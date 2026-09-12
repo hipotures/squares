@@ -323,29 +323,41 @@ separate Git directory, the exact lockfile read boundary, `OSError`, `MemoryErro
 SIGTERM, and SIGHUP. All three beads remain open for source-distinct re-review.
 
 The separate calibration implementation then received its own source-distinct review.
-It reproduced seven blockers, all repaired on the same integrated commit:
+It reproduced seven blockers, and the integrated repair commit addressed each one.
+A later source-distinct correction review at `d924a4bfff54fad8a039ae0cde2103a0e4817848`
+confirmed the CAL-1 and CAL-7 dispositions but reproduced five defects in the remaining
+contracts. Implementation commit `0533ebaeb90cf42acf20e0029535356282a5624c` addresses
+those five findings as follows:
 
 - `think-pk84` makes complete raw coverage, normalized bytes, all three complete routes,
   and their known-answer reconstruction mandatory for terminal success.
-- `think-bi3f` compares the complete generic dilation record to the exact n=2 oracle,
-  including canonical surds, source geometry, defining polynomials, proof fields, and
-  the outer summary.
-- `think-1kgu` uses the common exact-set reconstruction for partial interval and
-  dilation checkpoints, including deletion, substitution, published-last-row, and
-  unpublished-tail controls.
-- `think-lidy` applies SIGTERM, SIGHUP, launch-window, restoration, and group-reaping
-  behavior to the calibration supervisor.
-- `think-4wuj` keeps the receipt nonterminal through a deadline-bounded child readback,
-  bounds process-group observation by the remaining allowance, and makes success the
-  final write.
-- `think-1e9p` requires reconstructible CPU start/end observations and at least two
-  positive, error-free RSS samples; it retains sample order, observed and missing
-  phases, actual gaps, and leading and trailing unobserved intervals.
+- `think-bi3f` adds Condition 5′ to the exact dilation oracle and compares the oracle
+  positively with the real generic builder on a complete three-direction n=2 net.
+  Canonical surd, geometry, polynomial, proof, and outer-summary refusal controls remain
+  exact.
+- `think-1kgu` records dilation direction identities as string labels in the writer,
+  schema, and common reader.
+  Real partial readback accepts a valid set and rejects substitution, deletion, a last
+  row outside the published set, and a malformed unpublished tail.
+- `think-lidy` applies the launch-window deferral and cleanup contract to SIGINT as well
+  as SIGTERM and SIGHUP. The real-process control checks signal provenance, restoration
+  and invocation of the prior SIGINT handler, and disappearance of the owned worker.
+- `think-4wuj` leaves the durable receipt partial while terminal validation and
+  serialization prepare staged bytes.
+  Fresh cancellation and deadline checks precede the one atomic replace, and a
+  post-replace check revokes success if that operating system boundary returns late.
+  The receipt gives the terminal-admission duration a narrow scope through the first
+  validated terminal serialization and staging.
+  The second staging that embeds that duration and the atomic replacement remain
+  excluded.
+- `think-1e9p` reconstructs the count of positive, error-free RSS observations and
+  requires at least two; sample count and a positive peak alone no longer suffice.
 - `think-th5z` binds workers, allowances, grace, monotonic origin and deadlines, run
   metadata, and implementation revision to the seed, worker, and independent reader.
 
-The combined target-free calibration and fixed-core suites pass 170 tests in 18.44
-seconds on Python 3.14; focused Ruff and BasedPyright checks report zero findings.
+The combined target-free calibration and fixed-core suites pass 177 tests in 18.07
+seconds on Python 3.14. Repository-wide Ruff formatting and lint checks and BasedPyright
+report zero findings, and `packing-validate --edit` passes in 50.83 seconds.
 The exact n=2 fixture and its 14,404-row full profile shape are unchanged.
 The seven calibration beads remain open pending source-distinct review, after which the
 three fresh calibration profiles and their independent readback are still required.
@@ -410,9 +422,9 @@ Decimal renderings used 70-digit `Decimal` arithmetic after exact decisions.
 
 All those target-free mathematical checks passed.
 The implementation review and its first re-review found the preflight blockers listed in
-Section 6. The integrated repair’s combined calibration and fixed-core suite passes 170
-tests, and focused Ruff and BasedPyright checks report zero findings.
-A source-distinct review of `d6bbe20172d4048a9f156b1c3c4fcfe8f1b64014` and the three
+Section 6. The correction repair’s combined calibration and fixed-core suite passes 177
+tests, and repository-wide Ruff and BasedPyright checks report zero findings.
+A source-distinct re-review of `0533ebaeb90cf42acf20e0029535356282a5624c` and the three
 full-shape calibration profiles with independent readback remain unrun.
 BC329 coverage, normalization by its measured minimum, two-route retention, and
 dilation-source replay remain unrun.

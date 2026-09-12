@@ -434,26 +434,39 @@ There is no new `n=11` claim in these outputs.
 ## Remaining Gaps and Source Map
 
 No mathematical obstruction was found to this fixture.
-Operational admission is still unmeasured.
-Before closing the calibration work, resolve these concrete gaps:
+The calibration-only producer, reader, frozen fixture, exact witness checks, common
+partial readers, and refusal controls now exist.
+A source-distinct correction review of `d924a4bfff54fad8a039ae0cde2103a0e4817848`
+accepted the CAL-1 and CAL-7 repairs but reproduced five remaining defects under
+`think-bi3f`, `think-1kgu`, `think-lidy`, `think-4wuj`, and `think-1e9p`.
 
-- Implement a calibration-only producer and reader without reopening the scientific
-  state machine to arbitrary fixtures or forged source identities.
-- Freeze the fixture and oracle before its first measurement; implement exact witness
-  checks and the negative controls as maintained tools/tests.
-- Complete bounded parent preflight and exact partial direction-set recording in the
-  common lifecycle used by the admitted command.
+Implementation commit `0533ebaeb90cf42acf20e0029535356282a5624c` adds the missing
+Condition 5′ oracle field and a real small-net builder comparison; makes dilation labels
+consistent across producer, schema, and common reader; protects the SIGINT launch
+window; stages terminal bytes behind fresh deadline and cancellation checks; and
+requires two reconstructed positive, error-free RSS observations.
+Its combined target-free calibration and fixed-core suites pass 177 tests in 18.07
+seconds on Python 3.14. Repository-wide Ruff formatting and lint checks and BasedPyright
+report zero findings, and `packing-validate --edit` passes in 50.83 seconds.
+These are author-run implementation controls, not source-distinct admission or
+host-profile evidence.
+
+Operational admission remains unmeasured.
+Before closing the calibration work:
+
+- Obtain a source-distinct re-review of the correction commit and keep the seven CAL
+  beads open until that review records its dispositions.
 - Run at least three fresh repetitions of the intended profile, retaining complete
   metrics and all 14,404 direction rows per run.
-- Obtain the source-distinct admission record before any BC329 registration.
+- Admit those receipts through source-distinct readback before any BC329 registration.
 
-Integration also remains gated on the four common preflight repairs tracked as
-`think-rvhu`, `think-fmju`, `think-42zc`, and `think-5fdx`: literal Git exclusion and
-tracked-path overlap semantics; operational classification of transient Git, OS, and
-launch failures; a fresh remaining-time calculation across the launch boundary; and
-supervisor cancellation, signal, and process-group reaping semantics.
-The separate calibration command does not resolve those scientific preflight
-obligations, even where it applies the same conservative rule locally.
+The common target-free preflight repairs are retained in integrated commit
+`d6bbe20172d4048a9f156b1c3c4fcfe8f1b64014`. They cover `think-rvhu`, `think-fmju`,
+`think-42zc`, `think-5fdx`, `think-g7vg`, and `think-pvmv`: literal Git pathspec and
+tracked-output overlap handling; operational lockfile and launch-failure taxonomy; fresh
+time calculations across launch; resolved Git administrative-directory refusal; and
+signal cleanup. Those beads also remain open for their requested source-distinct
+re-review. The calibration command cannot supply that independent review.
 
 The reviewed sources were:
 
