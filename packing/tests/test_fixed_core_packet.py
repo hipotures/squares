@@ -1479,6 +1479,64 @@ def test_source_manifest_refuses_a_stale_revision() -> None:
         source_manifest(REPOSITORY, REVISION)
 
 
+def test_source_manifest_allows_only_the_supervised_result_directory(
+    tmp_path: Path,
+) -> None:
+    repository = tmp_path / "repository"
+    for relative, data in ((SOURCE_PATH, SOURCE), (T026_PATH, T026_BYTES)):
+        path = repository / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(data)
+    subprocess.run(("git", "init", "-q", str(repository)), check=True)
+    subprocess.run(("git", "-C", str(repository), "add", "."), check=True)
+    subprocess.run(
+        (
+            "git",
+            "-C",
+            str(repository),
+            "-c",
+            "user.name=Fixed Core Test",
+            "-c",
+            "user.email=fixed-core@example.invalid",
+            "commit",
+            "-qm",
+            "fixture",
+        ),
+        check=True,
+    )
+    revision = subprocess.run(
+        ("git", "-C", str(repository), "rev-parse", "HEAD"),
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    result_directory = repository / "result"
+    result_directory.mkdir()
+    (result_directory / "result.json").write_text("preflight\n")
+
+    with (
+        patch(
+            "devtools.fixed_core_packet.discover_implementation_paths",
+            return_value=(SOURCE_PATH, T026_PATH),
+        ),
+        patch("devtools.fixed_core_packet._validate_loaded_modules"),
+    ):
+        manifest = source_manifest(
+            repository,
+            revision,
+            result_directory=result_directory,
+        )
+        assert {row["path"] for row in manifest} == {SOURCE_PATH, T026_PATH}
+
+        (repository / "unrelated.txt").write_text("dirty\n")
+        with pytest.raises(PacketError, match="checkout must be clean"):
+            source_manifest(
+                repository,
+                revision,
+                result_directory=result_directory,
+            )
+
+
 @pytest.mark.parametrize("constant", ["NaN", "Infinity", "-Infinity"])
 def test_strict_json_refuses_nonstandard_numeric_constants(constant: str) -> None:
     with pytest.raises(PacketError, match="nonstandard JSON constant"):
@@ -1531,6 +1589,54 @@ def test_direct_worker_requires_parent_deadline_attestation(tmp_path: Path) -> N
                 "--external-seconds",
                 "2",
             ]
+        )
+
+
+def test_parent_launches_supervised_preflight_before_source_or_runtime_work(
+    tmp_path: Path,
+) -> None:
+    output = tmp_path / "result"
+    with (
+        patch(
+            "devtools.fixed_core_packet.source_manifest",
+            side_effect=AssertionError("parent ran source preflight"),
+        ),
+        patch(
+            "devtools.fixed_core_packet.runtime_binding",
+            side_effect=AssertionError("parent ran runtime preflight"),
+        ),
+        patch("devtools.fixed_core_packet.supervise_worker", return_value=1) as supervisor,
+    ):
+        assert (
+            main(
+                [
+                    "--repository",
+                    str(REPOSITORY),
+                    "--expect-implementation-revision",
+                    REVISION,
+                    "--output-dir",
+                    str(output),
+                    "--scientific-seconds",
+                    "10",
+                    "--external-seconds",
+                    "20",
+                ]
+            )
+            == 1
+        )
+
+    command = supervisor.call_args.args[0]
+    assert "--worker" in command
+    receipt = cast(dict[str, object], json.loads((output / "result.json").read_text()))
+    fixed_core_packet.validate_preflight_document(receipt)
+    assert receipt["status"] == "partial"
+    assert receipt["outcome"] == "preflight-pending"
+    assert receipt["scientific_decision"] == "unresolved"
+    with pytest.raises(PacketError, match="closed packet schema"):
+        load_result(
+            output,
+            repository=REPOSITORY,
+            expected_revision=REVISION,
         )
 
 
@@ -1705,9 +1811,67 @@ def test_supervisor_refuses_to_launch_after_parent_deadline(tmp_path: Path) -> N
     assert cast(dict[str, object], saved["supervision"])["status"] == ("deadline-before-launch")
 
 
+def test_preflight_launch_failure_is_retained_as_operational_and_unresolved(
+    tmp_path: Path,
+) -> None:
+    result = tmp_path / "result.json"
+    fixed_core_packet.write_result(
+        result,
+        fixed_core_packet.initial_preflight_document(
+            REVISION,
+            workers=1,
+            scientific_seconds=10.0,
+            external_seconds=20.0,
+            grace_seconds=2.0,
+        ),
+    )
+    with (
+        patch(
+            "devtools.fixed_core_packet.subprocess.Popen",
+            side_effect=OSError("synthetic launch failure"),
+        ),
+        patch("devtools.fixed_core_packet.time.perf_counter", side_effect=[11.0, 12.0]),
+    ):
+        assert (
+            supervise_worker(
+                ("worker",),
+                result,
+                external_seconds=20.0,
+                grace_seconds=2.0,
+                invocation_started=10.0,
+                external_deadline=30.0,
+            )
+            == 1
+        )
+
+    receipt = cast(dict[str, object], json.loads(result.read_text()))
+    fixed_core_packet.validate_preflight_document(receipt)
+    assert receipt["status"] == "partial"
+    assert receipt["outcome"] == "preflight-failed"
+    assert receipt["scientific_decision"] == "unresolved"
+    assert receipt["error"] == "worker process launch failed: synthetic launch failure"
+    assert cast(dict[str, object], receipt["supervision"]) == {
+        "status": "launch-failed",
+        "worker_exit_status": None,
+    }
+
+
 @pytest.mark.skipif(sys.platform == "win32", reason="POSIX process groups are required")
-def test_real_process_group_termination_reaps_a_grandchild(tmp_path: Path) -> None:
+def test_stalled_preflight_process_group_termination_reaps_a_grandchild(
+    tmp_path: Path,
+) -> None:
     pids = tmp_path / "pids"
+    result = tmp_path / "result.json"
+    fixed_core_packet.write_result(
+        result,
+        fixed_core_packet.initial_preflight_document(
+            REVISION,
+            workers=1,
+            scientific_seconds=0.25,
+            external_seconds=0.5,
+            grace_seconds=2.0,
+        ),
+    )
     program = (
         "import os,signal,subprocess,sys; from pathlib import Path; "
         "child=subprocess.Popen([sys.executable,'-c','import signal; signal.pause()']); "
@@ -1718,7 +1882,7 @@ def test_real_process_group_termination_reaps_a_grandchild(tmp_path: Path) -> No
     assert (
         supervise_worker(
             (sys.executable, "-c", program),
-            tmp_path / "missing.json",
+            result,
             external_seconds=0.5,
             grace_seconds=2.0,
         )
@@ -1728,6 +1892,15 @@ def test_real_process_group_termination_reaps_a_grandchild(tmp_path: Path) -> No
     for pid in (leader, child):
         with pytest.raises(ProcessLookupError):
             os.kill(pid, 0)
+    receipt = cast(dict[str, object], json.loads(result.read_text()))
+    fixed_core_packet.validate_preflight_document(receipt)
+    assert receipt["status"] == "partial"
+    assert receipt["outcome"] == "preflight-timeout"
+    assert receipt["scientific_decision"] == "unresolved"
+    assert "external deadline" in cast(str, receipt["error"])
+    assert cast(dict[str, object], receipt["supervision"])["status"] == (
+        "deadline-terminated"
+    )
 
 
 @pytest.mark.skipif(sys.platform == "win32", reason="POSIX process groups are required")
@@ -2144,6 +2317,51 @@ def test_child_source_race_reclassifies_the_seed_as_invalid(tmp_path: Path) -> N
     assert saved["error"] == "synthetic source race"
     clocks = cast(dict[str, object], saved["clocks"])
     assert clocks["process_seconds"] == 1.0
+
+
+def test_preflight_source_failure_is_retained_without_a_packet_receipt(
+    tmp_path: Path,
+) -> None:
+    output = tmp_path / "preflight-source-failure"
+    output.mkdir()
+    fixed_core_packet.write_result(
+        output / "result.json",
+        fixed_core_packet.initial_preflight_document(
+            REVISION,
+            workers=1,
+            scientific_seconds=10.0,
+            external_seconds=20.0,
+            grace_seconds=2.0,
+        ),
+    )
+    with (
+        patch(
+            "devtools.fixed_core_packet.source_manifest",
+            side_effect=PacketError("synthetic source preflight failure"),
+        ),
+        patch("devtools.fixed_core_packet.time.perf_counter", side_effect=[10.0, 11.0]),
+    ):
+        status = run_worker(
+            REPOSITORY,
+            REVISION,
+            output,
+            workers=1,
+            scientific_seconds=10.0,
+            external_seconds=20.0,
+            grace_seconds=2.0,
+        )
+
+    assert status == 2
+    receipt = cast(dict[str, object], json.loads((output / "result.json").read_text()))
+    fixed_core_packet.validate_preflight_document(receipt)
+    assert receipt["status"] == "invalid"
+    assert receipt["outcome"] == "preflight-invalid"
+    assert receipt["scientific_decision"] == "unresolved"
+    assert receipt["error"] == "synthetic source preflight failure"
+    assert receipt["clocks"] == {
+        "process_seconds": 1.0,
+        "external_lifetime_seconds": None,
+    }
 
 
 def test_worker_republishes_complete_receipt_after_readback_with_end_to_end_clock(

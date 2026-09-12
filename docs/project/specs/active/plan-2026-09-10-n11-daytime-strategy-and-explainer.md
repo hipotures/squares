@@ -286,11 +286,13 @@ It binds its source and runtime, runs bounded raw and exact schedulers, records
 coordinator-observed direction evidence, and supervises the worker process group under a
 hard deadline. Target-free controls pass and an independent source review found no
 acceptance-safety blocker in the current implementation.
-The parent-side Git, runtime, and source preflight still needs a bounded clock before
-target registration.
-Atomic replacement prevents a reader from seeing half-written JSON after an ordinary
-worker failure or termination; the runner makes no host-crash or power-loss durability
-claim.
+The Git, runtime, and source preflight now runs inside the supervised worker process
+group, under deadlines that begin at the parent invocation.
+A timeout, launch failure, or source or runtime violation leaves a closed preflight
+receipt with `scientific_decision="unresolved"`; only successful preflight can publish
+the packet schema. Atomic replacement prevents a reader from seeing half-written JSON
+after an ordinary worker failure or termination; the runner makes no host-crash or
+power-loss durability claim.
 Admission uses a separate `fixed-core-packet-calibration/v1` receipt and a frozen,
 analytically solved fixture unrelated to BC329. The full-shape control runs all four
 generic routes and 14,404 direction records, but its schema cannot express a scientific

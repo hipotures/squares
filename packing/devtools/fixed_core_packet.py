@@ -100,8 +100,18 @@ DEFAULT_GRACE_SECONDS = 2.0
 MAX_WORKERS = 4
 IN_FLIGHT_WORK_PER_WORKER = 2
 STRIF_ATOMIC_UID_LENGTH = 13
-RESULT_SCHEMA = "fixed-core-threshold-packet/v2"
+RESULT_SCHEMA = "fixed-core-threshold-packet/v3"
+PREFLIGHT_SCHEMA = "fixed-core-threshold-packet-preflight/v1"
 NORMALIZATION_SETTING = "alpha=1/m after complete strict acceptance"
+SCIENTIFIC_DEADLINE_SCOPE = (
+    "parent invocation through supervised source and runtime preflight, source replay, "
+    "all retaining readers, publication, and independent readback; expiration revokes "
+    "acceptance"
+)
+EXTERNAL_DEADLINE_SCOPE = (
+    "parent invocation through supervised worker process-group termination; the "
+    "termination grace follows the deadline"
+)
 RUNTIME_ATTESTATION_SCOPE = (
     "source and observed runtime identities for this execution; no interpreter-binary, "
     "installed-wheel, operating-system, CPU, scheduling, or cross-host byte-equivalence "
@@ -378,7 +388,10 @@ def _validate_loaded_modules(repository: Path, paths: Sequence[str]) -> None:
 
 
 def source_manifest(
-    repository: Path, revision: str, *, permit_result_files: bool = False
+    repository: Path,
+    revision: str,
+    *,
+    result_directory: Path | None = None,
 ) -> list[dict[str, str]]:
     """Bind the exact source and recursive implementation closure to one clean revision."""
 
@@ -392,7 +405,20 @@ def source_manifest(
     changed = _git(repository, "status", "--porcelain", "--", *paths)
     if changed:
         raise PacketError("fixed source or implementation closure is not clean")
-    if not permit_result_files and _git(repository, "status", "--porcelain"):
+    status_arguments = ["status", "--porcelain", "--untracked-files=all"]
+    if result_directory is not None:
+        resolved_result = result_directory.resolve()
+        if resolved_result.is_relative_to(repository):
+            relative_result = resolved_result.relative_to(repository).as_posix()
+            status_arguments.extend(
+                (
+                    "--",
+                    ".",
+                    f":(exclude,top){relative_result}",
+                    f":(exclude,top){relative_result}/**",
+                )
+            )
+    if _git(repository, *status_arguments):
         raise PacketError("instrument checkout must be clean before the run")
     tracked = set(
         _git(repository, "ls-tree", "-r", "--name-only", revision, "--", *paths).splitlines()
@@ -1114,6 +1140,63 @@ def run_dilation_replay(
         ) from error
 
 
+def _deadline_settings(
+    *,
+    workers: int,
+    scientific_seconds: float,
+    external_seconds: float,
+    grace_seconds: float,
+) -> dict[str, object]:
+    return {
+        "workers": workers,
+        "scientific_seconds": scientific_seconds,
+        "scientific_deadline_scope": SCIENTIFIC_DEADLINE_SCOPE,
+        "external_seconds": external_seconds,
+        "external_deadline_scope": EXTERNAL_DEADLINE_SCOPE,
+        "termination_grace_seconds": grace_seconds,
+    }
+
+
+def initial_preflight_document(
+    revision: str,
+    *,
+    workers: int,
+    scientific_seconds: float,
+    external_seconds: float,
+    grace_seconds: float,
+) -> dict[str, object]:
+    """Seed the only receipt available until supervised source preflight completes."""
+
+    return {
+        "schema": PREFLIGHT_SCHEMA,
+        "status": "partial",
+        "outcome": "preflight-pending",
+        "scientific_decision": "unresolved",
+        "claim_limit": CLAIM_LIMIT,
+        "sources": {
+            "implementation_revision": revision,
+            "source_path": SOURCE_PATH,
+            "t026_path": T026_PATH,
+        },
+        "settings": _deadline_settings(
+            workers=workers,
+            scientific_seconds=scientific_seconds,
+            external_seconds=external_seconds,
+            grace_seconds=grace_seconds,
+        ),
+        "clocks": {
+            "process_seconds": 0.0,
+            "external_lifetime_seconds": None,
+        },
+        "supervision": {
+            "status": "pending",
+            "worker_exit_status": None,
+        },
+        "phase": "preflight",
+        "error": "source and runtime preflight has not completed",
+    }
+
+
 def _initial_document(
     revision: str,
     manifest: list[dict[str, str]],
@@ -1154,18 +1237,12 @@ def _initial_document(
             "half_gap_tangent": str(PACKET_HALF_GAP),
             "raw_threshold_M_over_11": str(RAW_THRESHOLD),
             "normalization": NORMALIZATION_SETTING,
-            "workers": workers,
-            "scientific_seconds": scientific_seconds,
-            "scientific_deadline_scope": (
-                "worker invocation through source binding and replay, all readers, "
-                "publication, and independent readback"
+            **_deadline_settings(
+                workers=workers,
+                scientific_seconds=scientific_seconds,
+                external_seconds=external_seconds,
+                grace_seconds=grace_seconds,
             ),
-            "external_seconds": external_seconds,
-            "external_deadline_scope": (
-                "worker process lifetime through process-group termination; the "
-                "termination grace follows the deadline"
-            ),
-            "termination_grace_seconds": grace_seconds,
         },
         "clocks": {
             "source_seconds": 0.0,
@@ -1314,6 +1391,165 @@ def _is_raw_normalization_checkpoint(
         ("partial", "incomplete", "incomplete"),
         ("invalid", "invalid", "invalid"),
     }
+
+
+def validate_preflight_document(document: dict[str, object]) -> None:
+    """Validate a non-scientific receipt from the supervised preflight interval."""
+
+    if set(document) != {
+        "schema",
+        "status",
+        "outcome",
+        "scientific_decision",
+        "claim_limit",
+        "sources",
+        "settings",
+        "clocks",
+        "supervision",
+        "phase",
+        "error",
+    } or document.get("schema") != PREFLIGHT_SCHEMA:
+        raise PacketError("document does not match the closed preflight schema")
+    if (
+        document.get("claim_limit") != CLAIM_LIMIT
+        or document.get("scientific_decision") != "unresolved"
+        or document.get("phase") != "preflight"
+    ):
+        raise PacketError("preflight receipt changed its scientific scope")
+    state = (document.get("status"), document.get("outcome"))
+    if state not in {
+        ("partial", "preflight-pending"),
+        ("partial", "preflight-timeout"),
+        ("partial", "preflight-failed"),
+        ("invalid", "preflight-invalid"),
+    }:
+        raise PacketError("preflight receipt has an impossible state")
+    if not isinstance(document.get("error"), str) or not document["error"]:
+        raise PacketError("preflight receipt lacks its unresolved reason")
+
+    sources = document.get("sources")
+    if not isinstance(sources, dict) or set(sources) != {
+        "implementation_revision",
+        "source_path",
+        "t026_path",
+    }:
+        raise PacketError("preflight source fields do not match the closed schema")
+    revision = sources.get("implementation_revision")
+    if (
+        not isinstance(revision, str)
+        or len(revision) != 40
+        or any(character not in "0123456789abcdef" for character in revision)
+        or sources.get("source_path") != SOURCE_PATH
+        or sources.get("t026_path") != T026_PATH
+    ):
+        raise PacketError("preflight source request is malformed")
+
+    settings = document.get("settings")
+    if not isinstance(settings, dict) or set(settings) != {
+        "workers",
+        "scientific_seconds",
+        "scientific_deadline_scope",
+        "external_seconds",
+        "external_deadline_scope",
+        "termination_grace_seconds",
+    }:
+        raise PacketError("preflight settings do not match the closed schema")
+    workers = settings.get("workers")
+    scientific = settings.get("scientific_seconds")
+    external = settings.get("external_seconds")
+    grace = settings.get("termination_grace_seconds")
+    if (
+        type(workers) is not int
+        or not 1 <= cast(int, workers) <= MAX_WORKERS
+        or not isinstance(scientific, (int, float))
+        or isinstance(scientific, bool)
+        or not isinstance(external, (int, float))
+        or isinstance(external, bool)
+        or not isinstance(grace, (int, float))
+        or isinstance(grace, bool)
+        or not all(math.isfinite(float(value)) for value in (scientific, external, grace))
+        or not 0 < scientific <= external
+        or grace <= 0
+        or settings.get("scientific_deadline_scope") != SCIENTIFIC_DEADLINE_SCOPE
+        or settings.get("external_deadline_scope") != EXTERNAL_DEADLINE_SCOPE
+    ):
+        raise PacketError("preflight deadline settings are malformed")
+
+    clocks = document.get("clocks")
+    if not isinstance(clocks, dict) or set(clocks) != {
+        "process_seconds",
+        "external_lifetime_seconds",
+    }:
+        raise PacketError("preflight clocks do not match the closed schema")
+    process_seconds = clocks.get("process_seconds")
+    external_lifetime = clocks.get("external_lifetime_seconds")
+    if (
+        not isinstance(process_seconds, (int, float))
+        or isinstance(process_seconds, bool)
+        or not math.isfinite(process_seconds)
+        or process_seconds < 0
+        or (
+            external_lifetime is not None
+            and (
+                not isinstance(external_lifetime, (int, float))
+                or isinstance(external_lifetime, bool)
+                or not math.isfinite(external_lifetime)
+                or external_lifetime < 0
+            )
+        )
+    ):
+        raise PacketError("preflight clocks are malformed")
+
+    supervision = document.get("supervision")
+    if not isinstance(supervision, dict) or set(supervision) != {
+        "status",
+        "worker_exit_status",
+    }:
+        raise PacketError("preflight supervision fields do not match the closed schema")
+    supervision_status = supervision.get("status")
+    worker_status = supervision.get("worker_exit_status")
+    if supervision_status not in {
+        "pending",
+        "observed-exit",
+        "deadline-before-launch",
+        "deadline-terminated",
+        "launch-failed",
+        "supervisor-interrupted",
+    } or (worker_status is not None and type(worker_status) is not int):
+        raise PacketError("preflight supervision is malformed")
+    if supervision_status == "pending" and (
+        worker_status is not None or external_lifetime is not None
+    ):
+        raise PacketError("pending preflight supervision carries a completed observation")
+    if supervision_status != "pending" and external_lifetime is None:
+        raise PacketError("completed preflight supervision lacks external lifetime")
+    if supervision_status == "observed-exit" and worker_status is None:
+        raise PacketError("observed preflight exit lacks its status")
+    if supervision_status in {"deadline-before-launch", "launch-failed"} and (
+        worker_status is not None
+    ):
+        raise PacketError("prelaunch supervision cannot carry a worker exit status")
+    if state == ("partial", "preflight-pending") and supervision_status != "pending":
+        raise PacketError("completed supervision retained a pending preflight state")
+    if state == ("partial", "preflight-timeout") and supervision_status not in {
+        "deadline-before-launch",
+        "deadline-terminated",
+    }:
+        raise PacketError("preflight timeout lacks deadline supervision")
+    if state == ("partial", "preflight-failed") and supervision_status not in {
+        "pending",
+        "observed-exit",
+        "launch-failed",
+        "supervisor-interrupted",
+    }:
+        raise PacketError("preflight failure has incompatible supervision")
+    if state == ("invalid", "preflight-invalid") and supervision_status not in {
+        "pending",
+        "observed-exit",
+        "deadline-terminated",
+        "supervisor-interrupted",
+    }:
+        raise PacketError("invalid preflight has incompatible supervision")
 
 
 def validate_result_document(document: dict[str, object]) -> None:  # noqa: C901
@@ -1550,16 +1786,8 @@ def validate_result_document(document: dict[str, object]) -> None:  # noqa: C901
         or settings.get("half_gap_tangent") != str(PACKET_HALF_GAP)
         or settings.get("raw_threshold_M_over_11") != str(RAW_THRESHOLD)
         or settings.get("normalization") != NORMALIZATION_SETTING
-        or settings.get("scientific_deadline_scope")
-        != (
-            "worker invocation through source binding and replay, all readers, "
-            "publication, and independent readback"
-        )
-        or settings.get("external_deadline_scope")
-        != (
-            "worker process lifetime through process-group termination; the "
-            "termination grace follows the deadline"
-        )
+        or settings.get("scientific_deadline_scope") != SCIENTIFIC_DEADLINE_SCOPE
+        or settings.get("external_deadline_scope") != EXTERNAL_DEADLINE_SCOPE
     ):
         raise PacketError("fixed packet settings changed")
     workers = settings.get("workers")
@@ -1984,7 +2212,10 @@ def validate_result_document(document: dict[str, object]) -> None:  # noqa: C901
 
 
 def write_result(path: Path, document: dict[str, object]) -> None:
-    validate_result_document(document)
+    if document.get("schema") == PREFLIGHT_SCHEMA:
+        validate_preflight_document(document)
+    else:
+        validate_result_document(document)
     atomic_write_text(path, json.dumps(document, indent=2, allow_nan=False) + "\n")
 
 
@@ -3209,7 +3440,11 @@ def load_result(
     sources = _source_record(document)
     if sources.get("implementation_revision") != expected_revision:
         raise PacketError("result revision differs from the requested readback revision")
-    manifest = source_manifest(repository, expected_revision, permit_result_files=True)
+    manifest = source_manifest(
+        repository,
+        expected_revision,
+        result_directory=output_dir,
+    )
     if sources.get("manifest") != manifest:
         raise PacketError("result source or implementation manifest differs on readback")
     if sources.get("runtime") != runtime_binding(repository):
@@ -3403,6 +3638,15 @@ def prepare_output_dir(output_dir: Path, repository: Path) -> Path:
     return resolved
 
 
+def _supervision_receipt(path: Path) -> tuple[dict[str, object], bool]:
+    document = _strict_json(path)
+    if document.get("schema") == PREFLIGHT_SCHEMA:
+        validate_preflight_document(document)
+        return document, True
+    validate_result_document(document)
+    return document, False
+
+
 def _record_external_timeout(
     path: Path,
     error: str,
@@ -3419,9 +3663,32 @@ def _record_external_timeout(
     """Record an outer kill without erasing a valid invalid-run classification."""
 
     try:
-        document = _strict_json(path)
-        validate_result_document(document)
+        document, preflight = _supervision_receipt(path)
     except PacketError:
+        return
+    if preflight:
+        cast(dict[str, object], document["clocks"])["external_lifetime_seconds"] = elapsed
+        cast(dict[str, object], document["supervision"]).update(
+            {
+                "status": supervision_status,
+                "worker_exit_status": worker_status,
+            }
+        )
+        if document["status"] != "invalid":
+            timeout = supervision_status in {
+                "deadline-before-launch",
+                "deadline-terminated",
+            }
+            document.update(
+                {
+                    "status": "partial",
+                    "outcome": "preflight-timeout" if timeout else "preflight-failed",
+                    "scientific_decision": "unresolved",
+                    "phase": "preflight",
+                    "error": error,
+                }
+            )
+        write_result(path, document)
         return
     preserve_classification = document["status"] == "invalid" or (
         document["status"] == "partial"
@@ -3458,14 +3725,27 @@ def _record_worker_exit(path: Path, status: int, elapsed: float) -> None:
     """Attest a worker exit and preserve only classifications its exit supports."""
 
     try:
-        document = _strict_json(path)
-        validate_result_document(document)
+        document, preflight = _supervision_receipt(path)
     except PacketError:
         return
     cast(dict[str, object], document["clocks"])["external_lifetime_seconds"] = elapsed
     cast(dict[str, object], document["supervision"]).update(
         {"status": "observed-exit", "worker_exit_status": status}
     )
+    if preflight:
+        expected = 2 if document["status"] == "invalid" else 1
+        if document["outcome"] == "preflight-pending" or status != expected:
+            document.update(
+                {
+                    "status": "partial",
+                    "outcome": "preflight-failed",
+                    "scientific_decision": "unresolved",
+                    "phase": "preflight",
+                    "error": f"worker exited before completing preflight with status {status}",
+                }
+            )
+        write_result(path, document)
+        return
     expected = (
         0 if document["status"] == "complete" else 2 if document["status"] == "invalid" else 1
     )
@@ -3587,7 +3867,48 @@ def supervise_worker(
         raise
 
 
-def run_worker(  # noqa: PLR0911
+def _record_worker_failure(
+    path: Path,
+    *,
+    error: str,
+    elapsed: float,
+    invalid: bool,
+) -> bool:
+    """Retain a worker failure in whichever closed receipt schema is available."""
+
+    try:
+        document, preflight = _supervision_receipt(path)
+    except PacketError:
+        return False
+    if preflight:
+        document.update(
+            {
+                "status": "invalid" if invalid else "partial",
+                "outcome": "preflight-invalid" if invalid else "preflight-failed",
+                "scientific_decision": "unresolved",
+                "phase": "preflight",
+                "error": error,
+            }
+        )
+        cast(dict[str, object], document["clocks"])["process_seconds"] = elapsed
+    else:
+        document.update(
+            {
+                "status": "invalid" if invalid else "partial",
+                "outcome": "invalid" if invalid else "incomplete",
+                "scientific_decision": "unresolved",
+                "phase": "invalid" if invalid else "incomplete",
+                "error": error,
+            }
+        )
+        clocks = cast(dict[str, object], document["clocks"])
+        clocks["scientific_seconds"] = elapsed
+        clocks["process_seconds"] = elapsed
+    write_result(path, document)
+    return True
+
+
+def run_worker(
     repository: Path,
     revision: str,
     output_dir: Path,
@@ -3610,7 +3931,11 @@ def run_worker(  # noqa: PLR0911
         worker_started + external_seconds if external_deadline is None else external_deadline
     )
     try:
-        manifest = source_manifest(repository, revision, permit_result_files=True)
+        manifest = source_manifest(
+            repository,
+            revision,
+            result_directory=output_dir,
+        )
         runtime = runtime_binding(repository)
         source = (repository / SOURCE_PATH).read_bytes()
         t026 = (repository / T026_PATH).read_bytes()
@@ -3628,47 +3953,23 @@ def run_worker(  # noqa: PLR0911
             process_deadline=min(scientific_deadline, external_deadline),
             invocation_started=worker_started,
         )
-    except (PacketError, OSError, ValueError, TypeError) as error:
-        try:
-            document = _strict_json(output_dir / "result.json")
-            validate_result_document(document)
-        except PacketError:
-            return 2
-        document.update(
-            {
-                "status": "invalid",
-                "outcome": "invalid",
-                "scientific_decision": "unresolved",
-                "phase": "invalid",
-                "error": str(error),
-            }
-        )
-        clocks = cast(dict[str, object], document["clocks"])
+    except (PacketError, OSError, ValueError, TypeError, ImportError) as error:
         elapsed = time.perf_counter() - worker_started
-        clocks["scientific_seconds"] = elapsed
-        clocks["process_seconds"] = elapsed
-        write_result(output_dir / "result.json", document)
+        _record_worker_failure(
+            output_dir / "result.json",
+            error=str(error),
+            elapsed=elapsed,
+            invalid=True,
+        )
         return 2
     except Exception as error:  # noqa: BLE001 -- operational failures retain partial evidence
-        try:
-            document = _strict_json(output_dir / "result.json")
-            validate_result_document(document)
-        except PacketError:
-            return 1
-        document.update(
-            {
-                "status": "partial",
-                "outcome": "incomplete",
-                "scientific_decision": "unresolved",
-                "phase": "incomplete",
-                "error": f"unexpected worker failure: {type(error).__name__}: {error}",
-            }
-        )
-        clocks = cast(dict[str, object], document["clocks"])
         elapsed = time.perf_counter() - worker_started
-        clocks["scientific_seconds"] = elapsed
-        clocks["process_seconds"] = elapsed
-        write_result(output_dir / "result.json", document)
+        _record_worker_failure(
+            output_dir / "result.json",
+            error=f"unexpected worker failure: {type(error).__name__}: {error}",
+            elapsed=elapsed,
+            invalid=False,
+        )
         return 1
     if document["status"] == "complete":
         try:
@@ -3745,6 +4046,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     options = _parser().parse_args(argv)
     repository = options.repository.resolve()
     revision = cast(str, options.expect_implementation_revision)
+    if len(revision) != 40 or any(c not in "0123456789abcdef" for c in revision):
+        raise PacketError("expected revision must be 40 lowercase hexadecimal digits")
     if not 1 <= options.workers <= MAX_WORKERS:
         raise PacketError(f"workers must be between 1 and {MAX_WORKERS}")
     if not all(
@@ -3801,19 +4104,14 @@ def main(argv: Sequence[str] | None = None) -> int:
         raise PacketError("parent-only invocation cannot accept inherited deadline fields")
     scientific_deadline = invocation_started + options.scientific_seconds
     external_deadline = invocation_started + options.external_seconds
-    manifest = source_manifest(repository, revision)
-    runtime = runtime_binding(repository)
     output = prepare_output_dir(options.output_dir, repository)
-    seed = _initial_document(
+    seed = initial_preflight_document(
         revision,
-        manifest,
-        runtime,
         workers=options.workers,
         scientific_seconds=options.scientific_seconds,
         external_seconds=options.external_seconds,
         grace_seconds=options.grace_seconds,
     )
-    seed["error"] = "worker has not completed source replay"
     write_result(output / "result.json", seed)
     command = [
         sys.executable,
@@ -3852,6 +4150,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 
 __all__ = [
+    "PREFLIGHT_SCHEMA",
     "ExactRoute",
     "IntervalRoute",
     "PackageRuntimeObservation",
@@ -3861,6 +4160,7 @@ __all__ = [
     "RuntimeObservation",
     "discover_implementation_paths",
     "execute_packet",
+    "initial_preflight_document",
     "load_packet_source",
     "load_result",
     "load_t026_reference",
@@ -3871,6 +4171,7 @@ __all__ = [
     "runtime_binding",
     "source_manifest",
     "supervise_worker",
+    "validate_preflight_document",
     "validate_result_document",
 ]
 
