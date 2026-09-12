@@ -47,6 +47,7 @@ from devtools.fixed_core_packet import (
     RawMinimum,
     RuntimeObservation,
     _direction_digest,
+    _reconstruct_dilation_directions,
     _reconstruct_exact_directions,
     _reconstruct_interval_directions,
     _reconstruct_raw_directions,
@@ -966,6 +967,201 @@ def test_interval_readback_refuses_missing_extra_and_mislabeled_rows(tmp_path: P
             )
 
 
+def test_partial_interval_readback_binds_a_sparse_set_and_validates_unpublished_tail(
+    tmp_path: Path,
+) -> None:
+    directory = tmp_path / "interval"
+    labels = ("0", "1", "1'", "2", "2'")
+    for label in ("0", "1'", "2"):
+        _write_row(directory, label, _interval_row_for(label))
+    receipt: dict[str, object] = {
+        "status": "partial",
+        "directions_completed": 2,
+        "completed_directions": ["0", "2"],
+        "last": _interval_row_for("2"),
+    }
+
+    assert (
+        _reconstruct_interval_directions(
+            directory, receipt, labels=labels, scale=10, complete=False
+        )
+        is None
+    )
+
+    tail = json.loads((directory / "1'.json").read_text())
+    tail["status"] = "forged"
+    _write_row(directory, "1'", tail)
+    with pytest.raises(PacketError, match="status"):
+        _reconstruct_interval_directions(
+            directory, receipt, labels=labels, scale=10, complete=False
+        )
+
+
+@pytest.mark.parametrize(
+    "completed_directions",
+    [
+        ["0"],
+        ["0", "0"],
+        ["2", "0"],
+        ["0", "missing"],
+    ],
+)
+def test_partial_interval_readback_refuses_noncanonical_or_mismatched_direction_sets(
+    tmp_path: Path, completed_directions: list[str]
+) -> None:
+    directory = tmp_path / "interval"
+    labels = ("0", "1", "2")
+    for label in labels:
+        _write_row(directory, label, _interval_row_for(label))
+    receipt: dict[str, object] = {
+        "status": "partial",
+        "directions_completed": 2,
+        "completed_directions": completed_directions,
+        "last": _interval_row_for("0"),
+    }
+
+    with pytest.raises(PacketError, match="completed directions"):
+        _reconstruct_interval_directions(
+            directory, receipt, labels=labels, scale=10, complete=False
+        )
+
+
+def test_partial_interval_last_row_must_belong_to_the_published_set(tmp_path: Path) -> None:
+    directory = tmp_path / "interval"
+    labels = ("0", "1", "2")
+    for label in labels:
+        _write_row(directory, label, _interval_row_for(label))
+    receipt: dict[str, object] = {
+        "status": "partial",
+        "directions_completed": 2,
+        "completed_directions": ["0", "1"],
+        "last": _interval_row_for("2"),
+    }
+
+    with pytest.raises(PacketError, match="published direction"):
+        _reconstruct_interval_directions(
+            directory, receipt, labels=labels, scale=10, complete=False
+        )
+
+
+def test_partial_interval_readback_refuses_a_missing_published_row_hidden_by_tail(
+    tmp_path: Path,
+) -> None:
+    directory = tmp_path / "interval"
+    labels = ("0", "1", "2")
+    for label in ("0", "1"):
+        _write_row(directory, label, _interval_row_for(label))
+    receipt: dict[str, object] = {
+        "status": "partial",
+        "directions_completed": 2,
+        "completed_directions": ["0", "2"],
+        "last": _interval_row_for("0"),
+    }
+
+    with pytest.raises(PacketError, match="were not retained"):
+        _reconstruct_interval_directions(
+            directory, receipt, labels=labels, scale=10, complete=False
+        )
+
+
+def _dilation_row(index: int, label: str) -> dict[str, object]:
+    return {"direction": index, "label": label, "minimum": "1"}
+
+
+def test_partial_dilation_readback_binds_sparse_labels_and_validates_unpublished_tail(
+    tmp_path: Path,
+) -> None:
+    directory = tmp_path / "dilation"
+    labels = ("zero", "one", "two", "three")
+    for index in (0, 1, 3):
+        _write_row(directory, str(index), _dilation_row(index, labels[index]))
+    receipt: dict[str, object] = {
+        "status": "partial",
+        "directions_completed": 2,
+        "completed_directions": ["zero", "three"],
+        "last": _dilation_row(3, "three"),
+    }
+
+    _reconstruct_dilation_directions(
+        directory, receipt, labels=labels, complete=False
+    )
+
+    tail = json.loads((directory / "1.json").read_text())
+    tail["minimum"] = "01"
+    _write_row(directory, "1", tail)
+    with pytest.raises(PacketError, match="canonical exact form"):
+        _reconstruct_dilation_directions(
+            directory, receipt, labels=labels, complete=False
+        )
+
+
+@pytest.mark.parametrize(
+    "completed_directions",
+    [
+        ["zero"],
+        ["zero", "zero"],
+        ["three", "zero"],
+        ["zero", "missing"],
+    ],
+)
+def test_partial_dilation_readback_refuses_noncanonical_or_mismatched_direction_sets(
+    tmp_path: Path, completed_directions: list[str]
+) -> None:
+    directory = tmp_path / "dilation"
+    labels = ("zero", "one", "two", "three")
+    for index, label in enumerate(labels):
+        _write_row(directory, str(index), _dilation_row(index, label))
+    receipt: dict[str, object] = {
+        "status": "partial",
+        "directions_completed": 2,
+        "completed_directions": completed_directions,
+        "last": _dilation_row(0, "zero"),
+    }
+
+    with pytest.raises(PacketError, match="completed directions"):
+        _reconstruct_dilation_directions(
+            directory, receipt, labels=labels, complete=False
+        )
+
+
+def test_partial_dilation_last_row_must_belong_to_the_published_set(tmp_path: Path) -> None:
+    directory = tmp_path / "dilation"
+    labels = ("zero", "one", "two")
+    for index, label in enumerate(labels):
+        _write_row(directory, str(index), _dilation_row(index, label))
+    receipt: dict[str, object] = {
+        "status": "partial",
+        "directions_completed": 2,
+        "completed_directions": ["zero", "one"],
+        "last": _dilation_row(2, "two"),
+    }
+
+    with pytest.raises(PacketError, match="published direction"):
+        _reconstruct_dilation_directions(
+            directory, receipt, labels=labels, complete=False
+        )
+
+
+def test_partial_dilation_readback_refuses_a_missing_published_row_hidden_by_tail(
+    tmp_path: Path,
+) -> None:
+    directory = tmp_path / "dilation"
+    labels = ("zero", "one", "two")
+    for index in (0, 1):
+        _write_row(directory, str(index), _dilation_row(index, labels[index]))
+    receipt: dict[str, object] = {
+        "status": "partial",
+        "directions_completed": 2,
+        "completed_directions": ["zero", "two"],
+        "last": _dilation_row(0, "zero"),
+    }
+
+    with pytest.raises(PacketError, match="were not retained"):
+        _reconstruct_dilation_directions(
+            directory, receipt, labels=labels, complete=False
+        )
+
+
 def test_partial_readback_uses_named_checkpoint_and_ignores_valid_unpublished_tail(
     tmp_path: Path,
 ) -> None:
@@ -1242,8 +1438,12 @@ def test_all_three_readers_bind_the_same_normalized_bytes(tmp_path: Path) -> Non
     routes = cast(dict[str, object], result["routes"])
     assert normalized["sha256"] == digest
     assert cast(dict[str, object], routes["exact"])["minimum"] == "1"
-    assert cast(dict[str, object], routes["reflected_interval"])["enclosure"] == ["1", "1"]
-    assert cast(dict[str, object], routes["dilation"])["source_sha256"] == digest
+    interval = cast(dict[str, object], routes["reflected_interval"])
+    dilation = cast(dict[str, object], routes["dilation"])
+    assert interval["enclosure"] == ["1", "1"]
+    assert dilation["source_sha256"] == digest
+    assert "completed_directions" not in interval
+    assert "completed_directions" not in dilation
 
 
 def test_route_disagreement_is_invalid_but_scientifically_unresolved(tmp_path: Path) -> None:
@@ -1292,9 +1492,42 @@ def test_interval_stall_is_incomplete_and_scientifically_unresolved(tmp_path: Pa
     assert result["scientific_decision"] == "unresolved"
 
 
+def test_interval_progress_publishes_canonical_completed_labels(tmp_path: Path) -> None:
+    def interrupted(_candidate, *, progress, log: Path, **_kwargs):
+        for label in ("2'", "0"):
+            outcome = fixed_core_packet.DirectionOutcome(
+                label,
+                "certified",
+                10,
+                10,
+                (1.25, 2.5),
+                1,
+                0,
+                budget_exhausted=False,
+            )
+            _write_row(log, label, _interval_row_for(label))
+            progress(outcome)
+        raise PacketDeadlineError("synthetic interval timeout")
+
+    _output, result = _execute(
+        tmp_path,
+        RAW_THRESHOLD + Fraction(1, 10**9),
+        interval_runner=interrupted,
+    )
+    assert result["status"] == "partial"
+    assert result["phase"] == "timeout"
+    interval = cast(
+        dict[str, object], cast(dict[str, object], result["routes"])["reflected_interval"]
+    )
+    assert interval["directions_completed"] == 2
+    assert interval["completed_directions"] == ["0", "2'"]
+    assert cast(dict[str, object], interval["last"])["label"] == "0"
+
+
 def test_dilation_progress_is_retained_before_a_deadline(tmp_path: Path) -> None:
     def interrupted(_path: Path, *, progress, **_kwargs):
-        progress(1, Fraction(1), "1")
+        progress(2, Fraction(1), "2")
+        progress(0, Fraction(1), "0")
         raise PacketDeadlineError("synthetic dilation timeout")
 
     output, result = _execute(
@@ -1305,10 +1538,11 @@ def test_dilation_progress_is_retained_before_a_deadline(tmp_path: Path) -> None
     assert result["status"] == "partial"
     assert result["phase"] == "timeout"
     dilation = cast(dict[str, object], cast(dict[str, object], result["routes"])["dilation"])
-    assert dilation["directions_completed"] == 1
-    assert cast(dict[str, object], dilation["last"])["direction"] == 1
-    row = json.loads((output / "dilation-directions" / "1.json").read_text())
-    assert row == {"direction": 1, "label": "1", "minimum": "1"}
+    assert dilation["directions_completed"] == 2
+    assert dilation["completed_directions"] == ["0", "2"]
+    assert cast(dict[str, object], dilation["last"])["direction"] == 0
+    row = json.loads((output / "dilation-directions" / "2.json").read_text())
+    assert row == {"direction": 2, "label": "2", "minimum": "1"}
 
 
 def test_raw_argmin_must_match_exact_admissible_membership_replay(tmp_path: Path) -> None:

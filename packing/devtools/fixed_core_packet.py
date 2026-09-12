@@ -1352,6 +1352,26 @@ def _completed_direction_indices(
     return tuple(indices)
 
 
+def _completed_direction_labels(
+    value: object,
+    *,
+    completed: int,
+    labels: Sequence[str],
+    label: str,
+) -> tuple[str, ...]:
+    if not isinstance(value, list) or len(value) != completed:
+        raise PacketError(f"{label} does not match its completed direction count")
+    positions = {direction_label: index for index, direction_label in enumerate(labels)}
+    if len(positions) != len(labels):
+        raise PacketError(f"{label} has duplicate labels in its canonical direction set")
+    if any(not isinstance(direction, str) or direction not in positions for direction in value):
+        raise PacketError(f"{label} contains an unknown direction")
+    directions = cast(list[str], value)
+    if directions != sorted(set(directions), key=positions.__getitem__):
+        raise PacketError(f"{label} is not canonical, ordered, and unique")
+    return tuple(directions)
+
+
 def _sha256(value: object, label: str) -> None:
     if (
         not isinstance(value, str)
@@ -2122,6 +2142,7 @@ def validate_result_document(document: dict[str, object]) -> None:  # noqa: C901
                 "source_sha256",
                 "directions_expected",
                 "directions_completed",
+                "completed_directions",
                 "last",
             }
         )
@@ -2150,8 +2171,23 @@ def validate_result_document(document: dict[str, object]) -> None:  # noqa: C901
             if type(interval.get("accepted")) is not bool:
                 raise PacketError("interval acceptance flag is malformed")
             _sha256(interval.get("directions_sha256"), "interval retained-direction digest")
-        elif not isinstance(interval.get("last"), dict):
-            raise PacketError("partial interval route lacks its last retained direction")
+        else:
+            interval_labels = tuple(str(index) for index in range(PACKET_STEPS + 1)) + tuple(
+                f"{index}'" for index in range(1, PACKET_STEPS + 1)
+            )
+            interval_completed_labels = _completed_direction_labels(
+                interval.get("completed_directions"),
+                completed=cast(int, interval_completed),
+                labels=interval_labels,
+                label="interval completed directions",
+            )
+            last = interval.get("last")
+            if not isinstance(last, dict):
+                raise PacketError("partial interval route lacks its last retained direction")
+            if last.get("label") not in interval_completed_labels:
+                raise PacketError(
+                    "partial interval last row is absent from completed directions"
+                )
     normalized_digest = normalized.get("sha256") if isinstance(normalized, dict) else None
     if isinstance(exact, dict) and exact.get("source_sha256") != normalized_digest:
         raise PacketError("exact route names different normalized bytes")
@@ -2182,6 +2218,7 @@ def validate_result_document(document: dict[str, object]) -> None:  # noqa: C901
                 "source_sha256",
                 "directions_expected",
                 "directions_completed",
+                "completed_directions",
                 "last",
             }
         )
@@ -2208,8 +2245,20 @@ def validate_result_document(document: dict[str, object]) -> None:  # noqa: C901
             _exact_rational(dilation.get("bounded_side_squared"), "dilation squared side")
             if dilation.get("strictly_above_t026") is not True:
                 raise PacketError("dilation comparison flag is malformed")
-        elif not isinstance(dilation.get("last"), dict):
-            raise PacketError("partial dilation replay lacks its last retained direction")
+        else:
+            dilation_completed_labels = _completed_direction_labels(
+                dilation.get("completed_directions"),
+                completed=cast(int, dilation_completed),
+                labels=tuple(str(index) for index in range(RAW_DIRECTIONS)),
+                label="dilation completed directions",
+            )
+            last = dilation.get("last")
+            if not isinstance(last, dict):
+                raise PacketError("partial dilation replay lacks its last retained direction")
+            if last.get("label") not in dilation_completed_labels:
+                raise PacketError(
+                    "partial dilation last row is absent from completed directions"
+                )
     if interval is not None and not (
         isinstance(exact, dict) and exact.get("status") == "complete"
     ):
@@ -2764,16 +2813,32 @@ def execute_packet(  # noqa: PLR0911
         publisher(result_path, document)
         _expired(deadline, clock, "before reflected interval route")
 
-        interval_completed = 0
+        interval_labels = tuple(str(index) for index in range(PACKET_STEPS + 1)) + tuple(
+            f"{index}'" for index in range(1, PACKET_STEPS + 1)
+        )
+        interval_label_positions = {
+            label: index for index, label in enumerate(interval_labels)
+        }
+        interval_completed_labels: set[str] = set()
 
         def interval_progress(outcome: DirectionOutcome) -> None:
-            nonlocal interval_completed
-            interval_completed += 1
+            _require(
+                outcome.label in interval_label_positions,
+                "interval progress named an unknown direction",
+            )
+            _require(
+                outcome.label not in interval_completed_labels,
+                "interval progress repeated a completed direction",
+            )
+            interval_completed_labels.add(outcome.label)
             _routes(document)["reflected_interval"] = {
                 "status": "partial",
                 "source_sha256": candidate_sha,
                 "directions_expected": INTERVAL_DIRECTIONS,
-                "directions_completed": interval_completed,
+                "directions_completed": len(interval_completed_labels),
+                "completed_directions": sorted(
+                    interval_completed_labels, key=interval_label_positions.__getitem__
+                ),
                 "last": _interval_row(outcome),
             }
             record_elapsed()
@@ -2812,10 +2877,7 @@ def execute_packet(  # noqa: PLR0911
             "directions_sha256": _direction_digest(
                 tuple(
                     output_dir / "normalized-interval-directions" / f"{label}.json"
-                    for label in (
-                        tuple(str(index) for index in range(PACKET_STEPS + 1))
-                        + tuple(f"{index}'" for index in range(1, PACKET_STEPS + 1))
-                    )
+                    for label in interval_labels
                 )
             ),
         }
@@ -2864,11 +2926,26 @@ def execute_packet(  # noqa: PLR0911
         record_elapsed()
         publisher(result_path, document)
         _expired(deadline, clock, "before dilation replay")
-        dilation_completed = 0
+        dilation_labels = tuple(direction.label for direction in normalized.directions)
+        dilation_label_positions = {
+            label: index for index, label in enumerate(dilation_labels)
+        }
+        _require(
+            len(dilation_label_positions) == len(dilation_labels),
+            "dilation direction labels are not unique",
+        )
+        dilation_completed_labels: set[str] = set()
 
         def dilation_progress(index: int, minimum: Fraction, label: str) -> None:
-            nonlocal dilation_completed
-            dilation_completed += 1
+            _require(
+                0 <= index < len(dilation_labels) and dilation_labels[index] == label,
+                "dilation progress named the wrong direction",
+            )
+            _require(
+                label not in dilation_completed_labels,
+                "dilation progress repeated a completed direction",
+            )
+            dilation_completed_labels.add(label)
             row: dict[str, object] = {
                 "direction": index,
                 "label": label,
@@ -2879,7 +2956,10 @@ def execute_packet(  # noqa: PLR0911
                 "status": "partial",
                 "source_sha256": candidate_sha,
                 "directions_expected": RAW_DIRECTIONS,
-                "directions_completed": dilation_completed,
+                "directions_completed": len(dilation_completed_labels),
+                "completed_directions": sorted(
+                    dilation_completed_labels, key=dilation_label_positions.__getitem__
+                ),
                 "last": row,
             }
             record_elapsed()
@@ -3361,10 +3441,18 @@ def _reconstruct_interval_directions(
     if receipt is None:
         return None
     if receipt.get("status") != "complete":
+        completed_labels = _completed_direction_labels(
+            receipt.get("completed_directions"),
+            completed=reported,
+            labels=labels,
+            label="interval completed directions",
+        )
+        if not set(completed_labels).issubset(actual):
+            raise PacketError("receipt reports interval directions that were not retained")
         last = cast(dict[str, object], receipt["last"])
         last_label = last.get("label")
-        if not isinstance(last_label, str) or last_label not in rows:
-            raise PacketError("partial interval receipt does not name a retained direction")
+        if not isinstance(last_label, str) or last_label not in completed_labels:
+            raise PacketError("partial interval receipt does not name a published direction")
         _interval_row_readback(last, last_label, "partial interval receipt")
         if last != _strict_json(files[last_label]):
             raise PacketError("partial interval last row differs from retained bytes")
@@ -3450,10 +3538,21 @@ def _reconstruct_dilation_directions(
     if receipt is None:
         return
     if not complete:
+        completed_labels = _completed_direction_labels(
+            receipt.get("completed_directions"),
+            completed=reported,
+            labels=labels,
+            label="dilation completed directions",
+        )
+        retained_labels = {cast(str, row["label"]) for row in rows.values()}
+        if not set(completed_labels).issubset(retained_labels):
+            raise PacketError("receipt reports dilation directions that were not retained")
         last = cast(dict[str, object], receipt["last"])
         last_index = last.get("direction")
         if type(last_index) is not int or last_index not in rows:
             raise PacketError("partial dilation receipt does not name a retained direction")
+        if last.get("label") not in completed_labels:
+            raise PacketError("partial dilation receipt does not name a published direction")
         if last != rows[cast(int, last_index)]:
             raise PacketError("partial dilation last row differs from retained bytes")
         return
