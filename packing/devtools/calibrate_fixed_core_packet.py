@@ -25,6 +25,7 @@ import resource
 import signal
 import subprocess
 import sys
+import tempfile
 import time
 from collections.abc import Callable, Collection, Sequence
 from contextlib import suppress
@@ -146,7 +147,12 @@ CALIBRATION_SCOPE = (
 PHASE_DURATION_SCOPE = (
     "phase durations use one monotonic origin, include checkpoint publications inside "
     "the phase, and exclude the closing checkpoint that publishes the duration; "
-    "external lifetime ends at the parent final readback before terminal publication"
+    "external lifetime ends at the parent final readback; terminal admission runs from "
+    "that readback through metrics and invocation validation and the first complete "
+    "receipt validation, serialization, and staging; it excludes the second staging "
+    "needed to embed that duration and the atomic operating-system replace; those final "
+    "steps remain subject to a fresh deadline and cancellation check immediately before "
+    "the replace"
 )
 RSS_SCOPE = (
     "sampled sum of resident-set sizes for observed members of the supervised process "
@@ -552,7 +558,8 @@ def _expected_dilation_record(
             "minimum_cell_charge": str(NORMALIZED_MINIMUM),
             "accepted_conditions": [
                 condition.name for condition in closed_form_threshold_conditions(certificate)
-            ],
+            ]
+            + ["Condition 5' every reachable cell is charged at least 1"],
             "variant": THRESHOLD_VARIANT,
             "point_atoms": len(certificate.atoms),
             "threshold_atoms": len(certificate.threshold_atoms),
@@ -944,6 +951,7 @@ def initial_document(
             "dilation_seconds": None,
             "full_readback_seconds": None,
             "parent_final_readback_seconds": None,
+            "terminal_admission_seconds": None,
             "worker_elapsed_seconds": None,
             "worker_exit_seconds": None,
             "supervisor_cleanup_seconds": None,
@@ -1134,9 +1142,21 @@ def _validate_route_receipt(name: str, receipt: object) -> None:
             or completed_directions != _ordered_labels(cast(list[str], completed_directions))
         ):
             raise CalibrationError("reflected interval completed labels are malformed")
-    elif any(
-        type(index) is not int for index in completed_directions
-    ) or completed_directions != sorted(set(cast(list[int], completed_directions))):
+    elif name == "dilation":
+        allowed = {str(index) for index in range(RAW_DIRECTIONS)}
+        if (
+            any(
+                not isinstance(label, str) or label not in allowed
+                for label in completed_directions
+            )
+            or len(set(cast(list[str], completed_directions))) != completed
+            or completed_directions
+            != sorted(set(cast(list[str], completed_directions)), key=int)
+        ):
+            raise CalibrationError("dilation completed labels are malformed")
+    elif any(type(index) is not int for index in completed_directions) or (
+        completed_directions != sorted(set(cast(list[int], completed_directions)))
+    ):
         raise CalibrationError(f"{name} completed directions are malformed")
     if status != "complete":
         return
@@ -1144,8 +1164,10 @@ def _validate_route_receipt(name: str, receipt: object) -> None:
         completed != expected
         or (name == "reflected_interval" and completed_directions != list(_interval_labels()))
         or (
-            name != "reflected_interval" and completed_directions != list(range(RAW_DIRECTIONS))
+            name == "dilation"
+            and completed_directions != [str(index) for index in range(RAW_DIRECTIONS)]
         )
+        or (name == "normalized_exact" and completed_directions != list(range(RAW_DIRECTIONS)))
         or not _digest(receipt.get("directions_sha256"))
     ):
         raise CalibrationError(f"{name} complete direction binding is malformed")
@@ -1357,6 +1379,7 @@ def validate_document(document: dict[str, object]) -> None:
             "dilation_seconds",
             "full_readback_seconds",
             "parent_final_readback_seconds",
+            "terminal_admission_seconds",
             "worker_elapsed_seconds",
             "worker_exit_seconds",
             "supervisor_cleanup_seconds",
@@ -1416,10 +1439,15 @@ def validate_document(document: dict[str, object]) -> None:
         sample_count = (
             rss_summary.get("sample_count") if isinstance(rss_summary, dict) else None
         )
+        positive_sample_count = (
+            rss_summary.get("positive_sample_count") if isinstance(rss_summary, dict) else None
+        )
         if (
             not isinstance(rss_summary, dict)
             or type(sample_count) is not int
             or cast(int, sample_count) < MINIMUM_TERMINAL_RSS_SAMPLES
+            or type(positive_sample_count) is not int
+            or cast(int, positive_sample_count) < MINIMUM_TERMINAL_RSS_SAMPLES
         ):
             raise CalibrationError("terminal calibration lacks minimum RSS coverage")
     raw = document.get("raw")
@@ -1573,7 +1601,7 @@ def validate_document(document: dict[str, object]) -> None:
     supervisor_signal = supervision.get("supervisor_signal")
     if supervisor_signal is not None and (
         type(supervisor_signal) is not int
-        or supervisor_signal not in {signal.SIGHUP, signal.SIGTERM}
+        or supervisor_signal not in {signal.SIGHUP, signal.SIGINT, signal.SIGTERM}
         or supervision.get("status") != "supervisor-interrupted"
     ):
         raise CalibrationError("supervisor signal provenance is malformed")
@@ -1682,6 +1710,34 @@ def write_result(output_dir: Path, document: dict[str, object]) -> None:
     encoded = _serialized_document(output_dir, document)
     validate_document(_strict_json_bytes(encoded.encode(), "calibration receipt"))
     atomic_write_text(output_dir / "result.json", encoded)
+
+
+def _stage_result(output_dir: Path, document: dict[str, object]) -> Path:
+    """Prepare validated terminal bytes without replacing the partial receipt."""
+
+    validate_document(document)
+    encoded = _serialized_document(output_dir, document)
+    validate_document(_strict_json_bytes(encoded.encode(), "calibration receipt"))
+    descriptor, temporary = tempfile.mkstemp(
+        dir=output_dir,
+        prefix=".result-admission-",
+        suffix=".json",
+    )
+    path = Path(temporary)
+    try:
+        with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
+            stream.write(encoded)
+            stream.flush()
+    except BaseException:
+        path.unlink(missing_ok=True)
+        raise
+    return path
+
+
+def _promote_staged_result(staged: Path, destination: Path) -> None:
+    """Perform the single operating-system boundary for terminal publication."""
+
+    staged.replace(destination)
 
 
 def _routes(document: dict[str, object]) -> dict[str, object]:
@@ -1948,7 +2004,7 @@ def execute_calibration(
         publish()
         _expired(deadline, clock, "before dilation replay")
         dilation_started = clock()
-        dilation_completed: set[int] = set()
+        dilation_completed: set[str] = set()
 
         def dilation_progress(index: int, minimum: Fraction, label: str) -> None:
             row: dict[str, object] = {
@@ -1957,13 +2013,13 @@ def execute_calibration(
                 "minimum": str(minimum),
             }
             _write_direction(output_dir / "dilation-directions", index, row)
-            dilation_completed.add(index)
+            dilation_completed.add(label)
             _routes(document)["dilation"] = {
                 "status": "partial",
                 "source_sha256": candidate_sha,
                 "directions_expected": RAW_DIRECTIONS,
                 "directions_completed": len(dilation_completed),
-                "completed_directions": sorted(dilation_completed),
+                "completed_directions": sorted(dilation_completed, key=int),
                 "last": row,
             }
             publish()
@@ -1991,7 +2047,7 @@ def execute_calibration(
             "source_sha256": candidate_sha,
             "directions_expected": RAW_DIRECTIONS,
             "directions_completed": RAW_DIRECTIONS,
-            "completed_directions": list(range(RAW_DIRECTIONS)),
+            "completed_directions": [str(index) for index in range(RAW_DIRECTIONS)],
             "directions_sha256": _direction_digest(
                 tuple(
                     output_dir / "dilation-directions" / f"{index}.json"
@@ -2088,6 +2144,7 @@ def _validate_rss_observations(
         "sample_interval_seconds",
         "minimum_terminal_samples",
         "sample_count",
+        "positive_sample_count",
         "maximum_actual_gap_seconds",
         "observation_lifetime_seconds",
         "unobserved_leading_seconds",
@@ -2154,6 +2211,7 @@ def _validate_rss_observations(
     pids = sorted({cast(int, pid) for row in parsed for pid in cast(list[object], row["pids"])})
     by_phase: dict[str, set[int]] = {}
     errors: list[str] = []
+    positive_sample_count = 0
     for row in parsed:
         phase = cast(str, row["phase"])
         if phase not in RSS_OBSERVABLE_PHASES:
@@ -2161,6 +2219,8 @@ def _validate_rss_observations(
         by_phase.setdefault(phase, set()).update(cast(list[int], row["pids"]))
         if row["error"] is not None:
             errors.append(cast(str, row["error"]))
+        elif cast(list[int], row["pids"]) and cast(int, row["rss_bytes"]) > 0:
+            positive_sample_count += 1
     lifetime = rss.get("observation_lifetime_seconds")
     _finite_nonnegative(lifetime, "RSS observation lifetime", optional=False)
     observation_lifetime = cast(float, lifetime)
@@ -2171,6 +2231,7 @@ def _validate_rss_observations(
         "sample_interval_seconds": RSS_SAMPLE_SECONDS,
         "minimum_terminal_samples": MINIMUM_TERMINAL_RSS_SAMPLES,
         "sample_count": len(parsed),
+        "positive_sample_count": positive_sample_count,
         "maximum_actual_gap_seconds": max(gaps, default=0.0),
         "observation_lifetime_seconds": observation_lifetime,
         "unobserved_leading_seconds": times[0] if times else observation_lifetime,
@@ -2193,7 +2254,7 @@ def _validate_rss_observations(
         raise CalibrationError("RSS summary does not reconstruct from retained samples")
     if required and (
         len(parsed) < MINIMUM_TERMINAL_RSS_SAMPLES
-        or cast(int, expected["peak_sampled_rss_bytes"]) <= 0
+        or positive_sample_count < MINIMUM_TERMINAL_RSS_SAMPLES
         or errors
     ):
         raise CalibrationError("RSS metrics admission requires observed, error-free samples")
@@ -2418,7 +2479,8 @@ def load_result(
             dilation = _strict_json_bytes(dilation_raw, "dilation.json")
             _check_dilation_record(dilation, rebuilt, cast(str, candidate_sha))
             if (
-                dilation_receipt.get("completed_directions") != list(range(RAW_DIRECTIONS))
+                dilation_receipt.get("completed_directions")
+                != [str(index) for index in range(RAW_DIRECTIONS)]
                 or dilation_receipt.get("record_sha256")
                 != hashlib.sha256(dilation_raw).hexdigest()
                 or dilation_receipt.get("generic_record_schema")
@@ -2503,6 +2565,7 @@ def load_result(
             "dilation_seconds",
             "full_readback_seconds",
             "parent_final_readback_seconds",
+            "terminal_admission_seconds",
             "worker_elapsed_seconds",
             "worker_exit_seconds",
             "supervisor_cleanup_seconds",
@@ -2515,8 +2578,10 @@ def load_result(
             raise CalibrationError("RSS observation lifetime differs from invocation lifetime")
         if cast(float, clocks["worker_elapsed_seconds"]) >= cast(
             float, cast(dict[str, object], document["settings"])["calibration_seconds"]
-        ) or cast(float, clocks["external_lifetime_seconds"]) >= cast(
-            float, cast(dict[str, object], document["settings"])["external_seconds"]
+        ) or (
+            cast(float, clocks["external_lifetime_seconds"])
+            + cast(float, clocks["terminal_admission_seconds"])
+            >= cast(float, cast(dict[str, object], document["settings"])["external_seconds"])
         ):
             raise CalibrationError("terminal calibration exceeded a declared deadline")
     return document
@@ -2636,16 +2701,20 @@ def _write_rss_samples(
     )
     by_phase: dict[str, set[int]] = {}
     errors: list[str] = []
+    positive_sample_count = 0
     for sample in samples:
         phase = cast(str, sample["phase"])
         by_phase.setdefault(phase, set()).update(cast(list[int], sample["pids"]))
         if sample["error"] is not None:
             errors.append(cast(str, sample["error"]))
+        elif cast(list[int], sample["pids"]) and cast(int, sample["rss_bytes"]) > 0:
+            positive_sample_count += 1
     return {
         "scope": RSS_SCOPE,
         "sample_interval_seconds": RSS_SAMPLE_SECONDS,
         "minimum_terminal_samples": MINIMUM_TERMINAL_RSS_SAMPLES,
         "sample_count": len(samples),
+        "positive_sample_count": positive_sample_count,
         "maximum_actual_gap_seconds": max(gaps, default=0.0),
         "observation_lifetime_seconds": lifetime,
         "unobserved_leading_seconds": times[0] if times else lifetime,
@@ -2798,7 +2867,7 @@ def supervise_worker(  # noqa: PLR0911
     ):
         raise CalibrationError("supervisor revision differs from its invocation identity")
 
-    handled_signals = (signal.SIGTERM, signal.SIGHUP)
+    handled_signals = (signal.SIGTERM, signal.SIGHUP, signal.SIGINT)
     previous_mask = signal.pthread_sigmask(signal.SIG_BLOCK, handled_signals)
     previous_handlers: dict[signal.Signals, Any] = {}
     active_process: subprocess.Popen[bytes] | None = None
@@ -2809,6 +2878,7 @@ def supervise_worker(  # noqa: PLR0911
     launch_seconds: float | None = None
     worker_exit_seconds: float | None = None
     cleanup_seconds = 0.0
+    staged_result: Path | None = None
 
     def handle_signal(signum: int, _frame: object) -> None:
         nonlocal interrupted_signal
@@ -3036,6 +3106,7 @@ def supervise_worker(  # noqa: PLR0911
         clocks["parent_final_readback_seconds"] = readback_finished - readback_started
         clocks["supervisor_cleanup_seconds"] = cleanup_seconds
         clocks["external_lifetime_seconds"] = readback_finished - invocation_started
+        admission_started = readback_finished
         resources = cast(dict[str, object], document["resources"])
         resources["rss"] = _write_rss_samples(
             output_dir,
@@ -3067,6 +3138,7 @@ def supervise_worker(  # noqa: PLR0911
             )
             write_result(output_dir, document)
             return 2
+        clocks["terminal_admission_seconds"] = 0.0
         document.update(
             {
                 "status": "complete",
@@ -3075,11 +3147,25 @@ def supervise_worker(  # noqa: PLR0911
                 "error": None,
             }
         )
-        write_result(output_dir, document)
+        staged_result = _stage_result(output_dir, document)
+        admission_finished = time.perf_counter()
+        clocks["terminal_admission_seconds"] = admission_finished - admission_started
+        raise_if_interrupted()
+        if admission_finished >= external_deadline:
+            return record_deadline("external deadline reached during terminal admission")
+        staged_result.unlink()
+        staged_result = _stage_result(output_dir, document)
+        raise_if_interrupted()
+        if time.perf_counter() >= external_deadline:
+            return record_deadline("external deadline reached during terminal serialization")
+        _promote_staged_result(staged_result, output_dir / "result.json")
+        staged_result = None
+        if time.perf_counter() >= external_deadline:
+            return record_deadline("external deadline reached during terminal publication")
         return 0  # noqa: TRY300 -- every earlier branch records its terminal disposition
     except _SupervisorSignal as error:
         signal.pthread_sigmask(signal.SIG_BLOCK, handled_signals)
-        group_reaped = active_process is None
+        group_reaped = active_process is None and not launching
         if active_process is not None:
             try:
                 interrupted_status, interrupted_cleanup = _reap_process_group(
@@ -3109,7 +3195,7 @@ def supervise_worker(  # noqa: PLR0911
         interrupted_signal = signal_number.value
     except BaseException as error:
         signal.pthread_sigmask(signal.SIG_BLOCK, handled_signals)
-        group_reaped = active_process is None
+        group_reaped = active_process is None and not launching
         if active_process is not None:
             try:
                 interrupted_status, interrupted_cleanup = _reap_process_group(
@@ -3137,6 +3223,8 @@ def supervise_worker(  # noqa: PLR0911
         raise
     finally:
         signal.pthread_sigmask(signal.SIG_BLOCK, handled_signals)
+        if staged_result is not None:
+            staged_result.unlink(missing_ok=True)
         for signal_number, previous_handler in previous_handlers.items():
             signal.signal(signal_number, previous_handler)
         signal.pthread_sigmask(signal.SIG_SETMASK, previous_mask)

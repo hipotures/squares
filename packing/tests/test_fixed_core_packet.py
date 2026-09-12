@@ -1082,17 +1082,13 @@ def test_partial_dilation_readback_binds_sparse_labels_and_validates_unpublished
         "last": _dilation_row(3, "three"),
     }
 
-    _reconstruct_dilation_directions(
-        directory, receipt, labels=labels, complete=False
-    )
+    _reconstruct_dilation_directions(directory, receipt, labels=labels, complete=False)
 
     tail = json.loads((directory / "1.json").read_text())
     tail["minimum"] = "01"
     _write_row(directory, "1", tail)
     with pytest.raises(PacketError, match="canonical exact form"):
-        _reconstruct_dilation_directions(
-            directory, receipt, labels=labels, complete=False
-        )
+        _reconstruct_dilation_directions(directory, receipt, labels=labels, complete=False)
 
 
 @pytest.mark.parametrize(
@@ -1119,9 +1115,7 @@ def test_partial_dilation_readback_refuses_noncanonical_or_mismatched_direction_
     }
 
     with pytest.raises(PacketError, match="completed directions"):
-        _reconstruct_dilation_directions(
-            directory, receipt, labels=labels, complete=False
-        )
+        _reconstruct_dilation_directions(directory, receipt, labels=labels, complete=False)
 
 
 def test_partial_dilation_last_row_must_belong_to_the_published_set(tmp_path: Path) -> None:
@@ -1137,9 +1131,7 @@ def test_partial_dilation_last_row_must_belong_to_the_published_set(tmp_path: Pa
     }
 
     with pytest.raises(PacketError, match="published direction"):
-        _reconstruct_dilation_directions(
-            directory, receipt, labels=labels, complete=False
-        )
+        _reconstruct_dilation_directions(directory, receipt, labels=labels, complete=False)
 
 
 def test_partial_dilation_readback_refuses_a_missing_published_row_hidden_by_tail(
@@ -1157,9 +1149,7 @@ def test_partial_dilation_readback_refuses_a_missing_published_row_hidden_by_tai
     }
 
     with pytest.raises(PacketError, match="were not retained"):
-        _reconstruct_dilation_directions(
-            directory, receipt, labels=labels, complete=False
-        )
+        _reconstruct_dilation_directions(directory, receipt, labels=labels, complete=False)
 
 
 def test_partial_readback_uses_named_checkpoint_and_ignores_valid_unpublished_tail(

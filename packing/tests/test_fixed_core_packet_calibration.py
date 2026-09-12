@@ -33,6 +33,7 @@ from devtools.fixed_core_packet import (
     PacketError,
     RawMinimum,
     _direction_digest,
+    _reconstruct_dilation_directions,
     _reconstruct_raw_directions,
     run_exact_route,
     run_interval_route,
@@ -92,6 +93,108 @@ def _seed(output: Path, *, invocation_started: float | None = None) -> dict[str,
         background_load="test host; background load unmeasured",
     )
     calibration.write_result(output, document)
+    return document
+
+
+def _terminal_candidate_summary() -> dict[str, object]:
+    document = calibration.initial_document(
+        REVISION,
+        workers=1,
+        calibration_seconds=4.0,
+        external_seconds=5.0,
+        grace_seconds=0.05,
+        invocation_started=0.0,
+        run_order=1,
+        cache_observation="no-kernel publication control",
+        background_load="unmeasured",
+    )
+    document.update(
+        phase="awaiting-worker-exit",
+        error="parent has not observed worker exit",
+    )
+    cast(dict[str, object], document["raw"]).update(
+        directions_completed=calibration.RAW_DIRECTIONS,
+        completed_directions=list(range(calibration.RAW_DIRECTIONS)),
+        observed_minimum_upper_bound="2",
+        observed_argmin=0,
+        observed_witness=["3/8", "3/8"],
+        raw_minimum="2",
+        comparison="passed",
+        witness_replay_charge="2",
+        witness_admissible=True,
+        directions_sha256="a" * 64,
+    )
+    document["normalized"] = {
+        "path": "candidate.json",
+        "sha256": "b" * 64,
+        "source_fixture_sha256": calibration.FIXTURE_SHA256,
+        "id": calibration.NORMALIZED_ID,
+        "alpha": "1/2",
+        "point_mass": "1/4",
+        "threshold_budget": "3/4",
+        "total_budget": "1",
+        "least_cell_charge": "1",
+        "integer_scale": 8,
+        "closed_form_conditions": [],
+    }
+    common: dict[str, object] = {
+        "status": "complete",
+        "source_sha256": "b" * 64,
+        "directions_expected": calibration.RAW_DIRECTIONS,
+        "directions_completed": calibration.RAW_DIRECTIONS,
+        "completed_directions": list(range(calibration.RAW_DIRECTIONS)),
+        "directions_sha256": "a" * 64,
+    }
+    routes = cast(dict[str, object], document["routes"])
+    routes["normalized_exact"] = common | {
+        "minimum": "1",
+        "argmin": 0,
+        "witness": ["3/8", "3/8"],
+        "dense_slab_disagreements": 0,
+    }
+    routes["reflected_interval"] = common | {
+        "directions_expected": calibration.INTERVAL_DIRECTIONS,
+        "directions_completed": calibration.INTERVAL_DIRECTIONS,
+        "completed_directions": list(calibration._interval_labels()),
+        "integer_scale": 8,
+        "integer_enclosure": [8, 8],
+        "enclosure": ["1", "1"],
+        "stalled": 0,
+        "budget_exhausted": 0,
+        "accepted": True,
+        "boxes_observed": calibration.INTERVAL_DIRECTIONS,
+    }
+    routes["dilation"] = common | {
+        "completed_directions": [str(index) for index in range(calibration.RAW_DIRECTIONS)],
+        "record_sha256": "c" * 64,
+        "generic_record_schema": calibration.THRESHOLD_LIMIT_RECORD_SCHEMA,
+        "generic_record_scope": (
+            "valid normalized n=2 calibration fixture; no campaign or fixed-packet evidence"
+        ),
+        "factor_supremum": "2*sqrt(33177601)/5761",
+        "factor_supremum_squared": "132710404/33189121",
+        "bounded_side": "3*sqrt(33177601)/11522",
+        "bounded_side_squared": "298598409/132756484",
+        "relation": ">=",
+        "endpoint_certificate": False,
+        "requires_compactness": False,
+    }
+    cast(dict[str, object], document["resources"]).update(
+        cpu_observations={
+            "coordinator_start_seconds": 0.0,
+            "coordinator_end_seconds": 0.1,
+            "direct_children_user_start_seconds": 0.0,
+            "direct_children_user_end_seconds": 0.0,
+            "direct_children_system_start_seconds": 0.0,
+            "direct_children_system_end_seconds": 0.0,
+        },
+        coordinator_process_seconds=0.1,
+        reaped_direct_children_user_seconds=0.0,
+        reaped_direct_children_system_seconds=0.0,
+    )
+    for key in cast(dict[str, object], document["clocks"]):
+        if key != "phase_duration_scope":
+            cast(dict[str, object], document["clocks"])[key] = 0.1
     return document
 
 
@@ -408,6 +511,30 @@ def test_dilation_record_refuses_a_missing_generic_field() -> None:
         calibration._check_dilation_record(record, normalized, "b" * 64)
 
 
+def test_real_generic_dilation_record_matches_oracle_on_small_complete_net(
+    tmp_path: Path,
+) -> None:
+    _certificate, source = _fixture()
+    candidate = calibration._normalized_record(source)
+    candidate["direction_steps"] = 2
+    path = tmp_path / "candidate.json"
+    _write_json(path, candidate)
+
+    record = build_limit_record(path, source_name="candidate.json", workers=1)
+    certificate, _declared = calibration.load(path.read_bytes())
+
+    assert len(certificate.directions) == 3
+    assert cast(dict[str, object], record["source"])["accepted_conditions"] == [
+        condition.name
+        for condition in calibration.closed_form_threshold_conditions(certificate)
+    ] + ["Condition 5' every reachable cell is charged at least 1"]
+    calibration._check_dilation_record(
+        record,
+        certificate,
+        hashlib.sha256(path.read_bytes()).hexdigest(),
+    )
+
+
 def test_calibration_wrapper_is_closed_and_cross_schema_readers_refuse(
     tmp_path: Path,
 ) -> None:
@@ -476,7 +603,7 @@ def test_terminal_status_cannot_substitute_declared_row_counts_for_routes(
             "coordinator_process_seconds": 0.1,
             "reaped_direct_children_user_seconds": 0.0,
             "reaped_direct_children_system_seconds": 0.0,
-            "rss": {"sample_count": 2},
+            "rss": {"sample_count": 2, "positive_sample_count": 2},
         }
     )
     cast(dict[str, object], document["supervision"]).update(
@@ -515,6 +642,75 @@ def test_partial_route_receipts_bind_the_exact_published_direction_set() -> None
     receipt["completed_directions"] = [0]
     with pytest.raises(calibration.CalibrationError, match="progress"):
         calibration._validate_route_receipt("normalized_exact", receipt)
+
+
+def test_partial_dilation_receipt_round_trips_through_common_reader(
+    tmp_path: Path,
+) -> None:
+    directory = tmp_path / "dilation-directions"
+    directory.mkdir()
+    rows = (
+        {"direction": 0, "label": "0", "minimum": "1"},
+        {"direction": 1, "label": "1", "minimum": "1"},
+    )
+    for row in rows:
+        _write_json(directory / f"{row['direction']}.json", row)
+    labels = tuple(str(index) for index in range(calibration.RAW_DIRECTIONS))
+    receipt: dict[str, object] = {
+        "status": "partial",
+        "source_sha256": "b" * 64,
+        "directions_expected": calibration.RAW_DIRECTIONS,
+        "directions_completed": 2,
+        "completed_directions": ["0", "1"],
+        "last": rows[1],
+    }
+
+    calibration._validate_route_receipt("dilation", receipt)
+    _reconstruct_dilation_directions(
+        directory,
+        receipt,
+        labels=labels,
+        complete=False,
+    )
+
+    substituted = deepcopy(receipt)
+    substituted["completed_directions"] = ["0", "2"]
+    with pytest.raises(PacketError):
+        _reconstruct_dilation_directions(
+            directory,
+            substituted,
+            labels=labels,
+            complete=False,
+        )
+
+    (directory / "1.json").unlink()
+    with pytest.raises(PacketError, match="not retained"):
+        _reconstruct_dilation_directions(
+            directory,
+            receipt,
+            labels=labels,
+            complete=False,
+        )
+    _write_json(directory / "1.json", rows[1])
+
+    bad_last = deepcopy(receipt)
+    bad_last["last"] = {"direction": 2, "label": "2", "minimum": "1"}
+    with pytest.raises(PacketError, match="retained direction"):
+        _reconstruct_dilation_directions(
+            directory,
+            bad_last,
+            labels=labels,
+            complete=False,
+        )
+
+    _write_json(directory / "2.json", {"direction": 2, "label": "wrong", "minimum": "1"})
+    with pytest.raises(PacketError, match="wrong identity"):
+        _reconstruct_dilation_directions(
+            directory,
+            receipt,
+            labels=labels,
+            complete=False,
+        )
 
 
 def test_receipt_parser_refuses_duplicate_keys(tmp_path: Path) -> None:
@@ -877,6 +1073,173 @@ def test_parent_readback_that_finishes_after_deadline_revokes_admission(
     assert "parent final readback" in receipt["error"]
 
 
+@pytest.mark.parametrize("late_at", ["validation", "serialization", "publication"])
+def test_terminal_admission_deadline_never_publishes_success(
+    tmp_path: Path,
+    late_at: str,
+) -> None:
+    output = tmp_path / f"late-{late_at}"
+    output.mkdir()
+    document = _terminal_candidate_summary()
+    calibration.write_result(output, document)
+    now = [0.0]
+
+    class Worker:
+        pid = 101
+        states = iter((None, None, 0))
+
+        def poll(self) -> int | None:
+            return next(self.states)
+
+    class Readback:
+        pid = 102
+
+        @staticmethod
+        def wait(*, timeout: float) -> int:
+            del timeout
+            return 0
+
+    real_validate_cpu = calibration._validate_cpu_observations
+    real_serialize = calibration._serialized_document
+    real_promote = calibration._promote_staged_result
+
+    def validate_cpu(*args: object, **kwargs: object) -> None:
+        real_validate_cpu(*args, **kwargs)  # type: ignore[arg-type]
+        if late_at == "validation":
+            now[0] = 6.0
+
+    def serialize(output_dir: Path, candidate: dict[str, object]) -> str:
+        if late_at == "serialization" and candidate["status"] == "complete":
+            now[0] = 6.0
+        return real_serialize(output_dir, candidate)
+
+    def promote_file(source: Path, target: Path) -> None:
+        real_promote(source, target)
+        if late_at == "publication":
+            now[0] = 6.0
+
+    def sample(process_group: int, **kwargs: object) -> dict[str, object]:
+        return {
+            "elapsed_seconds": kwargs["elapsed"],
+            "phase": kwargs["phase"],
+            "pids": [process_group],
+            "rss_bytes": 4_096,
+            "error": None,
+        }
+
+    with (
+        patch.object(calibration.subprocess, "Popen", side_effect=[Worker(), Readback()]),
+        patch.object(calibration, "_reap_process_group", return_value=(0, 0.0)),
+        patch.object(calibration.time, "perf_counter", side_effect=lambda: now[0]),
+        patch.object(
+            calibration.time,
+            "sleep",
+            side_effect=lambda delay: now.__setitem__(0, now[0] + delay),
+        ),
+        patch.object(calibration, "_sample_process_group", side_effect=sample),
+        patch.object(calibration, "_validate_cpu_observations", side_effect=validate_cpu),
+        patch.object(calibration, "_serialized_document", side_effect=serialize),
+        patch.object(calibration, "_promote_staged_result", side_effect=promote_file),
+    ):
+        status = calibration.supervise_worker(
+            ("control", "--worker"),
+            output,
+            repository=REPOSITORY,
+            expected_revision=REVISION,
+            external_seconds=5.0,
+            grace_seconds=0.05,
+            invocation_started=0.0,
+            external_deadline=5.0,
+            expected_invocation=cast(
+                dict[str, object],
+                cast(dict[str, object], document["invocation"])["identity"],
+            ),
+        )
+
+    receipt = cast(dict[str, object], json.loads((output / "result.json").read_bytes()))
+    assert status == 1
+    assert receipt["status"] == "partial"
+    assert receipt["disposition"] == "incomplete"
+    assert receipt["phase"] == "timeout"
+    assert not any(path.name.startswith(".result-admission-") for path in output.iterdir())
+
+
+def test_interrupt_during_terminal_serialization_preserves_partial_receipt(
+    tmp_path: Path,
+) -> None:
+    output = tmp_path / "interrupt-terminal-serialization"
+    output.mkdir()
+    document = _terminal_candidate_summary()
+    calibration.write_result(output, document)
+    now = [0.0]
+
+    class Worker:
+        pid = 101
+        states = iter((None, None, 0))
+
+        def poll(self) -> int | None:
+            return next(self.states)
+
+    class Readback:
+        pid = 102
+
+        @staticmethod
+        def wait(*, timeout: float) -> int:
+            del timeout
+            return 0
+
+    real_serialize = calibration._serialized_document
+
+    def serialize(output_dir: Path, candidate: dict[str, object]) -> str:
+        if candidate["status"] == "complete":
+            raise KeyboardInterrupt
+        return real_serialize(output_dir, candidate)
+
+    with (
+        patch.object(calibration.subprocess, "Popen", side_effect=[Worker(), Readback()]),
+        patch.object(calibration, "_reap_process_group", return_value=(0, 0.0)),
+        patch.object(calibration.time, "perf_counter", side_effect=lambda: now[0]),
+        patch.object(
+            calibration.time,
+            "sleep",
+            side_effect=lambda delay: now.__setitem__(0, now[0] + delay),
+        ),
+        patch.object(
+            calibration,
+            "_sample_process_group",
+            side_effect=lambda process_group, **kwargs: {
+                "elapsed_seconds": kwargs["elapsed"],
+                "phase": kwargs["phase"],
+                "pids": [process_group],
+                "rss_bytes": 4_096,
+                "error": None,
+            },
+        ),
+        patch.object(calibration, "_serialized_document", side_effect=serialize),
+        pytest.raises(KeyboardInterrupt),
+    ):
+        calibration.supervise_worker(
+            ("control", "--worker"),
+            output,
+            repository=REPOSITORY,
+            expected_revision=REVISION,
+            external_seconds=5.0,
+            grace_seconds=0.05,
+            invocation_started=0.0,
+            external_deadline=5.0,
+            expected_invocation=cast(
+                dict[str, object],
+                cast(dict[str, object], document["invocation"])["identity"],
+            ),
+        )
+
+    receipt = cast(dict[str, object], json.loads((output / "result.json").read_bytes()))
+    assert receipt["status"] == "partial"
+    assert receipt["disposition"] == "incomplete"
+    assert receipt["phase"] == "operational-failure"
+    assert not any(path.name.startswith(".result-admission-") for path in output.iterdir())
+
+
 def test_worker_git_oserror_remains_operationally_unresolved(
     tmp_path: Path,
 ) -> None:
@@ -912,17 +1275,26 @@ def test_worker_git_oserror_remains_operationally_unresolved(
 
 @pytest.mark.skipif(sys.platform == "win32", reason="POSIX signals are required")
 @pytest.mark.parametrize(
-    ("signal_number", "delivery"),
-    [(signal.SIGTERM, "running"), (signal.SIGHUP, "launch")],
+    ("signal_number", "delivery", "handler_mode"),
+    [
+        (signal.SIGTERM, "running", "default"),
+        (signal.SIGHUP, "launch", "default"),
+        (signal.SIGINT, "launch", "custom"),
+    ],
 )
 def test_real_supervisor_signal_reaps_worker_including_launch_window(
-    tmp_path: Path, signal_number: signal.Signals, delivery: str
+    tmp_path: Path,
+    signal_number: signal.Signals,
+    delivery: str,
+    handler_mode: str,
 ) -> None:
     during_launch = delivery == "launch"
     output = tmp_path / f"signal-{signal_number.name}"
     output.mkdir()
     _seed(output)
     worker_pid_path = tmp_path / f"worker-{signal_number.name}.pid"
+    prior_handler_path = tmp_path / f"prior-handler-{signal_number.name}.txt"
+    custom_handler = handler_mode == "custom"
     supervisor_program = f"""
 import os
 import signal
@@ -934,18 +1306,25 @@ from devtools import calibrate_fixed_core_packet as calibration
 
 real_popen = subprocess.Popen
 pid_path = Path({str(worker_pid_path)!r})
+prior_handler_path = Path({str(prior_handler_path)!r})
 during_launch = {during_launch!r}
+signal_number = signal.Signals({int(signal_number)!r})
+
+if {custom_handler!r}:
+    def prior_handler(signum, _frame):
+        prior_handler_path.write_text(str(signum), encoding="utf-8")
+    signal.signal(signal_number, prior_handler)
 
 def launch(*args, **kwargs):
     process = real_popen(*args, **kwargs)
     pid_path.write_text(str(process.pid), encoding="utf-8")
     if during_launch:
-        os.kill(os.getpid(), signal.SIGHUP)
+        os.kill(os.getpid(), signal_number)
     return process
 
 calibration.subprocess.Popen = launch
 started = time.perf_counter()
-calibration.supervise_worker(
+status = calibration.supervise_worker(
     (sys.executable, "-c", "import time; time.sleep(60)"),
     Path({str(output)!r}),
     repository=Path({str(REPOSITORY)!r}),
@@ -955,6 +1334,7 @@ calibration.supervise_worker(
     invocation_started=started,
     external_deadline=started + 60.0,
 )
+raise SystemExit(status)
 """
     supervisor = subprocess.Popen((sys.executable, "-c", supervisor_program))
     deadline = time.monotonic() + 3.0
@@ -964,7 +1344,8 @@ calibration.supervise_worker(
     worker_pid = int(worker_pid_path.read_text())
     if not during_launch:
         os.kill(supervisor.pid, signal_number)
-    assert supervisor.wait(timeout=3.0) == -signal_number
+    expected_status = 128 + signal_number if custom_handler else -signal_number
+    assert supervisor.wait(timeout=3.0) == expected_status
 
     receipt = cast(dict[str, object], json.loads((output / "result.json").read_bytes()))
     assert receipt["status"] == "partial"
@@ -975,6 +1356,9 @@ calibration.supervise_worker(
     assert cast(dict[str, object], receipt["supervision"])["supervisor_signal"] == (
         signal_number
     )
+    assert prior_handler_path.exists() is custom_handler
+    if custom_handler:
+        assert prior_handler_path.read_text(encoding="utf-8") == str(signal_number)
     with pytest.raises(ProcessLookupError):
         os.kill(worker_pid, 0)
 
@@ -1023,6 +1407,38 @@ def test_terminal_rss_requires_ordered_repeated_samples(tmp_path: Path) -> None:
         tmp_path, reversed_samples, observation_lifetime=0.3
     )
     with pytest.raises(calibration.CalibrationError, match="times are not monotonic"):
+        calibration._validate_rss_observations(tmp_path, resources, required=True)
+
+    one_positive = [
+        one_sample[0],
+        {
+            "elapsed_seconds": 0.2,
+            "phase": "preflight",
+            "pids": [],
+            "rss_bytes": 0,
+            "error": None,
+        },
+    ]
+    resources["rss"] = calibration._write_rss_samples(
+        tmp_path,
+        one_positive,
+        observation_lifetime=0.3,
+    )
+    with pytest.raises(calibration.CalibrationError, match="requires observed"):
+        calibration._validate_rss_observations(tmp_path, resources, required=True)
+
+    two_positive = [
+        one_sample[0],
+        {**one_sample[0], "elapsed_seconds": 0.2},
+    ]
+    resources["rss"] = calibration._write_rss_samples(
+        tmp_path,
+        two_positive,
+        observation_lifetime=0.3,
+    )
+    calibration._validate_rss_observations(tmp_path, resources, required=True)
+    cast(dict[str, object], resources["rss"])["positive_sample_count"] = 1
+    with pytest.raises(calibration.CalibrationError, match="reconstruct"):
         calibration._validate_rss_observations(tmp_path, resources, required=True)
 
 

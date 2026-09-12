@@ -2827,9 +2827,7 @@ def execute_packet(  # noqa: PLR0911
         interval_labels = tuple(str(index) for index in range(PACKET_STEPS + 1)) + tuple(
             f"{index}'" for index in range(1, PACKET_STEPS + 1)
         )
-        interval_label_positions = {
-            label: index for index, label in enumerate(interval_labels)
-        }
+        interval_label_positions = {label: index for index, label in enumerate(interval_labels)}
         interval_completed_labels: set[str] = set()
 
         def interval_progress(outcome: DirectionOutcome) -> None:
@@ -2938,9 +2936,7 @@ def execute_packet(  # noqa: PLR0911
         publisher(result_path, document)
         _expired(deadline, clock, "before dilation replay")
         dilation_labels = tuple(direction.label for direction in normalized.directions)
-        dilation_label_positions = {
-            label: index for index, label in enumerate(dilation_labels)
-        }
+        dilation_label_positions = {label: index for index, label in enumerate(dilation_labels)}
         _require(
             len(dilation_label_positions) == len(dilation_labels),
             "dilation direction labels are not unique",
