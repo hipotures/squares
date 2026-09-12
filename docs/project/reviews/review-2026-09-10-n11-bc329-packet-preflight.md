@@ -358,9 +358,28 @@ those five findings as follows:
 The combined target-free calibration and fixed-core suites pass 177 tests in 18.07
 seconds on Python 3.14. Repository-wide Ruff formatting and lint checks and BasedPyright
 report zero findings, and `packing-validate --edit` passes in 50.83 seconds.
-The exact n=2 fixture and its 14,404-row full profile shape are unchanged.
-The seven calibration beads remain open pending source-distinct review, after which the
-three fresh calibration profiles and their independent readback are still required.
+
+A final source-distinct correction review at `b626097000a3f7cc9dbb19fbf3fb787f505c7104`
+accepted `think-bi3f`, `think-1kgu`, `think-lidy`, and `think-1e9p`, retaining the
+earlier source-distinct acceptances of `think-pk84` and `think-th5z`. It refused only
+`think-4wuj`: a real SIGINT during either `tempfile.mkstemp` acquisition could arrive
+after the operating system created the staging file and descriptor but before either
+cleanup owner knew their identity.
+The follow-up repair keeps handled signals pending from before each staging acquisition
+until `_stage_result` closes the descriptor and transfers the returned path to the
+supervisor’s final cleanup owner.
+A maintained real-subprocess control synchronizes SIGINT at both acquisitions and checks
+return status 130, signal provenance, prior-handler restoration and redelivery, a closed
+descriptor, no staging-file remainder, and a readable retained partial artifact set.
+The expanded success/deadline control retains ordinary publication and the validation,
+serialization, and publication expiry refusals.
+
+The repaired combined suites pass 180 tests in 23.31 seconds on Python 3.14. The exact
+n=2 fixture and its 14,404-row full profile shape are unchanged.
+`think-4wuj` and source-distinct review bead `think-1arg` remain open for readback of
+the follow-up repair.
+The three fresh calibration profiles and their independent readback are still required
+after implementation admission.
 No positive full-shape profile or BC329 scientific target ran during the repair.
 
 The older `packing/devtools/measure_threshold_net_refinement.py:main` remains an

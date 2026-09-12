@@ -451,11 +451,29 @@ report zero findings, and `packing-validate --edit` passes in 50.83 seconds.
 These are author-run implementation controls, not source-distinct admission or
 host-profile evidence.
 
+A final source-distinct correction review at `b626097000a3f7cc9dbb19fbf3fb787f505c7104`
+accepted CAL-2, CAL-3, CAL-4, and CAL-6, retaining the earlier CAL-1 and CAL-7
+acceptances. It refused CAL-5 because real SIGINT during either staging-file acquisition
+could leave the new descriptor and path outside both cleanup owners.
+The follow-up repair blocks the handled signal set across each acquisition, descriptor
+close, and assignment of the returned path to the supervisor’s cleanup owner; pending
+cancellation is then delivered through the existing provenance, partial-publication,
+handler-restoration, and redelivery path.
+A maintained real-subprocess regression synchronizes SIGINT at the first and second
+acquisitions and checks status 130, signal 2, one prior-handler delivery, descriptor
+closure, absence of the staging file, and successful strict readback of the retained
+partial artifact set.
+The expanded transaction control also verifies ordinary success and every existing late
+validation, serialization, and publication refusal.
+The combined target-free calibration and fixed-core suites pass 180 tests in 23.31
+seconds on Python 3.14. This is author-run repair evidence; CAL-5 remains unadmitted
+until source-distinct readback.
+
 Operational admission remains unmeasured.
 Before closing the calibration work:
 
-- Obtain a source-distinct re-review of the correction commit and keep the seven CAL
-  beads open until that review records its dispositions.
+- Obtain a source-distinct re-review of the CAL-5 follow-up and keep `think-4wuj` and
+  `think-1arg` open until that review records its disposition.
 - Run at least three fresh repetitions of the intended profile, retaining complete
   metrics and all 14,404 direction rows per run.
 - Admit those receipts through source-distinct readback before any BC329 registration.

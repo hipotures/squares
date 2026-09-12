@@ -1073,8 +1073,8 @@ def test_parent_readback_that_finishes_after_deadline_revokes_admission(
     assert "parent final readback" in receipt["error"]
 
 
-@pytest.mark.parametrize("late_at", ["validation", "serialization", "publication"])
-def test_terminal_admission_deadline_never_publishes_success(
+@pytest.mark.parametrize("late_at", ["success", "validation", "serialization", "publication"])
+def test_terminal_admission_deadline_and_success_publication(
     tmp_path: Path,
     late_at: str,
 ) -> None:
@@ -1157,10 +1157,16 @@ def test_terminal_admission_deadline_never_publishes_success(
         )
 
     receipt = cast(dict[str, object], json.loads((output / "result.json").read_bytes()))
-    assert status == 1
-    assert receipt["status"] == "partial"
-    assert receipt["disposition"] == "incomplete"
-    assert receipt["phase"] == "timeout"
+    if late_at == "success":
+        assert status == 0
+        assert receipt["status"] == "complete"
+        assert receipt["disposition"] == "calibration-passed"
+        assert receipt["phase"] == "complete"
+    else:
+        assert status == 1
+        assert receipt["status"] == "partial"
+        assert receipt["disposition"] == "incomplete"
+        assert receipt["phase"] == "timeout"
     assert not any(path.name.startswith(".result-admission-") for path in output.iterdir())
 
 
@@ -1238,6 +1244,149 @@ def test_interrupt_during_terminal_serialization_preserves_partial_receipt(
     assert receipt["disposition"] == "incomplete"
     assert receipt["phase"] == "operational-failure"
     assert not any(path.name.startswith(".result-admission-") for path in output.iterdir())
+
+
+@pytest.mark.skipif(sys.platform == "win32", reason="POSIX signals are required")
+@pytest.mark.parametrize("stage_number", [1, 2])
+def test_real_sigint_during_staging_acquisition_closes_and_removes_resource(
+    tmp_path: Path,
+    stage_number: int,
+) -> None:
+    output = tmp_path / f"sigint-stage-{stage_number}"
+    output.mkdir()
+    calibration.write_result(output, _terminal_candidate_summary())
+    observation_path = tmp_path / f"sigint-stage-{stage_number}.json"
+    supervisor_program = f"""
+import json
+import os
+import signal
+from pathlib import Path
+from unittest.mock import patch
+from devtools import calibrate_fixed_core_packet as calibration
+
+output = Path({str(output)!r})
+observation_path = Path({str(observation_path)!r})
+document = json.loads((output / "result.json").read_bytes())
+deliveries = []
+created = []
+calls = [0]
+previous = signal.getsignal(signal.SIGINT)
+
+def prior_handler(signum, _frame):
+    deliveries.append(signum)
+
+signal.signal(signal.SIGINT, prior_handler)
+real_mkstemp = calibration.tempfile.mkstemp
+
+def create(*args, **kwargs):
+    descriptor, temporary = real_mkstemp(*args, **kwargs)
+    calls[0] += 1
+    if calls[0] == {stage_number!r}:
+        created.append((descriptor, temporary))
+        os.kill(os.getpid(), signal.SIGINT)
+    return descriptor, temporary
+
+class Worker:
+    pid = 101
+    states = iter((None, None, 0))
+
+    def poll(self):
+        return next(self.states)
+
+class Readback:
+    pid = 102
+
+    @staticmethod
+    def wait(*, timeout):
+        del timeout
+        return 0
+
+def sample(process_group, **kwargs):
+    return {{
+        "elapsed_seconds": kwargs["elapsed"],
+        "phase": kwargs["phase"],
+        "pids": [process_group],
+        "rss_bytes": 4096,
+        "error": None,
+    }}
+
+try:
+    with (
+        patch.object(calibration.subprocess, "Popen", side_effect=[Worker(), Readback()]),
+        patch.object(calibration, "_reap_process_group", return_value=(0, 0.0)),
+        patch.object(calibration.time, "perf_counter", return_value=0.2),
+        patch.object(calibration.time, "sleep", return_value=None),
+        patch.object(calibration, "_sample_process_group", side_effect=sample),
+        patch.object(calibration.tempfile, "mkstemp", side_effect=create),
+    ):
+        status = calibration.supervise_worker(
+            ("control", "--worker"),
+            output,
+            repository=Path({str(REPOSITORY)!r}),
+            expected_revision={REVISION!r},
+            external_seconds=5.0,
+            grace_seconds=0.05,
+            invocation_started=0.0,
+            external_deadline=5.0,
+            expected_invocation=document["invocation"]["identity"],
+        )
+    receipt = json.loads((output / "result.json").read_bytes())
+    descriptor, temporary = created[0]
+    try:
+        os.fstat(descriptor)
+    except OSError:
+        descriptor_open = False
+    else:
+        descriptor_open = True
+    readback_error = None
+    try:
+        calibration.validate_document(receipt)
+        calibration._validate_retained_artifact_set(output)
+    except calibration.CalibrationError as error:
+        readback_error = str(error)
+    observation_path.write_text(
+        json.dumps(
+            {{
+                "status": status,
+                "receipt_status": receipt["status"],
+                "receipt_phase": receipt["phase"],
+                "supervisor_signal": receipt["supervision"]["supervisor_signal"],
+                "descriptor_open": descriptor_open,
+                "staged_path_exists": Path(temporary).exists(),
+                "staged_files": sorted(
+                    path.name for path in output.glob(".result-admission-*")
+                ),
+                "readback_error": readback_error,
+                "handler_restored": signal.getsignal(signal.SIGINT) is prior_handler,
+                "deliveries": deliveries,
+            }}
+        ),
+        encoding="utf-8",
+    )
+finally:
+    signal.signal(signal.SIGINT, previous)
+"""
+    supervisor = subprocess.run(
+        (sys.executable, "-c", supervisor_program),
+        check=False,
+        timeout=5.0,
+    )
+    assert supervisor.returncode == 0
+    observation = cast(
+        dict[str, object], json.loads(observation_path.read_text(encoding="utf-8"))
+    )
+    assert observation == {
+        "status": 128 + signal.SIGINT,
+        "receipt_status": "partial",
+        "receipt_phase": "operational-failure",
+        "supervisor_signal": signal.SIGINT,
+        "descriptor_open": False,
+        "staged_path_exists": False,
+        "staged_files": [],
+        "readback_error": None,
+        "handler_restored": True,
+        "deliveries": [signal.SIGINT],
+    }
 
 
 def test_worker_git_oserror_remains_operationally_unresolved(

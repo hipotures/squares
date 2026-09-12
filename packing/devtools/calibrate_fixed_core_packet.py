@@ -2891,6 +2891,16 @@ def supervise_worker(  # noqa: PLR0911
         if interrupted_signal is not None:
             raise _SupervisorSignal(interrupted_signal)
 
+    def stage_owned_result(document: dict[str, object]) -> None:
+        nonlocal staged_result
+        # Keep handled signals pending until _stage_result has closed its descriptor and
+        # transferred the returned path to the supervisor's final cleanup owner.
+        staging_mask = signal.pthread_sigmask(signal.SIG_BLOCK, handled_signals)
+        try:
+            staged_result = _stage_result(output_dir, document)
+        finally:
+            signal.pthread_sigmask(signal.SIG_SETMASK, staging_mask)
+
     def record_deadline(message: str, *, before_launch: bool = False) -> int:
         _record_supervision(
             output_dir,
@@ -3147,17 +3157,20 @@ def supervise_worker(  # noqa: PLR0911
                 "error": None,
             }
         )
-        staged_result = _stage_result(output_dir, document)
+        stage_owned_result(document)
         admission_finished = time.perf_counter()
         clocks["terminal_admission_seconds"] = admission_finished - admission_started
         raise_if_interrupted()
         if admission_finished >= external_deadline:
             return record_deadline("external deadline reached during terminal admission")
+        assert staged_result is not None
         staged_result.unlink()
-        staged_result = _stage_result(output_dir, document)
+        staged_result = None
+        stage_owned_result(document)
         raise_if_interrupted()
         if time.perf_counter() >= external_deadline:
             return record_deadline("external deadline reached during terminal serialization")
+        assert staged_result is not None
         _promote_staged_result(staged_result, output_dir / "result.json")
         staged_result = None
         if time.perf_counter() >= external_deadline:
