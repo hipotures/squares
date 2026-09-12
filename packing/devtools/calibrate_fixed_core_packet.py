@@ -39,7 +39,13 @@ from typing import Any, Literal, Never, cast
 from strif import atomic_write_text
 
 from devtools.decide_threshold_certificate import _placement_membership, load
-from devtools.dilation_corollary import THRESHOLD_LIMIT_RECORD_SCHEMA
+from devtools.dilation_corollary import (
+    THRESHOLD_LIMIT_RECORD_SCHEMA,
+    THRESHOLD_VARIANT,
+    _decimal,
+    point_view,
+    sharp_dilation_ceiling,
+)
 from devtools.fixed_core_packet import (
     ExactReaderDisagreementError,
     ExactRoute,
@@ -123,6 +129,16 @@ EXPECTED_STRICT_RIGHT = Fraction(33177601, 33177600)
 MAX_WORKERS = 4
 DEFAULT_GRACE_SECONDS = 2.0
 RSS_SAMPLE_SECONDS = 0.1
+MINIMUM_TERMINAL_RSS_SAMPLES = 2
+RSS_OBSERVABLE_PHASES = (
+    "preflight",
+    "raw-sweep",
+    "normalized-exact",
+    "reflected-interval",
+    "dilation-replay",
+    "readback",
+    "awaiting-worker-exit",
+)
 CALIBRATION_SCOPE = (
     "execution-path calibration for the frozen n=2 cross fixture; observed timing, "
     "box, CPU, and RSS measurements describe this invocation only"
@@ -138,7 +154,8 @@ RSS_SCOPE = (
 )
 CPU_SCOPE = (
     "coordinator process_time plus cumulative user/system time of its reaped direct "
-    "children between recorded baselines; neither is process-group CPU time"
+    "children between retained start and end observations; neither is process-group "
+    "CPU time and parent readback CPU is excluded"
 )
 
 FORBIDDEN_RECEIPT_KEYS = {
@@ -169,6 +186,14 @@ class CalibrationDeadlineError(CalibrationError):
 
 class CalibrationOperationalError(RuntimeError):
     """A transient host or process failure left the calibration unresolved."""
+
+
+class _SupervisorSignal(BaseException):
+    """Transfer POSIX termination to synchronous process-group cleanup."""
+
+    def __init__(self, signum: int) -> None:
+        self.signum = signum
+        super().__init__(signum)
 
 
 def _refuse(message: str) -> Never:
@@ -504,37 +529,115 @@ def _check_dilation_rows(
             raise CalibrationError(f"dilation known-answer check failed at direction {index}")
 
 
+def _expected_dilation_record(
+    certificate: ThresholdCertificate, source_sha256: str
+) -> dict[str, object]:
+    point = point_view(certificate)
+    gap = point.largest_half_gap_tangent
+    factor = sharp_dilation_ceiling(certificate)
+    side = factor.scaled(certificate.outer_side)
+    left = point.square_side**2 * (1 + gap) ** 2
+    right = 1 + gap * gap
+    expected = {
+        "schema": THRESHOLD_LIMIT_RECORD_SCHEMA,
+        "source": {
+            "certificate": "candidate.json",
+            "sha256": source_sha256,
+            "n": FIXTURE_N,
+            "outer_side": str(certificate.outer_side),
+            "square_side": str(point.square_side),
+            "half_gap_tangent": str(gap),
+            "coarse_containment": str(point.square_side * (1 + gap)),
+            "total_budget": str(NORMALIZED_BUDGET),
+            "minimum_cell_charge": str(NORMALIZED_MINIMUM),
+            "accepted_conditions": [
+                condition.name for condition in closed_form_threshold_conditions(certificate)
+            ],
+            "variant": THRESHOLD_VARIANT,
+            "point_atoms": len(certificate.atoms),
+            "threshold_atoms": len(certificate.threshold_atoms),
+        },
+        "sharpened_containment": {
+            "identity": "cos(d) + sin(d) = (1 + t) / sqrt(1 + t^2), where t = tan(d)",
+            "gap_domain": f"0 <= t <= D = {gap} < 1",
+            "monotonicity_identity": (
+                "(1 + D)^2(1 + t^2) - (1 + t)^2(1 + D^2) = 2(D - t)(1 - Dt) >= 0"
+            ),
+            "strict_factor_test": f"q^2 * {left} < {right}",
+            "strict_factor_test_left_multiplier": str(left),
+            "strict_factor_test_right": str(right),
+            "source_gap_below_one": True,
+        },
+        "strict_dilation_family": {
+            "factor_supremum": factor.exact,
+            "factor_supremum_squared": str(factor.squared),
+            "factor_supremum_decimal": _decimal(factor),
+            "factor_supremum_irrational": factor.irrational,
+            "factor_supremum_defining_polynomial": factor.defining_polynomial,
+            "factor_domain": f"q in Q with q > 0 and q^2 < {factor.squared}",
+            "scaled_containment_test": (
+                "q^2 B^2 (1 + D)^2 < 1 + D^2; this rational inequality is "
+                "equivalent to strict geometric containment"
+            ),
+            "invariants": [
+                (
+                    "Conditions 1 and 1' D4 symmetry of the point and threshold atoms "
+                    "is equivariant under common scaling"
+                ),
+                "Conditions 2' and 3 (total budget and direction net) are unchanged",
+                (
+                    "Condition 5' charge is preserved by inverse dilation of placements: "
+                    "a core's trace on each threshold atom's scaled points is unchanged"
+                ),
+            ],
+        },
+        "conclusion": {
+            "bounded_side": side.exact,
+            "bounded_side_squared": str(side.squared),
+            "bounded_side_defining_polynomial": side.defining_polynomial,
+            "decimal": _decimal(side),
+            "relation": ">=",
+            "endpoint_certificate": False,
+        },
+        "proof": {
+            "strict_family": (
+                "for every rational q > 0 with q^2 below factor_supremum_squared, "
+                "the sharpened containment theorem and the scaled source data rule out "
+                "a packing at side q * outer_side"
+            ),
+            "density_step": (
+                "for every real x below bounded_side, rational density supplies q with "
+                "x / outer_side < q < factor_supremum"
+            ),
+            "embedding_step": (
+                "a packing at side x embeds in the larger side q * outer_side, "
+                "contradicting that strict-subfactor no-fit proof"
+            ),
+            "order_step": (
+                "equivalently, s(n) is at least every strict rational subbound and "
+                "therefore at least their real supremum"
+            ),
+            "requires_compactness": False,
+            "endpoint_status": (
+                f"the dilation-limit theorem establishes s({FIXTURE_N}) >= {side.exact}; "
+                "at the factor supremum the sharpened containment inequality is equality, "
+                "so endpoint_certificate is false because the proof supplies no individual "
+                f"certificate at that side; the method does not establish s({FIXTURE_N}) > "
+                f"{side.exact}"
+            ),
+        },
+    }
+    if scaled_threshold_masses(certificate)[0] != NORMALIZED_SCALE:
+        raise CalibrationError("dilation source does not use normalized scale 8")
+    return expected
+
+
 def _check_dilation_record(
     record: dict[str, object], certificate: ThresholdCertificate, source_sha256: str
 ) -> None:
-    if record.get("schema") != THRESHOLD_LIMIT_RECORD_SCHEMA:
-        raise CalibrationError("nested dilation record is not the generic threshold schema")
-    source = cast(dict[str, object], record.get("source"))
-    conclusion = cast(dict[str, object], record.get("conclusion"))
-    containment = cast(dict[str, object], record.get("sharpened_containment"))
-    family = cast(dict[str, object], record.get("strict_dilation_family"))
-    proof = cast(dict[str, object], record.get("proof"))
-    factor = cast(str, family.get("factor_supremum"))
-    side = cast(str, conclusion.get("bounded_side"))
-    if (
-        source.get("certificate") != "candidate.json"
-        or source.get("sha256") != source_sha256
-        or source.get("n") != FIXTURE_N
-        or source.get("total_budget") != str(NORMALIZED_BUDGET)
-        or source.get("minimum_cell_charge") != str(NORMALIZED_MINIMUM)
-        or family.get("factor_supremum_squared") != str(EXPECTED_FACTOR_SQUARED)
-        or containment.get("strict_factor_test_left_multiplier") != str(EXPECTED_STRICT_LEFT)
-        or containment.get("strict_factor_test_right") != str(EXPECTED_STRICT_RIGHT)
-        or conclusion.get("bounded_side_squared") != str(EXPECTED_SIDE_SQUARED)
-        or conclusion.get("relation") != ">="
-        or conclusion.get("endpoint_certificate") is not False
-        or proof.get("requires_compactness") is not False
-        or not factor.startswith("2*sqrt(33177601)/5761")
-        or not side.startswith("3*sqrt(33177601)/11522")
-    ):
+    expected = _expected_dilation_record(certificate, source_sha256)
+    if record != expected:
         raise CalibrationError("dilation record differs from the exact calibration oracle")
-    if scaled_threshold_masses(certificate)[0] != NORMALIZED_SCALE:
-        raise CalibrationError("dilation source does not use normalized scale 8")
 
 
 def _walk_receipt(value: object) -> None:
@@ -745,6 +848,33 @@ def _settings(
     }
 
 
+def _invocation_identity(
+    revision: str,
+    *,
+    workers: int,
+    calibration_seconds: float,
+    external_seconds: float,
+    grace_seconds: float,
+    invocation_started: float,
+    run_order: int,
+    cache_observation: str,
+    background_load: str,
+) -> dict[str, object]:
+    return {
+        "implementation_revision": revision,
+        "requested_workers": workers,
+        "calibration_seconds": calibration_seconds,
+        "external_seconds": external_seconds,
+        "termination_grace_seconds": grace_seconds,
+        "monotonic_origin": invocation_started,
+        "calibration_deadline_monotonic": invocation_started + calibration_seconds,
+        "external_deadline_monotonic": invocation_started + external_seconds,
+        "run_order": run_order,
+        "cache_observation": cache_observation,
+        "background_load": background_load,
+    }
+
+
 def initial_document(
     revision: str,
     *,
@@ -784,6 +914,17 @@ def initial_document(
             "run_order": run_order,
             "cache_observation": cache_observation,
             "background_load": background_load,
+            "identity": _invocation_identity(
+                revision,
+                workers=workers,
+                calibration_seconds=calibration_seconds,
+                external_seconds=external_seconds,
+                grace_seconds=grace_seconds,
+                invocation_started=invocation_started,
+                run_order=run_order,
+                cache_observation=cache_observation,
+                background_load=background_load,
+            ),
         },
         "settings": _settings(
             workers=workers,
@@ -810,6 +951,7 @@ def initial_document(
         },
         "resources": {
             "cpu_scope": CPU_SCOPE,
+            "cpu_observations": None,
             "coordinator_process_seconds": None,
             "reaped_direct_children_user_seconds": None,
             "reaped_direct_children_system_seconds": None,
@@ -841,6 +983,7 @@ def initial_document(
             "status": "pending",
             "worker_exit_status": None,
             "process_group_reaped": False,
+            "supervisor_signal": None,
         },
         "phase": "preflight",
         "error": "source and runtime preflight has not completed",
@@ -1030,7 +1173,9 @@ def _validate_route_receipt(name: str, receipt: object) -> None:
         or receipt.get("generic_record_schema") != THRESHOLD_LIMIT_RECORD_SCHEMA
         or receipt.get("generic_record_scope")
         != "valid normalized n=2 calibration fixture; no campaign or fixed-packet evidence"
+        or receipt.get("factor_supremum") != "2*sqrt(33177601)/5761"
         or receipt.get("factor_supremum_squared") != str(EXPECTED_FACTOR_SQUARED)
+        or receipt.get("bounded_side") != "3*sqrt(33177601)/11522"
         or receipt.get("bounded_side_squared") != str(EXPECTED_SIDE_SQUARED)
         or receipt.get("relation") != ">="
         or receipt.get("endpoint_certificate") is not False
@@ -1126,6 +1271,7 @@ def validate_document(document: dict[str, object]) -> None:
         "run_order",
         "cache_observation",
         "background_load",
+        "identity",
     }:
         raise CalibrationError("calibration invocation fields changed")
     if (
@@ -1138,6 +1284,7 @@ def validate_document(document: dict[str, object]) -> None:
         or not cast(str, invocation["cache_observation"]).strip()
         or not isinstance(invocation.get("background_load"), str)
         or not cast(str, invocation["background_load"]).strip()
+        or not isinstance(invocation.get("identity"), dict)
     ):
         raise CalibrationError("calibration invocation metadata is malformed")
     _finite_nonnegative(invocation.get("monotonic_origin"), "monotonic origin", optional=False)
@@ -1181,6 +1328,19 @@ def validate_document(document: dict[str, object]) -> None:
         )
     ):
         raise CalibrationError("worker or deadline settings are malformed")
+    expected_identity = _invocation_identity(
+        cast(str, revision),
+        workers=cast(int, requested),
+        calibration_seconds=cast(float, calibration_seconds),
+        external_seconds=cast(float, external_seconds),
+        grace_seconds=cast(float, grace_seconds),
+        invocation_started=cast(float, invocation["monotonic_origin"]),
+        run_order=cast(int, invocation["run_order"]),
+        cache_observation=cast(str, invocation["cache_observation"]),
+        background_load=cast(str, invocation["background_load"]),
+    )
+    if invocation.get("identity") != expected_identity:
+        raise CalibrationError("calibration invocation identity changed")
     clocks = document.get("clocks")
     if (
         not isinstance(clocks, dict)
@@ -1214,6 +1374,7 @@ def validate_document(document: dict[str, object]) -> None:
         or set(resources)
         != {
             "cpu_scope",
+            "cpu_observations",
             "coordinator_process_seconds",
             "reaped_direct_children_user_seconds",
             "reaped_direct_children_system_seconds",
@@ -1228,6 +1389,39 @@ def validate_document(document: dict[str, object]) -> None:
         "reaped_direct_children_system_seconds",
     ):
         _finite_nonnegative(resources.get(key), f"resource {key}")
+    cpu_observations = resources.get("cpu_observations")
+    if cpu_observations is not None:
+        if not isinstance(cpu_observations, dict) or set(cpu_observations) != {
+            "coordinator_start_seconds",
+            "coordinator_end_seconds",
+            "direct_children_user_start_seconds",
+            "direct_children_user_end_seconds",
+            "direct_children_system_start_seconds",
+            "direct_children_system_end_seconds",
+        }:
+            raise CalibrationError("CPU observation fields changed")
+        for key, value in cpu_observations.items():
+            _finite_nonnegative(value, f"CPU observation {key}", optional=False)
+    if status == "complete":
+        if cpu_observations is None or any(
+            resources.get(key) is None
+            for key in (
+                "coordinator_process_seconds",
+                "reaped_direct_children_user_seconds",
+                "reaped_direct_children_system_seconds",
+            )
+        ):
+            raise CalibrationError("terminal calibration lacks CPU observations")
+        rss_summary = resources.get("rss")
+        sample_count = (
+            rss_summary.get("sample_count") if isinstance(rss_summary, dict) else None
+        )
+        if (
+            not isinstance(rss_summary, dict)
+            or type(sample_count) is not int
+            or cast(int, sample_count) < MINIMUM_TERMINAL_RSS_SAMPLES
+        ):
+            raise CalibrationError("terminal calibration lacks minimum RSS coverage")
     raw = document.get("raw")
     if (
         not isinstance(raw, dict)
@@ -1321,12 +1515,42 @@ def validate_document(document: dict[str, object]) -> None:
         raise CalibrationError("calibration route fields changed")
     for name, receipt in routes.items():
         _validate_route_receipt(name, receipt)
+    raw_complete = raw.get("raw_minimum") is not None
+    exact_receipt = routes["normalized_exact"]
+    interval_receipt = routes["reflected_interval"]
+    dilation_receipt = routes["dilation"]
+    exact_complete = (
+        isinstance(exact_receipt, dict) and exact_receipt.get("status") == "complete"
+    )
+    interval_complete = (
+        isinstance(interval_receipt, dict) and interval_receipt.get("status") == "complete"
+    )
+    dilation_complete = (
+        isinstance(dilation_receipt, dict) and dilation_receipt.get("status") == "complete"
+    )
+    if normalized is not None and not raw_complete:
+        raise CalibrationError("normalization appeared before complete raw coverage")
+    if exact_receipt is not None and normalized is None:
+        raise CalibrationError("normalized exact route appeared before normalization")
+    if interval_receipt is not None and not exact_complete:
+        raise CalibrationError("interval route appeared before complete exact readback")
+    if dilation_receipt is not None and not interval_complete:
+        raise CalibrationError("dilation route appeared before complete interval readback")
+    if status == "complete" and not (
+        raw_complete
+        and normalized is not None
+        and exact_complete
+        and interval_complete
+        and dilation_complete
+    ):
+        raise CalibrationError("terminal calibration lacks complete known-answer routes")
     _validate_artifact_receipts(document.get("artifacts"))
     supervision = document.get("supervision")
     if not isinstance(supervision, dict) or set(supervision) != {
         "status",
         "worker_exit_status",
         "process_group_reaped",
+        "supervisor_signal",
     }:
         raise CalibrationError("calibration supervision fields changed")
     if (
@@ -1346,6 +1570,13 @@ def validate_document(document: dict[str, object]) -> None:
     exit_status = supervision.get("worker_exit_status")
     if exit_status is not None and type(exit_status) is not int:
         raise CalibrationError("worker exit status is malformed")
+    supervisor_signal = supervision.get("supervisor_signal")
+    if supervisor_signal is not None and (
+        type(supervisor_signal) is not int
+        or supervisor_signal not in {signal.SIGHUP, signal.SIGTERM}
+        or supervision.get("status") != "supervisor-interrupted"
+    ):
+        raise CalibrationError("supervisor signal provenance is malformed")
     if status == "complete" and (
         disposition != "calibration-passed"
         or document.get("phase") != "complete"
@@ -1354,6 +1585,7 @@ def validate_document(document: dict[str, object]) -> None:
             "status": "observed-exit",
             "worker_exit_status": 0,
             "process_group_reaped": True,
+            "supervisor_signal": None,
         }
     ):
         raise CalibrationError("complete calibration lacks successful parent supervision")
@@ -1854,12 +2086,18 @@ def _validate_rss_observations(
     if not isinstance(rss, dict) or set(rss) != {
         "scope",
         "sample_interval_seconds",
+        "minimum_terminal_samples",
         "sample_count",
         "maximum_actual_gap_seconds",
+        "observation_lifetime_seconds",
+        "unobserved_leading_seconds",
+        "unobserved_trailing_seconds",
         "peak_sampled_rss_bytes",
         "peak_sample_time_seconds",
         "observed_pids",
         "pids_by_phase",
+        "observed_phases",
+        "unobserved_phases",
         "observer_errors",
         "samples_path",
         "samples_sha256",
@@ -1868,6 +2106,7 @@ def _validate_rss_observations(
     if (
         rss.get("scope") != RSS_SCOPE
         or rss.get("sample_interval_seconds") != RSS_SAMPLE_SECONDS
+        or rss.get("minimum_terminal_samples") != MINIMUM_TERMINAL_RSS_SAMPLES
     ):
         raise CalibrationError("RSS observation scope or interval changed")
     raw = path.read_bytes()
@@ -1908,6 +2147,8 @@ def _validate_rss_observations(
             raise CalibrationError("RSS sample is malformed")
         parsed.append(cast(dict[str, object], sample))
     times = [cast(float, row["elapsed_seconds"]) for row in parsed]
+    if times != sorted(times):
+        raise CalibrationError("RSS sample times are not monotonic")
     gaps = [right - left for left, right in pairwise(times)]
     peak = max(parsed, key=lambda row: cast(int, row["rss_bytes"]), default=None)
     pids = sorted({cast(int, pid) for row in parsed for pid in cast(list[object], row["pids"])})
@@ -1915,20 +2156,35 @@ def _validate_rss_observations(
     errors: list[str] = []
     for row in parsed:
         phase = cast(str, row["phase"])
+        if phase not in RSS_OBSERVABLE_PHASES:
+            raise CalibrationError("RSS sample names an unknown calibration phase")
         by_phase.setdefault(phase, set()).update(cast(list[int], row["pids"]))
         if row["error"] is not None:
             errors.append(cast(str, row["error"]))
+    lifetime = rss.get("observation_lifetime_seconds")
+    _finite_nonnegative(lifetime, "RSS observation lifetime", optional=False)
+    observation_lifetime = cast(float, lifetime)
+    if times and times[-1] > observation_lifetime:
+        raise CalibrationError("RSS sample occurs after its observation lifetime")
     expected = {
         "scope": RSS_SCOPE,
         "sample_interval_seconds": RSS_SAMPLE_SECONDS,
+        "minimum_terminal_samples": MINIMUM_TERMINAL_RSS_SAMPLES,
         "sample_count": len(parsed),
         "maximum_actual_gap_seconds": max(gaps, default=0.0),
+        "observation_lifetime_seconds": observation_lifetime,
+        "unobserved_leading_seconds": times[0] if times else observation_lifetime,
+        "unobserved_trailing_seconds": (
+            observation_lifetime - times[-1] if times else observation_lifetime
+        ),
         "peak_sampled_rss_bytes": 0 if peak is None else peak["rss_bytes"],
         "peak_sample_time_seconds": None if peak is None else peak["elapsed_seconds"],
         "observed_pids": pids,
         "pids_by_phase": {
             phase: sorted(phase_pids) for phase, phase_pids in sorted(by_phase.items())
         },
+        "observed_phases": sorted(by_phase),
+        "unobserved_phases": sorted(set(RSS_OBSERVABLE_PHASES) - set(by_phase)),
         "observer_errors": errors,
         "samples_path": "rss-samples.json",
         "samples_sha256": hashlib.sha256(raw).hexdigest(),
@@ -1936,9 +2192,52 @@ def _validate_rss_observations(
     if rss != expected:
         raise CalibrationError("RSS summary does not reconstruct from retained samples")
     if required and (
-        not parsed or cast(int, expected["peak_sampled_rss_bytes"]) <= 0 or errors
+        len(parsed) < MINIMUM_TERMINAL_RSS_SAMPLES
+        or cast(int, expected["peak_sampled_rss_bytes"]) <= 0
+        or errors
     ):
         raise CalibrationError("RSS metrics admission requires observed, error-free samples")
+
+
+def _validate_cpu_observations(resources: dict[str, object], *, required: bool) -> None:
+    observations = resources.get("cpu_observations")
+    values = (
+        resources.get("coordinator_process_seconds"),
+        resources.get("reaped_direct_children_user_seconds"),
+        resources.get("reaped_direct_children_system_seconds"),
+    )
+    if observations is None:
+        if required or any(value is not None for value in values):
+            raise CalibrationError("terminal calibration lacks CPU observations")
+        return
+    if not isinstance(observations, dict) or set(observations) != {
+        "coordinator_start_seconds",
+        "coordinator_end_seconds",
+        "direct_children_user_start_seconds",
+        "direct_children_user_end_seconds",
+        "direct_children_system_start_seconds",
+        "direct_children_system_end_seconds",
+    }:
+        raise CalibrationError("CPU observation fields changed")
+    for key, value in observations.items():
+        _finite_nonnegative(value, f"CPU observation {key}", optional=False)
+    pairs = (
+        ("coordinator_start_seconds", "coordinator_end_seconds", values[0]),
+        ("direct_children_user_start_seconds", "direct_children_user_end_seconds", values[1]),
+        (
+            "direct_children_system_start_seconds",
+            "direct_children_system_end_seconds",
+            values[2],
+        ),
+    )
+    for start_key, end_key, elapsed in pairs:
+        _finite_nonnegative(elapsed, f"CPU elapsed {start_key}", optional=False)
+        start = cast(float, observations[start_key])
+        end = cast(float, observations[end_key])
+        if end < start or not math.isclose(
+            end - start, cast(float, elapsed), rel_tol=1e-12, abs_tol=1e-12
+        ):
+            raise CalibrationError("CPU elapsed values differ from retained observations")
 
 
 def load_result(
@@ -1948,6 +2247,7 @@ def load_result(
     expected_revision: str,
     require_supervision: bool = True,
     require_complete_candidate: bool = False,
+    expected_invocation: dict[str, object] | None = None,
 ) -> dict[str, object]:
     """Reconstruct every calibration artifact and known answer from retained bytes."""
 
@@ -1963,6 +2263,11 @@ def load_result(
     sources = cast(dict[str, object], document["sources"])
     if sources.get("implementation_revision") != expected_revision:
         raise CalibrationError("calibration revision differs from requested readback")
+    invocation = cast(dict[str, object], document["invocation"])
+    if expected_invocation is not None and invocation.get("identity") != expected_invocation:
+        raise CalibrationError("calibration invocation differs from requested readback")
+    if require_supervision and document["status"] == "complete" and expected_invocation is None:
+        raise CalibrationError("terminal readback requires an expected invocation identity")
     manifest = source_manifest(
         repository,
         expected_revision,
@@ -2123,12 +2428,24 @@ def load_result(
                     "valid normalized n=2 calibration fixture; no campaign or "
                     "fixed-packet evidence"
                 )
+                or dilation_receipt.get("factor_supremum")
+                != cast(dict[str, object], dilation["strict_dilation_family"])[
+                    "factor_supremum"
+                ]
                 or dilation_receipt.get("factor_supremum_squared")
-                != str(EXPECTED_FACTOR_SQUARED)
-                or dilation_receipt.get("bounded_side_squared") != str(EXPECTED_SIDE_SQUARED)
-                or dilation_receipt.get("relation") != ">="
-                or dilation_receipt.get("endpoint_certificate") is not False
-                or dilation_receipt.get("requires_compactness") is not False
+                != cast(dict[str, object], dilation["strict_dilation_family"])[
+                    "factor_supremum_squared"
+                ]
+                or dilation_receipt.get("bounded_side")
+                != cast(dict[str, object], dilation["conclusion"])["bounded_side"]
+                or dilation_receipt.get("bounded_side_squared")
+                != cast(dict[str, object], dilation["conclusion"])["bounded_side_squared"]
+                or dilation_receipt.get("relation")
+                != cast(dict[str, object], dilation["conclusion"])["relation"]
+                or dilation_receipt.get("endpoint_certificate")
+                is not cast(dict[str, object], dilation["conclusion"])["endpoint_certificate"]
+                or dilation_receipt.get("requires_compactness")
+                is not cast(dict[str, object], dilation["proof"])["requires_compactness"]
             ):
                 raise CalibrationError("dilation receipt differs from known answers")
     candidate_complete = all(
@@ -2136,12 +2453,16 @@ def load_result(
         and cast(dict[str, object], routes[name]).get("status") == "complete"
         for name in routes
     )
-    if require_complete_candidate and not candidate_complete:
+    if (require_complete_candidate or document["status"] == "complete") and not (
+        raw_complete and rebuilt is not None and candidate_complete
+    ):
         raise CalibrationError("calibration candidate lacks a complete route")
     complete = document["status"] == "complete"
+    resources = cast(dict[str, object], document["resources"])
+    _validate_cpu_observations(resources, required=complete)
     _validate_rss_observations(
         output_dir,
-        cast(dict[str, object], document["resources"]),
+        resources,
         required=complete,
     )
     if document["artifacts"] != _artifact_inventory(
@@ -2189,6 +2510,9 @@ def load_result(
         )
         if any(clocks[key] is None for key in required_clocks):
             raise CalibrationError("terminal calibration lacks a required clock")
+        rss = cast(dict[str, object], resources["rss"])
+        if rss.get("observation_lifetime_seconds") != clocks["external_lifetime_seconds"]:
+            raise CalibrationError("RSS observation lifetime differs from invocation lifetime")
         if cast(float, clocks["worker_elapsed_seconds"]) >= cast(
             float, cast(dict[str, object], document["settings"])["calibration_seconds"]
         ) or cast(float, clocks["external_lifetime_seconds"]) >= cast(
@@ -2225,6 +2549,7 @@ def _sample_process_group(
     *,
     elapsed: float,
     phase: str,
+    timeout_seconds: float,
 ) -> dict[str, object]:
     try:
         result = subprocess.run(
@@ -2232,7 +2557,16 @@ def _sample_process_group(
             check=False,
             capture_output=True,
             text=True,
+            timeout=timeout_seconds,
         )
+    except subprocess.TimeoutExpired:
+        return {
+            "elapsed_seconds": elapsed,
+            "phase": phase,
+            "pids": [],
+            "rss_bytes": 0,
+            "error": f"ps observation exceeded {timeout_seconds:g} seconds",
+        }
     except OSError as error:
         return {
             "elapsed_seconds": elapsed,
@@ -2274,7 +2608,12 @@ def _sample_process_group(
     }
 
 
-def _write_rss_samples(output_dir: Path, samples: list[dict[str, object]]) -> dict[str, object]:
+def _write_rss_samples(
+    output_dir: Path,
+    samples: list[dict[str, object]],
+    *,
+    observation_lifetime: float | None = None,
+) -> dict[str, object]:
     path = output_dir / "rss-samples.json"
     encoded = (
         json.dumps(
@@ -2290,6 +2629,7 @@ def _write_rss_samples(output_dir: Path, samples: list[dict[str, object]]) -> di
     atomic_write_text(path, encoded.decode())
     times = [cast(float, sample["elapsed_seconds"]) for sample in samples]
     gaps = [right - left for left, right in pairwise(times)]
+    lifetime = max(times, default=0.0) if observation_lifetime is None else observation_lifetime
     peak = max(samples, key=lambda row: cast(int, row["rss_bytes"]), default=None)
     pids = sorted(
         {cast(int, pid) for sample in samples for pid in cast(list[object], sample["pids"])}
@@ -2304,14 +2644,20 @@ def _write_rss_samples(output_dir: Path, samples: list[dict[str, object]]) -> di
     return {
         "scope": RSS_SCOPE,
         "sample_interval_seconds": RSS_SAMPLE_SECONDS,
+        "minimum_terminal_samples": MINIMUM_TERMINAL_RSS_SAMPLES,
         "sample_count": len(samples),
         "maximum_actual_gap_seconds": max(gaps, default=0.0),
+        "observation_lifetime_seconds": lifetime,
+        "unobserved_leading_seconds": times[0] if times else lifetime,
+        "unobserved_trailing_seconds": lifetime - times[-1] if times else lifetime,
         "peak_sampled_rss_bytes": 0 if peak is None else peak["rss_bytes"],
         "peak_sample_time_seconds": None if peak is None else peak["elapsed_seconds"],
         "observed_pids": pids,
         "pids_by_phase": {
             phase: sorted(phase_pids) for phase, phase_pids in sorted(by_phase.items())
         },
+        "observed_phases": sorted(by_phase),
+        "unobserved_phases": sorted(set(RSS_OBSERVABLE_PHASES) - set(by_phase)),
         "observer_errors": errors,
         "samples_path": "rss-samples.json",
         "samples_sha256": hashlib.sha256(encoded).hexdigest(),
@@ -2373,11 +2719,12 @@ def _record_supervision(
     cleanup_seconds: float,
     external_lifetime: float,
     error: str | None,
+    supervisor_signal: int | None = None,
 ) -> dict[str, object] | None:
     document = _load_receipt_for_supervisor(output_dir)
     if document is None:
         return None
-    rss = _write_rss_samples(output_dir, samples)
+    rss = _write_rss_samples(output_dir, samples, observation_lifetime=external_lifetime)
     cast(dict[str, object], document["resources"])["rss"] = rss
     clocks = _clocks(document)
     clocks.update(
@@ -2393,6 +2740,7 @@ def _record_supervision(
             "status": status,
             "worker_exit_status": worker_status,
             "process_group_reaped": group_reaped,
+            "supervisor_signal": supervisor_signal,
         }
     )
     if error is not None:
@@ -2408,6 +2756,18 @@ def _record_supervision(
     return document
 
 
+def _parent_readback_command(command: Sequence[str]) -> tuple[str, ...]:
+    readback = list(command)
+    try:
+        worker_flag = readback.index("--worker")
+    except ValueError as error:
+        raise CalibrationOperationalError(
+            "supervised worker command lacks the readback identity arguments"
+        ) from error
+    readback[worker_flag] = "--readback-only"
+    return tuple(readback)
+
+
 def supervise_worker(  # noqa: PLR0911
     command: Sequence[str],
     output_dir: Path,
@@ -2418,234 +2778,373 @@ def supervise_worker(  # noqa: PLR0911
     grace_seconds: float,
     invocation_started: float,
     external_deadline: float,
+    expected_invocation: dict[str, object] | None = None,
 ) -> int:
     """Sample, terminate, reap, and finally admit one worker process group."""
 
-    if time.perf_counter() >= external_deadline:
-        _record_supervision(
-            output_dir,
-            status="deadline-before-launch",
-            worker_status=None,
-            group_reaped=True,
-            samples=[],
-            launch_seconds=None,
-            worker_exit_seconds=None,
-            cleanup_seconds=0.0,
-            external_lifetime=time.perf_counter() - invocation_started,
-            error=(
-                f"worker process group exceeded the {external_seconds:g}-second "
-                "external deadline before launch"
-            ),
-        )
-        return 1
-    launch_started = time.perf_counter()
-    try:
-        process = subprocess.Popen(tuple(command), start_new_session=True)
-    except OSError as launch_error:
-        _record_supervision(
-            output_dir,
-            status="launch-failed",
-            worker_status=None,
-            group_reaped=True,
-            samples=[],
-            launch_seconds=time.perf_counter() - launch_started,
-            worker_exit_seconds=None,
-            cleanup_seconds=0.0,
-            external_lifetime=time.perf_counter() - invocation_started,
-            error=f"worker process launch failed: {launch_error}",
-        )
-        return 1
-    launch_seconds = time.perf_counter() - launch_started
+    command_arguments = tuple(command)
+    bindings: tuple[tuple[str, str], ...] = (
+        ("--repository", str(repository.resolve())),
+        ("--expect-implementation-revision", expected_revision),
+    )
+    for flag, expected in bindings:
+        if flag in command_arguments:
+            index = command_arguments.index(flag)
+            if index + 1 == len(command_arguments) or command_arguments[index + 1] != expected:
+                raise CalibrationError(f"supervised command {flag} differs from its seed")
+    if (
+        expected_invocation is not None
+        and expected_invocation.get("implementation_revision") != expected_revision
+    ):
+        raise CalibrationError("supervisor revision differs from its invocation identity")
+
+    handled_signals = (signal.SIGTERM, signal.SIGHUP)
+    previous_mask = signal.pthread_sigmask(signal.SIG_BLOCK, handled_signals)
+    previous_handlers: dict[signal.Signals, Any] = {}
+    active_process: subprocess.Popen[bytes] | None = None
+    worker_status: int | None = None
+    interrupted_signal: int | None = None
+    launching = False
     samples: list[dict[str, object]] = []
-    timed_out = False
-    interrupted: BaseException | None = None
+    launch_seconds: float | None = None
+    worker_exit_seconds: float | None = None
+    cleanup_seconds = 0.0
+
+    def handle_signal(signum: int, _frame: object) -> None:
+        nonlocal interrupted_signal
+        if interrupted_signal is None:
+            interrupted_signal = signum
+        if active_process is not None or not launching:
+            raise _SupervisorSignal(signum)
+
+    def raise_if_interrupted() -> None:
+        if interrupted_signal is not None:
+            raise _SupervisorSignal(interrupted_signal)
+
+    def record_deadline(message: str, *, before_launch: bool = False) -> int:
+        _record_supervision(
+            output_dir,
+            status="deadline-before-launch" if before_launch else "deadline-terminated",
+            worker_status=worker_status,
+            group_reaped=True,
+            samples=samples,
+            launch_seconds=launch_seconds,
+            worker_exit_seconds=worker_exit_seconds,
+            cleanup_seconds=cleanup_seconds,
+            external_lifetime=time.perf_counter() - invocation_started,
+            error=message,
+        )
+        return 1
+
     try:
-        while process.poll() is None:
+        for signal_number in handled_signals:
+            previous_handlers[signal_number] = signal.signal(signal_number, handle_signal)
+        signal.pthread_sigmask(signal.SIG_SETMASK, previous_mask)
+        raise_if_interrupted()
+        if time.perf_counter() >= external_deadline:
+            return record_deadline(
+                (
+                    f"worker process group exceeded the {external_seconds:g}-second "
+                    "external deadline before launch"
+                ),
+                before_launch=True,
+            )
+
+        launch_started = time.perf_counter()
+        launching = True
+        try:
+            active_process = subprocess.Popen(tuple(command), start_new_session=True)
+        except OSError as launch_error:
+            launch_seconds = time.perf_counter() - launch_started
+            _record_supervision(
+                output_dir,
+                status="launch-failed",
+                worker_status=None,
+                group_reaped=True,
+                samples=[],
+                launch_seconds=launch_seconds,
+                worker_exit_seconds=None,
+                cleanup_seconds=0.0,
+                external_lifetime=time.perf_counter() - invocation_started,
+                error=f"worker process launch failed: {launch_error}",
+            )
+            raise_if_interrupted()
+            return 1
+        finally:
+            launching = False
+        raise_if_interrupted()
+        launch_seconds = time.perf_counter() - launch_started
+        if time.perf_counter() >= external_deadline:
+            worker_status, cleanup_seconds = _reap_process_group(
+                active_process, grace_seconds=grace_seconds
+            )
+            active_process = None
+            return record_deadline(
+                f"worker process group exceeded the {external_seconds:g}-second deadline"
+            )
+
+        timed_out = False
+        while active_process.poll() is None:
             now = time.perf_counter()
+            remaining = external_deadline - now
+            if remaining <= 0:
+                timed_out = True
+                break
             samples.append(
                 _sample_process_group(
-                    process.pid,
+                    active_process.pid,
                     elapsed=now - invocation_started,
                     phase=_receipt_phase(output_dir / "result.json"),
+                    timeout_seconds=min(RSS_SAMPLE_SECONDS, remaining),
                 )
             )
+            raise_if_interrupted()
             remaining = external_deadline - time.perf_counter()
             if remaining <= 0:
                 timed_out = True
                 break
             time.sleep(min(RSS_SAMPLE_SECONDS, remaining))
-    except BaseException as error:  # noqa: BLE001 -- cleanup must precede propagation
-        interrupted = error
-    exit_observed = time.perf_counter()
-    cleanup_started = time.perf_counter()
-    try:
-        status, cleanup_seconds = _reap_process_group(process, grace_seconds=grace_seconds)
-    except (OSError, CalibrationOperationalError) as cleanup_error:
-        _record_supervision(
+
+        exit_observed = time.perf_counter()
+        worker_exit_seconds = max(0.0, exit_observed - invocation_started)
+        worker_status, cleanup_seconds = _reap_process_group(
+            active_process, grace_seconds=grace_seconds
+        )
+        active_process = None
+        if timed_out:
+            return record_deadline(
+                f"worker process group exceeded the {external_seconds:g}-second deadline"
+            )
+
+        document = _record_supervision(
             output_dir,
-            status="cleanup-failed",
-            worker_status=process.poll(),
-            group_reaped=False,
+            status="observed-exit",
+            worker_status=worker_status,
+            group_reaped=True,
             samples=samples,
             launch_seconds=launch_seconds,
-            worker_exit_seconds=max(0.0, exit_observed - invocation_started),
-            cleanup_seconds=time.perf_counter() - cleanup_started,
+            worker_exit_seconds=worker_exit_seconds,
+            cleanup_seconds=cleanup_seconds,
             external_lifetime=time.perf_counter() - invocation_started,
-            error=f"worker process-group cleanup failed: {cleanup_error}",
+            error=None,
         )
-        return 1
-    external_lifetime = time.perf_counter() - invocation_started
-    worker_exit_seconds = max(0.0, exit_observed - invocation_started)
-    if interrupted is not None:
+        if document is None:
+            return 1
+        if worker_status != 0 or document.get("phase") != "awaiting-worker-exit":
+            document.update(
+                {
+                    "status": "partial" if document.get("status") != "invalid" else "invalid",
+                    "disposition": (
+                        "incomplete"
+                        if document.get("status") != "invalid"
+                        else "calibration-refused"
+                    ),
+                    "phase": (
+                        "operational-failure"
+                        if document.get("status") != "invalid"
+                        else "invalid"
+                    ),
+                    "error": (
+                        "worker exited without a complete candidate with status "
+                        f"{worker_status}"
+                    ),
+                }
+            )
+            write_result(output_dir, document)
+            return 2 if document["status"] == "invalid" else 1
+
+        identity = expected_invocation or cast(
+            dict[str, object], cast(dict[str, object], document["invocation"])["identity"]
+        )
+        try:
+            readback_command = _parent_readback_command(command)
+        except CalibrationOperationalError as error:
+            document.update(
+                {
+                    "status": "partial",
+                    "disposition": "incomplete",
+                    "phase": "operational-failure",
+                    "error": str(error),
+                }
+            )
+            write_result(output_dir, document)
+            return 1
+        readback_started = time.perf_counter()
+        remaining = external_deadline - readback_started
+        if remaining <= 0:
+            return record_deadline("external deadline reached before parent final readback")
+        launching = True
+        try:
+            active_process = subprocess.Popen(readback_command, start_new_session=True)
+        except OSError as readback_launch_error:
+            document.update(
+                {
+                    "status": "partial",
+                    "disposition": "incomplete",
+                    "phase": "operational-failure",
+                    "error": f"parent readback launch failed: {readback_launch_error}",
+                }
+            )
+            write_result(output_dir, document)
+            raise_if_interrupted()
+            return 1
+        finally:
+            launching = False
+        raise_if_interrupted()
+        remaining = external_deadline - time.perf_counter()
+        if remaining <= 0:
+            _readback_status, readback_cleanup = _reap_process_group(
+                active_process, grace_seconds=grace_seconds
+            )
+            cleanup_seconds += readback_cleanup
+            active_process = None
+            return record_deadline("external deadline reached during parent final readback")
+        try:
+            readback_status = active_process.wait(timeout=remaining)
+        except subprocess.TimeoutExpired:
+            readback_status, readback_cleanup = _reap_process_group(
+                active_process, grace_seconds=grace_seconds
+            )
+            cleanup_seconds += readback_cleanup
+            active_process = None
+            return record_deadline("external deadline reached during parent final readback")
+        _readback_status, readback_cleanup = _reap_process_group(
+            active_process, grace_seconds=grace_seconds
+        )
+        cleanup_seconds += readback_cleanup
+        active_process = None
+        readback_finished = time.perf_counter()
+        if readback_finished >= external_deadline:
+            return record_deadline("external deadline reached during parent final readback")
+        document = _load_receipt_for_supervisor(output_dir)
+        if document is None:
+            return 1
+        if readback_status != 0:
+            invalid = readback_status == 2
+            document.update(
+                {
+                    "status": "invalid" if invalid else "partial",
+                    "disposition": "calibration-refused" if invalid else "incomplete",
+                    "phase": "invalid" if invalid else "operational-failure",
+                    "error": f"parent final readback exited with status {readback_status}",
+                }
+            )
+            write_result(output_dir, document)
+            return readback_status if invalid else 1
+
+        clocks = _clocks(document)
+        clocks["parent_final_readback_seconds"] = readback_finished - readback_started
+        clocks["supervisor_cleanup_seconds"] = cleanup_seconds
+        clocks["external_lifetime_seconds"] = readback_finished - invocation_started
+        resources = cast(dict[str, object], document["resources"])
+        resources["rss"] = _write_rss_samples(
+            output_dir,
+            samples,
+            observation_lifetime=cast(float, clocks["external_lifetime_seconds"]),
+        )
+        try:
+            _validate_cpu_observations(resources, required=True)
+            _validate_rss_observations(output_dir, resources, required=True)
+        except CalibrationError as error:
+            document.update(
+                {
+                    "status": "invalid",
+                    "disposition": "calibration-refused",
+                    "phase": "metrics-refused",
+                    "error": f"metrics admission refused: {error}",
+                }
+            )
+            write_result(output_dir, document)
+            return 2
+        if cast(dict[str, object], document["invocation"])["identity"] != identity:
+            document.update(
+                {
+                    "status": "invalid",
+                    "disposition": "calibration-refused",
+                    "phase": "invalid",
+                    "error": "parent final readback observed a different invocation identity",
+                }
+            )
+            write_result(output_dir, document)
+            return 2
+        document.update(
+            {
+                "status": "complete",
+                "disposition": "calibration-passed",
+                "phase": "complete",
+                "error": None,
+            }
+        )
+        write_result(output_dir, document)
+        return 0  # noqa: TRY300 -- every earlier branch records its terminal disposition
+    except _SupervisorSignal as error:
+        signal.pthread_sigmask(signal.SIG_BLOCK, handled_signals)
+        group_reaped = active_process is None
+        if active_process is not None:
+            try:
+                interrupted_status, interrupted_cleanup = _reap_process_group(
+                    active_process, grace_seconds=grace_seconds
+                )
+                cleanup_seconds += interrupted_cleanup
+                if worker_status is None:
+                    worker_status = interrupted_status
+                group_reaped = True
+            except OSError, CalibrationOperationalError:
+                group_reaped = False
+            active_process = None
+        signal_number = signal.Signals(interrupted_signal or error.signum)
         _record_supervision(
             output_dir,
             status="supervisor-interrupted",
-            worker_status=status,
-            group_reaped=True,
+            worker_status=worker_status,
+            group_reaped=group_reaped,
             samples=samples,
             launch_seconds=launch_seconds,
             worker_exit_seconds=worker_exit_seconds,
             cleanup_seconds=cleanup_seconds,
-            external_lifetime=external_lifetime,
-            error=f"supervisor interrupted by {type(interrupted).__name__}",
+            external_lifetime=time.perf_counter() - invocation_started,
+            error=f"supervisor interrupted by {signal_number.name} ({signal_number.value})",
+            supervisor_signal=signal_number.value,
         )
-        raise interrupted
-    if timed_out:
+        interrupted_signal = signal_number.value
+    except BaseException as error:
+        signal.pthread_sigmask(signal.SIG_BLOCK, handled_signals)
+        group_reaped = active_process is None
+        if active_process is not None:
+            try:
+                interrupted_status, interrupted_cleanup = _reap_process_group(
+                    active_process, grace_seconds=grace_seconds
+                )
+                cleanup_seconds += interrupted_cleanup
+                if worker_status is None:
+                    worker_status = interrupted_status
+                group_reaped = True
+            except OSError, CalibrationOperationalError:
+                group_reaped = False
+            active_process = None
         _record_supervision(
             output_dir,
-            status="deadline-terminated",
-            worker_status=status,
-            group_reaped=True,
+            status="supervisor-interrupted",
+            worker_status=worker_status,
+            group_reaped=group_reaped,
             samples=samples,
             launch_seconds=launch_seconds,
             worker_exit_seconds=worker_exit_seconds,
             cleanup_seconds=cleanup_seconds,
-            external_lifetime=external_lifetime,
-            error=f"worker process group exceeded the {external_seconds:g}-second deadline",
+            external_lifetime=time.perf_counter() - invocation_started,
+            error=f"supervisor interrupted by {type(error).__name__}",
         )
-        return 1
-    document = _record_supervision(
-        output_dir,
-        status="observed-exit",
-        worker_status=status,
-        group_reaped=True,
-        samples=samples,
-        launch_seconds=launch_seconds,
-        worker_exit_seconds=worker_exit_seconds,
-        cleanup_seconds=cleanup_seconds,
-        external_lifetime=external_lifetime,
-        error=None,
-    )
-    if document is None:
-        return 1
-    if status != 0 or document.get("phase") != "awaiting-worker-exit":
-        document.update(
-            {
-                "status": "partial" if document.get("status") != "invalid" else "invalid",
-                "disposition": (
-                    "incomplete"
-                    if document.get("status") != "invalid"
-                    else "calibration-refused"
-                ),
-                "phase": (
-                    "operational-failure" if document.get("status") != "invalid" else "invalid"
-                ),
-                "error": f"worker exited without a complete candidate with status {status}",
-            }
-        )
-        write_result(output_dir, document)
-        return 2 if document["status"] == "invalid" else 1
-    readback_started = time.perf_counter()
-    try:
-        load_result(
-            output_dir,
-            repository=repository,
-            expected_revision=expected_revision,
-            require_supervision=False,
-            require_complete_candidate=True,
-        )
-    except (CalibrationError, PacketError, OSError, ValueError, TypeError) as error:
-        document.update(
-            {
-                "status": "invalid",
-                "disposition": "calibration-refused",
-                "phase": "invalid",
-                "error": f"parent final readback refused: {error}",
-            }
-        )
-        write_result(output_dir, document)
-        return 2
-    readback_finished = time.perf_counter()
-    clocks = _clocks(document)
-    clocks["parent_final_readback_seconds"] = readback_finished - readback_started
-    clocks["external_lifetime_seconds"] = readback_finished - invocation_started
-    if readback_finished >= external_deadline:
-        document.update(
-            {
-                "status": "partial",
-                "disposition": "incomplete",
-                "phase": "timeout",
-                "error": "external deadline reached during parent final readback",
-            }
-        )
-        write_result(output_dir, document)
-        return 1
-    rss = cast(dict[str, object], cast(dict[str, object], document["resources"])["rss"])
-    if (
-        cast(int, rss["sample_count"]) == 0
-        or cast(int, rss["peak_sampled_rss_bytes"]) <= 0
-        or cast(list[object], rss["observer_errors"])
-    ):
-        document.update(
-            {
-                "status": "invalid",
-                "disposition": "calibration-refused",
-                "phase": "metrics-refused",
-                "error": "metrics admission requires observed, error-free RSS samples",
-            }
-        )
-        write_result(output_dir, document)
-        return 2
-    document.update(
-        {
-            "status": "complete",
-            "disposition": "calibration-passed",
-            "phase": "complete",
-            "error": None,
-        }
-    )
-    write_result(output_dir, document)
-    try:
-        load_result(
-            output_dir,
-            repository=repository,
-            expected_revision=expected_revision,
-        )
-    except (CalibrationError, PacketError, OSError, ValueError, TypeError) as error:
-        document.update(
-            {
-                "status": "invalid",
-                "disposition": "calibration-refused",
-                "phase": "invalid",
-                "error": f"terminal readback refused: {error}",
-            }
-        )
-        write_result(output_dir, document)
-        return 2
-    terminal_readback_finished = time.perf_counter()
-    if terminal_readback_finished >= external_deadline:
-        clocks["external_lifetime_seconds"] = terminal_readback_finished - invocation_started
-        document.update(
-            {
-                "status": "partial",
-                "disposition": "incomplete",
-                "phase": "timeout",
-                "error": "external deadline reached during terminal receipt readback",
-            }
-        )
-        write_result(output_dir, document)
-        return 1
-    return 0
+        raise
+    finally:
+        signal.pthread_sigmask(signal.SIG_BLOCK, handled_signals)
+        for signal_number, previous_handler in previous_handlers.items():
+            signal.signal(signal_number, previous_handler)
+        signal.pthread_sigmask(signal.SIG_SETMASK, previous_mask)
+
+    if interrupted_signal is not None:
+        signal.raise_signal(interrupted_signal)
+        return 128 + interrupted_signal
+    raise AssertionError("calibration supervisor left its process state without an outcome")
 
 
 def _record_worker_failure(
@@ -2678,14 +3177,36 @@ def run_worker(
     invocation_started: float,
     calibration_deadline: float,
     external_deadline: float,
+    run_order: int,
+    cache_observation: str,
+    background_load: str,
 ) -> int:
     """Run bounded preflight, all routes, and the first full byte readback."""
 
-    del calibration_seconds, external_seconds, grace_seconds
     preflight_started = time.perf_counter()
     cpu_started = time.process_time()
     children_started = resource.getrusage(resource.RUSAGE_CHILDREN)
     try:
+        expected_identity = _invocation_identity(
+            revision,
+            workers=workers,
+            calibration_seconds=calibration_seconds,
+            external_seconds=external_seconds,
+            grace_seconds=grace_seconds,
+            invocation_started=invocation_started,
+            run_order=run_order,
+            cache_observation=cache_observation,
+            background_load=background_load,
+        )
+        if (
+            calibration_deadline != invocation_started + calibration_seconds
+            or external_deadline != invocation_started + external_seconds
+        ):
+            _refuse("worker deadlines differ from its invocation allowances")
+        document = _strict_json(output_dir / "result.json")
+        validate_document(document)
+        if cast(dict[str, object], document["invocation"])["identity"] != expected_identity:
+            _refuse("worker arguments differ from the seeded invocation")
         manifest = source_manifest(
             repository,
             revision,
@@ -2700,8 +3221,6 @@ def run_worker(
             row["sha256"] for row in manifest if row["path"] == FIXTURE_PATH
         ):
             _refuse("executed fixture bytes differ from the source manifest")
-        document = _strict_json(output_dir / "result.json")
-        validate_document(document)
         cast(dict[str, object], document["sources"]).update(
             {"manifest": manifest, "runtime": runtime}
         )
@@ -2730,6 +3249,7 @@ def run_worker(
                 repository=repository,
                 expected_revision=revision,
                 require_supervision=False,
+                expected_invocation=expected_identity,
             )
             _clocks(document)["full_readback_seconds"] = time.perf_counter() - readback_started
             if time.perf_counter() >= calibration_deadline:
@@ -2781,10 +3301,19 @@ def run_worker(
         )
         return 1
     children_finished = resource.getrusage(resource.RUSAGE_CHILDREN)
+    cpu_finished = time.process_time()
     resources = cast(dict[str, object], document["resources"])
     resources.update(
         {
-            "coordinator_process_seconds": time.process_time() - cpu_started,
+            "cpu_observations": {
+                "coordinator_start_seconds": cpu_started,
+                "coordinator_end_seconds": cpu_finished,
+                "direct_children_user_start_seconds": children_started.ru_utime,
+                "direct_children_user_end_seconds": children_finished.ru_utime,
+                "direct_children_system_start_seconds": children_started.ru_stime,
+                "direct_children_system_end_seconds": children_finished.ru_stime,
+            },
+            "coordinator_process_seconds": cpu_finished - cpu_started,
             "reaped_direct_children_user_seconds": (
                 children_finished.ru_utime - children_started.ru_utime
             ),
@@ -2815,6 +3344,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--cache-observation", required=True)
     parser.add_argument("--background-load", required=True)
     parser.add_argument("--worker", action="store_true", help=argparse.SUPPRESS)
+    parser.add_argument("--readback-only", action="store_true", help=argparse.SUPPRESS)
     parser.add_argument("--invocation-started-monotonic", type=float, help=argparse.SUPPRESS)
     parser.add_argument("--calibration-deadline-monotonic", type=float, help=argparse.SUPPRESS)
     parser.add_argument("--external-deadline-monotonic", type=float, help=argparse.SUPPRESS)
@@ -2854,9 +3384,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         options.calibration_deadline_monotonic,
         options.external_deadline_monotonic,
     )
-    if options.worker:
+    if options.worker and options.readback_only:
+        raise CalibrationError("worker and readback modes are mutually exclusive")
+    if options.worker or options.readback_only:
         if any(value is None or not math.isfinite(value) for value in inherited):
-            raise CalibrationError("worker requires finite parent deadline attestation")
+            raise CalibrationError("child mode requires finite parent deadline attestation")
         inherited_started = cast(float, options.invocation_started_monotonic)
         inherited_calibration = cast(float, options.calibration_deadline_monotonic)
         inherited_external = cast(float, options.external_deadline_monotonic)
@@ -2865,6 +3397,32 @@ def main(argv: Sequence[str] | None = None) -> int:
             or inherited_external != inherited_started + options.external_seconds
         ):
             raise CalibrationError("worker deadlines differ from the parent invocation clock")
+        identity = _invocation_identity(
+            revision,
+            workers=options.workers,
+            calibration_seconds=options.calibration_seconds,
+            external_seconds=options.external_seconds,
+            grace_seconds=options.grace_seconds,
+            invocation_started=inherited_started,
+            run_order=options.run_order,
+            cache_observation=options.cache_observation,
+            background_load=options.background_load,
+        )
+        if options.readback_only:
+            try:
+                load_result(
+                    options.output_dir.resolve(),
+                    repository=repository,
+                    expected_revision=revision,
+                    require_supervision=False,
+                    require_complete_candidate=True,
+                    expected_invocation=identity,
+                )
+            except CalibrationError, PacketError, OSError, ValueError, TypeError:
+                return 2
+            except Exception:  # noqa: BLE001 -- child status preserves operational failure
+                return 1
+            return 0
         return run_worker(
             repository,
             revision,
@@ -2876,6 +3434,9 @@ def main(argv: Sequence[str] | None = None) -> int:
             invocation_started=inherited_started,
             calibration_deadline=inherited_calibration,
             external_deadline=inherited_external,
+            run_order=options.run_order,
+            cache_observation=options.cache_observation,
+            background_load=options.background_load,
         )
     if any(value is not None for value in inherited):
         raise CalibrationError("parent invocation cannot accept inherited deadline fields")
@@ -2894,6 +3455,17 @@ def main(argv: Sequence[str] | None = None) -> int:
         background_load=options.background_load,
     )
     write_result(output, seed)
+    expected_invocation = _invocation_identity(
+        revision,
+        workers=options.workers,
+        calibration_seconds=options.calibration_seconds,
+        external_seconds=options.external_seconds,
+        grace_seconds=options.grace_seconds,
+        invocation_started=invocation_started,
+        run_order=options.run_order,
+        cache_observation=options.cache_observation,
+        background_load=options.background_load,
+    )
     command = [
         sys.executable,
         "-m",
@@ -2935,6 +3507,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         grace_seconds=options.grace_seconds,
         invocation_started=invocation_started,
         external_deadline=external_deadline,
+        expected_invocation=expected_invocation,
     )
 
 

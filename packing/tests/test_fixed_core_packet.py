@@ -1839,6 +1839,55 @@ def test_source_manifest_refuses_a_result_directory_overlapping_tracked_output(
         )
 
 
+def test_output_guard_rejects_normal_and_linked_worktree_git_data(tmp_path: Path) -> None:
+    repository, revision = _repository_with_sources(tmp_path / "source")
+    linked = tmp_path / "linked"
+    subprocess.run(
+        ("git", "-C", str(repository), "worktree", "add", "--detach", str(linked), revision),
+        check=True,
+        capture_output=True,
+    )
+    normal_git = Path(
+        subprocess.run(
+            ("git", "-C", str(repository), "rev-parse", "--absolute-git-dir"),
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.strip()
+    )
+    linked_git = Path(
+        subprocess.run(
+            ("git", "-C", str(linked), "rev-parse", "--absolute-git-dir"),
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.strip()
+    )
+
+    for checkout, destination in (
+        (repository, normal_git / "refs" / "heads" / "forged"),
+        (linked, linked_git / "nested"),
+        (linked, normal_git / "worktrees" / "forged"),
+    ):
+        with pytest.raises(PacketError, match="Git administrative data"):
+            fixed_core_packet.prepare_output_dir(destination, checkout)
+        assert not destination.exists()
+
+
+def test_output_guard_rejects_separate_git_directory(tmp_path: Path) -> None:
+    checkout = tmp_path / "separate-checkout"
+    administrative = tmp_path / "separate-admin"
+    subprocess.run(
+        ("git", "init", "-q", "--separate-git-dir", str(administrative), str(checkout)),
+        check=True,
+    )
+    destination = administrative / "refs" / "heads" / "forged"
+
+    with pytest.raises(PacketError, match="Git administrative data"):
+        fixed_core_packet.prepare_output_dir(destination, checkout)
+    assert not destination.exists()
+
+
 def test_scientific_readback_cannot_hide_unrelated_state_with_a_metachar_output(
     tmp_path: Path,
 ) -> None:
@@ -2243,6 +2292,48 @@ def test_preflight_launch_failure_is_retained_as_operational_and_unresolved(
     assert receipt["outcome"] == "preflight-failed"
     assert receipt["scientific_decision"] == "unresolved"
     assert receipt["error"] == "worker process launch failed: synthetic launch failure"
+    assert cast(dict[str, object], receipt["supervision"]) == {
+        "status": "launch-failed",
+        "worker_exit_status": None,
+        "supervisor_signal": None,
+    }
+
+
+def test_non_oserror_launch_failure_retains_type_message_and_returns_one(
+    tmp_path: Path,
+) -> None:
+    result = tmp_path / "result.json"
+    fixed_core_packet.write_result(
+        result,
+        fixed_core_packet.initial_preflight_document(
+            REVISION,
+            workers=1,
+            scientific_seconds=10.0,
+            external_seconds=20.0,
+            grace_seconds=2.0,
+        ),
+    )
+    with (
+        patch(
+            "devtools.fixed_core_packet.subprocess.Popen",
+            side_effect=MemoryError("synthetic host allocation failure"),
+        ),
+        patch("devtools.fixed_core_packet.time.perf_counter", side_effect=[11.0, 12.0]),
+    ):
+        status = supervise_worker(
+            ("worker",),
+            result,
+            external_seconds=20.0,
+            grace_seconds=2.0,
+            invocation_started=10.0,
+            external_deadline=30.0,
+        )
+
+    receipt = cast(dict[str, object], json.loads(result.read_text()))
+    assert status == 1
+    assert receipt["error"] == (
+        "worker process launch failed: MemoryError: synthetic host allocation failure"
+    )
     assert cast(dict[str, object], receipt["supervision"]) == {
         "status": "launch-failed",
         "worker_exit_status": None,
@@ -2896,6 +2987,60 @@ def test_operational_preflight_failure_remains_partial_and_unresolved(
             expected_revision=REVISION,
             require_supervision=False,
         )
+
+
+def test_uv_lock_read_oserror_stays_operational_through_worker_receipt(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    output = tmp_path / "uv-lock-io"
+    output.mkdir()
+    fixed_core_packet.write_result(
+        output / "result.json",
+        fixed_core_packet.initial_preflight_document(
+            REVISION,
+            workers=1,
+            scientific_seconds=10.0,
+            external_seconds=20.0,
+            grace_seconds=2.0,
+        ),
+    )
+    original_read_text = Path.read_text
+    monkeypatch.setattr(fixed_core_packet, "runtime_binding", runtime_binding)
+
+    def read_text(
+        path: Path,
+        encoding: str | None = None,
+        errors: str | None = None,
+        newline: str | None = None,
+    ) -> str:
+        if path.resolve() == (REPOSITORY / "packing" / "uv.lock").resolve():
+            raise OSError("synthetic uv.lock I/O failure")
+        return original_read_text(path, encoding=encoding, errors=errors, newline=newline)
+
+    with (
+        patch("devtools.fixed_core_packet.source_manifest", return_value=MANIFEST),
+        patch.object(Path, "read_text", read_text),
+        patch("devtools.fixed_core_packet.time.perf_counter", side_effect=[10.0, 11.0]),
+    ):
+        status = run_worker(
+            REPOSITORY,
+            REVISION,
+            output,
+            workers=1,
+            scientific_seconds=10.0,
+            external_seconds=20.0,
+            grace_seconds=2.0,
+        )
+
+    receipt = cast(dict[str, object], json.loads((output / "result.json").read_text()))
+    assert status == 1
+    assert receipt["status"] == "partial"
+    assert receipt["outcome"] == "preflight-failed"
+    assert receipt["scientific_decision"] == "unresolved"
+    assert receipt["error"] == (
+        "operational preflight failure: PacketOperationalError: "
+        "could not read the bound uv.lock: OSError: synthetic uv.lock I/O failure"
+    )
 
 
 def test_worker_republishes_complete_receipt_after_readback_with_end_to_end_clock(

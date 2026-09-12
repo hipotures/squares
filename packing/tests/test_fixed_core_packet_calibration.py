@@ -10,6 +10,9 @@ from __future__ import annotations
 import ast
 import hashlib
 import json
+import os
+import signal
+import subprocess
 import sys
 import time
 from collections.abc import Callable
@@ -24,7 +27,6 @@ import pytest
 
 from devtools import calibrate_fixed_core_packet as calibration
 from devtools.dilation_corollary import (
-    THRESHOLD_LIMIT_RECORD_SCHEMA,
     build_limit_record,
 )
 from devtools.fixed_core_packet import (
@@ -76,14 +78,15 @@ def _small(
     return _normalized(reduced) if normalized else reduced
 
 
-def _seed(output: Path) -> dict[str, object]:
+def _seed(output: Path, *, invocation_started: float | None = None) -> dict[str, object]:
+    started = time.perf_counter() if invocation_started is None else invocation_started
     document = calibration.initial_document(
         REVISION,
         workers=1,
         calibration_seconds=1.0,
         external_seconds=2.0,
         grace_seconds=0.05,
-        invocation_started=time.perf_counter(),
+        invocation_started=started,
         run_order=1,
         cache_observation="test process; cache state unmeasured",
         background_load="test host; background load unmeasured",
@@ -112,31 +115,8 @@ def _run_small_raw(
 
 
 def _dilation_oracle() -> dict[str, object]:
-    return {
-        "schema": THRESHOLD_LIMIT_RECORD_SCHEMA,
-        "source": {
-            "certificate": "candidate.json",
-            "sha256": "b" * 64,
-            "n": 2,
-            "total_budget": "1",
-            "minimum_cell_charge": "1",
-        },
-        "sharpened_containment": {
-            "strict_factor_test_left_multiplier": str(calibration.EXPECTED_STRICT_LEFT),
-            "strict_factor_test_right": str(calibration.EXPECTED_STRICT_RIGHT),
-        },
-        "strict_dilation_family": {
-            "factor_supremum": "2*sqrt(33177601)/5761",
-            "factor_supremum_squared": str(calibration.EXPECTED_FACTOR_SQUARED),
-        },
-        "conclusion": {
-            "bounded_side": "3*sqrt(33177601)/11522",
-            "bounded_side_squared": str(calibration.EXPECTED_SIDE_SQUARED),
-            "relation": ">=",
-            "endpoint_certificate": False,
-        },
-        "proof": {"requires_compactness": False},
-    }
+    certificate, _source = _fixture()
+    return calibration._expected_dilation_record(_normalized(certificate), "b" * 64)
 
 
 def test_frozen_cross_fixture_and_normalization_have_the_reviewed_answers() -> None:
@@ -398,7 +378,10 @@ def test_interval_scale_is_semantic_while_box_count_is_observational(
 @pytest.mark.parametrize(
     ("path", "value"),
     [
+        (("source", "outer_side"), "999"),
+        (("strict_dilation_family", "factor_supremum"), "2*sqrt(33177601)/5761+0"),
         (("strict_dilation_family", "factor_supremum_squared"), "4"),
+        (("strict_dilation_family", "factor_supremum_defining_polynomial"), "x^2-1"),
         (("conclusion", "bounded_side_squared"), "3"),
         (("conclusion", "endpoint_certificate"), True),
         (("proof", "requires_compactness"), True),
@@ -412,6 +395,15 @@ def test_dilation_surd_endpoint_and_compactness_mutations_are_refused(
     record = _dilation_oracle()
     calibration._check_dilation_record(record, normalized, "b" * 64)
     cast(dict[str, object], record[path[0]])[path[1]] = value
+    with pytest.raises(calibration.CalibrationError, match="dilation record"):
+        calibration._check_dilation_record(record, normalized, "b" * 64)
+
+
+def test_dilation_record_refuses_a_missing_generic_field() -> None:
+    certificate, _source = _fixture()
+    normalized = _normalized(certificate)
+    record = _dilation_oracle()
+    cast(dict[str, object], record["source"]).pop("variant")
     with pytest.raises(calibration.CalibrationError, match="dilation record"):
         calibration._check_dilation_record(record, normalized, "b" * 64)
 
@@ -448,31 +440,81 @@ def test_calibration_wrapper_is_closed_and_cross_schema_readers_refuse(
         )
 
 
-def test_partial_route_receipts_bind_the_exact_published_direction_set() -> None:
-    document = calibration.initial_document(
-        REVISION,
-        workers=1,
-        calibration_seconds=1.0,
-        external_seconds=2.0,
-        grace_seconds=0.05,
-        invocation_started=0.0,
-        run_order=1,
-        cache_observation="unmeasured",
-        background_load="unmeasured",
+def test_terminal_status_cannot_substitute_declared_row_counts_for_routes(
+    tmp_path: Path,
+) -> None:
+    output = tmp_path / "fabricated-terminal"
+    output.mkdir()
+    document = _seed(output)
+    document.update(
+        {
+            "status": "complete",
+            "disposition": "calibration-passed",
+            "phase": "complete",
+            "error": None,
+        }
     )
-    routes = cast(dict[str, object], document["routes"])
-    routes["reflected_interval"] = {
+    document["artifacts"] = [
+        {
+            "role": "declared-direction-counts",
+            "path": "absent",
+            "count": calibration.TOTAL_DIRECTION_ROWS,
+            "bytes": 0,
+        }
+    ]
+    resources = cast(dict[str, object], document["resources"])
+    resources.update(
+        {
+            "cpu_observations": {
+                "coordinator_start_seconds": 0.0,
+                "coordinator_end_seconds": 0.1,
+                "direct_children_user_start_seconds": 0.0,
+                "direct_children_user_end_seconds": 0.0,
+                "direct_children_system_start_seconds": 0.0,
+                "direct_children_system_end_seconds": 0.0,
+            },
+            "coordinator_process_seconds": 0.1,
+            "reaped_direct_children_user_seconds": 0.0,
+            "reaped_direct_children_system_seconds": 0.0,
+            "rss": {"sample_count": 2},
+        }
+    )
+    cast(dict[str, object], document["supervision"]).update(
+        {
+            "status": "observed-exit",
+            "worker_exit_status": 0,
+            "process_group_reaped": True,
+        }
+    )
+    _write_json(output / "result.json", document)
+
+    with pytest.raises(calibration.CalibrationError, match="complete known-answer routes"):
+        calibration.load_result(
+            output,
+            repository=REPOSITORY,
+            expected_revision=REVISION,
+            expected_invocation=cast(
+                dict[str, object],
+                cast(dict[str, object], document["invocation"])["identity"],
+            ),
+        )
+
+
+def test_partial_route_receipts_bind_the_exact_published_direction_set() -> None:
+    receipt: dict[str, object] = {
         "status": "partial",
         "source_sha256": "b" * 64,
-        "directions_expected": calibration.INTERVAL_DIRECTIONS,
+        "directions_expected": calibration.RAW_DIRECTIONS,
         "directions_completed": 2,
-        "completed_directions": ["0", "2'"],
-        "last": {"label": "2'"},
+        "completed_directions": [0, 2],
+        "observed_minimum_upper_bound": "1",
+        "argmin": 0,
+        "witness": ["0", "0"],
     }
-    calibration.validate_document(document)
-    cast(dict[str, object], routes["reflected_interval"])["completed_directions"] = ["0"]
+    calibration._validate_route_receipt("normalized_exact", receipt)
+    receipt["completed_directions"] = [0]
     with pytest.raises(calibration.CalibrationError, match="progress"):
-        calibration.validate_document(document)
+        calibration._validate_route_receipt("normalized_exact", receipt)
 
 
 def test_receipt_parser_refuses_duplicate_keys(tmp_path: Path) -> None:
@@ -545,9 +587,10 @@ def test_rss_summary_is_byte_bound_but_not_a_semantic_answer(tmp_path: Path) -> 
             "error": None,
         },
     ]
-    summary = calibration._write_rss_samples(tmp_path, samples)
-    resources = {
+    summary = calibration._write_rss_samples(tmp_path, samples, observation_lifetime=0.3)
+    resources: dict[str, object] = {
         "cpu_scope": calibration.CPU_SCOPE,
+        "cpu_observations": None,
         "coordinator_process_seconds": None,
         "reaped_direct_children_user_seconds": None,
         "reaped_direct_children_system_seconds": None,
@@ -720,6 +763,7 @@ def test_timeout_kills_and_reaps_a_termination_resistant_process_group(
         "status": "deadline-terminated",
         "worker_exit_status": -9,
         "process_group_reaped": True,
+        "supervisor_signal": None,
     }
 
 
@@ -750,6 +794,60 @@ def test_nonzero_exit_revokes_a_stale_complete_candidate_phase(
     assert receipt["supervision"]["worker_exit_status"] == 7
 
 
+def test_interrupt_during_parent_readback_never_publishes_success(tmp_path: Path) -> None:
+    output = tmp_path / "interrupted-readback"
+    output.mkdir()
+    document = _seed(output)
+    document["phase"] = "awaiting-worker-exit"
+    document["error"] = "parent has not observed worker exit"
+    calibration.write_result(output, document)
+
+    class Worker:
+        pid = 101
+
+        @staticmethod
+        def poll() -> int:
+            return 0
+
+    class Readback:
+        pid = 102
+
+        @staticmethod
+        def wait(*, timeout: float) -> int:
+            del timeout
+            raise KeyboardInterrupt
+
+    started = time.perf_counter()
+    with (
+        patch(
+            "devtools.calibrate_fixed_core_packet.subprocess.Popen",
+            side_effect=[Worker(), Readback()],
+        ),
+        patch(
+            "devtools.calibrate_fixed_core_packet._reap_process_group",
+            side_effect=[(0, 0.0), (-signal.SIGTERM, 0.01)],
+        ),
+        pytest.raises(KeyboardInterrupt),
+    ):
+        calibration.supervise_worker(
+            ("worker", "--worker"),
+            output,
+            repository=REPOSITORY,
+            expected_revision=REVISION,
+            external_seconds=2.0,
+            grace_seconds=0.05,
+            invocation_started=started,
+            external_deadline=started + 2.0,
+        )
+
+    receipt = cast(dict[str, object], json.loads((output / "result.json").read_bytes()))
+    assert receipt["status"] == "partial"
+    assert receipt["phase"] == "operational-failure"
+    assert cast(dict[str, object], receipt["supervision"])["status"] == (
+        "supervisor-interrupted"
+    )
+
+
 def test_parent_readback_that_finishes_after_deadline_revokes_admission(
     tmp_path: Path,
 ) -> None:
@@ -761,24 +859,17 @@ def test_parent_readback_that_finishes_after_deadline_revokes_admission(
     calibration.write_result(output, document)
     started = time.perf_counter()
 
-    def late_readback(*_args: object, **_kwargs: object) -> dict[str, object]:
-        time.sleep(0.12)
-        return document
-
-    with patch(
-        "devtools.calibrate_fixed_core_packet.load_result",
-        side_effect=late_readback,
-    ):
-        status = calibration.supervise_worker(
-            (sys.executable, "-c", "import time; time.sleep(0.02)"),
-            output,
-            repository=REPOSITORY,
-            expected_revision=REVISION,
-            external_seconds=0.15,
-            grace_seconds=0.05,
-            invocation_started=started,
-            external_deadline=started + 0.15,
-        )
+    program = "import sys,time;time.sleep(0.3 if '--readback-only' in sys.argv else 0.02)"
+    status = calibration.supervise_worker(
+        (sys.executable, "-c", program, "--worker"),
+        output,
+        repository=REPOSITORY,
+        expected_revision=REVISION,
+        external_seconds=0.18,
+        grace_seconds=0.05,
+        invocation_started=started,
+        external_deadline=started + 0.18,
+    )
     receipt = json.loads((output / "result.json").read_bytes())
     assert status == 1
     assert receipt["status"] == "partial"
@@ -791,8 +882,8 @@ def test_worker_git_oserror_remains_operationally_unresolved(
 ) -> None:
     output = tmp_path / "worker-oserror"
     output.mkdir()
-    _seed(output)
     started = time.perf_counter()
+    _seed(output, invocation_started=started)
     with patch(
         "devtools.calibrate_fixed_core_packet.source_manifest",
         side_effect=OSError("transient Git failure"),
@@ -808,9 +899,180 @@ def test_worker_git_oserror_remains_operationally_unresolved(
             invocation_started=started,
             calibration_deadline=started + 1.0,
             external_deadline=started + 2.0,
+            run_order=1,
+            cache_observation="test process; cache state unmeasured",
+            background_load="test host; background load unmeasured",
         )
     receipt = json.loads((output / "result.json").read_bytes())
     assert status == 1
     assert receipt["status"] == "partial"
     assert receipt["phase"] == "operational-failure"
     assert "transient Git failure" in receipt["error"]
+
+
+@pytest.mark.skipif(sys.platform == "win32", reason="POSIX signals are required")
+@pytest.mark.parametrize(
+    ("signal_number", "delivery"),
+    [(signal.SIGTERM, "running"), (signal.SIGHUP, "launch")],
+)
+def test_real_supervisor_signal_reaps_worker_including_launch_window(
+    tmp_path: Path, signal_number: signal.Signals, delivery: str
+) -> None:
+    during_launch = delivery == "launch"
+    output = tmp_path / f"signal-{signal_number.name}"
+    output.mkdir()
+    _seed(output)
+    worker_pid_path = tmp_path / f"worker-{signal_number.name}.pid"
+    supervisor_program = f"""
+import os
+import signal
+import subprocess
+import sys
+import time
+from pathlib import Path
+from devtools import calibrate_fixed_core_packet as calibration
+
+real_popen = subprocess.Popen
+pid_path = Path({str(worker_pid_path)!r})
+during_launch = {during_launch!r}
+
+def launch(*args, **kwargs):
+    process = real_popen(*args, **kwargs)
+    pid_path.write_text(str(process.pid), encoding="utf-8")
+    if during_launch:
+        os.kill(os.getpid(), signal.SIGHUP)
+    return process
+
+calibration.subprocess.Popen = launch
+started = time.perf_counter()
+calibration.supervise_worker(
+    (sys.executable, "-c", "import time; time.sleep(60)"),
+    Path({str(output)!r}),
+    repository=Path({str(REPOSITORY)!r}),
+    expected_revision={REVISION!r},
+    external_seconds=60.0,
+    grace_seconds=0.05,
+    invocation_started=started,
+    external_deadline=started + 60.0,
+)
+"""
+    supervisor = subprocess.Popen((sys.executable, "-c", supervisor_program))
+    deadline = time.monotonic() + 3.0
+    while not worker_pid_path.exists() and time.monotonic() < deadline:
+        time.sleep(0.01)
+    assert worker_pid_path.exists()
+    worker_pid = int(worker_pid_path.read_text())
+    if not during_launch:
+        os.kill(supervisor.pid, signal_number)
+    assert supervisor.wait(timeout=3.0) == -signal_number
+
+    receipt = cast(dict[str, object], json.loads((output / "result.json").read_bytes()))
+    assert receipt["status"] == "partial"
+    assert receipt["phase"] == "operational-failure"
+    assert cast(dict[str, object], receipt["supervision"])["status"] == (
+        "supervisor-interrupted"
+    )
+    assert cast(dict[str, object], receipt["supervision"])["supervisor_signal"] == (
+        signal_number
+    )
+    with pytest.raises(ProcessLookupError):
+        os.kill(worker_pid, 0)
+
+
+def test_cpu_observations_reconstruct_elapsed_measurements() -> None:
+    resources: dict[str, object] = {
+        "cpu_observations": {
+            "coordinator_start_seconds": 2.0,
+            "coordinator_end_seconds": 3.5,
+            "direct_children_user_start_seconds": 4.0,
+            "direct_children_user_end_seconds": 4.25,
+            "direct_children_system_start_seconds": 5.0,
+            "direct_children_system_end_seconds": 5.125,
+        },
+        "coordinator_process_seconds": 1.5,
+        "reaped_direct_children_user_seconds": 0.25,
+        "reaped_direct_children_system_seconds": 0.125,
+    }
+    calibration._validate_cpu_observations(resources, required=True)
+    resources["coordinator_process_seconds"] = 1.25
+    with pytest.raises(calibration.CalibrationError, match="retained observations"):
+        calibration._validate_cpu_observations(resources, required=True)
+
+
+def test_terminal_rss_requires_ordered_repeated_samples(tmp_path: Path) -> None:
+    one_sample = [
+        {
+            "elapsed_seconds": 0.1,
+            "phase": "preflight",
+            "pids": [101],
+            "rss_bytes": 1024,
+            "error": None,
+        }
+    ]
+    resources: dict[str, object] = {
+        "rss": calibration._write_rss_samples(tmp_path, one_sample, observation_lifetime=0.2)
+    }
+    with pytest.raises(calibration.CalibrationError, match="requires observed"):
+        calibration._validate_rss_observations(tmp_path, resources, required=True)
+
+    reversed_samples = [
+        {**one_sample[0], "elapsed_seconds": 0.2},
+        {**one_sample[0], "elapsed_seconds": 0.1},
+    ]
+    resources["rss"] = calibration._write_rss_samples(
+        tmp_path, reversed_samples, observation_lifetime=0.3
+    )
+    with pytest.raises(calibration.CalibrationError, match="times are not monotonic"):
+        calibration._validate_rss_observations(tmp_path, resources, required=True)
+
+
+def test_worker_refuses_arguments_that_differ_from_seeded_invocation(
+    tmp_path: Path,
+) -> None:
+    output = tmp_path / "invocation-mismatch"
+    output.mkdir()
+    started = time.perf_counter()
+    _seed(output, invocation_started=started)
+    with (
+        patch("devtools.calibrate_fixed_core_packet.source_manifest") as manifest,
+        patch("devtools.calibrate_fixed_core_packet.execute_calibration") as execute,
+    ):
+        status = calibration.run_worker(
+            REPOSITORY,
+            REVISION,
+            output,
+            workers=2,
+            calibration_seconds=1.0,
+            external_seconds=2.0,
+            grace_seconds=0.05,
+            invocation_started=started,
+            calibration_deadline=started + 1.0,
+            external_deadline=started + 2.0,
+            run_order=1,
+            cache_observation="test process; cache state unmeasured",
+            background_load="test host; background load unmeasured",
+        )
+    assert status == 2
+    manifest.assert_not_called()
+    execute.assert_not_called()
+    receipt = cast(dict[str, object], json.loads((output / "result.json").read_bytes()))
+    assert receipt["status"] == "invalid"
+    assert "worker arguments differ" in cast(str, receipt["error"])
+
+
+def test_reader_refuses_a_different_invocation_identity(tmp_path: Path) -> None:
+    output = tmp_path / "reader-identity"
+    output.mkdir()
+    document = _seed(output)
+    expected = deepcopy(
+        cast(dict[str, object], cast(dict[str, object], document["invocation"])["identity"])
+    )
+    expected["requested_workers"] = 2
+    with pytest.raises(calibration.CalibrationError, match="invocation differs"):
+        calibration.load_result(
+            output,
+            repository=REPOSITORY,
+            expected_revision=REVISION,
+            require_supervision=False,
+            expected_invocation=expected,
+        )

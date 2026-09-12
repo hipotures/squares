@@ -526,7 +526,12 @@ def runtime_binding(
     expected_environment = (repository / "packing" / ".venv").resolve()
     if observation.environment.resolve() != expected_environment:
         raise PacketError("fixed-core packet must run in the repository packing/.venv")
-    expected_version = (repository / PROJECT_RUNTIME_PATHS[0]).read_text().strip()
+    try:
+        expected_version = (repository / PROJECT_RUNTIME_PATHS[0]).read_text().strip()
+    except OSError as error:
+        raise PacketOperationalError(
+            f"could not read the bound Python version: {type(error).__name__}: {error}"
+        ) from error
     if (
         observation.implementation != "cpython"
         or observation.version != expected_version
@@ -544,8 +549,14 @@ def runtime_binding(
         raise PacketError("Python executable identity is missing or inconsistent")
 
     try:
-        lock = tomllib.loads((repository / "packing" / "uv.lock").read_text())
-    except (OSError, tomllib.TOMLDecodeError) as error:
+        lock_text = (repository / "packing" / "uv.lock").read_text()
+    except OSError as error:
+        raise PacketOperationalError(
+            f"could not read the bound uv.lock: {type(error).__name__}: {error}"
+        ) from error
+    try:
+        lock = tomllib.loads(lock_text)
+    except tomllib.TOMLDecodeError as error:
         raise PacketError(f"could not read the bound uv.lock: {error}") from error
     package_rows = lock.get("package")
     if not isinstance(package_rows, list):
@@ -3774,9 +3785,20 @@ def load_result(
 
 
 def prepare_output_dir(output_dir: Path, repository: Path) -> Path:
+    repository = repository.resolve()
     resolved = output_dir.resolve()
     if resolved.exists():
         raise PacketError("output directory must be fresh")
+    git_directory = Path(_git(repository, "rev-parse", "--absolute-git-dir")).resolve()
+    common_text = _git(repository, "rev-parse", "--git-common-dir")
+    common_directory = Path(common_text)
+    if not common_directory.is_absolute():
+        common_directory = repository / common_directory
+    git_control_directories = {git_directory, common_directory.resolve()}
+    if any(
+        resolved == path or resolved.is_relative_to(path) for path in git_control_directories
+    ):
+        raise PacketError("output directory cannot be inside Git administrative data")
     protected = (
         repository / "packing" / "devtools",
         repository / "packing" / "src",
@@ -4022,12 +4044,14 @@ def supervise_worker(  # noqa: PLR0911
             )
             return 1
 
-        launch_error: OSError | None = None
+        launch_error: str | None = None
         launching = True
         try:
             process = subprocess.Popen(command, start_new_session=True)
         except OSError as error:
-            launch_error = error
+            launch_error = str(error)
+        except Exception as error:  # noqa: BLE001 -- ordinary launch failures are operational
+            launch_error = f"{type(error).__name__}: {error}"
         finally:
             launching = False
         raise_if_interrupted()
