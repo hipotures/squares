@@ -35,7 +35,7 @@ from contextlib import suppress
 from dataclasses import dataclass
 from fractions import Fraction
 from multiprocessing import get_context
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any, Literal, Protocol, cast
 
 from strif import atomic_write_text
@@ -100,8 +100,8 @@ DEFAULT_GRACE_SECONDS = 2.0
 MAX_WORKERS = 4
 IN_FLIGHT_WORK_PER_WORKER = 2
 STRIF_ATOMIC_UID_LENGTH = 13
-RESULT_SCHEMA = "fixed-core-threshold-packet/v3"
-PREFLIGHT_SCHEMA = "fixed-core-threshold-packet-preflight/v1"
+RESULT_SCHEMA = "fixed-core-threshold-packet/v4"
+PREFLIGHT_SCHEMA = "fixed-core-threshold-packet-preflight/v2"
 NORMALIZATION_SETTING = "alpha=1/m after complete strict acceptance"
 SCIENTIFIC_DEADLINE_SCOPE = (
     "parent invocation through supervised source and runtime preflight, source replay, "
@@ -109,8 +109,10 @@ SCIENTIFIC_DEADLINE_SCOPE = (
     "acceptance"
 )
 EXTERNAL_DEADLINE_SCOPE = (
-    "parent invocation through supervised worker process-group termination; the "
-    "termination grace follows the deadline"
+    "clocked from parent invocation through supervised worker process-group "
+    "termination; enforcement excludes time blocked inside the operating-system "
+    "process-launch call, checks the deadline immediately before and after that call, "
+    "and allows termination grace after the deadline"
 )
 RUNTIME_ATTESTATION_SCOPE = (
     "source and observed runtime identities for this execution; no interpreter-binary, "
@@ -129,6 +131,18 @@ Publisher = Callable[[Path, dict[str, object]], None]
 
 class PacketError(ValueError):
     """A source, invocation, result, or reader violated the fixed packet contract."""
+
+
+class PacketOperationalError(RuntimeError):
+    """The host failed while collecting or supervising fixed packet evidence."""
+
+
+class _SupervisorSignal(BaseException):
+    """Transfer POSIX termination to the synchronous process-group cleanup path."""
+
+    def __init__(self, signum: int) -> None:
+        self.signum = signum
+        super().__init__(signum)
 
 
 class PacketDeadlineError(PacketError):
@@ -284,7 +298,10 @@ def _git(repository: Path, *arguments: str) -> str:
         ("git", *arguments), cwd=repository, check=False, capture_output=True, text=True
     )
     if result.returncode:
-        raise PacketError(result.stderr.strip() or f"git {' '.join(arguments)} failed")
+        detail = result.stderr.strip() or "no diagnostic"
+        raise PacketOperationalError(
+            f"git {' '.join(arguments)} failed with status {result.returncode}: {detail}"
+        )
     return result.stdout.strip()
 
 
@@ -309,7 +326,11 @@ def _local_module_path(repository: Path, module: str) -> Path | None:
 def _imported_local_modules(module: str, path: Path) -> set[str]:
     try:
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-    except (OSError, SyntaxError) as error:
+    except OSError as error:
+        raise PacketOperationalError(
+            f"could not read dependency {path}: {type(error).__name__}: {error}"
+        ) from error
+    except SyntaxError as error:
         raise PacketError(f"could not inspect dependency {path}: {error}") from error
     package = module if path.name == "__init__.py" else module.rpartition(".")[0]
     imported: set[str] = set()
@@ -402,6 +423,9 @@ def source_manifest(
     _validate_loaded_modules(repository, paths)
     if _git(repository, "rev-parse", "HEAD") != revision:
         raise PacketError("current Git revision differs from the frozen instrument")
+    revision_paths = set(
+        _git(repository, "ls-tree", "-r", "--name-only", revision).splitlines()
+    )
     changed = _git(repository, "status", "--porcelain", "--", *paths)
     if changed:
         raise PacketError("fixed source or implementation closure is not clean")
@@ -410,12 +434,20 @@ def source_manifest(
         resolved_result = result_directory.resolve()
         if resolved_result.is_relative_to(repository):
             relative_result = resolved_result.relative_to(repository).as_posix()
+            result_path = PurePosixPath(relative_result)
+            if any(
+                PurePosixPath(tracked_path).is_relative_to(result_path)
+                or result_path.is_relative_to(PurePosixPath(tracked_path))
+                for tracked_path in revision_paths
+            ):
+                raise PacketError(
+                    "result directory overlaps a path tracked at the frozen revision"
+                )
             status_arguments.extend(
                 (
                     "--",
                     ".",
-                    f":(exclude,top){relative_result}",
-                    f":(exclude,top){relative_result}/**",
+                    f":(exclude,top,literal){relative_result}",
                 )
             )
     if _git(repository, *status_arguments):
@@ -1191,6 +1223,7 @@ def initial_preflight_document(
         "supervision": {
             "status": "pending",
             "worker_exit_status": None,
+            "supervisor_signal": None,
         },
         "phase": "preflight",
         "error": "source and runtime preflight has not completed",
@@ -1253,6 +1286,7 @@ def _initial_document(
         "supervision": {
             "status": "pending",
             "worker_exit_status": None,
+            "supervisor_signal": None,
         },
         "phase": "source-replay",
         "raw": {
@@ -1396,19 +1430,23 @@ def _is_raw_normalization_checkpoint(
 def validate_preflight_document(document: dict[str, object]) -> None:
     """Validate a non-scientific receipt from the supervised preflight interval."""
 
-    if set(document) != {
-        "schema",
-        "status",
-        "outcome",
-        "scientific_decision",
-        "claim_limit",
-        "sources",
-        "settings",
-        "clocks",
-        "supervision",
-        "phase",
-        "error",
-    } or document.get("schema") != PREFLIGHT_SCHEMA:
+    if (
+        set(document)
+        != {
+            "schema",
+            "status",
+            "outcome",
+            "scientific_decision",
+            "claim_limit",
+            "sources",
+            "settings",
+            "clocks",
+            "supervision",
+            "phase",
+            "error",
+        }
+        or document.get("schema") != PREFLIGHT_SCHEMA
+    ):
         raise PacketError("document does not match the closed preflight schema")
     if (
         document.get("claim_limit") != CLAIM_LIMIT
@@ -1504,10 +1542,12 @@ def validate_preflight_document(document: dict[str, object]) -> None:
     if not isinstance(supervision, dict) or set(supervision) != {
         "status",
         "worker_exit_status",
+        "supervisor_signal",
     }:
         raise PacketError("preflight supervision fields do not match the closed schema")
     supervision_status = supervision.get("status")
     worker_status = supervision.get("worker_exit_status")
+    supervisor_signal = supervision.get("supervisor_signal")
     if supervision_status not in {
         "pending",
         "observed-exit",
@@ -1517,6 +1557,13 @@ def validate_preflight_document(document: dict[str, object]) -> None:
         "supervisor-interrupted",
     } or (worker_status is not None and type(worker_status) is not int):
         raise PacketError("preflight supervision is malformed")
+    if supervisor_signal is not None and (
+        type(supervisor_signal) is not int
+        or supervisor_signal not in {signal.SIGHUP, signal.SIGTERM}
+    ):
+        raise PacketError("preflight supervisor signal is malformed")
+    if supervision_status != "supervisor-interrupted" and supervisor_signal is not None:
+        raise PacketError("preflight signal provenance lacks an interrupted supervisor")
     if supervision_status == "pending" and (
         worker_status is not None or external_lifetime is not None
     ):
@@ -1835,10 +1882,12 @@ def validate_result_document(document: dict[str, object]) -> None:  # noqa: C901
     if not isinstance(supervision, dict) or set(supervision) != {
         "status",
         "worker_exit_status",
+        "supervisor_signal",
     }:
         raise PacketError("supervision fields do not match the closed packet schema")
     supervision_status = supervision.get("status")
     worker_exit_status = supervision.get("worker_exit_status")
+    supervisor_signal = supervision.get("supervisor_signal")
     if supervision_status not in {
         "pending",
         "observed-exit",
@@ -1850,6 +1899,13 @@ def validate_result_document(document: dict[str, object]) -> None:  # noqa: C901
         raise PacketError("supervision status is malformed")
     if worker_exit_status is not None and type(worker_exit_status) is not int:
         raise PacketError("supervised worker exit status is malformed")
+    if supervisor_signal is not None and (
+        type(supervisor_signal) is not int
+        or supervisor_signal not in {signal.SIGHUP, signal.SIGTERM}
+    ):
+        raise PacketError("supervisor signal is malformed")
+    if supervision_status != "supervisor-interrupted" and supervisor_signal is not None:
+        raise PacketError("signal provenance lacks an interrupted supervisor")
     if supervision_status == "pending" and (
         worker_exit_status is not None or external_lifetime is not None
     ):
@@ -3653,6 +3709,7 @@ def _record_external_timeout(
     elapsed: float,
     *,
     worker_status: int | None = None,
+    supervisor_signal: int | None = None,
     supervision_status: Literal[
         "deadline-before-launch",
         "deadline-terminated",
@@ -3672,6 +3729,7 @@ def _record_external_timeout(
             {
                 "status": supervision_status,
                 "worker_exit_status": worker_status,
+                "supervisor_signal": supervisor_signal,
             }
         )
         if document["status"] != "invalid":
@@ -3700,6 +3758,7 @@ def _record_external_timeout(
         {
             "status": supervision_status,
             "worker_exit_status": worker_status,
+            "supervisor_signal": supervisor_signal,
         }
     )
     if preserve_classification:
@@ -3730,7 +3789,11 @@ def _record_worker_exit(path: Path, status: int, elapsed: float) -> None:
         return
     cast(dict[str, object], document["clocks"])["external_lifetime_seconds"] = elapsed
     cast(dict[str, object], document["supervision"]).update(
-        {"status": "observed-exit", "worker_exit_status": status}
+        {
+            "status": "observed-exit",
+            "worker_exit_status": status,
+            "supervisor_signal": None,
+        }
     )
     if preflight:
         expected = 2 if document["status"] == "invalid" else 1
@@ -3762,7 +3825,7 @@ def _record_worker_exit(path: Path, status: int, elapsed: float) -> None:
     write_result(path, document)
 
 
-def supervise_worker(
+def supervise_worker(  # noqa: PLR0911
     command: Sequence[str],
     result_path: Path,
     *,
@@ -3775,30 +3838,27 @@ def supervise_worker(
 
     started = time.perf_counter() if invocation_started is None else invocation_started
     deadline = started + external_seconds if external_deadline is None else external_deadline
-    remaining = deadline - time.perf_counter()
-    if remaining <= 0:
-        _record_external_timeout(
-            result_path,
-            (
-                "worker process group exceeded the "
-                f"{external_seconds:g}-second external deadline before launch"
-            ),
-            time.perf_counter() - started,
-            supervision_status="deadline-before-launch",
-        )
-        return 1
-    try:
-        process = subprocess.Popen(command, start_new_session=True)
-    except OSError as error:
-        _record_external_timeout(
-            result_path,
-            f"worker process launch failed: {error}",
-            time.perf_counter() - started,
-            supervision_status="launch-failed",
-        )
-        return 1
+    handled_signals = (signal.SIGTERM, signal.SIGHUP)
+    previous_mask = signal.pthread_sigmask(signal.SIG_BLOCK, handled_signals)
+    previous_handlers: dict[signal.Signals, Any] = {}
+    process: subprocess.Popen[bytes] | None = None
+    interrupted_signal: int | None = None
+    launching = False
+
+    def handle_signal(signum: int, _frame: object) -> None:
+        nonlocal interrupted_signal, launching
+        if interrupted_signal is None:
+            interrupted_signal = signum
+        if process is not None or not launching:
+            raise _SupervisorSignal(signum)
+
+    def raise_if_interrupted() -> None:
+        if interrupted_signal is not None:
+            raise _SupervisorSignal(interrupted_signal)
 
     def group_exists() -> bool:
+        if process is None:
+            return False
         try:
             os.killpg(process.pid, 0)
         except ProcessLookupError:
@@ -3815,6 +3875,8 @@ def supervise_worker(
         return True
 
     def reap_descendants_after_leader_exit() -> None:
+        if process is None:
+            return
         if not group_exists():
             return
         with suppress(ProcessLookupError):
@@ -3826,7 +3888,9 @@ def supervise_worker(
         if not wait_for_group_absence():
             raise PacketError("worker process group remained alive after SIGKILL")
 
-    def terminate_group() -> int:
+    def terminate_group() -> int | None:
+        if process is None:
+            return None
         with suppress(ProcessLookupError):
             os.killpg(process.pid, signal.SIGTERM)
         worker_status: int | None = None
@@ -3842,20 +3906,94 @@ def supervise_worker(
         return status
 
     try:
-        status = process.wait(timeout=remaining)
-        reap_descendants_after_leader_exit()
-        _record_worker_exit(result_path, status, time.perf_counter() - started)
-        return status  # noqa: TRY300 -- timeout has a separate process-group cleanup path
-    except subprocess.TimeoutExpired:
+        for signal_number in handled_signals:
+            previous_handlers[signal_number] = signal.signal(signal_number, handle_signal)
+        signal.pthread_sigmask(signal.SIG_SETMASK, previous_mask)
+        raise_if_interrupted()
+        remaining = deadline - time.perf_counter()
+        if remaining <= 0:
+            _record_external_timeout(
+                result_path,
+                (
+                    "worker process group exceeded the "
+                    f"{external_seconds:g}-second external deadline before launch"
+                ),
+                time.perf_counter() - started,
+                supervision_status="deadline-before-launch",
+            )
+            return 1
+
+        launch_error: OSError | None = None
+        launching = True
+        try:
+            process = subprocess.Popen(command, start_new_session=True)
+        except OSError as error:
+            launch_error = error
+        finally:
+            launching = False
+        raise_if_interrupted()
+        if launch_error is not None:
+            _record_external_timeout(
+                result_path,
+                f"worker process launch failed: {launch_error}",
+                time.perf_counter() - started,
+                supervision_status="launch-failed",
+            )
+            return 1
+        if process is None:
+            _record_external_timeout(
+                result_path,
+                "worker process launch returned no process handle",
+                time.perf_counter() - started,
+                supervision_status="launch-failed",
+            )
+            return 1
+
+        remaining = deadline - time.perf_counter()
+        if remaining <= 0:
+            worker_status = terminate_group()
+            _record_external_timeout(
+                result_path,
+                (
+                    "worker process group exceeded the "
+                    f"{external_seconds:g}-second external deadline"
+                ),
+                time.perf_counter() - started,
+                worker_status=worker_status,
+            )
+            return 1
+        try:
+            status = process.wait(timeout=remaining)
+            reap_descendants_after_leader_exit()
+            _record_worker_exit(result_path, status, time.perf_counter() - started)
+            return status  # noqa: TRY300 -- timeout has a process-group cleanup path
+        except subprocess.TimeoutExpired:
+            worker_status = terminate_group()
+            _record_external_timeout(
+                result_path,
+                (
+                    "worker process group exceeded the "
+                    f"{external_seconds:g}-second external deadline"
+                ),
+                time.perf_counter() - started,
+                worker_status=worker_status,
+            )
+            return 1
+    except _SupervisorSignal as error:
+        signal.pthread_sigmask(signal.SIG_BLOCK, handled_signals)
         worker_status = terminate_group()
+        signal_number = signal.Signals(interrupted_signal or error.signum)
         _record_external_timeout(
             result_path,
-            f"worker process group exceeded the {external_seconds:g}-second external deadline",
+            f"supervisor interrupted by {signal_number.name} ({signal_number.value})",
             time.perf_counter() - started,
             worker_status=worker_status,
+            supervisor_signal=signal_number.value,
+            supervision_status="supervisor-interrupted",
         )
-        return 1
+        interrupted_signal = signal_number.value
     except BaseException as error:  # parent interruption must still reap the process group
+        signal.pthread_sigmask(signal.SIG_BLOCK, handled_signals)
         worker_status = terminate_group()
         _record_external_timeout(
             result_path,
@@ -3865,6 +4003,16 @@ def supervise_worker(
             supervision_status="supervisor-interrupted",
         )
         raise
+    finally:
+        signal.pthread_sigmask(signal.SIG_BLOCK, handled_signals)
+        for signal_number, previous_handler in previous_handlers.items():
+            signal.signal(signal_number, previous_handler)
+        signal.pthread_sigmask(signal.SIG_SETMASK, previous_mask)
+
+    if interrupted_signal is not None:
+        signal.raise_signal(interrupted_signal)
+        return 128 + interrupted_signal
+    raise AssertionError("supervisor left its process state without an outcome")
 
 
 def _record_worker_failure(
@@ -3908,7 +4056,7 @@ def _record_worker_failure(
     return True
 
 
-def run_worker(
+def run_worker(  # noqa: PLR0911
     repository: Path,
     revision: str,
     output_dir: Path,
@@ -3939,6 +4087,25 @@ def run_worker(
         runtime = runtime_binding(repository)
         source = (repository / SOURCE_PATH).read_bytes()
         t026 = (repository / T026_PATH).read_bytes()
+    except PacketError as error:
+        elapsed = time.perf_counter() - worker_started
+        _record_worker_failure(
+            output_dir / "result.json",
+            error=str(error),
+            elapsed=elapsed,
+            invalid=True,
+        )
+        return 2
+    except Exception as error:  # noqa: BLE001 -- preflight host failures are unresolved
+        elapsed = time.perf_counter() - worker_started
+        _record_worker_failure(
+            output_dir / "result.json",
+            error=f"operational preflight failure: {type(error).__name__}: {error}",
+            elapsed=elapsed,
+            invalid=False,
+        )
+        return 1
+    try:
         document = execute_packet(
             source,
             t026,
@@ -3953,7 +4120,7 @@ def run_worker(
             process_deadline=min(scientific_deadline, external_deadline),
             invocation_started=worker_started,
         )
-    except (PacketError, OSError, ValueError, TypeError, ImportError) as error:
+    except PacketError as error:
         elapsed = time.perf_counter() - worker_started
         _record_worker_failure(
             output_dir / "result.json",
@@ -4156,6 +4323,7 @@ __all__ = [
     "PackageRuntimeObservation",
     "PacketDeadlineError",
     "PacketError",
+    "PacketOperationalError",
     "RawMinimum",
     "RuntimeObservation",
     "discover_implementation_paths",

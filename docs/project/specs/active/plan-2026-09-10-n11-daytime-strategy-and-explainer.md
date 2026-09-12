@@ -284,15 +284,30 @@ this single fixed packet.
 A maintained fixed-core runner is now implemented on the publication stack.
 It binds its source and runtime, runs bounded raw and exact schedulers, records
 coordinator-observed direction evidence, and supervises the worker process group under a
-hard deadline. Target-free controls pass and an independent source review found no
-acceptance-safety blocker in the current implementation.
-The Git, runtime, and source preflight now runs inside the supervised worker process
-group, under deadlines that begin at the parent invocation.
-A timeout, launch failure, or source or runtime violation leaves a closed preflight
-receipt with `scientific_decision="unresolved"`; only successful preflight can publish
-the packet schema. Atomic replacement prevents a reader from seeing half-written JSON
-after an ordinary worker failure or termination; the runner makes no host-crash or
-power-loss durability claim.
+hard deadline. The Git, runtime, and source preflight now runs inside the supervised
+worker process group, under deadlines that begin at the parent invocation.
+The supervisor checks that deadline before and immediately after process launch, then
+recomputes the remaining wait allowance.
+The operating system’s process-launch call is the one unbounded interval: if it returns
+after the deadline, the supervisor terminates and reaps the new worker group without
+beginning scientific work.
+SIGTERM and SIGHUP received before, during, or after launch follow the same cleanup
+path; the receipt records both the supervisor signal and worker exit status.
+
+A source or invocation mismatch leaves an invalid preflight receipt.
+Git execution, I/O, process launch, timeout, and other host failures leave an
+operationally failed or timed-out preflight receipt.
+Both retain `scientific_decision="unresolved"`, and only successful preflight can
+publish the packet schema.
+Result-directory exclusions use literal Git pathspecs, and any output path overlapping a
+file tracked at the bound revision is rejected.
+Atomic replacement prevents a reader from seeing half-written JSON after an ordinary
+worker failure or termination; the runner makes no host-crash or power-loss durability
+claim.
+
+The repair addresses `think-rvhu`, `think-fmju`, `think-42zc`, and `think-5fdx`. Those
+beads remain open until a source-distinct review confirms the repair; BC329 cannot be
+registered or run before that review.
 Admission uses a separate `fixed-core-packet-calibration/v1` receipt and a frozen,
 analytically solved fixture unrelated to BC329. The full-shape control runs all four
 generic routes and 14,404 direction records, but its schema cannot express a scientific

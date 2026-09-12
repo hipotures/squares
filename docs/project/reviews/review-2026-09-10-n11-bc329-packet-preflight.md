@@ -250,10 +250,12 @@ decisions:
    source identities, and retained logs.
 6. A supervised worker-process deadline and atomic process-level partial output,
    including the normalized gate and the dilation record’s additional source replay.
-   The parent-side Git, runtime, and source preflight currently precedes that clock and
-   must be bounded before target registration.
-   Any staged deadlines must be fixed before the target; an incomplete stage cannot
-   silently acquire another budget.
+   Git, runtime, and source preflight must run inside the supervised process group.
+   The deadline begins at parent invocation, is checked before and after the operating
+   system’s process-launch call, and is recomputed before the worker wait.
+   The launch call itself is outside the enforceable interval; a late return triggers
+   immediate group termination.
+   An incomplete stage cannot silently acquire another budget.
 7. The outcome table below and the scope of any rejection.
    Preserve every completed direction observed by the coordinator when a timeout or
    invalid invocation stops the run.
@@ -277,17 +279,43 @@ project runtime, and complete local implementation manifest; keeps raw and exact
 submissions bounded; retains coordinator-observed direction rows; checks the normalized
 candidate through exact, interval, and dilation routes; and rejects incomplete evidence
 as scientifically unresolved.
-Its target-free controls currently pass 156 tests with three platform skips, and an
-independent source review found no acceptance-safety blocker in the current
-implementation. That establishes the implementation checkpoint only.
+
+An independent target-free implementation review of `c516a592` reproduced four preflight
+blockers:
+
+- `think-rvhu`: result-directory names were interpolated into nonliteral Git pathspecs,
+  and a deleted or replaced tracked output path could be hidden by the exclusion.
+  The repair uses a literal pathspec and rejects every result directory that overlaps a
+  path tracked at the bound revision.
+  Its controls cover `*`, a normal nested directory, tracked deletion and replacement,
+  unrelated untracked state, and scientific readback.
+- `think-fmju`: `OSError` and other host failures were classified as invalid input.
+  The worker now reserves invalid preflight for malformed or mismatched evidence; Git
+  execution, I/O, import, and unexpected host failures remain operationally failed and
+  scientifically unresolved.
+- `think-42zc`: the worker wait reused the allowance computed before `Popen`. The
+  supervisor now recomputes it after launch and terminates the group if launch consumed
+  the deadline. The receipt describes the operating system launch call as an explicitly
+  unbounded interval rather than claiming enforcement while that call is blocked.
+- `think-5fdx`: SIGTERM or SIGHUP could terminate the supervisor and leave its new
+  worker session alive.
+  Temporary handlers now cover the full supervised lifetime, including the launch
+  window, and preserve the supervisor signal and worker exit status after group cleanup.
+
+The repaired target-free module passes 98 tests in 11.40 seconds, including real SIGTERM
+and SIGHUP subprocess controls.
+The repository-wide Ruff and BasedPyright checks report zero findings, and
+`packing-validate --edit` passes in 65.14 seconds.
+The four beads remain open for a fresh source-distinct review.
+This repair does not admit or execute BC329.
 
 The older `packing/devtools/measure_threshold_net_refinement.py:main` remains an
 adaptive core-sweep and bisection tool.
 Running it with `--nets 2880` does not execute this one fixed packet.
-Before the fixed-packet runner is admitted for BC329, the separate full-shape
-calibration must pass three host runs and source-distinct readback.
-The parent preflight must gain a bounded clock, and partial interval and dilation
-receipts must name their exact published direction sets.
+Before the fixed-packet runner is admitted for BC329, a source-distinct reviewer must
+accept the preflight repair, the separate full-shape calibration must pass three host
+runs and source-distinct readback, and partial interval and dilation receipts must name
+their exact published direction sets.
 None of those remaining tasks asks the BC329 coverage question.
 
 The raw sweep should precede the normalized retention gate.
@@ -308,7 +336,7 @@ finish within the wall deadline.
 | --- | --- | --- |
 | Accept | Exact `m_c>M/11`; normalized bytes pass all closed-form conditions; the complete exact and interval routes accept and agree at minimum one; dilation replay produces the exact `S_c>S_0` record | A stronger unconditional lower bound `s(11)>=S_c` |
 | Reject this relative-weight packet | One independently re-evaluated admissible rational core with original-weight charge `<=M/11`, or a fully checked minimum implying normalized budget `>=11` | These fixed sites, threshold atoms, relative weights, core side and net cannot satisfy the retained criterion under any common scaling |
-| Unresolved | Timeout, incomplete directions, interval stalls, exhausted box budgets, or a nonzero-width enclosure without a verified refuting witness | The planned run did not decide the packet |
+| Unresolved | Operational preflight failure, timeout, incomplete directions, interval stalls, exhausted box budgets, or a nonzero-width enclosure without a verified refuting witness | The planned run did not decide the packet |
 | Invalid | Mutated or mismatched sources, malformed declarations, wrong geometry, disagreement between methods, or a purported witness failing exact membership/admissibility checks | Repair the instrument or invocation; no scientific verdict |
 
 For the registered target, use `packing/devtools/fixed_core_packet.py` at the exact
@@ -339,12 +367,15 @@ arithmetic. The formula agreed with the maintained dilation helper.
 Decimal renderings used 70-digit `Decimal` arithmetic after exact decisions.
 
 All those target-free mathematical checks passed.
-The runner’s target-free unit and integration controls also pass, but the full-shape
-calibration and its independent readback remain unrun.
+The later runner implementation review found the four preflight blockers listed in
+Section 6. The repaired module’s 98 target-free unit and integration controls pass, as
+do repository-wide Ruff and BasedPyright checks with zero findings.
+A source-distinct review of the repaired implementation and the full-shape calibration
+with independent readback remain unrun.
 BC329 coverage, normalization by its measured minimum, two-route retention, and
 dilation-source replay remain unrun.
-The packet becomes suitable for prospective registration only after the remaining
-admission tasks above are resolved.
+The packet is not suitable for prospective registration until those remaining admission
+tasks are resolved.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

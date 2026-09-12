@@ -12,6 +12,7 @@ import os
 import signal
 import subprocess
 import sys
+import time
 from collections.abc import Callable, Sequence
 from concurrent.futures import Future
 from contextlib import suppress
@@ -42,6 +43,7 @@ from devtools.fixed_core_packet import (
     PackageRuntimeObservation,
     PacketDeadlineError,
     PacketError,
+    PacketOperationalError,
     RawMinimum,
     RuntimeObservation,
     _direction_digest,
@@ -247,6 +249,42 @@ def _install_controlled_executor(
 def _missing_group_on_probe(_pid: int, signal_number: int) -> None:
     if signal_number == 0:
         raise ProcessLookupError
+
+
+def _repository_with_sources(root: Path, *extra_files: tuple[str, bytes]) -> tuple[Path, str]:
+    repository = root / "repository"
+    for relative, data in (
+        (SOURCE_PATH, SOURCE),
+        (T026_PATH, T026_BYTES),
+        *extra_files,
+    ):
+        path = repository / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(data)
+    subprocess.run(("git", "init", "-q", str(repository)), check=True)
+    subprocess.run(("git", "-C", str(repository), "add", "."), check=True)
+    subprocess.run(
+        (
+            "git",
+            "-C",
+            str(repository),
+            "-c",
+            "user.name=Fixed Core Test",
+            "-c",
+            "user.email=fixed-core@example.invalid",
+            "commit",
+            "-qm",
+            "fixture",
+        ),
+        check=True,
+    )
+    revision = subprocess.run(
+        ("git", "-C", str(repository), "rev-parse", "HEAD"),
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    return repository, revision
 
 
 def _raw_receipt(
@@ -1479,39 +1517,30 @@ def test_source_manifest_refuses_a_stale_revision() -> None:
         source_manifest(REPOSITORY, REVISION)
 
 
-def test_source_manifest_allows_only_the_supervised_result_directory(
-    tmp_path: Path,
-) -> None:
-    repository = tmp_path / "repository"
-    for relative, data in ((SOURCE_PATH, SOURCE), (T026_PATH, T026_BYTES)):
-        path = repository / relative
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_bytes(data)
-    subprocess.run(("git", "init", "-q", str(repository)), check=True)
-    subprocess.run(("git", "-C", str(repository), "add", "."), check=True)
-    subprocess.run(
-        (
-            "git",
-            "-C",
-            str(repository),
-            "-c",
-            "user.name=Fixed Core Test",
-            "-c",
-            "user.email=fixed-core@example.invalid",
-            "commit",
-            "-qm",
-            "fixture",
-        ),
-        check=True,
+def test_git_execution_failure_has_operational_provenance() -> None:
+    failure = subprocess.CompletedProcess(
+        ("git", "status"),
+        returncode=128,
+        stdout="",
+        stderr="synthetic repository failure\n",
     )
-    revision = subprocess.run(
-        ("git", "-C", str(repository), "rev-parse", "HEAD"),
-        check=True,
-        capture_output=True,
-        text=True,
-    ).stdout.strip()
-    result_directory = repository / "result"
-    result_directory.mkdir()
+    with (
+        patch("devtools.fixed_core_packet.subprocess.run", return_value=failure),
+        pytest.raises(
+            PacketOperationalError,
+            match="git status failed with status 128: synthetic repository failure",
+        ),
+    ):
+        fixed_core_packet._git(REPOSITORY, "status")  # noqa: SLF001 -- taxonomy boundary
+
+
+@pytest.mark.parametrize("relative_result", ["result", "nested/result", "*"])
+def test_source_manifest_uses_a_literal_result_directory_exclusion(
+    tmp_path: Path, relative_result: str
+) -> None:
+    repository, revision = _repository_with_sources(tmp_path)
+    result_directory = repository / relative_result
+    result_directory.mkdir(parents=True)
     (result_directory / "result.json").write_text("preflight\n")
 
     with (
@@ -1535,6 +1564,75 @@ def test_source_manifest_allows_only_the_supervised_result_directory(
                 revision,
                 result_directory=result_directory,
             )
+
+
+@pytest.mark.parametrize(
+    ("tracked_path", "relative_result"),
+    [
+        ("reserved/result.json", "reserved"),
+        ("reserved", "reserved"),
+        ("reserved", "reserved/result"),
+    ],
+)
+def test_source_manifest_refuses_a_result_directory_overlapping_tracked_output(
+    tmp_path: Path, tracked_path: str, relative_result: str
+) -> None:
+    repository, revision = _repository_with_sources(
+        tmp_path, (tracked_path, b"tracked output\n")
+    )
+    tracked = repository / tracked_path
+    tracked.unlink()
+    for parent in tracked.parents:
+        if parent == repository or any(parent.iterdir()):
+            break
+        parent.rmdir()
+    result_directory = repository / relative_result
+    result_directory.mkdir(parents=True, exist_ok=True)
+    (result_directory / "result.json").write_text("preflight\n")
+
+    with (
+        patch(
+            "devtools.fixed_core_packet.discover_implementation_paths",
+            return_value=(SOURCE_PATH, T026_PATH),
+        ),
+        patch("devtools.fixed_core_packet._validate_loaded_modules"),
+        pytest.raises(PacketError, match="overlaps a path tracked"),
+    ):
+        source_manifest(
+            repository,
+            revision,
+            result_directory=result_directory,
+        )
+
+
+def test_scientific_readback_cannot_hide_unrelated_state_with_a_metachar_output(
+    tmp_path: Path,
+) -> None:
+    packet_root = tmp_path / "packet"
+    packet_root.mkdir()
+    output, result = _execute(packet_root, RAW_THRESHOLD)
+    repository, revision = _repository_with_sources(tmp_path / "fixture")
+    result_directory = repository / "*"
+    output.rename(result_directory)
+    sources = cast(dict[str, object], result["sources"])
+    sources["implementation_revision"] = revision
+    (result_directory / "result.json").write_text(json.dumps(result, indent=2) + "\n")
+    (repository / "unrelated.txt").write_text("dirty\n")
+
+    with (
+        patch(
+            "devtools.fixed_core_packet.discover_implementation_paths",
+            return_value=(SOURCE_PATH, T026_PATH),
+        ),
+        patch("devtools.fixed_core_packet._validate_loaded_modules"),
+        pytest.raises(PacketError, match="checkout must be clean"),
+    ):
+        load_result(
+            result_directory,
+            repository=repository,
+            expected_revision=revision,
+            require_supervision=False,
+        )
 
 
 @pytest.mark.parametrize("constant", ["NaN", "Infinity", "-Infinity"])
@@ -1768,7 +1866,10 @@ def test_supervisor_deducts_parent_prelaunch_time_from_external_deadline(
 
     with (
         patch("devtools.fixed_core_packet.subprocess.Popen", return_value=Process()),
-        patch("devtools.fixed_core_packet.time.perf_counter", side_effect=[12.0, 13.0]),
+        patch(
+            "devtools.fixed_core_packet.time.perf_counter",
+            side_effect=[12.0, 13.0, 14.0],
+        ),
         patch(
             "devtools.fixed_core_packet.os.killpg",
             side_effect=_missing_group_on_probe,
@@ -1785,7 +1886,65 @@ def test_supervisor_deducts_parent_prelaunch_time_from_external_deadline(
             )
             == 0
         )
-    assert waits == [8.0]
+    assert waits == [7.0]
+
+
+def test_supervisor_terminates_a_worker_when_launch_consumes_the_deadline(
+    tmp_path: Path,
+) -> None:
+    result = tmp_path / "result.json"
+    fixed_core_packet.write_result(
+        result,
+        fixed_core_packet.initial_preflight_document(
+            REVISION,
+            workers=1,
+            scientific_seconds=5.0,
+            external_seconds=10.0,
+            grace_seconds=1.0,
+        ),
+    )
+
+    class Process:
+        pid = 4321
+
+        def wait(self, timeout: float | None = None) -> int:
+            assert timeout == 1.0
+            return -signal.SIGTERM
+
+    with (
+        patch("devtools.fixed_core_packet.subprocess.Popen", return_value=Process()),
+        patch(
+            "devtools.fixed_core_packet.time.perf_counter",
+            side_effect=[12.0, 21.0, 22.0, 22.0],
+        ),
+        patch(
+            "devtools.fixed_core_packet.os.killpg",
+            side_effect=_missing_group_on_probe,
+        ) as killpg,
+    ):
+        assert (
+            supervise_worker(
+                ("worker",),
+                result,
+                external_seconds=10.0,
+                grace_seconds=1.0,
+                invocation_started=10.0,
+                external_deadline=20.0,
+            )
+            == 1
+        )
+    assert [call.args for call in killpg.call_args_list] == [
+        (4321, signal.SIGTERM),
+        (4321, signal.SIGKILL),
+        (4321, 0),
+    ]
+    receipt = cast(dict[str, object], json.loads(result.read_text()))
+    assert receipt["outcome"] == "preflight-timeout"
+    assert cast(dict[str, object], receipt["supervision"]) == {
+        "status": "deadline-terminated",
+        "worker_exit_status": -signal.SIGTERM,
+        "supervisor_signal": None,
+    }
 
 
 def test_supervisor_refuses_to_launch_after_parent_deadline(tmp_path: Path) -> None:
@@ -1853,6 +2012,7 @@ def test_preflight_launch_failure_is_retained_as_operational_and_unresolved(
     assert cast(dict[str, object], receipt["supervision"]) == {
         "status": "launch-failed",
         "worker_exit_status": None,
+        "supervisor_signal": None,
     }
 
 
@@ -1898,9 +2058,7 @@ def test_stalled_preflight_process_group_termination_reaps_a_grandchild(
     assert receipt["outcome"] == "preflight-timeout"
     assert receipt["scientific_decision"] == "unresolved"
     assert "external deadline" in cast(str, receipt["error"])
-    assert cast(dict[str, object], receipt["supervision"])["status"] == (
-        "deadline-terminated"
-    )
+    assert cast(dict[str, object], receipt["supervision"])["status"] == ("deadline-terminated")
 
 
 @pytest.mark.skipif(sys.platform == "win32", reason="POSIX process groups are required")
@@ -2155,7 +2313,11 @@ def test_nonzero_worker_exit_preserves_valid_receipt_classification(
     assert saved["status"] == kind
     assert saved["outcome"] == result["outcome"]
     supervision = cast(dict[str, object], saved["supervision"])
-    assert supervision == {"status": "observed-exit", "worker_exit_status": exit_status}
+    assert supervision == {
+        "status": "observed-exit",
+        "worker_exit_status": exit_status,
+        "supervisor_signal": None,
+    }
 
 
 def test_external_kill_replaces_a_stale_partial_phase_with_timeout(tmp_path: Path) -> None:
@@ -2249,6 +2411,90 @@ def test_parent_interruption_reaps_group_and_retains_partial_receipt(tmp_path: P
     assert saved["phase"] == "incomplete"
     assert "KeyboardInterrupt" in cast(str, saved["error"])
     assert cast(dict[str, object], saved["supervision"])["status"] == ("supervisor-interrupted")
+
+
+@pytest.mark.skipif(sys.platform == "win32", reason="POSIX signals are required")
+@pytest.mark.parametrize(
+    ("signal_number", "delivery_phase"),
+    [(signal.SIGTERM, "waiting"), (signal.SIGHUP, "launch")],
+)
+def test_posix_signal_reaps_a_live_worker_and_closes_the_preflight_receipt(
+    tmp_path: Path, signal_number: signal.Signals, delivery_phase: str
+) -> None:
+    result = tmp_path / "result.json"
+    ready_path = tmp_path / "supervisor-ready"
+    fixed_core_packet.write_result(
+        result,
+        fixed_core_packet.initial_preflight_document(
+            REVISION,
+            workers=1,
+            scientific_seconds=20.0,
+            external_seconds=30.0,
+            grace_seconds=1.0,
+        ),
+    )
+    worker_program = "import signal; signal.pause()"
+    supervisor_program = "\n".join(
+        (
+            "import os, signal, subprocess, sys, time",
+            "from pathlib import Path",
+            "from devtools import fixed_core_packet as packet",
+            "real_popen = subprocess.Popen",
+            f"command = (sys.executable, '-c', {worker_program!r})",
+            f"result = Path({str(result)!r})",
+            f"ready = Path({str(ready_path)!r})",
+            f"during_launch = {delivery_phase == 'launch'!r}",
+            f"signal_number = {int(signal_number)!r}",
+            "def launch(command, *, start_new_session):",
+            "    process = real_popen(command, start_new_session=start_new_session)",
+            "    ready.write_text(str(process.pid))",
+            "    if during_launch:",
+            "        os.kill(os.getpid(), signal_number)",
+            "        time.sleep(0.05)",
+            "    return process",
+            "packet.subprocess.Popen = launch",
+            "packet.supervise_worker(command, result, external_seconds=30., grace_seconds=1.)",
+        )
+    )
+    supervisor = subprocess.Popen((sys.executable, "-c", supervisor_program))
+    worker_pid: int | None = None
+    try:
+        deadline = time.monotonic() + 5.0
+        while not ready_path.exists() and time.monotonic() < deadline:
+            time.sleep(0.01)
+        worker_pid = int(ready_path.read_text())
+        if delivery_phase == "waiting":
+            os.kill(supervisor.pid, signal_number)
+        assert supervisor.wait(timeout=5.0) == -signal_number
+        deadline = time.monotonic() + 1.0
+        while time.monotonic() < deadline:
+            try:
+                os.kill(worker_pid, 0)
+            except ProcessLookupError:
+                break
+            time.sleep(0.01)
+        with pytest.raises(ProcessLookupError):
+            os.kill(worker_pid, 0)
+    finally:
+        with suppress(ProcessLookupError):
+            os.kill(supervisor.pid, signal.SIGKILL)
+        if worker_pid is not None:
+            with suppress(ProcessLookupError):
+                os.kill(worker_pid, signal.SIGKILL)
+
+    receipt = cast(dict[str, object], json.loads(result.read_text()))
+    fixed_core_packet.validate_preflight_document(receipt)
+    assert receipt["status"] == "partial"
+    assert receipt["outcome"] == "preflight-failed"
+    assert receipt["scientific_decision"] == "unresolved"
+    assert receipt["error"] == (
+        f"supervisor interrupted by {signal_number.name} ({signal_number.value})"
+    )
+    assert cast(dict[str, object], receipt["supervision"]) == {
+        "status": "supervisor-interrupted",
+        "worker_exit_status": -signal.SIGTERM,
+        "supervisor_signal": signal_number,
+    }
 
 
 def test_unexpected_worker_failure_preserves_completed_direction_files(
@@ -2362,6 +2608,60 @@ def test_preflight_source_failure_is_retained_without_a_packet_receipt(
         "process_seconds": 1.0,
         "external_lifetime_seconds": None,
     }
+
+
+@pytest.mark.parametrize(
+    "failure",
+    [
+        OSError("synthetic source I/O failure"),
+        PacketOperationalError("synthetic Git execution failure"),
+    ],
+)
+def test_operational_preflight_failure_remains_partial_and_unresolved(
+    tmp_path: Path, failure: Exception
+) -> None:
+    output = tmp_path / "operational-preflight-failure"
+    output.mkdir()
+    fixed_core_packet.write_result(
+        output / "result.json",
+        fixed_core_packet.initial_preflight_document(
+            REVISION,
+            workers=1,
+            scientific_seconds=10.0,
+            external_seconds=20.0,
+            grace_seconds=2.0,
+        ),
+    )
+    with (
+        patch("devtools.fixed_core_packet.source_manifest", side_effect=failure),
+        patch("devtools.fixed_core_packet.time.perf_counter", side_effect=[10.0, 11.0]),
+    ):
+        status = run_worker(
+            REPOSITORY,
+            REVISION,
+            output,
+            workers=1,
+            scientific_seconds=10.0,
+            external_seconds=20.0,
+            grace_seconds=2.0,
+        )
+
+    assert status == 1
+    receipt = cast(dict[str, object], json.loads((output / "result.json").read_text()))
+    fixed_core_packet.validate_preflight_document(receipt)
+    assert receipt["status"] == "partial"
+    assert receipt["outcome"] == "preflight-failed"
+    assert receipt["scientific_decision"] == "unresolved"
+    assert receipt["error"] == (
+        f"operational preflight failure: {type(failure).__name__}: {failure}"
+    )
+    with pytest.raises(PacketError, match="closed packet schema"):
+        load_result(
+            output,
+            repository=REPOSITORY,
+            expected_revision=REVISION,
+            require_supervision=False,
+        )
 
 
 def test_worker_republishes_complete_receipt_after_readback_with_end_to_end_clock(
