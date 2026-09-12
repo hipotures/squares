@@ -309,6 +309,48 @@ The repository-wide Ruff and BasedPyright checks report zero findings, and
 The four beads remain open for a fresh source-distinct review.
 This repair does not admit or execute BC329.
 
+That source-distinct review accepted the original `think-rvhu`, `think-42zc`, and
+`think-5fdx` repairs but found three remaining boundaries.
+The `think-fmju` taxonomy still treated a real `uv.lock` read `OSError` as invalid;
+`think-g7vg` showed that an output beneath a worktree or common Git administrative
+directory could corrupt refs; and `think-pvmv` showed that an ordinary non-`OSError`
+failure from `Popen` was reported as a supervisor interruption and re-raised.
+The integrated repair commit `d6bbe20172d4048a9f156b1c3c4fcfe8f1b64014` keeps lockfile
+I/O operational and preserves its type and message, rejects resolved Git administrative
+paths before creating output, and records ordinary launch exceptions as `launch-failed`
+with return status 1. Maintained controls cover a normal checkout, a linked worktree, a
+separate Git directory, the exact lockfile read boundary, `OSError`, `MemoryError`,
+SIGTERM, and SIGHUP. All three beads remain open for source-distinct re-review.
+
+The separate calibration implementation then received its own source-distinct review.
+It reproduced seven blockers, all repaired on the same integrated commit:
+
+- `think-pk84` makes complete raw coverage, normalized bytes, all three complete routes,
+  and their known-answer reconstruction mandatory for terminal success.
+- `think-bi3f` compares the complete generic dilation record to the exact n=2 oracle,
+  including canonical surds, source geometry, defining polynomials, proof fields, and
+  the outer summary.
+- `think-1kgu` uses the common exact-set reconstruction for partial interval and
+  dilation checkpoints, including deletion, substitution, published-last-row, and
+  unpublished-tail controls.
+- `think-lidy` applies SIGTERM, SIGHUP, launch-window, restoration, and group-reaping
+  behavior to the calibration supervisor.
+- `think-4wuj` keeps the receipt nonterminal through a deadline-bounded child readback,
+  bounds process-group observation by the remaining allowance, and makes success the
+  final write.
+- `think-1e9p` requires reconstructible CPU start/end observations and at least two
+  positive, error-free RSS samples; it retains sample order, observed and missing
+  phases, actual gaps, and leading and trailing unobserved intervals.
+- `think-th5z` binds workers, allowances, grace, monotonic origin and deadlines, run
+  metadata, and implementation revision to the seed, worker, and independent reader.
+
+The combined target-free calibration and fixed-core suites pass 170 tests in 18.44
+seconds on Python 3.14; focused Ruff and BasedPyright checks report zero findings.
+The exact n=2 fixture and its 14,404-row full profile shape are unchanged.
+The seven calibration beads remain open pending source-distinct review, after which the
+three fresh calibration profiles and their independent readback are still required.
+No positive full-shape profile or BC329 scientific target ran during the repair.
+
 The older `packing/devtools/measure_threshold_net_refinement.py:main` remains an
 adaptive core-sweep and bisection tool.
 Running it with `--nets 2880` does not execute this one fixed packet.
@@ -367,11 +409,11 @@ arithmetic. The formula agreed with the maintained dilation helper.
 Decimal renderings used 70-digit `Decimal` arithmetic after exact decisions.
 
 All those target-free mathematical checks passed.
-The later runner implementation review found the four preflight blockers listed in
-Section 6. The repaired module’s 98 target-free unit and integration controls pass, as
-do repository-wide Ruff and BasedPyright checks with zero findings.
-A source-distinct review of the repaired implementation and the full-shape calibration
-with independent readback remain unrun.
+The implementation review and its first re-review found the preflight blockers listed in
+Section 6. The integrated repair’s combined calibration and fixed-core suite passes 170
+tests, and focused Ruff and BasedPyright checks report zero findings.
+A source-distinct review of `d6bbe20172d4048a9f156b1c3c4fcfe8f1b64014` and the three
+full-shape calibration profiles with independent readback remain unrun.
 BC329 coverage, normalization by its measured minimum, two-route retention, and
 dilation-source replay remain unrun.
 The packet is not suitable for prospective registration until those remaining admission

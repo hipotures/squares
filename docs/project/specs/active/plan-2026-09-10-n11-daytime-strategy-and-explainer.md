@@ -300,14 +300,18 @@ operationally failed or timed-out preflight receipt.
 Both retain `scientific_decision="unresolved"`, and only successful preflight can
 publish the packet schema.
 Result-directory exclusions use literal Git pathspecs, and any output path overlapping a
-file tracked at the bound revision is rejected.
+file tracked at the bound revision or resolving beneath the worktree or common Git
+administrative directory is rejected before mutation.
 Atomic replacement prevents a reader from seeing half-written JSON after an ordinary
 worker failure or termination; the runner makes no host-crash or power-loss durability
 claim.
 
-The repair addresses `think-rvhu`, `think-fmju`, `think-42zc`, and `think-5fdx`. Those
-beads remain open until a source-distinct review confirms the repair; BC329 cannot be
-registered or run before that review.
+The integrated repair addresses `think-rvhu`, `think-fmju`, `think-42zc`, `think-5fdx`,
+`think-g7vg`, and `think-pvmv`. The latest additions keep `uv.lock` read failures
+operational, reject normal, linked, and separate Git administrative directories, and
+retain ordinary `Popen` failure type and message in a `launch-failed` receipt with
+return status 1. These beads remain open until a source-distinct review confirms the
+combined repair; BC329 cannot be registered or run before that review.
 Admission uses a separate `fixed-core-packet-calibration/v1` receipt and a frozen,
 analytically solved fixture unrelated to BC329. The full-shape control runs all four
 generic routes and 14,404 direction records, but its schema cannot express a scientific
@@ -319,9 +323,12 @@ fixes the fixture, exact answers, refusal controls, and limits on interpreting t
 measurements.
 Because the fixture is deliberately easy, its timing does not bound BC329’s
 computation. A source-distinct reader must accept those controls before registration.
-Partial interval and dilation receipts must also name the exact direction set bound to
-each published checkpoint; their current count-and-last form cannot yield a scientific
-acceptance, but it is less precise for interrupted-run recovery.
+The repair tracked by `think-pk84`, `think-bi3f`, `think-1kgu`, `think-lidy`,
+`think-4wuj`, `think-1e9p`, and `think-th5z` makes terminal route reconstruction,
+complete dilation semantics, exact partial direction sets, signal cleanup, bounded final
+readback, interpretable CPU/RSS observations, and invocation identity mandatory.
+Those seven beads remain open for a source-distinct review of the repaired commit.
+No positive full-shape profile may run before that review.
 
 Then register one hypothesis and one experiment, freeze the packet and normalization
 rule, measure `m_c`, and run the normalized object through the complete exact route, the
