@@ -262,6 +262,9 @@ Runner admission is not a BC329 measurement.
 It uses a separate `fixed-core-packet-calibration/v1` receipt and a frozen known-answer
 fixture that exercises the real raw, exact, interval, dilation, publication, and
 per-direction readback paths at the full 14,404-record shape.
+The fixture, exact answers, refusal controls, and limits of the resulting measurements
+are fixed in the
+[calibration design review](review-2026-09-12-n11-bc329-calibration-design.md).
 That schema cannot carry a scientific acceptance and the scientific reader refuses it.
 Three fresh runs price operational overhead on the intended host; their timing does not
 bound the harder BC329 computation.

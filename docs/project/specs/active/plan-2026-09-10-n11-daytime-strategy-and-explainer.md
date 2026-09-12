@@ -298,8 +298,12 @@ analytically solved fixture unrelated to BC329. The full-shape control runs all 
 generic routes and 14,404 direction records, but its schema cannot express a scientific
 acceptance. Three fresh host runs measure operational overhead, effective workers by
 route, clocks, sampled process-group RSS, artifact bytes, and deadline headroom.
-Because the fixture is deliberately easy, its timing does not bound BC329’s computation.
-A source-distinct reader must accept those controls before registration.
+The
+[calibration design review](../../reviews/review-2026-09-12-n11-bc329-calibration-design.md)
+fixes the fixture, exact answers, refusal controls, and limits on interpreting those
+measurements.
+Because the fixture is deliberately easy, its timing does not bound BC329’s
+computation. A source-distinct reader must accept those controls before registration.
 Partial interval and dilation receipts must also name the exact direction set bound to
 each published checkpoint; their current count-and-last form cannot yield a scientific
 acceptance, but it is less precise for interrupted-run recovery.
