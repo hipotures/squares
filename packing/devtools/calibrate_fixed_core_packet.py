@@ -888,6 +888,10 @@ def _invocation_identity(
     cache_observation: str,
     background_load: str,
 ) -> dict[str, object]:
+    calibration_deadline = invocation_started + calibration_seconds
+    external_deadline = invocation_started + external_seconds
+    if not math.isfinite(calibration_deadline) or not math.isfinite(external_deadline):
+        raise CalibrationError("derived invocation deadlines are not finite")
     return {
         "implementation_revision": revision,
         "requested_workers": workers,
@@ -895,8 +899,8 @@ def _invocation_identity(
         "external_seconds": external_seconds,
         "termination_grace_seconds": grace_seconds,
         "monotonic_origin": invocation_started,
-        "calibration_deadline_monotonic": invocation_started + calibration_seconds,
-        "external_deadline_monotonic": invocation_started + external_seconds,
+        "calibration_deadline_monotonic": calibration_deadline,
+        "external_deadline_monotonic": external_deadline,
         "run_order": run_order,
         "cache_observation": cache_observation,
         "background_load": background_load,
@@ -1058,10 +1062,16 @@ def _finite_nonnegative(value: object, label: str, *, optional: bool = True) -> 
 def _validate_worker_phase_durations(clocks: dict[str, object]) -> None:
     for name in (*WORKER_DISJOINT_PHASES, "worker_elapsed_seconds"):
         _finite_nonnegative(clocks.get(name), f"clock {name}", optional=False)
-    total = math.fsum(cast(float, clocks[name]) for name in WORKER_DISJOINT_PHASES)
+    try:
+        total = math.fsum(cast(float, clocks[name]) for name in WORKER_DISJOINT_PHASES)
+    except OverflowError as error:
+        raise CalibrationError("worker phase durations exceed worker elapsed") from error
     elapsed = cast(float, clocks["worker_elapsed_seconds"])
-    if total > elapsed and not math.isclose(
-        total, elapsed, rel_tol=PHASE_ROUNDING_REL_TOL, abs_tol=PHASE_ROUNDING_ABS_TOL
+    if not math.isfinite(total) or (
+        total > elapsed
+        and not math.isclose(
+            total, elapsed, rel_tol=PHASE_ROUNDING_REL_TOL, abs_tol=PHASE_ROUNDING_ABS_TOL
+        )
     ):
         raise CalibrationError("worker phase durations exceed worker elapsed")
 

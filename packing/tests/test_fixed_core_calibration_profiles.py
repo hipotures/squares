@@ -850,7 +850,7 @@ def test_inventory_refuses_special_receipt_replaced_after_safe_read(
         )
 
 
-@pytest.mark.parametrize("mutation", ["single", "combined"])
+@pytest.mark.parametrize("mutation", ["single", "combined", "finite-sum-overflow"])
 def test_inventory_refuses_worker_phase_durations_beyond_elapsed(
     tmp_path: Path, mutation: str
 ) -> None:
@@ -863,7 +863,7 @@ def test_inventory_refuses_worker_phase_durations_beyond_elapsed(
     clocks = cast(dict[str, object], receipt["clocks"])
     if mutation == "single":
         clocks["raw_seconds"] = 100.0
-    else:
+    elif mutation == "combined":
         for phase in (
             "preflight_seconds",
             "raw_seconds",
@@ -874,6 +874,9 @@ def test_inventory_refuses_worker_phase_durations_beyond_elapsed(
             "full_readback_seconds",
         ):
             clocks[phase] = 0.2
+    else:
+        clocks["raw_seconds"] = clocks["exact_seconds"] = 1e308
+        clocks["worker_elapsed_seconds"] = 1e308
     _publish_fake_receipt(output, receipt)
     with pytest.raises(profiles.ProfileCoordinatorError, match="phase durations"):
         profiles.inventory_profile(
@@ -888,6 +891,76 @@ def test_inventory_phase_rounding_tolerance_has_a_small_boundary() -> None:
     clocks["worker_elapsed_seconds"] = 0.7 - 5e-7
     with pytest.raises(profiles.ProfileCoordinatorError, match="phase durations"):
         profiles._validate_worker_phase_durations(clocks)
+
+
+def test_inventory_accepts_finite_phase_total_near_float_limit() -> None:
+    clocks: dict[str, object] = dict.fromkeys(profiles._WORKER_DISJOINT_PHASES, 0.0)
+    clocks.update(raw_seconds=1e308, exact_seconds=7e307, worker_elapsed_seconds=1.7e308)
+    profiles._validate_worker_phase_durations(clocks)
+
+
+def test_inventory_refuses_nonfinite_derived_deadlines(tmp_path: Path) -> None:
+    output = tmp_path / "profile"
+    _fake_receipt(output, 1)
+    receipt = profiles._strict_json(output / "result.json", "receipt")
+    settings = cast(dict[str, object], receipt["settings"])
+    settings.update(calibration_seconds=1e308, external_seconds=1.1e308)
+    identity = cast(
+        dict[str, object], cast(dict[str, object], receipt["invocation"])["identity"]
+    )
+    identity.update(
+        monotonic_origin=1e308,
+        calibration_seconds=1e308,
+        external_seconds=1.1e308,
+        calibration_deadline_monotonic=1e307,
+        external_deadline_monotonic=1e307,
+    )
+    _publish_fake_receipt(output, receipt)
+    receipt_path = output / "result.json"
+    encoded = receipt_path.read_text(encoding="utf-8")
+    for field in ("calibration_deadline_monotonic", "external_deadline_monotonic"):
+        placeholder = f'"{field}": 1e+307'
+        assert placeholder in encoded
+        encoded = encoded.replace(placeholder, f'"{field}": 1e999 ', 1)
+    receipt_path.write_text(encoded, encoding="utf-8")
+    with pytest.raises(profiles.ProfileCoordinatorError, match="deadline"):
+        profiles.inventory_profile(
+            output, execution_revision=REVISION, run_order=1, spec=SMALL_SPEC
+        )
+    parsed = profiles._strict_json(receipt_path, "receipt")
+    parsed_identity = cast(
+        dict[str, object], cast(dict[str, object], parsed["invocation"])["identity"]
+    )
+    with pytest.raises(profiles.ProfileCoordinatorError, match="deadline"):
+        profiles._validate_profile_identity(parsed_identity, revision=REVISION, run_order=1)
+
+
+def test_inventory_accepts_finite_derived_deadlines_near_float_limit(
+    tmp_path: Path,
+) -> None:
+    output = tmp_path / "profile"
+    _fake_receipt(output, 1)
+    receipt = profiles._strict_json(output / "result.json", "receipt")
+    calibration_seconds = 1e307
+    external_seconds = 2e307
+    origin = 1e308
+    settings = cast(dict[str, object], receipt["settings"])
+    settings.update(calibration_seconds=calibration_seconds, external_seconds=external_seconds)
+    identity = cast(
+        dict[str, object], cast(dict[str, object], receipt["invocation"])["identity"]
+    )
+    identity.update(
+        monotonic_origin=origin,
+        calibration_seconds=calibration_seconds,
+        external_seconds=external_seconds,
+        calibration_deadline_monotonic=origin + calibration_seconds,
+        external_deadline_monotonic=origin + external_seconds,
+    )
+    _publish_fake_receipt(output, receipt)
+    profiles.inventory_profile(
+        output, execution_revision=REVISION, run_order=1, spec=SMALL_SPEC
+    )
+    profiles._validate_profile_identity(identity, revision=REVISION, run_order=1)
 
 
 def test_inventory_refuses_retired_four_field_supervision(tmp_path: Path) -> None:

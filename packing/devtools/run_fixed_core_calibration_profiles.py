@@ -206,16 +206,22 @@ def _finite_nonnegative(value: object, label: str) -> float:
 
 
 def _validate_worker_phase_durations(clocks: dict[str, object]) -> None:
-    total = math.fsum(
-        _finite_nonnegative(clocks.get(name), f"clock {name}")
-        for name in _WORKER_DISJOINT_PHASES
-    )
+    try:
+        total = math.fsum(
+            _finite_nonnegative(clocks.get(name), f"clock {name}")
+            for name in _WORKER_DISJOINT_PHASES
+        )
+    except OverflowError as error:
+        raise ProfileCoordinatorError("worker phase durations exceed worker elapsed") from error
     elapsed = _finite_nonnegative(clocks.get("worker_elapsed_seconds"), "worker elapsed")
-    if total > elapsed and not math.isclose(
-        total,
-        elapsed,
-        rel_tol=_PHASE_ROUNDING_REL_TOL,
-        abs_tol=_PHASE_ROUNDING_ABS_TOL,
+    if not math.isfinite(total) or (
+        total > elapsed
+        and not math.isclose(
+            total,
+            elapsed,
+            rel_tol=_PHASE_ROUNDING_REL_TOL,
+            abs_tol=_PHASE_ROUNDING_ABS_TOL,
+        )
     ):
         raise ProfileCoordinatorError("worker phase durations exceed worker elapsed")
 
@@ -757,6 +763,10 @@ def _validate_inventory_receipt(
         "background_load",
     }
     origin = _finite_nonnegative(identity.get("monotonic_origin"), "monotonic origin")
+    calibration_deadline = origin + calibration
+    external_deadline = origin + external
+    if not math.isfinite(calibration_deadline) or not math.isfinite(external_deadline):
+        raise ProfileCoordinatorError("receipt invocation deadlines are not finite")
     if (
         calibration == 0
         or external <= calibration
@@ -767,8 +777,8 @@ def _validate_inventory_receipt(
         or identity.get("calibration_seconds") != calibration
         or identity.get("external_seconds") != external
         or identity.get("termination_grace_seconds") != grace
-        or identity.get("calibration_deadline_monotonic") != origin + calibration
-        or identity.get("external_deadline_monotonic") != origin + external
+        or identity.get("calibration_deadline_monotonic") != calibration_deadline
+        or identity.get("external_deadline_monotonic") != external_deadline
         or identity.get("run_order") != run_order
         or not isinstance(identity.get("cache_observation"), str)
         or not cast(str, identity["cache_observation"]).strip()
@@ -1610,6 +1620,10 @@ def _validate_profile_identity(
     external = _finite_nonnegative(identity.get("external_seconds"), "external allowance")
     grace = _finite_nonnegative(identity.get("termination_grace_seconds"), "termination grace")
     origin = _finite_nonnegative(identity.get("monotonic_origin"), "monotonic origin")
+    calibration_deadline = origin + calibration
+    external_deadline = origin + external
+    if not math.isfinite(calibration_deadline) or not math.isfinite(external_deadline):
+        raise ProfileCoordinatorError("profile invocation deadlines are not finite")
     if (
         set(identity) != expected
         or identity.get("implementation_revision") != revision
@@ -1619,8 +1633,8 @@ def _validate_profile_identity(
         or calibration == 0
         or external <= calibration
         or grace == 0
-        or identity.get("calibration_deadline_monotonic") != origin + calibration
-        or identity.get("external_deadline_monotonic") != origin + external
+        or identity.get("calibration_deadline_monotonic") != calibration_deadline
+        or identity.get("external_deadline_monotonic") != external_deadline
         or not isinstance(identity.get("cache_observation"), str)
         or not cast(str, identity["cache_observation"]).strip()
         or not isinstance(identity.get("background_load"), str)

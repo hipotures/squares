@@ -1037,7 +1037,7 @@ def test_worker_topology_refuses_digest_consistent_reversed_route_chronology(
         validate()
 
 
-@pytest.mark.parametrize("mutation", ["single", "combined"])
+@pytest.mark.parametrize("mutation", ["single", "combined", "finite-sum-overflow"])
 def test_terminal_document_refuses_worker_phase_durations_beyond_elapsed(
     tmp_path: Path,
     mutation: str,
@@ -1062,7 +1062,7 @@ def test_terminal_document_refuses_worker_phase_durations_beyond_elapsed(
     calibration.validate_document(document)
     if mutation == "single":
         clocks["raw_seconds"] = 100.0
-    else:
+    elif mutation == "combined":
         clocks["worker_elapsed_seconds"] = 0.1
         for phase in (
             "preflight_seconds",
@@ -1074,6 +1074,9 @@ def test_terminal_document_refuses_worker_phase_durations_beyond_elapsed(
             "full_readback_seconds",
         ):
             clocks[phase] = 0.02
+    else:
+        clocks["raw_seconds"] = clocks["exact_seconds"] = 1e308
+        clocks["worker_elapsed_seconds"] = 1e308
     with pytest.raises(calibration.CalibrationError, match="phase durations"):
         calibration.validate_document(document)
 
@@ -1085,6 +1088,46 @@ def test_producer_phase_rounding_tolerance_has_a_small_boundary() -> None:
     clocks["worker_elapsed_seconds"] = 0.07 - 5e-7
     with pytest.raises(calibration.CalibrationError, match="phase durations"):
         calibration._validate_worker_phase_durations(clocks)
+
+
+def test_producer_accepts_finite_phase_total_near_float_limit() -> None:
+    clocks: dict[str, object] = dict.fromkeys(calibration.WORKER_DISJOINT_PHASES, 0.0)
+    clocks.update(raw_seconds=1e308, exact_seconds=7e307, worker_elapsed_seconds=1.7e308)
+    calibration._validate_worker_phase_durations(clocks)
+
+
+def test_producer_refuses_nonfinite_derived_deadlines() -> None:
+    document = calibration.initial_document(
+        REVISION,
+        workers=1,
+        calibration_seconds=1e307,
+        external_seconds=2e307,
+        grace_seconds=1.0,
+        invocation_started=1e308,
+        run_order=1,
+        cache_observation="test cache",
+        background_load="test load",
+    )
+    calibration.validate_document(document)
+    settings = cast(dict[str, object], document["settings"])
+    settings.update(calibration_seconds=1e308, external_seconds=1.1e308)
+    identity = cast(
+        dict[str, object], cast(dict[str, object], document["invocation"])["identity"]
+    )
+    identity.update(
+        calibration_seconds=1e308,
+        external_seconds=1.1e308,
+        calibration_deadline_monotonic=1e307,
+        external_deadline_monotonic=1e307,
+    )
+    encoded = json.dumps(document, allow_nan=False)
+    for field in ("calibration_deadline_monotonic", "external_deadline_monotonic"):
+        placeholder = f'"{field}": 1e+307'
+        assert placeholder in encoded
+        encoded = encoded.replace(placeholder, f'"{field}": 1e999', 1)
+    parsed = calibration._strict_json_bytes(encoded.encode(), "calibration receipt")
+    with pytest.raises(calibration.CalibrationError, match="deadline"):
+        calibration.validate_document(parsed)
 
 
 @pytest.mark.parametrize(
@@ -1470,7 +1513,15 @@ def test_parent_readback_that_finishes_after_deadline_revokes_admission(
 
 
 @pytest.mark.parametrize(
-    "late_at", ["success", "phase-overflow", "validation", "serialization", "publication"]
+    "late_at",
+    [
+        "success",
+        "phase-overflow",
+        "finite-sum-overflow",
+        "validation",
+        "serialization",
+        "publication",
+    ],
 )
 def test_terminal_admission_outcomes(
     tmp_path: Path,
@@ -1481,6 +1532,10 @@ def test_terminal_admission_outcomes(
     document = _terminal_candidate_summary(output)
     if late_at == "phase-overflow":
         cast(dict[str, object], document["clocks"])["raw_seconds"] = 100.0
+    elif late_at == "finite-sum-overflow":
+        clocks = cast(dict[str, object], document["clocks"])
+        clocks["raw_seconds"] = clocks["exact_seconds"] = 1e308
+        clocks["worker_elapsed_seconds"] = 1e308
     calibration.write_result(output, document)
     now = [0.0]
 
@@ -1562,7 +1617,7 @@ def test_terminal_admission_outcomes(
         assert receipt["status"] == "complete"
         assert receipt["disposition"] == "calibration-passed"
         assert receipt["phase"] == "complete"
-    elif late_at == "phase-overflow":
+    elif late_at in {"phase-overflow", "finite-sum-overflow"}:
         assert status == 2
         assert receipt["status"] == "invalid"
         assert receipt["disposition"] == "calibration-refused"
