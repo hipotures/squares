@@ -142,12 +142,12 @@ The detailed implementation statuses remain in [What Is Built](#what-is-built).
 | Visualization | Inspect the exact `n = 3` moduli SVG and design evidence-typed views from retained artifacts | The scalable basin atlas and the first `n = 5` ambiguity view are unbuilt; endpoint rows must not be pictured as components | [Visualization ladder](docs/project/reviews/review-2026-08-23-mathematical-frontier-strategy.md#basin-ontology-and-visualization-ladder) |
 | Unattended numerical execution | Run bounded supervised slices and let an agent resume dependency-ready work | The numerical runner remains **NO-GO** until its independent validity, recovery, receipt, and capacity gates pass | [Numeric launch agenda](docs/project/specs/active/plan-2026-08-23-overnight-cartography-run.md#the-numeric-runner-launch-gate) |
 
-The generated ledger currently derives twenty-five confirmed hypotheses, twenty-three
+The generated ledger currently derives twenty-five confirmed hypotheses, twenty-four
 refuted hypotheses, two open hypotheses, twenty-six open questions, and forty-six
 blocked hypotheses. H-104’s seven fixed-formula exact-angle clauses are confirmed; H-036
 remains unresolved. H-125 is blocked after exp129 missed its launch cutoff without
 scientific invocation; this does not refute its claim.
-One hypothesis is running; none is waiting on review and nine are unresolved.
+No hypothesis is running; none is waiting on review and nine are unresolved.
 H-124’s fixed-square screen found no pair; its witness-only reader was not invoked.
 H-105 is refuted: all 134 eligible candidate pairs are separated.
 Exp128 subsequently settled H-099’s entire fixed support at optimum eleven through seven
@@ -215,6 +215,7 @@ case or experiment separately.
 | [Fractional Packing, Duality, and the Next $n=11$ Discriminators](docs/project/research/research-2026-09-10-x027-fractional-duality.md) | research synthesis | record | retained | — |
 | [X027: Seven Corner Marks, Contact Components, and Relational Helpers](docs/project/research/research-2026-09-10-x027-structural-helpers.md) | research synthesis | record | retained | — |
 | [N11: The Missing Owner-Selection Theorem](docs/project/research/research-2026-09-12-n11-selection-routing-first-principles.md) | research synthesis | record | retained | — |
+| [BC303 Literal Parent-Union Mass](docs/project/research/research-2026-09-13-bc303-literal-parent-union-result.md) | research synthesis | record | retained | — |
 | [Certificate Mechanisms After the $n=11$ Fractional Ceilings](docs/project/research/research-2026-09-10-x027-certificate-mechanisms.md) | research synthesis | record | retained | — |
 | [A6 Fixed-Support Dual Admission](packing/cases/n11_fractional_certificate/a6_dual_upper/README.md) | research synthesis | record | retained | — |
 | [A6 Scope and Overnight Plan Review](docs/project/reviews/review-2026-09-10-n11-a6-scope-and-plan.md) | dated review record | record | retained | — |
@@ -3605,7 +3606,7 @@ round that names the hypothesis, control roles included.
 | [H-157](packing/campaign/hypotheses/H-157-refined-owner-sector-patch-breaks-neutrality.md) | refuted | Sixteen owner sectors instead of eight fatten every guaranteed patch past the `0.014978` separating gap, so no neutral class survives the refinement | 1 | exp-154: six of eight refined subclasses still read exactly 10 and two read `19/2`; this refutes the all-subclasses claim, while broader conditioning and changed charges remain open |
 | [H-158](packing/campaign/hypotheses/H-158-unit-parent-domain-excludes-saved-residual.md) | unresolved | Exp151’s direction-6 residual fails its own necessary parent box, or one selected owner has a newly replayed positive B-only witness and no positive witness after the complete parent restriction | 1 | exp-156: residual survives; TR is B-only incompatible after 181 frames, making parent gain impossible there; BL, BR and TL were not run; 20.63s external wall |
 | [H-159](packing/campaign/hypotheses/H-159-bc303-one-corner-surplus.md) | refuted | Every bottom-left role-C selected core with labels 0 and 15 absent has surplus above the BC303 shared allowance | 1 | exp-157: the disclosed literal parent has labels `{3,4,11,12}` and exact surplus `3/800000 < epsilon`; 1.92s replay wall |
-| [H-161](packing/campaign/hypotheses/H-161-bc303-literal-parent-union.md) | running | The frozen literal closed Q0 has integer mass `N>=4262074`, excluding the named four-corner tuple under the imported BC303 floor | 1 | exp-159 target pending; the separate one-parent cutoff is `5048249` |
+| [H-161](packing/campaign/hypotheses/H-161-bc303-literal-parent-union.md) | refuted | The frozen literal closed Q0 has integer mass `N>=4262074`, excluding the named four-corner tuple under the imported BC303 floor | 1 | exp-159: `N=4000015`; neither the four-corner nor one-parent threshold rejects |
 
 ### Confirmed
 
@@ -4048,7 +4049,7 @@ archive beside it.
 | [exp-155](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-155-h156-finer-net-threshold-dilation.md) | 11 | target | H-156 | Frozen T-025 atoms on the 1440-step direction net and exact dilation corollary | Proved `s(11) >= 955000*sqrt(518400042893309449)/179696714646249 = 3.8264474...`; the result is now V4/C5 | **accepted** |
 | [exp-156](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-156-unit-parent-saved-residual.md) | 11 | target | H-158 | Exact residual parent-box check followed by matched B-only and parent-restricted owner comparisons in TR, BL, BR, TL order | Residual inside parent box; TR / bottom-left:m1:j7 has exact negative B-only maximum after 181 frames, which also precludes parent gain there; BL, BR and TL unrun | unresolved |
 | [exp-157](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-157-bc303-literal-t1-witness.md) | 11 | target | H-159 | Retrospective source-bound replay of one disclosed bottom-left role-C parent across all 377 atoms | Labels `{3,4,11,12}`; 19 captured atoms give `S(X)=3/800000 < epsilon`, rejecting only the named local inequality | rejected |
-| [exp-159](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-159-bc303-literal-parent-union.md) | 11 | target | H-161 | Prospective source-bound exact mass of closed `Q0=[0,1]^2` against frozen one-parent and four-corner budgets | Target not yet run; cutoffs fixed at `5048249` and `4262074` | in-progress |
+| [exp-159](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-159-bc303-literal-parent-union.md) | 11 | target | H-161 | Source-bound exact mass of closed `Q0=[0,1]^2` against frozen one-parent and four-corner budgets | `N=4000015`; both tests retain `1048233` units of slack | rejected |
 
 ### Cost and provenance
 
@@ -4167,7 +4168,7 @@ archive beside it.
 | exp-155 | retrospective registration of one completed bounded lane; no new target allowance | 6713.2s additive reported | — | criterion | `7ccb679c` |
 | exp-156 | one 90-second scientific allowance inside one 120-second supervised process plus two-second grace | 0.4452s scientific | 20.6281s external command wall, including mandatory in-process readback and supervision | criterion | receipt: 8.6396s source replay and 9.0848s pre-readback publication clock; later Astra receipt audit: 9.26s separate review work; H-158 unresolved |
 | exp-157 | one fixed disclosed candidate; no search clock | — | 1.92s external replay wall | criterion | source-bound receipt at `81898608`; independent 377-row audit separate |
-| exp-159 | one source-bound literal target invocation; no pose sweep or retry | — | — | pending | admitted reader `641beab7`; target not yet run |
+| exp-159 | one source-bound literal target invocation; no pose sweep or retry | 0.16s | — | criterion | execution head `f27c8ec7`; independent 377-atom and D4 audit retained |
 
 ### What the 114 rounds jointly establish
 

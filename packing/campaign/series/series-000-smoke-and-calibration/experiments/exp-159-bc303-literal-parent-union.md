@@ -36,22 +36,45 @@ experiment:
     operator: Codex source-distinct reviewer, then exact target operator
     entry_point: packing/devtools/read_bc303_parent_union.py:literal_q0_mass
     command: >-
-      From packing/, run one Python 3.14 process importing
-      devtools.read_bc303_parent_union.literal_q0_mass with repository '..';
-      serialize returned N, source revision, source SHA-256, and implementation
-      revision to /private/tmp/bc303-parent-union-target.json.
+      From packing/, PYTHONPATH=. /usr/bin/time -p
+      /opt/homebrew/bin/python3.14 - with the receipt-serialization stdin
+      program recorded below; stdout to
+      /private/tmp/bc303-parent-union-target-f27c8ec7.json and timing to
+      /private/tmp/bc303-parent-union-target-f27c8ec7.time.
     budget: One deterministic literal Q0 target invocation; no pose sweep or retry
     record: packing/campaign/series/series-000-smoke-and-calibration/results/agenda-035/exp-159-bc303-literal-parent-union.json
-  lease:
-    expires: '2026-09-15T00:00:00Z'
-  results: []
+    commit: f27c8ec7c8ebeb8a9b369c1c6f7efef4b531c359
+    dirty: false
+  effort:
+    timebox: One deterministic invocation
+    wall_seconds: 0.16
+    stopped_by: criterion
+  results:
+  - shape: determination
+    role: outcome
+    question: >-
+      Does the exact literal Q0 mass violate the four-corner parent-union budget,
+      and does it separately violate the one-parent budget?
+    outcome: criterion_missed
+    checked_by: >-
+      packing/devtools/audit_bc303_parent_union.py independently replayed all
+      377 raw source atoms and found
+      19 closed Q0 sites of mass 4000015 units, no boundary or parent-only sites
+      beyond the T1 core, and four disjoint D4 images with 19 sites and 4000015
+      units each. It confirmed the retained source SHA-256, frozen and execution
+      blobs, exact budgets 5048248 and 17048293, and 1048233 units of slack in
+      each necessary inequality.
   verdict:
-    decision: in-progress
+    decision: rejected
     primary_criterion: >-
       Accept H-161 iff N>=4262074; separately report whether N>=5048249.
-    reason: The source-bound literal target has not run.
+    reason: >-
+      N=4000015 is below both first-rejecting integers, so the literal
+      four-corner and one-parent resource tests survive with 1048233 units
+      of slack each; neither extension is established.
+    commit: f27c8ec7c8ebeb8a9b369c1c6f7efef4b531c359
 ---
-# Exp-159: Frozen Decisions Before the Target
+# Exp-159: Literal BC303 Parent-Union Mass
 
 The accepted parent-union lemma gives `mu(Q_I)+sum(outside core masses)<=M` for
 hypothetical eleven-parent packings with disjoint interiors.
@@ -65,12 +88,72 @@ between corner copies give four-parent union mass `4N`. Thus the first rejecting
 integers are `5048249` for one literal parent and `4262074` for the four-corner tuple.
 The primary H-161 decision uses the four-corner cutoff.
 
-The source, reader, and executed checkout revisions will be retained with the target
-receipt. An independent raw-source replay will check the mass and D4 union afterward.
-A cutoff failure means only that this necessary resource test survives.
-A cutoff rejection means only nonextension of the named literal parent or tuple.
-Neither result settles a pose neighborhood, continuous selection routing, or a global
-lower bound on `s(11)`.
+The
+[source-bound receipt](../results/agenda-035/exp-159-bc303-literal-parent-union.json) at
+preregistered execution head `f27c8ec7c8ebeb8a9b369c1c6f7efef4b531c359` reports
+`N=4000015`, or `mu(Q0)=800003/800000`. It used the admitted reader file from commit
+`641beab7020570e71680950a92535073c8f698bd`, unchanged at the execution head.
+The independent
+[377-row audit](../results/agenda-035/exp-159-bc303-literal-parent-union-audit.json) was
+reproduced byte for byte by the
+[replay tool](../../../../devtools/audit_bc303_parent_union.py).
+It found the same 19 Q0 sites as the T1 core, no sites on Q0’s boundary or in its
+parent-only annulus, and 19 sites of equal mass in each of the four disjoint D4 corner
+images. The
+[timing receipt](../results/agenda-035/exp-159-bc303-literal-parent-union.time.txt)
+records 0.16 seconds of external wall time for the one target invocation.
+
+The measured four-corner union has `4N=16000060` units against `17048293` allowed by the
+necessary inequality.
+The one-parent mass has `4000015` units against `5048248`. Each test has `1048233`
+units, or `1048233/4000000`, of slack.
+H-161 is rejected: this resource test excludes neither the literal four-corner tuple nor
+one literal Q0 parent from an eleven-parent packing.
+It also supplies no extension, pose-neighborhood exclusion, continuous selection
+routing, or new lower bound on `s(11)`.
+
+The executed Python 3.14 stdin program called the committed `literal_q0_mass` tool once
+and serialized the result.
+Its retained JSON includes N, exact mass, source and implementation revisions, source
+SHA-256, closed bounds, both budgets and signed differences, both Boolean decisions, the
+source atom count, and the response scope.
+
+The one target invocation ran from `packing/`:
+
+```bash
+PYTHONPATH=. /usr/bin/time -p /opt/homebrew/bin/python3.14 - <<'PY' > /private/tmp/bc303-parent-union-target-f27c8ec7.json 2> /private/tmp/bc303-parent-union-target-f27c8ec7.time
+import json
+from fractions import Fraction
+from pathlib import Path
+from devtools.read_bc303_parent_union import (
+    Q0, TOTAL_MASS, WEIGHT_SCALE, literal_q0_mass,
+)
+n, bound = literal_q0_mass(Path(".."))
+one_budget = 45_048_398 - 10 * 4_000_015
+four_budget = 45_048_398 - 7 * 4_000_015
+receipt = {
+    "schema": "bc303-literal-parent-union/v1",
+    "source_revision": bound.source_revision,
+    "source_sha256": bound.source_sha256,
+    "implementation_revision": bound.implementation_revision,
+    "atom_count": len(bound.atoms),
+    "weight_scale": WEIGHT_SCALE,
+    "total_mass": str(TOTAL_MASS),
+    "closed_parent_bounds": [str(v) for v in Q0],
+    "integer_mass_N": n,
+    "mass": str(Fraction(n, WEIGHT_SCALE)),
+    "one_parent_budget_units": one_budget,
+    "four_parent_budget_units": four_budget,
+    "four_corner_union_units": 4 * n,
+    "one_parent_excess_units": n - one_budget,
+    "four_corner_excess_units": 4 * n - four_budget,
+    "one_parent_nonextension": n > one_budget,
+    "four_corner_nonextension": 4 * n > four_budget,
+    "scope": "literal Q0 and its four specified D4 corner images only",
+}
+print(json.dumps(receipt, indent=2, sort_keys=True))
+PY
+```
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

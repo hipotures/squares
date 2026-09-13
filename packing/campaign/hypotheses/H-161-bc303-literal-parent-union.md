@@ -51,7 +51,10 @@ For the four separated D4 corner copies, it is `4N<=17048293`, equivalently
 `N<=4262073`. These are fixed before the
 [exp-159 target read](../series/series-000-smoke-and-calibration/experiments/exp-159-bc303-literal-parent-union.md).
 
-The four-corner claim concerns that specified tuple only.
+Exp-159 measured `N=4000015`, below both first-rejecting integers.
+It rejects H-161’s predicted four-corner nonextension.
+The four-corner claim concerns that specified tuple only, and this necessary test
+surviving does not prove the tuple extends to eleven parents.
 A pointwise result does not extend to nearby parent poses without a separate uniform
 lower bound on their union mass.
 
