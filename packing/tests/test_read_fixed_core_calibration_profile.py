@@ -10,6 +10,7 @@ import ast
 import hashlib
 import importlib.util
 import json
+import math
 import os
 import subprocess
 import sys
@@ -1857,5 +1858,66 @@ def test_real_binder_rejects_execution_tree_identity(
     try:
         with pytest.raises(reader.ReadbackRefusalError, match="not a Git commit"):
             _read_with_real_binder(output, execution_revision=tree)
+    finally:
+        _publish_receipt(output, deepcopy(baseline))
+
+
+def _large_finite_clock_profile(
+    baseline: dict[str, object], *, phase_seconds: float, worker_elapsed: float
+) -> dict[str, object]:
+    changed = deepcopy(baseline)
+    settings = cast(dict[str, object], changed["settings"])
+    settings["calibration_seconds"] = 1.6e308
+    settings["external_seconds"] = 1.7e308
+    invocation = cast(dict[str, object], changed["invocation"])
+    identity = cast(dict[str, object], invocation["identity"])
+    identity["calibration_seconds"] = settings["calibration_seconds"]
+    identity["external_seconds"] = settings["external_seconds"]
+    identity["calibration_deadline_monotonic"] = 1.6e308
+    identity["external_deadline_monotonic"] = 1.7e308
+    clocks = cast(dict[str, object], changed["clocks"])
+    for key in (
+        "preflight_seconds",
+        "raw_seconds",
+        "normalization_publication_seconds",
+        "exact_seconds",
+        "interval_seconds",
+        "dilation_seconds",
+        "full_readback_seconds",
+    ):
+        clocks[key] = phase_seconds
+    clocks["worker_elapsed_seconds"] = worker_elapsed
+    clocks["worker_exit_seconds"] = worker_elapsed
+    clocks["external_lifetime_seconds"] = 1.55e308
+    rss = cast(dict[str, object], cast(dict[str, object], changed["resources"])["rss"])
+    rss["observation_lifetime_seconds"] = 1.55e308
+    rss["unobserved_trailing_seconds"] = 1.55e308 - 0.2
+    return changed
+
+
+@pytest.mark.parametrize(
+    ("phase_seconds", "accepted"),
+    [(4e307, False), (2e307, True)],
+)
+def test_real_binder_phase_sum_finiteness_controls(
+    phase_seconds: float,
+    accepted: object,
+    profile: tuple[Path, dict[str, object]],
+) -> None:
+    output, baseline = profile
+    total = sum([phase_seconds] * 7)
+    assert math.isfinite(phase_seconds)
+    assert math.isfinite(total) is (accepted is True)
+    worker_elapsed = total if accepted is True else 1.5e308
+    changed = _large_finite_clock_profile(
+        baseline, phase_seconds=phase_seconds, worker_elapsed=worker_elapsed
+    )
+    _publish_receipt(output, changed)
+    try:
+        if accepted is True:
+            assert _read_with_real_binder(output)["status"] == "accepted"
+        else:
+            with pytest.raises(reader.ReadbackRefusalError, match=r"worker phase"):
+                _read_with_real_binder(output)
     finally:
         _publish_receipt(output, deepcopy(baseline))

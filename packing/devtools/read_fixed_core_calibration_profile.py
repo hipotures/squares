@@ -1259,6 +1259,8 @@ def _maximum_simultaneous(tasks: list[dict[str, object]], label: str) -> int:
 
 def _not_later(first: float, second: float) -> bool:
     """Allow only roundoff in differences of measured monotonic clocks."""
+    if not math.isfinite(first) or not math.isfinite(second):
+        return False
     return first <= second or first - second <= 8 * max(math.ulp(first), math.ulp(second))
 
 
@@ -1530,7 +1532,7 @@ def _validate_topology(output: Path, receipt: dict[str, object]) -> dict[str, ob
             earliest_start = max(earliest_start, observed_finish - duration)
             if not _not_later(earliest_start, observed_start):
                 _refuse(f"{phase} tasks cannot fit their sequential worker phase")
-        earliest_start += duration
+        earliest_start = _number(earliest_start + duration, "worker phase schedule")
     if not _not_later(earliest_start, worker_elapsed):
         _refuse("worker phases and task observations exceed worker lifetime")
     supervision = cast(dict[str, object], receipt["supervision"])
@@ -1790,6 +1792,8 @@ def _validate_receipt_schema(receipt: dict[str, object], run_order: int) -> None
     grace = _number(settings["termination_grace_seconds"], "termination grace")
     if not 0 < calibration_seconds <= external_seconds or grace <= 0:
         _refuse("deadline settings are incoherent")
+    calibration_deadline = _number(origin + calibration_seconds, "calibration deadline")
+    external_deadline = _number(origin + external_seconds, "external deadline")
     source = _object(
         receipt["sources"],
         {"implementation_revision", "manifest", "runtime"},
@@ -1821,8 +1825,8 @@ def _validate_receipt_schema(receipt: dict[str, object], run_order: int) -> None
         "external_seconds": external_seconds,
         "termination_grace_seconds": grace,
         "monotonic_origin": origin,
-        "calibration_deadline_monotonic": origin + calibration_seconds,
-        "external_deadline_monotonic": origin + external_seconds,
+        "calibration_deadline_monotonic": calibration_deadline,
+        "external_deadline_monotonic": external_deadline,
         "run_order": run_order,
         "cache_observation": invocation["cache_observation"],
         "background_load": invocation["background_load"],
@@ -1860,11 +1864,13 @@ def _validate_receipt_schema(receipt: dict[str, object], run_order: int) -> None
             if measured < 0:
                 _refuse(f"clock {key} must be nonnegative")
             clock_values[key] = measured
+    terminal_external_elapsed = _number(
+        clock_values["external_lifetime_seconds"] + clock_values["terminal_admission_seconds"],
+        "terminal external elapsed",
+    )
     if (
         clock_values["worker_elapsed_seconds"] >= calibration_seconds
-        or clock_values["external_lifetime_seconds"]
-        + clock_values["terminal_admission_seconds"]
-        >= external_seconds
+        or terminal_external_elapsed >= external_seconds
         or clock_values["worker_elapsed_seconds"] > clock_values["external_lifetime_seconds"]
     ):
         _refuse("terminal calibration exceeded or contradicted a declared deadline")
@@ -1898,12 +1904,13 @@ def _validate_receipt_schema(receipt: dict[str, object], run_order: int) -> None
         "dilation_seconds",
         "full_readback_seconds",
     )
+    worker_phase_total = _number(
+        sum(clock_values[key] for key in disjoint_worker_phases), "worker phase total"
+    )
     if any(
         not _not_later(clock_values[key], worker_elapsed)
         for key in (*disjoint_worker_phases, "source_loading_seconds")
-    ) or not _not_later(
-        sum(clock_values[key] for key in disjoint_worker_phases), worker_elapsed
-    ):
+    ) or not _not_later(worker_phase_total, worker_elapsed):
         _refuse("worker phase durations contradict worker lifetime")
     resources = _object(
         receipt["resources"],
