@@ -549,8 +549,9 @@ independently reviewed parent-union inequality, its one-parent and four-parent i
 thresholds, and the remaining steps from a local exclusion to a complete selection
 argument. It also places the BC329 packet, T2 charge decision, weighted trace test, and
 other options against their separate acceptance conditions.
-The parent mass and T2 target charges were unmeasured at this source cutoff; the
-exploration registers no new bound or experiment.
+Exp-159 measured the literal parent $Q_0$ at $N=4000015$ source units; the T2 C/S target
+charges remain unrun.
+X-030 registers no additional target or bound.
 
 ## Dead ends
 

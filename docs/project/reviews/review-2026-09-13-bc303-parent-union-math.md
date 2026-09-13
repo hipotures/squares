@@ -7,7 +7,7 @@ review of the parent’s W3 strategy analysis.
 and the four-corner transport, with the literal nonextension scope stated below.** No
 Blocker or High mathematical finding was found in this bounded review.
 This accepts an analytic implication and a prospective discriminator.
-The target parent mass remains uncomputed.
+At this review’s T1 cutoff, the target parent mass had not been computed.
 
 The reviewed proposal is [X-030][proposal], specifically “Core surplus alone still
 admits four bad corner owners” and “Charge the parent union and its unavailable atoms.”
