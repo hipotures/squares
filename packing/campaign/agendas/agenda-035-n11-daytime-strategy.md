@@ -263,8 +263,12 @@ agenda:
       sequential task positions, and parent-cycle topology; a Git tree object also passes execution identity.
       Candidate reader F6/F7 repair 95830f9e is integrated; independent review accepted F6a, F6c,
       and F7 but refused F6b because finite phase clocks can overflow their sum and pass the reader.
-      Follow-up finite-clock repair a5701e73 and coordinator repair dbbf8495 are integrated,
-      with independent exact-head rereviews pending. The verifier's first six defects have focused
+      Follow-up finite-clock repair a5701e73 and coordinator repair dbbf8495 are integrated.
+      Coordinator rereview accepted its three targeted controls but refused strict receipt admission;
+      a finite derived deadline can become infinity and finite phase sums can raise an uncaught
+      OverflowError. The reader's independent exact-head rereview accepted F6/F7 at a5701e73
+      after twenty-three full-binder controls; later integrated-head closure remains. The verifier's
+      first six defects have focused
       repairs at 0874e912, but rereview refused R3 because it rejects the coordinator's required
       eighteen command logs and can retain a nonzero status after the first success check.
       Verifier repair/rereview, the final run-sheet review, three fresh
@@ -285,8 +289,10 @@ agenda:
     - docs/project/reviews/review-2026-09-13-n11-bc329-source-distinct-reader.md
     - docs/project/reviews/review-2026-09-13-n11-bc329-reader-rereview.md
     - docs/project/reviews/review-2026-09-13-n11-bc329-reader-f6f7-overflow.md
+    - docs/project/reviews/review-2026-09-13-n11-bc329-reader-f6f7-final.md
     - docs/project/reviews/review-2026-09-13-n11-bc329-topology-coordinator-initial.md
     - docs/project/reviews/review-2026-09-13-n11-bc329-coordinator-rereview.md
+    - docs/project/reviews/review-2026-09-13-n11-bc329-coordinator-final.md
     - docs/project/reviews/review-2026-09-13-n11-bc329-three-profile-run-sheet.md
     - docs/project/reviews/review-2026-09-13-n11-bc329-runset-verifier.md
     - docs/project/reviews/review-2026-09-13-n11-bc329-runset-verifier-rereview.md

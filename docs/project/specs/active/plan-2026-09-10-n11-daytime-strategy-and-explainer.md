@@ -329,11 +329,21 @@ Candidate F6/F7 repair `95830f9e` is integrated; its
 accepted F6a, F6c, and F7, but refused F6b after a full real-binder control accepted
 finite phase clocks whose sum overflows.
 Finite-clock repair `a5701e73` is integrated with a maintained full-binder overflow
-refusal and finite equality control; independent exact-head rereview remains open.
+refusal and finite equality control.
+Its
+[independent exact-head rereview](../../reviews/review-2026-09-13-n11-bc329-reader-f6f7-final.md)
+accepted F6/F7 at that source blob after 23 full real-binder controls.
+This scoped verdict does not transfer automatically to the later integrated head or
+admit positive calibration.
 Coordinator repair `dbbf8495` is integrated for inverted route chronology, disjoint
-phase time, and a changing `result.json`; independent exact-head rereview remains open.
-The first maintained run-set verifier at `878e18d0` implements the R2 proof join, R3
-inventory and archive comparison, and R4 source-closure check, but its
+phase time, and a changing `result.json`. Its
+[independent exact-head review](../../reviews/review-2026-09-13-n11-bc329-coordinator-final.md)
+accepted those targeted controls but refused strict receipt admission: finite inputs can
+overflow a derived deadline to infinity, and finite phase durations can raise an
+uncaught `OverflowError` rather than the specified metrics refusal.
+A scoped repair is in progress under `think-0osz` and `think-dgfk`. The first maintained
+run-set verifier at `878e18d0` implements the R2 proof join, R3 inventory and archive
+comparison, and R4 source-closure check, but its
 [exact-head review](../../reviews/review-2026-09-13-n11-bc329-runset-verifier.md)
 refused admission on six reproducible binding and refusal-path gaps.
 Candidate repair `0874e912` closes those six in focused controls, but its

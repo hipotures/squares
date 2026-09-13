@@ -21,8 +21,10 @@ documents:
   - {path: docs/project/reviews/review-2026-09-13-n11-bc329-source-distinct-reader.md, role: review, authority: record, lifecycle: retained}
   - {path: docs/project/reviews/review-2026-09-13-n11-bc329-reader-rereview.md, role: review, authority: record, lifecycle: retained}
   - {path: docs/project/reviews/review-2026-09-13-n11-bc329-reader-f6f7-overflow.md, role: review, authority: record, lifecycle: retained}
+  - {path: docs/project/reviews/review-2026-09-13-n11-bc329-reader-f6f7-final.md, role: review, authority: record, lifecycle: retained}
   - {path: docs/project/reviews/review-2026-09-13-n11-bc329-topology-coordinator-initial.md, role: review, authority: record, lifecycle: retained}
   - {path: docs/project/reviews/review-2026-09-13-n11-bc329-coordinator-rereview.md, role: review, authority: record, lifecycle: retained}
+  - {path: docs/project/reviews/review-2026-09-13-n11-bc329-coordinator-final.md, role: review, authority: record, lifecycle: retained}
   - {path: docs/project/reviews/review-2026-09-13-n11-bc329-three-profile-run-sheet.md, role: review, authority: record, lifecycle: retained}
   - {path: docs/project/reviews/review-2026-09-13-n11-bc329-runset-verifier.md, role: review, authority: record, lifecycle: retained}
   - {path: docs/project/reviews/review-2026-09-13-n11-bc329-runset-verifier-rereview.md, role: review, authority: record, lifecycle: retained}

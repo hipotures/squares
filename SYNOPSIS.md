@@ -224,8 +224,10 @@ case or experiment separately.
 | [BC329 Calibration Reader: Source-Distinct Review](docs/project/reviews/review-2026-09-13-n11-bc329-source-distinct-reader.md) | dated review record | record | retained | — |
 | [BC329 Reader Repair: Exact-Commit Rereview](docs/project/reviews/review-2026-09-13-n11-bc329-reader-rereview.md) | dated review record | record | retained | — |
 | [BC329 Reader F6/F7: Exact-Commit Admission Review](docs/project/reviews/review-2026-09-13-n11-bc329-reader-f6f7-overflow.md) | dated review record | record | retained | — |
+| [BC329 Reader F6/F7: Final Exact-Head Review](docs/project/reviews/review-2026-09-13-n11-bc329-reader-f6f7-final.md) | dated review record | record | retained | — |
 | [BC329 Topology Coordinator Exact-Head Review](docs/project/reviews/review-2026-09-13-n11-bc329-topology-coordinator-initial.md) | dated review record | record | retained | — |
 | [BC329 Coordinator Exact-Head Review](docs/project/reviews/review-2026-09-13-n11-bc329-coordinator-rereview.md) | dated review record | record | retained | — |
+| [BC329 Coordinator and Producer Exact-Head Review](docs/project/reviews/review-2026-09-13-n11-bc329-coordinator-final.md) | dated review record | record | retained | — |
 | [Independent Operational Review: BC329 Three-Profile Run Sheet](docs/project/reviews/review-2026-09-13-n11-bc329-three-profile-run-sheet.md) | dated review record | record | retained | — |
 | [Exact-Head Review: BC329 Run-Set Verifier](docs/project/reviews/review-2026-09-13-n11-bc329-runset-verifier.md) | dated review record | record | retained | — |
 | [BC329 Run-Set Verifier: Exact-Head Rereview](docs/project/reviews/review-2026-09-13-n11-bc329-runset-verifier-rereview.md) | dated review record | record | retained | — |
