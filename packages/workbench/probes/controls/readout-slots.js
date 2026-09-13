@@ -1,8 +1,12 @@
 // Each readout that changes at runtime, as [its id, whether it is a readout, its width, its
 // overflow, whether it takes a line of its own]. o.ids is the list to ask about.
+/** @param {{ids: string[]}} o */
 (o) =>
   o.ids.map((id) => {
     const e = document.getElementById(id);
+    if (e == null) {
+      throw new Error(`probe requires #${id}`);
+    }
     const s = getComputedStyle(e);
     return [
       id,

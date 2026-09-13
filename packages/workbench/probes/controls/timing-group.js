@@ -1,12 +1,22 @@
 // The step-animation group in each mode: the boxes around it, whether it is drawn, whether
 // it is alone in its row, and whether it holds the timing and phasing controls.
 // o.n is the size Pack is put on.
+/** @param {{n: number}} o */
 (o) => {
   const api = window.atlasTransitions;
   const box = document.getElementById("step-anim-box");
+  if (box == null || box.parentElement == null) {
+    throw new Error("probe requires #step-anim-box in a row");
+  }
+  const row = box.parentElement;
   const geo = () => {
+    /** @param {string} id */
     const r = (id) => {
-      const b = document.getElementById(id).getBoundingClientRect();
+      const element = document.getElementById(id);
+      if (element == null) {
+        throw new Error(`probe requires #${id}`);
+      }
+      const b = element.getBoundingClientRect();
       return [b.x, b.y, b.width, b.height];
     };
     const b = box.getBoundingClientRect();
@@ -22,11 +32,11 @@
       display: getComputedStyle(box).display,
       focusable: box.contains(document.activeElement),
       alone_in_row:
-        Array.from(box.parentElement.children).filter((e) => e.classList.contains("subpanel"))
-          .length === 1,
-      holds: ["t-dwell", "t-move", "t-settle", "phase-seg", "fullbeat-toggle"].every((id) =>
-        box.contains(document.getElementById(id)),
-      ),
+        Array.from(row.children).filter((e) => e.classList.contains("subpanel")).length === 1,
+      holds: ["t-dwell", "t-move", "t-settle", "phase-seg", "fullbeat-toggle"].every((id) => {
+        const element = document.getElementById(id);
+        return element != null && box.contains(element);
+      }),
     };
   };
   api.setMode("animate");

@@ -1,6 +1,6 @@
 // Restart in Animate: the beginning is the first step of the range, not this step's own
 // zero. o.lo and o.hi are the range, o.at the step to go to, o.t how far into it.
-(o) => {
+/** @param {{lo: number, hi: number, at: number, t: number}} o */ (o) => {
   const api = window.atlasTransitions;
   api.setMode("animate");
   api.setRange(o.lo, o.hi);

@@ -1,4 +1,4 @@
 // The blind run, which hides the record from the simulation. Takes {on}.
-(o) => {
+/** @param {{on: boolean}} o */ (o) => {
   window.atlasTransitions.setBlind(o.on);
 };

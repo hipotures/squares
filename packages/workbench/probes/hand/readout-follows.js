@@ -1,6 +1,6 @@
 // The measured side before and after a drag. o.n is the size, o.at where the square is,
 // o.to where it is dragged.
-(o) => {
+/** @param {{n: number, at: number, to: number}} o */ (o) => {
   const api = window.atlasTransitions;
   api.setStepN(o.n);
   api.setInitial("grid");

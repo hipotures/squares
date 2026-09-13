@@ -4,14 +4,19 @@
   const bs = Array.from(document.querySelectorAll("#controls button"));
   const i = bs.findIndex((b) => b.id === "restart");
   const j = bs.findIndex((b) => b.id === "play");
-  const r = bs[i].getBoundingClientRect();
-  const q = bs[j].getBoundingClientRect();
+  const restart = bs[i];
+  const play = bs[j];
+  if (restart === undefined || play === undefined) {
+    throw new Error("probe requires restart and play controls");
+  }
+  const r = restart.getBoundingClientRect();
+  const q = play.getBoundingClientRect();
   return {
     i,
     j,
     sameRow: Math.abs(r.top - q.top) < 2,
     gap: r.left - q.right,
-    glyph: bs[i].querySelector("svg") !== null,
-    name: bs[i].getAttribute("aria-label"),
+    glyph: restart.querySelector("svg") !== null,
+    name: restart.getAttribute("aria-label"),
   };
 };

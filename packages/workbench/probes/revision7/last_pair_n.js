@@ -1,2 +1,8 @@
 // The n the last pair steps from.
-() => window.atlasTransitions.pairs().slice(-1)[0].n;
+() => {
+  const last = window.atlasTransitions.pairs().at(-1);
+  if (last === undefined) {
+    throw new Error("probe requires at least one pair");
+  }
+  return last.n;
+};

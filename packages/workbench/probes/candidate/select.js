@@ -1,4 +1,4 @@
 // Put the stage on one pair, by its index. Takes {index}.
-(o) => {
+/** @param {{index: number}} o */ (o) => {
   window.atlasTransitions.select(o.index);
 };

@@ -1,2 +1,2 @@
 // Is a removed element back in the page? Takes {id}.
-(o) => document.getElementById(o.id) !== null;
+/** @param {{id: string}} o */ (o) => document.getElementById(o.id) !== null;

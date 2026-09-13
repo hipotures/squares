@@ -1,10 +1,12 @@
 // What four levels of the dial do to the shake and to the run, keyed by level.
 // Takes {index}; leaves the dial back at its default.
+/** @param {{index: number}} o */
 (o) => {
   const A = window.atlasTransitions;
   A.setStyle("bodies");
   A.setSnap(false);
   A.setBlind(false);
+  /** @type {Record<number, object>} */
   const out = {};
   for (const L of [0, 3, 6, 10]) {
     A.setAnneal(L);

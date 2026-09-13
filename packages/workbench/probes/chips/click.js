@@ -1,5 +1,5 @@
 // Click the quick-pick chip for this size, and say what range it set. o.n is the size.
-(o) => {
+/** @param {{n: number}} o */ (o) => {
   /** @type {HTMLButtonElement} */ (
     document.querySelector(`#step-chips button[data-n="${o.n}"]`)
   ).click();

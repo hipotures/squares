@@ -1,6 +1,8 @@
 // What the bar reads at the dwell, at rest under the snap, and at rest on a free run.
 // Takes {index, style}; leaves the snap back on.
-(o) => {
+/** @param {{index: number, style: Parameters<import("../../src/api/workbench-api.js").AtlasTransitions["physics"]>[1]}} o */ (
+  o,
+) => {
   const A = window.atlasTransitions;
   A.stopAll();
   A.select(o.index);

@@ -1,6 +1,6 @@
 // Press one of the law's preset buttons, and read back the law it set and which button is
 // lit. o.name is the preset.
-(o) => {
+/** @param {{name: string}} o */ (o) => {
   /** @type {HTMLButtonElement} */ (
     document.querySelector(`#law-preset-seg button[data-law="${o.name}"]`)
   ).click();

@@ -1,6 +1,6 @@
 // A grab made while a run is playing must leave it playing. o.n is the size, o.x and o.y
 // where the square is reached for.
-(o) => {
+/** @param {{n: number, x: number, y: number}} o */ (o) => {
   const api = window.atlasTransitions;
   api.setInitial("previous");
   api.setStepN(o.n);

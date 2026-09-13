@@ -9,13 +9,21 @@
     api.setColorScheme("angle-stable");
   }
   const seen = new Set();
+  /** @param {Element} g */
+  const fillOf = (g) => {
+    const rect = g.firstElementChild;
+    if (rect == null) {
+      throw new Error("a drawn square has no rect");
+    }
+    return rect.getAttribute("fill");
+  };
   const collect = () => {
     const n = api.state().n;
     /** @type {NodeListOf<SVGGElement>} */ (
       document.querySelectorAll("#squares g[data-identity]")
     ).forEach((g) => {
       if (Number(g.dataset.identity) <= n) {
-        seen.add(g.firstElementChild.getAttribute("fill"));
+        seen.add(fillOf(g));
       }
     });
   };
@@ -29,6 +37,7 @@
     }
   }
   const colour = api.colour();
+  /** @param {string} name */
   const token = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   return {
     fills: Array.from(seen),

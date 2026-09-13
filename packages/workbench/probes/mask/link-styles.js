@@ -1,6 +1,6 @@
 // How each of the mask's two classes is drawn, which is what makes the difference readable.
 () => {
-  const one = (k) => {
+  const one = /** @param {string} k */ (k) => {
     const l = document.querySelector(`#mask-links line.${k}`);
     if (l === null) {
       return null;

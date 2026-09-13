@@ -2,11 +2,21 @@
 // group, what the box's neighbours are called, and whether the select has a width of its own.
 () => {
   const sel = document.getElementById("style-select");
+  if (sel == null) {
+    throw new Error("probe requires #style-select");
+  }
   const box = sel.closest(".subpanel");
+  if (box == null) {
+    throw new Error("solver select is outside a subpanel");
+  }
   const row = box.parentElement;
+  if (row == null) {
+    throw new Error("solver subpanel has no row");
+  }
+  /** @param {Element} e */
   const title = (e) => {
     const t = e.querySelector(".box-title");
-    return t ? t.textContent.trim() : null;
+    return t?.textContent?.trim() ?? null;
   };
   return {
     title: title(box),

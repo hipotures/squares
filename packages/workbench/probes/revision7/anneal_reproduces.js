@@ -1,7 +1,7 @@
 // One level's trajectory, then another level's, then the first level's again: the two
 // readings say whether a level reproduces itself rather than caching something else.
 // Takes {index}; leaves the dial back at its default.
-(o) => {
+/** @param {{index: number}} o */ (o) => {
   const A = window.atlasTransitions;
   A.setAnneal(7);
   const a = A.physics(o.index, "bodies", "free").final[0];

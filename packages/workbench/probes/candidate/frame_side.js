@@ -1,2 +1,9 @@
 // The container side the record states for one frame. Takes {n}.
-(o) => JSON.parse(document.getElementById("atlas-data").textContent).frames[String(o.n)].side;
+/** @param {{n: number}} o */
+(o) => {
+  const data = document.getElementById("atlas-data")?.textContent;
+  if (data == null) {
+    throw new Error("probe requires #atlas-data text");
+  }
+  return JSON.parse(data).frames[String(o.n)].side;
+};

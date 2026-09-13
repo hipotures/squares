@@ -2,6 +2,7 @@
 // pushed aside. o.n is the size, o.steps how far the run is taken first and o.settle how
 // far after the drag; o.at is where the square is, o.to where it goes, o.neighbour where
 // the square next door sits.
+/** @param {{n: number, steps: number, settle: number, at: [number, number], to: [number, number], neighbour: [number, number]}} o */
 (o) => {
   const api = window.atlasTransitions;
   api.setStepN(o.n);
@@ -17,6 +18,8 @@
     held: api.hand().held,
     stillThere: api.pickAt(o.to[0], o.to[1]) === i,
     neighbourMoved: api.pickAt(o.neighbour[0], o.neighbour[1]) !== neighbour,
+    dropped: -1,
+    after: -1,
   };
   out.dropped = api.release();
   out.after = api.hand().held;

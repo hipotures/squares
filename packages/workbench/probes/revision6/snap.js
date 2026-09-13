@@ -1,6 +1,8 @@
 // What the snapped and the free run miss by, and whether they rest in the same poses.
 // Takes {index, style}.
-(o) => {
+/** @param {{index: number, style: Parameters<import("../../src/api/workbench-api.js").AtlasTransitions["physics"]>[1]}} o */ (
+  o,
+) => {
   const A = window.atlasTransitions;
   A.select(o.index);
   A.setStyle(o.style);

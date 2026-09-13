@@ -1,6 +1,6 @@
 // Every one of these angles at every contact count, flattened: the whole map as one table,
 // so two stages can be compared. o.angles is the list of angles.
-(o) => {
+/** @param {{angles: number[]}} o */ (o) => {
   const out = [];
   for (const a of o.angles) {
     for (let k = 0; k <= 4; k++) {

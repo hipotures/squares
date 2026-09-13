@@ -2,10 +2,19 @@
 // span, the two bold bound rules, the two numerals, and how many reference marks the scale
 // carries for this n.
 () => {
-  const s = document.getElementById("stage").getBoundingClientRect();
+  const stage = document.getElementById("stage");
+  if (stage == null) {
+    throw new Error("probe requires #stage");
+  }
+  const s = stage.getBoundingClientRect();
   const k = s.width / 1920;
-  const box = (sel) => {
-    const b = document.querySelector(sel).getBoundingClientRect();
+  /** @param {string} selector */
+  const box = (selector) => {
+    const element = document.querySelector(selector);
+    if (element == null) {
+      throw new Error(`probe requires ${selector}`);
+    }
+    const b = element.getBoundingClientRect();
     return {
       l: (b.left - s.left) / k,
       r: (b.right - s.left) / k,

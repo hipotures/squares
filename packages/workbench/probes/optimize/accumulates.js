@@ -1,6 +1,6 @@
 // An open-ended run from the grid start, read before, during and after two batches of
 // steps. o.n is the size, o.steps the size of each batch.
-(o) => {
+/** @param {{n: number, steps: number}} o */ (o) => {
   const api = window.atlasTransitions;
   api.setStepN(o.n);
   api.setInitial("grid");

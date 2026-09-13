@@ -1,5 +1,9 @@
 // How far in each of the panel's two fading layers is.
-() => [
-  parseFloat(document.getElementById("facts-a").style.opacity),
-  parseFloat(document.getElementById("facts-b").style.opacity),
-];
+() =>
+  ["facts-a", "facts-b"].map((id) => {
+    const element = document.getElementById(id);
+    if (element == null) {
+      throw new Error(`probe requires #${id}`);
+    }
+    return parseFloat(element.style.opacity);
+  });

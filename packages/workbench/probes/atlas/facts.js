@@ -1,2 +1,9 @@
 // What the page's own data says about one size. o.n is the size.
-(o) => JSON.parse(document.getElementById("atlas-data").textContent).facts[String(o.n)];
+/** @param {{n: number}} o */
+(o) => {
+  const data = document.getElementById("atlas-data")?.textContent;
+  if (data == null) {
+    throw new Error("probe requires #atlas-data text");
+  }
+  return JSON.parse(data).facts[String(o.n)];
+};

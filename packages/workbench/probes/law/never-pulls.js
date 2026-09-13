@@ -1,6 +1,8 @@
 // Over a grid of laws, every setting at which the force at a penetration is not a push, or
 // at which touching is not zero. o.laws is the grid; the shipped law is put back after.
-(o) => {
+/** @param {{laws: Parameters<import("../../src/api/workbench-api.js").AtlasTransitions["setLaw"]>[0][]}} o */ (
+  o,
+) => {
   const api = window.atlasTransitions;
   const bad = [];
   const ds = [-0.6, -0.42, -0.4, -0.3, -0.2, -0.15, -0.08, -0.02, -0.002, -1e-9];

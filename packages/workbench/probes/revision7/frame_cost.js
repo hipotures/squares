@@ -1,5 +1,5 @@
 // What a whole frame costs while the bar is live, over 200 seeks. Takes {index}.
-(o) => {
+/** @param {{index: number}} o */ (o) => {
   const A = window.atlasTransitions;
   A.select(o.index);
   A.setStyle("bodies");

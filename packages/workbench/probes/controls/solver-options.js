@@ -1,13 +1,20 @@
 // Which solvers each mode offers, what is selected, and what the fallback note says, walked
 // through Animate, Pack, a choice made in Pack, the tween asked for in Pack, and back.
 // o.n is the size Pack is put on.
+/** @param {{n: number}} o */
 (o) => {
   const api = window.atlasTransitions;
   const shown = () =>
     Array.from(/** @type {HTMLSelectElement} */ (document.getElementById("style-select")).options)
       .filter((opt) => !opt.hidden && !opt.disabled)
       .map((opt) => opt.value);
-  const note = () => document.getElementById("solver-note").textContent;
+  const note = () => {
+    const element = document.getElementById("solver-note");
+    if (element == null) {
+      throw new Error("probe requires #solver-note");
+    }
+    return element.textContent;
+  };
   api.setMode("animate");
   api.setStyle("tween");
   const animating = {

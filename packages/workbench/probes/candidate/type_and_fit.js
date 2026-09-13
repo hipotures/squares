@@ -6,13 +6,17 @@
   api.setCapture(true);
   const stage = document.getElementById("stage");
   const facts = document.getElementById("facts");
+  if (stage == null || facts == null) {
+    throw new Error("type-and-fit probe requires stage and facts");
+  }
   const d = api.duration();
+  /** @type {Map<number, Set<string>>} */
   const sizes = new Map();
   let svgGlyphs = 0;
   const census = () => {
     const walker = document.createTreeWalker(stage, NodeFilter.SHOW_TEXT);
     for (let node = walker.nextNode(); node; node = walker.nextNode()) {
-      if (!node.textContent.trim()) {
+      if (!node.textContent?.trim()) {
         continue;
       }
       const el = node.parentElement;
@@ -25,10 +29,9 @@
         continue;
       }
       const size = parseFloat(cs.fontSize);
-      if (!sizes.has(size)) {
-        sizes.set(size, new Set());
-      }
-      sizes.get(size).add(el.id || el.className || el.tagName.toLowerCase());
+      const names = sizes.get(size) ?? new Set();
+      names.add(el.id || el.className || el.tagName.toLowerCase());
+      sizes.set(size, names);
     }
   };
   const SLOTS = [
@@ -52,14 +55,20 @@
       api.seek(t);
       census();
       const root = document.getElementById(layer);
+      if (root == null) {
+        throw new Error(`type-and-fit probe requires #${layer}`);
+      }
       let bottom = 0,
         right = 0;
       const walker = document.createTreeWalker(facts, NodeFilter.SHOW_TEXT);
       for (let node = walker.nextNode(); node; node = walker.nextNode()) {
-        if (!node.textContent.trim()) {
+        if (!node.textContent?.trim()) {
           continue;
         }
         const el = node.parentElement;
+        if (el == null) {
+          continue;
+        }
         if (el.closest(`#${other}`)) {
           continue;
         }
@@ -76,7 +85,11 @@
         right = Math.max(right, r.right);
       });
       const slots = SLOTS.map((sel) => {
-        const r = root.querySelector(sel).getBoundingClientRect();
+        const element = root.querySelector(sel);
+        if (element == null) {
+          throw new Error(`type-and-fit probe requires ${sel} in #${layer}`);
+        }
+        const r = element.getBoundingClientRect();
         return [sel, Math.round(r.top * 100) / 100, Math.round(r.height * 100) / 100];
       });
       // The headline: the numeral against the `n =` line it shares a row with. Read
@@ -103,12 +116,14 @@
   // Revision 16 removed that bar entirely -- the owner found it distracting -- so the
   // clearance is now to the stage's own foot, and the two numbers the callers read are the
   // stage's bottom rather than the bar's top.
-  const stageBox = document.getElementById("stage").getBoundingClientRect();
+  const stageBox = stage.getBoundingClientRect();
   const barTop = stageBox.bottom;
   const pnTop = stageBox.bottom;
   const box = facts.getBoundingClientRect();
   return {
-    sizes: Array.from(sizes, ([s, k]) => [s, Array.from(k).sort()]).sort((a, b) => a[0] - b[0]),
+    sizes: Array.from(sizes, ([size, names]) => ({ size, names: Array.from(names).sort() }))
+      .sort((first, second) => first.size - second.size)
+      .map(({ size, names }) => [size, names]),
     svgGlyphs,
     fits,
     pnTop,

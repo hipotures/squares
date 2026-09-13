@@ -1,2 +1,9 @@
 // Click the element with this id. o.id is the id.
-(o) => document.getElementById(o.id).click();
+/** @param {{id: string}} o */
+(o) => {
+  const element = document.getElementById(o.id);
+  if (element == null) {
+    throw new Error(`probe requires #${o.id}`);
+  }
+  element.click();
+};

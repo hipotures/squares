@@ -1,7 +1,12 @@
 // How far a style's cached trajectory ends from the n + 1 poses, and how many bodies it
 // simulated. Takes {index, style}.
+/** @param {{index: number, style: import("../../src/api/workbench-api.js").AtlasStyle}} o */
 (o) => {
-  const data = JSON.parse(document.getElementById("atlas-data").textContent);
+  const source = document.getElementById("atlas-data")?.textContent;
+  if (source == null) {
+    throw new Error("probe requires #atlas-data text");
+  }
+  const data = JSON.parse(source);
   const info = window.atlasTransitions.physics(o.index, o.style);
   const pair = data.pairs[o.index];
   const target = data.frames[String(pair.n + 1)].squares;

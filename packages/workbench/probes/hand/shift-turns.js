@@ -1,6 +1,6 @@
 // A shifted drag turns the held square about its own centre. o.n is the size, o.at where
 // the square is, o.grab where the cursor takes hold, o.first and o.second where it goes.
-(o) => {
+/** @param {{n: number, at: number, grab: number, first: number, second: number}} o */ (o) => {
   const api = window.atlasTransitions;
   api.setStepN(o.n);
   api.setInitial("grid");

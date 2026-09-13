@@ -1,2 +1,3 @@
 // Which of these ids are in the page? o.ids is the list to look for.
-(o) => o.ids.filter((id) => document.getElementById(id) !== null);
+/** @param {{ids: string[]}} o */ (o) =>
+  o.ids.filter(/** @param {string} id */ (id) => document.getElementById(id) !== null);

@@ -5,4 +5,10 @@
     /** @type {NodeListOf<SVGGElement>} */ (document.querySelectorAll("#squares g[data-identity]")),
   )
     .filter((e) => e.style.display !== "none")
-    .map((e) => e.firstElementChild.getBoundingClientRect().width);
+    .map((e) => {
+      const rect = e.firstElementChild;
+      if (rect == null) {
+        throw new Error(`square identity ${e.dataset.identity} has no drawn rect`);
+      }
+      return rect.getBoundingClientRect().width;
+    });

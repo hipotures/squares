@@ -1,6 +1,6 @@
 // Restart in Pack: the run goes back to its start and every setting stays. o.n is the size,
 // o.steps how far the run is taken first, o.anneal the dial to leave it on.
-(o) => {
+/** @param {{n: number, steps: number, anneal: number}} o */ (o) => {
   const api = window.atlasTransitions;
   api.setMode("pack");
   api.setStepN(o.n);

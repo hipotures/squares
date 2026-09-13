@@ -4,12 +4,16 @@
   const api = window.atlasTransitions;
   api.setRelationship("groups");
   const box = /** @type {HTMLInputElement} */ (document.getElementById("links-toggle"));
+  const links = document.getElementById("mask-links");
+  if (links == null) {
+    throw new Error("probe requires #mask-links");
+  }
   box.checked = true;
   box.dispatchEvent(new Event("change"));
-  const on = document.getElementById("mask-links").style.display !== "none";
+  const on = links.style.display !== "none";
   box.checked = false;
   box.dispatchEvent(new Event("change"));
-  const off = document.getElementById("mask-links").style.display === "none";
+  const off = links.style.display === "none";
   api.setRelationship("contact");
   return { on, off, links: api.state().links };
 };

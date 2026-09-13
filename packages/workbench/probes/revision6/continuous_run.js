@@ -3,7 +3,11 @@
 () =>
   new Promise((resolve) => {
     const A = window.atlasTransitions;
-    A.goTo(A.pairs()[0].n);
+    const first = A.pairs()[0];
+    if (first === undefined) {
+      throw new Error("probe requires at least one pair");
+    }
+    A.goTo(first.n);
     A.setStyle("bodies");
     A.setDesaturate(false);
     A.playAll();

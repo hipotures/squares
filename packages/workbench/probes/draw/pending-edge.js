@@ -1,6 +1,9 @@
 // The edge being drawn while the gesture is still being made.
 () => {
   const l = document.getElementById("draw-line");
+  if (l == null) {
+    throw new Error("probe requires #draw-line");
+  }
   return {
     shown: l.style.display !== "none",
     x1: Number(l.getAttribute("x1")),

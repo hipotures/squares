@@ -1,5 +1,7 @@
 // An open-ended run at one n from one of the three starts. Takes {n, initial}.
-(o) => {
+/** @param {{n: number, initial: import("../../src/api/workbench-api.js").AtlasInitial}} o */ (
+  o,
+) => {
   const A = window.atlasTransitions;
   A.setStepN(o.n);
   A.setInitial(o.initial);

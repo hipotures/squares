@@ -1,5 +1,5 @@
 // Does style A come to rest in the same poses with the snap off and on? Takes {index}.
-(o) => {
+/** @param {{index: number}} o */ (o) => {
   const A = window.atlasTransitions;
   A.select(o.index);
   A.setStyle("tween");

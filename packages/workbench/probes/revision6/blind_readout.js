@@ -1,6 +1,6 @@
 // What the bar reads at the end of a blind run, beside what the trajectory missed by.
 // Takes {index}.
-(o) => {
+/** @param {{index: number}} o */ (o) => {
   const A = window.atlasTransitions;
   A.select(o.index);
   A.setStyle("bodies");

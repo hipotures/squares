@@ -1,6 +1,6 @@
 // The side the bar reads at the end of a free run, beside the side the trajectory says it
 // reached. Takes {index}; leaves the snap back on.
-(o) => {
+/** @param {{index: number}} o */ (o) => {
   const A = window.atlasTransitions;
   A.select(o.index);
   A.setStyle("bodies");

@@ -1,6 +1,6 @@
 // Walk a range's scope by hand: the run must not carry past the range's last pair.
 // o.lo and o.hi are the range's two ends, o.step the step to walk to.
-(o) => {
+/** @param {{lo: number, hi: number, step: number}} o */ (o) => {
   const api = window.atlasTransitions;
   api.setRange(o.lo, o.hi);
   api.playRange();

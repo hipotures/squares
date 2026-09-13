@@ -1,5 +1,5 @@
 // Setting the graph must change the graph and nothing else. o.kind is the graph to set.
-(o) => {
+/** @param {{kind: import("../../src/api/workbench-api.js").AtlasRelationshipKind}} o */ (o) => {
   const api = window.atlasTransitions;
   const before = api.law().key;
   api.setRelationship(o.kind);

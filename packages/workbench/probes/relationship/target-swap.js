@@ -1,5 +1,7 @@
 // A target graph given from outside, and back to the record's. o.graph is what to give it.
-(o) => {
+/** @param {{graph: Parameters<import("../../src/api/workbench-api.js").AtlasTransitions["setTargetGraph"]>[0]}} o */ (
+  o,
+) => {
   const api = window.atlasTransitions;
   const before = api.targetGraph();
   const from = api.relationship().target;
