@@ -471,17 +471,25 @@ descriptor on adoption failure.
 Maintained subprocess controls exercise both staging passes for all three signals from
 the main thread and an already eligible background thread, plus adoption failure at both
 passes. They check exact signal provenance, partial publication, prior-handler and mask
-restoration, descriptor closure, staging-file absence, and strict artifact readback.
+restoration, descriptor closure, staging-file absence, the closed receipt envelope, and
+the strict retained-artifact set.
 The combined target-free calibration and fixed-core suites pass 192 tests in 25.44
 seconds on Python 3.14; Ruff and BasedPyright report zero findings.
-This remains author-run repair evidence.
-CAL-5 remains unadmitted until source-distinct exact-head readback.
+These are author-run controls.
+
+A source-distinct exact-head review at `fcb538c29b846fb5e7c33bd962772ada9c21aedd`
+accepts CAL-5 and retains every prior CAL-1 through CAL-7 acceptance.
+The reviewer independently passed 54 bounded lifecycle controls, including combined
+signal and adoption faults and the two staging return boundaries; ten fixture, source,
+and readback controls; four real launch controls; the 192-test focused suite; and the
+configured Ruff and BasedPyright checks.
+The review is scoped to the inspected POSIX implementation on the current macOS Python
+3.14 host. It does not admit Linux execution, SIGKILL, host failure, blocked operating
+system calls, cleanup-filesystem failure, or signal storms.
 
 Operational admission remains unmeasured.
 Before closing the calibration work:
 
-- Obtain a source-distinct re-review of the CAL-5 follow-up and keep `think-4wuj` and
-  `think-1arg` open until that review records its disposition.
 - Run at least three fresh repetitions of the intended profile, retaining complete
   metrics and all 14,404 direction rows per run.
 - Admit those receipts through source-distinct readback before any BC329 registration.

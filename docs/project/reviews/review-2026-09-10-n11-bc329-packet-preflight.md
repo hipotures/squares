@@ -391,10 +391,14 @@ The repaired combined suites pass 192 tests in 25.44 seconds on Python 3.14. Ruf
 BasedPyright report zero findings.
 These are author-run controls.
 The exact n=2 fixture and its 14,404-row full profile shape are unchanged.
-`think-4wuj` and source-distinct review bead `think-1arg` remain open until an
-independent exact-head rereview accepts or refuses the second repair.
+A source-distinct exact-head review at `fcb538c29b846fb5e7c33bd962772ada9c21aedd`
+accepts CAL-5 and retains the prior CAL-1, CAL-2, CAL-3, CAL-4, CAL-6, and CAL-7
+acceptances.
+It independently passed 54 signal, staging, adoption, and deadline controls;
+ten fixture, source, and readback controls; four real launch controls; the 192-test
+focused suite; and the configured Ruff and BasedPyright checks.
 The three fresh calibration profiles and their independent readback are still required
-after implementation admission.
+for operational admission.
 No positive full-shape profile or BC329 scientific target ran during the repair.
 
 The older `packing/devtools/measure_threshold_net_refinement.py:main` remains an
@@ -458,8 +462,9 @@ All those target-free mathematical checks passed.
 The implementation reviews found the preflight blockers listed in Section 6. The second
 CAL-5 repair’s combined calibration and fixed-core suite passes 192 tests, and
 repository-wide Ruff and BasedPyright checks report zero findings.
-Source-distinct exact-head rereview of `85d3f529c29114cf6b202fb1b09445c0dc002bc1` and
-the three full-shape calibration profiles with independent readback remain unrun.
+A source-distinct exact-head review at `fcb538c29b846fb5e7c33bd962772ada9c21aedd`
+accepts the implementation repair.
+The three full-shape calibration profiles and their independent readback remain unrun.
 BC329 coverage, normalization by its measured minimum, two-route retention, and
 dilation-source replay remain unrun.
 The packet is not suitable for prospective registration until those remaining admission
