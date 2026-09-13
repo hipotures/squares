@@ -81,6 +81,7 @@ documents:
   - {path: docs/project/reviews/review-2026-09-08-pr127-research-readiness.md, role: review, authority: record, lifecycle: retained}
   - {path: docs/project/reviews/review-2026-09-09-threshold-certificate-theorem.md, role: review, authority: record, lifecycle: retained}
   - {path: docs/project/reviews/review-2026-09-10-t025-t026-verifiable-claims.md, role: review, authority: record, lifecycle: retained}
+  - {path: docs/project/reviews/review-2026-09-13-explainer-pdf-comparison.md, role: review, authority: record, lifecycle: retained}
   - {path: docs/project/reviews/review-2026-09-08-extending-s11-lower-bound-note.md, role: review, authority: record, lifecycle: retained}
   - {path: docs/project/reviews/review-2026-09-07-research-throughput-and-timeboxes.md, role: review, authority: record, lifecycle: retained}
   - {path: docs/project/research/research-2026-09-07-n26-best-known-audit.md, role: research-report, authority: supporting, lifecycle: maintained}

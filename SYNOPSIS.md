@@ -284,6 +284,7 @@ case or experiment separately.
 | [PR 127: Research Handoff Review](docs/project/reviews/review-2026-09-08-pr127-research-readiness.md) | dated review record | record | retained | — |
 | [Adversarial Review of the Threshold-Certificate Theorem and the 191/50 Candidate](docs/project/reviews/review-2026-09-09-threshold-certificate-theorem.md) | dated review record | record | retained | — |
 | [Adversarial Review of the T-025 and T-026 Verifiable Claims](docs/project/reviews/review-2026-09-10-t025-t026-verifiable-claims.md) | dated review record | record | retained | — |
+| [Preserved Explainer PDF Comparison: A Page-15 Baseline Shift](docs/project/reviews/review-2026-09-13-explainer-pdf-comparison.md) | dated review record | record | retained | — |
 | [Contributed Research Note: Extending the Lower Bound for Eleven Squares](docs/project/reviews/review-2026-09-08-extending-s11-lower-bound-note.md) | dated review record | record | retained | — |
 | [Research Throughput and Time-Box Review](docs/project/reviews/review-2026-09-07-research-throughput-and-timeboxes.md) | dated review record | record | retained | — |
 | [n = 26: Best-Known Upper-Bound Search](docs/project/research/research-2026-09-07-n26-best-known-audit.md) | research synthesis | supporting | maintained | — |
