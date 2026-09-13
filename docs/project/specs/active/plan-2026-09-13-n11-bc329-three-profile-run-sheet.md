@@ -23,9 +23,9 @@ clean PR 156 head.
 | --- | --- | --- |
 | Calibration producer | CAL-1 through CAL-7 accepted on the integrated source | Accepted through implementation head `fcb538c29b846fb5e7c33bd962772ada9c21aedd`; exact PR-head integration review pending |
 | Observed worker topology | Configured and observed workers, task lifetimes, child identities, and supervisor binding reconstruct from retained bytes | [First review](../../reviews/review-2026-09-13-n11-bc329-topology-coordinator-initial.md) refused temporal binding; `fc3e314d` repairs that boundary, but cross-route and phase-time checks remain open |
-| Three-profile coordinator | Three sequential fresh profiles, exact command records, strict readback, and atomic summary publication | [Rereview](../../reviews/review-2026-09-13-n11-bc329-coordinator-rereview.md) at `fc3e314d` refused inverted route chronology, disjoint phase time, and a second `result.json` read. Repair `dbbf8495` closed those targeted controls, but its [exact-head review](../../reviews/review-2026-09-13-n11-bc329-coordinator-final.md) refused strict receipt admission on an infinite deadline identity and uncaught finite phase-sum overflow. Repair and rereview remain under `think-0osz` and `think-dgfk` |
+| Three-profile coordinator | Three sequential fresh profiles, exact command records, strict readback, and atomic summary publication | [Rereview](../../reviews/review-2026-09-13-n11-bc329-coordinator-rereview.md) at `fc3e314d` refused inverted route chronology, disjoint phase time, and a second `result.json` read. Repair `dbbf8495` closed those targeted controls, but its [exact-head review](../../reviews/review-2026-09-13-n11-bc329-coordinator-final.md) found infinite deadline identity and finite phase-sum overflow. The [follow-up exact-head review](../../reviews/review-2026-09-13-n11-bc329-coordinator-arithmetic-final.md) accepts both arithmetic repairs at `775c71d5`; later integrated-head and positive-run evidence remain |
 | Source-distinct reader | Separate implementation; independently bound revision, geometry, arithmetic, rows, resources, and topology | [Rereview](../../reviews/review-2026-09-13-n11-bc329-reader-rereview.md) of `7e4d2487` accepted F1–F5 and refused F6/F7. The [exact-commit review](../../reviews/review-2026-09-13-n11-bc329-reader-f6f7-overflow.md) of the first repair refused F6b finite phase overflow. The [final exact-head review](../../reviews/review-2026-09-13-n11-bc329-reader-f6f7-final.md) accepted F6/F7 at `a5701e73` after 23 independent full-binder controls. Later integrated-head/source closure remains under `think-n4gh` |
-| Run-set verifier | Source-distinct proof join, coordinator-root inventory and retention, and full source closure | Initial [exact-head review](../../reviews/review-2026-09-13-n11-bc329-runset-verifier.md) refused six controls. Repair `0874e912` closes those controls, but its [rereview](../../reviews/review-2026-09-13-n11-bc329-runset-verifier-rereview.md) refused the valid 22-file coordinator root and a status check/copy race. R3 repair and rereview remain open under `think-q6by` and `think-eepr` |
+| Run-set verifier | Source-distinct proof join, coordinator-root inventory and retention, and full source closure | Initial [exact-head review](../../reviews/review-2026-09-13-n11-bc329-runset-verifier.md) refused six controls. Repair `0874e912` closed those controls, but its [rereview](../../reviews/review-2026-09-13-n11-bc329-runset-verifier-rereview.md) refused a valid 22-file coordinator root and a status check/copy race. The [final R3 exact-head review](../../reviews/review-2026-09-13-n11-bc329-runset-verifier-r3-final.md) accepts the repair at verifier blobs from `2ea77405`; actual positive-run bytes, evidence-commit OID, and later integrated-head admission remain |
 | This run sheet | Literal commands, frozen values, refusal rules, and retention path accepted on the execution head | [Independent operational review](../../reviews/review-2026-09-13-n11-bc329-three-profile-run-sheet.md) refused this snapshot: reader stop order, proof-to-summary binding, run-root inventory, and full source freeze remain under `think-pp3j` |
 | Remote identity | Clean local `HEAD` equals the live PR 156 head | Pending the reviewed integration push |
 | Profiles and BC329 | No positive profile and no BC329 target has run | Satisfied |
@@ -275,8 +275,12 @@ The
 at `0874e912` confirms that all six original controls now refuse, but it finds two new
 R3 blockers: the coordinator’s required command logs are rejected, and a changed nonzero
 status can pass between the first status read and the retained digest snapshot.
-The literal commands and retention block below remain an unadmitted draft until the
-repairs, their focused controls, and a fresh integrated review pass.
+The
+[follow-up R3 review](../../reviews/review-2026-09-13-n11-bc329-runset-verifier-r3-final.md)
+accepts both repairs at its exact source blobs.
+The literal commands and retention block below remain an unadmitted draft until all
+implementation gates are accepted on one integrated execution head and the postcommit
+source-closure check is exercised.
 
 ## Refusal Conditions
 

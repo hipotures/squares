@@ -341,18 +341,24 @@ phase time, and a changing `result.json`. Its
 accepted those targeted controls but refused strict receipt admission: finite inputs can
 overflow a derived deadline to infinity, and finite phase durations can raise an
 uncaught `OverflowError` rather than the specified metrics refusal.
-A scoped repair is in progress under `think-0osz` and `think-dgfk`. The first maintained
-run-set verifier at `878e18d0` implements the R2 proof join, R3 inventory and archive
-comparison, and R4 source-closure check, but its
+A scoped repair at `775c71d5` has an
+[independent exact-head review](../../reviews/review-2026-09-13-n11-bc329-coordinator-arithmetic-final.md)
+accepting both arithmetic refusal paths at its reviewed source blobs.
+The later integrated-head and positive-run gates remain.
+The first maintained run-set verifier at `878e18d0` implements the R2 proof join, R3
+inventory and archive comparison, and R4 source-closure check, but its
 [exact-head review](../../reviews/review-2026-09-13-n11-bc329-runset-verifier.md)
 refused admission on six reproducible binding and refusal-path gaps.
 Candidate repair `0874e912` closes those six in focused controls, but its
 [rereview](../../reviews/review-2026-09-13-n11-bc329-runset-verifier-rereview.md)
 refused R3: the verifier rejects the coordinator’s 18 required top-level command logs,
 and a status change between the first check and digest snapshot can be retained as
-accepted.
-Both findings have repair beads; no run-set admission follows from the targeted
-R2/R4 checks. The reader’s
+accepted. Follow-up repair `2ea77405` has an
+[independent exact-head review](../../reviews/review-2026-09-13-n11-bc329-runset-verifier-r3-final.md)
+accepting the 22-file coordinator-shaped root and deterministic status-race refusals at
+its reviewed verifier blobs.
+Actual positive-run bytes, the evidence-commit OID, and the later integrated-head gate
+remain open. The reader’s
 [initial review](../../reviews/review-2026-09-13-n11-bc329-source-distinct-reader.md)
 records the refusal at `212e0dfc`; its
 [rereview](../../reviews/review-2026-09-13-n11-bc329-reader-rereview.md) records the

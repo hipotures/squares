@@ -266,12 +266,15 @@ agenda:
       Follow-up finite-clock repair a5701e73 and coordinator repair dbbf8495 are integrated.
       Coordinator rereview accepted its three targeted controls but refused strict receipt admission;
       a finite derived deadline can become infinity and finite phase sums can raise an uncaught
-      OverflowError. The reader's independent exact-head rereview accepted F6/F7 at a5701e73
+      OverflowError. Follow-up 775c71d5 repairs both arithmetic refusal paths, accepted by
+      independent exact-head review at its reviewed source blobs. The reader's independent exact-head rereview accepted F6/F7 at a5701e73
       after twenty-three full-binder controls; later integrated-head closure remains. The verifier's
       first six defects have focused
       repairs at 0874e912, but rereview refused R3 because it rejects the coordinator's required
       eighteen command logs and can retain a nonzero status after the first success check.
-      Verifier repair/rereview, the final run-sheet review, three fresh
+      Follow-up 2ea77405 repairs both R3 findings, accepted on exact verifier blobs by an
+      independent synthetic review. Integrated-head and actual-run evidence remain open.
+      The final run-sheet review, three fresh
       14,404-record host profiles, and independent admission remain open. No profile or BC329 target has
       run. Child bead think-qw9w owns this boundary.
     next_evidence: Repair and rereview the integrated coordinator, source-distinct reader, and run-set
@@ -293,9 +296,11 @@ agenda:
     - docs/project/reviews/review-2026-09-13-n11-bc329-topology-coordinator-initial.md
     - docs/project/reviews/review-2026-09-13-n11-bc329-coordinator-rereview.md
     - docs/project/reviews/review-2026-09-13-n11-bc329-coordinator-final.md
+    - docs/project/reviews/review-2026-09-13-n11-bc329-coordinator-arithmetic-final.md
     - docs/project/reviews/review-2026-09-13-n11-bc329-three-profile-run-sheet.md
     - docs/project/reviews/review-2026-09-13-n11-bc329-runset-verifier.md
     - docs/project/reviews/review-2026-09-13-n11-bc329-runset-verifier-rereview.md
+    - docs/project/reviews/review-2026-09-13-n11-bc329-runset-verifier-r3-final.md
     - docs/project/specs/active/plan-2026-09-13-n11-bc329-three-profile-run-sheet.md
   - id: BC-330
     purpose: research
