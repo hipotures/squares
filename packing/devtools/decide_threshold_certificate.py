@@ -70,6 +70,7 @@ from sqpack.fractional.threshold import (
     closed_form_threshold_conditions,
     exact_charge,
     minimum_charge,
+    preflight_expansion,
 )
 from sqpack.fractional.threshold_interval import (
     exact_charge_at_witness,
@@ -337,6 +338,10 @@ def _exact_route(
     certificate: ThresholdCertificate, *, workers: int
 ) -> tuple[Fraction | None, list[str]]:
     """Run the exact sweep two ways; return the least charge and every objection."""
+    try:
+        preflight_expansion(certificate.threshold_atoms)
+    except ValueError as error:
+        return None, [f"the exact route could not decide it: {error}"]
     problems: list[str] = []
     start = time.perf_counter()
     directions = certificate.directions

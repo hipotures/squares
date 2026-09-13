@@ -82,7 +82,12 @@ from devtools.measure_net_refinement import (
     uniform_net,
 )
 from sqpack.fractional.model import Direction
-from sqpack.fractional.threshold import Point, ThresholdCertificate, minimum_charge
+from sqpack.fractional.threshold import (
+    Point,
+    ThresholdCertificate,
+    minimum_charge,
+    preflight_expansion,
+)
 
 PACKING = Path(__file__).resolve().parents[1]
 """The build root, `packing/`; the frozen source is named relative to it, not to a cwd."""
@@ -242,6 +247,7 @@ def sweep(
     threshold: a failure is one direction's, a pass is every direction's.
     """
 
+    preflight_expansion(certificate.threshold_atoms)
     started = time.monotonic()
     SHARED.certificate = certificate
     SHARED.directions = certificate.directions

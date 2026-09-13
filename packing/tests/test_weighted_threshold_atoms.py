@@ -20,19 +20,26 @@ import itertools
 import json
 from collections.abc import Callable
 from fractions import Fraction
+from math import comb
 from typing import Any
 
 import pytest
 
+from sqpack.fractional import threshold as threshold_module
 from sqpack.fractional.generate import net_half_tangents
 from sqpack.fractional.model import Atom, rotation_from_half_tangent
+from sqpack.fractional.sweep import minimum_covered_mass, reduce_to_spans
 from sqpack.fractional.threshold import (
+    MAX_EXPANSION_TOKENS_PER_ATOM,
     WEIGHTED_VARIANT,
     ThresholdAtom,
     absolute_expansion_sum,
     charge_grid,
     charge_grid_direct,
     expansion_terms,
+    minimum_charge,
+    preflight_expansion,
+    rectangle_terms,
     threshold_weight_scale,
 )
 
@@ -375,6 +382,175 @@ def test_the_token_expansion_matches_the_multiplicity_painted_count_grid() -> No
         assert fast.reduction == slow.reduction
         assert (fast.grid == slow.grid).all()
         assert fast.grid.min() >= 0
+
+
+#: PR157-MATH-05's compact hostile record: one site, a trillion tokens. Its record is a few
+#: dozen bytes, and anything proportional to its token count never finishes.
+TRILLION = 10**12
+
+
+class _TokenWorkError(AssertionError):
+    """An O(tokens) or O(subsets) helper ran: the refusal came too late."""
+
+
+def _tripped(name: str) -> Callable[..., Any]:
+    def trip(*_args: object, **_kwargs: object) -> Any:
+        raise _TokenWorkError(name)
+
+    return trip
+
+
+def _forbid_token_work(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Replace every helper whose cost grows with the token count by a raising sentinel.
+
+    A refusal that happens before these run is instant and allocates nothing. One that
+    happens after them raises `_TokenWorkError`, which no refusal test accepts in place of
+    the `ValueError` it expects.
+    """
+
+    monkeypatch.setattr(ThresholdAtom, "token_sites", property(_tripped("token_sites")))
+    for name in ("expansion_terms", "absolute_expansion_sum", "combinations"):
+        monkeypatch.setattr(threshold_module, name, _tripped(name))
+
+
+_CENTRE = ((Fraction(3, 2), Fraction(3, 2)),)
+
+
+@pytest.mark.parametrize("threshold", [TRILLION, 1], ids=["k=A", "k=1"])
+def test_a_compact_trillion_token_atom_is_refused_before_any_token_work(
+    monkeypatch: pytest.MonkeyPatch, threshold: int
+) -> None:
+    """The finding's sentinel reproduction, as a refusal.
+
+    At ``k = A`` the absolute expansion mass is exactly one, so the ``int64`` headroom
+    check alone passes the atom and the route used to materialize a trillion token
+    indices. At ``k = 1`` the headroom check itself used to iterate a trillion
+    coefficients. Both must stop at the compact token count.
+    """
+
+    atom = ThresholdAtom(_CENTRE, threshold, Fraction(1), (TRILLION,))
+    _forbid_token_work(monkeypatch)
+    arguments = ((), (atom,), DIRECTIONS[0], SIDE, SQUARE)
+    cap = rf"\b{MAX_EXPANSION_TOKENS_PER_ATOM}\b"
+    with pytest.raises(ValueError, match=cap):
+        preflight_expansion((atom,))
+    with pytest.raises(ValueError, match=cap):
+        rectangle_terms(*arguments, scale=1)
+    with pytest.raises(ValueError, match=cap):
+        charge_grid(*arguments, scale=1)
+    with pytest.raises(ValueError, match=cap):
+        minimum_charge(*arguments)
+
+
+@pytest.mark.parametrize("threshold", [TRILLION, 1], ids=["k=A", "k=1"])
+def test_a_zero_weight_trillion_token_atom_costs_only_its_event_points(
+    monkeypatch: pytest.MonkeyPatch, threshold: int
+) -> None:
+    """A zero weight charges nothing, so it expands nothing; its site still makes events.
+
+    Both routes must finish with every token helper replaced by a sentinel, and the event
+    grid must be exactly the one its site makes as a zero-weight point.
+    """
+
+    point = Atom("p", Fraction(12, 10), Fraction(12, 10), Fraction(1, 4))
+    atom = ThresholdAtom(_CENTRE, threshold, Fraction(0), (TRILLION,))
+    event_only = Atom("t", *_CENTRE[0], Fraction(0))
+    _forbid_token_work(monkeypatch)
+    assert preflight_expansion((atom,)) == 0
+    for direction in DIRECTIONS:
+        expected = reduce_to_spans((point, event_only), direction, SIDE, SQUARE)
+        terms = rectangle_terms((point,), (atom,), direction, SIDE, SQUARE, scale=4)
+        assert terms.reduction == expected
+        assert terms.weight.tolist() == [1]
+        fast = charge_grid((point,), (atom,), direction, SIDE, SQUARE, scale=4)
+        slow = charge_grid_direct((point,), (atom,), direction, SIDE, SQUARE, scale=4)
+        assert fast.reduction == slow.reduction == expected
+        assert (fast.grid == slow.grid).all()
+        assert minimum_charge((point,), (atom,), direction, SIDE, SQUARE) == (
+            minimum_covered_mass((point, event_only), direction, SIDE, SQUARE)
+        )
+
+
+def test_the_token_cap_admits_an_atom_exactly_at_it() -> None:
+    """``A`` equal to the cap expands, and both routes still agree cell for cell."""
+
+    cap = MAX_EXPANSION_TOKENS_PER_ATOM
+    sites = ((Fraction(1), Fraction(1)), (Fraction(3, 2), Fraction(1)))
+    atom = ThresholdAtom(sites, cap, Fraction(1), (cap // 2, cap - cap // 2))
+    assert preflight_expansion((atom,)) == 1
+    for direction in DIRECTIONS:
+        fast = charge_grid((), (atom,), direction, SIDE, SQUARE, scale=1)
+        slow = charge_grid_direct((), (atom,), direction, SIDE, SQUARE, scale=1)
+        assert (fast.grid == slow.grid).all()
+        assert fast.grid.max() == 1
+
+
+def test_one_token_past_the_cap_is_refused_cleanly_before_any_token_work(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """``k = A``: one subset and mass one, so nothing but the token cap stands in the way."""
+
+    cap = MAX_EXPANSION_TOKENS_PER_ATOM
+    atom = ThresholdAtom(_CENTRE, cap + 1, Fraction(1), (cap + 1,))
+    _forbid_token_work(monkeypatch)
+    with pytest.raises(ValueError, match=rf"{cap + 1} tokens.*\b{cap}\b"):
+        rectangle_terms((), (atom,), DIRECTIONS[0], SIDE, SQUARE, scale=1)
+
+
+def test_the_absolute_expansion_sum_refuses_an_unbounded_range_without_iterating(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Every superset of one ``k``-subset of tokens is an expansion subset, so the mass is
+    at least ``2^(A-k)``; at ``A - k = 60`` it has reached the ``2^60`` headroom limit."""
+
+    assert absolute_expansion_sum(60, 1) == 2**60 - 1
+    assert sum(comb(61, j) for j in range(1, 62)) >= 2**60
+    monkeypatch.setattr(threshold_module, "expansion_terms", _tripped("expansion_terms"))
+    for size, threshold in ((61, 1), (TRILLION, 1), (TRILLION, TRILLION - 60)):
+        with pytest.raises(ValueError, match="int64"):
+            absolute_expansion_sum(size, threshold)
+    # The direct route has no token cap -- it paints per site -- and stays bounded through
+    # the same refusal.
+    atom = ThresholdAtom(_CENTRE, 1, Fraction(1), (TRILLION,))
+    with pytest.raises(ValueError, match="int64"):
+        charge_grid_direct((), (atom,), DIRECTIONS[0], SIDE, SQUARE, scale=1)
+
+
+def test_the_motif_enumerates_exactly_the_subsets_the_preflight_counts(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The preflight's exact count is the enumeration's count: 64 for the motif."""
+
+    enumerated: list[int] = []
+    real = itertools.combinations
+
+    def counting(tokens: Any, size: int) -> Any:
+        for subset in real(tokens, size):
+            enumerated.append(size)
+            yield subset
+
+    monkeypatch.setattr(threshold_module, "combinations", counting)
+    atom = _motif()
+    assert preflight_expansion((atom,)) == 64
+    rectangle_terms((), (atom,), DIRECTIONS[0], SIDE, SQUARE, scale=1)
+    assert len(enumerated) == 64
+    assert absolute_expansion_sum(atom.token_count, atom.threshold) == 209
+
+
+def test_an_all_ones_atom_expands_exactly_as_the_unweighted_atom() -> None:
+    """The identity mutation, on behaviour: the same subset count and the same terms, byte
+    for byte, so every grid built from them is the same too."""
+
+    sites = _sites()
+    implicit = ThresholdAtom(sites, 3, Fraction(3, 4))
+    explicit = ThresholdAtom(sites, 3, Fraction(3, 4), (1, 1, 1, 1, 1))
+    assert preflight_expansion((implicit,)) == preflight_expansion((explicit,)) == 16
+    for direction in DIRECTIONS:
+        a = rectangle_terms((), (implicit,), direction, SIDE, SQUARE, scale=4)
+        b = rectangle_terms((), (explicit,), direction, SIDE, SQUARE, scale=4)
+        assert a.reduction == b.reduction
+        for field in ("left", "right", "bottom", "top", "weight"):
+            assert getattr(a, field).tobytes() == getattr(b, field).tobytes()
 
 
 def test_the_weighted_routes_differ_from_the_same_atom_read_unweighted() -> None:

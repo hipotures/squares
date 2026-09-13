@@ -50,8 +50,10 @@ never reach the theorem. `ThresholdAtom` refuses negative weights, thresholds ou
 ``1..A``, non-positive or non-integer token counts, and repeated points; `charge_grid`
 checks the ``int64`` headroom against the
 sum of the absolute expansion coefficients, the largest magnitude any intermediate prefix
-sum can reach; and `charge_grid_direct`, which thresholds one integer count grid per
-atom instead, is the independent route the tests hold it to, cell for cell.
+sum can reach; `preflight_expansion` refuses, from each atom's token count and threshold
+alone, an expansion with more tokens or subsets than the route can enumerate, which that
+headroom does not bound; and `charge_grid_direct`, which thresholds one integer count grid
+per atom instead, is the independent route the tests hold it to, cell for cell.
 """
 
 # The sweep's cell witness and int64 limit are its own and used here on purpose: one
@@ -340,10 +342,72 @@ class ThresholdAtom:
         )
 
 
+#: Tokens one threshold atom may carry into the inclusion--exclusion expansion.
+#:
+#: The route builds one rectangle per token and intersects up to ``A`` of them for every
+#: subset. Together with `MAX_EXPANSION_SUBSETS`, this bounds subset intersection work
+#: at ``2^18 * 64`` token slots per direction, including unweighted atoms. It leaves room
+#: above the seven-token motif and the shipped three-token certificate atoms. This is an
+#: expansion limit, not a restriction on the membership-based atom model or direct grid.
+MAX_EXPANSION_TOKENS_PER_ATOM = 64
+
+#: Token subsets one direction's expansion may enumerate, summed over the threshold atoms
+#: of nonzero weight: ``sum_{j=k}^{A} C(A, j)`` per atom, exact once ``A`` is capped.
+#:
+#: The ``int64`` headroom check bounds coefficient mass, not this count: 30 tokens at
+#: threshold 15 pass it and enumerate 614 million subsets. The shipped n = 11 certificate
+#: uses 1,280 subsets per direction, and the seven-token motif uses 64 per atom. Measure
+#: admitted expansions with ``python -m devtools.measure_threshold_expansion``; its
+#: coincident-site fixtures retain every enumerated subset, without bypassing these caps.
+MAX_EXPANSION_SUBSETS = 2**18
+
+
+def preflight_expansion(threshold_atoms: Iterable[ThresholdAtom]) -> int:
+    """The token subsets one direction's expansion enumerates; refuses past either cap.
+
+    It reads only each atom's weight, threshold and token count, so it runs before
+    `_headroom` sums a coefficient and before `ThresholdAtom.token_sites` builds a token.
+    A zero-weight atom counts nothing: it charges nothing, so it expands nothing, while
+    its points still reach the event grid through `_event_atoms`. `rectangle_terms` calls
+    it first, which covers `charge_grid`, `minimum_charge` and the slab and cell readers
+    of their output. `sweep_all_threshold_directions` also calls it before any direction
+    runs, and `verify_threshold` goes through that sweep.
+    """
+
+    total = 0
+    for index, threshold_atom in enumerate(threshold_atoms):
+        if threshold_atom.weight == 0:
+            continue
+        tokens, threshold = threshold_atom.token_count, threshold_atom.threshold
+        if tokens > MAX_EXPANSION_TOKENS_PER_ATOM:
+            raise ValueError(
+                f"threshold atom {index} carries {tokens} tokens, above the "
+                f"{MAX_EXPANSION_TOKENS_PER_ATOM} per atom the event-grid route expands"
+            )
+        # Every superset of one fixed k-subset of the tokens is enumerated, so one atom
+        # alone enumerates at least 2^(A-k) subsets. That refuses without summing, and it
+        # bounds the sum below to at most `bit_length` entries.
+        if tokens - threshold >= MAX_EXPANSION_SUBSETS.bit_length():
+            raise ValueError(
+                f"threshold atom {index} ({tokens} tokens, threshold {threshold}) enumerates "
+                f"at least 2**{tokens - threshold} token subsets, above the "
+                f"{MAX_EXPANSION_SUBSETS} per direction the event-grid route expands"
+            )
+        total += sum(comb(tokens, j) for j in range(threshold, tokens + 1))
+        if total > MAX_EXPANSION_SUBSETS:
+            raise ValueError(
+                f"threshold atoms 0..{index} enumerate {total} token subsets at one "
+                f"direction, above the {MAX_EXPANSION_SUBSETS} the event-grid route expands"
+            )
+    return total
+
+
 def expansion_terms(size: int, threshold: int) -> tuple[tuple[int, int], ...]:
     """``(j, (-1)^(j-k) C(j-1, k-1))`` for ``j = k .. size``: the inclusion--exclusion
     coefficients of ``[m >= k]`` over the ``j``-subsets of an ``m``-token trace.
-    ``size`` is the token count, including coincident tokens."""
+    ``size`` is the token count, including coincident tokens. The tuple has
+    ``size - threshold + 1`` entries. Event routes bound that with `preflight_expansion`;
+    direct-grid headroom uses `absolute_expansion_sum`'s mass bound instead."""
 
     if threshold < 1 or threshold > size:
         raise ValueError("threshold outside 1..size")
@@ -354,8 +418,20 @@ def expansion_terms(size: int, threshold: int) -> tuple[tuple[int, int], ...]:
 
 
 def absolute_expansion_sum(size: int, threshold: int) -> int:
-    """``sum_j C(j-1, k-1) C(size, j)``: the total absolute coefficient mass of one atom."""
+    """``sum_j C(j-1, k-1) C(size, j)``: the total absolute coefficient mass of one atom.
 
+    Refuses without iterating once the mass must reach the ``int64`` headroom limit. Every
+    superset of one fixed ``k``-subset of the tokens is a ``j``-subset with ``j >= k`` and
+    a coefficient of magnitude at least one, so the mass is at least ``2^(size -
+    threshold)``. The refusal therefore turns away only atoms `_headroom` would refuse at
+    any nonzero weight, and the sum below never has more than 60 entries.
+    """
+
+    if size - threshold >= (_INTEGER_MASS_LIMIT - 1).bit_length():
+        raise ValueError(
+            f"an atom of {size} tokens at threshold {threshold} has absolute expansion mass "
+            f"at least 2**{size - threshold}, past the safe int64 limit"
+        )
     return sum(
         abs(coefficient) * comb(size, j) for j, coefficient in expansion_terms(size, threshold)
     )
@@ -402,9 +478,12 @@ def _headroom(
     if not isinstance(scale, int) or isinstance(scale, bool) or scale <= 0:
         raise ValueError("the common weight scale must be a positive integer")
     total = sum(_scaled(atom.weight, scale) for atom in atoms)
+    # A zero weight adds no mass whatever its expansion, and its coefficients are never
+    # summed: that sum alone is linear in the token count.
     total += sum(
         _scaled(t.weight, scale) * absolute_expansion_sum(t.token_count, t.threshold)
         for t in threshold_atoms
+        if t.weight != 0
     )
     if total >= _INTEGER_MASS_LIMIT:
         raise ValueError("scaled absolute charge mass exceeds the safe int64 limit")
@@ -440,6 +519,7 @@ def rectangle_terms(
 ) -> Terms:
     """Every signed rectangle term at one direction, with the event grid it indexes."""
 
+    preflight_expansion(threshold_atoms)
     _headroom(atoms, threshold_atoms, scale)
     for threshold_atom in threshold_atoms:
         for x, y in threshold_atom.points:
@@ -470,10 +550,11 @@ def rectangle_terms(
         # positions, which is what keeps their combinatorial multiplicity.
         rectangles = reduction.rectangles[cursor : cursor + threshold_atom.size]
         cursor += threshold_atom.size
-        tokens = tuple(rectangles[site] for site in threshold_atom.token_sites)
         scaled_weight = _scaled(threshold_atom.weight, scale)
         if scaled_weight == 0:
+            # Its sites are already events and it charges nothing: no token is built.
             continue
+        tokens = tuple(rectangles[site] for site in threshold_atom.token_sites)
         for j, coefficient in expansion_terms(
             threshold_atom.token_count, threshold_atom.threshold
         ):
@@ -972,6 +1053,9 @@ def sweep_all_threshold_directions(
     requests worker termination; the outer supervisor owns the hard process-tree guarantee.
     """
 
+    # Refuse an unaffordable expansion once, before any direction runs or any worker forks;
+    # every direction would otherwise refuse it again inside `rectangle_terms`.
+    preflight_expansion(certificate.threshold_atoms)
     directions = certificate.directions
     if workers <= 1 or len(directions) < 2 or not sys.platform.startswith("linux"):
         serial_outcomes: list[tuple[Fraction, str]] = []
@@ -1083,6 +1167,8 @@ def verify_threshold(
 
 __all__ = [
     "DENSE_CELL_LIMIT",
+    "MAX_EXPANSION_SUBSETS",
+    "MAX_EXPANSION_TOKENS_PER_ATOM",
     "WEIGHTED_VARIANT",
     "Point",
     "Terms",
@@ -1100,6 +1186,7 @@ __all__ = [
     "least_charged_cells",
     "least_charged_slabs",
     "minimum_charge",
+    "preflight_expansion",
     "rectangle_terms",
     "sweep_all_threshold_directions",
     "sweep_slabs",

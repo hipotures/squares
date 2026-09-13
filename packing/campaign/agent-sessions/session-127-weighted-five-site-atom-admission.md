@@ -159,6 +159,7 @@ session:
   - The threshold, interval, admission, certificate, dilation and plateau suites were run together; their result is recorded in the report below.
   - 'full gate: fast at 6cb9eebd: failed (September 12 historical attempt: 585.26s of a 600s ceiling at 4 cpus, --jobs 3 --inner-jobs 1; the record reported ALL CHECKS PASSED and 4997 tests passed, but also reported a failing declaration check. A later records-tier pass did not change this invocation''s verdict. Corrected during the September 13 PR157 review.)'
   - 'full gate: fast at fa8c3b21817ae10eef903e6c39e5b5d8753b74eb: passed (September 13 later CI evidence, not a session127 invocation: run 34741508598 passed all four fast partitions, --checks, --suite, --sweeps and --geometry. The actual checkout was merge commit 32665ad25b7caa04e9d9aeb208b4b7cdaaf8be0d; its Git tree 04062e2d39f38f11e49ac8598a31be2603620df4 is identical to this declared source revision. This run predates the review repairs and does not certify the final integrated tree.)'
+  - 'full gate: full at e0a1a65e7c3694554ae76f91092dc9d5c80499f3: passed (September 13 CI evidence, not a session127 invocation: workflow_dispatch run 34746623069 checked out this commit directly. Its validate, slow-lane, exhaustive and screen jobs together passed all 74 steps, 71 in validate and one in each of the others, and macos-portability passed its four arm64 steps. 5320 fast tests passed with 6 skipped, 99 slow-lane tests passed with none skipped, 57 exhaustive tests passed including the standalone T025 and T026 full sweeps, and the screen covered 318 records with six documented exclusions. The later PR157-MATH-05 repair is not in this run, so it does not certify the final PR157 head.)'
   resource_rollups:
   - packing/campaign/resource-usage/f37f604c-3212-50e9-b7f7-4b00b94bfcc0.yaml
   - packing/campaign/resource-usage/agent-ac97342e4ca35e69e.yaml
@@ -338,8 +339,11 @@ not exist in code, so stage four builds it rather than extends it.
 
 The [PR157 review](https://github.com/jlevy/squares/pull/157#issuecomment-5651978187)
 examined the original head `fa8c3b21` before any fixes and found implementation and
-record defects. The September 12 completion statements above describe the original
-session’s conclusions; they do not establish that every weighted consumer was correct.
+record defects. Its
+[addendum](https://github.com/jlevy/squares/pull/157#issuecomment-5654506997), posted
+against the repaired head `e0a1a65e`, added the grid-route finding described below.
+The September 12 completion statements above describe the original session’s
+conclusions; they do not establish that every weighted consumer was correct.
 The resource inequality and labelled-token inclusion–exclusion remain valid.
 The defects concern numeric and allocation limits, readers, witness recomputation, and
 the association between replayed data and its recorded digests.
@@ -353,7 +357,21 @@ The separate
 Its actual checkout `32665ad25b7caa04e9d9aeb208b4b7cdaaf8be0d` and PR head
 `fa8c3b21817ae10eef903e6c39e5b5d8753b74eb` have the same Git tree,
 `04062e2d39f38f11e49ac8598a31be2603620df4`. This is later evidence for the original
-source tree. Final validation of the repaired integration remains pending.
+source tree. The repaired integration `e0a1a65e7c3694554ae76f91092dc9d5c80499f3` then
+passed its pull-request
+[Packing](https://github.com/jlevy/squares/actions/runs/34746614059) and
+[Pages](https://github.com/jlevy/squares/actions/runs/34746614055) runs and the
+[full checkpoint](https://github.com/jlevy/squares/actions/runs/34746623069) on that
+exact commit.
+
+In the checkpoint, the four Linux jobs together passed all 74 validation steps, and
+macOS passed its four portability steps.
+They passed 5,320 fast tests with six skipped, 99 slow-lane tests with none skipped, and
+57 exhaustive tests including the standalone T025 and T026 full sweeps.
+The translation screen covered 318 records with six documented exclusions.
+That checkpoint predates the PR157-MATH-05 repair below.
+Independent review has accepted that repair; its final validation remains pending.
+The successful earlier run does not certify it.
 
 **Reader contracts:** An ordinary atom retains the legacy `points`, `threshold`, and
 `weight` record. A weighted atom uses `variant: weighted-threshold/v1` and
@@ -379,11 +397,11 @@ validate the charged-placement indices, declared family counts, and any declared
 total weight. Duplicate JSON keys are refused so each declared field has one
 interpretation. These checks bind the supplied snapshots without recovering unavailable
 historical authentication.
-The maintained producer now emits `plateau-reader/v2` with explicit `site_count` and
-`token_count` fields and no `size` alias.
+The maintained producer now emits `plateau-reader/v2`. Its atom records have explicit
+`site_count` and `token_count` fields and no `size` alias.
 The replay accepts archived v1 receipts with their required `size` interpreted as token
 count, and checks any explicit counts also present.
-A v2 receipt requires both named counts and refuses `size`. Its replay result names
+A v2 atom record requires both named counts and refuses `size`. Its replay result names
 `threshold_charge`, `floor_charge`, `threshold_violation`, and `floor_violation`
 separately. Archived receipt bytes remain unchanged.
 
@@ -393,6 +411,26 @@ and is caught by the budget comparison, but thresholds four through seven all gi
 budget one. Charges and placement lists supply further consistency checks; the budget
 alone does not identify the threshold.
 
+**Grid-route resource limit:** The
+[PR157-MATH-05 addendum](https://github.com/jlevy/squares/pull/157#issuecomment-5654506997),
+tracked as `think-6dca`, found unbounded work before the event-grid route’s resource
+checks. At `e0a1a65e`, `_headroom` summed every expansion coefficient even for a
+zero-weight atom, and `rectangle_terms` built the token tuple before skipping zero
+weights. Neither bounded the emitted subsets: 30 tokens at threshold 15 passed the
+`int64` headroom check while requiring about 6.1e8 subsets.
+
+The independently reviewed repair limits each nonzero atom to 64 tokens and each
+direction to $2^{18}$ subsets summed across nonzero threshold atoms, before coefficient
+summation or token materialization.
+It skips zero weights before that work and uses an exact lower bound on absolute
+coefficient mass to limit the summation loop.
+The expansion caps also apply to unweighted atoms.
+Controls cover refusal before token work, zero-weight success, exact-cap acceptance and
+one-past-cap refusal.
+Independent review accepted the repair; final validation remains pending.
+No false theorem or admission bypass was established by this finding, and the retained
+seven-token motif stays within these limits.
+
 **Cost and provenance:** The five dedicated agent rollups report 434 assistant turns,
 269 tool calls, five tool errors, and 1,978.818 seconds of summed, overlapping spans.
 The refreshed parent log spans September 4–12 and is shared with earlier sessions; its
@@ -401,12 +439,18 @@ All six logs retain other branch labels, so the branch-cost generator has no tur
 attributed to this branch.
 The retained schema, arithmetic and generated views were checked during review.
 The raw exports were unavailable for an independent digest and count recount, and these
-Claude receipts do not measure the September 13 Codex review and repair work.
+Claude receipts do not measure the September 13 review work.
+`devtools.codex_task_tree_delta` can measure the original Codex review and repair turn,
+07:10:45Z to 08:37:18Z, but no receipt is retained or declared for it or the resumed
+Codex repair work.
+The September 13 Claude lanes also have no retained rollup: the MATH05
+addendum, its repair and the closing documentation.
 
 **Current handoff:** `think-8c9e` remains the weighted lane’s next entry for stage
 three. Stage four’s paired instrument and exact common manifests remain blocked behind
 it. Neither stage is admitted by this repair, and no BC327 hypothesis, experiment or
 scientific target has been registered or run.
+MATH05 is a repair within the PR157 review and does not change this research handoff.
 In parallel, PR156’s BC329 runner implementation review is complete.
 Its separate calibration instrument, three fresh full-shape host runs and
 source-distinct readbacks remain unadmitted and unrun; BC329 execution remains blocked.
