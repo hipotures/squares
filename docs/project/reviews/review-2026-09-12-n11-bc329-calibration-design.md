@@ -455,19 +455,27 @@ A final source-distinct correction review at `b626097000a3f7cc9dbb19fbf3fb787f50
 accepted CAL-2, CAL-3, CAL-4, and CAL-6, retaining the earlier CAL-1 and CAL-7
 acceptances. It refused CAL-5 because real SIGINT during either staging-file acquisition
 could leave the new descriptor and path outside both cleanup owners.
-The follow-up repair blocks the handled signal set across each acquisition, descriptor
-close, and assignment of the returned path to the supervisor’s cleanup owner; pending
-cancellation is then delivered through the existing provenance, partial-publication,
-handler-restoration, and redelivery path.
-A maintained real-subprocess regression synchronizes SIGINT at the first and second
-acquisitions and checks status 130, signal 2, one prior-handler delivery, descriptor
-closure, absence of the staging file, and successful strict readback of the retained
-partial artifact set.
-The expanded transaction control also verifies ordinary success and every existing late
-validation, serialization, and publication refusal.
-The combined target-free calibration and fixed-core suites pass 180 tests in 23.31
-seconds on Python 3.14. This is author-run repair evidence; CAL-5 remains unadmitted
-until source-distinct readback.
+The first follow-up at `967f7cd46e94a9fddbad653295b146de5740110c` used a main-thread
+signal mask. Source-distinct exact-head review refused it because the mask did not cover
+an already eligible background thread.
+SIGINT, SIGTERM, and SIGHUP at either staging pass could still run the Python handler in
+the main thread inside `mkstemp`, before the descriptor and path had a cleanup owner.
+The same review found a separate descriptor leak when injected `os.fdopen` failure
+occurred before stream adoption.
+
+The second repair at `85d3f529c29114cf6b202fb1b09445c0dc002bc1` makes the Python handler
+consult a nesting-aware staging critical section, then raises the recorded signal after
+ownership and cleanup are established.
+It also keeps raw-descriptor ownership until `os.fdopen` succeeds and closes the
+descriptor on adoption failure.
+Maintained subprocess controls exercise both staging passes for all three signals from
+the main thread and an already eligible background thread, plus adoption failure at both
+passes. They check exact signal provenance, partial publication, prior-handler and mask
+restoration, descriptor closure, staging-file absence, and strict artifact readback.
+The combined target-free calibration and fixed-core suites pass 192 tests in 25.44
+seconds on Python 3.14; Ruff and BasedPyright report zero findings.
+This remains author-run repair evidence.
+CAL-5 remains unadmitted until source-distinct exact-head readback.
 
 Operational admission remains unmeasured.
 Before closing the calibration work:

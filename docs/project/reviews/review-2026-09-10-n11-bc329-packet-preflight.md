@@ -365,19 +365,34 @@ earlier source-distinct acceptances of `think-pk84` and `think-th5z`. It refused
 `think-4wuj`: a real SIGINT during either `tempfile.mkstemp` acquisition could arrive
 after the operating system created the staging file and descriptor but before either
 cleanup owner knew their identity.
-The follow-up repair keeps handled signals pending from before each staging acquisition
-until `_stage_result` closes the descriptor and transfers the returned path to the
-supervisor’s final cleanup owner.
-A maintained real-subprocess control synchronizes SIGINT at both acquisitions and checks
-return status 130, signal provenance, prior-handler restoration and redelivery, a closed
-descriptor, no staging-file remainder, and a readable retained partial artifact set.
-The expanded success/deadline control retains ordinary publication and the validation,
-serialization, and publication expiry refusals.
+The first follow-up, `967f7cd46e94a9fddbad653295b146de5740110c`, blocked handled signals
+in the main thread around each acquisition.
+Exact-head source-distinct review refused that correction.
+POSIX signal masks are thread-local: an already eligible background thread could receive
+a process-directed SIGINT, SIGTERM, or SIGHUP and cause the Python handler to run in the
+main thread inside `mkstemp`. All six combinations of signal and staging pass reproduced
+the unowned descriptor and staging path.
+The review also injected `os.fdopen` failure before stream adoption at both passes and
+reproduced an open descriptor, although the path was removed.
 
-The repaired combined suites pass 180 tests in 23.31 seconds on Python 3.14. The exact
-n=2 fixture and its 14,404-row full profile shape are unchanged.
-`think-4wuj` and source-distinct review bead `think-1arg` remain open for readback of
-the follow-up repair.
+Implementation commit `85d3f529c29114cf6b202fb1b09445c0dc002bc1` adds a nesting-aware
+staging critical section to the handler and defers the signal exception until the
+staging resource has a cleanup owner.
+`_stage_result` now retains raw-descriptor ownership until `os.fdopen` succeeds,
+transfers ownership once, and closes and unlinks on adoption failure.
+Maintained subprocess controls cover all three handled signals at both passes through
+both the main thread and an already eligible background thread.
+Two further controls inject adoption failure at the two passes.
+Each checks the terminal partial receipt, signal provenance where applicable, handler
+and mask restoration, a closed descriptor, no staging-file remainder, and strict
+artifact readback.
+
+The repaired combined suites pass 192 tests in 25.44 seconds on Python 3.14. Ruff and
+BasedPyright report zero findings.
+These are author-run controls.
+The exact n=2 fixture and its 14,404-row full profile shape are unchanged.
+`think-4wuj` and source-distinct review bead `think-1arg` remain open until an
+independent exact-head rereview accepts or refuses the second repair.
 The three fresh calibration profiles and their independent readback are still required
 after implementation admission.
 No positive full-shape profile or BC329 scientific target ran during the repair.
@@ -440,11 +455,11 @@ arithmetic. The formula agreed with the maintained dilation helper.
 Decimal renderings used 70-digit `Decimal` arithmetic after exact decisions.
 
 All those target-free mathematical checks passed.
-The implementation review and its first re-review found the preflight blockers listed in
-Section 6. The correction repair’s combined calibration and fixed-core suite passes 177
-tests, and repository-wide Ruff and BasedPyright checks report zero findings.
-A source-distinct re-review of `0533ebaeb90cf42acf20e0029535356282a5624c` and the three
-full-shape calibration profiles with independent readback remain unrun.
+The implementation reviews found the preflight blockers listed in Section 6. The second
+CAL-5 repair’s combined calibration and fixed-core suite passes 192 tests, and
+repository-wide Ruff and BasedPyright checks report zero findings.
+Source-distinct exact-head rereview of `85d3f529c29114cf6b202fb1b09445c0dc002bc1` and
+the three full-shape calibration profiles with independent readback remain unrun.
 BC329 coverage, normalization by its measured minimum, two-route retention, and
 dilation-source replay remain unrun.
 The packet is not suitable for prospective registration until those remaining admission
