@@ -3,7 +3,9 @@
 Date: 2026-09-13. Mathematical continuation of X-029, independently accepted under
 `think-pcxo` with the implementation conditions stated below.
 The source analysis and review were read-only; this retained note does not execute a
-scientific target.
+scientific target. The
+[source-distinct review](../reviews/review-2026-09-13-bc303-t2-charge-bridge.md) records
+the accepted deductions and required reader specifications.
 
 The next useful bridge is a complete C charge sweep over open atom cells, together with
 a cheaper sufficient test for S using only its first owner.
