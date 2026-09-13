@@ -105,7 +105,7 @@ SETTLED = """async (observe) => {
 #: unchanged reserved box. DOM-order formula/token indices include hidden nodes, so
 #: identities do not shift merely because a print alternative becomes visible. FontFace
 #: status lists available faces; computed font-family is not proof of the selected face.
-_MATH_SNAPSHOT = r"""(phase) => {
+_MATH_SNAPSHOT = r"""(phase, selected = null) => {
   const rect = r => ({x:r.x, y:r.y, width:r.width, height:r.height});
   const visible = element => element.checkVisibility({
     opacityProperty:true, visibilityProperty:true});
@@ -145,7 +145,9 @@ _MATH_SNAPSHOT = r"""(phase) => {
         path.unshift(element.tagName.toLowerCase() + ':'
           + ([...element.parentElement.children].indexOf(element) + 1));
       }
-      tokens.push({formula, token, path:path.join('/'),
+      const identity = {formula, token, path:path.join('/')};
+      if (selected !== null) selected.push({node, ...identity});
+      tokens.push({...identity,
         text:node.textContent.slice(0,512), text_truncated:node.textContent.length > 512,
         class_name:owner.className, element_rect:rect(owner.getBoundingClientRect()),
         text_rects:boxes.map(rect), font_family:style.fontFamily, font_size:style.fontSize,
@@ -160,6 +162,46 @@ _MATH_SNAPSHOT = r"""(phase) => {
       unicode_range:face.unicodeRange})),
     token_limit:limit, truncated, formulas:prepared, tokens};
 }"""
+
+#: Diagnostic control and treatment use the snapshot's visible-text traversal.
+#: Both arms select and observe the same nodes after settlement; only the treatment
+#: replaces each selected Text node with a new Text node containing its exact data.
+#: Refuse a truncated selection before changing the DOM, since a partial intervention
+#: could look stable while leaving the omitted prepared text untouched.
+_PREPARED_TEXT_INTERVENTION = (
+    "(rebuild) => { const snapshot = " + _MATH_SNAPSHOT + "; "
+    "const selected = []; const before = snapshot('before-intervention', selected); "
+    "const beforeHtml = document.documentElement.outerHTML; "
+    "const identities = nodes => nodes.map(({node, formula, token, path}) => "
+    "({formula, token, path, text:node.data})); "
+    "const intervention = {requested:rebuild, applied:false, "
+    "status:'control', selected_count:selected.length, selected:identities(selected), "
+    "mutated_count:0, mutated:[]}; "
+    "if (before.truncated) { intervention.status = 'refused'; "
+    "return {snapshots:[before], intervention, "
+    "error:'prepared-text selection truncated before replacement'}; } "
+    "if (!selected.length) { intervention.status = 'no-targets'; "
+    "return {snapshots:[before], intervention, "
+    "error:'no visible prepared-text nodes selected'}; } "
+    "if (rebuild) { for (const {node, formula, token, path} of selected) { "
+    "const text = node.data; "
+    "node.parentNode.replaceChild(document.createTextNode(text), node); "
+    "intervention.mutated.push({formula, token, path, text}); } "
+    "intervention.mutated_count = intervention.mutated.length; "
+    "intervention.applied = true; intervention.status = 'applied'; } "
+    "const afterSelected = []; "
+    "const after = snapshot('after-intervention', afterSelected); "
+    "const afterIdentities = identities(afterSelected); "
+    "intervention.after_selected_count = afterSelected.length; "
+    "intervention.after_selected = afterIdentities; "
+    "intervention.html_unchanged = beforeHtml === document.documentElement.outerHTML; "
+    "const same = JSON.stringify(intervention.selected) === JSON.stringify(afterIdentities); "
+    "if (after.truncated || !same || !intervention.html_unchanged) { "
+    "intervention.status = 'verification-failed'; "
+    "return {snapshots:[before, after], intervention, "
+    "error:'prepared-text identities changed during diagnostic intervention'}; } "
+    "return {snapshots:[before, after], intervention}; }"
+)
 
 _TRACED_SETTLED = (
     "async () => { const snapshots = []; const capture = " + _MATH_SNAPSHOT + "; "
@@ -503,7 +545,9 @@ def _difference(first: bytes, second: bytes) -> str:
     )
 
 
-def render_pdf_bytes(*, math_trace: dict[str, object] | None = None) -> bytes:
+def render_pdf_bytes(
+    *, math_trace: dict[str, object] | None = None, rebuild_prepared_text: bool = False
+) -> bytes:
     """Draw the page as a PDF, waiting for it to be finished rather than for the network.
 
     `preferCSSPageSize` is what makes the stylesheet's `@page` rule decide the paper,
@@ -532,6 +576,19 @@ def render_pdf_bytes(*, math_trace: dict[str, object] | None = None) -> bytes:
     exposed TeX source. Native MathML fallback is permitted when readable; the later
     PDF font guard still decides whether the host supplied an accepted face.
     """
+    if rebuild_prepared_text and math_trace is None:
+        raise ValueError("prepared-text replacement requires a math trace")
+    if math_trace is not None:
+        math_trace["prepared_text_intervention"] = {
+            "requested": rebuild_prepared_text,
+            "applied": False,
+            "status": "not-reached",
+            "selected_count": 0,
+            "selected": [],
+            "mutated_count": 0,
+            "mutated": [],
+            "html_unchanged": None,
+        }
     from playwright.sync_api import Error as PlaywrightError  # noqa: PLC0415
     from playwright.sync_api import sync_playwright  # noqa: PLC0415
 
@@ -578,6 +635,23 @@ def render_pdf_bytes(*, math_trace: dict[str, object] | None = None) -> bytes:
             else:
                 math_trace["snapshots"] = snapshots
                 snapshots.extend(page.evaluate(_TRACED_SETTLED))
+                # Evaluation can throw after replacing some Text nodes. Mark the
+                # intervention's outcome unknown until its full receipt returns.
+                math_trace["prepared_text_intervention"] = {
+                    "requested": rebuild_prepared_text,
+                    "applied": None,
+                    "status": "interrupted",
+                    "selected_count": None,
+                    "selected": None,
+                    "mutated_count": None,
+                    "mutated": None,
+                    "html_unchanged": None,
+                }
+                intervention = page.evaluate(_PREPARED_TEXT_INTERVENTION, rebuild_prepared_text)
+                snapshots.extend(intervention["snapshots"])
+                math_trace["prepared_text_intervention"] = intervention["intervention"]
+                if error := intervention.get("error"):
+                    raise RuntimeError(error)
             page.evaluate(_MATH_RENDERED)
             if math_trace is not None:
                 snapshots.append(page.evaluate(_MATH_SNAPSHOT, "before-pdf"))
@@ -1053,7 +1127,9 @@ def _retain_math_draw(
         "or browser observation. Settlement snapshots return as a batch; a failure "
         "during settlement can lose earlier phase observations. DOM rectangles use "
         "the continuous page viewport under print media, not paginated PDF coordinates "
-        "or transient layout inside the PDF call.",
+        "or transient layout inside the PDF call. Prepared-text replacement is a "
+        "diagnostic hypothesis probe; a stable treatment alone does not establish "
+        "the cause of a control failure.",
     }
     outputs = [(f"draw-{index}.json", (json.dumps(record, indent=2) + "\n").encode())]
     if data is not None:
@@ -1064,14 +1140,22 @@ def _retain_math_draw(
 
 
 def _draw_for_check(
-    trace_dir: Path | None, index: int, *, source: bytes | None = None
+    trace_dir: Path | None,
+    index: int,
+    *,
+    source: bytes | None = None,
+    rebuild_prepared_text: bool = False,
 ) -> bytes:
     observations: dict[str, object] = {}
     if trace_dir is None:
         drawn = render_pdf_bytes()
     else:
         try:
-            drawn = render_pdf_bytes(math_trace=observations)
+            drawn = (
+                render_pdf_bytes(math_trace=observations, rebuild_prepared_text=True)
+                if rebuild_prepared_text
+                else render_pdf_bytes(math_trace=observations)
+            )
         except Exception as error:
             _retain_math_draw(trace_dir, index, None, observations, error=str(error))
             raise
@@ -1123,13 +1207,16 @@ def _check_renders(
     source: bytes | None,
     diagnostics_dir: Path | None,
     trace_dir: Path | None = None,
+    rebuild_prepared_text: bool = False,
 ) -> None:
     """Compare complete files; the stored artifact's receipt participates in equality."""
     reference_kind = "stored artifact" if source is not None else "fresh draw 1"
     first = _normalised(reference)
     replay = reference
     for number in range(1, renders):
-        replay = _draw_for_check(trace_dir, number, source=source)
+        replay = _draw_for_check(
+            trace_dir, number, source=source, rebuild_prepared_text=rebuild_prepared_text
+        )
         again = _normalised(replay)
         if first != again:
             length_delta = abs(len(first) - len(again))
@@ -1186,7 +1273,11 @@ def _check_renders(
 
 
 def check(
-    renders: int = 2, *, diagnostics_dir: Path | None = None, trace_math: bool = False
+    renders: int = 2,
+    *,
+    diagnostics_dir: Path | None = None,
+    trace_math: bool = False,
+    rebuild_prepared_text: bool = False,
 ) -> None:
     """Compare fresh draws for diagnosis, independently of any stored artifact.
 
@@ -1197,13 +1288,18 @@ def check(
     """
     if renders < 2:
         raise ValueError("at least 2 renders are required for a comparison")
+    if rebuild_prepared_text and (not trace_math or diagnostics_dir is None):
+        raise ValueError(
+            "prepared-text replacement requires --trace-math and --diagnostics-dir"
+        )
     trace_dir = _math_trace_directory(diagnostics_dir) if trace_math else None
     _check_renders(
-        _draw_for_check(trace_dir, 0),
+        _draw_for_check(trace_dir, 0, rebuild_prepared_text=rebuild_prepared_text),
         renders,
         source=None,
         diagnostics_dir=diagnostics_dir,
         trace_dir=trace_dir,
+        rebuild_prepared_text=rebuild_prepared_text,
     )
 
 
@@ -1283,10 +1379,21 @@ def main(argv: Sequence[str] | None = None) -> int:
         action="store_true",
         help="retain per-draw math geometry and font observations; observing can alter layout",
     )
+    command.add_argument(
+        "--rebuild-prepared-text",
+        action="store_true",
+        help="diagnostic treatment: replace selected prepared math Text nodes",
+    )
     arguments = command.parse_args(argv)
     comparing = arguments.check or arguments.check_artifact
     if arguments.trace_math and (not comparing or arguments.diagnostics_dir is None):
         command.error("--trace-math requires --check or --check-artifact and --diagnostics-dir")
+    if arguments.rebuild_prepared_text and (
+        not arguments.check or not arguments.trace_math or arguments.diagnostics_dir is None
+    ):
+        command.error(
+            "--rebuild-prepared-text requires --check --trace-math and --diagnostics-dir"
+        )
     if not comparing and arguments.renders is not None:
         command.error("--renders is for --check or --check-artifact")
     if not comparing and arguments.diagnostics_dir is not None:
@@ -1306,7 +1413,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         else:
             check_artifact(renders, diagnostics_dir=arguments.diagnostics_dir)
     elif arguments.trace_math:
-        check(renders, diagnostics_dir=arguments.diagnostics_dir, trace_math=True)
+        check(
+            renders,
+            diagnostics_dir=arguments.diagnostics_dir,
+            trace_math=True,
+            rebuild_prepared_text=arguments.rebuild_prepared_text,
+        )
     else:
         check(renders, diagnostics_dir=arguments.diagnostics_dir)
     return 0

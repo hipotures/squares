@@ -148,7 +148,12 @@ def test_pdf_tracing_is_manual_and_preserves_the_uninstrumented_artifact_gate() 
     assert option["type"] == "boolean"
     assert option["default"] is False
     steps = workflow["jobs"]["build"]["steps"]
-    traces = [step for step in steps if "--trace-math" in step.get("run", "")]
+    traces = [
+        step
+        for step in steps
+        if "--trace-math" in step.get("run", "")
+        and "--rebuild-prepared-text" not in step.get("run", "")
+    ]
     assert len(traces) == 1
     trace = traces[0]
     assert trace["if"] == (
@@ -181,6 +186,50 @@ def test_pdf_tracing_is_manual_and_preserves_the_uninstrumented_artifact_gate() 
         if step.get("uses", "").startswith("actions/upload-pages-artifact@")
     )
     assert steps.index(gate) < steps.index(trace) < steps.index(capture) < steps.index(publish)
+
+
+def test_pdf_reconstruction_is_a_separate_optional_diagnostic_arm() -> None:
+    workflow = safe_load((REPO / ".github/workflows/pages.yml").read_text("utf-8"))
+    option = workflow["on"]["workflow_dispatch"]["inputs"]["rebuild_pdf_math_text"]
+    assert option["type"] == "boolean"
+    assert option["default"] is False
+    steps = workflow["jobs"]["build"]["steps"]
+    treatments = [step for step in steps if "--rebuild-prepared-text" in step.get("run", "")]
+    assert len(treatments) == 1
+    treatment = treatments[0]
+    assert treatment["if"] == (
+        "${{ !cancelled() && github.event_name == 'workflow_dispatch' "
+        "&& inputs.trace_pdf && inputs.rebuild_pdf_math_text }}"
+    )
+    assert not treatment.get("continue-on-error")
+    args = shlex.split(treatment["run"])
+    assert args[args.index("devtools.render_explainer_pdf") + 1 :] == [
+        "--check",
+        "--renders",
+        "20",
+        "--trace-math",
+        "--rebuild-prepared-text",
+        "--diagnostics-dir",
+        "/tmp/explainer-pdf-rebuild",
+    ]
+    capture = next(
+        step for step in steps if step.get("with", {}).get("name") == "explainer-pdf-rebuild"
+    )
+    assert capture["if"] == (
+        "${{ always() && github.event_name == 'workflow_dispatch' "
+        "&& inputs.trace_pdf && inputs.rebuild_pdf_math_text }}"
+    )
+    assert capture["with"]["path"] == "/tmp/explainer-pdf-rebuild"
+    assert capture["with"]["if-no-files-found"] == "error"
+    assert capture["with"]["retention-days"] == 7
+    assert re.fullmatch(r"actions/upload-artifact@[0-9a-f]{40}", capture["uses"])
+    control = next(
+        step
+        for step in steps
+        if "--trace-math" in step.get("run", "")
+        and "--rebuild-prepared-text" not in step.get("run", "")
+    )
+    assert steps.index(control) < steps.index(treatment) < steps.index(capture)
 
 
 def test_every_browser_checks_the_same_prepared_publication() -> None:
