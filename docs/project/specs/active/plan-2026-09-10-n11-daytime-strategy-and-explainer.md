@@ -668,6 +668,39 @@ on the combined head.
 Publish the final PR157 disposition and close the review beads only after those receipts
 exist. No main-branch merge or deployment was done.
 
+## September 13 Integrated Stack Checkpoint
+
+This later checkpoint supersedes the live statuses in the preceding handoff while
+retaining its dated review history.
+PR148 and PR149 were merged into main at `f2e24e07`; main’s Packing and Pages checks
+passed and Pages deployed.
+Their PR bodies and dated closeout comments now record that outcome.
+PR149’s closeout also corrects the earlier timer and glyph-layout assertions against
+D-491.
+
+PR156 is published at `2f8925b2` as an intentional draft.
+Its hosted Packing and Pages checks pass after eight measured controls moved from the
+fast lane to the slow lane.
+The solved-fixture three-profile calibration and the BC329 target have not run.
+The PR156 component reviews remain scoped to their recorded heads and synthetic
+controls; they do not admit the integrated PR157 source.
+
+PR157 merge commit `53578447` incorporates that exact PR156 head and the
+[PR157 launch supplement](plan-2026-09-13-pr157-integrated-calibration-launch-supplement.md).
+An independent mathematical review found no new defect in the combined packet boundary:
+the two MATH05 preflights remain before shared state, workers, or receipts, and the
+maintained producer, reader, and verifier agree on the 23-path source closure.
+The same review accepted the supplement’s branch/live-head, reader-revision, and
+evidence-parent guards after its packet-boundary control was added.
+It accepted an operational procedure, not a positive profile or a scientific bound.
+
+The combined tree passed the edit tier (45 selected steps), records tier (32 selected
+steps), and 12 focused MATH05 test cases before the merge commit.
+The pre-push tier, full checkpoint, fresh hosted CI, and PR157 disposition still need
+receipts on the published combined head.
+PR157 remains unmerged; no PR157 deployment or BC329 run is claimed here.
+The unresolved PDF text-position cause remains under `think-ptit`.
+
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
 -->
