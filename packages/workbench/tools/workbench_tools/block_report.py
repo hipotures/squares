@@ -31,7 +31,10 @@ def wilson_interval(hits: int, total: int) -> tuple[float, float] | None:
     radius = (
         z * math.sqrt(rate * (1 - rate) / total + z * z / (4 * total * total)) / denominator
     )
-    return max(0.0, centre - radius), min(1.0, centre + radius)
+    return (
+        0.0 if hits == 0 else max(0.0, centre - radius),
+        1.0 if hits == total else min(1.0, centre + radius),
+    )
 
 
 def _rate(hits: int, total: int) -> dict[str, object]:
@@ -292,11 +295,19 @@ def main() -> int:
     parser.add_argument("trials", type=Path, help="JSONL with cohort and trial objects")
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--tolerance-pct", type=float, default=0.0001)
+    parser.add_argument(
+        "--cohort",
+        help="read raw benchmark JSONL for this single-cohort manifest instead of envelopes",
+    )
     args = parser.parse_args()
     manifest = read_manifest(strict_json(args.manifest.read_text(encoding="utf-8")))
     trials: dict[str, list[Trial]] = {cohort.identifier: [] for cohort in manifest.cohorts}
+    if args.cohort is not None and set(trials) != {args.cohort}:
+        raise ValueError("raw benchmark JSONL requires the named single-cohort manifest")
     for number, line in enumerate(args.trials.read_text(encoding="utf-8").splitlines(), 1):
         row = strict_json(line)
+        if args.cohort is not None:
+            row = {"cohort": args.cohort, "trial": row}
         if not isinstance(row, dict) or set(row) != {"cohort", "trial"}:
             raise ValueError(f"line {number}: expected cohort and trial objects")
         key, trial = row["cohort"], row["trial"]

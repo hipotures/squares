@@ -2,21 +2,44 @@
 
 from __future__ import annotations
 
+import json
 import math
+from dataclasses import replace
+from pathlib import Path
 from typing import Any
 
+import jsonschema
 import numpy as np
 import pytest
+
+from sqpack.render.model import EvidenceTier, PackingTrajectory
+from workbench_tools.animation_records import (
+    ANIMATION_CONTRACT,
+    animation_to_row,
+    decode_animation,
+    decode_legacy_animation,
+)
+from workbench_tools.animation_render import (
+    describe_animation,
+    export_svg,
+    muting_from_animation,
+    trajectory_from_animation,
+)
+from workbench_tools.ascent import render_ascent
 from workbench_tools.packing_contracts import (
     GeometryIssue,
     PackingContractError,
     check_unit_square_packing,
 )
+from workbench_tools.strategy_execution import animation_document, execute_strategy, run
+from workbench_tools.strategy_records import (
+    STRATEGY_CONTRACT,
+    UntilSpec,
+    decode_strategy,
+    materialize_configuration,
+)
 
-from devtools.animation_from_trace import muting_from_animation, trajectory_from_animation
-from devtools.build_ascent import render_ascent
-from devtools.packing_strategy import animation_document, run
-from sqpack.render.model import EvidenceTier
+FIXTURES = Path(__file__).parent / "fixtures"
 
 
 def _animation(
@@ -28,7 +51,16 @@ def _animation(
     frame: dict[str, object] = {"t": 0.0, "side": side, "squares": squares}
     if feasible is not None:
         frame["feasible"] = feasible
-    return {"name": "fixture", "n": len(squares), "frames": [frame]}
+    return {
+        "contract": ANIMATION_CONTRACT,
+        "name": "fixture",
+        "n": len(squares),
+        "frames": [frame],
+    }
+
+
+def _trajectory(value: object) -> PackingTrajectory:
+    return trajectory_from_animation(decode_animation(value))
 
 
 def test_geometry_check_fails_closed_for_count_finite_pairs_and_walls() -> None:
@@ -88,7 +120,7 @@ def test_geometry_check_rejects_invalid_checker_contracts(
 def test_animation_import_retains_the_actual_failed_check(
     squares: list[list[float]], side: float, issue: str
 ) -> None:
-    trajectory = trajectory_from_animation(_animation(squares, side=side))
+    trajectory = _trajectory(_animation(squares, side=side))
     frame = trajectory.frames[0]
     assert frame.evidence is EvidenceTier.CANDIDATE
     assert frame.check is not None
@@ -97,9 +129,7 @@ def test_animation_import_retains_the_actual_failed_check(
 
 
 def test_animation_import_does_not_promote_an_omitted_feasibility_claim() -> None:
-    trajectory = trajectory_from_animation(
-        _animation([[0.5, 0.5, 0.0]], side=1.0, feasible=None)
-    )
+    trajectory = _trajectory(_animation([[0.5, 0.5, 0.0]], side=1.0, feasible=None))
     frame = trajectory.frames[0]
     assert frame.evidence is EvidenceTier.CANDIDATE
     assert frame.check is not None
@@ -108,7 +138,96 @@ def test_animation_import_does_not_promote_an_omitted_feasibility_claim() -> Non
 
 def test_animation_muting_rechecks_geometry_instead_of_trusting_feasible() -> None:
     document = _animation([[0.5, 0.5, 0.0], [0.5, 0.5, 0.0]], side=1.0, feasible=True)
-    assert muting_from_animation(document) == ((True, True),)
+    assert muting_from_animation(decode_animation(document)) == ((True, True),)
+
+
+def test_typed_animation_cannot_forge_a_geometry_receipt() -> None:
+    document = decode_animation(
+        _animation([[0.5, 0.5, 0.0], [0.5, 0.5, 0.0]], side=1.0, feasible=True)
+    )
+    frame = document.frames[0]
+    forged = replace(
+        document,
+        frames=(replace(frame, geometry=replace(frame.geometry, issues=())),),
+    )
+    assert muting_from_animation(forged) == ((True, True),)
+
+
+def test_shared_animation_v1_preserves_checked_fields_and_guidance_ancestry() -> None:
+    raw = json.loads((FIXTURES / "packing-animation-v1.json").read_text(encoding="utf-8"))
+    document = decode_animation(raw)
+    assert document.palette is not None
+    assert (document.palette.hue, document.palette.shade) == ("identity", "evidence")
+    assert document.reference is not None
+    assert document.reference.best_known == 2.0
+    assert document.frames[0].square_ids == (2, 1)
+    assert [document.frame_is_guided(frame) for frame in document.frames] == [
+        False,
+        True,
+        True,
+    ]
+    assert document.frames[1].feasible is True
+    assert document.frames[1].geometry.passed is False
+    assert muting_from_animation(document)[1] == (True, True)
+
+    encoded = animation_to_row(document)
+    encoded_frames = encoded["frames"]
+    assert isinstance(encoded_frames, list)
+    assert [frame["guided"] for frame in encoded_frames] == [False, True, True]
+    assert decode_animation(encoded).fair_reach == document.fair_reach
+
+
+def test_animation_version_is_explicit_with_a_named_legacy_adapter() -> None:
+    legacy = _animation([[0.5, 0.5, 0.0]], side=1.0)
+    legacy.pop("contract")
+    with pytest.raises(jsonschema.ValidationError, match="contract"):
+        decode_animation(legacy)
+    assert decode_legacy_animation(legacy).contract == ANIMATION_CONTRACT
+
+
+@pytest.mark.parametrize("configuration", [{"x": math.nan}, {"x": (1, 2)}])
+def test_animation_source_configuration_is_finite_json(configuration: object) -> None:
+    raw = _animation([[0.5, 0.5, 0.0]], side=1.0)
+    raw["source"] = {"configuration": configuration}
+    with pytest.raises((TypeError, ValueError), match=r"source configuration|finite"):
+        decode_animation(raw)
+
+
+def test_animation_allows_an_explicit_empty_display_label() -> None:
+    raw = _animation([[0.5, 0.5, 0.0]], side=1.0)
+    raw["frames"][0]["label"] = ""
+    assert decode_animation(raw).frames[0].label == ""
+
+
+def test_svg_description_uses_checked_geometry_and_prefix_guidance() -> None:
+    raw = json.loads((FIXTURES / "packing-animation-v1.json").read_text(encoding="utf-8"))
+    document = decode_animation(raw)
+    description = describe_animation(document)
+    assert "guided onto a known packing" in description
+    assert "1 of 3 frames are not valid packings" in description
+    assert document.palette is not None
+    svg = export_svg(
+        replace(document, palette=replace(document.palette, shade="full-side-contact")),
+        width=320,
+    )
+    assert "guided onto a known packing" in svg
+
+
+@pytest.mark.parametrize(
+    "palette",
+    [
+        {"hue": "uniform", "shade": "full-side-contact"},
+        {"hue": "identity", "shade": "none"},
+        {"hue": "identity", "shade": "evidence"},
+    ],
+)
+def test_svg_export_rejects_admitted_palette_modes_it_cannot_render(
+    palette: dict[str, str],
+) -> None:
+    raw = _animation([[0.5, 0.5, 0.0]], side=1.0)
+    raw["palette"] = palette
+    with pytest.raises(ValueError, match=r"SVG renderer does not support"):
+        export_svg(decode_animation(raw))
 
 
 @pytest.mark.parametrize(
@@ -124,23 +243,26 @@ def test_animation_guidance_ancestry_cannot_be_erased_by_a_frame(
     document = _animation([[0.5, 0.5, 0.0]], side=1.0, feasible=True)
     document.update(ancestry)
     document["frames"][0]["guided"] = False
-    assert "guided" in trajectory_from_animation(document).frames[0].label
+    assert "guided" in _trajectory(document).frames[0].label
 
 
 @pytest.mark.parametrize(
     "document",
     [
         {
+            "contract": ANIMATION_CONTRACT,
             "name": "wrong-count",
             "n": 2,
             "frames": [{"t": 0, "side": 2, "squares": [[0.5, 0.5, 0]]}],
         },
         {
+            "contract": ANIMATION_CONTRACT,
             "name": "nonfinite",
             "n": 1,
             "frames": [{"t": 0, "side": 1, "squares": [[math.nan, 0.5, 0]]}],
         },
         {
+            "contract": ANIMATION_CONTRACT,
             "name": "backwards",
             "n": 1,
             "frames": [
@@ -154,27 +276,27 @@ def test_animation_import_rejects_malformed_or_unstable_frames(
     document: dict[str, object],
 ) -> None:
     with pytest.raises(ValueError, match=r"(square count|finite|non-decreasing)"):
-        trajectory_from_animation(document)
+        _trajectory(document)
 
 
 def test_animation_record_reference_cannot_replace_unrelated_geometry() -> None:
     document = _animation([[0.6, 0.5, 0.0]], side=1.0)
     document["frames"][0]["record"] = 1
     with pytest.raises(ValueError, match="record reference"):
-        trajectory_from_animation(document)
+        _trajectory(document)
 
 
 def test_animation_record_reference_rejects_a_different_valid_packing() -> None:
     document = _animation([[0.5, 0.5, 0.0], [0.5, 1.5, 0.0]], side=2.0)
     document["frames"][0]["record"] = 2
     with pytest.raises(ValueError, match="record reference poses"):
-        trajectory_from_animation(document)
+        _trajectory(document)
 
 
 def test_animation_record_reference_is_checked_before_canonical_substitution() -> None:
     document = _animation([[0.5, 0.5, 0.0]], side=1.0)
     document["frames"][0]["record"] = 1
-    frame = trajectory_from_animation(document).frames[0]
+    frame = _trajectory(document).frames[0]
     assert len(frame.squares) == 1
     assert frame.check is not None
     assert frame.check.passed
@@ -184,6 +306,45 @@ def test_ascent_record_reference_carries_checked_record_geometry() -> None:
     document = render_ascent(1, 3, fair_steps=3)
     trajectory = trajectory_from_animation(document)
     assert trajectory.frames[-1].evidence is not EvidenceTier.CANDIDATE
+
+
+def test_strategy_version_and_checked_result_are_explicit() -> None:
+    strategy = decode_strategy(
+        {
+            "contract": STRATEGY_CONTRACT,
+            "name": "invalid-container",
+            "n": 2,
+            "seed": 9,
+            "phases": [
+                {
+                    "mechanism": "container",
+                    "side": {"relative_to": "current", "factor": 0.5},
+                    "until": {"frames": 1},
+                }
+            ],
+        }
+    )
+    result = execute_strategy(strategy)
+    assert result.configuration.seed == 9
+    assert result.geometry.passed is False
+    assert GeometryIssue.PAIR_OVERLAP in result.geometry.issues
+    assert result.phases[-1].geometry == result.geometry
+
+
+def test_typed_strategy_cannot_bypass_capability_or_seed_validation() -> None:
+    strategy = decode_strategy(
+        {
+            "contract": STRATEGY_CONTRACT,
+            "name": "typed-bypass",
+            "n": 1,
+            "phases": [{"mechanism": "project", "until": {"steps": 1}}],
+        }
+    )
+    phase = replace(strategy.phases[0], until=UntilSpec(feasible=True, steps=1))
+    with pytest.raises(ValueError, match=r"until\.feasible"):
+        execute_strategy(replace(strategy, phases=(phase,)))
+    with pytest.raises(ValueError, match="seed"):
+        materialize_configuration(strategy, seed=True)  # type: ignore[arg-type]
 
 
 def test_grid_refuses_a_side_that_cannot_hold_the_requested_count() -> None:
@@ -307,7 +468,7 @@ def test_container_trace_keeps_each_intermediate_side() -> None:
         ],
     }
     state = run(strategy, keep_trace=True)
-    assert [frame["side"] for frame in state.animation] == [1.5, 2.0]
+    assert [frame.side for frame in state.animation] == [1.5, 2.0]
 
 
 def test_generated_seed_and_effective_configuration_survive_export() -> None:
@@ -319,12 +480,15 @@ def test_generated_seed_and_effective_configuration_survive_export() -> None:
     state = run(strategy, seed_source=lambda: 123_456)
     document = animation_document(strategy, state)
     assert state.seed == 123_456
-    assert document["source"]["seed"] == 123_456
-    assert document["source"]["configuration"]["seed"] == 123_456
-    phase = document["source"]["configuration"]["phases"][0]
-    assert phase["relaxation"] == 0.1
-    assert phase["until"] == {"steps": 1, "stalled_for": 1}
-    assert phase["constraints"] == {"band": 0.02, "weight": 1.0}
+    assert document.source is not None
+    assert document.source.seed == 123_456
+    assert state.configuration.seed == 123_456
+    phase = state.configuration.phases[0]
+    assert phase.relaxation == 0.1
+    assert phase.until is not None
+    assert (phase.until.steps, phase.until.stalled_for) == (1, 1)
+    assert phase.constraints is not None
+    assert (phase.constraints.band, phase.constraints.weight) == (0.02, 1.0)
 
 
 def test_guidance_ancestry_survives_later_phases() -> None:
@@ -343,4 +507,4 @@ def test_guidance_ancestry_survives_later_phases() -> None:
     }
     state = run(strategy, keep_trace=True)
     assert state.animation
-    assert all(frame["guided"] for frame in state.animation)
+    assert all(frame.guided for frame in state.animation)

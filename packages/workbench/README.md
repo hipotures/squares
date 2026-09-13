@@ -31,7 +31,7 @@ From `packing/`:
 
 ```bash
 uv run --frozen --all-extras --group dev python -m pytest ../packages/workbench/tests
-uv run --frozen --all-extras --group dev python -m devtools.build_workbench_site
+uv run --frozen --all-extras --group dev python -m workbench_tools.build_site
 ```
 
 The latter builds the self-contained page in `packing/site/workbench/`. Its publisher

@@ -58,19 +58,17 @@ as an improvement.
    uv run --frozen --all-extras --group dev packing-validate --records
    ```
 
-The current legacy harness can be invoked from `packing/`:
+The package benchmark can be invoked from `packing/`:
 
 ```bash
-uv run --frozen --all-extras --group dev python -m devtools.bench_annealing \
+uv run --frozen --all-extras --group dev squares-workbench-benchmark \
     --n 5 10 11 17 26 29 --seeds 2000 --anneal 6
-uv run --frozen --all-extras --group dev python -m devtools.bench_annealing \
+uv run --frozen --all-extras --group dev squares-workbench-benchmark \
     --replay /path/to/retained-trials.jsonl
 ```
 
-The Phase 1 admission repair and Phase 3 shared kernel replace this legacy instrument
-before new comparative conclusions are accepted.
-Existing commands are reproduction routes, not evidence that their known defects are
-fixed.
+Historical campaign records retain their original instrument paths at their source
+commits. New comparative conclusions use the package command and its admission receipts.
 
 ## Metrics and acceptance
 

@@ -92,8 +92,8 @@ remains.
 | Product shape | Pack runs one interactive trajectory. Animate plays a range of retained atlas records and illustrative transitions. The page has no Search mode and Pack still depends on atlas transition pairs instead of accepting an independent `n`. |
 | Runtime shape | One IIFE owns application state, geometry, two related physics loops, timeline, SVG rendering, facts, controls, and the public API. The cached transition simulator and live optimizer repeat collision, wall, broad-phase, and integration logic. |
 
-One regression crosses the completed extraction boundary: `devtools/bench_annealing.py`
-contains `TRIAL_JS` and `GUARD_JS` Python strings.
+At the reviewed baseline, one regression crosses the completed extraction boundary:
+`devtools/bench_annealing.py` contains `TRIAL_JS` and `GUARD_JS` Python strings.
 Its trial string also carries a third separating-axis implementation and the only
 current caller of the new seed API. The manually maintained API declaration consequently
 omits `setSeed` and `seed` while the browser type check remains green.
@@ -104,8 +104,9 @@ omits `setSeed` and `seed` while the browser type check remains green.
 
 The leaf incorporates PR #125 at `27d2f8cc`. PR #155 now carries the historical record
 repairs through `e13ff926`; its required hosted checks, Pages build and browser jobs
-pass. The package implementation is being prepared as the third and final PR in this
-stack.
+pass. The package foundation is committed at `f9099096` in
+[PR #160](https://github.com/jlevy/squares/pull/160), the third and final PR in this
+stack. The PR stays draft while the remaining outcomes are implemented.
 
 The foundation introduces the private `@squares/workbench` workspace, strict module
 build, package-local Python adapters and immediate source discovery.
@@ -123,17 +124,62 @@ cells; it does not recreate them.
 See the review’s
 [cohort reconciliation](../../reviews/review-2026-09-12-workbench-stack-architecture.md#retained-cohort-reconciliation--2026-09-13).
 
-These repairs do not complete Phase 3. Most legacy app, painter and simulation code
-still lives in the retained script and inherits four documented compiler relaxations.
-After typed boundaries were introduced, its strict audit reports 1,246 diagnostics; that
-inventory must reach zero before `think-4ylo` or merge readiness closes.
-The next disjoint migration slices are colour/view helpers, shared geometry/contact,
-cached trajectories, live optimizer, painter, then the app/controller.
-The package build still reads the retained spike until those consumers move under
-`think-g0lh`. The focused accessibility checks also need a durable behavioral CI entry
-point before `think-y9pw` closes.
-Arbitrary-n Pack, shared bounded Resolve, trace editing/capture, Search/calibration and
-actual release remain open under the phases below.
+The foundation’s local gate passed 46 of 47 checks and 5,055 behavioral tests.
+Two test failures exposed a missing package path in mutation snapshots and a test that
+requires committed source bytes.
+Package snapshot and test discovery were repaired; all 19 snapshot tests, 30 selector
+tests, 35 adjacent selector checks and the committed source-binding control then passed.
+Hosted Pages, Firefox, WebKit, suite, geometry and sweep checks passed.
+The checks job passed its functional assertions but exceeded its 195-second wall ceiling
+twice, at 197.56 and 195.15 seconds.
+The second run spent 37.31 seconds in the browser floor before the full-page
+accessibility contract was added.
+Those frontend checks now form their own measured pull-request partition; the existing
+ceiling was not raised.
+
+A clean checkout of `f9099096` produced six n=5 browser trials with complete receipts.
+Their raw JSONL, manifest and disjoint-block output are retained as the package’s
+`tests/fixtures/benchmark-foundation/` software-validation fixture.
+All six completed and their repaired geometry passed admission; benchmark replay and the
+manifest reporter agree.
+This fixture tests the instrument and report path, not packing performance, and does not
+replace missing historical trial data.
+
+These repairs do not complete Phase 3. The retained application controller still
+inherits four documented compiler relaxations.
+Its earlier strict audit reported 1,246 diagnostics; the retained source must reach zero
+before `think-4ylo` or merge readiness closes.
+Shared geometry, colour, prepared illustration scenes and the SVG renderer are now
+strict package modules used by the actual page.
+The primary Chromium checker passes the integrated renderer through n=324. Cached
+trajectories and the live optimizer are the next consumers of the shared simulation
+kernel.
+
+The browser animation importer and Python adapter share a versioned fixture with stable
+IDs, a coincident frame falsely labelled feasible, and guidance followed by a later
+unguided flag. Both recompute geometry and preserve guidance ancestry.
+The animation studio exposes import, frame editing, seek, reduced-motion playback and
+JSON/SVG export; its browser integration is being verified.
+Its pure capture adapter retains completed frames on cancellation or failure.
+Browser imports allow at most 324 squares, 10,000 frames, 8 MiB of input and five
+million worst-case pair checks; frame capture permits 300 SVG frames per request.
+These are explicit browser resource limits, not limits on the Python interchange format.
+The package build, assets, probes, checkers, and capture tools now live under
+`packages/workbench`; the retained spike no longer supplies live build inputs.
+The accessibility check builds the full corpus and exercises stage semantics, roving
+focus, keyboard editing, and reduced-motion transport in the pinned Chromium shell as a
+durable CI entry point.
+The migrated Python contract suite passes 105 tests.
+The old workbench-only devtools wrappers have been removed; maintained commands use
+`workbench_tools` inside the package, while campaign records retain their source-commit
+instrument paths.
+Python SVG export rejects palette modes that its renderer cannot honor;
+browser replay supports the complete declared palette selection.
+
+Arbitrary-n Pack, shared bounded Resolve, complete trace/strategy editing and capture,
+Search/calibration and actual release remain open under the phases below.
+Preparing their strict modules in parallel does not close the earlier correctness or
+release checkpoints; each phase still requires its specified integration receipts.
 
 ### Mode Contracts
 

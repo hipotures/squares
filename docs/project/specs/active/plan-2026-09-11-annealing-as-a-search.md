@@ -53,9 +53,9 @@ The package layout and product migration belong to the
 
 ## Current State and Evidence Limits
 
-The seeded page API and `devtools.bench_annealing` make repeatable multi-run execution
-possible. The exploratory records established useful questions about the proposal,
-schedule, repair and contact law.
+The seeded page API and `squares-workbench-benchmark` make repeatable multi-run
+execution possible. The exploratory records established useful questions about the
+proposal, schedule, repair and contact law.
 They do not yet support fresh comparative claims because the evidence contract is
 incomplete.
 

@@ -3,11 +3,7 @@ import { resolve } from "node:path";
 import { bundleBrowser } from "./bundle-browser.ts";
 
 const PACKAGE_ROOT = resolve(import.meta.dirname, "..");
-const REPOSITORY_ROOT = resolve(PACKAGE_ROOT, "../..");
-const LEGACY_APPLICATION = resolve(
-  REPOSITORY_ROOT,
-  "packing/atlas/known-best/video/spikes/v2-transitions/assets/workbench.js",
-);
+const APPLICATION_SOURCE = resolve(PACKAGE_ROOT, "src/application.js");
 
 export const APPLICATION_BUNDLE = "workbench.js";
 export const BENCHMARK_BUNDLE = "bench-annealing.js";
@@ -25,7 +21,7 @@ export async function buildAssets(outputDirectory: string): Promise<void> {
     });
     const [api, application] = await Promise.all([
       readFile(apiBundle, "utf8"),
-      readFile(LEGACY_APPLICATION, "utf8"),
+      readFile(APPLICATION_SOURCE, "utf8"),
     ]);
     await writeFile(resolve(out, APPLICATION_BUNDLE), `${api.trimEnd()}\n${application}`, "utf8");
   } finally {

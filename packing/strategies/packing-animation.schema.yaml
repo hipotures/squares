@@ -20,8 +20,11 @@ description: >
   producing something that can be mistaken for a search result.
 type: object
 additionalProperties: false
-required: [name, n, frames]
+required: [contract, name, n, frames]
 properties:
+  contract:
+    const: packing.squares:PackingAnimation/v1
+    description: Versioned identity of this animation interchange contract.
   name: {type: string, minLength: 1}
   n:
     type: integer
@@ -39,9 +42,16 @@ properties:
     additionalProperties: false
     description: Where the frames came from, so a viewer can go and re-run it.
     properties:
-      strategy: {type: string, description: Path to the PackingStrategy document.}
-      records: {type: array, items: {type: integer}, description: Retained records used as targets.}
-      commit: {type: string}
+      strategy:
+        type: string
+        minLength: 1
+        description: Stable strategy name or repository-relative path to its document.
+      records:
+        type: array
+        uniqueItems: true
+        items: {type: integer, minimum: 1}
+        description: Retained records used as targets.
+      commit: {type: string, minLength: 1}
       seed: {type: integer, minimum: 0, maximum: 4294967295}
       configuration:
         type: object
@@ -52,7 +62,9 @@ properties:
     additionalProperties: false
     description: >
       Which colouring rule to apply, never the colours themselves. A renderer owns
-      its palette; an animation only says what the colour should mean.
+      its palette; an animation only says what the colour should mean. The wire
+      contract admits the shared browser vocabulary. A renderer with a smaller
+      capability set must reject an unavailable scheme explicitly.
     properties:
       hue: {enum: [identity, angle-class, uniform]}
       shade: {enum: [none, full-side-contact, evidence]}
@@ -133,7 +145,10 @@ $defs:
           picture reads as the packing assembling itself rather than as a crossfade.
           Omitted means the frame's own feasibility decides, which is the right default
           for an animation that has no notion of locking.
-      phase: {type: string, description: Which strategy phase produced this frame.}
+      phase:
+        type: string
+        default: frame
+        description: Which strategy phase produced this frame.
       guided:
         type: boolean
         default: false

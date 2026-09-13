@@ -159,15 +159,16 @@ alone is not full pre-merge evidence.
 
 | Tier | Who runs it, and when | Steps | Ceiling | Cost when last measured |
 | --- | --- | ---: | ---: | --- |
-| `--records` | contributor, before touching a registry; also every pull request | 31 of 73 | 300 s | 11.0 s |
-| `--edit` | contributor, in the edit loop | — | 240 s | 59.4 s |
+| `--records` | contributor, before touching a registry; also every pull request | 32 of 76 | 300 s | 11.0 s |
+| `--edit` | contributor, in the edit loop | 46 of 76 | 240 s | 59.4 s |
 | `--push` | contributor, before a push — the edit tier plus tests reachable from the diff (`--since`) | varies with the diff | 1800 s | about a minute for a narrow code change; a broad diff selects the whole suite and needs `--jobs 1`, see below |
-| `--fast` | contributor, at a block boundary; the union of the four tiers below | 62 of 73 | 600 s | record cleared 2026-09-07 when the corpus widened; 229.1 s locally, only the ceiling applies |
-| `--checks` | **CI, on every pull request**, in the `validate` job | 48 of 73 | 195 s | record cleared 2026-09-07 when the grid replay was deferred; 87.6 s locally, only the ceiling applies |
-| `--geometry` | **CI, on every pull request**, in the `geometry` job, concurrently | 9 of 73 | 180 s | 91.6 s on CI, the mean of four readings |
-| `--suite` | **CI, on every pull request**, in the `suite` job, concurrently | 1 of 73 | 275 s | 183.4 s on CI, one reading of the lane as it now stands |
-| `--sweeps` | **CI, on every pull request**, in the `sweeps` job, concurrently | 4 of 73 | 210 s | record cleared 2026-09-07 when two of its four steps were split; 58.5 s locally, only the ceiling applies |
-| *(no flag)* | Full checkpoint before final review and at block close; main, dispatch, and daily CI | 73 of 73 | 3600 s | split across four jobs; not clocked whole |
+| `--fast` | contributor, at a block boundary; the union of the five tiers below | 65 of 76 | 600 s | record cleared 2026-09-07 when the corpus widened; 229.1 s locally, only the ceiling applies |
+| `--checks` | **CI, on every pull request**, in the `validate` job | 49 of 76 | 195 s | composition changed after two PR 160 runs exceeded the ceiling; only the ceiling applies |
+| `--frontend` | **CI, on every pull request**, in the `frontend` job, concurrently | 2 of 76 | 150 s | new partition; the first hosted run establishes its baseline |
+| `--geometry` | **CI, on every pull request**, in the `geometry` job, concurrently | 9 of 76 | 180 s | 91.6 s on CI, the mean of four readings |
+| `--suite` | **CI, on every pull request**, in the `suite` job, concurrently | 1 of 76 | 275 s | 183.4 s on CI, one reading of the lane as it now stands |
+| `--sweeps` | **CI, on every pull request**, in the `sweeps` job, concurrently | 4 of 76 | 210 s | record cleared 2026-09-07 when two of its four steps were split; 58.5 s locally, only the ceiling applies |
+| *(no flag)* | Full checkpoint before final review and at block close; main, dispatch, and daily CI | 76 of 76 | 3600 s | split across four jobs; not clocked whole |
 
 `--geometry`’s cost is a geometric mean of four readings at the reference shape.
 `--suite`’s is a single reading, because the lane it measures is new: merging PR 137
@@ -185,8 +186,8 @@ whose 1.79x spread was runner variation rather than a code speedup — stays in 
 register as history of the previous selection.
 Refresh the means as comparable measurements accumulate; a recorded band would represent
 that variation better than a point.
-The other two, `--sweeps` and `--checks`, have no recorded cost, and the corpus widening
-of 2026-09-07 is why both times.
+`--sweeps`, `--checks`, and `--frontend` have no recorded cost.
+The corpus widening of 2026-09-07 invalidated the first two baselines.
 Two of the sweeps tier’s four steps were split that day, so the tier those readings
 measured no longer exists.
 The `checks` record was cleared the same day and by its own rule firing rather than by
@@ -194,15 +195,19 @@ hand: at n = 1..324 the tier ran 189.09 s against a recorded 99.39 s — 1.90x, 
 fails — and the gate’s verdict named `exact verification` as 133.4 s of it.
 The grid replay inside that step was the corpus-scaling member and is now deferred; the
 [readings are retained](packing/benchmarks/gate-cost-at-324/README.md).
-Only the ceilings apply on both until CI clocks the new tiers, and the gate prints the
-line to write when it does.
+Two PR 160 attempts then measured `--checks` at 197.56 s and 195.15 s against its 195 s
+ceiling. The second run spent 132.21 s in exact verification, 106.34 s in BasedPyright,
+62.74 s in the soundness perimeter, and 37.31 s in the browser floor.
+The browser floor and the new full-page accessibility check now form `--frontend`,
+leaving every verdict in `--fast` while removing that work from the saturated queue.
+The first hosted run of each changed partition supplies its new baseline.
 [D-472](defects.md) retains the calibration history, and `think-be1s` tracks the band
 representation.
 
-**The pull-request surface is `--checks`, `--geometry`, `--suite` and `--sweeps`
-together, run as four concurrent CI jobs**, so a pull request waits for the longest of
-the four rather than for their sum.
-All four feed the single required `packing-required` context, and
+**The pull-request surface is `--checks`, `--frontend`, `--geometry`, `--suite` and
+`--sweeps` together, run as five concurrent CI jobs**, so a pull request waits for the
+longest part rather than for their sum.
+All five feed the single required `packing-required` context, and
 `test_the_pull_request_jobs_partition_the_surface` reads the workflow and checks that
 they are pairwise disjoint and that they cover every step of `--fast` — so the split
 cannot lose a check the way a set of independent filters could.
@@ -226,7 +231,7 @@ comparisons:
 All three runs are from 2026-09-06. The durations are observations, not necessary lower
 bounds or enforced tier baselines.
 The [tier table](#the-tiers) lists the current declarations: `--geometry` and `--suite`
-have measured baselines; `--checks` and `--sweeps` remain unmeasured.
+have measured baselines; `--checks`, `--frontend`, and `--sweeps` remain unmeasured.
 
 ### The behavioural lanes
 
@@ -397,13 +402,14 @@ uv run --frozen --all-extras --group dev packing-validate --edit
 uv run --frozen --all-extras --group dev packing-validate --push
 
 # The pull-request surface: the edit tier plus every behavioral test under the
-# per-test ceiling. CI runs it as the four parts below, one per runner; run it whole
+# per-test ceiling. CI runs it as the five parts below, one per runner; run it whole
 # here, where there is only one machine and nothing to overlap with.
 uv run --frozen --all-extras --group dev packing-validate --fast
 
-# The four parts CI runs concurrently on a pull request. They partition --fast, so
-# running all four is running the surface and running one is running a part of it.
+# The five parts CI runs concurrently on a pull request. They partition --fast, so
+# running all five is running the surface and running one is running a part of it.
 uv run --frozen --all-extras --group dev packing-validate --checks
+uv run --frozen --all-extras --group dev packing-validate --frontend
 uv run --frozen --all-extras --group dev packing-validate --geometry
 uv run --frozen --all-extras --group dev packing-validate --suite
 uv run --frozen --all-extras --group dev packing-validate --sweeps

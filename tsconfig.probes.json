@@ -12,7 +12,7 @@
     "exactOptionalPropertyTypes": false
   },
   "include": [
-    "packing/atlas/known-best/video/spikes/v2-transitions/probes/**/*.js",
-    "packing/atlas/known-best/video/spikes/v2-transitions/probes/atlas-transitions.d.ts"
+    "packages/workbench/probes/**/*.js",
+    "packages/workbench/probes/atlas-transitions.d.ts"
   ]
 }

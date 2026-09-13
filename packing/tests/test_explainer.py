@@ -18,10 +18,11 @@ from urllib.parse import urljoin
 import pytest
 import tinycss2
 
+from workbench_tools.build_site import NOTE as WORKBENCH_NOTE
+from workbench_tools.build_site import RENDER_INPUTS as WORKBENCH_INPUTS
+from workbench_tools.build_site import build_metadata as workbench_build_metadata
+
 from devtools import render_explainer
-from devtools.build_workbench_site import NOTE as WORKBENCH_NOTE
-from devtools.build_workbench_site import RENDER_INPUTS as WORKBENCH_INPUTS
-from devtools.build_workbench_site import build_metadata as workbench_build_metadata
 from devtools.render_explainer import (
     ATLAS,
     BEST_RENDERING,
@@ -454,7 +455,7 @@ def test_pages_installs_the_locked_package_before_building_the_workbench() -> No
     build = next(
         i
         for i, step in enumerate(steps)
-        if "python -m devtools.build_workbench_site" in step.get("run", "")
+        if "python -m workbench_tools.build_site" in step.get("run", "")
     )
     assert node < install < build
     assert steps[install]["working-directory"] == "."

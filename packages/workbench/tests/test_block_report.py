@@ -7,6 +7,8 @@ from dataclasses import replace
 from pathlib import Path
 
 import pytest
+
+from devtools.known_structure import record
 from workbench_tools import block_report
 from workbench_tools.cohort_manifest import (
     SCHEMA,
@@ -26,8 +28,6 @@ from workbench_tools.trial_records import (
     admission_reason,
     canonical_reference,
 )
-
-from devtools.known_structure import record
 
 
 def _trial(seed: int, *, reached: bool = True) -> Trial:
@@ -358,6 +358,33 @@ def test_identical_overrides_cannot_hide_different_effective_defaults() -> None:
     cohort = _cohort((Attempt(0, AttemptStatus.COMPLETED), Attempt(1, AttemptStatus.COMPLETED)))
     with pytest.raises(ValueError, match="one effective configuration"):
         block_report.summarize_cohort(cohort, [first, changed], tolerance_pct=0.001)
+
+
+def test_clean_browser_trial_fixture_reproduces_its_disjoint_block_report(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    fixture = Path(__file__).parent / "fixtures/benchmark-foundation"
+    output = tmp_path / "report.json"
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "block-report",
+            str(fixture / "manifest.json"),
+            str(fixture / "trials.jsonl"),
+            "--cohort",
+            "foundation-n5",
+            "--out",
+            str(output),
+        ],
+    )
+    assert block_report.main() == 0
+    observed = json.loads(output.read_text(encoding="utf-8"))
+    expected = json.loads((fixture / "report.json").read_text(encoding="utf-8"))
+    assert observed == expected
+    assert observed["purpose"] == "software-validation"
+    cohort = observed["cohorts"][0]
+    assert cohort["counts"]["accepted"] == 6
+    assert [block["seeds"] for block in cohort["blocks"]] == [[0, 1], [2, 3], [4, 5]]
 
 
 @pytest.mark.parametrize("token", ["NaN", "Infinity", "-Infinity"])

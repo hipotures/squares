@@ -30,9 +30,9 @@ capture deliverables.
 
 | Surface | Present at the reviewed head | Remaining work |
 | --- | --- | --- |
-| Strategy description | `packing/strategies/packing-strategy.schema.yaml`, examples, and `devtools.packing_strategy.MECHANISMS` | Enforce accepted fields and record the complete executed configuration. |
+| Strategy description | `packing/strategies/packing-strategy.schema.yaml`, examples, and `workbench_tools.strategy_execution.MECHANISMS` | Enforce accepted fields and record the complete executed configuration. |
 | Python mechanisms | Scatter, grid, assemble, project, ratchet, relax, guide, container | Extract reusable algorithms from devtools; reject unsupported capabilities. |
-| Animation interchange | `packing-animation.schema.yaml`, `animation_from_trace`, `export_animation_svg` | Validate geometry and provenance before assigning evidence; enforce time, identity, and cardinality. |
+| Animation interchange | `packing-animation.schema.yaml`, `workbench_tools.animation_records`, and `squares-workbench-export-svg` | Validate geometry and provenance before assigning evidence; enforce time, identity, and cardinality. |
 | Renderer | `sqpack.render` supports rotation and changing container side | Reuse its model, palette, and evidence distinctions through browser adapters. |
 | Capture | `devtools.capture_video` captures the workbench page | Trace playback and page simulation are distinct paths; receipts must identify the path used. |
 | Browser | Workbench and Motion Lab have their own runtime models | Workbench does not yet execute the shared strategy schema. |
@@ -50,8 +50,9 @@ Browser and Rust strategy readers remain future work.
 
 ### Checked results and imported animation
 
-`animation_from_trace.py` treats omitted `feasible` as true and creates a passing
-numerical receipt. An import containing two coincident squares consequently exports with
+The former `animation_from_trace.py` treated omitted `feasible` as true and created a
+passing numerical receipt.
+An import containing two coincident squares consequently exports with
 `numerically-checked` metadata.
 Imported claims must not create their own evidence.
 
@@ -108,7 +109,8 @@ Its boundary with Python is:
 - Python algorithms belong under `packing/src/sqpack/`, following its existing
   `research`, `render`, and `motion_lab` boundaries.
   Extract reusable functions from `divide_and_concur.py`, `run_projection_ratchet.py`,
-  `known_structure.py`, and `packing_strategy.py` where current consumers justify them.
+  `known_structure.py`, and the package strategy executor where current consumers
+  justify them.
 - Workbench-specific command parsing, benchmarks, capture, and build adapters move into
   `packages/workbench/tools/`. General-purpose research orchestration remains outside
   the package. Keep an old devtools wrapper only for a named consumer during migration,

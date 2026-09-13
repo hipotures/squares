@@ -112,7 +112,17 @@ DEFAULT_TIMEOUT_SECONDS = 900.0
 #: `test_every_boolean_flag_is_classified` refuses a new `store_true` flag that appears in
 #: neither this tuple nor its allow-list, so a tier cannot be added without deciding
 #: whether it needs a ceiling.
-TIER_FLAGS = ("push", "records", "edit", "suite", "checks", "sweeps", "geometry", "fast")
+TIER_FLAGS = (
+    "push",
+    "records",
+    "edit",
+    "frontend",
+    "suite",
+    "checks",
+    "sweeps",
+    "geometry",
+    "fast",
+)
 TIER_IDS = (*TIER_FLAGS, "full")
 #: The budget of the whole non-exhaustive suite, read by `fast behavioral tests` and by
 #: `--push` when its selector expands to everything (D-432). The two run the same suite
@@ -455,12 +465,21 @@ class Step:
     Broad steps remain in their declared fast or full tier when excluded from `--edit`.
     Pull-request CI runs the fast surface; full checkpoints also run deferred checks."""
 
+    frontend: bool = False
+    """Runs browser-source and built-page contracts on the frontend CI runner.
+
+    This is a scheduling boundary within ``--fast``. It moves the browser floor out of
+    the saturated ``--checks`` queue and gives the full-page accessibility contract the
+    pinned Node and Playwright runtimes it needs. It does not change ``--edit``: cheap
+    frontend floors still run there, while the full-corpus browser check is broad.
+    """
+
     sweep: bool = False
     """This step re-derives a retained atlas from its witnesses, and it is expensive
     enough that the pull request runs it on its own runner rather than beside the rest.
 
     `fast` says *whether* a pull request runs a step; this, `suite` and `geometry` say
-    *which of the pull request's four jobs* runs it. Every sweep is also `fast`, the four
+    *which pull-request job* runs it. Every sweep is also `fast`, the five
     selections are complements within `--fast`, and
     `test_the_pull_request_jobs_partition_the_surface` reads the workflow and checks all
     four against what CI actually invokes -- so a step cannot land in no job, and no
@@ -645,7 +664,9 @@ class Step:
     @property
     def tags(self) -> str:
         tags = ["fast" if self.fast else "full"]
-        if self.sweep:
+        if self.frontend:
+            tags.append("frontend")
+        elif self.sweep:
             tags.append("sweeps")
         elif self.suite:
             tags.append("suite")
@@ -1482,8 +1503,8 @@ def _browser_floor(context: Context) -> str:
             (str(biome), "ci", "--error-on-warnings", "."),
             (
                 str(eslint),
-                "packing/atlas/known-best/video/spikes/v2-transitions/assets",
-                "packing/atlas/known-best/video/spikes/v2-transitions/probes",
+                "packages/workbench/src/application.js",
+                "packages/workbench/probes",
                 "packing/src/sqpack/motion_lab/assets",
                 "packing/atlas/known-best/video/spikes/v1-slideshow",
                 "--config",
@@ -1500,6 +1521,11 @@ def _browser_floor(context: Context) -> str:
         ),
         cwd=REPOSITORY_ROOT,
     )
+
+
+def _workbench_frontend(context: Context) -> str:
+    """Build once, then exercise accessibility and animation editing in Chromium."""
+    return _module(context, "workbench_tools.check_frontend")
 
 
 def _type_floor(context: Context) -> str:
@@ -2816,6 +2842,17 @@ _CASES = ("packing/cases/*",)
 # The retained replay archives. Whole subtree, not the named files: several steps
 # discover which archives to replay by globbing, so adding one changes what runs.
 _RESULTS = ("packing/campaign/series/*",)
+_WORKBENCH_INPUTS = (
+    "packages/workbench/*",
+    "packing/src/sqpack/render/*",
+    "packing/witnesses/known-best/*",
+    "packing/atlas/known-best/*",
+    "package.json",
+    "package-lock.json",
+    ".node-version",
+    "vendor/kpress/*",
+    *_TOOLCHAIN,
+)
 
 # What `fast` means since 2026-09-05: the tier a pull request runs, and therefore the
 # tier that has to hold everything a merge would otherwise be the first to check. Since
@@ -2948,6 +2985,7 @@ STEPS: tuple[Step, ...] = (
         "browser floor (biome, eslint, tsc, node:test)",
         _browser_floor,
         fast=True,
+        frontend=True,
         touches=(
             "biome.json",
             "tsconfig*.json",
@@ -2965,6 +3003,14 @@ STEPS: tuple[Step, ...] = (
             "**/*.cts",
             "**/*.css",
         ),
+    ),
+    Step(
+        "workbench browser behavior in Chromium",
+        _workbench_frontend,
+        fast=True,
+        broad=True,
+        frontend=True,
+        touches=_WORKBENCH_INPUTS,
     ),
     # 9.63s.
     Step(
@@ -4100,6 +4146,7 @@ def _select_steps(
     records: bool = False,
     edit: bool = False,
     checks: bool = False,
+    frontend: bool = False,
     sweeps: bool = False,
     suite: bool = False,
     geometry: bool = False,
@@ -4107,8 +4154,8 @@ def _select_steps(
 ) -> list[Step]:
     """The steps a tier and its name filters select.
 
-    `--checks`, `--suite`, `--sweeps` and `--geometry` are the four parts of `--fast`,
-    and they exist because the pull request runs them as four concurrent GitHub jobs.
+    `--checks`, `--frontend`, `--suite`, `--sweeps` and `--geometry` are the five parts
+    of `--fast`, and they exist because the pull request runs them as concurrent GitHub jobs.
     They are a partition by construction here -- one takes the fast steps marked `sweep`,
     one the fast steps marked `suite`, one the fast steps marked `geometry`, and
     `--checks` takes the fast steps marked none of the three -- so no step can be in two
@@ -4142,7 +4189,9 @@ def _select_steps(
     is refused rather than silently ignored, which is the honest answer to a request this
     selector cannot carry out.
     """
-    if sweeps:
+    if frontend:
+        selected = [step for step in STEPS if step.frontend]
+    elif sweeps:
         selected = [step for step in STEPS if step.sweep]
     elif suite:
         selected = [step for step in STEPS if step.suite]
@@ -4152,7 +4201,7 @@ def _select_steps(
         selected = [
             step
             for step in STEPS
-            if step.fast and not (step.sweep or step.suite or step.geometry)
+            if step.fast and not (step.frontend or step.sweep or step.suite or step.geometry)
         ]
     else:
         selected = [step for step in STEPS if not (fast or edit) or step.fast]
@@ -4534,8 +4583,16 @@ def _parser() -> ArgumentParser:
         "--checks",
         action="store_true",
         help=(
-            "run the part of --fast that is none of the other three: the floors, the "
+            "run the part of --fast that is none of the other four: the Python and Rust "
             "record checks, and everything that needs the Rust engine"
+        ),
+    )
+    parser.add_argument(
+        "--frontend",
+        action="store_true",
+        help=(
+            "run the browser-source and built-page part of --fast; the pull request "
+            "gives it a pinned Node and Playwright runner"
         ),
     )
     parser.add_argument(
@@ -4649,6 +4706,7 @@ def _validate_invocation(
     records: bool = False,
     edit: bool = False,
     checks: bool = False,
+    frontend: bool = False,
     sweeps: bool = False,
     suite: bool = False,
     geometry: bool = False,
@@ -4656,26 +4714,26 @@ def _validate_invocation(
     push: bool = False,
     skip: Sequence[str] = (),
 ) -> None:
-    parts = checks or sweeps or suite or geometry
+    parts = checks or frontend or sweeps or suite or geometry
     narrowed = only or skip or fast or records or edit or parts or since or push
     if strict and narrowed:
         raise UsageError(
             "--strict cannot be combined with --only, --skip, --fast, --checks, "
-            "--suite, --sweeps, --geometry, --records, --edit, --push, or --since"
+            "--frontend, --suite, --sweeps, --geometry, --records, --edit, --push, or --since"
         )
     if edit and fast:
         raise UsageError(
             "--edit and --fast select different tiers; --fast is the wider of the two"
         )
-    if [checks, sweeps, suite, geometry].count(True) > 1:
+    if [checks, frontend, sweeps, suite, geometry].count(True) > 1:
         raise UsageError(
-            "--checks, --geometry, --suite and --sweeps are the four parts of --fast; "
+            "--checks, --frontend, --geometry, --suite and --sweeps are parts of --fast; "
             "ask for --fast to run them all, or for one of them to run that part"
         )
     if parts and (fast or records or edit or push):
         raise UsageError(
-            "--checks, --geometry, --suite and --sweeps are parts of --fast and are not "
-            "combined with another tier; --fast is all four of them"
+            "--checks, --frontend, --geometry, --suite and --sweeps are parts of --fast "
+            "and are not combined with another tier; --fast is all five of them"
         )
     if push and (fast or records or edit):
         raise UsageError(
@@ -4703,6 +4761,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             records=namespace.records,
             edit=namespace.edit,
             checks=namespace.checks,
+            frontend=namespace.frontend,
             sweeps=namespace.sweeps,
             suite=namespace.suite,
             geometry=namespace.geometry,
@@ -4742,6 +4801,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             records=namespace.records,
             edit=namespace.edit or namespace.push,
             checks=namespace.checks,
+            frontend=namespace.frontend,
             sweeps=namespace.sweeps,
             suite=namespace.suite,
             geometry=namespace.geometry,

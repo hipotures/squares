@@ -72,11 +72,18 @@ Source archives and negative research results are not disposable spike code.
 
 ## Findings
 
+The code references and line numbers in the findings identify the reviewed `6e191a35`
+baseline. Live replacements now belong to `packages/workbench/`; the
+[consumer inventory](review-2026-09-13-workbench-consumer-inventory.md#migration-receipt--2026-09-13)
+records their routes.
+Removing an obsolete source file does not remove its finding or the source commit needed
+to reproduce it.
+
 ### R1 — Blocker: imported animation manufactures passing evidence
 
-[animation_from_trace.py](../../../packing/devtools/animation_from_trace.py), lines
-148–167, maps `entry.get("feasible", True)` to `NUMERICALLY_CHECKED` and constructs
-`CheckSummary(passed=True)` without checking separation or containment.
+[animation_from_trace.py](https://github.com/jlevy/squares/blob/6e191a35bf3948bd2b83a3c024f7156f9dc3a7f5/packing/devtools/animation_from_trace.py),
+lines 148–167, maps `entry.get("feasible", True)` to `NUMERICALLY_CHECKED` and
+constructs `CheckSummary(passed=True)` without checking separation or containment.
 A schema-valid import with two coincident unit squares at `(0.5, 0.5, 0)` in a side-1
 box, repeated at times 0 and 1, exports successfully with `numerically-checked` metadata
 and a passing “separating-axis violation at most 1e-9” receipt.
@@ -88,11 +95,12 @@ Validate record references and provenance at the same boundary.
 
 ### R2 — Blocker: a valid strategy request can silently lose a square
 
-[packing_strategy.py](../../../packing/devtools/packing_strategy.py), lines 116–138,
-builds only `round(side)²` grid cells and truncates to `n`, without refusing an
-insufficient count. For `n: 5`, a grid phase with
-`side: {relative_to: grid, factor: 0.6666666666666666}` returns four squares in a side-2
-box. The CLI reports `n=5`, zero violation, and −26.12% excess; the trace labels the
+[packing_strategy.py](https://github.com/jlevy/squares/blob/6e191a35bf3948bd2b83a3c024f7156f9dc3a7f5/packing/devtools/packing_strategy.py),
+lines 116–138, builds only `round(side)²` grid cells and truncates to `n`, without
+refusing an insufficient count.
+For `n: 5`, a grid phase with `side: {relative_to: grid, factor: 0.6666666666666666}`
+returns four squares in a side-2 box.
+The CLI reports `n=5`, zero violation, and −26.12% excess; the trace labels the
 four-square frame feasible.
 This is a false packing result from an ordinary schema-valid request.
 
@@ -108,10 +116,10 @@ the trace. **Bead:** `think-karf`.
 
 ### R3 — High: benchmark admission differs between reporting paths
 
-[bench_annealing.py](../../../packing/devtools/bench_annealing.py), lines 422–429,
-admits a trial when `not (resolved_overlap > tolerance)`. A NaN therefore passes.
-The replay parser supplies NaN for missing resolved fields at lines 621–623. The sweep
-at lines 576–596 skips the admission function altogether and ranks every
+[bench_annealing.py](https://github.com/jlevy/squares/blob/6e191a35bf3948bd2b83a3c024f7156f9dc3a7f5/packing/devtools/bench_annealing.py),
+lines 422–429, admits a trial when `not (resolved_overlap > tolerance)`. A NaN therefore
+passes. The replay parser supplies NaN for missing resolved fields at lines 621–623. The
+sweep at lines 576–596 skips the admission function altogether and ranks every
 `resolved_closed` value.
 
 The independent reviewer reproduced both paths: a NaN trial was admitted and reported
@@ -188,7 +196,7 @@ silently rerun a campaign or choose a new winning preset.
 
 ### R5 — Medium: accepted large seeds alias in JavaScript
 
-[workbench.js](../../../packing/atlas/known-best/video/spikes/v2-transitions/assets/workbench.js),
+[workbench.js](https://github.com/jlevy/squares/blob/6e191a35bf3948bd2b83a3c024f7156f9dc3a7f5/packing/atlas/known-best/video/spikes/v2-transitions/assets/workbench.js),
 line 4167, multiplies the seed as a JavaScript Number before integer conversion.
 `setSeed` accepts the full wrapped unsigned-32-bit range at lines 6437–6442. Seeds
 79,049,217 and 29,207,060 produce the same mixed value 3,151,104,992 for base 17 and the
@@ -216,9 +224,9 @@ retained for replay.
 
 ### R7 — Medium: the published navigation escapes the project site
 
-[build_workbench_site.py](../../../packing/devtools/build_workbench_site.py), line 67,
-injects `href="/"`. From `/squares/workbench/`, this opens the account site’s root, not
-the explainer at `/squares/`.
+[build_workbench_site.py](https://github.com/jlevy/squares/blob/6e191a35bf3948bd2b83a3c024f7156f9dc3a7f5/packing/devtools/build_workbench_site.py),
+line 67, injects `href="/"`. From `/squares/workbench/`, this opens the account site’s
+root, not the explainer at `/squares/`.
 
 **Fix:** Use a project-relative link and exercise the workbench under the deployed
 subpath, including navigation.
@@ -265,7 +273,7 @@ generic text containers for its labels.
 ### R9 — High: Pages does not declare the Node runtime its builder uses
 
 The
-[spike builder](../../../packing/atlas/known-best/video/spikes/v2-transitions/build_candidate.py),
+[spike builder](https://github.com/jlevy/squares/blob/6e191a35bf3948bd2b83a3c024f7156f9dc3a7f5/packing/atlas/known-best/video/spikes/v2-transitions/build_candidate.py),
 line 1330, calls bare `node` to run KaTeX. The
 [Pages workflow](../../../.github/workflows/pages.yml) sets up Python and uv but does
 not set up Node.
@@ -284,7 +292,7 @@ workbench as well as the explainer.
 The follow-up mapping audit found another admission mismatch by source inspection at the
 same reviewed revision.
 In
-[workbench.js](../../../packing/atlas/known-best/video/spikes/v2-transitions/assets/workbench.js),
+[workbench.js](https://github.com/jlevy/squares/blob/6e191a35bf3948bd2b83a3c024f7156f9dc3a7f5/packing/atlas/known-best/video/spikes/v2-transitions/assets/workbench.js),
 `optimizeStep` computes contact penetration, changes positions/angles and possibly the
 growing square size, then stores that penetration in `o.pen`. `measureOptimizer` (lines
 4341–4383) measures the new geometry but uses `o.pen` to admit it as a new best; the
@@ -341,16 +349,16 @@ A bead being created or closed without that evidence is not a review resolution.
 
 | Finding | Implementation owner | Governing phase | Required closure evidence | Resolution |
 | --- | --- | --- | --- | --- |
-| R1 — Imported evidence | `think-sdmi` | 1 | Negative import/export and retained-valid controls; actual validator, tolerance and provenance. | Open |
-| R2 — Strategy/count/trace semantics | `think-karf` | 1 | Small-grid rejection/count control, unsupported-field matrix, exact side/time/ID/seed/guidance round trips. | Open |
-| R3 — Invalid benchmark admission | `think-1fpa` | 1 | Run/replay/report/sweep reject nonfinite and invalid states; empty-cohort and rejection-count controls. | Open |
+| R1 — Imported evidence | `think-sdmi` | 1 | Negative import/export and retained-valid controls; actual validator, tolerance and provenance. | Implemented, awaiting committed checkpoint: import and every SVG/render consumer re-admit supplied geometry; forged checks and false feasible flags fail. Python and browser share a negative fixture and prefix guidance semantics; 105 Python contract tests pass. |
+| R2 — Strategy/count/trace semantics | `think-karf` | 1 | Small-grid rejection/count control, unsupported-field matrix, exact side/time/ID/seed/guidance round trips. | Implemented, awaiting committed checkpoint: typed strategies re-enter capability admission, exact counts/sides/IDs/seed receipts are enforced, and unsupported SVG palette modes fail explicitly. The Python contract suite passes; browser import/edit/export checks are in progress. |
+| R3 — Invalid benchmark admission | `think-1fpa` | 1 | Run/replay/report/sweep reject nonfinite and invalid states; empty-cohort and rejection-count controls. | Repaired at `f9099096`: one canonical geometry/configuration/source admission path, strict JSON, rejection counts and empty-population controls. The clean-source six-trial browser fixture also passes replay and block reporting. |
 | R4 — Record/stack integration | `think-5pv0`, `think-3eha` | 0–1 | Integrated revisions and passing record/provenance/documentation/generated-view checks. | Repaired 2026-09-13: parent merged at `27d2f8cc`; collision renumbered `exp-210`, source mappings verified, unknown timing marked, index/ledger/SYNOPSIS reconciled. Schema, campaign and documentation gates pass; 47 campaign contract tests and focused BasedPyright pass. |
-| R5 — Seed aliases | `think-dq1l` | 1 | Exact mixer/domain, reproduced alias regression and effective-seed browser/headless replay. | Open |
+| R5 — Seed aliases | `think-dq1l` | 1 | Exact mixer/domain, reproduced alias regression and effective-seed browser/headless replay. | Repaired at `f9099096`: exact uint32 input and `Math.imul` mixing, alias/boundary controls, effective seed receipts and shared browser/Node module. |
 | R6 — Missing compaction instrument | `think-3hb7` | 1 | Recovered committed tool/controls or dated annotation withdrawing the unsupported ceiling claim. | Dispositioned 2026-09-13: `exp-209`, X-028 and the runbook mark the discarded program/output unreproducible; current verdict is unresolved and the resolver-ceiling exclusion is withdrawn. Original observations are retained. No replacement experiment is claimed. |
 | R7 — Project-subpath navigation | `think-5wnw`, `think-9x0m`, `think-tn6s` | 2–4 | Served `/squares/` path test, checker negative controls, then a deployed navigation receipt. | Open |
 | R8 — Incomplete quality gates | `think-7f3p`, `think-gxxc`, `think-4ylo`, `think-kpvc`, `think-y9pw` | 2–3 | Checked source/API, strict zero-finding language gates, negative discovery controls, semantic CI and accessibility checks. | Open. The strict audit found 1,030 workbench and 249 probe errors; the plan now combines typing with coherent TS module migration. Final strict graduation remains a pre-merge gate. |
 | R9 — Ambient Node runtime | `think-l6l4`, `think-9x0m`, `think-tn6s` | 2–4 | Explicit runtime selection across package/CI/Pages; artifact and deployed revision verification. | Open |
-| R10 — Optimizer snapshot mismatch | `think-6hqs`, `think-nals` | 1–2 | Exact returned-pose validation, unit-size semantics, overlap-crossing regression and retained valid-snapshot control. | Open |
+| R10 — Optimizer snapshot mismatch | `think-6hqs`, `think-nals` | 1–2 | Exact returned-pose validation, unit-size semantics, overlap-crossing regression and retained valid-snapshot control. | Snapshot defect repaired at `f9099096` with copied post-step geometry and retained best poses; unit-size and overlap-crossing controls pass. Shared bounded Resolve remains open under `think-nals`. |
 
 Architectural work has explicit owners too: `think-a9gt` inventories consumers before
 `think-l9z0` establishes the package foundation; `think-109t` gates broad extraction;

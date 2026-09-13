@@ -4,6 +4,7 @@ softschema:
   envelope: strategy
   status: enforced
 strategy:
+  contract: packing.squares:PackingStrategy/v1
   name: sweep-landing
   n: 11
   seed: 3

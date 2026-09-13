@@ -80,7 +80,7 @@
     {
       "includes": [
         "packing/src/sqpack/motion_lab/assets/**/*.js",
-        "packing/atlas/known-best/video/spikes/v2-transitions/assets/workbench.js"
+        "packages/workbench/src/application.js"
       ],
       "linter": {
         "rules": {

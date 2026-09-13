@@ -7,13 +7,10 @@ import { runInNewContext } from "node:vm";
 import { APPLICATION_BUNDLE, BENCHMARK_BUNDLE, buildAssets } from "../tools/build-assets.ts";
 
 const REPOSITORY_ROOT = resolve(import.meta.dirname, "../../..");
-const LEGACY_APPLICATION = resolve(
-  REPOSITORY_ROOT,
-  "packing/atlas/known-best/video/spikes/v2-transitions/assets/workbench.js",
-);
+const APPLICATION_SOURCE = resolve(REPOSITORY_ROOT, "packages/workbench/src/application.js");
 
 test("the retained application refuses to run before its package bundle", async () => {
-  const application = await readFile(LEGACY_APPLICATION, "utf8");
+  const application = await readFile(APPLICATION_SOURCE, "utf8");
   assert.throws(
     () => runInNewContext(application, {}),
     /SquaresWorkbench bundle must load before the application script/,

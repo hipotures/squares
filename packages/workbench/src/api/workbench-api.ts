@@ -1,3 +1,5 @@
+import type { AnimationPanelState } from "./animation-api.js";
+
 /**
  * Public browser API for the packing workbench.
  *
@@ -652,6 +654,12 @@ export interface AtlasTransitions {
   blockOf(): number[];
   identities(): { from: number[]; to: number[] };
   newSquare(): AtlasNewSquare;
+  importAnimation(text: string, legacy?: boolean): AnimationPanelState;
+  animationState(): AnimationPanelState;
+  seekAnimation(logicalTime: number): AnimationPanelState;
+  exportAnimation(): string;
+  exportAnimationSvg(): string;
+  leaveAnimation(): void;
   state(): AtlasState;
 }
 

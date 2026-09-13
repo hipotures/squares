@@ -9,6 +9,9 @@ from pathlib import Path
 from typing import cast
 
 import pytest
+
+from devtools.known_structure import record
+from workbench_tools import benchmark as bench
 from workbench_tools.trial_records import (
     EffectiveConfiguration,
     RepairReceipt,
@@ -22,9 +25,6 @@ from workbench_tools.trial_records import (
     trial_from_row,
     trial_to_json,
 )
-
-from devtools import bench_annealing as bench
-from devtools.known_structure import record
 
 
 def _source() -> SourceReceipt:
@@ -182,7 +182,10 @@ def test_zero_reference_gap_grid_control_is_valid_without_a_normalized_score(
     assert grid.resolved_closed is None
     assert admission_reason(grid) is None
     assert bench.report([grid]) == 0
-    assert "undefined for every zero reference-gap control" in capsys.readouterr().out
+    output = capsys.readouterr().out
+    assert "undefined for every zero reference-gap control" in output
+    assert "absolute container side" in output
+    assert "only column that compares across n" not in output
 
 
 def test_malformed_runtime_values_fail_closed_without_raising() -> None:

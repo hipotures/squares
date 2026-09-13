@@ -315,6 +315,36 @@ tiers:
     `test_the_pull_request_jobs_partition_the_surface` checks that the workflow really
     invokes all four. What the fourth job bought is on the `geometry` entry below.
 
+- id: frontend
+  command: packing-validate --frontend
+  # This tier was split from `checks` after two consecutive hosted readings of the
+  # foundation revision exceeded that tier's 195s ceiling: 197.56s and 195.15s. On the
+  # second run the browser floor was 37.31s, behind exact verification at 132.21s,
+  # BasedPyright at 106.34s and the soundness perimeter at 62.74s. The new full-page
+  # accessibility contract also needs a Chromium runtime and a fresh 4.4 MB build.
+  # Keeping those two frontend units in `checks` made that lane's existing ceiling
+  # impossible; appending them to the 160s behavioural suite would create the same queue.
+  #
+  # 150s is an initial fail-safe, not a hosted baseline. It is four times the observed
+  # source floor and leaves a similar amount for the build/browser contract plus ordinary
+  # runner setup variance. `measured_seconds` remains empty until this exact partition
+  # runs on its reference runner; the first hosted result supplies the record and tests
+  # the estimate instead of being made to agree with it.
+  ceiling_seconds: 150.0
+  measured_seconds: null
+  measured_on: null
+  measured_where: null
+  reference: {jobs: 1, inner_jobs: 1, cpus: 4}
+  argument: >-
+    The source and built-page contracts for the top-level workbench package: Biome,
+    type-aware ESLint, every TypeScript program, Node tests, deterministic package build,
+    keyboard navigation and reduced-motion transport in the pinned Chromium shell. It is
+    a separate pull-request job because PR #160 measured the existing checks queue at
+    195.15s against its 195s ceiling, including 37.31s for the source floor, before the
+    full-page contract was added. Both steps remain in `--fast`; the cheap source floor
+    remains in `--edit`; the workflow partition test proves the new runner neither drops
+    nor duplicates either verdict.
+
 - id: geometry
   command: packing-validate --geometry
   # The other half of the `checks` queue, and the entry that carries the arithmetic for

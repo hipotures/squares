@@ -9,7 +9,7 @@ mirrors that shape:
 | `/` | the explainer | `devtools/render_explainer.py`, in CI |
 | `/workbench/` | the workbench, its own address | the v2 spike generator |
 | `/atlas/` | the slideshow | the v1 spike generator |
-| `/embed/*.svg` | one animation per case | `devtools/export_animation_svg.py` |
+| `/embed/*.svg` | one animation per case | `squares-workbench-export-svg` |
 
 ## Why the explainer is a mockup here
 
@@ -26,7 +26,7 @@ a column of prose.
 From `packing`:
 
 ```bash
-uv run --frozen --all-extras --group dev python -m devtools.build_ascent \
+uv run --frozen --all-extras --group dev squares-workbench-ascent \
   --from 2 --to 6 --render --out /tmp/ascent.json --svg /tmp/ascent.svg
 ```
 

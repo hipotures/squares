@@ -13,5 +13,5 @@
     "noUncheckedIndexedAccess": false,
     "exactOptionalPropertyTypes": false
   },
-  "include": ["packing/atlas/known-best/video/spikes/v2-transitions/assets/**/*.js"]
+  "include": ["packages/workbench/src/application.js"]
 }

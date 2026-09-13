@@ -56,12 +56,7 @@ name: Certificate page
       - package.json
       - package-lock.json
       - packages/workbench/**
-      - packing/devtools/build_workbench_site.py
       - packing/devtools/check_published_site.py
-      - packing/atlas/known-best/video/spikes/v2-transitions/build_candidate.py
-      - packing/atlas/known-best/video/spikes/v2-transitions/template.html
-      - packing/atlas/known-best/video/spikes/v2-transitions/assets/workbench.css
-      - packing/atlas/known-best/video/spikes/v2-transitions/assets/workbench.js
       - packing/atlas/known-best/manifest.json
       - .github/workflows/pages.yml
   # On a pull request the page is built but not deployed, so a change that
@@ -105,12 +100,7 @@ name: Certificate page
       - package.json
       - package-lock.json
       - packages/workbench/**
-      - packing/devtools/build_workbench_site.py
       - packing/devtools/check_published_site.py
-      - packing/atlas/known-best/video/spikes/v2-transitions/build_candidate.py
-      - packing/atlas/known-best/video/spikes/v2-transitions/template.html
-      - packing/atlas/known-best/video/spikes/v2-transitions/assets/workbench.css
-      - packing/atlas/known-best/video/spikes/v2-transitions/assets/workbench.js
       - packing/atlas/known-best/manifest.json
       - .github/workflows/pages.yml
 
@@ -352,7 +342,7 @@ jobs:
       # leaves the explainer where it is, at `/`, which readers may already have linked.
       # After the download, not before: that step writes `packing/site` and would erase it.
       - name: Build the workbench at its own URL
-        run: uv run --frozen --group dev python -m devtools.build_workbench_site --check --revision "${{ github.sha }}"
+        run: uv run --frozen --all-extras --group dev python -m workbench_tools.build_site --check --revision "${{ github.sha }}"
 
       - name: Upload the page artifact
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'

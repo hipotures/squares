@@ -246,8 +246,8 @@ def test_an_untracked_relaxation_is_detected() -> None:
 @pytest.mark.skipif(not ESLINT.is_file(), reason="run `npm ci` at the repository root")
 def test_the_checked_javascript_promise_overlay_is_effective() -> None:
     representatives = (
-        "packing/atlas/known-best/video/spikes/v2-transitions/assets/workbench.js",
-        "packing/atlas/known-best/video/spikes/v2-transitions/probes/api/apply.js",
+        "packages/workbench/src/application.js",
+        "packages/workbench/probes/api/apply.js",
         "packing/src/sqpack/motion_lab/assets/free-quench.js",
         "packing/atlas/known-best/video/spikes/v1-slideshow/timeline_harness.js",
     )
@@ -272,7 +272,7 @@ def test_the_checked_javascript_promise_overlay_is_effective() -> None:
 
 @pytest.mark.skipif(not ESLINT.is_file(), reason="run `npm ci` at the repository root")
 def test_the_checked_javascript_overlay_rejects_a_floating_promise() -> None:
-    assets = REPOSITORY_ROOT / "packing/atlas/known-best/video/spikes/v2-transitions/assets"
+    assets = REPOSITORY_ROOT / "packages/workbench/src"
     with tempfile.TemporaryDirectory(dir=assets) as scratch:
         sample = Path(scratch) / "floating-promise.js"
         sample.write_text(

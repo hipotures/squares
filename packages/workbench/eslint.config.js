@@ -14,7 +14,7 @@ export default [
     ignores: ["node_modules/**", "vendor/**"],
   },
   {
-    files: ["packing/atlas/known-best/video/spikes/v2-transitions/assets/**/*.js"],
+    files: ["packages/workbench/src/application.js"],
     languageOptions: {
       parser,
       parserOptions: { project: "./tsconfig.json" },
@@ -23,7 +23,7 @@ export default [
     rules: promiseRules,
   },
   {
-    files: ["packing/atlas/known-best/video/spikes/v2-transitions/probes/**/*.js"],
+    files: ["packages/workbench/probes/**/*.js"],
     languageOptions: {
       parser,
       parserOptions: { project: "./tsconfig.probes.json" },
