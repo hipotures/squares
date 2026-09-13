@@ -365,11 +365,27 @@ records the refusal at `212e0dfc`; its
 remaining gaps at `7e4d2487`. The coordinator’s
 [rereview](../../reviews/review-2026-09-13-n11-bc329-coordinator-rereview.md) records
 the next refusal at `fc3e314d` and the three prior repairs it accepted.
-Operational admission still requires the coordinator, reader, and verifier repairs,
-independent integrated rereview, the reviewed
-[run sheet](plan-2026-09-13-n11-bc329-three-profile-run-sheet.md), three fresh profiles,
-and independent readback.
-None of those profiles has run.
+An
+[integrated-head review](../../reviews/review-2026-09-13-n11-bc329-integrated-run-sheet.md)
+at `fbd915fc` found that the component source blobs still match those accepted reviews.
+It refused the run sheet because its commands bypassed the maintained verifier.
+The revised [run sheet](plan-2026-09-13-n11-bc329-three-profile-run-sheet.md) now calls
+`snapshot`, `read`, `join`, `retain`, and `source-closure` on both the staged evidence
+tree and the later evidence commit.
+An
+[exact-diff rereview](../../reviews/review-2026-09-13-n11-bc329-run-sheet-identity-refusal.md)
+accepted that command wiring but found no proof that the evidence commit directly
+descends from the execution commit.
+The sheet now checks the parent before claiming admission.
+A
+[final exact-diff rereview](../../reviews/review-2026-09-13-n11-bc329-run-sheet-parent-final.md)
+accepts that repair at its reviewed working blob after direct-child and refusal
+controls. A
+[format-final rereview](../../reviews/review-2026-09-13-n11-bc329-run-sheet-flowmark-final.md)
+also accepts the current formatted sheet at Git blob `29517a3f`. A clean integrated-head
+review and live PR-head equality still precede execution.
+The later integrated-source gate, three fresh profiles, and independent readback also
+remain open. None of those profiles has run.
 The implemented runner and calibration repairs do not admit BC329 execution.
 
 Then register one hypothesis and one experiment, freeze the packet and normalization

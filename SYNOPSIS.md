@@ -233,6 +233,11 @@ case or experiment separately.
 | [Exact-Head Review: BC329 Run-Set Verifier](docs/project/reviews/review-2026-09-13-n11-bc329-runset-verifier.md) | dated review record | record | retained | — |
 | [BC329 Run-Set Verifier: Exact-Head Rereview](docs/project/reviews/review-2026-09-13-n11-bc329-runset-verifier-rereview.md) | dated review record | record | retained | — |
 | [BC329 Run-Set Verifier: Independent Exact-Head R3 Review](docs/project/reviews/review-2026-09-13-n11-bc329-runset-verifier-r3-final.md) | dated review record | record | retained | — |
+| [PR 156 Integrated Source and BC329 Run-Sheet Review](docs/project/reviews/review-2026-09-13-n11-bc329-integrated-run-sheet.md) | dated review record | record | retained | — |
+| [PR 156 Run-Sheet Exact-Diff Rereview](docs/project/reviews/review-2026-09-13-n11-bc329-run-sheet-identity-refusal.md) | dated review record | record | retained | — |
+| [PR 156 Run-Sheet Parent-Identity Final Rereview](docs/project/reviews/review-2026-09-13-n11-bc329-run-sheet-parent-final.md) | dated review record | record | retained | — |
+| [PR 156 Run-Sheet Flowmark Final Rereview](docs/project/reviews/review-2026-09-13-n11-bc329-run-sheet-flowmark-final.md) | dated review record | record | retained | — |
+| [PR156 Native Usage Delta Audit](docs/project/reviews/review-2026-09-13-pr156-usage-delta.md) | dated review record | record | retained | — |
 | [N11: Three Overnight Research Blocks After PR139](docs/project/specs/active/plan-2026-09-10-n11-overnight-three-blocks.md) | implementation plan | record | superseded | [N11: Daytime Strategy Blocks and Parallel Explainer Update](docs/project/specs/active/plan-2026-09-10-n11-daytime-strategy-and-explainer.md) |
 | [Independent Review of the Unit-Parent Centre Bound](docs/project/reviews/review-2026-09-10-n11-parent-centre-independent-review.md) | dated review record | record | retained | — |
 | [Independent Review of the Adopted Parent Adapter](docs/project/reviews/review-2026-09-10-n11-parent-adapter-admission.md) | dated review record | record | retained | — |

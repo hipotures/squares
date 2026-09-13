@@ -26,7 +26,7 @@ clean PR 156 head.
 | Three-profile coordinator | Three sequential fresh profiles, exact command records, strict readback, and atomic summary publication | [Rereview](../../reviews/review-2026-09-13-n11-bc329-coordinator-rereview.md) at `fc3e314d` refused inverted route chronology, disjoint phase time, and a second `result.json` read. Repair `dbbf8495` closed those targeted controls, but its [exact-head review](../../reviews/review-2026-09-13-n11-bc329-coordinator-final.md) found infinite deadline identity and finite phase-sum overflow. The [follow-up exact-head review](../../reviews/review-2026-09-13-n11-bc329-coordinator-arithmetic-final.md) accepts both arithmetic repairs at `775c71d5`; later integrated-head and positive-run evidence remain |
 | Source-distinct reader | Separate implementation; independently bound revision, geometry, arithmetic, rows, resources, and topology | [Rereview](../../reviews/review-2026-09-13-n11-bc329-reader-rereview.md) of `7e4d2487` accepted F1–F5 and refused F6/F7. The [exact-commit review](../../reviews/review-2026-09-13-n11-bc329-reader-f6f7-overflow.md) of the first repair refused F6b finite phase overflow. The [final exact-head review](../../reviews/review-2026-09-13-n11-bc329-reader-f6f7-final.md) accepted F6/F7 at `a5701e73` after 23 independent full-binder controls. Later integrated-head/source closure remains under `think-n4gh` |
 | Run-set verifier | Source-distinct proof join, coordinator-root inventory and retention, and full source closure | Initial [exact-head review](../../reviews/review-2026-09-13-n11-bc329-runset-verifier.md) refused six controls. Repair `0874e912` closed those controls, but its [rereview](../../reviews/review-2026-09-13-n11-bc329-runset-verifier-rereview.md) refused a valid 22-file coordinator root and a status check/copy race. The [final R3 exact-head review](../../reviews/review-2026-09-13-n11-bc329-runset-verifier-r3-final.md) accepts the repair at verifier blobs from `2ea77405`; actual positive-run bytes, evidence-commit OID, and later integrated-head admission remain |
-| This run sheet | Literal commands, frozen values, refusal rules, and retention path accepted on the execution head | [Independent operational review](../../reviews/review-2026-09-13-n11-bc329-three-profile-run-sheet.md) refused this snapshot: reader stop order, proof-to-summary binding, run-root inventory, and full source freeze remain under `think-pp3j` |
+| This run sheet | Literal commands, frozen values, refusal rules, and retention path accepted on the execution head | [Independent operational review](../../reviews/review-2026-09-13-n11-bc329-three-profile-run-sheet.md) refused the earlier snapshot. The [integrated-head review](../../reviews/review-2026-09-13-n11-bc329-integrated-run-sheet.md) refused missing verifier wiring at `fbd915fc`. A [wiring rereview](../../reviews/review-2026-09-13-n11-bc329-run-sheet-identity-refusal.md) accepted the five verifier commands but refused evidence-commit parent identity; the revised sheet remains a draft pending final exact-head rereview |
 | Remote identity | Clean local `HEAD` equals the live PR 156 head | Pending the reviewed integration push |
 | Profiles and BC329 | No positive profile and no BC329 target has run | Satisfied |
 
@@ -84,6 +84,7 @@ test "$(git -C "$REPOSITORY" branch --show-current)" = \
 test "$(uname -s)" = Darwin
 test "$(uname -m)" = arm64
 test ! -e "$PACKING/.gate-running"
+command -v jq > /dev/null
 
 UV_VERSION="$(uv --version | awk '{print $2}')"
 case "$UV_VERSION" in
@@ -128,17 +129,23 @@ copy cannot claim the checkout’s revision.
 The coordinator requires a fresh, nonexistent run root and creates `profile-1`,
 `profile-2`, and `profile-3` itself.
 The sibling review root holds the coordinator’s top-level console record, the pre-series
-host snapshot, and later source-distinct reader output.
-Nothing written after the coordinator returns may be placed inside the run root or any
-profile directory.
+host snapshot, and the maintained verifier’s inventory, reader records, and admission.
+Its retention whitelist is exactly 19 files: five host/coordinator records, the
+inventory and admission, and four reader records per profile.
+Keep verifier console output in a separate audit root; no other file belongs in
+`REVIEW_ROOT`. Nothing written after the coordinator returns may be placed inside the
+run root or any profile directory.
 
 ```bash
 export RUN_SET_ID="$(date -u +%Y%m%dT%H%M%SZ)-${EXECUTION_REV:0:12}-$$"
 export RUN_ROOT="/private/tmp/bc329-fixed-core-calibration-$RUN_SET_ID"
 export REVIEW_ROOT="/private/tmp/bc329-fixed-core-calibration-review-$RUN_SET_ID"
+export AUDIT_ROOT="/private/tmp/bc329-fixed-core-calibration-audit-$RUN_SET_ID"
 test ! -e "$RUN_ROOT"
 test ! -e "$REVIEW_ROOT"
+test ! -e "$AUDIT_ROOT"
 mkdir "$REVIEW_ROOT"
+mkdir "$AUDIT_ROOT"
 
 ps -axo pid=,ppid=,pgid=,%cpu=,rss=,etime=,comm= \
   > "$REVIEW_ROOT/pre-series-processes.txt"
@@ -186,10 +193,21 @@ COORDINATOR_STATUS=$?
 set -e
 printf '%s\n' "$COORDINATOR_STATUS" > "$REVIEW_ROOT/coordinator.status"
 test "$COORDINATOR_STATUS" -eq 0
-test -s "$RUN_ROOT/three-profile-summary.json"
+"$PYTHON" -m devtools.verify_fixed_core_calibration_runset snapshot \
+  --run-root "$RUN_ROOT" \
+  --review-root "$REVIEW_ROOT" \
+  --expect-execution-revision "$EXECUTION_REV" \
+  > "$AUDIT_ROOT/snapshot.stdout.json" \
+  2> "$AUDIT_ROOT/snapshot.stderr.log"
+jq -e '.status == "accepted" and .inventory_sha256 != null' \
+  "$AUDIT_ROOT/snapshot.stdout.json" > /dev/null
 ```
 
 After this command returns, treat the entire `RUN_ROOT` as immutable.
+A successful coordinator has exactly 22 top-level files: one summary, three run records,
+and 18 calibration/readback logs.
+The snapshot records every run-root directory and file type, byte count, and digest at
+the first post-return observation.
 A retry uses a new run-set identity.
 Keep a refused or partial root for diagnosis.
 
@@ -203,65 +221,75 @@ exact fixture geometry, normalization and dilation arithmetic, every retained ro
 digest, worker topology, resource summaries, invocation identity, and supervisor
 binding.
 
-After `think-n4gh` is independently accepted, run this literal command for each profile.
-Write all new output under `REVIEW_ROOT`.
+After `think-n4gh` is independently accepted, use the verifier to launch each reader in
+order. It checks the snapshot before and after each child, writes that reader’s exact
+argv, status, streams, and proof into `REVIEW_ROOT`, and refuses a changed run root.
+Each status test stops the shell before the next reader on refusal.
 
 ```bash
 export READER_REV="$EXECUTION_REV"
 
 set +e
-"$PYTHON" -m devtools.read_fixed_core_calibration_profile \
+"$PYTHON" -m devtools.verify_fixed_core_calibration_runset read \
   --repository "$REPOSITORY" \
+  --run-root "$RUN_ROOT" \
+  --review-root "$REVIEW_ROOT" \
   --expect-execution-revision "$EXECUTION_REV" \
   --expect-reader-revision "$READER_REV" \
-  --output-dir "$RUN_ROOT/profile-1" \
   --run-order 1 \
-  > "$REVIEW_ROOT/profile-1-source-distinct.stdout.json" \
-  2> "$REVIEW_ROOT/profile-1-source-distinct.stderr.log"
+  > "$AUDIT_ROOT/read-1.stdout.log" \
+  2> "$AUDIT_ROOT/read-1.stderr.log"
 READER_1_STATUS=$?
 set -e
-printf '%s\n' "$READER_1_STATUS" \
-  > "$REVIEW_ROOT/profile-1-source-distinct.status"
 test "$READER_1_STATUS" -eq 0
 
 set +e
-"$PYTHON" -m devtools.read_fixed_core_calibration_profile \
+"$PYTHON" -m devtools.verify_fixed_core_calibration_runset read \
   --repository "$REPOSITORY" \
+  --run-root "$RUN_ROOT" \
+  --review-root "$REVIEW_ROOT" \
   --expect-execution-revision "$EXECUTION_REV" \
   --expect-reader-revision "$READER_REV" \
-  --output-dir "$RUN_ROOT/profile-2" \
   --run-order 2 \
-  > "$REVIEW_ROOT/profile-2-source-distinct.stdout.json" \
-  2> "$REVIEW_ROOT/profile-2-source-distinct.stderr.log"
+  > "$AUDIT_ROOT/read-2.stdout.log" \
+  2> "$AUDIT_ROOT/read-2.stderr.log"
 READER_2_STATUS=$?
 set -e
-printf '%s\n' "$READER_2_STATUS" \
-  > "$REVIEW_ROOT/profile-2-source-distinct.status"
 test "$READER_2_STATUS" -eq 0
 
 set +e
-"$PYTHON" -m devtools.read_fixed_core_calibration_profile \
+"$PYTHON" -m devtools.verify_fixed_core_calibration_runset read \
   --repository "$REPOSITORY" \
+  --run-root "$RUN_ROOT" \
+  --review-root "$REVIEW_ROOT" \
   --expect-execution-revision "$EXECUTION_REV" \
   --expect-reader-revision "$READER_REV" \
-  --output-dir "$RUN_ROOT/profile-3" \
   --run-order 3 \
-  > "$REVIEW_ROOT/profile-3-source-distinct.stdout.json" \
-  2> "$REVIEW_ROOT/profile-3-source-distinct.stderr.log"
+  > "$AUDIT_ROOT/read-3.stdout.log" \
+  2> "$AUDIT_ROOT/read-3.stderr.log"
 READER_3_STATUS=$?
 set -e
-printf '%s\n' "$READER_3_STATUS" \
-  > "$REVIEW_ROOT/profile-3-source-distinct.status"
 test "$READER_3_STATUS" -eq 0
+
+"$PYTHON" -m devtools.verify_fixed_core_calibration_runset join \
+  --run-root "$RUN_ROOT" \
+  --review-root "$REVIEW_ROOT" \
+  --expect-execution-revision "$EXECUTION_REV" \
+  --expect-reader-revision "$READER_REV" \
+  > "$AUDIT_ROOT/join.stdout.json" \
+  2> "$AUDIT_ROOT/join.stderr.log"
+jq -e '.status == "accepted" and (.runs | length) == 3' \
+  "$AUDIT_ROOT/join.stdout.json" > /dev/null
 ```
 
 The revision equality follows the reader CLI’s checkout binding.
 It does not waive the independent review: the reviewer must accept the reader file’s
 exact bytes at `EXECUTION_REV` before this sheet becomes eligible.
 
-The external reader sequence stops at the first refusal.
-The accepted output from each reader must also be joined to the corresponding
-coordinator run before admission.
+Require `run-root-inventory.json`, each profile’s `.command.json`, `.stdout.json`,
+`.stderr.log`, and `.status`, and `run-set-reader-admission.json` in `REVIEW_ROOT`. The
+join checks all three reader proofs against their coordinator runs, including exact
+argv, revisions, typed invocation identity, and receipt byte counts and digests.
 The [maintained verifier contract](plan-2026-09-13-n11-bc329-runset-verifier.md)
 specifies the exact reader-command/proof join (R2), run-root byte/type inventory and
 archive comparison (R3), and full source-closure check (R4). Its first implementation
@@ -291,7 +319,7 @@ Abort before the coordinator if any of these holds:
 - the checkout is dirty, `uv` is older than 0.12, the runtime is outside the checkout’s
   Python 3.14 environment, or the fixture bytes differ;
 - the tuple is not exactly `4 / 5400 / 7200 / 2`;
-- `RUN_ROOT` or `REVIEW_ROOT` already exists;
+- `RUN_ROOT`, `REVIEW_ROOT`, or `AUDIT_ROOT` already exists;
 - another profile, validation gate, package build, or scientific target is running; or
 - the operator sees material competing host load.
 
@@ -308,7 +336,9 @@ dilation, topology, RSS, source, invocation, or receipt binding; or fails the
 source-distinct reader.
 Also refuse if the reader command or revision differs from the accepted record, if an
 immutable run artifact changes after coordinator return, or if the retention destination
-already exists.
+already exists. A nonzero `snapshot`, `read`, `join`, `retain`, or `source-closure`
+status, or a failed accepted-JSON check, stops admission and preserves the external
+roots for diagnosis.
 
 A refusal is operational evidence.
 It is not a BC329 result.
@@ -322,67 +352,104 @@ packing/campaign/series/series-000-smoke-and-calibration/results/agenda-035/bc32
 ```
 
 The directory contains the three-profile summary, coordinator console records, host
-observations, all source-distinct reader records, and a compressed archive of the
+observations, all 19 whitelisted review records, and a compressed archive of the
 unchanged `RUN_ROOT`, plus a SHA-256 file and archive contents list.
 The raw archive is part of the evidence commit so the retained proof does not depend on
 an expiring CI artifact.
+`retain` requires a fresh, nonexistent evidence root; it copies the exact review set,
+compares each archived member with the coordinator-return inventory, and rereads the
+archive digest. Leave the external run, review, and audit roots in place on any refusal.
 
 ```bash
 export EVIDENCE_RELATIVE="packing/campaign/series/series-000-smoke-and-calibration/results/agenda-035/bc329-fixed-core-calibration-${EXECUTION_REV:0:12}"
 export EVIDENCE_ROOT="$REPOSITORY/$EVIDENCE_RELATIVE"
 test ! -e "$EVIDENCE_ROOT"
-mkdir -p "$EVIDENCE_ROOT"
-
-REVIEW_FILES=(
-  pre-series-processes.txt
-  pre-series-uptime.txt
-  coordinator.stdout.log
-  coordinator.stderr.log
-  coordinator.status
-  profile-1-source-distinct.stdout.json
-  profile-1-source-distinct.stderr.log
-  profile-1-source-distinct.status
-  profile-2-source-distinct.stdout.json
-  profile-2-source-distinct.stderr.log
-  profile-2-source-distinct.status
-  profile-3-source-distinct.stdout.json
-  profile-3-source-distinct.stderr.log
-  profile-3-source-distinct.status
-)
-test "$(find "$REVIEW_ROOT" -mindepth 1 -maxdepth 1 | wc -l | tr -d ' ')" = \
-  "${#REVIEW_FILES[@]}"
-for FILE in "${REVIEW_FILES[@]}"; do
-  test -f "$REVIEW_ROOT/$FILE"
-  test ! -L "$REVIEW_ROOT/$FILE"
-  cp "$REVIEW_ROOT/$FILE" "$EVIDENCE_ROOT/$FILE"
-done
-
-cp "$RUN_ROOT/three-profile-summary.json" \
-  "$EVIDENCE_ROOT/three-profile-summary.json"
-printf '%s\n' "$EXECUTION_REV" > "$EVIDENCE_ROOT/execution-revision.txt"
-printf '%s\n' "$READER_REV" > "$EVIDENCE_ROOT/reader-revision.txt"
-
-tar -C "$(dirname "$RUN_ROOT")" -czf "$EVIDENCE_ROOT/run-root.tar.gz" \
-  "$(basename "$RUN_ROOT")"
-tar -tzf "$EVIDENCE_ROOT/run-root.tar.gz" \
-  > "$EVIDENCE_ROOT/run-root-contents.txt"
+"$PYTHON" -m devtools.verify_fixed_core_calibration_runset retain \
+  --run-root "$RUN_ROOT" \
+  --review-root "$REVIEW_ROOT" \
+  --evidence-root "$EVIDENCE_ROOT" \
+  --expect-execution-revision "$EXECUTION_REV" \
+  > "$AUDIT_ROOT/retain.stdout.json" \
+  2> "$AUDIT_ROOT/retain.stderr.log"
+jq -e --arg revision "$EXECUTION_REV" \
+  '.status == "accepted" and .execution_revision == $revision' \
+  "$AUDIT_ROOT/retain.stdout.json" > /dev/null
 (
   cd "$EVIDENCE_ROOT"
-  shasum -a 256 run-root.tar.gz > run-root.tar.gz.sha256
   shasum -a 256 -c run-root.tar.gz.sha256
+  tar -tzf run-root.tar.gz | diff -u run-root-contents.txt -
 )
-
-git -C "$REPOSITORY" diff --quiet "$EXECUTION_REV" -- \
-  packing/devtools/calibrate_fixed_core_packet.py \
-  packing/devtools/run_fixed_core_calibration_profiles.py \
-  packing/devtools/read_fixed_core_calibration_profile.py
-git -C "$REPOSITORY" diff --cached --quiet
 ```
 
-The evidence commit advances PR 156 beyond `EXECUTION_REV`. Record both revisions.
-It may add evidence files and update status documents; it must not change any source
-path bound by a profile receipt.
-Recheck the archive digest and contents before committing it.
+Stage the evidence directory and any intended status documents.
+Inspect the staged paths before running this block.
+The candidate is the actual index tree, not a named ancestor or a hand-picked three-file
+diff.
+The verifier reconstructs the complete receipt import closure, fixture, and runtime
+declarations at `EXECUTION_REV`; it compares modes, blobs, hashes, and working bytes
+with that staged tree.
+
+```bash
+git -C "$REPOSITORY" add -- "$EVIDENCE_RELATIVE"
+git -C "$REPOSITORY" diff --cached --name-status
+if git -C "$REPOSITORY" diff --cached --quiet; then
+  exit 1
+fi
+export TREE_OID="$(git -C "$REPOSITORY" write-tree)"
+"$PYTHON" -m devtools.verify_fixed_core_calibration_runset source-closure \
+  --repository "$REPOSITORY" \
+  --run-root "$RUN_ROOT" \
+  --review-root "$REVIEW_ROOT" \
+  --expect-execution-revision "$EXECUTION_REV" \
+  --candidate-tree "$TREE_OID" \
+  > "$AUDIT_ROOT/source-closure-staged.stdout.json" \
+  2> "$AUDIT_ROOT/source-closure-staged.stderr.log"
+jq -e --arg revision "$EXECUTION_REV" --arg tree "$TREE_OID" \
+  '.schema == "fixed-core-calibration-source-closure-check/v1" and
+   .status == "accepted" and .execution_revision == $revision and
+   .candidate_tree == $tree' \
+  "$AUDIT_ROOT/source-closure-staged.stdout.json" > /dev/null
+```
+
+Commit that inspected index tree.
+Then pass the exact new `HEAD` commit OID to the same verifier.
+Before committing, require `HEAD` to remain `EXECUTION_REV` and tracked working files to
+match the index. After committing, require the evidence commit to have exactly that
+execution commit as its sole parent.
+Its tree must still equal `TREE_OID`; the postcommit verifier also requires the index to
+match that commit tree.
+Keep both accepted JSON outputs outside `REVIEW_ROOT`, and record their hashes and the
+actual evidence commit OID in the admission disposition.
+
+```bash
+test "$(git -C "$REPOSITORY" rev-parse HEAD)" = "$EXECUTION_REV"
+git -C "$REPOSITORY" diff --quiet
+git -C "$REPOSITORY" commit -m "Retain target-free BC329 fixed-core calibration run set"
+export EVIDENCE_COMMIT="$(git -C "$REPOSITORY" rev-parse HEAD)"
+test "$(git -C "$REPOSITORY" rev-list --parents -n 1 "$EVIDENCE_COMMIT")" = \
+  "$EVIDENCE_COMMIT $EXECUTION_REV"
+test "$(git -C "$REPOSITORY" rev-parse "$EVIDENCE_COMMIT^{tree}")" = "$TREE_OID"
+"$PYTHON" -m devtools.verify_fixed_core_calibration_runset source-closure \
+  --repository "$REPOSITORY" \
+  --run-root "$RUN_ROOT" \
+  --review-root "$REVIEW_ROOT" \
+  --expect-execution-revision "$EXECUTION_REV" \
+  --candidate-tree "$EVIDENCE_COMMIT" \
+  > "$AUDIT_ROOT/source-closure-committed.stdout.json" \
+  2> "$AUDIT_ROOT/source-closure-committed.stderr.log"
+jq -e --arg revision "$EXECUTION_REV" --arg tree "$TREE_OID" \
+  '.schema == "fixed-core-calibration-source-closure-check/v1" and
+   .status == "accepted" and .execution_revision == $revision and
+   .candidate_tree == $tree' \
+  "$AUDIT_ROOT/source-closure-committed.stdout.json" > /dev/null
+shasum -a 256 "$AUDIT_ROOT/source-closure-staged.stdout.json" \
+  "$AUDIT_ROOT/source-closure-committed.stdout.json" \
+  > "$AUDIT_ROOT/source-closure-outputs.sha256"
+printf '%s\n' "$EVIDENCE_COMMIT" > "$AUDIT_ROOT/evidence-commit.txt"
+```
+
+The evidence commit advances PR 156 beyond `EXECUTION_REV`; it may add evidence and
+status documents but must preserve every receipt-bound source path.
 Keep the external originals until the evidence commit is pushed, hosted CI passes, and
 `think-1mma` records admission.
 
