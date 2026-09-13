@@ -1,6 +1,6 @@
 # N11: Daytime Strategy Blocks and Parallel Explainer Update
 
-**Active plan, September 10, 2026; updated September 12.** This plan replaces the
+**Active plan, September 10, 2026; updated September 13.** This plan replaces the
 uninterrupted overnight schedule with shorter blocks that can start and stop during the
 day. Each research block gets its own session clock, falsifiable output, stop rule, and
 closeout. A later block is selected from the evidence produced by the earlier ones; gaps
@@ -51,12 +51,22 @@ preserves the broader six-route option map and reconciles it with T-026 and exp-
 [post-T1 draft exploration](../../../../packing/campaign/explorations/X-030-n11-post-t1-proof-obligations-draft.md)
 states the exact parent-union lemma and separates literal-parent tests from the still
 necessary continuous-domain selection proof.
-Its source cutoff precedes the proposed parent-mass and T2 charge targets.
+The
+[H-161/exp-159 result](../../research/research-2026-09-13-bc303-literal-parent-union-result.md)
+now measures the literal parent $Q_0=[0,1]^2$ at $N=4000015$ source units.
+Its one-parent and four-corner necessary tests both survive with $1048233$ units of
+slack. This does not construct an eleven-parent extension or decide any pose cell.
+The T2 C/S charge targets remain unrun.
+The target-free reader has an
+[independent readmission](../../reviews/review-2026-09-13-bc303-t2-charge-reader-readmission.md)
+after two documented defects were repaired; its integrated execution head still needs a
+source/readiness check before the registered H-160/exp-158 target.
 The
 [source-distinct closeout audit](../../reviews/review-2026-09-12-n11-post-bc329-strategy-audit.md)
 records the exact T-025/T-026/BC329 fact ladder, the terminal meaning of each possible
 BC329 outcome, and the remaining conditional-selection obligations.
-None of these documents registers a target; this plan remains the execution controller.
+H-161 and exp-159 own that completed literal target; the strategy analysis registers no
+additional target. This plan remains the execution controller.
 
 An **atom** is a nonnegative resource rule used by a covering certificate.
 A point atom charges a core when it contains one site.
@@ -100,12 +110,16 @@ Strategy intake and BC326 are complete and retained below as history.
 BC329 is the next planned direct attempt to improve the global lower bound.
 BC337 is a secondary parent-conditioning lane that may proceed in parallel while BC329’s
 runner is being admitted.
+The H-160/exp-158 C/S charge lane has an admitted target-free reader and a separate
+registered target. It tests a local forced-type helper, not the global availability
+theorem.
 
 | Rank | Block | Time | Exact deliverable and stop rule |
 | --- | --- | --- | --- |
 | 0 | Strategy intake and analytic pruning — complete | 45 min | Reconciled the post-PR139 frontier, retained the parent-domain translation lemma, ranked distinct routes, and selected BC326 as the first dependency-ready block. |
 | 1 | Necessary parent geometry on the saved owner escape — complete | 60–90 min | Admitted the parent-domain adapter and ran the fixed exp151 target once. The residual survived its parent box; TR was already B-only incompatible, making its parent-domain arm redundant; BL, BR and TL were not run. H158 remains unresolved. |
 | 2 | One direct core and direction-net packet | 90–120 min after a fixed-core runner is admitted | Freeze the 2880-step net, one larger core, the original relative-weight scale and one deterministic normalization rule. Accept only when the raw minimum exceeds the exact budget threshold, both coverage routes agree, and dilation replay gives a limit strictly above T-026. A verified charge at or below that threshold rejects only the fixed relative-weight packet; timeout leaves it unresolved. |
+| 2T | BC303 C/S charge target, in parallel | Integrated-head admission, then one 30-minute scientific allowance | Authenticate the 377 source atoms, 182 eligible charts, both axis aliases, the repaired reader, and the executing revision; pass its synthetic all-strata controls. Run H-160/exp-158 once. C passes at $\ge4524200$; a lower C cell needs exact physical-parent replay to reject its opposite/combined helper. S first-owner passes at $\ge4524185$; a lower strip cell rejects only the sufficient filter. Even a positive T2 result leaves local availability and global selection open. |
 | 2P | Exact TR-incompatibility centre obstacle, in parallel | 45 min admission, then one 240 s scientific allowance inside a 300 s process | Keep exp151 direction 6, tuple `(0,0,0,7)`, open residual domain `C°`, and the same nine other closed centre-space obstacles. The control adds `P_TR + (-R)`; the candidate adds `K_TR` directly, with no second Minkowski expansion. Run once only after source-bound construction, clipping, a bounded runner and an independent reader are admitted. |
 | 3 | Weighted-atom admission, then a matched support comparison | 60–90 min for admission; a separate 90–120 minute target block | Version multiplicity semantics and make every producer, loader and coverage route agree before freezing one common-row control/candidate comparison. Accept finite improvement only when an exact candidate primal upper bound is below the control dual lower bound. |
 | 4 | Genuine-contact or snug-parent residual pilot | 60–90 min | Use the proved fixed-angle contact alternative to define one exact conditional domain. Admit physical contacts and all complementary branches before measuring; a result on one branch remains conditional. |

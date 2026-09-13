@@ -19,21 +19,29 @@ exploration:
   - packing/campaign/explorations/X-028-n11-strategy-portfolio-draft.md
   - packing/campaign/explorations/X-029-bc303-t2-exact-geometry-draft.md
   - packing/campaign/hypotheses/H-159-bc303-one-corner-surplus.md
+  - packing/campaign/hypotheses/H-161-bc303-literal-parent-union.md
+  - packing/campaign/hypotheses/H-160-bc303-t2-charge-filters.md
+  - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-159-bc303-literal-parent-union.md
+  - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-158-bc303-t2-charge-filters.md
   - docs/project/reviews/review-2026-09-13-bc303-parent-union-math.md
+  - docs/project/reviews/review-2026-09-13-bc303-literal-parent-union-result.md
+  - docs/project/research/research-2026-09-13-bc303-literal-parent-union-result.md
   - docs/project/research/research-2026-09-12-n11-selection-routing-first-principles.md
   - docs/project/research/research-2026-09-13-bc303-t2-charge-bridge.md
+  - docs/project/reviews/review-2026-09-13-bc303-t2-charge-reader-readmission.md
   - docs/project/reviews/review-2026-09-10-n11-bc329-packet-preflight.md
   - packing/cases/n11_threshold_certificate/t-026-verifiable-claim-dilation-limit.md
   proposes: []
 ---
 # X-030: N11 Proof Obligations After the T1 Local Witness
 
-**Status: draft exploration.** This analysis is source-bound to the T1 and T2 local
-branches named below.
-It runs no scientific target.
+**Status: draft exploration.** This analysis reconciles the T1 and T2 local branches
+with the later H-161 literal-parent result.
+It runs no additional scientific target.
 The parent-union inequality and its integer thresholds have an
-[independent mathematical review][parentreview]; the local parent mass and broader
-geometric implications are separate experimental questions.
+[independent mathematical review][parentreview]; the local parent mass has an
+[independent result audit][parentaudit]. Broader geometric implications remain separate
+questions.
 
 T1 rejects one local BC303 surplus inequality.
 It does not reject local availability restricted to actual eleven-parent packings, the
@@ -52,21 +60,25 @@ rational dilations; it does not assert a certificate at that endpoint.
 
 ## Evidence Before Priorities
 
-The source cutoff matters: the T1 and T2 worktrees are siblings above PR156. An old
-admission statement in one sibling does not override later evidence in the other.
+The source revisions matter: T1 and T2 began as sibling worktrees above PR156. H-161 was
+measured later on T1 and merged with T2 geometry for this exploration.
+A review of one inspected revision does not admit later code on another branch.
 
 | Source at the inspected revision | Established evidence | Remaining implication |
 | --- | --- | --- |
 | [T-026 claim][t026] and [mapped review][t026review], T1 tree `375c7bc1d49c506636a5abf71d37a8455888ff42` | Complete finite certificate decisions, strict-core counting, exact dilation, and mapped review establish $s(11)\ge C$ at V4/C5 | A new endpoint needs a new complete exclusion; strictness at $C$ is separate |
 | [T1 reader review][t1] and [H-159][h159], same tree | The authenticated 377-row scan gives $\mu(C_0)=800003/800000$, surplus $g=3/800000$, and labels $\{3,4,11,12\}$ for parent $Q_0=[0,1]^2$ | This local parent is not known to extend to eleven parents; no continuous minimum or global routing conclusion follows |
+| [H-161][h161], [exp-159][exp159], and [result audit][parentaudit], execution tree `f27c8ec7c8ebeb8a9b369c1c6f7efef4b531c359` | An exact one-run scan gives $N=4000015$ for $Q_0$ and $4N=16000060$ for four separated D4 copies; both necessary tests survive with $1048233$ integer units of slack | No extension, pose-cell exclusion, owner selection, or improved global bound follows |
 | [X-029][x029], [charge bridge][bridge], and [bridge review][bridgereview], T2 tree `820e5355bdeaea122705e69f244c15725e66ec51` | Reviewed reductions of complete C geometry, its open-cell charge decision, opposite-corner separation, and a sufficient S test; exact uncharged C/S feasibility controls | C/S target charges and T2 are uncomputed in these sources; reader admission is distinct from the mathematical reduction |
+| [H-160][h160], [exp-158][exp158], and [reader readmission][t2readmission], repaired reader tree `0f20fdcdd5bac7e0734b29cd0b0efef4ffea3699` | The target-free reader passed an independent exact source/replay and all-strata readmission after two documented defects were repaired | The registered C/S charge target has not run; the merged execution head still needs its own source/readiness check before that one run |
 | [BC329 preflight][bc329] and [run-sheet plan][runsheet], PR156 tree `9c56e9019b97be0511d5afe590790b362b93e9e4` | An exact geometric endpoint above $C$, conditional on this packet’s coverage; instrument and control contracts | No BC329 scientific coverage outcome is assumed here |
 | [X-028][x028] and [certificate analysis][mechanisms], T1 tree | Scoped fractional obstructions, the distinction between cutting a family and improving a complete program, and separate structural alternatives | Neither finite support failure nor a local counterexample exhausts a method |
 | [Weighted admission record][weightedstate], PR157 tree `876c594521ba61840cf68d732b0a795f8d24e378` | Token representation and retained source replays, with implementation review corrections recorded | At this inspected revision, coverage controls and the paired-program stage remained unadmitted; no BC327 target gain follows |
 
 The [reviewed parent-union lemma][parentreview] follows from strict-core geometry and
 the imported BC303 floor.
-At this source cutoff, its target masses were not evaluated.
+H-161 evaluates one literal parent mass; other parent poses and the T2 source charges
+remain uncomputed in the cited results.
 Prioritization at the end is a judgment about readiness and logical information, with no
 estimated success probability.
 
@@ -125,9 +137,12 @@ low-surplus full-corner witness a rejecting opposite pair.
 The remaining exact queries are therefore C mass at most $4524199$ or S total mass at
 most $8524199$, in integer units $W\mu$. [X-029][x029]
 
-The smallest *complete* next discrimination is the reviewed shared C/S-first-owner
-sweep. C accepts only if every feasible cell has mass at least $4524200$. S accepts from
-its sufficient relaxation if every first-owner strip cell has mass at least $4524185$,
+The smallest complete test of the registered C and S first-owner filters is their shared
+all-chart sweep. Its target-free reader has been
+[independently readmitted][t2readmission] at the repaired reader revision; no C or S
+target charge has been measured.
+C accepts only if every feasible cell has mass at least $4524200$. S accepts from its
+sufficient relaxation if every first-owner strip cell has mass at least $4524185$,
 because the second owner contributes at least $4000015$. A lower strip cell fails only
 that sufficient relaxation; it is not a jointly realizable S witness.
 C keeps all 182 source charts, 181 distinct orientations, the forbidden axis edge, and
@@ -135,9 +150,11 @@ the exact strict open-cell wall test.
 Joint S boundaries cannot be discarded using C’s interior-density proof.
 [Charge bridge][bridge], [independent review][bridgereview]
 
-One disclosed C or S candidate is a smaller *one-sided* test after reader admission: an
-exact low charge rejects the corresponding helper, while a high charge leaves its domain
-unresolved. These are disclosed-candidate checks, not target-blind discovery.
+One disclosed candidate is a smaller *one-sided* test after integrated-head reader
+admission. A low C charge, with exact physical-parent replay, rejects the C helper.
+A low S first-owner charge rejects only the sufficient S filter; it does not supply a
+joint S witness. A high charge leaves the corresponding complete domain unresolved.
+These are disclosed-candidate checks, not target-blind discovery.
 An opposite T2 rejection does not determine adjacent-only T2.
 
 ## Stronger Geometric Information Beyond T1
@@ -190,22 +207,23 @@ union prevents charging the same unavailable atom twice.
 This uses parent occupancy as unused mass, rather than assuming that a parent footprint
 belongs to its selected core.
 
-**Smallest prospective discriminator.** A maintained authenticated scan of the 377
-source atoms over the single disclosed parent $Q_0$ returns the exact integer
-$N=W\mu(Q_0)$. It resolves two different necessary conditions:
+**Completed literal discriminator.** The source-bound H-161 scan of all 377 atoms over
+the disclosed parent $Q_0$ returned $N=W\mu(Q_0)=4000015$. It decided two preregistered
+necessary conditions:
 
-| Frozen local configuration | Necessary condition for an eleven-parent extension | An exact rejecting outcome |
-| --- | --- | --- |
-| The one literal parent $Q_0$ | $N+10(4000015)\le45048398$ | $N\ge5048249$ |
-| Its four separated D4 corner copies | $4N+7(4000015)\le45048398$ | $N\ge4262074$ |
+| Frozen local configuration | Necessary condition for an eleven-parent extension | First rejecting $N$ | Measured result |
+| --- | --- | ---: | --- |
+| The one literal parent $Q_0$ | $N+10(4000015)\le45048398$ | $5048249$ | $N=4000015$; survives with $1048233$ units of slack |
+| Its four separated D4 corner copies | $4N+7(4000015)\le45048398$ | $4262074$ | $4N=16000060$; survives with $1048233$ units of slack |
 
-$N$ has not been computed here.
-A rejection proves nonextension of that literal parent or tuple; a surviving inequality
-proves no extension.
-This test changes the information used by T1 without remeasuring its already settled
-core surplus. Turning a successful literal exclusion into a pose-cell exclusion needs
-uniform atom membership or a strict interior captured subset.
-A pointwise boundary atom may disappear under perturbation.
+All 19 source atoms captured by $Q_0$ already lie in its selected strict T1 core; this
+parent adds no source atom on the frozen pose.
+The result rejects H-161’s predicted literal nonextension.
+Passing a necessary inequality does not construct the seven missing parents.
+It says nothing about the mass of other parent poses, and it gives no uniform lower
+bound over a pose cell.
+An eventual pose-cell exclusion would need such a bound, including its boundary
+behavior. [Result][parentresult], [audit][parentaudit]
 
 ### Shared residuals, contact restrictions, and different selections
 
@@ -257,24 +275,25 @@ automatically distinct-method confirmation.
    It has a direct specified chain from complete coverage to an ordinary improved lower
    bound, because the counting and dilation theorem already exist.
    No terminal BC329 result is assumed.
-2. Finish the C/S-first-owner reader against the reviewed charge-bridge contract.
-   It gives a complete C answer and either a sufficient S proof or a precisely delimited
-   joint S remainder. This is information about forced-type consistency, not a substitute
-   for the missing availability theorem.
-3. Use the reviewed (P) in the single disclosed-parent mass scan as a small alternative
-   geometric discriminator.
-   It tests whether parent occupancy eliminates the exact T1 obstruction before funding
-   a general parent-union optimizer.
-   Its positive scope is explicit nonextension; its negative scope is only failure of
-   this resource test.
+2. Check source identity and readiness on the integrated C/S reader head, then run the
+   one preregistered H-160/exp-158 target.
+   Independent readmission accepted the target-free repaired reader, not a charge
+   result. A complete C answer and either a sufficient S proof or a precisely delimited
+   joint S remainder would inform forced-type consistency; the availability theorem
+   would remain separate.
+3. Reframe the parent-union route after H-161. The literal $Q_0$ scan is complete and
+   did not reject. A changed parent pose, a set of proved unavailable marks, or a larger
+   joint parent union could charge different source atoms; each proposal needs a frozen
+   exact comparison and a separate argument connecting its domain to every physical
+   packing branch it claims to cover.
 4. Keep the weighted geometric trace test as an independent route after its required
    admission, and select broader joint-owner, contact, or residual-class work only with
    one complete frozen domain and a stated route to the selection theorem.
    These choices have more open proof implications than BC329; that is not evidence of a
    lower chance of eventual success.
 
-No scientific target, new lower bound, probability estimate, or method-wide exhaustion
-claim is supplied by this note.
+Beyond the recorded H-161 result, this note supplies no scientific target, new lower
+bound, probability estimate, or method-wide exhaustion claim.
 
 [t026]: ../../cases/n11_threshold_certificate/t-026-verifiable-claim-dilation-limit.md
 [t026review]: ../../../docs/project/reviews/review-2026-09-10-t025-t026-verifiable-claims.md
@@ -293,6 +312,13 @@ claim is supplied by this note.
 [h131]: ../hypotheses/H-131-near-axis-counts-at-q.md
 [audit]: ../../../docs/project/reviews/review-2026-09-12-n11-post-bc329-strategy-audit.md
 [parentreview]: ../../../docs/project/reviews/review-2026-09-13-bc303-parent-union-math.md
+[parentresult]: ../../../docs/project/research/research-2026-09-13-bc303-literal-parent-union-result.md
+[parentaudit]: ../../../docs/project/reviews/review-2026-09-13-bc303-literal-parent-union-result.md
+[h161]: ../hypotheses/H-161-bc303-literal-parent-union.md
+[exp159]: ../series/series-000-smoke-and-calibration/experiments/exp-159-bc303-literal-parent-union.md
+[h160]: ../hypotheses/H-160-bc303-t2-charge-filters.md
+[exp158]: ../series/series-000-smoke-and-calibration/experiments/exp-158-bc303-t2-charge-filters.md
+[t2readmission]: ../../../docs/project/reviews/review-2026-09-13-bc303-t2-charge-reader-readmission.md
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
