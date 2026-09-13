@@ -1,0 +1,25 @@
+{
+  "atom_count": 377,
+  "closed_parent_bounds": [
+    "0",
+    "0",
+    "1",
+    "1"
+  ],
+  "four_corner_excess_units": -1048233,
+  "four_corner_nonextension": false,
+  "four_corner_union_units": 16000060,
+  "four_parent_budget_units": 17048293,
+  "implementation_revision": "f27c8ec7c8ebeb8a9b369c1c6f7efef4b531c359",
+  "integer_mass_N": 4000015,
+  "mass": "800003/800000",
+  "one_parent_budget_units": 5048248,
+  "one_parent_excess_units": -1048233,
+  "one_parent_nonextension": false,
+  "schema": "bc303-literal-parent-union/v1",
+  "scope": "literal Q0 and its four specified D4 corner images only",
+  "source_revision": "39714308ce2081abbd76624387d134fee4be6deb",
+  "source_sha256": "c30b600d3d35f3851f0595e2c42962bf353721f9e72b0539bd691aec522e876f",
+  "total_mass": "22524199/2000000",
+  "weight_scale": 4000000
+}
