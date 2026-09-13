@@ -1577,7 +1577,14 @@ def test_impossible_topologies_refuse_after_sidecars_and_summaries_are_rebound(
     ("changes", "expected_status"),
     [
         ({"worker_exit_seconds": 1.0}, True),
-        ({"worker_exit_seconds": 1.2, "parent_final_readback_seconds": 0.0}, True),
+        (
+            {
+                "worker_exit_seconds": 1.2,
+                "parent_final_readback_seconds": 0.0,
+                "supervisor_cleanup_seconds": 0.0,
+            },
+            True,
+        ),
         ({"parent_final_readback_seconds": 0.15}, True),
         ({"worker_exit_seconds": 0.9}, False),
         ({"worker_exit_seconds": 1.3}, False),
@@ -1650,3 +1657,205 @@ def test_topology_sidecar_count_substitution_refuses(
             reader._validate_topology(output, receipt)
     finally:
         sidecar_path.write_bytes(original)
+
+
+def _read_with_real_binder(
+    output: Path, *, execution_revision: str = EXECUTION_REVISION
+) -> dict[str, object]:
+    reader_revision = subprocess.run(
+        ("git", "rev-parse", "HEAD"),
+        cwd=REPOSITORY,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    return reader.read_profile(
+        repository=REPOSITORY,
+        execution_revision=execution_revision,
+        reader_revision=reader_revision,
+        output_dir=output,
+        run_order=1,
+    )
+
+
+def test_real_binder_accepts_synthetic_baseline(
+    profile: tuple[Path, dict[str, object]],
+) -> None:
+    output, _baseline = profile
+    proof = _read_with_real_binder(output)
+    assert proof["status"] == "accepted"
+    assert proof["execution_revision"] == EXECUTION_REVISION
+    assert proof["reader_revision"] != EXECUTION_REVISION
+
+
+@pytest.mark.parametrize(
+    ("clock", "value", "accepted"),
+    [
+        ("source_loading_seconds", 0.9, False),
+        ("launch_seconds", 1_000_000.0, False),
+        ("supervisor_cleanup_seconds", 1_000_000.0, False),
+        ("source_loading_seconds", 0.1, True),
+        ("launch_seconds", 1.05, True),
+        ("supervisor_cleanup_seconds", 0.15, True),
+    ],
+)
+def test_real_binder_nested_and_supervisor_duration_controls(
+    clock: str,
+    value: float,
+    accepted: object,
+    profile: tuple[Path, dict[str, object]],
+) -> None:
+    output, baseline = profile
+    changed = deepcopy(baseline)
+    cast(dict[str, object], changed["clocks"])[clock] = value
+    _publish_receipt(output, changed)
+    try:
+        if accepted is True:
+            assert _read_with_real_binder(output)["status"] == "accepted"
+        else:
+            with pytest.raises(
+                reader.ReadbackRefusalError, match=r"nested preflight|supervisor"
+            ):
+                _read_with_real_binder(output)
+    finally:
+        _publish_receipt(output, deepcopy(baseline))
+
+
+@pytest.mark.parametrize(
+    ("control", "route", "shift", "accepted"),
+    [
+        ("raw-before-preflight", "raw", -0.19, False),
+        ("exact-before-preceding-phases", "normalized_exact", -0.3, False),
+        ("exact-leaves-no-tail", "normalized_exact", 0.8, False),
+        ("raw-at-preflight-boundary", "raw", -0.1, True),
+        ("exact-at-preceding-boundary", "normalized_exact", -0.1, True),
+        ("exact-at-tail-boundary", "normalized_exact", None, True),
+    ],
+)
+def test_real_binder_phase_schedule_controls(
+    control: str,
+    route: str,
+    shift: float | None,
+    accepted: object,
+    profile: tuple[Path, dict[str, object]],
+) -> None:
+    output, baseline = profile
+    original_sidecars = {
+        name: (output / name).read_bytes()
+        for name in ("raw-worker-topology.json", "normalized-exact-worker-topology.json")
+    }
+    try:
+        changed = _pooled_receipt(output, baseline, children_count=1)
+        filename = (
+            "raw-worker-topology.json"
+            if route == "raw"
+            else "normalized-exact-worker-topology.json"
+        )
+        path = output / filename
+        sidecar = json.loads(path.read_bytes())
+        route_record = cast(dict[str, object], sidecar["route"])
+        tasks = cast(list[dict[str, object]], route_record["tasks"])
+        children = cast(list[dict[str, object]], route_record["children"])
+        if shift is None:
+            clocks = cast(dict[str, object], changed["clocks"])
+            following = sum(
+                cast(float, clocks[key])
+                for key in ("interval_seconds", "dilation_seconds", "full_readback_seconds")
+            )
+            shift = (
+                cast(float, clocks["worker_elapsed_seconds"])
+                - following
+                - cast(float, tasks[-1]["finished_seconds"])
+            )
+        for task in tasks:
+            task["started_seconds"] = cast(float, task["started_seconds"]) + shift
+            task["finished_seconds"] = cast(float, task["finished_seconds"]) + shift
+        for child in children:
+            child["first_task_started_seconds"] = (
+                cast(float, child["first_task_started_seconds"]) + shift
+            )
+            child["last_task_finished_seconds"] = (
+                cast(float, child["last_task_finished_seconds"]) + shift
+            )
+        data = _write(path, sidecar)
+        resources = cast(dict[str, object], changed["resources"])
+        topology = cast(dict[str, object], resources["worker_topology"])
+        summaries = cast(dict[str, object], topology["routes"])
+        cast(dict[str, object], summaries[route])["record_sha256"] = hashlib.sha256(
+            data
+        ).hexdigest()
+        _publish_receipt(output, changed)
+        if accepted is True:
+            assert _read_with_real_binder(output)["status"] == "accepted", control
+        else:
+            with pytest.raises(reader.ReadbackRefusalError, match=r"worker phase|tasks"):
+                _read_with_real_binder(output)
+    finally:
+        for name, data in original_sidecars.items():
+            (output / name).write_bytes(data)
+        _publish_receipt(output, deepcopy(baseline))
+
+
+def test_real_binder_refuses_two_process_parent_cycle(
+    profile: tuple[Path, dict[str, object]],
+) -> None:
+    output, baseline = profile
+    original_sidecars = {
+        name: (output / name).read_bytes()
+        for name in ("raw-worker-topology.json", "normalized-exact-worker-topology.json")
+    }
+    try:
+        changed = _pooled_receipt(output, baseline, children_count=1)
+        resources = cast(dict[str, object], changed["resources"])
+        topology = cast(dict[str, object], resources["worker_topology"])
+        cast(dict[str, object], topology["coordinator"])["ppid"] = 201
+        summaries = cast(dict[str, object], topology["routes"])
+        for route, filename in (
+            ("raw", "raw-worker-topology.json"),
+            ("normalized_exact", "normalized-exact-worker-topology.json"),
+        ):
+            path = output / filename
+            sidecar = json.loads(path.read_bytes())
+            cast(dict[str, object], sidecar["coordinator"])["ppid"] = 201
+            data = _write(path, sidecar)
+            cast(dict[str, object], summaries[route])["record_sha256"] = hashlib.sha256(
+                data
+            ).hexdigest()
+        _publish_receipt(output, changed)
+        with pytest.raises(reader.ReadbackRefusalError, match=r"task|child"):
+            _read_with_real_binder(output)
+    finally:
+        for name, data in original_sidecars.items():
+            (output / name).write_bytes(data)
+        _publish_receipt(output, deepcopy(baseline))
+
+
+def test_real_binder_rejects_execution_tree_identity(
+    profile: tuple[Path, dict[str, object]],
+) -> None:
+    output, baseline = profile
+    tree = subprocess.run(
+        ("git", "rev-parse", f"{EXECUTION_REVISION}^{{tree}}"),
+        cwd=REPOSITORY,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    kind = subprocess.run(
+        ("git", "cat-file", "-t", tree),
+        cwd=REPOSITORY,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    assert kind == "tree"
+    changed = deepcopy(baseline)
+    cast(dict[str, object], changed["sources"])["implementation_revision"] = tree
+    invocation = cast(dict[str, object], changed["invocation"])
+    cast(dict[str, object], invocation["identity"])["implementation_revision"] = tree
+    _publish_receipt(output, changed)
+    try:
+        with pytest.raises(reader.ReadbackRefusalError, match="not a Git commit"):
+            _read_with_real_binder(output, execution_revision=tree)
+    finally:
+        _publish_receipt(output, deepcopy(baseline))

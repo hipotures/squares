@@ -392,6 +392,8 @@ def _git(repository: Path, *arguments: str, binary: bool = False) -> bytes | str
 def _bind_revisions(repository: Path, execution: str, reader: str) -> None:
     _hex(execution, 40, "expected execution revision")
     _hex(reader, 40, "expected reader revision")
+    if cast(str, _git(repository, "cat-file", "-t", execution)).strip() != "commit":
+        _refuse("expected execution revision is not a Git commit")
     head = cast(str, _git(repository, "rev-parse", "HEAD")).strip()
     if head != reader:
         _refuse("current checkout differs from the expected reader revision")
@@ -1324,6 +1326,7 @@ def _validate_topology_route(
             or task["ppid"] != coordinator["pid"]
             or task["pgid"] != coordinator["pgid"]
             or task["pid"] == coordinator["pid"]
+            or task["pid"] == coordinator["ppid"]
             or task["pid"] == task["ppid"]
             or cast(float, task["started_seconds"]) < 0
             or cast(float, task["finished_seconds"]) <= cast(float, task["started_seconds"])
@@ -1381,6 +1384,7 @@ def _validate_topology_route(
             or child["ppid"] != coordinator["pid"]
             or child["pgid"] != coordinator["pgid"]
             or child["pid"] == coordinator["pid"]
+            or child["pid"] == coordinator["ppid"]
             or child["pid"] == child["ppid"]
             or type(child["tasks_completed"]) is not int
             or cast(int, child["tasks_completed"]) <= 0
@@ -1508,6 +1512,27 @@ def _validate_topology(output: Path, receipt: dict[str, object]) -> dict[str, ob
         and not _not_later(spans["raw"][1], spans["normalized_exact"][0])
     ):
         _refuse("normalized exact tasks precede raw task completion")
+    # Each duration occupies one sequential worker phase. A task span can slide
+    # within its phase, but no phase may start before its predecessor completes.
+    earliest_start = 0.0
+    for phase, key in (
+        (None, "preflight_seconds"),
+        ("raw", "raw_seconds"),
+        (None, "normalization_publication_seconds"),
+        ("normalized_exact", "exact_seconds"),
+        (None, "interval_seconds"),
+        (None, "dilation_seconds"),
+        (None, "full_readback_seconds"),
+    ):
+        duration = _number(clocks[key], f"{key} duration")
+        if phase is not None and phase in spans:
+            observed_start, observed_finish = spans[phase]
+            earliest_start = max(earliest_start, observed_finish - duration)
+            if not _not_later(earliest_start, observed_start):
+                _refuse(f"{phase} tasks cannot fit their sequential worker phase")
+        earliest_start += duration
+    if not _not_later(earliest_start, worker_elapsed):
+        _refuse("worker phases and task observations exceed worker lifetime")
     supervision = cast(dict[str, object], receipt["supervision"])
     if (
         supervision["coordinator_pid"] != coordinator["pid"]
@@ -1854,6 +1879,16 @@ def _validate_receipt_schema(receipt: dict[str, object], run_order: int) -> None
         )
     ):
         _refuse("worker exit or parent readback contradicts external lifetime")
+    if (
+        not _not_later(
+            clock_values["source_loading_seconds"], clock_values["preflight_seconds"]
+        )
+        or not _not_later(clock_values["launch_seconds"], worker_exit)
+        or not _not_later(
+            clock_values["supervisor_cleanup_seconds"], external_lifetime - worker_exit
+        )
+    ):
+        _refuse("nested preflight or supervisor durations contradict invocation lifetime")
     disjoint_worker_phases = (
         "preflight_seconds",
         "raw_seconds",
