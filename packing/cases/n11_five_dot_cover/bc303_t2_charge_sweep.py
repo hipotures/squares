@@ -387,34 +387,51 @@ def rational_cell_centre(minimum: Minimum) -> Point:
 def rational_parent(chart: Chart, centre: Point) -> Point:
     if chart.axis:
         return Fraction(1), Fraction(0)
+    core = square(centre, chart.selected_ray, H)
     for exponent in range(1, 129):
         denominator = 2**exponent
-        low, high = 0, denominator
-        while low < high:
-            middle = (low + high) // 2
-            candidate = Fraction(middle, denominator)
-            whole = (
-                2 * candidate / (1 - candidate * candidate) if candidate < 1 else Fraction(10)
-            )
-            if whole > chart.lower_tangent:
-                high = middle
-            else:
-                low = middle + 1
-        if low >= denominator:
-            continue
-        original = ray(Fraction(low, denominator))
-        tangent = original[1] / original[0]
-        if not chart.lower_tangent < tangent < chart.upper_tangent:
-            continue
-        # The selected first ray is already in the folded bin-0 source cell.
-        candidate_ray = original
-        if all(
-            0 <= coordinate <= Q
-            for vertex in square(centre, candidate_ray, Fraction(1, 2))
-            for coordinate in vertex
-        ):
-            return candidate_ray
+        bounds = []
+        for boundary in (chart.lower_tangent, chart.upper_tangent):
+            low, high = 0, denominator
+            while low < high:
+                middle = (low + high) // 2
+                candidate = Fraction(middle, denominator)
+                whole = (
+                    2 * candidate / (1 - candidate * candidate)
+                    if candidate < 1
+                    else Fraction(10)
+                )
+                if whole > boundary:
+                    high = middle
+                else:
+                    low = middle + 1
+            bounds.append(low)
+        for numerator in (bounds[0], bounds[1] - 1):
+            if not 0 <= numerator < denominator:
+                continue
+            original = ray(Fraction(numerator, denominator))
+            tangent = original[1] / original[0]
+            if not chart.lower_tangent < tangent < chart.upper_tangent:
+                continue
+            candidate_ray = (original[1], original[0]) if chart.reflected else original
+            parent = square(centre, candidate_ray, Fraction(1, 2))
+            if all(0 <= coordinate <= Q for vertex in parent for coordinate in vertex) and all(
+                min(edges(parent, vertex)) > 0 for vertex in core
+            ):
+                return candidate_ray
     raise ValueError("failed to construct a rational physical parent in the source cell")
+
+
+def source_cell_admits(chart: Chart, physical_ray: Point) -> bool:
+    """Undo source reflection and the square's quarter-turn symmetry."""
+    for oriented in axis_set(physical_ray):
+        folded = (oriented[1], oriented[0]) if chart.reflected else oriented
+        if folded[0] <= 0 or folded[1] < 0:
+            continue
+        tangent = folded[1] / folded[0]
+        if chart.lower_tangent <= tangent <= chart.upper_tangent:
+            return True
+    return False
 
 
 def replay(minimum: Minimum, atoms: tuple[AtomMass, ...], role: str) -> dict[str, Any]:
@@ -428,7 +445,7 @@ def replay(minimum: Minimum, atoms: tuple[AtomMass, ...], role: str) -> dict[str
             (minimum.cell.y_low + minimum.cell.y_high) / 2,
         )
     )
-    parent_ray = rational_parent(chart, centre) if role == "C" else chart.selected_ray
+    parent_ray = rational_parent(chart, centre)
     if charge_at(atoms, centre, chart.selected_ray) != minimum.integer_mass:
         raise ValueError("closed atom replay disagrees with the open-cell minimum")
     complete_labels = labels(centre, chart.selected_ray)
@@ -439,12 +456,13 @@ def replay(minimum: Minimum, atoms: tuple[AtomMass, ...], role: str) -> dict[str
     if owned != ([True, True] if role == "C" else [True, False]):
         raise ValueError("witness has wrong mark ownership role")
     parent = square(centre, parent_ray, Fraction(1, 2))
+    if dot(parent_ray, parent_ray) != 1:
+        raise ValueError("physical parent ray is not unit length")
     if any(coordinate < 0 or coordinate > Q for vertex in parent for coordinate in vertex):
         raise ValueError("physical parent leaves the container")
     if any(min(edges(parent, vertex)) <= 0 for vertex in core):
         raise ValueError("core is not strictly contained in its physical parent")
-    original_tangent = Fraction(0) if chart.axis else parent_ray[1] / parent_ray[0]
-    if not chart.lower_tangent <= original_tangent <= chart.upper_tangent:
+    if not source_cell_admits(chart, parent_ray):
         raise ValueError("physical parent is outside its declared source cell")
     return {
         "role": role,
