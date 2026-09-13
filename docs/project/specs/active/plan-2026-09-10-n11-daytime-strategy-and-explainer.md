@@ -316,9 +316,29 @@ measurements. The calibration implementation is independently accepted through e
 implementation head `fcb538c29b846fb5e7c33bd962772ada9c21aedd`, including CAL-1 through
 CAL-7 and the signal-safe terminal staging boundary.
 Because the fixture is deliberately easy, its timing does not bound BC329’s computation.
-Operational admission still requires the integrated observed-worker contract, maintained
-three-profile coordinator, source-distinct receipt reader, reviewed run sheet, three
-fresh profiles, and independent readback.
+The observed-worker contract, maintained three-profile coordinator, and source-distinct
+receipt reader are integrated locally.
+Exact-head reviews identified source, running-reader identity, typed-field, dilation,
+witness-agreement, cross-route chronology, phase-lifetime, and receipt-byte binding
+boundaries.
+The source-distinct reader’s repair at `7e4d2487` passed independent rereview
+for F1–F5; F6 still admits impossible nested clocks, task positions, and a parent cycle,
+and execution identity accepts a Git tree object.
+The coordinator’s later three findings remain unrepaired.
+The first maintained run-set verifier at `878e18d0` implements the R2 proof join, R3
+inventory and archive comparison, and R4 source-closure check, but its
+[exact-head review](../../reviews/review-2026-09-13-n11-bc329-runset-verifier.md)
+refused admission on six reproducible binding and refusal-path gaps.
+The reader’s
+[initial review](../../reviews/review-2026-09-13-n11-bc329-source-distinct-reader.md)
+records the refusal at `212e0dfc`; its
+[rereview](../../reviews/review-2026-09-13-n11-bc329-reader-rereview.md) records the
+remaining gaps at `7e4d2487`. The coordinator’s
+[rereview](../../reviews/review-2026-09-13-n11-bc329-coordinator-rereview.md) records
+the next refusal at `fc3e314d` and the three prior repairs it accepted.
+Operational admission still requires those repairs and independent rereview, the
+reviewed [run sheet](plan-2026-09-13-n11-bc329-three-profile-run-sheet.md), three fresh
+profiles, and independent readback.
 None of those profiles has run.
 The implemented runner and calibration repairs do not admit BC329 execution.
 

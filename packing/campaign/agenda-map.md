@@ -122,7 +122,7 @@ A commitment blocked by other commitments names them; one blocked by something e
 | agenda-028 | `BC-270` | 0 | — | no | A natural finite same-domain geometric baseline and exact LP survival witness are missing; the accepted central… |
 | agenda-028 | `BC-271` | 1 | `BC-270`, `BC-261` | no | — |
 | agenda-031 | `BC-306` | 1 | — | no | Fresh forward launch allocation after the owner-prioritized BC-309 pilot; exp-134 was never invoked and its original… |
-| agenda-035 | `BC-329` | 1 | `BC-325` | yes | The separate full-shape calibration instrument and controls are not admitted. The runner now bounds parent preflight… |
+| agenda-035 | `BC-329` | 1 | `BC-325` | yes | The target-free calibration producer is accepted, and the observed-topology, three-profile coordinator, and… |
 | agenda-035 | `BC-337` | 2 | `BC-326` | yes | No admitted source-bound constructor derives K_TR from all 181 frames and eight signed SAT axes per frame, and no… |
 | agenda-035 | `BC-327` | 2 | `BC-325` | yes | Multiplicity semantics are not admitted across the producer, loader, capacity reader and both coverage routes; the… |
 | agenda-035 | `BC-330` | 2 | — | no | The restricted-domain threshold gate and complete matched point baseline are not admitted. |

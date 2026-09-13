@@ -219,6 +219,14 @@ case or experiment separately.
 | [A6 Fixed-Support Dual Admission](packing/cases/n11_fractional_certificate/a6_dual_upper/README.md) | research synthesis | record | retained | — |
 | [A6 Scope and Overnight Plan Review](docs/project/reviews/review-2026-09-10-n11-a6-scope-and-plan.md) | dated review record | record | retained | — |
 | [N11: Daytime Strategy Blocks and Parallel Explainer Update](docs/project/specs/active/plan-2026-09-10-n11-daytime-strategy-and-explainer.md) | implementation plan | current | transient | — |
+| [BC329 Target-Free Three-Profile Run Sheet](docs/project/specs/active/plan-2026-09-13-n11-bc329-three-profile-run-sheet.md) | implementation plan | current | transient | — |
+| [BC329 Run-Set Verifier Contract](docs/project/specs/active/plan-2026-09-13-n11-bc329-runset-verifier.md) | implementation plan | current | transient | — |
+| [BC329 Calibration Reader: Source-Distinct Review](docs/project/reviews/review-2026-09-13-n11-bc329-source-distinct-reader.md) | dated review record | record | retained | — |
+| [BC329 Reader Repair: Exact-Commit Rereview](docs/project/reviews/review-2026-09-13-n11-bc329-reader-rereview.md) | dated review record | record | retained | — |
+| [BC329 Topology Coordinator Exact-Head Review](docs/project/reviews/review-2026-09-13-n11-bc329-topology-coordinator-initial.md) | dated review record | record | retained | — |
+| [BC329 Coordinator Exact-Head Review](docs/project/reviews/review-2026-09-13-n11-bc329-coordinator-rereview.md) | dated review record | record | retained | — |
+| [Independent Operational Review: BC329 Three-Profile Run Sheet](docs/project/reviews/review-2026-09-13-n11-bc329-three-profile-run-sheet.md) | dated review record | record | retained | — |
+| [Exact-Head Review: BC329 Run-Set Verifier](docs/project/reviews/review-2026-09-13-n11-bc329-runset-verifier.md) | dated review record | record | retained | — |
 | [N11: Three Overnight Research Blocks After PR139](docs/project/specs/active/plan-2026-09-10-n11-overnight-three-blocks.md) | implementation plan | record | superseded | [N11: Daytime Strategy Blocks and Parallel Explainer Update](docs/project/specs/active/plan-2026-09-10-n11-daytime-strategy-and-explainer.md) |
 | [Independent Review of the Unit-Parent Centre Bound](docs/project/reviews/review-2026-09-10-n11-parent-centre-independent-review.md) | dated review record | record | retained | — |
 | [Independent Review of the Adopted Parent Adapter](docs/project/reviews/review-2026-09-10-n11-parent-adapter-admission.md) | dated review record | record | retained | — |

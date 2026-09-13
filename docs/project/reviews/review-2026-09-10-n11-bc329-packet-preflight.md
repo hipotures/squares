@@ -304,8 +304,10 @@ Running it with `--nets 2880` does not execute this one fixed packet.
 Before the fixed-packet runner is admitted for BC329, the operational calibration chain
 must retain observed worker topology, run three fresh host profiles through the
 maintained coordinator, admit them through the source-distinct reader, and pass the
-reviewed run sheet. Parent preflight has a bounded clock, and partial interval and
-dilation receipts name their exact published direction sets.
+reviewed
+[three-profile run sheet](../specs/active/plan-2026-09-13-n11-bc329-three-profile-run-sheet.md).
+Parent preflight has a bounded clock, and partial interval and dilation receipts name
+their exact published direction sets.
 None of those tasks asks the BC329 coverage question.
 
 The raw sweep should precede the normalized retention gate.

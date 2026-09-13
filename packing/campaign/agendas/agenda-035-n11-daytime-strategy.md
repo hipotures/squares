@@ -254,14 +254,21 @@ agenda:
       unresolved timeout or incomplete gate.
     bead: think-17qa
     depends_on: [BC-325]
-    blocked_on: The separate full-shape calibration instrument and controls are not admitted. The runner
-      now bounds parent preflight and publishes exact partial direction sets, but neither three fresh
-      14,404-record host controls nor their source-distinct readback has run. Child bead think-qw9w owns
-      this admission boundary before target registration and execution.
-    next_evidence: Publish the reviewed runner checkpoint, admit the separate full-shape calibration
-      instrument, then run and independently read three controls under fixed-core-packet-calibration/v1.
-      Only after those gates pass, prospectively register one packet retaining T025's sites and relative
-      weights with a 2880-step net, B=9981/10000,
+    blocked_on: The target-free calibration producer is accepted, and the observed-topology, three-profile
+      coordinator, and source-distinct reader implementations are integrated locally. Commit fc3e314d
+      repairs the first worker-shape, task-lifetime, and filesystem findings, but a second coordinator
+      review refused cross-route chronology, phase lifetime, and receipt-byte binding. The initial reader
+      review refused manifest closure, running-file identity, typed fields, dilation fields, witness
+      agreement, and lifecycle topology. The 7e4d2487 rereview accepts F1-F5 but refuses nested clocks,
+      sequential task positions, and parent-cycle topology; a Git tree object also passes execution identity.
+      Reader and coordinator repair/rereview, the final run-sheet review, three fresh
+      14,404-record host profiles, and independent admission remain open. No profile or BC329 target has
+      run. The verifier at 878e18d0 is also refused on six binding and refusal-path gaps. Child bead
+      think-qw9w owns this boundary.
+    next_evidence: Repair and rereview the integrated coordinator, source-distinct reader, and run-set
+      verifier; admit the three-profile run sheet; publish the reviewed PR head; then run and independently read three controls
+      under fixed-core-packet-calibration/v1. Only after those gates pass, prospectively register one packet
+      retaining T025's sites and relative weights with a 2880-step net, B=9981/10000,
       D=207107/1440000000, raw acceptance threshold M/11=685457679/687500000, and normalization alpha=1/m.
       Require complete exact and interval agreement plus dilation replay on the same normalized bytes.
     workflows: [research-loop]
@@ -269,6 +276,14 @@ agenda:
     artifacts:
     - packing/cases/n11_threshold_certificate/t-026-dilation-limit-proof.md
     - docs/project/reviews/review-2026-09-10-n11-bc329-packet-preflight.md
+    - docs/project/reviews/review-2026-09-12-n11-bc329-calibration-design.md
+    - docs/project/reviews/review-2026-09-13-n11-bc329-source-distinct-reader.md
+    - docs/project/reviews/review-2026-09-13-n11-bc329-reader-rereview.md
+    - docs/project/reviews/review-2026-09-13-n11-bc329-topology-coordinator-initial.md
+    - docs/project/reviews/review-2026-09-13-n11-bc329-coordinator-rereview.md
+    - docs/project/reviews/review-2026-09-13-n11-bc329-three-profile-run-sheet.md
+    - docs/project/reviews/review-2026-09-13-n11-bc329-runset-verifier.md
+    - docs/project/specs/active/plan-2026-09-13-n11-bc329-three-profile-run-sheet.md
   - id: BC-330
     purpose: research
     owner_focus: insight
