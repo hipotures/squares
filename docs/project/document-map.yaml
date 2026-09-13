@@ -23,6 +23,7 @@ documents:
   - {path: docs/project/reviews/review-2026-09-10-n11-parent-realizability-independent.md, role: review, authority: record, lifecycle: retained}
   - {path: docs/project/reviews/review-2026-09-10-n11-parent-runner-independent.md, role: review, authority: record, lifecycle: retained}
   - {path: docs/project/reviews/review-2026-09-10-n11-bc329-packet-preflight.md, role: review, authority: record, lifecycle: retained}
+  - {path: docs/project/reviews/review-2026-09-12-n11-bc329-calibration-design.md, role: review, authority: record, lifecycle: retained}
   - {path: docs/project/reviews/review-2026-09-12-n11-post-bc329-strategy-audit.md, role: review, authority: record, lifecycle: retained}
   - {path: docs/project/reviews/review-2026-09-12-n11-selection-routing-first-principles.md, role: review, authority: record, lifecycle: retained}
   - {path: docs/project/reviews/review-2026-09-10-n11-strategy-frontier.md, role: review, authority: record, lifecycle: retained}

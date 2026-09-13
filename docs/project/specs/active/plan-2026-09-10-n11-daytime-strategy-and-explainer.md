@@ -296,16 +296,31 @@ boundary and termination grace.
 Atomic replacement prevents a reader from seeing half-written JSON after an ordinary
 worker failure or termination; the runner makes no host-crash or power-loss durability
 claim.
+
+The integrated repair addresses `think-rvhu`, `think-fmju`, `think-42zc`, `think-5fdx`,
+`think-g7vg`, and `think-pvmv`. The latest additions keep `uv.lock` read failures
+operational, reject normal, linked, and separate Git administrative directories, and
+retain ordinary `Popen` failure type and message in a `launch-failed` receipt with
+return status 1. Source-distinct review accepted the combined repair at
+`421c344545873647dd26f856320d93dbfd59413a`; BC329 remains blocked on the separate
+calibration and scientific admission chain.
 Admission uses a separate `fixed-core-packet-calibration/v1` receipt and a frozen,
 analytically solved fixture unrelated to BC329. The full-shape control runs all four
 generic routes and 14,404 direction records, but its schema cannot express a scientific
 acceptance. Three fresh host runs measure operational overhead, effective workers by
 route, clocks, sampled process-group RSS, artifact bytes, and deadline headroom.
+The
+[calibration design review](../../reviews/review-2026-09-12-n11-bc329-calibration-design.md)
+fixes the fixture, exact answers, refusal controls, and limits on interpreting those
+measurements. The calibration implementation is independently accepted through exact
+implementation head `fcb538c29b846fb5e7c33bd962772ada9c21aedd`, including CAL-1 through
+CAL-7 and the signal-safe terminal staging boundary.
 Because the fixture is deliberately easy, its timing does not bound BC329’s computation.
-A source-distinct reader must accept those controls before registration.
-The separate calibration instrument and its controls remain unadmitted; none of the
-three full-shape host runs or their independent readbacks has occurred.
-The implemented runner repairs do not admit BC329 execution.
+Operational admission still requires the integrated observed-worker contract, maintained
+three-profile coordinator, source-distinct receipt reader, reviewed run sheet, three
+fresh profiles, and independent readback.
+None of those profiles has run.
+The implemented runner and calibration repairs do not admit BC329 execution.
 
 Then register one hypothesis and one experiment, freeze the packet and normalization
 rule, measure `m_c`, and run the normalized object through the complete exact route, the
