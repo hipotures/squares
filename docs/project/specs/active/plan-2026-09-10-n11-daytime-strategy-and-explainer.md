@@ -322,9 +322,10 @@ Exact-head reviews identified source, running-reader identity, typed-field, dila
 witness-agreement, cross-route chronology, phase-lifetime, and receipt-byte binding
 boundaries.
 The source-distinct reader’s repair at `7e4d2487` passed independent rereview
-for F1–F5; F6 still admits impossible nested clocks, task positions, and a parent cycle,
-and execution identity accepts a Git tree object.
-The coordinator’s later three findings remain unrepaired.
+for F1–F5; that review found impossible nested clocks, task positions, a parent cycle,
+and a Git tree object accepted as execution identity.
+The candidate F6/F7 repair is integrated at `95830f9e` and awaits independent exact-head
+review. The coordinator’s later three findings remain unrepaired.
 The first maintained run-set verifier at `878e18d0` implements the R2 proof join, R3
 inventory and archive comparison, and R4 source-closure check, but its
 [exact-head review](../../reviews/review-2026-09-13-n11-bc329-runset-verifier.md)
@@ -336,9 +337,10 @@ records the refusal at `212e0dfc`; its
 remaining gaps at `7e4d2487`. The coordinator’s
 [rereview](../../reviews/review-2026-09-13-n11-bc329-coordinator-rereview.md) records
 the next refusal at `fc3e314d` and the three prior repairs it accepted.
-Operational admission still requires those repairs and independent rereview, the
-reviewed [run sheet](plan-2026-09-13-n11-bc329-three-profile-run-sheet.md), three fresh
-profiles, and independent readback.
+Operational admission still requires the coordinator and verifier repairs, independent
+reader and integrated rereview, the reviewed
+[run sheet](plan-2026-09-13-n11-bc329-three-profile-run-sheet.md), three fresh profiles,
+and independent readback.
 None of those profiles has run.
 The implemented runner and calibration repairs do not admit BC329 execution.
 

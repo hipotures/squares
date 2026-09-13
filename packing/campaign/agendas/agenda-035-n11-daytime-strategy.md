@@ -261,7 +261,8 @@ agenda:
       review refused manifest closure, running-file identity, typed fields, dilation fields, witness
       agreement, and lifecycle topology. The 7e4d2487 rereview accepts F1-F5 but refuses nested clocks,
       sequential task positions, and parent-cycle topology; a Git tree object also passes execution identity.
-      Reader and coordinator repair/rereview, the final run-sheet review, three fresh
+      Candidate reader F6/F7 repair 95830f9e is integrated but awaits independent rereview.
+      Coordinator repair/rereview, reader rereview, the final run-sheet review, three fresh
       14,404-record host profiles, and independent admission remain open. No profile or BC329 target has
       run. The verifier at 878e18d0 is also refused on six binding and refusal-path gaps. Child bead
       think-qw9w owns this boundary.
