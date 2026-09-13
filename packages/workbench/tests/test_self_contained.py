@@ -2,8 +2,8 @@
 
 import pytest
 
-from workbench_tools.self_contained import assert_self_contained_html
 from workbench_tools.build_site import dirty_metadata
+from workbench_tools.self_contained import assert_self_contained_html
 
 
 def test_dirty_metadata_is_explicit() -> None:
@@ -37,8 +37,8 @@ def test_external_resource_is_refused(fragment: str) -> None:
         '<script>URL.createObjectURL(new Blob(["ok"]));</script>',
         '<link rel="canonical" href="https://example.test/workbench/">',
         '<a href="https://example.test/explainer/">explainer</a>',
-        '<style>.font { src: url(data:font/woff2;base64,AAAA); }</style>',
-        '<style>.mark { fill: url(#gradient); }</style>',
+        "<style>.font { src: url(data:font/woff2;base64,AAAA); }</style>",
+        "<style>.mark { fill: url(#gradient); }</style>",
         '<img src="data:image/svg+xml;base64,AAAA">',
     ],
 )

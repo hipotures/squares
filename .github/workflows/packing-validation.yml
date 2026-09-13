@@ -97,7 +97,9 @@ jobs:
 
       - name: Install Chromium for the complete post-merge gate
         if: "github.event_name != 'pull_request'"
-        run: uv run --frozen --group dev python -m playwright install --with-deps --only-shell chromium
+        run: >-
+          uv run --frozen --all-extras --group dev
+          python -m playwright install --with-deps --only-shell chromium
 
       # Only this job builds the engine, and `_build_engine` runs it *before* the
       # executor rather than inside it, so a cold `cargo build --locked --release` is a
@@ -428,7 +430,9 @@ jobs:
           key: playwright-${{ runner.os }}-chromium-${{ hashFiles('packing/uv.lock') }}
 
       - name: Install the pinned Chromium shell
-        run: uv run --frozen --group dev python -m playwright install --with-deps --only-shell chromium
+        run: >-
+          uv run --frozen --all-extras --group dev
+          python -m playwright install --with-deps --only-shell chromium
 
       - name: Run the frontend source and built-page contracts
         run: >-

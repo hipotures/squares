@@ -121,6 +121,10 @@ def test_the_rule_families_are_enabled_and_print_is_a_checked_boundary() -> None
         # wholesale when the lint floor was raised over them. `**` rather than `*` because
         # they sit two directories below `packing/`.
         "atlas/known-best/video/spikes/**",
+        # The workbench's command modules, moved out of that spike into their own package:
+        # the same tools, whose progress and receipts are what they print. Written from
+        # `packing/` because ruff resolves per-file patterns against this config's root.
+        "../packages/workbench/tools/**/*.py",
     }
     ceiling = _mapping(lint["mccabe"])["max-complexity"]
     assert isinstance(ceiling, int)

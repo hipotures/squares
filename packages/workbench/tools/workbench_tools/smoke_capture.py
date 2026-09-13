@@ -102,6 +102,7 @@ INK_X0, INK_X1 = 1100, 1900  # the panel's columns; the packing ends at x = 1060
 INK_THRESHOLD = 160  # a pixel darker than this (mean of R, G, B) is ink
 INK_PAIRS = [(103, 0.5), (28, 0.5), (17, 0.5), (100, 0.5), (147, 2.8)]
 
+
 def _control(
     page: Any,
     *,

@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 
 import pytest
+
 from workbench_tools.historical_summary_audit import audit
 
 

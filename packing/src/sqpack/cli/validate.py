@@ -1503,8 +1503,9 @@ def _browser_floor(context: Context) -> str:
             (str(biome), "ci", "--error-on-warnings", "."),
             (
                 str(eslint),
-                "packages/workbench/src/application.js",
-                "packages/workbench/probes",
+                # The whole package: its config types every workbench JavaScript file, so
+                # naming files here would leave a new one outside the promise floor.
+                "packages/workbench",
                 "packing/src/sqpack/motion_lab/assets",
                 "packing/atlas/known-best/video/spikes/v1-slideshow",
                 "--config",

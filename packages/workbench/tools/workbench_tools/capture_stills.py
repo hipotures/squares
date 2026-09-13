@@ -57,6 +57,7 @@ def control(
         request.update({"prepare": True, "capture": capture})
     return page.evaluate(probe("capture/control"), request)
 
+
 # name -> (n, seconds, commands applied after the pair is selected)
 SHOTS = {
     "feat-desat-100-mid": (100, 1.7, [["setStyle", "bodies"]]),

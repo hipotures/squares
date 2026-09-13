@@ -254,9 +254,7 @@ def main() -> int:
     o = ap.parse_args()
 
     if not o.page.exists():
-        raise SystemExit(
-            f"{o.page} is not built: run `squares-workbench-build` first"
-        )
+        raise SystemExit(f"{o.page} is not built: run `squares-workbench-build` first")
     ffmpeg = _encoder()
     scale = HEIGHTS[o.height]
     started_all = time.monotonic()
@@ -281,8 +279,7 @@ def main() -> int:
                 _control(page, prepare=True, commands=[["setMode", "animate"]])
                 steps = _steps(page, o.first, o.last)
                 print(
-                    f"{len(steps)} steps, n = {o.first} to {o.last}, "
-                    f"{o.fps} fps at {o.height}p"
+                    f"{len(steps)} steps, n = {o.first} to {o.last}, {o.fps} fps at {o.height}p"
                 )
                 receipt = _capture(page, steps, o.fps, frames_dir)
                 animation = None
@@ -317,9 +314,7 @@ def main() -> int:
         **(
             {
                 "animation": str(o.animation),
-                "animation_sha256": hashlib.sha256(
-                    o.animation.read_bytes()
-                ).hexdigest(),
+                "animation_sha256": hashlib.sha256(o.animation.read_bytes()).hexdigest(),
                 "animation_contract": animation["contract"],
             }
             if o.animation is not None and animation is not None

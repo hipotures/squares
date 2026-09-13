@@ -2303,9 +2303,10 @@ def test_the_pull_request_jobs_partition_the_surface() -> None:
     a step in no selection, run by nobody, reported by nothing -- so the five commands are
     read from the workflow and checked to be a partition rather than trusted to be.
 
-    `--checks`, `--frontend`, `--geometry`, `--suite` and `--sweeps` are a partition in `_select_steps`
-    by construction, so this is really a check on the YAML: that the workflow invokes all
-    four, on a pull request, and narrows none of them with `--only` or `--skip`.
+    `--checks`, `--frontend`, `--geometry`, `--suite` and `--sweeps` are a partition in
+    `_select_steps` by construction, so this is really a check on the YAML: that the
+    workflow invokes all five, on a pull request, and narrows none of them with `--only`
+    or `--skip`.
 
     Pairwise disjointness is asserted rather than inferred from the union. Two jobs make
     those the same statement; more than two do not, and the case they differ on -- one

@@ -18,10 +18,6 @@ from urllib.parse import urljoin
 import pytest
 import tinycss2
 
-from workbench_tools.build_site import NOTE as WORKBENCH_NOTE
-from workbench_tools.build_site import RENDER_INPUTS as WORKBENCH_INPUTS
-from workbench_tools.build_site import build_metadata as workbench_build_metadata
-
 from devtools import render_explainer
 from devtools.render_explainer import (
     ATLAS,
@@ -53,6 +49,9 @@ from devtools.render_explainer import load_certificate as load
 from devtools.render_explainer_pdf import OUTPUT as PDF_OUTPUT
 from sqpack.release import PUBLICATION_STATUS, PUBLICATION_VERSION
 from sqpack.yamlio import safe_load
+from workbench_tools.build_site import NOTE as WORKBENCH_NOTE
+from workbench_tools.build_site import RENDER_INPUTS as WORKBENCH_INPUTS
+from workbench_tools.build_site import build_metadata as workbench_build_metadata
 
 
 @pytest.fixture(scope="module")

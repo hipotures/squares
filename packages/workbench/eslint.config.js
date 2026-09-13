@@ -11,7 +11,27 @@ const plugins = { "@typescript-eslint": tseslint.plugin };
 
 export default [
   {
-    ignores: ["node_modules/**", "vendor/**"],
+    ignores: ["node_modules/**", "vendor/**", "packages/workbench/dist/**"],
+  },
+  {
+    // Every workbench JavaScript file outside the two legacy programs below, so no package
+    // JavaScript escapes the promise floor. A file a package tsconfig includes is typed by
+    // that program; one no program includes yet is typed at the shared strict floor rather
+    // than skipped. typescript-eslint refuses `**` in `allowDefaultProject`, so the globs
+    // name depths: a file deeper than they reach fails to parse, which fails the lint.
+    files: ["packages/workbench/**/*.js"],
+    ignores: ["packages/workbench/src/application.js", "packages/workbench/probes/**"],
+    languageOptions: {
+      parser,
+      parserOptions: {
+        projectService: {
+          allowDefaultProject: ["packages/workbench/*/*.js", "packages/workbench/*/*/*.js"],
+          defaultProject: "tsconfig.base.json",
+        },
+      },
+    },
+    plugins,
+    rules: promiseRules,
   },
   {
     files: ["packages/workbench/src/application.js"],
