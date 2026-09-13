@@ -194,6 +194,15 @@ export interface PackAdvanceOptions {
   shouldCancel?: () => boolean;
 }
 
+export interface PackRunUpdate {
+  pairLaw: AtlasLaw;
+  wallLaw: AtlasLaw;
+  relatedMask: Uint8Array | null;
+  physics: Pick<PackPhysicsConfiguration, "jiggle" | "jiggleTorque">;
+  anneal: Pick<PackAnnealConfiguration, "amplitude" | "decayPower">;
+  growth: PackGrowthConfiguration;
+}
+
 function finite(value: number, label: string): void {
   if (!Number.isFinite(value)) {
     throw new RangeError(`${label} must be finite`);
@@ -378,7 +387,8 @@ export function createRandomPackStart(
   };
 }
 
-function measureRun(run: PackRun): PackingAssessment {
+/** Recheck the run's exact current buffers and refresh its derived fields. */
+export function measurePackRun(run: PackRun): PackingAssessment {
   const snapshot = packingSnapshot(run.X, run.Y, run.TH, run.size, {
     originX: run.configuration.start.container.originX,
     originY: run.configuration.start.container.originY,
@@ -477,8 +487,38 @@ export function createPackRun(input: PackConfiguration): PackRun {
     forcingScale: 1,
     work: { baseSteps: 0, steps: 0, pairCandidates: 0, pairForces: 0, wallForces: 0 },
   };
-  measureRun(run);
+  measurePackRun(run);
   return run;
+}
+
+/** Apply live control values after validating the complete effective configuration. */
+export function updatePackRun(run: PackRun, update: PackRunUpdate): void {
+  const candidate = cloneConfiguration(run.configuration);
+  candidate.pairLaw = { ...update.pairLaw };
+  candidate.wallLaw = { ...update.wallLaw };
+  candidate.relatedMask = update.relatedMask?.slice() ?? null;
+  candidate.physics.jiggle = update.physics.jiggle;
+  candidate.physics.jiggleTorque = update.physics.jiggleTorque;
+  candidate.anneal.amplitude = update.anneal.amplitude;
+  candidate.anneal.decayPower = update.anneal.decayPower;
+  candidate.growth = { ...update.growth };
+  validateConfiguration(candidate);
+  run.configuration.pairLaw = candidate.pairLaw;
+  run.configuration.wallLaw = candidate.wallLaw;
+  run.configuration.relatedMask = candidate.relatedMask;
+  run.configuration.physics.jiggle = candidate.physics.jiggle;
+  run.configuration.physics.jiggleTorque = candidate.physics.jiggleTorque;
+  run.configuration.anneal.amplitude = candidate.anneal.amplitude;
+  run.configuration.anneal.decayPower = candidate.anneal.decayPower;
+  run.configuration.growth = candidate.growth;
+}
+
+/** Replace the uniform square side without discarding the current poses or velocities. */
+export function setPackSquareSide(run: PackRun, squareSide: number): PackingAssessment {
+  positive(squareSide, "Pack square side");
+  run.size = squareSide;
+  setUniformSimulationSquareSize(run.simulation, squareSide);
+  return measurePackRun(run);
 }
 
 function addWork(total: PackWork, step: SimulationWork): void {
@@ -501,7 +541,7 @@ function finiteSnapshot(snapshot: GeometrySnapshot): boolean {
 }
 
 function receipt(run: PackRun, reason: PackTerminationReason): PackReceipt {
-  const assessment = measureRun(run);
+  const assessment = measurePackRun(run);
   const snapshot = assessment.snapshot;
   const unitSquares = snapshot.squareSide === 1;
   const geometry = finiteSnapshot(snapshot)
@@ -590,7 +630,8 @@ export function advancePackRun(
     for (let substep = 0; substep < substeps; substep++) {
       const decay =
         anneal.floor + (1 - anneal.floor) * (1 / (1 + run.time / anneal.tau)) ** anneal.decayPower;
-      run.forcingScale = anneal.amplitude * decay;
+      run.forcingScale =
+        physics.jiggle > 0 || physics.jiggleTorque > 0 ? anneal.amplitude * decay : 0;
       const step = advanceSimulation(run.simulation, {
         timestep,
         container: {
@@ -697,6 +738,9 @@ export const packSimulation = Object.freeze({
   createGridPackStart,
   createRandomPackStart,
   createPackRun,
+  updatePackRun,
+  setPackSquareSide,
+  measurePackRun,
   advancePackRun,
   runPack,
 });

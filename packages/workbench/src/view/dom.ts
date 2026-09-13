@@ -18,6 +18,21 @@ export function requireSvg(document: Document, id: string): SVGElement {
 }
 
 export function createDom(document: Document) {
+  function input(id: string): HTMLInputElement {
+    const node = requireHtml(document, id);
+    if (!(node instanceof HTMLInputElement)) {
+      throw new Error(`workbench template needs an input at ${id}`);
+    }
+    return node;
+  }
+
+  function select(id: string): HTMLSelectElement {
+    const node = requireHtml(document, id);
+    if (!(node instanceof HTMLSelectElement)) {
+      throw new Error(`workbench template needs a select at ${id}`);
+    }
+    return node;
+  }
   function el<Tag extends keyof SVGElementTagNameMap>(
     tag: Tag,
     attrs: Readonly<Record<string, string | number>> = {},
@@ -42,5 +57,12 @@ export function createDom(document: Document) {
     }
     return node;
   }
-  return { el, text };
+  return {
+    el,
+    text,
+    input,
+    select,
+    html: (id: string) => requireHtml(document, id),
+    svg: (id: string) => requireSvg(document, id),
+  };
 }

@@ -60,6 +60,10 @@ test("the public API rejects missing, extra, and incompatible members", async ()
       "incompatible",
       `import type { AtlasTransitions } from "${relativeApi}";\ndeclare const api: AtlasTransitions;\nconst checked: AtlasTransitions = { ...api, setSpeed: (value: string) => value };\nvoid checked;\n`,
     ],
+    [
+      "extra-helper",
+      `import { defineWorkbenchApi, type AtlasTransitions } from "${relativeApi}";\ndeclare const api: AtlasTransitions;\ndefineWorkbenchApi({ ...api, unexpected: () => false });\n`,
+    ],
   ]);
 
   try {
@@ -72,6 +76,7 @@ test("the public API rejects missing, extra, and incompatible members", async ()
     assert.match(diagnostics.get("valid") ?? "", /^0\n$/);
     assert.match(diagnostics.get("missing") ?? "", /^[^0]\n[\s\S]*Property 'state' is missing/);
     assert.match(diagnostics.get("extra") ?? "", /^[^0]\n[\s\S]*unexpected/);
+    assert.match(diagnostics.get("extra-helper") ?? "", /^[^0]\n[\s\S]*never/);
     assert.match(
       diagnostics.get("incompatible") ?? "",
       /^[^0]\n[\s\S]*\(value: string\) => string[\s\S]*\(multiplier: number\) => number/,

@@ -672,14 +672,16 @@ export interface WorkbenchApiHost {
  * Preserve the exact inferred implementation type while checking it against the public contract.
  * Object literals passed here fail type checking on missing, extra, or incompatible members.
  */
-export function defineWorkbenchApi<const Api extends AtlasTransitions>(api: Api): Api {
+export function defineWorkbenchApi<const Api extends AtlasTransitions>(
+  api: Api & Record<Exclude<keyof Api, keyof AtlasTransitions>, never>,
+): Api {
   return api;
 }
 
 /** Install one contract-checked API object on the browser compatibility global. */
 export function installWorkbenchApi<const Api extends AtlasTransitions>(
   host: WorkbenchApiHost,
-  api: Api,
+  api: Api & Record<Exclude<keyof Api, keyof AtlasTransitions>, never>,
 ): Api {
   host.atlasTransitions = api;
   return api;

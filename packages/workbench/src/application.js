@@ -17,18 +17,17 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     return;
   }
   const {
-    parseUint32Seed,
-    mixUint32Seed,
-    seededRandom,
-    packingSnapshot,
-    assessPackingSnapshot,
-    admitBestPacking,
-  } = SQUARES_WORKBENCH_CORE;
+    el,
+    html: htmlNode,
+    svg: svgNode,
+    input: inputNode,
+    select: selectNode,
+  } = workbenchBundle.dom.createDom(document);
+  const { parseUint32Seed, mixUint32Seed, packingSnapshot } = SQUARES_WORKBENCH_CORE;
   const {
     forceAtGap: forceOf,
     forceLawAttracts: attractsOf,
     forceLawSteep: steepOf,
-    forceLawSubsteps,
   } = workbenchBundle.simulation;
   const {
     availableStyles,
@@ -56,6 +55,16 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   const { createColourSystem } = workbenchBundle.colour;
   const { buildTrajectory, sampleTrajectoryPose, sampleTrajectorySide } =
     workbenchBundle.trajectory;
+  const {
+    advancePackRun,
+    createGridPackStart,
+    createPackRun,
+    createRandomPackStart,
+    measurePackRun,
+    setPackSquareSide,
+    updatePackRun,
+  } = workbenchBundle.pack;
+  const { createAppendPackStart } = workbenchBundle.startProposals;
   const { illustrationFrame } = workbenchBundle.illustration;
   const { renderStage } = workbenchBundle.stageView;
   /** @type {import("./app/animation-panel.js").AnimationPanel | null} */
@@ -73,7 +82,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   /** @typedef {import("./api/workbench-api.js").AtlasTargetFrom} AtlasTargetFrom */
   /** @typedef {import("./api/workbench-api.js").AtlasTargetSource} AtlasTargetSource */
   /** @typedef {import("./api/workbench-api.js").AtlasTransitions} WorkbenchApi */
-  const DATA = decodeCorpus(JSON.parse(document.getElementById("atlas-data").textContent));
+  const DATA = decodeCorpus(JSON.parse(htmlNode("atlas-data").textContent ?? "null"));
   const COLOUR = createColourSystem(DATA.colour);
   const FRAMES = DATA.frames;
   const PAIRS = DATA.pairs;
@@ -158,8 +167,11 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     min: 0,
     max: 10,
     dflt: 3,
+    /** @type {(level: number) => number} */
     amplitude: (L) => (L <= 3 ? L / 3 : 1 + (L - 3) * (2 / 7)),
+    /** @type {(level: number) => number} */
     decayPower: (L) => (L <= 3 ? 1.5 : 1.5 - (L - 3) * (1.15 / 7)),
+    /** @type {(level: number) => number} */
     span: (L) => (L <= 3 ? 1 : 1 + (L - 3) * 0.1),
   };
   // Revision 9: the playback speed. The ends are the owner's — slow enough to watch a settle
@@ -167,9 +179,11 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // slider is logarithmic between them, so half way is the geometric mean rather than 1.02x, and
   // 1x is a value the slider can actually land on because the readout rounds to two places.
   const SPEED = { min: 0.05, max: 2, steps: 1000 };
+  /** @param {number} m */
   const speedToSlider = (m) =>
     Math.round((Math.log(m / SPEED.min) / Math.log(SPEED.max / SPEED.min)) * SPEED.steps);
-  const sliderToSpeed = (v) => SPEED.min * (SPEED.max / SPEED.min) ** (v / SPEED.steps);
+  /** @param {number | string} v */
+  const sliderToSpeed = (v) => SPEED.min * (SPEED.max / SPEED.min) ** (Number(v) / SPEED.steps);
   const DEG = Math.PI / 180;
   const _QUARTER = Math.PI / 2;
   // Scarlet is defined once, in the stylesheet, and read back here for the fill tint.
@@ -248,13 +262,18 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   };
 
   // ---------------------------------------------------------------- maths
+  /** @param {number} v */
   const clamp01 = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
+  /** @type {(a: number, b: number, progress: number) => number} */
   const lerp = (a, b, u) => a + (b - a) * u;
+  /** @param {number} u */
   const easeInOut = (u) => (u < 0.5 ? 4 * u * u * u : 1 - (-2 * u + 2) ** 3 / 2);
+  /** @param {number} u */
   const easeOut = (u) => 1 - (1 - u) ** 3;
   // Shortest signed turn modulo 90, in (-45, 45]; an exact 45 degree tie turns counter-clockwise, so
   // the direction is a rule rather than a rounding accident (the symmetric colour sweep looks the same
   // either way).
+  /** @param {number} a @param {number} b */
   function angleDelta(a, b) {
     let d = (((b - a) % 90) + 90) % 90;
     if (d > 45 + 1e-9) {
@@ -266,12 +285,14 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // it to its own final tilt, the correction taken the way round that keeps the total turn
   // smallest. (A square that rides a 45 degree block but ends upright is an exact tie for the
   // correction; the rule above would send it round by 90 rather than let it stay upright.)
+  /** @param {number} blockTurn @param {number} a @param {number} b */
   function memberTurn(blockTurn, a, b) {
     const d = (((b - a - blockTurn) % 90) + 90) % 90;
     const one = blockTurn + d,
       other = blockTurn + d - 90;
     return Math.abs(one) <= Math.abs(other) + 1e-9 ? one : other;
   }
+  /** @param {number} v @param {number} [d] */
   const fmt = (v, d) => v.toFixed(d);
 
   // Colour and geometry are pure package modules. The retained controller keeps only user state and
@@ -483,21 +504,21 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
         (targetFrom() === "drawn" ? `:${drawnHash(state.pair)}` : "");
 
   // ---------------------------------------------------------------- DOM
-  const svg = document.getElementById("packing-svg");
-  const stage = document.getElementById("stage");
-  const stageDescriptionNode = document.getElementById("stage-accessible-description");
-  const containerRect = document.getElementById("container");
-  const linksGroup = document.getElementById("links");
-  const maskGroup = document.getElementById("mask-links");
-  const drawLine = document.getElementById("draw-line");
-  const squaresGroup = document.getElementById("squares");
-  const ghost = document.getElementById("ghost");
-  const mark = document.getElementById("mark");
+  const svg = svgNode("packing-svg");
+  const stage = htmlNode("stage");
+  const stageDescriptionNode = htmlNode("stage-accessible-description");
+  const containerRect = svgNode("container");
+  const linksGroup = svgNode("links");
+  const maskGroup = svgNode("mask-links");
+  const drawLine = svgNode("draw-line");
+  const squaresGroup = svgNode("squares");
+  const ghost = svgNode("ghost");
+  const mark = svgNode("mark");
   const markRect = mark.firstElementChild;
-  const factsA = document.getElementById("facts-a");
-  const factsB = document.getElementById("facts-b");
-  const kindTag = document.getElementById("kind-tag");
-  const live = document.getElementById("live");
+  const factsA = htmlNode("facts-a");
+  const factsB = htmlNode("facts-b");
+  const kindTag = htmlNode("kind-tag");
+  const live = htmlNode("live");
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const SVG_NS = svg.namespaceURI;
   // One measurement of one numeral gives the figure width; the numerals are tabular, so every
@@ -567,8 +588,6 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     }
   }
 
-  const { el } = workbenchBundle.dom.createDom(document);
-
   // Every square is one DOM element keyed by its global identity: identity k is born as the new
   // square of step k and is carried through every later pair by the identity chain the build
   // composed from the per-pair maps. An element is created once, the first time its identity is
@@ -610,8 +629,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   );
   let numeralA = null;
   let numeralB = null;
-  const numeralSlotA = document.getElementById("numeral-a");
-  const numeralSlotB = document.getElementById("numeral-b");
+  const numeralSlotA = htmlNode("numeral-a");
+  const numeralSlotB = htmlNode("numeral-b");
 
   // The current pair's motion, one entry per square of n: its element, its start and end
   // poses, and, for a block member, the block's transform (a rotation about the source pivot
@@ -1291,7 +1310,6 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       })
       .join("|");
   const wallForce = (d) => forceOf(WALLLAW, d);
-  const wallAttracts = () => attractsOf(WALLLAW);
   // One setter for any law: which one is an argument, not a copy of this function.
   function setLawOf(name, next) {
     const spec = lawSpec(name),
@@ -1398,39 +1416,6 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   const MODES = ["snap", "free", "blind"];
   function simMode() {
     return state.blind ? "blind" : state.snap ? "snap" : "free";
-  }
-
-  // The emptiest place in a container of `side` holding `count` squares: a coarse grid of candidate
-  // centres, inset half a side from the walls so an upright square fits, scored by the distance to
-  // the nearest square's centre. Ties go to the first cell in scan order, so it is deterministic.
-  function emptiestSpot(X, Y, count, side) {
-    const lo = 0.5,
-      hi = side - 0.5;
-    const cells = Math.max(1, Math.round((hi - lo) / BLIND.gridStep));
-    let bx = lo,
-      by = lo,
-      best = -1;
-    for (let a = 0; a <= cells; a++) {
-      const px = lerp(lo, hi, a / cells);
-      for (let b = 0; b <= cells; b++) {
-        const py = lerp(lo, hi, b / cells);
-        let near = Infinity;
-        for (let i = 0; i < count; i++) {
-          const dx = X[i] - px,
-            dy = Y[i] - py;
-          const d = dx * dx + dy * dy;
-          if (d < near) {
-            near = d;
-          }
-        }
-        if (near > best) {
-          best = near;
-          bx = px;
-          by = py;
-        }
-      }
-    }
-    return [bx, by];
   }
 
   // The controller supplies corpus and UI choices; the package trajectory adapter owns every
@@ -1646,15 +1631,15 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   function drawLawPlot() {
     if (lawPlot === null) {
       lawPlot = {
-        svg: document.getElementById("law-plot"),
-        curve: document.getElementById("lp-curve"),
-        cross: document.getElementById("lp-cross"),
-        knee: document.getElementById("lp-knee"),
-        pull: document.getElementById("lp-pull"),
-        vaxis: document.getElementById("lp-vaxis"),
-        top: document.getElementById("lp-top"),
-        left: document.getElementById("lp-left"),
-        right: document.getElementById("lp-right"),
+        svg: svgNode("law-plot"),
+        curve: svgNode("lp-curve"),
+        cross: svgNode("lp-cross"),
+        knee: svgNode("lp-knee"),
+        pull: svgNode("lp-pull"),
+        vaxis: svgNode("lp-vaxis"),
+        top: svgNode("lp-top"),
+        left: svgNode("lp-left"),
+        right: svgNode("lp-right"),
       };
     }
     const g = lawPlot;
@@ -1833,7 +1818,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       GROWTH.on = !!o.on;
     }
     if (opt !== null && opt.grew === 0) {
-      opt.size = GROWTH.size;
+      setPackSquareSide(opt, GROWTH.size);
     }
     if (GROWTH.size !== wasSize) {
       stagePack();
@@ -2283,11 +2268,11 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // box that happens to be small enough. A blind run has no correspondence to the record's
   // labelling, so there the box is the whole test — and it never wins it.
   const GAP_MET = { centre: 0.02, angle: 0.5, side: 0.002 };
-  const gapbar = document.getElementById("gapbar");
-  const gapbarOpen = document.getElementById("gapbar-open");
-  const gapbarLowerRule = document.getElementById("gapbar-lower-rule");
-  const gapbarRecordRule = document.getElementById("gapbar-record-rule");
-  const gapbarTicks = document.getElementById("gapbar-ticks");
+  const gapbar = htmlNode("gapbar");
+  const gapbarOpen = svgNode("gapbar-open");
+  const gapbarLowerRule = svgNode("gapbar-lower-rule");
+  const gapbarRecordRule = svgNode("gapbar-record-rule");
+  const gapbarTicks = svgNode("gapbar-ticks");
   /** @type {HTMLElement} */
   const gapbarAreaEnd = document.querySelector(".gapbar-area");
   /** @type {HTMLElement} */
@@ -2296,13 +2281,13 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // else to three places. `5` rather than `5.00`, because the second says a measurement was
   // taken to two places when in fact the value is four.
   const barNum = (value) => (Number.isInteger(value) ? String(value) : value.toFixed(3));
-  const gapbarHand = document.getElementById("gapbar-hand");
-  const gapbarLowerLabel = document.getElementById("gapbar-lower-label");
+  const gapbarHand = svgNode("gapbar-hand");
+  const gapbarLowerLabel = svgNode("gapbar-lower-label");
   // An SVG text node, not an HTML one, which is why `measureDigit` can ask it for its
   // `getComputedTextLength`. `getElementById` is typed as returning an HTML element whatever it
   // finds, so the step through `Element` is what lets the SVG type be named at all.
   const gapbarRecordLabel = /** @type {SVGTextElement} */ (
-    /** @type {Element} */ (document.getElementById("gapbar-record-label"))
+    /** @type {Element} */ (svgNode("gapbar-record-label"))
   );
   let gapbarInfo = null;
   //: What the summed overlap may be for the arrangement to count as a packing, in unit sides.
@@ -2653,83 +2638,79 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // than in neighbouring streams; at `state.seed === 0` it adds nothing, which is what keeps
   // the default bit-identical to every run recorded before seeds existed.
   const withSeed = (base) => mixUint32Seed(base, state.seed);
-  // The arrangement of N = n + 1 squares an open-ended run starts from, in the renderer's own square
-  // order (square i of n, then the arriving square last), and the box it starts in.
-  //   previous  the retained packing of n with the new square added, which is what the page has
-  //             always shown; with the target springs on, in the record's own box.
-  //   random    N squares at seeded pseudo-random centres and angles in a box a quarter larger than
-  //             the record. Starting overlaps are expected and are what the run has to clear.
-  //   grid      N squares axis-aligned in rows from the bottom-left, the trivial grid, in the grid's
-  //             own box of side ceil(sqrt(N)).
-  function initialArrangement(kind, p, A, B, springs) {
-    const N = p.n + 1;
-    const X = new Float64Array(N),
-      Y = new Float64Array(N),
-      TH = new Float64Array(N);
-    let side;
-    if (kind === "grid") {
-      const cols = Math.ceil(Math.sqrt(N));
-      side = Math.max(cols, Math.ceil(N / cols));
-      for (let i = 0; i < N; i++) {
-        X[i] = (i % cols) + 0.5;
-        Y[i] = Math.floor(i / cols) + 0.5;
-        TH[i] = 0;
-      }
-    } else if (kind === "random") {
-      side = B.side * OPT.randomInflate;
-      const rnd = seededRandom(withSeed(N));
-      // Inset by half a diagonal so a square at any angle starts inside the walls.
-      const lo = Math.SQRT1_2,
-        hi = Math.max(lo, side - Math.SQRT1_2);
-      for (let i = 0; i < N; i++) {
-        X[i] = lerp(lo, hi, rnd());
-        Y[i] = lerp(lo, hi, rnd());
-        TH[i] = rnd() * 90 * DEG;
-      }
-    } else if (kind === "record") {
-      // The retained packing of n, exactly as the atlas holds it, in its own container. Every
-      // square is placed, so there is no arriving square to drop and nothing to make room for.
-      side = B.side;
-      for (let i = 0; i < N; i++) {
-        const b = B.squares[i];
-        X[i] = b[0];
-        Y[i] = b[1];
-        TH[i] = b[2] * DEG;
-      }
-    } else if (springs) {
-      side = B.side;
-      for (let i = 0; i < p.n; i++) {
-        X[i] = A.squares[i][0];
-        Y[i] = A.squares[i][1];
-        TH[i] = A.squares[i][2] * DEG;
-      }
-      const nb = B.squares[p.new];
-      X[p.n] = nb[0];
-      Y[p.n] = nb[1];
-      TH[p.n] = nb[2] * DEG;
-    } else {
-      // The blind start of revision 6, feature 3: the packing of n centred in an inflated box, the
-      // new square dropped upright wherever the coarse grid finds most room.
-      side = B.side * BLIND.inflate;
-      const shift = (side - A.side) / 2;
-      for (let i = 0; i < p.n; i++) {
-        X[i] = A.squares[i][0] + shift;
-        Y[i] = A.squares[i][1] + shift;
-        TH[i] = A.squares[i][2] * DEG;
-      }
-      const spot = emptiestSpot(X, Y, p.n, side);
-      X[p.n] = spot[0];
-      Y[p.n] = spot[1];
-      TH[p.n] = 0;
-    }
-    return { X, Y, TH, side };
+  // Build the open-ended Pack adapter's start and optional record target from the retained
+  // corpus. The simulation itself is package code and does not know about transition pairs.
+  function frameSnapshot(frame, squareSide) {
+    return {
+      squareSide,
+      container: { originX: 0, originY: 0, side: frame.side },
+      poses: frame.squares.map((square) => ({
+        x: square[0],
+        y: square[1],
+        angle: square[2] * DEG,
+      })),
+    };
   }
 
-  let opt = null; // the live run, or null
+  function initialArrangement(kind, p, A, B, springs) {
+    const N = p.n + 1;
+    if (kind === "grid") {
+      return { ...createGridPackStart(N), squareSide: GROWTH.size };
+    }
+    if (kind === "random") {
+      return {
+        ...createRandomPackStart(N, B.side * OPT.randomInflate, withSeed(N)),
+        squareSide: GROWTH.size,
+      };
+    }
+    if (kind === "record") {
+      return frameSnapshot(B, GROWTH.size);
+    }
+    if (!springs) {
+      return {
+        ...createAppendPackStart(frameSnapshot(A, 1), B.side * BLIND.inflate, {
+          gridStep: BLIND.gridStep,
+        }),
+        squareSide: GROWTH.size,
+      };
+    }
+    const poses = A.squares.map((square) => ({
+      x: square[0],
+      y: square[1],
+      angle: square[2] * DEG,
+    }));
+    const arriving = B.squares[p.new];
+    poses.push({ x: arriving[0], y: arriving[1], angle: arriving[2] * DEG });
+    return {
+      squareSide: GROWTH.size,
+      container: { originX: 0, originY: 0, side: B.side },
+      poses,
+    };
+  }
 
-  // Target springs only where there is a target: the previous packing with the blind box off. A
-  // random or grid start has no correspondence to the record's labelling, and a blind run is defined
-  // by not having one, so both of those are pure compaction — contacts, walls and the shake.
+  function optimizerTargets(p, A, B, springs) {
+    if (!springs) {
+      return null;
+    }
+    const targets = [];
+    for (let i = 0; i < p.n; i++) {
+      const a = A.squares[i];
+      const b = B.squares[p.map[i]];
+      targets.push({
+        x: b[0],
+        y: b[1],
+        angle: (a[2] + angleDelta(a[2], b[2])) * DEG,
+      });
+    }
+    const arriving = B.squares[p.new];
+    targets.push({ x: arriving[0], y: arriving[1], angle: arriving[2] * DEG });
+    return targets;
+  }
+
+  /** @type {import("./simulation/pack.js").PackRun | null} */
+  let opt = null;
+
+  // Target springs only where there is a target: the previous packing with the blind box off.
   function optSprings(kind) {
     return kind === "previous" && !state.blind;
   }
@@ -2740,444 +2721,83 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     const B = FRAMES[String(p.n + 1)];
     const N = p.n + 1;
     const springs = optSprings(kind);
-    const start = startOverride || initialArrangement(kind, p, A, B, springs);
-    const o = {
-      kind,
-      springs,
+    const start =
+      startOverride === undefined
+        ? initialArrangement(kind, p, A, B, springs)
+        : packingSnapshot(startOverride.X, startOverride.Y, startOverride.TH, GROWTH.size, {
+            originX: 0,
+            originY: 0,
+            side: startOverride.side,
+          });
+    return createPackRun({
       n: N,
-      pair: state.pair,
-      record: B.side,
-      X: start.X,
-      Y: start.Y,
-      TH: start.TH,
-      VX: new Float64Array(N),
-      VY: new Float64Array(N),
-      W: new Float64Array(N),
-      COS: new Float64Array(N),
-      SIN: new Float64Array(N),
-      FX: new Float64Array(N),
-      FY: new Float64Array(N),
-      TQ: new Float64Array(N),
-      TX: new Float64Array(N),
-      TY: new Float64Array(N),
-      TT: new Float64Array(N),
-      FQX: new Float64Array(N),
-      FQY: new Float64Array(N),
-      FQT: new Float64Array(N),
-      PHX: new Float64Array(N),
-      PHY: new Float64Array(N),
-      PHT: new Float64Array(N),
-      side: start.side,
-      startSide: start.side,
       seed: state.seed,
-      // Revision 11: every square's side, a fraction of a unit. 1 is the shipped behaviour and
-      // leaves every arithmetic below exactly what it was.
-      size: GROWTH.size,
-      grew: 0,
-      stalled: false,
-      time: 0,
-      steps: 0,
-      pen: Infinity,
-      near: 0,
-      best: Infinity,
-      bestAt: 0,
-      bestPen: 0,
-      bestWallPen: 0,
-      bestPacking: null,
-      exactPen: Infinity,
-      wallPen: Infinity,
-      packingValid: false,
-      invalidReason: "not-measured",
-      edited: false,
-      held: -1,
-      heldX: 0,
-      heldY: 0,
-      heldTH: 0,
-      msPerStep: 0.02,
-    };
-    if (springs) {
-      for (let i = 0; i < p.n; i++) {
-        const a = A.squares[i],
-          b = B.squares[p.map[i]];
-        o.TX[i] = b[0];
-        o.TY[i] = b[1];
-        o.TT[i] = (a[2] + angleDelta(a[2], b[2])) * DEG;
-      }
-      const nb = B.squares[p.new];
-      o.TX[p.n] = nb[0];
-      o.TY[p.n] = nb[1];
-      o.TT[p.n] = nb[2] * DEG;
-    }
-    // The shake's phases, from the same generator the cached simulator draws from, seeded by n and
-    // the kind, so an un-dragged run repeats exactly given the same number of steps.
-    const rnd = seededRandom(withSeed(N + INITIALS.indexOf(kind) * 7919));
-    const [hzLo, hzHi] = PHYS.jiggleHz;
-    for (let i = 0; i < N; i++) {
-      o.FQX[i] = 2 * Math.PI * lerp(hzLo, hzHi, rnd());
-      o.PHX[i] = 2 * Math.PI * rnd();
-      o.FQY[i] = 2 * Math.PI * lerp(hzLo, hzHi, rnd());
-      o.PHY[i] = 2 * Math.PI * rnd();
-      o.FQT[i] = 2 * Math.PI * lerp(hzLo, hzHi, rnd());
-      o.PHT[i] = 2 * Math.PI * rnd();
-    }
-    measureOptimizer(o);
-    return o;
-  }
-
-  // The side of the smallest axis-aligned box that holds the arrangement, and the deepest overlap in
-  // it: the two numbers that say how good it is. Taken at chunk boundaries, not per step.
-  function measureOptimizer(o) {
-    const snapshot = packingSnapshot(o.X, o.Y, o.TH, o.size, {
-      originX: 0,
-      originY: 0,
-      side: o.side,
+      effectiveSeed: withSeed(N + INITIALS.indexOf(kind) * 7919),
+      startKind: kind,
+      start,
+      targets: optimizerTargets(p, A, B, springs),
+      reference: { pairIndex: state.pair, recordSide: B.side },
+      pairLaw: LAW,
+      wallLaw: WALLLAW,
+      relatedMask: maskFor(state.pair),
+      physics: {
+        stepsPerSecond: OPT.stepsPerSecond,
+        omega: PHYS.omega,
+        zeta: PHYS.zeta,
+        contactDamping: PHYS.contactDamping,
+        contactTorque: PHYS.contactTorque,
+        jiggle: state.style === "bodies" ? BODIES.jiggle : PHYS.jiggle,
+        jiggleTorque: state.style === "bodies" ? BODIES.jiggleTorque : PHYS.jiggleTorque,
+        jiggleHz: [PHYS.jiggleHz[0], PHYS.jiggleHz[1]],
+        maxSpeed: PHYS.maxSpeed,
+        maxSpin: PHYS.maxSpin,
+        cell: PHYS.cell,
+      },
+      anneal: {
+        amplitude: ANNEAL.amplitude(state.anneal),
+        decayPower: ANNEAL.decayPower(state.anneal),
+        tau: OPT.tau,
+        floor: OPT.floor,
+      },
+      growth: { on: GROWTH.on, rate: GROWTH.rate, rule: GROWTH.rule },
+      container: {
+        squeezeRate: OPT.squeezeRate,
+        relaxRate: OPT.relaxRate,
+        squeezeTolerance: OPT.squeezeTol,
+        jamTolerance: OPT.jamTol,
+        minimumSide: OPT.minSide,
+      },
+      stationarity: {
+        linearSpeed: 0,
+        angularSpeed: 0,
+        forcingScale: 0,
+        window: 1,
+        stop: false,
+      },
     });
-    const assessed = assessPackingSnapshot(snapshot, o.n);
-    o.required = assessed.requiredSide;
-    // Kept as well as the side: a square dragged outside the walls still has to be drawn, so the
-    // view is sized on the union of the box and whatever the hand has put outside it.
-    o.bx0 = assessed.bounds.minX;
-    o.bx1 = assessed.bounds.maxX;
-    o.by0 = assessed.bounds.minY;
-    o.by1 = assessed.bounds.maxY;
-    o.exactPen = assessed.maxPairOverlap;
-    o.wallPen = assessed.maxWallOverlap;
-    o.packingValid = assessed.valid;
-    o.invalidReason = assessed.reason;
-    // "Best" is the smallest box the run has held the squares in without them overlapping, which is
-    // the only figure that is a packing rather than a picture of one.
-    const admitted = admitBestPacking(o.bestPacking, assessed, o.time);
-    if (admitted !== o.bestPacking) {
-      o.bestPacking = admitted;
-      o.best = admitted.requiredSide;
-      o.bestAt = admitted.at;
-      o.bestPen = admitted.maxPairOverlap;
-      o.bestWallPen = admitted.maxWallOverlap;
-    }
-    return o.required;
   }
 
-  // One chunk of the open-ended run: `steps` fixed steps of 1 / OPT.stepsPerSecond simulated seconds
-  // each. Semi-implicit Euler, one body per square, exactly the forces the cached simulator applies.
+  function measureOptimizer(o) {
+    return measurePackRun(o).requiredSide;
+  }
+
   function optAdvance(o, steps) {
-    // Substepping keeps the simulated time identical and only divides how it is taken, so a
-    // chunk still advances `steps / stepsPerSecond` seconds. `o.steps` stays in base units so the
-    // readout counts what the owner asked for rather than what stability cost.
-    const sub = forceLawSubsteps(LAW, 1 / OPT.stepsPerSecond);
-    o.sub = sub;
-    const dt = 1 / (OPT.stepsPerSecond * sub);
-    steps = steps * sub;
-    const N = o.n;
-    const level = state.anneal;
     const rigidStyle = state.style === "bodies";
-    const amp = ANNEAL.amplitude(level);
-    const jig = (rigidStyle ? BODIES.jiggle : PHYS.jiggle) * amp;
-    const jigT = (rigidStyle ? BODIES.jiggleTorque : PHYS.jiggleTorque) * amp;
-    const decayPower = ANNEAL.decayPower(level);
-    const k = PHYS.omega * PHYS.omega;
-    const c = 2 * PHYS.zeta * PHYS.omega;
-    const ks = o.springs ? k : 0;
-    // The law's reach past touching widens both the pair test and the broad phase's cell, and the
-    // relationship graph says which pairs get it. Repulsion is unmasked and always applies.
-    const reach = lawAttracts() ? LAW.range : 0;
-    const relatedMask = maskFor(o.pair);
-    const cell = Math.max(PHYS.cell, 1.41422 * o.size + reach + 1e-9);
-    const X = o.X,
-      Y = o.Y,
-      TH = o.TH,
-      VX = o.VX,
-      VY = o.VY,
-      W = o.W;
-    const COS = o.COS,
-      SIN = o.SIN,
-      FX = o.FX,
-      FY = o.FY,
-      TQ = o.TQ;
-    for (let s = 0; s < steps; s++) {
-      // The shake anneals toward a floor rather than to nothing: an open-ended run must keep some
-      // energy or it is just a settle.
-      const decay = OPT.floor + (1 - OPT.floor) * (1 / (1 + o.time / OPT.tau)) ** decayPower;
-      let pen = 0;
-      for (let i = 0; i < N; i++) {
-        FX[i] = 0;
-        FY[i] = 0;
-        TQ[i] = 0;
-        COS[i] = Math.cos(TH[i]);
-        SIN[i] = Math.sin(TH[i]);
-      }
-      // The walls, at each corner of each square.
-      for (let i = 0; i < N; i++) {
-        const h = o.size / 2,
-          cs = COS[i],
-          sn = SIN[i];
-        for (let q = 0; q < 4; q++) {
-          const s1 = q & 1 ? -1 : 1,
-            s2 = q & 2 ? -1 : 1;
-          const vx = X[i] + h * (s1 * cs - s2 * sn),
-            vy = Y[i] + h * (s1 * sn + s2 * cs);
-          // Revision 15: the walls run their own law. Overhang is a negative gap and clearance a
-          // positive one, exactly as for a pair, so one function serves both and a wall can be made to
-          // pull a square flush as well as push it back in. The defaults reproduce the old push to the bit.
-          const wr = wallAttracts() ? WALLLAW.range : 0;
-          if (vx < wr) {
-            optPush(
-              o,
-              i,
-              vx,
-              vy,
-              wallForce(vx) + (vx < 0 && VX[i] < 0 ? -PHYS.contactDamping * VX[i] : 0),
-              0,
-            );
-          }
-          if (o.side - vx < wr) {
-            optPush(
-              o,
-              i,
-              vx,
-              vy,
-              -(
-                wallForce(o.side - vx) +
-                (vx > o.side && VX[i] > 0 ? PHYS.contactDamping * VX[i] : 0)
-              ),
-              0,
-            );
-          }
-          if (vy < wr) {
-            optPush(
-              o,
-              i,
-              vx,
-              vy,
-              0,
-              wallForce(vy) + (vy < 0 && VY[i] < 0 ? -PHYS.contactDamping * VY[i] : 0),
-            );
-          }
-          if (o.side - vy < wr) {
-            optPush(
-              o,
-              i,
-              vx,
-              vy,
-              0,
-              -(
-                wallForce(o.side - vy) +
-                (vy > o.side && VY[i] > 0 ? PHYS.contactDamping * VY[i] : 0)
-              ),
-            );
-          }
-        }
-      }
-      // Push-apart, each unordered pair once, through a grid broad phase rebuilt per step.
-      o.near = 0;
-      const dim = Math.max(2, Math.ceil((o.side + 4) / cell) + 1);
-      if (o.head === undefined || o.dim !== dim) {
-        o.head = new Int32Array(dim * dim);
-        o.next = new Int32Array(N);
-        o.dim = dim;
-      }
-      const head = o.head,
-        next = o.next;
-      head.fill(-1);
-      const cellOf = (v) => Math.max(0, Math.min(dim - 1, Math.floor((v + 2) / cell)));
-      for (let i = 0; i < N; i++) {
-        const ci = cellOf(X[i]) + cellOf(Y[i]) * dim;
-        next[i] = head[ci];
-        head[ci] = i;
-      }
-      for (let i = 0; i < N; i++) {
-        const cx = cellOf(X[i]),
-          cy = cellOf(Y[i]);
-        for (let oy = -1; oy <= 1; oy++) {
-          const yy = cy + oy;
-          if (yy < 0 || yy >= dim) {
-            continue;
-          }
-          for (let ox = -1; ox <= 1; ox++) {
-            const xx = cx + ox;
-            if (xx < 0 || xx >= dim) {
-              continue;
-            }
-            for (let j = head[xx + yy * dim]; j !== -1; j = next[j]) {
-              if (j <= i) {
-                continue;
-              }
-              const d = optCollide(
-                o,
-                i,
-                j,
-                relatedMask === null || relatedMask[i * N + j] !== 0 ? reach : 0,
-              );
-              if (d > pen) {
-                pen = d;
-              }
-            }
-          }
-        }
-      }
-      // Integrate. A held square is pinned: it takes the cursor's pose and no force at all, so its
-      // neighbours are pushed aside by it rather than the other way round.
-      for (let i = 0; i < N; i++) {
-        if (i === o.held) {
-          X[i] = o.heldX;
-          Y[i] = o.heldY;
-          TH[i] = o.heldTH;
-          VX[i] = 0;
-          VY[i] = 0;
-          W[i] = 0;
-          continue;
-        }
-        const wob = jig * decay;
-        const ax =
-          FX[i] - ks * (X[i] - o.TX[i]) - c * VX[i] + wob * Math.cos(o.FQX[i] * o.time + o.PHX[i]);
-        const ay =
-          FY[i] - ks * (Y[i] - o.TY[i]) - c * VY[i] + wob * Math.cos(o.FQY[i] * o.time + o.PHY[i]);
-        VX[i] += ax * dt;
-        VY[i] += ay * dt;
-        const sp = Math.hypot(VX[i], VY[i]);
-        if (sp > PHYS.maxSpeed) {
-          VX[i] *= PHYS.maxSpeed / sp;
-          VY[i] *= PHYS.maxSpeed / sp;
-        }
-        X[i] += VX[i] * dt;
-        Y[i] += VY[i] * dt;
-        const alpha =
-          TQ[i] / (PHYS.inertia * o.size * o.size) -
-          ks * angleDelta(o.TT[i] / DEG, TH[i] / DEG) * DEG -
-          c * W[i] +
-          jigT * decay * Math.cos(o.FQT[i] * o.time + o.PHT[i]);
-        W[i] += alpha * dt;
-        if (W[i] > PHYS.maxSpin) {
-          W[i] = PHYS.maxSpin;
-        } else if (W[i] < -PHYS.maxSpin) {
-          W[i] = -PHYS.maxSpin;
-        }
-        TH[i] += W[i] * dt;
-      }
-      // The walls, where there is no target to hold the packing at the record's side: in while the
-      // squares are clear of each other, back out while something is jammed, so the run is an
-      // inflate-and-contract cycle rather than a one-way squeeze that can only fail.
-      // While the squares are still growing, growth *is* the compaction and the walls hold: the
-      // squeeze is gated on the same tolerance as the `clean` rule, so the two would otherwise take
-      // turns and neither would get anywhere — measured, `clean` deadlocked at a size of 0.76 with
-      // the walls taking every thousandth of slack the growth wanted. The walls resume the moment
-      // the squares reach full size, which is the contraction half of inflate-and-contract.
-      if (!o.springs && !(GROWTH.on && o.size < 1)) {
-        let nextSide = o.side;
-        if (pen <= OPT.squeezeTol) {
-          nextSide = Math.max(OPT.minSide, o.side * (1 - OPT.squeezeRate * dt));
-        } else if (pen > OPT.jamTol) {
-          nextSide = o.side * (1 + OPT.relaxRate * dt);
-        }
-        if (nextSide !== o.side) {
-          const shift = (nextSide - o.side) / 2;
-          for (let i = 0; i < N; i++) {
-            X[i] += shift;
-            Y[i] += shift;
-          }
-          if (o.held >= 0) {
-            o.heldX += shift;
-            o.heldY += shift;
-          }
-          o.side = nextSide;
-        }
-      }
-      o.pen = pen;
-      // Growth, before the clock advances, so the size after k steps is a function of k alone.
-      // `constant` climbs whatever the arrangement is doing; `clean` climbs only while the deepest
-      // overlap is inside the same tolerance the walls' squeeze is gated on, so the two stall
-      // together instead of fighting. Either way the size stops at one: a unit square is the goal,
-      // not a stage on the way to something larger.
-      if (GROWTH.on && o.size < 1) {
-        const may = GROWTH.rule === "clean" ? pen <= OPT.squeezeTol : true;
-        o.stalled = !may;
-        if (may) {
-          o.size = Math.min(1, o.size + GROWTH.rate * dt);
-          o.grew += GROWTH.rate * dt;
-        }
-      } else {
-        o.stalled = false;
-      }
-      o.time += dt;
-      o.steps += 1 / sub;
-    }
-    measureOptimizer(o);
-  }
-  function optPush(o, i, px, py, fx, fy) {
-    o.FX[i] += fx;
-    o.FY[i] += fy;
-    o.TQ[i] += PHYS.contactTorque * ((px - o.X[i]) * fy - (py - o.Y[i]) * fx);
-  }
-  // The separating-axis test of the cached simulator, on unit squares, returning the penetration.
-  let optSpx = 0,
-    optSpy = 0;
-  function optSupport(o, i, nx, ny) {
-    const h = o.size / 2,
-      cs = o.COS[i],
-      sn = o.SIN[i];
-    const s1 = nx * cs + ny * sn >= 0 ? 1 : -1;
-    const s2 = -nx * sn + ny * cs >= 0 ? 1 : -1;
-    optSpx = o.X[i] + h * (s1 * cs - s2 * sn);
-    optSpy = o.Y[i] + h * (s1 * sn + s2 * cs);
-  }
-  // The same law as the cached simulator's `collide`, on unit squares, returning the penetration
-  // (zero when the pair is not overlapping). `o.near` counts the pairs the attraction reached.
-  function optCollide(o, i, j, reach) {
-    const X = o.X,
-      Y = o.Y,
-      COS = o.COS,
-      SIN = o.SIN;
-    const dx = X[j] - X[i],
-      dy = Y[j] - Y[i];
-    const lim = 1.41422 * o.size + reach;
-    if (dx * dx + dy * dy >= lim * lim) {
-      return 0;
-    }
-    let best = Infinity,
-      bnx = 0,
-      bny = 0,
-      owner = -1;
-    for (let a = 0; a < 4; a++) {
-      const own = a < 2 ? i : j;
-      const cs = COS[own],
-        sn = SIN[own];
-      const ax = a & 1 ? -sn : cs,
-        ay = a & 1 ? cs : sn;
-      const ri =
-        (o.size * (Math.abs(ax * COS[i] + ay * SIN[i]) + Math.abs(-ax * SIN[i] + ay * COS[i]))) / 2;
-      const rj =
-        (o.size * (Math.abs(ax * COS[j] + ay * SIN[j]) + Math.abs(-ax * SIN[j] + ay * COS[j]))) / 2;
-      const d = dx * ax + dy * ay;
-      const p = ri + rj - Math.abs(d);
-      if (p <= 1e-9 && reach === 0) {
-        return 0;
-      }
-      if (p < best) {
-        best = p;
-        bnx = d < 0 ? -ax : ax;
-        bny = d < 0 ? -ay : ay;
-        owner = own;
-      }
-    }
-    const gap = -best;
-    if (gap > 0) {
-      if (gap >= reach) {
-        return 0;
-      }
-      o.near++;
-    }
-    if (owner === i) {
-      optSupport(o, j, -bnx, -bny);
-    } else {
-      optSupport(o, i, bnx, bny);
-    }
-    const vn = (o.VX[j] - o.VX[i]) * bnx + (o.VY[j] - o.VY[i]) * bny;
-    const damp = best > 0 && vn < 0 ? -PHYS.contactDamping * vn : 0;
-    const f = lawForce(-best) + damp;
-    const fx = f * bnx,
-      fy = f * bny;
-    optPush(o, j, optSpx, optSpy, fx, fy);
-    optPush(o, i, optSpx, optSpy, -fx, -fy);
-    return best > 0 ? best : 0;
+    updatePackRun(o, {
+      pairLaw: LAW,
+      wallLaw: WALLLAW,
+      relatedMask: maskFor(state.pair),
+      physics: {
+        jiggle: rigidStyle ? BODIES.jiggle : PHYS.jiggle,
+        jiggleTorque: rigidStyle ? BODIES.jiggleTorque : PHYS.jiggleTorque,
+      },
+      anneal: {
+        amplitude: ANNEAL.amplitude(state.anneal),
+        decayPower: ANNEAL.decayPower(state.anneal),
+      },
+      growth: { on: GROWTH.on, rate: GROWTH.rate, rule: GROWTH.rule },
+    });
+    advancePackRun(o, steps);
   }
 
   // One frame of the open-ended run: as many fixed steps as the wall clock asked for, capped so a
@@ -3427,18 +3047,21 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
             required: opt.bestPacking.requiredSide,
             squareSide: opt.bestPacking.squareSide,
             container: { ...opt.bestPacking.container },
-            poses: opt.bestPacking.poses.map((pose) => [pose.x, pose.y, pose.angle / DEG]),
+            poses: opt.bestPacking.poses.map(
+              (pose) =>
+                /** @type {[number, number, number]} */ ([pose.x, pose.y, pose.angle / DEG]),
+            ),
             maxPairOverlap: opt.bestPacking.maxPairOverlap,
             maxWallOverlap: opt.bestPacking.maxWallOverlap,
           };
     return {
       on: state.optimizing,
       running: state.playing,
-      initial: opt.kind,
+      initial: /** @type {AtlasInitial} */ (opt.kind),
       springs: opt.springs,
       seed: opt.seed,
       n: opt.n,
-      pair: opt.pair,
+      ...(opt.pair === null ? {} : { pair: opt.pair }),
       time: opt.time,
       steps: opt.steps,
       side: opt.side,
@@ -3450,8 +3073,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       bestWallPenetration: opt.best === Infinity ? null : opt.bestWallPen,
       bestPacking,
       feasible: OPT.feasible,
-      record: opt.record,
-      excess: (opt.required / opt.record - 1) * 100,
+      ...(opt.record === null
+        ? {}
+        : { record: opt.record, excess: (opt.required / opt.record - 1) * 100 }),
       penetration: Number.isFinite(opt.pen) ? opt.pen : null,
       exactPenetration: Number.isFinite(opt.exactPen) ? opt.exactPen : null,
       wallPenetration: Number.isFinite(opt.wallPen) ? opt.wallPen : null,
@@ -3759,8 +3383,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     const midX = (lox + hix) / 2,
       midY = (loy + hiy) / 2;
     svg.setAttribute("viewBox", `${midX - view / 2} ${-midY - view / 2} ${view} ${view}`);
-    containerRect.setAttribute("width", side);
-    containerRect.setAttribute("height", side);
+    containerRect.setAttribute("width", String(side));
+    containerRect.setAttribute("height", String(side));
     sceneSide = side;
     const drain = state.desaturate && state.playing ? 1 : 0;
     // Revision 11: the squares carry the run's own size, which is one unless growth is on. It is a
@@ -3843,8 +3467,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     const refit = easeInOut(ramp(t, sc.moveEnd, sc.end));
     const view = u < 1 ? held : lerp(held, fit * (1 + 2 * PAD), refit);
     svg.setAttribute("viewBox", `${side / 2 - view / 2} ${-side / 2 - view / 2} ${view} ${view}`);
-    containerRect.setAttribute("width", side);
-    containerRect.setAttribute("height", side);
+    containerRect.setAttribute("width", String(side));
+    containerRect.setAttribute("height", String(side));
     sceneSide = side;
 
     currentTrajectory = tr;
@@ -3984,9 +3608,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     const out = clamp01(q / 0.45);
     const back = clamp01((q - 0.55) / 0.45);
     factsA.style.opacity = String(1 - out);
-    factsB.style.opacity = back;
+    factsB.style.opacity = String(back);
     numeralSlotA.style.opacity = String(1 - out);
-    numeralSlotB.style.opacity = back;
+    numeralSlotB.style.opacity = String(back);
     numeralA.style.transform = `translateY(${-24 * easeOut(out)}px)`;
     numeralB.style.transform = `translateY(${24 * (1 - easeOut(back))}px)`;
     if (live.textContent !== `n = ${state.liveN}`) {
@@ -4055,12 +3679,12 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   }
 
   // ---------------------------------------------------------------- chrome
-  const playButton = document.getElementById("play");
-  const clock = document.getElementById("clock");
-  const stageWrap = document.getElementById("stage-wrap");
-  const controls = document.getElementById("controls");
-  const continuousInfo = document.getElementById("continuous-info");
-  const optimizeButton = document.getElementById("optimize");
+  const playButton = htmlNode("play");
+  const clock = htmlNode("clock");
+  const stageWrap = htmlNode("stage-wrap");
+  const controls = htmlNode("controls");
+  const continuousInfo = htmlNode("continuous-info");
+  const optimizeButton = htmlNode("optimize");
 
   function squareNodeAt(index) {
     return index < motion.length ? motion[index]?.node : index === motion.length ? newNode : null;
@@ -4120,7 +3744,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       return;
     }
     const rel = relationshipState();
-    document.getElementById("rel-info").textContent =
+    htmlNode("rel-info").textContent =
       relKind === "general"
         ? `every pair attracts${rel.attracting ? "" : " \u00b7 no pull set"}`
         : relKind === "groups"
@@ -4133,7 +3757,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
             " contacts" +
             (rel.attracting ? "" : " \u00b7 no pull");
     const g = growthState();
-    document.getElementById("grow-info").textContent = !GROWTH.on
+    htmlNode("grow-info").textContent = !GROWTH.on
       ? "off: every square is a unit side"
       : g.unitSide === null
         ? `starts at ${fmt(g.size, 2)} of a side`
@@ -4214,7 +3838,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       }
     }
   }
-  const styleSelect = /** @type {HTMLSelectElement} */ (document.getElementById("style-select"));
+  const styleSelect = /** @type {HTMLSelectElement} */ (selectNode("style-select"));
   function updateSegments() {
     animationPanel?.setVisible(state.mode === "animate");
     // Revision 14: which solver runs is strategy, so the select sits with the law and the graph —
@@ -4236,10 +3860,10 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       o.disabled = !ok;
     });
     styleSelect.value = state.style;
-    document.getElementById("solver-note").textContent = solverNote;
+    htmlNode("solver-note").textContent = solverNote;
     // The timing and the phasing describe a step. Pack has none, so the group goes — in place, so
     // that nothing else on the panel moves and the stage keeps its size (see the stylesheet).
-    document.getElementById("step-anim-box").classList.toggle("is-off", state.mode === "pack");
+    htmlNode("step-anim-box").classList.toggle("is-off", state.mode === "pack");
     // The mode sub-panel. Two buttons drawn as tabs: the pressed one names the aspect on show.
     document.querySelectorAll("#mode-tabs button").forEach((b) => {
       const on = /** @type {HTMLElement} */ (b).dataset.mode === state.mode;
@@ -4249,24 +3873,18 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     document.querySelectorAll("#phase-seg button").forEach((b) => {
       b.classList.toggle("on", /** @type {HTMLElement} */ (b).dataset.phase === state.phase);
     });
-    /** @type {HTMLInputElement} */ (document.getElementById("desat-toggle")).checked =
-      state.desaturate;
-    /** @type {HTMLInputElement} */ (document.getElementById("desat-floor")).value =
-      String(desatFloor);
-    document.getElementById("desat-floor-val").textContent = fmt(desatFloor, 2);
-    /** @type {HTMLInputElement} */ (document.getElementById("blind-toggle")).checked = state.blind;
+    /** @type {HTMLInputElement} */ (inputNode("desat-toggle")).checked = state.desaturate;
+    /** @type {HTMLInputElement} */ (inputNode("desat-floor")).value = String(desatFloor);
+    htmlNode("desat-floor-val").textContent = fmt(desatFloor, 2);
+    /** @type {HTMLInputElement} */ (inputNode("blind-toggle")).checked = state.blind;
     document.querySelectorAll("#initial-seg button").forEach((b) => {
       b.classList.toggle("on", /** @type {HTMLElement} */ (b).dataset.initial === state.initial);
     });
     optimizeButton.textContent = state.optimizing ? "Restart optimize" : "Optimize";
-    /** @type {HTMLInputElement} */ (document.getElementById("blind-inflate")).value = String(
-      BLIND.inflate,
-    );
-    /** @type {HTMLInputElement} */ (document.getElementById("anneal")).value = String(
-      state.anneal,
-    );
+    /** @type {HTMLInputElement} */ (inputNode("blind-inflate")).value = String(BLIND.inflate);
+    /** @type {HTMLInputElement} */ (inputNode("anneal")).value = String(state.anneal);
     const an = annealState();
-    document.getElementById("anneal-info").textContent =
+    htmlNode("anneal-info").textContent =
       state.anneal +
       " \u00b7 shake \u00d7" +
       fmt(an.amplitude, 2) +
@@ -4289,7 +3907,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     });
     // Revision 12: every live readout is written to fit its slot, a slot that overruns clipping
     // rather than pushing what is next to it. This one is at most 44 characters.
-    document.getElementById("law-info").textContent =
+    htmlNode("law-info").textContent =
       "knee " +
       Math.round(LAW.repulsion * LAW.rigidity) +
       " · slope ×" +
@@ -4305,12 +3923,11 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     document.querySelectorAll("#rel-seg button").forEach((b) => {
       b.classList.toggle("on", /** @type {HTMLElement} */ (b).dataset.rel === relKind);
     });
-    /** @type {HTMLInputElement} */ (document.getElementById("snap-toggle")).checked = state.snap;
-    /** @type {HTMLInputElement} */ (document.getElementById("bias-toggle")).checked =
-      relKind === "contact";
+    /** @type {HTMLInputElement} */ (inputNode("snap-toggle")).checked = state.snap;
+    /** @type {HTMLInputElement} */ (inputNode("bias-toggle")).checked = relKind === "contact";
     // Growth.
-    const gs = /** @type {HTMLInputElement} */ (document.getElementById("grow-size")),
-      gr = /** @type {HTMLInputElement} */ (document.getElementById("grow-rate"));
+    const gs = /** @type {HTMLInputElement} */ (inputNode("grow-size")),
+      gr = /** @type {HTMLInputElement} */ (inputNode("grow-rate"));
     gs.min = String(GROWTH_BOUNDS.size[0]);
     gs.max = String(GROWTH_BOUNDS.size[1]);
     gs.step = "0.01";
@@ -4323,20 +3940,17 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     if (document.activeElement !== gr) {
       gr.value = String(GROWTH.rate);
     }
-    document.getElementById("grow-size-val").textContent = fmt(GROWTH.size, 2);
-    document.getElementById("grow-rate-val").textContent = `${fmt(GROWTH.rate, 3)}/s`;
-    /** @type {HTMLInputElement} */ (document.getElementById("grow-toggle")).checked = GROWTH.on;
+    htmlNode("grow-size-val").textContent = fmt(GROWTH.size, 2);
+    htmlNode("grow-rate-val").textContent = `${fmt(GROWTH.rate, 3)}/s`;
+    /** @type {HTMLInputElement} */ (inputNode("grow-toggle")).checked = GROWTH.on;
     document.querySelectorAll("#grow-rule-seg button").forEach((b) => {
       b.classList.toggle("on", /** @type {HTMLElement} */ (b).dataset.growRule === GROWTH.rule);
     });
     updateLive();
-    /** @type {HTMLInputElement} */ (document.getElementById("speed")).value = String(
-      speedToSlider(state.speed),
-    );
-    document.getElementById("speed-info").textContent = `\u00d7${state.speed.toFixed(2)}`;
-    /** @type {HTMLInputElement} */ (document.getElementById("links-toggle")).checked = state.links;
-    /** @type {HTMLInputElement} */ (document.getElementById("capture-toggle")).checked =
-      state.capture;
+    /** @type {HTMLInputElement} */ (inputNode("speed")).value = String(speedToSlider(state.speed));
+    htmlNode("speed-info").textContent = `\u00d7${state.speed.toFixed(2)}`;
+    /** @type {HTMLInputElement} */ (inputNode("links-toggle")).checked = state.links;
+    /** @type {HTMLInputElement} */ (inputNode("capture-toggle")).checked = state.capture;
     // Revision 12: the colour scheme, and Animate's own standardising. The standardising box is
     // disabled rather than hidden outside Animate, and disabled under either angle scheme, where it
     // would have nothing to do: a control that vanishes is a control that moves its neighbours.
@@ -4347,13 +3961,10 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     document.querySelectorAll("#target-seg button").forEach((b) => {
       b.classList.toggle("on", /** @type {HTMLElement} */ (b).dataset.target === targetFrom());
     });
-    /** @type {HTMLInputElement} */ (document.getElementById("draw-toggle")).checked =
-      state.drawing;
-    /** @type {HTMLButtonElement} */ (document.getElementById("clear-edges")).disabled =
+    /** @type {HTMLInputElement} */ (inputNode("draw-toggle")).checked = state.drawing;
+    /** @type {HTMLButtonElement} */ (htmlNode("clear-edges")).disabled =
       drawnFor(state.pair).length === 0;
-    const animateBox = /** @type {HTMLInputElement} */ (
-      document.getElementById("animate-standard-toggle")
-    );
+    const animateBox = /** @type {HTMLInputElement} */ (inputNode("animate-standard-toggle"));
     animateBox.checked = ANIMATE.standardize;
     animateBox.disabled = state.mode !== "animate" || colorScheme !== "identity";
 
@@ -4367,7 +3978,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       input.disabled = false;
       input.value = state.continuous.on ? CONTINUOUS[key] : state.timing[key];
     });
-    /** @type {HTMLInputElement} */ (document.getElementById("fullbeat-toggle")).checked =
+    /** @type {HTMLInputElement} */ (inputNode("fullbeat-toggle")).checked =
       state.continuous.fullBeat;
     updateStepChooser();
     updateRangeControls();
@@ -4408,7 +4019,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     // The second button does two different things and should say which. Paused, it skips back to
     // the start, so it draws the skip-to-start bar. Running, what it actually does is restart the
     // run, so it draws a circling arrow. Same button, same action, honest glyph.
-    const restartButton = document.getElementById("restart");
+    const restartButton = htmlNode("restart");
     restartButton.classList.toggle("is-playing", state.playing);
     restartButton.setAttribute(
       "aria-label",
@@ -4428,9 +4039,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       "n = 17: the search engine here returned exactly the trivial 5 x 5 grid until a " +
       "whole-configuration move was added, so this is the natural step to play the physics on.",
   };
-  const stepLabel = document.getElementById("step-label");
-  const stepNote = document.getElementById("step-note");
-  const stepChips = document.getElementById("step-chips");
+  const stepLabel = htmlNode("step-label");
+  const stepNote = htmlNode("step-note");
+  const stepChips = htmlNode("step-chips");
   const stepN = () => PAIRS[state.pair].n + 1;
   // The pair that arrives at n, or the nearest one this page carries (the 25-pair demo build carries
   // 25 of the 323 steps, so a chip there lands on the closest step it has).
@@ -4476,12 +4087,12 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // The two range boxes, the run's length in wall-clock seconds before it is started, and where the
   // run stands inside it. The length is the honest one: it prices every pair in the range at the
   // beat it will actually play at, static appends and the annealing dial included.
-  const rangeFrom = /** @type {HTMLInputElement} */ (document.getElementById("range-from"));
-  const rangeTo = /** @type {HTMLInputElement} */ (document.getElementById("range-to"));
-  const rangeDurationOut = document.getElementById("range-duration");
-  const rangePosition = document.getElementById("range-position");
-  const rangeAllButton = document.getElementById("range-all");
-  const rangeSep = document.getElementById("range-sep");
+  const rangeFrom = /** @type {HTMLInputElement} */ (inputNode("range-from"));
+  const rangeTo = /** @type {HTMLInputElement} */ (inputNode("range-to"));
+  const rangeDurationOut = htmlNode("range-duration");
+  const rangePosition = htmlNode("range-position");
+  const rangeAllButton = htmlNode("range-all");
+  const rangeSep = htmlNode("range-sep");
   rangeFrom.min = rangeTo.min = String(RANGE_MIN);
   rangeFrom.max = rangeTo.max = String(RANGE_MAX);
   rangeAllButton.textContent = `whole corpus (${RANGE_MIN} → ${RANGE_MAX})`;
@@ -5612,12 +5223,12 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     pause();
     select(Math.max(b.first, Math.min(b.last, state.pair + delta)));
   }
-  document.getElementById("prev").addEventListener("click", () => nudgeStep(-1));
-  document.getElementById("next").addEventListener("click", () => nudgeStep(1));
+  htmlNode("prev").addEventListener("click", () => nudgeStep(-1));
+  htmlNode("next").addEventListener("click", () => nudgeStep(1));
   rangeAllButton.addEventListener("click", () => setRange(RANGE_MIN, RANGE_MAX));
-  document.getElementById("refresh-gap").addEventListener("click", () => refreshGap());
+  htmlNode("refresh-gap").addEventListener("click", () => refreshGap());
   playButton.addEventListener("click", () => transport());
-  document.getElementById("restart").addEventListener("click", () => restart());
+  htmlNode("restart").addEventListener("click", () => restart());
   document.querySelectorAll("#mode-tabs button").forEach((b) => {
     b.addEventListener("click", () => setMode(/** @type {HTMLElement} */ (b).dataset.mode));
   });
@@ -5651,7 +5262,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   document.querySelectorAll("#rel-seg button").forEach((b) => {
     b.addEventListener("click", () => setRelationship(/** @type {HTMLElement} */ (b).dataset.rel));
   });
-  document.getElementById("desat-floor").addEventListener("input", (ev) => {
+  inputNode("desat-floor").addEventListener("input", (ev) => {
     win.atlasTransitions.setDesatFloor(/** @type {HTMLInputElement} */ (ev.target).value);
     updateChrome();
   });
@@ -5675,7 +5286,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       setGrowth({ rule: /** @type {HTMLElement} */ (b).dataset.growRule }),
     );
   });
-  document.getElementById("reset-physics").addEventListener("click", () => resetPhysics());
+  htmlNode("reset-physics").addEventListener("click", () => resetPhysics());
   document
     .getElementById("snap-toggle")
     .addEventListener("change", (ev) =>
@@ -5684,7 +5295,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // Turning the bias on with no attraction set would mask a force that is not there, so it brings
   // the sticky preset's pull with it. That is a convenience of the control, not of the physics:
   // `setRelationship('contact')` on the API changes the graph and nothing else.
-  document.getElementById("bias-toggle").addEventListener("change", (ev) => {
+  inputNode("bias-toggle").addEventListener("change", (ev) => {
     // The wanted state is read once, before anything is set. `setLaw` runs `updateSegments`, which
     // writes this box's checked state back from a relationship that has not been changed yet, so
     // re-reading `ev.target.checked` on the next line saw the box untick itself and turned the bias
@@ -5730,7 +5341,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       setTargetSource(/** @type {HTMLElement} */ (b).dataset.target),
     );
   });
-  document.getElementById("clear-edges").addEventListener("click", () => clearEdges());
+  htmlNode("clear-edges").addEventListener("click", () => clearEdges());
   document
     .getElementById("capture-toggle")
     .addEventListener("change", (ev) =>
@@ -5761,9 +5372,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // The SVG group the stage is drawn in, so it carries a screen matrix. `getElementById` is typed
   // as returning an HTML element whatever it finds, which is why the SVG type is named through
   // `Element` here.
-  const worldGroup = /** @type {SVGGElement} */ (
-    /** @type {Element} */ (document.getElementById("world"))
-  );
+  const worldGroup = /** @type {SVGGElement} */ (/** @type {Element} */ (svgNode("world")));
   function worldPoint(ev) {
     const m = worldGroup.getScreenCTM();
     if (m === null) {
@@ -6013,8 +5622,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // The scale's figure width is measured from the drawn numerals, so it has to be taken again once
   // the faces are in; re-rendering afterwards is a no-op on everything but the suppression.
   // The bar's two ends, set once: they are the same expression at every n.
-  document.getElementById("gapbar-area").innerHTML = METRICS.bound_html.area;
-  document.getElementById("gapbar-grid").innerHTML = METRICS.bound_html.grid;
+  htmlNode("gapbar-area").innerHTML = METRICS.bound_html.area;
+  htmlNode("gapbar-grid").innerHTML = METRICS.bound_html.grid;
   measureDigit();
   measureHeadline();
   if ("fonts" in document) {
