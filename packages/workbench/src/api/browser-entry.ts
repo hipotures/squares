@@ -3,6 +3,8 @@ export { timeline } from "../animation/timeline.js";
 export * as trace from "../animation/trace.js";
 export * as animationPanel from "../app/animation-panel.js";
 export * as capture from "../app/capture.js";
+export * as packPanel from "../app/pack-panel.js";
+export * as searchPanel from "../app/search-panel.js";
 export { geometry } from "../core/geometry.js";
 export { navigation } from "../core/navigation.js";
 export { workbenchCore as core } from "../core/runtime-contracts.js";

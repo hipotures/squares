@@ -69,6 +69,10 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   const { renderStage } = workbenchBundle.stageView;
   /** @type {import("./app/animation-panel.js").AnimationPanel | null} */
   let animationPanel = null;
+  /** @type {import("./app/pack-panel.js").PackPanel | null} */
+  let packPanel = null;
+  /** @type {import("./app/search-panel.js").SearchPanel | null} */
+  let searchPanel = null;
   /** @typedef {import("./api/workbench-api.js").AtlasAspect} AtlasAspect */
   /** @typedef {import("./api/workbench-api.js").AtlasGrowth} AtlasGrowth */
   /** @typedef {import("./api/workbench-api.js").AtlasGrowthRule} AtlasGrowthRule */
@@ -2632,7 +2636,6 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     grid: "ordered fill",
     record: "best known",
   };
-  const _initialShort = { previous: "previous", random: "random", grid: "grid" };
   // The run's seed folded into a generator's own base. The multiplier is the odd 32-bit
   // constant from the same family as the LCG's, so successive seeds land far apart rather
   // than in neighbouring streams; at `state.seed === 0` it adds nothing, which is what keeps
@@ -3551,6 +3554,14 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   }
 
   function render() {
+    if (searchPanel?.visible()) {
+      searchPanel.redraw();
+      return;
+    }
+    if (packPanel?.visible()) {
+      packPanel.redraw();
+      return;
+    }
     if (animationPanel?.state().active) {
       animationPanel.redraw();
       return;
@@ -3840,7 +3851,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   }
   const styleSelect = /** @type {HTMLSelectElement} */ (selectNode("style-select"));
   function updateSegments() {
-    animationPanel?.setVisible(state.mode === "animate");
+    const searching = searchPanel?.visible() ?? false;
+    animationPanel?.setVisible(!searching && state.mode === "animate");
+    packPanel?.setVisible(!searching && state.mode === "pack");
     // Revision 14: which solver runs is strategy, so the select sits with the law and the graph —
     // and Pack offers two of the three, the tween being an interpolation toward an answer Pack has
     // not got. The option is taken out of the list rather than left selectable and inert.
@@ -3866,7 +3879,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     htmlNode("step-anim-box").classList.toggle("is-off", state.mode === "pack");
     // The mode sub-panel. Two buttons drawn as tabs: the pressed one names the aspect on show.
     document.querySelectorAll("#mode-tabs button").forEach((b) => {
-      const on = /** @type {HTMLElement} */ (b).dataset.mode === state.mode;
+      const on =
+        /** @type {HTMLElement} */ (b).dataset.mode === (searching ? "search" : state.mode);
       b.classList.toggle("on", on);
       b.setAttribute("aria-pressed", on ? "true" : "false");
     });
@@ -4762,6 +4776,30 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // Pack(17) again, and Animate always opens at the first step of its range rather than wherever
   // Pack happened to leave the stage.
   function setMode(next) {
+    if (next === "search") {
+      if (searchPanel === null) {
+        throw new Error("Search panel has not mounted");
+      }
+      if (!searchPanel.visible()) {
+        pause();
+        state.optimizing = false;
+        opt = null;
+        searchPanel.setVisible(true);
+        animationPanel?.leave();
+        packPanel?.setVisible(false);
+        document.body.classList.add("search-active");
+      }
+      updateSegments();
+      layout();
+      return "search";
+    }
+    if (searchPanel?.visible()) {
+      searchPanel.setVisible(false);
+      document.body.classList.remove("search-active");
+    }
+    if (next !== "pack") {
+      packPanel?.setVisible(false);
+    }
     if (next === "pack" && animationPanel?.state().active) {
       animationPanel.leave();
     }
@@ -4778,6 +4816,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       updateSegments();
       return state.mode;
     } // updateSegments coerces the style
+    controlsHeight = 0;
     state.animate = transition.rememberedAnimateRange;
     state.packN = transition.rememberedPackN;
     state.mode = transition.aspect;
@@ -4978,7 +5017,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // The workbench's API, hung on the page's own global: one handle for the probes, the capture
   // script and the console. The type library's `Window` knows nothing of `atlasTransitions`, so the
   // property is named here, once, rather than at each of the two places that touch it.
-  /** @typedef {Window & typeof globalThis & { atlasTransitions: WorkbenchApi }} PageWindow */
+  /** @typedef {Window & typeof globalThis & { atlasTransitions: WorkbenchApi, packWorkbench: import("./api/pack-api.js").PackWorkbenchApi, searchWorkbench: import("./app/search-panel.js").SearchPanel }} PageWindow */
   const win = /** @type {PageWindow} */ (window);
   /** @type {WorkbenchApi} */
   const atlasTransitions = {
@@ -5006,7 +5045,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     // Revision 10: which aspect the page is showing. Pack is the range collapsed onto one n and
     // played as the open-ended run; Animate is the range played end to end.
     setMode,
-    mode: () => state.mode,
+    mode: () => (searchPanel?.visible() ? "search" : state.mode),
     // Revision 8, feature 4: what the gap bar is showing. Revision 9: and the call that redraws it
     // on demand, the bar having stopped following every frame of the motion.
     gapBar: () => Object.assign({}, gapbarOut),
@@ -5209,7 +5248,24 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       shownN: state.liveN,
     }),
   };
-  win.atlasTransitions = atlasTransitions;
+  win.atlasTransitions = new Proxy(atlasTransitions, {
+    get(target, property, receiver) {
+      const member = Reflect.get(target, property, receiver);
+      if (
+        (packPanel?.visible() || searchPanel?.visible()) &&
+        typeof member === "function" &&
+        property !== "setMode" &&
+        property !== "mode"
+      ) {
+        return () => {
+          throw new Error(
+            "atlasTransitions controls catalogue animation; use packWorkbench or searchWorkbench for the active view",
+          );
+        };
+      }
+      return member;
+    },
+  });
 
   // ---------------------------------------------------------------- wiring
   // Previous and next move the step the stage is on. Where the range is one step they carry it with
@@ -5418,7 +5474,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // decides which of them a press starts and nothing is ever ambiguous. With `draw links` on no
   // square is picked up at all; with it off the drawing code is never entered.
   svg.addEventListener("pointerdown", (ev) => {
-    if (animationPanel?.state().active) {
+    if (animationPanel?.state().active || packPanel?.visible()) {
       return;
     }
     if (ev.button !== 0) {
@@ -5481,6 +5537,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   svg.addEventListener("pointercancel", endDrag);
 
   window.addEventListener("keydown", (ev) => {
+    if (packPanel?.visible()) {
+      return;
+    }
     // What has the focus, read as an element once: the guard is about typing into a control, and
     // the three questions below are all about the same one.
     const focused = /** @type {HTMLElement} */ (ev.target);
@@ -5617,6 +5676,29 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     },
     reducedMotion: () => reduceMotion,
   });
+  packPanel = workbenchBundle.packPanel.mountPackPanel({
+    document,
+    colours: COLOUR,
+    reducedMotion: () => reduceMotion,
+    onChange: () => requestAnimationFrame(layout),
+  });
+  win.packWorkbench = Object.freeze({
+    configure: (options) => packPanel.configure(options),
+    play: () => packPanel.play(),
+    pause: () => packPanel.pause(),
+    playing: () => packPanel.playing(),
+    step: (count) => packPanel.step(count),
+    restart: () => packPanel.restart(),
+    resolve: () => packPanel.resolve(),
+    load: (text) => packPanel.load(text),
+    state: () => packPanel.state(),
+    exportSnapshot: () => packPanel.exportSnapshot(),
+  });
+  searchPanel = workbenchBundle.searchPanel.mountSearchPanel({
+    document,
+    onChange: () => requestAnimationFrame(layout),
+  });
+  win.searchWorkbench = searchPanel;
   setRange(DEFAULT_STEP_N, DEFAULT_STEP_N);
   layout();
   // The scale's figure width is measured from the drawn numerals, so it has to be taken again once

@@ -10,6 +10,8 @@ import type { AnimationPanelState } from "./animation-api.js";
 
 /** Which aspect the page is showing: one n optimised, or a range animated end to end. */
 export type AtlasAspect = "pack" | "animate";
+/** The three visible workbench areas; Search keeps Pack/Animate navigation in memory. */
+export type WorkbenchView = AtlasAspect | "search";
 
 /** The solvers. `tween` interpolates toward the record; the other two run the physics. */
 export type AtlasStyle = "tween" | "physics" | "bodies";
@@ -494,8 +496,8 @@ export interface AtlasTransitions {
   restart(): AtlasRestart;
 
   // Which aspect the page is showing.
-  setMode(next: string): AtlasAspect;
-  mode(): AtlasAspect;
+  setMode(next: string): WorkbenchView;
+  mode(): WorkbenchView;
 
   // The gap bar, and the call that redraws it on demand.
   gapBar(): AtlasGapBar;

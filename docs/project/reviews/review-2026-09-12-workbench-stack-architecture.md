@@ -19,9 +19,11 @@ and `0281a508`, and diverges from it at `117d224f`. The local review branch is
 **Workflow and tracking:** W10 review-planning-oversight, `think-3kk1`. Three reviewers
 used GPT-5.6 Sol at extra-high effort for frontend architecture, physics/benchmark
 semantics, and CI/Pages; the coordinator verified findings and integrated the plans.
-This phase changes documentation and beads.
-Source cleanup, stack integration, experiments, deployment, and the Search tab are
-subsequent phases.
+The original review phase changed documentation and beads.
+PR #160 now carries the follow-up package migration, independent Pack panel, bounded
+Search preview and focused browser checks.
+The resolution table and plan distinguish these implementation slices from the unpassed
+release gates. Deployment and full experimental Search remain later phases.
 
 The [workbench plan](../specs/active/plan-2026-09-11-workbench-from-spike-to-product.md)
 is the governing source for final outcomes and implementation phases.
@@ -307,6 +309,51 @@ Add a step-crossing overlap/rotation/growth regression and a valid control.
 This finding has not had a standalone dynamic reproduction in the planning pass.
 **Bead:** `think-6hqs`, before shared resolution and the extraction checkpoint.
 
+### R11 — High: Pack best depends on UI step batching
+
+Independent review of the shared Pack path at `0f2ac8ce` found that the retained best
+can change when the same fixed-seed simulation steps are grouped into different UI
+batches. A render/yield boundary must not decide which geometry is admitted as best.
+The implementing fix needs a per-step admission rule and a fixed-work comparison across
+several batch sizes, including browser and headless receipts.
+**Bead:** `think-wqf3`, before Pack/Animate merge readiness.
+
+### R12 — High: a shrinking container can be labelled stationary
+
+Independent review of the shared Pack path at `0f2ac8ce` found a stationary outcome
+while the container schedule was still shrinking.
+A small pose-motion residual alone does not prove that the forced run has settled.
+The receipt must distinguish pose, container and forcing motion, then apply a declared
+threshold/window after forcing settles.
+A shrinking negative and settled positive control must agree across browser and headless
+callers. **Bead:** `think-a2j9`, before Pack/Animate merge readiness.
+
+### Follow-up dispositions — independent Pack and exploratory Search
+
+The independent Pack panel now accepts `n` without an atlas transition pair.
+This is progress under `think-uhqw`; versioned receipt import/export and deterministic
+replay remain open under `think-adlf`. Pack/Animate readiness depends on both contracts,
+the batch-invariant best control (`think-wqf3`) and truthful stationarity
+(`think-a2j9`).
+
+The Search tab is an experimental preview limited to `n ≤ 32`, eight seeds and 5,000
+steps per trial. It is not the Phase 5 result.
+The scheduler and panel beads are `think-gfqt` and `think-vhgz`; synchronous
+proposal/Resolve work still needs a responsive execution path (`think-vwz7` and
+`think-naf7`). Saved Search outcomes now decode and re-admit against plan-derived
+fields. `think-i5pg` remains open for isolated nonfinite partial failures and effective
+growth semantics. Calibration, CLI and distribution views remain Phase 5 work under the
+governing plan.
+
+The browser checker migration is covered by focused Pack, Search, Animate and
+accessibility checks on a freshly built page.
+`think-kpvc` and `think-cqfc` still own final CI/disposition work.
+Historical `check_workbench` assertions requiring a paired Pack transition are obsolete;
+their failure is not a passing browser receipt.
+The public API’s original missing-key/type mismatch was repaired under `think-gxxc`;
+browser and browser-free entry points must still expose the same versioned Pack receipt
+and replay contract under `think-adlf`.
+
 ## Disposition of the Prior Agent’s Notes
 
 The owner supplied a prior-agent handoff on 2026-09-12. Its requested ordering is
@@ -350,24 +397,27 @@ A bead being created or closed without that evidence is not a review resolution.
 | Finding | Implementation owner | Governing phase | Required closure evidence | Resolution |
 | --- | --- | --- | --- | --- |
 | R1 — Imported evidence | `think-sdmi` | 1 | Negative import/export and retained-valid controls; actual validator, tolerance and provenance. | Implemented, awaiting committed checkpoint: import and every SVG/render consumer re-admit supplied geometry; forged checks and false feasible flags fail. Python and browser share a negative fixture and prefix guidance semantics; 105 Python contract tests pass. |
-| R2 — Strategy/count/trace semantics | `think-karf` | 1 | Small-grid rejection/count control, unsupported-field matrix, exact side/time/ID/seed/guidance round trips. | Implemented, awaiting committed checkpoint: typed strategies re-enter capability admission, exact counts/sides/IDs/seed receipts are enforced, and unsupported SVG palette modes fail explicitly. The Python contract suite passes; browser import/edit/export checks are in progress. |
+| R2 — Strategy/count/trace semantics | `think-karf` | 1 | Small-grid rejection/count control, unsupported-field matrix, exact side/time/ID/seed/guidance round trips. | Implemented, awaiting committed checkpoint: typed strategies re-enter capability admission, exact counts/sides/IDs/seed receipts are enforced, and unsupported SVG palette modes fail explicitly. The Python contract suite and focused browser Animate import/edit/export check pass. |
 | R3 — Invalid benchmark admission | `think-1fpa` | 1 | Run/replay/report/sweep reject nonfinite and invalid states; empty-cohort and rejection-count controls. | Repaired at `f9099096`: one canonical geometry/configuration/source admission path, strict JSON, rejection counts and empty-population controls. The clean-source six-trial browser fixture also passes replay and block reporting. |
 | R4 — Record/stack integration | `think-5pv0`, `think-3eha` | 0–1 | Integrated revisions and passing record/provenance/documentation/generated-view checks. | Repaired 2026-09-13: parent merged at `27d2f8cc`; collision renumbered `exp-210`, source mappings verified, unknown timing marked, index/ledger/SYNOPSIS reconciled. Schema, campaign and documentation gates pass; 47 campaign contract tests and focused BasedPyright pass. |
 | R5 — Seed aliases | `think-dq1l` | 1 | Exact mixer/domain, reproduced alias regression and effective-seed browser/headless replay. | Repaired at `f9099096`: exact uint32 input and `Math.imul` mixing, alias/boundary controls, effective seed receipts and shared browser/Node module. |
 | R6 — Missing compaction instrument | `think-3hb7` | 1 | Recovered committed tool/controls or dated annotation withdrawing the unsupported ceiling claim. | Dispositioned 2026-09-13: `exp-209`, X-028 and the runbook mark the discarded program/output unreproducible; current verdict is unresolved and the resolver-ceiling exclusion is withdrawn. Original observations are retained. No replacement experiment is claimed. |
 | R7 — Project-subpath navigation | `think-5wnw`, `think-9x0m`, `think-tn6s` | 2–4 | Served `/squares/` path test, checker negative controls, then a deployed navigation receipt. | Open |
-| R8 — Incomplete quality gates | `think-7f3p`, `think-gxxc`, `think-4ylo`, `think-kpvc`, `think-y9pw` | 2–3 | Checked source/API, strict zero-finding language gates, negative discovery controls, semantic CI and accessibility checks. | Open. The strict audit found 1,030 workbench and 249 probe errors; the plan now combines typing with coherent TS module migration. Final strict graduation remains a pre-merge gate. |
+| R8 — Incomplete quality gates | `think-7f3p`, `think-gxxc`, `think-4ylo`, `think-kpvc`, `think-y9pw` | 2–3 | Checked source/API, strict zero-finding language gates, negative discovery controls, semantic CI and accessibility checks. | Open. Package assets, probes and checkers moved at `15d97a59`; the strict audit found 1,030 workbench and 249 probe errors. Final strict graduation and semantic CI remain pre-merge gates. |
 | R9 — Ambient Node runtime | `think-l6l4`, `think-9x0m`, `think-tn6s` | 2–4 | Explicit runtime selection across package/CI/Pages; artifact and deployed revision verification. | Open |
-| R10 — Optimizer snapshot mismatch | `think-6hqs`, `think-nals` | 1–2 | Exact returned-pose validation, unit-size semantics, overlap-crossing regression and retained valid-snapshot control. | Snapshot defect repaired at `f9099096` with copied post-step geometry and retained best poses; unit-size and overlap-crossing controls pass. Shared bounded Resolve remains open under `think-nals`. |
+| R10 — Optimizer snapshot mismatch | `think-6hqs`, `think-nals` | 1–2 | Exact returned-pose validation, unit-size semantics, overlap-crossing regression and retained valid-snapshot control. | Snapshot defect repaired at `f9099096` with copied post-step geometry and retained best poses; unit-size and overlap-crossing controls pass. A bounded resolver landed at `12b4ed6c`; integration into Pack/headless remains open under `think-nals`. |
+| R11 — Batch-dependent Pack best | `think-wqf3` | 4 | Fixed seed/config/work produce identical validated best pose and receipt across UI batch sizes and browser/headless calls. | Implemented with fixed observation cadence and a batch-invariance Node control; final browser/headless checkpoint remains. |
+| R12 — False Pack stationarity | `think-a2j9` | 2–3 | Shrinking-container negative and settled positive controls; declared residual/window and browser/headless termination parity. | Implemented with moving-side and held-square controls; final browser/headless checkpoint remains. |
 
 Architectural work has explicit owners too: `think-a9gt` inventories consumers before
 `think-l9z0` establishes the package foundation; `think-109t` gates broad extraction;
 `think-nubm`, `think-w0a1` and `think-ywj4` own kernel/data/timeline; `think-g0lh`
 migrates live consumers and `think-cqfc` removes obsolete ones.
-`think-uhqw` finishes arbitrary-n Pack; `think-gfqt`, `think-vhgz` and `think-3yma`
-deliver experimental Search and calibration.
-`think-9sdr` records the clean Pack/Animate merge decision, `think-tn6s` the live
-release, and `think-wln2` the final O1–O7 result.
+`think-uhqw` finishes arbitrary-n Pack; `think-wqf3` and `think-a2j9` own the new Pack
+controls. `think-gfqt`, `think-vhgz` and `think-3yma` deliver experimental Search and
+calibration.
+`think-9sdr` records the clean Pack/Animate merge decision, `think-tn6s` the
+live release, and `think-wln2` the final O1–O7 result.
 The detailed ordering is maintained only in the plan.
 
 ### Standalone package boundary

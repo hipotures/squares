@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import tempfile
 from pathlib import Path
 from typing import Any
@@ -19,13 +20,16 @@ FIXTURE = Path(__file__).resolve().parents[2] / "tests/fixtures/packing-animatio
 def check(page_path: Path, screenshots: Path | None = None) -> str:
     """Run against the delivered page, including the public API and actual DOM controls."""
     with sync_playwright() as playwright:
-        browser = playwright.chromium.launch(headless=True)
+        browser = playwright.chromium.launch(
+            headless=True, executable_path=os.environ.get("SQUARES_BROWSER_EXECUTABLE")
+        )
         page = browser.new_page(
             reduced_motion="reduce", viewport={"width": 1440, "height": 1000}
         )
         errors: list[str] = []
         page.on("pageerror", lambda error: errors.append(str(error)))
         page.goto(page_path.resolve().as_uri())
+        page.locator("#mode-animate").click()
 
         def call(name: str, *arguments: Any) -> Any:
             return page.evaluate(probe("api/apply"), {"calls": [[name, *arguments]]})
@@ -110,8 +114,12 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
         )
 
         page.locator("#mode-pack").click()
-        require(not call("animationState")["active"], "Pack did not relinquish the trace scene")
-        require(page.locator("#squares").is_visible(), "catalogue squares remained hidden")
+        require(
+            not page.locator("#animation-editor").is_visible(),
+            "Pack did not relinquish the trace scene",
+        )
+        require(page.locator("#pack-squares").is_visible(), "Pack scene remained hidden")
+        require(page.locator("#pack-workspace").is_visible(), "Pack controls remained hidden")
         require(not errors, "page errors: " + "; ".join(errors))
         browser.close()
     return (

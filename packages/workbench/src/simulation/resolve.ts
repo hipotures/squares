@@ -214,18 +214,33 @@ export function resolvePacking(
       normalization: "lower-left-square",
     };
   }
+  if (options.shouldCancel?.()) {
+    return {
+      raw,
+      repaired: raw,
+      configuration: { ...configuration },
+      work,
+      termination: { reason: "cancelled", resolved: false, exhausted: false },
+      normalization: "lower-left-square",
+    };
+  }
   if (raw.maxPairOverlap <= configuration.tolerance) {
     const fittedRaw = fitLowerLeft(raw.snapshot);
     work.fitTranslations += fitTranslationCount(raw.snapshot, fittedRaw);
     const fittedAssessment = assessPackingSnapshot(fittedRaw, configuration.expectedCount);
+    const resolved = isResolved(fittedAssessment, configuration.tolerance);
     return {
       raw,
       repaired: fittedAssessment,
       configuration: { ...configuration },
       work,
       termination: {
-        reason: isResolved(raw, configuration.tolerance) ? "already-valid" : "resolved",
-        resolved: true,
+        reason: resolved
+          ? isResolved(raw, configuration.tolerance)
+            ? "already-valid"
+            : "resolved"
+          : "stalled",
+        resolved,
         exhausted: false,
       },
       normalization: "lower-left-square",

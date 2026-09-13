@@ -150,3 +150,24 @@ test("cancellation returns the last checked repair state and exact work", () => 
     fitTranslations: 0,
   });
 });
+
+test("fitting at zero tolerance cannot claim success for a rounded wall overlap", () => {
+  const result = resolvePacking(
+    snapshot([{ x: 1.61, y: 0.45099999999999996, angle: 0.151 }], 100),
+    { expectedCount: 1, iterationLimit: 1, tolerance: 0 },
+  );
+  assert((result.repaired?.maxWallOverlap ?? 0) > 0);
+  assert.equal(result.termination.reason, "stalled");
+  assert.equal(result.termination.resolved, false);
+});
+
+test("cancellation is observed before the fast fitting path", () => {
+  const result = resolvePacking(
+    snapshot([{ x: 0.5, y: 0.5, angle: 0 }]),
+    { expectedCount: 1, iterationLimit: 1, tolerance: 1e-9 },
+    { shouldCancel: () => true },
+  );
+  assert.equal(result.termination.reason, "cancelled");
+  assert.equal(result.termination.resolved, false);
+  assert.equal(result.work.fitTranslations, 0);
+});

@@ -1127,6 +1127,115 @@ input[type="number"] {
   padding: 12px;
   margin: 8px 0;
 }
+#pack-workspace {
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  padding: 12px;
+  margin: 8px 0;
+}
+#pack-workspace h2 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+#pack-workspace .row {
+  align-items: center;
+  margin: 8px 0;
+}
+#pack-workspace #pack-seed {
+  width: 112px;
+}
+#pack-workspace textarea {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  font: 12px var(--mono);
+  margin: 8px 0;
+}
+#pack-workspace output {
+  display: block;
+  margin-top: 6px;
+  font-variant-numeric: tabular-nums;
+}
+#pack-squares .pack-sq {
+  cursor: grab;
+}
+#pack-squares .pack-sq:focus-visible rect {
+  stroke: var(--new);
+  stroke-width: 3;
+}
+#pack-stage-facts {
+  position: absolute;
+  left: 1480px;
+  top: 210px;
+  width: 370px;
+  font: 28px / 1.35 var(--sans);
+  font-variant-numeric: tabular-nums;
+  white-space: pre-line;
+}
+body.pack-independent #facts,
+body.pack-independent #headline,
+body.pack-independent #kind-tag,
+body.pack-independent #mask-links,
+body.pack-independent #mode-panel,
+body.pack-independent #panel > .row,
+body.pack-independent #panel > .subpanel:not(:first-child) {
+  display: none;
+}
+body.pack-independent #packing-svg {
+  left: 460px;
+}
+body.pack-independent #pack-stage-facts {
+  display: block;
+}
+body.search-active #stage-wrap,
+body.search-active #mode-panel,
+body.search-active #panel > .row,
+body.search-active #panel > .subpanel:not(:first-child),
+body.search-active #continuous-info {
+  display: none;
+}
+body.search-active #controls {
+  max-height: 100vh;
+}
+#search-workspace {
+  align-self: center;
+  box-sizing: border-box;
+  width: min(100%, 1100px);
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  padding: 16px;
+}
+#search-workspace h2 {
+  margin: 0 0 8px;
+}
+#search-workspace .row {
+  margin: 10px 0;
+  align-items: center;
+}
+#search-workspace textarea {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  font: 12px var(--mono);
+  margin: 8px 0;
+}
+#search-workspace output {
+  display: block;
+  margin: 8px 0;
+  font-variant-numeric: tabular-nums;
+}
+#search-table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 12px 0;
+  font-variant-numeric: tabular-nums;
+}
+#search-table th,
+#search-table td {
+  border-bottom: 1px solid var(--rule);
+  padding: 5px 9px;
+  text-align: left;
+}
 body.trace-active #controls {
   max-height: calc(100vh - min(56.25vw, 42vh));
 }

@@ -9,14 +9,14 @@ author: Claude and Codex agents, for the repository maintainer
 
 **Updated:** 2026-09-13
 
-**Status:** Active; package foundation and correctness repairs implemented, broad
-migration in progress
+**Status:** Active; PR #160 adds independent Pack and bounded Search, phase gates open
 
 **Workflow:** W7 pipeline improvement
 
 **Tracking:** `think-ooi2` (product epic), `think-zisr` (standalone package)
 
-**Reviewed baseline:** `6e191a35`, with findings in the
+**Reviewed baseline:** `6e191a35`; prior committed checkpoint `0f2ac8ce`, with findings
+in the
 [2026-09-12 workbench stack architecture review](../../reviews/review-2026-09-12-workbench-stack-architecture.md)
 
 ## Authority and Implementation Entry Point
@@ -145,27 +145,43 @@ manifest reporter agree.
 This fixture tests the instrument and report path, not packing performance, and does not
 replace missing historical trial data.
 
-These repairs do not complete Phase 3. The retained application controller still
-inherits four documented compiler relaxations.
-Its earlier strict audit reported 1,246 diagnostics; the retained source must reach zero
-before `think-4ylo` or merge readiness closes.
-Shared geometry, colour, prepared illustration scenes and the SVG renderer are now
-strict package modules used by the actual page.
-The primary Chromium checker passes the integrated renderer through n=324. Cached
-trajectories and the live optimizer are the next consumers of the shared simulation
-kernel.
+At `0f2ac8ce`, the package build, assets, probes, checkers and capture tools have moved
+under `packages/workbench`; the retained spike no longer supplies live build inputs.
+The page uses the shared simulation kernel for cached trajectories and the live Pack
+optimizer, and a bounded resolver exists as a strict package module.
+The primary Chromium checker passes the integrated renderer through n=324. These commits
+establish implementation slices, not Phase 2 or 3 completion.
+The application controller and retained probes still inherit documented compiler
+relaxations; their earlier strict audit reported 1,246 diagnostics.
+`think-4ylo` and merge readiness require zero findings across retained live source.
+
+An independent Pack panel now accepts a chosen `n` without an atlas transition pair.
+Search is exposed as an experimental preview, bounded to `n ≤ 32`, at most eight seeds,
+and at most 5,000 steps per trial.
+This preview does not satisfy Phase 5: proposal and Resolve work can still block
+interaction, and calibration, CLI, and distribution views remain open.
+Saved ledgers now decode and re-admit outcomes against plan-derived fields; isolated
+nonfinite partial failures and effective growth semantics remain open in `think-i5pg`.
+The browser checker migration now covers independent Pack, bounded Search, Animate and
+accessibility on a freshly built page.
+Historical paired-Pack assertions in `check_workbench` remain obsolete and need a
+documented retirement disposition.
+
+Independent review of the shared Pack path found two defects: retained best could depend
+on how fixed steps were batched for UI yielding (`think-wqf3`), and a shrinking
+container could receive a stationary label (`think-a2j9`). Both have implementation
+controls in the current branch and need final checkpoint disposition, including
+fixed-seed browser/headless regressions before Pack/Animate readiness.
 
 The browser animation importer and Python adapter share a versioned fixture with stable
 IDs, a coincident frame falsely labelled feasible, and guidance followed by a later
 unguided flag. Both recompute geometry and preserve guidance ancestry.
 The animation studio exposes import, frame editing, seek, reduced-motion playback and
-JSON/SVG export; its browser integration is being verified.
+JSON/SVG export; its focused browser check passes on the current built page.
 Its pure capture adapter retains completed frames on cancellation or failure.
 Browser imports allow at most 324 squares, 10,000 frames, 8 MiB of input and five
 million worst-case pair checks; frame capture permits 300 SVG frames per request.
 These are explicit browser resource limits, not limits on the Python interchange format.
-The package build, assets, probes, checkers, and capture tools now live under
-`packages/workbench`; the retained spike no longer supplies live build inputs.
 The accessibility check builds the full corpus and exercises stage semantics, roving
 focus, keyboard editing, and reduced-motion transport in the pinned Chromium shell as a
 durable CI entry point.
@@ -176,8 +192,9 @@ instrument paths.
 Python SVG export rejects palette modes that its renderer cannot honor;
 browser replay supports the complete declared palette selection.
 
-Arbitrary-n Pack, shared bounded Resolve, complete trace/strategy editing and capture,
-Search/calibration and actual release remain open under the phases below.
+Full Pack acceptance, responsive resolver integration with the page and headless
+harness, complete trace/strategy editing and capture, full Search/calibration and actual
+release remain open under the phases below.
 Preparing their strict modules in parallel does not close the earlier correctness or
 release checkpoints; each phase still requires its specified integration receipts.
 
@@ -378,6 +395,7 @@ under the annealing plan.
 | `think-gxxc` | One public API/type contract (R8). | Runtime and declarations agree, including `setSeed`/`seed`; negative key/shape controls fail the normal gate. |
 | `think-4ylo` | Establish the full tbd Python and TS/JS gate; complete graduation during Phase 3. | Every new module passes strict compiler/lint/promise checks immediately. After live-source migration, Ruff/BasedPyright and compiler/lint/promise checks have zero findings across all retained live code, with no broad exclusions, suppressions or legacy flag inheritance. |
 | `think-nals` | Shared validity and bounded Resolve. | Raw and repaired states remain separate; finite/count/pair/wall checks agree; repair succeeds only after post-validation and reports stalled/budget/nonfinite outcomes honestly. |
+| `think-a2j9` | Make Pack stationarity truthful under container motion. | A shrinking-container run remains nonstationary; a settled control may pass only the declared residual/window test after forcing settles; browser/headless receipts agree. |
 | `think-y9pw` | Accessible stage and controls. | Current descriptions, focus, keyboard manipulation/transport and reduced-motion behavior pass served-page assertions. |
 | `think-kpvc` | Measured behavioral PR coverage (R8). | Startup, run/reset, modes, validity, seed replay and frame provenance reach the appropriate existing tiers; a broken behavior fails CI, and the builder’s inaccurate gate claim is corrected. |
 | `think-109t` | Correctness and strict-new-source checkpoint. | The refreshed commit, executable repairs, semantic checks and strict new-source gates pass. The remaining legacy typing inventory is explicit; final graduation belongs to `think-4ylo`, before merge readiness. |
@@ -430,8 +448,11 @@ The kernel receipt separates **feasibility**, **termination**, and **stationarit
 records arithmetic, timestep, configuration, steps/work, final motion residuals and
 termination reason. A feasible state at a work limit is not necessarily converged.
 A stationary label needs a declared threshold/window, with continuation controls after
-forcing decays. The benchmark reports warmup, repetitions, source/runtime/host and
-effective configuration; throughput alone proves neither feasibility nor convergence.
+forcing decays.
+`think-a2j9` adds the shrinking-container negative control; pose velocity
+alone cannot establish stationarity while the side changes.
+The benchmark reports warmup, repetitions, source/runtime/host and effective
+configuration; throughput alone proves neither feasibility nor convergence.
 
 **Package acceptance:** build, lint, typecheck, tests and headless benchmark run from
 the package directory; Node imports need no DOM; fixed-seed metrics/frames agree before
@@ -453,14 +474,17 @@ the migration.
 
 | Bead | Deliverable | Done when |
 | --- | --- | --- |
-| `think-uhqw` | Complete arbitrary-n Pack. | Generic and supplied starts work without an atlas pair; optional record start, effective seed, direct manipulation, import/export and cancellation obey O2 within measured limits. |
+| `think-uhqw` | Complete arbitrary-n Pack. | The independent panel accepts generic and supplied starts without an atlas pair; optional record start, effective seed, direct manipulation and cancellation obey O2 within measured limits. Current panel exposure is an implementation slice, not this acceptance receipt. |
+| `think-adlf` | Version and replay Pack receipts. | Browser and headless export/import the same versioned single-trial receipt; effective inputs, checked geometry, work and termination survive round-trip; malformed or altered receipts fail admission. |
+| `think-wqf3` | Make retained Pack best independent of UI step batching. | Equal fixed-seed work yields the same validated best pose and receipt across batch sizes and browser/headless callers; cancellation and restart do not publish stale best. |
 | `think-cqfc` | Retire obsolete sources after migration. | The Phase 0 inventory proves each old entry point and duplicate/revision assertion is replaced or unused; no live consumer reads the spike tree. |
 | `think-9x0m` | Implement post-deploy verification. | The checker passes against a served package artifact and rejects wrong/missing/stale output; it is wired after deployment without depending on an actual merge to be implemented. |
 | `think-9sdr` | Record Pack/Animate merge readiness. | O1/O2/O4/O6/O7, review dispositions, package gates, record checks, hosted required checks and the full checkpoint pass on one integrated revision. |
 | `think-tn6s` | Execute release and verify the live page. | After the merge decision, the validated artifact is deployed and the published source identity, startup and `/squares/` navigation pass; retain the URL/revision/check receipt. |
 
-`think-9sdr` depends on migrated consumers, arbitrary-n Pack, direct animation, headless
-benchmark, Pages fixes/checker, and evidence reconciliation.
+`think-9sdr` depends on migrated consumers, arbitrary-n Pack and its receipt/replay
+contract, both new Pack defect controls, direct animation, headless benchmark, Pages
+fixes/checker, and evidence reconciliation.
 It produces a concrete merge decision.
 `think-tn6s` follows it; a live success receipt is never required before the checker can
 be implemented. Pull requests build/test and do not deploy.
@@ -478,18 +502,21 @@ Retain archives, negative results and reproducible research instruments.
 Temporary old-path wrappers require a named live consumer and a retirement condition.
 Git retains discarded prototype code; neither a flat devtools move nor a second package
 tree constitutes consolidation.
-Search remains unavailable at this release boundary.
+The bounded Search preview is experimental and does not count as the released Search
+outcome at this boundary.
 
 ### Phase 5: Complete Experimental Search and Calibration
 
 | Bead | Deliverable | Done when |
 | --- | --- | --- |
-| `think-gfqt` | Bounded experimental multi-run scheduler. | Configurations from `think-6qxx` vary proposal, force/contact model, annealing/container schedule, repair and objective; repeated Pack runs report progress, cancellation and exact work/seed manifests without blocking interaction. |
-| `think-vhgz` | Search tab over that scheduler. | Best valid poses, rates, status counts, disjoint-block distributions and replay/export agree with headless output; empty or interrupted cohorts are explicit. |
+| `think-gfqt` | Bounded experimental multi-run scheduler. | Configurations from `think-6qxx` vary proposal, force/contact model, annealing/container schedule, repair and objective; repeated Pack runs report progress, cancellation and exact work/seed manifests without blocking interaction. The current `n ≤ 32`, eight-seed, 5,000-step preview does not meet this responsiveness or configuration contract. |
+| `think-i5pg` | Make Search ledgers independently checkable. | Decode and re-admit each outcome, derive block, budget and `n` from the plan, isolate nonfinite partial encoding failures, and make growth settings effective or reject them. A forged outcome cannot change the summary by supplying its own plan fields. |
+| `think-vhgz` | Complete Search over the shared scheduler. | Best valid poses, rates, status counts, disjoint-block distributions and replay/export agree with headless output; empty or interrupted cohorts are explicit. The preview tab remains exploratory until these views and controls pass. |
 | `think-3yma` | Calibration and held-out presets. | Campaign manifest fixes tuning/held-out partitions before execution; configuration-level distributions and individual best poses are distinguished; replay preserves the partition. |
 | `think-wln2` | Final end-to-end acceptance. | Every O1–O7 journey passes, documentation matches the product, required/full checks pass, and the released revision has a live smoke receipt. |
 
 `think-gfqt` starts after Phase 4 readiness and the corrected reporter/registry;
+`think-i5pg` is required before Search’s saved manifests can certify acceptance;
 `think-vhgz` follows it, calibration follows Search, and final acceptance follows both
 calibration and release verification.
 The existing research harness `think-k2fr`, hypothesis work `think-a87q`, and later

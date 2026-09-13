@@ -1,4 +1,8 @@
-"""The revision-9 checks: one view, the chooser for n, the range spine, the gap bar.
+"""Historical revision-9-to-18 checks for the pair-bound workbench controller.
+
+This exploratory suite preserves the behavior record of the original controller. Its Pack
+scene, optimizer, and controls were superseded by the independent Pack panel. The current
+Pack browser contract is ``check_pack_panel.py`` and runs through ``check_frontend.py``.
 
 Everything here is a property of the built page, driven through `window.atlasTransitions` in the
 pinned headless shell. It complements `check_revision6.py` (desaturation, snap, blind,
@@ -28,6 +32,7 @@ a probe that needs a number takes it as its one argument. See `probes.py` for wh
 """
 
 import math
+import os
 import sys
 from collections import Counter
 from pathlib import Path
@@ -189,7 +194,8 @@ def main() -> int:  # noqa: C901, PLR0911 -- a flat list of page invariants
             failures.append(message)
 
     with sync_playwright() as p:
-        browser = p.chromium.launch()
+        browser_executable = os.environ.get("SQUARES_BROWSER_EXECUTABLE")
+        browser = p.chromium.launch(executable_path=browser_executable)
         page = browser.new_page(viewport={"width": 1920, "height": 1080})
         page.on(
             "console",
@@ -310,6 +316,7 @@ def main() -> int:  # noqa: C901, PLR0911 -- a flat list of page invariants
                     "desat-floor",
                     "grow-rate",
                     "grow-size",
+                    "pack-shake",
                     "speed",
                 ]
             ),

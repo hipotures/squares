@@ -7,11 +7,15 @@ defines the finished product and migration phases; the
 [review](../../docs/project/reviews/review-2026-09-12-workbench-stack-architecture.md)
 tracks repairs and their evidence.
 
-The current migration checkpoint builds strict API, geometry-admission, force-law,
-navigation, corpus and timeline modules into the existing Pack/Animate page.
-The retained application and several build/capture consumers still live under the spike
-and `packing/devtools`. Consolidation, strict graduation of every retained source,
-arbitrary-n Pack and Search remain active work in the plan.
+The package builds a self-contained Pack, Animate and experimental Search page.
+Pack has its own seeded, arbitrary-count session, snapshot import/export and bounded
+overlap repair. Animate retains the catalogue and animation studio.
+Search runs a bounded browser preview and can export and resume exact-plan ledgers; its
+wider scheduler, calibration and research acceptance remain open in the plan.
+The checked JavaScript application is still large, and its historical pair-based Pack
+path needs retirement after the remaining consumers migrate.
+The source, probes, build tools and workbench-specific Python adapters now live in this
+package.
 
 ## Development
 

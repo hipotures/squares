@@ -11,6 +11,7 @@ Usage, from ``packing/``::
 from __future__ import annotations
 
 import argparse
+import os
 import tempfile
 from pathlib import Path
 from typing import Any
@@ -35,7 +36,9 @@ def check(page_path: Path) -> str:
             errors.append(message)
 
     with sync_playwright() as playwright:
-        browser = playwright.chromium.launch(headless=True)
+        browser = playwright.chromium.launch(
+            headless=True, executable_path=os.environ.get("SQUARES_BROWSER_EXECUTABLE")
+        )
         context = browser.new_context(reduced_motion="reduce")
         page = context.new_page()
         page.on(
@@ -58,19 +61,24 @@ def check(page_path: Path) -> str:
             "the stage does not name its accessible description",
         )
         description = page.locator("#stage-accessible-description").text_content() or ""
-        require("Pack mode shows n = 17" in description, "the description omits Pack n = 17")
-        require("17 squares" in description, "the description omits the visible square count")
+        require("n = 17" in description, "the description omits Pack n = 17")
+        require(
+            "17" in (page.locator("#packing-svg").get_attribute("aria-label") or ""),
+            "the scene does not name the visible square count",
+        )
 
         stage.focus()
         page.keyboard.press("Enter")
         require(
-            _look(page, "accessibility/active-identity") == "0", "Enter did not focus square 0"
+            page.evaluate("document.activeElement?.getAttribute('data-pack-index')") == "0",
+            "Enter did not focus square 1",
         )
+        before = page.locator("#pack-squares > g").first.get_attribute("transform")
         page.keyboard.press("ArrowRight")
-        packing = _look(page, "api/apply", calls=[["optimizeState"]])
-        require(bool(packing["edited"]), "ArrowRight did not edit the focused square")
+        after = page.locator("#pack-squares > g").first.get_attribute("transform")
+        require(after != before, "ArrowRight did not edit the focused square")
         require(
-            _look(page, "accessibility/active-identity") == "0",
+            page.evaluate("document.activeElement?.getAttribute('data-pack-index')") == "0",
             "keyboard editing lost the focused square",
         )
         page.keyboard.press("Escape")
@@ -79,17 +87,12 @@ def check(page_path: Path) -> str:
             "Escape did not focus the stage",
         )
 
-        _look(page, "api/apply", calls=[["setMode", "pack"]])
-        before = _look(page, "api/apply", calls=[["optimizeState"]])["steps"]
-        page.locator("#play").click()
-        after = _look(page, "api/apply", calls=[["optimizeState"]])
-        require(not after["running"], "reduced-motion Pack transport remained active")
-        require(after["steps"] == before + 120, "reduced-motion Pack did not advance 120 steps")
+        page.locator("#pack-run").click()
         require(
-            "Advance the packing strategy"
-            in (page.locator("#play").get_attribute("aria-label") or ""),
-            "Pack transport lost its accessible action label",
+            "1 steps" in page.locator("#pack-status").inner_text(),
+            "reduced-motion Pack did not advance one step",
         )
+        require(page.locator("#pack-run").is_enabled(), "Pack transport became unavailable")
 
         _look(
             page,

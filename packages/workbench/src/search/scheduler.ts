@@ -1,0 +1,211 @@
+import {
+  SEARCH_OUTCOMES_CONTRACT,
+  type SearchCancellationReason,
+  type SearchInterruptedOutcome,
+  type SearchNotStartedOutcome,
+  type SearchOutcome,
+  type SearchOutcomes,
+  type SearchPlan,
+  type SearchSlot,
+  type SearchTrialControl,
+  type SearchTrialRunner,
+  type SearchTrialValue,
+} from "./contracts.ts";
+import { decodeSearchOutcomes } from "./outcomes.ts";
+import { configurationFor } from "./registry.ts";
+import { decodeSearchTrialValue, type SearchAdmissionOptions } from "./validation.ts";
+
+export interface SearchSchedulerOptions extends SearchAdmissionOptions {
+  concurrency?: number;
+  /** Preserve terminal slots and claim only the ledger’s not-started slots. */
+  resume?: SearchOutcomes;
+  signal?: AbortSignal;
+  now?: () => number;
+  yieldControl?: () => Promise<void>;
+  onOutcome?: (outcome: SearchOutcome) => void | Promise<void>;
+}
+
+function elapsed(now: () => number, began: number): number {
+  return Math.max(0, now() - began);
+}
+
+function errorText(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
+function interrupted(
+  slot: SearchSlot,
+  reason: SearchCancellationReason,
+  elapsedMs: number,
+  partial: SearchTrialValue | null,
+): SearchInterruptedOutcome {
+  return {
+    slot,
+    status: reason,
+    elapsedMs,
+    error: reason === "cancelled" ? "search cancelled during trial" : "trial deadline elapsed",
+    partial,
+  };
+}
+
+/**
+ * Run a deterministic slot plan with bounded concurrency.
+ *
+ * Trial runners must poll `cancellationReason()` while doing work. This avoids a
+ * Promise-race timeout leaving an unobserved simulation alive after its slot was
+ * reported terminal. Pending slots remain explicit `not-started` outcomes.
+ */
+export async function runSearchPlan(
+  declaredPlan: SearchPlan,
+  runner: SearchTrialRunner,
+  options: SearchSchedulerOptions = {},
+): Promise<SearchOutcomes> {
+  const plan = structuredClone(declaredPlan);
+  const concurrency = options.concurrency ?? 1;
+  if (!Number.isSafeInteger(concurrency) || concurrency < 1 || concurrency > 64) {
+    throw new RangeError("search concurrency must be an integer from 1 to 64");
+  }
+  const now = options.now ?? performance.now.bind(performance);
+  const yieldControl =
+    options.yieldControl ??
+    (() => new Promise<void>((resolve) => globalThis.setTimeout(resolve, 0)));
+  const outcomes: Array<SearchOutcome | undefined> = Array.from({ length: plan.slots.length });
+  if (options.resume !== undefined) {
+    const previous = decodeSearchOutcomes(options.resume, plan, options);
+    for (const outcome of previous.outcomes) {
+      if (outcome.status !== "not-started") {
+        outcomes[outcome.slot.index] = outcome;
+      }
+    }
+  }
+  let nextIndex = 0;
+  let observerFailed = false;
+
+  const record = async (outcome: SearchOutcome): Promise<void> => {
+    outcomes[outcome.slot.index] = outcome;
+    try {
+      await options.onOutcome?.(structuredClone(outcome));
+    } catch (error: unknown) {
+      observerFailed = true;
+      throw error;
+    }
+  };
+
+  const claim = (): SearchSlot | null => {
+    while (nextIndex < plan.slots.length && outcomes[nextIndex] !== undefined) {
+      nextIndex += 1;
+    }
+    if (observerFailed || options.signal?.aborted === true || nextIndex >= plan.slots.length) {
+      return null;
+    }
+    const slot = plan.slots[nextIndex];
+    nextIndex += 1;
+    if (slot === undefined) {
+      throw new RangeError("search plan slot index is inconsistent");
+    }
+    return slot;
+  };
+
+  const worker = async (): Promise<void> => {
+    for (let slot = claim(); slot !== null; slot = claim()) {
+      const began = now();
+      const deadline = slot.timeoutMs === null ? null : began + slot.timeoutMs;
+      const control: SearchTrialControl = {
+        cancellationReason: () => {
+          if (observerFailed || options.signal?.aborted === true) {
+            return "cancelled";
+          }
+          if (deadline !== null && now() >= deadline) {
+            return "timed-out";
+          }
+          return null;
+        },
+      };
+      let outcome: SearchOutcome;
+      try {
+        const result = await runner(
+          structuredClone(slot),
+          structuredClone(configurationFor(plan, slot.configurationId)),
+          control,
+        );
+        const cancellation = control.cancellationReason();
+        if (cancellation !== null) {
+          outcome = interrupted(
+            slot,
+            cancellation,
+            elapsed(now, began),
+            decodeSearchTrialValue(
+              result,
+              slot,
+              false,
+              configurationFor(plan, slot.configurationId),
+              options,
+            ),
+          );
+        } else {
+          outcome = {
+            slot,
+            status: "completed",
+            elapsedMs: elapsed(now, began),
+            result: decodeSearchTrialValue(
+              result,
+              slot,
+              true,
+              configurationFor(plan, slot.configurationId),
+              options,
+            ),
+          };
+        }
+      } catch (error: unknown) {
+        const cancellation = control.cancellationReason();
+        outcome =
+          cancellation === null
+            ? {
+                slot,
+                status: "failed",
+                elapsedMs: elapsed(now, began),
+                error: errorText(error),
+                partial: null,
+              }
+            : interrupted(slot, cancellation, elapsed(now, began), null);
+      }
+      await record(outcome);
+      await yieldControl();
+    }
+  };
+
+  const workers = await Promise.allSettled(
+    Array.from({ length: Math.min(concurrency, plan.slots.length) }, worker),
+  );
+  for (const result of workers) {
+    if (result.status === "rejected") {
+      throw result.reason;
+    }
+  }
+  for (const slot of plan.slots) {
+    if (outcomes[slot.index] !== undefined) {
+      continue;
+    }
+    const outcome: SearchNotStartedOutcome = {
+      slot,
+      status: "not-started",
+      elapsedMs: 0,
+      reason:
+        options.signal?.aborted === true
+          ? "search cancelled before trial started"
+          : "trial was not claimed",
+    };
+    await record(outcome);
+  }
+  return {
+    contract: SEARCH_OUTCOMES_CONTRACT,
+    planId: plan.id,
+    plan: structuredClone(plan),
+    outcomes: outcomes.map((outcome) => {
+      if (outcome === undefined) {
+        throw new RangeError("search scheduler omitted a planned slot");
+      }
+      return outcome;
+    }),
+  };
+}

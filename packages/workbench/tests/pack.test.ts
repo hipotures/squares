@@ -91,8 +91,28 @@ test("fixed work can be continued without changing the deterministic result", ()
   advancePackRun(continued, 7);
   const twice = advancePackRun(continued, 13);
   assert.deepEqual(twice.snapshot, once.snapshot);
+  assert.deepEqual(twice.best, once.best);
   assert.deepEqual(twice.work, once.work);
   assert.deepEqual(twice.residual, once.residual);
+});
+
+test("best packing is independent of how the same fixed work is batched", () => {
+  const config = configuration({
+    n: 2,
+    seed: 0,
+    effectiveSeed: 0,
+    startKind: "random",
+    start: createRandomPackStart(2, 4, 0),
+  });
+  const uninterrupted = runPack(config, 300);
+  const continued = createPackRun(config);
+  let batched = advancePackRun(continued, 10);
+  for (let batch = 1; batch < 30; batch += 1) {
+    batched = advancePackRun(continued, 10);
+  }
+  assert.deepEqual(batched.snapshot, uninterrupted.snapshot);
+  assert.deepEqual(batched.best, uninterrupted.best);
+  assert((batched.best?.requiredSide ?? Infinity) < 2.5);
 });
 
 test("cancellation and stationarity are explicit and separate from feasibility", () => {
@@ -120,6 +140,7 @@ test("cancellation and stationarity are explicit and separate from feasibility",
         window: 2,
         stop: true,
       },
+      container: { ...configuration().container, squeezeRate: 0, relaxRate: 0 },
     }),
     20,
   );
@@ -127,6 +148,43 @@ test("cancellation and stationarity are explicit and separate from feasibility",
   assert.equal(stationary.termination.stationary, true);
   assert.equal(stationary.termination.converged, true);
   assert.equal(stationary.work.baseSteps, 2);
+});
+
+test("changing container or square size cannot be declared stationary", () => {
+  const base = configuration({
+    n: 1,
+    start: {
+      squareSide: 1,
+      container: { originX: 0, originY: 0, side: 10 },
+      poses: [{ x: 5, y: 5, angle: 0 }],
+    },
+    pairLaw: { ...law, repulsion: 0 },
+    wallLaw: { ...law, repulsion: 0 },
+    anneal: { amplitude: 0, decayPower: 1.5, tau: 2, floor: 0 },
+    stationarity: {
+      linearSpeed: 0,
+      angularSpeed: 0,
+      forcingScale: 0,
+      window: 1,
+      stop: true,
+    },
+  });
+  const shrinking = runPack(base, 1);
+  assert(shrinking.snapshot.container.side < 10);
+  assert.equal(shrinking.termination.reason, "work-limit");
+  assert.equal(shrinking.termination.stationarySteps, 0);
+
+  const growing = runPack(
+    {
+      ...base,
+      start: { ...base.start, squareSide: 0.5 },
+      growth: { on: true, rate: 0.1, rule: "constant" },
+    },
+    1,
+  );
+  assert(growing.snapshot.squareSide > 0.5);
+  assert.equal(growing.termination.reason, "work-limit");
+  assert.equal(growing.termination.stationarySteps, 0);
 });
 
 test("sub-unit growth is disclosed and cannot produce a retained unit packing", () => {

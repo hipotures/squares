@@ -23,6 +23,9 @@ import {
 } from "./kernel.ts";
 
 const QUARTER_TURN = Math.PI / 2;
+// Best admission uses a fixed simulation cadence, independent of browser frame batches.
+// Exact all-pairs checks on every physics step would dominate large Pack runs.
+const BEST_OBSERVATION_INTERVAL = 10;
 
 export interface PackPhysicsConfiguration {
   stepsPerSecond: number;
@@ -388,7 +391,7 @@ export function createRandomPackStart(
 }
 
 /** Recheck the run's exact current buffers and refresh its derived fields. */
-export function measurePackRun(run: PackRun): PackingAssessment {
+export function measurePackRun(run: PackRun, admitBest = true): PackingAssessment {
   const snapshot = packingSnapshot(run.X, run.Y, run.TH, run.size, {
     originX: run.configuration.start.container.originX,
     originY: run.configuration.start.container.originY,
@@ -404,14 +407,16 @@ export function measurePackRun(run: PackRun): PackingAssessment {
   run.wallPen = assessment.maxWallOverlap;
   run.packingValid = assessment.valid;
   run.invalidReason = assessment.reason;
-  const admitted = admitBestPacking(run.bestPacking, assessment, run.time);
-  if (admitted !== run.bestPacking) {
-    run.bestPacking = admitted;
-    if (admitted !== null) {
-      run.best = admitted.requiredSide;
-      run.bestAt = admitted.at;
-      run.bestPen = admitted.maxPairOverlap;
-      run.bestWallPen = admitted.maxWallOverlap;
+  if (admitBest) {
+    const admitted = admitBestPacking(run.bestPacking, assessment, run.time);
+    if (admitted !== run.bestPacking) {
+      run.bestPacking = admitted;
+      if (admitted !== null) {
+        run.best = admitted.requiredSide;
+        run.bestAt = admitted.at;
+        run.bestPen = admitted.maxPairOverlap;
+        run.bestWallPen = admitted.maxWallOverlap;
+      }
     }
   }
   return assessment;
@@ -541,7 +546,9 @@ function finiteSnapshot(snapshot: GeometrySnapshot): boolean {
 }
 
 function receipt(run: PackRun, reason: PackTerminationReason): PackReceipt {
-  const assessment = measurePackRun(run);
+  // A caller may request a receipt after any step. It cannot change which sampled
+  // states compete for best; otherwise browser frame size changes Search results.
+  const assessment = measurePackRun(run, false);
   const snapshot = assessment.snapshot;
   const unitSquares = snapshot.squareSide === 1;
   const geometry = finiteSnapshot(snapshot)
@@ -627,6 +634,8 @@ export function advancePackRun(
       reason = "cancelled";
       break;
     }
+    let containerChanged = false;
+    let squareSizeChanged = false;
     for (let substep = 0; substep < substeps; substep++) {
       const decay =
         anneal.floor + (1 - anneal.floor) * (1 / (1 + run.time / anneal.tau)) ** anneal.decayPower;
@@ -683,6 +692,7 @@ export function advancePackRun(
           nextSide = run.side * (1 + container.relaxRate * timestep);
         }
         if (nextSide !== run.side) {
+          containerChanged = true;
           const shift = (nextSide - run.side) / 2;
           translateSimulation(run.simulation, shift, shift);
           if (run.held >= 0) {
@@ -698,6 +708,7 @@ export function advancePackRun(
         if (mayGrow) {
           const previousSize = run.size;
           run.size = Math.min(1, run.size + growth.rate * timestep);
+          squareSizeChanged ||= run.size !== previousSize;
           run.grew += run.size - previousSize;
           setUniformSimulationSquareSize(run.simulation, run.size);
         }
@@ -713,10 +724,16 @@ export function advancePackRun(
       reason = "nonfinite";
       break;
     }
+    if (run.work.baseSteps % BEST_OBSERVATION_INTERVAL === 0) {
+      measurePackRun(run);
+    }
     const withinStationarity =
       run.residual.maxLinearSpeed <= stationarity.linearSpeed &&
       run.residual.maxAngularSpeed <= stationarity.angularSpeed &&
-      run.forcingScale <= stationarity.forcingScale;
+      run.forcingScale <= stationarity.forcingScale &&
+      !containerChanged &&
+      !squareSizeChanged &&
+      run.held < 0;
     run.stationarySteps = withinStationarity ? run.stationarySteps + 1 : 0;
     if (stationarity.stop && run.stationarySteps >= stationarity.window) {
       reason = "stationary";
