@@ -258,6 +258,7 @@ case or experiment separately.
 | [BC303 T2 Charge Reader: Independent Admission Review](docs/project/reviews/review-2026-09-13-bc303-t2-charge-reader-refusal.md) | dated review record | record | retained | — |
 | [BC303 T2 Charge Reader: Independent Readmission](docs/project/reviews/review-2026-09-13-bc303-t2-charge-reader-readmission.md) | dated review record | record | retained | — |
 | [H-160 T2 Reader: Integrated-Head Target-Free Admission](docs/project/reviews/review-2026-09-13-bc303-t2-integrated-head-admission.md) | dated review record | record | retained | — |
+| [X-030 Final Publication Review at `147ceff6`](docs/project/reviews/review-2026-09-13-x030-publication.md) | dated review record | record | retained | — |
 | [Strategic Review of the N11 Daytime Research Frontier](docs/project/reviews/review-2026-09-10-n11-strategy-frontier.md) | dated review record | record | retained | — |
 | [N=11 Structural Normal Forms](docs/project/reviews/review-2026-09-10-n11-structural-normal-forms.md) | dated review record | record | retained | — |
 | [Independent Review of the N=11 Structural Normal Form](docs/project/reviews/review-2026-09-10-n11-structural-normal-forms-independent.md) | dated review record | record | retained | — |
