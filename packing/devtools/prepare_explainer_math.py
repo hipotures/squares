@@ -488,12 +488,14 @@ class MathFontRejection(TypedDict):
 class FontRequestTrace(TypedDict):
     time_origin_ms: float
     first_math_request_ms: float | None
+    root_watchdog_paused: bool
     rejections: list[MathFontRejection]
 
 
 class FontHoldTiming(TypedDict):
     first_math_request_ms: float | None
     first_font_request_ms: float | None
+    root_watchdog_paused: bool
     release_started_ms: float
     release_completed_ms: float
     held_ms: float | None
@@ -554,16 +556,31 @@ def geometry_findings(
     before: list[GeometryBox],
     after: list[GeometryBox],
     *,
+    root_watchdog_paused: bool,
     tolerance: float = 1.0,
     early_ready: frozenset[int] = frozenset(),
+    exposed_early: frozenset[int] | None = None,
 ) -> list[str]:
-    """Compare the same boxes and their line breaks across actual font arrival."""
+    """Compare the same boxes and their line breaks across actual font arrival.
+
+    `exposed_early` and `early_ready` describe the same observation: the boxes visible
+    when their font evidence was gathered. Keeping those sets together prevents a later
+    probe state from changing the exposure question. The root-watchdog flag separately
+    proves that the artificial setup did not consume the page's recovery timeout.
+    """
     findings: list[str] = []
+    if not root_watchdog_paused:
+        findings.append("the geometry probe did not pause the root math watchdog")
     old = {box["key"]: box for box in before}
     new = {box["key"]: box for box in after}
     if not old or old.keys() != new.keys():
         findings.append("prepared math boxes disappeared or were never measured")
-    if before and any(not box["hidden"] and box["key"] not in early_ready for box in before):
+    exposed = (
+        exposed_early
+        if exposed_early is not None
+        else frozenset(box["key"] for box in before if not box["hidden"])
+    )
+    if before and exposed - early_ready:
         findings.append("math was exposed while its font requests were held")
     if before and not any(box["hidden"] for box in before):
         findings.append("no hidden prepared math was observed before fonts arrived")
@@ -818,7 +835,53 @@ _GEOMETRY_EARLY_READY = dedent("""
 _GEOMETRY_FONT_TRACE = dedent("""
     (() => {
       const trace = globalThis.__squaresGeometryFontTrace = {
-        time_origin_ms: performance.timeOrigin, first_math_request_ms: null, rejections: []
+        time_origin_ms: performance.timeOrigin, first_math_request_ms: null,
+        before_snapshot_complete: false, root_watchdog_paused: false,
+        queued_calls: 0, rejections: []
+      };
+      const waiting = [];
+      let released = false;
+      // This control delays entry into kpressMathText while it constructs the
+      // altered before-state. Pause the independent root fallback or that test
+      // setup can expose dynamic prepared formulas before the real runtime gets
+      // the synchronous call that hides them. Watchdog expiry has its own control.
+      let rootWatchdog;
+      Object.defineProperty(globalThis, 'kpressMathPendingTimer', {
+        configurable: true,
+        get() { return rootWatchdog; },
+        set(timer) {
+          rootWatchdog = timer;
+          clearTimeout(timer);
+          trace.root_watchdog_paused = true;
+        }
+      });
+      globalThis.__squaresMarkGeometryBeforeSnapshotComplete = () => {
+        trace.before_snapshot_complete = true;
+      };
+      globalThis.__squaresReleaseGeometryFontGate = () => {
+        if (!trace.before_snapshot_complete) {
+          throw new Error('geometry font gate released before the before snapshot');
+        }
+        if (released) return;
+        released = true;
+        for (const invoke of waiting.splice(0)) invoke();
+      };
+      const invoke = (original, receiver, args) => {
+        const start = performance.now();
+        trace.first_math_request_ms ??= start;
+        let result;
+        try {
+          result = original.apply(receiver, args);
+        } catch (error) {
+          trace.rejections.push({source: String(args[0]),
+            elapsed_ms: performance.now() - start, reason: String(error)});
+          throw error;
+        }
+        Promise.resolve(result).then(undefined, error => {
+          trace.rejections.push({source: String(args[0]),
+            elapsed_ms: performance.now() - start, reason: String(error)});
+        });
+        return result;
       };
       let runtime;
       Object.defineProperty(globalThis, 'kpressMathText', {
@@ -829,14 +892,18 @@ _GEOMETRY_FONT_TRACE = dedent("""
           for (const name of ['render', 'hydrate']) {
             const original = api[name];
             api[name] = function(...args) {
-              const start = performance.now();
-              trace.first_math_request_ms ??= start;
-              const result = original.apply(this, args);
-              result.then(undefined, error => {
-                trace.rejections.push({source: String(args[0]),
-                  elapsed_ms: performance.now() - start, reason: String(error)});
+              const receiver = this;
+              if (released) return invoke(original, receiver, args);
+              return new Promise((resolve, reject) => {
+                trace.queued_calls++;
+                waiting.push(() => {
+                  try {
+                    Promise.resolve(invoke(original, receiver, args)).then(resolve, reject);
+                  } catch (error) {
+                    reject(error);
+                  }
+                });
               });
-              return result;
             };
           }
         }
@@ -1170,6 +1237,7 @@ async def _check_geometry_async(
     held: list[Route] = []
     released = False
     first_request: float | None = None
+    first_held_request = asyncio.Event()
 
     async def route_font(route: Route) -> None:
         nonlocal first_request
@@ -1183,6 +1251,7 @@ async def _check_geometry_async(
             )
         else:
             held.append(route)
+            first_held_request.set()
 
     async with async_playwright() as driver:
         browser_type = getattr(driver, browser_name)
@@ -1290,6 +1359,12 @@ async def _check_geometry_async(
                     }
                 """)
                 )
+            # The trace gate keeps KPress's production timeout clock stopped while
+            # this probe constructs and measures its deliberately altered before
+            # state. Start the real runtime only after those test styles are gone.
+            await page.evaluate("__squaresMarkGeometryBeforeSnapshotComplete()")
+            await page.evaluate("__squaresReleaseGeometryFontGate()")
+            await asyncio.wait_for(first_held_request.wait(), timeout=5)
             held_count = len(held)
             released = True
             release_started = time.time() * 1000
@@ -1328,7 +1403,16 @@ async def _check_geometry_async(
             for request in box["requests"]
         )
     )
-    findings = geometry_findings(before, after, early_ready=early_ready)
+    findings = geometry_findings(
+        before,
+        after,
+        early_ready=early_ready,
+        root_watchdog_paused=font_trace["root_watchdog_paused"],
+        # `_GEOMETRY_EARLY_READY` skips hidden boxes, so its keys are exactly what was
+        # visible when it weighed each box's faces -- the one observation the exposure
+        # rule and its exemptions can share.
+        exposed_early=frozenset(box["key"] for box in early_visible),
+    )
     findings.extend(coverage_findings(coverage_before))
     findings.extend(coverage_findings(coverage_after))
     if not held_count:
@@ -1357,6 +1441,7 @@ async def _check_geometry_async(
                 if first_request is not None
                 else None
             ),
+            "root_watchdog_paused": font_trace["root_watchdog_paused"],
             "release_started_ms": release_started - font_trace["time_origin_ms"],
             "release_completed_ms": release_completed - font_trace["time_origin_ms"],
             "held_ms": release_started - first_request if first_request is not None else None,
