@@ -1,0 +1,113 @@
+..{"open_cell_maximum_clearance": "4436777100798802905238461218821/6338253001141147007483516026880", "reference_minimum": 1, "scope": "Synthetic atoms and rational synthetic wall only", "sweep_minimum": 0}
+F{"inverse_reflected_source_tangent": "13575/13568", "lower_source_tangent": "37175706500000/37322097608629", "receipt": {"centre": ["394207856528233634434199534679/435795372857537377232693080000", "871855023117583431527238456521/871590745715074754465386160000"], "integer_charge": 10, "labels": [0, 14], "owns_marks": [true, true], "physical_parent_ray": ["13575/19193", "13568/19193"], "reflected": true, "role": "C", "selected_core_ray": ["207107000000/292893309449", "207106690551/292893309449"], "source_index": 180}, "scope": "Synthetic atoms only; no BC293 source measure loaded or charged", "source_cell_valid": false, "upper_source_tangent": "1"}
+F{"inverse_reflected_source_tangent": "207107000000/207106690551", "lower_source_tangent": "37175706500000/37322097608629", "receipt": {"centre": ["509499837793163949924595034679/435795372857537377232693080000", "275609660280082972269174943721/217897686428768688616346540000"], "integer_charge": 15, "labels": [0], "owns_marks": [true, false], "physical_parent_ray": ["207107000000/292893309449", "207106690551/292893309449"], "reflected": true, "role": "S_first_owner", "selected_core_ray": ["207107000000/292893309449", "207106690551/292893309449"], "source_index": 180}, "scope": "Synthetic atoms only; no BC293 source measure loaded or charged", "source_cell_valid": false, "upper_source_tangent": "1"}
+F
+=================================== FAILURES ===================================
+____ test_reference_keeps_a_feasible_open_cell_thinner_than_its_search_cap _____
+
+    def test_reference_keeps_a_feasible_open_cell_thinner_than_its_search_cap() -> None:
+        """A rational wall at 7/10 cuts a nonempty synthetic zero-charge cell."""
+        spec = importlib.util.spec_from_file_location(
+            "reviewed_reader_controls", REPO / "packing/tests/test_bc303_t2_charge_sweep.py"
+        )
+        assert spec is not None and spec.loader is not None
+        controls = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(controls)
+        c, s = Fraction(4, 5), Fraction(3, 5)
+        chart = Chart(1, False, (c, s), Fraction(3, 4), Fraction(1), H - DELTA * (c - s))
+        x_high = Fraction(1, 1000)
+        epsilon = Fraction(1, 2**100)
+        y_low = (A + c * x_high - Fraction(7, 10) - epsilon) / s
+        assert 0 < y_low < H
+        atoms = (
+            AtomMass(centre_of(chart, x_high + H, H / 2), 1),
+            AtomMass(centre_of(chart, H / 2, y_low - H), 1),
+        )
+        minimum, _, _ = sweep_chart(chart, atoms)
+        reference, _ = controls.direct_all_strata_minima(chart, atoms)
+        # This explicit point proves the missed zero-charge cell is nonempty.
+        x = x_high - x_high / 2**110
+        y = y_low + (H - y_low) / 2**110
+        centre = centre_of(chart, x, y)
+        assert centre[0] > Fraction(7, 10)
+        assert charge_at(atoms, centre, chart.selected_ray) == 0
+        print(json.dumps({
+            "scope": "Synthetic atoms and rational synthetic wall only",
+            "open_cell_maximum_clearance": str(Fraction(7, 10) + epsilon),
+            "sweep_minimum": minimum.integer_mass,
+            "reference_minimum": reference,
+        }, sort_keys=True))
+>       assert reference == minimum.integer_mass
+E       assert 1 == 0
+E        +  where 0 = Minimum(integer_mass=0, chart=Chart(index=1, reflected=False, selected_ray=(Fraction(4, 5), Fraction(3, 5)), lower_tan..._low=Fraction(29537526635917973284274681388386801, 60371859835869425246280490156032000), y_high=Fraction(9977, 20000))).integer_mass
+
+../../test_bc303_t2_charge_reader_admission_2026_09_13.py:107: AssertionError
+______ test_reflected_parent_inverse_transport_matches_declared_source[C] ______
+
+role = 'C'
+
+    @pytest.mark.parametrize("role", ["C", "S_first_owner"])
+    def test_reflected_parent_inverse_transport_matches_declared_source(role: str) -> None:
+        chart = next(chart for chart in charts() if chart.index == 180 and chart.reflected)
+        atoms = (
+            AtomMass(centre_of(chart, H, H), 3),
+            AtomMass(centre_of(chart, chart.x_cut / 2 + H, H / 2), 5),
+            AtomMass(centre_of(chart, H / 3, H / 3), 7),
+        )
+        c_minimum, s_minimum, _ = sweep_chart(chart, atoms)
+        minimum = c_minimum if role == "C" else s_minimum
+        receipt = replay(minimum, atoms, role)
+        ux, uy = map(Fraction, receipt["physical_parent_ray"])
+        # All eligible non-axis reflected charts have positive physical coordinates.
+        # Undo the source's coordinate swap before testing its folded angular cell.
+        source_tangent = ux / uy
+        valid = chart.lower_tangent <= source_tangent <= chart.upper_tangent
+        print(json.dumps({
+            "receipt": receipt,
+            "lower_source_tangent": str(chart.lower_tangent),
+            "upper_source_tangent": str(chart.upper_tangent),
+            "inverse_reflected_source_tangent": str(source_tangent),
+            "source_cell_valid": valid,
+            "scope": "Synthetic atoms only; no BC293 source measure loaded or charged",
+        }, sort_keys=True))
+>       assert valid
+E       assert False
+
+../../test_bc303_t2_charge_reader_admission_2026_09_13.py:134: AssertionError
+_ test_reflected_parent_inverse_transport_matches_declared_source[S_first_owner] _
+
+role = 'S_first_owner'
+
+    @pytest.mark.parametrize("role", ["C", "S_first_owner"])
+    def test_reflected_parent_inverse_transport_matches_declared_source(role: str) -> None:
+        chart = next(chart for chart in charts() if chart.index == 180 and chart.reflected)
+        atoms = (
+            AtomMass(centre_of(chart, H, H), 3),
+            AtomMass(centre_of(chart, chart.x_cut / 2 + H, H / 2), 5),
+            AtomMass(centre_of(chart, H / 3, H / 3), 7),
+        )
+        c_minimum, s_minimum, _ = sweep_chart(chart, atoms)
+        minimum = c_minimum if role == "C" else s_minimum
+        receipt = replay(minimum, atoms, role)
+        ux, uy = map(Fraction, receipt["physical_parent_ray"])
+        # All eligible non-axis reflected charts have positive physical coordinates.
+        # Undo the source's coordinate swap before testing its folded angular cell.
+        source_tangent = ux / uy
+        valid = chart.lower_tangent <= source_tangent <= chart.upper_tangent
+        print(json.dumps({
+            "receipt": receipt,
+            "lower_source_tangent": str(chart.lower_tangent),
+            "upper_source_tangent": str(chart.upper_tangent),
+            "inverse_reflected_source_tangent": str(source_tangent),
+            "source_cell_valid": valid,
+            "scope": "Synthetic atoms only; no BC293 source measure loaded or charged",
+        }, sort_keys=True))
+>       assert valid
+E       assert False
+
+../../test_bc303_t2_charge_reader_admission_2026_09_13.py:134: AssertionError
+=========================== short test summary info ============================
+FAILED ../../test_bc303_t2_charge_reader_admission_2026_09_13.py::test_reference_keeps_a_feasible_open_cell_thinner_than_its_search_cap
+FAILED ../../test_bc303_t2_charge_reader_admission_2026_09_13.py::test_reflected_parent_inverse_transport_matches_declared_source[C]
+FAILED ../../test_bc303_t2_charge_reader_admission_2026_09_13.py::test_reflected_parent_inverse_transport_matches_declared_source[S_first_owner]
+3 failed, 2 passed in 1.10s

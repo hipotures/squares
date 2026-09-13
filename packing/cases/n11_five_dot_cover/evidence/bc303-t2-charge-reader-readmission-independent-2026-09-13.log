@@ -1,0 +1,13 @@
+........................................................................ [ 36%]
+........................................................................ [ 72%]
+......................................................                   [100%]
+============================= slowest 8 durations ==============================
+0.09s call     test_bc303_t2_charge_reader_readmission_2026_09_13.py::test_all_chart_endpoints_and_exterior_rays_under_d4
+0.05s call     test_bc303_t2_charge_reader_readmission_2026_09_13.py::test_independent_synthetic_event_layouts_match_reference[90]
+0.04s call     test_bc303_t2_charge_reader_readmission_2026_09_13.py::test_independent_synthetic_event_layouts_match_reference[179]
+0.04s call     test_bc303_t2_charge_reader_readmission_2026_09_13.py::test_independent_synthetic_event_layouts_match_reference[178]
+0.04s call     test_bc303_t2_charge_reader_readmission_2026_09_13.py::test_independent_synthetic_event_layouts_match_reference[180]
+0.04s call     test_bc303_t2_charge_reader_readmission_2026_09_13.py::test_independent_synthetic_event_layouts_match_reference[2]
+0.04s call     test_bc303_t2_charge_reader_readmission_2026_09_13.py::test_independent_synthetic_event_layouts_match_reference[135]
+0.04s call     test_bc303_t2_charge_reader_readmission_2026_09_13.py::test_independent_synthetic_event_layouts_match_reference[45]
+198 passed in 1.50s
