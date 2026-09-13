@@ -144,6 +144,11 @@ def check(page_path: Path) -> str:
             panel.is_visible() and squares.count() == 1, "Pack lost its arrangement on return"
         )
         page.set_viewport_size({"width": 390, "height": 844})
+        # Chromium delivers the resize event after set_viewport_size returns. Wait for
+        # the stage's JS scale to reflect the new viewport before testing overflow.
+        page.wait_for_function(
+            "document.querySelector('#stage-wrap').getBoundingClientRect().width <= innerWidth"
+        )
         width = page.evaluate("document.documentElement.scrollWidth")
         require(width <= 390, f"Pack overflows the mobile viewport: {width}px")
         require(not errors, "page errors: " + "; ".join(errors))
