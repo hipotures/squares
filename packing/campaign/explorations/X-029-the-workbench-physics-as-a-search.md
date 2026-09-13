@@ -1,12 +1,12 @@
 ---
-title: X-028 — the workbench's blind physics, measured as a search
+title: X-029 — the workbench's blind physics, measured as a search
 softschema:
   contract: packing.squares:Exploration/v1
   schema: ../schemas/exploration.schema.yaml
   envelope: exploration
   status: enforced
 exploration:
-  id: X-028
+  id: X-029
   title: The Workbench's Blind Physics, Measured as a Search
   date: '2026-09-12'
   author: Claude Opus 5, unattended
@@ -22,7 +22,7 @@ exploration:
   - docs/project/specs/active/plan-2026-09-11-annealing-as-a-search.md
   proposes: [H-206, H-207, H-208, H-209, H-210, H-211]
 ---
-# X-028: The Workbench’s Blind Physics, Measured as a Search
+# X-029: The Workbench’s Blind Physics, Measured as a Search
 
 ## Correction — 2026-09-13
 

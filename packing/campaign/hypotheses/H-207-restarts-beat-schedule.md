@@ -14,7 +14,7 @@ hypothesis:
     landscape is multi-modal and the budget is better spent on restarts than on annealing
     more carefully within one.
   lane: search
-  derived_from: [X-028]
+  derived_from: [X-029]
   criterion:
     shape: record
     metric: closed at the best trial within a fixed cost budget
