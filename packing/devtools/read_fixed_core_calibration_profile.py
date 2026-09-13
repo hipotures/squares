@@ -10,16 +10,19 @@ from the retained bytes.  Its proof is calibration-only evidence.
 from __future__ import annotations
 
 import argparse
+import ast
 import hashlib
+import importlib.util
 import json
 import math
 import stat
 import subprocess
 import sys
 from collections.abc import Collection, Sequence
+from decimal import ROUND_HALF_UP, Decimal, localcontext
 from fractions import Fraction
 from itertools import pairwise
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Never, cast
 
 READER_SCHEMA = "fixed-core-calibration-source-distinct-readback/v1"
@@ -191,7 +194,9 @@ def _json_bytes(data: bytes, label: str) -> dict[str, object]:
         value = json.loads(
             data, object_pairs_hook=_unique_object, parse_constant=_reject_constant
         )
-    except (UnicodeDecodeError, json.JSONDecodeError) as error:
+    except ReadbackRefusalError:
+        raise
+    except (UnicodeDecodeError, ValueError) as error:
         raise ReadbackRefusalError(f"{label} is not strict JSON: {error}") from error
     if not isinstance(value, dict):
         _refuse(f"{label} must be a JSON object")
@@ -279,13 +284,53 @@ def _hex(value: object, length: int, label: str) -> str:
 
 
 def _number(value: object, label: str) -> float:
-    if (
-        type(value) not in (int, float)
-        or not math.isfinite(cast(float, value))
-        or cast(float, value) < 0
-    ):
+    if type(value) not in (int, float):
         _refuse(f"{label} is not a finite nonnegative number")
-    return float(cast(int | float, value))
+    try:
+        result = float(cast(int | float, value))
+    except (OverflowError, ValueError) as error:
+        raise ReadbackRefusalError(f"{label} is not a finite nonnegative number") from error
+    if not math.isfinite(result) or result < 0:
+        _refuse(f"{label} is not a finite nonnegative number")
+    return result
+
+
+def _finite_real(value: object, label: str) -> int | float:
+    if type(value) not in (int, float):
+        _refuse(f"{label} is not a finite real number")
+    try:
+        finite = math.isfinite(float(cast(int | float, value)))
+    except (OverflowError, ValueError) as error:
+        raise ReadbackRefusalError(f"{label} is not a finite real number") from error
+    if not finite:
+        _refuse(f"{label} is not a finite real number")
+    return cast(int | float, value)
+
+
+def _same_typed(actual: object, expected: object) -> bool:
+    """Compare a fixed JSON shape without Python's bool/int/float equality aliases."""
+    if isinstance(expected, dict):
+        return (
+            isinstance(actual, dict)
+            and actual.keys() == expected.keys()
+            and all(_same_typed(actual[key], value) for key, value in expected.items())
+        )
+    if isinstance(expected, list):
+        return (
+            isinstance(actual, list)
+            and len(actual) == len(expected)
+            and all(
+                _same_typed(left, right) for left, right in zip(actual, expected, strict=True)
+            )
+        )
+    if type(expected) is float:
+        if type(actual) not in (int, float):
+            return False
+        try:
+            return math.isfinite(float(cast(int | float, actual))) and actual == expected
+        except OverflowError, ValueError:
+            return False
+    return type(actual) is type(expected) and actual == expected
 
 
 def _fraction(value: object, label: str) -> Fraction:
@@ -303,6 +348,18 @@ def _fraction(value: object, label: str) -> Fraction:
 def _point(value: object, label: str) -> tuple[Fraction, Fraction]:
     row = _array(value, 2, label)
     return _fraction(row[0], label), _fraction(row[1], label)
+
+
+def _decimal_root(coefficient: Fraction, radicand: int) -> str:
+    """Present a positive quadratic root at 15 places, rounded half up."""
+    with localcontext() as context:
+        context.prec = 50
+        value = (
+            Decimal(coefficient.numerator)
+            * Decimal(radicand).sqrt()
+            / Decimal(coefficient.denominator)
+        )
+        return format(value.quantize(Decimal("0.000000000000001"), rounding=ROUND_HALF_UP), "f")
 
 
 def _walk_receipt(value: object) -> None:
@@ -339,10 +396,83 @@ def _bind_revisions(repository: Path, execution: str, reader: str) -> None:
     if head != reader:
         _refuse("current checkout differs from the expected reader revision")
     relative = "packing/devtools/read_fixed_core_calibration_profile.py"
-    current = (repository / relative).read_bytes()
+    expected_entry = (repository / relative).resolve()
+    if Path(__file__).resolve() != expected_entry:
+        _refuse("running reader comes from another file or checkout")
+    current = expected_entry.read_bytes()
     frozen = cast(bytes, _git(repository, "show", f"{reader}:{relative}", binary=True))
     if current != frozen:
         _refuse("reader bytes differ from the retained reader revision")
+
+
+def _execution_source_paths(repository: Path, revision: str) -> tuple[str, ...]:
+    """Discover the local import closure from Git objects at the execution revision."""
+    tracked = set(
+        cast(str, _git(repository, "ls-tree", "-r", "--name-only", revision)).splitlines()
+    )
+    roots = {
+        "cases": "packing/cases",
+        "devtools": "packing/devtools",
+        "sqpack": "packing/src/sqpack",
+    }
+
+    def module_path(module: str) -> str | None:
+        parts = module.split(".")
+        root = roots.get(parts[0])
+        if root is None:
+            return None
+        stem = "/".join((root, *parts[1:]))
+        for candidate in (f"{stem}.py", f"{stem}/__init__.py"):
+            if candidate in tracked:
+                return candidate
+        return None
+
+    pending = ["devtools.calibrate_fixed_core_packet"]
+    visited: set[str] = set()
+    paths = {
+        FIXTURE_PATH,
+        "packing/.python-version",
+        "packing/pyproject.toml",
+        "packing/uv.lock",
+    }
+    while pending:
+        module = pending.pop()
+        if module in visited:
+            continue
+        path = module_path(module)
+        if path is None:
+            continue
+        visited.add(module)
+        paths.add(path)
+        data = cast(bytes, _git(repository, "show", f"{revision}:{path}", binary=True))
+        try:
+            tree = ast.parse(data.decode("utf-8"), filename=path)
+        except (UnicodeDecodeError, SyntaxError) as error:
+            raise ReadbackRefusalError(
+                f"execution dependency cannot be parsed: {path}"
+            ) from error
+        package = module if path.endswith("/__init__.py") else module.rpartition(".")[0]
+        pending.extend(
+            ".".join(module.split(".")[:length]) for length in range(1, len(module.split(".")))
+        )
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                pending.extend(alias.name for alias in node.names)
+            elif isinstance(node, ast.ImportFrom):
+                base = node.module or ""
+                if node.level:
+                    try:
+                        base = importlib.util.resolve_name(f"{'.' * node.level}{base}", package)
+                    except ImportError as error:
+                        raise ReadbackRefusalError(
+                            f"execution dependency has invalid relative import: {path}"
+                        ) from error
+                if base:
+                    pending.append(base)
+                    pending.extend(f"{base}.{alias.name}" for alias in node.names)
+    if not paths.issubset(tracked):
+        _refuse("execution revision omits a required fixture or runtime declaration")
+    return tuple(sorted(paths))
 
 
 def _validate_sources(repository: Path, sources: object, execution_revision: str) -> None:
@@ -361,21 +491,25 @@ def _validate_sources(repository: Path, sources: object, execution_revision: str
         if (
             not isinstance(path, str)
             or not path
-            or Path(path).is_absolute()
-            or ".." in Path(path).parts
+            or PurePosixPath(path).is_absolute()
+            or PurePosixPath(path).as_posix() != path
+            or any(part in (".", "..") for part in path.split("/"))
             or path in paths
         ):
             _refuse("source manifest path is malformed or duplicated")
         paths.add(path)
+    expected_paths = _execution_source_paths(repository, execution_revision)
+    if [cast(dict[str, object], row)["path"] for row in manifest] != list(expected_paths):
+        _refuse("source manifest differs from the complete execution import closure")
+    for value in manifest:
+        row = cast(dict[str, object], value)
+        path = cast(str, row["path"])
         blob = cast(str, _git(repository, "rev-parse", f"{execution_revision}:{path}")).strip()
         data = cast(
             bytes, _git(repository, "show", f"{execution_revision}:{path}", binary=True)
         )
         if row["git_blob"] != blob or row["sha256"] != hashlib.sha256(data).hexdigest():
             _refuse(f"source manifest row does not bind execution bytes: {path}")
-    required_paths = {FIXTURE_PATH, "packing/devtools/calibrate_fixed_core_packet.py"}
-    if not required_paths.issubset(paths):
-        _refuse("source manifest omits the fixture or calibration entry point")
     fixture_data = cast(
         bytes,
         _git(repository, "show", f"{execution_revision}:{FIXTURE_PATH}", binary=True),
@@ -505,7 +639,10 @@ def _read_rows(output: Path, receipt: dict[str, object]) -> dict[str, object]:
         _object(row, {"direction", "charge", "witness"}, f"raw row {index}")
         witness = _point(row["witness"], f"raw witness {index}")
         charge, admissible = _charge(str(index), witness, normalized=False)
-        if row["direction"] != index or _fraction(row["charge"], "raw charge") != charge:
+        if (
+            not _same_typed(row["direction"], index)
+            or _fraction(row["charge"], "raw charge") != charge
+        ):
             _refuse(f"raw row differs from exact membership at direction {index}")
         if charge != RAW_MINIMUM or not admissible:
             _refuse(f"raw witness is not an admissible known answer at direction {index}")
@@ -525,10 +662,11 @@ def _read_rows(output: Path, receipt: dict[str, object]) -> dict[str, object]:
         dense_replay = _charge(str(index), dense_witness, normalized=True)
         slab_replay = _charge(str(index), slab_witness, normalized=True)
         if (
-            row["direction"] != index
+            not _same_typed(row["direction"], index)
             or type(row["agree"]) is not bool
             or row["agree"] is not True
             or dense != slab
+            or dense_witness != slab_witness
             or dense != NORMALIZED_MINIMUM
             or dense_replay != (dense, True)
             or slab_replay != (slab, True)
@@ -553,25 +691,22 @@ def _read_rows(output: Path, receipt: dict[str, object]) -> dict[str, object]:
             f"interval row {label}",
         )
         witness_values = _array(row["witness"], 2, f"interval witness {label}")
-        if any(
-            type(value) not in (int, float)
-            or not math.isfinite(float(cast(int | float, value)))
-            for value in witness_values
-        ):
-            _refuse(f"interval witness {label} is malformed")
+        coordinates = [
+            _finite_real(value, f"interval witness {label}") for value in witness_values
+        ]
         witness = (
-            Fraction(cast(int | float, witness_values[0])),
-            Fraction(cast(int | float, witness_values[1])),
+            Fraction(coordinates[0]),
+            Fraction(coordinates[1]),
         )
         replay = _charge(label, witness, normalized=True)
         if (
             row["label"] != label
             or row["status"] != "certified"
-            or row["lower"] != INTEGER_SCALE
-            or row["upper"] != INTEGER_SCALE
+            or not _same_typed(row["lower"], INTEGER_SCALE)
+            or not _same_typed(row["upper"], INTEGER_SCALE)
             or type(row["boxes"]) is not int
             or cast(int, row["boxes"]) <= 0
-            or row["stalled"] != 0
+            or not _same_typed(row["stalled"], 0)
             or row["budget_exhausted"] is not False
             or replay != (NORMALIZED_MINIMUM, True)
         ):
@@ -581,7 +716,7 @@ def _read_rows(output: Path, receipt: dict[str, object]) -> dict[str, object]:
     for index, path in enumerate(dilation_paths):
         _data, row = _json(path, f"dilation row {index}")
         expected = {"direction": index, "label": str(index), "minimum": "1"}
-        if row != expected:
+        if not _same_typed(row, expected):
             _refuse(f"dilation row differs from the normalized answer at direction {index}")
 
     if first_raw is None or first_exact is None:
@@ -606,21 +741,24 @@ def _read_rows(output: Path, receipt: dict[str, object]) -> dict[str, object]:
         },
         "raw receipt",
     )
-    if raw_receipt != {
-        "directions_expected": RAW_DIRECTIONS,
-        "directions_completed": RAW_DIRECTIONS,
-        "completed_directions": list(range(RAW_DIRECTIONS)),
-        "observed_minimum_upper_bound": "2",
-        "observed_argmin": 0,
-        "observed_witness": [str(first_raw[0]), str(first_raw[1])],
-        "raw_minimum": "2",
-        "budget": "2",
-        "threshold_M_over_n": "1",
-        "comparison": "passed",
-        "witness_replay_charge": "2",
-        "witness_admissible": True,
-        "directions_sha256": _direction_digest(raw_paths),
-    }:
+    if not _same_typed(
+        raw_receipt,
+        {
+            "directions_expected": RAW_DIRECTIONS,
+            "directions_completed": RAW_DIRECTIONS,
+            "completed_directions": list(range(RAW_DIRECTIONS)),
+            "observed_minimum_upper_bound": "2",
+            "observed_argmin": 0,
+            "observed_witness": [str(first_raw[0]), str(first_raw[1])],
+            "raw_minimum": "2",
+            "budget": "2",
+            "threshold_M_over_n": "1",
+            "comparison": "passed",
+            "witness_replay_charge": "2",
+            "witness_admissible": True,
+            "directions_sha256": _direction_digest(raw_paths),
+        },
+    ):
         _refuse("raw receipt does not reconstruct from every retained row")
 
     routes = _object(
@@ -649,14 +787,18 @@ def _read_rows(output: Path, receipt: dict[str, object]) -> dict[str, object]:
         },
         "normalized exact route",
     )
-    if exact != common_int | {
-        "completed_directions": list(range(RAW_DIRECTIONS)),
-        "minimum": "1",
-        "argmin": 0,
-        "witness": [str(first_exact[0]), str(first_exact[1])],
-        "dense_slab_disagreements": 0,
-        "directions_sha256": _direction_digest(exact_paths),
-    }:
+    if not _same_typed(
+        exact,
+        common_int
+        | {
+            "completed_directions": list(range(RAW_DIRECTIONS)),
+            "minimum": "1",
+            "argmin": 0,
+            "witness": [str(first_exact[0]), str(first_exact[1])],
+            "dense_slab_disagreements": 0,
+            "directions_sha256": _direction_digest(exact_paths),
+        },
+    ):
         _refuse("normalized exact receipt does not reconstruct")
     interval = _object(
         routes["reflected_interval"],
@@ -677,21 +819,24 @@ def _read_rows(output: Path, receipt: dict[str, object]) -> dict[str, object]:
         },
         "interval route",
     )
-    if interval != {
-        "status": "complete",
-        "source_sha256": candidate_sha,
-        "directions_expected": INTERVAL_DIRECTIONS,
-        "directions_completed": INTERVAL_DIRECTIONS,
-        "completed_directions": interval_labels,
-        "integer_scale": INTEGER_SCALE,
-        "integer_enclosure": [INTEGER_SCALE, INTEGER_SCALE],
-        "enclosure": ["1", "1"],
-        "stalled": 0,
-        "budget_exhausted": 0,
-        "accepted": True,
-        "boxes_observed": boxes,
-        "directions_sha256": _direction_digest(interval_paths),
-    }:
+    if not _same_typed(
+        interval,
+        {
+            "status": "complete",
+            "source_sha256": candidate_sha,
+            "directions_expected": INTERVAL_DIRECTIONS,
+            "directions_completed": INTERVAL_DIRECTIONS,
+            "completed_directions": interval_labels,
+            "integer_scale": INTEGER_SCALE,
+            "integer_enclosure": [INTEGER_SCALE, INTEGER_SCALE],
+            "enclosure": ["1", "1"],
+            "stalled": 0,
+            "budget_exhausted": 0,
+            "accepted": True,
+            "boxes_observed": boxes,
+            "directions_sha256": _direction_digest(interval_paths),
+        },
+    ):
         _refuse("interval receipt does not reconstruct")
     dilation = _object(
         routes["dilation"],
@@ -732,7 +877,7 @@ def _read_rows(output: Path, receipt: dict[str, object]) -> dict[str, object]:
         "endpoint_certificate": False,
         "requires_compactness": False,
     }
-    if dilation != expected_dilation:
+    if not _same_typed(dilation, expected_dilation):
         _refuse("dilation receipt does not reconstruct")
     return {
         "raw": _direction_digest(raw_paths),
@@ -784,7 +929,7 @@ def _expected_candidate() -> dict[str, object]:
 
 def _validate_candidate(output: Path, receipt: dict[str, object]) -> None:
     data, candidate = _json(output / "candidate.json", "normalized candidate")
-    if candidate != _expected_candidate():
+    if not _same_typed(candidate, _expected_candidate()):
         _refuse("normalized candidate geometry or weights changed")
     point_weights = [
         Fraction(cast(str, row[2])) for row in cast(list[list[str]], candidate["atoms"])
@@ -859,7 +1004,7 @@ def _validate_candidate(output: Path, receipt: dict[str, object]) -> None:
         "integer_scale": INTEGER_SCALE,
         "closed_form_conditions": conditions,
     }
-    if normalized != expected:
+    if not _same_typed(normalized, expected):
         _refuse("normalized receipt differs from candidate bytes")
 
 
@@ -898,29 +1043,31 @@ def _validate_dilation(output: Path) -> None:
     )
     candidate = (output / "candidate.json").read_bytes()
     if (
-        source
-        != {
-            "certificate": "candidate.json",
-            "sha256": hashlib.sha256(candidate).hexdigest(),
-            "n": N,
-            "outer_side": "3/4",
-            "square_side": "1/2",
-            "half_gap_tangent": "1/5760",
-            "coarse_containment": "5761/11520",
-            "total_budget": "1",
-            "minimum_cell_charge": "1",
-            "accepted_conditions": [
-                "Condition 1 atoms carry the declared symmetry",
-                "Condition 1' threshold atoms carry the declared symmetry",
-                "Condition 2' total budget below n",
-                "Condition 3 net reaches pi/4",
-                "Condition 4 containment B(1 + D) < 1",
-                "Condition 5' every reachable cell is charged at least 1",
-            ],
-            "variant": "threshold",
-            "point_atoms": 1,
-            "threshold_atoms": 2,
-        }
+        not _same_typed(
+            source,
+            {
+                "certificate": "candidate.json",
+                "sha256": hashlib.sha256(candidate).hexdigest(),
+                "n": N,
+                "outer_side": "3/4",
+                "square_side": "1/2",
+                "half_gap_tangent": "1/5760",
+                "coarse_containment": "5761/11520",
+                "total_budget": "1",
+                "minimum_cell_charge": "1",
+                "accepted_conditions": [
+                    "Condition 1 atoms carry the declared symmetry",
+                    "Condition 1' threshold atoms carry the declared symmetry",
+                    "Condition 2' total budget below n",
+                    "Condition 3 net reaches pi/4",
+                    "Condition 4 containment B(1 + D) < 1",
+                    "Condition 5' every reachable cell is charged at least 1",
+                ],
+                "variant": "threshold",
+                "point_atoms": 1,
+                "threshold_atoms": 2,
+            },
+        )
         or record["schema"] != DILATION_SCHEMA
     ):
         _refuse("dilation source does not reconstruct from the normalized fixture")
@@ -939,14 +1086,23 @@ def _validate_dilation(output: Path) -> None:
     )
     left = CORE_SIDE**2 * (1 + HALF_GAP) ** 2
     right = 1 + HALF_GAP**2
-    if (
-        containment["strict_factor_test_left_multiplier"] != str(left)
-        or containment["strict_factor_test_right"] != str(right)
-        or containment["source_gap_below_one"] is not True
-        or right / left != FACTOR_SQUARED
-        or OUTER_SIDE**2 * FACTOR_SQUARED != SIDE_SQUARED
-    ):
+    factor_squared = right / left
+    side_squared = OUTER_SIDE**2 * factor_squared
+    if factor_squared != FACTOR_SQUARED or side_squared != SIDE_SQUARED:
         _refuse("dilation containment algebra changed")
+    expected_containment = {
+        "identity": "cos(d) + sin(d) = (1 + t) / sqrt(1 + t^2), where t = tan(d)",
+        "gap_domain": f"0 <= t <= D = {HALF_GAP} < 1",
+        "monotonicity_identity": (
+            "(1 + D)^2(1 + t^2) - (1 + t)^2(1 + D^2) = 2(D - t)(1 - Dt) >= 0"
+        ),
+        "strict_factor_test": f"q^2 * {left} < {right}",
+        "strict_factor_test_left_multiplier": str(left),
+        "strict_factor_test_right": str(right),
+        "source_gap_below_one": True,
+    }
+    if not _same_typed(containment, expected_containment):
+        _refuse("dilation containment statement changed")
     family = _object(
         record["strict_dilation_family"],
         {
@@ -985,17 +1141,92 @@ def _validate_dilation(output: Path) -> None:
         },
         "dilation proof",
     )
+    denominator_root = math.isqrt(factor_squared.denominator)
+    radicand = factor_squared.numerator // 4
+    factor_coefficient = Fraction(2, denominator_root)
+    side_coefficient = OUTER_SIDE * factor_coefficient
     if (
-        family["factor_supremum"] != "2*sqrt(33177601)/5761"
-        or family["factor_supremum_squared"] != str(FACTOR_SQUARED)
-        or family["factor_supremum_irrational"] is not True
-        or conclusion["bounded_side"] != "3*sqrt(33177601)/11522"
-        or conclusion["bounded_side_squared"] != str(SIDE_SQUARED)
-        or conclusion["relation"] != ">="
-        or conclusion["endpoint_certificate"] is not False
-        or proof["requires_compactness"] is not False
+        denominator_root**2 != factor_squared.denominator
+        or factor_coefficient**2 * radicand != factor_squared
+        or side_coefficient**2 * radicand != side_squared
+        or math.isqrt(radicand) ** 2 == radicand
     ):
-        _refuse("dilation surd, relation, or endpoint semantics changed")
+        _refuse("dilation positive-root representation is inconsistent")
+    factor_exact = (
+        f"{factor_coefficient.numerator}*sqrt({radicand})/{factor_coefficient.denominator}"
+    )
+    side_exact = f"{side_coefficient.numerator}*sqrt({radicand})/{side_coefficient.denominator}"
+    expected_family = {
+        "factor_supremum": factor_exact,
+        "factor_supremum_squared": str(factor_squared),
+        "factor_supremum_decimal": _decimal_root(factor_coefficient, radicand),
+        "factor_supremum_irrational": True,
+        "factor_supremum_defining_polynomial": (
+            f"{factor_squared.denominator}*x^2 - {factor_squared.numerator}"
+        ),
+        "factor_domain": f"q in Q with q > 0 and q^2 < {factor_squared}",
+        "scaled_containment_test": (
+            "q^2 B^2 (1 + D)^2 < 1 + D^2; this rational inequality is "
+            "equivalent to strict geometric containment"
+        ),
+        "invariants": [
+            (
+                "Conditions 1 and 1' D4 symmetry of the point and threshold atoms "
+                "is equivariant under common scaling"
+            ),
+            "Conditions 2' and 3 (total budget and direction net) are unchanged",
+            (
+                "Condition 5' charge is preserved by inverse dilation of placements: "
+                "a core's trace on each threshold atom's scaled points is unchanged"
+            ),
+        ],
+    }
+    expected_conclusion = {
+        "bounded_side": side_exact,
+        "bounded_side_squared": str(side_squared),
+        "bounded_side_defining_polynomial": (
+            f"{side_squared.denominator}*x^2 - {side_squared.numerator}"
+        ),
+        "decimal": _decimal_root(side_coefficient, radicand),
+        "relation": ">=",
+        "endpoint_certificate": False,
+    }
+    expected_proof = {
+        "strict_family": (
+            "for every rational q > 0 with q^2 below factor_supremum_squared, "
+            "the sharpened containment theorem and the scaled source data rule out "
+            "a packing at side q * outer_side"
+        ),
+        "density_step": (
+            "for every real x below bounded_side, rational density supplies q with "
+            "x / outer_side < q < factor_supremum"
+        ),
+        "embedding_step": (
+            "a packing at side x embeds in the larger side q * outer_side, "
+            "contradicting that strict-subfactor no-fit proof"
+        ),
+        "order_step": (
+            "equivalently, s(n) is at least every strict rational subbound and "
+            "therefore at least their real supremum"
+        ),
+        "requires_compactness": False,
+        "endpoint_status": (
+            f"the dilation-limit theorem establishes s({N}) >= {side_exact}; "
+            "at the factor supremum the sharpened containment inequality is equality, "
+            "so endpoint_certificate is false because the proof supplies no individual "
+            f"certificate at that side; the method does not establish s({N}) > "
+            f"{side_exact}"
+        ),
+    }
+    if not all(
+        _same_typed(actual, expected)
+        for actual, expected in (
+            (family, expected_family),
+            (conclusion, expected_conclusion),
+            (proof, expected_proof),
+        )
+    ):
+        _refuse("dilation surd, presentation, or proof semantics changed")
 
 
 def _maximum_simultaneous(tasks: list[dict[str, object]], label: str) -> int:
@@ -1024,8 +1255,19 @@ def _maximum_simultaneous(tasks: list[dict[str, object]], label: str) -> int:
     return maximum
 
 
+def _not_later(first: float, second: float) -> bool:
+    """Allow only roundoff in differences of measured monotonic clocks."""
+    return first <= second or first - second <= 8 * max(math.ulp(first), math.ulp(second))
+
+
 def _validate_topology_route(
-    route: object, *, phase: str, workers: int, coordinator: dict[str, object]
+    route: object,
+    *,
+    phase: str,
+    workers: int,
+    coordinator: dict[str, object],
+    worker_elapsed: float,
+    phase_duration: float,
 ) -> dict[str, object]:
     row = _object(
         route,
@@ -1081,8 +1323,11 @@ def _validate_topology_route(
             or type(task["pgid"]) is not int
             or task["ppid"] != coordinator["pid"]
             or task["pgid"] != coordinator["pgid"]
+            or task["pid"] == coordinator["pid"]
+            or task["pid"] == task["ppid"]
             or cast(float, task["started_seconds"]) < 0
             or cast(float, task["finished_seconds"]) <= cast(float, task["started_seconds"])
+            or not _not_later(cast(float, task["finished_seconds"]), worker_elapsed)
         ):
             _refuse(f"{phase} task is malformed")
         parsed_tasks.append(task)
@@ -1135,6 +1380,8 @@ def _validate_topology_route(
             or type(child["pgid"]) is not int
             or child["ppid"] != coordinator["pid"]
             or child["pgid"] != coordinator["pgid"]
+            or child["pid"] == coordinator["pid"]
+            or child["pid"] == child["ppid"]
             or type(child["tasks_completed"]) is not int
             or cast(int, child["tasks_completed"]) <= 0
             or _number(child["first_task_started_seconds"], "child first task") < 0
@@ -1164,8 +1411,12 @@ def _validate_topology_route(
             }
         )
     maximum = _maximum_simultaneous(parsed_tasks, phase)
+    span = max(cast(float, task["finished_seconds"]) for task in parsed_tasks) - min(
+        cast(float, task["started_seconds"]) for task in parsed_tasks
+    )
     if (
-        parsed_children != expected_children
+        not _same_typed(parsed_children, expected_children)
+        or not _not_later(span, phase_duration)
         or row["execution_model"] != "process-pool"
         or row["child_tasks_observed"] != RAW_DIRECTIONS
         or row["observed_child_count"] != len(pids)
@@ -1199,6 +1450,7 @@ def _validate_topology(output: Path, receipt: dict[str, object]) -> dict[str, ob
         or cast(int, coordinator["ppid"]) <= 0
         or type(coordinator["pgid"]) is not int
         or coordinator["pgid"] != coordinator["pid"]
+        or coordinator["ppid"] == coordinator["pid"]
     ):
         _refuse("topology coordinator is malformed")
     if (
@@ -1207,9 +1459,12 @@ def _validate_topology(output: Path, receipt: dict[str, object]) -> dict[str, ob
     ):
         _refuse("worker topology schema or scope changed")
     settings = cast(dict[str, object], receipt["settings"])
+    clocks = cast(dict[str, object], receipt["clocks"])
+    worker_elapsed = _number(clocks["worker_elapsed_seconds"], "worker elapsed")
     configured = cast(dict[str, object], settings["effective_workers"])
     summaries = _object(summary["routes"], {"raw", "normalized_exact"}, "topology routes")
     result: dict[str, object] = {}
+    spans: dict[str, tuple[float, float]] = {}
     for name, phase, filename in (
         ("raw", "raw-sweep", "raw-worker-topology.json"),
         ("normalized_exact", "normalized-exact", "normalized-exact-worker-topology.json"),
@@ -1219,7 +1474,7 @@ def _validate_topology(output: Path, receipt: dict[str, object]) -> dict[str, ob
         if (
             sidecar["schema"] != "fixed-core-packet-calibration-worker-route/v1"
             or sidecar["scope"] != TOPOLOGY_SCOPE
-            or sidecar["coordinator"] != coordinator
+            or not _same_typed(sidecar["coordinator"], coordinator)
         ):
             _refuse(f"{filename} identity changed")
         derived = _validate_topology_route(
@@ -1227,14 +1482,32 @@ def _validate_topology(output: Path, receipt: dict[str, object]) -> dict[str, ob
             phase=phase,
             workers=cast(int, configured[name]),
             coordinator=coordinator,
+            worker_elapsed=worker_elapsed,
+            phase_duration=_number(
+                clocks["raw_seconds" if name == "raw" else "exact_seconds"],
+                f"{name} phase duration",
+            ),
         )
+        route = cast(dict[str, object], sidecar["route"])
+        tasks = cast(list[dict[str, object]], route["tasks"])
+        if tasks:
+            spans[name] = (
+                min(cast(float, task["started_seconds"]) for task in tasks),
+                max(cast(float, task["finished_seconds"]) for task in tasks),
+            )
         expected = derived | {
             "record_path": filename,
             "record_sha256": hashlib.sha256(data).hexdigest(),
         }
-        if summaries[name] != expected:
+        if not _same_typed(summaries[name], expected):
             _refuse(f"{name} topology summary does not reconstruct")
         result[name] = derived
+    if (
+        "raw" in spans
+        and "normalized_exact" in spans
+        and not _not_later(spans["raw"][1], spans["normalized_exact"][0])
+    ):
+        _refuse("normalized exact tasks precede raw task completion")
     supervision = cast(dict[str, object], receipt["supervision"])
     if (
         supervision["coordinator_pid"] != coordinator["pid"]
@@ -1384,7 +1657,7 @@ def _validate_resources(output: Path, receipt: dict[str, object]) -> dict[str, o
         "samples_path": "rss-samples.json",
         "samples_sha256": hashlib.sha256(data).hexdigest(),
     }
-    if rss != expected_rss or len(parsed) < 2 or positive < 2 or errors:
+    if not _same_typed(rss, expected_rss) or len(parsed) < 2 or positive < 2 or errors:
         _refuse("RSS summary does not reconstruct with terminal coverage")
     return {
         "cpu": cpu,
@@ -1407,13 +1680,16 @@ def _validate_receipt_schema(receipt: dict[str, object], run_order: int) -> None
         or receipt["evidence_scope"] != CALIBRATION_SCOPE
     ):
         _refuse("calibration receipt is not a terminal calibration-only pass")
-    if receipt["fixture"] != {
-        "id": FIXTURE_ID,
-        "source_path": FIXTURE_PATH,
-        "source_sha256": FIXTURE_SHA256,
-        "source_bytes": FIXTURE_BYTES,
-        "provenance": FIXTURE_PROVENANCE,
-    }:
+    if not _same_typed(
+        receipt["fixture"],
+        {
+            "id": FIXTURE_ID,
+            "source_path": FIXTURE_PATH,
+            "source_sha256": FIXTURE_SHA256,
+            "source_bytes": FIXTURE_BYTES,
+            "provenance": FIXTURE_PROVENANCE,
+        },
+    ):
         _refuse("calibration fixture identity changed")
     invocation = _object(
         receipt["invocation"],
@@ -1429,7 +1705,7 @@ def _validate_receipt_schema(receipt: dict[str, object], run_order: int) -> None
         },
         "invocation",
     )
-    if invocation["run_order"] != run_order or not all(
+    if not _same_typed(invocation["run_order"], run_order) or not all(
         isinstance(invocation[key], str) and cast(str, invocation[key]).strip()
         for key in ("started_utc", "host", "platform", "cache_observation", "background_load")
     ):
@@ -1472,14 +1748,14 @@ def _validate_receipt_schema(receipt: dict[str, object], run_order: int) -> None
         "dilation": platform_workers,
     }
     if (
-        effective != expected_effective
-        or settings["rss_sample_interval_seconds"] != 0.1
+        not _same_typed(effective, expected_effective)
+        or not _same_typed(settings["rss_sample_interval_seconds"], 0.1)
         or settings["core_side"] != "1/2"
-        or settings["direction_steps"] != STEPS
+        or not _same_typed(settings["direction_steps"], STEPS)
         or settings["angle_limit"] != "1/2"
         or settings["half_gap_tangent"] != "1/5760"
         or settings["raw_threshold_M_over_n"] != "1"
-        or settings["expected_direction_rows"] != TOTAL_DIRECTION_ROWS
+        or not _same_typed(settings["expected_direction_rows"], TOTAL_DIRECTION_ROWS)
         or Fraction(cast(str, settings["angle_limit"])) / cast(int, settings["direction_steps"])
         != HALF_GAP
     ):
@@ -1526,7 +1802,7 @@ def _validate_receipt_schema(receipt: dict[str, object], run_order: int) -> None
         "cache_observation": invocation["cache_observation"],
         "background_load": invocation["background_load"],
     }
-    if identity != expected_identity:
+    if not _same_typed(identity, expected_identity):
         _refuse("invocation identity does not reconstruct")
     clocks = _object(
         receipt["clocks"],
@@ -1567,6 +1843,33 @@ def _validate_receipt_schema(receipt: dict[str, object], run_order: int) -> None
         or clock_values["worker_elapsed_seconds"] > clock_values["external_lifetime_seconds"]
     ):
         _refuse("terminal calibration exceeded or contradicted a declared deadline")
+    worker_elapsed = clock_values["worker_elapsed_seconds"]
+    worker_exit = clock_values["worker_exit_seconds"]
+    external_lifetime = clock_values["external_lifetime_seconds"]
+    if (
+        not _not_later(worker_elapsed, worker_exit)
+        or not _not_later(worker_exit, external_lifetime)
+        or not _not_later(
+            clock_values["parent_final_readback_seconds"], external_lifetime - worker_exit
+        )
+    ):
+        _refuse("worker exit or parent readback contradicts external lifetime")
+    disjoint_worker_phases = (
+        "preflight_seconds",
+        "raw_seconds",
+        "normalization_publication_seconds",
+        "exact_seconds",
+        "interval_seconds",
+        "dilation_seconds",
+        "full_readback_seconds",
+    )
+    if any(
+        not _not_later(clock_values[key], worker_elapsed)
+        for key in (*disjoint_worker_phases, "source_loading_seconds")
+    ) or not _not_later(
+        sum(clock_values[key] for key in disjoint_worker_phases), worker_elapsed
+    ):
+        _refuse("worker phase durations contradict worker lifetime")
     resources = _object(
         receipt["resources"],
         {
@@ -1623,7 +1926,7 @@ def _validate_receipt_schema(receipt: dict[str, object], run_order: int) -> None
     )
     if (
         supervision["status"] != "observed-exit"
-        or supervision["worker_exit_status"] != 0
+        or not _same_typed(supervision["worker_exit_status"], 0)
         or supervision["process_group_reaped"] is not True
         or supervision["supervisor_signal"] is not None
         or type(supervision["coordinator_pid"]) is not int
@@ -1661,7 +1964,7 @@ def _validate_artifacts(output: Path, receipt: dict[str, object]) -> list[dict[s
                 "bytes": sum(item.stat().st_size for item in files),
             }
         )
-    if receipt["artifacts"] != rows:
+    if not _same_typed(receipt["artifacts"], rows):
         _refuse("receipt artifact inventory does not reconstruct from retained bytes")
     return rows
 

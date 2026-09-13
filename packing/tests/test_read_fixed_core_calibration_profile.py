@@ -8,9 +8,11 @@ from __future__ import annotations
 
 import ast
 import hashlib
+import importlib.util
 import json
 import os
 import subprocess
+import sys
 from copy import deepcopy
 from fractions import Fraction
 from pathlib import Path
@@ -23,6 +25,31 @@ from devtools import read_fixed_core_calibration_profile as reader
 REPOSITORY = Path(__file__).resolve().parents[2]
 EXECUTION_REVISION = "faa4085db8fb4cf42154afec0022a0585f59196d"
 READER_REVISION = "b" * 40
+SOURCE_PATHS = (
+    "packing/.python-version",
+    reader.FIXTURE_PATH,
+    "packing/devtools/__init__.py",
+    "packing/devtools/calibrate_fixed_core_packet.py",
+    "packing/devtools/decide_certificate.py",
+    "packing/devtools/decide_threshold_certificate.py",
+    "packing/devtools/dilation_corollary.py",
+    "packing/devtools/fixed_core_packet.py",
+    "packing/devtools/measure_net_refinement.py",
+    "packing/devtools/measure_threshold_net_refinement.py",
+    "packing/pyproject.toml",
+    "packing/src/sqpack/__init__.py",
+    "packing/src/sqpack/field.py",
+    "packing/src/sqpack/fractional/__init__.py",
+    "packing/src/sqpack/fractional/certificate.py",
+    "packing/src/sqpack/fractional/interval.py",
+    "packing/src/sqpack/fractional/model.py",
+    "packing/src/sqpack/fractional/sweep.py",
+    "packing/src/sqpack/fractional/threshold.py",
+    "packing/src/sqpack/fractional/threshold_interval.py",
+    "packing/src/sqpack/verify.py",
+    "packing/src/sqpack/workers.py",
+    "packing/uv.lock",
+)
 CONDITION_NAMES = [
     "Condition 1 atoms carry the declared symmetry",
     "Condition 1' threshold atoms carry the declared symmetry",
@@ -100,10 +127,12 @@ def _dilation(candidate_sha: str) -> dict[str, object]:
             "threshold_atoms": 2,
         },
         "sharpened_containment": {
-            "identity": "independently retained identity",
-            "gap_domain": "independently retained domain",
-            "monotonicity_identity": "independently retained monotonicity",
-            "strict_factor_test": "independently retained inequality",
+            "identity": "cos(d) + sin(d) = (1 + t) / sqrt(1 + t^2), where t = tan(d)",
+            "gap_domain": "0 <= t <= D = 1/5760 < 1",
+            "monotonicity_identity": (
+                "(1 + D)^2(1 + t^2) - (1 + t)^2(1 + D^2) = 2(D - t)(1 - Dt) >= 0"
+            ),
+            "strict_factor_test": "q^2 * 33189121/132710400 < 33177601/33177600",
             "strict_factor_test_left_multiplier": "33189121/132710400",
             "strict_factor_test_right": "33177601/33177600",
             "source_gap_below_one": True,
@@ -111,28 +140,60 @@ def _dilation(candidate_sha: str) -> dict[str, object]:
         "strict_dilation_family": {
             "factor_supremum": "2*sqrt(33177601)/5761",
             "factor_supremum_squared": "132710404/33189121",
-            "factor_supremum_decimal": "1.999826",
+            "factor_supremum_decimal": "1.999652868184536",
             "factor_supremum_irrational": True,
             "factor_supremum_defining_polynomial": "33189121*x^2 - 132710404",
-            "factor_domain": "positive strict rational subfactors",
-            "scaled_containment_test": "exact rational inequality",
-            "invariants": ["weights and membership scale together"],
+            "factor_domain": "q in Q with q > 0 and q^2 < 132710404/33189121",
+            "scaled_containment_test": (
+                "q^2 B^2 (1 + D)^2 < 1 + D^2; this rational inequality is "
+                "equivalent to strict geometric containment"
+            ),
+            "invariants": [
+                (
+                    "Conditions 1 and 1' D4 symmetry of the point and threshold atoms "
+                    "is equivariant under common scaling"
+                ),
+                "Conditions 2' and 3 (total budget and direction net) are unchanged",
+                (
+                    "Condition 5' charge is preserved by inverse dilation of placements: "
+                    "a core's trace on each threshold atom's scaled points is unchanged"
+                ),
+            ],
         },
         "conclusion": {
             "bounded_side": "3*sqrt(33177601)/11522",
             "bounded_side_squared": "298598409/132756484",
             "bounded_side_defining_polynomial": "132756484*x^2 - 298598409",
-            "decimal": "1.49987",
+            "decimal": "1.499739651138402",
             "relation": ">=",
             "endpoint_certificate": False,
         },
         "proof": {
-            "strict_family": "strict rational family",
-            "density_step": "rational density",
-            "embedding_step": "monotone embedding",
-            "order_step": "take the supremum",
+            "strict_family": (
+                "for every rational q > 0 with q^2 below factor_supremum_squared, "
+                "the sharpened containment theorem and the scaled source data rule out "
+                "a packing at side q * outer_side"
+            ),
+            "density_step": (
+                "for every real x below bounded_side, rational density supplies q with "
+                "x / outer_side < q < factor_supremum"
+            ),
+            "embedding_step": (
+                "a packing at side x embeds in the larger side q * outer_side, "
+                "contradicting that strict-subfactor no-fit proof"
+            ),
+            "order_step": (
+                "equivalently, s(n) is at least every strict rational subbound and "
+                "therefore at least their real supremum"
+            ),
             "requires_compactness": False,
-            "endpoint_status": "no individual endpoint certificate",
+            "endpoint_status": (
+                "the dilation-limit theorem establishes s(2) >= 3*sqrt(33177601)/11522; "
+                "at the factor supremum the sharpened containment inequality is equality, "
+                "so endpoint_certificate is false because the proof supplies no individual "
+                "certificate at that side; the method does not establish s(2) > "
+                "3*sqrt(33177601)/11522"
+            ),
         },
     }
 
@@ -182,6 +243,19 @@ def _publish_receipt(output: Path, receipt: dict[str, object]) -> None:
             return
         size = len(data)
     raise AssertionError("result inventory did not reach a fixed point")
+
+
+def _set_path(root: dict[str, object], path: tuple[str | int, ...], value: object) -> None:
+    current: object = root
+    for key in path[:-1]:
+        if isinstance(current, dict):
+            current = cast(dict[str, object], current)[cast(str, key)]
+        else:
+            current = cast(list[object], current)[cast(int, key)]
+    if isinstance(current, dict):
+        cast(dict[str, object], current)[cast(str, path[-1])] = value
+    else:
+        cast(list[object], current)[cast(int, path[-1])] = value
 
 
 def _build_profile(output: Path) -> dict[str, object]:
@@ -278,10 +352,7 @@ def _build_profile(output: Path) -> dict[str, object]:
             "record_sha256": hashlib.sha256(data).hexdigest(),
         }
     manifest = []
-    for relative in (
-        reader.FIXTURE_PATH,
-        "packing/devtools/calibrate_fixed_core_packet.py",
-    ):
+    for relative in SOURCE_PATHS:
         frozen = subprocess.run(
             ("git", "show", f"{EXECUTION_REVISION}:{relative}"),
             cwd=REPOSITORY,
@@ -398,7 +469,7 @@ def _build_profile(output: Path) -> dict[str, object]:
             "parent_final_readback_seconds": 0.1,
             "terminal_admission_seconds": 0.1,
             "worker_elapsed_seconds": 1.0,
-            "worker_exit_seconds": 0.1,
+            "worker_exit_seconds": 1.05,
             "supervisor_cleanup_seconds": 0.1,
             "external_lifetime_seconds": 1.2,
         },
@@ -915,3 +986,667 @@ def test_cli_emits_no_json_proof_on_refusal(capsys: pytest.CaptureFixture[str]) 
     assert status != 0
     assert captured.out == ""
     assert captured.err.startswith("REFUSED:")
+
+
+def test_execution_manifest_closure_and_every_missing_path(
+    profile: tuple[Path, dict[str, object]],
+) -> None:
+    _output, receipt = profile
+    assert reader._execution_source_paths(REPOSITORY, EXECUTION_REVISION) == SOURCE_PATHS
+    sources = cast(dict[str, object], receipt["sources"])
+    reader._validate_sources(REPOSITORY, sources, EXECUTION_REVISION)
+    for missing in SOURCE_PATHS:
+        altered = deepcopy(sources)
+        manifest = cast(list[dict[str, object]], altered["manifest"])
+        altered["manifest"] = [row for row in manifest if row["path"] != missing]
+        with pytest.raises(
+            reader.ReadbackRefusalError, match="complete execution import closure"
+        ):
+            reader._validate_sources(REPOSITORY, altered, EXECUTION_REVISION)
+
+    for change in ("unexpected", "duplicate", "alias", "blob", "sha256"):
+        altered = deepcopy(sources)
+        manifest = cast(list[dict[str, object]], altered["manifest"])
+        if change == "unexpected":
+            manifest.append(
+                {"path": "packing/README.md", "git_blob": "0" * 40, "sha256": "0" * 64}
+            )
+        elif change == "duplicate":
+            manifest.append(deepcopy(manifest[0]))
+        elif change == "alias":
+            manifest[0]["path"] = "packing//.python-version"
+        else:
+            manifest[0]["git_blob" if change == "blob" else "sha256"] = "0" * (
+                40 if change == "blob" else 64
+            )
+        with pytest.raises(reader.ReadbackRefusalError):
+            reader._validate_sources(REPOSITORY, altered, EXECUTION_REVISION)
+    with pytest.raises(reader.ReadbackRefusalError, match="execution revision"):
+        reader._validate_sources(REPOSITORY, sources, "c" * 40)
+    other_revision = subprocess.run(
+        ("git", "rev-parse", "HEAD"), cwd=REPOSITORY, check=True, capture_output=True, text=True
+    ).stdout.strip()
+    altered = deepcopy(sources)
+    altered["implementation_revision"] = other_revision
+    with pytest.raises(reader.ReadbackRefusalError):
+        reader._validate_sources(REPOSITORY, altered, other_revision)
+
+
+def test_running_reader_origin_and_cli_copy_refusal(
+    tmp_path: Path, profile: tuple[Path, dict[str, object]]
+) -> None:
+    output, _receipt = profile
+    head = subprocess.run(
+        ("git", "rev-parse", "HEAD"), cwd=REPOSITORY, check=True, capture_output=True, text=True
+    ).stdout.strip()
+    reader_path = REPOSITORY / "packing/devtools/read_fixed_core_calibration_profile.py"
+    for name, content in (
+        ("outside", reader_path.read_bytes()),
+        ("altered", reader_path.read_bytes() + b"\n# changed running source\n"),
+    ):
+        copied = tmp_path / f"{name}.py"
+        copied.write_bytes(content)
+        spec = importlib.util.spec_from_file_location(f"reader_copy_{name}", copied)
+        assert spec is not None
+        assert spec.loader is not None
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[spec.name] = module
+        spec.loader.exec_module(module)
+        with pytest.raises(ValueError, match="running reader"):
+            module._bind_revisions(REPOSITORY, EXECUTION_REVISION, head)
+        command = (
+            sys.executable,
+            str(copied),
+            "--repository",
+            str(REPOSITORY),
+            "--expect-execution-revision",
+            EXECUTION_REVISION,
+            "--expect-reader-revision",
+            head,
+            "--output-dir",
+            str(output),
+            "--run-order",
+            "1",
+        )
+        result = subprocess.run(command, check=False, capture_output=True, text=True)
+        assert result.returncode == 2
+        assert result.stdout == ""
+        assert result.stderr.startswith("REFUSED: running reader")
+    other_checkout = tmp_path / "other-checkout" / "packing/devtools"
+    other_checkout.mkdir(parents=True)
+    copied = other_checkout / reader_path.name
+    copied.write_bytes(reader_path.read_bytes())
+    result = subprocess.run(
+        (
+            sys.executable,
+            str(copied),
+            "--repository",
+            str(REPOSITORY),
+            "--expect-execution-revision",
+            EXECUTION_REVISION,
+            "--expect-reader-revision",
+            head,
+            "--output-dir",
+            str(output),
+            "--run-order",
+            "1",
+        ),
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 2
+    assert result.stdout == ""
+    assert result.stderr.startswith("REFUSED: running reader")
+    # This positive binding is exercised after the repaired reader is committed.
+    reader._bind_revisions(REPOSITORY, EXECUTION_REVISION, head)
+    current = reader_path.read_bytes()
+    reader_path.write_bytes(current + b"\n# altered on-disk reader\n")
+    try:
+        with pytest.raises(reader.ReadbackRefusalError, match="reader bytes"):
+            reader._bind_revisions(REPOSITORY, EXECUTION_REVISION, head)
+    finally:
+        reader_path.write_bytes(current)
+    result = subprocess.run(
+        (
+            sys.executable,
+            str(reader_path),
+            "--repository",
+            str(REPOSITORY),
+            "--expect-execution-revision",
+            EXECUTION_REVISION,
+            "--expect-reader-revision",
+            head,
+            "--output-dir",
+            str(output),
+            "--run-order",
+            "1",
+        ),
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 0
+    assert json.loads(result.stdout)["status"] == "accepted"
+
+
+def test_exact_method_witness_agreement_and_closed_boundary(
+    monkeypatch: pytest.MonkeyPatch, profile: tuple[Path, dict[str, object]]
+) -> None:
+    output, baseline = profile
+    path = output / "normalized-exact-directions/0.json"
+    original = path.read_bytes()
+    for slab, slab_charge, agree, valid in (
+        (["9/32", "9/32"], "1", True, False),
+        (["3/8", "3/8"], "1", False, False),
+        (["3/8", "3/8"], "1/2", True, False),
+        (["6/16", "3/8"], "1", True, False),
+        (["0", "0"], "1", True, False),
+        (["1/4", "1/4"], "1", True, True),
+    ):
+        receipt = deepcopy(baseline)
+        row = json.loads(original)
+        row["slab_witness"] = slab
+        row["slab"] = slab_charge
+        row["agree"] = agree
+        if valid:
+            row["witness"] = slab
+            cast(
+                dict[str, object],
+                cast(dict[str, object], receipt["routes"])["normalized_exact"],
+            )["witness"] = slab
+        _write(path, row)
+        exact_paths = [
+            output / "normalized-exact-directions" / f"{index}.json"
+            for index in range(reader.RAW_DIRECTIONS)
+        ]
+        cast(dict[str, object], cast(dict[str, object], receipt["routes"])["normalized_exact"])[
+            "directions_sha256"
+        ] = reader._direction_digest(exact_paths)
+        _publish_receipt(output, receipt)
+        try:
+            if valid:
+                assert _read(monkeypatch, output)["status"] == "accepted"
+            else:
+                with pytest.raises(reader.ReadbackRefusalError):
+                    _read(monkeypatch, output)
+        finally:
+            path.write_bytes(original)
+            _publish_receipt(output, deepcopy(baseline))
+
+
+def test_json_number_failures_follow_cli_refusal_contract(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    profile: tuple[Path, dict[str, object]],
+) -> None:
+    with pytest.raises(reader.ReadbackRefusalError, match="finite nonnegative"):
+        reader._number(10**1000, "clock")
+    with pytest.raises(reader.ReadbackRefusalError, match="strict JSON"):
+        reader._json_bytes(b'{"value":' + b"1" * 5000 + b"}", "control")
+    output, baseline = profile
+    path = output / "result.json"
+    monkeypatch.setattr(reader, "_bind_revisions", lambda *_args: None)
+    overflow_receipt = deepcopy(baseline)
+    cast(dict[str, object], overflow_receipt["clocks"])["raw_seconds"] = 10**1000
+    _publish_receipt(output, overflow_receipt)
+    overflow_bytes = path.read_bytes()
+    try:
+        for malformed in (b'{"value":' + b"1" * 5000 + b"}", overflow_bytes):
+            path.write_bytes(malformed)
+            status = reader.main(
+                [
+                    "--repository",
+                    str(REPOSITORY),
+                    "--expect-execution-revision",
+                    EXECUTION_REVISION,
+                    "--expect-reader-revision",
+                    READER_REVISION,
+                    "--output-dir",
+                    str(output),
+                    "--run-order",
+                    "1",
+                ]
+            )
+            captured = capsys.readouterr()
+            assert status == 2
+            assert captured.out == ""
+            assert captured.err.startswith("REFUSED:")
+    finally:
+        _publish_receipt(output, deepcopy(baseline))
+
+
+@pytest.mark.parametrize(
+    ("path", "replacement"),
+    [
+        (("fixture", "source_bytes"), 935.0),
+        (("invocation", "run_order"), True),
+        (("invocation", "run_order"), 1.0),
+        (("invocation", "run_order"), "1"),
+        (("invocation", "run_order"), None),
+        (("invocation", "monotonic_origin"), True),
+        (("invocation", "identity", "run_order"), True),
+        (("invocation", "identity", "requested_workers"), 1.0),
+        (("invocation", "identity", "calibration_deadline_monotonic"), True),
+        (("settings", "requested_workers"), True),
+        (("settings", "effective_workers", "raw"), True),
+        (("settings", "effective_workers", "normalized_exact"), 1.0),
+        (("settings", "effective_workers", "reflected_interval"), False),
+        (("settings", "effective_workers", "dilation"), None),
+        (("settings", "direction_steps"), 2880.0),
+        (("settings", "expected_direction_rows"), 14404.0),
+        (("settings", "calibration_seconds"), True),
+        (("clocks", "raw_seconds"), True),
+        (("supervision", "worker_exit_status"), False),
+        (("supervision", "coordinator_pid"), 101.0),
+    ],
+)
+def test_receipt_scalar_substitutions_refuse(
+    path: tuple[str | int, ...],
+    replacement: object,
+    profile: tuple[Path, dict[str, object]],
+) -> None:
+    _output, baseline = profile
+    changed = deepcopy(baseline)
+    _set_path(changed, path, replacement)
+    with pytest.raises(reader.ReadbackRefusalError):
+        reader._validate_receipt_schema(changed, 1)
+
+
+@pytest.mark.parametrize(
+    ("path", "replacement"),
+    [
+        (("n",), 2.0),
+        (("direction_steps",), 2880.0),
+        (("threshold_atoms", 0, "threshold"), 2.0),
+        (("threshold_atoms", 1, "threshold"), True),
+    ],
+)
+def test_candidate_integer_substitutions_refuse_before_budget_arithmetic(
+    path: tuple[str | int, ...],
+    replacement: object,
+    profile: tuple[Path, dict[str, object]],
+) -> None:
+    output, baseline = profile
+    candidate_path = output / "candidate.json"
+    original = candidate_path.read_bytes()
+    candidate = json.loads(original)
+    _set_path(candidate, path, replacement)
+    data = _write(candidate_path, candidate, indent=1)
+    receipt = deepcopy(baseline)
+    cast(dict[str, object], receipt["normalized"])["sha256"] = hashlib.sha256(data).hexdigest()
+    try:
+        with pytest.raises(reader.ReadbackRefusalError, match="candidate geometry"):
+            reader._validate_candidate(output, receipt)
+    finally:
+        candidate_path.write_bytes(original)
+
+
+@pytest.mark.parametrize(
+    ("path", "replacement"),
+    [
+        (("raw", "observed_argmin"), False),
+        (("raw", "completed_directions", 0), False),
+        (("raw", "witness_admissible"), 1),
+        (("routes", "normalized_exact", "argmin"), False),
+        (("routes", "normalized_exact", "dense_slab_disagreements"), 0.0),
+        (("routes", "reflected_interval", "integer_scale"), 8.0),
+        (("routes", "reflected_interval", "integer_enclosure", 0), 8.0),
+        (("routes", "reflected_interval", "stalled"), False),
+        (("routes", "reflected_interval", "budget_exhausted"), 0.0),
+        (("routes", "reflected_interval", "boxes_observed"), 5761.0),
+        (("routes", "dilation", "directions_completed"), 2881.0),
+    ],
+)
+def test_route_scalar_substitutions_refuse(
+    monkeypatch: pytest.MonkeyPatch,
+    path: tuple[str | int, ...],
+    replacement: object,
+    profile: tuple[Path, dict[str, object]],
+) -> None:
+    output, baseline = profile
+    changed = deepcopy(baseline)
+    _set_path(changed, path, replacement)
+    _publish_receipt(output, changed)
+    try:
+        with pytest.raises(reader.ReadbackRefusalError):
+            _read(monkeypatch, output)
+    finally:
+        _publish_receipt(output, deepcopy(baseline))
+
+
+@pytest.mark.parametrize(
+    ("relative", "path", "replacement"),
+    [
+        ("raw-directions/0.json", ("direction",), False),
+        ("normalized-exact-directions/0.json", ("direction",), 0.0),
+        ("normalized-interval-directions/0.json", ("lower",), 8.0),
+        ("normalized-interval-directions/0.json", ("upper",), True),
+        ("normalized-interval-directions/0.json", ("stalled",), False),
+        ("dilation-directions/0.json", ("direction",), False),
+    ],
+)
+def test_row_scalar_substitutions_refuse_with_rebound_digests(
+    monkeypatch: pytest.MonkeyPatch,
+    relative: str,
+    path: tuple[str | int, ...],
+    replacement: object,
+    profile: tuple[Path, dict[str, object]],
+) -> None:
+    output, baseline = profile
+    artifact = output / relative
+    original = artifact.read_bytes()
+    row = json.loads(original)
+    _set_path(row, path, replacement)
+    _write(artifact, row)
+    receipt = deepcopy(baseline)
+    directory = artifact.parent.name
+    route = {
+        "raw-directions": cast(dict[str, object], receipt["raw"]),
+        "normalized-exact-directions": cast(
+            dict[str, object], cast(dict[str, object], receipt["routes"])["normalized_exact"]
+        ),
+        "normalized-interval-directions": cast(
+            dict[str, object], cast(dict[str, object], receipt["routes"])["reflected_interval"]
+        ),
+        "dilation-directions": cast(
+            dict[str, object], cast(dict[str, object], receipt["routes"])["dilation"]
+        ),
+    }[directory]
+    labels = [str(index) for index in range(reader.RAW_DIRECTIONS)]
+    if directory == "normalized-interval-directions":
+        labels += [f"{index}'" for index in range(1, reader.RAW_DIRECTIONS)]
+    route["directions_sha256"] = reader._direction_digest(
+        [output / directory / f"{label}.json" for label in labels]
+    )
+    _publish_receipt(output, receipt)
+    try:
+        with pytest.raises(reader.ReadbackRefusalError):
+            _read(monkeypatch, output)
+    finally:
+        artifact.write_bytes(original)
+        _publish_receipt(output, deepcopy(baseline))
+
+
+@pytest.mark.parametrize(
+    ("path", "replacement"),
+    [
+        (("source", "n"), 2.0),
+        (("sharpened_containment", "identity"), "wrong identity"),
+        (("sharpened_containment", "gap_domain"), "0 <= t"),
+        (("sharpened_containment", "strict_factor_test"), "q < 9"),
+        (("sharpened_containment", "source_gap_below_one"), 1),
+        (("strict_dilation_family", "factor_supremum"), "-2*sqrt(33177601)/5761"),
+        (("strict_dilation_family", "factor_supremum_squared"), "4"),
+        (("strict_dilation_family", "factor_supremum_decimal"), "999"),
+        (
+            ("strict_dilation_family", "factor_supremum_defining_polynomial"),
+            "33189120*x^2 - 132710404",
+        ),
+        (("strict_dilation_family", "factor_domain"), "q > 0"),
+        (("strict_dilation_family", "invariants", 0), False),
+        (("conclusion", "bounded_side"), "-3*sqrt(33177601)/11522"),
+        (("conclusion", "bounded_side_squared"), "3"),
+        (("conclusion", "bounded_side_defining_polynomial"), "132756484*x^2 - 298598408"),
+        (("conclusion", "decimal"), "999"),
+        (("conclusion", "relation"), ">"),
+        (("conclusion", "endpoint_certificate"), 0),
+        (("proof", "requires_compactness"), 0),
+        (("proof", "endpoint_status"), "endpoint proved"),
+    ],
+)
+def test_dilation_contradictions_refuse_with_rebound_record(
+    monkeypatch: pytest.MonkeyPatch,
+    path: tuple[str | int, ...],
+    replacement: object,
+    profile: tuple[Path, dict[str, object]],
+) -> None:
+    output, baseline = profile
+    artifact = output / "dilation.json"
+    original = artifact.read_bytes()
+    record = json.loads(original)
+    _set_path(record, path, replacement)
+    data = _write(artifact, record, indent=2)
+    receipt = deepcopy(baseline)
+    cast(dict[str, object], cast(dict[str, object], receipt["routes"])["dilation"])[
+        "record_sha256"
+    ] = hashlib.sha256(data).hexdigest()
+    _publish_receipt(output, receipt)
+    try:
+        with pytest.raises(reader.ReadbackRefusalError, match="dilation"):
+            _read(monkeypatch, output)
+    finally:
+        artifact.write_bytes(original)
+        _publish_receipt(output, deepcopy(baseline))
+
+
+def _pooled_receipt(
+    output: Path, baseline: dict[str, object], *, children_count: int, mode: str = "normal"
+) -> dict[str, object]:
+    receipt = deepcopy(baseline)
+    settings = cast(dict[str, object], receipt["settings"])
+    settings["requested_workers"] = 2
+    cast(dict[str, object], settings["effective_workers"]).update(
+        {"raw": 2, "normalized_exact": 2}
+    )
+    cast(dict[str, object], cast(dict[str, object], receipt["invocation"])["identity"])[
+        "requested_workers"
+    ] = 2
+    clocks = cast(dict[str, object], receipt["clocks"])
+    clocks.update(
+        {
+            "raw_seconds": 0.5,
+            "exact_seconds": 0.5,
+            "worker_elapsed_seconds": 2.0,
+            "worker_exit_seconds": 2.1,
+            "external_lifetime_seconds": 2.3,
+        }
+    )
+    rss = cast(dict[str, object], cast(dict[str, object], receipt["resources"])["rss"])
+    rss["observation_lifetime_seconds"] = 2.3
+    rss["unobserved_trailing_seconds"] = 2.3 - 0.2
+    summaries = cast(
+        dict[str, object],
+        cast(
+            dict[str, object], cast(dict[str, object], receipt["resources"])["worker_topology"]
+        )["routes"],
+    )
+    for name, phase, filename, default_base in (
+        ("raw", "raw-sweep", "raw-worker-topology.json", 0.2),
+        ("normalized_exact", "normalized-exact", "normalized-exact-worker-topology.json", 0.8),
+    ):
+        base = default_base
+        if mode == "late":
+            base = 1_000_000.0
+        elif mode == "reversed" and name == "normalized_exact":
+            base = 0.3
+        stride = 0.0002 if mode == "long" and name == "raw" else 0.0001
+        duration = stride if mode == "touch" else 0.00015 if children_count == 2 else 0.00005
+        tasks: list[dict[str, object]] = []
+        for index in range(reader.RAW_DIRECTIONS):
+            pid = 101 if mode == "self-parent" else 201 + index % children_count
+            started = base + index * stride
+            tasks.append(
+                {
+                    "direction": index,
+                    "pid": pid,
+                    "ppid": 101,
+                    "pgid": 101,
+                    "started_seconds": started,
+                    "finished_seconds": (
+                        base + (index + 1) * stride
+                        if mode == "touch"
+                        else base + index * stride + duration
+                    ),
+                }
+            )
+        children = []
+        for pid in sorted({cast(int, task["pid"]) for task in tasks}):
+            owned = [task for task in tasks if task["pid"] == pid]
+            children.append(
+                {
+                    "role": "route-worker",
+                    "phase": phase,
+                    "pid": pid,
+                    "ppid": 101,
+                    "pgid": 101,
+                    "tasks_completed": len(owned),
+                    "first_task_started_seconds": owned[0]["started_seconds"],
+                    "last_task_finished_seconds": owned[-1]["finished_seconds"],
+                }
+            )
+        maximum = 2 if children_count == 2 and duration > stride else 1
+        sidecar = {
+            "schema": "fixed-core-packet-calibration-worker-route/v1",
+            "scope": reader.TOPOLOGY_SCOPE,
+            "coordinator": {"role": "coordinator", "pid": 101, "ppid": 100, "pgid": 101},
+            "route": {
+                "phase": phase,
+                "execution_model": "process-pool",
+                "configured_workers": 2,
+                "directions_expected": reader.RAW_DIRECTIONS,
+                "directions_completed": reader.RAW_DIRECTIONS,
+                "child_tasks_observed": reader.RAW_DIRECTIONS,
+                "observed_child_count": len(children),
+                "maximum_simultaneous_children": maximum,
+                "tasks": tasks,
+                "children": children,
+            },
+        }
+        data = _write(output / filename, sidecar)
+        summaries[name] = {
+            "configured_workers": 2,
+            "execution_model": "process-pool",
+            "observed_child_count": len(children),
+            "maximum_simultaneous_children": maximum,
+            "record_path": filename,
+            "record_sha256": hashlib.sha256(data).hexdigest(),
+        }
+    _publish_receipt(output, receipt)
+    return receipt
+
+
+@pytest.mark.parametrize(
+    ("children_count", "mode"), [(2, "normal"), (1, "normal"), (1, "touch")]
+)
+def test_valid_pooled_topologies_include_overlap_one_child_and_touching_boundaries(
+    monkeypatch: pytest.MonkeyPatch,
+    children_count: int,
+    mode: str,
+    profile: tuple[Path, dict[str, object]],
+) -> None:
+    output, baseline = profile
+    originals = {
+        name: (output / name).read_bytes()
+        for name in ("raw-worker-topology.json", "normalized-exact-worker-topology.json")
+    }
+    try:
+        _pooled_receipt(output, baseline, children_count=children_count, mode=mode)
+        proof = _read(monkeypatch, output)
+        raw = cast(dict[str, object], cast(dict[str, object], proof["worker_topology"])["raw"])
+        assert raw["observed_child_count"] == children_count
+        assert raw["maximum_simultaneous_children"] == (2 if children_count == 2 else 1)
+    finally:
+        for name, data in originals.items():
+            (output / name).write_bytes(data)
+        _publish_receipt(output, deepcopy(baseline))
+
+
+@pytest.mark.parametrize("mode", ["late", "reversed", "long", "self-parent"])
+def test_impossible_topologies_refuse_after_sidecars_and_summaries_are_rebound(
+    monkeypatch: pytest.MonkeyPatch,
+    mode: str,
+    profile: tuple[Path, dict[str, object]],
+) -> None:
+    output, baseline = profile
+    originals = {
+        name: (output / name).read_bytes()
+        for name in ("raw-worker-topology.json", "normalized-exact-worker-topology.json")
+    }
+    try:
+        _pooled_receipt(output, baseline, children_count=1, mode=mode)
+        with pytest.raises(reader.ReadbackRefusalError, match=r"task|topology"):
+            _read(monkeypatch, output)
+    finally:
+        for name, data in originals.items():
+            (output / name).write_bytes(data)
+        _publish_receipt(output, deepcopy(baseline))
+
+
+@pytest.mark.parametrize(
+    ("changes", "expected_status"),
+    [
+        ({"worker_exit_seconds": 1.0}, True),
+        ({"worker_exit_seconds": 1.2, "parent_final_readback_seconds": 0.0}, True),
+        ({"parent_final_readback_seconds": 0.15}, True),
+        ({"worker_exit_seconds": 0.9}, False),
+        ({"worker_exit_seconds": 1.3}, False),
+        ({"parent_final_readback_seconds": 0.2}, False),
+        ({"raw_seconds": 1.1}, False),
+        ({"raw_seconds": 0.6, "exact_seconds": 0.6}, False),
+        ({"worker_elapsed_seconds": 20.0}, False),
+    ],
+)
+def test_clock_lifetime_edges(
+    changes: dict[str, float],
+    expected_status: object,
+    profile: tuple[Path, dict[str, object]],
+) -> None:
+    _output, baseline = profile
+    receipt = deepcopy(baseline)
+    cast(dict[str, object], receipt["clocks"]).update(changes)
+    if expected_status is True:
+        reader._validate_receipt_schema(receipt, 1)
+    else:
+        with pytest.raises(reader.ReadbackRefusalError):
+            reader._validate_receipt_schema(receipt, 1)
+
+
+@pytest.mark.parametrize(
+    ("path", "bad"),
+    [
+        (("resources", "rss", "sample_count"), 2.0),
+        (("resources", "rss", "positive_sample_count"), True),
+        (("resources", "rss", "minimum_terminal_samples"), False),
+        (("resources", "rss", "peak_sampled_rss_bytes"), 2048.0),
+        (("resources", "worker_topology", "routes", "raw", "configured_workers"), True),
+        (("resources", "worker_topology", "routes", "raw", "observed_child_count"), False),
+    ],
+)
+def test_resource_and_topology_scalar_substitutions_refuse(
+    path: tuple[str | int, ...],
+    bad: object,
+    profile: tuple[Path, dict[str, object]],
+) -> None:
+    output, baseline = profile
+    receipt = deepcopy(baseline)
+    _set_path(receipt, path, bad)
+    if path[1] == "rss":
+        with pytest.raises(reader.ReadbackRefusalError):
+            reader._validate_resources(output, receipt)
+    else:
+        with pytest.raises(reader.ReadbackRefusalError):
+            reader._validate_topology(output, receipt)
+
+
+def test_topology_sidecar_count_substitution_refuses(
+    profile: tuple[Path, dict[str, object]],
+) -> None:
+    output, baseline = profile
+
+    sidecar_path = output / "raw-worker-topology.json"
+    original = sidecar_path.read_bytes()
+    sidecar = json.loads(original)
+    cast(dict[str, object], sidecar["route"])["child_tasks_observed"] = False
+    data = _write(sidecar_path, sidecar)
+    receipt = deepcopy(baseline)
+    resources = cast(dict[str, object], receipt["resources"])
+    topology = cast(dict[str, object], resources["worker_topology"])
+    routes = cast(dict[str, object], topology["routes"])
+    raw_summary = cast(dict[str, object], routes["raw"])
+    raw_summary["record_sha256"] = hashlib.sha256(data).hexdigest()
+    try:
+        with pytest.raises(reader.ReadbackRefusalError, match="topology route"):
+            reader._validate_topology(output, receipt)
+    finally:
+        sidecar_path.write_bytes(original)
