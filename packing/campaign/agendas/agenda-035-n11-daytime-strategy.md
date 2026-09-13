@@ -8,7 +8,7 @@ softschema:
 agenda:
   id: agenda-035
   title: N11 Daytime Strategy and Research Blocks
-  updated: '2026-09-12'
+  updated: '2026-09-13'
   status: active
   objective: Select and execute short, high-information blocks across distinct routes to a stronger n11
     result. Preserve exact scope, put the most direct theorem paths first, and keep the standalone explainer
@@ -114,6 +114,48 @@ agenda:
       evidence:
       - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-035/exp-156-unit-parent-saved-residual.json
       - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-156-unit-parent-saved-residual.md
+      disposition: retire-negative
+      follow_up: null
+  - id: BC-338
+    purpose: research
+    owner_focus: insight
+    instances: [11]
+    state: complete
+    priority: 1
+    question: Does the named universal bottom-left role-C inequality S(X) > epsilon
+      survive the already disclosed literal parent with labels 0 and 15 absent?
+    hypotheses: [H-159]
+    budget: One source-bound deterministic replay of the fixed 377-atom candidate,
+      with no search, rerun, or full BC303 coverage-certificate replay.
+    entry: The literal local arithmetic and repaired reader were independently accepted
+      at original code head 74ec773c; the same reader/test blobs were ported onto the
+      settled local PR156 base and all eighteen source blobs were checked again.
+    exit: A complete new-execution-head receipt and independent source-atom readback
+      either reject this one universal inequality or leave it unresolved on refusal.
+    bead: think-ms9l
+    depends_on: []
+    next_evidence: The inequality is retired by exp-157. The separate T2 forced-type
+      test under think-cexv and global owner routing remain open under their own admission.
+    workflows: [research-loop, factual-review, documentation-pass]
+    program: n11-daytime-strategy
+    artifacts:
+    - packing/campaign/hypotheses/H-159-bc303-one-corner-surplus.md
+    - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-157-bc303-literal-t1-witness.md
+    - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-035/exp-157-bc303-literal-t1-witness.json
+    - docs/project/reviews/review-2026-09-13-n11-bc303-t1-reader-final-math.md
+    outcomes:
+    - scope: One disclosed admissible bottom-left role-C parent and its selected core;
+        the universal local inequality S(X) > epsilon with labels 0 and 15 absent.
+      classification: bounded-negative
+      result: The new-head source-bound replay captures 19 of 377 atoms in the selected
+        core, with complete labels {3,4,11,12} and S(X)=3/800000 below
+        epsilon=524199/2000000. This one witness rejects H-159. No continuous-domain
+        minimum, full-packing extension, T2 verdict, global routing, or new s(11) bound
+        follows.
+      evidence:
+      - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-157-bc303-literal-t1-witness.md
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-035/exp-157-bc303-literal-t1-witness.json
+      - docs/project/reviews/review-2026-09-13-n11-bc303-t1-reader-final-math.md
       disposition: retire-negative
       follow_up: null
   - id: BC-337
@@ -523,6 +565,10 @@ BC326’s sole invocation found TR already incompatible under the old B-only mod
 retired that protocol; H158 remains unresolved.
 BC329 is now the first planned direct lower-bound target, pending its separate
 calibration admission.
+BC338 retains the retrospective literal T1 rejection: one bottom-left role-C parent has
+surplus `3/800000 < epsilon` with neither favorable local label.
+This closes only that named universal inequality.
+T2 and owner routing keep their separate entries.
 BC337 is the secondary parent-conditioning lane.
 BC327 still needs multiplicity admission, a paired-program adapter and a fresh common
 row manifest before its changed-atom comparison can run.

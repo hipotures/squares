@@ -492,12 +492,14 @@ Exact four-parent controls satisfy eight-mark ownership and simultaneous owner
 compatibility while defeating either missing lemma.
 They do not extend to eleven parents and do not refute the selection theorem.
 
-The proposed one-corner surplus test `think-ms9l` and adjacent/opposite pair test
-`think-cexv` are unrun.
-Their dependencies keep them blocked by `think-gldo` until this accepted retention is
-integrated. A success proves only the corresponding lemma; a rejection refutes only the
-named BC303 surplus inequality on its declared domain.
-No selection theorem or new n11 bound follows yet.
+The retrospective one-corner
+[T1 literal replay](../../../../packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-157-bc303-literal-t1-witness.md)
+rejects the named bottom-left role-C universal surplus inequality with one admissible
+parent. It does not compute the minimum over that continuous domain or establish that
+this parent extends to an eleven-parent packing.
+The adjacent/opposite pair test `think-cexv` remains a separate unrun T2 question.
+The dependencies on global selection and packing feasibility remain.
+No selection theorem or new n11 bound follows.
 
 Any later structural experiment must retain the complementary branches and combine the
 fixed-side normal form with the seven-of-eight mark-ownership alternative and one shared

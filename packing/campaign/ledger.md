@@ -714,6 +714,7 @@ Status: **active**. Select and execute short, high-information blocks across dis
 | --- | --- | --- | --- | ---: | --- | --- |
 | BC-325 | research | 11 | complete | 1 | think-gvlg | BC326 is selected first. The independent translation review then promotes BC329's one frozen 2880-step packet ahead of a weighted target, while BC327 remains blocked on multiplicity admission, a paired-program adapter and a freshly materialized row manifest. |
 | BC-326 | research | 11 | complete | 1 | think-fx2y | Exp156 is retired after its sole registered invocation returned B-only incompatibility at the first selected owner. Since the parent-restricted TR set is contained in its B-only set, no parent gain is possible there. Any further test of H158 requires a separately registered protocol that skips TR and tests BL, BR and TL; exp156 does not authorize a rerun or continuation to those owners. |
+| BC-338 | research | 11 | complete | 1 | think-ms9l | The inequality is retired by exp-157. The separate T2 forced-type test under think-cexv and global owner routing remain open under their own admission. |
 | BC-337 | research | 11 | blocked | 2 | think-0cdq | Build and independently admit the source-bound K_TR constructor, exact clipping and union calculation, bounded runner and independent reader. BC329 remains the higher-priority direct global-bound target; BC337 is a parallel secondary lane and must register its hypothesis and sole target only after tool admission. |
 | BC-327 | research | 11 | blocked | 2 | think-yc80 | The conditional primary is the retained seven-token, threshold-four K5 motif. Run its W7 admission before allocating the paired scientific comparison; do not substitute ordinary atoms inside the same protocol. |
 | BC-328 | research | 11 | complete | 1 | think-02l0 | Use the reviewed adjacent-wall component normal form to define one snug-parent or genuine contact-path pilot. Preserve the complementary path-length branches and verify physical contact rather than treating an arbitrary tight support row as contact. |
@@ -730,7 +731,7 @@ Status: **active**. Select and execute short, high-information blocks across dis
 
 | id | status | title | rounds | opened because |
 | --- | --- | --- | --- | --- |
-| series-000 | open | S0: smoke and calibration — prove the machinery, establish every baseline metric | 112 | First series. There is no prior instrument, so not |
+| series-000 | open | S0: smoke and calibration — prove the machinery, establish every baseline metric | 113 | First series. There is no prior instrument, so not |
 
 ## Registry
 
@@ -870,6 +871,7 @@ Status: **active**. Select and execute short, high-information blocks across dis
 | H-156 | confirmed | proof | The rank-one threshold-atom closure admits a D4-symmetric certificate  |  | 1 |  | 111.9m wall |
 | H-157 | refuted | proof | Refining the corner-owner angular bins from eight to sixteen makes eve |  | 1 |  | 5.9m wall |
 | H-158 | unresolved | proof | For exp151's direction-6 saved residual on selected tuple (0,0,0,7), e |  | 1 |  | 21s wall |
+| H-159 | refuted | proof | For every admissible bottom-left one-corner role-C unit parent X with  |  | 1 |  | 2s wall |
 
 ## Needs review — held for a human, not decided
 
@@ -879,7 +881,7 @@ Status: **active**. Select and execute short, high-information blocks across dis
 
 ## Rounds
 
-### rejected (27)
+### rejected (28)
 
 | id | series | instance | operator | hypotheses | reason |
 | --- | --- | --- | --- | --- | --- |
@@ -910,6 +912,7 @@ Status: **active**. Select and execute short, high-information blocks across dis
 | exp-151 | series-000 | 11 | GPT-6 Astra coordinator; implementation by GPT-5.6 Sol extra high; mathematical admission by GPT-6 Astra max | H-149 | The completed first-deficit stop refutes this fixed six-dot set after seven of 361 directions. It does not rule out relocating the sixth site, changing other sites or a weighted certificate. |
 | exp-153 | series-000 | 11 | GPT-6 Astra coordinator; implementation by GPT-5.6 Sol extra high; mathematical admission by GPT-6 Astra max | H-151 | The exact site region becomes empty after 188 complete direction constraints. This rules out every additional single site while original D and tuple(0,0,0,7) stay fixed. It does not rule out weighted added mass below two, repositioned six-site patterns or physical packings. |
 | exp-154 | series-000 | 11 | Claude Opus 5 measurement lane, coordinated by Claude Fable | H-157 | Six refined subclasses still read exactly 10, so the case split as posed is not closed by refinement and H-157 is refuted on its own registered direction. |
+| exp-157 | series-000 | 11 | Codex Sol implementation and record; source-distinct mathematical review at the original reader head by Astra Max | H-159 | The fixed parent has S(X)=3/800000 < epsilon=524199/2000000, so the named universal local inequality is false; no continuous-domain or global claim follows. |
 
 ### abandoned (2)
 
@@ -1042,7 +1045,7 @@ Status: **active**. Select and execute short, high-information blocks across dis
 
 ## Effort
 
-112 rounds, 2152.1 agent-minutes, 1485.2 wall-minutes.
+113 rounds, 2152.1 agent-minutes, 1485.2 wall-minutes.
 
 ## Exploration reports not yet codified
 
