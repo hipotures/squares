@@ -13,7 +13,7 @@ hypothesis:
     parameter setting the squares come to rest overlapping, so every side it reports is a
     bounding box around an invalid arrangement rather than a container a packing needs.
   lane: search
-  derived_from: [X-028]
+  derived_from: [X-029]
   criterion:
     shape: determination
     metric: the deepest pairwise overlap in the final arrangement, by separating axis

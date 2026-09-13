@@ -14,7 +14,7 @@ hypothesis:
     runs never clears the trivial grid at any n; at levels 6 to 8 it reaches within half a
     per cent of the record at n = 5 and 10.
   lane: search
-  derived_from: [X-028]
+  derived_from: [X-029]
   criterion:
     shape: conditions
     metric: closed at the best of a thousand valid runs

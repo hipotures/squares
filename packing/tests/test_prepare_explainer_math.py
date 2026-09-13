@@ -1,5 +1,7 @@
 """The publication pass changes math slots, preserving the rest of the source."""
 
+# pyright: reportPrivateUsage=false
+
 from __future__ import annotations
 
 import asyncio
@@ -12,6 +14,7 @@ from textwrap import dedent
 from typing import TYPE_CHECKING, Any, cast
 
 import pytest
+from nodejs_wheel import node
 
 if TYPE_CHECKING:
     from playwright.async_api import Route
@@ -123,6 +126,65 @@ def test_cli_prepares_before_comparing_or_writing_the_publication_artifact(
     )
 
 
+def test_the_exposure_rule_reads_the_observation_its_exemptions_came_from() -> None:
+    """The exposure decision and its exemptions must describe one observation (D-491).
+
+    `early_ready` can only name a box the font evidence saw, and that evidence is gathered
+    before the later `before` snapshot. Judging exposure against one observation while
+    taking exemptions from another makes the result depend on intervening probe work.
+    """
+    held: list[GeometryBox] = [
+        {
+            "key": key,
+            "group": 0,
+            "x": 12,
+            "y": 24,
+            "width": 30,
+            "height": 20,
+            "baseline": 40,
+            "intrinsic_width": 30,
+            "hidden": hidden,
+        }
+        for key, hidden in ((0, True), (1, False))
+    ]
+    arrived: list[GeometryBox] = [{**box, "hidden": False} for box in held]
+
+    # The evidence saw nothing, so later visibility in `before` is not early exposure.
+    assert (
+        geometry_findings(held, arrived, exposed_early=frozenset(), root_watchdog_paused=True)
+        == []
+    )
+
+    # The rule keeps its teeth. A box the evidence did see visible, and could not admit,
+    # is still an exposed box -- whether or not `before` agrees that it was visible.
+    assert any(
+        "exposed while its font requests were held" in message
+        for message in geometry_findings(
+            held,
+            arrived,
+            exposed_early=frozenset({1}),
+            root_watchdog_paused=True,
+        )
+    )
+    assert (
+        geometry_findings(
+            held,
+            arrived,
+            exposed_early=frozenset({1}),
+            early_ready=frozenset({1}),
+            root_watchdog_paused=True,
+        )
+        == []
+    )
+
+    # Omitted, the rule falls back to `before`'s own flags, which is what every caller
+    # without the evidence still gets.
+    assert any(
+        "exposed while its font requests were held" in message
+        for message in geometry_findings(held, arrived, root_watchdog_paused=True)
+    )
+
+
 def test_geometry_oracle_requires_hidden_then_visible_unchanged_boxes_and_line_breaks() -> None:
     before: list[GeometryBox] = [
         {
@@ -151,31 +213,43 @@ def test_geometry_oracle_requires_hidden_then_visible_unchanged_boxes_and_line_b
     after: list[GeometryBox] = [
         {**box, "hidden": False, "intrinsic_width": box["width"]} for box in before
     ]
-    assert geometry_findings(before, after) == []
+    assert geometry_findings(before, after, root_watchdog_paused=True) == []
     after[1] = {**after[1], "y": 50, "baseline": 66}
-    findings = geometry_findings(before, after)
+    findings = geometry_findings(before, after, root_watchdog_paused=True)
     assert any("moved 26.000px" in finding for finding in findings)
     assert any("line wrapping changed" in finding for finding in findings)
-    assert geometry_findings(before, [])
-    assert geometry_findings(before, before)
-    assert geometry_findings(after, after)
+    assert geometry_findings(before, [], root_watchdog_paused=True)
+    assert geometry_findings(before, before, root_watchdog_paused=True)
+    assert geometry_findings(after, after, root_watchdog_paused=True)
     before[0] = {**before[0], "hidden": False}
     after = [{**box, "hidden": False, "intrinsic_width": box["width"]} for box in before]
-    assert geometry_findings(before, after)
-    assert geometry_findings(before, after, early_ready=frozenset({0})) == []
-    assert geometry_findings(after, after, early_ready=frozenset({0, 1}))
+    assert geometry_findings(before, after, root_watchdog_paused=True)
+    assert (
+        geometry_findings(before, after, early_ready=frozenset({0}), root_watchdog_paused=True)
+        == []
+    )
+    assert geometry_findings(
+        after, after, early_ready=frozenset({0, 1}), root_watchdog_paused=True
+    )
+    assert any(
+        "did not pause the root math watchdog" in message
+        for message in geometry_findings(before, after, root_watchdog_paused=False)
+    )
     before[0] = {**before[0], "width": 42, "hidden": True}
     after[0] = {**after[0], "width": 42}
     assert any(
-        "reserved width differs" in message for message in geometry_findings(before, after)
+        "reserved width differs" in message
+        for message in geometry_findings(before, after, root_watchdog_paused=True)
     )
     after[0] = {**after[0], "text_rendering": "auto"}
     assert any(
-        "linear glyph metrics" in message for message in geometry_findings(before, after)
+        "linear glyph metrics" in message
+        for message in geometry_findings(before, after, root_watchdog_paused=True)
     )
     after[0] = {**after[0], "native_linear_metrics": True}
     assert not any(
-        "linear glyph metrics" in message for message in geometry_findings(before, after)
+        "linear glyph metrics" in message
+        for message in geometry_findings(before, after, root_watchdog_paused=True)
     )
 
 
@@ -226,6 +300,76 @@ def test_held_font_responses_all_start_before_any_waits_for_completion() -> None
         assert payloads == fonts
 
     asyncio.run(exercise())
+
+
+def test_geometry_font_gate_starts_runtime_only_after_before_snapshot() -> None:
+    """The geometry probe's own setup cannot consume KPress's timeout budget."""
+    trace = prepare_explainer_math._GEOMETRY_FONT_TRACE  # noqa: SLF001
+    exercise = dedent("""
+        const assert = require('node:assert/strict');
+        const starts = [];
+        const postReleasePromise = Promise.resolve('post-release');
+        const synchronousError = new Error('synchronous failure');
+        const rejection = new Error('post-release rejection');
+        let rejectedPromise;
+        const document = {documentElement: {dataset: {kpressMathPending: 'true'}}};
+        globalThis.kpressMathText = {
+          render(source) { starts.push(['render', source, performance.now()]);
+            if (source === 'post-release') return postReleasePromise;
+            if (source === 'throw') throw synchronousError;
+            if (source === 'reject') {
+              rejectedPromise = Promise.reject(rejection); return rejectedPromise;
+            }
+            return Promise.resolve('rendered'); },
+          hydrate(source) { starts.push(['hydrate', source, performance.now()]);
+            return Promise.resolve('hydrated'); }
+        };
+        (async () => {
+          globalThis.kpressMathPendingTimer = setTimeout(() => {
+            delete document.documentElement.dataset.kpressMathPending;
+          }, 0);
+          await new Promise(resolve => setTimeout(resolve, 10));
+          assert.equal(document.documentElement.dataset.kpressMathPending, 'true');
+          assert.equal(__squaresGeometryFontTrace.root_watchdog_paused, true);
+          const rendered = kpressMathText.render('x');
+          const hydrated = kpressMathText.hydrate('y');
+          await Promise.resolve();
+          const beforeSnapshotCompleted = performance.now();
+          assert.deepEqual(starts, []);
+          assert.equal(__squaresGeometryFontTrace.first_math_request_ms, null);
+          assert.equal(__squaresGeometryFontTrace.queued_calls, 2);
+          assert.throws(() => __squaresReleaseGeometryFontGate(),
+            /released before the before snapshot/);
+          assert.deepEqual(starts, []);
+          __squaresMarkGeometryBeforeSnapshotComplete();
+          __squaresReleaseGeometryFontGate();
+          assert.deepEqual(starts.map(call => call.slice(0, 2)),
+            [['render', 'x'], ['hydrate', 'y']]);
+          assert.ok(starts.every(call => call[2] >= beforeSnapshotCompleted));
+          assert.ok(__squaresGeometryFontTrace.first_math_request_ms
+            >= beforeSnapshotCompleted);
+          assert.deepEqual(await Promise.all([rendered, hydrated]),
+            ['rendered', 'hydrated']);
+          assert.strictEqual(kpressMathText.render('post-release'), postReleasePromise);
+          assert.throws(() => kpressMathText.render('throw'),
+            error => error === synchronousError);
+          const observedRejection = kpressMathText.render('reject');
+          assert.strictEqual(observedRejection, rejectedPromise);
+          await assert.rejects(observedRejection, /post-release rejection/);
+          assert.deepEqual(__squaresGeometryFontTrace.rejections.map(entry => entry.source),
+            ['throw', 'reject']);
+          process.stdout.write('complete');
+        })().catch(error => { console.error(error); process.exitCode = 1; });
+    """)
+    completed = node(
+        ["-"],
+        return_completed_process=True,
+        input=trace + exercise,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0, completed.stderr
+    assert completed.stdout == "complete"
 
 
 @pytest.mark.parametrize("font_set", ["custom", "system"])
@@ -342,6 +486,7 @@ def test_cli_retains_raw_control_reports_and_automatic_provenance(
             "font_timing": {
                 "first_math_request_ms": 20,
                 "first_font_request_ms": 30,
+                "root_watchdog_paused": True,
                 "release_started_ms": 200,
                 "release_completed_ms": 210,
                 "held_ms": 170,
@@ -424,6 +569,7 @@ def test_cli_retains_raw_control_reports_and_automatic_provenance(
     assert report["coverage_after"]["unreserved"] == []
     assert report["font_timing"]["held_ms"] == 170
     assert report["font_timing"]["release_ms"] == 10
+    assert report["font_timing"]["root_watchdog_paused"] is True
     assert report["font_timing"]["rejections"] == []
     assert "missing_reservation" in report["controls"]
     assert "unprotected_queue" in report["controls"]

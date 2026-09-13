@@ -14,7 +14,7 @@ hypothesis:
     than performing better at some n than at others. What looks like difficulty varying with
     n is the gap varying with n.
   lane: search
-  derived_from: [X-028]
+  derived_from: [X-029]
   criterion:
     shape: conditions
     metric: closed, the fraction of the record-to-grid gap a run closes
@@ -35,7 +35,7 @@ hypothesis:
 
 Raw excess cannot be compared across n: at n = 29 the grid is 1.1% above the record and
 at n = 5 it is 10.8%, so the same excess means opposite things.
-Normalised, the six n measured in X-028 fall between 0.33 and 0.70 with a median of 0.47
+Normalised, the six n measured in X-029 fall between 0.33 and 0.70 with a median of 0.47
 — a far narrower band than the tenfold range of the gaps themselves.
 
 **What would refute it.** An n whose median `closed` sits outside that band by more than

@@ -207,10 +207,11 @@ representation.
 **The pull-request surface is `--checks`, `--frontend`, `--geometry`, `--suite` and
 `--sweeps` together, run as five concurrent CI jobs**, so a pull request waits for the
 longest part rather than for their sum.
-All five feed the single required `packing-required` context, and
-`test_the_pull_request_jobs_partition_the_surface` reads the workflow and checks that
-they are pairwise disjoint and that they cover every step of `--fast` — so the split
-cannot lose a check the way a set of independent filters could.
+All five feed the stable `packing-required` aggregate context.
+Repository protection settings determine whether GitHub requires that context before a
+merge. `test_the_pull_request_jobs_partition_the_surface` reads the workflow and checks
+that they are pairwise disjoint and that they cover every step of `--fast` — so the
+split cannot lose a check the way a set of independent filters could.
 
 The merged [PR95](https://github.com/jlevy/squares/pull/95) implementation pools the
 known-best census and prospective-atlas rebuilds through the shared worker policy.
@@ -698,11 +699,14 @@ on exactly that edge.
 The explainer at <https://jlevy.github.io/squares/> is not checked in.
 GitHub Pages builds it from `main` in `.github/workflows/pages.yml`, on every push that
 touches one of the renderer’s declared inputs (`RENDER_INPUTS` in
-`devtools/render_explainer.py`, which a test keeps equal to the workflow’s path filter).
-The build renders the page (`site/index.html`), the Markdown edition
+`devtools/render_explainer.py`, which a test ensures the workflow’s path filter covers).
+The build writes the page (`site/index.html`), the Markdown edition
 (`site/t-018-explainer.md`), the PDF (`site/t-018-explainer.pdf`, drawn by Playwright’s
-Chromium) and the composite assets beside them, renders each twice and requires the two
-to agree, checks the print layout, and only then deploys.
+Chromium), and the composite assets beside them.
+It checks that the prepared HTML reproduces itself and compares the stored PDF with a
+fresh render, including the receipt that binds it to the HTML source.
+Font and page-count checks inspect that stored PDF. The workflow uploads the checked
+bytes unchanged; deployment waits for the print-layout and browser checks.
 A pull request runs the same build without deploying, so a render that breaks fails
 review rather than the next deploy.
 
@@ -726,7 +730,23 @@ Firefox/WebKit loading checks.
 Deployment waits for all of them.
 The build job selects Node 24.18.0, installs the root lockfile with scripts disabled,
 and builds the typed workbench package into the self-contained `/workbench/` page.
-Normal parameter startup and neighboring text movement are measured by
+Before drawing PDF bytes, the exporter checks that visible math is typeset; a completed
+font-error fallback that exposes literal TeX fails this check.
+Readable native MathML fallback is accepted by that check and remains subject to the
+separate PDF font policy.
+Pages exercises the production exporter with normal math and injected font errors and
+timeouts before it draws the publication candidate.
+These browser controls require the prepared page and pinned Chromium in Pages; the
+Python-only validation jobs leave them to that dedicated invocation.
+The PDF command `--check-artifact` requires an existing PDF and never rewrites it;
+`--check` remains available for repeated fresh-render diagnosis.
+On a reproduction disagreement, `--diagnostics-dir` retains the two raw PDFs and a
+neutral difference report in a separate directory for that invocation.
+Pages uploads those diagnostics on failure with seven-day retention.
+Download them before rerunning the job: GitHub can make a previous attempt’s artifacts
+unavailable on a rerun, even when their names differ
+([upstream report](https://github.com/actions/upload-artifact/issues/585)). Normal
+parameter startup and neighboring text movement are measured by
 `devtools.check_math_startup`; its controlled fixtures run in CI, while timing
 comparisons are retained in the
 [math startup campaign](packing/benchmarks/math-startup/README.md).
@@ -742,19 +762,25 @@ from the checkout:
 uv run --frozen --all-extras --group dev python -m devtools.check_published_site --commit <merge commit>
 ```
 
-It fetches the live page, the Markdown edition, the PDF, the assets, and the workbench.
-It checks the explainer edition and repository links, validates the PDF, requires the
-workbench’s exact source revision, starts its public API in pinned Chromium, and follows
-its project-relative link back to the explainer.
+It fetches the live page, Markdown edition, PDF, assets, and workbench.
+It checks the explainer edition, verifies that repository links name and resolve at the
+expected commit, and requires the PDF source receipt to match the exact served HTML
+bytes and its page count to match the publication.
+It also requires the workbench’s exact source revision, starts its public API in pinned
+Chromium, and follows its project-relative link to the explainer.
 
 **The stamp in the credits has two parts, and they move on different clocks.** The
-version (`v0.3.0`) is editorial and pinned in `src/sqpack/release.py`; the hash after it
-is the commit the page is built from, read at render time (`page_edition()`), so it
-changes on every push, and a reader of the deployed page sees exactly which commit they
-are looking at. The atlas footer and the generated claim documents are checked in and
-drift-checked byte for byte, so they carry the pinned `PUBLICATION_REVISION` instead
-(`PUBLICATION_EDITION` and `edition_file()`); the two spellings agree on the status and
-the version and differ only in which commit they name.
+current version and publication date come from the first entry in `PUBLICATION_HISTORY`
+in `src/sqpack/release.py`; the page renders the two retained history entries from that
+same source. Each history date records when that label first appeared in Git as an
+edition of this publication.
+The hash after the version is the commit the page is built from, read at render time
+(`page_edition()`), so it changes on every push, and a reader of the deployed page sees
+exactly which commit they are looking at.
+The atlas footer and the generated claim documents are checked in and drift-checked byte
+for byte, so they carry the pinned `PUBLICATION_REVISION` instead (`PUBLICATION_EDITION`
+and `edition_file()`); the two spellings agree on the status and the version and differ
+only in which commit they name.
 
 **Cutting an edition** is the one manual step, and it is editorial: it changes the
 version, and with it the revision the committed artifacts are stamped with.
@@ -763,9 +789,10 @@ Keep the chosen version fixed throughout a pull request; further edits update th
 content revision, not the patch number.
 To cut one:
 
-1. Set `PUBLICATION_VERSION`, `PUBLICATION_REVISION` (the short hash of the commit whose
-   content the edition describes, which is by construction older than the commit that
-   carries the bump) and `PUBLICATION_DATE` in `src/sqpack/release.py`.
+1. Add the edition to the front of `PUBLICATION_HISTORY` with the date its label will
+   first appear in Git, and set `PUBLICATION_REVISION` to the short hash of the commit
+   whose content the edition describes.
+   That revision is by construction older than the commit that carries the bump.
 2. Rebuild the atlas family:
    `uv run --frozen --all-extras --group dev python -m devtools.build_known_best_atlas --update`
    (see the cairo note under Supported Environment), and regenerate the claim documents:
