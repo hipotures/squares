@@ -239,6 +239,18 @@ class IntervalReadback:
     accepted: bool
 
 
+@dataclass(frozen=True, slots=True)
+class WorkerTaskObservation:
+    """Identity and monotonic bounds observed inside one completed pool task."""
+
+    direction: int
+    pid: int
+    ppid: int
+    pgid: int
+    started: float
+    finished: float
+
+
 class RawRunner(Protocol):
     def __call__(
         self,
@@ -812,6 +824,39 @@ def _exact_direction(
     return index, dense, slab
 
 
+def _raw_direction_observed(
+    index: int,
+) -> tuple[tuple[int, Fraction, Point], WorkerTaskObservation]:
+    started = time.perf_counter()
+    result = _raw_direction(index)
+    return result, WorkerTaskObservation(
+        direction=index,
+        pid=os.getpid(),
+        ppid=os.getppid(),
+        pgid=os.getpgid(0),
+        started=started,
+        finished=time.perf_counter(),
+    )
+
+
+def _exact_direction_observed(
+    index: int,
+) -> tuple[
+    tuple[int, tuple[Fraction, Point], tuple[Fraction, Point]],
+    WorkerTaskObservation,
+]:
+    started = time.perf_counter()
+    result = _exact_direction(index)
+    return result, WorkerTaskObservation(
+        direction=index,
+        pid=os.getpid(),
+        ppid=os.getppid(),
+        pgid=os.getpgid(0),
+        started=started,
+        finished=time.perf_counter(),
+    )
+
+
 def _write_direction(directory: Path, index: int | str, row: dict[str, object]) -> None:
     """Atomically retain one completed direction independently of later work."""
 
@@ -888,6 +933,7 @@ def run_raw_sweep(
     clock: Clock,
     progress: Callable[[int, tuple[int, ...], Fraction, int, Point], None],
     log: Path,
+    task_observer: Callable[[WorkerTaskObservation], None] | None = None,
 ) -> RawMinimum:
     """Sweep all raw directions, publishing only an observed upper bound until complete."""
 
@@ -926,7 +972,7 @@ def run_raw_sweep(
             )
             batches = _bounded_completion_batches(
                 pool,
-                _raw_direction,
+                _raw_direction_observed if task_observer is not None else _raw_direction,
                 total=total,
                 limit=IN_FLIGHT_WORK_PER_WORKER * effective_workers,
                 deadline=deadline,
@@ -939,7 +985,16 @@ def run_raw_sweep(
                 failure: Exception | None = None
                 for _index, future in batch:
                     try:
-                        landed.append(future.result())
+                        result = future.result()
+                        if task_observer is not None:
+                            observed_result, observation = cast(
+                                tuple[tuple[int, Fraction, Point], WorkerTaskObservation],
+                                result,
+                            )
+                            task_observer(observation)
+                            landed.append(observed_result)
+                        else:
+                            landed.append(cast(tuple[int, Fraction, Point], result))
                     except Exception as error:  # noqa: BLE001 -- retain peer completions first
                         if failure is None:
                             failure = error
@@ -993,6 +1048,7 @@ def run_exact_route(
     clock: Clock,
     progress: Callable[[int, tuple[int, ...], Fraction, int, Point], None],
     log: Path,
+    task_observer: Callable[[WorkerTaskObservation], None] | None = None,
 ) -> ExactRoute:
     """Run dense and slab exact coverage on every normalized net direction."""
 
@@ -1060,7 +1116,7 @@ def run_exact_route(
             )
             batches = _bounded_completion_batches(
                 pool,
-                _exact_direction,
+                _exact_direction_observed if task_observer is not None else _exact_direction,
                 total=total,
                 limit=IN_FLIGHT_WORK_PER_WORKER * effective_workers,
                 deadline=deadline,
@@ -1073,7 +1129,32 @@ def run_exact_route(
                 failure: Exception | None = None
                 for _index, future in batch:
                     try:
-                        landed.append(future.result())
+                        result = future.result()
+                        if task_observer is not None:
+                            observed_result, observation = cast(
+                                tuple[
+                                    tuple[
+                                        int,
+                                        tuple[Fraction, Point],
+                                        tuple[Fraction, Point],
+                                    ],
+                                    WorkerTaskObservation,
+                                ],
+                                result,
+                            )
+                            task_observer(observation)
+                            landed.append(observed_result)
+                        else:
+                            landed.append(
+                                cast(
+                                    tuple[
+                                        int,
+                                        tuple[Fraction, Point],
+                                        tuple[Fraction, Point],
+                                    ],
+                                    result,
+                                )
+                            )
                     except Exception as error:  # noqa: BLE001 -- retain peer completions first
                         if failure is None:
                             failure = error

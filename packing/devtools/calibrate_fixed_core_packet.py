@@ -55,6 +55,7 @@ from devtools.fixed_core_packet import (
     PacketDeadlineError,
     PacketError,
     RawMinimum,
+    WorkerTaskObservation,
     _direction_digest,
     _direction_files,
     _exact_row,
@@ -157,6 +158,14 @@ PHASE_DURATION_SCOPE = (
 RSS_SCOPE = (
     "sampled sum of resident-set sizes for observed members of the supervised process "
     "group; samples can miss transient peaks and can count shared pages more than once"
+)
+WORKER_TOPOLOGY_SCHEMA = "fixed-core-packet-calibration-worker-topology/v1"
+WORKER_TOPOLOGY_ROUTE_SCHEMA = "fixed-core-packet-calibration-worker-route/v1"
+WORKER_TOPOLOGY_SCOPE = (
+    "route-scoped coordinator and completed process-pool task lifetimes observed by "
+    "the calibration worker; configured workers are reported separately from actual "
+    "child identities and simultaneous task execution, and no process arguments or "
+    "unrelated host-process metadata are retained"
 )
 CPU_SCOPE = (
     "coordinator process_time plus cumulative user/system time of its reaped direct "
@@ -964,6 +973,7 @@ def initial_document(
             "reaped_direct_children_user_seconds": None,
             "reaped_direct_children_system_seconds": None,
             "rss": None,
+            "worker_topology": None,
         },
         "raw": {
             "directions_expected": RAW_DIRECTIONS,
@@ -992,6 +1002,8 @@ def initial_document(
             "worker_exit_status": None,
             "process_group_reaped": False,
             "supervisor_signal": None,
+            "coordinator_pid": None,
+            "coordinator_process_group_id": None,
         },
         "phase": "preflight",
         "error": "source and runtime preflight has not completed",
@@ -1230,6 +1242,297 @@ def _validate_artifact_receipts(value: object) -> None:
         seen.add(role)
 
 
+def _validate_worker_topology_summary(
+    value: object,
+    settings: dict[str, object],
+    *,
+    required: bool,
+) -> None:
+    if value is None:
+        if required:
+            raise CalibrationError("terminal calibration lacks worker topology")
+        return
+    if not isinstance(value, dict) or set(value) != {
+        "schema",
+        "scope",
+        "coordinator",
+        "routes",
+    }:
+        raise CalibrationError("worker topology fields changed")
+    coordinator = value.get("coordinator")
+    routes = value.get("routes")
+    if (
+        value.get("schema") != WORKER_TOPOLOGY_SCHEMA
+        or value.get("scope") != WORKER_TOPOLOGY_SCOPE
+        or not isinstance(coordinator, dict)
+        or set(coordinator) != {"role", "pid", "ppid", "pgid"}
+        or not isinstance(routes, dict)
+        or set(routes) != {"raw", "normalized_exact"}
+    ):
+        raise CalibrationError("worker topology is malformed")
+    coordinator_pid = coordinator.get("pid")
+    coordinator_group = coordinator.get("pgid")
+    if (
+        coordinator.get("role") != "coordinator"
+        or type(coordinator_pid) is not int
+        or cast(int, coordinator_pid) <= 0
+        or type(coordinator.get("ppid")) is not int
+        or cast(int, coordinator["ppid"]) <= 0
+        or coordinator_group != coordinator_pid
+    ):
+        raise CalibrationError("worker topology coordinator identity is malformed")
+    configured = settings.get("effective_workers")
+    if not isinstance(configured, dict):
+        raise CalibrationError("worker topology lacks configured route workers")
+    for name, record_path in (
+        ("raw", "raw-worker-topology.json"),
+        ("normalized_exact", "normalized-exact-worker-topology.json"),
+    ):
+        route = routes.get(name)
+        if route is None:
+            if required:
+                raise CalibrationError(f"terminal calibration lacks {name} worker topology")
+            continue
+        expected_workers = configured.get(name)
+        if not isinstance(route, dict) or set(route) != {
+            "configured_workers",
+            "execution_model",
+            "observed_child_count",
+            "maximum_simultaneous_children",
+            "record_path",
+            "record_sha256",
+        }:
+            raise CalibrationError(f"{name} worker topology summary fields changed")
+        observed_count = route.get("observed_child_count")
+        maximum_simultaneous = route.get("maximum_simultaneous_children")
+        parallel = type(expected_workers) is int and cast(int, expected_workers) > 1
+        if (
+            route.get("configured_workers") != expected_workers
+            or route.get("execution_model")
+            != ("process-pool" if parallel else "coordinator-serial")
+            or route.get("record_path") != record_path
+            or not _digest(route.get("record_sha256"))
+            or type(observed_count) is not int
+            or type(maximum_simultaneous) is not int
+            or (
+                parallel
+                and not (
+                    1
+                    <= cast(int, maximum_simultaneous)
+                    <= cast(int, observed_count)
+                    <= cast(int, expected_workers)
+                )
+            )
+            or (not parallel and (observed_count != 0 or maximum_simultaneous != 0))
+        ):
+            raise CalibrationError(f"{name} worker topology summary is malformed")
+
+
+def _maximum_simultaneous_children(
+    intervals: Sequence[tuple[float, float, int]],
+    *,
+    phase: str,
+) -> int:
+    active: set[int] = set()
+    maximum = 0
+    events = sorted(
+        (
+            (when, event_order, pid)
+            for started, finished, pid in intervals
+            for when, event_order in ((finished, 0), (started, 1))
+        )
+    )
+    for _when, event_order, pid in events:
+        if event_order == 0:
+            if pid not in active:
+                raise CalibrationError(f"{phase} child task lifetimes overlap per worker")
+            active.remove(pid)
+        else:
+            if pid in active:
+                raise CalibrationError(f"{phase} child task lifetimes overlap per worker")
+            active.add(pid)
+            maximum = max(maximum, len(active))
+    if active:
+        raise CalibrationError(f"{phase} child task lifetimes are unbalanced")
+    return maximum
+
+
+def _build_route_worker_topology(
+    phase: str,
+    *,
+    configured_workers: int,
+    directions_expected: int,
+    coordinator_pid: int,
+    coordinator_group: int,
+    invocation_started: float,
+    observations: Sequence[WorkerTaskObservation],
+) -> dict[str, object]:
+    if configured_workers == 1:
+        if observations:
+            raise CalibrationError(f"serial {phase} route reported process-pool children")
+        return {
+            "phase": phase,
+            "execution_model": "coordinator-serial",
+            "configured_workers": 1,
+            "directions_expected": directions_expected,
+            "directions_completed": directions_expected,
+            "child_tasks_observed": 0,
+            "observed_child_count": 0,
+            "maximum_simultaneous_children": 0,
+            "tasks": [],
+            "children": [],
+        }
+    if len(observations) != directions_expected:
+        raise CalibrationError(f"{phase} route lacks a child observation for every direction")
+    if sorted(observation.direction for observation in observations) != list(
+        range(directions_expected)
+    ):
+        raise CalibrationError(f"{phase} child observations do not bind every direction")
+    by_pid: dict[int, list[WorkerTaskObservation]] = {}
+    for observation in observations:
+        if (
+            type(observation.direction) is not int
+            or observation.pid <= 0
+            or observation.ppid != coordinator_pid
+            or observation.pgid != coordinator_group
+            or not math.isfinite(observation.started)
+            or not math.isfinite(observation.finished)
+            or observation.started < invocation_started
+            or observation.finished <= observation.started
+        ):
+            raise CalibrationError(f"{phase} child identity or lifetime is malformed")
+        by_pid.setdefault(observation.pid, []).append(observation)
+    child_pids = set(by_pid)
+    if not child_pids or len(child_pids) > configured_workers:
+        raise CalibrationError(f"{phase} observed child count exceeds its worker setting")
+    intervals = tuple(
+        (observation.started, observation.finished, observation.pid)
+        for observation in observations
+    )
+    maximum_simultaneous = _maximum_simultaneous_children(intervals, phase=phase)
+    tasks = [
+        {
+            "direction": observation.direction,
+            "pid": observation.pid,
+            "ppid": observation.ppid,
+            "pgid": observation.pgid,
+            "started_seconds": observation.started - invocation_started,
+            "finished_seconds": observation.finished - invocation_started,
+        }
+        for observation in sorted(observations, key=lambda row: row.direction)
+    ]
+    children = [
+        {
+            "role": "route-worker",
+            "phase": phase,
+            "pid": pid,
+            "ppid": coordinator_pid,
+            "pgid": coordinator_group,
+            "tasks_completed": len(rows),
+            "first_task_started_seconds": min(row.started for row in rows) - invocation_started,
+            "last_task_finished_seconds": max(row.finished for row in rows)
+            - invocation_started,
+        }
+        for pid, rows in sorted(by_pid.items())
+    ]
+    return {
+        "phase": phase,
+        "execution_model": "process-pool",
+        "configured_workers": configured_workers,
+        "directions_expected": directions_expected,
+        "directions_completed": directions_expected,
+        "child_tasks_observed": len(observations),
+        "observed_child_count": len(children),
+        "maximum_simultaneous_children": maximum_simultaneous,
+        "tasks": tasks,
+        "children": children,
+    }
+
+
+def _write_worker_topology(
+    output_dir: Path,
+    *,
+    invocation_started: float,
+    configured_workers: dict[str, int],
+    raw_observations: Sequence[WorkerTaskObservation],
+    exact_observations: Sequence[WorkerTaskObservation] | None,
+) -> dict[str, object]:
+    coordinator_pid = os.getpid()
+    coordinator_group = os.getpgid(0)
+    raw = _build_route_worker_topology(
+        "raw-sweep",
+        configured_workers=configured_workers["raw"],
+        directions_expected=RAW_DIRECTIONS,
+        coordinator_pid=coordinator_pid,
+        coordinator_group=coordinator_group,
+        invocation_started=invocation_started,
+        observations=raw_observations,
+    )
+    exact = (
+        None
+        if exact_observations is None
+        else _build_route_worker_topology(
+            "normalized-exact",
+            configured_workers=configured_workers["normalized_exact"],
+            directions_expected=RAW_DIRECTIONS,
+            coordinator_pid=coordinator_pid,
+            coordinator_group=coordinator_group,
+            invocation_started=invocation_started,
+            observations=exact_observations,
+        )
+    )
+    coordinator: dict[str, object] = {
+        "role": "coordinator",
+        "pid": coordinator_pid,
+        "ppid": os.getppid(),
+        "pgid": coordinator_group,
+    }
+
+    def retain_route(name: str, route: dict[str, object]) -> dict[str, object]:
+        filename = f"{name.replace('_', '-')}-worker-topology.json"
+        record = {
+            "schema": WORKER_TOPOLOGY_ROUTE_SCHEMA,
+            "scope": WORKER_TOPOLOGY_SCOPE,
+            "coordinator": coordinator,
+            "route": route,
+        }
+        encoded = (json.dumps(record, indent=2, allow_nan=False) + "\n").encode()
+        path = output_dir / filename
+        if path.exists():
+            if path.is_symlink() or not path.is_file():
+                raise CalibrationError(f"{name} worker topology has the wrong artifact type")
+            try:
+                retained = path.read_bytes()
+            except OSError as error:
+                raise CalibrationError(
+                    f"{name} worker topology cannot be read after publication"
+                ) from error
+            if retained != encoded:
+                raise CalibrationError(f"{name} worker topology changed after publication")
+        else:
+            atomic_write_text(path, encoded.decode())
+        return {
+            "configured_workers": route["configured_workers"],
+            "execution_model": route["execution_model"],
+            "observed_child_count": route["observed_child_count"],
+            "maximum_simultaneous_children": route["maximum_simultaneous_children"],
+            "record_path": filename,
+            "record_sha256": hashlib.sha256(encoded).hexdigest(),
+        }
+
+    return {
+        "schema": WORKER_TOPOLOGY_SCHEMA,
+        "scope": WORKER_TOPOLOGY_SCOPE,
+        "coordinator": coordinator,
+        "routes": {
+            "raw": retain_route("raw", raw),
+            "normalized_exact": (
+                None if exact is None else retain_route("normalized_exact", exact)
+            ),
+        },
+    }
+
+
 def validate_document(document: dict[str, object]) -> None:
     """Validate the closed calibration wrapper without interpreting generic artifacts."""
 
@@ -1402,6 +1705,7 @@ def validate_document(document: dict[str, object]) -> None:
             "reaped_direct_children_user_seconds",
             "reaped_direct_children_system_seconds",
             "rss",
+            "worker_topology",
         }
         or resources.get("cpu_scope") != CPU_SCOPE
     ):
@@ -1572,6 +1876,20 @@ def validate_document(document: dict[str, object]) -> None:
         and dilation_complete
     ):
         raise CalibrationError("terminal calibration lacks complete known-answer routes")
+    worker_topology = resources.get("worker_topology")
+    _validate_worker_topology_summary(
+        worker_topology,
+        settings,
+        required=status == "complete",
+    )
+    if worker_topology is not None:
+        assert isinstance(worker_topology, dict)
+        topology_routes = worker_topology["routes"]
+        assert isinstance(topology_routes, dict)
+        if (topology_routes["raw"] is not None) != raw_complete or (
+            topology_routes["normalized_exact"] is not None
+        ) != exact_complete:
+            raise CalibrationError("worker topology appeared outside a completed route")
     _validate_artifact_receipts(document.get("artifacts"))
     supervision = document.get("supervision")
     if not isinstance(supervision, dict) or set(supervision) != {
@@ -1579,6 +1897,8 @@ def validate_document(document: dict[str, object]) -> None:
         "worker_exit_status",
         "process_group_reaped",
         "supervisor_signal",
+        "coordinator_pid",
+        "coordinator_process_group_id",
     }:
         raise CalibrationError("calibration supervision fields changed")
     if (
@@ -1605,6 +1925,17 @@ def validate_document(document: dict[str, object]) -> None:
         or supervision.get("status") != "supervisor-interrupted"
     ):
         raise CalibrationError("supervisor signal provenance is malformed")
+    coordinator_pid = supervision.get("coordinator_pid")
+    coordinator_group = supervision.get("coordinator_process_group_id")
+    if (coordinator_pid is None) is not (coordinator_group is None) or (
+        coordinator_pid is not None
+        and (
+            type(coordinator_pid) is not int
+            or cast(int, coordinator_pid) <= 0
+            or coordinator_group != coordinator_pid
+        )
+    ):
+        raise CalibrationError("supervised coordinator identity is malformed")
     if status == "complete" and (
         disposition != "calibration-passed"
         or document.get("phase") != "complete"
@@ -1614,7 +1945,10 @@ def validate_document(document: dict[str, object]) -> None:
             "worker_exit_status": 0,
             "process_group_reaped": True,
             "supervisor_signal": None,
+            "coordinator_pid": coordinator_pid,
+            "coordinator_process_group_id": coordinator_pid,
         }
+        or coordinator_pid is None
     ):
         raise CalibrationError("complete calibration lacks successful parent supervision")
     if (
@@ -1646,8 +1980,12 @@ def validate_document(document: dict[str, object]) -> None:
         raise CalibrationError("calibration error is malformed")
 
 
-def _artifact_inventory(output_dir: Path, receipt_bytes: int) -> list[dict[str, object]]:
-    roles = (
+def _artifact_inventory(
+    output_dir: Path,
+    receipt_bytes: int,
+    worker_topology: object,
+) -> list[dict[str, object]]:
+    roles = [
         ("raw-directions", "raw-directions", True),
         ("normalized-exact-directions", "normalized-exact-directions", True),
         ("normalized-interval-directions", "normalized-interval-directions", True),
@@ -1655,7 +1993,17 @@ def _artifact_inventory(output_dir: Path, receipt_bytes: int) -> list[dict[str, 
         ("normalized-candidate", "candidate.json", False),
         ("generic-dilation-record", "dilation.json", False),
         ("rss-observations", "rss-samples.json", False),
-    )
+    ]
+    if isinstance(worker_topology, dict):
+        topology_routes = worker_topology.get("routes")
+        if isinstance(topology_routes, dict):
+            for name, role in (
+                ("raw", "raw-worker-topology"),
+                ("normalized_exact", "normalized-exact-worker-topology"),
+            ):
+                route = topology_routes.get(name)
+                if isinstance(route, dict) and isinstance(route.get("record_path"), str):
+                    roles.append((role, cast(str, route["record_path"]), False))
     rows: list[dict[str, object]] = []
     for role, relative, directory in roles:
         path = output_dir / relative
@@ -1694,7 +2042,11 @@ def _artifact_inventory(output_dir: Path, receipt_bytes: int) -> list[dict[str, 
 def _serialized_document(output_dir: Path, document: dict[str, object]) -> str:
     size = 0
     for _attempt in range(8):
-        document["artifacts"] = _artifact_inventory(output_dir, size)
+        document["artifacts"] = _artifact_inventory(
+            output_dir,
+            size,
+            cast(dict[str, object], document["resources"])["worker_topology"],
+        )
         encoded = json.dumps(document, indent=2, allow_nan=False) + "\n"
         next_size = len(encoded.encode())
         if next_size == size:
@@ -1776,6 +2128,12 @@ def execute_calibration(
 ) -> dict[str, object]:
     """Run all four generic routes and publish calibration-only checkpoints."""
 
+    effective_workers = cast(
+        dict[str, int], cast(dict[str, object], document["settings"])["effective_workers"]
+    )
+    raw_observations: list[WorkerTaskObservation] = []
+    exact_observations: list[WorkerTaskObservation] = []
+
     def publish() -> None:
         _update_worker_elapsed(document, invocation_started, clock)
         write_result(output_dir, document)
@@ -1812,6 +2170,11 @@ def execute_calibration(
             )
             publish()
 
+        raw_observers: dict[str, object] = {}
+        if kernels.raw is run_raw_sweep:
+            raw_observers = {
+                "task_observer": raw_observations.append,
+            }
         raw_result = kernels.raw(
             certificate,
             workers=workers,
@@ -1819,6 +2182,7 @@ def execute_calibration(
             clock=clock,
             progress=raw_progress,
             log=output_dir / "raw-directions",
+            **raw_observers,
         )
         if raw_result.completed != RAW_DIRECTIONS:
             _refuse("raw kernel returned an incomplete global minimum")
@@ -1850,6 +2214,15 @@ def execute_calibration(
                     )
                 ),
             }
+        )
+        cast(dict[str, object], document["resources"])["worker_topology"] = (
+            _write_worker_topology(
+                output_dir,
+                invocation_started=invocation_started,
+                configured_workers=effective_workers,
+                raw_observations=raw_observations,
+                exact_observations=None,
+            )
         )
         _clocks(document)["raw_seconds"] = clock() - raw_started
         publish()
@@ -1907,6 +2280,11 @@ def execute_calibration(
             }
             publish()
 
+        exact_observers: dict[str, object] = {}
+        if kernels.exact is run_exact_route:
+            exact_observers = {
+                "task_observer": exact_observations.append,
+            }
         exact = kernels.exact(
             normalized,
             workers=workers,
@@ -1914,6 +2292,7 @@ def execute_calibration(
             clock=clock,
             progress=exact_progress,
             log=output_dir / "normalized-exact-directions",
+            **exact_observers,
         )
         if exact.completed != RAW_DIRECTIONS:
             _refuse("normalized exact kernel returned incomplete")
@@ -1941,6 +2320,15 @@ def execute_calibration(
                 )
             ),
         }
+        cast(dict[str, object], document["resources"])["worker_topology"] = (
+            _write_worker_topology(
+                output_dir,
+                invocation_started=invocation_started,
+                configured_workers=effective_workers,
+                raw_observations=raw_observations,
+                exact_observations=exact_observations,
+            )
+        )
         _clocks(document)["exact_seconds"] = clock() - exact_started
         document["phase"] = "reflected-interval"
         document["error"] = "reflected interval route is incomplete"
@@ -2130,6 +2518,8 @@ def _validate_retained_artifact_set(output_dir: Path) -> None:
         "candidate.json",
         "dilation.json",
         "rss-samples.json",
+        "raw-worker-topology.json",
+        "normalized-exact-worker-topology.json",
         "raw-directions",
         "normalized-exact-directions",
         "normalized-interval-directions",
@@ -2138,6 +2528,282 @@ def _validate_retained_artifact_set(output_dir: Path) -> None:
     entries = {path.name for path in output_dir.iterdir()}
     if not entries.issubset(allowed):
         raise CalibrationError("calibration output contains an unexpected artifact")
+
+
+def _validate_worker_topology_route(
+    name: str,
+    value: object,
+    *,
+    phase: str,
+    configured_workers: int,
+    directions_expected: int,
+    coordinator_pid: int,
+    coordinator_group: int,
+    required: bool,
+) -> dict[str, object] | None:
+    if value is None:
+        if required:
+            raise CalibrationError(f"calibration lacks completed {name} worker topology")
+        return None
+    if not isinstance(value, dict) or set(value) != {
+        "phase",
+        "execution_model",
+        "configured_workers",
+        "directions_expected",
+        "directions_completed",
+        "child_tasks_observed",
+        "observed_child_count",
+        "maximum_simultaneous_children",
+        "tasks",
+        "children",
+    }:
+        raise CalibrationError(f"{name} worker topology fields changed")
+    integer_fields = (
+        "configured_workers",
+        "directions_expected",
+        "directions_completed",
+        "child_tasks_observed",
+        "observed_child_count",
+        "maximum_simultaneous_children",
+    )
+    if any(type(value.get(key)) is not int for key in integer_fields):
+        raise CalibrationError(f"{name} worker topology counts are malformed")
+    if (
+        value.get("phase") != phase
+        or value.get("configured_workers") != configured_workers
+        or value.get("directions_expected") != directions_expected
+        or value.get("directions_completed") != directions_expected
+    ):
+        raise CalibrationError(f"{name} worker topology identity changed")
+    children = value.get("children")
+    tasks = value.get("tasks")
+    if not isinstance(children, list) or not isinstance(tasks, list):
+        raise CalibrationError(f"{name} worker topology observations are malformed")
+    parsed_tasks: list[dict[str, object]] = []
+    for task in cast(list[object], tasks):
+        if not isinstance(task, dict) or set(task) != {
+            "direction",
+            "pid",
+            "ppid",
+            "pgid",
+            "started_seconds",
+            "finished_seconds",
+        }:
+            raise CalibrationError(f"{name} child task fields changed")
+        _finite_nonnegative(
+            task.get("started_seconds"), f"{name} child task start", optional=False
+        )
+        _finite_nonnegative(
+            task.get("finished_seconds"), f"{name} child task finish", optional=False
+        )
+        if (
+            type(task.get("direction")) is not int
+            or not 0 <= cast(int, task["direction"]) < directions_expected
+            or type(task.get("pid")) is not int
+            or cast(int, task["pid"]) <= 0
+            or task.get("ppid") != coordinator_pid
+            or task.get("pgid") != coordinator_group
+            or cast(float, task["finished_seconds"]) <= cast(float, task["started_seconds"])
+        ):
+            raise CalibrationError(f"{name} child task is malformed")
+        parsed_tasks.append(cast(dict[str, object], task))
+    directions = [cast(int, task["direction"]) for task in parsed_tasks]
+    if configured_workers > 1 and directions != list(range(directions_expected)):
+        raise CalibrationError(f"{name} child tasks do not bind every direction")
+    parsed_children: list[dict[str, object]] = []
+    for child in cast(list[object], children):
+        if not isinstance(child, dict) or set(child) != {
+            "role",
+            "phase",
+            "pid",
+            "ppid",
+            "pgid",
+            "tasks_completed",
+            "first_task_started_seconds",
+            "last_task_finished_seconds",
+        }:
+            raise CalibrationError(f"{name} child topology fields changed")
+        for key in ("first_task_started_seconds", "last_task_finished_seconds"):
+            _finite_nonnegative(child.get(key), f"{name} child {key}", optional=False)
+        if (
+            child.get("role") != "route-worker"
+            or child.get("phase") != phase
+            or type(child.get("pid")) is not int
+            or cast(int, child["pid"]) <= 0
+            or child.get("ppid") != coordinator_pid
+            or child.get("pgid") != coordinator_group
+            or type(child.get("tasks_completed")) is not int
+            or cast(int, child["tasks_completed"]) <= 0
+            or cast(float, child["last_task_finished_seconds"])
+            < cast(float, child["first_task_started_seconds"])
+        ):
+            raise CalibrationError(f"{name} child topology is malformed")
+        parsed_children.append(cast(dict[str, object], child))
+    child_pids = [cast(int, child["pid"]) for child in parsed_children]
+    if child_pids != sorted(set(child_pids)):
+        raise CalibrationError(f"{name} child identities are duplicated or unordered")
+    observed_count = len(parsed_children)
+    task_pids = {cast(int, task["pid"]) for task in parsed_tasks}
+    maximum_simultaneous = _maximum_simultaneous_children(
+        tuple(
+            (
+                cast(float, task["started_seconds"]),
+                cast(float, task["finished_seconds"]),
+                cast(int, task["pid"]),
+            )
+            for task in parsed_tasks
+        ),
+        phase=name,
+    )
+    child_tasks = sum(cast(int, child["tasks_completed"]) for child in parsed_children)
+    expected_children = [
+        {
+            "role": "route-worker",
+            "phase": phase,
+            "pid": pid,
+            "ppid": coordinator_pid,
+            "pgid": coordinator_group,
+            "tasks_completed": len(pid_tasks),
+            "first_task_started_seconds": min(
+                cast(float, task["started_seconds"]) for task in pid_tasks
+            ),
+            "last_task_finished_seconds": max(
+                cast(float, task["finished_seconds"]) for task in pid_tasks
+            ),
+        }
+        for pid in sorted(task_pids)
+        for pid_tasks in ([task for task in parsed_tasks if cast(int, task["pid"]) == pid],)
+    ]
+    if configured_workers == 1:
+        if (
+            value.get("execution_model") != "coordinator-serial"
+            or children
+            or tasks
+            or value.get("child_tasks_observed") != 0
+            or value.get("observed_child_count") != 0
+            or value.get("maximum_simultaneous_children") != 0
+        ):
+            raise CalibrationError(f"serial {name} topology reported pool execution")
+    elif (
+        value.get("execution_model") != "process-pool"
+        or not parsed_tasks
+        or child_tasks != directions_expected
+        or value.get("child_tasks_observed") != child_tasks
+        or value.get("observed_child_count") != observed_count
+        or value.get("maximum_simultaneous_children") != maximum_simultaneous
+        or not 1 <= observed_count <= configured_workers
+        or not 1 <= maximum_simultaneous <= observed_count
+        or set(child_pids) != task_pids
+        or parsed_children != expected_children
+    ):
+        raise CalibrationError(f"{name} topology does not reconstruct from child tasks")
+    return {
+        "configured_workers": configured_workers,
+        "execution_model": value["execution_model"],
+        "observed_child_count": observed_count,
+        "maximum_simultaneous_children": maximum_simultaneous,
+    }
+
+
+def _validate_worker_topology(
+    output_dir: Path,
+    resources: dict[str, object],
+    settings: dict[str, object],
+    supervision: dict[str, object],
+    *,
+    required_routes: Collection[str],
+    require_supervisor_binding: bool,
+    expected_directions: dict[str, int] | None = None,
+) -> None:
+    summary = resources.get("worker_topology")
+    if summary is None and required_routes:
+        raise CalibrationError("completed route lacks worker topology")
+    _validate_worker_topology_summary(summary, settings, required=False)
+    coordinator_summary: dict[str, object] | None = None
+    route_summaries: dict[str, object] = {}
+    if isinstance(summary, dict):
+        coordinator_summary = cast(dict[str, object], summary["coordinator"])
+        route_summaries = cast(dict[str, object], summary["routes"])
+        if require_supervisor_binding and (
+            supervision.get("coordinator_pid") != coordinator_summary["pid"]
+            or supervision.get("coordinator_process_group_id") != coordinator_summary["pgid"]
+        ):
+            raise CalibrationError("worker topology differs from the supervised coordinator")
+    configured = settings.get("effective_workers")
+    assert isinstance(configured, dict)
+    directions = expected_directions or {
+        "raw": RAW_DIRECTIONS,
+        "normalized_exact": RAW_DIRECTIONS,
+    }
+
+    for name, phase, filename in (
+        ("raw", "raw-sweep", "raw-worker-topology.json"),
+        (
+            "normalized_exact",
+            "normalized-exact",
+            "normalized-exact-worker-topology.json",
+        ),
+    ):
+        route_summary = route_summaries.get(name)
+        path = output_dir / filename
+        if not path.exists():
+            if route_summary is not None or name in required_routes:
+                raise CalibrationError(f"calibration lacks retained {name} worker topology")
+            continue
+        if path.is_symlink() or not path.is_file():
+            raise CalibrationError(f"{name} worker topology has the wrong artifact type")
+        try:
+            raw = path.read_bytes()
+        except OSError as error:
+            raise CalibrationError(f"{name} worker topology cannot be read") from error
+        sidecar = _strict_json_bytes(raw, filename)
+        if (
+            set(sidecar) != {"schema", "scope", "coordinator", "route"}
+            or sidecar.get("schema") != WORKER_TOPOLOGY_ROUTE_SCHEMA
+            or sidecar.get("scope") != WORKER_TOPOLOGY_SCOPE
+        ):
+            raise CalibrationError(f"{name} worker topology uses an unknown schema or scope")
+        coordinator = sidecar.get("coordinator")
+        if not isinstance(coordinator, dict) or set(coordinator) != {
+            "role",
+            "pid",
+            "ppid",
+            "pgid",
+        }:
+            raise CalibrationError(f"{name} worker topology coordinator fields changed")
+        coordinator_pid = coordinator.get("pid")
+        coordinator_group = coordinator.get("pgid")
+        if (
+            coordinator.get("role") != "coordinator"
+            or type(coordinator_pid) is not int
+            or cast(int, coordinator_pid) <= 0
+            or type(coordinator.get("ppid")) is not int
+            or cast(int, coordinator["ppid"]) <= 0
+            or coordinator_group != coordinator_pid
+            or (coordinator_summary is not None and coordinator != coordinator_summary)
+        ):
+            raise CalibrationError(f"{name} worker topology coordinator is malformed")
+        derived = _validate_worker_topology_route(
+            name,
+            sidecar.get("route"),
+            phase=phase,
+            configured_workers=cast(int, configured[name]),
+            directions_expected=directions[name],
+            coordinator_pid=cast(int, coordinator_pid),
+            coordinator_group=cast(int, coordinator_group),
+            required=True,
+        )
+        assert derived is not None
+        if route_summary is None:
+            if name in required_routes:
+                raise CalibrationError(f"completed {name} topology is not receipt-bound")
+            continue
+        expected_summary = derived | {
+            "record_path": filename,
+            "record_sha256": hashlib.sha256(raw).hexdigest(),
+        }
+        if route_summary != expected_summary:
+            raise CalibrationError(f"{name} worker topology summary does not reconstruct")
 
 
 def _validate_rss_observations(
@@ -2537,8 +3203,22 @@ def load_result(
         resources,
         required=complete,
     )
+    required_topology = {"raw"} if raw_complete else set()
+    if exact_receipt is not None and exact_receipt.get("status") == "complete":
+        required_topology.add("normalized_exact")
+    supervision = cast(dict[str, object], document["supervision"])
+    _validate_worker_topology(
+        output_dir,
+        resources,
+        cast(dict[str, object], document["settings"]),
+        supervision,
+        required_routes=required_topology,
+        require_supervisor_binding=supervision.get("coordinator_pid") is not None,
+    )
     if document["artifacts"] != _artifact_inventory(
-        output_dir, (output_dir / "result.json").stat().st_size
+        output_dir,
+        (output_dir / "result.json").stat().st_size,
+        resources["worker_topology"],
     ):
         raise CalibrationError("artifact inventory does not reconstruct from retained bytes")
     if complete:
@@ -2799,6 +3479,7 @@ def _record_supervision(
     external_lifetime: float,
     error: str | None,
     supervisor_signal: int | None = None,
+    coordinator_pid: int | None = None,
 ) -> dict[str, object] | None:
     document = _load_receipt_for_supervisor(output_dir)
     if document is None:
@@ -2820,6 +3501,8 @@ def _record_supervision(
             "worker_exit_status": worker_status,
             "process_group_reaped": group_reaped,
             "supervisor_signal": supervisor_signal,
+            "coordinator_pid": coordinator_pid,
+            "coordinator_process_group_id": coordinator_pid,
         }
     )
     if error is not None:
@@ -2882,6 +3565,7 @@ def supervise_worker(  # noqa: PLR0911
     previous_handlers: dict[signal.Signals, Any] = {}
     active_process: subprocess.Popen[bytes] | None = None
     worker_status: int | None = None
+    coordinator_pid: int | None = None
     interrupted_signal: int | None = None
     launching = False
     samples: list[dict[str, object]] = []
@@ -2933,6 +3617,7 @@ def supervise_worker(  # noqa: PLR0911
             cleanup_seconds=cleanup_seconds,
             external_lifetime=time.perf_counter() - invocation_started,
             error=message,
+            coordinator_pid=coordinator_pid,
         )
         return 1
 
@@ -2954,6 +3639,7 @@ def supervise_worker(  # noqa: PLR0911
         launching = True
         try:
             active_process = subprocess.Popen(tuple(command), start_new_session=True)
+            coordinator_pid = active_process.pid
         except OSError as launch_error:
             launch_seconds = time.perf_counter() - launch_started
             _record_supervision(
@@ -3027,6 +3713,7 @@ def supervise_worker(  # noqa: PLR0911
             cleanup_seconds=cleanup_seconds,
             external_lifetime=time.perf_counter() - invocation_started,
             error=None,
+            coordinator_pid=coordinator_pid,
         )
         if document is None:
             return 1
@@ -3146,6 +3833,14 @@ def supervise_worker(  # noqa: PLR0911
         try:
             _validate_cpu_observations(resources, required=True)
             _validate_rss_observations(output_dir, resources, required=True)
+            _validate_worker_topology(
+                output_dir,
+                resources,
+                cast(dict[str, object], document["settings"]),
+                cast(dict[str, object], document["supervision"]),
+                required_routes={"raw", "normalized_exact"},
+                require_supervisor_binding=True,
+            )
         except CalibrationError as error:
             document.update(
                 {
@@ -3224,6 +3919,7 @@ def supervise_worker(  # noqa: PLR0911
             external_lifetime=time.perf_counter() - invocation_started,
             error=f"supervisor interrupted by {signal_number.name} ({signal_number.value})",
             supervisor_signal=signal_number.value,
+            coordinator_pid=coordinator_pid,
         )
         interrupted_signal = signal_number.value
     except BaseException as error:
@@ -3252,6 +3948,7 @@ def supervise_worker(  # noqa: PLR0911
             cleanup_seconds=cleanup_seconds,
             external_lifetime=time.perf_counter() - invocation_started,
             error=f"supervisor interrupted by {type(error).__name__}",
+            coordinator_pid=coordinator_pid,
         )
         raise
     finally:
