@@ -35,6 +35,18 @@ RUN_ORDERS = (1, 2, 3)
 INVENTORY_NAME = "run-root-inventory.json"
 ADMISSION_NAME = "run-set-reader-admission.json"
 SUMMARY_NAME = "three-profile-summary.json"
+COORDINATOR_TOP_LEVEL_FILES = frozenset(
+    {
+        SUMMARY_NAME,
+        *(f"profile-{order}-run.json" for order in RUN_ORDERS),
+        *(
+            f"profile-{order}{suffix}.{stream}.log"
+            for order in RUN_ORDERS
+            for suffix in ("", "-producer-readback", "-inventory-readback")
+            for stream in ("stdout", "stderr")
+        ),
+    }
+)
 FIXTURE_PATH = "packing/cases/n02_fixed_core_packet_calibration/fixture.json"
 RUNTIME_PATHS = ("packing/.python-version", "packing/pyproject.toml", "packing/uv.lock")
 HEX40 = re.compile(r"[0-9a-f]{40}\Z")
@@ -420,11 +432,10 @@ def _inventory(run_root: Path, revision: str) -> dict[str, object]:
         f"profile-{order}" for order in RUN_ORDERS
     }:
         _refuse("run root does not contain exactly three profile directories")
-    # The coordinator writes only its summary and three run records at this level.
+    # The coordinator writes three command pairs and a run record per profile.
     # Producer artifacts are confined to the three profile directories.
-    required = {SUMMARY_NAME, *(f"profile-{order}-run.json" for order in RUN_ORDERS)}
     top_level = {cast(str, row["path"]) for row in files if "/" not in cast(str, row["path"])}
-    if top_level != required:
+    if top_level != COORDINATOR_TOP_LEVEL_FILES:
         _refuse("run root top-level files differ from the coordinator output set")
     _summary(run_root, revision)
     return {
@@ -853,6 +864,8 @@ def retain_run_root(
         name: _sha(_regular_bytes(review_root / name, "review artifact"))
         for name in REVIEW_NAMES
     }
+    if review_digests["coordinator.status"] != _sha(b"0\n"):
+        _refuse("coordinator status changed before retention copy")
     if review_digests[ADMISSION_NAME] != _sha(admission_data):
         _refuse("review artifact changed after admission check")
     evidence_root.mkdir()
@@ -912,6 +925,12 @@ def retain_run_root(
     )
     if _sha(_regular_bytes(archive_path, "run-root archive")) != archive_digest:
         _refuse("archive digest changed on reread")
+    if (
+        _regular_bytes(review_root / "coordinator.status", "coordinator status") != b"0\n"
+        or _regular_bytes(evidence_root / "coordinator.status", "copied coordinator status")
+        != b"0\n"
+    ):
+        _refuse("coordinator status changed during retention")
     return {
         "schema": "fixed-core-calibration-run-root-retention/v1",
         "status": "accepted",

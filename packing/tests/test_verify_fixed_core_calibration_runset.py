@@ -17,6 +17,7 @@ from typing import cast
 
 import pytest
 
+from devtools import run_fixed_core_calibration_profiles as coordinator
 from devtools import verify_fixed_core_calibration_runset as verifier
 
 EXECUTION = "a" * 40
@@ -61,6 +62,18 @@ def _root(base: Path, revision: str = EXECUTION) -> tuple[Path, Path, Path, dict
         (profile / "raw-directions" / "0.json").write_bytes(b"{}\n")
         receipt = _write_json(profile / "result.json", {"sources": {}})
         (run_root / f"profile-{order}-run.json").write_bytes(b"{}\n")
+        for stem in (
+            f"profile-{order}",
+            f"profile-{order}-producer-readback",
+            f"profile-{order}-inventory-readback",
+        ):
+            argv = ("synthetic-command", stem)
+            coordinator._write_command_output(
+                run_root,
+                stem,
+                argv,
+                subprocess.CompletedProcess(argv, 0, f"{stem}\n".encode(), b""),
+            )
         runs.append(
             {
                 "run_order": order,
@@ -170,6 +183,9 @@ def _complete_review_root(review_root: Path) -> None:
 
 def test_reader_join_and_retention_preserve_exact_run_root(tmp_path: Path) -> None:
     repository, run_root, review_root, summary = _root(tmp_path)
+    top_level = {path.name for path in run_root.iterdir() if path.is_file()}
+    assert len(top_level) == 22
+    assert top_level == verifier.COORDINATOR_TOP_LEVEL_FILES
     _read_all(repository, run_root, review_root, summary)
     admission = _join(repository, run_root, review_root)
     assert admission["status"] == "accepted"
@@ -229,6 +245,18 @@ def test_snapshot_refuses_extra_top_level_coordinator_artifacts(tmp_path: Path) 
             )
 
 
+def test_snapshot_refuses_missing_coordinator_command_log(tmp_path: Path) -> None:
+    _, run_root, review_root, _ = _root(tmp_path)
+    (run_root / "profile-2-inventory-readback.stderr.log").unlink()
+    (review_root / verifier.INVENTORY_NAME).unlink()
+    with pytest.raises(verifier.RunSetRefusalError, match="top-level"):
+        verifier.snapshot_run_root(
+            run_root=run_root,
+            review_root=review_root,
+            execution_revision=EXECUTION,
+        )
+
+
 def test_retention_refuses_review_proof_change_at_copy_boundary(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -265,6 +293,63 @@ def test_retention_refuses_changed_coordinator_status(tmp_path: Path) -> None:
             run_root=run_root,
             review_root=review_root,
             evidence_root=tmp_path / "evidence",
+            execution_revision=EXECUTION,
+        )
+
+
+def test_retention_refuses_status_change_between_check_and_digest(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repository, run_root, review_root, summary = _root(tmp_path)
+    _read_all(repository, run_root, review_root, summary)
+    _join(repository, run_root, review_root)
+    _complete_review_root(review_root)
+    status_path = review_root / "coordinator.status"
+    original = verifier._regular_bytes
+    changed = False
+
+    def change_after_first_status_read(path: Path, label: str) -> bytes:
+        nonlocal changed
+        data = original(path, label)
+        if path == status_path and not changed:
+            changed = True
+            status_path.write_bytes(b"2\n")
+        return data
+
+    monkeypatch.setattr(verifier, "_regular_bytes", change_after_first_status_read)
+    evidence_root = tmp_path / "evidence"
+    with pytest.raises(verifier.RunSetRefusalError, match="coordinator status"):
+        verifier.retain_run_root(
+            run_root=run_root,
+            review_root=review_root,
+            evidence_root=evidence_root,
+            execution_revision=EXECUTION,
+        )
+    assert changed
+    assert not evidence_root.exists()
+
+
+def test_retention_refuses_copied_status_change_at_final_boundary(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repository, run_root, review_root, summary = _root(tmp_path)
+    _read_all(repository, run_root, review_root, summary)
+    _join(repository, run_root, review_root)
+    _complete_review_root(review_root)
+    evidence_root = tmp_path / "evidence"
+    original = verifier._atomic_new
+
+    def change_after_digest_file(path: Path, data: bytes) -> None:
+        original(path, data)
+        if path == evidence_root / "run-root.tar.gz.sha256":
+            (evidence_root / "coordinator.status").write_bytes(b"2\n")
+
+    monkeypatch.setattr(verifier, "_atomic_new", change_after_digest_file)
+    with pytest.raises(verifier.RunSetRefusalError, match="coordinator status"):
+        verifier.retain_run_root(
+            run_root=run_root,
+            review_root=review_root,
+            evidence_root=evidence_root,
             execution_revision=EXECUTION,
         )
 
