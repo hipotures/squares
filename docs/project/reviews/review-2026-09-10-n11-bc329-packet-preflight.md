@@ -254,10 +254,13 @@ decisions:
    source identities, and retained logs.
 6. A supervised worker-process deadline and atomic process-level partial output,
    including the normalized gate and the dilation record’s additional source replay.
-   The maintained runner includes parent-side Git, runtime, and source preflight in the
-   invocation clock; the addendum records its reviewed enforcement boundary.
-   Any staged deadlines must be fixed before the target; an incomplete stage cannot
-   silently acquire another budget.
+   The parent invocation clock covers the output guard and supervised worker.
+   Git, runtime, and source preflight run inside the worker process group.
+   The supervisor checks the deadline immediately before and after process launch, then
+   recomputes the remaining wait allowance.
+   It cannot bound time spent inside the operating system’s launch call; a late return
+   triggers immediate termination and reaping.
+   An incomplete stage cannot silently acquire another budget.
 7. The outcome table below and the scope of any rejection.
    Preserve every completed direction observed by the coordinator when a timeout or
    invalid invocation stops the run.
@@ -266,6 +269,9 @@ Runner admission is not a BC329 measurement.
 It uses a separate `fixed-core-packet-calibration/v1` receipt and a frozen known-answer
 fixture that exercises the real raw, exact, interval, dilation, publication, and
 per-direction readback paths at the full 14,404-record shape.
+The fixture, exact answers, refusal controls, and limits of the resulting measurements
+are fixed in the
+[calibration design review](review-2026-09-12-n11-bc329-calibration-design.md).
 That schema cannot carry a scientific acceptance and the scientific reader refuses it.
 Three fresh runs price operational overhead on the intended host; their timing does not
 bound the harder BC329 computation.
@@ -283,15 +289,26 @@ three platform skips and an independent source review finding no acceptance-safe
 blocker. Those figures describe that checkpoint; the addendum names the later review and
 its test selection.
 
+The separate calibration command is implemented and independently admitted through exact
+implementation head `fcb538c29b846fb5e7c33bd962772ada9c21aedd`. The source-distinct
+review accepts CAL-1 through CAL-7 after replaying 54 lifecycle controls, ten fixture,
+source, and readback controls, four real launch controls, the 192-test focused suite,
+and the configured Ruff and BasedPyright checks.
+The [calibration design review](review-2026-09-12-n11-bc329-calibration-design.md)
+records the fixture, repaired boundaries, evidence, and scope of that acceptance.
+It does not admit a host profile or the BC329 target.
+
 The older `packing/devtools/measure_threshold_net_refinement.py:main` remains an
 adaptive core-sweep and bisection tool.
 Running it with `--nets 2880` does not execute this one fixed packet.
-Before the fixed-packet runner is admitted for BC329, the separate full-shape
-calibration must pass three host runs and source-distinct readback.
-Parent preflight now has a bounded clock, and partial interval and dilation receipts
-name their exact published direction sets.
-The separate calibration instrument and its controls remain unadmitted.
-Calibration does not ask the BC329 coverage question.
+Before the fixed-packet runner is admitted for BC329, the operational calibration chain
+must retain observed worker topology, run three fresh host profiles through the
+maintained coordinator, admit them through the source-distinct reader, and pass the
+reviewed
+[three-profile run sheet](../specs/active/plan-2026-09-13-n11-bc329-three-profile-run-sheet.md).
+Parent preflight has a bounded clock, and partial interval and dilation receipts name
+their exact published direction sets.
+None of those tasks asks the BC329 coverage question.
 
 The raw sweep should precede the normalized retention gate.
 Feeding the original weights directly to `decide_threshold_certificate` and treating its
@@ -311,7 +328,7 @@ finish within the wall deadline.
 | --- | --- | --- |
 | Accept | Exact `m_c>M/11`; normalized bytes pass all closed-form conditions; the complete exact and interval routes accept and agree at minimum one; dilation replay produces the exact `S_c>S_0` record | A stronger unconditional lower bound `s(11)>=S_c` |
 | Reject this relative-weight packet | One independently re-evaluated admissible rational core with original-weight charge `<=M/11`, or a fully checked minimum implying normalized budget `>=11` | These fixed sites, threshold atoms, relative weights, core side and net cannot satisfy the retained criterion under any common scaling |
-| Unresolved | Timeout, incomplete directions, interval stalls, exhausted box budgets, or a nonzero-width enclosure without a verified refuting witness | The planned run did not decide the packet |
+| Unresolved | Operational preflight failure, timeout, incomplete directions, interval stalls, exhausted box budgets, or a nonzero-width enclosure without a verified refuting witness | The planned run did not decide the packet |
 | Invalid | Mutated or mismatched sources, malformed declarations, wrong geometry, disagreement between methods, or a purported witness failing exact membership/admissibility checks | Repair the instrument or invocation; no scientific verdict |
 
 For the registered target, use `packing/devtools/fixed_core_packet.py` at the exact
@@ -342,12 +359,16 @@ arithmetic. The formula agreed with the maintained dilation helper.
 Decimal renderings used 70-digit `Decimal` arithmetic after exact decisions.
 
 All those target-free mathematical checks passed.
-The runner’s target-free unit and integration controls also pass, but the full-shape
-calibration and its independent readback remain unrun.
+The implementation reviews found the preflight blockers listed in Section 6. The second
+CAL-5 repair’s combined calibration and fixed-core suite passes 192 tests, and
+repository-wide Ruff and BasedPyright checks report zero findings.
+A source-distinct exact-head review at `fcb538c29b846fb5e7c33bd962772ada9c21aedd`
+accepts the implementation repair.
+The three full-shape calibration profiles and their independent readback remain unrun.
 BC329 coverage, normalization by its measured minimum, two-route retention, and
 dilation-source replay remain unrun.
-The packet becomes suitable for prospective registration only after the remaining
-admission tasks above are resolved.
+The packet is not suitable for prospective registration until those remaining admission
+tasks are resolved.
 
 ## Stack Review Addendum, 2026-09-12
 

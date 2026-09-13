@@ -219,6 +219,25 @@ case or experiment separately.
 | [A6 Fixed-Support Dual Admission](packing/cases/n11_fractional_certificate/a6_dual_upper/README.md) | research synthesis | record | retained | — |
 | [A6 Scope and Overnight Plan Review](docs/project/reviews/review-2026-09-10-n11-a6-scope-and-plan.md) | dated review record | record | retained | — |
 | [N11: Daytime Strategy Blocks and Parallel Explainer Update](docs/project/specs/active/plan-2026-09-10-n11-daytime-strategy-and-explainer.md) | implementation plan | current | transient | — |
+| [BC329 Target-Free Three-Profile Run Sheet](docs/project/specs/active/plan-2026-09-13-n11-bc329-three-profile-run-sheet.md) | implementation plan | current | transient | — |
+| [BC329 Run-Set Verifier Contract](docs/project/specs/active/plan-2026-09-13-n11-bc329-runset-verifier.md) | implementation plan | current | transient | — |
+| [BC329 Calibration Reader: Source-Distinct Review](docs/project/reviews/review-2026-09-13-n11-bc329-source-distinct-reader.md) | dated review record | record | retained | — |
+| [BC329 Reader Repair: Exact-Commit Rereview](docs/project/reviews/review-2026-09-13-n11-bc329-reader-rereview.md) | dated review record | record | retained | — |
+| [BC329 Reader F6/F7: Exact-Commit Admission Review](docs/project/reviews/review-2026-09-13-n11-bc329-reader-f6f7-overflow.md) | dated review record | record | retained | — |
+| [BC329 Reader F6/F7: Final Exact-Head Review](docs/project/reviews/review-2026-09-13-n11-bc329-reader-f6f7-final.md) | dated review record | record | retained | — |
+| [BC329 Topology Coordinator Exact-Head Review](docs/project/reviews/review-2026-09-13-n11-bc329-topology-coordinator-initial.md) | dated review record | record | retained | — |
+| [BC329 Coordinator Exact-Head Review](docs/project/reviews/review-2026-09-13-n11-bc329-coordinator-rereview.md) | dated review record | record | retained | — |
+| [BC329 Coordinator and Producer Exact-Head Review](docs/project/reviews/review-2026-09-13-n11-bc329-coordinator-final.md) | dated review record | record | retained | — |
+| [BC329 Coordinator Arithmetic Repair: Exact-Head Review](docs/project/reviews/review-2026-09-13-n11-bc329-coordinator-arithmetic-final.md) | dated review record | record | retained | — |
+| [Independent Operational Review: BC329 Three-Profile Run Sheet](docs/project/reviews/review-2026-09-13-n11-bc329-three-profile-run-sheet.md) | dated review record | record | retained | — |
+| [Exact-Head Review: BC329 Run-Set Verifier](docs/project/reviews/review-2026-09-13-n11-bc329-runset-verifier.md) | dated review record | record | retained | — |
+| [BC329 Run-Set Verifier: Exact-Head Rereview](docs/project/reviews/review-2026-09-13-n11-bc329-runset-verifier-rereview.md) | dated review record | record | retained | — |
+| [BC329 Run-Set Verifier: Independent Exact-Head R3 Review](docs/project/reviews/review-2026-09-13-n11-bc329-runset-verifier-r3-final.md) | dated review record | record | retained | — |
+| [PR 156 Integrated Source and BC329 Run-Sheet Review](docs/project/reviews/review-2026-09-13-n11-bc329-integrated-run-sheet.md) | dated review record | record | retained | — |
+| [PR 156 Run-Sheet Exact-Diff Rereview](docs/project/reviews/review-2026-09-13-n11-bc329-run-sheet-identity-refusal.md) | dated review record | record | retained | — |
+| [PR 156 Run-Sheet Parent-Identity Final Rereview](docs/project/reviews/review-2026-09-13-n11-bc329-run-sheet-parent-final.md) | dated review record | record | retained | — |
+| [PR 156 Run-Sheet Flowmark Final Rereview](docs/project/reviews/review-2026-09-13-n11-bc329-run-sheet-flowmark-final.md) | dated review record | record | retained | — |
+| [PR156 Native Usage Delta Audit](docs/project/reviews/review-2026-09-13-pr156-usage-delta.md) | dated review record | record | retained | — |
 | [N11: Three Overnight Research Blocks After PR139](docs/project/specs/active/plan-2026-09-10-n11-overnight-three-blocks.md) | implementation plan | record | superseded | [N11: Daytime Strategy Blocks and Parallel Explainer Update](docs/project/specs/active/plan-2026-09-10-n11-daytime-strategy-and-explainer.md) |
 | [Independent Review of the Unit-Parent Centre Bound](docs/project/reviews/review-2026-09-10-n11-parent-centre-independent-review.md) | dated review record | record | retained | — |
 | [Independent Review of the Adopted Parent Adapter](docs/project/reviews/review-2026-09-10-n11-parent-adapter-admission.md) | dated review record | record | retained | — |
@@ -226,6 +245,7 @@ case or experiment separately.
 | [Independent Review of Translated Individual-Parent Realizability](docs/project/reviews/review-2026-09-10-n11-parent-realizability-independent.md) | dated review record | record | retained | — |
 | [Independent Admission Review: BC326 Parent-Domain Runner](docs/project/reviews/review-2026-09-10-n11-parent-runner-independent.md) | dated review record | record | retained | — |
 | [BC329: Preflight of the 2880-Step Threshold Packet](docs/project/reviews/review-2026-09-10-n11-bc329-packet-preflight.md) | dated review record | record | retained | — |
+| [Fixed-Core Packet Calibration: Mathematical and Admission Review](docs/project/reviews/review-2026-09-12-n11-bc329-calibration-design.md) | dated review record | record | retained | — |
 | [N11 Strategy Audit for the BC329 Closeout](docs/project/reviews/review-2026-09-12-n11-post-bc329-strategy-audit.md) | dated review record | record | retained | — |
 | [Source-Distinct Review of the N11 Owner-Selection Report](docs/project/reviews/review-2026-09-12-n11-selection-routing-first-principles.md) | dated review record | record | retained | — |
 | [Strategic Review of the N11 Daytime Research Frontier](docs/project/reviews/review-2026-09-10-n11-strategy-frontier.md) | dated review record | record | retained | — |

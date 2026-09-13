@@ -296,16 +296,97 @@ boundary and termination grace.
 Atomic replacement prevents a reader from seeing half-written JSON after an ordinary
 worker failure or termination; the runner makes no host-crash or power-loss durability
 claim.
+
+The integrated repair addresses `think-rvhu`, `think-fmju`, `think-42zc`, `think-5fdx`,
+`think-g7vg`, and `think-pvmv`. The latest additions keep `uv.lock` read failures
+operational, reject normal, linked, and separate Git administrative directories, and
+retain ordinary `Popen` failure type and message in a `launch-failed` receipt with
+return status 1. Source-distinct review accepted the combined repair at
+`421c344545873647dd26f856320d93dbfd59413a`; BC329 remains blocked on the separate
+calibration and scientific admission chain.
 Admission uses a separate `fixed-core-packet-calibration/v1` receipt and a frozen,
 analytically solved fixture unrelated to BC329. The full-shape control runs all four
 generic routes and 14,404 direction records, but its schema cannot express a scientific
 acceptance. Three fresh host runs measure operational overhead, effective workers by
 route, clocks, sampled process-group RSS, artifact bytes, and deadline headroom.
+The
+[calibration design review](../../reviews/review-2026-09-12-n11-bc329-calibration-design.md)
+fixes the fixture, exact answers, refusal controls, and limits on interpreting those
+measurements. The calibration implementation is independently accepted through exact
+implementation head `fcb538c29b846fb5e7c33bd962772ada9c21aedd`, including CAL-1 through
+CAL-7 and the signal-safe terminal staging boundary.
 Because the fixture is deliberately easy, its timing does not bound BC329’s computation.
-A source-distinct reader must accept those controls before registration.
-The separate calibration instrument and its controls remain unadmitted; none of the
-three full-shape host runs or their independent readbacks has occurred.
-The implemented runner repairs do not admit BC329 execution.
+The observed-worker contract, maintained three-profile coordinator, and source-distinct
+receipt reader are integrated locally.
+Exact-head reviews identified source, running-reader identity, typed-field, dilation,
+witness-agreement, cross-route chronology, phase-lifetime, and receipt-byte binding
+boundaries.
+The source-distinct reader’s repair at `7e4d2487` passed independent rereview
+for F1–F5; that review found impossible nested clocks, task positions, a parent cycle,
+and a Git tree object accepted as execution identity.
+Candidate F6/F7 repair `95830f9e` is integrated; its
+[exact-commit review](../../reviews/review-2026-09-13-n11-bc329-reader-f6f7-overflow.md)
+accepted F6a, F6c, and F7, but refused F6b after a full real-binder control accepted
+finite phase clocks whose sum overflows.
+Finite-clock repair `a5701e73` is integrated with a maintained full-binder overflow
+refusal and finite equality control.
+Its
+[independent exact-head rereview](../../reviews/review-2026-09-13-n11-bc329-reader-f6f7-final.md)
+accepted F6/F7 at that source blob after 23 full real-binder controls.
+This scoped verdict does not transfer automatically to the later integrated head or
+admit positive calibration.
+Coordinator repair `dbbf8495` is integrated for inverted route chronology, disjoint
+phase time, and a changing `result.json`. Its
+[independent exact-head review](../../reviews/review-2026-09-13-n11-bc329-coordinator-final.md)
+accepted those targeted controls but refused strict receipt admission: finite inputs can
+overflow a derived deadline to infinity, and finite phase durations can raise an
+uncaught `OverflowError` rather than the specified metrics refusal.
+A scoped repair at `775c71d5` has an
+[independent exact-head review](../../reviews/review-2026-09-13-n11-bc329-coordinator-arithmetic-final.md)
+accepting both arithmetic refusal paths at its reviewed source blobs.
+The later integrated-head and positive-run gates remain.
+The first maintained run-set verifier at `878e18d0` implements the R2 proof join, R3
+inventory and archive comparison, and R4 source-closure check, but its
+[exact-head review](../../reviews/review-2026-09-13-n11-bc329-runset-verifier.md)
+refused admission on six reproducible binding and refusal-path gaps.
+Candidate repair `0874e912` closes those six in focused controls, but its
+[rereview](../../reviews/review-2026-09-13-n11-bc329-runset-verifier-rereview.md)
+refused R3: the verifier rejects the coordinator’s 18 required top-level command logs,
+and a status change between the first check and digest snapshot can be retained as
+accepted. Follow-up repair `2ea77405` has an
+[independent exact-head review](../../reviews/review-2026-09-13-n11-bc329-runset-verifier-r3-final.md)
+accepting the 22-file coordinator-shaped root and deterministic status-race refusals at
+its reviewed verifier blobs.
+Actual positive-run bytes, the evidence-commit OID, and the later integrated-head gate
+remain open. The reader’s
+[initial review](../../reviews/review-2026-09-13-n11-bc329-source-distinct-reader.md)
+records the refusal at `212e0dfc`; its
+[rereview](../../reviews/review-2026-09-13-n11-bc329-reader-rereview.md) records the
+remaining gaps at `7e4d2487`. The coordinator’s
+[rereview](../../reviews/review-2026-09-13-n11-bc329-coordinator-rereview.md) records
+the next refusal at `fc3e314d` and the three prior repairs it accepted.
+An
+[integrated-head review](../../reviews/review-2026-09-13-n11-bc329-integrated-run-sheet.md)
+at `fbd915fc` found that the component source blobs still match those accepted reviews.
+It refused the run sheet because its commands bypassed the maintained verifier.
+The revised [run sheet](plan-2026-09-13-n11-bc329-three-profile-run-sheet.md) now calls
+`snapshot`, `read`, `join`, `retain`, and `source-closure` on both the staged evidence
+tree and the later evidence commit.
+An
+[exact-diff rereview](../../reviews/review-2026-09-13-n11-bc329-run-sheet-identity-refusal.md)
+accepted that command wiring but found no proof that the evidence commit directly
+descends from the execution commit.
+The sheet now checks the parent before claiming admission.
+A
+[final exact-diff rereview](../../reviews/review-2026-09-13-n11-bc329-run-sheet-parent-final.md)
+accepts that repair at its reviewed working blob after direct-child and refusal
+controls. A
+[format-final rereview](../../reviews/review-2026-09-13-n11-bc329-run-sheet-flowmark-final.md)
+also accepts the current formatted sheet at Git blob `29517a3f`. A clean integrated-head
+review and live PR-head equality still precede execution.
+The later integrated-source gate, three fresh profiles, and independent readback also
+remain open. None of those profiles has run.
+The implemented runner and calibration repairs do not admit BC329 execution.
 
 Then register one hypothesis and one experiment, freeze the packet and normalization
 rule, measure `m_c`, and run the normalized object through the complete exact route, the
