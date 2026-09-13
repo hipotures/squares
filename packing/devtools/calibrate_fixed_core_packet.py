@@ -155,6 +155,18 @@ PHASE_DURATION_SCOPE = (
     "steps remain subject to a fresh deadline and cancellation check immediately before "
     "the replace"
 )
+WORKER_DISJOINT_PHASES = (
+    "preflight_seconds",
+    "raw_seconds",
+    "normalization_publication_seconds",
+    "exact_seconds",
+    "interval_seconds",
+    "dilation_seconds",
+    "full_readback_seconds",
+)
+# Account for floating-point subtraction and serialization of the phase observations.
+PHASE_ROUNDING_REL_TOL = 1e-9
+PHASE_ROUNDING_ABS_TOL = 1e-9
 RSS_SCOPE = (
     "sampled sum of resident-set sizes for observed members of the supervised process "
     "group; samples can miss transient peaks and can count shared pages more than once"
@@ -1043,6 +1055,17 @@ def _finite_nonnegative(value: object, label: str, *, optional: bool = True) -> 
         raise CalibrationError(f"{label} is not a finite nonnegative observation")
 
 
+def _validate_worker_phase_durations(clocks: dict[str, object]) -> None:
+    for name in (*WORKER_DISJOINT_PHASES, "worker_elapsed_seconds"):
+        _finite_nonnegative(clocks.get(name), f"clock {name}", optional=False)
+    total = math.fsum(cast(float, clocks[name]) for name in WORKER_DISJOINT_PHASES)
+    elapsed = cast(float, clocks["worker_elapsed_seconds"])
+    if total > elapsed and not math.isclose(
+        total, elapsed, rel_tol=PHASE_ROUNDING_REL_TOL, abs_tol=PHASE_ROUNDING_ABS_TOL
+    ):
+        raise CalibrationError("worker phase durations exceed worker elapsed")
+
+
 def _canonical_rational_text(value: object) -> bool:
     if not isinstance(value, str):
         return False
@@ -1876,6 +1899,8 @@ def validate_document(document: dict[str, object]) -> None:
         and dilation_complete
     ):
         raise CalibrationError("terminal calibration lacks complete known-answer routes")
+    if status == "complete":
+        _validate_worker_phase_durations(clocks)
     worker_topology = resources.get("worker_topology")
     _validate_worker_topology_summary(
         worker_topology,
@@ -2742,6 +2767,7 @@ def _validate_worker_topology(
         "raw": RAW_DIRECTIONS,
         "normalized_exact": RAW_DIRECTIONS,
     }
+    route_tasks: dict[str, list[dict[str, object]]] = {}
 
     for name, phase, filename in (
         ("raw", "raw-sweep", "raw-worker-topology.json"),
@@ -2812,6 +2838,18 @@ def _validate_worker_topology(
         }
         if route_summary != expected_summary:
             raise CalibrationError(f"{name} worker topology summary does not reconstruct")
+        route_tasks[name] = cast(
+            list[dict[str, object]], cast(dict[str, object], sidecar["route"])["tasks"]
+        )
+    raw_tasks = route_tasks.get("raw", [])
+    exact_tasks = route_tasks.get("normalized_exact", [])
+    if (
+        raw_tasks
+        and exact_tasks
+        and max(cast(float, task["finished_seconds"]) for task in raw_tasks)
+        > min(cast(float, task["started_seconds"]) for task in exact_tasks)
+    ):
+        raise CalibrationError("raw tasks finish after normalized exact tasks start")
 
 
 def _validate_rss_observations(
@@ -3840,6 +3878,7 @@ def supervise_worker(  # noqa: PLR0911
             observation_lifetime=cast(float, clocks["external_lifetime_seconds"]),
         )
         try:
+            _validate_worker_phase_durations(clocks)
             _validate_cpu_observations(resources, required=True)
             _validate_rss_observations(output_dir, resources, required=True)
             _validate_worker_topology(

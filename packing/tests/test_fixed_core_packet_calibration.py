@@ -199,7 +199,8 @@ def _terminal_candidate_summary(
     )
     for key in cast(dict[str, object], document["clocks"]):
         if key != "phase_duration_scope":
-            cast(dict[str, object], document["clocks"])[key] = 0.1
+            cast(dict[str, object], document["clocks"])[key] = 0.01
+    cast(dict[str, object], document["clocks"])["worker_elapsed_seconds"] = 0.2
     if output is not None:
         with (
             patch.object(calibration.os, "getpid", return_value=coordinator_pid),
@@ -942,6 +943,150 @@ def test_worker_topology_refuses_coherently_shifted_tasks_past_worker_elapsed() 
         )
 
 
+def test_worker_topology_refuses_digest_consistent_reversed_route_chronology(
+    tmp_path: Path,
+) -> None:
+    document = calibration.initial_document(
+        REVISION,
+        workers=2,
+        calibration_seconds=4.0,
+        external_seconds=5.0,
+        grace_seconds=0.05,
+        invocation_started=0.0,
+        run_order=1,
+        cache_observation="synthetic chronology control",
+        background_load="unmeasured",
+    )
+    coordinator = {"role": "coordinator", "pid": 100, "ppid": 99, "pgid": 100}
+    settings = cast(dict[str, object], document["settings"])
+    resources = cast(dict[str, object], document["resources"])
+    supervision = cast(dict[str, object], document["supervision"])
+    summaries: dict[str, object] = {}
+    sidecars: dict[str, dict[str, object]] = {}
+    for name, phase, first_pid, starts in (
+        ("raw", "raw-sweep", 201, (0.1, 0.2)),
+        ("normalized_exact", "normalized-exact", 301, (0.6, 0.7)),
+    ):
+        route = calibration._build_route_worker_topology(
+            phase,
+            configured_workers=2,
+            directions_expected=2,
+            coordinator_pid=100,
+            coordinator_group=100,
+            invocation_started=0.0,
+            observations=tuple(
+                WorkerTaskObservation(index, first_pid + index, 100, 100, start, start + 0.3)
+                for index, start in enumerate(starts)
+            ),
+        )
+        sidecars[name] = {
+            "schema": calibration.WORKER_TOPOLOGY_ROUTE_SCHEMA,
+            "scope": calibration.WORKER_TOPOLOGY_SCOPE,
+            "coordinator": coordinator,
+            "route": route,
+        }
+        filename = f"{name.replace('_', '-')}-worker-topology.json"
+        _write_json(tmp_path / filename, sidecars[name])
+        summaries[name] = {
+            "configured_workers": route["configured_workers"],
+            "execution_model": route["execution_model"],
+            "observed_child_count": route["observed_child_count"],
+            "maximum_simultaneous_children": route["maximum_simultaneous_children"],
+            "record_path": filename,
+            "record_sha256": hashlib.sha256((tmp_path / filename).read_bytes()).hexdigest(),
+        }
+    resources["worker_topology"] = {
+        "schema": calibration.WORKER_TOPOLOGY_SCHEMA,
+        "scope": calibration.WORKER_TOPOLOGY_SCOPE,
+        "coordinator": coordinator,
+        "routes": summaries,
+    }
+
+    def validate() -> None:
+        calibration._validate_worker_topology(
+            tmp_path,
+            resources,
+            settings,
+            supervision,
+            required_routes={"raw", "normalized_exact"},
+            require_supervisor_binding=False,
+            expected_directions={"raw": 2, "normalized_exact": 2},
+            worker_elapsed_seconds=1.0,
+        )
+
+    validate()
+    raw_route = cast(dict[str, object], sidecars["raw"]["route"])
+    exact_route = cast(dict[str, object], sidecars["normalized_exact"]["route"])
+    for key, fields in (
+        ("tasks", ("started_seconds", "finished_seconds")),
+        ("children", ("first_task_started_seconds", "last_task_finished_seconds")),
+    ):
+        raw_rows = cast(list[dict[str, object]], raw_route[key])
+        exact_rows = cast(list[dict[str, object]], exact_route[key])
+        for raw_row, exact_row in zip(raw_rows, exact_rows, strict=True):
+            for field in fields:
+                raw_row[field], exact_row[field] = exact_row[field], raw_row[field]
+    for name in ("raw", "normalized_exact"):
+        filename = f"{name.replace('_', '-')}-worker-topology.json"
+        _write_json(tmp_path / filename, sidecars[name])
+        cast(dict[str, object], summaries[name])["record_sha256"] = hashlib.sha256(
+            (tmp_path / filename).read_bytes()
+        ).hexdigest()
+
+    with pytest.raises(calibration.CalibrationError, match="raw tasks finish after"):
+        validate()
+
+
+@pytest.mark.parametrize("mutation", ["single", "combined"])
+def test_terminal_document_refuses_worker_phase_durations_beyond_elapsed(
+    tmp_path: Path,
+    mutation: str,
+) -> None:
+    document = _terminal_candidate_summary(tmp_path)
+    document.update(
+        status="complete", disposition="calibration-passed", phase="complete", error=None
+    )
+    supervision = cast(dict[str, object], document["supervision"])
+    supervision.update(
+        status="observed-exit",
+        worker_exit_status=0,
+        process_group_reaped=True,
+        coordinator_pid=101,
+        coordinator_process_group_id=101,
+    )
+    cast(dict[str, object], document["resources"])["rss"] = {
+        "sample_count": 2,
+        "positive_sample_count": 2,
+    }
+    clocks = cast(dict[str, object], document["clocks"])
+    calibration.validate_document(document)
+    if mutation == "single":
+        clocks["raw_seconds"] = 100.0
+    else:
+        clocks["worker_elapsed_seconds"] = 0.1
+        for phase in (
+            "preflight_seconds",
+            "raw_seconds",
+            "normalization_publication_seconds",
+            "exact_seconds",
+            "interval_seconds",
+            "dilation_seconds",
+            "full_readback_seconds",
+        ):
+            clocks[phase] = 0.02
+    with pytest.raises(calibration.CalibrationError, match="phase durations"):
+        calibration.validate_document(document)
+
+
+def test_producer_phase_rounding_tolerance_has_a_small_boundary() -> None:
+    clocks: dict[str, object] = dict.fromkeys(calibration.WORKER_DISJOINT_PHASES, 0.01)
+    clocks["worker_elapsed_seconds"] = 0.07 - 5e-10
+    calibration._validate_worker_phase_durations(clocks)
+    clocks["worker_elapsed_seconds"] = 0.07 - 5e-7
+    with pytest.raises(calibration.CalibrationError, match="phase durations"):
+        calibration._validate_worker_phase_durations(clocks)
+
+
 @pytest.mark.parametrize(
     "mutation",
     [
@@ -1324,14 +1469,18 @@ def test_parent_readback_that_finishes_after_deadline_revokes_admission(
     assert "parent final readback" in receipt["error"]
 
 
-@pytest.mark.parametrize("late_at", ["success", "validation", "serialization", "publication"])
-def test_terminal_admission_deadline_and_success_publication(
+@pytest.mark.parametrize(
+    "late_at", ["success", "phase-overflow", "validation", "serialization", "publication"]
+)
+def test_terminal_admission_outcomes(
     tmp_path: Path,
     late_at: str,
 ) -> None:
     output = tmp_path / f"late-{late_at}"
     output.mkdir()
     document = _terminal_candidate_summary(output)
+    if late_at == "phase-overflow":
+        cast(dict[str, object], document["clocks"])["raw_seconds"] = 100.0
     calibration.write_result(output, document)
     now = [0.0]
 
@@ -1413,6 +1562,12 @@ def test_terminal_admission_deadline_and_success_publication(
         assert receipt["status"] == "complete"
         assert receipt["disposition"] == "calibration-passed"
         assert receipt["phase"] == "complete"
+    elif late_at == "phase-overflow":
+        assert status == 2
+        assert receipt["status"] == "invalid"
+        assert receipt["disposition"] == "calibration-refused"
+        assert receipt["phase"] == "metrics-refused"
+        assert "phase durations" in cast(str, receipt["error"])
     else:
         assert status == 1
         assert receipt["status"] == "partial"

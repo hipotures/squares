@@ -114,6 +114,18 @@ _CLOCK_METRICS = (
     "supervisor_cleanup_seconds",
     "external_lifetime_seconds",
 )
+_WORKER_DISJOINT_PHASES = (
+    "preflight_seconds",
+    "raw_seconds",
+    "normalization_publication_seconds",
+    "exact_seconds",
+    "interval_seconds",
+    "dilation_seconds",
+    "full_readback_seconds",
+)
+# Account for floating-point subtraction and serialization of the phase observations.
+_PHASE_ROUNDING_REL_TOL = 1e-9
+_PHASE_ROUNDING_ABS_TOL = 1e-9
 _CPU_METRICS = (
     "coordinator_process_seconds",
     "reaped_direct_children_user_seconds",
@@ -191,6 +203,21 @@ def _finite_nonnegative(value: object, label: str) -> float:
     ):
         raise ProfileCoordinatorError(f"{label} is not a finite nonnegative number")
     return float(value)
+
+
+def _validate_worker_phase_durations(clocks: dict[str, object]) -> None:
+    total = math.fsum(
+        _finite_nonnegative(clocks.get(name), f"clock {name}")
+        for name in _WORKER_DISJOINT_PHASES
+    )
+    elapsed = _finite_nonnegative(clocks.get("worker_elapsed_seconds"), "worker elapsed")
+    if total > elapsed and not math.isclose(
+        total,
+        elapsed,
+        rel_tol=_PHASE_ROUNDING_REL_TOL,
+        abs_tol=_PHASE_ROUNDING_ABS_TOL,
+    ):
+        raise ProfileCoordinatorError("worker phase durations exceed worker elapsed")
 
 
 def _dict(value: object, label: str) -> dict[str, object]:
@@ -610,6 +637,7 @@ def _reconstruct_worker_topology(
         raise ProfileCoordinatorError("worker topology route summary set changed")
 
     digests: dict[str, str] = {}
+    route_tasks: dict[str, list[dict[str, object]]] = {}
     for route, phase, filename, directions_expected in (
         ("raw", "raw-sweep", "raw-worker-topology.json", len(spec.raw)),
         (
@@ -657,6 +685,18 @@ def _reconstruct_worker_topology(
                 f"{route} worker topology summary does not reconstruct"
             )
         digests[f"{route.replace('_', '-')}-worker-topology"] = digest
+        route_tasks[route] = cast(
+            list[dict[str, object]], _dict(sidecar["route"], f"{route} topology route")["tasks"]
+        )
+    raw_tasks = route_tasks["raw"]
+    exact_tasks = route_tasks["normalized_exact"]
+    if (
+        raw_tasks
+        and exact_tasks
+        and max(cast(float, task["finished_seconds"]) for task in raw_tasks)
+        > min(cast(float, task["started_seconds"]) for task in exact_tasks)
+    ):
+        raise ProfileCoordinatorError("raw tasks finish after normalized exact tasks start")
     return digests
 
 
@@ -760,6 +800,7 @@ def _validate_inventory_receipt(
     clocks = _dict(receipt.get("clocks"), "receipt clocks")
     for name in _CLOCK_METRICS:
         _finite_nonnegative(clocks.get(name), f"clock {name}")
+    _validate_worker_phase_durations(clocks)
     if (
         cast(float, clocks["worker_elapsed_seconds"]) >= calibration
         or cast(float, clocks["external_lifetime_seconds"])
@@ -865,9 +906,19 @@ def inventory_profile(
         path = output_dir / relative
         if path.is_symlink() or not path.is_file():
             raise ProfileCoordinatorError(f"{relative} is not a real file")
-        if relative != "result.json":
+        if relative == "result.json":
+            artifacts.append(
+                {
+                    "role": role,
+                    "path": relative,
+                    "count": 1,
+                    "bytes": len(receipt_bytes),
+                    "sha256": _sha256(receipt_bytes),
+                }
+            )
+        else:
             _strict_json(path, relative)
-        artifacts.append(_artifact_row(role, relative, (path,)))
+            artifacts.append(_artifact_row(role, relative, (path,)))
 
     by_role = {cast(str, row["role"]): row for row in artifacts}
     normalized = _dict(receipt.get("normalized"), "normalized receipt")
