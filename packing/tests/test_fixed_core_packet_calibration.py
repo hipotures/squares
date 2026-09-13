@@ -32,6 +32,7 @@ from devtools.dilation_corollary import (
 from devtools.fixed_core_packet import (
     PacketError,
     RawMinimum,
+    WorkerTaskObservation,
     _direction_digest,
     _reconstruct_dilation_directions,
     _reconstruct_raw_directions,
@@ -96,7 +97,11 @@ def _seed(output: Path, *, invocation_started: float | None = None) -> dict[str,
     return document
 
 
-def _terminal_candidate_summary() -> dict[str, object]:
+def _terminal_candidate_summary(
+    output: Path | None = None,
+    *,
+    coordinator_pid: int = 101,
+) -> dict[str, object]:
     document = calibration.initial_document(
         REVISION,
         workers=1,
@@ -195,6 +200,24 @@ def _terminal_candidate_summary() -> dict[str, object]:
     for key in cast(dict[str, object], document["clocks"]):
         if key != "phase_duration_scope":
             cast(dict[str, object], document["clocks"])[key] = 0.1
+    if output is not None:
+        with (
+            patch.object(calibration.os, "getpid", return_value=coordinator_pid),
+            patch.object(calibration.os, "getppid", return_value=max(1, coordinator_pid - 1)),
+            patch.object(calibration.os, "getpgid", return_value=coordinator_pid),
+        ):
+            cast(dict[str, object], document["resources"])["worker_topology"] = (
+                calibration._write_worker_topology(
+                    output,
+                    invocation_started=0.0,
+                    configured_workers=cast(
+                        dict[str, int],
+                        cast(dict[str, object], document["settings"])["effective_workers"],
+                    ),
+                    raw_observations=[],
+                    exact_observations=[],
+                )
+            )
     return document
 
 
@@ -280,6 +303,36 @@ def test_real_generic_raw_exact_and_reflected_interval_kernels_run_on_reduced_ne
         "1.json",
         "1'.json",
     }
+
+
+def test_parallel_raw_and_exact_kernels_report_route_task_identity(tmp_path: Path) -> None:
+    certificate, _source = _fixture()
+    raw_observations: list[WorkerTaskObservation] = []
+    exact_observations: list[WorkerTaskObservation] = []
+    run_raw_sweep(
+        _small(certificate),
+        workers=2,
+        deadline=time.perf_counter() + 10.0,
+        clock=time.perf_counter,
+        progress=lambda *_args: None,
+        log=tmp_path / "observed-raw",
+        task_observer=raw_observations.append,
+    )
+    run_exact_route(
+        _small(certificate, normalized=True),
+        workers=2,
+        deadline=time.perf_counter() + 10.0,
+        clock=time.perf_counter,
+        progress=lambda *_args: None,
+        log=tmp_path / "observed-exact",
+        task_observer=exact_observations.append,
+    )
+
+    for observations in (raw_observations, exact_observations):
+        assert sorted(row.direction for row in observations) == [0, 1]
+        assert all(row.ppid == os.getpid() for row in observations)
+        assert all(row.pgid == os.getpgid(0) for row in observations)
+        assert all(row.started < row.finished for row in observations)
 
 
 def test_strict_raw_comparison_refuses_the_n1_equality_control() -> None:
@@ -803,6 +856,148 @@ def test_rss_summary_is_byte_bound_but_not_a_semantic_answer(tmp_path: Path) -> 
         calibration._validate_rss_observations(tmp_path, resources, required=True)
 
 
+def test_parallel_worker_topology_distinguishes_configuration_from_execution() -> None:
+    observations = (
+        WorkerTaskObservation(0, 201, 100, 100, 1.0, 3.0),
+        WorkerTaskObservation(1, 202, 100, 100, 1.5, 2.5),
+        WorkerTaskObservation(2, 201, 100, 100, 3.0, 4.0),
+        WorkerTaskObservation(3, 202, 100, 100, 4.0, 5.0),
+    )
+    route = calibration._build_route_worker_topology(
+        "raw-sweep",
+        configured_workers=4,
+        directions_expected=4,
+        coordinator_pid=100,
+        coordinator_group=100,
+        invocation_started=0.0,
+        observations=observations,
+    )
+
+    summary = calibration._validate_worker_topology_route(
+        "raw",
+        route,
+        phase="raw-sweep",
+        configured_workers=4,
+        directions_expected=4,
+        coordinator_pid=100,
+        coordinator_group=100,
+        required=True,
+    )
+
+    assert summary == {
+        "configured_workers": 4,
+        "execution_model": "process-pool",
+        "observed_child_count": 2,
+        "maximum_simultaneous_children": 2,
+    }
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        lambda route: cast(list[object], route["tasks"]).pop(),
+        lambda route: route.update(observed_child_count=1),
+        lambda route: route.update(maximum_simultaneous_children=1),
+        lambda route: cast(list[dict[str, object]], route["children"])[0].update(ppid=99),
+    ],
+)
+def test_worker_topology_refuses_incomplete_or_coherently_false_execution(
+    mutation: Callable[[dict[str, object]], object],
+) -> None:
+    route = calibration._build_route_worker_topology(
+        "raw-sweep",
+        configured_workers=2,
+        directions_expected=2,
+        coordinator_pid=100,
+        coordinator_group=100,
+        invocation_started=0.0,
+        observations=(
+            WorkerTaskObservation(0, 201, 100, 100, 1.0, 3.0),
+            WorkerTaskObservation(1, 202, 100, 100, 1.5, 2.5),
+        ),
+    )
+    mutation(route)
+
+    with pytest.raises(calibration.CalibrationError):
+        calibration._validate_worker_topology_route(
+            "raw",
+            route,
+            phase="raw-sweep",
+            configured_workers=2,
+            directions_expected=2,
+            coordinator_pid=100,
+            coordinator_group=100,
+            required=True,
+        )
+
+
+def test_unpublished_topology_tail_is_validated_without_entering_inventory(
+    tmp_path: Path,
+) -> None:
+    output = tmp_path / "topology-tail"
+    output.mkdir()
+    document = _seed(output, invocation_started=0.0)
+    settings = cast(dict[str, object], document["settings"])
+    with (
+        patch.object(calibration.os, "getpid", return_value=101),
+        patch.object(calibration.os, "getppid", return_value=100),
+        patch.object(calibration.os, "getpgid", return_value=101),
+    ):
+        calibration._write_worker_topology(
+            output,
+            invocation_started=0.0,
+            configured_workers=cast(dict[str, int], settings["effective_workers"]),
+            raw_observations=[],
+            exact_observations=None,
+        )
+
+    calibration._validate_worker_topology(
+        output,
+        cast(dict[str, object], document["resources"]),
+        settings,
+        cast(dict[str, object], document["supervision"]),
+        required_routes=set(),
+        require_supervisor_binding=False,
+    )
+    roles = {
+        cast(str, row["role"])
+        for row in calibration._artifact_inventory(
+            output,
+            (output / "result.json").stat().st_size,
+            None,
+        )
+    }
+    assert "raw-worker-topology" not in roles
+
+    (output / "raw-worker-topology.json").write_text("{}\n", encoding="utf-8")
+    with pytest.raises(calibration.CalibrationError, match="unknown schema or scope"):
+        calibration._validate_worker_topology(
+            output,
+            cast(dict[str, object], document["resources"]),
+            settings,
+            cast(dict[str, object], document["supervision"]),
+            required_routes=set(),
+            require_supervisor_binding=False,
+        )
+
+
+def test_worker_topology_refuses_a_missing_receipt_bound_sidecar(tmp_path: Path) -> None:
+    output = tmp_path / "missing-topology-sidecar"
+    output.mkdir()
+    document = _terminal_candidate_summary(output)
+    (output / "raw-worker-topology.json").unlink()
+
+    with pytest.raises(calibration.CalibrationError, match="lacks retained raw"):
+        calibration._validate_worker_topology(
+            output,
+            cast(dict[str, object], document["resources"]),
+            cast(dict[str, object], document["settings"]),
+            cast(dict[str, object], document["supervision"]),
+            required_routes={"raw", "normalized_exact"},
+            require_supervisor_binding=False,
+        )
+
+
 def test_launch_oserror_is_an_operational_unresolved_receipt(
     tmp_path: Path,
 ) -> None:
@@ -955,7 +1150,13 @@ def test_timeout_kills_and_reaps_a_termination_resistant_process_group(
     assert status == 1
     assert receipt["status"] == "partial"
     assert receipt["phase"] == "timeout"
-    assert receipt["supervision"] == {
+    supervision = cast(dict[str, object], receipt["supervision"])
+    coordinator_pid = supervision.pop("coordinator_pid")
+    coordinator_group = supervision.pop("coordinator_process_group_id")
+    assert type(coordinator_pid) is int
+    assert coordinator_pid > 0
+    assert coordinator_group == coordinator_pid
+    assert supervision == {
         "status": "deadline-terminated",
         "worker_exit_status": -9,
         "process_group_reaped": True,
@@ -1080,7 +1281,7 @@ def test_terminal_admission_deadline_and_success_publication(
 ) -> None:
     output = tmp_path / f"late-{late_at}"
     output.mkdir()
-    document = _terminal_candidate_summary()
+    document = _terminal_candidate_summary(output)
     calibration.write_result(output, document)
     now = [0.0]
 
@@ -1170,12 +1371,73 @@ def test_terminal_admission_deadline_and_success_publication(
     assert not any(path.name.startswith(".result-admission-") for path in output.iterdir())
 
 
+def test_metrics_admission_refuses_absent_worker_topology(tmp_path: Path) -> None:
+    output = tmp_path / "missing-worker-topology"
+    output.mkdir()
+    document = _terminal_candidate_summary()
+    calibration.write_result(output, document)
+
+    class Worker:
+        pid = 101
+        states = iter((None, None, 0))
+
+        def poll(self) -> int | None:
+            return next(self.states)
+
+    class Readback:
+        pid = 102
+
+        @staticmethod
+        def wait(*, timeout: float) -> int:
+            del timeout
+            return 0
+
+    with (
+        patch.object(calibration.subprocess, "Popen", side_effect=[Worker(), Readback()]),
+        patch.object(calibration, "_reap_process_group", return_value=(0, 0.0)),
+        patch.object(calibration.time, "perf_counter", return_value=0.2),
+        patch.object(calibration.time, "sleep", return_value=None),
+        patch.object(
+            calibration,
+            "_sample_process_group",
+            side_effect=lambda process_group, **kwargs: {
+                "elapsed_seconds": kwargs["elapsed"],
+                "phase": kwargs["phase"],
+                "pids": [process_group],
+                "rss_bytes": 4_096,
+                "error": None,
+            },
+        ),
+    ):
+        status = calibration.supervise_worker(
+            ("control", "--worker"),
+            output,
+            repository=REPOSITORY,
+            expected_revision=REVISION,
+            external_seconds=5.0,
+            grace_seconds=0.05,
+            invocation_started=0.0,
+            external_deadline=5.0,
+            expected_invocation=cast(
+                dict[str, object],
+                cast(dict[str, object], document["invocation"])["identity"],
+            ),
+        )
+
+    receipt = cast(dict[str, object], json.loads((output / "result.json").read_bytes()))
+    assert status == 2
+    assert receipt["status"] == "invalid"
+    assert receipt["disposition"] == "calibration-refused"
+    assert receipt["phase"] == "metrics-refused"
+    assert "worker topology" in cast(str, receipt["error"])
+
+
 def test_interrupt_during_terminal_serialization_preserves_partial_receipt(
     tmp_path: Path,
 ) -> None:
     output = tmp_path / "interrupt-terminal-serialization"
     output.mkdir()
-    document = _terminal_candidate_summary()
+    document = _terminal_candidate_summary(output)
     calibration.write_result(output, document)
     now = [0.0]
 
@@ -1254,7 +1516,7 @@ def test_real_sigint_during_staging_acquisition_closes_and_removes_resource(
 ) -> None:
     output = tmp_path / f"sigint-stage-{stage_number}"
     output.mkdir()
-    calibration.write_result(output, _terminal_candidate_summary())
+    calibration.write_result(output, _terminal_candidate_summary(output))
     observation_path = tmp_path / f"sigint-stage-{stage_number}.json"
     supervisor_program = f"""
 import json
