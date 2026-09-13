@@ -150,3 +150,16 @@ test("bad counts, step budgets and nonfinite inputs are rejected", () => {
     /omega/,
   );
 });
+
+test("annealing level zero is an unforced run, not an invalid request", () => {
+  const unforced = buildTrajectory(
+    request({ mode: "free", anneal: { level: 0, amplitude: 0, decayPower: 1.5, span: 1 } }),
+  );
+  assert.equal(unforced.receipt.forcing.active, false);
+  assert.equal(unforced.receipt.work.steps, 24);
+  assert.throws(
+    () =>
+      buildTrajectory(request({ anneal: { level: 0, amplitude: -0.1, decayPower: 1.5, span: 1 } })),
+    /annealAmplitude/,
+  );
+});

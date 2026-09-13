@@ -136,6 +136,13 @@ function positive(value: number, label: string): void {
   }
 }
 
+function nonNegative(value: number, label: string): void {
+  finite(value, label);
+  if (value < 0) {
+    throw new RangeError(`${label} must not be negative`);
+  }
+}
+
 function fraction(value: number, label: string): void {
   finite(value, label);
   if (value < 0 || value > 1) {
@@ -246,12 +253,13 @@ function validateConfiguration(request: TrajectoryRequest): void {
     blindInflate: blind.inflate,
     blindTolerance: blind.overlapTolerance,
     blindGridStep: blind.gridStep,
-    annealAmplitude: anneal.amplitude,
     annealDecayPower: anneal.decayPower,
     annealSpan: anneal.span,
   })) {
     positive(value, label);
   }
+  // Level zero on the annealing dial is amplitude zero: an unforced run, reported as such.
+  nonNegative(anneal.amplitude, "annealAmplitude");
   for (const [label, value] of Object.entries({
     lockIn: physics.lockIn,
     openBy: physics.openBy,

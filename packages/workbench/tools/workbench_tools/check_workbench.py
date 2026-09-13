@@ -297,11 +297,24 @@ def main() -> int:  # noqa: C901, PLR0911 -- a flat list of page invariants
         # `desat-floor` joins them: the owner asked for the degree of desaturation to be
         # settable, so how much chroma a moving square keeps
         # is a dial like the rest rather than a constant.
+        # `animation-time` is the animation studio's position within an imported trace. The
+        # studio is its own panel with its own playback, so this is not the step timeline's
+        # scrubber returning; `check_animation_editor` owns its behavior.
         check(
             sorted(sliders)
-            == sorted([*derived, "anneal", "desat-floor", "grow-rate", "grow-size", "speed"]),
-            f"the controls carry a slider that is none of the speed, drain, annealing and law "
-            f"dials: {sliders}",
+            == sorted(
+                [
+                    *derived,
+                    "anneal",
+                    "animation-time",
+                    "desat-floor",
+                    "grow-rate",
+                    "grow-size",
+                    "speed",
+                ]
+            ),
+            f"the controls carry a slider that is none of the speed, drain, annealing, law "
+            f"and animation-studio dials: {sliders}",
         )
         check("seek" in api, "the API lost seek when the scrubber went")
         # The controls may not push the stage off the window.
