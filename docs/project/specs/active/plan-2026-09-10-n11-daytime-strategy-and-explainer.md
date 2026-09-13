@@ -48,6 +48,11 @@ contains the later analytical mechanism synthesis.
 The draft
 [X-028 portfolio](../../../../packing/campaign/explorations/X-028-n11-strategy-portfolio-draft.md)
 preserves the broader six-route option map and reconciles it with T-026 and exp-156. The
+[post-T1 draft exploration](../../../../packing/campaign/explorations/X-030-n11-post-t1-proof-obligations-draft.md)
+states the exact parent-union lemma and separates literal-parent tests from the still
+necessary continuous-domain selection proof.
+Its source cutoff precedes the proposed parent-mass and T2 charge targets.
+The
 [source-distinct closeout audit](../../reviews/review-2026-09-12-n11-post-bc329-strategy-audit.md)
 records the exact T-025/T-026/BC329 fact ladder, the terminal meaning of each possible
 BC329 outcome, and the remaining conditional-selection obligations.

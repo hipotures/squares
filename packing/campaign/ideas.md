@@ -540,6 +540,16 @@ X-027. It adds no hypothesis or scientific claim.
 Its order is a readiness judgment, with a separate discriminator and stopping condition
 for each route; the active agenda still owns execution.
 
+## Post-T1 Proof Obligations — X-030
+
+[X-030](explorations/X-030-n11-post-t1-proof-obligations-draft.md) records the
+independently reviewed parent-union inequality, its one-parent and four-parent integer
+thresholds, and the remaining steps from a local exclusion to a complete selection
+argument. It also places the BC329 packet, T2 charge decision, weighted trace test, and
+other options against their separate acceptance conditions.
+The parent mass and T2 target charges were unmeasured at this source cutoff; the
+exploration registers no new bound or experiment.
+
 ## Dead ends
 
 Killed without spending a round, with the reason.
