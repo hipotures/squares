@@ -1,0 +1,917 @@
+"""Focused source-distinct controls for one retained n=2 calibration profile."""
+
+# The tests deliberately exercise the reader's independent private reconstruction seams.
+# ruff: noqa: SLF001
+# pyright: reportPrivateUsage=false
+
+from __future__ import annotations
+
+import ast
+import hashlib
+import json
+import os
+import subprocess
+from copy import deepcopy
+from fractions import Fraction
+from pathlib import Path
+from typing import cast
+
+import pytest
+
+from devtools import read_fixed_core_calibration_profile as reader
+
+REPOSITORY = Path(__file__).resolve().parents[2]
+EXECUTION_REVISION = "faa4085db8fb4cf42154afec0022a0585f59196d"
+READER_REVISION = "b" * 40
+CONDITION_NAMES = [
+    "Condition 1 atoms carry the declared symmetry",
+    "Condition 1' threshold atoms carry the declared symmetry",
+    "Condition 2' total budget below n",
+    "Condition 3 net reaches pi/4",
+    "Condition 4 containment B(1 + D) < 1",
+]
+
+
+def _write(path: Path, value: object, *, indent: int | None = None) -> bytes:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    data = (json.dumps(value, indent=indent, allow_nan=False) + "\n").encode()
+    path.write_bytes(data)
+    return data
+
+
+def _candidate() -> dict[str, object]:
+    return {
+        "id": reader.NORMALIZED_ID,
+        "variant": "threshold",
+        "n": 2,
+        "claim": "s(2) >= 3/4",
+        "outer_side": "3/4",
+        "square_side": "1/2",
+        "angle_limit": "1/2",
+        "direction_steps": reader.STEPS,
+        "symmetry": "D4",
+        "point_mass": "1/4",
+        "threshold_budget": "3/4",
+        "total_budget": "1",
+        "atoms": [["3/8", "3/8", "1/4"]],
+        "threshold_atoms": [
+            {
+                "points": [["3/16", "3/8"], ["3/8", "3/8"], ["9/16", "3/8"]],
+                "threshold": 2,
+                "weight": "3/8",
+            },
+            {
+                "points": [["3/8", "3/16"], ["3/8", "3/8"], ["3/8", "9/16"]],
+                "threshold": 2,
+                "weight": "3/8",
+            },
+        ],
+        "provenance": {
+            "kind": "normalized synthetic fixed-core packet calibration fixture",
+            "construction": reader.FIXTURE_PROVENANCE["construction"],
+            "purpose": reader.FIXTURE_PROVENANCE["purpose"],
+            "derived_from": reader.FIXTURE_PATH,
+            "source_id": reader.FIXTURE_ID,
+            "normalization": "every weight multiplied by 1/2 after raw minimum 2",
+        },
+        "least_cell_charge": "1",
+    }
+
+
+def _dilation(candidate_sha: str) -> dict[str, object]:
+    return {
+        "schema": reader.DILATION_SCHEMA,
+        "source": {
+            "certificate": "candidate.json",
+            "sha256": candidate_sha,
+            "n": 2,
+            "outer_side": "3/4",
+            "square_side": "1/2",
+            "half_gap_tangent": "1/5760",
+            "coarse_containment": "5761/11520",
+            "total_budget": "1",
+            "minimum_cell_charge": "1",
+            "accepted_conditions": [
+                *CONDITION_NAMES,
+                "Condition 5' every reachable cell is charged at least 1",
+            ],
+            "variant": "threshold",
+            "point_atoms": 1,
+            "threshold_atoms": 2,
+        },
+        "sharpened_containment": {
+            "identity": "independently retained identity",
+            "gap_domain": "independently retained domain",
+            "monotonicity_identity": "independently retained monotonicity",
+            "strict_factor_test": "independently retained inequality",
+            "strict_factor_test_left_multiplier": "33189121/132710400",
+            "strict_factor_test_right": "33177601/33177600",
+            "source_gap_below_one": True,
+        },
+        "strict_dilation_family": {
+            "factor_supremum": "2*sqrt(33177601)/5761",
+            "factor_supremum_squared": "132710404/33189121",
+            "factor_supremum_decimal": "1.999826",
+            "factor_supremum_irrational": True,
+            "factor_supremum_defining_polynomial": "33189121*x^2 - 132710404",
+            "factor_domain": "positive strict rational subfactors",
+            "scaled_containment_test": "exact rational inequality",
+            "invariants": ["weights and membership scale together"],
+        },
+        "conclusion": {
+            "bounded_side": "3*sqrt(33177601)/11522",
+            "bounded_side_squared": "298598409/132756484",
+            "bounded_side_defining_polynomial": "132756484*x^2 - 298598409",
+            "decimal": "1.49987",
+            "relation": ">=",
+            "endpoint_certificate": False,
+        },
+        "proof": {
+            "strict_family": "strict rational family",
+            "density_step": "rational density",
+            "embedding_step": "monotone embedding",
+            "order_step": "take the supremum",
+            "requires_compactness": False,
+            "endpoint_status": "no individual endpoint certificate",
+        },
+    }
+
+
+def _centre_witness(index: int, *, reflected: bool = False) -> tuple[Fraction, Fraction]:
+    cosine, sine = reader._rotation(index, reflected=reflected)
+    x = y = Fraction(3, 8)
+    return cosine * x + sine * y, -sine * x + cosine * y
+
+
+def _topology(phase: str) -> dict[str, object]:
+    return {
+        "phase": phase,
+        "execution_model": "coordinator-serial",
+        "configured_workers": 1,
+        "directions_expected": reader.RAW_DIRECTIONS,
+        "directions_completed": reader.RAW_DIRECTIONS,
+        "child_tasks_observed": 0,
+        "observed_child_count": 0,
+        "maximum_simultaneous_children": 0,
+        "tasks": [],
+        "children": [],
+    }
+
+
+def _artifact_rows(output: Path, receipt_size: int) -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for role, relative, _count, directory in reader.ARTIFACTS:
+        path = output / relative
+        files = tuple(path.iterdir()) if directory else (path,)
+        size = (
+            receipt_size
+            if relative == "result.json"
+            else sum(item.stat().st_size for item in files)
+        )
+        rows.append({"role": role, "path": relative, "count": len(files), "bytes": size})
+    return rows
+
+
+def _publish_receipt(output: Path, receipt: dict[str, object]) -> None:
+    size = 0
+    for _attempt in range(10):
+        receipt["artifacts"] = _artifact_rows(output, size)
+        data = (json.dumps(receipt, indent=2, allow_nan=False) + "\n").encode()
+        if len(data) == size:
+            (output / "result.json").write_bytes(data)
+            return
+        size = len(data)
+    raise AssertionError("result inventory did not reach a fixed point")
+
+
+def _build_profile(output: Path) -> dict[str, object]:
+    output.mkdir()
+    candidate_data = _write(output / "candidate.json", _candidate(), indent=1)
+    candidate_sha = hashlib.sha256(candidate_data).hexdigest()
+    labels = [str(index) for index in range(reader.RAW_DIRECTIONS)]
+    interval_labels = labels + [f"{index}'" for index in range(1, reader.RAW_DIRECTIONS)]
+    raw_paths: list[Path] = []
+    exact_paths: list[Path] = []
+    interval_paths: list[Path] = []
+    dilation_paths: list[Path] = []
+    for index in range(reader.RAW_DIRECTIONS):
+        u, v = _centre_witness(index)
+        raw = output / "raw-directions" / f"{index}.json"
+        exact = output / "normalized-exact-directions" / f"{index}.json"
+        dilation = output / "dilation-directions" / f"{index}.json"
+        _write(raw, {"direction": index, "charge": "2", "witness": [str(u), str(v)]})
+        _write(
+            exact,
+            {
+                "direction": index,
+                "dense": "1",
+                "slab": "1",
+                "agree": True,
+                "witness": [str(u), str(v)],
+                "slab_witness": [str(u), str(v)],
+            },
+        )
+        _write(dilation, {"direction": index, "label": str(index), "minimum": "1"})
+        raw_paths.append(raw)
+        exact_paths.append(exact)
+        dilation_paths.append(dilation)
+    for label in interval_labels:
+        index = int(label.rstrip("'"))
+        u, v = _centre_witness(index, reflected=label.endswith("'"))
+        path = output / "normalized-interval-directions" / f"{label}.json"
+        _write(
+            path,
+            {
+                "label": label,
+                "status": "certified",
+                "lower": 8,
+                "upper": 8,
+                "witness": [float(u), float(v)],
+                "boxes": 1,
+                "stalled": 0,
+                "budget_exhausted": False,
+            },
+        )
+        interval_paths.append(path)
+    dilation_data = _write(output / "dilation.json", _dilation(candidate_sha), indent=2)
+    rss_samples = {
+        "schema": "fixed-core-packet-calibration-rss/v1",
+        "samples": [
+            {
+                "elapsed_seconds": 0.1,
+                "phase": "preflight",
+                "pids": [101],
+                "rss_bytes": 1_024,
+                "error": None,
+            },
+            {
+                "elapsed_seconds": 0.2,
+                "phase": "raw-sweep",
+                "pids": [101],
+                "rss_bytes": 2_048,
+                "error": None,
+            },
+        ],
+    }
+    rss_data = _write(output / "rss-samples.json", rss_samples)
+    coordinator = {"role": "coordinator", "pid": 101, "ppid": 100, "pgid": 101}
+    topology_summaries: dict[str, object] = {}
+    for name, phase, filename in (
+        ("raw", "raw-sweep", "raw-worker-topology.json"),
+        ("normalized_exact", "normalized-exact", "normalized-exact-worker-topology.json"),
+    ):
+        data = _write(
+            output / filename,
+            {
+                "schema": "fixed-core-packet-calibration-worker-route/v1",
+                "scope": reader.TOPOLOGY_SCOPE,
+                "coordinator": coordinator,
+                "route": _topology(phase),
+            },
+        )
+        topology_summaries[name] = {
+            "configured_workers": 1,
+            "execution_model": "coordinator-serial",
+            "observed_child_count": 0,
+            "maximum_simultaneous_children": 0,
+            "record_path": filename,
+            "record_sha256": hashlib.sha256(data).hexdigest(),
+        }
+    manifest = []
+    for relative in (
+        reader.FIXTURE_PATH,
+        "packing/devtools/calibrate_fixed_core_packet.py",
+    ):
+        frozen = subprocess.run(
+            ("git", "show", f"{EXECUTION_REVISION}:{relative}"),
+            cwd=REPOSITORY,
+            check=True,
+            capture_output=True,
+        ).stdout
+        blob = subprocess.run(
+            ("git", "rev-parse", f"{EXECUTION_REVISION}:{relative}"),
+            cwd=REPOSITORY,
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.strip()
+        manifest.append(
+            {
+                "path": relative,
+                "git_blob": blob,
+                "sha256": hashlib.sha256(frozen).hexdigest(),
+            }
+        )
+    origin = 10.0
+    settings = {
+        "requested_workers": 1,
+        "effective_workers": {
+            "raw": 1,
+            "normalized_exact": 1,
+            "reflected_interval": 1,
+            "dilation": 1,
+        },
+        "calibration_seconds": 20.0,
+        "external_seconds": 30.0,
+        "termination_grace_seconds": 2.0,
+        "rss_sample_interval_seconds": 0.1,
+        "core_side": "1/2",
+        "direction_steps": reader.STEPS,
+        "angle_limit": "1/2",
+        "half_gap_tangent": "1/5760",
+        "raw_threshold_M_over_n": "1",
+        "expected_direction_rows": reader.TOTAL_DIRECTION_ROWS,
+    }
+    identity = {
+        "implementation_revision": EXECUTION_REVISION,
+        "requested_workers": 1,
+        "calibration_seconds": 20.0,
+        "external_seconds": 30.0,
+        "termination_grace_seconds": 2.0,
+        "monotonic_origin": origin,
+        "calibration_deadline_monotonic": 30.0,
+        "external_deadline_monotonic": 40.0,
+        "run_order": 1,
+        "cache_observation": "test cache observation",
+        "background_load": "test background load",
+    }
+    cpu_observations = {
+        "coordinator_start_seconds": 1.0,
+        "coordinator_end_seconds": 1.5,
+        "direct_children_user_start_seconds": 2.0,
+        "direct_children_user_end_seconds": 2.25,
+        "direct_children_system_start_seconds": 3.0,
+        "direct_children_system_end_seconds": 3.125,
+    }
+    receipt: dict[str, object] = {
+        "schema": reader.RECEIPT_SCHEMA,
+        "status": "complete",
+        "disposition": "calibration-passed",
+        "evidence_scope": reader.CALIBRATION_SCOPE,
+        "fixture": {
+            "id": reader.FIXTURE_ID,
+            "source_path": reader.FIXTURE_PATH,
+            "source_sha256": reader.FIXTURE_SHA256,
+            "source_bytes": reader.FIXTURE_BYTES,
+            "provenance": reader.FIXTURE_PROVENANCE,
+        },
+        "sources": {
+            "implementation_revision": EXECUTION_REVISION,
+            "manifest": manifest,
+            "runtime": {
+                "python": {
+                    "implementation": "cpython",
+                    "version": "3.14.7",
+                    "abi": "cpython-314t",
+                    "gil_enabled": False,
+                    "environment": "/profile/.venv",
+                    "executable": "/profile/.venv/bin/python",
+                    "resolved_executable": "/runtime/python",
+                    "build": "test build",
+                },
+                "packages": {"numpy": "2.3.3", "strif": "3.0.0"},
+                "attestation_scope": reader.RUNTIME_SCOPE,
+            },
+        },
+        "invocation": {
+            "started_utc": "2026-09-13T00:00:00+00:00",
+            "monotonic_origin": origin,
+            "host": "test-host",
+            "platform": "test-platform",
+            "run_order": 1,
+            "cache_observation": "test cache observation",
+            "background_load": "test background load",
+            "identity": identity,
+        },
+        "settings": settings,
+        "clocks": {
+            "phase_duration_scope": reader.PHASE_DURATION_SCOPE,
+            "preflight_seconds": 0.1,
+            "launch_seconds": 0.1,
+            "source_loading_seconds": 0.1,
+            "raw_seconds": 0.1,
+            "normalization_publication_seconds": 0.1,
+            "exact_seconds": 0.1,
+            "interval_seconds": 0.1,
+            "dilation_seconds": 0.1,
+            "full_readback_seconds": 0.1,
+            "parent_final_readback_seconds": 0.1,
+            "terminal_admission_seconds": 0.1,
+            "worker_elapsed_seconds": 1.0,
+            "worker_exit_seconds": 0.1,
+            "supervisor_cleanup_seconds": 0.1,
+            "external_lifetime_seconds": 1.2,
+        },
+        "resources": {
+            "cpu_scope": reader.CPU_SCOPE,
+            "cpu_observations": cpu_observations,
+            "coordinator_process_seconds": 0.5,
+            "reaped_direct_children_user_seconds": 0.25,
+            "reaped_direct_children_system_seconds": 0.125,
+            "rss": {
+                "scope": reader.RSS_SCOPE,
+                "sample_interval_seconds": 0.1,
+                "minimum_terminal_samples": 2,
+                "sample_count": 2,
+                "positive_sample_count": 2,
+                "maximum_actual_gap_seconds": 0.2 - 0.1,
+                "observation_lifetime_seconds": 1.2,
+                "unobserved_leading_seconds": 0.1,
+                "unobserved_trailing_seconds": 1.2 - 0.2,
+                "peak_sampled_rss_bytes": 2_048,
+                "peak_sample_time_seconds": 0.2,
+                "observed_pids": [101],
+                "pids_by_phase": {"preflight": [101], "raw-sweep": [101]},
+                "observed_phases": ["preflight", "raw-sweep"],
+                "unobserved_phases": sorted(
+                    set(reader.OBSERVABLE_PHASES) - {"preflight", "raw-sweep"}
+                ),
+                "observer_errors": [],
+                "samples_path": "rss-samples.json",
+                "samples_sha256": hashlib.sha256(rss_data).hexdigest(),
+            },
+            "worker_topology": {
+                "schema": "fixed-core-packet-calibration-worker-topology/v1",
+                "scope": reader.TOPOLOGY_SCOPE,
+                "coordinator": coordinator,
+                "routes": topology_summaries,
+            },
+        },
+        "raw": {
+            "directions_expected": reader.RAW_DIRECTIONS,
+            "directions_completed": reader.RAW_DIRECTIONS,
+            "completed_directions": list(range(reader.RAW_DIRECTIONS)),
+            "observed_minimum_upper_bound": "2",
+            "observed_argmin": 0,
+            "observed_witness": json.loads(raw_paths[0].read_bytes())["witness"],
+            "raw_minimum": "2",
+            "budget": "2",
+            "threshold_M_over_n": "1",
+            "comparison": "passed",
+            "witness_replay_charge": "2",
+            "witness_admissible": True,
+            "directions_sha256": reader._direction_digest(raw_paths),
+        },
+        "normalized": {
+            "path": "candidate.json",
+            "sha256": candidate_sha,
+            "source_fixture_sha256": reader.FIXTURE_SHA256,
+            "id": reader.NORMALIZED_ID,
+            "alpha": "1/2",
+            "point_mass": "1/4",
+            "threshold_budget": "3/4",
+            "total_budget": "1",
+            "least_cell_charge": "1",
+            "integer_scale": 8,
+            "closed_form_conditions": [
+                {"name": name, "detail": "independently retained detail", "holds": True}
+                for name in CONDITION_NAMES
+            ],
+        },
+        "routes": {
+            "normalized_exact": {
+                "status": "complete",
+                "source_sha256": candidate_sha,
+                "directions_expected": reader.RAW_DIRECTIONS,
+                "directions_completed": reader.RAW_DIRECTIONS,
+                "completed_directions": list(range(reader.RAW_DIRECTIONS)),
+                "minimum": "1",
+                "argmin": 0,
+                "witness": json.loads(exact_paths[0].read_bytes())["witness"],
+                "dense_slab_disagreements": 0,
+                "directions_sha256": reader._direction_digest(exact_paths),
+            },
+            "reflected_interval": {
+                "status": "complete",
+                "source_sha256": candidate_sha,
+                "directions_expected": reader.INTERVAL_DIRECTIONS,
+                "directions_completed": reader.INTERVAL_DIRECTIONS,
+                "completed_directions": interval_labels,
+                "integer_scale": 8,
+                "integer_enclosure": [8, 8],
+                "enclosure": ["1", "1"],
+                "stalled": 0,
+                "budget_exhausted": 0,
+                "accepted": True,
+                "boxes_observed": reader.INTERVAL_DIRECTIONS,
+                "directions_sha256": reader._direction_digest(interval_paths),
+            },
+            "dilation": {
+                "status": "complete",
+                "source_sha256": candidate_sha,
+                "directions_expected": reader.RAW_DIRECTIONS,
+                "directions_completed": reader.RAW_DIRECTIONS,
+                "completed_directions": labels,
+                "directions_sha256": reader._direction_digest(dilation_paths),
+                "record_sha256": hashlib.sha256(dilation_data).hexdigest(),
+                "generic_record_schema": reader.DILATION_SCHEMA,
+                "generic_record_scope": (
+                    "valid normalized n=2 calibration fixture; no campaign or "
+                    "fixed-packet evidence"
+                ),
+                "factor_supremum": "2*sqrt(33177601)/5761",
+                "factor_supremum_squared": "132710404/33189121",
+                "bounded_side": "3*sqrt(33177601)/11522",
+                "bounded_side_squared": "298598409/132756484",
+                "relation": ">=",
+                "endpoint_certificate": False,
+                "requires_compactness": False,
+            },
+        },
+        "artifacts": [],
+        "supervision": {
+            "status": "observed-exit",
+            "worker_exit_status": 0,
+            "process_group_reaped": True,
+            "supervisor_signal": None,
+            "coordinator_pid": 101,
+            "coordinator_process_group_id": 101,
+        },
+        "phase": "complete",
+        "error": None,
+    }
+    (output / "result.json").touch()
+    _publish_receipt(output, receipt)
+    return receipt
+
+
+@pytest.fixture(scope="module")
+def profile(tmp_path_factory: pytest.TempPathFactory) -> tuple[Path, dict[str, object]]:
+    output = tmp_path_factory.mktemp("source-distinct-profile") / "profile-1"
+    return output, _build_profile(output)
+
+
+def _read(
+    monkeypatch: pytest.MonkeyPatch,
+    output: Path,
+    *,
+    execution_revision: str = EXECUTION_REVISION,
+    reader_revision: str = READER_REVISION,
+) -> dict[str, object]:
+    monkeypatch.setattr(reader, "_bind_revisions", lambda *_args: None)
+    return reader.read_profile(
+        repository=REPOSITORY,
+        execution_revision=execution_revision,
+        reader_revision=reader_revision,
+        output_dir=output,
+        run_order=1,
+    )
+
+
+def test_full_profile_reconstructs_every_row_digest_resource_and_sidecar(
+    monkeypatch: pytest.MonkeyPatch, profile: tuple[Path, dict[str, object]]
+) -> None:
+    output, _receipt = profile
+    proof = _read(monkeypatch, output)
+
+    assert proof["status"] == "accepted"
+    assert proof["execution_revision"] == EXECUTION_REVISION
+    assert proof["reader_revision"] == READER_REVISION
+    assert proof["interval_boxes_observed"] == reader.INTERVAL_DIRECTIONS
+    assert len(cast(list[object], proof["artifacts"])) == 10
+    assert cast(dict[str, object], proof["worker_topology"])["raw"] == {
+        "configured_workers": 1,
+        "execution_model": "coordinator-serial",
+        "observed_child_count": 0,
+        "maximum_simultaneous_children": 0,
+    }
+
+
+def test_reader_import_closure_is_source_distinct() -> None:
+    path = REPOSITORY / "packing/devtools/read_fixed_core_calibration_profile.py"
+    tree = ast.parse(path.read_text(encoding="utf-8"))
+    local_imports = {
+        node.module
+        for node in ast.walk(tree)
+        if isinstance(node, ast.ImportFrom) and node.module is not None
+    } | {
+        alias.name
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Import)
+        for alias in node.names
+    }
+    assert not any(name.startswith(("devtools", "sqpack", "cases")) for name in local_imports)
+
+
+def test_strict_json_duplicate_and_scientific_schema_controls(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    profile: tuple[Path, dict[str, object]],
+) -> None:
+    with pytest.raises(reader.ReadbackRefusalError, match="duplicate JSON"):
+        reader._json_bytes(b'{"schema": 1, "schema": 2}', "control")
+
+    output, receipt = profile
+    mutated = deepcopy(receipt)
+    mutated["scientific_decision"] = "accepted"
+    path = tmp_path / "result.json"
+    _write(path, mutated)
+    with pytest.raises(reader.ReadbackRefusalError, match="fields or schema"):
+        reader._validate_receipt_schema(mutated, 1)
+    mutated.pop("scientific_decision")
+    cast(dict[str, object], mutated["fixture"])["id"] = "BC329"
+    with pytest.raises(reader.ReadbackRefusalError, match="scientific-target vocabulary"):
+        reader._validate_receipt_schema(mutated, 1)
+    malformed_sources = deepcopy(receipt)
+    malformed_sources["sources"] = []
+    with pytest.raises(reader.ReadbackRefusalError, match="sources fields"):
+        reader._validate_receipt_schema(malformed_sources, 1)
+    monkeypatch.setattr(reader, "_bind_revisions", lambda *_args: None)
+    _publish_receipt(output, malformed_sources)
+    try:
+        with pytest.raises(reader.ReadbackRefusalError, match="sources fields"):
+            _read(monkeypatch, output)
+    finally:
+        _publish_receipt(output, deepcopy(receipt))
+
+
+def test_deadline_and_rss_lifetime_relations_are_independently_bound(
+    profile: tuple[Path, dict[str, object]],
+) -> None:
+    output, baseline = profile
+
+    worker_deadline = deepcopy(baseline)
+    cast(dict[str, object], worker_deadline["clocks"])["worker_elapsed_seconds"] = 20.0
+    with pytest.raises(reader.ReadbackRefusalError, match="declared deadline"):
+        reader._validate_receipt_schema(worker_deadline, 1)
+
+    external_deadline = deepcopy(baseline)
+    clocks = cast(dict[str, object], external_deadline["clocks"])
+    clocks["external_lifetime_seconds"] = 29.9
+    clocks["terminal_admission_seconds"] = 0.1
+    rss = cast(
+        dict[str, object], cast(dict[str, object], external_deadline["resources"])["rss"]
+    )
+    rss["observation_lifetime_seconds"] = 29.9
+    rss["unobserved_trailing_seconds"] = 29.7
+    with pytest.raises(reader.ReadbackRefusalError, match="declared deadline"):
+        reader._validate_receipt_schema(external_deadline, 1)
+
+    lifetime_split = deepcopy(baseline)
+    rss = cast(dict[str, object], cast(dict[str, object], lifetime_split["resources"])["rss"])
+    rss["observation_lifetime_seconds"] = 1.3
+    rss["unobserved_trailing_seconds"] = 1.1
+    with pytest.raises(reader.ReadbackRefusalError, match="RSS observation lifetime"):
+        reader._validate_receipt_schema(lifetime_split, 1)
+
+    malformed_coordinator = deepcopy(baseline)
+    topology = cast(
+        dict[str, object],
+        cast(dict[str, object], malformed_coordinator["resources"])["worker_topology"],
+    )
+    cast(dict[str, object], topology["coordinator"])["ppid"] = 0
+    with pytest.raises(reader.ReadbackRefusalError, match="topology coordinator"):
+        reader._validate_topology(output, malformed_coordinator)
+
+
+def test_filesystem_preflight_refuses_links_and_special_files(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    profile: tuple[Path, dict[str, object]],
+) -> None:
+    output, _receipt = profile
+
+    output_link = tmp_path / "profile-link"
+    output_link.symlink_to(output, target_is_directory=True)
+    with pytest.raises(reader.ReadbackRefusalError, match="must not be a symlink"):
+        _read(monkeypatch, output_link)
+
+    candidate = output / "candidate.json"
+    candidate_bytes = candidate.read_bytes()
+    linked_bytes = tmp_path / "linked-candidate.json"
+    linked_bytes.write_bytes(candidate_bytes)
+    candidate.unlink()
+    candidate.symlink_to(linked_bytes)
+    try:
+        with pytest.raises(reader.ReadbackRefusalError, match=r"wrong type: candidate\.json"):
+            _read(monkeypatch, output)
+    finally:
+        candidate.unlink()
+        candidate.write_bytes(candidate_bytes)
+
+    candidate.unlink()
+    os.mkfifo(candidate)
+    try:
+        with pytest.raises(reader.ReadbackRefusalError, match=r"wrong type: candidate\.json"):
+            _read(monkeypatch, output)
+    finally:
+        candidate.unlink()
+        candidate.write_bytes(candidate_bytes)
+
+
+def test_coherent_mathematical_and_operational_mutations_are_refused(
+    monkeypatch: pytest.MonkeyPatch, profile: tuple[Path, dict[str, object]]
+) -> None:
+    output, baseline = profile
+    result_path = output / "result.json"
+
+    def restore_receipt() -> dict[str, object]:
+        receipt = deepcopy(baseline)
+        _publish_receipt(output, receipt)
+        return receipt
+
+    # A retained witness and its digest are changed together; membership still catches it.
+    receipt = restore_receipt()
+    raw_path = output / "raw-directions/1.json"
+    original_raw = raw_path.read_bytes()
+    _write(raw_path, {"direction": 1, "charge": "2", "witness": ["0", "0"]})
+    raw_paths = [
+        output / "raw-directions" / f"{index}.json" for index in range(reader.RAW_DIRECTIONS)
+    ]
+    cast(dict[str, object], receipt["raw"])["directions_sha256"] = reader._direction_digest(
+        raw_paths
+    )
+    _publish_receipt(output, receipt)
+    with pytest.raises(reader.ReadbackRefusalError, match=r"raw row|raw witness"):
+        _read(monkeypatch, output)
+    raw_path.write_bytes(original_raw)
+
+    # The exact route's two methods and its digest agree on a forged witness.
+    receipt = restore_receipt()
+    exact_path = output / "normalized-exact-directions/1.json"
+    original_exact = exact_path.read_bytes()
+    _write(
+        exact_path,
+        {
+            "direction": 1,
+            "dense": "1",
+            "slab": "1",
+            "agree": True,
+            "witness": ["0", "0"],
+            "slab_witness": ["0", "0"],
+        },
+    )
+    exact_paths = [
+        output / "normalized-exact-directions" / f"{index}.json"
+        for index in range(reader.RAW_DIRECTIONS)
+    ]
+    cast(dict[str, object], cast(dict[str, object], receipt["routes"])["normalized_exact"])[
+        "directions_sha256"
+    ] = reader._direction_digest(exact_paths)
+    _publish_receipt(output, receipt)
+    with pytest.raises(reader.ReadbackRefusalError, match="exact row"):
+        _read(monkeypatch, output)
+    exact_path.write_bytes(original_exact)
+
+    # The interval route's retained float witness and route digest move together.
+    receipt = restore_receipt()
+    interval_path = output / "normalized-interval-directions/0.json"
+    original_interval = interval_path.read_bytes()
+    interval_row = json.loads(original_interval)
+    interval_row["witness"] = [0.0, 0.0]
+    _write(interval_path, interval_row)
+    interval_labels = [str(index) for index in range(reader.RAW_DIRECTIONS)] + [
+        f"{index}'" for index in range(1, reader.RAW_DIRECTIONS)
+    ]
+    interval_paths = [
+        output / "normalized-interval-directions" / f"{label}.json" for label in interval_labels
+    ]
+    cast(dict[str, object], cast(dict[str, object], receipt["routes"])["reflected_interval"])[
+        "directions_sha256"
+    ] = reader._direction_digest(interval_paths)
+    _publish_receipt(output, receipt)
+    with pytest.raises(reader.ReadbackRefusalError, match="interval row"):
+        _read(monkeypatch, output)
+    interval_path.write_bytes(original_interval)
+
+    # Candidate geometry, all candidate digests, and the dilation source binding move together.
+    receipt = restore_receipt()
+    candidate_path = output / "candidate.json"
+    original_candidate = candidate_path.read_bytes()
+    candidate = json.loads(original_candidate)
+    candidate["square_side"] = "3/5"
+    candidate_data = _write(candidate_path, candidate, indent=1)
+    candidate_sha = hashlib.sha256(candidate_data).hexdigest()
+    cast(dict[str, object], receipt["normalized"])["sha256"] = candidate_sha
+    for route in cast(dict[str, object], receipt["routes"]).values():
+        cast(dict[str, object], route)["source_sha256"] = candidate_sha
+    dilation_path = output / "dilation.json"
+    original_dilation = dilation_path.read_bytes()
+    dilation = json.loads(original_dilation)
+    cast(dict[str, object], dilation["source"])["sha256"] = candidate_sha
+    dilation_data = _write(dilation_path, dilation, indent=2)
+    cast(dict[str, object], cast(dict[str, object], receipt["routes"])["dilation"])[
+        "record_sha256"
+    ] = hashlib.sha256(dilation_data).hexdigest()
+    _publish_receipt(output, receipt)
+    with pytest.raises(reader.ReadbackRefusalError, match="candidate geometry"):
+        _read(monkeypatch, output)
+    candidate_path.write_bytes(original_candidate)
+    dilation_path.write_bytes(original_dilation)
+
+    # A coherent normalization rewrite is still outside the sole frozen derivation.
+    receipt = restore_receipt()
+    candidate = json.loads(original_candidate)
+    cast(list[list[str]], candidate["atoms"])[0][2] = "1/8"
+    candidate["point_mass"] = "1/8"
+    candidate["total_budget"] = "7/8"
+    candidate_data = _write(candidate_path, candidate, indent=1)
+    normalized = cast(dict[str, object], receipt["normalized"])
+    normalized.update(
+        {
+            "sha256": hashlib.sha256(candidate_data).hexdigest(),
+            "point_mass": "1/8",
+            "total_budget": "7/8",
+        }
+    )
+    _publish_receipt(output, receipt)
+    with pytest.raises(reader.ReadbackRefusalError, match=r"candidate geometry|normalization"):
+        _read(monkeypatch, output)
+    candidate_path.write_bytes(original_candidate)
+
+    # Dilation record and receipt agree on the forged value; independent algebra refuses it.
+    receipt = restore_receipt()
+    dilation = json.loads(original_dilation)
+    cast(dict[str, object], dilation["strict_dilation_family"])["factor_supremum_squared"] = "4"
+    dilation_data = _write(dilation_path, dilation, indent=2)
+    dilation_receipt = cast(
+        dict[str, object], cast(dict[str, object], receipt["routes"])["dilation"]
+    )
+    dilation_receipt["factor_supremum_squared"] = "4"
+    dilation_receipt["record_sha256"] = hashlib.sha256(dilation_data).hexdigest()
+    _publish_receipt(output, receipt)
+    with pytest.raises(reader.ReadbackRefusalError, match=r"dilation receipt|dilation surd"):
+        _read(monkeypatch, output)
+    dilation_path.write_bytes(original_dilation)
+
+    # RSS bytes and digest change without the corresponding derived peak.
+    receipt = restore_receipt()
+    rss_path = output / "rss-samples.json"
+    original_rss = rss_path.read_bytes()
+    rss = json.loads(original_rss)
+    cast(list[dict[str, object]], rss["samples"])[1]["rss_bytes"] = 4_096
+    rss_data = _write(rss_path, rss)
+    cast(dict[str, object], cast(dict[str, object], receipt["resources"])["rss"])[
+        "samples_sha256"
+    ] = hashlib.sha256(rss_data).hexdigest()
+    _publish_receipt(output, receipt)
+    with pytest.raises(reader.ReadbackRefusalError, match="RSS summary"):
+        _read(monkeypatch, output)
+    rss_path.write_bytes(original_rss)
+
+    # A sidecar and summary digest move together, but the route execution claim is false.
+    receipt = restore_receipt()
+    topology_path = output / "raw-worker-topology.json"
+    original_topology = topology_path.read_bytes()
+    topology = json.loads(original_topology)
+    cast(dict[str, object], topology["route"])["execution_model"] = "process-pool"
+    topology_data = _write(topology_path, topology)
+    topology_summary = cast(
+        dict[str, object],
+        cast(
+            dict[str, object], cast(dict[str, object], receipt["resources"])["worker_topology"]
+        )["routes"],
+    )
+    cast(dict[str, object], topology_summary["raw"])["record_sha256"] = hashlib.sha256(
+        topology_data
+    ).hexdigest()
+    _publish_receipt(output, receipt)
+    with pytest.raises(reader.ReadbackRefusalError, match="serial raw-sweep topology"):
+        _read(monkeypatch, output)
+    topology_path.write_bytes(original_topology)
+    restore_receipt()
+    assert result_path.exists()
+
+
+def test_source_and_reader_revisions_are_separate_exact_bindings(
+    monkeypatch: pytest.MonkeyPatch, profile: tuple[Path, dict[str, object]]
+) -> None:
+    output, _receipt = profile
+    with pytest.raises(reader.ReadbackRefusalError, match="execution revision"):
+        _read(monkeypatch, output, execution_revision="c" * 40)
+
+    monkeypatch.undo()
+    head = subprocess.run(
+        ("git", "rev-parse", "HEAD"),
+        cwd=REPOSITORY,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    with pytest.raises(
+        reader.ReadbackRefusalError, match=r"expected reader revision|current checkout"
+    ):
+        reader._bind_revisions(REPOSITORY, EXECUTION_REVISION, "0" * 40)
+    if (REPOSITORY / "packing/devtools/read_fixed_core_calibration_profile.py").exists():
+        assert head != READER_REVISION
+
+
+def test_cli_emits_no_json_proof_on_refusal(capsys: pytest.CaptureFixture[str]) -> None:
+    status = reader.main(
+        [
+            "--repository",
+            str(REPOSITORY),
+            "--expect-execution-revision",
+            EXECUTION_REVISION,
+            "--expect-reader-revision",
+            "invalid",
+            "--output-dir",
+            str(REPOSITORY),
+            "--run-order",
+            "1",
+        ]
+    )
+    captured = capsys.readouterr()
+    assert status != 0
+    assert captured.out == ""
+    assert captured.err.startswith("REFUSED:")
