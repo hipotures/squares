@@ -161,6 +161,13 @@ def _join(
     )
 
 
+def _complete_review_root(review_root: Path) -> None:
+    for name in verifier.REVIEW_NAMES:
+        path = review_root / name
+        if not path.exists():
+            path.write_bytes(b"synthetic observation\n")
+
+
 def test_reader_join_and_retention_preserve_exact_run_root(tmp_path: Path) -> None:
     repository, run_root, review_root, summary = _root(tmp_path)
     _read_all(repository, run_root, review_root, summary)
@@ -171,10 +178,7 @@ def test_reader_join_and_retention_preserve_exact_run_root(tmp_path: Path) -> No
         2,
         3,
     ]
-    for name in verifier.REVIEW_NAMES:
-        path = review_root / name
-        if not path.exists():
-            path.write_bytes(b"synthetic observation\n")
+    _complete_review_root(review_root)
     evidence_root = tmp_path / "evidence"
     retained = verifier.retain_run_root(
         run_root=run_root,
@@ -189,6 +193,106 @@ def test_reader_join_and_retention_preserve_exact_run_root(tmp_path: Path) -> No
     assert (evidence_root / verifier.INVENTORY_NAME).read_bytes() == (
         review_root / verifier.INVENTORY_NAME
     ).read_bytes()
+
+
+def test_snapshot_refuses_shared_invalid_invocation_identity(tmp_path: Path) -> None:
+    for field, value in (
+        ("requested_workers", True),
+        ("requested_workers", 5),
+        ("calibration_seconds", False),
+        ("monotonic_origin", -1),
+        ("cache_observation", " "),
+    ):
+        _, run_root, review_root, summary = _root(tmp_path / f"{field}-{value}")
+        identity = cast(list[dict[str, object]], summary["runs"])[0]["invocation_identity"]
+        cast(dict[str, object], identity)[field] = value
+        _write_json(run_root / verifier.SUMMARY_NAME, summary)
+        (review_root / verifier.INVENTORY_NAME).unlink()
+        with pytest.raises(verifier.RunSetRefusalError, match="identity"):
+            verifier.snapshot_run_root(
+                run_root=run_root,
+                review_root=review_root,
+                execution_revision=EXECUTION,
+            )
+
+
+def test_snapshot_refuses_extra_top_level_coordinator_artifacts(tmp_path: Path) -> None:
+    for name in ("profile-4-run.json", "unexpected.log"):
+        _, run_root, review_root, _ = _root(tmp_path / name)
+        (run_root / name).write_bytes(b"{}\n")
+        (review_root / verifier.INVENTORY_NAME).unlink()
+        with pytest.raises(verifier.RunSetRefusalError, match="top-level"):
+            verifier.snapshot_run_root(
+                run_root=run_root,
+                review_root=review_root,
+                execution_revision=EXECUTION,
+            )
+
+
+def test_retention_refuses_review_proof_change_at_copy_boundary(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repository, run_root, review_root, summary = _root(tmp_path)
+    _read_all(repository, run_root, review_root, summary)
+    _join(repository, run_root, review_root)
+    _complete_review_root(review_root)
+    evidence_root = tmp_path / "evidence"
+    original = verifier._atomic_new
+
+    def change_after_admission_copy(path: Path, data: bytes) -> None:
+        original(path, data)
+        if path == evidence_root / verifier.ADMISSION_NAME:
+            _reseal_proof(review_root, 1, b"{}\n")
+
+    monkeypatch.setattr(verifier, "_atomic_new", change_after_admission_copy)
+    with pytest.raises(verifier.RunSetRefusalError, match="review artifact"):
+        verifier.retain_run_root(
+            run_root=run_root,
+            review_root=review_root,
+            evidence_root=evidence_root,
+            execution_revision=EXECUTION,
+        )
+
+
+def test_retention_refuses_changed_coordinator_status(tmp_path: Path) -> None:
+    repository, run_root, review_root, summary = _root(tmp_path)
+    _read_all(repository, run_root, review_root, summary)
+    _join(repository, run_root, review_root)
+    _complete_review_root(review_root)
+    (review_root / "coordinator.status").write_bytes(b"2\n")
+    with pytest.raises(verifier.RunSetRefusalError, match="coordinator"):
+        verifier.retain_run_root(
+            run_root=run_root,
+            review_root=review_root,
+            evidence_root=tmp_path / "evidence",
+            execution_revision=EXECUTION,
+        )
+
+
+def test_join_cli_refuses_oversized_json_integer(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    repository, run_root, review_root, summary = _root(tmp_path)
+    _read_all(repository, run_root, review_root, summary)
+    _reseal_proof(review_root, 1, b'{"n":' + b"9" * 5000 + b"}\n")
+    assert (
+        verifier.main(
+            [
+                "join",
+                "--run-root",
+                str(run_root),
+                "--review-root",
+                str(review_root),
+                "--expect-execution-revision",
+                EXECUTION,
+                "--expect-reader-revision",
+                READER,
+            ]
+        )
+        == 2
+    )
+    assert "REFUSED: reader 1 proof" in capsys.readouterr().err
+    assert not (review_root / verifier.ADMISSION_NAME).exists()
 
 
 def test_snapshot_cli_publishes_once_and_refuses_overwrite(
@@ -475,7 +579,32 @@ def test_source_closure_checks_nested_code_runtime_and_added_import(tmp_path: Pa
             candidate_tree=_git(repository, "write-tree"),
         )
     _git(repository, "reset", "--hard", "HEAD")
+    assert (
+        verifier.verify_source_closure(
+            repository=repository,
+            run_root=run_root,
+            review_root=review_root,
+            execution_revision=revision,
+            candidate_tree=revision,
+        )["status"]
+        == "accepted"
+    )
     helper_path = repository / helper
+    original = helper_path.read_bytes()
+    helper_path.write_bytes(original + b"# staged change\n")
+    _git(repository, "add", helper)
+    helper_path.write_bytes(original)
+    assert _git(repository, "write-tree") != tree
+    for stale_candidate in (tree, revision):
+        with pytest.raises(verifier.RunSetRefusalError, match="index"):
+            verifier.verify_source_closure(
+                repository=repository,
+                run_root=run_root,
+                review_root=review_root,
+                execution_revision=revision,
+                candidate_tree=stale_candidate,
+            )
+    _git(repository, "reset", "--hard", "HEAD")
     helper_path.write_bytes(helper_path.read_bytes() + b"# unstaged\n")
     with pytest.raises(verifier.RunSetRefusalError, match="source bytes differ"):
         verifier.verify_source_closure(

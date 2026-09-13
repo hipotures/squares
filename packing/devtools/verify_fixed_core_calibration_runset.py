@@ -141,6 +141,53 @@ def _integer(value: object, label: str, *, positive: bool = False) -> int:
     return value
 
 
+def _finite_number(value: object, label: str, *, positive: bool = False) -> int | float:
+    if type(value) not in (int, float):
+        _refuse(f"{label} must be a finite number")
+    typed_value = cast(int | float, value)
+    try:
+        number = float(typed_value)
+    except (OverflowError, ValueError) as error:
+        raise RunSetRefusalError(f"{label} must be a finite number") from error
+    if not math.isfinite(number) or (number <= 0 if positive else number < 0):
+        _refuse(f"{label} must be a finite {'positive' if positive else 'nonnegative'} number")
+    return typed_value
+
+
+def _identity(value: object, revision: str, order: int, label: str) -> dict[str, object]:
+    identity = _object(value, IDENTITY_KEYS, label)
+    if identity["implementation_revision"] != revision or identity["run_order"] != order:
+        _refuse(f"{label} revision or order differs")
+    workers = _integer(
+        identity["requested_workers"], f"{label} requested workers", positive=True
+    )
+    if workers > 4 or type(identity["run_order"]) is not int:
+        _refuse(f"{label} workers or run order is malformed")
+    calibration = _finite_number(
+        identity["calibration_seconds"], f"{label} calibration", positive=True
+    )
+    external = _finite_number(identity["external_seconds"], f"{label} external", positive=True)
+    _finite_number(identity["termination_grace_seconds"], f"{label} grace", positive=True)
+    origin = _finite_number(identity["monotonic_origin"], f"{label} origin")
+    calibration_deadline = _finite_number(
+        identity["calibration_deadline_monotonic"], f"{label} calibration deadline"
+    )
+    external_deadline = _finite_number(
+        identity["external_deadline_monotonic"], f"{label} external deadline"
+    )
+    if (
+        calibration >= external
+        or calibration_deadline != origin + calibration
+        or external_deadline != origin + external
+    ):
+        _refuse(f"{label} deadlines are incoherent")
+    for field in ("cache_observation", "background_load"):
+        text = identity[field]
+        if type(text) is not str or not text.strip():
+            _refuse(f"{label} {field} must be nonempty text")
+    return identity
+
+
 def _pairs(pairs: list[tuple[str, object]]) -> dict[str, object]:
     result: dict[str, object] = {}
     for key, value in pairs:
@@ -170,11 +217,13 @@ def _json_bytes(data: bytes, label: str) -> dict[str, object]:
         value: object = json.loads(
             data.decode("utf-8"), object_pairs_hook=_pairs, parse_constant=_constant
         )
-    except (UnicodeDecodeError, json.JSONDecodeError) as error:
+        if type(value) is not dict:
+            _refuse(f"{label} must be a JSON object")
+        _finite_tree(value)
+    except RunSetRefusalError:
+        raise
+    except (ValueError, RecursionError) as error:
         raise RunSetRefusalError(f"{label} is not one UTF-8 JSON object") from error
-    if type(value) is not dict:
-        _refuse(f"{label} must be a JSON object")
-    _finite_tree(value)
     return cast(dict[str, object], value)
 
 
@@ -320,13 +369,9 @@ def _summary(
             _refuse("coordinator runs are out of order")
         if run["profile_directory"] != str(run_root / f"profile-{order}"):
             _refuse("coordinator profile path differs from the run root")
-        identity = _object(run["invocation_identity"], IDENTITY_KEYS, "run identity")
-        if (
-            identity["implementation_revision"] != revision
-            or type(identity["run_order"]) is not int
-            or identity["run_order"] != order
-        ):
-            _refuse("coordinator invocation identity differs from revision or order")
+        _identity(
+            run["invocation_identity"], revision, order, "coordinator invocation identity"
+        )
         _binding(run["calibration_receipt"], "coordinator receipt", path="result.json")
         if type(run["inventory"]) is not dict:
             _refuse("coordinator run inventory must be an object")
@@ -375,9 +420,12 @@ def _inventory(run_root: Path, revision: str) -> dict[str, object]:
         f"profile-{order}" for order in RUN_ORDERS
     }:
         _refuse("run root does not contain exactly three profile directories")
+    # The coordinator writes only its summary and three run records at this level.
+    # Producer artifacts are confined to the three profile directories.
     required = {SUMMARY_NAME, *(f"profile-{order}-run.json" for order in RUN_ORDERS)}
-    if not required.issubset({cast(str, row["path"]) for row in files}):
-        _refuse("run root lacks a summary or coordinator run record")
+    top_level = {cast(str, row["path"]) for row in files if "/" not in cast(str, row["path"])}
+    if top_level != required:
+        _refuse("run root top-level files differ from the coordinator output set")
     _summary(run_root, revision)
     return {
         "schema": INVENTORY_SCHEMA,
@@ -582,9 +630,17 @@ def _command(
 
 
 def _admission(
-    run_root: Path, review_root: Path, repository: Path, revision: str, reader_revision: str
+    run_root: Path,
+    review_root: Path,
+    repository: Path,
+    revision: str,
+    reader_revision: str,
+    *,
+    copied_review: bool = False,
 ) -> dict[str, object]:
-    if run_root.is_relative_to(repository) or review_root.is_relative_to(repository):
+    if run_root.is_relative_to(repository) or (
+        not copied_review and review_root.is_relative_to(repository)
+    ):
         _refuse("run and review roots must be outside the repository")
     inventory_data, _ = _baseline(run_root, review_root, revision)
     summary_data, _, runs = _summary(run_root, revision)
@@ -608,6 +664,9 @@ def _admission(
         )
         proof = _json_bytes(proof_data, f"reader {order} proof")
         _object(proof, PROOF_KEYS, f"reader {order} proof")
+        proof_identity = _identity(
+            proof["invocation_identity"], revision, order, f"reader {order} identity"
+        )
         if (
             proof["schema"] != READER_SCHEMA
             or proof["status"] != "accepted"
@@ -616,7 +675,7 @@ def _admission(
             or type(proof["run_order"]) is not int
             or proof["run_order"] != order
             or proof["profile_directory"] != run["profile_directory"]
-            or not _same_typed(proof["invocation_identity"], run["invocation_identity"])
+            or not _same_typed(proof_identity, run["invocation_identity"])
         ):
             _refuse(f"reader {order} proof does not bind its coordinator run")
         receipt = _binding(proof["receipt"], f"reader {order} receipt", path="result.json")
@@ -788,9 +847,20 @@ def retain_run_root(
     observed_review = {entry.name for entry in os.scandir(review_root)}
     if observed_review != set(REVIEW_NAMES):
         _refuse("review root file set differs from the retention whitelist")
+    if _regular_bytes(review_root / "coordinator.status", "coordinator status") != b"0\n":
+        _refuse("coordinator status changed after snapshot")
+    review_digests = {
+        name: _sha(_regular_bytes(review_root / name, "review artifact"))
+        for name in REVIEW_NAMES
+    }
+    if review_digests[ADMISSION_NAME] != _sha(admission_data):
+        _refuse("review artifact changed after admission check")
     evidence_root.mkdir()
     for name in REVIEW_NAMES:
-        _atomic_new(evidence_root / name, _regular_bytes(review_root / name, "review artifact"))
+        data = _regular_bytes(review_root / name, "review artifact")
+        if _sha(data) != review_digests[name]:
+            _refuse(f"review artifact changed during retention: {name}")
+        _atomic_new(evidence_root / name, data)
     summary_data = _regular_bytes(run_root / SUMMARY_NAME, "coordinator summary")
     _atomic_new(evidence_root / SUMMARY_NAME, summary_data)
     _atomic_new(evidence_root / "execution-revision.txt", f"{revision}\n".encode())
@@ -814,12 +884,25 @@ def retain_run_root(
             archive.addfile(info, io.BytesIO(data))
     names = _verify_archive(archive_path, run_root, baseline)
     _baseline(run_root, review_root, revision)
-    if (
-        _regular_bytes(evidence_root / SUMMARY_NAME, "copied summary") != summary_data
-        or _regular_bytes(evidence_root / INVENTORY_NAME, "copied inventory") != inventory_data
-        or _regular_bytes(evidence_root / ADMISSION_NAME, "copied admission") != admission_data
-    ):
+    if {entry.name for entry in os.scandir(review_root)} != set(REVIEW_NAMES):
+        _refuse("review artifact set changed during retention")
+    for name, digest in review_digests.items():
+        if (
+            _sha(_regular_bytes(review_root / name, "review artifact")) != digest
+            or _sha(_regular_bytes(evidence_root / name, "copied review artifact")) != digest
+        ):
+            _refuse(f"review artifact changed or copied inconsistently: {name}")
+    if _regular_bytes(evidence_root / SUMMARY_NAME, "copied summary") != summary_data:
         _refuse("copied summary, inventory, or admission differs")
+    if admission != _admission(
+        run_root,
+        evidence_root,
+        repository,
+        revision,
+        reader_revision,
+        copied_review=True,
+    ):
+        _refuse("copied review artifacts disagree with retained admission")
     archive_data = _regular_bytes(archive_path, "run-root archive")
     archive_digest = _sha(archive_data)
     _atomic_new(evidence_root / "run-root-contents.txt", ("\n".join(names) + "\n").encode())
@@ -957,6 +1040,15 @@ def verify_source_closure(
         _git(repository, "rev-parse", "--verify", f"{candidate_tree}^{{tree}}").strip().decode()
     )
     _revision(candidate_oid, "candidate tree object")
+    candidate_kind = _git(repository, "cat-file", "-t", candidate_tree).strip()
+    if candidate_kind == b"commit":
+        if _git(repository, "rev-parse", "HEAD").strip().decode() != candidate_tree:
+            _refuse("committed candidate is not the current HEAD")
+    elif candidate_kind != b"tree":
+        _refuse("candidate must be a staged tree or committed revision")
+    index_tree = _git(repository, "write-tree").strip().decode()
+    if _revision(index_tree, "staged index tree") != candidate_oid:
+        _refuse("candidate tree differs from the current staged index")
     execution_entries = _tree(repository, revision)
     candidate_entries = _tree(repository, candidate_oid)
     execution_paths = _closure(repository, execution_entries)
