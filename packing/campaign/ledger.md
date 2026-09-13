@@ -731,7 +731,7 @@ Status: **active**. Select and execute short, high-information blocks across dis
 
 | id | status | title | rounds | opened because |
 | --- | --- | --- | --- | --- |
-| series-000 | open | S0: smoke and calibration — prove the machinery, establish every baseline metric | 114 | First series. There is no prior instrument, so not |
+| series-000 | open | S0: smoke and calibration — prove the machinery, establish every baseline metric | 115 | First series. There is no prior instrument, so not |
 
 ## Registry
 
@@ -873,6 +873,7 @@ Status: **active**. Select and execute short, high-information blocks across dis
 | H-158 | unresolved | proof | For exp151's direction-6 saved residual on selected tuple (0,0,0,7), e |  | 1 |  | 21s wall |
 | H-159 | refuted | proof | For every admissible bottom-left one-corner role-C unit parent X with  |  | 1 |  | 2s wall |
 | H-160 | running | proof | On the frozen BC293 377-atom measure and every one of the 182 eligible |  | 1 |  |  |
+| H-161 | refuted | proof | In the frozen BC303 377-atom measure, the closed literal parent Q0=[0, |  | 1 |  | 0s wall |
 
 ## Needs review — held for a human, not decided
 
@@ -882,7 +883,7 @@ Status: **active**. Select and execute short, high-information blocks across dis
 
 ## Rounds
 
-### rejected (28)
+### rejected (29)
 
 | id | series | instance | operator | hypotheses | reason |
 | --- | --- | --- | --- | --- | --- |
@@ -914,6 +915,7 @@ Status: **active**. Select and execute short, high-information blocks across dis
 | exp-153 | series-000 | 11 | GPT-6 Astra coordinator; implementation by GPT-5.6 Sol extra high; mathematical admission by GPT-6 Astra max | H-151 | The exact site region becomes empty after 188 complete direction constraints. This rules out every additional single site while original D and tuple(0,0,0,7) stay fixed. It does not rule out weighted added mass below two, repositioned six-site patterns or physical packings. |
 | exp-154 | series-000 | 11 | Claude Opus 5 measurement lane, coordinated by Claude Fable | H-157 | Six refined subclasses still read exactly 10, so the case split as posed is not closed by refinement and H-157 is refuted on its own registered direction. |
 | exp-157 | series-000 | 11 | Codex Sol implementation and record; source-distinct mathematical review at the original reader head by Astra Max | H-159 | The fixed parent has S(X)=3/800000 < epsilon=524199/2000000, so the named universal local inequality is false; no continuous-domain or global claim follows. |
+| exp-159 | series-000 | 11 | Codex source-distinct reviewer, then exact target operator | H-161 | N=4000015 is below both first-rejecting integers, so the literal four-corner and one-parent resource tests survive with 1048233 units of slack each; neither extension is established. |
 
 ### abandoned (2)
 
@@ -1052,7 +1054,7 @@ Status: **active**. Select and execute short, high-information blocks across dis
 
 ## Effort
 
-114 rounds, 2152.1 agent-minutes, 1485.2 wall-minutes.
+115 rounds, 2152.1 agent-minutes, 1485.2 wall-minutes.
 
 ## Exploration reports not yet codified
 
