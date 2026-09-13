@@ -248,6 +248,7 @@ case or experiment separately.
 | [Fixed-Core Packet Calibration: Mathematical and Admission Review](docs/project/reviews/review-2026-09-12-n11-bc329-calibration-design.md) | dated review record | record | retained | — |
 | [N11 Strategy Audit for the BC329 Closeout](docs/project/reviews/review-2026-09-12-n11-post-bc329-strategy-audit.md) | dated review record | record | retained | — |
 | [Source-Distinct Review of the N11 Owner-Selection Report](docs/project/reviews/review-2026-09-12-n11-selection-routing-first-principles.md) | dated review record | record | retained | — |
+| [Independent Review of the BC303 T2 Geometry Reduction](docs/project/reviews/review-2026-09-13-bc303-t2-geometry.md) | dated review record | record | retained | — |
 | [Strategic Review of the N11 Daytime Research Frontier](docs/project/reviews/review-2026-09-10-n11-strategy-frontier.md) | dated review record | record | retained | — |
 | [N=11 Structural Normal Forms](docs/project/reviews/review-2026-09-10-n11-structural-normal-forms.md) | dated review record | record | retained | — |
 | [Independent Review of the N=11 Structural Normal Form](docs/project/reviews/review-2026-09-10-n11-structural-normal-forms-independent.md) | dated review record | record | retained | — |
