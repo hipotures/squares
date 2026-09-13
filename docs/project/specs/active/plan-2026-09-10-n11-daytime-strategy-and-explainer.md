@@ -626,8 +626,10 @@ independent replay.
 Every active block records a checkpoint at most thirty minutes after its previous one.
 At a checkpoint, record evidence obtained, actual cost, changed dependencies, and the
 next admitted action.
-Native task usage remains in local accounting under the current publication restriction;
-the public record names block clocks and outcomes without publishing that telemetry.
+Each stacked PR leads with its own verified task usage and measured scientific runtime,
+with the accounting interval and exclusions stated.
+Raw native logs remain local; the PR body reports attributable totals without charging
+one layer for another layer’s work.
 Run a W5 efficiency block when the reconstructed four-to-eight block cadence requires
 it. Validation can run beside read-only work, but large LP and covering processes remain
 serial unless the host is measured to support concurrency.
