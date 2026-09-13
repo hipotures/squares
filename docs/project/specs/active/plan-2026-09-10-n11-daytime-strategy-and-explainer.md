@@ -544,6 +544,49 @@ bounded audit found no identifiable source in the repository or linked bead stat
 This plan cannot claim V3 alignment until that source is supplied and mapped requirement
 by requirement.
 
+## September 13 Stack Review Handoff
+
+The review of PRs 148, 149, 156, and 157 remains open at this checkpoint.
+The [PR148 review](https://github.com/jlevy/squares/pull/148#issuecomment-5655488385)
+accepts published head `b43d3011`; the
+[PR149 review](https://github.com/jlevy/squares/pull/149#issuecomment-5655488459)
+accepts `8d0a3ff2`. PR156’s reviewed calibration continuation is published at `9c56e901`
+as a draft. Its standalone reachable rerun passed 5,511 tests with nine skips, but its
+prior full pre-push gate failed and hosted Packing run `34782594805` has a failing
+suite. The PR156 owner tracks that failure and operational admission in `think-4ovs` and
+`think-pp3j`. No full-shape calibration profile or BC329 target ran.
+
+PR157 has the weighted-atom repairs through `cadbf7e1`, the retained PDF comparison and
+optional math trace at `876c5945`, and the reviewed diagnostic control/treatment at
+`a481ec24`. The diagnostic replaces each selected visible prepared-math Text node with
+an equal new node only in an explicit manual trace arm.
+The ordinary stored-artifact comparison remains strict and unconditional.
+A 46-step local pre-push gate passed on the diagnostic source, including 5,478
+behavioral tests with nine skips; the final wording edit then passed 75 focused tests
+and Ruff. Hosted checks for the new head and a Linux two-arm diagnostic have not run at
+this checkpoint. The
+[preserved comparison](../../reviews/review-2026-09-13-explainer-pdf-comparison.md) and
+a later manual trace show small PDF text-position differences with unchanged extracted
+math text. Their browser cause remains unknown under `think-ptit`. A local two-draw Mac
+Chrome smoke passed in both diagnostic arms and cannot settle that cause.
+
+An independent mathematical review found no new defect in the anticipated
+`9c56e901`/`876c5945` merge.
+It checked the five shared source-closure paths and the two MATH05 packet preflights.
+This is not an acceptance of the as-yet-unmerged tree.
+PR157 changes five paths that PR156’s calibration receipt binds, so the maintained
+[run sheet](https://github.com/jlevy/squares/blob/9c56e9019b97be0511d5afe590790b362b93e9e4/docs/project/specs/active/plan-2026-09-13-n11-bc329-three-profile-run-sheet.md)
+must be rebound to the final PR157 execution head under `think-99bz` before any profile
+launch.
+
+The next integration sequence is to resolve PR156’s hosted failure, merge its final
+published head into PR157, review the resulting packet preflights and source closure,
+apply and independently review the run-sheet binding, then run the targeted math and
+calibration controls, the full 74-step checkpoint, Pages browser checks, and ordinary CI
+on the combined head.
+Publish the final PR157 disposition and close the review beads only after those receipts
+exist. No main-branch merge or deployment was done.
+
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
 -->
