@@ -324,21 +324,33 @@ boundaries.
 The source-distinct reader’s repair at `7e4d2487` passed independent rereview
 for F1–F5; that review found impossible nested clocks, task positions, a parent cycle,
 and a Git tree object accepted as execution identity.
-The candidate F6/F7 repair is integrated at `95830f9e` and awaits independent exact-head
-review. The coordinator’s later three findings remain unrepaired.
+Candidate F6/F7 repair `95830f9e` is integrated; its
+[exact-commit review](../../reviews/review-2026-09-13-n11-bc329-reader-f6f7-overflow.md)
+accepted F6a, F6c, and F7, but refused F6b after a full real-binder control accepted
+finite phase clocks whose sum overflows.
+Finite-clock repair `a5701e73` is integrated with a maintained full-binder overflow
+refusal and finite equality control; independent exact-head rereview remains open.
+Coordinator repair `dbbf8495` is integrated for inverted route chronology, disjoint
+phase time, and a changing `result.json`; independent exact-head rereview remains open.
 The first maintained run-set verifier at `878e18d0` implements the R2 proof join, R3
 inventory and archive comparison, and R4 source-closure check, but its
 [exact-head review](../../reviews/review-2026-09-13-n11-bc329-runset-verifier.md)
 refused admission on six reproducible binding and refusal-path gaps.
-The reader’s
+Candidate repair `0874e912` closes those six in focused controls, but its
+[rereview](../../reviews/review-2026-09-13-n11-bc329-runset-verifier-rereview.md)
+refused R3: the verifier rejects the coordinator’s 18 required top-level command logs,
+and a status change between the first check and digest snapshot can be retained as
+accepted.
+Both findings have repair beads; no run-set admission follows from the targeted
+R2/R4 checks. The reader’s
 [initial review](../../reviews/review-2026-09-13-n11-bc329-source-distinct-reader.md)
 records the refusal at `212e0dfc`; its
 [rereview](../../reviews/review-2026-09-13-n11-bc329-reader-rereview.md) records the
 remaining gaps at `7e4d2487`. The coordinator’s
 [rereview](../../reviews/review-2026-09-13-n11-bc329-coordinator-rereview.md) records
 the next refusal at `fc3e314d` and the three prior repairs it accepted.
-Operational admission still requires the coordinator and verifier repairs, independent
-reader and integrated rereview, the reviewed
+Operational admission still requires the coordinator, reader, and verifier repairs,
+independent integrated rereview, the reviewed
 [run sheet](plan-2026-09-13-n11-bc329-three-profile-run-sheet.md), three fresh profiles,
 and independent readback.
 None of those profiles has run.

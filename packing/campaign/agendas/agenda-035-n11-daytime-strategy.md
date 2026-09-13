@@ -261,11 +261,15 @@ agenda:
       review refused manifest closure, running-file identity, typed fields, dilation fields, witness
       agreement, and lifecycle topology. The 7e4d2487 rereview accepts F1-F5 but refuses nested clocks,
       sequential task positions, and parent-cycle topology; a Git tree object also passes execution identity.
-      Candidate reader F6/F7 repair 95830f9e is integrated but awaits independent rereview.
-      Coordinator repair/rereview, reader rereview, the final run-sheet review, three fresh
+      Candidate reader F6/F7 repair 95830f9e is integrated; independent review accepted F6a, F6c,
+      and F7 but refused F6b because finite phase clocks can overflow their sum and pass the reader.
+      Follow-up finite-clock repair a5701e73 and coordinator repair dbbf8495 are integrated,
+      with independent exact-head rereviews pending. The verifier's first six defects have focused
+      repairs at 0874e912, but rereview refused R3 because it rejects the coordinator's required
+      eighteen command logs and can retain a nonzero status after the first success check.
+      Verifier repair/rereview, the final run-sheet review, three fresh
       14,404-record host profiles, and independent admission remain open. No profile or BC329 target has
-      run. The verifier at 878e18d0 is also refused on six binding and refusal-path gaps. Child bead
-      think-qw9w owns this boundary.
+      run. Child bead think-qw9w owns this boundary.
     next_evidence: Repair and rereview the integrated coordinator, source-distinct reader, and run-set
       verifier; admit the three-profile run sheet; publish the reviewed PR head; then run and independently read three controls
       under fixed-core-packet-calibration/v1. Only after those gates pass, prospectively register one packet
@@ -280,10 +284,12 @@ agenda:
     - docs/project/reviews/review-2026-09-12-n11-bc329-calibration-design.md
     - docs/project/reviews/review-2026-09-13-n11-bc329-source-distinct-reader.md
     - docs/project/reviews/review-2026-09-13-n11-bc329-reader-rereview.md
+    - docs/project/reviews/review-2026-09-13-n11-bc329-reader-f6f7-overflow.md
     - docs/project/reviews/review-2026-09-13-n11-bc329-topology-coordinator-initial.md
     - docs/project/reviews/review-2026-09-13-n11-bc329-coordinator-rereview.md
     - docs/project/reviews/review-2026-09-13-n11-bc329-three-profile-run-sheet.md
     - docs/project/reviews/review-2026-09-13-n11-bc329-runset-verifier.md
+    - docs/project/reviews/review-2026-09-13-n11-bc329-runset-verifier-rereview.md
     - docs/project/specs/active/plan-2026-09-13-n11-bc329-three-profile-run-sheet.md
   - id: BC-330
     purpose: research
