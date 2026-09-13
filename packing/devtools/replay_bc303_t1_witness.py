@@ -3,6 +3,10 @@
 The reader verifies one disclosed role-C counterexample with exact arithmetic. It does
 not search, minimize surplus, replay the full BC303 certificate, or make a routing or
 packing-bound claim.
+
+``validate_record(record, repository)`` authenticates retained records against the
+reviewed source bytes and the executing reader at the checkout's HEAD. The source
+revision names the frozen input proposal; the implementation revision names this reader.
 """
 
 from __future__ import annotations
@@ -23,6 +27,7 @@ from strif import atomic_write_text
 
 SCHEMA = "bc303-literal-t1-witness/v1"
 SOURCE_REVISION = "39714308ce2081abbd76624387d134fee4be6deb"
+READER_PATH = "packing/devtools/replay_bc303_t1_witness.py"
 MEASURE_PATH = (
     "packing/campaign/series/series-000-smoke-and-calibration/results/agenda-030/"
     "bc-293-measure-free-96-25.json"
@@ -291,7 +296,7 @@ def validate_source_bytes(source_bytes: Mapping[str, bytes]) -> None:
 
 
 def bind_sources(repository: Path) -> tuple[str, dict[str, bytes], list[dict[str, object]]]:
-    """Bind proposal-revision, current-HEAD, and working bytes for all 18 sources."""
+    """Bind proposal-revision, input-checkout HEAD, and working bytes for all 18 sources."""
 
     repository = repository.resolve()
     root = Path(_git(repository, "rev-parse", "--show-toplevel").decode().strip()).resolve()
@@ -299,7 +304,7 @@ def bind_sources(repository: Path) -> tuple[str, dict[str, bytes], list[dict[str
         raise T1ReplayError("repository argument must name the Git worktree root")
     head = _git(root, "rev-parse", "HEAD").decode().strip()
     if len(head) != 40 or any(character not in "0123456789abcdef" for character in head):
-        raise T1ReplayError("current implementation revision is malformed")
+        raise T1ReplayError("current source checkout revision is malformed")
 
     source_bytes: dict[str, bytes] = {}
     for source in SOURCES:
@@ -321,6 +326,22 @@ def bind_sources(repository: Path) -> tuple[str, dict[str, bytes], list[dict[str
         for source in SOURCES
     ]
     return head, source_bytes, bindings
+
+
+def _bind_implementation(repository: Path, head: str) -> None:
+    """Require the executing reader to be the regular file committed at input HEAD."""
+
+    reader = repository / READER_PATH
+    if reader.is_symlink() or not reader.is_file() or Path(__file__).resolve() != reader:
+        raise T1ReplayError("executing T1 reader is not the input checkout's reader path")
+    try:
+        committed = _git(repository, "cat-file", "blob", f"{head}:{READER_PATH}")
+    except T1ReplayError as error:
+        raise T1ReplayError(
+            "executing T1 reader is absent at implementation revision"
+        ) from error
+    if reader.read_bytes() != committed:
+        raise T1ReplayError("executing T1 reader differs from implementation revision")
 
 
 def _turn(ray: Point) -> Point:
@@ -605,8 +626,14 @@ def _equipment() -> dict[str, object]:
     }
 
 
-def validate_record(record: Mapping[str, object]) -> None:
-    """Validate the closed deterministic T1 record and its narrow determination."""
+def validate_record(record: Mapping[str, object], repository: Path) -> None:
+    """Authenticate a retained T1 record against source atoms and executing reader."""
+
+    head, source_bytes, _bindings = bind_sources(repository)
+    _bind_implementation(repository.resolve(), head)
+    source_measure = _parse_measure(
+        strict_json_bytes(source_bytes[MEASURE_PATH], "BC303 measure")
+    )
 
     if set(record) != {
         "schema",
@@ -631,6 +658,8 @@ def validate_record(record: Mapping[str, object]) -> None:
         or any(character not in "0123456789abcdef" for character in revision)
     ):
         raise T1ReplayError("T1 record identity is malformed")
+    if revision != head:
+        raise T1ReplayError("T1 record implementation revision differs from executing reader")
     expected_sources = [
         {"path": source.path, "git_blob": source.git_blob, "bytes": source.byte_count}
         for source in SOURCES
@@ -683,48 +712,33 @@ def validate_record(record: Mapping[str, object]) -> None:
         raise T1ReplayError("T1 witness summary changed")
 
     memberships = _sequence(record.get("memberships"), "T1 memberships")
-    if len(memberships) != 377:
+    if len(memberships) != len(source_measure.atoms):
         raise T1ReplayError("T1 record does not retain all 377 memberships")
     captured_indices: list[int] = []
     captured_mass = Fraction(0)
-    for expected_index, value in enumerate(memberships):
-        row = _mapping(value, f"membership {expected_index}")
-        if (
-            set(row)
-            != {
-                "index",
-                "point",
-                "weight",
-                "weight_units",
-                "inside_core",
-                "axis_slacks",
-            }
-            or row.get("index") != expected_index
-        ):
-            raise T1ReplayError(f"membership {expected_index} fields or index changed")
-        point_values = _sequence(row.get("point"), f"membership {expected_index} point")
-        slack_values = _sequence(
-            row.get("axis_slacks"), f"membership {expected_index} axis slacks"
-        )
-        if len(point_values) != 2 or len(slack_values) != 2:
-            raise T1ReplayError(f"membership {expected_index} geometry is malformed")
-        point = (
-            _fraction(point_values[0], f"membership {expected_index} x"),
-            _fraction(point_values[1], f"membership {expected_index} y"),
-        )
-        weight = _fraction(row.get("weight"), f"membership {expected_index} weight")
+    for atom, value in zip(source_measure.atoms, memberships, strict=True):
+        row = _mapping(value, f"membership {atom.index}")
         inside, slacks = closed_core_membership(
-            point, (Fraction(1, 2), Fraction(1, 2)), (Fraction(1), Fraction(0))
+            atom.point, (Fraction(1, 2), Fraction(1, 2)), (Fraction(1), Fraction(0))
         )
+        expected_row = {
+            "index": atom.index,
+            "point": [str(value) for value in atom.point],
+            "weight": str(atom.weight),
+            "weight_units": int(source_measure.weight_scale * atom.weight),
+            "inside_core": inside,
+            "axis_slacks": [str(value) for value in slacks],
+        }
         if (
-            row.get("inside_core") is not inside
-            or slack_values != [str(value) for value in slacks]
-            or row.get("weight_units") != int(WEIGHT_SCALE * weight)
+            row != expected_row
+            or type(row.get("index")) is not int
+            or type(row.get("weight_units")) is not int
+            or type(row.get("inside_core")) is not bool
         ):
-            raise T1ReplayError(f"membership {expected_index} does not reconstruct")
+            raise T1ReplayError(f"membership {atom.index} differs from bound source atom")
         if inside:
-            captured_indices.append(expected_index)
-            captured_mass += weight
+            captured_indices.append(atom.index)
+            captured_mass += atom.weight
     if tuple(captured_indices) != CAPTURED_INDICES or captured_mass != CAPTURED_MASS:
         raise T1ReplayError("T1 record capture does not reconstruct")
     if record.get("determination") != DETERMINATION:
@@ -735,6 +749,7 @@ def replay(repository: Path) -> dict[str, object]:
     """Bind the reviewed sources and replay the literal witness exactly once."""
 
     head, source_bytes, source_bindings = bind_sources(repository)
+    _bind_implementation(repository.resolve(), head)
     measure_document = strict_json_bytes(source_bytes[MEASURE_PATH], "BC303 measure")
     measure = _parse_measure(measure_document)
     witness, memberships = _literal_witness(measure)
@@ -750,21 +765,23 @@ def replay(repository: Path) -> dict[str, object]:
         "memberships": memberships,
         "determination": dict(DETERMINATION),
     }
-    validate_record(record)
+    validate_record(record, repository)
     return record
 
 
-def encode_record(record: Mapping[str, object]) -> str:
-    """Serialize a validated record with deterministic strict JSON bytes."""
+def encode_record(record: Mapping[str, object], repository: Path) -> str:
+    """Authenticate and serialize a record with deterministic strict JSON bytes."""
 
-    validate_record(record)
+    validate_record(record, repository)
     return json.dumps(record, indent=2, sort_keys=True, allow_nan=False) + "\n"
 
 
-def _publish_record(path: Path, record: dict[str, object], encoded: str) -> None:
+def _publish_record(
+    path: Path, record: dict[str, object], encoded: str, repository: Path
+) -> None:
     atomic_write_text(path, encoded)
     retained = strict_json_bytes(path.read_bytes(), "retained T1 record")
-    validate_record(retained)
+    validate_record(retained, repository)
     if retained != record:
         raise T1ReplayError("retained T1 record differs after atomic publication")
 
@@ -776,9 +793,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     arguments = parser.parse_args(argv)
     try:
         record = replay(arguments.repository)
-        encoded = encode_record(record)
+        encoded = encode_record(record, arguments.repository)
         if arguments.output is not None:
-            _publish_record(arguments.output, record, encoded)
+            _publish_record(arguments.output, record, encoded, arguments.repository)
         sys.stdout.write(encoded)
     except (OSError, T1ReplayError) as error:
         sys.stderr.write(

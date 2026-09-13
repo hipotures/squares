@@ -27,7 +27,7 @@ def _measure_document() -> dict[str, object]:
 
 def test_bound_replay_emits_the_closed_narrow_determination() -> None:
     record = replay.replay(REPO)
-    replay.validate_record(record)
+    replay.validate_record(record, REPO)
     witness = cast(dict[str, object], record["witness"])
     determination = cast(dict[str, object], record["determination"])
     memberships = cast(list[dict[str, object]], record["memberships"])
@@ -52,7 +52,110 @@ def test_bound_replay_emits_the_closed_narrow_determination() -> None:
         "n11_lower_bound": "not-claimed",
         "minimum_surplus": "not-claimed",
     }
-    assert replay.encode_record(record) == replay.encode_record(deepcopy(record))
+    assert record["source_revision"] == replay.SOURCE_REVISION
+    assert (
+        record["implementation_revision"]
+        == subprocess.run(
+            ("git", "-C", str(REPO), "rev-parse", "HEAD"), check=True, capture_output=True
+        )
+        .stdout.decode()
+        .strip()
+    )
+    assert replay.encode_record(record, REPO) == replay.encode_record(deepcopy(record), REPO)
+
+
+def test_retained_rows_must_match_every_bound_source_atom() -> None:
+    original = replay.replay(REPO)
+    changed_weights = deepcopy(original)
+    rows = cast(list[dict[str, object]], changed_weights["memberships"])
+    delta = Fraction(1, replay.WEIGHT_SCALE)
+    for index, change in ((0, delta), (2, -delta)):
+        row = rows[index]
+        weight = Fraction(cast(str, row["weight"])) + change
+        row["weight"] = str(weight)
+        row["weight_units"] = int(replay.WEIGHT_SCALE * weight)
+    with pytest.raises(replay.T1ReplayError, match="bound source atom"):
+        replay.validate_record(changed_weights, REPO)
+    with pytest.raises(replay.T1ReplayError, match="bound source atom"):
+        replay.encode_record(changed_weights, REPO)
+
+    negative_excluded = deepcopy(original)
+    rows = cast(list[dict[str, object]], negative_excluded["memberships"])
+    rows[1]["weight"] = "-1"
+    rows[1]["weight_units"] = -replay.WEIGHT_SCALE
+    with pytest.raises(replay.T1ReplayError, match="bound source atom"):
+        replay.validate_record(negative_excluded, REPO)
+
+    outside_excluded = deepcopy(original)
+    rows = cast(list[dict[str, object]], outside_excluded["memberships"])
+    rows[1]["point"] = ["10", "10"]
+    _inside, slacks = replay.closed_core_membership(
+        (Fraction(10), Fraction(10)),
+        (Fraction(1, 2), Fraction(1, 2)),
+        (Fraction(1), Fraction(0)),
+    )
+    rows[1]["axis_slacks"] = [str(value) for value in slacks]
+    with pytest.raises(replay.T1ReplayError, match="bound source atom"):
+        replay.validate_record(outside_excluded, REPO)
+
+    for changed_flag in (False, 1):
+        altered_membership = deepcopy(original)
+        rows = cast(list[dict[str, object]], altered_membership["memberships"])
+        rows[0]["inside_core"] = changed_flag
+        with pytest.raises(replay.T1ReplayError, match="bound source atom"):
+            replay.validate_record(altered_membership, REPO)
+
+
+def test_retained_implementation_revision_must_name_the_executing_reader() -> None:
+    record = replay.replay(REPO)
+    record["implementation_revision"] = "0" * 40
+    with pytest.raises(replay.T1ReplayError, match="implementation revision differs"):
+        replay.validate_record(record, REPO)
+    with pytest.raises(replay.T1ReplayError, match="implementation revision differs"):
+        replay.encode_record(record, REPO)
+
+
+def test_cross_checkout_and_dirty_executing_reader_are_refused(tmp_path: Path) -> None:
+    checkout = tmp_path / "input-checkout"
+    subprocess.run(
+        ("git", "clone", "--shared", "--quiet", str(REPO), str(checkout)), check=True
+    )
+
+    with pytest.raises(replay.T1ReplayError, match=r"executing T1 reader.*path"):
+        replay.replay(checkout)
+
+    reader = checkout / replay.READER_PATH
+    reader.write_bytes(reader.read_bytes() + b"\n# changed executing reader\n")
+    output = tmp_path / "dirty.json"
+    result = subprocess.run(
+        (
+            sys.executable,
+            "-m",
+            "devtools.replay_bc303_t1_witness",
+            "--repository",
+            str(checkout),
+            "--output",
+            str(output),
+        ),
+        cwd=checkout / "packing",
+        check=False,
+        capture_output=True,
+    )
+    assert result.returncode == 2
+    assert result.stdout == b""
+    assert "differs from implementation revision" in result.stderr.decode()
+    assert not output.exists()
+
+    subprocess.run(
+        ("git", "-C", str(checkout), "reset", "--hard", "HEAD"), check=True, capture_output=True
+    )
+    subprocess.run(
+        ("git", "-C", str(checkout), "checkout", "--quiet", replay.SOURCE_REVISION),
+        check=True,
+    )
+    assert not reader.exists()
+    with pytest.raises(replay.T1ReplayError, match=r"executing T1 reader.*path"):
+        replay.replay(checkout)
 
 
 def test_source_binding_rejects_changed_missing_and_duplicate_json_bytes() -> None:
@@ -153,7 +256,7 @@ def test_owner_identity_and_record_scope_mutations_are_refused() -> None:
     determination = cast(dict[str, object], record["determination"])
     determination["global_routing"] = "established"
     with pytest.raises(replay.T1ReplayError, match="overstates"):
-        replay.validate_record(record)
+        replay.validate_record(record, REPO)
 
 
 def test_cli_atomically_writes_the_same_strict_record_as_stdout(tmp_path: Path) -> None:
@@ -177,7 +280,7 @@ def test_cli_atomically_writes_the_same_strict_record_as_stdout(tmp_path: Path) 
     assert result.stderr == b""
     assert result.stdout == output.read_bytes()
     retained = replay.strict_json_bytes(output.read_bytes(), "retained record")
-    replay.validate_record(retained)
+    replay.validate_record(retained, REPO)
 
 
 def test_cli_refusal_is_nonzero_and_does_not_publish(tmp_path: Path) -> None:
