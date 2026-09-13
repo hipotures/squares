@@ -7,6 +7,8 @@ import base64
 import hashlib
 import json
 import math
+import os
+import stat
 import statistics
 import subprocess
 import sys
@@ -213,6 +215,38 @@ def _digest(value: object, label: str) -> str:
     return value
 
 
+def _read_regular_file(path: Path, label: str) -> bytes:
+    """Refuse links and special files before opening a retained receipt."""
+
+    try:
+        mode = path.lstat().st_mode
+    except OSError as error:
+        raise ProfileCoordinatorError(f"{label} cannot be inspected: {error}") from error
+    if not stat.S_ISREG(mode):
+        raise ProfileCoordinatorError(f"{label} is not a regular file")
+
+    def no_follow_nonblocking(name: str, flags: int) -> int:
+        return os.open(name, flags | os.O_NOFOLLOW | os.O_NONBLOCK)
+
+    try:
+        with open(path, "rb", opener=no_follow_nonblocking) as stream:
+            if not stat.S_ISREG(os.fstat(stream.fileno()).st_mode):
+                raise ProfileCoordinatorError(f"{label} is not a regular file")
+            return stream.read()
+    except OSError as error:
+        raise ProfileCoordinatorError(f"{label} cannot be read: {error}") from error
+
+
+def _effective_worker_shape(requested: int, *, linux: bool) -> dict[str, int]:
+    generic_workers = requested if linux else 1
+    return {
+        "raw": requested,
+        "normalized_exact": requested,
+        "reflected_interval": generic_workers,
+        "dilation": generic_workers,
+    }
+
+
 def _validate_revision(value: str) -> None:
     if len(value) != 40 or any(character not in "0123456789abcdef" for character in value):
         raise ProfileCoordinatorError(
@@ -373,6 +407,7 @@ def _reconstruct_topology_route(
     directions_expected: int,
     coordinator_pid: int,
     coordinator_group: int,
+    worker_elapsed_seconds: float,
 ) -> dict[str, object]:
     detail = _dict(value, f"{route} worker topology route")
     integer_fields = {
@@ -426,6 +461,7 @@ def _reconstruct_topology_route(
             or task.get("ppid") != coordinator_pid
             or task.get("pgid") != coordinator_group
             or finished <= started
+            or finished > worker_elapsed_seconds
         ):
             raise ProfileCoordinatorError(
                 f"{route} worker task identity or lifetime is malformed"
@@ -565,6 +601,10 @@ def _reconstruct_worker_topology(
         raise ProfileCoordinatorError("worker topology differs from the supervised coordinator")
     settings = _dict(receipt.get("settings"), "receipt settings")
     configured = _dict(settings.get("effective_workers"), "configured route workers")
+    clocks = _dict(receipt.get("clocks"), "receipt clocks")
+    worker_elapsed_seconds = _finite_nonnegative(
+        clocks.get("worker_elapsed_seconds"), "worker elapsed"
+    )
     route_summaries = _dict(summary.get("routes"), "worker topology route summaries")
     if set(route_summaries) != {"raw", "normalized_exact"}:
         raise ProfileCoordinatorError("worker topology route summary set changed")
@@ -608,6 +648,7 @@ def _reconstruct_worker_topology(
             directions_expected=directions_expected,
             coordinator_pid=coordinator_pid,
             coordinator_group=coordinator_group,
+            worker_elapsed_seconds=worker_elapsed_seconds,
         )
         digest = _sha256(raw)
         expected_summary = derived | {"record_path": filename, "record_sha256": digest}
@@ -643,17 +684,17 @@ def _validate_inventory_receipt(
     identity = _dict(invocation.get("identity"), "receipt invocation identity")
     settings = _dict(receipt.get("settings"), "receipt settings")
     requested = settings.get("requested_workers")
+    execution_platform = invocation.get("platform")
     if (
         invocation.get("run_order") != run_order
+        or not isinstance(execution_platform, str)
+        or not execution_platform.strip()
         or type(requested) is not int
         or not 1 <= cast(int, requested) <= 4
         or settings.get("effective_workers")
-        != {
-            "raw": requested,
-            "normalized_exact": requested,
-            "reflected_interval": 1,
-            "dilation": 1,
-        }
+        != _effective_worker_shape(
+            cast(int, requested), linux=execution_platform.startswith("Linux")
+        )
         or settings.get("expected_direction_rows") != spec.total_direction_rows
     ):
         raise ProfileCoordinatorError("receipt run order or worker settings changed")
@@ -772,7 +813,7 @@ def inventory_profile(
         raise ProfileCoordinatorError("profile top-level artifact set is not exact")
 
     receipt_path = output_dir / "result.json"
-    receipt_bytes = receipt_path.read_bytes()
+    receipt_bytes = _read_regular_file(receipt_path, "calibration receipt")
     receipt = _strict_json_bytes(receipt_bytes, "calibration receipt")
     identity = _validate_inventory_receipt(
         receipt,
@@ -957,7 +998,10 @@ def _inline_command_output(
 def _read_calibration_identity(
     output_dir: Path, execution_revision: str, run_order: int
 ) -> tuple[dict[str, object], dict[str, object]]:
-    receipt = _strict_json(output_dir / "result.json", "calibration receipt")
+    receipt = _strict_json_bytes(
+        _read_regular_file(output_dir / "result.json", "calibration receipt"),
+        "calibration receipt",
+    )
     if receipt.get("schema") != CALIBRATION_SCHEMA:
         raise ProfileCoordinatorError("calibration receipt schema changed")
     sources = _dict(receipt.get("sources"), "receipt sources")
@@ -990,7 +1034,7 @@ def producer_readback(
     )
     if loaded != receipt:
         raise ProfileCoordinatorError("producer readback changed the retained receipt")
-    data = (output_dir / "result.json").read_bytes()
+    data = _read_regular_file(output_dir / "result.json", "calibration receipt")
     return {
         "schema": "fixed-core-calibration-producer-readback/v1",
         "execution_revision": execution_revision,
@@ -1240,9 +1284,12 @@ def build_summary(run_records: Sequence[dict[str, object]]) -> dict[str, object]
         if record["status"] != "complete" or record["run_order"] != expected_order:
             raise ProfileCoordinatorError("profile sequence is incomplete or out of order")
         profile_dir = Path(cast(str, record["profile_directory"]))
-        receipt = _strict_json(profile_dir / "result.json", "calibration receipt")
+        receipt = _strict_json_bytes(
+            _read_regular_file(profile_dir / "result.json", "calibration receipt"),
+            "calibration receipt",
+        )
         inventory = _dict(record.get("inventory"), "profile inventory")
-        receipt_bytes = (profile_dir / "result.json").read_bytes()
+        receipt_bytes = _read_regular_file(profile_dir / "result.json", "calibration receipt")
         receipt_binding = _dict(record.get("calibration_receipt"), "receipt binding")
         if receipt_binding.get("sha256") != _sha256(receipt_bytes) or receipt_binding.get(
             "bytes"
@@ -1665,7 +1712,9 @@ def validate_profile_record(record: dict[str, object], *, run_root: Path | None 
                 or profile_dir.name != f"profile-{record['run_order']}"
             ):
                 raise ProfileCoordinatorError("profile directory is outside its run-set root")
-            receipt_bytes = (profile_dir / "result.json").read_bytes()
+            receipt_bytes = _read_regular_file(
+                profile_dir / "result.json", "calibration receipt"
+            )
             if receipt_binding["bytes"] != len(receipt_bytes) or receipt_binding[
                 "sha256"
             ] != _sha256(receipt_bytes):
@@ -1722,7 +1771,9 @@ def validate_profile_record(record: dict[str, object], *, run_root: Path | None 
                     raise ProfileCoordinatorError(
                         "profile directory is outside its run-set root"
                     )
-                receipt_bytes = (profile_dir / "result.json").read_bytes()
+                receipt_bytes = _read_regular_file(
+                    profile_dir / "result.json", "calibration receipt"
+                )
                 if receipt_binding["bytes"] != len(receipt_bytes) or receipt_binding[
                     "sha256"
                 ] != _sha256(receipt_bytes):
@@ -1859,12 +1910,10 @@ def validate_summary(
         or external <= calibration
         or grace == 0
         or settings.get("effective_workers")
-        != {
-            "raw": workers,
-            "normalized_exact": workers,
-            "reflected_interval": 1,
-            "dilation": 1,
-        }
+        not in (
+            _effective_worker_shape(cast(int, workers), linux=False),
+            _effective_worker_shape(cast(int, workers), linux=True),
+        )
         or settings.get("expected_direction_rows") != expected_direction_rows
     ):
         raise ProfileCoordinatorError("summary settings are malformed")
@@ -2125,7 +2174,9 @@ def coordinate_profiles(
             record["calibration_command"] = calibration_command
             record["error"] = "calibration evidence readback is pending"
             _publish_profile_record(record_path, record)
-            receipt_bytes = (output_dir / "result.json").read_bytes()
+            receipt_bytes = _read_regular_file(
+                output_dir / "result.json", "calibration receipt"
+            )
             receipt_binding = {
                 "path": "result.json",
                 "bytes": len(receipt_bytes),

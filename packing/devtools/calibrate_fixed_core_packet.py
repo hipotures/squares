@@ -2540,6 +2540,7 @@ def _validate_worker_topology_route(
     coordinator_pid: int,
     coordinator_group: int,
     required: bool,
+    worker_elapsed_seconds: float | None = None,
 ) -> dict[str, object] | None:
     if value is None:
         if required:
@@ -2604,6 +2605,10 @@ def _validate_worker_topology_route(
             or task.get("ppid") != coordinator_pid
             or task.get("pgid") != coordinator_group
             or cast(float, task["finished_seconds"]) <= cast(float, task["started_seconds"])
+            or (
+                worker_elapsed_seconds is not None
+                and cast(float, task["finished_seconds"]) > worker_elapsed_seconds
+            )
         ):
             raise CalibrationError(f"{name} child task is malformed")
         parsed_tasks.append(cast(dict[str, object], task))
@@ -2714,7 +2719,9 @@ def _validate_worker_topology(
     required_routes: Collection[str],
     require_supervisor_binding: bool,
     expected_directions: dict[str, int] | None = None,
+    worker_elapsed_seconds: float | None = None,
 ) -> None:
+    _finite_nonnegative(worker_elapsed_seconds, "worker elapsed topology bound", optional=True)
     summary = resources.get("worker_topology")
     if summary is None and required_routes:
         raise CalibrationError("completed route lacks worker topology")
@@ -2792,6 +2799,7 @@ def _validate_worker_topology(
             coordinator_pid=cast(int, coordinator_pid),
             coordinator_group=cast(int, coordinator_group),
             required=True,
+            worker_elapsed_seconds=worker_elapsed_seconds,
         )
         assert derived is not None
         if route_summary is None:
@@ -3214,6 +3222,7 @@ def load_result(
         supervision,
         required_routes=required_topology,
         require_supervisor_binding=supervision.get("coordinator_pid") is not None,
+        worker_elapsed_seconds=cast(float | None, _clocks(document)["worker_elapsed_seconds"]),
     )
     if document["artifacts"] != _artifact_inventory(
         output_dir,
@@ -3840,6 +3849,7 @@ def supervise_worker(  # noqa: PLR0911
                 cast(dict[str, object], document["supervision"]),
                 required_routes={"raw", "normalized_exact"},
                 require_supervisor_binding=True,
+                worker_elapsed_seconds=cast(float, clocks["worker_elapsed_seconds"]),
             )
         except CalibrationError as error:
             document.update(

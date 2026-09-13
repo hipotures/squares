@@ -892,6 +892,56 @@ def test_parallel_worker_topology_distinguishes_configuration_from_execution() -
     }
 
 
+def test_worker_topology_refuses_coherently_shifted_tasks_past_worker_elapsed() -> None:
+    route = calibration._build_route_worker_topology(
+        "raw-sweep",
+        configured_workers=2,
+        directions_expected=2,
+        coordinator_pid=100,
+        coordinator_group=100,
+        invocation_started=0.0,
+        observations=(
+            WorkerTaskObservation(0, 201, 100, 100, 0.1, 0.3),
+            WorkerTaskObservation(1, 202, 100, 100, 0.2, 0.4),
+        ),
+    )
+    calibration._validate_worker_topology_route(
+        "raw",
+        route,
+        phase="raw-sweep",
+        configured_workers=2,
+        directions_expected=2,
+        coordinator_pid=100,
+        coordinator_group=100,
+        required=True,
+        worker_elapsed_seconds=1.0,
+    )
+
+    for task in cast(list[dict[str, object]], route["tasks"]):
+        task["started_seconds"] = cast(float, task["started_seconds"]) + 100.0
+        task["finished_seconds"] = cast(float, task["finished_seconds"]) + 100.0
+    for child in cast(list[dict[str, object]], route["children"]):
+        child["first_task_started_seconds"] = (
+            cast(float, child["first_task_started_seconds"]) + 100.0
+        )
+        child["last_task_finished_seconds"] = (
+            cast(float, child["last_task_finished_seconds"]) + 100.0
+        )
+
+    with pytest.raises(calibration.CalibrationError, match="child task is malformed"):
+        calibration._validate_worker_topology_route(
+            "raw",
+            route,
+            phase="raw-sweep",
+            configured_workers=2,
+            directions_expected=2,
+            coordinator_pid=100,
+            coordinator_group=100,
+            required=True,
+            worker_elapsed_seconds=1.0,
+        )
+
+
 @pytest.mark.parametrize(
     "mutation",
     [

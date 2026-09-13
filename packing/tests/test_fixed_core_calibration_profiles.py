@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 from copy import deepcopy
 from pathlib import Path
@@ -150,7 +151,24 @@ def _republish_topology_sidecar(output: Path, route: str, sidecar: dict[str, obj
     _publish_fake_receipt(output, receipt)
 
 
-def _fake_receipt(output: Path, run_order: int, *, status: str = "complete") -> None:
+def _replace_receipt_with_special(output: Path, kind: str, target: Path) -> None:
+    receipt_path = output / "result.json"
+    retained = receipt_path.read_bytes()
+    receipt_path.unlink()
+    if kind == "symlink":
+        target.write_bytes(retained)
+        receipt_path.symlink_to(target)
+    else:
+        os.mkfifo(receipt_path)
+
+
+def _fake_receipt(
+    output: Path,
+    run_order: int,
+    *,
+    status: str = "complete",
+    platform_name: str = "macOS-test",
+) -> None:
     directions = {
         "raw-directions": SMALL_SPEC.raw,
         "normalized-exact-directions": SMALL_SPEC.normalized_exact,
@@ -261,14 +279,18 @@ def _fake_receipt(output: Path, run_order: int, *, status: str = "complete") -> 
         "schema": profiles.CALIBRATION_SCHEMA,
         "status": status,
         "sources": {"implementation_revision": REVISION},
-        "invocation": {"run_order": run_order, "identity": identity},
+        "invocation": {
+            "run_order": run_order,
+            "platform": platform_name,
+            "identity": identity,
+        },
         "settings": {
             "requested_workers": 4,
             "effective_workers": {
                 "raw": 4,
                 "normalized_exact": 4,
-                "reflected_interval": 1,
-                "dilation": 1,
+                "reflected_interval": 4 if platform_name.startswith("Linux") else 1,
+                "dilation": 4 if platform_name.startswith("Linux") else 1,
             },
             "calibration_seconds": 5_400.0,
             "external_seconds": 7_200.0,
@@ -335,10 +357,12 @@ class FakeRunner:
         partial_order: int | None = None,
         failed_readback: str | None = None,
         bad_identity: bool = False,
+        platform_name: str = "macOS-test",
     ) -> None:
         self.partial_order = partial_order
         self.failed_readback = failed_readback
         self.bad_identity = bad_identity
+        self.platform_name = platform_name
         self.calibration_orders: list[int] = []
         self.calls: list[tuple[str, ...]] = []
 
@@ -354,6 +378,7 @@ class FakeRunner:
                 output,
                 order,
                 status="partial" if order == self.partial_order else "complete",
+                platform_name=self.platform_name,
             )
             if self.bad_identity:
                 receipt = profiles._strict_json(output / "result.json", "receipt")
@@ -444,6 +469,40 @@ def test_three_profiles_are_sequentially_bound_and_summarized(tmp_path: Path) ->
     ] == [SMALL_SPEC.total_direction_rows] * 3
     profiles.validate_summary(summary, expected_direction_rows=SMALL_SPEC.total_direction_rows)
     assert profiles._strict_json(run_root / "three-profile-summary.json", "summary") == summary
+
+
+def test_linux_worker_shape_is_retained_in_inventory_and_summary(tmp_path: Path) -> None:
+    runner = FakeRunner(platform_name="Linux-test")
+    summary = profiles.coordinate_profiles(
+        repository=tmp_path / "repository",
+        execution_revision=REVISION,
+        run_root=tmp_path / "profiles",
+        workers=4,
+        calibration_seconds=5_400.0,
+        external_seconds=7_200.0,
+        grace_seconds=2.0,
+        cache_observations=("cache-1", "cache-2", "cache-3"),
+        background_loads=("load-1", "load-2", "load-3"),
+        runner=runner,
+        clock=iter((1.0, 2.0, 3.0, 4.0, 5.0, 6.0)).__next__,
+        inventory_spec=SMALL_SPEC,
+    )
+    profiles.validate_summary(summary, expected_direction_rows=SMALL_SPEC.total_direction_rows)
+    settings = cast(dict[str, object], summary["settings"])
+    effective = cast(dict[str, object], settings["effective_workers"])
+    assert effective["reflected_interval"] == effective["dilation"] == 4
+
+    output = tmp_path / "profiles/profile-1"
+    receipt = profiles._strict_json(output / "result.json", "receipt")
+    configured = cast(
+        dict[str, object], cast(dict[str, object], receipt["settings"])["effective_workers"]
+    )
+    configured["dilation"] = 1
+    _publish_fake_receipt(output, receipt)
+    with pytest.raises(profiles.ProfileCoordinatorError, match="worker settings changed"):
+        profiles.inventory_profile(
+            output, execution_revision=REVISION, run_order=1, spec=SMALL_SPEC
+        )
 
 
 def test_first_noncomplete_profile_stops_the_series(tmp_path: Path) -> None:
@@ -642,6 +701,70 @@ def test_inventory_mutations_are_refused(tmp_path: Path, mutation: str) -> None:
         )
 
 
+@pytest.mark.parametrize("kind", ["symlink", "fifo"])
+def test_result_receipt_special_file_is_refused_before_read(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, kind: str
+) -> None:
+    output = tmp_path / "profile"
+    _fake_receipt(output, 1)
+    _replace_receipt_with_special(output, kind, tmp_path / "receipt-target.json")
+
+    original_read_bytes = Path.read_bytes
+
+    def guarded_read_bytes(path: Path) -> bytes:
+        if path.name == "result.json" and (path.is_symlink() or not path.is_file()):
+            raise AssertionError("special receipt content was read")
+        return original_read_bytes(path)
+
+    monkeypatch.setattr(Path, "read_bytes", guarded_read_bytes)
+    with pytest.raises(profiles.ProfileCoordinatorError, match="not a regular file"):
+        profiles.inventory_profile(
+            output, execution_revision=REVISION, run_order=1, spec=SMALL_SPEC
+        )
+
+
+@pytest.mark.parametrize("kind", ["symlink", "fifo"])
+def test_coordinator_refuses_special_result_before_read(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, kind: str
+) -> None:
+    fake = FakeRunner()
+    original_read_bytes = Path.read_bytes
+
+    def guarded_read_bytes(path: Path) -> bytes:
+        if path.name == "result.json" and (path.is_symlink() or not path.is_file()):
+            raise AssertionError("special receipt content was read")
+        return original_read_bytes(path)
+
+    monkeypatch.setattr(Path, "read_bytes", guarded_read_bytes)
+
+    def runner(arguments: profiles.Sequence[str]) -> subprocess.CompletedProcess[bytes]:
+        result = fake(arguments)
+        if arguments[2] == profiles.CALIBRATION_MODULE:
+            output = Path(_argument(tuple(arguments), "--output-dir"))
+            _replace_receipt_with_special(output, kind, tmp_path / "receipt-target.json")
+        return result
+
+    run_root = tmp_path / "profiles"
+    with pytest.raises(profiles.ProfileCoordinatorError, match="profile 1 refused"):
+        profiles.coordinate_profiles(
+            repository=tmp_path / "repository",
+            execution_revision=REVISION,
+            run_root=run_root,
+            workers=4,
+            calibration_seconds=5_400.0,
+            external_seconds=7_200.0,
+            grace_seconds=2.0,
+            cache_observations=("cache-1", "cache-2", "cache-3"),
+            background_loads=("load-1", "load-2", "load-3"),
+            runner=runner,
+            clock=iter((1.0, 2.0)).__next__,
+            inventory_spec=SMALL_SPEC,
+        )
+    refused = profiles._strict_json(run_root / "profile-1-run.json", "profile record")
+    assert refused["status"] == "refused"
+    assert "not a regular file" in cast(str, refused["error"])
+
+
 def test_inventory_binds_topology_sidecars_as_exact_artifacts(tmp_path: Path) -> None:
     output = tmp_path / "profile"
     _fake_receipt(output, 1)
@@ -728,6 +851,7 @@ def test_inventory_refuses_unbound_topology_artifacts(tmp_path: Path, mutation: 
         "configured",
         "task-parent",
         "task-lifetime",
+        "task-after-worker-elapsed",
         "task-overlap",
         "simultaneous",
         "child-summary",
@@ -748,6 +872,17 @@ def test_inventory_reconstructs_topology_observations(tmp_path: Path, mutation: 
         tasks[0]["ppid"] = cast(int, tasks[0]["ppid"]) + 1
     elif mutation == "task-lifetime":
         tasks[0]["finished_seconds"] = tasks[0]["started_seconds"]
+    elif mutation == "task-after-worker-elapsed":
+        for task in tasks:
+            task["started_seconds"] = cast(float, task["started_seconds"]) + 100.0
+            task["finished_seconds"] = cast(float, task["finished_seconds"]) + 100.0
+        for child in children:
+            child["first_task_started_seconds"] = (
+                cast(float, child["first_task_started_seconds"]) + 100.0
+            )
+            child["last_task_finished_seconds"] = (
+                cast(float, child["last_task_finished_seconds"]) + 100.0
+            )
     elif mutation == "task-overlap":
         tasks[1]["pid"] = tasks[0]["pid"]
     elif mutation == "simultaneous":
