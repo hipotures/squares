@@ -731,7 +731,7 @@ Status: **active**. Select and execute short, high-information blocks across dis
 
 | id | status | title | rounds | opened because |
 | --- | --- | --- | --- | --- |
-| series-000 | open | S0: smoke and calibration — prove the machinery, establish every baseline metric | 113 | First series. There is no prior instrument, so not |
+| series-000 | open | S0: smoke and calibration — prove the machinery, establish every baseline metric | 114 | First series. There is no prior instrument, so not |
 
 ## Registry
 
@@ -872,6 +872,7 @@ Status: **active**. Select and execute short, high-information blocks across dis
 | H-157 | refuted | proof | Refining the corner-owner angular bins from eight to sixteen makes eve |  | 1 |  | 5.9m wall |
 | H-158 | unresolved | proof | For exp151's direction-6 saved residual on selected tuple (0,0,0,7), e |  | 1 |  | 21s wall |
 | H-159 | refuted | proof | For every admissible bottom-left one-corner role-C unit parent X with  |  | 1 |  | 2s wall |
+| H-161 | running | proof | In the frozen BC303 377-atom measure, the closed literal parent Q0=[0, |  | 1 |  |  |
 
 ## Needs review — held for a human, not decided
 
@@ -1024,6 +1025,12 @@ Status: **active**. Select and execute short, high-information blocks across dis
 | exp-031 | series-000 | 10 | openai-codex | H-002 | All four source perturbations satisfy every declared condition and return to the proved side within floating-point precision. This confirms the narrow known-answer control without reopening H-002's refuted universal claim. |
 | exp-032 | series-000 | 3 | openai-codex | H-021 | The exact connected and isolated controls pass, every declared conflation fails, and all unsupported floating-point observations remain unresolved. |
 
+### in-progress (1)
+
+| id | series | instance | operator | hypotheses | reason |
+| --- | --- | --- | --- | --- | --- |
+| exp-159 | series-000 | 11 | Codex source-distinct reviewer, then exact target operator | H-161 | The source-bound literal target has not run. |
+
 ## Resumable — stopped on the clock, not on an answer
 
 | id | hypotheses | spent | stopped by | resume from | reopen when |
@@ -1045,7 +1052,7 @@ Status: **active**. Select and execute short, high-information blocks across dis
 
 ## Effort
 
-113 rounds, 2152.1 agent-minutes, 1485.2 wall-minutes.
+114 rounds, 2152.1 agent-minutes, 1485.2 wall-minutes.
 
 ## Exploration reports not yet codified
 
