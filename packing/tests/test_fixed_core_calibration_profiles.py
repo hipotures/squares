@@ -34,6 +34,122 @@ def _write_json(path: Path, value: object) -> None:
     path.write_text(json.dumps(value, indent=1, allow_nan=False) + "\n", encoding="utf-8")
 
 
+def _fake_topology_route(
+    *, phase: str, coordinator_pid: int, first_child_pid: int, start: float
+) -> dict[str, object]:
+    tasks = [
+        {
+            "direction": 0,
+            "pid": first_child_pid,
+            "ppid": coordinator_pid,
+            "pgid": coordinator_pid,
+            "started_seconds": start,
+            "finished_seconds": start + 0.3,
+        },
+        {
+            "direction": 1,
+            "pid": first_child_pid + 1,
+            "ppid": coordinator_pid,
+            "pgid": coordinator_pid,
+            "started_seconds": start + 0.1,
+            "finished_seconds": start + 0.4,
+        },
+    ]
+    children = [
+        {
+            "role": "route-worker",
+            "phase": phase,
+            "pid": task["pid"],
+            "ppid": coordinator_pid,
+            "pgid": coordinator_pid,
+            "tasks_completed": 1,
+            "first_task_started_seconds": task["started_seconds"],
+            "last_task_finished_seconds": task["finished_seconds"],
+        }
+        for task in tasks
+    ]
+    return {
+        "phase": phase,
+        "execution_model": "process-pool",
+        "configured_workers": 4,
+        "directions_expected": 2,
+        "directions_completed": 2,
+        "child_tasks_observed": 2,
+        "observed_child_count": 2,
+        "maximum_simultaneous_children": 2,
+        "tasks": tasks,
+        "children": children,
+    }
+
+
+def _publish_fake_receipt(output: Path, receipt: dict[str, object]) -> None:
+    directions = {
+        "raw-directions": SMALL_SPEC.raw,
+        "normalized-exact-directions": SMALL_SPEC.normalized_exact,
+        "normalized-interval-directions": SMALL_SPEC.normalized_interval,
+        "dilation-directions": SMALL_SPEC.dilation,
+    }
+    size = 0
+    for _attempt in range(10):
+        rows = []
+        for role, relative, *_rest in profiles._DIRECTION_ROLES:
+            files = tuple(output / relative / name for name in directions[relative])
+            rows.append(
+                {
+                    "role": role,
+                    "path": relative,
+                    "count": len(files),
+                    "bytes": sum(path.stat().st_size for path in files),
+                }
+            )
+        rows.extend(
+            {
+                "role": role,
+                "path": relative,
+                "count": 1,
+                "bytes": size
+                if relative == "result.json"
+                else (output / relative).stat().st_size,
+            }
+            for role, relative in profiles._SINGLE_FILE_ROLES
+        )
+        receipt["artifacts"] = rows
+        encoded = json.dumps(receipt, indent=2, allow_nan=False) + "\n"
+        next_size = len(encoded.encode())
+        if next_size == size:
+            (output / "result.json").write_text(encoded, encoding="utf-8")
+            return
+        size = next_size
+    raise AssertionError("fake receipt size did not converge")
+
+
+def _rewrite_receipt_with_retained_artifacts(output: Path, receipt: dict[str, object]) -> None:
+    artifacts = cast(list[dict[str, object]], receipt["artifacts"])
+    result_row = next(row for row in artifacts if row["role"] == "calibration-receipt")
+    size = 0
+    for _attempt in range(10):
+        result_row["bytes"] = size
+        encoded = json.dumps(receipt, indent=2, allow_nan=False) + "\n"
+        next_size = len(encoded.encode())
+        if next_size == size:
+            (output / "result.json").write_text(encoded, encoding="utf-8")
+            return
+        size = next_size
+    raise AssertionError("mutated receipt size did not converge")
+
+
+def _republish_topology_sidecar(output: Path, route: str, sidecar: dict[str, object]) -> None:
+    filename = f"{route.replace('_', '-')}-worker-topology.json"
+    _write_json(output / filename, sidecar)
+    receipt = profiles._strict_json(output / "result.json", "receipt")
+    resources = cast(dict[str, object], receipt["resources"])
+    topology = cast(dict[str, object], resources["worker_topology"])
+    summaries = cast(dict[str, object], topology["routes"])
+    summary = cast(dict[str, object], summaries[route])
+    summary["record_sha256"] = profiles._sha256((output / filename).read_bytes())
+    _publish_fake_receipt(output, receipt)
+
+
 def _fake_receipt(output: Path, run_order: int, *, status: str = "complete") -> None:
     directions = {
         "raw-directions": SMALL_SPEC.raw,
@@ -75,6 +191,51 @@ def _fake_receipt(output: Path, run_order: int, *, status: str = "complete") -> 
             _write_json(output / directory / name, row)
     for name in ("candidate.json", "dilation.json", "rss-samples.json"):
         _write_json(output / name, {"fixture": name})
+
+    coordinator_pid = 10_000 + run_order
+    coordinator = {
+        "role": "coordinator",
+        "pid": coordinator_pid,
+        "ppid": 9_999,
+        "pgid": coordinator_pid,
+    }
+    topology_routes = {
+        "raw": _fake_topology_route(
+            phase="raw-sweep",
+            coordinator_pid=coordinator_pid,
+            first_child_pid=20_000 + 10 * run_order,
+            start=0.1,
+        ),
+        "normalized_exact": _fake_topology_route(
+            phase="normalized-exact",
+            coordinator_pid=coordinator_pid,
+            first_child_pid=30_000 + 10 * run_order,
+            start=0.6,
+        ),
+    }
+    topology_summaries: dict[str, object] = {}
+    for route, filename in (
+        ("raw", "raw-worker-topology.json"),
+        ("normalized_exact", "normalized-exact-worker-topology.json"),
+    ):
+        detail = cast(dict[str, object], topology_routes[route])
+        _write_json(
+            output / filename,
+            {
+                "schema": profiles.WORKER_TOPOLOGY_ROUTE_SCHEMA,
+                "scope": profiles.WORKER_TOPOLOGY_SCOPE,
+                "coordinator": coordinator,
+                "route": detail,
+            },
+        )
+        topology_summaries[route] = {
+            "configured_workers": detail["configured_workers"],
+            "execution_model": detail["execution_model"],
+            "observed_child_count": detail["observed_child_count"],
+            "maximum_simultaneous_children": detail["maximum_simultaneous_children"],
+            "record_path": filename,
+            "record_sha256": profiles._sha256((output / filename).read_bytes()),
+        }
 
     direction_digests = {
         directory: profiles._direction_digest(
@@ -129,6 +290,12 @@ def _fake_receipt(output: Path, run_order: int, *, status: str = "complete") -> 
                 "observer_errors": [],
                 "samples_sha256": profiles._sha256((output / "rss-samples.json").read_bytes()),
             },
+            "worker_topology": {
+                "schema": profiles.WORKER_TOPOLOGY_SCHEMA,
+                "scope": profiles.WORKER_TOPOLOGY_SCOPE,
+                "coordinator": coordinator,
+                "routes": topology_summaries,
+            },
         },
         "raw": {"directions_sha256": direction_digests["raw-directions"]},
         "normalized": {"sha256": profiles._sha256((output / "candidate.json").read_bytes())},
@@ -151,43 +318,14 @@ def _fake_receipt(output: Path, run_order: int, *, status: str = "complete") -> 
             "worker_exit_status": 0,
             "process_group_reaped": True,
             "supervisor_signal": None,
+            "coordinator_pid": coordinator_pid,
+            "coordinator_process_group_id": coordinator_pid,
         },
         "disposition": "calibration-passed" if status == "complete" else "incomplete",
         "phase": "complete" if status == "complete" else "readback",
         "error": None if status == "complete" else "fixture interruption",
     }
-    size = 0
-    for _attempt in range(10):
-        rows = []
-        for role, relative, *_rest in profiles._DIRECTION_ROLES:
-            files = tuple(output / relative / name for name in directions[relative])
-            rows.append(
-                {
-                    "role": role,
-                    "path": relative,
-                    "count": len(files),
-                    "bytes": sum(path.stat().st_size for path in files),
-                }
-            )
-        rows.extend(
-            {
-                "role": role,
-                "path": relative,
-                "count": 1,
-                "bytes": size
-                if relative == "result.json"
-                else (output / relative).stat().st_size,
-            }
-            for role, relative in profiles._SINGLE_FILE_ROLES
-        )
-        receipt["artifacts"] = rows
-        encoded = json.dumps(receipt, indent=2, allow_nan=False) + "\n"
-        next_size = len(encoded.encode())
-        if next_size == size:
-            (output / "result.json").write_text(encoded, encoding="utf-8")
-            return
-        size = next_size
-    raise AssertionError("fake receipt size did not converge")
+    _publish_fake_receipt(output, receipt)
 
 
 class FakeRunner:
@@ -495,6 +633,209 @@ def test_inventory_mutations_are_refused(tmp_path: Path, mutation: str) -> None:
         receipt = profiles._strict_json(output / "result.json", "receipt")
         cast(dict[str, object], receipt["raw"])["directions_sha256"] = "0" * 64
         _write_json(output / "result.json", receipt)
+    with pytest.raises(profiles.ProfileCoordinatorError):
+        profiles.inventory_profile(
+            output,
+            execution_revision=REVISION,
+            run_order=1,
+            spec=SMALL_SPEC,
+        )
+
+
+def test_inventory_binds_topology_sidecars_as_exact_artifacts(tmp_path: Path) -> None:
+    output = tmp_path / "profile"
+    _fake_receipt(output, 1)
+
+    inventory = profiles.inventory_profile(
+        output,
+        execution_revision=REVISION,
+        run_order=1,
+        spec=SMALL_SPEC,
+    )
+    by_role = {
+        cast(str, row["role"]): row
+        for row in cast(list[dict[str, object]], inventory["artifacts"])
+    }
+    for role, filename in (
+        ("raw-worker-topology", "raw-worker-topology.json"),
+        ("normalized-exact-worker-topology", "normalized-exact-worker-topology.json"),
+    ):
+        retained = (output / filename).read_bytes()
+        assert by_role[role] == {
+            "role": role,
+            "path": filename,
+            "count": 1,
+            "bytes": len(retained),
+            "sha256": profiles._sha256(retained),
+        }
+
+
+def test_inventory_refuses_retired_four_field_supervision(tmp_path: Path) -> None:
+    output = tmp_path / "profile"
+    _fake_receipt(output, 1)
+    receipt = profiles._strict_json(output / "result.json", "receipt")
+    supervision = cast(dict[str, object], receipt["supervision"])
+    del supervision["coordinator_pid"]
+    del supervision["coordinator_process_group_id"]
+    _publish_fake_receipt(output, receipt)
+
+    with pytest.raises(profiles.ProfileCoordinatorError, match="reaped successful worker"):
+        profiles.inventory_profile(
+            output,
+            execution_revision=REVISION,
+            run_order=1,
+            spec=SMALL_SPEC,
+        )
+
+
+@pytest.mark.parametrize("mutation", ["missing", "digest", "count", "bytes"])
+def test_inventory_refuses_unbound_topology_artifacts(tmp_path: Path, mutation: str) -> None:
+    output = tmp_path / "profile"
+    _fake_receipt(output, 1)
+    if mutation == "missing":
+        (output / "raw-worker-topology.json").unlink()
+    else:
+        receipt = profiles._strict_json(output / "result.json", "receipt")
+        if mutation == "digest":
+            resources = cast(dict[str, object], receipt["resources"])
+            topology = cast(dict[str, object], resources["worker_topology"])
+            routes = cast(dict[str, object], topology["routes"])
+            raw = cast(dict[str, object], routes["raw"])
+            raw["record_sha256"] = "0" * 64
+            _publish_fake_receipt(output, receipt)
+        else:
+            artifacts = cast(list[dict[str, object]], receipt["artifacts"])
+            row = next(row for row in artifacts if row["role"] == "raw-worker-topology")
+            if mutation == "count":
+                row["count"] = 2
+            else:
+                row["bytes"] = cast(int, row["bytes"]) + 1
+            _rewrite_receipt_with_retained_artifacts(output, receipt)
+
+    with pytest.raises(profiles.ProfileCoordinatorError):
+        profiles.inventory_profile(
+            output,
+            execution_revision=REVISION,
+            run_order=1,
+            spec=SMALL_SPEC,
+        )
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "schema",
+        "configured",
+        "task-parent",
+        "task-lifetime",
+        "task-overlap",
+        "simultaneous",
+        "child-summary",
+    ],
+)
+def test_inventory_reconstructs_topology_observations(tmp_path: Path, mutation: str) -> None:
+    output = tmp_path / "profile"
+    _fake_receipt(output, 1)
+    sidecar = profiles._strict_json(output / "raw-worker-topology.json", "raw worker topology")
+    detail = cast(dict[str, object], sidecar["route"])
+    tasks = cast(list[dict[str, object]], detail["tasks"])
+    children = cast(list[dict[str, object]], detail["children"])
+    if mutation == "schema":
+        sidecar["schema"] = "fixed-core-packet-calibration-worker-route/v0"
+    elif mutation == "configured":
+        detail["configured_workers"] = 3
+    elif mutation == "task-parent":
+        tasks[0]["ppid"] = cast(int, tasks[0]["ppid"]) + 1
+    elif mutation == "task-lifetime":
+        tasks[0]["finished_seconds"] = tasks[0]["started_seconds"]
+    elif mutation == "task-overlap":
+        tasks[1]["pid"] = tasks[0]["pid"]
+    elif mutation == "simultaneous":
+        detail["maximum_simultaneous_children"] = 1
+    else:
+        children[0]["tasks_completed"] = 2
+    _republish_topology_sidecar(output, "raw", sidecar)
+
+    with pytest.raises(profiles.ProfileCoordinatorError):
+        profiles.inventory_profile(
+            output,
+            execution_revision=REVISION,
+            run_order=1,
+            spec=SMALL_SPEC,
+        )
+
+
+def test_inventory_accepts_coordinator_serial_topology(tmp_path: Path) -> None:
+    output = tmp_path / "profile"
+    _fake_receipt(output, 1)
+    receipt = profiles._strict_json(output / "result.json", "receipt")
+    settings = cast(dict[str, object], receipt["settings"])
+    settings["requested_workers"] = 1
+    effective = cast(dict[str, object], settings["effective_workers"])
+    effective["raw"] = 1
+    effective["normalized_exact"] = 1
+    invocation = cast(dict[str, object], receipt["invocation"])
+    identity = cast(dict[str, object], invocation["identity"])
+    identity["requested_workers"] = 1
+    resources = cast(dict[str, object], receipt["resources"])
+    topology = cast(dict[str, object], resources["worker_topology"])
+    summaries = cast(dict[str, object], topology["routes"])
+    for route, filename in (
+        ("raw", "raw-worker-topology.json"),
+        ("normalized_exact", "normalized-exact-worker-topology.json"),
+    ):
+        sidecar = profiles._strict_json(output / filename, filename)
+        detail = cast(dict[str, object], sidecar["route"])
+        detail.update(
+            {
+                "execution_model": "coordinator-serial",
+                "configured_workers": 1,
+                "child_tasks_observed": 0,
+                "observed_child_count": 0,
+                "maximum_simultaneous_children": 0,
+                "tasks": [],
+                "children": [],
+            }
+        )
+        _write_json(output / filename, sidecar)
+        summaries[route] = {
+            "configured_workers": 1,
+            "execution_model": "coordinator-serial",
+            "observed_child_count": 0,
+            "maximum_simultaneous_children": 0,
+            "record_path": filename,
+            "record_sha256": profiles._sha256((output / filename).read_bytes()),
+        }
+    _publish_fake_receipt(output, receipt)
+
+    profiles.inventory_profile(
+        output,
+        execution_revision=REVISION,
+        run_order=1,
+        spec=SMALL_SPEC,
+    )
+
+
+@pytest.mark.parametrize("mutation", ["route-summary", "supervisor-binding"])
+def test_inventory_reconstructs_topology_receipt_bindings(
+    tmp_path: Path, mutation: str
+) -> None:
+    output = tmp_path / "profile"
+    _fake_receipt(output, 1)
+    receipt = profiles._strict_json(output / "result.json", "receipt")
+    if mutation == "route-summary":
+        resources = cast(dict[str, object], receipt["resources"])
+        topology = cast(dict[str, object], resources["worker_topology"])
+        routes = cast(dict[str, object], topology["routes"])
+        raw = cast(dict[str, object], routes["raw"])
+        raw["observed_child_count"] = 3
+    else:
+        supervision = cast(dict[str, object], receipt["supervision"])
+        supervised_pid = cast(int, supervision["coordinator_pid"]) + 1
+        supervision["coordinator_pid"] = supervised_pid
+        supervision["coordinator_process_group_id"] = supervised_pid
+    _publish_fake_receipt(output, receipt)
+
     with pytest.raises(profiles.ProfileCoordinatorError):
         profiles.inventory_profile(
             output,

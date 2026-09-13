@@ -27,6 +27,14 @@ EVIDENCE_SCOPE = (
 )
 CALIBRATION_MODULE = "devtools.calibrate_fixed_core_packet"
 PROFILE_COUNT = 3
+WORKER_TOPOLOGY_SCHEMA = "fixed-core-packet-calibration-worker-topology/v1"
+WORKER_TOPOLOGY_ROUTE_SCHEMA = "fixed-core-packet-calibration-worker-route/v1"
+WORKER_TOPOLOGY_SCOPE = (
+    "route-scoped coordinator and completed process-pool task lifetimes observed by "
+    "the calibration worker; configured workers are reported separately from actual "
+    "child identities and simultaneous task execution, and no process arguments or "
+    "unrelated host-process metadata are retained"
+)
 
 
 class ProfileCoordinatorError(ValueError):
@@ -83,6 +91,8 @@ _SINGLE_FILE_ROLES = (
     ("normalized-candidate", "candidate.json"),
     ("generic-dilation-record", "dilation.json"),
     ("rss-observations", "rss-samples.json"),
+    ("raw-worker-topology", "raw-worker-topology.json"),
+    ("normalized-exact-worker-topology", "normalized-exact-worker-topology.json"),
     ("calibration-receipt", "result.json"),
 )
 _CLOCK_METRICS = (
@@ -307,6 +317,308 @@ def _known_answer_row(role: str, path: Path, row: dict[str, object]) -> None:
         raise ProfileCoordinatorError(f"{role} known-answer row failed at {path.name}")
 
 
+def _topology_coordinator(value: object, label: str) -> dict[str, object]:
+    coordinator = _dict(value, label)
+    pid = coordinator.get("pid")
+    if (
+        set(coordinator) != {"role", "pid", "ppid", "pgid"}
+        or coordinator.get("role") != "coordinator"
+        or type(pid) is not int
+        or cast(int, pid) <= 0
+        or type(coordinator.get("ppid")) is not int
+        or cast(int, coordinator["ppid"]) <= 0
+        or coordinator.get("pgid") != pid
+    ):
+        raise ProfileCoordinatorError(f"{label} is malformed")
+    return coordinator
+
+
+def _maximum_simultaneous_children(
+    intervals: Sequence[tuple[float, float, int]], *, route: str
+) -> int:
+    active: set[int] = set()
+    maximum = 0
+    events = sorted(
+        (
+            (when, event_order, pid)
+            for started, finished, pid in intervals
+            for when, event_order in ((finished, 0), (started, 1))
+        )
+    )
+    for _when, event_order, pid in events:
+        if event_order == 0:
+            if pid not in active:
+                raise ProfileCoordinatorError(
+                    f"{route} worker task lifetimes overlap for one child"
+                )
+            active.remove(pid)
+        else:
+            if pid in active:
+                raise ProfileCoordinatorError(
+                    f"{route} worker task lifetimes overlap for one child"
+                )
+            active.add(pid)
+            maximum = max(maximum, len(active))
+    if active:
+        raise ProfileCoordinatorError(f"{route} worker task lifetimes are unbalanced")
+    return maximum
+
+
+def _reconstruct_topology_route(
+    value: object,
+    *,
+    route: str,
+    phase: str,
+    configured_workers: int,
+    directions_expected: int,
+    coordinator_pid: int,
+    coordinator_group: int,
+) -> dict[str, object]:
+    detail = _dict(value, f"{route} worker topology route")
+    integer_fields = {
+        "configured_workers",
+        "directions_expected",
+        "directions_completed",
+        "child_tasks_observed",
+        "observed_child_count",
+        "maximum_simultaneous_children",
+    }
+    if set(detail) != {
+        "phase",
+        "execution_model",
+        *integer_fields,
+        "tasks",
+        "children",
+    } or any(type(detail.get(name)) is not int for name in integer_fields):
+        raise ProfileCoordinatorError(f"{route} worker topology fields changed")
+    if (
+        detail.get("phase") != phase
+        or detail.get("configured_workers") != configured_workers
+        or detail.get("directions_expected") != directions_expected
+        or detail.get("directions_completed") != directions_expected
+    ):
+        raise ProfileCoordinatorError(
+            f"{route} worker topology differs from configured workers or directions"
+        )
+
+    tasks = _list(detail.get("tasks"), f"{route} worker tasks")
+    parsed_tasks: list[dict[str, object]] = []
+    for value_task in tasks:
+        task = _dict(value_task, f"{route} worker task")
+        if set(task) != {
+            "direction",
+            "pid",
+            "ppid",
+            "pgid",
+            "started_seconds",
+            "finished_seconds",
+        }:
+            raise ProfileCoordinatorError(f"{route} worker task fields changed")
+        started = _finite_nonnegative(task.get("started_seconds"), f"{route} worker task start")
+        finished = _finite_nonnegative(
+            task.get("finished_seconds"), f"{route} worker task finish"
+        )
+        if (
+            type(task.get("direction")) is not int
+            or not 0 <= cast(int, task["direction"]) < directions_expected
+            or type(task.get("pid")) is not int
+            or cast(int, task["pid"]) <= 0
+            or task.get("ppid") != coordinator_pid
+            or task.get("pgid") != coordinator_group
+            or finished <= started
+        ):
+            raise ProfileCoordinatorError(
+                f"{route} worker task identity or lifetime is malformed"
+            )
+        parsed_tasks.append(task)
+    if configured_workers > 1 and [task["direction"] for task in parsed_tasks] != list(
+        range(directions_expected)
+    ):
+        raise ProfileCoordinatorError(f"{route} worker tasks do not bind every direction")
+
+    children = _list(detail.get("children"), f"{route} worker children")
+    parsed_children: list[dict[str, object]] = []
+    for value_child in children:
+        child = _dict(value_child, f"{route} worker child")
+        if set(child) != {
+            "role",
+            "phase",
+            "pid",
+            "ppid",
+            "pgid",
+            "tasks_completed",
+            "first_task_started_seconds",
+            "last_task_finished_seconds",
+        }:
+            raise ProfileCoordinatorError(f"{route} worker child fields changed")
+        first = _finite_nonnegative(
+            child.get("first_task_started_seconds"), f"{route} worker child first task"
+        )
+        last = _finite_nonnegative(
+            child.get("last_task_finished_seconds"), f"{route} worker child last task"
+        )
+        if (
+            child.get("role") != "route-worker"
+            or child.get("phase") != phase
+            or type(child.get("pid")) is not int
+            or cast(int, child["pid"]) <= 0
+            or child.get("ppid") != coordinator_pid
+            or child.get("pgid") != coordinator_group
+            or type(child.get("tasks_completed")) is not int
+            or cast(int, child["tasks_completed"]) <= 0
+            or last < first
+        ):
+            raise ProfileCoordinatorError(
+                f"{route} worker child identity or lifetime is malformed"
+            )
+        parsed_children.append(child)
+
+    child_pids = [cast(int, child["pid"]) for child in parsed_children]
+    if child_pids != sorted(set(child_pids)):
+        raise ProfileCoordinatorError(
+            f"{route} worker child identities are duplicated or unordered"
+        )
+    task_pids = {cast(int, task["pid"]) for task in parsed_tasks}
+    maximum_simultaneous = _maximum_simultaneous_children(
+        tuple(
+            (
+                cast(float, task["started_seconds"]),
+                cast(float, task["finished_seconds"]),
+                cast(int, task["pid"]),
+            )
+            for task in parsed_tasks
+        ),
+        route=route,
+    )
+    expected_children = [
+        {
+            "role": "route-worker",
+            "phase": phase,
+            "pid": pid,
+            "ppid": coordinator_pid,
+            "pgid": coordinator_group,
+            "tasks_completed": len(pid_tasks),
+            "first_task_started_seconds": min(
+                cast(float, task["started_seconds"]) for task in pid_tasks
+            ),
+            "last_task_finished_seconds": max(
+                cast(float, task["finished_seconds"]) for task in pid_tasks
+            ),
+        }
+        for pid in sorted(task_pids)
+        for pid_tasks in ([task for task in parsed_tasks if task["pid"] == pid],)
+    ]
+    observed_count = len(parsed_children)
+    child_tasks = sum(cast(int, child["tasks_completed"]) for child in parsed_children)
+    if configured_workers == 1:
+        if (
+            detail.get("execution_model") != "coordinator-serial"
+            or tasks
+            or children
+            or detail.get("child_tasks_observed") != 0
+            or detail.get("observed_child_count") != 0
+            or detail.get("maximum_simultaneous_children") != 0
+        ):
+            raise ProfileCoordinatorError(f"serial {route} topology reports child execution")
+    elif (
+        detail.get("execution_model") != "process-pool"
+        or not parsed_tasks
+        or child_tasks != directions_expected
+        or detail.get("child_tasks_observed") != child_tasks
+        or detail.get("observed_child_count") != observed_count
+        or detail.get("maximum_simultaneous_children") != maximum_simultaneous
+        or not 1 <= observed_count <= configured_workers
+        or not 1 <= maximum_simultaneous <= observed_count
+        or set(child_pids) != task_pids
+        or parsed_children != expected_children
+    ):
+        raise ProfileCoordinatorError(f"{route} topology does not reconstruct from child tasks")
+    return {
+        "configured_workers": configured_workers,
+        "execution_model": detail["execution_model"],
+        "observed_child_count": observed_count,
+        "maximum_simultaneous_children": maximum_simultaneous,
+    }
+
+
+def _reconstruct_worker_topology(
+    output_dir: Path, receipt: dict[str, object], spec: InventorySpec
+) -> dict[str, str]:
+    resources = _dict(receipt.get("resources"), "receipt resources")
+    summary = _dict(resources.get("worker_topology"), "worker topology summary")
+    if (
+        set(summary) != {"schema", "scope", "coordinator", "routes"}
+        or summary.get("schema") != WORKER_TOPOLOGY_SCHEMA
+        or summary.get("scope") != WORKER_TOPOLOGY_SCOPE
+    ):
+        raise ProfileCoordinatorError("worker topology summary schema or scope changed")
+    coordinator = _topology_coordinator(
+        summary.get("coordinator"), "worker topology coordinator"
+    )
+    coordinator_pid = cast(int, coordinator["pid"])
+    coordinator_group = cast(int, coordinator["pgid"])
+    supervision = _dict(receipt.get("supervision"), "receipt supervision")
+    if (
+        supervision.get("coordinator_pid") != coordinator_pid
+        or supervision.get("coordinator_process_group_id") != coordinator_group
+    ):
+        raise ProfileCoordinatorError("worker topology differs from the supervised coordinator")
+    settings = _dict(receipt.get("settings"), "receipt settings")
+    configured = _dict(settings.get("effective_workers"), "configured route workers")
+    route_summaries = _dict(summary.get("routes"), "worker topology route summaries")
+    if set(route_summaries) != {"raw", "normalized_exact"}:
+        raise ProfileCoordinatorError("worker topology route summary set changed")
+
+    digests: dict[str, str] = {}
+    for route, phase, filename, directions_expected in (
+        ("raw", "raw-sweep", "raw-worker-topology.json", len(spec.raw)),
+        (
+            "normalized_exact",
+            "normalized-exact",
+            "normalized-exact-worker-topology.json",
+            len(spec.normalized_exact),
+        ),
+    ):
+        path = output_dir / filename
+        if path.is_symlink() or not path.is_file():
+            raise ProfileCoordinatorError(f"{route} worker topology is not a real file")
+        raw = path.read_bytes()
+        sidecar = _strict_json_bytes(raw, filename)
+        if (
+            set(sidecar) != {"schema", "scope", "coordinator", "route"}
+            or sidecar.get("schema") != WORKER_TOPOLOGY_ROUTE_SCHEMA
+            or sidecar.get("scope") != WORKER_TOPOLOGY_SCOPE
+        ):
+            raise ProfileCoordinatorError(f"{route} worker topology schema or scope changed")
+        if (
+            _topology_coordinator(
+                sidecar.get("coordinator"), f"{route} worker topology coordinator"
+            )
+            != coordinator
+        ):
+            raise ProfileCoordinatorError(f"{route} worker topology coordinator changed")
+        workers = configured.get(route)
+        if type(workers) is not int or cast(int, workers) <= 0:
+            raise ProfileCoordinatorError(f"{route} configured worker count is malformed")
+        derived = _reconstruct_topology_route(
+            sidecar.get("route"),
+            route=route,
+            phase=phase,
+            configured_workers=cast(int, workers),
+            directions_expected=directions_expected,
+            coordinator_pid=coordinator_pid,
+            coordinator_group=coordinator_group,
+        )
+        digest = _sha256(raw)
+        expected_summary = derived | {"record_path": filename, "record_sha256": digest}
+        if route_summaries.get(route) != expected_summary:
+            raise ProfileCoordinatorError(
+                f"{route} worker topology summary does not reconstruct"
+            )
+        digests[f"{route.replace('_', '-')}-worker-topology"] = digest
+    return digests
+
+
 def _validate_inventory_receipt(
     receipt: dict[str, object],
     *,
@@ -384,12 +696,25 @@ def _validate_inventory_receipt(
     ):
         raise ProfileCoordinatorError("receipt invocation identity changed")
     supervision = _dict(receipt.get("supervision"), "receipt supervision")
-    if supervision != {
-        "status": "observed-exit",
-        "worker_exit_status": 0,
-        "process_group_reaped": True,
-        "supervisor_signal": None,
-    }:
+    coordinator_pid = supervision.get("coordinator_pid")
+    if (
+        set(supervision)
+        != {
+            "status",
+            "worker_exit_status",
+            "process_group_reaped",
+            "supervisor_signal",
+            "coordinator_pid",
+            "coordinator_process_group_id",
+        }
+        or supervision.get("status") != "observed-exit"
+        or supervision.get("worker_exit_status") != 0
+        or supervision.get("process_group_reaped") is not True
+        or supervision.get("supervisor_signal") is not None
+        or type(coordinator_pid) is not int
+        or cast(int, coordinator_pid) <= 0
+        or supervision.get("coordinator_process_group_id") != coordinator_pid
+    ):
         raise ProfileCoordinatorError("receipt does not prove a reaped successful worker")
     clocks = _dict(receipt.get("clocks"), "receipt clocks")
     for name in _CLOCK_METRICS:
@@ -435,6 +760,8 @@ def inventory_profile(
         "candidate.json",
         "dilation.json",
         "rss-samples.json",
+        "raw-worker-topology.json",
+        "normalized-exact-worker-topology.json",
         "raw-directions",
         "normalized-exact-directions",
         "normalized-interval-directions",
@@ -453,6 +780,7 @@ def inventory_profile(
         run_order=run_order,
         spec=spec,
     )
+    topology_digests = _reconstruct_worker_topology(output_dir, receipt, spec)
 
     artifacts: list[dict[str, object]] = []
     route_digests: dict[str, str] = {}
@@ -510,6 +838,7 @@ def inventory_profile(
         "normalized-candidate": normalized.get("sha256"),
         "generic-dilation-record": dilation.get("record_sha256"),
         "rss-observations": rss.get("samples_sha256"),
+        **topology_digests,
     }
     for role, expected_digest in expected_single_digests.items():
         if by_role[role]["sha256"] != expected_digest:
