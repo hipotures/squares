@@ -1246,20 +1246,22 @@ def test_interrupt_during_terminal_serialization_preserves_partial_receipt(
     assert not any(path.name.startswith(".result-admission-") for path in output.iterdir())
 
 
-@pytest.mark.skipif(sys.platform == "win32", reason="POSIX signals are required")
-@pytest.mark.parametrize("stage_number", [1, 2])
-def test_real_sigint_during_staging_acquisition_closes_and_removes_resource(
+def _run_staging_resource_control(
     tmp_path: Path,
+    *,
+    mode: str,
+    signal_number: signal.Signals,
     stage_number: int,
-) -> None:
-    output = tmp_path / f"sigint-stage-{stage_number}"
+) -> dict[str, object]:
+    output = tmp_path / f"{mode}-{signal_number.name}-stage-{stage_number}"
     output.mkdir()
     calibration.write_result(output, _terminal_candidate_summary())
-    observation_path = tmp_path / f"sigint-stage-{stage_number}.json"
+    observation_path = tmp_path / f"{output.name}.json"
     supervisor_program = f"""
 import json
 import os
 import signal
+import threading
 from pathlib import Path
 from unittest.mock import patch
 from devtools import calibrate_fixed_core_packet as calibration
@@ -1267,24 +1269,57 @@ from devtools import calibrate_fixed_core_packet as calibration
 output = Path({str(output)!r})
 observation_path = Path({str(observation_path)!r})
 document = json.loads((output / "result.json").read_bytes())
+mode = {mode!r}
+signal_number = signal.Signals({int(signal_number)!r})
 deliveries = []
 created = []
-calls = [0]
-previous = signal.getsignal(signal.SIGINT)
+stage_calls = [0]
+fdopen_calls = [0]
+system_handlers = {{item: signal.getsignal(item) for item in (
+    signal.SIGINT, signal.SIGTERM, signal.SIGHUP
+)}}
 
 def prior_handler(signum, _frame):
     deliveries.append(signum)
 
-signal.signal(signal.SIGINT, prior_handler)
+signal.signal(signal_number, prior_handler)
+expected_handlers = {{item: signal.getsignal(item) for item in system_handlers}}
+expected_mask = signal.pthread_sigmask(signal.SIG_BLOCK, set())
+ready = threading.Event()
+stop = threading.Event()
+helper = None
+if mode == "other-thread":
+    def background():
+        signal.pthread_sigmask(
+            signal.SIG_UNBLOCK, (signal.SIGINT, signal.SIGTERM, signal.SIGHUP)
+        )
+        ready.set()
+        stop.wait(2.0)
+
+    helper = threading.Thread(target=background)
+    helper.start()
+    if not ready.wait(1.0):
+        raise RuntimeError("signal helper did not become eligible")
+
 real_mkstemp = calibration.tempfile.mkstemp
+real_fdopen = calibration.os.fdopen
 
 def create(*args, **kwargs):
     descriptor, temporary = real_mkstemp(*args, **kwargs)
-    calls[0] += 1
-    if calls[0] == {stage_number!r}:
+    stage_calls[0] += 1
+    if stage_calls[0] == {stage_number!r}:
         created.append((descriptor, temporary))
-        os.kill(os.getpid(), signal.SIGINT)
+        if mode in {{"main-thread", "other-thread"}}:
+            os.kill(os.getpid(), signal_number)
+            if helper is not None:
+                threading.Event().wait(0.05)
     return descriptor, temporary
+
+def adopt(*args, **kwargs):
+    fdopen_calls[0] += 1
+    if mode == "fdopen-error" and fdopen_calls[0] == {stage_number!r}:
+        raise OSError("retained descriptor-adoption fault")
+    return real_fdopen(*args, **kwargs)
 
 class Worker:
     pid = 101
@@ -1318,18 +1353,24 @@ try:
         patch.object(calibration.time, "sleep", return_value=None),
         patch.object(calibration, "_sample_process_group", side_effect=sample),
         patch.object(calibration.tempfile, "mkstemp", side_effect=create),
+        patch.object(calibration.os, "fdopen", side_effect=adopt),
     ):
-        status = calibration.supervise_worker(
-            ("control", "--worker"),
-            output,
-            repository=Path({str(REPOSITORY)!r}),
-            expected_revision={REVISION!r},
-            external_seconds=5.0,
-            grace_seconds=0.05,
-            invocation_started=0.0,
-            external_deadline=5.0,
-            expected_invocation=document["invocation"]["identity"],
-        )
+        status = None
+        raised = None
+        try:
+            status = calibration.supervise_worker(
+                ("control", "--worker"),
+                output,
+                repository=Path({str(REPOSITORY)!r}),
+                expected_revision={REVISION!r},
+                external_seconds=5.0,
+                grace_seconds=0.05,
+                invocation_started=0.0,
+                external_deadline=5.0,
+                expected_invocation=document["invocation"]["identity"],
+            )
+        except BaseException as error:
+            raised = f"{{type(error).__name__}}: {{error}}"
     receipt = json.loads((output / "result.json").read_bytes())
     descriptor, temporary = created[0]
     try:
@@ -1348,6 +1389,7 @@ try:
         json.dumps(
             {{
                 "status": status,
+                "raised": raised,
                 "receipt_status": receipt["status"],
                 "receipt_phase": receipt["phase"],
                 "supervisor_signal": receipt["supervision"]["supervisor_signal"],
@@ -1357,14 +1399,24 @@ try:
                     path.name for path in output.glob(".result-admission-*")
                 ),
                 "readback_error": readback_error,
-                "handler_restored": signal.getsignal(signal.SIGINT) is prior_handler,
+                "handlers_restored": all(
+                    signal.getsignal(item) is expected
+                    for item, expected in expected_handlers.items()
+                ),
+                "mask_restored": (
+                    signal.pthread_sigmask(signal.SIG_BLOCK, set()) == expected_mask
+                ),
                 "deliveries": deliveries,
             }}
         ),
         encoding="utf-8",
     )
 finally:
-    signal.signal(signal.SIGINT, previous)
+    stop.set()
+    if helper is not None:
+        helper.join(1.0)
+    for item, handler in system_handlers.items():
+        signal.signal(item, handler)
 """
     supervisor = subprocess.run(
         (sys.executable, "-c", supervisor_program),
@@ -1372,20 +1424,66 @@ finally:
         timeout=5.0,
     )
     assert supervisor.returncode == 0
-    observation = cast(
-        dict[str, object], json.loads(observation_path.read_text(encoding="utf-8"))
+    return cast(dict[str, object], json.loads(observation_path.read_text(encoding="utf-8")))
+
+
+@pytest.mark.skipif(sys.platform == "win32", reason="POSIX signals are required")
+@pytest.mark.parametrize("stage_number", [1, 2])
+@pytest.mark.parametrize("signal_number", [signal.SIGINT, signal.SIGTERM, signal.SIGHUP])
+@pytest.mark.parametrize("mode", ["main-thread", "other-thread"])
+def test_real_signal_during_staging_acquisition_defers_until_resource_is_owned(
+    tmp_path: Path,
+    stage_number: int,
+    signal_number: signal.Signals,
+    mode: str,
+) -> None:
+    observation = _run_staging_resource_control(
+        tmp_path,
+        mode=mode,
+        signal_number=signal_number,
+        stage_number=stage_number,
     )
     assert observation == {
-        "status": 128 + signal.SIGINT,
+        "status": 128 + signal_number,
+        "raised": None,
         "receipt_status": "partial",
         "receipt_phase": "operational-failure",
-        "supervisor_signal": signal.SIGINT,
+        "supervisor_signal": signal_number,
         "descriptor_open": False,
         "staged_path_exists": False,
         "staged_files": [],
         "readback_error": None,
-        "handler_restored": True,
-        "deliveries": [signal.SIGINT],
+        "handlers_restored": True,
+        "mask_restored": True,
+        "deliveries": [signal_number],
+    }
+
+
+@pytest.mark.skipif(sys.platform == "win32", reason="POSIX signal masks are required")
+@pytest.mark.parametrize("stage_number", [1, 2])
+def test_fdopen_failure_closes_unadopted_staging_descriptor(
+    tmp_path: Path,
+    stage_number: int,
+) -> None:
+    observation = _run_staging_resource_control(
+        tmp_path,
+        mode="fdopen-error",
+        signal_number=signal.SIGINT,
+        stage_number=stage_number,
+    )
+    assert observation == {
+        "status": None,
+        "raised": "OSError: retained descriptor-adoption fault",
+        "receipt_status": "partial",
+        "receipt_phase": "operational-failure",
+        "supervisor_signal": None,
+        "descriptor_open": False,
+        "staged_path_exists": False,
+        "staged_files": [],
+        "readback_error": None,
+        "handlers_restored": True,
+        "mask_restored": True,
+        "deliveries": [],
     }
 
 

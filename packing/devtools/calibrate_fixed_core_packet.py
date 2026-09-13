@@ -1723,13 +1723,23 @@ def _stage_result(output_dir: Path, document: dict[str, object]) -> Path:
         prefix=".result-admission-",
         suffix=".json",
     )
-    path = Path(temporary)
+    stream = None
     try:
-        with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
+        path = Path(temporary)
+        stream = os.fdopen(descriptor, "w", encoding="utf-8")
+        descriptor = -1
+        with stream:
             stream.write(encoded)
             stream.flush()
     except BaseException:
-        path.unlink(missing_ok=True)
+        if descriptor >= 0:
+            with suppress(OSError):
+                os.close(descriptor)
+        if stream is not None:
+            with suppress(OSError):
+                stream.close()
+        with suppress(OSError):
+            Path(temporary).unlink()
         raise
     return path
 
@@ -2879,12 +2889,13 @@ def supervise_worker(  # noqa: PLR0911
     worker_exit_seconds: float | None = None
     cleanup_seconds = 0.0
     staged_result: Path | None = None
+    staging_depth = 0
 
     def handle_signal(signum: int, _frame: object) -> None:
         nonlocal interrupted_signal
         if interrupted_signal is None:
             interrupted_signal = signum
-        if active_process is not None or not launching:
+        if active_process is not None or (not launching and staging_depth == 0):
             raise _SupervisorSignal(signum)
 
     def raise_if_interrupted() -> None:
@@ -2892,14 +2903,23 @@ def supervise_worker(  # noqa: PLR0911
             raise _SupervisorSignal(interrupted_signal)
 
     def stage_owned_result(document: dict[str, object]) -> None:
-        nonlocal staged_result
-        # Keep handled signals pending until _stage_result has closed its descriptor and
-        # transferred the returned path to the supervisor's final cleanup owner.
+        nonlocal staged_result, staging_depth
+        # The mask protects the ordinary single-threaded CLI path. The depth guard also
+        # defers Python handler exceptions when another eligible thread receives a
+        # process-directed signal while this thread acquires the staging resource.
         staging_mask = signal.pthread_sigmask(signal.SIG_BLOCK, handled_signals)
+        staging_depth += 1
+        stage_error: BaseException | None = None
         try:
             staged_result = _stage_result(output_dir, document)
+        except BaseException as error:  # noqa: BLE001 -- signal provenance takes priority
+            stage_error = error
         finally:
+            staging_depth -= 1
             signal.pthread_sigmask(signal.SIG_SETMASK, staging_mask)
+        raise_if_interrupted()
+        if stage_error is not None:
+            raise stage_error
 
     def record_deadline(message: str, *, before_launch: bool = False) -> int:
         _record_supervision(
