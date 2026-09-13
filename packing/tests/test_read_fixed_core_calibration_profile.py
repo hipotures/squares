@@ -771,6 +771,7 @@ def test_filesystem_preflight_refuses_links_and_special_files(
         candidate.write_bytes(candidate_bytes)
 
 
+@pytest.mark.slow
 def test_coherent_mathematical_and_operational_mutations_are_refused(
     monkeypatch: pytest.MonkeyPatch, profile: tuple[Path, dict[str, object]]
 ) -> None:
@@ -989,6 +990,7 @@ def test_cli_emits_no_json_proof_on_refusal(capsys: pytest.CaptureFixture[str]) 
     assert captured.err.startswith("REFUSED:")
 
 
+@pytest.mark.slow
 def test_execution_manifest_closure_and_every_missing_path(
     profile: tuple[Path, dict[str, object]],
 ) -> None:
@@ -1131,6 +1133,7 @@ def test_running_reader_origin_and_cli_copy_refusal(
     assert json.loads(result.stdout)["status"] == "accepted"
 
 
+@pytest.mark.slow
 def test_exact_method_witness_agreement_and_closed_boundary(
     monkeypatch: pytest.MonkeyPatch, profile: tuple[Path, dict[str, object]]
 ) -> None:
@@ -1299,6 +1302,7 @@ def test_candidate_integer_substitutions_refuse_before_budget_arithmetic(
         (("routes", "dilation", "directions_completed"), 2881.0),
     ],
 )
+@pytest.mark.slow
 def test_route_scalar_substitutions_refuse(
     monkeypatch: pytest.MonkeyPatch,
     path: tuple[str | int, ...],
@@ -1396,6 +1400,7 @@ def test_row_scalar_substitutions_refuse_with_rebound_digests(
         (("proof", "endpoint_status"), "endpoint proved"),
     ],
 )
+@pytest.mark.slow
 def test_dilation_contradictions_refuse_with_rebound_record(
     monkeypatch: pytest.MonkeyPatch,
     path: tuple[str | int, ...],
@@ -1530,6 +1535,7 @@ def _pooled_receipt(
 @pytest.mark.parametrize(
     ("children_count", "mode"), [(2, "normal"), (1, "normal"), (1, "touch")]
 )
+@pytest.mark.slow
 def test_valid_pooled_topologies_include_overlap_one_child_and_touching_boundaries(
     monkeypatch: pytest.MonkeyPatch,
     children_count: int,
@@ -1554,6 +1560,7 @@ def test_valid_pooled_topologies_include_overlap_one_child_and_touching_boundari
 
 
 @pytest.mark.parametrize("mode", ["late", "reversed", "long", "self-parent"])
+@pytest.mark.slow
 def test_impossible_topologies_refuse_after_sidecars_and_summaries_are_rebound(
     monkeypatch: pytest.MonkeyPatch,
     mode: str,
@@ -1733,6 +1740,7 @@ def test_real_binder_nested_and_supervisor_duration_controls(
         ("exact-at-tail-boundary", "normalized_exact", None, True),
     ],
 )
+@pytest.mark.slow
 def test_real_binder_phase_schedule_controls(
     control: str,
     route: str,
