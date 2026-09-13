@@ -3608,6 +3608,7 @@ round that names the hypothesis, control roles included.
 | [H-157](packing/campaign/hypotheses/H-157-refined-owner-sector-patch-breaks-neutrality.md) | refuted | Sixteen owner sectors instead of eight fatten every guaranteed patch past the `0.014978` separating gap, so no neutral class survives the refinement | 1 | exp-154: six of eight refined subclasses still read exactly 10 and two read `19/2`; this refutes the all-subclasses claim, while broader conditioning and changed charges remain open |
 | [H-158](packing/campaign/hypotheses/H-158-unit-parent-domain-excludes-saved-residual.md) | unresolved | Exp151’s direction-6 residual fails its own necessary parent box, or one selected owner has a newly replayed positive B-only witness and no positive witness after the complete parent restriction | 1 | exp-156: residual survives; TR is B-only incompatible after 181 frames, making parent gain impossible there; BL, BR and TL were not run; 20.63s external wall |
 | [H-159](packing/campaign/hypotheses/H-159-bc303-one-corner-surplus.md) | refuted | Every bottom-left role-C selected core with labels 0 and 15 absent has surplus above the BC303 shared allowance | 1 | exp-157: the disclosed literal parent has labels `{3,4,11,12}` and exact surplus `3/800000 < epsilon`; 1.92s replay wall |
+| [H-160](packing/campaign/hypotheses/H-160-bc303-t2-charge-filters.md) | running | Every frozen BC303 C charge is at least 4524200 and every S first-owner strip charge is at least 4524185 | 1 | exp-158 preregistered without target charge; source and controls pending |
 
 ### Confirmed
 
@@ -3895,7 +3896,7 @@ The relevant generator writes the receipt, and the entry fills in on the next
 
 ## Experiments Conducted
 
-There are 113 rounds registered in `series-000`.
+There are 114 rounds registered in `series-000`.
 
 They record 2152.1 agent-minutes and 1485.2 wall-minutes.
 Exp129 closed as blocked without invocation and contributes zero scientific elapsed
@@ -4050,6 +4051,7 @@ archive beside it.
 | [exp-155](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-155-h156-finer-net-threshold-dilation.md) | 11 | target | H-156 | Frozen T-025 atoms on the 1440-step direction net and exact dilation corollary | Proved `s(11) >= 955000*sqrt(518400042893309449)/179696714646249 = 3.8264474...`; the result is now V4/C5 | **accepted** |
 | [exp-156](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-156-unit-parent-saved-residual.md) | 11 | target | H-158 | Exact residual parent-box check followed by matched B-only and parent-restricted owner comparisons in TR, BL, BR, TL order | Residual inside parent box; TR / bottom-left:m1:j7 has exact negative B-only maximum after 181 frames, which also precludes parent gain there; BL, BR and TL unrun | unresolved |
 | [exp-157](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-157-bc303-literal-t1-witness.md) | 11 | target | H-159 | Retrospective source-bound replay of one disclosed bottom-left role-C parent across all 377 atoms | Labels `{3,4,11,12}`; 19 captured atoms give `S(X)=3/800000 < epsilon`, rejecting only the named local inequality | rejected |
+| [exp-158](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-158-bc303-t2-charge-filters.md) | 11 | target | H-160 | Prospective exact all-chart C and S first-owner charge filters after source and synthetic-control admission | No target charge run | in-progress |
 
 ### Cost and provenance
 
@@ -4168,10 +4170,11 @@ archive beside it.
 | exp-155 | retrospective registration of one completed bounded lane; no new target allowance | 6713.2s additive reported | — | criterion | `7ccb679c` |
 | exp-156 | one 90-second scientific allowance inside one 120-second supervised process plus two-second grace | 0.4452s scientific | 20.6281s external command wall, including mandatory in-process readback and supervision | criterion | receipt: 8.6396s source replay and 9.0848s pre-readback publication clock; later Astra receipt audit: 9.26s separate review work; H-158 unresolved |
 | exp-157 | one fixed disclosed candidate; no search clock | — | 1.92s external replay wall | criterion | source-bound receipt at `81898608`; independent 377-row audit separate |
+| exp-158 | one all-chart invocation, at most 30 minutes after controls | — | — | not started | source and control admission pending; no target charge |
 
-### What the 113 rounds jointly establish
+### What the 114 rounds jointly establish
 
-The 113 rounds use 2152.1 agent-minutes and 1485.2 wall-minutes under the campaign’s
+The 114 rounds use 2152.1 agent-minutes and 1485.2 wall-minutes under the campaign’s
 retained effort accounting.
 The never-invoked exp129 adds no scientific result or execution time.
 Exp-114 contributes 2.46 seconds of target/replay effort; its readiness work is recorded
