@@ -9,8 +9,10 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import subprocess
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -116,15 +118,19 @@ def analyze_receipt(value: object) -> dict[str, object]:
         )
         if matching_row[row_field] != mass:
             raise ValueError(f"{minimum_field} disagrees with its covered chart")
-        if any(
-            witness.get(field) != expected
-            for field, expected in (
-                ("role", role),
-                ("integer_charge", mass),
-                ("source_index", key[0]),
-                ("reflected", key[1]),
-            )
-        ):
+        witness_mass = _integer(
+            witness.get("integer_charge"), f"{witness_field}.integer_charge"
+        )
+        witness_index = _integer(witness.get("source_index"), f"{witness_field}.source_index")
+        witness_reflected = witness.get("reflected")
+        if type(witness_reflected) is not bool:
+            raise ValueError(f"{witness_field}.reflected must be Boolean")
+        if (
+            witness.get("role"),
+            witness_mass,
+            witness_index,
+            witness_reflected,
+        ) != (role, mass, key[0], key[1]):
             raise ValueError(f"{witness_field} disagrees with the retained minimum")
         minima[role] = mass
 
@@ -186,20 +192,49 @@ def analysis_revision(expected: str) -> str:
     return actual
 
 
+def _publish_new(path: Path, text: str) -> None:
+    """Atomically publish one completed result without replacing another run."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    descriptor, temporary_name = tempfile.mkstemp(
+        dir=path.parent, prefix=f".{path.name}.", suffix=".tmp"
+    )
+    temporary = Path(temporary_name)
+    try:
+        with os.fdopen(descriptor, "w", encoding="utf-8", newline="\n") as stream:
+            stream.write(text)
+            stream.flush()
+            os.fsync(stream.fileno())
+        try:
+            os.link(temporary, path)
+        except FileExistsError as error:
+            raise FileExistsError(f"refusing to overwrite {path}") from error
+        directory = os.open(path.parent, os.O_RDONLY)
+        try:
+            os.fsync(directory)
+        finally:
+            os.close(directory)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--expect-analysis-revision", required=True)
     args = parser.parse_args()
+    same_path = args.input.resolve() == args.output.resolve()
+    if not same_path and args.input.exists() and args.output.exists():
+        same_path = args.input.samefile(args.output)
+    if same_path:
+        raise ValueError("input and output paths must differ")
+    if args.output.exists():
+        raise FileExistsError(f"refusing to overwrite {args.output}")
     revision = analysis_revision(args.expect_analysis_revision)
     result = analyze_receipt(json.loads(args.input.read_text(encoding="utf-8")))
     result["analysis_revision"] = revision
     result["analysis_entry_point"] = "packing/devtools/analyze_bc303_h162_receipt.py"
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(
-        json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8"
-    )
+    _publish_new(args.output, json.dumps(result, indent=2, sort_keys=True) + "\n")
     print(
         json.dumps(
             {

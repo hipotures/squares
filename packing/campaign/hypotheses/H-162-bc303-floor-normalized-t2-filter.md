@@ -20,7 +20,7 @@ hypothesis:
     direction: Both minima at or above 4524132
     threshold: C >= 4524132 and S first owner >= 4524132
   instrument: packing/devtools/analyze_bc303_h162_receipt.py
-  instrument_ready: false
+  instrument_ready: true
   regime: >-
     q=96/25, h=9977/20000, W=4000000; frozen 377-atom BC293 measure and closed
     symmetric BC303 source equipment; 182 eligible C and S first-owner charts

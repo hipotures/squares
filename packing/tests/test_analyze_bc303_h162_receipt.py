@@ -2,8 +2,14 @@
 
 from __future__ import annotations
 
+import json
+import os
+import sys
+from pathlib import Path
+
 import pytest
 
+from devtools import analyze_bc303_h162_receipt as analyzer
 from devtools.analyze_bc303_h162_receipt import analysis_revision, analyze_receipt
 
 
@@ -104,3 +110,112 @@ def test_minimum_must_match_its_chart() -> None:
     minimum["source_index"] = 1
     with pytest.raises(ValueError, match="disagrees with its covered chart"):
         analyze_receipt(value)
+
+
+@pytest.mark.parametrize(
+    ("field", "malformed", "message"),
+    [
+        ("integer_charge", True, r"c_witness\.integer_charge must be an integer"),
+        ("source_index", False, r"c_witness\.source_index must be an integer"),
+        ("reflected", 0, r"c_witness\.reflected must be Boolean"),
+    ],
+)
+def test_witness_fields_require_exact_json_types(
+    field: str, malformed: object, message: str
+) -> None:
+    value = receipt(1, 4_524_132)
+    witness = value["c_witness"]
+    assert isinstance(witness, dict)
+    witness[field] = malformed
+    with pytest.raises(ValueError, match=message):
+        analyze_receipt(value)
+
+
+def _invoke_main(
+    input_path: Path,
+    output_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    revision = "1" * 40
+    monkeypatch.setattr(analyzer, "analysis_revision", lambda expected: expected)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "analyze_bc303_h162_receipt.py",
+            "--input",
+            str(input_path),
+            "--output",
+            str(output_path),
+            "--expect-analysis-revision",
+            revision,
+        ],
+    )
+    analyzer.main()
+
+
+def test_input_output_alias_is_refused_without_changing_the_receipt(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source = tmp_path / "exp-158.json"
+    original = json.dumps(receipt(4_524_132, 4_524_132)) + "\n"
+    source.write_text(original, encoding="utf-8")
+
+    with pytest.raises(ValueError, match="input and output paths must differ"):
+        _invoke_main(source, source, monkeypatch)
+
+    assert source.read_text(encoding="utf-8") == original
+
+
+def test_existing_one_run_output_is_never_overwritten(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source = tmp_path / "exp-158.json"
+    output = tmp_path / "exp-160.json"
+    source.write_text(json.dumps(receipt(4_524_132, 4_524_132)), encoding="utf-8")
+    output.write_text("standing record\n", encoding="utf-8")
+
+    with pytest.raises(FileExistsError, match="refusing to overwrite"):
+        _invoke_main(source, output, monkeypatch)
+
+    assert output.read_text(encoding="utf-8") == "standing record\n"
+
+
+def test_interrupted_publication_never_exposes_partial_output(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source = tmp_path / "exp-158.json"
+    output = tmp_path / "exp-160.json"
+    source.write_text(json.dumps(receipt(4_524_132, 4_524_132)), encoding="utf-8")
+
+    def interrupt_publication(_temporary: os.PathLike[str], _output: os.PathLike[str]) -> None:
+        raise KeyboardInterrupt
+
+    monkeypatch.setattr(os, "link", interrupt_publication)
+    with pytest.raises(KeyboardInterrupt):
+        _invoke_main(source, output, monkeypatch)
+
+    assert not output.exists()
+    assert list(tmp_path.iterdir()) == [source]
+
+
+def test_concurrent_output_creator_wins_the_atomic_publication_race(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source = tmp_path / "exp-158.json"
+    output = tmp_path / "exp-160.json"
+    source.write_text(json.dumps(receipt(4_524_132, 4_524_132)), encoding="utf-8")
+    link = os.link
+
+    def publish_competing_result(
+        temporary: os.PathLike[str], destination: os.PathLike[str]
+    ) -> None:
+        Path(destination).write_text("competing record\n", encoding="utf-8")
+        link(temporary, destination)
+
+    monkeypatch.setattr(os, "link", publish_competing_result)
+    with pytest.raises(FileExistsError, match="refusing to overwrite"):
+        _invoke_main(source, output, monkeypatch)
+
+    assert output.read_text(encoding="utf-8") == "competing record\n"
+    assert sorted(tmp_path.iterdir()) == sorted((source, output))
