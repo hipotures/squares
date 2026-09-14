@@ -15,6 +15,7 @@ session:
   branch: codex/n11-w10-route-selection
   primary_bead: think-9y7p
   status: stopped
+  certification_pending: think-9y7p
   goal: >-
     Reconstruct whether OR-12 makes the W5 checkpoint due, review the recent merged
     stack for stability, compare every audited mathematical route on one common frame,
@@ -183,6 +184,7 @@ session:
   - The planning base equals origin/main at 1d367d6af8f148e9b0a28a4393e96df8a3e0b478.
   - Eight conservative substantive non-W5 blocks follow the latest qualifying W5 in Session 116/BC-322.
   - No efficiency repair or scientific target ran.
+  - 'full gate: fast at 32d81339b84c6d7e5d6a30e8365627f059805209: failed (structured certification-pending field absent)'
   - 'certification pending: think-9y7p'
   resource_rollups: []
   stop_reason: >-
