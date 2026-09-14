@@ -38,6 +38,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     transportIntent,
   } = workbenchBundle.navigation;
   const { reducedMotionAction, stageDescription, stageKeyCommand } = workbenchBundle.accessibility;
+  const { clampSeparator, mountResizeHandle } = workbenchBundle.resizeHandle;
   const { decodeCorpus, isSimpleTransition } = workbenchBundle.data;
   const {
     displayedCount,
@@ -4314,12 +4315,61 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // was noticed. 0.58 is chosen to leave 1920x1080 exactly as it was: the panel is 596 px
   // there, which is 0.552 of the height, so it still fits under the cap and nothing moves.
   const CONTROLS_SHARE = 0.58;
+  // The separator between the stage and the controls (owner, 2026-09-14). Dragging it, or
+  // moving it with the keyboard, fixes the share of the window height the stage may take;
+  // the share is remembered across reloads and re-clamped whenever the window changes, and
+  // the controls take the rest and scroll inside it. A double-click forgets the share and
+  // returns to the automatic layout below. The stage keeps STAGE_MIN px however high the
+  // separator goes, and the controls keep CONTROLS_MIN px, enough for the mode tabs.
+  const STAGE_SHARE_KEY = "squares.workbench.stageShare";
+  const STAGE_MIN = 120;
+  const CONTROLS_MIN = 56;
+  let stageShare = readStageShare();
+  let stageHandle = null;
+  function readStageShare() {
+    try {
+      const share = Number(window.localStorage.getItem(STAGE_SHARE_KEY));
+      return share > 0 && share < 1 ? share : null;
+    } catch {
+      return null;
+    }
+  }
+  function writeStageShare(share) {
+    try {
+      if (share === null) {
+        window.localStorage.removeItem(STAGE_SHARE_KEY);
+      } else {
+        window.localStorage.setItem(STAGE_SHARE_KEY, String(share));
+      }
+    } catch {
+      // Storage can be unavailable (a private window, a blocked origin); the share still
+      // holds for this page.
+    }
+  }
+  function stageBounds() {
+    return { min: STAGE_MIN, max: window.innerHeight - CONTROLS_MIN };
+  }
   function layout() {
     if (document.hidden) {
       return;
     }
     const vw = window.innerWidth,
       vh = window.innerHeight;
+    const sized =
+      stageShare !== null && !state.capture && !document.body.classList.contains("search-active");
+    if (sized) {
+      const height = clampSeparator(stageShare * vh, stageBounds());
+      const scale = Math.min(vw / 1920, height / 1080);
+      stage.style.transform = `scale(${scale})`;
+      stageWrap.style.width = `${1920 * scale}px`;
+      stageWrap.style.height = `${1080 * scale}px`;
+      controls.style.height = `${vh - 1080 * scale}px`;
+      controls.style.maxHeight = "none";
+      stageHandle?.sync();
+      return;
+    }
+    controls.style.height = "";
+    controls.style.maxHeight = "";
     let ch = state.capture ? 0 : controls.offsetHeight;
     if (!state.capture) {
       // A hidden document is not laid out, so `offsetHeight` reads zero in a background tab;
@@ -4333,6 +4383,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     stage.style.transform = `scale(${s})`;
     stageWrap.style.width = `${1920 * s}px`;
     stageWrap.style.height = `${1080 * s}px`;
+    stageHandle?.sync();
   }
 
   // ---------------------------------------------------------------- clock (rAF deltas only)
@@ -5842,6 +5893,24 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     onChange: () => requestAnimationFrame(layout),
   });
   win.searchWorkbench = searchPanel;
+  stageHandle = mountResizeHandle({
+    document,
+    handle: htmlNode("stage-resize"),
+    position: () => stageWrap.getBoundingClientRect().height,
+    bounds: stageBounds,
+    place: (height) => {
+      stageShare = height === null ? null : height / window.innerHeight;
+      writeStageShare(stageShare);
+      // Back to the automatic layout, the tallest-controls measurement starts again: the
+      // height the controls were held at is not evidence about their own.
+      if (stageShare === null) {
+        controlsHeight = 0;
+      }
+      layout();
+    },
+    describe: (height) =>
+      `stage ${Math.round((100 * height) / window.innerHeight)} percent of the window height`,
+  });
   setRange(DEFAULT_STEP_N, DEFAULT_STEP_N);
   // The page opens on Animate, the aspect the owner uses most (2026-09-14), through the same
   // transition a click on its tab takes, so Pack still remembers the n it was set up on.

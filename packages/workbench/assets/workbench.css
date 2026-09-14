@@ -20,6 +20,9 @@
   --serif: "PT Serif", "Atlas Symbols", Georgia, "Times New Roman", serif;
   --sans: "Source Sans 3", "Atlas Symbols", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  /* metabrowser's accent and fast transition, which its resize handle is drawn in. */
+  --handle-accent: oklch(54.14% 0.1337 246.71);
+  --transition-fast: 150ms ease;
 }
 html,
 body {
@@ -630,6 +633,53 @@ body.capture #kind-tag {
 }
 body.capture #controls {
   display: none;
+}
+/* The separator between the stage and the controls, after metabrowser's `.resize-handle`
+   (src/metabrowser/static/styles.css), turned for a stacked layout: a 4 px strip that takes
+   no layout space, a 12 px hit area, transparent at rest and metabrowser's accent while
+   hovered, focused or dragged, with its 2 px focus ring. */
+.resize-handle {
+  flex: none;
+  align-self: stretch;
+  height: 4px;
+  margin-bottom: -4px;
+  position: relative;
+  z-index: 2;
+  cursor: row-resize;
+  background: transparent;
+  touch-action: none;
+  transition: background var(--transition-fast);
+}
+.resize-handle::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -4px;
+  bottom: -4px;
+  cursor: row-resize;
+}
+.resize-handle:hover,
+.resize-handle:focus-visible,
+body.resizing .resize-handle {
+  background: var(--handle-accent);
+}
+.resize-handle:focus-visible {
+  outline: 2px solid var(--handle-accent);
+  outline-offset: 1px;
+}
+body.resizing {
+  cursor: row-resize;
+  user-select: none;
+}
+body.capture .resize-handle,
+body.search-active .resize-handle {
+  display: none;
+}
+@media print {
+  .resize-handle {
+    display: none;
+  }
 }
 #panel {
   display: flex;
