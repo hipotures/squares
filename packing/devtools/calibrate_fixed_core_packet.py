@@ -3481,10 +3481,15 @@ def _write_rss_samples(
 
 
 def _group_exists(process_group: int) -> bool:
+    # Only ESRCH proves the group is gone. EPERM means it still exists with no member
+    # this process may signal: macOS reports it while the last member is exiting and
+    # not yet reaped, so the reaper keeps polling to its deadline.
     try:
         os.killpg(process_group, 0)
     except ProcessLookupError:
         return False
+    except PermissionError:
+        return True
     return True
 
 
@@ -3493,18 +3498,18 @@ def _reap_process_group(
 ) -> tuple[int, float]:
     cleanup_started = time.perf_counter()
     if _group_exists(process.pid):
-        with suppress(ProcessLookupError):
+        with suppress(ProcessLookupError, PermissionError):
             os.killpg(process.pid, signal.SIGTERM)
     try:
         status = process.wait(timeout=grace_seconds)
     except subprocess.TimeoutExpired:
-        with suppress(ProcessLookupError):
+        with suppress(ProcessLookupError, PermissionError):
             os.killpg(process.pid, signal.SIGKILL)
         status = process.wait()
     # The leader can exit while a termination-resistant descendant keeps the session
     # alive. Send SIGKILL after the group-wide grace interval in either case.
     if _group_exists(process.pid):
-        with suppress(ProcessLookupError):
+        with suppress(ProcessLookupError, PermissionError):
             os.killpg(process.pid, signal.SIGKILL)
     final_deadline = time.perf_counter() + grace_seconds
     while _group_exists(process.pid) and time.perf_counter() < final_deadline:

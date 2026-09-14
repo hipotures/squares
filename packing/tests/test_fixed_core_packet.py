@@ -2208,6 +2208,66 @@ def test_outer_deadline_reaps_the_worker_process_group(tmp_path: Path) -> None:
     ]
 
 
+class _ExitedLeader:
+    pid = 4321
+
+    @staticmethod
+    def wait(timeout: float | None = None) -> int:
+        del timeout
+        return 0
+
+
+def test_supervisor_polls_through_eperm_until_the_group_is_gone(tmp_path: Path) -> None:
+    # macOS reports EPERM for signal 0 while the group's last member is exiting but not
+    # yet reaped, and for a signal sent in that window. Neither may escape the
+    # supervisor, and only the later ESRCH may count as the group being gone.
+    probes = [PermissionError, PermissionError, PermissionError]
+
+    def killpg(_pid: int, signal_number: int) -> None:
+        if signal_number == 0:
+            raise probes.pop(0) if probes else ProcessLookupError
+        raise PermissionError
+
+    with (
+        patch("devtools.fixed_core_packet.subprocess.Popen", return_value=_ExitedLeader()),
+        patch("devtools.fixed_core_packet.os.killpg", side_effect=killpg) as sent,
+    ):
+        assert (
+            supervise_worker(
+                ("worker",), tmp_path / "missing.json", external_seconds=10.0, grace_seconds=1.0
+            )
+            == 0
+        )
+    assert [call.args for call in sent.call_args_list] == [
+        (4321, 0),
+        (4321, signal.SIGTERM),
+        (4321, 0),
+        (4321, 0),
+        (4321, 0),
+    ]
+
+
+def test_supervisor_refuses_to_prove_reaping_while_the_group_reports_eperm(
+    tmp_path: Path,
+) -> None:
+    with (
+        patch("devtools.fixed_core_packet.subprocess.Popen", return_value=_ExitedLeader()),
+        patch("devtools.fixed_core_packet.os.killpg", side_effect=PermissionError) as sent,
+        pytest.raises(PacketError, match="worker process group remained alive after SIGKILL"),
+    ):
+        supervise_worker(
+            ("worker",), tmp_path / "missing.json", external_seconds=10.0, grace_seconds=0.02
+        )
+    calls = [call.args for call in sent.call_args_list]
+    assert [call for call in calls if call[1] != 0] == [
+        (4321, signal.SIGTERM),
+        (4321, signal.SIGKILL),
+        (4321, signal.SIGTERM),
+        (4321, signal.SIGKILL),
+    ]
+    assert calls[0] == calls[-1] == (4321, 0)
+
+
 def test_supervisor_deducts_parent_prelaunch_time_from_external_deadline(
     tmp_path: Path,
 ) -> None:
