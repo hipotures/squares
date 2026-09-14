@@ -1172,7 +1172,7 @@
   const markRect = mark.firstElementChild;
   const factsA = document.getElementById("facts-a");
   const factsB = document.getElementById("facts-b");
-  const kindTag = document.getElementById("kind-tag");
+
   const live = document.getElementById("live");
   const SVG_NS = svg.namespaceURI;
   // One measurement of one numeral gives the figure width; the numerals are tabular, so every
@@ -1407,8 +1407,7 @@
       return line;
     }
     // PROVED, in the order a reader wants it: the best known side, the proved lower bound
-    // under it, the scarlet mark when that bound was first proved here, the closed form or
-    // degree note for the value, and the badges. Both bounds are proved facts -- a construction
+    // under it, the scarlet mark when that bound was first proved here, and the badges. Both bounds are proved facts -- a construction
     // proves its upper bound -- so both belong here, and OPEN below carries the questions.
     layer.appendChild(text("div", "section-head head-proved", "Proven"));
     // The bound is one chained statement now, so it is one row. The star sits to the LEFT of
@@ -1427,16 +1426,11 @@
       starLine.appendChild(text("span", "note", STAR_LABEL));
     }
     layer.appendChild(starLine);
-    // The closed form when there is one the value does not already state, set as mathematics;
-    // otherwise the degree note, which is a fact about the value rather than a caption on it, so it
-    // is set in the text face in ink like the lines above it and only smaller.
-    const exact = text("div", "exact");
-    if (f.html_exact && f.exact !== f.side) {
-      exact.innerHTML = f.html_exact;
-    } else if (f.exact_state === "minimal-polynomial") {
-      exact.appendChild(text("span", "note", `algebraic${f.degree ? `, degree ${f.degree}` : ""}`));
-    }
-    layer.appendChild(exact);
+    // No closed-form line. It sat under a chain of two bounds and did not say which bound it was
+    // the value of -- 108 of the 110 n that had one show `lower <= s(n) <= upper` -- so the owner
+    // asked for it to go. The data keeps `html_exact` and `degree` for a design that attaches a
+    // form to the bound it belongs to.
+
     const badges = text("div", "badges");
     for (const b of f.badges) {
       const label = BADGE_LABELS[`${b.glyph}/${b.style}`];
@@ -1462,6 +1456,7 @@
   }
   let numeralA = null;
   let numeralB = null;
+  const numeralStatic = document.getElementById("numeral-static");
   const numeralSlotA = document.getElementById("numeral-a");
   const numeralSlotB = document.getElementById("numeral-b");
 
@@ -1745,20 +1740,15 @@
     ghost.setAttribute("transform", `translate(${newPose[0]} ${newPose[1]}) rotate(${newPose[2]})`);
     numeralA = buildFacts(factsA, p.n);
     numeralB = buildFacts(factsB, p.n + 1);
-    const s = p.stats;
-    kindTag.textContent =
-      p.n +
-      " → " +
-      (p.n + 1) +
-      " · " +
-      p.kind +
-      " · max move " +
-      fmt(s.max_displacement, 2) +
-      " · " +
-      s.rotated +
-      " rotate · " +
-      s.block_count +
-      " blocks";
+    // `n =` is drawn once, in its own slot, and never fades or drifts: only the number changes
+    // between n. The still copy is the same rendered expression as the rolling ones with its
+    // digits hidden, so KaTeX's spacing after the `=` is identical in all three and the rolling
+    // number lands exactly where the still one would have been.
+    numeralStatic.textContent = "";
+    numeralStatic.appendChild(numeralA.cloneNode(true));
+    // The step header (`16 → 17 · matched · max move 1.31 · …`) is gone from the stage: the
+    // owner asked for it to go, and the transition's kind and motion statistics stay in
+    // `transition-stats.json` for anyone who needs them.
     linksGroup.style.display = state.links ? "" : "none";
     ghost.style.display = state.links ? "" : "none";
   }
@@ -5666,10 +5656,6 @@
           fmt(g.record, 3);
   }
   function updateChrome() {
-    // Revision 14: no step header in Pack. `16 → 17 · matched · max move 1.31 · …` describes a
-    // step, and Pack has no steps: it packs one n. Animate keeps it. Like the bar, the tag is
-    // absolutely positioned on the stage, so hiding it moves nothing.
-    kindTag.hidden = state.mode === "pack";
     if (state.capture) {
       return;
     }
@@ -7309,6 +7295,11 @@
   svg.addEventListener("pointercancel", endDrag);
 
   window.addEventListener("keydown", (ev) => {
+    // A shortcut is a bare key. With Cmd, Ctrl or Alt held the key belongs to the browser or the
+    // system: Cmd+C is a copy, not capture mode, and taking it made the controls vanish.
+    if (ev.metaKey || ev.ctrlKey || ev.altKey) {
+      return;
+    }
     // What has the focus, read as an element once: the guard is about typing into a control, and
     // the three questions below are all about the same one.
     const focused = /** @type {HTMLElement} */ (ev.target);

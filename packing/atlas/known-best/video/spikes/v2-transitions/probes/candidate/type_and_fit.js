@@ -36,7 +36,7 @@
     ".head-proved",
     ".side",
     ".star-line",
-    ".exact",
+
     ".badges",
     ".head-open",
     ".open-items",
