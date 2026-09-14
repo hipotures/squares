@@ -205,21 +205,33 @@ test("the scheduler retains completed, failed, timeout, cancellation and pending
 });
 
 test("fixed physics work and validity are admission conditions", async () => {
-  const short = await runSearchPlan(plan([0]), (_slot, configuration) => {
-    const result = completed(configuration);
-    return { ...result, work: { ...result.work, physicsSteps: 3 } };
-  });
+  // A frozen clock, as in every other test here that is not about the deadline: the plan's
+  // tuning slots allow 5 ms, and decoding a rejected trial on a loaded machine can take longer,
+  // which reported the slot as timed out rather than failed.
+  const frozen = { now: () => 0 };
+  const short = await runSearchPlan(
+    plan([0]),
+    (_slot, configuration) => {
+      const result = completed(configuration);
+      return { ...result, work: { ...result.work, physicsSteps: 3 } };
+    },
+    frozen,
+  );
   assert.equal(short.outcomes[0]?.status, "failed");
 
-  const invalidRank = await runSearchPlan(plan([0]), (_slot, configuration) => ({
-    ...completed(configuration),
-    raw: {
-      ...completed(configuration).raw,
-      valid: false,
-      validityReason: "pair-overlap",
-    },
-    selectedState: "raw",
-  }));
+  const invalidRank = await runSearchPlan(
+    plan([0]),
+    (_slot, configuration) => ({
+      ...completed(configuration),
+      raw: {
+        ...completed(configuration).raw,
+        valid: false,
+        validityReason: "pair-overlap",
+      },
+      selectedState: "raw",
+    }),
+    frozen,
+  );
   assert.equal(invalidRank.outcomes[0]?.status, "failed");
 });
 
