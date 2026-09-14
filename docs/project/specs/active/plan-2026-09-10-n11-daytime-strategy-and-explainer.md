@@ -118,7 +118,9 @@ efficiency checkpoint; exact-revision certification remains before the handoff a
 A conservative derivation reaches OR-12’s mandatory eight-block ceiling after Session
 116/BC-322. BC-340 will measure the current gate first, accept at most one demonstrated
 repair behind an equivalence guard or record a measured no-change decision, then return
-to a fresh W10. None of these blocks runs a scientific target.
+to BC-353 / `think-d3h5` for a fresh W10. Every scientific candidate depends on BC-353,
+so closing the present W10 releases only the efficiency checkpoint.
+None of these blocks runs a scientific target.
 
 The planning candidates are:
 

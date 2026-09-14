@@ -352,7 +352,7 @@ synopsis’s
 [Research Program Status and Roadmap](../../../../SYNOPSIS.md#research-program-status-and-roadmap),
 and
 [agenda-036](../../../../packing/campaign/agendas/agenda-036-n11-strategy-reset-roadmap.md)
-owns the disposition.
+owns the disposition and the fresh scientific selection after W5.
 
 ## Prior Exact-Research Handoff Record
 

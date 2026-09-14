@@ -2,7 +2,7 @@
 
 # Agenda map
 
-341 agenda commitments across 35 agendas, as declared in each agenda's own frontmatter.
+342 agenda commitments across 35 agendas, as declared in each agenda's own frontmatter.
 Source of truth is [`agendas/`](agendas/); this view is regenerated, never edited.
 
 An agenda's queue owns priority ordering, so this map preserves each agenda's
@@ -10,7 +10,7 @@ order rather than imposing one across them.
 
 ## The short version
 
-- **8** in_progress, **15** ready, **22** tentative, **64** blocked, **59** stopped, **173** complete.
+- **8** in_progress, **15** ready, **22** tentative, **65** blocked, **59** stopped, **173** complete.
 
 - **23 blocked commitments carry a manual condition** (`BC-016`, `BC-025`, `BC-033`, `BC-050`, `BC-115`, `BC-170`, `BC-204`, `BC-205`, `BC-212`, `BC-207`, `BC-208`, `BC-209`, `BC-215`, `BC-217`, `BC-221`, `BC-238`, `BC-248`, `BC-270`, `BC-306`, `BC-337`, `BC-327`, `BC-329`, `BC-330`). Dependency edges alone cannot make these ready; each condition is named in the table below and must be explicitly cleared.
 
@@ -136,6 +136,7 @@ A commitment blocked by other commitments names them; one blocked by something e
 | agenda-035 | `BC-337` | 2 | `BC-326` | yes | No admitted source-bound constructor derives K_TR from all 181 frames and eight signed SAT axes per frame, and no… |
 | agenda-035 | `BC-327` | 2 | `BC-325` | yes | Multiplicity semantics are not admitted across the producer, loader, capacity reader and both coverage routes; the… |
 | agenda-035 | `BC-330` | 2 | — | no | The restricted-domain threshold gate and complete matched point baseline are not admitted. |
+| agenda-036 | `BC-353` | 0 | `BC-340` | no | — |
 
 ## Discharged elsewhere
 
@@ -193,7 +194,7 @@ A commitment whose exit another agenda's commitment satisfied. Recorded as an ed
 | agenda-032 | completed |  |  |  |  |  | 6 | 6 |
 | agenda-033 | completed |  |  |  |  | 1 | 8 | 9 |
 | agenda-035 | paused |  |  |  | 4 | 2 | 8 | 14 |
-| agenda-036 | active | 1 |  | 11 |  |  | 2 | 14 |
+| agenda-036 | active | 1 |  | 11 | 1 |  | 2 | 15 |
 
 ## By program
 
@@ -363,6 +364,7 @@ Open frontier: `BC-221`, `BC-222`, `BC-223`, `BC-224`, `BC-225`.
 | agenda-036 | `BC-347` | complete | Which mathematically distinct approaches have a credible path to significant progress on n=11 or… |
 | agenda-036 | `BC-346` | in_progress | Given the reconciled state, is the validation-efficiency checkpoint due, and which one entry from… |
 | agenda-036 | `BC-340` | tentative | Does the four-to-eight-block cadence make an efficiency checkpoint due, and if so what one… |
+| agenda-036 | `BC-353` | blocked | After the due efficiency checkpoint, which one scientific route has the highest information value… |
 | agenda-036 | `BC-341` | tentative | At side 3.84, can one complete difficult occupancy or wall-contact root family be closed by proved… |
 | agenda-036 | `BC-342` | tentative | Does a sound theta-prime or level-two pairwise relaxation pass the n=6 formulation controls and… |
 | agenda-036 | `BC-343` | tentative | Can the T-025/T-026 witness at side 3.82 be compressed into a small exact certificate described by… |
@@ -374,7 +376,7 @@ Open frontier: `BC-221`, `BC-222`, `BC-223`, `BC-224`, `BC-225`.
 | agenda-036 | `BC-351` | tentative | Can an orientation-sensitive two- or three-parent gap lemma be summed without double counting to… |
 | agenda-036 | `BC-352` | tentative | Can joint-parent geometry lower the ordinary budget of one atom by proving that two simultaneous… |
 
-Open frontier: `BC-346`, `BC-340`, `BC-341`, `BC-342`, `BC-343`, `BC-344`, `BC-345`, `BC-348`, `BC-349`, `BC-350`, `BC-351`, `BC-352`.
+Open frontier: `BC-346`, `BC-340`, `BC-353`, `BC-341`, `BC-342`, `BC-343`, `BC-344`, `BC-345`, `BC-348`, `BC-349`, `BC-350`, `BC-351`, `BC-352`.
 
 ### `n11-structure-and-conditional-dots`
 

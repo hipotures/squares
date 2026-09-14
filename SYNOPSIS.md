@@ -138,7 +138,7 @@ hypothesis status and summarizes experiment verdicts, and the
 | Record | Count | State at the cutoff |
 | --- | ---: | --- |
 | Agendas | 35 | 15 active; 14 completed; 5 paused; 1 superseded |
-| Commitments | 341 | 173 complete; 59 stopped; 64 blocked; 15 ready; 22 tentative; 8 in progress |
+| Commitments | 342 | 173 complete; 59 stopped; 65 blocked; 15 ready; 22 tentative; 8 in progress |
 | Sessions | 130 | 84 completed; 46 stopped; all terminal |
 | Explorations | 29 | 17 linked to proposed hypotheses; 12 uncodified |
 | Hypotheses | 138 | 25 confirmed; 24 refuted; 48 blocked; 10 unresolved; 2 open; 26 open questions; 2 result registered; 1 abandoned; 0 running |
@@ -201,9 +201,9 @@ The current order is:
    block and pull request.
    Measure the current gate first and accept at most one demonstrated repair behind an
    equivalence guard, or retain a measured no-change decision.
-2. Return to a fresh W10 after W5, with A at side `96/25` as the presumptive first
-   scientific choice and S as the fallback if A cannot freeze a complete admission
-   slice.
+2. Return to BC-353 / `think-d3h5` for a fresh W10 after W5, with A at side `96/25` as
+   the presumptive first scientific choice and S as the fallback if A cannot freeze a
+   complete admission slice.
 3. Treat A, S, global angular resources, and B as the first advisory tier.
    A is the strongest route to a material `n = 11` lower bound; S is the best bounded
    deliverable; angular resources offer a cheap optimal-face screen; and B is the
@@ -876,6 +876,8 @@ The bounded action is to certify this source without changing the decision.
 BC-340 then measures the current gate and addresses at most one demonstrated bottleneck
 behind an equivalence guard, or records a measured no-change result.
 It receives its own branch and pull request and runs no scientific target.
+BC-353 under `think-d3h5` then makes the scientific selection; all ten candidate cells
+depend on that post-W5 gate, so closing BC-346 releases only the efficiency block.
 
 The older BC329, weighted-atom stages 3–4, and BC303 H-160/H-162 target lanes are
 paused. Their admitted implementations, registrations, and controls remain evidence; no

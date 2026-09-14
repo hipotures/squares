@@ -15,8 +15,8 @@ worthwhile change clears that standard, its correct result is a measured no-chan
 decision.
 
 No scientific route is selected for execution yet.
-When BC-340 closes, a fresh W10 must reconsider the scientific portfolio using the new
-performance evidence.
+When BC-340 closes, a fresh W10 under BC-353 / `think-d3h5` must reconsider the
+scientific portfolio using the new performance evidence.
 The present scientific recommendation is Route A at side `3.84`, with Route S as the
 fallback if Route A cannot freeze a complete root family and exact checker within its
 admission allowance.
@@ -94,6 +94,13 @@ No scientific candidate is stopped as a method class.
 Each paused entry has a named missing premise or control, and each negative
 discriminator will apply only to the tested representation.
 
+The dependency graph enforces these dispositions.
+Closing BC-346 releases only BC-340. BC-353 depends on BC-340, and all ten scientific
+candidates depend on BC-353. The legacy stronger-charge task `think-yc80` is also
+blocked by `think-d3h5`, so closing the present W10 cannot accidentally revive it.
+Route A’s live task now names the `3.84` complete root-family discriminator and reserves
+`3.85` until its premises are re-established.
+
 ## Post-W5 Mathematical Strategy
 
 The primary strategy is to cross the known point-and-density ceiling with information
@@ -125,6 +132,7 @@ caveat. It then selects at most one measured bottleneck.
 Any prospective repair must preserve the same test population or carry an explicit
 equivalence guard. The block exits with either an accepted measured change or a measured
 no-change decision, then hands control to a new W10 route-selection block.
+BC-353 / `think-d3h5` owns that block.
 It does not run Route A, S, E, or another scientific target.
 
 <!-- This document follows common-doc-guidelines.md.
