@@ -731,7 +731,7 @@ Status: **active**. Select and execute short, high-information blocks across dis
 
 | id | status | title | rounds | opened because |
 | --- | --- | --- | --- | --- |
-| series-000 | open | S0: smoke and calibration — prove the machinery, establish every baseline metric | 115 | First series. There is no prior instrument, so not |
+| series-000 | open | S0: smoke and calibration — prove the machinery, establish every baseline metric | 116 | First series. There is no prior instrument, so not |
 
 ## Registry
 
@@ -874,6 +874,7 @@ Status: **active**. Select and execute short, high-information blocks across dis
 | H-159 | refuted | proof | For every admissible bottom-left one-corner role-C unit parent X with  |  | 1 |  | 2s wall |
 | H-160 | running | proof | On the frozen BC293 377-atom measure and every one of the 182 eligible |  | 1 |  |  |
 | H-161 | refuted | proof | In the frozen BC303 377-atom measure, the closed literal parent Q0=[0, |  | 1 |  | 0s wall |
+| H-162 | running | proof | On the frozen BC293 377-atom measure and every one of the 182 eligible |  | 1 |  |  |
 
 ## Needs review — held for a human, not decided
 
@@ -1027,11 +1028,12 @@ Status: **active**. Select and execute short, high-information blocks across dis
 | exp-031 | series-000 | 10 | openai-codex | H-002 | All four source perturbations satisfy every declared condition and return to the proved side within floating-point precision. This confirms the narrow known-answer control without reopening H-002's refuted universal claim. |
 | exp-032 | series-000 | 3 | openai-codex | H-021 | The exact connected and isolated controls pass, every declared conflation fails, and all unsupported floating-point observations remain unresolved. |
 
-### in-progress (1)
+### in-progress (2)
 
 | id | series | instance | operator | hypotheses | reason |
 | --- | --- | --- | --- | --- | --- |
 | exp-158 | series-000 | 11 | Codex BC303 T2 charge-sweep agent | H-160 | The target charge has not run; source and adversarial controls must pass first. |
+| exp-160 | series-000 | 11 | Codex BC303 H-162 retained-receipt analyst | H-162 | The exp-158 target receipt does not yet exist; no H-162 minimum or verdict has been observed. |
 
 ## Resumable — stopped on the clock, not on an answer
 
@@ -1054,7 +1056,7 @@ Status: **active**. Select and execute short, high-information blocks across dis
 
 ## Effort
 
-115 rounds, 2152.1 agent-minutes, 1485.2 wall-minutes.
+116 rounds, 2152.1 agent-minutes, 1485.2 wall-minutes.
 
 ## Exploration reports not yet codified
 
