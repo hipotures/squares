@@ -1,22 +1,21 @@
 # N11: Daytime Strategy Blocks and Parallel Explainer Update
 
-**Active plan, September 10, 2026; updated September 13.** This plan replaces the
+**Active plan, September 10, 2026; updated September 14.** This plan replaces the
 uninterrupted overnight schedule with shorter blocks that can start and stop during the
 day. Each research block gets its own session clock, falsifiable output, stop rule, and
 closeout. A later block is selected from the evidence produced by the earlier ones; gaps
 between blocks consume no scientific budget.
 
-The workflow entry is **W10 review, planning, and oversight** under `think-gvlg`. The
-first exit is agenda035, a durable strategy comparison, and selection of the first
-60–120 minute research block.
-The research branch is `codex/n11-daytime-strategy`, based on merged PR139 at
+The original workflow entry was **W10 review, planning, and oversight** under
+`think-gvlg`. Its first exit was agenda035, a durable strategy comparison, and selection
+of the first 60–120 minute research block.
+The original research branch was `codex/n11-daytime-strategy`, based on merged PR139 at
 `3a18a05a6af75e3800612549d5a3c5fe419b96f2`.
 
-A separate W8 documentation lane runs from `codex/n11-explainer-current-bound`, also
-based directly on the PR139 merge.
-It is divided into bounded blocks and has its own pull request and review.
-Documentation work does not consume a research target’s allowance and does not change a
-scientific result.
+A separate W8 documentation lane ran from `codex/n11-explainer-current-bound`, also
+based directly on the PR139 merge, in bounded blocks with its own pull request and
+review. Documentation work does not consume a research target’s allowance and does not
+change a scientific result.
 
 ## Entry Facts
 
@@ -81,7 +80,8 @@ The
 records the exact T-025/T-026/BC329 fact ladder, the terminal meaning of each possible
 BC329 outcome, and the remaining conditional-selection obligations.
 H-161 and exp-159 own that completed literal target; the strategy analysis registers no
-additional target. This plan remains the execution controller.
+additional target. Agenda036 now owns the live execution order; the retained sections
+below record the September 10–13 controller and evidence.
 
 An **atom** is a nonnegative resource rule used by a covering certificate.
 A point atom charges a core when it contains one site.
@@ -96,6 +96,49 @@ usually through boundary contacts or corner marks.
 Its residual certificate is global only after a separate selection theorem proves that
 every physical packing admits at least one certified selection.
 Counting overlapping labels is not such a theorem.
+
+## September 14 Strategy Reset
+
+The owner has paused heavy computer-assisted proof work aimed at very small lower-bound
+increments. The current objective is either a material improvement to the `n = 11` bound
+or a substantially simpler proof of `s(11) >= 3.82`.
+[Agenda 036](../../../../packing/campaign/agendas/agenda-036-n11-strategy-reset-roadmap.md)
+is the live controller, and the synopsis’s
+[Research Program Status and Roadmap](../../../../SYNOPSIS.md#research-program-status-and-roadmap)
+is the reader-facing account.
+
+The transition has three separate blocks.
+BC-339 completed and certified the W7 pipeline-improvement work and its W8 source
+reconciliation. BC-347 then completed and certified a read-only
+[Astra Max mathematical audit](../../reviews/review-2026-09-14-small-n-significant-progress-mathematical-audit.md)
+of the retained evidence, the five shaped routes, and additional hypotheses with
+material small-`n` upside behind that prerequisite.
+BC-346 is the current W10 planning block.
+It compares dependency readiness, expected information value, first discriminator, stop
+rule, and resource cost, then selects exactly one execution entry.
+None of these blocks runs a scientific target.
+
+The planning candidates are:
+
+| Route | First discriminator | Intended payoff |
+| --- | --- | --- |
+| W5 efficiency checkpoint | Determine whether the four-to-eight-block cadence makes it due; if so, measure at most one demonstrated bottleneck | Protect the speed and equivalence of the next research loop |
+| A — systematic case split | At side `3.84`, freeze one complete difficult root family and report the fixed denominator and exact worst survivor; use `3.85` only after rebuilding its premises | A material lower-bound route beyond the point-certificate ceiling |
+| S — certificate compression | Start with T-025 and seek a fivefold reduction in orbit representatives or comparable independent geometry, with unchanged exact replay | Replace the current large certificate with a human-statable proof |
+| E — global angular resources | Test H-131’s proved angle-count caps against the whole retained fractional optimal face, with coherent selection explicit | Add a global physical resource without assuming two orientations or owner selection |
+| B — pairwise SDP | Audit a sound pose cover and compare with the strongest matched threshold baseline after the `n = 6` controls | Attack the fractional-versus-integer gap through pairwise compatibility |
+| F1 — stronger charge algebra | Test one exact realizable trace language against matched ordinary-threshold atoms | Change the relaxation by coupling individually admissible placements |
+| F2 — geometry-dependent budgets | Prove one joint-parent physical-capacity bound for an atom with ordinary budget at least two | Replace a fixed combinatorial budget with a geometry-dependent theorem |
+| N — `n = 12` exact value | Seek a uniform boundary-capacity or deformation lemma for `L = 4 - epsilon`, with solved controls and flexible boundary families | Attempt the larger theorem `s(12) = 4` without a decimal ladder |
+| C — orientation structure | Reproduce the 6+5 Trump-angle control, then close one complete positive-width interval near `3.87` | Prove a restricted-family theorem and test a possible bridge to optimality |
+| D — upper-bound search | Make one changed proposer recover an oblique control at matched work before allocating a larger search | Improve the upper bound or retain verified competing configurations |
+| G — geometric waste | Prove one orientation-sensitive local gap and a non-double-counting global accounting rule | Explore a speculative geometric mechanism beyond one-body density |
+
+The audit’s advisory order is A, S, E, B, F1, F2, N, C, D, then G. It is a
+readiness-and-information judgment, not a measured success probability or a preselected
+execution. BC329, weighted-atom stages 3–4, and the BC303 H-160/H-162 target lane are
+paused. Their admitted code and registrations remain retained; no exp-158 or exp-160
+target ran, so the pause carries no scientific verdict.
 
 ## One-Block Controller
 
@@ -116,13 +159,12 @@ method.
 The next block is chosen only after the current block has a terminal disposition.
 The coordinator owns shared campaign records and Git integration.
 
-## Ranked Research Blocks
+## September 10–13 Research Blocks
 
-The order reflects present source readiness and expected information value.
-It is a working allocation, not a claim that one mathematical direction is intrinsically
-more productive than another.
-Strategy intake and BC326 are complete and retained below as history.
-BC329 is the next planned direct attempt to improve the global lower bound.
+This is the prior allocation retained for history.
+Agenda036 and the September 14 strategy-reset section above replace it for current
+selection. Strategy intake and BC326 are complete and retained below as history.
+BC329 was the next planned direct attempt to improve the global lower bound.
 BC337 is a secondary parent-conditioning lane that may proceed in parallel while BC329’s
 runner is being admitted.
 The H-160/exp-158 C/S charge lane has an admitted target-free reader and a separate

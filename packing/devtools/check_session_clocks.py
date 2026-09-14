@@ -44,6 +44,7 @@ from __future__ import annotations
 
 import argparse
 import pathlib
+import re
 import sys
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -102,10 +103,25 @@ def violations(name: str, record: dict[str, object], now: datetime) -> list[str]
     """What cannot be true about this artifact's clock. Refusals only; see the reports."""
     found: list[str] = []
     opened = _moment(record.get("started_at"))
+    ended = _moment(record.get("ended_at"))
+    status = record.get("status")
+    identifier = str(record.get("id") or "")
+    match = re.fullmatch(r"session-(\d{3})", identifier)
+    session_number = int(match.group(1)) if match else 0
     if opened is not None and opened > now:
         found.append(
             f"{name}: session starts at {opened:%Y-%m-%dT%H:%M:%SZ}, which is ahead of now"
         )
+    if status in {"completed", "stopped"} and session_number >= 128 and ended is None:
+        found.append(f"{name}: terminal session needs an observed ended_at")
+    if status == "in_progress" and ended is not None:
+        found.append(f"{name}: in-progress session has ended_at")
+    if ended is not None and ended > now:
+        found.append(
+            f"{name}: session ends at {ended:%Y-%m-%dT%H:%M:%SZ}, which is ahead of now"
+        )
+    if opened is not None and ended is not None and ended < opened:
+        found.append(f"{name}: ended_at is before started_at")
 
     for phase in phases(record):
         label = f"{name} phase {phase.index + 1} ({phase.workflow})"

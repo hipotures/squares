@@ -1,11 +1,17 @@
 # Synopsis: The `s(n)` Program
 
-**Date:** 2026-09-03
+**Date:** 2026-09-14
 
 **Status:** Living document, revised whenever a result lands.
 
 **Owns:** The single technical account of what this project knows, how it knows it, and
 what it is doing next.
+
+**Evidence cutoff:** Last scientific target and result evidence through
+`80bcdbb0819504354e1278c37f211dd8cc2158fb`; later changes in this roll-up reconcile
+record lifecycle and reader state but add no scientific evidence.
+The record-state and validation revisions are retained in
+[Session 128](packing/campaign/agent-sessions/session-128-research-state-rollup.md).
 
 > Every number here also appears in a schema-validated artifact in this repository, or
 > is reproducible by a command given in the text, and the artifact is authoritative
@@ -114,6 +120,112 @@ action for each are in [`frontier/RESULTS.md`](packing/frontier/RESULTS.md); the
 
 <!-- END GENERATED: results-headline -->
 
+### Research Program Status and Roadmap
+
+This is the current repository-wide roll-up.
+The enforced records own the facts: agenda and commitment state lives in the
+[agenda records](packing/campaign/agendas/), session accounting in the
+[session records](packing/campaign/agent-sessions/README.md), and exploration state in
+the [exploration records](packing/campaign/explorations/). The
+[`agenda-map.md`](packing/campaign/agenda-map.md) and
+[`session-close-report.yaml`](packing/campaign/session-close-report.yaml) are generated
+views of those sources, the [generated ledger](packing/campaign/ledger.md) derives
+hypothesis status and summarizes experiment verdicts, and the
+[frontier register](packing/frontier/results.yaml) owns promoted results.
+
+<!-- BEGIN CURRENT-RESEARCH-STATUS -->
+
+| Record | Count | State at the cutoff |
+| --- | ---: | --- |
+| Agendas | 35 | 15 active; 14 completed; 5 paused; 1 superseded |
+| Commitments | 341 | 173 complete; 59 stopped; 64 blocked; 16 ready; 22 tentative; 7 in progress |
+| Sessions | 129 | 84 completed; 45 stopped; all terminal |
+| Explorations | 29 | 17 linked to proposed hypotheses; 12 uncodified |
+| Hypotheses | 138 | 25 confirmed; 24 refuted; 48 blocked; 10 unresolved; 2 open; 26 open questions; 2 result registered; 1 abandoned; 0 running |
+| Experiments | 116 | 38 accepted; 29 rejected; 25 unresolved; 11 baseline; 11 blocked; 2 abandoned; 0 in progress |
+| Frontier results | 26 | 26 registered |
+
+<!-- END CURRENT-RESEARCH-STATUS -->
+
+The agendas divide into six practical eras.
+Agendas 001–010 built the campaign record, controls, constructive search, and first
+exact-promotion machinery.
+Agendas 011–017 made verification and result disposition routine.
+Agendas 018–023 tested scaling, restricted covering programs, and the validation loop.
+Agendas 024–028 built on the `3.81` result with adaptive and structural routes.
+Agendas 029–033 and 035 developed conditional-owner geometry, T-025/T-026, and the
+now-paused incremental follow-ups.
+[Agenda 036](packing/campaign/agendas/agenda-036-n11-strategy-reset-roadmap.md) is the
+current strategy-reset queue.
+The generated agenda map, not this narrative, summarizes commitment state.
+
+All recorded sessions are terminal.
+`stopped` is not a scientific failure; it includes time limits, guarded refusals,
+administrative handoffs, and work deliberately ended after its next evidence was
+identified. The late-session arc moved from certificate production and exact dilation
+through owner geometry and bounded negative tests, then through the T-025/T-026
+publication stack and this reconciliation.
+Use the generated close report for individual session clocks and never add child-session
+resource totals to their parent roll-up.
+
+The exploration namespace has deliberate gaps; an absent identifier is not a missing
+report.
+Some explorations link forward through `proposes`, while others remain uncodified
+observations or strategy notes.
+The most consequential recent synthesis is X-027’s ceiling for pure point/density
+certificates, followed by X-028’s strategy portfolio and the scoped BC303 drafts
+X-029–X-031. A draft or proposed direction is not a registered hypothesis, and a
+registered hypothesis is not a frontier result.
+
+Scientifically, the current bracket is unchanged:
+`3.826447410572939… <= s(11) <= 3.877083590022814…`. T-026 closes about 43% of the older
+Stromquist-to-Trump interval.
+The pure point/density ceiling `38200/9977 ≈ 3.8288` lies only about `0.00236` above
+T-026, so additional heavy work for microscopic gains in that language is paused.
+H-160/exp-158 and H-162/exp-160 are registered but blocked before target invocation;
+their source and control work is retained, and their blocked status carries no
+scientific verdict.
+
+BC-339’s W7 pipeline-improvement and W8 reconciliation are complete and certified.
+BC-347’s source-bound
+[Astra Max mathematical audit](docs/project/reviews/review-2026-09-14-small-n-significant-progress-mathematical-audit.md)
+and roadmap integration are also complete and certified; they ran no scientific target
+and changed no frontier claim.
+The current order is:
+
+1. Run BC-346 as one W10 planning block.
+   Reconstruct whether the W5 validation-efficiency checkpoint is due, compare the
+   enlarged candidate set, and select exactly one execution entry.
+2. Treat A, S, global angular resources, and B as the first advisory tier.
+   A is the strongest route to a material `n = 11` lower bound; S is the best bounded
+   deliverable; angular resources offer a cheap optimal-face screen; and B is the
+   strongest alternative mechanism after its soundness controls.
+3. Retain stronger charge algebra, geometry-dependent budgets, an `n = 12` exact-value
+   program, and orientation structure as second-tier candidates whose first blocks must
+   pay for missing premises.
+4. Keep constructive search separately budgeted after an oblique proposer control, and
+   treat geometric waste accounting as a speculative candidate requiring both a local
+   lemma and a non-double-counting global rule.
+
+The audit’s linear advisory order is A, S, angular resources, B, stronger charge
+algebra, geometry-dependent budgets, `n = 12`, C, D, then geometric waste.
+That is a readiness-and-information judgment, not a measured probability of success or
+an execution decision.
+
+The
+[W8 documentation-pass runbook](packing/campaign/documentation-pass.md#synopsis-research-status-roll-up)
+defines the cutoff, source precedence, counting rules, conflict handling, and validation
+needed to refresh this section.
+Together, `packing-ledger check` and `devtools.check_synopsis` derive every row in the
+marked table from its owning artifacts and checked generated views, so a later source
+change cannot leave a plausible but stale total here.
+
+The roll-up and audit source checkpoint `fa6363b6c2b4c7d7449807c04166e9df94bc7b35`
+passed the complete 63-step fast surface at the declared four-CPU reference shape in
+459.37 seconds. The following closeout changes only record that gate, advance lifecycle
+state, and regenerate derived views; pull-request CI independently validates the
+resulting tree.
+
 ### Current research readiness
 
 The program has two promoted mathematical outputs: an exactly verified packing that
@@ -142,33 +254,9 @@ The detailed implementation statuses remain in [What Is Built](#what-is-built).
 | Visualization | Inspect the exact `n = 3` moduli SVG and design evidence-typed views from retained artifacts | The scalable basin atlas and the first `n = 5` ambiguity view are unbuilt; endpoint rows must not be pictured as components | [Visualization ladder](docs/project/reviews/review-2026-08-23-mathematical-frontier-strategy.md#basin-ontology-and-visualization-ladder) |
 | Unattended numerical execution | Run bounded supervised slices and let an agent resume dependency-ready work | The numerical runner remains **NO-GO** until its independent validity, recovery, receipt, and capacity gates pass | [Numeric launch agenda](docs/project/specs/active/plan-2026-08-23-overnight-cartography-run.md#the-numeric-runner-launch-gate) |
 
-The generated ledger currently derives twenty-five confirmed hypotheses, twenty-four
-refuted hypotheses, two open hypotheses, twenty-six open questions, and forty-six
-blocked hypotheses. H-104’s seven fixed-formula exact-angle clauses are confirmed; H-036
-remains unresolved. H-125 is blocked after exp129 missed its launch cutoff without
-scientific invocation; this does not refute its claim.
-No hypothesis is running; none is waiting on review and nine are unresolved.
-H-124’s fixed-square screen found no pair; its witness-only reader was not invoked.
-H-105 is refuted: all 134 eligible candidate pairs are separated.
-Exp128 subsequently settled H-099’s entire fixed support at optimum eleven through seven
-necessary rows; this does not determine expanded supports or a global packing bound.
-H-062 left that set on 2026-09-05: its fifth rung walled on both constructions and
-pinned the `m = 5` covering wall to a bracket of width 0.015 where it had registered
-0.02. One, H-064, is abandoned in the ledger’s word — its latest round expired resumable
-with the exact floor it raised.
-One, H-061, has no round and reads `result registered`: T-017 and T-018 name it in their
-`produced_by`, and the ledger’s `results` column shows them.
-H-070 left the running set at T+2: its released inset seed and matched unseeded control
-converged to byte-identical candidates, so the registered strict-improvement claim is
-refuted for this test.
-The set includes one claim whose formal prerequisite is missing, H-044 whose registered
-calibration-only amendment keeps the hypothesis undisposed — its first scored round
-(exp-046) missed the criterion determinately under both denominator readings, the review
-hold is cleared, and disposition waits on a confirmatory successor over a fresh-frozen
-corpus.
-Its active confidence ladder has completed the exact and event controls up to the
-first nontrivial identity question; the next scientific transition is from specialized
-`n = 5` local geometry to a defensible component relation, not to a larger raw census.
+Its active confidence ladder has completed the exact and event controls up to the first
+nontrivial identity question; the next scientific transition is from specialized `n = 5`
+local geometry to a defensible component relation, not to a larger raw census.
 
 #### Refresh rule
 
@@ -404,7 +492,7 @@ case or experiment separately.
 | [Operating Rules](operating-rules.md) | how a session is conducted | definitive | maintained | — |
 | [Packing Development Guide](development.md) | engineering and validation rules | definitive | maintained | — |
 | [The `s(n)` Research Campaign: W6 Runbook](packing/campaign/README.md) | W6 experiment mechanics | definitive | maintained | — |
-| [The W8 Documentation Pass — Runbook](packing/campaign/documentation-pass.md) | W8 documentation reconciliation | definitive | maintained | — |
+| [The W8 Documentation Pass: Runbook](packing/campaign/documentation-pass.md) | W8 documentation reconciliation | definitive | maintained | — |
 | [W9 Remediation Pass](packing/campaign/remediation-pass.md) | systematic defect and issue-backlog remediation | definitive | maintained | — |
 | [W10 Review, Planning, and Oversight](packing/campaign/review-planning-oversight.md) | post-agenda disposition, document review, and replanning | definitive | maintained | — |
 | [Agent Sessions](packing/campaign/agent-sessions/README.md) | escalated session and recovery contract | definitive | maintained | — |
@@ -546,6 +634,7 @@ case or experiment separately.
 | [Published Core Claims: Adversarial Review and Corrections](docs/project/reviews/review-2026-09-06-published-core-claims-adversarial.md) | dated review record | record | retained | — |
 | [Research: Comprehensive Review of the n = 17 Record](docs/project/reviews/review-2026-09-07-n17-comprehensive-review.md) | dated review record | record | retained | — |
 | [Review of the Paper Font Merge](docs/project/reviews/review-2026-09-08-paper-font-merge.md) | dated review record | record | retained | — |
+| [Mathematical Audit of Routes to Significant Progress on Small Square Packings](docs/project/reviews/review-2026-09-14-small-n-significant-progress-mathematical-audit.md) | dated review record | record | retained | — |
 | [The Three-Lane Research Method](docs/project/three-lane-research-method.md) | component scope and use | record | retained | — |
 | [Handoff — 2026-09-04, close of the fractional-certificate block](docs/project/handoff-2026-09-04-block-close.md) | dated handoff record | record | retained | — |
 | [Handoff: Post-3.81 Portfolio at T+2](docs/project/handoff-2026-09-06-post-381-t2-commissioning.md) | dated handoff record | record | retained | — |
@@ -761,6 +850,36 @@ controller, not permission to blur contracts.
 
 ### Current Handoff
 
+[Session 128](packing/campaign/agent-sessions/session-128-research-state-rollup.md)
+records the source-first reconciliation, five independent reviews, and the new snapshot
+drift check.
+[Session 129](packing/campaign/agent-sessions/session-129-small-n-mathematical-audit.md)
+records the separate Astra Max mathematical audit and the read-only roadmap-duplication
+review. Neither block ran a scientific target or changed a mathematical claim.
+The scientific evidence cutoff remains main revision
+`80bcdbb0819504354e1278c37f211dd8cc2158fb`, where the latest merged stack is green and
+the T-026 lower bound remains the frontier.
+
+**Selected next entry:** `think-9y7p`, the BC-346 W10 planning block.
+
+The roll-up and audit are certified and closed in dependency order.
+The bounded action is to reconstruct whether the W5 efficiency checkpoint is due,
+compare the ten candidate cells by payoff, readiness, first discriminator, stop rule,
+and cost, then select exactly one later execution entry.
+No scientific target runs inside this planning block.
+
+The older BC329, weighted-atom stages 3–4, and BC303 H-160/H-162 target lanes are
+paused. Their admitted implementations, registrations, and controls remain evidence; no
+exp-158 or exp-160 target receipt exists, so none carries a scientific verdict.
+The current inventory and candidate roadmap are in
+[Research Program Status and Roadmap](#research-program-status-and-roadmap), and
+[agenda-036](packing/campaign/agendas/agenda-036-n11-strategy-reset-roadmap.md) owns the
+queue.
+
+## Handoff Record
+
+### September 10–13
+
 **New analytical exploration:**
 [X-027](packing/campaign/explorations/X-027-stromquist-fractional-and-structural-strategy.md)
 connects the Stromquist correspondence with the recent certificate and owner results.
@@ -803,10 +922,10 @@ limits; that support does not admit certificate coverage.
 No hypothesis, experiment or scientific target was registered or run, and the frontier
 is unchanged.
 
-**Selected next entry:** `think-8c9e`, the weighted-atom coverage mechanics.
-The agreeing direct, event and interval controls on weighted atoms remain, including the
-closed-boundary and undercharged-core cases and the interval route’s stall handling,
-which is unresolved rather than a refuted atom or a failed budget proof.
+**Selected next entry at that cutoff:** `think-8c9e`, the weighted-atom coverage
+mechanics. The agreeing direct, event and interval controls on weighted atoms remain,
+including the closed-boundary and undercharged-core cases and the interval route’s stall
+handling, which is unresolved rather than a refuted atom or a failed budget proof.
 Certificate coverage admission stays blocked until they pass, and the paired instrument
 with its exact common row and point manifests is tracked separately behind it.
 The parallel BC329 lane has completed its bounded fixed-core runner implementation
@@ -1426,7 +1545,7 @@ reliably; the `12 s` call-wall backstop remains enforced.
 configuration and measurements; none of these historical selections supersedes Agenda
 024’s allocation.
 
-### Handoff Record
+### Earlier Handoffs
 
 [Open the house rendering of the retained 100-square witness.](packing/atlas/known-best/rendering/n-100.svg)
 
@@ -3647,9 +3766,9 @@ round that names the hypothesis, control roles included.
 | [H-157](packing/campaign/hypotheses/H-157-refined-owner-sector-patch-breaks-neutrality.md) | refuted | Sixteen owner sectors instead of eight fatten every guaranteed patch past the `0.014978` separating gap, so no neutral class survives the refinement | 1 | exp-154: six of eight refined subclasses still read exactly 10 and two read `19/2`; this refutes the all-subclasses claim, while broader conditioning and changed charges remain open |
 | [H-158](packing/campaign/hypotheses/H-158-unit-parent-domain-excludes-saved-residual.md) | unresolved | Exp151’s direction-6 residual fails its own necessary parent box, or one selected owner has a newly replayed positive B-only witness and no positive witness after the complete parent restriction | 1 | exp-156: residual survives; TR is B-only incompatible after 181 frames, making parent gain impossible there; BL, BR and TL were not run; 20.63s external wall |
 | [H-159](packing/campaign/hypotheses/H-159-bc303-one-corner-surplus.md) | refuted | Every bottom-left role-C selected core with labels 0 and 15 absent has surplus above the BC303 shared allowance | 1 | exp-157: the disclosed literal parent has labels `{3,4,11,12}` and exact surplus `3/800000 < epsilon`; 1.92s replay wall |
-| [H-160](packing/campaign/hypotheses/H-160-bc303-t2-charge-filters.md) | running | Every frozen BC303 C charge is at least 4524200 and every S first-owner strip charge is at least 4524185 | 1 | exp-158 preregistered without target charge; source and controls pending |
+| [H-160](packing/campaign/hypotheses/H-160-bc303-t2-charge-filters.md) | blocked | Every frozen BC303 C charge is at least 4524200 and every S first-owner strip charge is at least 4524185 | 1 | exp-158 paused before target invocation; no scientific verdict |
 | [H-161](packing/campaign/hypotheses/H-161-bc303-literal-parent-union.md) | refuted | The frozen literal closed Q0 has integer mass `N>=4262074`, excluding the named four-corner tuple under the imported BC303 floor | 1 | exp-159: `N=4000015`; neither the four-corner nor one-parent threshold rejects |
-| [H-162](packing/campaign/hypotheses/H-162-bc303-floor-normalized-t2-filter.md) | running | Frozen BC303 C and S first-owner strip minima are each at least 4524132 | 1 | exp-160 prospectively compares one admitted exp-158 receipt; neither target nor analysis has run |
+| [H-162](packing/campaign/hypotheses/H-162-bc303-floor-normalized-t2-filter.md) | blocked | Frozen BC303 C and S first-owner strip minima are each at least 4524132 | 1 | exp-160 paused without an exp-158 receipt; no scientific verdict |
 
 ### Confirmed
 
@@ -3921,8 +4040,8 @@ in separate tables: their units differ, and the same work can appear in both.
 | Coverage | sessions |
 | --- | ---: |
 | measured | 82 |
-| unmeasured | 45 |
-| **total** | **127** |
+| unmeasured | 47 |
+| **total** | **129** |
 
 <!-- END GENERATED: session-close-report -->
 
@@ -4093,9 +4212,9 @@ archive beside it.
 | [exp-155](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-155-h156-finer-net-threshold-dilation.md) | 11 | target | H-156 | Frozen T-025 atoms on the 1440-step direction net and exact dilation corollary | Proved `s(11) >= 955000*sqrt(518400042893309449)/179696714646249 = 3.8264474...`; the result is now V4/C5 | **accepted** |
 | [exp-156](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-156-unit-parent-saved-residual.md) | 11 | target | H-158 | Exact residual parent-box check followed by matched B-only and parent-restricted owner comparisons in TR, BL, BR, TL order | Residual inside parent box; TR / bottom-left:m1:j7 has exact negative B-only maximum after 181 frames, which also precludes parent gain there; BL, BR and TL unrun | unresolved |
 | [exp-157](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-157-bc303-literal-t1-witness.md) | 11 | target | H-159 | Retrospective source-bound replay of one disclosed bottom-left role-C parent across all 377 atoms | Labels `{3,4,11,12}`; 19 captured atoms give `S(X)=3/800000 < epsilon`, rejecting only the named local inequality | rejected |
-| [exp-158](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-158-bc303-t2-charge-filters.md) | 11 | target | H-160 | Prospective exact all-chart C and S first-owner charge filters after source and synthetic-control admission | No target charge run | in-progress |
+| [exp-158](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-158-bc303-t2-charge-filters.md) | 11 | target | H-160 | Prospective exact all-chart C and S first-owner charge filters after source and synthetic-control admission | Paused by strategy reset before target invocation; no scientific result | blocked |
 | [exp-159](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-159-bc303-literal-parent-union.md) | 11 | target | H-161 | Source-bound exact mass of closed `Q0=[0,1]^2` against frozen one-parent and four-corner budgets | `N=4000015`; both tests retain `1048233` units of slack | rejected |
-| [exp-160](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-160-bc303-floor-normalized-t2-filter-analysis.md) | 11 | target | H-162 | Prospective receipt-only comparison of admitted exp-158 C and S-strip minima with 4524132 | No target receipt or analysis run | in-progress |
+| [exp-160](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-160-bc303-floor-normalized-t2-filter-analysis.md) | 11 | target | H-162 | Prospective receipt-only comparison of admitted exp-158 C and S-strip minima with 4524132 | Paused without an exp-158 receipt; no comparison or scientific result | blocked |
 
 ### Cost and provenance
 
@@ -4974,10 +5093,15 @@ agrees, and new components inheriting the perimeter—that apply to code not yet
 
 ## Where This Stands
 
-**As of 2026-09-06 the project’s largest live result is the fractional lower-bound lane,
-and it is not the cartography spine.** Its weighted-resource lineage runs through Göbel,
-Kearney–Shiu, Nagamochi and Bentz; the recent pure-atomic rational direction-net
-architecture follows Burns, and the LP instance and parameter line follows Massaccesi.
+**As of 2026-09-14 the current state and execution order are the checked
+[Research Program Status and Roadmap](#research-program-status-and-roadmap) above.**
+T-026 remains the strongest lower bound; the point/density ceiling leaves too little
+room for further incremental work in that language, and the owner has selected material
+bound improvement or proof simplification as the governing payoff.
+The historical synthesis below explains how the program reached that boundary.
+Its weighted-resource lineage runs through Göbel, Kearney–Shiu, Nagamochi and Bentz; the
+recent pure-atomic rational direction-net architecture follows Burns, and the LP
+instance and parameter line follows Massaccesi.
 This project’s instances and generator moved seven registered cases in one day.
 `s(11) >= 381/100` is [T-018](packing/frontier/RESULTS.md), improving Stromquist’s
 `2 + 4/sqrt(5)`, stated in 1984 and published in 2003; the recorded search found no

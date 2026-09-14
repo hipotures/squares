@@ -341,31 +341,16 @@ on.
 It is not the next thing, because a reassessment of what to search is queued in front
 of it.
 
-For the next supervised exact-research goal, continue the weighted-atom coverage
-mechanics under `think-8c9e`. The production threshold-atom model now carries explicit
-per-site integer token counts through its budget, its D4 orbit key, its record and both
-exact coverage routes, and all four retained seven-token receipts reproduce their
-declared token total, budget, charge $3/2$ and charged-placement lists from family
-geometry. The
-[session127 review addendum](../../../../packing/campaign/agent-sessions/session-127-weighted-five-site-atom-admission.md#review-addendum--september-13-2026)
-records the consumer corrections and their validation boundary.
-What remains before certificate coverage can be admitted is the agreeing direct, event
-and interval controls on weighted atoms, including the closed-boundary and
-undercharged-core cases and the interval route’s stall handling, which is unresolved
-rather than a refutation.
-The paired instrument and exact common row and point manifests are stage four, blocked
-behind those coverage controls.
-Neither a BC327 hypothesis nor any experiment may be registered until both stages pass.
-The
-[weighted-atom review](../../reviews/review-2026-09-10-n11-weighted-five-site-atoms.md)
-owns the staged accept rules, and the
-[daytime plan](plan-2026-09-10-n11-daytime-strategy-and-explainer.md) owns the block it
-sits in. In parallel, PR156 has completed the BC329 bounded fixed-core runner’s
-implementation review.
-Its separate calibration instrument, three fresh full-shape host runs and
-source-distinct readbacks remain unadmitted and unrun.
-BC329 execution remains blocked on those requirements, as recorded in the
-[preflight addendum](../../reviews/review-2026-09-10-n11-bc329-packet-preflight.md#stack-review-addendum-2026-09-12).
+For the next supervised exact-research goal, run BC-346 under `think-9y7p` as the W10
+planning block over the certified roll-up and mathematical audit.
+This planning step runs no scientific target and selects exactly one later execution
+entry. The current evidence and candidate set are in the synopsis’s
+[Research Program Status and Roadmap](../../../../SYNOPSIS.md#research-program-status-and-roadmap),
+and
+[agenda-036](../../../../packing/campaign/agendas/agenda-036-n11-strategy-reset-roadmap.md)
+owns the disposition.
+
+## Prior Exact-Research Handoff Record
 
 [Session126](../../../../packing/campaign/agent-sessions/session-126-stromquist-analytical-exploration.md)
 and

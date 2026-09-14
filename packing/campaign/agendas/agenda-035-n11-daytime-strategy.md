@@ -8,8 +8,8 @@ softschema:
 agenda:
   id: agenda-035
   title: N11 Daytime Strategy and Research Blocks
-  updated: '2026-09-13'
-  status: active
+  updated: '2026-09-14'
+  status: paused
   objective: Select and execute short, high-information blocks across distinct routes to a stronger n11
     result. Preserve exact scope, put the most direct theorem paths first, and keep the standalone explainer
     update reviewable in parallel.
@@ -368,7 +368,7 @@ agenda:
     purpose: research
     owner_focus: insight
     instances: [11]
-    state: ready
+    state: stopped
     priority: 2
     question: Does full-support pricing expose an absent D4 site orbit missed by the first 32 positive dual rows?
     hypotheses: [H-135]
@@ -379,7 +379,9 @@ agenda:
       other completed one-candidate result remains unresolved under H135.
     bead: think-lkvd
     depends_on: [BC-325]
-    next_evidence: Keep as the prepared reserve when higher-ranked work waits on source review.
+    next_evidence: >-
+      The September 14 strategy reset removed this reserve from the live queue. Reopen it
+      only if BC-346 selects the full-support-pricing route.
     workflows: [research-loop]
     program: n11-daytime-strategy
   - id: BC-332
@@ -538,7 +540,7 @@ agenda:
     purpose: measurement_validation
     owner_focus: efficiency
     instances: [11]
-    state: ready
+    state: stopped
     priority: 2
     question: Are the selected blocks producing reusable evidence without repeated parsing, gates or source repair?
     budget: One W5 block when the reconstructed four-to-eight-block cadence makes it due, plus a bounded W10
@@ -548,7 +550,9 @@ agenda:
       and session handoffs for the work actually attempted.
     bead: think-1ydi
     depends_on: []
-    next_evidence: Reconstruct cadence after each terminal block; administrative planning does not reset it.
+    next_evidence: >-
+      BC-340 in agenda-036 now owns this bead and the due efficiency-checkpoint question;
+      it remains behind BC-346's one-route selection.
     workflows: [efficiency-loop, review-planning-oversight]
     program: n11-daytime-strategy
 ---
@@ -558,6 +562,12 @@ This agenda is a portfolio, not a promise to run every line today.
 One research block is active at a time.
 Its result selects the next block, and the branch publishes a resumable checkpoint
 before another target begins.
+
+The September 14 owner strategy reset pauses this portfolio’s nonterminal work.
+Its completed outcomes remain authoritative, but
+[agenda-036](agenda-036-n11-strategy-reset-roadmap.md) owns the current sequence.
+A paused commitment here is not a negative scientific result; no H-160, H-162, exp-158,
+or exp-160 target was run.
 The explainer is the sole parallel write lane and has its own checkout and pull request.
 
 BC325 reconciled two independent rankings and selected BC326 first.
