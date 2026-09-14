@@ -714,23 +714,24 @@ Status: **active**. Select and execute short, high-information blocks across dis
 | --- | --- | --- | --- | ---: | --- | --- |
 | BC-325 | research | 11 | complete | 1 | think-gvlg | BC326 is selected first. The independent translation review then promotes BC329's one frozen 2880-step packet ahead of a weighted target, while BC327 remains blocked on multiplicity admission, a paired-program adapter and a freshly materialized row manifest. |
 | BC-326 | research | 11 | complete | 1 | think-fx2y | Exp156 is retired after its sole registered invocation returned B-only incompatibility at the first selected owner. Since the parent-restricted TR set is contained in its B-only set, no parent gain is possible there. Any further test of H158 requires a separately registered protocol that skips TR and tests BL, BR and TL; exp156 does not authorize a rerun or continuation to those owners. |
+| BC-338 | research | 11 | complete | 1 | think-ms9l | The inequality is retired by exp-157. The separate T2 forced-type test under think-cexv and global owner routing remain open under their own admission. |
 | BC-337 | research | 11 | blocked | 2 | think-0cdq | Build and independently admit the source-bound K_TR constructor, exact clipping and union calculation, bounded runner and independent reader. BC329 remains the higher-priority direct global-bound target; BC337 is a parallel secondary lane and must register its hypothesis and sole target only after tool admission. |
 | BC-327 | research | 11 | blocked | 2 | think-yc80 | The conditional primary is the retained seven-token, threshold-four K5 motif. Run its W7 admission before allocating the paired scientific comparison; do not substitute ordinary atoms inside the same protocol. |
 | BC-328 | research | 11 | complete | 1 | think-02l0 | Use the reviewed adjacent-wall component normal form to define one snug-parent or genuine contact-path pilot. Preserve the complementary path-length branches and verify physical contact rather than treating an arbitrary tight support row as contact. |
-| BC-329 | research | 11 | blocked | 1 | think-17qa | Build and independently admit that fixed-core runner. Then prospectively register one packet retaining T025's sites and relative weights with a 2880-step net, B=9981/10000, D=207107/1440000000, raw acceptance threshold M/11=685457679/687500000, and normalization alpha=1/m. Require complete exact and interval agreement plus dilation replay on the same normalized bytes. |
+| BC-329 | research | 11 | blocked | 1 | think-17qa | Repair and rereview the integrated coordinator, source-distinct reader, and run-set verifier; admit the three-profile run sheet; publish the reviewed PR head; then run and independently read three controls under fixed-core-packet-calibration/v1. Only after those gates pass, prospectively register one packet retaining T025's sites and relative weights with a 2880-step net, B=9981/10000, D=207107/1440000000, raw acceptance threshold M/11=685457679/687500000, and normalization alpha=1/m. Require complete exact and interval agreement plus dilation replay on the same normalized bytes. |
 | BC-330 | research | 11 | blocked | 2 | think-vx0p | Use BC326 and BC328 to select a meaningful class; do not treat one class as the global existential owner-selection theorem. |
 | BC-331 | research | 11 | ready | 2 | think-lkvd | Keep as the prepared reserve when higher-ranked work waits on source review. |
 | BC-332 | tool_validation | 11 | complete | 1 | think-b5b1 | BC334 implements the selected incremental architecture: retain the T018 worked proof and add T025/T026 as an advanced final section. |
-| BC-334 | tool_validation | 11 | complete | 1 | think-gv5a | PR148 at f7126bfc implements the section and v0.4.0 edition and has passed the complete local documentation block. BC335 owns the stack-only hosted checkpoint. |
+| BC-334 | tool_validation | 11 | complete | 1 | think-gv5a | The implementation and historical hosted checkpoint are complete at PR148 revision 989fd544. The September 12 review corrections start at e8baa8ff; the dated T025/T026 review addendum records the subsequent source checks and 22-page rendering evidence. These are later validation of the completed documentation milestone. |
 | BC-336 | tool_validation | 11 | complete | 1 | think-ccsi | PR148 commit 35484ebd first uses v0.4.0 as this explainer's edition label on September 10, 2026; commit ce3b1ab5606307ed5cb6780da09c1b5f233ab2e1 first uses v0.3.0 as that label on September 8, 2026. Both dates are rendered from one release-history source and covered by focused tests. |
-| BC-335 | tool_validation | 11 | in_progress | 1 | think-0zc1 | The independent mathematical review passed after narrowing the T025 certificate and standalone-checker wording; the terminology audit states the exact proved lower bound with its V4/C5 assurance, identifies dilation-limit as the proof method, and distinguishes the separate stronger strict inequality. The review defines core, trace and charge before use. PR154 and X-027 are merged into the PR148 head; local merged-head checks pass, and hosted checks are the remaining exit evidence. |
+| BC-335 | tool_validation | 11 | complete | 1 | think-0zc1 | The historical D3 checkpoint passed on PR148 at 989fd544. The September 12 mathematical, clarity and integration review is recorded separately in the T025/T026 review addendum; later stack revisions require their own validation and do not change the completed milestone's evidence source. |
 | BC-333 | measurement_validation | 11 | ready | 2 | think-1ydi | Reconstruct cadence after each terminal block; administrative planning does not reset it. |
 
 ## Series
 
 | id | status | title | rounds | opened because |
 | --- | --- | --- | --- | --- |
-| series-000 | open | S0: smoke and calibration — prove the machinery, establish every baseline metric | 112 | First series. There is no prior instrument, so not |
+| series-000 | open | S0: smoke and calibration — prove the machinery, establish every baseline metric | 115 | First series. There is no prior instrument, so not |
 
 ## Registry
 
@@ -870,6 +871,9 @@ Status: **active**. Select and execute short, high-information blocks across dis
 | H-156 | confirmed | proof | The rank-one threshold-atom closure admits a D4-symmetric certificate  |  | 1 |  | 111.9m wall |
 | H-157 | refuted | proof | Refining the corner-owner angular bins from eight to sixteen makes eve |  | 1 |  | 5.9m wall |
 | H-158 | unresolved | proof | For exp151's direction-6 saved residual on selected tuple (0,0,0,7), e |  | 1 |  | 21s wall |
+| H-159 | refuted | proof | For every admissible bottom-left one-corner role-C unit parent X with  |  | 1 |  | 2s wall |
+| H-160 | running | proof | On the frozen BC293 377-atom measure and every one of the 182 eligible |  | 1 |  |  |
+| H-161 | refuted | proof | In the frozen BC303 377-atom measure, the closed literal parent Q0=[0, |  | 1 |  | 0s wall |
 
 ## Needs review — held for a human, not decided
 
@@ -879,7 +883,7 @@ Status: **active**. Select and execute short, high-information blocks across dis
 
 ## Rounds
 
-### rejected (27)
+### rejected (29)
 
 | id | series | instance | operator | hypotheses | reason |
 | --- | --- | --- | --- | --- | --- |
@@ -910,6 +914,8 @@ Status: **active**. Select and execute short, high-information blocks across dis
 | exp-151 | series-000 | 11 | GPT-6 Astra coordinator; implementation by GPT-5.6 Sol extra high; mathematical admission by GPT-6 Astra max | H-149 | The completed first-deficit stop refutes this fixed six-dot set after seven of 361 directions. It does not rule out relocating the sixth site, changing other sites or a weighted certificate. |
 | exp-153 | series-000 | 11 | GPT-6 Astra coordinator; implementation by GPT-5.6 Sol extra high; mathematical admission by GPT-6 Astra max | H-151 | The exact site region becomes empty after 188 complete direction constraints. This rules out every additional single site while original D and tuple(0,0,0,7) stay fixed. It does not rule out weighted added mass below two, repositioned six-site patterns or physical packings. |
 | exp-154 | series-000 | 11 | Claude Opus 5 measurement lane, coordinated by Claude Fable | H-157 | Six refined subclasses still read exactly 10, so the case split as posed is not closed by refinement and H-157 is refuted on its own registered direction. |
+| exp-157 | series-000 | 11 | Codex Sol implementation and record; source-distinct mathematical review at the original reader head by Astra Max | H-159 | The fixed parent has S(X)=3/800000 < epsilon=524199/2000000, so the named universal local inequality is false; no continuous-domain or global claim follows. |
+| exp-159 | series-000 | 11 | Codex source-distinct reviewer, then exact target operator | H-161 | N=4000015 is below both first-rejecting integers, so the literal four-corner and one-parent resource tests survive with 1048233 units of slack each; neither extension is established. |
 
 ### abandoned (2)
 
@@ -1021,6 +1027,12 @@ Status: **active**. Select and execute short, high-information blocks across dis
 | exp-031 | series-000 | 10 | openai-codex | H-002 | All four source perturbations satisfy every declared condition and return to the proved side within floating-point precision. This confirms the narrow known-answer control without reopening H-002's refuted universal claim. |
 | exp-032 | series-000 | 3 | openai-codex | H-021 | The exact connected and isolated controls pass, every declared conflation fails, and all unsupported floating-point observations remain unresolved. |
 
+### in-progress (1)
+
+| id | series | instance | operator | hypotheses | reason |
+| --- | --- | --- | --- | --- | --- |
+| exp-158 | series-000 | 11 | Codex BC303 T2 charge-sweep agent | H-160 | The target charge has not run; source and adversarial controls must pass first. |
+
 ## Resumable — stopped on the clock, not on an answer
 
 | id | hypotheses | spent | stopped by | resume from | reopen when |
@@ -1042,7 +1054,7 @@ Status: **active**. Select and execute short, high-information blocks across dis
 
 ## Effort
 
-112 rounds, 2152.1 agent-minutes, 1485.2 wall-minutes.
+115 rounds, 2152.1 agent-minutes, 1485.2 wall-minutes.
 
 ## Exploration reports not yet codified
 
@@ -1055,6 +1067,9 @@ Status: **active**. Select and execute short, high-information blocks across dis
 - X-015 — The map and the three programs: where significant progress is likeliest next
 - X-027 — Fractional Obstructions and Structural Proof Mechanisms
 - X-028 — Draft N11 Strategy Portfolio After the Daytime Explorations
+- X-029 — BC303 T2 Exact Geometry and Open Threshold Tests
+- X-030 — Draft N11 Proof Obligations After the T1 Local Witness
+- X-031 — Floor-Normalized BC303 T2 Helper and H-161 Local Stability
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

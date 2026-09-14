@@ -142,12 +142,12 @@ The detailed implementation statuses remain in [What Is Built](#what-is-built).
 | Visualization | Inspect the exact `n = 3` moduli SVG and design evidence-typed views from retained artifacts | The scalable basin atlas and the first `n = 5` ambiguity view are unbuilt; endpoint rows must not be pictured as components | [Visualization ladder](docs/project/reviews/review-2026-08-23-mathematical-frontier-strategy.md#basin-ontology-and-visualization-ladder) |
 | Unattended numerical execution | Run bounded supervised slices and let an agent resume dependency-ready work | The numerical runner remains **NO-GO** until its independent validity, recovery, receipt, and capacity gates pass | [Numeric launch agenda](docs/project/specs/active/plan-2026-08-23-overnight-cartography-run.md#the-numeric-runner-launch-gate) |
 
-The generated ledger currently derives twenty-five confirmed hypotheses, twenty-two
+The generated ledger currently derives twenty-five confirmed hypotheses, twenty-four
 refuted hypotheses, two open hypotheses, twenty-six open questions, and forty-six
 blocked hypotheses. H-104’s seven fixed-formula exact-angle clauses are confirmed; H-036
 remains unresolved. H-125 is blocked after exp129 missed its launch cutoff without
 scientific invocation; this does not refute its claim.
-One hypothesis is running; none is waiting on review and nine are unresolved.
+No hypothesis is running; none is waiting on review and nine are unresolved.
 H-124’s fixed-square screen found no pair; its witness-only reader was not invoked.
 H-105 is refuted: all 134 eligible candidate pairs are separated.
 Exp128 subsequently settled H-099’s entire fixed support at optimum eleven through seven
@@ -214,10 +214,34 @@ case or experiment separately.
 | --- | --- | --- | --- | --- |
 | [Fractional Packing, Duality, and the Next $n=11$ Discriminators](docs/project/research/research-2026-09-10-x027-fractional-duality.md) | research synthesis | record | retained | — |
 | [X027: Seven Corner Marks, Contact Components, and Relational Helpers](docs/project/research/research-2026-09-10-x027-structural-helpers.md) | research synthesis | record | retained | — |
+| [N11: The Missing Owner-Selection Theorem](docs/project/research/research-2026-09-12-n11-selection-routing-first-principles.md) | research synthesis | record | retained | — |
+| [BC303 Literal Parent-Union Mass](docs/project/research/research-2026-09-13-bc303-literal-parent-union-result.md) | research synthesis | record | retained | — |
+| [H-161 Literal Parent-Union Result: Independent Audit](docs/project/reviews/review-2026-09-13-bc303-literal-parent-union-result.md) | dated review record | record | retained | — |
+| [BC303 T2: From the Accepted Pose Domains to Exact Charge Tests](docs/project/research/research-2026-09-13-bc303-t2-charge-bridge.md) | research synthesis | record | retained | — |
 | [Certificate Mechanisms After the $n=11$ Fractional Ceilings](docs/project/research/research-2026-09-10-x027-certificate-mechanisms.md) | research synthesis | record | retained | — |
 | [A6 Fixed-Support Dual Admission](packing/cases/n11_fractional_certificate/a6_dual_upper/README.md) | research synthesis | record | retained | — |
 | [A6 Scope and Overnight Plan Review](docs/project/reviews/review-2026-09-10-n11-a6-scope-and-plan.md) | dated review record | record | retained | — |
 | [N11: Daytime Strategy Blocks and Parallel Explainer Update](docs/project/specs/active/plan-2026-09-10-n11-daytime-strategy-and-explainer.md) | implementation plan | current | transient | — |
+| [BC329 Target-Free Three-Profile Run Sheet](docs/project/specs/active/plan-2026-09-13-n11-bc329-three-profile-run-sheet.md) | implementation plan | current | transient | — |
+| [BC329 Run-Set Verifier Contract](docs/project/specs/active/plan-2026-09-13-n11-bc329-runset-verifier.md) | implementation plan | current | transient | — |
+| [BC329 Calibration Reader: Source-Distinct Review](docs/project/reviews/review-2026-09-13-n11-bc329-source-distinct-reader.md) | dated review record | record | retained | — |
+| [BC329 Reader Repair: Exact-Commit Rereview](docs/project/reviews/review-2026-09-13-n11-bc329-reader-rereview.md) | dated review record | record | retained | — |
+| [BC329 Reader F6/F7: Exact-Commit Admission Review](docs/project/reviews/review-2026-09-13-n11-bc329-reader-f6f7-overflow.md) | dated review record | record | retained | — |
+| [BC329 Reader F6/F7: Final Exact-Head Review](docs/project/reviews/review-2026-09-13-n11-bc329-reader-f6f7-final.md) | dated review record | record | retained | — |
+| [BC329 Topology Coordinator Exact-Head Review](docs/project/reviews/review-2026-09-13-n11-bc329-topology-coordinator-initial.md) | dated review record | record | retained | — |
+| [BC329 Coordinator Exact-Head Review](docs/project/reviews/review-2026-09-13-n11-bc329-coordinator-rereview.md) | dated review record | record | retained | — |
+| [BC329 Coordinator and Producer Exact-Head Review](docs/project/reviews/review-2026-09-13-n11-bc329-coordinator-final.md) | dated review record | record | retained | — |
+| [BC329 Coordinator Arithmetic Repair: Exact-Head Review](docs/project/reviews/review-2026-09-13-n11-bc329-coordinator-arithmetic-final.md) | dated review record | record | retained | — |
+| [Independent Operational Review: BC329 Three-Profile Run Sheet](docs/project/reviews/review-2026-09-13-n11-bc329-three-profile-run-sheet.md) | dated review record | record | retained | — |
+| [Exact-Head Review: BC329 Run-Set Verifier](docs/project/reviews/review-2026-09-13-n11-bc329-runset-verifier.md) | dated review record | record | retained | — |
+| [BC329 Run-Set Verifier: Exact-Head Rereview](docs/project/reviews/review-2026-09-13-n11-bc329-runset-verifier-rereview.md) | dated review record | record | retained | — |
+| [BC329 Run-Set Verifier: Independent Exact-Head R3 Review](docs/project/reviews/review-2026-09-13-n11-bc329-runset-verifier-r3-final.md) | dated review record | record | retained | — |
+| [PR 156 Integrated Source and BC329 Run-Sheet Review](docs/project/reviews/review-2026-09-13-n11-bc329-integrated-run-sheet.md) | dated review record | record | retained | — |
+| [PR 156 Run-Sheet Exact-Diff Rereview](docs/project/reviews/review-2026-09-13-n11-bc329-run-sheet-identity-refusal.md) | dated review record | record | retained | — |
+| [PR 156 Run-Sheet Parent-Identity Final Rereview](docs/project/reviews/review-2026-09-13-n11-bc329-run-sheet-parent-final.md) | dated review record | record | retained | — |
+| [PR 156 Run-Sheet Flowmark Final Rereview](docs/project/reviews/review-2026-09-13-n11-bc329-run-sheet-flowmark-final.md) | dated review record | record | retained | — |
+| [PR156 Native Usage Delta Audit](docs/project/reviews/review-2026-09-13-pr156-usage-delta.md) | dated review record | record | retained | — |
+| [Exact Review of the Repaired BC303 T1 Reader](docs/project/reviews/review-2026-09-13-n11-bc303-t1-reader-final-math.md) | dated review record | record | retained | — |
 | [N11: Three Overnight Research Blocks After PR139](docs/project/specs/active/plan-2026-09-10-n11-overnight-three-blocks.md) | implementation plan | record | superseded | [N11: Daytime Strategy Blocks and Parallel Explainer Update](docs/project/specs/active/plan-2026-09-10-n11-daytime-strategy-and-explainer.md) |
 | [Independent Review of the Unit-Parent Centre Bound](docs/project/reviews/review-2026-09-10-n11-parent-centre-independent-review.md) | dated review record | record | retained | — |
 | [Independent Review of the Adopted Parent Adapter](docs/project/reviews/review-2026-09-10-n11-parent-adapter-admission.md) | dated review record | record | retained | — |
@@ -225,6 +249,18 @@ case or experiment separately.
 | [Independent Review of Translated Individual-Parent Realizability](docs/project/reviews/review-2026-09-10-n11-parent-realizability-independent.md) | dated review record | record | retained | — |
 | [Independent Admission Review: BC326 Parent-Domain Runner](docs/project/reviews/review-2026-09-10-n11-parent-runner-independent.md) | dated review record | record | retained | — |
 | [BC329: Preflight of the 2880-Step Threshold Packet](docs/project/reviews/review-2026-09-10-n11-bc329-packet-preflight.md) | dated review record | record | retained | — |
+| [Fixed-Core Packet Calibration: Mathematical and Admission Review](docs/project/reviews/review-2026-09-12-n11-bc329-calibration-design.md) | dated review record | record | retained | — |
+| [N11 Strategy Audit for the BC329 Closeout](docs/project/reviews/review-2026-09-12-n11-post-bc329-strategy-audit.md) | dated review record | record | retained | — |
+| [Source-Distinct Review of the N11 Owner-Selection Report](docs/project/reviews/review-2026-09-12-n11-selection-routing-first-principles.md) | dated review record | record | retained | — |
+| [Independent Review of the BC303 T2 Geometry Reduction](docs/project/reviews/review-2026-09-13-bc303-t2-geometry.md) | dated review record | record | retained | — |
+| [Source-Distinct Review of the BC303 T2 Charge Bridge](docs/project/reviews/review-2026-09-13-bc303-t2-charge-bridge.md) | dated review record | record | retained | — |
+| [BC303 T2 and H161: The Remaining Global Implication](docs/project/reviews/review-2026-09-13-bc303-t2-global-bridge.md) | dated review record | record | retained | — |
+| [BC303 Floor-Normalized T2: Independent Mathematical Review](docs/project/reviews/review-2026-09-13-bc303-floor-normalized-t2-independent.md) | dated review record | record | retained | — |
+| [BC303 Parent-Union Lemma: Independent Mathematical Review](docs/project/reviews/review-2026-09-13-bc303-parent-union-math.md) | dated review record | record | retained | — |
+| [BC303 T2 Charge Reader: Independent Admission Review](docs/project/reviews/review-2026-09-13-bc303-t2-charge-reader-refusal.md) | dated review record | record | retained | — |
+| [BC303 T2 Charge Reader: Independent Readmission](docs/project/reviews/review-2026-09-13-bc303-t2-charge-reader-readmission.md) | dated review record | record | retained | — |
+| [H-160 T2 Reader: Integrated-Head Target-Free Admission](docs/project/reviews/review-2026-09-13-bc303-t2-integrated-head-admission.md) | dated review record | record | retained | — |
+| [X-030 Final Publication Review at `147ceff6`](docs/project/reviews/review-2026-09-13-x030-publication.md) | dated review record | record | retained | — |
 | [Strategic Review of the N11 Daytime Research Frontier](docs/project/reviews/review-2026-09-10-n11-strategy-frontier.md) | dated review record | record | retained | — |
 | [N=11 Structural Normal Forms](docs/project/reviews/review-2026-09-10-n11-structural-normal-forms.md) | dated review record | record | retained | — |
 | [Independent Review of the N=11 Structural Normal Form](docs/project/reviews/review-2026-09-10-n11-structural-normal-forms-independent.md) | dated review record | record | retained | — |
@@ -958,6 +994,11 @@ The corrected T1 and T2 statements concern the retained finite ray universe and 
 fixed patch-only residual domain.
 They do not rule out other angular restrictions, stronger domains, changed charges, or
 owner-selection routing, and they do not establish that the conditional strategy fails.
+Separately, the retrospective
+[BC303 T1 literal replay](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-157-bc303-literal-t1-witness.md)
+rejects the named bottom-left role-C universal local surplus inequality: one admissible
+parent has closed labels `{3,4,11,12}` and surplus `3/800000 < epsilon`. It decides no
+continuous-domain minimum, T2 forced-type case, global routing, or new `s(11)` bound.
 Exp150’s compatibility result does not establish continuous unit parents or simultaneous
 owners, and exp153 does not exclude the physical tuple.
 
@@ -3575,6 +3616,9 @@ round that names the hypothesis, control roles included.
 | [H-156](packing/campaign/hypotheses/H-156-threshold-certificate-past-3-82.md) | confirmed | T-026 confirms the finer-net disjunct by proving `s(11) >= 955000*sqrt(518400042893309449)/179696714646249 = 3.8264474...`; the result is now V4/C5 | 1 | 111.9m wall |
 | [H-157](packing/campaign/hypotheses/H-157-refined-owner-sector-patch-breaks-neutrality.md) | refuted | Sixteen owner sectors instead of eight fatten every guaranteed patch past the `0.014978` separating gap, so no neutral class survives the refinement | 1 | exp-154: six of eight refined subclasses still read exactly 10 and two read `19/2`; this refutes the all-subclasses claim, while broader conditioning and changed charges remain open |
 | [H-158](packing/campaign/hypotheses/H-158-unit-parent-domain-excludes-saved-residual.md) | unresolved | Exp151’s direction-6 residual fails its own necessary parent box, or one selected owner has a newly replayed positive B-only witness and no positive witness after the complete parent restriction | 1 | exp-156: residual survives; TR is B-only incompatible after 181 frames, making parent gain impossible there; BL, BR and TL were not run; 20.63s external wall |
+| [H-159](packing/campaign/hypotheses/H-159-bc303-one-corner-surplus.md) | refuted | Every bottom-left role-C selected core with labels 0 and 15 absent has surplus above the BC303 shared allowance | 1 | exp-157: the disclosed literal parent has labels `{3,4,11,12}` and exact surplus `3/800000 < epsilon`; 1.92s replay wall |
+| [H-160](packing/campaign/hypotheses/H-160-bc303-t2-charge-filters.md) | running | Every frozen BC303 C charge is at least 4524200 and every S first-owner strip charge is at least 4524185 | 1 | exp-158 preregistered without target charge; source and controls pending |
+| [H-161](packing/campaign/hypotheses/H-161-bc303-literal-parent-union.md) | refuted | The frozen literal closed Q0 has integer mass `N>=4262074`, excluding the named four-corner tuple under the imported BC303 floor | 1 | exp-159: `N=4000015`; neither the four-corner nor one-parent threshold rejects |
 
 ### Confirmed
 
@@ -3862,7 +3906,7 @@ The relevant generator writes the receipt, and the entry fills in on the next
 
 ## Experiments Conducted
 
-There are 112 rounds registered in `series-000`.
+There are 115 rounds registered in `series-000`.
 
 They record 2152.1 agent-minutes and 1485.2 wall-minutes.
 Exp129 closed as blocked without invocation and contributes zero scientific elapsed
@@ -4016,6 +4060,9 @@ archive beside it.
 | [exp-154](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-154-h157-sixteen-sector-refinement-limit.md) | 11 | target | H-157 | Exact sixteen-bin and singleton-ray owner-sector screen of the mass-eleven ceiling family | Six of eight refined subclasses still read survivor weight exactly 10; the two that break read 19/2, not 79/8 | **rejected** |
 | [exp-155](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-155-h156-finer-net-threshold-dilation.md) | 11 | target | H-156 | Frozen T-025 atoms on the 1440-step direction net and exact dilation corollary | Proved `s(11) >= 955000*sqrt(518400042893309449)/179696714646249 = 3.8264474...`; the result is now V4/C5 | **accepted** |
 | [exp-156](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-156-unit-parent-saved-residual.md) | 11 | target | H-158 | Exact residual parent-box check followed by matched B-only and parent-restricted owner comparisons in TR, BL, BR, TL order | Residual inside parent box; TR / bottom-left:m1:j7 has exact negative B-only maximum after 181 frames, which also precludes parent gain there; BL, BR and TL unrun | unresolved |
+| [exp-157](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-157-bc303-literal-t1-witness.md) | 11 | target | H-159 | Retrospective source-bound replay of one disclosed bottom-left role-C parent across all 377 atoms | Labels `{3,4,11,12}`; 19 captured atoms give `S(X)=3/800000 < epsilon`, rejecting only the named local inequality | rejected |
+| [exp-158](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-158-bc303-t2-charge-filters.md) | 11 | target | H-160 | Prospective exact all-chart C and S first-owner charge filters after source and synthetic-control admission | No target charge run | in-progress |
+| [exp-159](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-159-bc303-literal-parent-union.md) | 11 | target | H-161 | Source-bound exact mass of closed `Q0=[0,1]^2` against frozen one-parent and four-corner budgets | `N=4000015`; both tests retain `1048233` units of slack | rejected |
 
 ### Cost and provenance
 
@@ -4133,10 +4180,13 @@ archive beside it.
 | exp-154 | under an hour, as registered | 356.1 s | — | criterion | `67ccd16b` |
 | exp-155 | retrospective registration of one completed bounded lane; no new target allowance | 6713.2s additive reported | — | criterion | `7ccb679c` |
 | exp-156 | one 90-second scientific allowance inside one 120-second supervised process plus two-second grace | 0.4452s scientific | 20.6281s external command wall, including mandatory in-process readback and supervision | criterion | receipt: 8.6396s source replay and 9.0848s pre-readback publication clock; later Astra receipt audit: 9.26s separate review work; H-158 unresolved |
+| exp-157 | one fixed disclosed candidate; no search clock | — | 1.92s external replay wall | criterion | source-bound receipt at `81898608`; independent 377-row audit separate |
+| exp-158 | one all-chart invocation, at most 30 minutes after controls | — | — | not started | source and control admission pending; no target charge |
+| exp-159 | one source-bound literal target invocation; no pose sweep or retry | 0.16s | — | criterion | execution head `f27c8ec7`; independent 377-atom and D4 audit retained |
 
-### What the 112 rounds jointly establish
+### What the 115 rounds jointly establish
 
-The 112 rounds use 2152.1 agent-minutes and 1485.2 wall-minutes under the campaign’s
+The 115 rounds use 2152.1 agent-minutes and 1485.2 wall-minutes under the campaign’s
 retained effort accounting.
 The never-invoked exp129 adds no scientific result or execution time.
 Exp-114 contributes 2.46 seconds of target/replay effort; its readiness work is recorded
