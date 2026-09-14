@@ -32,36 +32,27 @@ hypothesis:
 ---
 # H-210 — the blind physics never settles to a valid packing
 
-**The finding that reframed the epic, registered so the claim can be tested rather than
-assumed.**
+**Registered so the claim can be tested rather than assumed.**
 
-15,000 of 15,000 blind trials ended with squares overlapping -- at every n from 5 to 29,
-at every shake level including zero, by 0.03 to 0.12 of a unit side.
-Measured by a separating-axis test over the final poses, written independently of the
-simulation, with its tolerance taken from a control rather than chosen: the SNAPPED
-trajectory, which ends on the record’s own poses by construction, scores 5.5e-7 to
-1.0e-6.
+Every blind run observed ended with squares overlapping by 0.03 to 0.12 of a unit side.
+A separating-axis test measured it over the final poses, with a tolerance taken from the
+snapped control
+([exp-210](../series/series-000-smoke-and-calibration/experiments/exp-210-h210-blind-runs-are-not-packings.md)).
+The trials were not kept, so this is an observation to re-measure rather than a result.
 
-So the workbench’s physics does not settle to a packing on its own.
-The animation looks right because its last frame is snapped onto the record; underneath,
-contacts stay soft and the squares come to rest inside each other.
+**A suggested mechanism.** The contact law is a spring, and at rest a compressed spring
+balances the walls’ inward pressure at a non-zero overlap.
+The snapped and free modes end with a correction phase that pulls squares toward their
+destinations. Blind mode is not given destinations, so nothing removes the residual.
 
-**Why the residual survives.** The correction phase pulls every pose onto its target
-over the last part of the move -- and in blind mode there is no target, so nothing in
-the schedule removes penetration.
-The contact law is a spring: at equilibrium a spring balances the wall’s inward pressure
-at a non-zero compression, and the run ends at that equilibrium rather than at
-separation.
+**What would refute it.** One blind run, at any n and any parameters, whose deepest
+final overlap is under 1e-5. That is the same falsifier as H-209’s and a cheaper one to
+check, which is why it is worth having both.
 
-**What would refute this claim.** One blind run, at any n and any parameters, whose
-deepest final overlap is under 1e-5. That is the same falsifier as H-209’s and a cheaper
-one to check, which is why it is worth having both.
-
-**What follows if it stands.** Every search result from this instrument is about
-bounding boxes rather than packings, and the instrument needs a resolution phase -- a
-final stage that pushes squares apart until no pair overlaps, and reports the container
-that arrangement actually needs -- before any of its numbers are about packing at all.
-That is a change to the method, not to its dials.
+**What follows if it stands.** Every side the instrument reads directly is a bounding
+box rather than a container, so scoring needs a repair first.
+The harness has one: it separates overlapping squares and scores the container the
+repaired arrangement needs.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

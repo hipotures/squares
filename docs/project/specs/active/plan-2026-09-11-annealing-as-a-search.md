@@ -7,7 +7,7 @@ author: Claude (agent), for the repository maintainer
 
 **Date:** 2026-09-11
 
-**Updated:** 2026-09-12
+**Updated:** 2026-09-14
 
 **Author:** Claude (agent), for the repository maintainer
 
@@ -63,17 +63,18 @@ The review found these distinct cases:
 
 | observation | status | disposition |
 | --- | --- | --- |
-| The retained summaries include `n = 17` cells at anneal level 8. Those cells are sweep outputs marked unresolved, while the retained deep level-8 artifact contains `n = 11` only. | The earlier note that `n = 17` ran only at level 6 is false. The stronger deep-run claim in `exp-208` is not supported by the retained summary layout. | `think-jdgu` reconciles the experiment narrative with the actual cells, parameters and sample counts before any numerical conclusion is repeated. |
+| The retained summaries include `n = 17` cells at anneal level 8, all scored before the validity check. Repaired `n = 17` runs exist at level 6 only, and the retained deep level-8 artifact contains `n = 11` only. | `exp-208`’s deep level-8 table for `n = 17`, 26 and 29 had no retained source. | Removed from `exp-208` and `X-029` (`think-jdgu`, `think-84m3`); the record now cites only `resolved: true` cells. |
 | The report validator admits non-finite metrics, and the sweep path ranks results without applying that validator. | Demonstrated implementation defect. It can turn an invalid or non-finite outcome into a reported best. The retained aggregates do not show whether it changed a published result. | `think-1fpa` fixes every harness path; `think-nals` makes the definition fail closed and identical at every later ranking and display boundary. |
 | Large accepted seed values can alias in the generated JavaScript because the seed mix loses integer precision before the 32-bit operation. | Demonstrated public reproducibility defect. The small seed ranges in the recorded campaign are not known to be affected. | `think-dq1l` fixes the mixer and supported seed domain; `think-karf` enforces seed receipt and replay semantics at the strategy boundary. |
-| Raw annealing JSONL files are ignored and absent; retained summaries cannot reconstruct per-seed trials or disjoint blocks. | Deliberate storage choice with a material audit limitation. | `think-3eha` repairs the record contract, and `think-4z7d` produces distributions from durable inputs. Existing records remain in place for annotation. |
+| Raw annealing JSONL files are ignored and absent; retained summaries cannot reconstruct per-seed trials or disjoint blocks. | Deliberate storage choice with a material audit limitation. | `think-3eha` repaired the record contract, and `think-4z7d` produces distributions from durable inputs. Findings cite only retained cells and state what cannot be re-checked. |
 | `exp-209` records an inline compaction pass whose program and outputs were deliberately not retained. | Historical exploratory note, not replayable evidence under OR-1. | `think-3eha` marks the evidential limit; `think-3hb7` supplies the missing instrument before the algorithm or negative result is reused. |
 | Imported animation entries can acquire numerical assurance from an asserted `feasible` flag, and intermediate strategy frames can be relabelled with a later container side. | Demonstrated provenance and trace-semantics defects. | `think-sdmi` validates imported evidence; `think-karf` enforces executable strategy and trace semantics. |
 | Revision probes, research instruments and product entry points overlap. | Cleanup risk: deleting a probe can also delete its only semantic assertion. | `think-cqfc` inventories consumers and preserves unique controls before retiring obsolete code. |
 
-These dispositions preserve the exploratory record.
-Corrections add annotations and replacement measurements; they do not erase old records
-or silently rewrite the conditions under which they were produced.
+**Record policy, revised by the owner on 2026-09-14.** Superseded claims are removed,
+not annotated. Each annealing artifact states only what survived checking and names
+commit `a40d272c` for its previous text (`think-84m3`). Git keeps the history; the
+current text carries no layered corrections.
 
 ## Evidence Contract
 
@@ -196,9 +197,8 @@ inputs.
 with its control and outputs.
 Until then, the historical negative does not rule out a reusable compaction algorithm.
 
-Existing files are retained for later annotation.
-A rerun is justified only when phase A shows that the required input cannot be recovered
-and the claim is still worth testing.
+The narrative correction is done (`think-84m3`). A rerun is justified only when phase A
+shows that the required input cannot be recovered and the claim is still worth testing.
 
 ### C. Establish shared semantics, then extract the package
 

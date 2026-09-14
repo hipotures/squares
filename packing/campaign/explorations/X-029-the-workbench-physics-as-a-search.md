@@ -12,226 +12,212 @@ exploration:
   author: Claude Opus 5, unattended
   campaign: packing.squares
   brief: >-
-    The workbench's animation runs a contact-and-jiggle simulation that, in blind mode, is
-    told nothing about where the squares are meant to end up. Nobody had measured whether
-    it can rediscover a known-best packing. This exploration builds the instrument, takes
-    the baseline, and reports what the first 80,000 trials say about what the method is.
+    The workbench animates each step from one known-best packing to the next with a contact
+    simulation. In blind mode the run starts from the previous record and is not given the
+    destination poses. This exploration measured that run as a search: whether it ends on a
+    packing, and how close the best of many seeded runs gets to the known-best side.
   sources:
   - packing/atlas/known-best/video/spikes/v2-transitions/assets/workbench.js
   - packing/devtools/bench_annealing.py
+  - packing/campaign/results/annealing/summaries.json
   - docs/project/specs/active/plan-2026-09-11-annealing-as-a-search.md
-  proposes: [H-206, H-207, H-208, H-209, H-210, H-211]
+  proposes: [H-207, H-208, H-209, H-210, H-211]
 ---
 # X-029: The Workbench’s Blind Physics, Measured as a Search
 
-## Correction — 2026-09-13
+**Rewritten 2026-09-14.** This report keeps only what survived checking.
+Earlier versions reported numbers from runs whose arrangements were never checked to be
+packings, and from inline analyses whose code was not kept.
+That text is recoverable at commit `a40d272c`; none of it is repeated here.
 
-This account retains the original exploration, including claims subsequently found
-unsupported. The repaired experiment records `exp-207` through `exp-210` now carry
-unresolved verdicts.
-`exp-210` is the renumbered blind-run experiment; the older divide-and-concur record
-keeps `exp-206`.
+## Summary
 
-The retained `summaries.json` stores prefix best-of-k observations, not distributions
-over disjoint blocks, and omits the raw geometry needed for current admission checks.
-The later agent’s disjoint-block table is a supplied historical report until its raw
-inputs and reporter reproduce it.
-Size alone is not an established cause of difficulty.
-There are unresolved n=17 level-8 sweep cells; the retained deep level-8 summary
-contains n=11 only. Neither “n=17 ran only at level 6” nor the claimed four-case deep
-level-8 coverage is supported by that retained layout.
+- **A blind run is not blind.** It starts from the known-best packing for the previous
+  `n`, contracts toward the known-best side, and places the new square with a
+  coarse-grid proposal.
+  Only the destination poses are withheld.
+  It is one point on a range of how much of the answer a search is given.
+- **The runs did not end on packings.** Every blind run observed finished with squares
+  overlapping by 0.03 to 0.12 of a unit side.
+  A container side read from such an arrangement is a bounding box around overlaps, so
+  every number taken that way has been discarded.
+- **Repaired to a packing, a single run is worse than the trivial grid.** At every `n`
+  and every shake level measured, the median run needs a larger container than
+  `ceil(sqrt(n))`.
+- **The best of many runs sometimes comes close and never reaches a record.** At shake
+  level 6 the best of the first 1,000 seeds was 0.28% above `s(5)` and 0.42% above
+  `s(10)`. At `n = 17` and `n = 29` no run in 5,000 beat the grid.
+- **Difficulty does not follow the number of squares.** `n = 26` did better than
+  `n = 11` and `n = 17`. What does decide it is not established.
+- **The shake dial is a search parameter that the page sets for looks.** At levels 0 to
+  4 no run in 3,000 beat the grid at `n = 5`, 10 or 11. At levels 6 to 10 the best run
+  did, with one exception.
+  The page ships level 3.
 
-The compaction pass in `exp-209` was discarded with its outputs.
-Its claimed null result is unreproducible and cannot rule out translation or rotation
-repair or establish stationarity.
-The original account below remains a research record, not the current workbench’s
-evidence contract. The
-[workbench plan](../../../docs/project/specs/active/plan-2026-09-11-workbench-from-spike-to-product.md)
-owns the admission, reporting and source repairs.
+## 1. What a Blind Run Is
 
-## Original account
+The workbench draws the step from the packing of `n - 1` squares to the packing of `n`
+by simulating it:
 
-The workbench draws each step of the atlas by simulating it.
-In its **blind** mode the simulation is told nothing about the target: it starts from
-the packing of `n` in a container inflated past the record, drops the new square into
-the emptiest cell of a coarse grid, and closes the walls in with contacts, walls and a
-decaying jiggle.
+1. The squares start at the known-best poses for `n - 1`, in a container inflated past
+   the known-best side for `n`.
+2. The new square is dropped into the emptiest cell of a coarse grid.
+3. Contact forces between squares, wall forces and a decaying shake act while the
+   container contracts toward the known-best side.
 
-That is a search. It had never been measured as one, and this exploration is what
-measuring it found.
+The page has three ways to finish the step:
 
-## 1. There Was No Seed, So There Was No Rate
+| mode | what the run is given about the destination |
+| --- | --- |
+| snap | the destination poses, and it ends on them by construction |
+| free | the destination poses as a pull, without the snap |
+| blind | nothing beyond the start, the drop and the contraction target |
 
-The first finding came before any measurement and reshaped what could be measured.
+So “blind” is conditioned on a great deal: the previous record, the reference side and
+the proposal. Any claim about it is a claim about improving a known packing toward a
+known side, not about finding a packing from nothing.
 
-Every generator on the page was seeded from `n` alone — the cached simulator’s shake
-from `p.n`, the live optimiser’s from `N + INITIALS.indexOf(kind) * 7919`, the random
-start’s poses from `N`. So a given `n` and parameter set had **exactly one blind
-trial**, and it was the same trial every time.
+## 2. One Trial Per `n`, Until Runs Were Seeded
 
-That is the right property for an animation: it is what makes a capture reproducible
-across builds. It also makes a success *rate* impossible, because a rate over one sample
-is 0 or 1.
+Every generator on the page was seeded from `n` alone, so a given `n` and parameter set
+had exactly one blind trial.
+That is right for an animation, which must reproduce across builds, and it makes a
+success rate meaningless.
 
-`setSeed` now folds a run seed into all three generators, defaulting to zero, which
-mixes to nothing — the page’s whole checker suite passes unchanged, including the one
-that compares free-run misses against values recorded before seeds existed.
+`setSeed` folds a run seed into every generator.
+Seed 0 reproduces the page exactly, so the existing checks pass unchanged.
 
-## 2. The Method Closes About Half the Gap, Wherever It Is Pointed
+## 3. The Runs Were Not Packings
 
-The baseline: 1,200 trials, six `n`, four seconds.
+The first two rounds of the benchmark scored the bounding box of each run’s final
+arrangement and never checked that the squares were disjoint.
+Some parameter cells reported a container below the known-best side, which no packing
+can need. That was the signal that something was wrong, and it was missed.
 
-**No trial at any `n` came within 0.1% of the record.**
+The check that exposed it is a separating-axis test over the final poses, computed in
+the harness rather than read from the simulation.
+It reports the deepest overlap between any two squares.
+The tolerance comes from a control: a snapped run ends on the record’s own poses, so
+whatever it scores is float noise.
 
-The apparent structure in the raw numbers — `n = 11` landing 0.95% out while `n = 17`
-landed 4.6% out — is an artefact of the metric.
-Raw excess cannot be compared across `n`, because the room between the record and the
-trivial grid `ceil(sqrt(n))` differs at every one: at `n = 29` the grid is 1.1% above
-the record, at `n = 5` it is 10.8%. The same excess means opposite things.
-
-Normalised — the fraction of the record-to-grid gap a run closes, 1 for the record and 0
-for the grid — the picture is flat:
-
-| n | gap % | excess % | closed |
-| ---: | ---: | ---: | ---: |
-| 5 | 10.82 | 5.686 | 0.474 |
-| 10 | 7.90 | 4.230 | 0.465 |
-| 11 | 3.17 | 0.947 | 0.701 |
-| 17 | 6.94 | 4.617 | 0.335 |
-| 26 | 6.74 | 4.528 | 0.328 |
-| 29 | 1.12 | 0.475 | 0.574 |
-
-Median 0.469 over all 1,200 trials.
-**The method closes about half the gap wherever it is pointed**; `n = 11` and `n = 29`
-only looked easy because their gaps are small.
-
-This retires the framing the campaign started with.
-There is no difficulty gradient across these `n` to explain, so a hypothesis about which
-arrangements are hard for the annealing is answering a question the data does not pose.
-
-## 3. The Value Is in the Tail, and the Shake Is What Buys It
-
-A trial costs half a millisecond.
-So the operational question is never what one run gives but what the best of a budget
-gives — and nothing was reporting that.
-
-80,000 trials at shake level 6:
-
-| n | k=1 | k=10 | k=100 | k=1000 | k=10000 |
-| ---: | ---: | ---: | ---: | ---: | ---: |
-| 5 | 0.500 | 0.520 | 0.538 | **0.987** | 0.989 |
-| 11 | 0.695 | 0.719 | 0.747 | 0.747 | 0.845 |
-| 17 | 0.337 | 0.461 | 0.507 | 0.538 | 0.553 |
-| 29 | 0.364 | 0.596 | 0.653 | 0.692 | 0.708 |
-
-The median says the method closes half the gap.
-The best of a thousand at `n = 5` closes **98.7%** of it.
-Both are true, and only the second says what the search can reach.
-
-**The shake trades the median for the tail, which is what a search does.** Median
-`closed` falls monotonically with the dial — 0.712, 0.707, 0.696, 0.689, 0.539 at
-`n = 11` for levels 0, 1, 3, 6, 10 — while best-of-k rises.
-At level 0 the variance is exactly zero: best equals median equals worst at every `n`,
-because the shake is the only randomness there is, so without it the seed does nothing.
-At level 10 it overshoots — `n = 29`’s median `closed` is **−3.6**, a run ending worse
-than the grid it started from.
-
-### The shape of the `n = 5` tail is the interesting part
-
-At level 6, two trials in a thousand land at 0.139% and 0.230% excess, and the next best
-is 4.854%.
-
-That is not a gradient.
-It is a **second basin**, reached about twice in a thousand tries, and it is why
-best-of-k has a step in it between k=100 and k=1000 rather than a slope.
-A landscape with a rare good basin is a landscape where restarts are worth more than
-schedule tuning — which is a claim the sweep can test rather than a conclusion this
-exploration is entitled to.
-
-## 3a. Correction: Sections 2 and 3 Were Not About Packings
-
-**Added the same night, after the guard was built.** The sections above stand as a
-record of what was measured and are wrong about what was being measured.
-
-Every one of those runs ended with squares inside each other.
-Measured by a separating-axis test over the final poses — written in the harness rather
-than read off the simulation, with its tolerance taken from a control rather than chosen
-— **15,000 of 15,000 blind trials are invalid**, at every n and every shake level
-including zero, with overlaps of 0.03 to 0.12 of a unit side.
-
-The control is what makes that a measurement.
-The *snapped* trajectory ends on the record’s own poses by construction and scores
-5.5e-7 to 1.0e-6, the float noise the stored poses carry.
-Two orders of magnitude separate it from the smallest real overlap.
-
-| mode | n=5 | n=11 | n=17 |
+| mode | n = 5 | n = 11 | n = 17 |
 | --- | ---: | ---: | ---: |
 | snap | 5.5e-7 | 1.0e-6 | 7.3e-7 |
 | free | 3.9e-5 | 4.5e-5 | 3.1e-2 |
 | blind | 8.4e-2 | 3.5e-2 | 8.6e-2 |
 
-So a side reported above is the bounding box of an invalid arrangement, and a box can be
-made smaller by letting squares intersect.
-That is why thirty cells of the parameter sweep reported a container **below** the
-known-best side. It should have been the tell; it was read as a promising tail.
+Two orders of magnitude separate the control from the smallest real overlap, so the
+harness uses 1e-5 of a unit side.
+The details are in
+[exp-210](../series/series-000-smoke-and-calibration/experiments/exp-210-h210-blind-runs-are-not-packings.md).
 
-### Resolved, the picture inverts
+**Everything measured before this check is void.** In `summaries.json` those cells are
+the ones marked `resolved: false`: 243 cells across 49 run files.
+No number from them appears in the record.
 
-Projecting each run to a packing — translation only, angles held, each pair pushed apart
-along its own minimum-penetration axis — makes 120 of 120 trials valid in 15 to 56
-sweeps, and the honest numbers over 30,000 trials are:
+Since then the harness repairs every run before scoring it.
+The repair moves squares apart along each overlapping pair’s minimum-penetration axis,
+holding angles fixed, until no pair overlaps.
+The score is the container that the repaired arrangement needs.
 
-| n | median | best-of-100 | best-of-1000 |
-| ---: | ---: | ---: | ---: |
-| 5 | −0.084 | −0.015 | **0.974** |
-| 10 | −0.099 | 0.874 | **0.947** |
-| 11 | −0.085 | −0.035 | −0.012 |
-| 17 | −0.122 | −0.062 | −0.062 |
-| 26 | −0.155 | 0.120 | 0.212 |
-| 29 | −0.857 | −0.370 | −0.193 |
+## 4. What a Repaired Run Is Worth
 
-**Run once, the method is worse than doing nothing** — the median is below the trivial
-grid at every n. The uniform “closes about half the gap” of §2 was entirely overlap.
+The score is `closed = (grid - side) / (grid - record)`, where `grid` is
+`ceil(sqrt(n))`. One is the record, zero is the trivial grid, and a negative value is
+worse than the grid.
+Raw excess over the record cannot be compared across `n`, because the room between the
+record and the grid ranges from 1.12% at `n = 29` to 10.82% at `n = 5`.
 
-**Run a thousand times and take the best, it is a real search at small n** — n = 5
-reaches 0.974 and n = 10 reaches 0.947, valid packings within 0.28% and 0.42% of the
-records. At n = 11, 17 and 29 the tail barely clears the grid.
+### Across `n`, at shake level 6
 
-So there is a difficulty gradient after all, and it runs opposite to §2’s: the search
-works where there are few squares and fails where there are many.
+5,000 seeds per `n`, each run repaired and checked before scoring:
 
-**One limit bounds every number here.** The resolver only translates.
-A resolver that could rotate, or that solved for the smallest container directly, would
-score these same runs higher.
-These are a lower bound on what the arrangements are worth.
+| n | gap to grid | median run | best of first 100 | best of first 1,000 | best of 5,000 |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 5 | 10.82% | −0.074 | −0.015 | 0.974 | 0.977 |
+| 10 | 7.90% | −0.099 | 0.874 | 0.947 | 0.974 |
+| 11 | 3.17% | −0.107 | −0.035 | −0.012 | 0.476 |
+| 17 | 6.94% | −0.104 | −0.062 | −0.062 | −0.061 |
+| 26 | 6.74% | −0.101 | 0.120 | 0.212 | 0.230 |
+| 29 | 1.12% | −0.857 | −0.370 | −0.193 | −0.110 |
 
-## 4. What This Changes
+What this shows:
 
-- **The outcome metric is `closed`, not excess.** Excess stays in the record because it
-  is what the page shows, but nothing may be compared across `n` with it.
-- **Best-of-k is the report.** A median is a statement about one run and nobody runs
-  one.
-- **The shake dial is a search parameter, not a presentation one.** Its effect on the
-  median is the opposite of its effect on the tail, and the workbench’s own default (3)
-  is chosen for how the animation looks.
+- **One run is worse than doing nothing.** The median is below zero at every `n`.
+- **A budget of runs is the method.** A run’s median wall time was 0.3 ms at `n = 5` and
+  2.4 ms at `n = 29`, so the best of a thousand takes seconds.
+  At `n = 5` the best of the first 1,000 is 0.28% above the record; at `n = 10` it is
+  0.42%.
+- **No run reached a record.** The closest is at `n = 5`: over 39,871 seeds the best is
+  0.15% above `s(5)`.
+- **Size does not order the results.** `n = 26` beats the grid in its first 100 seeds,
+  while `n = 11` needed more than 1,000 and `n = 17` never did.
+  `n = 11` and `n = 29` have the two smallest gaps, where `closed` is a harsh scale, but
+  `n = 17`’s gap is ordinary.
+
+### Across shake levels, at `n = 5`, 10 and 11
+
+3,000 seeds per cell; each entry is the best of the first 1,000, then the median run:
+
+| level | n = 5 | n = 10 | n = 11 |
+| ---: | --- | --- | --- |
+| 0 | −0.082 / −0.082 | −0.114 / −0.114 | −0.112 / −0.112 |
+| 2 | −0.056 / −0.090 | −0.076 / −0.104 | −0.015 / −0.103 |
+| 4 | −0.018 / −0.083 | −0.070 / −0.103 | −0.021 / −0.103 |
+| 6 | 0.974 / −0.074 | 0.947 / −0.099 | −0.012 / −0.106 |
+| 8 | 0.958 / −0.076 | 0.977 / −0.098 | 0.564 / −0.115 |
+| 10 | 0.864 / −0.095 | 0.879 / −0.098 | 0.325 / −0.249 |
+
+What this shows:
+
+- **At level 0 every seed gives the same answer**, because the shake is the only
+  randomness in the run.
+- **At levels 0 to 4 no run beat the grid** in 3,000 seeds at any of the three `n`.
+- **At levels 6 to 10 the best run beat it**, except `n = 11` at level 6. At level 8,
+  `n = 11` reached 0.564 in the first 1,000 seeds and 0.616 over 16,319.
+- **The median barely moves with the level**, except `n = 11` at level 10, so the dial
+  acts on the best run rather than the typical one.
+- **The page ships level 3**, chosen for how the animation looks.
+  Level 3 was not measured after the repair existed.
 
 ## 5. What Is Not Established
 
-- **Nothing has reached a record.** The best result anywhere is 98.7% of the way at
-  `n = 5`, which is 0.139% above `s(5)`. Whether the remaining 1.3% is reachable at all
-  by this method is open.
-- **Only one instrument.** These numbers are the workbench’s simulation, at its own step
-  count and force law.
-  They say nothing about the campaign’s Rust engine.
-- **The regime is one machine, one build.** Every number here is from a single headless
-  Chromium on one laptop, at the shipped beat.
+- **No spread.** Every “best of the first k” is one observation from one ordered seed
+  stream. None of these numbers carries a range or a confidence interval.
+- **The runs cannot be re-checked.** Trials and final poses were not retained, so the
+  validity of each repaired run rests on the check as it ran at the time.
+- **Coverage is thin.** `n = 17`, 26 and 29 have repaired runs at level 6 only.
+  Levels 3, 5, 7 and 9 were not measured.
+- **The repair only translates.** Whether a repair that rotates changes the scores is
+  untested. A compaction pass was tried and its code was not kept, so
+  [exp-209](../series/series-000-smoke-and-calibration/experiments/exp-209-h211-an-unretained-compaction-pass.md)
+  supports no conclusion.
+- **The open hypotheses are untested:** whether restarts beat schedule tuning at equal
+  cost (H-207), whether the drop decides the outcome (H-208), and whether any setting
+  reaches a record (H-209).
+- **One instrument.** These are the workbench’s simulation in one headless Chromium on
+  one laptop. They say nothing about the campaign’s Rust engine.
 
 ## 6. What Follows
 
-The hypotheses this compresses into are registered separately; the ones worth naming
-here are whether the initial drop or the schedule decides the answer, whether the rare
-basin at `n = 5` is reachable more often by restarting rather than shaking, and whether
-the half-the-gap regularity survives `n` outside the six sampled.
+- **Re-measure before reusing any number here.** The package benchmark keeps each
+  trial’s poses and reports disjoint seed blocks, which is what these observations lack.
+- **Measure success against how much the run is given.** Blind is one level between
+  nothing and the full answer.
+  The
+  [annealing plan](../../../docs/project/specs/active/plan-2026-09-11-annealing-as-a-search.md)
+  lays out the levels in between, from the record’s connected components to its contact
+  graph and rigid clusters.
+
+## Evidence
+
+- **Retained:** `packing/campaign/results/annealing/summaries.json`, which holds one
+  median and one best-of-first-k ladder per cell, per run file.
+  Cells marked `resolved: true` were repaired and checked before scoring.
+  Several files replay the same seeds, so their trial counts overlap.
+- **Not retained:** per-trial rows and final poses, which were removed from the branch
+  at `6e191a35` to keep the diff reviewable.
+- **Instrument:** `packing/devtools/bench_annealing.py` on this branch.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

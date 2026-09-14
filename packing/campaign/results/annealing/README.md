@@ -8,22 +8,24 @@ governs implementation; the
 [annealing plan](../../../../docs/project/specs/active/plan-2026-09-11-annealing-as-a-search.md)
 defines the experimental comparison.
 
-## Retained record and current limits
+## What is retained
 
-`summaries.json` contains the summaries retained when 185 MB of raw JSONL was removed
-from the branch at `6e191a35`. The raw files named inside it are not present in this
-checkout. A summary is insufficient to replay exact geometry, reconstruct disjoint
-blocks, or recover total elapsed time.
-Do not pass it to the raw-trial replay command or treat its `best_of` values as
-distributions.
+`summaries.json` holds one entry per run file: the median `closed` and the best of the
+first k runs, per cell.
+It was kept when 185 MB of per-trial JSONL was removed from the branch at `6e191a35`.
 
-The old divide-and-concur experiment keeps `exp-206`. The colliding blind-run record is
-now `exp-210`; `exp-207` through `exp-210` carry dated corrections, reachable source
-mappings and explicit unrecorded timing.
-Their original accounts remain visible, but their verdicts are unresolved pending
-reproducible evidence.
-The discarded compaction pass in `exp-209` cannot exclude translation or rotation repair
-as an improvement.
+- **Cells marked `resolved: true`** were repaired to packings and checked before
+  scoring. They are the only cells any finding may cite.
+- **Cells marked `resolved: false`** were scored before any validity check, on
+  arrangements with overlapping squares.
+  They are void.
+- **Best-of-k is a prefix of one seed stream**, not a distribution, and several files
+  replay the same seeds.
+- **No trials or final poses survive**, so no cell can be re-checked or split into
+  disjoint blocks.
+
+What those cells show is written up in
+[X-029](../../explorations/X-029-the-workbench-physics-as-a-search.md).
 
 ## One round
 
@@ -85,12 +87,9 @@ spread. Keep tuning and held-out cases separate.
 A better median, a single lucky seed, or a visually flat tail does not by itself
 establish the registered claim.
 
-Continue from [H-206 through H-211](../../ideas.md#workbench-physics-as-a-search), the
+Continue from the open hypotheses
+[H-207 through H-211](../../ideas.md#workbench-physics-as-a-search), the
 [ledger](../../ledger.md), and the governing plan.
-Do not repeat the old monotone difficulty claim or the claim that n=17 was tested only
-at shake 6; retained summaries include unresolved n=17 level-8 cells, while the retained
-deep level-8 artifact contains n=11 only.
-The plan assigns the detailed cohort reconciliation to `think-jdgu`.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
