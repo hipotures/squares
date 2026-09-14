@@ -5843,6 +5843,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   });
   win.searchWorkbench = searchPanel;
   setRange(DEFAULT_STEP_N, DEFAULT_STEP_N);
+  // The page opens on Animate, the aspect the owner uses most (2026-09-14), through the same
+  // transition a click on its tab takes, so Pack still remembers the n it was set up on.
+  setMode("animate");
   layout();
   // The scale's figure width is measured from the drawn numerals, so it has to be taken again once
   // the faces are in; re-rendering afterwards is a no-op on everything but the suppression.

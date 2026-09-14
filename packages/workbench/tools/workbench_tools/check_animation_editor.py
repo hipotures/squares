@@ -29,6 +29,11 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
         errors: list[str] = []
         page.on("pageerror", lambda error: errors.append(str(error)))
         page.goto(page_path.resolve().as_uri())
+        tabs = page.evaluate(probe("modes/tabs"))
+        if [tab[0] for tab in tabs] != ["animate", "pack", "search"] or tabs[0][2] != "true":
+            raise ValueError(f"tabs are not Animate, Pack, Search with Animate open: {tabs}")
+        if not page.locator("#animation-editor").is_visible() or errors:
+            raise ValueError(f"Animate is not what the page opens on: {errors}")
         page.locator("#mode-animate").click()
 
         def call(name: str, *arguments: Any) -> Any:
@@ -259,7 +264,8 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
         require(not errors, "page errors: " + "; ".join(errors))
         browser.close()
     return (
-        "the owner's law, dial, beat and desaturation defaults, the box, its trace, its lock "
+        "arrival on Animate, first of Animate, Pack and Search; the owner's law, dial, beat "
+        "and desaturation defaults, the box, its trace, its lock "
         "and its gap-bar pointer through a step, double-speed simple "
         "transitions and their checkbox, animation import, "
         "geometry/guidance, frame edits, replay, "

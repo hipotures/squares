@@ -25,6 +25,7 @@ def check(page_path: Path) -> str:
         )
         page.on("pageerror", lambda error: errors.append(str(error)))
         page.goto(page_path.resolve().as_uri())
+        page.locator("#mode-pack").click()
         panel = page.locator("#pack-workspace")
         squares = page.locator("#pack-squares > g")
 
@@ -34,7 +35,7 @@ def check(page_path: Path) -> str:
 
         require(
             panel.is_visible(),
-            "Pack panel is hidden on arrival: " + "; ".join(errors),
+            "Pack panel is hidden after choosing Pack: " + "; ".join(errors),
         )
         require(squares.count() == 17, "Pack did not draw all 17 starting squares")
         require(not page.locator("#squares").is_visible(), "catalogue scene still owns Pack")
