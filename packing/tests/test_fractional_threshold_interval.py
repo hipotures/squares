@@ -851,10 +851,15 @@ def test_real_forked_callback_failure_requests_and_observes_worker_exit() -> Non
     data = ThresholdAtomData.of(certificate)
     rotations = doubled_net(certificate.half_tangents)[:8]
     worker_processes: list[BaseProcess] = []
+    manager_threads: list[threading.Thread] = []
 
     class TrackingExecutor(ProcessPoolExecutor):
         def terminate_workers(self) -> None:
             worker_processes.extend(self._processes.values())
+            # Typeshed annotates this attribute as the wakeup pipe; at runtime it is the thread.
+            manager = cast("threading.Thread | None", self._executor_manager_thread)
+            if manager is not None:
+                manager_threads.append(manager)
             super().terminate_workers()
 
     def fail(_outcome: DirectionOutcome) -> None:
@@ -874,9 +879,22 @@ def test_real_forked_callback_failure_requests_and_observes_worker_exit() -> Non
         )
 
     assert worker_processes
-    for process in worker_processes:
-        process.join(timeout=5)
-        assert not process.is_alive()
+    assert manager_threads
+    # terminate_workers() returns at once; the executor's manager thread then joins these
+    # same workers. A second reaper races it: whichever waitpid loses sees ECHILD, which
+    # popen_fork reports as still running. So the exit is read only after the manager,
+    # the one reaper, has joined every worker -- and a worker that never exits keeps the
+    # manager alive, which fails the first assertion instead of hanging.
+    manager = manager_threads[0]
+    try:
+        manager.join(timeout=10)
+        assert not manager.is_alive()
+        assert all(process.exitcode is not None for process in worker_processes)
+    finally:
+        if manager.is_alive():
+            for process in worker_processes:
+                process.kill()
+            manager.join(timeout=5)
 
 
 def test_parallel_worker_failure_retains_other_completed_results(
