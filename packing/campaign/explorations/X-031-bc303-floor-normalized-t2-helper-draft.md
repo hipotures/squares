@@ -176,37 +176,37 @@ normalized C/S helper.
 ## Bounded H-162 Registration Proposal
 
 H-162 is **proposed, not allocated or registered** here.
-Before any analysis treats the normalized thresholds as prospective target criteria, its
-owner should freeze a separate contract with the exact source revision, 377 atoms, all
-182 eligible C and S first-owner charts, both axis aliases, physical-parent conventions,
-and the unchanged H-160/exp-158 registration.
-An actual S second owner ranges over every admitted compatible chart satisfying its
-ownership and absence-of-15 conditions; the 182-chart first-owner manifest does not
-bound that quantifier.
-Its claim would be equation (2), with C mass at least $4524132$ and actual S-pair mass
-at least $8524147$ as the complete criteria.
-The cheap S first-owner cutoff $4524132$ is a sufficient filter, not the definition of
-the actual S condition.
+Its prospective claim should be the sufficient filter determined by the complete exp-158
+minima: C mass at least $4524132$ **and** S first-owner strip mass at least $4524132$.
+Before using a target receipt, its owner should freeze a separate contract with the
+exact source revision, 377 atoms, all 182 eligible C and S first-owner charts, both axis
+aliases, physical-parent conventions, and the unchanged H-160/exp-158 registration.
+The filter mirrors H-160’s first-owner measurement but uses the floor-normalized
+cutoffs. It is not the complete actual-S criterion in equation (2).
 
 The contract should record these outcomes before using a target receipt:
 
-- A C minimum at most $4524131$: reject the helper only after a rational physical
-  parent, closed membership, and complete labels replay, regardless of S.
-- If C passes and the S strip minimum is at least $4524132$: accept the normalized local
-  helper after source, revision, and control admission; the strip bound supplies the
-  needed lower bound on every actual S pair.
-- If C passes and the S strip minimum is at most $4524131$: the sufficient filter fails,
-  and the helper stays unresolved until actual simultaneous S pairs are controlled.
-  A replayed actual S pair at most $8524146$ rejects the helper; a complete admitted
-  lower-bound proof that every actual S pair has mass at least $8524147$ accepts it.
-  One high S pair alone cannot establish that lower bound.
+- A C minimum at most $4524131$: after rational physical-parent, closed-membership, and
+  complete-label replay, reject both the H-162 filter and the normalized local helper,
+  regardless of S.
+- If C passes and the S strip minimum is at least $4524132$: accept the H-162 filter
+  after source, revision, and control admission.
+  The strip bound then proves the normalized local helper by supplying the lower bound
+  on every actual S pair.
+- If C passes and an admitted S strip minimum is at most $4524131$: reject the H-162
+  filter, while the normalized helper remains unresolved.
+  A later separately controlled actual-S registration may determine that helper; it does
+  not reverse the H-162 filter verdict.
+  The actual S second owner ranges over every admitted compatible chart satisfying its
+  ownership and absence-of-15 conditions, beyond the 182-chart first-owner manifest.
+  One high S pair cannot establish the complete lower bound.
 - An incomplete sweep, revision mismatch, or control refusal: retain an unresolved
   instrument outcome, without a scientific verdict.
 
 The intended input is the single preregistered exp-158 C/S target invocation after its
 own exact-head readiness transition.
-Reading its retained minimum receipt for a second mathematical comparison needs no
-rerun; an actual-S pairing decision would require a separately controlled method.
+Reading its retained minimum receipt for this separate filter needs no rerun; an
+actual-S pairing decision would require a separately controlled method and registration.
 If H-162 is registered after that target read, its use of the receipt must be marked
 retrospective. Neither positive local helper nor H-161 stability establishes local
 availability, coherent owner selection for every packing, adjacent-only T2 on its own,
