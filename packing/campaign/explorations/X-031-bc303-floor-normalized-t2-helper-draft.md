@@ -43,9 +43,9 @@ exploration.
 In [the repository’s epistemic vocabulary](../../../epistemics.md), the identity and
 local equivalence have proof-audited, V3-type analytic support conditional on that
 imported floor. X-031 is an exploration, not a classified whole frontier result.
-The proposed numerical thresholds have V0-type claim-only support as target
-determinations: no new machine-confirmed C3 charge outcome or V4 certificate exists
-here.
+The cutoff arithmetic is proof-audited; whether the unmeasured C/S minima meet those
+cutoffs has no target determination yet.
+No new machine-confirmed C3 charge outcome or V4 certificate exists here.
 
 ## Eleven-Core Resource Account
 
@@ -115,7 +115,7 @@ follow from $A_g>E/2$. For necessity, reflect an attaining full forced-0 C or ac
 configuration to the opposite corner.
 X-029’s parent separation in $x+y$ is $708/3175>0$, so the two local configurations
 coexist with surplus $2A_g\le E$ if (2) fails.
-This refutes the separate local helper; it does not construct the seven omitted parents.
+This refutes the separate local helper; it does not construct the remaining parents.
 The argument does not equate adjacent-only failure with independent local products.
 
 At scale $W$, $WE/2=524116.5$, so a passing normalized full-corner surplus needs at
@@ -178,8 +178,11 @@ normalized C/S helper.
 H-162 is **proposed, not allocated or registered** here.
 Before any analysis treats the normalized thresholds as prospective target criteria, its
 owner should freeze a separate contract with the exact source revision, 377 atoms, all
-182 eligible charts, both axis aliases, physical-parent conventions, and the unchanged
-H-160/exp-158 registration.
+182 eligible C and S first-owner charts, both axis aliases, physical-parent conventions,
+and the unchanged H-160/exp-158 registration.
+An actual S second owner ranges over every admitted compatible chart satisfying its
+ownership and absence-of-15 conditions; the 182-chart first-owner manifest does not
+bound that quantifier.
 Its claim would be equation (2), with C mass at least $4524132$ and actual S-pair mass
 at least $8524147$ as the complete criteria.
 The cheap S first-owner cutoff $4524132$ is a sufficient filter, not the definition of
@@ -187,12 +190,16 @@ the actual S condition.
 
 The contract should record these outcomes before using a target receipt:
 
-- Both C and S strip minima pass: accept the normalized local helper after source,
-  revision, and control admission.
 - A C minimum at most $4524131$: reject the helper only after a rational physical
-  parent, closed membership, and complete labels replay.
-- An S strip minimum at most $4524131$: mark the sufficient filter failed and the
-  normalized helper unresolved until a jointly realizable S pair is checked.
+  parent, closed membership, and complete labels replay, regardless of S.
+- If C passes and the S strip minimum is at least $4524132$: accept the normalized local
+  helper after source, revision, and control admission; the strip bound supplies the
+  needed lower bound on every actual S pair.
+- If C passes and the S strip minimum is at most $4524131$: the sufficient filter fails,
+  and the helper stays unresolved until actual simultaneous S pairs are controlled.
+  A replayed actual S pair at most $8524146$ rejects the helper; a complete admitted
+  lower-bound proof that every actual S pair has mass at least $8524147$ accepts it.
+  One high S pair alone cannot establish that lower bound.
 - An incomplete sweep, revision mismatch, or control refusal: retain an unresolved
   instrument outcome, without a scientific verdict.
 
