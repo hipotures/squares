@@ -1333,28 +1333,40 @@ def test_supervisor_recomputes_deadline_after_process_launch(tmp_path: Path) -> 
 def test_each_execution_checkpoint_remains_partial_when_terminated(
     tmp_path: Path, phase: str
 ) -> None:
-    output = tmp_path / phase
-    output.mkdir()
-    document = _seed(output)
-    document["phase"] = phase
-    document["error"] = f"{phase} is incomplete"
-    calibration.write_result(output, document)
-    started = time.perf_counter()
-    status = calibration.supervise_worker(
-        (sys.executable, "-c", "import time; time.sleep(60)"),
-        output,
-        repository=REPOSITORY,
-        expected_revision=REVISION,
-        external_seconds=0.08,
-        grace_seconds=0.03,
-        invocation_started=started,
-        external_deadline=started + 0.08,
-    )
-    receipt = json.loads((output / "result.json").read_bytes())
-    rss = cast(dict[str, object], cast(dict[str, object], receipt["resources"])["rss"])
-    assert status == 1
-    assert receipt["status"] == "partial"
-    assert receipt["phase"] == "timeout"
+    # The supervisor samples only after the worker launches, so a launch slower than
+    # the external window terminates the worker before any checkpoint is observed.
+    # Every attempt must still be a deadline-terminated partial receipt; the window
+    # widens only while no sample was taken, and the bound matters only on failure.
+    window = 0.08
+    give_up = time.monotonic() + 10.0
+    attempt = 0
+    while True:
+        output = tmp_path / f"{phase}-{attempt}"
+        output.mkdir()
+        document = _seed(output)
+        document["phase"] = phase
+        document["error"] = f"{phase} is incomplete"
+        calibration.write_result(output, document)
+        started = time.perf_counter()
+        status = calibration.supervise_worker(
+            (sys.executable, "-c", "import time; time.sleep(60)"),
+            output,
+            repository=REPOSITORY,
+            expected_revision=REVISION,
+            external_seconds=window,
+            grace_seconds=0.03,
+            invocation_started=started,
+            external_deadline=started + window,
+        )
+        receipt = json.loads((output / "result.json").read_bytes())
+        rss = cast(dict[str, object], cast(dict[str, object], receipt["resources"])["rss"])
+        assert status == 1
+        assert receipt["status"] == "partial"
+        assert receipt["phase"] == "timeout"
+        if cast(int, rss["sample_count"]) or time.monotonic() >= give_up:
+            break
+        window *= 2
+        attempt += 1
     assert phase in cast(dict[str, object], rss["pids_by_phase"])
 
 
@@ -1400,6 +1412,68 @@ def test_timeout_kills_and_reaps_a_termination_resistant_process_group(
         "process_group_reaped": True,
         "supervisor_signal": None,
     }
+
+
+class _ExitedLeader:
+    pid = 4321
+
+    @staticmethod
+    def wait(timeout: float | None = None) -> int:
+        del timeout
+        return -signal.SIGKILL
+
+
+def test_reaper_polls_through_eperm_until_the_group_is_gone() -> None:
+    # macOS reports EPERM for signal 0 while the group's last member is exiting but not
+    # yet reaped, and for a signal sent in that window. Neither may escape the reaper,
+    # and only the later ESRCH may count as the group being gone.
+    probes = [PermissionError, PermissionError, PermissionError]
+
+    def killpg(_pid: int, signal_number: int) -> None:
+        if signal_number == 0:
+            raise probes.pop(0) if probes else ProcessLookupError
+        raise PermissionError
+
+    with patch("devtools.calibrate_fixed_core_packet.os.killpg", side_effect=killpg) as sent:
+        status, _cleanup = calibration._reap_process_group(
+            cast(subprocess.Popen[bytes], _ExitedLeader()), grace_seconds=1.0
+        )
+
+    assert status == -signal.SIGKILL
+    assert [call.args for call in sent.call_args_list] == [
+        (4321, 0),
+        (4321, signal.SIGTERM),
+        (4321, 0),
+        (4321, signal.SIGKILL),
+        (4321, 0),
+        (4321, 0),
+        (4321, 0),
+    ]
+
+
+def test_reaper_refuses_to_prove_reaping_while_the_group_reports_eperm() -> None:
+    with (
+        patch(
+            "devtools.calibrate_fixed_core_packet.os.killpg", side_effect=PermissionError
+        ) as sent,
+        pytest.raises(
+            calibration.CalibrationOperationalError,
+            match="worker process group remained alive after SIGKILL",
+        ),
+    ):
+        calibration._reap_process_group(
+            cast(subprocess.Popen[bytes], _ExitedLeader()), grace_seconds=0.02
+        )
+
+    calls = [call.args for call in sent.call_args_list]
+    assert calls[:4] == [
+        (4321, 0),
+        (4321, signal.SIGTERM),
+        (4321, 0),
+        (4321, signal.SIGKILL),
+    ]
+    assert len(calls) > 4
+    assert set(calls[4:]) == {(4321, 0)}
 
 
 def test_nonzero_exit_revokes_a_stale_complete_candidate_phase(
@@ -2086,7 +2160,10 @@ if {custom_handler!r}:
 
 def launch(*args, **kwargs):
     process = real_popen(*args, **kwargs)
-    pid_path.write_text(str(process.pid), encoding="utf-8")
+    # Publish by rename: the test polls for the file and must never see it empty.
+    staged_pid_path = pid_path.with_name(pid_path.name + ".tmp")
+    staged_pid_path.write_text(str(process.pid), encoding="utf-8")
+    os.replace(staged_pid_path, pid_path)
     if during_launch:
         os.kill(os.getpid(), signal_number)
     return process
