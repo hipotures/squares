@@ -72,7 +72,16 @@ body.capture #stage {
   left: 60px;
   top: 12px;
   width: 1000px;
-  height: 940px;
+  /* 954, not 940: the owner asked for the box to be a little bigger so the headline under it
+     has even space above and below. The square view fits this height, so the settled
+     container's drawn floor is 12 + 954 x 1.045 / 1.09 = 926.6 at every n, and the headline
+     (ink 981 to 1026, measured in pixels) has 54 above and 54 below to the stage's edge.
+     Not larger, because a MOVING drawing reaches lower than the settled floor: while the box
+     grows toward the next record's side, and as squares tilt in the physical styles, the
+     deepest drawn point over every step of the corpus lies 47 below the floor (n = 12 and 20
+     under bodies, n = 6 under physics). At 971 that touched the headline; here it clears it
+     by 8. The stage itself stays 1920 x 1080, which the 1080p capture depends on. */
+  height: 954px;
   display: block;
   touch-action: none;
 }
@@ -304,25 +313,27 @@ body.drawing #packing-svg #squares {
    rolls inside them, so the two are positioned within the row rather than as one element. */
 /* Below the packing, with air the container cannot eat into.
    The container's DRAWN floor is a constant: the packing SVG fits the box into the same
-   rectangle whatever the box is, so it sits at 913.2 at every n, from every start, at every
-   growth size and under a doubled blind inflation -- all five measured. What changes inside
+   rectangle whatever the box is, so it sits at 926.6 at every n, from every start, at every
+   growth size and under a doubled blind inflation -- all five measured (at 913.2, before the
+   drawing grew to 954 tall). What changes inside
    it is how much of it the squares fill, not where its edge is. So the clearance here is a
    number that can be chosen once rather than a worst case to guess at.
    The numeral's own box opens above its ink by about a fifth of its size, so what matters is
-   where the INK starts, not where the box does. Measured: ink from 950, which is 37 below the
-   container's floor and 31 above the stage's own.
+   where the INK starts, not where the box does. Measured with pixels: ink from 981 to 1026,
+   54 below the container's floor and 54 above the stage's own.
    Anchored to the stage's floor with `bottom` rather than to its ceiling with `top`. The stage
    is a fixed 1080 tall so the two are the same number today; `bottom` is the one that stays
    true, because what this row is measured from is the bottom of the diagram. */
 #headline {
   position: absolute;
   left: 60px;
-  bottom: 12px;
+  bottom: 20px;
   width: 1000px;
   height: 96px;
 }
-/* One slot per fading layer. The numeral used to live inside the layer and take the layer's own
-   opacity; out here it carries its own, which is the whole of what moving it cost. */
+/* One slot per fading layer, and one still slot for `n =`. The numeral used to live inside the
+   layer and take the layer's own opacity; out here it carries its own, which is the whole of
+   what moving it cost. */
 .numeral-slot {
   position: absolute;
   left: 0;
@@ -371,6 +382,17 @@ body.drawing #packing-svg #squares {
 .numeral .katex {
   font-size: 64px;
 }
+/* `n =` never moves: the owner asked that a step change the number and nothing else. All three
+   slots render the whole expression; the rolling two hide `n` and `=`, and the still one hides
+   the digits. `visibility` rather than `display`, so every copy keeps KaTeX's own spacing and
+   the number lands where the still copy leaves room for it. */
+#numeral-a .katex .boldsymbol,
+#numeral-a .katex .mrel,
+#numeral-b .katex .boldsymbol,
+#numeral-b .katex .mrel,
+#numeral-static .katex .mord.mathbf {
+  visibility: hidden;
+}
 /* The panel says two things about n, and says them under headings: what is proved, then what
    is open. The heads are the gap bar's head style, so the three headings in the column read as
    one set. Every slot below is fixed, so nothing jumps between n; a slot with nothing to say
@@ -392,7 +414,7 @@ body.drawing #packing-svg #squares {
   top: 320px;
 }
 .head-open {
-  top: 636px;
+  top: 546px;
 }
 /* The two bounds, one above the other at one size: a best known side and a proved lower bound
    are the same kind of fact about the same quantity, and a reader is meant to compare them, so
@@ -433,8 +455,7 @@ body.drawing #packing-svg #squares {
    big they are. `.katex` inherits the line's size, so one number here scales the whole expression,
    and the relation's own colour is left to KaTeX rather than being tinted by a class of ours. */
 .side .katex,
-.lower .katex,
-.exact .katex {
+.lower .katex {
   font-size: 1em;
 }
 /* KaTeX's own stylesheet sets `white-space: normal` on `.katex`, and KaTeX breaks an expression
@@ -442,10 +463,8 @@ body.drawing #packing-svg #squares {
    a poster and must not: `s(11)` wrapped away from its own bound and landed on the line below. */
 .side .katex,
 .lower .katex,
-.exact .katex,
 .side .katex-html,
-.lower .katex-html,
-.exact .katex-html {
+.lower .katex-html {
   white-space: nowrap;
 }
 /* A bound first proved here, in scarlet on the line directly under the bound it is about --
@@ -459,35 +478,16 @@ body.drawing #packing-svg #squares {
   align-items: center;
   white-space: nowrap;
 }
-/* Under both bounds, annotating the value above them: the closed form in the text face, or a
-   small-caps note giving its degree. Never to the right of a value. */
-.exact {
-  position: absolute;
-  left: 6px;
-  top: 470px;
-  height: 86px;
-  font-family: var(--serif);
-  font-size: 34px;
-  line-height: 1.3;
-  color: var(--muted);
-  white-space: nowrap;
-}
-/* The degree note. It was grey small-caps sans, which made a proved fact read as a caption; it
-   is a statement about the value, so it is set in the text face in ink like the bound above it and
-   differs only in size. */
-/* Both notes under the bound -- "algebraic, degree 8" and "new lower bound" -- are remarks
-   ABOUT the value rather than claims about it, so they are one style: the text face at the
-   annotation size, in ink. The star beside the bound is what marks the result as ours; the
-   words only name what the mark means, and shouting them twice was the old arrangement. */
-.exact .note,
+/* "new lower bound" names what the star beside the bound means, in the text face at the
+   annotation size. The closed-form line that used to share this style is gone: it sat under
+   two bounds and did not say which one it was the value of. */
 .star-line .note {
   font-family: var(--serif);
   font-size: 34px;
   color: var(--ink);
 }
 /* "new lower bound" is the star's own caption, so it takes the star's colour: the two are one
-   mark and reading them as one is the point. "algebraic, degree 8" above it stays ink, being a
-   remark about the value rather than about where the value came from. */
+   mark and reading them as one is the point. */
 .star-line .note {
   color: var(--new);
 }
@@ -496,7 +496,7 @@ body.drawing #packing-svg #squares {
 .badges {
   position: absolute;
   left: 6px;
-  top: 568px;
+  top: 478px;
   height: 40px;
   display: flex;
   align-items: center;
@@ -561,7 +561,7 @@ body.drawing #packing-svg #squares {
 .open-items {
   position: absolute;
   left: 6px;
-  top: 676px;
+  top: 586px;
   height: 40px;
   display: flex;
   align-items: center;
@@ -588,20 +588,6 @@ body.drawing #packing-svg #squares {
   font-size: 28px;
   font-weight: 450;
   color: var(--quiet);
-}
-#kind-tag {
-  position: absolute;
-  left: 60px;
-  top: 14px;
-  font-family: var(--sans);
-  font-size: 18px;
-  color: var(--label);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  font-weight: 500;
-}
-body.capture #kind-tag {
-  display: none;
 }
 .sr-only {
   position: absolute;
@@ -1234,7 +1220,6 @@ input[type="number"] {
 }
 body.pack-independent #facts,
 body.pack-independent #headline,
-body.pack-independent #kind-tag,
 body.pack-independent #mask-links,
 body.pack-independent #mode-panel,
 body.pack-independent #panel > .row,
@@ -1322,7 +1307,6 @@ body.trace-active #controls {
 }
 body.trace-active #facts,
 body.trace-active #headline,
-body.trace-active #kind-tag,
 body.trace-active #mask-links,
 body.trace-active #mode-panel,
 body.trace-active #panel > .row,

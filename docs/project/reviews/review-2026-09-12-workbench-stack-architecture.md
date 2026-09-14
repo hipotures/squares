@@ -212,7 +212,7 @@ behavior, and test boundary seeds plus browser/headless parity.
 
 ### R6 — High: the compaction negative cannot be reproduced
 
-[exp-209](../../../packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-209-h211-the-resolver-is-not-the-ceiling.md),
+[exp-209](../../../packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-209-h211-an-unretained-compaction-pass.md),
 lines 31–34 and 50–54, says the compaction pass ran inline and was deliberately not
 retained. No implementation was found in the reviewed source.
 The negative result therefore cannot establish that this class of repair has been

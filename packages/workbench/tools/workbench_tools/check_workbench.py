@@ -31,6 +31,7 @@ a probe that needs a number takes it as its one argument. See `probes.py` for wh
     packing/.venv/bin/python3 check_workbench.py [workbench.html]
 """
 
+import io
 import math
 import os
 import sys
@@ -38,6 +39,8 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
+import numpy as np
+from PIL import Image
 from playwright.sync_api import sync_playwright
 
 from workbench_tools.probes import probe
@@ -947,6 +950,18 @@ def main() -> int:  # noqa: C901, PLR0911 -- a flat list of page invariants
         check(ask("state")["playing"], "the space bar no longer plays")
         page.keyboard.press(" ")
         check(not ask("state")["playing"], "the space bar no longer pauses")
+        # Shortcuts are bare keys. Cmd+C is the browser's copy; read as `c` it put the page into
+        # capture mode and hid every control (owner, 2026-09-14); Cmd, Ctrl, Alt pass.
+        keys = ("capture", "snap", "style", "blind", "playing")
+        before = {key: ask("state")[key] for key in keys}
+        for combo in ("Meta+c", "Control+c", "Meta+s", "Meta+p", "Alt+b"):
+            page.keyboard.press(combo)
+            after = {key: ask("state")[key] for key in keys}
+            check(after == before, f"{combo} acted as a shortcut: {before} became {after}")
+        page.keyboard.press("c")
+        check(ask("state")["capture"], "the bare c key no longer enters capture")
+        page.keyboard.press("Escape")
+        check(not ask("state")["capture"], "Escape no longer leaves capture")
 
         # ---- step 8 (revision 10): the two modes, and what each of them plays.
         if "setMode" not in api:
@@ -2537,9 +2552,10 @@ def main() -> int:  # noqa: C901, PLR0911 -- a flat list of page invariants
                 packed[key] == swept[key],
                 f"the mode moved the {key}: {packed[key]} against {swept[key]}",
             )
-        # The step header still goes with the mode: it describes a step, and Pack has none.
-        drive(("setMode", "pack"), ("setStepN", 17))
-        check(look("dom/hidden", id="kind-tag"), "Pack still draws the step header")
+        # No step header in either mode: the owner asked for the line at the stage's top-left
+        # to go (2026-09-14), and the transition's statistics stay in `transition-stats.json`.
+        check(not in_page("kind-tag"), "the stage still carries a step header")
+
         drive(("setMode", "animate"), ("setInitial", "previous"), ("setStepN", 17), ("seek", 0))
 
         # ---- step 14 (revision 12): a contact graph drawn by hand. The owner: "it would be
@@ -2969,21 +2985,6 @@ def main() -> int:  # noqa: C901, PLR0911 -- a flat list of page invariants
                     )
                 counted[(n, kind)] = at_rest
         check(len(counted) >= 12, f"only {len(counted)} start-and-size pairs were counted")
-        # And the step header goes with the step: `16 -> 17 · matched · max move …` describes a
-        # transition, and Pack makes none. Animate keeps it, and hiding it moves nothing, the
-        # tag being absolutely positioned on the stage.
-        tag = look("modes/step-header", n=17)
-        check(tag["packed"]["hidden"], "Pack still draws the step header")
-        check(not tag["swept"]["hidden"], "Animate lost the step header as well")
-        check(
-            "→" in tag["swept"]["text"],
-            f"the step header does not name a step: {tag['swept']['text']!r}",
-        )
-        check(
-            tag["packed"]["stage"] == tag["swept"]["stage"],
-            f"hiding the step header moved the stage: {tag['packed']['stage']} against "
-            f"{tag['swept']['stage']}",
-        )
 
         # ---- step 17 (revision 14): restart, beside play and pause. The owner asked for it
         # there, and then for the thought behind it: "perhaps the restart makes more sense for
@@ -3162,6 +3163,113 @@ def main() -> int:  # noqa: C901, PLR0911 -- a flat list of page invariants
             f"{timing_group['packing']['law']} against {timing_group['animating']['law']}",
         )
         drive(("setMode", "pack"), ("setStepN", 17), ("setStyle", "bodies"))
+
+        # ---- step 19 (2026-09-14): the headline and the facts panel, from the owner's review.
+        # `n =` stays still while the number rolls; the space above and below the headline is
+        # even; no closed-form line sits under two bounds it cannot be attached to.
+        drive(("setMode", "animate"), ("setInitial", "previous"))
+        for n in (10, 100):
+            roll = look("headline/still", n=n)
+            faded = min(min(s["fadeA"], s["fadeB"]) for s in roll["samples"])
+            check(
+                faded < 0.5, f"the step into n = {n} never rolled its number: {roll['samples']}"
+            )
+            for s in roll["samples"]:
+                check(
+                    s["stillOpacity"] == 1 and s["stillTransform"] in ("", "none"),
+                    f"`n =` moved or faded during the step into n = {n}: {s}",
+                )
+            check(
+                roll["stillEquals"] == "visible" and roll["stillDigits"] == "hidden",
+                f"the still copy is not `n =` alone at n = {n}: {roll}",
+            )
+            check(
+                roll["rollingEquals"] == "hidden" and roll["rollingDigits"] == "visible",
+                f"the rolling copy still draws `n =` at n = {n}: {roll}",
+            )
+        check(
+            look("dom/count", selector=".exact") == 0, "a closed-form line is back under Proven"
+        )
+        # Text that reads the same for n and n + 1 stays up through the step, down to the glyph,
+        # and text that changes crossfades without dimming (owner, 2026-09-14: the panel used to
+        # fade away and come back where nothing changed). A glyph with the same markup in the
+        # same box in both layers is unchanged; the probe derives that itself.
+        for n in (18, 26, 100):
+            slots = look("facts/handover", n=n)
+            check(
+                any(s["same"] for s in slots) and not all(s["same"] for s in slots),
+                f"the step into n = {n} has no unchanged and changed slots to compare: {slots}",
+            )
+            for s in slots:
+                keys_a, keys_b = s["keys"]
+                shared = [k for k in keys_a if k in keys_b]
+                for sample in s["samples"]:
+                    seen_a, seen_b = sample
+                    for key in shared:
+                        top = max(seen_a[keys_a.index(key)], seen_b[keys_b.index(key)])
+                        check(top > 1 - 1e-9, f"{s['name']} dipped at n = {n} though unchanged")
+                    going = {seen_a[j] for j, k in enumerate(keys_a) if k not in keys_b}
+                    coming = {seen_b[j] for j, k in enumerate(keys_b) if k not in keys_a}
+                    if going and coming:
+                        check(
+                            len(going) == 1
+                            and len(coming) == 1
+                            and abs(going.pop() + coming.pop() - 1) <= 0.02,
+                            f"{s['name']} dimmed crossfading into n = {n}: {sample}",
+                        )
+
+        def headline_gaps() -> tuple[float, float, float]:
+            """Pixels from the container floor to the headline ink, and from ink to edge.
+
+            Read from a capture-mode screenshot rather than from element boxes, because a box
+            is not where the glyphs are: KaTeX's strut opens well above the digits.
+            """
+            stage = page.evaluate(
+                "() => { const r = document.getElementById('stage').getBoundingClientRect();"
+                " return [r.left, r.top, r.width / 1920]; }"
+            )
+            image = np.asarray(Image.open(io.BytesIO(page.screenshot())).convert("RGB")).astype(
+                int
+            )
+            left, top, scale = stage
+
+            def at(y: float, x: float) -> Any:
+                return image[int(top + y * scale), int(left + x * scale)]
+
+            paper = at(1076, 100)
+            band = image[
+                int(top) : int(top + 1080 * scale),
+                int(left + 60 * scale) : int(left + 1060 * scale),
+            ]
+            inked = np.abs(band - paper).sum(axis=2) > 60
+            wide = np.where(inked.mean(axis=1) > 0.5)[0]
+            floor = (wide[wide < 975 * scale].max() + 1) / scale
+            below = np.where(inked.any(axis=1))[0] / scale
+            ink = below[below > floor + 4]
+            return ink.min() - floor, 1080 - (ink.max() + 1 / scale), ink.min()
+
+        drive(("setCapture", True))
+        for n in (1, 17, 100):
+            drive(("setStepN", n), ("seek", 0))
+            page.evaluate("() => window.getSelection()?.removeAllRanges()")
+            page.wait_for_timeout(300)
+            above, under, ink_top = headline_gaps()
+            check(
+                abs(above - under) <= 2,
+                f"the headline at n = {n} is not centred in its space: {above:.1f} above, "
+                f"{under:.1f} below",
+            )
+        # A moving drawing reaches below the settled floor: the box grows toward the next record
+        # side and squares tilt. At the steps where it reaches deepest over the whole corpus it
+        # must still clear the headline, which is what capped how much bigger the box could get.
+        for style, n in (("physics", 6), ("bodies", 12), ("bodies", 20), ("physics", 26)):
+            deepest = look("stage/lowest-drawn", n=n, style=style)
+            check(
+                deepest < ink_top - 2,
+                f"the drawing reaches {deepest:.1f} in the step into n = {n} under {style}, "
+                f"into the headline starting at {ink_top:.1f}",
+            )
+        drive(("setCapture", False), ("setMode", "pack"), ("setStepN", 17))
 
         browser.close()
 

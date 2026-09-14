@@ -43,6 +43,26 @@ In particular, `structure.source` accepts `record`, `given`, and `random`, while
 Python executor loads the retained record for every nonempty structure request.
 Browser and Rust strategy readers remain future work.
 
+## Guidance Is Part of the Format
+
+**Added 2026-09-14, owner direction.** Every way of stitching a record’s structure into
+an optimisation is a strategy, written as a document and compared in a loop.
+Two gaps stand between the format and that:
+
+- **The workbench’s physics is not expressible.** Its blind, free and snap runs, shake
+  schedule, welded blocks and overlap-tolerant contraction need mechanisms (`drop`,
+  `simulate`, `resolve`) and a statement of where guidance acts (`start`, `weld`,
+  `attract`, `shake`, beside the existing `constraints`).
+- **Guidance is declared per phase but never summarised.** A derived summary — the most
+  informative rung any phase uses, and whether any phase guides onto the record — must
+  travel with every run record and every displayed result.
+
+Executors declare the mechanisms and uses they support, and refuse a document with any
+phase they cannot run.
+The field list, the rung table and the evaluation loop are in the
+[annealing plan](plan-2026-09-11-annealing-as-a-search.md#strategies-with-declared-guidance);
+the bead is `think-8ocb`.
+
 ## Phase 1: Repair the Contracts Before Reuse
 
 **Beads:** `think-sdmi` and `think-karf`. These precede standalone package extraction,
