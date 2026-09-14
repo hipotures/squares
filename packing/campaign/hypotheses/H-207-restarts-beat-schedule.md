@@ -20,7 +20,7 @@ hypothesis:
     metric: closed at the best trial within a fixed cost budget
     direction: higher
     threshold: best-of-k at the shipped schedule beats the best single-run schedule found by the sweep
-  instrument: packing/devtools/bench_annealing.py --sweep
+  instrument: packages/workbench/tools/workbench_tools/benchmark.py --sweep
   instrument_ready: true
   regime: >-
     the workbench's simulation; cost measured as total simulated steps, so a longer run and
@@ -33,10 +33,13 @@ hypothesis:
 ---
 # H-207 — restarts beat schedule tuning at equal cost
 
-The evidence that suggested it: at n = 5 and shake level 6, two trials in a thousand
-land at 0.139% and 0.230% excess while the next best is 4.854%. That is a rare basin,
-not a gradient, and a rare basin is reached by trying again rather than by descending
-more carefully.
+**Why it is worth testing.** Once runs are repaired to packings, a single run scores
+below the trivial grid at every `n` measured, while the best of a thousand sometimes
+comes within a fraction of a per cent of the record
+([X-029](../explorations/X-029-the-workbench-physics-as-a-search.md)). If that holds
+under a fair comparison, budget spent on restarts is worth more than budget spent on one
+careful run. Those observations are prefix values without spread, so they motivate the
+test and do not decide it.
 
 **What would refute it.** A schedule — a shake profile, a contraction rate, a step count
 — whose single run reaches a `closed` that best-of-k at the same total step count does

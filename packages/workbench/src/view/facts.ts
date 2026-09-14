@@ -122,8 +122,7 @@ export function createFactsView(document: Document, DATA: Corpus, numeralLeft: (
       return line;
     }
     // PROVED, in the order a reader wants it: the best known side, the proved lower bound
-    // under it, the scarlet mark when that bound was first proved here, the closed form or
-    // degree note for the value, and the badges. Both bounds are proved facts -- a construction
+    // under it, the scarlet mark when that bound was first proved here, and the badges. Both bounds are proved facts -- a construction
     // proves its upper bound -- so both belong here, and OPEN below carries the questions.
     layer.appendChild(text("div", "section-head head-proved", "Proven"));
     // The bound is one chained statement now, so it is one row. The star sits to the LEFT of
@@ -142,16 +141,10 @@ export function createFactsView(document: Document, DATA: Corpus, numeralLeft: (
       starLine.appendChild(text("span", "note", STAR_LABEL));
     }
     layer.appendChild(starLine);
-    // The closed form when there is one the value does not already state, set as mathematics;
-    // otherwise the degree note, which is a fact about the value rather than a caption on it, so it
-    // is set in the text face in ink like the lines above it and only smaller.
-    const exact = text("div", "exact");
-    if (f.html_exact && f.exact !== f.side) {
-      exact.innerHTML = f.html_exact;
-    } else if (f.exact_state === "minimal-polynomial") {
-      exact.appendChild(text("span", "note", `algebraic${f.degree ? `, degree ${f.degree}` : ""}`));
-    }
-    layer.appendChild(exact);
+    // No closed-form line. It sat under a chain of two bounds and did not say which bound it was
+    // the value of -- 108 of the 110 n that had one show `lower <= s(n) <= upper` -- so the owner
+    // asked for it to go. The data keeps `html_exact` and `degree` for a design that attaches a
+    // form to the bound it belongs to.
     const badges = text("div", "badges");
     for (const b of f.badges) {
       const label = BADGE_LABELS[`${b.glyph}/${b.style}`];

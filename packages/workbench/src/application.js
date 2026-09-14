@@ -97,7 +97,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   const ARRIVAL_FRACTION = DATA.arrival_fraction; // the share of the move the new square takes to arrive in the two staged modes
   const PAD = 0.045; // container-side fraction of breathing room inside the 1000 px box
   const NEW_FRACTION = 1 / 3; // in the three unstaged modes the new square fades in over the last third of the move
-  const ROLL_MAX = 0.4; // seconds for the panel's out-then-in sequence, from the moment the new square starts to appear
+  const ROLL_MAX = 0.4; // seconds for the panel's handover to the next n, from the moment the new square starts to appear
   const MARK_FADE = 0.15; // fraction of the move over which the previous pair's scarlet outline gives way to the normal stroke
   const MARK_WIDE = 4,
     MARK_THIN = 2; // scarlet outline widths, px: at arrival, and through the following dwell
@@ -521,7 +521,6 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   const markRect = mark.firstElementChild;
   const factsA = htmlNode("facts-a");
   const factsB = htmlNode("facts-b");
-  const kindTag = htmlNode("kind-tag");
   const live = htmlNode("live");
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const SVG_NS = svg.namespaceURI;
@@ -632,7 +631,82 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     () => numeralLeft,
   );
   let numeralA = null;
-  let numeralB = null;
+  //: Per slot of the facts panel, whether the n layer and the n + 1 layer draw it identically.
+  //: An identical slot hands over at the midpoint, which cannot be seen; only a slot that
+  //: changes is faded. Filled when the pair's layers are built.
+  let factsSame = [];
+  //: Per changing slot, its drawn parts split into those held (the same glyph in the same place in
+  //: both layers) and those that crossfade; null where the slot fades whole.
+  /** @type {({heldA: Element[], heldB: Element[], fadeA: Element[], fadeB: Element[]} | null)[]} */
+  let factsParts = [];
+  // The drawing units of one slot: an SVG as a whole, and every other element with no element
+  // children. Null when some element mixes its own text with child elements, since that text
+  // could not be faded apart from its children; such a slot fades whole.
+  function drawnParts(/** @type {Element} */ root) {
+    /** @type {Element[]} */
+    const parts = [];
+    let mixed = false;
+    const walk = (/** @type {Element} */ el) => {
+      for (const child of el.children) {
+        if (child instanceof SVGElement || child.children.length === 0) {
+          parts.push(child);
+        } else {
+          if ([...child.childNodes].some((c) => c.nodeType === 3 && c.textContent?.trim())) {
+            mixed = true;
+          }
+          walk(child);
+        }
+      }
+    };
+    walk(root);
+    return mixed ? null : parts;
+  }
+  // Which parts of a changing slot are unchanged: equal markup in an equal box in both layers.
+  // `4.59 ≤` in front of `s(17)` and `s(18)` is held; `17` and `18` crossfade. Anything not laid
+  // out yet has no box to compare, so it is never held.
+  function pairParts(/** @type {Element} */ a, /** @type {Element} */ b) {
+    const partsA = drawnParts(a);
+    const partsB = drawnParts(b);
+    if (partsA === null || partsB === null) {
+      return null;
+    }
+    const place = (/** @type {Element} */ el) => {
+      const r = el.getBoundingClientRect();
+      if (r.width === 0 && r.height === 0) {
+        return null;
+      }
+      const h = (/** @type {number} */ v) => Math.round(v * 2);
+      return `${el.outerHTML}@${h(r.left)},${h(r.top)},${h(r.width)},${h(r.height)}`;
+    };
+    /** @type {Map<string, Element[]>} */
+    const waiting = new Map();
+    for (const el of partsB) {
+      const key = place(el);
+      if (key !== null) {
+        waiting.set(key, [...(waiting.get(key) || []), el]);
+      }
+    }
+    /** @type {Element[]} */
+    const heldA = [];
+    /** @type {Element[]} */
+    const heldB = [];
+    /** @type {Element[]} */
+    const fadeA = [];
+    const fadeB = new Set(partsB);
+    for (const el of partsA) {
+      const key = place(el);
+      const twin = key === null ? undefined : waiting.get(key)?.shift();
+      if (twin === undefined) {
+        fadeA.push(el);
+      } else {
+        heldA.push(el);
+        heldB.push(twin);
+        fadeB.delete(twin);
+      }
+    }
+    return { heldA, heldB, fadeA, fadeB: [...fadeB] };
+  }
+  const numeralStatic = htmlNode("numeral-static");
   const numeralSlotA = htmlNode("numeral-a");
   const numeralSlotB = htmlNode("numeral-b");
 
@@ -920,21 +994,35 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     prevIndex = p.n > 1 ? A.ident.indexOf(p.n) : -1;
     ghost.setAttribute("transform", `translate(${newPose[0]} ${newPose[1]}) rotate(${newPose[2]})`);
     numeralA = buildFacts(factsA, p.n);
-    numeralB = buildFacts(factsB, p.n + 1);
-    const s = p.stats;
-    kindTag.textContent =
-      p.n +
-      " → " +
-      (p.n + 1) +
-      " · " +
-      p.kind +
-      " · max move " +
-      fmt(s.max_displacement, 2) +
-      " · " +
-      s.rotated +
-      " rotate · " +
-      s.block_count +
-      " blocks";
+    buildFacts(factsB, p.n + 1);
+    // `n =` is drawn once, in its own slot, and never fades or drifts: only the number changes
+    // between n. The still copy is the same rendered expression as the rolling ones with its
+    // digits hidden, so KaTeX's spacing after the `=` is identical in all three and the rolling
+    // number lands exactly where the still one would have been.
+    numeralStatic.textContent = "";
+    numeralStatic.appendChild(numeralA.cloneNode(true));
+    // Which slots read the same for both n. Compared as markup: the two layers are built by the
+    // same function into the same absolute slots, so equal markup is an equal picture.
+    const slotsA = factsA.children;
+    const slotsB = factsB.children;
+    factsSame = [];
+    for (let i = 0; i < Math.max(slotsA.length, slotsB.length); i++) {
+      factsSame.push(
+        slotsA[i] !== undefined &&
+          slotsB[i] !== undefined &&
+          slotsA[i].outerHTML === slotsB[i].outerHTML,
+      );
+    }
+    factsParts = factsSame.map((same, i) =>
+      same || slotsA[i] === undefined || slotsB[i] === undefined
+        ? null
+        : pairParts(slotsA[i], slotsB[i]),
+    );
+    factsA.style.opacity = "1";
+    factsB.style.opacity = "1";
+    // The step header (`16 → 17 · matched · max move 1.31 · …`) is gone from the stage: the
+    // owner asked for it to go, and the transition's kind and motion statistics stay in
+    // `transition-stats.json` for anyone who needs them.
     linksGroup.style.display = state.links ? "" : "none";
     ghost.style.display = state.links ? "" : "none";
   }
@@ -3607,8 +3695,15 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       optimizing ? !state.playing : t <= sc.moveStart || t >= sc.end - 1e-9,
     );
 
-    // The panel's text leaves, then returns: the n layer is fully gone before the n + 1 layer begins,
-    // so two numerals are never on the stage together. The numeral drifts a little on the way.
+    // The panel hands over to the next n only where it changes. It used to fade both layers whole
+    // -- the n layer out, a blank beat, then the n + 1 layer in -- so "Proven", the badges and
+    // every line that reads the same for both n blinked away and came back. The owner asked for
+    // that to stop. A slot drawn identically in both layers now swaps at the midpoint, which
+    // cannot be seen. A slot that differs crossfades over the middle half of the handover, 0.2 s
+    // at the most: the two opacities always sum to one, so the text never dims through a blank
+    // beat, and the eased curve keeps the moment both are half-visible short.
+    // The number under the packing is always a changing slot, and it crossfades in place: it used
+    // to drift as it faded, which stacked the two numbers into a ghost for the length of the fade.
     const q = optimizing
       ? 1
       : sc.roll > 0
@@ -3616,14 +3711,44 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
         : t >= sc.arrive
           ? 1
           : 0;
-    const out = clamp01(q / 0.45);
-    const back = clamp01((q - 0.55) / 0.45);
-    factsA.style.opacity = String(1 - out);
-    factsB.style.opacity = String(back);
-    numeralSlotA.style.opacity = String(1 - out);
-    numeralSlotB.style.opacity = String(back);
-    numeralA.style.transform = `translateY(${-24 * easeOut(out)}px)`;
-    numeralB.style.transform = `translateY(${24 * (1 - easeOut(back))}px)`;
+    const enter = easeInOut(clamp01((q - 0.25) / 0.5));
+    const leave = 1 - enter;
+    const heldA = q < 0.5 ? "1" : "0";
+    const heldB = q < 0.5 ? "0" : "1";
+    const slotsA = factsA.children;
+    const slotsB = factsB.children;
+    const fadeTo = (/** @type {Element[]} */ els, /** @type {string} */ value) => {
+      for (const el of els) {
+        /** @type {HTMLElement | SVGElement} */ (el).style.opacity = value;
+      }
+    };
+    for (let i = 0; i < factsSame.length; i++) {
+      const a = /** @type {HTMLElement | undefined} */ (slotsA[i]);
+      const b = /** @type {HTMLElement | undefined} */ (slotsB[i]);
+      const parts = factsParts[i];
+      if (parts) {
+        // A changing slot: the slot itself stays up and its parts do the work.
+        if (a !== undefined) {
+          a.style.opacity = "1";
+        }
+        if (b !== undefined) {
+          b.style.opacity = "1";
+        }
+        fadeTo(parts.heldA, heldA);
+        fadeTo(parts.heldB, heldB);
+        fadeTo(parts.fadeA, String(leave));
+        fadeTo(parts.fadeB, String(enter));
+        continue;
+      }
+      if (a !== undefined) {
+        a.style.opacity = factsSame[i] ? heldA : String(leave);
+      }
+      if (b !== undefined) {
+        b.style.opacity = factsSame[i] ? heldB : String(enter);
+      }
+    }
+    numeralSlotA.style.opacity = String(leave);
+    numeralSlotB.style.opacity = String(enter);
     if (live.textContent !== `n = ${state.liveN}`) {
       live.textContent = `n = ${state.liveN}`;
     }
@@ -3782,10 +3907,6 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
           fmt(g.record, 3);
   }
   function updateChrome() {
-    // Revision 14: no step header in Pack. `16 → 17 · matched · max move 1.31 · …` describes a
-    // step, and Pack has no steps: it packs one n. Animate keeps it. Like the bar, the tag is
-    // absolutely positioned on the stage, so hiding it moves nothing.
-    kindTag.hidden = state.mode === "pack";
     if (state.capture) {
       return;
     }
@@ -5439,6 +5560,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     return [pt.x, pt.y];
   }
   stage.addEventListener("keydown", (ev) => {
+    if (ev.metaKey || ev.ctrlKey || ev.altKey) {
+      return;
+    }
     const target = ev.target instanceof Element ? ev.target : null;
     const rawIndex = target?.getAttribute("data-square-index");
     const squareIndex = rawIndex === null || rawIndex === undefined ? -1 : Number(rawIndex);
@@ -5537,6 +5661,11 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   svg.addEventListener("pointercancel", endDrag);
 
   window.addEventListener("keydown", (ev) => {
+    // A shortcut is a bare key. With Cmd, Ctrl or Alt held the key belongs to the browser or the
+    // system: Cmd+C is a copy, not capture mode, and taking it made the controls vanish.
+    if (ev.metaKey || ev.ctrlKey || ev.altKey) {
+      return;
+    }
     if (packPanel?.visible()) {
       return;
     }

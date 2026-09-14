@@ -19,7 +19,7 @@ hypothesis:
     metric: whether any cell of the parameter sweep produces a trial inside the close tolerance
     direction: no cell does
     threshold: 0.1
-  instrument: packing/devtools/bench_annealing.py --sweep
+  instrument: packages/workbench/tools/workbench_tools/benchmark.py --sweep
   instrument_ready: true
   regime: >-
     the workbench's simulation as shipped; a negative here is about this instrument and not
@@ -32,13 +32,15 @@ hypothesis:
 ---
 # H-209 — no parameter set in the workbench’s own space reaches a record
 
-Stated so it can be wrong, and worth stating because the negative is the useful outcome:
-it would say the animation’s physics is a picture of a search rather than a search, and
-that improving it means changing the method rather than its dials.
+Stated so it can be wrong, and worth stating because the negative is useful: it would
+say the animation’s physics is a picture of a search rather than a search, and that
+improving it means changing the method rather than its dials.
 
-80,000 trials at the shipped force law found nothing inside 0.1% at any n. The best
-result anywhere was 0.139% at n = 5 — close enough that the claim is not safe, which is
-why it is worth a full grid rather than an assumption.
+**Where it stands.** No repaired run in the retained summaries is within 0.1% of a
+record. The closest is 0.15% above `s(5)`, the best of 39,871 runs at shake level 6
+([exp-207](../series/series-000-smoke-and-calibration/experiments/exp-207-h207-what-restarts-buy.md)).
+Only the shake dial has been swept on repaired runs; inflation, the force law and the
+step count have not.
 
 **What would refute it.** One trial, at any cell, inside the tolerance.
 A single counterexample settles it, which makes this the cheapest claim in the registry
