@@ -1414,6 +1414,68 @@ def test_timeout_kills_and_reaps_a_termination_resistant_process_group(
     }
 
 
+class _ExitedLeader:
+    pid = 4321
+
+    @staticmethod
+    def wait(timeout: float | None = None) -> int:
+        del timeout
+        return -signal.SIGKILL
+
+
+def test_reaper_polls_through_eperm_until_the_group_is_gone() -> None:
+    # macOS reports EPERM for signal 0 while the group's last member is exiting but not
+    # yet reaped, and for a signal sent in that window. Neither may escape the reaper,
+    # and only the later ESRCH may count as the group being gone.
+    probes = [PermissionError, PermissionError, PermissionError]
+
+    def killpg(_pid: int, signal_number: int) -> None:
+        if signal_number == 0:
+            raise probes.pop(0) if probes else ProcessLookupError
+        raise PermissionError
+
+    with patch("devtools.calibrate_fixed_core_packet.os.killpg", side_effect=killpg) as sent:
+        status, _cleanup = calibration._reap_process_group(
+            cast(subprocess.Popen[bytes], _ExitedLeader()), grace_seconds=1.0
+        )
+
+    assert status == -signal.SIGKILL
+    assert [call.args for call in sent.call_args_list] == [
+        (4321, 0),
+        (4321, signal.SIGTERM),
+        (4321, 0),
+        (4321, signal.SIGKILL),
+        (4321, 0),
+        (4321, 0),
+        (4321, 0),
+    ]
+
+
+def test_reaper_refuses_to_prove_reaping_while_the_group_reports_eperm() -> None:
+    with (
+        patch(
+            "devtools.calibrate_fixed_core_packet.os.killpg", side_effect=PermissionError
+        ) as sent,
+        pytest.raises(
+            calibration.CalibrationOperationalError,
+            match="worker process group remained alive after SIGKILL",
+        ),
+    ):
+        calibration._reap_process_group(
+            cast(subprocess.Popen[bytes], _ExitedLeader()), grace_seconds=0.02
+        )
+
+    calls = [call.args for call in sent.call_args_list]
+    assert calls[:4] == [
+        (4321, 0),
+        (4321, signal.SIGTERM),
+        (4321, 0),
+        (4321, signal.SIGKILL),
+    ]
+    assert len(calls) > 4
+    assert set(calls[4:]) == {(4321, 0)}
+
+
 def test_nonzero_exit_revokes_a_stale_complete_candidate_phase(
     tmp_path: Path,
 ) -> None:

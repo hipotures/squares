@@ -4100,10 +4100,15 @@ def supervise_worker(  # noqa: PLR0911
     def group_exists() -> bool:
         if process is None:
             return False
+        # Only ESRCH proves the group is gone. EPERM means it still exists with no
+        # member this process may signal: macOS reports it while the last member is
+        # exiting and not yet reaped, so the reaper keeps polling to its deadline.
         try:
             os.killpg(process.pid, 0)
         except ProcessLookupError:
             return False
+        except PermissionError:
+            return True
         return True
 
     def wait_for_group_absence() -> bool:
@@ -4120,11 +4125,11 @@ def supervise_worker(  # noqa: PLR0911
             return
         if not group_exists():
             return
-        with suppress(ProcessLookupError):
+        with suppress(ProcessLookupError, PermissionError):
             os.killpg(process.pid, signal.SIGTERM)
         if wait_for_group_absence():
             return
-        with suppress(ProcessLookupError):
+        with suppress(ProcessLookupError, PermissionError):
             os.killpg(process.pid, signal.SIGKILL)
         if not wait_for_group_absence():
             raise PacketError("worker process group remained alive after SIGKILL")
@@ -4132,14 +4137,15 @@ def supervise_worker(  # noqa: PLR0911
     def terminate_group() -> int | None:
         if process is None:
             return None
-        with suppress(ProcessLookupError):
+        with suppress(ProcessLookupError, PermissionError):
             os.killpg(process.pid, signal.SIGTERM)
         worker_status: int | None = None
         with suppress(subprocess.TimeoutExpired):
             worker_status = process.wait(timeout=grace_seconds)
         # The leader may have exited while descendants remain. SIGKILL is therefore
-        # sent to the session after every grace period; ESRCH means it is already gone.
-        with suppress(ProcessLookupError):
+        # sent to the session after every grace period; ESRCH means it is already gone,
+        # and EPERM is left to the absence poll, which alone can prove reaping.
+        with suppress(ProcessLookupError, PermissionError):
             os.killpg(process.pid, signal.SIGKILL)
         status = process.wait() if worker_status is None else worker_status
         if not wait_for_group_absence():
