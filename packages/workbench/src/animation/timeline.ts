@@ -18,6 +18,11 @@ export interface TimelineConfiguration {
   simple?: readonly boolean[];
   /** Play simple transitions, every phase, at `SIMPLE_TRANSITION_SPEED`. */
   fastSimple?: boolean;
+  /**
+   * The fraction of the moving span kept at its start for the box to grow, before the new square
+   * arrives or any square moves. Zero, the default, starts both with the move.
+   */
+  boxFirst?: number;
   timing: AtlasTiming;
   continuous: ContinuousTiming;
   anneal: number;
@@ -156,24 +161,27 @@ export function pairSchedule(
   const end = timingDuration(timing);
   const arrivalFraction = fraction(configuration.arrivalFraction, "arrival fraction");
   const newFraction = fraction(configuration.newFraction, "new fraction");
+  const reserved = span * fraction(configuration.boxFirst ?? 0, "box-first fraction");
+  const workStart = moveStart + reserved;
+  const work = span - reserved;
   let arrive: number;
   let arrived: number;
   let blocksStart: number;
   let blocksEnd: number;
   if (configuration.phase === "add-then-move") {
-    arrive = moveStart;
-    arrived = moveStart + span * arrivalFraction;
+    arrive = workStart;
+    arrived = workStart + work * arrivalFraction;
     blocksStart = arrived;
     blocksEnd = moveEnd;
   } else if (configuration.phase === "move-then-add") {
-    blocksStart = moveStart;
-    blocksEnd = moveStart + span * (1 - arrivalFraction);
+    blocksStart = workStart;
+    blocksEnd = workStart + work * (1 - arrivalFraction);
     arrive = blocksEnd;
     arrived = moveEnd;
   } else {
-    blocksStart = moveStart;
+    blocksStart = workStart;
     blocksEnd = moveEnd;
-    arrive = moveStart + span * (1 - newFraction);
+    arrive = workStart + work * (1 - newFraction);
     arrived = moveEnd;
   }
   return {

@@ -113,6 +113,24 @@ test("staging exposes arrival, free movement, correction and facts-panel count",
   near(pairSchedule(config, 1, "tween").arrive, 0.8 + (0.8 * 2) / 3);
 });
 
+test("box-first holds arrival and block motion until its share of the move has passed", () => {
+  const config = configuration();
+  const plain = pairSchedule(config, 1, "tween");
+  config.boxFirst = 0.32;
+  const held = pairSchedule(config, 1, "tween");
+  const span = plain.moveEnd - plain.moveStart;
+  near(held.moveStart, plain.moveStart);
+  near(held.moveEnd, plain.moveEnd);
+  near(held.arrive, plain.moveStart + 0.32 * span);
+  near(held.arrived, held.arrive + 0.68 * span * 0.3);
+  near(held.blocksStart, held.arrived);
+  near(held.blocksEnd, plain.moveEnd);
+  config.phase = "simultaneous";
+  near(pairSchedule(config, 1, "tween").blocksStart, plain.moveStart + 0.32 * span);
+  config.boxFirst = 1.5;
+  assert.throws(() => pairSchedule(config, 1, "tween"), /box-first fraction/);
+});
+
 test("rotation-first and slide-first are distinct pure schedules", () => {
   const rotate = phaseProgress("rotate-first", 0.3);
   const slide = phaseProgress("slide-first", 0.3);

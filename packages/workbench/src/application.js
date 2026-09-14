@@ -147,6 +147,14 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // a short move and a settle of its own, so the scarlet square comes in and takes its colour.
   // Nothing rearranges (that is what makes it static), and the drain stays off for the same
   // reason: there is no motion to mute.
+  // The box's beat on a step (see `drawBounds`): the fraction of the dwell over which the last
+  // step's outer trace clears, of the move over which the box grows, and of the move over which
+  // the inner trace then fades. Nothing is added or moved until both are done, which is
+  // BOX_FIRST of every move.
+  const BOUND_CLEAR = 0.3;
+  const BOUND_GROW = 0.2;
+  const BOUND_FADE = 0.12;
+  const BOX_FIRST = BOUND_GROW + BOUND_FADE;
   const CONTINUOUS = {
     // The owner's beat of 2026-09-13, the same as the single-step timing the builder supplies.
     // The moving span is split: the free rearrangement and then the landing.
@@ -200,6 +208,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   const _QUARTER = Math.PI / 2;
   // Scarlet is defined once, in the stylesheet, and read back here for the fill tint.
   const SCARLET = getComputedStyle(document.documentElement).getPropertyValue("--new").trim();
+  // The best known upper bound's green, which the stage's box turns when it locks at that side.
+  const MET = getComputedStyle(document.documentElement).getPropertyValue("--met").trim();
 
   const state = {
     // Revision 9: one view. Revision 8's two tabs were the same operation over a different span, so
@@ -520,6 +530,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   const stage = htmlNode("stage");
   const stageDescriptionNode = htmlNode("stage-accessible-description");
   const containerRect = svgNode("container");
+  const traceRect = svgNode("bound-trace");
+  const boxRect = svgNode("bound-box");
   const linksGroup = svgNode("links");
   const maskGroup = svgNode("mask-links");
   const drawLine = svgNode("draw-line");
@@ -661,6 +673,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     poseY = null,
     poseA = null;
   let sceneSide = 0; // the container side the last frame drew, which is where a drag picks the run up
+  let boxSide = 0; // the side the stage's box was last drawn at, which the gap bar points to
+  let boxLocked = false; // whether that box is at the best known side of the n it is showing
   let keyboardSquare = 0;
   let tgtX = null,
     tgtY = null,
@@ -953,6 +967,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       pairs: PAIRS,
       simple: SIMPLE,
       fastSimple: state.continuous.fastSimple,
+      boxFirst: BOX_FIRST,
       timing: state.timing,
       continuous: {
         on: state.continuous.on,
@@ -2297,6 +2312,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // taken to two places when in fact the value is four.
   const barNum = (value) => (Number.isInteger(value) ? String(value) : value.toFixed(3));
   const gapbarHand = svgNode("gapbar-hand");
+  const gapbarBox = svgNode("gapbar-box");
   const gapbarLowerLabel = svgNode("gapbar-lower-label");
   // An SVG text node, not an HTML one, which is why `measureDigit` can ask it for its
   // `getComputedTextLength`. `getElementById` is typed as returning an HTML element whatever it
@@ -2448,6 +2464,16 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     const i = gapbarInfo;
     const span = GAPBAR.width - 2 * GAPBAR.inset;
     return GAPBAR.inset + clamp01((value - i.lo) / (i.hi - i.lo)) * span;
+  }
+  // The triangle over the rail follows the stage's box on every frame, not only the still
+  // ones the hand is measured on: the box's growing and shrinking is the thing it shows. Kept
+  // inside the bar by its half-width, like the hand.
+  function pointAtBox(p) {
+    gapbarSetup(p, state.liveN);
+    const HALF = 8;
+    const x = Math.max(HALF, Math.min(GAPBAR.width - HALF, gapbarX(boxSide)));
+    gapbarBox.setAttribute("transform", `translate(${fmt(x, 2)} 0)`);
+    gapbarBox.classList.toggle("is-locked", boxLocked);
   }
   function updateGapBar(p, _B, g, mode) {
     const info = gapbarSetup(p, state.liveN);
@@ -3437,16 +3463,18 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // the run's first 68 per cent and `correct` seconds on its last 32, so the two phases have
   // independent durations while the run they play is the same one. Lengthening the search no
   // longer lengthens the landing with it, which was the whole complaint.
+  // The run waits out the box's BOX_FIRST of the move, like every other motion on a step.
   function moveProgress(sc, t) {
     const tm = timing();
-    const span = sc.moveEnd - sc.moveStart;
+    const start = sc.moveStart + (sc.moveEnd - sc.moveStart) * BOX_FIRST;
+    const span = sc.moveEnd - start;
     const total = tm.move + tm.correct;
     if (span <= 0 || total <= 0) {
-      return ramp(t, sc.moveStart, sc.moveEnd);
+      return ramp(t, start, sc.moveEnd);
     }
-    const knee = sc.moveStart + span * (tm.move / total);
+    const knee = start + span * (tm.move / total);
     return t < knee
-      ? ramp(t, sc.moveStart, knee) * PHYS.tightenFrom
+      ? ramp(t, start, knee) * PHYS.tightenFrom
       : PHYS.tightenFrom + ramp(t, knee, sc.moveEnd) * (1 - PHYS.tightenFrom);
   }
   function renderPhysicsScene(p, A, B, _tm, sc, t) {
@@ -3607,6 +3635,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     } else {
       renderTweenScene(p, A, B, tm, sc, t);
     }
+    drawBounds(p, sc, t, optimizing);
+    pointAtBox(p);
     // The live gap, from the poses the scene just drew. Style A never runs blind or free, so it is
     // always measured against the record's own labelling. A run from a random or grid start, or a
     // blind one, has no correspondence to that labelling, so only the box comparison means anything.
@@ -3641,6 +3671,90 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
 
     syncStageAccessibility();
     updateChrome();
+  }
+
+  // The box, as the owner asked on 2026-09-13: a bold square at the side the step is using, black
+  // while it is on its way and green once it locks at the best known side, and a thin black trace
+  // of where it just was, so every change of size is seen from both ends.
+  //   dwell   green rests at n's best known side; the trace the last step left outside it clears
+  //           over the dwell's last BOUND_CLEAR.
+  //   grow    over the first BOUND_GROW of the move green opens up and to the right to the room
+  //           n + 1 can always use -- ceil(sqrt(n + 1)), the grid, or the best known side where that
+  //           is wider -- riding out further wherever the moving container breathes past it. The
+  //           trace stays inside at n's side.
+  //   clear   the inner trace fades over the next BOUND_FADE, leaving room for the new square,
+  //           which the schedule holds back, with every other motion, until BOX_FIRST.
+  //   settle  green contracts to n + 1's best known side and the trace stays outside it, where the
+  //           box was, until the next step clears it.
+  // Where the grid is the best known packing the box never changes size and stays green. An
+  // open-ended run has walls rather than a step: its box is drawn on the walls, black, with no
+  // trace.
+  function openSide(n) {
+    return Math.max(Math.ceil(Math.sqrt(n)), FRAMES[String(n)].side);
+  }
+  // Each scene fits its view to its own container, which the box and its trace can lie outside of,
+  // so the view is widened, never narrowed, to hold them with the same breathing room.
+  function holdInView(side) {
+    const view = (svg.getAttribute("viewBox") ?? "").split(/\s+/).map(Number);
+    const x = view[0] ?? 0;
+    const y = view[1] ?? 0;
+    const size = view[2] ?? 0;
+    const pad = side * PAD;
+    const left = Math.min(x, -pad);
+    const right = Math.max(x + size, side + pad);
+    const top = Math.min(y, -side - pad);
+    const bottom = Math.max(y + size, pad);
+    const span = Math.max(right - left, bottom - top);
+    if (left === x && top === y && span === size) {
+      return;
+    }
+    const cx = (left + right) / 2;
+    const cy = (top + bottom) / 2;
+    svg.setAttribute("viewBox", `${cx - span / 2} ${cy - span / 2} ${span} ${span}`);
+  }
+  function drawBounds(p, sc, t, optimizing) {
+    const from = FRAMES[String(p.n)].side;
+    const to = FRAMES[String(p.n + 1)].side;
+    const open = openSide(p.n + 1);
+    let box = sceneSide;
+    let trace = sceneSide;
+    let seen = 0;
+    // The side the view holds through the whole step, so the picture does not zoom as the trace
+    // comes and goes: n's open side through the dwell, n + 1's once the box has grown.
+    let held = sceneSide;
+    if (!optimizing && t <= sc.moveStart) {
+      box = from;
+      trace = openSide(p.n);
+      seen = 1 - ramp(t, sc.moveStart * (1 - BOUND_CLEAR), sc.moveStart);
+      held = trace;
+    } else if (!optimizing && t < sc.moveEnd) {
+      const span = sc.moveEnd - sc.moveStart;
+      const grown = sc.moveStart + span * BOUND_GROW;
+      const opening = easeInOut(ramp(t, sc.moveStart, grown));
+      box = Math.max(sceneSide, lerp(from, open, opening));
+      trace = from;
+      seen = 1 - ramp(t, grown, grown + span * BOUND_FADE);
+      held = Math.max(box, lerp(openSide(p.n), open, opening));
+    } else if (!optimizing) {
+      trace = Math.max(sceneSide, open);
+      box = Math.max(sceneSide, lerp(trace, to, easeInOut(ramp(t, sc.moveEnd, sc.end))));
+      seen = 1;
+      held = trace;
+    }
+    if (!optimizing) {
+      holdInView(held);
+    }
+    traceRect.setAttribute("opacity", String(seen));
+    traceRect.setAttribute("width", String(trace));
+    traceRect.setAttribute("height", String(trace));
+    boxRect.setAttribute("width", String(box));
+    boxRect.setAttribute("height", String(box));
+    boxSide = box;
+    // Locked means at the best known side of the n on show: n's through the dwell, n + 1's after.
+    // A box on its way up can pass through n + 1's side, but not to within a billionth of it.
+    const best = t <= sc.moveStart ? from : to;
+    boxLocked = !optimizing && Math.abs(box - best) <= 1e-9 * best;
+    boxRect.setAttribute("stroke", boxLocked ? MET : "#000000");
   }
 
   // Style A, the block tween of revision 5: poses tween between the two frames, a block's members

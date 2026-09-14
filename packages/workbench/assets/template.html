@@ -19,8 +19,14 @@ __WORKBENCH_CSS__
       <p class="sr-only" id="stage-keyboard-help">Press Enter to focus a square in Pack mode. Use the arrow keys to move it, hold Shift for larger moves, use Q and E to rotate it, and press Escape to return to the stage. Space controls playback when the stage itself has focus.</p>
       <svg id="packing-svg" viewBox="0 0 1 1" preserveAspectRatio="xMidYMid meet" role="group" aria-label="Packing squares">
         <g id="world" transform="scale(1 -1)">
-          <rect id="container" x="0" y="0" width="1" height="1" fill="none" stroke="#000000" stroke-width="2" vector-effect="non-scaling-stroke" />
+          <!-- The container is geometry only: the scene keeps its size, and the two bounds below
+               are what is drawn. -->
+          <rect id="container" x="0" y="0" width="1" height="1" fill="none" stroke="none" />
           <g id="squares"></g>
+          <!-- The box, over the squares: bold where it is, turning the page's green when it locks at
+               the best known side, and a thin black trace of where it just was, under it. -->
+          <rect id="bound-trace" x="0" y="0" width="1" height="1" fill="none" stroke="#000000" stroke-width="1.5" vector-effect="non-scaling-stroke" pointer-events="none" />
+          <rect id="bound-box" x="0" y="0" width="1" height="1" fill="none" stroke-width="4" vector-effect="non-scaling-stroke" pointer-events="none" />
           <g id="links"></g>
           <g id="mask-links"></g>
           <line id="draw-line" x1="0" y1="0" x2="0" y2="0" vector-effect="non-scaling-stroke" stroke-linecap="round" style="display: none" />
@@ -46,6 +52,9 @@ __WORKBENCH_CSS__
             <!-- Where the arrangement on the stage actually is: inside the rail, because it is
                  a reading rather than a mark on the scale, and the only thing here that moves. -->
             <line class="hand-stem" id="gapbar-hand" x1="0" y1="2" x2="0" y2="24" />
+            <!-- The stage's box, at its side on this scale: a triangle pointing down into the rail at
+                 the value, clear of the labels above, following the box every frame, green when it locks. -->
+            <path class="box-pointer" id="gapbar-box" d="M -8 -9 L 8 -9 L 0 5 Z" />
             <!-- Both bounds' values above the rail, on one line, scarlet and green: the colour
                  is what says which is which now that neither carries an arrow. -->
             <text class="gapbar-num is-lower" id="gapbar-lower-label" x="0" y="-16" text-anchor="middle"></text>

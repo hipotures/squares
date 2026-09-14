@@ -90,6 +90,90 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
         toggle.click()
         require(call("continuous")["fastSimple"], "checking did not turn the speed-up back on")
 
+        # The box on the stage: black on its way, green once locked at the best known side,
+        # with a black trace where it just was and a triangle over the gap bar at its side. On
+        # 10 -> 11 the box rests at 3.707 with 9 -> 10's trace outside it at 4, grows to 4
+        # leaving a trace at 3.707, clears that trace before the new square arrives, and
+        # settles at 3.877 with a trace outside at 4. 6 -> 7 is a grid fill, where the box
+        # never changes size.
+        trace, box = page.locator("#bound-trace"), page.locator("#bound-box")
+
+        def at(seconds: float) -> tuple[float, float, float]:
+            call("seek", seconds)
+            return (
+                float(trace.get_attribute("width") or "nan"),
+                float(box.get_attribute("width") or "nan"),
+                float(trace.get_attribute("opacity") or "nan"),
+            )
+
+        met = page.evaluate(
+            "getComputedStyle(document.documentElement).getPropertyValue('--met').trim()"
+        )
+        pointer = page.locator("#gapbar-box")
+
+        def locked() -> tuple[bool, bool]:
+            return (
+                box.get_attribute("stroke") == met,
+                "is-locked" in (pointer.get_attribute("class") or "").split(),
+            )
+
+        require(
+            page.evaluate(
+                "document.getElementById('bound-trace').nextElementSibling"
+                " === document.getElementById('bound-box')"
+            ),
+            "the box is not drawn over its trace",
+        )
+        call("select", 9)
+        step = call("schedule")
+        span = step["moveEnd"] - step["moveStart"]
+        rest = at(0)
+        require(
+            abs(rest[0] - 4) < 1e-9 and abs(rest[1] - 3.707106781) < 1e-6 and rest[2] == 1,
+            f"n = 10 does not rest at 3.707 inside the last step's trace at 4: {rest}",
+        )
+        require(locked() == (True, True), f"n = 10 at rest is not locked green: {locked()}")
+        grown = at(step["moveStart"] + 0.2 * span)
+        moving = float(page.locator("#container").get_attribute("width") or "nan")
+        require(
+            abs(grown[0] - 3.707106781) < 1e-6
+            and abs(grown[1] - max(4, moving)) < 1e-9
+            and grown[2] == 1,
+            f"the box did not grow to 4 over a trace of where it was: {grown}",
+        )
+        require(
+            locked() == (False, False) and box.get_attribute("stroke") == "#000000",
+            f"the growing box or its pointer is not black: {locked()}",
+        )
+        cleared = at(step["moveStart"] + 0.32 * span)
+        arriving = page.locator('#squares g[data-identity="11"]').get_attribute("opacity")
+        require(
+            cleared[2] == 0 and step["arrive"] >= step["moveStart"] + 0.32 * span - 1e-9,
+            f"the inner trace is not gone before the new square arrives: {cleared}, {step}",
+        )
+        require(
+            arriving == "0", f"the new square appeared before the box was ready: {arriving}"
+        )
+        settled = at(call("duration", 9))
+        require(
+            abs(settled[0] - 4) < 1e-9
+            and abs(settled[1] - 3.87708359) < 1e-6
+            and settled[2] == 1,
+            f"n = 11 does not settle at 3.877 inside a trace at 4: {settled}",
+        )
+        require(locked() == (True, True), f"n = 11 settled is not locked green: {locked()}")
+        record_x = float(page.locator("#gapbar-record-rule").get_attribute("x1") or "nan")
+        pointer_x = page.evaluate(
+            "document.getElementById('gapbar-box').transform.baseVal.consolidate().matrix.e"
+        )
+        require(
+            abs(pointer_x - record_x) < 0.02,
+            f"the pointer is not over the best known side: {pointer_x} against {record_x}",
+        )
+        call("select", 5)
+        fill = at(call("duration", 5))
+        require(fill[0] == fill[1] == 3, f"a grid fill changed the box: {fill}")
+
         initial = call("importAnimation", FIXTURE.read_text(encoding="utf-8"))
         require(initial["active"] and initial["n"] == 2, "import did not activate n = 2")
         require(not initial["guided"], "an earlier free frame inherited later guidance")
@@ -175,7 +259,8 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
         require(not errors, "page errors: " + "; ".join(errors))
         browser.close()
     return (
-        "the owner's law, dial, beat and desaturation defaults, double-speed simple "
+        "the owner's law, dial, beat and desaturation defaults, the box, its trace, its lock "
+        "and its gap-bar pointer through a step, double-speed simple "
         "transitions and their checkbox, animation import, "
         "geometry/guidance, frame edits, replay, "
         "SVG/JSON/frame capture, and Pack return"

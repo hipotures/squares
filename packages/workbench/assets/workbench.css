@@ -5,8 +5,10 @@
   --quiet: #8a939e;
   --quiet-rule: #c9cfd5;
   --new: #a3123f;
-  /* Revision 8: the one green on the page, and it means one thing — the arrangement on the stage
-     is the best known one. Nothing else is ever drawn in it. */
+  /* Revision 8: the one green on the page, and it means one thing — the best known arrangement.
+     It marks the stage when the arrangement is the best known one, the best known upper bound
+     on the gap bar, and, since 2026-09-13, the stage's box and its pointer once the box locks at
+     that side. */
   --met: #17794a;
   --paper: #ffffff;
   --panel: #f7f8fa;
@@ -230,6 +232,14 @@ body.drawing #packing-svg #squares {
 }
 .gapbar.is-met .gapbar-plot .hand-stem {
   stroke: var(--met);
+}
+/* The stage's box, pointed at from above the rail: black while it moves, green once it locks at
+   the best known side, as the box itself does. */
+.gapbar-plot .box-pointer {
+  fill: #000000;
+}
+.gapbar-plot .box-pointer.is-locked {
+  fill: var(--met);
 }
 /* Every number on the bar is set the same: one size, one weight, tabular figures. What differs
    is the colour, and the colour is the only thing that says which bound it is -- scarlet for
