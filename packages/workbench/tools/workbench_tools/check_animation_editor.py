@@ -69,6 +69,27 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
             "the timing inputs do not show the 0.6 / 0.5 / 0.4 / 0.3 beat",
         )
 
+        # 6 -> 7 fills the last row of a 3 x 3 grid; 4 -> 5 tilts its squares.
+        simple_index, moving_index = 5, 3
+        toggle = page.locator("#fastsimple-toggle")
+        require(toggle.is_checked(), "simple transitions are not sped up by default")
+        fast = [call("duration", simple_index), call("duration", moving_index)]
+        toggle.click()
+        playback = call("continuous")
+        require(not playback["fastSimple"], "unchecking did not turn the speed-up off")
+        require(playback["simplePairs"] > 0, "the page found no simple transitions")
+        full = [call("duration", simple_index), call("duration", moving_index)]
+        require(
+            abs(full[0] - 2 * fast[0]) < 1e-9,
+            f"the grid fill does not play at double speed: {fast[0]} s against {full[0]} s",
+        )
+        require(
+            abs(full[1] - fast[1]) < 1e-9,
+            f"a step with motion changed speed: {fast[1]} s against {full[1]} s",
+        )
+        toggle.click()
+        require(call("continuous")["fastSimple"], "checking did not turn the speed-up back on")
+
         initial = call("importAnimation", FIXTURE.read_text(encoding="utf-8"))
         require(initial["active"] and initial["n"] == 2, "import did not activate n = 2")
         require(not initial["guided"], "an earlier free frame inherited later guidance")
@@ -154,7 +175,8 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
         require(not errors, "page errors: " + "; ".join(errors))
         browser.close()
     return (
-        "the owner's law, dial, beat and desaturation defaults, animation import, "
+        "the owner's law, dial, beat and desaturation defaults, double-speed simple "
+        "transitions and their checkbox, animation import, "
         "geometry/guidance, frame edits, replay, "
         "SVG/JSON/frame capture, and Pack return"
     )

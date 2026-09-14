@@ -1,7 +1,13 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
-import { decodeCorpus, frameAt, pairAt } from "../src/data/corpus.ts";
+import {
+  type CorpusFrame,
+  decodeCorpus,
+  frameAt,
+  isSimpleTransition,
+  pairAt,
+} from "../src/data/corpus.ts";
 
 function fixture(): unknown {
   return JSON.parse(readFileSync(new URL("fixtures/corpus.json", import.meta.url), "utf8"));
@@ -60,4 +66,22 @@ test("counts, pair maps, block indices and stable square identities are checked"
   const missingFrame = decodeCorpus(fixture());
   delete missingFrame.frames["2"];
   assert.throws(() => decodeCorpus(missingFrame), /no frame/);
+});
+
+test("a simple transition keeps an axis-aligned grid in the same container", () => {
+  const frame = (side: number, degrees: number[]): CorpusFrame => ({
+    side,
+    squares: degrees.map((angle, index) => [index + 0.5, 0.5, angle, "#257260", index + 1]),
+    ident: degrees.map((_, index) => index + 1),
+  });
+  assert.ok(isSimpleTransition(frame(3, [0, 90, -90]), frame(3, [0, 180, 270, 0])));
+  assert.ok(!isSimpleTransition(frame(3, [0, 0]), frame(4, [0, 0, 0])), "the container grew");
+  assert.ok(!isSimpleTransition(frame(3, [0, 0.0001]), frame(3, [0, 0, 0])), "a tilted source");
+  assert.ok(!isSimpleTransition(frame(3, [0, 0]), frame(3, [0, 0, 44.9])), "a tilted target");
+  const corpus = decodeCorpus(fixture());
+  const first = pairAt(corpus, 0);
+  assert.equal(
+    isSimpleTransition(frameAt(corpus, first.n), frameAt(corpus, first.n + 1)),
+    frameAt(corpus, first.n).side === frameAt(corpus, first.n + 1).side,
+  );
 });

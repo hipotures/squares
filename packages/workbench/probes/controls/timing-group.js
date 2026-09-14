@@ -33,7 +33,14 @@
       focusable: box.contains(document.activeElement),
       alone_in_row:
         Array.from(row.children).filter((e) => e.classList.contains("subpanel")).length === 1,
-      holds: ["t-dwell", "t-move", "t-settle", "phase-seg", "fullbeat-toggle"].every((id) => {
+      holds: [
+        "t-dwell",
+        "t-move",
+        "t-settle",
+        "phase-seg",
+        "fullbeat-toggle",
+        "fastsimple-toggle",
+      ].every((id) => {
         const element = document.getElementById(id);
         return element != null && box.contains(element);
       }),

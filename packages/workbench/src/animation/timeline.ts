@@ -9,8 +9,15 @@ export interface ContinuousTiming {
   staticBeat: AtlasTiming;
 }
 
+/** How many times faster a simple transition plays while `fastSimple` is on. */
+export const SIMPLE_TRANSITION_SPEED = 2;
+
 export interface TimelineConfiguration {
   pairs: readonly Pick<CorpusPair, "n" | "kind">[];
+  /** Per pair, whether the step only fills an axis-aligned grid; see `isSimpleTransition`. */
+  simple?: readonly boolean[];
+  /** Play simple transitions, every phase, at `SIMPLE_TRANSITION_SPEED`. */
+  fastSimple?: boolean;
   timing: AtlasTiming;
   continuous: ContinuousTiming;
   anneal: number;
@@ -90,6 +97,22 @@ export function continuousTiming(
   return scaledTiming(continuous.beat, annealSpan(style, configuration.anneal));
 }
 
+/** Whether this pair is a simple transition that currently plays sped up. */
+export function isSpedUpPair(configuration: TimelineConfiguration, index: number): boolean {
+  pairAt(configuration, index);
+  return configuration.fastSimple === true && configuration.simple?.[index] === true;
+}
+
+function spedTiming(timing: AtlasTiming, speed: number): AtlasTiming {
+  const valid = checkedTiming(timing);
+  return {
+    dwell: valid.dwell / speed,
+    move: valid.move / speed,
+    correct: valid.correct / speed,
+    settle: valid.settle / speed,
+  };
+}
+
 function scaledTiming(timing: AtlasTiming, scale: number): AtlasTiming {
   const valid = checkedTiming(timing);
   return { ...valid, move: valid.move * scale, correct: valid.correct * scale };
@@ -100,10 +123,10 @@ export function pairTiming(
   index: number,
   style: AtlasStyle,
 ): AtlasTiming {
-  pairAt(configuration, index);
-  return configuration.continuous.on
+  const timing = configuration.continuous.on
     ? continuousTiming(configuration, index, style)
     : scaledTiming(configuration.timing, annealSpan(style, configuration.anneal));
+  return isSpedUpPair(configuration, index) ? spedTiming(timing, SIMPLE_TRANSITION_SPEED) : timing;
 }
 
 export function timingDuration(timing: AtlasTiming): number {
@@ -281,6 +304,7 @@ export function displayedCount(
 
 export const timeline = Object.freeze({
   isStillPair,
+  isSpedUpPair,
   annealSpan,
   continuousTiming,
   pairTiming,

@@ -38,7 +38,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     transportIntent,
   } = workbenchBundle.navigation;
   const { reducedMotionAction, stageDescription, stageKeyCommand } = workbenchBundle.accessibility;
-  const { decodeCorpus } = workbenchBundle.data;
+  const { decodeCorpus, isSimpleTransition } = workbenchBundle.data;
   const {
     displayedCount,
     isStillPair: timelineIsStillPair,
@@ -90,6 +90,10 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   const COLOUR = createColourSystem(DATA.colour);
   const FRAMES = DATA.frames;
   const PAIRS = DATA.pairs;
+  // The owner's request of 2026-09-13: a step that only fills the last row of an axis-aligned
+  // grid has no phase worth watching, so it can play at double speed. Decided once, from the
+  // records themselves rather than from n.
+  const SIMPLE = PAIRS.map((p) => isSimpleTransition(FRAMES[p.n], FRAMES[p.n + 1]));
   const FACTS = DATA.facts;
   const METRICS = DATA.metrics;
   const N_MAX = DATA.n_max; // 324: the progress bar always maps to 1..N_MAX
@@ -244,7 +248,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     packN: null,
     // Continuous play across the whole sequence: on, whether static appends take the full beat, and
     // whether the next pair is simulated during this one's dwell.
-    continuous: { on: false, fullBeat: false, prefetch: true },
+    continuous: { on: false, fullBeat: false, fastSimple: true, prefetch: true },
     // Revision 9: the range, stated as the values of n stepped *into*, which is the unit the chooser
     // and the chips have always used. 17 to 17 is the one step 16 -> 17 (the page's default), 2 to
     // 324 is the whole corpus. Clamped to what the page carries by `setRange`.
@@ -947,6 +951,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   function timelineConfiguration() {
     return {
       pairs: PAIRS,
+      simple: SIMPLE,
+      fastSimple: state.continuous.fastSimple,
       timing: state.timing,
       continuous: {
         on: state.continuous.on,
@@ -3999,6 +4005,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     });
     /** @type {HTMLInputElement} */ (inputNode("fullbeat-toggle")).checked =
       state.continuous.fullBeat;
+    /** @type {HTMLInputElement} */ (inputNode("fastsimple-toggle")).checked =
+      state.continuous.fastSimple;
     updateStepChooser();
     updateRangeControls();
     const c = continuousState();
@@ -4015,7 +4023,10 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       c.staticPairs +
       " of " +
       c.pairs +
-      " pairs); this pair " +
+      " pairs); " +
+      c.simplePairs +
+      (c.fastSimple ? " simple grid fills at double speed" : " simple grid fills at full length") +
+      "; this pair " +
       fmt(duration(), 2) +
       " s, " +
       fmt(c.remaining, 0) +
@@ -4642,8 +4653,14 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   }
   function setContinuous(options) {
     const o = options || {};
+    // A change of speed keeps the playhead at the same point of the pair rather than of the clock.
+    const frac = duration() > 0 ? state.t / duration() : 0;
     if (o.fullBeat !== undefined) {
       state.continuous.fullBeat = !!o.fullBeat;
+    }
+    if (o.fastSimple !== undefined && !!o.fastSimple !== state.continuous.fastSimple) {
+      state.continuous.fastSimple = !!o.fastSimple;
+      state.t = frac * duration();
     }
     if (o.prefetch !== undefined) {
       state.continuous.prefetch = !!o.prefetch;
@@ -4673,6 +4690,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     return {
       on: state.continuous.on,
       fullBeat: state.continuous.fullBeat,
+      fastSimple: state.continuous.fastSimple,
       prefetch: state.continuous.prefetch,
       dwell: CONTINUOUS.dwell,
       move: CONTINUOUS.move,
@@ -4681,6 +4699,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       pair: state.pair,
       pairs: PAIRS.length,
       staticPairs: still,
+      simplePairs: SIMPLE.filter(Boolean).length,
       timing: Object.assign({}, timing()),
       total: sequenceDuration(),
       remaining,
@@ -5419,6 +5438,11 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     .getElementById("fullbeat-toggle")
     .addEventListener("change", (ev) =>
       setContinuous({ fullBeat: /** @type {HTMLInputElement} */ (ev.target).checked }),
+    );
+  document
+    .getElementById("fastsimple-toggle")
+    .addEventListener("change", (ev) =>
+      setContinuous({ fastSimple: /** @type {HTMLInputElement} */ (ev.target).checked }),
     );
   // Typing in `from` alone drags `to` with it while the two are equal, so a one-step range stays one
   // step rather than silently widening.

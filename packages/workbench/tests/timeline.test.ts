@@ -4,6 +4,7 @@ import {
   annealSpan,
   continuousTiming,
   displayedCount,
+  isSpedUpPair,
   pairDuration,
   pairSchedule,
   pairTiming,
@@ -11,6 +12,7 @@ import {
   ramp,
   rangeDuration,
   rangeProgress,
+  SIMPLE_TRANSITION_SPEED,
   seekSequence,
   sequenceDuration,
   type TimelineConfiguration,
@@ -59,6 +61,36 @@ test("four-span timing preserves correction in single, continuous and annealed p
   near(pairDuration(config, 0, "physics"), 2.8);
   assert.equal(annealSpan("physics", 0), 1);
   assert.equal(annealSpan("tween", 10), 1);
+});
+
+test("simple transitions play every phase at double speed only while the setting is on", () => {
+  const config = configuration();
+  config.simple = [true, false, true, false];
+  const full = [0, 1, 2, 3].map((index) => pairDuration(config, index, "tween"));
+  const fullSequence = sequenceDuration(config, "tween");
+  config.fastSimple = true;
+  assert.equal(SIMPLE_TRANSITION_SPEED, 2);
+  assert.deepEqual(
+    [0, 1, 2, 3].map((index) => isSpedUpPair(config, index)),
+    [true, false, true, false],
+  );
+  near(pairDuration(config, 0, "tween"), (full[0] ?? Number.NaN) / 2);
+  near(pairDuration(config, 1, "tween"), full[1] ?? Number.NaN);
+  near(pairDuration(config, 2, "tween"), (full[2] ?? Number.NaN) / 2);
+  near(
+    sequenceDuration(config, "tween"),
+    fullSequence - ((full[0] ?? Number.NaN) + (full[2] ?? Number.NaN)) / 2,
+  );
+  const beat = pairTiming(config, 2, "tween");
+  near(beat.dwell, 0.2);
+  near(beat.move, 0.14);
+  near(beat.correct, 0.06);
+  near(beat.settle, 0.175);
+  config.continuous.on = false;
+  near(pairTiming(config, 0, "tween").settle, 0.4);
+  config.fastSimple = false;
+  near(pairTiming(config, 0, "tween").settle, 0.8);
+  assert.throws(() => isSpedUpPair(config, 9), /no transition/);
 });
 
 test("staging exposes arrival, free movement, correction and facts-panel count", () => {
