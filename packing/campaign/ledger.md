@@ -144,6 +144,7 @@ Each entry summarizes one user-level research window. Cycle slots are wall-clock
 | [session-127](agent-sessions/session-127-weighted-five-site-atom-admission.md) | completed | contemporaneous | `pipeline-improvement` (correctness) | `pipeline-improvement` (correctness) | 2 | think-zvr3 | Continue under think-8c9e, the weighted-atom coverage mechanics, which cover the direct, event and interval controls including the boundary and undercharged-core cases and the interval route's stall handling. Stage four's paired runner and exact common manifests are tracked separately and blocked on it. |
 | [session-128](agent-sessions/session-128-research-state-rollup.md) | stopped | contemporaneous | `pipeline-improvement` (process) | `documentation-pass` (correctness) | 2 | think-uqa4 | Hand the certified inventory and scientific boundary to BC-347 under think-oj12 for the separate mathematical-audit lifecycle. |
 | [session-129](agent-sessions/session-129-small-n-mathematical-audit.md) | stopped | contemporaneous | `factual-review` (correctness) | `insight-iteration` (insight) | 2 | think-oj12 | Run BC-346 under think-9y7p as the separate planning block; select no scientific target before that block records its disposition. |
+| [session-130](agent-sessions/session-130-n11-w10-route-selection.md) | stopped | contemporaneous | `review-planning-oversight` (process) | `review-planning-oversight` (process) | 1 | think-9y7p | Complete BC-346 under think-9y7p by certifying this planning source; the durable W10 review owns the selected subsequent checkpoint and its separate pull-request boundary. |
 
 ### Workflow summary
 
@@ -160,7 +161,7 @@ Declared counts are contemporaneous contracts; retrospective counts are reconstr
 | `pipeline-improvement` | 29 | 1 | 146 | 4 |
 | `documentation-pass` | 1 | 0 | 22 | 1 |
 | `remediation` | 0 | 1 | 0 | 1 |
-| `review-planning-oversight` | 1 | 0 | 14 | 1 |
+| `review-planning-oversight` | 2 | 0 | 15 | 1 |
 | `general-improvement` | 1 | 0 | 7 | 1 |
 
 ## Experiment agendas
@@ -738,7 +739,7 @@ Status: **active**. Reconcile the merged research record, then choose among rout
 | --- | --- | --- | --- | ---: | --- | --- |
 | BC-339 | tool_validation | 11 | complete | 0 | think-uqa4 | BC-347 consumes the checked inventory and scientific boundary without reopening the source reconciliation. |
 | BC-347 | research | 6, 7, 10, 11, 13 | complete | 0 | think-oj12 | BC-346 compares the audited prerequisites, first discriminators, payoff, and cost and selects exactly one execution entry. |
-| BC-346 | tool_validation | 11 | ready | 0 | think-9y7p | Reconstruct the W5 cadence, then compare any due checkpoint with Routes A, S, E, B, F1, F2, N, C, D, and G using their declared first discriminators; select one block rather than a multi-lane research promise. |
+| BC-346 | tool_validation | 11 | in_progress | 0 | think-9y7p | Reconstruct the W5 cadence, then compare any due checkpoint with Routes A, S, E, B, F1, F2, N, C, D, and G using their declared first discriminators; select one block rather than a multi-lane research promise. |
 | BC-340 | measurement_validation | 11 | tentative | 0 | think-1ydi | Reconstruct the cadence from active daytime blocks and retained gate receipts; administrative work does not reset the cadence. |
 | BC-341 | research | 11 | tentative | 1 | think-9y6q | Freeze the smallest occupancy/contact partition that strictly extends T-023's single four-owner branch without claiming an owner-selection theorem. |
 | BC-342 | research | 6, 11 | tentative | 1 | think-ol1z | Specify the n=6 control and the conflict-edge soundness obligation before selecting a solver. |

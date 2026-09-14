@@ -118,7 +118,7 @@ agenda:
     purpose: tool_validation
     owner_focus: process
     instances: [11]
-    state: ready
+    state: in_progress
     priority: 0
     question: >-
       Given the reconciled state, is the validation-efficiency checkpoint due, and which
@@ -141,6 +141,9 @@ agenda:
       block rather than a multi-lane research promise.
     workflows: [review-planning-oversight]
     program: n11-strategy-reset
+    artifacts:
+    - docs/project/reviews/review-2026-09-14-n11-w10-route-selection.md
+    - packing/campaign/agent-sessions/session-130-n11-w10-route-selection.md
     parallel_group: route-selection
   - id: BC-340
     purpose: measurement_validation
@@ -413,12 +416,16 @@ It preserves the older portfolio’s completed evidence while removing its pause
 incremental lanes from the live queue.
 
 The research-state roll-up and mathematical audit are certified and closed in declared
-dependency order. The audit recommends A, S, angular resources, B, stronger charge
-algebra, geometry-dependent budgets, n12, C, D, then geometric waste; the ordering is a
-judgment about the next allocation, not a measured success probability.
-BC-346 is the current W10 handoff; it will first determine whether the efficiency
-checkpoint is due and then select exactly one execution entry.
-Every unselected route remains tentative until the planning disposition says otherwise.
+dependency order. BC-346’s W10 review has now selected BC-340, the due W5 efficiency
+checkpoint, as the next execution entry; exact-revision certification is still pending.
+A conservative source reconstruction counts eight substantive non-W5 blocks since the
+latest qualifying W5 in Session 116/BC-322, which reaches OR-12’s mandatory ceiling.
+
+No scientific target is authorized before W5 closes and a fresh W10 selects one.
+The advisory scientific order remains A at side `3.84`, S, angular resources, B,
+stronger charge algebra, geometry-dependent budgets, n12, C, D, then geometric waste.
+Route A is the expected first scientific choice and Route S is its admission fallback,
+but both remain tentative until the post-W5 planning block.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
