@@ -3262,7 +3262,7 @@ def main() -> int:  # noqa: C901, PLR0911 -- a flat list of page invariants
         # A moving drawing reaches below the settled floor: the box grows toward the next record
         # side and squares tilt. At the steps where it reaches deepest over the whole corpus it
         # must still clear the headline, which is what capped how much bigger the box could get.
-        for style, n in (("physics", 6), ("bodies", 12), ("bodies", 20), ("physics", 26)):
+        for style, n in (("physics", 6), ("physics", 5), ("bodies", 293), ("bodies", 302)):
             deepest = look("stage/lowest-drawn", n=n, style=style)
             check(
                 deepest < ink_top - 2,

@@ -48,8 +48,10 @@ The best of the first 1,000 runs in `closed`, with 3,000 repaired runs per cell
 Below level 6 no run beat the grid at any of the three `n`. At levels 6 to 10 the best
 run beat it in eight cells of nine.
 
-**What the measurement cannot yet say.** The claim compares against the shipped level 3,
-which was not measured.
+**What the measurement cannot yet say.** The claim compares against level 3, the page’s
+default when it was registered, which was not measured.
+The owner’s defaults now ship level 9 on a 0–20 dial (#171), inside the range measured
+as working; nothing above 10 has been measured.
 Each cell is one prefix without spread, and only three `n` were swept.
 
 **The mechanism this suggests, and does not establish.** The shake is the only

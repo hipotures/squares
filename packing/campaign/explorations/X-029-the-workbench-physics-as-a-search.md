@@ -53,7 +53,8 @@ That text is recoverable at commit `a40d272c`; none of it is repeated here.
 - **The shake dial is a search parameter that the page sets for looks.** At levels 0 to
   4 no run in 3,000 beat the grid at `n = 5`, 10 or 11. At levels 6 to 10 the best run
   did, with one exception.
-  The page ships level 3.
+  The page shipped level 3 when these runs were measured; the owner’s defaults now ship
+  9 on a 0–20 dial (#171).
 
 ## 1. What a Blind Run Is
 
@@ -198,7 +199,9 @@ What this shows:
   `n = 11` reached 0.564 in the first 1,000 seeds and 0.616 over 16,319.
 - **The median barely moves with the level**, except `n = 11` at level 10, so the dial
   acts on the best run rather than the typical one.
-- **The page ships level 3**, chosen for how the animation looks.
+- **The page shipped level 3** when these runs were measured, chosen for how the
+  animation looked. The owner’s defaults now ship level 9 on a dial widened to 0–20
+  (#171); levels above 10 have not been measured.
   Level 3 was not measured after the repair existed.
 
 ## 5. What Is Not Established

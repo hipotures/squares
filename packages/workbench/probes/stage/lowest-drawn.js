@@ -1,5 +1,5 @@
-// The lowest point the packing drawing reaches through one step, in stage units: every square
-// and the container, sampled at evenly spaced instants. o.n is the step's n, o.style the style.
+// The lowest point the packing drawing reaches through one step, in stage units: every square,
+// the container, the drawn box and its trace, sampled at evenly spaced instants. o.n is the step's n, o.style the style.
 (o) => {
   const api = window.atlasTransitions;
   api.setStyle(o.style);
@@ -12,7 +12,9 @@
   let deepest = -Infinity;
   for (let k = 0; k <= 48; k++) {
     api.seek((total * k) / 48);
-    for (const el of document.querySelectorAll("#squares > *, #container")) {
+    for (const el of document.querySelectorAll(
+      "#squares > *, #container, #bound-box, #bound-trace",
+    )) {
       const r = el.getBoundingClientRect();
       if (r.width > 0 || r.height > 0) {
         deepest = Math.max(deepest, (r.bottom - stage.top) / scale);
