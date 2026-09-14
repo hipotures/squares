@@ -3168,8 +3168,35 @@ def main() -> int:  # noqa: C901, PLR0911 -- a flat list of page invariants
         check(
             look("dom/count", selector=".exact") == 0, "a closed-form line is back under Proven"
         )
+        # Text that reads the same for n and n + 1 stays up through the step, down to the glyph,
+        # and text that changes crossfades without dimming (owner, 2026-09-14: the panel used to
+        # fade away and come back where nothing changed). A glyph with the same markup in the
+        # same box in both layers is unchanged; the probe derives that itself.
+        for n in (18, 26, 100):
+            slots = look("facts/handover", n=n)
+            check(
+                any(s["same"] for s in slots) and not all(s["same"] for s in slots),
+                f"the step into n = {n} has no unchanged and changed slots to compare: {slots}",
+            )
+            for s in slots:
+                keys_a, keys_b = s["keys"]
+                shared = [k for k in keys_a if k in keys_b]
+                for sample in s["samples"]:
+                    seen_a, seen_b = sample
+                    for key in shared:
+                        top = max(seen_a[keys_a.index(key)], seen_b[keys_b.index(key)])
+                        check(top > 1 - 1e-9, f"{s['name']} dipped at n = {n} though unchanged")
+                    going = {seen_a[j] for j, k in enumerate(keys_a) if k not in keys_b}
+                    coming = {seen_b[j] for j, k in enumerate(keys_b) if k not in keys_a}
+                    if going and coming:
+                        check(
+                            len(going) == 1
+                            and len(coming) == 1
+                            and abs(going.pop() + coming.pop() - 1) <= 0.02,
+                            f"{s['name']} dimmed crossfading into n = {n}: {sample}",
+                        )
 
-        def headline_gaps() -> tuple[float, float]:
+        def headline_gaps() -> tuple[float, float, float]:
             """Pixels from the container floor to the headline ink, and from ink to edge.
 
             Read from a capture-mode screenshot rather than from element boxes, because a box
@@ -3197,18 +3224,28 @@ def main() -> int:  # noqa: C901, PLR0911 -- a flat list of page invariants
             floor = (wide[wide < 975 * scale].max() + 1) / scale
             below = np.where(inked.any(axis=1))[0] / scale
             ink = below[below > floor + 4]
-            return ink.min() - floor, 1080 - (ink.max() + 1 / scale)
+            return ink.min() - floor, 1080 - (ink.max() + 1 / scale), ink.min()
 
         drive(("setCapture", True))
         for n in (1, 17, 100):
             drive(("setStepN", n), ("seek", 0))
             page.evaluate("() => window.getSelection()?.removeAllRanges()")
             page.wait_for_timeout(300)
-            above, under = headline_gaps()
+            above, under, ink_top = headline_gaps()
             check(
                 abs(above - under) <= 2,
                 f"the headline at n = {n} is not centred in its space: {above:.1f} above, "
                 f"{under:.1f} below",
+            )
+        # A moving drawing reaches below the settled floor: the box grows toward the next record
+        # side and squares tilt. At the steps where it reaches deepest over the whole corpus it
+        # must still clear the headline, which is what capped how much bigger the box could get.
+        for style, n in (("physics", 6), ("bodies", 12), ("bodies", 20), ("physics", 26)):
+            deepest = look("stage/lowest-drawn", n=n, style=style)
+            check(
+                deepest < ink_top - 2,
+                f"the drawing reaches {deepest:.1f} in the step into n = {n} under {style}, "
+                f"into the headline starting at {ink_top:.1f}",
             )
         drive(("setCapture", False), ("setMode", "pack"), ("setStepN", 17))
 

@@ -67,12 +67,16 @@ body.capture #stage {
   left: 60px;
   top: 12px;
   width: 1000px;
-  /* 971, not 940: the owner asked for the box to be a little bigger so the headline under it
-     has even space above and below. The square view fits this height, so the container's
-     drawn floor is 12 + 971 x 1.045 / 1.09 = 942.9 at every n. Measured with pixels, the
-     headline's ink runs 989 to 1034, which leaves 46 above it and 46 below it to the stage's
-     edge. The stage itself stays 1920 x 1080, which the 1080p capture depends on. */
-  height: 971px;
+  /* 954, not 940: the owner asked for the box to be a little bigger so the headline under it
+     has even space above and below. The square view fits this height, so the settled
+     container's drawn floor is 12 + 954 x 1.045 / 1.09 = 926.6 at every n, and the headline
+     (ink 981 to 1026, measured in pixels) has 54 above and 54 below to the stage's edge.
+     Not larger, because a MOVING drawing reaches lower than the settled floor: while the box
+     grows toward the next record's side, and as squares tilt in the physical styles, the
+     deepest drawn point over every step of the corpus lies 47 below the floor (n = 12 and 20
+     under bodies, n = 6 under physics). At 971 that touched the headline; here it clears it
+     by 8. The stage itself stays 1920 x 1080, which the 1080p capture depends on. */
+  height: 954px;
   display: block;
   touch-action: none;
 }
@@ -296,21 +300,21 @@ body.drawing #packing-svg #squares {
    rolls inside them, so the two are positioned within the row rather than as one element. */
 /* Below the packing, with air the container cannot eat into.
    The container's DRAWN floor is a constant: the packing SVG fits the box into the same
-   rectangle whatever the box is, so it sits at 942.9 at every n, from every start, at every
+   rectangle whatever the box is, so it sits at 926.6 at every n, from every start, at every
    growth size and under a doubled blind inflation -- all five measured (at 913.2, before the
-   drawing grew to 971 tall). What changes inside
+   drawing grew to 954 tall). What changes inside
    it is how much of it the squares fill, not where its edge is. So the clearance here is a
    number that can be chosen once rather than a worst case to guess at.
    The numeral's own box opens above its ink by about a fifth of its size, so what matters is
-   where the INK starts, not where the box does. Measured with pixels: ink from 989 to 1034,
-   46 below the container's floor and 46 above the stage's own.
+   where the INK starts, not where the box does. Measured with pixels: ink from 981 to 1026,
+   54 below the container's floor and 54 above the stage's own.
    Anchored to the stage's floor with `bottom` rather than to its ceiling with `top`. The stage
    is a fixed 1080 tall so the two are the same number today; `bottom` is the one that stays
    true, because what this row is measured from is the bottom of the diagram. */
 #headline {
   position: absolute;
   left: 60px;
-  bottom: 12px;
+  bottom: 20px;
   width: 1000px;
   height: 96px;
 }
