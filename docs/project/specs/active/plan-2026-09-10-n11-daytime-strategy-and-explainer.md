@@ -1,22 +1,21 @@
 # N11: Daytime Strategy Blocks and Parallel Explainer Update
 
-**Active plan, September 10, 2026; updated September 13.** This plan replaces the
+**Active plan, September 10, 2026; updated September 14.** This plan replaces the
 uninterrupted overnight schedule with shorter blocks that can start and stop during the
 day. Each research block gets its own session clock, falsifiable output, stop rule, and
 closeout. A later block is selected from the evidence produced by the earlier ones; gaps
 between blocks consume no scientific budget.
 
-The workflow entry is **W10 review, planning, and oversight** under `think-gvlg`. The
-first exit is agenda035, a durable strategy comparison, and selection of the first
-60–120 minute research block.
-The research branch is `codex/n11-daytime-strategy`, based on merged PR139 at
+The original workflow entry was **W10 review, planning, and oversight** under
+`think-gvlg`. Its first exit was agenda035, a durable strategy comparison, and selection
+of the first 60–120 minute research block.
+The original research branch was `codex/n11-daytime-strategy`, based on merged PR139 at
 `3a18a05a6af75e3800612549d5a3c5fe419b96f2`.
 
-A separate W8 documentation lane runs from `codex/n11-explainer-current-bound`, also
-based directly on the PR139 merge.
-It is divided into bounded blocks and has its own pull request and review.
-Documentation work does not consume a research target’s allowance and does not change a
-scientific result.
+A separate W8 documentation lane ran from `codex/n11-explainer-current-bound`, also
+based directly on the PR139 merge, in bounded blocks with its own pull request and
+review. Documentation work does not consume a research target’s allowance and does not
+change a scientific result.
 
 ## Entry Facts
 
@@ -81,7 +80,8 @@ The
 records the exact T-025/T-026/BC329 fact ladder, the terminal meaning of each possible
 BC329 outcome, and the remaining conditional-selection obligations.
 H-161 and exp-159 own that completed literal target; the strategy analysis registers no
-additional target. This plan remains the execution controller.
+additional target. Agenda036 now owns the live execution order; the retained sections
+below record the September 10–13 controller and evidence.
 
 An **atom** is a nonnegative resource rule used by a covering certificate.
 A point atom charges a core when it contains one site.
@@ -96,6 +96,42 @@ usually through boundary contacts or corner marks.
 Its residual certificate is global only after a separate selection theorem proves that
 every physical packing admits at least one certified selection.
 Counting overlapping labels is not such a theorem.
+
+## September 14 Strategy Reset
+
+The owner has paused heavy computer-assisted proof work aimed at very small lower-bound
+increments. The current objective is either a material improvement to the `n = 11` bound
+or a substantially simpler proof of `s(11) >= 3.82`.
+[Agenda 036](../../../../packing/campaign/agendas/agenda-036-n11-strategy-reset-roadmap.md)
+is the live controller, and the synopsis’s
+[Research Program Status and Roadmap](../../../../SYNOPSIS.md#research-program-status-and-roadmap)
+is the reader-facing account.
+
+The transition has three separate blocks.
+BC-339 is tracked as a W7 pipeline-improvement block: its W7 phase adds the roll-up
+contract and checker, and its W8 phase reconciles the records and root documents.
+BC-347 is then a read-only Astra Max mathematical audit of the retained evidence, the
+five shaped routes, and additional hypotheses with material small-`n` upside.
+BC-346 is the subsequent W10 planning block.
+It compares dependency readiness, expected information value, first discriminator, stop
+rule, and resource cost, then selects exactly one execution entry.
+None of these blocks runs a scientific target.
+
+The planning candidates are:
+
+| Route | First discriminator | Intended payoff |
+| --- | --- | --- |
+| W5 efficiency checkpoint | Determine whether the four-to-eight-block cadence makes it due; if so, measure at most one demonstrated bottleneck | Protect the speed and equivalence of the next research loop |
+| A — systematic case split | At side `3.85`, enumerate proved occupancy or contact cases and measure the exactly closed share | A significant conditional lower-bound route beyond the point-certificate ceiling |
+| B — pairwise SDP | Reproduce the `n = 6` control near side `3` before an `n = 11` comparison | Attack the fractional-versus-integer gap directly |
+| S — certificate compression | Group T-025/T-026 by D4 orbit, weight, and tight-cell pattern at side `3.82` | Replace the current large certificate with a human-statable proof |
+| C — orientation structure | Reproduce the 6+5 control at Trump’s angle, then test robust bins near `3.87` | Restrict any packing near the standing upper bound |
+| D — upper-bound search | Reproduce Trump’s packing, then exactly polish every endpoint at or below `3.90` | Improve the upper bound or catalogue the local optima an optimality proof must exclude |
+
+Route A is the standing scientific favorite, not a preselected execution.
+BC329, weighted-atom stages 3–4, and the BC303 H-160/H-162 target lane are paused.
+Their admitted code and registrations remain retained; no exp-158 or exp-160 target ran,
+so the pause carries no scientific verdict.
 
 ## One-Block Controller
 
@@ -116,13 +152,12 @@ method.
 The next block is chosen only after the current block has a terminal disposition.
 The coordinator owns shared campaign records and Git integration.
 
-## Ranked Research Blocks
+## September 10–13 Research Blocks
 
-The order reflects present source readiness and expected information value.
-It is a working allocation, not a claim that one mathematical direction is intrinsically
-more productive than another.
-Strategy intake and BC326 are complete and retained below as history.
-BC329 is the next planned direct attempt to improve the global lower bound.
+This is the prior allocation retained for history.
+Agenda036 and the September 14 strategy-reset section above replace it for current
+selection. Strategy intake and BC326 are complete and retained below as history.
+BC329 was the next planned direct attempt to improve the global lower bound.
 BC337 is a secondary parent-conditioning lane that may proceed in parallel while BC329’s
 runner is being admitted.
 The H-160/exp-158 C/S charge lane has an admitted target-free reader and a separate

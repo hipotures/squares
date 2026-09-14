@@ -48,16 +48,27 @@ experiment:
       --output campaign/series/series-000-smoke-and-calibration/results/agenda-035/exp-160-bc303-floor-normalized-t2-filter-analysis.json
     budget: One admitted retained exp-158 receipt and one comparison; zero new target invocations or retries
     record: packing/campaign/series/series-000-smoke-and-calibration/results/agenda-035/exp-160-bc303-floor-normalized-t2-filter-analysis.json
-  lease:
-    expires: '2026-09-15T00:00:00Z'
-  results: []
+  effort:
+    timebox: One receipt comparison, unspent
+    wall_seconds: 0
+    stopped_by: dependency
+  results:
+  - shape: determination
+    role: guard
+    question: Did an admitted exp-158 receipt exist when the strategy reset paused this route?
+    outcome: criterion_missed
+    checked_by: >-
+      No exp-158 target receipt exists, so the receipt-only analyzer had no scientific
+      input and was not invoked before the owner paused BC303 target work.
   verdict:
-    decision: in-progress
+    decision: blocked
     primary_criterion: >-
       Accept H-162 iff complete admitted C and S first-owner strip minima are both
       at least 4524132 integer units; apply source/control refusal before either
       mathematical branch and replay a low C before any helper rejection.
-    reason: The exp-158 target receipt does not yet exist; no H-162 minimum or verdict has been observed.
+    reason: >-
+      The September 14 strategy reset paused this route with no exp-158 target receipt;
+      no H-162 comparison or scientific verdict exists.
 ---
 # Exp-160: Frozen Receipt Analysis Before Target Charge
 
@@ -99,6 +110,10 @@ This record contains no target charge, result, or readiness transition.
 H-160 and exp-158 keep their original thresholds, budget, and separate verdict.
 If this registration is completed after any target receipt is read, that comparison must
 be labeled retrospective rather than prospective.
+
+The September 14 strategy reset paused the registration before the input receipt
+existed. Its prospective contract and controls remain useful, but the blocked status is
+an owner disposition and says nothing about whether H-162 is true.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

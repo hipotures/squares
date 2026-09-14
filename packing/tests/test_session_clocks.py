@@ -70,6 +70,49 @@ def test_a_phase_starting_before_its_session_is_refused() -> None:
     assert any("before the session" in problem for problem in violations("s.md", record, NOW))
 
 
+def test_new_terminal_session_requires_an_observed_end() -> None:
+    record = _record("2026-08-30T09:30:00Z")
+    record.update({"id": "session-128", "status": "stopped"})
+
+    assert any(
+        "needs an observed ended_at" in problem for problem in violations("s.md", record, NOW)
+    )
+
+
+def test_session_end_must_follow_start_and_not_be_in_the_future() -> None:
+    record = _record("2026-08-30T09:30:00Z")
+    record.update(
+        {
+            "id": "session-128",
+            "status": "stopped",
+            "ended_at": "2026-08-30T08:59:59Z",
+        }
+    )
+    assert any(
+        "ended_at is before started_at" in problem
+        for problem in violations("s.md", record, NOW)
+    )
+
+    record["ended_at"] = "2026-08-30T12:00:01Z"
+    assert any("session ends at" in problem for problem in violations("s.md", record, NOW))
+
+
+def test_live_session_cannot_carry_an_end() -> None:
+    record = _record("2026-08-30T09:30:00Z")
+    record.update(
+        {
+            "id": "session-128",
+            "status": "in_progress",
+            "ended_at": "2026-08-30T11:00:00Z",
+        }
+    )
+
+    assert any(
+        "in-progress session has ended_at" in problem
+        for problem in violations("s.md", record, NOW)
+    )
+
+
 def test_backwards_phases_are_reported_and_not_refused() -> None:
     """The distinction this file exists to hold.
 

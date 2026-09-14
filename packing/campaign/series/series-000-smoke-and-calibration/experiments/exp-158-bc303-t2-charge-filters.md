@@ -47,15 +47,26 @@ experiment:
       allowance. No partial positive verdict, early chart stop, changed source,
       threshold adjustment, or rerun under this registration.
     record: packing/campaign/series/series-000-smoke-and-calibration/results/agenda-035/exp-158-bc303-t2-charge-filters.json
-  lease:
-    expires: '2026-09-15T00:00:00Z'
-  results: []
+  effort:
+    timebox: One 30-minute target allowance, unspent
+    wall_seconds: 0
+    stopped_by: dependency
+  results:
+  - shape: determination
+    role: guard
+    question: Did the owner authorize this target after the September 14 strategy reset?
+    outcome: criterion_missed
+    checked_by: >-
+      The owner paused BC303 target work before invocation while the program selects
+      routes capable of a significant bound improvement or a much simpler proof.
   verdict:
-    decision: in-progress
+    decision: blocked
     primary_criterion: >-
       C minimum >=4524200 and S first-owner minimum >=4524185 after all charts
       and source/control/revision admission.
-    reason: The target charge has not run; source and adversarial controls must pass first.
+    reason: >-
+      The September 14 strategy reset paused this route before the target charge ran;
+      no target receipt or scientific verdict exists.
 ---
 # Exp158: Frozen Outcomes Before Target Charge
 
@@ -65,6 +76,11 @@ The source is the literal BC293 measure at reviewed revision
 scale `W=4000000`, 182 eligible source charts, and both axis aliases must be checked
 before the target invocation.
 The reader must identify its own checkout and full committed implementation revision.
+
+The September 14 strategy reset paused this protocol before its sole target invocation.
+The source and control work remains retained, but the pause is an owner disposition, not
+evidence for or against H-160. A later resumption requires a new current-roadmap
+selection and a renewed operational registration.
 
 The C determination is positive only if every feasible open cell has integer mass at
 least `4524200`. A value at most `4524199` rejects C and the opposite and combined T2

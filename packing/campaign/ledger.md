@@ -142,6 +142,7 @@ Each entry summarizes one user-level research window. Cycle slots are wall-clock
 | [session-125](agent-sessions/session-125-past-the-point-atom-ceiling.md) | completed | retrospective | `research-survey` (insight) | `review-planning-oversight` (process) | 4 | think-hs7y | Widen the certificate format to carry weighted and floor atoms, since the reader can already separate cuts the format cannot express; and generate sites by structure rather than by arrangement vertex. |
 | [session-126](agent-sessions/session-126-stromquist-analytical-exploration.md) | completed | contemporaneous | `insight-iteration` (insight) | `documentation-pass` (correctness) | 8 | think-jx95 | Continue the already tracked BC329 bounded fixed-core runner admission under think-qw9w; a scientific packet run still requires the stated prospective contract and independent admission. |
 | [session-127](agent-sessions/session-127-weighted-five-site-atom-admission.md) | completed | contemporaneous | `pipeline-improvement` (correctness) | `pipeline-improvement` (correctness) | 2 | think-zvr3 | Continue under think-8c9e, the weighted-atom coverage mechanics, which cover the direct, event and interval controls including the boundary and undercharged-core cases and the interval route's stall handling. Stage four's paired runner and exact common manifests are tracked separately and blocked on it. |
+| [session-128](agent-sessions/session-128-research-state-rollup.md) | stopped | contemporaneous | `pipeline-improvement` (process) | `documentation-pass` (correctness) | 2 | think-uqa4 | Complete BC-339 under think-uqa4 by running the qualifying validation gate on this handed-over source and retaining its exact revision. |
 
 ### Workflow summary
 
@@ -155,8 +156,8 @@ Declared counts are contemporaneous contracts; retrospective counts are reconstr
 | `process-review` | 16 | 4 | 64 | 6 |
 | `efficiency-loop` | 9 | 1 | 35 | 1 |
 | `research-loop` | 26 | 4 | 96 | 8 |
-| `pipeline-improvement` | 28 | 1 | 145 | 4 |
-| `documentation-pass` | 1 | 0 | 21 | 1 |
+| `pipeline-improvement` | 29 | 1 | 146 | 4 |
+| `documentation-pass` | 1 | 0 | 22 | 1 |
 | `remediation` | 0 | 1 | 0 | 1 |
 | `review-planning-oversight` | 1 | 0 | 14 | 1 |
 | `general-improvement` | 1 | 0 | 7 | 1 |
@@ -709,7 +710,7 @@ Status: **completed**. Make the largest defensible progress toward stronger n11 
 
 ### [agenda-035](agendas/agenda-035-n11-daytime-strategy.md) — N11 Daytime Strategy and Research Blocks
 
-Status: **active**. Select and execute short, high-information blocks across distinct routes to a stronger n11 result. Preserve exact scope, put the most direct theorem paths first, and keep the standalone explainer update reviewable in parallel.
+Status: **paused**. Select and execute short, high-information blocks across distinct routes to a stronger n11 result. Preserve exact scope, put the most direct theorem paths first, and keep the standalone explainer update reviewable in parallel.
 
 | item | purpose | n | state | priority | bead | next evidence |
 | --- | --- | --- | --- | ---: | --- | --- |
@@ -721,12 +722,28 @@ Status: **active**. Select and execute short, high-information blocks across dis
 | BC-328 | research | 11 | complete | 1 | think-02l0 | Use the reviewed adjacent-wall component normal form to define one snug-parent or genuine contact-path pilot. Preserve the complementary path-length branches and verify physical contact rather than treating an arbitrary tight support row as contact. |
 | BC-329 | research | 11 | blocked | 1 | think-17qa | Repair and rereview the integrated coordinator, source-distinct reader, and run-set verifier; admit the three-profile run sheet; publish the reviewed PR head; then run and independently read three controls under fixed-core-packet-calibration/v1. Only after those gates pass, prospectively register one packet retaining T025's sites and relative weights with a 2880-step net, B=9981/10000, D=207107/1440000000, raw acceptance threshold M/11=685457679/687500000, and normalization alpha=1/m. Require complete exact and interval agreement plus dilation replay on the same normalized bytes. |
 | BC-330 | research | 11 | blocked | 2 | think-vx0p | Use BC326 and BC328 to select a meaningful class; do not treat one class as the global existential owner-selection theorem. |
-| BC-331 | research | 11 | ready | 2 | think-lkvd | Keep as the prepared reserve when higher-ranked work waits on source review. |
+| BC-331 | research | 11 | stopped | 2 | think-lkvd | The September 14 strategy reset removed this reserve from the live queue. Reopen it only if BC-346 selects the full-support-pricing route. |
 | BC-332 | tool_validation | 11 | complete | 1 | think-b5b1 | BC334 implements the selected incremental architecture: retain the T018 worked proof and add T025/T026 as an advanced final section. |
 | BC-334 | tool_validation | 11 | complete | 1 | think-gv5a | The implementation and historical hosted checkpoint are complete at PR148 revision 989fd544. The September 12 review corrections start at e8baa8ff; the dated T025/T026 review addendum records the subsequent source checks and 22-page rendering evidence. These are later validation of the completed documentation milestone. |
 | BC-336 | tool_validation | 11 | complete | 1 | think-ccsi | PR148 commit 35484ebd first uses v0.4.0 as this explainer's edition label on September 10, 2026; commit ce3b1ab5606307ed5cb6780da09c1b5f233ab2e1 first uses v0.3.0 as that label on September 8, 2026. Both dates are rendered from one release-history source and covered by focused tests. |
 | BC-335 | tool_validation | 11 | complete | 1 | think-0zc1 | The historical D3 checkpoint passed on PR148 at 989fd544. The September 12 mathematical, clarity and integration review is recorded separately in the T025/T026 review addendum; later stack revisions require their own validation and do not change the completed milestone's evidence source. |
-| BC-333 | measurement_validation | 11 | ready | 2 | think-1ydi | Reconstruct cadence after each terminal block; administrative planning does not reset it. |
+| BC-333 | measurement_validation | 11 | stopped | 2 | think-1ydi | BC-340 in agenda-036 now owns this bead and the due efficiency-checkpoint question; it remains behind BC-346's one-route selection. |
+
+### [agenda-036](agendas/agenda-036-n11-strategy-reset-roadmap.md) — N11 Strategy-Reset Roadmap
+
+Status: **active**. Reconcile the merged research record, then choose among routes that can either improve the n=11 bound materially or replace the current certificate with a much simpler proof. Keep paused incremental lanes out of the execution queue unless new evidence changes their expected value.
+
+| item | purpose | n | state | priority | bead | next evidence |
+| --- | --- | --- | --- | ---: | --- | --- |
+| BC-339 | tool_validation | 11 | in_progress | 0 | think-uqa4 | Commit the reconciled records and documents, pass the records, push, and complete validation tiers, and retain a terminal session pointing at BC-347. |
+| BC-347 | research | 6, 7, 10, 11, 13 | blocked | 0 | think-oj12 | Read the retained n11 proof and negative-result stack, then test whether each proposed mechanism escapes the known point-certificate ceiling or merely repackages an incremental lane. |
+| BC-346 | tool_validation | 11 | blocked | 0 | think-9y7p | Reconstruct the W5 cadence, then compare any due checkpoint with the five shaped routes using their declared first discriminators; select one block rather than a multi-lane research promise. |
+| BC-340 | measurement_validation | 11 | tentative | 0 | think-1ydi | Reconstruct the cadence from active daytime blocks and retained gate receipts; administrative work does not reset the cadence. |
+| BC-341 | research | 11 | tentative | 1 | think-9y6q | Freeze the smallest occupancy/contact partition that strictly extends T-023's single four-owner branch without claiming an owner-selection theorem. |
+| BC-342 | research | 6, 11 | tentative | 1 | think-ol1z | Specify the n=6 control and the conflict-edge soundness obligation before selecting a solver. |
+| BC-343 | research | 11 | tentative | 2 | think-a1e8 | Group the exact witness by D4 orbit, weight, and tight-cell incidence before changing any atom. |
+| BC-344 | research | 11 | tentative | 2 | think-29ch | Reproduce the 6+5 control at Trump's angle before interpreting any solver infeasibility. |
+| BC-345 | research | 11 | tentative | 3 | think-7n2w | Design the positive-control and endpoint-polishing contract before allocating the background search. |
 
 ## Series
 
@@ -873,9 +890,9 @@ Status: **active**. Select and execute short, high-information blocks across dis
 | H-157 | refuted | proof | Refining the corner-owner angular bins from eight to sixteen makes eve |  | 1 |  | 5.9m wall |
 | H-158 | unresolved | proof | For exp151's direction-6 saved residual on selected tuple (0,0,0,7), e |  | 1 |  | 21s wall |
 | H-159 | refuted | proof | For every admissible bottom-left one-corner role-C unit parent X with  |  | 1 |  | 2s wall |
-| H-160 | running | proof | On the frozen BC293 377-atom measure and every one of the 182 eligible |  | 1 |  |  |
+| H-160 | blocked | proof | On the frozen BC293 377-atom measure and every one of the 182 eligible |  | 1 |  |  |
 | H-161 | refuted | proof | In the frozen BC303 377-atom measure, the closed literal parent Q0=[0, |  | 1 |  | 0s wall |
-| H-162 | running | proof | On the frozen BC293 377-atom measure and every one of the 182 eligible |  | 1 |  |  |
+| H-162 | blocked | proof | On the frozen BC293 377-atom measure and every one of the 182 eligible |  | 1 |  |  |
 
 ## Needs review — held for a human, not decided
 
@@ -956,7 +973,7 @@ Status: **active**. Select and execute short, high-information blocks across dis
 | exp-148 | series-000 | 11 | GPT-6 Astra coordinator; implementation by GPT-5.6 Sol extra high; mathematical admission by GPT-6 Astra max | H-146 | The seed-stage guard expired before any complete seed direction or candidate check. Two valid retained escapes give reusable negative evidence for49152 labels, but neither a new cover nor an all-label refutation was completed. |
 | exp-156 | series-000 | 11 | Codex root coordinator; prospective strategy independently audited by GPT-6 Astra Max | H-158 | The sole run found that the old B-only model already excludes the first selected owner, making parent-domain gain impossible there by set inclusion. The later owners were not tested, so this complete fixed-protocol result neither accepts nor rejects H-158. |
 
-### blocked (9)
+### blocked (11)
 
 | id | series | instance | operator | hypotheses | reason |
 | --- | --- | --- | --- | --- | --- |
@@ -969,6 +986,8 @@ Status: **active**. Select and execute short, high-information blocks across dis
 | exp-118 | series-000 | 11 | Codex coordinator, max mathematical reasoning, Session 090 BC-252 | H-107 | The prospective record gate was not complete by the 03:16 UTC launch cutoff; no target or verification process ran and both allowances remain unspent. |
 | exp-129 | series-000 | 11 | Session097 coordinator under BC264 and think-rzdb; independent max mathematical admission | H-125 | Required protocol checks and publication did not complete before the immutable22:20 launch cutoff. No scientific process ran; H125 remains untested and both child allowances are unspent. |
 | exp-134 | series-000 | 11 | GPT-6 Astra, max; coordinator of session-112 | H-135 | No target was invoked. The owner prioritized BC-309 before this launch, and the unused lease expired at 02:40Z. The scientific protocol is retained unchanged; execution needs a fresh forward allocation. This is an administrative unrun disposition, not negative evidence about H-135. |
+| exp-158 | series-000 | 11 | Codex BC303 T2 charge-sweep agent | H-160 | The September 14 strategy reset paused this route before the target charge ran; no target receipt or scientific verdict exists. |
+| exp-160 | series-000 | 11 | Codex BC303 H-162 retained-receipt analyst | H-162 | The September 14 strategy reset paused this route with no exp-158 target receipt; no H-162 comparison or scientific verdict exists. |
 
 ### accepted (38)
 
@@ -1029,13 +1048,6 @@ Status: **active**. Select and execute short, high-information blocks across dis
 | exp-031 | series-000 | 10 | openai-codex | H-002 | All four source perturbations satisfy every declared condition and return to the proved side within floating-point precision. This confirms the narrow known-answer control without reopening H-002's refuted universal claim. |
 | exp-032 | series-000 | 3 | openai-codex | H-021 | The exact connected and isolated controls pass, every declared conflation fails, and all unsupported floating-point observations remain unresolved. |
 
-### in-progress (2)
-
-| id | series | instance | operator | hypotheses | reason |
-| --- | --- | --- | --- | --- | --- |
-| exp-158 | series-000 | 11 | Codex BC303 T2 charge-sweep agent | H-160 | The target charge has not run; source and adversarial controls must pass first. |
-| exp-160 | series-000 | 11 | Codex BC303 H-162 retained-receipt analyst | H-162 | The exp-158 target receipt does not yet exist; no H-162 minimum or verdict has been observed. |
-
 ## Resumable — stopped on the clock, not on an answer
 
 | id | hypotheses | spent | stopped by | resume from | reopen when |
@@ -1054,6 +1066,8 @@ Status: **active**. Select and execute short, high-information blocks across dis
 | exp-134 | H-135 |  | dependency |  |  |
 | exp-140 | H-139 | 16s wall | timebox | Exp142 freshly restarts the same four arms with 300 rounds a |  |
 | exp-148 | H-146 | 1.2m wall | timebox | Exp149 tests the separately registered explicit tuple(0,0,0, |  |
+| exp-158 | H-160 |  | dependency |  |  |
+| exp-160 | H-162 |  | dependency |  |  |
 
 ## Effort
 
