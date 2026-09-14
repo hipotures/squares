@@ -94,7 +94,7 @@ def angle_gap(a: float, b: float) -> float:
 # defaults reproduce the old hard-coded law exactly.
 LAW_KEYS = ("rigidity", "repulsion", "attraction", "range")
 LAW_TOL0, LAW_STEEP_MAX = 0.15, 8
-LAW_DEFAULT = {"rigidity": 0.15, "repulsion": 2500, "attraction": 0, "range": 0}
+LAW_DEFAULT = {"rigidity": 0.35, "repulsion": 950, "attraction": 80, "range": 0.15}
 LAW_BOUNDS = {
     "rigidity": [0.002, 0.4],
     "repulsion": [200, 8000],

@@ -38,6 +38,37 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
             if not condition:
                 raise ValueError(message)
 
+        # The owner's defaults of 2026-09-13, as the page reports them before anything moves.
+        law = call("law")
+        require(
+            {key: law[key] for key in ("rigidity", "repulsion", "attraction", "range")}
+            == {"rigidity": 0.35, "repulsion": 950, "attraction": 80, "range": 0.15},
+            f"the pair law does not start at the owner's defaults: {law}",
+        )
+        dial = call("anneal")
+        require(
+            (dial["level"], dial["min"], dial["max"], dial["dflt"]) == (9, 0, 20, 9),
+            f"the annealing dial does not start at 9 of 0..20: {dial}",
+        )
+        require(
+            page.locator("#anneal").get_attribute("max") == "20",
+            "the dial's slider stops short",
+        )
+        require(call("desatFloor") == 0.08, "the desaturation floor is not 0.08")
+        beat = call("continuous")
+        require(
+            (beat["dwell"], beat["move"], beat["settle"]) == (0.6, 0.5, 0.3),
+            f"the continuous beat is not 0.6 + 0.5 + 0.3: {beat}",
+        )
+        require(
+            [
+                page.locator(f"#t-{key}").input_value()
+                for key in ("dwell", "move", "correct", "settle")
+            ]
+            == ["0.6", "0.5", "0.4", "0.3"],
+            "the timing inputs do not show the 0.6 / 0.5 / 0.4 / 0.3 beat",
+        )
+
         initial = call("importAnimation", FIXTURE.read_text(encoding="utf-8"))
         require(initial["active"] and initial["n"] == 2, "import did not activate n = 2")
         require(not initial["guided"], "an earlier free frame inherited later guidance")
@@ -123,7 +154,8 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
         require(not errors, "page errors: " + "; ".join(errors))
         browser.close()
     return (
-        "animation import, geometry/guidance, frame edits, replay, "
+        "the owner's law, dial, beat and desaturation defaults, animation import, "
+        "geometry/guidance, frame edits, replay, "
         "SVG/JSON/frame capture, and Pack return"
     )
 

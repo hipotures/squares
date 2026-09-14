@@ -316,7 +316,7 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--style", default="bodies", choices=["physics", "bodies"])
     parser.add_argument("--inflate", type=_inflate, default=None, help="BLIND.inflate override")
     parser.add_argument(
-        "--anneal", type=int, choices=range(11), default=None, help="the shake dial, 0..10"
+        "--anneal", type=int, choices=range(21), default=None, help="the shake dial, 0..20"
     )
     parser.add_argument(
         "--budget",
@@ -374,8 +374,8 @@ def parse_grid(spec: list[str]) -> list[dict[str, float | int]]:
         parsed: list[float | int]
         if key == "anneal":
             parsed = [int(value) for value in values.split(",")]
-            if any(not 0 <= value <= 10 for value in parsed):
-                raise ValueError("anneal sweep values must be integers from 0 through 10")
+            if any(not 0 <= value <= 20 for value in parsed):
+                raise ValueError("anneal sweep values must be integers from 0 through 20")
         else:
             parsed = [_inflate(value) for value in values.split(",")]
         axes.append(

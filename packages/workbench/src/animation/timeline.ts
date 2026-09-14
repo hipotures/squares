@@ -72,8 +72,8 @@ export function isStillPair(configuration: TimelineConfiguration, index: number)
 
 /** The simulation has more work above level three; an illustration has no annealing. */
 export function annealSpan(style: AtlasStyle, level: number): number {
-  if (finiteNonnegative(level, "anneal") > 10) {
-    throw new RangeError("anneal must be between zero and ten");
+  if (finiteNonnegative(level, "anneal") > 20) {
+    throw new RangeError("anneal must be between zero and twenty");
   }
   return style !== "tween" && level > 3 ? 1 + (level - 3) * 0.1 : 1;
 }

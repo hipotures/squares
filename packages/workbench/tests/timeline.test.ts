@@ -122,6 +122,7 @@ test("zero-duration phases remain deterministic and malformed durations fail ear
   assert.equal(ramp(-1, 0, 0), 0);
   config.timing.correct = Number.NaN;
   assert.throws(() => pairDuration(config, 0, "tween"), /finite/);
-  assert.throws(() => annealSpan("physics", 11), /zero and ten/);
+  assert.equal(annealSpan("physics", 20), 2.7);
+  assert.throws(() => annealSpan("physics", 21), /zero and twenty/);
   assert.throws(() => seekSequence(configuration(), "tween", Number.NaN), /finite seconds/);
 });

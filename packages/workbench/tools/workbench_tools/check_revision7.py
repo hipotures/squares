@@ -108,7 +108,7 @@ def main() -> int:
         # ---- feature 2: the annealing dial.
         a = page.evaluate(probe("revision7/anneal"))
         check(
-            (a["level"], a["min"], a["max"], a["dflt"]) == (3, 0, 10, 3),
+            (a["level"], a["min"], a["max"], a["dflt"]) == (9, 0, 20, 9),
             f"the dial reports {a}",
         )
         check(

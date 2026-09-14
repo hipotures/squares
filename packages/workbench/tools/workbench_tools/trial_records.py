@@ -569,7 +569,7 @@ def _configuration_reason(  # noqa: PLR0911 - preserves distinct configuration r
         or not 1 <= configuration.inflate <= 2
         or isinstance(configuration.anneal, bool)
         or not isinstance(configuration.anneal, int)
-        or not 0 <= configuration.anneal <= 10
+        or not 0 <= configuration.anneal <= 20
     ):
         return "invalid-effective-configuration"
     if trial.params is None or set(trial.params) - {"inflate", "anneal"}:

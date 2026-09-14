@@ -107,10 +107,10 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // so the resting frame is exactly the retained colours and only the moving picture is muted.
   //: The chroma a fill keeps at full desaturation, as a fraction of its own. 1 leaves the colour
   //: alone and 0 takes it to grey; the owner sets it from the page, so it is a variable rather than
-  //: the constant it was. The default is measured rather than chosen: at a third the moving squares
-  //: still competed with the locked ones for attention, and at an eighth the locked ones carry the
-  //: picture, which is the point of locking them one at a time.
-  let desatFloor = 0.15;
+  //: the constant it was. At a third the moving squares still competed with the locked ones for
+  //: attention, and at an eighth the locked ones carry the picture, which is the point of locking
+  //: them one at a time. The owner lowered the default from 0.15 to 0.08 on 2026-09-13.
+  let desatFloor = 0.08;
   // **Chroma and hue move one at a time, and the hue always moves in the grey.** A square's
   // colour changes twice a beat -- it drains and comes back, and it swaps between the scheme a
   // viewer chose and the atlas's own answer for a finished picture. Doing both at once is what
@@ -144,37 +144,41 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // Nothing rearranges (that is what makes it static), and the drain stays off for the same
   // reason: there is no motion to mute.
   const CONTINUOUS = {
-    dwell: 0.8,
-    // The moving span, split: the free rearrangement and then the landing. 0.55 + 0.25 is the
-    // 0.8 this was, at the ratio the physics was already using inside it.
-    move: 0.55,
-    correct: 0.25,
-    settle: 0.8,
+    // The owner's beat of 2026-09-13, the same as the single-step timing the builder supplies.
+    // The moving span is split: the free rearrangement and then the landing.
+    dwell: 0.6,
+    move: 0.5,
+    correct: 0.4,
+    settle: 0.3,
     staticDwell: 0.4,
     staticMove: 0.28,
     staticCorrect: 0.12,
     staticSettle: 0.35,
   };
-  // Revision 7, feature 2: the annealing dial, 0 to 10, default 3. The default is exactly the
-  // revision-6 shake, so nothing about the shipped picture moves when the dial is not touched.
-  // Three things rise with the level, and all three are stated here rather than in the simulator:
-  //   amplitude  0 at level 0, 1 (the shipped jiggle) at 3, 3 at 10, linear on each side of 3;
+  // Revision 7, feature 2: the annealing dial. It ran 0 to 10 with a default of 3, the revision-6
+  // shake; on 2026-09-13 the owner widened it to 0 to 20 and moved the default to 9. Levels 0..10
+  // mean exactly what they did. Three things rise with the level, and all three are stated here
+  // rather than in the simulator:
+  //   amplitude  0 at level 0, 1 (the revision-6 jiggle) at 3, linear on each side of 3: 3 at 10
+  //              and about 5.86 at 20;
   //   decay      the shake falls as (1 - tau)^p over the run, p = 1.5 at levels 0..3 easing to
-  //              0.35 at 10, so at 10 the shake is still at 57% of its amplitude four fifths of
+  //              0.35 at 10 and held there above it, since a power at or below zero would never
+  //              let the shake die; at 0.35 it is still at 57% of its amplitude four fifths of
   //              the way through instead of 9%;
   //   span       the run is 1 move long up to level 3 and lengthens by a tenth of a move a level
-  //              after that, to 1.7 moves at 10 — extra sub-steps at the same dt (the wall clock
-  //              of a step stays 1/120 s), so a high level buys more simulated time to settle in
-  //              rather than a faster shake in the same time. The move on the clock lengthens with
-  //              it, which is why `timing` takes the style: only B and C are annealed.
+  //              after that, to 1.7 moves at 10 and 2.7 at 20 — extra sub-steps at the same dt
+  //              (the wall clock of a step stays 1/120 s), so a high level buys more simulated
+  //              time to settle in rather than a faster shake in the same time. The move on the
+  //              clock lengthens with it, which is why `timing` takes the style: only B and C are
+  //              annealed.
   const ANNEAL = {
     min: 0,
-    max: 10,
-    dflt: 3,
+    max: 20,
+    dflt: 9,
     /** @type {(level: number) => number} */
     amplitude: (L) => (L <= 3 ? L / 3 : 1 + (L - 3) * (2 / 7)),
     /** @type {(level: number) => number} */
-    decayPower: (L) => (L <= 3 ? 1.5 : 1.5 - (L - 3) * (1.15 / 7)),
+    decayPower: (L) => (L <= 3 ? 1.5 : 1.5 - (Math.min(L, 10) - 3) * (1.15 / 7)),
     /** @type {(level: number) => number} */
     span: (L) => (L <= 3 ? 1 : 1 + (L - 3) * 0.1),
   };
@@ -219,7 +223,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     desaturate: true, // drain the fills' chroma while the pair moves, lock the colour back in over the settle
     snap: true, // blend the physics onto the record's poses over the last of the move, and end on them exactly
     blind: false, // run the physics with no knowledge of the target poses at all
-    anneal: 3, // how hard and how long the physical styles shake: 0 none, 3 the shipped default, 10 the loudest
+    anneal: ANNEAL.dflt, // how hard and how long the physical styles shake: 0 none, 20 the loudest
     links: false,
     // Revision 12: the stage takes two different press-drag-release gestures, and a toggle is what
     // keeps them apart. Off — the shipped behaviour — a press picks a square up and moves it. On, a
@@ -1113,7 +1117,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     // squares do not rush before the container has made room
     // Revision 11: the push-apart's stiffness (2500 per unit of penetration, per move^2) and its
     // cap (0.15, past which it stopped growing) left this table and became `LAW.repulsion` and
-    // `LAW.rigidity`, which the owner can edit. The defaults there are those two numbers.
+    // `LAW.rigidity`, which the owner can edit. They were the defaults until 2026-09-13.
     contactDamping: 20, // damping on the closing speed of two overlapping squares
     contactTorque: 0.15, // fraction of a contact's or wall's torque applied to a single square (the push acts at a
     // corner); the rest yields to the angle spring. A block takes the whole torque about its centroid.
@@ -1185,9 +1189,10 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   //
   // `steep` is not a fifth parameter: it is derived from the rigidity so that the shipped value is
   // exactly the old law. The old law was `contact * min(p, contactCap)` — linear to a cap and flat
-  // past it — so rigidity 0.15 (the old `contactCap`) with steep 0 reproduces it to the bit, which
-  // is why the four defaults below are what they are and why every cached trajectory, every blind
-  // run and every measurement in revisions 6 to 10 is unchanged until the law is touched.
+  // past it — so rigidity 0.15 (the old `contactCap`) with steep 0 reproduces it to the bit.
+  // That law was the default until 2026-09-13, so the cached trajectories, blind runs and
+  // measurements of revisions 6 to 10 reproduce under `{rigidity: 0.15, repulsion: 2500,
+  // attraction: 0, range: 0}`. On 2026-09-13 the owner chose a softer, slightly sticky default.
   // Below the shipped rigidity the shared law's slope past the knee climbs linearly, so the
   // hardest setting is a knee at two thousandths of a side with eight times the stiffness past it:
   // effectively rigid at this timestep, and measured stable.
@@ -1236,7 +1241,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   ];
   const LAW_KEYS = LAW_PARAMS.map((d) => d.key);
   /** @type {AtlasLaw} */
-  const LAW_DEFAULT = { rigidity: 0.15, repulsion: 2500, attraction: 0, range: 0 };
+  const LAW_DEFAULT = { rigidity: 0.35, repulsion: 950, attraction: 80, range: 0.15 };
   /** @type {AtlasLawBounds} */
   const LAW_BOUNDS = {
     rigidity: [0.002, 0.4], // the penetration tolerated before the repulsion climbs steeply
@@ -4503,7 +4508,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     updateSegments();
     render();
   }
-  // The annealing dial. A level is a whole number 0..10; it scales the jiggle, stretches its decay
+  // The annealing dial. A level is a whole number 0..20; it scales the jiggle, stretches its decay
   // and lengthens the run, so the trajectory cache is keyed by it and the clock has to be rescaled
   // where the move's length changes under a playing pair.
   function setAnneal(level) {
