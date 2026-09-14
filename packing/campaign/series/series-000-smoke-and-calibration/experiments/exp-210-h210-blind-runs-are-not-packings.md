@@ -134,12 +134,20 @@ Every blind run observed ended with at least one pair of squares overlapping, by
 
 ## Why the Overlap Survives
 
-This is a suggested mechanism, not a tested one.
-The contact law is a spring, and a compressed spring at rest balances the walls’ inward
-pressure, so squares settle at a non-zero overlap.
-In the snapped and free modes a correction phase pulls each square toward its
-destination. Blind mode has no destination to pull toward, so nothing removes the
-residual.
+The page’s own schedule allows it.
+In blind mode the walls close toward the known-best side, and the contraction advances
+whenever the deepest overlap is at most `BLIND.overlapTol`, which is 0.08 of a unit side
+(`workbench.js`, the blind branch of the trajectory loop).
+The walls stop at the known-best side and never go below it.
+
+So a blind run is squeezed into the record’s own container while squares may overlap by
+up to 0.08. The observed overlaps, 0.035 to 0.086, sit at that tolerance.
+It also explains the early cells that reported a container below the known-best side:
+squares compressed inside a record-sized box can have a smaller bounding box than the
+box.
+
+The snapped and free modes add target springs that pull each square toward its
+destination. Blind mode has none, so nothing drives the overlap out.
 
 ## Evidence
 

@@ -64,14 +64,14 @@ TOLERANCES = {"exact": 0.0001, "close": 0.1, "near": 1.0}
 #:
 #: `closed` normalises it: 1 means the run reached the record, 0 means it got no further than
 #: the grid `ceil(sqrt(n))`, and a negative number means it ended worse than the grid.
-#: Measured over 1200 trials at six n it sits at 0.47 with a range of 0.33 to 0.70 -- which is
-#: what turned "n = 11 is easy and n = 17 is hard" into "the method closes about half the gap
-#: wherever it is pointed, and the two only looked different because their gaps differ".
+#: Scored on unrepaired arrangements it once read as a uniform 0.47 across six n. That was
+#: overlap, not search (see VALID_OVERLAP): repaired first, a single run scores below zero at
+#: every n measured. Only trials that pass `valid` may be scored with it.
 OUTCOME = "closed"
 
-#: The k at which best-of-k is reported. A trial costs a fraction of a millisecond, so the
-#: question is never "what does one run give" but "what does the best of a budget give", and
-#: the ladder is what shows whether more budget is still buying anything.
+#: The k at which best-of-k is reported: the best of the FIRST k seeds of one ordered stream.
+#: That is one observation per k, not a distribution over independent blocks, so it shows
+#: whether more budget is still buying anything and carries no spread.
 BEST_OF = (1, 10, 100, 1000, 10_000)
 
 #: How deep two squares may overlap in the final arrangement before the trial is INVALID
@@ -87,7 +87,7 @@ BEST_OF = (1, 10, 100, 1000, 10_000)
 #: **The number is measured, not chosen.** Run the same check over the SNAPPED trajectory,
 #: which ends on the record's own poses by construction, and the deepest pair overlap is
 #: 5.5e-7 at n = 5, 1.0e-6 at n = 11 and 7.3e-7 at n = 17 -- the float noise the stored poses
-#: carry. A blind run at the same n scores 0.091, 0.035 and 0.095. Two orders of magnitude
+#: carry. A blind run ends at several hundredths of a side (exp-210). Two orders of magnitude
 #: separate the noise from the smallest real overlap, so 1e-5 refuses overlaps without
 #: refusing arithmetic, and the control is what says so rather than a guess about precision.
 VALID_OVERLAP = 1e-5
@@ -472,11 +472,11 @@ def report(trials: list[Trial]) -> int:
             + f"  {closed:>7.3f}  {excess[0]:>8.4f}  {statistics.median(excess):>8.4f}  "
             f"{excess[-1]:>8.4f}  {statistics.median(t.ms for t in rows):>9.1f}"
         )
-    # **Best-of-k, which is the number that matters and the one nobody was reporting.**
-    # The median says the method closes about half the gap; the best of a thousand trials at
-    # n = 5 closes 98.7% of it. Those are both true and only the second is a result about
-    # what the search can reach -- a run costs a fraction of a millisecond, so k is free and
-    # the tail is the product.
+    # **Best-of-k over the first k seeds.** A single repaired run scores below the grid at
+    # every n measured while the best of a thousand sometimes comes close to the record, so
+    # the ladder is what shows whether more runs still buy anything. It is one prefix of one
+    # ordered seed stream: not a distribution, and no substitute for disjoint blocks.
+    # Every trial here has already passed `valid`.
     print(f"\n{'    n':>5}" + "".join(f"{'best-of-' + str(k):>12}" for k in BEST_OF))
     for n in sorted(by_n):
         ordered = sorted(by_n[n], key=lambda t: t.seed)

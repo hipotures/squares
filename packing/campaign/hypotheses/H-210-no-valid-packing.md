@@ -40,10 +40,10 @@ snapped control
 ([exp-210](../series/series-000-smoke-and-calibration/experiments/exp-210-h210-blind-runs-are-not-packings.md)).
 The trials were not kept, so this is an observation to re-measure rather than a result.
 
-**A suggested mechanism.** The contact law is a spring, and at rest a compressed spring
-balances the walls’ inward pressure at a non-zero overlap.
-The snapped and free modes end with a correction phase that pulls squares toward their
-destinations. Blind mode is not given destinations, so nothing removes the residual.
+**Why it happens.** The page’s blind contraction advances whenever the deepest overlap
+is at most 0.08 of a unit side, and closes the walls onto the known-best side
+(`BLIND.overlapTol` in `workbench.js`). The runs are squeezed into the record’s own
+container with that much overlap allowed, and nothing afterwards drives it out.
 
 **What would refute it.** One blind run, at any n and any parameters, whose deepest
 final overlap is under 1e-5. That is the same falsifier as H-209’s and a cheaper one to

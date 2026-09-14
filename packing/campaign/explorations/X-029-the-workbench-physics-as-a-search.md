@@ -59,11 +59,13 @@ That text is recoverable at commit `a40d272c`; none of it is repeated here.
 The workbench draws the step from the packing of `n - 1` squares to the packing of `n`
 by simulating it:
 
-1. The squares start at the known-best poses for `n - 1`, in a container inflated past
-   the known-best side for `n`.
-2. The new square is dropped into the emptiest cell of a coarse grid.
-3. Contact forces between squares, wall forces and a decaying shake act while the
-   container contracts toward the known-best side.
+1. The squares start at the known-best poses for `n - 1`, centred in a container 12%
+   larger than the known-best side for `n`.
+2. The new square is dropped, upright, into the emptiest cell of a coarse grid.
+3. Contact forces between squares, wall forces and a decaying shake act while the walls
+   close onto the known-best side.
+   The walls keep closing while the deepest overlap is at most 0.08 of a unit side, and
+   they never go below the known-best side.
 
 The page has three ways to finish the step:
 
@@ -71,7 +73,7 @@ The page has three ways to finish the step:
 | --- | --- |
 | snap | the destination poses, and it ends on them by construction |
 | free | the destination poses as a pull, without the snap |
-| blind | nothing beyond the start, the drop and the contraction target |
+| blind | nothing beyond the start, the drop and the known-best side the walls close onto |
 
 So “blind” is conditioned on a great deal: the previous record, the reference side and
 the proposal. Any claim about it is a claim about improving a known packing toward a
@@ -108,6 +110,12 @@ whatever it scores is float noise.
 
 Two orders of magnitude separate the control from the smallest real overlap, so the
 harness uses 1e-5 of a unit side.
+
+The overlap is built into the blind schedule.
+The walls close onto the known-best side while squares may overlap by up to 0.08, and
+the observed overlaps sit at that tolerance.
+Squares compressed inside a record-sized box can have a bounding box smaller than the
+box, which is how a cell came to report a container below the known-best side.
 The details are in
 [exp-210](../series/series-000-smoke-and-calibration/experiments/exp-210-h210-blind-runs-are-not-packings.md).
 
