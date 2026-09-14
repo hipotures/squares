@@ -425,6 +425,10 @@ These 18 research reports are the durable topical syntheses:
 | [The Best-Known n = 26 Packing](docs/project/research/research-2026-09-07-n26-best-known-audit.md) | Dated literature and source search, exact score normalization, and the limits of the best-known claim |
 
 The reports distinguish formal proof, finite numerical checks, and source reports.
+The draft
+[X-031 floor-normalized T2 exploration](packing/campaign/explorations/X-031-bc303-floor-normalized-t2-helper-draft.md)
+records reviewed local cutoffs, bounded H-161 stability, and a proposed H-162
+registration; it has no C/S target result or global bound.
 The [document map](SYNOPSIS.md#document-map) identifies every maintained guide, dated
 record, generated view, and superseded document.
 

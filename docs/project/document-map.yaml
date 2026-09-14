@@ -51,6 +51,8 @@ documents:
   - {path: docs/project/reviews/review-2026-09-12-n11-selection-routing-first-principles.md, role: review, authority: record, lifecycle: retained}
   - {path: docs/project/reviews/review-2026-09-13-bc303-t2-geometry.md, role: review, authority: record, lifecycle: retained}
   - {path: docs/project/reviews/review-2026-09-13-bc303-t2-charge-bridge.md, role: review, authority: record, lifecycle: retained}
+  - {path: docs/project/reviews/review-2026-09-13-bc303-t2-global-bridge.md, role: review, authority: record, lifecycle: retained}
+  - {path: docs/project/reviews/review-2026-09-13-bc303-floor-normalized-t2-independent.md, role: review, authority: record, lifecycle: retained}
   - {path: docs/project/reviews/review-2026-09-13-bc303-parent-union-math.md, role: review, authority: record, lifecycle: retained}
   - {path: docs/project/reviews/review-2026-09-13-bc303-t2-charge-reader-refusal.md, role: review, authority: record, lifecycle: retained}
   - {path: docs/project/reviews/review-2026-09-13-bc303-t2-charge-reader-readmission.md, role: review, authority: record, lifecycle: retained}

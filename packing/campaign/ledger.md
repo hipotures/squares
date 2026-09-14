@@ -1069,6 +1069,7 @@ Status: **active**. Select and execute short, high-information blocks across dis
 - X-028 — Draft N11 Strategy Portfolio After the Daytime Explorations
 - X-029 — BC303 T2 Exact Geometry and Open Threshold Tests
 - X-030 — Draft N11 Proof Obligations After the T1 Local Witness
+- X-031 — Floor-Normalized BC303 T2 Helper and H-161 Local Stability
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

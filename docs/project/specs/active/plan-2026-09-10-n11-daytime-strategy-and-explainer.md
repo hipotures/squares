@@ -57,6 +57,14 @@ now measures the literal parent $Q_0=[0,1]^2$ at $N=4000015$ source units.
 Its one-parent and four-corner necessary tests both survive with $1048233$ units of
 slack. This does not construct an eleven-parent extension or decide any pose cell.
 The T2 C/S charge targets remain unrun.
+The separate
+[X-031 floor-normalized exploration](../../../../packing/campaign/explorations/X-031-bc303-floor-normalized-t2-helper-draft.md)
+records a source-distinct reviewed strengthening of the local forced-type account: C
+passes its normalized half-budget at integer mass $4524132$, and an actual jointly
+realizable S pair passes at total mass $8524147$. An S first-owner strip minimum of
+$4524132$ is sufficient, but a lower strip cell does not refute actual S. X-031 proposes
+a bounded H-162 registration before prospective use of an exp-158 target receipt; it
+does not allocate H-162, alter H-160/exp-158, or run a target.
 The target-free reader has an
 [independent readmission](../../reviews/review-2026-09-13-bc303-t2-charge-reader-readmission.md)
 after two documented defects were repaired; its integrated execution head still needs a

@@ -553,6 +553,17 @@ Exp-159 measured the literal parent $Q_0$ at $N=4000015$ source units; the T2 C/
 charges remain unrun.
 X-030 registers no additional target or bound.
 
+## Floor-Normalized T2 Helper — X-031
+
+[X-031](explorations/X-031-bc303-floor-normalized-t2-helper-draft.md) retains two
+source-distinct mathematical reviews of the eleven-core floor account.
+It lowers the separate local helper’s first passing integer masses to $4524132$ for C
+and $8524147$ for an actual S pair; the same $4524132$ first-owner strip cutoff is only
+sufficient for S. H-161’s failed literal parent-union test is locally stable under
+sufficiently small admissible perturbations, without proving an extension.
+A bounded separate registration is proposed but not allocated; H-160/exp-158 remain
+frozen and unrun.
+
 ## Dead ends
 
 Killed without spending a round, with the reason.
