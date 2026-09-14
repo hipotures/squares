@@ -964,7 +964,7 @@ Status: **active**. Select and execute short, high-information blocks across dis
 | exp-207 | series-000 | 5 | claude-opus-5, unattended | H-207 | At n = 5 the best of the first 1,000 repaired runs is 0.28% above the record while a single run is worse than the grid, but these are prefix values from one seed stream with no spread, and no schedule was compared at equal cost, so H-207's criterion was not tested. |
 | exp-208 | series-000 | 11 | claude-opus-5, unattended | H-211 | At levels 0 to 4 no repaired run in 3,000 beat the grid at n = 5, 10 or 11, and at levels 6 to 10 the best run did in eight of nine cells, but each value is one prefix from one seed stream and the page's own level 3 was not measured. |
 | exp-209 | series-000 | 11 | claude-opus-5, unattended | H-211 | The historical compaction program and outputs were not retained, so its null result and the inference that the resolver is not the ceiling cannot be reproduced or used to exclude an optimization. |
-| exp-210 | series-000 | 11 | claude-opus-5, unattended | H-210 | Every blind run observed ended overlapping against a snapped control at float noise, but neither the trials nor their final poses were kept, so the observation cannot be re-checked from the repository. |
+| exp-210 | series-000 | 11 | claude-opus-5, unattended | H-210 | Every blind run observed ended overlapping, but the snapped control was measured once with a probe variant that was not kept, and neither the trials nor their final poses are in the repository, so the observation cannot be re-checked from it. |
 
 ### blocked (9)
 

@@ -33,14 +33,15 @@ That text is recoverable at commit `a40d272c`; none of it is repeated here.
 ## Summary
 
 - **A blind run is not blind.** It starts from the known-best packing for the previous
-  `n`, contracts toward the known-best side, and places the new square with a
-  coarse-grid proposal.
+  `n`, closes its walls onto the known-best side, places the new square with a
+  coarse-grid proposal, and in the style measured here welds squares into blocks chosen
+  by matching the two records.
   Only the destination poses are withheld.
   It is one point on a range of how much of the answer a search is given.
-- **The runs did not end on packings.** Every blind run observed finished with squares
-  overlapping by 0.03 to 0.12 of a unit side.
-  A container side read from such an arrangement is a bounding box around overlaps, so
-  every number taken that way has been discarded.
+- **The runs did not end on packings.** None of the 123,190 blind runs whose rows
+  survive ended without overlapping squares; the median deepest overlap was 0.083 of a
+  unit side. A container side read from such an arrangement is a bounding box around
+  overlaps, so every number taken that way has been discarded.
 - **Repaired to a packing, a single run is worse than the trivial grid.** At every `n`
   and every shake level measured, the median run needs a larger container than
   `ceil(sqrt(n))`.
@@ -66,6 +67,10 @@ by simulating it:
    close onto the known-best side.
    The walls keep closing while the deepest overlap is at most 0.08 of a unit side, and
    they never go below the known-best side.
+4. In the `bodies` style, which every run in this report used, squares are welded into
+   rigid blocks in their starting arrangement.
+   Which squares share a block comes from matching the record for `n - 1` against the
+   record for `n`, so it is information about the destination.
 
 The page has three ways to finish the step:
 
@@ -73,11 +78,12 @@ The page has three ways to finish the step:
 | --- | --- |
 | snap | the destination poses, and it ends on them by construction |
 | free | the destination poses as a pull, without the snap |
-| blind | nothing beyond the start, the drop and the known-best side the walls close onto |
+| blind | no poses; still the known-best side, and in `bodies` style the matched blocks |
 
-So “blind” is conditioned on a great deal: the previous record, the reference side and
-the proposal. Any claim about it is a claim about improving a known packing toward a
-known side, not about finding a packing from nothing.
+So “blind” is conditioned on a great deal: the previous record, the reference side, the
+proposal and, in `bodies` style, which squares move together.
+Any claim about it is a claim about improving a known packing toward a known side, not
+about finding a packing from nothing.
 
 ## 2. One Trial Per `n`, Until Runs Were Seeded
 
@@ -110,6 +116,13 @@ whatever it scores is float noise.
 
 Two orders of magnitude separate the control from the smallest real overlap, so the
 harness uses 1e-5 of a unit side.
+The snap and free rows came from a variant of the probe that was run once and not kept;
+the committed harness runs blind only, so the control is a recorded observation rather
+than a reproducible one.
+
+Across the 123,190 runs of the later rounds, whose rows survive locally, no run ended
+below 1e-5. The deepest overlap before repair ranged from 0.002 to 0.118 of a side, with
+a median of 0.083.
 
 The overlap is built into the blind schedule.
 The walls close onto the known-best side while squares may overlap by up to 0.08, and
@@ -225,6 +238,10 @@ What this shows:
   Several files replay the same seeds, so their trial counts overlap.
 - **Not retained:** per-trial rows and final poses, which were removed from the branch
   at `6e191a35` to keep the diff reviewable.
+- **Checked before this rewrite:** local copies of the rows behind every
+  `resolved: true` cell, 59.7 MB and not in the repository.
+  No run was refused, every repaired overlap is finite and at most 1e-9, seeds run
+  contiguously from 0, and the counts match the summaries.
 - **Instrument:** `packing/devtools/bench_annealing.py` on this branch.
 
 <!-- This document follows common-doc-guidelines.md.

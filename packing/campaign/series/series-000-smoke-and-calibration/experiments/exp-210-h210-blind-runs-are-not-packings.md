@@ -73,9 +73,9 @@ experiment:
   verdict:
     decision: unresolved
     primary_criterion: the deepest pairwise overlap in the final arrangement
-    reason: Every blind run observed ended overlapping against a snapped control at float noise,
-      but neither the trials nor their final poses were kept, so the observation cannot be
-      re-checked from the repository.
+    reason: Every blind run observed ended overlapping, but the snapped control was measured
+      once with a probe variant that was not kept, and neither the trials nor their final poses
+      are in the repository, so the observation cannot be re-checked from it.
     commit: d3c3a778
   effort:
     stopped_by: dependency
@@ -95,6 +95,8 @@ A blind run starts from the known-best packing for `n - 1`, drops the new square
 the emptiest cell of a coarse grid, and runs contact forces, wall forces and a decaying
 shake while the container contracts toward the known-best side for `n`. It is not given
 the destination poses.
+In the `bodies` style the benchmark used, squares also move as rigid blocks whose
+membership comes from matching the two records.
 
 The measurement is the deepest overlap between any two squares in the arrangement the
 run **ends on**. A separating-axis test computes it from the final poses, in the
@@ -111,13 +113,17 @@ nothing about where the squares stopped.
 | blind: not given the destination poses | 8.4e-2 | 3.5e-2 | 8.6e-2 |
 
 The snapped row is the float noise the stored poses carry.
+The snap and free rows came from a variant of the probe that was run once and not kept.
+The committed harness runs blind only, so this control is recorded, not reproducible.
 Two orders of magnitude separate it from the smallest real overlap, so a tolerance of
 1e-5 refuses overlaps without refusing arithmetic.
 
 ## Result
 
-Every blind run observed ended with at least one pair of squares overlapping, by 0.03 to
-0.12 of a unit side.
+Every blind run observed ended with at least one pair of squares overlapping.
+The later rounds kept a row per run, and their local copies cover 123,190 runs: none
+ended below 1e-5, and the deepest overlap before repair ranged from 0.002 to 0.118 of a
+side, with a median of 0.083.
 
 ## What It Means
 
@@ -141,7 +147,7 @@ whenever the deepest overlap is at most `BLIND.overlapTol`, which is 0.08 of a u
 The walls stop at the known-best side and never go below it.
 
 So a blind run is squeezed into the record’s own container while squares may overlap by
-up to 0.08. The observed overlaps, 0.035 to 0.086, sit at that tolerance.
+up to 0.08. The observed overlaps, with a median of 0.083, sit at that tolerance.
 It also explains the early cells that reported a container below the known-best side:
 squares compressed inside a record-sized box can have a smaller bounding box than the
 box.
@@ -153,7 +159,7 @@ destination. Blind mode has none, so nothing drives the overlap out.
 
 The trials and their final poses were not retained, so this result cannot be re-checked
 from the repository.
-It is cheap to reproduce: from `packing/`, run
+The blind rows are cheap to reproduce: from `packing/`, run
 `uv run --frozen --all-extras --group dev python -m devtools.bench_annealing --n 5 11 17 --seeds 200`.
 Each trial row it writes under `campaign/results/annealing/` carries `overlap`, the
 deepest pairwise overlap before repair.
