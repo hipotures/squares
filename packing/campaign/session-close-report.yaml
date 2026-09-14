@@ -7,12 +7,12 @@ softschema:
   schema: schemas/session-close-report.schema.yaml
   envelope: null
   status: enforced
-count: 128
+count: 129
 generated_by: >-
   uv run --frozen --all-extras --group dev python -m devtools.close_session --render
 totals:
   sessions_measured: 82
-  sessions_unmeasured: 46
+  sessions_unmeasured: 47
   attributed:
     rollups: 129
     turns: 40048
@@ -2139,5 +2139,15 @@ sessions:
   measured: false
   unmeasured_reason: >-
     native harness data unavailable; This Codex desktop continuation exposes no native task-tree resource receipt or log identifier from which the repository roll-up can be generated.
+  rollups: []
+  codex_receipts: []
+- id: session-129
+  title: "Small-n Significant-Progress Mathematical Audit"
+  status: stopped
+  primary_bead: think-oj12
+  phases: 2
+  measured: false
+  unmeasured_reason: >-
+    native harness data unavailable; The collaboration harness exposed the delegated results but no native task-tree resource receipt or log identifier from which the repository roll-up can be generated.
   rollups: []
   codex_receipts: []

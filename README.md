@@ -283,6 +283,10 @@ synthesizes the generated frontier [status table](packing/frontier/STATUS.md),
 The
 [W8 documentation pass](packing/campaign/documentation-pass.md#synopsis-research-status-roll-up)
 defines how those sources are reconciled.
+The separate
+[small-n mathematical audit](docs/project/reviews/review-2026-09-14-small-n-significant-progress-mathematical-audit.md)
+challenges the current research approaches and supplies the enlarged candidate set;
+agenda 036 and W10, not the review itself, own the eventual route selection.
 To resume work, use the synopsis’s [current handoff](SYNOPSIS.md#current-handoff), which
 names the owning work item and next bounded slice.
 

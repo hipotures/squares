@@ -108,11 +108,13 @@ is the live controller, and the synopsis’s
 is the reader-facing account.
 
 The transition has three separate blocks.
-BC-339 is tracked as a W7 pipeline-improvement block: its W7 phase adds the roll-up
-contract and checker, and its W8 phase reconciles the records and root documents.
-BC-347 is then a read-only Astra Max mathematical audit of the retained evidence, the
-five shaped routes, and additional hypotheses with material small-`n` upside.
-BC-346 is the subsequent W10 planning block.
+BC-339 has implemented the W7 pipeline-improvement work and its W8 source reconciliation
+and awaits exact-revision certification.
+BC-347 then produced a read-only
+[Astra Max mathematical audit](../../reviews/review-2026-09-14-small-n-significant-progress-mathematical-audit.md)
+of the retained evidence, the five shaped routes, and additional hypotheses with
+material small-`n` upside behind that prerequisite.
+BC-346 remains blocked until both predecessor lifecycles close.
 It compares dependency readiness, expected information value, first discriminator, stop
 rule, and resource cost, then selects exactly one execution entry.
 None of these blocks runs a scientific target.
@@ -122,16 +124,22 @@ The planning candidates are:
 | Route | First discriminator | Intended payoff |
 | --- | --- | --- |
 | W5 efficiency checkpoint | Determine whether the four-to-eight-block cadence makes it due; if so, measure at most one demonstrated bottleneck | Protect the speed and equivalence of the next research loop |
-| A — systematic case split | At side `3.85`, enumerate proved occupancy or contact cases and measure the exactly closed share | A significant conditional lower-bound route beyond the point-certificate ceiling |
-| B — pairwise SDP | Reproduce the `n = 6` control near side `3` before an `n = 11` comparison | Attack the fractional-versus-integer gap directly |
-| S — certificate compression | Group T-025/T-026 by D4 orbit, weight, and tight-cell pattern at side `3.82` | Replace the current large certificate with a human-statable proof |
-| C — orientation structure | Reproduce the 6+5 control at Trump’s angle, then test robust bins near `3.87` | Restrict any packing near the standing upper bound |
-| D — upper-bound search | Reproduce Trump’s packing, then exactly polish every endpoint at or below `3.90` | Improve the upper bound or catalogue the local optima an optimality proof must exclude |
+| A — systematic case split | At side `3.84`, freeze one complete difficult root family and report the fixed denominator and exact worst survivor; use `3.85` only after rebuilding its premises | A material lower-bound route beyond the point-certificate ceiling |
+| S — certificate compression | Start with T-025 and seek a fivefold reduction in orbit representatives or comparable independent geometry, with unchanged exact replay | Replace the current large certificate with a human-statable proof |
+| E — global angular resources | Test H-131’s proved angle-count caps against the whole retained fractional optimal face, with coherent selection explicit | Add a global physical resource without assuming two orientations or owner selection |
+| B — pairwise SDP | Audit a sound pose cover and compare with the strongest matched threshold baseline after the `n = 6` controls | Attack the fractional-versus-integer gap through pairwise compatibility |
+| F1 — stronger charge algebra | Test one exact realizable trace language against matched ordinary-threshold atoms | Change the relaxation by coupling individually admissible placements |
+| F2 — geometry-dependent budgets | Prove one joint-parent physical-capacity bound for an atom with ordinary budget at least two | Replace a fixed combinatorial budget with a geometry-dependent theorem |
+| N — `n = 12` exact value | Seek a uniform boundary-capacity or deformation lemma for `L = 4 - epsilon`, with solved controls and flexible boundary families | Attempt the larger theorem `s(12) = 4` without a decimal ladder |
+| C — orientation structure | Reproduce the 6+5 Trump-angle control, then close one complete positive-width interval near `3.87` | Prove a restricted-family theorem and test a possible bridge to optimality |
+| D — upper-bound search | Make one changed proposer recover an oblique control at matched work before allocating a larger search | Improve the upper bound or retain verified competing configurations |
+| G — geometric waste | Prove one orientation-sensitive local gap and a non-double-counting global accounting rule | Explore a speculative geometric mechanism beyond one-body density |
 
-Route A is the standing scientific favorite, not a preselected execution.
-BC329, weighted-atom stages 3–4, and the BC303 H-160/H-162 target lane are paused.
-Their admitted code and registrations remain retained; no exp-158 or exp-160 target ran,
-so the pause carries no scientific verdict.
+The audit’s advisory order is A, S, E, B, F1, F2, N, C, D, then G. It is a
+readiness-and-information judgment, not a measured success probability or a preselected
+execution. BC329, weighted-atom stages 3–4, and the BC303 H-160/H-162 target lane are
+paused. Their admitted code and registrations remain retained; no exp-158 or exp-160
+target ran, so the pause carries no scientific verdict.
 
 ## One-Block Controller
 

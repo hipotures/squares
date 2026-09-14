@@ -342,10 +342,10 @@ It is not the next thing, because a reassessment of what to search is queued in 
 of it.
 
 For the next supervised exact-research goal, complete BC-339 under `think-uqa4` by
-running the qualifying validation gate on the handed-over roll-up source and retaining
-its exact revision.
-This certification step runs no scientific target and does not select
-a research route. The current evidence and candidate set are in the synopsis’s
+running the qualifying validation gate on the handed-over roll-up and mathematical-audit
+source and retaining its exact revision.
+This certification step runs no scientific target and does not select a research route.
+The current evidence and candidate set are in the synopsis’s
 [Research Program Status and Roadmap](../../../../SYNOPSIS.md#research-program-status-and-roadmap),
 and
 [agenda-036](../../../../packing/campaign/agendas/agenda-036-n11-strategy-reset-roadmap.md)

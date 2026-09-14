@@ -143,6 +143,7 @@ Each entry summarizes one user-level research window. Cycle slots are wall-clock
 | [session-126](agent-sessions/session-126-stromquist-analytical-exploration.md) | completed | contemporaneous | `insight-iteration` (insight) | `documentation-pass` (correctness) | 8 | think-jx95 | Continue the already tracked BC329 bounded fixed-core runner admission under think-qw9w; a scientific packet run still requires the stated prospective contract and independent admission. |
 | [session-127](agent-sessions/session-127-weighted-five-site-atom-admission.md) | completed | contemporaneous | `pipeline-improvement` (correctness) | `pipeline-improvement` (correctness) | 2 | think-zvr3 | Continue under think-8c9e, the weighted-atom coverage mechanics, which cover the direct, event and interval controls including the boundary and undercharged-core cases and the interval route's stall handling. Stage four's paired runner and exact common manifests are tracked separately and blocked on it. |
 | [session-128](agent-sessions/session-128-research-state-rollup.md) | stopped | contemporaneous | `pipeline-improvement` (process) | `documentation-pass` (correctness) | 2 | think-uqa4 | Complete BC-339 under think-uqa4 by running the qualifying validation gate on this handed-over source and retaining its exact revision. |
+| [session-129](agent-sessions/session-129-small-n-mathematical-audit.md) | stopped | contemporaneous | `factual-review` (correctness) | `insight-iteration` (insight) | 2 | think-oj12 | Complete BC-339 under think-uqa4 by certifying the handed-over roll-up and audit revision before advancing the dependent audit lifecycle. |
 
 ### Workflow summary
 
@@ -151,8 +152,8 @@ Declared counts are contemporaneous contracts; retrospective counts are reconstr
 | workflow | declared entries | retrospective entries | declared phases | retrospective phases |
 | --- | ---: | ---: | ---: | ---: |
 | `research-survey` | 2 | 2 | 13 | 2 |
-| `factual-review` | 5 | 0 | 48 | 2 |
-| `insight-iteration` | 24 | 1 | 78 | 3 |
+| `factual-review` | 6 | 0 | 49 | 2 |
+| `insight-iteration` | 24 | 1 | 79 | 3 |
 | `process-review` | 16 | 4 | 64 | 6 |
 | `efficiency-loop` | 9 | 1 | 35 | 1 |
 | `research-loop` | 26 | 4 | 96 | 8 |
@@ -731,19 +732,24 @@ Status: **paused**. Select and execute short, high-information blocks across dis
 
 ### [agenda-036](agendas/agenda-036-n11-strategy-reset-roadmap.md) — N11 Strategy-Reset Roadmap
 
-Status: **active**. Reconcile the merged research record, then choose among routes that can either improve the n=11 bound materially or replace the current certificate with a much simpler proof. Keep paused incremental lanes out of the execution queue unless new evidence changes their expected value.
+Status: **active**. Reconcile the merged research record, then choose among routes that can either improve the n=11 bound materially, replace the current certificate with a much simpler proof, or resolve another small case through a transferable technique. Keep paused incremental lanes out of the execution queue unless new evidence changes their expected value.
 
 | item | purpose | n | state | priority | bead | next evidence |
 | --- | --- | --- | --- | ---: | --- | --- |
-| BC-339 | tool_validation | 11 | in_progress | 0 | think-uqa4 | Commit the reconciled records and documents, pass the records, push, and complete validation tiers, and retain a terminal session pointing at BC-347. |
-| BC-347 | research | 6, 7, 10, 11, 13 | blocked | 0 | think-oj12 | Read the retained n11 proof and negative-result stack, then test whether each proposed mechanism escapes the known point-certificate ceiling or merely repackages an incremental lane. |
-| BC-346 | tool_validation | 11 | blocked | 0 | think-9y7p | Reconstruct the W5 cadence, then compare any due checkpoint with the five shaped routes using their declared first discriminators; select one block rather than a multi-lane research promise. |
+| BC-339 | tool_validation | 11 | in_progress | 0 | think-uqa4 | BC-347 consumes the checked inventory and scientific boundary without reopening the source reconciliation. |
+| BC-347 | research | 6, 7, 10, 11, 13 | blocked | 0 | think-oj12 | BC-346 compares the audited prerequisites, first discriminators, payoff, and cost and selects exactly one execution entry. |
+| BC-346 | tool_validation | 11 | blocked | 0 | think-9y7p | Reconstruct the W5 cadence, then compare any due checkpoint with Routes A, S, E, B, F1, F2, N, C, D, and G using their declared first discriminators; select one block rather than a multi-lane research promise. |
 | BC-340 | measurement_validation | 11 | tentative | 0 | think-1ydi | Reconstruct the cadence from active daytime blocks and retained gate receipts; administrative work does not reset the cadence. |
 | BC-341 | research | 11 | tentative | 1 | think-9y6q | Freeze the smallest occupancy/contact partition that strictly extends T-023's single four-owner branch without claiming an owner-selection theorem. |
 | BC-342 | research | 6, 11 | tentative | 1 | think-ol1z | Specify the n=6 control and the conflict-edge soundness obligation before selecting a solver. |
-| BC-343 | research | 11 | tentative | 2 | think-a1e8 | Group the exact witness by D4 orbit, weight, and tight-cell incidence before changing any atom. |
+| BC-343 | research | 11 | tentative | 1 | think-a1e8 | Group the exact witness by D4 orbit, weight, and tight-cell incidence before changing any atom. |
 | BC-344 | research | 11 | tentative | 2 | think-29ch | Reproduce the 6+5 control at Trump's angle before interpreting any solver infeasibility. |
 | BC-345 | research | 11 | tentative | 3 | think-7n2w | Design the positive-control and endpoint-polishing contract before allocating the background search. |
+| BC-348 | research | 11 | tentative | 1 | think-u15l | Test the valid angle-count rows against the entire retained optimal face before building a larger certificate. |
+| BC-349 | research | 11 | tentative | 2 | think-o4p9 | Relate the selected candidate explicitly to adjacent think-yc80 support work and think-g3j7 format admission. |
+| BC-352 | research | 11 | tentative | 2 | think-iy9h | Decide whether the selected atom needs think-g3j7's K5/K6 format before freezing the scientific target. |
+| BC-350 | research | 6, 12, 13 | tentative | 2 | think-0z9b | Reuse H-039 and the existing n12 lane with its obsolete pre-T-017 target explicitly superseded. |
+| BC-351 | research | 6, 11 | tentative | 3 | think-gzjq | Register no hypothesis until W10 selects one concrete local lemma and domain. |
 
 ## Series
 

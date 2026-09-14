@@ -138,8 +138,8 @@ hypothesis status and summarizes experiment verdicts, and the
 | Record | Count | State at the cutoff |
 | --- | ---: | --- |
 | Agendas | 35 | 15 active; 14 completed; 5 paused; 1 superseded |
-| Commitments | 336 | 171 complete; 59 stopped; 66 blocked; 15 ready; 17 tentative; 8 in progress |
-| Sessions | 128 | 84 completed; 44 stopped; all terminal |
+| Commitments | 341 | 171 complete; 59 stopped; 66 blocked; 15 ready; 22 tentative; 8 in progress |
+| Sessions | 129 | 84 completed; 45 stopped; all terminal |
 | Explorations | 29 | 17 linked to proposed hypotheses; 12 uncodified |
 | Hypotheses | 138 | 25 confirmed; 24 refuted; 48 blocked; 10 unresolved; 2 open; 26 open questions; 2 result registered; 1 abandoned; 0 running |
 | Experiments | 116 | 38 accepted; 29 rejected; 25 unresolved; 11 baseline; 11 blocked; 2 abandoned; 0 in progress |
@@ -186,24 +186,34 @@ H-160/exp-158 and H-162/exp-160 are registered but blocked before target invocat
 their source and control work is retained, and their blocked status carries no
 scientific verdict.
 
+BC-339’s W7 pipeline-improvement and W8 reconciliation content is implemented but awaits
+exact-revision certification.
+BC-347’s source-bound
+[Astra Max mathematical audit](docs/project/reviews/review-2026-09-14-small-n-significant-progress-mathematical-audit.md)
+has produced its review and roadmap integration behind that dependency; it ran no
+scientific target and changed no frontier claim.
 The current order is:
 
-1. Finish BC-339’s W7 pipeline-improvement block, including the W8 documentation-pass
-   requirements and checked reconciliation.
-2. Run BC-347 as a source-bound Astra Max mathematical audit: challenge Routes A, B, S,
-   C, and D; add genuinely distinct approaches and hypotheses; and rank them for
-   significant progress on `n = 11` or transferable small-`n` technique.
-3. Run one W10 planning block that determines whether the validation-efficiency
-   checkpoint is due and selects exactly one next entry from it and the five shaped
-   research routes plus any serious candidates surviving the audit.
-4. Treat Route A’s systematic occupancy or contact case split at side `3.85` as the
-   standing scientific favorite, subject to that planning decision.
-5. Keep Route B’s pairwise SDP control and Route S’s certificate compression as the
-   principal alternatives: one attacks the fractional gap, the other seeks a much
-   simpler proof of the existing `3.82` result.
-6. Retain the orientation-class theorem as a structural route and a serious upper-bound
-   search as a background route whose local-optimum catalogue may help an optimality
-   proof.
+1. Certify the handed-over BC-339 roll-up and audit revision, then advance BC-347’s
+   lifecycle without changing the scientific evidence cutoff.
+2. Run BC-346 as one W10 planning block.
+   Reconstruct whether the W5 validation-efficiency checkpoint is due, compare the
+   enlarged candidate set, and select exactly one execution entry.
+3. Treat A, S, global angular resources, and B as the first advisory tier.
+   A is the strongest route to a material `n = 11` lower bound; S is the best bounded
+   deliverable; angular resources offer a cheap optimal-face screen; and B is the
+   strongest alternative mechanism after its soundness controls.
+4. Retain stronger charge algebra, geometry-dependent budgets, an `n = 12` exact-value
+   program, and orientation structure as second-tier candidates whose first blocks must
+   pay for missing premises.
+5. Keep constructive search separately budgeted after an oblique proposer control, and
+   treat geometric waste accounting as a speculative candidate requiring both a local
+   lemma and a non-double-counting global rule.
+
+The audit’s linear advisory order is A, S, angular resources, B, stronger charge
+algebra, geometry-dependent budgets, `n = 12`, C, D, then geometric waste.
+That is a readiness-and-information judgment, not a measured probability of success or
+an execution decision.
 
 The
 [W8 documentation-pass runbook](packing/campaign/documentation-pass.md#synopsis-research-status-roll-up)
@@ -621,6 +631,7 @@ case or experiment separately.
 | [Published Core Claims: Adversarial Review and Corrections](docs/project/reviews/review-2026-09-06-published-core-claims-adversarial.md) | dated review record | record | retained | — |
 | [Research: Comprehensive Review of the n = 17 Record](docs/project/reviews/review-2026-09-07-n17-comprehensive-review.md) | dated review record | record | retained | — |
 | [Review of the Paper Font Merge](docs/project/reviews/review-2026-09-08-paper-font-merge.md) | dated review record | record | retained | — |
+| [Mathematical Audit of Routes to Significant Progress on Small Square Packings](docs/project/reviews/review-2026-09-14-small-n-significant-progress-mathematical-audit.md) | dated review record | record | retained | — |
 | [The Three-Lane Research Method](docs/project/three-lane-research-method.md) | component scope and use | record | retained | — |
 | [Handoff — 2026-09-04, close of the fractional-certificate block](docs/project/handoff-2026-09-04-block-close.md) | dated handoff record | record | retained | — |
 | [Handoff: Post-3.81 Portfolio at T+2](docs/project/handoff-2026-09-06-post-381-t2-commissioning.md) | dated handoff record | record | retained | — |
@@ -837,20 +848,22 @@ controller, not permission to blur contracts.
 ### Current Handoff
 
 [Session 128](packing/campaign/agent-sessions/session-128-research-state-rollup.md)
-records the source-first reconciliation, three independent document audits, the new
-snapshot drift check, and the owner-directed separation between this pipeline block and
-the next mathematical audit and planning blocks.
-It changes no mathematical claim.
+records the source-first reconciliation, five independent reviews, and the new snapshot
+drift check.
+[Session 129](packing/campaign/agent-sessions/session-129-small-n-mathematical-audit.md)
+records the separate Astra Max mathematical audit and the read-only roadmap-duplication
+review. Neither block ran a scientific target or changed a mathematical claim.
 The scientific evidence cutoff remains main revision
 `80bcdbb0819504354e1278c37f211dd8cc2158fb`, where the latest merged stack is green and
 the T-026 lower bound remains the frontier.
 
 **Selected next entry:** `think-uqa4`, the BC-339 roll-up certification.
 
-BC-339 has implemented the pipeline but remains explicitly uncertified.
-Its current bounded action is to run the qualifying gate on the handed-over source,
-retain the exact revision, and only then move the selected handoff to BC-347. No
-scientific target runs inside this certification step.
+The roll-up, audit content, and roadmap integration are implemented, but Sessions 128
+and 129 retain an explicit certification debt to the roll-up prerequisite.
+The bounded action is to run the qualifying gate on the handed-over revision, record the
+exact checkpoint, close BC-339 and BC-347 in dependency order, and only then move the
+current handoff to BC-346. No scientific target runs inside this certification step.
 
 The older BC329, weighted-atom stages 3–4, and BC303 H-160/H-162 target lanes are
 paused. Their admitted implementations, registrations, and controls remain evidence; no
@@ -4024,8 +4037,8 @@ in separate tables: their units differ, and the same work can appear in both.
 | Coverage | sessions |
 | --- | ---: |
 | measured | 82 |
-| unmeasured | 46 |
-| **total** | **128** |
+| unmeasured | 47 |
+| **total** | **129** |
 
 <!-- END GENERATED: session-close-report -->
 
