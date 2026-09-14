@@ -21,7 +21,7 @@ agenda:
     purpose: tool_validation
     owner_focus: process
     instances: [11]
-    state: in_progress
+    state: complete
     priority: 0
     question: >-
       Can the post-merge agendas, sessions, explorations, hypotheses, experiments,
@@ -52,11 +52,29 @@ agenda:
     - packing/campaign/documentation-pass.md
     - docs/project/specs/active/plan-2026-09-10-n11-daytime-strategy-and-explainer.md
     parallel_group: research-state-rollup
+    outcomes:
+    - scope: >-
+        The reader-facing research inventory, source precedence, generated views,
+        current handoff, and repeatable roll-up procedure after the September 14 merge
+        stack.
+      classification: achieved
+      result: >-
+        The synopsis now carries a source-derived program snapshot and current handoff;
+        README and the active plans route through it; W8 defines the repeatable roll-up;
+        and focused checks reject stale counts, lifecycle ordering, and handoff drift.
+        No scientific target or frontier claim changed.
+      evidence:
+      - SYNOPSIS.md
+      - README.md
+      - packing/campaign/documentation-pass.md
+      - packing/campaign/agent-sessions/session-128-research-state-rollup.md
+      disposition: retire-success
+      follow_up: null
   - id: BC-347
     purpose: research
     owner_focus: insight
     instances: [6, 7, 10, 11, 13]
-    state: blocked
+    state: complete
     priority: 0
     question: >-
       Which mathematically distinct approaches have a credible path to significant
@@ -83,11 +101,24 @@ agenda:
     artifacts:
     - docs/project/reviews/review-2026-09-14-small-n-significant-progress-mathematical-audit.md
     parallel_group: mathematical-strategy-audit
+    outcomes:
+    - scope: >-
+        The retained n11 proof, fractional ceiling, scoped negative results, five shaped
+        routes, and additional mechanisms with potential at n=11 or another small n.
+      classification: achieved
+      result: >-
+        Astra Max ranked the original A, S, B, C, and D routes; added E, F1, F2, N, and
+        G; corrected premises and discriminators; and advised the order A, S, E, B, F1,
+        F2, N, C, D, G. This is a recommendation, not a selected scientific target.
+      evidence:
+      - docs/project/reviews/review-2026-09-14-small-n-significant-progress-mathematical-audit.md
+      disposition: retire-success
+      follow_up: null
   - id: BC-346
     purpose: tool_validation
     owner_focus: process
     instances: [11]
-    state: blocked
+    state: ready
     priority: 0
     question: >-
       Given the reconciled state, is the validation-efficiency checkpoint due, and which
@@ -381,13 +412,12 @@ This agenda is the current execution map after the September 14 strategy reset.
 It preserves the older portfolio’s completed evidence while removing its paused
 incremental lanes from the live queue.
 
-The research-state roll-up and mathematical-audit content are implemented, but their
-declared dependency chain remains open until exact-revision certification.
-The audit recommends A, S, angular resources, B, stronger charge algebra,
-geometry-dependent budgets, n12, C, D, then geometric waste; the ordering is a judgment
-about the next allocation, not a measured success probability.
-W10 remains blocked until the audit checkpoint is certified; it will first determine
-whether the efficiency checkpoint is due and then select exactly one execution entry.
+The research-state roll-up and mathematical audit are certified and closed in declared
+dependency order. The audit recommends A, S, angular resources, B, stronger charge
+algebra, geometry-dependent budgets, n12, C, D, then geometric waste; the ordering is a
+judgment about the next allocation, not a measured success probability.
+BC-346 is the current W10 handoff; it will first determine whether the efficiency
+checkpoint is due and then select exactly one execution entry.
 Every unselected route remains tentative until the planning disposition says otherwise.
 
 <!-- This document follows common-doc-guidelines.md.

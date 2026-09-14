@@ -20,7 +20,6 @@ session:
     make the roll-up repeatable and checked, route README and the active plans through
     it, and hand a separate mathematical audit one explicit candidate set before W10
     makes the execution choice.
-  certification_pending: think-uqa4
   resource_usage_unmeasured:
     reason: native_harness_data_unavailable
     detail: >-
@@ -261,14 +260,16 @@ session:
   - TUTORIAL.md, conventions.md, operating-rules.md, and development.md were checked against the reconciled state; their stable contracts remain current and need no change.
   - The focused lifecycle, session-clock, handoff, and campaign suites passed 89 tests after the new stale-count and terminal-time negative controls were added; Ruff passed every modified Python file.
   - No scientific target ran; exp-158 and exp-160 have zero target wall seconds and administrative blocked dispositions.
+  - 'full gate: fast at fa6363b6c2b4c7d7449807c04166e9df94bc7b35: passed'
+  - The qualifying local run used the declared four-CPU reference shape and passed all 63 fast-surface steps in 459.37 seconds.
   resource_rollups: []
   stop_reason: >-
-    The pipeline-improvement deliverables are implemented, but this stopped record is
-    explicitly uncertified until a qualifying gate covers the handed-over source. Native
-    task-tree resource data is unavailable and is not reconstructed from prose.
+    The pipeline-improvement deliverables and handed-over source passed the qualifying
+    fast gate at the recorded exact revision. Native task-tree resource data is
+    unavailable and is not reconstructed from prose.
   next_action: >-
-    Complete BC-339 under think-uqa4 by running the qualifying validation gate on this
-    handed-over source and retaining its exact revision.
+    Hand the certified inventory and scientific boundary to BC-347 under think-oj12 for
+    the separate mathematical-audit lifecycle.
 ---
 # Session 128 — Checked Research-State Roll-Up Pipeline
 

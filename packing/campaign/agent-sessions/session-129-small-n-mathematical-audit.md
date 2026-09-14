@@ -20,7 +20,6 @@ session:
     theorem-sized advance, distinguish those approaches from incremental refinements,
     enlarge the candidate set without duplicating existing work, and hand one disciplined
     portfolio to W10 for selection.
-  certification_pending: think-uqa4
   resource_usage_unmeasured:
     reason: native_harness_data_unavailable
     detail: >-
@@ -197,15 +196,16 @@ session:
   - Astra Max distinguished proved facts, new analytical deductions, planning judgments, and speculation and ran no scientific target.
   - Route S's upward 1/30000 weight-rounding recipe remains below budget eleven; it is an analytical recipe, not a produced certificate.
   - The roadmap-duplication review created no new hypothesis, reused existing tbd ownership for Route N, and separated new current-strategy ownership for Routes F1 and F2 from related legacy work.
+  - 'full gate: fast at fa6363b6c2b4c7d7449807c04166e9df94bc7b35: passed'
+  - The qualifying local run used the declared four-CPU reference shape and passed all 63 fast-surface steps in 459.37 seconds.
   resource_rollups: []
   stop_reason: >-
     The source-bound audit, enlarged portfolio, duplication decisions, and W10 frame are
-    durable. This stopped record remains explicitly uncertified until a qualifying gate
-    first discharges the roll-up prerequisite under think-uqa4 and covers the audit
-    source; native task-tree usage is unavailable and was not reconstructed.
+    durable and certified at the recorded exact revision. Native task-tree usage is
+    unavailable and was not reconstructed.
   next_action: >-
-    Complete BC-339 under think-uqa4 by certifying the handed-over roll-up and audit
-    revision before advancing the dependent audit lifecycle.
+    Run BC-346 under think-9y7p as the separate planning block; select no scientific
+    target before that block records its disposition.
 ---
 # Small-n Significant-Progress Mathematical Audit
 

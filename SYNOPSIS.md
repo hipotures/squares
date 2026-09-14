@@ -138,7 +138,7 @@ hypothesis status and summarizes experiment verdicts, and the
 | Record | Count | State at the cutoff |
 | --- | ---: | --- |
 | Agendas | 35 | 15 active; 14 completed; 5 paused; 1 superseded |
-| Commitments | 341 | 171 complete; 59 stopped; 66 blocked; 15 ready; 22 tentative; 8 in progress |
+| Commitments | 341 | 173 complete; 59 stopped; 64 blocked; 16 ready; 22 tentative; 7 in progress |
 | Sessions | 129 | 84 completed; 45 stopped; all terminal |
 | Explorations | 29 | 17 linked to proposed hypotheses; 12 uncodified |
 | Hypotheses | 138 | 25 confirmed; 24 refuted; 48 blocked; 10 unresolved; 2 open; 26 open questions; 2 result registered; 1 abandoned; 0 running |
@@ -186,27 +186,24 @@ H-160/exp-158 and H-162/exp-160 are registered but blocked before target invocat
 their source and control work is retained, and their blocked status carries no
 scientific verdict.
 
-BC-339’s W7 pipeline-improvement and W8 reconciliation content is implemented but awaits
-exact-revision certification.
+BC-339’s W7 pipeline-improvement and W8 reconciliation are complete and certified.
 BC-347’s source-bound
 [Astra Max mathematical audit](docs/project/reviews/review-2026-09-14-small-n-significant-progress-mathematical-audit.md)
-has produced its review and roadmap integration behind that dependency; it ran no
-scientific target and changed no frontier claim.
+and roadmap integration are also complete and certified; they ran no scientific target
+and changed no frontier claim.
 The current order is:
 
-1. Certify the handed-over BC-339 roll-up and audit revision, then advance BC-347’s
-   lifecycle without changing the scientific evidence cutoff.
-2. Run BC-346 as one W10 planning block.
+1. Run BC-346 as one W10 planning block.
    Reconstruct whether the W5 validation-efficiency checkpoint is due, compare the
    enlarged candidate set, and select exactly one execution entry.
-3. Treat A, S, global angular resources, and B as the first advisory tier.
+2. Treat A, S, global angular resources, and B as the first advisory tier.
    A is the strongest route to a material `n = 11` lower bound; S is the best bounded
    deliverable; angular resources offer a cheap optimal-face screen; and B is the
    strongest alternative mechanism after its soundness controls.
-4. Retain stronger charge algebra, geometry-dependent budgets, an `n = 12` exact-value
+3. Retain stronger charge algebra, geometry-dependent budgets, an `n = 12` exact-value
    program, and orientation structure as second-tier candidates whose first blocks must
    pay for missing premises.
-5. Keep constructive search separately budgeted after an oblique proposer control, and
+4. Keep constructive search separately budgeted after an oblique proposer control, and
    treat geometric waste accounting as a speculative candidate requiring both a local
    lemma and a non-double-counting global rule.
 
@@ -222,6 +219,12 @@ needed to refresh this section.
 Together, `packing-ledger check` and `devtools.check_synopsis` derive every row in the
 marked table from its owning artifacts and checked generated views, so a later source
 change cannot leave a plausible but stale total here.
+
+The roll-up and audit source checkpoint `fa6363b6c2b4c7d7449807c04166e9df94bc7b35`
+passed the complete 63-step fast surface at the declared four-CPU reference shape in
+459.37 seconds. The following closeout changes only record that gate, advance lifecycle
+state, and regenerate derived views; pull-request CI independently validates the
+resulting tree.
 
 ### Current research readiness
 
@@ -857,13 +860,13 @@ The scientific evidence cutoff remains main revision
 `80bcdbb0819504354e1278c37f211dd8cc2158fb`, where the latest merged stack is green and
 the T-026 lower bound remains the frontier.
 
-**Selected next entry:** `think-uqa4`, the BC-339 roll-up certification.
+**Selected next entry:** `think-9y7p`, the BC-346 W10 planning block.
 
-The roll-up, audit content, and roadmap integration are implemented, but Sessions 128
-and 129 retain an explicit certification debt to the roll-up prerequisite.
-The bounded action is to run the qualifying gate on the handed-over revision, record the
-exact checkpoint, close BC-339 and BC-347 in dependency order, and only then move the
-current handoff to BC-346. No scientific target runs inside this certification step.
+The roll-up and audit are certified and closed in dependency order.
+The bounded action is to reconstruct whether the W5 efficiency checkpoint is due,
+compare the ten candidate cells by payoff, readiness, first discriminator, stop rule,
+and cost, then select exactly one later execution entry.
+No scientific target runs inside this planning block.
 
 The older BC329, weighted-atom stages 3–4, and BC303 H-160/H-162 target lanes are
 paused. Their admitted implementations, registrations, and controls remain evidence; no

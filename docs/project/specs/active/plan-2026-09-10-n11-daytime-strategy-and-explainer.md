@@ -108,13 +108,12 @@ is the live controller, and the synopsis’s
 is the reader-facing account.
 
 The transition has three separate blocks.
-BC-339 has implemented the W7 pipeline-improvement work and its W8 source reconciliation
-and awaits exact-revision certification.
-BC-347 then produced a read-only
+BC-339 completed and certified the W7 pipeline-improvement work and its W8 source
+reconciliation. BC-347 then completed and certified a read-only
 [Astra Max mathematical audit](../../reviews/review-2026-09-14-small-n-significant-progress-mathematical-audit.md)
 of the retained evidence, the five shaped routes, and additional hypotheses with
 material small-`n` upside behind that prerequisite.
-BC-346 remains blocked until both predecessor lifecycles close.
+BC-346 is the current W10 planning block.
 It compares dependency readiness, expected information value, first discriminator, stop
 rule, and resource cost, then selects exactly one execution entry.
 None of these blocks runs a scientific target.
