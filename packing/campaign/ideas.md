@@ -561,8 +561,11 @@ It lowers the separate local helper’s first passing integer masses to $4524132
 and $8524147$ for an actual S pair; the same $4524132$ first-owner strip cutoff is only
 sufficient for S. H-161’s failed literal parent-union test is locally stable under
 sufficiently small admissible perturbations, without proving an extension.
-A bounded separate registration is proposed but not allocated; H-160/exp-158 remain
-frozen and unrun.
+The separate [H-162 filter](hypotheses/H-162-bc303-floor-normalized-t2-filter.md) and
+[exp-160 analysis](series/series-000-smoke-and-calibration/experiments/exp-160-bc303-floor-normalized-t2-filter-analysis.md)
+prospectively compare complete C and S first-owner strip minima from one admitted
+exp-158 receipt. They do not register the complete actual-S condition.
+H-160/exp-158 remain frozen and unrun.
 
 ## Dead ends
 

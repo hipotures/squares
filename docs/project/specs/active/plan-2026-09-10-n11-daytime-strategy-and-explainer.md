@@ -60,11 +60,18 @@ The T2 C/S charge targets remain unrun.
 The separate
 [X-031 floor-normalized exploration](../../../../packing/campaign/explorations/X-031-bc303-floor-normalized-t2-helper-draft.md)
 records a source-distinct reviewed strengthening of the local forced-type account: C
-passes its normalized half-budget at integer mass $4524132$, and an actual jointly
-realizable S pair passes at total mass $8524147$. An S first-owner strip minimum of
-$4524132$ is sufficient, but a lower strip cell does not refute actual S. X-031 proposes
-a bounded H-162 registration before prospective use of an exp-158 target receipt; it
-does not allocate H-162, alter H-160/exp-158, or run a target.
+requires at least $4524132$ integer mass units, and an actual jointly realizable S pair
+requires at least $8524147$. An S first-owner strip minimum of $4524132$ is sufficient,
+but a lower strip cell does not refute actual S. The separate
+[H-162 filter](../../../../packing/campaign/hypotheses/H-162-bc303-floor-normalized-t2-filter.md)
+and
+[exp-160 analysis](../../../../packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-160-bc303-floor-normalized-t2-filter-analysis.md)
+prospectively register the C and S strip cutoffs for one admitted retained exp-158
+receipt. They do not alter H-160/exp-158, allocate a second target run, or decide the
+complete actual-S condition.
+The
+[source-distinct H-162 audit](../../reviews/review-2026-09-13-bc303-h162-preregistration-math.md)
+records the verdict order and quantifier boundary.
 The target-free reader has an
 [independent readmission](../../reviews/review-2026-09-13-bc303-t2-charge-reader-readmission.md)
 after two documented defects were repaired; its integrated execution head still needs a

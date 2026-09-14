@@ -257,6 +257,7 @@ case or experiment separately.
 | [Source-Distinct Review of the BC303 T2 Charge Bridge](docs/project/reviews/review-2026-09-13-bc303-t2-charge-bridge.md) | dated review record | record | retained | — |
 | [BC303 T2 and H161: The Remaining Global Implication](docs/project/reviews/review-2026-09-13-bc303-t2-global-bridge.md) | dated review record | record | retained | — |
 | [BC303 Floor-Normalized T2: Independent Mathematical Review](docs/project/reviews/review-2026-09-13-bc303-floor-normalized-t2-independent.md) | dated review record | record | retained | — |
+| [BC303 H-162 Preregistration Mathematical Audit](docs/project/reviews/review-2026-09-13-bc303-h162-preregistration-math.md) | dated review record | record | retained | — |
 | [BC303 Parent-Union Lemma: Independent Mathematical Review](docs/project/reviews/review-2026-09-13-bc303-parent-union-math.md) | dated review record | record | retained | — |
 | [BC303 T2 Charge Reader: Independent Admission Review](docs/project/reviews/review-2026-09-13-bc303-t2-charge-reader-refusal.md) | dated review record | record | retained | — |
 | [BC303 T2 Charge Reader: Independent Readmission](docs/project/reviews/review-2026-09-13-bc303-t2-charge-reader-readmission.md) | dated review record | record | retained | — |
@@ -3648,6 +3649,7 @@ round that names the hypothesis, control roles included.
 | [H-159](packing/campaign/hypotheses/H-159-bc303-one-corner-surplus.md) | refuted | Every bottom-left role-C selected core with labels 0 and 15 absent has surplus above the BC303 shared allowance | 1 | exp-157: the disclosed literal parent has labels `{3,4,11,12}` and exact surplus `3/800000 < epsilon`; 1.92s replay wall |
 | [H-160](packing/campaign/hypotheses/H-160-bc303-t2-charge-filters.md) | running | Every frozen BC303 C charge is at least 4524200 and every S first-owner strip charge is at least 4524185 | 1 | exp-158 preregistered without target charge; source and controls pending |
 | [H-161](packing/campaign/hypotheses/H-161-bc303-literal-parent-union.md) | refuted | The frozen literal closed Q0 has integer mass `N>=4262074`, excluding the named four-corner tuple under the imported BC303 floor | 1 | exp-159: `N=4000015`; neither the four-corner nor one-parent threshold rejects |
+| [H-162](packing/campaign/hypotheses/H-162-bc303-floor-normalized-t2-filter.md) | running | Frozen BC303 C and S first-owner strip minima are each at least 4524132 | 1 | exp-160 prospectively compares one admitted exp-158 receipt; neither target nor analysis has run |
 
 ### Confirmed
 
@@ -3936,7 +3938,7 @@ The relevant generator writes the receipt, and the entry fills in on the next
 
 ## Experiments Conducted
 
-There are 115 rounds registered in `series-000`.
+There are 116 rounds registered in `series-000`.
 
 They record 2152.1 agent-minutes and 1485.2 wall-minutes.
 Exp129 closed as blocked without invocation and contributes zero scientific elapsed
@@ -4093,6 +4095,7 @@ archive beside it.
 | [exp-157](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-157-bc303-literal-t1-witness.md) | 11 | target | H-159 | Retrospective source-bound replay of one disclosed bottom-left role-C parent across all 377 atoms | Labels `{3,4,11,12}`; 19 captured atoms give `S(X)=3/800000 < epsilon`, rejecting only the named local inequality | rejected |
 | [exp-158](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-158-bc303-t2-charge-filters.md) | 11 | target | H-160 | Prospective exact all-chart C and S first-owner charge filters after source and synthetic-control admission | No target charge run | in-progress |
 | [exp-159](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-159-bc303-literal-parent-union.md) | 11 | target | H-161 | Source-bound exact mass of closed `Q0=[0,1]^2` against frozen one-parent and four-corner budgets | `N=4000015`; both tests retain `1048233` units of slack | rejected |
+| [exp-160](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-160-bc303-floor-normalized-t2-filter-analysis.md) | 11 | target | H-162 | Prospective receipt-only comparison of admitted exp-158 C and S-strip minima with 4524132 | No target receipt or analysis run | in-progress |
 
 ### Cost and provenance
 
@@ -4213,10 +4216,11 @@ archive beside it.
 | exp-157 | one fixed disclosed candidate; no search clock | — | 1.92s external replay wall | criterion | source-bound receipt at `81898608`; independent 377-row audit separate |
 | exp-158 | one all-chart invocation, at most 30 minutes after controls | — | — | not started | source and control admission pending; no target charge |
 | exp-159 | one source-bound literal target invocation; no pose sweep or retry | 0.16s | — | criterion | execution head `f27c8ec7`; independent 377-atom and D4 audit retained |
+| exp-160 | one admitted retained exp-158 receipt; zero new charge sweeps | — | — | not started | future receipt-only H-162 comparison; source admission remains separate |
 
-### What the 115 rounds jointly establish
+### What the 116 rounds jointly establish
 
-The 115 rounds use 2152.1 agent-minutes and 1485.2 wall-minutes under the campaign’s
+The 116 rounds use 2152.1 agent-minutes and 1485.2 wall-minutes under the campaign’s
 retained effort accounting.
 The never-invoked exp129 adds no scientific result or execution time.
 Exp-114 contributes 2.46 seconds of target/replay effort; its readiness work is recorded
