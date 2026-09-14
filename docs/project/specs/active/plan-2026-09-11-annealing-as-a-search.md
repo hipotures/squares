@@ -193,7 +193,7 @@ a strategy anyone can re-run by name.
   onto the record side for `n`, and in the `bodies` style the benchmark used it welds
   squares into rigid blocks chosen by matching the two records.
 - **A first structure ladder already ran, on the projection solver** (2026-09-09,
-  [X-025](../../../packing/campaign/explorations/X-025-hunting-by-hand-and-the-move-set-threads.md),
+  [X-025](../../../../packing/campaign/explorations/X-025-hunting-by-hand-and-the-move-set-threads.md),
   `packing/devtools/sweep_structure_hints.py`). Declared as constraints, structure made
   search worse at `n ≤ 17`: success fell as more contacts were declared, the reachable
   side got worse, and exact equalities pushed the search away from the record.
