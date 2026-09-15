@@ -389,7 +389,7 @@ def colour_sweep(browser, page_path: Path, check) -> tuple[int, int]:
     Revision 12 made that map an *option* and the square's own identity the default, so the
     sweep selects `angle-stable` before it starts: what is under test here is still the angle
     map, and the identity greens are a different scheme with their own checks in
-    `check_workbench.py`.
+    `animate_view_contract.colours`, which `check_frontend` runs.
 
     The arriving square is left out: its fill leans toward scarlet on purpose (it is identity
     n + 1 of the pair), and so are the hidden pool elements of later identities. Revision 6's
@@ -1576,8 +1576,8 @@ def main() -> int:
     )
     # Revision 9: nothing on the stage explains the stage. The three legend lines, the
     # sentence that narrated the block matching and the keyboard hint are gone, and
-    # `check_legend.py` drives the rendered page to prove none of their wording comes back at
-    # any setting.
+    # `check_animate_view.stage_says_only_facts` drives the rendered page to prove the stage
+    # draws no text but its facts at any setting.
     for gone in (
         'class="legend"',
         'id="legend-style"',

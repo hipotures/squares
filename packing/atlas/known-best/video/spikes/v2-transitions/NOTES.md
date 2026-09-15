@@ -14,13 +14,16 @@ manifest, per-n renderings and composite record; nothing in the worktree was mod
 > to `assets/`, `assets/workbench.js` as `src/application.js`, and the probes to
 > `probes/`. The moved generator writes to `packages/workbench/dist/` unless given
 > `--out`. `frames/` and `review/` are not retained.
-> The line counts, byte sizes and timings in the table are that build’s; at `f3874426`
-> the template is 384 lines, the stylesheet 1,259, the script 5,852, and a build writes
-> a 1,815,735-byte `index.html` and a 4,806,337-byte `index-all.html`. `check_candidate`
-> no longer passes: it fails on stale text needles (`think-tn0j`). What remains here is
-> these notes, the instruments, and `transition-stats.json` and `stats-summary.md`,
-> which are frozen historical output, last regenerated at `0281a508` and compared with
-> nothing.
+> Later on #160 (`46b8f14e`), `check_workbench.py`, `check_legend.py` and
+> `check_revision7.py`, which the revisions below cite, were retired; their live
+> assertions run in `check_animate_view.py` and `animate_view_contract.py`, through
+> `check_frontend`. The line counts, byte sizes and timings in the table are that
+> build’s; at `f3874426` the template is 384 lines, the stylesheet 1,259, the script
+> 5,852, and a build writes a 1,815,735-byte `index.html` and a 4,806,337-byte
+> `index-all.html`. `check_candidate` no longer passes: it fails on stale text needles
+> (`think-tn0j`). What remains here is these notes, the instruments, and
+> `transition-stats.json` and `stats-summary.md`, which are frozen historical output,
+> last regenerated at `0281a508` and compared with nothing.
 
 ## What was built
 
