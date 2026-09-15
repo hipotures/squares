@@ -164,11 +164,30 @@ def seeks_anywhere(session: Session) -> str:
     return f"{swept['seeks']} seeks drawn"
 
 
+def seeds(session: Session) -> str:
+    """One seed replays, another differs, and a new seed stops a run it would orphan."""
+    runs = session.look("animate/seed-poses", n=26, at=0.55, seeds=[7, 8, 7])
+    session.require([run["seed"] for run in runs] == [7, 8, 7], f"setSeed did not take: {runs}")
+    session.require(runs[0]["poses"] == runs[2]["poses"], "seed 7 does not replay its poses")
+    session.require(runs[0]["poses"] != runs[1]["poses"], "seeds 7 and 8 draw the same poses")
+    run = session.look("animate/seed-during-run", n=17)
+    session.require(
+        run["before"]["playing"] and run["before"]["optimizing"],
+        f"the hand's run did not start, so the seed check tested nothing: {run}",
+    )
+    session.require(
+        not run["after"]["playing"] and not run["after"]["optimizing"],
+        f"a new seed left the page playing with no run behind it: {run['after']}",
+    )
+    return "seeds replay and a new seed ends the run"
+
+
 SECTIONS: tuple[Callable[[Session], str], ...] = (
     keyboard_ownership,
     gap_bar_through_dwell,
     colours_by_instant,
     seeks_anywhere,
+    seeds,
 )
 
 

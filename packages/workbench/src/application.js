@@ -4594,6 +4594,15 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     updateSegments();
     rafHandle = requestAnimationFrame(tick);
   }
+  // End an open-ended run. The clock stops with it: a run is what an optimising clock advances, so
+  // leaving the clock running after the run is gone plays whatever the timeline holds instead.
+  function endRun() {
+    if (state.optimizing || opt !== null) {
+      pause();
+      state.optimizing = false;
+      opt = null;
+    }
+  }
   function pause() {
     state.playing = false;
     markGapBar();
@@ -4840,14 +4849,19 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       return state.seed;
     }
     state.seed = k;
-    // A new seed is a new run: the staged arrangement and any cached trajectory belong to the
-    // old one.
-    if (state.optimizing) {
-      state.optimizing = false;
-      opt = null;
+    // A new seed is a new run: the staged arrangement and any open-ended run belong to the old one.
+    // The run is ended through `endRun`, so the clock stops with it rather than playing on with no
+    // run behind it; a Pack run starts again from its own start under the new seed. Trajectories
+    // are keyed by the seed, so the next frame reads the new seed's.
+    const running = state.optimizing && opt !== null;
+    endRun();
+    if (running && state.mode === "pack") {
+      state.optimizing = true;
+      opt = newOptimizer(state.initial);
     }
     markGapBar();
     stagePack();
+    updateSegments();
     render();
     return state.seed;
   }
