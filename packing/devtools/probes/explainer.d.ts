@@ -52,6 +52,20 @@ interface SquaresMathFirstPaint {
   required: SquaresFontRequirement[];
 }
 
+/**
+ * The KaTeX build the page inlines: its public `render`, which `check_math_faces` re-typesets
+ * with and the startup fixture stands in for, and the internal `__renderToDomTree`, whose box
+ * tree `compare_math_fonts` sums (`compare_math_fonts/types.d.ts` has that tree's shape).
+ */
+interface SquaresKatex {
+  render(expression: string, element: Element, options?: object): void;
+  __renderToDomTree(
+    expression: string,
+    options: { throwOnError: boolean; displayMode: boolean },
+  ): CompareMathFontsKatexTree;
+}
+
+declare var katex: SquaresKatex;
 declare var squaresMath: SquaresMathHost | undefined;
 declare var kpressMathText: KpressMathText | undefined;
 declare var __mathLoadControl: SquaresMathLoadControl | undefined;

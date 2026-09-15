@@ -1,5 +1,6 @@
-// The page globals `compare_math_fonts`'s probes read: the KaTeX build the variant page
-// inlines, through the internal entry point that returns its box tree before it is drawn.
+// The box tree KaTeX's internal `__renderToDomTree` returns before it is drawn, which
+// `compare_math_fonts`'s advance probe sums. The `katex` global itself is in
+// `probes/explainer.d.ts`.
 
 /** One node of KaTeX's box tree: a symbol carries its text and metric widths. */
 interface CompareMathFontsKatexNode {
@@ -13,12 +14,3 @@ interface CompareMathFontsKatexNode {
 interface CompareMathFontsKatexTree extends CompareMathFontsKatexNode {
   toNode(): Node;
 }
-
-interface CompareMathFontsKatex {
-  __renderToDomTree(
-    expression: string,
-    options: { throwOnError: boolean; displayMode: boolean },
-  ): CompareMathFontsKatexTree;
-}
-
-declare var katex: CompareMathFontsKatex;
