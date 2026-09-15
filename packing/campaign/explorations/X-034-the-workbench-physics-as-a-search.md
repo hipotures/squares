@@ -133,7 +133,7 @@ Across the 123,190 seeded runs of the repaired rounds, no run ended below 1e-5. 
 those, 9,000 are at level 0, where every seed of an `n` repeats one run.
 The deepest overlap before repair ranged from 0.002 to 0.118 of a side, with a median of
 0.083. These figures come from local copies of the rows, which are not retained, and
-`devtools.summarize_annealing --overlaps` recomputes them from regenerated rows.
+`workbench_tools.summarize_annealing --overlaps` recomputes them from regenerated rows.
 
 The overlap is built into the blind schedule.
 The walls close onto the known-best side while squares may overlap by up to 0.08, and
@@ -255,7 +255,7 @@ What this shows:
 
 - **Retained:** `packing/campaign/results/annealing/summaries.json`, which holds one
   median and one best-of-first-k ladder per cell, per run file.
-  `packing/devtools/summarize_annealing.py` wrote it.
+  `packages/workbench/tools/workbench_tools/summarize_annealing.py` wrote it.
   Cells marked `resolved: true` were scored on runs repaired to packings.
   Several files replay the same seeds, so their trial counts overlap.
 - **Not retained:** the per-trial rows, removed from the branch at `6e191a35` to keep
@@ -268,7 +268,7 @@ What this shows:
   contiguously from 0.
 - **Regenerable:** the [runbook](../results/annealing/README.md#what-is-retained) gives
   the commands that rewrite the rows and re-check them.
-  One file, `resolved-5k-a6.jsonl`, was regenerated on this branch and matched its
+  One file, `resolved-5k-a6.jsonl`, was regenerated on #155’s branch and matched its
   summary.
 - **Instrument:** these runs used `packing/devtools/bench_annealing.py`, which #160
   replaced with the package benchmark `squares-workbench-benchmark`

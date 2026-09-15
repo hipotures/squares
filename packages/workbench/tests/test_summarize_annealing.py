@@ -13,8 +13,8 @@ from pathlib import Path
 
 import pytest
 
-from devtools import summarize_annealing
-from devtools.summarize_annealing import overlaps, render, summarize, summarize_rows
+from workbench_tools import summarize_annealing
+from workbench_tools.summarize_annealing import overlaps, render, summarize, summarize_rows
 
 FIXTURES = Path(__file__).parent / "fixtures" / "annealing-rows"
 UNREPAIRED = FIXTURES / "20260912T012205-n11-bodies.jsonl"

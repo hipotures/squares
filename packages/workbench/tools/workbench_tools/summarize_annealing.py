@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 """Summarise the annealing benchmark's per-trial rows into `summaries.json`.
 
-    uv run --frozen --all-extras --group dev python -m devtools.summarize_annealing --check
-    uv run --frozen --all-extras --group dev python -m devtools.summarize_annealing --overlaps
-    uv run --frozen --all-extras --group dev python -m devtools.summarize_annealing \
+    uv run --frozen --all-extras --group dev squares-workbench-summarize-annealing --check
+    uv run --frozen --all-extras --group dev squares-workbench-summarize-annealing --overlaps
+    uv run --frozen --all-extras --group dev squares-workbench-summarize-annealing \
         --rows DIR --out PATH
 
-`devtools.bench_annealing` writes one JSON line per trial under
-`campaign/results/annealing/`. Those rows are not retained in Git: a round is tens of
-thousands of lines, and the first night's were 185 MB. Each round's recorded command
-regenerates its rows, and this tool turns them into the committed summary.
+The historical harness, `devtools.bench_annealing` at each round's recorded commit, wrote
+one JSON line per trial under `campaign/results/annealing/`. Those rows are not retained in
+Git: a round is tens of thousands of lines, and the first night's were 185 MB. Each
+round's recorded command, run at that commit, regenerates its rows, and this tool turns
+them into the committed summary. It moved from `packing/devtools/` into the workbench
+package on 2026-09-15; its output is unchanged.
 
 This is the code that wrote `summaries.json` on 2026-09-12 (`6e191a35`). It was run
 inline then and recovered from that session's transcript; what it computes is unchanged.
@@ -46,7 +48,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-ROOT = Path(__file__).resolve().parent.parent
+#: `packing/`, where the rows and the committed summaries live.
+ROOT = Path(__file__).resolve().parents[4] / "packing"
 ROWS = ROOT / "campaign/results/annealing"
 SUMMARIES = ROWS / "summaries.json"
 
@@ -54,9 +57,11 @@ SUMMARIES = ROWS / "summaries.json"
 #: stream, so one observation per k and not a distribution.
 BEST_OF = (1, 10, 100, 1000, 10_000)
 
-#: The deepest overlap, in unit sides, below which a final arrangement would count as a
-#: packing. Chosen, not measured: the snapped control that was said to set it was run once
-#: and never kept (`think-2ngs`).
+#: The deepest overlap, in unit sides, below which the historical rounds counted a final
+#: arrangement as a packing, kept so `--overlaps` reproduces the figures X-034 cites. Chosen,
+#: not measured: the snapped control said to set it was run once and never kept
+#: (`think-2ngs`). The package benchmark admits nothing at this value: it checks geometry
+#: under the workbench's validity contract, 1e-9 (`packing_contracts.py`).
 TOLERANCE = 1e-5
 
 Row = Mapping[str, Any]

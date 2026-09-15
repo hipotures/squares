@@ -12,8 +12,8 @@ defines the experimental comparison.
 
 `summaries.json` holds one entry per run file: the median `closed` and the best of the
 first k runs, per cell.
-[`devtools/summarize_annealing.py`](../../../devtools/summarize_annealing.py) wrote it
-from the per-trial rows, and rebuilds it from them.
+[`packages/workbench/tools/workbench_tools/summarize_annealing.py`](../../../../packages/workbench/tools/workbench_tools/summarize_annealing.py)
+wrote it from the per-trial rows, and rebuilds it from them.
 
 - **Cells marked `resolved: true`** were scored on runs repaired to packings.
   They are the only cells any finding may cite.
@@ -40,8 +40,8 @@ From `packing/`, naming the file as its `summaries.json` entry does:
 uv run --frozen --all-extras --group dev python -m devtools.bench_annealing \
     --n 5 10 11 17 26 29 --seeds 5000 --anneal 6 --budget 3600 \
     --out campaign/results/annealing/resolved-5k-a6.jsonl
-uv run --frozen --all-extras --group dev python -m devtools.summarize_annealing --check
-uv run --frozen --all-extras --group dev python -m devtools.summarize_annealing --overlaps
+uv run --frozen --all-extras --group dev python -m workbench_tools.summarize_annealing --check
+uv run --frozen --all-extras --group dev python -m workbench_tools.summarize_annealing --overlaps
 ```
 
 `--check` compares each run file present with its committed entry and says how many it
