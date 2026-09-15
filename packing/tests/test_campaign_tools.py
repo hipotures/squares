@@ -1010,3 +1010,35 @@ def test_a_commit_dated_in_the_future_is_reported_rather_than_trusted() -> None:
     assert skewed.certified, "ordinary host skew must not cost coverage"
     assert not forged.certified
     assert "dated ahead of this host's clock" in forged.source
+
+
+def test_board_refuses_an_idea_number_that_two_rows_claim() -> None:
+    """Two branches can each take the next free idea number, and a merge keeps both
+    rows. Main and the annealing branch shared ideas 119 to 123 through two merges, and
+    the id reconciliation saw nothing wrong because the rows name different hypotheses."""
+    board = """\
+## Main's ideas
+
+| # | Idea | Status | H | Crux |
+| --- | --- | --- | --- | --- |
+| 4a | a lettered idea | registered | [H-001](x.md) | crux |
+| 119 | main's idea | registered | [H-125](x.md) | crux |
+
+## The branch's ideas
+
+| # | Idea | Status | H | Crux |
+| --- | --- | --- | --- | --- |
+| 4 | not the same idea as 4a | registered | [H-002](x.md) | crux |
+| 119 | the branch's idea | registered | [H-201](x.md) | crux |
+
+| 120 | a row the formatter split from its table | registered |
+[H-202](x.md) | crux
+|
+
+| n | side |
+| --- | --- |
+| 120 | a numbered row that is not an idea |
+"""
+
+    assert ledger.idea_number_collisions(board) == ["ideas.md: idea 119 is numbered on 2 rows"]
+    assert ledger.idea_number_collisions(board.replace("| 119 | the", "| 175 | the")) == []
