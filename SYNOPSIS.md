@@ -138,8 +138,8 @@ hypothesis status and summarizes experiment verdicts, and the
 | Record | Count | State at the cutoff |
 | --- | ---: | --- |
 | Agendas | 35 | 15 active; 14 completed; 5 paused; 1 superseded |
-| Commitments | 343 | 177 complete; 59 stopped; 64 blocked; 16 ready; 20 tentative; 7 in progress |
-| Sessions | 133 | 84 completed; 49 stopped; all terminal |
+| Commitments | 343 | 177 complete; 59 stopped; 64 blocked; 15 ready; 20 tentative; 8 in progress |
+| Sessions | 134 | 84 completed; 49 stopped; 1 nonterminal |
 | Explorations | 29 | 17 linked to proposed hypotheses; 12 uncodified |
 | Hypotheses | 138 | 25 confirmed; 24 refuted; 48 blocked; 10 unresolved; 2 open; 26 open questions; 2 result registered; 1 abandoned; 0 running |
 | Experiments | 116 | 38 accepted; 29 rejected; 25 unresolved; 11 baseline; 11 blocked; 2 abandoned; 0 in progress |
@@ -206,10 +206,11 @@ The current order is:
    Its source inventories found no complete 80-stratum negative-root producer, matched
    exact baseline, conditional gate, or method-distinct replay.
    No target ran and no physical root closed.
-2. Run BC-343 / `think-a1e8` as the sole next entry.
-   Its first PR is a no-target Route S admission: freeze the unmodified T-025/T-026
-   control, an at-most-23-orbit ceiling or another quantitative metric, one candidate
-   family, mutation controls, and its accept-or-park rule before optimization.
+2. BC-343 / `think-a1e8` is the active entry.
+   Its first PR is a no-target Route S admission: freeze T-025 as the matched control,
+   T-026 as a support and rescaling sentinel, the at-most-23-orbit ceiling, one
+   fixed-support family, mutation controls, and its accept-or-park rule before
+   optimization.
 3. Treat A, S, global angular resources, and B as the first advisory tier.
    A is the strongest route to a material `n = 11` lower bound; S is the best bounded
    deliverable; angular resources offer a cheap optimal-face screen; and B is the
@@ -876,8 +877,13 @@ controller, not permission to blur contracts.
 
 ### Current Handoff
 
+[Session 134](packing/campaign/agent-sessions/session-134-n11-route-s-admission.md) is
+the active handoff on merged main revision `5ce2839f17b2f5a337260dc3f649e05ab974bd25`.
+It begins BC-343 with a no-target W7 admission of one fixed-support T-025 compression
+family, its exact provenance and complexity metrics, a deterministic decompressor, and
+target-blind controls.
 [Session 133](packing/campaign/agent-sessions/session-133-n11-route-a-admission.md) is
-the latest terminal handoff.
+the latest terminal predecessor.
 It began BC-354 from post-W5 planning merge `a9de8a705d785e5b7b6ac46f28c11b6f5a45d7c6`,
 after
 [Session 132](packing/campaign/agent-sessions/session-132-n11-post-w5-route-selection.md)
@@ -892,12 +898,12 @@ The scientific evidence cutoff remains main revision
 `80bcdbb0819504354e1278c37f211dd8cc2158fb`, where the latest merged stack is green and
 the T-026 lower bound remains the frontier.
 
-**Selected next entry:** `think-a1e8`, the BC-343 Route S admission phase.
+**Selected next entry:** `think-a1e8`, the active BC-343 Route S admission phase.
 
 BC-340, BC-353, and BC-354 are terminal.
 BC-341 remains tentative behind a future W10 reselection and the named Route A
 representation gaps.
-BC-343 begins with a separate no-target PR that freezes Route S’s complexity metric,
+BC-343 is running a separate no-target PR that freezes Route S’s complexity metric,
 candidate family, controls, and verdict rules.
 No scientific compression target has execution authority before that admission PR
 merges.

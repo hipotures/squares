@@ -353,30 +353,31 @@ agenda:
     purpose: research
     owner_focus: insight
     instances: [11]
-    state: ready
+    state: in_progress
     priority: 0
     question: >-
-      Can the T-025/T-026 witness at side 3.82 be compressed into a small exact
-      certificate described by a few D4-orbit, weight, and tight-cell templates?
+      Can the T-025 witness at side 3.82 be compressed into a small exact certificate
+      described by a few D4-orbit, weight, and geometric templates?
     budget: >-
       First, one separate no-target admission PR freezes T-025 as the control, an
       at-most-23 active-orbit ceiling or another independently quantified complexity
       metric, one sparse or quantized template family, mutation controls, and an
       accept-or-park rule. Only a later fresh branch may optimize and replay a candidate.
     entry: >-
-      BC-354 stops at the Route A representation boundary, and the unmodified T-025/T-026
-      receipt is available as the Route S control.
+      BC-354 stops at the Route A representation boundary, T-025 is available as the
+      matched Route S control, and T-026 is available as a support and rescaling
+      provenance sentinel.
     exit: >-
       A fivefold reduction in orbit representatives or comparable independent geometric
       complexity, with a human-statable generating rule and exact replay, or a recorded
       obstruction that parks the selected template family.
     bead: think-a1e8
-    depends_on: [BC-353]
+    depends_on: [BC-354]
     next_evidence: >-
       Open a separate no-target admission PR that freezes the unmodified control, the
       at-most-23 orbit ceiling or another predeclared metric, one template family,
       mutation controls, and an accept-or-park rule before changing any atom.
-    workflows: [insight-iteration, research-loop]
+    workflows: [pipeline-improvement, factual-review, research-loop]
     program: n11-strategy-reset
     parallel_group: proof-simplification
   - id: BC-344
