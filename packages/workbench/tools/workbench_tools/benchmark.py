@@ -49,6 +49,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import TYPE_CHECKING, TextIO, cast
 
+from workbench_tools.probes import probe
 from workbench_tools.trial_records import (
     AttemptFailure,
     AttemptFailureReason,
@@ -101,8 +102,12 @@ TOLERANCES = {"exact": 0.0001, "close": 0.1, "near": 1.0}
 BEST_OF = (1, 10, 100, 1000, 10_000)
 
 
-PROBE_EXPRESSION = "(options) => SquaresWorkbenchBench.runTrial(options)"
-GUARD_EXPRESSION = "() => SquaresWorkbenchBench.guard()"
+#: The page-side calls, as probe files under `probes/benchmark/`, not JavaScript strings here.
+BENCHMARK_PROBES = {
+    "ready": "benchmark/page-api-ready",
+    "guard": "benchmark/guard",
+    "trial": "benchmark/run-trial",
+}
 
 
 def _launch(playwright: Playwright) -> Browser:
@@ -294,9 +299,9 @@ def run_trials(run: Run) -> RunResult:
             page_errors: list[str] = []
             page.on("pageerror", lambda error: page_errors.append(str(error)))
             page.goto(PAGE.as_uri())
-            page.wait_for_function("window.atlasTransitions !== undefined", timeout=60_000)
+            page.wait_for_function(probe(BENCHMARK_PROBES["ready"]), timeout=60_000)
             page.add_script_tag(path=str(benchmark_bundle))
-            guard: object = page.evaluate(GUARD_EXPRESSION)
+            guard: object = page.evaluate(probe(BENCHMARK_PROBES["guard"]))
             if not isinstance(guard, dict):
                 raise TypeError("the benchmark guard returned a malformed receipt")
             receipt = cast(dict[str, object], guard)
@@ -312,7 +317,7 @@ def run_trials(run: Run) -> RunResult:
 
             def evaluate(options: dict[str, object]) -> object:
                 try:
-                    return page.evaluate(PROBE_EXPRESSION, options)
+                    return page.evaluate(probe(BENCHMARK_PROBES["trial"]), options)
                 except PlaywrightError as error:
                     raise ProbeCallError(str(error)) from error
 

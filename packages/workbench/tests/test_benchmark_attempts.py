@@ -15,6 +15,7 @@ import pytest
 
 from devtools.known_structure import record
 from workbench_tools import benchmark as bench
+from workbench_tools.probes import probe
 from workbench_tools.trial_records import (
     AttemptFailure,
     EffectiveConfiguration,
@@ -394,3 +395,13 @@ def test_a_missing_page_names_the_build_command_that_exists(
     output = capsys.readouterr().out
     assert "squares-workbench-build" in output
     assert "devtools" not in output
+
+
+def test_the_harness_drives_the_page_only_through_probe_files() -> None:
+    source = Path(bench.__file__).read_text(encoding="utf-8")
+    for call in ("page.wait_for_function(", "page.evaluate(", ".add_init_script("):
+        for line in source.splitlines():
+            if call in line:
+                assert "probe(" in line, line
+    for name in bench.BENCHMARK_PROBES.values():
+        assert probe(name).strip()
