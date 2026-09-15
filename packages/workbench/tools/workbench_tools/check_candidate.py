@@ -1,18 +1,21 @@
 #!/usr/bin/env python3
-"""Checks for the v2 transition candidate. Run with packing/.venv/bin/python3.
+"""Checks for the v2 transition candidate. From `packing/`:
 
-    packing/.venv/bin/python3 test_candidate.py
+    uv run --frozen --all-extras --group dev python -m workbench_tools.check_candidate
 
 Asserts byte-identical regeneration on two runs, that every correspondence is a
 bijection from n into n+1 with exactly one unmatched square, that the five
 shared-picture pairs and every grid-to-grid pair are recognised as such, and that
-index.html never references the network.
+index.html never references the network. Everything is checked on fresh builds in a
+temporary directory. The copies of `transition-stats.json` and `stats-summary.md` kept
+under `packing/atlas/known-best/video/spikes/v2-transitions/` are frozen historical output,
+and nothing here compares them with a build.
 
 Revision 2 adds: the facts carry the poster's badges (only its vocabulary), the star
 and the open list exactly as the composite record states them; each pair knows the
 square that arrived in the pair before; the star polygon matches the atlas source;
 scarlet is defined once in the page; and, in the headless shell, the progress bar is
-a pure function of the clock, the two facts layers are never visible together, and
+a pure function of the clock, each facts layer reads its own n before the arrival, and
 the scarlet mark sits where the requests put it.
 
 Revision 3 adds: the `n =` line sits above the numeral (132 px) and shares its left
@@ -126,8 +129,9 @@ def digest(path: Path) -> str:
 def build(out: Path) -> None:
     # Nothing in the build is a BLAS call, and on a loaded host OpenBLAS's idle thread pool
     # roughly doubles the wall time; one thread costs nothing and changes no byte.
+    # `--all` writes index-all.html, which the type-and-fit and colour sweeps run over.
     subprocess.run(
-        [str(PYTHON), "-m", "workbench_tools.build_candidate", "--out", str(out)],
+        [str(PYTHON), "-m", "workbench_tools.build_candidate", "--out", str(out), "--all"],
         check=True,
         capture_output=True,
         env={**os.environ, "OPENBLAS_NUM_THREADS": "1"},
@@ -798,21 +802,12 @@ def browser_checks(page_path: Path, check) -> None:
                 first == page.evaluate(probe("candidate/stage_html")), "seek is not idempotent"
             )
 
-            # The panel's text never cross-dissolves over itself: at no instant are both
-            # layers visible.
-            # Checked in the default staging and in the unstaged mode, whose roll starts later.
+            # Each facts layer reads its own n just before the arrival, in the default staging
+            # and in the unstaged mode, whose roll starts later. The two layers are both shown
+            # now and hand over slot by slot, so their opacities are not compared.
             for phase in ("add-then-move", "simultaneous"):
                 page.evaluate(probe("candidate/set_phase"), {"phase": phase})
                 schedule = page.evaluate(probe("candidate/schedule"))
-                samples = 60
-                for k in range(samples + 1):
-                    t = schedule["arrive"] - 0.05 + (schedule["roll"] + 0.1) * k / samples
-                    page.evaluate(probe("candidate/seek"), {"t": t})
-                    a, b = page.evaluate(probe("candidate/facts_opacities"))
-                    check(
-                        min(a, b) == 0.0,
-                        f"{phase}: both facts layers visible at t={t:.3f}: {a:.3f} and {b:.3f}",
-                    )
                 page.evaluate(probe("candidate/seek"), {"t": schedule["arrive"] - 0.01})
                 check(
                     page.evaluate(probe("candidate/text_of"), {"selector": "#facts-a .n-val"})
@@ -1656,7 +1651,7 @@ def main() -> int:
         "add-then-move the default, styles B and C ending on n+1's poses, "
         "the new square in before anything moves, blocks rigid mid motion, "
         "n-line above the numeral, "
-        "lower-bound slots fixed, progress bar clock-pure, facts layers never overlap, "
+        "lower-bound slots fixed, progress bar clock-pure, each facts layer on its own n, "
         f"scarlet mark on schedule, every fill in the {SHADE_HUES}x{SHADE_STEPS} "
         f"angle-map shade table; "
         f"type scale {'/'.join(map(str, TYPE_SCALE))}, "
