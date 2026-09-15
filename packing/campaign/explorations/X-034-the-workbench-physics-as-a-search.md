@@ -108,8 +108,9 @@ can need. That was the signal that something was wrong, and it was missed.
 The check that exposed it is a separating-axis test over the final poses, computed in
 the harness rather than read from the simulation.
 It reports the deepest overlap between any two squares.
-The tolerance comes from a control: a snapped run ends on the record’s own poses, so
-whatever it scores is float noise.
+The tolerance is chosen.
+Beside it is one observation of a control: a snapped run ends on the record’s own poses,
+so whatever it scores is float noise.
 
 | mode | n = 5 | n = 11 | n = 17 |
 | --- | ---: | ---: | ---: |
@@ -117,8 +118,9 @@ whatever it scores is float noise.
 | free | 3.9e-5 | 4.5e-5 | 3.1e-2 |
 | blind | 8.4e-2 | 3.5e-2 | 8.6e-2 |
 
-Two orders of magnitude separate the control from the smallest real overlap, so the
-harness uses 1e-5 of a unit side.
+The harness uses 1e-5 of a unit side: ten times the largest snapped value, a factor of
+3.9 below the smallest free value, and more than three orders of magnitude below every
+blind value in the table.
 The snap and free rows came from a variant of the probe that was run once and not kept;
 the committed harness runs blind only, so the control is a recorded observation rather
 than a reproducible one.

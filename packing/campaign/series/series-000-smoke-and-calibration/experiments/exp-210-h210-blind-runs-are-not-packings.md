@@ -19,8 +19,8 @@ experiment:
     engine_commit: d3c3a778
     assurance: numerically-checked
     method: numerical-f64
-    tolerance: 1e-5 of a unit side of deepest pairwise overlap, taken from the snapped run's
-      own float noise rather than chosen
+    tolerance: 1e-5 of a unit side of deepest pairwise overlap, chosen; the snapped observation
+      beside it was run once and not kept (think-2ngs)
     host_system: macOS on Apple silicon, one headless Chromium
     selftest_passed: true
     precision:
@@ -36,7 +36,8 @@ experiment:
     role: target
   method:
     operator: claude-opus-5, unattended
-    control: the snapped trajectory, which ends on the record's poses by construction
+    control: none retained; the snapped trajectory, which ends on the record's poses by
+      construction, was measured once with a probe variant that was not kept (think-2ngs)
     candidate: the blind trajectory, which starts from the previous record and is not given the
       destination poses
     trials: 15000
@@ -104,7 +105,7 @@ harness, without using the simulation’s own bookkeeping.
 The page’s `maxPenetration` is a running maximum over the whole trajectory and says
 nothing about where the squares stopped.
 
-## The Control Sets the Tolerance
+## A Chosen Tolerance Beside an Unretained Control
 
 | mode | n = 5 | n = 11 | n = 17 |
 | --- | ---: | ---: | ---: |
@@ -115,8 +116,9 @@ nothing about where the squares stopped.
 The snapped row is the float noise the stored poses carry.
 The snap and free rows came from a variant of the probe that was run once and not kept.
 The committed harness runs blind only, so this control is recorded, not reproducible.
-Two orders of magnitude separate it from the smallest real overlap, so a tolerance of
-1e-5 refuses overlaps without refusing arithmetic.
+The tolerance, 1e-5 of a side, was chosen rather than derived from it.
+It is ten times the largest snapped value and a factor of 3.9 below the smallest free
+value; the blind values are more than three orders of magnitude above it.
 
 ## Result
 

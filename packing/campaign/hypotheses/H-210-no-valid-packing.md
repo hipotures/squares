@@ -22,8 +22,8 @@ hypothesis:
   instrument: packing/devtools/bench_annealing.py
   instrument_ready: true
   regime: >-
-    the workbench's simulation in blind mode; the snapped mode is valid by construction and
-    is the control that sets the tolerance
+    the workbench's simulation in blind mode; the tolerance is chosen, and the snapped mode,
+    valid by construction, was observed once beside it and not kept (think-2ngs)
   instance: {axis: n, point: 11}
   sweep: {axis: n, points: [5, 10, 11, 17, 26, 29]}
   priority: 1
@@ -37,8 +37,8 @@ hypothesis:
 Every blind run observed ended with squares overlapping: in 123,190 runs of the repaired
 rounds, whose rows are not retained, the deepest overlap before repair ranged from 0.002
 to 0.118 of a unit side.
-A separating-axis test measured it over the final poses, with a tolerance taken from the
-snapped control
+A separating-axis test measured it over the final poses, against a chosen tolerance of
+1e-5
 ([exp-210](../series/series-000-smoke-and-calibration/experiments/exp-210-h210-blind-runs-are-not-packings.md)).
 The trials were not kept, so this is an observation to re-measure rather than a result.
 

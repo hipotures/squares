@@ -18,7 +18,8 @@ experiment:
     engine_commit: e9d13c1d
     assurance: numerically-checked
     method: numerical-f64
-    tolerance: 1e-5 of a unit side of deepest pairwise overlap, measured from the snapped control
+    tolerance: 1e-5 of a unit side of deepest pairwise overlap, chosen; the snapped observation
+      beside it was run once and not kept (think-2ngs)
     host_system: macOS on Apple silicon, one headless Chromium
     selftest_passed: true
     precision:
