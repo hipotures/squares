@@ -15,6 +15,10 @@ from workbench_tools.build_site import build
 from workbench_tools.probes import probe
 
 FIXTURE = Path(__file__).resolve().parents[2] / "tests/fixtures/packing-animation-v1.json"
+#: Within what the box's side counts as the best known side the gap bar shows: the catalogue's
+#: declared stored precision (`CATALOGUE_PRECISION.penetrationTolerance`), because the bar's
+#: record is the six-decimal fact and the box's side the frame's nine-decimal side.
+CATALOGUE_TOLERANCE = 4e-6
 
 
 def check(page_path: Path, screenshots: Path | None = None) -> str:
@@ -201,6 +205,51 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
         call("select", 5)
         fill = at(call("duration", 5))
         require(fill[0] == fill[1] == 3, f"a grid fill changed the box: {fill}")
+
+        # Green means one thing. The box locks, and its pointer with it, only where it rests at
+        # the best known side of the n the gap bar describes, within the validity contract's
+        # tolerance, and never while it is on its way: through a move only a step whose box
+        # does not change size stays green. Every step rests locked in its dwell and at its end.
+        # Swept over every step under the tween, and under physics at the steps into 6 and 12,
+        # where the moving container breathes past the record.
+        into = {pair["n"] + 1: index for index, pair in enumerate(call("pairs"))}
+        sweeps = [
+            ("tween", None, [0.1, 0.21, 0.25, 0.5, 0.9]),
+            ("physics", [into[6], into[12]], [0.25, 0.5, 0.9]),
+        ]
+        misread: list[str] = []
+        sampled = 0
+        for style, indices, fractions in sweeps:
+            rows = page.evaluate(
+                probe("stage/box-locks"),
+                {"indices": indices, "style": style, "fractions": fractions},
+            )
+            steps: dict[int, list[dict[str, Any]]] = {}
+            for row in rows:
+                steps.setdefault(row["index"], []).append(row)
+            for step_rows in steps.values():
+                resting = all(row["side"] == step_rows[0]["side"] for row in step_rows)
+                for row in step_rows:
+                    sampled += 1
+                    at_record = abs(row["side"] - row["record"]) <= CATALOGUE_TOLERANCE
+                    label = (
+                        f"{style} {row['n']} -> {row['n'] + 1} {row['phase']} t={row['t']:.3f}"
+                    )
+                    if row["green"] != row["pointer"]:
+                        misread.append(
+                            f"{label}: box green {row['green']}, pointer {row['pointer']}"
+                        )
+                    elif row["phase"] != "move" and not row["green"]:
+                        misread.append(f"{label}: not locked at rest ({row})")
+                    elif row["green"] and not (
+                        at_record and (row["phase"] != "move" or resting)
+                    ):
+                        misread.append(f"{label}: locked on its way or off the record ({row})")
+        require(
+            not misread,
+            f"the box or its pointer misreads its lock in {len(misread)} of {sampled} samples: "
+            + "; ".join(misread[:6]),
+        )
 
         initial = call("importAnimation", FIXTURE.read_text(encoding="utf-8"))
         require(initial["active"] and initial["n"] == 2, "import did not activate n = 2")

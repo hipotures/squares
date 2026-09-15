@@ -24,6 +24,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     select: selectNode,
   } = workbenchBundle.dom.createDom(document);
   const {
+    PACKING_VALIDITY,
     assessCataloguePrecisionFrame,
     assessPackingSnapshot,
     mixUint32Seed,
@@ -4112,10 +4113,17 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     boxRect.setAttribute("width", String(box));
     boxRect.setAttribute("height", String(box));
     boxSide = box;
-    // Locked means at the best known side of the n on show: n's through the dwell, n + 1's after.
-    // A box on its way up can pass through n + 1's side, but not to within a billionth of it.
-    const best = t <= sc.moveStart ? from : to;
-    boxLocked = !optimizing && Math.abs(box - best) <= 1e-9 * best;
+    // **Locked means at rest at the best known side of the n on show.** The n on show is
+    // `state.liveN`, the one the panel and the gap bar describe. Through a move the box is on its
+    // way to the room n + 1 needs, and where that room is n + 1's own best known side the box
+    // reaches it a fifth of the way in, while the squares still move and the bar still shows n:
+    // keyed to n + 1 from the move's start, 16 steps turned green there (#171 R2), and under
+    // physics 5 -> 6 flickered as the container breathed past it. So through a move the box locks
+    // only on a step whose box does not change size, a grid fill, where it rests from end to end.
+    const best = FRAMES[String(state.liveN)].side;
+    const resting = t <= sc.moveStart || t >= sc.moveEnd || (from === to && open === to);
+    boxLocked =
+      !optimizing && resting && Math.abs(box - best) <= PACKING_VALIDITY.penetrationTolerance;
     boxRect.setAttribute("stroke", boxLocked ? MET : "#000000");
   }
 
