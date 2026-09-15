@@ -255,6 +255,36 @@ def drag_ends(session: Session) -> str:
     return "a drag always ends"
 
 
+def drag_past_walls(session: Session) -> str:
+    """A square dragged past the walls with a real mouse stays under the cursor."""
+    page = session.page
+    poses = session.look("animate/rest-poses", n=17)
+    index = max(range(len(poses)), key=lambda i: poses[i][0])
+    x, y = session.look("stage/screen-of", index=index)
+    page.mouse.move(x, y)
+    page.mouse.down()
+    for k in range(1, 11):
+        page.mouse.move(x + 15 * k, y)
+    for k in range(10):
+        page.mouse.move(x + 150 + (1 if k % 2 == 0 else 0), y)
+    held = session.look("stage/screen-of", index=index)
+    away = math.dist(held, (x + 150, y))
+    session.require(
+        session.look("animate/hand")["held"] == index,
+        f"the drag did not hold square {index}, so the check tested nothing",
+    )
+    session.require(
+        away < 3, f"a square dragged past the wall is {away:.1f} px from the cursor"
+    )
+    page.mouse.up()
+    session.require(
+        session.look("animate/hand") == {"held": -1, "dragging": False},
+        f"release did not end the drag: {session.look('animate/hand')}",
+    )
+    session.api(("pause",), ("seek", 0))
+    return "a dragged square stays under the cursor"
+
+
 SECTIONS: tuple[Callable[[Session], str], ...] = (
     keyboard_ownership,
     gap_bar_through_dwell,
@@ -264,6 +294,7 @@ SECTIONS: tuple[Callable[[Session], str], ...] = (
     scope,
     transport_loop,
     drag_ends,
+    drag_past_walls,
 )
 
 

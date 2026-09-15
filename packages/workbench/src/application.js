@@ -3187,6 +3187,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     grabAngle = Math.atan2(py - o.Y[i], px - o.X[i]);
     grabTH = o.TH[i];
     grabRotating = false;
+    // A new hold takes its own view, whatever an earlier hold that never let go left behind.
+    heldView = null;
     updateSegments();
     render();
     return i;
@@ -3613,20 +3615,35 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // walls are at, and the view sized to hold whichever of the box and the record is wider so the
   // picture does not breathe as the walls close. The fills are the pair's own, drained while the run
   // is going and locked back in on pause, as they are for the step animation.
+  //: The view a held square is dragged in, taken when it is picked up; null while nothing is held.
+  /** @type {{x: number, y: number, size: number} | null} */
+  let heldView = null;
   function renderOptimizeScene(p, _A, B) {
     const o = opt;
     const side = o.side;
-    // The view covers the walls and the squares both, so a square held outside the box stays on the
-    // stage instead of vanishing off the edge of it.
+    // The view covers the walls and the squares both, so a square let go outside the box stays on
+    // the stage instead of vanishing off the edge of it.
     const lox = Math.min(0, o.bx0),
       hix = Math.max(side, o.bx1);
     const loy = Math.min(0, o.by0),
       hiy = Math.max(side, o.by1);
     const span = Math.max(hix - lox, hiy - loy, B.side);
-    const view = span * (1 + 2 * PAD);
+    const size = span * (1 + 2 * PAD);
     const midX = (lox + hix) / 2,
       midY = (loy + hiy) / 2;
-    svg.setAttribute("viewBox", `${midX - view / 2} ${-midY - view / 2} ${view} ${view}`);
+    let view = { x: midX - size / 2, y: -midY - size / 2, size };
+    // **While a square is held, the view holds still** (#125 F6). Re-fitted on every frame, it moved
+    // under the cursor: the pointer is mapped through the view just drawn, a square past a wall
+    // widens that view, the same pixel then maps further out, and the square ran away from the
+    // hand -- a 65 px drag took it from x 4.5 to 29, and ten one-pixel jiggles to 124. So the view is
+    // taken when the square is picked up and kept until it is let go, when it catches up.
+    if (o.held >= 0) {
+      heldView ??= view;
+      view = heldView;
+    } else {
+      heldView = null;
+    }
+    svg.setAttribute("viewBox", `${view.x} ${view.y} ${view.size} ${view.size}`);
     containerRect.setAttribute("width", String(side));
     containerRect.setAttribute("height", String(side));
     sceneSide = side;
