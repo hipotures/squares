@@ -64,12 +64,6 @@ allowlist:
   - path: packing/devtools/check_math_startup.py
     sites: 5
     bead: think-3pox
-  - path: packing/devtools/check_print_layout.py
-    sites: 37
-    bead: think-3pox
-  - path: packing/devtools/inspect_explainer_typography.py
-    sites: 27
-    bead: think-3pox
   - path: packing/devtools/prepare_explainer_math.py
     sites: 51
     bead: think-3pox
@@ -78,9 +72,6 @@ allowlist:
     bead: think-3pox
   - path: packing/tests/test_browser_floor_contract.py
     sites: 2
-    bead: think-3pox
-  - path: packing/tests/test_check_print_layout.py
-    sites: 18
     bead: think-3pox
   - path: packing/tests/test_check_published_site.py
     sites: 1
