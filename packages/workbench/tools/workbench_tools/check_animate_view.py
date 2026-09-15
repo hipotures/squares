@@ -540,6 +540,30 @@ def headline_space(session: Session) -> str:
     return "the headline is centred under the container"
 
 
+def capture_baseline(session: Session) -> str:
+    """The capture tools' shared baseline starts from any view and lands on the catalogue."""
+    session.page.locator("#mode-pack").click()
+    try:
+        prepared = session.look(
+            "capture/control", prepare=True, capture=False, read=["state", "duration"]
+        )
+    except Exception as error:  # noqa: BLE001 - the refusal is the finding
+        session.failures.append(f"the capture baseline cannot start from Pack: {error}")
+        session.enter_animate()
+        return "capture baseline refused"
+    state = prepared["state"]
+    session.require(
+        (state["aspect"], state["n"] + 1, state["t"], state["playing"], state["capture"])
+        == ("animate", 17, 0, False, False),
+        f"the capture baseline is not Animate at the step into 17, paused at 0: {state}",
+    )
+    session.require(
+        session.page.locator("#mode-animate").get_attribute("aria-pressed") == "true",
+        "the capture baseline did not show the Animate tab as the page's view",
+    )
+    return "the capture baseline reaches Animate from Pack"
+
+
 SECTIONS: tuple[Callable[[Session], str], ...] = (
     keyboard_ownership,
     gap_bar_through_dwell,
@@ -554,6 +578,7 @@ SECTIONS: tuple[Callable[[Session], str], ...] = (
     headline_roll,
     headline_space,
     stage_says_only_facts,
+    capture_baseline,
 )
 
 
