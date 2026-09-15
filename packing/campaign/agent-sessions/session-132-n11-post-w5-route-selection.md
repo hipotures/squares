@@ -165,7 +165,12 @@ session:
   - The branch base is merged W5 revision cdb088142f596c468b910a6d44c7915e26ea02e1.
   - No scientific target, solver, search, or verifier has run in BC-353.
   - Three independent Astra Max reviews covered all ten routes and transferable small-n opportunities.
-  - 'full gate: fast at 807f0dcca7dc2a9cf651e78bb8b234fcccb65c38: all scientific and mergeability lanes passed; validate found only the expected missing live-session receipt, supplied at terminal closeout (GitHub Actions run 34920175787)'
+  - 'full gate: fast at 0489f56e13f25153aa767fd04f8cc196209939a6: passed'
+  - 'full gate: fast at 807f0dcca7dc2a9cf651e78bb8b234fcccb65c38: failed'
+  - >-
+    PR 176 entry run 34920175787 passed every scientific, portability, and mergeability
+    lane; validation found only the expected missing live-session receipt, which the
+    terminal closeout supplies.
   resource_rollups:
   - packing/campaign/resource-usage/codex-task-tree-session-132.yaml
   stop_reason: >-
