@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { formatSearchSummary } from "../src/app/search-panel.ts";
+import { createBrowserSearchPlan } from "../src/api/search-api.ts";
+import { formatSearchSummary, searchRunFailure } from "../src/app/search-panel.ts";
+import { createPackSearchRunner } from "../src/search/pack-runner.ts";
+import { runSearchPlan, SearchObserverError } from "../src/search/scheduler.ts";
 import type { SearchCohortSummary } from "../src/search/summary.ts";
 
 function cohort(overrides: Partial<SearchCohortSummary>): SearchCohortSummary {
@@ -83,4 +86,37 @@ test("the Search summary gives each cohort its own line", () => {
         "0 physics steps, 0 repair iterations; best objective by block: none",
     ],
   );
+});
+
+test("an observer failure leaves the panel the outcomes collected so far", async () => {
+  const plan = createBrowserSearchPlan({
+    n: 1,
+    seeds: [0, 1],
+    physicsSteps: 1,
+    proposal: "grid",
+    repair: false,
+  });
+  const error: unknown = await runSearchPlan(plan, createPackSearchRunner({ batchSteps: 1 }), {
+    now: () => 0,
+    onOutcome: () => {
+      throw new Error("redraw failed");
+    },
+  }).then(
+    () => null,
+    (failure: unknown) => failure,
+  );
+  assert.ok(error instanceof SearchObserverError, String(error));
+  assert.deepEqual(searchRunFailure(error), {
+    ledger: error.outcomes,
+    message:
+      "Search stopped: redraw failed. Export the ledger to keep its finished slots; resuming it runs the rest.",
+  });
+  assert.deepEqual(
+    error.outcomes.outcomes.map(({ status }) => status),
+    ["completed", "not-started"],
+  );
+  assert.deepEqual(searchRunFailure(new RangeError("bad seeds")), {
+    ledger: null,
+    message: "Search could not run: bad seeds",
+  });
 });

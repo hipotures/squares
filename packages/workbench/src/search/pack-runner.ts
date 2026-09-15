@@ -635,8 +635,10 @@ export function createPackSearchRunner(context: PackSearchContext = {}): SearchT
     const bestObserved =
       receipt.best === null ? null : packingState(assessPackingSnapshot(receipt.best, slot.n));
     await yieldControl();
+    // A requested repair always calls Resolve, which reports `cancelled` itself when the slot was
+    // cancelled first, so the receipt never says repair was not requested when it was.
     const repairReceipt =
-      decoded.repair.kind === "none" || control.cancellationReason() !== null
+      decoded.repair.kind === "none"
         ? null
         : resolvePacking(
             raw.snapshot,

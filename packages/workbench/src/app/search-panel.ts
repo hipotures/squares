@@ -1,9 +1,13 @@
-import { createBrowserSearchPlan, parseBrowserSearchSeeds } from "../api/search-api.ts";
+import {
+  browserSearchSource,
+  createBrowserSearchPlan,
+  parseBrowserSearchSeeds,
+} from "../api/search-api.ts";
 import type { SearchOutcome, SearchOutcomes, SearchPlan } from "../search/contracts.ts";
 import { selectedSearchState } from "../search/contracts.ts";
 import { decodeSearchOutcomes, encodeSearchOutcomes, statusCounts } from "../search/outcomes.ts";
 import { createPackSearchRunner } from "../search/pack-runner.ts";
-import { runSearchPlan } from "../search/scheduler.ts";
+import { runSearchPlan, SearchObserverError } from "../search/scheduler.ts";
 import { type SearchCohortSummary, summarizeSearch } from "../search/summary.ts";
 
 export interface SearchPanelOptions {
@@ -81,6 +85,26 @@ export function formatSearchSummary(summaries: readonly SearchCohortSummary[]): 
   });
 }
 
+/**
+ * What the panel keeps when a run rejects. An observer failure still carries a complete ledger of
+ * the outcomes collected so far, which stays exportable and resumable; any other error has none.
+ */
+export function searchRunFailure(error: unknown): {
+  ledger: SearchOutcomes | null;
+  message: string;
+} {
+  if (error instanceof SearchObserverError) {
+    return {
+      ledger: error.outcomes,
+      message: `Search stopped: ${error.message}. Export the ledger to keep its finished slots; resuming it runs the rest.`,
+    };
+  }
+  return {
+    ledger: null,
+    message: `Search could not run: ${error instanceof Error ? error.message : String(error)}`,
+  };
+}
+
 function ranked(outcomes: readonly SearchOutcome[]): SearchOutcome[] {
   return [...outcomes].sort((a, b) => {
     const aObjective = a.status === "completed" ? a.result.objective : null;
@@ -119,6 +143,12 @@ export function mountSearchPanel(options: SearchPanelOptions): SearchPanel {
   let summaryLines: readonly string[] = [];
   let message =
     "Experimental search. Results are exploratory and have not passed research acceptance.";
+  const stamped = (name: string): string | null =>
+    document.querySelector(`meta[name="${name}"]`)?.getAttribute("content") ?? null;
+  const source = browserSearchSource(
+    stamped("squares-workbench-revision"),
+    stamped("squares-workbench-dirty"),
+  );
 
   const currentPlan = (): SearchPlan => {
     const proposal = proposalInput.value;
@@ -131,6 +161,7 @@ export function mountSearchPanel(options: SearchPanelOptions): SearchPanel {
       physicsSteps: Number(stepsInput.value),
       proposal,
       repair: repairInput.checked,
+      source,
     });
   };
 
@@ -195,7 +226,12 @@ export function mountSearchPanel(options: SearchPanelOptions): SearchPanel {
         ? "Experimental search cancelled. Export the ledger to retain completed slots."
         : "Experimental search finished. Inspect valid ranked results and export the ledger.";
     } catch (error: unknown) {
-      message = `Search could not run: ${error instanceof Error ? error.message : String(error)}`;
+      const failure = searchRunFailure(error);
+      message = failure.message;
+      if (failure.ledger !== null) {
+        ledger = failure.ledger;
+        summaryLines = formatSearchSummary(summarizeSearch(ledger.plan, ledger));
+      }
     } finally {
       running = false;
       controller = null;
@@ -237,6 +273,10 @@ export function mountSearchPanel(options: SearchPanelOptions): SearchPanel {
         return;
       }
       active = visible;
+      if (!visible) {
+        // A hidden search would keep spending the page's time with nobody watching it.
+        controller?.abort();
+      }
       redraw();
       options.onChange?.();
     },

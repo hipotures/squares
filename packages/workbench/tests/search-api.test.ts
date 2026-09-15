@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { createBrowserSearchPlan, parseBrowserSearchSeeds } from "../src/api/search-api.ts";
+import {
+  browserSearchSource,
+  createBrowserSearchPlan,
+  parseBrowserSearchSeeds,
+} from "../src/api/search-api.ts";
 import { PACKING_VALIDITY } from "../src/core/runtime-contracts.ts";
 import { decodeSearchOutcomes, encodeSearchOutcomes } from "../src/search/outcomes.ts";
 import { createPackSearchRunner } from "../src/search/pack-runner.ts";
@@ -87,4 +91,29 @@ test("browser search rejects excessive work and ambiguous seed lists", () => {
   assert.throws(() => createBrowserSearchPlan({ ...baseline, n: 33 }), /1 to 32/);
   assert.throws(() => createBrowserSearchPlan({ ...baseline, physicsSteps: 5001 }), /5000/);
   assert.throws(() => createBrowserSearchPlan({ ...baseline, seeds: [1, 1] }), /unique/);
+});
+
+test("browser plans record the page's source revision and dirty flag", () => {
+  const inputs = { n: 2, seeds: [1], physicsSteps: 2, proposal: "grid", repair: false } as const;
+  const commit = "0123456789abcdef0123456789abcdef01234567";
+  assert.deepEqual(
+    createBrowserSearchPlan({ ...inputs, source: { commit, dirty: false } }).source,
+    {
+      commit,
+      dirty: false,
+      runtime: "browser",
+      engine: "pack/v1",
+    },
+  );
+  assert.deepEqual(createBrowserSearchPlan(inputs).source, {
+    commit: "unknown",
+    dirty: true,
+    runtime: "browser",
+    engine: "pack/v1",
+  });
+  assert.deepEqual(browserSearchSource(commit, "false"), { commit, dirty: false });
+  assert.deepEqual(browserSearchSource(commit, "true"), { commit, dirty: true });
+  assert.deepEqual(browserSearchSource(null, null), { commit: "unknown", dirty: true });
+  assert.deepEqual(browserSearchSource("", "false"), { commit: "unknown", dirty: true });
+  assert.deepEqual(browserSearchSource(commit, "maybe"), { commit, dirty: true });
 });

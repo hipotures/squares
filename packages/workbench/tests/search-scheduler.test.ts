@@ -16,7 +16,7 @@ import {
   statusCounts,
 } from "../src/search/outcomes.ts";
 import { decodeSearchPlan } from "../src/search/registry.ts";
-import { runSearchPlan } from "../src/search/scheduler.ts";
+import { runSearchPlan, SearchObserverError } from "../src/search/scheduler.ts";
 import { summarizeSearch } from "../src/search/summary.ts";
 
 function required<T>(value: T | undefined): T {
@@ -554,31 +554,168 @@ test("no observed valid packing completes with a null objective rather than fail
   assert.equal(summary[0]?.valid, 0);
 });
 
-test("observer failure waits for active runners to stop before rejecting", async () => {
+test("observer failure waits for active runners, then rejects with the outcomes so far", async () => {
   let active = 0;
   let sawCancellation = false;
-  await assert.rejects(
-    runSearchPlan(
-      plan([0, 1, 2]),
-      async (slot, configuration, control) => {
-        active += 1;
-        if (slot.seed === 1) {
-          await new Promise<void>((resolve) => globalThis.setTimeout(resolve, 0));
-          sawCancellation = control.cancellationReason() === "cancelled";
-        }
-        active -= 1;
-        return completed(configuration);
+  const declared = plan([0, 1, 2]);
+  const failure: unknown = await runSearchPlan(
+    declared,
+    async (slot, configuration, control) => {
+      active += 1;
+      if (slot.seed === 1) {
+        await new Promise<void>((resolve) => globalThis.setTimeout(resolve, 0));
+        sawCancellation = control.cancellationReason() === "cancelled";
+      }
+      active -= 1;
+      return completed(configuration);
+    },
+    {
+      concurrency: 2,
+      now: () => 0,
+      onOutcome: () => {
+        throw new Error("ledger write failed");
       },
-      {
-        concurrency: 2,
-        now: () => 0,
-        onOutcome: () => {
-          throw new Error("ledger write failed");
-        },
-      },
-    ),
-    /ledger write failed/,
+    },
+  ).then(
+    () => null,
+    (error: unknown) => error,
   );
   assert.equal(active, 0);
   assert.equal(sawCancellation, true);
+  assert.ok(failure instanceof SearchObserverError, String(failure));
+  assert.match(failure.message, /ledger write failed/);
+  const carried = failure.outcomes;
+  assert.deepEqual(
+    carried.outcomes.map(({ slot, status }) => [slot.seed, status]),
+    [
+      [0, "completed"],
+      [1, "cancelled"],
+      [2, "not-started"],
+      [100, "not-started"],
+    ],
+  );
+  assert.deepEqual(
+    decodeSearchOutcomes(JSON.parse(encodeSearchOutcomes(carried)), declared),
+    carried,
+  );
+  const visited: number[] = [];
+  const resumed = await runSearchPlan(
+    declared,
+    (slot, configuration) => {
+      visited.push(slot.seed);
+      return completed(configuration);
+    },
+    { resume: carried, now: () => 0 },
+  );
+  assert.deepEqual(visited, [1, 2, 100]);
+  assert.deepEqual(resumed.outcomes[0], carried.outcomes[0]);
+});
+
+/** A trial whose repair Resolve reported as already valid, with every flag consistent. */
+function repairedTrial(configuration: JsonObject): SearchTrialValue {
+  const base = completed(configuration);
+  return {
+    ...base,
+    repaired: base.raw,
+    repair: {
+      termination: "already-valid",
+      resolved: true,
+      exhausted: false,
+      tolerance: 1e-9,
+      iterationLimit: 0,
+    },
+  };
+}
+
+test("ledger admission accepts only Resolve's terminations with consistent flags", async () => {
+  const declared = plan([0]);
+  const forgeries: ReadonlyArray<{
+    name: string;
+    base: (configuration: JsonObject) => SearchTrialValue;
+    forge: (repair: Record<string, unknown>) => void;
+  }> = [
+    {
+      name: "an unknown termination",
+      base: completed,
+      forge: (repair) => {
+        repair.termination = "succeeded";
+      },
+    },
+    {
+      name: "no repair requested, with a tolerance",
+      base: completed,
+      forge: (repair) => {
+        repair.tolerance = 1e-9;
+      },
+    },
+    {
+      name: "a Resolve termination without a tolerance",
+      base: repairedTrial,
+      forge: (repair) => {
+        repair.tolerance = null;
+      },
+    },
+    {
+      name: "a resolving termination not marked resolved",
+      base: repairedTrial,
+      forge: (repair) => {
+        repair.resolved = false;
+      },
+    },
+    {
+      name: "a stall marked resolved",
+      base: repairedTrial,
+      forge: (repair) => {
+        repair.termination = "stalled";
+      },
+    },
+    {
+      name: "no repair requested, marked resolved",
+      base: repairedTrial,
+      forge: (repair) => {
+        repair.termination = "not-requested";
+        repair.tolerance = null;
+      },
+    },
+    {
+      name: "budget exhaustion not marked exhausted",
+      base: repairedTrial,
+      forge: (repair) => {
+        repair.termination = "budget-exhausted";
+        repair.resolved = false;
+      },
+    },
+    {
+      name: "a stall marked exhausted",
+      base: repairedTrial,
+      forge: (repair) => {
+        repair.termination = "stalled";
+        repair.resolved = false;
+        repair.exhausted = true;
+      },
+    },
+  ];
+  for (const { name, base, forge } of forgeries) {
+    const ledger = await runSearchPlan(declared, (_slot, configuration) => base(configuration), {
+      now: () => 0,
+    });
+    assert.equal(ledger.outcomes[0]?.status, "completed", `${name}: honest control`);
+    const forged = structuredClone(ledger);
+    const outcome = required(forged.outcomes[0]);
+    if (outcome.status !== "completed") {
+      throw new Error("expected a completed control");
+    }
+    forge(outcome.result.repair as unknown as Record<string, unknown>);
+    assert.throws(() => decodeSearchOutcomes(forged, declared), /repair/, name);
+    const direct = await runSearchPlan(
+      declared,
+      (_slot, configuration) => {
+        const trial = base(configuration);
+        forge(trial.repair as unknown as Record<string, unknown>);
+        return trial;
+      },
+      { now: () => 0 },
+    );
+    assert.equal(direct.outcomes[0]?.status, "failed", name);
+  }
 });

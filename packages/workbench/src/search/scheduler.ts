@@ -37,6 +37,27 @@ function errorText(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
+/**
+ * The `onOutcome` observer threw, so the run stopped early.
+ *
+ * `outcomes` is still a complete ledger for the plan: every outcome recorded before the run
+ * stopped, including the one the observer failed on, and `not-started` for every other slot. It
+ * can be exported and resumed like any other ledger.
+ */
+export class SearchObserverError extends Error {
+  readonly outcomes: SearchOutcomes;
+
+  constructor(cause: unknown, outcomes: SearchOutcomes) {
+    super(errorText(cause), { cause });
+    this.name = "SearchObserverError";
+    this.outcomes = outcomes;
+  }
+}
+
+function notStarted(slot: SearchSlot, reason: string): SearchNotStartedOutcome {
+  return { slot, status: "not-started", elapsedMs: 0, reason };
+}
+
 function interrupted(
   slot: SearchSlot,
   reason: SearchCancellationReason,
@@ -58,6 +79,9 @@ function interrupted(
  * Trial runners must poll `cancellationReason()` while doing work. This avoids a
  * Promise-race timeout leaving an unobserved simulation alive after its slot was
  * reported terminal. Pending slots remain explicit `not-started` outcomes.
+ *
+ * If `onOutcome` throws, no further slot is claimed, active runners are told to cancel and are
+ * waited for, and the run rejects with a `SearchObserverError` carrying the ledger so far.
  */
 export async function runSearchPlan(
   declaredPlan: SearchPlan,
@@ -84,16 +108,33 @@ export async function runSearchPlan(
   }
   let nextIndex = 0;
   let observerFailed = false;
+  let observerError: unknown = null;
 
   const record = async (outcome: SearchOutcome): Promise<void> => {
     outcomes[outcome.slot.index] = outcome;
     try {
       await options.onOutcome?.(structuredClone(outcome));
     } catch (error: unknown) {
-      observerFailed = true;
+      if (!observerFailed) {
+        observerFailed = true;
+        observerError = error;
+      }
       throw error;
     }
   };
+
+  /** The ledger as it stands, with every slot not yet recorded marked not-started. */
+  const envelope = (missing: string): SearchOutcomes => ({
+    contract: SEARCH_OUTCOMES_CONTRACT,
+    planId: plan.id,
+    plan: structuredClone(plan),
+    outcomes: plan.slots.map((slot) => outcomes[slot.index] ?? notStarted(slot, missing)),
+  });
+  const observerStopped = (): SearchObserverError =>
+    new SearchObserverError(
+      observerError,
+      envelope("search stopped when an outcome observer failed"),
+    );
 
   const claim = (): SearchSlot | null => {
     while (nextIndex < plan.slots.length && outcomes[nextIndex] !== undefined) {
@@ -181,35 +222,27 @@ export async function runSearchPlan(
   const workers = await Promise.allSettled(
     Array.from({ length: Math.min(concurrency, plan.slots.length) }, worker),
   );
+  if (observerFailed) {
+    throw observerStopped();
+  }
   for (const result of workers) {
     if (result.status === "rejected") {
       throw result.reason;
     }
   }
+  const unclaimed =
+    options.signal?.aborted === true
+      ? "search cancelled before trial started"
+      : "trial was not claimed";
   for (const slot of plan.slots) {
     if (outcomes[slot.index] !== undefined) {
       continue;
     }
-    const outcome: SearchNotStartedOutcome = {
-      slot,
-      status: "not-started",
-      elapsedMs: 0,
-      reason:
-        options.signal?.aborted === true
-          ? "search cancelled before trial started"
-          : "trial was not claimed",
-    };
-    await record(outcome);
+    try {
+      await record(notStarted(slot, unclaimed));
+    } catch {
+      throw observerStopped();
+    }
   }
-  return {
-    contract: SEARCH_OUTCOMES_CONTRACT,
-    planId: plan.id,
-    plan: structuredClone(plan),
-    outcomes: outcomes.map((outcome) => {
-      if (outcome === undefined) {
-        throw new RangeError("search scheduler omitted a planned slot");
-      }
-      return outcome;
-    }),
-  };
+  return envelope(unclaimed);
 }

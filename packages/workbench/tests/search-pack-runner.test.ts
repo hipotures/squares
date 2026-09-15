@@ -267,6 +267,13 @@ test("Pack Search yields to timer cancellation and retains partial physics work"
   }
   assert.equal(outcome.partial?.work.physicsSteps, 1);
   assert.equal(outcome.partial?.work.repairIterations, 0);
+  assert.deepEqual(outcome.partial?.repair, {
+    termination: "cancelled",
+    resolved: false,
+    exhausted: false,
+    tolerance: 1e-9,
+    iterationLimit: 8,
+  });
 });
 
 test("Pack Search receipts do not depend on cooperative batch size", async () => {

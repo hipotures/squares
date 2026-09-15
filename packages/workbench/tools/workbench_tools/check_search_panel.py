@@ -12,6 +12,8 @@ from playwright.sync_api import Page, expect, sync_playwright
 
 # The status line once a run stops, whichever way it stops.
 SETTLED = re.compile(r"finished|cancelled|could not run")
+# The source revision `build_site` stamps into the page.
+REVISION = re.compile(r"[0-9a-f]{40}")
 
 
 def run_plan(page: Page, *, n: int, seeds: str, steps: int, repair: bool) -> str:
@@ -51,6 +53,28 @@ def check_bounded_run(page: Page) -> None:
     ledger = export_ledger(page)
     if len(ledger.get("outcomes", [])) != 1:
         raise ValueError("Search ledger omitted its completed slot")
+    source = ledger["plan"]["source"]
+    stamped = page.locator('meta[name="squares-workbench-dirty"]').get_attribute("content")
+    if REVISION.fullmatch(source["commit"]) is None or source["dirty"] != (stamped == "true"):
+        raise ValueError(f"Search plan does not record the page's source: {source}")
+
+
+def check_leaving_cancels(page: Page) -> None:
+    """Switching to Pack cancels a running search rather than leaving it working unseen."""
+    page.locator("#search-n").fill("32")
+    page.locator("#search-seeds").fill("0,1,2,3,4,5,6,7")
+    page.locator("#search-steps").fill("5000")
+    page.locator("#search-repair").set_checked(False)
+    page.locator("#search-start").click()
+    expect(page.locator("#search-cancel")).to_be_enabled()
+    page.locator("#mode-pack").click()
+    expect(page.locator("#pack-workspace")).to_be_visible()
+    page.locator("#mode-search").click()
+    expect(page.locator("#search-status")).to_contain_text("cancelled")
+    expect(page.locator("#search-start")).to_be_enabled()
+    progress = page.locator("#search-progress").inner_text()
+    if " 0 pending" in progress:
+        raise ValueError(f"Search finished every slot instead of cancelling: {progress}")
 
 
 def check_repair_run(page: Page) -> None:
@@ -99,10 +123,13 @@ def check(page_path: Path) -> str:
             raise ValueError("Search tab did not expose its panel")
         check_bounded_run(page)
         check_repair_run(page)
+        check_leaving_cancels(page)
         page.locator("#mode-pack").click()
         if not page.locator("#pack-workspace").is_visible():
             raise ValueError("Pack did not return after Search")
         if errors:
             raise ValueError("Search page errors: " + "; ".join(errors))
         browser.close()
-    return "bounded and Resolve Search runs, summaries, ledger export and Pack return"
+    return (
+        "bounded and Resolve Search runs, summaries, source, cancel on leaving, and Pack return"
+    )
