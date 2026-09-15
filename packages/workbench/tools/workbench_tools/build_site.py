@@ -9,7 +9,8 @@ elsewhere, so nothing here moves `site/index.html`.
 The page is already self-contained, which is what makes it deployable at all: one file,
 no external script, stylesheet or font, so it works from any static host. This tool exists
 to put it where the Pages artifact will find it, to check that self-containment rather than
-assume it, and to declare its inputs so the workflow rebuilds when they move.
+assume it, to give it a policy under which the browser refuses any network request, and to
+declare its inputs so the workflow rebuilds when they move.
 
 The page no longer carries a banner calling itself unchecked, because it is checked. It
 carries one quiet line saying what a reader does have to know -- that the animation model is
@@ -101,7 +102,36 @@ drag. `body.capture` hides it, because a note about the page does not belong in 
 the video.
 """
 
+#: What the published page may load, which is nothing from the network. Scripts and styles
+#: are inline, fonts and images are `data:` URIs, and exports are `blob:` downloads, so the
+#: page needs no source beyond those. `default-src 'none'` covers every fetch the
+#: self-contained scan cannot recognise -- a URL assembled at run time, a worker, a socket.
+#: The browser enforces it; `self_contained` is the build-time half (#125 F21).
+#:
+#: `'unsafe-eval'` grants no network source; it is there for the checkers. Playwright
+#: evaluates a `wait_for_function` predicate written as an expression string with `eval`,
+#: and the package checkers still pass such strings. Once `think-xvjf` moves them into probe
+#: files, which Playwright calls as functions, the grant can go.
+CONTENT_SECURITY_POLICY = (
+    "default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval'; style-src 'unsafe-inline'; "
+    "img-src data: blob:; font-src data:; base-uri 'none'; form-action 'none'"
+)
+POLICY_META = f'<meta http-equiv="Content-Security-Policy" content="{CONTENT_SECURITY_POLICY}">'
+HEAD = re.compile(r"<head(?:\s[^>]*)?>", re.IGNORECASE)
+
 REVISION = re.compile(r"[0-9a-f]{40}")
+
+
+def with_policy(page: str) -> str:
+    """Put the page's Content-Security-Policy first in `<head>`.
+
+    A policy delivered by `<meta>` governs only what follows it, so it opens the head,
+    before the inline style and script it has to cover.
+    """
+    head = HEAD.search(page)
+    if head is None:
+        raise ValueError("could not place the page's security policy; the page has no <head>")
+    return f"{page[: head.end()]}\n{POLICY_META}{page[head.end() :]}"
 
 
 def source_revision() -> str:
@@ -207,7 +237,7 @@ def build(
             dirty_metadata(dirty=source_dirty() if dirty is None else dirty),
         )
     )
-    marked = page.replace("</head>", f"{identity}\n</head>", 1)
+    marked = with_policy(page).replace("</head>", f"{identity}\n</head>", 1)
     if identity not in marked:
         raise ValueError("could not stamp the page; it has no </head> to close")
 
