@@ -2856,9 +2856,13 @@ _CASES = ("packing/cases/*",)
 # The retained replay archives. Whole subtree, not the named files: several steps
 # discover which archives to replay by globbing, so adding one changes what runs.
 _RESULTS = ("packing/campaign/series/*",)
+# `build_site.RENDER_INPUTS` is the builder's own declaration and this is the gate's copy,
+# which cannot import the optional package; `test_change_scoped_selection.py` requires every
+# declared render input to select the step that checks the page.
 _WORKBENCH_INPUTS = (
     "packages/workbench/*",
     "packing/src/sqpack/render/*",
+    "packing/devtools/render_explainer.py",
     "packing/witnesses/known-best/*",
     "packing/atlas/known-best/*",
     "package.json",

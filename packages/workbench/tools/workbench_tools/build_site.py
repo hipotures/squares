@@ -62,11 +62,15 @@ RENDER_INPUTS = (
     WORKBENCH_PACKAGE / "tools/bundle-browser.ts",
     WORKBENCH_PACKAGE / "tools/build-assets.ts",
     WORKBENCH_PACKAGE / "tools/check-candidate-corpus.ts",
+    WORKBENCH_PACKAGE / "tools/render-katex.ts",
     WORKBENCH_PACKAGE / "probes/bench-annealing.ts",
 )
 """Everything the page is built from. The Pages workflow's path filter has to cover this
 list, and `test_the_pages_filter_covers_every_render_input` is what says so -- which is what
-stops a published page going stale when the data under it moves."""
+stops a published page going stale when the data under it moves. The list is written by
+hand, so `test_build_site_inputs.py` derives what this module and `build_candidate` name --
+imports, modules run, paths joined, Node tools and their imports -- and requires this list
+to cover it."""
 
 NOTE = """<style>
 #site-note {
