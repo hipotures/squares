@@ -76,6 +76,9 @@ experiment:
 ---
 # exp-210 — Blind Runs of the Workbench’s Physics End With Squares Overlapping
 
+**Renumbered 2026-09-13** from exp-206, which the older divide-and-concur experiment
+keeps.
+
 **Rewritten 2026-09-14** to remove superseded framing and layered corrections.
 The previous text is at commit `a40d272c`.
 

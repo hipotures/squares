@@ -199,22 +199,24 @@ def offset_timestamp(value: object) -> dt.datetime | None:
 
 
 def board_ids() -> tuple[set[str], set[str]] | None:
-    """(H-ids named on the board, H-ids the board declares reserved).
+    """(H-ids named on the board, H-ids the board declares reserved or retired).
 
     A reserved id is one held for a claim that exists somewhere upstream -- another
     campaign's register, a paper, a review -- but has not been codified here yet.
-    Naming it on the board is how the two numberings stay aligned and how nobody
-    reuses it; it is not a dangling reference. Declare them with a line like:
+    A retired id was published and then withdrawn; it stays consumed, so the board may
+    name it where it records the retirement. Naming either on the board is how nobody
+    reuses it; it is not a dangling reference. Declare them with lines like:
 
         <!-- reserved-ids: H-003 H-004 H-013 -->
+        <!-- retired-ids: H-206 -->
     """
     if not IDEAS.exists():
         return None
     text = IDEAS.read_text()
-    reserved = set()
-    for line in re.findall(r"<!--\s*reserved-ids:([^>]*?)-->", text):
-        reserved |= set(re.findall(r"\bH-[0-9]{3}\b", line))
-    return set(re.findall(r"\bH-[0-9]{3}\b", text)), reserved
+    declared = set()
+    for line in re.findall(r"<!--\s*(?:reserved|retired)-ids:([^>]*?)-->", text):
+        declared |= set(re.findall(r"\bH-[0-9]{3}\b", line))
+    return set(re.findall(r"\bH-[0-9]{3}\b", text)), declared
 
 
 def naming(
@@ -798,10 +800,12 @@ def check(  # noqa: C901 - a flat list of record invariants, each a few lines; s
         for hypothesis_id in sorted(known - on_board):
             problems.append(f"ideas.md: does not mention {hypothesis_id}")
         # A reservation that has been fulfilled is stale and must be retired, or the
-        # board keeps claiming an id is unwritten after it has been written.
+        # board keeps claiming an id is unwritten after it has been written. A retired id
+        # back in the registry is worse: an id reused.
         for hypothesis_id in sorted(reserved & known):
             problems.append(
-                f"ideas.md: {hypothesis_id} is declared reserved but is now in the registry"
+                f"ideas.md: {hypothesis_id} is declared reserved or retired but is now in "
+                "the registry"
             )
         # Reserved ids are exempt from the dangling-reference check, which means a
         # LINK to one would otherwise pass silently -- the board would assert a

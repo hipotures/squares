@@ -33,6 +33,9 @@ hypothesis:
 ---
 # H-207 — restarts beat schedule tuning at equal cost
 
+**Identity.** Derived from X-034, which was X-028 until 2026-09-13 and X-029 until
+2026-09-14.
+
 **Why it is worth testing.** Once runs are repaired to packings, a single run scores
 below the trivial grid at every `n` measured, while the best of a thousand sometimes
 comes within a fraction of a per cent of the record

@@ -26,7 +26,8 @@ exploration:
 # X-034: The Workbench’s Blind Physics, Measured as a Search
 
 **Renumbered 2026-09-14** from X-029, which main had already assigned to the BC303 T2
-exact-geometry draft; before 2026-09-13 this report was X-028.
+exact-geometry draft; before 2026-09-13 this report was X-028. It also proposed H-206,
+retired on 2026-09-14; that id stays consumed.
 
 **Rewritten 2026-09-14.** This report keeps only what survived checking.
 Earlier versions reported numbers from runs whose arrangements were never checked to be

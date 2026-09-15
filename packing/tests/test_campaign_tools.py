@@ -606,6 +606,47 @@ def test_a_lease_written_without_an_offset_is_read_as_utc(
     assert not any("STALE CLAIM" in problem for problem in live)
 
 
+def _board_problems(
+    monkeypatch: pytest.MonkeyPatch, board: Path, registered: list[str]
+) -> list[str]:
+    """Only the idea-board reconciliation, against a board file and a bare registry."""
+    monkeypatch.setattr(ledger, "IDEAS", board)
+    monkeypatch.setattr(ledger, "dead_links", list)
+    hypotheses = [
+        {"id": hypothesis_id, "kind": "open_question", "_path": Path(f"{hypothesis_id}-x.md")}
+        for hypothesis_id in registered
+    ]
+    problems = ledger.check(
+        [],
+        [],
+        hypotheses,
+        [],
+        [],
+        agendas=[],
+        clock=_clock(dt.datetime(2026, 9, 14, tzinfo=dt.UTC)),
+    ).problems
+    return [problem for problem in problems if problem.startswith("ideas.md")]
+
+
+def test_the_board_may_name_a_retired_hypothesis_id_but_the_registry_may_not_reuse_it(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    board = tmp_path / "ideas.md"
+    named = "Idea 169 was retired; its hypothesis id, H-206, stays consumed.\n"
+    board.write_text(named + "H-207 is registered.\n", encoding="utf-8")
+    assert _board_problems(monkeypatch, board, ["H-207"]) == [
+        "ideas.md: names H-206, which is not in the registry"
+    ]
+
+    board.write_text(
+        named + "<!-- retired-ids: H-206 -->\nH-207 is registered.\n", encoding="utf-8"
+    )
+    assert _board_problems(monkeypatch, board, ["H-207"]) == []
+    assert _board_problems(monkeypatch, board, ["H-206", "H-207"]) == [
+        "ideas.md: H-206 is declared reserved or retired but is now in the registry"
+    ]
+
+
 def test_terminal_round_requires_a_real_result(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

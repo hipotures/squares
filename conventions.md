@@ -113,6 +113,8 @@ particular upstream claims awaiting codification, not a worker’s future namesp
 No such comments are currently active; Agenda 024 records known pending transports.
 Name an uncreated record without linking to a nonexistent file.
 Publishing a record consumes its ID permanently, even if the research is later retired.
+A retired hypothesis ID is declared in a `retired-ids` comment on the board, which lets
+the board name it where it records the retirement and makes reusing it a check failure.
 Superseded launch drafts do not reserve speculative future blocks.
 Missing numbers are not automatically free: preserve pending upstream work and check
 known parallel assignments.

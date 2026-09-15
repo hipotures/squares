@@ -6,6 +6,10 @@ date: 2026-09-13
 ---
 # Workbench Consumer and Legacy-Task Inventory
 
+**Identity note, added 2026-09-14.** X-029 in this inventory is the workbench-physics
+exploration, written as X-028 and renumbered X-034 on 2026-09-14; main’s X-029 is the
+BC303 T2 exact-geometry draft.
+
 This is the Phase 0 inventory for `think-a9gt` at integrated commit `27d2f8cc`. It
 implements the disposition rules in the
 [workbench plan](../specs/active/plan-2026-09-11-workbench-from-spike-to-product.md) and

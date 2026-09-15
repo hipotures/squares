@@ -33,6 +33,9 @@ hypothesis:
 ---
 # H-211 — the shake has a sweet spot, and the shipped value is far below it
 
+**Identity.** Derived from X-034, which was X-028 until 2026-09-13 and X-029 until
+2026-09-14.
+
 **Registered after its data, and untested.** The table below was in hand when this claim
 was registered, so exp-208, which reports it, is the exploratory data behind the claim,
 filed under the open question [H-212](H-212-the-workbench-physics-as-a-search.md).

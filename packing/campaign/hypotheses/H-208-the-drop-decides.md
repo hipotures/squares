@@ -30,6 +30,9 @@ hypothesis:
 ---
 # H-208 — the initial drop decides the answer, not the annealing
 
+**Identity.** Derived from X-034, which was X-028 until 2026-09-13 and X-029 until
+2026-09-14.
+
 If the answer is settled at the drop, the schedule is decoration and the effort belongs
 in the proposal: more candidate drops, a finer grid, best-of-k over placements rather
 than over shakes.

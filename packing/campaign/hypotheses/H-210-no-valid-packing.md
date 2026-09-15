@@ -32,6 +32,9 @@ hypothesis:
 ---
 # H-210 — the blind physics never settles to a valid packing
 
+**Identity.** Derived from X-034, which was X-028 until 2026-09-13 and X-029 until
+2026-09-14.
+
 **Registered so the claim can be tested rather than assumed.** It was registered after
 its data: the runs
 [exp-210](../series/series-000-smoke-and-calibration/experiments/exp-210-h210-blind-runs-are-not-packings.md)
