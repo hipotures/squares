@@ -534,13 +534,16 @@ def main() -> int:
     strategy = load_strategy(options.strategy)
     state = run(strategy, keep_trace=options.trace is not None)
     known = record(state.n)[1]
+    packed = state.phases[-1].geometry.passed
     payload: dict[str, object] = {
         "name": strategy.name,
         "n": state.n,
         "side": state.side,
-        "excess_pct": 100.0 * (state.side - known) / known,
+        # An excess over the record is a claim about a packing, so an arrangement that
+        # failed the geometry check has none.
+        "excess_pct": 100.0 * (state.side - known) / known if packed else None,
         "violation": state.phases[-1].violation,
-        "packing_valid": state.phases[-1].geometry.passed,
+        "packing_valid": packed,
         "guided": state.guided,
         "phases": [_phase_payload(phase) for phase in state.phases],
         "configuration": strategy_to_row(state.configuration),
@@ -557,13 +560,19 @@ def main() -> int:
     print(f"{strategy.name}  n = {state.n}{tag}")
     print(
         f"{'#':>2} {'mechanism':>10} {'rung':>26} {'side':>12} {'violation':>10} {'frames':>7}"
+        f"  packing"
     )
     for phase in state.phases:
         print(
             f"{phase.index:>2} {phase.mechanism:>10} {phase.rung:>26} {phase.side:>12.7f} "
-            f"{phase.violation:>10.1e} {phase.frame_count:>7}"
+            f"{phase.violation:>10.1e} {phase.frame_count:>7}  "
+            f"{'valid' if phase.geometry.passed else 'not a packing'}"
         )
-    print(f"best known {known:.7f}, reached {state.side:.7f} ({payload['excess_pct']:+.3f} %)")
+    if packed:
+        excess = 100.0 * (state.side - known) / known
+        print(f"best known {known:.7f}, reached {state.side:.7f} ({excess:+.3f} %)")
+    else:
+        print(f"best known {known:.7f}; final side {state.side:.7f} is not a packing")
     return 0
 
 
