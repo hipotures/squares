@@ -181,8 +181,11 @@ def test_the_loader_refuses_names_outside_its_root(tmp_path: Path) -> None:
     for name in ("../escape", "/absolute", "tool/name.js", ""):
         with pytest.raises(ValueError, match="not a probe name"):
             probe(tmp_path, name)
+    # A variable, not a literal: `devtools.check_probes` requires every literal handed to the
+    # loader beside `tests/probes` to name a file, and this one deliberately names none.
+    absent = "tool/absent"
     with pytest.raises(FileNotFoundError, match=str(tmp_path)):
-        probe(tmp_path, "tool/absent")
+        probe(tmp_path, absent)
 
 
 # -- the ratchet ------------------------------------------------------------------------
@@ -294,3 +297,57 @@ def test_the_probe_check_refuses_an_orphan_a_non_function_and_a_missing_name(
     absent = "tool/probes/group/absent.js: named by a Python file beside tool/probes"
     assert f"{absent}, and no such file" in found
     assert len(found) == 4
+
+
+def _names(have: set[str], **sources: str) -> tuple[list[str], list[str]]:
+    """Missing and unnamed probes for callers given as `file_name=source`."""
+    callers = {name: check_probes.read_caller(source, name) for name, source in sources.items()}
+    return check_probes.name_faults(callers, have)
+
+
+HAVE = {"stage/visible-count"}
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        "from sqpack.probes import probe\nprobe(ROOT, 'newgroup/zz_missing')\n",
+        "from workbench_tools.probes import probe\nprobe('newgroup/zz_missing')\n",
+        "from sqpack import probes\nprobes.probe(ROOT, 'newgroup/zz_missing')\n",
+        "from sqpack.probes import probe as load\nload(ROOT, 'newgroup/zz_missing')\n",
+    ],
+)
+def test_a_loaded_name_in_a_group_that_does_not_exist_fails(source: str) -> None:
+    """#125 F9, fixed in the workbench checker by #160: `newgroup/zz_missing` passed because
+    no probe directory is called `newgroup`, so the name did not look like a probe."""
+    source += "NAMES = ('stage/visible-count',)\n"
+    assert _names(HAVE, caller=source) == (["newgroup/zz_missing"], [])
+
+
+def test_a_name_handed_to_a_wrapper_in_another_file_is_resolved() -> None:
+    """`look` forwards its parameter to the loader, and a second file calls it as a method,
+    the way the Animate view's contract calls `session.look`."""
+    session = (
+        "from workbench_tools.probes import probe\n\n"
+        "class Session:\n"
+        "    def look(self, probe_name, /, **argument):\n"
+        "        return self.page.evaluate(probe(probe_name), argument or None)\n"
+    )
+    contract = (
+        "session.look('elsewhere/zz_missing', n=3)\nsession.look('stage/visible-count')\n"
+    )
+    assert _names(HAVE, session=session, contract=contract) == (["elsewhere/zz_missing"], [])
+
+
+def test_a_path_not_handed_to_a_loader_is_not_a_probe() -> None:
+    sources = {
+        "checker": "from sqpack.probes import probe\n"
+        "PAGE = 'packing/site/workbench/index.html'\nprobe(ROOT, 'stage/visible-count')\n",
+        "build": "ATLAS = 'stage/known-best/manifest.json'\n",
+    }
+    assert _names(HAVE, **sources) == ([], [])
+
+
+def test_a_name_that_looks_like_a_probe_in_a_loader_file_still_fails() -> None:
+    source = "from sqpack.probes import probe\nNAMES = ('stage/zz_missing',)\n"
+    assert _names(HAVE, caller=source) == (["stage/zz_missing"], ["stage/visible-count"])

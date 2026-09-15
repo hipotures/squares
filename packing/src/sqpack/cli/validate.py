@@ -1549,15 +1549,18 @@ def _browser_code_in_files(context: Context) -> str:
 def _workbench_frontend(context: Context) -> str:
     """Check the probe files, then build once and exercise the page in Chromium.
 
-    `check_probes` goes first because it needs no browser and takes under a second: a probe
-    that does not parse, is not a function, or is named by a checker with no file behind it
-    fails here rather than at the far end of the browser run. It was run by no gate until
-    the #160 review (D13), so a missing probe could sit in the tree unnoticed.
+    The probe check goes first because it needs no browser and takes a second or two: a
+    probe that does not parse, is not a function, or is named with no file behind it fails
+    here rather than at the far end of the browser run. It was run by no gate until the
+    #160 review (D13). It is now `devtools.check_probes`, which covers every probe tree in
+    the repository without a hand-kept list of callers; the `browser code lives in files`
+    step runs it too, so the edit tier sees it, and this run keeps the frontend job's own
+    early failure.
     """
     return _commands(
         context,
         (
-            (sys.executable, "-m", "workbench_tools.check_probes"),
+            (sys.executable, "-m", "devtools.check_probes"),
             (sys.executable, "-m", "workbench_tools.check_frontend"),
         ),
     )
