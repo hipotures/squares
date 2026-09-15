@@ -262,6 +262,16 @@ independent verification in a separate process.
   refinements on any seed, so the arm as measured is single-funnel basin hopping with no
   restart, which is a weaker algorithm than the one the code implements.
 - `f64` throughout, and `numerically-checked` assurance only.
+- The per-seed ranges cannot be re-run.
+  This round seeded each random stream from `hash(condition) % 251`, and Python salts
+  `str` hashing per process, so the recorded command does not reproduce its streams.
+  The instrument now derives the seed from `zlib.crc32(condition.encode()) % 251` and
+  writes the derivation and every derived seed to `meta.json`. A fixed seed would still
+  not replay this round exactly: `--quench-seconds 4` is a wall-clock bound, a quench
+  that reaches it returns wherever it got to, and in the committed traces 408 of 500
+  basin-hopping quenches and 485 of 500 multistart quenches ran for at least 4 s. So a
+  replay reproduces multistart’s proposals but not its refined sides, and basin
+  hopping’s proposals depend on those sides, so its differences compound.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
