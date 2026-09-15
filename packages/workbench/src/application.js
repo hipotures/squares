@@ -27,6 +27,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     assessCataloguePrecisionFrame,
     assessPackingSnapshot,
     mixUint32Seed,
+    PACKING_VALIDITY,
     packingSnapshot,
     parseUint32Seed,
   } = SQUARES_WORKBENCH_CORE;
@@ -293,13 +294,16 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   const easeInOut = (u) => (u < 0.5 ? 4 * u * u * u : 1 - (-2 * u + 2) ** 3 / 2);
   /** @param {number} u */
   const easeOut = (u) => 1 - (1 - u) ** 3;
+  //: Absorbs float rounding where two computed angles, times or law settings are compared as equal or
+  //: tied. It never measures geometry, so it is not the validity tolerance (`PACKING_VALIDITY`).
+  const ROUNDING = 1e-9;
   // Shortest signed turn modulo 90, in (-45, 45]; an exact 45 degree tie turns counter-clockwise, so
   // the direction is a rule rather than a rounding accident (the symmetric colour sweep looks the same
   // either way).
   /** @param {number} a @param {number} b */
   function angleDelta(a, b) {
     let d = (((b - a) % 90) + 90) % 90;
-    if (d > 45 + 1e-9) {
+    if (d > 45 + ROUNDING) {
       d -= 90;
     }
     return d;
@@ -313,7 +317,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     const d = (((b - a - blockTurn) % 90) + 90) % 90;
     const one = blockTurn + d,
       other = blockTurn + d - 90;
-    return Math.abs(one) <= Math.abs(other) + 1e-9 ? one : other;
+    return Math.abs(one) <= Math.abs(other) + ROUNDING ? one : other;
   }
   /** @param {number} v @param {number} [d] */
   const fmt = (v, d) => v.toFixed(d);
@@ -874,7 +878,10 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     const due =
       span <= 0 || t <= from
         ? 0
-        : Math.min(GROUP_CHECKPOINTS, Math.floor(((t - from) / span) * GROUP_CHECKPOINTS + 1e-9));
+        : Math.min(
+            GROUP_CHECKPOINTS,
+            Math.floor(((t - from) / span) * GROUP_CHECKPOINTS + ROUNDING),
+          );
     const source = [
       state.pair,
       state.style,
@@ -931,7 +938,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     if (groupSlot === null || groupSlot.length !== count) {
       return;
     }
-    if (groupClock === null || groupFolded > 0 || clock < groupClock - 1e-9) {
+    if (groupClock === null || groupFolded > 0 || clock < groupClock - ROUNDING) {
       resetGroups(count);
     }
     groupClock = clock;
@@ -1600,6 +1607,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   const isPhysical = (style) => style === "physics" || style === "bodies";
   const physicsCache = new Map();
   const PHYS_CACHE_MAX = 16;
+  //: Keeps a divisor that a setting can drive to zero (a span of the move, a rigidity) off zero; a
+  //: floor on a setting, not a tolerance on any measurement.
+  const DIVISOR_FLOOR = 1e-6;
   // Ken Perlin's sixth-degree ease: zero first AND second derivative at both ends, where
   // smoothstep only zeroes the first. Used where a change has to start and stop invisibly.
   // Clamped as well as guarded: just below one the polynomial rounds to 1 + 2^-52, and the colour
@@ -1611,7 +1621,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // How far past its target the box is open at u, in sides. Zero at both ends of the move, so the
   // side it starts from and the side it lands on are exactly the record's.
   function containerOpen(u) {
-    const shutSpan = Math.max(1e-6, 1 - PHYS.blend - PHYS.shutFrom);
+    const shutSpan = Math.max(DIVISOR_FLOOR, 1 - PHYS.blend - PHYS.shutFrom);
     const open = smootherstep(clamp01(u / PHYS.openBy));
     const shut = smootherstep(clamp01((u - PHYS.shutFrom) / shutSpan));
     return PHYS.open * open * (1 - shut);
@@ -1852,6 +1862,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     LP.zero + Math.min(1, Math.max(0, -f / LAW_BOUNDS.attraction[1])) * LP.pullSpan;
   const lpY = (f, top) => (f >= 0 ? lpPushY(f, top) : lpPullY(f));
   let lawPlot = null;
+  //: How far beside each breakpoint of the force law the plot also samples it, so the corner is drawn
+  //: as a corner; an offset along the gap axis of a drawing, unrelated to validity.
+  const LAW_BREAKPOINT_OFFSET = 1e-6;
   function drawLawPlot() {
     if (lawPlot === null) {
       lawPlot = {
@@ -1881,9 +1894,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     for (let i = 0; i <= 120; i++) {
       xs.push(lerp(LP.dLo, LP.dHi, i / 120));
     }
-    xs.push(-LAW.rigidity, -LAW.rigidity - 1e-6, 0, 1e-6);
+    xs.push(-LAW.rigidity, -LAW.rigidity - LAW_BREAKPOINT_OFFSET, 0, LAW_BREAKPOINT_OFFSET);
     if (lawAttracts()) {
-      xs.push(LAW.range, LAW.range - 1e-6, LAW.range / 2);
+      xs.push(LAW.range, LAW.range - LAW_BREAKPOINT_OFFSET, LAW.range / 2);
     }
     xs.sort((a, b) => a - b);
     let d = "";
@@ -1938,7 +1951,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
         Math.min(LAW_BOUNDS.rigidity[1], -lpD(pt[0])),
       );
       const push = Math.max(0, (LP.zero - Math.min(LP.zero, Math.max(0, pt[1]))) / LP.zero) * top;
-      setLaw({ rigidity, repulsion: push / Math.max(rigidity, 1e-6) });
+      setLaw({ rigidity, repulsion: push / Math.max(rigidity, DIVISOR_FLOOR) });
       return;
     }
     const range = Math.max(0, Math.min(LAW_BOUNDS.range[1], lpD(pt[0]) * 2));
@@ -2113,7 +2126,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       // which called an arrangement a packing at eight million times the contract's tolerance.
       packing,
       // Below a record as a packing is not a find: it is a report that the geometry lost precision.
-      suspect: packing && tight !== null && tight < record - 1e-9,
+      suspect: packing && tight !== null && tight < record - PACKING_VALIDITY.penetrationTolerance,
       excess: packing && unit !== null ? (unit / record - 1) * 100 : null,
     };
   }
@@ -2761,7 +2774,10 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // rotation that rounds, and angles as a square's, a quarter turn being the same square. A hand's run picked up from the record is still the record until a
   // square moves, and not after.
   function drawsStoredRecord(p, shown) {
-    const near = (/** @type {number} */ a, /** @type {number} */ b) => Math.abs(a - b) <= 1e-9;
+    // Within the contract's own tolerance: a frame that close to the stored one is the stored frame,
+    // and nothing further from it may be assessed at the catalogue's precision.
+    const near = (/** @type {number} */ a, /** @type {number} */ b) =>
+      Math.abs(a - b) <= PACKING_VALIDITY.penetrationTolerance;
     for (let i = 0; i < shown; i++) {
       const at =
         shown === p.n ? motion[i]?.a : [tgtX[i] ?? Number.NaN, tgtY[i] ?? Number.NaN, tgtA[i]];
@@ -3084,6 +3100,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // One frame of the open-ended run: as many fixed steps as the wall clock asked for, capped so a
   // chunk holds the frame budget. The state after k steps is exact and repeatable; how many steps a
   // second of wall clock buys is not, and that is the whole difference between this and `seek`.
+  //: The cost of a step, in milliseconds, assumed before any step has been timed, so the first chunk
+  //: is a finite number of steps; a wall-clock floor, unrelated to validity.
+  const MIN_MS_PER_STEP = 1e-4;
   function optimizeAdvance(dtSim) {
     const o = opt;
     if (o === null) {
@@ -3091,7 +3110,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     }
     const cap = Math.max(
       OPT.minChunk,
-      Math.min(OPT.maxChunk, Math.round(OPT.budgetMs / Math.max(o.msPerStep, 1e-4))),
+      Math.min(OPT.maxChunk, Math.round(OPT.budgetMs / Math.max(o.msPerStep, MIN_MS_PER_STEP))),
     );
     const want = Math.max(OPT.minChunk, Math.min(cap, Math.round(dtSim * OPT.stepsPerSecond)));
     const t0 = performance.now();
@@ -3924,7 +3943,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       A,
       B,
       optimizing ? (opt.springs ? "snap" : "blind") : isPhysical(state.style) ? mode : "snap",
-      optimizing ? !state.playing : t <= sc.moveStart || t >= sc.end - 1e-9,
+      optimizing ? !state.playing : t <= sc.moveStart || t >= sc.end - ROUNDING,
     );
 
     // The panel hands over to the next n only where it changes. It used to fade both layers whole
@@ -4273,7 +4292,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
         "on",
         preset !== undefined &&
           ["rigidity", "repulsion", "attraction", "range"].every(
-            (k) => Math.abs(preset[k] - LAW[k]) < 1e-9,
+            (k) => Math.abs(preset[k] - LAW[k]) < ROUNDING,
           ),
       );
     });
