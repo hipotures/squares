@@ -118,7 +118,7 @@ agenda:
     purpose: tool_validation
     owner_focus: process
     instances: [11]
-    state: ready
+    state: complete
     priority: 0
     question: >-
       Given the reconciled state, is the validation-efficiency checkpoint due, and which
@@ -141,12 +141,31 @@ agenda:
       block rather than a multi-lane research promise.
     workflows: [review-planning-oversight]
     program: n11-strategy-reset
+    artifacts:
+    - docs/project/reviews/review-2026-09-14-n11-w10-route-selection.md
+    - packing/campaign/agent-sessions/session-130-n11-w10-route-selection.md
     parallel_group: route-selection
+    outcomes:
+    - scope: >-
+        The post-audit W5 cadence, recent-merge stability, ten scientific candidates,
+        and one bounded next entry, without running an efficiency repair or scientific
+        target.
+      classification: achieved
+      result: >-
+        The conservative cadence reaches OR-12's eight-block ceiling, so BC-340 is the
+        sole selected next entry. Every scientific candidate remains behind BC-353's
+        fresh post-W5 selection; Route A at 3.84 is the presumptive first choice and
+        Route S its admission fallback, but neither is authorized.
+      evidence:
+      - docs/project/reviews/review-2026-09-14-n11-w10-route-selection.md
+      - packing/campaign/agent-sessions/session-130-n11-w10-route-selection.md
+      disposition: retire-success
+      follow_up: think-1ydi
   - id: BC-340
     purpose: measurement_validation
     owner_focus: efficiency
     instances: [11]
-    state: tentative
+    state: ready
     priority: 0
     question: >-
       Does the four-to-eight-block cadence make an efficiency checkpoint due, and if so
@@ -158,8 +177,7 @@ agenda:
     entry: BC-346 selects this checkpoint from the reconciled sequence and retained costs.
     exit: >-
       One measured bottleneck disposition or an evidence-backed no-change result, then a
-      terminal handoff to a fresh W10 route selection. If the checkpoint is not due,
-      BC-346 selects the scientific route directly and BC-340 remains tentative.
+      terminal handoff to BC-353's fresh W10 route selection.
     bead: think-1ydi
     depends_on: [BC-346]
     next_evidence: >-
@@ -168,6 +186,32 @@ agenda:
     workflows: [efficiency-loop, review-planning-oversight]
     program: n11-strategy-reset
     parallel_group: efficiency-checkpoint
+  - id: BC-353
+    purpose: tool_validation
+    owner_focus: process
+    instances: [11]
+    state: blocked
+    priority: 0
+    question: >-
+      After the due efficiency checkpoint, which one scientific route has the highest
+      information value under the new gate evidence and retained mathematical audit?
+    budget: >-
+      One fresh W10 planning block after BC-340. Recheck repository stability and all
+      scientific candidates; select exactly one execution entry and run no target.
+    entry: >-
+      BC-340 closes with a measured repair or measured no-change decision, its own merged
+      pull request, and a terminal handoff to this block.
+    exit: >-
+      Exactly one scientific route is selected, every alternative has an explicit
+      disposition and resume condition, and only the selected route becomes ready.
+    bead: think-d3h5
+    depends_on: [BC-340]
+    next_evidence: >-
+      Reconsider Route A at side 3.84 first, Route S as its admission fallback, and Route
+      E in the first tier, while incorporating BC-340's measured result.
+    workflows: [review-planning-oversight]
+    program: n11-strategy-reset
+    parallel_group: post-efficiency-route-selection
   - id: BC-341
     purpose: research
     owner_focus: insight
@@ -182,12 +226,12 @@ agenda:
       One day-or-less Route A discriminator: freeze an original root-family denominator,
       certify each closed domain, and report the unchanged denominator, closed roots,
       and exact worst surviving domain. Subdivided leaves do not change the denominator.
-    entry: BC-346 selects Route A and the case partition, capacity caps, and unchanged certificate checker are frozen.
+    entry: BC-353 selects Route A and the case partition, capacity caps, and unchanged certificate checker are frozen.
     exit: >-
       A complete difficult root family closes or a precise relaxation witness and worst
       surviving domain identify why it does not. Continue only on new matched strength.
     bead: think-9y6q
-    depends_on: [BC-346]
+    depends_on: [BC-353]
     next_evidence: >-
       Freeze the smallest occupancy/contact partition that strictly extends T-023's
       single four-owner branch without claiming an owner-selection theorem.
@@ -207,12 +251,12 @@ agenda:
     budget: >-
       One control-first Route B block; no n=11 target until the n=6 formulation,
       discretization soundness, and symmetry handling are independently checked.
-    entry: BC-346 selects Route B and a sound placement-graph discretization has an explicit conflict-edge guarantee.
+    entry: BC-353 selects Route B and a sound placement-graph discretization has an explicit conflict-edge guarantee.
     exit: >-
       A passed n=6 control and measured n=11 separation, or a precise formulation,
       scaling, or soundness obstruction that parks the route.
     bead: think-ol1z
-    depends_on: [BC-346]
+    depends_on: [BC-353]
     next_evidence: Specify the n=6 control and the conflict-edge soundness obligation before selecting a solver.
     workflows: [insight-iteration, research-loop]
     program: n11-strategy-reset
@@ -229,13 +273,13 @@ agenda:
     budget: >-
       One bounded Route S pass beginning with T-025; test sparse or quantized templates
       with the existing exact coverage and budget replay.
-    entry: BC-346 selects Route S and the unmodified T-025/T-026 receipt is the control.
+    entry: BC-353 selects Route S and the unmodified T-025/T-026 receipt is the control.
     exit: >-
       A fivefold reduction in orbit representatives or comparable independent geometric
       complexity, with a human-statable generating rule and exact replay, or a recorded
       obstruction that parks the selected template family.
     bead: think-a1e8
-    depends_on: [BC-346]
+    depends_on: [BC-353]
     next_evidence: Group the exact witness by D4 orbit, weight, and tight-cell incidence before changing any atom.
     workflows: [insight-iteration, research-loop]
     program: n11-strategy-reset
@@ -253,12 +297,12 @@ agenda:
       One Route C feasibility block with the exact Trump-angle control followed by one
       complete positive-width interval at a rational target near 3.87. Midpoint shrink
       does not make one-degree bins adequate.
-    entry: BC-346 selects Route C and the fixed-angle control reproduces a known feasible arrangement before any exclusion claim.
+    entry: BC-353 selects Route C and the fixed-angle control reproduces a known feasible arrangement before any exclusion claim.
     exit: >-
       A sound excluded orientation window with exact evidence, or a named feasibility or
       interval obstruction that prevents a structural theorem.
     bead: think-29ch
-    depends_on: [BC-346]
+    depends_on: [BC-353]
     next_evidence: Reproduce the 6+5 control at Trump's angle before interpreting any solver infeasibility.
     workflows: [insight-iteration, research-loop]
     program: n11-strategy-reset
@@ -276,13 +320,13 @@ agenda:
       One background Route D proposer-control block comparing one changed proposal
       mechanism with the stock control at equal pair-test work. A larger campaign is
       admissible only after independent or perturbed starts recover an oblique control.
-    entry: BC-346 selects Route D and the runner reproduces Trump's packing and its exact side as a positive control.
+    entry: BC-353 selects Route D and the runner reproduces Trump's packing and its exact side as a positive control.
     exit: >-
       A new verified upper bound, or a retained catalogue of exact-polished competing
       optima useful to an optimality proof; unverified or unreplayed sub-Trump artifacts
       are presumed bugs until exact verification.
     bead: think-7n2w
-    depends_on: [BC-346]
+    depends_on: [BC-353]
     next_evidence: Design the positive-control and endpoint-polishing contract before allocating the background search.
     workflows: [research-survey, research-loop]
     program: n11-strategy-reset
@@ -301,13 +345,13 @@ agenda:
       One Route E admission-and-discrimination block. Freeze a common angle partition,
       coherent selection semantics, every admissible integer profile, the matched
       baseline, and an exact checker before any synthesis target.
-    entry: BC-346 selects Route E and the existing H-131 cap receipts are replayed without strengthening their scope.
+    entry: BC-353 selects Route E and the existing H-131 cap receipts are replayed without strengthening their scope.
     exit: >-
       A valid angular resource removes an optimum retained by the matched baseline, or
       an exact surviving optimum parks this cap family while leaving other angle bands
       and charge functions open.
     bead: think-u15l
-    depends_on: [BC-346]
+    depends_on: [BC-353]
     next_evidence: Test the valid angle-count rows against the entire retained optimal face before building a larger certificate.
     workflows: [factual-review, insight-iteration, research-loop]
     program: n11-strategy-reset
@@ -325,13 +369,13 @@ agenda:
       One Route F1 discriminator. Freeze one candidate charge language, trace universe,
       ordinary-threshold baseline, and exact evaluator; declare whether think-g3j7's
       certificate-format work is a prerequisite.
-    entry: BC-346 selects Route F1 and freezes the exact realizable trace universe and matched ordinary-threshold comparison.
+    entry: BC-353 selects Route F1 and freezes the exact realizable trace universe and matched ordinary-threshold comparison.
     exit: >-
       An exact strict domination gap justifies a larger support-and-atom comparison; an
       ordinary domination proof parks the tested motif without judging other charge
       languages.
     bead: think-o4p9
-    depends_on: [BC-346]
+    depends_on: [BC-353]
     next_evidence: Relate the selected candidate explicitly to adjacent think-yc80 support work and think-g3j7 format admission.
     workflows: [factual-review, insight-iteration, research-loop]
     program: n11-strategy-reset
@@ -349,12 +393,12 @@ agenda:
       One Route F2 discriminator. Freeze one atom with ordinary budget at least two, one
       joint-parent domain, exact containment and trigger semantics, and a complete pair
       evaluator.
-    entry: BC-346 selects Route F2 and separates its physical capacity theorem from charge-language and serializer work.
+    entry: BC-353 selects Route F2 and separates its physical capacity theorem from charge-language and serializer work.
     exit: >-
       A complete joint-parent exclusion lowers the selected atom's budget, or one feasible
       simultaneous triggering pair rejects that reduction without judging other atoms.
     bead: think-iy9h
-    depends_on: [BC-346]
+    depends_on: [BC-353]
     next_evidence: Decide whether the selected atom needs think-g3j7's K5/K6 format before freezing the scientific target.
     workflows: [factual-review, insight-iteration, research-loop]
     program: n11-strategy-reset
@@ -373,12 +417,12 @@ agenda:
       One Route N discriminator over a nontrivial epsilon interval, with n=6 and n=13
       as solved controls and the flexible side-four n12 family included. Do not resume a
       decimal ladder.
-    entry: BC-346 selects Route N and freezes the uniform lemma, interval, control behavior, and exact replay contract.
+    entry: BC-353 selects Route N and freezes the uniform lemma, interval, control behavior, and exact replay contract.
     exit: >-
       A stable complete case reduction or exact parameterized inequality, or a legal
       flex or boundary degeneration that parks the mechanism without resolving H-039.
     bead: think-0z9b
-    depends_on: [BC-346]
+    depends_on: [BC-353]
     next_evidence: Reuse H-039 and the existing n12 lane with its obsolete pre-T-017 target explicitly superseded.
     workflows: [factual-review, insight-iteration, research-loop]
     program: n11-strategy-reset
@@ -395,12 +439,12 @@ agenda:
     budget: >-
       One speculative Route G discriminator: one exact local lemma, the Trump and n=6
       angular-rattler controls, and one explicit global accounting map.
-    entry: BC-346 selects Route G and freezes the local domain, deficit, degeneration controls, and non-overcounting obligation.
+    entry: BC-353 selects Route G and freezes the local domain, deficit, degeneration controls, and non-overcounting obligation.
     exit: >-
       Both the uniform local deficit and complete accounting rule hold, or a legal
       degeneration or duplicate charge parks the candidate.
     bead: think-gzjq
-    depends_on: [BC-346]
+    depends_on: [BC-353]
     next_evidence: Register no hypothesis until W10 selects one concrete local lemma and domain.
     workflows: [factual-review, insight-iteration, research-loop]
     program: n11-strategy-reset
@@ -412,13 +456,23 @@ This agenda is the current execution map after the September 14 strategy reset.
 It preserves the older portfolio’s completed evidence while removing its paused
 incremental lanes from the live queue.
 
-The research-state roll-up and mathematical audit are certified and closed in declared
-dependency order. The audit recommends A, S, angular resources, B, stronger charge
-algebra, geometry-dependent budgets, n12, C, D, then geometric waste; the ordering is a
-judgment about the next allocation, not a measured success probability.
-BC-346 is the current W10 handoff; it will first determine whether the efficiency
-checkpoint is due and then select exactly one execution entry.
-Every unselected route remains tentative until the planning disposition says otherwise.
+The research-state roll-up, mathematical audit, and BC-346 W10 selection are certified
+and closed in declared dependency order.
+BC-340, the due W5 efficiency checkpoint, is the sole next execution entry.
+A conservative source reconstruction counts eight substantive non-W5 blocks since the
+latest qualifying W5 in Session 116/BC-322, which reaches OR-12’s mandatory ceiling.
+
+No scientific target is authorized before W5 closes and BC-353’s fresh W10 selects one.
+The advisory scientific order remains A at side `3.84`, S, angular resources, B,
+stronger charge algebra, geometry-dependent budgets, n12, C, D, then geometric waste.
+Route A is the expected first scientific choice and Route S is its admission fallback,
+but both remain tentative until the post-W5 planning block.
+
+The W10 review maps the next six active work hours into five sequential PR-bounded
+blocks: BC-340 W5, BC-353 W10, selected-route admission, one exact discriminator, and a
+review-and-replan closeout.
+The last three blocks are conditional on the preceding exit; an unadmitted target does
+not run, and no later branch starts before the prior PR merges.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
