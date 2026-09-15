@@ -219,8 +219,9 @@ on this PR from `claude/workbench-defaults-and-bounds`, one commit each:
 
 These add O6 behaviour and repair one test; none closes a Phase 4 or Phase 5 acceptance
 bead. The independent Pack panel keeps its own law and shake scale until `think-doxp`
-decides whether it adopts the new ones, and `think-7sw8` owns the historical checkers
-that assumed the earlier defaults.
+decides whether it adopts the new ones.
+The historical checkers that assumed the earlier defaults were retired at `46b8f14e`
+(above), and the defaults are checked from the page by `check_animation_editor`.
 
 ### Mode Contracts
 
