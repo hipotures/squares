@@ -165,7 +165,7 @@ session:
   - The branch base is merged W5 revision cdb088142f596c468b910a6d44c7915e26ea02e1.
   - No scientific target, solver, search, or verifier has run in BC-353.
   - Three independent Astra Max reviews covered all ten routes and transferable small-n opportunities.
-  - 'full gate: fast at 0489f56e13f25153aa767fd04f8cc196209939a6: passed'
+  - 'full gate: fast at bce050ad5008a3e113f8718a2641a328d5d19bde: passed'
   - 'full gate: fast at 807f0dcca7dc2a9cf651e78bb8b234fcccb65c38: failed'
   - >-
     PR 176 entry run 34920175787 passed every scientific, portability, and mergeability
