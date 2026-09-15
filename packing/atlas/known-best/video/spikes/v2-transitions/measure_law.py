@@ -195,6 +195,7 @@ def main() -> None:
     ap.add_argument("--drawn", action="store_true")
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--n", type=int, nargs="*", default=list(SIZES))
+    ap.add_argument("--page", type=Path, default=PAGE, help="the built workbench page")
     args = ap.parse_args()
     everything = not (args.laws or args.graphs or args.grow or args.drawn)
     out: dict[str, list[dict]] = {}
@@ -203,7 +204,7 @@ def main() -> None:
         page = browser.new_page(viewport={"width": 1920, "height": 1080})
         errors: list[str] = []
         page.on("pageerror", lambda e: errors.append(str(e)))
-        page.goto(PAGE.as_uri(), wait_until="load")
+        page.goto(args.page.resolve().as_uri(), wait_until="load")
         page.wait_for_timeout(400)
         if everything or args.laws:
             out["the force law"] = law_table(page, args.n)
