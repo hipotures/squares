@@ -119,12 +119,16 @@ eight-block ceiling after Session 116/BC-322. Session 131 has now completed BC-3
 VE-005 accepted one guarded validation repair, and the first candidate hosted checks
 tier passed at 106.38 seconds against the unchanged 195-second ceiling.
 BC-353 selected Route A and is terminal.
-BC-354 / `think-0t5y` is the sole next entry: a 75-minute, no-target admission of one
-complete same-corner root at side `96/25`, its shared physical geometry, matched
-baseline, exact controls, and independent checker.
-BC-341 remains blocked until that admission merges.
-If the complete root or checker cannot be admitted in the block, Route S becomes the
-sole next admission entry.
+BC-354 stopped at Route A’s representation boundary without running a target or closing
+a physical root; the complete 80-stratum negative-root producer, matched exact baseline,
+conditional gate, and independent replay remain absent.
+BC-343 / `think-a1e8` is the sole next entry.
+Its first pull request is a no-target Route S admission that freezes T-025/T-026 as the
+unchanged control, the at-most-23 active-orbit ceiling or another predeclared metric,
+one template family, mutation controls, unchanged exact replays, and the accept-or-park
+rule before optimization.
+BC-341 remains tentative behind a future W10 reselection and the missing Route A
+representation.
 
 The planning candidates are:
 
