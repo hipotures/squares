@@ -165,7 +165,7 @@ agenda:
     purpose: measurement_validation
     owner_focus: efficiency
     instances: [11]
-    state: in_progress
+    state: complete
     priority: 0
     question: >-
       Does the four-to-eight-block cadence make an efficiency checkpoint due, and if so
@@ -187,12 +187,31 @@ agenda:
     program: n11-strategy-reset
     artifacts:
     - packing/campaign/agent-sessions/session-131-n11-w5-validation-efficiency.md
+    - packing/benchmarks/validation-efficiency/experiments/VE-005-rollup-corpus-snapshot.md
     parallel_group: efficiency-checkpoint
+    outcomes:
+    - scope: >-
+        The current pull-request gate at its declared host shape, one demonstrated
+        bottleneck, its equivalence guard, and a measured response; no scientific target.
+      classification: achieved
+      result: >-
+        VE-005 removed repeated whole-corpus parsing from the branch-cost rollup. Three
+        alternating local pairs reduced its median from 47.72 to 2.31 seconds without
+        changing the representative output digest or rendered branch population. The
+        first candidate hosted checks tier passed at 106.38 seconds against the
+        unchanged 195-second ceiling; further hosted readings are required before a
+        measured baseline is recorded.
+      evidence:
+      - packing/benchmarks/validation-efficiency/experiments/VE-005-rollup-corpus-snapshot.md
+      - packing/benchmarks/validation-efficiency/report.md
+      - packing/campaign/agent-sessions/session-131-n11-w5-validation-efficiency.md
+      disposition: retire-success
+      follow_up: think-d3h5
   - id: BC-353
     purpose: tool_validation
     owner_focus: process
     instances: [11]
-    state: blocked
+    state: ready
     priority: 0
     question: >-
       After the due efficiency checkpoint, which one scientific route has the highest

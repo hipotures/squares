@@ -4052,13 +4052,14 @@ in separate tables: their units differ, and the same work can appear in both.
 | `codex-task-tree-session-123.yaml` | session-123 | 87 | 18.56 h | 6.18 h | 6.18 h | yes |
 | `codex-task-tree-session-124-publication.yaml` | session-124 | 154 | 6.97 h | 0.41 h | 0.41 h | yes |
 | `codex-task-tree-session-126.yaml` | session-126 | 576 | 4.31 h | 2.39 h | 2.39 h | yes |
+| `codex-task-tree-session-131.yaml` | session-131 | 313 | 1.24 h | 0.75 h | 0.75 h | yes |
 | `codex-task-tree-pr137-publication-tail.yaml` | unattributed | 610 | 4.39 h | 1.77 h | 1.82 h | yes |
 | `codex-task-tree-pr142-publication-tail.yaml` | unattributed | 136 | 0.87 h | 0.41 h | 0.58 h | yes |
 
 | Coverage | sessions |
 | --- | ---: |
-| measured | 82 |
-| unmeasured | 49 |
+| measured | 83 |
+| unmeasured | 48 |
 | **total** | **131** |
 
 <!-- END GENERATED: session-close-report -->
