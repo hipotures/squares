@@ -62,7 +62,8 @@ __WORKBENCH_CSS__
         <div class="numeral-slot" id="numeral-a"></div>
         <div class="numeral-slot" id="numeral-b"></div>
       </div>
-      <div id="pack-stage-facts" aria-live="polite" hidden></div>
+      <div id="pack-stage-facts" hidden></div>
+      <p class="sr-only" id="pack-announcement" aria-live="polite" aria-atomic="true"></p>
     </div>
   </div>
   <div id="controls">
@@ -296,8 +297,8 @@ __WORKBENCH_CSS__
           <textarea id="pack-json" rows="5" spellcheck="false"></textarea>
           <button type="button" id="pack-load">Load snapshot</button>
         </details>
-        <output id="pack-status" aria-live="polite"></output>
-        <output id="pack-repair-status" aria-live="polite"></output>
+        <output id="pack-status" aria-live="off"></output>
+        <output id="pack-repair-status" aria-live="off"></output>
       </section>
       <section id="search-workspace" aria-labelledby="search-workspace-title" hidden>
         <h2 id="search-workspace-title">Experimental search</h2>
