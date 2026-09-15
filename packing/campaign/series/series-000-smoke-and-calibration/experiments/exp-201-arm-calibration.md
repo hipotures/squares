@@ -42,7 +42,7 @@ experiment:
     entry_point: devtools/run_arm_sweep.py
     command: python3 devtools/run_arm_sweep.py <plan>.yaml --out <pass>
     budget: 1.13e12 pair tests over four passes, 2,681 s wall
-    record: campaign/series/series-000-smoke-and-calibration/results/exp-201-arm-calibration/
+    record: packing/campaign/series/series-000-smoke-and-calibration/results/exp-201-arm-calibration/
   effort:
     timebox: 90m
     wall_seconds: 2681.0

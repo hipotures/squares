@@ -40,7 +40,7 @@ experiment:
     entry_point: devtools/run_arm_sweep.py
     command: python3 devtools/run_arm_sweep.py plan-part-1.yaml --out part-1
     budget: 1.25e9 pair tests per chain, 8 chains, 5 seeds, 11 cells per arm
-    record: campaign/series/series-000-smoke-and-calibration/results/exp-202-round-1/
+    record: packing/campaign/series/series-000-smoke-and-calibration/results/exp-202-round-1/
   effort:
     timebox: 3h
     wall_seconds: 3663.0

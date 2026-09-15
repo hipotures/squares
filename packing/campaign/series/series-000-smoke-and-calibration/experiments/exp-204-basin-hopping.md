@@ -43,7 +43,7 @@ experiment:
     command: python3 devtools/run_basin_hopping.py --cells 5,10,11,17,19 --seeds 1,2,3,4,5
       --quenches 20 --quench-seconds 4 --eps0 0.1 --out <dir>
     budget: 1,000 refined local optima, 500 per condition, 4,871 s wall
-    record: campaign/series/series-000-smoke-and-calibration/results/exp-204-basin-hopping/
+    record: packing/campaign/series/series-000-smoke-and-calibration/results/exp-204-basin-hopping/
   effort:
     timebox: 2h
     wall_seconds: 4871.0
