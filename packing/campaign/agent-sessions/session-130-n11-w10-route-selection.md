@@ -15,7 +15,6 @@ session:
   branch: codex/n11-w10-route-selection
   primary_bead: think-9y7p
   status: stopped
-  certification_pending: think-9y7p
   goal: >-
     Reconstruct whether OR-12 makes the W5 checkpoint due, review the recent merged
     stack for stability, compare every audited mathematical route on one common frame,
@@ -88,11 +87,11 @@ session:
     - packing/campaign/agendas/agenda-033-overnight-owner-geometry.md
     - packing/campaign/agendas/agenda-036-n11-strategy-reset-roadmap.md
     stop_reason: >-
-      The route selection and all alternative dispositions are durable; exact-revision
-      certification remains the only unfinished part of BC-346.
+      The route selection and all alternative dispositions are durable, and the exact
+      planning source passed the hosted fast gate on an unchanged-source retry.
     next_action: >-
-      Complete BC-346 under think-9y7p by certifying this planning source before
-      advancing the current handoff to BC-340.
+      Run BC-340 under think-1ydi as the separate W5 efficiency checkpoint, beginning
+      with the measured gate and running no scientific target.
   progress:
     metric: >-
       Audited candidate entries with an explicit disposition and one selected next
@@ -188,14 +187,17 @@ session:
   - The next six active work hours are mapped into five sequential blocks with separate merge boundaries.
   - No efficiency repair or scientific target ran.
   - 'full gate: fast at 32d81339b84c6d7e5d6a30e8365627f059805209: failed (structured certification-pending field absent)'
-  - 'certification pending: think-9y7p'
+  - 'GitHub Actions run 34912062104 attempt 1 completed every correctness check but the checks tier took 195.60 seconds against its 195-second ceiling.'
+  - 'full gate: fast at 1b2c911c866843b460b80b333c64e57d6d2b8542: passed (GitHub Actions run 34912062104 attempt 2; checks tier 181.86 seconds, suite, geometry, sweeps, macOS portability, mergeability, and packing-required all passed)'
+  - 'A local fast gate at b73b517a686adc5f7d4f8788d99472ade9ce2b8a passed in 397.83 seconds; a later local run at 040ceacafcb893040904df6ade5211b1adeae0e1 exceeded 600 seconds under concurrent host load and was interrupted.'
   resource_rollups: []
   stop_reason: >-
     The source-bound cadence, stability review, route matrix, and single W5 selection
-    are durable. Native task-tree usage is unavailable and was not reconstructed.
+    are durable and exact-source certified. Native task-tree usage is unavailable and
+    was not reconstructed.
   next_action: >-
-    Complete BC-346 under think-9y7p by certifying this planning source; the durable W10
-    review owns the selected subsequent checkpoint and its separate pull-request boundary.
+    Run BC-340 under think-1ydi as a separate W5 efficiency block and pull request,
+    beginning with the declared gate and running no scientific target.
 ---
 # N11 W10 Route Selection
 

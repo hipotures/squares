@@ -154,6 +154,16 @@ If Route A cannot freeze a complete family and checker during admission, the tar
 not run; the remaining work clock returns to W10 and Route S rather than turning an
 incomplete sample into evidence.
 
+## Validation Receipt
+
+The exact planning source `1b2c911c866843b460b80b333c64e57d6d2b8542` passed the hosted
+fast surface in GitHub Actions run 34912062104, attempt 2: checks, suite, geometry,
+sweeps, macOS portability, mergeability, and the aggregate required gate all passed.
+Attempt 1 completed the correctness checks but measured the checks tier at 195.60
+seconds against its 195-second ceiling; the unchanged retry measured 181.86 seconds.
+W5 owns that variance as entry evidence.
+This planning block changes no gate budget and runs no repair.
+
 ## Next Block Contract
 
 BC-340 begins with the current gate and declared ceilings.

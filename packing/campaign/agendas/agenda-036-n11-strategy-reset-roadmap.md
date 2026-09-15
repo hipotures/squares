@@ -118,7 +118,7 @@ agenda:
     purpose: tool_validation
     owner_focus: process
     instances: [11]
-    state: in_progress
+    state: complete
     priority: 0
     question: >-
       Given the reconciled state, is the validation-efficiency checkpoint due, and which
@@ -145,11 +145,27 @@ agenda:
     - docs/project/reviews/review-2026-09-14-n11-w10-route-selection.md
     - packing/campaign/agent-sessions/session-130-n11-w10-route-selection.md
     parallel_group: route-selection
+    outcomes:
+    - scope: >-
+        The post-audit W5 cadence, recent-merge stability, ten scientific candidates,
+        and one bounded next entry, without running an efficiency repair or scientific
+        target.
+      classification: achieved
+      result: >-
+        The conservative cadence reaches OR-12's eight-block ceiling, so BC-340 is the
+        sole selected next entry. Every scientific candidate remains behind BC-353's
+        fresh post-W5 selection; Route A at 3.84 is the presumptive first choice and
+        Route S its admission fallback, but neither is authorized.
+      evidence:
+      - docs/project/reviews/review-2026-09-14-n11-w10-route-selection.md
+      - packing/campaign/agent-sessions/session-130-n11-w10-route-selection.md
+      disposition: retire-success
+      follow_up: think-1ydi
   - id: BC-340
     purpose: measurement_validation
     owner_focus: efficiency
     instances: [11]
-    state: tentative
+    state: ready
     priority: 0
     question: >-
       Does the four-to-eight-block cadence make an efficiency checkpoint due, and if so
@@ -440,9 +456,9 @@ This agenda is the current execution map after the September 14 strategy reset.
 It preserves the older portfolio’s completed evidence while removing its paused
 incremental lanes from the live queue.
 
-The research-state roll-up and mathematical audit are certified and closed in declared
-dependency order. BC-346’s W10 review has now selected BC-340, the due W5 efficiency
-checkpoint, as the next execution entry; exact-revision certification is still pending.
+The research-state roll-up, mathematical audit, and BC-346 W10 selection are certified
+and closed in declared dependency order.
+BC-340, the due W5 efficiency checkpoint, is the sole next execution entry.
 A conservative source reconstruction counts eight substantive non-W5 blocks since the
 latest qualifying W5 in Session 116/BC-322, which reaches OR-12’s mandatory ceiling.
 
