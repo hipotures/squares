@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { parsePackSnapshot } from "../src/api/pack-api.ts";
+import { maximumPackContainerSide, parsePackSnapshot } from "../src/api/pack-api.ts";
 import { PackController } from "../src/app/pack-controller.ts";
 import { createGridPackStart } from "../src/simulation/pack.ts";
 import { createColourSystem } from "../src/view/colour.ts";
@@ -51,6 +51,47 @@ test("snapshot import/export isolates ownership and invalid input is transaction
   assert.throws(() => controller.load({ ...snapshot, squareSide: Number.NaN }));
   assert.equal(controller.export().container.side, 3);
   assert.throws(() => parsePackSnapshot({ ...snapshot, poses: [{ x: "1", y: 1, angle: 0 }] }));
+});
+
+test("a container out of proportion to its squares is refused before it reaches a run", () => {
+  const huge = {
+    squareSide: 1,
+    container: { originX: 0, originY: 0, side: 1e6 },
+    poses: [{ x: 0.5, y: 0.5, angle: 0 }],
+  };
+  assert.throws(() => parsePackSnapshot(huge), {
+    name: "RangeError",
+    message:
+      "Pack snapshot container side 1000000 is too large for n = 1 squares of side 1; the most accepted is 8",
+  });
+  const controller = new PackController();
+  const before = controller.state();
+  assert.throws(() => controller.load(huge), RangeError);
+  assert.throws(() => new PackController({ startKind: "given", snapshot: huge }), RangeError);
+  assert.deepEqual(controller.state(), before);
+
+  // Four grid sides plus four squares, in the snapshot's own square units.
+  assert.equal(maximumPackContainerSide(1, 1), 8);
+  assert.equal(maximumPackContainerSide(17, 1), 24);
+  assert.equal(maximumPackContainerSide(400, 1), 84);
+  assert.equal(maximumPackContainerSide(17, 0.5), 12);
+  const atBound = { ...huge, container: { originX: 0, originY: 0, side: 8 } };
+  assert.equal(parsePackSnapshot(atBound).container.side, 8);
+  const pastBound = { ...huge, container: { originX: 0, originY: 0, side: 8.000001 } };
+  assert.throws(() => parsePackSnapshot(pastBound), RangeError);
+  const scaled = { ...huge, squareSide: 1_000, container: { originX: 0, originY: 0, side: 8_000 } };
+  assert.equal(parsePackSnapshot(scaled).container.side, 8_000);
+
+  // Every start Pack makes for itself, and every run's own export, stays inside the bound.
+  for (const n of [1, 2, 3, 17, 100, 325, 400]) {
+    for (const startKind of ["grid", "random"] as const) {
+      const run = new PackController({ n, seed: 3, startKind });
+      const start = run.export();
+      assert.ok(start.container.side <= maximumPackContainerSide(n, start.squareSide));
+      run.step(10);
+      assert.doesNotThrow(() => run.load(run.export()));
+    }
+  }
 });
 
 test("successful Resolve retains raw evidence and begins a fresh repaired phase", () => {
