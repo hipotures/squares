@@ -88,6 +88,10 @@ def test_an_undeclared_tolerance_is_a_contract_error() -> None:
 def test_the_first_issue_is_the_reason_the_contract_reports() -> None:
     overlapping_and_outside = [(0.4, 0.5, 0.0), (0.4, 0.5, 0.0)]
     check = check_unit_square_packing(overlapping_and_outside, side=2.0, expected_count=2)
-    assert check.issues == (GeometryIssue.PAIR_OVERLAP, GeometryIssue.WALL_ESCAPE)
+    assert check.issues == (
+        GeometryIssue.PAIR_OVERLAP,
+        GeometryIssue.WALL_ESCAPE,
+        GeometryIssue.AREA_BOUND,
+    )
     assert check.reason == "pair-overlap"
     assert check.max_pair_overlap == pytest.approx(1.0)

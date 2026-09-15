@@ -45,8 +45,15 @@ CONTRACT_CLAUSES = (
     "dimensions",
     "pair-overlap",
     "wall-overlap",
+    "area-bound",
+    "magnitude",
     "unit-size",
 )
+
+#: The largest centre, container origin, container side or square side the float64 measure is
+#: trusted at (`PACKING_VALIDITY.coordinateLimit`). Rounding at 2^17 stays under a tenth of the
+#: contract tolerance; near 2^52 a centre plus or minus half a side rounds away entirely.
+COORDINATE_LIMIT = float(2**16)
 
 
 class PackingContractError(ValueError):
@@ -66,6 +73,8 @@ class GeometryIssue(StrEnum):
     DIMENSIONS = "dimensions"
     PAIR_OVERLAP = "pair-overlap"
     WALL_ESCAPE = "wall-overlap"
+    AREA_BOUND = "area-bound"
+    MAGNITUDE = "magnitude"
     UNIT_SIZE = "unit-size"
 
 
@@ -314,6 +323,14 @@ def check_unit_square_packing(
         issues.append(GeometryIssue.PAIR_OVERLAP)
     if wall_failures:
         issues.append(GeometryIssue.WALL_ESCAPE)
+    fitted_side = required_side(matrix, square_float)
+    if fitted_side < area_bound(expected_count, square_float, tolerance):
+        issues.append(GeometryIssue.AREA_BOUND)
+    lengths = [square_float, side_float, *origin_pair]
+    if max(abs(value) for value in lengths) > COORDINATE_LIMIT or (
+        float(np.max(np.abs(matrix[:, :2]))) > COORDINATE_LIMIT
+    ):
+        issues.append(GeometryIssue.MAGNITUDE)
     if square_float != UNIT_SQUARE_SIDE:
         issues.append(GeometryIssue.UNIT_SIZE)
     return GeometryCheck(
@@ -328,10 +345,20 @@ def check_unit_square_packing(
         square_side=square_float,
         max_pair_overlap=float(pairs.max()) if pairs.size else 0.0,
         max_wall_overlap=float(walls.max()) if walls.size else 0.0,
-        required_side=required_side(matrix, square_float),
+        required_side=fitted_side,
     )
 
 
 def malformed(check: GeometryCheck) -> bool:
     """Whether the record could not be measured: shape, count, finiteness or dimensions."""
     return bool(_MALFORMED.intersection(check.issues))
+
+
+def area_bound(count: int, square_side: float, tolerance: float) -> float:
+    """The smallest side a tolerance-qualified packing of `count` squares can measure.
+
+    Squares whose pairs penetrate by at most `tolerance` still fit without overlap when shrunk
+    by twice the tolerance, so their tight side is at least `sqrt(count)` of that; one more
+    tolerance allows for rounding. This is `areaBound` in the TypeScript contract.
+    """
+    return math.sqrt(count) * (square_side - 2 * tolerance) - tolerance

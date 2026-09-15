@@ -96,7 +96,7 @@ test("iteration exhaustion returns the checked partial repair without a success 
   assert.equal(result.repaired?.reason, "pair-overlap");
 });
 
-test("count, dimensions, nonfinite and non-unit input are refused without a repaired state", () => {
+test("count, dimensions, nonfinite, non-unit and out-of-limit input are refused unrepaired", () => {
   const count = resolvePacking(snapshot([{ x: 0.5, y: 0.5, angle: 0 }]), configuration);
   assert.equal(count.termination.reason, "refused-count");
   assert.equal(count.repaired, null);
@@ -133,6 +133,22 @@ test("count, dimensions, nonfinite and non-unit input are refused without a repa
   assert.equal(halfSize.termination.reason, "refused-unit-size");
   assert.equal(halfSize.termination.resolved, false);
   assert.equal(halfSize.repaired, null);
+  // Overlapping squares beyond the coordinate limit: fitting them to the origin cannot recover
+  // the digits float64 already lost, so Resolve must not report a repaired packing.
+  const far = 2 ** 40;
+  const beyondLimit = resolvePacking(
+    {
+      squareSide: 1,
+      container: { originX: far, originY: 0, side: 2 },
+      poses: [
+        { x: far + 0.5, y: 0.5, angle: 0 },
+        { x: far + 1.25, y: 0.5, angle: 0 },
+      ],
+    },
+    configuration,
+  );
+  assert.equal(beyondLimit.termination.reason, "refused-magnitude");
+  assert.equal(beyondLimit.repaired, null);
   assert.deepEqual(nonfinite.work, {
     iterations: 0,
     pairTests: 0,

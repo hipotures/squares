@@ -3,6 +3,7 @@ import {
   assessPackingSnapshot,
   PACKING_VALIDITY,
   type PackingAssessment,
+  withinCoordinateLimit,
 } from "../core/runtime-contracts.ts";
 
 export interface ResolveConfiguration {
@@ -29,6 +30,7 @@ export const RESOLVE_TERMINATION_REASONS = Object.freeze([
   "refused-count",
   "refused-dimensions",
   "refused-nonfinite",
+  "refused-magnitude",
   "refused-unit-size",
 ] as const);
 
@@ -197,6 +199,10 @@ function refusedReason(assessment: PackingAssessment): ResolveTerminationReason 
   }
   if (assessment.reason === "dimensions") {
     return "refused-dimensions";
+  }
+  if (!withinCoordinateLimit(assessment.snapshot)) {
+    // Fitting to the origin cannot restore digits float64 already lost at this magnitude.
+    return "refused-magnitude";
   }
   if (assessment.snapshot.squareSide !== PACKING_VALIDITY.squareSide) {
     // Translation cannot change a square's size, so no repair of this input is a packing.

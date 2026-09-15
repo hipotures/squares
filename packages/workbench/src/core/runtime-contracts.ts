@@ -30,15 +30,51 @@ export const PACKING_VALIDITY = Object.freeze({
   squareSide: 1,
   /** The largest pair or wall penetration, in the poses' length unit, that still counts as contact. */
   penetrationTolerance: 1e-9,
+  /**
+   * The largest centre, container origin, container side or square side the float64 measure is
+   * trusted at. Float64 spacing at 2^17, where an origin plus a side can reach, is 2.9e-11, and the
+   * pair, wall and side measures each take a few subtractions of such values, so rounding stays
+   * under 1.2e-10, a tenth of `penetrationTolerance`. Near 2^52 a centre +- half a side rounds
+   * away entirely and overlapping squares read as touching.
+   */
+  coordinateLimit: 2 ** 16,
+  /**
+   * The order an assessment reports the first failure in. The two precision clauses follow the
+   * geometric ones because they only matter for an arrangement that would otherwise pass.
+   * `area-bound`: n squares of side a whose pairs penetrate by at most t still fit, shrunk to side
+   * a - 2t, without overlap, so their tight side is at least sqrt(n)(a - 2t); a measured side below
+   * that, less one more t for rounding, can only come from arithmetic that lost the geometry.
+   */
   clauses: Object.freeze([
     "count",
     "nonfinite",
     "dimensions",
     "pair-overlap",
     "wall-overlap",
+    "area-bound",
+    "magnitude",
     "unit-size",
   ] as const),
 });
+
+/** The smallest side a tolerance-qualified packing of `count` squares can measure (`area-bound`). */
+export function areaBound(count: number, squareSide: number, tolerance: number): number {
+  return Math.sqrt(count) * (squareSide - 2 * tolerance) - tolerance;
+}
+
+/** Whether every length in the snapshot is inside `PACKING_VALIDITY.coordinateLimit` (`magnitude`). */
+export function withinCoordinateLimit(snapshot: GeometrySnapshot): boolean {
+  const limit = PACKING_VALIDITY.coordinateLimit;
+  if (
+    Math.abs(snapshot.squareSide) > limit ||
+    Math.abs(snapshot.container.originX) > limit ||
+    Math.abs(snapshot.container.originY) > limit ||
+    Math.abs(snapshot.container.side) > limit
+  ) {
+    return false;
+  }
+  return snapshot.poses.every((pose) => Math.abs(pose.x) <= limit && Math.abs(pose.y) <= limit);
+}
 
 /**
  * The one declared exception to the contract tolerance: frames at the catalogue's stored precision.
@@ -70,7 +106,7 @@ export interface PackingAssessment {
   snapshot: PackingSnapshot;
   /** Every clause of `PACKING_VALIDITY` holds at `tolerance`. */
   valid: boolean;
-  /** The pair and wall clauses hold at `tolerance`, whatever the square size. */
+  /** Every clause but `unit-size` holds at `tolerance`: sound geometry, whatever the square size. */
   geometryValid: boolean;
   /** The first clause that failed, in `PACKING_VALIDITY.clauses` order. */
   reason: PackingValidityClause | null;
@@ -217,21 +253,21 @@ function assessAtTolerance(
     return { ...unavailable, valid: false, reason: "dimensions" };
   }
   const geometry = measurePackingGeometry(snapshot);
-  const pairOverlap = geometry.maxPairOverlap > tolerance;
-  const wallOverlap = geometry.maxWallOverlap > tolerance;
-  const geometryValid = !pairOverlap && !wallOverlap;
-  const unitSize = snapshot.squareSide === PACKING_VALIDITY.squareSide;
-  const reason: PackingValidityClause | null = pairOverlap
-    ? "pair-overlap"
-    : wallOverlap
-      ? "wall-overlap"
-      : unitSize
-        ? null
-        : "unit-size";
+  const failed: readonly [boolean, PackingValidityClause][] = [
+    [geometry.maxPairOverlap > tolerance, "pair-overlap"],
+    [geometry.maxWallOverlap > tolerance, "wall-overlap"],
+    [
+      geometry.requiredSide < areaBound(expectedCount, snapshot.squareSide, tolerance),
+      "area-bound",
+    ],
+    [!withinCoordinateLimit(snapshot), "magnitude"],
+    [snapshot.squareSide !== PACKING_VALIDITY.squareSide, "unit-size"],
+  ];
+  const reason = failed.find(([fails]) => fails)?.[1] ?? null;
   return {
     snapshot,
     valid: reason === null,
-    geometryValid,
+    geometryValid: reason === null || reason === "unit-size",
     reason,
     tolerance,
     requiredSide: geometry.requiredSide,
@@ -289,6 +325,8 @@ export function admitBestPacking(
 export const workbenchCore = Object.freeze({
   PACKING_VALIDITY,
   CATALOGUE_PRECISION,
+  areaBound,
+  withinCoordinateLimit,
   parseUint32Seed,
   mixUint32Seed,
   seededRandom,

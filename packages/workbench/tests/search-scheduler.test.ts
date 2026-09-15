@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { measurePackingGeometry } from "../src/core/geometry.ts";
+import type { PackingSnapshot } from "../src/core/runtime-contracts.ts";
 import type {
   JsonObject,
   SearchPlan,
@@ -330,6 +332,143 @@ test("ledger admission recomputes geometry and refuses missing work and unknown 
       ),
     /physicsSteps/,
   );
+});
+
+function singleSlotPlan(n: number): SearchPlan {
+  return decodeSearchPlan({
+    contract: "packing.squares:SearchPlan/v1",
+    id: `forgery-n${n}`,
+    source: { commit: "abc123", dirty: false, runtime: "node-test", engine: "pack/v1" },
+    configurations: [
+      {
+        id: "control",
+        configuration: {
+          mode: "blind",
+          objective: { kind: "absolute-side", state: "best-observed", require_stationary: false },
+        },
+      },
+    ],
+    cohorts: [
+      {
+        id: "forgery",
+        configuration_id: "control",
+        partition: "tuning",
+        n,
+        seeds: [0],
+        block_size: 1,
+        work_budget: { proposal_attempts: 1, physics_steps: 4, repair_iterations: 0 },
+      },
+    ],
+  });
+}
+
+/** A trial that claims `snapshot` is a valid packing, with every field a forger can compute. */
+function claimedValid(configuration: JsonObject, snapshot: PackingSnapshot): SearchTrialValue {
+  const side = measurePackingGeometry(snapshot).requiredSide;
+  const state = { snapshot, valid: true, validityReason: null, absoluteSide: side };
+  return { ...completed(configuration), raw: state, bestObserved: state, objective: side };
+}
+
+function grid(columns: number, base: number, squareSide = 1): PackingSnapshot {
+  return {
+    squareSide,
+    container: { originX: base, originY: base, side: columns * squareSide },
+    poses: Array.from({ length: columns * columns }, (_unused, index) => ({
+      x: base + ((index % columns) + 0.5) * squareSide,
+      y: base + (Math.floor(index / columns) + 0.5) * squareSide,
+      angle: 0,
+    })),
+  };
+}
+
+test("ledger admission refuses forged geometry at any magnitude, rotation or square size", async () => {
+  // Integers near 2^52 are exact, but a centre +- 0.5 rounds to one of them, so this grid of
+  // touching squares reads with no overlap and a side of 2.
+  const far = 2 ** 52 + 2;
+  const forgeries: ReadonlyArray<{
+    name: string;
+    honest: PackingSnapshot;
+    forged: PackingSnapshot;
+  }> = [
+    {
+      name: "a 3 by 3 grid at 2^52 whose side reads 2",
+      honest: grid(3, 0),
+      forged: {
+        squareSide: 1,
+        container: { originX: far, originY: far, side: 2 },
+        poses: Array.from({ length: 9 }, (_unused, index) => ({
+          x: far + (index % 3),
+          y: far + Math.floor(index / 3),
+          angle: 0,
+        })),
+      },
+    },
+    {
+      name: "one square at 1e17 whose side reads 0",
+      honest: grid(1, 0),
+      forged: {
+        squareSide: 1,
+        container: { originX: 1e17, originY: 1e17, side: 1 },
+        poses: [{ x: 1e17, y: 1e17, angle: 0 }],
+      },
+    },
+    {
+      name: "two squares 5e-6 into each other",
+      honest: grid(2, 0),
+      forged: {
+        ...grid(2, 0),
+        poses: grid(2, 0).poses.map((pose, index) =>
+          index === 1 ? { ...pose, x: pose.x - 5e-6 } : pose,
+        ),
+      },
+    },
+    {
+      name: "a rotated square's corner 2e-9 into its neighbour",
+      honest: grid(2, 0),
+      forged: {
+        squareSide: 1,
+        container: { originX: 0, originY: 0, side: 3 },
+        poses: [
+          { x: 1, y: 1, angle: Math.PI / 4 },
+          { x: 2.2071067791865473, y: 1, angle: 0 },
+          { x: 0.5, y: 2.5, angle: 0 },
+          { x: 2.5, y: 2.5, angle: 0 },
+        ],
+      },
+    },
+    { name: "half-size squares", honest: grid(2, 0), forged: grid(2, 0, 0.5) },
+  ];
+  for (const { name, honest, forged } of forgeries) {
+    const n = honest.poses.length;
+    const declared = singleSlotPlan(n);
+    const ledger = await runSearchPlan(
+      declared,
+      (_slot, configuration) => claimedValid(configuration, honest),
+      { now: () => 0 },
+    );
+    assert.equal(ledger.outcomes[0]?.status, "completed", `${name}: honest control`);
+    const forgedLedger = structuredClone(ledger);
+    const outcome = required(forgedLedger.outcomes[0]);
+    if (outcome.status !== "completed") {
+      throw new Error("expected a completed control");
+    }
+    const configuration = outcome.result.configuration;
+    outcome.result = claimedValid(configuration, forged);
+    assert.throws(() => decodeSearchOutcomes(forgedLedger, declared), /validity disagrees/, name);
+    assert.throws(() => summarizeSearch(declared, forgedLedger), /validity disagrees/, name);
+    await assert.rejects(
+      runSearchPlan(declared, (_slot, again) => claimedValid(again, honest), {
+        resume: forgedLedger,
+        now: () => 0,
+      }),
+      /validity disagrees/,
+      name,
+    );
+    const direct = await runSearchPlan(declared, (_slot, again) => claimedValid(again, forged), {
+      now: () => 0,
+    });
+    assert.equal(direct.outcomes[0]?.status, "failed", name);
+  }
 });
 
 test("no observed valid packing completes with a null objective rather than failing", async () => {
