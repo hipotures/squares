@@ -67,9 +67,6 @@ allowlist:
   - path: packing/devtools/prepare_explainer_math.py
     sites: 51
     bead: think-3pox
-  - path: packing/devtools/render_explainer.py
-    sites: 4
-    bead: think-3pox
   - path: packing/tests/test_browser_floor_contract.py
     sites: 2
     bead: think-3pox
@@ -90,7 +87,4 @@ allowlist:
     bead: think-3pox
   - path: packing/tests/test_prepare_explainer_math.py
     sites: 4
-    bead: think-3pox
-  - path: packing/tests/test_render_explainer_fonts.py
-    sites: 13
     bead: think-3pox
