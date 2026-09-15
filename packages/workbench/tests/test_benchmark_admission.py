@@ -294,7 +294,13 @@ def test_sweep_cannot_rank_an_invalid_high_score(
         resolved_poses=None,
     )
     monkeypatch.setattr(bench, "RESULTS", tmp_path)
-    monkeypatch.setattr(bench, "run_trials", lambda _run: [good, bad])
+    monkeypatch.setattr(
+        bench,
+        "run_trials",
+        lambda _run: bench.RunResult(
+            planned=[(5, 0), (5, 1)], trials=[good, bad], failures=[], stopped_early=False
+        ),
+    )
     args = argparse.Namespace(
         sweep=["anneal=6"], n=[5], style="bodies", inflate=None, anneal=6, budget=1.0
     )

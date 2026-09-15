@@ -18,11 +18,12 @@ from workbench_tools.cohort_manifest import (
     strict_json,
 )
 from workbench_tools.trial_records import (
+    AttemptFailure,
     Trial,
     admission_reason,
+    attempt_from_json,
     canonical_reference,
     check_success_band,
-    trial_from_row,
 )
 
 
@@ -294,6 +295,19 @@ def report(
     }
 
 
+def _require_failed_attempt(
+    manifest: Manifest, cohort_id: str, failure: AttemptFailure, line: int
+) -> None:
+    """A benchmark failure row is evidence only for a slot the manifest records as failed."""
+    cohort = next(cohort for cohort in manifest.cohorts if cohort.identifier == cohort_id)
+    statuses = {attempt.seed: attempt.status for attempt in cohort.attempts}
+    if failure.n != cohort.n or statuses.get(failure.seed) is not AttemptStatus.FAILED:
+        raise ValueError(
+            f"line {line}: a {failure.reason} failure for n = {failure.n}, seed {failure.seed} "
+            f"is not a failed attempt of {cohort_id}"
+        )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("manifest", type=Path)
@@ -318,7 +332,11 @@ def main() -> int:
         key, trial = row["cohort"], row["trial"]
         if not isinstance(key, str) or key not in trials or not isinstance(trial, dict):
             raise ValueError(f"line {number}: unknown cohort or malformed trial")
-        trials[key].append(trial_from_row(trial))
+        attempt = attempt_from_json(json.dumps(trial, allow_nan=False))
+        if isinstance(attempt, AttemptFailure):
+            _require_failed_attempt(manifest, key, attempt, number)
+            continue
+        trials[key].append(attempt)
     args.out.write_text(
         json.dumps(
             report(manifest, trials, tolerance_pct=args.tolerance_pct),

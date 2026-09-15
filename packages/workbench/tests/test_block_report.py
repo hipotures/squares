@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from dataclasses import replace
 from pathlib import Path
+from typing import cast
 
 import pytest
 
@@ -21,11 +22,13 @@ from workbench_tools.cohort_manifest import (
     strict_json,
 )
 from workbench_tools.trial_records import (
+    AttemptFailure,
     EffectiveConfiguration,
     RepairReceipt,
     SourceReceipt,
     Trial,
     admission_reason,
+    attempt_to_json,
     canonical_reference,
 )
 
@@ -401,3 +404,43 @@ def test_a_block_success_band_finer_than_the_validity_tolerance_is_refused() -> 
         block_report.summarize_cohort(cohort, [_verified_trial()], tolerance_pct=0.0)
     with pytest.raises(ValueError, match="finer than the validity tolerance"):
         block_report.summarize_cohort(cohort, [_verified_trial()], tolerance_pct=1e-8)
+
+
+def test_raw_benchmark_failure_rows_count_only_as_the_manifests_failed_attempts(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    trial = _verified_trial()
+    failure = AttemptFailure(
+        n=5,
+        seed=1,
+        style="bodies",
+        params={},
+        reason="malformed-result",
+        detail="excess must be a finite number",
+        source=trial.source,
+    )
+    manifest = _manifest_value() | {"reference_source": "packing/witnesses/known-best"}
+    cohorts = cast(list[dict[str, object]], manifest["cohorts"])
+    manifest_path, rows_path, output_path = (
+        tmp_path / "manifest.json",
+        tmp_path / "trials.jsonl",
+        tmp_path / "report.json",
+    )
+    rows_path.write_text(
+        "\n".join(attempt_to_json(row) for row in (trial, failure)) + "\n", encoding="utf-8"
+    )
+    arguments = ["block-report", str(manifest_path), str(rows_path), "--out", str(output_path)]
+    monkeypatch.setattr("sys.argv", [*arguments, "--cohort", "control"])
+    for status, succeeds in (("failed", True), ("completed", False)):
+        cohorts[0]["attempts"] = [
+            {"seed": 0, "status": "completed"},
+            {"seed": 1, "status": status},
+        ]
+        manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+        if succeeds:
+            assert block_report.main() == 0
+            counts = json.loads(output_path.read_text(encoding="utf-8"))["cohorts"][0]["counts"]
+            assert (counts["accepted"], counts["failed"]) == (1, 1)
+        else:
+            with pytest.raises(ValueError, match="not a failed attempt"):
+                block_report.main()

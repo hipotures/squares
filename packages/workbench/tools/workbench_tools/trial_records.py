@@ -8,6 +8,7 @@ import re
 from collections import Counter
 from collections.abc import Callable
 from dataclasses import dataclass, field
+from enum import StrEnum
 from functools import cache
 from typing import cast
 
@@ -24,6 +25,7 @@ TRIAL_CONTRACT = "packing.squares:AnnealingTrial/v2"
 CONFIGURATION_CONTRACT = "packing.squares:AnnealingConfiguration/v1"
 SOURCE_CONTRACT = "packing.squares:WorkbenchSource/v1"
 REPAIR_CONTRACT = "packing.squares:OverlapRepair/v1"
+ATTEMPT_FAILURE_CONTRACT = "packing.squares:AnnealingAttemptFailure/v1"
 
 #: Geometry is admitted under the workbench's one validity contract and nothing looser: the raw
 #: and repaired arrangements, the reported overlaps, the fitted origin and the fitted side.
@@ -325,7 +327,9 @@ def admission_reason(  # noqa: PLR0911 - each ordered refusal is part of the wir
         )
     except PackingContractError, OverflowError, TypeError, ValueError:
         return "malformed-geometry"
-    malformed = {GeometryIssue.SHAPE, GeometryIssue.COUNT, GeometryIssue.NONFINITE}
+    if GeometryIssue.NONFINITE in raw.issues or GeometryIssue.NONFINITE in repaired.issues:
+        return "nonfinite-geometry"
+    malformed = {GeometryIssue.SHAPE, GeometryIssue.COUNT, GeometryIssue.DIMENSIONS}
     if malformed.intersection(raw.issues) or GeometryIssue.WALL_ESCAPE in raw.issues:
         return "raw-geometry"
     reported_overlap = trial.overlap > VALIDITY_TOLERANCE
@@ -374,6 +378,84 @@ def valid(
 ) -> list[Trial]:
     """Return only canonical, finite, independently checked packing snapshots."""
     return partition_trials(trials, reference_for=reference_for)[0]
+
+
+class AttemptFailureReason(StrEnum):
+    """Why a planned attempt produced no trial record."""
+
+    #: The probe answered with an error, such as a page that carries no pair into this n.
+    PROBE_ERROR = "probe-error"
+    #: The probe's result could not be read as a trial: a missing, non-finite or mistyped field.
+    MALFORMED_RESULT = "malformed-result"
+    #: The canonical witness for this n could not be read.
+    REFERENCE_UNAVAILABLE = "reference-unavailable"
+    #: The browser call itself failed.
+    BROWSER_ERROR = "browser-error"
+
+
+@dataclass(frozen=True, slots=True)
+class AttemptFailure:
+    """A planned (n, seed) attempt that produced no trial, retained so it is counted."""
+
+    n: int
+    seed: int
+    style: str
+    params: dict[str, float | int]
+    reason: str
+    detail: str
+    source: SourceReceipt | None
+    contract: str = ATTEMPT_FAILURE_CONTRACT
+
+    def row(self) -> dict[str, object]:
+        return {
+            "contract": self.contract,
+            "n": self.n,
+            "seed": self.seed,
+            "style": self.style,
+            "params": self.params,
+            "reason": self.reason,
+            "detail": self.detail,
+            "source": self.source.row() if self.source else None,
+        }
+
+
+def attempt_to_json(attempt: Trial | AttemptFailure) -> str:
+    """Serialize a trial or a failed attempt as one strict JSON line."""
+    return json.dumps(attempt.row(), allow_nan=False, separators=(",", ":"), sort_keys=True)
+
+
+def attempt_from_json(text: str) -> Trial | AttemptFailure:
+    """Parse one benchmark line: a failed attempt by its contract, anything else as a trial."""
+    loaded: object = json.loads(text, parse_constant=_reject_json_constant)
+    row = _mapping(loaded)
+    if row is None:
+        raise ValueError("an attempt JSON value must be an object with string keys")
+    if row.get("contract") != ATTEMPT_FAILURE_CONTRACT:
+        return trial_from_row(row)
+    reason = row.get("reason")
+    if reason not in {member.value for member in AttemptFailureReason}:
+        raise ValueError(f"unsupported attempt failure reason {reason!r}")
+    params = _record_params(row.get("params"))
+    if params is None or set(row) != {
+        "contract",
+        "n",
+        "seed",
+        "style",
+        "params",
+        "reason",
+        "detail",
+        "source",
+    }:
+        raise ValueError("an attempt failure row has unexpected, missing or malformed fields")
+    return AttemptFailure(
+        n=_required_integer(row["n"], "n"),
+        seed=_required_integer(row["seed"], "seed"),
+        style=_required_string(row["style"], "style"),
+        params=params,
+        reason=cast(str, reason),
+        detail=_record_string(row["detail"]),
+        source=source_receipt_from_row(row["source"]),
+    )
 
 
 def trial_to_json(trial: Trial) -> str:
@@ -444,7 +526,9 @@ def trial_from_probe(
     poses = pose_rows(row["poses"])
     resolved_poses = pose_rows(row["resolvedPoses"])
     if poses is None or resolved_poses is None:
-        raise ValueError("browser trial poses must be finite numeric triples")
+        raise ValueError("browser trial poses must be numeric triples")
+    if not all(math.isfinite(value) for pose in (*poses, *resolved_poses) for value in pose):
+        raise ValueError("browser trial poses must be finite")
     record = _required_number(row["record"], "record")
     excess = _required_number(row["excess"], "excess")
     resolved_side = _required_number(row["resolvedSide"], "resolvedSide")

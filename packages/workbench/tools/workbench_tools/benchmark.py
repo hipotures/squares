@@ -32,6 +32,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import importlib.metadata
+import json
 import math
 import os
 import platform
@@ -39,20 +40,26 @@ import statistics
 import subprocess
 import sys
 import time
+from collections import Counter
+from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TextIO, cast
 
 from workbench_tools.trial_records import (
+    AttemptFailure,
+    AttemptFailureReason,
+    ReferenceLookup,
     SourceReceipt,
     Trial,
+    attempt_from_json,
+    attempt_to_json,
+    canonical_reference,
     check_success_band,
     partition_trials,
-    trial_from_json,
     trial_from_probe,
     trial_from_row,
-    trial_to_json,
     valid,
 )
 
@@ -158,13 +165,120 @@ class Run:
         }
 
 
-def run_trials(run: Run) -> list[Trial]:
+class ProbeCallError(RuntimeError):
+    """The browser call behind one attempt failed; it is recorded and the run goes on."""
+
+
+type ProbeCall = Callable[[dict[str, object]], object]
+
+
+@dataclass(frozen=True)
+class RunResult:
+    """Every planned (n, seed) of a run and what became of it.
+
+    `planned` is the exact order the run would have attempted. An attempt either produced a
+    trial (admitted or refused later) or a counted failure; a planned slot with neither was
+    not attempted because the budget ran out.
+    """
+
+    planned: list[tuple[int, int]]
+    trials: list[Trial]
+    failures: list[AttemptFailure]
+    stopped_early: bool
+
+    @property
+    def attempted(self) -> int:
+        """How many planned slots produced a trial or a failure."""
+        return len(self.trials) + len(self.failures)
+
+
+def run_attempts(
+    evaluate: ProbeCall,
+    run: Run,
+    source: SourceReceipt,
+    sink: TextIO,
+    *,
+    clock: Callable[[], float] = time.monotonic,
+    reference_for: ReferenceLookup = canonical_reference,
+) -> RunResult:
+    """Attempt every planned (n, seed) in order, recording a failure instead of aborting.
+
+    A malformed or non-finite probe result, a missing witness and a failed browser call each
+    become an `AttemptFailure` for that slot. A probe error for an n (the page carries no pair
+    into it) is recorded once per remaining seed of that n without calling the probe again.
+    Every trial and failure is written to `sink` as it lands.
+    """
+    planned = [(n, seed) for n in run.sizes for seed in run.seeds]
+    trials: list[Trial] = []
+    failures: list[AttemptFailure] = []
+    started = clock()
+    probe_errors: dict[int, str] = {}
+
+    def fail(n: int, seed: int, reason: AttemptFailureReason, detail: str) -> None:
+        failure = AttemptFailure(
+            n=n,
+            seed=seed,
+            style=run.style,
+            params=run.params,
+            reason=reason.value,
+            detail=detail,
+            source=source,
+        )
+        failures.append(failure)
+        sink.write(attempt_to_json(failure) + "\n")
+        sink.flush()
+
+    for n, seed in planned:
+        if clock() - started > run.budget:
+            return RunResult(planned, trials, failures, stopped_early=True)
+        if n in probe_errors:
+            fail(n, seed, AttemptFailureReason.PROBE_ERROR, probe_errors[n])
+            continue
+        options: dict[str, object] = {
+            "n": n,
+            "seed": seed,
+            "style": run.style,
+            "inflate": run.inflate,
+            "anneal": run.anneal,
+        }
+        try:
+            got = evaluate(options)
+        except ProbeCallError as error:
+            fail(n, seed, AttemptFailureReason.BROWSER_ERROR, str(error))
+            continue
+        if isinstance(got, dict):
+            message = cast(dict[str, object], got).get("error")
+            if isinstance(message, str):
+                probe_errors[n] = message
+                fail(n, seed, AttemptFailureReason.PROBE_ERROR, message)
+                continue
+        try:
+            trial = trial_from_probe(
+                got,
+                n=n,
+                seed=seed,
+                style=run.style,
+                params=run.params,
+                source=source,
+                reference_for=reference_for,
+            )
+        except OSError as error:
+            fail(n, seed, AttemptFailureReason.REFERENCE_UNAVAILABLE, str(error))
+            continue
+        except (TypeError, ValueError) as error:
+            fail(n, seed, AttemptFailureReason.MALFORMED_RESULT, str(error))
+            continue
+        trials.append(trial)
+        sink.write(attempt_to_json(trial) + "\n")
+        sink.flush()
+    return RunResult(planned, trials, failures, stopped_early=False)
+
+
+def run_trials(run: Run) -> RunResult:
     """Every (n, seed) in the grid, streamed to `out` as each lands."""
+    from playwright.sync_api import Error as PlaywrightError  # noqa: PLC0415
     from playwright.sync_api import sync_playwright  # noqa: PLC0415
 
-    trials: list[Trial] = []
-    started = time.monotonic()
-    stopped_early = False
     with TemporaryDirectory(prefix="squares-workbench-bench-") as asset_directory:
         subprocess.run(
             ["node", str(BUILD_ASSETS), asset_directory],
@@ -177,61 +291,47 @@ def run_trials(run: Run) -> list[Trial]:
             page = browser.new_page(
                 viewport={"width": VIEWPORT_WIDTH, "height": VIEWPORT_HEIGHT}
             )
-            failures: list[str] = []
-            page.on("pageerror", lambda error: failures.append(str(error)))
+            page_errors: list[str] = []
+            page.on("pageerror", lambda error: page_errors.append(str(error)))
             page.goto(PAGE.as_uri())
             page.wait_for_function("window.atlasTransitions !== undefined", timeout=60_000)
             page.add_script_tag(path=str(benchmark_bundle))
             guard: object = page.evaluate(GUARD_EXPRESSION)
             if not isinstance(guard, dict):
                 raise TypeError("the benchmark guard returned a malformed receipt")
-            if guard.get("ok") is not True:
-                why = guard.get("why")
+            receipt = cast(dict[str, object], guard)
+            if receipt.get("ok") is not True:
+                why = receipt.get("why")
                 raise RuntimeError(f"the instrument is not measuring anything: {why}")
-            pairs = guard.get("pairs")
-            initial_seed = guard.get("seed")
+            pairs = receipt.get("pairs")
+            initial_seed = receipt.get("seed")
             if not isinstance(pairs, int) or not isinstance(initial_seed, int):
                 raise TypeError("the benchmark guard omitted its pair or seed count")
             print(f"# page: {pairs} pairs, seed {initial_seed}, {PAGE}")
             source = _source_receipt(browser)
+
+            def evaluate(options: dict[str, object]) -> object:
+                try:
+                    return page.evaluate(PROBE_EXPRESSION, options)
+                except PlaywrightError as error:
+                    raise ProbeCallError(str(error)) from error
+
             with run.out.open("w", encoding="utf-8") as sink:
-                for n in run.sizes:
-                    for seed in run.seeds:
-                        if time.monotonic() - started > run.budget:
-                            stopped_early = True
-                            break
-                        got: object = page.evaluate(
-                            PROBE_EXPRESSION,
-                            {
-                                "n": n,
-                                "seed": seed,
-                                "style": run.style,
-                                "inflate": run.inflate,
-                                "anneal": run.anneal,
-                            },
-                        )
-                        if isinstance(got, dict) and isinstance(got.get("error"), str):
-                            print(f"# skipped n = {n}: {got['error']}")
-                            break
-                        trial = trial_from_probe(
-                            got,
-                            n=n,
-                            seed=seed,
-                            style=run.style,
-                            params=run.params,
-                            source=source,
-                        )
-                        trials.append(trial)
-                        sink.write(trial_to_json(trial) + "\n")
-                        sink.flush()
-                    if stopped_early:
-                        break
-            if failures:
-                print(f"# {len(failures)} page error(s), first: {failures[0][:120]}")
+                result = run_attempts(evaluate, run, source, sink)
+            if page_errors:
+                print(f"# {len(page_errors)} page error(s), first: {page_errors[0][:120]}")
             browser.close()
-    if stopped_early:
-        print(f"# budget of {run.budget:g}s spent; {len(trials)} trial(s) recorded")
-    return trials
+    if result.stopped_early:
+        print(
+            f"# budget of {run.budget:g}s spent after {result.attempted} of "
+            f"{len(result.planned)} planned attempts"
+        )
+    return result
+
+
+def _counts(reasons: Iterable[str]) -> str:
+    tally = Counter(reasons)
+    return ", ".join(f"{reason}={count}" for reason, count in sorted(tally.items()))
 
 
 def _report_refusals(total: int, refused: dict[str, int]) -> None:
@@ -247,62 +347,109 @@ def _report_refusals(total: int, refused: dict[str, int]) -> None:
         print(f"  REFUSED {sum(others.values())} of {total} trials: {counts}")
 
 
-def report(trials: list[Trial]) -> int:
-    """Per n: the rate at each tolerance, the shape of the failures, and the cost."""
-    if not trials:
+def _best_of(
+    ordered_seeds: list[int], attempted: set[int], scores: dict[int, float], k: int
+) -> str:
+    """Best `closed` over the first k planned seeds, or `-` when any of them was not attempted.
+
+    A seed that was attempted but refused, failed or has no defined score is a miss in its
+    slot, so best-of-k is always over exactly k planned seeds.
+    """
+    prefix = ordered_seeds[:k]
+    if len(prefix) < k or any(seed not in attempted for seed in prefix):
+        return "-"
+    values = [scores[seed] for seed in prefix if seed in scores]
+    return f"{max(values):.3f}" if values else "none"
+
+
+def report(
+    trials: list[Trial],
+    failures: Sequence[AttemptFailure] = (),
+    *,
+    planned: Sequence[tuple[int, int]] | None = None,
+    stopped_early: bool = False,
+) -> int:
+    """Per n: counts, each band's rate per attempted seed, the failures' shape and the cost.
+
+    `planned` is the run's (n, seed) order; a replay, which has no plan, treats the seeds it
+    holds as planned. The report fails on a partial run, and when nothing was admitted.
+    """
+    if not trials and not failures:
         print("no trials")
         return 1
     kept, refused = partition_trials(trials)
     _report_refusals(len(trials), refused)
-    if not kept:
-        print("  every trial was invalid")
-        return 1
-    trials = kept
-    by_n: dict[int, list[Trial]] = {}
-    for t in trials:
-        by_n.setdefault(t.n, []).append(t)
-
-    for record in sorted({t.record for t in trials}):
+    if failures:
+        print(f"  FAILED {len(failures)} attempts: {_counts(f.reason for f in failures)}")
+    if planned is None:
+        planned = sorted({(t.n, t.seed) for t in trials} | {(f.n, f.seed) for f in failures})
+    attempted = {(t.n, t.seed) for t in trials} | {(f.n, f.seed) for f in failures}
+    if stopped_early:
+        print(
+            f"  PARTIAL: the budget stopped the run after {len(attempted)} of "
+            f"{len(planned)} planned attempts"
+        )
+    for record in sorted({t.record for t in kept}):
         for band in TOLERANCES.values():
             check_success_band(band, record)
+
+    sizes = list(dict.fromkeys(n for n, _seed in planned))
     names = list(TOLERANCES)
-    head = "    n  trials  " + "  ".join(f"{name:>7}" for name in names)
+    head = "    n  " + "  ".join(f"{name:>7}" for name in names)
     print(f"\n{head}   closed      best    median     worst   ms/trial")
     print("  " + "-" * (len(head) + 44))
-    for n in sorted(by_n):
-        rows = by_n[n]
+    for n in sizes:
+        seeds = [seed for size, seed in planned if size == n]
+        tried = {seed for seed in seeds if (n, seed) in attempted}
+        rows = [t for t in kept if t.n == n]
+        failed = [f for f in failures if f.n == n]
+        print(
+            f"  n = {n}: planned {len(seeds)}, attempted {len(tried)}, admitted {len(rows)}"
+            + (
+                f", failed {len(failed)} ({_counts(f.reason for f in failed)})"
+                if failed
+                else ""
+            )
+        )
+        if not rows:
+            print(
+                f"  {n:>3}  " + "  ".join(f"{'-':>7}" for _name in names) + "  (none admitted)"
+            )
+            continue
         # The RESOLVED excess, so every column in this table is about the same arrangement.
-        # Scoring the tolerances on the raw side while scoring `closed` on the resolved one
-        # would put two different arrangements in one row.
         excess = sorted((t.resolved_side / t.record - 1) * 100 for t in rows)
         rates = []
         for name in names:
             hits = sum(1 for e in excess if e <= TOLERANCES[name])
-            rates.append(f"{hits / len(excess):>6.1%} ")
+            rates.append(f"{hits / len(tried):>6.1%} ")
         normalized = [value for t in rows if (value := t.resolved_closed) is not None]
         closed = f"{statistics.median(normalized):.3f}" if normalized else "-"
         print(
-            f"  {n:>3}  {len(rows):>6}  "
+            f"  {n:>3}  "
             + "  ".join(rates)
             + f"  {closed:>7}  {excess[0]:>8.4f}  {statistics.median(excess):>8.4f}  "
             f"{excess[-1]:>8.4f}  {statistics.median(t.ms for t in rows):>9.1f}"
         )
+    print(
+        "  (rates per attempted seed: a refused or failed attempt is a miss; excess, closed and"
+        " ms are over admitted trials)"
+    )
     # Prefixes keep best-of-k reproducible without treating different random orderings as the
     # same work allocation.
     print(f"\n{'    n':>5}" + "".join(f"{'best-of-' + str(k):>12}" for k in BEST_OF))
-    for n in sorted(by_n):
-        ordered = sorted(by_n[n], key=lambda t: t.seed)
-        line = f"{n:>5}"
-        for k in BEST_OF:
-            if k > len(ordered):
-                line += f"{'-':>12}"
-                continue
-            prefix = [value for t in ordered[:k] if (value := t.resolved_closed) is not None]
-            line += f"{max(prefix):>12.3f}" if prefix else f"{'-':>12}"
-        print(line)
-    print("  (closed at the best trial of the first k seeds)")
+    for n in sizes:
+        seeds = [seed for size, seed in planned if size == n]
+        tried = {seed for seed in seeds if (n, seed) in attempted}
+        scores = {
+            t.seed: value for t in kept if t.n == n and (value := t.resolved_closed) is not None
+        }
+        print(f"{n:>5}" + "".join(f"{_best_of(seeds, tried, scores, k):>12}" for k in BEST_OF))
+    print(
+        "  (closed at the best admitted trial of the first k planned seeds; - where fewer than"
+        " k were attempted, none where no admitted trial has a score)"
+    )
 
-    every = sorted(value for t in trials if (value := t.resolved_closed) is not None)
+    every = sorted(value for t in kept if (value := t.resolved_closed) is not None)
     print(
         "\n  closed is the fraction of the record-to-grid gap the run closed: 1 reached the "
         "record,\n  0 got no further than ceil(sqrt(n)); it is undefined when that gap is "
@@ -315,9 +462,55 @@ def report(trials: list[Trial]) -> int:
             f"\n  over all {len(every)} defined scores: closed median "
             f"{statistics.median(every):.3f}, range {every[0]:.3f} to {every[-1]:.3f}"
         )
-    else:
+    elif kept:
         print("\n  closed is undefined for every zero reference-gap control in this report")
-    return 0
+    if not kept:
+        print("  every trial was invalid or failed")
+        return 1
+    return 1 if stopped_early else 0
+
+
+def _group_key(attempt: Trial | AttemptFailure) -> str:
+    source = attempt.source
+    identity = None if source is None else (source.commit, source.page_sha256, source.benchmark)
+    return json.dumps(
+        [attempt.style, attempt.params, identity], sort_keys=True, separators=(",", ":")
+    )
+
+
+def replay_groups(
+    attempts: Sequence[Trial | AttemptFailure],
+) -> list[tuple[list[Trial], list[AttemptFailure]]]:
+    """Split replayed rows into like runs; refuse a duplicate (n, seed) or mixed configuration.
+
+    Rows are like when they share style, parameter overrides and source (commit, page and
+    probe); within a group every trial must also carry one effective configuration apart from
+    its seed, as `block_report` requires of a cohort.
+    """
+    groups: dict[str, tuple[list[Trial], list[AttemptFailure]]] = {}
+    for attempt in attempts:
+        trials, failures = groups.setdefault(_group_key(attempt), ([], []))
+        if isinstance(attempt, Trial):
+            trials.append(attempt)
+        else:
+            failures.append(attempt)
+    for trials, failures in groups.values():
+        seen: set[tuple[int, int]] = set()
+        for slot in [(t.n, t.seed) for t in trials] + [(f.n, f.seed) for f in failures]:
+            if slot in seen:
+                raise ValueError(f"duplicate attempt for n = {slot[0]}, seed {slot[1]}")
+            seen.add(slot)
+        configurations = {
+            json.dumps(
+                {key: value for key, value in t.configuration.row().items() if key != "seed"},
+                sort_keys=True,
+            )
+            for t in trials
+            if t.configuration is not None
+        }
+        if len(configurations) > 1:
+            raise ValueError("a replay group mixes effective configurations")
+    return list(groups.values())
 
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
@@ -403,14 +596,20 @@ def parse_grid(spec: list[str]) -> list[dict[str, float | int]]:
 
 
 def sweep(args: argparse.Namespace, seeds: list[int], stamp: str) -> int:
-    """One run per cell of the grid, reported as one table of best-of-k."""
+    """One run per cell of the grid, reported as one table of best-of-k.
+
+    Every planned (cell, n) gets a row, with planned, attempted and admitted counts. Best-of-k
+    is printed only where the first k planned seeds were all attempted, and a sweep any of whose
+    cells the budget stopped fails.
+    """
     cells = parse_grid(args.sweep)
     print(f"# {len(cells)} cell(s) x {len(args.n)} n x {len(seeds)} seeds")
-    table: list[tuple[dict[str, float | int], int, list[Trial]]] = []
+    table: list[tuple[dict[str, float | int], int, list[int], set[int], list[Trial]]] = []
+    partial = False
     for cell in cells:
         label = "-".join(f"{k}{v}" for k, v in cell.items())
         out = RESULTS / f"{stamp}-sweep-{label}.jsonl"
-        trials = run_trials(
+        result = run_trials(
             Run(
                 sizes=args.n,
                 seeds=seeds,
@@ -421,43 +620,68 @@ def sweep(args: argparse.Namespace, seeds: list[int], stamp: str) -> int:
                 out=out,
             )
         )
-        by_n: dict[int, list[Trial]] = {}
-        admitted, refused = partition_trials(trials)
-        _report_refusals(len(trials), refused)
-        for trial in admitted:
-            by_n.setdefault(trial.n, []).append(trial)
-        table.extend((cell, n, by_n[n]) for n in sorted(by_n))
+        partial |= result.stopped_early
+        admitted, refused = partition_trials(result.trials)
+        _report_refusals(len(result.trials), refused)
+        if result.failures:
+            reasons = _counts(failure.reason for failure in result.failures)
+            print(f"  FAILED {len(result.failures)} attempts: {reasons}")
+        attempted = {(t.n, t.seed) for t in result.trials} | {
+            (f.n, f.seed) for f in result.failures
+        }
+        for n in dict.fromkeys(size for size, _seed in result.planned):
+            planned = [seed for size, seed in result.planned if size == n]
+            tried = {seed for seed in planned if (n, seed) in attempted}
+            rows = [trial for trial in admitted if trial.n == n]
+            table.append((cell, n, planned, tried, rows))
     if not table:
         print("no trials")
         return 1
     keys = list(cells[0])
-    head = "  " + "".join(f"{k:>9}" for k in keys) + f"{'n':>5}{'trials':>8}{'median':>9}"
+    head = (
+        "  "
+        + "".join(f"{k:>9}" for k in keys)
+        + f"{'n':>5}{'planned':>9}{'tried':>7}{'admitted':>10}{'median':>9}"
+    )
     print(f"\n{head}" + "".join(f"{'best-' + str(k):>11}" for k in BEST_OF if k <= len(seeds)))
     print("  " + "-" * (len(head) + 11 * len(BEST_OF)))
-    for cell, n, rows in table:
-        ordered = sorted(rows, key=lambda t: t.seed)
+    for cell, n, planned, tried, rows in table:
         line = "  " + "".join(f"{cell[k]:>9}" for k in keys)
-        normalized = [value for t in rows if (value := t.resolved_closed) is not None]
-        median = f"{statistics.median(normalized):.3f}" if normalized else "-"
-        line += f"{n:>5}{len(rows):>8}{median:>9}"
+        scores = {t.seed: value for t in rows if (value := t.resolved_closed) is not None}
+        median = f"{statistics.median(scores.values()):.3f}" if scores else "-"
+        line += f"{n:>5}{len(planned):>9}{len(tried):>7}{len(rows):>10}{median:>9}"
         for k in BEST_OF:
-            if k > len(seeds):
-                continue
-            prefix = [value for t in ordered[:k] if (value := t.resolved_closed) is not None]
-            line += f"{max(prefix):>11.3f}" if prefix else f"{'-':>11}"
+            if k <= len(seeds):
+                line += f"{_best_of(planned, tried, scores, k):>11}"
         print(line)
-    print("\n  median and best-of-k are both `closed`: 1 is the record, 0 the grid.")
+    print(
+        "\n  median and best-of-k are both `closed`: 1 is the record, 0 the grid; best-of-k is"
+        " over the first k planned seeds, - where fewer were attempted."
+    )
+    if partial:
+        print("  PARTIAL: the budget stopped at least one cell before its planned attempts")
+        return 1
     return 0
 
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(sys.argv[1:] if argv is None else argv)
     if args.replay is not None:
-        trials = [
-            trial_from_json(line)
+        attempts = [
+            attempt_from_json(line)
             for line in args.replay.read_text(encoding="utf-8").splitlines()
         ]
-        return report(trials)
+        try:
+            groups = replay_groups(attempts)
+        except ValueError as error:
+            print(f"replay refused: {error}")
+            return 2
+        status = 0
+        for index, (trials, failures) in enumerate(groups, 1):
+            key = _group_key(trials[0] if trials else failures[0])
+            print(f"\n== group {index} of {len(groups)}: {key}")
+            status = max(status, report(trials, failures))
+        return status
     if not PAGE.is_file():
         print(f"no built page at {PAGE}; run `python -m devtools.build_workbench_site` first")
         return 1
@@ -468,7 +692,7 @@ def main(argv: list[str] | None = None) -> int:
     label = "-".join(str(n) for n in args.n)
     out = args.out or RESULTS / f"{stamp}-n{label}-{args.style}.jsonl"
     seeds = list(range(args.seed_from, args.seed_from + args.seeds))
-    trials = run_trials(
+    result = run_trials(
         Run(
             sizes=args.n,
             seeds=seeds,
@@ -479,8 +703,13 @@ def main(argv: list[str] | None = None) -> int:
             out=out,
         )
     )
-    print(f"# {len(trials)} trial(s) -> {out}")
-    return report(trials)
+    print(f"# {len(result.trials)} trial(s), {len(result.failures)} failure(s) -> {out}")
+    return report(
+        result.trials,
+        result.failures,
+        planned=result.planned,
+        stopped_early=result.stopped_early,
+    )
 
 
 if __name__ == "__main__":
