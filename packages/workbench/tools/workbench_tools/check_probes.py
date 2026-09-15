@@ -22,7 +22,7 @@ arrangement could not even express:
    `FileNotFoundError` at the far end of a slow checker. Both are cheap to find here.
 
 The third question is answered by scanning the checkers for quoted strings rather than by
-importing them: the loader is `probe()` today and `look()` wraps it in `check_workbench`,
+importing them: the loader is `probe()` today and `look()` wraps it in `check_animate_view`,
 and a scan that does not care which helper is used keeps working when a fourth appears.
 """
 
@@ -48,10 +48,7 @@ CALLERS = (
     "check_pack_panel.py",
     "check_page_policy.py",
     "check_search_panel.py",
-    "check_workbench.py",
     "check_revision6.py",
-    "check_revision7.py",
-    "check_legend.py",
     "check_candidate.py",
     "capture_stills.py",
     "capture_video.py",
@@ -87,7 +84,7 @@ def probe_files() -> list[Path]:
 
 
 #: The loader. A function whose body hands one of its own parameters to it -- `look` in
-#: `check_workbench`, `_look` in `check_accessibility` -- is found and treated the same.
+#: `check_animate_view`, `_look` in `check_accessibility` -- is found and treated the same.
 LOADER = "probe"
 
 

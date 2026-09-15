@@ -732,8 +732,8 @@ input[type="number"] {
    takes a fixed slot wide enough for the widest value it can hold, or — the owner's own suggestion,
    and the better rule for anything that changes often — moves onto its own line *below* the control
    it belongs to. Figures are tabular throughout, so a slot's width is a character count and not a
-   guess, and anything that overruns is clipped rather than allowed to push. `check_workbench.py`
-   holds it down by comparing every button's bounding box at two instants of a run. */
+   guess, and anything that overruns is clipped rather than allowed to push. `check_animate_view`
+   holds it down by comparing every button's bounding box across a step and a setting change. */
 .readout {
   display: inline-block;
   overflow: hidden;

@@ -134,6 +134,16 @@ def gap_bar_through_dwell(session: Session) -> str:
                 math.isclose(sample["side"], sample["record"], rel_tol=1e-6),
                 f"{label}: the side {sample['side']} is not n - 1's record {sample['record']}",
             )
+    for n in (17, 26):
+        session.api(("pause",), ("setStepN", n), ("seek", 0))
+        dwell = session.look("stage/visible-count")
+        session.api(("seek", session.api(("duration",))))
+        rest = session.look("stage/visible-count")
+        session.require(
+            (dwell, rest) == (n - 1, n),
+            f"step into {n}: the stage draws {dwell} squares in the dwell and {rest} at rest",
+        )
+    session.api(("seek", 0))
     return "the dwell's bar measures only the squares drawn"
 
 
@@ -541,6 +551,42 @@ def headline_space(session: Session) -> str:
     return "the headline is centred under the container"
 
 
+def stage_clearance(session: Session) -> str:
+    """A moving drawing clears the headline, at the steps where it reaches deepest.
+
+    The box grows toward the next record's side and squares tilt, so a moving drawing reaches
+    below the settled floor. This is `check_workbench`'s guard as it was, and its home: the
+    measure reads element boxes the stage's `overflow: hidden` may clip, which lane E (D16) is
+    to replace with the drawn geometry on #171.
+    """
+    style = session.api(("state",))["style"]
+    session.api(("pause",), ("setCapture", True), ("setStepN", 17), ("seek", 0))
+    session.look("animate/clear-selection")
+    session.page.wait_for_timeout(300)
+    left, top, width, _ = session.look("layout/stage-boxes")["stage"]
+    scale = width / 1920
+    image = np.asarray(Image.open(io.BytesIO(session.page.screenshot())).convert("RGB")).astype(
+        int
+    )
+    paper = image[int(top + 1076 * scale), int(left + 100 * scale)]
+    band = image[
+        int(top + 975 * scale) : int(top + 1080 * scale),
+        int(left + 60 * scale) : int(left + 1060 * scale),
+    ]
+    rows = np.where((np.abs(band - paper).sum(axis=2) > 60).any(axis=1))[0]
+    ink_top = 975 + float(rows.min()) / scale if rows.size else math.inf
+    session.require(rows.size > 0, "no headline ink below the container to clear")
+    for solver, n in (("physics", 6), ("bodies", 12), ("bodies", 20), ("physics", 26)):
+        deepest = session.look("stage/lowest-drawn", n=n, style=solver)
+        session.require(
+            deepest < ink_top - 2,
+            f"the drawing reaches {deepest:.1f} in the step into n = {n} under {solver}, "
+            f"into the headline starting at {ink_top:.1f}",
+        )
+    session.api(("setCapture", False), ("setStyle", style), ("setStepN", 17), ("seek", 0))
+    return "a moving drawing clears the headline"
+
+
 def capture_baseline(session: Session) -> str:
     """The capture tools' shared baseline starts from any view and lands on the catalogue."""
     session.page.locator("#mode-pack").click()
@@ -578,6 +624,7 @@ SECTIONS: tuple[Callable[[Session], str], ...] = (
     facts_handover,
     headline_roll,
     headline_space,
+    stage_clearance,
     stage_says_only_facts,
     *animate_view_contract.SECTIONS,
     capture_baseline,

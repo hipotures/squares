@@ -1696,7 +1696,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     // The whole moving span, not just the rearrangement: the physics runs through the landing
     // too, and `move` stopped being the whole of it when the correction got its own time.
     // Reading `move` alone cut a run's steps by 31 per cent at the shipped beat, which
-    // `check_revision7` caught as every free run suddenly missing by ten times as much.
+    // the revision-7 checks caught as every free run suddenly missing by ten times as much.
     const tm = timing(pairIndex, style);
     return Math.max(1, Math.round(PHYS.stepsPerSecond * (tm.move + tm.correct)));
   }
