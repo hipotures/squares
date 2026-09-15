@@ -51,22 +51,17 @@ script_code: '[A-Za-z_$][\w$]*\s*[(.=;]'
 # when a listed file no longer offends. Entries only ever leave, and the list is empty when
 # think-m0zb closes.
 #
-# Written from `--inventory` on 2026-09-14: 477 sites in 48 files.
+# Written from `--inventory` on 2026-09-14 at 477 sites in 48 files, and lowered as files
+# came off it. Now 462 sites in 43 files:
 #   think-3pox  packing/devtools and packing/tests       324 sites in 25 files
 #   think-53dt  the video spikes                          123 sites in 13 files
-#   think-xvjf  packages/workbench tools and tests         30 sites in 10 files
+#   think-xvjf  packages/workbench tools and tests         15 sites in  5 files
 allowlist:
   - path: packages/workbench/tests/test_self_contained.py
     sites: 1
     bead: think-xvjf
-  - path: packages/workbench/tools/workbench_tools/benchmark.py
-    sites: 5
-    bead: think-xvjf
   - path: packages/workbench/tools/workbench_tools/check_accessibility.py
     sites: 2
-    bead: think-xvjf
-  - path: packages/workbench/tools/workbench_tools/check_animation_editor.py
-    sites: 3
     bead: think-xvjf
   - path: packages/workbench/tools/workbench_tools/check_candidate.py
     sites: 3
@@ -76,15 +71,6 @@ allowlist:
     bead: think-xvjf
   - path: packages/workbench/tools/workbench_tools/check_probes.py
     sites: 1
-    bead: think-xvjf
-  - path: packages/workbench/tools/workbench_tools/check_search_panel.py
-    sites: 1
-    bead: think-xvjf
-  - path: packages/workbench/tools/workbench_tools/check_stage_resize.py
-    sites: 4
-    bead: think-xvjf
-  - path: packages/workbench/tools/workbench_tools/check_workbench.py
-    sites: 2
     bead: think-xvjf
   - path: packing/atlas/known-best/video/spikes/v1-slideshow/build_candidate.py
     sites: 1
