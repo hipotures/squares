@@ -222,6 +222,39 @@ def scope(session: Session) -> str:
     return "goTo, seekSequence and playAll keep to the range"
 
 
+def transport_loop(session: Session) -> str:
+    """Play pressed in the frame a step ended starts one loop, not a second."""
+    loops = session.look("animate/tick-loops", n=17, frames=30)
+    session.require(loops["replayed"], f"the step never ended inside a frame: {loops}")
+    session.require(
+        loops["ticks"] <= loops["frames"] + 2,
+        f"{loops['ticks']} tick requests in {loops['frames']} frames: two loops are running",
+    )
+    return "one playback loop"
+
+
+def drag_ends(session: Session) -> str:
+    """A key that ends the run mid-drag does not leave the page marked as dragging."""
+    page = session.page
+    session.look("animate/rest-poses", n=17)
+    x, y = session.look("stage/screen-of", index=0)
+    page.mouse.move(x, y)
+    page.mouse.down()
+    page.mouse.move(x + 5, y)
+    session.require(
+        session.look("animate/hand")["dragging"],
+        "a press on a square did not start a drag, so the check tested nothing",
+    )
+    page.keyboard.press("Home")
+    page.mouse.up()
+    session.require(
+        not session.look("animate/hand")["dragging"],
+        "a key that ended the run mid-drag left `body.dragging` behind",
+    )
+    session.api(("pause",), ("seek", 0))
+    return "a drag always ends"
+
+
 SECTIONS: tuple[Callable[[Session], str], ...] = (
     keyboard_ownership,
     gap_bar_through_dwell,
@@ -229,6 +262,8 @@ SECTIONS: tuple[Callable[[Session], str], ...] = (
     seeks_anywhere,
     seeds,
     scope,
+    transport_loop,
+    drag_ends,
 )
 
 

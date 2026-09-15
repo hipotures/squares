@@ -30,6 +30,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     forceLawSteep: steepOf,
   } = workbenchBundle.simulation;
   const {
+    adjacentSupportedStep,
     availableStyles,
     nearestSupportedIndex,
     normalizeRange,
@@ -4502,8 +4503,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   let rafHandle = null;
   let lastStamp = null;
   function tick(stamp) {
+    // The frame this loop asked for has arrived, so it holds no pending request until it makes one.
+    rafHandle = null;
     if (!state.playing) {
-      rafHandle = null;
       return;
     }
     if (lastStamp !== null) {
@@ -4523,7 +4525,12 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       }
     }
     lastStamp = stamp;
-    rafHandle = requestAnimationFrame(tick);
+    // Only a clock still playing asks for the next frame, and only when nothing inside this one
+    // already has: a step that ends here pauses, and a play pressed before the next frame starts
+    // its own loop. Asking unconditionally ran two loops at twice the frame rate.
+    if (state.playing && rafHandle === null) {
+      rafHandle = requestAnimationFrame(tick);
+    }
   }
   // The next pair is simulated during this pair's dwell, so the cost of a precompute falls where
   // nothing is moving rather than on the first frame of the next move.
@@ -5613,7 +5620,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // them, so the pair and the range never disagree; inside a wider range they stay inside it.
   function nudgeStep(delta) {
     if (state.mode === "pack" || state.range.from === state.range.to) {
-      setStepN(stepN() + delta);
+      // The next step the page carries, across any gap: `stepN() + delta` rounded back to the
+      // nearest carried step, which on a sparse page is the step already showing.
+      setStepN(adjacentSupportedStep(SUPPORTED_STEP_NS, stepN(), delta));
       return;
     }
     const b = rangeBounds();
@@ -5860,6 +5869,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     dragTo(w[0], w[1], ev.shiftKey);
   });
   const endDrag = (ev) => {
+    // Whatever ended the gesture, the drag is over: a key that ends the run mid-drag has already
+    // dropped the hand, and the early return below would otherwise leave the class behind.
+    document.body.classList.remove("dragging");
     if (linkFrom >= 0) {
       if (svg.hasPointerCapture(ev.pointerId)) {
         svg.releasePointerCapture(ev.pointerId);
@@ -5874,7 +5886,6 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     if (svg.hasPointerCapture(ev.pointerId)) {
       svg.releasePointerCapture(ev.pointerId);
     }
-    document.body.classList.remove("dragging");
     release();
   };
   svg.addEventListener("pointerup", endDrag);
