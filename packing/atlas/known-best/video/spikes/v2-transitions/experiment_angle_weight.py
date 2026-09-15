@@ -17,7 +17,7 @@ from __future__ import annotations
 import json
 import sys
 
-import build_candidate as bc
+from workbench_tools import build_candidate as bc
 
 
 def main(argv: list[str]) -> int:

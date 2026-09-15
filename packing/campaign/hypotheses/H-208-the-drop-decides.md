@@ -19,7 +19,7 @@ hypothesis:
     metric: the spread of median `closed` across a start sweep against across a schedule sweep
     direction: the start sweep's spread is the larger
     threshold: at least twice the schedule sweep's spread at the same n
-  instrument: packing/devtools/bench_annealing.py --sweep inflate=... anneal=...
+  instrument: packages/workbench/tools/workbench_tools/benchmark.py --sweep inflate=... anneal=...
   instrument_ready: false
   regime: the workbench's simulation; the drop is its coarse-grid emptiest-cell rule
   instance: {axis: n, point: 11}

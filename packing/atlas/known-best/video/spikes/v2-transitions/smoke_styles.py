@@ -22,7 +22,7 @@ import time
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-PAGE = HERE / "index.html"
+PAGE = HERE.parents[4] / "site/workbench/index.html"
 REVIEW = HERE / "review"
 
 # (file, style, pair n, seconds): dwell to 1.0, move to 2.4, settle to 2.8 at the

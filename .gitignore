@@ -1,5 +1,6 @@
-# Node tooling: this repo carries a tooling-only package.json for lefthook.
+# Pinned Node tooling and generated package build output.
 node_modules/
+/packages/workbench/dist/
 
 # Local scratch area, by repo convention.
 /attic/
@@ -35,7 +36,7 @@ packing/atlas/known-best/video/spikes/**/frames/
 
 # The annealing benchmark's per-trial rows. One JSON line per trial, and a round is tens
 # of thousands of them -- 185 MB across the first night -- so they are not retained. The
-# summaries beside them are kept. A round's recorded command regenerates its rows, and
-# `python -m devtools.summarize_annealing --check` compares them with the summaries; see
-# packing/campaign/results/annealing/README.md.
+# summaries beside them are kept. A round's recorded command, run at its engine commit,
+# regenerates its rows, and `squares-workbench-summarize-annealing --check` compares them
+# with the summaries; see packing/campaign/results/annealing/README.md.
 /packing/campaign/results/annealing/*.jsonl

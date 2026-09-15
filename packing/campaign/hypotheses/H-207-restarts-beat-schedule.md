@@ -20,7 +20,7 @@ hypothesis:
     metric: closed at the best trial within a fixed cost budget
     direction: higher
     threshold: best-of-k at the shipped schedule beats the best single-run schedule found by the sweep
-  instrument: packing/devtools/bench_annealing.py --sweep
+  instrument: packages/workbench/tools/workbench_tools/benchmark.py --sweep
   instrument_ready: false
   regime: >-
     the workbench's simulation; cost measured as total simulated steps, so a longer run and

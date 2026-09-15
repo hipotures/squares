@@ -18,8 +18,11 @@ import argparse
 import json
 import sys
 import time
+from pathlib import Path
 
-import build_candidate as bc
+from workbench_tools import build_candidate as bc
+
+HERE = Path(__file__).resolve().parent
 
 
 def load_all() -> tuple[dict, dict, dict]:
@@ -273,7 +276,7 @@ def main() -> int:
     parser.add_argument(
         "--draw", action="store_true", help="also draw each named pair to frames/blocks-NNN.png"
     )
-    parser.add_argument("--out", default=str(bc.HERE / "frames"))
+    parser.add_argument("--out", default=str(HERE / "frames"))
     args = parser.parse_args()
     manifest, witnesses, renderings = load_all()
     for n in args.pairs:

@@ -323,6 +323,9 @@ case or experiment separately.
 
 | Document or collection | Role | Authority | Lifecycle | Current replacement |
 | --- | --- | --- | --- | --- |
+| [Square-packing workbench](packages/workbench/README.md) | component scope and use | current | maintained | — |
+| [The checkers’ probes](packages/workbench/probes/README.md) | component scope and use | supporting | maintained | — |
+| [Foundation Benchmark Replay Fixture](packages/workbench/tests/fixtures/benchmark-foundation/README.md) | component scope and use | supporting | maintained | — |
 | [Workbench Consumer and Legacy-Task Inventory](docs/project/reviews/review-2026-09-13-workbench-consumer-inventory.md) | dated review record | record | retained | — |
 | [The annealing benchmark’s runbook](packing/campaign/results/annealing/README.md) | W6 experiment mechanics | current | maintained | — |
 | [Workbench Stack Review and Cleanup Map](docs/project/reviews/review-2026-09-12-workbench-stack-architecture.md) | dated review record | record | retained | — |
@@ -340,8 +343,7 @@ case or experiment separately.
 | [A Pages Preview, Served Locally](packing/strategies/preview/README.md) | component scope and use | supporting | maintained | — |
 | [Slideshow candidate v1 — notes](packing/atlas/known-best/video/spikes/v1-slideshow/NOTES.md) | research synthesis | record | retained | — |
 | [Spike v2: animated transitions between consecutive known-best packings](packing/atlas/known-best/video/spikes/v2-transitions/NOTES.md) | research synthesis | record | retained | — |
-| [stats-summary.md](packing/atlas/known-best/video/spikes/v2-transitions/stats-summary.md) | generated status view | generated | generated | — |
-| [The checkers’ probes](packing/atlas/known-best/video/spikes/v2-transitions/probes/README.md) | component scope and use | supporting | maintained | — |
+| [stats-summary.md](packing/atlas/known-best/video/spikes/v2-transitions/stats-summary.md) | generated status view | record | retained | — |
 | [A6 Fixed-Support Dual Admission](packing/cases/n11_fractional_certificate/a6_dual_upper/README.md) | research synthesis | record | retained | — |
 | [A6 Scope and Overnight Plan Review](docs/project/reviews/review-2026-09-10-n11-a6-scope-and-plan.md) | dated review record | record | retained | — |
 | [N11: Daytime Strategy Blocks and Parallel Explainer Update](docs/project/specs/active/plan-2026-09-10-n11-daytime-strategy-and-explainer.md) | implementation plan | current | transient | — |

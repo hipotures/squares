@@ -20,13 +20,16 @@ description: >
   producing something that can be mistaken for a search result.
 type: object
 additionalProperties: false
-required: [name, n, frames]
+required: [contract, name, n, frames]
 properties:
+  contract:
+    const: packing.squares:PackingAnimation/v1
+    description: Versioned identity of this animation interchange contract.
   name: {type: string, minLength: 1}
   n:
     type: integer
     minimum: 1
-    description: Squares in the final frame. A frame may hold fewer while one arrives.
+    description: Squares in every frame. Waiting squares remain present but unlocked.
   guided:
     type: boolean
     default: false
@@ -39,16 +42,29 @@ properties:
     additionalProperties: false
     description: Where the frames came from, so a viewer can go and re-run it.
     properties:
-      strategy: {type: string, description: Path to the PackingStrategy document.}
-      records: {type: array, items: {type: integer}, description: Retained records used as targets.}
-      commit: {type: string}
+      strategy:
+        type: string
+        minLength: 1
+        description: Stable strategy name or repository-relative path to its document.
+      records:
+        type: array
+        uniqueItems: true
+        items: {type: integer, minimum: 1}
+        description: Retained records used as targets.
+      commit: {type: string, minLength: 1}
+      seed: {type: integer, minimum: 0, maximum: 4294967295}
+      configuration:
+        type: object
+        description: The complete effective strategy, including its chosen seed.
   duration_seconds: {type: number, exclusiveMinimum: 0}
   palette:
     type: object
     additionalProperties: false
     description: >
       Which colouring rule to apply, never the colours themselves. A renderer owns
-      its palette; an animation only says what the colour should mean.
+      its palette; an animation only says what the colour should mean. The wire
+      contract admits the shared browser vocabulary. A renderer with a smaller
+      capability set must reject an unavailable scheme explicitly.
     properties:
       hue: {enum: [identity, angle-class, uniform]}
       shade: {enum: [none, full-side-contact, evidence]}
@@ -61,6 +77,40 @@ properties:
     properties:
       best_known: {type: number, exclusiveMinimum: 0}
       proved_lower_bound: {type: number, exclusiveMinimum: 0}
+  fair_reach:
+    type: array
+    description: Optional ascent measurements retained for the report beside the animation.
+    items:
+      type: object
+      additionalProperties: false
+      required: [n, fair_side, record, excess_pct]
+      properties:
+        n: {type: integer, minimum: 1}
+        fair_side:
+          type: [number, "null"]
+          exclusiveMinimum: 0
+          description: The side the unguided settle reached; null when it is not a packing.
+        record: {type: number, exclusiveMinimum: 0}
+        excess_pct:
+          type: [number, "null"]
+          description: Percent above the record; null when the settle is not a packing.
+        packing_valid:
+          type: boolean
+          description: >
+            Whether the settled arrangement passed the independent unit-square check.
+            A settle that failed reached no side, so its side and excess are null.
+            A row without this field predates it, and its side is unchecked.
+      if:
+        required: [packing_valid]
+        properties: {packing_valid: {const: false}}
+      then:
+        properties:
+          fair_side: {type: "null"}
+          excess_pct: {type: "null"}
+      else:
+        properties:
+          fair_side: {type: number}
+          excess_pct: {type: number}
   frames:
     type: array
     minItems: 1
@@ -86,12 +136,19 @@ $defs:
         description: Container side at this frame. It may change between frames.
       squares:
         type: array
+        minItems: 1
         description: One `[x, y, theta]` per square, centre and angle in radians.
         items:
           type: array
           minItems: 3
           maxItems: 3
           items: {type: number}
+      square_ids:
+        type: array
+        minItems: 1
+        uniqueItems: true
+        items: {type: integer, minimum: 1}
+        description: Stable square identities in the same order as `squares`.
       record:
         type: integer
         minimum: 1
@@ -110,7 +167,10 @@ $defs:
           picture reads as the packing assembling itself rather than as a crossfade.
           Omitted means the frame's own feasibility decides, which is the right default
           for an animation that has no notion of locking.
-      phase: {type: string, description: Which strategy phase produced this frame.}
+      phase:
+        type: string
+        default: frame
+        description: Which strategy phase produced this frame.
       guided:
         type: boolean
         default: false

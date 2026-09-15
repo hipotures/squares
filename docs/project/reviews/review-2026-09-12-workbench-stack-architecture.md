@@ -26,9 +26,11 @@ and `0281a508`, and diverges from it at `117d224f`. The local review branch is
 **Workflow and tracking:** W10 review-planning-oversight, `think-3kk1`. Three reviewers
 used GPT-5.6 Sol at extra-high effort for frontend architecture, physics/benchmark
 semantics, and CI/Pages; the coordinator verified findings and integrated the plans.
-This phase changes documentation and beads.
-Source cleanup, stack integration, experiments, deployment, and the Search tab are
-subsequent phases.
+The original review phase changed documentation and beads.
+PR #160 now carries the follow-up package migration, independent Pack panel, bounded
+Search preview and focused browser checks.
+The resolution table and plan distinguish these implementation slices from the unpassed
+release gates. Deployment and full experimental Search remain later phases.
 
 The [workbench plan](../specs/active/plan-2026-09-11-workbench-from-spike-to-product.md)
 is the governing source for final outcomes and implementation phases.
@@ -79,11 +81,18 @@ Source archives and negative research results are not disposable spike code.
 
 ## Findings
 
+The code references and line numbers in the findings identify the reviewed `6e191a35`
+baseline. Live replacements now belong to `packages/workbench/`; the
+[consumer inventory](review-2026-09-13-workbench-consumer-inventory.md#migration-receipt--2026-09-13)
+records their routes.
+Removing an obsolete source file does not remove its finding or the source commit needed
+to reproduce it.
+
 ### R1 — Blocker: imported animation manufactures passing evidence
 
-[animation_from_trace.py](../../../packing/devtools/animation_from_trace.py), lines
-148–167, maps `entry.get("feasible", True)` to `NUMERICALLY_CHECKED` and constructs
-`CheckSummary(passed=True)` without checking separation or containment.
+[animation_from_trace.py](https://github.com/jlevy/squares/blob/6e191a35bf3948bd2b83a3c024f7156f9dc3a7f5/packing/devtools/animation_from_trace.py),
+lines 148–167, maps `entry.get("feasible", True)` to `NUMERICALLY_CHECKED` and
+constructs `CheckSummary(passed=True)` without checking separation or containment.
 A schema-valid import with two coincident unit squares at `(0.5, 0.5, 0)` in a side-1
 box, repeated at times 0 and 1, exports successfully with `numerically-checked` metadata
 and a passing “separating-axis violation at most 1e-9” receipt.
@@ -95,11 +104,12 @@ Validate record references and provenance at the same boundary.
 
 ### R2 — Blocker: a valid strategy request can silently lose a square
 
-[packing_strategy.py](../../../packing/devtools/packing_strategy.py), lines 116–138,
-builds only `round(side)²` grid cells and truncates to `n`, without refusing an
-insufficient count. For `n: 5`, a grid phase with
-`side: {relative_to: grid, factor: 0.6666666666666666}` returns four squares in a side-2
-box. The CLI reports `n=5`, zero violation, and −26.12% excess; the trace labels the
+[packing_strategy.py](https://github.com/jlevy/squares/blob/6e191a35bf3948bd2b83a3c024f7156f9dc3a7f5/packing/devtools/packing_strategy.py),
+lines 116–138, builds only `round(side)²` grid cells and truncates to `n`, without
+refusing an insufficient count.
+For `n: 5`, a grid phase with `side: {relative_to: grid, factor: 0.6666666666666666}`
+returns four squares in a side-2 box.
+The CLI reports `n=5`, zero violation, and −26.12% excess; the trace labels the
 four-square frame feasible.
 This is a false packing result from an ordinary schema-valid request.
 
@@ -115,10 +125,10 @@ the trace. **Bead:** `think-karf`.
 
 ### R3 — High: benchmark admission differs between reporting paths
 
-[bench_annealing.py](../../../packing/devtools/bench_annealing.py), lines 422–429,
-admits a trial when `not (resolved_overlap > tolerance)`. A NaN therefore passes.
-The replay parser supplies NaN for missing resolved fields at lines 621–623. The sweep
-at lines 576–596 skips the admission function altogether and ranks every
+[bench_annealing.py](https://github.com/jlevy/squares/blob/6e191a35bf3948bd2b83a3c024f7156f9dc3a7f5/packing/devtools/bench_annealing.py),
+lines 422–429, admits a trial when `not (resolved_overlap > tolerance)`. A NaN therefore
+passes. The replay parser supplies NaN for missing resolved fields at lines 621–623. The
+sweep at lines 576–596 skips the admission function altogether and ranks every
 `resolved_closed` value.
 
 The independent reviewer reproduced both paths: a NaN trial was admitted and reported
@@ -151,9 +161,51 @@ regenerate the owning views.
 Never invent effort or source fields to satisfy a schema.
 **Beads:** `think-5pv0`, then `think-3eha`.
 
+### Retained-cohort reconciliation — 2026-09-13
+
+The package tool `workbench_tools.historical_summary_audit` inventories all 59 files and
+275 cells in the retained `summaries.json` without treating its flags as fresh packing
+validation. It reproduces the following dispositions for `think-jdgu`:
+
+| Retained artifact/cell | Recorded rows | Stored resolved flag | Disposition |
+| --- | ---: | --- | --- |
+| `20260912T013025-sweep-anneal8-inflate{1.02,1.06,1.12,1.25,1.5}.jsonl`, n17 | 2,000 each | false | Five level-8 cells exist. They do not establish a valid resolved level-8 result. |
+| `a8-deep.jsonl`, n11 | 16,319 | true | The retained deep level-8 artifact contains n11 only; 20,000 was a planned count. |
+| `deep-n5-n10.jsonl`, n5 | 39,871 | true | Despite its filename, the retained summary contains n5 only. |
+| `resolved-5k-a6.jsonl`, n5/10/11/17/26/29 | 5,000 each | true | Six retained cells at level 6. Raw geometry and seed identities are absent. |
+
+For the last artifact, the stored normalized medians and reconstructed absolute/relative
+excess are shown together.
+The excess columns are arithmetic reconstructions from rounded summary values, not newly
+measured packings:
+
+| n | Median gap closed | Median absolute excess | Median relative excess |
+| ---: | ---: | ---: | ---: |
+| 5 | −0.073654 | 0.314466 | 11.6163% |
+| 10 | −0.098970 | 0.321881 | 8.6828% |
+| 11 | −0.106898 | 0.136056 | 3.5092% |
+| 17 | −0.103850 | 0.358166 | 7.6604% |
+| 26 | −0.101157 | 0.416986 | 7.4179% |
+| 29 | −0.857133 | 0.122880 | 2.0708% |
+
+n29 is the largest retained case; n26 is not.
+Normalized and absolute ordering differ because the reference-to-grid gap differs.
+Neither ordering identifies size as a cause.
+The pasted 34/39, 1/5, 13/16, 0/5 and 5/5 disjoint-block claims remain unavailable for
+independent replay: rounded prefix summaries do not recover their input seeds or block
+extrema. Row totals across files are not unique-trial counts because seed overlap is
+unrecorded. Claims of 611,796 total trials or 468,606 pre-guard trials therefore remain
+historical counts, not reconstructed unique populations.
+
+The exact command is documented in the annealing runbook.
+The tool’s controls preserve the n17 resolved flags, actual deep-cell count, largest n,
+and undefined block evidence.
+A new run belongs to a separately registered research round; this correction does not
+silently rerun a campaign or choose a new winning preset.
+
 ### R5 — Medium: accepted large seeds alias in JavaScript
 
-[workbench.js](../../../packing/atlas/known-best/video/spikes/v2-transitions/assets/workbench.js),
+[workbench.js](https://github.com/jlevy/squares/blob/6e191a35bf3948bd2b83a3c024f7156f9dc3a7f5/packing/atlas/known-best/video/spikes/v2-transitions/assets/workbench.js),
 line 4167, multiplies the seed as a JavaScript Number before integer conversion.
 `setSeed` accepts the full wrapped unsigned-32-bit range at lines 6437–6442. Seeds
 79,049,217 and 29,207,060 produce the same mixed value 3,151,104,992 for base 17 and the
@@ -181,9 +233,9 @@ retained for replay.
 
 ### R7 — Medium: the published navigation escapes the project site
 
-[build_workbench_site.py](../../../packing/devtools/build_workbench_site.py), line 67,
-injects `href="/"`. From `/squares/workbench/`, this opens the account site’s root, not
-the explainer at `/squares/`.
+[build_workbench_site.py](https://github.com/jlevy/squares/blob/6e191a35bf3948bd2b83a3c024f7156f9dc3a7f5/packing/devtools/build_workbench_site.py),
+line 67, injects `href="/"`. From `/squares/workbench/`, this opens the account site’s
+root, not the explainer at `/squares/`.
 
 **Fix:** Use a project-relative link and exercise the workbench under the deployed
 subpath, including navigation.
@@ -230,7 +282,7 @@ generic text containers for its labels.
 ### R9 — High: Pages does not declare the Node runtime its builder uses
 
 The
-[spike builder](../../../packing/atlas/known-best/video/spikes/v2-transitions/build_candidate.py),
+[spike builder](https://github.com/jlevy/squares/blob/6e191a35bf3948bd2b83a3c024f7156f9dc3a7f5/packing/atlas/known-best/video/spikes/v2-transitions/build_candidate.py),
 line 1330, calls bare `node` to run KaTeX. The
 [Pages workflow](../../../.github/workflows/pages.yml) sets up Python and uv but does
 not set up Node.
@@ -249,7 +301,7 @@ workbench as well as the explainer.
 The follow-up mapping audit found another admission mismatch by source inspection at the
 same reviewed revision.
 In
-[workbench.js](../../../packing/atlas/known-best/video/spikes/v2-transitions/assets/workbench.js),
+[workbench.js](https://github.com/jlevy/squares/blob/6e191a35bf3948bd2b83a3c024f7156f9dc3a7f5/packing/atlas/known-best/video/spikes/v2-transitions/assets/workbench.js),
 `optimizeStep` computes contact penetration, changes positions/angles and possibly the
 growing square size, then stores that penetration in `o.pen`. `measureOptimizer` (lines
 4341–4383) measures the new geometry but uses `o.pen` to admit it as a new best; the
@@ -263,6 +315,51 @@ validity from convergence.
 Add a step-crossing overlap/rotation/growth regression and a valid control.
 This finding has not had a standalone dynamic reproduction in the planning pass.
 **Bead:** `think-6hqs`, before shared resolution and the extraction checkpoint.
+
+### R11 — High: Pack best depends on UI step batching
+
+Independent review of the shared Pack path at `0f2ac8ce` found that the retained best
+can change when the same fixed-seed simulation steps are grouped into different UI
+batches. A render/yield boundary must not decide which geometry is admitted as best.
+The implementing fix needs a per-step admission rule and a fixed-work comparison across
+several batch sizes, including browser and headless receipts.
+**Bead:** `think-wqf3`, before Pack/Animate merge readiness.
+
+### R12 — High: a shrinking container can be labelled stationary
+
+Independent review of the shared Pack path at `0f2ac8ce` found a stationary outcome
+while the container schedule was still shrinking.
+A small pose-motion residual alone does not prove that the forced run has settled.
+The receipt must distinguish pose, container and forcing motion, then apply a declared
+threshold/window after forcing settles.
+A shrinking negative and settled positive control must agree across browser and headless
+callers. **Bead:** `think-a2j9`, before Pack/Animate merge readiness.
+
+### Follow-up dispositions — independent Pack and exploratory Search
+
+The independent Pack panel now accepts `n` without an atlas transition pair.
+This is progress under `think-uhqw`; versioned receipt import/export and deterministic
+replay remain open under `think-adlf`. Pack/Animate readiness depends on both contracts,
+the batch-invariant best control (`think-wqf3`) and truthful stationarity
+(`think-a2j9`).
+
+The Search tab is an experimental preview limited to `n ≤ 32`, eight seeds and 5,000
+steps per trial. It is not the Phase 5 result.
+The scheduler and panel beads are `think-gfqt` and `think-vhgz`; synchronous
+proposal/Resolve work still needs a responsive execution path (`think-vwz7` and
+`think-naf7`). Saved Search outcomes now decode and re-admit against plan-derived
+fields. `think-i5pg` remains open for isolated nonfinite partial failures and effective
+growth semantics. Calibration, CLI and distribution views remain Phase 5 work under the
+governing plan.
+
+The browser checker migration is covered by focused Pack, Search, Animate and
+accessibility checks on a freshly built page.
+`think-kpvc` and `think-cqfc` still own final CI/disposition work.
+Historical `check_workbench` assertions requiring a paired Pack transition are obsolete;
+their failure is not a passing browser receipt.
+The public API’s original missing-key/type mismatch was repaired under `think-gxxc`;
+browser and browser-free entry points must still expose the same versioned Pack receipt
+and replay contract under `think-adlf`.
 
 ## Disposition of the Prior Agent’s Notes
 
@@ -296,8 +393,8 @@ The
 [governing workbench plan](../specs/active/plan-2026-09-11-workbench-from-spike-to-product.md)
 owns final outcomes and implementation phases.
 This register tracks how the reviewed findings are addressed.
-All rows below are **open**: mapping is complete, but no source repair is claimed by
-this planning pass.
+The resolution column distinguishes completed record repairs from source work still
+awaiting its implementing commit and verification receipt.
 
 When a repair lands, keep the finding’s baseline text and update its row with the
 implementing revision, named check/artifact, and one of: fixed, superseded with
@@ -306,25 +403,59 @@ A bead being created or closed without that evidence is not a review resolution.
 
 | Finding | Implementation owner | Governing phase | Required closure evidence | Resolution |
 | --- | --- | --- | --- | --- |
-| R1 — Imported evidence | `think-sdmi` | 1 | Negative import/export and retained-valid controls; actual validator, tolerance and provenance. | Open |
-| R2 — Strategy/count/trace semantics | `think-karf` | 1 | Small-grid rejection/count control, unsupported-field matrix, exact side/time/ID/seed/guidance round trips. | Open |
-| R3 — Invalid benchmark admission | `think-1fpa` | 1 | Run/replay/report/sweep reject nonfinite and invalid states; empty-cohort and rejection-count controls. | Open |
+| R1 — Imported evidence | `think-sdmi` | 1 | Negative import/export and retained-valid controls; actual validator, tolerance and provenance. | Implemented, awaiting committed checkpoint: import and every SVG/render consumer re-admit supplied geometry; forged checks and false feasible flags fail. Python and browser share a negative fixture and prefix guidance semantics; 105 Python contract tests pass. |
+| R2 — Strategy/count/trace semantics | `think-karf` | 1 | Small-grid rejection/count control, unsupported-field matrix, exact side/time/ID/seed/guidance round trips. | Implemented, awaiting committed checkpoint: typed strategies re-enter capability admission, exact counts/sides/IDs/seed receipts are enforced, and unsupported SVG palette modes fail explicitly. The Python contract suite and focused browser Animate import/edit/export check pass. |
+| R3 — Invalid benchmark admission | `think-1fpa` | 1 | Run/replay/report/sweep reject nonfinite and invalid states; empty-cohort and rejection-count controls. | Repaired at `f9099096`: one canonical geometry/configuration/source admission path, strict JSON, rejection counts and empty-population controls. The clean-source six-trial browser fixture also passes replay and block reporting. |
 | R4 — Record/stack integration | `think-5pv0`, `think-3eha` | 0–1 | Integrated revisions and passing record/provenance/documentation/generated-view checks. | Repaired 2026-09-13: parent merged at `27d2f8cc`; collision renumbered `exp-210`, source mappings verified, unknown timing marked, index/ledger/SYNOPSIS reconciled. Schema, campaign and documentation gates pass; 47 campaign contract tests and focused BasedPyright pass. |
-| R5 — Seed aliases | `think-dq1l` | 1 | Exact mixer/domain, reproduced alias regression and effective-seed browser/headless replay. | Open |
+| R5 — Seed aliases | `think-dq1l` | 1 | Exact mixer/domain, reproduced alias regression and effective-seed browser/headless replay. | Repaired at `f9099096`: exact uint32 input and `Math.imul` mixing, alias/boundary controls, effective seed receipts and shared browser/Node module. |
 | R6 — Missing compaction instrument | `think-3hb7` | 1 | Recovered committed tool/controls or dated annotation withdrawing the unsupported ceiling claim. | Dispositioned 2026-09-13: `exp-209`, X-029 and the runbook mark the discarded program/output unreproducible; current verdict is unresolved and the resolver-ceiling exclusion is withdrawn. Original observations are retained. No replacement experiment is claimed. |
 | R7 — Project-subpath navigation | `think-5wnw`, `think-9x0m`, `think-tn6s` | 2–4 | Served `/squares/` path test, checker negative controls, then a deployed navigation receipt. | Open |
-| R8 — Incomplete quality gates | `think-7f3p`, `think-gxxc`, `think-4ylo`, `think-kpvc`, `think-y9pw` | 2 | Checked source/API, strict zero-finding language gates, negative discovery controls, semantic CI and accessibility checks. | Open |
+| R8 — Incomplete quality gates | `think-7f3p`, `think-gxxc`, `think-4ylo`, `think-kpvc`, `think-y9pw` | 2–3 | Checked source/API, strict zero-finding language gates, negative discovery controls, semantic CI and accessibility checks. | Open. Package assets, probes and checkers moved at `15d97a59`; the strict audit found 1,030 workbench and 249 probe errors. Final strict graduation and semantic CI remain pre-merge gates. |
 | R9 — Ambient Node runtime | `think-l6l4`, `think-9x0m`, `think-tn6s` | 2–4 | Explicit runtime selection across package/CI/Pages; artifact and deployed revision verification. | Open |
-| R10 — Optimizer snapshot mismatch | `think-6hqs`, `think-nals` | 1–2 | Exact returned-pose validation, unit-size semantics, overlap-crossing regression and retained valid-snapshot control. | Open |
+| R10 — Optimizer snapshot mismatch | `think-6hqs`, `think-nals` | 1–2 | Exact returned-pose validation, unit-size semantics, overlap-crossing regression and retained valid-snapshot control. | Snapshot defect repaired at `f9099096` with copied post-step geometry and retained best poses; unit-size and overlap-crossing controls pass. A bounded resolver landed at `12b4ed6c`; integration into Pack/headless remains open under `think-nals`. |
+| R11 — Batch-dependent Pack best | `think-wqf3` | 4 | Fixed seed/config/work produce identical validated best pose and receipt across UI batch sizes and browser/headless calls. | Implemented with fixed observation cadence and a batch-invariance Node control; final browser/headless checkpoint remains. |
+| R12 — False Pack stationarity | `think-a2j9` | 2–3 | Shrinking-container negative and settled positive controls; declared residual/window and browser/headless termination parity. | Implemented with moving-side and held-square controls; final browser/headless checkpoint remains. |
+
+**Status addendum, 2026-09-14, after PR #160’s review round.** The rows above are kept
+as last written, which was before #160 was reviewed.
+Where they no longer match the code on #160:
+
+- **R1** is fixed on #160 at `15d97a59` (foundation `f9099096`). An imported frame is
+  numerically checked only when geometry measured at decode passes
+  (`animation_render.py`, `animation_records.py`); the controls are in
+  `packages/workbench/tests/test_python_contract_repairs.py`. The review round also
+  stopped padded ascent frames from carrying a stale feasible flag (`e90187c8`).
+- **R2** is fixed on #160 at `f9099096`. The grid refuses a side that cannot hold `n`,
+  unimplemented sources are refused, and the seed and per-frame side are recorded
+  (`strategy_execution.py`, `strategy_records.py`), with controls in the same test file.
+  The review round put the three strategy documents that declare `status: enforced` into
+  the schema corpus (`e90187c8`).
+- **R3**’s repair at `f9099096` stands, but #160’s review found that admission still
+  counted an overlapping below-record arrangement as an exact success and that one
+  malformed probe row aborted a run.
+  Both are fixed at `fbc74c0e` and `acae83c6`, on the shared validity contract from
+  `ec0a0604`.
+- **R7** is fixed in source at `f9099096`: the site note links `href="../"`
+  (`build_site.py`), and `check_published_site` resolves that link against the project
+  root (`packing/tests/test_check_published_site.py`). Its post-deploy fetches retry
+  transient answers (`2782c27e`). The deployed navigation receipt is still owed
+  (`think-9x0m`).
+- **R9** is fixed in source at `f9099096`: `pages.yml` pins `setup-node` 24.18.0 before
+  `npm ci` in `prepare` and `build`. The deployed revision check is still owed
+  (`think-9x0m`, `think-tn6s`).
+- **R10**’s remaining item has landed: one fail-closed validity contract is shared by
+  Pack, Resolve, Search, the benchmark and the page’s readouts (`ec0a0604`, `c0d9db2b`).
+  `think-nals` stays open for its remaining acceptance evidence.
 
 Architectural work has explicit owners too: `think-a9gt` inventories consumers before
 `think-l9z0` establishes the package foundation; `think-109t` gates broad extraction;
 `think-nubm`, `think-w0a1` and `think-ywj4` own kernel/data/timeline; `think-g0lh`
 migrates live consumers and `think-cqfc` removes obsolete ones.
-`think-uhqw` finishes arbitrary-n Pack; `think-gfqt`, `think-vhgz` and `think-3yma`
-deliver experimental Search and calibration.
-`think-9sdr` records the clean Pack/Animate merge decision, `think-tn6s` the live
-release, and `think-wln2` the final O1–O7 result.
+`think-uhqw` finishes arbitrary-n Pack; `think-wqf3` and `think-a2j9` own the new Pack
+controls. `think-gfqt`, `think-vhgz` and `think-3yma` deliver experimental Search and
+calibration.
+`think-9sdr` records the clean Pack/Animate merge decision, `think-tn6s` the
+live release, and `think-wln2` the final O1–O7 result.
 The detailed ordering is maintained only in the plan.
 
 ### Standalone package boundary

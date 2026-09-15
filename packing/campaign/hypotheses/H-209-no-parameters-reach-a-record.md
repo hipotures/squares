@@ -19,7 +19,7 @@ hypothesis:
     metric: whether any cell of the parameter sweep produces a trial inside the close tolerance
     direction: no cell does
     threshold: 0.1
-  instrument: packing/devtools/bench_annealing.py --sweep
+  instrument: packages/workbench/tools/workbench_tools/benchmark.py --sweep
   instrument_ready: false
   regime: >-
     the workbench's simulation as shipped; a negative here is about this instrument and not

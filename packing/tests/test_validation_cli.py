@@ -669,7 +669,7 @@ def test_fast_behavioral_step_excludes_exhaustive_exact_tests(
         "-m",
         "pytest",
         "-q",
-        "tests",
+        *validate.BEHAVIORAL_TEST_ROOTS,
         "-m",
         "not exhaustive_exact and not slow",
         "-n",
@@ -780,7 +780,7 @@ def test_slow_behavioral_step_selects_exactly_what_the_quick_lane_defers(
         "-m",
         "pytest",
         "-q",
-        "tests",
+        *validate.BEHAVIORAL_TEST_ROOTS,
         "-m",
         "slow and not exhaustive_exact",
         "-n",
@@ -859,6 +859,7 @@ def test_slow_lane_distinguishes_worker_collection_failure_from_empty_selection(
 
     monkeypatch.setattr(validate, "_run", run_here)
     monkeypatch.setattr(validate, "_pytest_workers", lambda _jobs: 2)
+    monkeypatch.setattr(validate, "BEHAVIORAL_TEST_ROOTS", ("tests",))
     environment = os.environ.copy()
     for name in ("PYTEST_ADDOPTS", "PYTEST_XDIST_WORKER", "PACKING_VALIDATION_ARTIFACT_DIR"):
         environment.pop(name, None)
@@ -1188,7 +1189,7 @@ def test_full_exhaustive_behavioral_step_selects_only_exhaustive_exact_tests(
         "-m",
         "pytest",
         "-q",
-        "tests",
+        *validate.BEHAVIORAL_TEST_ROOTS,
         "-m",
         "exhaustive_exact",
         "--durations=0",
@@ -1247,6 +1248,7 @@ def test_invalid_worker_count_and_unmatched_selection_are_actionable() -> None:
         ("--records",),
         ("--edit",),
         ("--checks",),
+        ("--frontend",),
         ("--geometry",),
         ("--suite",),
         ("--sweeps",),
@@ -1853,6 +1855,7 @@ def test_the_edit_tier_cannot_under_run() -> None:
     edit = names(fast=False, edit=True)
     records = names(fast=True, records=True)
     checks = names(fast=False, checks=True)
+    frontend = names(fast=False, frontend=True)
     sweeps = names(fast=False, sweeps=True)
     suite = names(fast=False, suite=True)
     geometry = names(fast=False, geometry=True)
@@ -1861,20 +1864,20 @@ def test_the_edit_tier_cannot_under_run() -> None:
     assert fast - edit == {step.name for step in validate.STEPS if step.broad}, (
         "the only steps --fast adds over --edit are the ones marked broad"
     )
-    # The pull request's four jobs are a partition of `--fast` and not four filters,
+    # The pull request's jobs are a partition of `--fast` rather than independent filters,
     # which is what makes it safe to run them on separate runners: no step can be in two
     # and none in none.
-    parts = [checks, geometry, suite, sweeps]
+    parts = [checks, frontend, geometry, suite, sweeps]
     assert set().union(*parts) == fast
     for index, part in enumerate(parts):
         for other in parts[index + 1 :]:
             assert not part & other
-    # `--edit` lands wholly inside `--checks`, and since 2026-09-06 that is a rule rather
-    # than an accident. Every sweep and the behavioural lane are `broad`, and
-    # `Step.geometry` may be carried only by a `broad` step for exactly this reason: a
-    # contributor's edit loop never spans two of the pull request's runners, and the one
-    # job it does depend on is the one that already builds the engine.
-    assert edit <= checks
+    # The cheap frontend source floor remains in `--edit`; the full-page browser contract
+    # is broad. The other partition lanes remain wholly broad.
+    assert edit <= checks | frontend
+    assert {step.name for step in validate.STEPS if step.frontend and not step.broad} == {
+        "browser floor (biome, eslint, tsc, node:test)",
+    }
     assert all(step.broad for step in validate.STEPS if step.geometry), (
         "a non-broad step in --geometry would put part of --edit on a second runner"
     )
@@ -2109,8 +2112,8 @@ def test_the_pull_request_surface_defers_only_what_was_measured() -> None:
 def test_the_pull_request_runs_its_sweeps_and_its_suite_apart() -> None:
     """Which steps leave the `checks` job for a runner of their own, and why each did.
 
-    `sweep`, `suite` and `geometry` decide which of the pull request's four jobs runs a
-    step, and all three default to False, so the failure mode of forgetting one is a
+    `frontend`, `sweep`, `suite` and `geometry` decide which pull-request job runs a
+    step, and all four default to False, so the failure mode of forgetting one is a
     slower `checks` job rather than a step nobody runs -- the safe direction, as with
     `broad` and `touches`. What needs a guard is the other direction: a step moved out to
     make the `checks` job look fast. Adding a name below means typing a number next to it.
@@ -2203,6 +2206,10 @@ def test_the_pull_request_runs_its_sweeps_and_its_suite_apart() -> None:
     assert {step.name for step in validate.STEPS if step.suite} == {
         "fast behavioral tests",
     }
+    assert {step.name for step in validate.STEPS if step.frontend} == {
+        "browser floor (biome, eslint, tsc, node:test)",
+        "workbench browser behavior in Chromium",
+    }
     assert {step.name for step in validate.STEPS if step.geometry} == {
         "D-034's n=5 identity pair still reproduces",
         "historical regressions",
@@ -2219,12 +2226,15 @@ def test_the_pull_request_runs_its_sweeps_and_its_suite_apart() -> None:
     # rather than in this one. Carrying two of the flags would put one step in two jobs,
     # which is a bill paid twice.
     marks = [
+        {step.name for step in validate.STEPS if step.frontend},
         {step.name for step in validate.STEPS if step.sweep},
         {step.name for step in validate.STEPS if step.suite},
         {step.name for step in validate.STEPS if step.geometry},
     ]
     assert all(
-        step.fast for step in validate.STEPS if step.sweep or step.suite or step.geometry
+        step.fast
+        for step in validate.STEPS
+        if step.frontend or step.sweep or step.suite or step.geometry
     )
     for index, marked in enumerate(marks):
         for other in marks[index + 1 :]:
@@ -2267,6 +2277,7 @@ def _workflow_selections(*, pull_request: bool) -> dict[str, set[str]]:
                     records=namespace.records,
                     edit=namespace.edit,
                     checks=namespace.checks,
+                    frontend=namespace.frontend,
                     sweeps=namespace.sweeps,
                     suite=namespace.suite,
                     geometry=namespace.geometry,
@@ -2290,12 +2301,13 @@ def test_the_pull_request_jobs_partition_the_surface() -> None:
     shape is shortened by cpus and by nothing else.
 
     What a split like this risks is the gap `D-455` came through in the other direction --
-    a step in no selection, run by nobody, reported by nothing -- so the four commands are
+    a step in no selection, run by nobody, reported by nothing -- so the five commands are
     read from the workflow and checked to be a partition rather than trusted to be.
 
-    `--checks`, `--geometry`, `--suite` and `--sweeps` are a partition in `_select_steps`
-    by construction, so this is really a check on the YAML: that the workflow invokes all
-    four, on a pull request, and narrows none of them with `--only` or `--skip`.
+    `--checks`, `--frontend`, `--geometry`, `--suite` and `--sweeps` are a partition in
+    `_select_steps` by construction, so this is really a check on the YAML: that the
+    workflow invokes all five, on a pull request, and narrows none of them with `--only`
+    or `--skip`.
 
     Pairwise disjointness is asserted rather than inferred from the union. Two jobs make
     those the same statement; more than two do not, and the case they differ on -- one
@@ -2304,7 +2316,7 @@ def test_the_pull_request_jobs_partition_the_surface() -> None:
     """
     selections = _workflow_selections(pull_request=True)
 
-    assert set(selections) == {"validate", "geometry", "suite", "sweeps"}
+    assert set(selections) == {"validate", "frontend", "geometry", "suite", "sweeps"}
     names = list(selections)
     for index, job in enumerate(names):
         for other in names[index + 1 :]:
@@ -2315,6 +2327,7 @@ def test_the_pull_request_jobs_partition_the_surface() -> None:
     assert selections["sweeps"] == {step.name for step in validate.STEPS if step.sweep}
     assert selections["suite"] == {step.name for step in validate.STEPS if step.suite}
     assert selections["geometry"] == {step.name for step in validate.STEPS if step.geometry}
+    assert selections["frontend"] == {step.name for step in validate.STEPS if step.frontend}
 
 
 def test_every_tier_band_is_declared_for_the_shape_ci_runs() -> None:
@@ -2362,7 +2375,7 @@ def test_every_tier_band_is_declared_for_the_shape_ci_runs() -> None:
             assert tier.reference.jobs == int(namespace.jobs), tier_id
             assert tier.reference.inner_jobs == int(namespace.inner_jobs), tier_id
             checked.add(tier_id)
-    assert checked == {"checks", "geometry", "suite", "sweeps"}
+    assert checked == {"checks", "frontend", "geometry", "suite", "sweeps"}
 
 
 def test_the_post_merge_jobs_partition_the_gate() -> None:
@@ -2509,6 +2522,7 @@ def test_broad_is_opt_out_so_a_new_step_joins_the_edit_tier() -> None:
     assert validate.Step("probe", lambda _context: "", fast=True).broad is False
     assert {step.name for step in validate.STEPS if step.broad} == {
         "fast behavioral tests",
+        "workbench browser behavior in Chromium",
         # Measured 2026-08-30: 31.6s in CI against a 43s edit tier, so carrying it there
         # would nearly double the tier for a record that changes when a witness is
         # retained -- which is to say rarely, and never from an edit. It still runs in

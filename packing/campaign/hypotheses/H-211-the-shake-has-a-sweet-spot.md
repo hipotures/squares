@@ -20,7 +20,7 @@ hypothesis:
     metric: closed at the best of a thousand valid runs
     direction: rises from level 0 to a maximum near 6-8, then falls
     threshold: the maximum exceeds the level-3 value by more than one whole gap
-  instrument: packing/devtools/bench_annealing.py --sweep anneal=...
+  instrument: packages/workbench/tools/workbench_tools/benchmark.py --sweep anneal=...
   instrument_ready: true
   regime: >-
     the workbench's simulation, trials resolved to packings before scoring; the dial's own

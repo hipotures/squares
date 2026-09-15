@@ -19,11 +19,32 @@ The destination is the top-level `packages/workbench/` package.
 Every newly introduced workbench file belongs there, including files added during
 repair.
 
-The current v2 tree contains 211 tracked files: 23 Python entry points or helpers, two
-browser assets, 180 JavaScript probes, one probe declaration, one probe guide, one HTML
-template, two generated data/views, and the retained notes.
+At the inventory baseline, the v2 tree contains 211 tracked files: 23 Python entry
+points or helpers, two browser assets, 180 JavaScript probes, one probe declaration, one
+probe guide, one HTML template, two generated data/views, and the retained notes.
 The tree is both a live publication source and a research record.
 Location under `spikes/` therefore does not prove that a file is dead.
+
+## Migration Receipt — 2026-09-13
+
+The tables below retain the baseline consumer census at `27d2f8cc`; source paths and
+line numbers in that census describe that commit.
+The implementation now lives in [PR #160](https://github.com/jlevy/squares/pull/160).
+Its foundation is committed at `f9099096`; the following migration is in progress and
+awaits the next committed gate:
+
+| Baseline responsibility | Package replacement | Current evidence |
+| --- | --- | --- |
+| v2 template, CSS and browser script | `assets/template.html`, `assets/workbench.css`, `src/application.js` | Deterministic site build; primary browser checker passes the extracted illustration and colour/geometry integration through n=324. |
+| Candidate/site builders, checkers, 180 ordinary probes and captures | `tools/workbench_tools/` and `probes/` | Build reads only package live sources; required frontend partition includes browser floor and actual-page accessibility checks. Capture/import extensions are under verification. |
+| `animation_from_trace`, `export_animation_svg`, `packing_strategy`, `build_ascent`, `recover_records`, `bench_annealing` devtools wrappers | `workbench_tools.animation_render`, `.export_animation_svg`, `.strategy_execution`, `.ascent`, `.recover_records`, `.benchmark` | Wrappers removed and live imports moved; 105 Python contract tests pass. Historical experiment instrument names remain bound to their original source commits. |
+| Browser geometry, colour, direct illustrations and SVG painting | `src/core/geometry.ts`, `src/view/`, `src/animation/` | Shared geometry admission, prepared scenes and pure seek; actual page consumes these modules. |
+| Trace import/edit/replay/capture | `src/data/animation.ts`, `src/app/animation-editor.ts`, `.animation-panel.ts`, `.capture.ts` | Shared Python/browser negative fixture; bounded import, stale-clock rejection, edit-time admission and capture-prefix tests pass. Browser editor checks remain in progress. |
+
+All replacement paths above are relative to `packages/workbench/`. This table is a
+migration receipt, not an exemption from the exit conditions below.
+The remaining prototype measurement tools still need a replacement assertion or a
+commit-pinned historical disposition before deletion.
 
 ## Disposition Rules
 
@@ -44,13 +65,13 @@ it does not retain duplicate live application engines for historical interest.
 
 ## Executable Consumer Graph
 
-The current publication route is:
+The publication route at the inventory baseline is:
 
-1. [build_candidate.py](../../../packing/atlas/known-best/video/spikes/v2-transitions/build_candidate.py#L1718)
+1. [build_candidate.py](https://github.com/jlevy/squares/blob/27d2f8ccb6df532e94e38f745f3e7efb8fab3707/packing/atlas/known-best/video/spikes/v2-transitions/build_candidate.py#L1718)
    reads all 324 witnesses and renderings, the known-best manifest, the composite
    record, kpress fonts and KaTeX support, then inlines the template, CSS, JavaScript,
    and payload.
-2. [build_workbench_site.py](../../../packing/devtools/build_workbench_site.py#L91)
+2. [build_workbench_site.py](https://github.com/jlevy/squares/blob/27d2f8ccb6df532e94e38f745f3e7efb8fab3707/packing/devtools/build_workbench_site.py#L91)
    invokes that script with `--all`, selects its `workbench.html`, adds the site note,
    and writes `packing/site/workbench/index.html`.
 3. [pages.yml](../../../.github/workflows/pages.yml#L321) runs the site builder and
@@ -58,16 +79,16 @@ The current publication route is:
 
 Two live tools consume the published-shape artifact directly:
 
-- [capture_video.py](../../../packing/devtools/capture_video.py#L44) drives the page’s
-  `pairs`, `select`, `duration`, `seek`, `gapBar`, `setMode`, and `setCapture` methods
-  and writes a video plus receipt.
-- [bench_annealing.py](../../../packing/devtools/bench_annealing.py#L351) loads the same
-  page, calls its seeded `physics` API, independently checks and repairs returned poses,
-  and streams trials to the annealing result directory.
+- [capture_video.py](https://github.com/jlevy/squares/blob/27d2f8ccb6df532e94e38f745f3e7efb8fab3707/packing/devtools/capture_video.py#L44)
+  drives the page’s `pairs`, `select`, `duration`, `seek`, `gapBar`, `setMode`, and
+  `setCapture` methods and writes a video plus receipt.
+- [bench_annealing.py](https://github.com/jlevy/squares/blob/27d2f8ccb6df532e94e38f745f3e7efb8fab3707/packing/devtools/bench_annealing.py#L351)
+  loads the same page, calls its seeded `physics` API, independently checks and repairs
+  returned poses, and streams trials to the annealing result directory.
 
 The browser checkers and the older measurement tools also load generated HTML and drive
 `window.atlasTransitions`. The declaration at
-[atlas-transitions.d.ts](../../../packing/atlas/known-best/video/spikes/v2-transitions/probes/atlas-transitions.d.ts#L449)
+[atlas-transitions.d.ts](https://github.com/jlevy/squares/blob/27d2f8ccb6df532e94e38f745f3e7efb8fab3707/packing/atlas/known-best/video/spikes/v2-transitions/probes/atlas-transitions.d.ts#L449)
 is therefore a consumer contract, although the browser never loads it.
 
 ## Live Sources and Build Inputs
@@ -86,9 +107,9 @@ is therefore a consumer contract, although the browser never loads it.
 
 ### Publication Input Gap
 
-[RENDER_INPUTS](../../../packing/devtools/build_workbench_site.py#L43) declares seven
-paths, but the invoked builder reads the 324 witnesses, 324 renderings, composite
-record, kpress assets, and `devtools.render_explainer` described above.
+[RENDER_INPUTS](https://github.com/jlevy/squares/blob/27d2f8ccb6df532e94e38f745f3e7efb8fab3707/packing/devtools/build_workbench_site.py#L43)
+declares seven paths, but the invoked builder reads the 324 witnesses, 324 renderings,
+composite record, kpress assets, and `devtools.render_explainer` described above.
 It also declares the tracked `transition-stats.json`, although the invoked builder
 regenerates that file in its scratch output and the site builder does not read the
 tracked copy. [test_explainer.py](../../../packing/tests/test_explainer.py#L470) proves
@@ -105,7 +126,7 @@ fails.
 ## Browser API Consumers
 
 The runtime object is assigned at
-[workbench.js](../../../packing/atlas/known-best/video/spikes/v2-transitions/assets/workbench.js#L6854).
+[workbench.js](https://github.com/jlevy/squares/blob/27d2f8ccb6df532e94e38f745f3e7efb8fab3707/packing/atlas/known-best/video/spikes/v2-transitions/assets/workbench.js#L6854).
 Its consumers fall into these groups:
 
 | Consumer | API use and evidence | Disposition and owner |

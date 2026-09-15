@@ -343,12 +343,14 @@ def test_ci_jobs_fetch_provenance_history_and_key_the_uv_cache_from_the_lock() -
 
     validate_steps = _mapping(jobs["validate"])["steps"]
     assert isinstance(validate_steps, list)
-    # The pull-request surface is four concurrent jobs since 2026-09-06: `--checks`
-    # here, `--geometry` in the `geometry` job, `--suite` in the `suite` job and
-    # `--sweeps` in the `sweeps` job, so a pull request waits for the longest of them
-    # rather than their sum. That they partition `--fast` is proved against the CLI's own
-    # selector by `test_the_pull_request_jobs_partition_the_surface`; what is pinned here
-    # is only that the commands in the file are the ones that test resolves.
+    # The pull-request surface is concurrent jobs, four since 2026-09-06 and five since
+    # the workbench package took its frontend contracts out of the checks queue:
+    # `--checks` here, `--frontend` in the `frontend` job, `--geometry` in the `geometry`
+    # job, `--suite` in the `suite` job and `--sweeps` in the `sweeps` job, so a pull
+    # request waits for the longest of them rather than their sum. That they partition
+    # `--fast` is proved against the CLI's own selector by
+    # `test_the_pull_request_jobs_partition_the_surface`; what is pinned here is only that
+    # the commands in the file are the ones that test resolves.
     #
     # The `--jobs` and `--inner-jobs` figures are part of the pin because they are not
     # decoration, and every one of them is a measurement someone took:
@@ -371,6 +373,19 @@ def test_ci_jobs_fetch_provenance_history_and_key_the_uv_cache_from_the_lock() -
     assert " ".join(str(required_step["run"]).split()) == (
         "uv run --frozen --all-extras --group dev packing-validate --checks "
         "--jobs 3 --inner-jobs 1"
+    )
+    frontend_job = _mapping(jobs["frontend"])
+    assert frontend_job["if"] == "github.event_name == 'pull_request'"
+    frontend_steps = frontend_job["steps"]
+    assert isinstance(frontend_steps, list)
+    frontend_step = next(
+        _mapping(step)
+        for step in frontend_steps
+        if _mapping(step).get("name") == "Run the frontend source and built-page contracts"
+    )
+    assert " ".join(str(frontend_step["run"]).split()) == (
+        "uv run --frozen --all-extras --group dev packing-validate --frontend "
+        "--jobs 1 --inner-jobs 1"
     )
     geometry_job = _mapping(jobs["geometry"])
     assert geometry_job["if"] == "github.event_name == 'pull_request'"
@@ -492,10 +507,10 @@ def test_ci_jobs_fetch_provenance_history_and_key_the_uv_cache_from_the_lock() -
     required_job = _mapping(jobs["packing-required"])
     # Every part of the pull-request surface, and this is the assertion that keeps them
     # mandatory. Splitting `--fast` across concurrent jobs buys wall time only if a pull
-    # request still cannot merge without all of them, so a `needs` naming three of the
-    # four would turn the fourth into an advisory check that nothing blocks on -- the
+    # request still cannot merge without all of them, so a `needs` naming four of the
+    # five would turn the fifth into an advisory check that nothing blocks on -- the
     # failure mode the split is otherwise a clean win against.
-    assert required_job["needs"] == ["validate", "geometry", "suite", "sweeps"]
+    assert required_job["needs"] == ["validate", "frontend", "geometry", "suite", "sweeps"]
     # `!cancelled()`, not `always()`, and the difference is D-380. With `always()` a run
     # superseded by the next push -- routine, since the workflow sets
     # `cancel-in-progress: true` and OR-3 says to push and keep working -- reached this job
@@ -507,18 +522,20 @@ def test_ci_jobs_fetch_provenance_history_and_key_the_uv_cache_from_the_lock() -
     assert "continue-on-error" not in required_job
     required_job_steps = required_job["steps"]
     assert isinstance(required_job_steps, list)
-    # One `test` per prerequisite, and all four of them, because `needs` alone does not
+    # One `test` per prerequisite, and all five of them, because `needs` alone does not
     # make a job's failure fatal here: this job runs under `!cancelled()`, so it is reached
     # even when a prerequisite failed, and it is the shell that decides. A missing line
     # would leave that part of the surface green whatever it reported.
     required_command = " ".join(str(_mapping(required_job_steps[0])["run"]).split())
     assert required_command == (
-        'test "$VALIDATE_RESULT" = "success" test "$GEOMETRY_RESULT" = "success" '
-        'test "$SUITE_RESULT" = "success" test "$SWEEPS_RESULT" = "success"'
+        'test "$VALIDATE_RESULT" = "success" test "$FRONTEND_RESULT" = "success" '
+        'test "$GEOMETRY_RESULT" = "success" test "$SUITE_RESULT" = "success" '
+        'test "$SWEEPS_RESULT" = "success"'
     )
     required_env = _mapping(_mapping(required_job_steps[0])["env"])
     assert required_env == {
         "VALIDATE_RESULT": "${{ needs.validate.result }}",
+        "FRONTEND_RESULT": "${{ needs.frontend.result }}",
         "GEOMETRY_RESULT": "${{ needs.geometry.result }}",
         "SUITE_RESULT": "${{ needs.suite.result }}",
         "SWEEPS_RESULT": "${{ needs.sweeps.result }}",

@@ -19,7 +19,7 @@ hypothesis:
     metric: the deepest pairwise overlap in the final arrangement, by separating axis
     direction: above tolerance in every trial
     threshold: 0.00001
-  instrument: packing/devtools/bench_annealing.py
+  instrument: packages/workbench/tools/workbench_tools/benchmark.py
   instrument_ready: true
   regime: >-
     the workbench's simulation in blind mode; the tolerance is chosen, and the snapped mode,

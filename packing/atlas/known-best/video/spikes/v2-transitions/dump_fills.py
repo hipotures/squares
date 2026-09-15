@@ -15,6 +15,7 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 HERE = Path(__file__).resolve().parent
+DEFAULT_PAGE = HERE.parents[4] / "site/workbench/index.html"
 PAIRS = [1, 4, 10, 17, 100, 110, 272, 307, 323]
 STYLES = ["tween", "physics", "bodies"]
 RULES = ["continuous", "house"]
@@ -32,7 +33,7 @@ FILLS_JS = (
 
 def main() -> int:
     out = Path(sys.argv[1])
-    page_path = Path(sys.argv[2]) if len(sys.argv) > 2 else HERE / "index.html"
+    page_path = Path(sys.argv[2]) if len(sys.argv) > 2 else DEFAULT_PAGE
     snap = {}
     with sync_playwright() as p:
         browser = p.chromium.launch()

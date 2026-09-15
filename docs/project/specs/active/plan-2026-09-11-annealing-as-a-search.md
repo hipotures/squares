@@ -54,9 +54,9 @@ The package layout and product migration belong to the
 
 ## Current State and Evidence Limits
 
-The seeded page API and `devtools.bench_annealing` make repeatable multi-run execution
-possible. The exploratory records established useful questions about the proposal,
-schedule, repair and contact law.
+The seeded page API and `squares-workbench-benchmark` make repeatable multi-run
+execution possible. The exploratory records established useful questions about the
+proposal, schedule, repair and contact law.
 They do not yet support fresh comparative claims because the evidence contract is
 incomplete.
 
@@ -65,9 +65,9 @@ The review found these distinct cases:
 | observation | status | disposition |
 | --- | --- | --- |
 | The retained summaries include `n = 17` cells at anneal level 8, all scored before the validity check. Repaired `n = 17` runs exist at level 6 only, and the retained deep level-8 artifact contains `n = 11` only. | `exp-208`’s deep level-8 table for `n = 17`, 26 and 29 had no retained source. | Removed from `exp-208` and `X-034` (`think-jdgu`, `think-84m3`); the record now cites only `resolved: true` cells. |
-| The report validator admits non-finite metrics, and the sweep path ranks results without applying that validator. | Demonstrated implementation defect. It can turn an invalid or non-finite outcome into a reported best. The retained aggregates do not show whether it changed a published result. | Fixed on #160, not here: `think-1fpa` closed at `f9099096`, where the package benchmark replaces the harness. `think-nals` makes the definition fail closed and identical at every later ranking and display boundary. |
+| The report validator admits non-finite metrics, and the sweep path ranks results without applying that validator. | Demonstrated implementation defect. It can turn an invalid or non-finite outcome into a reported best. The retained aggregates do not show whether it changed a published result. | Fixed on #160, not here: `think-1fpa` closed at `f9099096`, where the package benchmark replaces the harness; its review round refused below-record and non-converged successes and counted every attempt (`fbc74c0e`, `acae83c6`). `think-nals`’s one fail-closed validity contract (`ec0a0604`) is now read at the benchmark, Search and page boundaries (`c0d9db2b`). |
 | Large accepted seed values can alias in the generated JavaScript because the seed mix loses integer precision before the 32-bit operation. | Demonstrated public reproducibility defect. The small seed ranges in the recorded campaign are not known to be affected. | Fixed on #160, not here: `think-dq1l` (`f9099096`) fixed the mixer and supported seed domain, and `think-karf` (`15d97a59`) enforces seed receipt and replay semantics at the strategy boundary. |
-| Raw annealing JSONL files are ignored and absent; retained summaries cannot reconstruct per-seed trials or disjoint blocks. | Deliberate storage choice with a material audit limitation. | `think-3eha` repaired the record contract (`91722c3a`). `devtools/summarize_annealing.py` rebuilds the summaries from regenerated rows. `think-4z7d` closed on #160 (`15d97a59`) with a disjoint-block reporter. Findings cite only retained cells and state what cannot be re-checked. |
+| Raw annealing JSONL files are ignored and absent; retained summaries cannot reconstruct per-seed trials or disjoint blocks. | Deliberate storage choice with a material audit limitation. | `think-3eha` repaired the record contract (`91722c3a`). `packages/workbench/tools/workbench_tools/summarize_annealing.py` rebuilds the summaries from regenerated rows. `think-4z7d` closed on #160 (`15d97a59`) with a disjoint-block reporter. Findings cite only retained cells and state what cannot be re-checked. |
 | `exp-209` records an inline compaction pass whose program and outputs were deliberately not retained. | Historical exploratory note, not replayable evidence under OR-1. | `think-3eha` marks the evidential limit; `think-na2i` builds the missing instrument before the algorithm or negative result is reused (`think-3hb7` closed as a disposition without one). |
 | Imported animation entries can acquire numerical assurance from an asserted `feasible` flag, and intermediate strategy frames can be relabelled with a later container side. | Demonstrated provenance and trace-semantics defects. | Fixed on #160 at `15d97a59`, not here: `think-sdmi` validates imported evidence and `think-karf` enforces executable strategy and trace semantics. |
 | Revision probes, research instruments and product entry points overlap. | Cleanup risk: deleting a probe can also delete its only semantic assertion. | `think-cqfc` inventories consumers and preserves unique controls before retiring obsolete code. |
@@ -185,7 +185,8 @@ Each phase names a mechanism (`scatter`, `grid`, `assemble`, `project`, `ratchet
 `relax`, `guide` or `container`) and carries a `structure` block: the `rung` it was
 given, the `source` of that structure, and an optional `rewired` or `thinned` control.
 Constraints are declared as bands.
-`devtools/packing_strategy.py` executes documents for the projection solver.
+`workbench_tools.strategy_execution` (`squares-workbench-strategy`) executes documents
+for the projection solver.
 `frontier/search-strategies.yaml` separately catalogues 28 named search strategies, and
 hypotheses cite catalogue entries through `strategy_refs`.
 
@@ -363,6 +364,10 @@ shows that the required input cannot be recovered and the claim is still worth t
 
 `think-1fpa` closed the non-finite and sweep-ranking paths on #160 (`f9099096`), in the
 package benchmark that replaces the harness.
+#160’s review found that admission still counted an overlapping below-record arrangement
+as an exact success, and that one malformed probe row aborted a run uncounted.
+Both are fixed on #160 (`fbc74c0e`, `acae83c6`): every planned attempt is counted, and
+one that fails is recorded with its reason.
 `think-nals` supplies one resolver and one fail-closed validity contract for the
 benchmark and workbench.
 Parity fixtures cover valid arrangements and failures for count, non-finite values,
@@ -388,8 +393,10 @@ plan.
 
 Search remains explicitly deferred until phases A through C and the standalone package
 extraction are complete.
-It then becomes a third workbench mode built from the shared proposal, physics,
-validation, repair, objective and scheduler.
+PR #160 ships a bounded experimental Search preview (n ≤ 32, at most eight seeds and
+5,000 steps per trial).
+It is not this mode and does not meet gate D. It then becomes a third workbench mode
+built from the shared proposal, physics, validation, repair, objective and scheduler.
 
 The mode shows the best valid arrangement, acceptance and failure counts, CPU work and
 the disjoint-block outcome distribution.
