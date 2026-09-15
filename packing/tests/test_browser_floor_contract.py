@@ -9,9 +9,11 @@ Two different things are checked here, and the second is the one that matters.
 
 **The contract**: the named floor rules are present and set to `error`, every tracked
 first-party script and stylesheet is inside the scope Biome actually resolves and inside
-one of the type gate's programs, every Biome exception is one this file declares, no
-program relaxes a flag outside the declared ratchet, and every relaxation names an open
-bead tracking its removal.
+one of the type gate's programs, Biome has no override and no rule turned down, ESLint
+resolves one configuration for every owned script, every file is a module to `tsc` as it
+is to Biome, no program relaxes a flag outside the declared ratchet, and every relaxation
+names an open bead tracking its removal. The floor has no exceptions (owner, 2026-09-14):
+the overrides and the file-specific ESLint blocks it once carried went in think-6o9n.
 
 **Liveness**: `ci-and-gates-rules` exists because gates go green while checking nothing —
 a `files.includes` typo silently exempts the only thing the floor is for, and nothing
@@ -40,6 +42,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from nodejs_wheel import node
 
 from devtools.check_bead_tree import ISSUES, MAPPINGS, REFS, parse_aliases
 from sqpack.cli import validate
@@ -51,6 +54,8 @@ BIOME_CONFIG = REPOSITORY_ROOT / "biome.json"
 BIOME = REPOSITORY_ROOT / "node_modules/.bin/biome"
 ESLINT = REPOSITORY_ROOT / "node_modules/.bin/eslint"
 ESLINT_CONFIG = REPOSITORY_ROOT / "packages/workbench/eslint.config.js"
+ESLINT_FILE_CONFIGS = PROJECT_ROOT / "devtools/node/eslint-file-configs.mjs"
+LEFTHOOK = REPOSITORY_ROOT / "lefthook.yml"
 TSC = REPOSITORY_ROOT / "node_modules/.bin/tsc"
 TSCONFIG_BASE = REPOSITORY_ROOT / "tsconfig.base.json"
 ROOT_PACKAGE = REPOSITORY_ROOT / "package.json"
@@ -135,46 +140,46 @@ TRACKER = re.compile(r"\bthink-[a-z0-9]{4}\b")
 #: relaxations came to name the closed `think-4cwy` with every check green (#160 R24).
 LIVE_BEAD_STATES = frozenset({"open", "in_progress", "blocked"})
 
-#: Every Biome override the floor tolerates, exactly as `biome.json` writes it, with the
-#: bead that removes it. An override is floor rule 7's scoped exception only if it is one of
-#: these. Any other override fails until it is declared here, where a reviewer reads it --
-#: above all a broad one such as `packing/**` with a floor rule off, which the old test
-#: accepted because `biome.json` mentioned `motion_lab` somewhere (#125 F19a).
-DECLARED_BIOME_OVERRIDES: tuple[dict[str, Any], ...] = (
+#: The Biome overrides the floor carried until think-6o9n, exactly as `biome.json` wrote them:
+#: the motion-lab assets' unused-symbol rules and the classic scripts' strict-mode directive.
+#: They went when those files became modules. They are kept here only as reintroductions the
+#: negative control must refuse, beside a broad one such as `packing/**` with a floor rule
+#: off (#125 F19a): an override is a fault however narrow, and no declaration licenses one.
+REMOVED_BIOME_OVERRIDES: tuple[dict[str, Any], ...] = (
     {
-        "tracker": "think-6o9n",
-        "reason": "the motion-lab assets are fragments concatenated into one page, so a "
-        "symbol one fragment defines is used by another",
-        "override": {
-            "includes": ["packing/src/sqpack/motion_lab/assets/**/*.js"],
-            "linter": {
-                "rules": {
-                    "correctness": {
-                        "noUnusedVariables": "off",
-                        "noUnusedFunctionParameters": "off",
-                    }
+        "includes": ["packing/src/sqpack/motion_lab/assets/**/*.js"],
+        "linter": {
+            "rules": {
+                "correctness": {
+                    "noUnusedVariables": "off",
+                    "noUnusedFunctionParameters": "off",
                 }
-            },
+            }
         },
     },
     {
-        "tracker": "think-6o9n",
-        "reason": "the motion-lab assets and the legacy application script are classic "
-        "scripts that declare their own strict mode",
-        "override": {
-            "includes": [
-                "packing/src/sqpack/motion_lab/assets/**/*.js",
-                "packages/workbench/src/application.js",
-            ],
-            "linter": {"rules": {"suspicious": {"noRedundantUseStrict": "off"}}},
-        },
+        "includes": [
+            "packing/src/sqpack/motion_lab/assets/**/*.js",
+            "packages/workbench/src/application.js",
+        ],
+        "linter": {"rules": {"suspicious": {"noRedundantUseStrict": "off"}}},
     },
 )
 
-#: Directories whose JavaScript is not ours to hold to a floor.
+#: Directories whose JavaScript is not ours to hold to a floor: third-party code, vendored
+#: or installed. Minified files are excluded from Biome too, and none is tracked.
 NOT_OURS = ("vendor/", "node_modules/")
 SCRIPT_SUFFIXES = (".js", ".jsx", ".mjs", ".cjs", ".ts", ".tsx", ".mts", ".cts")
 STYLE_SUFFIXES = (".css",)
+#: The suffixes the ESLint promise overlay covers: checked JavaScript. Biome's own promise
+#: rules hold the TypeScript.
+JAVASCRIPT_SUFFIXES = (".js", ".jsx", ".mjs", ".cjs")
+
+#: The language sections of `biome.json` that can switch a tool off for a whole language.
+LANGUAGES = ("javascript", "css", "json")
+
+#: How every file must be read by `tsc`: as a module, which is how Biome parses it.
+MODULE_DETECTION = "force"
 
 #: Reads one repository-relative path from the bead store, or None when it is absent.
 BeadReader = Callable[[str], str | None]
@@ -233,6 +238,9 @@ def _relaxed_flags(config: Path) -> list[str]:
         for flag, value in options.items()
         if (value is False and flag in FLOOR_FLAGS)
         or (value is True and flag in FORBIDDEN_TRUE)
+        # A program that reads its files as scripts lets them share top-level names, which
+        # is how two motion-lab files once passed every tool while calling each other.
+        or (flag == "moduleDetection" and value != MODULE_DETECTION)
     )
 
 
@@ -331,16 +339,89 @@ def _fixture_store(states: Mapping[str, str]) -> BeadReader:
 # Biome
 
 
-def _biome_override_faults(
-    config: Mapping[str, Any], declared: Iterable[Mapping[str, Any]]
-) -> list[str]:
-    """Every override in `config` that is not exactly one of the declared exceptions."""
-    allowed = [entry["override"] for entry in declared]
+def _biome_override_faults(config: Mapping[str, Any]) -> list[str]:
+    """Every override in `config`, each a fault: a rule is on for every file Biome reaches."""
     return [
-        f"undeclared Biome override: {json.dumps(override, sort_keys=True)}"
+        f"Biome override: {json.dumps(override, sort_keys=True)}"
         for override in config.get("overrides", [])
-        if override not in allowed
     ]
+
+
+def _biome_downgrade_faults(config: Mapping[str, Any]) -> list[str]:
+    """Every rule turned below `error` or off, and every tool or language switched off.
+
+    The global form of an override, and a worse one: floor rule 7 forbids it outright. A rule
+    is set to a severity string or to an object carrying a `level`.
+    """
+    faults: list[str] = []
+    for group, rules in config.get("linter", {}).get("rules", {}).items():
+        if not isinstance(rules, Mapping):
+            continue
+        for rule, setting in rules.items():
+            level = setting.get("level") if isinstance(setting, Mapping) else setting
+            if level != "error":
+                faults.append(f"{group}.{rule} is {level!r}")
+    sections = {"": config, **{f"{name}.": config.get(name, {}) for name in LANGUAGES}}
+    faults.extend(
+        f"{prefix}{tool}.enabled is false"
+        for prefix, section in sections.items()
+        for tool in ("linter", "formatter", "assist")
+        if section.get(tool, {}).get("enabled") is False
+    )
+    return faults
+
+
+# ---------------------------------------------------------------------------------------
+# ESLint
+
+
+def _eslint_file_configs(
+    paths: Iterable[str], block: Path | None = None
+) -> list[dict[str, Any]]:
+    """What ESLint resolves for each path, read through ESLint's own API.
+
+    `block`, a JSON configuration object, is applied after the config file's own, which is how
+    the negative control reintroduces a relaxed block without writing one into the tree.
+    """
+    done = node(
+        [str(ESLINT_FILE_CONFIGS), str(ESLINT_CONFIG), *([str(block)] if block else [])],
+        return_completed_process=True,
+        input="\n".join(paths),
+        capture_output=True,
+        text=True,
+        cwd=REPOSITORY_ROOT,
+    )
+    assert done.returncode == 0, done.stderr
+    return json.loads(done.stdout)
+
+
+def _eslint_faults(tracked: Iterable[str], resolved: Iterable[Mapping[str, Any]]) -> list[str]:
+    """Every owned script ESLint misses or holds below the promise floor, and every
+    configuration that is not the one all of them share.
+
+    "No file-specific block" is checked as what ESLint does rather than how the config reads:
+    a block that relaxes a rule for some files, or types them through a different program,
+    shows up as those files resolving differently from the rest.
+    """
+    by_path = {entry["path"]: entry for entry in resolved}
+    faults: list[str] = []
+    shapes: dict[str, list[str]] = {}
+    for path in sorted(tracked):
+        entry = by_path.get(path)
+        if entry is None or entry["ignored"]:
+            faults.append(f"outside ESLint: {path}")
+            continue
+        below = [rule for rule in PROMISE_RULES if entry["rules"].get(rule) != 2]
+        if below:
+            faults.append(f"{path}: {below} below error")
+        shape = json.dumps(
+            {key: entry[key] for key in ("rules", "parser", "parserOptions")}, sort_keys=True
+        )
+        shapes.setdefault(shape, []).append(path)
+    if len(shapes) > 1:
+        for shape, paths in sorted(shapes.items(), key=lambda item: -len(item[1]))[1:]:
+            faults.append(f"file-specific ESLint configuration for {paths[:3]}: {shape}")
+    return faults
 
 
 def _biome_listed(command: str) -> set[str]:
@@ -442,38 +523,43 @@ def test_the_node_toolchain_is_exactly_pinned_and_runtime_bounded() -> None:
     }
 
 
-def test_every_biome_exception_is_declared() -> None:
-    """Floor rule 7: an exception names exact files and exact rules, never a global
-    downgrade. A rule turned off at the top level, or over a whole tree, would be a
-    different floor wearing this one's name."""
-    assert _biome_override_faults(_jsonc(BIOME_CONFIG), DECLARED_BIOME_OVERRIDES) == []
-    tracked = _tracked(*(f"*{suffix}" for suffix in (*SCRIPT_SUFFIXES, *STYLE_SUFFIXES)))
-    for entry in DECLARED_BIOME_OVERRIDES:
-        for pattern in entry["override"]["includes"]:
-            assert not pattern.startswith("!"), f"an override that excludes: {pattern}"
-            assert _tracked(pattern.replace("**/*", "*")), (
-                f"a declared override names no tracked file: {pattern}"
-            )
-    assert tracked
-
-
-def test_a_broad_or_undeclared_biome_override_is_refused() -> None:
-    """The negative control for the test above, on the reproduction from #125 F19a."""
+def test_biome_has_no_override_and_no_rule_turned_down() -> None:
+    """No exceptions: not floor rule 7's scoped kind, and not the global downgrade that rule
+    forbids. Every rule Biome enables is at `error` for every file it reaches."""
     config = _jsonc(BIOME_CONFIG)
-    broad = {
-        "includes": ["packing/**"],
-        "linter": {"rules": {"style": {"useBlockStatements": "off"}}},
-    }
-    faults = _biome_override_faults(
-        {**config, "overrides": [*config.get("overrides", []), broad]},
-        DECLARED_BIOME_OVERRIDES,
-    )
-    assert len(faults) == 1
-    assert "packing/**" in faults[0]
+    assert _biome_override_faults(config) == []
+    assert _biome_downgrade_faults(config) == []
 
-    widened = json.loads(json.dumps(config))
-    widened["overrides"][0]["includes"].append("packages/**/*.js")
-    assert len(_biome_override_faults(widened, DECLARED_BIOME_OVERRIDES)) == 1
+
+@pytest.mark.parametrize(
+    "override",
+    [
+        *REMOVED_BIOME_OVERRIDES,
+        {
+            "includes": ["packing/**"],
+            "linter": {"rules": {"style": {"useBlockStatements": "off"}}},
+        },
+    ],
+    ids=["unused-symbols", "strict-directive", "broad"],
+)
+def test_a_reintroduced_biome_override_is_refused(override: dict[str, Any]) -> None:
+    """The negative control: each override the floor carried, put back exactly as it was, and
+    the broad one from #125 F19a."""
+    config = _jsonc(BIOME_CONFIG)
+    faults = _biome_override_faults({**config, "overrides": [override]})
+    assert faults == [f"Biome override: {json.dumps(override, sort_keys=True)}"]
+
+
+def test_a_global_downgrade_is_refused() -> None:
+    config = json.loads(json.dumps(_jsonc(BIOME_CONFIG)))
+    config["linter"]["rules"]["suspicious"] = {"noRedundantUseStrict": "off"}
+    config["linter"]["rules"]["style"]["useBlockStatements"] = {"level": "warn"}
+    config["css"] = {"linter": {"enabled": False}}
+    assert _biome_downgrade_faults(config) == [
+        "style.useBlockStatements is 'warn'",
+        "suspicious.noRedundantUseStrict is 'off'",
+        "css.linter.enabled is false",
+    ]
 
 
 def test_the_type_floor_is_declared_once_and_extended() -> None:
@@ -484,6 +570,10 @@ def test_the_type_floor_is_declared_once_and_extended() -> None:
     assert not missing_js, (
         "the retained browser programs are checked JavaScript; without "
         f"{missing_js} their type gates check nothing"
+    )
+    assert options.get("moduleDetection") == MODULE_DETECTION, (
+        "tsconfig.base.json does not read every file as a module, as Biome does; a program "
+        "that reads files as scripts lets them share top-level names by scope"
     )
     for config in _tsconfigs():
         if config.name == "tsconfig.base.json":
@@ -525,6 +615,17 @@ def test_a_tracked_relaxation_of_checkjs_is_still_refused(tmp_path: Path) -> Non
     assert "strictNullChecks" in _relaxed_flags(config)
 
 
+def test_a_program_reading_files_as_scripts_is_refused(tmp_path: Path) -> None:
+    """The negative control for module detection: `auto` is `tsc`'s default, and what let the
+    motion lab's model and page script share functions by scope while both tools passed."""
+    config = tmp_path / "tsconfig.json"
+    config.write_text(
+        json.dumps({"compilerOptions": {"moduleDetection": "auto"}}), encoding="utf-8"
+    )
+    assert _relaxed_flags(config) == ["moduleDetection"]
+    assert sorted(set(_relaxed_flags(config)) - RATCHET_FLAGS) == ["moduleDetection"]
+
+
 def test_every_relaxed_flag_names_an_open_tracker() -> None:
     """Floor rule 8: legacy code ratchets toward strict. A flag turned off without a live
     tracked issue is not a ratchet, it is a lower floor."""
@@ -538,7 +639,6 @@ def test_every_relaxed_flag_names_an_open_tracker() -> None:
     named = {
         config.name: TRACKER.findall(config.read_text(encoding="utf-8")) for config in relaxed
     }
-    named["biome.json overrides"] = [entry["tracker"] for entry in DECLARED_BIOME_OVERRIDES]
     for source, aliases in named.items():
         assert _dead_trackers(aliases, read) == [], f"{source} names a tracker that is not open"
 
@@ -657,48 +757,133 @@ def test_a_file_outside_biome_scope_is_detected() -> None:
     ]
 
 
-def test_the_checked_javascript_promise_overlay_is_effective() -> None:
+def _owned_javascript() -> list[str]:
+    return [
+        path
+        for path in _tracked(*(f"*{suffix}" for suffix in JAVASCRIPT_SUFFIXES))
+        if (REPOSITORY_ROOT / path).is_file()
+    ]
+
+
+def test_eslint_holds_every_owned_script_to_one_configuration() -> None:
+    """Every tracked JavaScript file is reached, at the promise floor, and resolves exactly as
+    every other one does: no file has a block of its own, relaxed or merely different. Read
+    from ESLint's own resolution of each file, not from the config's source (#125 F19c)."""
     _require_tool(ESLINT)
-    representatives = (
-        "packages/workbench/src/application.js",
-        "packages/workbench/probes/api/apply.js",
-        "packing/devtools/probes/check_published_site/startup.js",
-        "packing/devtools/node/inspect-probes.mjs",
-        "packing/src/sqpack/motion_lab/assets/free-quench.js",
-        "packing/atlas/known-best/video/spikes/v1-slideshow/timeline_harness.js",
-    )
-    for source in representatives:
-        configured = subprocess.run(
-            [
-                str(ESLINT),
-                "--print-config",
-                source,
-                "--config",
-                str(ESLINT_CONFIG),
-            ],
-            check=True,
-            capture_output=True,
-            text=True,
-            cwd=REPOSITORY_ROOT,
+    owned = _owned_javascript()
+    assert owned
+    assert _eslint_faults(owned, _eslint_file_configs(owned)) == []
+
+
+@pytest.mark.parametrize(
+    ("block", "expected"),
+    [
+        (
+            {
+                "files": ["packages/workbench/probes/**/*.js"],
+                "rules": {"@typescript-eslint/no-floating-promises": "off"},
+            },
+            "below error",
+        ),
+        (
+            # The shape of the block `application.js` had: the same rules, typed through a
+            # program of its own.
+            {
+                "files": ["packages/workbench/src/application.js"],
+                "languageOptions": {"parserOptions": {"project": "./tsconfig.json"}},
+            },
+            "file-specific ESLint configuration for ['packages/workbench/src/application.js']",
+        ),
+        ({"ignores": ["packing/src/sqpack/motion_lab/assets/**"]}, "outside ESLint"),
+    ],
+    ids=["relaxed-rule", "own-program", "ignored"],
+)
+def test_a_reintroduced_eslint_block_is_refused(
+    tmp_path: Path, block: dict[str, Any], expected: str
+) -> None:
+    """The negative control, live: ESLint resolves the real config with the block added, and
+    the faults name what the block did."""
+    _require_tool(ESLINT)
+    extra = tmp_path / "block.json"
+    extra.write_text(json.dumps(block), encoding="utf-8")
+    owned = _owned_javascript()
+    faults = _eslint_faults(owned, _eslint_file_configs(owned, extra))
+    assert faults
+    assert any(expected in fault for fault in faults), faults
+
+
+def test_eslint_faults_name_each_kind_of_gap() -> None:
+    floor = dict.fromkeys(PROMISE_RULES, 2)
+    shared = {
+        "ignored": False,
+        "rules": floor,
+        "parser": "p",
+        "parserOptions": {"project": ["a"]},
+    }
+    resolved = [
+        {**shared, "path": "a.js"},
+        {**shared, "path": "b.js"},
+        {**shared, "path": "c.js", "rules": {**floor, PROMISE_RULES[1]: 1}},
+        {**shared, "path": "d.js", "parserOptions": {"project": ["b"]}},
+        {"path": "e.js", "ignored": True},
+    ]
+    faults = _eslint_faults(["a.js", "b.js", "c.js", "d.js", "e.js", "f.js"], resolved)
+    assert faults[:3] == [
+        "c.js: ['@typescript-eslint/no-floating-promises'] below error",
+        "outside ESLint: e.js",
+        "outside ESLint: f.js",
+    ]
+    configurations = sorted(fault.split(":")[0] for fault in faults[3:])
+    assert configurations == [
+        "file-specific ESLint configuration for ['c.js']",
+        "file-specific ESLint configuration for ['d.js']",
+    ]
+
+
+def test_the_gates_lint_the_whole_repository_with_eslint(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A directory list in a gate could only leave a new tree outside the floor, as the old one
+    left the video spikes' probes: the config decides what is owned, so both gates pass `.`."""
+    _require_tool(ESLINT)
+    captured: list[tuple[str, ...]] = []
+
+    def record(_context: validate.Context, commands: Any, **_options: Any) -> str:
+        captured.extend(tuple(command) for command in commands)
+        return ""
+
+    monkeypatch.setattr(validate, "_commands", record)
+    validate._browser_floor(  # noqa: SLF001  # pyright: ignore[reportPrivateUsage]
+        validate.Context(
+            deep=False, strict=False, jobs=1, inner_jobs=1, environment=dict(os.environ)
         )
-        rules = json.loads(configured.stdout)["rules"]
-        for rule in PROMISE_RULES:
-            assert rules[rule][0] == 2, f"{source}: {rule} is below error severity"
+    )
+    (eslint,) = [command for command in captured if command[0] == str(ESLINT)]
+    expected = (".", "--config", "packages/workbench/eslint.config.js", "--max-warnings", "0")
+    assert eslint[1:] == expected
+    script = _jsonc(WORKBENCH_PACKAGE)["scripts"]["lint:promises"]
+    assert script == f"cd ../.. && eslint {' '.join(expected)}"
 
 
 def test_the_checked_javascript_overlay_rejects_a_floating_promise() -> None:
     """Linted at an in-scope path through stdin, so the config's own `files` globs decide
-    whether the rule applies, and no fixture is ever written into the source tree."""
+    whether the rule applies, and no fixture is ever written into the source tree.
+
+    The path is a real file in a type program, because a file in none fails to parse, which
+    is the point. `TSESTREE_SINGLE_RUN=false` is what makes typescript-eslint type the text on
+    stdin: detecting a one-shot CLI run, it otherwise builds each program once from the disk
+    and lints the file there, and the fixture is never seen."""
     _require_tool(ESLINT)
     done = subprocess.run(
         [
             str(ESLINT),
             "--stdin",
             "--stdin-filename",
-            "packages/workbench/src/floor-liveness-probe.js",
+            "packages/workbench/src/application.js",
             "--config",
             str(ESLINT_CONFIG),
         ],
+        env=os.environ | {"TSESTREE_SINGLE_RUN": "false"},
         input="/** @returns {Promise<void>} */\nasync function later() {}\nlater();\n",
         check=False,
         capture_output=True,
@@ -752,3 +937,63 @@ def test_the_type_gate_actually_rejects_a_type_error(tmp_path: Path) -> None:
         cwd=tmp_path,
     )
     assert done.returncode != 0, "tsc accepted a type error under the floor's own options"
+
+
+# ---------------------------------------------------------------------------------------
+# Formatting
+
+
+def test_the_commit_hook_fixes_every_owned_suffix() -> None:
+    """Floor rule 6: the hook formats and fixes each staged script and stylesheet with Biome
+    and stages the result. The glob is matched against the whole path, so `*.js` reaches a
+    probe four directories down (measured with lefthook 2.1.10 on a nested `.ts`, `.js` and
+    `.css` for think-6o9n)."""
+    hook = safe_load(LEFTHOOK.read_text(encoding="utf-8"))["pre-commit"]
+    assert hook["parallel"] is False, "stage_fixed commands race on the index when parallel"
+    biome = hook["commands"]["biome"]
+    globbed = re.fullmatch(r"\*\.\{([a-z,]+)\}", biome["glob"])
+    assert globbed, f"the Biome hook's glob is not one suffix set: {biome['glob']}"
+    covered = {f".{suffix}" for suffix in globbed.group(1).split(",")}
+    missing = sorted({*SCRIPT_SUFFIXES, *STYLE_SUFFIXES} - covered)
+    assert not missing, f"the commit hook does not format {missing}"
+    command = shlex.split(biome["run"])
+    assert command[:2] == ["./node_modules/.bin/biome", "check"]
+    assert {"--write", "--unsafe"} <= set(command)
+    assert command[-1] == "{staged_files}"
+    assert biome["stage_fixed"] is True
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        "packages/workbench/src/core/geometry.ts",
+        "packages/workbench/probes/animate/scope.js",
+        "packing/src/sqpack/motion_lab/assets/motion-lab.css",
+    ],
+)
+def test_the_gate_rejects_an_unformatted_file(tmp_path: Path, source: str) -> None:
+    """The verify half of floor rule 6: `biome ci`, the pull-request gate's command, fails a
+    file the formatter would change. The fixture is a real source file with its indentation
+    doubled, so what is proved is the formatter's verdict and not a lint rule's."""
+    _require_tool(BIOME)
+    text = (REPOSITORY_ROOT / source).read_text(encoding="utf-8")
+    unformatted = re.sub(r"^( +)", r"\1\1", text, flags=re.MULTILINE)
+    assert unformatted != text
+    sample = tmp_path / Path(source).name
+    sample.write_text(unformatted, encoding="utf-8")
+    done = subprocess.run(
+        [
+            str(BIOME),
+            "ci",
+            "--error-on-warnings",
+            f"--config-path={REPOSITORY_ROOT}",
+            sample.name,
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+        cwd=tmp_path,
+    )
+    output = done.stdout + done.stderr
+    assert done.returncode != 0, f"biome ci accepted an unformatted {source}"
+    assert "format" in output, f"biome ci failed, but not on formatting:\n{output}"

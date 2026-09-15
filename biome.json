@@ -64,31 +64,5 @@
         "organizeImports": "on"
       }
     }
-  },
-  "overrides": [
-    {
-      "includes": ["packing/src/sqpack/motion_lab/assets/**/*.js"],
-      "linter": {
-        "rules": {
-          "correctness": {
-            "noUnusedVariables": "off",
-            "noUnusedFunctionParameters": "off"
-          }
-        }
-      }
-    },
-    {
-      "includes": [
-        "packing/src/sqpack/motion_lab/assets/**/*.js",
-        "packages/workbench/src/application.js"
-      ],
-      "linter": {
-        "rules": {
-          "suspicious": {
-            "noRedundantUseStrict": "off"
-          }
-        }
-      }
-    }
-  ]
+  }
 }

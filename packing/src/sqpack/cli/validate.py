@@ -1477,8 +1477,8 @@ def _browser_floor(context: Context) -> str:
     warning-severity rules. Fixing is `npm run lint:fix`, at a commit hook or by hand.
 
     The type gate is separate from the lint gate (floor rule 3) and runs once per program:
-    each legacy global program remains separate so unrelated assets do not collide. The
-    module-based workbench package has its own strict program.
+    the relaxed legacy programs stay separate so that no relaxation reaches a file outside
+    them, and the module-based workbench package has its own strict program.
 
     Node is not a `uv` dependency, so this asks for the pinned local binaries rather than
     anything on PATH. `npm ci` at the repository root is what puts them there.
@@ -1503,14 +1503,12 @@ def _browser_floor(context: Context) -> str:
             (str(biome), "ci", "--error-on-warnings", "."),
             (
                 str(eslint),
-                # The whole package: its config types every workbench JavaScript file, so
-                # naming files here would leave a new one outside the promise floor.
-                "packages/workbench",
-                "packing/src/sqpack/motion_lab/assets",
-                "packing/atlas/known-best/video/spikes/v1-slideshow",
-                "packing/devtools/probes",
-                "packing/devtools/node",
-                "packing/tests/probes",
+                # The whole repository, as Biome is given it. The config holds every owned
+                # JavaScript file to one block and ignores only what is not ours. A list of
+                # directories here had to grow with every new tree, and one it missed was
+                # outside the promise floor with the gate green: `npm run lint`'s shorter copy
+                # of the list skipped three of the six trees this one named.
+                ".",
                 "--config",
                 "packages/workbench/eslint.config.js",
                 "--max-warnings",
