@@ -34,10 +34,11 @@ hypothesis:
 
 **Registered so the claim can be tested rather than assumed.**
 
-Every blind run observed ended with squares overlapping: in the 123,190 runs whose rows
-survive locally, the deepest overlap before repair ranged from 0.002 to 0.118 of a unit
-side. A separating-axis test measured it over the final poses, with a tolerance taken
-from the snapped control
+Every blind run observed ended with squares overlapping: in 123,190 runs of the repaired
+rounds, whose rows are not retained, the deepest overlap before repair ranged from 0.002
+to 0.118 of a unit side.
+A separating-axis test measured it over the final poses, with a tolerance taken from the
+snapped control
 ([exp-210](../series/series-000-smoke-and-calibration/experiments/exp-210-h210-blind-runs-are-not-packings.md)).
 The trials were not kept, so this is an observation to re-measure rather than a result.
 

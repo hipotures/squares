@@ -41,8 +41,8 @@ That text is recoverable at commit `a40d272c`; none of it is repeated here.
   by matching the two records.
   Only the destination poses are withheld.
   It is one point on a range of how much of the answer a search is given.
-- **The runs did not end on packings.** None of the 123,190 blind runs whose rows
-  survive ended without overlapping squares; the median deepest overlap was 0.083 of a
+- **The runs did not end on packings.** None of the 123,190 blind runs in the repaired
+  rounds ended without overlapping squares; the median deepest overlap was 0.083 of a
   unit side. A container side read from such an arrangement is a bounding box around
   overlaps, so every number taken that way has been discarded.
 - **Repaired to a packing, a single run is worse than the trivial grid.** At every `n`
@@ -123,9 +123,10 @@ The snap and free rows came from a variant of the probe that was run once and no
 the committed harness runs blind only, so the control is a recorded observation rather
 than a reproducible one.
 
-Across the 123,190 runs of the later rounds, whose rows survive locally, no run ended
-below 1e-5. The deepest overlap before repair ranged from 0.002 to 0.118 of a side, with
-a median of 0.083.
+Across the 123,190 runs of the repaired rounds, no run ended below 1e-5. The deepest
+overlap before repair ranged from 0.002 to 0.118 of a side, with a median of 0.083.
+These figures come from local copies of the rows, which are not retained, and
+`devtools.summarize_annealing --overlaps` recomputes them from regenerated rows.
 
 The overlap is built into the blind schedule.
 The walls close onto the known-best side while squares may overlap by up to 0.08, and
@@ -208,8 +209,10 @@ What this shows:
 
 - **No spread.** Every “best of the first k” is one observation from one ordered seed
   stream. None of these numbers carries a range or a confidence interval.
-- **The runs cannot be re-checked.** Trials and final poses were not retained, so the
-  validity of each repaired run rests on the check as it ran at the time.
+- **The runs are not independently re-checkable.** The per-trial rows are not retained,
+  and the harness never wrote final poses, so a repaired run’s validity rests on the
+  harness’s own separating-axis check.
+  Regenerating the rows repeats that check; it is not an independent one.
 - **Coverage is thin.** `n = 17`, 26 and 29 have repaired runs at level 6 only.
   Levels 3, 5, 7 and 9 were not measured.
 - **The repair only translates.** Whether a repair that rotates changes the scores is
@@ -237,14 +240,21 @@ What this shows:
 
 - **Retained:** `packing/campaign/results/annealing/summaries.json`, which holds one
   median and one best-of-first-k ladder per cell, per run file.
-  Cells marked `resolved: true` were repaired and checked before scoring.
+  `packing/devtools/summarize_annealing.py` wrote it.
+  Cells marked `resolved: true` were scored on runs repaired to packings.
   Several files replay the same seeds, so their trial counts overlap.
-- **Not retained:** per-trial rows and final poses, which were removed from the branch
-  at `6e191a35` to keep the diff reviewable.
-- **Checked before this rewrite:** local copies of the rows behind every
-  `resolved: true` cell, 59.7 MB and not in the repository.
-  No run was refused, every repaired overlap is finite and at most 1e-9, seeds run
-  contiguously from 0, and the counts match the summaries.
+- **Not retained:** the per-trial rows, removed from the branch at `6e191a35` to keep
+  the diff reviewable.
+  The harness never wrote final poses.
+- **Checked on 2026-09-14, against local copies of the rows** that are not in the
+  repository: `summarize_annealing --check` matched all 59 run files, and `--overlaps`,
+  over the 59.7 MB behind the `resolved: true` cells, gave the figures in section 3. No
+  run would be refused, every repaired overlap is finite and at most 1e-9, and seeds run
+  contiguously from 0.
+- **Regenerable:** the [runbook](../results/annealing/README.md#what-is-retained) gives
+  the commands that rewrite the rows and re-check them.
+  One file, `resolved-5k-a6.jsonl`, was regenerated on this branch and matched its
+  summary.
 - **Instrument:** `packing/devtools/bench_annealing.py` on this branch.
 
 <!-- This document follows common-doc-guidelines.md.

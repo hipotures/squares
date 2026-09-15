@@ -121,9 +121,10 @@ Two orders of magnitude separate it from the smallest real overlap, so a toleran
 ## Result
 
 Every blind run observed ended with at least one pair of squares overlapping.
-The later rounds kept a row per run, and their local copies cover 123,190 runs: none
-ended below 1e-5, and the deepest overlap before repair ranged from 0.002 to 0.118 of a
-side, with a median of 0.083.
+The repaired rounds wrote a row per run.
+Local copies of those rows, which are not retained, cover 123,190 runs: none ended below
+1e-5, and the deepest overlap before repair ranged from 0.002 to 0.118 of a side, with a
+median of 0.083.
 
 ## What It Means
 
@@ -157,8 +158,8 @@ destination. Blind mode has none, so nothing drives the overlap out.
 
 ## Evidence
 
-The trials and their final poses were not retained, so this result cannot be re-checked
-from the repository.
+The per-trial rows are not retained and the harness never wrote final poses, so the
+repository alone cannot re-check this result; the runbook regenerates the rows.
 The blind rows are cheap to reproduce: from `packing/`, run
 `uv run --frozen --all-extras --group dev python -m devtools.bench_annealing --n 5 11 17 --seeds 200`.
 Each trial row it writes under `campaign/results/annealing/` carries `overlap`, the
