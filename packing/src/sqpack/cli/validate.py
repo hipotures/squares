@@ -1525,8 +1525,20 @@ def _browser_floor(context: Context) -> str:
 
 
 def _workbench_frontend(context: Context) -> str:
-    """Build once, then exercise accessibility and animation editing in Chromium."""
-    return _module(context, "workbench_tools.check_frontend")
+    """Check the probe files, then build once and exercise the page in Chromium.
+
+    `check_probes` goes first because it needs no browser and takes under a second: a probe
+    that does not parse, is not a function, or is named by a checker with no file behind it
+    fails here rather than at the far end of the browser run. It was run by no gate until
+    the #160 review (D13), so a missing probe could sit in the tree unnoticed.
+    """
+    return _commands(
+        context,
+        (
+            (sys.executable, "-m", "workbench_tools.check_probes"),
+            (sys.executable, "-m", "workbench_tools.check_frontend"),
+        ),
+    )
 
 
 def _type_floor(context: Context) -> str:
