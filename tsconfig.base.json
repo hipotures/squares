@@ -6,10 +6,18 @@
   //
   // The retained browser programs are checked JavaScript, while new workbench modules are
   // TypeScript. `allowJs` + `checkJs` keeps the legacy programs under this same floor.
+  //
+  // `moduleDetection: "force"` makes every file a module, with no import or export needed, which
+  // is how Biome parses every file and how the pages run them: as an ES module, a bundle entry, or
+  // a module script. Under the default, a file with no import is a script whose top-level names
+  // every other script in the program can see, so two files could share a function by scope
+  // while both tools passed -- the coupling the motion lab's overrides existed for. A name one
+  // file gives another is an import, or a property of `globalThis` its owner assigns.
   "compilerOptions": {
     "allowJs": true,
     "allowImportingTsExtensions": true,
     "checkJs": true,
+    "moduleDetection": "force",
     "noEmit": true,
     "target": "ES2022",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
