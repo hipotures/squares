@@ -122,7 +122,10 @@ export function mountResizeHandle(options: ResizeHandleOptions): ResizeHandle {
       event.shiftKey,
     );
     if (next !== null) {
+      // The key is the separator's alone. The page's shortcuts listen on the window, where Home
+      // and End rewind or finish the step, or seek an imported animation.
       event.preventDefault();
+      event.stopPropagation();
       place(next);
     }
   };

@@ -6,12 +6,15 @@ import argparse
 import os
 import tempfile
 from pathlib import Path
+from typing import Any
 
 from playwright.sync_api import Page, sync_playwright
 
 from workbench_tools.build_site import build
+from workbench_tools.probes import probe
 
 KEY = "squares.workbench.stageShare"
+FIXTURE = Path(__file__).resolve().parents[2] / "tests/fixtures/packing-animation-v1.json"
 
 
 def check(page_path: Path) -> str:
@@ -75,6 +78,17 @@ def check(page_path: Path) -> str:
             "the page is still marked as resizing after the drag",
         )
 
+        def call(*calls: list[Any]) -> Any:
+            return page.evaluate(probe("api/apply"), {"calls": list(calls)})
+
+        def playhead() -> tuple[int, float]:
+            state = call(["state"])
+            return state["pair"], state["t"]
+
+        # The separator's keys move the separator and nothing else: with the playhead part-way
+        # through 10 -> 11, the page's own Home and End would rewind or finish the step.
+        call(["pause"], ["select", 9], ["seek", 1.0])
+        before = playhead()
         handle.focus()
         page.keyboard.press("ArrowUp")
         keyed = stage_height(page)
@@ -86,6 +100,24 @@ def check(page_path: Path) -> str:
         page.keyboard.press("End")
         require(fits(page), "End pushed the controls out of the window")
         page.keyboard.press("Shift+ArrowUp")
+        shifted = stage_height(page)
+        require(
+            playhead() == before,
+            f"the separator's keys moved the playhead from {before} to {playhead()}",
+        )
+        # And with an imported animation on the stage, whose own Home and End seek it.
+        call(["importAnimation", FIXTURE.read_text(encoding="utf-8")], ["seekAnimation", 0.5])
+        handle.focus()
+        page.keyboard.press("Home")
+        page.keyboard.press("End")
+        page.keyboard.press("Shift+ArrowUp")
+        traced = call(["animationState"])
+        require(
+            traced["active"] and traced["time"] == 0.5,
+            f"the separator's keys seeked the imported animation: {traced}",
+        )
+        page.locator("#mode-pack").click()
+        page.locator("#mode-animate").click()
         shifted = stage_height(page)
 
         page.reload()
@@ -111,8 +143,8 @@ def check(page_path: Path) -> str:
         require(not errors, "page errors: " + "; ".join(errors))
         browser.close()
     return (
-        "stage separator drag, arrows, Home and End, reload persistence, double-click reset "
-        "and Search hiding"
+        "stage separator drag, arrows, Home and End with the step and an imported animation "
+        "left where they were, reload persistence, double-click reset and Search hiding"
     )
 
 
