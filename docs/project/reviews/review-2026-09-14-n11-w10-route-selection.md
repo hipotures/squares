@@ -124,6 +124,36 @@ but their first blocks must pay for soundness or admission rather than claim a b
 The `n = 12` route has theorem-sized upside but no instrument-ready uniform lemma.
 Orientation, constructive search, and geometric waste stay behind their stated controls.
 
+## Six-Hour Execution Schedule
+
+The clock below starts when PR 173 is merged and `origin/main` is fetched.
+It allocates six hours of active work, not six hours of elapsed calendar time: waiting
+for CI or a review does not consume the next block, and a block ends on its declared
+evidence or kill condition rather than merely because its nominal time elapsed.
+
+| Work clock | Block | Workflow and deliverable | Merge boundary |
+| --- | --- | --- | --- |
+| `T+0:00–1:15` | BC-340 W5 checkpoint | W5 measures the current gate at its declared host shape, chooses at most one demonstrated bottleneck, and accepts a guarded repair or measured no-change result | One efficiency PR, watched to green and merged |
+| `T+1:15–1:45` | BC-353 route selection | W10 consumes the W5 receipt, rechecks stability, and selects exactly one scientific entry; Route A is the default recommendation and Route S the admission fallback | One planning PR, watched to green and merged |
+| `T+1:45–3:00` | Selected-route admission | Default Route A: freeze one complete original root family, fixed denominator, physical-transfer statement, matched baseline, conditional capacities, exact checker, and kill rule. If BC-353 selects S, freeze its template family and unchanged replay instead | One admission PR; no target run before merge |
+| `T+3:00–5:00` | Selected scientific discriminator | Run exactly the admitted target. For Route A, compare geometry alone with geometry plus conditional capacities and report either a complete family exclusion or the exact worst survivor | One research PR with independent replay, watched to green and merged |
+| `T+5:00–6:00` | Review and replan | W2 reviews any theorem-sized claim or scoped negative, W8 reconciles the durable record, and W10 continues, parks, or redirects the route. A result does not enlarge its scope during closeout | One review/planning PR, watched to green and merged |
+
+Every block begins from a fresh fetch of the prior merge and uses a new `codex/` branch.
+Three to five agents receive disjoint roles matched to the block: owner, independent
+mathematical or equivalence reviewer, record reviewer, and—when code or a target is
+present—implementation or replay lanes.
+CI may run beside independent review, but no later block starts before the prior block’s
+PR is merged. Each PR leads with measured cost, carries its own session and agenda
+disposition, passes the applicable local or hosted gate on an exact source revision,
+closes or updates its beads, and syncs tbd.
+
+The schedule is conditional after BC-353. If W5 exposes a correctness or equivalence
+problem, its repair and remeasurement replace the later allocation.
+If Route A cannot freeze a complete family and checker during admission, the target does
+not run; the remaining work clock returns to W10 and Route S rather than turning an
+incomplete sample into evidence.
+
 ## Next Block Contract
 
 BC-340 begins with the current gate and declared ceilings.

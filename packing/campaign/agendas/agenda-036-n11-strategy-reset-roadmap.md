@@ -452,6 +452,12 @@ stronger charge algebra, geometry-dependent budgets, n12, C, D, then geometric w
 Route A is the expected first scientific choice and Route S is its admission fallback,
 but both remain tentative until the post-W5 planning block.
 
+The W10 review maps the next six active work hours into five sequential PR-bounded
+blocks: BC-340 W5, BC-353 W10, selected-route admission, one exact discriminator, and a
+review-and-replan closeout.
+The last three blocks are conditional on the preceding exit; an unadmitted target does
+not run, and no later branch starts before the prior PR merges.
+
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
 -->

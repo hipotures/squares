@@ -105,7 +105,8 @@ session:
       The cadence is derived at the mandatory eight-block ceiling; the latest W5's
       agenda classification is repaired; BC-340 is selected pending certification; and
       all scientific routes remain explicitly continued or paused for the fresh W10
-      under BC-353/think-d3h5 that follows W5.
+      under BC-353/think-d3h5 that follows W5. Five sequential PR-bounded blocks allocate
+      the next six active work hours without preauthorizing a scientific target.
   delegations:
   - task: >-
       Reconstruct the OR-12 cadence from agenda cells, sessions, and measured gate
@@ -184,6 +185,7 @@ session:
   - The planning base equals origin/main at 1d367d6af8f148e9b0a28a4393e96df8a3e0b478.
   - Eight conservative substantive non-W5 blocks follow the latest qualifying W5 in Session 116/BC-322.
   - Closing BC-346 releases only BC-340; BC-353 blocks every scientific candidate until W5 closes.
+  - The next six active work hours are mapped into five sequential blocks with separate merge boundaries.
   - No efficiency repair or scientific target ran.
   - 'full gate: fast at 32d81339b84c6d7e5d6a30e8365627f059805209: failed (structured certification-pending field absent)'
   - 'certification pending: think-9y7p'

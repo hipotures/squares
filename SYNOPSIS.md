@@ -215,6 +215,15 @@ The current order is:
    treat geometric waste accounting as a speculative candidate requiring both a local
    lemma and a non-double-counting global rule.
 
+The detailed
+[six-hour execution schedule](docs/project/reviews/review-2026-09-14-n11-w10-route-selection.md#six-hour-execution-schedule)
+allocates five sequential merge-bounded blocks: W5 measurement, post-W5 W10 selection,
+selected-route admission, one exact scientific discriminator, and independent review
+plus replanning. Each block starts from the preceding merge on a fresh branch and gets
+its own session, bead disposition, validation receipt, and pull request.
+Route A is the default research shape, not an authorization: BC-353 may select Route S
+or redirect the remaining work if W5 or admission evidence changes the decision.
+
 The audit’s linear advisory order is A, S, angular resources, B, stronger charge
 algebra, geometry-dependent budgets, `n = 12`, C, D, then geometric waste.
 That is a readiness-and-information judgment, not a measured probability of success or
