@@ -56,7 +56,7 @@ def distance(x: str, y: str) -> float:
 
 def main() -> int:
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
-    page_path = (HERE / args[0]) if args else HERE / "workbench.html"
+    page_path = (HERE / args[0]) if args else HERE.parents[4] / "site/workbench/index.html"
     identities = 324
     if "--identities" in sys.argv:
         identities = int(sys.argv[sys.argv.index("--identities") + 1])

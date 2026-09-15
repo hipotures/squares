@@ -13,6 +13,7 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 HERE = Path(__file__).resolve().parent
+DEFAULT_PAGE = HERE.parents[4] / "site/workbench/index.html"
 
 
 def note_console(errors: list[str], message) -> None:
@@ -24,7 +25,7 @@ def note_console(errors: list[str], message) -> None:
 def main() -> int:
     args = sys.argv[1:]
     levels: list[int] = []
-    page_name = "index.html"
+    page_name = str(DEFAULT_PAGE)
     while "--anneal" in args:
         i = args.index("--anneal")
         levels = [int(v) for v in args[i + 1].split(",")]
@@ -43,7 +44,7 @@ def main() -> int:
         errors: list[str] = []
         page.on("console", lambda m: note_console(errors, m))
         page.on("pageerror", lambda e: errors.append(f"pageerror: {e}"))
-        page.goto(f"file://{HERE / 'index.html'}")
+        page.goto(f"file://{HERE / page_name}")
         page.wait_for_timeout(600)
         index_of = {q["n"]: q["index"] for q in page.evaluate("atlasTransitions.pairs()")}
         print("| pair | style | max centre | max angle | side reached | record | excess |")

@@ -39,7 +39,8 @@ uv run --frozen --all-extras --group dev python -m workbench_tools.build_site
 ```
 
 The latter builds the self-contained page in `packing/site/workbench/`. Its publisher
-checks the generated full corpus, source identity, local links and deterministic output.
+checks the generated full corpus and that the page is self-contained, stamps the source
+revision, and with `--check` requires two builds to match byte for byte.
 The GitHub Pages deployment is owned by the repository workflow.
 
 ## Contracts and ownership

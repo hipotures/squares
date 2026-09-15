@@ -93,7 +93,7 @@ def main() -> int:
     flags = {a for a in sys.argv[1:] if a.startswith("--")}
     if not flags:
         flags = {"--classes", "--still"}
-    page_path = (HERE / args[0]) if args else HERE / "workbench.html"
+    page_path = (HERE / args[0]) if args else HERE.parents[4] / "site/workbench/index.html"
 
     with sync_playwright() as p:
         browser = p.chromium.launch()
