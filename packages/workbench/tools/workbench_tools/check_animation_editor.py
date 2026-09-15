@@ -84,6 +84,7 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
         simple_index, moving_index = into[7], into[5]
         toggle = page.locator("#fastsimple-toggle")
         require(toggle.is_checked(), "simple transitions are not sped up by default")
+
         # The census, observed as the steps whose duration halves. A simple step lies inside
         # k^2 - k .. k^2 - 1 for k = ceil(sqrt(n + 1)), and that range holds 170 steps of the
         # corpus; eleven of them change the container, because their best packing is tilted, and
