@@ -51,7 +51,8 @@ def check(page_path: Path) -> str:
         )
         page.on("pageerror", lambda error: errors.append(f"pageerror: {error}"))
         page.goto(page_path.resolve().as_uri())
-        page.wait_for_timeout(500)
+        # The page's script installs its API as it loads; wait on that, not on a fixed time.
+        page.wait_for_function(probe("benchmark/page-api-ready"))
         # The page opens on Animate; the stage's editing semantics below are Pack's.
         page.locator("#mode-pack").click()
 
