@@ -1,5 +1,5 @@
 # Git hooks managed by lefthook (https://lefthook.dev).
-# Install once after cloning: `make hooks-install` (or `npx lefthook install`).
+# Install once after cloning: `make hooks-install` (npm ci, then the lockfile's lefthook).
 # Bypass for an emergency commit: `git commit --no-verify` (avoid in PRs).
 
 pre-commit:
