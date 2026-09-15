@@ -7,6 +7,7 @@ from pathlib import Path
 
 from workbench_tools.build_site import build
 from workbench_tools.check_accessibility import check as check_accessibility
+from workbench_tools.check_animate_view import check as check_animate_view
 from workbench_tools.check_animation_editor import check as check_animation_editor
 from workbench_tools.check_pack_panel import check as check_pack_panel
 from workbench_tools.check_search_panel import check as check_search_panel
@@ -21,7 +22,8 @@ def main() -> int:
         editor = check_animation_editor(page)
         pack = check_pack_panel(page)
         search = check_search_panel(page)
-    print(f"OK: {accessibility}; {editor}; {pack}; {search}")
+        animate = check_animate_view(page)
+    print(f"OK: {accessibility}; {editor}; {pack}; {search}; {animate}")
     return 0
 
 

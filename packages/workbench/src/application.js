@@ -73,6 +73,18 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   let packPanel = null;
   /** @type {import("./app/search-panel.js").SearchPanel | null} */
   let searchPanel = null;
+  // **Whether the catalogue view owns the page's input.** This controller answers the page's
+  // global shortcuts, the stage's keys and pointer, and `atlasTransitions` only while neither
+  // independent panel is showing; each of those entry points asks this one question rather than
+  // naming the panels itself, so a panel cannot be refused in one place and obeyed in another.
+  // Before Pack mounts, the mode stands in for its visibility, so the answer holds from the first
+  // event the page can receive, whichever view it opens on.
+  function catalogueOwnsPage() {
+    if (searchPanel?.visible()) {
+      return false;
+    }
+    return packPanel === null ? state.mode !== "pack" : !packPanel.visible();
+  }
   /** @typedef {import("./api/workbench-api.js").AtlasAspect} AtlasAspect */
   /** @typedef {import("./api/workbench-api.js").AtlasGrowth} AtlasGrowth */
   /** @typedef {import("./api/workbench-api.js").AtlasGrowthRule} AtlasGrowthRule */
@@ -5373,7 +5385,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     get(target, property, receiver) {
       const member = Reflect.get(target, property, receiver);
       if (
-        (packPanel?.visible() || searchPanel?.visible()) &&
+        !catalogueOwnsPage() &&
         typeof member === "function" &&
         property !== "setMode" &&
         property !== "mode"
@@ -5560,7 +5572,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     return [pt.x, pt.y];
   }
   stage.addEventListener("keydown", (ev) => {
-    if (ev.metaKey || ev.ctrlKey || ev.altKey) {
+    if (ev.metaKey || ev.ctrlKey || ev.altKey || !catalogueOwnsPage()) {
       return;
     }
     const target = ev.target instanceof Element ? ev.target : null;
@@ -5598,7 +5610,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // decides which of them a press starts and nothing is ever ambiguous. With `draw links` on no
   // square is picked up at all; with it off the drawing code is never entered.
   svg.addEventListener("pointerdown", (ev) => {
-    if (animationPanel?.state().active || packPanel?.visible()) {
+    if (animationPanel?.state().active || !catalogueOwnsPage()) {
       return;
     }
     if (ev.button !== 0) {
@@ -5666,7 +5678,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     if (ev.metaKey || ev.ctrlKey || ev.altKey) {
       return;
     }
-    if (packPanel?.visible()) {
+    // Pack and Search own their keys: their fields take Space and the arrows, their buttons
+    // take Space, and a letter typed there is text, not a shortcut for the hidden catalogue.
+    if (!catalogueOwnsPage()) {
       return;
     }
     // What has the focus, read as an element once: the guard is about typing into a control, and
