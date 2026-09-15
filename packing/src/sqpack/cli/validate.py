@@ -1505,9 +1505,9 @@ def _browser_floor(context: Context) -> str:
                 str(eslint),
                 # The whole repository, as Biome is given it. The config holds every owned
                 # JavaScript file to one block and ignores only what is not ours. A list of
-                # directories here had to grow with every new tree, and one it missed was
-                # outside the promise floor with the gate green: `npm run lint`'s shorter copy
-                # of the list skipped three of the six trees this one named.
+                # directories here had to grow with every new tree -- the spike extraction
+                # added a seventh -- and a tree it missed was outside the promise floor with
+                # the gate green: `npm run lint`'s shorter copy named three of the seven.
                 ".",
                 "--config",
                 "packages/workbench/eslint.config.js",

@@ -10,8 +10,8 @@ Two different things are checked here, and the second is the one that matters.
 **The contract**: the named floor rules are present and set to `error`, every tracked
 first-party script and stylesheet is inside the scope Biome actually resolves and inside
 one of the type gate's programs, Biome has no override and no rule turned down, ESLint
-resolves one configuration for every owned script, every file is a module to `tsc` as it
-is to Biome, no program relaxes a flag outside the declared ratchet, and every relaxation
+resolves one configuration for every owned script, `tsc` gives every file its own scope,
+no program relaxes a flag outside the declared ratchet, and every relaxation
 names an open bead tracking its removal. The floor has no exceptions (owner, 2026-09-14):
 the overrides and the file-specific ESLint blocks it once carried went in think-6o9n.
 
@@ -178,7 +178,7 @@ JAVASCRIPT_SUFFIXES = (".js", ".jsx", ".mjs", ".cjs")
 #: The language sections of `biome.json` that can switch a tool off for a whole language.
 LANGUAGES = ("javascript", "css", "json")
 
-#: How every file must be read by `tsc`: as a module, which is how Biome parses it.
+#: How every file must be read by `tsc`: in its own scope, so no two files share a name by it.
 MODULE_DETECTION = "force"
 
 #: Reads one repository-relative path from the bead store, or None when it is absent.
@@ -572,8 +572,8 @@ def test_the_type_floor_is_declared_once_and_extended() -> None:
         f"{missing_js} their type gates check nothing"
     )
     assert options.get("moduleDetection") == MODULE_DETECTION, (
-        "tsconfig.base.json does not read every file as a module, as Biome does; a program "
-        "that reads files as scripts lets them share top-level names by scope"
+        "tsconfig.base.json does not give every file its own scope; a program that reads "
+        "files as scripts lets them share top-level names by scope"
     )
     for config in _tsconfigs():
         if config.name == "tsconfig.base.json":
