@@ -208,21 +208,30 @@ test("the scheduler retains completed, failed, timeout, cancellation and pending
 });
 
 test("fixed physics work and validity are admission conditions", async () => {
-  const short = await runSearchPlan(plan([0]), (_slot, configuration) => {
-    const result = completed(configuration);
-    return { ...result, work: { ...result.work, physicsSteps: 3 } };
-  });
+  // The plan gives each slot 5 ms; a fixed clock keeps a loaded machine from timing it out first.
+  const short = await runSearchPlan(
+    plan([0]),
+    (_slot, configuration) => {
+      const result = completed(configuration);
+      return { ...result, work: { ...result.work, physicsSteps: 3 } };
+    },
+    { now: () => 0 },
+  );
   assert.equal(short.outcomes[0]?.status, "failed");
 
-  const invalidRank = await runSearchPlan(plan([0]), (_slot, configuration) => ({
-    ...completed(configuration),
-    raw: {
-      ...completed(configuration).raw,
-      valid: false,
-      validityReason: "pair-overlap",
-    },
-    selectedState: "raw",
-  }));
+  const invalidRank = await runSearchPlan(
+    plan([0]),
+    (_slot, configuration) => ({
+      ...completed(configuration),
+      raw: {
+        ...completed(configuration).raw,
+        valid: false,
+        validityReason: "pair-overlap",
+      },
+      selectedState: "raw",
+    }),
+    { now: () => 0 },
+  );
   assert.equal(invalidRank.outcomes[0]?.status, "failed");
 });
 
