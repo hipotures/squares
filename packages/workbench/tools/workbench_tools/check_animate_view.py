@@ -182,12 +182,53 @@ def seeds(session: Session) -> str:
     return "seeds replay and a new seed ends the run"
 
 
+def scope(session: Session) -> str:
+    """Pair-moving calls keep the stage inside the range, and a run ends where one starts."""
+    steps = session.look(
+        "animate/scope",
+        calls=[
+            ["pause"],
+            ["setRange", 17, 17],
+            ["goTo", 26],
+            ["setRange", 20, 30],
+            ["goTo", 99],
+            ["seekSequence", 0],
+            ["seekSequence", 1e9],
+            ["setRange", 17, 17],
+            ["grab", 0],
+            ["release"],
+            ["play"],
+            ["playAll"],
+            ["stopAll"],
+        ],
+    )
+    for step in steps:
+        session.require(
+            step["inside"], f"`{step['call']}` left the stage outside the range: {step}"
+        )
+    one_step = steps[2]
+    session.require(
+        (one_step["from"], one_step["to"], one_step["n"]) == (27, 27, 27),
+        f"goTo on a one-step range did not carry the range with it: {one_step}",
+    )
+    session.require(
+        (steps[4]["n"], steps[5]["n"], steps[6]["n"]) == (30, 20, 30),
+        f"goTo and seekSequence did not hold a wide range's ends: {steps[4:7]}",
+    )
+    session.require(
+        steps[10]["optimizing"] and not steps[11]["optimizing"],
+        f"playAll ran continuous play on top of the hand's run: {steps[10:12]}",
+    )
+    return "goTo, seekSequence and playAll keep to the range"
+
+
 SECTIONS: tuple[Callable[[Session], str], ...] = (
     keyboard_ownership,
     gap_bar_through_dwell,
     colours_by_instant,
     seeks_anywhere,
     seeds,
+    scope,
 )
 
 

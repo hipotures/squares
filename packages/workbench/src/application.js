@@ -4631,11 +4631,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   }
   function select(index) {
     index = Math.max(0, Math.min(PAIRS.length - 1, index | 0));
-    // A run belongs to one n; choosing another ends it.
-    if (state.optimizing) {
-      state.optimizing = false;
-      opt = null;
-    }
+    // A run belongs to one n; choosing another ends it, and the clock with it.
+    endRun();
     state.pair = index;
     state.t = 0;
     markGapBar();
@@ -4920,11 +4917,14 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     if (position.index !== state.pair) {
       select(position.index);
     }
-    seek(position.time);
+    const held = keepStageInRange();
+    seek(held === null ? position.time : held === "first" ? 0 : duration());
   }
   // Continuous play: every pair from here to the last, back to back, keeping the style, the colour
   // rule, the snap, the blind run and the desaturation, on the sequence's own beat.
   function playAll() {
+    endRun();
+    keepStageInRange();
     state.continuous.on = true;
     preparedFor = -1;
     state.t = 0;
@@ -5002,8 +5002,18 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     // other where they would otherwise disagree. A range wider than one step is something Pack
     // cannot show, so it puts the page in Animate; a collapsed range is legal in both and never
     // forces a mode, since `setRange(17, 17)` in Animate is how one step animation is played.
-    if (forcedAspect !== null) {
-      state.mode = forcedAspect;
+    if (forcedAspect !== null && forcedAspect !== state.mode) {
+      enterAspect(
+        planAspectTransition({
+          currentAspect: state.mode,
+          currentRange: { from: lo, to: hi },
+          currentStepN: stepN(),
+          rememberedPackN: state.packN,
+          rememberedAnimateRange: state.animate,
+          supportedSteps: SUPPORTED_STEP_NS,
+          target: forcedAspect,
+        }),
+      );
     }
     // A one-step range is not a continuous run: the three timing boxes govern again.
     if (collapsed && state.continuous.on) {
@@ -5123,26 +5133,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       updateSegments();
       return state.mode;
     } // updateSegments coerces the style
-    controlsHeight = 0;
-    state.animate = transition.rememberedAnimateRange;
-    state.packN = transition.rememberedPackN;
-    state.mode = transition.aspect;
-    // The reset itself: nothing that belonged to the mode being left survives into the one being
-    // entered. `opt` is the open-ended run, `state.t` the animation clock.
-    pause();
-    state.optimizing = false;
-    opt = null;
-    state.t = 0;
-    // Revision 14: the tween is Animate's, so entering Pack with it selected falls back to the
-    // physics and leaves the reason under the select; leaving Pack clears the note, the choice
-    // being available again.
-    if (transition.aspect === "pack" && state.style === "tween") {
-      state.style = "physics";
-      solverNote = TWEEN_NOTE;
-    }
-    if (transition.aspect === "animate") {
-      solverNote = "";
-    }
+    enterAspect(transition);
     if (transition.aspect === "pack") {
       // Revision 13: Pack is where the starting size lives. Revision 14: and where all n squares are
       // on the stage from the first frame, so entering Pack always stages the arrangement --
@@ -5158,6 +5149,48 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     updateSegments();
     render();
     return state.mode;
+  }
+  // **Entering an aspect is a reset, wherever the entry comes from** (#125 F12): the mode tabs, or a
+  // range too wide for Pack. Nothing that belonged to the aspect being left survives into the one
+  // being entered: `opt` is the open-ended run, `state.t` the animation clock, and each aspect's
+  // remembered n or range is stored on the way out.
+  function enterAspect(transition) {
+    controlsHeight = 0;
+    state.animate = transition.rememberedAnimateRange;
+    state.packN = transition.rememberedPackN;
+    state.mode = transition.aspect;
+    endRun();
+    pause();
+    state.t = 0;
+    // Revision 14: the tween is Animate's, so entering Pack with it selected falls back to the
+    // physics and leaves the reason under the select; leaving Pack clears the note, the choice
+    // being available again.
+    if (transition.aspect === "pack" && state.style === "tween") {
+      state.style = "physics";
+      solverNote = TWEEN_NOTE;
+    }
+    if (transition.aspect === "animate") {
+      solverNote = "";
+    }
+  }
+  // **The one place the stage is put back inside the range** (#125 F12). Every call that moves the
+  // stage to another step ends here: a one-step range follows the stage, as the step buttons carry
+  // it, and a wider range holds the stage at its nearer end. Answers which end it held at, if any.
+  function keepStageInRange() {
+    const b = rangeBounds();
+    if (state.pair >= b.first && state.pair <= b.last) {
+      return null;
+    }
+    if (state.range.from === state.range.to) {
+      const n = PAIRS[state.pair].n + 1;
+      state.range.from = n;
+      state.range.to = n;
+      updateSegments();
+      return null;
+    }
+    const end = state.pair < b.first ? "first" : "last";
+    select(end === "first" ? b.first : b.last);
+    return end;
   }
   function advanceReducedMotion() {
     const b = rangeBounds();
@@ -5318,7 +5351,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       pause();
     }
     select(best);
-    return PAIRS[best].n;
+    keepStageInRange();
+    return PAIRS[state.pair].n;
   }
 
   // The workbench's API, hung on the page's own global: one handle for the probes, the capture
