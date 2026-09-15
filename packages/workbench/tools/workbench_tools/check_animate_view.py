@@ -20,6 +20,7 @@ Usage, from ``packing/``::
 from __future__ import annotations
 
 import argparse
+import math
 import os
 import tempfile
 from collections.abc import Callable
@@ -112,7 +113,29 @@ def keyboard_ownership(session: Session) -> str:
     return "shortcuts yield to Pack at load and to Search's fields and buttons"
 
 
-SECTIONS: tuple[Callable[[Session], str], ...] = (keyboard_ownership,)
+def gap_bar_through_dwell(session: Session) -> str:
+    """Through the dwell the bar measures only the squares drawn, against their own record."""
+    for n in (17, 26):
+        for sample in session.look("animate/gap-through-dwell", n=n):
+            label = f"step into {n} at t = {sample['t']:.3f}"
+            session.require(
+                sample["n"] == n - 1, f"{label}: the bar describes n = {sample['n']}"
+            )
+            session.require(
+                sample["valid"] is True,
+                f"{label}: the bar calls n - 1's own record not a packing: {sample}",
+            )
+            session.require(
+                math.isclose(sample["side"], sample["record"], rel_tol=1e-6),
+                f"{label}: the side {sample['side']} is not n - 1's record {sample['record']}",
+            )
+    return "the dwell's bar measures only the squares drawn"
+
+
+SECTIONS: tuple[Callable[[Session], str], ...] = (
+    keyboard_ownership,
+    gap_bar_through_dwell,
+)
 
 
 def check(page_path: Path) -> str:

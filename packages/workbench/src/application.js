@@ -2271,15 +2271,16 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // interpolation shows it closing to nothing, a snapped run reaches nothing at the end, a free run
   // rests at its residual. In a blind run the squares have no correspondence to the record's
   // labelling, so the centre and angle errors are meaningless and only the box is reported.
+  // `count` is how many of the squares to measure, from the first: the squares the frame shows.
   const gapOut = { centre: 0, angle: 0, side: 0 };
-  function gapOf(px, py, pa) {
+  function gapOf(px, py, pa, count) {
     let centre = 0,
       angle = 0,
       x0 = Infinity,
       x1 = -Infinity,
       y0 = Infinity,
       y1 = -Infinity;
-    for (let i = 0; i < px.length; i++) {
+    for (let i = 0; i < count; i++) {
       const dx = px[i] - tgtX[i],
         dy = py[i] - tgtY[i];
       const d = Math.sqrt(dx * dx + dy * dy);
@@ -2538,7 +2539,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     const span = GAPBAR.width - 2 * GAPBAR.inset;
     return GAPBAR.inset + clamp01((value - i.lo) / (i.hi - i.lo)) * span;
   }
-  function updateGapBar(p, _B, g, mode) {
+  function updateGapBar(p, _B, g, mode, overlap) {
     const info = gapbarSetup(p, state.liveN);
     // **`met` is a claim about the n the bar describes.** The centre and angle gaps are measured
     // against the targets of the n the step is heading INTO, so they mean nothing while the bar is
@@ -2566,7 +2567,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     // -- the float precision of the poses the page carries -- while the same step mid-move reaches
     // 1.1 at n = 11 and 12.4 at n = 110. Five orders of magnitude between them, so the threshold
     // does not need to be delicate.
-    const valid = paintOut.overlap <= VALID_OVERLAP;
+    const valid = overlap <= VALID_OVERLAP;
     const excess = (g.side / info.record - 1) * 100;
     gapbarHand.setAttribute("x1", fmt(x, 2));
     gapbarHand.setAttribute("x2", fmt(x, 2));
@@ -2586,15 +2587,33 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     gapbarOut.excess = excess;
     gapbarOut.met = met;
     gapbarOut.valid = valid;
-    gapbarOut.overlap = paintOut.overlap;
+    gapbarOut.overlap = overlap;
   }
   // `still` is true where the picture is not in motion: through the dwell, and from the instant the
   // settle ends. Those are the frames the bar is allowed to move on, along with the ones something
   // has marked dirty (a step boundary, a setting, a pause, a seek, a drop, or `refreshGap()`).
+  //
+  // **The bar measures the squares the frame shows, and only those.** Through the dwell the arriving
+  // square is already in the pose buffers, at its starting pose and drawn at opacity zero, while
+  // the bar describes the n before it (`state.liveN`). Counting it put an invisible square inside
+  // n's record: the step into 17 read a side of 4.67553 for n = 16, whose record is 4, and called
+  // the record itself no packing, which hid the hand through every dwell.
   function updateGap(p, _A, B, mode, still) {
-    const g = gapOf(poseX, poseY, poseA);
+    const shown = Math.min(poseX.length, state.liveN);
+    const g = gapOf(poseX, poseY, poseA, shown);
     if (gapBarDirty || still) {
-      updateGapBar(p, B, g, mode);
+      const overlap =
+        shown === poseX.length
+          ? paintOut.overlap
+          : measureFrameGeometry(
+              poseX.subarray(0, shown),
+              poseY.subarray(0, shown),
+              poseA.subarray(0, shown),
+              paintOut.side,
+              paintOut.size,
+              { gap: CONTACT.gap, angleToleranceDegrees: ANGLE_TOL },
+            ).totalOverlap;
+      updateGapBar(p, B, g, mode, overlap);
       gapBarDirty = false;
     }
   }
@@ -3364,6 +3383,10 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     overlap: 0,
     deepestOverlap: 0,
     overlapPairs: 0,
+    // The container side and square size the frame was measured at, so a later measurement of
+    // part of the frame uses the same geometry.
+    side: 0,
+    size: 1,
   };
   function paintSquares(p, side, drain, tint, size, resting, homeward) {
     const N = poseA.length;
@@ -3420,6 +3443,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       movingSlots: groupSlot,
     });
     paintTouching = painted.touching;
+    paintOut.side = side;
+    paintOut.size = size ?? 1;
     drawMaskLinks(N);
     for (let i = 0; i < motion.length; i++) {
       motion[i].rect.setAttribute("fill", painted.fills[i]);
