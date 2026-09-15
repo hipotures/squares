@@ -1508,6 +1508,9 @@ def _browser_floor(context: Context) -> str:
                 "packages/workbench",
                 "packing/src/sqpack/motion_lab/assets",
                 "packing/atlas/known-best/video/spikes/v1-slideshow",
+                "packing/devtools/probes",
+                "packing/devtools/node",
+                "packing/tests/probes",
                 "--config",
                 "packages/workbench/eslint.config.js",
                 "--max-warnings",
@@ -1521,6 +1524,25 @@ def _browser_floor(context: Context) -> str:
             (npm, "test", "--workspace", "@squares/workbench"),
         ),
         cwd=REPOSITORY_ROOT,
+    )
+
+
+def _browser_code_in_files(context: Context) -> str:
+    """No JavaScript in a Python string, and every probe file is a used function.
+
+    The half of the browser floor that is about Python. Biome and `tsc` can only hold code
+    they can see, and JavaScript written as a Python string is code they cannot: the guard
+    refuses it anywhere in the repository, under a ratchet allowlist that only shrinks, and
+    the probe check proves the files that replace it are live. Both are plain Python plus
+    one Node pass through the `nodejs-wheel-binaries` the dev group already installs, so
+    neither needs the npm toolchain and both run in the edit tier.
+    """
+    return _commands(
+        context,
+        (
+            (sys.executable, "-m", "devtools.check_no_embedded_js"),
+            (sys.executable, "-m", "devtools.check_probes"),
+        ),
     )
 
 
@@ -3004,6 +3026,23 @@ STEPS: tuple[Step, ...] = (
             "**/*.mts",
             "**/*.cts",
             "**/*.css",
+        ),
+    ),
+    # 2.5s locally for 892 Python files and 188 probes: the guard parses every Python file
+    # in threads on the free-threaded interpreter, and the probe check makes one Node call per
+    # probe tree. Not `frontend`: it needs no npm toolchain, and the edit loop is where a
+    # JavaScript string should be refused, before it is ever pushed.
+    Step(
+        "browser code lives in files (embedded JavaScript, probes)",
+        _browser_code_in_files,
+        fast=True,
+        touches=(
+            "*.py",
+            "*/probes/*",
+            "packing/devtools/embedded-javascript.yaml",
+            "packing/devtools/node/*",
+            "packing/pyproject.toml",
+            "packing/uv.lock",
         ),
     ),
     Step(

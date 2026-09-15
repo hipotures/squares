@@ -248,6 +248,8 @@ def test_the_checked_javascript_promise_overlay_is_effective() -> None:
     representatives = (
         "packages/workbench/src/application.js",
         "packages/workbench/probes/api/apply.js",
+        "packing/devtools/probes/check_published_site/startup.js",
+        "packing/devtools/node/inspect-probes.mjs",
         "packing/src/sqpack/motion_lab/assets/free-quench.js",
         "packing/atlas/known-best/video/spikes/v1-slideshow/timeline_harness.js",
     )
