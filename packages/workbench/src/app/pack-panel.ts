@@ -1,6 +1,11 @@
 import { type PackWorkbenchApi, parsePackSnapshot } from "../api/pack-api.ts";
 import type { GeometrySnapshot } from "../core/geometry.ts";
-import { assessPackingSnapshot, parseUint32Seed } from "../core/runtime-contracts.ts";
+import {
+  assessPackingSnapshot,
+  type PackingAssessment,
+  parseUint32Seed,
+} from "../core/runtime-contracts.ts";
+import { packKeyCommand } from "../view/accessibility.ts";
 import type { ColourSystem } from "../view/colour.ts";
 import { paintPack } from "../view/pack-scene.ts";
 import { renderStage, type StageTargets } from "../view/stage-renderer.ts";
@@ -45,6 +50,73 @@ function cloneSnapshot(snapshot: GeometrySnapshot): GeometrySnapshot {
   };
 }
 
+/** Two snapshots place every square identically, so committing one over the other changes nothing. */
+function samePlacement(left: GeometrySnapshot, right: GeometrySnapshot): boolean {
+  return (
+    left.poses.length === right.poses.length &&
+    left.poses.every((pose, index) => {
+      const other = right.poses[index];
+      return (
+        other !== undefined &&
+        pose.x === other.x &&
+        pose.y === other.y &&
+        pose.angle === other.angle
+      );
+    })
+  );
+}
+
+export interface PackValidityText {
+  valid: boolean;
+  /** The side, named for what it is: a packing's required side, or only a bounding box's. */
+  side: string;
+  /** The validity clause for the status line. */
+  status: string;
+  /** The validity line for the stage facts. */
+  fact: string;
+}
+
+/**
+ * What the Pack readouts say about an assessment. Every word comes from the one validity
+ * contract: the arrangement is a packing only where `assessment.valid`, and otherwise its side is
+ * a bounding box's and the first failing clause says why (#160 R12: the stage facts printed
+ * "Required side" and a bare overlap for arrangements that were not packings).
+ */
+export function describePackValidity(assessment: PackingAssessment): PackValidityText {
+  const side = Number.isFinite(assessment.requiredSide)
+    ? assessment.requiredSide.toFixed(6)
+    : "unavailable";
+  if (assessment.valid) {
+    return {
+      valid: true,
+      side: `required side ${side}`,
+      status: "valid unit packing",
+      fact: "Valid unit packing",
+    };
+  }
+  const detail =
+    assessment.reason === "unit-size"
+      ? `not unit squares (side ${assessment.snapshot.squareSide.toFixed(4)})`
+      : assessment.reason === "pair-overlap"
+        ? `pair overlap ${assessment.maxPairOverlap.toExponential(2)}`
+        : assessment.reason === "wall-overlap"
+          ? `wall overlap ${assessment.maxWallOverlap.toExponential(2)}`
+          : `${assessment.reason ?? "unchecked"}`;
+  return {
+    valid: false,
+    side: `bounding side ${side}`,
+    status: assessment.reason === "unit-size" ? detail : `not a valid packing (${detail})`,
+    fact: `Not a packing: ${detail}`,
+  };
+}
+
+/** Write text only when it differs, so an unchanged frame is no DOM mutation at all. */
+function show(node: HTMLElement, text: string): void {
+  if (node.textContent !== text) {
+    node.textContent = text;
+  }
+}
+
 function download(document: Document, name: string, content: string): void {
   const url = URL.createObjectURL(new Blob([content], { type: "application/json" }));
   const link = document.createElement("a");
@@ -61,6 +133,8 @@ export function mountPackPanel(options: PackPanelOptions): PackPanel {
   const status = element(document, "pack-status", HTMLOutputElement);
   const repairStatus = element(document, "pack-repair-status", HTMLOutputElement);
   const stageFacts = element(document, "pack-stage-facts", HTMLElement);
+  const announcement = element(document, "pack-announcement", HTMLElement);
+  const stageDescription = element(document, "stage-accessible-description", HTMLElement);
   const count = element(document, "pack-count", HTMLInputElement);
   const seed = element(document, "pack-seed", HTMLInputElement);
   const start = element(document, "pack-start", HTMLSelectElement);
@@ -157,29 +231,45 @@ export function mountPackPanel(options: PackPanelOptions): PackPanel {
     }
     const assessment =
       preview === null ? current.assessment : assessPackingSnapshot(preview, preview.poses.length);
-    const valid = assessment.valid && snapshot.squareSide === 1;
+    const readout = describePackValidity(assessment);
     const steps = current.latest?.work.baseSteps ?? 0;
-    const score = Number.isFinite(assessment.requiredSide)
-      ? assessment.requiredSide.toFixed(6)
-      : "unavailable";
-    const overlap = Math.max(assessment.maxPairOverlap, assessment.maxWallOverlap);
-    const validity = valid
-      ? "valid unit packing"
-      : snapshot.squareSide !== 1
-        ? `not unit squares (side ${snapshot.squareSide.toFixed(4)})`
-        : `not a valid packing (overlap ${overlap.toExponential(2)})`;
-    status.value = `n = ${current.configuration.n} · seed ${current.configuration.seed} · ${steps} steps · required side ${score} · ${validity} · ${preview === null ? (playing ? "running" : "paused") : "drag preview"}`;
+    show(
+      status,
+      `n = ${current.configuration.n} · seed ${current.configuration.seed} · ${steps} steps · ${readout.side} · ${readout.status} · ${preview === null ? (playing ? "running" : "paused") : "drag preview"}`,
+    );
     const repair = current.repair;
-    repairStatus.value =
+    show(
+      repairStatus,
       repair === null
         ? ""
-        : `Resolve ${repair.termination.reason}: raw side ${repair.raw.requiredSide.toFixed(6)}, repaired side ${repair.repaired?.requiredSide.toFixed(6) ?? "unavailable"}; ${repair.termination.resolved ? "checked repair shown" : "raw arrangement retained"}`;
-    stageFacts.textContent = `n = ${current.configuration.n}\nRequired side ${score}\n${valid ? "Valid unit packing" : `Overlap ${overlap.toExponential(2)}`}\n${steps} steps · ${preview === null ? (playing ? "running" : "paused") : "drag preview"}`;
-    element(document, "stage-accessible-description", HTMLElement).textContent = status.value;
+        : `Resolve ${repair.termination.reason}: raw side ${repair.raw.requiredSide.toFixed(6)}, repaired side ${repair.repaired?.requiredSide.toFixed(6) ?? "unavailable"}; ${repair.termination.resolved ? "checked repair shown" : "raw arrangement retained"}`,
+    );
+    show(
+      stageFacts,
+      `n = ${current.configuration.n}\n${readout.side.charAt(0).toUpperCase()}${readout.side.slice(1)}\n${readout.fact}\n${steps} steps · ${preview === null ? (playing ? "running" : "paused") : "drag preview"}`,
+    );
+    show(stageDescription, status.value);
     svg.setAttribute("aria-label", `${current.configuration.n} packing squares`);
   }
 
-  function pause(): void {
+  /**
+   * Say what changed, once. The status lines and the stage facts are redrawn on every
+   * animation frame, so they are not live regions (#160 R16); `#pack-announcement` is, and
+   * it is written only here -- on Run, Pause, a step, Restart, Resolve, an import, a
+   * settings change, an edit or an error -- never from a frame.
+   */
+  function announce(): void {
+    if (!active) {
+      return;
+    }
+    show(
+      announcement,
+      [status.value, repairStatus.value].filter((part) => part.length > 0).join(". "),
+    );
+  }
+
+  /** Stop the frame loop. */
+  function halt(): void {
     playing = false;
     generation += 1;
     lastFrame = null;
@@ -187,7 +277,17 @@ export function mountPackPanel(options: PackPanelOptions): PackPanel {
       cancelAnimationFrame(frameHandle);
       frameHandle = null;
     }
+  }
+
+  /** Stop and redraw without announcing, for an operation that announces once it is done. */
+  function stop(): void {
+    halt();
     redraw();
+  }
+
+  function pause(): void {
+    stop();
+    announce();
   }
 
   function tick(timestamp: number, expectedGeneration: number): void {
@@ -205,8 +305,9 @@ export function mountPackPanel(options: PackPanelOptions): PackPanel {
       controller.step(Math.min(MAX_STEPS_PER_FRAME, wanted));
       redraw();
     } catch (error) {
-      pause();
-      status.value = error instanceof Error ? error.message : String(error);
+      stop();
+      show(status, error instanceof Error ? error.message : String(error));
+      announce();
       return;
     }
     frameHandle = requestAnimationFrame((next) => tick(next, expectedGeneration));
@@ -219,12 +320,14 @@ export function mountPackPanel(options: PackPanelOptions): PackPanel {
     if (options.reducedMotion()) {
       controller.step(1);
       redraw();
+      announce();
       return;
     }
     playing = true;
     generation += 1;
     frameHandle = requestAnimationFrame((timestamp) => tick(timestamp, generation));
     redraw();
+    announce();
   }
 
   function point(event: PointerEvent): { x: number; y: number } | null {
@@ -238,14 +341,26 @@ export function mountPackPanel(options: PackPanelOptions): PackPanel {
     return { x: transformed.x, y: transformed.y };
   }
 
+  /**
+   * End a pointer gesture. Only a gesture that moved a square is an edit: a press that
+   * moved nothing (a click, say, to focus the square) keeps the run -- its time, anneal,
+   * retained best and seeded start -- instead of reloading an identical arrangement.
+   */
   function commitPreview(): void {
     if (preview === null) {
       return;
     }
-    controller.load(preview);
-    start.value = "given";
+    const edited = preview;
     preview = null;
-    redraw();
+    try {
+      if (!samePlacement(edited, controller.export())) {
+        controller.load(edited);
+        start.value = "given";
+      }
+    } finally {
+      redraw();
+    }
+    announce();
   }
 
   const panel: PackPanel = {
@@ -254,7 +369,7 @@ export function mountPackPanel(options: PackPanelOptions): PackPanel {
         return;
       }
       if (!visible) {
-        pause();
+        stop();
         preview = null;
         drag = null;
       }
@@ -277,7 +392,7 @@ export function mountPackPanel(options: PackPanelOptions): PackPanel {
       if (settings.n !== undefined && (settings.n < MIN_COUNT || settings.n > MAX_COUNT)) {
         throw new RangeError(`Pack count must be ${MIN_COUNT}–${MAX_COUNT}`);
       }
-      pause();
+      stop();
       const next = controller.configure(settings);
       count.value = String(next.configuration.n);
       seed.value = String(next.configuration.seed);
@@ -287,27 +402,31 @@ export function mountPackPanel(options: PackPanelOptions): PackPanel {
       );
       shakeValue.value = shake.value;
       redraw();
+      announce();
       return next;
     },
     step(count) {
-      pause();
+      stop();
       controller.step(count);
       redraw();
+      announce();
       return controller.state();
     },
     restart() {
-      pause();
+      stop();
       controller.restart();
       redraw();
+      announce();
       return controller.state();
     },
     resolve() {
-      pause();
+      stop();
       const receipt = controller.resolve(RESOLVE_ITERATIONS);
       if (receipt.termination.resolved) {
         start.value = "given";
       }
       redraw();
+      announce();
       return receipt;
     },
     load(text) {
@@ -316,11 +435,12 @@ export function mountPackPanel(options: PackPanelOptions): PackPanel {
       if (snapshot.poses.length > MAX_COUNT) {
         throw new RangeError(`Pack supports at most ${MAX_COUNT} squares in this browser`);
       }
-      pause();
+      stop();
       controller.load(snapshot);
       start.value = "given";
       count.value = String(snapshot.poses.length);
       redraw();
+      announce();
       return controller.state();
     },
     state: () => controller.state(),
@@ -332,7 +452,8 @@ export function mountPackPanel(options: PackPanelOptions): PackPanel {
     try {
       action();
     } catch (error) {
-      status.value = error instanceof Error ? error.message : String(error);
+      show(status, error instanceof Error ? error.message : String(error));
+      announce();
     }
   }
 
@@ -359,7 +480,7 @@ export function mountPackPanel(options: PackPanelOptions): PackPanel {
       if (start.value !== "grid" && start.value !== "random") {
         throw new RangeError("select a supported Pack start");
       }
-      pause();
+      stop();
       controller.configure({
         n,
         seed: requestedSeed,
@@ -367,10 +488,11 @@ export function mountPackPanel(options: PackPanelOptions): PackPanel {
         anneal: { amplitude: Number(shake.value) / 3 },
       });
       redraw();
+      announce();
     }),
   );
   element(document, "pack-reset", HTMLButtonElement).addEventListener("click", () => {
-    pause();
+    stop();
     count.value = "17";
     seed.value = "1";
     start.value = "grid";
@@ -378,6 +500,7 @@ export function mountPackPanel(options: PackPanelOptions): PackPanel {
     shakeValue.value = "3";
     controller.configure({ n: 17, seed: 1, startKind: "grid", anneal: { amplitude: 1 } });
     redraw();
+    announce();
   });
   shake.addEventListener("input", () => {
     shakeValue.value = shake.value;
@@ -409,7 +532,7 @@ export function mountPackPanel(options: PackPanelOptions): PackPanel {
       return;
     }
     event.preventDefault();
-    pause();
+    stop();
     focusedIndex = index;
     drag = { index, x: at.x, y: at.y, pose: { ...pose } };
     preview = cloneSnapshot(controller.export());
@@ -448,6 +571,7 @@ export function mountPackPanel(options: PackPanelOptions): PackPanel {
     preview = null;
     drag = null;
     redraw();
+    announce();
   });
   packSquares.addEventListener("keydown", (event) => {
     if (!(event.target instanceof Element)) {
@@ -458,48 +582,31 @@ export function mountPackPanel(options: PackPanelOptions): PackPanel {
     if (square === null || !Number.isSafeInteger(index)) {
       return;
     }
-    const stride = event.shiftKey ? 0.25 : 0.05;
+    const command = packKeyCommand(event, true);
+    if (command === null) {
+      return;
+    }
     const snapshot = cloneSnapshot(controller.export());
     const pose = snapshot.poses[index];
     if (pose === undefined) {
       return;
     }
-    switch (event.key) {
-      case "ArrowLeft":
-        pose.x -= stride;
+    switch (command.kind) {
+      case "move-square":
+        pose.x += command.dx;
+        pose.y += command.dy;
         break;
-      case "ArrowRight":
-        pose.x += stride;
+      case "rotate-square":
+        pose.angle += command.radians;
         break;
-      case "ArrowUp":
-        pose.y += stride;
-        break;
-      case "ArrowDown":
-        pose.y -= stride;
-        break;
-      case "q":
-        pose.angle -= Math.PI / 36;
-        break;
-      case "e":
-        pose.angle += Math.PI / 36;
-        break;
-      case "PageDown":
-      case "]":
+      case "cycle-square":
         event.preventDefault();
         event.stopPropagation();
-        focusedIndex = (index + 1) % snapshot.poses.length;
+        focusedIndex = (index + command.offset + snapshot.poses.length) % snapshot.poses.length;
         redraw();
         squareNodes.get(focusedIndex + 1)?.node.focus();
         return;
-      case "PageUp":
-      case "[":
-        event.preventDefault();
-        event.stopPropagation();
-        focusedIndex = (index + snapshot.poses.length - 1) % snapshot.poses.length;
-        redraw();
-        squareNodes.get(focusedIndex + 1)?.node.focus();
-        return;
-      case "Escape":
+      case "leave-square":
         stage.focus();
         event.stopPropagation();
         return;
@@ -508,11 +615,14 @@ export function mountPackPanel(options: PackPanelOptions): PackPanel {
     }
     event.preventDefault();
     event.stopPropagation();
-    pause();
+    stop();
     focusedIndex = index;
-    controller.load(snapshot);
-    start.value = "given";
-    redraw();
+    guarded(() => {
+      controller.load(snapshot);
+      start.value = "given";
+      redraw();
+      announce();
+    });
   });
   stage.addEventListener(
     "keydown",
@@ -520,11 +630,12 @@ export function mountPackPanel(options: PackPanelOptions): PackPanel {
       if (!active || event.target !== stage) {
         return;
       }
-      if (event.key === "Enter") {
+      const command = packKeyCommand(event, false);
+      if (command?.kind === "focus-square") {
         event.preventDefault();
         event.stopPropagation();
         squareNodes.get(focusedIndex + 1)?.node.focus();
-      } else if (event.key === " ") {
+      } else if (command?.kind === "toggle-playback") {
         event.preventDefault();
         event.stopPropagation();
         if (playing) {

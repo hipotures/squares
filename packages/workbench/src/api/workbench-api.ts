@@ -140,14 +140,24 @@ export interface AtlasGapBar {
   lower: number;
   lo: number;
   hi: number;
+  /** The drawn squares' bounding side: a measurement, and a packing's side only where `valid`. */
   side: number;
   /** Where the hand sits along the bar, as a fraction. */
   x: number;
-  excess: number;
+  /** Percent above the record, reported only for a valid packing. */
+  excess: number | null;
+  /** On the record; only a valid packing can be. */
   met: boolean;
-  /** Whether `side` is a claim at all: only an arrangement without overlaps is a packing. */
+  /** Whether `side` is a claim at all: the drawn squares pass the packing validity contract. */
   valid: boolean;
+  /** The first contract clause that failed, or null. */
+  reason: string | null;
+  /** The deepest pair or wall penetration. */
   overlap: number;
+  /** The penetration tolerance the assessment applied. */
+  tolerance: number;
+  /** `catalogue-precision` where the frame draws a retained record as stored, else `packing`. */
+  precision: "packing" | "catalogue-precision";
 }
 
 /** What the frame was painted from, and what the painter measured while it painted. */
@@ -270,7 +280,8 @@ export interface AtlasOptimize {
   /** The unsigned 32-bit seed this run was created with. */
   seed?: number;
   record?: number;
-  excess?: number;
+  /** Percent above the record, reported only for a valid packing. */
+  excess?: number | null;
   penetration?: number | null;
   /** Pair overlap recomputed after integration on the pose being reported. */
   exactPenetration?: number | null;

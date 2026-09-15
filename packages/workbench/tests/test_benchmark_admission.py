@@ -13,18 +13,41 @@ import pytest
 from devtools.known_structure import record
 from workbench_tools import benchmark as bench
 from workbench_tools.trial_records import (
+    VALIDITY_TOLERANCE,
+    BeatTiming,
     EffectiveConfiguration,
+    PackingReference,
+    PhysicsLaw,
     RepairReceipt,
     SourceReceipt,
     Trial,
     admission_reason,
     canonical_reference,
+    check_success_band,
     gap_closed,
+    partition_trials,
     trial_from_json,
     trial_from_probe,
     trial_from_row,
     trial_to_json,
 )
+
+
+def configuration(
+    seed: int, *, anneal: int = 3, rigidity: float = 0.15
+) -> EffectiveConfiguration:
+    """A browser configuration with the law and beat a trial must record."""
+    return EffectiveConfiguration(
+        style="bodies",
+        mode="blind",
+        seed=seed,
+        inflate=1.12,
+        anneal=anneal,
+        pair_law=PhysicsLaw(rigidity=rigidity, repulsion=2500, attraction=0, range=0),
+        wall_law=PhysicsLaw(rigidity=0.25, repulsion=2500, attraction=0, range=0),
+        timing=BeatTiming(dwell=0.6, move=0.8, correct=0.25, settle=0.4),
+        anneal_span=0.95,
+    )
 
 
 def _source() -> SourceReceipt:
@@ -70,9 +93,7 @@ def _trial(n: int = 5, *, seed: int = 0) -> Trial:
         poses=poses,
         resolved_poses=poses,
         record_source=reference.source,
-        configuration=EffectiveConfiguration(
-            style="bodies", mode="blind", seed=seed, inflate=1.12, anneal=3
-        ),
+        configuration=configuration(seed),
         source=_source(),
         repair=RepairReceipt(
             sweeps=0,
@@ -221,6 +242,10 @@ def test_browser_probe_adapter_requires_exact_fields_and_preserves_receipts() ->
             "seed": 0,
             "inflate": 1.12,
             "anneal": 3,
+            "pairLaw": {"rigidity": 0.15, "repulsion": 2500, "attraction": 0, "range": 0},
+            "wallLaw": {"rigidity": 0.25, "repulsion": 2500, "attraction": 0, "range": 0},
+            "timing": {"dwell": 0.6, "move": 0.8, "correct": 0.25, "settle": 0.4},
+            "annealSpan": 0.95,
         },
         "excess": good.excess,
         "side": good.side,
@@ -281,16 +306,29 @@ def test_sweep_cannot_rank_an_invalid_high_score(
     monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], tmp_path: Path
 ) -> None:
     good = _trial()
-    bad = replace(good, seed=1, resolved_closed=999.0, resolved_poses=None)
+    assert good.configuration is not None
+    bad = replace(
+        good,
+        seed=1,
+        configuration=replace(good.configuration, seed=1),
+        resolved_closed=999.0,
+        resolved_poses=None,
+    )
     monkeypatch.setattr(bench, "RESULTS", tmp_path)
-    monkeypatch.setattr(bench, "run_trials", lambda _run: [good, bad])
+    monkeypatch.setattr(
+        bench,
+        "run_trials",
+        lambda _run: bench.RunResult(
+            planned=[(5, 0), (5, 1)], trials=[good, bad], failures=[], stopped_early=False
+        ),
+    )
     args = argparse.Namespace(
         sweep=["anneal=6"], n=[5], style="bodies", inflate=None, anneal=6, budget=1.0
     )
     assert bench.sweep(args, [0, 1], "fixture") == 0
     output = capsys.readouterr().out
     assert "999.000" not in output
-    assert "REFUSED 1 of 2" in output
+    assert "REFUSED 1 of 2 trials: missing-geometry=1" in output
 
 
 @pytest.mark.parametrize(
@@ -305,3 +343,164 @@ def test_sweep_cannot_rank_an_invalid_high_score(
 def test_sweep_rejects_options_the_probe_cannot_honor(spec: list[str]) -> None:
     with pytest.raises((ValueError, argparse.ArgumentTypeError)):
         bench.parse_grid(spec)
+
+
+def _pressed(p: float, *, reported: float = 0.0, converged: bool = True) -> Trial:
+    """The n = 5 record with its top-left corner square pressed `p` into the central square.
+
+    The record's side is unchanged, so only the repaired arrangement's overlap differs from an
+    admitted trial; `reported` is the overlap the forged receipt claims.
+    """
+    good = _trial()
+    assert good.resolved_poses is not None
+    assert good.repair is not None
+    shift = p / math.sqrt(2)
+    (x, y, angle), *rest = good.resolved_poses
+    return replace(
+        good,
+        resolved_poses=((x + shift, y - shift, angle), *rest),
+        resolved_overlap=reported,
+        repair=replace(good.repair, converged=converged),
+    )
+
+
+@pytest.mark.parametrize(
+    ("penetration", "reason"),
+    [
+        (5e-10, None),
+        (2e-9, "invalid-packing"),
+        (5e-6, "invalid-packing"),
+        (2e-5, "invalid-packing"),
+    ],
+)
+def test_repaired_geometry_is_admitted_only_under_the_validity_contract(
+    penetration: float, reason: str | None
+) -> None:
+    assert admission_reason(_pressed(penetration)) == reason
+
+
+def test_a_non_converged_repair_is_refused_even_when_its_residual_is_small() -> None:
+    residual = 5e-6
+    assert admission_reason(_pressed(residual, reported=residual, converged=False)) == (
+        "repair-not-converged"
+    )
+
+
+def test_a_reported_side_below_the_fitted_box_puts_squares_through_its_walls() -> None:
+    good = _trial()
+    slack = 5e-6
+    shrunk = good.resolved_side - slack
+    excess = (shrunk / good.record - 1) * 100
+    below = replace(
+        good, resolved_side=shrunk, resolved_closed=gap_closed(good.n, good.record, excess)
+    )
+    assert admission_reason(below) == "invalid-packing"
+
+
+def test_a_valid_arrangement_below_the_record_is_refused_as_needing_exact_verification() -> (
+    None
+):
+    good = _trial()
+    canonical = canonical_reference(good.n)
+    larger = PackingReference(n=good.n, side=good.side + 0.01, source=canonical.source)
+    excess = (good.side / larger.side - 1) * 100
+    beats = replace(
+        good,
+        record=larger.side,
+        excess=excess,
+        closed=gap_closed(good.n, larger.side, excess),
+        resolved_closed=gap_closed(good.n, larger.side, excess),
+    )
+    assert admission_reason(beats, reference_for=lambda _n: larger) == "below-record"
+    at_record = replace(good)
+    assert admission_reason(at_record) is None
+    kept, refused = partition_trials([beats], reference_for=lambda _n: larger)
+    assert kept == []
+    assert refused == {"below-record": 1}
+
+
+def test_report_names_below_record_trials_separately_from_other_refusals(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    good = _trial()
+    canonical = canonical_reference(good.n)
+    larger = PackingReference(n=good.n, side=good.side + 0.01, source=canonical.source)
+    excess = (good.side / larger.side - 1) * 100
+    beats = replace(
+        good,
+        seed=1,
+        configuration=replace(cast(EffectiveConfiguration, good.configuration), seed=1),
+        record=larger.side,
+        excess=excess,
+        closed=gap_closed(good.n, larger.side, excess),
+        resolved_closed=gap_closed(good.n, larger.side, excess),
+    )
+    real = bench.partition_trials
+    monkeypatch.setattr(
+        bench,
+        "partition_trials",
+        lambda trials: real(
+            trials, reference_for=lambda n: larger if n == good.n else canonical
+        ),
+    )
+    assert bench.report([beats]) == 1
+    output = capsys.readouterr().out
+    assert "BELOW RECORD 1" in output
+    assert "exact verification" in output
+
+
+def test_a_success_band_finer_than_the_validity_tolerance_is_refused() -> None:
+    record_side = canonical_reference(5).side
+    with pytest.raises(ValueError, match="finer than the validity tolerance"):
+        check_success_band(1e-8, record_side)
+    check_success_band(bench.TOLERANCES["exact"], 1.0)
+    for name, band in bench.TOLERANCES.items():
+        assert band / 100 >= VALIDITY_TOLERANCE, name
+
+
+def test_a_written_row_says_whether_each_side_belongs_to_a_packing() -> None:
+    good = _trial()
+    assert good.poses is not None
+    row = good.row()
+    assert (row["raw_valid"], row["resolved_valid"]) == (True, True)
+    coincident = replace(good, poses=(good.poses[0], good.poses[0], *good.poses[2:]))
+    assert coincident.row()["raw_valid"] is False
+    overlapping = _pressed(2e-9)
+    assert overlapping.row()["resolved_valid"] is False
+    assert replace(good, resolved_poses=None).row()["resolved_valid"] is False
+    assert trial_from_json(trial_to_json(overlapping)) == overlapping
+
+
+def test_a_configuration_without_its_pair_law_and_timing_is_refused() -> None:
+    good = _trial()
+    row = good.row()
+    legacy = cast(dict[str, object], row["configuration"])
+    for recorded in ("pair_law", "wall_law", "timing", "anneal_span"):
+        del legacy[recorded]
+    legacy["contract"] = "packing.squares:AnnealingConfiguration/v1"
+    assert admission_reason(trial_from_row(row)) == "unsupported-configuration-contract"
+    assert good.configuration is not None
+    for broken in (
+        replace(
+            good.configuration, pair_law=replace(good.configuration.pair_law, rigidity=0.0)
+        ),
+        replace(good.configuration, timing=replace(good.configuration.timing, move=math.nan)),
+        replace(good.configuration, anneal_span=-1.0),
+    ):
+        assert admission_reason(replace(good, configuration=broken)) == (
+            "invalid-effective-configuration"
+        )
+
+
+def test_trials_under_different_pair_laws_stay_apart() -> None:
+    before = _trial(seed=0)
+    after = replace(_trial(seed=1), configuration=configuration(1, rigidity=0.35))
+    assert admission_reason(before) is None
+    assert admission_reason(after) is None
+    assert before.row()["configuration"] != {
+        **cast(dict[str, object], after.row()["configuration"]),
+        "seed": 0,
+    }
+    assert trial_from_json(trial_to_json(after)) == after
+    with pytest.raises(ValueError, match="mixes effective configurations"):
+        bench.replay_groups([before, after])

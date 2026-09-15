@@ -4,13 +4,222 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import tempfile
 from pathlib import Path
+from typing import Any
 
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import Browser, Page, sync_playwright
 
 from workbench_tools.build_site import build
+from workbench_tools.probes import probe
+
+#: Chords that belong to the browser or the system, pressed with a square focused. Each
+#: names a key the Pack map does handle bare, so a missing guard shows as a change.
+SQUARE_CHORDS = (
+    "Alt+ArrowLeft",
+    "Control+ArrowLeft",
+    "Meta+ArrowRight",
+    "Alt+ArrowUp",
+    "Control+KeyQ",
+    "Meta+KeyE",
+    "Meta+BracketRight",
+    "Meta+BracketLeft",
+    "Control+PageDown",
+    "Control+PageUp",
+    "Alt+Escape",
+)
+
+#: The same, pressed with the stage itself focused, where Enter and Space are Pack's.
+STAGE_CHORDS = ("Control+Enter", "Meta+Enter", "Alt+Enter", "Control+Space", "Alt+Space")
+
+#: Mutations of live regions allowed across a second of Run: the Run press itself may be
+#: announced, a frame may not. At 60 frames a second a per-frame write is far above it.
+LIVE_MUTATION_LIMIT = 3
+
+
+def _require(condition: bool, message: str) -> None:  # noqa: FBT001
+    if not condition:
+        raise ValueError(message)
+
+
+def _look(page: Page, name: str, /, **argument: Any) -> Any:
+    """Evaluate one checked probe, passing values through Playwright's data channel."""
+    return page.evaluate(probe(name), argument or None)
+
+
+def _seeded_run(page: Page, index: int) -> dict[str, Any]:
+    """Restore the default grid start and advance it, so a reset of the run is visible."""
+    page.locator("#pack-reset").click()
+    _look(page, "pack/apply", calls=[["step", 25]])
+    run = _look(page, "pack/run", index=index)
+    _require(
+        run["latest"] and run["steps"] == 25 and run["startControl"] == "grid",
+        f"Pack did not reach a 25-step seeded run to test against: {run}",
+    )
+    return run
+
+
+def _unfocused(run: dict[str, Any]) -> dict[str, Any]:
+    return {**run, "focus": None}
+
+
+def _check_modifier_chords(page: Page) -> None:
+    """A Pack shortcut is a bare key: Ctrl, Meta and Alt chords leave the run alone."""
+    before = _seeded_run(page, 0)
+    page.locator("#stage").focus()
+    page.keyboard.press("Enter")
+    focused = _look(page, "pack/run", index=0)
+    _require(
+        focused["focus"] == "0" and _unfocused(focused) == _unfocused(before),
+        f"Enter did not focus Pack square 1 and leave the run alone: {focused}",
+    )
+    for chord in SQUARE_CHORDS:
+        page.keyboard.press(chord)
+        after = _look(page, "pack/run", index=0)
+        _require(
+            after == focused,
+            f"{chord} with a square focused was taken as a Pack shortcut: "
+            f"{focused} became {after}",
+        )
+    # The positive control, and the capital case the square's label promises.
+    page.keyboard.press("Shift+KeyE")
+    rotated = _look(page, "pack/run", index=0)
+    _require(
+        abs(rotated["angle"] - focused["angle"] - math.pi / 36) < 1e-12
+        and rotated["startControl"] == "given",
+        f"Shift+E did not rotate the focused square by five degrees: {rotated}",
+    )
+    page.keyboard.press("Escape")
+    at_stage = _look(page, "pack/run", index=0)
+    _require(at_stage["focus"] == "stage", f"Escape did not return to the stage: {at_stage}")
+    for chord in STAGE_CHORDS:
+        page.keyboard.press(chord)
+        after = _look(page, "pack/run", index=0)
+        _require(
+            after == at_stage,
+            f"{chord} on the stage was taken as a Pack shortcut: {at_stage} became {after}",
+        )
+
+
+def _check_click_keeps_run(page: Page) -> None:
+    """Pressing a square without moving it keeps the run; a drag still edits it."""
+    before = _seeded_run(page, 3)
+    centre = _look(page, "pack/square-centre", index=3)
+    page.mouse.click(centre["x"], centre["y"])
+    clicked = _look(page, "pack/run", index=3)
+    _require(
+        _unfocused(clicked) == _unfocused(before),
+        f"a click without a drag changed the Pack run: {before} became {clicked}",
+    )
+    page.mouse.move(centre["x"], centre["y"])
+    page.mouse.down()
+    page.mouse.move(centre["x"] + 40, centre["y"], steps=4)
+    page.mouse.up()
+    dragged = _look(page, "pack/run", index=3)
+    _require(
+        dragged["x"] > clicked["x"]
+        and not dragged["latest"]
+        and dragged["startControl"] == "given",
+        f"a drag did not commit its edit: {clicked} became {dragged}",
+    )
+
+
+def _check_non_packings_labelled(page: Page) -> None:
+    """An import that is not a packing is never shown as one, in the status or on the stage."""
+    touching = [{"x": 0.5, "y": 0.5, "angle": 0}, {"x": 1.5, "y": 0.5, "angle": 0}]
+    cases = (
+        (
+            "half-size squares",
+            {
+                "squareSide": 0.5,
+                "container": {"originX": 0, "originY": 0, "side": 1},
+                "poses": [
+                    {"x": 0.25, "y": 0.25, "angle": 0},
+                    {"x": 0.75, "y": 0.25, "angle": 0},
+                ],
+            },
+            "not unit squares",
+        ),
+        (
+            "a 5e-9 overlap",
+            {
+                "squareSide": 1,
+                "container": {"originX": 0, "originY": 0, "side": 2},
+                "poses": [touching[0], {"x": 1.5 - 5e-9, "y": 0.5, "angle": 0}],
+            },
+            "pair overlap",
+        ),
+        (
+            "two touching unit squares",
+            {
+                "squareSide": 1,
+                "container": {"originX": 0, "originY": 0, "side": 2},
+                "poses": touching,
+            },
+            None,
+        ),
+    )
+    page.locator("#pack-json").fill("")
+    for label, snapshot, refusal in cases:
+        page.locator("#pack-json").fill(json.dumps(snapshot))
+        page.locator("#pack-load").click()
+        status = page.locator("#pack-status").inner_text()
+        facts = page.locator("#pack-stage-facts").inner_text()
+        if refusal is None:
+            _require(
+                "valid unit packing" in status
+                and "Valid unit packing" in facts
+                and "Required side 2.000000" in facts,
+                f"{label} is not shown as a packing: {status!r}; {facts!r}",
+            )
+            continue
+        _require(
+            refusal in status
+            and "valid unit packing" not in status
+            and "bounding side" in status
+            and "Not a packing" in facts
+            and "Bounding side" in facts
+            and "Required side" not in facts
+            and "Valid unit packing" not in facts,
+            f"{label} is shown as a packing, or unlabelled: {status!r}; {facts!r}",
+        )
+
+
+def _check_quiet_live_regions(browser: Browser, page_path: Path, errors: list[str]) -> None:
+    """A second of animated Run rewrites the stage text but announces no frame."""
+    page = browser.new_page(
+        reduced_motion="no-preference", viewport={"width": 1440, "height": 1000}
+    )
+    page.on("pageerror", lambda error: errors.append(str(error)))
+    page.goto(page_path.resolve().as_uri())
+    page.locator("#mode-pack").click()
+    facts = page.locator("#pack-stage-facts")
+    _require(facts.is_visible(), "the Pack stage facts are hidden after choosing Pack")
+    regions = _look(page, "pack/live-watch")
+    _require(bool(regions), "the page has no live region to watch")
+    first = facts.inner_text()
+    page.locator("#pack-run").click()
+    page.wait_for_timeout(1000)
+    counts = _look(page, "pack/live-count")
+    running = _look(page, "pack/run", index=0)
+    shown = facts.inner_text()
+    page.locator("#pack-pause").click()
+    _require(
+        running["playing"] and running["steps"] >= 20,
+        f"Pack did not animate for a second: {running}",
+    )
+    _require(
+        shown != first and "running" in shown,
+        f"the stage facts did not follow the run: {first!r} then {shown!r}",
+    )
+    _require(
+        sum(counts.values()) <= LIVE_MUTATION_LIMIT,
+        f"live regions changed per frame during a second of Run: {counts} "
+        f"(regions watched: {regions})",
+    )
+    page.close()
 
 
 def check(page_path: Path) -> str:
@@ -20,8 +229,12 @@ def check(page_path: Path) -> str:
         browser = playwright.chromium.launch(
             headless=True, executable_path=os.environ.get("SQUARES_BROWSER_EXECUTABLE")
         )
+        # `bypass_csp`: the mobile-fit wait below is an expression-string predicate, which
+        # Playwright compiles inside the page, and the published policy grants no
+        # `'unsafe-eval'`. `check_page_policy` loads the page without the bypass. It can go
+        # once that predicate is a probe file (think-xvjf).
         page = browser.new_page(
-            reduced_motion="reduce", viewport={"width": 1440, "height": 1000}
+            reduced_motion="reduce", viewport={"width": 1440, "height": 1000}, bypass_csp=True
         )
         page.on("pageerror", lambda error: errors.append(str(error)))
         page.goto(page_path.resolve().as_uri())
@@ -39,6 +252,17 @@ def check(page_path: Path) -> str:
         )
         require(squares.count() == 17, "Pack did not draw all 17 starting squares")
         require(not page.locator("#squares").is_visible(), "catalogue scene still owns Pack")
+        # Pack draws no box: the catalogue's box and trace are hidden, and Pack's container,
+        # side 5 for 17 squares from a grid, is drawn.
+        drawn = _look(page, "stage/bounds")
+        require(
+            drawn["container"]["shown"]
+            and drawn["container"]["stroke"] not in {"none", ""}
+            and drawn["container"]["width"] == 5
+            and not drawn["box"]["shown"]
+            and not drawn["trace"]["shown"],
+            f"Pack does not draw its container, or keeps the catalogue's box: {drawn}",
+        )
         require("n = 17" in page.locator("#pack-status").inner_text(), "Pack status lost n")
 
         page.locator("#pack-count").fill("7")
@@ -144,6 +368,9 @@ def check(page_path: Path) -> str:
         require(
             panel.is_visible() and squares.count() == 1, "Pack lost its arrangement on return"
         )
+        _check_modifier_chords(page)
+        _check_click_keeps_run(page)
+        _check_non_packings_labelled(page)
         page.set_viewport_size({"width": 390, "height": 844})
         # Chromium delivers the resize event after set_viewport_size returns. Wait for
         # the stage's JS scale to reflect the new viewport before testing overflow.
@@ -152,11 +379,15 @@ def check(page_path: Path) -> str:
         )
         width = page.evaluate("document.documentElement.scrollWidth")
         require(width <= 390, f"Pack overflows the mobile viewport: {width}px")
+        _check_quiet_live_regions(browser, page_path, errors)
         require(not errors, "page errors: " + "; ".join(errors))
         browser.close()
     return (
-        "Pack count, seeded starts, transport, import/export, Resolve, "
-        "mode return and mobile fit"
+        "Pack's own container with no catalogue box, count, seeded starts, transport, "
+        "import/export, Resolve, "
+        "mode return, bare-key shortcuts, click without drag, non-packings labelled, "
+        "quiet live regions "
+        "and mobile fit"
     )
 
 

@@ -12,9 +12,11 @@ import numpy as np
 from devtools.known_structure import record
 from devtools.lock_order import lock_order
 from devtools.run_projection_ratchet import match_targets
+from sqpack.cover import write_text_atomic
 from workbench_tools.animation_records import (
     ANIMATION_CONTRACT,
     AnimationDocument,
+    FairReach,
     animation_to_json,
     decode_animation,
 )
@@ -44,7 +46,11 @@ class _AscentFrame:
 
 
 def step_strategy(n: int, *, fair_steps: int = 3000, seed: int = 11) -> PackingStrategy:
-    """Declare the settle-and-guide step from `n - 1` squares to retained `n`."""
+    """Declare the settle-and-guide step from `n - 1` squares to retained `n`.
+
+    The settle runs at the record side for `n`. There is no separate container phase: a
+    rendered step already starts at that side, so one would only repeat a still frame.
+    """
     return decode_strategy(
         {
             "contract": STRATEGY_CONTRACT,
@@ -53,14 +59,9 @@ def step_strategy(n: int, *, fair_steps: int = 3000, seed: int = 11) -> PackingS
             "seed": seed,
             "phases": [
                 {
-                    "mechanism": "container",
-                    "label": "open the container",
-                    "side": {"relative_to": "record", "factor": 1.0},
-                    "until": {"frames": 18},
-                },
-                {
                     "mechanism": "project",
                     "label": "settle",
+                    "side": {"relative_to": "record", "factor": 1.0},
                     "relaxation": 0.1,
                     "until": {"steps": fair_steps, "stalled_for": max(1, fair_steps // 3)},
                 },
@@ -112,12 +113,18 @@ def render_ascent(first: int, last: int, *, fair_steps: int = 2000) -> Animation
             None,
         )
         if settled is not None:
+            # The receipt's geometry is the independent unit-square check the animation
+            # decoder applies to every frame. A settle it rejects reached no side.
+            packed = settled.geometry.passed
             reach.append(
                 {
                     "n": n,
-                    "fair_side": settled.side,
+                    "fair_side": settled.side if packed else None,
                     "record": target_side,
-                    "excess_pct": 100.0 * (settled.side - target_side) / target_side,
+                    "excess_pct": (
+                        100.0 * (settled.side - target_side) / target_side if packed else None
+                    ),
+                    "packing_valid": packed,
                 }
             )
 
@@ -171,6 +178,9 @@ def render_ascent(first: int, last: int, *, fair_steps: int = 2000) -> Animation
             frame.squares.extend([(corner, corner, 0.0)] * missing)
             frame.square_ids.extend(range(present + 1, last + 1))
             frame.locked.extend([False] * missing)
+            # Feasibility was measured on the step's own squares, before the waiting ones
+            # were parked in a corner, so a padded frame is never offered as a packing.
+            frame.feasible = False
     frames[-1].record = last
 
     span = max(1, len(frames) - 1)
@@ -216,6 +226,16 @@ def _poses(values: np.ndarray) -> list[Pose]:
     return [(float(pose[0]), float(pose[1]), float(pose[2])) for pose in values]
 
 
+def fair_reach_line(item: FairReach) -> str:
+    """Format one report row, printing a reached side only beside a checked packing."""
+    head = f"{item.n:>4}"
+    record_side = f"{item.record:>12.7f}"
+    if item.packing_valid is False or item.fair_side is None or item.excess_pct is None:
+        return f"{head} {'-':>12} {record_side} {'-':>9}  not a packing"
+    reached = f"{head} {item.fair_side:>12.7f} {record_side} {item.excess_pct:>+8.3f}%"
+    return reached if item.packing_valid else f"{reached}  unchecked, not a packing"
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--from", dest="first", type=int, default=2)
@@ -230,20 +250,16 @@ def main() -> int:
 
     if options.render:
         document = render_ascent(options.first, options.last, fair_steps=options.fair_steps)
-        options.out.parent.mkdir(parents=True, exist_ok=True)
-        options.out.write_text(animation_to_json(document), encoding="utf-8")
+        write_text_atomic(options.out, animation_to_json(document))
         print(
             f"{document.name}: {len(document.frames)} frames, "
             f"n = {options.first} to {options.last}, {options.out}"
         )
         print(f"{'n':>4} {'fair reach':>12} {'record':>12} {'excess':>9}")
         for item in document.fair_reach:
-            print(
-                f"{item.n:>4} {item.fair_side:>12.7f} {item.record:>12.7f} "
-                f"{item.excess_pct:>+8.3f}%"
-            )
+            print(fair_reach_line(item))
         if options.svg:
-            options.svg.write_text(export_svg(document), encoding="utf-8")
+            write_text_atomic(options.svg, export_svg(document))
             print(f"wrote {options.svg}")
         return 0
 
@@ -260,7 +276,7 @@ def main() -> int:
             },
             "strategy": strategy_to_row(strategy),
         }
-        path.write_text(json.dumps(document, indent=2, allow_nan=False), encoding="utf-8")
+        write_text_atomic(path, json.dumps(document, indent=2, allow_nan=False))
         written.append(path)
     print(
         f"{len(written)} step strategies in {options.out}, "

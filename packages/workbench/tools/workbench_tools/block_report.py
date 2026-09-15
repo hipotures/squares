@@ -17,7 +17,15 @@ from workbench_tools.cohort_manifest import (
     read_manifest,
     strict_json,
 )
-from workbench_tools.trial_records import Trial, admission_reason, trial_from_row
+from workbench_tools.trial_records import (
+    CONFIGURATION_CONTRACT,
+    AttemptFailure,
+    Trial,
+    admission_reason,
+    attempt_from_json,
+    canonical_reference,
+    check_success_band,
+)
 
 
 def wilson_interval(hits: int, total: int) -> tuple[float, float] | None:
@@ -69,8 +77,7 @@ def summarize_cohort(
     cohort: Cohort, trials: list[Trial], *, tolerance_pct: float
 ) -> dict[str, object]:
     """Join exact seed slots, checking geometry before any accepted block can rank."""
-    if not math.isfinite(tolerance_pct) or tolerance_pct < 0:
-        raise ValueError("success tolerance must be finite and nonnegative")
+    check_success_band(tolerance_pct, canonical_reference(cohort.n).side)
     rows: dict[int, Trial] = {}
     effective_configuration: dict[str, object] | None = None
     for trial in trials:
@@ -78,7 +85,12 @@ def summarize_cohort(
             raise ValueError(f"duplicate trial seed {trial.seed} in {cohort.identifier}")
         if trial.n != cohort.n or trial.style != cohort.style or trial.params != cohort.params:
             raise ValueError(f"trial configuration differs from cohort {cohort.identifier}")
-        if trial.configuration is not None:
+        # A configuration under a superseded contract is refused by admission and recorded no
+        # law or beat, so it is neither compared with nor reported as the cohort's.
+        if (
+            trial.configuration is not None
+            and trial.configuration.contract == CONFIGURATION_CONTRACT
+        ):
             effective = trial.configuration.row()
             del effective["seed"]
             if effective_configuration is None:
@@ -289,6 +301,19 @@ def report(
     }
 
 
+def _require_failed_attempt(
+    manifest: Manifest, cohort_id: str, failure: AttemptFailure, line: int
+) -> None:
+    """A benchmark failure row is evidence only for a slot the manifest records as failed."""
+    cohort = next(cohort for cohort in manifest.cohorts if cohort.identifier == cohort_id)
+    statuses = {attempt.seed: attempt.status for attempt in cohort.attempts}
+    if failure.n != cohort.n or statuses.get(failure.seed) is not AttemptStatus.FAILED:
+        raise ValueError(
+            f"line {line}: a {failure.reason} failure for n = {failure.n}, seed {failure.seed} "
+            f"is not a failed attempt of {cohort_id}"
+        )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("manifest", type=Path)
@@ -313,7 +338,11 @@ def main() -> int:
         key, trial = row["cohort"], row["trial"]
         if not isinstance(key, str) or key not in trials or not isinstance(trial, dict):
             raise ValueError(f"line {number}: unknown cohort or malformed trial")
-        trials[key].append(trial_from_row(trial))
+        attempt = attempt_from_json(json.dumps(trial, allow_nan=False))
+        if isinstance(attempt, AttemptFailure):
+            _require_failed_attempt(manifest, key, attempt, number)
+            continue
+        trials[key].append(attempt)
     args.out.write_text(
         json.dumps(
             report(manifest, trials, tolerance_pct=args.tolerance_pct),

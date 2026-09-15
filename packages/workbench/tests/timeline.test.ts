@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
   annealSpan,
+  baseTiming,
   continuousTiming,
   displayedCount,
   isSpedUpPair,
@@ -69,7 +70,6 @@ test("simple transitions play every phase at double speed only while the setting
   const full = [0, 1, 2, 3].map((index) => pairDuration(config, index, "tween"));
   const fullSequence = sequenceDuration(config, "tween");
   config.fastSimple = true;
-  assert.equal(SIMPLE_TRANSITION_SPEED, 2);
   assert.deepEqual(
     [0, 1, 2, 3].map((index) => isSpedUpPair(config, index)),
     [true, false, true, false],
@@ -91,6 +91,30 @@ test("simple transitions play every phase at double speed only while the setting
   config.fastSimple = false;
   near(pairTiming(config, 0, "tween").settle, 0.8);
   assert.throws(() => isSpedUpPair(config, 9), /no transition/);
+});
+
+test("physics work is priced from the base timing, which the speed-up does not shorten", () => {
+  const config = configuration();
+  config.simple = [true, false, true, false];
+  config.fastSimple = true;
+  config.anneal = 8;
+  const spans = ["dwell", "move", "correct", "settle"] as const;
+  for (const on of [true, false]) {
+    config.continuous.on = on;
+    for (const index of [0, 1, 2, 3]) {
+      const played = pairTiming(config, index, "physics");
+      const base = baseTiming(config, index, "physics");
+      const speed = isSpedUpPair(config, index) ? SIMPLE_TRANSITION_SPEED : 1;
+      for (const span of spans) {
+        near(played[span] * speed, base[span]);
+      }
+    }
+  }
+  const sped = baseTiming(config, 0, "physics");
+  config.fastSimple = false;
+  assert.deepEqual(baseTiming(config, 0, "physics"), sped);
+  assert.deepEqual(pairTiming(config, 0, "physics"), sped);
+  assert.throws(() => baseTiming(config, 9, "physics"), /no transition/);
 });
 
 test("staging exposes arrival, free movement, correction and facts-panel count", () => {

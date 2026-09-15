@@ -16,6 +16,7 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 HERE = Path(__file__).resolve().parent
+DEFAULT_PAGE = HERE.parents[4] / "site/workbench/index.html"
 
 PROBE = """
 ([startN, style, prefetch]) => {
@@ -44,7 +45,7 @@ def note_console(errors: list[str], message) -> None:
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--page", default="index-all.html")
+    ap.add_argument("--page", default=str(DEFAULT_PAGE))
     ap.add_argument("--start", type=int, default=100)
     ap.add_argument("--pairs", type=int, default=30)
     ap.add_argument("--styles", default="physics,bodies")

@@ -72,16 +72,20 @@ body.capture #stage {
   left: 60px;
   top: 12px;
   width: 1000px;
-  /* 949, not 940: the owner asked for the box to be a little bigger so the headline under it
-     has even space above and below. The square view fits this height, so the settled box's
-     path sits at 12 + 949 x 1.045 / 1.09 = 921.8 at every n, and its 4 px stroke draws to
-     924. The headline's ink runs 980 to 1025, measured in pixels: 56 above, 55 below.
-     Not larger, because a MOVING drawing reaches lower than the settled box. Over every step
-     of the corpus the deepest drawn point is a square swinging in a rigid block under the
-     bodies style (n = 293, 975 at this size); at 954 that came within 0.5 of the headline,
-     and here it clears it by 5. Under the default physics style the deepest is n = 6, far
-     clear. The stage itself stays 1920 x 1080, which the 1080p capture depends on. */
-  height: 949px;
+  /* 971, not 940: the owner asked for the box to be bigger, with even space above and below
+     the headline under it, and saw and accepted this size. The square view fits this height,
+     so the settled box's path sits at 12 + 971 x 1.045 / 1.09 = 942.9 at every n, and its
+     4 px stroke draws to 945. The headline's ink runs 990 to 1035, measured in pixels: 45
+     above, 45 below.
+     A MOVING drawing reaches lower than the settled box. The SVG clips it (`overflow:
+     hidden`), so nothing is drawn below the SVG's own floor, at 983: on the corpus's deepest
+     steps, a square swinging in a rigid block under the bodies style at n = 293 and 302, the
+     drawing is cut flat there, 7 px above the headline's ink, and `check_animate_view`
+     requires at least 5. The page was shrunk to 954 and then 949 on element boxes, which
+     ignore the clip and put that square 8 px into the headline's ink at this size; drawn,
+     it never reaches it. The stage itself stays 1920 x 1080, which the 1080p capture
+     depends on. */
+  height: 971px;
   display: block;
   touch-action: none;
 }
@@ -154,11 +158,9 @@ body.drawing #packing-svg #squares {
   height: 100%;
   will-change: opacity;
 }
-/* Type scale, revision 4: four sizes on the stage, 28 / 34 / 44 / 96 px, nothing smaller than
-   28 so the page reads on video. 28 is every small line (the PROVED and OPEN heads, the
-   small-caps note, the badge labels, the open group, the progress bar's labels); 34 the exact
-   line; 44 both bound lines, one size because they are one kind of fact; 96 the `n =` line and
-   the numeral, PT Serif Regular, 3.4 times the smallest.
+/* The type scale on the stage, large enough to read on video: 26 px the gap bar's numbers; 28 the
+   PROVED and OPEN heads, the badge labels and the open group; 34 the note under a bound first
+   proved here; 38 the bound line; 64 the headline, `n = 17`, set by KaTeX.
    The badge glyphs are drawn marks in the poster's boxes, not stage text. */
 /* Revision 8, feature 4: how close the arrangement on the stage is to the best known, drawn on a
    scale that runs from the proved lower bound to comfortably past the record. The panel's top 200 px
@@ -295,39 +297,29 @@ body.drawing #packing-svg #squares {
   font-weight: 700;
 }
 /* The headline, on one line: `n = 11`, the label and the value reading as one statement rather
-   than as a caption stacked over a number. They are two elements because only one of them
-   changes -- `n =` is constant, so it lives outside the two fading layers and never blinks,
-   while the numeral rolls with the rest of the facts.
-   That split is also why the numeral's left is not in this stylesheet. It has to begin where the
-   constant line's ink ends, and the width of `n =` depends on the faces the browser actually
-   got, so the script measures that line once the faces are in and puts the numeral
-   `metrics.headline_gap_px` past it, less the median digit's left side bearing so the GAP is
-   between ink and ink rather than between boxes.
-   The eyebrow that used to sit above the headline said "Best known packing", which every packing
-   on screen already is, so it named nothing and has been dropped.
-   Every slot below is fixed, so nothing jumps between n. */
-/* The headline sits under the packing it names, centred on it, rather than at the top of the
-   panel: it is the one thing on the stage that belongs to the picture rather than to the record,
-   and moving it gives the panel back a hundred and thirty pixels for the facts. `#headline` is
-   the row; the `n =` half is constant and lives outside the two fading layers, and the numeral
-   rolls inside them, so the two are positioned within the row rather than as one element. */
+   than as a caption stacked over a number. It sits under the packing it names, centred on it:
+   it is the one thing on the stage that belongs to the picture rather than to the record.
+   `#headline` is the row, and it holds three copies of the same KaTeX expression at the same
+   place: a still one that draws only `n =` and never fades, and the two rolling layers' copies,
+   which draw only the number (see `.numeral .katex` below). The script centres the expression
+   on the widest number the corpus holds, so `n =` does not move as a digit is gained. */
 /* Below the packing, with air the container cannot eat into.
    The container's DRAWN floor is a constant: the packing SVG fits the box into the same
-   rectangle whatever the box is, so it sits at 921.8 at every n, from every start, at every
+   rectangle whatever the box is, so it sits at 942.9 at every n, from every start, at every
    growth size and under a doubled blind inflation -- all five measured (at 913.2, before the
-   drawing grew to 949 tall). What changes inside
+   drawing grew to 971 tall). What changes inside
    it is how much of it the squares fill, not where its edge is. So the clearance here is a
    number that can be chosen once rather than a worst case to guess at.
    The numeral's own box opens above its ink by about a fifth of its size, so what matters is
-   where the INK starts, not where the box does. Measured with pixels: ink from 980 to 1025,
-   56 below the box's drawn edge and 55 above the stage's own.
+   where the INK starts, not where the box does. Measured with pixels: ink from 990 to 1035,
+   45 below the box's drawn edge and 45 above the stage's own.
    Anchored to the stage's floor with `bottom` rather than to its ceiling with `top`. The stage
    is a fixed 1080 tall so the two are the same number today; `bottom` is the one that stays
    true, because what this row is measured from is the bottom of the diagram. */
 #headline {
   position: absolute;
   left: 60px;
-  bottom: 21px;
+  bottom: 11px;
   width: 1000px;
   height: 96px;
 }
@@ -367,7 +359,6 @@ body.drawing #packing-svg #squares {
   color: var(--ink);
   line-height: 92px;
   white-space: nowrap;
-  will-change: transform;
 }
 .numeral .n-val {
   font-weight: 700;
@@ -479,16 +470,11 @@ body.drawing #packing-svg #squares {
   white-space: nowrap;
 }
 /* "new lower bound" names what the star beside the bound means, in the text face at the
-   annotation size. The closed-form line that used to share this style is gone: it sat under
-   two bounds and did not say which one it was the value of. */
+   annotation size. It is the star's own caption, so it takes the star's colour: the two are one
+   mark and reading them as one is the point. */
 .star-line .note {
   font-family: var(--serif);
   font-size: 34px;
-  color: var(--ink);
-}
-/* "new lower bound" is the star's own caption, so it takes the star's colour: the two are one
-   mark and reading them as one is the point. */
-.star-line .note {
   color: var(--new);
 }
 /* The poster's badges, in a row with short labels: what this record establishes. Fixed height,
@@ -810,8 +796,8 @@ input[type="number"] {
    takes a fixed slot wide enough for the widest value it can hold, or — the owner's own suggestion,
    and the better rule for anything that changes often — moves onto its own line *below* the control
    it belongs to. Figures are tabular throughout, so a slot's width is a character count and not a
-   guess, and anything that overruns is clipped rather than allowed to push. `check_workbench.py`
-   holds it down by comparing every button's bounding box at two instants of a run. */
+   guess, and anything that overruns is clipped rather than allowed to push. `check_animate_view`
+   holds it down by comparing every button's bounding box across a step and a setting change. */
 .readout {
   display: inline-block;
   overflow: hidden;
@@ -1231,6 +1217,21 @@ body.pack-independent #packing-svg {
 }
 body.pack-independent #pack-stage-facts {
   display: block;
+}
+/* The box and its trace are the catalogue's drawing of its container (`drawBounds`), and only the
+   catalogue's scene updates them. Pack and the animation studio draw into the same stage and the
+   same `#container` and draw no box, so while either owns the stage the bounds, which would
+   otherwise stay at the last catalogue step's side, are hidden and the container is drawn, as it
+   was before the box. */
+body.pack-independent #bound-box,
+body.pack-independent #bound-trace,
+body.trace-active #bound-box,
+body.trace-active #bound-trace {
+  display: none;
+}
+body.pack-independent #container,
+body.trace-active #container {
+  stroke: #000000;
 }
 body.search-active #stage-wrap,
 body.search-active #mode-panel,

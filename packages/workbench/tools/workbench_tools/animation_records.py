@@ -48,10 +48,18 @@ class AnimationReference:
 
 @dataclass(frozen=True, slots=True)
 class FairReach:
+    """What an ascent step's unguided settle reached, beside the record it aimed at.
+
+    `fair_side` and `excess_pct` are None exactly when `packing_valid` is False: an
+    arrangement the geometry check rejected reached no side. `packing_valid` is None
+    only for a row written before validity was recorded; its side is unchecked.
+    """
+
     n: int
-    fair_side: float
+    fair_side: float | None
     record: float
-    excess_pct: float
+    excess_pct: float | None
+    packing_valid: bool | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -155,6 +163,7 @@ def animation_to_row(document: AnimationDocument) -> dict[str, object]:
                 "fair_side": item.fair_side,
                 "record": item.record,
                 "excess_pct": item.excess_pct,
+                **({} if item.packing_valid is None else {"packing_valid": item.packing_valid}),
             }
             for item in document.fair_reach
         ]
@@ -285,16 +294,31 @@ def _fair_reach(value: object) -> tuple[FairReach, ...]:
     if value is None:
         return ()
     return tuple(
-        FairReach(
-            n=_positive_integer(row["n"], "fair-reach n"),
-            fair_side=_positive_number(row["fair_side"], "fair-reach side"),
-            record=_positive_number(row["record"], "fair-reach record"),
-            excess_pct=_number(row["excess_pct"], "fair-reach excess"),
+        _fair_reach_row(_required_mapping(item, "fair-reach row"))
+        for item in _required_list(value, "fair reach")
+    )
+
+
+def _fair_reach_row(row: dict[str, object]) -> FairReach:
+    packing_valid = (
+        _required_bool(row["packing_valid"], "fair-reach packing validity")
+        if "packing_valid" in row
+        else None
+    )
+    n = _positive_integer(row["n"], "fair-reach n")
+    record = _positive_number(row["record"], "fair-reach record")
+    if packing_valid is False:
+        if row["fair_side"] is not None or row["excess_pct"] is not None:
+            raise ValueError("a fair-reach settle that is not a packing reached no side")
+        return FairReach(
+            n=n, fair_side=None, record=record, excess_pct=None, packing_valid=False
         )
-        for row in (
-            _required_mapping(item, "fair-reach row")
-            for item in _required_list(value, "fair reach")
-        )
+    return FairReach(
+        n=n,
+        fair_side=_positive_number(row["fair_side"], "fair-reach side"),
+        record=record,
+        excess_pct=_number(row["excess_pct"], "fair-reach excess"),
+        packing_valid=packing_valid,
     )
 
 

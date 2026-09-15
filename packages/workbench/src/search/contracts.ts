@@ -1,4 +1,5 @@
 import type { PackingSnapshot } from "../core/runtime-contracts.ts";
+import type { ResolveTerminationReason } from "../simulation/resolve.ts";
 
 export const SEARCH_PLAN_CONTRACT = "packing.squares:SearchPlan/v1";
 export const SEARCH_OUTCOMES_CONTRACT = "packing.squares:SearchOutcomes/v1";
@@ -87,6 +88,9 @@ export interface SearchPackingState {
 
 export type SearchSelectedState = "raw" | "repaired" | "best-observed";
 
+/** How a slot's repair ended: Resolve's own termination, or `not-requested` when none was asked for. */
+export type SearchRepairTermination = ResolveTerminationReason | "not-requested";
+
 export interface SearchStationarityReceipt {
   stationary: boolean;
   stationarySteps: number;
@@ -106,7 +110,7 @@ export interface SearchTrialValue {
   selectedState: SearchSelectedState;
   stationarity: SearchStationarityReceipt;
   repair: {
-    termination: string;
+    termination: SearchRepairTermination;
     resolved: boolean;
     exhausted: boolean;
     tolerance: number | null;

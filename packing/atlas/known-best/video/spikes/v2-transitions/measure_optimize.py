@@ -20,12 +20,13 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 HERE = Path(__file__).resolve().parent
+DEFAULT_PAGE = HERE.parents[4] / "site/workbench/index.html"
 KINDS = ("previous", "random", "grid")
 
 
 def main() -> int:
     argv = sys.argv[1:]
-    page_name = "workbench.html"
+    page_name = str(DEFAULT_PAGE)
     steps = 2400
     ns: list[int] = []
     i = 0

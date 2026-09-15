@@ -291,3 +291,36 @@ def test_check_compares_the_exact_fetched_html_bytes(
         "https://example.org", commit, timeout=1, browser=False
     )
     assert all(passed for passed, _ in results), results
+
+
+def test_fetch_retries_a_transient_answer_before_reporting_it(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Pages can answer 404 or 5xx for a short while after a deploy reports success, and
+    the check runs straight after it (#160 R26). A lasting answer is still reported."""
+    answers = [(404, b""), (503, b""), (200, b"page")]
+    pauses: list[float] = []
+    monkeypatch.setattr(
+        check_published_site, "fetch_once", lambda _url, **_kwargs: answers.pop(0)
+    )
+    status = check_published_site.fetch(
+        "https://example.org/", timeout=1, delays=(1.0, 2.0, 4.0), sleep=pauses.append
+    )
+    assert status == (200, b"page")
+    assert pauses == [1.0, 2.0]
+
+    pauses.clear()
+    monkeypatch.setattr(check_published_site, "fetch_once", lambda _url, **_kwargs: (0, b""))
+    status = check_published_site.fetch(
+        "https://example.org/", timeout=1, delays=(1.0, 2.0), sleep=pauses.append
+    )
+    assert status == (0, b"")
+    assert pauses == [1.0, 2.0]
+
+    pauses.clear()
+    monkeypatch.setattr(check_published_site, "fetch_once", lambda _url, **_kwargs: (403, b""))
+    status = check_published_site.fetch(
+        "https://example.org/", timeout=1, delays=(1.0, 2.0), sleep=pauses.append
+    )
+    assert status == (403, b"")
+    assert pauses == [], "a refusal is an answer, not a deploy still settling"

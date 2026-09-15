@@ -1,6 +1,6 @@
 {
   "schema": "squares.workbench.block-report/v1",
-  "source_commit": "f9099096247271b92320f93bc23a16c7503e7a79",
+  "source_commit": "4ae3a8ee6ff6cb23dc4672b40e3176efaf199aa5",
   "reference_source": "packing/witnesses/known-best",
   "instrument": "packages/workbench/probes/bench-annealing.ts",
   "purpose": "software-validation",
@@ -15,11 +15,30 @@
         "inflate": 1.12
       },
       "effective_configuration": {
-        "contract": "packing.squares:AnnealingConfiguration/v1",
+        "contract": "packing.squares:AnnealingConfiguration/v2",
         "style": "bodies",
         "mode": "blind",
         "inflate": 1.12,
-        "anneal": 3
+        "anneal": 3,
+        "pair_law": {
+          "rigidity": 0.15,
+          "repulsion": 2500.0,
+          "attraction": 0.0,
+          "range": 0.0
+        },
+        "wall_law": {
+          "rigidity": 0.25,
+          "repulsion": 2500.0,
+          "attraction": 0.0,
+          "range": 0.0
+        },
+        "timing": {
+          "dwell": 0.8,
+          "move": 0.55,
+          "correct": 0.25,
+          "settle": 0.8
+        },
+        "anneal_span": 1.0
       },
       "partition": "exploratory",
       "tolerance_pct": 0.0001,
@@ -51,11 +70,11 @@
         "repair_budget": 400,
         "measured_steps": 576,
         "attempts_with_unknown_steps": 0,
-        "measured_milliseconds": 8.400000035762787,
+        "measured_milliseconds": 16.0,
         "attempts_with_unknown_time": 0,
         "measured_repair_sweeps": 90,
-        "measured_physics_milliseconds": 4.799999952316284,
-        "measured_repair_milliseconds": 0.8000000715255737,
+        "measured_physics_milliseconds": 12.500000238418579,
+        "measured_repair_milliseconds": 0.9999997615814209,
         "attempts_with_unknown_repair": 0
       },
       "block_size": 2,
@@ -137,10 +156,10 @@
       },
       "source": {
         "contract": "packing.squares:WorkbenchSource/v1",
-        "commit": "f9099096247271b92320f93bc23a16c7503e7a79",
+        "commit": "4ae3a8ee6ff6cb23dc4672b40e3176efaf199aa5",
         "dirty": false,
         "page": "packing/site/workbench/index.html",
-        "page_sha256": "84908ead8faeb12488243d31773ed121f342212b8da71a74ea85e909a5b356e6",
+        "page_sha256": "01700057ec67b45ec1c5c62e5981087ae519ebb38bf4e3305f1e6c5a1031bee8",
         "benchmark": "packages/workbench/probes/bench-annealing.ts",
         "browser": "chromium",
         "browser_version": "151.0.7922.34",

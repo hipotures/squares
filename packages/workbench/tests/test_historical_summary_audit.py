@@ -36,7 +36,7 @@ def test_reconstruction_keeps_absolute_and_normalized_metrics_distinct() -> None
             "control.jsonl": {
                 "5": {
                     "trials": 2,
-                    "resolved": False,
+                    "resolved": True,
                     "record": 2.5,
                     "grid": 3,
                     "closed_median": -0.5,
@@ -61,3 +61,45 @@ def test_reconstruction_keeps_absolute_and_normalized_metrics_distinct() -> None
 def test_unretained_metadata_is_not_filled_with_invented_defaults() -> None:
     with pytest.raises(ValueError, match="trial counts"):
         audit({"bad.jsonl": {"5": {"resolved": True}}})
+
+
+def _cell(*, resolved: bool) -> dict[str, object]:
+    return {
+        "trials": 2,
+        "resolved": resolved,
+        "record": 2.5,
+        "grid": 3,
+        "closed_median": -0.5,
+        "params": {},
+        "best_of": {"1": 0.25},
+    }
+
+
+def test_an_unresolved_cell_is_void_and_exports_no_metrics() -> None:
+    result = audit({"control.jsonl": {"5": _cell(resolved=False), "6": _cell(resolved=True)}})
+    cells = result["cells"]
+    assert isinstance(cells, list)
+    unresolved, resolved = cells
+    assert unresolved["void"] is True
+    for metric in (
+        "median_grid_gap_closed",
+        "reconstructed_median_absolute_excess",
+        "reconstructed_median_relative_excess_pct",
+        "prefix_observations",
+    ):
+        assert unresolved[metric] is None, metric
+        assert resolved[metric] is not None, metric
+    assert resolved["void"] is False
+
+
+def test_no_retained_unresolved_cell_exports_a_metric() -> None:
+    repo = Path(__file__).resolve().parents[3]
+    result = audit(
+        json.loads((repo / "packing/campaign/results/annealing/summaries.json").read_text())
+    )
+    cells = result["cells"]
+    assert isinstance(cells, list)
+    void = [cell for cell in cells if not cell["resolved_flag"]]
+    assert len(void) == 243
+    assert all(cell["void"] and cell["median_grid_gap_closed"] is None for cell in void)
+    assert result["void_cell_count"] == 243

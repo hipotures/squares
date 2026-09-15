@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="0" skipped="0" tests="1" time="44.746" timestamp="2026-09-14T18:21:35.649909-07:00" hostname="spud10.local"><testcase classname="benchmarks.test_pr_rollup_timing" name="test_complete_rollup_corpus_renders" time="44.736" /></testsuite></testsuites>

@@ -21,14 +21,18 @@ Pull requests run the bounded Linux fast surface; integration events run the ord
 full checkpoint on Linux and four focused portability checks on macOS. The Rust search
 engine uses the stable Cargo toolchain.
 
-From this directory:
+From the repository root, then from `packing/`:
 
 ```shell
+npm ci --ignore-scripts
+cd packing
 uv sync --frozen --all-extras --group dev
 uv run --frozen --all-extras --group dev python --version
 uv run --frozen --all-extras --group dev packing-validate --fast
 ```
 
+`npm ci` installs the pinned Node tools the browser-floor step runs; without them that
+step fails. `make hooks-install` runs the same install and then the Git hooks.
 The version command must report Python 3.14.7. Do not run a bare `pip install`, commit a
 second requirements file, or rely on packages from a global interpreter.
 Use uv 0.12 or newer to bootstrap the pinned interpreter; uv 0.8.17 cannot install
@@ -134,7 +138,6 @@ process execution.
 <a id="validation-tiers"></a>
 
 A **tier** selects validation steps; a **lane** selects tests within a behavioural step.
-The ordinary full checkpoint has 77 steps.
 The
 [validation efficiency plan](docs/project/specs/active/plan-2026-09-06-validation-efficiency-and-checkpoints.md)
 owns the current W5 work on cost, naming, and checkpoint placement.
@@ -163,7 +166,7 @@ alone is not full pre-merge evidence.
 | `--edit` | contributor, in the edit loop | 47 of 77 | 240 s | 59.4 s |
 | `--push` | contributor, before a push — the edit tier plus tests reachable from the diff (`--since`) | varies with the diff | 1800 s | about a minute for a narrow code change; a broad diff selects the whole suite and needs `--jobs 1`, see below |
 | `--fast` | contributor, at a block boundary; the union of the five tiers below | 66 of 77 | 600 s | record cleared 2026-09-07 when the corpus widened; 229.1 s locally, only the ceiling applies |
-| `--checks` | **CI, on every pull request**, in the `validate` job | 50 of 77 | 195 s | composition changed after two PR 160 runs exceeded the ceiling; only the ceiling applies |
+| `--checks` | **CI, on every pull request**, in the `validate` job | 50 of 77 | 195 s | composition changed after two PR 160 runs exceeded the ceiling, which did not end the overruns (`think-lrs0`); only the ceiling applies |
 | `--frontend` | **CI, on every pull request**, in the `frontend` job, concurrently | 2 of 77 | 150 s | new partition; the first hosted run establishes its baseline |
 | `--geometry` | **CI, on every pull request**, in the `geometry` job, concurrently | 9 of 77 | 180 s | 91.6 s on CI, the mean of four readings |
 | `--suite` | **CI, on every pull request**, in the `suite` job, concurrently | 1 of 77 | 275 s | 183.4 s on CI, one reading of the lane as it now stands |
@@ -201,8 +204,16 @@ ceiling. The second run spent 132.21 s in exact verification, 106.34 s in BasedP
 The browser floor and the new full-page accessibility check now form `--frontend`,
 leaving every verdict in `--fast` while removing that work from the saturated queue.
 The first hosted run of each changed partition supplies its new baseline.
-[D-472](defects.md) retains the calibration history, and `think-be1s` tracks the band
-representation.
+That change did not end the overruns.
+After `main` merged into the stack, #160 read 200.68 s and 199.74 s at `72629c03`.
+`think-lrs0` records three causes:
+- runner speed, which moved every step of one branch by about 1.3x together;
+- the branch cost rollup’s render step, at 45 to 61 s, which `main` fixed at `65a5c001`;
+- type-floor time from the Python #160 adds.
+  With `main`’s fix merged, #125 read 146.04 s of 195 s at `bca21da0` (run 34923097435).
+  #160 has not been re-read since, and `think-lrs0` stays open until it is.
+  [D-472](defects.md) retains the calibration history, and `think-be1s` tracks the band
+  representation.
 
 **The pull-request surface is `--checks`, `--frontend`, `--geometry`, `--suite` and
 `--sweeps` together, run as five concurrent CI jobs**, so a pull request waits for the

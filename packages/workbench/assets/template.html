@@ -19,9 +19,10 @@ __WORKBENCH_CSS__
       <p class="sr-only" id="stage-keyboard-help">Press Enter to focus a square in Pack mode. Use the arrow keys to move it, hold Shift for larger moves, use Q and E to rotate it, and press Escape to return to the stage. Space controls playback when the stage itself has focus.</p>
       <svg id="packing-svg" viewBox="0 0 1 1" preserveAspectRatio="xMidYMid meet" role="group" aria-label="Packing squares">
         <g id="world" transform="scale(1 -1)">
-          <!-- The container is geometry only: the scene keeps its size, and the two bounds below
-               are what is drawn. -->
-          <rect id="container" x="0" y="0" width="1" height="1" fill="none" stroke="none" />
+          <!-- In the catalogue the container is geometry only: the scene keeps its size, and the
+               two bounds below are what is drawn. Pack and the animation studio draw no box, so
+               there the stylesheet hides the bounds and draws this, 2 px black. -->
+          <rect id="container" x="0" y="0" width="1" height="1" fill="none" stroke="none" stroke-width="2" vector-effect="non-scaling-stroke" />
           <g id="squares"></g>
           <!-- The box, over the squares: bold where it is, turning the page's green when it locks at
                the best known side, and a thin black trace of where it just was, under it. -->
@@ -71,10 +72,11 @@ __WORKBENCH_CSS__
         <div class="numeral-slot" id="numeral-a"></div>
         <div class="numeral-slot" id="numeral-b"></div>
       </div>
-      <div id="pack-stage-facts" aria-live="polite" hidden></div>
+      <div id="pack-stage-facts" hidden></div>
+      <p class="sr-only" id="pack-announcement" aria-live="polite" aria-atomic="true"></p>
     </div>
   </div>
-  <div id="stage-resize" class="resize-handle" role="separator" aria-orientation="horizontal" aria-controls="controls" aria-label="Resize the stage against the controls" title="Drag to resize the stage, or double-click to size it automatically" tabindex="0"></div>
+  <div id="stage-resize" class="resize-handle" role="separator" aria-orientation="horizontal" aria-controls="stage-wrap" aria-label="Resize the stage against the controls" title="Drag to resize the stage, or double-click to size it automatically" tabindex="0"></div>
   <div id="controls">
     <div id="panel">
       <div class="subpanel">
@@ -307,8 +309,8 @@ __WORKBENCH_CSS__
           <textarea id="pack-json" rows="5" spellcheck="false"></textarea>
           <button type="button" id="pack-load">Load snapshot</button>
         </details>
-        <output id="pack-status" aria-live="polite"></output>
-        <output id="pack-repair-status" aria-live="polite"></output>
+        <output id="pack-status" aria-live="off"></output>
+        <output id="pack-repair-status" aria-live="off"></output>
       </section>
       <section id="search-workspace" aria-labelledby="search-workspace-title" hidden>
         <h2 id="search-workspace-title">Experimental search</h2>

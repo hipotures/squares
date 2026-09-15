@@ -27,7 +27,7 @@ def _number(value: object, label: str) -> float:
 
 
 def audit(value: object) -> dict[str, object]:
-    """Retain file/cell identity and resolved flags; missing parameters stay missing."""
+    """Retain file and cell identity and resolved flags; an unresolved cell is void."""
     files = _object(value, "summaries")
     cells: list[dict[str, object]] = []
     counts: list[int] = []
@@ -59,19 +59,25 @@ def audit(value: object) -> dict[str, object]:
                 if int(prefix) < 1 or int(prefix) > count:
                     raise ValueError("best-of prefix must fit the retained cell count")
                 _number(number, prefix)
+            # The runbook calls an unresolved cell void: its summary was taken
+            # over arrangements nobody checked are packings, so none of its metrics is exported.
+            void = not resolved
             cells.append(
                 {
                     "artifact": filename,
                     "n": n,
                     "recorded_rows": count,
                     "resolved_flag": resolved,
+                    "void": void,
                     "parameter_overrides": params,
                     "reference_side": reference,
                     "grid_side": grid,
-                    "median_grid_gap_closed": closed,
-                    "reconstructed_median_absolute_excess": absolute,
-                    "reconstructed_median_relative_excess_pct": absolute / reference * 100,
-                    "prefix_observations": best,
+                    "median_grid_gap_closed": None if void else closed,
+                    "reconstructed_median_absolute_excess": None if void else absolute,
+                    "reconstructed_median_relative_excess_pct": (
+                        None if void else absolute / reference * 100
+                    ),
+                    "prefix_observations": None if void else best,
                 }
             )
             counts.append(n)
@@ -82,6 +88,7 @@ def audit(value: object) -> dict[str, object]:
         "reconstruction": "excess derived from rounded stored closed/reference/grid values",
         "file_count": len(files),
         "cell_count": len(cells),
+        "void_cell_count": sum(1 for cell in cells if cell["void"]),
         "largest_recorded_n": max(counts) if counts else None,
         "cells": cells,
     }

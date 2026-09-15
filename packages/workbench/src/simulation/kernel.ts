@@ -6,6 +6,15 @@ import { forceAtGap, forceLawAttracts } from "./force-law.ts";
 const SQUARE_INERTIA = 1 / 6;
 const QUARTER_TURN = Math.PI / 2;
 const QUARTER_TURN_TIE = Math.PI / 4 + 1e-9;
+/**
+ * A separating-axis penetration this small is float rounding between touching squares and applies
+ * no force. A solver threshold: validity is assessed separately, under `PACKING_VALIDITY`.
+ */
+const CONTACT_EPSILON = 1e-9;
+/** Widens a broad-phase cell past the interaction reach, so a pair at the reach is never lost. */
+const CELL_MARGIN = 1e-9;
+/** The widest broad-phase grid, in cells; `core/geometry.ts` caps its own grid the same. */
+export const MAX_BROAD_PHASE_DIMENSION = 512;
 
 /** Typed arrays are dense inside their allocated bounds; every index is validated on admission. */
 interface DenseFloat64Array extends Iterable<number> {
@@ -594,7 +603,7 @@ function applyPairForce(
       2;
     const separation = differenceX * axisX + differenceY * axisY;
     const penetration = radiusFirst + radiusSecond - Math.abs(separation);
-    if (penetration <= 1e-9 && pull === 0) {
+    if (penetration <= CONTACT_EPSILON && pull === 0) {
       return { penetration: 0, near: false, applied: false };
     }
     if (penetration < best) {
@@ -704,6 +713,33 @@ function pinBody(state: SimulationState, pin: SimulationPin): void {
   state.bodyAngularVelocity[pin.body] = 0;
 }
 
+/**
+ * The broad-phase grid for a container: how many cells wide, and how wide each cell is.
+ *
+ * The grid covers the container and two units beyond each wall in cells at least
+ * `minimumCell` wide, so a pair close enough to interact is never more than one cell apart.
+ * Left alone it grows with the square of the side: a 1e6 container asked for a grid that
+ * cannot be allocated (#160 R15). Past `MAX_BROAD_PHASE_DIMENSION` the grid stops growing
+ * and its cells grow instead. The neighbour search stays exact, because every cell is still
+ * at least `minimumCell` wide and the kernel's clamped mapping is monotone, so two points
+ * less than a cell apart still land in the same or adjacent cells; only more candidates
+ * share a cell. Below the cap this is the grid the kernel always built, cell for cell, so
+ * ordinary runs are bit-for-bit what they were.
+ */
+export function broadPhaseGrid(
+  containerSide: number,
+  minimumCell: number,
+): { dimension: number; cell: number } {
+  const dimension = Math.max(2, Math.ceil((containerSide + 4) / minimumCell) + 1);
+  if (dimension <= MAX_BROAD_PHASE_DIMENSION) {
+    return { dimension, cell: minimumCell };
+  }
+  return {
+    dimension: MAX_BROAD_PHASE_DIMENSION,
+    cell: Math.max(minimumCell, (containerSide + 4) / (MAX_BROAD_PHASE_DIMENSION - 1)),
+  };
+}
+
 /** Advance one deterministic semi-implicit Euler step. */
 export function advanceSimulation(
   state: SimulationState,
@@ -729,8 +765,10 @@ export function advanceSimulation(
   for (const size of state.squareSize) {
     maximumSize = Math.max(maximumSize, size);
   }
-  const cell = Math.max(step.baseCell, Math.SQRT2 * maximumSize + attractionReach + 1e-9);
-  const dimension = Math.max(2, Math.ceil((step.container.side + 4) / cell) + 1);
+  const { dimension, cell } = broadPhaseGrid(
+    step.container.side,
+    Math.max(step.baseCell, Math.SQRT2 * maximumSize + attractionReach + CELL_MARGIN),
+  );
   if (state.gridDimension !== dimension) {
     state.gridDimension = dimension;
     state.gridHead = integerBuffer(dimension * dimension);

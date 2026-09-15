@@ -114,13 +114,17 @@ reconciliation. BC-347 then completed and certified a read-only
 of the retained evidence, the five shaped routes, and additional hypotheses with
 material small-`n` upside behind that prerequisite.
 BC-346 completed and certified its source-bound W10 comparison and selected BC-340, the
-due W5 efficiency checkpoint, as the sole next entry.
-A conservative derivation reaches OR-12’s mandatory eight-block ceiling after Session
-116/BC-322. BC-340 will measure the current gate first, accept at most one demonstrated
-repair behind an equivalence guard or record a measured no-change decision, then return
-to BC-353 / `think-d3h5` for a fresh W10. Every scientific candidate depends on BC-353,
-so closing the present W10 releases only the efficiency checkpoint.
-Neither planning block nor W5 runs a scientific target.
+due W5 efficiency checkpoint, after a conservative derivation reached OR-12’s mandatory
+eight-block ceiling after Session 116/BC-322. Session 131 has now completed BC-340.
+VE-005 accepted one guarded validation repair, and the first candidate hosted checks
+tier passed at 106.38 seconds against the unchanged 195-second ceiling.
+BC-353 selected Route A and is terminal.
+BC-354 / `think-0t5y` is the sole next entry: a 75-minute, no-target admission of one
+complete same-corner root at side `96/25`, its shared physical geometry, matched
+baseline, exact controls, and independent checker.
+BC-341 remains blocked until that admission merges.
+If the complete root or checker cannot be admitted in the block, Route S becomes the
+sole next admission entry.
 
 The planning candidates are:
 

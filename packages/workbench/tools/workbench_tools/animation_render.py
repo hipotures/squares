@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+import re
 from dataclasses import replace
 from decimal import Decimal
 
@@ -32,7 +33,30 @@ from workbench_tools.animation_records import (
 )
 from workbench_tools.packing_contracts import GeometryCheck
 
+#: How far a frame that names a retained record may sit from that record's witness before it
+#: is refused as a different arrangement: in side units for centres, radians for angles, and
+#: relative to the record side (with this as its floor) for the container.
+#:
+#: A matching tolerance, not packing validity, which is `packing_contracts` at 1e-9. A frame
+#: that names a record is drawn from the witness's exact geometry, so what it must show is
+#: that its own poses are that witness. The witnesses are stored as exact decimals and read
+#: as binary64: over all 324 on 2026-09-14 that moved a centre by at most 2.4e-15 and a
+#: side by 1.7e-15. 1e-7 admits any faithful binary64 copy with seven orders of room, and
+#: refuses a coarser one, including a copy at the page's catalogue precision (centres to
+#: 1e-6, angles to 1e-4 degrees), which is a rounded arrangement rather than the witness.
+#: `tests/test_record_reference_tolerance.py` pins both edges.
 RECORD_REFERENCE_TOLERANCE = 1e-7
+
+#: What an export says about its motion. It goes in the SVG's `<desc>` and the export receipt,
+#: never on the picture: the owner removed the page's visible kind tag, and a caption line
+#: drawn over the figure would put it back by another route.
+TRANSITIONS_STATEMENT = "Transitions are illustrative, not packings."
+
+#: Why no exported animation's in-between states are packings, whatever its frames are.
+INTERPOLATION_REASON = (
+    "The SVG interpolates between the animation's frames, and the in-between states are "
+    "illustrative tweens that nothing checks as packings."
+)
 
 
 def _renamed(
@@ -213,6 +237,32 @@ def trajectory_from_animation(document: AnimationDocument) -> PackingTrajectory:
     )
 
 
+def _numerically_checked(entry: AnimationFrame) -> bool:
+    """Whether a frame is a checked packing: a retained record, or checked feasible geometry."""
+    if entry.record is not None:
+        return entry.geometry.passed
+    return entry.feasible is True and entry.geometry.passed
+
+
+def transitions_reason(document: AnimationDocument) -> str | None:
+    """Why this animation's motion must not be read as packings, or None if nothing says so.
+
+    The statement is owed whenever any frame is guided or not numerically checked: a guided
+    frame was pulled onto its packing, and an unchecked one is not known to be a packing, so
+    a file that shows either moving is showing an illustration of a search, not a result.
+    """
+    document = decode_animation(document)
+    total = len(document.frames)
+    guided = sum(document.frame_is_guided(frame) for frame in document.frames)
+    unchecked = sum(not _numerically_checked(frame) for frame in document.frames)
+    if not guided and not unchecked:
+        return None
+    return (
+        f"{TRANSITIONS_STATEMENT} {guided} of {total} frames are guided and {unchecked} of "
+        f"{total} are not numerically checked."
+    )
+
+
 def describe_animation(document: AnimationDocument) -> str:
     """Describe evidence ancestry and independently checked invalid frames."""
     document = decode_animation(document)
@@ -224,11 +274,21 @@ def describe_animation(document: AnimationDocument) -> str:
     unpacked = sum(not frame.geometry.passed for frame in document.frames)
     if unpacked:
         parts.append(f"{unpacked} of {len(document.frames)} frames are not valid packings.")
+    # Any SVG with more than one frame moves, and what it draws between frames is a tween
+    # nothing checks, so the statement is owed whether or not the frames themselves are checked.
+    if len(document.frames) > 1:
+        parts.append(TRANSITIONS_STATEMENT)
     return " ".join(parts)
 
 
+def refuse_script(svg: str) -> None:
+    """Refuse an SVG that carries a script: the export's promise is a file with none."""
+    if re.search(r"<(?:[A-Za-z_][\w.-]*:)?script\b", svg, flags=re.IGNORECASE):
+        raise ValueError("the rendered SVG contains a script element; it would not be inert")
+
+
 def export_svg(document: AnimationDocument, *, width: int = 960) -> str:
-    """Render one checked animation as a self-contained SVG."""
+    """Render one checked animation as a self-contained SVG with no script in it."""
     trajectory = trajectory_from_animation(document)
     palette = document.palette
     hue_name = palette.hue if palette is not None else None
@@ -251,4 +311,5 @@ def export_svg(document: AnimationDocument, *, width: int = 960) -> str:
     svg = render_packing_svg(trajectory.frames[-1], trajectory=trajectory, spec=spec)
     if len(trajectory.frames) > 1 and "@keyframes" not in svg:
         raise ValueError("an animation of several frames rendered without motion")
+    refuse_script(svg)
     return svg

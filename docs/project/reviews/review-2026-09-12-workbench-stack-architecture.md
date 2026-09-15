@@ -10,6 +10,13 @@ Preserve the working browser prototype, rendering toolkit, and research instrume
 repair the evidence and execution boundaries before promoting them into shared package
 APIs.
 
+**Identity note, added 2026-09-14.** This review was written against the
+workbench-physics exploration as X-028, and its references were changed to X-029 on
+2026-09-13. On 2026-09-14 that exploration was renumbered X-034, because main had
+assigned X-029 to the BC303 T2 exact-geometry draft, so read X-029 here as X-034. The
+register’s R6 row says the original observations are retained; the 2026-09-14 rewrite
+removed them from the records, and they remain at commit `a40d272c`.
+
 **Scope:** PR [#155](https://github.com/jlevy/squares/pull/155) at `6e191a35`, stacked
 on [#125](https://github.com/jlevy/squares/pull/125). The main baseline is `d507f5c7`.
 The current parent head is `0281a508`; the leaf lacks its two latest commits, `ee60689b`
@@ -408,6 +415,37 @@ A bead being created or closed without that evidence is not a review resolution.
 | R10 — Optimizer snapshot mismatch | `think-6hqs`, `think-nals` | 1–2 | Exact returned-pose validation, unit-size semantics, overlap-crossing regression and retained valid-snapshot control. | Snapshot defect repaired at `f9099096` with copied post-step geometry and retained best poses; unit-size and overlap-crossing controls pass. A bounded resolver landed at `12b4ed6c`; integration into Pack/headless remains open under `think-nals`. |
 | R11 — Batch-dependent Pack best | `think-wqf3` | 4 | Fixed seed/config/work produce identical validated best pose and receipt across UI batch sizes and browser/headless calls. | Implemented with fixed observation cadence and a batch-invariance Node control; final browser/headless checkpoint remains. |
 | R12 — False Pack stationarity | `think-a2j9` | 2–3 | Shrinking-container negative and settled positive controls; declared residual/window and browser/headless termination parity. | Implemented with moving-side and held-square controls; final browser/headless checkpoint remains. |
+
+**Status addendum, 2026-09-14, after PR #160’s review round.** The rows above are kept
+as last written, which was before #160 was reviewed.
+Where they no longer match the code on #160:
+
+- **R1** is fixed on #160 at `15d97a59` (foundation `f9099096`). An imported frame is
+  numerically checked only when geometry measured at decode passes
+  (`animation_render.py`, `animation_records.py`); the controls are in
+  `packages/workbench/tests/test_python_contract_repairs.py`. The review round also
+  stopped padded ascent frames from carrying a stale feasible flag (`e90187c8`).
+- **R2** is fixed on #160 at `f9099096`. The grid refuses a side that cannot hold `n`,
+  unimplemented sources are refused, and the seed and per-frame side are recorded
+  (`strategy_execution.py`, `strategy_records.py`), with controls in the same test file.
+  The review round put the three strategy documents that declare `status: enforced` into
+  the schema corpus (`e90187c8`).
+- **R3**’s repair at `f9099096` stands, but #160’s review found that admission still
+  counted an overlapping below-record arrangement as an exact success and that one
+  malformed probe row aborted a run.
+  Both are fixed at `fbc74c0e` and `acae83c6`, on the shared validity contract from
+  `ec0a0604`.
+- **R7** is fixed in source at `f9099096`: the site note links `href="../"`
+  (`build_site.py`), and `check_published_site` resolves that link against the project
+  root (`packing/tests/test_check_published_site.py`). Its post-deploy fetches retry
+  transient answers (`2782c27e`). The deployed navigation receipt is still owed
+  (`think-9x0m`).
+- **R9** is fixed in source at `f9099096`: `pages.yml` pins `setup-node` 24.18.0 before
+  `npm ci` in `prepare` and `build`. The deployed revision check is still owed
+  (`think-9x0m`, `think-tn6s`).
+- **R10**’s remaining item has landed: one fail-closed validity contract is shared by
+  Pack, Resolve, Search, the benchmark and the page’s readouts (`ec0a0604`, `c0d9db2b`).
+  `think-nals` stays open for its remaining acceptance evidence.
 
 Architectural work has explicit owners too: `think-a9gt` inventories consumers before
 `think-l9z0` establishes the package foundation; `think-109t` gates broad extraction;

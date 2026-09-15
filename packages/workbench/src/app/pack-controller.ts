@@ -4,7 +4,7 @@ import {
   parsePackSnapshot,
 } from "../api/pack-api.ts";
 import type { GeometrySnapshot } from "../core/geometry.ts";
-import { assessPackingSnapshot } from "../core/runtime-contracts.ts";
+import { assessPackingSnapshot, PACKING_VALIDITY } from "../core/runtime-contracts.ts";
 import {
   advancePackRun,
   createGridPackStart,
@@ -133,7 +133,8 @@ export class PackController {
     this.repair = resolvePacking(this.export(), {
       expectedCount: this.run.n,
       iterationLimit,
-      tolerance: 1e-9,
+      // Resolve reports success only for an arrangement the contract calls a packing.
+      tolerance: PACKING_VALIDITY.penetrationTolerance,
     });
     if (this.repair.termination.resolved && this.repair.repaired !== null) {
       this.run = createPackRun({

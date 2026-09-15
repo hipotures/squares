@@ -51,8 +51,21 @@ export interface AnimationDocument {
     shade: "none" | "full-side-contact" | "evidence" | null;
   } | null;
   reference: { bestKnown: number | null; provedLowerBound: number | null } | null;
-  fairReach: { n: number; fairSide: number; record: number; excessPct: number }[];
+  fairReach: FairReach[];
   frames: AnimationFrame[];
+}
+
+/**
+ * What an ascent step's unguided settle reached. `fairSide` and `excessPct` are null
+ * exactly when `packingValid` is false; `packingValid` is null only for a row written
+ * before validity was recorded, whose side is unchecked.
+ */
+export interface FairReach {
+  n: number;
+  fairSide: number | null;
+  record: number;
+  excessPct: number | null;
+  packingValid: boolean | null;
 }
 
 function object(
@@ -344,12 +357,28 @@ export function decodeAnimation(value: unknown): AnimationDocument {
   const fairReach =
     row.fair_reach === undefined
       ? []
-      : array(row.fair_reach, "fair reach").map((value) => {
-          const item = object(value, ["n", "fair_side", "record", "excess_pct"], "fair reach");
-          return {
+      : array(row.fair_reach, "fair reach").map((value): FairReach => {
+          const item = object(
+            value,
+            ["n", "fair_side", "record", "excess_pct", "packing_valid"],
+            "fair reach",
+          );
+          const packingValid =
+            item.packing_valid === undefined ? null : boolean(item.packing_valid, "fair validity");
+          const reach = {
             n: integer(item.n, "fair reach n"),
-            fairSide: positive(item.fair_side, "fair side"),
             record: positive(item.record, "fair reference"),
+            packingValid,
+          };
+          if (packingValid === false) {
+            if (item.fair_side !== null || item.excess_pct !== null) {
+              throw new TypeError("a fair-reach settle that is not a packing reached no side");
+            }
+            return { ...reach, fairSide: null, excessPct: null };
+          }
+          return {
+            ...reach,
+            fairSide: positive(item.fair_side, "fair side"),
             excessPct: number(item.excess_pct, "fair excess"),
           };
         });
@@ -434,6 +463,7 @@ export function encodeAnimation(document: AnimationDocument): string {
             fair_side: item.fairSide,
             record: item.record,
             excess_pct: item.excessPct,
+            ...(item.packingValid === null ? {} : { packing_valid: item.packingValid }),
           })),
         }),
   };

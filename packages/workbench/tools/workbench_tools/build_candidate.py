@@ -155,13 +155,14 @@ MOTION_PHASES = [
     "rotate-first",
     "slide-first",
 ]
-# The per-kind schedule NOTES computes for the 165 static appends (prefix and shared-picture),
-# which have nothing to move: no move at all, and with a short move for the new square's
-# fade-in.
-STATIC_APPEND_TIMINGS = {
-    "no move": {"dwell": 0.5, "move": 0.0, "settle": 0.4},
-    "short move": {"dwell": 0.5, "move": 0.4, "settle": 0.3},
-}
+#: The four spans of a beat, in the order the page plays them.
+BEAT_SPANS = ("dwell", "move", "correct", "settle")
+#: The pair kinds where nothing rearranges, as the page's `isStillPair` names them.
+STATIC_KINDS = frozenset({"prefix", "shared-picture"})
+#: The beat a static append plays in a continuous run unless the full beat is asked for. The
+#: page does not read it from the payload: it is `CONTINUOUS.staticDwell` to `staticSettle` in
+#: `src/application.js`, copied here so the printed run time is the page's. Change both.
+STATIC_TIMING = {"dwell": 0.4, "move": 0.28, "correct": 0.12, "settle": 0.35}
 
 # The poster's badge vocabulary, exactly as composite-figure.json states it (glyph, style); the
 # star is `lower.first_proved_here`. A badge outside this set fails the build rather than being
@@ -175,7 +176,7 @@ BADGE_VOCABULARY = {
 }
 # SUMMARY_STAR_POINTS from packing/devtools/build_known_best_atlas.py: the five-pointed star the
 # poster draws as a polygon, apex up, about its own centre, with its inset and the span it fills
-# of a badge box. test_candidate.py checks these against the atlas source.
+# of a badge box. `check_candidate` checks these against the atlas source.
 STAR_POINTS = [
     (0, -6),
     (1.411, -1.942),
@@ -1615,26 +1616,49 @@ def summary_text(stats: list[dict]) -> str:
     lines.append("")
     lines.extend(block_summary_lines(kinds.get("matched", []), stats))
     lines.append("")
-    per_pair = TIMING["dwell"] + TIMING["move"] + TIMING["settle"]
-    total_seconds = per_pair * total + TIMING["dwell"]
-    lines.append(
-        f"Full 1..324 run at dwell {TIMING['dwell']} s, move {TIMING['move']} s, "
-        f"settle {TIMING['settle']} s: {total_seconds:.1f} s = {total_seconds / 60:.1f} min "
-        f"({total} transitions plus a closing dwell)"
-    )
-    static = sum(1 for s in stats if s["kind"] != "matched")
-    moving = total - static
-    for name, timing in STATIC_APPEND_TIMINGS.items():
-        static_pair = timing["dwell"] + timing["move"] + timing["settle"]
-        seconds = per_pair * moving + static_pair * static + TIMING["dwell"]
-        lines.append(
-            f"Per-kind schedule, static appends at dwell {timing['dwell']} s, "
-            f"move {timing['move']} s, settle {timing['settle']} s ({name}): "
-            # U+00D7 MULTIPLICATION SIGN: the character the summary prints.
-            f"{moving} × {per_pair:.1f} + {static} × {static_pair:.1f} + "  # noqa: RUF001
-            f"{TIMING['dwell']} = {seconds:.1f} s = {seconds / 60:.1f} min"
-        )
+    lines.extend(run_time_lines([s["kind"] for s in stats]))
     return "\n".join(lines)
+
+
+def beat_seconds(timing: dict[str, float]) -> float:
+    """One pair's duration: all four spans, as the page's `timingDuration` adds them."""
+    return sum(timing[span] for span in BEAT_SPANS)
+
+
+def spans_text(timing: dict[str, float]) -> str:
+    return ", ".join(f"{span} {timing[span]:g} s" for span in BEAT_SPANS)
+
+
+def run_time_lines(
+    kinds: list[str],
+    *,
+    timing: dict[str, float] = TIMING,
+    static_timing: dict[str, float] = STATIC_TIMING,
+) -> list[str]:
+    """How long a continuous run over pairs of these kinds lasts, at the timings the page plays.
+
+    The first line is the page's range duration at the default annealing level: a pair that
+    rearranges plays `timing`, a static append `static_timing`, and nothing follows the last
+    pair, whose dwell opens it. The second is the same run with the full beat for every pair.
+    """
+    static = sum(1 for kind in kinds if kind in STATIC_KINDS)
+    moving = len(kinds) - static
+    beat, static_beat = beat_seconds(timing), beat_seconds(static_timing)
+    seconds = moving * beat + static * static_beat
+    full = len(kinds) * beat
+    # U+00D7 MULTIPLICATION SIGN: the character the summary prints.
+    return [
+        (
+            f"A continuous run over all {len(kinds)} transitions, a pair that rearranges at "
+            f"{spans_text(timing)} and a static append at {spans_text(static_timing)}: "
+            f"{moving} × {beat:g} + {static} × {static_beat:g} = "  # noqa: RUF001
+            f"{seconds:.2f} s = {seconds / 60:.1f} min"
+        ),
+        (
+            f"With the full beat for every pair: {len(kinds)} × {beat:g} = "  # noqa: RUF001
+            f"{full:.2f} s = {full / 60:.1f} min"
+        ),
+    ]
 
 
 def block_summary_lines(matched: list[dict], stats: list[dict]) -> list[str]:
@@ -1806,10 +1830,8 @@ def main(argv: list[str] | None = None) -> int:
         "rotation_tolerance_deg": ROTATION_TOLERANCE_DEG,
         "crossing_distance": CROSSING_DISTANCE,
         # The build's own timings are deliberately NOT recorded here. They are a measurement of
-        # this machine on this run, and writing them into a tracked artifact made two runs
-        # differ in bytes -- against this generator's "two runs give identical bytes" -- and
-        # churned a file that `pages.yml` and `build_workbench_site.py` both declare as a
-        # render input.
+        # this machine on this run, and writing them into the record made two runs differ in
+        # bytes, against this generator's "two runs give identical bytes".
         # They are printed to stdout instead, where a measurement of the run belongs.
         "block_matching": {
             "cluster_angle_tol_deg": CLUSTER_ANGLE_TOL,

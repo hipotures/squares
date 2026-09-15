@@ -205,7 +205,8 @@ def main() -> int:
 
     if not o.page.exists():
         raise SystemExit(
-            f"{o.page} is not built: run `python -m devtools.build_workbench_site`"
+            f"{o.page} is not built: from `packing/`, run "
+            "`uv run --frozen --all-extras --group dev squares-workbench-build`"
         )
     sizes = tuple(o.sizes)
     out: dict[str, dict] = {}

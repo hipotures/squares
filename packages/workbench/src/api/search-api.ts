@@ -1,4 +1,4 @@
-import { parseUint32Seed } from "../core/runtime-contracts.ts";
+import { PACKING_VALIDITY, parseUint32Seed } from "../core/runtime-contracts.ts";
 import type { JsonObject, SearchPlan } from "../search/contracts.ts";
 import {
   PACK_SEARCH_CONFIGURATION_CONTRACT,
@@ -6,12 +6,34 @@ import {
 } from "../search/pack-runner.ts";
 import { decodeSearchPlan } from "../search/registry.ts";
 
+/** The source the page was built from, as its build stamped it. */
+export interface BrowserSearchSource {
+  commit: string;
+  dirty: boolean;
+}
+
 export interface BrowserSearchInputs {
   n: number;
   seeds: readonly number[];
   physicsSteps: number;
   proposal: "grid" | "random";
   repair: boolean;
+  /** Recorded in the plan; without it the plan says `unknown` and dirty. */
+  source?: BrowserSearchSource;
+}
+
+/**
+ * Read the source from the page's `squares-workbench-revision` and `squares-workbench-dirty`
+ * meta contents. A missing or empty revision is `unknown`; a dirty flag that is not exactly
+ * `false` counts as dirty, so a page never claims a clean source it cannot show.
+ */
+export function browserSearchSource(
+  revision: string | null,
+  dirty: string | null,
+): BrowserSearchSource {
+  const commit = revision === null || revision === "" ? "unknown" : revision;
+  // Without a revision nothing ties the plan to a source, so it can never read as clean.
+  return { commit, dirty: commit === "unknown" || dirty !== "false" };
 }
 
 /** A bounded, reproducible exploratory plan. It makes no research acceptance claim. */
@@ -78,13 +100,25 @@ export function createBrowserSearchPlan(inputs: BrowserSearchInputs): SearchPlan
       window: 20,
       stop: false,
     },
-    repair: inputs.repair ? { kind: "resolve", tolerance: 1e-8 } : { kind: "none" },
-    objective: { kind: "absolute-side", state: "best-observed", require_stationary: false },
+    repair: inputs.repair
+      ? { kind: "resolve", tolerance: PACKING_VALIDITY.penetrationTolerance }
+      : { kind: "none" },
+    // With Resolve requested the table ranks what Resolve returned, not the best raw sample.
+    objective: {
+      kind: "absolute-side",
+      state: inputs.repair ? "repaired" : "best-observed",
+      require_stationary: false,
+    },
   };
   const plan = decodeSearchPlan({
     contract: "packing.squares:SearchPlan/v1",
     id: `browser-n${inputs.n}-${inputs.proposal}-${inputs.repair ? "repair" : "raw"}-${inputs.physicsSteps}-${inputs.seeds.join("-")}`,
-    source: { commit: "unknown", dirty: true, runtime: "browser", engine: "pack/v1" },
+    source: {
+      commit: inputs.source?.commit ?? "unknown",
+      dirty: inputs.source?.dirty ?? true,
+      runtime: "browser",
+      engine: "pack/v1",
+    },
     configurations: [{ id: "browser-control", configuration }],
     cohorts: [
       {

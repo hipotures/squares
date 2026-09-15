@@ -341,17 +341,19 @@ on.
 It is not the next thing, because a reassessment of what to search is queued in front
 of it.
 
-For the next supervised exact-research goal, run BC-340 under `think-1ydi` as the due W5
-checkpoint and a separate pull request.
-The certified W10 planning block selected it after a conservative count reached OR-12’s
-eight-block ceiling.
-BC-340 measures the gate first and runs no scientific target.
+For the next supervised exact-research goal, run BC-354 under `think-0t5y` as a separate
+75-minute Route A admission pull request from the merged planning block.
+BC-353 selected one complete same-corner root at side `96/25`; admission must freeze the
+16-root physical denominator, all incidence strata, shared parent geometry, a matched
+baseline, exact controls, and an independent checker without running a scientific
+target. BC-341 remains blocked until that admission merges; Route S is the explicit
+fallback if the root or checker cannot be admitted within the block.
 The current evidence, candidate dispositions, and post-W5 scientific order are in the
 synopsis’s
 [Research Program Status and Roadmap](../../../../SYNOPSIS.md#research-program-status-and-roadmap),
 and
 [agenda-036](../../../../packing/campaign/agendas/agenda-036-n11-strategy-reset-roadmap.md)
-owns the disposition and the fresh scientific selection after W5.
+owns the disposition and scientific selection.
 
 ## Prior Exact-Research Handoff Record
 
