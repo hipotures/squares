@@ -1987,7 +1987,7 @@ def _exact_verification(context: Context) -> str:
     """The exact certificates, and a sampled stand-in for the grid replay among them.
 
     `_commands` runs its list in one process after another, so this step's wall is the
-    sum of fifteen subcommands and the gate's `--jobs` pool cannot see inside it. At
+    sum of seventeen subcommands and the gate's `--jobs` pool cannot see inside it. At
     `n=1..324` the step was 84.21s on an idle ten-cpu box (three readings, spread 0.7 per
     cent) and 133.4s on CI, where it was 70.6 per cent of a `checks` job that ran 189.09s
     against a 195s ceiling. One member grows with the corpus and it is the one that grew:
@@ -2136,7 +2136,7 @@ def _exact_grid_replay(context: Context) -> str:
     exactly.
 
     The cost is quadratic in the corpus's last `n`, which is why this one moved and the
-    fourteen fixed cases beside it did not: 2.75s at `n=1..100`, 12.65s at `n=1..200`,
+    sixteen fixed cases beside it did not: 2.75s at `n=1..100`, 12.65s at `n=1..200`,
     34.81s at `n=1..324`, all on the box `benchmarks/gate-cost-at-324/` names.
     """
     output = _module(context, "devtools.check_basic_bounds")

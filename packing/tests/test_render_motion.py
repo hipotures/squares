@@ -10,11 +10,15 @@ passes against the new one.
 from __future__ import annotations
 
 import math
+import re
+from dataclasses import replace
 from decimal import Decimal
+from itertools import pairwise
 from xml.etree import ElementTree as ET
 
 import pytest
 
+from sqpack.render import RenderSpec, ViewLevel, render_packing_svg
 from sqpack.render.model import (
     CheckKind,
     CheckSummary,
@@ -75,8 +79,11 @@ def test_a_rotating_trajectory_is_accepted_and_emits_its_rotation() -> None:
     validate_motion_trajectory(traj)
     css = square_keyframes(traj, 0, Decimal(100))
     assert "rotate(" in css
-    # 0.4 rad at the first frame against 0 at the last, negated for the drawing's y.
-    assert "rotate(-22.9" in css or "rotate(22.9" in css
+    # 0 rad at the first frame against 0.4 at the last, so the keyframe turns the square
+    # back by -0.4 rad, negated for the drawing's y: CSS turns clockwise for a positive
+    # angle, which is the way a counter-clockwise packing turn is undone on screen.
+    assert "rotate(22.9" in css
+    assert "rotate(-22.9" not in css
 
 
 def test_rotation_takes_the_short_way_round_a_quarter_turn() -> None:
@@ -91,8 +98,42 @@ def test_rotation_takes_the_short_way_round_a_quarter_turn() -> None:
     assert short_quarter_turn(Decimal("0.1")) == Decimal("0.1")
 
 
+def _rotations(css: str) -> list[Decimal]:
+    return [Decimal(value) for value in re.findall(r"rotate\((-?[0-9.]+)deg\)", css)]
+
+
+def test_rotation_unwraps_along_the_track_across_the_eighth_turn() -> None:
+    """Each step turns the short way from the step before it, not from the final pose.
+
+    Reducing every keyframe against the final angle on its own makes a track that crosses
+    45 degrees from it jump from +44 to -44 between neighbours, and CSS interpolates that
+    as 88 degrees of spin where the square turned two.
+    """
+    degrees = [50, 48, 46, 44, 42, 0]
+    angles = [math.radians(angle) for angle in degrees]
+    traj = _trajectory([(float(t), 4.0, [(1.0, 1.0, angle)]) for t, angle in enumerate(angles)])
+    turns = _rotations(square_keyframes(traj, 0, Decimal(100)))
+    assert len(turns) == len(degrees)
+    # Negated for the drawing's y, so a square starting 50 degrees counter-clockwise of its
+    # final pose starts 50 degrees clockwise on screen and turns back from there.
+    assert [round(turn, 9) for turn in turns] == [-50, -48, -46, -44, -42, 0]
+    to_degrees = Decimal(180) / Decimal(str(math.pi))
+    for index, (earlier, later) in enumerate(pairwise(turns)):
+        delta = _scalar(angles[index]).projected - _scalar(angles[index + 1]).projected
+        assert abs(earlier - later) <= 45
+        assert abs((earlier - later) + short_quarter_turn(delta) * to_degrees) < Decimal("1e-9")
+
+
+def _container_outlines(svg: str) -> list[str]:
+    return re.findall(r'<rect\b[^>]*data-feature="container-outline"[^>]*>', svg)
+
+
 def test_a_resizing_container_is_accepted() -> None:
-    """A changing side was refused, and the atlas ascent changes it at every step."""
+    """A changing side was refused, and the atlas ascent changes it at every step.
+
+    Accepted is not animated: the outline is drawn once, at the final frame's side, and no
+    container keyframes are emitted, so the drawing matches one whose side never changed.
+    """
     traj = _trajectory(
         [
             (0.0, 4.5, [(1.0, 1.0, 0.0)]),
@@ -100,6 +141,16 @@ def test_a_resizing_container_is_accepted() -> None:
         ]
     )
     validate_motion_trajectory(traj)
+    fixed = _trajectory([(0.0, 4.0, [(1.0, 1.0, 0.0)]), (1.0, 4.0, [(1.0, 1.0, 0.0)])])
+    spec = RenderSpec(view=ViewLevel.TRAJECTORY)
+    resizing_svg = render_packing_svg(traj.frames[-1], trajectory=traj, spec=spec)
+    fixed_svg = render_packing_svg(fixed.frames[-1], trajectory=fixed, spec=spec)
+    assert len(_container_outlines(resizing_svg)) == 1
+    # The outline rect alone cannot say which side it is drawn at, because the panel scale
+    # follows that side; equality with the fixed-side drawing can.
+    assert resizing_svg == fixed_svg
+    assert "motion-container" not in resizing_svg
+    assert "sqpack-container" not in resizing_svg
 
 
 def test_motion_still_refuses_what_it_cannot_draw() -> None:
@@ -166,3 +217,51 @@ def test_colour_is_muted_exactly_where_a_frame_is_not_a_packing() -> None:
     css = square_keyframes(settled, 0, Decimal(100), ((True,), (False,)))
     assert css.count("filter:saturate") == 1, "only the unchecked frame is muted"
     assert css.index("filter:saturate") < css.index("100%"), "and it is the first one"
+
+
+def test_muting_is_derived_from_locking_and_evidence_when_not_passed_in() -> None:
+    """With no mask given, a square is muted where it has not locked or nothing is checked.
+
+    The renderer calls `append_motion_styles` without a mask, so this derivation, not the
+    pass-in path above, is what every rendered trajectory's colour actually comes from.
+    """
+    checked = CheckSummary(
+        passed=True,
+        kind=CheckKind.NUMERICAL,
+        method="test",
+        arithmetic="binary64",
+        precision="53",
+        rounding="nearest-even",
+        tolerance="1e-9",
+    )
+    traj = _trajectory(
+        [
+            (0.0, 4.0, [(1.0, 1.0, 0.0), (2.5, 1.0, 0.0)]),
+            (1.0, 4.0, [(1.5, 1.0, 0.0), (2.5, 1.0, 0.0)]),
+        ]
+    )
+    first, last = traj.frames
+    unlocked = replace(last.squares[0], locked=False)
+    derived = replace(
+        traj,
+        frames=(
+            first,
+            replace(
+                last,
+                squares=(unlocked, last.squares[1]),
+                evidence=EvidenceTier.NUMERICALLY_CHECKED,
+                check=checked,
+            ),
+        ),
+    )
+    root = ET.Element("svg")
+    append_motion_styles(root, derived, scale=Decimal(100), duration_seconds=Decimal(4))
+    css = "".join(node.text or "" for node in root.iter())
+    blocks = re.findall(r"@keyframes sqpack-(square-[0-9]+)\{((?:[^{}]*\{[^}]*\})+)\}", css)
+    muted = {
+        square_id: ["filter:saturate(" in rule for rule in re.findall(r"%\{([^}]*)\}", body)]
+        for square_id, body in blocks
+    }
+    # The first frame is a CANDIDATE, so both squares are muted there; in the checked last
+    # frame only the square that says it has not locked stays muted.
+    assert muted == {"square-00": [True, True], "square-01": [True, False]}

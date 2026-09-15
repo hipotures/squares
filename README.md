@@ -261,7 +261,7 @@ relevant source audit.
 | [**Frontier**](packing/frontier/STATUS.md) | One record per case for `n = 1…324`, with reported and verified bounds kept separate |
 | [**Atlas**](packing/atlas/README.md) | Known-best and prospective packings, contact-scaffold enumeration, and deterministic renderings |
 | [**Literature**](packing/resources/README.md) | Retained primary sources, cleaned transcriptions, and raw extractions |
-| [**Reports**](#reports) | Eleven research reports on the mathematics, algorithms, infrastructure, formal proof, and search strategy |
+| [**Reports**](#reports) | Research reports on the mathematics, algorithms, infrastructure, formal proof, and search strategy |
 | [**Code and development guide**](development.md) | Exact verification, search, promotion, and the [validation tiers and behavioral lanes](development.md#validation-tiers) that gate every change |
 | [**Campaign record**](packing/campaign/README.md) | Hypotheses, preregistered experiments, session records, agendas, and generated ledger |
 | [**Defect log**](defects.md) | Generated record of defects, detection methods, fixes, and regressions |
@@ -663,7 +663,7 @@ review. [`epistemics.md`](epistemics.md) owns whole-result classifications.
 ├── development.md          Python setup, engineering boundaries, and validation
 ├── defects.md              Generated view of packing/defects.yaml
 ├── docs/project/           Reports, reviews, specs, postmortems, and dated handoffs
-├── docs/project/research/  The twelve research reports listed above
+├── docs/project/research/  The research reports listed above
 ├── packing/                Code, data, and the research record
 │   ├── campaign/           Hypotheses, experiments, sessions, agendas, and ledger
 │   ├── frontier/           Per-case claims, evidence, generated views, and results

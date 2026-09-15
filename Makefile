@@ -24,15 +24,6 @@ format:
 format-check:
 	$(FLOWMARK) --auto --check .
 
-## Install the git hooks. Run once after cloning.
-##
-## Pinned for the same reason FLOWMARK is pinned above: an unpinned zero-install
-## runner is what `tbd guidelines supply-chain-hardening` rule 6 warns against, and
-## it fails in a second way here. On 2026-08-27 the installed hook resolved lefthook
-## through a purged npx cache path, so every commit printed "Can't find lefthook in
-## PATH" and the format-markdown hook silently did nothing -- while AGENTS.md
-## promised that unformatted Markdown could not be committed by accident. 2.1.10 is
-## the version verified working here that day.
 ## Install the browser floor's pinned tools and the git hooks. Run once after cloning.
 ##
 ## `npm ci --ignore-scripts` installs exactly what package-lock.json pins -- lefthook,

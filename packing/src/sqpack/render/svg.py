@@ -11,7 +11,8 @@ from strif import atomic_output_file
 
 SVG_NS = "http://www.w3.org/2000/svg"
 SQPACK_NS = "https://github.com/jlevy/thinking-scratchpad/ns/sqpack/v1"
-RENDERER_VERSION = "7"
+# Bumped whenever rendered output bytes change for the same input (8: rotation unwrapping).
+RENDERER_VERSION = "8"
 XML_DECLARATION = '<?xml version="1.0" encoding="UTF-8"?>\n'
 MOTION_MARKER = "sqpack-motion-v1"
 MOTION_MEDIA_PREFIX = "@media (prefers-reduced-motion: no-preference){"

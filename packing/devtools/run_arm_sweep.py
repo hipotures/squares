@@ -111,34 +111,61 @@ def run_one(
     return [line for line in done.stdout.splitlines() if line.strip()]
 
 
-def verify(archive: Path) -> dict[str, Any]:
-    """Hand the archive to the independent pose oracle, in its own process."""
+def verify(archive: Path) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    """Hand the archive to the independent pose oracle, in its own process.
+
+    Returns the report and the oracle's per-pose verdicts. The verdicts are what the
+    statistics are computed from; the report is what the summary keeps.
+    """
     done = subprocess.run(
         [sys.executable, "-m", "sqpack.campaign.runner", "verify-archive", str(archive)],
         cwd=ROOT, capture_output=True, text=True, check=False,
     )  # fmt: skip
     lines = [line for line in done.stdout.splitlines() if line.strip()]
     if not lines:
-        return {"verified": False, "failures": [done.stderr.strip()[:400]], "poses_checked": 0}
+        failure = {
+            "verified": False,
+            "failures": [done.stderr.strip()[:400]],
+            "poses_checked": 0,
+        }
+        return failure, []
     report = json.loads(lines[-1])
     # The per-pose detail is large and already summarised by the fields beside it.
-    report.pop("poses", None)
-    return report
+    return report, report.pop("poses", None) or []
 
 
-def summarise(rows: list[dict[str, Any]], n: int) -> dict[str, Any]:
-    """Per-(arm, cell) statistics. Median and range together, or it is not a result."""
-    best_by_seed = sorted(row["seed_best"] for row in rows)
+def summarise(
+    rows: list[dict[str, Any]], n: int, verdicts: list[dict[str, Any]]
+) -> dict[str, Any]:
+    """Per-(arm, cell) statistics. Median and range together, or it is not a result.
+
+    Only sides whose pose the oracle accepted are counted. A seed's result is the minimum
+    over its admitted poses, a seed with none is left out of every statistic, and both
+    kinds of refusal are counted beside the numbers rather than silently dropped.
+    """
+    admitted: dict[int, float] = {}
+    rejected = 0
+    for pose in verdicts:
+        if int(pose["n"]) != n:
+            continue
+        if pose["valid"]:
+            seed = int(pose["seed"])
+            admitted[seed] = min(admitted.get(seed, math.inf), float(pose["best_side"]))
+        else:
+            rejected += 1
+    best_by_seed = sorted(admitted[row["seed"]] for row in rows if row["seed"] in admitted)
     record, source = frontier_best(n)
     gaps = [side - record for side in best_by_seed]
     return {
         "n": n,
         "seeds": len(best_by_seed),
-        "median_side": statistics.median(best_by_seed),
-        "best_side": best_by_seed[0],
-        "worst_side": best_by_seed[-1],
-        "median_gap": statistics.median(gaps),
-        "best_gap": min(gaps),
+        "rejected_poses": rejected,
+        "unadmitted_seeds": len(rows) - len(best_by_seed),
+        "median_side": statistics.median(best_by_seed) if best_by_seed else None,
+        "best_side": best_by_seed[0] if best_by_seed else None,
+        "worst_side": best_by_seed[-1] if best_by_seed else None,
+        "median_gap": statistics.median(gaps) if gaps else None,
+        "best_gap": min(gaps) if gaps else None,
         "record": record,
         "record_source": source,
         "grid": grid_side(n),
@@ -150,6 +177,33 @@ def summarise(rows: list[dict[str, Any]], n: int) -> dict[str, Any]:
         "moves": sum(row["moves"] for row in rows),
         "seconds": sum(row["seconds"] for row in rows),
     }
+
+
+def refusals(summary: dict[str, Any]) -> list[str]:
+    """Why this summary must not pass: an arm the oracle refused, or a run below record."""
+    problems: list[str] = []
+    for arm, body in summary["arms"].items():
+        for n, cell in body["cells"].items():
+            if not body["verification"]["verified"]:
+                problems.append(
+                    f"REFUSED: arm {arm} n={n}: the pose oracle did not verify the archive "
+                    f"({cell.get('rejected_poses', '?')} poses rejected, "
+                    f"{cell.get('unadmitted_seeds', '?')} seeds with no admitted pose)"
+                )
+            if cell["below_record_runs"] > 0:
+                problems.append(
+                    f"BELOW RECORD: arm {arm} n={n}: {cell['below_record_runs']} admitted runs "
+                    f"below the standing best {cell['record']} ({cell['record_source']})"
+                )
+    return problems
+
+
+def refused(summary: dict[str, Any]) -> int:
+    """Print every refusal to stderr, and return the exit status they amount to."""
+    problems = refusals(summary)
+    for problem in problems:
+        print(problem, file=sys.stderr)
+    return 1 if problems else 0
 
 
 def rows_from_archive(archive: Path) -> list[dict[str, Any]]:
@@ -187,7 +241,9 @@ def rebuild(plan_path: Path, out: Path) -> dict[str, Any]:
         "plan": str(plan_path),
         "label": plan["label"] + " (rebuilt from archives)",
         "engine": plan["engine"],
-        "gate": {"passed": True, "command": "rebuilt: the gate ran when the sweep ran"},
+        # The archives carry engine lines and nothing about the gate, so its result is not
+        # known here. `None` says so; `True` would be this tool asserting what it never saw.
+        "gate": {"passed": None, "command": "not recorded: rebuilt from archives alone"},
         "host": {
             "platform": platform.platform(),
             "cpu_count": os.cpu_count(),
@@ -206,21 +262,25 @@ def rebuild(plan_path: Path, out: Path) -> dict[str, Any]:
         if not archive.exists():
             continue
         rows = rows_from_archive(archive)
+        if not any(r["n"] in plan["cells"] for r in rows):
+            continue
+        verification, verdicts = verify(archive)
         cells = {
-            str(n): summarise([r for r in rows if r["n"] == n], n)
+            str(n): summarise([r for r in rows if r["n"] == n], n, verdicts)
             for n in plan["cells"]
             if any(r["n"] == n for r in rows)
         }
-        if not cells:
-            continue
         summary["arms"][arm] = {
             "flags": list(flags),
             "archive": shown(archive),
-            "verification": verify(archive),
+            "verification": verification,
             "runs": rows,
             "cells": cells,
         }
     return summary
+
+
+GATE_SHOWN = {True: "passed", False: "FAILED", None: "not recorded"}
 
 
 def render(summary: dict[str, Any]) -> str:
@@ -231,7 +291,7 @@ def render(summary: dict[str, Any]) -> str:
         f"Budget {summary['budget_pair_tests_per_chain']:.3g} pair tests per chain, "
         f"{summary['chains']} chains, {summary['threads']} threads, "
         f"seeds {summary['seeds']}. "
-        f"Engine gate: {'passed' if summary['gate']['passed'] else 'FAILED'}. "
+        f"Engine gate: {GATE_SHOWN[summary['gate']['passed']]}. "
         f"Load {summary['host']['loadavg_before'][0]:.1f} -> "
         f"{summary['host']['loadavg_after'][0]:.1f} on "
         f"{summary['host']['cpu_count']} cores."
@@ -267,6 +327,9 @@ def render(summary: dict[str, Any]) -> str:
             if c is None:
                 row.append("--")
                 continue
+            if c["median_side"] is None:
+                row.append(f"no admitted pose<br>({c.get('rejected_poses', '?')} rejected)")
+                continue
             row.append(
                 f"`{c['median_side']:.6f}`<br>`{c['best_side']:.6f}`<br>{c['median_gap']:+.2e}"
                 + ("" if c["seeds"] == len(summary["seeds"]) else f"<br>({c['seeds']} seeds)")
@@ -281,7 +344,8 @@ def render(summary: dict[str, Any]) -> str:
     for arm, body in summary["arms"].items():
         totals = [body["cells"][n] for n in cells if n in body["cells"]]
         checked = body["verification"]["poses_checked"]
-        verdict = "ok" if body["verification"]["verified"] else "REFUSED"
+        rejected = sum(c.get("rejected_poses", 0) for c in totals)
+        verdict = "ok" if body["verification"]["verified"] else f"REFUSED, {rejected} rejected"
         lines.append(
             f"| {arm} | {checked} {verdict}"
             f" | {sum(c['beat_grid_runs'] for c in totals)}"
@@ -310,6 +374,11 @@ def merged(paths: list[Path]) -> dict[str, Any]:
                 raise SystemExit(message)
     out = dict(head)
     out["arms"] = {arm: body for part in parts for arm, body in part["arms"].items()}
+    # The merged gate is only as good as its weakest part: one failure fails it, and one
+    # part whose gate was never recorded leaves the whole unrecorded.
+    gates = [part["gate"]["passed"] for part in parts]
+    passed = False if False in gates else None if None in gates else True
+    out["gate"] = {"passed": passed, "parts": [part["gate"] for part in parts]}
     out["host"] = dict(head["host"])
     out["host"]["loadavg_after"] = max(
         (part["host"]["loadavg_after"] for part in parts), key=lambda load: load[0]
@@ -350,10 +419,11 @@ def main(argv: list[str] | None = None) -> int:
             json.dumps(summary, indent=2, sort_keys=True) + "\n"
         )
         print(render(summary))
-        return 0
+        return refused(summary)
     if options.report:
-        print(render(merged([options.plan, *options.extra])))
-        return 0
+        summary = merged([options.plan, *options.extra])
+        print(render(summary))
+        return refused(summary)
     if options.out is None:
         parser.error("--out is required unless --report is given")
 
@@ -423,20 +493,22 @@ def main(argv: list[str] | None = None) -> int:
                         f"{elapsed:.1f}s",
                         file=sys.stderr,
                     )
+        verification, verdicts = verify(archive)
         summary["arms"][arm] = {
             "flags": list(flags),
             "archive": shown(archive),
-            "verification": verify(archive),
+            "verification": verification,
             "runs": rows,
             "cells": {
-                str(n): summarise([r for r in rows if r["n"] == n], n) for n in plan["cells"]
+                str(n): summarise([r for r in rows if r["n"] == n], n, verdicts)
+                for n in plan["cells"]
             },
         }
 
     summary["host"]["loadavg_after"] = os.getloadavg()
     (out / "summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n")
-    print(json.dumps({"wrote": str((out / "summary.json").relative_to(REPO))}))
-    return 0
+    print(json.dumps({"wrote": shown(out / "summary.json")}))
+    return refused(summary)
 
 
 if __name__ == "__main__":

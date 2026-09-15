@@ -40,7 +40,7 @@ experiment:
     entry_point: devtools/run_arm_sweep.py
     command: python3 devtools/run_arm_sweep.py plan-part-2.yaml --out part-2
     budget: 1.25e9 pair tests per chain, 8 chains, 5 seeds, 11 cells
-    record: campaign/series/series-000-smoke-and-calibration/results/exp-202-round-1/
+    record: packing/campaign/series/series-000-smoke-and-calibration/results/exp-202-round-1/
   effort:
     timebox: 3h
     wall_seconds: 4281.0
@@ -233,9 +233,11 @@ measurement puts at `0.0000` for `n >= 26`.
   schedule `1.024` to `1.31`, and specifically `1.024` at `n = 11`, `1.024` at `n = 17`
   and `1.12` at `n = 26` — the three cells that decide this round.
   Those are close enough that the verdict stands.
-  The both-factors arm is not so clean: `1.31` at `n = 17`, `2.13` at `n = 37` and
-  `3.92` at `n = 50`, so its `n = 37` and `n = 50` results are **not** at equal budget
-  and are reported as observations rather than as comparisons.
+  The both-factors arm is not so clean: `1.31` at `n = 17`, `1.30` at `n = 29`, `2.13`
+  at `n = 37`, `3.92` at `n = 50` and `4.24` at `n = 52`, though its `n = 29` and
+  `n = 52` cells stayed on the grid on every seed.
+  Its `n = 37` and `n = 50` results are **not** at equal budget and are reported as
+  observations rather than as comparisons.
   The fix is to test the budget inside the anneal loop rather than between restarts, and
   it belongs in round 2 before any of this is re-run.
 - One alternative length.

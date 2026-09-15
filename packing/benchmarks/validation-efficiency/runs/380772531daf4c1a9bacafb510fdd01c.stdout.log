@@ -1,0 +1,6 @@
+.                                                                        [100%]
+============================== slowest durations ===============================
+2.03s call     benchmarks/test_pr_rollup_timing.py::test_complete_rollup_corpus_renders
+0.00s teardown benchmarks/test_pr_rollup_timing.py::test_complete_rollup_corpus_renders
+0.00s setup    benchmarks/test_pr_rollup_timing.py::test_complete_rollup_corpus_renders
+1 passed in 2.05s

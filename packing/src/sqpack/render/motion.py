@@ -76,7 +76,8 @@ def validate_motion_trajectory(trajectory: PackingTrajectory) -> None:
     squares 40.2 degrees apart, and an ascent that adds one square per step resizes the
     container at every step by construction. What remains are the two things the keyframe
     emitters genuinely require -- a pose on every square, and time that does not run
-    backwards.
+    backwards. A changing side is accepted, but the container outline is drawn once at
+    the final frame's side and does not animate.
     """
     for track in match_square_tracks(trajectory):
         if any(len(square.corners) < 2 for square in track):
@@ -107,16 +108,25 @@ def square_keyframes(
     muted: tuple[tuple[bool, ...], ...] | None = None,
 ) -> str:
     percentages = keyframe_percentages(tuple(frame.logical_time for frame in trajectory.frames))
-    final_x, final_y, final_angle = pose_of(trajectory.frames[-1].squares[square_index])
+    final_x, final_y, _final_angle = pose_of(trajectory.frames[-1].squares[square_index])
+    # Unwrapped along the track, backwards from the final pose, rather than each frame
+    # reduced against the final angle on its own. The independent reduction flips from
+    # +44 to -44 degrees where a track crosses an eighth turn from the final pose, and CSS
+    # interpolates that as 88 degrees of spin where the square turned two.
+    angles = [pose_of(frame.squares[square_index])[2] for frame in trajectory.frames]
+    turns = [Decimal(0)]
+    for later_angle, angle in pairwise(reversed(angles)):
+        turns.append(turns[-1] + short_quarter_turn(angle - later_angle))
+    turns.reverse()
     rules = []
-    for percentage, frame in zip(percentages, trajectory.frames, strict=True):
-        px, py, angle = pose_of(frame.squares[square_index])
+    for percentage, frame, unwrapped in zip(percentages, trajectory.frames, turns, strict=True):
+        px, py, _angle = pose_of(frame.squares[square_index])
         dx = (px - final_x) * scale
         dy = -(py - final_y) * scale
         # Negated for the same reason dy is: the drawing's y runs down while the
         # mathematics runs up, so a counter-clockwise turn in the packing is a clockwise
         # one on screen.
-        turn = -short_quarter_turn(angle - final_angle)
+        turn = -unwrapped
         degrees = turn * 180 / Decimal(str(math.pi))
         # Per square AND per frame, because locking is a property of one square at one
         # moment: the corner squares settle first and take their colour while the tilted

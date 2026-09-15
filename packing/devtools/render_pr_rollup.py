@@ -44,6 +44,7 @@ import subprocess
 import sys
 from collections import Counter, defaultdict
 from collections.abc import Sequence
+from dataclasses import dataclass, field
 from datetime import date, datetime
 from pathlib import Path
 
@@ -62,6 +63,25 @@ CLAUDE_CONTRACT = "packing.squares:ClaudeEfficiencyRollup/v1"
 CODEX_CONTRACT = "packing.squares:CodexTaskTreeDelta/v1"
 
 
+@dataclass(frozen=True)
+class ResourceDocument:
+    contract: str | None
+    rollup: dict
+    path: Path
+    document: dict
+
+
+@dataclass
+class RollupCorpus:
+    """One immutable input snapshot, plus its invocation-local validation cache."""
+
+    documents: tuple[ResourceDocument, ...]
+    sessions: tuple[dict, ...]
+    codex_by_reference: dict[str, ResourceDocument]
+    claims: dict[str, dict[str, set[str]]]
+    validated_codex: set[str] = field(default_factory=set)
+
+
 def current_branch() -> str:
     result = subprocess.run(
         ["git", "rev-parse", "--abbrev-ref", "HEAD"],
@@ -73,7 +93,7 @@ def current_branch() -> str:
     return result.stdout.strip()
 
 
-def resource_documents() -> list[tuple[str | None, dict, Path]]:
+def resource_documents() -> list[ResourceDocument]:
     """Load retained resource receipts without pretending their shapes are unified."""
     found = []
     for path in sorted(USAGE.glob("*.yaml")):
@@ -84,7 +104,7 @@ def resource_documents() -> list[tuple[str | None, dict, Path]]:
         rollup = document.get("rollup") or document
         if not isinstance(rollup, dict):
             continue
-        found.append((meta.get("contract"), rollup, path))
+        found.append(ResourceDocument(meta.get("contract"), rollup, path, document))
     return found
 
 
@@ -95,14 +115,33 @@ def resource_reference(path: Path) -> str:
     return f"packing/campaign/resource-usage/{path.name}"
 
 
-def rollups() -> list[dict]:
+def load_corpus() -> RollupCorpus:
+    """Parse each retained input once for one renderer invocation."""
+    documents = tuple(resource_documents())
+    sessions = tuple(session_payloads())
+    codex_by_reference = {
+        resource_reference(item.path): item
+        for item in documents
+        if item.contract == CODEX_CONTRACT
+    }
+    claims = codex_branch_claims(sessions, set(codex_by_reference))
+    conflicts = [reference for reference, branches in claims.items() if len(branches) > 1]
+    if conflicts:
+        name = Path(min(conflicts)).name
+        raise ValueError(f"{name} is attributed to more than one branch")
+    return RollupCorpus(documents, sessions, codex_by_reference, claims)
+
+
+def rollups(corpus: RollupCorpus | None = None) -> list[dict]:
     """Claude records retain harness-observed branch attribution."""
     found = []
-    for contract, rollup, path in resource_documents():
-        if contract != CLAUDE_CONTRACT:
+    documents = corpus.documents if corpus is not None else tuple(resource_documents())
+    for item in documents:
+        if item.contract != CLAUDE_CONTRACT:
             continue
-        rollup["_name"] = path.name
-        found.append(rollup)
+        record = dict(item.rollup)
+        record["_name"] = item.path.name
+        found.append(record)
     return found
 
 
@@ -120,36 +159,31 @@ def session_payloads() -> list[dict]:
     return found
 
 
-def codex_receipts(session_id: str | None, branch: str) -> list[dict]:
+def codex_receipts(
+    session_id: str | None,
+    branch: str,
+    corpus: RollupCorpus | None = None,
+) -> list[dict]:
     """Return distinct intervals declared for a branch, with their session claimants."""
-    payloads = session_payloads()
+    active = corpus or load_corpus()
+    payloads = active.sessions
     if session_id is not None:
         matches = [payload for payload in payloads if payload.get("id") == session_id]
         if len(matches) != 1 or matches[0].get("branch") != branch:
             return []
 
-    documents = {
-        resource_reference(path): (rollup, path)
-        for contract, rollup, path in resource_documents()
-        if contract == CODEX_CONTRACT
-    }
-    claims = codex_branch_claims(payloads, set(documents))
-    conflicts = [reference for reference, branches in claims.items() if len(branches) > 1]
-    if conflicts:
-        name = Path(min(conflicts)).name
-        raise ValueError(f"{name} is attributed to more than one branch")
-
     retained = []
-    for reference, branches in sorted(claims.items()):
+    for reference, branches in sorted(active.claims.items()):
         claimants = sorted(branches.get(branch, set()))
         if not claimants or (session_id is not None and session_id not in claimants):
             continue
-        rollup, path = documents[reference]
-        document = safe_load(path.read_text(encoding="utf-8"))
-        if problems := validate_delta_document(document):
-            raise ValueError(f"{path.name} fails semantic validation: {problems[0]}")
-        record = dict(rollup)
-        record["_name"] = path.name
+        item = active.codex_by_reference[reference]
+        if reference not in active.validated_codex:
+            if problems := validate_delta_document(item.document):
+                raise ValueError(f"{item.path.name} fails semantic validation: {problems[0]}")
+            active.validated_codex.add(reference)
+        record = dict(item.rollup)
+        record["_name"] = item.path.name
         record["_claimants"] = claimants
         retained.append(record)
     return retained
@@ -422,16 +456,22 @@ def section_codex(records: list[dict], branch: str) -> list[str]:
     return lines
 
 
-def render(branch: str, session_id: str | None = None) -> str:
+def render(
+    branch: str,
+    session_id: str | None = None,
+    *,
+    corpus: RollupCorpus | None = None,
+) -> str:
+    active = corpus or load_corpus()
     exact, mixed = [], []
-    for record in rollups():
+    for record in rollups(active):
         by_branch = record["turns"].get("by_branch") or {}
         here = by_branch.get(branch, 0)
         if not here:
             continue
         (exact if here == record["turns"]["assistant"] else mixed).append(record)
 
-    codex = codex_receipts(session_id, branch)
+    codex = codex_receipts(session_id, branch, active)
     if not exact and not mixed and not codex:
         return f"No rollup records any turn on `{branch}`.\n"
 
@@ -777,12 +817,13 @@ def render_description(branch: str, agenda_id: str, session_id: str | None = Non
     return render(branch) + render_agenda_results(agenda) + render_agenda_closeout(agenda)
 
 
-def branches() -> list[str]:
+def branches(*, corpus: RollupCorpus | None = None) -> list[str]:
     """Every branch any rollup has turns on, so `--check` exercises the real shapes."""
+    active = corpus or load_corpus()
     found: set[str] = set()
-    for record in rollups():
+    for record in rollups(active):
         found.update((record["turns"].get("by_branch") or {}).keys())
-    for payload in session_payloads():
+    for payload in active.sessions:
         branch = payload.get("branch")
         if isinstance(branch, str) and branch:
             found.add(branch)
@@ -815,10 +856,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     try:
         if args.check:
             # Rendering every branch exercises both harness records and the retained corpus.
-            checked_names = branches()
+            corpus = load_corpus()
+            checked_names = branches(corpus=corpus)
             for name in checked_names:
-                render(name)
-            render("a-branch-no-rollup-mentions")
+                render(name, corpus=corpus)
+            render("a-branch-no-rollup-mentions", corpus=corpus)
             for path in sorted(AGENDAS.glob("agenda-*.md")):
                 document = safe_load(path.read_text(encoding="utf-8").split("---\n")[1])
                 agenda = document.get("agenda") if isinstance(document, dict) else None

@@ -219,6 +219,33 @@ def board_ids() -> tuple[set[str], set[str]] | None:
     return set(re.findall(r"\bH-[0-9]{3}\b", text)), declared
 
 
+def idea_number_collisions(text: str) -> list[str]:
+    """Idea numbers that more than one row of the board claims.
+
+    Two branches can each take the next free number, and a merge keeps both rows. The
+    id reconciliation cannot see it, because the rows name different hypotheses; main
+    and the annealing branch shared ideas 119 to 123 through two merges this way.
+    A row counts when it sits under a table header whose first cell is `#`, including a
+    row the formatter split away from its table, until the next header or heading.
+    """
+    rows: Counter[str] = Counter()
+    lines = text.splitlines()
+    in_board = False
+    for index, line in enumerate(lines):
+        following = lines[index + 1] if index + 1 < len(lines) else ""
+        if line.startswith("#"):
+            in_board = False
+        elif line.startswith("|") and re.match(r"\|\s*:?-{3,}", following):
+            in_board = re.match(r"\|\s*#\s*\|", line) is not None
+        elif in_board and (row := re.match(r"\|\s*(\d+[a-z]?)\s*\|", line)):
+            rows[row.group(1)] += 1
+    return [
+        f"ideas.md: idea {number} is numbered on {count} rows"
+        for number, count in rows.items()
+        if count > 1
+    ]
+
+
 def naming(
     series,
     explorations,
@@ -815,6 +842,7 @@ def check(  # noqa: C901 - a flat list of record invariants, each a few lines; s
             problems.append(
                 f"ideas.md: {hypothesis_id} is reserved, so it must not be a link target"
             )
+        problems += idea_number_collisions(IDEAS.read_text())
 
     # Cross-field verdict rules. These could be `allOf` conditionals in the schema
     # (softschema 0.8.0 lifted the old 0.6.2 refusal), and stay here by the

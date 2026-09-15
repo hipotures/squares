@@ -81,6 +81,40 @@ pub struct Params {
     pub max_restarts: u64,
 }
 
+impl Params {
+    /// Refuse arm settings that would run something other than what they name.
+    ///
+    /// The guards in `anneal` turn an arm on only for a probability above zero, or for a
+    /// pressure ramp positive at both ends. So `--mu0` alone silently runs the control
+    /// under a pressure label, an infinite ramp freezes the chain, and a NaN probability
+    /// switches the arm off. Each is refused here, before any number is printed.
+    pub fn check_arms(&self) -> Result<(), String> {
+        if !(0.0..=1.0).contains(&self.p_perturb) {
+            return Err(format!(
+                "--p-perturb must be in [0, 1], got {}",
+                self.p_perturb
+            ));
+        }
+        if !(self.perturb_scale.is_finite() && self.perturb_scale > 0.0) {
+            return Err(format!(
+                "--perturb-scale must be finite and positive, got {}",
+                self.perturb_scale
+            ));
+        }
+        let off = self.mu0 == 0.0 && self.mu1 == 0.0;
+        let on = [self.mu0, self.mu1]
+            .iter()
+            .all(|mu| mu.is_finite() && *mu > 0.0);
+        if !(off || on) {
+            return Err(format!(
+                "--mu0 and --mu1 must both be zero or both finite and positive, got {} and {}",
+                self.mu0, self.mu1
+            ));
+        }
+        Ok(())
+    }
+}
+
 impl Default for Params {
     fn default() -> Self {
         Params {
