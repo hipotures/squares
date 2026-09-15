@@ -30,8 +30,31 @@ function hostWith(final: Pose[], pairN = final.length - 1): WorkbenchApiHost {
       annealSpan: 1.15,
     }),
     state: () => ({ blindInflate: 1, timing: { ...TIMING } }),
-  } as unknown as AtlasTransitions;
-  return { atlasTransitions: api };
+  };
+  // Like the page, which opens on Pack: the catalogue API refuses every call but `setMode` and
+  // `mode` until Animate owns the page.
+  let view = "pack";
+  const guarded = new Proxy(api, {
+    get(target, property, receiver) {
+      if (property === "setMode") {
+        return (next: string) => {
+          view = next;
+          return view;
+        };
+      }
+      if (property === "mode") {
+        return () => view;
+      }
+      const member: unknown = Reflect.get(target, property, receiver);
+      if (typeof member === "function" && view !== "animate") {
+        return () => {
+          throw new Error("atlasTransitions controls catalogue animation");
+        };
+      }
+      return member;
+    },
+  });
+  return { atlasTransitions: guarded as unknown as AtlasTransitions };
 }
 
 test("the benchmark guard refuses a missing API and accepts a loaded one", () => {

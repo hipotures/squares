@@ -133,8 +133,20 @@ function resolveOverlaps(poses: readonly Pose[]): { poses: Pose[]; sweeps: numbe
   return { poses: resolved, sweeps };
 }
 
-function requiredApi(host: WorkbenchApiHost): AtlasTransitions {
+/**
+ * The catalogue API, with Animate owning the page. The page opens on Pack, and until Animate
+ * owns it the catalogue API refuses every call but `setMode` and `mode`.
+ */
+function catalogueApi(host: WorkbenchApiHost): AtlasTransitions | undefined {
   const api = host.atlasTransitions;
+  if (api !== undefined && typeof api.setMode === "function" && api.mode() !== "animate") {
+    api.setMode("animate");
+  }
+  return api;
+}
+
+function requiredApi(host: WorkbenchApiHost): AtlasTransitions {
+  const api = catalogueApi(host);
   if (api === undefined) {
     throw new Error("the page has no workbench API");
   }
@@ -143,7 +155,7 @@ function requiredApi(host: WorkbenchApiHost): AtlasTransitions {
 
 /** Verify that a loaded page exposes a nonempty, seeded workbench API. */
 export function guard(host: WorkbenchApiHost = browserHost()): GuardResult {
-  const api = host.atlasTransitions;
+  const api = catalogueApi(host);
   if (api === undefined || typeof api.physics !== "function") {
     return { ok: false, why: "no page API" };
   }
