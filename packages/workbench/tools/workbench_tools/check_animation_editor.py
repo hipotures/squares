@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import tempfile
 from pathlib import Path
@@ -79,14 +80,33 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
         )
 
         # 6 -> 7 fills the last row of a 3 x 3 grid; 4 -> 5 tilts its squares.
-        simple_index, moving_index = 5, 3
+        into = {pair["n"] + 1: index for index, pair in enumerate(call("pairs"))}
+        simple_index, moving_index = into[7], into[5]
         toggle = page.locator("#fastsimple-toggle")
         require(toggle.is_checked(), "simple transitions are not sped up by default")
+        # The census, observed as the steps whose duration halves. A simple step lies inside
+        # k^2 - k .. k^2 - 1 for k = ceil(sqrt(n + 1)), and that range holds 170 steps of the
+        # corpus; eleven of them change the container, because their best packing is tilted, and
+        # play at full length. So 159 play sped up, and the page's own count agrees.
+        def grid_fill_range(n: int) -> bool:
+            k = math.isqrt(n) + 1  # ceil(sqrt(n + 1))
+            return k * k - k <= n <= k * k - 1
+
+        census = page.evaluate(probe("animate/sped-pairs"))
+        sped = {row["n"] for row in census if row["sped"]}
+        in_range = {row["n"] for row in census if grid_fill_range(row["n"])}
+        full_length = {110, 132, 156, 182, 210, 240, 241, 272, 273, 306, 307}
+        require(
+            call("continuous")["simplePairs"] == len(sped) == 159
+            and sped == in_range - full_length,
+            f"the simple steps are not the 159 grid fills: page count "
+            f"{call('continuous')['simplePairs']}, sped up {len(sped)}, outside the range "
+            f"{sorted(sped - in_range)}, missing {sorted(in_range - full_length - sped)}",
+        )
         fast = [call("duration", simple_index), call("duration", moving_index)]
         toggle.click()
         playback = call("continuous")
         require(not playback["fastSimple"], "unchecking did not turn the speed-up off")
-        require(playback["simplePairs"] > 0, "the page found no simple transitions")
         full = [call("duration", simple_index), call("duration", moving_index)]
         require(
             abs(full[0] - 2 * fast[0]) < 1e-9,
@@ -128,35 +148,20 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
         # leaving a trace at 3.707, clears that trace before the new square arrives, and
         # settles at 3.877 with a trace outside at 4. 6 -> 7 is a grid fill, where the box
         # never changes size.
-        trace, box = page.locator("#bound-trace"), page.locator("#bound-box")
-
         def at(seconds: float) -> tuple[float, float, float]:
             call("seek", seconds)
-            return (
-                float(trace.get_attribute("width") or "nan"),
-                float(box.get_attribute("width") or "nan"),
-                float(trace.get_attribute("opacity") or "nan"),
-            )
-
-        met = page.evaluate(
-            "getComputedStyle(document.documentElement).getPropertyValue('--met').trim()"
-        )
-        pointer = page.locator("#gapbar-box")
+            drawn = page.evaluate(probe("stage/box-state"))
+            return drawn["trace"], drawn["box"], drawn["traceOpacity"]
 
         def locked() -> tuple[bool, bool]:
-            return (
-                box.get_attribute("stroke") == met,
-                "is-locked" in (pointer.get_attribute("class") or "").split(),
-            )
+            drawn = page.evaluate(probe("stage/box-state"))
+            return drawn["green"], drawn["pointerLocked"]
 
         require(
-            page.evaluate(
-                "document.getElementById('bound-trace').nextElementSibling"
-                " === document.getElementById('bound-box')"
-            ),
+            page.evaluate(probe("stage/box-state"))["boxOverTrace"],
             "the box is not drawn over its trace",
         )
-        call("select", 9)
+        call("select", into[11])
         step = call("schedule")
         span = step["moveEnd"] - step["moveStart"]
         rest = at(0)
@@ -174,7 +179,8 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
             f"the box did not grow to 4 over a trace of where it was: {grown}",
         )
         require(
-            locked() == (False, False) and box.get_attribute("stroke") == "#000000",
+            locked() == (False, False)
+            and page.evaluate(probe("stage/box-state"))["boxStroke"] == "#000000",
             f"the growing box or its pointer is not black: {locked()}",
         )
         cleared = at(step["moveStart"] + 0.32 * span)
@@ -186,7 +192,7 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
         require(
             arriving == "0", f"the new square appeared before the box was ready: {arriving}"
         )
-        settled = at(call("duration", 9))
+        settled = at(call("duration", into[11]))
         require(
             abs(settled[0] - 4) < 1e-9
             and abs(settled[1] - 3.87708359) < 1e-6
@@ -194,16 +200,13 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
             f"n = 11 does not settle at 3.877 inside a trace at 4: {settled}",
         )
         require(locked() == (True, True), f"n = 11 settled is not locked green: {locked()}")
-        record_x = float(page.locator("#gapbar-record-rule").get_attribute("x1") or "nan")
-        pointer_x = page.evaluate(
-            "document.getElementById('gapbar-box').transform.baseVal.consolidate().matrix.e"
-        )
+        drawn = page.evaluate(probe("stage/box-state"))
         require(
-            abs(pointer_x - record_x) < 0.02,
-            f"the pointer is not over the best known side: {pointer_x} against {record_x}",
+            drawn["pointerX"] is not None and abs(drawn["pointerX"] - drawn["recordX"]) < 0.02,
+            f"the pointer is not over the best known side: {drawn}",
         )
-        call("select", 5)
-        fill = at(call("duration", 5))
+        call("select", simple_index)
+        fill = at(call("duration", simple_index))
         require(fill[0] == fill[1] == 3, f"a grid fill changed the box: {fill}")
 
         # Green means one thing. The box locks, and its pointer with it, only where it rests at
@@ -212,7 +215,6 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
         # does not change size stays green. Every step rests locked in its dwell and at its end.
         # Swept over every step under the tween, and under physics at the steps into 6 and 12,
         # where the moving container breathes past the record.
-        into = {pair["n"] + 1: index for index, pair in enumerate(call("pairs"))}
         sweeps = [
             ("tween", None, [0.1, 0.21, 0.25, 0.5, 0.9]),
             ("physics", [into[6], into[12]], [0.25, 0.5, 0.9]),

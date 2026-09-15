@@ -35,16 +35,14 @@ def check(page_path: Path) -> str:
             if not condition:
                 raise ValueError(message)
 
+        def layout(view: Page) -> dict[str, Any]:
+            return view.evaluate(probe("layout/separator"), {"key": KEY})
+
         def stage_height(view: Page) -> float:
-            return float(view.evaluate("document.getElementById('stage-wrap').offsetHeight"))
+            return float(layout(view)["stageHeight"])
 
         def fits(view: Page) -> bool:
-            return bool(
-                view.evaluate(
-                    "document.getElementById('controls').getBoundingClientRect().bottom"
-                    " <= window.innerHeight + 1"
-                )
-            )
+            return bool(layout(view)["controlsFit"])
 
         require(handle.get_attribute("role") == "separator", "the handle is not a separator")
         require(
@@ -83,8 +81,7 @@ def check(page_path: Path) -> str:
         )
         require(fits(page), "the controls overflow the window after a drag")
         require(
-            not page.evaluate("document.body.classList.contains('resizing')"),
-            "the page is still marked as resizing after the drag",
+            not layout(page)["resizing"], "the page is still marked as resizing after the drag"
         )
 
         def call(*calls: list[Any]) -> Any:
@@ -135,16 +132,39 @@ def check(page_path: Path) -> str:
             abs(restored - shifted) <= 2,
             f"a reload did not keep the stage at {shifted}, it came back at {restored}",
         )
+
+        # A chosen share is re-clamped whenever the window changes, and kept. End stores the
+        # largest share, 944 of 1000 px; in a 600 px window that share would leave the controls
+        # 34 px, so the stage stops at 600 - 56 = 544, and the separator reports the new range.
+        # Back at 1000 px the stored share, not the clamped height, comes back.
+        handle.focus()
+        page.keyboard.press("End")
+        tallest = layout(page)
+        page.set_viewport_size({"width": 1440, "height": 600})
+        page.wait_for_timeout(200)
+        short = layout(page)
+        require(
+            abs(short["stageHeight"] - 544) <= 2
+            and short["controlsFit"]
+            and short["valueMax"] == 544
+            and abs(short["valueNow"] - short["stageHeight"]) <= 1,
+            f"a 600 px window did not re-clamp the stage to 544: {short}",
+        )
+        page.set_viewport_size({"width": 1440, "height": 1000})
+        page.wait_for_timeout(200)
+        again = layout(page)
+        require(
+            abs(again["stageHeight"] - tallest["stageHeight"]) <= 2
+            and again["stored"] == tallest["stored"],
+            f"the clamp overwrote the chosen share: {tallest} then {again}",
+        )
         page.locator("#stage-resize").dblclick()
         reset = stage_height(page)
         require(
             abs(reset - automatic) <= 2,
             f"double-click did not return to the automatic {automatic}: {reset}",
         )
-        require(
-            page.evaluate(f"window.localStorage.getItem({KEY!r})") is None,
-            "double-click did not forget the stored share",
-        )
+        require(layout(page)["stored"] is None, "double-click did not forget the stored share")
         page.locator("#mode-search").click()
         require(not handle.is_visible(), "the separator shows over Search")
         page.locator("#mode-animate").click()
@@ -153,7 +173,8 @@ def check(page_path: Path) -> str:
         browser.close()
     return (
         "stage separator drag, arrows, Home and End with the step and an imported animation "
-        "left where they were, reload persistence, double-click reset and Search hiding"
+        "left where they were, reload persistence, re-clamping in a shorter window, "
+        "double-click reset and Search hiding"
     )
 
 

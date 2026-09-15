@@ -78,10 +78,15 @@ test("a simple transition keeps an axis-aligned grid in the same container", () 
   assert.ok(!isSimpleTransition(frame(3, [0, 0]), frame(4, [0, 0, 0])), "the container grew");
   assert.ok(!isSimpleTransition(frame(3, [0, 0.0001]), frame(3, [0, 0, 0])), "a tilted source");
   assert.ok(!isSimpleTransition(frame(3, [0, 0]), frame(3, [0, 0, 44.9])), "a tilted target");
+  // The tolerance sits between a float residue and the catalogue's smallest real tilt, 1e-4
+  // degrees off a right angle (at n = 105).
+  assert.ok(isSimpleTransition(frame(3, [1e-7, 90 - 1e-7]), frame(3, [-1e-7, 360, 0])));
+  assert.ok(!isSimpleTransition(frame(3, [0, 89.9999]), frame(3, [0, 0, 0])), "1e-4 off 90");
+  assert.ok(!isSimpleTransition(frame(3, [0, 0]), frame(3, [0, 0, -1e-4])), "1e-4 off 0");
+  // The fixture's one step, 1 -> 2, grows the container from 1 to 2, so it plays at full length.
   const corpus = decodeCorpus(fixture());
   const first = pairAt(corpus, 0);
-  assert.equal(
-    isSimpleTransition(frameAt(corpus, first.n), frameAt(corpus, first.n + 1)),
-    frameAt(corpus, first.n).side === frameAt(corpus, first.n + 1).side,
-  );
+  const [source, target] = [frameAt(corpus, first.n), frameAt(corpus, first.n + 1)];
+  assert.deepEqual([first.n, source.side, target.side], [1, 1, 2]);
+  assert.equal(isSimpleTransition(source, target), false);
 });

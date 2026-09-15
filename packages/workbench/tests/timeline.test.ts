@@ -70,7 +70,6 @@ test("simple transitions play every phase at double speed only while the setting
   const full = [0, 1, 2, 3].map((index) => pairDuration(config, index, "tween"));
   const fullSequence = sequenceDuration(config, "tween");
   config.fastSimple = true;
-  assert.equal(SIMPLE_TRANSITION_SPEED, 2);
   assert.deepEqual(
     [0, 1, 2, 3].map((index) => isSpedUpPair(config, index)),
     [true, false, true, false],
