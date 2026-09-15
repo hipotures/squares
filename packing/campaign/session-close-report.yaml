@@ -7,11 +7,11 @@ softschema:
   schema: schemas/session-close-report.schema.yaml
   envelope: null
   status: enforced
-count: 130
+count: 132
 generated_by: >-
   uv run --frozen --all-extras --group dev python -m devtools.close_session --render
 totals:
-  sessions_measured: 82
+  sessions_measured: 84
   sessions_unmeasured: 48
   attributed:
     rollups: 129
@@ -35,9 +35,9 @@ totals:
     one_off_code: 4407
     wall_hours: 421.83
 codex_receipts:
-  attributed: 50
+  attributed: 52
   unattributed: 2
-  measured: 52
+  measured: 54
 # Per-session figures below are the logs each session DECLARES. They overlap when
 # sessions share a harness log, so they do not sum to `attributed` above.
 sessions:
@@ -2161,3 +2161,43 @@ sessions:
     native harness data unavailable; The collaboration harness exposed the three delegated reviews but no native task-tree resource receipt or log identifier from which a repository roll-up can be generated.
   rollups: []
   codex_receipts: []
+- id: session-131
+  title: "N11 W5 Validation Efficiency"
+  status: stopped
+  primary_bead: think-1ydi
+  phases: 1
+  measured: true
+  rollups:
+  - packing/campaign/resource-usage/codex-task-tree-session-131.yaml
+  turns: null
+  tool_calls: null
+  tool_errors: null
+  one_off_code: null
+  wall_hours: null
+  codex_receipts:
+  - path: packing/campaign/resource-usage/codex-task-tree-session-131.yaml
+    model_responses: 313
+    agent_hours: 1.24
+    active_union_hours: 0.75
+    wall_hours: 0.75
+    snapshot_incomplete: true
+- id: session-132
+  title: "N11 Post-W5 Route Selection"
+  status: stopped
+  primary_bead: think-d3h5
+  phases: 1
+  measured: true
+  rollups:
+  - packing/campaign/resource-usage/codex-task-tree-session-132.yaml
+  turns: null
+  tool_calls: null
+  tool_errors: null
+  one_off_code: null
+  wall_hours: null
+  codex_receipts:
+  - path: packing/campaign/resource-usage/codex-task-tree-session-132.yaml
+    model_responses: 274
+    agent_hours: 1.03
+    active_union_hours: 0.72
+    wall_hours: 0.72
+    snapshot_incomplete: true

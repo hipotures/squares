@@ -44,6 +44,6 @@ def test_complete_checks_workload(capsys: pytest.CaptureFixture[str]) -> None:
     assert completed.returncode == 0
     summary = json.loads(completed.stdout)
     expected = json.loads(EXPECTED.read_text())
-    assert summary["selected_count"] == len(summary["results"]) == len(expected) == 48
+    assert summary["selected_count"] == len(summary["results"]) == len(expected) == 49
     assert sorted(row["name"] for row in summary["results"]) == expected
     assert all(row["status"] == "passed" for row in summary["results"])
