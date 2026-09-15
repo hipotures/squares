@@ -201,18 +201,20 @@ a strategy anyone can re-run by name.
   squares into rigid blocks chosen by matching the two records.
 - **A first structure ladder already ran, on the projection solver** (2026-09-09,
   [X-025](../../../../packing/campaign/explorations/X-025-hunting-by-hand-and-the-move-set-threads.md),
-  `packing/devtools/sweep_structure_hints.py`). Declared as constraints, structure made
-  search worse at `n ≤ 17`: success fell as more contacts were declared, the reachable
-  side got worse, and exact equalities pushed the search away from the record.
+  `packing/devtools/sweep_structure_hints.py`). Declared as constraints, structure did
+  not help. At `n = 11` success fell as more contacts were declared and the reachable
+  side got worse; at `n = 5` and 10, declaring faces left the basin as wide as the bare
+  projection; exact equalities pushed the search away from the record.
   Used to build the start, structure helped: laying out face groups first lifted a cold
   solve from 1 run in 8 to 5 in 8 at a loose side (commit `2d2a7790`). The samples were
   4 to 8 cold starts, and no registered experiment records them.
 - **The workbench’s contact-graph attraction did not realise the graph.** Its pull
   reaches a quarter of a side, while target pairs start one to four units apart, and no
   torque turns a pair into face-to-face contact (`NOTES.md` in the v2 spike).
-- **The owner’s merge-then-release has not been built anywhere.** No engine merges
-  near-flush groups at a declared tolerance, releases them on a schedule, or has an
-  aligning torque.
+- **The owner’s merge-then-release is built only in part.** The projection ratchet’s
+  `phased` mode holds face-contact groups tight and then releases them
+  (`run_projection_ratchet.py`). No engine merges near-flush groups at a declared
+  tolerance, releases them on a schedule, or has an aligning torque.
 - **Near-flush groups are uncommon below `n = 30`.** In the records for `n = 5`, 10, 11,
   17 and 26, every corner contact joins squares 36–45° apart.
   Near-flush corner contacts appear at `n = 29`, seven of them within 0.3–4.5° of
