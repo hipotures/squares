@@ -12,6 +12,7 @@
 //! run is appended to a campaign's `results/` and lifted into an artifact
 //! without retyping any number.
 
+mod control;
 mod geom;
 mod rng;
 mod search;
@@ -476,10 +477,13 @@ fn selftest() {
     );
 
     // 5b. THE CONTROL IS PINNED, WITHIN THE PROCESS. The arm flags all default to off,
-    //     and the guard on each of them short-circuits before its RNG draw, so naming
-    //     every arm at its off value must consume exactly the stream the defaults
-    //     consume. Comparing the two runs bitwise catches an arm that draws
-    //     unconditionally and so shifts the control's stream.
+    //     and the guard on each of them must short-circuit before its RNG draw, so the
+    //     control must consume exactly the stream and do exactly the arithmetic the
+    //     engine did before any arm existed. `control::run_chain` is that engine, frozen,
+    //     so comparing the control against it bitwise catches an arm that draws
+    //     unconditionally or leaks into the energy. (Comparing the control with itself,
+    //     arm flags spelled out at their defaults, could not fail: both runs had the same
+    //     parameters.)
     //
     //     This deliberately does not pin a literal. An earlier version did, and the
     //     value it recorded on the author's machine did not reproduce on the Linux
@@ -487,21 +491,25 @@ fn selftest() {
     //     the chain diverges without anything being wrong. A cross-process golden for
     //     this engine would have to be a tolerance, and a tolerance cannot express
     //     "the stream is untouched", which is the property under test.
-    // The control `p` above, with every arm written out at its off value. Anything
-    // but a bitwise match means an arm consumed the stream when it should not have.
-    let control_explicit = Params {
-        p_perturb: 0.0,
-        mu0: 0.0,
-        mu1: 0.0,
+    let frozen = control::run_chain(5, 42, 3, &p, 400_000);
+    report(
+        "control chain matches the frozen pre-arm move loop",
+        control::same_run(&a, &frozen),
+        &format!("{:.17e} vs {:.17e}", a.best_side, frozen.best_side),
+        &mut failures,
+    );
+    // The negative control: the comparison has to be able to fail. The smallest positive
+    // perturbation probability passes the arm's guard, so the arm draws on every move and
+    // shifts the stream while never perturbing anything, which is the defect above.
+    let drawing = Params {
+        p_perturb: f64::MIN_POSITIVE,
         ..p.clone()
     };
-    let a_explicit = search::run_chain(5, 42, 3, &control_explicit, 400_000);
+    let shifted = search::run_chain(5, 42, 3, &drawing, 400_000);
     report(
-        "control chain unchanged by the arm flags",
-        a.best_side.to_bits() == a_explicit.best_side.to_bits()
-            && a.moves == a_explicit.moves
-            && a.pair_tests == a_explicit.pair_tests,
-        &format!("{:.17e} vs {:.17e}", a.best_side, a_explicit.best_side),
+        "negative control: an arm that draws on the control path fails that comparison",
+        !control::same_run(&shifted, &frozen),
+        &format!("{:.17e} vs {:.17e}", shifted.best_side, frozen.best_side),
         &mut failures,
     );
 
