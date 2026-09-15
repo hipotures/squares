@@ -81,7 +81,16 @@ export interface CaptureControlResult {
   state?: ReturnType<AtlasTransitions["state"]>;
 }
 
+/**
+ * The capture tools' common baseline: the catalogue's step into 17, paused at its start.
+ *
+ * It enters Animate first. `atlasTransitions` answers only while the catalogue owns the page,
+ * and the page opens on the independent Pack panel, so a baseline that set its other settings
+ * before entering Animate -- or that entered Pack, the catalogue's old home -- was refused at
+ * its first call and no capture could start.
+ */
 function prepare(api: AtlasTransitions, capture: boolean): void {
+  api.setMode("animate");
   api.stopAll();
   api.setCapture(false);
   api.setStyle("tween");
@@ -96,7 +105,6 @@ function prepare(api: AtlasTransitions, capture: boolean): void {
   api.setDrawing(false);
   api.clearEdges();
   api.setColorScheme("identity");
-  api.setMode("pack");
   api.setRange(17, 17);
   api.seek(0);
   api.setCapture(capture);

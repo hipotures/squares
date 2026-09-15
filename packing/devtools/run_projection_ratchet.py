@@ -26,6 +26,8 @@ import json
 import math
 import multiprocessing as mp
 import os
+import subprocess
+import sys
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -454,7 +456,7 @@ def best_known(n: int) -> float | None:
     return float(value) if value is not None else None
 
 
-def verified_out_of_process(row: dict[str, Any]) -> bool:
+def admitted(row: dict[str, Any]) -> bool:
     """Re-check one reported packing with code this search does not share.
 
     The search's own separating-axis test agreeing with itself proves nothing. This is the
@@ -464,12 +466,44 @@ def verified_out_of_process(row: dict[str, Any]) -> bool:
     A tolerance is unavoidable and `sqpack.verify` says why -- a tight packing has exact
     contacts, so no tolerance separates a contact from a small overlap. The side is nudged
     by the tolerance rather than the test being loosened.
+
+    Finiteness and the count are checked first because the float oracle cannot see them:
+    a NaN coordinate makes every sign test return "touching", and it accepts the pose.
     """
     poses = row["poses"]
+    side = float(row["side"])
+    if len(poses) != int(row["n"]) or not math.isfinite(side):
+        return False
+    if not all(len(p) == 3 and all(math.isfinite(float(v)) for v in p) for p in poses):
+        return False
     squares = corners_from_poses(
         [p[0] for p in poses], [p[1] for p in poses], [p[2] for p in poses]
     )
-    return verify_packing(squares, float(row["side"]) + 1e-9, sign=float_sign(1e-12)).valid
+    return verify_packing(squares, side + 1e-9, sign=float_sign(1e-12)).valid
+
+
+def verified_out_of_process(rows: list[dict[str, Any]]) -> list[bool]:
+    """Run :func:`admitted` over every row in a child interpreter, and return its verdicts.
+
+    The child re-imports the oracle from disk, so nothing this process did to its own copy
+    -- a patched function, a mutated global -- reaches the verdict. A child that does not
+    answer admits nothing.
+    """
+    claims = [{"n": row["n"], "side": row["side"], "poses": row["poses"]} for row in rows]
+    done = subprocess.run(
+        [sys.executable, "-m", "devtools.run_projection_ratchet", VERIFY_ROWS],
+        input=json.dumps(claims), cwd=ROOT, capture_output=True, text=True, check=False,
+    )  # fmt: skip
+    try:
+        verdicts = json.loads(done.stdout)
+    except json.JSONDecodeError:
+        verdicts = None
+    if done.returncode != 0 or not isinstance(verdicts, list) or len(verdicts) != len(rows):
+        print(
+            f"the out-of-process verifier failed: {done.stderr.strip()[:400]}", file=sys.stderr
+        )
+        return [False] * len(rows)
+    return [verdict is True for verdict in verdicts]
 
 
 def _one(job: tuple[int, int, float, float, float, int, int, int]) -> dict[str, Any]:
@@ -494,7 +528,14 @@ def _one(job: tuple[int, int, float, float, float, int, int, int]) -> dict[str, 
     }
 
 
+VERIFY_ROWS = "--verify-rows"
+"""The child half of `verified_out_of_process`: rows on stdin, verdicts on stdout."""
+
+
 def main() -> int:
+    if sys.argv[1:] == [VERIFY_ROWS]:
+        print(json.dumps([admitted(row) for row in json.loads(sys.stdin.read())]))
+        return 0
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--n", type=int, nargs="+", required=True)
     ap.add_argument("--repeats", type=int, default=2)
@@ -520,7 +561,7 @@ def main() -> int:
     began = time.time()
     with mp.Pool(o.workers) as pool:
         rows = list(pool.imap_unordered(_one, jobs))
-    checked = sum(verified_out_of_process(row) for row in rows)
+    checked = sum(verified_out_of_process(rows))
     payload = {
         "rows": rows,
         "verified_out_of_process": f"{checked}/{len(rows)}",

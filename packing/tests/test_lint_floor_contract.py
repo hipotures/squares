@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import subprocess
 import sys
-import tempfile
 import tomllib
 from pathlib import Path
 from typing import cast
@@ -188,18 +187,37 @@ def test_every_tracked_python_file_is_under_a_gate_or_named() -> None:
 
 
 def test_the_workbench_python_floor_rejects_a_print_statement() -> None:
-    """The package target uses the packing Ruff configuration, including its T20 floor."""
+    """The package target uses the packing Ruff configuration, including its T20 floor.
+
+    The sample reaches Ruff on stdin under a package path, so the configuration's own
+    per-file rules decide what applies and nothing is written into the source tree, where a
+    transient file could race another test's inventory under xdist (#160 R18). The tools
+    directory, where `print` is allowed, is the control: the same text passes there.
+    """
     ruff = Path(sys.executable).with_name("ruff")
     assert ruff.is_file(), "run this contract through the packing development environment"
-    with tempfile.TemporaryDirectory(dir=WORKBENCH_ROOT) as scratch:
-        sample = Path(scratch) / "floor_violation.py"
-        sample.write_text('print("this must remain a tool-only exception")\n', encoding="utf-8")
-        done = subprocess.run(
-            [str(ruff), "check", "--config", str(PYPROJECT), str(sample)],
+
+    def check(path: Path) -> subprocess.CompletedProcess[str]:
+        return subprocess.run(
+            [
+                str(ruff),
+                "check",
+                "--config",
+                str(PYPROJECT),
+                "--stdin-filename",
+                str(path),
+                "-",
+            ],
+            input='print("this must remain a tool-only exception")\n',
             check=False,
             capture_output=True,
             text=True,
             cwd=PROJECT_ROOT,
         )
+
+    done = check(WORKBENCH_ROOT / "floor_violation.py")
     assert done.returncode != 0, "Ruff accepted a package violation below the project floor"
     assert "T201" in done.stdout + done.stderr
+    tool = check(WORKBENCH_ROOT / "tools/workbench_tools/floor_violation.py")
+    assert tool.returncode == 0, tool.stdout + tool.stderr
+    assert not (WORKBENCH_ROOT / "floor_violation.py").exists()

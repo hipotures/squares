@@ -1,4 +1,12 @@
-import { assessPackingSnapshot, mixUint32Seed } from "../core/runtime-contracts.ts";
+import {
+  assessPackingSnapshot,
+  mixUint32Seed,
+  PACKING_VALIDITY,
+} from "../core/runtime-contracts.ts";
+import {
+  RESOLVE_TERMINATION_REASONS,
+  RESOLVED_TERMINATION_REASONS,
+} from "../simulation/resolve.ts";
 import {
   type JsonObject,
   type SearchSlot,
@@ -233,8 +241,7 @@ export function decodeSearchTrialValue(
       continue;
     }
     const assessment = assessPackingSnapshot(state.snapshot, slot.n);
-    const valid = assessment.valid && state.snapshot.squareSide === 1;
-    if (state.valid !== valid || state.valid !== (state.validityReason === null)) {
+    if (state.valid !== assessment.valid || state.valid !== (state.validityReason === null)) {
       throw new RangeError("trial validity disagrees with snapshot geometry");
     }
     if (state.absoluteSide !== assessment.requiredSide) {
@@ -287,9 +294,28 @@ export function decodeSearchTrialValue(
   }
   if (
     result.repair.tolerance !== null &&
-    (result.repair.tolerance < 0 || result.repair.tolerance > 1e-9)
+    (result.repair.tolerance < 0 || result.repair.tolerance > PACKING_VALIDITY.penetrationTolerance)
   ) {
     throw new RangeError("invalid repair tolerance");
+  }
+  // The termination is Resolve's own reason or `not-requested`, and every flag beside it follows
+  // from it the way `resolvePacking` sets them.
+  const termination: string = result.repair.termination;
+  const resolveReason = RESOLVE_TERMINATION_REASONS.find((reason) => reason === termination);
+  if (resolveReason === undefined && termination !== "not-requested") {
+    throw new TypeError("unsupported repair termination");
+  }
+  if ((resolveReason === undefined) !== (result.repair.tolerance === null)) {
+    throw new RangeError("repair tolerance must be null exactly when no repair was requested");
+  }
+  if (
+    result.repair.resolved !==
+    (resolveReason !== undefined && RESOLVED_TERMINATION_REASONS.includes(resolveReason))
+  ) {
+    throw new RangeError("repair resolved flag disagrees with its termination");
+  }
+  if (result.repair.exhausted !== (resolveReason === "budget-exhausted")) {
+    throw new RangeError("repair exhausted flag disagrees with its termination");
   }
   if (
     result.repair.resolved &&

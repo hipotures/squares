@@ -1525,8 +1525,20 @@ def _browser_floor(context: Context) -> str:
 
 
 def _workbench_frontend(context: Context) -> str:
-    """Build once, then exercise accessibility and animation editing in Chromium."""
-    return _module(context, "workbench_tools.check_frontend")
+    """Check the probe files, then build once and exercise the page in Chromium.
+
+    `check_probes` goes first because it needs no browser and takes under a second: a probe
+    that does not parse, is not a function, or is named by a checker with no file behind it
+    fails here rather than at the far end of the browser run. It was run by no gate until
+    the #160 review (D13), so a missing probe could sit in the tree unnoticed.
+    """
+    return _commands(
+        context,
+        (
+            (sys.executable, "-m", "workbench_tools.check_probes"),
+            (sys.executable, "-m", "workbench_tools.check_frontend"),
+        ),
+    )
 
 
 def _type_floor(context: Context) -> str:
@@ -2037,7 +2049,7 @@ def _exact_verification(context: Context) -> str:
     """The exact certificates, and a sampled stand-in for the grid replay among them.
 
     `_commands` runs its list in one process after another, so this step's wall is the
-    sum of fifteen subcommands and the gate's `--jobs` pool cannot see inside it. At
+    sum of seventeen subcommands and the gate's `--jobs` pool cannot see inside it. At
     `n=1..324` the step was 84.21s on an idle ten-cpu box (three readings, spread 0.7 per
     cent) and 133.4s on CI, where it was 70.6 per cent of a `checks` job that ran 189.09s
     against a 195s ceiling. One member grows with the corpus and it is the one that grew:
@@ -2186,7 +2198,7 @@ def _exact_grid_replay(context: Context) -> str:
     exactly.
 
     The cost is quadratic in the corpus's last `n`, which is why this one moved and the
-    fourteen fixed cases beside it did not: 2.75s at `n=1..100`, 12.65s at `n=1..200`,
+    sixteen fixed cases beside it did not: 2.75s at `n=1..100`, 12.65s at `n=1..200`,
     34.81s at `n=1..324`, all on the box `benchmarks/gate-cost-at-324/` names.
     """
     output = _module(context, "devtools.check_basic_bounds")
@@ -2844,9 +2856,13 @@ _CASES = ("packing/cases/*",)
 # The retained replay archives. Whole subtree, not the named files: several steps
 # discover which archives to replay by globbing, so adding one changes what runs.
 _RESULTS = ("packing/campaign/series/*",)
+# `build_site.RENDER_INPUTS` is the builder's own declaration and this is the gate's copy,
+# which cannot import the optional package; `test_change_scoped_selection.py` requires every
+# declared render input to select the step that checks the page.
 _WORKBENCH_INPUTS = (
     "packages/workbench/*",
     "packing/src/sqpack/render/*",
+    "packing/devtools/render_explainer.py",
     "packing/witnesses/known-best/*",
     "packing/atlas/known-best/*",
     "package.json",

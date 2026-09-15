@@ -138,7 +138,8 @@ test("best admission uses the assessed pose, ignores stale dynamics, and stores 
     core.tightPackingSnapshot([0.25, 0.8], [0.25, 0.25], [0, 0], 1),
     2,
   );
-  assert.equal(beforeGrowth.valid, true);
+  assert.equal(beforeGrowth.geometryValid, true);
+  assert.equal(beforeGrowth.reason, "unit-size");
   assert.equal(afterGrowth.reason, "pair-overlap");
   assert.strictEqual(core.admitBestPacking(best, afterGrowth, 1), best);
 
@@ -158,7 +159,18 @@ test("a geometrically valid sub-unit state cannot rank as a unit-square packing"
     core.tightPackingSnapshot([0.25, 0.75], [0.25, 0.25], [0, 0], 0.5),
     2,
   );
-  assert.equal(growing.valid, true);
+  assert.equal(growing.geometryValid, true);
+  assert.equal(growing.valid, false);
+  assert.equal(growing.reason, "unit-size");
   assert.equal(growing.snapshot.squareSide, 0.5);
   assert.equal(core.admitBestPacking(null, growing, 0), null);
+});
+
+test("a catalogue-precision assessment cannot rank, even when it reads valid", () => {
+  const frame = core.tightPackingSnapshot([0.5, 1.499997], [0.5, 0.5], [0, 0], 1);
+  const record = core.assessCataloguePrecisionFrame(frame, 2);
+  assert.equal(record.valid, true);
+  assert.equal(record.tolerance, core.CATALOGUE_PRECISION.penetrationTolerance);
+  assert.equal(core.assessPackingSnapshot(frame, 2).reason, "pair-overlap");
+  assert.equal(core.admitBestPacking(null, record, 0), null);
 });

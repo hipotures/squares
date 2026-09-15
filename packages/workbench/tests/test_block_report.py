@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from dataclasses import replace
 from pathlib import Path
+from typing import cast
 
 import pytest
 
@@ -21,13 +22,34 @@ from workbench_tools.cohort_manifest import (
     strict_json,
 )
 from workbench_tools.trial_records import (
+    AttemptFailure,
+    BeatTiming,
     EffectiveConfiguration,
+    PhysicsLaw,
     RepairReceipt,
     SourceReceipt,
     Trial,
     admission_reason,
+    attempt_to_json,
     canonical_reference,
 )
+
+
+def configuration(
+    seed: int, *, anneal: int = 3, rigidity: float = 0.15
+) -> EffectiveConfiguration:
+    """A browser configuration with the law and beat a trial must record."""
+    return EffectiveConfiguration(
+        style="bodies",
+        mode="blind",
+        seed=seed,
+        inflate=1.12,
+        anneal=anneal,
+        pair_law=PhysicsLaw(rigidity=rigidity, repulsion=2500, attraction=0, range=0),
+        wall_law=PhysicsLaw(rigidity=0.25, repulsion=2500, attraction=0, range=0),
+        timing=BeatTiming(dwell=0.6, move=0.8, correct=0.25, settle=0.4),
+        anneal_span=0.95,
+    )
 
 
 def _trial(seed: int, *, reached: bool = True) -> Trial:
@@ -133,7 +155,7 @@ def test_disjoint_blocks_keep_failures_cancellation_and_trailing_slots() -> None
 
 @pytest.mark.usefixtures("admit_test_geometry")
 def test_empty_and_all_rejected_populations_have_no_invented_score() -> None:
-    empty = block_report.summarize_cohort(_cohort(()), [], tolerance_pct=0.0)
+    empty = block_report.summarize_cohort(_cohort(()), [], tolerance_pct=0.0001)
     assert empty["block_success_per_planned_block"] == {
         "hits": 0,
         "denominator": 0,
@@ -143,7 +165,7 @@ def test_empty_and_all_rejected_populations_have_no_invented_score() -> None:
     rejected = block_report.summarize_cohort(
         _cohort((Attempt(0, AttemptStatus.COMPLETED),), 1),
         [replace(_trial(0), resolved_poses=None)],
-        tolerance_pct=0.0,
+        tolerance_pct=0.0001,
     )
     assert rejected["blocks_without_valid_result"] == 1
     assert rejected["best_relative_excess_pct_conditional_on_validity"] == {
@@ -159,7 +181,7 @@ def test_empty_and_all_rejected_populations_have_no_invented_score() -> None:
 def test_zero_gap_is_undefined_normalization_not_an_infinite_score() -> None:
     cohort = replace(_cohort((Attempt(0, AttemptStatus.COMPLETED),), 1), n=4)
     trial = replace(_trial(0), n=4, record=2.0, side=2.0, resolved_side=2.0)
-    result = block_report.summarize_cohort(cohort, [trial], tolerance_pct=0.0)
+    result = block_report.summarize_cohort(cohort, [trial], tolerance_pct=0.0001)
     assert result["best_grid_gap_closed_conditional_on_defined_score"] == {
         "count": 0,
         "min": None,
@@ -179,7 +201,7 @@ def test_duplicate_missing_and_mismatched_rows_cannot_change_block_membership() 
         [replace(_trial(0), params={"anneal": 99})],
     ):
         with pytest.raises(ValueError, match=r"duplicate|configuration|manifest"):
-            block_report.summarize_cohort(cohort, rows, tolerance_pct=0.0)
+            block_report.summarize_cohort(cohort, rows, tolerance_pct=0.0001)
 
 
 def _manifest_value() -> dict[str, object]:
@@ -256,7 +278,7 @@ def _verified_trial(seed: int = 0) -> Trial:
     return replace(
         _trial(seed),
         record_source=canonical_reference(5).source,
-        configuration=EffectiveConfiguration("bodies", "blind", seed, 1.12, 3),
+        configuration=configuration(seed),
         source=SourceReceipt(
             commit="a" * 40,
             dirty=False,
@@ -385,6 +407,9 @@ def test_clean_browser_trial_fixture_reproduces_its_disjoint_block_report(
     cohort = observed["cohorts"][0]
     assert cohort["counts"]["accepted"] == 6
     assert [block["seeds"] for block in cohort["blocks"]] == [[0, 1], [2, 3], [4, 5]]
+    configuration = cohort["effective_configuration"]
+    assert configuration["contract"] == "packing.squares:AnnealingConfiguration/v2"
+    assert set(configuration) >= {"pair_law", "wall_law", "timing", "anneal_span"}
 
 
 @pytest.mark.parametrize("token", ["NaN", "Infinity", "-Infinity"])
@@ -393,3 +418,60 @@ def test_nonstandard_numeric_tokens_are_refused_before_manifest_or_trial_admissi
 ) -> None:
     with pytest.raises(ValueError, match="nonfinite JSON token"):
         strict_json('{"trial":{"ms":' + token + "}}")
+
+
+def test_a_block_success_band_finer_than_the_validity_tolerance_is_refused() -> None:
+    cohort = _cohort((Attempt(0, AttemptStatus.COMPLETED),), 1)
+    with pytest.raises(ValueError, match="finer than the validity tolerance"):
+        block_report.summarize_cohort(cohort, [_verified_trial()], tolerance_pct=0.0)
+    with pytest.raises(ValueError, match="finer than the validity tolerance"):
+        block_report.summarize_cohort(cohort, [_verified_trial()], tolerance_pct=1e-8)
+
+
+def test_raw_benchmark_failure_rows_count_only_as_the_manifests_failed_attempts(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    trial = _verified_trial()
+    failure = AttemptFailure(
+        n=5,
+        seed=1,
+        style="bodies",
+        params={},
+        reason="malformed-result",
+        detail="excess must be a finite number",
+        source=trial.source,
+    )
+    manifest = _manifest_value() | {"reference_source": "packing/witnesses/known-best"}
+    cohorts = cast(list[dict[str, object]], manifest["cohorts"])
+    manifest_path, rows_path, output_path = (
+        tmp_path / "manifest.json",
+        tmp_path / "trials.jsonl",
+        tmp_path / "report.json",
+    )
+    rows_path.write_text(
+        "\n".join(attempt_to_json(row) for row in (trial, failure)) + "\n", encoding="utf-8"
+    )
+    arguments = ["block-report", str(manifest_path), str(rows_path), "--out", str(output_path)]
+    monkeypatch.setattr("sys.argv", [*arguments, "--cohort", "control"])
+    for status, succeeds in (("failed", True), ("completed", False)):
+        cohorts[0]["attempts"] = [
+            {"seed": 0, "status": "completed"},
+            {"seed": 1, "status": status},
+        ]
+        manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+        if succeeds:
+            assert block_report.main() == 0
+            counts = json.loads(output_path.read_text(encoding="utf-8"))["cohorts"][0]["counts"]
+            assert (counts["accepted"], counts["failed"]) == (1, 1)
+        else:
+            with pytest.raises(ValueError, match="not a failed attempt"):
+                block_report.main()
+
+
+def test_a_cohort_cannot_pool_trials_run_under_different_pair_laws() -> None:
+    first = _verified_trial(0)
+    second = replace(_verified_trial(1), configuration=configuration(1, rigidity=0.35))
+    assert admission_reason(second) is None
+    cohort = _cohort((Attempt(0, AttemptStatus.COMPLETED), Attempt(1, AttemptStatus.COMPLETED)))
+    with pytest.raises(ValueError, match="one effective configuration"):
+        block_report.summarize_cohort(cohort, [first, second], tolerance_pct=0.001)

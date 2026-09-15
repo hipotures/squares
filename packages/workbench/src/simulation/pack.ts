@@ -100,9 +100,9 @@ export interface PackWork extends SimulationWork {
 }
 
 export interface PackFeasibility {
-  /** Exact pose and wall geometry passes, independent of square size. */
+  /** The contract's pair and wall clauses pass, independent of square size. */
   geometryValid: boolean;
-  /** True only for unit squares with valid geometry. */
+  /** Every clause of `PACKING_VALIDITY` passes: unit squares with valid geometry. */
   valid: boolean;
   unitSquares: boolean;
   reason: string | null;
@@ -570,10 +570,10 @@ function receipt(run: PackRun, reason: PackTerminationReason): PackReceipt {
     snapshot,
     best: run.bestPacking,
     feasibility: {
-      geometryValid: assessment.valid,
-      valid: assessment.valid && unitSquares,
+      geometryValid: assessment.geometryValid,
+      valid: assessment.valid,
       unitSquares,
-      reason: assessment.valid ? (unitSquares ? null : "sub-unit") : assessment.reason,
+      reason: assessment.reason,
       geometry,
     },
     configuration: {

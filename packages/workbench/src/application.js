@@ -23,13 +23,20 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     input: inputNode,
     select: selectNode,
   } = workbenchBundle.dom.createDom(document);
-  const { parseUint32Seed, mixUint32Seed, packingSnapshot } = SQUARES_WORKBENCH_CORE;
+  const {
+    assessCataloguePrecisionFrame,
+    assessPackingSnapshot,
+    mixUint32Seed,
+    packingSnapshot,
+    parseUint32Seed,
+  } = SQUARES_WORKBENCH_CORE;
   const {
     forceAtGap: forceOf,
     forceLawAttracts: attractsOf,
     forceLawSteep: steepOf,
   } = workbenchBundle.simulation;
   const {
+    adjacentSupportedStep,
     availableStyles,
     nearestSupportedIndex,
     normalizeRange,
@@ -74,6 +81,18 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   let packPanel = null;
   /** @type {import("./app/search-panel.js").SearchPanel | null} */
   let searchPanel = null;
+  // **Whether the catalogue view owns the page's input.** This controller answers the page's
+  // global shortcuts, the stage's keys and pointer, and `atlasTransitions` only while neither
+  // independent panel is showing; each of those entry points asks this one question rather than
+  // naming the panels itself, so a panel cannot be refused in one place and obeyed in another.
+  // Before Pack mounts, the mode stands in for its visibility, so the answer holds from the first
+  // event the page can receive, whichever view it opens on.
+  function catalogueOwnsPage() {
+    if (searchPanel?.visible()) {
+      return false;
+    }
+    return packPanel === null ? state.mode !== "pack" : !packPanel.visible();
+  }
   /** @typedef {import("./api/workbench-api.js").AtlasAspect} AtlasAspect */
   /** @typedef {import("./api/workbench-api.js").AtlasGrowth} AtlasGrowth */
   /** @typedef {import("./api/workbench-api.js").AtlasGrowthRule} AtlasGrowthRule */
@@ -558,12 +577,6 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   //: The row the headline is centred in: the packing's own box, so `n = 26` sits under the picture
   //: it names rather than under the panel.
   const HEADLINE_ROW = 1000;
-  //: How many digits the centring is computed for. The numeral rolls between two n through a step,
-  //: and `n =` lives outside the fading layers, so centring on the CURRENT numeral would shift the
-  //: constant half of the headline twice in the film -- at 9 to 10 and at 99 to 100 -- and shift it
-  //: mid-roll besides. The pair is centred as though the numeral were always three digits, which is
-  //: what the corpus ends on and what keeps `n =` still.
-  const _HEADLINE_DIGITS = 3;
   function measureHeadline() {
     // The headline is one rendered expression now, so centring it is centring one box. It is
     // centred on the WIDEST the corpus holds rather than on the current one: `n = 324` is the
@@ -656,8 +669,10 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   //: An identical slot hands over at the midpoint, which cannot be seen; only a slot that
   //: changes is faded. Filled when the pair's layers are built.
   let factsSame = [];
-  //: Per changing slot, its drawn parts split into those held (the same glyph in the same place in
-  //: both layers) and those that crossfade; null where the slot fades whole.
+  //: Per changing slot, its drawn parts split into those held (the same part in the same place in
+  //: both layers) and those that crossfade; null where the slot fades whole. A part is a KaTeX span,
+  //: an SVG badge or a text element; the facts view splits every typeset number into one span per
+  //: character, so a digit two numbers share is a part of its own.
   /** @type {({heldA: Element[], heldB: Element[], fadeA: Element[], fadeB: Element[]} | null)[]} */
   let factsParts = [];
   // The drawing units of one slot: an SVG as a whole, and every other element with no element
@@ -683,7 +698,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     return mixed ? null : parts;
   }
   // Which parts of a changing slot are unchanged: equal markup in an equal box in both layers.
-  // `4.59 ≤` in front of `s(17)` and `s(18)` is held; `17` and `18` crossfade. Anything not laid
+  // Between `4.59 ≤ s(17) ≤ 4.67553` and `4.59 ≤ s(18) ≤ 4.822876`, `4.59 ≤ s(1` and the `4.` of
+  // the upper bound are held; `7` and `8`, and the rest of the bound, crossfade. Anything not laid
   // out yet has no box to compare, so it is never held.
   function pairParts(/** @type {Element} */ a, /** @type {Element} */ b) {
     const partsA = drawnParts(a);
@@ -783,47 +799,61 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // square. Union-find over the contact graph the painter has already built, so the cost is the
   // edge count and nothing is recomputed: measured at n = 324 it does not move the trajectory's
   // build time, which the gate holds to 400 ms.
-  function assignGroups(count, clock) {
-    if (groupSlot === null || groupSlot.length !== count) {
-      return;
+  // The slot a square's run starts from, before any merge: spread over the slots the atlas does not
+  // reserve for right angles.
+  const firstSlot = (i) => 1 + (i % (PALETTE.length - 1));
+  //: **How many instants of a step's move and settle its runs are read at.** A frame's colours are a
+  //: function of its instant, not of which frames were drawn before it: runs used to merge on every
+  //: frame painted, so a still seeked straight to an instant, a film walked to it at 30 fps and one
+  //: at 60 fps each painted different runs (at n = 272, 22 to 44 fills of 272 apart). Merging only
+  //: at these fixed instants, read off the same poses the stage draws, gives one answer however the
+  //: instant is reached. They span the window the moving palette is drawn in, as the per-frame
+  //: merge did: forty-eight over the default window of a second and a quarter is a checkpoint
+  //: every 26 ms, under two frames, so a merge lands when the contact does.
+  const GROUP_CHECKPOINTS = 48;
+  let groupFolded = 0; // how many checkpoints are folded into the runs
+  let groupSource = null; // the settings the folded checkpoints were read under
+  /** @type {{x: Float64Array, y: Float64Array, a: Float64Array} | null} */
+  let groupPoses = null;
+  function resetGroups(count) {
+    for (let i = 0; i < count; i++) {
+      groupSlot[i] = firstSlot(i);
+      groupParent[i] = i;
+      groupSize[i] = 1;
     }
-    const parent = groupParent,
-      size = groupSize;
-    // **Runs only ever merge, and a join repaints the NEWCOMER.** Two rules, and both were found by
-    // measuring rather than by reasoning. Rebuilding the components each frame let a square
-    // oscillate between two of them as a contact made and broke at the tolerance: 49 direction
-    // reversals at n = 110. And taking the lowest-numbered member's colour meant a whole run
-    // repainted because one low-numbered square joined it, cascading as the merges did: 364 hue
-    // hops at n = 110, 13 of them on one square. Union by size fixes the second -- the larger run
-    // keeps its colour and the smaller adopts it, which is what "they become the same colour as
-    // that connected component" means -- and carrying the union-find forward fixes the first.
-    //
-    // The reset is for a scrub: playback and capture both run the clock forward.
-    if (groupClock === null || clock < groupClock - 1e-9) {
-      for (let i = 0; i < count; i++) {
-        parent[i] = i;
-        size[i] = 1;
-      }
+    groupFolded = 0;
+    groupSource = null;
+    groupClock = null;
+  }
+  function findGroup(a) {
+    const parent = groupParent;
+    while (parent[a] !== a) {
+      parent[a] = parent[parent[a]];
+      a = parent[a];
     }
-    groupClock = clock;
-    const find = (a) => {
-      while (parent[a] !== a) {
-        parent[a] = parent[parent[a]];
-        a = parent[a];
-      }
-      return a;
-    };
-    for (let e = 0; e < paintEdges.length; e += 2) {
-      const a = paintEdges[e],
-        b = paintEdges[e + 1];
+    return a;
+  }
+  // **Runs only ever merge, and a join repaints the NEWCOMER.** Two rules, and both were found by
+  // measuring rather than by reasoning. Rebuilding the components each frame let a square
+  // oscillate between two of them as a contact made and broke at the tolerance: 49 direction
+  // reversals at n = 110. And taking the lowest-numbered member's colour meant a whole run
+  // repainted because one low-numbered square joined it, cascading as the merges did: 364 hue
+  // hops at n = 110, 13 of them on one square. Union by size fixes the second -- the larger run
+  // keeps its colour and the smaller adopts it, which is what "they become the same colour as
+  // that connected component" means -- and carrying the union-find forward fixes the first.
+  function foldGroups(count, edges, angles) {
+    const size = groupSize;
+    for (let e = 0; e < edges.length; e += 2) {
+      const a = edges[e],
+        b = edges[e + 1];
       if (a >= count || b >= count) {
         continue;
       }
-      if (angleGap(foldAngle(poseA[a]), foldAngle(poseA[b])) > ANGLE_TOL) {
+      if (angleGap(foldAngle(angles[a]), foldAngle(angles[b])) > ANGLE_TOL) {
         continue;
       }
-      let ra = find(a),
-        rb = find(b);
+      let ra = findGroup(a),
+        rb = findGroup(b);
       if (ra === rb) {
         continue;
       }
@@ -834,12 +864,101 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
         ra = rb;
         rb = s;
       }
-      parent[rb] = ra;
+      groupParent[rb] = ra;
       size[ra] += size[rb];
     }
     for (let i = 0; i < count; i++) {
-      groupSlot[i] = groupSlot[find(i)];
+      groupSlot[i] = firstSlot(findGroup(i));
     }
+  }
+  // Every connected run of same-angle squares that share a whole side, as a palette slot per
+  // square, for a frame on the step's timeline: the runs are the checkpoints up to `t` folded in
+  // order, each read from the poses the scene would draw at its instant. Folding is incremental
+  // while the clock runs forward; a scrub back, or a change to anything the poses depend on, starts
+  // again from the first checkpoint.
+  function assignGroups(count, t) {
+    if (groupSlot === null || groupSlot.length !== count) {
+      return;
+    }
+    const p = PAIRS[state.pair];
+    const A = FRAMES[String(p.n)];
+    const B = FRAMES[String(p.n + 1)];
+    const tm = timing();
+    const sc = schedule();
+    const physical = isPhysical(state.style) && !isStillPair();
+    // The window the moving palette is drawn in: from the moment the hue starts to leave, once the
+    // chroma has drained, to the moment it is back. Outside it a frame is drawn in its resting
+    // colours and its contacts say nothing about runs, so no checkpoint is read there -- in
+    // particular not the dwell's own arrangement, where a record's touching squares would all
+    // merge before anything had moved.
+    const move = sc.moveEnd - sc.moveStart;
+    const from = sc.moveStart + move * DESAT_IN;
+    const span = sc.moveEnd + (sc.end - sc.moveEnd) * HUE_IN - from;
+    const due =
+      span <= 0 || t <= from
+        ? 0
+        : Math.min(GROUP_CHECKPOINTS, Math.floor(((t - from) / span) * GROUP_CHECKPOINTS + 1e-9));
+    const source = [
+      state.pair,
+      state.style,
+      physical ? trajectoryKey(state.pair, state.style, simMode()) : "",
+      simMode(),
+      state.phase,
+      state.anneal,
+      BLIND.inflate,
+      sc.moveStart,
+      sc.moveEnd,
+      sc.end,
+      sc.arrive,
+      sc.arrived,
+      sc.blocksStart,
+      sc.blocksEnd,
+    ].join("|");
+    if (groupClock !== null || source !== groupSource || due < groupFolded) {
+      resetGroups(count);
+    }
+    groupSource = source;
+    if (groupPoses === null || groupPoses.x.length !== count) {
+      groupPoses = {
+        x: new Float64Array(count),
+        y: new Float64Array(count),
+        a: new Float64Array(count),
+      };
+    }
+    const { x, y, a } = groupPoses;
+    for (let k = groupFolded; k < due; k++) {
+      const at = from + (span * (k + 1)) / GROUP_CHECKPOINTS;
+      let side;
+      if (physical) {
+        side = physicsFrame(p, A, B, sc, at, x, y, a).side;
+      } else {
+        const frame = tweenFrame(p, A, B, tm, sc, at);
+        for (const square of frame.squares) {
+          x[square.index] = square.x;
+          y[square.index] = square.y;
+          a[square.index] = square.angleDegrees;
+        }
+        side = frame.containerSide;
+      }
+      const edges = measureFrameGeometry(x, y, a, side, 1, {
+        gap: CONTACT.gap,
+        angleToleranceDegrees: ANGLE_TOL,
+      }).contactEdges;
+      foldGroups(count, edges, a);
+    }
+    groupFolded = due;
+  }
+  // The same for an open-ended run, which has no timeline to checkpoint: its runs fold the contacts
+  // of each frame it draws, carried forward from the moment the run began.
+  function assignRunGroups(count, clock) {
+    if (groupSlot === null || groupSlot.length !== count) {
+      return;
+    }
+    if (groupClock === null || groupFolded > 0 || clock < groupClock - 1e-9) {
+      resetGroups(count);
+    }
+    groupClock = clock;
+    foldGroups(count, paintEdges, poseA);
   }
   //: What counts as not moving and not turning, for a square that keeps its colour. A unit side is
   //: 1, so a hundredth of one is under half a pixel at the size the stage draws; half a degree is
@@ -1001,12 +1120,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     groupSlot = new Int16Array(p.n + 1);
     groupParent = new Int32Array(p.n + 1);
     groupSize = new Int32Array(p.n + 1);
-    groupClock = null;
-    for (let i = 0; i <= p.n; i++) {
-      groupSlot[i] = 1 + (i % (PALETTE.length - 1));
-      groupParent[i] = i;
-      groupSize[i] = 1;
-    }
+    resetGroups(p.n + 1);
     if (B.ident[p.new] !== p.n + 1) {
       throw new Error(`the new square of ${p.n} -> ${p.n + 1} is not identity ${p.n + 1}`);
     }
@@ -1515,7 +1629,11 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   const PHYS_CACHE_MAX = 16;
   // Ken Perlin's sixth-degree ease: zero first AND second derivative at both ends, where
   // smoothstep only zeroes the first. Used where a change has to start and stop invisibly.
-  const smootherstep = (x) => (x <= 0 ? 0 : x >= 1 ? 1 : x * x * x * (x * (x * 6 - 15) + 10));
+  // Clamped as well as guarded: just below one the polynomial rounds to 1 + 2^-52, and the colour
+  // levels built from it reached the painter a rounding error outside [0, 1], which it refuses --
+  // seeking the last instant of a long physical step threw instead of drawing.
+  const smootherstep = (x) =>
+    x <= 0 ? 0 : x >= 1 ? 1 : Math.min(1, x * x * x * (x * (x * 6 - 15) + 10));
   const containerCurve = (u) => easeOut(clamp01(u / PHYS.grow));
   // How far past its target the box is open at u, in sides. Zero at both ends of the move, so the
   // side it starts from and the side it lands on are exactly the record's.
@@ -1616,15 +1734,37 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     // The whole moving span, not just the rearrangement: the physics runs through the landing
     // too, and `move` stopped being the whole of it when the correction got its own time.
     // Reading `move` alone cut a run's steps by 31 per cent at the shipped beat, which
-    // `check_revision7` caught as every free run suddenly missing by ten times as much.
+    // the revision-7 checks caught as every free run suddenly missing by ten times as much.
     const tm = timing(pairIndex, style);
     return Math.max(1, Math.round(PHYS.stepsPerSecond * (tm.move + tm.correct)));
   }
   function ensureTrajectory(pairIndex, style, mode) {
-    mode = MODES.includes(mode) ? mode : simMode();
+    const key = trajectoryKey(pairIndex, style, mode);
+    let tr = physicsCache.get(key);
+    if (!tr) {
+      tr = simulate(
+        pairIndex,
+        physicsSteps(pairIndex, style),
+        style,
+        trajectoryMode(mode),
+        state.anneal,
+      );
+      if (physicsCache.size >= PHYS_CACHE_MAX) {
+        physicsCache.delete(physicsCache.keys().next().value);
+      }
+      physicsCache.set(key, tr);
+    }
+    return tr;
+  }
+  function trajectoryMode(mode) {
+    return MODES.includes(mode) ? mode : simMode();
+  }
+  // Everything a trajectory is a function of. The law is in the key: a trajectory drawn under one
+  // law is not the trajectory of another.
+  function trajectoryKey(pairIndex, style, requestedMode) {
+    const mode = trajectoryMode(requestedMode);
     const steps = physicsSteps(pairIndex, style);
-    // The law is in the key: a trajectory drawn under one law is not the trajectory of another.
-    const key =
+    return (
       style +
       "/" +
       mode +
@@ -1640,16 +1780,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       "/" +
       pairIndex +
       "/" +
-      steps;
-    let tr = physicsCache.get(key);
-    if (!tr) {
-      tr = simulate(pairIndex, steps, style, mode, state.anneal);
-      if (physicsCache.size >= PHYS_CACHE_MAX) {
-        physicsCache.delete(physicsCache.keys().next().value);
-      }
-      physicsCache.set(key, tr);
-    }
-    return tr;
+      steps
+    );
   }
   // The package reader is shared by interactive seek and deterministic capture.
   function samplePose(tr, u, i) {
@@ -1981,6 +2113,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     const unit = tight === null ? null : tight / size;
     const pen = opt === null || !Number.isFinite(opt.pen) ? null : opt.pen;
     const clean = pen !== null && pen <= OPT.feasible;
+    const packing = opt?.packingValid === true;
     return {
       on: GROWTH.on,
       size,
@@ -1999,13 +2132,16 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       unitSide: unit,
       record,
       penetration: pen,
+      // Within the growth rule's own overlap allowance, which decides whether the size may climb.
+      // It is not a packing test: `packing` is.
       clean,
-      // A packing only when the squares have reached full size with nothing overlapping.
-      packing: size >= 1 && clean,
-      // Below a record at full size is not a find: it is a report that something is overlapping by
-      // less than the tolerance says it is.
-      suspect: size >= 1 && clean && tight !== null && tight < record - 1e-9,
-      excess: unit === null ? null : (unit / record - 1) * 100,
+      // A packing under the one validity contract: unit squares, and pair and wall penetration
+      // within 1e-9. It used to be full size with the overlap inside the growth rule's 0.008,
+      // which called an arrangement a packing at eight million times the contract's tolerance.
+      packing,
+      // Below a record as a packing is not a find: it is a report that the geometry lost precision.
+      suspect: packing && tight !== null && tight < record - 1e-9,
+      excess: packing && unit !== null ? (unit / record - 1) * 100 : null,
     };
   }
   // ---------------------------------------------------------------- reset (revision 11)
@@ -2286,15 +2422,17 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // interpolation shows it closing to nothing, a snapped run reaches nothing at the end, a free run
   // rests at its residual. In a blind run the squares have no correspondence to the record's
   // labelling, so the centre and angle errors are meaningless and only the box is reported.
+  // `count` is how many of the squares to measure, from the first: the squares the frame shows.
+  // `size` is the side they are drawn at, so a run of shrunken squares reads its own box.
   const gapOut = { centre: 0, angle: 0, side: 0 };
-  function gapOf(px, py, pa) {
+  function gapOf(px, py, pa, count, size) {
     let centre = 0,
       angle = 0,
       x0 = Infinity,
       x1 = -Infinity,
       y0 = Infinity,
       y1 = -Infinity;
-    for (let i = 0; i < px.length; i++) {
+    for (let i = 0; i < count; i++) {
       const dx = px[i] - tgtX[i],
         dy = py[i] - tgtY[i];
       const d = Math.sqrt(dx * dx + dy * dy);
@@ -2305,8 +2443,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       if (da > angle) {
         angle = da;
       }
-      const cs = Math.cos(pa[i] * DEG) * 0.5,
-        sn = Math.sin(pa[i] * DEG) * 0.5;
+      const cs = Math.cos(pa[i] * DEG) * (size / 2),
+        sn = Math.sin(pa[i] * DEG) * (size / 2);
       for (let q = 0; q < 4; q++) {
         const s1 = q & 1 ? -1 : 1,
           s2 = q & 2 ? -1 : 1;
@@ -2410,10 +2548,6 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     /** @type {Element} */ (svgNode("gapbar-record-label"))
   );
   let gapbarInfo = null;
-  //: What the summed overlap may be for the arrangement to count as a packing, in unit sides.
-  //: Measured: retained records score 0 to 1.3e-5 -- the float precision of the poses -- and a
-  //: frame mid-move scores 1.1 to 12.4. The threshold sits five orders of magnitude clear of both.
-  const VALID_OVERLAP = 1e-4;
   const gapbarOut = {
     n: 0,
     record: 0,
@@ -2422,12 +2556,19 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     hi: 0,
     side: 0,
     x: 0,
+    /** @type {number | null} */
     excess: 0,
     met: false,
     // Whether the side above is a claim at all: a bounding box reports a number for any
-    // arrangement, and only an arrangement without overlaps is a packing.
+    // arrangement, and only a packing under the one validity contract has a side.
     valid: false,
+    /** @type {string | null} */
+    reason: null,
+    // The deepest pair or wall penetration, and the tolerance the assessment held it to.
     overlap: 0,
+    tolerance: 0,
+    /** @type {"packing" | "catalogue-precision"} */
+    precision: "packing",
   };
   // The scale and the static marks, once per n rather than once per frame.
   // **The bar is keyed to the n on the panel, not to the n the step is heading for.** Through the
@@ -2564,7 +2705,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     gapbarBox.setAttribute("transform", `translate(${fmt(x, 2)} 0)`);
     gapbarBox.classList.toggle("is-locked", boxLocked);
   }
-  function updateGapBar(p, _B, g, mode) {
+  function updateGapBar(p, _B, g, mode, assessment, precision) {
     const info = gapbarSetup(p, state.liveN);
     // **`met` is a claim about the n the bar describes.** The centre and angle gaps are measured
     // against the targets of the n the step is heading INTO, so they mean nothing while the bar is
@@ -2572,11 +2713,14 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     // own record, exactly, and the side test is the whole of what can be asked. The same is true of
     // a blind run, which has no correspondence to the record's labelling at all.
     const describesTarget = info.n === p.n + 1;
+    const valid = assessment.valid;
     const withinSide = g.side <= info.record * (1 + GAP_MET.side);
+    // A hit is a claim about a packing, so only a valid arrangement can make it.
     const met =
-      mode === "blind" || !describesTarget
+      valid &&
+      (mode === "blind" || !describesTarget
         ? withinSide
-        : g.centre <= GAP_MET.centre && g.angle <= GAP_MET.angle && withinSide;
+        : g.centre <= GAP_MET.centre && g.angle <= GAP_MET.angle && withinSide);
     // On a hit the hand locks to the record's tick rather than hovering a pixel off it.
     // The hand is a 20-unit triangle centred on the value, so at a record sitting hard against an
     // end -- which is every perfect square, whose record IS the area bound -- half of it hung off
@@ -2586,14 +2730,14 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       HALF,
       Math.min(GAPBAR.width - HALF, met ? gapbarX(info.record) : gapbarX(g.side)),
     );
-    // **And the hand is drawn only where the arrangement IS a packing.** A bounding box will happily
-    // report a smaller side for squares that are inside each other, so a side is a claim only when
-    // the overlap is zero. Measured: a retained record scores between 0 and 1.3e-5 of a unit side
-    // -- the float precision of the poses the page carries -- while the same step mid-move reaches
-    // 1.1 at n = 11 and 12.4 at n = 110. Five orders of magnitude between them, so the threshold
-    // does not need to be delicate.
-    const valid = paintOut.overlap <= VALID_OVERLAP;
-    const excess = (g.side / info.record - 1) * 100;
+    // **And the hand is drawn only where the arrangement IS a packing,** under the one validity
+    // contract every other part of the workbench uses: unit squares, pair and wall penetration
+    // within 1e-9, and the rest of `PACKING_VALIDITY`. A bounding box will happily report a smaller
+    // side for squares that are inside each other, or shrunk, so a side is a claim only then. A
+    // retained record drawn exactly as stored is assessed at the catalogue's declared stored
+    // precision instead, and says so in `precision`: rounding the witness to six places reads as
+    // up to 3.9e-6 of penetration on frames that do not overlap.
+    const excess = valid ? (g.side / info.record - 1) * 100 : null;
     gapbarHand.setAttribute("x1", fmt(x, 2));
     gapbarHand.setAttribute("x2", fmt(x, 2));
     gapbarHand.setAttribute("opacity", valid ? "1" : "0");
@@ -2612,17 +2756,63 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     gapbarOut.excess = excess;
     gapbarOut.met = met;
     gapbarOut.valid = valid;
-    gapbarOut.overlap = paintOut.overlap;
+    gapbarOut.reason = assessment.reason;
+    gapbarOut.overlap = Math.max(assessment.maxPairOverlap, assessment.maxWallOverlap);
+    gapbarOut.tolerance = assessment.tolerance;
+    gapbarOut.precision = precision;
   }
   // `still` is true where the picture is not in motion: through the dwell, and from the instant the
   // settle ends. Those are the frames the bar is allowed to move on, along with the ones something
   // has marked dirty (a step boundary, a setting, a pause, a seek, a drop, or `refreshGap()`).
+  //
+  // **The bar measures the squares the frame shows, and only those.** Through the dwell the arriving
+  // square is already in the pose buffers, at its starting pose and drawn at opacity zero, while
+  // the bar describes the n before it (`state.liveN`). Counting it put an invisible square inside
+  // n's record: the step into 17 read a side of 4.67553 for n = 16, whose record is 4, and called
+  // the record itself no packing, which hid the hand through every dwell.
   function updateGap(p, _A, B, mode, still) {
-    const g = gapOf(poseX, poseY, poseA);
+    const shown = Math.min(poseX.length, state.liveN);
+    const g = gapOf(poseX, poseY, poseA, shown, paintOut.size);
     if (gapBarDirty || still) {
-      updateGapBar(p, B, g, mode);
+      const radians = new Float64Array(shown);
+      for (let i = 0; i < shown; i++) {
+        radians[i] = poseA[i] * DEG;
+      }
+      const snapshot = packingSnapshot(
+        poseX.subarray(0, shown),
+        poseY.subarray(0, shown),
+        radians,
+        paintOut.size,
+        { originX: 0, originY: 0, side: paintOut.side },
+      );
+      const stored = drawsStoredRecord(p, shown);
+      const assessment = stored
+        ? assessCataloguePrecisionFrame(snapshot, shown)
+        : assessPackingSnapshot(snapshot, shown);
+      updateGapBar(p, B, g, mode, assessment, stored ? "catalogue-precision" : "packing");
       gapBarDirty = false;
     }
+  }
+  // Whether the frame draws a retained record as the catalogue stores it: n's poses through the
+  // dwell, or n + 1's once the step has landed, each square where the record puts it. Compared to
+  // a billionth rather than exactly, since a tween that has landed reaches its target through a
+  // rotation that rounds, and angles as a square's, a quarter turn being the same square. A hand's run picked up from the record is still the record until a
+  // square moves, and not after.
+  function drawsStoredRecord(p, shown) {
+    const near = (/** @type {number} */ a, /** @type {number} */ b) => Math.abs(a - b) <= 1e-9;
+    for (let i = 0; i < shown; i++) {
+      const at =
+        shown === p.n ? motion[i]?.a : [tgtX[i] ?? Number.NaN, tgtY[i] ?? Number.NaN, tgtA[i]];
+      if (
+        at === undefined ||
+        !near(poseX[i], at[0]) ||
+        !near(poseY[i], at[1]) ||
+        !near(angleDelta(at[2] ?? Number.NaN, poseA[i]), 0)
+      ) {
+        return false;
+      }
+    }
+    return shown === p.n || shown === p.n + 1;
   }
   // Where the two numbers come from at this instant, or the empty string when nothing is simulating.
   function _lawReadout() {
@@ -3082,6 +3272,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     grabAngle = Math.atan2(py - o.Y[i], px - o.X[i]);
     grabTH = o.TH[i];
     grabRotating = false;
+    // A new hold takes its own view, whatever an earlier hold that never let go left behind.
+    heldView = null;
     updateSegments();
     render();
     return i;
@@ -3202,18 +3394,18 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       bestWallPenetration: opt.best === Infinity ? null : opt.bestWallPen,
       bestPacking,
       feasible: OPT.feasible,
+      // The excess over the record is a claim about a packing, so it is reported only for one.
       ...(opt.record === null
         ? {}
-        : { record: opt.record, excess: (opt.required / opt.record - 1) * 100 }),
+        : {
+            record: opt.record,
+            excess: opt.packingValid ? (opt.required / opt.record - 1) * 100 : null,
+          }),
       penetration: Number.isFinite(opt.pen) ? opt.pen : null,
       exactPenetration: Number.isFinite(opt.exactPen) ? opt.exactPen : null,
       wallPenetration: Number.isFinite(opt.wallPen) ? opt.wallPen : null,
-      packing: opt.packingValid && opt.size === 1,
-      invalidReason: opt.packingValid
-        ? opt.size === 1
-          ? null
-          : "non-unit-square"
-        : opt.invalidReason,
+      packing: opt.packingValid,
+      invalidReason: opt.invalidReason,
       near: opt.near,
       edited: opt.edited,
       held: opt.held,
@@ -3390,6 +3582,10 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     overlap: 0,
     deepestOverlap: 0,
     overlapPairs: 0,
+    // The container side and square size the frame was measured at, so a later measurement of
+    // part of the frame uses the same geometry.
+    side: 0,
+    size: 1,
   };
   function paintSquares(p, side, drain, tint, size, resting, homeward) {
     const N = poseA.length;
@@ -3399,7 +3595,11 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     });
     paintEdges.splice(0, paintEdges.length, ...geometry.contactEdges);
     if (standardizing() && clamp01(Number(resting) || 0) < 1) {
-      assignGroups(N, state.t);
+      if (state.optimizing && opt !== null) {
+        assignRunGroups(N, state.t);
+      } else {
+        assignGroups(N, state.t);
+      }
     }
     /** @type {import("./view/scene-types.js").SceneFrame} */
     const scene = {
@@ -3446,6 +3646,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       movingSlots: groupSlot,
     });
     paintTouching = painted.touching;
+    paintOut.side = side;
+    paintOut.size = size ?? 1;
     drawMaskLinks(N);
     for (let i = 0; i < motion.length; i++) {
       motion[i].rect.setAttribute("fill", painted.fills[i]);
@@ -3498,20 +3700,35 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // walls are at, and the view sized to hold whichever of the box and the record is wider so the
   // picture does not breathe as the walls close. The fills are the pair's own, drained while the run
   // is going and locked back in on pause, as they are for the step animation.
+  //: The view a held square is dragged in, taken when it is picked up; null while nothing is held.
+  /** @type {{x: number, y: number, size: number} | null} */
+  let heldView = null;
   function renderOptimizeScene(p, _A, B) {
     const o = opt;
     const side = o.side;
-    // The view covers the walls and the squares both, so a square held outside the box stays on the
-    // stage instead of vanishing off the edge of it.
+    // The view covers the walls and the squares both, so a square let go outside the box stays on
+    // the stage instead of vanishing off the edge of it.
     const lox = Math.min(0, o.bx0),
       hix = Math.max(side, o.bx1);
     const loy = Math.min(0, o.by0),
       hiy = Math.max(side, o.by1);
     const span = Math.max(hix - lox, hiy - loy, B.side);
-    const view = span * (1 + 2 * PAD);
+    const size = span * (1 + 2 * PAD);
     const midX = (lox + hix) / 2,
       midY = (loy + hiy) / 2;
-    svg.setAttribute("viewBox", `${midX - view / 2} ${-midY - view / 2} ${view} ${view}`);
+    let view = { x: midX - size / 2, y: -midY - size / 2, size };
+    // **While a square is held, the view holds still** (#125 F6). Re-fitted on every frame, it moved
+    // under the cursor: the pointer is mapped through the view just drawn, a square past a wall
+    // widens that view, the same pixel then maps further out, and the square ran away from the
+    // hand -- a 65 px drag took it from x 4.5 to 29, and ten one-pixel jiggles to 124. So the view is
+    // taken when the square is picked up and kept until it is let go, when it catches up.
+    if (o.held >= 0) {
+      heldView ??= view;
+      view = heldView;
+    } else {
+      heldView = null;
+    }
+    svg.setAttribute("viewBox", `${view.x} ${view.y} ${view.size} ${view.size}`);
     containerRect.setAttribute("width", String(side));
     containerRect.setAttribute("height", String(side));
     sceneSide = side;
@@ -3566,7 +3783,10 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       ? ramp(t, start, knee) * PHYS.tightenFrom
       : PHYS.tightenFrom + ramp(t, knee, sc.moveEnd) * (1 - PHYS.tightenFrom);
   }
-  function renderPhysicsScene(p, A, B, _tm, sc, t) {
+  // Where the physical styles put every square at `t`, written into the three pose buffers, and
+  // the container around them. The stage draws this answer and the moving palette's checkpoints
+  // read it, so a run's colours are measured on the same poses the stage shows.
+  function physicsFrame(p, A, B, sc, t, xs, ys, as) {
     const u = moveProgress(sc, t);
     const moving = u > 0 && u < 1;
     // With the snap off the simulation's own final state is what the pair comes to rest at, so the
@@ -3580,8 +3800,6 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     // packing recentred inside it. After that the move is the simulation's own clock.
     const oe = blind ? easeInOut(clamp01(u / BLIND.open)) : 1;
     const su = blind ? clamp01((u - BLIND.open) / (1 - BLIND.open)) : Math.min(u, 1);
-    const settled = easeOut(ramp(t, sc.moveEnd, sc.end));
-    const e = easeInOut(u);
     let side, fit;
     if (blind && tr !== null) {
       side = oe < 1 ? lerp(A.side, tr.sides[0], oe) : sampleSide(tr, su);
@@ -3590,21 +3808,6 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       side = u >= 1 ? B.side : containerSide(A.side, B.side, u);
       fit = B.side;
     }
-    // The held view has to cover the widest the container ever gets, which for a blind run is its
-    // inflated start; that is a pure function of the record, so the view never jumps when the
-    // trajectory arrives.
-    const widest = blind ? B.side * BLIND.inflate : side;
-    const held = Math.max(A.side * (1 + 2 * PAD), widest * (1 + 2 * PAD_MIN));
-    const refit = easeInOut(ramp(t, sc.moveEnd, sc.end));
-    const view = u < 1 ? held : lerp(held, fit * (1 + 2 * PAD), refit);
-    svg.setAttribute("viewBox", `${side / 2 - view / 2} ${-side / 2 - view / 2} ${view} ${view}`);
-    containerRect.setAttribute("width", String(side));
-    containerRect.setAttribute("height", String(side));
-    sceneSide = side;
-
-    currentTrajectory = tr;
-    lastMoveU = su;
-    const drain = desatLevel(sc, t);
     for (let i = 0; i < motion.length; i++) {
       const m = motion[i];
       let x, y, ang;
@@ -3627,41 +3830,70 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
         y = pose[1];
         ang = pose[2];
       }
-      poseX[i] = x;
-      poseY[i] = y;
-      poseA[i] = ang;
-      m.node.setAttribute("transform", `translate(${x} ${y}) rotate(${ang})`);
+      xs[i] = x;
+      ys[i] = y;
+      as[i] = ang;
     }
-
     // The new square, identity n + 1: it fades and inflates in over the first part of the move
-    // where the simulation puts it, its fill leaning toward scarlet until the settle ends.
+    // where the simulation puts it.
     const nb = newPose;
     const appear = u <= 0 ? 0 : easeOut(clamp01(su / PHYS.appear));
+    let scale = 1;
+    if (appear > 0 && tr !== null) {
+      const pose = samplePose(tr, su, p.n);
+      xs[p.n] = pose[0];
+      ys[p.n] = pose[1];
+      as[p.n] = pose[2];
+      scale = lerp(PHYS.inflateFrom, 1, clamp01(su / PHYS.appear));
+    } else {
+      xs[p.n] = nb[0];
+      ys[p.n] = nb[1];
+      as[p.n] = nb[2];
+    }
+    return { u, moving, blind, tr, su, side, fit, appear, scale };
+  }
+  function renderPhysicsScene(p, A, B, _tm, sc, t) {
+    const { u, moving, blind, tr, su, side, fit, appear, scale } = physicsFrame(
+      p,
+      A,
+      B,
+      sc,
+      t,
+      poseX,
+      poseY,
+      poseA,
+    );
+    const settled = easeOut(ramp(t, sc.moveEnd, sc.end));
+    const e = easeInOut(u);
+    // The held view has to cover the widest the container ever gets, which for a blind run is its
+    // inflated start; that is a pure function of the record, so the view never jumps when the
+    // trajectory arrives.
+    const widest = blind ? B.side * BLIND.inflate : side;
+    const held = Math.max(A.side * (1 + 2 * PAD), widest * (1 + 2 * PAD_MIN));
+    const refit = easeInOut(ramp(t, sc.moveEnd, sc.end));
+    const view = u < 1 ? held : lerp(held, fit * (1 + 2 * PAD), refit);
+    svg.setAttribute("viewBox", `${side / 2 - view / 2} ${-side / 2 - view / 2} ${view} ${view}`);
+    containerRect.setAttribute("width", String(side));
+    containerRect.setAttribute("height", String(side));
+    sceneSide = side;
+
+    currentTrajectory = tr;
+    lastMoveU = su;
+    const drain = desatLevel(sc, t);
+    for (let i = 0; i < motion.length; i++) {
+      motion[i].node.setAttribute(
+        "transform",
+        `translate(${poseX[i]} ${poseY[i]}) rotate(${poseA[i]})`,
+      );
+    }
+    // The new square's fill leans toward scarlet until the settle ends.
+    const [x, y, ang] = [poseX[p.n], poseY[p.n], poseA[p.n]];
     if (appear > 0) {
-      let x, y, ang, scale;
-      if (tr === null) {
-        x = nb[0];
-        y = nb[1];
-        ang = nb[2];
-        scale = 1;
-      } else {
-        const pose = samplePose(tr, su, p.n);
-        x = pose[0];
-        y = pose[1];
-        ang = pose[2];
-        scale = lerp(PHYS.inflateFrom, 1, clamp01(su / PHYS.appear));
-      }
-      poseX[p.n] = x;
-      poseY[p.n] = y;
-      poseA[p.n] = ang;
       newNode.setAttribute("opacity", appear);
       newNode.setAttribute("transform", `translate(${x} ${y}) rotate(${ang}) scale(${scale})`);
     } else {
-      poseX[p.n] = nb[0];
-      poseY[p.n] = nb[1];
-      poseA[p.n] = nb[2];
       newNode.setAttribute("opacity", 0);
-      newNode.setAttribute("transform", `translate(${nb[0]} ${nb[1]}) rotate(${nb[2]})`);
+      newNode.setAttribute("transform", `translate(${x} ${y}) rotate(${ang})`);
     }
     // At rest through the dwell and from the instant the settle ends, which are the two frames a
     // Animate leaves a viewer looking at.
@@ -3885,8 +4117,10 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
 
   // Style A, the block tween of revision 5: poses tween between the two frames, a block's members
   // riding its rigid transform, the container and the view with them.
-  function renderTweenScene(p, A, B, tm, sc, t) {
-    const scene = illustrationFrame({
+  // Where style A puts every square at `t`: the illustration's frame, which the stage draws and the
+  // moving palette's checkpoints read.
+  function tweenFrame(p, A, B, tm, sc, t) {
+    return illustrationFrame({
       pairIndex: state.pair,
       n: state.liveN,
       fromSide: A.side,
@@ -3905,6 +4139,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       tint: TINT,
       mark: { wide: MARK_WIDE, thin: MARK_THIN, fade: MARK_FADE },
     });
+  }
+  function renderTweenScene(p, A, B, tm, sc, t) {
+    const scene = tweenFrame(p, A, B, tm, sc, t);
     sceneSide = scene.containerSide;
     for (const square of scene.squares) {
       poseX[square.index] = square.x;
@@ -4029,8 +4266,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
           (g.done ? "full" : g.growing ? "growing" : g.stalled ? "stalled" : "held") +
           " · unit " +
           fmt(g.unitSide, 3) +
-          " vs " +
-          fmt(g.record, 3);
+          // A side is compared with the record only when the arrangement is a packing.
+          (g.packing ? ` vs ${fmt(g.record, 3)}` : ", not a packing");
   }
   function updateChrome() {
     if (state.capture) {
@@ -4511,8 +4748,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   let rafHandle = null;
   let lastStamp = null;
   function tick(stamp) {
+    // The frame this loop asked for has arrived, so it holds no pending request until it makes one.
+    rafHandle = null;
     if (!state.playing) {
-      rafHandle = null;
       return;
     }
     if (lastStamp !== null) {
@@ -4532,7 +4770,12 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       }
     }
     lastStamp = stamp;
-    rafHandle = requestAnimationFrame(tick);
+    // Only a clock still playing asks for the next frame, and only when nothing inside this one
+    // already has: a step that ends here pauses, and a play pressed before the next frame starts
+    // its own loop. Asking unconditionally ran two loops at twice the frame rate.
+    if (state.playing && rafHandle === null) {
+      rafHandle = requestAnimationFrame(tick);
+    }
   }
   // The next pair is simulated during this pair's dwell, so the cost of a precompute falls where
   // nothing is moving rather than on the first frame of the next move.
@@ -4603,6 +4846,15 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     updateSegments();
     rafHandle = requestAnimationFrame(tick);
   }
+  // End an open-ended run. The clock stops with it: a run is what an optimising clock advances, so
+  // leaving the clock running after the run is gone plays whatever the timeline holds instead.
+  function endRun() {
+    if (state.optimizing || opt !== null) {
+      pause();
+      state.optimizing = false;
+      opt = null;
+    }
+  }
   function pause() {
     state.playing = false;
     markGapBar();
@@ -4631,11 +4883,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   }
   function select(index) {
     index = Math.max(0, Math.min(PAIRS.length - 1, index | 0));
-    // A run belongs to one n; choosing another ends it.
-    if (state.optimizing) {
-      state.optimizing = false;
-      opt = null;
-    }
+    // A run belongs to one n; choosing another ends it, and the clock with it.
+    endRun();
     state.pair = index;
     state.t = 0;
     markGapBar();
@@ -4849,14 +5098,19 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       return state.seed;
     }
     state.seed = k;
-    // A new seed is a new run: the staged arrangement and any cached trajectory belong to the
-    // old one.
-    if (state.optimizing) {
-      state.optimizing = false;
-      opt = null;
+    // A new seed is a new run: the staged arrangement and any open-ended run belong to the old one.
+    // The run is ended through `endRun`, so the clock stops with it rather than playing on with no
+    // run behind it; a Pack run starts again from its own start under the new seed. Trajectories
+    // are keyed by the seed, so the next frame reads the new seed's.
+    const running = state.optimizing && opt !== null;
+    endRun();
+    if (running && state.mode === "pack") {
+      state.optimizing = true;
+      opt = newOptimizer(state.initial);
     }
     markGapBar();
     stagePack();
+    updateSegments();
     render();
     return state.seed;
   }
@@ -4915,11 +5169,14 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     if (position.index !== state.pair) {
       select(position.index);
     }
-    seek(position.time);
+    const held = keepStageInRange();
+    seek(held === null ? position.time : held === "first" ? 0 : duration());
   }
   // Continuous play: every pair from here to the last, back to back, keeping the style, the colour
   // rule, the snap, the blind run and the desaturation, on the sequence's own beat.
   function playAll() {
+    endRun();
+    keepStageInRange();
     state.continuous.on = true;
     preparedFor = -1;
     state.t = 0;
@@ -5005,8 +5262,18 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     // other where they would otherwise disagree. A range wider than one step is something Pack
     // cannot show, so it puts the page in Animate; a collapsed range is legal in both and never
     // forces a mode, since `setRange(17, 17)` in Animate is how one step animation is played.
-    if (forcedAspect !== null) {
-      state.mode = forcedAspect;
+    if (forcedAspect !== null && forcedAspect !== state.mode) {
+      enterAspect(
+        planAspectTransition({
+          currentAspect: state.mode,
+          currentRange: { from: lo, to: hi },
+          currentStepN: stepN(),
+          rememberedPackN: state.packN,
+          rememberedAnimateRange: state.animate,
+          supportedSteps: SUPPORTED_STEP_NS,
+          target: forcedAspect,
+        }),
+      );
     }
     // A one-step range is not a continuous run: the three timing boxes govern again.
     if (collapsed && state.continuous.on) {
@@ -5126,26 +5393,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       updateSegments();
       return state.mode;
     } // updateSegments coerces the style
-    controlsHeight = 0;
-    state.animate = transition.rememberedAnimateRange;
-    state.packN = transition.rememberedPackN;
-    state.mode = transition.aspect;
-    // The reset itself: nothing that belonged to the mode being left survives into the one being
-    // entered. `opt` is the open-ended run, `state.t` the animation clock.
-    pause();
-    state.optimizing = false;
-    opt = null;
-    state.t = 0;
-    // Revision 14: the tween is Animate's, so entering Pack with it selected falls back to the
-    // physics and leaves the reason under the select; leaving Pack clears the note, the choice
-    // being available again.
-    if (transition.aspect === "pack" && state.style === "tween") {
-      state.style = "physics";
-      solverNote = TWEEN_NOTE;
-    }
-    if (transition.aspect === "animate") {
-      solverNote = "";
-    }
+    enterAspect(transition);
     if (transition.aspect === "pack") {
       // Revision 13: Pack is where the starting size lives. Revision 14: and where all n squares are
       // on the stage from the first frame, so entering Pack always stages the arrangement --
@@ -5161,6 +5409,48 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     updateSegments();
     render();
     return state.mode;
+  }
+  // **Entering an aspect is a reset, wherever the entry comes from** (#125 F12): the mode tabs, or a
+  // range too wide for Pack. Nothing that belonged to the aspect being left survives into the one
+  // being entered: `opt` is the open-ended run, `state.t` the animation clock, and each aspect's
+  // remembered n or range is stored on the way out.
+  function enterAspect(transition) {
+    controlsHeight = 0;
+    state.animate = transition.rememberedAnimateRange;
+    state.packN = transition.rememberedPackN;
+    state.mode = transition.aspect;
+    endRun();
+    pause();
+    state.t = 0;
+    // Revision 14: the tween is Animate's, so entering Pack with it selected falls back to the
+    // physics and leaves the reason under the select; leaving Pack clears the note, the choice
+    // being available again.
+    if (transition.aspect === "pack" && state.style === "tween") {
+      state.style = "physics";
+      solverNote = TWEEN_NOTE;
+    }
+    if (transition.aspect === "animate") {
+      solverNote = "";
+    }
+  }
+  // **The one place the stage is put back inside the range** (#125 F12). Every call that moves the
+  // stage to another step ends here: a one-step range follows the stage, as the step buttons carry
+  // it, and a wider range holds the stage at its nearer end. Answers which end it held at, if any.
+  function keepStageInRange() {
+    const b = rangeBounds();
+    if (state.pair >= b.first && state.pair <= b.last) {
+      return null;
+    }
+    if (state.range.from === state.range.to) {
+      const n = PAIRS[state.pair].n + 1;
+      state.range.from = n;
+      state.range.to = n;
+      updateSegments();
+      return null;
+    }
+    const end = state.pair < b.first ? "first" : "last";
+    select(end === "first" ? b.first : b.last);
+    return end;
   }
   function advanceReducedMotion() {
     const b = rangeBounds();
@@ -5321,7 +5611,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       pause();
     }
     select(best);
-    return PAIRS[best].n;
+    keepStageInRange();
+    return PAIRS[state.pair].n;
   }
 
   // The workbench's API, hung on the page's own global: one handle for the probes, the capture
@@ -5562,7 +5853,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     get(target, property, receiver) {
       const member = Reflect.get(target, property, receiver);
       if (
-        (packPanel?.visible() || searchPanel?.visible()) &&
+        !catalogueOwnsPage() &&
         typeof member === "function" &&
         property !== "setMode" &&
         property !== "mode"
@@ -5582,7 +5873,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // them, so the pair and the range never disagree; inside a wider range they stay inside it.
   function nudgeStep(delta) {
     if (state.mode === "pack" || state.range.from === state.range.to) {
-      setStepN(stepN() + delta);
+      // The next step the page carries, across any gap: `stepN() + delta` rounded back to the
+      // nearest carried step, which on a sparse page is the step already showing.
+      setStepN(adjacentSupportedStep(SUPPORTED_STEP_NS, stepN(), delta));
       return;
     }
     const b = rangeBounds();
@@ -5754,7 +6047,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     return [pt.x, pt.y];
   }
   stage.addEventListener("keydown", (ev) => {
-    if (ev.metaKey || ev.ctrlKey || ev.altKey) {
+    if (ev.metaKey || ev.ctrlKey || ev.altKey || !catalogueOwnsPage()) {
       return;
     }
     const target = ev.target instanceof Element ? ev.target : null;
@@ -5792,7 +6085,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // decides which of them a press starts and nothing is ever ambiguous. With `draw links` on no
   // square is picked up at all; with it off the drawing code is never entered.
   svg.addEventListener("pointerdown", (ev) => {
-    if (animationPanel?.state().active || packPanel?.visible()) {
+    if (animationPanel?.state().active || !catalogueOwnsPage()) {
       return;
     }
     if (ev.button !== 0) {
@@ -5834,6 +6127,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     dragTo(w[0], w[1], ev.shiftKey);
   });
   const endDrag = (ev) => {
+    // Whatever ended the gesture, the drag is over: a key that ends the run mid-drag has already
+    // dropped the hand, and the early return below would otherwise leave the class behind.
+    document.body.classList.remove("dragging");
     if (linkFrom >= 0) {
       if (svg.hasPointerCapture(ev.pointerId)) {
         svg.releasePointerCapture(ev.pointerId);
@@ -5848,7 +6144,6 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     if (svg.hasPointerCapture(ev.pointerId)) {
       svg.releasePointerCapture(ev.pointerId);
     }
-    document.body.classList.remove("dragging");
     release();
   };
   svg.addEventListener("pointerup", endDrag);
@@ -5860,7 +6155,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     if (ev.metaKey || ev.ctrlKey || ev.altKey) {
       return;
     }
-    if (packPanel?.visible()) {
+    // Pack and Search own their keys: their fields take Space and the arrows, their buttons
+    // take Space, and a letter typed there is text, not a shortcut for the hidden catalogue.
+    if (!catalogueOwnsPage()) {
       return;
     }
     // What has the focus, read as an element once: the guard is about typing into a control, and

@@ -3,7 +3,7 @@
   // they share a program only in the sense that none of them declares anything at the top
   // level; what they have in common is that they all talk to `window.atlasTransitions`.
   // `probes/atlas-transitions.d.ts` is what that is -- 114 keys, cross-checked against the
-  // object the page actually exports. Same ratchet, same tracker: think-4cwy.
+  // object the page actually exports. Same ratchet, same tracker: think-n711.
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "noImplicitAny": false,

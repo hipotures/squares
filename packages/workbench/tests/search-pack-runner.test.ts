@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
+import { assessPackingSnapshot, mixUint32Seed } from "../src/core/runtime-contracts.ts";
 import { decodeCorpus, frameAt } from "../src/data/corpus.ts";
 import type { JsonObject } from "../src/search/contracts.ts";
 import { decodeSearchOutcomes, encodeSearchOutcomes } from "../src/search/outcomes.ts";
@@ -13,6 +14,8 @@ import {
 import { decodeSearchPlan } from "../src/search/registry.ts";
 import { runSearchPlan } from "../src/search/scheduler.ts";
 import { summarizeSearch } from "../src/search/summary.ts";
+import { createRandomPackStart } from "../src/simulation/pack.ts";
+import { resolvePacking } from "../src/simulation/resolve.ts";
 
 function required<T>(value: T | undefined): T {
   assert.notEqual(value, undefined);
@@ -71,7 +74,11 @@ function configuration(overrides: Partial<JsonObject> = {}): JsonObject {
   };
 }
 
-function plan(config: JsonObject = configuration(), proposalAttempts = 4) {
+function plan(
+  config: JsonObject = configuration(),
+  proposalAttempts = 4,
+  { n = 2, physicsSteps = 2, repairIterations = 8 } = {},
+) {
   return decodeSearchPlan({
     contract: "packing.squares:SearchPlan/v1",
     id: "pack-runner-control",
@@ -82,13 +89,13 @@ function plan(config: JsonObject = configuration(), proposalAttempts = 4) {
         id: "tuning-control",
         configuration_id: "control",
         partition: "tuning",
-        n: 2,
+        n,
         seeds: [7],
         block_size: 1,
         work_budget: {
           proposal_attempts: proposalAttempts,
-          physics_steps: 2,
-          repair_iterations: 8,
+          physics_steps: physicsSteps,
+          repair_iterations: repairIterations,
         },
       },
     ],
@@ -216,27 +223,62 @@ test("Pack search preflight checks corpus joins and proposal work before executi
 
 test("Pack search retains raw, repaired and observed-best states with exact work and seeds", async () => {
   const context = { corpus: corpus() };
-  const declared = plan();
+  // Pack samples its best state every 10 steps, so 30 steps sample it three times, and by the
+  // end the pair has spread past the best sample: raw and best-observed are different states.
+  const declared = plan(configuration(), 4, { physicsSteps: 30 });
   validatePackSearchPlan(declared, context);
-  const envelope = await runSearchPlan(declared, createPackSearchRunner(context));
+  const envelope = await runSearchPlan(declared, createPackSearchRunner(context), {
+    now: () => 0,
+  });
   const outcome = envelope.outcomes[0];
   assert.equal(outcome?.status, "completed", JSON.stringify(outcome));
   if (outcome?.status !== "completed") {
     throw new Error("expected the Pack trial to complete");
   }
-  assert.equal(outcome.result.raw.snapshot.poses.length, 2);
-  assert.notEqual(outcome.result.repaired, null);
-  assert.notStrictEqual(outcome.result.raw.snapshot, outcome.result.repaired?.snapshot);
-  assert.equal(outcome.result.selectedState, "repaired");
-  assert.equal(outcome.result.work.proposalAttempts, 4);
-  assert.equal(outcome.result.work.physicsSteps, 2);
-  assert(outcome.result.work.repairIterations <= 8);
-  assert.equal(outcome.result.configuration.requested_seed, 7);
-  assert.equal(typeof outcome.result.configuration.effective_seed, "number");
-  assert.equal(
-    outcome.result.objective === null || Number.isFinite(outcome.result.objective),
-    true,
+  const { result } = outcome;
+  assert.equal(result.raw.snapshot.poses.length, 2);
+  assert.equal(result.selectedState, "repaired");
+  assert.equal(result.work.proposalAttempts, 4);
+  assert.equal(result.work.physicsSteps, 30);
+  assert.equal(result.configuration.requested_seed, 7);
+  assert.equal(result.configuration.effective_seed, mixUint32Seed(99, 7));
+
+  const best = required(result.bestObserved ?? undefined);
+  assert.equal(best.valid, true);
+  assert.equal(assessPackingSnapshot(best.snapshot, 2).valid, true);
+  assert.notEqual(best.absoluteSide, result.raw.absoluteSide);
+
+  // The repair receipt, work and state are exactly what Resolve does to the raw state.
+  const resolve = resolvePacking(result.raw.snapshot, {
+    expectedCount: 2,
+    iterationLimit: 8,
+    tolerance: 1e-9,
+  });
+  assert.deepEqual(result.repair, {
+    termination: resolve.termination.reason,
+    resolved: resolve.termination.resolved,
+    exhausted: resolve.termination.exhausted,
+    tolerance: 1e-9,
+    iterationLimit: 8,
+  });
+  assert.deepEqual(
+    {
+      iterations: result.work.repairIterations,
+      pairTests: result.work.repairPairTests,
+      pairTranslations: result.work.repairPairTranslations,
+      fitTranslations: result.work.repairFitTranslations,
+    },
+    resolve.work,
   );
+  assert.ok(resolve.work.fitTranslations > 0, "Resolve did no work, so the receipt proves little");
+  const repaired = required(result.repaired ?? undefined);
+  assert.notStrictEqual(result.raw.snapshot, repaired.snapshot);
+  assert.deepEqual(repaired.snapshot, resolve.repaired?.snapshot);
+
+  // The objective is the repaired state's side, measured here, which best-observed is not.
+  const side = assessPackingSnapshot(repaired.snapshot, 2).requiredSide;
+  assert.equal(result.objective, side);
+  assert.notEqual(best.absoluteSide, side);
 });
 
 test("Pack Search yields to timer cancellation and retains partial physics work", async () => {
@@ -267,23 +309,42 @@ test("Pack Search yields to timer cancellation and retains partial physics work"
   }
   assert.equal(outcome.partial?.work.physicsSteps, 1);
   assert.equal(outcome.partial?.work.repairIterations, 0);
+  assert.deepEqual(outcome.partial?.repair, {
+    termination: "cancelled",
+    resolved: false,
+    exhausted: false,
+    tolerance: 1e-9,
+    iterationLimit: 8,
+  });
 });
 
 test("Pack Search receipts do not depend on cooperative batch size", async () => {
-  const declared = plan(configuration({ proposal: { kind: "grid" } }), 1);
-  required(declared.slots[0]).workBudget.physicsSteps = 9;
+  // Five squares dropped at random into a side of 2.5 overlap: Pack pushes them apart for 45
+  // steps and Resolve still has to iterate, so every batch boundary lands mid-motion.
+  const declared = plan(
+    configuration({ reference: "none", proposal: { kind: "random", container_side: 2.5 } }),
+    1,
+    { n: 5, physicsSteps: 45, repairIterations: 64 },
+  );
   const execute = (batchSteps: number) =>
     runSearchPlan(
       declared,
-      createPackSearchRunner({
-        corpus: corpus(),
-        batchSteps,
-        yieldControl: () => Promise.resolve(),
-      }),
+      createPackSearchRunner({ batchSteps, yieldControl: () => Promise.resolve() }),
       { now: () => 0 },
     );
   const single = await execute(1);
-  const batched = await execute(8);
-  assert.equal(single.outcomes[0]?.status, "completed");
-  assert.deepEqual(single, batched);
+  const outcome = single.outcomes[0];
+  assert.equal(outcome?.status, "completed", JSON.stringify(outcome));
+  if (outcome?.status !== "completed") {
+    throw new Error("expected the Pack trial to complete");
+  }
+  const start = createRandomPackStart(5, 2.5, mixUint32Seed(99, 7));
+  assert.notDeepEqual(outcome.result.raw.snapshot.poses, start.poses);
+  assert.ok(outcome.result.work.pairForces > 0, "Pack did not move the squares");
+  assert.equal(outcome.result.raw.valid, false);
+  assert.equal(outcome.result.repair.termination, "resolved");
+  assert.ok(outcome.result.work.repairIterations > 1, "Resolve did not iterate");
+  for (const batchSteps of [7, 32]) {
+    assert.deepEqual(await execute(batchSteps), single, `batch size ${batchSteps}`);
+  }
 });

@@ -8,26 +8,32 @@ import re
 from collections import Counter
 from collections.abc import Callable
 from dataclasses import dataclass, field
+from enum import StrEnum
 from functools import cache
 from typing import cast
 
 from sqpack.project import configured_project_root
 from sqpack.yamlio import safe_load
 from workbench_tools.packing_contracts import (
+    DEFAULT_VALIDITY_TOLERANCE,
     GeometryIssue,
     PackingContractError,
     check_unit_square_packing,
 )
 
 TRIAL_CONTRACT = "packing.squares:AnnealingTrial/v2"
-CONFIGURATION_CONTRACT = "packing.squares:AnnealingConfiguration/v1"
+CONFIGURATION_CONTRACT = "packing.squares:AnnealingConfiguration/v2"
 SOURCE_CONTRACT = "packing.squares:WorkbenchSource/v1"
 REPAIR_CONTRACT = "packing.squares:OverlapRepair/v1"
+ATTEMPT_FAILURE_CONTRACT = "packing.squares:AnnealingAttemptFailure/v1"
 
-# Matches the retained catalogue precision; each independent check receives it explicitly.
-VALID_OVERLAP = 1e-5
+#: Geometry is admitted under the workbench's one validity contract and nothing looser: the raw
+#: and repaired arrangements, the reported overlaps, the fitted origin and the fitted side.
+VALIDITY_TOLERANCE = DEFAULT_VALIDITY_TOLERANCE
+
+#: Arithmetic identity, not geometry: a recorded reference side, excess, score or cost must
+#: equal the value recomputed from the same inputs, to within float64 rounding at these sizes.
 REFERENCE_TOLERANCE = 1e-9
-REPAIR_TOLERANCE = 1e-9
 
 
 @dataclass(frozen=True, slots=True)
@@ -61,6 +67,29 @@ def canonical_reference(n: int) -> PackingReference:
     return PackingReference(n=n, side=side, source=f"packing/{relative}")
 
 
+def below_record_side(record: float) -> float:
+    """The side under which an admitted arrangement would beat the record, and is refused.
+
+    Squares that pass the contract at tolerance t still fit, shrunk by 2t, without overlap, so
+    a side s implies a true packing at s / (1 - 2t). Below `record (1 - 2t) - t` that would be a
+    new record, which a float64 benchmark cannot establish: such a trial is refused as
+    `below-record` and needs exact verification before any claim.
+    """
+    return record * (1 - 2 * VALIDITY_TOLERANCE) - VALIDITY_TOLERANCE
+
+
+def check_success_band(tolerance_pct: float, record: float) -> None:
+    """Refuse a success band, in per cent of the record, finer than the validity tolerance."""
+    if not math.isfinite(tolerance_pct) or tolerance_pct < 0:
+        raise ValueError("success tolerance must be finite and nonnegative")
+    if record * tolerance_pct / 100 < VALIDITY_TOLERANCE:
+        raise ValueError(
+            f"a {tolerance_pct:g}% success band at side {record:g} is finer than the validity "
+            f"tolerance {VALIDITY_TOLERANCE:g}, so it would rank arrangements the contract "
+            "cannot tell apart"
+        )
+
+
 def gap_closed(n: int, record: float, excess: float) -> float | None:
     """Return the normalized record-to-grid score, or ``None`` for a zero gap."""
     grid = math.ceil(math.sqrt(n))
@@ -71,14 +100,58 @@ def gap_closed(n: int, record: float, excess: float) -> float | None:
 
 
 @dataclass(frozen=True, slots=True)
+class PhysicsLaw:
+    """One force law as the page ran it: the pair law or the wall law."""
+
+    rigidity: float
+    repulsion: float
+    attraction: float
+    range: float
+
+    def row(self) -> dict[str, object]:
+        return {
+            "rigidity": self.rigidity,
+            "repulsion": self.repulsion,
+            "attraction": self.attraction,
+            "range": self.range,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class BeatTiming:
+    """The page's beat in seconds, which sets how many physics steps a trajectory takes."""
+
+    dwell: float
+    move: float
+    correct: float
+    settle: float
+
+    def row(self) -> dict[str, object]:
+        return {
+            "dwell": self.dwell,
+            "move": self.move,
+            "correct": self.correct,
+            "settle": self.settle,
+        }
+
+
+@dataclass(frozen=True, slots=True)
 class EffectiveConfiguration:
-    """The browser settings actually used after its setters applied their contracts."""
+    """The browser settings actually used after its setters applied their contracts.
+
+    Version 2 adds the pair and wall laws, the beat and the annealed span, so trials run
+    before and after a change of the page's defaults are told apart by more than the commit.
+    """
 
     style: str
     mode: str
     seed: int
     inflate: float
     anneal: int
+    pair_law: PhysicsLaw
+    wall_law: PhysicsLaw
+    timing: BeatTiming
+    anneal_span: float
     contract: str = CONFIGURATION_CONTRACT
 
     def row(self) -> dict[str, object]:
@@ -89,6 +162,10 @@ class EffectiveConfiguration:
             "seed": self.seed,
             "inflate": self.inflate,
             "anneal": self.anneal,
+            "pair_law": self.pair_law.row(),
+            "wall_law": self.wall_law.row(),
+            "timing": self.timing.row(),
+            "anneal_span": self.anneal_span,
         }
 
 
@@ -183,15 +260,22 @@ class Trial:
     contract: str = TRIAL_CONTRACT
 
     def row(self) -> dict[str, object]:
-        """Return the complete versioned wire representation without legacy defaults."""
+        """Return the complete versioned wire representation without legacy defaults.
+
+        `raw_valid` and `resolved_valid` say whether the raw and repaired arrangements pass the
+        validity contract in their fitted boxes, so no side or excess is written without it.
+        They are derived here and never read back: admission rechecks the geometry itself.
+        """
         return {
             "contract": self.contract,
             "n": self.n,
             "seed": self.seed,
             "style": self.style,
+            "raw_valid": _passes_contract(self.poses, self.side, self.n),
             "excess": self.excess,
             "closed": self.closed,
             "overlap": self.overlap,
+            "resolved_valid": _passes_contract(self.resolved_poses, self.resolved_side, self.n),
             "resolved_side": self.resolved_side,
             "resolved_closed": self.resolved_closed,
             "resolved_overlap": self.resolved_overlap,
@@ -288,24 +372,26 @@ def admission_reason(  # noqa: PLR0911 - each ordered refusal is part of the wir
             trial.poses,
             side=trial.side,
             expected_count=trial.n,
-            tolerance=VALID_OVERLAP,
+            tolerance=VALIDITY_TOLERANCE,
         )
         repaired = check_unit_square_packing(
             trial.resolved_poses,
             side=trial.resolved_side,
             expected_count=trial.n,
-            tolerance=VALID_OVERLAP,
+            tolerance=VALIDITY_TOLERANCE,
         )
     except PackingContractError, OverflowError, TypeError, ValueError:
         return "malformed-geometry"
-    malformed = {GeometryIssue.SHAPE, GeometryIssue.COUNT, GeometryIssue.NONFINITE}
+    if GeometryIssue.NONFINITE in raw.issues or GeometryIssue.NONFINITE in repaired.issues:
+        return "nonfinite-geometry"
+    malformed = {GeometryIssue.SHAPE, GeometryIssue.COUNT, GeometryIssue.DIMENSIONS}
     if malformed.intersection(raw.issues) or GeometryIssue.WALL_ESCAPE in raw.issues:
         return "raw-geometry"
-    reported_overlap = trial.overlap > VALID_OVERLAP
+    reported_overlap = trial.overlap > VALIDITY_TOLERANCE
     checked_overlap = GeometryIssue.PAIR_OVERLAP in raw.issues
     if reported_overlap != checked_overlap:
         return "inconsistent-raw-overlap"
-    if not repaired.passed or trial.resolved_overlap > VALID_OVERLAP:
+    if not repaired.passed or trial.resolved_overlap > VALIDITY_TOLERANCE:
         return "invalid-packing"
     if not _fitted_side_agrees(trial.poses, trial.side):
         return "inconsistent-raw-side"
@@ -322,6 +408,8 @@ def admission_reason(  # noqa: PLR0911 - each ordered refusal is part of the wir
     expected_resolved = gap_closed(trial.n, trial.record, resolved_excess)
     if not _score_agrees(trial.resolved_closed, expected_resolved):
         return "inconsistent-score"
+    if trial.resolved_side < below_record_side(trial.record):
+        return "below-record"
     return None
 
 
@@ -345,6 +433,84 @@ def valid(
 ) -> list[Trial]:
     """Return only canonical, finite, independently checked packing snapshots."""
     return partition_trials(trials, reference_for=reference_for)[0]
+
+
+class AttemptFailureReason(StrEnum):
+    """Why a planned attempt produced no trial record."""
+
+    #: The probe answered with an error, such as a page that carries no pair into this n.
+    PROBE_ERROR = "probe-error"
+    #: The probe's result could not be read as a trial: a missing, non-finite or mistyped field.
+    MALFORMED_RESULT = "malformed-result"
+    #: The canonical witness for this n could not be read.
+    REFERENCE_UNAVAILABLE = "reference-unavailable"
+    #: The browser call itself failed.
+    BROWSER_ERROR = "browser-error"
+
+
+@dataclass(frozen=True, slots=True)
+class AttemptFailure:
+    """A planned (n, seed) attempt that produced no trial, retained so it is counted."""
+
+    n: int
+    seed: int
+    style: str
+    params: dict[str, float | int]
+    reason: str
+    detail: str
+    source: SourceReceipt | None
+    contract: str = ATTEMPT_FAILURE_CONTRACT
+
+    def row(self) -> dict[str, object]:
+        return {
+            "contract": self.contract,
+            "n": self.n,
+            "seed": self.seed,
+            "style": self.style,
+            "params": self.params,
+            "reason": self.reason,
+            "detail": self.detail,
+            "source": self.source.row() if self.source else None,
+        }
+
+
+def attempt_to_json(attempt: Trial | AttemptFailure) -> str:
+    """Serialize a trial or a failed attempt as one strict JSON line."""
+    return json.dumps(attempt.row(), allow_nan=False, separators=(",", ":"), sort_keys=True)
+
+
+def attempt_from_json(text: str) -> Trial | AttemptFailure:
+    """Parse one benchmark line: a failed attempt by its contract, anything else as a trial."""
+    loaded: object = json.loads(text, parse_constant=_reject_json_constant)
+    row = _mapping(loaded)
+    if row is None:
+        raise ValueError("an attempt JSON value must be an object with string keys")
+    if row.get("contract") != ATTEMPT_FAILURE_CONTRACT:
+        return trial_from_row(row)
+    reason = row.get("reason")
+    if reason not in {member.value for member in AttemptFailureReason}:
+        raise ValueError(f"unsupported attempt failure reason {reason!r}")
+    params = _record_params(row.get("params"))
+    if params is None or set(row) != {
+        "contract",
+        "n",
+        "seed",
+        "style",
+        "params",
+        "reason",
+        "detail",
+        "source",
+    }:
+        raise ValueError("an attempt failure row has unexpected, missing or malformed fields")
+    return AttemptFailure(
+        n=_required_integer(row["n"], "n"),
+        seed=_required_integer(row["seed"], "seed"),
+        style=_required_string(row["style"], "style"),
+        params=params,
+        reason=cast(str, reason),
+        detail=_record_string(row["detail"]),
+        source=source_receipt_from_row(row["source"]),
+    )
 
 
 def trial_to_json(trial: Trial) -> str:
@@ -402,7 +568,17 @@ def trial_from_probe(
     if style not in {"physics", "bodies"}:
         raise ValueError("trial style is unsupported")
     configuration_row = _mapping(row["configuration"])
-    configuration_fields = {"style", "mode", "seed", "inflate", "anneal"}
+    configuration_fields = {
+        "style",
+        "mode",
+        "seed",
+        "inflate",
+        "anneal",
+        "pairLaw",
+        "wallLaw",
+        "timing",
+        "annealSpan",
+    }
     if configuration_row is None or set(configuration_row) != configuration_fields:
         raise ValueError("browser effective configuration is malformed")
     configuration = EffectiveConfiguration(
@@ -411,11 +587,19 @@ def trial_from_probe(
         seed=_required_integer(configuration_row["seed"], "configuration.seed"),
         inflate=_required_number(configuration_row["inflate"], "configuration.inflate"),
         anneal=_required_integer(configuration_row["anneal"], "configuration.anneal"),
+        pair_law=_required_law(configuration_row["pairLaw"], "configuration.pairLaw"),
+        wall_law=_required_law(configuration_row["wallLaw"], "configuration.wallLaw"),
+        timing=_required_timing(configuration_row["timing"], "configuration.timing"),
+        anneal_span=_required_number(
+            configuration_row["annealSpan"], "configuration.annealSpan"
+        ),
     )
     poses = pose_rows(row["poses"])
     resolved_poses = pose_rows(row["resolvedPoses"])
     if poses is None or resolved_poses is None:
-        raise ValueError("browser trial poses must be finite numeric triples")
+        raise ValueError("browser trial poses must be numeric triples")
+    if not all(math.isfinite(value) for pose in (*poses, *resolved_poses) for value in pose):
+        raise ValueError("browser trial poses must be finite")
     record = _required_number(row["record"], "record")
     excess = _required_number(row["excess"], "excess")
     resolved_side = _required_number(row["resolvedSide"], "resolvedSide")
@@ -491,6 +675,10 @@ def configuration_from_row(value: object) -> EffectiveConfiguration | None:
         seed=_record_integer(row.get("seed")),
         inflate=_record_number(row.get("inflate")),
         anneal=_record_integer(row.get("anneal")),
+        pair_law=_record_law(row.get("pair_law")),
+        wall_law=_record_law(row.get("wall_law")),
+        timing=_record_timing(row.get("timing")),
+        anneal_span=_record_number(row.get("anneal_span")),
         contract=_record_string(row.get("contract")),
     )
 
@@ -560,6 +748,8 @@ def _configuration_reason(  # noqa: PLR0911 - preserves distinct configuration r
         return "missing-configuration"
     if configuration.contract != CONFIGURATION_CONTRACT:
         return "unsupported-configuration-contract"
+    # The benchmark measures blind runs only. No snapped or guided control is admitted, and
+    # none is needed: geometry is checked at the contract tolerance, not a measured one.
     if (
         configuration.style != trial.style
         or configuration.mode != "blind"
@@ -570,6 +760,11 @@ def _configuration_reason(  # noqa: PLR0911 - preserves distinct configuration r
         or isinstance(configuration.anneal, bool)
         or not isinstance(configuration.anneal, int)
         or not 0 <= configuration.anneal <= 20
+        or not _sound_law(configuration.pair_law)
+        or not _sound_law(configuration.wall_law)
+        or not _sound_timing(configuration.timing)
+        or not _finite_number(configuration.anneal_span)
+        or configuration.anneal_span <= 0
     ):
         return "invalid-effective-configuration"
     if trial.params is None or set(trial.params) - {"inflate", "anneal"}:
@@ -646,9 +841,13 @@ def _repair_reason(trial: Trial) -> str | None:
         or not isinstance(repair.converged, bool)
     ):
         return "invalid-repair-receipt"
-    converged = trial.resolved_overlap <= REPAIR_TOLERANCE
+    converged = trial.resolved_overlap <= VALIDITY_TOLERANCE
     if repair.converged != converged:
         return "inconsistent-repair-receipt"
+    if not repair.converged:
+        # The gate on the repair is that it converged under the contract. A repair that hit its
+        # sweep limit is refused here, however small its residual, before geometry is checked.
+        return "repair-not-converged"
     return None
 
 
@@ -693,9 +892,9 @@ def _fitted_side_agrees(poses: tuple[tuple[float, float, float], ...], side: flo
         high_y = max(high_y, y + radius)
     fitted = max(high_x - low_x, high_y - low_y)
     return (
-        math.isclose(low_x, 0, rel_tol=0, abs_tol=VALID_OVERLAP)
-        and math.isclose(low_y, 0, rel_tol=0, abs_tol=VALID_OVERLAP)
-        and math.isclose(side, fitted, rel_tol=REFERENCE_TOLERANCE, abs_tol=VALID_OVERLAP)
+        math.isclose(low_x, 0, rel_tol=0, abs_tol=VALIDITY_TOLERANCE)
+        and math.isclose(low_y, 0, rel_tol=0, abs_tol=VALIDITY_TOLERANCE)
+        and math.isclose(side, fitted, rel_tol=REFERENCE_TOLERANCE, abs_tol=VALIDITY_TOLERANCE)
     )
 
 
@@ -789,3 +988,67 @@ def _record_params(value: object) -> dict[str, float | int] | None:
 
 def _reject_json_constant(token: str) -> None:
     raise ValueError(f"non-standard JSON number {token!r} is not allowed")
+
+
+def _passes_contract(
+    poses: tuple[tuple[float, float, float], ...] | None, side: float, n: int
+) -> bool:
+    if poses is None or isinstance(n, bool) or not isinstance(n, int) or n < 1:
+        return False
+    return check_unit_square_packing(
+        poses, side=side, expected_count=n, tolerance=VALIDITY_TOLERANCE
+    ).passed
+
+
+def _record_law(value: object) -> PhysicsLaw:
+    row = _mapping(value) or {}
+    return PhysicsLaw(
+        rigidity=_record_number(row.get("rigidity")),
+        repulsion=_record_number(row.get("repulsion")),
+        attraction=_record_number(row.get("attraction")),
+        range=_record_number(row.get("range")),
+    )
+
+
+def _record_timing(value: object) -> BeatTiming:
+    row = _mapping(value) or {}
+    return BeatTiming(
+        dwell=_record_number(row.get("dwell")),
+        move=_record_number(row.get("move")),
+        correct=_record_number(row.get("correct")),
+        settle=_record_number(row.get("settle")),
+    )
+
+
+def _required_law(value: object, label: str) -> PhysicsLaw:
+    row = _mapping(value)
+    if row is None or set(row) != {"rigidity", "repulsion", "attraction", "range"}:
+        raise ValueError(f"{label} must be a law with exactly its four parameters")
+    return PhysicsLaw(
+        rigidity=_required_number(row["rigidity"], f"{label}.rigidity"),
+        repulsion=_required_number(row["repulsion"], f"{label}.repulsion"),
+        attraction=_required_number(row["attraction"], f"{label}.attraction"),
+        range=_required_number(row["range"], f"{label}.range"),
+    )
+
+
+def _required_timing(value: object, label: str) -> BeatTiming:
+    row = _mapping(value)
+    if row is None or set(row) != {"dwell", "move", "correct", "settle"}:
+        raise ValueError(f"{label} must be a beat with exactly its four spans")
+    return BeatTiming(
+        dwell=_required_number(row["dwell"], f"{label}.dwell"),
+        move=_required_number(row["move"], f"{label}.move"),
+        correct=_required_number(row["correct"], f"{label}.correct"),
+        settle=_required_number(row["settle"], f"{label}.settle"),
+    )
+
+
+def _sound_law(law: PhysicsLaw) -> bool:
+    values = (law.rigidity, law.repulsion, law.attraction, law.range)
+    return all(_finite_number(value) and value >= 0 for value in values) and law.rigidity > 0
+
+
+def _sound_timing(timing: BeatTiming) -> bool:
+    values = (timing.dwell, timing.move, timing.correct, timing.settle)
+    return all(_finite_number(value) and value >= 0 for value in values) and timing.move > 0

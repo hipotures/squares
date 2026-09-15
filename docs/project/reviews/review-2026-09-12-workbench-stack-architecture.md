@@ -10,6 +10,13 @@ Preserve the working browser prototype, rendering toolkit, and research instrume
 repair the evidence and execution boundaries before promoting them into shared package
 APIs.
 
+**Identity note, added 2026-09-14.** This review was written against the
+workbench-physics exploration as X-028, and its references were changed to X-029 on
+2026-09-13. On 2026-09-14 that exploration was renumbered X-034, because main had
+assigned X-029 to the BC303 T2 exact-geometry draft, so read X-029 here as X-034. The
+register’s R6 row says the original observations are retained; the 2026-09-14 rewrite
+removed them from the records, and they remain at commit `a40d272c`.
+
 **Scope:** PR [#155](https://github.com/jlevy/squares/pull/155) at `6e191a35`, stacked
 on [#125](https://github.com/jlevy/squares/pull/125). The main baseline is `d507f5c7`.
 The current parent head is `0281a508`; the leaf lacks its two latest commits, `ee60689b`

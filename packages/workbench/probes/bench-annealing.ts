@@ -1,12 +1,15 @@
 import type {
+  AtlasLaw,
   AtlasSimMode,
   AtlasStyle,
+  AtlasTiming,
   AtlasTransitions,
   WorkbenchApiHost,
 } from "../src/api/workbench-api.ts";
+import { type GeometryPose, packingBounds, pairSeparation } from "../src/core/geometry.ts";
+import { assessPackingSnapshot, PACKING_VALIDITY } from "../src/core/runtime-contracts.ts";
 
-type Axis = readonly [number, number];
-type Point = readonly [number, number];
+/** A lower-left pose as the trial reports it: centre x, centre y, radians. */
 type Pose = [number, number, number];
 
 export interface TrialOptions {
@@ -24,6 +27,13 @@ export interface TrialResult {
     seed: number;
     inflate: number;
     anneal: number;
+    /** The pair law the trajectory ran under; trials before and after a law change differ here. */
+    pairLaw: AtlasLaw;
+    wallLaw: AtlasLaw;
+    /** The page's beat, which sets how many physics steps a trajectory takes. */
+    timing: AtlasTiming;
+    /** The annealed moving span of this trajectory, in seconds. */
+    annealSpan: number;
   };
   excess: number;
   side: number;
@@ -49,94 +59,49 @@ export type TrialResponse = TrialResult | { error: string };
 export type GuardResult = { ok: false; why: string } | { ok: true; pairs: number; seed: number };
 
 const REPAIR_SWEEP_LIMIT = 400;
+const TOLERANCE = PACKING_VALIDITY.penetrationTolerance;
+const SQUARE = PACKING_VALIDITY.squareSide;
 
 function browserHost(): WorkbenchApiHost {
   return window as unknown as WorkbenchApiHost;
 }
 
-function axesOf(angle: number): readonly [Axis, Axis] {
-  const radians = (angle * Math.PI) / 180;
-  return [
-    [Math.cos(radians), Math.sin(radians)],
-    [-Math.sin(radians), Math.cos(radians)],
-  ];
+function geometryPoses(poses: readonly Pose[]): GeometryPose[] {
+  return poses.map(([x, y, angle]) => ({ x, y, angle }));
 }
 
-function cornersOf(pose: Pose): Point[] {
-  const radians = (pose[2] * Math.PI) / 180;
-  const cosine = Math.cos(radians) / 2;
-  const sine = Math.sin(radians) / 2;
-  return [
-    [pose[0] + cosine - sine, pose[1] + sine + cosine],
-    [pose[0] - cosine - sine, pose[1] - sine + cosine],
-    [pose[0] - cosine + sine, pose[1] - sine - cosine],
-    [pose[0] + cosine + sine, pose[1] + sine - cosine],
-  ];
+/** Translate radian poses into the smallest lower-left square container, as the contract fits it. */
+function fitted(poses: readonly Pose[]): { poses: Pose[]; side: number } {
+  const bounds = packingBounds(geometryPoses(poses), SQUARE);
+  return {
+    poses: poses.map(([x, y, angle]): Pose => [x - bounds.minX, y - bounds.minY, angle]),
+    side: Math.max(bounds.maxX - bounds.minX, bounds.maxY - bounds.minY),
+  };
 }
 
-function spanOn(points: readonly Point[], axis: Axis): Axis {
-  let low = Number.POSITIVE_INFINITY;
-  let high = Number.NEGATIVE_INFINITY;
-  for (const point of points) {
-    const value = point[0] * axis[0] + point[1] * axis[1];
-    low = Math.min(low, value);
-    high = Math.max(high, value);
-  }
-  return [low, high];
+/** The contract's assessment of a fitted arrangement: the deepest pair overlap and the verdict. */
+function measured(arrangement: { poses: Pose[]; side: number }) {
+  return assessPackingSnapshot(
+    {
+      squareSide: SQUARE,
+      container: { originX: 0, originY: 0, side: arrangement.side },
+      poses: geometryPoses(arrangement.poses),
+    },
+    arrangement.poses.length,
+  );
 }
 
-function pairDepth(
-  first: Pose,
-  second: Pose,
-  firstCorners: Point[],
-  secondCorners: Point[],
-): number {
-  let depth = Number.POSITIVE_INFINITY;
-  for (const axis of [...axesOf(first[2]), ...axesOf(second[2])]) {
-    const [firstLow, firstHigh] = spanOn(firstCorners, axis);
-    const [secondLow, secondHigh] = spanOn(secondCorners, axis);
-    const overlap = Math.min(firstHigh, secondHigh) - Math.max(firstLow, secondLow);
-    if (overlap <= 0) {
-      return 0;
-    }
-    depth = Math.min(depth, overlap);
-  }
-  return depth;
-}
-
-function deepestOverlap(poses: Pose[]): number {
-  const corners = poses.map(cornersOf);
-  let deepest = 0;
-  for (let first = 0; first < poses.length; first += 1) {
-    for (let second = first + 1; second < poses.length; second += 1) {
-      const firstPose = poses[first];
-      const secondPose = poses[second];
-      const firstCorners = corners[first];
-      const secondCorners = corners[second];
-      if (
-        firstPose === undefined ||
-        secondPose === undefined ||
-        firstCorners === undefined ||
-        secondCorners === undefined
-      ) {
-        throw new Error("pose inventory changed while measuring overlap");
-      }
-      if (Math.hypot(firstPose[0] - secondPose[0], firstPose[1] - secondPose[1]) > 1.4143) {
-        continue;
-      }
-      deepest = Math.max(deepest, pairDepth(firstPose, secondPose, firstCorners, secondCorners));
-    }
-  }
-  return deepest;
-}
-
-function resolveOverlaps(poses: Pose[]): { poses: Pose[]; sweeps: number } {
+/**
+ * Push overlapping pairs apart along their shallowest face normal until no pair penetrates by more
+ * than the contract tolerance, or the sweep limit is spent. Each push clears the pair by one
+ * tolerance, so a converged arrangement is left with a small gap rather than at the boundary.
+ */
+function resolveOverlaps(poses: readonly Pose[]): { poses: Pose[]; sweeps: number } {
   const resolved = poses.map((pose): Pose => [...pose]);
   let unresolved = true;
   let sweeps = 0;
   for (; sweeps < REPAIR_SWEEP_LIMIT && unresolved; sweeps += 1) {
     unresolved = false;
-    const corners = resolved.map(cornersOf);
     for (let first = 0; first < resolved.length; first += 1) {
       for (let second = first + 1; second < resolved.length; second += 1) {
         const firstPose = resolved[first];
@@ -144,40 +109,23 @@ function resolveOverlaps(poses: Pose[]): { poses: Pose[]; sweeps: number } {
         if (firstPose === undefined || secondPose === undefined) {
           throw new Error("pose inventory changed while resolving overlap");
         }
-        if (Math.hypot(firstPose[0] - secondPose[0], firstPose[1] - secondPose[1]) > 1.4143) {
+        const dx = secondPose[0] - firstPose[0];
+        const dy = secondPose[1] - firstPose[1];
+        if (dx * dx + dy * dy >= 2 * SQUARE * SQUARE) {
           continue;
         }
-        let depth = Number.POSITIVE_INFINITY;
-        let best: Axis | null = null;
-        let sign = 1;
-        for (const axis of [...axesOf(firstPose[2]), ...axesOf(secondPose[2])]) {
-          const firstCorners = corners[first];
-          const secondCorners = corners[second];
-          if (firstCorners === undefined || secondCorners === undefined) {
-            throw new Error("corner inventory changed while resolving overlap");
-          }
-          const [firstLow, firstHigh] = spanOn(firstCorners, axis);
-          const [secondLow, secondHigh] = spanOn(secondCorners, axis);
-          const overlap = Math.min(firstHigh, secondHigh) - Math.max(firstLow, secondLow);
-          if (overlap <= 0) {
-            depth = 0;
-            break;
-          }
-          if (overlap < depth) {
-            depth = overlap;
-            best = axis;
-            sign = firstHigh - secondHigh > 0 ? 1 : -1;
-          }
-        }
-        if (depth > 1e-9 && best !== null) {
+        const separation = pairSeparation(
+          { x: firstPose[0], y: firstPose[1], angle: firstPose[2] },
+          { x: secondPose[0], y: secondPose[1], angle: secondPose[2] },
+          SQUARE,
+        );
+        if (separation.penetration > TOLERANCE) {
           unresolved = true;
-          const push = (depth / 2 + 1e-9) * sign;
-          firstPose[0] += best[0] * push;
-          firstPose[1] += best[1] * push;
-          secondPose[0] -= best[0] * push;
-          secondPose[1] -= best[1] * push;
-          corners[first] = cornersOf(firstPose);
-          corners[second] = cornersOf(secondPose);
+          const push = separation.penetration / 2 + TOLERANCE;
+          firstPose[0] -= separation.normalX * push;
+          firstPose[1] -= separation.normalY * push;
+          secondPose[0] += separation.normalX * push;
+          secondPose[1] += separation.normalY * push;
         }
       }
     }
@@ -185,27 +133,20 @@ function resolveOverlaps(poses: Pose[]): { poses: Pose[]; sweeps: number } {
   return { poses: resolved, sweeps };
 }
 
-function fittedPoses(poses: Pose[]): { poses: Pose[]; side: number } {
-  let lowX = Number.POSITIVE_INFINITY;
-  let highX = Number.NEGATIVE_INFINITY;
-  let lowY = Number.POSITIVE_INFINITY;
-  let highY = Number.NEGATIVE_INFINITY;
-  for (const pose of poses) {
-    for (const corner of cornersOf(pose)) {
-      lowX = Math.min(lowX, corner[0]);
-      highX = Math.max(highX, corner[0]);
-      lowY = Math.min(lowY, corner[1]);
-      highY = Math.max(highY, corner[1]);
-    }
+/**
+ * The catalogue API, with Animate owning the page. The page opens on Pack, and until Animate
+ * owns it the catalogue API refuses every call but `setMode` and `mode`.
+ */
+function catalogueApi(host: WorkbenchApiHost): AtlasTransitions | undefined {
+  const api = host.atlasTransitions;
+  if (api !== undefined && typeof api.setMode === "function" && api.mode() !== "animate") {
+    api.setMode("animate");
   }
-  return {
-    poses: poses.map((pose): Pose => [pose[0] - lowX, pose[1] - lowY, (pose[2] * Math.PI) / 180]),
-    side: Math.max(highX - lowX, highY - lowY),
-  };
+  return api;
 }
 
 function requiredApi(host: WorkbenchApiHost): AtlasTransitions {
-  const api = host.atlasTransitions;
+  const api = catalogueApi(host);
   if (api === undefined) {
     throw new Error("the page has no workbench API");
   }
@@ -214,7 +155,7 @@ function requiredApi(host: WorkbenchApiHost): AtlasTransitions {
 
 /** Verify that a loaded page exposes a nonempty, seeded workbench API. */
 export function guard(host: WorkbenchApiHost = browserHost()): GuardResult {
-  const api = host.atlasTransitions;
+  const api = catalogueApi(host);
   if (api === undefined || typeof api.physics !== "function") {
     return { ok: false, why: "no page API" };
   }
@@ -228,7 +169,7 @@ export function guard(host: WorkbenchApiHost = browserHost()): GuardResult {
   return { ok: true, pairs: pairs.length, seed: api.seed() };
 }
 
-/** Run one blind trial and independently measure and resolve its final overlap. */
+/** Run one blind trial and measure and resolve its final overlap under the validity contract. */
 export function runTrial(
   options: TrialOptions,
   host: WorkbenchApiHost = browserHost(),
@@ -248,36 +189,59 @@ export function runTrial(
 
   const started = performance.now();
   const result = api.physics(index, options.style, "blind");
-  const poses = result.final.map((pose): Pose => [...pose]);
-  const overlap = deepestOverlap(poses);
-  const raw = fittedPoses(poses);
+  const raw = fitted(
+    result.final.map(([x, y, degrees]): Pose => [x, y, (degrees * Math.PI) / 180]),
+  );
+  const rawAssessment = measured(raw);
   const repairStarted = performance.now();
-  const resolved = resolveOverlaps(poses);
-  const fitted = fittedPoses(resolved.poses);
-  const resolvedOverlap = deepestOverlap(resolved.poses);
+  const resolved = resolveOverlaps(raw.poses);
+  const repaired = fitted(resolved.poses);
+  const repairedAssessment = measured(repaired);
   const repairMs = performance.now() - repairStarted;
+  const state = api.state();
+  const law = api.law();
+  const wallLaw = api.wallLaw();
 
   return {
     configuration: {
       style: result.style,
       mode: result.mode,
       seed: api.seed(),
-      inflate: api.state().blindInflate,
+      inflate: state.blindInflate,
       anneal: result.anneal,
+      pairLaw: {
+        rigidity: law.rigidity,
+        repulsion: law.repulsion,
+        attraction: law.attraction,
+        range: law.range,
+      },
+      wallLaw: {
+        rigidity: wallLaw.rigidity,
+        repulsion: wallLaw.repulsion,
+        attraction: wallLaw.attraction,
+        range: wallLaw.range,
+      },
+      timing: {
+        dwell: state.timing.dwell,
+        move: state.timing.move,
+        correct: state.timing.correct,
+        settle: state.timing.settle,
+      },
+      annealSpan: result.annealSpan,
     },
     excess: result.miss.excess,
-    side: raw.side,
+    side: rawAssessment.requiredSide,
     record: result.miss.record,
     centre: result.miss.centre,
     angle: result.miss.angle,
-    overlap,
+    overlap: rawAssessment.maxPairOverlap,
     poses: raw.poses,
-    resolvedPoses: fitted.poses,
-    resolvedSide: fitted.side,
-    resolvedOverlap,
+    resolvedPoses: repaired.poses,
+    resolvedSide: repairedAssessment.requiredSide,
+    resolvedOverlap: repairedAssessment.maxPairOverlap,
     repairSweeps: resolved.sweeps,
     repairSweepLimit: REPAIR_SWEEP_LIMIT,
-    repairConverged: resolvedOverlap <= 1e-9,
+    repairConverged: repairedAssessment.valid,
     steps: result.steps,
     physicsMs: result.ms,
     repairMs,

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
+  adjacentSupportedStep,
   availableStyles,
   nearestSupportedIndex,
   normalizeRange,
@@ -10,6 +11,22 @@ import {
 } from "../src/core/navigation.ts";
 
 const SUPPORTED = [2, 5, 11, 17, 29, 324] as const;
+
+test("the step buttons cross gaps in the steps a page carries and stop at its ends", () => {
+  assert.equal(adjacentSupportedStep(SUPPORTED, 11, 1), 17);
+  assert.equal(adjacentSupportedStep(SUPPORTED, 11, -1), 5);
+  assert.equal(adjacentSupportedStep(SUPPORTED, 29, 1), 324);
+  assert.equal(adjacentSupportedStep(SUPPORTED, 324, 1), 324);
+  assert.equal(adjacentSupportedStep(SUPPORTED, 2, -1), 2);
+  // From a size the page does not carry, the nearest carried step in the direction pressed.
+  assert.equal(adjacentSupportedStep(SUPPORTED, 12, 1), 17);
+  assert.equal(adjacentSupportedStep(SUPPORTED, 12, -1), 11);
+  assert.equal(adjacentSupportedStep(SUPPORTED, 400, -1), 324);
+  assert.equal(adjacentSupportedStep(SUPPORTED, 1, 1), 2);
+  // A dense page moves one n at a time, as before.
+  assert.equal(adjacentSupportedStep([2, 3, 4, 5], 3, 1), 4);
+  assert.equal(adjacentSupportedStep([2, 3, 4, 5], 3, -1), 2);
+});
 
 test("sparse and arbitrary supported n values resolve deterministically", () => {
   assert.equal(nearestSupportedIndex(SUPPORTED, 2), 0);

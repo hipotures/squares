@@ -42,6 +42,7 @@ import platform
 import random
 import sys
 import time
+import zlib
 from pathlib import Path
 from typing import Any
 
@@ -195,11 +196,23 @@ def refine(
     }
 
 
+RNG_SEED_DERIVATION = "(seed << 20) ^ (n << 8) ^ (zlib.crc32(condition.encode()) % 251)"
+
+
+def rng_seed(condition: str, n: int, seed: int) -> int:
+    """The random stream's seed for one (condition, cell, seed), stable across processes.
+
+    `hash(condition)` was used here once, and `str` hashing is salted per interpreter, so
+    no recorded run could be re-seeded. CRC-32 is a fixed function of the bytes.
+    """
+    return (seed << 20) ^ (n << 8) ^ (zlib.crc32(condition.encode()) % 251)
+
+
 def run_seed(
     condition: str, n: int, seed: int, *, quenches: int, budget: float, eps0: float
 ) -> dict[str, Any]:
     """One (condition, cell, seed): exactly `quenches` refined local optima."""
-    rng = random.Random((seed << 20) ^ (n << 8) ^ hash(condition) % 251)
+    rng = random.Random(rng_seed(condition, n, seed))
     incumbent: dict[str, Any] | None = None
     eps = eps0
     accepted = invalid = restarts = 0
@@ -278,10 +291,21 @@ def main(argv: list[str] | None = None) -> int:
     meta = {
         "quenches_per_seed": options.quenches,
         "quench_seconds": options.quench_seconds,
+        # A fixed seed fixes the proposals, not the refinements: a quench that reaches this
+        # bound returns wherever it had got to, which depends on the host's load.
+        "quench_bound": "wall clock, seconds per quench_bracket call",
         "eps0": options.eps0,
         "cells": cells,
         "seeds": seeds,
         "conditions": conditions,
+        "rng_seed_derivation": RNG_SEED_DERIVATION,
+        "rng_seeds": {
+            condition: {
+                str(n): {str(seed): rng_seed(condition, n, seed) for seed in seeds}
+                for n in cells
+            }
+            for condition in conditions
+        },
         "host": {
             "platform": platform.platform(),
             "cpu_count": os.cpu_count(),

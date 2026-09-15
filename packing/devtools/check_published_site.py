@@ -31,9 +31,10 @@ import hashlib
 import re
 import subprocess
 import sys
+import time
 import urllib.error
 import urllib.request
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from urllib.parse import urljoin
 
 from playwright.sync_api import Error as PlaywrightError
@@ -95,7 +96,15 @@ def pdf_source_matches(data: bytes, page: bytes) -> bool:
     )
 
 
-def fetch(url: str, *, head: bool = False, timeout: float = 30.0) -> tuple[int, bytes]:
+#: The pauses, in seconds, before each retry of a transient answer. This runs straight after
+#: a deploy reports success, when Pages can still answer 404 or 5xx for a short while, so a
+#: single fetch failed a good deploy on timing alone (#160 R26). Thirty seconds in all.
+RETRY_DELAYS = (2.0, 4.0, 8.0, 16.0)
+#: Answers worth asking again: unreachable (0), not yet there, throttled, or a server error.
+TRANSIENT_STATUSES = frozenset({0, 404, 408, 429, 500, 502, 503, 504})
+
+
+def fetch_once(url: str, *, head: bool = False, timeout: float = 30.0) -> tuple[int, bytes]:
     """The status and body of a GET (or the status alone of a HEAD); 0 when unreachable."""
     if not url.startswith("https://"):
         raise ValueError(f"refusing to fetch a non-https URL: {url}")
@@ -109,6 +118,28 @@ def fetch(url: str, *, head: bool = False, timeout: float = 30.0) -> tuple[int, 
         return error.code, b""
     except urllib.error.URLError:
         return 0, b""
+
+
+def fetch(
+    url: str,
+    *,
+    head: bool = False,
+    timeout: float = 30.0,
+    delays: Sequence[float] = RETRY_DELAYS,
+    sleep: Callable[[float], object] = time.sleep,
+) -> tuple[int, bytes]:
+    """`fetch_once`, asked again after each delay while the answer is transient.
+
+    The last answer is returned whatever it is, so a page that stays missing still fails
+    its check, only later.
+    """
+    answer = fetch_once(url, head=head, timeout=timeout)
+    for delay in delays:
+        if answer[0] not in TRANSIENT_STATUSES:
+            break
+        sleep(delay)
+        answer = fetch_once(url, head=head, timeout=timeout)
+    return answer
 
 
 def expected_commit() -> str:

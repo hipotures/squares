@@ -130,7 +130,7 @@ Three things worth knowing before changing any of it:
   without naming a tracker.
 - **Formatting the workbench’s script changes the published page’s bytes**, since the
   generator inlines it.
-  That is expected; what says the page is unharmed is `check_workbench.py`, not a hash.
+  That is expected; what says the page is unharmed is `check_frontend`, not a hash.
 
 ### Markdown formatting
 

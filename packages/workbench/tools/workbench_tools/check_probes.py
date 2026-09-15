@@ -22,7 +22,7 @@ arrangement could not even express:
    `FileNotFoundError` at the far end of a slow checker. Both are cheap to find here.
 
 The third question is answered by scanning the checkers for quoted strings rather than by
-importing them: the loader is `probe()` today and `look()` wraps it in `check_workbench`,
+importing them: the loader is `probe()` today and `look()` wraps it in `check_animate_view`,
 and a scan that does not care which helper is used keeps working when a fourth appears.
 """
 
@@ -32,6 +32,7 @@ import ast
 import json
 import subprocess
 import sys
+from collections.abc import Iterable
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -40,12 +41,15 @@ PROBES = Path(__file__).resolve().parents[2] / "probes"
 #: Every file that may name a probe. Anything scanning for orphans has to read all of
 #: them, or a probe used by one checker looks dead to a run that only knew about another.
 CALLERS = (
+    "animate_view_contract.py",
+    "benchmark.py",
     "check_accessibility.py",
+    "check_animate_view.py",
     "check_animation_editor.py",
-    "check_workbench.py",
+    "check_pack_panel.py",
+    "check_page_policy.py",
+    "check_search_panel.py",
     "check_revision6.py",
-    "check_revision7.py",
-    "check_legend.py",
     "check_candidate.py",
     "capture_stills.py",
     "capture_video.py",
@@ -80,22 +84,77 @@ def probe_files() -> list[Path]:
     return sorted(PROBES.rglob("*.js"))
 
 
-def names_used() -> set[str]:
-    """Every probe name any checker mentions, as a quoted string.
+#: The loader. A function whose body hands one of its own parameters to it -- `look` in
+#: `check_animate_view`, `_look` in `check_accessibility` -- is found and treated the same.
+LOADER = "probe"
+
+
+def _loaders(tree: ast.Module) -> set[str]:
+    """`probe`, and every function in the file that passes a parameter straight to it."""
+    loaders = {LOADER}
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef):
+            continue
+        parameters = {a.arg for a in (*node.args.posonlyargs, *node.args.args)}
+        for inner in ast.walk(node):
+            if (
+                isinstance(inner, ast.Call)
+                and _called(inner) == LOADER
+                and any(isinstance(a, ast.Name) and a.id in parameters for a in inner.args)
+            ):
+                loaders.add(node.name)
+    return loaders
+
+
+def _called(call: ast.Call) -> str | None:
+    match call.func:
+        case ast.Name(id=name) | ast.Attribute(attr=name):
+            return name
+        case _:
+            return None
+
+
+def names_used(callers: Iterable[Path]) -> tuple[set[str], set[str]]:
+    """Every quoted string in the checkers, and the ones handed to the probe loader.
 
     Parsing rather than grepping, so a name inside a comment does not count as a use and a
     name split across an implicit concatenation still does.
     """
     used: set[str] = set()
-    for caller in CALLERS:
-        path = HERE / caller
+    loaded: set[str] = set()
+    for path in callers:
         if not path.is_file():
             continue
         tree = ast.parse(path.read_text(encoding="utf-8"))
+        loaders = _loaders(tree)
         for node in ast.walk(tree):
             if isinstance(node, ast.Constant) and isinstance(node.value, str):
                 used.add(node.value)
-    return used
+            elif isinstance(node, ast.Call) and _called(node) in loaders:
+                loaded.update(
+                    a.value
+                    for a in node.args
+                    if isinstance(a, ast.Constant) and isinstance(a.value, str)
+                )
+    return used, loaded
+
+
+def name_faults(used: set[str], loaded: set[str], have: set[str]) -> list[str]:
+    """Every name a checker uses that no file answers, and every file no checker names.
+
+    A name handed to the loader must resolve, whatever its group: before this, a name was
+    checked only when its first segment was an existing probe directory, so a typo in the
+    group (`newgroup/zz_missing`) passed here and failed at the far end of a slow checker.
+    A string that only *looks* like a probe -- it has a `/` and names an existing group --
+    is also checked, because names reach the loader through tuples and loops too; a bare
+    word or a file path that no loader call receives is far more often a label.
+    """
+    groups = {name.split("/")[0] for name in have}
+    looks_like = {s for s in used if "/" in s and s.split("/")[0] in groups}
+    missing = (loaded | looks_like) - have
+    faults = [f"{name}: named by a checker, no such file" for name in sorted(missing)]
+    faults.extend(f"{name}: no checker names it" for name in sorted(have - used))
+    return faults
 
 
 def inspect(paths: list[Path]) -> dict[str, dict[str, str]]:
@@ -132,14 +191,7 @@ def main() -> int:
 
     # 3: every name resolves, and every file is named.
     have = {str(p.relative_to(PROBES).with_suffix("")) for p in files}
-    used = names_used()
-    # A string is a probe reference when a probe answers it; a name nothing answers is
-    # only a fault if it *looks* like one, which is the one heuristic here -- a bare word
-    # in a checker is far more often a label than a missing probe.
-    groups = {name.split("/")[0] for name in have}
-    missing = {s for s in used if "/" in s and s not in have and s.split("/")[0] in groups}
-    faults.extend(f"{name}: named by a checker, no such file" for name in sorted(missing))
-    faults.extend(f"{name}: no checker names it" for name in sorted(have - used))
+    faults.extend(name_faults(*names_used(HERE / c for c in CALLERS), have))
 
     for fault in faults:
         print(f"FAIL  {fault}")

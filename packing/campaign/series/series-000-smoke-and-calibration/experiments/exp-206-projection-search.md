@@ -40,7 +40,7 @@ experiment:
     entry_point: devtools/run_projection_ratchet.py
     command: uv run --frozen python -m devtools.run_projection_ratchet --n 5 10 11 17 --repeats 2 --beta 0.3 0.5 --attempts 6 --iters 5000 --monotone 700; then the same with --n 5 11 --repeats 3 --beta 0.5 --cold 0.5 1.0
     budget: 48 to 95 solver calls per ratchet run, 5,000 iterations each at most, 28 runs over two arms
-    record: campaign/series/series-000-smoke-and-calibration/results/exp-206-projection-search/
+    record: packing/campaign/series/series-000-smoke-and-calibration/results/exp-206-projection-search/
   effort:
     timebox: 2h
     wall_seconds: 937.0

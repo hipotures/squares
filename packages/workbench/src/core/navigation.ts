@@ -47,6 +47,39 @@ export function nearestSupportedIndex(
   return best;
 }
 
+/**
+ * The carried step `delta` presses of a step button away from `current`, in the direction
+ * pressed, crossing any gap in the steps the page carries and stopping at its ends. From a
+ * size the page does not carry, the first press lands on the nearest carried step that way.
+ * `current + delta` rounded to the nearest carried step could not leave a gap wider than
+ * two, which is how Prev and Next got stuck on the 25-pair page.
+ */
+export function adjacentSupportedStep(
+  supportedSteps: readonly number[],
+  current: number,
+  delta: number,
+): number {
+  const first = supportedAt(supportedSteps, 0);
+  const last = supportedAt(supportedSteps, supportedSteps.length - 1);
+  let step = current;
+  for (let press = 0; press < Math.abs(Math.trunc(delta)); press += 1) {
+    let ahead: number | undefined;
+    for (const candidate of supportedSteps) {
+      if (delta > 0 ? candidate > step : candidate < step) {
+        ahead = candidate;
+        if (delta > 0) {
+          break;
+        }
+      }
+    }
+    if (ahead === undefined) {
+      break;
+    }
+    step = ahead;
+  }
+  return Math.max(first, Math.min(last, step));
+}
+
 /** Clamp a requested range and snap a collapsed range to a size the data actually carries. */
 export function normalizeRange(
   supportedSteps: readonly number[],
@@ -208,6 +241,7 @@ export function transportIntent(state: TransportState): TransportIntent {
 }
 
 export const navigation = Object.freeze({
+  adjacentSupportedStep,
   nearestSupportedIndex,
   normalizeRange,
   rangeIndexBounds,

@@ -12,15 +12,17 @@ experiment:
   date: '2026-09-12'
   hypotheses: [H-207]
   tier: exploratory
+  known_defects: [D-067]
   subject:
     label: the workbench's blind physics, repaired to a packing before scoring
     engine: workbench page, branch claude/annealing-search-benchmark
     engine_commit: e9d13c1d
     assurance: numerically-checked
     method: numerical-f64
-    tolerance: 1e-5 of a unit side of deepest pairwise overlap, measured from the snapped control
+    tolerance: 1e-5 of a unit side of deepest pairwise overlap, chosen; the snapped observation
+      beside it was run once and not kept (think-2ngs)
     host_system: macOS on Apple silicon, one headless Chromium
-    selftest_passed: true
+    selftest_passed: false
     precision:
       binary_bits: 53
       rounding: nearest-even
@@ -34,44 +36,47 @@ experiment:
     role: calibration
   method:
     operator: claude-opus-5, unattended
-    control: the best of the first k repaired runs, for k of 100 or fewer
-    candidate: the best of the first k repaired runs, for k of 1,000 or more
+    control: none; one seed stream at one schedule, and no schedule was compared
     trials: 39871
     interleaved: false
     commit: e9d13c1d
     entry_point: packing/devtools/bench_annealing.py
-    command: python -m devtools.bench_annealing --n 5 10 --seeds 40000 --anneal 6
-    budget: 40,000 seeds requested for each of n = 5 and 10; 39,871 retained for n = 5
+    command: python -m devtools.bench_annealing --n 5 10 --seeds 40000 --anneal 6 --budget 900
+    budget: 900 seconds of wall clock, the harness default; 40,000 seeds requested for each of
+      n = 5 and 10, and 39,871 retained for n = 5, consistent with the budget stopping the run
     record: packing/campaign/results/annealing/summaries.json, entry deep-n5-n10.jsonl
   results:
   - shape: record
-    metric: closed, the fraction of the record-to-grid gap closed by a repaired packing
+    metric: closed at n = 5, the best of all 39,871 repaired runs of one seed stream
     direction: higher
     score: 0.986
     standing_best: 1.0
     standing_best_source: the known-best side recorded in the atlas
     beat_record: false
     runs: 39871
-  - shape: conditions
-    metric: closed at n = 5, best of the first k repaired runs, k of 100 or fewer against k of
-      1,000 or more
-    control_median: -0.037
-    candidate_median: 0.977
-    control_range:
-    - -0.084
-    - -0.015
-    candidate_range:
-    - 0.974
-    - 0.986
-    change_pct: 2740.5
-    overlapping: false
+  - shape: record
+    metric: closed at n = 5, the best of the first 100 repaired runs of that stream
+    direction: higher
+    score: -0.015
+    standing_best: 1.0
+    standing_best_source: the known-best side recorded in the atlas
+    beat_record: false
+    runs: 100
+  - shape: record
+    metric: closed at n = 5, the best of the first 1,000 repaired runs of that stream
+    direction: higher
+    score: 0.974
+    standing_best: 1.0
+    standing_best_source: the known-best side recorded in the atlas
+    beat_record: false
+    runs: 1000
   complexity:
     lines_changed: 0
     notes: No change to the method; the round measures what a budget of runs buys at one
       schedule.
   verdict:
     decision: unresolved
-    primary_criterion: closed at the best of k against closed at small k
+    primary_criterion: closed at the best of the first k repaired runs of one seed stream
     reason: At n = 5 the best of the first 1,000 repaired runs is 0.28% above the record while a
       single run is worse than the grid, but these are prefix values from one seed stream with
       no spread, and no schedule was compared at equal cost, so H-207's criterion was not tested.

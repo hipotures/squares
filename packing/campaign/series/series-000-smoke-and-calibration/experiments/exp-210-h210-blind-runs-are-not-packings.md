@@ -11,32 +11,36 @@ experiment:
   title: Blind runs of the workbench's physics end with squares overlapping
   date: '2026-09-12'
   hypotheses:
-  - H-210
+  - H-212
   tier: exploratory
+  known_defects: [D-067]
   subject:
     label: the workbench's contact simulation in blind mode, which withholds the destination poses
     engine: workbench page, build 4.4 MB, branch claude/annealing-search-benchmark
     engine_commit: d3c3a778
     assurance: numerically-checked
     method: numerical-f64
-    tolerance: 1e-5 of a unit side of deepest pairwise overlap, taken from the snapped run's
-      own float noise rather than chosen
+    tolerance: 1e-5 of a unit side of deepest pairwise overlap, chosen; the snapped observation
+      beside it was run once and not kept (think-2ngs)
     host_system: macOS on Apple silicon, one headless Chromium
-    selftest_passed: true
+    selftest_passed: false
     precision:
       binary_bits: 53
       rounding: nearest-even
     migration_annotation: '2026-09-13: source reference mapped from pre-purge ee27f8e3 to reachable
       d3c3a778; the retained harness and workbench source trees compare equal in Git. Original
-      run provenance was not recaptured. The declared trial count does not match the recorded
-      command, which requests 12,000, and no manifest was kept to reconcile them.'
+      run provenance was not recaptured. The 15,000 trials are the three summaries.json entries
+      named in record: the command wrote the 12,000 in guarded-a6.jsonl, and 500 seeds at each
+      of n = 5, 11 and 17 at shake levels 0 and 3, whose commands were not recorded, wrote
+      guarded-a0.jsonl and guarded-a3.jsonl.'
   instance:
     axis: n
     point: 11
     role: target
   method:
     operator: claude-opus-5, unattended
-    control: the snapped trajectory, which ends on the record's poses by construction
+    control: none retained; the snapped trajectory, which ends on the record's poses by
+      construction, was measured once with a probe variant that was not kept (think-2ngs)
     candidate: the blind trajectory, which starts from the previous record and is not given the
       destination poses
     trials: 15000
@@ -44,7 +48,9 @@ experiment:
     commit: d3c3a778
     entry_point: packing/devtools/bench_annealing.py
     command: python -m devtools.bench_annealing --n 5 10 11 17 26 29 --seeds 2000 --anneal 6
-    record: packing/campaign/results/annealing/
+      --budget 900
+    record: packing/campaign/results/annealing/summaries.json, entries guarded-a6.jsonl,
+      guarded-a0.jsonl and guarded-a3.jsonl
   results:
   - shape: determination
     question: does any blind run end on an arrangement with no overlapping squares, checked
@@ -52,18 +58,6 @@ experiment:
       off the simulation
     role: guard
     outcome: invalid
-  - shape: conditions
-    metric: deepest pairwise overlap in the final arrangement at n = 5, 11 and 17, unit sides
-    control_median: 7.3e-07
-    candidate_median: 0.084
-    control_range:
-    - 5.5e-07
-    - 1.01e-06
-    candidate_range:
-    - 0.035146
-    - 0.086189
-    change_pct: 11506749.3
-    overlapping: false
   complexity:
     lines_changed: 96
     new_failure_modes:
@@ -86,8 +80,16 @@ experiment:
 ---
 # exp-210 — Blind Runs of the Workbench’s Physics End With Squares Overlapping
 
+**Renumbered 2026-09-13** from exp-206, which the older divide-and-concur experiment
+keeps.
+
 **Rewritten 2026-09-14** to remove superseded framing and layered corrections.
 The previous text is at commit `a40d272c`.
+
+**Exploratory data, filed under the open question
+[H-212](../../../hypotheses/H-212-the-workbench-physics-as-a-search.md).** These runs
+came first, at `d3c3a778`, and H-210 was registered from them at `385707be`, so they
+cannot also be its test.
 
 ## What Was Measured
 
@@ -104,7 +106,7 @@ harness, without using the simulation’s own bookkeeping.
 The page’s `maxPenetration` is a running maximum over the whole trajectory and says
 nothing about where the squares stopped.
 
-## The Control Sets the Tolerance
+## A Chosen Tolerance Beside an Unretained Control
 
 | mode | n = 5 | n = 11 | n = 17 |
 | --- | ---: | ---: | ---: |
@@ -115,15 +117,17 @@ nothing about where the squares stopped.
 The snapped row is the float noise the stored poses carry.
 The snap and free rows came from a variant of the probe that was run once and not kept.
 The committed harness runs blind only, so this control is recorded, not reproducible.
-Two orders of magnitude separate it from the smallest real overlap, so a tolerance of
-1e-5 refuses overlaps without refusing arithmetic.
+The tolerance, 1e-5 of a side, was chosen rather than derived from it.
+It is ten times the largest snapped value and a factor of 3.9 below the smallest free
+value; the blind values are more than three orders of magnitude above it.
 
 ## Result
 
 Every blind run observed ended with at least one pair of squares overlapping.
-The later rounds kept a row per run, and their local copies cover 123,190 runs: none
-ended below 1e-5, and the deepest overlap before repair ranged from 0.002 to 0.118 of a
-side, with a median of 0.083.
+The repaired rounds wrote a row per run.
+Local copies of those rows, which are not retained, cover 123,190 runs: none ended below
+1e-5, and the deepest overlap before repair ranged from 0.002 to 0.118 of a side, with a
+median of 0.083.
 
 ## What It Means
 
@@ -157,8 +161,8 @@ destination. Blind mode has none, so nothing drives the overlap out.
 
 ## Evidence
 
-The trials and their final poses were not retained, so this result cannot be re-checked
-from the repository.
+The per-trial rows are not retained and the harness never wrote final poses, so the
+repository alone cannot re-check this result; the runbook regenerates the rows.
 The blind rows are cheap to reproduce: from `packing/`, run
 `uv run --frozen --all-extras --group dev squares-workbench-benchmark --n 5 11 17 --seeds 200`.
 Each trial row it writes under `campaign/results/annealing/` carries `overlap`, the
