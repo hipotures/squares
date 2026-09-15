@@ -629,7 +629,7 @@ def run_geometry_controls() -> dict[str, bool]:
 def run_animation_controls() -> dict[str, bool]:
     from devtools.packing_render_adapters import trajectory_from_n5_equal_side_face
     from sqpack.render import RenderSpec, ViewLevel, render_packing_svg
-    from sqpack.render.numbers import scalar_from_float
+    from sqpack.render.numbers import scalar_from_float, scalar_from_fraction
 
     trajectory = trajectory_from_n5_equal_side_face()
     text = render_packing_svg(
@@ -665,12 +665,25 @@ def run_animation_controls() -> dict[str, bool]:
             *trajectory.frames[1:],
         ),
     )
+    # An exact side, so the evidence rule -- certified frames need rational or exact
+    # sources -- cannot be why the container control below passes or fails.
     changing_container = replace(
         trajectory,
         frames=(
-            replace(trajectory.frames[0], container_side=scalar_from_float(3.0)),
+            replace(trajectory.frames[0], container_side=scalar_from_fraction(Fraction(3))),
             *trajectory.frames[1:],
         ),
+    )
+    try:
+        changing_text = render_packing_svg(
+            trajectory.frames[-1],
+            trajectory=changing_container,
+            spec=RenderSpec(view=ViewLevel.TRAJECTORY),
+        )
+    except TypeError, ValueError:
+        changing_text = ""
+    changing_outlines = re.findall(
+        r'<rect\b[^>]*data-feature="container-outline"[^>]*>', changing_text
     )
     rotating_text = render_packing_svg(
         trajectory.frames[-1],
@@ -709,12 +722,17 @@ def run_animation_controls() -> dict[str, bool]:
         "rotation_renders_at_its_true_size": any(
             abs(turn - expected_turn) < 1e-9 for turn in rendered_turns
         ),
-        "unsupported_container_change_is_rejected": _rejects(
-            render_packing_svg,
-            trajectory.frames[-1],
-            trajectory=changing_container,
-            spec=RenderSpec(view=ViewLevel.TRAJECTORY),
-        ),
+        # A changing side is accepted, because an ascent resizes the container at every
+        # step, but the outline does not animate: it is drawn once, at the final frame's
+        # side. Byte equality with the render whose side never changes is what pins "at
+        # the final side": the outline rect alone cannot, since the panel scale follows
+        # whichever side is drawn. A refusal, a second outline, an outline at another
+        # side, or container motion all fail this.
+        "container_change_renders_one_outline_at_the_final_side": bool(changing_text)
+        and len(changing_outlines) == 1
+        and changing_text == text
+        and "motion-container" not in changing_text
+        and "sqpack-container" not in changing_text,
     }
 
 

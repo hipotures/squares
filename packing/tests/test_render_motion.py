@@ -10,11 +10,13 @@ passes against the new one.
 from __future__ import annotations
 
 import math
+import re
 from decimal import Decimal
 from xml.etree import ElementTree as ET
 
 import pytest
 
+from sqpack.render import RenderSpec, ViewLevel, render_packing_svg
 from sqpack.render.model import (
     CheckKind,
     CheckSummary,
@@ -91,8 +93,16 @@ def test_rotation_takes_the_short_way_round_a_quarter_turn() -> None:
     assert short_quarter_turn(Decimal("0.1")) == Decimal("0.1")
 
 
+def _container_outlines(svg: str) -> list[str]:
+    return re.findall(r'<rect\b[^>]*data-feature="container-outline"[^>]*>', svg)
+
+
 def test_a_resizing_container_is_accepted() -> None:
-    """A changing side was refused, and the atlas ascent changes it at every step."""
+    """A changing side was refused, and the atlas ascent changes it at every step.
+
+    Accepted is not animated: the outline is drawn once, at the final frame's side, and no
+    container keyframes are emitted, so the drawing matches one whose side never changed.
+    """
     traj = _trajectory(
         [
             (0.0, 4.5, [(1.0, 1.0, 0.0)]),
@@ -100,6 +110,16 @@ def test_a_resizing_container_is_accepted() -> None:
         ]
     )
     validate_motion_trajectory(traj)
+    fixed = _trajectory([(0.0, 4.0, [(1.0, 1.0, 0.0)]), (1.0, 4.0, [(1.0, 1.0, 0.0)])])
+    spec = RenderSpec(view=ViewLevel.TRAJECTORY)
+    resizing_svg = render_packing_svg(traj.frames[-1], trajectory=traj, spec=spec)
+    fixed_svg = render_packing_svg(fixed.frames[-1], trajectory=fixed, spec=spec)
+    assert len(_container_outlines(resizing_svg)) == 1
+    # The outline rect alone cannot say which side it is drawn at, because the panel scale
+    # follows that side; equality with the fixed-side drawing can.
+    assert resizing_svg == fixed_svg
+    assert "motion-container" not in resizing_svg
+    assert "sqpack-container" not in resizing_svg
 
 
 def test_motion_still_refuses_what_it_cannot_draw() -> None:

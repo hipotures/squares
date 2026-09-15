@@ -76,7 +76,8 @@ def validate_motion_trajectory(trajectory: PackingTrajectory) -> None:
     squares 40.2 degrees apart, and an ascent that adds one square per step resizes the
     container at every step by construction. What remains are the two things the keyframe
     emitters genuinely require -- a pose on every square, and time that does not run
-    backwards.
+    backwards. A changing side is accepted, but the container outline is drawn once at
+    the final frame's side and does not animate.
     """
     for track in match_square_tracks(trajectory):
         if any(len(square.corners) < 2 for square in track):
