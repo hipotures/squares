@@ -123,12 +123,40 @@ def _bounded_session(*, max_cycles: int, active: bool = False) -> dict[str, obje
         "workflow_phases": phases,
         "delegations": [],
     }
+    if not active:
+        session["ended_at"] = "2026-08-24T00:20:00+00:00"
     if active:
         final_phase = phases[-1]
         final_phase["outcome"] = None
         final_phase["evidence"] = []
         final_phase["stop_reason"] = None
     return session
+
+
+def test_terminal_session_requires_valid_observed_end(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    session = _bounded_session(max_cycles=2)
+    del session["ended_at"]
+    assert (
+        "session-999-contract-test.md: terminal session needs an offset-aware ended_at"
+        in _session_problems(monkeypatch, session)
+    )
+
+    session["ended_at"] = "2026-08-23T23:59:00+00:00"
+    assert "session-999-contract-test.md: ended_at is before started_at" in _session_problems(
+        monkeypatch, session
+    )
+
+
+def test_active_session_rejects_observed_end(monkeypatch: pytest.MonkeyPatch) -> None:
+    session = _bounded_session(max_cycles=2, active=True)
+    session["ended_at"] = "2026-08-24T00:20:00+00:00"
+
+    assert (
+        "session-999-contract-test.md: in-progress session has ended_at"
+        in _session_problems(monkeypatch, session)
+    )
 
 
 def _session_problems(

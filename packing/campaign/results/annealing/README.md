@@ -25,7 +25,7 @@ It was kept when 185 MB of per-trial JSONL was removed from the branch at `6e191
   disjoint blocks.
 
 What those cells show is written up in
-[X-029](../../explorations/X-029-the-workbench-physics-as-a-search.md).
+[X-034](../../explorations/X-034-the-workbench-physics-as-a-search.md).
 `workbench_tools.historical_summary_audit` lists every cell with its flags, from
 `packing/`:
 

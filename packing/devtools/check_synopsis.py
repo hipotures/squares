@@ -11,7 +11,7 @@ It cannot be generated: most of it is judgement, and the judgement is the point.
 So it is *reconciled* instead, the way `campaign/ideas.md` is -- the numbers and
 statuses it asserts must match the artifacts, and every artifact must appear.
 
-Thirteen checks:
+Fifteen checks:
 
   1. every round's verdict in the roll-up matches its artifact
   2. every hypothesis's status and round count match the ledger's derived values
@@ -21,12 +21,13 @@ Thirteen checks:
   6. no round, hypothesis or open defect is silently missing from the synopsis
   7. the stated hypothesis-artifact count matches the registry directory
   8. every relative link and heading anchor resolves
-  9. freshness labels name the current round count and do not embed a stale update note
- 10. the readiness dashboard remains attached to its canonical status owners
- 11. living reproducibility instructions do not name removed command paths
- 12. the cold-start handoff agrees with the latest terminal session and its next entry
- 13. the reported covering values it names match `CERTIFICATE-REACH.md`'s own table
- 14. the `n = 11` fact table's two ends and their gap match the case's own front matter
+ 9. freshness labels name the current round count and do not embed a stale update note
+10. the readiness dashboard remains attached to its canonical status owners
+ 11. the current research-status roll-up matches its source records and generated ledger
+ 12. living reproducibility instructions do not name removed command paths
+ 13. the cold-start handoff agrees with the latest terminal session and its next entry
+ 14. the reported covering values it names match `CERTIFICATE-REACH.md`'s own table
+ 15. the `n = 11` fact table's two ends and their gap match the case's own front matter
 
 Check 8 closes a real gap: `packing-ledger check` walks links under `campaign/`
 only, so the root document's forty-odd references were unchecked.
@@ -40,6 +41,7 @@ import re
 import sys
 from collections import Counter
 from collections.abc import Iterable
+from datetime import UTC, datetime
 from decimal import ROUND_HALF_UP, Decimal, InvalidOperation, localcontext
 from pathlib import Path
 
@@ -56,6 +58,9 @@ README = REPO / "README.md"
 HYPOTHESES = ROOT / "campaign/hypotheses"
 AGENT_SESSIONS = ROOT / "campaign/agent-sessions"
 AGENDAS = ROOT / "campaign/agendas"
+EXPLORATIONS = ROOT / "campaign/explorations"
+LEDGER = ROOT / "campaign/ledger.md"
+RESULTS = ROOT / "frontier/results.yaml"
 ACTIVE_PLAN = REPO / "docs/project/specs/active/plan-2026-08-23-overnight-cartography-run.md"
 DEFECTS = ROOT / "defects.yaml"
 CASE_INTERVAL_ARTIFACT = ROOT / "frontier" / "n-011.md"
@@ -72,6 +77,9 @@ CASE_INTERVAL_LABELS = {
 _DECIMAL_PRECISION = 60
 READINESS_BEGIN = "<!-- BEGIN CURRENT-RESEARCH-READINESS -->"
 READINESS_END = "<!-- END CURRENT-RESEARCH-READINESS -->"
+STATUS_BEGIN = "<!-- BEGIN CURRENT-RESEARCH-STATUS -->"
+STATUS_END = "<!-- END CURRENT-RESEARCH-STATUS -->"
+TERMINAL_ENDED_AT_FROM = 128
 READINESS_SOURCES = (
     "campaign/ledger.md",
     "campaign/agendas/agenda-001-basin-confidence-ladder.md",
@@ -215,20 +223,6 @@ def check_hypotheses(text: str) -> list[str]:
                 f"ledger counts {derived_rounds.get(hid)}"
             )
 
-    counts = Counter(derived.values())
-    expected_summary = (
-        "The generated ledger currently derives "
-        f"{counted(counts['confirmed'], 'confirmed hypothesis', 'confirmed hypotheses')}, "
-        f"{counted(counts['refuted'], 'refuted hypothesis', 'refuted hypotheses')}, "
-        f"{counted(counts['open'], 'open hypothesis', 'open hypotheses')}, "
-        f"{counted(counts['open question'], 'open question', 'open questions')}, and "
-        f"{counted(counts['blocked'], 'blocked hypothesis', 'blocked hypotheses')}."
-    )
-    if expected_summary.lower() not in re.sub(r"\s+", " ", text).lower():
-        problems.append(
-            "SYNOPSIS.md: hypothesis-status aggregate does not match campaign/ledger.md; "
-            f"expected '{expected_summary}'"
-        )
     return problems
 
 
@@ -350,6 +344,183 @@ def check_readiness_dashboard(text: str) -> list[str]:
     ]
 
 
+def current_research_status_rows() -> list[tuple[str, int, str]]:
+    """Derive the synopsis snapshot from the records that own each count."""
+
+    def summary(counts: Counter[str], labels: tuple[tuple[str, str], ...]) -> str:
+        known = {key for key, _ in labels}
+        parts = [f"{counts[key]} {label}" for key, label in labels]
+        parts.extend(f"{counts[key]} {key}" for key in sorted(set(counts) - known))
+        return "; ".join(parts)
+
+    agenda_records = [front(path)["agenda"] for path in sorted(AGENDAS.glob("agenda-*.md"))]
+    agenda_states = Counter(record["status"] for record in agenda_records)
+    commitments = [item for record in agenda_records for item in record.get("items", [])]
+    commitment_states = Counter(item["state"] for item in commitments)
+
+    session_records = [
+        front(path)["session"]
+        for path in sorted(AGENT_SESSIONS.glob("session-[0-9][0-9][0-9]-*.md"))
+    ]
+    session_states = Counter(record["status"] for record in session_records)
+    session_terminal = session_states["completed"] + session_states["stopped"]
+    session_suffix = (
+        "all terminal"
+        if session_terminal == len(session_records)
+        else f"{len(session_records) - session_terminal} nonterminal"
+    )
+
+    exploration_records = [
+        front(path)["exploration"] for path in sorted(EXPLORATIONS.glob("X-*.md"))
+    ]
+    codified = sum(bool(record.get("proposes")) for record in exploration_records)
+
+    hypothesis_states = Counter(
+        status.strip()
+        for _, status in re.findall(
+            r"^\| (H-\d{3}) \| ([^|]+) \|", LEDGER.read_text(), re.MULTILINE
+        )
+    )
+    experiment_records = [
+        front(path)["experiment"]
+        for path in sorted(ROOT.glob("campaign/series/*/experiments/exp-*.md"))
+    ]
+    experiment_states = Counter(record["verdict"]["decision"] for record in experiment_records)
+    frontier_results = safe_load(RESULTS.read_text())["results"]
+
+    return [
+        (
+            "Agendas",
+            len(agenda_records),
+            summary(
+                agenda_states,
+                (
+                    ("active", "active"),
+                    ("completed", "completed"),
+                    ("paused", "paused"),
+                    ("superseded", "superseded"),
+                ),
+            ),
+        ),
+        (
+            "Commitments",
+            len(commitments),
+            summary(
+                commitment_states,
+                (
+                    ("complete", "complete"),
+                    ("stopped", "stopped"),
+                    ("blocked", "blocked"),
+                    ("ready", "ready"),
+                    ("tentative", "tentative"),
+                    ("in_progress", "in progress"),
+                ),
+            ),
+        ),
+        (
+            "Sessions",
+            len(session_records),
+            "; ".join(
+                (
+                    f"{session_states['completed']} completed",
+                    f"{session_states['stopped']} stopped",
+                    session_suffix,
+                )
+            ),
+        ),
+        (
+            "Explorations",
+            len(exploration_records),
+            "; ".join(
+                (
+                    f"{codified} linked to proposed hypotheses",
+                    f"{len(exploration_records) - codified} uncodified",
+                )
+            ),
+        ),
+        (
+            "Hypotheses",
+            sum(hypothesis_states.values()),
+            summary(
+                hypothesis_states,
+                (
+                    ("confirmed", "confirmed"),
+                    ("refuted", "refuted"),
+                    ("blocked", "blocked"),
+                    ("unresolved", "unresolved"),
+                    ("open", "open"),
+                    ("open question", "open questions"),
+                    ("result registered", "result registered"),
+                    ("abandoned", "abandoned"),
+                    ("running", "running"),
+                ),
+            ),
+        ),
+        (
+            "Experiments",
+            len(experiment_records),
+            summary(
+                experiment_states,
+                (
+                    ("accepted", "accepted"),
+                    ("rejected", "rejected"),
+                    ("unresolved", "unresolved"),
+                    ("baseline", "baseline"),
+                    ("blocked", "blocked"),
+                    ("abandoned", "abandoned"),
+                    ("in-progress", "in progress"),
+                ),
+            ),
+        ),
+        ("Frontier results", len(frontier_results), f"{len(frontier_results)} registered"),
+    ]
+
+
+def check_current_research_status(text: str) -> list[str]:
+    """The marked research-status table agrees exactly with its source records."""
+    begin_count = text.count(STATUS_BEGIN)
+    end_count = text.count(STATUS_END)
+    if begin_count != 1 or end_count != 1:
+        return [
+            (
+                "SYNOPSIS.md: research-status roll-up needs exactly one ordered marker pair "
+                f"(found {begin_count} begin, {end_count} end)"
+            )
+        ]
+
+    begin = text.index(STATUS_BEGIN)
+    end = text.index(STATUS_END)
+    if begin >= end:
+        return ["SYNOPSIS.md: research-status roll-up markers are reversed"]
+
+    block = text[begin:end]
+    shown_rows = [
+        (label, int(total), state.strip())
+        for label, total, state in re.findall(
+            r"^\| ([^|]+?) \| (\d+) \| ([^|]+?) \|$", block, re.MULTILINE
+        )
+        if label not in {"Record", "---"}
+    ]
+    shown = {label: (int(total), state.strip()) for label, total, state in shown_rows}
+    expected = {label: (total, state) for label, total, state in current_research_status_rows()}
+    problems = []
+    for label, value in expected.items():
+        if shown.get(label) != value:
+            problems.append(
+                f"SYNOPSIS.md: research-status row {label!r} is {shown.get(label)!r}, "
+                f"expected {value!r}"
+            )
+    unexpected = sorted(set(shown) - set(expected))
+    if unexpected:
+        problems.append(f"SYNOPSIS.md: research-status table has unexpected rows {unexpected}")
+    duplicates = sorted(
+        label for label, count in Counter(row[0] for row in shown_rows).items() if count > 1
+    )
+    if duplicates:
+        problems.append(f"SYNOPSIS.md: research-status table has duplicate rows {duplicates}")
+    return problems
+
+
 def check_migrated_commands(text: str) -> list[str]:
     """Living instructions must use the maintained module and command surfaces."""
     obsolete = {
@@ -382,10 +553,52 @@ def select_handoff_cell(items: list[dict], next_action: str) -> dict:
 
 
 def session_handoff_key(session: dict, session_number: int) -> tuple[str, str, int]:
-    """Order sessions by their terminal clock, then their start and stable number."""
-    started_at = str(session.get("started_at") or "")
-    terminal_at = str(session.get("deadline_at") or started_at)
-    return terminal_at, started_at, session_number
+    """Order sessions by observed end, then start and stable number.
+
+    Legacy records predate `ended_at`; their start is the only observed chronological
+    value available. A planned deadline is never evidence of when work ended.
+    """
+    floor = datetime.min.replace(tzinfo=UTC)
+    started_at = parse_session_moment(session.get("started_at")) or floor
+    terminal_at = parse_session_moment(session.get("ended_at")) or started_at
+    return terminal_at.isoformat(), started_at.isoformat(), session_number
+
+
+def parse_session_moment(value: object) -> datetime | None:
+    """Parse one offset-aware session instant and normalize it to UTC."""
+    if not isinstance(value, str):
+        return None
+    try:
+        parsed = datetime.fromisoformat(value)
+    except ValueError:
+        return None
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        return None
+    return parsed.astimezone(UTC)
+
+
+def terminal_end_time_problems(records: Iterable[tuple[Path, dict]]) -> list[str]:
+    """Require an observed end time for new terminal handoff records."""
+    problems = []
+    for path, session in records:
+        number = int(path.name.split("-", 2)[1])
+        if number < TERMINAL_ENDED_AT_FROM or session.get("status") not in {
+            "completed",
+            "stopped",
+        }:
+            continue
+        started_at = parse_session_moment(session.get("started_at"))
+        ended_at = parse_session_moment(session.get("ended_at"))
+        if ended_at is None:
+            problems.append(
+                f"{path.name}: terminal session needs offset-aware ended_at; "
+                "deadline_at is only a plan"
+            )
+        elif started_at is None:
+            problems.append(f"{path.name}: terminal session needs offset-aware started_at")
+        elif ended_at < started_at:
+            problems.append(f"{path.name}: ended_at is before started_at")
+    return problems
 
 
 def is_administrative_unmeasured_closeout(session: dict) -> bool:
@@ -494,12 +707,15 @@ def check_current_handoff(text: str) -> list[str]:
         return ["SYNOPSIS.md: has no Current Handoff section"]
 
     # Chronology, not numbering or start order: a coordinator can start before a lane
-    # and terminalize after it. The record's terminal clock is the truth the handoff
+    # and terminalize after it. The record's observed end is the truth the handoff
     # follows. Session number is only the final deterministic tie-breaker.
     records = [
         (path, front(path)["session"])
         for path in AGENT_SESSIONS.glob("session-[0-9][0-9][0-9]-*.md")
     ]
+    end_time_problems = terminal_end_time_problems(records)
+    if end_time_problems:
+        return end_time_problems
     latest_record = select_latest_terminal_session(records)
     if latest_record is None:
         return ["campaign/agent-sessions: has no terminal numbered session artifact"]
@@ -944,6 +1160,7 @@ def main() -> int:
         + check_experiment_scope_claims(text)
         + check_freshness_label(text)
         + check_readiness_dashboard(text)
+        + check_current_research_status(text)
         + check_migrated_commands(text)
         + check_current_handoff(text)
         + check_covering_value_reports(text)
