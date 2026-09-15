@@ -41,13 +41,17 @@ from tempfile import TemporaryDirectory
 from typing import Any, Literal
 
 from devtools.check_math_loading import ACTIVE_MATH_VARIANT, EXPOSED, page_url
-from devtools.render_explainer_pdf import BROWSER_OVERRIDE, PAGE, READY, SETTLED
+from devtools.render_explainer_pdf import BROWSER_OVERRIDE, PAGE, READY, SETTLED_REFERENCE
+from sqpack.probes import probe
 
 type BrowserName = Literal["chromium", "firefox", "webkit"]
 type MeasurementMode = Literal["full", "parameters"]
 type JsonRecord = dict[str, Any]
 
 EXPECTED_PARAMETERS = 14
+
+#: The probes this module hands the page, one file each under `probes/`.
+PROBES = Path(__file__).resolve().parent / "probes"
 
 #: Installed before parsing. Wrappers observe the original calls and return their
 #: original promises, preserving resolution order and rejection behavior. No waits,
@@ -576,11 +580,8 @@ def measure_startup(
                 # real settlement promise without awaiting it in that call, then
                 # use the bounded wait API so broken pages still retain a report.
                 page.evaluate(
-                    "() => { const state = globalThis.__mathStartup;"
-                    " state.settlement_state = 'pending';"
-                    f" ({SETTLED})().then(() => {{ state.settlement_state = 'resolved'; }},"
-                    " error => { state.errors.push(String(error));"
-                    " state.settlement_state = 'rejected'; }); }"
+                    probe(PROBES, "check_math_startup/start_settlement"),
+                    {"settled": page.evaluate_handle(SETTLED_REFERENCE)},
                 )
                 page.wait_for_function(
                     "globalThis.__mathStartup.settlement_state !== 'pending'"

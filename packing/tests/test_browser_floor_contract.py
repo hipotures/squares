@@ -24,10 +24,16 @@ A configured rule is a claim; a rule that rejects a violation is a fact.
 The liveness tests need the pinned Node tools. Locally, a checkout without `npm ci` skips
 them; under `CI` a missing tool fails, because a liveness test that skips on the surface
 that runs it proves nothing (#125 F20, #160 R19). A workflow check below keeps a Node
-toolchain on every job that runs this file. No fixture is written into the source tree:
-the ESLint probe reaches its in-scope path through `--stdin-filename`, and the other
-fixtures live under pytest's `tmp_path`, so nothing here can race a test that lists the
-tree (#160 R18).
+toolchain on every job that runs this file.
+
+The samples those tests hand their tools are checked in, under
+`packing/tests/fixtures/browser-floor/`, as `.js.txt` data rather than source: each must
+fail the floor, so no tool's scope may reach one, and a name that is not a script's keeps
+them out with no exclusion, which is what lets the floor have none. The contract holds the
+tree to exactly those samples at their sizes. No test writes into the source tree: the
+ESLint probe reads its sample on stdin under an in-scope `--stdin-filename`, and Biome and
+`tsc` read a copy named as JavaScript under pytest's `tmp_path`, so nothing here can race a
+test that lists the tree (#160 R18).
 """
 
 from __future__ import annotations
@@ -36,6 +42,7 @@ import json
 import os
 import re
 import shlex
+import shutil
 import subprocess
 from collections.abc import Callable, Iterable, Mapping
 from pathlib import Path
@@ -165,6 +172,24 @@ REMOVED_BIOME_OVERRIDES: tuple[dict[str, Any], ...] = (
         "linter": {"rules": {"suspicious": {"noRedundantUseStrict": "off"}}},
     },
 )
+
+#: The liveness samples: code that breaks the floor on purpose, one for each tool -- a
+#: braceless `if` for Biome, a floating Promise for ESLint, a type error for `tsc` -- with the
+#: most bytes each may grow to. They are test data rather than source, so each is named
+#: `.js.txt`: no tool's scope reaches it and no exclusion has to keep it out, which is what
+#: lets the floor have no exceptions. A test hands its tool a copy named as JavaScript under
+#: `tmp_path`, or its text on stdin. Declaring the files and their sizes keeps the tree to three
+#: minimal violations: a fourth file, or a sample that stops being minimal, fails the contract.
+FLOOR_SAMPLES = PROJECT_ROOT / "tests/fixtures/browser-floor"
+FLOOR_SAMPLE_BYTES = {
+    "braceless-if.js.txt": 36,
+    "floating-promise.js.txt": 67,
+    "type-error.js.txt": 22,
+}
+
+#: The only exclusions Biome's `files.includes` may write: what is not ours to hold to a floor,
+#: and minified output, of which none is tracked. Any other `!` pattern skips owned code.
+BIOME_EXCLUSIONS = frozenset({"!**/node_modules", "!vendor", "!**/.venv", "!**/*.min.js"})
 
 #: Directories whose JavaScript is not ours to hold to a floor: third-party code, vendored
 #: or installed. Minified files are excluded from Biome too, and none is tracked.
@@ -424,6 +449,43 @@ def _eslint_faults(tracked: Iterable[str], resolved: Iterable[Mapping[str, Any]]
     return faults
 
 
+def _biome_exclusion_faults(config: Mapping[str, Any]) -> list[str]:
+    """Every `files.includes` exclusion beyond what is not ours: an owned tree Biome skips."""
+    return [
+        f"Biome excludes {pattern}"
+        for pattern in config.get("files", {}).get("includes", [])
+        if pattern.startswith("!") and pattern not in BIOME_EXCLUSIONS
+    ]
+
+
+def _floor_sample_faults(tree: Path, declared: Mapping[str, int]) -> list[str]:
+    """Every way the samples' tree differs from its declaration: a file it does not name, a
+    file it names that is gone, a file over its bytes, or a file named as source, which a
+    tool's scope would reach."""
+    held = {
+        path.relative_to(tree).as_posix(): path.stat().st_size
+        for path in tree.rglob("*")
+        if path.is_file()
+    }
+    faults = [
+        f"holds {name}, which is not declared" for name in sorted(set(held) - set(declared))
+    ]
+    faults.extend(
+        f"declares {name}, which is not held" for name in sorted(set(declared) - set(held))
+    )
+    faults.extend(
+        f"{name} is {size} bytes, over the {declared[name]} declared"
+        for name, size in sorted(held.items())
+        if name in declared and size > declared[name]
+    )
+    faults.extend(
+        f"{name} is named as source"
+        for name in sorted(held)
+        if name.endswith((*SCRIPT_SUFFIXES, *STYLE_SUFFIXES))
+    )
+    return faults
+
+
 def _biome_listed(command: str) -> set[str]:
     """The files `biome <command>` processes, as it reports them under `--verbose`."""
     done = subprocess.run(
@@ -529,6 +591,7 @@ def test_biome_has_no_override_and_no_rule_turned_down() -> None:
     config = _jsonc(BIOME_CONFIG)
     assert _biome_override_faults(config) == []
     assert _biome_downgrade_faults(config) == []
+    assert _biome_exclusion_faults(config) == []
 
 
 @pytest.mark.parametrize(
@@ -559,6 +622,36 @@ def test_a_global_downgrade_is_refused() -> None:
         "style.useBlockStatements is 'warn'",
         "suspicious.noRedundantUseStrict is 'off'",
         "css.linter.enabled is false",
+    ]
+
+
+def test_an_owned_tree_excluded_from_biome_is_refused() -> None:
+    """The negative control for exclusions: the one the liveness samples briefly had, before
+    they became data rather than source."""
+    config = json.loads(json.dumps(_jsonc(BIOME_CONFIG)))
+    config["files"]["includes"].append("!packing/tests/fixtures/browser-floor")
+    assert _biome_exclusion_faults(config) == [
+        "Biome excludes !packing/tests/fixtures/browser-floor"
+    ]
+
+
+def test_the_floor_samples_are_exactly_the_declared_data() -> None:
+    assert _floor_sample_faults(FLOOR_SAMPLES, FLOOR_SAMPLE_BYTES) == []
+
+
+def test_a_grown_or_sourced_sample_tree_is_refused(tmp_path: Path) -> None:
+    """The negative control: a tree that has grown a file, lost one, let a sample grow past
+    its size, and named one as source."""
+    for name in FLOOR_SAMPLE_BYTES:
+        shutil.copyfile(FLOOR_SAMPLES / name, tmp_path / name)
+    shutil.copyfile(FLOOR_SAMPLES / "type-error.js.txt", tmp_path / "type-error.js")
+    declared = {"braceless-if.js.txt": 35, "floating-promise.js.txt": 67, "gone.js.txt": 1}
+    assert _floor_sample_faults(tmp_path, declared) == [
+        "holds type-error.js, which is not declared",
+        "holds type-error.js.txt, which is not declared",
+        "declares gone.js.txt, which is not held",
+        "braceless-if.js.txt is 36 bytes, over the 35 declared",
+        "type-error.js is named as source",
     ]
 
 
@@ -884,7 +977,7 @@ def test_the_checked_javascript_overlay_rejects_a_floating_promise() -> None:
             str(ESLINT_CONFIG),
         ],
         env=os.environ | {"TSESTREE_SINGLE_RUN": "false"},
-        input="/** @returns {Promise<void>} */\nasync function later() {}\nlater();\n",
+        input=(FLOOR_SAMPLES / "floating-promise.js.txt").read_text(encoding="utf-8"),
         check=False,
         capture_output=True,
         text=True,
@@ -897,11 +990,11 @@ def test_the_checked_javascript_overlay_rejects_a_floating_promise() -> None:
 def test_the_braces_rule_actually_rejects_a_violation(tmp_path: Path) -> None:
     """The liveness check. `useBlockStatements` being written in the config proves only
     that someone wrote it; what proves the floor is live is Biome refusing a braceless
-    `if`. The fixture is written outside the repository so no real file has to be broken
-    and so the repository's own scope rules cannot accidentally exempt it."""
+    `if`. The sample is copied outside the repository, named as JavaScript, so no real file
+    has to be broken and the repository's own scope rules cannot exempt it."""
     _require_tool(BIOME)
     sample = tmp_path / "sample.js"
-    sample.write_text("if (globalThis.x) globalThis.y = 1;\n", encoding="utf-8")
+    shutil.copyfile(FLOOR_SAMPLES / "braceless-if.js.txt", sample)
     done = subprocess.run(
         [str(BIOME), "check", f"--config-path={REPOSITORY_ROOT}", str(sample)],
         check=False,
@@ -919,7 +1012,7 @@ def test_the_type_gate_actually_rejects_a_type_error(tmp_path: Path) -> None:
     """The same liveness question for the type gate. A `tsconfig` whose `include` matches
     nothing reports zero errors and looks exactly like a clean program."""
     _require_tool(TSC)
-    (tmp_path / "sample.js").write_text("Math.round(Math.max);\n", encoding="utf-8")
+    shutil.copyfile(FLOOR_SAMPLES / "type-error.js.txt", tmp_path / "sample.js")
     (tmp_path / "tsconfig.json").write_text(
         json.dumps(
             {

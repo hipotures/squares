@@ -58,7 +58,12 @@ import os
 from pathlib import Path
 from typing import Literal, NotRequired, TypedDict
 
-from devtools.check_math_loading import ACTIVE_MATH_VARIANT, FIRST_PAINT_SCRIPT, page_url
+from devtools.check_math_loading import (
+    ACTIVE_MATH_VARIANT,
+    FIRST_PAINT_SCRIPT,
+    MATH_LIBRARY_INIT,
+    page_url,
+)
 from devtools.check_print_layout import PRINT_VIEWPORT
 from devtools.render_explainer import MATH_WRAPPERS
 from devtools.render_explainer_pdf import BROWSER_OVERRIDE, PAGE, READY, SETTLED
@@ -468,6 +473,7 @@ def check(path: Path | str = PAGE, *, width: int = 1280) -> Report:
                     page.add_init_script(
                         f"localStorage.setItem('kpress.proseFont', {json.dumps(prose_font)});"
                     )
+                    page.add_init_script(MATH_LIBRARY_INIT)
                     page.add_init_script(FIRST_PAINT_SCRIPT)
                     page.goto(page_url(path), wait_until="load")
                     page.wait_for_selector(READY, timeout=60_000)
