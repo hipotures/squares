@@ -772,47 +772,60 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // square. Union-find over the contact graph the painter has already built, so the cost is the
   // edge count and nothing is recomputed: measured at n = 324 it does not move the trajectory's
   // build time, which the gate holds to 400 ms.
-  function assignGroups(count, clock) {
-    if (groupSlot === null || groupSlot.length !== count) {
-      return;
+  // The slot a square's run starts from, before any merge: spread over the slots the atlas does not
+  // reserve for right angles.
+  const firstSlot = (i) => 1 + (i % (PALETTE.length - 1));
+  //: **How many instants of a step's move and settle its runs are read at.** A frame's colours are a
+  //: function of its instant, not of which frames were drawn before it: runs used to merge on every
+  //: frame painted, so a still seeked straight to an instant, a film walked to it at 30 fps and one
+  //: at 60 fps each painted different runs (at n = 272, 22 to 44 fills of 272 apart). Merging only
+  //: at these fixed instants, read off the same poses the stage draws, gives one answer however the
+  //: instant is reached. Forty-eight over a beat of about a second and a half is a checkpoint every
+  //: thirty milliseconds, under two frames, so a merge lands when the contact does.
+  const GROUP_CHECKPOINTS = 48;
+  let groupFolded = 0; // how many checkpoints are folded into the runs
+  let groupSource = null; // the settings the folded checkpoints were read under
+  /** @type {{x: Float64Array, y: Float64Array, a: Float64Array} | null} */
+  let groupPoses = null;
+  function resetGroups(count) {
+    for (let i = 0; i < count; i++) {
+      groupSlot[i] = firstSlot(i);
+      groupParent[i] = i;
+      groupSize[i] = 1;
     }
-    const parent = groupParent,
-      size = groupSize;
-    // **Runs only ever merge, and a join repaints the NEWCOMER.** Two rules, and both were found by
-    // measuring rather than by reasoning. Rebuilding the components each frame let a square
-    // oscillate between two of them as a contact made and broke at the tolerance: 49 direction
-    // reversals at n = 110. And taking the lowest-numbered member's colour meant a whole run
-    // repainted because one low-numbered square joined it, cascading as the merges did: 364 hue
-    // hops at n = 110, 13 of them on one square. Union by size fixes the second -- the larger run
-    // keeps its colour and the smaller adopts it, which is what "they become the same colour as
-    // that connected component" means -- and carrying the union-find forward fixes the first.
-    //
-    // The reset is for a scrub: playback and capture both run the clock forward.
-    if (groupClock === null || clock < groupClock - 1e-9) {
-      for (let i = 0; i < count; i++) {
-        parent[i] = i;
-        size[i] = 1;
-      }
+    groupFolded = 0;
+    groupSource = null;
+    groupClock = null;
+  }
+  function findGroup(a) {
+    const parent = groupParent;
+    while (parent[a] !== a) {
+      parent[a] = parent[parent[a]];
+      a = parent[a];
     }
-    groupClock = clock;
-    const find = (a) => {
-      while (parent[a] !== a) {
-        parent[a] = parent[parent[a]];
-        a = parent[a];
-      }
-      return a;
-    };
-    for (let e = 0; e < paintEdges.length; e += 2) {
-      const a = paintEdges[e],
-        b = paintEdges[e + 1];
+    return a;
+  }
+  // **Runs only ever merge, and a join repaints the NEWCOMER.** Two rules, and both were found by
+  // measuring rather than by reasoning. Rebuilding the components each frame let a square
+  // oscillate between two of them as a contact made and broke at the tolerance: 49 direction
+  // reversals at n = 110. And taking the lowest-numbered member's colour meant a whole run
+  // repainted because one low-numbered square joined it, cascading as the merges did: 364 hue
+  // hops at n = 110, 13 of them on one square. Union by size fixes the second -- the larger run
+  // keeps its colour and the smaller adopts it, which is what "they become the same colour as
+  // that connected component" means -- and carrying the union-find forward fixes the first.
+  function foldGroups(count, edges, angles) {
+    const size = groupSize;
+    for (let e = 0; e < edges.length; e += 2) {
+      const a = edges[e],
+        b = edges[e + 1];
       if (a >= count || b >= count) {
         continue;
       }
-      if (angleGap(foldAngle(poseA[a]), foldAngle(poseA[b])) > ANGLE_TOL) {
+      if (angleGap(foldAngle(angles[a]), foldAngle(angles[b])) > ANGLE_TOL) {
         continue;
       }
-      let ra = find(a),
-        rb = find(b);
+      let ra = findGroup(a),
+        rb = findGroup(b);
       if (ra === rb) {
         continue;
       }
@@ -823,12 +836,97 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
         ra = rb;
         rb = s;
       }
-      parent[rb] = ra;
+      groupParent[rb] = ra;
       size[ra] += size[rb];
     }
     for (let i = 0; i < count; i++) {
-      groupSlot[i] = groupSlot[find(i)];
+      groupSlot[i] = firstSlot(findGroup(i));
     }
+  }
+  // Every connected run of same-angle squares that share a whole side, as a palette slot per
+  // square, for a frame on the step's timeline: the runs are the checkpoints up to `t` folded in
+  // order, each read from the poses the scene would draw at its instant. Folding is incremental
+  // while the clock runs forward; a scrub back, or a change to anything the poses depend on, starts
+  // again from the first checkpoint.
+  function assignGroups(count, t) {
+    if (groupSlot === null || groupSlot.length !== count) {
+      return;
+    }
+    const p = PAIRS[state.pair];
+    const A = FRAMES[String(p.n)];
+    const B = FRAMES[String(p.n + 1)];
+    const tm = timing();
+    const sc = schedule();
+    const physical = isPhysical(state.style) && !isStillPair();
+    const span = sc.end - sc.moveStart;
+    const due =
+      span <= 0 || t < sc.moveStart
+        ? 0
+        : Math.min(
+            GROUP_CHECKPOINTS,
+            Math.floor(((t - sc.moveStart) / span) * GROUP_CHECKPOINTS + 1e-9),
+          ) + 1;
+    const source = [
+      state.pair,
+      state.style,
+      physical ? trajectoryKey(state.pair, state.style, simMode()) : "",
+      simMode(),
+      state.phase,
+      state.anneal,
+      BLIND.inflate,
+      sc.moveStart,
+      sc.moveEnd,
+      sc.end,
+      sc.arrive,
+      sc.arrived,
+      sc.blocksStart,
+      sc.blocksEnd,
+    ].join("|");
+    if (groupClock !== null || source !== groupSource || due < groupFolded) {
+      resetGroups(count);
+    }
+    groupSource = source;
+    if (groupPoses === null || groupPoses.x.length !== count) {
+      groupPoses = {
+        x: new Float64Array(count),
+        y: new Float64Array(count),
+        a: new Float64Array(count),
+      };
+    }
+    const { x, y, a } = groupPoses;
+    for (let k = groupFolded; k < due; k++) {
+      const at = sc.moveStart + (span * k) / GROUP_CHECKPOINTS;
+      let side;
+      if (physical) {
+        side = physicsFrame(p, A, B, sc, at, x, y, a).side;
+      } else {
+        const frame = tweenFrame(p, A, B, tm, sc, at);
+        for (const square of frame.squares) {
+          x[square.index] = square.x;
+          y[square.index] = square.y;
+          a[square.index] = square.angleDegrees;
+        }
+        side = frame.containerSide;
+      }
+      const edges = measureFrameGeometry(x, y, a, side, 1, {
+        gap: CONTACT.gap,
+        angleToleranceDegrees: ANGLE_TOL,
+      }).contactEdges;
+      foldGroups(count, edges, a);
+    }
+    groupFolded = due;
+  }
+  // The same for an open-ended run, which has no timeline to checkpoint: its runs fold the contacts
+  // of each frame it draws, carried forward from the moment the run began.
+  function assignRunGroups(count, clock) {
+    if (groupSlot === null || groupSlot.length !== count) {
+      return;
+    }
+    if (groupClock === null || groupFolded > 0 || clock < groupClock - 1e-9) {
+      resetGroups(count);
+    }
+    groupClock = clock;
+    foldGroups(count, paintEdges, poseA);
   }
   //: What counts as not moving and not turning, for a square that keeps its colour. A unit side is
   //: 1, so a hundredth of one is under half a pixel at the size the stage draws; half a degree is
@@ -990,12 +1088,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     groupSlot = new Int16Array(p.n + 1);
     groupParent = new Int32Array(p.n + 1);
     groupSize = new Int32Array(p.n + 1);
-    groupClock = null;
-    for (let i = 0; i <= p.n; i++) {
-      groupSlot[i] = 1 + (i % (PALETTE.length - 1));
-      groupParent[i] = i;
-      groupSize[i] = 1;
-    }
+    resetGroups(p.n + 1);
     if (B.ident[p.new] !== p.n + 1) {
       throw new Error(`the new square of ${p.n} -> ${p.n + 1} is not identity ${p.n + 1}`);
     }
@@ -1606,10 +1699,32 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     return Math.max(1, Math.round(PHYS.stepsPerSecond * (tm.move + tm.correct)));
   }
   function ensureTrajectory(pairIndex, style, mode) {
-    mode = MODES.includes(mode) ? mode : simMode();
+    const key = trajectoryKey(pairIndex, style, mode);
+    let tr = physicsCache.get(key);
+    if (!tr) {
+      tr = simulate(
+        pairIndex,
+        physicsSteps(pairIndex, style),
+        style,
+        trajectoryMode(mode),
+        state.anneal,
+      );
+      if (physicsCache.size >= PHYS_CACHE_MAX) {
+        physicsCache.delete(physicsCache.keys().next().value);
+      }
+      physicsCache.set(key, tr);
+    }
+    return tr;
+  }
+  function trajectoryMode(mode) {
+    return MODES.includes(mode) ? mode : simMode();
+  }
+  // Everything a trajectory is a function of. The law is in the key: a trajectory drawn under one
+  // law is not the trajectory of another.
+  function trajectoryKey(pairIndex, style, requestedMode) {
+    const mode = trajectoryMode(requestedMode);
     const steps = physicsSteps(pairIndex, style);
-    // The law is in the key: a trajectory drawn under one law is not the trajectory of another.
-    const key =
+    return (
       style +
       "/" +
       mode +
@@ -1625,16 +1740,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       "/" +
       pairIndex +
       "/" +
-      steps;
-    let tr = physicsCache.get(key);
-    if (!tr) {
-      tr = simulate(pairIndex, steps, style, mode, state.anneal);
-      if (physicsCache.size >= PHYS_CACHE_MAX) {
-        physicsCache.delete(physicsCache.keys().next().value);
-      }
-      physicsCache.set(key, tr);
-    }
-    return tr;
+      steps
+    );
   }
   // The package reader is shared by interactive seek and deterministic capture.
   function samplePose(tr, u, i) {
@@ -3396,7 +3503,11 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     });
     paintEdges.splice(0, paintEdges.length, ...geometry.contactEdges);
     if (standardizing() && clamp01(Number(resting) || 0) < 1) {
-      assignGroups(N, state.t);
+      if (state.optimizing && opt !== null) {
+        assignRunGroups(N, state.t);
+      } else {
+        assignGroups(N, state.t);
+      }
     }
     /** @type {import("./view/scene-types.js").SceneFrame} */
     const scene = {
@@ -3563,7 +3674,10 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       ? ramp(t, sc.moveStart, knee) * PHYS.tightenFrom
       : PHYS.tightenFrom + ramp(t, knee, sc.moveEnd) * (1 - PHYS.tightenFrom);
   }
-  function renderPhysicsScene(p, A, B, _tm, sc, t) {
+  // Where the physical styles put every square at `t`, written into the three pose buffers, and
+  // the container around them. The stage draws this answer and the moving palette's checkpoints
+  // read it, so a run's colours are measured on the same poses the stage shows.
+  function physicsFrame(p, A, B, sc, t, xs, ys, as) {
     const u = moveProgress(sc, t);
     const moving = u > 0 && u < 1;
     // With the snap off the simulation's own final state is what the pair comes to rest at, so the
@@ -3577,8 +3691,6 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     // packing recentred inside it. After that the move is the simulation's own clock.
     const oe = blind ? easeInOut(clamp01(u / BLIND.open)) : 1;
     const su = blind ? clamp01((u - BLIND.open) / (1 - BLIND.open)) : Math.min(u, 1);
-    const settled = easeOut(ramp(t, sc.moveEnd, sc.end));
-    const e = easeInOut(u);
     let side, fit;
     if (blind && tr !== null) {
       side = oe < 1 ? lerp(A.side, tr.sides[0], oe) : sampleSide(tr, su);
@@ -3587,21 +3699,6 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       side = u >= 1 ? B.side : containerSide(A.side, B.side, u);
       fit = B.side;
     }
-    // The held view has to cover the widest the container ever gets, which for a blind run is its
-    // inflated start; that is a pure function of the record, so the view never jumps when the
-    // trajectory arrives.
-    const widest = blind ? B.side * BLIND.inflate : side;
-    const held = Math.max(A.side * (1 + 2 * PAD), widest * (1 + 2 * PAD_MIN));
-    const refit = easeInOut(ramp(t, sc.moveEnd, sc.end));
-    const view = u < 1 ? held : lerp(held, fit * (1 + 2 * PAD), refit);
-    svg.setAttribute("viewBox", `${side / 2 - view / 2} ${-side / 2 - view / 2} ${view} ${view}`);
-    containerRect.setAttribute("width", String(side));
-    containerRect.setAttribute("height", String(side));
-    sceneSide = side;
-
-    currentTrajectory = tr;
-    lastMoveU = su;
-    const drain = desatLevel(sc, t);
     for (let i = 0; i < motion.length; i++) {
       const m = motion[i];
       let x, y, ang;
@@ -3624,41 +3721,70 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
         y = pose[1];
         ang = pose[2];
       }
-      poseX[i] = x;
-      poseY[i] = y;
-      poseA[i] = ang;
-      m.node.setAttribute("transform", `translate(${x} ${y}) rotate(${ang})`);
+      xs[i] = x;
+      ys[i] = y;
+      as[i] = ang;
     }
-
     // The new square, identity n + 1: it fades and inflates in over the first part of the move
-    // where the simulation puts it, its fill leaning toward scarlet until the settle ends.
+    // where the simulation puts it.
     const nb = newPose;
     const appear = u <= 0 ? 0 : easeOut(clamp01(su / PHYS.appear));
+    let scale = 1;
+    if (appear > 0 && tr !== null) {
+      const pose = samplePose(tr, su, p.n);
+      xs[p.n] = pose[0];
+      ys[p.n] = pose[1];
+      as[p.n] = pose[2];
+      scale = lerp(PHYS.inflateFrom, 1, clamp01(su / PHYS.appear));
+    } else {
+      xs[p.n] = nb[0];
+      ys[p.n] = nb[1];
+      as[p.n] = nb[2];
+    }
+    return { u, moving, blind, tr, su, side, fit, appear, scale };
+  }
+  function renderPhysicsScene(p, A, B, _tm, sc, t) {
+    const { u, moving, blind, tr, su, side, fit, appear, scale } = physicsFrame(
+      p,
+      A,
+      B,
+      sc,
+      t,
+      poseX,
+      poseY,
+      poseA,
+    );
+    const settled = easeOut(ramp(t, sc.moveEnd, sc.end));
+    const e = easeInOut(u);
+    // The held view has to cover the widest the container ever gets, which for a blind run is its
+    // inflated start; that is a pure function of the record, so the view never jumps when the
+    // trajectory arrives.
+    const widest = blind ? B.side * BLIND.inflate : side;
+    const held = Math.max(A.side * (1 + 2 * PAD), widest * (1 + 2 * PAD_MIN));
+    const refit = easeInOut(ramp(t, sc.moveEnd, sc.end));
+    const view = u < 1 ? held : lerp(held, fit * (1 + 2 * PAD), refit);
+    svg.setAttribute("viewBox", `${side / 2 - view / 2} ${-side / 2 - view / 2} ${view} ${view}`);
+    containerRect.setAttribute("width", String(side));
+    containerRect.setAttribute("height", String(side));
+    sceneSide = side;
+
+    currentTrajectory = tr;
+    lastMoveU = su;
+    const drain = desatLevel(sc, t);
+    for (let i = 0; i < motion.length; i++) {
+      motion[i].node.setAttribute(
+        "transform",
+        `translate(${poseX[i]} ${poseY[i]}) rotate(${poseA[i]})`,
+      );
+    }
+    // The new square's fill leans toward scarlet until the settle ends.
+    const [x, y, ang] = [poseX[p.n], poseY[p.n], poseA[p.n]];
     if (appear > 0) {
-      let x, y, ang, scale;
-      if (tr === null) {
-        x = nb[0];
-        y = nb[1];
-        ang = nb[2];
-        scale = 1;
-      } else {
-        const pose = samplePose(tr, su, p.n);
-        x = pose[0];
-        y = pose[1];
-        ang = pose[2];
-        scale = lerp(PHYS.inflateFrom, 1, clamp01(su / PHYS.appear));
-      }
-      poseX[p.n] = x;
-      poseY[p.n] = y;
-      poseA[p.n] = ang;
       newNode.setAttribute("opacity", appear);
       newNode.setAttribute("transform", `translate(${x} ${y}) rotate(${ang}) scale(${scale})`);
     } else {
-      poseX[p.n] = nb[0];
-      poseY[p.n] = nb[1];
-      poseA[p.n] = nb[2];
       newNode.setAttribute("opacity", 0);
-      newNode.setAttribute("transform", `translate(${nb[0]} ${nb[1]}) rotate(${nb[2]})`);
+      newNode.setAttribute("transform", `translate(${x} ${y}) rotate(${ang})`);
     }
     // At rest through the dwell and from the instant the settle ends, which are the two frames a
     // Animate leaves a viewer looking at.
@@ -3796,8 +3922,10 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
 
   // Style A, the block tween of revision 5: poses tween between the two frames, a block's members
   // riding its rigid transform, the container and the view with them.
-  function renderTweenScene(p, A, B, tm, sc, t) {
-    const scene = illustrationFrame({
+  // Where style A puts every square at `t`: the illustration's frame, which the stage draws and the
+  // moving palette's checkpoints read.
+  function tweenFrame(p, A, B, tm, sc, t) {
+    return illustrationFrame({
       pairIndex: state.pair,
       n: state.liveN,
       fromSide: A.side,
@@ -3816,6 +3944,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       tint: TINT,
       mark: { wide: MARK_WIDE, thin: MARK_THIN, fade: MARK_FADE },
     });
+  }
+  function renderTweenScene(p, A, B, tm, sc, t) {
+    const scene = tweenFrame(p, A, B, tm, sc, t);
     sceneSide = scene.containerSide;
     for (const square of scene.squares) {
       poseX[square.index] = square.x;

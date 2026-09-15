@@ -132,9 +132,26 @@ def gap_bar_through_dwell(session: Session) -> str:
     return "the dwell's bar measures only the squares drawn"
 
 
+def colours_by_instant(session: Session) -> str:
+    """A frame's colours are a function of its instant, not of the seeks before it."""
+    for n in (26, 110, 272):
+        for walk in (6, 24):
+            fills = session.look("animate/seek-fills", n=n, at=0.6, walk=walk)
+            direct = fills["direct"]
+            for route in ("walked", "again"):
+                differ = sum(1 for a, b in zip(direct, fills[route], strict=True) if a != b)
+                session.require(
+                    len(direct) == n and differ == 0,
+                    f"step into {n}: the {route} seek ({walk} steps) paints {differ} of "
+                    f"{len(direct)} fills differently from a direct seek to the same instant",
+                )
+    return "direct, walked and revisited seeks paint alike"
+
+
 SECTIONS: tuple[Callable[[Session], str], ...] = (
     keyboard_ownership,
     gap_bar_through_dwell,
+    colours_by_instant,
 )
 
 
