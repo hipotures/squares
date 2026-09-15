@@ -45,8 +45,10 @@ The best of the first 1,000 runs in `closed`, with 3,000 repaired runs per cell
 | 8 | 0.958 | 0.977 | 0.564 |
 | 10 | 0.864 | 0.879 | 0.325 |
 
-Below level 6 no run beat the grid at any of the three `n`. At levels 6 to 10 the best
-run beat it in eight cells of nine.
+At levels 0, 2 and 4 no run beat the grid at any of the three `n`. At levels 6, 8 and 10
+the best run beat it in eight cells of nine; the ninth, `n = 11` at level 6, did before
+seed 5,000 of the same stream.
+Levels 1, 3, 5, 7 and 9 have no repaired runs.
 
 **What the measurement cannot yet say.** The claim compares against the shipped level 3,
 which was not measured.

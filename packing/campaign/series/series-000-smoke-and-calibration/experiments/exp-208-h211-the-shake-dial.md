@@ -108,9 +108,10 @@ experiment:
   verdict:
     decision: unresolved
     primary_criterion: closed at the best of the first 1,000 repaired runs
-    reason: At levels 0 to 4 no repaired run in 3,000 beat the grid at n = 5, 10 or 11, and at
-      levels 6 to 10 the best run did in eight of nine cells, but each value is one prefix from
-      one seed stream and the page's own level 3 was not measured.
+    reason: At levels 0, 2 and 4 no repaired run in 3,000 beat the grid at n = 5, 10 or 11, and
+      at levels 6, 8 and 10 the best run did in eight of nine cells, the ninth within 5,000
+      seeds, but each value is one prefix from one seed stream and the page's own level 3 was
+      not measured on repaired runs.
     commit: 88d452f1
   effort:
     stopped_by: dependency
@@ -147,9 +148,10 @@ At level 8, `n = 11` reached 0.616 over 16,319 seeds, 1.22% above `s(11)`.
 
 - **Without shake every seed gives the same run**, because the shake is the only
   randomness.
-- **At levels 0 to 4 no run beat the grid** in 3,000 seeds at any of the three `n`.
-- **At levels 6 to 10 the best run beat it in eight cells of nine.** The exception is
-  `n = 11` at level 6.
+- **At levels 0, 2 and 4 no run beat the grid** in 3,000 seeds at any of the three `n`.
+- **At levels 6, 8 and 10 the best run beat it in eight cells of nine.** The ninth,
+  `n = 11` at level 6, marks the budget rather than the level: the same seed stream beat
+  the grid before seed 5,000 (`resolved-5k-a6.jsonl`).
 - **The median barely moves**, except `n = 11` at level 10, so the dial changes the best
   run rather than the typical one.
 - **The best of 1,000 peaks at level 6 for `n = 5` and at level 8 for `n = 10` and 11.**
@@ -158,9 +160,9 @@ At level 8, `n = 11` reached 0.616 over 16,319 seeds, 1.22% above `s(11)`.
 ## What Is Not Established
 
 - **No spread.** Each cell is one prefix from one seed stream.
-- **The page’s level 3 was not measured**, so H-211’s threshold, which compares against
-  level 3, cannot be applied.
-  Neither were levels 5, 7 and 9.
+- **The page’s level 3 was not measured on repaired runs**, so H-211’s threshold, which
+  compares against level 3, cannot be applied.
+  Levels 1 and 3 have only void cells, and levels 5, 7 and 9 none.
 - **Larger `n` at level 8 is missing.** The run requested `n = 17`, 26 and 29 and
   retained only `n = 11`.
 - **Whether the best level moves with `n`** is untested beyond these three.

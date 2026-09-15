@@ -41,21 +41,24 @@ That text is recoverable at commit `a40d272c`; none of it is repeated here.
   by matching the two records.
   Only the destination poses are withheld.
   It is one point on a range of how much of the answer a search is given.
-- **The runs did not end on packings.** None of the 123,190 blind runs in the repaired
-  rounds ended without overlapping squares; the median deepest overlap was 0.083 of a
-  unit side. A container side read from such an arrangement is a bounding box around
-  overlaps, so every number taken that way has been discarded.
+- **The runs did not end on packings.** None of the 123,190 seeded blind runs in the
+  repaired rounds ended without overlapping squares; the median deepest overlap was
+  0.083 of a unit side.
+  A container side read from such an arrangement is a bounding box around overlaps, so
+  every number taken that way has been discarded.
 - **Repaired to a packing, a single run is worse than the trivial grid.** At every `n`
   and every shake level measured, the median run needs a larger container than
   `ceil(sqrt(n))`.
 - **The best of many runs sometimes comes close and never reaches a record.** At shake
   level 6 the best of the first 1,000 seeds was 0.28% above `s(5)` and 0.42% above
   `s(10)`. At `n = 17` and `n = 29` no run in 5,000 beat the grid.
-- **Difficulty does not follow the number of squares.** `n = 26` did better than
-  `n = 11` and `n = 17`. What does decide it is not established.
-- **The shake dial is a search parameter that the page sets for looks.** At levels 0 to
-  4 no run in 3,000 beat the grid at `n = 5`, 10 or 11. At levels 6 to 10 the best run
-  did, with one exception.
+- **How hard an `n` is depends on the scale and the budget.** In `closed` at the best of
+  the first 1,000 seeds, `n = 26` did better than `n = 11` and `n = 17`; at the best of
+  5,000, or in excess over the record, `n = 11` did better than `n = 26`. Six `n`, one
+  seed stream each, cannot show how difficulty depends on `n`.
+- **The shake dial is a search parameter that the page sets for looks.** At levels 0, 2
+  and 4 no run in 3,000 beat the grid at `n = 5`, 10 or 11. At levels 6, 8 and 10 the
+  best run did in eight cells of nine, and the ninth did within 5,000 seeds.
   The page ships level 3.
 
 ## 1. What a Blind Run Is
@@ -125,9 +128,10 @@ The snap and free rows came from a variant of the probe that was run once and no
 the committed harness runs blind only, so the control is a recorded observation rather
 than a reproducible one.
 
-Across the 123,190 runs of the repaired rounds, no run ended below 1e-5. The deepest
-overlap before repair ranged from 0.002 to 0.118 of a side, with a median of 0.083.
-These figures come from local copies of the rows, which are not retained, and
+Across the 123,190 seeded runs of the repaired rounds, no run ended below 1e-5. Of
+those, 9,000 are at level 0, where every seed of an `n` repeats one run.
+The deepest overlap before repair ranged from 0.002 to 0.118 of a side, with a median of
+0.083. These figures come from local copies of the rows, which are not retained, and
 `devtools.summarize_annealing --overlaps` recomputes them from regenerated rows.
 
 The overlap is built into the blind schedule.
@@ -159,14 +163,14 @@ record and the grid ranges from 1.12% at `n = 29` to 10.82% at `n = 5`.
 
 5,000 seeds per `n`, each run repaired and checked before scoring:
 
-| n | gap to grid | median run | best of first 100 | best of first 1,000 | best of 5,000 |
-| ---: | ---: | ---: | ---: | ---: | ---: |
-| 5 | 10.82% | −0.074 | −0.015 | 0.974 | 0.977 |
-| 10 | 7.90% | −0.099 | 0.874 | 0.947 | 0.974 |
-| 11 | 3.17% | −0.107 | −0.035 | −0.012 | 0.476 |
-| 17 | 6.94% | −0.104 | −0.062 | −0.062 | −0.061 |
-| 26 | 6.74% | −0.101 | 0.120 | 0.212 | 0.230 |
-| 29 | 1.12% | −0.857 | −0.370 | −0.193 | −0.110 |
+| n | gap to grid | median run | median, above record | best of first 100 | best of first 1,000 | best of 5,000 | best, above record |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 5 | 10.82% | −0.074 | 11.62% | −0.015 | 0.974 | 0.977 | 0.25% |
+| 10 | 7.90% | −0.099 | 8.68% | 0.874 | 0.947 | 0.974 | 0.20% |
+| 11 | 3.17% | −0.107 | 3.51% | −0.035 | −0.012 | 0.476 | 1.66% |
+| 17 | 6.94% | −0.104 | 7.66% | −0.062 | −0.062 | −0.061 | 7.36% |
+| 26 | 6.74% | −0.101 | 7.42% | 0.120 | 0.212 | 0.230 | 5.19% |
+| 29 | 1.12% | −0.857 | 2.07% | −0.370 | −0.193 | −0.110 | 1.24% |
 
 What this shows:
 
@@ -177,10 +181,12 @@ What this shows:
   0.42%.
 - **No run reached a record.** The closest is at `n = 5`: over 39,871 seeds the best is
   0.15% above `s(5)`.
-- **Size does not order the results.** `n = 26` beats the grid in its first 100 seeds,
-  while `n = 11` needed more than 1,000 and `n = 17` never did.
-  `n = 11` and `n = 29` have the two smallest gaps, where `closed` is a harsh scale, but
-  `n = 17`’s gap is ordinary.
+- **The order across `n` depends on the scale and the budget.** In `closed`, `n = 26`
+  beat the grid within its first 100 seeds, `n = 11` needed more than 1,000 and `n = 17`
+  never did. In excess over the record the order changes: the best `n = 11` run is 1.66%
+  above its record and the best `n = 26` run 5.19%. `closed` is a harsh scale where the
+  gap is small, as at `n = 11` and `n = 29`. One seed stream at each of six `n` does not
+  show how difficulty depends on `n`.
 
 ### Across shake levels, at `n = 5`, 10 and 11
 
@@ -199,9 +205,11 @@ What this shows:
 
 - **At level 0 every seed gives the same answer**, because the shake is the only
   randomness in the run.
-- **At levels 0 to 4 no run beat the grid** in 3,000 seeds at any of the three `n`.
-- **At levels 6 to 10 the best run beat it**, except `n = 11` at level 6. At level 8,
-  `n = 11` reached 0.564 in the first 1,000 seeds and 0.616 over 16,319.
+- **At levels 0, 2 and 4 no run beat the grid** in 3,000 seeds at any of the three `n`.
+- **At levels 6, 8 and 10 the best of 3,000 beat it in eight cells of nine.** The ninth,
+  `n = 11` at level 6, is the budget rather than the level: the same seed stream beat
+  the grid before seed 5,000, as the table across `n` shows.
+  At level 8, `n = 11` reached 0.564 in the first 1,000 seeds and 0.616 over 16,319.
 - **The median barely moves with the level**, except `n = 11` at level 10, so the dial
   acts on the best run rather than the typical one.
 - **The page ships level 3**, chosen for how the animation looks.
@@ -216,7 +224,8 @@ What this shows:
   harness’s own separating-axis check.
   Regenerating the rows repeats that check; it is not an independent one.
 - **Coverage is thin.** `n = 17`, 26 and 29 have repaired runs at level 6 only.
-  Levels 3, 5, 7 and 9 were not measured.
+  Levels 1 and 3 were measured only before runs were repaired, and levels 5, 7 and 9 not
+  at all.
 - **The repair only translates.** Whether a repair that rotates changes the scores is
   untested. A compaction pass was tried and its code was not kept, so
   [exp-209](../series/series-000-smoke-and-calibration/experiments/exp-209-h211-an-unretained-compaction-pass.md)
