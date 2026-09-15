@@ -28,8 +28,10 @@ experiment:
       rounding: nearest-even
     migration_annotation: '2026-09-13: source reference mapped from pre-purge ee27f8e3 to reachable
       d3c3a778; the retained harness and workbench source trees compare equal in Git. Original
-      run provenance was not recaptured. The declared trial count does not match the recorded
-      command, which requests 12,000, and no manifest was kept to reconcile them.'
+      run provenance was not recaptured. The 15,000 trials are the three summaries.json entries
+      named in record: the command wrote the 12,000 in guarded-a6.jsonl, and 500 seeds at each
+      of n = 5, 11 and 17 at shake levels 0 and 3, whose commands were not recorded, wrote
+      guarded-a0.jsonl and guarded-a3.jsonl.'
   instance:
     axis: n
     point: 11
@@ -46,7 +48,8 @@ experiment:
     entry_point: packing/devtools/bench_annealing.py
     command: python -m devtools.bench_annealing --n 5 10 11 17 26 29 --seeds 2000 --anneal 6
       --budget 900
-    record: packing/campaign/results/annealing/
+    record: packing/campaign/results/annealing/summaries.json, entries guarded-a6.jsonl,
+      guarded-a0.jsonl and guarded-a3.jsonl
   results:
   - shape: determination
     question: does any blind run end on an arrangement with no overlapping squares, checked
