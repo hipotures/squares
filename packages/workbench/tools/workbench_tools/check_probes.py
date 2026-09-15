@@ -42,7 +42,10 @@ PROBES = Path(__file__).resolve().parents[2] / "probes"
 #: them, or a probe used by one checker looks dead to a run that only knew about another.
 CALLERS = (
     "check_accessibility.py",
+    "check_animate_view.py",
     "check_animation_editor.py",
+    "check_pack_panel.py",
+    "check_search_panel.py",
     "check_workbench.py",
     "check_revision6.py",
     "check_revision7.py",
