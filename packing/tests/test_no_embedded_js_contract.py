@@ -177,6 +177,17 @@ def test_applied_calls_the_probe_with_its_argument_serialised() -> None:
     assert json.loads(str(done.stdout)) == argument
 
 
+def test_applied_without_an_argument_passes_nothing_rather_than_null() -> None:
+    """An init probe is called with no argument, so a default parameter still applies."""
+    script = applied(probe(PROBES, "no_embedded_js/echo"))
+    done = node(
+        ["--print", script], return_completed_process=True, capture_output=True, text=True
+    )
+    assert done.returncode == 0, done.stderr
+    assert str(done.stdout).strip() == "undefined"
+    assert applied(probe(PROBES, "no_embedded_js/echo"), None).endswith(")(null);\n")
+
+
 def test_the_loader_refuses_names_outside_its_root(tmp_path: Path) -> None:
     for name in ("../escape", "/absolute", "tool/name.js", ""):
         with pytest.raises(ValueError, match="not a probe name"):

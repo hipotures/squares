@@ -39,6 +39,7 @@ from typing import Any
 
 from playwright.sync_api import ConsoleMessage, sync_playwright
 
+from sqpack.probes import applied
 from workbench_tools.build_site import OUT, POLICY_META
 from workbench_tools.probes import probe
 
@@ -58,17 +59,6 @@ class PolicyRun:
     started: dict[str, Any]
     violations: list[dict[str, str]] | None
     errors: list[str] = field(default_factory=list)
-
-
-def applied(source: str) -> str:
-    """A probe's source called with no argument, as one script for `add_init_script`.
-
-    `add_init_script` runs a script rather than calling a function, so an init probe is
-    called here, in one place. It is the same boundary `sqpack.probes.applied` draws on the
-    no-JavaScript-in-Python branch (#175), and becomes that import when #175 merges up.
-    """
-    expression = source.strip().removesuffix(";")
-    return f"({expression}\n)();\n"
 
 
 def with_policy(page_text: str, meta: str) -> str:

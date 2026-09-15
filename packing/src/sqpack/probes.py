@@ -28,7 +28,8 @@ single JSON-serialisable argument, so a probe that needs `n` takes `(o) => ...` 
     box = page.evaluate(probe(PROBES, "check_layout/slots"), {"n": 26})
 
 `add_init_script` is the one entry point that takes no argument; `applied` gives it the
-probe already called with one, serialised as JSON rather than formatted.
+probe already called, with no argument or with one serialised as JSON rather than
+formatted.
 
 `devtools.check_probes` keeps every probe tree honest: each file parses as a function, each
 is named by a Python file beside its directory, and each name a Python file uses has a
@@ -67,12 +68,19 @@ def probe(root: Path, name: str) -> str:
     return path.read_text(encoding="utf-8")
 
 
-def applied(source: str, argument: object = None) -> str:
-    """A probe's source called with `argument`, as one script for `add_init_script`.
+#: Stands for "no argument", which is not the same call as an argument of `None`: a probe
+#: with a default parameter sees `undefined` in the first case and `null` in the second.
+_NO_ARGUMENT = object()
 
-    The argument is serialised with `json.dumps`, which escapes every character JavaScript
-    could misread, and JSON is a JavaScript expression. That is the boundary Playwright
-    itself draws for `evaluate`, drawn once here instead of at each call site.
+
+def applied(source: str, argument: object = _NO_ARGUMENT) -> str:
+    """A probe's source called once, as one script for `add_init_script`.
+
+    With `argument`, the call passes it serialised by `json.dumps`, which escapes every
+    character JavaScript could misread; JSON is a JavaScript expression. That is the
+    boundary Playwright itself draws for `evaluate`, drawn once here instead of at each call
+    site. Without one, the probe is called with no argument at all.
     """
     expression = source.strip().removesuffix(";")
-    return f"({expression}\n)({json.dumps(argument, allow_nan=False)});\n"
+    passed = "" if argument is _NO_ARGUMENT else json.dumps(argument, allow_nan=False)
+    return f"({expression}\n)({passed});\n"
