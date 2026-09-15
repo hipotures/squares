@@ -11,8 +11,8 @@ count: 132
 generated_by: >-
   uv run --frozen --all-extras --group dev python -m devtools.close_session --render
 totals:
-  sessions_measured: 83
-  sessions_unmeasured: 49
+  sessions_measured: 84
+  sessions_unmeasured: 48
   attributed:
     rollups: 129
     turns: 40048
@@ -35,8 +35,8 @@ totals:
     one_off_code: 4407
     wall_hours: 421.83
 codex_receipts:
-  attributed: 51
-  unattributed: 3
+  attributed: 52
+  unattributed: 2
   measured: 54
 # Per-session figures below are the logs each session DECLARES. They overlap when
 # sessions share a harness log, so they do not sum to `attributed` above.
@@ -2183,11 +2183,21 @@ sessions:
     snapshot_incomplete: true
 - id: session-132
   title: "N11 Post-W5 Route Selection"
-  status: in_progress
+  status: stopped
   primary_bead: think-d3h5
   phases: 1
-  measured: false
-  unmeasured_reason: >-
-    declares no resource measurement
-  rollups: []
-  codex_receipts: []
+  measured: true
+  rollups:
+  - packing/campaign/resource-usage/codex-task-tree-session-132.yaml
+  turns: null
+  tool_calls: null
+  tool_errors: null
+  one_off_code: null
+  wall_hours: null
+  codex_receipts:
+  - path: packing/campaign/resource-usage/codex-task-tree-session-132.yaml
+    model_responses: 274
+    agent_hours: 1.03
+    active_union_hours: 0.72
+    wall_hours: 0.72
+    snapshot_incomplete: true

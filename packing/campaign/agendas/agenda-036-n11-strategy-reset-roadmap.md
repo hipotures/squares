@@ -211,7 +211,7 @@ agenda:
     purpose: tool_validation
     owner_focus: process
     instances: [11]
-    state: in_progress
+    state: complete
     priority: 0
     question: >-
       After the due efficiency checkpoint, which one scientific route has the highest
@@ -236,11 +236,25 @@ agenda:
     - packing/campaign/agent-sessions/session-132-n11-post-w5-route-selection.md
     - docs/project/reviews/review-2026-09-14-n11-post-w5-route-selection.md
     parallel_group: post-efficiency-route-selection
+    outcomes:
+    - scope: >-
+        The ten-route post-W5 portfolio, exact first discriminators, admission gaps,
+        fallback rules, and six active hours of merge-bounded follow-up work.
+      classification: achieved
+      result: >-
+        Route A's complete same-corner root admission at side 96/25 is the sole next
+        entry. Route S is the explicit fallback if the physical root and independent
+        checker cannot be admitted within 75 minutes. No scientific target ran.
+      evidence:
+      - docs/project/reviews/review-2026-09-14-n11-post-w5-route-selection.md
+      - packing/campaign/agent-sessions/session-132-n11-post-w5-route-selection.md
+      disposition: retire-success
+      follow_up: think-0t5y
   - id: BC-354
     purpose: tool_validation
     owner_focus: process
     instances: [11]
-    state: blocked
+    state: ready
     priority: 0
     question: >-
       Can one complete same-corner availability-blocker root at side 96/25 be frozen
@@ -512,15 +526,10 @@ incremental lanes from the live queue.
 
 The research-state roll-up, mathematical audit, and BC-346 W10 selection are certified
 and closed in declared dependency order.
-BC-340, the due W5 efficiency checkpoint, is the sole next execution entry.
-A conservative source reconstruction counts eight substantive non-W5 blocks since the
-latest qualifying W5 in Session 116/BC-322, which reaches OR-12’s mandatory ceiling.
-
-No scientific target is authorized before W5 closes and BC-353’s fresh W10 selects one.
-The advisory scientific order remains A at side `3.84`, S, angular resources, B,
-stronger charge algebra, geometry-dependent budgets, n12, C, D, then geometric waste.
-Route A is the expected first scientific choice and Route S is its admission fallback,
-but both remain tentative until the post-W5 planning block.
+BC-340 and BC-353 are complete.
+Route A’s BC-354 admission at side `96/25` is the sole next execution entry, and Route S
+is the explicit fallback if the complete physical root and checker cannot be admitted
+within 75 minutes. The exact discriminator remains blocked on that no-target admission.
 
 The W10 review maps the next six active work hours into five sequential PR-bounded
 blocks: BC-340 W5, BC-353 W10, selected-route admission, one exact discriminator, and a

@@ -138,8 +138,8 @@ hypothesis status and summarizes experiment verdicts, and the
 | Record | Count | State at the cutoff |
 | --- | ---: | --- |
 | Agendas | 35 | 15 active; 14 completed; 5 paused; 1 superseded |
-| Commitments | 343 | 175 complete; 59 stopped; 65 blocked; 15 ready; 21 tentative; 8 in progress |
-| Sessions | 132 | 84 completed; 47 stopped; 1 nonterminal |
+| Commitments | 343 | 176 complete; 59 stopped; 64 blocked; 16 ready; 21 tentative; 7 in progress |
+| Sessions | 132 | 84 completed; 48 stopped; all terminal |
 | Explorations | 29 | 17 linked to proposed hypotheses; 12 uncodified |
 | Hypotheses | 138 | 25 confirmed; 24 refuted; 48 blocked; 10 unresolved; 2 open; 26 open questions; 2 result registered; 1 abandoned; 0 running |
 | Experiments | 116 | 38 accepted; 29 rejected; 25 unresolved; 11 baseline; 11 blocked; 2 abandoned; 0 in progress |
@@ -202,11 +202,10 @@ unchanged 195-second ceiling.
 This is validation evidence, not new mathematics.
 The current order is:
 
-1. Merge BC-340’s separate W5 pull request, then run BC-353 / `think-d3h5` as a fresh
-   W10 planning block from that merge.
-2. Reconsider A at side `96/25` as the presumptive first scientific choice and S as the
-   fallback if A cannot freeze a complete admission slice; select exactly one and run no
-   scientific target in W10.
+1. Run BC-354 / `think-0t5y` as a 75-minute, no-target admission block for one complete
+   Route A same-corner root at side `96/25`.
+2. If admission succeeds, run BC-341’s exact matched discriminator; if the physical root
+   or independent checker cannot be frozen, stop Route A and admit Route S instead.
 3. Treat A, S, global angular resources, and B as the first advisory tier.
    A is the strongest route to a material `n = 11` lower bound; S is the best bounded
    deliverable; angular resources offer a cheap optimal-face screen; and B is the
@@ -219,13 +218,12 @@ The current order is:
    lemma and a non-double-counting global rule.
 
 The detailed
-[six-hour execution schedule](docs/project/reviews/review-2026-09-14-n11-w10-route-selection.md#six-hour-execution-schedule)
-allocates five sequential merge-bounded blocks: W5 measurement, post-W5 W10 selection,
-selected-route admission, one exact scientific discriminator, and independent review
-plus replanning. Each block starts from the preceding merge on a fresh branch and gets
-its own session, bead disposition, validation receipt, and pull request.
-Route A is the default research shape, not an authorization: BC-353 may select Route S
-or redirect the remaining work if W5 or admission evidence changes the decision.
+[six-hour execution schedule](docs/project/reviews/review-2026-09-14-n11-post-w5-route-selection.md#six-active-hours-after-this-planning-merge)
+allocates five sequential merge-bounded blocks: Route A admission, its exact
+discriminator, an independent mathematical audit, one evidence-earned follow-up or Route
+S admission, and W10 closeout.
+Each block starts from the preceding merge on a fresh branch and gets its own session,
+bead disposition, validation receipt, and pull request.
 
 The audit’s linear advisory order is A, S, angular resources, B, stronger charge
 algebra, geometry-dependent budgets, `n = 12`, C, D, then geometric waste.
@@ -873,27 +871,24 @@ controller, not permission to blur contracts.
 
 ### Current Handoff
 
-[Session 131](packing/campaign/agent-sessions/session-131-n11-w5-validation-efficiency.md)
-is the latest terminal handoff and records the completed BC-340 validation checkpoint.
 [Session 132](packing/campaign/agent-sessions/session-132-n11-post-w5-route-selection.md)
-is running BC-353 from its W5 merge `cdb088142f596c468b910a6d44c7915e26ea02e1`. Three
-read-only Astra Max lanes are reconciling A/S, E/B/F1/F2, and N/C/D/G plus small-`n`
+is the latest terminal handoff.
+It closed BC-353 from the W5 merge `cdb088142f596c468b910a6d44c7915e26ea02e1` after
+three read-only Astra Max lanes reconciled A/S, E/B/F1/F2, and N/C/D/G plus small-`n`
 transfer against the retained mathematical audit.
-Their shared draft recommendation is Route A admission at side `96/25`, with Route S as
-the explicit fallback if the complete A root and checker cannot be frozen.
-The planning block runs no scientific target.
+The selected entry is Route A admission at side `96/25`, with Route S as the explicit
+fallback if the complete physical root and checker cannot be frozen.
+The planning block ran no scientific target.
 The scientific evidence cutoff remains main revision
 `80bcdbb0819504354e1278c37f211dd8cc2158fb`, where the latest merged stack is green and
 the T-026 lower bound remains the frontier.
 
-**Selected next entry:** `think-d3h5`, the BC-353 post-W5 W10 route-selection block.
+**Selected next entry:** `think-0t5y`, the BC-354 Route A admission block.
 
-BC-340 and its primary bead are terminal, and PR 174 is merged.
-BC-353 now owns the sole active planning entry and will select exactly one scientific
-admission block. The draft introduces BC-354 / `think-0t5y` as a separate no-target
-admission boundary for one complete same-corner Route A root; BC-341 cannot run until
-that admission PR merges.
-No candidate has execution authority before BC-353 closes and merges.
+BC-340 and BC-353 are terminal.
+BC-354 is a separate no-target admission boundary for one complete same-corner Route A
+root; BC-341 cannot run until that admission PR merges.
+No scientific target has execution authority before admission succeeds.
 
 The older BC329, weighted-atom stages 3–4, and BC303 H-160/H-162 target lanes are
 paused. Their admitted implementations, registrations, and controls remain evidence; no
@@ -4062,14 +4057,14 @@ in separate tables: their units differ, and the same work can appear in both.
 | `codex-task-tree-session-124-publication.yaml` | session-124 | 154 | 6.97 h | 0.41 h | 0.41 h | yes |
 | `codex-task-tree-session-126.yaml` | session-126 | 576 | 4.31 h | 2.39 h | 2.39 h | yes |
 | `codex-task-tree-session-131.yaml` | session-131 | 313 | 1.24 h | 0.75 h | 0.75 h | yes |
+| `codex-task-tree-session-132.yaml` | session-132 | 274 | 1.03 h | 0.72 h | 0.72 h | yes |
 | `codex-task-tree-pr137-publication-tail.yaml` | unattributed | 610 | 4.39 h | 1.77 h | 1.82 h | yes |
 | `codex-task-tree-pr142-publication-tail.yaml` | unattributed | 136 | 0.87 h | 0.41 h | 0.58 h | yes |
-| `codex-task-tree-session-132.yaml` | unattributed | 205 | 0.8 h | 0.51 h | 0.51 h | yes |
 
 | Coverage | sessions |
 | --- | ---: |
-| measured | 83 |
-| unmeasured | 49 |
+| measured | 84 |
+| unmeasured | 48 |
 | **total** | **132** |
 
 <!-- END GENERATED: session-close-report -->

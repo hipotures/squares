@@ -341,12 +341,13 @@ on.
 It is not the next thing, because a reassessment of what to search is queued in front
 of it.
 
-For the next supervised exact-research goal, run BC-353 under `think-d3h5` as the fresh
-post-W5 W10 route-selection block and a separate pull request.
-BC-340 completed its measured validation repair behind an equivalence guard; its first
-candidate hosted checks tier passed at 106.38 seconds against the unchanged 195-second
-ceiling. BC-353 consumes that receipt, selects exactly one scientific admission route,
-and runs no scientific target.
+For the next supervised exact-research goal, run BC-354 under `think-0t5y` as a separate
+75-minute Route A admission pull request from the merged planning block.
+BC-353 selected one complete same-corner root at side `96/25`; admission must freeze the
+16-root physical denominator, all incidence strata, shared parent geometry, a matched
+baseline, exact controls, and an independent checker without running a scientific
+target. BC-341 remains blocked until that admission merges; Route S is the explicit
+fallback if the root or checker cannot be admitted within the block.
 The current evidence, candidate dispositions, and post-W5 scientific order are in the
 synopsis’s
 [Research Program Status and Roadmap](../../../../SYNOPSIS.md#research-program-status-and-roadmap),

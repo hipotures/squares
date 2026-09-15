@@ -11,9 +11,10 @@ session:
   date: '2026-09-14'
   started_at: '2026-09-15T01:35:00Z'
   deadline_at: '2026-09-15T02:35:00Z'
+  ended_at: '2026-09-15T02:18:00Z'
   branch: codex/n11-post-w5-route-selection
   primary_bead: think-d3h5
-  status: in_progress
+  status: stopped
   goal: >-
     Consume the merged W5 receipt, recheck the ten-route mathematical portfolio, and
     select exactly one scientific admission block capable of material progress without
@@ -45,7 +46,7 @@ session:
     objective: >-
       Reconcile three source-bound mathematical reviews with the retained audit and W5
       evidence, then publish one executable research handoff.
-    status: in_progress
+    status: stopped
     entered_by: session_start
     switch_reason: null
     budget_minutes: 50
@@ -64,10 +65,21 @@ session:
     fallback: >-
       Select Route S's bounded certificate-compression admission if Route A's complete
       physical root and checker cannot be frozen.
-    outcome: null
-    evidence: []
-    stop_reason: null
-    next_action: Synthesize the three Astra Max reviews and select exactly one route.
+    outcome: >-
+      Selected Route A's complete same-corner admission at side 96/25 as the sole next
+      entry, with Route S's bounded certificate compression as the named fallback. The
+      admission must preserve the 16-root physical denominator, shared parent geometry,
+      all incidence strata, a matched baseline, exact controls, and an independent
+      checker. Every other route remains tentative behind a stated resume condition.
+    evidence:
+    - docs/project/reviews/review-2026-09-14-n11-post-w5-route-selection.md
+    - packing/campaign/agendas/agenda-036-n11-strategy-reset-roadmap.md
+    stop_reason: >-
+      One route and one fallback have complete bounded admission contracts, all other
+      routes have explicit dispositions, and no scientific target ran.
+    next_action: >-
+      Merge PR 176, then start BC-354 under think-0t5y from origin/main and admit Route
+      A without running its scientific target.
   progress:
     metric: >-
       Candidate routes with explicit prerequisites, exact first discriminators,
@@ -76,7 +88,10 @@ session:
       Ten candidates had an advisory order after the September 14 audit; Route A was
       presumptive and Route S its fallback, but W5 had not closed and no science route
       was authorized.
-    after: null
+    after: >-
+      Route A admission is the sole next execution entry. Route S is the fallback if a
+      complete physical root and checker cannot be admitted in 75 minutes; the exact
+      discriminator BC-341 remains blocked on that admission.
   delegations:
   - task: Compare Route A's complete root-family program with Route S's bounded proof simplification.
     operator: Astra Max route-A/S sub-agent, read-only
@@ -149,8 +164,16 @@ session:
   checks:
   - The branch base is merged W5 revision cdb088142f596c468b910a6d44c7915e26ea02e1.
   - No scientific target, solver, search, or verifier has run in BC-353.
-  stop_reason: null
-  next_action: Complete BC-353's one-route selection and open its separate planning pull request.
+  - Three independent Astra Max reviews covered all ten routes and transferable small-n opportunities.
+  - 'full gate: fast at 807f0dcca7dc2a9cf651e78bb8b234fcccb65c38: all scientific and mergeability lanes passed; validate found only the expected missing live-session receipt, supplied at terminal closeout (GitHub Actions run 34920175787)'
+  resource_rollups:
+  - packing/campaign/resource-usage/codex-task-tree-session-132.yaml
+  stop_reason: >-
+    The post-W5 review selected exactly one no-target admission block, preserved Route S
+    as its bounded fallback, disposed every alternative, and left no scientific target
+    running.
+  next_action: >-
+    Merge PR 176, then start BC-354 under think-0t5y from the merged origin/main.
 ---
 # N11 Post-W5 Route Selection
 
