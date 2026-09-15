@@ -67,23 +67,8 @@ allowlist:
   - path: packing/devtools/prepare_explainer_math.py
     sites: 51
     bead: think-3pox
-  - path: packing/tests/test_browser_floor_contract.py
-    sites: 2
-    bead: think-3pox
-  - path: packing/tests/test_check_published_site.py
-    sites: 1
-    bead: think-3pox
-  - path: packing/tests/test_codex_log_rollup.py
-    sites: 3
-    bead: think-3pox
   - path: packing/tests/test_math_startup.py
     sites: 2
-    bead: think-3pox
-  - path: packing/tests/test_motion_lab.py
-    sites: 1
-    bead: think-3pox
-  - path: packing/tests/test_motion_lab_interactive.py
-    sites: 3
     bead: think-3pox
   - path: packing/tests/test_prepare_explainer_math.py
     sites: 4
