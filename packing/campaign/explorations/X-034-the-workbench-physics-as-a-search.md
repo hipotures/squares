@@ -17,8 +17,8 @@ exploration:
     destination poses. This exploration measured that run as a search: whether it ends on a
     packing, and how close the best of many seeded runs gets to the known-best side.
   sources:
-  - packing/atlas/known-best/video/spikes/v2-transitions/assets/workbench.js
-    - packages/workbench/tools/workbench_tools/benchmark.py
+  - packages/workbench/src/application.js
+  - packages/workbench/tools/workbench_tools/benchmark.py
   - packing/campaign/results/annealing/summaries.json
   - docs/project/specs/active/plan-2026-09-11-annealing-as-a-search.md
   proposes: [H-207, H-208, H-209, H-210, H-211]
