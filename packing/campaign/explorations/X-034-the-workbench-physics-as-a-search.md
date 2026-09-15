@@ -241,8 +241,9 @@ What this shows:
 
 ## 6. What Follows
 
-- **Re-measure before reusing any number here.** The package benchmark keeps each
-  trial’s poses and reports disjoint seed blocks, which is what these observations lack.
+- **Re-measure before reusing any number here.** From #160 on, the package benchmark
+  keeps each trial’s raw and repaired poses and reports disjoint seed blocks, which is
+  what these observations lack.
 - **Measure success against how much the run is given.** Blind is one level between
   nothing and the full answer.
   The

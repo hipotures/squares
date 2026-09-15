@@ -94,10 +94,10 @@ uv run --frozen --all-extras --group dev python -m devtools.bench_annealing \
     --replay /path/to/retained-trials.jsonl
 ```
 
-The Phase 1 admission repair and Phase 3 shared kernel replace this legacy instrument
-before new comparative conclusions are accepted.
-Existing commands are reproduction routes, not evidence that their known defects are
-fixed.
+On this branch the harness still ranks non-finite and unchecked trials, drops unknown
+sweep keys and can alias large seeds.
+Its repairs ship with PR #160, which replaces it with the package benchmark, so these
+commands reproduce the recorded rounds and do not support new comparative conclusions.
 
 ## Metrics and acceptance
 

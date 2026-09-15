@@ -5,7 +5,8 @@ author: Joshua Levy with agent assistance
 ---
 # Feature: Packing Strategies as a Shared Language
 
-**Updated:** 2026-09-12, against PR #155 head `6e191a35`, stacked on PR #125.
+**Updated:** 2026-09-14, on PR #155, stacked on PR #125. The surface table still
+describes PR #155 at `6e191a35`.
 
 **Status:** Python executor and SVG adapters exist; shared browser execution and
 semantic conformance are incomplete.
@@ -34,7 +35,7 @@ capture deliverables.
 | Python mechanisms | Scatter, grid, assemble, project, ratchet, relax, guide, container | Extract reusable algorithms from devtools; reject unsupported capabilities. |
 | Animation interchange | `packing-animation.schema.yaml`, `animation_from_trace`, `export_animation_svg` | Validate geometry and provenance before assigning evidence; enforce time, identity, and cardinality. |
 | Renderer | `sqpack.render` supports rotation and changing container side | Reuse its model, palette, and evidence distinctions through browser adapters. |
-| Capture | `devtools.capture_video` captures the workbench page | Trace playback and page simulation are distinct paths; receipts must identify the path used. |
+| Capture | `devtools.capture_video` captures the workbench page | Trace playback and page simulation are distinct paths; receipts must identify the path used and name the strategy documents (`think-zvor`). |
 | Browser | Workbench and Motion Lab have their own runtime models | Workbench does not yet execute the shared strategy schema. |
 | Rust | Search engine and experimental controls exist | No shared strategy executor is delivered by this stack. |
 
@@ -59,9 +60,12 @@ Two gaps stand between the format and that:
 
 Executors declare the mechanisms and uses they support, and refuse a document with any
 phase they cannot run.
-The field list, the rung table and the evaluation loop are in the
-[annealing plan](plan-2026-09-11-annealing-as-a-search.md#strategies-with-declared-guidance);
-the bead is `think-8ocb`.
+The field list and rung table are drafted in the
+[annealing plan](plan-2026-09-11-annealing-as-a-search.md#strategies-with-declared-guidance).
+This plan owns them as the format (`think-8ocb`); the annealing plan owns the evaluation
+loop that compares documents (`think-qx88`). `think-dekm` tests the format against what
+is already measured: four projection results written as documents, each checked to
+reproduce its number.
 
 ## Phase 1: Repair the Contracts Before Reuse
 
@@ -166,6 +170,8 @@ Acceptance:
 - Produce the same frame through seek and capture at the same time.
 - Preserve feasibility and guidance in visible labels or the export’s accessible
   description.
+- Record, per ascent step, how close the unguided phase came before a guide took over
+  (`think-e74w`).
 - Represent changes in `n`, container side, and orientation explicitly.
 
 ## Phase 4: Optional Backends and New Mechanisms
