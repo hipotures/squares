@@ -21,14 +21,18 @@ Pull requests run the bounded Linux fast surface; integration events run the ord
 full checkpoint on Linux and four focused portability checks on macOS. The Rust search
 engine uses the stable Cargo toolchain.
 
-From this directory:
+From the repository root, then from `packing/`:
 
 ```shell
+npm ci --ignore-scripts
+cd packing
 uv sync --frozen --all-extras --group dev
 uv run --frozen --all-extras --group dev python --version
 uv run --frozen --all-extras --group dev packing-validate --fast
 ```
 
+`npm ci` installs the pinned Node tools the browser-floor step runs; without them that
+step fails. `make hooks-install` runs the same install and then the Git hooks.
 The version command must report Python 3.14.7. Do not run a bare `pip install`, commit a
 second requirements file, or rely on packages from a global interpreter.
 Use uv 0.12 or newer to bootstrap the pinned interpreter; uv 0.8.17 cannot install
@@ -134,7 +138,6 @@ process execution.
 <a id="validation-tiers"></a>
 
 A **tier** selects validation steps; a **lane** selects tests within a behavioural step.
-The ordinary full checkpoint has 74 steps.
 The
 [validation efficiency plan](docs/project/specs/active/plan-2026-09-06-validation-efficiency-and-checkpoints.md)
 owns the current W5 work on cost, naming, and checkpoint placement.
