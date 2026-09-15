@@ -122,7 +122,8 @@ BC-353 selected Route A and is terminal.
 BC-354 stopped at Route A’s representation boundary without running a target or closing
 a physical root; the complete 80-stratum negative-root producer, matched exact baseline,
 conditional gate, and independent replay remain absent.
-BC-343 / `think-a1e8` is the sole next entry.
+BC-343 / `think-a1e8` remains the active research commitment; its guard-discharge and
+certification child `think-r55v` is the sole next entry.
 Its first pull request is a no-target Route S admission.
 [X-032](../../../../packing/campaign/explorations/X-032-route-s-threshold-compression.md)
 freezes T-025 as the sole matched control, its exact 79 point-orbit and 40

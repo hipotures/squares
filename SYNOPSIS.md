@@ -208,7 +208,8 @@ The current order is:
    Its source inventories found no complete 80-stratum negative-root producer, matched
    exact baseline, conditional gate, or method-distinct replay.
    No target ran and no physical root closed.
-2. BC-343 / `think-a1e8` is the active entry.
+2. BC-343 / `think-a1e8` remains the active research commitment; `think-r55v` is its
+   sole operational entry.
    [X-032](packing/campaign/explorations/X-032-route-s-threshold-compression.md) and
    [H-163](packing/campaign/hypotheses/H-163-route-s-threshold-compression.md) freeze
    T-025 as the sole matched control, its exact 119-orbit support universe, and the
@@ -915,7 +916,8 @@ The scientific evidence cutoff remains main revision
 `80bcdbb0819504354e1278c37f211dd8cc2158fb`, where the latest merged stack is green and
 the T-026 lower bound remains the frontier.
 
-**Selected next entry:** `think-a1e8`, the active BC-343 Route S admission phase.
+**Selected next entry:** `think-r55v`, the guard-discharge and certification child of
+BC-343 / `think-a1e8`.
 
 BC-340, BC-353, and BC-354 are terminal.
 BC-341 remains tentative behind a future W10 reselection and the named Route A
