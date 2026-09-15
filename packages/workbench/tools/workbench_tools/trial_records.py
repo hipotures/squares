@@ -212,15 +212,22 @@ class Trial:
     contract: str = TRIAL_CONTRACT
 
     def row(self) -> dict[str, object]:
-        """Return the complete versioned wire representation without legacy defaults."""
+        """Return the complete versioned wire representation without legacy defaults.
+
+        `raw_valid` and `resolved_valid` say whether the raw and repaired arrangements pass the
+        validity contract in their fitted boxes, so no side or excess is written without it.
+        They are derived here and never read back: admission rechecks the geometry itself.
+        """
         return {
             "contract": self.contract,
             "n": self.n,
             "seed": self.seed,
             "style": self.style,
+            "raw_valid": _passes_contract(self.poses, self.side, self.n),
             "excess": self.excess,
             "closed": self.closed,
             "overlap": self.overlap,
+            "resolved_valid": _passes_contract(self.resolved_poses, self.resolved_side, self.n),
             "resolved_side": self.resolved_side,
             "resolved_closed": self.resolved_closed,
             "resolved_overlap": self.resolved_overlap,
@@ -908,3 +915,13 @@ def _record_params(value: object) -> dict[str, float | int] | None:
 
 def _reject_json_constant(token: str) -> None:
     raise ValueError(f"non-standard JSON number {token!r} is not allowed")
+
+
+def _passes_contract(
+    poses: tuple[tuple[float, float, float], ...] | None, side: float, n: int
+) -> bool:
+    if poses is None or isinstance(n, bool) or not isinstance(n, int) or n < 1:
+        return False
+    return check_unit_square_packing(
+        poses, side=side, expected_count=n, tolerance=VALIDITY_TOLERANCE
+    ).passed

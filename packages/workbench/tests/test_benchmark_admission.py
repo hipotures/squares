@@ -435,3 +435,16 @@ def test_a_success_band_finer_than_the_validity_tolerance_is_refused() -> None:
     check_success_band(bench.TOLERANCES["exact"], 1.0)
     for name, band in bench.TOLERANCES.items():
         assert band / 100 >= VALIDITY_TOLERANCE, name
+
+
+def test_a_written_row_says_whether_each_side_belongs_to_a_packing() -> None:
+    good = _trial()
+    assert good.poses is not None
+    row = good.row()
+    assert (row["raw_valid"], row["resolved_valid"]) == (True, True)
+    coincident = replace(good, poses=(good.poses[0], good.poses[0], *good.poses[2:]))
+    assert coincident.row()["raw_valid"] is False
+    overlapping = _pressed(2e-9)
+    assert overlapping.row()["resolved_valid"] is False
+    assert replace(good, resolved_poses=None).row()["resolved_valid"] is False
+    assert trial_from_json(trial_to_json(overlapping)) == overlapping
