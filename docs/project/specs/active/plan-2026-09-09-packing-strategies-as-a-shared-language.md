@@ -189,8 +189,10 @@ A local backend or future browser-compatible backend is optional, with a visible
 capability check. Neither is a prerequisite for browser packing or replay.
 
 New physics and optimization experiments follow the annealing plan.
-Search remains deferred until record/statistics repairs, shared resolution, and package
-extraction are complete.
+Search as a research mode remains deferred until record/statistics repairs, shared
+resolution, and package extraction are complete.
+PR #160 ships only a bounded experimental Search preview, which the workbench plan
+describes.
 
 ## Validation and Migration Limits
 

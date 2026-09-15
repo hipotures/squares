@@ -6,6 +6,13 @@ import { forceAtGap, forceLawAttracts } from "./force-law.ts";
 const SQUARE_INERTIA = 1 / 6;
 const QUARTER_TURN = Math.PI / 2;
 const QUARTER_TURN_TIE = Math.PI / 4 + 1e-9;
+/**
+ * A separating-axis penetration this small is float rounding between touching squares and applies
+ * no force. A solver threshold: validity is assessed separately, under `PACKING_VALIDITY`.
+ */
+const CONTACT_EPSILON = 1e-9;
+/** Widens a broad-phase cell past the interaction reach, so a pair at the reach is never lost. */
+const CELL_MARGIN = 1e-9;
 /** The widest broad-phase grid, in cells; `core/geometry.ts` caps its own grid the same. */
 export const MAX_BROAD_PHASE_DIMENSION = 512;
 
@@ -596,7 +603,7 @@ function applyPairForce(
       2;
     const separation = differenceX * axisX + differenceY * axisY;
     const penetration = radiusFirst + radiusSecond - Math.abs(separation);
-    if (penetration <= 1e-9 && pull === 0) {
+    if (penetration <= CONTACT_EPSILON && pull === 0) {
       return { penetration: 0, near: false, applied: false };
     }
     if (penetration < best) {
@@ -760,7 +767,7 @@ export function advanceSimulation(
   }
   const { dimension, cell } = broadPhaseGrid(
     step.container.side,
-    Math.max(step.baseCell, Math.SQRT2 * maximumSize + attractionReach + 1e-9),
+    Math.max(step.baseCell, Math.SQRT2 * maximumSize + attractionReach + CELL_MARGIN),
   );
   if (state.gridDimension !== dimension) {
     state.gridDimension = dimension;

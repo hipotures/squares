@@ -7,7 +7,7 @@ author: Claude and Codex agents, for the repository maintainer
 
 **Date:** 2026-09-11
 
-**Updated:** 2026-09-13
+**Updated:** 2026-09-14
 
 **Status:** Active; PR #160 adds independent Pack and bounded Search, phase gates open
 
@@ -54,9 +54,12 @@ Workbench-specific build, benchmark, capture, and Python adapters live inside th
 package. Existing general-purpose `sqpack` libraries remain dependencies.
 
 The package shell starts in Phase 0; broad live-source consolidation starts only after
-the evidence, correctness, and strict-new-source checkpoint in Phase 2. Search remains
-deferred until the annealing record reports valid distributions and the page and
-benchmark use the same packing-validity contract.
+the evidence, correctness, and strict-new-source checkpoint in Phase 2. Search as a
+research mode remains deferred until the annealing record reports valid distributions.
+PR #160 ships only a bounded experimental Search preview, described under the current
+state below.
+Since #160’s review round, the page, Pack, Search and the benchmark read one
+packing-validity contract (`ec0a0604`, page readouts `c0d9db2b`).
 
 ## Required Final Outcomes
 
@@ -160,12 +163,16 @@ Search is exposed as an experimental preview, bounded to `n ≤ 32`, at most eig
 and at most 5,000 steps per trial.
 This preview does not satisfy Phase 5: proposal and Resolve work can still block
 interaction, and calibration, CLI, and distribution views remain open.
-Saved ledgers now decode and re-admit outcomes against plan-derived fields; isolated
-nonfinite partial failures and effective growth semantics remain open in `think-i5pg`.
-The browser checker migration now covers independent Pack, bounded Search, Animate and
-accessibility on a freshly built page.
-Historical paired-Pack assertions in `check_workbench` remain obsolete and need a
-documented retirement disposition.
+#160’s review round (2026-09-14) made its Resolve option run and rank the repaired state
+(`158af9d5`), added validity, work and block-best summaries (`5d5760cd`), and let resume
+rerun cancelled and timed-out slots (`38d9f21b`). Saved ledgers now decode and re-admit
+outcomes against plan-derived fields; isolated nonfinite partial failures and effective
+growth semantics remain open in `think-i5pg`. The browser checker migration now covers
+independent Pack, bounded Search, Animate and accessibility on a freshly built page.
+The historical paired-Pack assertions were retired with `check_workbench`,
+`check_legend` and `check_revision7` at `46b8f14e`. That commit’s message is the
+retirement disposition: it lists each dropped assertion and why, and the live assertions
+it kept run in `check_animate_view` through `check_frontend` (`3dfc7f11`).
 
 Independent review of the shared Pack path found two defects: retained best could depend
 on how fixed steps were batched for UI yielding (`think-wqf3`), and a shrinking
