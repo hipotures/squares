@@ -60,8 +60,10 @@ That text is recoverable at commit `a40d272c`; none of it is repeated here.
 - **The shake dial is a search parameter that the page sets for looks.** At levels 0, 2
   and 4 no run in 3,000 beat the grid at `n = 5`, 10 or 11. At levels 6, 8 and 10 the
   best run did in eight cells of nine, and the ninth did within 5,000 seeds.
-  The page shipped level 3 when these runs were measured; the owner’s defaults now ship
-  9 on a 0–20 dial (#171).
+  These runs used the page’s defaults of the time: level 3, a pair law of rigidity 0.15
+  and repulsion 2500 with no attraction, and a 0.8 s moving span.
+  #171 ships level 9 on a 0–20 dial, under a different law and beat, and no level has
+  been measured under those.
 
 ## 1. What a Blind Run Is
 
@@ -215,9 +217,14 @@ What this shows:
 - **The median barely moves with the level**, except `n = 11` at level 10, so the dial
   acts on the best run rather than the typical one.
 - **The page shipped level 3** when these runs were measured, chosen for how the
-  animation looked. The owner’s defaults now ship level 9 on a dial widened to 0–20
-  (#171); levels above 10 have not been measured.
-  Level 3 was not measured after the repair existed.
+  animation looked. Level 3 was not measured after the repair existed.
+- **Every cell ran under the page’s previous law and beat.** At `engine_commit`
+  `88d452f1` the pair law was rigidity 0.15, repulsion 2500, attraction 0 and range 0,
+  and the moving span was 0.8 s, which gives a level-9 run 154 physics steps.
+  #171 ships the owner’s defaults: level 9 on a dial widened to 0–20, the pair law 0.35,
+  950, 80 and 0.15, and a 0.9 s moving span, 173 steps at level 9. Level 9 lies between
+  measured levels, but no level has been measured under these defaults, and none above
+  10 under any. From #160 on, every trial’s configuration records its pair law and beat.
 
 ## 5. What Is Not Established
 
