@@ -72,10 +72,12 @@ The review found these distinct cases:
 | Imported animation entries can acquire numerical assurance from an asserted `feasible` flag, and intermediate strategy frames can be relabelled with a later container side. | Demonstrated provenance and trace-semantics defects. | `think-sdmi` validates imported evidence; `think-karf` enforces executable strategy and trace semantics. |
 | Revision probes, research instruments and product entry points overlap. | Cleanup risk: deleting a probe can also delete its only semantic assertion. | `think-cqfc` inventories consumers and preserves unique controls before retiring obsolete code. |
 
-**Record policy, revised by the owner on 2026-09-14.** Superseded claims are removed,
-not annotated. Each annealing artifact states only what survived checking and names
-commit `a40d272c` for its previous text (`think-84m3`). Git keeps the history; the
-current text carries no layered corrections.
+**Record policy.** The annealing records have not reached `main`, so under
+[conventions §7](../../../../conventions.md#7-corrections) they are drafts.
+On the owner’s direction of 2026-09-14, superseded claims were removed rather than
+annotated, and each artifact names commit `a40d272c` for its previous text
+(`think-84m3`). Ids and renumberings stay recorded as identity notes.
+Once the records land on `main`, they are corrected by addition.
 
 ## Evidence Contract
 
