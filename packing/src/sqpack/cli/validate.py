@@ -1508,6 +1508,7 @@ def _browser_floor(context: Context) -> str:
                 "packages/workbench",
                 "packing/src/sqpack/motion_lab/assets",
                 "packing/atlas/known-best/video/spikes/v1-slideshow",
+                "packing/atlas/known-best/video/spikes/v2-transitions/probes",
                 "packing/devtools/probes",
                 "packing/devtools/node",
                 "packing/tests/probes",
