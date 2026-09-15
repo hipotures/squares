@@ -49,6 +49,8 @@ name: Certificate page
       - packing/frontier/results.yaml
       - packing/atlas/known-best/composite-figure.json
       - packing/atlas/known-best/rendering/n-011.svg
+      - packing/atlas/known-best/rendering/**
+      - packing/witnesses/known-best/**
       - packing/devtools/templates/explainer-shell.html
       - packing/devtools/templates/explainer-article.md
       - packing/devtools/templates/fonts/**
@@ -95,6 +97,8 @@ name: Certificate page
       - packing/frontier/results.yaml
       - packing/atlas/known-best/composite-figure.json
       - packing/atlas/known-best/rendering/n-011.svg
+      - packing/atlas/known-best/rendering/**
+      - packing/witnesses/known-best/**
       - packing/devtools/templates/explainer-shell.html
       - packing/devtools/templates/explainer-article.md
       - packing/devtools/templates/fonts/**

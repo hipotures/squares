@@ -39,6 +39,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SPIKE = ROOT / "atlas/known-best/video/spikes/v2-transitions"
 OUT = ROOT / "site/workbench"
+KNOWN_BEST = ROOT / "atlas/known-best"
+KPRESS = ROOT.parent / "vendor/kpress"
 
 RENDER_INPUTS = (
     Path(__file__),
@@ -46,8 +48,12 @@ RENDER_INPUTS = (
     SPIKE / "template.html",
     SPIKE / "assets/workbench.css",
     SPIKE / "assets/workbench.js",
-    SPIKE / "transition-stats.json",
-    ROOT / "atlas/known-best/manifest.json",
+    ROOT / "witnesses/known-best",
+    KNOWN_BEST / "rendering",
+    KNOWN_BEST / "manifest.json",
+    KNOWN_BEST / "composite-figure.json",
+    ROOT / "devtools/render_explainer.py",
+    KPRESS,
 )
 """Everything the page is built from. The Pages workflow's path filter has to cover this
 list, and `test_the_pages_filter_covers_every_render_input` is what says so -- which is what
