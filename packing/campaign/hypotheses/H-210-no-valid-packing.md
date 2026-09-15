@@ -22,8 +22,8 @@ hypothesis:
   instrument: packages/workbench/tools/workbench_tools/benchmark.py
   instrument_ready: true
   regime: >-
-    the workbench's simulation in blind mode; the snapped mode is valid by construction and
-    is the control that sets the tolerance
+    the workbench's simulation in blind mode; the tolerance is chosen, and the snapped mode,
+    valid by construction, was observed once beside it and not kept (think-2ngs)
   instance: {axis: n, point: 11}
   sweep: {axis: n, points: [5, 10, 11, 17, 26, 29]}
   priority: 1
@@ -32,12 +32,21 @@ hypothesis:
 ---
 # H-210 — the blind physics never settles to a valid packing
 
-**Registered so the claim can be tested rather than assumed.**
+**Identity.** Derived from X-034, which was X-028 until 2026-09-13 and X-029 until
+2026-09-14.
 
-Every blind run observed ended with squares overlapping: in the 123,190 runs whose rows
-survive locally, the deepest overlap before repair ranged from 0.002 to 0.118 of a unit
-side. A separating-axis test measured it over the final poses, with a tolerance taken
-from the snapped control
+**Registered so the claim can be tested rather than assumed.** It was registered after
+its data: the runs
+[exp-210](../series/series-000-smoke-and-calibration/experiments/exp-210-h210-blind-runs-are-not-packings.md)
+reports came first, so that round is the exploratory data behind the claim, filed under
+the open question [H-212](H-212-the-workbench-physics-as-a-search.md), and not its test.
+The test is a preregistered round on seed blocks those runs did not use.
+
+Every blind run observed ended with squares overlapping: in 123,190 runs of the repaired
+rounds, whose rows are not retained, the deepest overlap before repair ranged from 0.002
+to 0.118 of a unit side.
+A separating-axis test measured it over the final poses, against a chosen tolerance of
+1e-5
 ([exp-210](../series/series-000-smoke-and-calibration/experiments/exp-210-h210-blind-runs-are-not-packings.md)).
 The trials were not kept, so this is an observation to re-measure rather than a result.
 

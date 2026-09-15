@@ -295,7 +295,7 @@ strategies:
     mechanism is the one Torquato and Jiao name as load-bearing in their own words: the
     cell strain "corresponds to non-trivial collective motions of the particle centroids
     ... It is this collective motion that enables the algorithm to explore the
-    configuration space more efficiently", which is exactly the defect exp-134 measured
+    configuration space more efficiently", which is exactly the defect exp-201 measured
     here seventeen years later. Its two-dimensional protocol is fully published:
     acceptance-ratio target 50 percent, strictly downhill strain, compression schedules
     of 1000, 100 and 10 trial moves per particle, termination when density gains fall

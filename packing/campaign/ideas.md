@@ -553,12 +553,22 @@ in the finite optimum.
 | 173 | the blind physics never settles to a valid packing | registered | [H-210](hypotheses/H-210-no-valid-packing.md) | [X-034](explorations/X-034-the-workbench-physics-as-a-search.md) | Re-measure with retained final poses and disjoint seed blocks before reusing any number. |
 | 174 | the shake has a sweet spot, and the shipped value is far below it | registered | [H-211](hypotheses/H-211-the-shake-has-a-sweet-spot.md) | [X-034](explorations/X-034-the-workbench-physics-as-a-search.md) | Re-measure with retained final poses and disjoint seed blocks before reusing any number. |
 
+[H-212](hypotheses/H-212-the-workbench-physics-as-a-search.md) is the open question
+X-034 explored, not an idea.
+It holds exp-208, exp-209 and exp-210, the exploratory rounds H-210 and H-211 were
+registered from, so neither of those has been tested.
+
 Idea 169, that the blind physics closes a constant fraction of the record-to-grid gap,
 was retired on 2026-09-14. Its premise came from arrangements that were never checked to
 be packings; once runs were repaired, a single run scored below the grid at every `n`.
-Its hypothesis id stays consumed.
+Its hypothesis, H-206, was retired with it, and the id stays consumed.
+<!-- retired-ids: H-206 -->
+
 These ideas were numbered 164–169 until 2026-09-14, when main had landed 164 and 165 and
-parallel n = 11 branches held 166–168.
+parallel n = 11 branches held 166–168. Each moved up by five: 164, the retired idea, is
+now 169, and 165–169 are now 170–174 (H-207 to H-211). An idea number written before
+then is five lower than the same idea’s number here, so the shake dial, once idea 169,
+is idea 174.
 
 ## Reconciled Daytime Portfolio — X-028
 

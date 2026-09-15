@@ -252,7 +252,12 @@ def violation(poses: Array, side: float) -> float:
     This is the number the penalty calibration of 2026-09-08 had no way to drive to zero,
     and the reason its reported container sides were smaller than geometry allows. Every
     side this module reports is one at which this number is zero.
+
+    A non-finite pose or side is infinitely far from a packing. Without that rule a NaN
+    corner makes every comparison false, and `max(0.0, nan)` reports a perfect score.
     """
+    if not (np.isfinite(poses).all() and np.isfinite(side)):
+        return float("inf")
     v = corners_of(poses)
     wall = -float(wall_clearance(v, side).min())
     n = len(poses)

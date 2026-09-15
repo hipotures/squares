@@ -12,17 +12,42 @@ defines the experimental comparison.
 
 `summaries.json` holds one entry per run file: the median `closed` and the best of the
 first k runs, per cell.
-It was kept when 185 MB of per-trial JSONL was removed from the branch at `6e191a35`.
+[`devtools/summarize_annealing.py`](../../../devtools/summarize_annealing.py) wrote it
+from the per-trial rows, and rebuilds it from them.
 
-- **Cells marked `resolved: true`** were repaired to packings and checked before
-  scoring. They are the only cells any finding may cite.
+- **Cells marked `resolved: true`** were scored on runs repaired to packings.
+  They are the only cells any finding may cite.
+  The flag means the rows carry the repaired side; the summariser counts every row and
+  refuses none.
 - **Cells marked `resolved: false`** were scored before any validity check, on
   arrangements with overlapping squares.
   They are void.
 - **Best-of-k is a prefix of one seed stream**, not a distribution, and several files
   replay the same seeds.
-- **No trials or final poses survive**, so no cell can be re-checked or split into
-  disjoint blocks.
+
+**The per-trial rows are not retained.** The 185 MB of JSONL was removed from the branch
+at `6e191a35`, `.gitignore` keeps new rows out, and no copy is published.
+Nothing in the repository alone re-checks a cell or splits it into disjoint blocks.
+
+**The rows can be regenerated.** Every run is seeded, so a round’s recorded command, run
+on a page built from its engine commit, should write the same rows again.
+That has been checked for one file: on 2026-09-14 the first command below regenerated
+all 30,000 rows of `resolved-5k-a6.jsonl` on this branch in 82 seconds, and every cell
+matched `summaries.json` apart from the median milliseconds.
+From `packing/`, naming the file as its `summaries.json` entry does:
+
+```bash
+uv run --frozen --all-extras --group dev python -m devtools.bench_annealing \
+    --n 5 10 11 17 26 29 --seeds 5000 --anneal 6 --budget 3600 \
+    --out campaign/results/annealing/resolved-5k-a6.jsonl
+uv run --frozen --all-extras --group dev python -m devtools.summarize_annealing --check
+uv run --frozen --all-extras --group dev python -m devtools.summarize_annealing --overlaps
+```
+
+`--check` compares each run file present with its committed entry and says how many it
+compared. `--overlaps` reports the overlap figures X-034 cites, over the files whose
+every cell is resolved.
+Rows written after the page’s physics changes will not match.
 
 What those cells show is written up in
 [X-034](../../explorations/X-034-the-workbench-physics-as-a-search.md).

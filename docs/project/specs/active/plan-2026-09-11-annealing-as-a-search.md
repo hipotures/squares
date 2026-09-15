@@ -65,17 +65,24 @@ The review found these distinct cases:
 | observation | status | disposition |
 | --- | --- | --- |
 | The retained summaries include `n = 17` cells at anneal level 8, all scored before the validity check. Repaired `n = 17` runs exist at level 6 only, and the retained deep level-8 artifact contains `n = 11` only. | `exp-208`’s deep level-8 table for `n = 17`, 26 and 29 had no retained source. | Removed from `exp-208` and `X-034` (`think-jdgu`, `think-84m3`); the record now cites only `resolved: true` cells. |
-| The report validator admits non-finite metrics, and the sweep path ranks results without applying that validator. | Demonstrated implementation defect. It can turn an invalid or non-finite outcome into a reported best. The retained aggregates do not show whether it changed a published result. | `think-1fpa` fixes every harness path; `think-nals` makes the definition fail closed and identical at every later ranking and display boundary. |
-| Large accepted seed values can alias in the generated JavaScript because the seed mix loses integer precision before the 32-bit operation. | Demonstrated public reproducibility defect. The small seed ranges in the recorded campaign are not known to be affected. | `think-dq1l` fixes the mixer and supported seed domain; `think-karf` enforces seed receipt and replay semantics at the strategy boundary. |
-| Raw annealing JSONL files are ignored and absent; retained summaries cannot reconstruct per-seed trials or disjoint blocks. | Deliberate storage choice with a material audit limitation. | `think-3eha` repaired the record contract, and `think-4z7d` produces distributions from durable inputs. Findings cite only retained cells and state what cannot be re-checked. |
-| `exp-209` records an inline compaction pass whose program and outputs were deliberately not retained. | Historical exploratory note, not replayable evidence under OR-1. | `think-3eha` marks the evidential limit; `think-3hb7` supplies the missing instrument before the algorithm or negative result is reused. |
-| Imported animation entries can acquire numerical assurance from an asserted `feasible` flag, and intermediate strategy frames can be relabelled with a later container side. | Demonstrated provenance and trace-semantics defects. | `think-sdmi` validates imported evidence; `think-karf` enforces executable strategy and trace semantics. |
+| The report validator admits non-finite metrics, and the sweep path ranks results without applying that validator. | Demonstrated implementation defect. It can turn an invalid or non-finite outcome into a reported best. The retained aggregates do not show whether it changed a published result. | Fixed on #160, not here: `think-1fpa` closed at `f9099096`, where the package benchmark replaces the harness. `think-nals` makes the definition fail closed and identical at every later ranking and display boundary. |
+| Large accepted seed values can alias in the generated JavaScript because the seed mix loses integer precision before the 32-bit operation. | Demonstrated public reproducibility defect. The small seed ranges in the recorded campaign are not known to be affected. | Fixed on #160, not here: `think-dq1l` (`f9099096`) fixed the mixer and supported seed domain, and `think-karf` (`15d97a59`) enforces seed receipt and replay semantics at the strategy boundary. |
+| Raw annealing JSONL files are ignored and absent; retained summaries cannot reconstruct per-seed trials or disjoint blocks. | Deliberate storage choice with a material audit limitation. | `think-3eha` repaired the record contract (`91722c3a`). `devtools/summarize_annealing.py` rebuilds the summaries from regenerated rows. `think-4z7d` closed on #160 (`15d97a59`) with a disjoint-block reporter. Findings cite only retained cells and state what cannot be re-checked. |
+| `exp-209` records an inline compaction pass whose program and outputs were deliberately not retained. | Historical exploratory note, not replayable evidence under OR-1. | `think-3eha` marks the evidential limit; `think-na2i` builds the missing instrument before the algorithm or negative result is reused (`think-3hb7` closed as a disposition without one). |
+| Imported animation entries can acquire numerical assurance from an asserted `feasible` flag, and intermediate strategy frames can be relabelled with a later container side. | Demonstrated provenance and trace-semantics defects. | Fixed on #160 at `15d97a59`, not here: `think-sdmi` validates imported evidence and `think-karf` enforces executable strategy and trace semantics. |
 | Revision probes, research instruments and product entry points overlap. | Cleanup risk: deleting a probe can also delete its only semantic assertion. | `think-cqfc` inventories consumers and preserves unique controls before retiring obsolete code. |
 
-**Record policy, revised by the owner on 2026-09-14.** Superseded claims are removed,
-not annotated. Each annealing artifact states only what survived checking and names
-commit `a40d272c` for its previous text (`think-84m3`). Git keeps the history; the
-current text carries no layered corrections.
+**What ships with #160.** The harness and page repairs named above are commits on PR
+#160, which deletes `devtools.bench_annealing` in favour of the package benchmark.
+On this branch the harness keeps those defects, so this record uses it only to reproduce
+the recorded rounds, and a new comparative round waits for #160.
+
+**Record policy.** The annealing records have not reached `main`, so under
+[conventions §7](../../../../conventions.md#7-corrections) they are drafts.
+On the owner’s direction of 2026-09-14, superseded claims were removed rather than
+annotated, and each artifact names commit `a40d272c` for its previous text
+(`think-84m3`). Ids and renumberings stay recorded as identity notes.
+Once the records land on `main`, they are corrected by addition.
 
 ## Evidence Contract
 
@@ -194,18 +201,20 @@ a strategy anyone can re-run by name.
   squares into rigid blocks chosen by matching the two records.
 - **A first structure ladder already ran, on the projection solver** (2026-09-09,
   [X-025](../../../../packing/campaign/explorations/X-025-hunting-by-hand-and-the-move-set-threads.md),
-  `packing/devtools/sweep_structure_hints.py`). Declared as constraints, structure made
-  search worse at `n ≤ 17`: success fell as more contacts were declared, the reachable
-  side got worse, and exact equalities pushed the search away from the record.
+  `packing/devtools/sweep_structure_hints.py`). Declared as constraints, structure did
+  not help. At `n = 11` success fell as more contacts were declared and the reachable
+  side got worse; at `n = 5` and 10, declaring faces left the basin as wide as the bare
+  projection; exact equalities pushed the search away from the record.
   Used to build the start, structure helped: laying out face groups first lifted a cold
   solve from 1 run in 8 to 5 in 8 at a loose side (commit `2d2a7790`). The samples were
   4 to 8 cold starts, and no registered experiment records them.
 - **The workbench’s contact-graph attraction did not realise the graph.** Its pull
   reaches a quarter of a side, while target pairs start one to four units apart, and no
   torque turns a pair into face-to-face contact (`NOTES.md` in the v2 spike).
-- **The owner’s merge-then-release has not been built anywhere.** No engine merges
-  near-flush groups at a declared tolerance, releases them on a schedule, or has an
-  aligning torque.
+- **The owner’s merge-then-release is built only in part.** The projection ratchet’s
+  `phased` mode holds face-contact groups tight and then releases them
+  (`run_projection_ratchet.py`). No engine merges near-flush groups at a declared
+  tolerance, releases them on a schedule, or has an aligning torque.
 - **Near-flush groups are uncommon below `n = 30`.** In the records for `n = 5`, 10, 11,
   17 and 26, every corner contact joins squares 36–45° apart.
   Near-flush corner contacts appear at `n = 29`, seven of them within 0.3–4.5° of
@@ -306,17 +315,16 @@ runs the loop and shows the comparison; **Animate** plays a recorded trace.
 7. **Hypotheses registered before the first round** (`think-gdkd`).
 
 The same extraction serves `think-hk37`, the rigidity marks.
-The shared-language plan owns the format; this plan owns the evaluation.
+The shared-language plan owns the format change (`think-8ocb`) and takes this section’s
+field list and rung table as its design; this plan owns the evaluation loop
+(`think-qx88`).
 
 ## Ordered Work
 
-Before implementation resumes, `think-5pv0` integrates the current workbench parent into
-the annealing-search leaf and reruns its affected checks.
-The reviewed leaf was based before the parent’s Python-floor and
-retained-timing-artifact changes, so results from the older combination are not a clean
-integration baseline.
-`think-kpvc` then makes the existing behavioral checker part of the normal validation
-path so this contract does not depend on a manual run.
+`think-5pv0` integrated the workbench parent into this leaf at `27d2f8cc` and reran its
+affected checks, so later results rest on the combined baseline.
+`think-kpvc` makes the existing behavioral checker part of the normal validation path so
+this contract does not depend on a manual run.
 
 ### A. Repair the record contract — `think-3eha`
 
@@ -332,20 +340,19 @@ Extend an existing gate only where a demonstrated provenance gap needs coverage.
 
 No new experiment starts in this phase.
 
-### B. Rebuild measurement and correct the narrative — `think-4z7d`, `think-jdgu`, `think-3hb7`
+### B. Rebuild measurement and correct the narrative — `think-4z7d`, `think-jdgu`, `think-na2i`
 
-`think-4z7d` supplies the committed reporter for acceptance rates, CPU work and
-disjoint-block distributions.
+`think-4z7d` closed on #160 (`f9099096`, `15d97a59`) with the committed reporter for
+acceptance rates, CPU work and disjoint-block distributions.
 It distinguishes prefix summaries from independent block estimates and can optionally
 reserve held-out blocks.
 
-`think-jdgu` reconciles `exp-208` and dependent prose with the retained `n`, parameter
-and sample layout. It records both parts of the `n = 17` correction: level 8 is present
-in the sweep, and a retained resolved deep block is not.
-Numerical claims are restated only after the repaired tool derives them from durable
-inputs.
+`think-jdgu` closed on #160 (`f9099096`) with an audit of every retained cell.
+`exp-208` and X-034 here state what the retained cells support at `n = 17`: repaired
+runs at level 6 only, and no retained deep run at level 8. Numerical claims are restated
+only after the repaired tool derives them from durable inputs.
 
-`think-3hb7` turns the unretained `exp-209` compaction pass into a reusable instrument
+`think-na2i` turns the unretained `exp-209` compaction pass into a reusable instrument
 with its control and outputs.
 Until then, the historical negative does not rule out a reusable compaction algorithm.
 
@@ -354,8 +361,9 @@ shows that the required input cannot be recovered and the claim is still worth t
 
 ### C. Establish shared semantics, then extract the package
 
-`think-1fpa` first closes the harness’s non-finite and sweep-ranking paths.
-`think-nals` then supplies one resolver and one fail-closed validity contract for the
+`think-1fpa` closed the non-finite and sweep-ranking paths on #160 (`f9099096`), in the
+package benchmark that replaces the harness.
+`think-nals` supplies one resolver and one fail-closed validity contract for the
 benchmark and workbench.
 Parity fixtures cover valid arrangements and failures for count, non-finite values,
 walls and pairs. The API returns raw and repaired states separately, with acceptance and
@@ -364,10 +372,10 @@ validation path.
 
 Three related cleanups land around that contract:
 
-- `think-sdmi` prevents imported animation metadata from manufacturing numerical
-  evidence.
-- `think-dq1l` removes seed aliases; `think-karf` makes strategy, seed receipt,
-  trace-side and animation semantics executable.
+- `think-sdmi` stopped imported animation metadata from manufacturing numerical
+  evidence, on #160 (`15d97a59`).
+- `think-dq1l` removed seed aliases and `think-karf` made strategy, seed receipt,
+  trace-side and animation semantics executable, on #160 (`f9099096`, `15d97a59`).
 - `think-cqfc` inventories obsolete probes and duplicate entry points before extraction;
   removal follows migration of live consumers and preservation of unique assertions and
   research records.

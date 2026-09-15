@@ -145,6 +145,8 @@ Each entry summarizes one user-level research window. Cycle slots are wall-clock
 | [session-128](agent-sessions/session-128-research-state-rollup.md) | stopped | contemporaneous | `pipeline-improvement` (process) | `documentation-pass` (correctness) | 2 | think-uqa4 | Hand the certified inventory and scientific boundary to BC-347 under think-oj12 for the separate mathematical-audit lifecycle. |
 | [session-129](agent-sessions/session-129-small-n-mathematical-audit.md) | stopped | contemporaneous | `factual-review` (correctness) | `insight-iteration` (insight) | 2 | think-oj12 | Run BC-346 under think-9y7p as the separate planning block; select no scientific target before that block records its disposition. |
 | [session-130](agent-sessions/session-130-n11-w10-route-selection.md) | stopped | contemporaneous | `review-planning-oversight` (process) | `review-planning-oversight` (process) | 1 | think-9y7p | Run BC-340 under think-1ydi as a separate W5 efficiency block and pull request, beginning with the declared gate and running no scientific target. |
+| [session-131](agent-sessions/session-131-n11-w5-validation-efficiency.md) | stopped | contemporaneous | `efficiency-loop` (efficiency) | `efficiency-loop` (efficiency) | 1 | think-1ydi | Merge PR 174, then start BC-353 under think-d3h5 from the merged origin/main and select exactly one scientific admission route. |
+| [session-132](agent-sessions/session-132-n11-post-w5-route-selection.md) | stopped | contemporaneous | `review-planning-oversight` (process) | `review-planning-oversight` (process) | 1 | think-d3h5 | Merge PR 176, then start BC-354 under think-0t5y from the merged origin/main. |
 
 ### Workflow summary
 
@@ -156,12 +158,12 @@ Declared counts are contemporaneous contracts; retrospective counts are reconstr
 | `factual-review` | 6 | 0 | 49 | 2 |
 | `insight-iteration` | 24 | 1 | 79 | 3 |
 | `process-review` | 16 | 4 | 64 | 6 |
-| `efficiency-loop` | 9 | 1 | 35 | 1 |
+| `efficiency-loop` | 10 | 1 | 36 | 1 |
 | `research-loop` | 26 | 4 | 96 | 8 |
 | `pipeline-improvement` | 29 | 1 | 146 | 4 |
 | `documentation-pass` | 1 | 0 | 22 | 1 |
 | `remediation` | 0 | 1 | 0 | 1 |
-| `review-planning-oversight` | 2 | 0 | 15 | 1 |
+| `review-planning-oversight` | 3 | 0 | 16 | 1 |
 | `general-improvement` | 1 | 0 | 7 | 1 |
 
 ## Experiment agendas
@@ -740,8 +742,9 @@ Status: **active**. Reconcile the merged research record, then choose among rout
 | BC-339 | tool_validation | 11 | complete | 0 | think-uqa4 | BC-347 consumes the checked inventory and scientific boundary without reopening the source reconciliation. |
 | BC-347 | research | 6, 7, 10, 11, 13 | complete | 0 | think-oj12 | BC-346 compares the audited prerequisites, first discriminators, payoff, and cost and selects exactly one execution entry. |
 | BC-346 | tool_validation | 11 | complete | 0 | think-9y7p | Reconstruct the W5 cadence, then compare any due checkpoint with Routes A, S, E, B, F1, F2, N, C, D, and G using their declared first discriminators; select one block rather than a multi-lane research promise. |
-| BC-340 | measurement_validation | 11 | ready | 0 | think-1ydi | Reconstruct the cadence from active daytime blocks and retained gate receipts; administrative work does not reset the cadence. |
-| BC-353 | tool_validation | 11 | blocked | 0 | think-d3h5 | Reconsider Route A at side 3.84 first, Route S as its admission fallback, and Route E in the first tier, while incorporating BC-340's measured result. |
+| BC-340 | measurement_validation | 11 | complete | 0 | think-1ydi | Reconstruct the cadence from active daytime blocks and retained gate receipts; administrative work does not reset the cadence. |
+| BC-353 | tool_validation | 11 | complete | 0 | think-d3h5 | Reconsider Route A at side 3.84 first, Route S as its admission fallback, and Route E in the first tier, while incorporating BC-340's measured result. |
+| BC-354 | tool_validation | 11 | ready | 0 | think-0t5y | Audit H-155's instrument gap and freeze a shared-variable adapter from the multi-owner residual polygons to both exact conditional-cover routes. |
 | BC-341 | research | 11 | tentative | 1 | think-9y6q | Freeze the smallest occupancy/contact partition that strictly extends T-023's single four-owner branch without claiming an owner-selection theorem. |
 | BC-342 | research | 6, 11 | tentative | 1 | think-ol1z | Specify the n=6 control and the conflict-edge soundness obligation before selecting a solver. |
 | BC-343 | research | 11 | tentative | 1 | think-a1e8 | Group the exact witness by D4 orbit, weight, and tight-cell incidence before changing any atom. |
@@ -907,10 +910,11 @@ Status: **active**. Reconcile the merged research record, then choose among rout
 | H-204 | refuted | search | Raising only the anneal length from 400,000 to 4,000,000 steps per res | n: 5 10 11* 17 19 26 27 29 37 50 52 | 1 |  | 45m agent + 71.3m wall |
 | H-205 | unresolved | search | Divide and concur searched with relaxed-reflect-reflect, run cold over | n: 5 10 11* 17 | 1 |  | 95m agent + 15.6m wall |
 | H-207 | unresolved | search | At equal total cost, running k independent blind trials and taking the | n: 5* 11 17 29 | 1 |  | 1 round unrecorded |
-| H-208 | open | search | Where a blind run ends is decided by where the new square is dropped a | n: 5 10 11 17 26 29 | 0 |  |  |
-| H-209 | open | search | No combination of the workbench's exposed parameters -- the shake dial | n: 5 10 11 17 26 29 | 0 |  |  |
-| H-210 | unresolved | search | No blind run of the workbench's physics ends on a valid packing. At ev | n: 5 10 11* 17 26 29 | 1 |  | 1 round unrecorded |
-| H-211 | unresolved | search | The workbench's shake dial has a maximum for search quality between le | n: 5 10 11* 17 26 29 | 2 |  | 2 rounds unrecorded |
+| H-208 | blocked | search | Where a blind run ends is decided by where the new square is dropped a | n: 5 10 11 17 26 29 | 0 |  |  |
+| H-209 | blocked | search | No combination of the workbench's exposed parameters -- the shake dial | n: 5 10 11 17 26 29 | 0 |  |  |
+| H-210 | open | search | No blind run of the workbench's physics ends on a valid packing. At ev | n: 5 10 11 17 26 29 | 0 |  |  |
+| H-211 | open | search | The workbench's shake dial has a maximum for search quality between le | n: 5 10 11 17 26 29 | 0 |  |  |
+| H-212 | open question | search | What does the workbench's blind physics do when its runs are measured  |  | 3 |  | 3 rounds unrecorded |
 
 ## Needs review — held for a human, not decided
 
@@ -995,9 +999,9 @@ Status: **active**. Reconcile the merged research record, then choose among rout
 | exp-156 | series-000 | 11 | Codex root coordinator; prospective strategy independently audited by GPT-6 Astra Max | H-158 | The sole run found that the old B-only model already excludes the first selected owner, making parent-domain gain impossible there by set inclusion. The later owners were not tested, so this complete fixed-protocol result neither accepts nor rejects H-158. |
 | exp-206 | series-000 | 11 | claude-opus-5 | H-205 | The guard clause is met decisively and is the point of the round: 16 of 16 runs end on packings that an independent oracle confirms, against 0 of 48 for the penalty physics, which settles the precondition the 2026-09-08 calibration failed. The accuracy clause is missed by three cells of four. The failure is localised rather than diffuse -- every failed run failed at the first tightening and never moved -- so the repair is in the container schedule and the restart policy, not in the projections. |
 | exp-207 | series-000 | 5 | claude-opus-5, unattended | H-207 | At n = 5 the best of the first 1,000 repaired runs is 0.28% above the record while a single run is worse than the grid, but these are prefix values from one seed stream with no spread, and no schedule was compared at equal cost, so H-207's criterion was not tested. |
-| exp-208 | series-000 | 11 | claude-opus-5, unattended | H-211 | At levels 0 to 4 no repaired run in 3,000 beat the grid at n = 5, 10 or 11, and at levels 6 to 10 the best run did in eight of nine cells, but each value is one prefix from one seed stream and the page's own level 3 was not measured. |
-| exp-209 | series-000 | 11 | claude-opus-5, unattended | H-211 | The historical compaction program and outputs were not retained, so its null result and the inference that the resolver is not the ceiling cannot be reproduced or used to exclude an optimization. |
-| exp-210 | series-000 | 11 | claude-opus-5, unattended | H-210 | Every blind run observed ended overlapping, but the snapped control was measured once with a probe variant that was not kept, and neither the trials nor their final poses are in the repository, so the observation cannot be re-checked from it. |
+| exp-208 | series-000 | 11 | claude-opus-5, unattended | H-212 | At levels 0, 2 and 4 no repaired run in 3,000 beat the grid at n = 5, 10 or 11, and at levels 6, 8 and 10 the best run did in eight of nine cells, the ninth within 5,000 seeds, but each value is one prefix from one seed stream and the page's own level 3 was not measured on repaired runs. |
+| exp-209 | series-000 | 11 | claude-opus-5, unattended | H-212 | The compaction program, its inputs and its outputs were not kept, so the observation cannot be reproduced and supports no conclusion about whether repaired arrangements are locally compact. |
+| exp-210 | series-000 | 11 | claude-opus-5, unattended | H-212 | Every blind run observed ended overlapping, but the snapped control was measured once with a probe variant that was not kept, and neither the trials nor their final poses are in the repository, so the observation cannot be re-checked from it. |
 
 ### blocked (11)
 
@@ -1097,9 +1101,9 @@ Status: **active**. Reconcile the merged research record, then choose among rout
 | exp-158 | H-160 |  | dependency |  |  |
 | exp-160 | H-162 |  | dependency |  |  |
 | exp-207 | H-207 | 1 round unrecorded | dependency |  |  |
-| exp-208 | H-211 | 1 round unrecorded | dependency |  |  |
-| exp-209 | H-211 | 1 round unrecorded | dependency |  |  |
-| exp-210 | H-210 | 1 round unrecorded | dependency |  |  |
+| exp-208 | H-212 | 1 round unrecorded | dependency |  |  |
+| exp-209 | H-212 | 1 round unrecorded | dependency |  |  |
+| exp-210 | H-212 | 1 round unrecorded | dependency |  |  |
 
 ## Effort
 

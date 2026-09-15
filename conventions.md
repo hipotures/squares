@@ -113,6 +113,8 @@ particular upstream claims awaiting codification, not a worker’s future namesp
 No such comments are currently active; Agenda 024 records known pending transports.
 Name an uncreated record without linking to a nonexistent file.
 Publishing a record consumes its ID permanently, even if the research is later retired.
+A retired hypothesis ID is declared in a `retired-ids` comment on the board, which lets
+the board name it where it records the retirement and makes reusing it a check failure.
 Superseded launch drafts do not reserve speculative future blocks.
 Missing numbers are not automatically free: preserve pending upstream work and check
 known parallel assignments.
@@ -437,9 +439,14 @@ maintained across hundreds of millions of updates.
 
 ## 7. Corrections
 
-**The record is corrected by addition, never rewritten.** [convention] A defective
-artifact gets a dated annotation stating what still stands and what does not.
-`exp-001` carries three.
+**A landed record is corrected by addition; an unlanded one is a draft.**
+[convention, 2026-09-14] Until a record reaches `main` it may be rewritten, and a
+superseded claim is removed rather than annotated, with the commit that holds the
+previous text named.
+Once on `main`, a defective artifact gets a dated annotation stating what still stands
+and what does not; `exp-001` carries three.
+Either way, assigned ids and renumberings are identity (§1): a rewrite keeps them, and
+the renumbering is recorded on the affected artifacts.
 
 **Views are generated and never hand-edited.** [checked: drift] `campaign/ledger.md` and
 the frontier tables inside the research documents rebuild from their artifacts; the gate

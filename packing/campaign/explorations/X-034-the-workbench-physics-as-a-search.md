@@ -21,12 +21,13 @@ exploration:
   - packages/workbench/tools/workbench_tools/benchmark.py
   - packing/campaign/results/annealing/summaries.json
   - docs/project/specs/active/plan-2026-09-11-annealing-as-a-search.md
-  proposes: [H-207, H-208, H-209, H-210, H-211]
+  proposes: [H-207, H-208, H-209, H-210, H-211, H-212]
 ---
 # X-034: The Workbench’s Blind Physics, Measured as a Search
 
 **Renumbered 2026-09-14** from X-029, which main had already assigned to the BC303 T2
-exact-geometry draft; before 2026-09-13 this report was X-028.
+exact-geometry draft; before 2026-09-13 this report was X-028. It also proposed H-206,
+retired on 2026-09-14; that id stays consumed.
 
 **Rewritten 2026-09-14.** This report keeps only what survived checking.
 Earlier versions reported numbers from runs whose arrangements were never checked to be
@@ -41,21 +42,24 @@ That text is recoverable at commit `a40d272c`; none of it is repeated here.
   by matching the two records.
   Only the destination poses are withheld.
   It is one point on a range of how much of the answer a search is given.
-- **The runs did not end on packings.** None of the 123,190 blind runs whose rows
-  survive ended without overlapping squares; the median deepest overlap was 0.083 of a
-  unit side. A container side read from such an arrangement is a bounding box around
-  overlaps, so every number taken that way has been discarded.
+- **The runs did not end on packings.** None of the 123,190 seeded blind runs in the
+  repaired rounds ended without overlapping squares; the median deepest overlap was
+  0.083 of a unit side.
+  A container side read from such an arrangement is a bounding box around overlaps, so
+  every number taken that way has been discarded.
 - **Repaired to a packing, a single run is worse than the trivial grid.** At every `n`
   and every shake level measured, the median run needs a larger container than
   `ceil(sqrt(n))`.
 - **The best of many runs sometimes comes close and never reaches a record.** At shake
   level 6 the best of the first 1,000 seeds was 0.28% above `s(5)` and 0.42% above
   `s(10)`. At `n = 17` and `n = 29` no run in 5,000 beat the grid.
-- **Difficulty does not follow the number of squares.** `n = 26` did better than
-  `n = 11` and `n = 17`. What does decide it is not established.
-- **The shake dial is a search parameter that the page sets for looks.** At levels 0 to
-  4 no run in 3,000 beat the grid at `n = 5`, 10 or 11. At levels 6 to 10 the best run
-  did, with one exception.
+- **How hard an `n` is depends on the scale and the budget.** In `closed` at the best of
+  the first 1,000 seeds, `n = 26` did better than `n = 11` and `n = 17`; at the best of
+  5,000, or in excess over the record, `n = 11` did better than `n = 26`. Six `n`, one
+  seed stream each, cannot show how difficulty depends on `n`.
+- **The shake dial is a search parameter that the page sets for looks.** At levels 0, 2
+  and 4 no run in 3,000 beat the grid at `n = 5`, 10 or 11. At levels 6, 8 and 10 the
+  best run did in eight cells of nine, and the ninth did within 5,000 seeds.
   The page ships level 3.
 
 ## 1. What a Blind Run Is
@@ -108,8 +112,9 @@ can need. That was the signal that something was wrong, and it was missed.
 The check that exposed it is a separating-axis test over the final poses, computed in
 the harness rather than read from the simulation.
 It reports the deepest overlap between any two squares.
-The tolerance comes from a control: a snapped run ends on the record’s own poses, so
-whatever it scores is float noise.
+The tolerance is chosen.
+Beside it is one observation of a control: a snapped run ends on the record’s own poses,
+so whatever it scores is float noise.
 
 | mode | n = 5 | n = 11 | n = 17 |
 | --- | ---: | ---: | ---: |
@@ -117,15 +122,18 @@ whatever it scores is float noise.
 | free | 3.9e-5 | 4.5e-5 | 3.1e-2 |
 | blind | 8.4e-2 | 3.5e-2 | 8.6e-2 |
 
-Two orders of magnitude separate the control from the smallest real overlap, so the
-harness uses 1e-5 of a unit side.
+The harness uses 1e-5 of a unit side: ten times the largest snapped value, a factor of
+3.9 below the smallest free value, and more than three orders of magnitude below every
+blind value in the table.
 The snap and free rows came from a variant of the probe that was run once and not kept;
 the committed harness runs blind only, so the control is a recorded observation rather
 than a reproducible one.
 
-Across the 123,190 runs of the later rounds, whose rows survive locally, no run ended
-below 1e-5. The deepest overlap before repair ranged from 0.002 to 0.118 of a side, with
-a median of 0.083.
+Across the 123,190 seeded runs of the repaired rounds, no run ended below 1e-5. Of
+those, 9,000 are at level 0, where every seed of an `n` repeats one run.
+The deepest overlap before repair ranged from 0.002 to 0.118 of a side, with a median of
+0.083. These figures come from local copies of the rows, which are not retained, and
+`devtools.summarize_annealing --overlaps` recomputes them from regenerated rows.
 
 The overlap is built into the blind schedule.
 The walls close onto the known-best side while squares may overlap by up to 0.08, and
@@ -156,14 +164,14 @@ record and the grid ranges from 1.12% at `n = 29` to 10.82% at `n = 5`.
 
 5,000 seeds per `n`, each run repaired and checked before scoring:
 
-| n | gap to grid | median run | best of first 100 | best of first 1,000 | best of 5,000 |
-| ---: | ---: | ---: | ---: | ---: | ---: |
-| 5 | 10.82% | −0.074 | −0.015 | 0.974 | 0.977 |
-| 10 | 7.90% | −0.099 | 0.874 | 0.947 | 0.974 |
-| 11 | 3.17% | −0.107 | −0.035 | −0.012 | 0.476 |
-| 17 | 6.94% | −0.104 | −0.062 | −0.062 | −0.061 |
-| 26 | 6.74% | −0.101 | 0.120 | 0.212 | 0.230 |
-| 29 | 1.12% | −0.857 | −0.370 | −0.193 | −0.110 |
+| n | gap to grid | median run | median, above record | best of first 100 | best of first 1,000 | best of 5,000 | best, above record |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 5 | 10.82% | −0.074 | 11.62% | −0.015 | 0.974 | 0.977 | 0.25% |
+| 10 | 7.90% | −0.099 | 8.68% | 0.874 | 0.947 | 0.974 | 0.20% |
+| 11 | 3.17% | −0.107 | 3.51% | −0.035 | −0.012 | 0.476 | 1.66% |
+| 17 | 6.94% | −0.104 | 7.66% | −0.062 | −0.062 | −0.061 | 7.36% |
+| 26 | 6.74% | −0.101 | 7.42% | 0.120 | 0.212 | 0.230 | 5.19% |
+| 29 | 1.12% | −0.857 | 2.07% | −0.370 | −0.193 | −0.110 | 1.24% |
 
 What this shows:
 
@@ -174,10 +182,12 @@ What this shows:
   0.42%.
 - **No run reached a record.** The closest is at `n = 5`: over 39,871 seeds the best is
   0.15% above `s(5)`.
-- **Size does not order the results.** `n = 26` beats the grid in its first 100 seeds,
-  while `n = 11` needed more than 1,000 and `n = 17` never did.
-  `n = 11` and `n = 29` have the two smallest gaps, where `closed` is a harsh scale, but
-  `n = 17`’s gap is ordinary.
+- **The order across `n` depends on the scale and the budget.** In `closed`, `n = 26`
+  beat the grid within its first 100 seeds, `n = 11` needed more than 1,000 and `n = 17`
+  never did. In excess over the record the order changes: the best `n = 11` run is 1.66%
+  above its record and the best `n = 26` run 5.19%. `closed` is a harsh scale where the
+  gap is small, as at `n = 11` and `n = 29`. One seed stream at each of six `n` does not
+  show how difficulty depends on `n`.
 
 ### Across shake levels, at `n = 5`, 10 and 11
 
@@ -196,9 +206,11 @@ What this shows:
 
 - **At level 0 every seed gives the same answer**, because the shake is the only
   randomness in the run.
-- **At levels 0 to 4 no run beat the grid** in 3,000 seeds at any of the three `n`.
-- **At levels 6 to 10 the best run beat it**, except `n = 11` at level 6. At level 8,
-  `n = 11` reached 0.564 in the first 1,000 seeds and 0.616 over 16,319.
+- **At levels 0, 2 and 4 no run beat the grid** in 3,000 seeds at any of the three `n`.
+- **At levels 6, 8 and 10 the best of 3,000 beat it in eight cells of nine.** The ninth,
+  `n = 11` at level 6, is the budget rather than the level: the same seed stream beat
+  the grid before seed 5,000, as the table across `n` shows.
+  At level 8, `n = 11` reached 0.564 in the first 1,000 seeds and 0.616 over 16,319.
 - **The median barely moves with the level**, except `n = 11` at level 10, so the dial
   acts on the best run rather than the typical one.
 - **The page ships level 3**, chosen for how the animation looks.
@@ -208,24 +220,30 @@ What this shows:
 
 - **No spread.** Every “best of the first k” is one observation from one ordered seed
   stream. None of these numbers carries a range or a confidence interval.
-- **The runs cannot be re-checked.** Trials and final poses were not retained, so the
-  validity of each repaired run rests on the check as it ran at the time.
+- **The runs are not independently re-checkable.** The per-trial rows are not retained,
+  and the harness never wrote final poses, so a repaired run’s validity rests on the
+  harness’s own separating-axis check.
+  Regenerating the rows repeats that check; it is not an independent one.
 - **Coverage is thin.** `n = 17`, 26 and 29 have repaired runs at level 6 only.
-  Levels 3, 5, 7 and 9 were not measured.
+  Levels 1 and 3 were measured only before runs were repaired, and levels 5, 7 and 9 not
+  at all.
 - **The repair only translates.** Whether a repair that rotates changes the scores is
   untested. A compaction pass was tried and its code was not kept, so
   [exp-209](../series/series-000-smoke-and-calibration/experiments/exp-209-h211-an-unretained-compaction-pass.md)
   supports no conclusion.
 - **The open hypotheses are untested:** whether restarts beat schedule tuning at equal
   cost (H-207), whether the drop decides the outcome (H-208), and whether any setting
-  reaches a record (H-209).
+  reaches a record (H-209). H-210 and H-211 were registered from the data of exp-210 and
+  exp-208, so those rounds are exploratory data, filed under the open question H-212,
+  and neither claim has had a test.
 - **One instrument.** These are the workbench’s simulation in one headless Chromium on
   one laptop. They say nothing about the campaign’s Rust engine.
 
 ## 6. What Follows
 
-- **Re-measure before reusing any number here.** The package benchmark keeps each
-  trial’s poses and reports disjoint seed blocks, which is what these observations lack.
+- **Re-measure before reusing any number here.** From #160 on, the package benchmark
+  keeps each trial’s raw and repaired poses and reports disjoint seed blocks, which is
+  what these observations lack.
 - **Measure success against how much the run is given.** Blind is one level between
   nothing and the full answer.
   The
@@ -237,16 +255,23 @@ What this shows:
 
 - **Retained:** `packing/campaign/results/annealing/summaries.json`, which holds one
   median and one best-of-first-k ladder per cell, per run file.
-  Cells marked `resolved: true` were repaired and checked before scoring.
+  `packing/devtools/summarize_annealing.py` wrote it.
+  Cells marked `resolved: true` were scored on runs repaired to packings.
   Several files replay the same seeds, so their trial counts overlap.
-- **Not retained:** per-trial rows and final poses, which were removed from the branch
-  at `6e191a35` to keep the diff reviewable.
-- **Checked before this rewrite:** local copies of the rows behind every
-  `resolved: true` cell, 59.7 MB and not in the repository.
-  No run was refused, every repaired overlap is finite and at most 1e-9, seeds run
-  contiguously from 0, and the counts match the summaries.
-- **Instrument:** these runs used `packing/devtools/bench_annealing.py`, which now lives
-  in the package as `squares-workbench-benchmark`
+- **Not retained:** the per-trial rows, removed from the branch at `6e191a35` to keep
+  the diff reviewable.
+  The harness never wrote final poses.
+- **Checked on 2026-09-14, against local copies of the rows** that are not in the
+  repository: `summarize_annealing --check` matched all 59 run files, and `--overlaps`,
+  over the 59.7 MB behind the `resolved: true` cells, gave the figures in section 3. No
+  run would be refused, every repaired overlap is finite and at most 1e-9, and seeds run
+  contiguously from 0.
+- **Regenerable:** the [runbook](../results/annealing/README.md#what-is-retained) gives
+  the commands that rewrite the rows and re-check them.
+  One file, `resolved-5k-a6.jsonl`, was regenerated on this branch and matched its
+  summary.
+- **Instrument:** these runs used `packing/devtools/bench_annealing.py`, which #160
+  replaced with the package benchmark `squares-workbench-benchmark`
   (`packages/workbench/tools/workbench_tools/benchmark.py`).
 
 <!-- This document follows common-doc-guidelines.md.

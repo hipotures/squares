@@ -21,7 +21,7 @@ hypothesis:
     direction: higher
     threshold: best-of-k at the shipped schedule beats the best single-run schedule found by the sweep
   instrument: packages/workbench/tools/workbench_tools/benchmark.py --sweep
-  instrument_ready: true
+  instrument_ready: false
   regime: >-
     the workbench's simulation; cost measured as total simulated steps, so a longer run and
     more restarts are compared on the same budget rather than on wall clock
@@ -32,6 +32,9 @@ hypothesis:
   registered: '2026-09-12'
 ---
 # H-207 — restarts beat schedule tuning at equal cost
+
+**Identity.** Derived from X-034, which was X-028 until 2026-09-13 and X-029 until
+2026-09-14.
 
 **Why it is worth testing.** Once runs are repaired to packings, a single run scores
 below the trivial grid at every `n` measured, while the best of a thousand sometimes
@@ -47,6 +50,13 @@ not.
 
 **The trap to avoid.** Cost has to be counted in steps, not in wall clock, or the
 comparison measures the harness’s overhead rather than the method.
+
+**No instrument can run the test yet.** The harness sweeps only the shake level and the
+container inflation, drops any other sweep key without saying so, and budgets in wall
+clock. The test needs an instrument that varies the schedule this claim names (the shake
+profile, the contraction rate and the step count) and budgets both arms in simulated
+steps. The package benchmark on #160 refuses the keys it cannot set instead of dropping
+them, but it still sweeps only those two parameters and budgets in seconds.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
