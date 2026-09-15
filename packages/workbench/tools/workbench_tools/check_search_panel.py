@@ -46,6 +46,8 @@ def check_bounded_run(page: Page) -> None:
     progress = page.locator("#search-progress").inner_text()
     if "1/1 slots" not in progress or "1 completed" not in progress:
         raise ValueError(f"Search did not record its bounded slot: {progress}")
+    if "1 of 1 completed valid" not in progress:
+        raise ValueError(f"Search did not summarise validity: {progress}")
     ledger = export_ledger(page)
     if len(ledger.get("outcomes", [])) != 1:
         raise ValueError("Search ledger omitted its completed slot")
@@ -68,6 +70,14 @@ def check_repair_run(page: Page) -> None:
             "not-requested"
         ):
             raise ValueError(f"Search with Resolve did not repair: {result['repair']}")
+    steps = sum(outcome["result"]["work"]["physicsSteps"] for outcome in ledger["outcomes"])
+    iterations = sum(
+        outcome["result"]["work"]["repairIterations"] for outcome in ledger["outcomes"]
+    )
+    work = f"{steps} physics steps, {iterations} repair iterations"
+    progress = page.locator("#search-progress").inner_text()
+    if iterations < 1 or "1 of 1 completed valid" not in progress or work not in progress:
+        raise ValueError(f"Search with Resolve summary lacks validity or {work}: {progress}")
 
 
 def check(page_path: Path) -> str:
@@ -95,4 +105,4 @@ def check(page_path: Path) -> str:
         if errors:
             raise ValueError("Search page errors: " + "; ".join(errors))
         browser.close()
-    return "bounded and Resolve Search runs, progress, ledger export and Pack return"
+    return "bounded and Resolve Search runs, summaries, ledger export and Pack return"

@@ -4,6 +4,7 @@ import { selectedSearchState } from "../search/contracts.ts";
 import { decodeSearchOutcomes, encodeSearchOutcomes, statusCounts } from "../search/outcomes.ts";
 import { createPackSearchRunner } from "../search/pack-runner.ts";
 import { runSearchPlan } from "../search/scheduler.ts";
+import { type SearchCohortSummary, summarizeSearch } from "../search/summary.ts";
 
 export interface SearchPanelOptions {
   document: Document;
@@ -55,6 +56,31 @@ function outcomeRow(document: Document, outcome: SearchOutcome): HTMLTableRowEle
   return row;
 }
 
+/**
+ * One line per cohort of what a finished ledger holds: validity among completed slots,
+ * stationarity, rankable slots, the physics and repair work spent, and each block's best objective.
+ */
+export function formatSearchSummary(summaries: readonly SearchCohortSummary[]): string[] {
+  return summaries.map((summary) => {
+    const blocks =
+      summary.blocks.length === 0
+        ? "none"
+        : summary.blocks
+            .map(
+              (block) =>
+                `${block.bestObjective === null ? "none" : block.bestObjective.toFixed(6)} (block ${block.block})`,
+            )
+            .join(", ");
+    return (
+      `${summary.partition} n = ${summary.n}: ` +
+      `${summary.validityRate.numerator} of ${summary.validityRate.denominator} completed valid, ` +
+      `${summary.stationary} stationary, ${summary.rankable} rankable; ` +
+      `${summary.work.physicsSteps} physics steps, ${summary.work.repairIterations} repair iterations; ` +
+      `best objective by block: ${blocks}`
+    );
+  });
+}
+
 function ranked(outcomes: readonly SearchOutcome[]): SearchOutcome[] {
   return [...outcomes].sort((a, b) => {
     const aObjective = a.status === "completed" ? a.result.objective : null;
@@ -89,6 +115,8 @@ export function mountSearchPanel(options: SearchPanelOptions): SearchPanel {
   let plan: SearchPlan | null = null;
   let ledger: SearchOutcomes | null = null;
   let observed: SearchOutcome[] = [];
+  /** Summary lines for `ledger`, empty while a run is producing it. */
+  let summaryLines: readonly string[] = [];
   let message =
     "Experimental search. Results are exploratory and have not passed research acceptance.";
 
@@ -125,7 +153,11 @@ export function mountSearchPanel(options: SearchPanelOptions): SearchPanel {
     const counts = statusCounts(visibleOutcomes);
     const total = plan?.slots.length ?? 0;
     const done = visibleOutcomes.length - counts.notStarted;
-    progress.textContent = `${done}/${total} slots; ${counts.completed} completed, ${counts.failed} failed, ${counts.cancelled} cancelled, ${counts.timedOut} timed out, ${total - done} pending`;
+    const line = `${done}/${total} slots; ${counts.completed} completed, ${counts.failed} failed, ${counts.cancelled} cancelled, ${counts.timedOut} timed out, ${total - done} pending`;
+    progress.replaceChildren(
+      line,
+      ...summaryLines.flatMap((text) => [document.createElement("br"), text]),
+    );
     results.replaceChildren(
       ...ranked(visibleOutcomes).map((outcome) => outcomeRow(document, outcome)),
     );
@@ -143,6 +175,7 @@ export function mountSearchPanel(options: SearchPanelOptions): SearchPanel {
       plan = declared;
       ledger = resume ?? null;
       observed = [];
+      summaryLines = [];
       running = true;
       controller = new AbortController();
       message =
@@ -157,6 +190,7 @@ export function mountSearchPanel(options: SearchPanelOptions): SearchPanel {
           redraw();
         },
       });
+      summaryLines = formatSearchSummary(summarizeSearch(declared, ledger));
       message = controller.signal.aborted
         ? "Experimental search cancelled. Export the ledger to retain completed slots."
         : "Experimental search finished. Inspect valid ranked results and export the ledger.";
