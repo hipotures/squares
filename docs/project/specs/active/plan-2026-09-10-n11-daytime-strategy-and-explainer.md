@@ -118,10 +118,13 @@ due W5 efficiency checkpoint, after a conservative derivation reached OR-12’s 
 eight-block ceiling after Session 116/BC-322. Session 131 has now completed BC-340.
 VE-005 accepted one guarded validation repair, and the first candidate hosted checks
 tier passed at 106.38 seconds against the unchanged 195-second ceiling.
-BC-353 / `think-d3h5` is the sole next entry: a fresh W10 will consume that receipt,
-select exactly one scientific admission route, and run no target.
-Every scientific candidate remains behind BC-353 until that planning block closes and
-merges.
+BC-353 selected Route A and is terminal.
+BC-354 / `think-0t5y` is the sole next entry: a 75-minute, no-target admission of one
+complete same-corner root at side `96/25`, its shared physical geometry, matched
+baseline, exact controls, and independent checker.
+BC-341 remains blocked until that admission merges.
+If the complete root or checker cannot be admitted in the block, Route S becomes the
+sole next admission entry.
 
 The planning candidates are:
 

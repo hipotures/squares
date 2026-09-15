@@ -146,6 +146,7 @@ Each entry summarizes one user-level research window. Cycle slots are wall-clock
 | [session-129](agent-sessions/session-129-small-n-mathematical-audit.md) | stopped | contemporaneous | `factual-review` (correctness) | `insight-iteration` (insight) | 2 | think-oj12 | Run BC-346 under think-9y7p as the separate planning block; select no scientific target before that block records its disposition. |
 | [session-130](agent-sessions/session-130-n11-w10-route-selection.md) | stopped | contemporaneous | `review-planning-oversight` (process) | `review-planning-oversight` (process) | 1 | think-9y7p | Run BC-340 under think-1ydi as a separate W5 efficiency block and pull request, beginning with the declared gate and running no scientific target. |
 | [session-131](agent-sessions/session-131-n11-w5-validation-efficiency.md) | stopped | contemporaneous | `efficiency-loop` (efficiency) | `efficiency-loop` (efficiency) | 1 | think-1ydi | Merge PR 174, then start BC-353 under think-d3h5 from the merged origin/main and select exactly one scientific admission route. |
+| [session-132](agent-sessions/session-132-n11-post-w5-route-selection.md) | stopped | contemporaneous | `review-planning-oversight` (process) | `review-planning-oversight` (process) | 1 | think-d3h5 | Merge PR 176, then start BC-354 under think-0t5y from the merged origin/main. |
 
 ### Workflow summary
 
@@ -162,7 +163,7 @@ Declared counts are contemporaneous contracts; retrospective counts are reconstr
 | `pipeline-improvement` | 29 | 1 | 146 | 4 |
 | `documentation-pass` | 1 | 0 | 22 | 1 |
 | `remediation` | 0 | 1 | 0 | 1 |
-| `review-planning-oversight` | 2 | 0 | 15 | 1 |
+| `review-planning-oversight` | 3 | 0 | 16 | 1 |
 | `general-improvement` | 1 | 0 | 7 | 1 |
 
 ## Experiment agendas
@@ -742,7 +743,8 @@ Status: **active**. Reconcile the merged research record, then choose among rout
 | BC-347 | research | 6, 7, 10, 11, 13 | complete | 0 | think-oj12 | BC-346 compares the audited prerequisites, first discriminators, payoff, and cost and selects exactly one execution entry. |
 | BC-346 | tool_validation | 11 | complete | 0 | think-9y7p | Reconstruct the W5 cadence, then compare any due checkpoint with Routes A, S, E, B, F1, F2, N, C, D, and G using their declared first discriminators; select one block rather than a multi-lane research promise. |
 | BC-340 | measurement_validation | 11 | complete | 0 | think-1ydi | Reconstruct the cadence from active daytime blocks and retained gate receipts; administrative work does not reset the cadence. |
-| BC-353 | tool_validation | 11 | ready | 0 | think-d3h5 | Reconsider Route A at side 3.84 first, Route S as its admission fallback, and Route E in the first tier, while incorporating BC-340's measured result. |
+| BC-353 | tool_validation | 11 | complete | 0 | think-d3h5 | Reconsider Route A at side 3.84 first, Route S as its admission fallback, and Route E in the first tier, while incorporating BC-340's measured result. |
+| BC-354 | tool_validation | 11 | ready | 0 | think-0t5y | Audit H-155's instrument gap and freeze a shared-variable adapter from the multi-owner residual polygons to both exact conditional-cover routes. |
 | BC-341 | research | 11 | tentative | 1 | think-9y6q | Freeze the smallest occupancy/contact partition that strictly extends T-023's single four-owner branch without claiming an owner-selection theorem. |
 | BC-342 | research | 6, 11 | tentative | 1 | think-ol1z | Specify the n=6 control and the conflict-edge soundness obligation before selecting a solver. |
 | BC-343 | research | 11 | tentative | 1 | think-a1e8 | Group the exact witness by D4 orbit, weight, and tight-cell incidence before changing any atom. |
