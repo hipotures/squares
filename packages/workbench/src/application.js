@@ -48,6 +48,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   const { clampSeparator, mountResizeHandle } = workbenchBundle.resizeHandle;
   const { decodeCorpus, isSimpleTransition } = workbenchBundle.data;
   const {
+    baseTiming: timelineBaseTiming,
     displayedCount,
     isStillPair: timelineIsStillPair,
     pairDuration: timelinePairDuration,
@@ -1735,7 +1736,10 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     // too, and `move` stopped being the whole of it when the correction got its own time.
     // Reading `move` alone cut a run's steps by 31 per cent at the shipped beat, which
     // the revision-7 checks caught as every free run suddenly missing by ten times as much.
-    const tm = timing(pairIndex, style);
+    // And the base timing, not the one the clock plays: the simple-transition speed-up is
+    // presentation, and pricing steps off the played span halved a grid fill's physics work in
+    // `physics()` and the annealing benchmark.
+    const tm = timelineBaseTiming(timelineConfiguration(), pairIndex, style);
     return Math.max(1, Math.round(PHYS.stepsPerSecond * (tm.move + tm.correct)));
   }
   function ensureTrajectory(pairIndex, style, mode) {
@@ -5084,8 +5088,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       amplitude: ANNEAL.amplitude(state.anneal),
       decayPower: ANNEAL.decayPower(state.anneal),
       span: ANNEAL.span(state.anneal),
-      // The whole moving span, which is what the run is drawn over and what `steps` counts.
-      // `move` alone stopped being that when the correction got its own time.
+      // The whole moving span the run is drawn over on the clock. `move` alone stopped being
+      // that when the correction got its own time. `steps` counts the base span's work, which a
+      // simple transition's speed-up does not shorten.
       move: timing().move + timing().correct,
       steps: physicsSteps(state.pair, state.style),
     };

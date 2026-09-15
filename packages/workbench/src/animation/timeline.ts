@@ -123,14 +123,31 @@ function scaledTiming(timing: AtlasTiming, scale: number): AtlasTiming {
   return { ...valid, move: valid.move * scale, correct: valid.correct * scale };
 }
 
+/**
+ * The timing a pair's work is priced from: the beat, and the annealed span of the move, with no
+ * presentation speed-up. Physics steps are counted from this, so a simple transition played at
+ * double speed simulates what it simulates at full length, and `physics()` and the benchmark do
+ * the same work whatever the clock plays. A trajectory is sampled by move fraction, so a faster
+ * clock still plays all of it.
+ */
+export function baseTiming(
+  configuration: TimelineConfiguration,
+  index: number,
+  style: AtlasStyle,
+): AtlasTiming {
+  pairAt(configuration, index);
+  return configuration.continuous.on
+    ? continuousTiming(configuration, index, style)
+    : scaledTiming(configuration.timing, annealSpan(style, configuration.anneal));
+}
+
+/** The timing a pair plays on the clock: its base timing, sped up while it plays sped up. */
 export function pairTiming(
   configuration: TimelineConfiguration,
   index: number,
   style: AtlasStyle,
 ): AtlasTiming {
-  const timing = configuration.continuous.on
-    ? continuousTiming(configuration, index, style)
-    : scaledTiming(configuration.timing, annealSpan(style, configuration.anneal));
+  const timing = baseTiming(configuration, index, style);
   return isSpedUpPair(configuration, index) ? spedTiming(timing, SIMPLE_TRANSITION_SPEED) : timing;
 }
 
@@ -315,6 +332,7 @@ export const timeline = Object.freeze({
   isSpedUpPair,
   annealSpan,
   continuousTiming,
+  baseTiming,
   pairTiming,
   timingDuration,
   pairDuration,

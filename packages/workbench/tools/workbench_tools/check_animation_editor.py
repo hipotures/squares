@@ -94,6 +94,29 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
         )
         toggle.click()
         require(call("continuous")["fastSimple"], "checking did not turn the speed-up back on")
+        # The speed-up is presentation only: a simple transition simulates as many physics steps
+        # at double speed as at full length, so `physics()`, and the annealing benchmark that
+        # calls it, do the same work whatever the clock plays.
+        work = page.evaluate(
+            probe("physics/steps-by-speed"),
+            {"indices": [simple_index, moving_index], "style": "physics", "mode": "blind"},
+        )
+        by_speed = {(row["index"], row["fastSimple"]): row for row in work}
+        require(
+            abs(
+                2 * by_speed[simple_index, True]["duration"]
+                - by_speed[simple_index, False]["duration"]
+            )
+            < 1e-9,
+            f"the grid fill is not sped up where its physics work is compared: {work}",
+        )
+        require(
+            all(
+                by_speed[index, True]["steps"] == by_speed[index, False]["steps"]
+                for index in (simple_index, moving_index)
+            ),
+            f"the simple-transition speed-up changed the physics work: {work}",
+        )
 
         # The box on the stage: black on its way, green once locked at the best known side,
         # with a black trace where it just was and a triangle over the gap bar at its side. On
