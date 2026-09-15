@@ -213,7 +213,7 @@ controls:
 
 - name: synopsis - hypothesis status row drifting from the ledger
   file: ../SYNOPSIS.md
-  replace: ["| Hypotheses | 138 |", "| Hypotheses | 0 |"]
+  replace: ["| Hypotheses | 139 |", "| Hypotheses | 0 |"]
   run: uv run --frozen --quiet python -m devtools.check_synopsis
   expect: "research-status row 'Hypotheses'"
 
