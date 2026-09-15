@@ -10,6 +10,8 @@ from typing import Any
 
 from playwright.sync_api import Page, expect, sync_playwright
 
+from workbench_tools.probes import probe
+
 # The status line once a run stops, whichever way it stops.
 SETTLED = re.compile(r"finished|cancelled|could not run")
 # The source revision `build_site` stamps into the page.
@@ -57,6 +59,41 @@ def check_bounded_run(page: Page) -> None:
     stamped = page.locator('meta[name="squares-workbench-dirty"]').get_attribute("content")
     if REVISION.fullmatch(source["commit"]) is None or source["dirty"] != (stamped == "true"):
         raise ValueError(f"Search plan does not record the page's source: {source}")
+
+
+def check_keys_stay_in_search(page: Page) -> None:
+    """While Search shows, the page's global shortcuts leave its fields and buttons alone.
+
+    The catalogue's key handler used to act behind Search: Space or an arrow blurred the
+    field being typed in and ran the hidden Animate transport, Space on a focused button was
+    swallowed, and a bare `c` entered capture mode (#160 R6).
+    """
+    seeds = page.locator("#search-seeds")
+    seeds.fill("")
+    seeds.focus()
+    page.keyboard.type("0, 5")
+    page.keyboard.press("ArrowLeft")
+    page.keyboard.press("ArrowRight")
+    owner = page.evaluate(probe("animate/input-owner"))
+    if owner["seeds"] != "0, 5" or owner["focused"] != "search-seeds":
+        raise ValueError(f"typing in Search's seeds field was taken by page shortcuts: {owner}")
+    if owner["transport"] != "Play":
+        raise ValueError(f"a key in Search ran the hidden Animate transport: {owner}")
+    page.locator("#search-n").fill("1")
+    page.locator("#search-steps").fill("1")
+    seeds.fill("0")
+    page.locator("#search-repair").set_checked(False)
+    page.locator("#search-start").focus()
+    page.keyboard.press("c")
+    if page.evaluate(probe("animate/input-owner"))["capture"]:
+        raise ValueError("a bare `c` on a focused Search button entered capture mode")
+    page.keyboard.press(" ")
+    status = page.locator("#search-status")
+    expect(status).to_have_text(SETTLED)
+    if "finished" not in status.inner_text():
+        raise ValueError(
+            f"Space on a focused Start did not run the search: {status.inner_text()}"
+        )
 
 
 def check_leaving_cancels(page: Page) -> None:
@@ -121,6 +158,7 @@ def check(page_path: Path) -> str:
         page.locator("#mode-search").click()
         if not page.locator("#search-workspace").is_visible():
             raise ValueError("Search tab did not expose its panel")
+        check_keys_stay_in_search(page)
         check_bounded_run(page)
         check_repair_run(page)
         check_leaving_cancels(page)
@@ -131,5 +169,6 @@ def check(page_path: Path) -> str:
             raise ValueError("Search page errors: " + "; ".join(errors))
         browser.close()
     return (
-        "bounded and Resolve Search runs, summaries, source, cancel on leaving, and Pack return"
+        "bounded and Resolve Search runs, summaries, source, keys kept from the page's "
+        "shortcuts, cancel on leaving, and Pack return"
     )

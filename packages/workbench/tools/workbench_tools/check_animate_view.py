@@ -70,52 +70,21 @@ class Session:
 
 
 def keyboard_ownership(session: Session) -> str:
-    """The page's global shortcuts act only while the Animate view owns the page."""
+    """The page's global shortcuts act only while the Animate view owns the page.
+
+    From load: the page opens on Pack, and a shortcut letter there is Pack's business. The
+    same guard behind Search is `check_search_panel`'s keyboard case.
+    """
     page = session.page
-    # From load: the page opens on Pack, and a shortcut letter there is Pack's business.
     page.locator("#pack-count").focus()
     page.locator("#pack-count").blur()
     page.keyboard.press("c")
-    session.require(
-        not session.look("animate/input-owner")["capture"],
-        "a bare `c` at load entered capture mode behind Pack",
-    )
-
-    page.locator("#mode-search").click()
-    seeds = page.locator("#search-seeds")
-    seeds.fill("")
-    seeds.focus()
-    page.keyboard.type("0, 5")
-    page.keyboard.press("ArrowLeft")
     owner = session.look("animate/input-owner")
     session.require(
-        owner["seeds"] == "0, 5" and owner["focused"] == "search-seeds",
-        f"typing into Search's seeds field was taken by the page's shortcuts: {owner}",
+        not owner["capture"] and owner["transport"] == "Play",
+        f"a bare `c` at load acted behind Pack: {owner}",
     )
-    session.require(
-        owner["transport"] == "Play",
-        f"Space or an arrow in Search ran the hidden Animate transport: {owner}",
-    )
-    page.locator("#search-n").fill("1")
-    page.locator("#search-steps").fill("1")
-    seeds.fill("0")
-    page.locator("#search-start").focus()
-    page.keyboard.press("c")
-    session.require(
-        not session.look("animate/input-owner")["capture"],
-        "a bare `c` with Search's Start focused entered capture mode",
-    )
-    page.keyboard.press(" ")
-    export = page.locator("#search-export")
-    started = False
-    for _ in range(100):
-        if export.is_enabled():
-            started = True
-            break
-        page.wait_for_timeout(50)
-    session.require(started, "Space on a focused Search Start did not run the search")
-    session.enter_animate()
-    return "shortcuts yield to Pack at load and to Search's fields and buttons"
+    return "shortcuts yield to Pack from load"
 
 
 def gap_bar_through_dwell(session: Session) -> str:
