@@ -223,11 +223,12 @@ The current order is:
 
 The detailed
 [six-hour execution schedule](docs/project/reviews/review-2026-09-14-n11-post-w5-route-selection.md#six-active-hours-after-this-planning-merge)
-allocates five sequential merge-bounded blocks: Route A admission, its exact
-discriminator, an independent mathematical audit, one evidence-earned follow-up or Route
-S admission, and W10 closeout.
-Each block starts from the preceding merge on a fresh branch and gets its own session,
-bead disposition, validation receipt, and pull request.
+originally allocated five sequential merge-bounded blocks.
+BC-354 activated that schedule’s guard-refusal branch, so the Route A discriminator no
+longer follows it. The remaining path begins with BC-343’s no-target Route S admission;
+only an admitted compression contract may proceed to a target, independent audit, and
+closeout. Each block starts from the preceding merge on a fresh branch and gets its own
+session, bead disposition, validation receipt, and pull request.
 
 The audit’s linear advisory order is A, S, angular resources, B, stronger charge
 algebra, geometry-dependent budgets, `n = 12`, C, D, then geometric waste.
@@ -875,16 +876,13 @@ controller, not permission to blur contracts.
 
 ### Current Handoff
 
+[Session 133](packing/campaign/agent-sessions/session-133-n11-route-a-admission.md) is
+the latest terminal handoff.
+It began BC-354 from post-W5 planning merge `a9de8a705d785e5b7b6ac46f28c11b6f5a45d7c6`,
+after
 [Session 132](packing/campaign/agent-sessions/session-132-n11-post-w5-route-selection.md)
-is the latest terminal handoff.
-It closed BC-353 from the W5 merge `cdb088142f596c468b910a6d44c7915e26ea02e1` after
-three read-only Astra Max lanes reconciled A/S, E/B/F1/F2, and N/C/D/G plus small-`n`
-transfer against the retained mathematical audit.
-The selected entry is Route A admission at side `96/25`, with Route S as the explicit
-fallback if the complete physical root and checker cannot be frozen.
-The planning block ran no scientific target.
-[Session 133](packing/campaign/agent-sessions/session-133-n11-route-a-admission.md)
-stopped BC-354 at the frozen Route A representation boundary.
+selected Route A admission with Route S as the explicit fallback.
+Session 133 stopped BC-354 at the frozen Route A representation boundary.
 Three source inventories found no complete 80-stratum negative-root producer, seam-safe
 shared-parent domain, rows-complete matched baseline, conditional-domain gate, or
 independent exact replay.

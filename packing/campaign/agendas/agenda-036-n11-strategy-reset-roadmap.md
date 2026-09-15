@@ -562,11 +562,13 @@ freezes the compression metric and controls.
 BC-341 remains tentative behind a future W10 reselection and the named representation
 gaps.
 
-The W10 review maps the next six active work hours into five sequential PR-bounded
-blocks: BC-340 W5, BC-353 W10, selected-route admission, one exact discriminator, and a
-review-and-replan closeout.
-The last three blocks are conditional on the preceding exit; an unadmitted target does
-not run, and no later branch starts before the prior PR merges.
+The W10 review originally mapped six active hours into five sequential PR-bounded
+blocks. BC-340 and BC-353 completed, and BC-354 activated the selected-route admission’s
+guard-refusal branch.
+The remaining conditional path begins with BC-343’s separate no-target admission PR,
+then permits one compression discriminator only if that contract is admitted, followed
+by review and replanning.
+No later branch starts before the prior PR merges.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
