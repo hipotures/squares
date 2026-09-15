@@ -60,9 +60,6 @@ allowlist:
   - path: packages/workbench/tests/test_self_contained.py
     sites: 1
     bead: think-xvjf
-  - path: packages/workbench/tools/workbench_tools/check_accessibility.py
-    sites: 2
-    bead: think-xvjf
   - path: packages/workbench/tools/workbench_tools/check_candidate.py
     sites: 3
     bead: think-xvjf

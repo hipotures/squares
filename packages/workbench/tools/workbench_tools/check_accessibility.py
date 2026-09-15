@@ -72,7 +72,7 @@ def check(page_path: Path) -> str:
         stage.focus()
         page.keyboard.press("Enter")
         require(
-            page.evaluate("document.activeElement?.getAttribute('data-pack-index')") == "0",
+            _look(page, "accessibility/active-pack-index") == "0",
             "Enter did not focus square 1",
         )
         before = page.locator("#pack-squares > g").first.get_attribute("transform")
@@ -80,7 +80,7 @@ def check(page_path: Path) -> str:
         after = page.locator("#pack-squares > g").first.get_attribute("transform")
         require(after != before, "ArrowRight did not edit the focused square")
         require(
-            page.evaluate("document.activeElement?.getAttribute('data-pack-index')") == "0",
+            _look(page, "accessibility/active-pack-index") == "0",
             "keyboard editing lost the focused square",
         )
         page.keyboard.press("Escape")
