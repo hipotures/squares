@@ -784,8 +784,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   //: frame painted, so a still seeked straight to an instant, a film walked to it at 30 fps and one
   //: at 60 fps each painted different runs (at n = 272, 22 to 44 fills of 272 apart). Merging only
   //: at these fixed instants, read off the same poses the stage draws, gives one answer however the
-  //: instant is reached. Forty-eight over a beat of about a second and a half is a checkpoint every
-  //: thirty milliseconds, under two frames, so a merge lands when the contact does.
+  //: instant is reached. They span the window the moving palette is drawn in, as the per-frame
+  //: merge did: forty-eight over the default window of a second and a quarter is a checkpoint
+  //: every 26 ms, under two frames, so a merge lands when the contact does.
   const GROUP_CHECKPOINTS = 48;
   let groupFolded = 0; // how many checkpoints are folded into the runs
   let groupSource = null; // the settings the folded checkpoints were read under
@@ -862,14 +863,18 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     const tm = timing();
     const sc = schedule();
     const physical = isPhysical(state.style) && !isStillPair();
-    const span = sc.end - sc.moveStart;
+    // The window the moving palette is drawn in: from the moment the hue starts to leave, once the
+    // chroma has drained, to the moment it is back. Outside it a frame is drawn in its resting
+    // colours and its contacts say nothing about runs, so no checkpoint is read there -- in
+    // particular not the dwell's own arrangement, where a record's touching squares would all
+    // merge before anything had moved.
+    const move = sc.moveEnd - sc.moveStart;
+    const from = sc.moveStart + move * DESAT_IN;
+    const span = sc.moveEnd + (sc.end - sc.moveEnd) * HUE_IN - from;
     const due =
-      span <= 0 || t < sc.moveStart
+      span <= 0 || t <= from
         ? 0
-        : Math.min(
-            GROUP_CHECKPOINTS,
-            Math.floor(((t - sc.moveStart) / span) * GROUP_CHECKPOINTS + 1e-9),
-          ) + 1;
+        : Math.min(GROUP_CHECKPOINTS, Math.floor(((t - from) / span) * GROUP_CHECKPOINTS + 1e-9));
     const source = [
       state.pair,
       state.style,
@@ -899,7 +904,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     }
     const { x, y, a } = groupPoses;
     for (let k = groupFolded; k < due; k++) {
-      const at = sc.moveStart + (span * k) / GROUP_CHECKPOINTS;
+      const at = from + (span * (k + 1)) / GROUP_CHECKPOINTS;
       let side;
       if (physical) {
         side = physicsFrame(p, A, B, sc, at, x, y, a).side;
