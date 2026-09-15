@@ -126,6 +126,67 @@ def _check_click_keeps_run(page: Page) -> None:
     )
 
 
+def _check_non_packings_labelled(page: Page) -> None:
+    """An import that is not a packing is never shown as one, in the status or on the stage."""
+    touching = [{"x": 0.5, "y": 0.5, "angle": 0}, {"x": 1.5, "y": 0.5, "angle": 0}]
+    cases = (
+        (
+            "half-size squares",
+            {
+                "squareSide": 0.5,
+                "container": {"originX": 0, "originY": 0, "side": 1},
+                "poses": [
+                    {"x": 0.25, "y": 0.25, "angle": 0},
+                    {"x": 0.75, "y": 0.25, "angle": 0},
+                ],
+            },
+            "not unit squares",
+        ),
+        (
+            "a 5e-9 overlap",
+            {
+                "squareSide": 1,
+                "container": {"originX": 0, "originY": 0, "side": 2},
+                "poses": [touching[0], {"x": 1.5 - 5e-9, "y": 0.5, "angle": 0}],
+            },
+            "pair overlap",
+        ),
+        (
+            "two touching unit squares",
+            {
+                "squareSide": 1,
+                "container": {"originX": 0, "originY": 0, "side": 2},
+                "poses": touching,
+            },
+            None,
+        ),
+    )
+    page.locator("#pack-json").fill("")
+    for label, snapshot, refusal in cases:
+        page.locator("#pack-json").fill(json.dumps(snapshot))
+        page.locator("#pack-load").click()
+        status = page.locator("#pack-status").inner_text()
+        facts = page.locator("#pack-stage-facts").inner_text()
+        if refusal is None:
+            _require(
+                "valid unit packing" in status
+                and "Valid unit packing" in facts
+                and "Required side 2.000000" in facts,
+                f"{label} is not shown as a packing: {status!r}; {facts!r}",
+            )
+            continue
+        _require(
+            refusal in status
+            and "valid unit packing" not in status
+            and "bounding side" in status
+            and "Not a packing" in facts
+            and "Bounding side" in facts
+            and "Required side" not in facts
+            and "Valid unit packing" not in facts,
+            f"{label} is shown as a packing, or unlabelled: {status!r}; {facts!r}",
+        )
+
+
 def _check_quiet_live_regions(browser: Browser, page_path: Path, errors: list[str]) -> None:
     """A second of animated Run rewrites the stage text but announces no frame."""
     page = browser.new_page(
@@ -296,6 +357,7 @@ def check(page_path: Path) -> str:
         )
         _check_modifier_chords(page)
         _check_click_keeps_run(page)
+        _check_non_packings_labelled(page)
         page.set_viewport_size({"width": 390, "height": 844})
         # Chromium delivers the resize event after set_viewport_size returns. Wait for
         # the stage's JS scale to reflect the new viewport before testing overflow.
@@ -309,7 +371,8 @@ def check(page_path: Path) -> str:
         browser.close()
     return (
         "Pack count, seeded starts, transport, import/export, Resolve, "
-        "mode return, bare-key shortcuts, click without drag, quiet live regions "
+        "mode return, bare-key shortcuts, click without drag, non-packings labelled, "
+        "quiet live regions "
         "and mobile fit"
     )
 

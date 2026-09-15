@@ -1,6 +1,10 @@
 import { type PackWorkbenchApi, parsePackSnapshot } from "../api/pack-api.ts";
 import type { GeometrySnapshot } from "../core/geometry.ts";
-import { assessPackingSnapshot, parseUint32Seed } from "../core/runtime-contracts.ts";
+import {
+  assessPackingSnapshot,
+  type PackingAssessment,
+  parseUint32Seed,
+} from "../core/runtime-contracts.ts";
 import { packKeyCommand } from "../view/accessibility.ts";
 import type { ColourSystem } from "../view/colour.ts";
 import { paintPack } from "../view/pack-scene.ts";
@@ -60,6 +64,50 @@ function samePlacement(left: GeometrySnapshot, right: GeometrySnapshot): boolean
       );
     })
   );
+}
+
+export interface PackValidityText {
+  valid: boolean;
+  /** The side, named for what it is: a packing's required side, or only a bounding box's. */
+  side: string;
+  /** The validity clause for the status line. */
+  status: string;
+  /** The validity line for the stage facts. */
+  fact: string;
+}
+
+/**
+ * What the Pack readouts say about an assessment. Every word comes from the one validity
+ * contract: the arrangement is a packing only where `assessment.valid`, and otherwise its side is
+ * a bounding box's and the first failing clause says why (#160 R12: the stage facts printed
+ * "Required side" and a bare overlap for arrangements that were not packings).
+ */
+export function describePackValidity(assessment: PackingAssessment): PackValidityText {
+  const side = Number.isFinite(assessment.requiredSide)
+    ? assessment.requiredSide.toFixed(6)
+    : "unavailable";
+  if (assessment.valid) {
+    return {
+      valid: true,
+      side: `required side ${side}`,
+      status: "valid unit packing",
+      fact: "Valid unit packing",
+    };
+  }
+  const detail =
+    assessment.reason === "unit-size"
+      ? `not unit squares (side ${assessment.snapshot.squareSide.toFixed(4)})`
+      : assessment.reason === "pair-overlap"
+        ? `pair overlap ${assessment.maxPairOverlap.toExponential(2)}`
+        : assessment.reason === "wall-overlap"
+          ? `wall overlap ${assessment.maxWallOverlap.toExponential(2)}`
+          : `${assessment.reason ?? "unchecked"}`;
+  return {
+    valid: false,
+    side: `bounding side ${side}`,
+    status: assessment.reason === "unit-size" ? detail : `not a valid packing (${detail})`,
+    fact: `Not a packing: ${detail}`,
+  };
 }
 
 /** Write text only when it differs, so an unchanged frame is no DOM mutation at all. */
@@ -183,20 +231,11 @@ export function mountPackPanel(options: PackPanelOptions): PackPanel {
     }
     const assessment =
       preview === null ? current.assessment : assessPackingSnapshot(preview, preview.poses.length);
-    const valid = assessment.valid && snapshot.squareSide === 1;
+    const readout = describePackValidity(assessment);
     const steps = current.latest?.work.baseSteps ?? 0;
-    const score = Number.isFinite(assessment.requiredSide)
-      ? assessment.requiredSide.toFixed(6)
-      : "unavailable";
-    const overlap = Math.max(assessment.maxPairOverlap, assessment.maxWallOverlap);
-    const validity = valid
-      ? "valid unit packing"
-      : snapshot.squareSide !== 1
-        ? `not unit squares (side ${snapshot.squareSide.toFixed(4)})`
-        : `not a valid packing (overlap ${overlap.toExponential(2)})`;
     show(
       status,
-      `n = ${current.configuration.n} · seed ${current.configuration.seed} · ${steps} steps · required side ${score} · ${validity} · ${preview === null ? (playing ? "running" : "paused") : "drag preview"}`,
+      `n = ${current.configuration.n} · seed ${current.configuration.seed} · ${steps} steps · ${readout.side} · ${readout.status} · ${preview === null ? (playing ? "running" : "paused") : "drag preview"}`,
     );
     const repair = current.repair;
     show(
@@ -207,7 +246,7 @@ export function mountPackPanel(options: PackPanelOptions): PackPanel {
     );
     show(
       stageFacts,
-      `n = ${current.configuration.n}\nRequired side ${score}\n${valid ? "Valid unit packing" : `Overlap ${overlap.toExponential(2)}`}\n${steps} steps · ${preview === null ? (playing ? "running" : "paused") : "drag preview"}`,
+      `n = ${current.configuration.n}\n${readout.side.charAt(0).toUpperCase()}${readout.side.slice(1)}\n${readout.fact}\n${steps} steps · ${preview === null ? (playing ? "running" : "paused") : "drag preview"}`,
     );
     show(stageDescription, status.value);
     svg.setAttribute("aria-label", `${current.configuration.n} packing squares`);

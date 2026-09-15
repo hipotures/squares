@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { maximumPackContainerSide, parsePackSnapshot } from "../src/api/pack-api.ts";
 import { PackController } from "../src/app/pack-controller.ts";
+import { describePackValidity } from "../src/app/pack-panel.ts";
 import { createGridPackStart } from "../src/simulation/pack.ts";
 import { createColourSystem } from "../src/view/colour.ts";
 import { paintPack } from "../src/view/pack-scene.ts";
@@ -19,6 +20,57 @@ test("independent Pack supports count 1, off-catalogue 17, and 325", () => {
     assert.equal(receipt.configuration.guided, false);
     assert.equal(receipt.configuration.effectiveSeed, 0);
   }
+});
+
+test("a half-size or barely overlapping import is no packing, and the readout says so", () => {
+  const controller = new PackController();
+  const half = {
+    squareSide: 0.5,
+    container: { originX: 0, originY: 0, side: 1 },
+    poses: [
+      { x: 0.25, y: 0.25, angle: 0 },
+      { x: 0.75, y: 0.25, angle: 0 },
+    ],
+  };
+  controller.load(half);
+  const shrunk = controller.state().assessment;
+  assert.equal(shrunk.valid, false);
+  assert.equal(shrunk.reason, "unit-size");
+  const shrunkText = describePackValidity(shrunk);
+  assert.equal(shrunkText.valid, false);
+  assert.match(shrunkText.status, /not unit squares \(side 0\.5000\)/);
+  assert.match(shrunkText.fact, /^Not a packing/);
+  assert.match(shrunkText.side, /^bounding side/);
+
+  const overlap = 5e-9;
+  controller.load({
+    squareSide: 1,
+    container: { originX: 0, originY: 0, side: 2 },
+    poses: [
+      { x: 0.5, y: 0.5, angle: 0 },
+      { x: 1.5 - overlap, y: 0.5, angle: 0 },
+    ],
+  });
+  const pressed = controller.state().assessment;
+  assert.equal(pressed.valid, false);
+  assert.equal(pressed.reason, "pair-overlap");
+  const pressedText = describePackValidity(pressed);
+  assert.match(pressedText.status, /not a valid packing \(pair overlap 5\.00e-9\)/);
+  assert.match(pressedText.fact, /^Not a packing: pair overlap 5\.00e-9/);
+
+  controller.load({
+    squareSide: 1,
+    container: { originX: 0, originY: 0, side: 2 },
+    poses: [
+      { x: 0.5, y: 0.5, angle: 0 },
+      { x: 1.5, y: 0.5, angle: 0 },
+    ],
+  });
+  const touching = describePackValidity(controller.state().assessment);
+  assert.equal(touching.valid, true);
+  assert.equal(touching.status, "valid unit packing");
+  assert.equal(touching.fact, "Valid unit packing");
+  assert.equal(touching.side, "required side 2.000000");
 });
 
 test("exact seeds and restart reproduce a random run independently of batching", () => {

@@ -461,11 +461,16 @@ def gap_bar(session: Session) -> str:
     for style, n in (("physics", 17), ("bodies", 11), ("tween", 110)):
         rows = session.look("gapbar/validity-through-step", n=n, style=style)
         swept += len(rows)
-        for t, valid, overlap, opacity in rows:
+        for t, valid, overlap, opacity, reason, tolerance, precision in rows:
+            # Valid is the validity contract: no failing clause, penetration within the
+            # tolerance applied, the contract's 1e-9 unless the frame draws a stored record.
             session.require(
-                valid is (overlap < 1e-4) and opacity == (1 if valid else 0),
-                f"{style} {n} at t = {t:.3f}: valid {valid}, overlap {overlap:.2e}, "
-                f"hand opacity {opacity}",
+                valid is (reason is None)
+                and (not valid or overlap <= tolerance)
+                and tolerance == (4e-6 if precision == "catalogue-precision" else 1e-9)
+                and opacity == (1 if valid else 0),
+                f"{style} {n} at t = {t:.3f}: valid {valid}, reason {reason}, overlap "
+                f"{overlap:.2e} at {precision} tolerance {tolerance}, hand opacity {opacity}",
             )
         session.require(
             len(rows) == 6 and rows[-1][1] and not all(row[1] for row in rows),

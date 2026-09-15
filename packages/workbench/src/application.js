@@ -23,7 +23,13 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     input: inputNode,
     select: selectNode,
   } = workbenchBundle.dom.createDom(document);
-  const { parseUint32Seed, mixUint32Seed, packingSnapshot } = SQUARES_WORKBENCH_CORE;
+  const {
+    assessCataloguePrecisionFrame,
+    assessPackingSnapshot,
+    mixUint32Seed,
+    packingSnapshot,
+    parseUint32Seed,
+  } = SQUARES_WORKBENCH_CORE;
   const {
     forceAtGap: forceOf,
     forceLawAttracts: attractsOf,
@@ -2075,6 +2081,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     const unit = tight === null ? null : tight / size;
     const pen = opt === null || !Number.isFinite(opt.pen) ? null : opt.pen;
     const clean = pen !== null && pen <= OPT.feasible;
+    const packing = opt?.packingValid === true;
     return {
       on: GROWTH.on,
       size,
@@ -2093,13 +2100,16 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       unitSide: unit,
       record,
       penetration: pen,
+      // Within the growth rule's own overlap allowance, which decides whether the size may climb.
+      // It is not a packing test: `packing` is.
       clean,
-      // A packing only when the squares have reached full size with nothing overlapping.
-      packing: size >= 1 && clean,
-      // Below a record at full size is not a find: it is a report that something is overlapping by
-      // less than the tolerance says it is.
-      suspect: size >= 1 && clean && tight !== null && tight < record - 1e-9,
-      excess: unit === null ? null : (unit / record - 1) * 100,
+      // A packing under the one validity contract: unit squares, and pair and wall penetration
+      // within 1e-9. It used to be full size with the overlap inside the growth rule's 0.008,
+      // which called an arrangement a packing at eight million times the contract's tolerance.
+      packing,
+      // Below a record as a packing is not a find: it is a report that the geometry lost precision.
+      suspect: packing && tight !== null && tight < record - 1e-9,
+      excess: packing && unit !== null ? (unit / record - 1) * 100 : null,
     };
   }
   // ---------------------------------------------------------------- reset (revision 11)
@@ -2381,8 +2391,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // rests at its residual. In a blind run the squares have no correspondence to the record's
   // labelling, so the centre and angle errors are meaningless and only the box is reported.
   // `count` is how many of the squares to measure, from the first: the squares the frame shows.
+  // `size` is the side they are drawn at, so a run of shrunken squares reads its own box.
   const gapOut = { centre: 0, angle: 0, side: 0 };
-  function gapOf(px, py, pa, count) {
+  function gapOf(px, py, pa, count, size) {
     let centre = 0,
       angle = 0,
       x0 = Infinity,
@@ -2400,8 +2411,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       if (da > angle) {
         angle = da;
       }
-      const cs = Math.cos(pa[i] * DEG) * 0.5,
-        sn = Math.sin(pa[i] * DEG) * 0.5;
+      const cs = Math.cos(pa[i] * DEG) * (size / 2),
+        sn = Math.sin(pa[i] * DEG) * (size / 2);
       for (let q = 0; q < 4; q++) {
         const s1 = q & 1 ? -1 : 1,
           s2 = q & 2 ? -1 : 1;
@@ -2504,10 +2515,6 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     /** @type {Element} */ (svgNode("gapbar-record-label"))
   );
   let gapbarInfo = null;
-  //: What the summed overlap may be for the arrangement to count as a packing, in unit sides.
-  //: Measured: retained records score 0 to 1.3e-5 -- the float precision of the poses -- and a
-  //: frame mid-move scores 1.1 to 12.4. The threshold sits five orders of magnitude clear of both.
-  const VALID_OVERLAP = 1e-4;
   const gapbarOut = {
     n: 0,
     record: 0,
@@ -2516,12 +2523,19 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     hi: 0,
     side: 0,
     x: 0,
+    /** @type {number | null} */
     excess: 0,
     met: false,
     // Whether the side above is a claim at all: a bounding box reports a number for any
-    // arrangement, and only an arrangement without overlaps is a packing.
+    // arrangement, and only a packing under the one validity contract has a side.
     valid: false,
+    /** @type {string | null} */
+    reason: null,
+    // The deepest pair or wall penetration, and the tolerance the assessment held it to.
     overlap: 0,
+    tolerance: 0,
+    /** @type {"packing" | "catalogue-precision"} */
+    precision: "packing",
   };
   // The scale and the static marks, once per n rather than once per frame.
   // **The bar is keyed to the n on the panel, not to the n the step is heading for.** Through the
@@ -2648,7 +2662,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     const span = GAPBAR.width - 2 * GAPBAR.inset;
     return GAPBAR.inset + clamp01((value - i.lo) / (i.hi - i.lo)) * span;
   }
-  function updateGapBar(p, _B, g, mode, overlap) {
+  function updateGapBar(p, _B, g, mode, assessment, precision) {
     const info = gapbarSetup(p, state.liveN);
     // **`met` is a claim about the n the bar describes.** The centre and angle gaps are measured
     // against the targets of the n the step is heading INTO, so they mean nothing while the bar is
@@ -2656,11 +2670,14 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     // own record, exactly, and the side test is the whole of what can be asked. The same is true of
     // a blind run, which has no correspondence to the record's labelling at all.
     const describesTarget = info.n === p.n + 1;
+    const valid = assessment.valid;
     const withinSide = g.side <= info.record * (1 + GAP_MET.side);
+    // A hit is a claim about a packing, so only a valid arrangement can make it.
     const met =
-      mode === "blind" || !describesTarget
+      valid &&
+      (mode === "blind" || !describesTarget
         ? withinSide
-        : g.centre <= GAP_MET.centre && g.angle <= GAP_MET.angle && withinSide;
+        : g.centre <= GAP_MET.centre && g.angle <= GAP_MET.angle && withinSide);
     // On a hit the hand locks to the record's tick rather than hovering a pixel off it.
     // The hand is a 20-unit triangle centred on the value, so at a record sitting hard against an
     // end -- which is every perfect square, whose record IS the area bound -- half of it hung off
@@ -2670,14 +2687,14 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       HALF,
       Math.min(GAPBAR.width - HALF, met ? gapbarX(info.record) : gapbarX(g.side)),
     );
-    // **And the hand is drawn only where the arrangement IS a packing.** A bounding box will happily
-    // report a smaller side for squares that are inside each other, so a side is a claim only when
-    // the overlap is zero. Measured: a retained record scores between 0 and 1.3e-5 of a unit side
-    // -- the float precision of the poses the page carries -- while the same step mid-move reaches
-    // 1.1 at n = 11 and 12.4 at n = 110. Five orders of magnitude between them, so the threshold
-    // does not need to be delicate.
-    const valid = overlap <= VALID_OVERLAP;
-    const excess = (g.side / info.record - 1) * 100;
+    // **And the hand is drawn only where the arrangement IS a packing,** under the one validity
+    // contract every other part of the workbench uses: unit squares, pair and wall penetration
+    // within 1e-9, and the rest of `PACKING_VALIDITY`. A bounding box will happily report a smaller
+    // side for squares that are inside each other, or shrunk, so a side is a claim only then. A
+    // retained record drawn exactly as stored is assessed at the catalogue's declared stored
+    // precision instead, and says so in `precision`: rounding the witness to six places reads as
+    // up to 3.9e-6 of penetration on frames that do not overlap.
+    const excess = valid ? (g.side / info.record - 1) * 100 : null;
     gapbarHand.setAttribute("x1", fmt(x, 2));
     gapbarHand.setAttribute("x2", fmt(x, 2));
     gapbarHand.setAttribute("opacity", valid ? "1" : "0");
@@ -2696,7 +2713,10 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     gapbarOut.excess = excess;
     gapbarOut.met = met;
     gapbarOut.valid = valid;
-    gapbarOut.overlap = overlap;
+    gapbarOut.reason = assessment.reason;
+    gapbarOut.overlap = Math.max(assessment.maxPairOverlap, assessment.maxWallOverlap);
+    gapbarOut.tolerance = assessment.tolerance;
+    gapbarOut.precision = precision;
   }
   // `still` is true where the picture is not in motion: through the dwell, and from the instant the
   // settle ends. Those are the frames the bar is allowed to move on, along with the ones something
@@ -2709,22 +2729,47 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // the record itself no packing, which hid the hand through every dwell.
   function updateGap(p, _A, B, mode, still) {
     const shown = Math.min(poseX.length, state.liveN);
-    const g = gapOf(poseX, poseY, poseA, shown);
+    const g = gapOf(poseX, poseY, poseA, shown, paintOut.size);
     if (gapBarDirty || still) {
-      const overlap =
-        shown === poseX.length
-          ? paintOut.overlap
-          : measureFrameGeometry(
-              poseX.subarray(0, shown),
-              poseY.subarray(0, shown),
-              poseA.subarray(0, shown),
-              paintOut.side,
-              paintOut.size,
-              { gap: CONTACT.gap, angleToleranceDegrees: ANGLE_TOL },
-            ).totalOverlap;
-      updateGapBar(p, B, g, mode, overlap);
+      const radians = new Float64Array(shown);
+      for (let i = 0; i < shown; i++) {
+        radians[i] = poseA[i] * DEG;
+      }
+      const snapshot = packingSnapshot(
+        poseX.subarray(0, shown),
+        poseY.subarray(0, shown),
+        radians,
+        paintOut.size,
+        { originX: 0, originY: 0, side: paintOut.side },
+      );
+      const stored = drawsStoredRecord(p, shown);
+      const assessment = stored
+        ? assessCataloguePrecisionFrame(snapshot, shown)
+        : assessPackingSnapshot(snapshot, shown);
+      updateGapBar(p, B, g, mode, assessment, stored ? "catalogue-precision" : "packing");
       gapBarDirty = false;
     }
+  }
+  // Whether the frame draws a retained record as the catalogue stores it: n's poses through the
+  // dwell, or n + 1's once the step has landed, each square where the record puts it. Compared to
+  // a billionth rather than exactly, since a tween that has landed reaches its target through a
+  // rotation that rounds, and angles as a square's, a quarter turn being the same square. A hand's run picked up from the record is still the record until a
+  // square moves, and not after.
+  function drawsStoredRecord(p, shown) {
+    const near = (/** @type {number} */ a, /** @type {number} */ b) => Math.abs(a - b) <= 1e-9;
+    for (let i = 0; i < shown; i++) {
+      const at =
+        shown === p.n ? motion[i]?.a : [tgtX[i] ?? Number.NaN, tgtY[i] ?? Number.NaN, tgtA[i]];
+      if (
+        at === undefined ||
+        !near(poseX[i], at[0]) ||
+        !near(poseY[i], at[1]) ||
+        !near(angleDelta(at[2] ?? Number.NaN, poseA[i]), 0)
+      ) {
+        return false;
+      }
+    }
+    return shown === p.n || shown === p.n + 1;
   }
   // Where the two numbers come from at this instant, or the empty string when nothing is simulating.
   function _lawReadout() {
@@ -3306,18 +3351,18 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       bestWallPenetration: opt.best === Infinity ? null : opt.bestWallPen,
       bestPacking,
       feasible: OPT.feasible,
+      // The excess over the record is a claim about a packing, so it is reported only for one.
       ...(opt.record === null
         ? {}
-        : { record: opt.record, excess: (opt.required / opt.record - 1) * 100 }),
+        : {
+            record: opt.record,
+            excess: opt.packingValid ? (opt.required / opt.record - 1) * 100 : null,
+          }),
       penetration: Number.isFinite(opt.pen) ? opt.pen : null,
       exactPenetration: Number.isFinite(opt.exactPen) ? opt.exactPen : null,
       wallPenetration: Number.isFinite(opt.wallPen) ? opt.wallPen : null,
-      packing: opt.packingValid && opt.size === 1,
-      invalidReason: opt.packingValid
-        ? opt.size === 1
-          ? null
-          : "non-unit-square"
-        : opt.invalidReason,
+      packing: opt.packingValid,
+      invalidReason: opt.invalidReason,
       near: opt.near,
       edited: opt.edited,
       held: opt.held,
@@ -4090,8 +4135,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
           (g.done ? "full" : g.growing ? "growing" : g.stalled ? "stalled" : "held") +
           " · unit " +
           fmt(g.unitSide, 3) +
-          " vs " +
-          fmt(g.record, 3);
+          // A side is compared with the record only when the arrangement is a packing.
+          (g.packing ? ` vs ${fmt(g.record, 3)}` : ", not a packing");
   }
   function updateChrome() {
     if (state.capture) {

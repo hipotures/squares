@@ -580,6 +580,69 @@ def capture_baseline(session: Session) -> str:
     return "the capture baseline reaches Animate from Pack"
 
 
+def readouts_claim_only_packings(session: Session) -> str:
+    """No readout calls a non-packing valid, on the record, or gives it an excess or a side."""
+
+    def read(label: str, *calls: tuple[Any, ...]) -> dict[str, Any]:
+        out = session.look("animate/readouts", calls=[list(call) for call in calls])
+        out["label"] = label
+        return out
+
+    def require_record(out: dict[str, Any]) -> None:
+        session.require(
+            out["valid"]
+            and out["met"]
+            and out["hand"] == 1
+            and out["precision"] == "catalogue-precision",
+            f"{out['label']}: a retained record drawn as stored is not a packing: {out}",
+        )
+
+    def require_refused(out: dict[str, Any], reason: str) -> None:
+        session.require(
+            not out["valid"]
+            and not out["met"]
+            and out["excess"] is None
+            and out["reason"] == reason
+            and out["precision"] == "packing"
+            and out["tolerance"] == 1e-9
+            and out["hand"] == 0
+            and not out["growthPacking"]
+            and out["growthExcess"] is None
+            and out["runPacking"] is False
+            and out["runExcess"] is None,
+            f"{out['label']}: a readout claims a packing for {reason}: {out}",
+        )
+
+    require_record(read("dwell of the step into 16", ("pause",), ("setStepN", 16), ("seek", 0)))
+    require_record(read("rest of the step into 16", ("seek", session.api(("duration",)))))
+    pair = session.look("animate/touching-pair", n=16)
+    session.require(pair is not None, "the record of 16 has no touching pair to press together")
+    if pair is None:
+        return "no touching pair"
+    left, _neighbour = pair
+    x, y, _ = session.api(("poseOf", left))
+    # 5e-9 of overlap: under the catalogue's stored precision, over the contract's 1e-9.
+    pressed = read(
+        "a square pressed 5e-9 into its neighbour",
+        ("grab", left, x, y),
+        ("dragTo", x + 5e-9, y, False),
+        ("release",),
+    )
+    require_refused(pressed, "pair-overlap")
+    shrunk = read(
+        "the hand's run at half size",
+        ("dragTo", x, y, False),
+        ("setGrowth", {"on": True, "size": 0.5}),
+    )
+    require_refused(shrunk, "unit-size")
+    session.require(
+        shrunk["growInfo"].endswith("not a packing"),
+        f"the growth readout compares a non-packing with the record: {shrunk['growInfo']!r}",
+    )
+    session.api(("setGrowth", {"on": False, "size": 1}), ("pause",), ("seek", 0))
+    return "no readout claims a packing for a 5e-9 overlap or half-size squares"
+
+
 SECTIONS: tuple[Callable[[Session], str], ...] = (
     keyboard_ownership,
     gap_bar_through_dwell,
@@ -595,6 +658,7 @@ SECTIONS: tuple[Callable[[Session], str], ...] = (
     headline_space,
     stage_clearance,
     stage_says_only_facts,
+    readouts_claim_only_packings,
     *animate_view_contract.SECTIONS,
     capture_baseline,
 )
