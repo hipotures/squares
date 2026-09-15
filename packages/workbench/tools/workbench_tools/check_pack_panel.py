@@ -167,8 +167,12 @@ def check(page_path: Path) -> str:
         browser = playwright.chromium.launch(
             headless=True, executable_path=os.environ.get("SQUARES_BROWSER_EXECUTABLE")
         )
+        # `bypass_csp`: the mobile-fit wait below is an expression-string predicate, which
+        # Playwright compiles inside the page, and the published policy grants no
+        # `'unsafe-eval'`. `check_page_policy` loads the page without the bypass. It can go
+        # once that predicate is a probe file (think-xvjf).
         page = browser.new_page(
-            reduced_motion="reduce", viewport={"width": 1440, "height": 1000}
+            reduced_motion="reduce", viewport={"width": 1440, "height": 1000}, bypass_csp=True
         )
         page.on("pageerror", lambda error: errors.append(str(error)))
         page.goto(page_path.resolve().as_uri())

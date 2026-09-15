@@ -45,6 +45,7 @@ CALLERS = (
     "check_animate_view.py",
     "check_animation_editor.py",
     "check_pack_panel.py",
+    "check_page_policy.py",
     "check_search_panel.py",
     "check_workbench.py",
     "check_revision6.py",

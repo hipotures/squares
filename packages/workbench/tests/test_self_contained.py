@@ -101,7 +101,8 @@ def test_the_published_page_carries_a_policy_that_grants_no_network_source() -> 
     }
     assert directives["default-src"] == ["'none'"]
     granted = [source for sources in directives.values() for source in sources]
-    assert set(granted) <= {"'none'", "'unsafe-inline'", "'unsafe-eval'", "data:", "blob:"}
+    assert set(granted) <= {"'none'", "'unsafe-inline'", "data:", "blob:"}
+    assert "'unsafe-eval'" not in granted, "the public page is not loosened for test tooling"
     assert "connect-src" not in directives, "requests fall to default-src 'none'"
     assert page.count("Content-Security-Policy") == 1
 

@@ -108,12 +108,12 @@ the video.
 #: self-contained scan cannot recognise -- a URL assembled at run time, a worker, a socket.
 #: The browser enforces it; `self_contained` is the build-time half (#125 F21).
 #:
-#: `'unsafe-eval'` grants no network source; it is there for the checkers. Playwright
-#: evaluates a `wait_for_function` predicate written as an expression string with `eval`,
-#: and the package checkers still pass such strings. Once `think-xvjf` moves them into probe
-#: files, which Playwright calls as functions, the grant can go.
+#: No `'unsafe-eval'`: the page does not evaluate strings, and the public page is not
+#: loosened for test tooling. A checker that hands Playwright an expression-string predicate,
+#: which Playwright compiles in the page, opens its context with `bypass_csp`, and
+#: `check_page_policy` loads the page without it to hold this policy to what the page needs.
 CONTENT_SECURITY_POLICY = (
-    "default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval'; style-src 'unsafe-inline'; "
+    "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; "
     "img-src data: blob:; font-src data:; base-uri 'none'; form-action 'none'"
 )
 POLICY_META = f'<meta http-equiv="Content-Security-Policy" content="{CONTENT_SECURITY_POLICY}">'
