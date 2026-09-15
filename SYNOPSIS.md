@@ -4396,10 +4396,10 @@ archive beside it.
 | exp-204 | 20 refined optima per seed, seeds 1-5 | 4871.0 s | 40 m | criterion | `9ae7700` |
 | exp-205 | 1.25e9 pair tests per chain, 8 chains, 5 seeds, 11 cells, two arms | 4281.0 s | 45 m | criterion | `9ae7700` |
 | exp-206 | 48 to 95 solver calls per ratchet run, 28 runs over two arms | 937.0 s | 95 m | criterion | `ffa6d01` |
-| exp-207 | Historical budget/account retained in the artifact | unrecorded | unrecorded | dependency: missing receipt | `e9d13c1d` (mapped source) |
-| exp-208 | Historical budget/account retained in the artifact | unrecorded | unrecorded | dependency: missing receipt | `88d452f1` (mapped source) |
-| exp-209 | Historical budget/account retained in the artifact | unrecorded | unrecorded | dependency: missing receipt | `f91fc7d4` (mapped source) |
-| exp-210 | Historical budget/account retained in the artifact | unrecorded | unrecorded | dependency: missing receipt | `d3c3a778` (mapped source) |
+| exp-207 | 900 s harness default, in the recorded command; 39,871 of 40,000 seeds at `n = 5` | unrecorded | unrecorded | dependency: timing receipt lost (D-067) | `e9d13c1d` (mapped source) |
+| exp-208 | 900 s harness default per run, in the recorded command | unrecorded | unrecorded | dependency: timing receipt lost (D-067) | `88d452f1` (mapped source) |
+| exp-209 | not recorded | unrecorded | unrecorded | dependency: timing receipt lost (D-067) | `f91fc7d4` (mapped source) |
+| exp-210 | 900 s harness default, in the recorded command | unrecorded | unrecorded | dependency: timing receipt lost (D-067) | `d3c3a778` (mapped source) |
 
 ### What the 126 rounds jointly establish
 

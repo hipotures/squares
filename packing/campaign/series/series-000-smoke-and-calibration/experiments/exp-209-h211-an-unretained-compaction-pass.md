@@ -13,6 +13,7 @@ experiment:
   hypotheses:
   - H-212
   tier: exploratory
+  known_defects: [D-067]
   subject:
     label: the resolved arrangements, tested for local compactness
     engine: workbench page, branch claude/annealing-search-benchmark

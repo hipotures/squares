@@ -172,8 +172,9 @@ properties:
           - {const: unrecorded-historical}
         description: >-
           Wall-clock seconds actually spent measuring, from the run data. The historical
-          marker is confined by ledger.py to the four annealing records migrated on
-          2026-09-13; it is never zero and requires a dated migration annotation.
+          marker is for a round whose timing receipt was lost: ledger.py accepts it only
+          when the round declares D-067 in known_defects and carries a migration annotation
+          dated after the round. It is never zero.
       migration_annotation:
         type: string
         minLength: 1

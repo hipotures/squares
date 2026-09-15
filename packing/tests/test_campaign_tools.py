@@ -297,6 +297,7 @@ def _experiment_problems(
     commit: dt.datetime,
     effort: dict[str, object] | None = None,
     experiment_id: str = "exp-999",
+    fields: dict[str, object] | None = None,
 ) -> list[str]:
     """Run experiment cross-field invariants without repository link state."""
     monkeypatch.setattr(ledger, "dead_links", list)
@@ -310,6 +311,7 @@ def _experiment_problems(
         "instance": {"axis": "n", "point": 5, "role": "target"},
         "results": results,
         "verdict": {"decision": decision},
+        **(fields or {}),
     }
     if decision != "in-progress":
         experiment["effort"] = (
@@ -661,18 +663,28 @@ def test_terminal_round_requires_a_real_result(
     assert "exp-999-contract-test.md: terminal round without results" in problems
 
 
+MIGRATED = "2026-09-13: no timing receipt was retained."
+
+
 @pytest.mark.parametrize(
-    ("experiment_id", "annotation", "accepted"),
+    ("experiment_id", "declared", "date", "annotation", "accepted"),
     [
-        ("exp-209", "2026-09-13: the original run retained no timing receipt.", True),
-        ("exp-209", "", False),
-        ("exp-209", "timing was lost", False),
-        ("exp-999", "2026-09-13: no timing receipt.", False),
+        # Declared by the round, so any id may carry it: the exemption is data, not a list.
+        ("exp-999", ["D-067"], "2026-09-12", MIGRATED, True),
+        # One of the four ids the ledger used to name, now refused without the declaration.
+        ("exp-209", [], "2026-09-12", MIGRATED, False),
+        ("exp-999", ["D-010"], "2026-09-12", MIGRATED, False),
+        ("exp-999", ["D-067"], "2026-09-12", "", False),
+        ("exp-999", ["D-067"], "2026-09-12", "timing was lost", False),
+        # A migration comes after the round it migrates, so a new round cannot be its own.
+        ("exp-999", ["D-067"], "2026-09-13", MIGRATED, False),
     ],
 )
-def test_missing_historical_effort_is_explicit_and_bounded(
+def test_missing_historical_effort_is_declared_and_bounded(
     monkeypatch: pytest.MonkeyPatch,
     experiment_id: str,
+    declared: list[str],
+    date: str,
     annotation: str,
     *,
     accepted: bool,
@@ -684,13 +696,14 @@ def test_missing_historical_effort_is_explicit_and_bounded(
             {"shape": "determination", "question": "historical claim", "outcome": "no_progress"}
         ],
         lease=None,
-        commit=dt.datetime(2026, 9, 13, tzinfo=dt.UTC),
+        commit=dt.datetime(2026, 9, 14, tzinfo=dt.UTC),
         effort={
             "stopped_by": "dependency",
             "wall_seconds": "unrecorded-historical",
             "migration_annotation": annotation,
         },
         experiment_id=experiment_id,
+        fields={"known_defects": declared, "date": date},
     )
     assert (not any("historical effort" in problem for problem in problems)) is accepted
 

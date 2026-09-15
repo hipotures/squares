@@ -12,6 +12,7 @@ experiment:
   date: '2026-09-12'
   hypotheses: [H-207]
   tier: exploratory
+  known_defects: [D-067]
   subject:
     label: the workbench's blind physics, repaired to a packing before scoring
     engine: workbench page, branch claude/annealing-search-benchmark

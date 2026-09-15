@@ -882,16 +882,27 @@ def check(  # noqa: C901 - a flat list of record invariants, each a few lines; s
                 if "wall_seconds" not in effort:
                     problems.append(f"{name}: terminal round without effort.wall_seconds")
                 elif effort["wall_seconds"] == "unrecorded-historical":
-                    # These four pre-gate records lost their timing receipts. A named
-                    # migration preserves that gap without excusing new experiments.
+                    # A round whose timing receipt was lost declares the defect it carries
+                    # (D-067, a terminal round missing from wall-time accounting) instead of
+                    # being named here. The dated migration must come after the round, so
+                    # a new round cannot declare the gap about itself.
                     annotation = effort.get("migration_annotation")
-                    if experiment["id"] not in {"exp-207", "exp-208", "exp-209", "exp-210"}:
-                        problems.append(f"{name}: historical effort requires a named migration")
-                    if not isinstance(annotation, str) or not re.match(
-                        r"^2026-09-13: .+", annotation
-                    ):
+                    migrated = (
+                        re.match(r"^(\d{4}-\d{2}-\d{2}): .+", annotation)
+                        if isinstance(annotation, str)
+                        else None
+                    )
+                    if "D-067" not in declared:
+                        problems.append(
+                            f"{name}: historical effort requires known_defects to declare D-067"
+                        )
+                    if migrated is None:
                         problems.append(
                             f"{name}: historical effort requires a dated annotation"
+                        )
+                    elif migrated.group(1) <= str(experiment.get("date") or ""):
+                        problems.append(
+                            f"{name}: historical effort migration must be dated after the round"
                         )
                 stopped = effort.get("stopped_by")
                 if stopped == "timebox" and not effort.get("timebox"):

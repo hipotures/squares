@@ -13,6 +13,7 @@ experiment:
   hypotheses:
   - H-212
   tier: exploratory
+  known_defects: [D-067]
   subject:
     label: the workbench's contact simulation in blind mode, which withholds the destination poses
     engine: workbench page, build 4.4 MB, branch claude/annealing-search-benchmark

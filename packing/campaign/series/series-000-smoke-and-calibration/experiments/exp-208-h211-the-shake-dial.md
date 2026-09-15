@@ -12,6 +12,7 @@ experiment:
   date: '2026-09-12'
   hypotheses: [H-212]
   tier: exploratory
+  known_defects: [D-067]
   subject:
     label: the workbench's blind physics at six shake levels, repaired to packings before scoring
     engine: workbench page, branch claude/annealing-search-benchmark
