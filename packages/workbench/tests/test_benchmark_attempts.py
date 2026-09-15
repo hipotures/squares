@@ -380,3 +380,13 @@ def test_repair_receipt_and_gap_score_helpers_still_agree() -> None:
     trial = _trial_from_probe()
     assert isinstance(trial.repair, RepairReceipt)
     assert trial.resolved_closed == gap_closed(5, trial.record, trial.excess)
+
+
+def test_a_missing_page_names_the_build_command_that_exists(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], tmp_path: Path
+) -> None:
+    monkeypatch.setattr(bench, "PAGE", tmp_path / "missing.html")
+    assert bench.main(["--n", "5", "--seeds", "1"]) == 1
+    output = capsys.readouterr().out
+    assert "squares-workbench-build" in output
+    assert "devtools" not in output

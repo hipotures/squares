@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
-"""Does the workbench's blind physics rediscover a known-best packing, and how often?
+"""How often does the workbench's blind physics improve a previous packing toward the record?
 
     squares-workbench-benchmark --n 11 17 --seeds 40
     squares-workbench-benchmark --n 11 --seeds 200
     squares-workbench-benchmark --replay results/....jsonl
 
-The page's physics is a search. In blind mode it is told nothing about where the squares
-are meant to end up: it starts from the packing of n in an inflated container, drops the
-new square into the emptiest place a coarse grid finds, and closes the walls in with
-contacts, walls and a decaying jiggle. Whether it lands on the record is a question with
-a number for an answer, and this is where the number comes from.
+The page's blind physics is an incremental, record-conditioned search. It starts from the
+retained packing for n - 1, withholds only the destination poses for n, places the added
+square with a coarse-grid proposal, and runs the contact dynamics while contracting toward
+the reference side, which the run is given; in the default `bodies` style it also welds
+squares into blocks matched from the two records. So the question this answers is narrower
+than rediscovering a packing from nothing: can this proposal and physics, under a stated
+budget and seed schedule, repair to a packing that comes near the known reference?
 
 **One trial is one (n, seed, parameter set).** Before `setSeed` existed there was exactly
 one trial per n, because every generator on the page was seeded from n alone -- so a rate
@@ -23,8 +25,8 @@ trial carries its seed, so any claim here can be re-run rather than believed.
 
 **It finishes.** `check_revision6.py` runs a blind sweep over 323 pairs and has never
 completed -- 57 minutes without finishing, measured, and still going at 30 on an idle
-machine. This one samples the n it is given, streams each trial to disk as it lands, and
-stops at `--budget` seconds with a partial result rather than a lost one.
+machine. This one samples the n it is given, streams each attempt to disk as it lands, and
+stops at `--budget` seconds with a partial result, reported as partial, rather than a lost one.
 """
 
 from __future__ import annotations
@@ -89,13 +91,11 @@ VIEWPORT_HEIGHT = 1080
 #: and 12..16 and 10.8 per cent at n = 5.
 TOLERANCES = {"exact": 0.0001, "close": 0.1, "near": 1.0}
 
-#: The normalized metric reported beside absolute side and relative excess.
-#:
-#: `closed` describes where a result falls inside that case's record-to-grid interval: 1 is
-#: the record, 0 is `ceil(sqrt(n))`, and a negative number is worse than the grid. It is
-#: undefined for cases where the record and grid coincide. The report retains side and excess
-#: because the three scales answer different descriptive questions.
-OUTCOME = "closed"
+# `closed`, the normalized metric reported beside absolute side and relative excess,
+# describes where a result falls inside that case's record-to-grid interval: 1 is
+# the record, 0 is `ceil(sqrt(n))`, and a negative number is worse than the grid. It is
+# undefined for cases where the record and grid coincide. The report retains side and excess
+# because the three scales answer different descriptive questions.
 
 #: The k at which best-of-k is reported for prefixes of the exact recorded seed order.
 BEST_OF = (1, 10, 100, 1000, 10_000)
@@ -683,7 +683,7 @@ def main(argv: list[str] | None = None) -> int:
             status = max(status, report(trials, failures))
         return status
     if not PAGE.is_file():
-        print(f"no built page at {PAGE}; run `python -m devtools.build_workbench_site` first")
+        print(f"no built page at {PAGE}; run `squares-workbench-build` first")
         return 1
     RESULTS.mkdir(parents=True, exist_ok=True)
     stamp = time.strftime("%Y%m%dT%H%M%S")
