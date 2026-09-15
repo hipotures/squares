@@ -207,6 +207,11 @@ session:
   - >-
     full gate: fast at 7afd35550a0065b86a06ea75ad175157a70b7560: passed (GitHub
     Actions run 34995673723 after terminal records were rendered)
+  - >-
+    full gate: full at eac9d5386527e7b1d0d5cd98359ef2fb1fc8a8a9: passed (GitHub
+    Actions workflow-dispatch run 34997041426 checked PR 177's exact merge ref; deferred
+    controls, slow behavioral tests, exhaustive exact tests, and the translation screen
+    all passed)
   resource_rollups:
   - packing/campaign/resource-usage/codex-task-tree-session-133.yaml
   stop_reason: >-
