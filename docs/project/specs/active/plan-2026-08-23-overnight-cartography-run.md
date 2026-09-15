@@ -341,14 +341,17 @@ on.
 It is not the next thing, because a reassessment of what to search is queued in front
 of it.
 
-For the next supervised exact-research goal, run BC-346 under `think-9y7p` as the W10
-planning block over the certified roll-up and mathematical audit.
-This planning step runs no scientific target and selects exactly one later execution
-entry. The current evidence and candidate set are in the synopsis’s
+For the next supervised exact-research goal, run BC-340 under `think-1ydi` as the due W5
+checkpoint and a separate pull request.
+The certified W10 planning block selected it after a conservative count reached OR-12’s
+eight-block ceiling.
+BC-340 measures the gate first and runs no scientific target.
+The current evidence, candidate dispositions, and post-W5 scientific order are in the
+synopsis’s
 [Research Program Status and Roadmap](../../../../SYNOPSIS.md#research-program-status-and-roadmap),
 and
 [agenda-036](../../../../packing/campaign/agendas/agenda-036-n11-strategy-reset-roadmap.md)
-owns the disposition.
+owns the disposition and the fresh scientific selection after W5.
 
 ## Prior Exact-Research Handoff Record
 
