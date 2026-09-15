@@ -41,6 +41,7 @@ PROBES = Path(__file__).resolve().parents[2] / "probes"
 #: Every file that may name a probe. Anything scanning for orphans has to read all of
 #: them, or a probe used by one checker looks dead to a run that only knew about another.
 CALLERS = (
+    "animate_view_contract.py",
     "check_accessibility.py",
     "check_animate_view.py",
     "check_animation_editor.py",

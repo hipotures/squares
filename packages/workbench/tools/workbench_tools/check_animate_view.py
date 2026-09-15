@@ -34,6 +34,7 @@ import numpy as np
 from PIL import Image
 from playwright.sync_api import Page, sync_playwright
 
+from workbench_tools import animate_view_contract
 from workbench_tools.build_site import build
 from workbench_tools.probes import probe
 
@@ -578,6 +579,7 @@ SECTIONS: tuple[Callable[[Session], str], ...] = (
     headline_roll,
     headline_space,
     stage_says_only_facts,
+    *animate_view_contract.SECTIONS,
     capture_baseline,
 )
 
