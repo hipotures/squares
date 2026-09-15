@@ -134,7 +134,7 @@ process execution.
 <a id="validation-tiers"></a>
 
 A **tier** selects validation steps; a **lane** selects tests within a behavioural step.
-The ordinary full checkpoint has 74 steps.
+The ordinary full checkpoint has 77 steps.
 The
 [validation efficiency plan](docs/project/specs/active/plan-2026-09-06-validation-efficiency-and-checkpoints.md)
 owns the current W5 work on cost, naming, and checkpoint placement.
@@ -159,16 +159,16 @@ alone is not full pre-merge evidence.
 
 | Tier | Who runs it, and when | Steps | Ceiling | Cost when last measured |
 | --- | --- | ---: | ---: | --- |
-| `--records` | contributor, before touching a registry; also every pull request | 32 of 76 | 300 s | 11.0 s |
-| `--edit` | contributor, in the edit loop | 46 of 76 | 240 s | 59.4 s |
+| `--records` | contributor, before touching a registry; also every pull request | 32 of 77 | 300 s | 11.0 s |
+| `--edit` | contributor, in the edit loop | 47 of 77 | 240 s | 59.4 s |
 | `--push` | contributor, before a push — the edit tier plus tests reachable from the diff (`--since`) | varies with the diff | 1800 s | about a minute for a narrow code change; a broad diff selects the whole suite and needs `--jobs 1`, see below |
-| `--fast` | contributor, at a block boundary; the union of the five tiers below | 65 of 76 | 600 s | record cleared 2026-09-07 when the corpus widened; 229.1 s locally, only the ceiling applies |
-| `--checks` | **CI, on every pull request**, in the `validate` job | 49 of 76 | 195 s | composition changed after two PR 160 runs exceeded the ceiling; only the ceiling applies |
-| `--frontend` | **CI, on every pull request**, in the `frontend` job, concurrently | 2 of 76 | 150 s | new partition; the first hosted run establishes its baseline |
-| `--geometry` | **CI, on every pull request**, in the `geometry` job, concurrently | 9 of 76 | 180 s | 91.6 s on CI, the mean of four readings |
-| `--suite` | **CI, on every pull request**, in the `suite` job, concurrently | 1 of 76 | 275 s | 183.4 s on CI, one reading of the lane as it now stands |
-| `--sweeps` | **CI, on every pull request**, in the `sweeps` job, concurrently | 4 of 76 | 210 s | record cleared 2026-09-07 when two of its four steps were split; 58.5 s locally, only the ceiling applies |
-| *(no flag)* | Full checkpoint before final review and at block close; main, dispatch, and daily CI | 76 of 76 | 3600 s | split across four jobs; not clocked whole |
+| `--fast` | contributor, at a block boundary; the union of the five tiers below | 66 of 77 | 600 s | record cleared 2026-09-07 when the corpus widened; 229.1 s locally, only the ceiling applies |
+| `--checks` | **CI, on every pull request**, in the `validate` job | 50 of 77 | 195 s | composition changed after two PR 160 runs exceeded the ceiling; only the ceiling applies |
+| `--frontend` | **CI, on every pull request**, in the `frontend` job, concurrently | 2 of 77 | 150 s | new partition; the first hosted run establishes its baseline |
+| `--geometry` | **CI, on every pull request**, in the `geometry` job, concurrently | 9 of 77 | 180 s | 91.6 s on CI, the mean of four readings |
+| `--suite` | **CI, on every pull request**, in the `suite` job, concurrently | 1 of 77 | 275 s | 183.4 s on CI, one reading of the lane as it now stands |
+| `--sweeps` | **CI, on every pull request**, in the `sweeps` job, concurrently | 4 of 77 | 210 s | record cleared 2026-09-07 when two of its four steps were split; 58.5 s locally, only the ceiling applies |
+| *(no flag)* | Full checkpoint before final review and at block close; main, dispatch, and daily CI | 77 of 77 | 3600 s | split across four jobs; not clocked whole |
 
 `--geometry`’s cost is a geometric mean of four readings at the reference shape.
 `--suite`’s is a single reading, because the lane it measures is new: merging PR 137
@@ -892,6 +892,54 @@ Both pin their working precision per case and print it beside the number it boun
 That is not decoration: a rank verdict is a judgement about a gap between singular
 values, and at mpmath’s ambient default the gap a probe can *see* is many decades
 narrower than the truth, with nothing in the output to say so.
+
+## Browser Code Lives in Files
+
+**No JavaScript in a Python string, with no exceptions.** Browser code lives in `.js`
+and `.ts` files, where Biome formats and lints it and `tsc` type-checks it.
+A Python string is invisible to all three, which is how a TeX escape doubled inside an
+f-string once reached a rendered page.
+The rule covers page probes, Playwright init scripts, Node scripts run by tests, and
+`<script>` bodies built in Python; tests and spikes included.
+
+A Python tool that drives a page uses a **probe**:
+
+1. Write one JavaScript expression, normally an arrow function taking one argument
+   object, in `probes/<tool>/<name>.js` beside the tool: `packing/devtools/probes/`,
+   `packing/tests/probes/`, or a spike’s own `probes/`. Declare any page global it reads
+   in a `.d.ts` in the same tree.
+2. Load it with `probe(PROBES, "<tool>/<name>")` from `sqpack.probes`, where `PROBES` is
+   that `probes` directory, and pass values as Playwright’s one argument:
+   `page.evaluate(probe(PROBES, "check_layout/slots"), {"n": 26})`. Never format a value
+   into the text. `add_init_script` takes no argument, so give it
+   `applied(probe(...), argument)`, which serialises the argument as JSON.
+3. Write the name out whole.
+   `devtools.check_probes` reads names from string literals, and a probe no literal
+   names fails as unused.
+
+The probes are in Biome’s scope, in the strict `tsconfig.packing-probes.json` program,
+and under the ESLint promise overlay.
+A Node script a Python tool runs goes in `packing/devtools/node/`, under
+`tsconfig.devtools-node.json`. The workbench package’s `workbench_tools.probes` is the
+same loader bound to `packages/workbench/probes/`.
+
+Two checks hold the rule, and both run in `--edit` and on every pull request as the
+`browser code lives in files` step:
+
+- `devtools.check_no_embedded_js` parses every Python file and fails on a built script
+  argument to Playwright’s evaluate family, a string that matches a JavaScript
+  signature, or a `<script>` body written in Python.
+  Its signatures and its ratchet allowlist are in
+  `packing/devtools/embedded-javascript.yaml`. The allowlist names each file that still
+  offends, its site count, and the bead that removes them; the check fails when a count
+  moves in either direction without the entry moving with it, and when a listed file is
+  clean. `--inventory` prints every site.
+- `devtools.check_probes` fails on a probe that does not evaluate to a function, one no
+  Python file beside its tree names, and a name no file answers.
+
+`tests/test_no_embedded_js_contract.py` plants each forbidden form and requires the
+guard to refuse it; three negative controls in `devtools/controls.yaml` do the same
+against the real tree.
 
 ## Safe Refactoring
 
