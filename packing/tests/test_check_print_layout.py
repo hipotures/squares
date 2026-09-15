@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import json
 import re
+from pathlib import Path
 from textwrap import dedent
 
 import pytest
@@ -41,32 +42,18 @@ from devtools.check_print_layout import (
     Probe,
     findings,
 )
-from devtools.render_explainer_pdf import SETTLED
+
+#: The Node scripts that run this module's probes against stand-ins.
+NODE = Path(__file__).resolve().parent / "node" / "check_print_layout"
 
 
 def test_layout_settlement_waits_for_pending_math() -> None:
     """Two animation frames cannot finish a readout still waiting for its font."""
-    script = dedent("""
-        const assert = require('node:assert/strict');
-        let finish;
-        const pendingMath = new Promise(resolve => { finish = resolve; });
-        const document = {documentElement: {offsetHeight: 100},
-          fonts: {ready: Promise.resolve()}};
-        const requestAnimationFrame = callback => queueMicrotask(callback);
-        globalThis.squaresMath = {settled: () => pendingMath};
-        let done = false;
-    """)
-    script += f"const settled = ({SETTLED})().then(() => {{ done = true; }});\n"
-    script += dedent("""
-        setImmediate(async () => {
-          assert.equal(done, false, 'math is still pending after the layout frames');
-          finish();
-          await settled;
-          assert.equal(done, true);
-        });
-    """)
     completed = node(
-        ["-"], return_completed_process=True, input=script, capture_output=True, text=True
+        [str(NODE / "settlement-waits-for-math.mjs")],
+        return_completed_process=True,
+        capture_output=True,
+        text=True,
     )
     assert completed.returncode == 0, completed.stderr
 

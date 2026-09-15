@@ -115,10 +115,10 @@ allowlist:
     sites: 34
     bead: think-3pox
   - path: packing/devtools/check_math_loading.py
-    sites: 20
+    sites: 2
     bead: think-3pox
   - path: packing/devtools/check_math_startup.py
-    sites: 6
+    sites: 5
     bead: think-3pox
   - path: packing/devtools/check_print_layout.py
     sites: 37
@@ -138,9 +138,6 @@ allowlist:
   - path: packing/devtools/render_explainer.py
     sites: 4
     bead: think-3pox
-  - path: packing/devtools/render_explainer_pdf.py
-    sites: 18
-    bead: think-3pox
   - path: packing/devtools/sans_instances.py
     sites: 7
     bead: think-3pox
@@ -148,16 +145,13 @@ allowlist:
     sites: 2
     bead: think-3pox
   - path: packing/tests/test_check_print_layout.py
-    sites: 21
+    sites: 18
     bead: think-3pox
   - path: packing/tests/test_check_published_site.py
     sites: 1
     bead: think-3pox
   - path: packing/tests/test_codex_log_rollup.py
     sites: 3
-    bead: think-3pox
-  - path: packing/tests/test_math_loading.py
-    sites: 24
     bead: think-3pox
   - path: packing/tests/test_math_startup.py
     sites: 2
@@ -168,17 +162,11 @@ allowlist:
   - path: packing/tests/test_motion_lab_interactive.py
     sites: 3
     bead: think-3pox
-  - path: packing/tests/test_pdf_math_browser.py
-    sites: 11
-    bead: think-3pox
   - path: packing/tests/test_prepare_explainer_math.py
     sites: 4
     bead: think-3pox
   - path: packing/tests/test_render_explainer_fonts.py
     sites: 13
-    bead: think-3pox
-  - path: packing/tests/test_render_explainer_pdf.py
-    sites: 15
     bead: think-3pox
   - path: packing/tests/test_sans_instances.py
     sites: 2
