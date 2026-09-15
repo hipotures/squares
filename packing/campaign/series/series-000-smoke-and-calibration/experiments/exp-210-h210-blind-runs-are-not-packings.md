@@ -22,7 +22,7 @@ experiment:
     tolerance: 1e-5 of a unit side of deepest pairwise overlap, chosen; the snapped observation
       beside it was run once and not kept (think-2ngs)
     host_system: macOS on Apple silicon, one headless Chromium
-    selftest_passed: true
+    selftest_passed: false
     precision:
       binary_bits: 53
       rounding: nearest-even

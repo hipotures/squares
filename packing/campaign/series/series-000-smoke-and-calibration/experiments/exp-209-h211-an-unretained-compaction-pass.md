@@ -21,7 +21,7 @@ experiment:
     method: numerical-f64
     tolerance: a move is accepted only if it creates no overlap deeper than 1e-9
     host_system: macOS on Apple silicon, one headless Chromium
-    selftest_passed: true
+    selftest_passed: false
     precision: unrecorded-historical
     migration_annotation: '2026-09-13: source reference mapped from pre-purge 6ed8bd56 to reachable
       f91fc7d4; the retained harness and workbench source trees compare equal in Git. Original
@@ -34,39 +34,24 @@ experiment:
     operator: claude-opus-5, unattended
     control: the same arrangement scattered outward by 0.15 of a side, then compacted
     candidate: the resolved arrangement, compacted
-    trials: 3320
-    interleaved: true
     commit: f91fc7d4
     entry_point: packing/devtools/bench_annealing.py
     command: a compaction pass over the resolver's output, with a scatter control
     record: run inline; the pass is not retained in the harness
   results:
-  - shape: conditions
-    metric: closed at the best of 800, resolved against resolved-then-compacted, n = 5
-    control_median: 0.958
-    candidate_median: 0.958
-    control_range:
-    - 0.958
-    - 0.958
-    candidate_range:
-    - 0.958
-    - 0.958
-    change_pct: 0.0
-    overlapping: true
   - shape: determination
-    question: does walking every square toward the box centre, as far as it will go without
-      overlapping, shrink the container the resolved arrangement needs
+    question: can the inline compaction pass's observation be reproduced from what was kept
     role: guard
-    outcome: no_progress
+    outcome: invalid
   complexity:
     lines_changed: 0
     notes: The compaction pass was run inline; its code and outputs were not kept.
   verdict:
     decision: unresolved
-    primary_criterion: closed at the best of 800, with and without compaction
-    reason: The historical compaction program and outputs were not retained, so its null result
-      and the inference that the resolver is not the ceiling cannot be reproduced or used to
-      exclude an optimization.
+    primary_criterion: whether the inline pass's observation can be reproduced from what was kept
+    reason: The compaction program, its inputs and its outputs were not kept, so the observation
+      cannot be reproduced and supports no conclusion about whether repaired arrangements are
+      locally compact.
     commit: f91fc7d4
   effort:
     stopped_by: dependency
@@ -98,7 +83,7 @@ to 3.028 at `n = 5`.
 The pass was written inline, and its code, inputs and outputs were not kept.
 The observation cannot be reproduced, so it does not show that the repaired arrangements
 are locally compact, and it does not rule out a better repair, translating or rotating.
-`think-3hb7` builds the pass as a retained instrument before anything depends on it.
+`think-na2i` builds the pass as a retained instrument before anything depends on it.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

@@ -68,7 +68,7 @@ The review found these distinct cases:
 | The report validator admits non-finite metrics, and the sweep path ranks results without applying that validator. | Demonstrated implementation defect. It can turn an invalid or non-finite outcome into a reported best. The retained aggregates do not show whether it changed a published result. | `think-1fpa` fixes every harness path; `think-nals` makes the definition fail closed and identical at every later ranking and display boundary. |
 | Large accepted seed values can alias in the generated JavaScript because the seed mix loses integer precision before the 32-bit operation. | Demonstrated public reproducibility defect. The small seed ranges in the recorded campaign are not known to be affected. | `think-dq1l` fixes the mixer and supported seed domain; `think-karf` enforces seed receipt and replay semantics at the strategy boundary. |
 | Raw annealing JSONL files are ignored and absent; retained summaries cannot reconstruct per-seed trials or disjoint blocks. | Deliberate storage choice with a material audit limitation. | `think-3eha` repaired the record contract, and `think-4z7d` produces distributions from durable inputs. Findings cite only retained cells and state what cannot be re-checked. |
-| `exp-209` records an inline compaction pass whose program and outputs were deliberately not retained. | Historical exploratory note, not replayable evidence under OR-1. | `think-3eha` marks the evidential limit; `think-3hb7` supplies the missing instrument before the algorithm or negative result is reused. |
+| `exp-209` records an inline compaction pass whose program and outputs were deliberately not retained. | Historical exploratory note, not replayable evidence under OR-1. | `think-3eha` marks the evidential limit; `think-na2i` builds the missing instrument before the algorithm or negative result is reused (`think-3hb7` closed as a disposition without one). |
 | Imported animation entries can acquire numerical assurance from an asserted `feasible` flag, and intermediate strategy frames can be relabelled with a later container side. | Demonstrated provenance and trace-semantics defects. | `think-sdmi` validates imported evidence; `think-karf` enforces executable strategy and trace semantics. |
 | Revision probes, research instruments and product entry points overlap. | Cleanup risk: deleting a probe can also delete its only semantic assertion. | `think-cqfc` inventories consumers and preserves unique controls before retiring obsolete code. |
 
@@ -332,7 +332,7 @@ Extend an existing gate only where a demonstrated provenance gap needs coverage.
 
 No new experiment starts in this phase.
 
-### B. Rebuild measurement and correct the narrative — `think-4z7d`, `think-jdgu`, `think-3hb7`
+### B. Rebuild measurement and correct the narrative — `think-4z7d`, `think-jdgu`, `think-na2i`
 
 `think-4z7d` supplies the committed reporter for acceptance rates, CPU work and
 disjoint-block distributions.
@@ -345,7 +345,7 @@ in the sweep, and a retained resolved deep block is not.
 Numerical claims are restated only after the repaired tool derives them from durable
 inputs.
 
-`think-3hb7` turns the unretained `exp-209` compaction pass into a reusable instrument
+`think-na2i` turns the unretained `exp-209` compaction pass into a reusable instrument
 with its control and outputs.
 Until then, the historical negative does not rule out a reusable compaction algorithm.
 
