@@ -20,6 +20,7 @@ Usage, from ``packing/``::
 from __future__ import annotations
 
 import argparse
+import io
 import math
 import os
 import tempfile
@@ -29,6 +30,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+import numpy as np
+from PIL import Image
 from playwright.sync_api import Page, sync_playwright
 
 from workbench_tools.build_site import build
@@ -394,6 +397,149 @@ def facts_handover(session: Session) -> str:
     return f"the facts hand over part by part, {held_digits} kept digits held"
 
 
+def _near(a: list[float] | None, b: list[float] | None, within: float = 0.5) -> bool:
+    return (
+        a is not None
+        and b is not None
+        and all(abs(x - y) <= within for x, y in zip(a, b, strict=True))
+    )
+
+
+def headline_roll(session: Session) -> str:
+    """`n =` holds still at full ink while only the number crossfades, in place."""
+    equals_at: list[float] | None = None
+    for n in (10, 100, 101):
+        schedule, at = handover_instants(session, n)
+        samples = session.look("headline/roll", n=n, at=at)
+        require_crossfade(
+            session,
+            f"headline, step into {n}",
+            schedule,
+            at,
+            [s["arriving"]["seen"] for s in samples],
+        )
+        first = samples[0]
+        for sample in samples:
+            label = f"headline, step into {n} at t = {sample['t']:.3f}"
+            still, leaving, arriving = sample["still"], sample["leaving"], sample["arriving"]
+            session.require(
+                abs(leaving["seen"] + arriving["seen"] - 1) <= OPACITY_TOLERANCE,
+                f"{label}: the numbers are seen at "
+                f"{leaving['seen']:.3f} + {arriving['seen']:.3f}",
+            )
+            session.require(
+                abs(still["seen"] - 1) <= OPACITY_TOLERANCE
+                and still["equalsShown"]
+                and not still["digitsShown"],
+                f"{label}: the still `n =` is not `n =` alone at full ink: {still}",
+            )
+            session.require(
+                leaving["digitsShown"]
+                and arriving["digitsShown"]
+                and not leaving["equalsShown"]
+                and not arriving["equalsShown"],
+                f"{label}: a rolling copy draws `n =` or hides its number: "
+                f"{leaving}, {arriving}",
+            )
+            session.require(
+                (leaving["digits"], arriving["digits"]) == (str(n - 1), str(n)),
+                f"{label}: the numbers read {leaving['digits']} and {arriving['digits']}",
+            )
+            equals_at = equals_at or still["equalsAt"]
+            session.require(
+                _near(still["equalsAt"], equals_at),
+                f"{label}: `=` moved from {equals_at} to {still['equalsAt']}",
+            )
+            session.require(
+                _near(leaving["digitsAt"], first["leaving"]["digitsAt"])
+                and _near(arriving["digitsAt"], first["arriving"]["digitsAt"])
+                and _near(leaving["digitsAt"], still["digitsAt"])
+                and _near(arriving["digitsAt"], still["digitsAt"]),
+                f"{label}: a rolling number is not where the still copy leaves room for it: "
+                f"{leaving['digitsAt']}, {arriving['digitsAt']} against {still['digitsAt']}",
+            )
+    return "`n =` holds while the number crossfades in place"
+
+
+#: The elements whose text the stage may draw: the gap bar, the facts panel and the headline.
+DRAWN_TEXT_OWNERS = ("gapbar", "facts-a", "facts-b", "numeral-static", "numeral-a", "numeral-b")
+
+
+def stage_says_only_facts(session: Session) -> str:
+    """No caption, legend, step header or closed-form line: the stage draws only its facts."""
+    states = 0
+    style_before = session.api(("state",))["style"]
+    for capture in (False, True):
+        for style in ("tween", "physics"):
+            for n in (17, 110):
+                for at in (0.0, 0.5, 1.0):
+                    session.api(
+                        ("pause",),
+                        ("setCapture", capture),
+                        ("setStyle", style),
+                        ("setStepN", n),
+                    )
+                    session.api(("seek", session.api(("duration",)) * at))
+                    states += 1
+                    label = (
+                        f"{style} step into {n} at {at:.0%}{' in capture' if capture else ''}"
+                    )
+                    strays = [
+                        d
+                        for d in session.look("stage/text-owners")
+                        if not str(d["owner"]).startswith(DRAWN_TEXT_OWNERS)
+                    ]
+                    session.require(
+                        not strays, f"{label}: the stage draws other text: {strays[:4]}"
+                    )
+                    lines = session.look("facts/slot-lines")
+                    session.require(
+                        len(lines) >= 10 and all(slot["lines"] <= 1 for slot in lines),
+                        f"{label}: a facts slot draws more than one line: "
+                        f"{[slot for slot in lines if slot['lines'] > 1]}",
+                    )
+    session.api(("setCapture", False), ("setStyle", style_before), ("seek", 0))
+    return f"the stage draws only its facts in {states} states"
+
+
+def headline_space(session: Session) -> str:
+    """The headline is centred in the space between the container's floor and the stage's foot.
+
+    Read from a capture-mode screenshot rather than from element boxes, because a box is not
+    where the glyphs are: KaTeX's strut opens well above the digits.
+    """
+    page = session.page
+    session.api(("pause",), ("setCapture", True))
+    for n in (2, 17, 100):
+        session.api(("setStepN", n), ("seek", 0))
+        session.look("animate/clear-selection")
+        page.wait_for_timeout(300)
+        left, top, width, _ = session.look("layout/stage-boxes")["stage"]
+        scale = width / 1920
+        image = np.asarray(Image.open(io.BytesIO(page.screenshot())).convert("RGB")).astype(int)
+        paper = image[int(top + 1076 * scale), int(left + 100 * scale)]
+        band = image[
+            int(top) : int(top + 1080 * scale),
+            int(left + 60 * scale) : int(left + 1060 * scale),
+        ]
+        inked = np.abs(band - paper).sum(axis=2) > 60
+        wide = np.where(inked.mean(axis=1) > 0.5)[0]
+        floor = (wide[wide < 975 * scale].max() + 1) / scale
+        rows = np.where(inked.any(axis=1))[0] / scale
+        ink = rows[rows > floor + 4]
+        session.require(ink.size > 0, f"no headline ink under the container at n = {n}")
+        if ink.size == 0:
+            continue
+        above, under = ink.min() - floor, 1080 - (ink.max() + 1 / scale)
+        session.require(
+            abs(above - under) <= 2,
+            f"the headline at n = {n} is not centred in its space: {above:.1f} above, "
+            f"{under:.1f} below",
+        )
+    session.api(("setCapture", False), ("seek", 0))
+    return "the headline is centred under the container"
+
+
 SECTIONS: tuple[Callable[[Session], str], ...] = (
     keyboard_ownership,
     gap_bar_through_dwell,
@@ -405,6 +551,9 @@ SECTIONS: tuple[Callable[[Session], str], ...] = (
     drag_ends,
     drag_past_walls,
     facts_handover,
+    headline_roll,
+    headline_space,
+    stage_says_only_facts,
 )
 
 
