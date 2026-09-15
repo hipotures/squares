@@ -182,6 +182,50 @@ def test_codex_renderer_accumulates_distinct_sessions_on_one_branch(
     assert "`second.yaml` — declared by `session-999`" in rendered
 
 
+def test_check_mode_loads_each_corpus_document_once(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    usage = tmp_path / "usage"
+    sessions = tmp_path / "sessions"
+    agendas = tmp_path / "agendas"
+    usage.mkdir()
+    sessions.mkdir()
+    agendas.mkdir()
+    _receipt(usage / "first.yaml")
+    _receipt(usage / "second.yaml")
+    _session(
+        sessions / "session-998-first.md",
+        "first.yaml",
+        branch="codex/first",
+        session_id="session-998",
+    )
+    _session(
+        sessions / "session-999-second.md",
+        "second.yaml",
+        branch="codex/second",
+        session_id="session-999",
+    )
+    monkeypatch.setattr(renderer, "USAGE", usage)
+    monkeypatch.setattr(renderer, "SESSIONS", sessions)
+    monkeypatch.setattr(renderer, "AGENDAS", agendas)
+
+    loads = 0
+    load = renderer.safe_load
+
+    def counted_load(source: str) -> object:
+        nonlocal loads
+        loads += 1
+        return load(source)
+
+    monkeypatch.setattr(renderer, "safe_load", counted_load)
+
+    assert renderer.main(["--check"]) == 0
+    assert loads == 4
+    assert "renders for 2 branches" in capsys.readouterr().out
+
+
 def test_codex_renderer_rejects_one_receipt_claimed_for_two_branches(
     monkeypatch, tmp_path: Path
 ) -> None:

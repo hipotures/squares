@@ -138,8 +138,8 @@ hypothesis status and summarizes experiment verdicts, and the
 | Record | Count | State at the cutoff |
 | --- | ---: | --- |
 | Agendas | 35 | 15 active; 14 completed; 5 paused; 1 superseded |
-| Commitments | 342 | 174 complete; 59 stopped; 65 blocked; 16 ready; 21 tentative; 7 in progress |
-| Sessions | 130 | 84 completed; 46 stopped; all terminal |
+| Commitments | 342 | 175 complete; 59 stopped; 64 blocked; 16 ready; 21 tentative; 7 in progress |
+| Sessions | 131 | 84 completed; 47 stopped; all terminal |
 | Explorations | 29 | 17 linked to proposed hypotheses; 12 uncodified |
 | Hypotheses | 138 | 25 confirmed; 24 refuted; 48 blocked; 10 unresolved; 2 open; 26 open questions; 2 result registered; 1 abandoned; 0 running |
 | Experiments | 116 | 38 accepted; 29 rejected; 25 unresolved; 11 baseline; 11 blocked; 2 abandoned; 0 in progress |
@@ -193,15 +193,20 @@ and roadmap integration are also complete and certified; they ran no scientific 
 and changed no frontier claim.
 BC-346’s
 [W10 route-selection review](docs/project/reviews/review-2026-09-14-n11-w10-route-selection.md)
-is certified and has selected the due BC-340 efficiency checkpoint.
+is certified and selected the due BC-340 efficiency checkpoint.
+BC-340 is now complete: VE-005 removed repeated whole-corpus parsing from the branch
+cost rollup behind an exactly-once load guard and unchanged-output checks.
+Its three alternating local pairs reduced the rollup’s median from 47.72 to 2.31
+seconds, and the first candidate hosted checks tier passed in 106.38 seconds against the
+unchanged 195-second ceiling.
+This is validation evidence, not new mathematics.
 The current order is:
 
-1. Run BC-340 as a separate W5 block and pull request.
-   Measure the current gate first and accept at most one demonstrated repair behind an
-   equivalence guard, or retain a measured no-change decision.
-2. Return to BC-353 / `think-d3h5` for a fresh W10 after W5, with A at side `96/25` as
-   the presumptive first scientific choice and S as the fallback if A cannot freeze a
-   complete admission slice.
+1. Merge BC-340’s separate W5 pull request, then run BC-353 / `think-d3h5` as a fresh
+   W10 planning block from that merge.
+2. Reconsider A at side `96/25` as the presumptive first scientific choice and S as the
+   fallback if A cannot freeze a complete admission slice; select exactly one and run no
+   scientific target in W10.
 3. Treat A, S, global angular resources, and B as the first advisory tier.
    A is the strongest route to a material `n = 11` lower bound; S is the best bounded
    deliverable; angular resources offer a cheap optimal-face screen; and B is the
@@ -487,6 +492,7 @@ case or experiment separately.
 | [Reuse Bridge Row Inventory](packing/benchmarks/validation-efficiency/experiments/VE-002-bridge.md) | research synthesis | record | retained | — |
 | [Start Exact Verification Earlier](packing/benchmarks/validation-efficiency/experiments/VE-003-checks-start-order.md) | research synthesis | record | retained | — |
 | [Start Exact Verification Earlier: Corrected Setup](packing/benchmarks/validation-efficiency/experiments/VE-004-checks-start-order.md) | research synthesis | record | retained | — |
+| [Parse the Branch-Cost Corpus Once](packing/benchmarks/validation-efficiency/experiments/VE-005-rollup-corpus-snapshot.md) | research synthesis | record | retained | — |
 | [Validation Efficiency Campaign](packing/benchmarks/validation-efficiency/README.md) | component scope and use | supporting | maintained | — |
 | [Validation Efficiency Results](packing/benchmarks/validation-efficiency/report.md) | generated status view | generated | generated | — |
 | [Gate Cost at the Widened Corpus](packing/benchmarks/gate-cost-at-324/README.md) | research synthesis | record | retained | — |
@@ -866,23 +872,28 @@ controller, not permission to blur contracts.
 
 ### Current Handoff
 
-[Session 130](packing/campaign/agent-sessions/session-130-n11-w10-route-selection.md)
-records the W10 cadence audit, recent-merge stability review, and ten-candidate route
-comparison. It ran no efficiency repair and no scientific target.
+[Session 131](packing/campaign/agent-sessions/session-131-n11-w5-validation-efficiency.md)
+records the completed BC-340 efficiency checkpoint.
+It accepted one measured repair: the branch-cost rollup now loads its receipt and
+session corpus once per invocation, rather than once per rendered branch.
+Three alternating pairs passed VE-005’s fixed acceptance rule and permanent equivalence
+guards; the first candidate hosted checks tier passed at 106.38 seconds.
+The 195-second ceiling and its unarmed hosted baseline remain unchanged until multiple
+post-change readings exist.
+No scientific target ran.
 The scientific evidence cutoff remains main revision
 `80bcdbb0819504354e1278c37f211dd8cc2158fb`, where the latest merged stack is green and
 the T-026 lower bound remains the frontier.
 
-**Selected next entry:** `think-1ydi`, the BC-340 W5 efficiency checkpoint.
+**Selected next entry:** `think-d3h5`, the BC-353 post-W5 W10 route-selection block.
 
-BC-346’s planning source passed its exact-revision gate, and the canonical handoff has
-advanced to BC-340. A conservative derivation counts eight substantive non-W5 blocks
-after Session 116/BC-322, so OR-12 makes W5 mandatory.
-BC-340 then measures the current gate and addresses at most one demonstrated bottleneck
-behind an equivalence guard, or records a measured no-change result.
-It receives its own branch and pull request and runs no scientific target.
-A fresh W10 then makes the scientific selection; all ten candidate cells remain behind
-that post-W5 gate, so closing BC-346 released only the efficiency block.
+BC-340 and its primary bead are terminal, and agenda-036 marks BC-353 ready.
+Execution still begins only after PR 174 merges, preserving the promised branch
+boundary. BC-353 will consume the W5 receipt, recheck repository stability, compare all
+ten candidate routes on the existing audit frame, and select exactly one scientific
+admission block. Route A at side `96/25` remains presumptive, Route S remains its
+explicit admission fallback, and no candidate has execution authority before that W10
+closes and merges.
 
 The older BC329, weighted-atom stages 3–4, and BC303 H-160/H-162 target lanes are
 paused. Their admitted implementations, registrations, and controls remain evidence; no
@@ -4050,14 +4061,15 @@ in separate tables: their units differ, and the same work can appear in both.
 | `codex-task-tree-session-123.yaml` | session-123 | 87 | 18.56 h | 6.18 h | 6.18 h | yes |
 | `codex-task-tree-session-124-publication.yaml` | session-124 | 154 | 6.97 h | 0.41 h | 0.41 h | yes |
 | `codex-task-tree-session-126.yaml` | session-126 | 576 | 4.31 h | 2.39 h | 2.39 h | yes |
+| `codex-task-tree-session-131.yaml` | session-131 | 313 | 1.24 h | 0.75 h | 0.75 h | yes |
 | `codex-task-tree-pr137-publication-tail.yaml` | unattributed | 610 | 4.39 h | 1.77 h | 1.82 h | yes |
 | `codex-task-tree-pr142-publication-tail.yaml` | unattributed | 136 | 0.87 h | 0.41 h | 0.58 h | yes |
 
 | Coverage | sessions |
 | --- | ---: |
-| measured | 82 |
+| measured | 83 |
 | unmeasured | 48 |
-| **total** | **130** |
+| **total** | **131** |
 
 <!-- END GENERATED: session-close-report -->
 

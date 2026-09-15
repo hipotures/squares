@@ -12,6 +12,7 @@ Selected test hashes do not establish whole-tree equivalence. Within-arm whole-t
 | [VE-002](experiments/VE-002-bridge.md) | 84.30 (81.13-86.28), n=3 | 31.72 (30.99-36.51), n=3 | Screen passes (62.4% median reduction); correctness and complexity review required; whole-tree diff varied within an arm: affected-source audit required, whole-tree equivalence is not established |
 | [VE-003](experiments/VE-003-checks-start-order.md) | No passing samples | No passing samples | Incomplete or unsuccessful observation; no acceptance |
 | [VE-004](experiments/VE-004-checks-start-order.md) | 93.18 (90.81-94.13), n=3 | 71.84 (64.96-73.09), n=3 | Screen passes (22.9% median reduction); correctness and complexity review required |
+| [VE-005](experiments/VE-005-rollup-corpus-snapshot.md) | 47.72 (44.96-50.80), n=3 | 2.31 (2.29-3.20), n=3 | Screen passes (95.2% median reduction); correctness and complexity review required; whole-tree diff varied within an arm: affected-source audit required, whole-tree equivalence is not established |
 
 ## Observations
 
@@ -36,6 +37,12 @@ Every observation is listed, including incomplete or failed work.
 - `fcdea8eb219947dd943b707c4b1ee045`: checks-order-candidate-v2, passed, 64.96s, 1 test cases; [output](runs/fcdea8eb219947dd943b707c4b1ee045.stdout.log), [errors](runs/fcdea8eb219947dd943b707c4b1ee045.stderr.log).
 - `c011890ae42c4c748761503c40a5a903`: checks-order-control-v2, passed, 90.81s, 1 test cases; [output](runs/c011890ae42c4c748761503c40a5a903.stdout.log), [errors](runs/c011890ae42c4c748761503c40a5a903.stderr.log).
 - `12a8d50e0eb44ae7abd8d1b1d6a74ef4`: checks-order-candidate-v2, passed, 71.84s, 1 test cases; [output](runs/12a8d50e0eb44ae7abd8d1b1d6a74ef4.stdout.log), [errors](runs/12a8d50e0eb44ae7abd8d1b1d6a74ef4.stderr.log).
+- `b0e18d21bf2c4956a76a061d54def2f7`: rollup-corpus-control, passed, 47.72s, 1 test cases; [output](runs/b0e18d21bf2c4956a76a061d54def2f7.stdout.log), [errors](runs/b0e18d21bf2c4956a76a061d54def2f7.stderr.log).
+- `380772531daf4c1a9bacafb510fdd01c`: rollup-corpus-candidate, passed, 2.29s, 1 test cases; [output](runs/380772531daf4c1a9bacafb510fdd01c.stdout.log), [errors](runs/380772531daf4c1a9bacafb510fdd01c.stderr.log).
+- `8cd347b72e0f478091441a1ba124489b`: rollup-corpus-control, passed, 44.96s, 1 test cases; [output](runs/8cd347b72e0f478091441a1ba124489b.stdout.log), [errors](runs/8cd347b72e0f478091441a1ba124489b.stderr.log).
+- `9548d7299e50469180f6f37a58027e13`: rollup-corpus-candidate, passed, 3.20s, 1 test cases; [output](runs/9548d7299e50469180f6f37a58027e13.stdout.log), [errors](runs/9548d7299e50469180f6f37a58027e13.stderr.log).
+- `3ea1ba12b3314ffa8530235f20062d6f`: rollup-corpus-control, passed, 50.80s, 1 test cases; [output](runs/3ea1ba12b3314ffa8530235f20062d6f.stdout.log), [errors](runs/3ea1ba12b3314ffa8530235f20062d6f.stderr.log).
+- `954782ba85ac461e8f046fff6eb454a0`: rollup-corpus-candidate, passed, 2.31s, 1 test cases; [output](runs/954782ba85ac461e8f046fff6eb454a0.stdout.log), [errors](runs/954782ba85ac461e8f046fff6eb454a0.stderr.log).
 
 The append-only [receipts](runs/receipts.jsonl) retain commands and provenance.
 
