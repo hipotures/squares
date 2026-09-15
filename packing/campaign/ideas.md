@@ -531,11 +531,13 @@ in the finite optimum.
 | 156 | Admit interior duality and export the transported full-unit obstruction | shaped |  | Compactness, finite-mask LP duality, and uniform atom smearing give equality with the density problem; retain the reviewed theorem contract and a consumer-ready unit-family export if needed. No search at `3.83–3.85` is necessary, and equality classification remains open. |
 | 157 | Test weighted-site expressiveness on realizable square traces | shaped |  | One frozen five-site motif has at most 32 traces and 80 ordinary threshold atoms on those sites. A witnessed realizable subset with domination cost above one proves a local gain; cost at most one on all realizable traces disproves its multiplicity advantage on that domain. Ordinary replacement columns may still improve the current catalog. Neither decides the global covering budget. |
 | 158 | Preserve a genuine floor advantage through square geometry | shaped |  | The reviewed five-site profile `floor(|T|/2)` costs two while every ordinary threshold mixture dominating all traces costs at least `5/2`. Find admitted geometric traces retaining multiple charge levels before widening the full certificate format. |
-| 159 | Use seven-mark ownership and one shared surplus allowance | shaped |  | BC303 forces at least seven of eight marks to be owned, with 80 abstract co-owned/split patterns and `4+s` owner cores. One source-bound parent-geometry or common-surplus comparison must add information beyond the retained neutral co-owner counterexample. |
+| 159 | Use seven-mark ownership and one shared surplus allowance | registered | [H-159](hypotheses/H-159-bc303-one-corner-surplus.md) | The accepted [selection-routing analysis](../../docs/project/research/research-2026-09-12-n11-selection-routing-first-principles.md) writes the exact obligation as `Gamma(P) intersect G != empty`. For T-023’s two uniform tuples, 16 maximal avoiding products reduce it to local availability and forced-type consistency. Exact four-parent controls show ownership and compatibility alone prove neither. H-159 narrows this broad idea to the bottom-left role-C T1 inequality tested by the disclosed literal parent; T2 and global routing remain separate. |
 | 160 | Require one owner to serve two compatible residual squares | shaped |  | Freeze a disjoint residual pair with positive unary controls, then test the intersection of its complete owner domains. Empty intersection reveals relational information that independent footprints lose; exp149/151 are unsuitable controls. |
-| 161 | Charge a normalized component connecting corner owners | shaped |  | At most three unit squares touch a wall; S1 yields at most three physical contact components and a path between owners from different corners. A complete anchored component cell must change a resource inequality; no short path, common angle, or rigidity follows. |
+| 161 | Charge a normalized component connecting corner owners | shaped |  | S1 yields at most three physical contact components. The accepted routing analysis proves that some shortest path between different-corner owners has at most `9-sigma` parents and that right/top owners need at least three parents to the distant normalized wall. These are existential and distant-wall bounds, not a prescribed short path, common angle, rigidity theorem, or exclusion. |
 | 162 | Use mixed angle-count profiles with one resource budget | shaped |  | For a proved `(9,2)` branch, test `M < 9*d0 + 2*d1` against the same language’s uniform-demand control; a separate point-only versus threshold comparison holds the profile fixed. Exact class boundaries and physical unit-to-core assignment are premises; no multiplicity extension is required first. |
 | 163 | Compose globally valid integer charges before a higher-rank search | shaped |  | A floor of a nonnegative rational combination of valid integer charges has the correspondingly rounded global budget. Retain an explicitly separating charge and complete pose evaluator before expanding the format; finite-support validity alone is insufficient. |
+| 164 | Sweep BC303 C and S first-owner charges under the accepted T2 domains | registered | [H-160](hypotheses/H-160-bc303-t2-charge-filters.md) | [X-029](explorations/X-029-bc303-t2-exact-geometry-draft.md) and the accepted charge bridge give complete open-cell C and sufficient first-owner S tests. A low C cell needs physical-parent replay to refute opposite T2; a low S strip cell only defeats the sufficient filter. |
+| 165 | Charge the exact BC303 literal parent union | registered; rejected by exp-159 | [H-161](hypotheses/H-161-bc303-literal-parent-union.md) | The source-bound closed Q0 mass is `N=4000015`, below both frozen cutoffs. Each necessary budget retains `1048233` units of slack, so this resource test excludes neither the literal parent nor its four-corner tuple. Idea 164 belongs to the parallel T2 branch. |
 
 ## Reconciled Daytime Portfolio — X-028
 
@@ -544,6 +546,31 @@ daytime portfolio as a draft options record and reconciles it with T-026, exp-15
 X-027. It adds no hypothesis or scientific claim.
 Its order is a readiness judgment, with a separate discriminator and stopping condition
 for each route; the active agenda still owns execution.
+
+## Post-T1 Proof Obligations — X-030
+
+[X-030](explorations/X-030-n11-post-t1-proof-obligations-draft.md) records the
+independently reviewed parent-union inequality, its one-parent and four-parent integer
+thresholds, and the remaining steps from a local exclusion to a complete selection
+argument. It also places the BC329 packet, T2 charge decision, weighted trace test, and
+other options against their separate acceptance conditions.
+Exp-159 measured the literal parent $Q_0$ at $N=4000015$ source units; the T2 C/S target
+charges remain unrun.
+X-030 registers no additional target or bound.
+
+## Floor-Normalized T2 Helper — X-031
+
+[X-031](explorations/X-031-bc303-floor-normalized-t2-helper-draft.md) retains two
+source-distinct mathematical reviews of the eleven-core floor account.
+It lowers the separate local helper’s first passing integer masses to $4524132$ for C
+and $8524147$ for an actual S pair; the same $4524132$ first-owner strip cutoff is only
+sufficient for S. H-161’s failed literal parent-union test is locally stable under
+sufficiently small admissible perturbations, without proving an extension.
+The separate [H-162 filter](hypotheses/H-162-bc303-floor-normalized-t2-filter.md) and
+[exp-160 analysis](series/series-000-smoke-and-calibration/experiments/exp-160-bc303-floor-normalized-t2-filter-analysis.md)
+prospectively compare complete C and S first-owner strip minima from one admitted
+exp-158 receipt. They do not register the complete actual-S condition.
+H-160/exp-158 remain frozen and unrun.
 
 ## Dead ends
 

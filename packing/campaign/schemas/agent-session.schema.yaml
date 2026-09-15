@@ -92,6 +92,13 @@ properties:
     type: string
     format: date-time
     description: Optional offset-aware hard deadline for this session.
+  ended_at:
+    type: string
+    format: date-time
+    description: >-
+      Optional offset-aware instant at which the session became terminal. Required by
+      the synopsis handoff selector for numbered sessions from session-128 onward;
+      `deadline_at` is a plan and must never substitute for this observed timestamp.
   branch:
     type: string
     minLength: 1
