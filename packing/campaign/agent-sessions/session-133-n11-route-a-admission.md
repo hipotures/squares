@@ -15,7 +15,6 @@ session:
   branch: codex/n11-route-a-admission
   primary_bead: think-0t5y
   status: stopped
-  certification_pending: think-a1e8
   goal: >-
     Decide whether one complete same-corner availability-blocker root at side 96/25 can
     be represented with shared physical geometry and checked exactly before any
@@ -205,6 +204,9 @@ session:
   - >-
     PR 177 entry run 34922167250 passed mergeability, suite, geometry, sweeps, and macOS
     portability; validate failed on the expected nonterminal Session 133 record.
+  - >-
+    full gate: fast at 7afd35550a0065b86a06ea75ad175157a70b7560: passed (GitHub
+    Actions run 34995673723 after terminal records were rendered)
   resource_rollups:
   - packing/campaign/resource-usage/codex-task-tree-session-133.yaml
   stop_reason: >-
