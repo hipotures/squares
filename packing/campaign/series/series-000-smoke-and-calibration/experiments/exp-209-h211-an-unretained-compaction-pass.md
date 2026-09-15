@@ -11,7 +11,7 @@ experiment:
   title: A compaction pass over repaired runs, run inline and not kept
   date: '2026-09-12'
   hypotheses:
-  - H-211
+  - H-212
   tier: exploratory
   subject:
     label: the resolved arrangements, tested for local compactness
@@ -64,6 +64,10 @@ experiment:
 
 **Rewritten 2026-09-14.** An earlier version drew a conclusion this round cannot
 support. The previous text is at commit `a40d272c`.
+
+**Filed under the open question
+[H-212](../../../hypotheses/H-212-the-workbench-physics-as-a-search.md).** The pass
+tested no registered claim; it was filed under H-211, the shake dial, until 2026-09-14.
 
 ## What Was Tried
 

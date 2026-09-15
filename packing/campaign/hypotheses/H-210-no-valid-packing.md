@@ -32,7 +32,12 @@ hypothesis:
 ---
 # H-210 — the blind physics never settles to a valid packing
 
-**Registered so the claim can be tested rather than assumed.**
+**Registered so the claim can be tested rather than assumed.** It was registered after
+its data: the runs
+[exp-210](../series/series-000-smoke-and-calibration/experiments/exp-210-h210-blind-runs-are-not-packings.md)
+reports came first, so that round is the exploratory data behind the claim, filed under
+the open question [H-212](H-212-the-workbench-physics-as-a-search.md), and not its test.
+The test is a preregistered round on seed blocks those runs did not use.
 
 Every blind run observed ended with squares overlapping: in 123,190 runs of the repaired
 rounds, whose rows are not retained, the deepest overlap before repair ranged from 0.002

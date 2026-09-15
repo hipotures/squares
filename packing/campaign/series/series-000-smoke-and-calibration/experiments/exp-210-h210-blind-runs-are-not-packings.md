@@ -11,7 +11,7 @@ experiment:
   title: Blind runs of the workbench's physics end with squares overlapping
   date: '2026-09-12'
   hypotheses:
-  - H-210
+  - H-212
   tier: exploratory
   subject:
     label: the workbench's contact simulation in blind mode, which withholds the destination poses
@@ -78,6 +78,11 @@ experiment:
 
 **Rewritten 2026-09-14** to remove superseded framing and layered corrections.
 The previous text is at commit `a40d272c`.
+
+**Exploratory data, filed under the open question
+[H-212](../../../hypotheses/H-212-the-workbench-physics-as-a-search.md).** These runs
+came first, at `d3c3a778`, and H-210 was registered from them at `385707be`, so they
+cannot also be its test.
 
 ## What Was Measured
 

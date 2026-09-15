@@ -33,6 +33,11 @@ hypothesis:
 ---
 # H-211 — the shake has a sweet spot, and the shipped value is far below it
 
+**Registered after its data, and untested.** The table below was in hand when this claim
+was registered, so exp-208, which reports it, is the exploratory data behind the claim,
+filed under the open question [H-212](H-212-the-workbench-physics-as-a-search.md).
+The test is a preregistered round on seed blocks or `n` that exp-208 did not use.
+
 The best of the first 1,000 runs in `closed`, with 3,000 repaired runs per cell
 ([exp-208](../series/series-000-smoke-and-calibration/experiments/exp-208-h211-the-shake-dial.md)):
 
@@ -54,10 +59,12 @@ Levels 1, 3, 5, 7 and 9 have no repaired runs.
 which was not measured.
 Each cell is one prefix without spread, and only three `n` were swept.
 
-**The mechanism this suggests, and does not establish.** The shake is the only
-randomness in the run, so below some amplitude every restart lands in the same basin and
-more runs buy nothing, while above it the run is thrown out of the basin it needs.
-The dial is therefore a search parameter that the page sets for a presentational reason.
+**What the cells suggest, and do not establish.** The shake is the only randomness in
+the run, so at level 0 every seed of an `n` gives the same run.
+At levels 2 and 4 the runs do differ, from −0.225 to −0.054 at `n = 5` and level 2, but
+none of 3,000 beat the grid; at levels 6, 8 and 10 the best one usually did.
+Why a larger shake reaches those few runs is not measured.
+The dial is a search parameter that the page sets for a presentational reason.
 
 **What would refute it.** A level between 0 and 4 whose best-of-k matches 6 to 8’s on a
 set of n it was not tuned on; or a maximum that moves with n far enough that “6 to 8” is

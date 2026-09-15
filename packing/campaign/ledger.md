@@ -909,8 +909,9 @@ Status: **active**. Reconcile the merged research record, then choose among rout
 | H-207 | unresolved | search | At equal total cost, running k independent blind trials and taking the | n: 5* 11 17 29 | 1 |  | 1 round unrecorded |
 | H-208 | blocked | search | Where a blind run ends is decided by where the new square is dropped a | n: 5 10 11 17 26 29 | 0 |  |  |
 | H-209 | blocked | search | No combination of the workbench's exposed parameters -- the shake dial | n: 5 10 11 17 26 29 | 0 |  |  |
-| H-210 | unresolved | search | No blind run of the workbench's physics ends on a valid packing. At ev | n: 5 10 11* 17 26 29 | 1 |  | 1 round unrecorded |
-| H-211 | unresolved | search | The workbench's shake dial has a maximum for search quality between le | n: 5 10 11* 17 26 29 | 2 |  | 2 rounds unrecorded |
+| H-210 | open | search | No blind run of the workbench's physics ends on a valid packing. At ev | n: 5 10 11 17 26 29 | 0 |  |  |
+| H-211 | open | search | The workbench's shake dial has a maximum for search quality between le | n: 5 10 11 17 26 29 | 0 |  |  |
+| H-212 | open question | search | What does the workbench's blind physics do when its runs are measured  |  | 3 |  | 3 rounds unrecorded |
 
 ## Needs review — held for a human, not decided
 
@@ -995,9 +996,9 @@ Status: **active**. Reconcile the merged research record, then choose among rout
 | exp-156 | series-000 | 11 | Codex root coordinator; prospective strategy independently audited by GPT-6 Astra Max | H-158 | The sole run found that the old B-only model already excludes the first selected owner, making parent-domain gain impossible there by set inclusion. The later owners were not tested, so this complete fixed-protocol result neither accepts nor rejects H-158. |
 | exp-206 | series-000 | 11 | claude-opus-5 | H-205 | The guard clause is met decisively and is the point of the round: 16 of 16 runs end on packings that an independent oracle confirms, against 0 of 48 for the penalty physics, which settles the precondition the 2026-09-08 calibration failed. The accuracy clause is missed by three cells of four. The failure is localised rather than diffuse -- every failed run failed at the first tightening and never moved -- so the repair is in the container schedule and the restart policy, not in the projections. |
 | exp-207 | series-000 | 5 | claude-opus-5, unattended | H-207 | At n = 5 the best of the first 1,000 repaired runs is 0.28% above the record while a single run is worse than the grid, but these are prefix values from one seed stream with no spread, and no schedule was compared at equal cost, so H-207's criterion was not tested. |
-| exp-208 | series-000 | 11 | claude-opus-5, unattended | H-211 | At levels 0, 2 and 4 no repaired run in 3,000 beat the grid at n = 5, 10 or 11, and at levels 6, 8 and 10 the best run did in eight of nine cells, the ninth within 5,000 seeds, but each value is one prefix from one seed stream and the page's own level 3 was not measured on repaired runs. |
-| exp-209 | series-000 | 11 | claude-opus-5, unattended | H-211 | The compaction program, its inputs and its outputs were not kept, so the observation cannot be reproduced and supports no conclusion about whether repaired arrangements are locally compact. |
-| exp-210 | series-000 | 11 | claude-opus-5, unattended | H-210 | Every blind run observed ended overlapping, but the snapped control was measured once with a probe variant that was not kept, and neither the trials nor their final poses are in the repository, so the observation cannot be re-checked from it. |
+| exp-208 | series-000 | 11 | claude-opus-5, unattended | H-212 | At levels 0, 2 and 4 no repaired run in 3,000 beat the grid at n = 5, 10 or 11, and at levels 6, 8 and 10 the best run did in eight of nine cells, the ninth within 5,000 seeds, but each value is one prefix from one seed stream and the page's own level 3 was not measured on repaired runs. |
+| exp-209 | series-000 | 11 | claude-opus-5, unattended | H-212 | The compaction program, its inputs and its outputs were not kept, so the observation cannot be reproduced and supports no conclusion about whether repaired arrangements are locally compact. |
+| exp-210 | series-000 | 11 | claude-opus-5, unattended | H-212 | Every blind run observed ended overlapping, but the snapped control was measured once with a probe variant that was not kept, and neither the trials nor their final poses are in the repository, so the observation cannot be re-checked from it. |
 
 ### blocked (11)
 
@@ -1097,9 +1098,9 @@ Status: **active**. Reconcile the merged research record, then choose among rout
 | exp-158 | H-160 |  | dependency |  |  |
 | exp-160 | H-162 |  | dependency |  |  |
 | exp-207 | H-207 | 1 round unrecorded | dependency |  |  |
-| exp-208 | H-211 | 1 round unrecorded | dependency |  |  |
-| exp-209 | H-211 | 1 round unrecorded | dependency |  |  |
-| exp-210 | H-210 | 1 round unrecorded | dependency |  |  |
+| exp-208 | H-212 | 1 round unrecorded | dependency |  |  |
+| exp-209 | H-212 | 1 round unrecorded | dependency |  |  |
+| exp-210 | H-212 | 1 round unrecorded | dependency |  |  |
 
 ## Effort
 

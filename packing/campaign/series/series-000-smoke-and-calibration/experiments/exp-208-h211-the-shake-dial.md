@@ -10,7 +10,7 @@ experiment:
   series: series-000
   title: The shake dial from level 0 to 10, on repaired runs
   date: '2026-09-12'
-  hypotheses: [H-211]
+  hypotheses: [H-212]
   tier: exploratory
   subject:
     label: the workbench's blind physics at six shake levels, repaired to packings before scoring
@@ -125,6 +125,10 @@ experiment:
 **Rewritten 2026-09-14** to remove claims the retained record does not support.
 The previous text is at commit `a40d272c`.
 
+**Exploratory data, filed under the open question
+[H-212](../../../hypotheses/H-212-the-workbench-physics-as-a-search.md).** H-211 was
+registered from this round’s table, so the round cannot also be its test.
+
 ## What Was Measured
 
 3,000 seeds at each of six shake levels for `n = 5`, 10 and 11. Every run was repaired
@@ -155,7 +159,8 @@ At level 8, `n = 11` reached 0.616 over 16,319 seeds, 1.22% above `s(11)`.
 - **The median barely moves**, except `n = 11` at level 10, so the dial changes the best
   run rather than the typical one.
 - **The best of 1,000 peaks at level 6 for `n = 5` and at level 8 for `n = 10` and 11.**
-  That is consistent with H-211’s maximum near levels 6 to 8.
+  H-211’s maximum near levels 6 to 8 was drawn from this pattern, which is why it needs
+  a test on other seeds or `n`.
 
 ## What Is Not Established
 

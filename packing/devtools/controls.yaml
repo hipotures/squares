@@ -213,7 +213,8 @@ controls:
 
 - name: synopsis - hypothesis status row drifting from the ledger
   file: ../SYNOPSIS.md
-  replace: ["| Hypotheses | 148 |", "| Hypotheses | 0 |"]
+  # Count-free, so registering a hypothesis does not silently disarm the control.
+  replace: ["| Hypotheses | ", "| Hypotheses | 9"]
   run: uv run --frozen --quiet python -m devtools.check_synopsis
   expect: "research-status row 'Hypotheses'"
 

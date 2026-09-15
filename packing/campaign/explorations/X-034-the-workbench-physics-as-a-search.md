@@ -21,7 +21,7 @@ exploration:
   - packing/devtools/bench_annealing.py
   - packing/campaign/results/annealing/summaries.json
   - docs/project/specs/active/plan-2026-09-11-annealing-as-a-search.md
-  proposes: [H-207, H-208, H-209, H-210, H-211]
+  proposes: [H-207, H-208, H-209, H-210, H-211, H-212]
 ---
 # X-034: The Workbench’s Blind Physics, Measured as a Search
 
@@ -232,7 +232,9 @@ What this shows:
   supports no conclusion.
 - **The open hypotheses are untested:** whether restarts beat schedule tuning at equal
   cost (H-207), whether the drop decides the outcome (H-208), and whether any setting
-  reaches a record (H-209).
+  reaches a record (H-209). H-210 and H-211 were registered from the data of exp-210 and
+  exp-208, so those rounds are exploratory data, filed under the open question H-212,
+  and neither claim has had a test.
 - **One instrument.** These are the workbench’s simulation in one headless Chromium on
   one laptop. They say nothing about the campaign’s Rust engine.
 
