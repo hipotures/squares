@@ -69,12 +69,6 @@ allowlist:
   - path: packages/workbench/tools/workbench_tools/check_pack_panel.py
     sites: 7
     bead: think-xvjf
-  - path: packing/atlas/known-best/video/spikes/v1-slideshow/build_candidate.py
-    sites: 1
-    bead: think-53dt
-  - path: packing/atlas/known-best/video/spikes/v1-slideshow/render_review.py
-    sites: 10
-    bead: think-53dt
   - path: packing/atlas/known-best/video/spikes/v2-transitions/calibrate.py
     sites: 8
     bead: think-53dt
