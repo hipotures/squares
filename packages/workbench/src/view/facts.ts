@@ -109,15 +109,11 @@ export function createFactsView(document: Document, DATA: Corpus, numeralLeft: (
       throw new RangeError(`no catalogue facts for n = ${n}`);
     }
     layer.textContent = "";
-    // The numeral alone: the `n =` line above it is static, outside the layers. Its box offset
-    // comes from the build, which read the regular face's digit bearings (see the stylesheet).
-    // The numeral belongs to the headline under the packing, not to the panel, but it still has
-    // to roll and fade with the layer whose facts it names -- so it is built here and placed in
-    // that layer's slot in the headline row.
-    // `n = 26` is an equation, so it is set as one -- the `=` included, which a serif glyph
-    // beside two serif numerals only approximates. The whole of it rolls, rather than a constant
-    // half and a rolling half: the two layers render the same `n =` at the same place, so the
-    // crossfade between them is invisible and nothing has to be held still by hand.
+    // The headline under the packing: `n = 26` is an equation, so it is set as one, the `=`
+    // included. It belongs to the picture rather than to the panel, but it rolls with the layer
+    // whose facts it names, so it is built here and placed in that layer's headline slot. Each
+    // rolling slot draws only the number; a third, still slot draws `n =` and never fades (see
+    // `buildPair` and the stylesheet), because a step changes the number and nothing else.
     const numeral = text("div", "numeral");
     numeral.style.left = `${numeralLeft()}px`;
     if (f.html_headline) {
@@ -143,9 +139,10 @@ export function createFactsView(document: Document, DATA: Corpus, numeralLeft: (
       }
       return line;
     }
-    // PROVED, in the order a reader wants it: the best known side, the proved lower bound
-    // under it, the scarlet mark when that bound was first proved here, and the badges. Both bounds are proved facts -- a construction
-    // proves its upper bound -- so both belong here, and OPEN below carries the questions.
+    // PROVED, in the order a reader wants it: the chained bound on the side, the scarlet note when
+    // its lower bound was first proved here, and the badges. Both bounds are proved facts -- a
+    // construction proves its upper bound -- so both belong here, and OPEN below carries the
+    // questions.
     layer.appendChild(text("div", "section-head head-proved", "Proven"));
     // The bound is one chained statement now, so it is one row. The star sits to the LEFT of
     // the lower bound it marks, inside a slot that is always the star's width whether or not

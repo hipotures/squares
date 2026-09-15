@@ -550,12 +550,6 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   //: The row the headline is centred in: the packing's own box, so `n = 26` sits under the picture
   //: it names rather than under the panel.
   const HEADLINE_ROW = 1000;
-  //: How many digits the centring is computed for. The numeral rolls between two n through a step,
-  //: and `n =` lives outside the fading layers, so centring on the CURRENT numeral would shift the
-  //: constant half of the headline twice in the film -- at 9 to 10 and at 99 to 100 -- and shift it
-  //: mid-roll besides. The pair is centred as though the numeral were always three digits, which is
-  //: what the corpus ends on and what keeps `n =` still.
-  const _HEADLINE_DIGITS = 3;
   function measureHeadline() {
     // The headline is one rendered expression now, so centring it is centring one box. It is
     // centred on the WIDEST the corpus holds rather than on the current one: `n = 324` is the
