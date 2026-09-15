@@ -382,12 +382,9 @@ def test_identical_overrides_cannot_hide_different_effective_defaults() -> None:
         block_report.summarize_cohort(cohort, [first, changed], tolerance_pct=0.001)
 
 
-def test_the_v1_browser_fixture_is_refused_until_it_records_its_law_and_beat(
+def test_clean_browser_trial_fixture_reproduces_its_disjoint_block_report(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    # Interim: the retained rows were collected before a configuration recorded its pair law
-    # and beat, so they are refused. The fixture is re-collected from a published commit that
-    # records them, and this test then compares the report again.
     fixture = Path(__file__).parent / "fixtures/benchmark-foundation"
     output = tmp_path / "report.json"
     monkeypatch.setattr(
@@ -404,11 +401,15 @@ def test_the_v1_browser_fixture_is_refused_until_it_records_its_law_and_beat(
     )
     assert block_report.main() == 0
     observed = json.loads(output.read_text(encoding="utf-8"))
+    expected = json.loads((fixture / "report.json").read_text(encoding="utf-8"))
+    assert observed == expected
     assert observed["purpose"] == "software-validation"
     cohort = observed["cohorts"][0]
-    assert cohort["counts"]["accepted"] == 0
-    assert cohort["rejection_reasons"] == {"unsupported-configuration-contract": 6}
-    assert cohort["effective_configuration"] is None
+    assert cohort["counts"]["accepted"] == 6
+    assert [block["seeds"] for block in cohort["blocks"]] == [[0, 1], [2, 3], [4, 5]]
+    configuration = cohort["effective_configuration"]
+    assert configuration["contract"] == "packing.squares:AnnealingConfiguration/v2"
+    assert set(configuration) >= {"pair_law", "wall_law", "timing", "anneal_span"}
 
 
 @pytest.mark.parametrize("token", ["NaN", "Infinity", "-Infinity"])
