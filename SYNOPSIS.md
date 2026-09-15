@@ -138,8 +138,8 @@ hypothesis status and summarizes experiment verdicts, and the
 | Record | Count | State at the cutoff |
 | --- | ---: | --- |
 | Agendas | 35 | 15 active; 14 completed; 5 paused; 1 superseded |
-| Commitments | 343 | 176 complete; 59 stopped; 64 blocked; 15 ready; 21 tentative; 8 in progress |
-| Sessions | 133 | 84 completed; 48 stopped; 1 nonterminal |
+| Commitments | 343 | 177 complete; 59 stopped; 64 blocked; 16 ready; 20 tentative; 7 in progress |
+| Sessions | 133 | 84 completed; 49 stopped; all terminal |
 | Explorations | 29 | 17 linked to proposed hypotheses; 12 uncodified |
 | Hypotheses | 138 | 25 confirmed; 24 refuted; 48 blocked; 10 unresolved; 2 open; 26 open questions; 2 result registered; 1 abandoned; 0 running |
 | Experiments | 116 | 38 accepted; 29 rejected; 25 unresolved; 11 baseline; 11 blocked; 2 abandoned; 0 in progress |
@@ -202,10 +202,14 @@ unchanged 195-second ceiling.
 This is validation evidence, not new mathematics.
 The current order is:
 
-1. Run BC-354 / `think-0t5y` as a 75-minute, no-target admission block for one complete
-   Route A same-corner root at side `96/25`.
-2. If admission succeeds, run BC-341’s exact matched discriminator; if the physical root
-   or independent checker cannot be frozen, stop Route A and admit Route S instead.
+1. BC-354 / `think-0t5y` stopped at Route A’s representation boundary.
+   Its source inventories found no complete 80-stratum negative-root producer, matched
+   exact baseline, conditional gate, or method-distinct replay.
+   No target ran and no physical root closed.
+2. Run BC-343 / `think-a1e8` as the sole next entry.
+   Its first PR is a no-target Route S admission: freeze the unmodified T-025/T-026
+   control, an at-most-23-orbit ceiling or another quantitative metric, one candidate
+   family, mutation controls, and its accept-or-park rule before optimization.
 3. Treat A, S, global angular resources, and B as the first advisory tier.
    A is the strongest route to a material `n = 11` lower bound; S is the best bounded
    deliverable; angular resources offer a cheap optimal-face screen; and B is the
@@ -879,20 +883,26 @@ transfer against the retained mathematical audit.
 The selected entry is Route A admission at side `96/25`, with Route S as the explicit
 fallback if the complete physical root and checker cannot be frozen.
 The planning block ran no scientific target.
-[Session 133](packing/campaign/agent-sessions/session-133-n11-route-a-admission.md) is
-running BC-354 from planning merge `a9de8a705d785e5b7b6ac46f28c11b6f5a45d7c6`. It is
-freezing the complete negative-availability domain, all 80 incidence strata, shared
-parent/core variables, matched controls, and an independent exact checker before any
-target can run. The scientific evidence cutoff remains main revision
+[Session 133](packing/campaign/agent-sessions/session-133-n11-route-a-admission.md)
+stopped BC-354 at the frozen Route A representation boundary.
+Three source inventories found no complete 80-stratum negative-root producer, seam-safe
+shared-parent domain, rows-complete matched baseline, conditional-domain gate, or
+independent exact replay.
+No target ran, zero of the 16 physical roots closed, and this is not evidence against a
+future complete Route A representation.
+The scientific evidence cutoff remains main revision
 `80bcdbb0819504354e1278c37f211dd8cc2158fb`, where the latest merged stack is green and
 the T-026 lower bound remains the frontier.
 
-**Selected next entry:** `think-0t5y`, the BC-354 Route A admission block.
+**Selected next entry:** `think-a1e8`, the BC-343 Route S admission phase.
 
-BC-340 and BC-353 are terminal.
-BC-354 is a separate no-target admission boundary for one complete same-corner Route A
-root; BC-341 cannot run until that admission PR merges.
-No scientific target has execution authority before admission succeeds.
+BC-340, BC-353, and BC-354 are terminal.
+BC-341 remains tentative behind a future W10 reselection and the named Route A
+representation gaps.
+BC-343 begins with a separate no-target PR that freezes Route S’s complexity metric,
+candidate family, controls, and verdict rules.
+No scientific compression target has execution authority before that admission PR
+merges.
 
 The older BC329, weighted-atom stages 3–4, and BC303 H-160/H-162 target lanes are
 paused. Their admitted implementations, registrations, and controls remain evidence; no
@@ -4062,14 +4072,15 @@ in separate tables: their units differ, and the same work can appear in both.
 | `codex-task-tree-session-126.yaml` | session-126 | 576 | 4.31 h | 2.39 h | 2.39 h | yes |
 | `codex-task-tree-session-131.yaml` | session-131 | 313 | 1.24 h | 0.75 h | 0.75 h | yes |
 | `codex-task-tree-session-132.yaml` | session-132 | 274 | 1.03 h | 0.72 h | 0.72 h | yes |
+| `codex-task-tree-session-133.yaml` | session-133 | 101 | 0.37 h | 0.2 h | 13.6 h | yes |
 | `codex-task-tree-pr137-publication-tail.yaml` | unattributed | 610 | 4.39 h | 1.77 h | 1.82 h | yes |
 | `codex-task-tree-pr142-publication-tail.yaml` | unattributed | 136 | 0.87 h | 0.41 h | 0.58 h | yes |
 
 | Coverage | sessions |
 | --- | ---: |
-| measured | 84 |
+| measured | 85 |
 | unmeasured | 48 |
-| **total** | **132** |
+| **total** | **133** |
 
 <!-- END GENERATED: session-close-report -->
 

@@ -11,9 +11,11 @@ session:
   date: '2026-09-14'
   started_at: '2026-09-15T02:37:36Z'
   deadline_at: '2026-09-15T03:52:36Z'
+  ended_at: '2026-09-15T16:13:27Z'
   branch: codex/n11-route-a-admission
   primary_bead: think-0t5y
-  status: in_progress
+  status: stopped
+  certification_pending: think-a1e8
   goal: >-
     Decide whether one complete same-corner availability-blocker root at side 96/25 can
     be represented with shared physical geometry and checked exactly before any
@@ -46,7 +48,7 @@ session:
     objective: >-
       Admit or reject the complete representation and exact-checking path for one
       same-corner Route A root at q = 96/25.
-    status: in_progress
+    status: stopped
     entered_by: session_start
     switch_reason: null
     budget_minutes: 60
@@ -66,12 +68,30 @@ session:
     fallback: >-
       Make Route S's at-most-23-orbit certificate-compression admission the sole next
       entry without running either route's target.
-    outcome: null
-    evidence: []
-    stop_reason: null
+    outcome: >-
+      Route A was not admitted. The source-bound inventories did not supply a complete
+      80-stratum negative-root representation, a seam-safe shared-owner domain, a
+      rows-complete matched point baseline, a conditional-domain adapter, or a
+      method-distinct exact checker. The frozen kill rule therefore parks this Route A
+      representation and makes Route S / BC-343 the sole next admission entry. No
+      scientific target ran.
+    evidence:
+    - docs/project/reviews/review-2026-09-14-n11-post-w5-route-selection.md
+    - docs/project/research/research-2026-09-12-n11-selection-routing-first-principles.md
+    - packing/campaign/hypotheses/H-155-conditional-threshold-cover-on-an-owner-class.md
+    - packing/devtools/multi_owner_domains.py
+    - packing/src/sqpack/fractional/threshold.py
+    - packing/src/sqpack/fractional/threshold_interval.py
+    stop_reason: >-
+      The hard deadline elapsed with the representation and exact-checker obligations
+      undischarged. The predeclared admission kill condition fires at the representation
+      boundary; a positive raw owner tuple cannot substitute for the universal negative
+      root. This is not an unresolved scientific enumeration because no target ran.
     next_action: >-
-      Reconcile the domain, checker, and control inventories into one executable
-      admission contract before selecting an implementation slice.
+      Open BC-343's separate no-target Route S admission pull request. Freeze T-025's
+      unchanged certificate and two-route exact replay as the control, the at-most-23
+      orbit ceiling or another independently quantified complexity metric, one candidate
+      template family, mutation controls, and the accept-or-park rule before optimization.
   progress:
     metric: >-
       Required physical strata and invariants represented, exact checker obligations
@@ -80,7 +100,12 @@ session:
       BC-353 selected the same-corner root, but existing tooling covers fixed positive
       owner classes rather than universal absence of labels 0 and 15 across all 80
       physical incidence strata.
-    after: null
+    after: >-
+      BC-354 is terminal with Route A not admitted, zero of the 16 physical blocker roots
+      closed, and BC-341 still tentative behind re-entry requirements. The audits
+      identify four missing boundaries: the shared-variable stratifier,
+      conditional-domain gate, matched exact baseline, and second exact coverage route.
+      Route S is the sole next admission entry; the n = 11 frontier is unchanged.
   delegations:
   - task: Inventory the complete physical domain for the selected same-corner root.
     operator: Codex domain-audit sub-agent, read-only
@@ -145,20 +170,60 @@ session:
     elapsed_quality: unavailable
     next_action: Bind the baseline claim and mutation controls before implementation.
     phase: 1
+  - task: Audit the terminal Route A disposition against the frozen kill rule.
+    operator: Codex controls-audit sub-agent, read-only
+    status: completed
+    recording: contemporaneous
+    outcome: >-
+      The deadline kill rule requires a representation-level park, not admission and not
+      a scientific timeout. No target launched, no candidate row was tested, and no
+      physical root closed; BC-343 must take the next no-target admission PR.
+    evidence:
+    - docs/project/reviews/review-2026-09-14-n11-post-w5-route-selection.md
+    - packing/campaign/agent-sessions/session-133-n11-route-a-admission.md
+    files: []
+    checks:
+    - Read-only comparison of the frozen entry, kill, fallback, and verdict contracts.
+    uncertainty: >-
+      Route A may be reopened by a future complete representation; this block supplies
+      no evidence against the mathematical route itself.
+    elapsed_seconds: null
+    elapsed_quality: unavailable
+    next_action: Park Route A and admit Route S without running its target.
+    phase: 1
   outputs:
   - packing/campaign/agent-sessions/session-133-n11-route-a-admission.md
   - packing/campaign/agendas/agenda-036-n11-strategy-reset-roadmap.md
+  - SYNOPSIS.md
+  - packing/campaign/resource-usage/codex-task-tree-session-133.yaml
   checks:
   - The branch base is merged planning revision a9de8a705d785e5b7b6ac46f28c11b6f5a45d7c6.
   - No scientific target, solver, search, or verifier has run in BC-354.
-  stop_reason: null
-  next_action: Freeze the complete Route A domain and checker contract, or park it for Route S.
+  - >-
+    Three independent source inventories and one terminal audit agree that the selected
+    physical root is not representable by the current positive-owner tools.
+  - >-
+    PR 177 entry run 34922167250 passed mergeability, suite, geometry, sweeps, and macOS
+    portability; validate failed on the expected nonterminal Session 133 record.
+  resource_rollups:
+  - packing/campaign/resource-usage/codex-task-tree-session-133.yaml
+  stop_reason: >-
+    BC-354 reached its frozen representation-level kill condition: the complete
+    negative-root producer, shared geometry, matched exact baseline, conditional gate,
+    and independent replay were not admitted within the block. Route A is parked without
+    a scientific claim, and Route S becomes the sole next admission entry.
+  next_action: >-
+    Open a separate no-target Route S admission pull request under BC-343 / think-a1e8,
+    and run no compression target before that admission PR merges.
 ---
 # N11 Route A Admission
 
-This is the first active-hour block after the post-W5 planning merge.
-It admits the representation and exact checker before any target run; an incomplete
-positive owner-class proxy does not count as the selected physical root.
+This block stopped at its predeclared representation boundary.
+The repository can model fixed positive owner classes, but it cannot yet express the
+selected universal negative root with shared physical parents, all 80 incidence strata,
+and two exact coverage routes.
+No target ran and no blocker root closed.
+Route S is the next admission entry.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

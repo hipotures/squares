@@ -8,7 +8,7 @@ softschema:
 agenda:
   id: agenda-036
   title: N11 Strategy-Reset Roadmap
-  updated: '2026-09-14'
+  updated: '2026-09-15'
   status: active
   objective: >-
     Reconcile the merged research record, then choose among routes that can either
@@ -254,7 +254,7 @@ agenda:
     purpose: tool_validation
     owner_focus: process
     instances: [11]
-    state: in_progress
+    state: complete
     priority: 0
     question: >-
       Can one complete same-corner availability-blocker root at side 96/25 be frozen
@@ -273,11 +273,30 @@ agenda:
     bead: think-0t5y
     depends_on: [BC-353]
     next_evidence: >-
-      Audit H-155's instrument gap and freeze a shared-variable adapter from the
-      multi-owner residual polygons to both exact conditional-cover routes.
+      Reopen only after one proposal supplies the complete 80-stratum negative-root
+      producer, a rows-complete matched baseline, and two method-distinct exact coverage
+      routes with shared physical variables.
     workflows: [factual-review, pipeline-improvement]
     program: n11-strategy-reset
+    artifacts:
+    - packing/campaign/agent-sessions/session-133-n11-route-a-admission.md
     parallel_group: significant-lower-bound-admission
+    outcomes:
+    - scope: >-
+        Admission of one complete same-corner Route A negative-availability root at side
+        96/25, before any scientific target.
+      classification: guard-refused
+      result: >-
+        The block inventoried the domain, checker, and controls but did not freeze the
+        complete shared-variable representation, matched exact baseline, conditional
+        gate, or independent replay before its deadline. The admission guard therefore
+        parked this representation. Zero of the 16 physical roots closed and the n = 11
+        frontier did not change.
+      evidence:
+      - packing/campaign/agent-sessions/session-133-n11-route-a-admission.md
+      - docs/project/reviews/review-2026-09-14-n11-post-w5-route-selection.md
+      disposition: defer-dependency
+      follow_up: think-a1e8
   - id: BC-341
     purpose: research
     owner_focus: insight
@@ -293,16 +312,17 @@ agenda:
       certify each closed domain, and report the unchanged denominator, closed roots,
       and exact worst surviving domain. Subdivided leaves do not change the denominator.
     entry: >-
-      BC-354 admits Route A and freezes the case partition, capacity caps, controls,
-      and independent exact certificate checker.
+      A future W10 reselects Route A after a seam-safe physical-root producer,
+      shared-variable checker, rows-complete matched exact baseline, and second exact
+      coverage route discharge BC-354's representation gaps.
     exit: >-
       A complete difficult root family closes or a precise relaxation witness and worst
       surviving domain identify why it does not. Continue only on new matched strength.
     bead: think-9y6q
     depends_on: [BC-354]
     next_evidence: >-
-      Freeze the smallest occupancy/contact partition that strictly extends T-023's
-      single four-owner branch without claiming an owner-selection theorem.
+      Preserve the named Route A gaps and reconsider this discriminator only through a
+      future W10 after a complete representation discharges them.
     workflows: [insight-iteration, research-loop]
     program: n11-strategy-reset
     parallel_group: significant-lower-bound
@@ -333,22 +353,29 @@ agenda:
     purpose: research
     owner_focus: insight
     instances: [11]
-    state: tentative
-    priority: 1
+    state: ready
+    priority: 0
     question: >-
       Can the T-025/T-026 witness at side 3.82 be compressed into a small exact
       certificate described by a few D4-orbit, weight, and tight-cell templates?
     budget: >-
-      One bounded Route S pass beginning with T-025; test sparse or quantized templates
-      with the existing exact coverage and budget replay.
-    entry: BC-353 selects Route S and the unmodified T-025/T-026 receipt is the control.
+      First, one separate no-target admission PR freezes T-025 as the control, an
+      at-most-23 active-orbit ceiling or another independently quantified complexity
+      metric, one sparse or quantized template family, mutation controls, and an
+      accept-or-park rule. Only a later fresh branch may optimize and replay a candidate.
+    entry: >-
+      BC-354 stops at the Route A representation boundary, and the unmodified T-025/T-026
+      receipt is available as the Route S control.
     exit: >-
       A fivefold reduction in orbit representatives or comparable independent geometric
       complexity, with a human-statable generating rule and exact replay, or a recorded
       obstruction that parks the selected template family.
     bead: think-a1e8
     depends_on: [BC-353]
-    next_evidence: Group the exact witness by D4 orbit, weight, and tight-cell incidence before changing any atom.
+    next_evidence: >-
+      Open a separate no-target admission PR that freezes the unmodified control, the
+      at-most-23 orbit ceiling or another predeclared metric, one template family,
+      mutation controls, and an accept-or-park rule before changing any atom.
     workflows: [insight-iteration, research-loop]
     program: n11-strategy-reset
     parallel_group: proof-simplification
@@ -527,9 +554,13 @@ incremental lanes from the live queue.
 The research-state roll-up, mathematical audit, and BC-346 W10 selection are certified
 and closed in declared dependency order.
 BC-340 and BC-353 are complete.
-Route A’s BC-354 admission at side `96/25` is the sole next execution entry, and Route S
-is the explicit fallback if the complete physical root and checker cannot be admitted
-within 75 minutes. The exact discriminator remains blocked on that no-target admission.
+BC-354 stopped at Route A’s representation boundary: the complete physical root, matched
+exact baseline, conditional gate, and independent replay were not admitted.
+No target ran and no physical root closed.
+Route S / BC-343 is now the sole next entry; its first PR is a no-target admission that
+freezes the compression metric and controls.
+BC-341 remains tentative behind a future W10 reselection and the named representation
+gaps.
 
 The W10 review maps the next six active work hours into five sequential PR-bounded
 blocks: BC-340 W5, BC-353 W10, selected-route admission, one exact discriminator, and a

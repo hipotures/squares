@@ -147,7 +147,7 @@ Each entry summarizes one user-level research window. Cycle slots are wall-clock
 | [session-130](agent-sessions/session-130-n11-w10-route-selection.md) | stopped | contemporaneous | `review-planning-oversight` (process) | `review-planning-oversight` (process) | 1 | think-9y7p | Run BC-340 under think-1ydi as a separate W5 efficiency block and pull request, beginning with the declared gate and running no scientific target. |
 | [session-131](agent-sessions/session-131-n11-w5-validation-efficiency.md) | stopped | contemporaneous | `efficiency-loop` (efficiency) | `efficiency-loop` (efficiency) | 1 | think-1ydi | Merge PR 174, then start BC-353 under think-d3h5 from the merged origin/main and select exactly one scientific admission route. |
 | [session-132](agent-sessions/session-132-n11-post-w5-route-selection.md) | stopped | contemporaneous | `review-planning-oversight` (process) | `review-planning-oversight` (process) | 1 | think-d3h5 | Merge PR 176, then start BC-354 under think-0t5y from the merged origin/main. |
-| [session-133](agent-sessions/session-133-n11-route-a-admission.md) | in_progress | contemporaneous | `pipeline-improvement` (process) | `pipeline-improvement` (process) | 1 | think-0t5y | Freeze the complete Route A domain and checker contract, or park it for Route S. |
+| [session-133](agent-sessions/session-133-n11-route-a-admission.md) | stopped | contemporaneous | `pipeline-improvement` (process) | `pipeline-improvement` (process) | 1 | think-0t5y | Open a separate no-target Route S admission pull request under BC-343 / think-a1e8, and run no compression target before that admission PR merges. |
 
 ### Workflow summary
 
@@ -745,10 +745,10 @@ Status: **active**. Reconcile the merged research record, then choose among rout
 | BC-346 | tool_validation | 11 | complete | 0 | think-9y7p | Reconstruct the W5 cadence, then compare any due checkpoint with Routes A, S, E, B, F1, F2, N, C, D, and G using their declared first discriminators; select one block rather than a multi-lane research promise. |
 | BC-340 | measurement_validation | 11 | complete | 0 | think-1ydi | Reconstruct the cadence from active daytime blocks and retained gate receipts; administrative work does not reset the cadence. |
 | BC-353 | tool_validation | 11 | complete | 0 | think-d3h5 | Reconsider Route A at side 3.84 first, Route S as its admission fallback, and Route E in the first tier, while incorporating BC-340's measured result. |
-| BC-354 | tool_validation | 11 | in_progress | 0 | think-0t5y | Audit H-155's instrument gap and freeze a shared-variable adapter from the multi-owner residual polygons to both exact conditional-cover routes. |
-| BC-341 | research | 11 | tentative | 1 | think-9y6q | Freeze the smallest occupancy/contact partition that strictly extends T-023's single four-owner branch without claiming an owner-selection theorem. |
+| BC-354 | tool_validation | 11 | complete | 0 | think-0t5y | Reopen only after one proposal supplies the complete 80-stratum negative-root producer, a rows-complete matched baseline, and two method-distinct exact coverage routes with shared physical variables. |
+| BC-341 | research | 11 | tentative | 1 | think-9y6q | Preserve the named Route A gaps and reconsider this discriminator only through a future W10 after a complete representation discharges them. |
 | BC-342 | research | 6, 11 | tentative | 1 | think-ol1z | Specify the n=6 control and the conflict-edge soundness obligation before selecting a solver. |
-| BC-343 | research | 11 | tentative | 1 | think-a1e8 | Group the exact witness by D4 orbit, weight, and tight-cell incidence before changing any atom. |
+| BC-343 | research | 11 | ready | 0 | think-a1e8 | Open a separate no-target admission PR that freezes the unmodified control, the at-most-23 orbit ceiling or another predeclared metric, one template family, mutation controls, and an accept-or-park rule before changing any atom. |
 | BC-344 | research | 11 | tentative | 2 | think-29ch | Reproduce the 6+5 control at Trump's angle before interpreting any solver infeasibility. |
 | BC-345 | research | 11 | tentative | 3 | think-7n2w | Design the positive-control and endpoint-polishing contract before allocating the background search. |
 | BC-348 | research | 11 | tentative | 1 | think-u15l | Test the valid angle-count rows against the entire retained optimal face before building a larger certificate. |
