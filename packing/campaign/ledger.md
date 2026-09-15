@@ -144,6 +144,7 @@ Each entry summarizes one user-level research window. Cycle slots are wall-clock
 | [session-127](agent-sessions/session-127-weighted-five-site-atom-admission.md) | completed | contemporaneous | `pipeline-improvement` (correctness) | `pipeline-improvement` (correctness) | 2 | think-zvr3 | Continue under think-8c9e, the weighted-atom coverage mechanics, which cover the direct, event and interval controls including the boundary and undercharged-core cases and the interval route's stall handling. Stage four's paired runner and exact common manifests are tracked separately and blocked on it. |
 | [session-128](agent-sessions/session-128-research-state-rollup.md) | stopped | contemporaneous | `pipeline-improvement` (process) | `documentation-pass` (correctness) | 2 | think-uqa4 | Hand the certified inventory and scientific boundary to BC-347 under think-oj12 for the separate mathematical-audit lifecycle. |
 | [session-129](agent-sessions/session-129-small-n-mathematical-audit.md) | stopped | contemporaneous | `factual-review` (correctness) | `insight-iteration` (insight) | 2 | think-oj12 | Run BC-346 under think-9y7p as the separate planning block; select no scientific target before that block records its disposition. |
+| [session-130](agent-sessions/session-130-n11-w10-route-selection.md) | stopped | contemporaneous | `review-planning-oversight` (process) | `review-planning-oversight` (process) | 1 | think-9y7p | Run BC-340 under think-1ydi as a separate W5 efficiency block and pull request, beginning with the declared gate and running no scientific target. |
 
 ### Workflow summary
 
@@ -160,7 +161,7 @@ Declared counts are contemporaneous contracts; retrospective counts are reconstr
 | `pipeline-improvement` | 29 | 1 | 146 | 4 |
 | `documentation-pass` | 1 | 0 | 22 | 1 |
 | `remediation` | 0 | 1 | 0 | 1 |
-| `review-planning-oversight` | 1 | 0 | 14 | 1 |
+| `review-planning-oversight` | 2 | 0 | 15 | 1 |
 | `general-improvement` | 1 | 0 | 7 | 1 |
 
 ## Experiment agendas
@@ -723,12 +724,12 @@ Status: **paused**. Select and execute short, high-information blocks across dis
 | BC-328 | research | 11 | complete | 1 | think-02l0 | Use the reviewed adjacent-wall component normal form to define one snug-parent or genuine contact-path pilot. Preserve the complementary path-length branches and verify physical contact rather than treating an arbitrary tight support row as contact. |
 | BC-329 | research | 11 | blocked | 1 | think-17qa | Repair and rereview the integrated coordinator, source-distinct reader, and run-set verifier; admit the three-profile run sheet; publish the reviewed PR head; then run and independently read three controls under fixed-core-packet-calibration/v1. Only after those gates pass, prospectively register one packet retaining T025's sites and relative weights with a 2880-step net, B=9981/10000, D=207107/1440000000, raw acceptance threshold M/11=685457679/687500000, and normalization alpha=1/m. Require complete exact and interval agreement plus dilation replay on the same normalized bytes. |
 | BC-330 | research | 11 | blocked | 2 | think-vx0p | Use BC326 and BC328 to select a meaningful class; do not treat one class as the global existential owner-selection theorem. |
-| BC-331 | research | 11 | stopped | 2 | think-lkvd | The September 14 strategy reset removed this reserve from the live queue. Reopen it only if BC-346 selects the full-support-pricing route. |
+| BC-331 | research | 11 | stopped | 2 | think-lkvd | The September 14 strategy reset removed this reserve from the live queue. Reopen it only if BC-353 selects the full-support-pricing route after W5. |
 | BC-332 | tool_validation | 11 | complete | 1 | think-b5b1 | BC334 implements the selected incremental architecture: retain the T018 worked proof and add T025/T026 as an advanced final section. |
 | BC-334 | tool_validation | 11 | complete | 1 | think-gv5a | The implementation and historical hosted checkpoint are complete at PR148 revision 989fd544. The September 12 review corrections start at e8baa8ff; the dated T025/T026 review addendum records the subsequent source checks and 22-page rendering evidence. These are later validation of the completed documentation milestone. |
 | BC-336 | tool_validation | 11 | complete | 1 | think-ccsi | PR148 commit 35484ebd first uses v0.4.0 as this explainer's edition label on September 10, 2026; commit ce3b1ab5606307ed5cb6780da09c1b5f233ab2e1 first uses v0.3.0 as that label on September 8, 2026. Both dates are rendered from one release-history source and covered by focused tests. |
 | BC-335 | tool_validation | 11 | complete | 1 | think-0zc1 | The historical D3 checkpoint passed on PR148 at 989fd544. The September 12 mathematical, clarity and integration review is recorded separately in the T025/T026 review addendum; later stack revisions require their own validation and do not change the completed milestone's evidence source. |
-| BC-333 | measurement_validation | 11 | stopped | 2 | think-1ydi | BC-340 in agenda-036 now owns this bead and the due efficiency-checkpoint question; it remains behind BC-346's one-route selection. |
+| BC-333 | measurement_validation | 11 | stopped | 2 | think-1ydi | BC-340 in agenda-036 now owns this bead and the due efficiency-checkpoint question; BC-346 selected it as the sole next entry, and it is ready to run. |
 
 ### [agenda-036](agendas/agenda-036-n11-strategy-reset-roadmap.md) — N11 Strategy-Reset Roadmap
 
@@ -738,8 +739,9 @@ Status: **active**. Reconcile the merged research record, then choose among rout
 | --- | --- | --- | --- | ---: | --- | --- |
 | BC-339 | tool_validation | 11 | complete | 0 | think-uqa4 | BC-347 consumes the checked inventory and scientific boundary without reopening the source reconciliation. |
 | BC-347 | research | 6, 7, 10, 11, 13 | complete | 0 | think-oj12 | BC-346 compares the audited prerequisites, first discriminators, payoff, and cost and selects exactly one execution entry. |
-| BC-346 | tool_validation | 11 | ready | 0 | think-9y7p | Reconstruct the W5 cadence, then compare any due checkpoint with Routes A, S, E, B, F1, F2, N, C, D, and G using their declared first discriminators; select one block rather than a multi-lane research promise. |
-| BC-340 | measurement_validation | 11 | tentative | 0 | think-1ydi | Reconstruct the cadence from active daytime blocks and retained gate receipts; administrative work does not reset the cadence. |
+| BC-346 | tool_validation | 11 | complete | 0 | think-9y7p | Reconstruct the W5 cadence, then compare any due checkpoint with Routes A, S, E, B, F1, F2, N, C, D, and G using their declared first discriminators; select one block rather than a multi-lane research promise. |
+| BC-340 | measurement_validation | 11 | ready | 0 | think-1ydi | Reconstruct the cadence from active daytime blocks and retained gate receipts; administrative work does not reset the cadence. |
+| BC-353 | tool_validation | 11 | blocked | 0 | think-d3h5 | Reconsider Route A at side 3.84 first, Route S as its admission fallback, and Route E in the first tier, while incorporating BC-340's measured result. |
 | BC-341 | research | 11 | tentative | 1 | think-9y6q | Freeze the smallest occupancy/contact partition that strictly extends T-023's single four-owner branch without claiming an owner-selection theorem. |
 | BC-342 | research | 6, 11 | tentative | 1 | think-ol1z | Specify the n=6 control and the conflict-edge soundness obligation before selecting a solver. |
 | BC-343 | research | 11 | tentative | 1 | think-a1e8 | Group the exact witness by D4 orbit, weight, and tight-cell incidence before changing any atom. |
