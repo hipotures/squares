@@ -511,6 +511,10 @@ documents:
     role: review
     authority: record
     lifecycle: retained
+  - path: docs/project/reviews/review-2026-09-14-n11-post-w5-route-selection.md
+    role: review
+    authority: record
+    lifecycle: retained
   - path: docs/project/three-lane-research-method.md
     role: component-guide
     authority: record

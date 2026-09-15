@@ -211,7 +211,7 @@ agenda:
     purpose: tool_validation
     owner_focus: process
     instances: [11]
-    state: ready
+    state: in_progress
     priority: 0
     question: >-
       After the due efficiency checkpoint, which one scientific route has the highest
@@ -232,7 +232,38 @@ agenda:
       E in the first tier, while incorporating BC-340's measured result.
     workflows: [review-planning-oversight]
     program: n11-strategy-reset
+    artifacts:
+    - packing/campaign/agent-sessions/session-132-n11-post-w5-route-selection.md
+    - docs/project/reviews/review-2026-09-14-n11-post-w5-route-selection.md
     parallel_group: post-efficiency-route-selection
+  - id: BC-354
+    purpose: tool_validation
+    owner_focus: process
+    instances: [11]
+    state: blocked
+    priority: 0
+    question: >-
+      Can one complete same-corner availability-blocker root at side 96/25 be frozen
+      with shared physical geometry, conditional capacities, and an independent exact
+      checker before any target run?
+    budget: >-
+      One 75-minute Route A admission block. Freeze the 16-root physical denominator,
+      one complete same-corner root, all label/pose/incidence strata, strict-core
+      transfer, matched baseline, candidate capacity rows, controls, acceptance rule,
+      and representation-level kill rule. Run no scientific target.
+    entry: BC-353 selects Route A and merges its planning pull request.
+    exit: >-
+      The complete root, physical-transfer statement, checker, controls, and target
+      contract are admitted in their own merged pull request, or Route A is paused and
+      Route S becomes the sole next admission entry.
+    bead: think-0t5y
+    depends_on: [BC-353]
+    next_evidence: >-
+      Audit H-155's instrument gap and freeze a shared-variable adapter from the
+      multi-owner residual polygons to both exact conditional-cover routes.
+    workflows: [factual-review, pipeline-improvement]
+    program: n11-strategy-reset
+    parallel_group: significant-lower-bound-admission
   - id: BC-341
     purpose: research
     owner_focus: insight
@@ -247,12 +278,14 @@ agenda:
       One day-or-less Route A discriminator: freeze an original root-family denominator,
       certify each closed domain, and report the unchanged denominator, closed roots,
       and exact worst surviving domain. Subdivided leaves do not change the denominator.
-    entry: BC-353 selects Route A and the case partition, capacity caps, and unchanged certificate checker are frozen.
+    entry: >-
+      BC-354 admits Route A and freezes the case partition, capacity caps, controls,
+      and independent exact certificate checker.
     exit: >-
       A complete difficult root family closes or a precise relaxation witness and worst
       surviving domain identify why it does not. Continue only on new matched strength.
     bead: think-9y6q
-    depends_on: [BC-353]
+    depends_on: [BC-354]
     next_evidence: >-
       Freeze the smallest occupancy/contact partition that strictly extends T-023's
       single four-owner branch without claiming an owner-selection theorem.

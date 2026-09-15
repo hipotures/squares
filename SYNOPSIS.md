@@ -138,8 +138,8 @@ hypothesis status and summarizes experiment verdicts, and the
 | Record | Count | State at the cutoff |
 | --- | ---: | --- |
 | Agendas | 35 | 15 active; 14 completed; 5 paused; 1 superseded |
-| Commitments | 342 | 175 complete; 59 stopped; 64 blocked; 16 ready; 21 tentative; 7 in progress |
-| Sessions | 131 | 84 completed; 47 stopped; all terminal |
+| Commitments | 343 | 175 complete; 59 stopped; 65 blocked; 15 ready; 21 tentative; 8 in progress |
+| Sessions | 132 | 84 completed; 47 stopped; 1 nonterminal |
 | Explorations | 29 | 17 linked to proposed hypotheses; 12 uncodified |
 | Hypotheses | 138 | 25 confirmed; 24 refuted; 48 blocked; 10 unresolved; 2 open; 26 open questions; 2 result registered; 1 abandoned; 0 running |
 | Experiments | 116 | 38 accepted; 29 rejected; 25 unresolved; 11 baseline; 11 blocked; 2 abandoned; 0 in progress |
@@ -657,6 +657,7 @@ case or experiment separately.
 | [Review of the Paper Font Merge](docs/project/reviews/review-2026-09-08-paper-font-merge.md) | dated review record | record | retained | — |
 | [Mathematical Audit of Routes to Significant Progress on Small Square Packings](docs/project/reviews/review-2026-09-14-small-n-significant-progress-mathematical-audit.md) | dated review record | record | retained | — |
 | [N11 W10 Route Selection](docs/project/reviews/review-2026-09-14-n11-w10-route-selection.md) | dated review record | record | retained | — |
+| [Post-W5 route selection for material small-n progress](docs/project/reviews/review-2026-09-14-n11-post-w5-route-selection.md) | dated review record | record | retained | — |
 | [The Three-Lane Research Method](docs/project/three-lane-research-method.md) | component scope and use | record | retained | — |
 | [Handoff — 2026-09-04, close of the fractional-certificate block](docs/project/handoff-2026-09-04-block-close.md) | dated handoff record | record | retained | — |
 | [Handoff: Post-3.81 Portfolio at T+2](docs/project/handoff-2026-09-06-post-381-t2-commissioning.md) | dated handoff record | record | retained | — |
@@ -873,27 +874,26 @@ controller, not permission to blur contracts.
 ### Current Handoff
 
 [Session 131](packing/campaign/agent-sessions/session-131-n11-w5-validation-efficiency.md)
-records the completed BC-340 efficiency checkpoint.
-It accepted one measured repair: the branch-cost rollup now loads its receipt and
-session corpus once per invocation, rather than once per rendered branch.
-Three alternating pairs passed VE-005’s fixed acceptance rule and permanent equivalence
-guards; the first candidate hosted checks tier passed at 106.38 seconds.
-The 195-second ceiling and its unarmed hosted baseline remain unchanged until multiple
-post-change readings exist.
-No scientific target ran.
+is the latest terminal handoff and records the completed BC-340 validation checkpoint.
+[Session 132](packing/campaign/agent-sessions/session-132-n11-post-w5-route-selection.md)
+is running BC-353 from its W5 merge `cdb088142f596c468b910a6d44c7915e26ea02e1`. Three
+read-only Astra Max lanes are reconciling A/S, E/B/F1/F2, and N/C/D/G plus small-`n`
+transfer against the retained mathematical audit.
+Their shared draft recommendation is Route A admission at side `96/25`, with Route S as
+the explicit fallback if the complete A root and checker cannot be frozen.
+The planning block runs no scientific target.
 The scientific evidence cutoff remains main revision
 `80bcdbb0819504354e1278c37f211dd8cc2158fb`, where the latest merged stack is green and
 the T-026 lower bound remains the frontier.
 
 **Selected next entry:** `think-d3h5`, the BC-353 post-W5 W10 route-selection block.
 
-BC-340 and its primary bead are terminal, and agenda-036 marks BC-353 ready.
-Execution still begins only after PR 174 merges, preserving the promised branch
-boundary. BC-353 will consume the W5 receipt, recheck repository stability, compare all
-ten candidate routes on the existing audit frame, and select exactly one scientific
-admission block. Route A at side `96/25` remains presumptive, Route S remains its
-explicit admission fallback, and no candidate has execution authority before that W10
-closes and merges.
+BC-340 and its primary bead are terminal, and PR 174 is merged.
+BC-353 now owns the sole active planning entry and will select exactly one scientific
+admission block. The draft introduces BC-354 / `think-0t5y` as a separate no-target
+admission boundary for one complete same-corner Route A root; BC-341 cannot run until
+that admission PR merges.
+No candidate has execution authority before BC-353 closes and merges.
 
 The older BC329, weighted-atom stages 3–4, and BC303 H-160/H-162 target lanes are
 paused. Their admitted implementations, registrations, and controls remain evidence; no
@@ -4064,12 +4064,13 @@ in separate tables: their units differ, and the same work can appear in both.
 | `codex-task-tree-session-131.yaml` | session-131 | 313 | 1.24 h | 0.75 h | 0.75 h | yes |
 | `codex-task-tree-pr137-publication-tail.yaml` | unattributed | 610 | 4.39 h | 1.77 h | 1.82 h | yes |
 | `codex-task-tree-pr142-publication-tail.yaml` | unattributed | 136 | 0.87 h | 0.41 h | 0.58 h | yes |
+| `codex-task-tree-session-132.yaml` | unattributed | 205 | 0.8 h | 0.51 h | 0.51 h | yes |
 
 | Coverage | sessions |
 | --- | ---: |
 | measured | 83 |
-| unmeasured | 48 |
-| **total** | **131** |
+| unmeasured | 49 |
+| **total** | **132** |
 
 <!-- END GENERATED: session-close-report -->
 

@@ -7,12 +7,12 @@ softschema:
   schema: schemas/session-close-report.schema.yaml
   envelope: null
   status: enforced
-count: 131
+count: 132
 generated_by: >-
   uv run --frozen --all-extras --group dev python -m devtools.close_session --render
 totals:
   sessions_measured: 83
-  sessions_unmeasured: 48
+  sessions_unmeasured: 49
   attributed:
     rollups: 129
     turns: 40048
@@ -36,8 +36,8 @@ totals:
     wall_hours: 421.83
 codex_receipts:
   attributed: 51
-  unattributed: 2
-  measured: 53
+  unattributed: 3
+  measured: 54
 # Per-session figures below are the logs each session DECLARES. They overlap when
 # sessions share a harness log, so they do not sum to `attributed` above.
 sessions:
@@ -2181,3 +2181,13 @@ sessions:
     active_union_hours: 0.75
     wall_hours: 0.75
     snapshot_incomplete: true
+- id: session-132
+  title: "N11 Post-W5 Route Selection"
+  status: in_progress
+  primary_bead: think-d3h5
+  phases: 1
+  measured: false
+  unmeasured_reason: >-
+    declares no resource measurement
+  rollups: []
+  codex_receipts: []
