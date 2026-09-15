@@ -33,6 +33,18 @@ from workbench_tools.animation_records import (
 )
 from workbench_tools.packing_contracts import GeometryCheck
 
+#: How far a frame that names a retained record may sit from that record's witness before it
+#: is refused as a different arrangement: in side units for centres, radians for angles, and
+#: relative to the record side (with this as its floor) for the container.
+#:
+#: A matching tolerance, not packing validity, which is `packing_contracts` at 1e-9. A frame
+#: that names a record is drawn from the witness's exact geometry, so what it must show is
+#: that its own poses are that witness. The witnesses are stored as exact decimals and read
+#: as binary64: over all 324 on 2026-09-14 that moved a centre by at most 2.4e-15 and a
+#: side by 1.7e-15. 1e-7 admits any faithful binary64 copy with seven orders of room, and
+#: refuses a coarser one, including a copy at the page's catalogue precision (centres to
+#: 1e-6, angles to 1e-4 degrees), which is a rounded arrangement rather than the witness.
+#: `tests/test_record_reference_tolerance.py` pins both edges.
 RECORD_REFERENCE_TOLERANCE = 1e-7
 
 #: What an export says about its motion. It goes in the SVG's `<desc>` and the export receipt,
