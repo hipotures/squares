@@ -141,7 +141,7 @@ hypothesis status and summarizes experiment verdicts, and the
 | Commitments | 342 | 174 complete; 59 stopped; 65 blocked; 16 ready; 21 tentative; 7 in progress |
 | Sessions | 130 | 84 completed; 46 stopped; all terminal |
 | Explorations | 31 | 18 linked to proposed hypotheses; 13 uncodified |
-| Hypotheses | 148 | 26 confirmed; 27 refuted; 48 blocked; 14 unresolved; 4 open; 26 open questions; 2 result registered; 1 abandoned; 0 running |
+| Hypotheses | 148 | 26 confirmed; 27 refuted; 50 blocked; 14 unresolved; 2 open; 26 open questions; 2 result registered; 1 abandoned; 0 running |
 | Experiments | 126 | 39 accepted; 32 rejected; 30 unresolved; 12 baseline; 11 blocked; 2 abandoned; 0 in progress |
 | Frontier results | 26 | 26 registered |
 
@@ -3806,8 +3806,8 @@ round that names the hypothesis, control roles included.
 | [H-204](packing/campaign/hypotheses/H-204-cooling-schedule-length.md) | refuted | A tenfold anneal length moves three cells of eleven against the six declared | 1 | 71.3m wall |
 | [H-205](packing/campaign/hypotheses/H-205-projection-search-reaches-feasibility.md) | unresolved | Every run ends on an exactly feasible packing, 28 of 28 against 0 of 48 for the penalty physics, but only one cell of four comes within a per cent | 1 | 15.6m wall |
 | [H-207](packing/campaign/hypotheses/H-207-restarts-beat-schedule.md) | unresolved | restarts beat schedule tuning at equal cost; re-measure before reuse | 1 | 1 round unrecorded |
-| [H-208](packing/campaign/hypotheses/H-208-the-drop-decides.md) | open | the initial drop decides the answer, not the annealing; re-measure before reuse | 0 | — |
-| [H-209](packing/campaign/hypotheses/H-209-no-parameters-reach-a-record.md) | open | no parameter set in the workbench’s own space reaches a record; re-measure before reuse | 0 | — |
+| [H-208](packing/campaign/hypotheses/H-208-the-drop-decides.md) | blocked | the initial drop decides the answer, not the annealing; no instrument varies the drop at a fixed container | 0 | — |
+| [H-209](packing/campaign/hypotheses/H-209-no-parameters-reach-a-record.md) | blocked | no parameter set in the workbench’s own space reaches a record; no instrument sets the force law or step count | 0 | — |
 | [H-210](packing/campaign/hypotheses/H-210-no-valid-packing.md) | unresolved | the blind physics never settles to a valid packing; re-measure before reuse | 1 | 1 round unrecorded |
 | [H-211](packing/campaign/hypotheses/H-211-the-shake-has-a-sweet-spot.md) | unresolved | the shake has a sweet spot, and the shipped value is far below it; re-measure before reuse | 2 | 2 rounds unrecorded |
 

@@ -20,7 +20,7 @@ hypothesis:
     direction: the start sweep's spread is the larger
     threshold: at least twice the schedule sweep's spread at the same n
   instrument: packing/devtools/bench_annealing.py --sweep inflate=... anneal=...
-  instrument_ready: true
+  instrument_ready: false
   regime: the workbench's simulation; the drop is its coarse-grid emptiest-cell rule
   instance: {axis: n, point: 11}
   sweep: {axis: n, points: [5, 10, 11, 17, 26, 29]}
@@ -46,6 +46,11 @@ finely.
 changes what the contraction has to do.
 A clean test needs a start that varies with the container held fixed, which the page
 cannot do today — so this may end `blocked` rather than measured.
+
+**No instrument can run the test yet.** The harness varies the start only through the
+inflation. The test needs an instrument that takes the drop as a parameter, such as a
+seeded choice among candidate cells at a fixed container, and records the drop each
+trial used.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

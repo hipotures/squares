@@ -907,8 +907,8 @@ Status: **active**. Reconcile the merged research record, then choose among rout
 | H-204 | refuted | search | Raising only the anneal length from 400,000 to 4,000,000 steps per res | n: 5 10 11* 17 19 26 27 29 37 50 52 | 1 |  | 45m agent + 71.3m wall |
 | H-205 | unresolved | search | Divide and concur searched with relaxed-reflect-reflect, run cold over | n: 5 10 11* 17 | 1 |  | 95m agent + 15.6m wall |
 | H-207 | unresolved | search | At equal total cost, running k independent blind trials and taking the | n: 5* 11 17 29 | 1 |  | 1 round unrecorded |
-| H-208 | open | search | Where a blind run ends is decided by where the new square is dropped a | n: 5 10 11 17 26 29 | 0 |  |  |
-| H-209 | open | search | No combination of the workbench's exposed parameters -- the shake dial | n: 5 10 11 17 26 29 | 0 |  |  |
+| H-208 | blocked | search | Where a blind run ends is decided by where the new square is dropped a | n: 5 10 11 17 26 29 | 0 |  |  |
+| H-209 | blocked | search | No combination of the workbench's exposed parameters -- the shake dial | n: 5 10 11 17 26 29 | 0 |  |  |
 | H-210 | unresolved | search | No blind run of the workbench's physics ends on a valid packing. At ev | n: 5 10 11* 17 26 29 | 1 |  | 1 round unrecorded |
 | H-211 | unresolved | search | The workbench's shake dial has a maximum for search quality between le | n: 5 10 11* 17 26 29 | 2 |  | 2 rounds unrecorded |
 

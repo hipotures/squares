@@ -20,7 +20,7 @@ hypothesis:
     direction: no cell does
     threshold: 0.1
   instrument: packing/devtools/bench_annealing.py --sweep
-  instrument_ready: true
+  instrument_ready: false
   regime: >-
     the workbench's simulation as shipped; a negative here is about this instrument and not
     about annealing in general
@@ -45,6 +45,13 @@ step count have not.
 **What would refute it.** One trial, at any cell, inside the tolerance.
 A single counterexample settles it, which makes this the cheapest claim in the registry
 to disprove and the most expensive to confirm.
+
+**No instrument can run the test yet.** The harness passes only the shake level and the
+inflation to the page and drops any other sweep key without saying so.
+A sweep of the force law or the step count would run identical cells under different
+labels, a false negative in this claim’s favour.
+The test needs an instrument that sets the force law’s four terms and the step count,
+refuses what it cannot set, and records the configuration the page ran.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
