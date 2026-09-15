@@ -491,7 +491,9 @@ def covered(path: Path, patterns: list[str]) -> bool:
     """
     relative = path.relative_to(REPO).as_posix()
     return any(
-        pattern == relative or pattern.rstrip("/*") in (relative, relative.rstrip("/"))
+        pattern == relative
+        or (pattern.endswith("/**") and relative.startswith(pattern[:-2]))
+        or pattern.rstrip("/*") in (relative, relative.rstrip("/"))
         for pattern in patterns
     )
 
@@ -531,11 +533,19 @@ def test_the_pages_filter_covers_every_workbench_input() -> None:
     serving the previous build with every check green. The comparison is the explainer's,
     asked of the other page's declared inputs.
     """
+    # These two files are outside the explainer's one-frame n=11 dependency. Keeping a
+    # representative member of each collection in the assertion proves the directory
+    # declarations above are backed by workflow globs that cover all 324 workbench frames,
+    # rather than by the explainer's narrower n-011.svg entry.
+    representative_collection_inputs = (
+        REPO / "packing/witnesses/known-best/n-105.yaml",
+        REPO / "packing/atlas/known-best/rendering/n-105.svg",
+    )
     filters = pages_filters()
     for event, patterns in filters.items():
         missing = [
             declared.relative_to(REPO).as_posix()
-            for declared in WORKBENCH_INPUTS
+            for declared in (*WORKBENCH_INPUTS, *representative_collection_inputs)
             if not covered(declared, patterns)
         ]
         assert not missing, f"{event}: workbench inputs not covered by paths: {missing}"
