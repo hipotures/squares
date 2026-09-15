@@ -113,10 +113,14 @@ reconciliation. BC-347 then completed and certified a read-only
 [Astra Max mathematical audit](../../reviews/review-2026-09-14-small-n-significant-progress-mathematical-audit.md)
 of the retained evidence, the five shaped routes, and additional hypotheses with
 material small-`n` upside behind that prerequisite.
-BC-346 is the current W10 planning block.
-It compares dependency readiness, expected information value, first discriminator, stop
-rule, and resource cost, then selects exactly one execution entry.
-None of these blocks runs a scientific target.
+BC-346 completed and certified its source-bound W10 comparison and selected BC-340, the
+due W5 efficiency checkpoint, as the sole next entry.
+A conservative derivation reaches OR-12’s mandatory eight-block ceiling after Session
+116/BC-322. BC-340 will measure the current gate first, accept at most one demonstrated
+repair behind an equivalence guard or record a measured no-change decision, then return
+to BC-353 / `think-d3h5` for a fresh W10. Every scientific candidate depends on BC-353,
+so closing the present W10 releases only the efficiency checkpoint.
+Neither planning block nor W5 runs a scientific target.
 
 The planning candidates are:
 

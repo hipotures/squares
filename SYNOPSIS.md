@@ -138,8 +138,8 @@ hypothesis status and summarizes experiment verdicts, and the
 | Record | Count | State at the cutoff |
 | --- | ---: | --- |
 | Agendas | 35 | 15 active; 14 completed; 5 paused; 1 superseded |
-| Commitments | 341 | 173 complete; 59 stopped; 64 blocked; 16 ready; 22 tentative; 7 in progress |
-| Sessions | 129 | 84 completed; 45 stopped; all terminal |
+| Commitments | 342 | 174 complete; 59 stopped; 65 blocked; 16 ready; 21 tentative; 7 in progress |
+| Sessions | 130 | 84 completed; 46 stopped; all terminal |
 | Explorations | 29 | 17 linked to proposed hypotheses; 12 uncodified |
 | Hypotheses | 138 | 25 confirmed; 24 refuted; 48 blocked; 10 unresolved; 2 open; 26 open questions; 2 result registered; 1 abandoned; 0 running |
 | Experiments | 116 | 38 accepted; 29 rejected; 25 unresolved; 11 baseline; 11 blocked; 2 abandoned; 0 in progress |
@@ -191,21 +191,36 @@ BC-347’s source-bound
 [Astra Max mathematical audit](docs/project/reviews/review-2026-09-14-small-n-significant-progress-mathematical-audit.md)
 and roadmap integration are also complete and certified; they ran no scientific target
 and changed no frontier claim.
+BC-346’s
+[W10 route-selection review](docs/project/reviews/review-2026-09-14-n11-w10-route-selection.md)
+is certified and has selected the due BC-340 efficiency checkpoint.
 The current order is:
 
-1. Run BC-346 as one W10 planning block.
-   Reconstruct whether the W5 validation-efficiency checkpoint is due, compare the
-   enlarged candidate set, and select exactly one execution entry.
-2. Treat A, S, global angular resources, and B as the first advisory tier.
+1. Run BC-340 as a separate W5 block and pull request.
+   Measure the current gate first and accept at most one demonstrated repair behind an
+   equivalence guard, or retain a measured no-change decision.
+2. Return to BC-353 / `think-d3h5` for a fresh W10 after W5, with A at side `96/25` as
+   the presumptive first scientific choice and S as the fallback if A cannot freeze a
+   complete admission slice.
+3. Treat A, S, global angular resources, and B as the first advisory tier.
    A is the strongest route to a material `n = 11` lower bound; S is the best bounded
    deliverable; angular resources offer a cheap optimal-face screen; and B is the
    strongest alternative mechanism after its soundness controls.
-3. Retain stronger charge algebra, geometry-dependent budgets, an `n = 12` exact-value
+4. Retain stronger charge algebra, geometry-dependent budgets, an `n = 12` exact-value
    program, and orientation structure as second-tier candidates whose first blocks must
    pay for missing premises.
-4. Keep constructive search separately budgeted after an oblique proposer control, and
+5. Keep constructive search separately budgeted after an oblique proposer control, and
    treat geometric waste accounting as a speculative candidate requiring both a local
    lemma and a non-double-counting global rule.
+
+The detailed
+[six-hour execution schedule](docs/project/reviews/review-2026-09-14-n11-w10-route-selection.md#six-hour-execution-schedule)
+allocates five sequential merge-bounded blocks: W5 measurement, post-W5 W10 selection,
+selected-route admission, one exact scientific discriminator, and independent review
+plus replanning. Each block starts from the preceding merge on a fresh branch and gets
+its own session, bead disposition, validation receipt, and pull request.
+Route A is the default research shape, not an authorization: BC-353 may select Route S
+or redirect the remaining work if W5 or admission evidence changes the decision.
 
 The audit’s linear advisory order is A, S, angular resources, B, stronger charge
 algebra, geometry-dependent budgets, `n = 12`, C, D, then geometric waste.
@@ -635,6 +650,7 @@ case or experiment separately.
 | [Research: Comprehensive Review of the n = 17 Record](docs/project/reviews/review-2026-09-07-n17-comprehensive-review.md) | dated review record | record | retained | — |
 | [Review of the Paper Font Merge](docs/project/reviews/review-2026-09-08-paper-font-merge.md) | dated review record | record | retained | — |
 | [Mathematical Audit of Routes to Significant Progress on Small Square Packings](docs/project/reviews/review-2026-09-14-small-n-significant-progress-mathematical-audit.md) | dated review record | record | retained | — |
+| [N11 W10 Route Selection](docs/project/reviews/review-2026-09-14-n11-w10-route-selection.md) | dated review record | record | retained | — |
 | [The Three-Lane Research Method](docs/project/three-lane-research-method.md) | component scope and use | record | retained | — |
 | [Handoff — 2026-09-04, close of the fractional-certificate block](docs/project/handoff-2026-09-04-block-close.md) | dated handoff record | record | retained | — |
 | [Handoff: Post-3.81 Portfolio at T+2](docs/project/handoff-2026-09-06-post-381-t2-commissioning.md) | dated handoff record | record | retained | — |
@@ -850,23 +866,23 @@ controller, not permission to blur contracts.
 
 ### Current Handoff
 
-[Session 128](packing/campaign/agent-sessions/session-128-research-state-rollup.md)
-records the source-first reconciliation, five independent reviews, and the new snapshot
-drift check.
-[Session 129](packing/campaign/agent-sessions/session-129-small-n-mathematical-audit.md)
-records the separate Astra Max mathematical audit and the read-only roadmap-duplication
-review. Neither block ran a scientific target or changed a mathematical claim.
+[Session 130](packing/campaign/agent-sessions/session-130-n11-w10-route-selection.md)
+records the W10 cadence audit, recent-merge stability review, and ten-candidate route
+comparison. It ran no efficiency repair and no scientific target.
 The scientific evidence cutoff remains main revision
 `80bcdbb0819504354e1278c37f211dd8cc2158fb`, where the latest merged stack is green and
 the T-026 lower bound remains the frontier.
 
-**Selected next entry:** `think-9y7p`, the BC-346 W10 planning block.
+**Selected next entry:** `think-1ydi`, the BC-340 W5 efficiency checkpoint.
 
-The roll-up and audit are certified and closed in dependency order.
-The bounded action is to reconstruct whether the W5 efficiency checkpoint is due,
-compare the ten candidate cells by payoff, readiness, first discriminator, stop rule,
-and cost, then select exactly one later execution entry.
-No scientific target runs inside this planning block.
+BC-346’s planning source passed its exact-revision gate, and the canonical handoff has
+advanced to BC-340. A conservative derivation counts eight substantive non-W5 blocks
+after Session 116/BC-322, so OR-12 makes W5 mandatory.
+BC-340 then measures the current gate and addresses at most one demonstrated bottleneck
+behind an equivalence guard, or records a measured no-change result.
+It receives its own branch and pull request and runs no scientific target.
+A fresh W10 then makes the scientific selection; all ten candidate cells remain behind
+that post-W5 gate, so closing BC-346 released only the efficiency block.
 
 The older BC329, weighted-atom stages 3–4, and BC303 H-160/H-162 target lanes are
 paused. Their admitted implementations, registrations, and controls remain evidence; no
@@ -4040,8 +4056,8 @@ in separate tables: their units differ, and the same work can appear in both.
 | Coverage | sessions |
 | --- | ---: |
 | measured | 82 |
-| unmeasured | 47 |
-| **total** | **129** |
+| unmeasured | 48 |
+| **total** | **130** |
 
 <!-- END GENERATED: session-close-report -->
 
