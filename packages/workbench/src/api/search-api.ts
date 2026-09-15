@@ -1,4 +1,4 @@
-import { parseUint32Seed } from "../core/runtime-contracts.ts";
+import { PACKING_VALIDITY, parseUint32Seed } from "../core/runtime-contracts.ts";
 import type { JsonObject, SearchPlan } from "../search/contracts.ts";
 import {
   PACK_SEARCH_CONFIGURATION_CONTRACT,
@@ -78,8 +78,15 @@ export function createBrowserSearchPlan(inputs: BrowserSearchInputs): SearchPlan
       window: 20,
       stop: false,
     },
-    repair: inputs.repair ? { kind: "resolve", tolerance: 1e-8 } : { kind: "none" },
-    objective: { kind: "absolute-side", state: "best-observed", require_stationary: false },
+    repair: inputs.repair
+      ? { kind: "resolve", tolerance: PACKING_VALIDITY.penetrationTolerance }
+      : { kind: "none" },
+    // With Resolve requested the table ranks what Resolve returned, not the best raw sample.
+    objective: {
+      kind: "absolute-side",
+      state: inputs.repair ? "repaired" : "best-observed",
+      require_stationary: false,
+    },
   };
   const plan = decodeSearchPlan({
     contract: "packing.squares:SearchPlan/v1",

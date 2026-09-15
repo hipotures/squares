@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { createBrowserSearchPlan, parseBrowserSearchSeeds } from "../src/api/search-api.ts";
+import { PACKING_VALIDITY } from "../src/core/runtime-contracts.ts";
 import { decodeSearchOutcomes, encodeSearchOutcomes } from "../src/search/outcomes.ts";
 import { createPackSearchRunner } from "../src/search/pack-runner.ts";
 import { runSearchPlan } from "../src/search/scheduler.ts";
@@ -24,6 +25,58 @@ test("browser search plans are deterministic and runnable without corpus", async
       ),
     /plan/i,
   );
+});
+
+test("the browser repair option runs Resolve and ranks the repaired state", async () => {
+  const plain = createBrowserSearchPlan({
+    n: 5,
+    seeds: [0, 1],
+    physicsSteps: 100,
+    proposal: "grid",
+    repair: false,
+  });
+  assert.deepEqual(plain.configurations[0]?.configuration.objective, {
+    kind: "absolute-side",
+    state: "best-observed",
+    require_stationary: false,
+  });
+  const plan = createBrowserSearchPlan({
+    n: 5,
+    seeds: [0, 1],
+    physicsSteps: 100,
+    proposal: "grid",
+    repair: true,
+  });
+  assert.deepEqual(plan.configurations[0]?.configuration.repair, {
+    kind: "resolve",
+    tolerance: PACKING_VALIDITY.penetrationTolerance,
+  });
+  assert.deepEqual(plan.configurations[0]?.configuration.objective, {
+    kind: "absolute-side",
+    state: "repaired",
+    require_stationary: false,
+  });
+  const ledger = await runSearchPlan(plan, createPackSearchRunner({ batchSteps: 32 }), {
+    now: () => 0,
+  });
+  assert.deepEqual(
+    ledger.outcomes.map((outcome) => outcome.status),
+    ["completed", "completed"],
+  );
+  let ranked = 0;
+  for (const outcome of ledger.outcomes) {
+    if (outcome.status !== "completed") {
+      throw new Error("expected a completed repair slot");
+    }
+    const { result } = outcome;
+    assert.equal(result.selectedState, "repaired");
+    assert.notEqual(result.repair.termination, "not-requested");
+    const repaired = result.repaired;
+    const expected = repaired?.valid === true ? repaired.absoluteSide : null;
+    assert.equal(result.objective, expected);
+    ranked += expected === null ? 0 : 1;
+  }
+  assert.ok(ranked > 0, "no repaired state was valid, so the objective check proved nothing");
 });
 
 test("browser search rejects excessive work and ambiguous seed lists", () => {
