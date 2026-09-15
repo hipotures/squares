@@ -17,16 +17,21 @@ import os
 import stat
 import sys
 from collections.abc import Sequence
+from copy import deepcopy
+from dataclasses import dataclass
 from fractions import Fraction
 from pathlib import Path, PurePosixPath
-from typing import Any, Never, cast
+from typing import Any, Final, Never, cast
 
 from strif import atomic_output_file
 
 from devtools.decide_threshold_certificate import load as load_threshold_certificate
 from sqpack.fractional.threshold_compression import (
+    SELECTION_MANIFEST_SCHEMA,
     CompressionPolicy,
+    OrbitInventory,
     PointOrbitSelection,
+    SelectionManifestError,
     ThresholdOrbitSelection,
     canonical_catalog_record,
     catalog_sha256,
@@ -35,28 +40,103 @@ from sqpack.fractional.threshold_compression import (
     inventory_certificate,
     measure_selection,
     ordered_support,
+    parse_selection_manifest,
     quantized_inventory_budget,
+    selection_manifest_record,
+    serialize_selection_manifest,
+    serialize_threshold_certificate,
 )
 
 PACKING = Path(__file__).resolve().parent.parent
 REPOSITORY = PACKING.parent
-ADMISSION = PACKING / "cases/n11_threshold_certificate/route-s-compression-admission.json"
-RECEIPT = PACKING / (
+ADMISSION: Final = PACKING / (
+    "cases/n11_threshold_certificate/route-s-compression-admission.json"
+)
+RECEIPT: Final = PACKING / (
     "cases/n11_threshold_certificate/route-s-compression-admission-receipt.json"
 )
-ADMISSION_PATH = "packing/cases/n11_threshold_certificate/route-s-compression-admission.json"
-SOURCE_PATH = "packing/cases/n11_threshold_certificate/certificate.json"
-SENTINEL_PATH = "packing/cases/n11_threshold_certificate/t-026-dilation-limit-corollary.json"
-SENTINEL_SOURCE_PATH = "packing/cases/n11_threshold_certificate/certificate-191-50-net1440.json"
-SCHEMA = "packing.squares:ThresholdCompressionAdmission/v1"
-RECEIPT_SCHEMA = "packing.squares:ThresholdCompressionAdmissionReceipt/v1"
-MAX_JSON_BYTES = 256 * 1024
-MAX_JSON_DEPTH = 16
-MAX_INTEGER_DIGITS = 6
-SHA256_LENGTH = 64
-MAX_CERTIFICATE_BYTES = 2 * 1024 * 1024
-QUANTIZATION_DENOMINATOR = 30_000
-SYNTHETIC_WEIGHT = Fraction(1, QUANTIZATION_DENOMINATOR)
+ADMISSION_PATH: Final = (
+    "packing/cases/n11_threshold_certificate/route-s-compression-admission.json"
+)
+SOURCE_PATH: Final = "packing/cases/n11_threshold_certificate/certificate.json"
+T025_CERTIFICATE_SHA256: Final = (
+    "3935651af614eb3e9a1926179925f98643beb17ed1764a323fe83a527f4bad5c"
+)
+T025_CATALOG_SHA256: Final = (
+    "8de1d9646efef5c49367b679a78ff20961f7f5c1d43b11ff28b5f9a6b41f0e75"
+)
+T026_NET720_CERTIFICATE_SHA256: Final = (
+    "fff8b2bcab95a0041e69fec30c704dd708908125883b6ed645bc2c653ecbf8cf"
+)
+T026_NET720_COROLLARY_SHA256: Final = (
+    "c955057bddc1ae45775d66f094781d54cd7c07e1c0d75a2691f48ab73130298b"
+)
+T026_NET720_CATALOG_SHA256: Final = (
+    "b797cdf458d60623cf49e063df9f2c73ffc4a3c3f7be1f17f57fda32dc76e3f2"
+)
+T026_NET1440_CERTIFICATE_SHA256: Final = (
+    "dc2da20c75d952690c93d67fb4b3eb8552e879585902fde98eedc9b3179ed3d0"
+)
+T026_NET1440_COROLLARY_SHA256: Final = (
+    "04fd6bbca1941671ddbabbe359219011b8217818b0a291f4c9a00f5fa7834f8e"
+)
+T026_NET1440_CATALOG_SHA256: Final = (
+    "43c2b94f932bb233c71191940447a6d761387041637dab72c9a1a5ed89aea925"
+)
+SCHEMA: Final = "packing.squares:ThresholdCompressionAdmission/v1"
+RECEIPT_SCHEMA: Final = "packing.squares:ThresholdCompressionAdmissionReceipt/v1"
+MAX_JSON_BYTES: Final = 256 * 1024
+MAX_JSON_DEPTH: Final = 16
+MAX_INTEGER_DIGITS: Final = 6
+SHA256_LENGTH: Final = 64
+MAX_CERTIFICATE_BYTES: Final = 2 * 1024 * 1024
+QUANTIZATION_DENOMINATOR: Final = 30_000
+SYNTHETIC_WEIGHT: Final = Fraction(1, QUANTIZATION_DENOMINATOR)
+
+
+@dataclass(frozen=True, slots=True)
+class SentinelAnchor:
+    """Checker-owned identity for one independently authenticated T-026 sentinel."""
+
+    direction_steps: int
+    role: str
+    path: str
+    sha256: str
+    source_path: str
+    source_sha256: str
+    catalog_sha256: str
+
+
+SENTINELS: Final = (
+    SentinelAnchor(
+        direction_steps=720,
+        role="T-026 720-step support and rescaling sentinel",
+        path=(
+            "packing/cases/n11_threshold_certificate/"
+            "t-026-net720-dilation-limit-corollary.json"
+        ),
+        sha256=T026_NET720_COROLLARY_SHA256,
+        source_path=(
+            "packing/cases/n11_threshold_certificate/certificate-191-50-net720.json"
+        ),
+        source_sha256=T026_NET720_CERTIFICATE_SHA256,
+        catalog_sha256=T026_NET720_CATALOG_SHA256,
+    ),
+    SentinelAnchor(
+        direction_steps=1440,
+        role="T-026 1440-step support and rescaling sentinel",
+        path=(
+            "packing/cases/n11_threshold_certificate/"
+            "t-026-dilation-limit-corollary.json"
+        ),
+        sha256=T026_NET1440_COROLLARY_SHA256,
+        source_path=(
+            "packing/cases/n11_threshold_certificate/certificate-191-50-net1440.json"
+        ),
+        source_sha256=T026_NET1440_CERTIFICATE_SHA256,
+        catalog_sha256=T026_NET1440_CATALOG_SHA256,
+    ),
+)
 
 
 class AdmissionError(ValueError):
@@ -173,9 +253,12 @@ def _repo_path(value: object, *, expected: str, label: str) -> Path:
         raise AdmissionError(f"{label} is not a normalized repository-relative path")
     if value != expected:
         raise AdmissionError(f"{label} is {value!r}; expected frozen path {expected!r}")
-    path = (REPOSITORY / pure).resolve()
-    if not path.is_relative_to(REPOSITORY.resolve()):
+    path = (REPOSITORY / pure).absolute()
+    resolved = path.resolve()
+    if not resolved.is_relative_to(REPOSITORY.resolve()):
         raise AdmissionError(f"{label} escapes the repository")
+    if resolved != path:
+        raise AdmissionError(f"{label} resolves through a symlink")
     return path
 
 
@@ -204,15 +287,37 @@ def _load_certificate(path: Path, *, label: str) -> tuple[object, bytes]:
 
 def _expected_admission(
     *,
-    source_digest: str,
-    source_inventory: Any,
-    sentinel_digest: str,
-    sentinel_source_digest: str,
-    sentinel_inventory: Any,
+    source_inventory: OrbitInventory,
+    sentinel_inventories: tuple[OrbitInventory, ...],
 ) -> dict[str, Any]:
-    relation = compare_scaled_support(source_inventory, sentinel_inventory)
-    if not relation.matches:
-        raise AdmissionError("T-026 does not preserve T-025 support under one exact scale")
+    if len(sentinel_inventories) != len(SENTINELS):
+        raise AdmissionError("the ordered T-026 sentinel inventory is incomplete")
+    sentinel_records: list[dict[str, Any]] = []
+    for anchor, sentinel_inventory in zip(
+        SENTINELS, sentinel_inventories, strict=True
+    ):
+        relation = compare_scaled_support(source_inventory, sentinel_inventory)
+        if not relation.matches:
+            raise AdmissionError(
+                f"T-026 net-{anchor.direction_steps} does not preserve T-025 support "
+                "under one exact scale"
+            )
+        sentinel_records.append(
+            {
+                "direction_steps": anchor.direction_steps,
+                "role": anchor.role,
+                "path": anchor.path,
+                "sha256": anchor.sha256,
+                "source_path": anchor.source_path,
+                "source_sha256": anchor.source_sha256,
+                "catalog_sha256": anchor.catalog_sha256,
+                "point_support_equal": relation.point_support_equal,
+                "threshold_support_equal": relation.threshold_support_equal,
+                "common_weight_scale": str(relation.common_weight_scale),
+                "support_equal": relation.support_equal,
+                "weights_have_common_scale": relation.weights_have_common_scale,
+            }
+        )
     rounded_budget = quantized_inventory_budget(source_inventory, QUANTIZATION_DENOMINATOR)
     if rounded_budget >= source_inventory.n:
         raise AdmissionError("the denominator-30000 upward-rounding control exceeds budget")
@@ -221,13 +326,13 @@ def _expected_admission(
         "control": {
             "role": "matched T-025 control",
             "path": SOURCE_PATH,
-            "sha256": source_digest,
+            "sha256": T025_CERTIFICATE_SHA256,
             "n": source_inventory.n,
             "outer_side": str(source_inventory.outer_side),
             "square_side": str(source_inventory.square_side),
             "symmetry": source_inventory.symmetry,
             "total_budget": str(source_inventory.total_budget),
-            "catalog_sha256": catalog_sha256(source_inventory),
+            "catalog_sha256": T025_CATALOG_SHA256,
             "point_orbits": source_inventory.point_orbit_count,
             "threshold_orbits": source_inventory.threshold_orbit_count,
             "orbits": source_inventory.orbit_count,
@@ -235,22 +340,13 @@ def _expected_admission(
             "threshold_atoms": source_inventory.threshold_atom_count,
             "atoms": source_inventory.atom_count,
         },
-        "sentinel": {
-            "role": "T-026 support and rescaling sentinel",
-            "path": SENTINEL_PATH,
-            "sha256": sentinel_digest,
-            "source_path": SENTINEL_SOURCE_PATH,
-            "source_sha256": sentinel_source_digest,
-            "catalog_sha256": catalog_sha256(sentinel_inventory),
-            "point_support_equal": relation.point_support_equal,
-            "threshold_support_equal": relation.threshold_support_equal,
-            "common_weight_scale": str(relation.common_weight_scale),
-            "support_equal": relation.support_equal,
-            "weights_have_common_scale": relation.weights_have_common_scale,
-        },
+        "sentinels": sentinel_records,
         "family": {
             "kind": "fixed-source-support D4-orbit selection",
             "catalog_schema": canonical_catalog_record(source_inventory)["schema"],
+            "manifest_schema": SELECTION_MANIFEST_SCHEMA,
+            "manifest_nonempty": True,
+            "manifest_source_bound": True,
             "selection_unit": "one complete source D4 orbit",
             "geometry_rule": "select source orbit representatives without moving sites",
             "weight_rule": "one positive exact rational weight per selected orbit",
@@ -285,18 +381,14 @@ def _expected_admission(
 
 def _validate_paths_and_digests(
     admission: dict[str, Any],
-    *,
-    source_digest: str,
-    sentinel_digest: str,
-    sentinel_source_digest: str,
 ) -> None:
-    """Refuse path aliases and digest substitutions before deriving the full record."""
+    """Refuse path aliases and any substitution for a checker-owned digest anchor."""
     _keys(
         admission,
         {
             "schema",
             "control",
-            "sentinel",
+            "sentinels",
             "family",
             "quantization_control",
             "execution_boundary",
@@ -328,66 +420,136 @@ def _validate_paths_and_digests(
     )
     _repo_path(control["path"], expected=SOURCE_PATH, label="control.path")
     declared = _digest(control["sha256"], label="control.sha256")
-    if declared != source_digest:
-        raise AdmissionError("control digest does not match the frozen T-025 bytes")
-    _digest(control["catalog_sha256"], label="control.catalog_sha256")
-    sentinel = _keys(
-        admission["sentinel"],
-        {
-            "role",
-            "path",
-            "sha256",
-            "source_path",
-            "source_sha256",
-            "catalog_sha256",
-            "point_support_equal",
-            "threshold_support_equal",
-            "common_weight_scale",
-            "support_equal",
-            "weights_have_common_scale",
-        },
-        "sentinel",
-    )
-    _repo_path(sentinel["path"], expected=SENTINEL_PATH, label="sentinel.path")
-    _repo_path(
-        sentinel["source_path"],
-        expected=SENTINEL_SOURCE_PATH,
-        label="sentinel.source_path",
-    )
-    if _digest(sentinel["sha256"], label="sentinel.sha256") != sentinel_digest:
-        raise AdmissionError("sentinel digest does not match the frozen T-026 record")
+    if declared != T025_CERTIFICATE_SHA256:
+        raise AdmissionError("control digest differs from the checker-owned T-025 anchor")
     if (
-        _digest(sentinel["source_sha256"], label="sentinel.source_sha256")
-        != sentinel_source_digest
+        _digest(control["catalog_sha256"], label="control.catalog_sha256")
+        != T025_CATALOG_SHA256
     ):
-        raise AdmissionError("sentinel source digest does not match the frozen T-026 bytes")
-    _digest(sentinel["catalog_sha256"], label="sentinel.catalog_sha256")
+        raise AdmissionError(
+            "control catalogue digest differs from the checker-owned T-025 anchor"
+        )
+    sentinels = admission["sentinels"]
+    if not isinstance(sentinels, list) or len(sentinels) != len(SENTINELS):
+        raise AdmissionError("sentinels must be the ordered 720-step and 1440-step pair")
+    for index, (value, anchor) in enumerate(zip(sentinels, SENTINELS, strict=True)):
+        label = f"sentinels[{index}]"
+        sentinel = _keys(
+            value,
+            {
+                "direction_steps",
+                "role",
+                "path",
+                "sha256",
+                "source_path",
+                "source_sha256",
+                "catalog_sha256",
+                "point_support_equal",
+                "threshold_support_equal",
+                "common_weight_scale",
+                "support_equal",
+                "weights_have_common_scale",
+            },
+            label,
+        )
+        if sentinel["direction_steps"] != anchor.direction_steps:
+            raise AdmissionError(f"{label} is out of the frozen sentinel order")
+        _repo_path(sentinel["path"], expected=anchor.path, label=f"{label}.path")
+        _repo_path(
+            sentinel["source_path"],
+            expected=anchor.source_path,
+            label=f"{label}.source_path",
+        )
+        if _digest(sentinel["sha256"], label=f"{label}.sha256") != anchor.sha256:
+            raise AdmissionError(
+                f"{label} digest differs from the checker-owned corollary anchor"
+            )
+        if (
+            _digest(sentinel["source_sha256"], label=f"{label}.source_sha256")
+            != anchor.source_sha256
+        ):
+            raise AdmissionError(
+                f"{label} source digest differs from the checker-owned certificate anchor"
+            )
+        if (
+            _digest(sentinel["catalog_sha256"], label=f"{label}.catalog_sha256")
+            != anchor.catalog_sha256
+        ):
+            raise AdmissionError(
+                f"{label} catalogue digest differs from the checker-owned catalogue anchor"
+            )
 
 
-def _synthetic_decompressor_check(inventory: Any) -> dict[str, Any]:
-    """Exercise the admitted family at its ceiling without making a candidate."""
+def _manifest_roundtrip(
+    inventory: OrbitInventory,
+    point_selections: tuple[PointOrbitSelection, ...],
+    threshold_selections: tuple[ThresholdOrbitSelection, ...],
+) -> tuple[
+    tuple[PointOrbitSelection, ...],
+    tuple[ThresholdOrbitSelection, ...],
+    bytes,
+]:
+    manifest = serialize_selection_manifest(
+        inventory, point_selections, threshold_selections
+    )
+    parsed_points, parsed_thresholds = parse_selection_manifest(manifest, inventory)
+    if (parsed_points, parsed_thresholds) != (point_selections, threshold_selections):
+        raise AdmissionError("selection-manifest round trip changed the selected orbits")
+    if (
+        serialize_selection_manifest(inventory, parsed_points, parsed_thresholds)
+        != manifest
+    ):
+        raise AdmissionError("selection-manifest serialization is not byte stable")
+    return parsed_points, parsed_thresholds, manifest
+
+
+def _loaded_inventory(certificate: object) -> OrbitInventory:
+    encoded = serialize_threshold_certificate(certificate)  # type: ignore[arg-type]
+    loaded, _ = load_threshold_certificate(encoded)
+    return inventory_certificate(loaded)  # type: ignore[arg-type]
+
+
+def _synthetic_selections(
+    inventory: OrbitInventory,
+) -> tuple[tuple[PointOrbitSelection, ...], tuple[ThresholdOrbitSelection, ...]]:
     policy = CompressionPolicy()
     point_count = min(len(inventory.point_orbits), policy.max_orbits - 1)
-    point_selections = tuple(
+    points = tuple(
         PointOrbitSelection(orbit.representative, SYNTHETIC_WEIGHT)
         for orbit in inventory.point_orbits[:point_count]
     )
     threshold_needed = policy.max_orbits - point_count
-    threshold_selections = tuple(
+    thresholds = tuple(
         ThresholdOrbitSelection(orbit.representative, SYNTHETIC_WEIGHT)
         for orbit in inventory.threshold_orbits[:threshold_needed]
     )
-    metrics = measure_selection(inventory, point_selections, threshold_selections, policy)
-    decompressed = decompress_selection(
-        inventory, point_selections, threshold_selections, policy
+    return points, thresholds
+
+
+def _synthetic_decompressor_check(inventory: OrbitInventory) -> dict[str, Any]:
+    """Exercise the admitted family at its ceiling without making a candidate."""
+    policy = CompressionPolicy()
+    points, thresholds = _synthetic_selections(inventory)
+    parsed_points, parsed_thresholds, manifest = _manifest_roundtrip(
+        inventory, points, thresholds
     )
-    if len(decompressed.atoms) + len(decompressed.threshold_atoms) != metrics.expanded_atoms:
+    metrics = measure_selection(inventory, parsed_points, parsed_thresholds, policy)
+    decompressed = decompress_selection(
+        inventory, parsed_points, parsed_thresholds, policy
+    )
+    reconstructed = _loaded_inventory(decompressed)
+    if reconstructed.atom_count != metrics.expanded_atoms:
         raise AdmissionError("synthetic decompressor disagrees with its exact atom metric")
-    if decompressed.total_budget != metrics.total_budget:
+    if reconstructed.total_budget != metrics.total_budget:
         raise AdmissionError("synthetic decompressor changed its uniform exact weights")
     return {
         "role": "target-blind decompressor control",
         "synthetic_weight": str(SYNTHETIC_WEIGHT),
+        "manifest_schema": SELECTION_MANIFEST_SCHEMA,
+        "manifest_sha256": _sha256(manifest),
+        "manifest_bytes": len(manifest),
+        "manifest_roundtrip": True,
+        "certificate_loader_roundtrip": True,
         "baseline_orbits": metrics.baseline_orbits,
         "point_orbits": metrics.point_orbits,
         "threshold_orbits": metrics.threshold_orbits,
@@ -400,14 +562,14 @@ def _synthetic_decompressor_check(inventory: Any) -> dict[str, Any]:
         "within_orbit_ceiling": metrics.within_orbit_ceiling,
         "meets_compression_factor": metrics.meets_compression_factor,
         "satisfies_policy": metrics.satisfies_policy,
-        "decompressed_point_atoms": len(decompressed.atoms),
-        "decompressed_threshold_atoms": len(decompressed.threshold_atoms),
-        "decompressed_budget": str(decompressed.total_budget),
+        "decompressed_point_atoms": reconstructed.point_atom_count,
+        "decompressed_threshold_atoms": reconstructed.threshold_atom_count,
+        "decompressed_budget": str(reconstructed.total_budget),
     }
 
 
-def _full_control_roundtrip(inventory: Any) -> dict[str, Any]:
-    """Decompress every authenticated T-025 orbit and compare the canonical result."""
+def _full_control_roundtrip(inventory: OrbitInventory) -> dict[str, Any]:
+    """Round-trip a full manifest and recover T-025 through its existing loader."""
     points = tuple(
         PointOrbitSelection(orbit.representative, orbit.weight)
         for orbit in inventory.point_orbits
@@ -416,20 +578,26 @@ def _full_control_roundtrip(inventory: Any) -> dict[str, Any]:
         ThresholdOrbitSelection(orbit.representative, orbit.weight)
         for orbit in inventory.threshold_orbits
     )
+    parsed_points, parsed_thresholds, manifest = _manifest_roundtrip(
+        inventory, points, thresholds
+    )
     policy = CompressionPolicy(
         max_orbits=inventory.orbit_count,
         minimum_compression_factor=Fraction(1),
     )
-    reconstructed = inventory_certificate(
-        decompress_selection(inventory, points, thresholds, policy)
+    reconstructed = _loaded_inventory(
+        decompress_selection(inventory, parsed_points, parsed_thresholds, policy)
     )
-    source_record = canonical_catalog_record(inventory)
-    reconstructed_record = canonical_catalog_record(reconstructed)
-    if reconstructed_record != source_record:
+    if canonical_catalog_record(reconstructed) != canonical_catalog_record(inventory):
         raise AdmissionError("full T-025 decompression is not canonically equivalent")
     return {
-        "role": "full authenticated T-025 decompressor control",
+        "role": "full authenticated T-025 manifest and decompressor control",
         "canonical_equivalent": True,
+        "manifest_schema": SELECTION_MANIFEST_SCHEMA,
+        "manifest_sha256": _sha256(manifest),
+        "manifest_bytes": len(manifest),
+        "manifest_roundtrip": True,
+        "certificate_loader_roundtrip": True,
         "catalog_sha256": catalog_sha256(reconstructed),
         "orbits": reconstructed.orbit_count,
         "atoms": reconstructed.atom_count,
@@ -437,41 +605,125 @@ def _full_control_roundtrip(inventory: Any) -> dict[str, Any]:
     }
 
 
-def build_receipt(admission_path: Path = ADMISSION) -> dict[str, Any]:
-    """Recompute the complete admission receipt without any scientific target work."""
-    admission, admission_bytes = load_json(admission_path, label="admission record")
-    top = _keys(
-        admission,
-        {
-            "schema",
-            "control",
-            "sentinel",
-            "family",
-            "quantization_control",
-            "execution_boundary",
-        },
-        "admission",
+def _mutation_controls(inventory: OrbitInventory) -> dict[str, bool]:
+    """Execute every target-blind malformed-manifest class named by X-032."""
+    points, thresholds = _synthetic_selections(inventory)
+    base = selection_manifest_record(inventory, points, thresholds)
+    rows = cast(list[dict[str, Any]], base["orbits"])
+    threshold_index = next(
+        index for index, row in enumerate(rows) if row["kind"] == "threshold"
     )
-    if not isinstance(top["control"], dict) or not isinstance(top["sentinel"], dict):
-        raise AdmissionError("control and sentinel must be JSON objects")
-    control = cast(dict[str, Any], top["control"])
-    sentinel = cast(dict[str, Any], top["sentinel"])
-    source_path = _repo_path(control.get("path"), expected=SOURCE_PATH, label="control.path")
-    sentinel_path = _repo_path(
-        sentinel.get("path"), expected=SENTINEL_PATH, label="sentinel.path"
+    noncanonical_d4 = next(
+        member
+        for member in inventory.point_orbits[0].members
+        if member != inventory.point_orbits[0].representative
     )
-    sentinel_source_path = _repo_path(
-        sentinel.get("source_path"),
-        expected=SENTINEL_SOURCE_PATH,
-        label="sentinel.source_path",
+
+    mutations: dict[str, dict[str, Any]] = {}
+    for name in (
+        "duplicate",
+        "missing",
+        "off_support",
+        "wrong_type",
+        "wrong_threshold",
+        "non_d4",
+        "negative",
+        "nonrational",
+    ):
+        mutations[name] = deepcopy(base)
+
+    duplicate_rows = cast(list[dict[str, Any]], mutations["duplicate"]["orbits"])
+    duplicate_rows.append(deepcopy(duplicate_rows[0]))
+    missing_rows = cast(list[dict[str, Any]], mutations["missing"]["orbits"])
+    del missing_rows[0]["weight"]
+    off_support_rows = cast(list[dict[str, Any]], mutations["off_support"]["orbits"])
+    off_support_rows[0]["representative"] = ["1/7", "1/11"]
+    wrong_type_rows = cast(list[dict[str, Any]], mutations["wrong_type"]["orbits"])
+    wrong_type_rows[0]["kind"] = "threshold"
+    wrong_threshold_rows = cast(
+        list[dict[str, Any]], mutations["wrong_threshold"]["orbits"]
     )
-    source_certificate, source_bytes = _load_certificate(source_path, label="T-025 certificate")
-    sentinel_record, sentinel_bytes = load_json(sentinel_path, label="T-026 limit record")
-    sentinel_source_certificate, sentinel_source_bytes = _load_certificate(
-        sentinel_source_path, label="T-026 source certificate"
+    wrong_threshold_rep = cast(
+        dict[str, Any], wrong_threshold_rows[threshold_index]["representative"]
     )
-    sentinel_source = _keys(
-        sentinel_record.get("source"),
+    wrong_threshold_rep["threshold"] = 1
+    non_d4_rows = cast(list[dict[str, Any]], mutations["non_d4"]["orbits"])
+    non_d4_rows[0]["representative"] = [str(value) for value in noncanonical_d4]
+    negative_rows = cast(list[dict[str, Any]], mutations["negative"]["orbits"])
+    negative_rows[0]["weight"] = str(-SYNTHETIC_WEIGHT)
+    nonrational_rows = cast(list[dict[str, Any]], mutations["nonrational"]["orbits"])
+    nonrational_rows[0]["weight"] = "sqrt(2)"
+
+    outcomes: dict[str, bool] = {}
+    for name, record in mutations.items():
+        try:
+            parse_selection_manifest(_canonical_json(record), inventory)
+        except SelectionManifestError:
+            outcomes[name] = True
+        else:
+            raise AdmissionError(f"X-032 {name.replace('_', '-')} mutation was accepted")
+    return outcomes
+
+
+def _policy_boundary_check(inventory: OrbitInventory) -> dict[str, Any]:
+    """Accept 23 selected orbits and refuse 24 before any coverage code can run."""
+    selections = tuple(
+        PointOrbitSelection(orbit.representative, SYNTHETIC_WEIGHT)
+        for orbit in inventory.point_orbits[:24]
+    )
+    points, thresholds, manifest = _manifest_roundtrip(inventory, selections, ())
+    metrics = measure_selection(inventory, points, thresholds)
+    if metrics.selected_orbits != 24 or metrics.satisfies_policy:
+        raise AdmissionError("the 24-orbit boundary does not violate the frozen policy")
+    try:
+        decompress_selection(inventory, points, thresholds)
+    except ValueError:
+        refused = True
+    else:
+        raise AdmissionError("the decompressor accepted a 24-orbit manifest")
+    return {
+        "accepted_orbits": 23,
+        "rejected_orbits": metrics.selected_orbits,
+        "rejected_manifest_sha256": _sha256(manifest),
+        "rejected_before_decompression": refused,
+        "coverage_ran": False,
+    }
+
+
+def _authenticate_inventory(
+    *, path: Path, label: str, byte_sha256: str, catalog_digest: str
+) -> OrbitInventory:
+    certificate, certificate_bytes = _load_certificate(path, label=label)
+    actual_digest = _sha256(certificate_bytes)
+    if actual_digest != byte_sha256:
+        raise AdmissionError(f"{label} differs from its checker-owned byte anchor")
+    inventory = inventory_certificate(certificate)  # type: ignore[arg-type]
+    if catalog_sha256(inventory) != catalog_digest:
+        raise AdmissionError(f"{label} differs from its checker-owned catalogue anchor")
+    return inventory
+
+
+def _authenticate_sentinel(anchor: SentinelAnchor) -> OrbitInventory:
+    """Authenticate one T-026 corollary, source, net size, and catalogue independently."""
+    record_path = _repo_path(anchor.path, expected=anchor.path, label="sentinel path")
+    source_path = _repo_path(
+        anchor.source_path, expected=anchor.source_path, label="sentinel source path"
+    )
+    record, record_bytes = load_json(
+        record_path, label=f"T-026 net-{anchor.direction_steps} limit record"
+    )
+    if _sha256(record_bytes) != anchor.sha256:
+        raise AdmissionError(
+            f"T-026 net-{anchor.direction_steps} record differs from its checker-owned anchor"
+        )
+    inventory = _authenticate_inventory(
+        path=source_path,
+        label=f"T-026 net-{anchor.direction_steps} source certificate",
+        byte_sha256=anchor.source_sha256,
+        catalog_digest=anchor.catalog_sha256,
+    )
+    source = _keys(
+        record.get("source"),
         {
             "accepted_conditions",
             "certificate",
@@ -487,54 +739,95 @@ def build_receipt(admission_path: Path = ADMISSION) -> dict[str, Any]:
             "total_budget",
             "variant",
         },
-        "T-026 source",
+        f"T-026 net-{anchor.direction_steps} source",
     )
-    if sentinel_source.get("certificate") != SENTINEL_SOURCE_PATH:
-        raise AdmissionError("T-026 record names a foreign source certificate")
-    if sentinel_source.get("sha256") != _sha256(sentinel_source_bytes):
-        raise AdmissionError("T-026 record does not bind its frozen source bytes")
-    source_inventory = inventory_certificate(source_certificate)  # type: ignore[arg-type]
-    sentinel_inventory = inventory_certificate(sentinel_source_certificate)  # type: ignore[arg-type]
+    _repo_path(
+        source["certificate"],
+        expected=anchor.source_path,
+        label=f"T-026 net-{anchor.direction_steps} source.certificate",
+    )
+    if (
+        _digest(source["sha256"], label=f"T-026 net-{anchor.direction_steps} source.sha256")
+        != anchor.source_sha256
+    ):
+        raise AdmissionError(
+            f"T-026 net-{anchor.direction_steps} record does not bind its source anchor"
+        )
+    if len(inventory.half_tangents) - 1 != anchor.direction_steps:
+        raise AdmissionError(
+            f"T-026 net-{anchor.direction_steps} certificate has the wrong direction net"
+        )
+    return inventory
+
+
+def build_receipt(admission_path: Path = ADMISSION) -> dict[str, Any]:
+    """Recompute the complete admission receipt without any scientific target work."""
+    admission, admission_bytes = load_json(admission_path, label="admission record")
+    top = _keys(
+        admission,
+        {
+            "schema",
+            "control",
+            "sentinels",
+            "family",
+            "quantization_control",
+            "execution_boundary",
+        },
+        "admission",
+    )
+    if not isinstance(top["control"], dict) or not isinstance(top["sentinels"], list):
+        raise AdmissionError("control must be an object and sentinels must be an array")
+    control = cast(dict[str, Any], top["control"])
+    _validate_paths_and_digests(admission)
+    source_path = _repo_path(control.get("path"), expected=SOURCE_PATH, label="control.path")
+    source_inventory = _authenticate_inventory(
+        path=source_path,
+        label="T-025 certificate",
+        byte_sha256=T025_CERTIFICATE_SHA256,
+        catalog_digest=T025_CATALOG_SHA256,
+    )
+    sentinel_inventories = tuple(_authenticate_sentinel(anchor) for anchor in SENTINELS)
     source_support = ordered_support(source_inventory)
     if len(source_support) != source_inventory.orbit_count:
         raise AdmissionError("ordered source support does not cover every orbit once")
-    source_digest = _sha256(source_bytes)
-    sentinel_digest = _sha256(sentinel_bytes)
-    sentinel_source_digest = _sha256(sentinel_source_bytes)
-    _validate_paths_and_digests(
-        admission,
-        source_digest=source_digest,
-        sentinel_digest=sentinel_digest,
-        sentinel_source_digest=sentinel_source_digest,
-    )
     expected = _expected_admission(
-        source_digest=source_digest,
         source_inventory=source_inventory,
-        sentinel_digest=sentinel_digest,
-        sentinel_source_digest=sentinel_source_digest,
-        sentinel_inventory=sentinel_inventory,
+        sentinel_inventories=sentinel_inventories,
     )
     if admission != expected:
         raise AdmissionError("admission record differs from its exact derived contract")
-    relation = compare_scaled_support(source_inventory, sentinel_inventory)
     rounded_budget = quantized_inventory_budget(source_inventory, QUANTIZATION_DENOMINATOR)
+    sentinel_receipts: list[dict[str, Any]] = []
+    for anchor, inventory in zip(SENTINELS, sentinel_inventories, strict=True):
+        relation = compare_scaled_support(source_inventory, inventory)
+        sentinel_receipts.append(
+            {
+                "direction_steps": anchor.direction_steps,
+                "path": anchor.path,
+                "sha256": anchor.sha256,
+                "source_path": anchor.source_path,
+                "source_sha256": anchor.source_sha256,
+                "catalog_sha256": anchor.catalog_sha256,
+                "point_support_equal": relation.point_support_equal,
+                "threshold_support_equal": relation.threshold_support_equal,
+                "support_equal": relation.support_equal,
+                "common_weight_scale": str(relation.common_weight_scale),
+                "weights_have_common_scale": relation.weights_have_common_scale,
+                "reproduced": relation.matches,
+            }
+        )
     return {
         "schema": RECEIPT_SCHEMA,
-        "status": "blocked",
-        "admission_blockers": [
-            "pin all T-025/T-026 digests outside the mutable admission record",
-            "bind both the 720-step and 1440-step T-026 provenance sentinels",
-            "admit a canonical selection-manifest parser and serializer",
-            "exercise every mutation refusal declared by X-032",
-        ],
+        "status": "admitted",
+        "admission_blockers": [],
         "admission": {
             "path": ADMISSION_PATH,
             "sha256": _sha256(admission_bytes),
         },
         "control": {
             "path": SOURCE_PATH,
-            "sha256": source_digest,
-            "catalog_sha256": catalog_sha256(source_inventory),
+            "sha256": T025_CERTIFICATE_SHA256,
+            "catalog_sha256": T025_CATALOG_SHA256,
             "support_keys": len(source_support),
             "orbits": source_inventory.orbit_count,
             "atoms": source_inventory.atom_count,
@@ -542,18 +835,7 @@ def build_receipt(admission_path: Path = ADMISSION) -> dict[str, Any]:
             "reproduced": True,
             "decompressor_roundtrip": _full_control_roundtrip(source_inventory),
         },
-        "sentinel": {
-            "path": SENTINEL_PATH,
-            "sha256": sentinel_digest,
-            "source_path": SENTINEL_SOURCE_PATH,
-            "source_sha256": sentinel_source_digest,
-            "point_support_equal": relation.point_support_equal,
-            "threshold_support_equal": relation.threshold_support_equal,
-            "support_equal": relation.support_equal,
-            "common_weight_scale": str(relation.common_weight_scale),
-            "weights_have_common_scale": relation.weights_have_common_scale,
-            "reproduced": relation.matches,
-        },
+        "sentinels": sentinel_receipts,
         "quantization_control": {
             "denominator": QUANTIZATION_DENOMINATOR,
             "rounded_budget": str(rounded_budget),
@@ -562,13 +844,15 @@ def build_receipt(admission_path: Path = ADMISSION) -> dict[str, Any]:
             "research_success": False,
         },
         "synthetic_decompressor": _synthetic_decompressor_check(source_inventory),
+        "policy_boundary": _policy_boundary_check(source_inventory),
+        "mutation_controls": _mutation_controls(source_inventory),
         "target_ran": False,
         "optimizer_ran": False,
         "coverage_ran": False,
         "candidate_created": False,
         "experiment_created": False,
         "scope": (
-            "Incomplete instrument checkpoint only. Admission is blocked; no coverage, "
+            "Target-blind instrument admitted after source-distinct review. No coverage, "
             "optimizer, candidate certificate, compression verdict, or improved n=11 "
             "bound is established."
         ),
@@ -585,9 +869,9 @@ def _write_receipt(output: Path, encoded: bytes, *, admission: Path) -> None:
     protected = {
         admission.resolve(),
         (REPOSITORY / SOURCE_PATH).resolve(),
-        (REPOSITORY / SENTINEL_PATH).resolve(),
-        (REPOSITORY / SENTINEL_SOURCE_PATH).resolve(),
     }
+    protected.update((REPOSITORY / anchor.path).resolve() for anchor in SENTINELS)
+    protected.update((REPOSITORY / anchor.source_path).resolve() for anchor in SENTINELS)
     if output.resolve() in protected:
         raise AdmissionError("receipt output may not overwrite an input")
     with atomic_output_file(output) as temporary:

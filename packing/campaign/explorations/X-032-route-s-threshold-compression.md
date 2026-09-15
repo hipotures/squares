@@ -30,11 +30,11 @@ exploration:
 ---
 # X-032: Route S Fixed-Support Threshold-Certificate Compression
 
-**Status: preregistered admission, with no scientific target.** This report fixes the
-objects, metric, and verdict boundary for BC-343 before any compression candidate is
-produced.
-It registers H-163 but does not allocate `exp-161`, run an optimizer, change an
-atom, replay candidate coverage, or make a compression claim.
+**Status: target-blind instrument admitted, with no scientific target.** This report
+fixes the objects, metric, and verdict boundary for BC-343 before any compression
+candidate is produced.
+It registers H-163 but does not allocate `exp-161`, run an optimizer, change an atom,
+replay candidate coverage, or make a compression claim.
 T-025 and T-026 retain their existing results and assurance levels.
 
 ## Frozen Control
@@ -79,6 +79,14 @@ Those changes could be valuable, but they would test a different hypothesis.
 A deterministic decompressor must take a canonical list of orbit representatives and
 their rational weights, expand every D4 image in the frozen order, and emit a candidate
 in the existing T-025 certificate format.
+The manifest lists only selected orbits with strictly positive weights; it represents a
+zero weight by omitting that orbit.
+The list must be nonempty.
+The all-zero family member is outside the admitted manifest language because it has no
+finite compression factor and cannot decompress to a candidate certificate.
+In the mutation controls below, “missing” means a required manifest field is absent or a
+selected orbit has an incomplete expansion.
+Omitting an inactive orbit is canonical, not an error.
 The admission analyzer must reject an unknown, duplicated, incomplete, or incorrectly
 expanded orbit before any coverage decision.
 The decompressed T-025 control must reproduce the frozen source bytes or a

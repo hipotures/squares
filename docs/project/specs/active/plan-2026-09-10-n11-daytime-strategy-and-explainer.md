@@ -122,9 +122,10 @@ BC-353 selected Route A and is terminal.
 BC-354 stopped at Route A’s representation boundary without running a target or closing
 a physical root; the complete 80-stratum negative-root producer, matched exact baseline,
 conditional gate, and independent replay remain absent.
-BC-343 / `think-a1e8` remains the active research commitment; its guard-discharge and
-certification child `think-r55v` is the sole next entry.
-Its first pull request is a no-target Route S admission.
+BC-343 remains the active research commitment.
+Session 135 completed the guard-discharge work; its exact-head certification and merge
+child `think-so4g` is the sole current entry for the no-target Route S admission
+checkpoint.
 [X-032](../../../../packing/campaign/explorations/X-032-route-s-threshold-compression.md)
 freezes T-025 as the sole matched control, its exact 79 point-orbit and 40
 two-of-three-threshold-orbit support universe, and the at-most-23 positive-orbit
@@ -132,12 +133,12 @@ criterion.
 [H-163](../../../../packing/campaign/hypotheses/H-163-route-s-threshold-compression.md)
 registers the later scientific claim.
 T-026 is only a support-and-rescaling provenance sentinel.
-Session 134’s independent review refused the first admission checkpoint pending
-immutable T-025/T-026 digest anchors, both T-026 sentinels, a canonical
-selection-manifest boundary, and the complete X-032 mutation matrix.
-The draft admission PR contains no optimizer, candidate, coverage target, or `exp-161`.
-BC-341 remains tentative behind a future W10 reselection and the missing Route A
-representation.
+Session 135 discharged the four obligations from Session 134 with checker-owned source
+anchors, both T-026 sentinels, a canonical source-bound manifest, and the complete X-032
+mutation matrix. Its source-distinct audit found and then cleared one symlink-alias
+finding. The instrument is admitted for exact-head certification; the branch contains no
+optimizer, candidate, coverage target, or `exp-161`. BC-341 remains tentative behind a
+future W10 reselection and the missing Route A representation.
 
 The planning candidates are:
 

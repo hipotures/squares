@@ -3307,6 +3307,9 @@ STEPS: tuple[Step, ...] = (
         touches=(
             *_CORE,
             "packing/cases/n11_threshold_certificate/certificate.json",
+            "packing/cases/n11_threshold_certificate/certificate-191-50-net720.json",
+            "packing/cases/n11_threshold_certificate/t-026-net720-dilation-limit-corollary.json",
+            "packing/cases/n11_threshold_certificate/certificate-191-50-net1440.json",
             "packing/cases/n11_threshold_certificate/t-026-dilation-limit-corollary.json",
             "packing/cases/n11_threshold_certificate/route-s-compression-admission.json",
             "packing/cases/n11_threshold_certificate/route-s-compression-admission-receipt.json",

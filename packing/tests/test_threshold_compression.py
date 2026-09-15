@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import json
 from fractions import Fraction
 from pathlib import Path
+from typing import Any, cast
 
 import pytest
 
@@ -15,6 +17,7 @@ from sqpack.fractional.threshold import ThresholdAtom, ThresholdCertificate
 from sqpack.fractional.threshold_compression import (
     CompressionPolicy,
     PointOrbitSelection,
+    SelectionManifestError,
     ThresholdNetSpec,
     ThresholdOrbitSelection,
     canonical_catalog_record,
@@ -24,8 +27,11 @@ from sqpack.fractional.threshold_compression import (
     inventory_certificate,
     measure_selection,
     ordered_support,
+    parse_selection_manifest,
     quantize_upward,
     quantized_inventory_budget,
+    selection_manifest_record,
+    serialize_selection_manifest,
     serialize_threshold_certificate,
     threshold_certificate_record,
 )
@@ -69,6 +75,19 @@ def _tiny_certificate(
         threshold_atoms=threshold_atoms,
         half_tangents=(Fraction(0), Fraction(1, 5)),
     )
+
+
+def _canonical_manifest_bytes(record: object) -> bytes:
+    return (
+        json.dumps(
+            record,
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+            allow_nan=False,
+        )
+        + "\n"
+    ).encode()
 
 
 def test_t025_inventory_is_the_frozen_119_orbits_and_904_atoms() -> None:
@@ -171,6 +190,22 @@ def test_inventory_refuses_a_broken_threshold_orbit() -> None:
         inventory_certificate(broken)
 
 
+def test_inventory_refuses_non_d4_symmetry_before_orbit_expansion() -> None:
+    source = _tiny_certificate()
+    broken = ThresholdCertificate(
+        n=source.n,
+        outer_side=source.outer_side,
+        square_side=source.square_side,
+        atoms=source.atoms,
+        threshold_atoms=source.threshold_atoms,
+        half_tangents=source.half_tangents,
+        symmetry="C4",
+    )
+
+    with pytest.raises(ValueError, match="compression inventory requires D4"):
+        inventory_certificate(broken)
+
+
 def test_catalog_digest_is_canonical_and_weight_sensitive() -> None:
     first = inventory_certificate(_tiny_certificate())
     reordered_source = _tiny_certificate()
@@ -238,8 +273,16 @@ def test_full_t025_selection_decompresses_to_a_canonical_equivalent() -> None:
     )
     source_policy = CompressionPolicy(max_orbits=119, minimum_compression_factor=Fraction(1))
 
-    rebuilt = decompress_selection(inventory, points, thresholds, source_policy)
+    manifest = serialize_selection_manifest(inventory, points, thresholds)
+    parsed_points, parsed_thresholds = parse_selection_manifest(manifest, inventory)
+    rebuilt = decompress_selection(
+        inventory, parsed_points, parsed_thresholds, source_policy
+    )
 
+    assert manifest == serialize_selection_manifest(
+        inventory, parsed_points, parsed_thresholds
+    )
+    assert len(selection_manifest_record(inventory, points, thresholds)["orbits"]) == 119
     assert canonical_catalog_record(inventory_certificate(rebuilt)) == (
         canonical_catalog_record(inventory)
     )
@@ -255,18 +298,30 @@ def test_full_t025_selection_decompresses_to_a_canonical_equivalent() -> None:
 
 def test_default_policy_accepts_a_synthetic_23_orbit_boundary() -> None:
     inventory = inventory_certificate(t025_certificate())
-    selections = tuple(
+    point_selections = tuple(
         PointOrbitSelection(orbit.representative, Fraction(1, 30000))
-        for orbit in inventory.point_orbits[:23]
+        for orbit in inventory.point_orbits[:22]
     )
+    threshold_selections = (
+        ThresholdOrbitSelection(
+            inventory.threshold_orbits[0].representative, Fraction(1, 30000)
+        ),
+    )
+    manifest = serialize_selection_manifest(
+        inventory, point_selections, threshold_selections
+    )
+    parsed_points, parsed_thresholds = parse_selection_manifest(manifest, inventory)
 
-    metrics = measure_selection(inventory, selections, ())
-    decompressed = decompress_selection(inventory, selections, ())
+    metrics = measure_selection(inventory, parsed_points, parsed_thresholds)
+    decompressed = decompress_selection(inventory, parsed_points, parsed_thresholds)
 
     assert metrics.selected_orbits == 23
+    assert metrics.point_orbits == 22
+    assert metrics.threshold_orbits == 1
     assert metrics.compression_factor == Fraction(119, 23)
     assert metrics.satisfies_policy
-    assert inventory_certificate(decompressed).point_orbit_count == 23
+    assert inventory_certificate(decompressed).point_orbit_count == 22
+    assert inventory_certificate(decompressed).threshold_orbit_count == 1
 
     loaded, _ = load(serialize_threshold_certificate(decompressed))
 
@@ -292,14 +347,125 @@ def test_default_policy_refuses_24_orbits_before_decompression() -> None:
         for orbit in inventory.point_orbits[:24]
     )
 
-    metrics = measure_selection(inventory, selections, ())
+    manifest = serialize_selection_manifest(inventory, selections, ())
+    parsed_points, parsed_thresholds = parse_selection_manifest(manifest, inventory)
+    metrics = measure_selection(inventory, parsed_points, parsed_thresholds)
 
     assert metrics.selected_orbits == 24
     assert not metrics.within_orbit_ceiling
     assert not metrics.meets_compression_factor
     assert not metrics.satisfies_policy
     with pytest.raises(ValueError, match="selection has 24 orbits"):
-        decompress_selection(inventory, selections, ())
+        decompress_selection(inventory, parsed_points, parsed_thresholds)
+
+
+def test_selection_manifest_is_canonical_source_bound_and_nonempty() -> None:
+    inventory = inventory_certificate(t025_certificate())
+    first = PointOrbitSelection(
+        inventory.point_orbits[0].representative, Fraction(1, 17)
+    )
+    second = PointOrbitSelection(
+        inventory.point_orbits[1].representative, Fraction(1, 19)
+    )
+    threshold = ThresholdOrbitSelection(
+        inventory.threshold_orbits[0].representative, Fraction(1, 23)
+    )
+
+    canonical = serialize_selection_manifest(
+        inventory, (first, second), (threshold,)
+    )
+    reordered = serialize_selection_manifest(
+        inventory, (second, first), (threshold,)
+    )
+    record = json.loads(canonical)
+
+    assert canonical == reordered
+    assert record["source_catalog_sha256"] == catalog_sha256(inventory)
+    assert [row["kind"] for row in record["orbits"]] == [
+        "point",
+        "point",
+        "threshold",
+    ]
+    with pytest.raises(ValueError, match="at least one positive orbit"):
+        selection_manifest_record(inventory, (), ())
+    with pytest.raises(SelectionManifestError, match="canonically serialized"):
+        parse_selection_manifest(
+            json.dumps(record, separators=(",", ":")).encode(), inventory
+        )
+
+
+@pytest.mark.parametrize(
+    ("mutation", "message"),
+    [
+        ("duplicate", "selected more than once"),
+        ("missing", "fields differ"),
+        ("off-support", "outside the source catalog"),
+        ("wrong-type", "must be a JSON object"),
+        ("wrong-threshold", "outside the source catalog"),
+        ("negative", "positive weight"),
+        ("zero", "positive weight"),
+        ("nonrational-string", "not canonically spelled"),
+        ("nonrational-number", "floating"),
+        ("foreign-catalog", "foreign source catalog"),
+    ],
+)
+def test_selection_manifest_refuses_x032_mutations(
+    mutation: str, message: str
+) -> None:
+    inventory = inventory_certificate(_tiny_certificate())
+    point = PointOrbitSelection(inventory.point_orbits[0].representative, Fraction(1, 7))
+    threshold = ThresholdOrbitSelection(
+        inventory.threshold_orbits[0].representative, Fraction(2, 11)
+    )
+    record: dict[str, Any] = selection_manifest_record(
+        inventory, (point,), (threshold,)
+    )
+    rows = cast(list[dict[str, Any]], record["orbits"])
+    point_row, threshold_row = rows
+
+    if mutation == "duplicate":
+        rows.append(dict(point_row))
+    elif mutation == "missing":
+        point_row.pop("weight")
+    elif mutation == "off-support":
+        cast(list[object], point_row["representative"])[0] = "999"
+    elif mutation == "wrong-type":
+        point_row["kind"] = "threshold"
+    elif mutation == "wrong-threshold":
+        representative = cast(dict[str, object], threshold_row["representative"])
+        representative["threshold"] = 1
+    elif mutation == "negative":
+        point_row["weight"] = "-1"
+    elif mutation == "zero":
+        point_row["weight"] = "0"
+    elif mutation == "nonrational-string":
+        point_row["weight"] = "0.5"
+    elif mutation == "nonrational-number":
+        point_row["weight"] = 0.5
+    elif mutation == "foreign-catalog":
+        record["source_catalog_sha256"] = "0" * 64
+    else:  # pragma: no cover - the parameter list is the mutation registry
+        raise AssertionError(f"unhandled mutation {mutation}")
+
+    with pytest.raises(SelectionManifestError, match=message):
+        parse_selection_manifest(_canonical_manifest_bytes(record), inventory)
+
+
+def test_selection_manifest_refuses_duplicate_keys_and_approximate_json() -> None:
+    inventory = inventory_certificate(_tiny_certificate())
+    duplicate = (
+        b'{"orbits":[],"schema":"packing.squares:ThresholdOrbitSelection/v1",'
+        b'"schema":"duplicate","source_catalog_sha256":"' + b"0" * 64 + b'"}\n'
+    )
+    approximate = (
+        b'{"orbits":[],"schema":"packing.squares:ThresholdOrbitSelection/v1",'
+        b'"source_catalog_sha256":0.5}\n'
+    )
+
+    with pytest.raises(SelectionManifestError, match="duplicate JSON object key"):
+        parse_selection_manifest(duplicate, inventory)
+    with pytest.raises(SelectionManifestError, match="floating"):
+        parse_selection_manifest(approximate, inventory)
 
 
 @pytest.mark.parametrize("denominator", [0, -1, True])

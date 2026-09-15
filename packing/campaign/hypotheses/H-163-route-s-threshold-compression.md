@@ -30,7 +30,7 @@ hypothesis:
     The BC-343 admission analyzer and deterministic U025 decompressor, followed in a
     later target branch by devtools.decide_threshold_certificate and a source-distinct
     manifest replay. No target producer or optimizer is admitted in this registration.
-  instrument_ready: false
+  instrument_ready: true
   regime: >-
     n=11; T-025 endpoint domain L=191/50, B=9977/10000, angle limit 207107/500000,
     181 directions, closed cores, exact rational arithmetic, D4 symmetry, 79 frozen
@@ -67,10 +67,12 @@ D4 orbits.
 Candidate weights may be zero but every coordinate, threshold triple, symmetry
 image, domain parameter, and budget coefficient remains fixed.
 
-**Status at registration: blocked on the no-target instrument.** This artifact creates
-no experiment and carries no scientific result.
-In particular, `exp-161` is unallocated; no optimizer, candidate certificate, or
+**Status after admission: the target-blind instrument is ready, and the scientific claim
+remains untested.** This artifact creates no experiment and carries no scientific
+result. In particular, `exp-161` is unallocated; no optimizer, candidate certificate, or
 coverage target has run.
+A separate target branch still requires a preregistered experiment and the admission
+pull request merged into `main`.
 
 The acceptance boundary is literal.
 At most 23 orbit representatives may have strictly positive rational weight, the exact

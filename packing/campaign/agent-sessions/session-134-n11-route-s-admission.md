@@ -15,7 +15,7 @@ session:
   branch: codex/n11-route-s-admission
   primary_bead: think-a1e8
   status: stopped
-  certification_pending: think-r55v
+  certification_pending: think-so4g
   goal: >-
     Admit or refuse one fixed-geometry support-sparse T-025 certificate family, its
     exact provenance and complexity metrics, and a reusable checker before any
@@ -215,7 +215,8 @@ session:
       The parent admission guard fired, so terminal finalization preserves a stopped,
       uncertified checkpoint rather than calling the instrument admitted.
     next_action: >-
-      Continue think-r55v from the four re-entry obligations on draft PR 182.
+      Continue under think-so4g with exact-head certification and merge after Session
+      135 discharged the four re-entry obligations on draft PR 182.
   progress:
     metric: >-
       Admission of a deterministic fixed-support Route S family and exact checker with
@@ -390,8 +391,7 @@ session:
     contract gaps. Session 134 stops without admitting the instrument, allocating an
     experiment, running a target, or reaching a scientific verdict.
   next_action: >-
-    Continue think-r55v from the four recorded re-entry obligations on draft PR 182,
-    rerun source-distinct review and exact-head fast/full gates, and do not create
+    Under think-so4g, certify and merge the exact admitted PR 182 head; do not create
     exp-161 or run a compression target before that admission merges.
 ---
 # N11 Route S Compression Admission

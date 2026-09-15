@@ -7,11 +7,11 @@ softschema:
   schema: schemas/session-close-report.schema.yaml
   envelope: null
   status: enforced
-count: 134
+count: 135
 generated_by: >-
   uv run --frozen --all-extras --group dev python -m devtools.close_session --render
 totals:
-  sessions_measured: 86
+  sessions_measured: 87
   sessions_unmeasured: 48
   attributed:
     rollups: 129
@@ -35,9 +35,9 @@ totals:
     one_off_code: 4407
     wall_hours: 421.83
 codex_receipts:
-  attributed: 54
+  attributed: 55
   unattributed: 2
-  measured: 56
+  measured: 57
 # Per-session figures below are the logs each session DECLARES. They overlap when
 # sessions share a harness log, so they do not sum to `attributed` above.
 sessions:
@@ -2240,4 +2240,24 @@ sessions:
     agent_hours: 4.88
     active_union_hours: 1.21
     wall_hours: 1.21
+    snapshot_incomplete: true
+- id: session-135
+  title: "N11 Route S Guard Discharge"
+  status: stopped
+  primary_bead: think-r55v
+  phases: 1
+  measured: true
+  rollups:
+  - packing/campaign/resource-usage/codex-task-tree-session-135.yaml
+  turns: null
+  tool_calls: null
+  tool_errors: null
+  one_off_code: null
+  wall_hours: null
+  codex_receipts:
+  - path: packing/campaign/resource-usage/codex-task-tree-session-135.yaml
+    model_responses: 437
+    agent_hours: 1.53
+    active_union_hours: 0.48
+    wall_hours: 0.48
     snapshot_incomplete: true

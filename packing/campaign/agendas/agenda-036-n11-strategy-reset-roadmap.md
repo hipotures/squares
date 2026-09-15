@@ -377,16 +377,17 @@ agenda:
     bead: think-a1e8
     depends_on: [BC-354]
     next_evidence: >-
-      Pin every T-025/T-026 digest outside the mutable admission record, bind both T-026
-      sentinels, add the canonical selection-manifest boundary, and exercise the full
-      X-032 mutation matrix. Merge the no-target admission only after a fresh independent
-      review; then register a separate experiment and budget before changing any weight.
+      Merge the source-distinct reviewed no-target admission after exact-head fast and
+      deferred gates. Then use a fresh branch to register exp-161, its target budget,
+      accept rule, and stop rule before changing any weight or running coverage.
     workflows: [pipeline-improvement, factual-review, research-loop]
     program: n11-strategy-reset
     artifacts:
     - packing/campaign/explorations/X-032-route-s-threshold-compression.md
     - packing/campaign/hypotheses/H-163-route-s-threshold-compression.md
     - packing/campaign/agent-sessions/session-134-n11-route-s-admission.md
+    - packing/campaign/agent-sessions/session-135-n11-route-s-guard-discharge.md
+    - packing/cases/n11_threshold_certificate/route-s-compression-admission-receipt.json
     parallel_group: proof-simplification
   - id: BC-344
     purpose: research
@@ -567,11 +568,14 @@ BC-354 stopped at Route A’s representation boundary: the complete physical roo
 exact baseline, conditional gate, and independent replay were not admitted.
 No target ran and no physical root closed.
 Route S / BC-343 is now in progress.
-Its first draft PR freezes T-025’s exact 119-orbit support universe, the at-most-23
+Its no-target PR freezes T-025’s exact 119-orbit support universe, the at-most-23
 positive-orbit metric, deterministic decompression, and target-blind controls.
-Session 134 refused admission after independent review found four live obligations:
-immutable T-025/T-026 digest anchors, both T-026 sentinels, a canonical
-selection-manifest boundary, and the complete X-032 mutation matrix.
+Session 135 discharged all four obligations retained by Session 134: checker-owned
+T-025/T-026 anchors, both T-026 sentinels, a canonical source-bound manifest, and the
+complete X-032 mutation matrix.
+A fresh source-distinct audit found one symlink-alias hole; the repaired boundary and
+regression passed re-audit, so the instrument is admitted.
+No target, candidate, coverage route, optimizer, or experiment ran.
 X-032 and H-163 own the source and hypothesis records; T-026 is only a
 support-and-rescaling provenance sentinel.
 BC-341 remains tentative behind a future W10 reselection and the named representation
@@ -580,10 +584,10 @@ gaps.
 The W10 review originally mapped six active hours into five sequential PR-bounded
 blocks. BC-340 and BC-353 completed, and BC-354 activated the selected-route admission’s
 guard-refusal branch.
-The remaining conditional path begins with BC-343’s separate no-target admission PR,
-then permits one compression discriminator only if that contract is admitted, followed
-by review and replanning.
-No later branch starts before the prior PR merges.
+The remaining conditional path begins with exact-head certification and merge of
+BC-343’s no-target admission PR. A fresh branch may then register one compression
+discriminator and its budget before any target access, followed by review and
+replanning. No later branch starts before the prior PR merges.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

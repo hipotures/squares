@@ -139,9 +139,9 @@ hypothesis status and summarizes experiment verdicts, and the
 | --- | ---: | --- |
 | Agendas | 35 | 15 active; 14 completed; 5 paused; 1 superseded |
 | Commitments | 343 | 177 complete; 59 stopped; 64 blocked; 15 ready; 20 tentative; 8 in progress |
-| Sessions | 134 | 84 completed; 50 stopped; all terminal |
+| Sessions | 135 | 84 completed; 51 stopped; all terminal |
 | Explorations | 30 | 18 linked to proposed hypotheses; 12 uncodified |
-| Hypotheses | 139 | 25 confirmed; 24 refuted; 49 blocked; 10 unresolved; 2 open; 26 open questions; 2 result registered; 1 abandoned; 0 running |
+| Hypotheses | 139 | 25 confirmed; 24 refuted; 48 blocked; 10 unresolved; 3 open; 26 open questions; 2 result registered; 1 abandoned; 0 running |
 | Experiments | 116 | 38 accepted; 29 rejected; 25 unresolved; 11 baseline; 11 blocked; 2 abandoned; 0 in progress |
 | Frontier results | 26 | 26 registered |
 
@@ -208,18 +208,19 @@ The current order is:
    Its source inventories found no complete 80-stratum negative-root producer, matched
    exact baseline, conditional gate, or method-distinct replay.
    No target ran and no physical root closed.
-2. BC-343 / `think-a1e8` remains the active research commitment; `think-r55v` is its
+2. BC-343 / `think-a1e8` remains the active research commitment; `think-so4g` is its
    sole operational entry.
    [X-032](packing/campaign/explorations/X-032-route-s-threshold-compression.md) and
    [H-163](packing/campaign/hypotheses/H-163-route-s-threshold-compression.md) freeze
    T-025 as the sole matched control, its exact 119-orbit support universe, and the
    at-most-23 positive-orbit criterion.
    T-026 is only a support-and-rescaling sentinel.
-   Session 134’s source-distinct review refused the first admission checkpoint: the
-   retained surface still needs immutable source digests, both T-026 sentinels, a
-   canonical selection-manifest boundary, and the complete X-032 mutation matrix.
-   No optimizer, candidate, coverage target, or `exp-161` is authorized before the
-   admission PR merges.
+   Session 134’s source-distinct review refused the first admission checkpoint.
+   Session 135 then discharged all four retained guards: checker-owned source digests,
+   both T-026 sentinels, a canonical selection-manifest boundary, and the complete X-032
+   mutation matrix. Its source-distinct re-audit returned ADMIT after one symlink-alias
+   boundary repair. No optimizer, candidate, coverage target, or `exp-161` is authorized
+   before the exact admitted PR head is certified and merged.
 3. Treat A, S, global angular resources, and B as the first advisory tier.
    A is the strongest route to a material `n = 11` lower bound; S is the best bounded
    deliverable; angular resources offer a cheap optimal-face screen; and B is the
@@ -235,10 +236,11 @@ The detailed
 [six-hour execution schedule](docs/project/reviews/review-2026-09-14-n11-post-w5-route-selection.md#six-active-hours-after-this-planning-merge)
 originally allocated five sequential merge-bounded blocks.
 BC-354 activated that schedule’s guard-refusal branch, so the Route A discriminator no
-longer follows it. The remaining path begins with BC-343’s no-target Route S admission;
-only an admitted compression contract may proceed to a target, independent audit, and
-closeout. Each block starts from the preceding merge on a fresh branch and gets its own
-session, bead disposition, validation receipt, and pull request.
+longer follows it. BC-343’s no-target Route S instrument is now admitted locally; the
+remaining path begins with exact-head certification and merge, followed by a separate
+planning block that may register `exp-161` and authorize one bounded target.
+Each block starts from the preceding merge on a fresh branch and gets its own session,
+bead disposition, validation receipt, and pull request.
 
 The audit’s linear advisory order is A, S, angular resources, B, stronger charge
 algebra, geometry-dependent budgets, `n = 12`, C, D, then geometric waste.
@@ -886,17 +888,18 @@ controller, not permission to blur contracts.
 
 ### Current Handoff
 
-[Session 134](packing/campaign/agent-sessions/session-134-n11-route-s-admission.md) is
-the latest terminal handoff on merged main revision
-`5ce2839f17b2f5a337260dc3f649e05ab974bd25`. It began BC-343 with a no-target W7
-admission of one fixed-support T-025 compression family and retained exact 119-orbit
-inventory, at-most-23 policy metrics, deterministic decompression, and existing-loader
-round trips.
-Its source-distinct review refused admission because the checkpoint does not
-yet pin immutable T-025/T-026 digests, bind both T-026 sentinels, expose a canonical
-selection-manifest parser and serializer, or exercise every declared mutation refusal.
-[X-032](packing/campaign/explorations/X-032-route-s-threshold-compression.md) owns the
-source and verdict boundary, and
+[Session 135](packing/campaign/agent-sessions/session-135-n11-route-s-guard-discharge.md)
+is the latest terminal handoff on the no-target Route S admission branch.
+It discharged the four guards retained by
+[Session 134](packing/campaign/agent-sessions/session-134-n11-route-s-admission.md):
+checker-owned T-025/T-026 byte and catalogue anchors, both T-026 sentinels, a canonical
+source-bound nonempty selection manifest, and every declared mutation refusal.
+A fresh source-distinct audit found one path-alias hole; the repaired symlink refusal
+and its regression passed re-audit.
+The retained receipt therefore admits the instrument.
+No optimizer, candidate, coverage target, experiment, or scientific verdict was
+produced. [X-032](packing/campaign/explorations/X-032-route-s-threshold-compression.md)
+owns the source and verdict boundary, and
 [H-163](packing/campaign/hypotheses/H-163-route-s-threshold-compression.md) owns the
 prospective scientific claim.
 T-026 is only a support-and-rescaling provenance sentinel.
@@ -916,17 +919,20 @@ The scientific evidence cutoff remains main revision
 `80bcdbb0819504354e1278c37f211dd8cc2158fb`, where the latest merged stack is green and
 the T-026 lower bound remains the frontier.
 
-**Selected next entry:** `think-r55v`, the guard-discharge and certification child of
-BC-343 / `think-a1e8`.
+**Selected next entry:** `think-so4g`, the exact-head certification and merge child of
+BC-343 / `think-a1e8`. Only after that checkpoint merges may a fresh branch register
+`exp-161` and its bounded compression target.
 
 BC-340, BC-353, and BC-354 are terminal.
 BC-341 remains tentative behind a future W10 reselection and the named Route A
 representation gaps.
-BC-343 has a separate draft no-target PR that freezes Route S’s complexity metric, fixed
-support universe, controls, and verdict rules, but its retained receipt remains
-explicitly blocked on the four Session 134 review findings.
-No scientific compression target has execution authority before that admission PR
-merges; no optimizer, candidate, coverage target, or `exp-161` has run.
+BC-343 has a separate no-target PR that freezes Route S’s complexity metric, fixed
+support universe, controls, and verdict rules.
+Its retained receipt is admitted after source-distinct review, but exact-head fast and
+deferred certification and merge remain the current gate.
+No scientific compression target has execution authority before that merge and a
+separate experiment registration; no optimizer, candidate, coverage target, or `exp-161`
+has run.
 
 The older BC329, weighted-atom stages 3–4, and BC303 H-160/H-162 target lanes are
 paused. Their admitted implementations, registrations, and controls remain evidence; no
@@ -3829,7 +3835,7 @@ round that names the hypothesis, control roles included.
 | [H-160](packing/campaign/hypotheses/H-160-bc303-t2-charge-filters.md) | blocked | Every frozen BC303 C charge is at least 4524200 and every S first-owner strip charge is at least 4524185 | 1 | exp-158 paused before target invocation; no scientific verdict |
 | [H-161](packing/campaign/hypotheses/H-161-bc303-literal-parent-union.md) | refuted | The frozen literal closed Q0 has integer mass `N>=4262074`, excluding the named four-corner tuple under the imported BC303 floor | 1 | exp-159: `N=4000015`; neither the four-corner nor one-parent threshold rejects |
 | [H-162](packing/campaign/hypotheses/H-162-bc303-floor-normalized-t2-filter.md) | blocked | Frozen BC303 C and S first-owner strip minima are each at least 4524132 | 1 | exp-160 paused without an exp-158 receipt; no scientific verdict |
-| [H-163](packing/campaign/hypotheses/H-163-route-s-threshold-compression.md) | blocked | T-025’s exact support universe admits a certificate with at most 23 positive D4 orbit representatives | 0 | BC-343 is admitting the instrument; no exp-161, candidate, optimizer, coverage target, or scientific verdict |
+| [H-163](packing/campaign/hypotheses/H-163-route-s-threshold-compression.md) | open | T-025’s exact support universe admits a certificate with at most 23 positive D4 orbit representatives | 0 | Target-blind instrument admitted; no exp-161, candidate, optimizer, coverage target, or scientific verdict |
 
 ### Confirmed
 
@@ -4099,14 +4105,15 @@ in separate tables: their units differ, and the same work can appear in both.
 | `codex-task-tree-session-132.yaml` | session-132 | 274 | 1.03 h | 0.72 h | 0.72 h | yes |
 | `codex-task-tree-session-133.yaml` | session-133 | 101 | 0.37 h | 0.2 h | 13.6 h | yes |
 | `codex-task-tree-session-134.yaml` | session-134 | 497 | 4.88 h | 1.21 h | 1.21 h | yes |
+| `codex-task-tree-session-135.yaml` | session-135 | 437 | 1.53 h | 0.48 h | 0.48 h | yes |
 | `codex-task-tree-pr137-publication-tail.yaml` | unattributed | 610 | 4.39 h | 1.77 h | 1.82 h | yes |
 | `codex-task-tree-pr142-publication-tail.yaml` | unattributed | 136 | 0.87 h | 0.41 h | 0.58 h | yes |
 
 | Coverage | sessions |
 | --- | ---: |
-| measured | 86 |
+| measured | 87 |
 | unmeasured | 48 |
-| **total** | **134** |
+| **total** | **135** |
 
 <!-- END GENERATED: session-close-report -->
 

@@ -5,7 +5,9 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from pathlib import Path
+from typing import cast
 
 import pytest
 
@@ -25,24 +27,29 @@ def _write(path: Path, record: object) -> Path:
 def test_retained_admission_replays_without_running_a_target() -> None:
     receipt = admission.build_receipt()
 
-    assert receipt["status"] == "blocked"
-    assert receipt["admission_blockers"] == [
-        "pin all T-025/T-026 digests outside the mutable admission record",
-        "bind both the 720-step and 1440-step T-026 provenance sentinels",
-        "admit a canonical selection-manifest parser and serializer",
-        "exercise every mutation refusal declared by X-032",
-    ]
+    assert receipt["status"] == "admitted"
+    assert receipt["admission_blockers"] == []
     assert receipt["control"]["orbits"] == 119
     assert receipt["control"]["atoms"] == 904
     assert receipt["control"]["decompressor_roundtrip"] == {
-        "role": "full authenticated T-025 decompressor control",
+        "role": "full authenticated T-025 manifest and decompressor control",
         "canonical_equivalent": True,
+        "manifest_schema": "packing.squares:ThresholdOrbitSelection/v1",
+        "manifest_sha256": "53fbe28bd6dd022600515663ea1e3609ed2bd36a83e69e350b4bb3b45d7b7176",
+        "manifest_bytes": 100_270,
+        "manifest_roundtrip": True,
+        "certificate_loader_roundtrip": True,
         "catalog_sha256": receipt["control"]["catalog_sha256"],
         "orbits": 119,
         "atoms": 904,
         "total_budget": "685457679/62500000",
     }
-    assert receipt["sentinel"]["reproduced"] is True
+    assert [sentinel["direction_steps"] for sentinel in receipt["sentinels"]] == [720, 1440]
+    assert all(sentinel["reproduced"] for sentinel in receipt["sentinels"])
+    assert all(
+        sentinel["common_weight_scale"] == "500000000/498684619"
+        for sentinel in receipt["sentinels"]
+    )
     assert receipt["quantization_control"] == {
         "denominator": 30_000,
         "rounded_budget": "82373/7500",
@@ -53,6 +60,27 @@ def test_retained_admission_replays_without_running_a_target() -> None:
     assert receipt["synthetic_decompressor"]["selected_orbits"] == 23
     assert receipt["synthetic_decompressor"]["compression_factor"] == "119/23"
     assert receipt["synthetic_decompressor"]["satisfies_policy"] is True
+    assert receipt["synthetic_decompressor"]["manifest_roundtrip"] is True
+    assert receipt["synthetic_decompressor"]["certificate_loader_roundtrip"] is True
+    assert receipt["policy_boundary"] == {
+        "accepted_orbits": 23,
+        "rejected_orbits": 24,
+        "rejected_manifest_sha256": (
+            "194f1f9f47fc94e7f945920c38a4efdb43476719eba025ea446a1d7b91fde27e"
+        ),
+        "rejected_before_decompression": True,
+        "coverage_ran": False,
+    }
+    assert receipt["mutation_controls"] == {
+        "duplicate": True,
+        "missing": True,
+        "negative": True,
+        "non_d4": True,
+        "nonrational": True,
+        "off_support": True,
+        "wrong_threshold": True,
+        "wrong_type": True,
+    }
     for field in (
         "target_ran",
         "optimizer_ran",
@@ -72,28 +100,107 @@ def test_output_is_byte_identical_to_the_retained_receipt(tmp_path: Path) -> Non
 
 
 @pytest.mark.parametrize(
-    ("section", "field", "value"),
+    ("keys", "value"),
     [
-        ("control", "path", "../certificate.json"),
-        ("control", "sha256", "0" * 64),
-        ("control", "catalog_sha256", "a" * 64),
-        ("sentinel", "source_path", "/tmp/certificate.json"),
-        ("sentinel", "source_sha256", "f" * 64),
-        ("family", "max_orbits", 24),
-        ("execution_boundary", "target_ran", True),
-        ("quantization_control", "denominator", 29_999),
+        (("control", "path"), "../certificate.json"),
+        (("control", "sha256"), "0" * 64),
+        (("control", "catalog_sha256"), "a" * 64),
+        (("sentinels", 0, "path"), "/tmp/corollary.json"),
+        (("sentinels", 0, "direction_steps"), 1440),
+        (("sentinels", 0, "sha256"), "b" * 64),
+        (("sentinels", 0, "source_path"), "/tmp/certificate.json"),
+        (("sentinels", 0, "source_sha256"), "c" * 64),
+        (("sentinels", 0, "catalog_sha256"), "d" * 64),
+        (("sentinels", 1, "sha256"), "e" * 64),
+        (("sentinels", 1, "source_sha256"), "f" * 64),
+        (("sentinels", 1, "catalog_sha256"), "0" * 64),
+        (("family", "max_orbits"), 24),
+        (("execution_boundary", "target_ran"), True),
+        (("quantization_control", "denominator"), 29_999),
     ],
 )
 def test_contract_mutations_are_refused(
-    tmp_path: Path, section: str, field: str, value: object
+    tmp_path: Path, keys: tuple[str | int, ...], value: object
 ) -> None:
     record = _record()
-    nested = record[section]
+    nested: object = record
+    for key in keys[:-1]:
+        if isinstance(key, int):
+            assert isinstance(nested, list)
+            nested = cast(list[object], nested)[key]
+        else:
+            assert isinstance(nested, dict)
+            nested = nested[key]
+    final = keys[-1]
+    assert isinstance(final, str)
     assert isinstance(nested, dict)
-    nested[field] = value
+    nested[final] = value
 
     with pytest.raises(admission.AdmissionError):
         admission.build_receipt(_write(tmp_path / "mutated.json", record))
+
+
+def test_sentinel_order_is_frozen(tmp_path: Path) -> None:
+    record = _record()
+    sentinels = record["sentinels"]
+    assert isinstance(sentinels, list)
+    sentinels.reverse()
+
+    with pytest.raises(admission.AdmissionError, match="order"):
+        admission.build_receipt(_write(tmp_path / "swapped.json", record))
+
+    sentinels.pop()
+    with pytest.raises(admission.AdmissionError, match="ordered"):
+        admission.build_receipt(_write(tmp_path / "missing.json", record))
+
+
+def test_bound_input_path_cannot_resolve_through_a_symlink(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    target = tmp_path / "target.json"
+    target.write_text("{}\n", encoding="utf-8")
+    alias = tmp_path / "alias.json"
+    alias.symlink_to(target)
+    monkeypatch.setattr(admission, "REPOSITORY", tmp_path)
+
+    with pytest.raises(admission.AdmissionError, match="resolves through a symlink"):
+        admission._repo_path(  # noqa: SLF001
+            "alias.json", expected="alias.json", label="bound input"
+        )
+
+
+def test_checker_owned_source_anchors_are_not_self_attested() -> None:
+    source_path = admission.REPOSITORY / admission.SOURCE_PATH
+    with pytest.raises(admission.AdmissionError, match="byte anchor"):
+        admission._authenticate_inventory(  # noqa: SLF001
+            path=source_path,
+            label="T-025 mutation control",
+            byte_sha256="0" * 64,
+            catalog_digest=admission.T025_CATALOG_SHA256,
+        )
+    with pytest.raises(admission.AdmissionError, match="catalogue anchor"):
+        admission._authenticate_inventory(  # noqa: SLF001
+            path=source_path,
+            label="T-025 mutation control",
+            byte_sha256=admission.T025_CERTIFICATE_SHA256,
+            catalog_digest="0" * 64,
+        )
+
+
+@pytest.mark.parametrize("anchor", admission.SENTINELS)
+def test_each_sentinel_has_three_independent_checker_owned_anchors(
+    anchor: admission.SentinelAnchor,
+) -> None:
+    with pytest.raises(admission.AdmissionError, match=r"record.*anchor"):
+        admission._authenticate_sentinel(replace(anchor, sha256="0" * 64))  # noqa: SLF001
+    with pytest.raises(admission.AdmissionError, match="byte anchor"):
+        admission._authenticate_sentinel(  # noqa: SLF001
+            replace(anchor, source_sha256="0" * 64)
+        )
+    with pytest.raises(admission.AdmissionError, match="catalogue anchor"):
+        admission._authenticate_sentinel(  # noqa: SLF001
+            replace(anchor, catalog_sha256="0" * 64)
+        )
 
 
 def test_duplicate_keys_and_floating_numbers_are_refused(tmp_path: Path) -> None:
@@ -120,8 +227,17 @@ def test_byte_and_depth_limits_are_enforced_before_contract_parsing(tmp_path: Pa
         admission.load_json(too_deep, label="control")
 
 
-def test_output_cannot_overwrite_a_bound_input() -> None:
-    assert admission.main(["--output", str(admission.ADMISSION)]) == 2
+@pytest.mark.parametrize(
+    "path",
+    [
+        admission.ADMISSION,
+        admission.REPOSITORY / admission.SOURCE_PATH,
+        *(admission.REPOSITORY / anchor.path for anchor in admission.SENTINELS),
+        *(admission.REPOSITORY / anchor.source_path for anchor in admission.SENTINELS),
+    ],
+)
+def test_output_cannot_overwrite_a_bound_input(path: Path) -> None:
+    assert admission.main(["--output", str(path)]) == 2
 
 
 def test_validation_step_runs_the_retained_check(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -151,3 +267,9 @@ def test_validation_step_runs_the_retained_check(monkeypatch: pytest.MonkeyPatch
     assert step.fast
     assert step.records
     assert not step.broad
+    assert {
+        "packing/cases/n11_threshold_certificate/certificate-191-50-net720.json",
+        "packing/cases/n11_threshold_certificate/t-026-net720-dilation-limit-corollary.json",
+        "packing/cases/n11_threshold_certificate/certificate-191-50-net1440.json",
+        "packing/cases/n11_threshold_certificate/t-026-dilation-limit-corollary.json",
+    }.issubset(step.touches)
