@@ -72,19 +72,20 @@ body.capture #stage {
   left: 60px;
   top: 12px;
   width: 1000px;
-  /* 979, not 940: the owner asked for the box to be bigger, with even space above and below
-     the headline under it. The square view fits this height, so the settled box's path sits
-     at 12 + 979 x 1.045 / 1.09 = 950.6 at every n, and its 4 px stroke draws to 953. The
-     headline's ink runs 994 to 1039, measured in pixels: 41 above, 41 below.
-     Not larger, because a MOVING drawing reaches lower than the settled box. The SVG clips
-     it (`overflow: hidden`), so nothing is drawn below the SVG's own floor, at 991: on the
-     corpus's deepest steps, a square swinging in a rigid block under the bodies style at
-     n = 293 and 302, the drawing is cut flat there, 3 px above the headline's ink, and
-     `check_animate_view` requires more than 2. At 980 no position of the headline gives
-     equal space to the pixel with that clearance. The earlier 954 and 949 were measured on
-     element boxes, which ignore the clip. The stage itself stays 1920 x 1080, which the
-     1080p capture depends on. */
-  height: 979px;
+  /* 971, not 940: the owner asked for the box to be bigger, with even space above and below
+     the headline under it, and saw and accepted this size. The square view fits this height,
+     so the settled box's path sits at 12 + 971 x 1.045 / 1.09 = 942.9 at every n, and its
+     4 px stroke draws to 945. The headline's ink runs 990 to 1035, measured in pixels: 45
+     above, 45 below.
+     A MOVING drawing reaches lower than the settled box. The SVG clips it (`overflow:
+     hidden`), so nothing is drawn below the SVG's own floor, at 983: on the corpus's deepest
+     steps, a square swinging in a rigid block under the bodies style at n = 293 and 302, the
+     drawing is cut flat there, 7 px above the headline's ink, and `check_animate_view`
+     requires at least 5. The page was shrunk to 954 and then 949 on element boxes, which
+     ignore the clip and put that square 8 px into the headline's ink at this size; drawn,
+     it never reaches it. The stage itself stays 1920 x 1080, which the 1080p capture
+     depends on. */
+  height: 971px;
   display: block;
   touch-action: none;
 }
@@ -304,21 +305,21 @@ body.drawing #packing-svg #squares {
    on the widest number the corpus holds, so `n =` does not move as a digit is gained. */
 /* Below the packing, with air the container cannot eat into.
    The container's DRAWN floor is a constant: the packing SVG fits the box into the same
-   rectangle whatever the box is, so it sits at 950.6 at every n, from every start, at every
+   rectangle whatever the box is, so it sits at 942.9 at every n, from every start, at every
    growth size and under a doubled blind inflation -- all five measured (at 913.2, before the
-   drawing grew to 979 tall). What changes inside
+   drawing grew to 971 tall). What changes inside
    it is how much of it the squares fill, not where its edge is. So the clearance here is a
    number that can be chosen once rather than a worst case to guess at.
    The numeral's own box opens above its ink by about a fifth of its size, so what matters is
-   where the INK starts, not where the box does. Measured with pixels: ink from 994 to 1039,
-   41 below the box's drawn edge and 41 above the stage's own.
+   where the INK starts, not where the box does. Measured with pixels: ink from 990 to 1035,
+   45 below the box's drawn edge and 45 above the stage's own.
    Anchored to the stage's floor with `bottom` rather than to its ceiling with `top`. The stage
    is a fixed 1080 tall so the two are the same number today; `bottom` is the one that stays
    true, because what this row is measured from is the bottom of the diagram. */
 #headline {
   position: absolute;
   left: 60px;
-  bottom: 7px;
+  bottom: 11px;
   width: 1000px;
   height: 96px;
 }

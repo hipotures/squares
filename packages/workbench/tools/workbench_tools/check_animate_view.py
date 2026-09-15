@@ -541,13 +541,19 @@ def headline_space(session: Session) -> str:
     return "the headline is centred under the container"
 
 
+#: How far above the headline's first inked row the lowest drawn point of a moving frame must
+#: stay, in stage px. The owner-approved 971 px stage clears it by 7; a 979 px stage would
+#: leave 3, and element boxes that ignore the SVG's clip read 7.8 px into the ink.
+HEADLINE_CLEARANCE = 5
+
+
 def stage_clearance(session: Session) -> str:
     """What a moving drawing draws clears the headline, at the steps where it reaches deepest.
 
     The box grows toward the next record's side and squares tilt, so a moving drawing reaches
     below the settled floor. `stage/lowest-drawn` counts only what the SVG draws, cut at the
     SVG's floor where the SVG clips, because an element's box is not what is drawn: at the
-    step into 293 under the bodies style a square's box reads 16 px below a floor that nothing
+    step into 293 under the bodies style a square's box reads 15 px below a floor that nothing
     is drawn under. The four steps are the corpus's deepest under each physical style.
     """
     style = session.api(("state",))["style"]
@@ -558,9 +564,9 @@ def stage_clearance(session: Session) -> str:
     for solver, n in (("physics", 6), ("physics", 5), ("bodies", 293), ("bodies", 302)):
         drawn = session.look("stage/lowest-drawn", n=n, style=solver)
         session.require(
-            drawn["deepest"] < ink_top - 2,
+            drawn["deepest"] <= ink_top - HEADLINE_CLEARANCE,
             f"the drawing reaches {drawn['deepest']:.1f} in the step into n = {n} under "
-            f"{solver}, within 2 of the headline's ink at {ink_top:.1f} "
+            f"{solver}, within {HEADLINE_CLEARANCE} of the headline's ink at {ink_top:.1f} "
             f"(the SVG's floor is {drawn['floor']:.1f}, clipping: {drawn['clips']})",
         )
     session.api(("setCapture", False), ("setStyle", style), ("setStepN", 17), ("seek", 0))
