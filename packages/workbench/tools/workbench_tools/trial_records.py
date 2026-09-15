@@ -14,6 +14,7 @@ from typing import cast
 from sqpack.project import configured_project_root
 from sqpack.yamlio import safe_load
 from workbench_tools.packing_contracts import (
+    DEFAULT_VALIDITY_TOLERANCE,
     GeometryIssue,
     PackingContractError,
     check_unit_square_packing,
@@ -24,10 +25,13 @@ CONFIGURATION_CONTRACT = "packing.squares:AnnealingConfiguration/v1"
 SOURCE_CONTRACT = "packing.squares:WorkbenchSource/v1"
 REPAIR_CONTRACT = "packing.squares:OverlapRepair/v1"
 
-# Matches the retained catalogue precision; each independent check receives it explicitly.
-VALID_OVERLAP = 1e-5
+#: Geometry is admitted under the workbench's one validity contract and nothing looser: the raw
+#: and repaired arrangements, the reported overlaps, the fitted origin and the fitted side.
+VALIDITY_TOLERANCE = DEFAULT_VALIDITY_TOLERANCE
+
+#: Arithmetic identity, not geometry: a recorded reference side, excess, score or cost must
+#: equal the value recomputed from the same inputs, to within float64 rounding at these sizes.
 REFERENCE_TOLERANCE = 1e-9
-REPAIR_TOLERANCE = 1e-9
 
 
 @dataclass(frozen=True, slots=True)
@@ -288,24 +292,24 @@ def admission_reason(  # noqa: PLR0911 - each ordered refusal is part of the wir
             trial.poses,
             side=trial.side,
             expected_count=trial.n,
-            tolerance=VALID_OVERLAP,
+            tolerance=VALIDITY_TOLERANCE,
         )
         repaired = check_unit_square_packing(
             trial.resolved_poses,
             side=trial.resolved_side,
             expected_count=trial.n,
-            tolerance=VALID_OVERLAP,
+            tolerance=VALIDITY_TOLERANCE,
         )
     except PackingContractError, OverflowError, TypeError, ValueError:
         return "malformed-geometry"
     malformed = {GeometryIssue.SHAPE, GeometryIssue.COUNT, GeometryIssue.NONFINITE}
     if malformed.intersection(raw.issues) or GeometryIssue.WALL_ESCAPE in raw.issues:
         return "raw-geometry"
-    reported_overlap = trial.overlap > VALID_OVERLAP
+    reported_overlap = trial.overlap > VALIDITY_TOLERANCE
     checked_overlap = GeometryIssue.PAIR_OVERLAP in raw.issues
     if reported_overlap != checked_overlap:
         return "inconsistent-raw-overlap"
-    if not repaired.passed or trial.resolved_overlap > VALID_OVERLAP:
+    if not repaired.passed or trial.resolved_overlap > VALIDITY_TOLERANCE:
         return "invalid-packing"
     if not _fitted_side_agrees(trial.poses, trial.side):
         return "inconsistent-raw-side"
@@ -646,7 +650,7 @@ def _repair_reason(trial: Trial) -> str | None:
         or not isinstance(repair.converged, bool)
     ):
         return "invalid-repair-receipt"
-    converged = trial.resolved_overlap <= REPAIR_TOLERANCE
+    converged = trial.resolved_overlap <= VALIDITY_TOLERANCE
     if repair.converged != converged:
         return "inconsistent-repair-receipt"
     return None
@@ -693,9 +697,9 @@ def _fitted_side_agrees(poses: tuple[tuple[float, float, float], ...], side: flo
         high_y = max(high_y, y + radius)
     fitted = max(high_x - low_x, high_y - low_y)
     return (
-        math.isclose(low_x, 0, rel_tol=0, abs_tol=VALID_OVERLAP)
-        and math.isclose(low_y, 0, rel_tol=0, abs_tol=VALID_OVERLAP)
-        and math.isclose(side, fitted, rel_tol=REFERENCE_TOLERANCE, abs_tol=VALID_OVERLAP)
+        math.isclose(low_x, 0, rel_tol=0, abs_tol=VALIDITY_TOLERANCE)
+        and math.isclose(low_y, 0, rel_tol=0, abs_tol=VALIDITY_TOLERANCE)
+        and math.isclose(side, fitted, rel_tol=REFERENCE_TOLERANCE, abs_tol=VALIDITY_TOLERANCE)
     )
 
 

@@ -1,0 +1,347 @@
+{
+  "contract": "packing.squares:PackingValidity/v1",
+  "about": "Boundary arrangements for the one validity contract. src/core/runtime-contracts.ts (node --test, tests/packing-validity.test.ts) and tools/workbench_tools/packing_contracts.py (pytest, tests/test_packing_validity.py) must both reach the stated verdict and first failing clause for every case. Each case sits just inside or just outside one clause. Penetrations are built as centre offsets: an inside case is 5e-10 and an outside case 2e-9 against the 1e-9 contract tolerance.",
+  "numbers": "Non-finite values are written as the strings NaN, Infinity and -Infinity; every other value is a JSON number.",
+  "tolerances": {
+    "contract": 1e-9,
+    "catalogue-precision": 4e-6
+  },
+  "cases": [
+    {
+      "id": "pair-contact",
+      "clause": "pair-overlap",
+      "tolerance": "contract",
+      "note": "two axis-aligned squares sharing a side",
+      "expectedCount": 2,
+      "snapshot": {
+        "squareSide": 1,
+        "container": { "originX": 0, "originY": 0, "side": 2 },
+        "poses": [{ "x": 0.5, "y": 0.5, "angle": 0 }, { "x": 1.5, "y": 0.5, "angle": 0 }]
+      },
+      "valid": true,
+      "geometryValid": true,
+      "reason": null
+    },
+    {
+      "id": "pair-inside",
+      "clause": "pair-overlap",
+      "tolerance": "contract",
+      "note": "pair penetration 5e-10",
+      "expectedCount": 2,
+      "snapshot": {
+        "squareSide": 1,
+        "container": { "originX": 0, "originY": 0, "side": 2 },
+        "poses": [{ "x": 0.5, "y": 0.5, "angle": 0 }, { "x": 1.4999999995, "y": 0.5, "angle": 0 }]
+      },
+      "valid": true,
+      "geometryValid": true,
+      "reason": null
+    },
+    {
+      "id": "pair-outside",
+      "clause": "pair-overlap",
+      "tolerance": "contract",
+      "note": "pair penetration 2e-9",
+      "expectedCount": 2,
+      "snapshot": {
+        "squareSide": 1,
+        "container": { "originX": 0, "originY": 0, "side": 2 },
+        "poses": [{ "x": 0.5, "y": 0.5, "angle": 0 }, { "x": 1.499999998, "y": 0.5, "angle": 0 }]
+      },
+      "valid": false,
+      "geometryValid": false,
+      "reason": "pair-overlap"
+    },
+    {
+      "id": "pair-5e-7",
+      "clause": "pair-overlap",
+      "tolerance": "contract",
+      "note": "pair penetration 5e-7",
+      "expectedCount": 2,
+      "snapshot": {
+        "squareSide": 1,
+        "container": { "originX": 0, "originY": 0, "side": 2 },
+        "poses": [{ "x": 0.5, "y": 0.5, "angle": 0 }, { "x": 1.4999995, "y": 0.5, "angle": 0 }]
+      },
+      "valid": false,
+      "geometryValid": false,
+      "reason": "pair-overlap"
+    },
+    {
+      "id": "pair-5e-6",
+      "clause": "pair-overlap",
+      "tolerance": "contract",
+      "note": "pair penetration 5e-6, which the benchmark's former 1e-5 admission accepted",
+      "expectedCount": 2,
+      "snapshot": {
+        "squareSide": 1,
+        "container": { "originX": 0, "originY": 0, "side": 2 },
+        "poses": [{ "x": 0.5, "y": 0.5, "angle": 0 }, { "x": 1.499995, "y": 0.5, "angle": 0 }]
+      },
+      "valid": false,
+      "geometryValid": false,
+      "reason": "pair-overlap"
+    },
+    {
+      "id": "pair-5e-5",
+      "clause": "pair-overlap",
+      "tolerance": "contract",
+      "note": "pair penetration 5e-5, which the gap bar's former summed 1e-4 accepted",
+      "expectedCount": 2,
+      "snapshot": {
+        "squareSide": 1,
+        "container": { "originX": 0, "originY": 0, "side": 2 },
+        "poses": [{ "x": 0.5, "y": 0.5, "angle": 0 }, { "x": 1.49995, "y": 0.5, "angle": 0 }]
+      },
+      "valid": false,
+      "geometryValid": false,
+      "reason": "pair-overlap"
+    },
+    {
+      "id": "rotated-pair-inside",
+      "clause": "pair-overlap",
+      "tolerance": "contract",
+      "note": "a 45-degree square's corner 5e-10 into an axis-aligned square's side",
+      "expectedCount": 2,
+      "snapshot": {
+        "squareSide": 1,
+        "container": { "originX": 0, "originY": 0, "side": 3 },
+        "poses": [
+          { "x": 1, "y": 1, "angle": 0.7853981633974483 },
+          { "x": 2.2071067806865474, "y": 1, "angle": 0 }
+        ]
+      },
+      "valid": true,
+      "geometryValid": true,
+      "reason": null
+    },
+    {
+      "id": "rotated-pair-outside",
+      "clause": "pair-overlap",
+      "tolerance": "contract",
+      "note": "a 45-degree square's corner 2e-9 into an axis-aligned square's side",
+      "expectedCount": 2,
+      "snapshot": {
+        "squareSide": 1,
+        "container": { "originX": 0, "originY": 0, "side": 3 },
+        "poses": [
+          { "x": 1, "y": 1, "angle": 0.7853981633974483 },
+          { "x": 2.2071067791865473, "y": 1, "angle": 0 }
+        ]
+      },
+      "valid": false,
+      "geometryValid": false,
+      "reason": "pair-overlap"
+    },
+    {
+      "id": "wall-inside",
+      "clause": "wall-overlap",
+      "tolerance": "contract",
+      "note": "wall penetration 5e-10 at the left wall",
+      "expectedCount": 1,
+      "snapshot": {
+        "squareSide": 1,
+        "container": { "originX": 0, "originY": 0, "side": 1 },
+        "poses": [{ "x": 0.4999999995, "y": 0.5, "angle": 0 }]
+      },
+      "valid": true,
+      "geometryValid": true,
+      "reason": null
+    },
+    {
+      "id": "wall-outside",
+      "clause": "wall-overlap",
+      "tolerance": "contract",
+      "note": "wall penetration 2e-9 at the left wall",
+      "expectedCount": 1,
+      "snapshot": {
+        "squareSide": 1,
+        "container": { "originX": 0, "originY": 0, "side": 1 },
+        "poses": [{ "x": 0.499999998, "y": 0.5, "angle": 0 }]
+      },
+      "valid": false,
+      "geometryValid": false,
+      "reason": "wall-overlap"
+    },
+    {
+      "id": "rotated-wall-inside",
+      "clause": "wall-overlap",
+      "tolerance": "contract",
+      "note": "a 30-degree square's corner 5e-10 through the left wall",
+      "expectedCount": 1,
+      "snapshot": {
+        "squareSide": 1,
+        "container": { "originX": 0, "originY": 0, "side": 2 },
+        "poses": [{ "x": 0.6830127013922193, "y": 1, "angle": 0.5235987755982988 }]
+      },
+      "valid": true,
+      "geometryValid": true,
+      "reason": null
+    },
+    {
+      "id": "rotated-wall-outside",
+      "clause": "wall-overlap",
+      "tolerance": "contract",
+      "note": "a 30-degree square's corner 2e-9 through the left wall",
+      "expectedCount": 1,
+      "snapshot": {
+        "squareSide": 1,
+        "container": { "originX": 0, "originY": 0, "side": 2 },
+        "poses": [{ "x": 0.6830126998922192, "y": 1, "angle": 0.5235987755982988 }]
+      },
+      "valid": false,
+      "geometryValid": false,
+      "reason": "wall-overlap"
+    },
+    {
+      "id": "offset-origin-inside",
+      "clause": "wall-overlap",
+      "tolerance": "contract",
+      "note": "a container whose lower-left corner is not the origin",
+      "expectedCount": 1,
+      "snapshot": {
+        "squareSide": 1,
+        "container": { "originX": 8, "originY": -4, "side": 1 },
+        "poses": [{ "x": 8.5, "y": -3.5, "angle": 0 }]
+      },
+      "valid": true,
+      "geometryValid": true,
+      "reason": null
+    },
+    {
+      "id": "count-short",
+      "clause": "count",
+      "tolerance": "contract",
+      "note": "two squares where three were declared",
+      "expectedCount": 3,
+      "snapshot": {
+        "squareSide": 1,
+        "container": { "originX": 0, "originY": 0, "side": 2 },
+        "poses": [{ "x": 0.5, "y": 0.5, "angle": 0 }, { "x": 1.5, "y": 0.5, "angle": 0 }]
+      },
+      "valid": false,
+      "geometryValid": false,
+      "reason": "count"
+    },
+    {
+      "id": "nonfinite-pose",
+      "clause": "nonfinite",
+      "tolerance": "contract",
+      "note": "a NaN angle",
+      "expectedCount": 1,
+      "snapshot": {
+        "squareSide": 1,
+        "container": { "originX": 0, "originY": 0, "side": 1 },
+        "poses": [{ "x": 0.5, "y": 0.5, "angle": "NaN" }]
+      },
+      "valid": false,
+      "geometryValid": false,
+      "reason": "nonfinite"
+    },
+    {
+      "id": "nonfinite-container",
+      "clause": "nonfinite",
+      "tolerance": "contract",
+      "note": "an infinite container side",
+      "expectedCount": 1,
+      "snapshot": {
+        "squareSide": 1,
+        "container": { "originX": 0, "originY": 0, "side": "Infinity" },
+        "poses": [{ "x": 0.5, "y": 0.5, "angle": 0 }]
+      },
+      "valid": false,
+      "geometryValid": false,
+      "reason": "nonfinite"
+    },
+    {
+      "id": "dimensions-container",
+      "clause": "dimensions",
+      "tolerance": "contract",
+      "note": "a container of side zero",
+      "expectedCount": 1,
+      "snapshot": {
+        "squareSide": 1,
+        "container": { "originX": 0, "originY": 0, "side": 0 },
+        "poses": [{ "x": 0.5, "y": 0.5, "angle": 0 }]
+      },
+      "valid": false,
+      "geometryValid": false,
+      "reason": "dimensions"
+    },
+    {
+      "id": "dimensions-square",
+      "clause": "dimensions",
+      "tolerance": "contract",
+      "note": "a negative square side",
+      "expectedCount": 1,
+      "snapshot": {
+        "squareSide": -1,
+        "container": { "originX": 0, "originY": 0, "side": 1 },
+        "poses": [{ "x": 0.5, "y": 0.5, "angle": 0 }]
+      },
+      "valid": false,
+      "geometryValid": false,
+      "reason": "dimensions"
+    },
+    {
+      "id": "unit-size-half",
+      "clause": "unit-size",
+      "tolerance": "contract",
+      "note": "non-overlapping half-size squares are sound geometry but not a unit-square packing",
+      "expectedCount": 2,
+      "snapshot": {
+        "squareSide": 0.5,
+        "container": { "originX": 0, "originY": 0, "side": 1 },
+        "poses": [{ "x": 0.25, "y": 0.25, "angle": 0 }, { "x": 0.75, "y": 0.25, "angle": 0 }]
+      },
+      "valid": false,
+      "geometryValid": true,
+      "reason": "unit-size"
+    },
+    {
+      "id": "catalogue-precision-at-contract",
+      "clause": "pair-overlap",
+      "tolerance": "contract",
+      "note": "pair penetration 3e-6, within the catalogue's rounding but not the contract",
+      "expectedCount": 2,
+      "snapshot": {
+        "squareSide": 1,
+        "container": { "originX": 0, "originY": 0, "side": 2 },
+        "poses": [{ "x": 0.5, "y": 0.5, "angle": 0 }, { "x": 1.499997, "y": 0.5, "angle": 0 }]
+      },
+      "valid": false,
+      "geometryValid": false,
+      "reason": "pair-overlap"
+    },
+    {
+      "id": "catalogue-precision-inside",
+      "clause": "pair-overlap",
+      "tolerance": "catalogue-precision",
+      "note": "the same 3e-6 penetration assessed as a catalogue frame",
+      "expectedCount": 2,
+      "snapshot": {
+        "squareSide": 1,
+        "container": { "originX": 0, "originY": 0, "side": 2 },
+        "poses": [{ "x": 0.5, "y": 0.5, "angle": 0 }, { "x": 1.499997, "y": 0.5, "angle": 0 }]
+      },
+      "valid": true,
+      "geometryValid": true,
+      "reason": null
+    },
+    {
+      "id": "catalogue-precision-outside",
+      "clause": "pair-overlap",
+      "tolerance": "catalogue-precision",
+      "note": "pair penetration 5e-6 assessed as a catalogue frame",
+      "expectedCount": 2,
+      "snapshot": {
+        "squareSide": 1,
+        "container": { "originX": 0, "originY": 0, "side": 2 },
+        "poses": [{ "x": 0.5, "y": 0.5, "angle": 0 }, { "x": 1.499995, "y": 0.5, "angle": 0 }]
+      },
+      "valid": false,
+      "geometryValid": false,
+      "reason": "pair-overlap"
+    }
+  ]
+}

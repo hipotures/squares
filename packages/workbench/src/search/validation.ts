@@ -1,4 +1,8 @@
-import { assessPackingSnapshot, mixUint32Seed } from "../core/runtime-contracts.ts";
+import {
+  assessPackingSnapshot,
+  mixUint32Seed,
+  PACKING_VALIDITY,
+} from "../core/runtime-contracts.ts";
 import {
   type JsonObject,
   type SearchSlot,
@@ -233,8 +237,7 @@ export function decodeSearchTrialValue(
       continue;
     }
     const assessment = assessPackingSnapshot(state.snapshot, slot.n);
-    const valid = assessment.valid && state.snapshot.squareSide === 1;
-    if (state.valid !== valid || state.valid !== (state.validityReason === null)) {
+    if (state.valid !== assessment.valid || state.valid !== (state.validityReason === null)) {
       throw new RangeError("trial validity disagrees with snapshot geometry");
     }
     if (state.absoluteSide !== assessment.requiredSide) {
@@ -287,7 +290,7 @@ export function decodeSearchTrialValue(
   }
   if (
     result.repair.tolerance !== null &&
-    (result.repair.tolerance < 0 || result.repair.tolerance > 1e-9)
+    (result.repair.tolerance < 0 || result.repair.tolerance > PACKING_VALIDITY.penetrationTolerance)
   ) {
     throw new RangeError("invalid repair tolerance");
   }

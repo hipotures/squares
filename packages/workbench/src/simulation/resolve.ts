@@ -1,12 +1,14 @@
 import { type GeometryPose, type GeometrySnapshot, packingBounds } from "../core/geometry.ts";
-import { assessPackingSnapshot, type PackingAssessment } from "../core/runtime-contracts.ts";
-
-const DEFAULT_TOLERANCE = 1e-9;
+import {
+  assessPackingSnapshot,
+  PACKING_VALIDITY,
+  type PackingAssessment,
+} from "../core/runtime-contracts.ts";
 
 export interface ResolveConfiguration {
   expectedCount: number;
   iterationLimit: number;
-  /** Maximum permitted pair or wall overlap. Must not exceed the shared validity tolerance. */
+  /** Maximum permitted pair or wall overlap. Must not exceed `PACKING_VALIDITY.penetrationTolerance`. */
   tolerance: number;
 }
 
@@ -17,15 +19,26 @@ export interface ResolveWork {
   fitTranslations: number;
 }
 
-export type ResolveTerminationReason =
-  | "already-valid"
-  | "resolved"
-  | "budget-exhausted"
-  | "cancelled"
-  | "stalled"
-  | "refused-count"
-  | "refused-dimensions"
-  | "refused-nonfinite";
+/** Every way a Resolve can end, in the order a receipt's reader should expect to meet them. */
+export const RESOLVE_TERMINATION_REASONS = Object.freeze([
+  "already-valid",
+  "resolved",
+  "budget-exhausted",
+  "cancelled",
+  "stalled",
+  "refused-count",
+  "refused-dimensions",
+  "refused-nonfinite",
+  "refused-unit-size",
+] as const);
+
+export type ResolveTerminationReason = (typeof RESOLVE_TERMINATION_REASONS)[number];
+
+/** The reasons whose receipt carries a checked, valid repaired state. */
+export const RESOLVED_TERMINATION_REASONS: readonly ResolveTerminationReason[] = Object.freeze([
+  "already-valid",
+  "resolved",
+]);
 
 export interface ResolveReceipt {
   /** Immutable copy of the input and its pre-repair assessment. */
@@ -71,9 +84,11 @@ function validateConfiguration(configuration: ResolveConfiguration): void {
   if (
     !Number.isFinite(configuration.tolerance) ||
     configuration.tolerance < 0 ||
-    configuration.tolerance > DEFAULT_TOLERANCE
+    configuration.tolerance > PACKING_VALIDITY.penetrationTolerance
   ) {
-    throw new RangeError("Resolve tolerance must be between zero and 1e-9");
+    throw new RangeError(
+      `Resolve tolerance must be between zero and the contract's ${PACKING_VALIDITY.penetrationTolerance}`,
+    );
   }
 }
 
@@ -182,6 +197,10 @@ function refusedReason(assessment: PackingAssessment): ResolveTerminationReason 
   }
   if (assessment.reason === "dimensions") {
     return "refused-dimensions";
+  }
+  if (assessment.snapshot.squareSide !== PACKING_VALIDITY.squareSide) {
+    // Translation cannot change a square's size, so no repair of this input is a packing.
+    return "refused-unit-size";
   }
   return null;
 }

@@ -3,6 +3,7 @@ import type { GeometryPose, GeometrySnapshot } from "../core/geometry.ts";
 import {
   assessPackingSnapshot,
   mixUint32Seed,
+  PACKING_VALIDITY,
   type PackingAssessment,
   parseUint32Seed,
 } from "../core/runtime-contracts.ts";
@@ -304,8 +305,10 @@ function repair(value: unknown): PackSearchRepair {
   if (declared.kind === "resolve") {
     row(value, ["kind", "tolerance"], "resolve configuration");
     const tolerance = nonnegative(declared.tolerance, "repair tolerance");
-    if (tolerance > 1e-9) {
-      throw new RangeError("repair tolerance must not exceed the shared 1e-9 validity tolerance");
+    if (tolerance > PACKING_VALIDITY.penetrationTolerance) {
+      throw new RangeError(
+        `repair tolerance must not exceed the shared ${PACKING_VALIDITY.penetrationTolerance} validity tolerance`,
+      );
     }
     return { kind: "resolve", tolerance };
   }
@@ -537,11 +540,8 @@ function packingState(assessment: PackingAssessment): SearchPackingState {
       container: { ...assessment.snapshot.container },
       poses: assessment.snapshot.poses.map((pose) => ({ ...pose })),
     },
-    valid: assessment.valid && assessment.snapshot.squareSide === 1,
-    validityReason:
-      assessment.valid && assessment.snapshot.squareSide === 1
-        ? null
-        : (assessment.reason ?? "sub-unit"),
+    valid: assessment.valid,
+    validityReason: assessment.reason,
     absoluteSide: Number.isFinite(assessment.requiredSide) ? assessment.requiredSide : null,
   };
 }

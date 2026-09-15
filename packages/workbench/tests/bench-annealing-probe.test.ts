@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { guard, runTrial } from "../probes/bench-annealing.ts";
 import type { AtlasTransitions, WorkbenchApiHost } from "../src/api/workbench-api.ts";
+import { assessPackingSnapshot, PACKING_VALIDITY } from "../src/core/runtime-contracts.ts";
 
 type Pose = [number, number, number];
 
@@ -62,6 +63,42 @@ test("a typed trial preserves valid geometry and reports its independent measure
     [0.5, 0.5, 0],
     [1.5, 0.5, 0],
   ]);
+});
+
+test("the probe measures and repairs overlap under the shared validity contract", () => {
+  for (const final of [
+    [
+      [-0.5, 0, 0],
+      [0.499995, 0, 0],
+    ],
+    [
+      [0, 0, 30],
+      [1.1, 0.2, 10],
+      [0.3, 1.05, 0],
+    ],
+  ] satisfies Pose[][]) {
+    const response = runTrial(
+      { n: final.length, seed: 0, style: "bodies", inflate: null, anneal: null },
+      hostWith(final),
+    );
+    assert(!("error" in response));
+    const snapshot = (poses: Pose[], side: number) => ({
+      squareSide: 1,
+      container: { originX: 0, originY: 0, side },
+      poses: poses.map(([x, y, angle]) => ({ x, y, angle })),
+    });
+    const raw = assessPackingSnapshot(snapshot(response.poses, response.side), final.length);
+    assert.equal(response.overlap, raw.maxPairOverlap);
+    assert(response.overlap > PACKING_VALIDITY.penetrationTolerance);
+    const repaired = assessPackingSnapshot(
+      snapshot(response.resolvedPoses, response.resolvedSide),
+      final.length,
+    );
+    assert.equal(repaired.valid, true, JSON.stringify(repaired));
+    assert.equal(response.resolvedOverlap, repaired.maxPairOverlap);
+    assert.equal(response.repairConverged, true);
+    assert.equal(response.resolvedSide, repaired.requiredSide);
+  }
 });
 
 test("the typed trial refuses an n absent from the loaded page", () => {

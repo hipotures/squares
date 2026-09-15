@@ -122,12 +122,29 @@ function squareRadiusOnAxis(
   );
 }
 
+export interface PairSeparation {
+  /** The smallest face-normal overlap, or zero when some face normal separates the squares. */
+  penetration: number;
+  /** The unit face normal of that overlap, oriented from `left` towards `right`; zero when separated. */
+  normalX: number;
+  normalY: number;
+}
+
 /** Separating-axis penetration for two equal squares, or zero when an axis separates them. */
 export function pairPenetration(
   left: GeometryPose,
   right: GeometryPose,
   squareSide: number,
 ): number {
+  return pairSeparation(left, right, squareSide).penetration;
+}
+
+/** `pairPenetration` with the face normal a repair would push the two squares apart along. */
+export function pairSeparation(
+  left: GeometryPose,
+  right: GeometryPose,
+  squareSide: number,
+): PairSeparation {
   positive(squareSide, "square side");
   for (const [value, name] of [
     [left.x, "left x"],
@@ -152,18 +169,25 @@ export function pairPenetration(
     [-rightSine, rightCosine],
   ];
   const halfSide = squareSide / 2;
-  let penetration = Infinity;
+  const separated: PairSeparation = { penetration: 0, normalX: 0, normalY: 0 };
+  const deepest: PairSeparation = { penetration: Infinity, normalX: 0, normalY: 0 };
   for (const [axisX, axisY] of axes) {
+    const projected = dx * axisX + dy * axisY;
     const overlap =
       squareRadiusOnAxis(axisX, axisY, leftCosine, leftSine, halfSide) +
       squareRadiusOnAxis(axisX, axisY, rightCosine, rightSine, halfSide) -
-      Math.abs(dx * axisX + dy * axisY);
+      Math.abs(projected);
     if (overlap <= 0) {
-      return 0;
+      return separated;
     }
-    penetration = Math.min(penetration, overlap);
+    if (overlap < deepest.penetration) {
+      const sign = projected < 0 ? -1 : 1;
+      deepest.penetration = overlap;
+      deepest.normalX = axisX * sign;
+      deepest.normalY = axisY * sign;
+    }
   }
-  return penetration;
+  return deepest;
 }
 
 export function packingBounds(poses: readonly GeometryPose[], squareSide: number): GeometryBounds {
@@ -426,6 +450,7 @@ export function measureFrameGeometry(
 export const geometry = Object.freeze({
   degreesToRadians,
   pairPenetration,
+  pairSeparation,
   packingBounds,
   measurePackingGeometry,
   measureFrameGeometry,
