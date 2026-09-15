@@ -64,12 +64,6 @@ allowlist:
   - path: packing/devtools/check_math_startup.py
     sites: 5
     bead: think-3pox
-  - path: packing/devtools/prepare_explainer_math.py
-    sites: 51
-    bead: think-3pox
   - path: packing/tests/test_math_startup.py
     sites: 2
-    bead: think-3pox
-  - path: packing/tests/test_prepare_explainer_math.py
-    sites: 4
     bead: think-3pox
