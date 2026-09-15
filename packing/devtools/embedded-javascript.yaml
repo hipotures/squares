@@ -63,9 +63,6 @@ allowlist:
   - path: packages/workbench/tools/workbench_tools/check_candidate.py
     sites: 3
     bead: think-xvjf
-  - path: packages/workbench/tools/workbench_tools/check_pack_panel.py
-    sites: 7
-    bead: think-xvjf
   - path: packing/atlas/known-best/video/spikes/v1-slideshow/build_candidate.py
     sites: 1
     bead: think-53dt
