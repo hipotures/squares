@@ -49,14 +49,23 @@ def check(page_path: Path) -> str:
         require(handle.get_attribute("role") == "separator", "the handle is not a separator")
         require(
             handle.get_attribute("aria-orientation") == "horizontal"
-            and handle.get_attribute("aria-controls") == "controls"
             and handle.get_attribute("tabindex") == "0",
-            "the separator does not name its orientation, its region or its focus",
+            "the separator does not name its orientation or take the focus",
         )
         automatic = stage_height(page)
+        # The window-splitter pattern: `aria-controls` names the primary pane, the one whose
+        # size the separator's value reports, and that is the stage.
+        controlled = handle.get_attribute("aria-controls") or ""
+        pane = page.locator(f"#{controlled}").bounding_box() if controlled else None
         require(
-            abs(float(handle.get_attribute("aria-valuenow") or "nan") - automatic) <= 1,
-            "the separator's value is not the stage height",
+            controlled == "stage-wrap" and pane is not None,
+            f"the separator controls {controlled!r}, not the stage whose height it reports",
+        )
+        require(
+            pane is not None
+            and abs(float(handle.get_attribute("aria-valuenow") or "nan") - pane["height"]) <= 1
+            and abs(pane["height"] - automatic) <= 1,
+            "the separator's value is not the height of the pane it controls",
         )
 
         box = handle.bounding_box()
