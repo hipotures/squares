@@ -29,6 +29,14 @@ fn arg<T: std::str::FromStr>(args: &[String], name: &str, default: T) -> T {
     }
 }
 
+/// Exit before any output if the arm flags would not run what they name.
+fn refuse_bad_arms(p: &Params) {
+    if let Err(reason) = p.check_arms() {
+        eprintln!("sqsearch: {reason}");
+        std::process::exit(2);
+    }
+}
+
 fn json_params(p: &Params) -> String {
     format!(
         "{{\"steps\":{},\"t_hot\":{},\"t_cold\":{},\"lambda0\":{},\"lambda1\":{},\
@@ -112,6 +120,7 @@ fn main() {
         budget_pair_tests: arg(&args, "--budget-pair-tests", u64::MAX),
         max_restarts: arg(&args, "--max-restarts", u64::MAX),
     };
+    refuse_bad_arms(&p);
 
     if threads > 0 {
         rayon::ThreadPoolBuilder::new()
@@ -274,6 +283,7 @@ fn basin_entry(args: &[String]) {
         budget_pair_tests: arg(args, "--budget-pair-tests", u64::MAX),
         max_restarts: arg(args, "--max-restarts", 1),
     };
+    refuse_bad_arms(&p);
 
     let seed_side = geom::required_side(&seed_cfg);
     let seed_overlap = geom::total_overlap(&seed_cfg);
