@@ -67,7 +67,7 @@ session:
     outcome: null
     evidence: []
     stop_reason: null
-    next_action: Complete the three independent audits while the declared baseline runs.
+    next_action: Await the first hosted candidate gate, then close BC-340 or reject the candidate.
   progress:
     metric: >-
       Checks-tier wall time, dominant step times, and preserved validation population at
@@ -80,16 +80,22 @@ session:
   delegations:
   - task: Audit the validation scheduler, budgets, and recent timing receipts.
     operator: Codex timing-architecture sub-agent, read-only
-    status: in_progress
+    status: completed
     recording: contemporaneous
-    outcome: null
-    evidence: []
+    outcome: >-
+      Seven hosted receipts identified the branch-cost rollup as the repeated critical
+      tail. Its check path reparsed the complete receipt and session corpus once per
+      branch; one invocation-local corpus snapshot is the direct repair.
+    evidence:
+    - packing/devtools/render_pr_rollup.py
+    - packing/benchmarks/validation-efficiency/experiments/VE-005-rollup-corpus-snapshot.md
     files: []
-    checks: []
-    uncertainty: The dominant wall-time mechanism is not yet isolated.
+    checks:
+    - PR 174 entry validation measured 192.54 seconds, including 62.76 seconds in the rollup step.
+    uncertainty: Hosted runner variance remains large; VE-005 makes no confirmatory hosted speedup claim.
     elapsed_seconds: null
     elapsed_quality: unavailable
-    next_action: Recommend one bounded repair candidate or a no-change verdict.
+    next_action: Preserve the corpus snapshot and verify the first hosted candidate gate.
     phase: 1
     budget_minutes: 20
     started_at: '2026-09-15T00:50:01Z'
@@ -102,16 +108,24 @@ session:
     excluded_commands: [packing-validate --fast, packing-validate]
   - task: Define the smallest permanent equivalence guard for a safe checks-tier optimization.
     operator: Codex equivalence-guard sub-agent, read-only
-    status: in_progress
+    status: completed
     recording: contemporaneous
-    outcome: null
-    evidence: []
+    outcome: >-
+      Existing tier-partition and report-order tests protect selection, failure
+      propagation, and visible ordering. The smallest additional guard proves that
+      every receipt and session document is loaded once while every branch and the
+      no-record case still render.
+    evidence:
+    - packing/tests/test_codex_rollup_consumers.py
+    - packing/tests/test_validation_cli.py
     files: []
-    checks: []
-    uncertainty: The existing scheduler tests may already cover part of the required invariant.
+    checks:
+    - 28 focused renderer and closeout tests passed.
+    - The representative cumulative render retained its exact SHA-256 digest.
+    uncertainty: Internal verifier sharding remains unguarded and was rejected from this block.
     elapsed_seconds: null
     elapsed_quality: unavailable
-    next_action: Name the exact guard and any optimization that must be rejected.
+    next_action: Keep scheduler and verifier scope unchanged; retain the corpus-load guard.
     phase: 1
     budget_minutes: 20
     started_at: '2026-09-15T00:50:01Z'
@@ -124,16 +138,22 @@ session:
     excluded_commands: [packing-validate --fast, packing-validate]
   - task: Reconcile the timing evidence with open efficiency and process-reaper debt.
     operator: Codex operational-debt sub-agent, read-only
-    status: in_progress
+    status: completed
     recording: contemporaneous
-    outcome: null
-    evidence: []
+    outcome: >-
+      The existing start-early debt was narrower than the measured cause. VE-005 removes
+      repeated whole-corpus parsing instead of scheduling that waste sooner; suite
+      timing, hosted-budget tooling, and process-reaper debt remain separate.
+    evidence:
+    - packing/benchmarks/validation-efficiency/experiments/VE-005-rollup-corpus-snapshot.md
+    - packing/benchmarks/validation-efficiency/report.md
     files: []
-    checks: []
-    uncertainty: A variance-only result may justify no code change.
+    checks:
+    - VE-005 passed three alternating control/candidate pairs and the fixed 15 percent screen.
+    uncertainty: The checks-tier ceiling remains unrecorded until multiple post-change hosted readings exist.
     elapsed_seconds: null
     elapsed_quality: unavailable
-    next_action: Select exactly one W5 action and sufficient closeout evidence.
+    next_action: Keep the ceiling unchanged and close superseded scheduling debt after merge.
     phase: 1
     budget_minutes: 20
     started_at: '2026-09-15T00:50:01Z'
