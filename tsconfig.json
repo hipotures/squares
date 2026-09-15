@@ -5,7 +5,7 @@
   // **The ratchet (floor rule 8).** At the full floor this program reports 1,145 errors and
   // with the four flags below relaxed it reports 109, so the four are off and the 109 are
   // the work. The default stays strict in tsconfig.base.json; nothing else in the repository
-  // inherits this relaxation, and files move OUT of it, never in. Tracked as think-4cwy.
+  // inherits this relaxation, and files move OUT of it, never in. Tracked as think-n711.
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "noImplicitAny": false,
