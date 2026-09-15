@@ -4,6 +4,7 @@ import { measurePackingGeometry } from "../src/core/geometry.ts";
 import type { PackingSnapshot } from "../src/core/runtime-contracts.ts";
 import type {
   JsonObject,
+  SearchOutcomes,
   SearchPlan,
   SearchSlot,
   SearchTrialControl,
@@ -259,18 +260,35 @@ test("the registry rejects ambiguous or non-replayable plans", () => {
   );
 });
 
-test("persisted ledgers resume only not-started slots and reject changed plans", async () => {
-  const declared = plan([0, 1]);
+test("persisted ledgers keep completed and failed slots, reclaim the rest, and reject changed plans", async () => {
+  const declared = plan([0, 1, 2]);
   const controller = new AbortController();
-  const first = await runSearchPlan(declared, (_slot, configuration) => completed(configuration), {
-    now: () => 0,
-    signal: controller.signal,
-    onOutcome: (outcome) => {
-      if (outcome.status === "completed") {
-        controller.abort();
+  let clock = 0;
+  const first = await runSearchPlan(
+    declared,
+    (slot, configuration) => {
+      if (slot.seed === 1) {
+        throw new Error("deliberate failure");
       }
+      if (slot.seed === 2) {
+        clock = 10;
+      }
+      return completed(configuration);
     },
-  });
+    {
+      now: () => clock,
+      signal: controller.signal,
+      onOutcome: (outcome) => {
+        if (outcome.status === "timed-out") {
+          controller.abort();
+        }
+      },
+    },
+  );
+  assert.deepEqual(
+    first.outcomes.map(({ status }) => status),
+    ["completed", "failed", "timed-out", "not-started"],
+  );
   const decoded = decodeSearchOutcomes(JSON.parse(encodeSearchOutcomes(first)), declared);
   const visited: number[] = [];
   const resumed = await runSearchPlan(
@@ -281,15 +299,64 @@ test("persisted ledgers resume only not-started slots and reject changed plans",
     },
     { resume: decoded, now: () => 0 },
   );
-  assert.deepEqual(visited, [1, 100]);
+  assert.deepEqual(visited, [2, 100]);
   assert.deepEqual(resumed.outcomes[0], first.outcomes[0]);
-  assert.equal(statusCounts(resumed.outcomes).completed, 3);
+  assert.deepEqual(resumed.outcomes[1], first.outcomes[1]);
+  assert.deepEqual(
+    resumed.outcomes.map(({ status }) => status),
+    ["completed", "failed", "completed", "completed"],
+  );
   const changed = structuredClone(declared);
   required(changed.configurations[0]).configuration.mode = "changed";
   assert.throws(() => decodeSearchOutcomes(first, changed), /exact plan/);
   const forged = structuredClone(resumed);
   required(forged.outcomes[0]).slot.block = 99;
   assert.throws(() => summarizeSearch(declared, forged), /mismatched slot/);
+});
+
+test("resume finishes a slot that was cancelled mid-run", async () => {
+  const declared = plan([0, 1]);
+  const controller = new AbortController();
+  const first = await runSearchPlan(
+    declared,
+    (_slot, configuration, control) => {
+      controller.abort();
+      assert.equal(control.cancellationReason(), "cancelled");
+      return completed(configuration);
+    },
+    { now: () => 0, signal: controller.signal },
+  );
+  assert.deepEqual(
+    first.outcomes.map(({ status }) => status),
+    ["cancelled", "not-started", "not-started"],
+  );
+  const visit = async (resume: SearchOutcomes) => {
+    const visited: number[] = [];
+    const ledger = await runSearchPlan(
+      declared,
+      (slot, configuration) => {
+        visited.push(slot.seed);
+        return completed(configuration);
+      },
+      {
+        resume: decodeSearchOutcomes(JSON.parse(encodeSearchOutcomes(resume)), declared),
+        now: () => 0,
+      },
+    );
+    return { visited, ledger };
+  };
+  const resumed = await visit(first);
+  assert.deepEqual(resumed.visited, [0, 1, 100]);
+  assert.deepEqual(
+    resumed.ledger.outcomes.map(({ status }) => status),
+    ["completed", "completed", "completed"],
+  );
+  for (const summary of summarizeSearch(declared, resumed.ledger)) {
+    assert.equal(summary.completionRate.numerator, summary.completionRate.denominator);
+  }
+  const again = await visit(resumed.ledger);
+  assert.deepEqual(again.visited, []);
+  assert.deepEqual(again.ledger, resumed.ledger);
 });
 
 test("ledger admission recomputes geometry and refuses missing work and unknown status", async () => {

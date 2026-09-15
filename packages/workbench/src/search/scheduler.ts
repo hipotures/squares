@@ -17,7 +17,11 @@ import { decodeSearchTrialValue, type SearchAdmissionOptions } from "./validatio
 
 export interface SearchSchedulerOptions extends SearchAdmissionOptions {
   concurrency?: number;
-  /** Preserve terminal slots and claim only the ledger’s not-started slots. */
+  /**
+   * Continue a saved ledger for the same plan. Completed and failed slots are kept as they are;
+   * cancelled, timed-out and not-started slots are claimed and run again, so a resumed plan can
+   * reach a completion rate of 1.
+   */
   resume?: SearchOutcomes;
   signal?: AbortSignal;
   now?: () => number;
@@ -73,7 +77,7 @@ export async function runSearchPlan(
   if (options.resume !== undefined) {
     const previous = decodeSearchOutcomes(options.resume, plan, options);
     for (const outcome of previous.outcomes) {
-      if (outcome.status !== "not-started") {
+      if (outcome.status === "completed" || outcome.status === "failed") {
         outcomes[outcome.slot.index] = outcome;
       }
     }
