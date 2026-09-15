@@ -285,8 +285,11 @@ The
 defines how those sources are reconciled.
 The separate
 [small-n mathematical audit](docs/project/reviews/review-2026-09-14-small-n-significant-progress-mathematical-audit.md)
-challenges the current research approaches and supplies the enlarged candidate set;
-agenda 036 and W10, not the review itself, own the eventual route selection.
+challenges the current research approaches and supplies the enlarged candidate set.
+The subsequent
+[W10 route-selection review](docs/project/reviews/review-2026-09-14-n11-w10-route-selection.md)
+derives the due efficiency checkpoint, records every candidate’s disposition, and
+separates the next W5 block from the later scientific choice.
 To resume work, use the synopsis’s [current handoff](SYNOPSIS.md#current-handoff), which
 names the owning work item and next bounded slice.
 

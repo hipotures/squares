@@ -276,7 +276,7 @@ agenda:
       mutation workers. The snapshot now measures123,253,184bytes,10,964,544bytes below the unchanged128MiB
       cap; six focused controls and the392-row inventory pass.
     workflows:
-    - research-loop
+    - efficiency-loop
     program: n11-structure-and-conditional-dots
     artifacts:
     - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-033/session116-negative-control-snapshot-measurement.log

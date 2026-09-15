@@ -381,7 +381,7 @@ agenda:
     depends_on: [BC-325]
     next_evidence: >-
       The September 14 strategy reset removed this reserve from the live queue. Reopen it
-      only if BC-346 selects the full-support-pricing route.
+      only if BC-353 selects the full-support-pricing route after W5.
     workflows: [research-loop]
     program: n11-daytime-strategy
   - id: BC-332
@@ -552,7 +552,7 @@ agenda:
     depends_on: []
     next_evidence: >-
       BC-340 in agenda-036 now owns this bead and the due efficiency-checkpoint question;
-      it remains behind BC-346's one-route selection.
+      BC-346 selected it as the sole next entry, and it is ready to run.
     workflows: [efficiency-loop, review-planning-oversight]
     program: n11-daytime-strategy
 ---

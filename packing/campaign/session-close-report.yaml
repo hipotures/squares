@@ -7,12 +7,12 @@ softschema:
   schema: schemas/session-close-report.schema.yaml
   envelope: null
   status: enforced
-count: 129
+count: 130
 generated_by: >-
   uv run --frozen --all-extras --group dev python -m devtools.close_session --render
 totals:
   sessions_measured: 82
-  sessions_unmeasured: 47
+  sessions_unmeasured: 48
   attributed:
     rollups: 129
     turns: 40048
@@ -2149,5 +2149,15 @@ sessions:
   measured: false
   unmeasured_reason: >-
     native harness data unavailable; The collaboration harness exposed the delegated results but no native task-tree resource receipt or log identifier from which the repository roll-up can be generated.
+  rollups: []
+  codex_receipts: []
+- id: session-130
+  title: "N11 W10 Route Selection"
+  status: stopped
+  primary_bead: think-9y7p
+  phases: 1
+  measured: false
+  unmeasured_reason: >-
+    native harness data unavailable; The collaboration harness exposed the three delegated reviews but no native task-tree resource receipt or log identifier from which a repository roll-up can be generated.
   rollups: []
   codex_receipts: []
