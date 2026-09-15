@@ -761,7 +761,7 @@ Status: **active**. Reconcile the merged research record, then choose among rout
 
 | id | status | title | rounds | opened because |
 | --- | --- | --- | --- | --- |
-| series-000 | open | S0: smoke and calibration — prove the machinery, establish every baseline metric | 122 | First series. There is no prior instrument, so not |
+| series-000 | open | S0: smoke and calibration — prove the machinery, establish every baseline metric | 126 | First series. There is no prior instrument, so not |
 
 ## Registry
 
@@ -910,6 +910,12 @@ Status: **active**. Reconcile the merged research record, then choose among rout
 | H-203 | confirmed | search | At an equal budget of refined local optima, basin hopping -- perturbin | n: 5 10 11* 17 19 | 1 |  | 40m agent + 81.2m wall |
 | H-204 | refuted | search | Raising only the anneal length from 400,000 to 4,000,000 steps per res | n: 5 10 11* 17 19 26 27 29 37 50 52 | 1 |  | 45m agent + 71.3m wall |
 | H-205 | unresolved | search | Divide and concur searched with relaxed-reflect-reflect, run cold over | n: 5 10 11* 17 | 1 |  | 95m agent + 15.6m wall |
+| H-207 | unresolved | search | At equal total cost, running k independent blind trials and taking the | n: 5* 11 17 29 | 1 |  | 1 round unrecorded |
+| H-208 | blocked | search | Where a blind run ends is decided by where the new square is dropped a | n: 5 10 11 17 26 29 | 0 |  |  |
+| H-209 | blocked | search | No combination of the workbench's exposed parameters -- the shake dial | n: 5 10 11 17 26 29 | 0 |  |  |
+| H-210 | open | search | No blind run of the workbench's physics ends on a valid packing. At ev | n: 5 10 11 17 26 29 | 0 |  |  |
+| H-211 | open | search | The workbench's shake dial has a maximum for search quality between le | n: 5 10 11 17 26 29 | 0 |  |  |
+| H-212 | open question | search | What does the workbench's blind physics do when its runs are measured  |  | 3 |  | 3 rounds unrecorded |
 
 ## Needs review — held for a human, not decided
 
@@ -963,7 +969,7 @@ Status: **active**. Reconcile the merged research record, then choose among rout
 | exp-060 | series-000 | 11 | Claude (agent), Lane B of agenda-021 BC-200, bead think-1qjs, session-086 | H-064 | Both walls expired with depth still 1.12 to 1.24 rather than one, so the loop stalled below eleven at both sides and decides nothing about the covering value; what it establishes is nu*(3.82) >= 9.907905 and nu*(3.85) >= 9.049860, with downward-safe displayed endpoints whose exact rational values are retained in the two summary records. The converged row loop's restricted optimum 11.055617 on 12,761 sites supplies the upper end of the 3.82 bracket. |
 | exp-070 | series-000 | 11 | Codex /root/fractional_t2_manager at max reasoning, BC-232, think-gmdy | H-064 | The one authorized leg improved the exact lower endpoint but expired before reaching eleven; the bracket is still open and the frozen four-CPU-hour routing rule forbids a continuation decision from this 105-minute partial budget alone. |
 
-### unresolved (26)
+### unresolved (30)
 
 | id | series | instance | operator | hypotheses | reason |
 | --- | --- | --- | --- | --- | --- |
@@ -993,6 +999,10 @@ Status: **active**. Reconcile the merged research record, then choose among rout
 | exp-148 | series-000 | 11 | GPT-6 Astra coordinator; implementation by GPT-5.6 Sol extra high; mathematical admission by GPT-6 Astra max | H-146 | The seed-stage guard expired before any complete seed direction or candidate check. Two valid retained escapes give reusable negative evidence for49152 labels, but neither a new cover nor an all-label refutation was completed. |
 | exp-156 | series-000 | 11 | Codex root coordinator; prospective strategy independently audited by GPT-6 Astra Max | H-158 | The sole run found that the old B-only model already excludes the first selected owner, making parent-domain gain impossible there by set inclusion. The later owners were not tested, so this complete fixed-protocol result neither accepts nor rejects H-158. |
 | exp-206 | series-000 | 11 | claude-opus-5 | H-205 | The guard clause is met decisively and is the point of the round: 16 of 16 runs end on packings that an independent oracle confirms, against 0 of 48 for the penalty physics, which settles the precondition the 2026-09-08 calibration failed. The accuracy clause is missed by three cells of four. The failure is localised rather than diffuse -- every failed run failed at the first tightening and never moved -- so the repair is in the container schedule and the restart policy, not in the projections. |
+| exp-207 | series-000 | 5 | claude-opus-5, unattended | H-207 | At n = 5 the best of the first 1,000 repaired runs is 0.28% above the record while a single run is worse than the grid, but these are prefix values from one seed stream with no spread, and no schedule was compared at equal cost, so H-207's criterion was not tested. |
+| exp-208 | series-000 | 11 | claude-opus-5, unattended | H-212 | At levels 0, 2 and 4 no repaired run in 3,000 beat the grid at n = 5, 10 or 11, and at levels 6, 8 and 10 the best run did in eight of nine cells, the ninth within 5,000 seeds, but each value is one prefix from one seed stream and the page's own level 3 was not measured on repaired runs. |
+| exp-209 | series-000 | 11 | claude-opus-5, unattended | H-212 | The compaction program, its inputs and its outputs were not kept, so the observation cannot be reproduced and supports no conclusion about whether repaired arrangements are locally compact. |
+| exp-210 | series-000 | 11 | claude-opus-5, unattended | H-212 | Every blind run observed ended overlapping, but the snapped control was measured once with a probe variant that was not kept, and neither the trials nor their final poses are in the repository, so the observation cannot be re-checked from it. |
 
 ### blocked (11)
 
@@ -1091,10 +1101,16 @@ Status: **active**. Reconcile the merged research record, then choose among rout
 | exp-148 | H-146 | 1.2m wall | timebox | Exp149 tests the separately registered explicit tuple(0,0,0, |  |
 | exp-158 | H-160 |  | dependency |  |  |
 | exp-160 | H-162 |  | dependency |  |  |
+| exp-207 | H-207 | 1 round unrecorded | dependency |  |  |
+| exp-208 | H-212 | 1 round unrecorded | dependency |  |  |
+| exp-209 | H-212 | 1 round unrecorded | dependency |  |  |
+| exp-210 | H-212 | 1 round unrecorded | dependency |  |  |
 
 ## Effort
 
-122 rounds, 2512.1 agent-minutes, 1798.3 wall-minutes.
+126 rounds, 2512.1 agent-minutes, 1798.3 wall-minutes.
+
+These totals exclude 4 historical rounds with unrecorded timing; their cost is unknown, not zero.
 
 ## Exploration reports not yet codified
 

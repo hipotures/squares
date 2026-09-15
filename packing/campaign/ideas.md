@@ -543,6 +543,33 @@ in the finite optimum.
 | 164 | Sweep BC303 C and S first-owner charges under the accepted T2 domains | registered | [H-160](hypotheses/H-160-bc303-t2-charge-filters.md) | [X-029](explorations/X-029-bc303-t2-exact-geometry-draft.md) and the accepted charge bridge give complete open-cell C and sufficient first-owner S tests. A low C cell needs physical-parent replay to refute opposite T2; a low S strip cell only defeats the sufficient filter. |
 | 165 | Charge the exact BC303 literal parent union | registered; rejected by exp-159 | [H-161](hypotheses/H-161-bc303-literal-parent-union.md) | The source-bound closed Q0 mass is `N=4000015`, below both frozen cutoffs. Each necessary budget retains `1048233` units of slack, so this resource test excludes neither the literal parent nor its four-corner tuple. Idea 164 belongs to the parallel T2 branch. |
 
+## Workbench physics as a search
+
+| # | Idea | Status | H | Source | Crux |
+| --- | --- | --- | --- | --- | --- |
+| 170 | restarts beat schedule tuning at equal cost | registered | [H-207](hypotheses/H-207-restarts-beat-schedule.md) | [X-034](explorations/X-034-the-workbench-physics-as-a-search.md) | Re-measure with retained final poses and disjoint seed blocks before reusing any number. |
+| 171 | the initial drop decides the answer, not the annealing | registered | [H-208](hypotheses/H-208-the-drop-decides.md) | [X-034](explorations/X-034-the-workbench-physics-as-a-search.md) | Re-measure with retained final poses and disjoint seed blocks before reusing any number. |
+| 172 | no parameter set in the workbench’s own space reaches a record | registered | [H-209](hypotheses/H-209-no-parameters-reach-a-record.md) | [X-034](explorations/X-034-the-workbench-physics-as-a-search.md) | Re-measure with retained final poses and disjoint seed blocks before reusing any number. |
+| 173 | the blind physics never settles to a valid packing | registered | [H-210](hypotheses/H-210-no-valid-packing.md) | [X-034](explorations/X-034-the-workbench-physics-as-a-search.md) | Re-measure with retained final poses and disjoint seed blocks before reusing any number. |
+| 174 | the shake has a sweet spot, and the shipped value is far below it | registered | [H-211](hypotheses/H-211-the-shake-has-a-sweet-spot.md) | [X-034](explorations/X-034-the-workbench-physics-as-a-search.md) | Re-measure with retained final poses and disjoint seed blocks before reusing any number. |
+
+[H-212](hypotheses/H-212-the-workbench-physics-as-a-search.md) is the open question
+X-034 explored, not an idea.
+It holds exp-208, exp-209 and exp-210, the exploratory rounds H-210 and H-211 were
+registered from, so neither of those has been tested.
+
+Idea 169, that the blind physics closes a constant fraction of the record-to-grid gap,
+was retired on 2026-09-14. Its premise came from arrangements that were never checked to
+be packings; once runs were repaired, a single run scored below the grid at every `n`.
+Its hypothesis, H-206, was retired with it, and the id stays consumed.
+<!-- retired-ids: H-206 -->
+
+These ideas were numbered 164–169 until 2026-09-14, when main had landed 164 and 165 and
+parallel n = 11 branches held 166–168. Each moved up by five: 164, the retired idea, is
+now 169, and 165–169 are now 170–174 (H-207 to H-211). An idea number written before
+then is five lower than the same idea’s number here, so the shake dial, once idea 169,
+is idea 174.
+
 ## Reconciled Daytime Portfolio — X-028
 
 [X-028](explorations/X-028-n11-strategy-portfolio-draft.md) preserves the six-route
