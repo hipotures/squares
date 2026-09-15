@@ -925,6 +925,8 @@ def check(  # noqa: C901 - a flat list of record invariants, each a few lines; s
 
         session_started = offset_timestamp(session.get("started_at"))
         session_deadline = offset_timestamp(session.get("deadline_at"))
+        session_ended = offset_timestamp(session.get("ended_at"))
+        session_number = int(name.split("-", 2)[1])
         if status == "in_progress":
             if session_started is None:
                 problems.append(f"{name}: in-progress session needs an offset-aware started_at")
@@ -936,6 +938,17 @@ def check(  # noqa: C901 - a flat list of record invariants, each a few lines; s
             problems.append(f"{name}: started_at is not an offset-aware ISO timestamp")
         if session.get("deadline_at") is not None and session_deadline is None:
             problems.append(f"{name}: deadline_at is not an offset-aware ISO timestamp")
+        if session.get("ended_at") is not None and session_ended is None:
+            problems.append(f"{name}: ended_at is not an offset-aware ISO timestamp")
+        if status in {"completed", "stopped"} and session_number >= 128:
+            if session_ended is None:
+                problems.append(f"{name}: terminal session needs an offset-aware ended_at")
+            elif session_started is None:
+                problems.append(f"{name}: terminal session needs an offset-aware started_at")
+            elif session_ended < session_started:
+                problems.append(f"{name}: ended_at is before started_at")
+        if status == "in_progress" and session_ended is not None:
+            problems.append(f"{name}: in-progress session has ended_at")
         if session_started is not None and session_deadline is not None:
             if session_deadline <= session_started:
                 problems.append(f"{name}: deadline_at is not after started_at")

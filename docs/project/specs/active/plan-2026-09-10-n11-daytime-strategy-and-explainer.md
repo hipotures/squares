@@ -1,22 +1,21 @@
 # N11: Daytime Strategy Blocks and Parallel Explainer Update
 
-**Active plan, September 10, 2026.** This plan replaces the uninterrupted overnight
-schedule with shorter blocks that can start and stop during the day.
-Each research block gets its own session clock, falsifiable output, stop rule, and
+**Active plan, September 10, 2026; updated September 14.** This plan replaces the
+uninterrupted overnight schedule with shorter blocks that can start and stop during the
+day. Each research block gets its own session clock, falsifiable output, stop rule, and
 closeout. A later block is selected from the evidence produced by the earlier ones; gaps
 between blocks consume no scientific budget.
 
-The workflow entry is **W10 review, planning, and oversight** under `think-gvlg`. The
-first exit is agenda035, a durable strategy comparison, and selection of the first
-60–120 minute research block.
-The research branch is `codex/n11-daytime-strategy`, based on merged PR139 at
+The original workflow entry was **W10 review, planning, and oversight** under
+`think-gvlg`. Its first exit was agenda035, a durable strategy comparison, and selection
+of the first 60–120 minute research block.
+The original research branch was `codex/n11-daytime-strategy`, based on merged PR139 at
 `3a18a05a6af75e3800612549d5a3c5fe419b96f2`.
 
-A separate W8 documentation lane runs from `codex/n11-explainer-current-bound`, also
-based directly on the PR139 merge.
-It is divided into three bounded blocks and has its own pull request and review.
-Documentation work does not consume a research target’s allowance and does not change a
-scientific result.
+A separate W8 documentation lane ran from `codex/n11-explainer-current-bound`, also
+based directly on the PR139 merge, in bounded blocks with its own pull request and
+review. Documentation work does not consume a research target’s allowance and does not
+change a scientific result.
 
 ## Entry Facts
 
@@ -47,8 +46,42 @@ These scopes remain in force throughout this plan.
 contains the later analytical mechanism synthesis.
 The draft
 [X-028 portfolio](../../../../packing/campaign/explorations/X-028-n11-strategy-portfolio-draft.md)
-preserves the broader six-route option map and reconciles it with T-026 and exp-156.
-Neither document registers a target; this plan remains the execution controller.
+preserves the broader six-route option map and reconciles it with T-026 and exp-156. The
+[post-T1 draft exploration](../../../../packing/campaign/explorations/X-030-n11-post-t1-proof-obligations-draft.md)
+states the exact parent-union lemma and separates literal-parent tests from the still
+necessary continuous-domain selection proof.
+The
+[H-161/exp-159 result](../../research/research-2026-09-13-bc303-literal-parent-union-result.md)
+now measures the literal parent $Q_0=[0,1]^2$ at $N=4000015$ source units.
+Its one-parent and four-corner necessary tests both survive with $1048233$ units of
+slack. This does not construct an eleven-parent extension or decide any pose cell.
+The T2 C/S charge targets remain unrun.
+The separate
+[X-031 floor-normalized exploration](../../../../packing/campaign/explorations/X-031-bc303-floor-normalized-t2-helper-draft.md)
+records a source-distinct reviewed strengthening of the local forced-type account: C
+requires at least $4524132$ integer mass units, and an actual jointly realizable S pair
+requires at least $8524147$. An S first-owner strip minimum of $4524132$ is sufficient,
+but a lower strip cell does not refute actual S. The separate
+[H-162 filter](../../../../packing/campaign/hypotheses/H-162-bc303-floor-normalized-t2-filter.md)
+and
+[exp-160 analysis](../../../../packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-160-bc303-floor-normalized-t2-filter-analysis.md)
+prospectively register the C and S strip cutoffs for one admitted retained exp-158
+receipt. They do not alter H-160/exp-158, allocate a second target run, or decide the
+complete actual-S condition.
+The
+[source-distinct H-162 audit](../../reviews/review-2026-09-13-bc303-h162-preregistration-math.md)
+records the verdict order and quantifier boundary.
+The target-free reader has an
+[independent readmission](../../reviews/review-2026-09-13-bc303-t2-charge-reader-readmission.md)
+after two documented defects were repaired; its integrated execution head still needs a
+source/readiness check before the registered H-160/exp-158 target.
+The
+[source-distinct closeout audit](../../reviews/review-2026-09-12-n11-post-bc329-strategy-audit.md)
+records the exact T-025/T-026/BC329 fact ladder, the terminal meaning of each possible
+BC329 outcome, and the remaining conditional-selection obligations.
+H-161 and exp-159 own that completed literal target; the strategy analysis registers no
+additional target. Agenda036 now owns the live execution order; the retained sections
+below record the September 10–13 controller and evidence.
 
 An **atom** is a nonnegative resource rule used by a covering certificate.
 A point atom charges a core when it contains one site.
@@ -63,6 +96,49 @@ usually through boundary contacts or corner marks.
 Its residual certificate is global only after a separate selection theorem proves that
 every physical packing admits at least one certified selection.
 Counting overlapping labels is not such a theorem.
+
+## September 14 Strategy Reset
+
+The owner has paused heavy computer-assisted proof work aimed at very small lower-bound
+increments. The current objective is either a material improvement to the `n = 11` bound
+or a substantially simpler proof of `s(11) >= 3.82`.
+[Agenda 036](../../../../packing/campaign/agendas/agenda-036-n11-strategy-reset-roadmap.md)
+is the live controller, and the synopsis’s
+[Research Program Status and Roadmap](../../../../SYNOPSIS.md#research-program-status-and-roadmap)
+is the reader-facing account.
+
+The transition has three separate blocks.
+BC-339 completed and certified the W7 pipeline-improvement work and its W8 source
+reconciliation. BC-347 then completed and certified a read-only
+[Astra Max mathematical audit](../../reviews/review-2026-09-14-small-n-significant-progress-mathematical-audit.md)
+of the retained evidence, the five shaped routes, and additional hypotheses with
+material small-`n` upside behind that prerequisite.
+BC-346 is the current W10 planning block.
+It compares dependency readiness, expected information value, first discriminator, stop
+rule, and resource cost, then selects exactly one execution entry.
+None of these blocks runs a scientific target.
+
+The planning candidates are:
+
+| Route | First discriminator | Intended payoff |
+| --- | --- | --- |
+| W5 efficiency checkpoint | Determine whether the four-to-eight-block cadence makes it due; if so, measure at most one demonstrated bottleneck | Protect the speed and equivalence of the next research loop |
+| A — systematic case split | At side `3.84`, freeze one complete difficult root family and report the fixed denominator and exact worst survivor; use `3.85` only after rebuilding its premises | A material lower-bound route beyond the point-certificate ceiling |
+| S — certificate compression | Start with T-025 and seek a fivefold reduction in orbit representatives or comparable independent geometry, with unchanged exact replay | Replace the current large certificate with a human-statable proof |
+| E — global angular resources | Test H-131’s proved angle-count caps against the whole retained fractional optimal face, with coherent selection explicit | Add a global physical resource without assuming two orientations or owner selection |
+| B — pairwise SDP | Audit a sound pose cover and compare with the strongest matched threshold baseline after the `n = 6` controls | Attack the fractional-versus-integer gap through pairwise compatibility |
+| F1 — stronger charge algebra | Test one exact realizable trace language against matched ordinary-threshold atoms | Change the relaxation by coupling individually admissible placements |
+| F2 — geometry-dependent budgets | Prove one joint-parent physical-capacity bound for an atom with ordinary budget at least two | Replace a fixed combinatorial budget with a geometry-dependent theorem |
+| N — `n = 12` exact value | Seek a uniform boundary-capacity or deformation lemma for `L = 4 - epsilon`, with solved controls and flexible boundary families | Attempt the larger theorem `s(12) = 4` without a decimal ladder |
+| C — orientation structure | Reproduce the 6+5 Trump-angle control, then close one complete positive-width interval near `3.87` | Prove a restricted-family theorem and test a possible bridge to optimality |
+| D — upper-bound search | Make one changed proposer recover an oblique control at matched work before allocating a larger search | Improve the upper bound or retain verified competing configurations |
+| G — geometric waste | Prove one orientation-sensitive local gap and a non-double-counting global accounting rule | Explore a speculative geometric mechanism beyond one-body density |
+
+The audit’s advisory order is A, S, E, B, F1, F2, N, C, D, then G. It is a
+readiness-and-information judgment, not a measured success probability or a preselected
+execution. BC329, weighted-atom stages 3–4, and the BC303 H-160/H-162 target lane are
+paused. Their admitted code and registrations remain retained; no exp-158 or exp-160
+target ran, so the pause carries no scientific verdict.
 
 ## One-Block Controller
 
@@ -83,21 +159,24 @@ method.
 The next block is chosen only after the current block has a terminal disposition.
 The coordinator owns shared campaign records and Git integration.
 
-## Ranked Research Blocks
+## September 10–13 Research Blocks
 
-The order reflects present source readiness and expected information value.
-It is a working allocation, not a claim that one mathematical direction is intrinsically
-more productive than another.
-Strategy intake and BC326 are complete and retained below as history.
-BC329 is the next active direct attempt to improve the global lower bound.
+This is the prior allocation retained for history.
+Agenda036 and the September 14 strategy-reset section above replace it for current
+selection. Strategy intake and BC326 are complete and retained below as history.
+BC329 was the next planned direct attempt to improve the global lower bound.
 BC337 is a secondary parent-conditioning lane that may proceed in parallel while BC329’s
 runner is being admitted.
+The H-160/exp-158 C/S charge lane has an admitted target-free reader and a separate
+registered target. It tests a local forced-type helper, not the global availability
+theorem.
 
 | Rank | Block | Time | Exact deliverable and stop rule |
 | --- | --- | --- | --- |
 | 0 | Strategy intake and analytic pruning — complete | 45 min | Reconciled the post-PR139 frontier, retained the parent-domain translation lemma, ranked distinct routes, and selected BC326 as the first dependency-ready block. |
 | 1 | Necessary parent geometry on the saved owner escape — complete | 60–90 min | Admitted the parent-domain adapter and ran the fixed exp151 target once. The residual survived its parent box; TR was already B-only incompatible, making its parent-domain arm redundant; BL, BR and TL were not run. H158 remains unresolved. |
 | 2 | One direct core and direction-net packet | 90–120 min after a fixed-core runner is admitted | Freeze the 2880-step net, one larger core, the original relative-weight scale and one deterministic normalization rule. Accept only when the raw minimum exceeds the exact budget threshold, both coverage routes agree, and dilation replay gives a limit strictly above T-026. A verified charge at or below that threshold rejects only the fixed relative-weight packet; timeout leaves it unresolved. |
+| 2T | BC303 C/S charge target, in parallel | Integrated-head admission, then one 30-minute scientific allowance | Authenticate the 377 source atoms, 182 eligible charts, both axis aliases, the repaired reader, and the executing revision; pass its synthetic all-strata controls. Run H-160/exp-158 once. C passes at $\ge4524200$; a lower C cell needs exact physical-parent replay to reject its opposite/combined helper. S first-owner passes at $\ge4524185$; a lower strip cell rejects only the sufficient filter. Even a positive T2 result leaves local availability and global selection open. |
 | 2P | Exact TR-incompatibility centre obstacle, in parallel | 45 min admission, then one 240 s scientific allowance inside a 300 s process | Keep exp151 direction 6, tuple `(0,0,0,7)`, open residual domain `C°`, and the same nine other closed centre-space obstacles. The control adds `P_TR + (-R)`; the candidate adds `K_TR` directly, with no second Minkowski expansion. Run once only after source-bound construction, clipping, a bounded runner and an independent reader are admitted. |
 | 3 | Weighted-atom admission, then a matched support comparison | 60–90 min for admission; a separate 90–120 minute target block | Version multiplicity semantics and make every producer, loader and coverage route agree before freezing one common-row control/candidate comparison. Accept finite improvement only when an exact candidate primal upper bound is below the control dual lower bound. |
 | 4 | Genuine-contact or snug-parent residual pilot | 60–90 min | Use the proved fixed-angle contact alternative to define one exact conditional domain. Admit physical contacts and all complementary branches before measuring; a result on one branch remains conditional. |
@@ -279,15 +358,132 @@ raw charge below one therefore does not by itself reject the packet.
 A verified admissible core with charge at most `M/11` does reject this fixed collection
 of sites, thresholds, relative weights, core side, and net under every common rescaling.
 
-The existing refinement CLI runs adaptive core sweeps and bisection and has no process
-deadline. It does not execute this single fixed packet.
-Before registration, add and independently admit a maintained fixed-core runner with a
-hard deadline and durable partial output.
+The existing refinement CLI runs adaptive core sweeps and bisection and does not execute
+this single fixed packet.
+A maintained fixed-core runner is implemented on the publication stack.
+It binds its source bytes to the frozen Git revision and runtime, runs bounded raw and
+exact schedulers, and records the exact coordinator-observed direction sets for every
+route. Its parent preflight and supervised worker share the invocation clock; deadline
+expiry through publication and readback revokes acceptance.
+The September 12
+[preflight addendum](../../reviews/review-2026-09-10-n11-bc329-packet-preflight.md#stack-review-addendum-2026-09-12)
+records the target-free review and controls, including the process-launch enforcement
+boundary and termination grace.
+Atomic replacement prevents a reader from seeing half-written JSON after an ordinary
+worker failure or termination; the runner makes no host-crash or power-loss durability
+claim.
+
+The integrated repair addresses `think-rvhu`, `think-fmju`, `think-42zc`, `think-5fdx`,
+`think-g7vg`, and `think-pvmv`. The latest additions keep `uv.lock` read failures
+operational, reject normal, linked, and separate Git administrative directories, and
+retain ordinary `Popen` failure type and message in a `launch-failed` receipt with
+return status 1. Source-distinct review accepted the combined repair at
+`421c344545873647dd26f856320d93dbfd59413a`; BC329 remains blocked on the separate
+calibration and scientific admission chain.
+Admission uses a separate `fixed-core-packet-calibration/v1` receipt and a frozen,
+analytically solved fixture unrelated to BC329. The full-shape control runs all four
+generic routes and 14,404 direction records, but its schema cannot express a scientific
+acceptance. Three fresh host runs measure operational overhead, effective workers by
+route, clocks, sampled process-group RSS, artifact bytes, and deadline headroom.
+The
+[calibration design review](../../reviews/review-2026-09-12-n11-bc329-calibration-design.md)
+fixes the fixture, exact answers, refusal controls, and limits on interpreting those
+measurements. The calibration implementation is independently accepted through exact
+implementation head `fcb538c29b846fb5e7c33bd962772ada9c21aedd`, including CAL-1 through
+CAL-7 and the signal-safe terminal staging boundary.
+Because the fixture is deliberately easy, its timing does not bound BC329’s computation.
+The observed-worker contract, maintained three-profile coordinator, and source-distinct
+receipt reader are integrated locally.
+Exact-head reviews identified source, running-reader identity, typed-field, dilation,
+witness-agreement, cross-route chronology, phase-lifetime, and receipt-byte binding
+boundaries.
+The source-distinct reader’s repair at `7e4d2487` passed independent rereview
+for F1–F5; that review found impossible nested clocks, task positions, a parent cycle,
+and a Git tree object accepted as execution identity.
+Candidate F6/F7 repair `95830f9e` is integrated; its
+[exact-commit review](../../reviews/review-2026-09-13-n11-bc329-reader-f6f7-overflow.md)
+accepted F6a, F6c, and F7, but refused F6b after a full real-binder control accepted
+finite phase clocks whose sum overflows.
+Finite-clock repair `a5701e73` is integrated with a maintained full-binder overflow
+refusal and finite equality control.
+Its
+[independent exact-head rereview](../../reviews/review-2026-09-13-n11-bc329-reader-f6f7-final.md)
+accepted F6/F7 at that source blob after 23 full real-binder controls.
+This scoped verdict does not transfer automatically to the later integrated head or
+admit positive calibration.
+Coordinator repair `dbbf8495` is integrated for inverted route chronology, disjoint
+phase time, and a changing `result.json`. Its
+[independent exact-head review](../../reviews/review-2026-09-13-n11-bc329-coordinator-final.md)
+accepted those targeted controls but refused strict receipt admission: finite inputs can
+overflow a derived deadline to infinity, and finite phase durations can raise an
+uncaught `OverflowError` rather than the specified metrics refusal.
+A scoped repair at `775c71d5` has an
+[independent exact-head review](../../reviews/review-2026-09-13-n11-bc329-coordinator-arithmetic-final.md)
+accepting both arithmetic refusal paths at its reviewed source blobs.
+The later integrated-head and positive-run gates remain.
+The first maintained run-set verifier at `878e18d0` implements the R2 proof join, R3
+inventory and archive comparison, and R4 source-closure check, but its
+[exact-head review](../../reviews/review-2026-09-13-n11-bc329-runset-verifier.md)
+refused admission on six reproducible binding and refusal-path gaps.
+Candidate repair `0874e912` closes those six in focused controls, but its
+[rereview](../../reviews/review-2026-09-13-n11-bc329-runset-verifier-rereview.md)
+refused R3: the verifier rejects the coordinator’s 18 required top-level command logs,
+and a status change between the first check and digest snapshot can be retained as
+accepted. Follow-up repair `2ea77405` has an
+[independent exact-head review](../../reviews/review-2026-09-13-n11-bc329-runset-verifier-r3-final.md)
+accepting the 22-file coordinator-shaped root and deterministic status-race refusals at
+its reviewed verifier blobs.
+Actual positive-run bytes, the evidence-commit OID, and the later integrated-head gate
+remain open. The reader’s
+[initial review](../../reviews/review-2026-09-13-n11-bc329-source-distinct-reader.md)
+records the refusal at `212e0dfc`; its
+[rereview](../../reviews/review-2026-09-13-n11-bc329-reader-rereview.md) records the
+remaining gaps at `7e4d2487`. The coordinator’s
+[rereview](../../reviews/review-2026-09-13-n11-bc329-coordinator-rereview.md) records
+the next refusal at `fc3e314d` and the three prior repairs it accepted.
+An
+[integrated-head review](../../reviews/review-2026-09-13-n11-bc329-integrated-run-sheet.md)
+at `fbd915fc` found that the component source blobs still match those accepted reviews.
+It refused the run sheet because its commands bypassed the maintained verifier.
+The revised [run sheet](plan-2026-09-13-n11-bc329-three-profile-run-sheet.md) now calls
+`snapshot`, `read`, `join`, `retain`, and `source-closure` on both the staged evidence
+tree and the later evidence commit.
+An
+[exact-diff rereview](../../reviews/review-2026-09-13-n11-bc329-run-sheet-identity-refusal.md)
+accepted that command wiring but found no proof that the evidence commit directly
+descends from the execution commit.
+The sheet now checks the parent before claiming admission.
+A
+[final exact-diff rereview](../../reviews/review-2026-09-13-n11-bc329-run-sheet-parent-final.md)
+accepts that repair at its reviewed working blob after direct-child and refusal
+controls. A
+[format-final rereview](../../reviews/review-2026-09-13-n11-bc329-run-sheet-flowmark-final.md)
+also accepts the current formatted sheet at Git blob `29517a3f`. A clean integrated-head
+review and live PR-head equality still precede execution.
+The later integrated-source gate, three fresh profiles, and independent readback also
+remain open. None of those profiles has run.
+The implemented runner and calibration repairs do not admit BC329 execution.
+
 Then register one hypothesis and one experiment, freeze the packet and normalization
 rule, measure `m_c`, and run the normalized object through the complete exact route, the
 reflected interval route, and the dilation reader’s source replay.
-A disagreement or incomplete run is unresolved.
+A timeout, incomplete direction set, or nonzero-width enclosure leaves coverage
+incomplete.
+Without an independently verified admissible core whose raw charge is at most
+`M/11`, it also leaves the packet scientifically unresolved; such a core instead rejects
+the fixed relative-weight packet even when the remaining directions are incomplete.
+A source mismatch, malformed geometry, method disagreement, or invalid witness makes the
+invocation or instrument invalid; it supplies no scientific verdict.
 A pass changes the bound only when all three readers verify the same retained bytes.
+
+The first direct follow-up depends on that terminal evidence.
+After a verified rejection, retain the low-charge witness and analyze its exact
+breakpoints across the full improving core-side interval before freezing one nearby
+packet. After acceptance, use the least-charge directions and measured budget margin to
+choose at most one smaller-core or locally refined candidate.
+After a timeout without a verified refuter, record the unfinished stage and evidence
+needed to judge whether another instrument is warranted.
+None of these outcomes ranks the wider method.
 
 ## Block 3: Changed Atoms and Support
 
@@ -298,8 +494,10 @@ K5 motif with five sites and integer multiplicities.
 Its budget is one because two disjoint cores cannot each consume four of seven labeled
 tokens. The retained reader reports charge `3/2` against A6’s family, but the production
 format and both coverage routes do not yet admit multiplicities.
-The scientific comparison is blocked on that narrow W7 admission and a maintained
-paired-program adapter.
+First admit exact traces for this one motif on a frozen core domain and compare them
+with all 80 ordinary threshold types on the same sites.
+Only a surviving geometric trace advantage justifies full W7 multiplicity-format
+expansion and a maintained paired-program adapter.
 
 The candidate must state what changes: the atom-generation rule, support-generation
 rule, core/net regime, or some combination.
@@ -331,7 +529,7 @@ That disjunction must then be joined to separate certificates for every branch.
 Literature analogues guide the formulation but do not replace the proof for congruent
 freely rotated squares.
 
-The analytic portion of Block 4 is now complete and independently reviewed.
+The fixed-angle normal-form portion of Block 4 is complete and independently reviewed.
 At every feasible fixed side, for each labelled fixed-angle connected component, there
 is a representative whose physical contact components all touch the left and bottom
 walls and whose active translation constraints contain a `2n`-row basis of genuine
@@ -347,14 +545,53 @@ The per-cell algebraic rank statement survives, while physical contacts require 
 component-wise choice of representative and separating axes.
 The proof, exact fixtures and independent audit are in the
 [structural review](../../reviews/review-2026-09-10-n11-structural-normal-forms.md).
-The next structural experiment must consume an actual contact path or snug parent and
-retain the complementary branches; it may not promote an arbitrary active LP row to a
-contact edge.
+
+The accepted
+[selection-routing analysis](../../research/research-2026-09-12-n11-selection-routing-first-principles.md)
+and its
+[source-distinct review](../../reviews/review-2026-09-12-n11-selection-routing-first-principles.md)
+state the missing transfer exactly: for every physical packing `P`, its valid selection
+set must satisfy `Gamma(P) intersect G != empty`, where `G` contains only completely
+excluded conditional selections.
+For T-023’s two certified uniform tuples, the complement has sixteen maximal
+availability products.
+These give three physical `D4` types, but ten orbits when S1’s fixed left/bottom wall
+chart is retained. The obligation reduces to two unproved lemmas: every corner offers
+label 0 or 15, and no two corners force opposing singleton types.
+
+Two path deductions are proved at their narrow scope.
+If `sigma` corner pairs split their mark owners, some shortest path between owners of
+different corners has at most `9-sigma` parents.
+A right-corner owner needs at least three parents to reach the normalized left wall,
+with the symmetric top/bottom statement.
+Exact four-parent controls satisfy eight-mark ownership and simultaneous owner
+compatibility while defeating either missing lemma.
+They do not extend to eleven parents and do not refute the selection theorem.
+
+The retrospective one-corner
+[T1 literal replay](../../../../packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-157-bc303-literal-t1-witness.md)
+rejects the named bottom-left role-C universal surplus inequality with one admissible
+parent. It does not compute the minimum over that continuous domain or establish that
+this parent extends to an eleven-parent packing.
+The adjacent/opposite pair test `think-cexv` remains a separate unrun T2 question.
+The dependencies on global selection and packing feasibility remain.
+No selection theorem or new n11 bound follows.
+
+Any later structural experiment must retain the complementary branches and combine the
+fixed-side normal form with the seven-of-eight mark-ownership alternative and one shared
+resource account. It may not promote an arbitrary active LP row to a contact edge or
+assume a literal corner, finite angle set, short prescribed path, or complete quench.
+
+For the angle-profile lane, H131 supplies upper counts, not an exact `(9,2)`
+decomposition. A certificate normalized to `9d_0+2d_1` therefore applies only to that
+conditional exact-count branch unless the demand is minimized over every allowed count
+vector. In the simpler `n_0 <= 9` case, `d_0 <= d_1` makes `9d_0+2d_1` the worst allowed
+demand; without that order, the single normalization does not cover the count theorem.
 
 ## Parallel Documentation Blocks
 
-The documentation lane stays reviewable independently on PR148. Its three blocks have
-separate evidence and stop conditions:
+The documentation lane stays reviewable independently on PR148. Its blocks have separate
+evidence and stop conditions:
 
 | Block | Time | Deliverable and stop rule |
 | --- | --- | --- |
@@ -363,15 +600,24 @@ separate evidence and stop conditions:
 | D2b: edition and history | 30–45 min | Label the current explainer `v0.4.0`, retain `v0.3.0` as the 3.81 edition, and render a two-entry history near the top. Recover the date each label was first applied to this explainer from Git rather than substituting a theorem or deployment date; bind the version and dates to focused tests. |
 | D3: independent review and stacking | 30–60 min | Independently check the mathematics, prose and rendered output, correct findings, then stack the docs PR on the research checkpoint. Readiness requires green checks on the stacked head; inherited base failures are recorded rather than attributed to the docs change. |
 
-D1, D2 and D2b are complete on PR148 at `f7126bfc`. The mathematical, prose and local
-rendering portion of D3 is also complete: 135 focused tests, static analysis,
-prepared-output drift, the deterministic 20-page PDF and font check, and the complete
-324-case atlas gate pass.
-The remaining D3 step is operational: publish this research branch, retarget PR148 onto
-it, and require the hosted checks to pass on that stacked head.
-On the temporary `main` base, every hosted job except `validate` and its aggregate
-passes; the log attributes those failures solely to the inherited expired session099
-deadline.
+D1, D2, D2b and D3 completed their historical checkpoint on PR148 at `989fd544`,
+including its required hosted checks.
+That checkpoint retained 135 focused tests, static analysis, prepared-output drift, PDF
+and font checks, and the complete 324-case atlas gate.
+The September 12 mathematical, clarity and integration review adds corrections from
+`e8baa8ff` and checks the 22-page edition.
+Its exact source revisions and rendering evidence are recorded in the
+[T025/T026 review addendum](../../reviews/review-2026-09-10-t025-t026-verifiable-claims.md#stack-review-addendum-2026-09-12).
+BC335 records the completed historical milestone; the new review supplies evidence for
+the later stack revisions.
+
+PR149 is the separate page-diagnostic layer above PR148. Its `4d00ab68` checkpoint
+passed hosted checks and an unrestricted full research checkpoint.
+The September 12 review correction `c699a7e3` adds object-header and explicit
+render-count controls and reports exact byte-prefix relationships without inferring
+truncation. The BC329 runner and later evidence corrections are retained in PR156 above
+PR149. Every later source revision requires matching validation; earlier green
+checkpoints do not certify the later stack.
 
 The blocks share one documentation branch because they revise one reader artifact.
 Their costs and outcomes remain distinct in the agenda and beads.
@@ -437,8 +683,10 @@ independent replay.
 Every active block records a checkpoint at most thirty minutes after its previous one.
 At a checkpoint, record evidence obtained, actual cost, changed dependencies, and the
 next admitted action.
-Native task usage remains in local accounting under the current publication restriction;
-the public record names block clocks and outcomes without publishing that telemetry.
+Each stacked PR leads with the cost evidence verified for that layer: task intervals and
+scientific runtime when available, their exclusions, and any usage that remains
+unattributed. Raw native logs remain local.
+Do not assign one layer’s cost to another.
 Run a W5 efficiency block when the reconstructed four-to-eight block cadence requires
 it. Validation can run beside read-only work, but large LP and covering processes remain
 serial unless the host is measured to support concurrency.
@@ -456,6 +704,82 @@ The exact owner-requested V3 plan source remains unresolved under `think-i1fr`. 
 bounded audit found no identifiable source in the repository or linked bead state.
 This plan cannot claim V3 alignment until that source is supplied and mapped requirement
 by requirement.
+
+## September 13 Stack Review Handoff
+
+The review of PRs 148, 149, 156, and 157 remains open at this checkpoint.
+The [PR148 review](https://github.com/jlevy/squares/pull/148#issuecomment-5655488385)
+accepts published head `b43d3011`; the
+[PR149 review](https://github.com/jlevy/squares/pull/149#issuecomment-5655488459)
+accepts `8d0a3ff2`. PR156’s reviewed calibration continuation is published at `9c56e901`
+as a draft. Its standalone reachable rerun passed 5,511 tests with nine skips, but its
+prior full pre-push gate failed and hosted Packing run `34782594805` has a failing
+suite. The PR156 owner tracks that failure and operational admission in `think-4ovs` and
+`think-pp3j`. No full-shape calibration profile or BC329 target ran.
+
+PR157 has the weighted-atom repairs through `cadbf7e1`, the retained PDF comparison and
+optional math trace at `876c5945`, and the reviewed diagnostic control/treatment at
+`a481ec24`. The diagnostic replaces each selected visible prepared-math Text node with
+an equal new node only in an explicit manual trace arm.
+The ordinary stored-artifact comparison remains strict and unconditional.
+A 46-step local pre-push gate passed on the diagnostic source, including 5,478
+behavioral tests with nine skips; the final wording edit then passed 75 focused tests
+and Ruff. Hosted checks for the new head and a Linux two-arm diagnostic have not run at
+this checkpoint. The
+[preserved comparison](../../reviews/review-2026-09-13-explainer-pdf-comparison.md) and
+a later manual trace show small PDF text-position differences with unchanged extracted
+math text. Their browser cause remains unknown under `think-ptit`. A local two-draw Mac
+Chrome smoke passed in both diagnostic arms and cannot settle that cause.
+
+An independent mathematical review found no new defect in the anticipated
+`9c56e901`/`876c5945` merge.
+It checked the five shared source-closure paths and the two MATH05 packet preflights.
+This is not an acceptance of the as-yet-unmerged tree.
+PR157 changes five paths that PR156’s calibration receipt binds, so the maintained
+[run sheet](https://github.com/jlevy/squares/blob/9c56e9019b97be0511d5afe590790b362b93e9e4/docs/project/specs/active/plan-2026-09-13-n11-bc329-three-profile-run-sheet.md)
+must be rebound to the final PR157 execution head under `think-99bz` before any profile
+launch.
+
+The next integration sequence is to resolve PR156’s hosted failure, merge its final
+published head into PR157, review the resulting packet preflights and source closure,
+apply and independently review the run-sheet binding, then run the targeted math and
+calibration controls, the full 74-step checkpoint, Pages browser checks, and ordinary CI
+on the combined head.
+Publish the final PR157 disposition and close the review beads only after those receipts
+exist. No main-branch merge or deployment was done.
+
+## September 13 Integrated Stack Checkpoint
+
+This later checkpoint supersedes the live statuses in the preceding handoff while
+retaining its dated review history.
+PR148 and PR149 were merged into main at `f2e24e07`; main’s Packing and Pages checks
+passed and Pages deployed.
+Their PR bodies and dated closeout comments now record that outcome.
+PR149’s closeout also corrects the earlier timer and glyph-layout assertions against
+D-491.
+
+PR156 is published at `2f8925b2` as an intentional draft.
+Its hosted Packing and Pages checks pass after eight measured controls moved from the
+fast lane to the slow lane.
+The solved-fixture three-profile calibration and the BC329 target have not run.
+The PR156 component reviews remain scoped to their recorded heads and synthetic
+controls; they do not admit the integrated PR157 source.
+
+PR157 merge commit `53578447` incorporates that exact PR156 head and the
+[PR157 launch supplement](plan-2026-09-13-pr157-integrated-calibration-launch-supplement.md).
+An independent mathematical review found no new defect in the combined packet boundary:
+the two MATH05 preflights remain before shared state, workers, or receipts, and the
+maintained producer, reader, and verifier agree on the 23-path source closure.
+The same review accepted the supplement’s branch/live-head, reader-revision, and
+evidence-parent guards after its packet-boundary control was added.
+It accepted an operational procedure, not a positive profile or a scientific bound.
+
+The combined tree passed the edit tier (45 selected steps), records tier (32 selected
+steps), and 12 focused MATH05 test cases before the merge commit.
+The pre-push tier, full checkpoint, fresh hosted CI, and PR157 disposition still need
+receipts on the published combined head.
+PR157 remains unmerged; no PR157 deployment or BC329 run is claimed here.
+The unresolved PDF text-position cause remains under `think-ptit`.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

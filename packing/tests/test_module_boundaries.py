@@ -984,6 +984,24 @@ def test_the_slow_marker_is_declared_only_by_measured_nodes() -> None:
         # file now checks a retirement record against the schema and the tree: 0.07s for
         # nine tests, nothing to defer, and the marker left with the build it was paying
         # for.
+        # At 9c56e901 on 2026-09-13, 112 tests in this file took 239.13s locally
+        # (`pytest --durations=0`); these eight functions cost 188.49s of call time.
+        # Every one of their parametrizations took at least 2.69s, above the 1s slow
+        # floor. The full accepted read and shorter refusal controls remain quick.
+        # Hosted run 34782594805 measured the two longest named controls at 28.02s
+        # and 12.32s, and failed the required quick suite at 436.36s against 275s.
+        "test_read_fixed_core_calibration_profile.py": {
+            "test_dilation_contradictions_refuse_with_rebound_record",  # 69.17s across 19
+            "test_route_scalar_substitutions_refuse",  # 31.88s across 11
+            "test_real_binder_phase_schedule_controls",  # 22.02s across 6
+            "test_coherent_mathematical_and_operational_mutations_are_refused",  # 17.68s
+            # 13.52s across 4.
+            "test_impossible_topologies_refuse_after_sidecars_and_summaries_are_rebound",
+            "test_exact_method_witness_agreement_and_closed_boundary",  # 13.01s
+            # 10.74s across 3.
+            "test_valid_pooled_topologies_include_overlap_one_child_and_touching_boundaries",
+            "test_execution_manifest_closure_and_every_missing_path",  # 10.47s
+        },
         # 7s of call time across 1.
         "test_render_colors.py": {
             "test_right_angles_and_diagonals_are_pinned_across_the_atlas",  # 6.5s

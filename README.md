@@ -44,9 +44,10 @@ describes both.
 `s(n)` is the side of the smallest square that holds `n` non-overlapping unit squares.
 The problem is elementary to state and remains open even at small `n`.
 
-[New Results](#new-results) · [Survey](#survey) · [Repository Guide](#repository-guide)
-· [Getting Started](#getting-started) · [Reports](#reports) ·
-[Autonomous Research Process](#autonomous-research-process) ·
+[New Results](#new-results) ·
+[Research Status](SYNOPSIS.md#research-program-status-and-roadmap) · [Survey](#survey) ·
+[Repository Guide](#repository-guide) · [Getting Started](#getting-started) ·
+[Reports](#reports) · [Autonomous Research Process](#autonomous-research-process) ·
 [Conventions](#conventions) · [Layout](#layout)
 
 ## New Results
@@ -255,7 +256,7 @@ relevant source audit.
 | Where | What |
 | --- | --- |
 | [**Tutorial**](TUTORIAL.md) | First-principles introduction to the objects, bounds, cells, stationary branches, search, and proof obligations |
-| [**Synopsis**](SYNOPSIS.md) | Current technical state, established results, terminology, experiment roll-up, and handoff |
+| [**Synopsis**](SYNOPSIS.md) | Current research status and roadmap, established results, terminology, workflow contracts, and handoff |
 | [**Results register**](packing/frontier/RESULTS.md) | Whole-result bounds, audits, structural theorems, and errata graded under [`epistemics.md`](epistemics.md) |
 | [**Frontier**](packing/frontier/STATUS.md) | One record per case for `n = 1…324`, with reported and verified bounds kept separate |
 | [**Atlas**](packing/atlas/README.md) | Known-best and prospective packings, contact-scaffold enumeration, and deterministic renderings |
@@ -273,18 +274,28 @@ tracks improvements to everyday feedback and full final checkpoints, with measur
 and preserved coverage required before accepting a speedup.
 
 [`SYNOPSIS.md`](SYNOPSIS.md) is the technical root and current-state document.
-The generated day-to-day views are the frontier
-[status table](packing/frontier/STATUS.md),
+Its [research-status roll-up](SYNOPSIS.md#research-program-status-and-roadmap)
+synthesizes the generated frontier [status table](packing/frontier/STATUS.md),
 [results register](packing/frontier/RESULTS.md),
-[campaign ledger](packing/campaign/ledger.md), and
-[agenda map](packing/campaign/agenda-map.md).
+[campaign ledger](packing/campaign/ledger.md),
+[agenda map](packing/campaign/agenda-map.md), and
+[session close report](packing/campaign/session-close-report.yaml).
+The
+[W8 documentation pass](packing/campaign/documentation-pass.md#synopsis-research-status-roll-up)
+defines how those sources are reconciled.
+The separate
+[small-n mathematical audit](docs/project/reviews/review-2026-09-14-small-n-significant-progress-mathematical-audit.md)
+challenges the current research approaches and supplies the enlarged candidate set;
+agenda 036 and W10, not the review itself, own the eventual route selection.
 To resume work, use the synopsis’s [current handoff](SYNOPSIS.md#current-handoff), which
 names the owning work item and next bounded slice.
 
 ## Getting Started
 
-Read [`TUTORIAL.md`](TUTORIAL.md) once for the mathematical orientation, then
-[`SYNOPSIS.md`](SYNOPSIS.md) for current results and open work.
+Read [`TUTORIAL.md`](TUTORIAL.md) once for the mathematical orientation, then the
+synopsis’s
+[research status and roadmap](SYNOPSIS.md#research-program-status-and-roadmap) for
+current results and open work.
 Run commands from `packing/`; the project uses Python 3.14 through `uv`.
 
 ### Essential Terminology
@@ -401,13 +412,16 @@ The Motion Lab is an exploratory instrument, not a citable research result.
 
 ## Reports
 
-These 17 research reports are the durable topical syntheses:
+These 20 research reports are the durable topical syntheses:
 
 | Report | Scope |
 | --- | --- |
 | [Fractional Packing, Duality, and the Next N11 Discriminators](docs/project/research/research-2026-09-10-x027-fractional-duality.md) | Exact full-unit transport, interior duality and density equivalence, finite witnesses, and the limits of fractional obstructions |
 | [Seven Corner Marks, Contact Components, and Relational Helpers](docs/project/research/research-2026-09-10-x027-structural-helpers.md) | New ownership and contact-component deductions, shared-owner consistency, and bounded segment-helper comparisons |
 | [Certificate Mechanisms After the N11 Fractional Ceilings](docs/project/research/research-2026-09-10-x027-certificate-mechanisms.md) | Recent bound gains, weighted and floor charges, geometric expressiveness tests, and the finite optimal-dual-face criterion |
+| [N11: The Missing Owner-Selection Theorem](docs/project/research/research-2026-09-12-n11-selection-routing-first-principles.md) | Exact owner-selection obligation, sixteen avoiding products, wall-chart symmetry split, proved path bounds, narrow four-parent controls, and two proposed surplus tests: the T1 bottom-left role-C inequality was rejected by [exp-157](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-157-bc303-literal-t1-witness.md); T2 remains unrun |
+| [BC303 Literal Parent-Union Mass](docs/project/research/research-2026-09-13-bc303-literal-parent-union-result.md) | Exact Q0 mass and independent four-corner replay; both frozen necessary resource tests survive with 1,048,233 source units of slack, without an extension or global conclusion |
+| [BC303 T2: From the Accepted Pose Domains to Exact Charge Tests](docs/project/research/research-2026-09-13-bc303-t2-charge-bridge.md) | Accepted C open-cell reduction and S first-owner sufficient test, with exact sweep and witness conditions; no charge or T2 verdict |
 | [N11 Definitions, Findings, and the Inference Chain](docs/project/research/research-2026-09-09-n11-evidence-and-inference.md) | First-principles interpretation through exp153, exact scope of results, remaining proof obligations, and unranked alternatives |
 | [N11 Inference Audit](docs/project/research/research-2026-09-09-n11-inference-audit.md) | Corrections to overbroad summaries, physical-versus-relaxed quantifiers, and missing evidence |
 | [Packing 11 Unit Squares in a Square](docs/project/research/research-2026-08-22-packing-11-unit-squares.md) | What is proved for `s(11)`, what remains conjectural, and why the available proof techniques do not close the gap |
@@ -424,6 +438,10 @@ These 17 research reports are the durable topical syntheses:
 | [The Best-Known n = 26 Packing](docs/project/research/research-2026-09-07-n26-best-known-audit.md) | Dated literature and source search, exact score normalization, and the limits of the best-known claim |
 
 The reports distinguish formal proof, finite numerical checks, and source reports.
+The draft
+[X-031 floor-normalized T2 exploration](packing/campaign/explorations/X-031-bc303-floor-normalized-t2-helper-draft.md)
+records reviewed local cutoffs and bounded H-161 stability; it establishes no target
+result or global bound.
 The [document map](SYNOPSIS.md#document-map) identifies every maintained guide, dated
 record, generated view, and superseded document.
 
@@ -610,11 +628,12 @@ Changing agents changes the driver, not the record or the evidence required for 
 | Document | Definitive responsibility |
 | --- | --- |
 | This README | High-level orientation and the relationship among the layers |
-| [`SYNOPSIS.md`](SYNOPSIS.md) | Current technical state, full workflow contracts, work-unit vocabulary, and handoff |
+| [`SYNOPSIS.md`](SYNOPSIS.md) | Current research status and roadmap, technical state, workflow contracts, work-unit vocabulary, and handoff |
 | [`epistemics.md`](epistemics.md) | Whole-result V/C/S/N classifications and their executable boundary |
 | [`conventions.md`](conventions.md) | IDs, filenames, artifact shape, evidence fields, provenance, and corrections |
 | [`operating-rules.md`](operating-rules.md) | How sessions choose, divide, validate, and hand off work |
 | [Campaign runbook](packing/campaign/README.md) | Hypothesis and experiment mechanics, clocks, budgets, verdicts, and routing |
+| [W8 documentation pass](packing/campaign/documentation-pass.md) | Source-first reader-document reconciliation and the checked synopsis roll-up |
 | [W9 remediation pass](packing/campaign/remediation-pass.md) | Systematic defect and issue-backlog triage, repair waves, and terminal dispositions |
 | [W10 review, planning, and oversight](packing/campaign/review-planning-oversight.md) | Post-agenda result classification, document review, reprioritization, and next-entry selection |
 | [Agent-session guide](packing/campaign/agent-sessions/README.md) | Escalation threshold, workflow phases, recovery state, and session closeout |
@@ -634,7 +653,7 @@ review. [`epistemics.md`](epistemics.md) owns whole-result classifications.
 ```
 .
 ├── TUTORIAL.md             First-principles orientation for a newcomer
-├── SYNOPSIS.md             Current technical state, results, terminology, and handoff
+├── SYNOPSIS.md             Current research status, roadmap, results, and handoff
 ├── conventions.md          Artifact, identifier, evidence, and correction rules
 ├── epistemics.md           Whole-result verification and confirmation rubric
 ├── operating-rules.md      Session conduct and workflow rules

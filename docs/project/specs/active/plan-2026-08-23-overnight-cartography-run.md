@@ -341,15 +341,16 @@ on.
 It is not the next thing, because a reassessment of what to search is queued in front
 of it.
 
-For the next supervised exact-research goal, continue the existing BC329 bounded
-fixed-core runner admission under `think-qw9w`. The frozen packet preserves T-025’s
-relative weights and total charge budget $M$. It must compare raw least core charge $m$
-with $M/11$ before applying $\alpha=1/m$. Independent instrument admission and a
-prospective run contract precede any scientific packet measurement.
-Coverage remains unmeasured.
-The [packet preflight](../../reviews/review-2026-09-10-n11-bc329-packet-preflight.md)
-and [daytime plan](plan-2026-09-10-n11-daytime-strategy-and-explainer.md) own those
-requirements.
+For the next supervised exact-research goal, run BC-346 under `think-9y7p` as the W10
+planning block over the certified roll-up and mathematical audit.
+This planning step runs no scientific target and selects exactly one later execution
+entry. The current evidence and candidate set are in the synopsis’s
+[Research Program Status and Roadmap](../../../../SYNOPSIS.md#research-program-status-and-roadmap),
+and
+[agenda-036](../../../../packing/campaign/agendas/agenda-036-n11-strategy-reset-roadmap.md)
+owns the disposition.
+
+## Prior Exact-Research Handoff Record
 
 [Session126](../../../../packing/campaign/agent-sessions/session-126-stromquist-analytical-exploration.md)
 and

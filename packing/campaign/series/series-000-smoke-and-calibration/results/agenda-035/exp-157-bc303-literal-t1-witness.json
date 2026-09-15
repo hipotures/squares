@@ -1,0 +1,5521 @@
+{
+  "determination": {
+    "claim": "for every X in the bottom-left one-corner role-C domain with labels 0 and 15 absent, S(X) > epsilon",
+    "global_routing": "not-claimed",
+    "minimum_surplus": "not-claimed",
+    "n11_lower_bound": "not-claimed",
+    "outcome": "rejected",
+    "scope": "the named one-corner BC303 T1 local surplus inequality only"
+  },
+  "equipment": {
+    "axis_source_aliases": [
+      {
+        "canonical_axis": [
+          "1",
+          "0"
+        ],
+        "folded_index": 0,
+        "reflected": false
+      },
+      {
+        "canonical_axis": [
+          "1",
+          "0"
+        ],
+        "folded_index": 0,
+        "reflected": true
+      }
+    ],
+    "closed_core_membership": true,
+    "deterministic_lower_index_seam_compatible": true,
+    "parent_and_selected_core_are_distinct_regions": true,
+    "physical_angle_tangent": "0",
+    "selected_source_policy": "closed nearest folded source choices"
+  },
+  "implementation_revision": "81898608213774dcab99a16f776000421b9083ac",
+  "measure": {
+    "allowance": "524199/2000000",
+    "angle_limit": "207107/500000",
+    "atom_count": 377,
+    "core_side": "9977/10000",
+    "direction_steps": 180,
+    "distinct_site_count": 377,
+    "id": "bc-293-D-free-final",
+    "mark_weight": "106251/800000",
+    "outer_side": "96/25",
+    "positive_weights": true,
+    "symmetry": "D4",
+    "total_mass": "22524199/2000000",
+    "weight_scale": 4000000
+  },
+  "memberships": [
+    {
+      "axis_slacks": [
+        "22831/60000",
+        "1531/60000"
+      ],
+      "index": 0,
+      "inside_core": true,
+      "point": [
+        "371/600",
+        "73/75"
+      ],
+      "weight": "5167/80000",
+      "weight_units": 258350
+    },
+    {
+      "axis_slacks": [
+        "22831/60000",
+        "-112069/60000"
+      ],
+      "index": 1,
+      "inside_core": false,
+      "point": [
+        "371/600",
+        "43/15"
+      ],
+      "weight": "5167/80000",
+      "weight_units": 258350
+    },
+    {
+      "axis_slacks": [
+        "1531/60000",
+        "22831/60000"
+      ],
+      "index": 2,
+      "inside_core": true,
+      "point": [
+        "73/75",
+        "371/600"
+      ],
+      "weight": "5167/80000",
+      "weight_units": 258350
+    },
+    {
+      "axis_slacks": [
+        "1531/60000",
+        "-133369/60000"
+      ],
+      "index": 3,
+      "inside_core": false,
+      "point": [
+        "73/75",
+        "1933/600"
+      ],
+      "weight": "5167/80000",
+      "weight_units": 258350
+    },
+    {
+      "axis_slacks": [
+        "-112069/60000",
+        "22831/60000"
+      ],
+      "index": 4,
+      "inside_core": false,
+      "point": [
+        "43/15",
+        "371/600"
+      ],
+      "weight": "5167/80000",
+      "weight_units": 258350
+    },
+    {
+      "axis_slacks": [
+        "-112069/60000",
+        "-133369/60000"
+      ],
+      "index": 5,
+      "inside_core": false,
+      "point": [
+        "43/15",
+        "1933/600"
+      ],
+      "weight": "5167/80000",
+      "weight_units": 258350
+    },
+    {
+      "axis_slacks": [
+        "-133369/60000",
+        "1531/60000"
+      ],
+      "index": 6,
+      "inside_core": false,
+      "point": [
+        "1933/600",
+        "73/75"
+      ],
+      "weight": "5167/80000",
+      "weight_units": 258350
+    },
+    {
+      "axis_slacks": [
+        "-133369/60000",
+        "-112069/60000"
+      ],
+      "index": 7,
+      "inside_core": false,
+      "point": [
+        "1933/600",
+        "43/15"
+      ],
+      "weight": "5167/80000",
+      "weight_units": 258350
+    },
+    {
+      "axis_slacks": [
+        "295457/820000",
+        "11457/820000"
+      ],
+      "index": 8,
+      "inside_core": true,
+      "point": [
+        "1309/2050",
+        "2019/2050"
+      ],
+      "weight": "86579/4000000",
+      "weight_units": 86579
+    },
+    {
+      "axis_slacks": [
+        "295457/820000",
+        "-1522143/820000"
+      ],
+      "index": 9,
+      "inside_core": false,
+      "point": [
+        "1309/2050",
+        "5853/2050"
+      ],
+      "weight": "86579/4000000",
+      "weight_units": 86579
+    },
+    {
+      "axis_slacks": [
+        "11457/820000",
+        "295457/820000"
+      ],
+      "index": 10,
+      "inside_core": true,
+      "point": [
+        "2019/2050",
+        "1309/2050"
+      ],
+      "weight": "86579/4000000",
+      "weight_units": 86579
+    },
+    {
+      "axis_slacks": [
+        "11457/820000",
+        "-1806143/820000"
+      ],
+      "index": 11,
+      "inside_core": false,
+      "point": [
+        "2019/2050",
+        "6563/2050"
+      ],
+      "weight": "86579/4000000",
+      "weight_units": 86579
+    },
+    {
+      "axis_slacks": [
+        "-1522143/820000",
+        "295457/820000"
+      ],
+      "index": 12,
+      "inside_core": false,
+      "point": [
+        "5853/2050",
+        "1309/2050"
+      ],
+      "weight": "86579/4000000",
+      "weight_units": 86579
+    },
+    {
+      "axis_slacks": [
+        "-1522143/820000",
+        "-1806143/820000"
+      ],
+      "index": 13,
+      "inside_core": false,
+      "point": [
+        "5853/2050",
+        "6563/2050"
+      ],
+      "weight": "86579/4000000",
+      "weight_units": 86579
+    },
+    {
+      "axis_slacks": [
+        "-1806143/820000",
+        "11457/820000"
+      ],
+      "index": 14,
+      "inside_core": false,
+      "point": [
+        "6563/2050",
+        "2019/2050"
+      ],
+      "weight": "86579/4000000",
+      "weight_units": 86579
+    },
+    {
+      "axis_slacks": [
+        "-1806143/820000",
+        "-1522143/820000"
+      ],
+      "index": 15,
+      "inside_core": false,
+      "point": [
+        "6563/2050",
+        "5853/2050"
+      ],
+      "weight": "86579/4000000",
+      "weight_units": 86579
+    },
+    {
+      "axis_slacks": [
+        "745079/2540000",
+        "15479/2540000"
+      ],
+      "index": 16,
+      "inside_core": true,
+      "point": [
+        "448/635",
+        "3152/3175"
+      ],
+      "weight": "7341/2000000",
+      "weight_units": 14682
+    },
+    {
+      "axis_slacks": [
+        "745079/2540000",
+        "-4694921/2540000"
+      ],
+      "index": 17,
+      "inside_core": false,
+      "point": [
+        "448/635",
+        "1808/635"
+      ],
+      "weight": "7341/2000000",
+      "weight_units": 14682
+    },
+    {
+      "axis_slacks": [
+        "15479/2540000",
+        "745079/2540000"
+      ],
+      "index": 18,
+      "inside_core": true,
+      "point": [
+        "3152/3175",
+        "448/635"
+      ],
+      "weight": "7341/2000000",
+      "weight_units": 14682
+    },
+    {
+      "axis_slacks": [
+        "15479/2540000",
+        "-5424521/2540000"
+      ],
+      "index": 19,
+      "inside_core": false,
+      "point": [
+        "3152/3175",
+        "9952/3175"
+      ],
+      "weight": "7341/2000000",
+      "weight_units": 14682
+    },
+    {
+      "axis_slacks": [
+        "-4694921/2540000",
+        "745079/2540000"
+      ],
+      "index": 20,
+      "inside_core": false,
+      "point": [
+        "1808/635",
+        "448/635"
+      ],
+      "weight": "7341/2000000",
+      "weight_units": 14682
+    },
+    {
+      "axis_slacks": [
+        "-4694921/2540000",
+        "-5424521/2540000"
+      ],
+      "index": 21,
+      "inside_core": false,
+      "point": [
+        "1808/635",
+        "9952/3175"
+      ],
+      "weight": "7341/2000000",
+      "weight_units": 14682
+    },
+    {
+      "axis_slacks": [
+        "-5424521/2540000",
+        "15479/2540000"
+      ],
+      "index": 22,
+      "inside_core": false,
+      "point": [
+        "9952/3175",
+        "3152/3175"
+      ],
+      "weight": "7341/2000000",
+      "weight_units": 14682
+    },
+    {
+      "axis_slacks": [
+        "-5424521/2540000",
+        "-4694921/2540000"
+      ],
+      "index": 23,
+      "inside_core": false,
+      "point": [
+        "9952/3175",
+        "1808/635"
+      ],
+      "weight": "7341/2000000",
+      "weight_units": 14682
+    },
+    {
+      "axis_slacks": [
+        "668279/2540000",
+        "15479/2540000"
+      ],
+      "index": 24,
+      "inside_core": true,
+      "point": [
+        "2336/3175",
+        "3152/3175"
+      ],
+      "weight": "106251/800000",
+      "weight_units": 531255
+    },
+    {
+      "axis_slacks": [
+        "668279/2540000",
+        "-4694921/2540000"
+      ],
+      "index": 25,
+      "inside_core": false,
+      "point": [
+        "2336/3175",
+        "1808/635"
+      ],
+      "weight": "106251/800000",
+      "weight_units": 531255
+    },
+    {
+      "axis_slacks": [
+        "15479/2540000",
+        "668279/2540000"
+      ],
+      "index": 26,
+      "inside_core": true,
+      "point": [
+        "3152/3175",
+        "2336/3175"
+      ],
+      "weight": "106251/800000",
+      "weight_units": 531255
+    },
+    {
+      "axis_slacks": [
+        "15479/2540000",
+        "-5347721/2540000"
+      ],
+      "index": 27,
+      "inside_core": false,
+      "point": [
+        "3152/3175",
+        "9856/3175"
+      ],
+      "weight": "106251/800000",
+      "weight_units": 531255
+    },
+    {
+      "axis_slacks": [
+        "-4694921/2540000",
+        "668279/2540000"
+      ],
+      "index": 28,
+      "inside_core": false,
+      "point": [
+        "1808/635",
+        "2336/3175"
+      ],
+      "weight": "106251/800000",
+      "weight_units": 531255
+    },
+    {
+      "axis_slacks": [
+        "-4694921/2540000",
+        "-5347721/2540000"
+      ],
+      "index": 29,
+      "inside_core": false,
+      "point": [
+        "1808/635",
+        "9856/3175"
+      ],
+      "weight": "106251/800000",
+      "weight_units": 531255
+    },
+    {
+      "axis_slacks": [
+        "-5347721/2540000",
+        "15479/2540000"
+      ],
+      "index": 30,
+      "inside_core": false,
+      "point": [
+        "9856/3175",
+        "3152/3175"
+      ],
+      "weight": "106251/800000",
+      "weight_units": 531255
+    },
+    {
+      "axis_slacks": [
+        "-5347721/2540000",
+        "-4694921/2540000"
+      ],
+      "index": 31,
+      "inside_core": false,
+      "point": [
+        "9856/3175",
+        "1808/635"
+      ],
+      "weight": "106251/800000",
+      "weight_units": 531255
+    },
+    {
+      "axis_slacks": [
+        "52947/220000",
+        "-579559/660000"
+      ],
+      "index": 32,
+      "inside_core": false,
+      "point": [
+        "417/550",
+        "3097/1650"
+      ],
+      "weight": "26087/250000",
+      "weight_units": 417392
+    },
+    {
+      "axis_slacks": [
+        "52947/220000",
+        "-636359/660000"
+      ],
+      "index": 33,
+      "inside_core": false,
+      "point": [
+        "417/550",
+        "3239/1650"
+      ],
+      "weight": "26087/250000",
+      "weight_units": 417392
+    },
+    {
+      "axis_slacks": [
+        "-579559/660000",
+        "52947/220000"
+      ],
+      "index": 34,
+      "inside_core": false,
+      "point": [
+        "3097/1650",
+        "417/550"
+      ],
+      "weight": "26087/250000",
+      "weight_units": 417392
+    },
+    {
+      "axis_slacks": [
+        "-579559/660000",
+        "-458253/220000"
+      ],
+      "index": 35,
+      "inside_core": false,
+      "point": [
+        "3097/1650",
+        "339/110"
+      ],
+      "weight": "26087/250000",
+      "weight_units": 417392
+    },
+    {
+      "axis_slacks": [
+        "-636359/660000",
+        "52947/220000"
+      ],
+      "index": 36,
+      "inside_core": false,
+      "point": [
+        "3239/1650",
+        "417/550"
+      ],
+      "weight": "26087/250000",
+      "weight_units": 417392
+    },
+    {
+      "axis_slacks": [
+        "-636359/660000",
+        "-458253/220000"
+      ],
+      "index": 37,
+      "inside_core": false,
+      "point": [
+        "3239/1650",
+        "339/110"
+      ],
+      "weight": "26087/250000",
+      "weight_units": 417392
+    },
+    {
+      "axis_slacks": [
+        "-458253/220000",
+        "-579559/660000"
+      ],
+      "index": 38,
+      "inside_core": false,
+      "point": [
+        "339/110",
+        "3097/1650"
+      ],
+      "weight": "26087/250000",
+      "weight_units": 417392
+    },
+    {
+      "axis_slacks": [
+        "-458253/220000",
+        "-636359/660000"
+      ],
+      "index": 39,
+      "inside_core": false,
+      "point": [
+        "339/110",
+        "3239/1650"
+      ],
+      "weight": "26087/250000",
+      "weight_units": 417392
+    },
+    {
+      "axis_slacks": [
+        "6634269/27940000",
+        "-18423/20000"
+      ],
+      "index": 40,
+      "inside_core": false,
+      "point": [
+        "26592/34925",
+        "48/25"
+      ],
+      "weight": "287209/4000000",
+      "weight_units": 287209
+    },
+    {
+      "axis_slacks": [
+        "-18423/20000",
+        "6634269/27940000"
+      ],
+      "index": 41,
+      "inside_core": false,
+      "point": [
+        "48/25",
+        "26592/34925"
+      ],
+      "weight": "287209/4000000",
+      "weight_units": 287209
+    },
+    {
+      "axis_slacks": [
+        "-18423/20000",
+        "-58108131/27940000"
+      ],
+      "index": 42,
+      "inside_core": false,
+      "point": [
+        "48/25",
+        "21504/6985"
+      ],
+      "weight": "287209/4000000",
+      "weight_units": 287209
+    },
+    {
+      "axis_slacks": [
+        "-58108131/27940000",
+        "-18423/20000"
+      ],
+      "index": 43,
+      "inside_core": false,
+      "point": [
+        "21504/6985",
+        "48/25"
+      ],
+      "weight": "287209/4000000",
+      "weight_units": 287209
+    },
+    {
+      "axis_slacks": [
+        "125057/820000",
+        "68257/820000"
+      ],
+      "index": 44,
+      "inside_core": true,
+      "point": [
+        "347/410",
+        "1877/2050"
+      ],
+      "weight": "121/80000",
+      "weight_units": 6050
+    },
+    {
+      "axis_slacks": [
+        "125057/820000",
+        "-1578943/820000"
+      ],
+      "index": 45,
+      "inside_core": false,
+      "point": [
+        "347/410",
+        "1199/410"
+      ],
+      "weight": "121/80000",
+      "weight_units": 6050
+    },
+    {
+      "axis_slacks": [
+        "68257/820000",
+        "125057/820000"
+      ],
+      "index": 46,
+      "inside_core": true,
+      "point": [
+        "1877/2050",
+        "347/410"
+      ],
+      "weight": "121/80000",
+      "weight_units": 6050
+    },
+    {
+      "axis_slacks": [
+        "68257/820000",
+        "-1635743/820000"
+      ],
+      "index": 47,
+      "inside_core": false,
+      "point": [
+        "1877/2050",
+        "6137/2050"
+      ],
+      "weight": "121/80000",
+      "weight_units": 6050
+    },
+    {
+      "axis_slacks": [
+        "-1578943/820000",
+        "125057/820000"
+      ],
+      "index": 48,
+      "inside_core": false,
+      "point": [
+        "1199/410",
+        "347/410"
+      ],
+      "weight": "121/80000",
+      "weight_units": 6050
+    },
+    {
+      "axis_slacks": [
+        "-1578943/820000",
+        "-1635743/820000"
+      ],
+      "index": 49,
+      "inside_core": false,
+      "point": [
+        "1199/410",
+        "6137/2050"
+      ],
+      "weight": "121/80000",
+      "weight_units": 6050
+    },
+    {
+      "axis_slacks": [
+        "-1635743/820000",
+        "68257/820000"
+      ],
+      "index": 50,
+      "inside_core": false,
+      "point": [
+        "6137/2050",
+        "1877/2050"
+      ],
+      "weight": "121/80000",
+      "weight_units": 6050
+    },
+    {
+      "axis_slacks": [
+        "-1635743/820000",
+        "-1578943/820000"
+      ],
+      "index": 51,
+      "inside_core": false,
+      "point": [
+        "6137/2050",
+        "1199/410"
+      ],
+      "weight": "121/80000",
+      "weight_units": 6050
+    },
+    {
+      "axis_slacks": [
+        "125057/820000",
+        "11457/820000"
+      ],
+      "index": 52,
+      "inside_core": true,
+      "point": [
+        "347/410",
+        "2019/2050"
+      ],
+      "weight": "2871/62500",
+      "weight_units": 183744
+    },
+    {
+      "axis_slacks": [
+        "125057/820000",
+        "-1522143/820000"
+      ],
+      "index": 53,
+      "inside_core": false,
+      "point": [
+        "347/410",
+        "5853/2050"
+      ],
+      "weight": "2871/62500",
+      "weight_units": 183744
+    },
+    {
+      "axis_slacks": [
+        "11457/820000",
+        "125057/820000"
+      ],
+      "index": 54,
+      "inside_core": true,
+      "point": [
+        "2019/2050",
+        "347/410"
+      ],
+      "weight": "2871/62500",
+      "weight_units": 183744
+    },
+    {
+      "axis_slacks": [
+        "11457/820000",
+        "-1635743/820000"
+      ],
+      "index": 55,
+      "inside_core": false,
+      "point": [
+        "2019/2050",
+        "6137/2050"
+      ],
+      "weight": "2871/62500",
+      "weight_units": 183744
+    },
+    {
+      "axis_slacks": [
+        "-1522143/820000",
+        "125057/820000"
+      ],
+      "index": 56,
+      "inside_core": false,
+      "point": [
+        "5853/2050",
+        "347/410"
+      ],
+      "weight": "2871/62500",
+      "weight_units": 183744
+    },
+    {
+      "axis_slacks": [
+        "-1522143/820000",
+        "-1635743/820000"
+      ],
+      "index": 57,
+      "inside_core": false,
+      "point": [
+        "5853/2050",
+        "6137/2050"
+      ],
+      "weight": "2871/62500",
+      "weight_units": 183744
+    },
+    {
+      "axis_slacks": [
+        "-1635743/820000",
+        "11457/820000"
+      ],
+      "index": 58,
+      "inside_core": false,
+      "point": [
+        "6137/2050",
+        "2019/2050"
+      ],
+      "weight": "2871/62500",
+      "weight_units": 183744
+    },
+    {
+      "axis_slacks": [
+        "-1635743/820000",
+        "-1522143/820000"
+      ],
+      "index": 59,
+      "inside_core": false,
+      "point": [
+        "6137/2050",
+        "5853/2050"
+      ],
+      "weight": "2871/62500",
+      "weight_units": 183744
+    },
+    {
+      "axis_slacks": [
+        "68257/820000",
+        "11457/820000"
+      ],
+      "index": 60,
+      "inside_core": true,
+      "point": [
+        "1877/2050",
+        "2019/2050"
+      ],
+      "weight": "351041/4000000",
+      "weight_units": 351041
+    },
+    {
+      "axis_slacks": [
+        "68257/820000",
+        "-1522143/820000"
+      ],
+      "index": 61,
+      "inside_core": false,
+      "point": [
+        "1877/2050",
+        "5853/2050"
+      ],
+      "weight": "351041/4000000",
+      "weight_units": 351041
+    },
+    {
+      "axis_slacks": [
+        "11457/820000",
+        "68257/820000"
+      ],
+      "index": 62,
+      "inside_core": true,
+      "point": [
+        "2019/2050",
+        "1877/2050"
+      ],
+      "weight": "351041/4000000",
+      "weight_units": 351041
+    },
+    {
+      "axis_slacks": [
+        "11457/820000",
+        "-1578943/820000"
+      ],
+      "index": 63,
+      "inside_core": false,
+      "point": [
+        "2019/2050",
+        "1199/410"
+      ],
+      "weight": "351041/4000000",
+      "weight_units": 351041
+    },
+    {
+      "axis_slacks": [
+        "-1522143/820000",
+        "68257/820000"
+      ],
+      "index": 64,
+      "inside_core": false,
+      "point": [
+        "5853/2050",
+        "1877/2050"
+      ],
+      "weight": "351041/4000000",
+      "weight_units": 351041
+    },
+    {
+      "axis_slacks": [
+        "-1522143/820000",
+        "-1578943/820000"
+      ],
+      "index": 65,
+      "inside_core": false,
+      "point": [
+        "5853/2050",
+        "1199/410"
+      ],
+      "weight": "351041/4000000",
+      "weight_units": 351041
+    },
+    {
+      "axis_slacks": [
+        "-1578943/820000",
+        "11457/820000"
+      ],
+      "index": 66,
+      "inside_core": false,
+      "point": [
+        "1199/410",
+        "2019/2050"
+      ],
+      "weight": "351041/4000000",
+      "weight_units": 351041
+    },
+    {
+      "axis_slacks": [
+        "-1578943/820000",
+        "-1522143/820000"
+      ],
+      "index": 67,
+      "inside_core": false,
+      "point": [
+        "1199/410",
+        "5853/2050"
+      ],
+      "weight": "351041/4000000",
+      "weight_units": 351041
+    },
+    {
+      "axis_slacks": [
+        "5166733/68580000",
+        "-27204467/68580000"
+      ],
+      "index": 68,
+      "inside_core": false,
+      "point": [
+        "79168/85725",
+        "119632/85725"
+      ],
+      "weight": "11847/4000000",
+      "weight_units": 11847
+    },
+    {
+      "axis_slacks": [
+        "5166733/68580000",
+        "-99140467/68580000"
+      ],
+      "index": 69,
+      "inside_core": false,
+      "point": [
+        "79168/85725",
+        "209552/85725"
+      ],
+      "weight": "11847/4000000",
+      "weight_units": 11847
+    },
+    {
+      "axis_slacks": [
+        "-27204467/68580000",
+        "5166733/68580000"
+      ],
+      "index": 70,
+      "inside_core": false,
+      "point": [
+        "119632/85725",
+        "79168/85725"
+      ],
+      "weight": "11847/4000000",
+      "weight_units": 11847
+    },
+    {
+      "axis_slacks": [
+        "-27204467/68580000",
+        "-131511667/68580000"
+      ],
+      "index": 71,
+      "inside_core": false,
+      "point": [
+        "119632/85725",
+        "250016/85725"
+      ],
+      "weight": "11847/4000000",
+      "weight_units": 11847
+    },
+    {
+      "axis_slacks": [
+        "-99140467/68580000",
+        "5166733/68580000"
+      ],
+      "index": 72,
+      "inside_core": false,
+      "point": [
+        "209552/85725",
+        "79168/85725"
+      ],
+      "weight": "11847/4000000",
+      "weight_units": 11847
+    },
+    {
+      "axis_slacks": [
+        "-99140467/68580000",
+        "-131511667/68580000"
+      ],
+      "index": 73,
+      "inside_core": false,
+      "point": [
+        "209552/85725",
+        "250016/85725"
+      ],
+      "weight": "11847/4000000",
+      "weight_units": 11847
+    },
+    {
+      "axis_slacks": [
+        "-131511667/68580000",
+        "-27204467/68580000"
+      ],
+      "index": 74,
+      "inside_core": false,
+      "point": [
+        "250016/85725",
+        "119632/85725"
+      ],
+      "weight": "11847/4000000",
+      "weight_units": 11847
+    },
+    {
+      "axis_slacks": [
+        "-131511667/68580000",
+        "-99140467/68580000"
+      ],
+      "index": 75,
+      "inside_core": false,
+      "point": [
+        "250016/85725",
+        "209552/85725"
+      ],
+      "weight": "11847/4000000",
+      "weight_units": 11847
+    },
+    {
+      "axis_slacks": [
+        "45241/660000",
+        "-26869/60000"
+      ],
+      "index": 76,
+      "inside_core": false,
+      "point": [
+        "307/330",
+        "217/150"
+      ],
+      "weight": "88343/4000000",
+      "weight_units": 88343
+    },
+    {
+      "axis_slacks": [
+        "45241/660000",
+        "-83669/60000"
+      ],
+      "index": 77,
+      "inside_core": false,
+      "point": [
+        "307/330",
+        "359/150"
+      ],
+      "weight": "88343/4000000",
+      "weight_units": 88343
+    },
+    {
+      "axis_slacks": [
+        "-26869/60000",
+        "45241/660000"
+      ],
+      "index": 78,
+      "inside_core": false,
+      "point": [
+        "217/150",
+        "307/330"
+      ],
+      "weight": "88343/4000000",
+      "weight_units": 88343
+    },
+    {
+      "axis_slacks": [
+        "-26869/60000",
+        "-1261159/660000"
+      ],
+      "index": 79,
+      "inside_core": false,
+      "point": [
+        "217/150",
+        "4801/1650"
+      ],
+      "weight": "88343/4000000",
+      "weight_units": 88343
+    },
+    {
+      "axis_slacks": [
+        "-83669/60000",
+        "45241/660000"
+      ],
+      "index": 80,
+      "inside_core": false,
+      "point": [
+        "359/150",
+        "307/330"
+      ],
+      "weight": "88343/4000000",
+      "weight_units": 88343
+    },
+    {
+      "axis_slacks": [
+        "-83669/60000",
+        "-1261159/660000"
+      ],
+      "index": 81,
+      "inside_core": false,
+      "point": [
+        "359/150",
+        "4801/1650"
+      ],
+      "weight": "88343/4000000",
+      "weight_units": 88343
+    },
+    {
+      "axis_slacks": [
+        "-1261159/660000",
+        "-26869/60000"
+      ],
+      "index": 82,
+      "inside_core": false,
+      "point": [
+        "4801/1650",
+        "217/150"
+      ],
+      "weight": "88343/4000000",
+      "weight_units": 88343
+    },
+    {
+      "axis_slacks": [
+        "-1261159/660000",
+        "-83669/60000"
+      ],
+      "index": 83,
+      "inside_core": false,
+      "point": [
+        "4801/1650",
+        "359/150"
+      ],
+      "weight": "88343/4000000",
+      "weight_units": 88343
+    },
+    {
+      "axis_slacks": [
+        "45241/660000",
+        "-579559/660000"
+      ],
+      "index": 84,
+      "inside_core": false,
+      "point": [
+        "307/330",
+        "3097/1650"
+      ],
+      "weight": "121/80000",
+      "weight_units": 6050
+    },
+    {
+      "axis_slacks": [
+        "45241/660000",
+        "-636359/660000"
+      ],
+      "index": 85,
+      "inside_core": false,
+      "point": [
+        "307/330",
+        "3239/1650"
+      ],
+      "weight": "121/80000",
+      "weight_units": 6050
+    },
+    {
+      "axis_slacks": [
+        "-579559/660000",
+        "45241/660000"
+      ],
+      "index": 86,
+      "inside_core": false,
+      "point": [
+        "3097/1650",
+        "307/330"
+      ],
+      "weight": "121/80000",
+      "weight_units": 6050
+    },
+    {
+      "axis_slacks": [
+        "-579559/660000",
+        "-1261159/660000"
+      ],
+      "index": 87,
+      "inside_core": false,
+      "point": [
+        "3097/1650",
+        "4801/1650"
+      ],
+      "weight": "121/80000",
+      "weight_units": 6050
+    },
+    {
+      "axis_slacks": [
+        "-636359/660000",
+        "45241/660000"
+      ],
+      "index": 88,
+      "inside_core": false,
+      "point": [
+        "3239/1650",
+        "307/330"
+      ],
+      "weight": "121/80000",
+      "weight_units": 6050
+    },
+    {
+      "axis_slacks": [
+        "-636359/660000",
+        "-1261159/660000"
+      ],
+      "index": 89,
+      "inside_core": false,
+      "point": [
+        "3239/1650",
+        "4801/1650"
+      ],
+      "weight": "121/80000",
+      "weight_units": 6050
+    },
+    {
+      "axis_slacks": [
+        "-1261159/660000",
+        "-579559/660000"
+      ],
+      "index": 90,
+      "inside_core": false,
+      "point": [
+        "4801/1650",
+        "3097/1650"
+      ],
+      "weight": "121/80000",
+      "weight_units": 6050
+    },
+    {
+      "axis_slacks": [
+        "-1261159/660000",
+        "-636359/660000"
+      ],
+      "index": 91,
+      "inside_core": false,
+      "point": [
+        "4801/1650",
+        "3239/1650"
+      ],
+      "weight": "121/80000",
+      "weight_units": 6050
+    },
+    {
+      "axis_slacks": [
+        "2303701/48260000",
+        "-19277099/48260000"
+      ],
+      "index": 92,
+      "inside_core": false,
+      "point": [
+        "57376/60325",
+        "84352/60325"
+      ],
+      "weight": "86453/4000000",
+      "weight_units": 86453
+    },
+    {
+      "axis_slacks": [
+        "2303701/48260000",
+        "-69632299/48260000"
+      ],
+      "index": 93,
+      "inside_core": false,
+      "point": [
+        "57376/60325",
+        "147296/60325"
+      ],
+      "weight": "86453/4000000",
+      "weight_units": 86453
+    },
+    {
+      "axis_slacks": [
+        "-19277099/48260000",
+        "2303701/48260000"
+      ],
+      "index": 94,
+      "inside_core": false,
+      "point": [
+        "84352/60325",
+        "57376/60325"
+      ],
+      "weight": "86453/4000000",
+      "weight_units": 86453
+    },
+    {
+      "axis_slacks": [
+        "-19277099/48260000",
+        "-91213099/48260000"
+      ],
+      "index": 95,
+      "inside_core": false,
+      "point": [
+        "84352/60325",
+        "174272/60325"
+      ],
+      "weight": "86453/4000000",
+      "weight_units": 86453
+    },
+    {
+      "axis_slacks": [
+        "-69632299/48260000",
+        "2303701/48260000"
+      ],
+      "index": 96,
+      "inside_core": false,
+      "point": [
+        "147296/60325",
+        "57376/60325"
+      ],
+      "weight": "86453/4000000",
+      "weight_units": 86453
+    },
+    {
+      "axis_slacks": [
+        "-69632299/48260000",
+        "-91213099/48260000"
+      ],
+      "index": 97,
+      "inside_core": false,
+      "point": [
+        "147296/60325",
+        "174272/60325"
+      ],
+      "weight": "86453/4000000",
+      "weight_units": 86453
+    },
+    {
+      "axis_slacks": [
+        "-91213099/48260000",
+        "-19277099/48260000"
+      ],
+      "index": 98,
+      "inside_core": false,
+      "point": [
+        "174272/60325",
+        "84352/60325"
+      ],
+      "weight": "86453/4000000",
+      "weight_units": 86453
+    },
+    {
+      "axis_slacks": [
+        "-91213099/48260000",
+        "-69632299/48260000"
+      ],
+      "index": 99,
+      "inside_core": false,
+      "point": [
+        "174272/60325",
+        "147296/60325"
+      ],
+      "weight": "86453/4000000",
+      "weight_units": 86453
+    },
+    {
+      "axis_slacks": [
+        "105079/2540000",
+        "28279/2540000"
+      ],
+      "index": 100,
+      "inside_core": true,
+      "point": [
+        "608/635",
+        "3136/3175"
+      ],
+      "weight": "35961/400000",
+      "weight_units": 359610
+    },
+    {
+      "axis_slacks": [
+        "105079/2540000",
+        "-4707721/2540000"
+      ],
+      "index": 101,
+      "inside_core": false,
+      "point": [
+        "608/635",
+        "9056/3175"
+      ],
+      "weight": "35961/400000",
+      "weight_units": 359610
+    },
+    {
+      "axis_slacks": [
+        "28279/2540000",
+        "105079/2540000"
+      ],
+      "index": 102,
+      "inside_core": true,
+      "point": [
+        "3136/3175",
+        "608/635"
+      ],
+      "weight": "35961/400000",
+      "weight_units": 359610
+    },
+    {
+      "axis_slacks": [
+        "28279/2540000",
+        "-4784521/2540000"
+      ],
+      "index": 103,
+      "inside_core": false,
+      "point": [
+        "3136/3175",
+        "9152/3175"
+      ],
+      "weight": "35961/400000",
+      "weight_units": 359610
+    },
+    {
+      "axis_slacks": [
+        "-4707721/2540000",
+        "105079/2540000"
+      ],
+      "index": 104,
+      "inside_core": false,
+      "point": [
+        "9056/3175",
+        "608/635"
+      ],
+      "weight": "35961/400000",
+      "weight_units": 359610
+    },
+    {
+      "axis_slacks": [
+        "-4707721/2540000",
+        "-4784521/2540000"
+      ],
+      "index": 105,
+      "inside_core": false,
+      "point": [
+        "9056/3175",
+        "9152/3175"
+      ],
+      "weight": "35961/400000",
+      "weight_units": 359610
+    },
+    {
+      "axis_slacks": [
+        "-4784521/2540000",
+        "28279/2540000"
+      ],
+      "index": 106,
+      "inside_core": false,
+      "point": [
+        "9152/3175",
+        "3136/3175"
+      ],
+      "weight": "35961/400000",
+      "weight_units": 359610
+    },
+    {
+      "axis_slacks": [
+        "-4784521/2540000",
+        "-4707721/2540000"
+      ],
+      "index": 107,
+      "inside_core": false,
+      "point": [
+        "9152/3175",
+        "9056/3175"
+      ],
+      "weight": "35961/400000",
+      "weight_units": 359610
+    },
+    {
+      "axis_slacks": [
+        "1531/60000",
+        "-26869/60000"
+      ],
+      "index": 108,
+      "inside_core": false,
+      "point": [
+        "73/75",
+        "217/150"
+      ],
+      "weight": "105357/4000000",
+      "weight_units": 105357
+    },
+    {
+      "axis_slacks": [
+        "1531/60000",
+        "-83669/60000"
+      ],
+      "index": 109,
+      "inside_core": false,
+      "point": [
+        "73/75",
+        "359/150"
+      ],
+      "weight": "105357/4000000",
+      "weight_units": 105357
+    },
+    {
+      "axis_slacks": [
+        "-26869/60000",
+        "1531/60000"
+      ],
+      "index": 110,
+      "inside_core": false,
+      "point": [
+        "217/150",
+        "73/75"
+      ],
+      "weight": "105357/4000000",
+      "weight_units": 105357
+    },
+    {
+      "axis_slacks": [
+        "-26869/60000",
+        "-112069/60000"
+      ],
+      "index": 111,
+      "inside_core": false,
+      "point": [
+        "217/150",
+        "43/15"
+      ],
+      "weight": "105357/4000000",
+      "weight_units": 105357
+    },
+    {
+      "axis_slacks": [
+        "-83669/60000",
+        "1531/60000"
+      ],
+      "index": 112,
+      "inside_core": false,
+      "point": [
+        "359/150",
+        "73/75"
+      ],
+      "weight": "105357/4000000",
+      "weight_units": 105357
+    },
+    {
+      "axis_slacks": [
+        "-83669/60000",
+        "-112069/60000"
+      ],
+      "index": 113,
+      "inside_core": false,
+      "point": [
+        "359/150",
+        "43/15"
+      ],
+      "weight": "105357/4000000",
+      "weight_units": 105357
+    },
+    {
+      "axis_slacks": [
+        "-112069/60000",
+        "-26869/60000"
+      ],
+      "index": 114,
+      "inside_core": false,
+      "point": [
+        "43/15",
+        "217/150"
+      ],
+      "weight": "105357/4000000",
+      "weight_units": 105357
+    },
+    {
+      "axis_slacks": [
+        "-112069/60000",
+        "-83669/60000"
+      ],
+      "index": 115,
+      "inside_core": false,
+      "point": [
+        "43/15",
+        "359/150"
+      ],
+      "weight": "105357/4000000",
+      "weight_units": 105357
+    },
+    {
+      "axis_slacks": [
+        "1531/60000",
+        "-11323/20000"
+      ],
+      "index": 116,
+      "inside_core": false,
+      "point": [
+        "73/75",
+        "313/200"
+      ],
+      "weight": "7089/1000000",
+      "weight_units": 28356
+    },
+    {
+      "axis_slacks": [
+        "1531/60000",
+        "-25523/20000"
+      ],
+      "index": 117,
+      "inside_core": false,
+      "point": [
+        "73/75",
+        "91/40"
+      ],
+      "weight": "7089/1000000",
+      "weight_units": 28356
+    },
+    {
+      "axis_slacks": [
+        "-11323/20000",
+        "1531/60000"
+      ],
+      "index": 118,
+      "inside_core": false,
+      "point": [
+        "313/200",
+        "73/75"
+      ],
+      "weight": "7089/1000000",
+      "weight_units": 28356
+    },
+    {
+      "axis_slacks": [
+        "-11323/20000",
+        "-112069/60000"
+      ],
+      "index": 119,
+      "inside_core": false,
+      "point": [
+        "313/200",
+        "43/15"
+      ],
+      "weight": "7089/1000000",
+      "weight_units": 28356
+    },
+    {
+      "axis_slacks": [
+        "-25523/20000",
+        "1531/60000"
+      ],
+      "index": 120,
+      "inside_core": false,
+      "point": [
+        "91/40",
+        "73/75"
+      ],
+      "weight": "7089/1000000",
+      "weight_units": 28356
+    },
+    {
+      "axis_slacks": [
+        "-25523/20000",
+        "-112069/60000"
+      ],
+      "index": 121,
+      "inside_core": false,
+      "point": [
+        "91/40",
+        "43/15"
+      ],
+      "weight": "7089/1000000",
+      "weight_units": 28356
+    },
+    {
+      "axis_slacks": [
+        "-112069/60000",
+        "-11323/20000"
+      ],
+      "index": 122,
+      "inside_core": false,
+      "point": [
+        "43/15",
+        "313/200"
+      ],
+      "weight": "7089/1000000",
+      "weight_units": 28356
+    },
+    {
+      "axis_slacks": [
+        "-112069/60000",
+        "-25523/20000"
+      ],
+      "index": 123,
+      "inside_core": false,
+      "point": [
+        "43/15",
+        "91/40"
+      ],
+      "weight": "7089/1000000",
+      "weight_units": 28356
+    },
+    {
+      "axis_slacks": [
+        "1531/60000",
+        "-18423/20000"
+      ],
+      "index": 124,
+      "inside_core": false,
+      "point": [
+        "73/75",
+        "48/25"
+      ],
+      "weight": "137619/4000000",
+      "weight_units": 137619
+    },
+    {
+      "axis_slacks": [
+        "-18423/20000",
+        "1531/60000"
+      ],
+      "index": 125,
+      "inside_core": false,
+      "point": [
+        "48/25",
+        "73/75"
+      ],
+      "weight": "137619/4000000",
+      "weight_units": 137619
+    },
+    {
+      "axis_slacks": [
+        "-18423/20000",
+        "-112069/60000"
+      ],
+      "index": 126,
+      "inside_core": false,
+      "point": [
+        "48/25",
+        "43/15"
+      ],
+      "weight": "137619/4000000",
+      "weight_units": 137619
+    },
+    {
+      "axis_slacks": [
+        "-112069/60000",
+        "-18423/20000"
+      ],
+      "index": 127,
+      "inside_core": false,
+      "point": [
+        "43/15",
+        "48/25"
+      ],
+      "weight": "137619/4000000",
+      "weight_units": 137619
+    },
+    {
+      "axis_slacks": [
+        "174437/7620000",
+        "-901001/2540000"
+      ],
+      "index": 128,
+      "inside_core": false,
+      "point": [
+        "9296/9525",
+        "21488/15875"
+      ],
+      "weight": "7089/1000000",
+      "weight_units": 28356
+    },
+    {
+      "axis_slacks": [
+        "174437/7620000",
+        "-3778441/2540000"
+      ],
+      "index": 129,
+      "inside_core": false,
+      "point": [
+        "9296/9525",
+        "39472/15875"
+      ],
+      "weight": "7089/1000000",
+      "weight_units": 28356
+    },
+    {
+      "axis_slacks": [
+        "-901001/2540000",
+        "174437/7620000"
+      ],
+      "index": 130,
+      "inside_core": false,
+      "point": [
+        "21488/15875",
+        "9296/9525"
+      ],
+      "weight": "7089/1000000",
+      "weight_units": 28356
+    },
+    {
+      "axis_slacks": [
+        "-901001/2540000",
+        "-14212763/7620000"
+      ],
+      "index": 131,
+      "inside_core": false,
+      "point": [
+        "21488/15875",
+        "5456/1905"
+      ],
+      "weight": "7089/1000000",
+      "weight_units": 28356
+    },
+    {
+      "axis_slacks": [
+        "-3778441/2540000",
+        "174437/7620000"
+      ],
+      "index": 132,
+      "inside_core": false,
+      "point": [
+        "39472/15875",
+        "9296/9525"
+      ],
+      "weight": "7089/1000000",
+      "weight_units": 28356
+    },
+    {
+      "axis_slacks": [
+        "-3778441/2540000",
+        "-14212763/7620000"
+      ],
+      "index": 133,
+      "inside_core": false,
+      "point": [
+        "39472/15875",
+        "5456/1905"
+      ],
+      "weight": "7089/1000000",
+      "weight_units": 28356
+    },
+    {
+      "axis_slacks": [
+        "-14212763/7620000",
+        "-901001/2540000"
+      ],
+      "index": 134,
+      "inside_core": false,
+      "point": [
+        "5456/1905",
+        "21488/15875"
+      ],
+      "weight": "7089/1000000",
+      "weight_units": 28356
+    },
+    {
+      "axis_slacks": [
+        "-14212763/7620000",
+        "-3778441/2540000"
+      ],
+      "index": 135,
+      "inside_core": false,
+      "point": [
+        "5456/1905",
+        "39472/15875"
+      ],
+      "weight": "7089/1000000",
+      "weight_units": 28356
+    },
+    {
+      "axis_slacks": [
+        "174437/7620000",
+        "-18423/20000"
+      ],
+      "index": 136,
+      "inside_core": false,
+      "point": [
+        "9296/9525",
+        "48/25"
+      ],
+      "weight": "15123/4000000",
+      "weight_units": 15123
+    },
+    {
+      "axis_slacks": [
+        "-18423/20000",
+        "174437/7620000"
+      ],
+      "index": 137,
+      "inside_core": false,
+      "point": [
+        "48/25",
+        "9296/9525"
+      ],
+      "weight": "15123/4000000",
+      "weight_units": 15123
+    },
+    {
+      "axis_slacks": [
+        "-18423/20000",
+        "-14212763/7620000"
+      ],
+      "index": 138,
+      "inside_core": false,
+      "point": [
+        "48/25",
+        "5456/1905"
+      ],
+      "weight": "15123/4000000",
+      "weight_units": 15123
+    },
+    {
+      "axis_slacks": [
+        "-14212763/7620000",
+        "-18423/20000"
+      ],
+      "index": 139,
+      "inside_core": false,
+      "point": [
+        "5456/1905",
+        "48/25"
+      ],
+      "weight": "15123/4000000",
+      "weight_units": 15123
+    },
+    {
+      "axis_slacks": [
+        "11457/820000",
+        "11457/820000"
+      ],
+      "index": 140,
+      "inside_core": true,
+      "point": [
+        "2019/2050",
+        "2019/2050"
+      ],
+      "weight": "11169/1000000",
+      "weight_units": 44676
+    },
+    {
+      "axis_slacks": [
+        "11457/820000",
+        "-1522143/820000"
+      ],
+      "index": 141,
+      "inside_core": false,
+      "point": [
+        "2019/2050",
+        "5853/2050"
+      ],
+      "weight": "11169/1000000",
+      "weight_units": 44676
+    },
+    {
+      "axis_slacks": [
+        "-1522143/820000",
+        "11457/820000"
+      ],
+      "index": 142,
+      "inside_core": false,
+      "point": [
+        "5853/2050",
+        "2019/2050"
+      ],
+      "weight": "11169/1000000",
+      "weight_units": 44676
+    },
+    {
+      "axis_slacks": [
+        "-1522143/820000",
+        "-1522143/820000"
+      ],
+      "index": 143,
+      "inside_core": false,
+      "point": [
+        "5853/2050",
+        "5853/2050"
+      ],
+      "weight": "11169/1000000",
+      "weight_units": 44676
+    },
+    {
+      "axis_slacks": [
+        "11457/820000",
+        "-272543/820000"
+      ],
+      "index": 144,
+      "inside_core": false,
+      "point": [
+        "2019/2050",
+        "2729/2050"
+      ],
+      "weight": "53939/4000000",
+      "weight_units": 53939
+    },
+    {
+      "axis_slacks": [
+        "11457/820000",
+        "-1238143/820000"
+      ],
+      "index": 145,
+      "inside_core": false,
+      "point": [
+        "2019/2050",
+        "5143/2050"
+      ],
+      "weight": "53939/4000000",
+      "weight_units": 53939
+    },
+    {
+      "axis_slacks": [
+        "-272543/820000",
+        "11457/820000"
+      ],
+      "index": 146,
+      "inside_core": false,
+      "point": [
+        "2729/2050",
+        "2019/2050"
+      ],
+      "weight": "53939/4000000",
+      "weight_units": 53939
+    },
+    {
+      "axis_slacks": [
+        "-272543/820000",
+        "-1522143/820000"
+      ],
+      "index": 147,
+      "inside_core": false,
+      "point": [
+        "2729/2050",
+        "5853/2050"
+      ],
+      "weight": "53939/4000000",
+      "weight_units": 53939
+    },
+    {
+      "axis_slacks": [
+        "-1238143/820000",
+        "11457/820000"
+      ],
+      "index": 148,
+      "inside_core": false,
+      "point": [
+        "5143/2050",
+        "2019/2050"
+      ],
+      "weight": "53939/4000000",
+      "weight_units": 53939
+    },
+    {
+      "axis_slacks": [
+        "-1238143/820000",
+        "-1522143/820000"
+      ],
+      "index": 149,
+      "inside_core": false,
+      "point": [
+        "5143/2050",
+        "5853/2050"
+      ],
+      "weight": "53939/4000000",
+      "weight_units": 53939
+    },
+    {
+      "axis_slacks": [
+        "-1522143/820000",
+        "-272543/820000"
+      ],
+      "index": 150,
+      "inside_core": false,
+      "point": [
+        "5853/2050",
+        "2729/2050"
+      ],
+      "weight": "53939/4000000",
+      "weight_units": 53939
+    },
+    {
+      "axis_slacks": [
+        "-1522143/820000",
+        "-1238143/820000"
+      ],
+      "index": 151,
+      "inside_core": false,
+      "point": [
+        "5853/2050",
+        "5143/2050"
+      ],
+      "weight": "53939/4000000",
+      "weight_units": 53939
+    },
+    {
+      "axis_slacks": [
+        "11457/820000",
+        "-329343/820000"
+      ],
+      "index": 152,
+      "inside_core": false,
+      "point": [
+        "2019/2050",
+        "2871/2050"
+      ],
+      "weight": "199371/4000000",
+      "weight_units": 199371
+    },
+    {
+      "axis_slacks": [
+        "11457/820000",
+        "-1181343/820000"
+      ],
+      "index": 153,
+      "inside_core": false,
+      "point": [
+        "2019/2050",
+        "5001/2050"
+      ],
+      "weight": "199371/4000000",
+      "weight_units": 199371
+    },
+    {
+      "axis_slacks": [
+        "-329343/820000",
+        "11457/820000"
+      ],
+      "index": 154,
+      "inside_core": false,
+      "point": [
+        "2871/2050",
+        "2019/2050"
+      ],
+      "weight": "199371/4000000",
+      "weight_units": 199371
+    },
+    {
+      "axis_slacks": [
+        "-329343/820000",
+        "-1522143/820000"
+      ],
+      "index": 155,
+      "inside_core": false,
+      "point": [
+        "2871/2050",
+        "5853/2050"
+      ],
+      "weight": "199371/4000000",
+      "weight_units": 199371
+    },
+    {
+      "axis_slacks": [
+        "-1181343/820000",
+        "11457/820000"
+      ],
+      "index": 156,
+      "inside_core": false,
+      "point": [
+        "5001/2050",
+        "2019/2050"
+      ],
+      "weight": "199371/4000000",
+      "weight_units": 199371
+    },
+    {
+      "axis_slacks": [
+        "-1181343/820000",
+        "-1522143/820000"
+      ],
+      "index": 157,
+      "inside_core": false,
+      "point": [
+        "5001/2050",
+        "5853/2050"
+      ],
+      "weight": "199371/4000000",
+      "weight_units": 199371
+    },
+    {
+      "axis_slacks": [
+        "-1522143/820000",
+        "-329343/820000"
+      ],
+      "index": 158,
+      "inside_core": false,
+      "point": [
+        "5853/2050",
+        "2871/2050"
+      ],
+      "weight": "199371/4000000",
+      "weight_units": 199371
+    },
+    {
+      "axis_slacks": [
+        "-1522143/820000",
+        "-1181343/820000"
+      ],
+      "index": 159,
+      "inside_core": false,
+      "point": [
+        "5853/2050",
+        "5001/2050"
+      ],
+      "weight": "199371/4000000",
+      "weight_units": 199371
+    },
+    {
+      "axis_slacks": [
+        "11457/820000",
+        "-386143/820000"
+      ],
+      "index": 160,
+      "inside_core": false,
+      "point": [
+        "2019/2050",
+        "3013/2050"
+      ],
+      "weight": "159673/4000000",
+      "weight_units": 159673
+    },
+    {
+      "axis_slacks": [
+        "11457/820000",
+        "-1124543/820000"
+      ],
+      "index": 161,
+      "inside_core": false,
+      "point": [
+        "2019/2050",
+        "4859/2050"
+      ],
+      "weight": "159673/4000000",
+      "weight_units": 159673
+    },
+    {
+      "axis_slacks": [
+        "-386143/820000",
+        "11457/820000"
+      ],
+      "index": 162,
+      "inside_core": false,
+      "point": [
+        "3013/2050",
+        "2019/2050"
+      ],
+      "weight": "159673/4000000",
+      "weight_units": 159673
+    },
+    {
+      "axis_slacks": [
+        "-386143/820000",
+        "-1522143/820000"
+      ],
+      "index": 163,
+      "inside_core": false,
+      "point": [
+        "3013/2050",
+        "5853/2050"
+      ],
+      "weight": "159673/4000000",
+      "weight_units": 159673
+    },
+    {
+      "axis_slacks": [
+        "-1124543/820000",
+        "11457/820000"
+      ],
+      "index": 164,
+      "inside_core": false,
+      "point": [
+        "4859/2050",
+        "2019/2050"
+      ],
+      "weight": "159673/4000000",
+      "weight_units": 159673
+    },
+    {
+      "axis_slacks": [
+        "-1124543/820000",
+        "-1522143/820000"
+      ],
+      "index": 165,
+      "inside_core": false,
+      "point": [
+        "4859/2050",
+        "5853/2050"
+      ],
+      "weight": "159673/4000000",
+      "weight_units": 159673
+    },
+    {
+      "axis_slacks": [
+        "-1522143/820000",
+        "-386143/820000"
+      ],
+      "index": 166,
+      "inside_core": false,
+      "point": [
+        "5853/2050",
+        "3013/2050"
+      ],
+      "weight": "159673/4000000",
+      "weight_units": 159673
+    },
+    {
+      "axis_slacks": [
+        "-1522143/820000",
+        "-1124543/820000"
+      ],
+      "index": 167,
+      "inside_core": false,
+      "point": [
+        "5853/2050",
+        "4859/2050"
+      ],
+      "weight": "159673/4000000",
+      "weight_units": 159673
+    },
+    {
+      "axis_slacks": [
+        "11457/820000",
+        "-442943/820000"
+      ],
+      "index": 168,
+      "inside_core": false,
+      "point": [
+        "2019/2050",
+        "631/410"
+      ],
+      "weight": "265029/4000000",
+      "weight_units": 265029
+    },
+    {
+      "axis_slacks": [
+        "11457/820000",
+        "-1067743/820000"
+      ],
+      "index": 169,
+      "inside_core": false,
+      "point": [
+        "2019/2050",
+        "4717/2050"
+      ],
+      "weight": "265029/4000000",
+      "weight_units": 265029
+    },
+    {
+      "axis_slacks": [
+        "-442943/820000",
+        "11457/820000"
+      ],
+      "index": 170,
+      "inside_core": false,
+      "point": [
+        "631/410",
+        "2019/2050"
+      ],
+      "weight": "265029/4000000",
+      "weight_units": 265029
+    },
+    {
+      "axis_slacks": [
+        "-442943/820000",
+        "-1522143/820000"
+      ],
+      "index": 171,
+      "inside_core": false,
+      "point": [
+        "631/410",
+        "5853/2050"
+      ],
+      "weight": "265029/4000000",
+      "weight_units": 265029
+    },
+    {
+      "axis_slacks": [
+        "-1067743/820000",
+        "11457/820000"
+      ],
+      "index": 172,
+      "inside_core": false,
+      "point": [
+        "4717/2050",
+        "2019/2050"
+      ],
+      "weight": "265029/4000000",
+      "weight_units": 265029
+    },
+    {
+      "axis_slacks": [
+        "-1067743/820000",
+        "-1522143/820000"
+      ],
+      "index": 173,
+      "inside_core": false,
+      "point": [
+        "4717/2050",
+        "5853/2050"
+      ],
+      "weight": "265029/4000000",
+      "weight_units": 265029
+    },
+    {
+      "axis_slacks": [
+        "-1522143/820000",
+        "-442943/820000"
+      ],
+      "index": 174,
+      "inside_core": false,
+      "point": [
+        "5853/2050",
+        "631/410"
+      ],
+      "weight": "265029/4000000",
+      "weight_units": 265029
+    },
+    {
+      "axis_slacks": [
+        "-1522143/820000",
+        "-1067743/820000"
+      ],
+      "index": 175,
+      "inside_core": false,
+      "point": [
+        "5853/2050",
+        "4717/2050"
+      ],
+      "weight": "265029/4000000",
+      "weight_units": 265029
+    },
+    {
+      "axis_slacks": [
+        "11457/820000",
+        "-499743/820000"
+      ],
+      "index": 176,
+      "inside_core": false,
+      "point": [
+        "2019/2050",
+        "3297/2050"
+      ],
+      "weight": "32641/4000000",
+      "weight_units": 32641
+    },
+    {
+      "axis_slacks": [
+        "11457/820000",
+        "-1010943/820000"
+      ],
+      "index": 177,
+      "inside_core": false,
+      "point": [
+        "2019/2050",
+        "183/82"
+      ],
+      "weight": "32641/4000000",
+      "weight_units": 32641
+    },
+    {
+      "axis_slacks": [
+        "-499743/820000",
+        "11457/820000"
+      ],
+      "index": 178,
+      "inside_core": false,
+      "point": [
+        "3297/2050",
+        "2019/2050"
+      ],
+      "weight": "32641/4000000",
+      "weight_units": 32641
+    },
+    {
+      "axis_slacks": [
+        "-499743/820000",
+        "-1522143/820000"
+      ],
+      "index": 179,
+      "inside_core": false,
+      "point": [
+        "3297/2050",
+        "5853/2050"
+      ],
+      "weight": "32641/4000000",
+      "weight_units": 32641
+    },
+    {
+      "axis_slacks": [
+        "-1010943/820000",
+        "11457/820000"
+      ],
+      "index": 180,
+      "inside_core": false,
+      "point": [
+        "183/82",
+        "2019/2050"
+      ],
+      "weight": "32641/4000000",
+      "weight_units": 32641
+    },
+    {
+      "axis_slacks": [
+        "-1010943/820000",
+        "-1522143/820000"
+      ],
+      "index": 181,
+      "inside_core": false,
+      "point": [
+        "183/82",
+        "5853/2050"
+      ],
+      "weight": "32641/4000000",
+      "weight_units": 32641
+    },
+    {
+      "axis_slacks": [
+        "-1522143/820000",
+        "-499743/820000"
+      ],
+      "index": 182,
+      "inside_core": false,
+      "point": [
+        "5853/2050",
+        "3297/2050"
+      ],
+      "weight": "32641/4000000",
+      "weight_units": 32641
+    },
+    {
+      "axis_slacks": [
+        "-1522143/820000",
+        "-1010943/820000"
+      ],
+      "index": 183,
+      "inside_core": false,
+      "point": [
+        "5853/2050",
+        "183/82"
+      ],
+      "weight": "32641/4000000",
+      "weight_units": 32641
+    },
+    {
+      "axis_slacks": [
+        "11457/820000",
+        "-556543/820000"
+      ],
+      "index": 184,
+      "inside_core": false,
+      "point": [
+        "2019/2050",
+        "3439/2050"
+      ],
+      "weight": "15249/4000000",
+      "weight_units": 15249
+    },
+    {
+      "axis_slacks": [
+        "11457/820000",
+        "-954143/820000"
+      ],
+      "index": 185,
+      "inside_core": false,
+      "point": [
+        "2019/2050",
+        "4433/2050"
+      ],
+      "weight": "15249/4000000",
+      "weight_units": 15249
+    },
+    {
+      "axis_slacks": [
+        "-556543/820000",
+        "11457/820000"
+      ],
+      "index": 186,
+      "inside_core": false,
+      "point": [
+        "3439/2050",
+        "2019/2050"
+      ],
+      "weight": "15249/4000000",
+      "weight_units": 15249
+    },
+    {
+      "axis_slacks": [
+        "-556543/820000",
+        "-1522143/820000"
+      ],
+      "index": 187,
+      "inside_core": false,
+      "point": [
+        "3439/2050",
+        "5853/2050"
+      ],
+      "weight": "15249/4000000",
+      "weight_units": 15249
+    },
+    {
+      "axis_slacks": [
+        "-954143/820000",
+        "11457/820000"
+      ],
+      "index": 188,
+      "inside_core": false,
+      "point": [
+        "4433/2050",
+        "2019/2050"
+      ],
+      "weight": "15249/4000000",
+      "weight_units": 15249
+    },
+    {
+      "axis_slacks": [
+        "-954143/820000",
+        "-1522143/820000"
+      ],
+      "index": 189,
+      "inside_core": false,
+      "point": [
+        "4433/2050",
+        "5853/2050"
+      ],
+      "weight": "15249/4000000",
+      "weight_units": 15249
+    },
+    {
+      "axis_slacks": [
+        "-1522143/820000",
+        "-556543/820000"
+      ],
+      "index": 190,
+      "inside_core": false,
+      "point": [
+        "5853/2050",
+        "3439/2050"
+      ],
+      "weight": "15249/4000000",
+      "weight_units": 15249
+    },
+    {
+      "axis_slacks": [
+        "-1522143/820000",
+        "-954143/820000"
+      ],
+      "index": 191,
+      "inside_core": false,
+      "point": [
+        "5853/2050",
+        "4433/2050"
+      ],
+      "weight": "15249/4000000",
+      "weight_units": 15249
+    },
+    {
+      "axis_slacks": [
+        "11457/820000",
+        "-613343/820000"
+      ],
+      "index": 192,
+      "inside_core": false,
+      "point": [
+        "2019/2050",
+        "3581/2050"
+      ],
+      "weight": "121/80000",
+      "weight_units": 6050
+    },
+    {
+      "axis_slacks": [
+        "11457/820000",
+        "-897343/820000"
+      ],
+      "index": 193,
+      "inside_core": false,
+      "point": [
+        "2019/2050",
+        "4291/2050"
+      ],
+      "weight": "121/80000",
+      "weight_units": 6050
+    },
+    {
+      "axis_slacks": [
+        "-613343/820000",
+        "11457/820000"
+      ],
+      "index": 194,
+      "inside_core": false,
+      "point": [
+        "3581/2050",
+        "2019/2050"
+      ],
+      "weight": "121/80000",
+      "weight_units": 6050
+    },
+    {
+      "axis_slacks": [
+        "-613343/820000",
+        "-1522143/820000"
+      ],
+      "index": 195,
+      "inside_core": false,
+      "point": [
+        "3581/2050",
+        "5853/2050"
+      ],
+      "weight": "121/80000",
+      "weight_units": 6050
+    },
+    {
+      "axis_slacks": [
+        "-897343/820000",
+        "11457/820000"
+      ],
+      "index": 196,
+      "inside_core": false,
+      "point": [
+        "4291/2050",
+        "2019/2050"
+      ],
+      "weight": "121/80000",
+      "weight_units": 6050
+    },
+    {
+      "axis_slacks": [
+        "-897343/820000",
+        "-1522143/820000"
+      ],
+      "index": 197,
+      "inside_core": false,
+      "point": [
+        "4291/2050",
+        "5853/2050"
+      ],
+      "weight": "121/80000",
+      "weight_units": 6050
+    },
+    {
+      "axis_slacks": [
+        "-1522143/820000",
+        "-613343/820000"
+      ],
+      "index": 198,
+      "inside_core": false,
+      "point": [
+        "5853/2050",
+        "3581/2050"
+      ],
+      "weight": "121/80000",
+      "weight_units": 6050
+    },
+    {
+      "axis_slacks": [
+        "-1522143/820000",
+        "-897343/820000"
+      ],
+      "index": 199,
+      "inside_core": false,
+      "point": [
+        "5853/2050",
+        "4291/2050"
+      ],
+      "weight": "121/80000",
+      "weight_units": 6050
+    },
+    {
+      "axis_slacks": [
+        "11457/820000",
+        "-726943/820000"
+      ],
+      "index": 200,
+      "inside_core": false,
+      "point": [
+        "2019/2050",
+        "773/410"
+      ],
+      "weight": "42171/1000000",
+      "weight_units": 168684
+    },
+    {
+      "axis_slacks": [
+        "11457/820000",
+        "-783743/820000"
+      ],
+      "index": 201,
+      "inside_core": false,
+      "point": [
+        "2019/2050",
+        "4007/2050"
+      ],
+      "weight": "42171/1000000",
+      "weight_units": 168684
+    },
+    {
+      "axis_slacks": [
+        "-726943/820000",
+        "11457/820000"
+      ],
+      "index": 202,
+      "inside_core": false,
+      "point": [
+        "773/410",
+        "2019/2050"
+      ],
+      "weight": "42171/1000000",
+      "weight_units": 168684
+    },
+    {
+      "axis_slacks": [
+        "-726943/820000",
+        "-1522143/820000"
+      ],
+      "index": 203,
+      "inside_core": false,
+      "point": [
+        "773/410",
+        "5853/2050"
+      ],
+      "weight": "42171/1000000",
+      "weight_units": 168684
+    },
+    {
+      "axis_slacks": [
+        "-783743/820000",
+        "11457/820000"
+      ],
+      "index": 204,
+      "inside_core": false,
+      "point": [
+        "4007/2050",
+        "2019/2050"
+      ],
+      "weight": "42171/1000000",
+      "weight_units": 168684
+    },
+    {
+      "axis_slacks": [
+        "-783743/820000",
+        "-1522143/820000"
+      ],
+      "index": 205,
+      "inside_core": false,
+      "point": [
+        "4007/2050",
+        "5853/2050"
+      ],
+      "weight": "42171/1000000",
+      "weight_units": 168684
+    },
+    {
+      "axis_slacks": [
+        "-1522143/820000",
+        "-726943/820000"
+      ],
+      "index": 206,
+      "inside_core": false,
+      "point": [
+        "5853/2050",
+        "773/410"
+      ],
+      "weight": "42171/1000000",
+      "weight_units": 168684
+    },
+    {
+      "axis_slacks": [
+        "-1522143/820000",
+        "-783743/820000"
+      ],
+      "index": 207,
+      "inside_core": false,
+      "point": [
+        "5853/2050",
+        "4007/2050"
+      ],
+      "weight": "42171/1000000",
+      "weight_units": 168684
+    },
+    {
+      "axis_slacks": [
+        "28279/2540000",
+        "-2198921/2540000"
+      ],
+      "index": 208,
+      "inside_core": false,
+      "point": [
+        "3136/3175",
+        "1184/635"
+      ],
+      "weight": "143983/2000000",
+      "weight_units": 287966
+    },
+    {
+      "axis_slacks": [
+        "28279/2540000",
+        "-2480521/2540000"
+      ],
+      "index": 209,
+      "inside_core": false,
+      "point": [
+        "3136/3175",
+        "6272/3175"
+      ],
+      "weight": "143983/2000000",
+      "weight_units": 287966
+    },
+    {
+      "axis_slacks": [
+        "-2198921/2540000",
+        "28279/2540000"
+      ],
+      "index": 210,
+      "inside_core": false,
+      "point": [
+        "1184/635",
+        "3136/3175"
+      ],
+      "weight": "143983/2000000",
+      "weight_units": 287966
+    },
+    {
+      "axis_slacks": [
+        "-2198921/2540000",
+        "-4707721/2540000"
+      ],
+      "index": 211,
+      "inside_core": false,
+      "point": [
+        "1184/635",
+        "9056/3175"
+      ],
+      "weight": "143983/2000000",
+      "weight_units": 287966
+    },
+    {
+      "axis_slacks": [
+        "-2480521/2540000",
+        "28279/2540000"
+      ],
+      "index": 212,
+      "inside_core": false,
+      "point": [
+        "6272/3175",
+        "3136/3175"
+      ],
+      "weight": "143983/2000000",
+      "weight_units": 287966
+    },
+    {
+      "axis_slacks": [
+        "-2480521/2540000",
+        "-4707721/2540000"
+      ],
+      "index": 213,
+      "inside_core": false,
+      "point": [
+        "6272/3175",
+        "9056/3175"
+      ],
+      "weight": "143983/2000000",
+      "weight_units": 287966
+    },
+    {
+      "axis_slacks": [
+        "-4707721/2540000",
+        "-2198921/2540000"
+      ],
+      "index": 214,
+      "inside_core": false,
+      "point": [
+        "9056/3175",
+        "1184/635"
+      ],
+      "weight": "143983/2000000",
+      "weight_units": 287966
+    },
+    {
+      "axis_slacks": [
+        "-4707721/2540000",
+        "-2480521/2540000"
+      ],
+      "index": 215,
+      "inside_core": false,
+      "point": [
+        "9056/3175",
+        "6272/3175"
+      ],
+      "weight": "143983/2000000",
+      "weight_units": 287966
+    },
+    {
+      "axis_slacks": [
+        "-102143/820000",
+        "-726943/820000"
+      ],
+      "index": 216,
+      "inside_core": false,
+      "point": [
+        "2303/2050",
+        "773/410"
+      ],
+      "weight": "86579/4000000",
+      "weight_units": 86579
+    },
+    {
+      "axis_slacks": [
+        "-102143/820000",
+        "-783743/820000"
+      ],
+      "index": 217,
+      "inside_core": false,
+      "point": [
+        "2303/2050",
+        "4007/2050"
+      ],
+      "weight": "86579/4000000",
+      "weight_units": 86579
+    },
+    {
+      "axis_slacks": [
+        "-726943/820000",
+        "-102143/820000"
+      ],
+      "index": 218,
+      "inside_core": false,
+      "point": [
+        "773/410",
+        "2303/2050"
+      ],
+      "weight": "86579/4000000",
+      "weight_units": 86579
+    },
+    {
+      "axis_slacks": [
+        "-726943/820000",
+        "-1408543/820000"
+      ],
+      "index": 219,
+      "inside_core": false,
+      "point": [
+        "773/410",
+        "5569/2050"
+      ],
+      "weight": "86579/4000000",
+      "weight_units": 86579
+    },
+    {
+      "axis_slacks": [
+        "-783743/820000",
+        "-102143/820000"
+      ],
+      "index": 220,
+      "inside_core": false,
+      "point": [
+        "4007/2050",
+        "2303/2050"
+      ],
+      "weight": "86579/4000000",
+      "weight_units": 86579
+    },
+    {
+      "axis_slacks": [
+        "-783743/820000",
+        "-1408543/820000"
+      ],
+      "index": 221,
+      "inside_core": false,
+      "point": [
+        "4007/2050",
+        "5569/2050"
+      ],
+      "weight": "86579/4000000",
+      "weight_units": 86579
+    },
+    {
+      "axis_slacks": [
+        "-1408543/820000",
+        "-726943/820000"
+      ],
+      "index": 222,
+      "inside_core": false,
+      "point": [
+        "5569/2050",
+        "773/410"
+      ],
+      "weight": "86579/4000000",
+      "weight_units": 86579
+    },
+    {
+      "axis_slacks": [
+        "-1408543/820000",
+        "-783743/820000"
+      ],
+      "index": 223,
+      "inside_core": false,
+      "point": [
+        "5569/2050",
+        "4007/2050"
+      ],
+      "weight": "86579/4000000",
+      "weight_units": 86579
+    },
+    {
+      "axis_slacks": [
+        "-125159/660000",
+        "-579559/660000"
+      ],
+      "index": 224,
+      "inside_core": false,
+      "point": [
+        "1961/1650",
+        "3097/1650"
+      ],
+      "weight": "13107/2000000",
+      "weight_units": 26214
+    },
+    {
+      "axis_slacks": [
+        "-125159/660000",
+        "-636359/660000"
+      ],
+      "index": 225,
+      "inside_core": false,
+      "point": [
+        "1961/1650",
+        "3239/1650"
+      ],
+      "weight": "13107/2000000",
+      "weight_units": 26214
+    },
+    {
+      "axis_slacks": [
+        "-579559/660000",
+        "-125159/660000"
+      ],
+      "index": 226,
+      "inside_core": false,
+      "point": [
+        "3097/1650",
+        "1961/1650"
+      ],
+      "weight": "13107/2000000",
+      "weight_units": 26214
+    },
+    {
+      "axis_slacks": [
+        "-579559/660000",
+        "-1090759/660000"
+      ],
+      "index": 227,
+      "inside_core": false,
+      "point": [
+        "3097/1650",
+        "175/66"
+      ],
+      "weight": "13107/2000000",
+      "weight_units": 26214
+    },
+    {
+      "axis_slacks": [
+        "-636359/660000",
+        "-125159/660000"
+      ],
+      "index": 228,
+      "inside_core": false,
+      "point": [
+        "3239/1650",
+        "1961/1650"
+      ],
+      "weight": "13107/2000000",
+      "weight_units": 26214
+    },
+    {
+      "axis_slacks": [
+        "-636359/660000",
+        "-1090759/660000"
+      ],
+      "index": 229,
+      "inside_core": false,
+      "point": [
+        "3239/1650",
+        "175/66"
+      ],
+      "weight": "13107/2000000",
+      "weight_units": 26214
+    },
+    {
+      "axis_slacks": [
+        "-1090759/660000",
+        "-579559/660000"
+      ],
+      "index": 230,
+      "inside_core": false,
+      "point": [
+        "175/66",
+        "3097/1650"
+      ],
+      "weight": "13107/2000000",
+      "weight_units": 26214
+    },
+    {
+      "axis_slacks": [
+        "-1090759/660000",
+        "-636359/660000"
+      ],
+      "index": 231,
+      "inside_core": false,
+      "point": [
+        "175/66",
+        "3239/1650"
+      ],
+      "weight": "13107/2000000",
+      "weight_units": 26214
+    },
+    {
+      "axis_slacks": [
+        "-158943/820000",
+        "-726943/820000"
+      ],
+      "index": 232,
+      "inside_core": false,
+      "point": [
+        "489/410",
+        "773/410"
+      ],
+      "weight": "1481/1000000",
+      "weight_units": 5924
+    },
+    {
+      "axis_slacks": [
+        "-158943/820000",
+        "-783743/820000"
+      ],
+      "index": 233,
+      "inside_core": false,
+      "point": [
+        "489/410",
+        "4007/2050"
+      ],
+      "weight": "1481/1000000",
+      "weight_units": 5924
+    },
+    {
+      "axis_slacks": [
+        "-726943/820000",
+        "-158943/820000"
+      ],
+      "index": 234,
+      "inside_core": false,
+      "point": [
+        "773/410",
+        "489/410"
+      ],
+      "weight": "1481/1000000",
+      "weight_units": 5924
+    },
+    {
+      "axis_slacks": [
+        "-726943/820000",
+        "-1351743/820000"
+      ],
+      "index": 235,
+      "inside_core": false,
+      "point": [
+        "773/410",
+        "5427/2050"
+      ],
+      "weight": "1481/1000000",
+      "weight_units": 5924
+    },
+    {
+      "axis_slacks": [
+        "-783743/820000",
+        "-158943/820000"
+      ],
+      "index": 236,
+      "inside_core": false,
+      "point": [
+        "4007/2050",
+        "489/410"
+      ],
+      "weight": "1481/1000000",
+      "weight_units": 5924
+    },
+    {
+      "axis_slacks": [
+        "-783743/820000",
+        "-1351743/820000"
+      ],
+      "index": 237,
+      "inside_core": false,
+      "point": [
+        "4007/2050",
+        "5427/2050"
+      ],
+      "weight": "1481/1000000",
+      "weight_units": 5924
+    },
+    {
+      "axis_slacks": [
+        "-1351743/820000",
+        "-726943/820000"
+      ],
+      "index": 238,
+      "inside_core": false,
+      "point": [
+        "5427/2050",
+        "773/410"
+      ],
+      "weight": "1481/1000000",
+      "weight_units": 5924
+    },
+    {
+      "axis_slacks": [
+        "-1351743/820000",
+        "-783743/820000"
+      ],
+      "index": 239,
+      "inside_core": false,
+      "point": [
+        "5427/2050",
+        "4007/2050"
+      ],
+      "weight": "1481/1000000",
+      "weight_units": 5924
+    },
+    {
+      "axis_slacks": [
+        "-215743/820000",
+        "-613343/820000"
+      ],
+      "index": 240,
+      "inside_core": false,
+      "point": [
+        "2587/2050",
+        "3581/2050"
+      ],
+      "weight": "8053/400000",
+      "weight_units": 80530
+    },
+    {
+      "axis_slacks": [
+        "-215743/820000",
+        "-897343/820000"
+      ],
+      "index": 241,
+      "inside_core": false,
+      "point": [
+        "2587/2050",
+        "4291/2050"
+      ],
+      "weight": "8053/400000",
+      "weight_units": 80530
+    },
+    {
+      "axis_slacks": [
+        "-613343/820000",
+        "-215743/820000"
+      ],
+      "index": 242,
+      "inside_core": false,
+      "point": [
+        "3581/2050",
+        "2587/2050"
+      ],
+      "weight": "8053/400000",
+      "weight_units": 80530
+    },
+    {
+      "axis_slacks": [
+        "-613343/820000",
+        "-1294943/820000"
+      ],
+      "index": 243,
+      "inside_core": false,
+      "point": [
+        "3581/2050",
+        "1057/410"
+      ],
+      "weight": "8053/400000",
+      "weight_units": 80530
+    },
+    {
+      "axis_slacks": [
+        "-897343/820000",
+        "-215743/820000"
+      ],
+      "index": 244,
+      "inside_core": false,
+      "point": [
+        "4291/2050",
+        "2587/2050"
+      ],
+      "weight": "8053/400000",
+      "weight_units": 80530
+    },
+    {
+      "axis_slacks": [
+        "-897343/820000",
+        "-1294943/820000"
+      ],
+      "index": 245,
+      "inside_core": false,
+      "point": [
+        "4291/2050",
+        "1057/410"
+      ],
+      "weight": "8053/400000",
+      "weight_units": 80530
+    },
+    {
+      "axis_slacks": [
+        "-1294943/820000",
+        "-613343/820000"
+      ],
+      "index": 246,
+      "inside_core": false,
+      "point": [
+        "1057/410",
+        "3581/2050"
+      ],
+      "weight": "8053/400000",
+      "weight_units": 80530
+    },
+    {
+      "axis_slacks": [
+        "-1294943/820000",
+        "-897343/820000"
+      ],
+      "index": 247,
+      "inside_core": false,
+      "point": [
+        "1057/410",
+        "4291/2050"
+      ],
+      "weight": "8053/400000",
+      "weight_units": 80530
+    },
+    {
+      "axis_slacks": [
+        "-60653/220000",
+        "-579559/660000"
+      ],
+      "index": 248,
+      "inside_core": false,
+      "point": [
+        "701/550",
+        "3097/1650"
+      ],
+      "weight": "13107/4000000",
+      "weight_units": 13107
+    },
+    {
+      "axis_slacks": [
+        "-60653/220000",
+        "-636359/660000"
+      ],
+      "index": 249,
+      "inside_core": false,
+      "point": [
+        "701/550",
+        "3239/1650"
+      ],
+      "weight": "13107/4000000",
+      "weight_units": 13107
+    },
+    {
+      "axis_slacks": [
+        "-579559/660000",
+        "-60653/220000"
+      ],
+      "index": 250,
+      "inside_core": false,
+      "point": [
+        "3097/1650",
+        "701/550"
+      ],
+      "weight": "13107/4000000",
+      "weight_units": 13107
+    },
+    {
+      "axis_slacks": [
+        "-579559/660000",
+        "-344653/220000"
+      ],
+      "index": 251,
+      "inside_core": false,
+      "point": [
+        "3097/1650",
+        "1411/550"
+      ],
+      "weight": "13107/4000000",
+      "weight_units": 13107
+    },
+    {
+      "axis_slacks": [
+        "-636359/660000",
+        "-60653/220000"
+      ],
+      "index": 252,
+      "inside_core": false,
+      "point": [
+        "3239/1650",
+        "701/550"
+      ],
+      "weight": "13107/4000000",
+      "weight_units": 13107
+    },
+    {
+      "axis_slacks": [
+        "-636359/660000",
+        "-344653/220000"
+      ],
+      "index": 253,
+      "inside_core": false,
+      "point": [
+        "3239/1650",
+        "1411/550"
+      ],
+      "weight": "13107/4000000",
+      "weight_units": 13107
+    },
+    {
+      "axis_slacks": [
+        "-344653/220000",
+        "-579559/660000"
+      ],
+      "index": 254,
+      "inside_core": false,
+      "point": [
+        "1411/550",
+        "3097/1650"
+      ],
+      "weight": "13107/4000000",
+      "weight_units": 13107
+    },
+    {
+      "axis_slacks": [
+        "-344653/220000",
+        "-636359/660000"
+      ],
+      "index": 255,
+      "inside_core": false,
+      "point": [
+        "1411/550",
+        "3239/1650"
+      ],
+      "weight": "13107/4000000",
+      "weight_units": 13107
+    },
+    {
+      "axis_slacks": [
+        "-19769/60000",
+        "-18423/20000"
+      ],
+      "index": 256,
+      "inside_core": false,
+      "point": [
+        "797/600",
+        "48/25"
+      ],
+      "weight": "34027/4000000",
+      "weight_units": 34027
+    },
+    {
+      "axis_slacks": [
+        "-18423/20000",
+        "-19769/60000"
+      ],
+      "index": 257,
+      "inside_core": false,
+      "point": [
+        "48/25",
+        "797/600"
+      ],
+      "weight": "34027/4000000",
+      "weight_units": 34027
+    },
+    {
+      "axis_slacks": [
+        "-18423/20000",
+        "-90769/60000"
+      ],
+      "index": 258,
+      "inside_core": false,
+      "point": [
+        "48/25",
+        "1507/600"
+      ],
+      "weight": "34027/4000000",
+      "weight_units": 34027
+    },
+    {
+      "axis_slacks": [
+        "-90769/60000",
+        "-18423/20000"
+      ],
+      "index": 259,
+      "inside_core": false,
+      "point": [
+        "1507/600",
+        "48/25"
+      ],
+      "weight": "34027/4000000",
+      "weight_units": 34027
+    },
+    {
+      "axis_slacks": [
+        "-272543/820000",
+        "-670143/820000"
+      ],
+      "index": 260,
+      "inside_core": false,
+      "point": [
+        "2729/2050",
+        "3723/2050"
+      ],
+      "weight": "2489/200000",
+      "weight_units": 49780
+    },
+    {
+      "axis_slacks": [
+        "-272543/820000",
+        "-840543/820000"
+      ],
+      "index": 261,
+      "inside_core": false,
+      "point": [
+        "2729/2050",
+        "4149/2050"
+      ],
+      "weight": "2489/200000",
+      "weight_units": 49780
+    },
+    {
+      "axis_slacks": [
+        "-670143/820000",
+        "-272543/820000"
+      ],
+      "index": 262,
+      "inside_core": false,
+      "point": [
+        "3723/2050",
+        "2729/2050"
+      ],
+      "weight": "2489/200000",
+      "weight_units": 49780
+    },
+    {
+      "axis_slacks": [
+        "-670143/820000",
+        "-1238143/820000"
+      ],
+      "index": 263,
+      "inside_core": false,
+      "point": [
+        "3723/2050",
+        "5143/2050"
+      ],
+      "weight": "2489/200000",
+      "weight_units": 49780
+    },
+    {
+      "axis_slacks": [
+        "-840543/820000",
+        "-272543/820000"
+      ],
+      "index": 264,
+      "inside_core": false,
+      "point": [
+        "4149/2050",
+        "2729/2050"
+      ],
+      "weight": "2489/200000",
+      "weight_units": 49780
+    },
+    {
+      "axis_slacks": [
+        "-840543/820000",
+        "-1238143/820000"
+      ],
+      "index": 265,
+      "inside_core": false,
+      "point": [
+        "4149/2050",
+        "5143/2050"
+      ],
+      "weight": "2489/200000",
+      "weight_units": 49780
+    },
+    {
+      "axis_slacks": [
+        "-1238143/820000",
+        "-670143/820000"
+      ],
+      "index": 266,
+      "inside_core": false,
+      "point": [
+        "5143/2050",
+        "3723/2050"
+      ],
+      "weight": "2489/200000",
+      "weight_units": 49780
+    },
+    {
+      "axis_slacks": [
+        "-1238143/820000",
+        "-840543/820000"
+      ],
+      "index": 267,
+      "inside_core": false,
+      "point": [
+        "5143/2050",
+        "4149/2050"
+      ],
+      "weight": "2489/200000",
+      "weight_units": 49780
+    },
+    {
+      "axis_slacks": [
+        "-329343/820000",
+        "-726943/820000"
+      ],
+      "index": 268,
+      "inside_core": false,
+      "point": [
+        "2871/2050",
+        "773/410"
+      ],
+      "weight": "32641/4000000",
+      "weight_units": 32641
+    },
+    {
+      "axis_slacks": [
+        "-329343/820000",
+        "-783743/820000"
+      ],
+      "index": 269,
+      "inside_core": false,
+      "point": [
+        "2871/2050",
+        "4007/2050"
+      ],
+      "weight": "32641/4000000",
+      "weight_units": 32641
+    },
+    {
+      "axis_slacks": [
+        "-726943/820000",
+        "-329343/820000"
+      ],
+      "index": 270,
+      "inside_core": false,
+      "point": [
+        "773/410",
+        "2871/2050"
+      ],
+      "weight": "32641/4000000",
+      "weight_units": 32641
+    },
+    {
+      "axis_slacks": [
+        "-726943/820000",
+        "-1181343/820000"
+      ],
+      "index": 271,
+      "inside_core": false,
+      "point": [
+        "773/410",
+        "5001/2050"
+      ],
+      "weight": "32641/4000000",
+      "weight_units": 32641
+    },
+    {
+      "axis_slacks": [
+        "-783743/820000",
+        "-329343/820000"
+      ],
+      "index": 272,
+      "inside_core": false,
+      "point": [
+        "4007/2050",
+        "2871/2050"
+      ],
+      "weight": "32641/4000000",
+      "weight_units": 32641
+    },
+    {
+      "axis_slacks": [
+        "-783743/820000",
+        "-1181343/820000"
+      ],
+      "index": 273,
+      "inside_core": false,
+      "point": [
+        "4007/2050",
+        "5001/2050"
+      ],
+      "weight": "32641/4000000",
+      "weight_units": 32641
+    },
+    {
+      "axis_slacks": [
+        "-1181343/820000",
+        "-726943/820000"
+      ],
+      "index": 274,
+      "inside_core": false,
+      "point": [
+        "5001/2050",
+        "773/410"
+      ],
+      "weight": "32641/4000000",
+      "weight_units": 32641
+    },
+    {
+      "axis_slacks": [
+        "-1181343/820000",
+        "-783743/820000"
+      ],
+      "index": 275,
+      "inside_core": false,
+      "point": [
+        "5001/2050",
+        "4007/2050"
+      ],
+      "weight": "32641/4000000",
+      "weight_units": 32641
+    },
+    {
+      "axis_slacks": [
+        "-26869/60000",
+        "-579559/660000"
+      ],
+      "index": 276,
+      "inside_core": false,
+      "point": [
+        "217/150",
+        "3097/1650"
+      ],
+      "weight": "316447/4000000",
+      "weight_units": 316447
+    },
+    {
+      "axis_slacks": [
+        "-26869/60000",
+        "-636359/660000"
+      ],
+      "index": 277,
+      "inside_core": false,
+      "point": [
+        "217/150",
+        "3239/1650"
+      ],
+      "weight": "316447/4000000",
+      "weight_units": 316447
+    },
+    {
+      "axis_slacks": [
+        "-579559/660000",
+        "-26869/60000"
+      ],
+      "index": 278,
+      "inside_core": false,
+      "point": [
+        "3097/1650",
+        "217/150"
+      ],
+      "weight": "316447/4000000",
+      "weight_units": 316447
+    },
+    {
+      "axis_slacks": [
+        "-579559/660000",
+        "-83669/60000"
+      ],
+      "index": 279,
+      "inside_core": false,
+      "point": [
+        "3097/1650",
+        "359/150"
+      ],
+      "weight": "316447/4000000",
+      "weight_units": 316447
+    },
+    {
+      "axis_slacks": [
+        "-636359/660000",
+        "-26869/60000"
+      ],
+      "index": 280,
+      "inside_core": false,
+      "point": [
+        "3239/1650",
+        "217/150"
+      ],
+      "weight": "316447/4000000",
+      "weight_units": 316447
+    },
+    {
+      "axis_slacks": [
+        "-636359/660000",
+        "-83669/60000"
+      ],
+      "index": 281,
+      "inside_core": false,
+      "point": [
+        "3239/1650",
+        "359/150"
+      ],
+      "weight": "316447/4000000",
+      "weight_units": 316447
+    },
+    {
+      "axis_slacks": [
+        "-83669/60000",
+        "-579559/660000"
+      ],
+      "index": 282,
+      "inside_core": false,
+      "point": [
+        "359/150",
+        "3097/1650"
+      ],
+      "weight": "316447/4000000",
+      "weight_units": 316447
+    },
+    {
+      "axis_slacks": [
+        "-83669/60000",
+        "-636359/660000"
+      ],
+      "index": 283,
+      "inside_core": false,
+      "point": [
+        "359/150",
+        "3239/1650"
+      ],
+      "weight": "316447/4000000",
+      "weight_units": 316447
+    },
+    {
+      "axis_slacks": [
+        "-1162121/2540000",
+        "-2301321/2540000"
+      ],
+      "index": 284,
+      "inside_core": false,
+      "point": [
+        "4624/3175",
+        "6048/3175"
+      ],
+      "weight": "43479/4000000",
+      "weight_units": 43479
+    },
+    {
+      "axis_slacks": [
+        "-1162121/2540000",
+        "-2378121/2540000"
+      ],
+      "index": 285,
+      "inside_core": false,
+      "point": [
+        "4624/3175",
+        "6144/3175"
+      ],
+      "weight": "43479/4000000",
+      "weight_units": 43479
+    },
+    {
+      "axis_slacks": [
+        "-2301321/2540000",
+        "-1162121/2540000"
+      ],
+      "index": 286,
+      "inside_core": false,
+      "point": [
+        "6048/3175",
+        "4624/3175"
+      ],
+      "weight": "43479/4000000",
+      "weight_units": 43479
+    },
+    {
+      "axis_slacks": [
+        "-2301321/2540000",
+        "-3517321/2540000"
+      ],
+      "index": 287,
+      "inside_core": false,
+      "point": [
+        "6048/3175",
+        "7568/3175"
+      ],
+      "weight": "43479/4000000",
+      "weight_units": 43479
+    },
+    {
+      "axis_slacks": [
+        "-2378121/2540000",
+        "-1162121/2540000"
+      ],
+      "index": 288,
+      "inside_core": false,
+      "point": [
+        "6144/3175",
+        "4624/3175"
+      ],
+      "weight": "43479/4000000",
+      "weight_units": 43479
+    },
+    {
+      "axis_slacks": [
+        "-2378121/2540000",
+        "-3517321/2540000"
+      ],
+      "index": 289,
+      "inside_core": false,
+      "point": [
+        "6144/3175",
+        "7568/3175"
+      ],
+      "weight": "43479/4000000",
+      "weight_units": 43479
+    },
+    {
+      "axis_slacks": [
+        "-3517321/2540000",
+        "-2301321/2540000"
+      ],
+      "index": 290,
+      "inside_core": false,
+      "point": [
+        "7568/3175",
+        "6048/3175"
+      ],
+      "weight": "43479/4000000",
+      "weight_units": 43479
+    },
+    {
+      "axis_slacks": [
+        "-3517321/2540000",
+        "-2378121/2540000"
+      ],
+      "index": 291,
+      "inside_core": false,
+      "point": [
+        "7568/3175",
+        "6144/3175"
+      ],
+      "weight": "43479/4000000",
+      "weight_units": 43479
+    },
+    {
+      "axis_slacks": [
+        "-386143/820000",
+        "-670143/820000"
+      ],
+      "index": 292,
+      "inside_core": false,
+      "point": [
+        "3013/2050",
+        "3723/2050"
+      ],
+      "weight": "193/125000",
+      "weight_units": 6176
+    },
+    {
+      "axis_slacks": [
+        "-386143/820000",
+        "-840543/820000"
+      ],
+      "index": 293,
+      "inside_core": false,
+      "point": [
+        "3013/2050",
+        "4149/2050"
+      ],
+      "weight": "193/125000",
+      "weight_units": 6176
+    },
+    {
+      "axis_slacks": [
+        "-670143/820000",
+        "-386143/820000"
+      ],
+      "index": 294,
+      "inside_core": false,
+      "point": [
+        "3723/2050",
+        "3013/2050"
+      ],
+      "weight": "193/125000",
+      "weight_units": 6176
+    },
+    {
+      "axis_slacks": [
+        "-670143/820000",
+        "-1124543/820000"
+      ],
+      "index": 295,
+      "inside_core": false,
+      "point": [
+        "3723/2050",
+        "4859/2050"
+      ],
+      "weight": "193/125000",
+      "weight_units": 6176
+    },
+    {
+      "axis_slacks": [
+        "-840543/820000",
+        "-386143/820000"
+      ],
+      "index": 296,
+      "inside_core": false,
+      "point": [
+        "4149/2050",
+        "3013/2050"
+      ],
+      "weight": "193/125000",
+      "weight_units": 6176
+    },
+    {
+      "axis_slacks": [
+        "-840543/820000",
+        "-1124543/820000"
+      ],
+      "index": 297,
+      "inside_core": false,
+      "point": [
+        "4149/2050",
+        "4859/2050"
+      ],
+      "weight": "193/125000",
+      "weight_units": 6176
+    },
+    {
+      "axis_slacks": [
+        "-1124543/820000",
+        "-670143/820000"
+      ],
+      "index": 298,
+      "inside_core": false,
+      "point": [
+        "4859/2050",
+        "3723/2050"
+      ],
+      "weight": "193/125000",
+      "weight_units": 6176
+    },
+    {
+      "axis_slacks": [
+        "-1124543/820000",
+        "-840543/820000"
+      ],
+      "index": 299,
+      "inside_core": false,
+      "point": [
+        "4859/2050",
+        "4149/2050"
+      ],
+      "weight": "193/125000",
+      "weight_units": 6176
+    },
+    {
+      "axis_slacks": [
+        "-117453/220000",
+        "-409159/660000"
+      ],
+      "index": 300,
+      "inside_core": false,
+      "point": [
+        "843/550",
+        "2671/1650"
+      ],
+      "weight": "123189/4000000",
+      "weight_units": 123189
+    },
+    {
+      "axis_slacks": [
+        "-117453/220000",
+        "-806759/660000"
+      ],
+      "index": 301,
+      "inside_core": false,
+      "point": [
+        "843/550",
+        "733/330"
+      ],
+      "weight": "123189/4000000",
+      "weight_units": 123189
+    },
+    {
+      "axis_slacks": [
+        "-409159/660000",
+        "-117453/220000"
+      ],
+      "index": 302,
+      "inside_core": false,
+      "point": [
+        "2671/1650",
+        "843/550"
+      ],
+      "weight": "123189/4000000",
+      "weight_units": 123189
+    },
+    {
+      "axis_slacks": [
+        "-409159/660000",
+        "-287853/220000"
+      ],
+      "index": 303,
+      "inside_core": false,
+      "point": [
+        "2671/1650",
+        "1269/550"
+      ],
+      "weight": "123189/4000000",
+      "weight_units": 123189
+    },
+    {
+      "axis_slacks": [
+        "-806759/660000",
+        "-117453/220000"
+      ],
+      "index": 304,
+      "inside_core": false,
+      "point": [
+        "733/330",
+        "843/550"
+      ],
+      "weight": "123189/4000000",
+      "weight_units": 123189
+    },
+    {
+      "axis_slacks": [
+        "-806759/660000",
+        "-287853/220000"
+      ],
+      "index": 305,
+      "inside_core": false,
+      "point": [
+        "733/330",
+        "1269/550"
+      ],
+      "weight": "123189/4000000",
+      "weight_units": 123189
+    },
+    {
+      "axis_slacks": [
+        "-287853/220000",
+        "-409159/660000"
+      ],
+      "index": 306,
+      "inside_core": false,
+      "point": [
+        "1269/550",
+        "2671/1650"
+      ],
+      "weight": "123189/4000000",
+      "weight_units": 123189
+    },
+    {
+      "axis_slacks": [
+        "-287853/220000",
+        "-806759/660000"
+      ],
+      "index": 307,
+      "inside_core": false,
+      "point": [
+        "1269/550",
+        "733/330"
+      ],
+      "weight": "123189/4000000",
+      "weight_units": 123189
+    },
+    {
+      "axis_slacks": [
+        "-442943/820000",
+        "-613343/820000"
+      ],
+      "index": 308,
+      "inside_core": false,
+      "point": [
+        "631/410",
+        "3581/2050"
+      ],
+      "weight": "32641/4000000",
+      "weight_units": 32641
+    },
+    {
+      "axis_slacks": [
+        "-442943/820000",
+        "-897343/820000"
+      ],
+      "index": 309,
+      "inside_core": false,
+      "point": [
+        "631/410",
+        "4291/2050"
+      ],
+      "weight": "32641/4000000",
+      "weight_units": 32641
+    },
+    {
+      "axis_slacks": [
+        "-613343/820000",
+        "-442943/820000"
+      ],
+      "index": 310,
+      "inside_core": false,
+      "point": [
+        "3581/2050",
+        "631/410"
+      ],
+      "weight": "32641/4000000",
+      "weight_units": 32641
+    },
+    {
+      "axis_slacks": [
+        "-613343/820000",
+        "-1067743/820000"
+      ],
+      "index": 311,
+      "inside_core": false,
+      "point": [
+        "3581/2050",
+        "4717/2050"
+      ],
+      "weight": "32641/4000000",
+      "weight_units": 32641
+    },
+    {
+      "axis_slacks": [
+        "-897343/820000",
+        "-442943/820000"
+      ],
+      "index": 312,
+      "inside_core": false,
+      "point": [
+        "4291/2050",
+        "631/410"
+      ],
+      "weight": "32641/4000000",
+      "weight_units": 32641
+    },
+    {
+      "axis_slacks": [
+        "-897343/820000",
+        "-1067743/820000"
+      ],
+      "index": 313,
+      "inside_core": false,
+      "point": [
+        "4291/2050",
+        "4717/2050"
+      ],
+      "weight": "32641/4000000",
+      "weight_units": 32641
+    },
+    {
+      "axis_slacks": [
+        "-1067743/820000",
+        "-613343/820000"
+      ],
+      "index": 314,
+      "inside_core": false,
+      "point": [
+        "4717/2050",
+        "3581/2050"
+      ],
+      "weight": "32641/4000000",
+      "weight_units": 32641
+    },
+    {
+      "axis_slacks": [
+        "-1067743/820000",
+        "-897343/820000"
+      ],
+      "index": 315,
+      "inside_core": false,
+      "point": [
+        "4717/2050",
+        "4291/2050"
+      ],
+      "weight": "32641/4000000",
+      "weight_units": 32641
+    },
+    {
+      "axis_slacks": [
+        "-442943/820000",
+        "-670143/820000"
+      ],
+      "index": 316,
+      "inside_core": false,
+      "point": [
+        "631/410",
+        "3723/2050"
+      ],
+      "weight": "15249/4000000",
+      "weight_units": 15249
+    },
+    {
+      "axis_slacks": [
+        "-442943/820000",
+        "-840543/820000"
+      ],
+      "index": 317,
+      "inside_core": false,
+      "point": [
+        "631/410",
+        "4149/2050"
+      ],
+      "weight": "15249/4000000",
+      "weight_units": 15249
+    },
+    {
+      "axis_slacks": [
+        "-670143/820000",
+        "-442943/820000"
+      ],
+      "index": 318,
+      "inside_core": false,
+      "point": [
+        "3723/2050",
+        "631/410"
+      ],
+      "weight": "15249/4000000",
+      "weight_units": 15249
+    },
+    {
+      "axis_slacks": [
+        "-670143/820000",
+        "-1067743/820000"
+      ],
+      "index": 319,
+      "inside_core": false,
+      "point": [
+        "3723/2050",
+        "4717/2050"
+      ],
+      "weight": "15249/4000000",
+      "weight_units": 15249
+    },
+    {
+      "axis_slacks": [
+        "-840543/820000",
+        "-442943/820000"
+      ],
+      "index": 320,
+      "inside_core": false,
+      "point": [
+        "4149/2050",
+        "631/410"
+      ],
+      "weight": "15249/4000000",
+      "weight_units": 15249
+    },
+    {
+      "axis_slacks": [
+        "-840543/820000",
+        "-1067743/820000"
+      ],
+      "index": 321,
+      "inside_core": false,
+      "point": [
+        "4149/2050",
+        "4717/2050"
+      ],
+      "weight": "15249/4000000",
+      "weight_units": 15249
+    },
+    {
+      "axis_slacks": [
+        "-1067743/820000",
+        "-670143/820000"
+      ],
+      "index": 322,
+      "inside_core": false,
+      "point": [
+        "4717/2050",
+        "3723/2050"
+      ],
+      "weight": "15249/4000000",
+      "weight_units": 15249
+    },
+    {
+      "axis_slacks": [
+        "-1067743/820000",
+        "-840543/820000"
+      ],
+      "index": 323,
+      "inside_core": false,
+      "point": [
+        "4717/2050",
+        "4149/2050"
+      ],
+      "weight": "15249/4000000",
+      "weight_units": 15249
+    },
+    {
+      "axis_slacks": [
+        "-11323/20000",
+        "-41069/60000"
+      ],
+      "index": 324,
+      "inside_core": false,
+      "point": [
+        "313/200",
+        "101/60"
+      ],
+      "weight": "25457/4000000",
+      "weight_units": 25457
+    },
+    {
+      "axis_slacks": [
+        "-11323/20000",
+        "-69469/60000"
+      ],
+      "index": 325,
+      "inside_core": false,
+      "point": [
+        "313/200",
+        "647/300"
+      ],
+      "weight": "25457/4000000",
+      "weight_units": 25457
+    },
+    {
+      "axis_slacks": [
+        "-41069/60000",
+        "-11323/20000"
+      ],
+      "index": 326,
+      "inside_core": false,
+      "point": [
+        "101/60",
+        "313/200"
+      ],
+      "weight": "25457/4000000",
+      "weight_units": 25457
+    },
+    {
+      "axis_slacks": [
+        "-41069/60000",
+        "-25523/20000"
+      ],
+      "index": 327,
+      "inside_core": false,
+      "point": [
+        "101/60",
+        "91/40"
+      ],
+      "weight": "25457/4000000",
+      "weight_units": 25457
+    },
+    {
+      "axis_slacks": [
+        "-69469/60000",
+        "-11323/20000"
+      ],
+      "index": 328,
+      "inside_core": false,
+      "point": [
+        "647/300",
+        "313/200"
+      ],
+      "weight": "25457/4000000",
+      "weight_units": 25457
+    },
+    {
+      "axis_slacks": [
+        "-69469/60000",
+        "-25523/20000"
+      ],
+      "index": 329,
+      "inside_core": false,
+      "point": [
+        "647/300",
+        "91/40"
+      ],
+      "weight": "25457/4000000",
+      "weight_units": 25457
+    },
+    {
+      "axis_slacks": [
+        "-25523/20000",
+        "-41069/60000"
+      ],
+      "index": 330,
+      "inside_core": false,
+      "point": [
+        "91/40",
+        "101/60"
+      ],
+      "weight": "25457/4000000",
+      "weight_units": 25457
+    },
+    {
+      "axis_slacks": [
+        "-25523/20000",
+        "-69469/60000"
+      ],
+      "index": 331,
+      "inside_core": false,
+      "point": [
+        "91/40",
+        "647/300"
+      ],
+      "weight": "25457/4000000",
+      "weight_units": 25457
+    },
+    {
+      "axis_slacks": [
+        "-499743/820000",
+        "-556543/820000"
+      ],
+      "index": 332,
+      "inside_core": false,
+      "point": [
+        "3297/2050",
+        "3439/2050"
+      ],
+      "weight": "25457/4000000",
+      "weight_units": 25457
+    },
+    {
+      "axis_slacks": [
+        "-499743/820000",
+        "-954143/820000"
+      ],
+      "index": 333,
+      "inside_core": false,
+      "point": [
+        "3297/2050",
+        "4433/2050"
+      ],
+      "weight": "25457/4000000",
+      "weight_units": 25457
+    },
+    {
+      "axis_slacks": [
+        "-556543/820000",
+        "-499743/820000"
+      ],
+      "index": 334,
+      "inside_core": false,
+      "point": [
+        "3439/2050",
+        "3297/2050"
+      ],
+      "weight": "25457/4000000",
+      "weight_units": 25457
+    },
+    {
+      "axis_slacks": [
+        "-556543/820000",
+        "-1010943/820000"
+      ],
+      "index": 335,
+      "inside_core": false,
+      "point": [
+        "3439/2050",
+        "183/82"
+      ],
+      "weight": "25457/4000000",
+      "weight_units": 25457
+    },
+    {
+      "axis_slacks": [
+        "-954143/820000",
+        "-499743/820000"
+      ],
+      "index": 336,
+      "inside_core": false,
+      "point": [
+        "4433/2050",
+        "3297/2050"
+      ],
+      "weight": "25457/4000000",
+      "weight_units": 25457
+    },
+    {
+      "axis_slacks": [
+        "-954143/820000",
+        "-1010943/820000"
+      ],
+      "index": 337,
+      "inside_core": false,
+      "point": [
+        "4433/2050",
+        "183/82"
+      ],
+      "weight": "25457/4000000",
+      "weight_units": 25457
+    },
+    {
+      "axis_slacks": [
+        "-1010943/820000",
+        "-556543/820000"
+      ],
+      "index": 338,
+      "inside_core": false,
+      "point": [
+        "183/82",
+        "3439/2050"
+      ],
+      "weight": "25457/4000000",
+      "weight_units": 25457
+    },
+    {
+      "axis_slacks": [
+        "-1010943/820000",
+        "-954143/820000"
+      ],
+      "index": 339,
+      "inside_core": false,
+      "point": [
+        "183/82",
+        "4433/2050"
+      ],
+      "weight": "25457/4000000",
+      "weight_units": 25457
+    },
+    {
+      "axis_slacks": [
+        "-499743/820000",
+        "-613343/820000"
+      ],
+      "index": 340,
+      "inside_core": false,
+      "point": [
+        "3297/2050",
+        "3581/2050"
+      ],
+      "weight": "35539/4000000",
+      "weight_units": 35539
+    },
+    {
+      "axis_slacks": [
+        "-499743/820000",
+        "-897343/820000"
+      ],
+      "index": 341,
+      "inside_core": false,
+      "point": [
+        "3297/2050",
+        "4291/2050"
+      ],
+      "weight": "35539/4000000",
+      "weight_units": 35539
+    },
+    {
+      "axis_slacks": [
+        "-613343/820000",
+        "-499743/820000"
+      ],
+      "index": 342,
+      "inside_core": false,
+      "point": [
+        "3581/2050",
+        "3297/2050"
+      ],
+      "weight": "35539/4000000",
+      "weight_units": 35539
+    },
+    {
+      "axis_slacks": [
+        "-613343/820000",
+        "-1010943/820000"
+      ],
+      "index": 343,
+      "inside_core": false,
+      "point": [
+        "3581/2050",
+        "183/82"
+      ],
+      "weight": "35539/4000000",
+      "weight_units": 35539
+    },
+    {
+      "axis_slacks": [
+        "-897343/820000",
+        "-499743/820000"
+      ],
+      "index": 344,
+      "inside_core": false,
+      "point": [
+        "4291/2050",
+        "3297/2050"
+      ],
+      "weight": "35539/4000000",
+      "weight_units": 35539
+    },
+    {
+      "axis_slacks": [
+        "-897343/820000",
+        "-1010943/820000"
+      ],
+      "index": 345,
+      "inside_core": false,
+      "point": [
+        "4291/2050",
+        "183/82"
+      ],
+      "weight": "35539/4000000",
+      "weight_units": 35539
+    },
+    {
+      "axis_slacks": [
+        "-1010943/820000",
+        "-613343/820000"
+      ],
+      "index": 346,
+      "inside_core": false,
+      "point": [
+        "183/82",
+        "3581/2050"
+      ],
+      "weight": "35539/4000000",
+      "weight_units": 35539
+    },
+    {
+      "axis_slacks": [
+        "-1010943/820000",
+        "-897343/820000"
+      ],
+      "index": 347,
+      "inside_core": false,
+      "point": [
+        "183/82",
+        "4291/2050"
+      ],
+      "weight": "35539/4000000",
+      "weight_units": 35539
+    },
+    {
+      "axis_slacks": [
+        "-41069/60000",
+        "-41069/60000"
+      ],
+      "index": 348,
+      "inside_core": false,
+      "point": [
+        "101/60",
+        "101/60"
+      ],
+      "weight": "65281/4000000",
+      "weight_units": 65281
+    },
+    {
+      "axis_slacks": [
+        "-41069/60000",
+        "-69469/60000"
+      ],
+      "index": 349,
+      "inside_core": false,
+      "point": [
+        "101/60",
+        "647/300"
+      ],
+      "weight": "65281/4000000",
+      "weight_units": 65281
+    },
+    {
+      "axis_slacks": [
+        "-69469/60000",
+        "-41069/60000"
+      ],
+      "index": 350,
+      "inside_core": false,
+      "point": [
+        "647/300",
+        "101/60"
+      ],
+      "weight": "65281/4000000",
+      "weight_units": 65281
+    },
+    {
+      "axis_slacks": [
+        "-69469/60000",
+        "-69469/60000"
+      ],
+      "index": 351,
+      "inside_core": false,
+      "point": [
+        "647/300",
+        "647/300"
+      ],
+      "weight": "65281/4000000",
+      "weight_units": 65281
+    },
+    {
+      "axis_slacks": [
+        "-579559/660000",
+        "-579559/660000"
+      ],
+      "index": 352,
+      "inside_core": false,
+      "point": [
+        "3097/1650",
+        "3097/1650"
+      ],
+      "weight": "79931/2000000",
+      "weight_units": 159862
+    },
+    {
+      "axis_slacks": [
+        "-579559/660000",
+        "-636359/660000"
+      ],
+      "index": 353,
+      "inside_core": false,
+      "point": [
+        "3097/1650",
+        "3239/1650"
+      ],
+      "weight": "79931/2000000",
+      "weight_units": 159862
+    },
+    {
+      "axis_slacks": [
+        "-636359/660000",
+        "-579559/660000"
+      ],
+      "index": 354,
+      "inside_core": false,
+      "point": [
+        "3239/1650",
+        "3097/1650"
+      ],
+      "weight": "79931/2000000",
+      "weight_units": 159862
+    },
+    {
+      "axis_slacks": [
+        "-636359/660000",
+        "-636359/660000"
+      ],
+      "index": 355,
+      "inside_core": false,
+      "point": [
+        "3239/1650",
+        "3239/1650"
+      ],
+      "weight": "79931/2000000",
+      "weight_units": 159862
+    },
+    {
+      "axis_slacks": [
+        "-726943/820000",
+        "-726943/820000"
+      ],
+      "index": 356,
+      "inside_core": false,
+      "point": [
+        "773/410",
+        "773/410"
+      ],
+      "weight": "8053/400000",
+      "weight_units": 80530
+    },
+    {
+      "axis_slacks": [
+        "-726943/820000",
+        "-783743/820000"
+      ],
+      "index": 357,
+      "inside_core": false,
+      "point": [
+        "773/410",
+        "4007/2050"
+      ],
+      "weight": "8053/400000",
+      "weight_units": 80530
+    },
+    {
+      "axis_slacks": [
+        "-783743/820000",
+        "-726943/820000"
+      ],
+      "index": 358,
+      "inside_core": false,
+      "point": [
+        "4007/2050",
+        "773/410"
+      ],
+      "weight": "8053/400000",
+      "weight_units": 80530
+    },
+    {
+      "axis_slacks": [
+        "-783743/820000",
+        "-783743/820000"
+      ],
+      "index": 359,
+      "inside_core": false,
+      "point": [
+        "4007/2050",
+        "4007/2050"
+      ],
+      "weight": "8053/400000",
+      "weight_units": 80530
+    },
+    {
+      "axis_slacks": [
+        "-18423/20000",
+        "-18423/20000"
+      ],
+      "index": 360,
+      "inside_core": false,
+      "point": [
+        "48/25",
+        "48/25"
+      ],
+      "weight": "9767/2000000",
+      "weight_units": 19534
+    },
+    {
+      "axis_slacks": [
+        "591161/171860000",
+        "591161/171860000"
+      ],
+      "index": 361,
+      "inside_core": true,
+      "point": [
+        "213839/214825",
+        "213839/214825"
+      ],
+      "weight": "35961/400000",
+      "weight_units": 359610
+    },
+    {
+      "axis_slacks": [
+        "591161/171860000",
+        "-317208839/171860000"
+      ],
+      "index": 362,
+      "inside_core": false,
+      "point": [
+        "213839/214825",
+        "611089/214825"
+      ],
+      "weight": "35961/400000",
+      "weight_units": 359610
+    },
+    {
+      "axis_slacks": [
+        "-317208839/171860000",
+        "591161/171860000"
+      ],
+      "index": 363,
+      "inside_core": false,
+      "point": [
+        "611089/214825",
+        "213839/214825"
+      ],
+      "weight": "35961/400000",
+      "weight_units": 359610
+    },
+    {
+      "axis_slacks": [
+        "-317208839/171860000",
+        "-317208839/171860000"
+      ],
+      "index": 364,
+      "inside_core": false,
+      "point": [
+        "611089/214825",
+        "611089/214825"
+      ],
+      "weight": "35961/400000",
+      "weight_units": 359610
+    },
+    {
+      "axis_slacks": [
+        "50993/8180000",
+        "-462421/540000"
+      ],
+      "index": 365,
+      "inside_core": false,
+      "point": [
+        "20299/20450",
+        "5009/2700"
+      ],
+      "weight": "35961/400000",
+      "weight_units": 359610
+    },
+    {
+      "axis_slacks": [
+        "50993/8180000",
+        "-532421/540000"
+      ],
+      "index": 366,
+      "inside_core": false,
+      "point": [
+        "20299/20450",
+        "5359/2700"
+      ],
+      "weight": "35961/400000",
+      "weight_units": 359610
+    },
+    {
+      "axis_slacks": [
+        "-462421/540000",
+        "50993/8180000"
+      ],
+      "index": 367,
+      "inside_core": false,
+      "point": [
+        "5009/2700",
+        "20299/20450"
+      ],
+      "weight": "35961/400000",
+      "weight_units": 359610
+    },
+    {
+      "axis_slacks": [
+        "-462421/540000",
+        "-15121007/8180000"
+      ],
+      "index": 368,
+      "inside_core": false,
+      "point": [
+        "5009/2700",
+        "58229/20450"
+      ],
+      "weight": "35961/400000",
+      "weight_units": 359610
+    },
+    {
+      "axis_slacks": [
+        "-532421/540000",
+        "50993/8180000"
+      ],
+      "index": 369,
+      "inside_core": false,
+      "point": [
+        "5359/2700",
+        "20299/20450"
+      ],
+      "weight": "35961/400000",
+      "weight_units": 359610
+    },
+    {
+      "axis_slacks": [
+        "-532421/540000",
+        "-15121007/8180000"
+      ],
+      "index": 370,
+      "inside_core": false,
+      "point": [
+        "5359/2700",
+        "58229/20450"
+      ],
+      "weight": "35961/400000",
+      "weight_units": 359610
+    },
+    {
+      "axis_slacks": [
+        "-15121007/8180000",
+        "-462421/540000"
+      ],
+      "index": 371,
+      "inside_core": false,
+      "point": [
+        "58229/20450",
+        "5009/2700"
+      ],
+      "weight": "35961/400000",
+      "weight_units": 359610
+    },
+    {
+      "axis_slacks": [
+        "-15121007/8180000",
+        "-532421/540000"
+      ],
+      "index": 372,
+      "inside_core": false,
+      "point": [
+        "58229/20450",
+        "5359/2700"
+      ],
+      "weight": "35961/400000",
+      "weight_units": 359610
+    },
+    {
+      "axis_slacks": [
+        "28671/24460000",
+        "28671/24460000"
+      ],
+      "index": 373,
+      "inside_core": true,
+      "point": [
+        "30504/30575",
+        "30504/30575"
+      ],
+      "weight": "13107/4000000",
+      "weight_units": 13107
+    },
+    {
+      "axis_slacks": [
+        "28671/24460000",
+        "-45091329/24460000"
+      ],
+      "index": 374,
+      "inside_core": false,
+      "point": [
+        "30504/30575",
+        "86904/30575"
+      ],
+      "weight": "13107/4000000",
+      "weight_units": 13107
+    },
+    {
+      "axis_slacks": [
+        "-45091329/24460000",
+        "28671/24460000"
+      ],
+      "index": 375,
+      "inside_core": false,
+      "point": [
+        "86904/30575",
+        "30504/30575"
+      ],
+      "weight": "13107/4000000",
+      "weight_units": 13107
+    },
+    {
+      "axis_slacks": [
+        "-45091329/24460000",
+        "-45091329/24460000"
+      ],
+      "index": 376,
+      "inside_core": false,
+      "point": [
+        "86904/30575",
+        "86904/30575"
+      ],
+      "weight": "13107/4000000",
+      "weight_units": 13107
+    }
+  ],
+  "schema": "bc303-literal-t1-witness/v1",
+  "source_revision": "39714308ce2081abbd76624387d134fee4be6deb",
+  "sources": [
+    {
+      "bytes": 28821,
+      "git_blob": "52b042cbb77405dd6c4cf4d394481b00e3ccd78f",
+      "path": "docs/project/research/research-2026-09-12-n11-selection-routing-first-principles.md"
+    },
+    {
+      "bytes": 21658,
+      "git_blob": "409d38f79bf1fd5cbf6ade4b1c70d7db44d0a3f2",
+      "path": "docs/project/reviews/review-2026-09-12-n11-selection-routing-first-principles.md"
+    },
+    {
+      "bytes": 38623,
+      "git_blob": "f4f192ca995b7664e235e0bdfdc2a18ccb282ecf",
+      "path": "docs/project/research/research-2026-09-10-x027-structural-helpers.md"
+    },
+    {
+      "bytes": 69368,
+      "git_blob": "ef7f2f5d6342904082a291f860f5ba732dc52a41",
+      "path": "packing/campaign/series/series-000-smoke-and-calibration/results/agenda-030/bc-303-first-wave-selection.md"
+    },
+    {
+      "bytes": 17616,
+      "git_blob": "db8abed8f716a4173b47bcfb19f8e045b44513d1",
+      "path": "packing/campaign/series/series-000-smoke-and-calibration/results/agenda-030/bc-293-measure-free-96-25.json"
+    },
+    {
+      "bytes": 6275,
+      "git_blob": "631fe7f861510a51107d458e27a09d32a0b6cad6",
+      "path": "packing/campaign/series/series-000-smoke-and-calibration/results/agenda-031/proofs/corner-owner-sector-footprints.md"
+    },
+    {
+      "bytes": 10740,
+      "git_blob": "6d07ae56760217277b2ac2cb1cf2887916061d4e",
+      "path": "packing/campaign/series/series-000-smoke-and-calibration/results/agenda-032/proofs/fixed-cover-transfer-review.md"
+    },
+    {
+      "bytes": 18245,
+      "git_blob": "24e00f7cbbbb07c26347e22a4b2b3467cea701fa",
+      "path": "packing/cases/n11_five_dot_cover/wall-containment-contract.md"
+    },
+    {
+      "bytes": 20972,
+      "git_blob": "902d19e7f9914d9d53c422c2cd050c787ea685d5",
+      "path": "packing/src/sqpack/fractional/certificate.py"
+    },
+    {
+      "bytes": 17536,
+      "git_blob": "6bd5c56564a8f1a0681213c9b083cf62e4621a95",
+      "path": "packing/src/sqpack/fractional/sweep.py"
+    },
+    {
+      "bytes": 8246,
+      "git_blob": "d80f6e060904bc5e01c21f5f23eba87ede456422",
+      "path": "packing/src/sqpack/fractional/adaptive.py"
+    },
+    {
+      "bytes": 30409,
+      "git_blob": "523e9f34593d04bfa7a327dbdde3a15cd5582f63",
+      "path": "packing/src/sqpack/fractional/classcert.py"
+    },
+    {
+      "bytes": 23223,
+      "git_blob": "65501ad186a463eb5e7e16978daf03e603149fbd",
+      "path": "packing/devtools/owner_footprints.py"
+    },
+    {
+      "bytes": 24481,
+      "git_blob": "da831e51cfbb81e4329ffbfc52005ec61fac2811",
+      "path": "packing/devtools/wall_owner_footprints.py"
+    },
+    {
+      "bytes": 10810,
+      "git_blob": "714229c1250e1403b44ea60fa873b2bd2e5bf4dc",
+      "path": "packing/cases/n11_five_dot_cover/unit-parent-centre-contract.md"
+    },
+    {
+      "bytes": 27401,
+      "git_blob": "6360f3af422a40fea40c1722da9fcb779fa5b1be",
+      "path": "packing/devtools/wall_owner_parent_compatibility.py"
+    },
+    {
+      "bytes": 2801,
+      "git_blob": "a5df6094eadfe441dba66fee8fe37a4e5530b6f6",
+      "path": "packing/src/sqpack/fractional/model.py"
+    },
+    {
+      "bytes": 21285,
+      "git_blob": "d6e90df695d3c3f59db6529ab904955cdd20f3a5",
+      "path": "packing/src/sqpack/fractional/generate.py"
+    }
+  ],
+  "status": "complete",
+  "witness": {
+    "allowance": "524199/2000000",
+    "allowance_formula": "epsilon - 0*w",
+    "allowance_minus_surplus": "1048383/4000000",
+    "captured_count": 19,
+    "captured_indices_zero_based": [
+      0,
+      2,
+      8,
+      10,
+      16,
+      18,
+      24,
+      26,
+      44,
+      46,
+      52,
+      54,
+      60,
+      62,
+      100,
+      102,
+      140,
+      361,
+      373
+    ],
+    "captured_mass": "800003/800000",
+    "center": [
+      "1/2",
+      "1/2"
+    ],
+    "core_bounds": [
+      [
+        "23/20000",
+        "23/20000"
+      ],
+      [
+        "19977/20000",
+        "19977/20000"
+      ]
+    ],
+    "corner": "bottom-left",
+    "labels": [
+      3,
+      4,
+      11,
+      12
+    ],
+    "mark_weight": "106251/800000",
+    "marks": [
+      [
+        "3152/3175",
+        "2336/3175"
+      ],
+      [
+        "2336/3175",
+        "3152/3175"
+      ]
+    ],
+    "missing_mark_count": 0,
+    "named_strict_inequality_holds": false,
+    "owner_count": 1,
+    "parent": [
+      [
+        "0",
+        "0"
+      ],
+      [
+        "1",
+        "0"
+      ],
+      [
+        "1",
+        "1"
+      ],
+      [
+        "0",
+        "1"
+      ]
+    ],
+    "parent_axis": [
+      "1",
+      "0"
+    ],
+    "required_absent_labels": [
+      0,
+      15
+    ],
+    "role": "C",
+    "selected_axis": [
+      "1",
+      "0"
+    ],
+    "surplus": "3/800000"
+  }
+}

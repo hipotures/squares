@@ -12,6 +12,7 @@ from devtools import check_synopsis
 from devtools.check_synopsis import (
     check_case_interval,
     check_covering_value_reports,
+    check_current_research_status,
     check_experiment_scope_claims,
     check_round_effort_claims,
     check_unprotected_fix_claims,
@@ -24,7 +25,22 @@ from devtools.check_synopsis import (
     select_latest_terminal_session,
     session_handoff_key,
     spell,
+    terminal_end_time_problems,
 )
+
+
+def test_current_research_status_rejects_a_stale_source_count() -> None:
+    rows = check_synopsis.current_research_status_rows()
+    table = "\n".join(f"| {label} | {total} | {state} |" for label, total, state in rows)
+    current = f"{check_synopsis.STATUS_BEGIN}\n{table}\n{check_synopsis.STATUS_END}"
+
+    assert check_current_research_status(current) == []
+    stale = current.replace(f"| {rows[0][0]} | {rows[0][1]} |", f"| {rows[0][0]} | 0 |", 1)
+    assert check_current_research_status(stale)
+    duplicate = current.replace(
+        check_synopsis.STATUS_END, f"{table}\n{check_synopsis.STATUS_END}"
+    )
+    assert check_current_research_status(duplicate)
 
 
 def _unmeasured_handoff(role: str = "administrative_closeout") -> dict:
@@ -33,6 +49,7 @@ def _unmeasured_handoff(role: str = "administrative_closeout") -> dict:
         "status": "stopped",
         "started_at": "2026-09-07T17:00:00Z",
         "deadline_at": "2026-09-10T15:20:00Z",
+        "ended_at": "2026-09-10T15:10:00Z",
         "resource_usage_unmeasured": {
             "reason": "native_harness_data_unavailable",
             "detail": "The native harness input is no longer available.",
@@ -83,14 +100,16 @@ def test_handoff_target_accepts_one_standalone_bead_after_an_agenda() -> None:
         select_handoff_target(items, "Choose think-first or think-second")
 
 
-def test_handoff_chronology_uses_terminal_clock_before_start_order() -> None:
+def test_handoff_chronology_uses_observed_end_before_start_order() -> None:
     coordinator = {
         "started_at": "2026-09-02T05:03:00Z",
         "deadline_at": "2026-09-02T15:03:00Z",
+        "ended_at": "2026-09-02T14:50:00Z",
     }
     later_lane = {
         "started_at": "2026-09-02T08:23:00Z",
         "deadline_at": "2026-09-02T11:23:00Z",
+        "ended_at": "2026-09-02T11:20:00Z",
     }
 
     assert session_handoff_key(coordinator, 78) > session_handoff_key(later_lane, 82)
@@ -101,6 +120,7 @@ def test_latest_handoff_ignores_live_session_with_later_deadline() -> None:
         "status": "stopped",
         "started_at": "2026-09-02T05:03:00Z",
         "deadline_at": "2026-09-02T15:03:00Z",
+        "ended_at": "2026-09-02T14:50:00Z",
     }
     live = {
         "status": "in_progress",
@@ -122,6 +142,7 @@ def test_late_administrative_closeout_does_not_displace_research_handoff() -> No
         "status": "completed",
         "started_at": "2026-09-09T22:52:40Z",
         "deadline_at": "2026-09-10T02:52:40Z",
+        "ended_at": "2026-09-10T02:40:00Z",
     }
     administrative = _unmeasured_handoff()
 
@@ -134,12 +155,13 @@ def test_late_administrative_closeout_does_not_displace_research_handoff() -> No
     ) == (Path("session-124-research.md"), research)
 
 
-def test_unmeasured_work_handoff_keeps_terminal_clock_ordering() -> None:
+def test_unmeasured_work_handoff_keeps_observed_end_ordering() -> None:
     earlier = {
         "id": "session-124",
         "status": "completed",
         "started_at": "2026-09-09T22:52:40Z",
         "deadline_at": "2026-09-10T02:52:40Z",
+        "ended_at": "2026-09-10T02:40:00Z",
     }
     work_handoff = _unmeasured_handoff("work_handoff")
 
@@ -158,6 +180,7 @@ def test_malformed_administrative_marker_cannot_hide_a_handoff() -> None:
         "status": "completed",
         "started_at": "2026-09-09T22:52:40Z",
         "deadline_at": "2026-09-10T02:52:40Z",
+        "ended_at": "2026-09-10T02:40:00Z",
     }
     malformed = _unmeasured_handoff()
     del malformed["resource_usage_unmeasured"]["detail"]
@@ -173,6 +196,41 @@ def test_malformed_administrative_marker_cannot_hide_a_handoff() -> None:
     extra_field = _unmeasured_handoff()
     extra_field["resource_usage_unmeasured"]["inferred_from_prose"] = True
     assert not is_administrative_unmeasured_closeout(extra_field)
+
+
+def test_new_terminal_handoff_requires_valid_observed_end_time() -> None:
+    path = Path("session-128-new.md")
+    terminal = {
+        "status": "stopped",
+        "started_at": "2026-09-14T20:28:00Z",
+        "deadline_at": "2026-09-14T23:28:00Z",
+    }
+
+    assert terminal_end_time_problems([(path, terminal)]) == [
+        (
+            "session-128-new.md: terminal session needs offset-aware ended_at; "
+            "deadline_at is only a plan"
+        )
+    ]
+    terminal["ended_at"] = "2026-09-14T20:00:00Z"
+    assert terminal_end_time_problems([(path, terminal)]) == [
+        "session-128-new.md: ended_at is before started_at"
+    ]
+    terminal["ended_at"] = "2026-09-14T21:03:24Z"
+    assert terminal_end_time_problems([(path, terminal)]) == []
+
+
+def test_handoff_chronology_compares_offsets_as_instants() -> None:
+    earlier = {
+        "started_at": "2026-09-14T09:00:00+02:00",
+        "ended_at": "2026-09-14T12:00:00+02:00",
+    }
+    later = {
+        "started_at": "2026-09-14T09:00:00Z",
+        "ended_at": "2026-09-14T10:30:00Z",
+    }
+
+    assert session_handoff_key(later, 129) > session_handoff_key(earlier, 128)
 
 
 def test_latest_closeout_uses_newest_terminal_agenda(tmp_path: Path) -> None:

@@ -2,7 +2,7 @@
 
 # Agenda map
 
-326 agenda commitments across 34 agendas, as declared in each agenda's own frontmatter.
+341 agenda commitments across 35 agendas, as declared in each agenda's own frontmatter.
 Source of truth is [`agendas/`](agendas/); this view is regenerated, never edited.
 
 An agenda's queue owns priority ordering, so this map preserves each agenda's
@@ -10,7 +10,7 @@ order rather than imposing one across them.
 
 ## The short version
 
-- **8** in_progress, **17** ready, **11** tentative, **64** blocked, **57** stopped, **169** complete.
+- **7** in_progress, **16** ready, **22** tentative, **64** blocked, **59** stopped, **173** complete.
 
 - **23 blocked commitments carry a manual condition** (`BC-016`, `BC-025`, `BC-033`, `BC-050`, `BC-115`, `BC-170`, `BC-204`, `BC-205`, `BC-212`, `BC-207`, `BC-208`, `BC-209`, `BC-215`, `BC-217`, `BC-221`, `BC-238`, `BC-248`, `BC-270`, `BC-306`, `BC-337`, `BC-327`, `BC-329`, `BC-330`). Dependency edges alone cannot make these ready; each condition is named in the table below and must be explicitly cleared.
 
@@ -53,9 +53,18 @@ Commitments a session may take now, in each agenda's declared order.
 | agenda-027 | `BC-266` | tentative | 3 | insight | research | Does the shared certificate interface make a complete two-angle family under H-113 worth attempting, with… | `think-bgsz` |
 | agenda-028 | `BC-272` | tentative | 2 | insight | research | Does retaining the common anchor remove a diagnosed H119 correlation loss? | `think-cy6g` |
 | agenda-028 | `BC-274` | tentative | 2 | insight | research | What concrete implication could establish or obstruct the existential H121 normal form? | `think-5hmt` |
-| agenda-035 | `BC-335` | in_progress | 1 | correctness | tool_validation | Does the standalone explainer state the point-only, threshold and dilation-limit proofs accurately, and does… | `think-0zc1` |
-| agenda-035 | `BC-331` | ready | 2 | insight | research | Does full-support pricing expose an absent D4 site orbit missed by the first 32 positive dual rows? | `think-lkvd` |
-| agenda-035 | `BC-333` | ready | 2 | efficiency | measurement_validation | Are the selected blocks producing reusable evidence without repeated parsing, gates or source repair? | `think-1ydi` |
+| agenda-036 | `BC-346` | ready | 0 | process | tool_validation | Given the reconciled state, is the validation-efficiency checkpoint due, and which one entry from the… | `think-9y7p` |
+| agenda-036 | `BC-340` | tentative | 0 | efficiency | measurement_validation | Does the four-to-eight-block cadence make an efficiency checkpoint due, and if so what one demonstrated… | `think-1ydi` |
+| agenda-036 | `BC-341` | tentative | 1 | insight | research | At side 3.84, can one complete difficult occupancy or wall-contact root family be closed by proved capacity… | `think-9y6q` |
+| agenda-036 | `BC-342` | tentative | 1 | insight | research | Does a sound theta-prime or level-two pairwise relaxation pass the n=6 formulation controls and improve… | `think-ol1z` |
+| agenda-036 | `BC-343` | tentative | 1 | insight | research | Can the T-025/T-026 witness at side 3.82 be compressed into a small exact certificate described by a few… | `think-a1e8` |
+| agenda-036 | `BC-348` | tentative | 1 | insight | research | Do H-131's proved aggregate angle-count caps, admitted as coherent global resources, remove the retained… | `think-u15l` |
+| agenda-036 | `BC-344` | tentative | 2 | insight | research | Can a robust orientation-class theorem rule out every two-orientation packing below Trump's recorded side,… | `think-29ch` |
+| agenda-036 | `BC-349` | tentative | 2 | insight | research | Can a weighted motif, genuinely multilevel floor atom, or higher-rank composition strictly dominate ordinary… | `think-o4p9` |
+| agenda-036 | `BC-352` | tentative | 2 | insight | research | Can joint-parent geometry lower the ordinary budget of one atom by proving that two simultaneous physical… | `think-iy9h` |
+| agenda-036 | `BC-350` | tentative | 2 | insight | research | Can one uniform boundary-capacity or deformation lemma for L = 4 - epsilon turn the open n12 bracket into a… | `think-0z9b` |
+| agenda-036 | `BC-345` | tentative | 3 | insight | research | What competing local optima appear under a serious orientation-profile-organized n=11 search, and can any… | `think-7n2w` |
+| agenda-036 | `BC-351` | tentative | 3 | insight | research | Can an orientation-sensitive two- or three-parent gap lemma be summed without double counting to prove… | `think-gzjq` |
 
 ## Blocked, and on what
 
@@ -123,7 +132,7 @@ A commitment blocked by other commitments names them; one blocked by something e
 | agenda-028 | `BC-270` | 0 | — | no | A natural finite same-domain geometric baseline and exact LP survival witness are missing; the accepted central… |
 | agenda-028 | `BC-271` | 1 | `BC-270`, `BC-261` | no | — |
 | agenda-031 | `BC-306` | 1 | — | no | Fresh forward launch allocation after the owner-prioritized BC-309 pilot; exp-134 was never invoked and its original… |
-| agenda-035 | `BC-329` | 1 | `BC-325` | yes | The existing adaptive refinement CLI does not execute the declared fixed-core packet and has no process deadline. Child… |
+| agenda-035 | `BC-329` | 1 | `BC-325` | yes | The target-free calibration producer is accepted, and the observed-topology, three-profile coordinator, and… |
 | agenda-035 | `BC-337` | 2 | `BC-326` | yes | No admitted source-bound constructor derives K_TR from all 181 frames and eight signed SAT axes per frame, and no… |
 | agenda-035 | `BC-327` | 2 | `BC-325` | yes | Multiplicity semantics are not admitted across the producer, loader, capacity reader and both coverage routes; the… |
 | agenda-035 | `BC-330` | 2 | — | no | The restricted-domain threshold gate and complete matched point baseline are not admitted. |
@@ -183,7 +192,8 @@ A commitment whose exit another agenda's commitment satisfied. Recorded as an ed
 | agenda-031 | paused |  |  |  | 1 | 2 | 2 | 5 |
 | agenda-032 | completed |  |  |  |  |  | 6 | 6 |
 | agenda-033 | completed |  |  |  |  | 1 | 8 | 9 |
-| agenda-035 | active | 1 | 2 |  | 4 |  | 6 | 13 |
+| agenda-035 | paused |  |  |  | 4 | 2 | 8 | 14 |
+| agenda-036 | active |  | 1 | 11 |  |  | 2 | 14 |
 
 ## By program
 
@@ -276,15 +286,16 @@ Open frontier: `BC-261`, `BC-262`, `BC-263`, `BC-264`, `BC-266`, `BC-267`, `BC-2
 | agenda-035 | `BC-328` | complete | What is the strongest provable boundary-contact, corner-owner or finite-alternative normal form for… |
 | agenda-035 | `BC-329` | blocked | Can one changed strict-core and direction-net packet yield a verified dilation limit above T026? |
 | agenda-035 | `BC-330` | blocked | Can threshold charges cover one proved four-owner residual class with budget below seven? |
-| agenda-035 | `BC-331` | ready | Does full-support pricing expose an absent D4 site orbit missed by the first 32 positive dual rows? |
+| agenda-035 | `BC-331` | stopped | Does full-support pricing expose an absent D4 site orbit missed by the first 32 positive dual rows? |
 | agenda-035 | `BC-332` | complete | Should the explainer preserve T018 as its worked example and append the T025/T026 result, or should… |
-| agenda-035 | `BC-333` | ready | Are the selected blocks producing reusable evidence without repeated parsing, gates or source… |
+| agenda-035 | `BC-333` | stopped | Are the selected blocks producing reusable evidence without repeated parsing, gates or source… |
 | agenda-035 | `BC-334` | complete | Can the selected incremental architecture be rendered as a self-contained explainer whose headline… |
 | agenda-035 | `BC-336` | complete | Can the current explainer be labeled v0.4.0 with a concise, source-bound history of the v0.3.0 and… |
-| agenda-035 | `BC-335` | in_progress | Does the standalone explainer state the point-only, threshold and dilation-limit proofs accurately,… |
+| agenda-035 | `BC-335` | complete | Does the standalone explainer state the point-only, threshold and dilation-limit proofs accurately,… |
 | agenda-035 | `BC-337` | blocked | Does substituting the exact TR all-owner-incompatible centre-space obstacle K_TR for the control… |
+| agenda-035 | `BC-338` | complete | Does the named universal bottom-left role-C inequality S(X) > epsilon survive the already disclosed… |
 
-Open frontier: `BC-327`, `BC-329`, `BC-330`, `BC-331`, `BC-333`, `BC-335`, `BC-337`.
+Open frontier: `BC-327`, `BC-329`, `BC-330`, `BC-337`.
 
 ### `n11-density-stationarity-trump-capture`
 
@@ -343,6 +354,27 @@ Open frontier: `BC-270`, `BC-271`, `BC-272`, `BC-274`.
 | agenda-024 | `BC-250` | complete | Which reviewed mathematical directions justify the next parallel work, and are their hypotheses,… |
 
 Open frontier: `BC-221`, `BC-222`, `BC-223`, `BC-224`, `BC-225`.
+
+### `n11-strategy-reset`
+
+| agenda | id | state | question |
+| --- | --- | --- | --- |
+| agenda-036 | `BC-339` | complete | Can the post-merge agendas, sessions, explorations, hypotheses, experiments, frontier results,… |
+| agenda-036 | `BC-347` | complete | Which mathematically distinct approaches have a credible path to significant progress on n=11 or… |
+| agenda-036 | `BC-346` | ready | Given the reconciled state, is the validation-efficiency checkpoint due, and which one entry from… |
+| agenda-036 | `BC-340` | tentative | Does the four-to-eight-block cadence make an efficiency checkpoint due, and if so what one… |
+| agenda-036 | `BC-341` | tentative | At side 3.84, can one complete difficult occupancy or wall-contact root family be closed by proved… |
+| agenda-036 | `BC-342` | tentative | Does a sound theta-prime or level-two pairwise relaxation pass the n=6 formulation controls and… |
+| agenda-036 | `BC-343` | tentative | Can the T-025/T-026 witness at side 3.82 be compressed into a small exact certificate described by… |
+| agenda-036 | `BC-344` | tentative | Can a robust orientation-class theorem rule out every two-orientation packing below Trump's… |
+| agenda-036 | `BC-345` | tentative | What competing local optima appear under a serious orientation-profile-organized n=11 search, and… |
+| agenda-036 | `BC-348` | tentative | Do H-131's proved aggregate angle-count caps, admitted as coherent global resources, remove the… |
+| agenda-036 | `BC-349` | tentative | Can a weighted motif, genuinely multilevel floor atom, or higher-rank composition strictly dominate… |
+| agenda-036 | `BC-350` | tentative | Can one uniform boundary-capacity or deformation lemma for L = 4 - epsilon turn the open n12… |
+| agenda-036 | `BC-351` | tentative | Can an orientation-sensitive two- or three-parent gap lemma be summed without double counting to… |
+| agenda-036 | `BC-352` | tentative | Can joint-parent geometry lower the ordinary budget of one atom by proving that two simultaneous… |
+
+Open frontier: `BC-346`, `BC-340`, `BC-341`, `BC-342`, `BC-343`, `BC-344`, `BC-345`, `BC-348`, `BC-349`, `BC-350`, `BC-351`, `BC-352`.
 
 ### `n11-structure-and-conditional-dots`
 

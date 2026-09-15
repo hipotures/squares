@@ -13,7 +13,7 @@ hypothesis:
     container is inflated, not by the annealing that follows. Varying the start produces a
     wider spread of `closed` than varying the schedule does.
   lane: search
-  derived_from: [X-029]
+  derived_from: [X-034]
   criterion:
     shape: conditions
     metric: the spread of median `closed` across a start sweep against across a schedule sweep
