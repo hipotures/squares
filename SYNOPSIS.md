@@ -138,8 +138,8 @@ hypothesis status and summarizes experiment verdicts, and the
 | Record | Count | State at the cutoff |
 | --- | ---: | --- |
 | Agendas | 35 | 15 active; 14 completed; 5 paused; 1 superseded |
-| Commitments | 343 | 176 complete; 59 stopped; 64 blocked; 16 ready; 21 tentative; 7 in progress |
-| Sessions | 132 | 84 completed; 48 stopped; all terminal |
+| Commitments | 343 | 176 complete; 59 stopped; 64 blocked; 15 ready; 21 tentative; 8 in progress |
+| Sessions | 133 | 84 completed; 48 stopped; 1 nonterminal |
 | Explorations | 29 | 17 linked to proposed hypotheses; 12 uncodified |
 | Hypotheses | 138 | 25 confirmed; 24 refuted; 48 blocked; 10 unresolved; 2 open; 26 open questions; 2 result registered; 1 abandoned; 0 running |
 | Experiments | 116 | 38 accepted; 29 rejected; 25 unresolved; 11 baseline; 11 blocked; 2 abandoned; 0 in progress |
@@ -879,7 +879,11 @@ transfer against the retained mathematical audit.
 The selected entry is Route A admission at side `96/25`, with Route S as the explicit
 fallback if the complete physical root and checker cannot be frozen.
 The planning block ran no scientific target.
-The scientific evidence cutoff remains main revision
+[Session 133](packing/campaign/agent-sessions/session-133-n11-route-a-admission.md) is
+running BC-354 from planning merge `a9de8a705d785e5b7b6ac46f28c11b6f5a45d7c6`. It is
+freezing the complete negative-availability domain, all 80 incidence strata, shared
+parent/core variables, matched controls, and an independent exact checker before any
+target can run. The scientific evidence cutoff remains main revision
 `80bcdbb0819504354e1278c37f211dd8cc2158fb`, where the latest merged stack is green and
 the T-026 lower bound remains the frontier.
 

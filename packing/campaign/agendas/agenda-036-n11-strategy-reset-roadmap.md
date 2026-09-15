@@ -254,7 +254,7 @@ agenda:
     purpose: tool_validation
     owner_focus: process
     instances: [11]
-    state: ready
+    state: in_progress
     priority: 0
     question: >-
       Can one complete same-corner availability-blocker root at side 96/25 be frozen
