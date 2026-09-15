@@ -23,7 +23,9 @@ from workbench_tools.cohort_manifest import (
 )
 from workbench_tools.trial_records import (
     AttemptFailure,
+    BeatTiming,
     EffectiveConfiguration,
+    PhysicsLaw,
     RepairReceipt,
     SourceReceipt,
     Trial,
@@ -31,6 +33,23 @@ from workbench_tools.trial_records import (
     attempt_to_json,
     canonical_reference,
 )
+
+
+def configuration(
+    seed: int, *, anneal: int = 3, rigidity: float = 0.15
+) -> EffectiveConfiguration:
+    """A browser configuration with the law and beat a trial must record."""
+    return EffectiveConfiguration(
+        style="bodies",
+        mode="blind",
+        seed=seed,
+        inflate=1.12,
+        anneal=anneal,
+        pair_law=PhysicsLaw(rigidity=rigidity, repulsion=2500, attraction=0, range=0),
+        wall_law=PhysicsLaw(rigidity=0.25, repulsion=2500, attraction=0, range=0),
+        timing=BeatTiming(dwell=0.6, move=0.8, correct=0.25, settle=0.4),
+        anneal_span=0.95,
+    )
 
 
 def _trial(seed: int, *, reached: bool = True) -> Trial:
@@ -259,7 +278,7 @@ def _verified_trial(seed: int = 0) -> Trial:
     return replace(
         _trial(seed),
         record_source=canonical_reference(5).source,
-        configuration=EffectiveConfiguration("bodies", "blind", seed, 1.12, 3),
+        configuration=configuration(seed),
         source=SourceReceipt(
             commit="a" * 40,
             dirty=False,
@@ -363,9 +382,12 @@ def test_identical_overrides_cannot_hide_different_effective_defaults() -> None:
         block_report.summarize_cohort(cohort, [first, changed], tolerance_pct=0.001)
 
 
-def test_clean_browser_trial_fixture_reproduces_its_disjoint_block_report(
+def test_the_v1_browser_fixture_is_refused_until_it_records_its_law_and_beat(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    # Interim: the retained rows were collected before a configuration recorded its pair law
+    # and beat, so they are refused. The fixture is re-collected from a published commit that
+    # records them, and this test then compares the report again.
     fixture = Path(__file__).parent / "fixtures/benchmark-foundation"
     output = tmp_path / "report.json"
     monkeypatch.setattr(
@@ -382,12 +404,11 @@ def test_clean_browser_trial_fixture_reproduces_its_disjoint_block_report(
     )
     assert block_report.main() == 0
     observed = json.loads(output.read_text(encoding="utf-8"))
-    expected = json.loads((fixture / "report.json").read_text(encoding="utf-8"))
-    assert observed == expected
     assert observed["purpose"] == "software-validation"
     cohort = observed["cohorts"][0]
-    assert cohort["counts"]["accepted"] == 6
-    assert [block["seeds"] for block in cohort["blocks"]] == [[0, 1], [2, 3], [4, 5]]
+    assert cohort["counts"]["accepted"] == 0
+    assert cohort["rejection_reasons"] == {"unsupported-configuration-contract": 6}
+    assert cohort["effective_configuration"] is None
 
 
 @pytest.mark.parametrize("token", ["NaN", "Infinity", "-Infinity"])
@@ -444,3 +465,12 @@ def test_raw_benchmark_failure_rows_count_only_as_the_manifests_failed_attempts(
         else:
             with pytest.raises(ValueError, match="not a failed attempt"):
                 block_report.main()
+
+
+def test_a_cohort_cannot_pool_trials_run_under_different_pair_laws() -> None:
+    first = _verified_trial(0)
+    second = replace(_verified_trial(1), configuration=configuration(1, rigidity=0.35))
+    assert admission_reason(second) is None
+    cohort = _cohort((Attempt(0, AttemptStatus.COMPLETED), Attempt(1, AttemptStatus.COMPLETED)))
+    with pytest.raises(ValueError, match="one effective configuration"):
+        block_report.summarize_cohort(cohort, [first, second], tolerance_pct=0.001)

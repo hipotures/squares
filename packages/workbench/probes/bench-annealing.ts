@@ -1,6 +1,8 @@
 import type {
+  AtlasLaw,
   AtlasSimMode,
   AtlasStyle,
+  AtlasTiming,
   AtlasTransitions,
   WorkbenchApiHost,
 } from "../src/api/workbench-api.ts";
@@ -25,6 +27,13 @@ export interface TrialResult {
     seed: number;
     inflate: number;
     anneal: number;
+    /** The pair law the trajectory ran under; trials before and after a law change differ here. */
+    pairLaw: AtlasLaw;
+    wallLaw: AtlasLaw;
+    /** The page's beat, which sets how many physics steps a trajectory takes. */
+    timing: AtlasTiming;
+    /** The annealed moving span of this trajectory, in seconds. */
+    annealSpan: number;
   };
   excess: number;
   side: number;
@@ -177,14 +186,36 @@ export function runTrial(
   const repaired = fitted(resolved.poses);
   const repairedAssessment = measured(repaired);
   const repairMs = performance.now() - repairStarted;
+  const state = api.state();
+  const law = api.law();
+  const wallLaw = api.wallLaw();
 
   return {
     configuration: {
       style: result.style,
       mode: result.mode,
       seed: api.seed(),
-      inflate: api.state().blindInflate,
+      inflate: state.blindInflate,
       anneal: result.anneal,
+      pairLaw: {
+        rigidity: law.rigidity,
+        repulsion: law.repulsion,
+        attraction: law.attraction,
+        range: law.range,
+      },
+      wallLaw: {
+        rigidity: wallLaw.rigidity,
+        repulsion: wallLaw.repulsion,
+        attraction: wallLaw.attraction,
+        range: wallLaw.range,
+      },
+      timing: {
+        dwell: state.timing.dwell,
+        move: state.timing.move,
+        correct: state.timing.correct,
+        settle: state.timing.settle,
+      },
+      annealSpan: result.annealSpan,
     },
     excess: result.miss.excess,
     side: rawAssessment.requiredSide,

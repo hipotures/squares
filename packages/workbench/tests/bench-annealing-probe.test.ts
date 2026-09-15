@@ -6,8 +6,14 @@ import { assessPackingSnapshot, PACKING_VALIDITY } from "../src/core/runtime-con
 
 type Pose = [number, number, number];
 
+const PAIR_LAW = { rigidity: 0.35, repulsion: 950, attraction: 80, range: 0.15 };
+const WALL_LAW = { rigidity: 0.25, repulsion: 2500, attraction: 0, range: 0 };
+const TIMING = { dwell: 0.6, move: 0.9, correct: 0.25, settle: 0.4 };
+
 function hostWith(final: Pose[], pairN = final.length - 1): WorkbenchApiHost {
   const api = {
+    law: () => ({ ...PAIR_LAW, steep: 0, key: "law" }),
+    wallLaw: () => ({ ...WALL_LAW }),
     setSeed: (seed: unknown) => Number(seed),
     seed: () => 17,
     setBlindInflate: () => 0,
@@ -21,8 +27,9 @@ function hostWith(final: Pose[], pairN = final.length - 1): WorkbenchApiHost {
       final,
       miss: { excess: 0, side: 2, record: 2, centre: 0, angle: 0 },
       steps: 12,
+      annealSpan: 1.15,
     }),
-    state: () => ({ blindInflate: 1 }),
+    state: () => ({ blindInflate: 1, timing: { ...TIMING } }),
   } as unknown as AtlasTransitions;
   return { atlasTransitions: api };
 }
@@ -54,6 +61,10 @@ test("a typed trial preserves valid geometry and reports its independent measure
     seed: 17,
     inflate: 1,
     anneal: 0,
+    pairLaw: PAIR_LAW,
+    wallLaw: WALL_LAW,
+    timing: TIMING,
+    annealSpan: 1.15,
   });
   assert.equal(response.physicsMs, 3);
   assert.equal(response.repairSweeps, 1);

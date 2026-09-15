@@ -11,6 +11,11 @@ The six n=5 trials used seeds 0–5, bodies, inflation 1.12, anneal 3 and a 60-s
 launch budget.
 All six completed and passed repaired-geometry admission; none reached the
 retained reference within the report tolerance.
+
+**Superseded rows (2026-09-14).** These rows use `AnnealingConfiguration/v1`, which
+records no pair law or beat, so admission now refuses all six as
+`unsupported-configuration-contract` and the regression test asserts exactly that.
+The fixture is being re-collected from a published commit whose rows record both.
 Their source, page digest, effective configuration, browser/runtime, exact poses and
 measured costs are in [trials.jsonl](trials.jsonl).
 The manifest groups them into three disjoint blocks of two.

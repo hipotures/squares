@@ -18,6 +18,7 @@ from workbench_tools.cohort_manifest import (
     strict_json,
 )
 from workbench_tools.trial_records import (
+    CONFIGURATION_CONTRACT,
     AttemptFailure,
     Trial,
     admission_reason,
@@ -84,7 +85,12 @@ def summarize_cohort(
             raise ValueError(f"duplicate trial seed {trial.seed} in {cohort.identifier}")
         if trial.n != cohort.n or trial.style != cohort.style or trial.params != cohort.params:
             raise ValueError(f"trial configuration differs from cohort {cohort.identifier}")
-        if trial.configuration is not None:
+        # A configuration under a superseded contract is refused by admission and recorded no
+        # law or beat, so it is neither compared with nor reported as the cohort's.
+        if (
+            trial.configuration is not None
+            and trial.configuration.contract == CONFIGURATION_CONTRACT
+        ):
             effective = trial.configuration.row()
             del effective["seed"]
             if effective_configuration is None:

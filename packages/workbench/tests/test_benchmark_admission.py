@@ -14,8 +14,10 @@ from devtools.known_structure import record
 from workbench_tools import benchmark as bench
 from workbench_tools.trial_records import (
     VALIDITY_TOLERANCE,
+    BeatTiming,
     EffectiveConfiguration,
     PackingReference,
+    PhysicsLaw,
     RepairReceipt,
     SourceReceipt,
     Trial,
@@ -29,6 +31,23 @@ from workbench_tools.trial_records import (
     trial_from_row,
     trial_to_json,
 )
+
+
+def configuration(
+    seed: int, *, anneal: int = 3, rigidity: float = 0.15
+) -> EffectiveConfiguration:
+    """A browser configuration with the law and beat a trial must record."""
+    return EffectiveConfiguration(
+        style="bodies",
+        mode="blind",
+        seed=seed,
+        inflate=1.12,
+        anneal=anneal,
+        pair_law=PhysicsLaw(rigidity=rigidity, repulsion=2500, attraction=0, range=0),
+        wall_law=PhysicsLaw(rigidity=0.25, repulsion=2500, attraction=0, range=0),
+        timing=BeatTiming(dwell=0.6, move=0.8, correct=0.25, settle=0.4),
+        anneal_span=0.95,
+    )
 
 
 def _source() -> SourceReceipt:
@@ -74,9 +93,7 @@ def _trial(n: int = 5, *, seed: int = 0) -> Trial:
         poses=poses,
         resolved_poses=poses,
         record_source=reference.source,
-        configuration=EffectiveConfiguration(
-            style="bodies", mode="blind", seed=seed, inflate=1.12, anneal=3
-        ),
+        configuration=configuration(seed),
         source=_source(),
         repair=RepairReceipt(
             sweeps=0,
@@ -225,6 +242,10 @@ def test_browser_probe_adapter_requires_exact_fields_and_preserves_receipts() ->
             "seed": 0,
             "inflate": 1.12,
             "anneal": 3,
+            "pairLaw": {"rigidity": 0.15, "repulsion": 2500, "attraction": 0, "range": 0},
+            "wallLaw": {"rigidity": 0.25, "repulsion": 2500, "attraction": 0, "range": 0},
+            "timing": {"dwell": 0.6, "move": 0.8, "correct": 0.25, "settle": 0.4},
+            "annealSpan": 0.95,
         },
         "excess": good.excess,
         "side": good.side,
@@ -448,3 +469,38 @@ def test_a_written_row_says_whether_each_side_belongs_to_a_packing() -> None:
     assert overlapping.row()["resolved_valid"] is False
     assert replace(good, resolved_poses=None).row()["resolved_valid"] is False
     assert trial_from_json(trial_to_json(overlapping)) == overlapping
+
+
+def test_a_configuration_without_its_pair_law_and_timing_is_refused() -> None:
+    good = _trial()
+    row = good.row()
+    legacy = cast(dict[str, object], row["configuration"])
+    for recorded in ("pair_law", "wall_law", "timing", "anneal_span"):
+        del legacy[recorded]
+    legacy["contract"] = "packing.squares:AnnealingConfiguration/v1"
+    assert admission_reason(trial_from_row(row)) == "unsupported-configuration-contract"
+    assert good.configuration is not None
+    for broken in (
+        replace(
+            good.configuration, pair_law=replace(good.configuration.pair_law, rigidity=0.0)
+        ),
+        replace(good.configuration, timing=replace(good.configuration.timing, move=math.nan)),
+        replace(good.configuration, anneal_span=-1.0),
+    ):
+        assert admission_reason(replace(good, configuration=broken)) == (
+            "invalid-effective-configuration"
+        )
+
+
+def test_trials_under_different_pair_laws_stay_apart() -> None:
+    before = _trial(seed=0)
+    after = replace(_trial(seed=1), configuration=configuration(1, rigidity=0.35))
+    assert admission_reason(before) is None
+    assert admission_reason(after) is None
+    assert before.row()["configuration"] != {
+        **cast(dict[str, object], after.row()["configuration"]),
+        "seed": 0,
+    }
+    assert trial_from_json(trial_to_json(after)) == after
+    with pytest.raises(ValueError, match="mixes effective configurations"):
+        bench.replay_groups([before, after])

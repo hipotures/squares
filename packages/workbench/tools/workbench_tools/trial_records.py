@@ -22,7 +22,7 @@ from workbench_tools.packing_contracts import (
 )
 
 TRIAL_CONTRACT = "packing.squares:AnnealingTrial/v2"
-CONFIGURATION_CONTRACT = "packing.squares:AnnealingConfiguration/v1"
+CONFIGURATION_CONTRACT = "packing.squares:AnnealingConfiguration/v2"
 SOURCE_CONTRACT = "packing.squares:WorkbenchSource/v1"
 REPAIR_CONTRACT = "packing.squares:OverlapRepair/v1"
 ATTEMPT_FAILURE_CONTRACT = "packing.squares:AnnealingAttemptFailure/v1"
@@ -100,14 +100,58 @@ def gap_closed(n: int, record: float, excess: float) -> float | None:
 
 
 @dataclass(frozen=True, slots=True)
+class PhysicsLaw:
+    """One force law as the page ran it: the pair law or the wall law."""
+
+    rigidity: float
+    repulsion: float
+    attraction: float
+    range: float
+
+    def row(self) -> dict[str, object]:
+        return {
+            "rigidity": self.rigidity,
+            "repulsion": self.repulsion,
+            "attraction": self.attraction,
+            "range": self.range,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class BeatTiming:
+    """The page's beat in seconds, which sets how many physics steps a trajectory takes."""
+
+    dwell: float
+    move: float
+    correct: float
+    settle: float
+
+    def row(self) -> dict[str, object]:
+        return {
+            "dwell": self.dwell,
+            "move": self.move,
+            "correct": self.correct,
+            "settle": self.settle,
+        }
+
+
+@dataclass(frozen=True, slots=True)
 class EffectiveConfiguration:
-    """The browser settings actually used after its setters applied their contracts."""
+    """The browser settings actually used after its setters applied their contracts.
+
+    Version 2 adds the pair and wall laws, the beat and the annealed span, so trials run
+    before and after a change of the page's defaults are told apart by more than the commit.
+    """
 
     style: str
     mode: str
     seed: int
     inflate: float
     anneal: int
+    pair_law: PhysicsLaw
+    wall_law: PhysicsLaw
+    timing: BeatTiming
+    anneal_span: float
     contract: str = CONFIGURATION_CONTRACT
 
     def row(self) -> dict[str, object]:
@@ -118,6 +162,10 @@ class EffectiveConfiguration:
             "seed": self.seed,
             "inflate": self.inflate,
             "anneal": self.anneal,
+            "pair_law": self.pair_law.row(),
+            "wall_law": self.wall_law.row(),
+            "timing": self.timing.row(),
+            "anneal_span": self.anneal_span,
         }
 
 
@@ -520,7 +568,17 @@ def trial_from_probe(
     if style not in {"physics", "bodies"}:
         raise ValueError("trial style is unsupported")
     configuration_row = _mapping(row["configuration"])
-    configuration_fields = {"style", "mode", "seed", "inflate", "anneal"}
+    configuration_fields = {
+        "style",
+        "mode",
+        "seed",
+        "inflate",
+        "anneal",
+        "pairLaw",
+        "wallLaw",
+        "timing",
+        "annealSpan",
+    }
     if configuration_row is None or set(configuration_row) != configuration_fields:
         raise ValueError("browser effective configuration is malformed")
     configuration = EffectiveConfiguration(
@@ -529,6 +587,12 @@ def trial_from_probe(
         seed=_required_integer(configuration_row["seed"], "configuration.seed"),
         inflate=_required_number(configuration_row["inflate"], "configuration.inflate"),
         anneal=_required_integer(configuration_row["anneal"], "configuration.anneal"),
+        pair_law=_required_law(configuration_row["pairLaw"], "configuration.pairLaw"),
+        wall_law=_required_law(configuration_row["wallLaw"], "configuration.wallLaw"),
+        timing=_required_timing(configuration_row["timing"], "configuration.timing"),
+        anneal_span=_required_number(
+            configuration_row["annealSpan"], "configuration.annealSpan"
+        ),
     )
     poses = pose_rows(row["poses"])
     resolved_poses = pose_rows(row["resolvedPoses"])
@@ -611,6 +675,10 @@ def configuration_from_row(value: object) -> EffectiveConfiguration | None:
         seed=_record_integer(row.get("seed")),
         inflate=_record_number(row.get("inflate")),
         anneal=_record_integer(row.get("anneal")),
+        pair_law=_record_law(row.get("pair_law")),
+        wall_law=_record_law(row.get("wall_law")),
+        timing=_record_timing(row.get("timing")),
+        anneal_span=_record_number(row.get("anneal_span")),
         contract=_record_string(row.get("contract")),
     )
 
@@ -692,6 +760,11 @@ def _configuration_reason(  # noqa: PLR0911 - preserves distinct configuration r
         or isinstance(configuration.anneal, bool)
         or not isinstance(configuration.anneal, int)
         or not 0 <= configuration.anneal <= 10
+        or not _sound_law(configuration.pair_law)
+        or not _sound_law(configuration.wall_law)
+        or not _sound_timing(configuration.timing)
+        or not _finite_number(configuration.anneal_span)
+        or configuration.anneal_span <= 0
     ):
         return "invalid-effective-configuration"
     if trial.params is None or set(trial.params) - {"inflate", "anneal"}:
@@ -925,3 +998,57 @@ def _passes_contract(
     return check_unit_square_packing(
         poses, side=side, expected_count=n, tolerance=VALIDITY_TOLERANCE
     ).passed
+
+
+def _record_law(value: object) -> PhysicsLaw:
+    row = _mapping(value) or {}
+    return PhysicsLaw(
+        rigidity=_record_number(row.get("rigidity")),
+        repulsion=_record_number(row.get("repulsion")),
+        attraction=_record_number(row.get("attraction")),
+        range=_record_number(row.get("range")),
+    )
+
+
+def _record_timing(value: object) -> BeatTiming:
+    row = _mapping(value) or {}
+    return BeatTiming(
+        dwell=_record_number(row.get("dwell")),
+        move=_record_number(row.get("move")),
+        correct=_record_number(row.get("correct")),
+        settle=_record_number(row.get("settle")),
+    )
+
+
+def _required_law(value: object, label: str) -> PhysicsLaw:
+    row = _mapping(value)
+    if row is None or set(row) != {"rigidity", "repulsion", "attraction", "range"}:
+        raise ValueError(f"{label} must be a law with exactly its four parameters")
+    return PhysicsLaw(
+        rigidity=_required_number(row["rigidity"], f"{label}.rigidity"),
+        repulsion=_required_number(row["repulsion"], f"{label}.repulsion"),
+        attraction=_required_number(row["attraction"], f"{label}.attraction"),
+        range=_required_number(row["range"], f"{label}.range"),
+    )
+
+
+def _required_timing(value: object, label: str) -> BeatTiming:
+    row = _mapping(value)
+    if row is None or set(row) != {"dwell", "move", "correct", "settle"}:
+        raise ValueError(f"{label} must be a beat with exactly its four spans")
+    return BeatTiming(
+        dwell=_required_number(row["dwell"], f"{label}.dwell"),
+        move=_required_number(row["move"], f"{label}.move"),
+        correct=_required_number(row["correct"], f"{label}.correct"),
+        settle=_required_number(row["settle"], f"{label}.settle"),
+    )
+
+
+def _sound_law(law: PhysicsLaw) -> bool:
+    values = (law.rigidity, law.repulsion, law.attraction, law.range)
+    return all(_finite_number(value) and value >= 0 for value in values) and law.rigidity > 0
+
+
+def _sound_timing(timing: BeatTiming) -> bool:
+    values = (timing.dwell, timing.move, timing.correct, timing.settle)
+    return all(_finite_number(value) and value >= 0 for value in values) and timing.move > 0
