@@ -1554,12 +1554,16 @@ def _workbench_frontend(context: Context) -> str:
     the repository without a hand-kept list of callers; the `browser code lives in files`
     step runs it too, so the edit tier sees it, and this run keeps the frontend job's own
     early failure.
+
+    The Motion Lab pages run here too, because this is the job with Chromium: four seconds
+    for both labs, and until think-6o9n nothing loaded them in a browser at all.
     """
     return _commands(
         context,
         (
             (sys.executable, "-m", "devtools.check_probes"),
             (sys.executable, "-m", "workbench_tools.check_frontend"),
+            (sys.executable, "-m", "devtools.check_motion_lab_pages"),
         ),
     )
 
@@ -2892,6 +2896,12 @@ _WORKBENCH_INPUTS = (
     "package-lock.json",
     ".node-version",
     "vendor/kpress/*",
+    # The Motion Lab pages the same step drives: their assets, renderers and checker.
+    "packing/src/sqpack/motion_lab/*",
+    "packing/devtools/render_packing_motion_lab.py",
+    "packing/devtools/render_general_motion_lab.py",
+    "packing/devtools/packing_motion_studies.py",
+    "packing/devtools/check_motion_lab_pages.py",
     *_TOOLCHAIN,
 )
 
