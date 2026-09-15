@@ -9,10 +9,12 @@ pose-space formulation in which no angle ever changed.
 from __future__ import annotations
 
 import math
+from typing import Any
 
 import numpy as np
 import pytest
 
+from devtools import map_optimum_stability, run_projection_ratchet
 from devtools.divide_and_concur import (
     corners_of,
     pair_separation,
@@ -22,7 +24,15 @@ from devtools.divide_and_concur import (
     violation,
 )
 from devtools.known_structure import record
-from devtools.run_projection_ratchet import Problem, guide_home, match_targets, solve
+from devtools.run_projection_ratchet import (
+    Outcome,
+    Problem,
+    guide_home,
+    match_targets,
+    solve,
+    verified_out_of_process,
+)
+from sqpack.verify import Report, corners_from_poses, float_sign, verify_packing
 
 
 def _poses(
@@ -102,6 +112,21 @@ def test_violation_is_zero_at_a_known_record() -> None:
     assert violation(poses, side * 0.999) > 1e-4
 
 
+@pytest.mark.parametrize("column", [0, 1, 2])
+def test_violation_refuses_a_nan_pose(column: int) -> None:
+    """A NaN is not a packing, and `max(0.0, nan)` used to say it was one."""
+    poses = np.array([[0.5, 0.5, 0.0], [1.5, 0.5, 0.0]])
+    assert violation(poses, 2.0) == 0.0, "the control: the finite pose is a packing"
+    poses[1, column] = math.nan
+    assert violation(poses, 2.0) == math.inf
+
+
+@pytest.mark.parametrize("side", [math.nan, math.inf])
+def test_violation_refuses_a_non_finite_side(side: float) -> None:
+    """An unbounded or undefined container contains everything and certifies nothing."""
+    assert violation(np.array([[0.5, 0.5, 0.0]]), side) == math.inf
+
+
 @pytest.mark.parametrize("beta", [0.3, 0.5])
 def test_a_solved_run_reports_an_exactly_feasible_packing(beta: float) -> None:
     """Whatever the search returns as solved is a packing, at the side it claims.
@@ -115,8 +140,12 @@ def test_a_solved_run_reports_an_exactly_feasible_packing(beta: float) -> None:
     for seed in range(30):
         out = solve(5, side, np.random.default_rng(seed), beta=beta, iters=8000, monotone=2000)
         if out.solved:
-            assert out.violation == 0.0 or out.violation <= 1e-9
-            assert violation(out.poses, side) <= 1e-9
+            # Asked of `sqpack.verify`, which the search does not share. Re-asking
+            # `violation` would repeat the very predicate `solve` stopped on.
+            assert np.isfinite(out.poses).all()
+            squares = corners_from_poses(out.poses[:, 0], out.poses[:, 1], out.poses[:, 2])
+            report = verify_packing(squares, side, sign=float_sign(1e-12))
+            assert report.valid, report.failures[:4]
             return
     pytest.fail("no run in thirty succeeded five per cent above the n = 5 record")
 
@@ -234,3 +263,51 @@ def test_matching_handles_one_more_target_than_square() -> None:
         np.allclose(ordered[:10], target[[i for i in range(11) if i != spare[0]]], atol=1e-9)
         or True
     )
+
+
+def _row(poses: np.ndarray, side: float) -> dict[str, Any]:
+    return {"n": len(poses), "side": side, "poses": poses.tolist()}
+
+
+def test_the_ratchet_verifier_admits_a_record_and_refuses_non_finite_poses() -> None:
+    """The second check refuses a NaN pose, which `verify_packing` alone accepts."""
+    target, side = record(5)
+    broken = target.copy()
+    broken[2, 0] = math.nan
+    squares = corners_from_poses(broken[:, 0], broken[:, 1], broken[:, 2])
+    assert verify_packing(squares, side + 1e-9, sign=float_sign(1e-12)).valid, (
+        "the control: the float oracle alone cannot see a NaN"
+    )
+    assert verified_out_of_process([_row(target, side), _row(broken, side)]) == [True, False]
+
+
+def test_the_ratchet_verifier_really_runs_in_another_process(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """An oracle patched to accept everything in this process must not be the one asked."""
+    target, side = record(5)
+    overlapping = target.copy()
+    overlapping[4, :2] = overlapping[0, :2]
+
+    def accepting(squares: Any, *_: Any, **__: Any) -> Report:
+        return Report(valid=True, n=len(squares))
+
+    monkeypatch.setattr(run_projection_ratchet, "verify_packing", accepting)
+    assert verified_out_of_process([_row(overlapping, side)]) == [False]
+
+
+def test_optimum_stability_does_not_count_a_non_finite_run_as_held(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The stability map trusts `violation`, so a NaN pose must not read as a held record."""
+    target, _side = record(5)
+
+    def diverged(n: int, *_: Any, **__: Any) -> Outcome:
+        return Outcome(solved=True, poses=np.full((n, 3), math.nan), violation=0.0, steps=1)
+
+    monkeypatch.setattr(map_optimum_stability, "solve", diverged)
+    row = map_optimum_stability.basin_radius(
+        len(target), "bare projection", {}, beta=0.5, steps=1
+    )
+    assert row["held"] is False
+    assert row["radius"] == 0.0
