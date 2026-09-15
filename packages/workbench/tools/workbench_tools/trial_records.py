@@ -65,6 +65,29 @@ def canonical_reference(n: int) -> PackingReference:
     return PackingReference(n=n, side=side, source=f"packing/{relative}")
 
 
+def below_record_side(record: float) -> float:
+    """The side under which an admitted arrangement would beat the record, and is refused.
+
+    Squares that pass the contract at tolerance t still fit, shrunk by 2t, without overlap, so
+    a side s implies a true packing at s / (1 - 2t). Below `record (1 - 2t) - t` that would be a
+    new record, which a float64 benchmark cannot establish: such a trial is refused as
+    `below-record` and needs exact verification before any claim.
+    """
+    return record * (1 - 2 * VALIDITY_TOLERANCE) - VALIDITY_TOLERANCE
+
+
+def check_success_band(tolerance_pct: float, record: float) -> None:
+    """Refuse a success band, in per cent of the record, finer than the validity tolerance."""
+    if not math.isfinite(tolerance_pct) or tolerance_pct < 0:
+        raise ValueError("success tolerance must be finite and nonnegative")
+    if record * tolerance_pct / 100 < VALIDITY_TOLERANCE:
+        raise ValueError(
+            f"a {tolerance_pct:g}% success band at side {record:g} is finer than the validity "
+            f"tolerance {VALIDITY_TOLERANCE:g}, so it would rank arrangements the contract "
+            "cannot tell apart"
+        )
+
+
 def gap_closed(n: int, record: float, excess: float) -> float | None:
     """Return the normalized record-to-grid score, or ``None`` for a zero gap."""
     grid = math.ceil(math.sqrt(n))
@@ -326,6 +349,8 @@ def admission_reason(  # noqa: PLR0911 - each ordered refusal is part of the wir
     expected_resolved = gap_closed(trial.n, trial.record, resolved_excess)
     if not _score_agrees(trial.resolved_closed, expected_resolved):
         return "inconsistent-score"
+    if trial.resolved_side < below_record_side(trial.record):
+        return "below-record"
     return None
 
 
@@ -564,6 +589,8 @@ def _configuration_reason(  # noqa: PLR0911 - preserves distinct configuration r
         return "missing-configuration"
     if configuration.contract != CONFIGURATION_CONTRACT:
         return "unsupported-configuration-contract"
+    # The benchmark measures blind runs only. No snapped or guided control is admitted, and
+    # none is needed: geometry is checked at the contract tolerance, not a measured one.
     if (
         configuration.style != trial.style
         or configuration.mode != "blind"
@@ -653,6 +680,10 @@ def _repair_reason(trial: Trial) -> str | None:
     converged = trial.resolved_overlap <= VALIDITY_TOLERANCE
     if repair.converged != converged:
         return "inconsistent-repair-receipt"
+    if not repair.converged:
+        # The gate on the repair is that it converged under the contract. A repair that hit its
+        # sweep limit is refused here, however small its residual, before geometry is checked.
+        return "repair-not-converged"
     return None
 
 

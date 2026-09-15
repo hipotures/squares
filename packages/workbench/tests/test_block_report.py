@@ -133,7 +133,7 @@ def test_disjoint_blocks_keep_failures_cancellation_and_trailing_slots() -> None
 
 @pytest.mark.usefixtures("admit_test_geometry")
 def test_empty_and_all_rejected_populations_have_no_invented_score() -> None:
-    empty = block_report.summarize_cohort(_cohort(()), [], tolerance_pct=0.0)
+    empty = block_report.summarize_cohort(_cohort(()), [], tolerance_pct=0.0001)
     assert empty["block_success_per_planned_block"] == {
         "hits": 0,
         "denominator": 0,
@@ -143,7 +143,7 @@ def test_empty_and_all_rejected_populations_have_no_invented_score() -> None:
     rejected = block_report.summarize_cohort(
         _cohort((Attempt(0, AttemptStatus.COMPLETED),), 1),
         [replace(_trial(0), resolved_poses=None)],
-        tolerance_pct=0.0,
+        tolerance_pct=0.0001,
     )
     assert rejected["blocks_without_valid_result"] == 1
     assert rejected["best_relative_excess_pct_conditional_on_validity"] == {
@@ -159,7 +159,7 @@ def test_empty_and_all_rejected_populations_have_no_invented_score() -> None:
 def test_zero_gap_is_undefined_normalization_not_an_infinite_score() -> None:
     cohort = replace(_cohort((Attempt(0, AttemptStatus.COMPLETED),), 1), n=4)
     trial = replace(_trial(0), n=4, record=2.0, side=2.0, resolved_side=2.0)
-    result = block_report.summarize_cohort(cohort, [trial], tolerance_pct=0.0)
+    result = block_report.summarize_cohort(cohort, [trial], tolerance_pct=0.0001)
     assert result["best_grid_gap_closed_conditional_on_defined_score"] == {
         "count": 0,
         "min": None,
@@ -179,7 +179,7 @@ def test_duplicate_missing_and_mismatched_rows_cannot_change_block_membership() 
         [replace(_trial(0), params={"anneal": 99})],
     ):
         with pytest.raises(ValueError, match=r"duplicate|configuration|manifest"):
-            block_report.summarize_cohort(cohort, rows, tolerance_pct=0.0)
+            block_report.summarize_cohort(cohort, rows, tolerance_pct=0.0001)
 
 
 def _manifest_value() -> dict[str, object]:
@@ -393,3 +393,11 @@ def test_nonstandard_numeric_tokens_are_refused_before_manifest_or_trial_admissi
 ) -> None:
     with pytest.raises(ValueError, match="nonfinite JSON token"):
         strict_json('{"trial":{"ms":' + token + "}}")
+
+
+def test_a_block_success_band_finer_than_the_validity_tolerance_is_refused() -> None:
+    cohort = _cohort((Attempt(0, AttemptStatus.COMPLETED),), 1)
+    with pytest.raises(ValueError, match="finer than the validity tolerance"):
+        block_report.summarize_cohort(cohort, [_verified_trial()], tolerance_pct=0.0)
+    with pytest.raises(ValueError, match="finer than the validity tolerance"):
+        block_report.summarize_cohort(cohort, [_verified_trial()], tolerance_pct=1e-8)

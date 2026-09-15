@@ -47,6 +47,7 @@ from typing import TYPE_CHECKING
 from workbench_tools.trial_records import (
     SourceReceipt,
     Trial,
+    check_success_band,
     partition_trials,
     trial_from_json,
     trial_from_probe,
@@ -70,14 +71,15 @@ BENCHMARK_SOURCE = WORKBENCH_PACKAGE / "probes/bench-annealing.ts"
 VIEWPORT_WIDTH = 1920
 VIEWPORT_HEIGHT = 1080
 
-#: How close a run's container side has to come to the record to count as having found it.
+#: Success bands: how far above the record, in per cent of it, an admitted side may sit.
 #:
-#: Argued rather than picked. The record's own poses, replayed through the same measurement,
-#: score 0 to 1.3e-5 of a unit side of summed overlap -- the float precision of the stored
-#: poses -- so anything looser than that is measuring the tolerance and not the search. The
-#: three reported here bracket it: `exact` is at the noise floor, `close` is a tenth of a
-#: per cent, and `near` is one per cent, which is about the gap between the best known
-#: packing and the grid it improves on at these n.
+#: Chosen, not measured. Admission already requires the repaired arrangement to pass the
+#: validity contract at 1e-9 and refuses a side below the record (`below-record`), so a band
+#: only says how near counts as reaching it. `report` refuses any band finer than the contract
+#: can resolve at that record (`check_success_band`): `exact` is 1e-6 of the record, 2.7e-6 to
+#: 4.7e-6 of a unit side for n = 5..17. `close` (a tenth of a per cent) and `near` (one per
+#: cent) are descriptive; neither comes from the record-to-grid gap, which is zero at n = 6..9
+#: and 12..16 and 10.8 per cent at n = 5.
 TOLERANCES = {"exact": 0.0001, "close": 0.1, "near": 1.0}
 
 #: The normalized metric reported beside absolute side and relative excess.
@@ -233,9 +235,16 @@ def run_trials(run: Run) -> list[Trial]:
 
 
 def _report_refusals(total: int, refused: dict[str, int]) -> None:
-    if refused:
-        counts = ", ".join(f"{reason}={count}" for reason, count in sorted(refused.items()))
-        print(f"  REFUSED {sum(refused.values())} of {total} trials: {counts}")
+    below = refused.get("below-record", 0)
+    if below:
+        print(
+            f"  BELOW RECORD {below} of {total} trials: smaller than the reference side, so "
+            "not ranked here; each needs exact verification before any claim"
+        )
+    others = {reason: count for reason, count in refused.items() if reason != "below-record"}
+    if others:
+        counts = ", ".join(f"{reason}={count}" for reason, count in sorted(others.items()))
+        print(f"  REFUSED {sum(others.values())} of {total} trials: {counts}")
 
 
 def report(trials: list[Trial]) -> int:
@@ -253,6 +262,9 @@ def report(trials: list[Trial]) -> int:
     for t in trials:
         by_n.setdefault(t.n, []).append(t)
 
+    for record in sorted({t.record for t in trials}):
+        for band in TOLERANCES.values():
+            check_success_band(band, record)
     names = list(TOLERANCES)
     head = "    n  trials  " + "  ".join(f"{name:>7}" for name in names)
     print(f"\n{head}   closed      best    median     worst   ms/trial")

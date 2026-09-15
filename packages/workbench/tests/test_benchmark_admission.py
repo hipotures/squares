@@ -13,13 +13,17 @@ import pytest
 from devtools.known_structure import record
 from workbench_tools import benchmark as bench
 from workbench_tools.trial_records import (
+    VALIDITY_TOLERANCE,
     EffectiveConfiguration,
+    PackingReference,
     RepairReceipt,
     SourceReceipt,
     Trial,
     admission_reason,
     canonical_reference,
+    check_success_band,
     gap_closed,
+    partition_trials,
     trial_from_json,
     trial_from_probe,
     trial_from_row,
@@ -281,7 +285,14 @@ def test_sweep_cannot_rank_an_invalid_high_score(
     monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], tmp_path: Path
 ) -> None:
     good = _trial()
-    bad = replace(good, seed=1, resolved_closed=999.0, resolved_poses=None)
+    assert good.configuration is not None
+    bad = replace(
+        good,
+        seed=1,
+        configuration=replace(good.configuration, seed=1),
+        resolved_closed=999.0,
+        resolved_poses=None,
+    )
     monkeypatch.setattr(bench, "RESULTS", tmp_path)
     monkeypatch.setattr(bench, "run_trials", lambda _run: [good, bad])
     args = argparse.Namespace(
@@ -290,7 +301,7 @@ def test_sweep_cannot_rank_an_invalid_high_score(
     assert bench.sweep(args, [0, 1], "fixture") == 0
     output = capsys.readouterr().out
     assert "999.000" not in output
-    assert "REFUSED 1 of 2" in output
+    assert "REFUSED 1 of 2 trials: missing-geometry=1" in output
 
 
 @pytest.mark.parametrize(
@@ -305,3 +316,116 @@ def test_sweep_cannot_rank_an_invalid_high_score(
 def test_sweep_rejects_options_the_probe_cannot_honor(spec: list[str]) -> None:
     with pytest.raises((ValueError, argparse.ArgumentTypeError)):
         bench.parse_grid(spec)
+
+
+def _pressed(p: float, *, reported: float = 0.0, converged: bool = True) -> Trial:
+    """The n = 5 record with its top-left corner square pressed `p` into the central square.
+
+    The record's side is unchanged, so only the repaired arrangement's overlap differs from an
+    admitted trial; `reported` is the overlap the forged receipt claims.
+    """
+    good = _trial()
+    assert good.resolved_poses is not None
+    assert good.repair is not None
+    shift = p / math.sqrt(2)
+    (x, y, angle), *rest = good.resolved_poses
+    return replace(
+        good,
+        resolved_poses=((x + shift, y - shift, angle), *rest),
+        resolved_overlap=reported,
+        repair=replace(good.repair, converged=converged),
+    )
+
+
+@pytest.mark.parametrize(
+    ("penetration", "reason"),
+    [
+        (5e-10, None),
+        (2e-9, "invalid-packing"),
+        (5e-6, "invalid-packing"),
+        (2e-5, "invalid-packing"),
+    ],
+)
+def test_repaired_geometry_is_admitted_only_under_the_validity_contract(
+    penetration: float, reason: str | None
+) -> None:
+    assert admission_reason(_pressed(penetration)) == reason
+
+
+def test_a_non_converged_repair_is_refused_even_when_its_residual_is_small() -> None:
+    residual = 5e-6
+    assert admission_reason(_pressed(residual, reported=residual, converged=False)) == (
+        "repair-not-converged"
+    )
+
+
+def test_a_reported_side_below_the_fitted_box_puts_squares_through_its_walls() -> None:
+    good = _trial()
+    slack = 5e-6
+    shrunk = good.resolved_side - slack
+    excess = (shrunk / good.record - 1) * 100
+    below = replace(
+        good, resolved_side=shrunk, resolved_closed=gap_closed(good.n, good.record, excess)
+    )
+    assert admission_reason(below) == "invalid-packing"
+
+
+def test_a_valid_arrangement_below_the_record_is_refused_as_needing_exact_verification() -> (
+    None
+):
+    good = _trial()
+    canonical = canonical_reference(good.n)
+    larger = PackingReference(n=good.n, side=good.side + 0.01, source=canonical.source)
+    excess = (good.side / larger.side - 1) * 100
+    beats = replace(
+        good,
+        record=larger.side,
+        excess=excess,
+        closed=gap_closed(good.n, larger.side, excess),
+        resolved_closed=gap_closed(good.n, larger.side, excess),
+    )
+    assert admission_reason(beats, reference_for=lambda _n: larger) == "below-record"
+    at_record = replace(good)
+    assert admission_reason(at_record) is None
+    kept, refused = partition_trials([beats], reference_for=lambda _n: larger)
+    assert kept == []
+    assert refused == {"below-record": 1}
+
+
+def test_report_names_below_record_trials_separately_from_other_refusals(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    good = _trial()
+    canonical = canonical_reference(good.n)
+    larger = PackingReference(n=good.n, side=good.side + 0.01, source=canonical.source)
+    excess = (good.side / larger.side - 1) * 100
+    beats = replace(
+        good,
+        seed=1,
+        configuration=replace(cast(EffectiveConfiguration, good.configuration), seed=1),
+        record=larger.side,
+        excess=excess,
+        closed=gap_closed(good.n, larger.side, excess),
+        resolved_closed=gap_closed(good.n, larger.side, excess),
+    )
+    real = bench.partition_trials
+    monkeypatch.setattr(
+        bench,
+        "partition_trials",
+        lambda trials: real(
+            trials, reference_for=lambda n: larger if n == good.n else canonical
+        ),
+    )
+    assert bench.report([beats]) == 1
+    output = capsys.readouterr().out
+    assert "BELOW RECORD 1" in output
+    assert "exact verification" in output
+
+
+def test_a_success_band_finer_than_the_validity_tolerance_is_refused() -> None:
+    record_side = canonical_reference(5).side
+    with pytest.raises(ValueError, match="finer than the validity tolerance"):
+        check_success_band(1e-8, record_side)
+    check_success_band(bench.TOLERANCES["exact"], 1.0)
+    for name, band in bench.TOLERANCES.items():
+        assert band / 100 >= VALIDITY_TOLERANCE, name

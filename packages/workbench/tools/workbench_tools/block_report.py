@@ -17,7 +17,13 @@ from workbench_tools.cohort_manifest import (
     read_manifest,
     strict_json,
 )
-from workbench_tools.trial_records import Trial, admission_reason, trial_from_row
+from workbench_tools.trial_records import (
+    Trial,
+    admission_reason,
+    canonical_reference,
+    check_success_band,
+    trial_from_row,
+)
 
 
 def wilson_interval(hits: int, total: int) -> tuple[float, float] | None:
@@ -69,8 +75,7 @@ def summarize_cohort(
     cohort: Cohort, trials: list[Trial], *, tolerance_pct: float
 ) -> dict[str, object]:
     """Join exact seed slots, checking geometry before any accepted block can rank."""
-    if not math.isfinite(tolerance_pct) or tolerance_pct < 0:
-        raise ValueError("success tolerance must be finite and nonnegative")
+    check_success_band(tolerance_pct, canonical_reference(cohort.n).side)
     rows: dict[int, Trial] = {}
     effective_configuration: dict[str, object] | None = None
     for trial in trials:
