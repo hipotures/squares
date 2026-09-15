@@ -1217,6 +1217,21 @@ body.pack-independent #packing-svg {
 body.pack-independent #pack-stage-facts {
   display: block;
 }
+/* The box and its trace are the catalogue's drawing of its container (`drawBounds`), and only the
+   catalogue's scene updates them. Pack and the animation studio draw into the same stage and the
+   same `#container` and draw no box, so while either owns the stage the bounds, which would
+   otherwise stay at the last catalogue step's side, are hidden and the container is drawn, as it
+   was before the box. */
+body.pack-independent #bound-box,
+body.pack-independent #bound-trace,
+body.trace-active #bound-box,
+body.trace-active #bound-trace {
+  display: none;
+}
+body.pack-independent #container,
+body.trace-active #container {
+  stroke: #000000;
+}
 body.search-active #stage-wrap,
 body.search-active #mode-panel,
 body.search-active #panel > .row,

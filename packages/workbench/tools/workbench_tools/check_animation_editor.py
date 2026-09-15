@@ -209,6 +209,18 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
         require(
             page.locator("#animation-squares > g").count() == 2, "stage lost square identities"
         )
+        # The studio draws no box: the catalogue's box and trace are hidden, and the imported
+        # animation's container is drawn at its own side, 2.
+        drawn = page.evaluate(probe("stage/bounds"))
+        require(
+            drawn["container"]["shown"]
+            and drawn["container"]["stroke"] not in {"none", ""}
+            and drawn["container"]["width"] == 2
+            and not drawn["box"]["shown"]
+            and not drawn["trace"]["shown"],
+            f"the animation studio does not draw its container, or keeps the catalogue's box: "
+            f"{drawn}",
+        )
         if screenshots is not None:
             screenshots.mkdir(parents=True, exist_ok=True)
             page.screenshot(path=str(screenshots / "animation-desktop.png"), full_page=True)
@@ -284,15 +296,22 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
         )
         require(page.locator("#pack-squares").is_visible(), "Pack scene remained hidden")
         require(page.locator("#pack-workspace").is_visible(), "Pack controls remained hidden")
+        page.locator("#mode-animate").click()
+        drawn = page.evaluate(probe("stage/bounds"))
+        require(
+            drawn["box"]["shown"] and drawn["container"]["stroke"] == "none",
+            f"back in Animate the catalogue does not draw its box over an undrawn container: "
+            f"{drawn}",
+        )
         require(not errors, "page errors: " + "; ".join(errors))
         browser.close()
     return (
         "arrival on Animate, first of Animate, Pack and Search; the owner's law, dial, beat "
         "and desaturation defaults, the box, its trace, its lock "
         "and its gap-bar pointer through a step, double-speed simple "
-        "transitions and their checkbox, animation import, "
-        "geometry/guidance, frame edits, replay, "
-        "SVG/JSON/frame capture, and Pack return"
+        "transitions and their checkbox, animation import drawn in its own container with no "
+        "catalogue box, geometry/guidance, frame edits, replay, "
+        "SVG/JSON/frame capture, Pack return, and the box back in Animate"
     )
 
 
