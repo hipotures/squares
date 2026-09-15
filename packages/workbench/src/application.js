@@ -648,8 +648,10 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   //: An identical slot hands over at the midpoint, which cannot be seen; only a slot that
   //: changes is faded. Filled when the pair's layers are built.
   let factsSame = [];
-  //: Per changing slot, its drawn parts split into those held (the same glyph in the same place in
-  //: both layers) and those that crossfade; null where the slot fades whole.
+  //: Per changing slot, its drawn parts split into those held (the same part in the same place in
+  //: both layers) and those that crossfade; null where the slot fades whole. A part is a KaTeX span,
+  //: an SVG badge or a text element; the facts view splits every typeset number into one span per
+  //: character, so a digit two numbers share is a part of its own.
   /** @type {({heldA: Element[], heldB: Element[], fadeA: Element[], fadeB: Element[]} | null)[]} */
   let factsParts = [];
   // The drawing units of one slot: an SVG as a whole, and every other element with no element
@@ -675,7 +677,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     return mixed ? null : parts;
   }
   // Which parts of a changing slot are unchanged: equal markup in an equal box in both layers.
-  // `4.59 ≤` in front of `s(17)` and `s(18)` is held; `17` and `18` crossfade. Anything not laid
+  // Between `4.59 ≤ s(17) ≤ 4.67553` and `4.59 ≤ s(18) ≤ 4.822876`, `4.59 ≤ s(1` and the `4.` of
+  // the upper bound are held; `7` and `8`, and the rest of the bound, crossfade. Anything not laid
   // out yet has no box to compare, so it is never held.
   function pairParts(/** @type {Element} */ a, /** @type {Element} */ b) {
     const partsA = drawnParts(a);

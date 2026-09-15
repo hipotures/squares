@@ -23,6 +23,7 @@ import argparse
 import math
 import os
 import tempfile
+from collections import Counter
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -285,6 +286,114 @@ def drag_past_walls(session: Session) -> str:
     return "a dragged square stays under the cursor"
 
 
+#: How close an opacity must be to the value it is asserted to have.
+OPACITY_TOLERANCE = 1e-6
+
+#: Steps whose facts handover is sampled. The step into 18 keeps `4.59 <= s(1` and the `4.` of
+#: its upper bound, and the step into 111 keeps two digits of `s(11`: each holds a digit of a
+#: number that changes.
+HANDOVER_STEPS = (18, 26, 100, 111)
+
+
+def handover_instants(session: Session, n: int) -> tuple[dict[str, Any], list[float]]:
+    """The step's schedule, and instants every 10 ms across its handover, ends included."""
+    schedule = session.api(("pause",), ("setStepN", n), ("schedule",))
+    arrive, roll, end = schedule["arrive"], schedule["roll"], schedule["end"]
+    start = max(0.0, arrive - 0.1)
+    count = round((roll + 0.2) / 0.01)
+    at = [0.0, *(start + k * 0.01 for k in range(count + 1)), end]
+    return schedule, at
+
+
+def require_crossfade(
+    session: Session, label: str, schedule: dict[str, Any], at: list[float], enter: list[float]
+) -> None:
+    """The arriving layer is 0 before the middle half of the roll, 1 after, partial within."""
+    arrive, roll = schedule["arrive"], schedule["roll"]
+    lo, hi = arrive + 0.25 * roll, arrive + 0.75 * roll
+    session.require(len(enter) == len(at), f"{label}: {len(enter)} of {len(at)} samples")
+    partial = [t for t, e in zip(at, enter, strict=True) if 1e-9 < e < 1 - 1e-9]
+    session.require(
+        bool(partial)
+        and lo - 0.011 <= min(partial) <= lo + 0.021
+        and hi - 0.021 <= max(partial) <= hi + 0.011,
+        f"{label}: the crossfade runs over {partial[:1]}..{partial[-1:]}, not the middle half "
+        f"of the roll [{lo:.3f}, {hi:.3f}]",
+    )
+    for t, e in zip(at, enter, strict=True):
+        q = (t - arrive) / roll if roll > 0 else float(t >= arrive)
+        if q < 0.25 or q > 0.75:
+            want = 0.0 if q < 0.25 else 1.0
+            session.require(
+                abs(e - want) <= OPACITY_TOLERANCE,
+                f"{label} at t = {t:.3f}: the arriving layer is at {e}, not {want}",
+            )
+
+
+def facts_handover(session: Session) -> str:
+    """Unchanged text never fades; changed text crossfades in the middle 0.2 s, never blank."""
+    held_digits = 0
+    for n in HANDOVER_STEPS:
+        schedule, at = handover_instants(session, n)
+        read = session.look("facts/crossfade", n=n, at=at)
+        enter = read["enter"]
+        require_crossfade(session, f"facts, step into {n}", schedule, at, enter)
+        changed = 0
+        for slot in read["slots"]:
+            keys_a, keys_b = slot["keys"]
+            shared = Counter(keys_a) & Counter(keys_b)
+            pairs = []
+            for key, times in shared.items():
+                ia = [i for i, k in enumerate(keys_a) if k == key]
+                ib = [i for i, k in enumerate(keys_b) if k == key]
+                pairs.extend(zip(ia[:times], ib[:times], strict=True))
+            held_a = {i for i, _ in pairs}
+            held_b = {j for _, j in pairs}
+            # A digit held although the number it belongs to changed: the `1` of 17 and 18.
+            numbers_a, numbers_b = slot["numbers"]
+            held_digits += sum(
+                1 for i, j in pairs if numbers_a[i] is not None and numbers_a[i] != numbers_b[j]
+            )
+            going = [i for i in range(len(keys_a)) if i not in held_a]
+            coming = [j for j in range(len(keys_b)) if j not in held_b]
+            changed += bool(going or coming)
+            label = f"step into {n}, slot {slot['name']!r}"
+            for k, (seen_a, seen_b) in enumerate(slot["seen"]):
+                t = at[k]
+                for i, j in pairs:
+                    total = seen_a[i] + seen_b[j]
+                    session.require(
+                        abs(total - 1) <= OPACITY_TOLERANCE
+                        and max(seen_a[i], seen_b[j]) >= 1 - OPACITY_TOLERANCE,
+                        f"{label} at t = {t:.3f}: unchanged {keys_a[i]!r} is seen at "
+                        f"{seen_a[i]:.3f} + {seen_b[j]:.3f}",
+                    )
+                for i in going:
+                    session.require(
+                        abs(seen_a[i] - (1 - enter[k])) <= OPACITY_TOLERANCE,
+                        f"{label} at t = {t:.3f}: leaving {keys_a[i]!r} at {seen_a[i]:.3f}, "
+                        f"not {1 - enter[k]:.3f}",
+                    )
+                for j in coming:
+                    session.require(
+                        abs(seen_b[j] - enter[k]) <= OPACITY_TOLERANCE,
+                        f"{label} at t = {t:.3f}: arriving {keys_b[j]!r} at {seen_b[j]:.3f}, "
+                        f"not {enter[k]:.3f}",
+                    )
+                if keys_a and keys_b:
+                    top = max([*seen_a, *seen_b])
+                    session.require(
+                        top >= 0.5 - OPACITY_TOLERANCE,
+                        f"{label} at t = {t:.3f} is blank: nothing drawn above {top:.3f}",
+                    )
+        session.require(changed > 0, f"step into {n} changed no slot, so it tested nothing")
+    session.require(
+        held_digits > 0,
+        "no step held a digit of a number it kept (a KaTeX number is one span unless split)",
+    )
+    return f"the facts hand over part by part, {held_digits} kept digits held"
+
+
 SECTIONS: tuple[Callable[[Session], str], ...] = (
     keyboard_ownership,
     gap_bar_through_dwell,
@@ -295,6 +404,7 @@ SECTIONS: tuple[Callable[[Session], str], ...] = (
     transport_loop,
     drag_ends,
     drag_past_walls,
+    facts_handover,
 )
 
 

@@ -82,6 +82,27 @@ export function createFactsView(document: Document, DATA: Corpus, numeralLeft: (
     return item;
   }
 
+  // **A typeset number is split into one span per character.** KaTeX sets a number as one span
+  // (`4.67553`, `17`), and the handover holds a part only where the n and n + 1 layers draw it
+  // identically, so a digit the two numbers share -- the `1` of 12 and 13 -- crossfaded with
+  // itself and lightened mid-roll, against the owner's request that unchanged text never fade
+  // out and back. Split, each character is a part of its own. The spans carry no class and no
+  // style, so the line is drawn as before; only KaTeX's visible HTML is split, not its MathML.
+  function splitNumerals(root: HTMLElement) {
+    for (const leaf of root.querySelectorAll(".katex-html .mord")) {
+      const digits = leaf.textContent ?? "";
+      if (leaf.children.length > 0 || digits.length < 2 || !/[0-9]/.test(digits)) {
+        continue;
+      }
+      leaf.textContent = "";
+      for (const character of digits) {
+        const span = document.createElement("span");
+        span.textContent = character;
+        leaf.appendChild(span);
+      }
+    }
+  }
+
   function buildFacts(layer: HTMLElement, n: number) {
     const f = FACTS[String(n)];
     if (f === undefined) {
@@ -118,6 +139,7 @@ export function createFactsView(document: Document, DATA: Corpus, numeralLeft: (
       const line = text("div", cls);
       if (html) {
         line.innerHTML = html;
+        splitNumerals(line);
       }
       return line;
     }
