@@ -135,7 +135,7 @@ side, with a median of 0.083.
 - **Scoring needs a repair step.** The harness now separates overlapping squares,
   translation only with angles held, and scores the container that the repaired
   arrangement needs.
-  [X-029](../../../explorations/X-029-the-workbench-physics-as-a-search.md) reports what
+  [X-034](../../../explorations/X-034-the-workbench-physics-as-a-search.md) reports what
   repaired runs are worth.
 
 ## Why the Overlap Survives

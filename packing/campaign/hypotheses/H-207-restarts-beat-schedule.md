@@ -14,7 +14,7 @@ hypothesis:
     landscape is multi-modal and the budget is better spent on restarts than on annealing
     more carefully within one.
   lane: search
-  derived_from: [X-029]
+  derived_from: [X-034]
   criterion:
     shape: record
     metric: closed at the best trial within a fixed cost budget
@@ -36,7 +36,7 @@ hypothesis:
 **Why it is worth testing.** Once runs are repaired to packings, a single run scores
 below the trivial grid at every `n` measured, while the best of a thousand sometimes
 comes within a fraction of a per cent of the record
-([X-029](../explorations/X-029-the-workbench-physics-as-a-search.md)). If that holds
+([X-034](../explorations/X-034-the-workbench-physics-as-a-search.md)). If that holds
 under a fair comparison, budget spent on restarts is worth more than budget spent on one
 careful run. Those observations are prefix values without spread, so they motivate the
 test and do not decide it.

@@ -13,7 +13,7 @@ hypothesis:
     inflation, the force law's four terms, the step count -- produces a blind run that lands
     within 0.1 per cent of a known-best side at any n between 5 and 29.
   lane: search
-  derived_from: [X-029]
+  derived_from: [X-034]
   criterion:
     shape: determination
     metric: whether any cell of the parameter sweep produces a trial inside the close tolerance

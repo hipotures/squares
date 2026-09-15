@@ -1,4 +1,4 @@
-# The W8 Documentation Pass — Runbook
+# The W8 Documentation Pass: Runbook
 
 How to run a documentation pass, and how to know it is finished.
 [`conventions.md`](../../conventions.md) owns the formats this checks against;
@@ -21,26 +21,26 @@ reverse: a pass that starts from the prose inherits the prose’s mistakes.
 
 **Per document.**
 
-- [`README.md`](../../README.md) — the front door.
+- [`README.md`](../../README.md): the front door.
   Does the first screen still say what the project is and what it has?
   Do the workflow entry points, the directory tree, and every headline number match the
   record? Is the thing a new reader should do first still the first thing offered?
-- [`TUTORIAL.md`](../../TUTORIAL.md) — orientation.
+- [`TUTORIAL.md`](../../TUTORIAL.md): orientation.
   Does every command run, on a clean checkout, in the order given?
   Does it teach the problem before the tooling?
-  Does a reader who finishes it know what this project can and cannot certify — and can
+  Does a reader who finishes it know what this project can and cannot certify, and can
   they say why the reported and verified bounds differ?
-- [`SYNOPSIS.md`](../../SYNOPSIS.md) — the technical account.
+- [`SYNOPSIS.md`](../../SYNOPSIS.md): the technical account.
   Does the readiness table match [What Is Built](../../SYNOPSIS.md#what-is-built)?
   Does the handoff point at work that exists, on beads that exist?
   Are the defect aggregates the generated ones?
-- [`conventions.md`](../../conventions.md) — Is every `[checked]` claim still checked by
+- [`conventions.md`](../../conventions.md): Is every `[checked]` claim still checked by
   something, and every `[convention]` still observed?
-- [`operating-rules.md`](../../operating-rules.md) — is every rule still one an agent
+- [`operating-rules.md`](../../operating-rules.md): is every rule still one an agent
   should follow, and does each still cite the failure that motivated it?
   Regenerate `AGENTS.md`’s summary with `devtools.render_operating_rules` rather than
   editing it.
-- [`development.md`](../../development.md) — do the commands still exist, with those
+- [`development.md`](../../development.md): do the commands still exist, with those
   flags?
 - **A dated document is a record, so a pass adds to it rather than rewriting it.** A
   `research-YYYY-MM-DD-` report states what was known on its date.
@@ -51,12 +51,92 @@ reverse: a pass that starts from the prose inherits the prose’s mistakes.
 **Across documents.**
 
 - One fact, one home. Where two documents state the same number, one of them should be
-  citing the other or the artifact — not restating it.
+  citing the other or the artifact, not restating it.
 - No document should be the only place a load-bearing claim appears.
 - Claim boundaries survive editing.
   `reported` is not `verified`, `verified` is not the optimum, and a bound on a retained
   witness is not a bound on `s(n)`. These are the sentences most likely to be smoothed
   away, and the ones that must not be.
+
+## Synopsis Research-Status Roll-Up
+
+The synopsis owns the current, reader-facing synthesis of the research program.
+Open a roll-up when a frontier result lands, an agenda or consequential session ends,
+the selected handoff or owner strategy changes, readiness changes materially, an
+explicit state audit is requested, or a release is prepared.
+OR-7’s common-edit pass remains due at documentation block boundaries even when none of
+those events changes a headline.
+
+Freeze the observation before editing.
+Record the ISO date and scientific cutoff Git revision, then inventory the latest agenda
+update, the latest terminal session by its recorded end timestamp rather than its
+number, the highest exploration, hypothesis, experiment, and frontier-result artifacts
+actually present, the live tbd snapshot time, and the exact revision to which validation
+will apply. Pause concurrent writers to the records being reconciled.
+Counts are a snapshot at that cutoff, not a claim about a moving checkout.
+
+Precedence is fact-specific: each source owns only the fields in its contract.
+When sources disagree, use this fact-to-owner map rather than treating one file type as
+globally authoritative:
+
+| Fact | Owning source | Derived or reader view |
+| --- | --- | --- |
+| Agenda and commitment state | Enforced agenda YAML frontmatter | Generated agenda map |
+| Session chronology, outcome, usage, and next action | Enforced session YAML frontmatter and retained native receipts | Generated session-close report |
+| Exploration scope and forward `proposes` links | Enforced exploration YAML frontmatter | Idea board and synopsis synthesis |
+| Hypothesis statement and prerequisites | Enforced hypothesis YAML frontmatter | Registry table in the synopsis |
+| Hypothesis status | Ledger precedence applied to experiment and frontier records | Fresh generated ledger and checked synopsis row |
+| Experiment invocation, evidence scope, and verdict | Enforced experiment YAML frontmatter plus its retained receipt | Fresh generated ledger and synopsis tables |
+| Promoted result registration | `packing/frontier/results.yaml` and its evidence links | Generated `RESULTS.md`, status tables, and headline |
+| Strategy, ranking, and selected next entry | Accepted W10 agenda and session closeout, or an explicit operator decision retained in an agenda and session | Current synopsis handoff and active plan |
+| Implementation owner, dependencies, holds, and resumability | Live tbd state | Agenda bead links and current handoff; never scientific truth |
+| Reader-facing implications and readiness | `SYNOPSIS.md`, after the sources above agree | README orientation and links; no volatile roll-up totals |
+
+Apply the following interpretation rules before writing prose:
+
+- Count files that satisfy the registered filename pattern; never infer a count from the
+  highest identifier. Agenda status and commitment state are different fields and must be
+  reported separately.
+- Order new sessions by their recorded `ended_at` timestamp; a planned deadline is not
+  an observed terminal time.
+  Sessions before session-128 have no end field, so the checker uses their start
+  timestamp as a legacy fallback.
+  `stopped` means the declared block ended, not that its work failed.
+  Use only the top-level session resource roll-up for totals, because child totals can
+  overlap it.
+- An exploration is codified only when its `proposes` field links it forward.
+  Derive hypothesis status from the freshly checked ledger, and derive an experiment
+  decision from its own record and retained receipt.
+- `running` or `in-progress` is not evidence that a target ran.
+  Require a target receipt or result record.
+  A confirmed hypothesis is not a frontier theorem; only the frontier register and its
+  evidence promote a result.
+- State validation with the exact revision, validation surface, local or hosted
+  environment, skipped checks, and outcome.
+  “CI passed” without those qualifiers is not a reproducibility statement.
+
+Run the roll-up in order:
+
+1. Validate source records, repair ownership or status conflicts there, and only then
+   regenerate the ledger, agenda map, session-close report, results views, defects,
+   research tables, and document map.
+2. Reconcile the synopsis’s dated status snapshot, readiness boundary, program arc,
+   current roadmap, and one selected handoff against those fresh views.
+   Reconcile active plans and tbd to an accepted W10 decision or an explicit operator
+   decision retained in the agenda and session; route unresolved strategy or selection
+   to W10.
+3. Reconcile README and the remaining reader-facing documents.
+   Link to the synopsis for current state rather than copying its volatile counts.
+4. Update the synopsis date only after the complete pass and format edited Markdown.
+   Follow [the named validation tiers](../../development.md#validation-tiers): check and
+   render records, run the pre-push tier, push, then retain the exact-head full
+   checkpoint and hosted-check outcomes.
+
+When two sources conflict, fix the record that owns the fact or file a defect; do not
+select the more convenient wording.
+Rewrite maintained current-state documents.
+Append a dated correction to historical reports so the original claim remains legible in
+its time context.
 
 **Generated graphics.** Figures drift the way prose does, and they drift more quietly
 because nobody rereads them.
@@ -68,22 +148,26 @@ because nobody rereads them.
   means the stored artifact no longer matches its inputs.
 - Then the half no checker does: **a figure can be byte-identical to its inputs and
   still be stale in meaning.** If the record now says something the figure was drawn
-  before — a bound moved, a case was added, a claim narrowed — the drawing is wrong even
-  though it regenerates clean.
+  before: a bound moved, a case was added, a claim narrowed.
+  The drawing is wrong even though it regenerates clean.
   Read each figure against the sentence that introduces it.
 - Never hand-edit a generated artifact.
   If it is wrong, the generator is wrong.
 - Two known limits, so a pass does not rediscover them: the composite PNG needs macOS
   `sips` or ImageMagick 7 and cannot be regenerated on a stock Linux runner, and
   emission precision is pinned at 28 ([D-359](../../defects.md)) with a related check
-  still open ([D-362](../../defects.md)) — a pass that finds a figure needing a
-  precision change is looking at that defect, not at a figure bug.
+  still open ([D-362](../../defects.md)); a pass that finds a figure needing a precision
+  change is looking at that defect, not at a figure bug.
 
 **Before closing.**
 
 - Every drift either fixed or filed as a defect, with no third option.
-- Generated views regenerated: `packing-ledger render`, `devtools.render_defects`,
-  `devtools.check_synopsis`.
+- Generated views regenerated: `packing-ledger render`, `devtools.render_agenda_map`,
+  `devtools.close_session --render`, `devtools.render_results --update`,
+  `devtools.render_results_headline`, `devtools.render_research_tables`,
+  `devtools.render_defects`, and `devtools.render_document_map`.
+- `devtools.check_synopsis` and `devtools.check_readme` agree with those views,
+  including the marked current-research snapshot and the single selected handoff.
 - `make format` clean, gate green, and a statement of what was checked *and what was
   left*.
 

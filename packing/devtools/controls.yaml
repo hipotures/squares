@@ -173,7 +173,7 @@ controls:
 # the one that announces itself.
 - name: synopsis - narrative round aggregate lagging the ledger
   file: ../SYNOPSIS.md
-  replace: ["There are 122 rounds", "There are 45 rounds"]
+  replace: ["There are 126 rounds", "There are 45 rounds"]
   run: uv run --frozen --quiet python -m devtools.check_synopsis
   expect: "registered-round aggregate is not"
 
@@ -211,11 +211,11 @@ controls:
   run: uv run --frozen --quiet python -m devtools.check_synopsis
   expect: "gate-detector aggregate is not"
 
-- name: synopsis - hypothesis-status aggregate drifting from the ledger
+- name: synopsis - hypothesis status row drifting from the ledger
   file: ../SYNOPSIS.md
-  replace: ["generated ledger currently derives", "generated ledger once derived"]
+  replace: ["| Hypotheses | 148 |", "| Hypotheses | 0 |"]
   run: uv run --frozen --quiet python -m devtools.check_synopsis
-  expect: "hypothesis-status aggregate does not match campaign/ledger.md"
+  expect: "research-status row 'Hypotheses'"
 
 - name: synopsis - readiness dashboard detached from a canonical owner
   file: ../SYNOPSIS.md
@@ -1292,9 +1292,15 @@ controls:
 
 - name: synopsis handoff - selected entry is replaced by another bead
   file: ../SYNOPSIS.md
-  replace: ["**Selected next entry:** `think-qw9w`", "**Selected next entry:** `think-cyko`"]
+  replace: ["**Selected next entry:** `think-9y7p`", "**Selected next entry:** `think-cyko`"]
   run: python3 -m devtools.check_synopsis
-  expect: "exactly one canonical Selected next entry marker for think-qw9w"
+  expect: "exactly one canonical Selected next entry marker for think-9y7p"
+
+- name: session handoff - observed end precedes its start
+  file: campaign/agent-sessions/session-128-research-state-rollup.md
+  replace: ["  ended_at: '2026-09-14T21:34:21Z'", "  ended_at: '2026-09-14T20:00:00Z'"]
+  run: python3 -m devtools.check_session_clocks
+  expect: "ended_at is before started_at"
 
 # --- the gate's own declared cost (agenda-023 BC-216) ---
 #
