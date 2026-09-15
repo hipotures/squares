@@ -12,6 +12,7 @@ from workbench_tools.check_animation_editor import check as check_animation_edit
 from workbench_tools.check_pack_panel import check as check_pack_panel
 from workbench_tools.check_page_policy import check as check_page_policy
 from workbench_tools.check_search_panel import check as check_search_panel
+from workbench_tools.check_stage_resize import check as check_stage_resize
 
 
 def main() -> int:
@@ -25,7 +26,8 @@ def main() -> int:
         search = check_search_panel(page)
         animate = check_animate_view(page)
         policy = check_page_policy(page)
-    print(f"OK: {accessibility}; {editor}; {pack}; {search}; {animate}; {policy}")
+        resize = check_stage_resize(page)
+    print(f"OK: {accessibility}; {editor}; {pack}; {search}; {animate}; {policy}; {resize}")
     return 0
 
 

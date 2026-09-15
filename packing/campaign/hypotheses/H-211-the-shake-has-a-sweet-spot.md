@@ -58,8 +58,14 @@ the best run beat it in eight cells of nine; the ninth, `n = 11` at level 6, did
 seed 5,000 of the same stream.
 Levels 1, 3, 5, 7 and 9 have no repaired runs.
 
-**What the measurement cannot yet say.** The claim compares against the shipped level 3,
-which was not measured.
+**What the measurement cannot yet say.** The claim compares against level 3, the page’s
+default when it was registered, which was not measured.
+#171 ships level 9 on a 0–20 dial.
+Level 9 lies between the levels measured, but these cells ran under the page’s previous
+pair law (rigidity 0.15, repulsion 2500, attraction 0, range 0) and a 0.8 s moving span.
+#171 also changes both, to 0.35, 950, 80 and 0.15 and a 0.9 s span, so no cell says how
+level 9 searches as shipped.
+Nothing above level 10 has been measured under either law.
 Each cell is one prefix without spread, and only three `n` were swept.
 
 **What the cells suggest, and do not establish.** The shake is the only randomness in

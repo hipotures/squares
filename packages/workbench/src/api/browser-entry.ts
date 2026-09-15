@@ -20,6 +20,7 @@ export { accessibility } from "../view/accessibility.js";
 export { colour } from "../view/colour.js";
 export * as dom from "../view/dom.js";
 export * as factsView from "../view/facts.js";
+export * as resizeHandle from "../view/resize-handle.js";
 export * as stageView from "../view/stage-renderer.js";
 export * as captureControl from "./capture-control.js";
 export { defineWorkbenchApi, installWorkbenchApi } from "./workbench-api.js";

@@ -5,8 +5,10 @@
   --quiet: #8a939e;
   --quiet-rule: #c9cfd5;
   --new: #a3123f;
-  /* Revision 8: the one green on the page, and it means one thing — the arrangement on the stage
-     is the best known one. Nothing else is ever drawn in it. */
+  /* Revision 8: the one green on the page, and it means one thing — the best known arrangement.
+     It marks the stage when the arrangement is the best known one, the best known upper bound
+     on the gap bar, and, since 2026-09-13, the stage's box and its pointer once the box locks at
+     that side. */
   --met: #17794a;
   --paper: #ffffff;
   --panel: #f7f8fa;
@@ -18,6 +20,9 @@
   --serif: "PT Serif", "Atlas Symbols", Georgia, "Times New Roman", serif;
   --sans: "Source Sans 3", "Atlas Symbols", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  /* metabrowser's accent and fast transition, which its resize handle is drawn in. */
+  --handle-accent: oklch(54.14% 0.1337 246.71);
+  --transition-fast: 150ms ease;
 }
 html,
 body {
@@ -67,16 +72,20 @@ body.capture #stage {
   left: 60px;
   top: 12px;
   width: 1000px;
-  /* 954, not 940: the owner asked for the box to be a little bigger so the headline under it
-     has even space above and below. The square view fits this height, so the settled
-     container's drawn floor is 12 + 954 x 1.045 / 1.09 = 926.6 at every n, and the headline
-     (ink 981 to 1026, measured in pixels) has 54 above and 54 below to the stage's edge.
-     Not larger, because a MOVING drawing reaches lower than the settled floor: while the box
-     grows toward the next record's side, and as squares tilt in the physical styles, the
-     deepest drawn point over every step of the corpus lies 47 below the floor (n = 12 and 20
-     under bodies, n = 6 under physics). At 971 that touched the headline; here it clears it
-     by 8. The stage itself stays 1920 x 1080, which the 1080p capture depends on. */
-  height: 954px;
+  /* 971, not 940: the owner asked for the box to be bigger, with even space above and below
+     the headline under it, and saw and accepted this size. The square view fits this height,
+     so the settled box's path sits at 12 + 971 x 1.045 / 1.09 = 942.9 at every n, and its
+     4 px stroke draws to 945. The headline's ink runs 990 to 1035, measured in pixels: 45
+     above, 45 below.
+     A MOVING drawing reaches lower than the settled box. The SVG clips it (`overflow:
+     hidden`), so nothing is drawn below the SVG's own floor, at 983: on the corpus's deepest
+     steps, a square swinging in a rigid block under the bodies style at n = 293 and 302, the
+     drawing is cut flat there, 7 px above the headline's ink, and `check_animate_view`
+     requires at least 5. The page was shrunk to 954 and then 949 on element boxes, which
+     ignore the clip and put that square 8 px into the headline's ink at this size; drawn,
+     it never reaches it. The stage itself stays 1920 x 1080, which the 1080p capture
+     depends on. */
+  height: 971px;
   display: block;
   touch-action: none;
 }
@@ -238,6 +247,14 @@ body.drawing #packing-svg #squares {
 .gapbar.is-met .gapbar-plot .hand-stem {
   stroke: var(--met);
 }
+/* The stage's box, pointed at from above the rail: black while it moves, green once it locks at
+   the best known side, as the box itself does. */
+.gapbar-plot .box-pointer {
+  fill: #000000;
+}
+.gapbar-plot .box-pointer.is-locked {
+  fill: var(--met);
+}
 /* Every number on the bar is set the same: one size, one weight, tabular figures. What differs
    is the colour, and the colour is the only thing that says which bound it is -- scarlet for
    the proved lower bound, green for the best known upper bound, ink for anything that is
@@ -288,21 +305,21 @@ body.drawing #packing-svg #squares {
    on the widest number the corpus holds, so `n =` does not move as a digit is gained. */
 /* Below the packing, with air the container cannot eat into.
    The container's DRAWN floor is a constant: the packing SVG fits the box into the same
-   rectangle whatever the box is, so it sits at 926.6 at every n, from every start, at every
+   rectangle whatever the box is, so it sits at 942.9 at every n, from every start, at every
    growth size and under a doubled blind inflation -- all five measured (at 913.2, before the
-   drawing grew to 954 tall). What changes inside
+   drawing grew to 971 tall). What changes inside
    it is how much of it the squares fill, not where its edge is. So the clearance here is a
    number that can be chosen once rather than a worst case to guess at.
    The numeral's own box opens above its ink by about a fifth of its size, so what matters is
-   where the INK starts, not where the box does. Measured with pixels: ink from 981 to 1026,
-   54 below the container's floor and 54 above the stage's own.
+   where the INK starts, not where the box does. Measured with pixels: ink from 990 to 1035,
+   45 below the box's drawn edge and 45 above the stage's own.
    Anchored to the stage's floor with `bottom` rather than to its ceiling with `top`. The stage
    is a fixed 1080 tall so the two are the same number today; `bottom` is the one that stays
    true, because what this row is measured from is the bottom of the diagram. */
 #headline {
   position: absolute;
   left: 60px;
-  bottom: 20px;
+  bottom: 11px;
   width: 1000px;
   height: 96px;
 }
@@ -588,6 +605,53 @@ body.drawing #packing-svg #squares {
 }
 body.capture #controls {
   display: none;
+}
+/* The separator between the stage and the controls, after metabrowser's `.resize-handle`
+   (src/metabrowser/static/styles.css), turned for a stacked layout: a 4 px strip that takes
+   no layout space, a 12 px hit area, transparent at rest and metabrowser's accent while
+   hovered, focused or dragged, with its 2 px focus ring. */
+.resize-handle {
+  flex: none;
+  align-self: stretch;
+  height: 4px;
+  margin-bottom: -4px;
+  position: relative;
+  z-index: 2;
+  cursor: row-resize;
+  background: transparent;
+  touch-action: none;
+  transition: background var(--transition-fast);
+}
+.resize-handle::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -4px;
+  bottom: -4px;
+  cursor: row-resize;
+}
+.resize-handle:hover,
+.resize-handle:focus-visible,
+body.resizing .resize-handle {
+  background: var(--handle-accent);
+}
+.resize-handle:focus-visible {
+  outline: 2px solid var(--handle-accent);
+  outline-offset: 1px;
+}
+body.resizing {
+  cursor: row-resize;
+  user-select: none;
+}
+body.capture .resize-handle,
+body.search-active .resize-handle {
+  display: none;
+}
+@media print {
+  .resize-handle {
+    display: none;
+  }
 }
 #panel {
   display: flex;
@@ -1153,6 +1217,21 @@ body.pack-independent #packing-svg {
 }
 body.pack-independent #pack-stage-facts {
   display: block;
+}
+/* The box and its trace are the catalogue's drawing of its container (`drawBounds`), and only the
+   catalogue's scene updates them. Pack and the animation studio draw into the same stage and the
+   same `#container` and draw no box, so while either owns the stage the bounds, which would
+   otherwise stay at the last catalogue step's side, are hidden and the container is drawn, as it
+   was before the box. */
+body.pack-independent #bound-box,
+body.pack-independent #bound-trace,
+body.trace-active #bound-box,
+body.trace-active #bound-trace {
+  display: none;
+}
+body.pack-independent #container,
+body.trace-active #container {
+  stroke: #000000;
 }
 body.search-active #stage-wrap,
 body.search-active #mode-panel,

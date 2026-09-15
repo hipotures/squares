@@ -205,6 +205,24 @@ release remain open under the phases below.
 Preparing their strict modules in parallel does not close the earlier correctness or
 release checkpoints; each phase still requires its specified integration receipts.
 
+The owner directed six interface changes on 2026-09-13 and 2026-09-14. They are stacked
+on this PR from `claude/workbench-defaults-and-bounds`, one commit each:
+
+| Bead | Change |
+| --- | --- |
+| `think-redh` | New defaults: pair law 0.35 / 950 / 80 / 0.15, an annealing dial of 0–20 defaulting to 9, a 0.6 / 0.5 / 0.4 / 0.3 beat and a 0.08 desaturation floor. |
+| `think-jk0f` | Steps that only fill an axis-aligned grid play at double speed behind a checked-by-default control. |
+| `think-31ln` | The stage draws the box a step packs into, black until it locks at the best known side and green once it does, with a trace of its previous size and a gap-bar pointer; motion waits until the box has grown. |
+| `think-tqdo` | Animate is the first tab and the one the page opens on, then Pack and Search. |
+| `think-bau0` | A draggable, keyboard-operable separator sets the stage’s share of the window height. |
+| `think-a7v3` | The Search admission test no longer races a 5 ms wall-clock deadline. |
+
+These add O6 behaviour and repair one test; none closes a Phase 4 or Phase 5 acceptance
+bead. The independent Pack panel keeps its own law and shake scale until `think-doxp`
+decides whether it adopts the new ones.
+The historical checkers that assumed the earlier defaults were retired at `46b8f14e`
+(above), and the defaults are checked from the page by `check_animation_editor`.
+
 ### Mode Contracts
 
 The product has three aspects with one set of computational building blocks:

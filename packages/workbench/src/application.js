@@ -46,8 +46,10 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     transportIntent,
   } = workbenchBundle.navigation;
   const { reducedMotionAction, stageDescription, stageKeyCommand } = workbenchBundle.accessibility;
-  const { decodeCorpus } = workbenchBundle.data;
+  const { clampSeparator, mountResizeHandle } = workbenchBundle.resizeHandle;
+  const { decodeCorpus, isSimpleTransition } = workbenchBundle.data;
   const {
+    baseTiming: timelineBaseTiming,
     displayedCount,
     isStillPair: timelineIsStillPair,
     pairDuration: timelinePairDuration,
@@ -110,6 +112,10 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   const COLOUR = createColourSystem(DATA.colour);
   const FRAMES = DATA.frames;
   const PAIRS = DATA.pairs;
+  // The owner's request of 2026-09-13: a step that only fills the last row of an axis-aligned
+  // grid has no phase worth watching, so it can play at double speed. Decided once, from the
+  // records themselves rather than from n.
+  const SIMPLE = PAIRS.map((p) => isSimpleTransition(FRAMES[p.n], FRAMES[p.n + 1]));
   const FACTS = DATA.facts;
   const METRICS = DATA.metrics;
   const N_MAX = DATA.n_max; // 324: the progress bar always maps to 1..N_MAX
@@ -127,10 +133,10 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // so the resting frame is exactly the retained colours and only the moving picture is muted.
   //: The chroma a fill keeps at full desaturation, as a fraction of its own. 1 leaves the colour
   //: alone and 0 takes it to grey; the owner sets it from the page, so it is a variable rather than
-  //: the constant it was. The default is measured rather than chosen: at a third the moving squares
-  //: still competed with the locked ones for attention, and at an eighth the locked ones carry the
-  //: picture, which is the point of locking them one at a time.
-  let desatFloor = 0.15;
+  //: the constant it was. At a third the moving squares still competed with the locked ones for
+  //: attention, and at an eighth the locked ones carry the picture, which is the point of locking
+  //: them one at a time. The owner lowered the default from 0.15 to 0.08 on 2026-09-13.
+  let desatFloor = 0.08;
   // **Chroma and hue move one at a time, and the hue always moves in the grey.** A square's
   // colour changes twice a beat -- it drains and comes back, and it swaps between the scheme a
   // viewer chose and the atlas's own answer for a finished picture. Doing both at once is what
@@ -163,38 +169,50 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // a short move and a settle of its own, so the scarlet square comes in and takes its colour.
   // Nothing rearranges (that is what makes it static), and the drain stays off for the same
   // reason: there is no motion to mute.
+  // The box's beat on a step (see `drawBounds`): the fraction of the dwell over which the last
+  // step's outer trace clears, of the move over which the box grows, and of the move over which
+  // the inner trace then fades. Nothing is added or moved until both are done, which is
+  // BOX_FIRST of every move.
+  const BOUND_CLEAR = 0.3;
+  const BOUND_GROW = 0.2;
+  const BOUND_FADE = 0.12;
+  const BOX_FIRST = BOUND_GROW + BOUND_FADE;
   const CONTINUOUS = {
-    dwell: 0.8,
-    // The moving span, split: the free rearrangement and then the landing. 0.55 + 0.25 is the
-    // 0.8 this was, at the ratio the physics was already using inside it.
-    move: 0.55,
-    correct: 0.25,
-    settle: 0.8,
+    // The owner's beat of 2026-09-13, the same as the single-step timing the builder supplies.
+    // The moving span is split: the free rearrangement and then the landing.
+    dwell: 0.6,
+    move: 0.5,
+    correct: 0.4,
+    settle: 0.3,
     staticDwell: 0.4,
     staticMove: 0.28,
     staticCorrect: 0.12,
     staticSettle: 0.35,
   };
-  // Revision 7, feature 2: the annealing dial, 0 to 10, default 3. The default is exactly the
-  // revision-6 shake, so nothing about the shipped picture moves when the dial is not touched.
-  // Three things rise with the level, and all three are stated here rather than in the simulator:
-  //   amplitude  0 at level 0, 1 (the shipped jiggle) at 3, 3 at 10, linear on each side of 3;
+  // Revision 7, feature 2: the annealing dial. It ran 0 to 10 with a default of 3, the revision-6
+  // shake; on 2026-09-13 the owner widened it to 0 to 20 and moved the default to 9. Levels 0..10
+  // mean exactly what they did. Three things rise with the level, and all three are stated here
+  // rather than in the simulator:
+  //   amplitude  0 at level 0, 1 (the revision-6 jiggle) at 3, linear on each side of 3: 3 at 10
+  //              and about 5.86 at 20;
   //   decay      the shake falls as (1 - tau)^p over the run, p = 1.5 at levels 0..3 easing to
-  //              0.35 at 10, so at 10 the shake is still at 57% of its amplitude four fifths of
+  //              0.35 at 10 and held there above it, since a power at or below zero would never
+  //              let the shake die; at 0.35 it is still at 57% of its amplitude four fifths of
   //              the way through instead of 9%;
   //   span       the run is 1 move long up to level 3 and lengthens by a tenth of a move a level
-  //              after that, to 1.7 moves at 10 — extra sub-steps at the same dt (the wall clock
-  //              of a step stays 1/120 s), so a high level buys more simulated time to settle in
-  //              rather than a faster shake in the same time. The move on the clock lengthens with
-  //              it, which is why `timing` takes the style: only B and C are annealed.
+  //              after that, to 1.7 moves at 10 and 2.7 at 20 — extra sub-steps at the same dt
+  //              (the wall clock of a step stays 1/120 s), so a high level buys more simulated
+  //              time to settle in rather than a faster shake in the same time. The move on the
+  //              clock lengthens with it, which is why `timing` takes the style: only B and C are
+  //              annealed.
   const ANNEAL = {
     min: 0,
-    max: 10,
-    dflt: 3,
+    max: 20,
+    dflt: 9,
     /** @type {(level: number) => number} */
     amplitude: (L) => (L <= 3 ? L / 3 : 1 + (L - 3) * (2 / 7)),
     /** @type {(level: number) => number} */
-    decayPower: (L) => (L <= 3 ? 1.5 : 1.5 - (L - 3) * (1.15 / 7)),
+    decayPower: (L) => (L <= 3 ? 1.5 : 1.5 - (Math.min(L, 10) - 3) * (1.15 / 7)),
     /** @type {(level: number) => number} */
     span: (L) => (L <= 3 ? 1 : 1 + (L - 3) * 0.1),
   };
@@ -212,6 +230,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   const _QUARTER = Math.PI / 2;
   // Scarlet is defined once, in the stylesheet, and read back here for the fill tint.
   const SCARLET = getComputedStyle(document.documentElement).getPropertyValue("--new").trim();
+  // The best known upper bound's green, which the stage's box turns when it locks at that side.
+  const MET = getComputedStyle(document.documentElement).getPropertyValue("--met").trim();
 
   const state = {
     // Revision 9: one view. Revision 8's two tabs were the same operation over a different span, so
@@ -239,7 +259,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     desaturate: true, // drain the fills' chroma while the pair moves, lock the colour back in over the settle
     snap: true, // blend the physics onto the record's poses over the last of the move, and end on them exactly
     blind: false, // run the physics with no knowledge of the target poses at all
-    anneal: 3, // how hard and how long the physical styles shake: 0 none, 3 the shipped default, 10 the loudest
+    anneal: ANNEAL.dflt, // how hard and how long the physical styles shake: 0 none, 20 the loudest
     links: false,
     // Revision 12: the stage takes two different press-drag-release gestures, and a toggle is what
     // keeps them apart. Off — the shipped behaviour — a press picks a square up and moves it. On, a
@@ -260,7 +280,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     packN: null,
     // Continuous play across the whole sequence: on, whether static appends take the full beat, and
     // whether the next pair is simulated during this one's dwell.
-    continuous: { on: false, fullBeat: false, prefetch: true },
+    continuous: { on: false, fullBeat: false, fastSimple: true, prefetch: true },
     // Revision 9: the range, stated as the values of n stepped *into*, which is the unit the chooser
     // and the chips have always used. 17 to 17 is the one step 16 -> 17 (the page's default), 2 to
     // 324 is the whole corpus. Clamped to what the page carries by `setRange`.
@@ -535,6 +555,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   const stage = htmlNode("stage");
   const stageDescriptionNode = htmlNode("stage-accessible-description");
   const containerRect = svgNode("container");
+  const traceRect = svgNode("bound-trace");
+  const boxRect = svgNode("bound-box");
   const linksGroup = svgNode("links");
   const maskGroup = svgNode("mask-links");
   const drawLine = svgNode("draw-line");
@@ -747,6 +769,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     poseY = null,
     poseA = null;
   let sceneSide = 0; // the container side the last frame drew, which is where a drag picks the run up
+  let boxSide = 0; // the side the stage's box was last drawn at, which the gap bar points to
+  let boxLocked = false; // whether that box is at the best known side of the n it is showing
   let keyboardSquare = 0;
   let tgtX = null,
     tgtY = null,
@@ -1152,6 +1176,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   function timelineConfiguration() {
     return {
       pairs: PAIRS,
+      simple: SIMPLE,
+      fastSimple: state.continuous.fastSimple,
+      boxFirst: BOX_FIRST,
       timing: state.timing,
       continuous: {
         on: state.continuous.on,
@@ -1322,7 +1349,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     // squares do not rush before the container has made room
     // Revision 11: the push-apart's stiffness (2500 per unit of penetration, per move^2) and its
     // cap (0.15, past which it stopped growing) left this table and became `LAW.repulsion` and
-    // `LAW.rigidity`, which the owner can edit. The defaults there are those two numbers.
+    // `LAW.rigidity`, which the owner can edit. They were the defaults until 2026-09-13.
     contactDamping: 20, // damping on the closing speed of two overlapping squares
     contactTorque: 0.15, // fraction of a contact's or wall's torque applied to a single square (the push acts at a
     // corner); the rest yields to the angle spring. A block takes the whole torque about its centroid.
@@ -1394,9 +1421,10 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   //
   // `steep` is not a fifth parameter: it is derived from the rigidity so that the shipped value is
   // exactly the old law. The old law was `contact * min(p, contactCap)` — linear to a cap and flat
-  // past it — so rigidity 0.15 (the old `contactCap`) with steep 0 reproduces it to the bit, which
-  // is why the four defaults below are what they are and why every cached trajectory, every blind
-  // run and every measurement in revisions 6 to 10 is unchanged until the law is touched.
+  // past it — so rigidity 0.15 (the old `contactCap`) with steep 0 reproduces it to the bit.
+  // That law was the default until 2026-09-13, so the cached trajectories, blind runs and
+  // measurements of revisions 6 to 10 reproduce under `{rigidity: 0.15, repulsion: 2500,
+  // attraction: 0, range: 0}`. On 2026-09-13 the owner chose a softer, slightly sticky default.
   // Below the shipped rigidity the shared law's slope past the knee climbs linearly, so the
   // hardest setting is a knee at two thousandths of a side with eight times the stiffness past it:
   // effectively rigid at this timestep, and measured stable.
@@ -1445,7 +1473,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   ];
   const LAW_KEYS = LAW_PARAMS.map((d) => d.key);
   /** @type {AtlasLaw} */
-  const LAW_DEFAULT = { rigidity: 0.15, repulsion: 2500, attraction: 0, range: 0 };
+  const LAW_DEFAULT = { rigidity: 0.35, repulsion: 950, attraction: 80, range: 0.15 };
   /** @type {AtlasLawBounds} */
   const LAW_BOUNDS = {
     rigidity: [0.002, 0.4], // the penetration tolerated before the repulsion climbs steeply
@@ -1718,7 +1746,10 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     // too, and `move` stopped being the whole of it when the correction got its own time.
     // Reading `move` alone cut a run's steps by 31 per cent at the shipped beat, which
     // the revision-7 checks caught as every free run suddenly missing by ten times as much.
-    const tm = timing(pairIndex, style);
+    // And the base timing, not the one the clock plays: the simple-transition speed-up is
+    // presentation, and pricing steps off the played span halved a grid fill's physics work in
+    // `physics()` and the annealing benchmark.
+    const tm = timelineBaseTiming(timelineConfiguration(), pairIndex, style);
     return Math.max(1, Math.round(PHYS.stepsPerSecond * (tm.move + tm.correct)));
   }
   function ensureTrajectory(pairIndex, style, mode) {
@@ -2525,6 +2556,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // taken to two places when in fact the value is four.
   const barNum = (value) => (Number.isInteger(value) ? String(value) : value.toFixed(3));
   const gapbarHand = svgNode("gapbar-hand");
+  const gapbarBox = svgNode("gapbar-box");
   const gapbarLowerLabel = svgNode("gapbar-lower-label");
   // An SVG text node, not an HTML one, which is why `measureDigit` can ask it for its
   // `getComputedTextLength`. `getElementById` is typed as returning an HTML element whatever it
@@ -2679,6 +2711,16 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     const i = gapbarInfo;
     const span = GAPBAR.width - 2 * GAPBAR.inset;
     return GAPBAR.inset + clamp01((value - i.lo) / (i.hi - i.lo)) * span;
+  }
+  // The triangle over the rail follows the stage's box on every frame, not only the still
+  // ones the hand is measured on: the box's growing and shrinking is the thing it shows. Kept
+  // inside the bar by its half-width, like the hand.
+  function pointAtBox(p) {
+    gapbarSetup(p, state.liveN);
+    const HALF = 8;
+    const x = Math.max(HALF, Math.min(GAPBAR.width - HALF, gapbarX(boxSide)));
+    gapbarBox.setAttribute("transform", `translate(${fmt(x, 2)} 0)`);
+    gapbarBox.classList.toggle("is-locked", boxLocked);
   }
   function updateGapBar(p, _B, g, mode, assessment, precision) {
     const info = gapbarSetup(p, state.liveN);
@@ -3750,16 +3792,18 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // the run's first 68 per cent and `correct` seconds on its last 32, so the two phases have
   // independent durations while the run they play is the same one. Lengthening the search no
   // longer lengthens the landing with it, which was the whole complaint.
+  // The run waits out the box's BOX_FIRST of the move, like every other motion on a step.
   function moveProgress(sc, t) {
     const tm = timing();
-    const span = sc.moveEnd - sc.moveStart;
+    const start = sc.moveStart + (sc.moveEnd - sc.moveStart) * BOX_FIRST;
+    const span = sc.moveEnd - start;
     const total = tm.move + tm.correct;
     if (span <= 0 || total <= 0) {
-      return ramp(t, sc.moveStart, sc.moveEnd);
+      return ramp(t, start, sc.moveEnd);
     }
-    const knee = sc.moveStart + span * (tm.move / total);
+    const knee = start + span * (tm.move / total);
     return t < knee
-      ? ramp(t, sc.moveStart, knee) * PHYS.tightenFrom
+      ? ramp(t, start, knee) * PHYS.tightenFrom
       : PHYS.tightenFrom + ramp(t, knee, sc.moveEnd) * (1 - PHYS.tightenFrom);
   }
   // Where the physical styles put every square at `t`, written into the three pose buffers, and
@@ -3935,6 +3979,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     } else {
       renderTweenScene(p, A, B, tm, sc, t);
     }
+    drawBounds(p, sc, t, optimizing);
+    pointAtBox(p);
     // The live gap, from the poses the scene just drew. Style A never runs blind or free, so it is
     // always measured against the record's own labelling. A run from a random or grid start, or a
     // blind one, has no correspondence to that labelling, so only the box comparison means anything.
@@ -4006,6 +4052,97 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
 
     syncStageAccessibility();
     updateChrome();
+  }
+
+  // The box, as the owner asked on 2026-09-13: a bold square at the side the step is using, black
+  // while it is on its way and green once it locks at the best known side, and a thin black trace
+  // of where it just was, so every change of size is seen from both ends.
+  //   dwell   green rests at n's best known side; the trace the last step left outside it clears
+  //           over the dwell's last BOUND_CLEAR.
+  //   grow    over the first BOUND_GROW of the move green opens up and to the right to the room
+  //           n + 1 can always use -- ceil(sqrt(n + 1)), the grid, or the best known side where that
+  //           is wider -- riding out further wherever the moving container breathes past it. The
+  //           trace stays inside at n's side.
+  //   clear   the inner trace fades over the next BOUND_FADE, leaving room for the new square,
+  //           which the schedule holds back, with every other motion, until BOX_FIRST.
+  //   settle  green contracts to n + 1's best known side and the trace stays outside it, where the
+  //           box was, until the next step clears it.
+  // Where the grid is the best known packing the box never changes size and stays green. An
+  // open-ended run has walls rather than a step: its box is drawn on the walls, black, with no
+  // trace.
+  function openSide(n) {
+    return Math.max(Math.ceil(Math.sqrt(n)), FRAMES[String(n)].side);
+  }
+  // Each scene fits its view to its own container, which the box and its trace can lie outside of,
+  // so the view is widened, never narrowed, to hold them with the same breathing room.
+  function holdInView(side) {
+    const view = (svg.getAttribute("viewBox") ?? "").split(/\s+/).map(Number);
+    const x = view[0] ?? 0;
+    const y = view[1] ?? 0;
+    const size = view[2] ?? 0;
+    const pad = side * PAD;
+    const left = Math.min(x, -pad);
+    const right = Math.max(x + size, side + pad);
+    const top = Math.min(y, -side - pad);
+    const bottom = Math.max(y + size, pad);
+    const span = Math.max(right - left, bottom - top);
+    if (left === x && top === y && span === size) {
+      return;
+    }
+    const cx = (left + right) / 2;
+    const cy = (top + bottom) / 2;
+    svg.setAttribute("viewBox", `${cx - span / 2} ${cy - span / 2} ${span} ${span}`);
+  }
+  function drawBounds(p, sc, t, optimizing) {
+    const from = FRAMES[String(p.n)].side;
+    const to = FRAMES[String(p.n + 1)].side;
+    const open = openSide(p.n + 1);
+    let box = sceneSide;
+    let trace = sceneSide;
+    let seen = 0;
+    // The side the view holds through the whole step, so the picture does not zoom as the trace
+    // comes and goes: n's open side through the dwell, n + 1's once the box has grown.
+    let held = sceneSide;
+    if (!optimizing && t <= sc.moveStart) {
+      box = from;
+      trace = openSide(p.n);
+      seen = 1 - ramp(t, sc.moveStart * (1 - BOUND_CLEAR), sc.moveStart);
+      held = trace;
+    } else if (!optimizing && t < sc.moveEnd) {
+      const span = sc.moveEnd - sc.moveStart;
+      const grown = sc.moveStart + span * BOUND_GROW;
+      const opening = easeInOut(ramp(t, sc.moveStart, grown));
+      box = Math.max(sceneSide, lerp(from, open, opening));
+      trace = from;
+      seen = 1 - ramp(t, grown, grown + span * BOUND_FADE);
+      held = Math.max(box, lerp(openSide(p.n), open, opening));
+    } else if (!optimizing) {
+      trace = Math.max(sceneSide, open);
+      box = Math.max(sceneSide, lerp(trace, to, easeInOut(ramp(t, sc.moveEnd, sc.end))));
+      seen = 1;
+      held = trace;
+    }
+    if (!optimizing) {
+      holdInView(held);
+    }
+    traceRect.setAttribute("opacity", String(seen));
+    traceRect.setAttribute("width", String(trace));
+    traceRect.setAttribute("height", String(trace));
+    boxRect.setAttribute("width", String(box));
+    boxRect.setAttribute("height", String(box));
+    boxSide = box;
+    // **Locked means at rest at the best known side of the n on show.** The n on show is
+    // `state.liveN`, the one the panel and the gap bar describe. Through a move the box is on its
+    // way to the room n + 1 needs, and where that room is n + 1's own best known side the box
+    // reaches it a fifth of the way in, while the squares still move and the bar still shows n:
+    // keyed to n + 1 from the move's start, 16 steps turned green there (#171 R2), and under
+    // physics 5 -> 6 flickered as the container breathed past it. So through a move the box locks
+    // only on a step whose box does not change size, a grid fill, where it rests from end to end.
+    const best = FRAMES[String(state.liveN)].side;
+    const resting = t <= sc.moveStart || t >= sc.moveEnd || (from === to && open === to);
+    boxLocked =
+      !optimizing && resting && Math.abs(box - best) <= PACKING_VALIDITY.penetrationTolerance;
+    boxRect.setAttribute("stroke", boxLocked ? MET : "#000000");
   }
 
   // Style A, the block tween of revision 5: poses tween between the two frames, a block's members
@@ -4371,6 +4508,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     });
     /** @type {HTMLInputElement} */ (inputNode("fullbeat-toggle")).checked =
       state.continuous.fullBeat;
+    /** @type {HTMLInputElement} */ (inputNode("fastsimple-toggle")).checked =
+      state.continuous.fastSimple;
     updateStepChooser();
     updateRangeControls();
     const c = continuousState();
@@ -4387,7 +4526,10 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       c.staticPairs +
       " of " +
       c.pairs +
-      " pairs); this pair " +
+      " pairs); " +
+      c.simplePairs +
+      (c.fastSimple ? " simple grid fills at double speed" : " simple grid fills at full length") +
+      "; this pair " +
       fmt(duration(), 2) +
       " s, " +
       fmt(c.remaining, 0) +
@@ -4561,12 +4703,61 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // was noticed. 0.58 is chosen to leave 1920x1080 exactly as it was: the panel is 596 px
   // there, which is 0.552 of the height, so it still fits under the cap and nothing moves.
   const CONTROLS_SHARE = 0.58;
+  // The separator between the stage and the controls (owner, 2026-09-14). Dragging it, or
+  // moving it with the keyboard, fixes the share of the window height the stage may take;
+  // the share is remembered across reloads and re-clamped whenever the window changes, and
+  // the controls take the rest and scroll inside it. A double-click forgets the share and
+  // returns to the automatic layout below. The stage keeps STAGE_MIN px however high the
+  // separator goes, and the controls keep CONTROLS_MIN px, enough for the mode tabs.
+  const STAGE_SHARE_KEY = "squares.workbench.stageShare";
+  const STAGE_MIN = 120;
+  const CONTROLS_MIN = 56;
+  let stageShare = readStageShare();
+  let stageHandle = null;
+  function readStageShare() {
+    try {
+      const share = Number(window.localStorage.getItem(STAGE_SHARE_KEY));
+      return share > 0 && share < 1 ? share : null;
+    } catch {
+      return null;
+    }
+  }
+  function writeStageShare(share) {
+    try {
+      if (share === null) {
+        window.localStorage.removeItem(STAGE_SHARE_KEY);
+      } else {
+        window.localStorage.setItem(STAGE_SHARE_KEY, String(share));
+      }
+    } catch {
+      // Storage can be unavailable (a private window, a blocked origin); the share still
+      // holds for this page.
+    }
+  }
+  function stageBounds() {
+    return { min: STAGE_MIN, max: window.innerHeight - CONTROLS_MIN };
+  }
   function layout() {
     if (document.hidden) {
       return;
     }
     const vw = window.innerWidth,
       vh = window.innerHeight;
+    const sized =
+      stageShare !== null && !state.capture && !document.body.classList.contains("search-active");
+    if (sized) {
+      const height = clampSeparator(stageShare * vh, stageBounds());
+      const scale = Math.min(vw / 1920, height / 1080);
+      stage.style.transform = `scale(${scale})`;
+      stageWrap.style.width = `${1920 * scale}px`;
+      stageWrap.style.height = `${1080 * scale}px`;
+      controls.style.height = `${vh - 1080 * scale}px`;
+      controls.style.maxHeight = "none";
+      stageHandle?.sync();
+      return;
+    }
+    controls.style.height = "";
+    controls.style.maxHeight = "";
     let ch = state.capture ? 0 : controls.offsetHeight;
     if (!state.capture) {
       // A hidden document is not laid out, so `offsetHeight` reads zero in a background tab;
@@ -4580,6 +4771,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     stage.style.transform = `scale(${s})`;
     stageWrap.style.width = `${1920 * s}px`;
     stageWrap.style.height = `${1080 * s}px`;
+    stageHandle?.sync();
   }
 
   // ---------------------------------------------------------------- clock (rAF deltas only)
@@ -4892,7 +5084,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     updateSegments();
     render();
   }
-  // The annealing dial. A level is a whole number 0..10; it scales the jiggle, stretches its decay
+  // The annealing dial. A level is a whole number 0..20; it scales the jiggle, stretches its decay
   // and lengthens the run, so the trajectory cache is keyed by it and the clock has to be rescaled
   // where the move's length changes under a playing pair.
   function setAnneal(level) {
@@ -4922,8 +5114,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       amplitude: ANNEAL.amplitude(state.anneal),
       decayPower: ANNEAL.decayPower(state.anneal),
       span: ANNEAL.span(state.anneal),
-      // The whole moving span, which is what the run is drawn over and what `steps` counts.
-      // `move` alone stopped being that when the correction got its own time.
+      // The whole moving span the run is drawn over on the clock. `move` alone stopped being
+      // that when the correction got its own time. `steps` counts the base span's work, which a
+      // simple transition's speed-up does not shorten.
       move: timing().move + timing().correct,
       steps: physicsSteps(state.pair, state.style),
     };
@@ -5034,8 +5227,14 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   }
   function setContinuous(options) {
     const o = options || {};
+    // A change of speed keeps the playhead at the same point of the pair rather than of the clock.
+    const frac = duration() > 0 ? state.t / duration() : 0;
     if (o.fullBeat !== undefined) {
       state.continuous.fullBeat = !!o.fullBeat;
+    }
+    if (o.fastSimple !== undefined && !!o.fastSimple !== state.continuous.fastSimple) {
+      state.continuous.fastSimple = !!o.fastSimple;
+      state.t = frac * duration();
     }
     if (o.prefetch !== undefined) {
       state.continuous.prefetch = !!o.prefetch;
@@ -5065,6 +5264,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     return {
       on: state.continuous.on,
       fullBeat: state.continuous.fullBeat,
+      fastSimple: state.continuous.fastSimple,
       prefetch: state.continuous.prefetch,
       dwell: CONTINUOUS.dwell,
       move: CONTINUOUS.move,
@@ -5073,6 +5273,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       pair: state.pair,
       pairs: PAIRS.length,
       staticPairs: still,
+      simplePairs: SIMPLE.filter(Boolean).length,
       timing: Object.assign({}, timing()),
       total: sequenceDuration(),
       remaining,
@@ -5848,6 +6049,11 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     .addEventListener("change", (ev) =>
       setContinuous({ fullBeat: /** @type {HTMLInputElement} */ (ev.target).checked }),
     );
+  document
+    .getElementById("fastsimple-toggle")
+    .addEventListener("change", (ev) =>
+      setContinuous({ fastSimple: /** @type {HTMLInputElement} */ (ev.target).checked }),
+    );
   // Typing in `from` alone drags `to` with it while the two are equal, so a one-step range stays one
   // step rather than silently widening.
   rangeFrom.addEventListener("change", () => {
@@ -6144,7 +6350,28 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     onChange: () => requestAnimationFrame(layout),
   });
   win.searchWorkbench = searchPanel;
+  stageHandle = mountResizeHandle({
+    document,
+    handle: htmlNode("stage-resize"),
+    position: () => stageWrap.getBoundingClientRect().height,
+    bounds: stageBounds,
+    place: (height) => {
+      stageShare = height === null ? null : height / window.innerHeight;
+      writeStageShare(stageShare);
+      // Back to the automatic layout, the tallest-controls measurement starts again: the
+      // height the controls were held at is not evidence about their own.
+      if (stageShare === null) {
+        controlsHeight = 0;
+      }
+      layout();
+    },
+    describe: (height) =>
+      `stage ${Math.round((100 * height) / window.innerHeight)} percent of the window height`,
+  });
   setRange(DEFAULT_STEP_N, DEFAULT_STEP_N);
+  // The page opens on Animate, the aspect the owner uses most (2026-09-14), through the same
+  // transition a click on its tab takes, so Pack still remembers the n it was set up on.
+  setMode("animate");
   layout();
   // The scale's figure width is measured from the drawn numerals, so it has to be taken again once
   // the faces are in; re-rendering afterwards is a no-op on everything but the suppression.

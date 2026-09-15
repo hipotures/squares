@@ -410,4 +410,27 @@ export function pairAt(corpus: Corpus, index: number): CorpusPair {
   return pair;
 }
 
-export const corpusData = Object.freeze({ decodeCorpus, frameAt, pairAt });
+/**
+ * Degrees within which a catalogue angle counts as axis-aligned. Catalogue angles are either
+ * exact multiples of 90 or at least 1e-4 degrees away from one.
+ */
+const AXIS_ALIGNED_DEGREES = 1e-6;
+
+function axisAligned(frame: CorpusFrame): boolean {
+  return frame.squares.every(([, , degrees]) => {
+    const offset = ((degrees % 90) + 90) % 90;
+    return Math.min(offset, 90 - offset) <= AXIS_ALIGNED_DEGREES;
+  });
+}
+
+/**
+ * A step is simple when both records are axis-aligned in the same container: the new square
+ * fills a hole in the last row of a grid, so nothing else has anywhere to go. In the catalogue
+ * these are steps within k^2 - k to k^2 whose packings are all grids; the step to k^2 + 1
+ * changes the container and is never simple.
+ */
+export function isSimpleTransition(source: CorpusFrame, target: CorpusFrame): boolean {
+  return source.side === target.side && axisAligned(source) && axisAligned(target);
+}
+
+export const corpusData = Object.freeze({ decodeCorpus, frameAt, pairAt, isSimpleTransition });

@@ -396,7 +396,15 @@ def single_view(session: Session) -> str:
             f"choosing {style} gave {chosen['style']} with the note {chosen['note']!r}",
         )
 
-    timing = ["t-dwell", "t-move", "t-correct", "t-settle", "phase-seg", "fullbeat-toggle"]
+    timing = [
+        "t-dwell",
+        "t-move",
+        "t-correct",
+        "t-settle",
+        "phase-seg",
+        "fullbeat-toggle",
+        "fastsimple-toggle",
+    ]
     outside = session.look("dom/contains", parent="step-anim-box", ids=timing)
     session.require(outside == [], f"the timing group does not hold {outside}")
     shown = session.look("dom/drawn", ids=["step-anim-box", *timing])

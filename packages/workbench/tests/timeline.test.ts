@@ -2,8 +2,10 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
   annealSpan,
+  baseTiming,
   continuousTiming,
   displayedCount,
+  isSpedUpPair,
   pairDuration,
   pairSchedule,
   pairTiming,
@@ -11,6 +13,7 @@ import {
   ramp,
   rangeDuration,
   rangeProgress,
+  SIMPLE_TRANSITION_SPEED,
   seekSequence,
   sequenceDuration,
   type TimelineConfiguration,
@@ -61,6 +64,59 @@ test("four-span timing preserves correction in single, continuous and annealed p
   assert.equal(annealSpan("tween", 10), 1);
 });
 
+test("simple transitions play every phase at double speed only while the setting is on", () => {
+  const config = configuration();
+  config.simple = [true, false, true, false];
+  const full = [0, 1, 2, 3].map((index) => pairDuration(config, index, "tween"));
+  const fullSequence = sequenceDuration(config, "tween");
+  config.fastSimple = true;
+  assert.deepEqual(
+    [0, 1, 2, 3].map((index) => isSpedUpPair(config, index)),
+    [true, false, true, false],
+  );
+  near(pairDuration(config, 0, "tween"), (full[0] ?? Number.NaN) / 2);
+  near(pairDuration(config, 1, "tween"), full[1] ?? Number.NaN);
+  near(pairDuration(config, 2, "tween"), (full[2] ?? Number.NaN) / 2);
+  near(
+    sequenceDuration(config, "tween"),
+    fullSequence - ((full[0] ?? Number.NaN) + (full[2] ?? Number.NaN)) / 2,
+  );
+  const beat = pairTiming(config, 2, "tween");
+  near(beat.dwell, 0.2);
+  near(beat.move, 0.14);
+  near(beat.correct, 0.06);
+  near(beat.settle, 0.175);
+  config.continuous.on = false;
+  near(pairTiming(config, 0, "tween").settle, 0.4);
+  config.fastSimple = false;
+  near(pairTiming(config, 0, "tween").settle, 0.8);
+  assert.throws(() => isSpedUpPair(config, 9), /no transition/);
+});
+
+test("physics work is priced from the base timing, which the speed-up does not shorten", () => {
+  const config = configuration();
+  config.simple = [true, false, true, false];
+  config.fastSimple = true;
+  config.anneal = 8;
+  const spans = ["dwell", "move", "correct", "settle"] as const;
+  for (const on of [true, false]) {
+    config.continuous.on = on;
+    for (const index of [0, 1, 2, 3]) {
+      const played = pairTiming(config, index, "physics");
+      const base = baseTiming(config, index, "physics");
+      const speed = isSpedUpPair(config, index) ? SIMPLE_TRANSITION_SPEED : 1;
+      for (const span of spans) {
+        near(played[span] * speed, base[span]);
+      }
+    }
+  }
+  const sped = baseTiming(config, 0, "physics");
+  config.fastSimple = false;
+  assert.deepEqual(baseTiming(config, 0, "physics"), sped);
+  assert.deepEqual(pairTiming(config, 0, "physics"), sped);
+  assert.throws(() => baseTiming(config, 9, "physics"), /no transition/);
+});
+
 test("staging exposes arrival, free movement, correction and facts-panel count", () => {
   const config = configuration();
   const schedule = pairSchedule(config, 1, "tween");
@@ -79,6 +135,24 @@ test("staging exposes arrival, free movement, correction and facts-panel count",
   near(after.arrived, 1.6);
   config.phase = "simultaneous";
   near(pairSchedule(config, 1, "tween").arrive, 0.8 + (0.8 * 2) / 3);
+});
+
+test("box-first holds arrival and block motion until its share of the move has passed", () => {
+  const config = configuration();
+  const plain = pairSchedule(config, 1, "tween");
+  config.boxFirst = 0.32;
+  const held = pairSchedule(config, 1, "tween");
+  const span = plain.moveEnd - plain.moveStart;
+  near(held.moveStart, plain.moveStart);
+  near(held.moveEnd, plain.moveEnd);
+  near(held.arrive, plain.moveStart + 0.32 * span);
+  near(held.arrived, held.arrive + 0.68 * span * 0.3);
+  near(held.blocksStart, held.arrived);
+  near(held.blocksEnd, plain.moveEnd);
+  config.phase = "simultaneous";
+  near(pairSchedule(config, 1, "tween").blocksStart, plain.moveStart + 0.32 * span);
+  config.boxFirst = 1.5;
+  assert.throws(() => pairSchedule(config, 1, "tween"), /box-first fraction/);
 });
 
 test("rotation-first and slide-first are distinct pure schedules", () => {
@@ -122,6 +196,7 @@ test("zero-duration phases remain deterministic and malformed durations fail ear
   assert.equal(ramp(-1, 0, 0), 0);
   config.timing.correct = Number.NaN;
   assert.throws(() => pairDuration(config, 0, "tween"), /finite/);
-  assert.throws(() => annealSpan("physics", 11), /zero and ten/);
+  assert.equal(annealSpan("physics", 20), 2.7);
+  assert.throws(() => annealSpan("physics", 21), /zero and twenty/);
   assert.throws(() => seekSequence(configuration(), "tween", Number.NaN), /finite seconds/);
 });

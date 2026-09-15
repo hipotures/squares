@@ -9,8 +9,20 @@ export interface ContinuousTiming {
   staticBeat: AtlasTiming;
 }
 
+/** How many times faster a simple transition plays while `fastSimple` is on. */
+export const SIMPLE_TRANSITION_SPEED = 2;
+
 export interface TimelineConfiguration {
   pairs: readonly Pick<CorpusPair, "n" | "kind">[];
+  /** Per pair, whether the step only fills an axis-aligned grid; see `isSimpleTransition`. */
+  simple?: readonly boolean[];
+  /** Play simple transitions, every phase, at `SIMPLE_TRANSITION_SPEED`. */
+  fastSimple?: boolean;
+  /**
+   * The fraction of the moving span kept at its start for the box to grow, before the new square
+   * arrives or any square moves. Zero, the default, starts both with the move.
+   */
+  boxFirst?: number;
   timing: AtlasTiming;
   continuous: ContinuousTiming;
   anneal: number;
@@ -72,8 +84,8 @@ export function isStillPair(configuration: TimelineConfiguration, index: number)
 
 /** The simulation has more work above level three; an illustration has no annealing. */
 export function annealSpan(style: AtlasStyle, level: number): number {
-  if (finiteNonnegative(level, "anneal") > 10) {
-    throw new RangeError("anneal must be between zero and ten");
+  if (finiteNonnegative(level, "anneal") > 20) {
+    throw new RangeError("anneal must be between zero and twenty");
   }
   return style !== "tween" && level > 3 ? 1 + (level - 3) * 0.1 : 1;
 }
@@ -90,12 +102,35 @@ export function continuousTiming(
   return scaledTiming(continuous.beat, annealSpan(style, configuration.anneal));
 }
 
+/** Whether this pair is a simple transition that currently plays sped up. */
+export function isSpedUpPair(configuration: TimelineConfiguration, index: number): boolean {
+  pairAt(configuration, index);
+  return configuration.fastSimple === true && configuration.simple?.[index] === true;
+}
+
+function spedTiming(timing: AtlasTiming, speed: number): AtlasTiming {
+  const valid = checkedTiming(timing);
+  return {
+    dwell: valid.dwell / speed,
+    move: valid.move / speed,
+    correct: valid.correct / speed,
+    settle: valid.settle / speed,
+  };
+}
+
 function scaledTiming(timing: AtlasTiming, scale: number): AtlasTiming {
   const valid = checkedTiming(timing);
   return { ...valid, move: valid.move * scale, correct: valid.correct * scale };
 }
 
-export function pairTiming(
+/**
+ * The timing a pair's work is priced from: the beat, and the annealed span of the move, with no
+ * presentation speed-up. Physics steps are counted from this, so a simple transition played at
+ * double speed simulates what it simulates at full length, and `physics()` and the benchmark do
+ * the same work whatever the clock plays. A trajectory is sampled by move fraction, so a faster
+ * clock still plays all of it.
+ */
+export function baseTiming(
   configuration: TimelineConfiguration,
   index: number,
   style: AtlasStyle,
@@ -104,6 +139,16 @@ export function pairTiming(
   return configuration.continuous.on
     ? continuousTiming(configuration, index, style)
     : scaledTiming(configuration.timing, annealSpan(style, configuration.anneal));
+}
+
+/** The timing a pair plays on the clock: its base timing, sped up while it plays sped up. */
+export function pairTiming(
+  configuration: TimelineConfiguration,
+  index: number,
+  style: AtlasStyle,
+): AtlasTiming {
+  const timing = baseTiming(configuration, index, style);
+  return isSpedUpPair(configuration, index) ? spedTiming(timing, SIMPLE_TRANSITION_SPEED) : timing;
 }
 
 export function timingDuration(timing: AtlasTiming): number {
@@ -133,24 +178,27 @@ export function pairSchedule(
   const end = timingDuration(timing);
   const arrivalFraction = fraction(configuration.arrivalFraction, "arrival fraction");
   const newFraction = fraction(configuration.newFraction, "new fraction");
+  const reserved = span * fraction(configuration.boxFirst ?? 0, "box-first fraction");
+  const workStart = moveStart + reserved;
+  const work = span - reserved;
   let arrive: number;
   let arrived: number;
   let blocksStart: number;
   let blocksEnd: number;
   if (configuration.phase === "add-then-move") {
-    arrive = moveStart;
-    arrived = moveStart + span * arrivalFraction;
+    arrive = workStart;
+    arrived = workStart + work * arrivalFraction;
     blocksStart = arrived;
     blocksEnd = moveEnd;
   } else if (configuration.phase === "move-then-add") {
-    blocksStart = moveStart;
-    blocksEnd = moveStart + span * (1 - arrivalFraction);
+    blocksStart = workStart;
+    blocksEnd = workStart + work * (1 - arrivalFraction);
     arrive = blocksEnd;
     arrived = moveEnd;
   } else {
-    blocksStart = moveStart;
+    blocksStart = workStart;
     blocksEnd = moveEnd;
-    arrive = moveStart + span * (1 - newFraction);
+    arrive = workStart + work * (1 - newFraction);
     arrived = moveEnd;
   }
   return {
@@ -281,8 +329,10 @@ export function displayedCount(
 
 export const timeline = Object.freeze({
   isStillPair,
+  isSpedUpPair,
   annealSpan,
   continuousTiming,
+  baseTiming,
   pairTiming,
   timingDuration,
   pairDuration,

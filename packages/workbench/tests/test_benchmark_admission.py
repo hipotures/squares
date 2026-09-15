@@ -335,7 +335,7 @@ def test_sweep_cannot_rank_an_invalid_high_score(
     "spec",
     [
         ["unknown=1"],
-        ["anneal=11"],
+        ["anneal=21"],
         ["inflate=0.9"],
         ["anneal=3", "anneal=4"],
     ],

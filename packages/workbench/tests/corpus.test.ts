@@ -1,7 +1,13 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
-import { decodeCorpus, frameAt, pairAt } from "../src/data/corpus.ts";
+import {
+  type CorpusFrame,
+  decodeCorpus,
+  frameAt,
+  isSimpleTransition,
+  pairAt,
+} from "../src/data/corpus.ts";
 
 function fixture(): unknown {
   return JSON.parse(readFileSync(new URL("fixtures/corpus.json", import.meta.url), "utf8"));
@@ -60,4 +66,27 @@ test("counts, pair maps, block indices and stable square identities are checked"
   const missingFrame = decodeCorpus(fixture());
   delete missingFrame.frames["2"];
   assert.throws(() => decodeCorpus(missingFrame), /no frame/);
+});
+
+test("a simple transition keeps an axis-aligned grid in the same container", () => {
+  const frame = (side: number, degrees: number[]): CorpusFrame => ({
+    side,
+    squares: degrees.map((angle, index) => [index + 0.5, 0.5, angle, "#257260", index + 1]),
+    ident: degrees.map((_, index) => index + 1),
+  });
+  assert.ok(isSimpleTransition(frame(3, [0, 90, -90]), frame(3, [0, 180, 270, 0])));
+  assert.ok(!isSimpleTransition(frame(3, [0, 0]), frame(4, [0, 0, 0])), "the container grew");
+  assert.ok(!isSimpleTransition(frame(3, [0, 0.0001]), frame(3, [0, 0, 0])), "a tilted source");
+  assert.ok(!isSimpleTransition(frame(3, [0, 0]), frame(3, [0, 0, 44.9])), "a tilted target");
+  // The tolerance sits between a float residue and the catalogue's smallest real tilt, 1e-4
+  // degrees off a right angle (at n = 105).
+  assert.ok(isSimpleTransition(frame(3, [1e-7, 90 - 1e-7]), frame(3, [-1e-7, 360, 0])));
+  assert.ok(!isSimpleTransition(frame(3, [0, 89.9999]), frame(3, [0, 0, 0])), "1e-4 off 90");
+  assert.ok(!isSimpleTransition(frame(3, [0, 0]), frame(3, [0, 0, -1e-4])), "1e-4 off 0");
+  // The fixture's one step, 1 -> 2, grows the container from 1 to 2, so it plays at full length.
+  const corpus = decodeCorpus(fixture());
+  const first = pairAt(corpus, 0);
+  const [source, target] = [frameAt(corpus, first.n), frameAt(corpus, first.n + 1)];
+  assert.deepEqual([first.n, source.side, target.side], [1, 1, 2]);
+  assert.equal(isSimpleTransition(source, target), false);
 });

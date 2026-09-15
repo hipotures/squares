@@ -49,6 +49,7 @@ CALLERS = (
     "check_pack_panel.py",
     "check_page_policy.py",
     "check_search_panel.py",
+    "check_stage_resize.py",
     "check_revision6.py",
     "check_candidate.py",
     "capture_stills.py",

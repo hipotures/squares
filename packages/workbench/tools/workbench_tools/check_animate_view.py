@@ -72,19 +72,24 @@ class Session:
 def keyboard_ownership(session: Session) -> str:
     """The page's global shortcuts act only while the Animate view owns the page.
 
-    From load: the page opens on Pack, and a shortcut letter there is Pack's business. The
-    same guard behind Search is `check_search_panel`'s keyboard case.
+    The page opens on Animate (#171), so from load a shortcut letter is the catalogue's; once
+    Pack is chosen it is Pack's business. The same guard behind Search is
+    `check_search_panel`'s keyboard case.
     """
     page = session.page
+    session.require(
+        session.api(("mode",)) == "animate", "the page does not open on the Animate view"
+    )
+    page.locator("#mode-pack").click()
     page.locator("#pack-count").focus()
     page.locator("#pack-count").blur()
     page.keyboard.press("c")
     owner = session.look("animate/input-owner")
     session.require(
         not owner["capture"] and owner["transport"] == "Play",
-        f"a bare `c` at load acted behind Pack: {owner}",
+        f"a bare `c` acted behind Pack: {owner}",
     )
-    return "shortcuts yield to Pack from load"
+    return "the page opens on Animate, and shortcuts yield to Pack"
 
 
 def gap_bar_through_dwell(session: Session) -> str:
@@ -482,35 +487,51 @@ def stage_says_only_facts(session: Session) -> str:
     return f"the stage draws only its facts in {states} states"
 
 
-def headline_space(session: Session) -> str:
-    """The headline is centred in the space between the container's floor and the stage's foot.
+def headline_ink(session: Session) -> tuple[float, float, float] | None:
+    """The settled box's drawn floor and the headline's first and last inked rows.
 
-    Read from a capture-mode screenshot rather than from element boxes, because a box is not
-    where the glyphs are: KaTeX's strut opens well above the digits.
+    In stage units, read from a capture-mode screenshot of the frame on the stage rather than
+    from element boxes, because a box is not where the glyphs are: KaTeX's strut opens well
+    above the digits. The floor is the lowest row the box draws across, above the SVG's own
+    floor.
     """
     page = session.page
+    session.look("animate/clear-selection")
+    page.wait_for_timeout(300)
+    boxes = session.look("layout/stage-boxes")
+    left, top, width, _ = boxes["stage"]
+    scale = width / 1920
+    svg_floor = boxes["svg"][1] + boxes["svg"][3] - top
+    image = np.asarray(Image.open(io.BytesIO(page.screenshot())).convert("RGB")).astype(int)
+    paper = image[int(top + 1076 * scale), int(left + 100 * scale)]
+    band = image[
+        int(top) : int(top + 1080 * scale),
+        int(left + 60 * scale) : int(left + 1060 * scale),
+    ]
+    inked = np.abs(band - paper).sum(axis=2) > 60
+    wide = np.where(inked.mean(axis=1) > 0.5)[0]
+    wide = wide[wide < svg_floor]
+    if wide.size == 0:
+        return None
+    floor = (wide.max() + 1) / scale
+    rows = np.where(inked.any(axis=1))[0] / scale
+    ink = rows[rows > floor + 4]
+    if ink.size == 0:
+        return None
+    return float(floor), float(ink.min()), float(ink.max() + 1 / scale)
+
+
+def headline_space(session: Session) -> str:
+    """The headline is centred in the space between the box's floor and the stage's foot."""
     session.api(("pause",), ("setCapture", True))
     for n in (2, 17, 100):
         session.api(("setStepN", n), ("seek", 0))
-        session.look("animate/clear-selection")
-        page.wait_for_timeout(300)
-        left, top, width, _ = session.look("layout/stage-boxes")["stage"]
-        scale = width / 1920
-        image = np.asarray(Image.open(io.BytesIO(page.screenshot())).convert("RGB")).astype(int)
-        paper = image[int(top + 1076 * scale), int(left + 100 * scale)]
-        band = image[
-            int(top) : int(top + 1080 * scale),
-            int(left + 60 * scale) : int(left + 1060 * scale),
-        ]
-        inked = np.abs(band - paper).sum(axis=2) > 60
-        wide = np.where(inked.mean(axis=1) > 0.5)[0]
-        floor = (wide[wide < 975 * scale].max() + 1) / scale
-        rows = np.where(inked.any(axis=1))[0] / scale
-        ink = rows[rows > floor + 4]
-        session.require(ink.size > 0, f"no headline ink under the container at n = {n}")
-        if ink.size == 0:
+        measured = headline_ink(session)
+        session.require(measured is not None, f"no headline ink under the container at n = {n}")
+        if measured is None:
             continue
-        above, under = ink.min() - floor, 1080 - (ink.max() + 1 / scale)
+        floor, ink_top, ink_bottom = measured
+        above, under = ink_top - floor, 1080 - ink_bottom
         session.require(
             abs(above - under) <= 2,
             f"the headline at n = {n} is not centred in its space: {above:.1f} above, "
@@ -520,40 +541,36 @@ def headline_space(session: Session) -> str:
     return "the headline is centred under the container"
 
 
+#: How far above the headline's first inked row the lowest drawn point of a moving frame must
+#: stay, in stage px. The owner-approved 971 px stage clears it by 7; a 979 px stage would
+#: leave 3, and element boxes that ignore the SVG's clip read 7.8 px into the ink.
+HEADLINE_CLEARANCE = 5
+
+
 def stage_clearance(session: Session) -> str:
-    """A moving drawing clears the headline, at the steps where it reaches deepest.
+    """What a moving drawing draws clears the headline, at the steps where it reaches deepest.
 
     The box grows toward the next record's side and squares tilt, so a moving drawing reaches
-    below the settled floor. This is `check_workbench`'s guard as it was, and its home: the
-    measure reads element boxes the stage's `overflow: hidden` may clip, which lane E (D16) is
-    to replace with the drawn geometry on #171.
+    below the settled floor. `stage/lowest-drawn` counts only what the SVG draws, cut at the
+    SVG's floor where the SVG clips, because an element's box is not what is drawn: at the
+    step into 293 under the bodies style a square's box reads 15 px below a floor that nothing
+    is drawn under. The four steps are the corpus's deepest under each physical style.
     """
     style = session.api(("state",))["style"]
     session.api(("pause",), ("setCapture", True), ("setStepN", 17), ("seek", 0))
-    session.look("animate/clear-selection")
-    session.page.wait_for_timeout(300)
-    left, top, width, _ = session.look("layout/stage-boxes")["stage"]
-    scale = width / 1920
-    image = np.asarray(Image.open(io.BytesIO(session.page.screenshot())).convert("RGB")).astype(
-        int
-    )
-    paper = image[int(top + 1076 * scale), int(left + 100 * scale)]
-    band = image[
-        int(top + 975 * scale) : int(top + 1080 * scale),
-        int(left + 60 * scale) : int(left + 1060 * scale),
-    ]
-    rows = np.where((np.abs(band - paper).sum(axis=2) > 60).any(axis=1))[0]
-    ink_top = 975 + float(rows.min()) / scale if rows.size else math.inf
-    session.require(rows.size > 0, "no headline ink below the container to clear")
-    for solver, n in (("physics", 6), ("bodies", 12), ("bodies", 20), ("physics", 26)):
-        deepest = session.look("stage/lowest-drawn", n=n, style=solver)
+    measured = headline_ink(session)
+    session.require(measured is not None, "no headline ink below the container to clear")
+    ink_top = math.inf if measured is None else measured[1]
+    for solver, n in (("physics", 6), ("physics", 5), ("bodies", 293), ("bodies", 302)):
+        drawn = session.look("stage/lowest-drawn", n=n, style=solver)
         session.require(
-            deepest < ink_top - 2,
-            f"the drawing reaches {deepest:.1f} in the step into n = {n} under {solver}, "
-            f"into the headline starting at {ink_top:.1f}",
+            drawn["deepest"] <= ink_top - HEADLINE_CLEARANCE,
+            f"the drawing reaches {drawn['deepest']:.1f} in the step into n = {n} under "
+            f"{solver}, within {HEADLINE_CLEARANCE} of the headline's ink at {ink_top:.1f} "
+            f"(the SVG's floor is {drawn['floor']:.1f}, clipping: {drawn['clips']})",
         )
     session.api(("setCapture", False), ("setStyle", style), ("setStepN", 17), ("seek", 0))
-    return "a moving drawing clears the headline"
+    return f"what a moving drawing draws clears the headline's ink at {ink_top:.0f}"
 
 
 def capture_baseline(session: Session) -> str:

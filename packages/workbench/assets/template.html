@@ -19,8 +19,15 @@ __WORKBENCH_CSS__
       <p class="sr-only" id="stage-keyboard-help">Press Enter to focus a square in Pack mode. Use the arrow keys to move it, hold Shift for larger moves, use Q and E to rotate it, and press Escape to return to the stage. Space controls playback when the stage itself has focus.</p>
       <svg id="packing-svg" viewBox="0 0 1 1" preserveAspectRatio="xMidYMid meet" role="group" aria-label="Packing squares">
         <g id="world" transform="scale(1 -1)">
-          <rect id="container" x="0" y="0" width="1" height="1" fill="none" stroke="#000000" stroke-width="2" vector-effect="non-scaling-stroke" />
+          <!-- In the catalogue the container is geometry only: the scene keeps its size, and the
+               two bounds below are what is drawn. Pack and the animation studio draw no box, so
+               there the stylesheet hides the bounds and draws this, 2 px black. -->
+          <rect id="container" x="0" y="0" width="1" height="1" fill="none" stroke="none" stroke-width="2" vector-effect="non-scaling-stroke" />
           <g id="squares"></g>
+          <!-- The box, over the squares: bold where it is, turning the page's green when it locks at
+               the best known side, and a thin black trace of where it just was, under it. -->
+          <rect id="bound-trace" x="0" y="0" width="1" height="1" fill="none" stroke="#000000" stroke-width="1.5" vector-effect="non-scaling-stroke" pointer-events="none" />
+          <rect id="bound-box" x="0" y="0" width="1" height="1" fill="none" stroke-width="4" vector-effect="non-scaling-stroke" pointer-events="none" />
           <g id="links"></g>
           <g id="mask-links"></g>
           <line id="draw-line" x1="0" y1="0" x2="0" y2="0" vector-effect="non-scaling-stroke" stroke-linecap="round" style="display: none" />
@@ -46,6 +53,9 @@ __WORKBENCH_CSS__
             <!-- Where the arrangement on the stage actually is: inside the rail, because it is
                  a reading rather than a mark on the scale, and the only thing here that moves. -->
             <line class="hand-stem" id="gapbar-hand" x1="0" y1="2" x2="0" y2="24" />
+            <!-- The stage's box, at its side on this scale: a triangle pointing down into the rail at
+                 the value, clear of the labels above, following the box every frame, green when it locks. -->
+            <path class="box-pointer" id="gapbar-box" d="M -8 -9 L 8 -9 L 0 5 Z" />
             <!-- Both bounds' values above the rail, on one line, scarlet and green: the colour
                  is what says which is which now that neither carries an arrow. -->
             <text class="gapbar-num is-lower" id="gapbar-lower-label" x="0" y="-16" text-anchor="middle"></text>
@@ -66,12 +76,13 @@ __WORKBENCH_CSS__
       <p class="sr-only" id="pack-announcement" aria-live="polite" aria-atomic="true"></p>
     </div>
   </div>
+  <div id="stage-resize" class="resize-handle" role="separator" aria-orientation="horizontal" aria-controls="stage-wrap" aria-label="Resize the stage against the controls" title="Drag to resize the stage, or double-click to size it automatically" tabindex="0"></div>
   <div id="controls">
     <div id="panel">
       <div class="subpanel">
         <div class="mode-tabs" id="mode-tabs" role="group" aria-label="what the page is showing">
-          <button type="button" id="mode-pack" data-mode="pack" aria-pressed="true" title="One fixed n: press play and the chosen strategy packs it until you pause">Pack</button>
-          <button type="button" id="mode-animate" data-mode="animate" aria-pressed="false" title="A range of n, played from end to end">Animate</button>
+          <button type="button" id="mode-animate" data-mode="animate" aria-pressed="true" title="A range of n, played from end to end">Animate</button>
+          <button type="button" id="mode-pack" data-mode="pack" aria-pressed="false" title="One fixed n: press play and the chosen strategy packs it until you pause">Pack</button>
           <button type="button" id="mode-search" data-mode="search" aria-pressed="false" title="Compare bounded experimental packing runs">Search</button>
         </div>
         <div class="mode-body row" id="mode-panel">
@@ -234,6 +245,7 @@ __WORKBENCH_CSS__
           <label title="The landing: the window where the spring stiffens and the poses ease onto their exact targets. It used to be a fixed fraction of the move.">correct <input type="number" id="t-correct" min="0.1" max="10" step="0.1"> s</label>
           <label>settle <input type="number" id="t-settle" min="0" max="5" step="0.1"> s</label>
           <label><input type="checkbox" id="fullbeat-toggle"> full beat for static appends</label>
+          <label title="A step that only fills the last row of an axis-aligned grid, where every square is already square to the container, plays every phase at double speed"><input type="checkbox" id="fastsimple-toggle" checked> speed up simple transitions</label>
         </div>
       </div>
       </div>
@@ -243,8 +255,8 @@ __WORKBENCH_CSS__
       <div class="subpanel groupbox" id="shake-box">
         <span class="box-title">the shake</span>
         <div class="group-body">
-          <label title="How hard and how long the two physical styles shake: 0 none, 3 the default, 10 the loudest and longest">annealing
-            <input type="range" id="anneal" min="0" max="10" step="1" style="width: 130px">
+          <label title="How hard and how long the two physical styles shake: 0 none, 9 the default, 20 the loudest and longest">annealing
+            <input type="range" id="anneal" min="0" max="20" step="1" style="width: 130px">
           </label>
           <label><input type="checkbox" id="blind-toggle"> blind, no target</label>
           <label>inflate <input type="number" id="blind-inflate" min="1" max="2" step="0.01"></label>

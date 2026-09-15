@@ -194,8 +194,9 @@ def _check_quiet_live_regions(browser: Browser, page_path: Path, errors: list[st
     )
     page.on("pageerror", lambda error: errors.append(str(error)))
     page.goto(page_path.resolve().as_uri())
+    page.locator("#mode-pack").click()
     facts = page.locator("#pack-stage-facts")
-    _require(facts.is_visible(), "the Pack stage facts are hidden on arrival")
+    _require(facts.is_visible(), "the Pack stage facts are hidden after choosing Pack")
     regions = _look(page, "pack/live-watch")
     _require(bool(regions), "the page has no live region to watch")
     first = facts.inner_text()
@@ -237,6 +238,7 @@ def check(page_path: Path) -> str:
         )
         page.on("pageerror", lambda error: errors.append(str(error)))
         page.goto(page_path.resolve().as_uri())
+        page.locator("#mode-pack").click()
         panel = page.locator("#pack-workspace")
         squares = page.locator("#pack-squares > g")
 
@@ -246,10 +248,21 @@ def check(page_path: Path) -> str:
 
         require(
             panel.is_visible(),
-            "Pack panel is hidden on arrival: " + "; ".join(errors),
+            "Pack panel is hidden after choosing Pack: " + "; ".join(errors),
         )
         require(squares.count() == 17, "Pack did not draw all 17 starting squares")
         require(not page.locator("#squares").is_visible(), "catalogue scene still owns Pack")
+        # Pack draws no box: the catalogue's box and trace are hidden, and Pack's container,
+        # side 5 for 17 squares from a grid, is drawn.
+        drawn = _look(page, "stage/bounds")
+        require(
+            drawn["container"]["shown"]
+            and drawn["container"]["stroke"] not in {"none", ""}
+            and drawn["container"]["width"] == 5
+            and not drawn["box"]["shown"]
+            and not drawn["trace"]["shown"],
+            f"Pack does not draw its container, or keeps the catalogue's box: {drawn}",
+        )
         require("n = 17" in page.locator("#pack-status").inner_text(), "Pack status lost n")
 
         page.locator("#pack-count").fill("7")
@@ -370,7 +383,8 @@ def check(page_path: Path) -> str:
         require(not errors, "page errors: " + "; ".join(errors))
         browser.close()
     return (
-        "Pack count, seeded starts, transport, import/export, Resolve, "
+        "Pack's own container with no catalogue box, count, seeded starts, transport, "
+        "import/export, Resolve, "
         "mode return, bare-key shortcuts, click without drag, non-packings labelled, "
         "quiet live regions "
         "and mobile fit"

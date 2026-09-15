@@ -363,6 +363,8 @@ export interface AtlasPhysics {
 export interface AtlasContinuous {
   on: boolean;
   fullBeat: boolean;
+  /** Whether simple transitions, axis-aligned grid fills, play at double speed. */
+  fastSimple: boolean;
   prefetch: boolean;
   dwell: number;
   move: number;
@@ -371,6 +373,7 @@ export interface AtlasContinuous {
   pair: number;
   pairs: number;
   staticPairs: number;
+  simplePairs: number;
   timing: AtlasTiming;
   total: number;
   remaining: number;
@@ -648,7 +651,7 @@ export interface AtlasTransitions {
   playAll(): AtlasContinuous;
   stopAll(): AtlasContinuous;
   setContinuous(
-    options?: Partial<Pick<AtlasContinuous, "on" | "fullBeat" | "prefetch">> | null,
+    options?: Partial<Pick<AtlasContinuous, "on" | "fullBeat" | "fastSimple" | "prefetch">> | null,
   ): AtlasContinuous;
   /** The n actually reached, which is the nearest one the page carries. */
   goTo(n: number): number;

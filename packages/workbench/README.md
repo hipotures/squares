@@ -7,9 +7,10 @@ defines the finished product and migration phases; the
 [review](../../docs/project/reviews/review-2026-09-12-workbench-stack-architecture.md)
 tracks repairs and their evidence.
 
-The package builds a self-contained Pack, Animate and experimental Search page.
-Pack has its own seeded, arbitrary-count session, snapshot import/export and bounded
-overlap repair. Animate retains the catalogue and animation studio.
+The package builds a self-contained Animate, Pack and experimental Search page, opening
+on Animate. Pack has its own seeded, arbitrary-count session, snapshot import/export and
+bounded overlap repair.
+Animate retains the catalogue and animation studio.
 Search runs a bounded browser preview and can export and resume exact-plan ledgers; its
 wider scheduler, calibration and research acceptance remain open in the plan.
 The checked JavaScript application is still large, and its historical pair-based Pack
