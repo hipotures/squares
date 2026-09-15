@@ -185,7 +185,8 @@ Each phase names a mechanism (`scatter`, `grid`, `assemble`, `project`, `ratchet
 `relax`, `guide` or `container`) and carries a `structure` block: the `rung` it was
 given, the `source` of that structure, and an optional `rewired` or `thinned` control.
 Constraints are declared as bands.
-`devtools/packing_strategy.py` executes documents for the projection solver.
+`workbench_tools.strategy_execution` (`squares-workbench-strategy`) executes documents
+for the projection solver.
 `frontier/search-strategies.yaml` separately catalogues 28 named search strategies, and
 hypotheses cite catalogue entries through `strategy_refs`.
 
