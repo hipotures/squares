@@ -138,8 +138,8 @@ hypothesis status and summarizes experiment verdicts, and the
 | Record | Count | State at the cutoff |
 | --- | ---: | --- |
 | Agendas | 35 | 15 active; 14 completed; 5 paused; 1 superseded |
-| Commitments | 342 | 174 complete; 59 stopped; 65 blocked; 16 ready; 21 tentative; 7 in progress |
-| Sessions | 130 | 84 completed; 46 stopped; all terminal |
+| Commitments | 342 | 174 complete; 59 stopped; 65 blocked; 15 ready; 21 tentative; 8 in progress |
+| Sessions | 131 | 84 completed; 46 stopped; 1 nonterminal |
 | Explorations | 29 | 17 linked to proposed hypotheses; 12 uncodified |
 | Hypotheses | 138 | 25 confirmed; 24 refuted; 48 blocked; 10 unresolved; 2 open; 26 open questions; 2 result registered; 1 abandoned; 0 running |
 | Experiments | 116 | 38 accepted; 29 rejected; 25 unresolved; 11 baseline; 11 blocked; 2 abandoned; 0 in progress |
@@ -876,8 +876,9 @@ the T-026 lower bound remains the frontier.
 **Selected next entry:** `think-1ydi`, the BC-340 W5 efficiency checkpoint.
 
 BC-346’s planning source passed its exact-revision gate, and the canonical handoff has
-advanced to BC-340. A conservative derivation counts eight substantive non-W5 blocks
-after Session 116/BC-322, so OR-12 makes W5 mandatory.
+advanced to BC-340. Session 131 is running it from merged main on
+`codex/n11-w5-validation-efficiency`. A conservative derivation counts eight substantive
+non-W5 blocks after Session 116/BC-322, so OR-12 makes W5 mandatory.
 BC-340 then measures the current gate and addresses at most one demonstrated bottleneck
 behind an equivalence guard, or records a measured no-change result.
 It receives its own branch and pull request and runs no scientific target.
@@ -4056,8 +4057,8 @@ in separate tables: their units differ, and the same work can appear in both.
 | Coverage | sessions |
 | --- | ---: |
 | measured | 82 |
-| unmeasured | 48 |
-| **total** | **130** |
+| unmeasured | 49 |
+| **total** | **131** |
 
 <!-- END GENERATED: session-close-report -->
 

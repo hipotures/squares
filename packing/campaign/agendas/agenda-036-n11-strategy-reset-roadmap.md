@@ -165,7 +165,7 @@ agenda:
     purpose: measurement_validation
     owner_focus: efficiency
     instances: [11]
-    state: ready
+    state: in_progress
     priority: 0
     question: >-
       Does the four-to-eight-block cadence make an efficiency checkpoint due, and if so
@@ -185,6 +185,8 @@ agenda:
       administrative work does not reset the cadence.
     workflows: [efficiency-loop, review-planning-oversight]
     program: n11-strategy-reset
+    artifacts:
+    - packing/campaign/agent-sessions/session-131-n11-w5-validation-efficiency.md
     parallel_group: efficiency-checkpoint
   - id: BC-353
     purpose: tool_validation
