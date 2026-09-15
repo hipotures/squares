@@ -43,23 +43,59 @@ experiment:
     commit: 88d452f1
     entry_point: packing/devtools/bench_annealing.py
     command: python -m devtools.bench_annealing --n 5 10 11 --seeds 3000 --sweep anneal=0,2,4,6,8,10
-      ; then --n 11 17 26 29 --seeds 20000 --anneal 8
+      --budget 900; then --n 11 17 26 29 --seeds 20000 --anneal 8 --budget 900
     record: packing/campaign/results/annealing/summaries.json
   results:
-  - shape: conditions
-    metric: closed at n = 5, best of the first 1,000 repaired runs, level 0 against levels 2 to 10
-    control_median: -0.082
-    candidate_median: 0.864
-    control_range:
-    - -0.082
-    - -0.082
-    candidate_range:
-    - -0.056
-    - 0.974
-    change_pct: 1153.7
-    overlapping: false
   - shape: record
-    metric: closed at n = 11, best of the first 10,000 repaired runs at level 8
+    metric: closed at n = 11, the best of the first 1,000 repaired runs at shake level 0
+    direction: higher
+    score: -0.112
+    standing_best: 1.0
+    standing_best_source: the known-best side recorded in the atlas
+    beat_record: false
+    runs: 1000
+  - shape: record
+    metric: closed at n = 11, the best of the first 1,000 repaired runs at shake level 2
+    direction: higher
+    score: -0.015
+    standing_best: 1.0
+    standing_best_source: the known-best side recorded in the atlas
+    beat_record: false
+    runs: 1000
+  - shape: record
+    metric: closed at n = 11, the best of the first 1,000 repaired runs at shake level 4
+    direction: higher
+    score: -0.021
+    standing_best: 1.0
+    standing_best_source: the known-best side recorded in the atlas
+    beat_record: false
+    runs: 1000
+  - shape: record
+    metric: closed at n = 11, the best of the first 1,000 repaired runs at shake level 6
+    direction: higher
+    score: -0.012
+    standing_best: 1.0
+    standing_best_source: the known-best side recorded in the atlas
+    beat_record: false
+    runs: 1000
+  - shape: record
+    metric: closed at n = 11, the best of the first 1,000 repaired runs at shake level 8
+    direction: higher
+    score: 0.564
+    standing_best: 1.0
+    standing_best_source: the known-best side recorded in the atlas
+    beat_record: false
+    runs: 1000
+  - shape: record
+    metric: closed at n = 11, the best of the first 1,000 repaired runs at shake level 10
+    direction: higher
+    score: 0.325
+    standing_best: 1.0
+    standing_best_source: the known-best side recorded in the atlas
+    beat_record: false
+    runs: 1000
+  - shape: record
+    metric: closed at n = 11, the best of all 16,319 repaired runs at shake level 8
     direction: higher
     score: 0.616
     standing_best: 1.0

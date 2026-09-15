@@ -45,6 +45,7 @@ experiment:
     commit: d3c3a778
     entry_point: packing/devtools/bench_annealing.py
     command: python -m devtools.bench_annealing --n 5 10 11 17 26 29 --seeds 2000 --anneal 6
+      --budget 900
     record: packing/campaign/results/annealing/
   results:
   - shape: determination
@@ -53,18 +54,6 @@ experiment:
       off the simulation
     role: guard
     outcome: invalid
-  - shape: conditions
-    metric: deepest pairwise overlap in the final arrangement at n = 5, 11 and 17, unit sides
-    control_median: 7.3e-07
-    candidate_median: 0.084
-    control_range:
-    - 5.5e-07
-    - 1.01e-06
-    candidate_range:
-    - 0.035146
-    - 0.086189
-    change_pct: 11506749.3
-    overlapping: false
   complexity:
     lines_changed: 96
     new_failure_modes:
