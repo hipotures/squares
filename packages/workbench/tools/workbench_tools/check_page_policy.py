@@ -4,11 +4,12 @@
     uv run --frozen --all-extras --group dev python -m workbench_tools.check_page_policy [PAGE]
 
 `build_site` publishes the page with a `default-src 'none'` policy, so the browser refuses
-anything the page was not built to need. A checker that hands Playwright a `wait_for_function`
-predicate written as an expression string opens its page with `bypass_csp`, because
-Playwright compiles such a predicate inside the page, and the policy grants no
-`'unsafe-eval'` for test tooling. Something therefore has to load the page as the public
-does. This does, without any bypass:
+anything the page was not built to need. The policy grants no `'unsafe-eval'` for test
+tooling, so a `wait_for_function` predicate written as an expression string, which
+Playwright compiles inside the page, would be refused; the checkers' predicates are probe
+functions, and none opens the page with `bypass_csp`. The other checkers exercise features,
+though, and something has to hold the policy itself to what the page needs. This loads the
+page as the public does:
 
 1. It installs the `policy/record-violations` init probe, which keeps every
    `securitypolicyviolation` the document reports from before the page's own scripts run,

@@ -52,10 +52,10 @@ script_code: '[A-Za-z_$][\w$]*\s*[(.=;]'
 # think-m0zb closes.
 #
 # Written from `--inventory` on 2026-09-14 at 477 sites in 48 files, and lowered as files
-# came off it. Now 461 sites in 42 files:
+# came off it. Now 460 sites in 42 files:
 #   think-3pox  packing/devtools and packing/tests       324 sites in 25 files
 #   think-53dt  the video spikes                          123 sites in 13 files
-#   think-xvjf  packages/workbench tools and tests         14 sites in  4 files
+#   think-xvjf  packages/workbench tools and tests         13 sites in  4 files
 allowlist:
   - path: packages/workbench/tests/test_self_contained.py
     sites: 1
@@ -67,7 +67,7 @@ allowlist:
     sites: 3
     bead: think-xvjf
   - path: packages/workbench/tools/workbench_tools/check_pack_panel.py
-    sites: 8
+    sites: 7
     bead: think-xvjf
   - path: packing/atlas/known-best/video/spikes/v1-slideshow/build_candidate.py
     sites: 1
