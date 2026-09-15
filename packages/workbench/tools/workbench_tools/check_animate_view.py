@@ -148,10 +148,27 @@ def colours_by_instant(session: Session) -> str:
     return "direct, walked and revisited seeks paint alike"
 
 
+def seeks_anywhere(session: Session) -> str:
+    """Every instant of a step can be drawn, the ends included, under every style."""
+    swept = session.look(
+        "animate/seek-grid",
+        ns=[10, 17, 26],
+        styles=["tween", "physics", "bodies"],
+        levels=[0, 3, 10],
+        k=48,
+    )
+    session.require(
+        swept["seeks"] == 3 * 3 * 3 * 49 and not swept["failures"],
+        f"{len(swept['failures'])} of {swept['seeks']} seeks threw: {swept['failures'][:4]}",
+    )
+    return f"{swept['seeks']} seeks drawn"
+
+
 SECTIONS: tuple[Callable[[Session], str], ...] = (
     keyboard_ownership,
     gap_bar_through_dwell,
     colours_by_instant,
+    seeks_anywhere,
 )
 
 

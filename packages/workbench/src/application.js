@@ -1593,7 +1593,11 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   const PHYS_CACHE_MAX = 16;
   // Ken Perlin's sixth-degree ease: zero first AND second derivative at both ends, where
   // smoothstep only zeroes the first. Used where a change has to start and stop invisibly.
-  const smootherstep = (x) => (x <= 0 ? 0 : x >= 1 ? 1 : x * x * x * (x * (x * 6 - 15) + 10));
+  // Clamped as well as guarded: just below one the polynomial rounds to 1 + 2^-52, and the colour
+  // levels built from it reached the painter a rounding error outside [0, 1], which it refuses --
+  // seeking the last instant of a long physical step threw instead of drawing.
+  const smootherstep = (x) =>
+    x <= 0 ? 0 : x >= 1 ? 1 : Math.min(1, x * x * x * (x * (x * 6 - 15) + 10));
   const containerCurve = (u) => easeOut(clamp01(u / PHYS.grow));
   // How far past its target the box is open at u, in sides. Zero at both ends of the move, so the
   // side it starts from and the side it lands on are exactly the record's.
