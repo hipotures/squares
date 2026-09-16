@@ -128,7 +128,12 @@ def pull_request_jobs(workflow: Mapping[str, Any]) -> set[str]:
     while grew:
         grew = False
         for name, job in jobs.items():
-            if name not in excluded and any(need in excluded for need in needs_of(job)):
+            condition = str(job.get("if", ""))
+            if (
+                name not in excluded
+                and "always()" not in condition
+                and any(need in excluded for need in needs_of(job))
+            ):
                 excluded.add(name)
                 grew = True
     return set(jobs) - excluded

@@ -705,13 +705,13 @@ tiers:
 pages:
   reference: {runner: ubuntu-latest, cpus: 4, caches: warm}
   wall:
-    measured_seconds: 200.3
+    measured_seconds: 178.9
     measured_on: 2026-09-16
     measured_where: >-
-      run 35040456480 (185 s), run 35039923396 (216 s) and run 35039248281 (201 s), the
-      geometric mean of the three, measured from the run's creation to the aggregator's
-      start
-    ceiling_seconds: 280.0
+      run 35040456480 (185 s) and exact-head run 35050591623 (173 s), the geometric mean
+      of the two final-shape readings, measured from the run's creation to the
+      `pages-required` aggregator's start
+    ceiling_seconds: 250.0
     argument: >-
       Before the split this workflow was `prepare` then a single `build` of about 300 s of
       serial Chromium checks: a 472 s median on the workbench stack's pull requests, 381 s
@@ -831,3 +831,12 @@ pages:
     measured_where: run 35039355763, the scope demonstration
     ceiling_seconds: 8.0
     argument: The same notice for the workbench half.
+  - id: pages-required
+    measured_seconds: 3.0
+    measured_on: 2026-09-16
+    measured_where: run 35050591623, job 104650434209, on the exact PR head
+    ceiling_seconds: 6.0
+    argument: >-
+      The required-check aggregator. It runs under `always()` even though it needs jobs
+      that are intentionally dispatch-only, so it is part of the pull-request surface
+      and must be budgeted with the jobs whose results it reduces.

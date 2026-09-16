@@ -194,11 +194,20 @@ def test_membership_follows_needs_and_leaves_out_what_a_pull_request_never_runs(
             },
             "verify": {"needs": "deploy"},
             "timing": {"needs": "prepare", "if": "github.event_name == 'workflow_dispatch'"},
+            "required": {"needs": ["publish", "timing"], "if": "always()"},
         }
     }
     members = half_jobs(workflow)
-    assert members["explainer"] == {"prepare", "check", "publish", "deploy", "verify", "timing"}
-    assert members["workbench"] == {"build", "publish", "deploy", "verify"}
+    assert members["explainer"] == {
+        "prepare",
+        "check",
+        "publish",
+        "deploy",
+        "verify",
+        "timing",
+        "required",
+    }
+    assert members["workbench"] == {"build", "publish", "deploy", "verify", "required"}
     assert pull_request_jobs(workflow) == {
         "scope",
         "prepare",
@@ -206,6 +215,7 @@ def test_membership_follows_needs_and_leaves_out_what_a_pull_request_never_runs(
         "note",
         "build",
         "publish",
+        "required",
     }
 
 
