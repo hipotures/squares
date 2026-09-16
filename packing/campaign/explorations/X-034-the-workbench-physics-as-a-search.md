@@ -265,6 +265,11 @@ What this shows:
   [annealing plan](../../../docs/project/specs/active/plan-2026-09-11-annealing-as-a-search.md)
   lays out the levels in between, from the record’s connected components to its contact
   graph and rigid clusters.
+- **Continuation, 2026-09-16:** [X-036](X-036-graded-guidance-for-annealing.md) turns
+  those levels into a staged, fixed-work program.
+  It separates ordinary pair stickiness from structural guidance, adds shuffled and
+  damaged-structure controls, and requires a valid-side improvement before target
+  recovery can support a search claim.
 
 ## Evidence
 

@@ -7,27 +7,28 @@ author: Claude (agent), for the repository maintainer
 
 **Date:** 2026-09-11
 
-**Updated:** 2026-09-14
+**Updated:** 2026-09-16
 
 **Author:** Claude (agent), for the repository maintainer
 
-**Status:** Active; the seeded harness and exploratory campaign exist, but record and
-validity repairs block further search claims
+**Status:** Active; the shared search instrument exists, while physical-response and
+graded-guidance prerequisites block the first registered guidance comparison
 
 **Workflow:** W7 instrument repair, W2 evidence review, then W6 for separately
 registered measurement rounds.
 The current phase is planning; no new experiment is authorized by this document alone.
 
 **Tracking:** `think-7umw` (research epic), `think-o13k` (Pack, Search and Animate),
-`think-c0rm` (strategies with declared guidance)
+`think-c0rm` (strategies with declared guidance), `think-0epc` (first stickiness and
+guidance sweep)
 
 ## Scope
 
 The [workbench plan](plan-2026-09-11-workbench-from-spike-to-product.md) governs the
 end-to-end product outcomes and implementation phases.
 This document supplies the research and measurement contracts: sections A/B feed its
-Phase 1, section C feeds Phases 2/3, and section D feeds Phase 5. It does not
-independently release Search.
+Phase 1, section C feeds Phases 2/3, section D feeds Phase 5, and section E feeds Phase
+5A. It does not independently release Search or authorize an experiment.
 
 The workbench’s blind physics is an incremental, record-conditioned search.
 It starts from the retained packing for `n`, withholds the destination poses for
@@ -177,6 +178,50 @@ and compare them for one `n` and across `n`.
 So the benchmark’s question becomes: **for each record, which strategies find it, and
 how much of the record does each have to be given?** Tracking: `think-c0rm`.
 
+Ordinary global stickiness and structural guidance are different experimental axes.
+Stickiness is a force-law parameter between nearby squares and requires no knowledge of
+a target packing. Structural guidance supplies selected relationships extracted from a
+known record.
+A run may combine them, but its configuration, receipt and report name each
+independently.
+
+### One target contract, separate application policy
+
+`GuidanceTarget/v1` is the JSON-safe interchange read by the nonvisual TypeScript
+kernel, Node CLI and browser.
+It stores target identity and provenance, a tier, stable square IDs, relative
+relationships, extraction tolerances and declared ambiguity metadata.
+It does not store application strength or an absolute destination pose.
+Extraction returns a separate refusal result when the requested tier cannot be made
+unambiguous under its correspondence rules.
+
+A separate guidance-application configuration states:
+
+- continuous strength;
+- the strength schedule;
+- the use, such as start, weld, attract, shake or constraint bands; and
+- how pairs or squares absent from the target are treated.
+
+Strength zero normalizes to the unguided effective configuration.
+For the same base configuration and seed, it must produce the exact unguided trajectory
+and receipt, not merely a numerically close outcome.
+Scheduled guidance composes explicitly with ordinary stickiness, collision, containment
+and annealing.
+
+The product exposes four comparable target tiers:
+
+| target tier | supplied information | strategy-rung mapping |
+| --- | --- | --- |
+| `none` | no target relationships | `none` |
+| `touching-component-partition` | membership in each connected component of touching squares | `touching-partition` |
+| `contact-graph` | target square–square adjacency | `contact-graph` |
+| `oriented-face-pairs` | corresponding square features and their relative face alignment | `contact-graph-with-types` |
+
+Oriented face pairs constrain relative features and alignment.
+They do not supply absolute centers, absolute angles or a rigid destination pose.
+Extraction declares symmetry and correspondence rules and refuses a requested tier when
+ambiguity cannot be resolved under those rules (`think-rey9`).
+
 ### The format already exists, and the physics is outside it
 
 A PackingStrategy document (`packing/strategies/packing-strategy.schema.yaml`) is an
@@ -227,6 +272,8 @@ Constraints stay bands, never equalities.
 
 ### Extending the format
 
+The PackingStrategy document says where the shared target and application policy act; it
+does not define a second guidance representation.
 Four additions make every approach a document (`think-8ocb`):
 
 1. **Physics mechanisms.** `drop` places the new square by the coarse-grid proposal.
@@ -275,8 +322,8 @@ chunk census counts slide freedoms.
 The loop is the benchmark generalised from one method’s parameters to strategies
 (`think-qx88`):
 
-- **Input:** a set of strategy documents, a set of `n`, and a plan of disjoint seed
-  blocks at equal work.
+- **Input:** a set of strategy documents, a set of `n`, and a plan of paired,
+  interleaved, disjoint seed blocks at equal work.
 - **Run:** each document on an implementation that supports every phase.
 - **Score:** only after the shared validity contract passes, with repair recorded as its
   own step.
@@ -294,26 +341,57 @@ The loop is the benchmark generalised from one method’s parameters to strategi
 - **Held out:** any parameter chosen from the results is checked on `n` it was not
   chosen on.
 
+The metric vector is registered before the first round (`think-gdkd`). Search outcomes
+are packing validity, best valid side and the known-result gap.
+Guards cover independent validity, finiteness, deterministic replay, zero-strength
+equivalence and Phase 2A continuity.
+Cost includes pair tests, candidates, integration steps, force work, CPU and wall time.
+Component recovery, contact precision/recall, false contacts, oriented-face recovery and
+kinetic gaps explain mechanisms; they cannot accept a search claim without a valid-side
+improvement.
+
+The first systematic campaign (`think-0epc`) starts with an unguided baseline and an
+ordinary-stickiness response curve, then compares true targets with shuffled, rewired or
+thinned controls. Known-answer cases are divided into calibration and held-out sets
+before tuning (`think-3yma`). Every rejected, invalid and no-effect round remains in the
+experiment record.
+
 A result names its strategy and guidance.
 A sentence of the form “given `merged-near-flush` as a start, with a release phase, the
 physics reached `s(29)` in k of m blocks” is a statement about guided search, never a
 discovery.
 
-The three modes are the loop’s three faces: **Pack** runs one document once; **Search**
-runs the loop and shows the comparison; **Animate** plays a recorded trace.
+The same nonvisual TypeScript kernel, target, application configuration, seed and
+receipt drive every surface:
+
+| surface | responsibility |
+| --- | --- |
+| Node API and CLI | Run one trial or a cohort without a DOM; emit raw trajectories, target-recovery metrics, work, validity and replay provenance. |
+| Pack | Run one document once and show the target tier and active application settings. |
+| Search | Run the loop and compare ordinary stickiness and structural guidance as separate sweep axes. |
+| Animate | Replay the resulting trace and overlays without turning a supplied target into numerical evidence. |
+
+The browser visualizes these results; it does not implement another force or receipt
+path.
 
 ### What must be built
 
-1. **The format extension** (`think-8ocb`) and **today’s approaches as documents**
-   (`think-w9pb`), so the first comparison has real entries.
-2. **Extraction** (`think-rey9`): each rung’s hint from a record at declared tolerances,
-   in one implementation that Python and the workbench both read.
-3. **Kernel mechanics** (`think-os1n`): weld and release, an aligning torque, attraction
-   range as a parameter, shake per body, and partial pins.
+1. **The target/application and format extension** (`think-8ocb`) and **today’s
+   approaches as documents** (`think-w9pb`), so the first comparison has real entries.
+2. **Extraction** (`think-rey9`): each rung’s hint, including oriented face pairs, from
+   a record at declared tolerances, in one implementation that Python and TypeScript
+   read.
+3. **Stable base response** (`think-o4wo`, `think-5tyy`) and **kernel mechanics**
+   (`think-os1n`): weld and release, aligning torque, attraction range, shake per body,
+   partial pins and exact zero-strength equivalence.
 4. **Starts from structure** (`think-y3o8`) that keep the record’s internal offsets.
-5. **The evaluation loop** (`think-qx88`).
-6. **Strategies in Pack and Search** (`think-czav`), labelled by guidance.
-7. **Hypotheses registered before the first round** (`think-gdkd`).
+5. **The bounded scheduler and replay receipt** (`think-gfqt`) and **evaluation loop and
+   CLI** (`think-qx88`).
+6. **Registered metrics and partitions** (`think-gdkd`, `think-3yma`) before any round.
+7. **Strategies in Pack and Search** (`think-czav`), with controls and overlays labelled
+   by guidance.
+8. **The systematic known-answer sweep** (`think-0epc`) after every instrument above is
+   ready.
 
 The same extraction serves `think-hk37`, the rigidity marks.
 The shared-language plan owns the format change (`think-8ocb`) and takes this section’s
@@ -406,11 +484,13 @@ The mode does not introduce another resolver, validator or physics path.
 
 ### E. Strategies with declared guidance — `think-c0rm`
 
-Starts after phase C supplies the shared validity contract.
+Starts after phase C supplies the shared validity contract, Phase 2A establishes stable
+physical response, and Phase 5 supplies the base Search scheduler.
 The format extension and today’s approaches as documents come first, then extraction,
 kernel mechanics and starts, then the evaluation loop.
-Hypotheses are registered before any round, and the workbench settings follow the Search
-mode.
+Hypotheses and the calibration/held-out split are registered before any round.
+The workbench controls and overlays consume the same configuration and receipt as the
+headless loop.
 
 ## Acceptance Gates
 
@@ -420,7 +500,7 @@ mode.
 | B | A committed tool reproduces acceptance, work and disjoint-block distributions from durable inputs. The `n = 17` narrative matches the retained cells and their resolved status. |
 | C | Benchmark and browser adapters agree on raw and repaired states and on every validity fixture, including non-finite values, pose counts, walls and pairs. Seed and trace replay tests pass. The standalone package is the shared source. |
 | D | Search displays only valid ranked outcomes, accounts for every attempted trial, reproduces an exact seed and configuration, and reports independent blocks rather than a correlated prefix as a distribution. |
-| E | Every approach compared is a validated strategy document with a derived guidance summary; each structural strategy runs beside its rewired and thinned controls; every reported success names its strategy and guidance. |
+| E | Every approach compared is a validated strategy document with a derived guidance summary; zero strength exactly matches the unguided trajectory and receipt; each structural strategy runs beside its rewired and thinned controls; browser and CLI replay agree; every reported success names its strategy, ordinary stickiness and guidance. |
 
 ## Questions for the Next Measured Round
 
@@ -432,6 +512,10 @@ mode.
   selected?
 - Which metrics help tune search while keeping animation quality a separate product
   decision?
+- At which ordinary-stickiness levels does each guidance tier improve valid best-side
+  outcomes at equal work, rather than only reproducing target contacts?
+- Do oriented face pairs add value over an untyped contact graph after both use the same
+  attraction range and schedule?
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

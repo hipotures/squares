@@ -391,6 +391,28 @@ for “found the right combinatorial class”, not a proof of it; confirming the
 a separately scoped structural check or formal certificate.
 Rounds that claim `reached_basin` should say which they mean.
 
+### Guided Pose-Search Extension
+
+A numerical pose-search round that compares ordinary stickiness or graded structural
+guidance adds the vector below.
+This extension does not apply to unrelated numerical search rounds and does not change
+the universal fields above.
+
+| Metric | Role | Required content |
+| --- | --- | --- |
+| guidance identity | identity | `GuidanceTarget/v1` content hash, information tier and the separate effective application configuration; an unguided arm records no target |
+| valid block outcome | **outcome** | valid successes and block-best valid side and comparator gap for each predeclared seed block |
+| exact execution controls | **guard** | independent geometry validity, finiteness, deterministic replay, exact zero-strength equivalence and the applicable X-035 trajectory budgets |
+| guidance work | cost | pair tests, candidates, kernel steps, guidance-force work, CPU time and wall time under one fixed-work comparison |
+| target recovery | mechanism | component recovery, contact precision and recall, false contacts and oriented-face recovery, alongside contacts, gaps and kinetic metrics |
+| paired spread | spread | paired differences over interleaved seed blocks, with calibration and held-out cells reported separately |
+
+Target-recovery metrics explain how a guided run behaved; they do not decide search
+quality. A guided arm can satisfy the search-proposer accept rule only through an
+improvement in the preregistered valid-side outcome at equal work, with every guard
+passing. Recovering more true contacts or oriented faces without that improvement is a
+mechanism result, not an accepted search strategy.
+
 ## The Search-Proposer Accept Rule
 
 This rule applies when a round compares numerical packing proposers.
@@ -654,6 +676,14 @@ A series is earned by a tooling or regime change that affects comparability, rec
 
 S6 *interleaves* with S1 rather than following it: S1’s basin byproducts are the
 census’s inputs.
+
+The graded-guidance program in
+[X-036](explorations/X-036-graded-guidance-for-annealing.md) changes the target,
+trajectory, receipt and work-accounting regime.
+Its first measured round must open a truthful successor series under `think-i08r`,
+rather than append incomparable results to `series-000`. No experiment artifact is
+allocated until the target contract, strength units, instrument and preregistered
+contrasts are frozen.
 
 ## Campaign Scope and Related Records
 

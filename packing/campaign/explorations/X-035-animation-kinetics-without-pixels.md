@@ -158,6 +158,12 @@ and `think-5tyy` remain open because the default budgets and preset claims are r
   produce better valid Search outcomes.
   It is an open question; attractive motion is not evidence of a better packing.
 
+**Continuation, 2026-09-16.** [X-036](X-036-graded-guidance-for-annealing.md) carries
+that open question into a planned response curve for unguided stickiness and a separate
+ladder of structural guidance.
+Its first measurements wait for stable physical response under `think-o4wo` and
+`think-5tyy`, a frozen guidance contract, and a new comparable campaign series.
+
 ## Limits
 
 This investigation covers deterministic raw, corrected and 60 Hz presentation
