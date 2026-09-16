@@ -140,6 +140,20 @@ def test_a_helper_a_checker_imports_is_an_input(declared: dict[str, tuple[Path, 
     assert REPO / "packing/devtools/render_explainer_pdf.py" in declared["explainer"]
 
 
+def test_every_pdf_browser_control_probe_selects_the_explainer(
+    declared: dict[str, tuple[Path, ...]],
+) -> None:
+    """The PDF test executes sibling probes that are not visible to import closure."""
+    controls = REPO / "packing/tests/probes/pdf_math_browser"
+    probes = sorted(path for path in controls.rglob("*") if path.is_file())
+    assert probes
+    assert controls in declared["explainer"]
+    missed = [
+        probe(path) for path in probes if "explainer" not in in_scope([probe(path)], declared)
+    ]
+    assert missed == []
+
+
 def test_pull_request_178_would_have_run_no_browser_work(
     declared: dict[str, tuple[Path, ...]],
 ) -> None:
