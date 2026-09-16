@@ -221,6 +221,15 @@ def _optional_positive(value: object, what: str) -> float | None:
     return None if value is None else _positive(value, what)
 
 
+def _nonnegative(value: object, what: str) -> float:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise BudgetError(f"{what} must be a number, found {value!r}")
+    number = float(value)
+    if not math.isfinite(number) or number < 0:
+        raise BudgetError(f"{what} must be non-negative and finite, found {number!r}")
+    return number
+
+
 def _text(value: object, what: str) -> str:
     if not isinstance(value, str) or not value.strip():
         raise BudgetError(f"{what} must be a non-empty string, found {value!r}")
@@ -250,15 +259,10 @@ def _attribution_from(raw: object, where: str) -> Attribution | None:
     grew: list[Growth] = []
     for position, item in enumerate(raw_grew):
         row = _require_mapping(item, f"{where}.grew[{position}]")
-        before = row.get("before")
-        if isinstance(before, bool) or not isinstance(before, (int, float)) or before < 0:
-            raise BudgetError(
-                f"{where}.grew[{position}].before must be a cost, found {before!r}"
-            )
         grew.append(
             Growth(
                 name=_text(row.get("name"), f"{where}.grew[{position}].name"),
-                before=float(before),
+                before=_nonnegative(row.get("before"), f"{where}.grew[{position}].before"),
                 after=_positive(row.get("after"), f"{where}.grew[{position}].after"),
             )
         )

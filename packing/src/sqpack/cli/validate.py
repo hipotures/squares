@@ -1041,6 +1041,40 @@ def _commands(
     return "\n".join(output for output in outputs if output)
 
 
+def _command_groups(
+    context: Context,
+    groups: Sequence[Sequence[Sequence[str]]],
+    *,
+    cwd: Path = PROJECT_ROOT,
+) -> str:
+    """Run independent serial command groups together and retain declared output order.
+
+    Some validation contracts contain one long producer followed by several independent
+    record checks. Making each command a gate step would change the public step inventory
+    and tier shape; leaving one serial list creates an avoidable tail. Groups expose the
+    real dependency boundary while `_commands` preserves fail-fast order inside each
+    group. Any failure stops every subprocess owned by the validation run, as a failure
+    in the outer step pool does.
+    """
+    if not groups:
+        return ""
+    outputs: dict[int, str] = {}
+    with ThreadPoolExecutor(max_workers=len(groups)) as pool:
+        futures = {
+            pool.submit(_commands, context, commands, cwd=cwd): index
+            for index, commands in enumerate(groups)
+        }
+        try:
+            for future in as_completed(futures):
+                outputs[futures[future]] = future.result()
+        except BaseException:
+            for future in futures:
+                future.cancel()
+            context.processes.stop()
+            raise
+    return "\n".join(output for index in range(len(groups)) if (output := outputs[index]))
+
+
 def _require_text(output: str, *needles: str) -> None:
     missing = [needle for needle in needles if needle not in output]
     if missing:
@@ -1793,45 +1827,63 @@ def _known_best_atlas(context: Context) -> str:
 
     So the seven stay here and the rebuild leaves, and what replaces it is `--sample`
     rather than nothing: the whole record layer re-derived, and a fixed recorded slice of
-    the cases rebuilt byte for byte. `known-best n=1..324 atlas rebuild` on the deferred
-    surface is the rest, and `benchmarks/gate-cost-at-324/` retains the readings.
+    the cases rebuilt byte for byte. Exact run 35123561888 later measured the sample at
+    113.69s and the seven independent record checks at 16.30s after it. They now run as
+    two command groups under this same step, so the record tail fits beneath the sample
+    without changing the tier or moving a check. `known-best n=1..324 atlas rebuild` on
+    the deferred surface is the rest, and `benchmarks/gate-cost-at-324/` retains the
+    earlier readings.
     """
-    output = _commands(
+    output = _command_groups(
         context,
         (
             (
-                sys.executable,
-                "-m",
-                "devtools.build_known_best_atlas",
-                "--check",
-                "--sample",
-            ),
-            (sys.executable, "-m", "devtools.build_composite_figure_data", "--check"),
-            (sys.executable, "-m", "devtools.render_composite_pdf", "--check"),
-            (
-                sys.executable,
-                "-m",
-                "devtools.render_known_best_contact_overlays",
-                "--check",
+                (
+                    sys.executable,
+                    "-m",
+                    "devtools.build_known_best_atlas",
+                    "--check",
+                    "--sample",
+                ),
             ),
             (
-                sys.executable,
-                "-m",
-                "devtools.profile_known_best_chunks",
-                "--check",
-            ),
-            (sys.executable, "-m", "devtools.price_contact_enumeration", "--check"),
-            (
-                sys.executable,
-                "-m",
-                "devtools.generate_contact_full_cell_control",
-                "--check",
-            ),
-            (
-                sys.executable,
-                "-m",
-                "devtools.generate_contact_structures",
-                "--check",
+                (
+                    sys.executable,
+                    "-m",
+                    "devtools.build_composite_figure_data",
+                    "--check",
+                ),
+                (sys.executable, "-m", "devtools.render_composite_pdf", "--check"),
+                (
+                    sys.executable,
+                    "-m",
+                    "devtools.render_known_best_contact_overlays",
+                    "--check",
+                ),
+                (
+                    sys.executable,
+                    "-m",
+                    "devtools.profile_known_best_chunks",
+                    "--check",
+                ),
+                (
+                    sys.executable,
+                    "-m",
+                    "devtools.price_contact_enumeration",
+                    "--check",
+                ),
+                (
+                    sys.executable,
+                    "-m",
+                    "devtools.generate_contact_full_cell_control",
+                    "--check",
+                ),
+                (
+                    sys.executable,
+                    "-m",
+                    "devtools.generate_contact_structures",
+                    "--check",
+                ),
             ),
         ),
     )

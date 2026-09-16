@@ -70,6 +70,7 @@ name: Certificate page
       - packages/workbench/**
       - packing/devtools/check_published_site.py
       - packing/devtools/pages_scope.py
+      - packing/devtools/wait_for_run_artifact.py
       - packing/devtools/explainer/**
       - packing/devtools/probes/**
       - packing/atlas/known-best/manifest.json
@@ -95,14 +96,14 @@ concurrency:
 #   scope ─┬─ explainer-unchanged                  (only when the explainer is skipped)
 #          ├─ workbench-unchanged                  (only when the workbench is skipped)
 #          ├─ workbench ───────────────────────────────┐
-#          └─ prepare ─┬─ pdf ─────────────────────────┼─ publish ─┐
-#                      ├─ print-layout                 │           ├─ pages-required (gate + wall)
-#                      ├─ typography                   │           │
-#                      ├─ screen                       │           │
-#                      ├─ geometry                     │           │
-#                      ├─ font-loading (ff, wk)        │           │
-#                      ├─ browser-geometry (ff, wk)    │           │
-#                      └─ startup-timing (dispatch)    │           │
+#          ├─ prepare ─┬─ pdf ─────────────────────────┼─ publish ─┐
+#          │           ├─ print-layout                 │           ├─ pages-required (gate + wall)
+#          │           ├─ typography                   │           │
+#          │           ├─ screen                       │           │
+#          │           ├─ geometry                     │           │
+#          │           └─ startup-timing (dispatch)    │           │
+#          ├─ font-loading (ff, wk) ── wait artifact ──┤           │
+#          └─ browser-geometry (ff, wk) ─ wait artifact┘           │
 #                                                      └───────────┴─ deploy ─ verify-deployment
 #
 # A pull request waits for its slowest job, so what sets its wall is the longest chain,
@@ -111,9 +112,11 @@ concurrency:
 # workbench stack's pull requests, 381 s on pull requests into `main`, and 471 s on the
 # push to `main` that merged the stack (run 35017781374). None of those checks reads
 # another's result -- each loads the one prepared page -- so they are split into jobs
-# balanced by their measured step times, and the long pole is now `scope`, `prepare` and
-# one check job. Every check that ran before still runs, on the same prepared artifact;
-# nothing moved off the pull request (`OR-13`).
+# balanced by their measured step times. Firefox and WebKit provisioning starts beside
+# `prepare`, then joins it through a bounded, fail-closed artifact wait immediately
+# before the page is read. The long pole therefore overlaps independent setup rather
+# than serializing it. Every check that ran before still runs, on the same prepared
+# artifact; nothing moved off the pull request (`OR-13`).
 jobs:
   # Which of the two pages this change can affect. A pull request that touches neither
   # page's inputs does no browser work at all, and a workbench-only change no longer
@@ -806,8 +809,12 @@ jobs:
   # 39 s on them serially and missed OR-14's 180 s outer edge by 9 s. Two pairs preserve
   # headroom on the four-CPU runner while removing roughly half that serial tail.
   font-loading:
-    needs: prepare
+    needs: scope
+    if: needs.scope.outputs.explainer == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
     strategy:
       fail-fast: false
       matrix:
@@ -874,6 +881,16 @@ jobs:
           uv run --frozen --group dev python -m playwright install --with-deps ${{ matrix.browser }}
           sudo rm -rf ~/apt-archives/partial ~/apt-archives/lock
           sudo chown -R "$(id -u):$(id -g)" ~/apt-archives
+
+      # Provisioning is independent of the page and starts beside `prepare`. Join only
+      # at the first consumer, with a bounded tool that also observes producer failure.
+      - name: Wait for the prepared page
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          uv run --frozen --group dev python -m devtools.wait_for_run_artifact
+          --repository "$GITHUB_REPOSITORY" --run-id "$GITHUB_RUN_ID"
+          --name prepared-page --producer prepare --timeout 600
 
       - name: Use the prepared page
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
@@ -915,8 +932,12 @@ jobs:
           retention-days: 7
 
   browser-geometry:
-    needs: prepare
+    needs: scope
+    if: needs.scope.outputs.explainer == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
     strategy:
       fail-fast: false
       matrix:
@@ -983,6 +1004,14 @@ jobs:
           uv run --frozen --group dev python -m playwright install --with-deps ${{ matrix.browser }}
           sudo rm -rf ~/apt-archives/partial ~/apt-archives/lock
           sudo chown -R "$(id -u):$(id -g)" ~/apt-archives
+
+      - name: Wait for the prepared page
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          uv run --frozen --group dev python -m devtools.wait_for_run_artifact
+          --repository "$GITHUB_REPOSITORY" --run-id "$GITHUB_RUN_ID"
+          --name prepared-page --producer prepare --timeout 600
 
       - name: Use the prepared page
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0

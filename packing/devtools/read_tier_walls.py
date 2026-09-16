@@ -80,7 +80,7 @@ def _tier_of(command: str) -> str | None:
     tokens = shlex.split(command)
     try:
         namespace = _validate_parser().parse_args(tokens[1:])
-    except (SystemExit, UsageError):
+    except SystemExit, UsageError:
         return None
     return None if namespace.only or namespace.skip else _tier_id(namespace)
 
@@ -200,6 +200,13 @@ def _groups(readings: Sequence[Reading]) -> dict[tuple[str, str], list[Reading]]
     return grouped
 
 
+def same_shape(readings: Sequence[Reading], *, tier: str, steps: str) -> list[Reading]:
+    """Only enforced readings of the same named tier and selected-step shape."""
+    return [
+        item for item in readings if item.tier == tier and item.steps == steps and item.enforced
+    ]
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Read tier walls out of hosted job logs.")
     parser.add_argument("--run-id", type=int, action="append", required=True)
@@ -223,7 +230,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             f"geometric mean of {len(walls)} readings at the reference shape -- {listed} -- "
             f"across runs {runs}. Observed spread {max(walls) / min(walls):.2f}x."
         )
-        before = [item for item in baseline if item.tier == tier and item.enforced]
+        before = same_shape(baseline, tier=tier, steps=steps)
         if not before:
             continue
         old = geometric_mean([item.wall_seconds for item in before])

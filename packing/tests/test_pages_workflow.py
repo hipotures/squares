@@ -108,9 +108,12 @@ def test_every_pull_request_job_is_scoped_to_its_page_or_says_why() -> None:
         }
         for half in halves
     }
-    assert gated == {"explainer": {"prepare"}, "workbench": {"workbench"}}
-    for half, (root,) in ((h, tuple(g)) for h, g in gated.items()):
-        assert needs_of(jobs[root]) == ["scope"]
+    assert gated == {
+        "explainer": {"prepare", "font-loading", "browser-geometry"},
+        "workbench": {"workbench"},
+    }
+    for half, roots in gated.items():
+        assert all(needs_of(jobs[root]) == ["scope"] for root in roots)
         notices = [
             name
             for name, job in jobs.items()
@@ -131,10 +134,13 @@ def test_every_pull_request_job_is_scoped_to_its_page_or_says_why() -> None:
             r"python -m (devtools\.render_explainer|workbench_tools\.build_site)\b", commands
         )
         if works and name not in DEPLOY_PATH:
-            assert upstream(jobs, name) & {"prepare", "workbench"} or name in {
-                "prepare",
-                "workbench",
-            }, f"{name} does page work on a pull request without waiting for the scope"
+            directly_scoped = job.get("if") in {
+                "needs.scope.outputs.explainer == 'true'",
+                "needs.scope.outputs.workbench == 'true'",
+            }
+            assert upstream(jobs, name) & {"prepare", "workbench"} or directly_scoped, (
+                f"{name} does page work on a pull request without waiting for the scope"
+            )
 
 
 def test_the_required_aggregate_passes_a_justified_skip_and_nothing_else() -> None:
@@ -192,6 +198,26 @@ def test_deployment_waits_for_the_cross_browser_loading_checks() -> None:
         "devtools.check_math_loading" in step.get("run", "")
         for step in jobs["font-loading"]["steps"]
     )
+
+
+def test_cross_browser_setup_overlaps_prepare_then_joins_its_exact_artifact() -> None:
+    """Independent provisioning starts early; no page consumer can outrun prepare."""
+    jobs = load()["jobs"]
+    for name in ("font-loading", "browser-geometry"):
+        job = jobs[name]
+        assert needs_of(job) == ["scope"]
+        assert job["if"] == "needs.scope.outputs.explainer == 'true'"
+        assert job["permissions"] == {"contents": "read", "actions": "read"}
+        steps = job["steps"]
+        wait = next(step for step in steps if step.get("name") == "Wait for the prepared page")
+        download = next(step for step in steps if step.get("name") == "Use the prepared page")
+        assert steps.index(wait) < steps.index(download)
+        assert wait["env"]["GH_TOKEN"] == "${{ github.token }}"
+        command = wait["run"]
+        assert "python -m devtools.wait_for_run_artifact" in command
+        assert '--repository "$GITHUB_REPOSITORY"' in command
+        assert '--run-id "$GITHUB_RUN_ID"' in command
+        assert "--name prepared-page --producer prepare --timeout 600" in command
 
 
 def test_saved_font_geometry_runs_as_two_bounded_pairs() -> None:
@@ -639,7 +665,10 @@ def test_every_browser_checks_the_same_prepared_publication() -> None:
         "startup-timing",
     } <= set(checks)
     for name in checks:
-        assert needs_of(jobs[name]) == ["prepare"], name
+        if name in {"font-loading", "browser-geometry"}:
+            assert needs_of(jobs[name]) == ["scope"], name
+        else:
+            assert needs_of(jobs[name]) == ["prepare"], name
         downloads = [
             step["with"]
             for step in jobs[name]["steps"]

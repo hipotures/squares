@@ -466,6 +466,27 @@ def test_ci_jobs_fetch_provenance_history_and_key_the_uv_cache_from_the_lock() -
         "uv run --frozen --all-extras --group dev packing-validate --sweeps "
         "--jobs 4 --inner-jobs 2"
     )
+    sweep_checkout = next(
+        _mapping(step)
+        for step in sweep_steps
+        if str(_mapping(step).get("uses", "")).startswith("actions/checkout@")
+    )
+    sweep_checkout_options = _mapping(sweep_checkout["with"])
+    assert sweep_checkout_options["filter"] == "blob:none"
+    assert sweep_checkout_options["sparse-checkout-cone-mode"] is False
+    assert sweep_checkout_options["persist-credentials"] is False
+    sparse = set(str(sweep_checkout_options["sparse-checkout"]).splitlines())
+    assert {
+        "!/packing/campaign/",
+        "!/packing/resources/",
+        "/packing/resources/web/kingbird-squares-in-squares.html",
+        "/packing/resources/web/known-best-packings/",
+        "/packing/resources/web/prospective-packings/",
+        "/packing/resources/web/unitsquare-release1-2026/",
+        "/packing/resources/papers/kingbird-square-29-provenance.svg",
+        "/packages/workbench/",
+        "/vendor/kpress/",
+    } <= sparse
     full_step = next(
         _mapping(step)
         for step in validate_steps

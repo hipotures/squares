@@ -398,14 +398,14 @@ def measure(
     )
     aggregator = next((job for job in jobs if job["name"] == workflow.aggregator), None)
     aggregator_start = _instant(aggregator.get("started_at")) if aggregator else None
-    wall_step = next(
-        (
-            step
-            for step in (aggregator.get("steps") or [])
-            if step.get("name") == WALL_STEP
-        ),
-        None,
-    ) if aggregator else None
+    wall_step = (
+        next(
+            (step for step in (aggregator.get("steps") or []) if step.get("name") == WALL_STEP),
+            None,
+        )
+        if aggregator
+        else None
+    )
     wall_step_start = _instant(wall_step.get("started_at")) if wall_step else None
     if wall_step_start is not None:
         end, ends_at = wall_step_start, f"the start of `{WALL_STEP}`"
@@ -694,14 +694,10 @@ def exit_status(verdict: WallVerdict) -> int:
     return 0 if verdict.status == "passed" else 1
 
 
-def _reported_job_ids(
-    jobs: Sequence[dict[str, Any]], workflow: WorkflowWall
-) -> set[str]:
+def _reported_job_ids(jobs: Sequence[dict[str, Any]], workflow: WorkflowWall) -> set[str]:
     """Workflow job ids visible in the API, apart from the aggregator and declared asides."""
     return {
-        _job_id(str(job["name"]))
-        for job in jobs
-        if _gates(job, workflow, workflow.aggregator)
+        _job_id(str(job["name"])) for job in jobs if _gates(job, workflow, workflow.aggregator)
     }
 
 
@@ -732,9 +728,7 @@ def _settled_jobs(
     """
     jobs = client.jobs(run_id)
     for _ in range(SETTLE_ATTEMPTS - 1):
-        aggregator = next(
-            (job for job in jobs if job.get("name") == workflow.aggregator), None
-        )
+        aggregator = next((job for job in jobs if job.get("name") == workflow.aggregator), None)
         if (
             aggregator is not None
             and _instant(aggregator.get("started_at")) is not None

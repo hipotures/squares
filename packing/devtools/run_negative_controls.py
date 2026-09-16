@@ -172,6 +172,22 @@ PRUNE = frozenset(
         ROOT / "campaign/series/series-000-smoke-and-calibration/results/agenda-024",
         ROOT / "campaign/series/series-000-smoke-and-calibration/results/agenda-025",
         ROOT / "campaign/series/series-000-smoke-and-calibration/results/agenda-026",
+        # Later agenda and campaign-calibration directories are the same retained-output
+        # class: numerical receipts, logs and copied scripts, not mutation-control
+        # inputs. `controls.yaml` names none of these paths. Inline-linked and registered
+        # dependencies still return through `snapshot_pruned_targets`, as they do for
+        # agendas 024--026. On 2026-09-16, pruning agenda 034 alone recovered only 596 KB
+        # because 14.7 MB was correctly copied back; these other unused output roots
+        # recover 23.2 MB more. That leaves meaningful margin below the fixed 160 MiB cap
+        # and makes every private-worker copy smaller without removing research evidence
+        # from the repository or a declared dependency from the worker.
+        ROOT / "campaign/series/series-000-smoke-and-calibration/results/agenda-031",
+        ROOT / "campaign/series/series-000-smoke-and-calibration/results/agenda-033",
+        ROOT / "campaign/series/series-000-smoke-and-calibration/results/agenda-034",
+        ROOT / "campaign/series/series-000-smoke-and-calibration/results/agenda-035",
+        ROOT
+        / "campaign/series/series-000-smoke-and-calibration/results/exp-201-arm-calibration",
+        ROOT / "campaign/series/series-000-smoke-and-calibration/results/exp-202-round-1",
         # The n=17 weighted-certificate solver state joins them on 2026-09-03, when the
         # H-052 lane committed exp-059's completion record and its checkpoint and pushed
         # the snapshot to 90,031,065 bytes against the 67,108,864 cap. Counted over the

@@ -670,6 +670,33 @@ jobs:
           # kpress is vendored at vendor/kpress and installed from that path, so
           # the environment does not resolve without the submodule checked out.
           submodules: true
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          # These four steps consume the package, tools, exact case/frontier/atlas
+          # records and a small declared slice of the source archive. They do not read
+          # the 130 MB campaign history or the rest of the 329 MB papers archive. Keep
+          # this list paired with the workflow contract in test_module_boundaries.py.
+          sparse-checkout: |
+            /*
+            !/*/
+            /.gitmodules
+            /vendor/kpress/
+            /packages/workbench/
+            /packing/
+            !/packing/campaign/
+            !/packing/resources/
+            /packing/resources/
+            !/packing/resources/*/
+            /packing/resources/web/
+            !/packing/resources/web/*/
+            /packing/resources/web/kingbird-squares-in-squares.html
+            /packing/resources/web/known-best-packings/
+            /packing/resources/web/prospective-packings/
+            /packing/resources/web/unitsquare-release1-2026/
+            /packing/resources/papers/
+            !/packing/resources/papers/*/
+            /packing/resources/papers/kingbird-square-29-provenance.svg
 
       - name: Install uv and Python 3.14
         uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0

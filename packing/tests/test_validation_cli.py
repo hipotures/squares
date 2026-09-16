@@ -1546,6 +1546,43 @@ def test_multi_command_step_stops_at_first_failure_without_printing_success(
     assert not marker.exists()
 
 
+def test_independent_command_groups_overlap_but_keep_serial_order_within_each(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    entered: set[str] = set()
+    finished: list[str] = []
+
+    def run(_context: validate.Context, command: tuple[str, ...], **_options: object) -> str:
+        name = command[0]
+        entered.add(name)
+        if name in {"a1", "b1"}:
+            deadline = time.monotonic() + 1
+            while len(entered & {"a1", "b1"}) < 2 and time.monotonic() < deadline:
+                time.sleep(0.001)
+            assert entered & {"a1", "b1"} == {"a1", "b1"}
+        finished.append(name)
+        return name
+
+    monkeypatch.setattr(validate, "_run", run)
+    context = validate.Context(
+        deep=False,
+        strict=False,
+        jobs=1,
+        inner_jobs=1,
+        environment={},
+    )
+    output = validate._command_groups(
+        context,
+        (
+            (("a1",), ("a2",)),
+            (("b1",), ("b2",)),
+        ),
+    )
+    assert finished.index("a1") < finished.index("a2")
+    assert finished.index("b1") < finished.index("b2")
+    assert output.splitlines() == ["a1", "a2", "b1", "b2"]
+
+
 def test_frontier_contract_accepts_the_declared_schema_metadata(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:

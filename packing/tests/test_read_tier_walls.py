@@ -17,7 +17,7 @@ from pathlib import Path
 
 import pytest
 
-from devtools.read_tier_walls import geometric_mean, growth, parse_log, step_means
+from devtools.read_tier_walls import geometric_mean, growth, parse_log, same_shape, step_means
 
 EXCERPT = (
     Path(__file__).resolve().parent
@@ -112,3 +112,16 @@ def test_a_mean_over_readings_is_geometric_and_per_step() -> None:
     )
     means = step_means([one, two])
     assert means["exact verification"] == pytest.approx(116.00)
+
+
+def test_baseline_attribution_uses_only_the_same_selected_step_shape() -> None:
+    """A tier name is not a comparable baseline when the tier selected different work."""
+    (matching,) = parse_log(excerpt())
+    (different_shape,) = parse_log(excerpt().replace("49 of 74 STEPS", "50 of 75 STEPS"))
+    (different_tier,) = parse_log(
+        excerpt().replace("packing-validate --checks", "packing-validate --typecheck")
+    )
+    selected = same_shape(
+        [matching, different_shape, different_tier], tier="checks", steps="49 of 74"
+    )
+    assert selected == [matching]

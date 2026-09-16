@@ -569,6 +569,22 @@ def test_an_attribution_that_names_no_growth_is_refused(tmp_path: Path) -> None:
         gate_budgets.load(spec)
 
 
+@pytest.mark.parametrize("before", [".nan", ".inf", "-.inf"])
+def test_an_attribution_before_cost_must_be_finite(tmp_path: Path, before: str) -> None:
+    spec = fabricated(tmp_path, ceiling=200.0, measured="100.0")
+    spec.write_text(
+        spec.read_text(encoding="utf-8") + "  attribution:\n"
+        "    cause: a fabricated rise\n"
+        "    unit: step-seconds\n"
+        "    source: a fabricated source\n"
+        "    grew:\n"
+        f"    - {{name: a step, before: {before}, after: 10.0}}\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(BudgetError, match="non-negative and finite"):
+        gate_budgets.load(spec)
+
+
 def test_a_suite_record_can_be_attributed_from_two_per_file_reports(tmp_path: Path) -> None:
     """G5's consumer: `suite` grows by many small files, so its attribution is per file.
 
