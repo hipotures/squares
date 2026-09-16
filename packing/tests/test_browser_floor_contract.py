@@ -205,6 +205,7 @@ DECLARED_BIOME_EXCLUSIONS: tuple[dict[str, Any], ...] = (
     },
 )
 FLOOR_SAMPLES = REPOSITORY_ROOT / DECLARED_BIOME_EXCLUSIONS[0]["exclusion"].removeprefix("!")
+PROBE_GROUP_SAMPLES = REPOSITORY_ROOT / "packing/tests/fixtures/probe-typecheck"
 
 #: Directories whose JavaScript is not ours to hold to a floor.
 NOT_OURS = ("vendor/", "node_modules/")
@@ -754,15 +755,9 @@ def test_a_probe_cannot_see_a_foreign_groups_ambient_types(tmp_path: Path) -> No
     beta = tmp_path / "probes/beta"
     alpha.mkdir(parents=True)
     beta.mkdir(parents=True)
-    (alpha / "types.d.ts").write_text(
-        "interface AlphaOnly { value: string; }\n", encoding="utf-8"
-    )
-    (alpha / "read.js").write_text(
-        '() => /** @type {AlphaOnly} */ ({ value: "owned" });\n', encoding="utf-8"
-    )
-    (beta / "read.js").write_text(
-        '() => /** @type {AlphaOnly} */ ({ value: "leaked" });\n', encoding="utf-8"
-    )
+    shutil.copyfile(PROBE_GROUP_SAMPLES / "alpha-types.txt", alpha / "types.d.ts")
+    shutil.copyfile(PROBE_GROUP_SAMPLES / "alpha-read.txt", alpha / "read.js")
+    shutil.copyfile(PROBE_GROUP_SAMPLES / "beta-read.txt", beta / "read.js")
     (tmp_path / "manifest.json").write_text(
         json.dumps({"probeRoots": [{"path": "probes"}]}), encoding="utf-8"
     )
