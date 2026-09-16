@@ -30,6 +30,8 @@ from devtools.run_negative_controls import (
 )
 from sqpack.yamlio import safe_load
 
+MOTION_LAB_GOLDEN = ROOT / "tests/golden/motion-lab-pages.json"
+
 
 @pytest.fixture(scope="module")
 def control_snapshot(tmp_path_factory: pytest.TempPathFactory) -> tuple[Path, set[Path]]:
@@ -268,6 +270,7 @@ def test_generator_owned_prospective_outputs_stay_out_of_mutation_snapshots() ->
     assert ROOT / "witnesses/prospective" in PRUNE
     assert ROOT / "atlas/known-best/rendering" in PRUNE
     assert ROOT / "atlas/known-best/contact-overlays" in PRUNE
+    assert MOTION_LAB_GOLDEN in PRUNE
     assert (
         ROOT
         / "campaign/series/series-000-smoke-and-calibration/results"
@@ -277,6 +280,24 @@ def test_generator_owned_prospective_outputs_stay_out_of_mutation_snapshots() ->
     assert ROOT / "campaign/series/series-000-smoke-and-calibration/results/agenda-025" in PRUNE
     assert CORNER_DUAL_SALVAGE_RECEIPT in PRUNE
     assert snapshot_source_bytes() < SNAPSHOT_MAX_BYTES
+
+
+def test_motion_lab_golden_is_not_a_mutation_worker_input(
+    control_snapshot: tuple[Path, set[Path]],
+) -> None:
+    tree, copied_targets = control_snapshot
+    relative = MOTION_LAB_GOLDEN.relative_to(controls.REPO)
+    packing_relative = MOTION_LAB_GOLDEN.relative_to(ROOT).as_posix()
+    specification = safe_load((ROOT / "devtools/controls.yaml").read_text())
+
+    assert MOTION_LAB_GOLDEN.is_file()
+    assert all(
+        (ROOT / control["file"]).resolve() != MOTION_LAB_GOLDEN
+        for control in specification["controls"]
+    )
+    assert all(packing_relative not in control["run"] for control in specification["controls"])
+    assert relative not in copied_targets
+    assert not (tree / relative).exists()
 
 
 def test_dual_salvage_receipt_is_not_a_mutation_worker_input(

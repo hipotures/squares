@@ -138,6 +138,11 @@ PRUNE = frozenset(
         ROOT / "atlas/known-best/known-best-1-324.png",
         ROOT / "atlas/known-best/rendering",
         ROOT / "atlas/prospective/rendering",
+        # The Motion Lab's deterministic report is generated output, replayed by the
+        # browser-golden check, and no registered mutation control names it. The report
+        # joined this list when its 280 KB first pushed the private-worker snapshot over
+        # the portable 160 MiB cap.
+        ROOT / "tests/golden/motion-lab-pages.json",
         # `site` is a stronger case than any of the above and is here for a different
         # reason: it is not repository content at all. The explainer's renderer writes
         # the page, the published Markdown and four copies of the composite there on

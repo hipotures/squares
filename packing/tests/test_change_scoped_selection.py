@@ -259,6 +259,10 @@ def test_a_motion_lab_probe_selects_the_workbench_check() -> None:
     )
 
 
+def test_the_motion_lab_golden_selects_its_browser_replay() -> None:
+    assert _selects("packing/tests/golden/motion-lab-pages.json", WORKBENCH_STEP)
+
+
 def test_an_omitted_workbench_input_is_detected() -> None:
     """The negative control: the step's patterns without the explainer renderer."""
     (step,) = [step for step in STEPS if step.name == WORKBENCH_STEP]
