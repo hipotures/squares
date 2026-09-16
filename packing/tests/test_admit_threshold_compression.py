@@ -222,6 +222,37 @@ def test_historical_source_mismatch_is_refused(
         )
 
 
+def test_sentinel_parses_the_exact_snapshots_returned_by_binding(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    anchor = admission.SENTINELS[0]
+    original_repository = admission.REPOSITORY
+    snapshots = {
+        anchor.path: (original_repository / anchor.path).read_bytes(),
+        anchor.source_path: (original_repository / anchor.source_path).read_bytes(),
+    }
+    for relative, data in snapshots.items():
+        path = tmp_path / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(data)
+
+    def bind_then_change(path: Path, _revision: str, *, label: str) -> bytes:
+        relative = path.relative_to(tmp_path).as_posix()
+        verified = snapshots[relative]
+        path.write_bytes(b'{"changed_after_binding":true}\n')
+        assert label
+        return verified
+
+    monkeypatch.setattr(admission, "REPOSITORY", tmp_path)
+    monkeypatch.setattr(admission, "_bind_repository_source", bind_then_change)
+
+    inventory = admission._authenticate_sentinel(anchor)  # noqa: SLF001
+
+    assert inventory.orbit_count > 0
+    assert (tmp_path / anchor.path).read_bytes() != snapshots[anchor.path]
+    assert (tmp_path / anchor.source_path).read_bytes() != snapshots[anchor.source_path]
+
+
 def test_duplicate_keys_and_floating_numbers_are_refused(tmp_path: Path) -> None:
     duplicate = tmp_path / "duplicate.json"
     duplicate.write_text('{"schema":"one","schema":"two"}\n', encoding="utf-8")

@@ -178,12 +178,9 @@ def _check_depth(text: str) -> None:
             depth -= 1
 
 
-def load_json(
-    path: Path, *, label: str, limit: int = MAX_JSON_BYTES
-) -> tuple[dict[str, Any], bytes]:
-    """Load one bounded exact JSON object, refusing aliases and approximate numbers."""
+def _parse_json_bytes(data: bytes, *, label: str) -> dict[str, Any]:
+    """Parse one already bounded byte snapshot as exact JSON."""
     try:
-        data = _bounded_regular_bytes(path, limit=limit, label=label)
         text = data.decode("utf-8")
         _check_depth(text)
         decoded = json.loads(
@@ -199,7 +196,20 @@ def load_json(
         raise AdmissionError(f"cannot read {label}: {error}") from None
     if not isinstance(decoded, dict):
         raise AdmissionError(f"{label} must be a JSON object")
-    return cast(dict[str, Any], decoded), data
+    return cast(dict[str, Any], decoded)
+
+
+def load_json(
+    path: Path, *, label: str, limit: int = MAX_JSON_BYTES
+) -> tuple[dict[str, Any], bytes]:
+    """Load one bounded exact JSON object, refusing aliases and approximate numbers."""
+    try:
+        data = _bounded_regular_bytes(path, limit=limit, label=label)
+    except AdmissionError:
+        raise
+    except OSError as error:
+        raise AdmissionError(f"cannot read {label}: {error}") from None
+    return _parse_json_bytes(data, label=label), data
 
 
 def _keys(value: object, expected: set[str], label: str) -> dict[str, Any]:
@@ -247,8 +257,8 @@ def _revision(value: object, *, label: str) -> str:
     return value
 
 
-def _bind_repository_source(path: Path, revision: str, *, label: str) -> None:
-    """Compare complete input bytes with one Git revision and path."""
+def _bind_repository_source(path: Path, revision: str, *, label: str) -> bytes:
+    """Return the complete bytes after comparing them with one Git revision and path."""
     _revision(revision, label="source revision")
     try:
         relative = path.resolve().relative_to(REPOSITORY.resolve()).as_posix()
@@ -258,6 +268,7 @@ def _bind_repository_source(path: Path, revision: str, *, label: str) -> None:
     reviewed = _git_content(revision, relative, label=label)
     if current != reviewed:
         raise AdmissionError(f"{label} differs from its declared Git revision and path")
+    return current
 
 
 def _digest(value: object, *, label: str) -> str:
@@ -274,13 +285,13 @@ def _canonical_json(value: object) -> bytes:
     return (json.dumps(value, indent=2, sort_keys=True, allow_nan=False) + "\n").encode()
 
 
-def _load_certificate(path: Path, *, label: str) -> tuple[object, bytes]:
-    data = _bounded_regular_bytes(path, limit=MAX_CERTIFICATE_BYTES, label=label)
+def _load_certificate_bytes(data: bytes, *, label: str) -> object:
+    """Load the exact certificate byte snapshot authenticated by its caller."""
     try:
         certificate, _ = load_threshold_certificate(data)
     except (TypeError, ValueError, RecursionError) as error:
         raise AdmissionError(f"cannot load {label}: {error}") from None
-    return certificate, data
+    return certificate
 
 
 def _expected_admission(
@@ -647,8 +658,8 @@ def _policy_boundary_check(inventory: OrbitInventory) -> dict[str, Any]:
 
 
 def _authenticate_inventory(*, path: Path, label: str, revision: str) -> OrbitInventory:
-    _bind_repository_source(path, revision, label=label)
-    certificate, _ = _load_certificate(path, label=label)
+    data = _bind_repository_source(path, revision, label=label)
+    certificate = _load_certificate_bytes(data, label=label)
     return inventory_certificate(certificate)  # type: ignore[arg-type]
 
 
@@ -658,12 +669,13 @@ def _authenticate_sentinel(anchor: SentinelAnchor) -> OrbitInventory:
     source_path = _repo_path(
         anchor.source_path, expected=anchor.source_path, label="sentinel source path"
     )
-    _bind_repository_source(
+    record_label = f"T-026 net-{anchor.direction_steps} limit record"
+    record_data = _bind_repository_source(
         record_path,
         SOURCE_REVISION,
-        label=f"T-026 net-{anchor.direction_steps} limit record",
+        label=record_label,
     )
-    record, _ = load_json(record_path, label=f"T-026 net-{anchor.direction_steps} limit record")
+    record = _parse_json_bytes(record_data, label=record_label)
     inventory = _authenticate_inventory(
         path=source_path,
         label=f"T-026 net-{anchor.direction_steps} source certificate",
