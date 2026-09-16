@@ -169,10 +169,44 @@ def test_the_probe_loader_and_non_scripts_pass(source: str) -> None:
             "import sqpack.probes as probes\n"
             "page.add_init_script(probes.applied('location.reload()'))\n"
         ),
+        (
+            "from sqpack.probes import applied\n"
+            "page.add_init_script(applied(source='location.reload()'))\n"
+        ),
+        (
+            "from sqpack.probes import applied\n"
+            "def install(page, source):\n"
+            "    page.add_init_script(applied(source))\n"
+        ),
+        (
+            "from sqpack.probes import applied, probe\n"
+            "page.add_init_script(applied(probe(ROOT, 'tool/name') if flag else source))\n"
+        ),
+        (
+            "from sqpack.probes import applied, probe\n"
+            "source = probe(ROOT, 'tool/name')\n"
+            "source = make_source()\n"
+            "page.add_init_script(applied(source))\n"
+        ),
+        (
+            "from sqpack.probes import applied, probe\n"
+            "source = probe(ROOT, 'tool/name')\n"
+            "source += suffix\n"
+            "page.add_init_script(applied(source))\n"
+        ),
+        ("from sqpack.probes import applied\npage.add_init_script(applied(**options))\n"),
     ],
 )
 def test_applied_accepts_only_file_backed_probe_source(source: str) -> None:
     assert _rules(source) == ["script argument"]
+
+
+def test_applied_accepts_a_file_backed_probe_as_a_keyword_source() -> None:
+    source = (
+        "from sqpack.probes import applied, probe\n"
+        "page.add_init_script(applied(source=probe(ROOT, 'tool/name')))\n"
+    )
+    assert _sites(source) == []
 
 
 def test_documentation_is_not_a_site() -> None:

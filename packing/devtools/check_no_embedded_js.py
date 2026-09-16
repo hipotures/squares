@@ -391,10 +391,14 @@ class _Scanner:
 
     def _classify_wrapper(self, node: ast.Call, seen: frozenset[str]) -> Verdict:
         """Accept `applied` only when its source came from the probe loader."""
-        if not node.args:
-            return "unknown"
-        source = self.classify(node.args[0], seen)
-        return "loader" if source == "loader" else source
+        named = [keyword.value for keyword in node.keywords if keyword.arg == "source"]
+        if node.args and not isinstance(node.args[0], ast.Starred) and not named:
+            source = node.args[0]
+        elif not node.args and len(named) == 1:
+            source = named[0]
+        else:
+            return "built"
+        return "loader" if self.classify(source, seen) == "loader" else "built"
 
     def script_arguments(self) -> Iterator[ast.expr]:
         for node in self.nodes:
