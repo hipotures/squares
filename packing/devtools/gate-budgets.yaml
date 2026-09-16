@@ -631,3 +631,160 @@ tiers:
     at 892s on the same runner (run 33932095609), the slow lane BC-214 moved here, and the
     rest. 3600s is roughly twice that sum, which is the room a tier growing one
     certificate at a time needs before anyone has clocked it whole.
+
+# The certificate page's pull-request jobs. The tiers above budget `packing-validate`'s
+# steps; this workflow runs none of them, and until 2026-09-15 nothing budgeted it at all.
+# It reached a 472 s median on a pull request with every check green, which is the hole
+# `think-xfqk` records: a ceiling around a gate step says nothing about the wall a
+# contributor waits for. `test_every_page_job_a_pull_request_runs_is_budgeted` holds the
+# tiers' own rule over these entries -- every job a pull request runs has one, every entry
+# names a job that exists, every cost is measured on named runs, and every ceiling is
+# inside `policy.max_headroom` of it -- and `devtools.check_pr_wall` enforces the wall on
+# the live run.
+#
+# A matrix job is one entry per cell, because a cell is what a runner runs.
+pages:
+  reference: {runner: ubuntu-latest, cpus: 4, caches: warm}
+  wall:
+    measured_seconds: 186.0
+    measured_on: 2026-09-16
+    measured_where: >-
+      exact-head run 35056004552 after the workbench checkout became sparse, measured
+      from the run's creation to the `pages-required` aggregator's start; the preceding
+      exact-head run 35052785989 took 281 s before that cut
+    ceiling_seconds: 250.0
+    argument: >-
+      Before the split this workflow was `prepare` then a single `build` of about 300 s of
+      serial Chromium checks: a 472 s median on the workbench stack's pull requests, 381 s
+      on pull requests into main. The checks now run as thirteen jobs beside each other,
+      and the wall is `prepare` plus the longest of them. 250 s is 1.34x the final-shape
+      reading, which leaves modest room for hosted-runner variance without leaving room
+      for another doubling. Sparse checkout removed the 281 s run's anomalous workbench
+      fetch from the critical path, but 186 s remains above `OR-14`'s two to two and a
+      half minute target. The floor is back in the browser jobs: after `prepare`, the
+      slowest full browser cell took 97 s.
+  jobs:
+  - id: scope
+    measured_seconds: 20.2
+    measured_on: 2026-09-16
+    measured_where: run 35040456480, run 35039923396, run 35039248281 and run 35039355763
+    ceiling_seconds: 32.0
+    argument: >-
+      Reads the pull request's changed paths and decides which halves build. It runs on
+      every pull request and gates the rest, so its cost is pure overhead and is checked
+      as such.
+  - id: prepare
+    measured_seconds: 49.6
+    measured_on: 2026-09-16
+    measured_where: run 35040456480, run 35039923396 and run 35039248281
+    ceiling_seconds: 79.0
+    argument: >-
+      Renders the explainer twice -- the publication draw and the determinism control --
+      and hands both to the jobs below as artifacts, so nothing downstream renders again.
+  - id: workbench
+    measured_seconds: 53.0
+    measured_on: 2026-09-16
+    measured_where: >-
+      exact-head run 35056004552 after sparse checkout: 53 s for the job and 7 s for
+      checkout, against 234 s and about 174 s respectively in run 35052785989
+    ceiling_seconds: 104.0
+    argument: >-
+      Builds the workbench page under `--check`, which builds it twice and requires the
+      two to match byte for byte. It runs beside `prepare` rather than after it. The
+      blobless sparse checkout omits 504 MB in `packing/resources/` and
+      `packing/campaign/`; a contract test proves those omitted trees contain no declared
+      workbench or explainer build input.
+  - id: pdf
+    measured_seconds: 73.3
+    measured_on: 2026-09-16
+    measured_where: run 35040456480, run 35039923396 and run 35039248281
+    ceiling_seconds: 117.0
+    argument: >-
+      Draws the PDF from `prepare`'s page and runs the real-browser math controls on that
+      draw rather than a fresh one.
+  - id: print-layout
+    measured_seconds: 93.0
+    measured_on: 2026-09-16
+    measured_where: run 35040456480 and run 35039923396
+    ceiling_seconds: 149.0
+    argument: >-
+      The print-layout checks, split from typography so the two run beside each other;
+      they were one 109 s job at run 35039248281.
+  - id: typography
+    measured_seconds: 94.4
+    measured_on: 2026-09-16
+    measured_where: run 35040456480 and run 35039923396
+    ceiling_seconds: 151.0
+    argument: The typography checks, the other half of that split.
+  - id: screen
+    measured_seconds: 95.1
+    measured_on: 2026-09-16
+    measured_where: run 35040456480, run 35039923396 and run 35039248281
+    ceiling_seconds: 152.0
+    argument: The screen-rendering checks over the prepared page.
+  - id: geometry
+    measured_seconds: 87.2
+    measured_on: 2026-09-16
+    measured_where: run 35040456480, run 35039923396 and run 35039248281
+    ceiling_seconds: 140.0
+    argument: >-
+      The Chromium share of the fourteen geometry configurations, which ran serially in
+      one job before the split.
+  - id: browser-geometry (webkit)
+    measured_seconds: 90.4
+    measured_on: 2026-09-16
+    measured_where: run 35040456480, run 35039923396 and run 35039248281
+    ceiling_seconds: 145.0
+    argument: WebKit's share of the geometry configurations, on its own runner.
+  - id: browser-geometry (firefox)
+    measured_seconds: 79.0
+    measured_on: 2026-09-16
+    measured_where: run 35040456480, run 35039923396 and run 35039248281
+    ceiling_seconds: 126.0
+    argument: Firefox's share of the geometry configurations, on its own runner.
+  - id: font-loading (webkit)
+    measured_seconds: 96.1
+    measured_on: 2026-09-16
+    measured_where: run 35040456480, run 35039923396 and run 35039248281
+    ceiling_seconds: 154.0
+    argument: >-
+      The font-loading check in WebKit, the slowest browser job: about a third of it is
+      the browser's own system packages, which the cache now carries.
+  - id: font-loading (firefox)
+    measured_seconds: 76.3
+    measured_on: 2026-09-16
+    measured_where: run 35040456480, run 35039923396 and run 35039248281
+    ceiling_seconds: 122.0
+    argument: The font-loading check in Firefox.
+  - id: publish
+    measured_seconds: 6.5
+    measured_on: 2026-09-16
+    measured_where: run 35040456480, run 35039923396 and run 35039248281
+    ceiling_seconds: 11.0
+    argument: >-
+      Assembles the site from the artifacts the jobs above produced. On a pull request it
+      publishes nothing; it proves the assembly still works.
+  - id: explainer-unchanged
+    measured_seconds: 4.0
+    measured_on: 2026-09-16
+    measured_where: run 35039355763, the scope demonstration
+    ceiling_seconds: 8.0
+    argument: >-
+      The notice a pull request gets when no declared explainer input changed. It exists
+      so a skipped half is visible rather than silent, and `pages-required` treats it as
+      the pass it is.
+  - id: workbench-unchanged
+    measured_seconds: 4.0
+    measured_on: 2026-09-16
+    measured_where: run 35039355763, the scope demonstration
+    ceiling_seconds: 8.0
+    argument: The same notice for the workbench half.
+  - id: pages-required
+    measured_seconds: 3.0
+    measured_on: 2026-09-16
+    measured_where: run 35050591623, job 104650434209, on the exact PR head
+    ceiling_seconds: 6.0
+    argument: >-
+      The required-check aggregator. It runs under `always()` even though it needs jobs
+      that are intentionally dispatch-only, so it is part of the pull-request surface
+      and must be budgeted with the jobs whose results it reduces.

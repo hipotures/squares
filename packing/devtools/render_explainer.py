@@ -2511,6 +2511,7 @@ RENDER_INPUTS = (
     CASE,
     THRESHOLD_CASE,
     Path(__file__),
+    EXPLAINER_SCRIPTS,
     PACKING / "devtools" / "prepare_explainer_math.py",
     PACKING / "devtools" / "measure_net_coarsening.py",
     PACKING / "devtools" / "build_composite_figure_data.py",
