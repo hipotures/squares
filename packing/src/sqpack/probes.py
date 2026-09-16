@@ -80,6 +80,12 @@ def applied(source: str, argument: object = _NO_ARGUMENT) -> str:
     character JavaScript could misread; JSON is a JavaScript expression. That is the
     boundary Playwright itself draws for `evaluate`, drawn once here instead of at each call
     site. Without one, the probe is called with no argument at all.
+
+    **The trailing `;` is trimmed, and only a trailing one.** `devtools.check_probes` and
+    its Node inspector trim the same way, so a probe whose last line ends `...; // note`
+    keeps the semicolon inside the parentheses and fails to parse -- as a check-time fault
+    rather than in a page, but with nothing saying why. Put a trailing comment on its own
+    line, or above the expression.
     """
     expression = source.strip().removesuffix(";")
     passed = "" if argument is _NO_ARGUMENT else json.dumps(argument, allow_nan=False)

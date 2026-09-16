@@ -13,7 +13,11 @@
     return false;
   }
   return snapshot.poses.every((pose, index) => {
-    const match = nodes[index]
+    const node = nodes[index];
+    if (!node) {
+      return false;
+    }
+    const match = node
       .getAttribute("transform")
       ?.match(/^translate\(([^ ]+) ([^)]+)\) rotate\(([^)]+)\)/);
     if (!match) {

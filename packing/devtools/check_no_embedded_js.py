@@ -17,12 +17,18 @@ Each occurrence is one *site*:
 
 1. **A built script argument.** The script argument of Playwright's `evaluate`,
    `evaluate_handle`, `evaluate_all`, `eval_on_selector`, `eval_on_selector_all`,
-   `wait_for_function` or `add_init_script`, positional or keyword, when it is a string
-   literal, an f-string, a concatenation, a `%` or `.format` result, a string method
-   applied to any of those, or a name bound to one. The accepted argument is a value the
-   probe loader returned, or a name bound only to such values. An argument this cannot
-   classify -- a parameter, an attribute -- is left to the next two rules, which see the
-   string wherever it was written.
+   `wait_for_function`, `add_init_script` or `add_script_tag`, positional or keyword, when
+   it is a string literal, an f-string, a concatenation, a `%` or `.format` result, a
+   string method applied to any of those, or a name bound to one. Bytes count: `b"..."`
+   is the same script one `.decode()` later. **The rule is default-deny.** Two pass: a
+   value the probe loader returned, or a name bound only to such values; and a name this
+   module never binds, which is a parameter or an import
+   whose text is written in the module that binds it, where rule 2 reads it. Everything
+   else is a site, including the arguments nothing here can read -- a subscript, an
+   attribute, `open().read()`, a `*args` unpacking -- because leaving them to the next two
+   rules only ever worked for a string carrying a signature. `add_init_script(path=...)`
+   and `add_script_tag(path=...)` name a file, which is the accepted form while the file is
+   one Biome and `tsc` see: a `.js` or `.ts` path, not a `.txt`.
 2. **A JavaScript string.** Any string whose literal text matches one of the signatures in
    `devtools/embedded-javascript.yaml`: arrow functions, `document.` and `window.`,
    `querySelector` and the like. Pieces of one concatenation or f-string are read as one
@@ -37,7 +43,9 @@ field -- is never a site: it is documentation, and it cannot reach a browser.
 **The ratchet.** The same YAML file lists each file that still offends, with its site count
 and the bead that removes them. The check fails when a file not on the list offends, when a
 count grows, when a count shrinks without the list being lowered to match, and when a
-listed file no longer offends at all. Failing on an unrecorded shrink is deliberate: a
+listed file no longer offends at all. `--since REF` adds the other half, which the YAML's
+"Entries only ever leave" used to assert without checking: no entry the base does not have,
+and no count above the base's. Failing on an unrecorded shrink is deliberate: a
 count left above the real number is headroom a later edit can fill without anything
 objecting. `--inventory` prints every site and the list as the scan sees it, which is how
 the list was first written.
@@ -71,9 +79,9 @@ ROOT = Path(__file__).resolve().parent.parent
 REPO = ROOT.parent
 POLICY = ROOT / "devtools" / "embedded-javascript.yaml"
 
-#: Playwright's evaluate family, and where each one takes its script: the positional index
-#: and the keyword. `add_init_script(path=...)` names a file, which is the accepted form.
-SCRIPT_ARGUMENT: dict[str, tuple[int, str]] = {
+#: Playwright's evaluate family, and where each one takes its script: the positional index,
+#: or None when the method takes it by keyword only, and the keyword.
+SCRIPT_ARGUMENT: dict[str, tuple[int | None, str]] = {
     "evaluate": (0, "expression"),
     "evaluate_handle": (0, "expression"),
     "evaluate_all": (0, "expression"),
@@ -81,7 +89,18 @@ SCRIPT_ARGUMENT: dict[str, tuple[int, str]] = {
     "eval_on_selector_all": (1, "expression"),
     "wait_for_function": (0, "expression"),
     "add_init_script": (0, "script"),
+    # `content=` is a script the page runs exactly as `evaluate` would (#175 R5).
+    "add_script_tag": (None, "content"),
 }
+
+#: The methods that take a script as a *file*, which is the accepted form -- but only while
+#: the file is one Biome formats and `tsc` types. A `.txt` holding JavaScript satisfied the
+#: guard and defeated the invariant behind it, which is the most plausible-looking bypass a
+#: real diff could carry: the script got long, so it moved to a data file.
+PATH_ARGUMENT = frozenset({"add_init_script", "add_script_tag"})
+
+#: What a `path=` argument may name. Everything else is a script the tools cannot see.
+SCRIPT_SUFFIXES = (".js", ".mjs", ".cjs", ".ts", ".mts", ".cts")
 
 #: The modules whose functions return a probe's text. The workbench package's loader is the
 #: shared one bound to the package's own probe directory, so both spellings are one loader.
@@ -131,7 +150,11 @@ NOT_OURS = frozenset(
 )
 
 type Rule = Literal["script argument", "JavaScript string", "script body"]
-type Verdict = Literal["loader", "built", "unknown"]
+type Verdict = Literal["loader", "opaque", "built", "unknown"]
+
+#: The verdicts a script argument may have. Rule 1 is default-deny: everything else is a
+#: site, including the arguments the analysis simply cannot read (#175 R3).
+ACCEPTED: frozenset[Verdict] = frozenset({"loader", "opaque"})
 
 
 @dataclass(frozen=True)
@@ -179,7 +202,12 @@ class PolicyError(ValueError):
 
 def load_policy(path: Path = POLICY) -> Policy:
     """Read and validate the signatures, the script tag, and the allowlist."""
-    document = safe_load(path.read_text(encoding="utf-8"))
+    return parse_policy(path.read_text(encoding="utf-8"), str(path))
+
+
+def parse_policy(text: str, path: str) -> Policy:
+    """The policy in `text`, named by `path` in every message it can raise."""
+    document = safe_load(text)
     if not isinstance(document, dict):
         raise PolicyError(f"{path}: expected a mapping")
     raw_signatures = document.get("signatures")
@@ -212,6 +240,52 @@ def load_policy(path: Path = POLICY) -> Policy:
         script_code=re.compile(raw_code),
         allowlist=allowlist,
     )
+
+
+def base_allowlist(repo: Path, policy: Path, ref: str) -> dict[str, Entry] | None:
+    """The allowlist as of `ref`, or None when that revision has no policy file.
+
+    None is not a failure: before this file was first committed there was no list to
+    compare against, and a comparison against a base that predates the guard would call
+    every entry new.
+    """
+    try:
+        relative = policy.resolve().relative_to(repo.resolve()).as_posix()
+    except ValueError:
+        return None
+    shown = subprocess.run(
+        ["git", "-C", str(repo), "show", f"{ref}:{relative}"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if shown.returncode != 0:
+        return None
+    return parse_policy(shown.stdout, f"{ref}:{relative}").allowlist
+
+
+def allowlist_growth(current: dict[str, Entry], base: dict[str, Entry]) -> list[str]:
+    """Every way the allowlist is wider than the base's.
+
+    The ratchet in `ratchet` holds each entry against the code; this holds the list itself
+    against where it came from. Without it the YAML's "Entries only ever leave" was a
+    comment rather than a check, and a new file holding JavaScript passed the gate as soon
+    as it brought its own stanza (#175 R2).
+    """
+    faults: list[str] = []
+    for path, entry in sorted(current.items()):
+        was = base.get(path)
+        if was is None:
+            faults.append(
+                f"{path}: a new allowlist entry ({entry.sites} site(s), {entry.bead}). The "
+                "list only ever shrinks; move the code into a probe file (see sqpack.probes)."
+            )
+        elif entry.sites > was.sites:
+            faults.append(
+                f"{path}: the allowlist records {entry.sites} site(s), {was.sites} at the "
+                "base. An entry's count only ever falls."
+            )
+    return faults
 
 
 def repository_files(repo: Path, suffix: str) -> list[str]:
@@ -281,10 +355,13 @@ class _Scanner:
         self.tree = tree
         self.policy = policy
         self._texts: dict[int, str | None] = {}
+        #: The names `text` is resolving, so a self-referential binding terminates.
+        self._resolving: set[str] = set()
         # One walk, shared by every rule: on the free-threaded interpreter this project
         # runs, `ast.walk` is most of the cost, and seven walks per file cost seven times one.
         self.nodes = list(ast.walk(tree))
         self.bindings = _bindings(self.nodes)
+        self.returns = _returns(self.nodes)
         (
             self.loader_functions,
             self.wrapper_functions,
@@ -295,6 +372,10 @@ class _Scanner:
 
     def text(self, node: ast.AST) -> str | None:
         """The literal text of a string-building expression, or None if it is not one."""
+        if self._resolving:
+            # A value read while a name is being resolved is read under a guard that can
+            # suppress part of it, so it is not the answer to cache for everyone else.
+            return self._text(node)
         key = id(node)
         if key not in self._texts:
             self._texts[key] = self._text(node)
@@ -302,7 +383,7 @@ class _Scanner:
 
     def _text(self, node: ast.AST) -> str | None:
         if isinstance(node, ast.Constant):
-            return node.value if isinstance(node.value, str) else None
+            return _constant_text(node.value)
         if isinstance(node, ast.JoinedStr):
             return "".join(
                 part.value
@@ -314,7 +395,30 @@ class _Scanner:
             return self._concatenated(node)
         if isinstance(node, ast.Call):
             return self._method_result(node)
+        if isinstance(node, ast.Name):
+            return self._name_text(node.id)
         return None
+
+    def _name_text(self, name: str) -> str | None:
+        """The text a name holds, when every value bound to it is text.
+
+        Rule 3 replaced a name in a script body with a space, so a body spliced from a
+        bound literal -- `"<script>" + code + "</script>"` -- had no code in it (#175 R7).
+        The generator case the rule protects has a call or a parameter in the hole, which
+        still resolves to nothing. Bindings that disagree resolve to a hole rather than to
+        one of them: the value is text, and which text is not knowable here.
+        """
+        values = self.bindings.get(name)
+        if not values or name in self._resolving:
+            return None
+        self._resolving.add(name)
+        try:
+            texts = [self.text(value) for value in values]
+        finally:
+            self._resolving.discard(name)
+        if any(text is None for text in texts):
+            return None
+        return texts[0] if len(set(texts)) == 1 else HOLE
 
     def _concatenated(self, node: ast.BinOp) -> str | None:
         """`"..." + x`, `x + "..."` and `"..." % x`; `x % "..."` is arithmetic, not text."""
@@ -358,43 +462,168 @@ class _Scanner:
     # -- rule 1 ------------------------------------------------------------------------
 
     def classify(self, node: ast.AST, seen: frozenset[str] = frozenset()) -> Verdict:
-        """Whether a script argument is the loader's value, built text, or unknown."""
+        """What a script argument is, of the four things it can be.
+
+        **Default-deny**: only `loader` and `opaque` pass. `opaque` is the argument this
+        cannot read *and* whose text is written elsewhere -- a parameter, or a name this
+        module never binds, whose value some other module writes where rule 2 reads it.
+        Everything else is a site, because the docstring's old promise that an argument
+        rule 1 could not classify was "left to the next two rules" only held for strings
+        carrying a signature: `Path(...).read_text()`, `open().read()`, a subscript, a
+        parameter default and a `*args` unpacking all passed with a script that has
+        none (#175 R3), and nothing counted or printed them (lane L6).
+        """
         if self.text(node) is not None:
             return "built"
-        if isinstance(node, ast.Call):
-            return self._classify_call(node, seen)
-        if isinstance(node, ast.BinOp) and isinstance(node.op, ast.Add | ast.Mod):
-            # Concatenating onto a probe is editing it by string formatting: built.
-            parts = {self.classify(node.left, seen), self.classify(node.right, seen)}
-            return "built" if parts & {"built", "loader"} else "unknown"
-        if isinstance(node, ast.IfExp):
-            return _merged({self.classify(node.body, seen), self.classify(node.orelse, seen)})
-        if isinstance(node, ast.Name) and node.id not in seen:
-            values = self.bindings.get(node.id, [])
-            return _merged({self.classify(value, seen | {node.id}) for value in values})
-        return "unknown"
+        match node:
+            case ast.Call():
+                verdict = self._classify_call(node, seen)
+            case ast.BinOp(op=ast.Add() | ast.Mod()):
+                # Concatenating or interpolating is building, whatever the pieces are.
+                verdict = "built"
+            case ast.BinOp(left=left, right=right):
+                # `"ab" * 3` is text; `[zero] * arity` is a vector.
+                sides = {self.classify(left, seen), self.classify(right, seen)}
+                verdict = "built" if "built" in sides else "opaque"
+            case ast.IfExp(body=body, orelse=orelse):
+                verdict = _merged({self.classify(body, seen), self.classify(orelse, seen)})
+            case ast.Name(id=name):
+                verdict = self._classify_name(name, seen)
+            case ast.Subscript() | ast.Attribute() | ast.Starred() | ast.Await():
+                # A value this declines to follow, and every one of them can hold text:
+                # `S["a"]`, `self.SCRIPT`, `*args`, `await build()` (#175 R3).
+                verdict = "unknown"
+            case (
+                ast.Constant()
+                | ast.Tuple()
+                | ast.List()
+                | ast.Dict()
+                | ast.Set()
+                | ast.ListComp()
+                | ast.SetComp()
+                | ast.DictComp()
+                | ast.GeneratorExp()
+                | ast.Compare()
+                | ast.BoolOp()
+                | ast.UnaryOp()
+            ):
+                # Not text, so not a script: a number, a container, a predicate. Any string
+                # constant has already been answered by `text` above.
+                verdict = "opaque"
+            case _:
+                verdict = "unknown"
+        return verdict
+
+    def _classify_name(self, name: str, seen: frozenset[str]) -> Verdict:
+        """A name's verdict: its bindings merged, or accepted when this module binds none."""
+        if name in seen:
+            return "unknown"
+        values = self.bindings.get(name)
+        if values is None:
+            return "opaque"
+        return _merged({self.classify(value, seen | {name}) for value in values})
 
     def _classify_call(self, node: ast.Call, seen: frozenset[str]) -> Verdict:
         func = node.func
-        if isinstance(func, ast.Name) and func.id in self.loader_functions:
-            return "loader"
-        if isinstance(func, ast.Name) and func.id in self.wrapper_functions:
-            return self._classify_wrapper(node, seen)
-        if isinstance(func, ast.Attribute):
-            if _dotted(func.value) in self.loader_modules and func.attr == "probe":
-                return "loader"
-            if _dotted(func.value) in self.loader_modules and func.attr == "applied":
-                return self._classify_wrapper(node, seen)
-            if func.attr in STRING_METHODS and self.classify(func.value, seen) != "unknown":
-                return "built"
-        return "unknown"
+        match func:
+            case ast.Name(id=name) if name in self.loader_functions:
+                verdict: Verdict = "loader"
+            case ast.Name(id=name) if name in self.wrapper_functions:
+                verdict = self._classify_wrapper(node, seen)
+            case ast.Attribute(value=receiver, attr="probe") if (
+                _dotted(receiver) in self.loader_modules
+            ):
+                verdict = "loader"
+            case ast.Attribute(value=receiver, attr="applied") if (
+                _dotted(receiver) in self.loader_modules
+            ):
+                verdict = self._classify_wrapper(node, seen)
+            case ast.Attribute(value=receiver) if self.classify(receiver, seen) in {
+                "built",
+                "loader",
+            }:
+                # A method on text or on a probe is that value being edited, whatever the
+                # method is named: `.decode()` and `.lower()` are no different from
+                # `.replace()`, and the allowlist of method names is what let a bytes
+                # constant through (#175 R1).
+                verdict = "built"
+            case ast.Name(id=name) if name in self.returns:
+                # A helper in this module is not opaque: its returns are available here.
+                # Accept it only when every value it can return is loader-backed. A literal
+                # was the original bypass (L6), but treating only literal returns as local
+                # let `return Path(...).read_text()` recreate the same hole one call away.
+                returned = (
+                    {self.classify(value, seen | {name}) for value in self.returns[name]}
+                    if name not in seen
+                    else {"unknown"}
+                )
+                verdict = "loader" if returned == {"loader"} else "built"
+            case _ if any(self.text(argument) is not None for argument in node.args):
+                # A call handed text and returning a script is building one: `str(b"...")`,
+                # `b64decode("...")`, `dedent(...)` under any alias.
+                verdict = "built"
+            case _:
+                # A call to something written in another module. Rule 2 reads its text where
+                # that module writes it, which is also why `polynomial.evaluate(origin)` is
+                # not reported: `evaluate` is a name mathematics uses too, and calling a
+                # value nothing here can read a script would be a guess.
+                verdict = "opaque"
+        return verdict
 
     def _classify_wrapper(self, node: ast.Call, seen: frozenset[str]) -> Verdict:
         """Accept `applied` only when its source came from the probe loader."""
-        if not node.args:
-            return "unknown"
-        source = self.classify(node.args[0], seen)
-        return "loader" if source == "loader" else source
+        named = [keyword.value for keyword in node.keywords if keyword.arg == "source"]
+        if node.args and not isinstance(node.args[0], ast.Starred) and not named:
+            source = node.args[0]
+        elif not node.args and len(named) == 1:
+            source = named[0]
+        else:
+            return "built"
+        return "loader" if self.classify(source, seen) == "loader" else "built"
+
+    def _names_a_script_file(self, node: ast.expr, seen: frozenset[str] = frozenset()) -> bool:
+        """Whether a `path=` expression reaches a literal naming a `.js` or `.ts` file."""
+        for inner in ast.walk(node):
+            match inner:
+                case ast.Constant(value=str() as value) if value.endswith(SCRIPT_SUFFIXES):
+                    return True
+                case ast.Name(id=name) if name not in seen:
+                    if any(
+                        self._names_a_script_file(value, seen | {name})
+                        for value in self.bindings.get(name, [])
+                    ):
+                        return True
+                case _:
+                    pass
+        return False
+
+    def refused_arguments(self) -> Iterator[ast.expr]:
+        """The arguments refused without being classified, because there is nothing to read.
+
+        A `path=` that does not name a file the JavaScript floor can see (lane L3), and a
+        script handed over inside a `*args` or `**kwargs` unpacking (#175 R3).
+        """
+        for node in self.nodes:
+            if not isinstance(node, ast.Call) or not isinstance(node.func, ast.Attribute):
+                continue
+            attribute = node.func.attr
+            if attribute in PATH_ARGUMENT:
+                for keyword in node.keywords:
+                    if keyword.arg == "path" and not self._names_a_script_file(keyword.value):
+                        yield keyword.value
+            where = SCRIPT_ARGUMENT.get(attribute)
+            if where is None:
+                continue
+            position, keyword_name = where
+            if any(kw.arg == keyword_name for kw in node.keywords):
+                continue
+            reached = position is not None and len(node.args) > position
+            if reached and not any(
+                isinstance(arg, ast.Starred) for arg in node.args[: (position or 0) + 1]
+            ):
+                continue
+            yield from (arg for arg in node.args if isinstance(arg, ast.Starred))
+            yield from (kw.value for kw in node.keywords if kw.arg is None)
 
     def script_arguments(self) -> Iterator[ast.expr]:
         for node in self.nodes:
@@ -408,11 +637,13 @@ class _Scanner:
             if named:
                 yield named[0]
                 continue
-            positional = node.args[: position + 1]
-            if len(positional) > position and not any(
-                isinstance(arg, ast.Starred) for arg in positional
-            ):
-                yield positional[position]
+            if position is not None:
+                positional = node.args[: position + 1]
+                if len(positional) > position and not any(
+                    isinstance(arg, ast.Starred) for arg in positional
+                ):
+                    yield positional[position]
+                    continue
 
     # -- the scan ----------------------------------------------------------------------
 
@@ -439,7 +670,12 @@ class _Scanner:
             if rule is not None:
                 found[id(node)] = self._site(node, rule, text)
         for argument in self.script_arguments():
-            if id(argument) not in found and self.classify(argument) == "built":
+            if id(argument) not in found and self.classify(argument) not in ACCEPTED:
+                found[id(argument)] = self._site(
+                    argument, "script argument", ast.unparse(argument)
+                )
+        for argument in self.refused_arguments():
+            if id(argument) not in found:
                 found[id(argument)] = self._site(
                     argument, "script argument", ast.unparse(argument)
                 )
@@ -465,11 +701,22 @@ class _Scanner:
         return Site(path=self.path, line=getattr(node, "lineno", 0), rule=rule, excerpt=excerpt)
 
 
+def _constant_text(value: object) -> str | None:
+    """A constant's text. A bytes constant is the same script one `.decode()` later, and
+    rule 2 never read one: `page.evaluate(b"() => document.title".decode())` passed both
+    rules while the `str` spelling was reported (#175 R1)."""
+    if isinstance(value, str):
+        return value
+    return value.decode("utf-8", "replace") if isinstance(value, bytes) else None
+
+
 def _merged(verdicts: set[Verdict]) -> Verdict:
-    """Built if any alternative is built; the loader's only if every one is."""
+    """Built if any alternative is built; accepted only if every one is."""
     if "built" in verdicts:
         return "built"
-    return "loader" if verdicts == {"loader"} else "unknown"
+    if not verdicts or "unknown" in verdicts:
+        return "unknown"
+    return "loader" if verdicts == {"loader"} else "opaque"
 
 
 def _dotted(node: ast.AST) -> str:
@@ -484,34 +731,88 @@ def _dotted(node: ast.AST) -> str:
 
 
 def _bindings(nodes: Sequence[ast.AST]) -> dict[str, list[ast.expr]]:
-    """Every value assigned to each plain name, in any scope.
+    """Every value bound to each plain name, in any scope.
 
     Scope-blind on purpose: a name bound to built text anywhere in the module makes every
     script argument of that name suspect, which errs toward reporting.
+
+    Tuple and list targets are unpacked element by element when the value is a matching
+    literal, so `a, b = "docu", "ment.title"` binds both halves rather than neither
+    (#175 R3). A parameter's default is a binding too: a name with no binding is the one
+    thing rule 1 accepts without reading it, and `def run(page, script="...")` wrote the
+    script into the signature.
     """
     bound: dict[str, list[ast.expr]] = {}
     for node in nodes:
         match node:
             case ast.Assign(targets=targets, value=value):
                 for target in targets:
-                    if isinstance(target, ast.Name):
-                        bound.setdefault(target.id, []).append(value)
+                    _bind(bound, target, value)
             case ast.AnnAssign(target=ast.Name(id=name), value=ast.expr() as value):
                 bound.setdefault(name, []).append(value)
             case ast.AugAssign(target=ast.Name(id=name), value=value):
                 bound.setdefault(name, []).append(value)
             case ast.NamedExpr(target=ast.Name(id=name), value=value):
                 bound.setdefault(name, []).append(value)
+            case (
+                ast.FunctionDef(args=arguments)
+                | ast.AsyncFunctionDef(args=arguments)
+                | ast.Lambda(args=arguments)
+            ):
+                positional = [*arguments.posonlyargs, *arguments.args]
+                defaults = arguments.defaults
+                for parameter, default in zip(
+                    positional[len(positional) - len(defaults) :], defaults, strict=True
+                ):
+                    bound.setdefault(parameter.arg, []).append(default)
+                for parameter, default in zip(
+                    arguments.kwonlyargs, arguments.kw_defaults, strict=True
+                ):
+                    if default is not None:
+                        bound.setdefault(parameter.arg, []).append(default)
             case _:
                 pass
     return bound
 
 
+def _bind(bound: dict[str, list[ast.expr]], target: ast.expr, value: ast.expr) -> None:
+    """Record `target = value`, unpacking a tuple or list target against a matching value."""
+    match target:
+        case ast.Name(id=name):
+            bound.setdefault(name, []).append(value)
+        case ast.Tuple(elts=elements) | ast.List(elts=elements):
+            pieces = value.elts if isinstance(value, ast.Tuple | ast.List) else []
+            paired = pieces if len(pieces) == len(elements) else None
+            for index, element in enumerate(elements):
+                _bind(bound, element, paired[index] if paired is not None else value)
+        case ast.Starred(value=inner):
+            _bind(bound, inner, value)
+        case _:
+            # An attribute or a subscript target. Rule 1 denies an attribute or a subscript
+            # argument outright, so binding one by its bare name would only collide with
+            # the plain names it shares.
+            pass
+
+
+def _returns(nodes: Sequence[ast.AST]) -> dict[str, list[ast.expr]]:
+    """Every expression each function in this module returns, by the function's name."""
+    returned: dict[str, list[ast.expr]] = {}
+    for node in nodes:
+        if not isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef):
+            continue
+        returned.setdefault(node.name, []).extend(
+            inner.value
+            for inner in ast.walk(node)
+            if isinstance(inner, ast.Return) and inner.value is not None
+        )
+    return returned
+
+
 def _loader_names(
     nodes: Sequence[ast.AST],
 ) -> tuple[frozenset[str], frozenset[str], frozenset[str]]:
-    """Local names for `probe`, its `applied` wrapper, and loader module aliases."""
-    functions: set[str] = set()
+    """The local names of `probe`, `applied`, and their module aliases."""
+    loaders: set[str] = set()
     wrappers: set[str] = set()
     modules: set[str] = set()
     for node in nodes:
@@ -519,10 +820,11 @@ def _loader_names(
             case ast.ImportFrom(module=str() as module, names=names, level=0):
                 for alias in names:
                     local = alias.asname or alias.name
-                    if module in LOADER_MODULES and alias.name == "probe":
-                        functions.add(local)
-                    elif module in LOADER_MODULES and alias.name == "applied":
-                        wrappers.add(local)
+                    if module in LOADER_MODULES:
+                        if alias.name == "probe":
+                            loaders.add(local)
+                        elif alias.name == "applied":
+                            wrappers.add(local)
                     elif f"{module}.{alias.name}" in LOADER_MODULES:
                         modules.add(local)
             case ast.Import(names=names):
@@ -531,7 +833,7 @@ def _loader_names(
                         modules.add(alias.asname or alias.name)
             case _:
                 pass
-    return frozenset(functions), frozenset(wrappers), frozenset(modules)
+    return frozenset(loaders), frozenset(wrappers), frozenset(modules)
 
 
 def scan_source(path: str, source: str, policy: Policy) -> list[Site]:
@@ -625,6 +927,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         action="store_true",
         help="print every site and the allowlist the scan implies, and exit 0",
     )
+    parser.add_argument(
+        "--since",
+        metavar="REF",
+        help="also refuse an allowlist entry this revision does not have, or a count above "
+        "its own; a revision with no policy file is reported and not compared",
+    )
     parser.add_argument("--repo", type=Path, default=REPO, help=argparse.SUPPRESS)
     parser.add_argument("--policy", type=Path, default=POLICY, help=argparse.SUPPRESS)
     arguments = parser.parse_args(argv)
@@ -641,9 +949,21 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 0
 
     faults = [*unreadable, *ratchet(by_file, policy.allowlist)]
+    notes: list[str] = []
+    if arguments.since:
+        base = base_allowlist(arguments.repo, arguments.policy, arguments.since)
+        if base is None:
+            notes.append(
+                f"{arguments.since} has no policy file, so the allowlist itself was not "
+                "compared; only the counts were held against the code"
+            )
+        else:
+            faults.extend(allowlist_growth(policy.allowlist, base))
     if read == 0:
         # The correct output is non-empty by construction: this file is Python.
         faults.append(f"no Python files found under {arguments.repo}; the scan read nothing")
+    for note in notes:
+        print(f"NOTE  {note}")
     for fault in faults:
         print(fault if fault.startswith("    ") else f"FAIL  {fault}")
     remaining = sum(len(sites) for sites in by_file.values())

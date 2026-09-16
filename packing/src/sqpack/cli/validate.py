@@ -1493,6 +1493,29 @@ def _lint_floor(context: Context) -> str:
     )
 
 
+#: Where the ESLint promise overlay runs. Biome takes `**/*.js`, the type programs take
+#: globs, and `devtools.check_probes` walks for probe trees; only this half of the floor
+#: names directories, which is why a probe tree outside it was formatted and type-checked
+#: and never saw `no-floating-promises` (#175 R4, and #179 R3 where the cost showed: a new
+#: tree had to be added here by hand). ESLint resolves a whole directory against its own
+#: config, so the entries are directories rather than files; what holds them to the config's
+#: own reach is `test_the_promise_floor_reaches_every_file_its_config_covers`, which fails
+#: when a file the config lints lies outside every entry here.
+ESLINT_PATHS = (
+    # The whole package: its config types every workbench JavaScript file, so naming files
+    # here would leave a new one outside the promise floor.
+    "packages/workbench",
+    "packing/src/sqpack/motion_lab/assets",
+    "packing/atlas/known-best/video/spikes/v1-slideshow",
+    "packing/atlas/known-best/video/spikes/v2-transitions",
+    "packing/devtools/probes",
+    "packing/devtools/explainer",
+    "packing/devtools/node",
+    "packing/tests/node",
+    "packing/tests/probes",
+)
+
+
 def _browser_floor(context: Context) -> str:
     """Biome, the promise overlay, `tsc`, and Node tests over browser source.
 
@@ -1532,17 +1555,7 @@ def _browser_floor(context: Context) -> str:
             (str(biome), "ci", "--error-on-warnings", "."),
             (
                 str(eslint),
-                # The whole package: its config types every workbench JavaScript file, so
-                # naming files here would leave a new one outside the promise floor.
-                "packages/workbench",
-                "packing/src/sqpack/motion_lab/assets",
-                "packing/atlas/known-best/video/spikes/v1-slideshow",
-                "packing/atlas/known-best/video/spikes/v2-transitions/probes",
-                "packing/devtools/probes",
-                "packing/devtools/explainer",
-                "packing/devtools/node",
-                "packing/tests/node",
-                "packing/tests/probes",
+                *ESLINT_PATHS,
                 "--config",
                 "packages/workbench/eslint.config.js",
                 "--max-warnings",
@@ -1573,7 +1586,12 @@ def _browser_code_in_files(context: Context) -> str:
     return _commands(
         context,
         (
-            (sys.executable, "-m", "devtools.check_no_embedded_js"),
+            # `--since origin/main` adds the half of the ratchet the YAML's "Entries only
+            # ever leave" used to assert without checking: no entry main does not have, and
+            # no count above main's (#175 R2). A revision with no policy file -- anything
+            # before the guard landed -- is reported and not compared, so this is a note
+            # rather than a failure in a checkout that has not fetched main.
+            (sys.executable, "-m", "devtools.check_no_embedded_js", "--since", "origin/main"),
             (sys.executable, "-m", "devtools.check_probes"),
         ),
     )

@@ -686,6 +686,7 @@ review. [`epistemics.md`](epistemics.md) owns whole-result classifications.
 ├── CLAUDE.md               Bridge to AGENTS.md
 ├── Makefile                Markdown formatting, hooks, and skill mirroring
 ├── biome.json              Biome lint and format config for the browser sources
+├── eslint.probes.json      Type information for the probe promise-rule overlay
 ├── lefthook.yml            Pre-commit Markdown formatter hook
 ├── package.json            Pinned tooling and private npm workspace declaration
 ├── package-lock.json       Root and workbench workspace lockfile

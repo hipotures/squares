@@ -18,10 +18,28 @@ import math
 from collections import Counter
 from collections.abc import Callable
 from itertools import pairwise
-from typing import TYPE_CHECKING, Any
+from typing import Any, Protocol
 
-if TYPE_CHECKING:
-    from workbench_tools.check_animate_view import Session
+from playwright.sync_api import Page
+
+
+class Session(Protocol):
+    """The Animate contract's structural seam to its browser-session driver."""
+
+    page: Page
+
+    def look(self, name: str, /, **argument: Any) -> Any: ...
+
+    def api(self, *calls: tuple[Any, ...]) -> Any: ...
+
+    def require(
+        self,
+        condition: bool,  # noqa: FBT001 - mirrors the assertion interface
+        message: str,
+    ) -> None: ...
+
+    def enter_animate(self) -> None: ...
+
 
 # ---------------------------------------------------------------- settings a section puts back
 

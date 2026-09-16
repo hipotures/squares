@@ -18,6 +18,7 @@ from playwright.sync_api import Browser, Error, Page, sync_playwright
 
 from devtools import render_explainer_pdf as pdf
 from devtools.check_math_loading import MATH_LIBRARY
+from devtools.render_explainer_pdf import SETTLED
 from devtools.render_explainer_pdf import _MATH_RENDERED  # pyright: ignore[reportPrivateUsage]
 from sqpack.probes import applied, probe
 
@@ -146,7 +147,7 @@ def test_final_math_guard_distinguishes_hidden_alternatives_and_render_errors() 
             page.emulate_media(media="print", reduced_motion="reduce")
             page.goto(pdf.PAGE.as_uri(), wait_until="load")
             page.wait_for_selector(pdf.READY, timeout=60_000)
-            page.evaluate(pdf.SETTLED)
+            page.evaluate(SETTLED)
             math = {"math": page.evaluate_handle(MATH_LIBRARY)}
             page.evaluate(_MATH_RENDERED, math)
             page.evaluate(probe(PROBES, "pdf_math_browser/guard_fixture"))
