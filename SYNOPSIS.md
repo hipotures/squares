@@ -1610,9 +1610,9 @@ resume the completed efficiency block.
 
 PR 93 subsequently landed two operational guards on `main` without changing this
 research entry point.
-The on-demand [`deep-gate.yml`](.github/workflows/deep-gate.yml) runs the four deferred
-checks against a pull request before merge; because it is advisory, the post-merge full
-gate remains the backstop for a pull request that does not request it.
+The on-demand [`deep-gate.yml`](.github/workflows/deep-gate.yml) runs the 11 deferred
+steps in four jobs against a pull request before merge; because it is advisory, the
+post-merge full gate remains the backstop for a pull request that does not request it.
 The push-triggered
 [`branch-mergeability.yml`](.github/workflows/branch-mergeability.yml) now reports a
 branch that cannot be merge-built even when GitHub cannot create its pull-request merge
@@ -1622,8 +1622,12 @@ push. Session 087 retains the full-gate evidence from run `34010683180` at `c743
 The later upstream efficiency corrections preserve that historical accounting.
 Session 087 reduced the then-required CI surface from `1369.60 s` to about `221.70 s`
 without removing checks.
-The R1 tree-id cache remains a separate efficiency task: 20.2 percent of measured
-deep-run work repeated, and 92 percent of that repetition came from unchanged trees.
+Exact-tree reuse is now fail-closed.
+A matching successful `packing-required` proof lets the post-merge integration job omit
+only explicitly allowlisted tree-pure fast steps; deferred and unclassified steps still
+run, and any lookup or proof failure repeats the complete surface.
+The work was motivated by the earlier measurement that 20.2 percent of deep-run work
+repeated and 92 percent of that repetition came from unchanged trees.
 Per-test CPU readings are diagnostic because child costs cannot yet be attributed
 reliably; the `12 s` call-wall backstop remains enforced.
 [D-472](defects.md) records why one hosted timing sample cannot establish a speedup.

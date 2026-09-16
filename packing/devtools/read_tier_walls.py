@@ -50,8 +50,8 @@ from collections.abc import Sequence
 from dataclasses import dataclass, field
 
 from devtools.check_pr_wall import API, USER_AGENT, Client, WallError, github_token
+from sqpack.cli.validate import UsageError, _tier_id
 from sqpack.cli.validate import _parser as _validate_parser
-from sqpack.cli.validate import _tier_id
 
 COMMAND = re.compile(r"##\[group\]Run .*?(packing-validate(?: .*)?)$")
 WALL = re.compile(r"^\s*(?P<wall>[0-9.]+)s  wall of a (?P<ceiling>[0-9.]+)s ceiling")
@@ -80,7 +80,7 @@ def _tier_of(command: str) -> str | None:
     tokens = shlex.split(command)
     try:
         namespace = _validate_parser().parse_args(tokens[1:])
-    except SystemExit:
+    except (SystemExit, UsageError):
         return None
     return None if namespace.only or namespace.skip else _tier_id(namespace)
 

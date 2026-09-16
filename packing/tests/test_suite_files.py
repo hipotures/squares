@@ -88,12 +88,12 @@ def test_record_takes_each_files_geometric_mean_and_names_its_sources() -> None:
     reports = [
         suite_files.report_document(
             {"packing/tests/test_a.py": (3, 2.0), "packing/tests/test_b.py": (1, 0.0)},
-            shard=Shard(1, 2),
+            shard=None,
             environment={"GITHUB_RUN_ID": "1", "GITHUB_JOB": "suite-1-of-2"},
         ),
         suite_files.report_document(
             {"packing/tests/test_a.py": (3, 8.0), "packing/tests/test_c.py": (2, 1.5)},
-            shard=Shard(2, 2),
+            shard=None,
             environment={},
         ),
     ]
@@ -104,11 +104,50 @@ def test_record_takes_each_files_geometric_mean_and_names_its_sources() -> None:
         "packing/tests/test_c.py": 1.5,
     }
     assert document["recorded_from"] == [
-        "shard 1/2: GITHUB_JOB=suite-1-of-2, GITHUB_RUN_ID=1",
-        "shard 2/2: no CI provenance",
+        "the whole lane: GITHUB_JOB=suite-1-of-2, GITHUB_RUN_ID=1",
+        "the whole lane: no CI provenance",
     ]
     assert reports[0]["tests"] == 4
     assert reports[0]["seconds"] == 2.0
+
+
+def _shard_report(
+    index: int, *, run: str = "1", attempt: str = "1", sha: str = "abc"
+) -> dict[str, object]:
+    return suite_files.report_document(
+        {f"packing/tests/test_{index}.py": (1, float(index))},
+        shard=Shard(index, 2),
+        environment={
+            "GITHUB_RUN_ID": run,
+            "GITHUB_RUN_ATTEMPT": attempt,
+            "GITHUB_JOB": f"suite-{index}",
+            "GITHUB_SHA": sha,
+        },
+    )
+
+
+def test_record_requires_one_complete_coherent_shard_cohort() -> None:
+    complete = [_shard_report(1), _shard_report(2)]
+    assert suite_files.record(complete, shards=2)["files"] == {
+        "packing/tests/test_1.py": 1.0,
+        "packing/tests/test_2.py": 2.0,
+    }
+    with pytest.raises(SuiteFilesError, match="each shard exactly once"):
+        suite_files.record(complete[:1], shards=2)
+    with pytest.raises(SuiteFilesError, match="each shard exactly once"):
+        suite_files.record([complete[0], complete[0]], shards=2)
+    with pytest.raises(SuiteFilesError, match="mix run id, attempt, or SHA"):
+        suite_files.record([complete[0], _shard_report(2, run="2")], shards=2)
+    with pytest.raises(SuiteFilesError, match="mix run id, attempt, or SHA"):
+        suite_files.record([complete[0], _shard_report(2, attempt="2")], shards=2)
+    with pytest.raises(SuiteFilesError, match="mix run id, attempt, or SHA"):
+        suite_files.record([complete[0], _shard_report(2, sha="def")], shards=2)
+
+
+def test_record_refuses_mixed_whole_lane_and_sharded_reports() -> None:
+    whole = suite_files.report_document({}, shard=None, environment={})
+    with pytest.raises(SuiteFilesError, match="cannot mix"):
+        suite_files.record([whole, _shard_report(1)], shards=2)
 
 
 _PROBE_FILES = {

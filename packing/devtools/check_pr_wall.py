@@ -10,11 +10,13 @@ the longest job with its checkout, its toolchain and its queue, and no tier sees
 
 This reads one workflow run's jobs from the GitHub API and computes:
 
-* **the run's wall**, from the run starting to the start of the job that aggregates it
-  (`packing-required`, or Pages' `pr-wall`). A job cannot see its own completion, so the
-  aggregator's start is where the measurement ends in CI, and a run measured afterwards
-  ends at the same place so that the two agree. A run with no aggregator -- the Pages
-  runs from before it existed -- ends at its last gating job's completion, and says so;
+* **the run's wall**, from the run starting to the wall-check step inside the job that
+  aggregates it (`packing-required`, or `pages-required`). This includes the aggregator's
+  own queue, blobless checkout and pinned Python setup, which the required context makes
+  a contributor wait through. A completed legacy run without that step ends at the
+  aggregator's start; a still older run with no aggregator ends at its last gating job's
+  completion. Both fallbacks say which endpoint they used and are unavailable to a live
+  check;
 * **each job's wall**, with its queue, and its step time split into setup and work.
   A step is setup when its name matches `setup_steps` in the register: provisioning,
   caches, artifact transfer and the post-job teardown. Everything else is work.
@@ -49,6 +51,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import re
 import statistics
@@ -61,7 +64,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, Protocol
 
 try:
     import yaml
@@ -96,6 +99,7 @@ STEP_FIELDS = ("name", "conclusion", "started_at", "completed_at")
 #: told finished. The jobs endpoint can lag the `needs` graph by a moment.
 SETTLE_ATTEMPTS = 3
 SETTLE_SECONDS = 3.0
+WALL_STEP = "Hold the pull request's wall to its budget"
 
 
 class WallError(Exception):
@@ -177,6 +181,8 @@ class Measurement:
     unmeasurable: tuple[str, ...] = ()
     #: The aggregator's own wait for a runner, which the pull request waits through too.
     aggregator_queue_seconds: float | None = None
+    #: Checkout and tool setup inside the aggregator, before this check begins.
+    aggregator_setup_seconds: float | None = None
 
 
 @dataclass(frozen=True)
@@ -196,7 +202,12 @@ def _mapping(value: object, what: str) -> dict[str, Any]:
 
 
 def _number(value: object, what: str) -> float:
-    if isinstance(value, bool) or not isinstance(value, (int, float)) or value <= 0:
+    if (
+        isinstance(value, bool)
+        or not isinstance(value, (int, float))
+        or not math.isfinite(value)
+        or value <= 0
+    ):
         raise WallError(f"{what} must be a positive number, found {value!r}")
     return float(value)
 
@@ -349,8 +360,9 @@ def measure(
     *,
     kind: str | None,
 ) -> Measurement:
-    """The run's wall to its aggregator's start, and every gating job's split."""
+    """The run's wall to its wall-check step, and every gating job's split."""
     reasons: list[str] = []
+    start = _instant(run.get("run_started_at") or run.get("created_at"))
     if run.get("conclusion") == "cancelled":
         reasons.append("the run was cancelled, so its wall is not the wall of a finished run")
     gating = [
@@ -361,6 +373,17 @@ def measure(
     if not gating:
         reasons.append("no gating job ran")
     for job in gating:
+        job_start = _instant(job.get("started_at"))
+        job_end = _instant(job.get("completed_at"))
+        if start is not None and job_start is not None and job_start < start:
+            reasons.append(
+                f"`{job['name']}` started before this attempt at {run.get('run_started_at')}; "
+                "the jobs API mixed a prior attempt into a partial rerun"
+            )
+        if job_start is None:
+            reasons.append(f"`{job['name']}` has no start time")
+        if job.get("status") == "completed" and job_end is None:
+            reasons.append(f"`{job['name']}` completed without an end time")
         if job.get("status") != "completed":
             reasons.append(f"`{job['name']}` has not completed ({job.get('status')})")
         elif job.get("conclusion") != "success":
@@ -373,11 +396,30 @@ def measure(
         for job in gating
         if (instant := _instant(job.get("completed_at"))) is not None
     )
-    start = _instant(run.get("run_started_at") or run.get("created_at"))
     aggregator = next((job for job in jobs if job["name"] == workflow.aggregator), None)
     aggregator_start = _instant(aggregator.get("started_at")) if aggregator else None
-    if aggregator_start is not None:
-        end, ends_at = aggregator_start, f"the start of `{workflow.aggregator}`"
+    wall_step = next(
+        (
+            step
+            for step in (aggregator.get("steps") or [])
+            if step.get("name") == WALL_STEP
+        ),
+        None,
+    ) if aggregator else None
+    wall_step_start = _instant(wall_step.get("started_at")) if wall_step else None
+    if wall_step_start is not None:
+        end, ends_at = wall_step_start, f"the start of `{WALL_STEP}`"
+    elif (
+        aggregator is not None
+        and aggregator_start is not None
+        and aggregator.get("status") == "completed"
+    ):
+        # Historical compatibility for runs from before the wall step existed. Live runs
+        # go through `_settled_jobs`, which refuses this fallback.
+        end, ends_at = aggregator_start, f"the legacy start of `{workflow.aggregator}`"
+    elif aggregator is not None:
+        reasons.append(f"`{WALL_STEP}` has not started")
+        end, ends_at = None, f"nowhere: `{WALL_STEP}` has not started"
     elif finished:
         end = finished[-1][0]
         ends_at = f"the last gating job's completion (this run has no `{workflow.aggregator}`)"
@@ -398,6 +440,11 @@ def measure(
             if aggregator
             else None
         ),
+        aggregator_setup_seconds=(
+            _span(aggregator.get("started_at"), wall_step.get("started_at"))
+            if aggregator and wall_step
+            else None
+        ),
     )
 
 
@@ -413,7 +460,10 @@ def critical_split(measurement: Measurement) -> str:
     )
     if measurement.aggregator_queue_seconds is None:
         return split
-    return f"{split}, then the aggregator queued {measurement.aggregator_queue_seconds:.0f}s"
+    prefix = f", then the aggregator queued {measurement.aggregator_queue_seconds:.0f}s"
+    if measurement.aggregator_setup_seconds is not None:
+        prefix += f" and prepared {measurement.aggregator_setup_seconds:.0f}s"
+    return split + prefix
 
 
 def judge(measurement: Measurement, workflow: WorkflowWall, policy: WallPolicy) -> WallVerdict:
@@ -566,7 +616,18 @@ class Client:
         return self.get(f"actions/runs/{run_id}")
 
     def jobs(self, run_id: int) -> list[dict[str, Any]]:
-        return list(self.get(f"actions/runs/{run_id}/jobs?filter=latest&per_page=100")["jobs"])
+        jobs: list[dict[str, Any]] = []
+        page_number = 1
+        while True:
+            page = self.get(
+                f"actions/runs/{run_id}/jobs?filter=latest&per_page=100&page={page_number}"
+            )
+            batch = list(page["jobs"])
+            jobs.extend(batch)
+            total = int(page.get("total_count", len(jobs)))
+            if len(jobs) >= total or not batch:
+                return jobs
+            page_number += 1
 
     def base_ref(self, run: dict[str, Any]) -> str | None:
         """The pull request's base, from the run or from the pulls its head commit is in."""
@@ -582,6 +643,10 @@ class Client:
             f"actions/workflows/{name}/runs?event=pull_request&status=success&per_page={count}"
         )
         return list(page["workflow_runs"])
+
+
+class JobsClient(Protocol):
+    def jobs(self, run_id: int) -> list[dict[str, Any]]: ...
 
 
 def trim(run: dict[str, Any], jobs: Sequence[dict[str, Any]]) -> dict[str, Any]:
@@ -629,19 +694,108 @@ def exit_status(verdict: WallVerdict) -> int:
     return 0 if verdict.status == "passed" else 1
 
 
-def _settled_jobs(client: Client, run_id: int, workflow: WorkflowWall) -> list[dict[str, Any]]:
-    """The jobs, once every gating job the API lists reports its completion."""
+def _reported_job_ids(
+    jobs: Sequence[dict[str, Any]], workflow: WorkflowWall
+) -> set[str]:
+    """Workflow job ids visible in the API, apart from the aggregator and declared asides."""
+    return {
+        _job_id(str(job["name"]))
+        for job in jobs
+        if _gates(job, workflow, workflow.aggregator)
+    }
+
+
+def _unexpected_non_skipped_job_ids(
+    jobs: Sequence[dict[str, Any]], workflow: WorkflowWall, expected: set[str]
+) -> set[str]:
+    """Non-skipped jobs the aggregator does not wait for and the register did not exempt."""
+    return {
+        _job_id(str(job["name"]))
+        for job in jobs
+        if _gates(job, workflow, workflow.aggregator)
+        and job.get("conclusion") != "skipped"
+        and _job_id(str(job["name"])) not in expected
+    }
+
+
+def _settled_jobs(
+    client: JobsClient,
+    run_id: int,
+    workflow: WorkflowWall,
+    expected: set[str],
+) -> list[dict[str, Any]]:
+    """The jobs once the live aggregator is visible and every listed gate has settled.
+
+    The historical reader can deliberately measure a workflow from before its aggregator
+    existed. A live aggregator may not use that fallback: omission or a missing start
+    time means the jobs endpoint is stale, not that the workflow has an older topology.
+    """
     jobs = client.jobs(run_id)
     for _ in range(SETTLE_ATTEMPTS - 1):
-        if all(
-            job.get("status") == "completed"
-            for job in jobs
-            if _gates(job, workflow, workflow.aggregator)
+        aggregator = next(
+            (job for job in jobs if job.get("name") == workflow.aggregator), None
+        )
+        if (
+            aggregator is not None
+            and _instant(aggregator.get("started_at")) is not None
+            and any(
+                step.get("name") == WALL_STEP and _instant(step.get("started_at")) is not None
+                for step in aggregator.get("steps") or []
+            )
+            and expected <= _reported_job_ids(jobs, workflow)
+            and not _unexpected_non_skipped_job_ids(jobs, workflow, expected)
+            and all(
+                job.get("status") == "completed"
+                for job in jobs
+                if _gates(job, workflow, workflow.aggregator)
+            )
         ):
             break
         time.sleep(SETTLE_SECONDS)
         jobs = client.jobs(run_id)
+    aggregator = next((job for job in jobs if job.get("name") == workflow.aggregator), None)
+    if aggregator is None:
+        raise WallError(
+            f"the jobs API did not report live aggregator `{workflow.aggregator}` after "
+            f"{SETTLE_ATTEMPTS} reads; refusing the historical no-aggregator fallback"
+        )
+    if _instant(aggregator.get("started_at")) is None:
+        raise WallError(
+            f"the jobs API reported live aggregator `{workflow.aggregator}` without a "
+            f"start time after {SETTLE_ATTEMPTS} reads"
+        )
+    if not any(
+        step.get("name") == WALL_STEP and _instant(step.get("started_at")) is not None
+        for step in aggregator.get("steps") or []
+    ):
+        raise WallError(
+            f"the jobs API reported live aggregator `{workflow.aggregator}` without a "
+            f"started `{WALL_STEP}` step after {SETTLE_ATTEMPTS} reads"
+        )
+    reported = _reported_job_ids(jobs, workflow)
+    missing = expected - reported
+    unexpected = _unexpected_non_skipped_job_ids(jobs, workflow, expected)
+    if missing or unexpected:
+        raise WallError(
+            f"the jobs API did not report the aggregator's required prerequisite set after "
+            f"{SETTLE_ATTEMPTS} reads (missing: {', '.join(sorted(missing)) or 'none'}; "
+            f"unexpected non-skipped jobs: {', '.join(sorted(unexpected)) or 'none'})"
+        )
     return jobs
+
+
+def _running_prerequisites() -> set[str]:
+    """The aggregator's `needs` keys, passed independently of the jobs API."""
+    raw = os.environ.get("EXPECTED_PREREQUISITES")
+    if not raw:
+        raise WallError("EXPECTED_PREREQUISITES is not set by the live aggregator")
+    try:
+        document = json.loads(raw)
+    except json.JSONDecodeError as error:
+        raise WallError(f"EXPECTED_PREREQUISITES is not JSON: {error}") from error
+    if not isinstance(document, dict) or not document:
+        raise WallError("EXPECTED_PREREQUISITES must be a non-empty `needs` mapping")
+    return {str(name) for name in document}
 
 
 def _sample(
@@ -715,12 +869,18 @@ def main(argv: Sequence[str] | None = None) -> int:
         if arguments.sample:
             return _sample(client, register, workflow, arguments)
         in_run = not arguments.run_id
+        expected: set[str] = set()
         if in_run:
             arguments.run_id = [_running_run(workflow)]
+            expected = _running_prerequisites()
         status = 0
         for run_id in arguments.run_id:
             run = client.run(run_id)
-            jobs = _settled_jobs(client, run_id, workflow) if in_run else client.jobs(run_id)
+            jobs = (
+                _settled_jobs(client, run_id, workflow, expected)
+                if in_run
+                else client.jobs(run_id)
+            )
             if arguments.dump:
                 print(json.dumps(trim(run, jobs), indent=1))
                 continue

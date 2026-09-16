@@ -517,6 +517,32 @@ def test_a_wall_budget_past_or14s_outer_edge_is_refused(tmp_path: Path) -> None:
     assert any("outer edge" in problem for problem in problems)
 
 
+def test_the_pages_wall_cannot_declare_a_second_budget(tmp_path: Path) -> None:
+    """The page register and the live wall checker describe the same metric."""
+    register = tmp_path / "gate-budgets.yaml"
+    register.write_text(
+        "pages:\n"
+        "  wall:\n"
+        "    ceiling_seconds: 179.0\n"
+        "pull_request_walls:\n"
+        "  policy:\n"
+        "    regression_ratio: 1.2\n"
+        "    min_samples: 15\n"
+        "    main_branch: main\n"
+        "    setup_steps: ['^Set up job$']\n"
+        "  workflows:\n"
+        "  - id: certificate-page\n"
+        "    file: .github/workflows/pages.yml\n"
+        "    aggregator: pages-required\n"
+        "    not_gating: []\n"
+        "    budget_seconds: 180.0\n"
+        "    argument: a fabricated register\n",
+        encoding="utf-8",
+    )
+    problems = wall_problems(register)
+    assert any("same metric" in problem for problem in problems)
+
+
 def test_each_workflow_still_runs_the_wall_check_it_declares() -> None:
     """Rule 7's wiring: a budget nothing runs is a budget nothing enforces.
 

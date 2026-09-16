@@ -522,6 +522,27 @@ than the tier’s own wall produces **no completed run at all** — three runs o
 were cancelled that way before the pattern was seen.
 On 2026-09-05 a single test fix cost twenty-three minutes to verify, four times over.
 
+The same failure recurred in a form the first timing register could not detect.
+The required pull-request wall had a 154-second median on 2026-09-06, crossed 180
+seconds on 2026-09-08, and reached 288 seconds by 2026-09-15. Over the same interval,
+the certificate-page pull-request wall rose from 37 seconds to a 464-second median.
+Every individual tier remained inside its own ceiling because those ceilings bound gate
+steps, while the contributor waits for the longest job together with its queue,
+checkout, toolchain setup, and artifact transfers.
+
+Three gaps allowed that growth.
+A pull-request tier could have no recorded cost, which disabled its drift, stale-record,
+and headroom checks.
+A new observation could simply replace the old baseline, turning the drift rule into a
+ratchet. Finally, the complete wall had no machine-read budget.
+The pull-request wall checker now measures that wait on every run and fails closed when
+the current run cannot be measured.
+It always enforces the 180-second wall; after 15 comparable samples establish a
+kind-specific median, it also fails at a 1.2-fold regression.
+Missing median evidence is reported explicitly rather than represented as a passed
+relative check. [The validation guide](development.md#validation-tiers) defines the
+measurement and the register contracts.
+
 The target applies to ordinary PR feedback.
 A full final checkpoint may take longer, but its measured duration is still open to
 improvement. Twenty-seven minutes observed on one checkpoint is not a necessary minimum.
@@ -570,6 +591,18 @@ What this rule requires in practice:
   aspiration, and a gate that goes red for reasons unrelated to any regression is one
   people learn to ignore.
   The target belongs in the agenda; the ceiling belongs around the measurement.
+  This rule’s outer edge is the exception: a pull-request wall above three minutes is
+  already a defect, so its absolute budget is 180 seconds and its regression check is
+  relative to the recorded median beside it.
+- **Budget the wall, not only the steps.** Every component can remain in band while the
+  contributor’s wait doubles.
+  Measure queue, setup, execution, and transfer time on the run they describe, and give
+  the complete wait a machine-read budget.
+- **Raise a record only with attribution.** Replacing a baseline with every new reading
+  hides compounding growth.
+  A material rise names the steps or test files that grew, quantifies the increase, and
+  records its cause. Keep earlier readings in the register so the cumulative change
+  remains visible.
 
 ### OR-15: Outcome over ceremony, and process is revised on a cadence rather than on irritation
 

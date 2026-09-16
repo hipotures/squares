@@ -68,6 +68,12 @@ def test_a_scoped_command_is_not_a_tier_reading() -> None:
     assert parse_log(scoped) == []
 
 
+def test_a_removed_tier_syntax_does_not_abort_a_multi_job_log() -> None:
+    """Historical suite commands may share a run with current tiers worth reading."""
+    obsolete = excerpt().replace("packing-validate --checks", "packing-validate --suite")
+    assert parse_log(obsolete) == []
+
+
 def test_the_step_table_is_read_for_attribution() -> None:
     """A raised record must name what grew, and this is where those numbers come from."""
     (reading,) = parse_log(excerpt())

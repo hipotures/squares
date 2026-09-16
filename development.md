@@ -162,17 +162,18 @@ alone is not full pre-merge evidence.
 
 | Tier | Who runs it, and when | Steps | Ceiling | Cost when last measured |
 | --- | --- | ---: | ---: | --- |
-| `--records` | contributor, before touching a registry; also every pull request | 32 of 78 | 300 s | 11.0 s |
-| `--edit` | contributor, in the edit loop | 47 of 78 | 240 s | 59.4 s |
+| `--records` | contributor, before touching a registry; also every pull request | 33 of 80 | 300 s | 11.0 s |
+| `--edit` | contributor, in the edit loop | 48 of 80 | 240 s | 59.4 s |
 | `--push` | contributor, before a push — the edit tier plus tests reachable from the diff (`--since`) | varies with the diff | 1800 s | about a minute for a narrow code change; a broad diff selects the whole suite and needs `--jobs 1`, see below |
-| `--fast` | contributor, at a block boundary; the union of the six tiers below | 67 of 78 | 600 s | record cleared 2026-09-07 when the corpus widened; 229.1 s locally, only the ceiling applies |
-| `--checks` | **CI, on every pull request**, in the `validate` job | 50 of 78 | 195 s | composition changed after two PR 160 runs exceeded the ceiling, which did not end the overruns (`think-lrs0`); only the ceiling applies |
-| `--frontend` | **CI, on every pull request**, in the `frontend` job, concurrently | 2 of 78 | 150 s | new partition; the first hosted run establishes its baseline |
-| `--geometry` | **CI, on every pull request**, in the `geometry` job, concurrently | 9 of 78 | 180 s | 91.6 s on CI, the mean of four readings |
-| `--suite-a` | **CI, on every pull request**, in the `suite-a` job, concurrently | 1 of 78 | 180 s | 150.54 s on CI, the mean of two exact-head readings |
-| `--suite-b` | **CI, on every pull request**, in the `suite-b` job, concurrently | 1 of 78 | 180 s | 119.54 s on CI, the mean of two exact-head readings |
-| `--sweeps` | **CI, on every pull request**, in the `sweeps` job, concurrently | 4 of 78 | 210 s | record cleared 2026-09-07 when two of its four steps were split; 58.5 s locally, only the ceiling applies |
-| *(no flag)* | Full checkpoint before final review and at block close; main, dispatch, and daily CI | 78 of 78 | 3600 s | split across four jobs; not clocked whole |
+| `--fast` | contributor, at a block boundary; the union of the seven tiers below | 69 of 80 | 600 s | record cleared 2026-09-07 when the corpus widened; 229.1 s locally, only the ceiling applies |
+| `--checks` | **CI, on every pull request**, in the `validate` job | 50 of 80 | 195 s | 158.82 s on the predecessor topology; refresh from the exact reconciliation head |
+| `--frontend` | **CI, on every pull request**, in the `frontend` job, concurrently | 3 of 80 | 150 s | 85.25 s on the three-step, two-worker topology, the mean of two readings |
+| `--typecheck` | **CI, on every pull request**, in the `typecheck` job, concurrently | 1 of 80 | 130 s | 67.26 s on CI, the mean of two readings |
+| `--geometry` | **CI, on every pull request**, in the `geometry` job, concurrently | 9 of 80 | 180 s | 102.73 s on the predecessor topology, the mean of seven readings |
+| `--suite-a` | **CI, on every pull request**, in the `suite-a` job, concurrently | 1 of 80 | 180 s | 150.54 s on the predecessor sharder; refresh from the exact reconciliation head |
+| `--suite-b` | **CI, on every pull request**, in the `suite-b` job, concurrently | 1 of 80 | 180 s | 119.54 s on the predecessor sharder; refresh from the exact reconciliation head |
+| `--sweeps` | **CI, on every pull request**, in the `sweeps` job, concurrently | 4 of 80 | 210 s | 119.72 s before reconciliation; PR 180’s predecessor topology read 138.84 s |
+| *(no flag)* | Full checkpoint before final review and at block close; main, dispatch, and daily CI | 80 of 80 | 3600 s | split across four jobs; not clocked whole |
 
 `--geometry`’s cost is a geometric mean of four readings at the reference shape.
 The superseded `--suite` tier’s final record was a single reading: merging PR 137
@@ -196,13 +197,14 @@ Changing only xdist’s scheduler did not recover the target: the local default 
 302.70 seconds, `loadscope` measured 318.54 seconds, and `worksteal` measured 323.69
 seconds. The latter two were rejected as 5.2 and 6.9 percent slower than the default.
 
-The current surface therefore runs two whole-module shards.
-Both jobs collect the complete quick lane; a deterministic largest-first assignment by
-collected item count places every module in exactly one shard, including newly added
-modules. `--dist=loadfile` keeps each module together inside its shard so module-scoped
-fixtures remain reusable.
-Both jobs install the browser toolchain and fetch full Git history because rebalancing
-may move any module between them.
+The current surface therefore runs two pre-collection shards.
+`devtools.suite_files` packs recorded per-file costs longest-first across the two; a
+file absent from the record uses a stable `crc32(path) mod 2` fallback.
+Each file belongs to exactly one shard and each runner imports only its own files.
+Both jobs retain full Git history for history-reading tests, but neither installs Node.
+Browser-floor liveness runs under `--frontend`, on the runner that owns the pinned Node
+toolchain. Each shard writes a per-file cost report beside its JUnit and timing
+artifacts; the recorder rejects partial, duplicated, and mixed-run shard sets.
 The two 180-second ceilings remain the predeclared absolute bounds.
 At PR 175 exact head `dee68bc8`, `--suite-a` measured 151.11 and 149.97 seconds, and
 `--suite-b` measured 133.13 and 107.34 seconds.
@@ -236,10 +238,10 @@ After `main` merged into the stack, #160 read 200.68 s and 199.74 s at `72629c03
   [D-472](defects.md) retains the calibration history, and `think-be1s` tracks the band
   representation.
 
-**The pull-request surface is `--checks`, `--frontend`, `--geometry`, `--suite-a`,
-`--suite-b`, and `--sweeps` together, run as six concurrent CI jobs**, so a pull request
-waits for the longest part rather than for their sum.
-All six feed the stable `packing-required` aggregate context.
+**The pull-request surface is `--checks`, `--frontend`, `--typecheck`, `--geometry`,
+`--suite-a`, `--suite-b`, and `--sweeps` together, run as seven concurrent CI jobs**, so
+a pull request waits for the longest part rather than for their sum.
+All seven feed the stable `packing-required` aggregate context.
 Repository protection settings determine whether GitHub requires that context before a
 merge. `test_the_pull_request_jobs_partition_the_surface` reads the workflow and checks
 that they are pairwise disjoint and that they cover every step of `--fast` — so the
@@ -263,9 +265,34 @@ comparisons:
 
 All three runs are from 2026-09-06. The durations are observations, not necessary lower
 bounds or enforced tier baselines.
-The [tier table](#the-tiers) lists the current declarations: `--geometry`, `--suite-a`,
-and `--suite-b` have measured baselines; `--checks`, `--frontend`, and `--sweeps` remain
-unmeasured.
+The [tier table](#the-tiers) lists the current declarations and identifies the entries
+that still cite the predecessor topology pending the exact reconciliation run.
+
+### The pull-request wall
+
+A tier clock and a pull-request wall are different measurements.
+Tier clocks begin when `packing-validate` runs.
+The `pull_request_walls` register measures from the workflow run’s start through the
+start of the wall-check step inside its required aggregator, `packing-required` or
+`pages-required`. That includes prerequisite queues, checkout, setup, work, artifact
+transfer, and the aggregator’s queue, result assertion, blobless checkout, and pinned
+Python setup; it excludes the wall check itself and subsequent teardown.
+
+`packing/devtools/check_pr_wall.py` runs inside both aggregators and fails above OR-14’s
+absolute 180-second budget.
+Once a pull-request kind (`main` or `stacked`) has at least 15 recorded samples, it also
+fails at 1.2 times that kind’s median.
+An unmeasurable current run fails closed.
+A missing or undersampled median produces an explicit warning while the absolute budget
+remains enforced. Partial reruns, missing jobs or timestamps, an incomplete jobs-API
+page, and non-finite register values cannot produce a passing measurement.
+
+On a push to `main`, the integration job looks for a successful pull-request run that
+validated the exact same Git tree and explicitly passed `packing-required`. A match
+licenses reuse only for fast steps named in the positive `TREE_REUSABLE_FAST_STEPS`
+allowlist. Every deferred step and every unclassified fast step repeats after merge;
+missing artifacts, expired artifacts, API errors, fork runs, and incomplete checks all
+fall back to the complete surface.
 
 ### The behavioural lanes
 
@@ -275,7 +302,7 @@ test satisfies exactly one, so no test can be in two lanes and none can be in ze
 
 | Lane | Marker | Tests at last count | Runs in | Bound |
 | --- | --- | ---: | --- | --- |
-| quick | neither | 6,111 selected (6,105 passed; 6 skipped) | PR fast surface, split across `suite-a` and `suite-b` | fails a test whose `call` phase reaches 12 s |
+| quick | neither | 6,111 selected (6,105 passed; 6 skipped) | PR fast surface: file shards in `suite-a` and `suite-b`, browser-floor liveness in `frontend` | fails a test whose `call` phase reaches 12 s |
 | slow | `slow` | 97 | full checkpoint, under xdist in CI | fails a test whose `call` phase is under 1 s |
 | exhaustive | `exhaustive_exact` | 55 | its own CI job | its own 3600 s budget |
 
@@ -435,14 +462,15 @@ uv run --frozen --all-extras --group dev packing-validate --edit
 uv run --frozen --all-extras --group dev packing-validate --push
 
 # The pull-request surface: the edit tier plus every behavioral test under the
-# per-test ceiling. CI runs it as the six parts below, one per runner; run it whole
+# per-test ceiling. CI runs it as the seven parts below, one per runner; run it whole
 # here, where there is only one machine and nothing to overlap with.
 uv run --frozen --all-extras --group dev packing-validate --fast
 
-# The six parts CI runs concurrently on a pull request. They partition --fast, so
-# running all six is running the surface and running one is running a part of it.
+# The seven parts CI runs concurrently on a pull request. They partition --fast, so
+# running all seven is running the surface and running one is running a part of it.
 uv run --frozen --all-extras --group dev packing-validate --checks
 uv run --frozen --all-extras --group dev packing-validate --frontend
+uv run --frozen --all-extras --group dev packing-validate --typecheck
 uv run --frozen --all-extras --group dev packing-validate --geometry
 uv run --frozen --all-extras --group dev packing-validate --suite-a
 uv run --frozen --all-extras --group dev packing-validate --suite-b

@@ -119,11 +119,11 @@ def test_every_pull_request_job_is_scoped_to_its_page_or_says_why() -> None:
         assert notices == [f"{half}-unchanged"], half
         notice = jobs[notices[0]]
         assert needs_of(notice) == ["scope"]
-        assert half in notice["name"]
-        assert "skipped" in notice["name"]
         (step,) = notice["steps"]
         assert step["env"]["REASON"] == f"${{{{ needs.scope.outputs.{half}_reason }}}}"
         assert step["run"].splitlines()[0] == 'test -n "$REASON"'
+        assert half in step["run"]
+        assert "not built" in step["run"]
 
     for name, job in jobs.items():
         commands = "\n".join(step.get("run", "") for step in job.get("steps", []))
@@ -148,7 +148,11 @@ def test_the_required_aggregate_passes_a_justified_skip_and_nothing_else() -> No
     aggregate = jobs["pages-required"]
     assert aggregate["if"] == "always()"
     assert set(needs_of(aggregate)) == set(jobs) - {"pages-required", *DEPLOY_PATH}
-    (step,) = aggregate["steps"]
+    step = next(
+        item
+        for item in aggregate["steps"]
+        if item.get("name") == "Require every page this run builds to pass"
+    )
     assert step["env"]["NEEDS"] == "${{ toJSON(needs) }}"
     program = step["run"]
     assert '.scope.result == "success"' in program
@@ -188,6 +192,23 @@ def test_deployment_waits_for_the_cross_browser_loading_checks() -> None:
         "devtools.check_math_loading" in step.get("run", "")
         for step in jobs["font-loading"]["steps"]
     )
+
+
+def test_saved_font_geometry_runs_as_two_bounded_pairs() -> None:
+    """Remove the serial WebKit tail without launching four browsers at once."""
+    steps = load()["jobs"]["font-loading"]["steps"]
+    command = next(
+        step["run"]
+        for step in steps
+        if step.get("name") == "Check saved font settings retain geometry at 1280 px"
+    )
+    lines = command.splitlines()
+    launches = [line for line in lines if "devtools.prepare_explainer_math" in line]
+    waits = [line for line in lines if line.strip().startswith("wait ")]
+    assert len(launches) == 4
+    assert all(line.endswith(" &") for line in launches)
+    assert len(waits) == 4
+    assert lines.index(waits[1]) < lines.index(launches[2])
 
 
 def test_every_browser_check_waits_for_deployment() -> None:
@@ -324,14 +345,25 @@ def test_every_page_job_a_pull_request_runs_is_budgeted() -> None:
     assert {entry["id"] for entry in pages["jobs"]} == expected
     assert pages["reference"] == {"runner": "ubuntu-latest", "cpus": 4, "caches": "warm"}
     headroom = register["policy"]["max_headroom"]
-    for entry in [*pages["jobs"], pages["wall"]]:
-        where = entry.get("id", "wall")
+    for entry in pages["jobs"]:
+        where = entry["id"]
         assert entry["measured_seconds"] > 0, where
         assert entry["measured_on"], where
         assert re.search(r"run \d{8,}", entry["measured_where"]), where
         assert entry["ceiling_seconds"] >= entry["measured_seconds"], where
         assert entry["ceiling_seconds"] <= headroom * entry["measured_seconds"], where
         assert entry["argument"].strip(), where
+    wall = pages["wall"]
+    wall_budget = next(
+        workflow
+        for workflow in register["pull_request_walls"]["workflows"]
+        if workflow["id"] == "certificate-page"
+    )["budget_seconds"]
+    assert wall["measured_seconds"] > 0
+    assert wall["measured_on"]
+    assert re.search(r"run \d{8,}", wall["measured_where"])
+    assert wall["ceiling_seconds"] == wall_budget == 180.0
+    assert wall["argument"].strip()
     assert pages["wall"]["measured_seconds"] >= max(
         entry["measured_seconds"] for entry in pages["jobs"]
     ), "the wall is at least the longest job"
@@ -636,6 +668,14 @@ def test_the_partial_checkouts_keep_the_directories_the_render_links() -> None:
                 continue
             settings = step["with"]
             if "sparse-checkout" in settings:
+                if step.get("name") == "Check out the wall budget and its register":
+                    assert settings["sparse-checkout"] == (
+                        "packing/devtools/check_pr_wall.py\n"
+                        "packing/devtools/gate-budgets.yaml\n"
+                    )
+                    assert settings["sparse-checkout-cone-mode"] is False, name
+                    assert settings["filter"] == "blob:none", name
+                    continue
                 assert settings["sparse-checkout"] == patterns, name
                 assert settings["sparse-checkout-cone-mode"] is False, name
                 assert settings["filter"] == "blob:none", name
@@ -722,7 +762,11 @@ def test_prepared_geometry_checks_cover_each_browser_and_their_controls() -> Non
                 f"/tmp/math-geometry/{expected_browser}-{option(command, '--width', '1280')}-"
                 f"{'-'.join(context(command))}-{medium}{suffix}.json"
             )
-            assert command[-2:] == ["||", "geometry_status=1"]
+            width = option(command, "--width", "1280")
+            if expected_browser == "matrix-browser" and width == "1280":
+                assert command[-1] == "&"
+            else:
+                assert command[-2:] == ["||", "geometry_status=1"]
         for name in names:
             geometry_steps = [
                 step

@@ -189,8 +189,11 @@ def wall_problems(register_path: Path = REGISTER) -> list[str]:
     """The pull-request wall budgets: readable, inside `OR-14`, and actually run."""
     try:
         walls = load_walls(register_path)
+        document = safe_load(register_path.read_text(encoding="utf-8"))
     except WallError as error:
         return [f"pull_request_walls: {error}"]
+    except (OSError, TypeError) as error:
+        return [f"pull_request_walls: cannot read duplicate wall declarations: {error}"]
     problems: list[str] = []
     for workflow in walls.workflows:
         label = f"pull-request wall {workflow.id!r}"
@@ -199,6 +202,15 @@ def wall_problems(register_path: Path = REGISTER) -> list[str]:
                 f"{label}: a {workflow.budget_seconds:g}s budget is past OR-14's "
                 f"{OR_14_OUTER_EDGE_SECONDS:g}s outer edge; change the rule, not the budget"
             )
+        if workflow.id == "certificate-page":
+            pages_wall = (document.get("pages") or {}).get("wall") or {}
+            duplicate = pages_wall.get("ceiling_seconds")
+            if duplicate != workflow.budget_seconds:
+                problems.append(
+                    f"{label}: pages.wall declares {duplicate!r}s but pull_request_walls "
+                    f"declares {workflow.budget_seconds:g}s for the same metric; keep one "
+                    "180-second authority"
+                )
         path = REPO / workflow.file
         try:
             jobs = safe_load(path.read_text(encoding="utf-8"))["jobs"]

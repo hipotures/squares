@@ -19,6 +19,10 @@ figure the live register is free to re-measure. The two things read from the liv
 are its own shape and its own rules, which is what `check_gate_budgets` enforces.
 """
 
+# The private readers are the unit under test; a public duplicate would drift from CI.
+# ruff: noqa: SLF001
+# pyright: reportPrivateUsage=false
+
 from __future__ import annotations
 
 import json
@@ -195,8 +199,8 @@ def test_a_kind_with_no_record_is_reported_rather_than_skipped(tmp_path: Path) -
     assert any("base branch is unknown" in note for note in unknown.unjudged)
 
 
-def test_the_wall_ends_where_the_aggregating_job_starts(tmp_path: Path) -> None:
-    """A job cannot see its own completion, so this is where the measurement stops.
+def test_the_wall_ends_where_the_wall_check_starts(tmp_path: Path) -> None:
+    """The wall includes aggregator checkout and setup, but not the check itself.
 
     The same rule applies afterwards, so a run measured live and the same run measured a
     day later agree. A run whose workflow had no aggregator yet -- every certificate-page
@@ -206,6 +210,15 @@ def test_the_wall_ends_where_the_aggregating_job_starts(tmp_path: Path) -> None:
     entry = walls.workflow("packing-validation")
     run, jobs = recorded(IN_BAND)
     aggregator = next(job for job in jobs if job["name"] == "packing-required")
+    aggregator["steps"].insert(
+        -1,
+        {
+            "name": check_pr_wall.WALL_STEP,
+            "conclusion": "success",
+            "started_at": aggregator["completed_at"],
+            "completed_at": aggregator["completed_at"],
+        },
+    )
     live = deepcopy(jobs)
     for job in live:
         if job["name"] == "packing-required":
@@ -213,7 +226,7 @@ def test_the_wall_ends_where_the_aggregating_job_starts(tmp_path: Path) -> None:
     measured_live = measure(run, live, entry, walls.policy, kind="main")
     measured_after = measure(run, jobs, entry, walls.policy, kind="main")
     assert measured_live.wall_seconds == measured_after.wall_seconds
-    assert measured_after.ends_at == "the start of `packing-required`"
+    assert measured_after.ends_at == f"the start of `{check_pr_wall.WALL_STEP}`"
     assert aggregator["started_at"] > max(
         str(job["completed_at"]) for job in jobs if job["name"] != "packing-required"
     )
@@ -233,6 +246,182 @@ def test_a_prerequisite_still_running_is_unmeasurable(tmp_path: Path) -> None:
     )
     assert verdict.status == "unmeasurable"
     assert any("`suite` has not completed" in note for note in verdict.unjudged)
+
+
+def test_a_partial_rerun_cannot_reuse_old_jobs_to_report_a_near_zero_wall(
+    tmp_path: Path,
+) -> None:
+    """GitHub's latest-job view may mix carried successes into a later attempt."""
+    walls = load_walls(register(tmp_path))
+    entry = walls.workflow("packing-validation")
+    run, jobs = recorded(IN_BAND)
+    partial = deepcopy(run)
+    aggregator = next(job for job in jobs if job["name"] == "packing-required")
+    partial["run_attempt"] = 2
+    partial["run_started_at"] = aggregator["started_at"]
+    measurement = measure(partial, jobs, entry, walls.policy, kind="main")
+    verdict = judge(measurement, entry, walls.policy)
+    assert verdict.status == "unmeasurable"
+    assert any("partial rerun" in note for note in verdict.unjudged)
+    assert exit_status(verdict) == 1
+
+
+def test_a_reported_aggregator_without_a_start_is_not_historical_fallback(
+    tmp_path: Path,
+) -> None:
+    """Only an absent aggregator identifies an older workflow topology."""
+    walls = load_walls(register(tmp_path))
+    entry = walls.workflow("packing-validation")
+    run, jobs = recorded(IN_BAND)
+    pending = deepcopy(jobs)
+    aggregator = next(job for job in pending if job["name"] == "packing-required")
+    aggregator["status"], aggregator["completed_at"] = "in_progress", None
+    measurement = measure(run, pending, entry, walls.policy, kind="main")
+    assert measurement.wall_seconds is None
+    assert measurement.ends_at == f"nowhere: `{check_pr_wall.WALL_STEP}` has not started"
+    assert f"`{check_pr_wall.WALL_STEP}` has not started" in measurement.unmeasurable
+
+
+class _JobsClient:
+    def __init__(self, responses: list[list[dict[str, Any]]]) -> None:
+        self.responses = responses
+        self.calls = 0
+
+    def jobs(self, run_id: int) -> list[dict[str, Any]]:
+        _ = run_id
+        response = self.responses[min(self.calls, len(self.responses) - 1)]
+        self.calls += 1
+        return response
+
+
+def test_the_jobs_reader_paginates_past_the_first_hundred(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    client = check_pr_wall.Client("jlevy/squares", None)
+    first = [{"name": f"job-{index}"} for index in range(100)]
+    second = [{"name": "job-100"}]
+    paths: list[str] = []
+
+    def get(path: str) -> dict[str, object]:
+        paths.append(path)
+        return {"total_count": 101, "jobs": first if path.endswith("page=1") else second}
+
+    monkeypatch.setattr(client, "get", get)
+    assert len(client.jobs(IN_BAND)) == 101
+    assert paths == [
+        f"actions/runs/{IN_BAND}/jobs?filter=latest&per_page=100&page=1",
+        f"actions/runs/{IN_BAND}/jobs?filter=latest&per_page=100&page=2",
+    ]
+
+
+def test_the_live_reader_waits_for_the_aggregator_it_is_running_in(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    walls = load_walls(register(tmp_path))
+    entry = walls.workflow("packing-validation")
+    _, jobs = recorded(IN_BAND)
+    aggregate = next(job for job in jobs if job["name"] == "packing-required")
+    aggregate["steps"].append(
+        {
+            "name": check_pr_wall.WALL_STEP,
+            "started_at": aggregate["completed_at"],
+            "completed_at": None,
+            "conclusion": None,
+        }
+    )
+    without = [job for job in jobs if job["name"] != "packing-required"]
+    client = _JobsClient([without, jobs])
+    monkeypatch.setattr(check_pr_wall.time, "sleep", lambda _seconds: None)
+    expected = check_pr_wall._reported_job_ids(jobs, entry)
+    settled = check_pr_wall._settled_jobs(client, IN_BAND, entry, expected)
+    assert client.calls == 2
+    assert any(job["name"] == "packing-required" for job in settled)
+
+
+@pytest.mark.parametrize("failure", ["missing", "not-started"])
+def test_the_live_reader_refuses_a_stale_aggregator_view(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, failure: str
+) -> None:
+    walls = load_walls(register(tmp_path))
+    entry = walls.workflow("packing-validation")
+    _, jobs = recorded(IN_BAND)
+    if failure == "missing":
+        jobs = [job for job in jobs if job["name"] != "packing-required"]
+    else:
+        jobs = deepcopy(jobs)
+        next(job for job in jobs if job["name"] == "packing-required")["started_at"] = None
+    client = _JobsClient([jobs])
+    monkeypatch.setattr(check_pr_wall.time, "sleep", lambda _seconds: None)
+    with pytest.raises(WallError, match="live aggregator"):
+        check_pr_wall._settled_jobs(
+            client, IN_BAND, entry, check_pr_wall._reported_job_ids(jobs, entry)
+        )
+    assert client.calls == check_pr_wall.SETTLE_ATTEMPTS
+
+
+def test_the_live_reader_refuses_a_missing_prerequisite(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    walls = load_walls(register(tmp_path))
+    entry = walls.workflow("packing-validation")
+    _, jobs = recorded(IN_BAND)
+    aggregate = next(job for job in jobs if job["name"] == "packing-required")
+    aggregate["steps"].append(
+        {"name": check_pr_wall.WALL_STEP, "started_at": aggregate["completed_at"]}
+    )
+    expected = check_pr_wall._reported_job_ids(jobs, entry)
+    jobs = [job for job in jobs if job["name"] != "suite"]
+    client = _JobsClient([jobs])
+    monkeypatch.setattr(check_pr_wall.time, "sleep", lambda _seconds: None)
+    with pytest.raises(WallError, match="required prerequisite set"):
+        check_pr_wall._settled_jobs(client, IN_BAND, entry, expected)
+
+
+def test_the_live_reader_allows_extra_skipped_jobs_but_not_extra_work(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    walls = load_walls(register(tmp_path))
+    entry = walls.workflow("packing-validation")
+    _, jobs = recorded(IN_BAND)
+    aggregate = next(job for job in jobs if job["name"] == "packing-required")
+    aggregate["steps"].append(
+        {"name": check_pr_wall.WALL_STEP, "started_at": aggregate["completed_at"]}
+    )
+    expected = check_pr_wall._reported_job_ids(jobs, entry)
+    skipped = {
+        "name": "deploy",
+        "status": "completed",
+        "conclusion": "skipped",
+        "created_at": aggregate["created_at"],
+        "started_at": aggregate["started_at"],
+        "completed_at": aggregate["completed_at"],
+        "steps": [],
+    }
+    monkeypatch.setattr(check_pr_wall.time, "sleep", lambda _seconds: None)
+    settled = check_pr_wall._settled_jobs(
+        _JobsClient([[*jobs, skipped]]), IN_BAND, entry, expected
+    )
+    assert settled[-1]["name"] == "deploy"
+
+    extra_work = {**skipped, "name": "undeclared-work", "conclusion": "success"}
+    with pytest.raises(WallError, match="unexpected non-skipped jobs: undeclared-work"):
+        check_pr_wall._settled_jobs(
+            _JobsClient([[*jobs, extra_work]]), IN_BAND, entry, expected
+        )
+
+
+def test_a_successful_job_without_timestamps_is_unmeasurable(tmp_path: Path) -> None:
+    walls = load_walls(register(tmp_path))
+    entry = walls.workflow("packing-validation")
+    run, jobs = recorded(IN_BAND)
+    damaged = deepcopy(jobs)
+    suite = next(job for job in damaged if job["name"] == "suite")
+    suite["started_at"] = None
+    suite["completed_at"] = None
+    measurement = measure(run, damaged, entry, walls.policy, kind="main")
+    verdict = judge(measurement, entry, walls.policy)
+    assert verdict.status == "unmeasurable"
+    assert any("no start time" in note for note in verdict.unjudged)
 
 
 def test_the_macos_job_is_declared_aside_and_not_waited_on(tmp_path: Path) -> None:
@@ -344,6 +533,17 @@ def test_a_median_that_disagrees_with_its_own_samples_is_refused(tmp_path: Path)
         load_walls(path)
 
 
+def test_nonfinite_wall_numbers_are_refused(tmp_path: Path) -> None:
+    path = register(tmp_path)
+    document = path.read_text(encoding="utf-8")
+    path.write_text(
+        document.replace("budget_seconds: 180.0", "budget_seconds: .nan"),
+        encoding="utf-8",
+    )
+    with pytest.raises(WallError, match="positive number"):
+        load_walls(path)
+
+
 def test_the_live_register_declares_a_wall_for_both_workflows() -> None:
     """Read from the register rather than asserted here, because both are measurements.
 
@@ -369,14 +569,36 @@ def test_wall_jobs_pin_the_interpreter_and_their_only_dependency() -> None:
     repository = Path(__file__).resolve().parents[2]
     jobs = []
     for path, name in (
-        (repository / ".github/workflows/pages.yml", "pr-wall"),
+        (repository / ".github/workflows/pages.yml", "pages-required"),
         (repository / ".github/workflows/packing-validation.yml", "packing-required"),
     ):
         document = safe_load(path.read_text(encoding="utf-8"))
         jobs.append(document["jobs"][name])
 
     for job in jobs:
+        assert job["permissions"]["actions"] == "read"
         steps = job["steps"]
+        wall_steps = [
+            step
+            for step in steps
+            if step.get("name")
+            in {
+                "Check out the wall budget and its register",
+                "Install uv and Python 3.14",
+                "Hold the pull request's wall to its budget",
+            }
+        ]
+        assert len(wall_steps) == 3
+        assert all(
+            step.get("if") == "always() && github.event_name == 'pull_request'"
+            for step in wall_steps
+        )
+        checkout = next(
+            step
+            for step in steps
+            if step.get("name") == "Check out the wall budget and its register"
+        )
+        assert checkout["with"]["filter"] == "blob:none"
         setup = next(step for step in steps if step.get("name") == "Install uv and Python 3.14")
         assert setup["with"] == {
             "version": "0.12.8",
@@ -384,11 +606,12 @@ def test_wall_jobs_pin_the_interpreter_and_their_only_dependency() -> None:
             "enable-cache": False,
         }
         command = next(
-            step["run"]
+            step
             for step in steps
             if step.get("name") == "Hold the pull request's wall to its budget"
         )
-        assert command.startswith(
+        assert command["env"]["EXPECTED_PREREQUISITES"] == "${{ toJSON(needs) }}"
+        assert command["run"].startswith(
             "uv run --no-project --python 3.14.7 --with PyYAML==6.0.3 python "
         )
-        assert "python3 " not in command
+        assert "python3 " not in command["run"]

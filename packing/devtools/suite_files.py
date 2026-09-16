@@ -325,14 +325,58 @@ def record(reports: Iterable[Mapping[str, Any]], *, shards: int) -> dict[str, An
     centre of that spread rather than whichever runner drew last. A file that reported no
     time at all is recorded at zero and packs last.
     """
+    reports = list(reports)
+    if not reports:
+        raise SuiteFilesError("record needs at least one cost report")
+    if shards < 1:
+        raise SuiteFilesError(f"record needs a positive shard count, found {shards}")
+    raw_shards = [report.get("shard") for report in reports]
+    if any(part is None for part in raw_shards) and not all(
+        part is None for part in raw_shards
+    ):
+        raise SuiteFilesError("cannot mix whole-lane and sharded cost reports")
+    if all(part is not None for part in raw_shards):
+        parsed = [Shard.parse(str(part)) for part in raw_shards]
+        counts = {part.count for part in parsed}
+        if counts != {shards}:
+            raise SuiteFilesError(
+                f"reports describe shard count(s) {sorted(counts)}, not the requested {shards}"
+            )
+        indexes = [part.index for part in parsed]
+        expected = set(range(1, shards + 1))
+        if set(indexes) != expected or len(indexes) != shards:
+            raise SuiteFilesError(
+                f"reports must contain each shard exactly once; found {indexes}, expected "
+                f"{sorted(expected)}"
+            )
+        cohort_keys = ("GITHUB_RUN_ID", "GITHUB_RUN_ATTEMPT", "GITHUB_SHA")
+        cohorts: set[tuple[str, ...]] = set()
+        for report in reports:
+            provenance = report.get("provenance")
+            if not isinstance(provenance, dict):
+                raise SuiteFilesError("a sharded report has no provenance mapping")
+            missing = [key for key in cohort_keys if not provenance.get(key)]
+            if missing:
+                raise SuiteFilesError(
+                    "a sharded report is missing cohort provenance: " + ", ".join(missing)
+                )
+            cohorts.add(tuple(str(provenance[key]) for key in cohort_keys))
+        if len(cohorts) != 1:
+            raise SuiteFilesError(
+                "sharded reports mix run id, attempt, or SHA; record one complete cohort"
+            )
+
     observed: defaultdict[str, list[float]] = defaultdict(list)
     sources: list[str] = []
     for report in reports:
+        rows = report.get("files")
+        if not isinstance(rows, list):
+            raise SuiteFilesError("a cost report has no files list")
         provenance = report.get("provenance") or {}
         label = ", ".join(f"{key}={value}" for key, value in sorted(provenance.items()))
         part = f"shard {report['shard']}" if report.get("shard") else "the whole lane"
         sources.append(f"{part}: {label or 'no CI provenance'}")
-        for row in report["files"]:
+        for row in rows:
             observed[str(row["file"])].append(float(row["seconds"]))
     files = {
         name: round(math.exp(sum(math.log(value) for value in values) / len(values)), 3)

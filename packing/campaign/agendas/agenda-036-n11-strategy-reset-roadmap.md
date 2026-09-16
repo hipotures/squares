@@ -207,6 +207,22 @@ agenda:
       - packing/campaign/agent-sessions/session-131-n11-w5-validation-efficiency.md
       disposition: retire-success
       follow_up: think-d3h5
+    - scope: >-
+        Correction of 2026-09-15, by addition. The checks-tier measured baseline the
+        outcome above says is still owed, and who owns it.
+      classification: never-opened
+      result: >-
+        BC-340 misrouted the still-owed hosted baseline to scientific bead think-d3h5.
+        Measurement belonged to think-gsz0, which remained unresolved for eight days and
+        was later closed as superseded after think-z121 recorded the predecessor
+        topology. That seven-run baseline is historical evidence, not a measurement of
+        the current seven-part surface. think-97we owns the exact-head replacement
+        measurements and their retained history.
+      evidence:
+      - packing/devtools/gate-budgets.yaml
+      - packing/devtools/read_tier_walls.py
+      disposition: defer-dependency
+      follow_up: think-97we
   - id: BC-353
     purpose: tool_validation
     owner_focus: process

@@ -96,7 +96,7 @@ concurrency:
 #          ├─ workbench-unchanged                  (only when the workbench is skipped)
 #          ├─ workbench ───────────────────────────────┐
 #          └─ prepare ─┬─ pdf ─────────────────────────┼─ publish ─┐
-#                      ├─ print-layout                 │           ├─ pages-required ─ (pr-wall)
+#                      ├─ print-layout                 │           ├─ pages-required (gate + wall)
 #                      ├─ typography                   │           │
 #                      ├─ screen                       │           │
 #                      ├─ geometry                     │           │
@@ -176,7 +176,6 @@ jobs:
   # has to interpret. These run only when their page is out of scope, and they fail if
   # the scope job gave no reason, so an empty output cannot pass for a decision.
   explainer-unchanged:
-    name: "explainer: no declared input changed, its build and browser checks are skipped"
     needs: scope
     if: needs.scope.outputs.explainer != 'true'
     runs-on: ubuntu-latest
@@ -190,7 +189,6 @@ jobs:
           echo "The explainer is not built or checked on this run: $REASON." >> "$GITHUB_STEP_SUMMARY"
 
   workbench-unchanged:
-    name: "workbench: no declared input changed, its build is skipped"
     needs: scope
     if: needs.scope.outputs.workbench != 'true'
     runs-on: ubuntu-latest
@@ -803,10 +801,10 @@ jobs:
 
   # The same prepared page in Firefox and WebKit: mobile font loading and the saved font
   # settings at 1280 px here, the 390 px settings and the reload position in
-  # `browser-geometry`. WebKit's page loads are about 7 s against Firefox's 5, and the
-  # eight settings in one job made WebKit the longest job of run 35039248281 at 120 s;
-  # split this way its two jobs are about 80 s each, on top of an install that the
-  # package cache below takes from 30 s to about 14 s.
+  # `browser-geometry`. WebKit's page loads are about 7 s against Firefox's 5. The four
+  # independent saved-font variants run in two pairs: exact-head run 35078515689 spent
+  # 39 s on them serially and missed OR-14's 180 s outer edge by 9 s. Two pairs preserve
+  # headroom on the four-CPU runner while removing roughly half that serial tail.
   font-loading:
     needs: prepare
     runs-on: ubuntu-latest
@@ -893,10 +891,18 @@ jobs:
           trap 'exit 130' INT TERM
           mkdir -p /tmp/math-geometry
           geometry_status=0
-          uv run --frozen --group dev python -m devtools.prepare_explainer_math site/index.html --browser ${{ matrix.browser }} --width 1280 --host-check --output /tmp/math-geometry/${{ matrix.browser }}-1280-custom-serif-screen.json || geometry_status=1
-          uv run --frozen --group dev python -m devtools.prepare_explainer_math site/index.html --browser ${{ matrix.browser }} --prose-font sans --width 1280 --output /tmp/math-geometry/${{ matrix.browser }}-1280-custom-sans-screen.json || geometry_status=1
-          uv run --frozen --group dev python -m devtools.prepare_explainer_math site/index.html --browser ${{ matrix.browser }} --font-set system --width 1280 --output /tmp/math-geometry/${{ matrix.browser }}-1280-system-serif-screen.json || geometry_status=1
-          uv run --frozen --group dev python -m devtools.prepare_explainer_math site/index.html --browser ${{ matrix.browser }} --font-set system --prose-font sans --width 1280 --output /tmp/math-geometry/${{ matrix.browser }}-1280-system-sans-screen.json || geometry_status=1
+          uv run --frozen --group dev python -m devtools.prepare_explainer_math site/index.html --browser ${{ matrix.browser }} --width 1280 --host-check --output /tmp/math-geometry/${{ matrix.browser }}-1280-custom-serif-screen.json &
+          custom_serif_pid=$!
+          uv run --frozen --group dev python -m devtools.prepare_explainer_math site/index.html --browser ${{ matrix.browser }} --prose-font sans --width 1280 --output /tmp/math-geometry/${{ matrix.browser }}-1280-custom-sans-screen.json &
+          custom_sans_pid=$!
+          wait "$custom_serif_pid" || geometry_status=1
+          wait "$custom_sans_pid" || geometry_status=1
+          uv run --frozen --group dev python -m devtools.prepare_explainer_math site/index.html --browser ${{ matrix.browser }} --font-set system --width 1280 --output /tmp/math-geometry/${{ matrix.browser }}-1280-system-serif-screen.json &
+          system_serif_pid=$!
+          uv run --frozen --group dev python -m devtools.prepare_explainer_math site/index.html --browser ${{ matrix.browser }} --font-set system --prose-font sans --width 1280 --output /tmp/math-geometry/${{ matrix.browser }}-1280-system-sans-screen.json &
+          system_sans_pid=$!
+          wait "$system_serif_pid" || geometry_status=1
+          wait "$system_sans_pid" || geometry_status=1
           exit "$geometry_status"
 
       - name: Retain browser geometry observations
@@ -1161,6 +1167,9 @@ jobs:
       - startup-timing
       - publish
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
     steps:
       - name: Require every page this run builds to pass
         env:
@@ -1173,11 +1182,37 @@ jobs:
             and ([.[].result] | all(. == "success" or . == "skipped"))
           ' <<< "$NEEDS" > /dev/null
 
-  # Lane 3 of think-xfqk (`claude/ci-wall-budget`) adds `pr-wall` here: a trailing job with
-  # `needs: pages-required` and `if: always() && github.event_name == 'pull_request'`
-  # that reads this run's job timings and holds the pull-request wall to its budget.
-  # `pages-required` needs every job a pull request runs, so a job that needs it is the
-  # last one in the graph; nothing below this comment runs on a pull request.
+      # The wall-check step's start is the stable end of the measured wall: every job
+      # above is settled, and this aggregator's checkout and setup are included while the
+      # check itself is not. The checkout is blobless and sparse so evidence collection
+      # does not become the wall's floor.
+      - name: Check out the wall budget and its register
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          sparse-checkout: |
+            packing/devtools/check_pr_wall.py
+            packing/devtools/gate-budgets.yaml
+          sparse-checkout-cone-mode: false
+          filter: blob:none
+          persist-credentials: false
+
+      - name: Install uv and Python 3.14
+        if: always() && github.event_name == 'pull_request'
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: "0.12.8"
+          python-version: "3.14.7"
+          enable-cache: false
+
+      - name: Hold the pull request's wall to its budget
+        if: always() && github.event_name == 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          EXPECTED_PREREQUISITES: ${{ toJSON(needs) }}
+        run: >-
+          uv run --no-project --python 3.14.7 --with PyYAML==6.0.3 python
+          packing/devtools/check_pr_wall.py --workflow certificate-page
 
   deploy:
     needs: [publish, pages-required]
