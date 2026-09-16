@@ -22,6 +22,7 @@ Object.assign(globalThis, {
   getComputedStyle: (el) => el,
 });
 
-/** @type {(handle: object) => string[]} */
-const rotationTarget = probe("devtools/probes/check_print_layout/rotation_target.js");
+const rotationTarget = /** @type {(handle: object) => string[]} */ (
+  probe("devtools/probes/check_print_layout/rotation_target.js")
+);
 process.stdout.write(JSON.stringify(rotationTarget(handle)));

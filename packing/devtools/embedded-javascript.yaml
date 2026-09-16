@@ -1,4 +1,4 @@
-# No JavaScript in Python: what counts as JavaScript, and the files that still hold some.
+# No JavaScript in Python: what counts as JavaScript, with no recorded exceptions.
 #
 # Read by `devtools.check_no_embedded_js`, where the three rules are argued. The patterns
 # are data rather than Python constants for a reason the rule itself creates: a regular
@@ -45,13 +45,6 @@ script_tag: '<script(?:\s(?![^>]*\btype\s*=\s*["'']?application/(?:ld\+)?json)[^
 # does a regular expression's capture group.
 script_code: '[A-Za-z_$][\w$]*\s*[(.=;]'
 
-# The ratchet: each file that still embeds JavaScript, the number of sites the guard counts
-# in it, and the bead that removes them. The check fails when a count grows, when a count
-# shrinks without its entry being lowered to match, when a file not listed here offends, and
-# when a listed file no longer offends. Entries only ever leave, and the list is empty when
-# think-m0zb closes.
-#
-# Written from `--inventory` on 2026-09-14 at 477 sites in 48 files, and lowered as files
-# came off it. This comment carries no running total, because every file that leaves the list
-# would make one stale; `--inventory` prints the current totals by bead.
+# The enforced exception set. It is empty: every JavaScript site in Python fails the check.
+# `--inventory` prints any detected site so it can be moved into a checked source file.
 allowlist:

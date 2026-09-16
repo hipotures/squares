@@ -58,7 +58,9 @@ const flush = async () => {
   }
 };
 
-probe("devtools/probes/render_explainer/host_math_init.js")(wrappers);
+/** @type {(wrappers: string | undefined) => void} */ (
+  probe("devtools/probes/render_explainer/host_math_init.js")
+)(wrappers);
 /**
  * @type {{ render(el: Stand, source: string): Promise<boolean>, reserve(): () => void,
  *   batch(jobs: ReadonlyArray<() => unknown>): Promise<void>, submitted(): Promise<void>,

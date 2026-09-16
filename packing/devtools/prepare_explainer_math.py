@@ -978,6 +978,10 @@ _HEAT_DRAWS_REPORT = probe(PROBES, "prepare_explainer_math/heat_draws_report")
 _REJECTED_FONTS = probe(PROBES, "prepare_explainer_math/rejected_fonts")
 _NATIVE_FALLBACKS = probe(PROBES, "prepare_explainer_math/native_fallbacks")
 _PREPARATION_METRICS = probe(PROBES, "prepare_explainer_math/preparation_metrics")
+_SUPPRESS_HIDDEN_PRINT_HEAT = applied(
+    probe(PROBES, "prepare_explainer_math/suppress_hidden_print_heat")
+)
+_BREAK_NATIVE_FALLBACKS = probe(PROBES, "prepare_explainer_math/break_native_fallbacks")
 
 
 def _head_script(source: str, script: str) -> str:
@@ -987,7 +991,9 @@ def _head_script(source: str, script: str) -> str:
     return source[: head.end()] + f"<script>{script}</script>" + source[head.end() :]
 
 
-def check_host_math(source: str, *, browser_name: str = "chromium") -> HostMathReport:
+def check_host_math(
+    source: str, *, browser_name: str = "chromium", fault_control: bool = False
+) -> HostMathReport:
     """Check alternate-certificate printing and semantic fallback on face failure."""
     from playwright.sync_api import sync_playwright  # noqa: PLC0415
 
@@ -998,7 +1004,10 @@ def check_host_math(source: str, *, browser_name: str = "chromium") -> HostMathR
         browser = browser_type.launch(executable_path=executable)
         try:
             page = browser.new_page()
-            page.set_content(_head_script(source, _HEAT_DRAW_PROBE), wait_until="load")
+            print_probe = _HEAT_DRAW_PROBE
+            if fault_control:
+                print_probe += _SUPPRESS_HIDDEN_PRINT_HEAT
+            page.set_content(_head_script(source, print_probe), wait_until="load")
             page.wait_for_selector(READY)
             page.evaluate(SETTLED)
             page.locator('.cert-toggle button[aria-pressed="false"]').first.click()
@@ -1019,6 +1028,8 @@ def check_host_math(source: str, *, browser_name: str = "chromium") -> HostMathR
             page.set_content(_head_script(source, _REQUIRED_FONT_FAILURE), wait_until="load")
             page.wait_for_selector(READY)
             rejected = cast("int", page.evaluate(_REJECTED_FONTS))
+            if fault_control:
+                page.evaluate(_BREAK_NATIVE_FALLBACKS)
             fallbacks = cast("list[bool]", page.evaluate(_NATIVE_FALLBACKS))
             if not rejected or len(fallbacks) != 3 or not all(fallbacks):
                 findings.append("required-font failure did not restore native semantic MathML")
@@ -1031,6 +1042,16 @@ def check_host_math(source: str, *, browser_name: str = "chromium") -> HostMathR
         "native_fallbacks": sum(fallbacks),
         "findings": findings,
     }
+
+
+def host_regression_control(
+    source: str, *, browser_name: str = "chromium"
+) -> tuple[HostMathReport, bool, bool]:
+    """Run both file-backed host faults and report whether each oracle rejected it."""
+    control = check_host_math(source, browser_name=browser_name, fault_control=True)
+    print_rejected = any("print heat map" in finding for finding in control["findings"])
+    fallback_rejected = any("semantic MathML" in finding for finding in control["findings"])
+    return control, print_rejected, fallback_rejected
 
 
 def check_preparation_metrics(*, browser_name: str = "chromium") -> dict[str, object]:
@@ -1249,37 +1270,22 @@ def main(argv: list[str] | None = None) -> int:
         output["host"] = host
         report["findings"].extend(host["findings"])
         if args.self_test:
-            # The former host branches are retained as actual browser controls. A
-            # source refactor must update their construction instead of silently
-            # turning either regression back into a positive-only assertion.
-            broken = host_source.replace(
-                "pv.getClientRects().length", "!pv.closest('.cert-figure').hidden"
+            # Exercise the former host failures with file-backed runtime probes. Source
+            # formatting must not decide whether a negative control can be constructed.
+            control, print_rejected, fallback_rejected = host_regression_control(
+                host_source, browser_name=args.browser
             )
-            if (
-                broken == host_source
-                or "else delete el.dataset.kpressMathRendered;" not in broken
-            ):
-                report["findings"].append("the host negative controls could not be constructed")
-            else:
-                broken = broken.replace("else delete el.dataset.kpressMathRendered;", "")
-                control = check_host_math(broken, browser_name=args.browser)
-                print_rejected = any(
-                    "print heat map" in finding for finding in control["findings"]
+            controls["host_regressions"] = {
+                "print_rejected": print_rejected,
+                "native_fallback_rejected": fallback_rejected,
+                "report": control,
+            }
+            if not print_rejected:
+                report["findings"].append(
+                    "the hidden-certificate print control was not rejected"
                 )
-                fallback_rejected = any(
-                    "semantic MathML" in finding for finding in control["findings"]
-                )
-                controls["host_regressions"] = {
-                    "print_rejected": print_rejected,
-                    "native_fallback_rejected": fallback_rejected,
-                    "report": control,
-                }
-                if not print_rejected:
-                    report["findings"].append(
-                        "the hidden-certificate print control was not rejected"
-                    )
-                if not fallback_rejected:
-                    report["findings"].append("the native fallback control was not rejected")
+            if not fallback_rejected:
+                report["findings"].append("the native fallback control was not rejected")
     encoded = json.dumps(output, indent=2) + "\n"
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)

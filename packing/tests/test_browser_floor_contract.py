@@ -2,8 +2,8 @@
 
 The JavaScript and CSS this repository serves have the same shape of floor the Python
 does: a formatter that owns layout, a linter at zero tolerance, and a separate type gate.
-`tbd guidelines typescript-lint-format-rules` defines it and `biome.json` plus the
-`tsconfig*.json` set implement it.
+`tbd guidelines typescript-lint-format-rules` defines it and `biome.json`, the
+`tsconfig*.json` set, and the isolated probe-program manifest implement it.
 
 Two different things are checked here, and the second is the one that matters.
 
@@ -45,14 +45,14 @@ import shlex
 import shutil
 import subprocess
 from collections import Counter
-from collections.abc import Callable, Iterable, Mapping
+from collections.abc import Iterable, Mapping
 from pathlib import Path
 from typing import Any
 
 import pytest
 from nodejs_wheel import node
 
-from devtools.check_bead_tree import ISSUES, MAPPINGS, REFS, parse_aliases
+from devtools import bead_state, render_explainer
 from sqpack.cli import validate
 from sqpack.yamlio import safe_load
 
@@ -62,16 +62,21 @@ BIOME_CONFIG = REPOSITORY_ROOT / "biome.json"
 BIOME = REPOSITORY_ROOT / "node_modules/.bin/biome"
 ESLINT = REPOSITORY_ROOT / "node_modules/.bin/eslint"
 ESLINT_CONFIG = REPOSITORY_ROOT / "packages/workbench/eslint.config.js"
+ESLINT_PROBES = REPOSITORY_ROOT / "eslint.probes.json"
 ESLINT_FILE_CONFIGS = PROJECT_ROOT / "devtools/node/eslint-file-configs.mjs"
 LEFTHOOK = REPOSITORY_ROOT / "lefthook.yml"
 TSC = REPOSITORY_ROOT / "node_modules/.bin/tsc"
 TSCONFIG_BASE = REPOSITORY_ROOT / "tsconfig.base.json"
 ROOT_PACKAGE = REPOSITORY_ROOT / "package.json"
 WORKBENCH_PACKAGE = REPOSITORY_ROOT / "packages/workbench/package.json"
+PROBE_TYPECHECK = REPOSITORY_ROOT / "packing/devtools/node/typecheck-probe-groups.mjs"
+PROBE_TYPECHECK_MANIFEST = REPOSITORY_ROOT / "packing/devtools/probe-typecheck.json"
 WORKFLOWS = (
     REPOSITORY_ROOT / ".github/workflows/packing-validation.yml",
     REPOSITORY_ROOT / ".github/workflows/deep-gate.yml",
 )
+SCRIPT_ELEMENT = re.compile(r"<script(?:\s[^>]*)?>(.*?)</script>", re.DOTALL)
+SCRIPT_PLACEHOLDER = re.compile(r"\s*\{\{([A-Z_]+)\}\}\s*")
 
 #: The lint rules the shared floor names, each of which the recommended preset does NOT
 #: enable on its own. That is the whole reason they are written out: a project that only
@@ -144,10 +149,6 @@ RATCHET_FLAGS = frozenset(
 #: so every config that turns a floor flag off has to name a bead in its own text.
 TRACKER = re.compile(r"\bthink-[a-z0-9]{4}\b")
 
-#: The bead states that still track work. A closed bead tracks nothing, which is how the
-#: relaxations came to name the closed `think-4cwy` with every check green (#160 R24).
-LIVE_BEAD_STATES = frozenset({"open", "in_progress", "blocked"})
-
 #: The Biome overrides the floor carried until think-6o9n, exactly as `biome.json` wrote them:
 #: the motion-lab assets' unused-symbol rules and the classic scripts' strict-mode directive.
 #: They went when those files became modules. They are kept here only as reintroductions the
@@ -175,19 +176,20 @@ REMOVED_BIOME_OVERRIDES: tuple[dict[str, Any], ...] = (
 )
 
 #: The liveness samples: code that breaks the floor on purpose, one for each tool -- a
-#: braceless `if` for Biome, a floating Promise for ESLint, a type error for `tsc` -- with the
-#: exact byte count each must keep. They are test data rather than source, so each is named
-#: `.js.txt`: no tool's scope reaches it and no exclusion has to keep it out, which is what
-#: lets the floor have no exceptions. A test hands its tool a copy named as JavaScript under
-#: `tmp_path`, or its text on stdin. Declaring the files and their sizes keeps the tree to three
-#: minimal violations: a fourth file, or a sample that changes in either direction, fails the
-#: contract.
+#: braceless `if` for Biome, a floating Promise for ESLint, type errors for `tsc`, and an
+#: undeclared probe result member -- with the exact byte count each must keep. They are test
+#: data rather than source, so each source suffix is followed by `.txt`: no tool's scope
+#: reaches them and no exclusion has to keep them out. A test hands its tool a copy named as
+#: source under `tmp_path`. Declaring the files and their sizes keeps the tree to four minimal
+#: violations: a fifth file, or a sample that changes in either direction, fails the contract.
 FLOOR_SAMPLES = PROJECT_ROOT / "tests/fixtures/browser-floor"
 FLOOR_SAMPLE_BYTES = {
     "braceless-if.js.txt": 36,
     "floating-promise.js.txt": 67,
+    "probe-undeclared-member.mjs.txt": 162,
     "type-error.js.txt": 22,
 }
+PROBE_GROUP_SAMPLES = REPOSITORY_ROOT / "packing/tests/fixtures/probe-typecheck"
 
 #: The only exclusions Biome's `files.includes` may write: what is not ours to hold to a floor,
 #: and minified output, of which none is tracked. Any other `!` pattern skips owned code.
@@ -320,8 +322,11 @@ DECLARED_PACKAGE_MODES: dict[str, tuple[str | None, str]] = {
 #: How every file must be read by `tsc`: in its own scope, so no two files share a name by it.
 MODULE_DETECTION = "force"
 
-#: Reads one repository-relative path from the bead store, or None when it is absent.
-BeadReader = Callable[[str], str | None]
+#: Reads one repository-relative path from the bead store, or None when it is absent. The
+#: reader, the state lookup and the fixture store are `devtools.bead_state`: the guard's
+#: allowlist resolves its trackers the same way (#175 R2), and one implementation is what
+#: keeps the two from drifting.
+BeadReader = bead_state.Reader
 
 
 def _jsonc(path: Path) -> dict[str, Any]:
@@ -352,6 +357,11 @@ def _tsconfigs() -> list[Path]:
     return sorted(REPOSITORY_ROOT.glob("tsconfig*.json")) + sorted(
         (REPOSITORY_ROOT / "packages/workbench").glob("tsconfig*.json")
     )
+
+
+def _floor_configs() -> list[Path]:
+    """Every compiler-options program, including ESLint's lint-only probe program."""
+    return [*_tsconfigs(), ESLINT_PROBES]
 
 
 def _program_files(config: Path) -> set[Path]:
@@ -388,6 +398,42 @@ def _covered_scripts(configs: list[Path]) -> set[str]:
     return covered
 
 
+def _probe_typecheck_sources() -> set[str]:
+    """The scripts the probe manifest assigns to isolated type programs."""
+    manifest = json.loads(PROBE_TYPECHECK_MANIFEST.read_text(encoding="utf-8"))
+    sources: set[str] = set()
+    for specification in manifest["probeRoots"]:
+        root = REPOSITORY_ROOT / specification["path"]
+        for group in root.iterdir():
+            if group.is_dir():
+                sources.update(
+                    path.relative_to(REPOSITORY_ROOT).as_posix() for path in group.rglob("*.js")
+                )
+    for program in manifest.get("standalonePrograms", []):
+        sources.update(program["sources"])
+    return sources
+
+
+def _probe_typecheck_files() -> set[str]:
+    """Every explicit source and declaration input in the isolated programs."""
+    manifest = json.loads(PROBE_TYPECHECK_MANIFEST.read_text(encoding="utf-8"))
+    files = _probe_typecheck_sources()
+    for specification in manifest["probeRoots"]:
+        root = REPOSITORY_ROOT / specification["path"]
+        files.update(
+            path.relative_to(REPOSITORY_ROOT).as_posix()
+            for group in root.iterdir()
+            if group.is_dir()
+            for path in group.rglob("*.d.ts")
+        )
+        files.update(specification.get("commonDeclarations", []))
+        for declarations in specification.get("dependencies", {}).values():
+            files.update(declarations)
+    for program in manifest.get("standalonePrograms", []):
+        files.update(program.get("declarations", []))
+    return files
+
+
 def _relaxed_flags(config: Path) -> list[str]:
     """Every option the config sets that lowers the type floor."""
     options = _jsonc(config).get("compilerOptions", {})
@@ -422,75 +468,13 @@ def _require_tool(tool: Path) -> None:
 # Bead store
 
 
-def _bead_store() -> BeadReader | None:
-    """A reader over the bead store: the local sync worktree, else the sync branch.
-
-    Read straight from the store rather than through the `tbd` binary, which CI does not
-    install. Every CI job that clones full history fetches `origin/tbd-sync`.
-    """
-    common = _git("rev-parse", "--path-format=absolute", "--git-common-dir")
-    if common.returncode == 0:
-        worktree = Path(common.stdout.strip()) / "tbd" / "data-sync-worktree"
-        if (worktree / MAPPINGS).is_file():
-
-            def from_worktree(path: str) -> str | None:
-                target = worktree / path
-                return target.read_text(encoding="utf-8") if target.is_file() else None
-
-            return from_worktree
-    for ref in REFS:
-        if _git("cat-file", "-e", f"{ref}:{MAPPINGS}").returncode == 0:
-
-            def from_ref(path: str, ref: str = ref) -> str | None:
-                shown = _git("show", f"{ref}:{path}")
-                return shown.stdout if shown.returncode == 0 else None
-
-            return from_ref
-    return None
-
-
-def _bead_state(alias: str, read: BeadReader) -> str | None:
-    """The status of the bead a `think-xxxx` alias names, or None if there is no such bead."""
-    tail = parse_aliases(read(MAPPINGS) or "").get(alias.removeprefix("think-"))
-    if tail is None:
-        return None
-    text = read(f"{ISSUES}/is-{tail}.md")
-    if text is None or not text.startswith("---\n"):
-        return None
-    front = safe_load(text[4 : text.index("\n---", 4)])
-    return str(front.get("status")) if isinstance(front, dict) else None
-
-
-def _dead_trackers(aliases: Iterable[str], read: BeadReader) -> list[str]:
-    """Each named tracker that is not a live bead, with what it is instead."""
-    faults: list[str] = []
-    for alias in sorted(set(aliases)):
-        state = _bead_state(alias, read)
-        if state is None:
-            faults.append(f"{alias}: no such bead")
-        elif state not in LIVE_BEAD_STATES:
-            faults.append(f"{alias}: {state}")
-    return faults
-
-
 def _require_bead_store() -> BeadReader:
-    read = _bead_store()
-    if read is not None:
-        return read
-    message = "no bead store is reachable (no tbd sync worktree, no tbd-sync branch)"
-    if os.environ.get("CI"):
-        pytest.fail(f"{message}; the job must fetch full history to check trackers")
-    pytest.skip(message)
-
-
-def _fixture_store(states: Mapping[str, str]) -> BeadReader:
-    """A bead store holding one bead per alias, in the given state."""
-    files = {MAPPINGS: "".join(f"{alias}: tail{alias}\n" for alias in states)}
-    for alias, state in states.items():
-        files[f"{ISSUES}/is-tail{alias}.md"] = (
-            f"---\nid: is-tail{alias}\nstatus: {state}\n---\n"
-        )
-    return files.get
+    try:
+        return bead_state.require_store()
+    except bead_state.UnavailableError as error:
+        if os.environ.get("CI"):
+            pytest.fail(f"{error}; the job must fetch full history to check trackers")
+        return pytest.skip(str(error))
 
 
 # ---------------------------------------------------------------------------------------
@@ -712,6 +696,15 @@ def _outside_scope(tracked: Iterable[str], processed: set[str]) -> list[str]:
     return sorted(path for path in tracked if path not in processed)
 
 
+def _literal_inline_scripts(source: str) -> list[str]:
+    """Script bodies that are executable source rather than one asset placeholder."""
+    return [
+        body.strip().splitlines()[0]
+        for body in SCRIPT_ELEMENT.findall(source)
+        if SCRIPT_PLACEHOLDER.fullmatch(body) is None
+    ]
+
+
 # ---------------------------------------------------------------------------------------
 # Workflows
 
@@ -773,6 +766,8 @@ def test_biome_names_every_floor_rule() -> None:
     for suffix in (*SCRIPT_SUFFIXES, *STYLE_SUFFIXES):
         assert f"**/*{suffix}" in includes, f"Biome does not include {suffix} source"
     assert "packages/workbench/**/*.json" in includes
+    assert "eslint.probes.json" in includes
+    assert "packing/devtools/probe-typecheck.json" in includes
 
 
 def test_the_node_toolchain_is_exactly_pinned_and_runtime_bounded() -> None:
@@ -788,6 +783,20 @@ def test_the_node_toolchain_is_exactly_pinned_and_runtime_bounded() -> None:
         "typescript": "6.0.2",
         "typescript-eslint": "8.68.0",
     }
+
+
+def test_the_root_typecheck_script_names_every_root_type_program() -> None:
+    """The convenience command covers the same root programs as the official gate."""
+    script = _jsonc(ROOT_PACKAGE)["scripts"]["typecheck"]
+    observed = set(re.findall(r"\btsc -p (tsconfig(?:\.[a-z-]+)?\.json)\b", script))
+    expected = {
+        config.name
+        for config in _tsconfigs()
+        if config.parent == REPOSITORY_ROOT and config != TSCONFIG_BASE
+    }
+    assert observed == expected
+    assert "npm run typecheck:packing-probes" in script
+    assert "npm run typecheck --workspace @squares/workbench" in script
 
 
 def test_biome_has_no_override_and_no_rule_turned_down() -> None:
@@ -924,7 +933,12 @@ def test_a_changed_or_sourced_sample_tree_is_refused(tmp_path: Path) -> None:
     for name in FLOOR_SAMPLE_BYTES:
         shutil.copyfile(FLOOR_SAMPLES / name, tmp_path / name)
     shutil.copyfile(FLOOR_SAMPLES / "type-error.js.txt", tmp_path / "type-error.js")
-    declared = {"braceless-if.js.txt": 35, "floating-promise.js.txt": 68, "gone.js.txt": 1}
+    declared = {
+        "braceless-if.js.txt": 35,
+        "floating-promise.js.txt": 68,
+        "gone.js.txt": 1,
+        "probe-undeclared-member.mjs.txt": 162,
+    }
     assert _floor_sample_faults(tmp_path, declared) == [
         "holds type-error.js, which is not declared",
         "holds type-error.js.txt, which is not declared",
@@ -948,7 +962,7 @@ def test_the_type_floor_is_declared_once_and_extended() -> None:
         "tsconfig.base.json does not give every file its own scope; a program that reads "
         "files as scripts lets them share top-level names by scope"
     )
-    for config in _tsconfigs():
+    for config in _floor_configs():
         if config.name == "tsconfig.base.json":
             continue
         extends = _jsonc(config).get("extends")
@@ -960,7 +974,7 @@ def test_the_type_floor_is_declared_once_and_extended() -> None:
 
 def test_no_program_relaxes_a_flag_outside_the_ratchet() -> None:
     """Only the declared ratchet flags may be off, tracker or no tracker."""
-    for config in _tsconfigs():
+    for config in _floor_configs():
         if config == TSCONFIG_BASE:
             continue
         beyond = sorted(set(_relaxed_flags(config)) - RATCHET_FLAGS)
@@ -1002,7 +1016,7 @@ def test_a_program_reading_files_as_scripts_is_refused(tmp_path: Path) -> None:
 def test_every_relaxed_flag_names_an_open_tracker() -> None:
     """Floor rule 8: legacy code ratchets toward strict. A flag turned off without a live
     tracked issue is not a ratchet, it is a lower floor."""
-    relaxed = {config: _relaxed_flags(config) for config in _tsconfigs()}
+    relaxed = {config: _relaxed_flags(config) for config in _floor_configs()}
     relaxed = {config: flags for config, flags in relaxed.items() if flags}
     for config, flags in relaxed.items():
         assert TRACKER.search(config.read_text(encoding="utf-8")), (
@@ -1013,15 +1027,17 @@ def test_every_relaxed_flag_names_an_open_tracker() -> None:
         config.name: TRACKER.findall(config.read_text(encoding="utf-8")) for config in relaxed
     }
     for source, aliases in named.items():
-        assert _dead_trackers(aliases, read) == [], f"{source} names a tracker that is not open"
+        assert bead_state.dead_trackers(aliases, read) == [], (
+            f"{source} names a tracker that is not open"
+        )
 
 
 def test_a_closed_or_unknown_tracker_is_refused(tmp_path: Path) -> None:
     """The negative control for the tracker check, on a fixture store, so it runs wherever
     the real store does not."""
-    read = _fixture_store({"aaaa": "open", "bbbb": "in_progress", "cccc": "closed"})
-    assert _dead_trackers(["think-aaaa", "think-bbbb"], read) == []
-    assert _dead_trackers(["think-aaaa", "think-cccc", "think-zzzz"], read) == [
+    read = bead_state.fixture_store({"aaaa": "open", "bbbb": "in_progress", "cccc": "closed"})
+    assert bead_state.dead_trackers(["think-aaaa", "think-bbbb"], read) == []
+    assert bead_state.dead_trackers(["think-aaaa", "think-cccc", "think-zzzz"], read) == [
         "think-cccc: closed",
         "think-zzzz: no such bead",
     ]
@@ -1031,9 +1047,8 @@ def test_a_closed_or_unknown_tracker_is_refused(tmp_path: Path) -> None:
         encoding="utf-8",
     )
     assert _relaxed_flags(config) == ["strictNullChecks"]
-    assert _dead_trackers(TRACKER.findall(config.read_text(encoding="utf-8")), read) == [
-        "think-cccc: closed"
-    ]
+    named = TRACKER.findall(config.read_text(encoding="utf-8"))
+    assert bead_state.dead_trackers(named, read) == ["think-cccc: closed"]
 
 
 def test_an_untracked_relaxation_is_detected(tmp_path: Path) -> None:
@@ -1048,10 +1063,96 @@ def test_an_untracked_relaxation_is_detected(tmp_path: Path) -> None:
 def test_every_first_party_script_is_in_a_type_program() -> None:
     """A file under the lint floor but in no `tsconfig` include is half covered, and the
     half that is missing is the one that catches type errors."""
-    covered = _covered_scripts(_tsconfigs())
+    covered = _covered_scripts(_tsconfigs()) | _probe_typecheck_files()
     tracked = _tracked(*(f"*{suffix}" for suffix in SCRIPT_SUFFIXES))
     uncovered = sorted(set(tracked) - covered)
     assert not uncovered, f"tracked JavaScript in no type-check program: {uncovered}"
+
+
+def test_the_probe_checker_and_contract_name_the_same_sources() -> None:
+    """A new group is discovered automatically, while a stale manifest/tool join cannot
+    make the coverage contract claim a source the executable gate never reads."""
+    _require_tool(TSC)
+    completed = node(
+        [str(PROBE_TYPECHECK), "--list-sources"],
+        return_completed_process=True,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0, completed.stderr
+    assert set(json.loads(completed.stdout)) == _probe_typecheck_sources()
+
+
+def test_a_probe_cannot_see_a_foreign_groups_ambient_types(tmp_path: Path) -> None:
+    """Negative control: the old monolithic program accepted this exact dependency."""
+    _require_tool(TSC)
+    alpha = tmp_path / "probes/alpha"
+    beta = tmp_path / "probes/beta"
+    alpha.mkdir(parents=True)
+    beta.mkdir(parents=True)
+    shutil.copyfile(PROBE_GROUP_SAMPLES / "alpha-types.txt", alpha / "types.d.ts")
+    shutil.copyfile(PROBE_GROUP_SAMPLES / "alpha-read.txt", alpha / "read.js")
+    shutil.copyfile(PROBE_GROUP_SAMPLES / "beta-read.txt", beta / "read.js")
+    (tmp_path / "manifest.json").write_text(
+        json.dumps({"probeRoots": [{"path": "probes"}]}), encoding="utf-8"
+    )
+    (tmp_path / "tsconfig.json").write_text(
+        json.dumps(
+            {
+                "compilerOptions": {
+                    "allowJs": True,
+                    "checkJs": True,
+                    "noEmit": True,
+                    "strict": True,
+                    "target": "ES2022",
+                    "lib": ["ES2022", "DOM"],
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+    completed = node(
+        [
+            str(PROBE_TYPECHECK),
+            "--root",
+            str(tmp_path),
+            "--manifest",
+            "manifest.json",
+            "--config",
+            "tsconfig.json",
+        ],
+        return_completed_process=True,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode != 0
+    stderr = completed.stderr
+    assert isinstance(stderr, str)
+    assert "probes/beta/read.js" in stderr
+    assert "Cannot find name 'AlphaOnly'" in stderr
+
+
+def test_the_explainer_shell_owns_no_inline_programs() -> None:
+    """HTML is not a Biome/ESLint/tsc input, so every executable body comes from a file."""
+    source = render_explainer.TEMPLATE.read_text(encoding="utf-8")
+    assert _literal_inline_scripts(source) == []
+    placeholders = {
+        match.group(1)
+        for body in SCRIPT_ELEMENT.findall(source)
+        if (match := SCRIPT_PLACEHOLDER.fullmatch(body)) is not None
+    }
+    assert placeholders == {
+        "THEME_BOOTSTRAP",
+        "KATEX_JS",
+        *render_explainer.INLINE_SCRIPT_ASSETS,
+    }
+
+
+def test_a_literal_explainer_program_is_refused() -> None:
+    """Negative control: a program written back into the HTML cannot escape the floor."""
+    source = render_explainer.TEMPLATE.read_text(encoding="utf-8")
+    planted = source.replace("{{NATIVE_MATH_METRICS}}", "literal program", 1)
+    assert _literal_inline_scripts(planted) == ["literal program"]
 
 
 def test_the_package_program_is_required_for_package_typescript() -> None:
@@ -1423,3 +1524,33 @@ def test_the_gate_rejects_an_unformatted_file(tmp_path: Path, source: str) -> No
     output = done.stdout + done.stderr
     assert done.returncode != 0, f"biome ci accepted an unformatted {source}"
     assert "format" in output, f"biome ci failed, but not on formatting:\n{output}"
+
+
+def test_the_probe_loader_refuses_an_undeclared_member(tmp_path: Path) -> None:
+    """A probe result stays unknown until its caller states the exact shape it consumes."""
+    _require_tool(TSC)
+    loader = REPOSITORY_ROOT / "packing/tests/node/probe.mjs"
+    shutil.copyfile(FLOOR_SAMPLES / "probe-undeclared-member.mjs.txt", tmp_path / "sample.mjs")
+    shutil.copyfile(loader, tmp_path / "probe.mjs")
+    (tmp_path / "tsconfig.json").write_text(
+        json.dumps(
+            {
+                "extends": str(REPOSITORY_ROOT / "tsconfig.devtools-node.json"),
+                "compilerOptions": {
+                    "typeRoots": [str(REPOSITORY_ROOT / "node_modules/@types")]
+                },
+                "include": ["sample.mjs"],
+            }
+        ),
+        encoding="utf-8",
+    )
+    done = subprocess.run(
+        [str(TSC), "-p", "tsconfig.json"],
+        check=False,
+        capture_output=True,
+        text=True,
+        cwd=tmp_path,
+    )
+    output = done.stdout + done.stderr
+    assert done.returncode != 0, "tsc accepted an undeclared member on a narrowed probe"
+    assert "Property 'undeclared' does not exist on type '{ declared: number; }'" in output

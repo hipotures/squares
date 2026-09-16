@@ -1504,9 +1504,10 @@ def _browser_floor(context: Context) -> str:
     `--error-on-warnings` because plain `ci` passes on warnings and this floor configures
     warning-severity rules. Fixing is `npm run lint:fix`, at a commit hook or by hand.
 
-    The type gate is separate from the lint gate (floor rule 3) and runs once per program:
-    the relaxed legacy programs stay separate so that no relaxation reaches a file outside
-    them, and the module-based workbench package has its own strict program.
+    The type gate is separate from the lint gate (floor rule 3). Legacy global programs
+    remain separate, and page probes are split one program per probe group so one group's
+    ambient declarations cannot hide a foreign dependency. The module-based workbench
+    package has its own strict program.
 
     Node is not a `uv` dependency, so this asks for the pinned local binaries rather than
     anything on PATH. `npm ci` at the repository root is what puts them there.
@@ -1532,11 +1533,9 @@ def _browser_floor(context: Context) -> str:
             (
                 str(eslint),
                 # The whole repository, as Biome is given it. The config holds every owned
-                # JavaScript file to one block and ignores only what is not ours. A list of
-                # directories here had to grow with every new tree -- the spike and
-                # explainer extractions added two -- and a tree it missed was outside the
-                # promise floor with the gate green: `npm run lint`'s shorter copy named
-                # three of the eight.
+                # JavaScript file to the promise rules and ignores only what is not ours.
+                # A directory list here had to grow with every new tree and repeatedly left
+                # checked source outside the promise floor while the gate stayed green.
                 ".",
                 "--config",
                 "packages/workbench/eslint.config.js",
@@ -1548,6 +1547,7 @@ def _browser_floor(context: Context) -> str:
                 for path in type_programs
                 if path != base
             ),
+            (npm, "run", "typecheck:packing-probes"),
             (npm, "test", "--workspace", "@squares/workbench"),
         ),
         cwd=REPOSITORY_ROOT,
@@ -1567,7 +1567,12 @@ def _browser_code_in_files(context: Context) -> str:
     return _commands(
         context,
         (
-            (sys.executable, "-m", "devtools.check_no_embedded_js"),
+            # `--since origin/main` adds the half of the ratchet the YAML's "Entries only
+            # ever leave" used to assert without checking: no entry main does not have, and
+            # no count above main's (#175 R2). A revision with no policy file -- anything
+            # before the guard landed -- is reported and not compared, so this is a note
+            # rather than a failure in a checkout that has not fetched main.
+            (sys.executable, "-m", "devtools.check_no_embedded_js", "--since", "origin/main"),
             (sys.executable, "-m", "devtools.check_probes"),
         ),
     )
@@ -2353,6 +2358,13 @@ def _threshold_limit_record_1440(context: Context) -> str:
     return _threshold_limit_record(context, 1440, "t-026-dilation-limit-corollary.json")
 
 
+def _threshold_compression_admission(context: Context) -> str:
+    """Replay Route S's cheap, target-blind admission contract."""
+    output = _module(context, "devtools.admit_threshold_compression", "--check")
+    _require_text(output, "Route S compression checkpoint check passed")
+    return output
+
+
 def _verifier_limits(context: Context) -> str:
     output = _module(context, "cases.trump11.verifier_limits")
     _require_text(output, "delta = 1e-100  REJECT", "tol=1e-09")
@@ -3066,9 +3078,9 @@ STEPS: tuple[Step, ...] = (
     ),
     Step("lint floor (ruff)", _lint_floor, fast=True, records=True, touches=_ANY_PYTHON),
     Step("type floor (basedpyright)", _type_floor, fast=True, touches=_ANY_PYTHON),
-    # Under two seconds for 190 files: Biome is one compiled binary and the three
-    # type-check programs are small. Cheap enough for the edit tier, but `fast` rather
-    # than unconditional because it needs a Node toolchain the Python tiers do not.
+    # Biome is one compiled binary and the type programs remain small enough for the edit
+    # tier. `fast` rather than unconditional because it needs a Node toolchain the Python
+    # tiers do not.
     Step(
         "browser floor (biome, eslint, tsc, node:test)",
         _browser_floor,
@@ -3076,6 +3088,8 @@ STEPS: tuple[Step, ...] = (
         frontend=True,
         touches=(
             "biome.json",
+            "eslint.probes.json",
+            "packing/devtools/probe-typecheck.json",
             "tsconfig*.json",
             "package.json",
             "**/package.json",
@@ -3539,6 +3553,23 @@ STEPS: tuple[Step, ...] = (
             "packing/devtools/decide_certificate.py",
             "packing/devtools/generate_known_best_n011_rational_control.py",
             "packing/devtools/check_rational_witness_independent.py",
+        ),
+    ),
+    Step(
+        "Route S compression admission checkpoint is consistent",
+        _threshold_compression_admission,
+        fast=True,
+        records=True,
+        touches=(
+            *_CORE,
+            "packing/cases/n11_threshold_certificate/certificate.json",
+            "packing/cases/n11_threshold_certificate/certificate-191-50-net720.json",
+            "packing/cases/n11_threshold_certificate/t-026-net720-dilation-limit-corollary.json",
+            "packing/cases/n11_threshold_certificate/certificate-191-50-net1440.json",
+            "packing/cases/n11_threshold_certificate/t-026-dilation-limit-corollary.json",
+            "packing/cases/n11_threshold_certificate/route-s-compression-admission.json",
+            "packing/cases/n11_threshold_certificate/route-s-compression-admission-receipt.json",
+            "packing/devtools/admit_threshold_compression.py",
         ),
     ),
     # The whole grid replay, off the pull-request surface since 2026-09-07 and on its own

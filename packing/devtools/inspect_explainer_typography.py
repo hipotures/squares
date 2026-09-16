@@ -73,7 +73,7 @@ class MathContext(TypedDict):
     """The outer math em compared with its surrounding text, excluding script sizes."""
 
     role: str
-    source: str
+    source: str | None
     size: float
     context_size: float
     family: str
@@ -620,7 +620,10 @@ def self_test(path: Path = PAGE) -> None:
                     raise SystemExit(
                         f"{medium} baseline self-test rejected valid math: {failures}"
                     )
-                if not set(sources) <= {row["source"] for row in baselines}:
+                observed_sources = {row["source"] for row in baselines}
+                if None in observed_sources:
+                    raise SystemExit("baseline self-test observed math without a source")
+                if not set(sources) <= observed_sources:
                     raise SystemExit("baseline self-test did not observe every real KaTeX case")
             fixture_caption = page.locator("[data-baseline-fixture]")
             prepared_fixture = fixture_caption.inner_html()

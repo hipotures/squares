@@ -22,9 +22,10 @@ const nodes = [
   make("system-serif system-sans", "10"),
 ];
 
-const math = probe("devtools/probes/math/library.js")();
-/** @type {(nodes: object[], o: { math: object }) => string[]} */
-const activeMathText = probe("devtools/probes/check_print_layout/active_math_text.js");
+const math = /** @type {() => object} */ (probe("devtools/probes/math/library.js"))();
+const activeMathText = /** @type {(nodes: object[], o: { math: object }) => string[]} */ (
+  probe("devtools/probes/check_print_layout/active_math_text.js")
+);
 /** @param {object[]} matched */
 const terms = (matched) => activeMathText(matched, { math });
 

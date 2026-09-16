@@ -31,7 +31,9 @@ Object.assign(globalThis, {
   },
 });
 
-/** @type {(argument: [string[], string[], (el: object) => string]) => object[]} */
-const requests = probe("devtools/probes/sans_instances/requests.js");
+const requests =
+  /** @type {(argument: [string[], string[], (el: object) => string]) => object[]} */ (
+    probe("devtools/probes/sans_instances/requests.js")
+  );
 const rows = requests([["Print Sans"], pseudos, () => "div[0]"]);
 process.stdout.write(JSON.stringify({ rows, read }));

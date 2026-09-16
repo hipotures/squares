@@ -1,9 +1,9 @@
-// The shell's `scheduleHeat` in `explainer-shell.html`: expensive canvas work starts after the
+// The checked `scheduleHeat` in `explainer/certificate.js`: expensive canvas work starts after the
 // required math settles and a paint occurs, only one heat-map task may be pending, a
 // certificate hidden since scheduling is not drawn, and a completed heat map is reused.
-// Evaluated from the template itself, so the test reads the script the page ships.
+// Evaluated from the source file, so the test reads the script the page ships.
 //
-// Usage: node heat-map-schedule.mjs <explainer-shell.html>
+// Usage: node heat-map-schedule.mjs <explainer/certificate.js>
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { runInThisContext } from "node:vm";
@@ -12,7 +12,7 @@ const [template] = /** @type {[string]} */ (process.argv.slice(2));
 const source = readFileSync(template, "utf8");
 const start = source.indexOf("function scheduleHeat() {");
 assert.notEqual(start, -1, "the shell has no heat-map scheduler");
-const end = source.indexOf("\nfunction toWorld(", start);
+const end = source.indexOf("\n  function toWorld(", start);
 assert.notEqual(end, -1, "the heat-map scheduler has no end");
 
 /** @type {((value?: unknown) => void) | undefined} */

@@ -16,8 +16,9 @@ Object.assign(globalThis, {
 });
 let done = false;
 
-/** @type {() => Promise<void>} */
-const settle = probe("devtools/probes/render_explainer_pdf/settled.js")();
+const settle = /** @type {() => () => Promise<void>} */ (
+  probe("devtools/probes/render_explainer_pdf/settled.js")
+)();
 const settled = settle().then(() => {
   done = true;
 });

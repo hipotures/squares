@@ -742,6 +742,12 @@ Font and page-count checks inspect that stored PDF. The workflow uploads the che
 bytes unchanged; deployment waits for the print-layout and browser checks.
 A pull request runs the same build without deploying, so a render that breaks fails
 review rather than the next deploy.
+It builds only the pages its changes can affect: the workflow’s `scope` job runs
+`devtools.pages_scope`, which reads each builder’s `RENDER_INPUTS` and the tools the
+workflow runs for that page, and a page none of the changed files touches is skipped by
+a job named for the reason.
+`pages-required` is the aggregate a branch rule would require; it passes such a skip and
+nothing else.
 
 Publication uses `python -m devtools.render_explainer --prepare-math` after installing
 the locked Playwright Chromium.
@@ -758,17 +764,22 @@ not need a browser. The canonical
 [font and math loading architecture](vendor/kpress/docs/project/architecture/arch-2026-09-08-font-and-math-loading.md)
 lives in KPress, alongside the shared runtime’s public API documentation.
 
-The prepare job shares one page artifact with the Chromium print checks and the
-Firefox/WebKit loading checks.
+The prepare job renders the page twice at once, requires the two renders to agree, and
+shares one page artifact with the Chromium PDF, print, typography, screen and geometry
+jobs and the Firefox/WebKit loading and geometry jobs, which run in parallel.
 Deployment waits for all of them.
-The build job selects Node 24.18.0, installs the root lockfile with scripts disabled,
-and builds the typed workbench package into the self-contained `/workbench/` page.
+The workbench job selects Node 24.18.0, installs the root lockfile with scripts
+disabled, and builds the typed workbench package into the self-contained `/workbench/`
+page, beside `prepare` rather than after it.
+The publish job puts the prepared page, the checked PDF and the workbench back into one
+tree; only a push to `main` uploads that tree to Pages.
 Before drawing PDF bytes, the exporter checks that visible math is typeset; a completed
 font-error fallback that exposes literal TeX fails this check.
 Readable native MathML fallback is accepted by that check and remains subject to the
 separate PDF font policy.
 Pages exercises the production exporter with normal math and injected font errors and
-timeouts before it draws the publication candidate.
+timeouts once it has drawn the publication candidate: the normal-math control reads that
+PDF rather than drawing it again, and each fault control drives a draw of its own.
 These browser controls require the prepared page and pinned Chromium in Pages; the
 Python-only validation jobs leave them to that dedicated invocation.
 The PDF command `--check-artifact` requires an existing PDF and never rewrites it;
@@ -962,12 +973,17 @@ An init script takes no argument and so no handle; it reads the global an earlie
 script installs, as `check_math_loading.MATH_LIBRARY_INIT` installs the library for
 `FIRST_PAINT_SCRIPT`.
 
-The probes are in Biome’s scope, in the strict `tsconfig.packing-probes.json` program,
-and under the ESLint promise overlay.
-A Node script a Python tool runs goes in `packing/devtools/node/`, and one a test runs
-goes in `packing/tests/node/<test module>/`, both under `tsconfig.devtools-node.json`. A
-test script that exercises a probe against stand-ins loads the probe file itself through
-`packing/tests/node/probe.mjs`, so what runs under Node is what runs in the page.
+The probes are in Biome’s scope and under the ESLint promise overlay.
+`packing/devtools/probe-typecheck.json` assigns each group to its own strict TypeScript
+program, so ambient declarations in an unrelated group cannot satisfy a probe.
+The manifest names each intentional shared declaration, and
+`packing/devtools/node/typecheck-probe-groups.mjs` discovers every probe in those
+groups.
+A Node script a Python tool runs goes in `packing/devtools/node/`, and one a test
+runs goes in `packing/tests/node/<test module>/`, both under
+`tsconfig.devtools-node.json`. A test script that exercises a probe against stand-ins
+loads the probe file itself through `packing/tests/node/probe.mjs`, so what runs under
+Node is what runs in the page.
 The workbench package’s `workbench_tools.probes` is the same loader bound to
 `packages/workbench/probes/`.
 
@@ -977,11 +993,9 @@ Two checks hold the rule, and both run in `--edit` and on every pull request as 
 - `devtools.check_no_embedded_js` parses every Python file and fails on a built script
   argument to Playwright’s evaluate family, a string that matches a JavaScript
   signature, or a `<script>` body written in Python.
-  Its signatures and its ratchet allowlist are in
-  `packing/devtools/embedded-javascript.yaml`. The allowlist names each file that still
-  offends, its site count, and the bead that removes them; the check fails when a count
-  moves in either direction without the entry moving with it, and when a listed file is
-  clean. `--inventory` prints every site.
+  Its signatures and enforced empty allowlist are in
+  `packing/devtools/embedded-javascript.yaml`. Any detected site fails the check;
+  `--inventory` prints every site.
 - `devtools.check_probes` fails on a probe that does not evaluate to a function, one no
   Python file beside its tree names, and a name no file answers.
 

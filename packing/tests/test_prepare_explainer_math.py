@@ -544,3 +544,35 @@ def test_checker_report_cannot_overwrite_its_input_html(tmp_path: Path) -> None:
         prepare_explainer_math.main([str(source), "--output", str(source)])
     assert error.value.code == 2
     assert source.read_text() == "prepared HTML"
+
+
+def test_host_fault_control_is_independent_of_rendered_source_formatting(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The self-test uses checked probes, not exact JavaScript spellings in HTML."""
+    source = '<html data-render-format="braced"><body>formatted source</body></html>'
+    calls: list[tuple[str, str, bool]] = []
+
+    def check(
+        candidate: str, *, browser_name: str = "chromium", fault_control: bool = False
+    ) -> prepare_explainer_math.HostMathReport:
+        calls.append((candidate, browser_name, fault_control))
+        return {
+            "print_visible": ["prove-a", "prove-b"],
+            "heat_draws": ["prove-a"],
+            "rejected_requests": 3,
+            "native_fallbacks": 0,
+            "findings": [
+                "print heat map does not match the CSS-visible certificate",
+                "required-font failure did not restore native semantic MathML",
+            ],
+        }
+
+    monkeypatch.setattr(prepare_explainer_math, "check_host_math", check)
+    report, print_rejected, fallback_rejected = prepare_explainer_math.host_regression_control(
+        source, browser_name="webkit"
+    )
+    assert calls == [(source, "webkit", True)]
+    assert len(report["findings"]) == 2
+    assert print_rejected is True
+    assert fallback_rejected is True

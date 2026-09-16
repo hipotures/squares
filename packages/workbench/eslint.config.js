@@ -12,8 +12,10 @@ import tseslint from "typescript-eslint";
 // reads the configuration ESLint resolves for every tracked file and fails any difference.
 //
 // **Types come from the type gate's programs**: every `tsconfig*.json` at the root but the shared
-// base, found here rather than listed, and each package program below. A file is typed as `tsc`
-// checks it, and a file in no program fails to parse, as it would be missing from the type gate.
+// base, found here rather than listed, and each package program below. The broad probe-only
+// project gives the promise rules type information; the type gate separately checks those probes
+// one group at a time so ambient declarations cannot leak between groups. A file in no program
+// fails to parse, as it would be missing from the type gate.
 //
 // **To bring a new tree under the floor**, add it to the `include` of the type program that
 // should check it: one line, in that `tsconfig`, and nothing here. A new root program is found
@@ -32,6 +34,7 @@ const TYPE_PROGRAMS = [
     .sort(),
   ...PACKAGE_PROGRAMS,
 ];
+const LINT_PROGRAMS = [...TYPE_PROGRAMS, "eslint.probes.json"];
 const NOT_OURS = [
   "vendor/**",
   "**/node_modules/**",
@@ -47,7 +50,7 @@ export default [
     files: ["**/*.js", "**/*.jsx", "**/*.mjs", "**/*.cjs"],
     languageOptions: {
       parser: tseslint.parser,
-      parserOptions: { project: TYPE_PROGRAMS, tsconfigRootDir: REPOSITORY },
+      parserOptions: { project: LINT_PROGRAMS, tsconfigRootDir: REPOSITORY },
     },
     plugins: { "@typescript-eslint": tseslint.plugin },
     rules: {

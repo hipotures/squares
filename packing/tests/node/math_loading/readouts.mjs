@@ -38,9 +38,11 @@ const targets = [
   { id: "kslider-example", value: "7" },
 ];
 
-const math = probe("devtools/probes/math/library.js")();
-/** @type {{ expected_source: string, actual_value: string, source: string, state_matches: boolean, sans: boolean, supported: boolean }[]} */
-const readouts = probe("devtools/probes/check_math_loading/readouts.js")({ targets, math });
+const math = /** @type {() => object} */ (probe("devtools/probes/math/library.js"))();
+const readouts =
+  /** @type {(input: { targets: typeof targets, math: object }) => { expected_source: string, actual_value: string, source: string, state_matches: boolean, sans: boolean, supported: boolean }[]} */ (
+    probe("devtools/probes/check_math_loading/readouts.js")
+  )({ targets, math });
 const [angle, direction] = /** @type {[(typeof readouts)[number], (typeof readouts)[number]]} */ (
   readouts
 );

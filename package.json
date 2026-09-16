@@ -19,6 +19,7 @@
     "lint:fix": "biome check --write --unsafe .",
     "lint:promises": "npm run lint:promises --workspace @squares/workbench",
     "format:check": "biome format .",
-    "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.probes.json && tsc -p tsconfig.motion-lab.json && tsc -p tsconfig.packing-probes.json && tsc -p tsconfig.devtools-node.json && npm run typecheck --workspace @squares/workbench"
+    "typecheck:packing-probes": "node packing/devtools/node/typecheck-probe-groups.mjs",
+    "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.probes.json && tsc -p tsconfig.motion-lab.json && tsc -p tsconfig.devtools-node.json && tsc -p tsconfig.explainer.json && npm run typecheck:packing-probes && npm run typecheck --workspace @squares/workbench"
   }
 }

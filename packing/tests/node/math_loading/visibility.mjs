@@ -30,8 +30,9 @@ const element = (style = {}, width = 100, height = 20, parent = null) => ({
   getBoundingClientRect: () => ({ left: 0, top: 0, right: width, bottom: height, width, height }),
 });
 
-/** @type {(node: Stand) => boolean} */
-const exposed = probe("devtools/probes/math/library.js")().exposed;
+const exposed = /** @type {() => { exposed(node: Stand): boolean }} */ (
+  probe("devtools/probes/math/library.js")
+)().exposed;
 assert.equal(exposed(element()), true);
 assert.equal(exposed(element({}, 1, 1)), false, "clipped accessibility text is not visible");
 assert.equal(exposed(element({ clipPath: "inset(50%)" })), false);

@@ -17,7 +17,7 @@ const PACKING = new URL("../../", import.meta.url);
  * The value of the probe at `packing/<path>`.
  *
  * @param {string} path relative to `packing/`, as in `"devtools/probes/math/library.js"`
- * @returns {any} whatever the file evaluates to; each test states the shape it expects
+ * @returns {unknown} whatever the file evaluates to; each test narrows the shape it expects
  */
 export function probe(path) {
   const file = fileURLToPath(new URL(path, PACKING));

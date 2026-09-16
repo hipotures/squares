@@ -67,6 +67,11 @@ DIRECTORY = "probes"
 SUFFIX = ".js"
 #: The loader's own name, in both modules that export it.
 LOADER = "probe"
+#: The keyword the loader itself takes the probe's name by. A name passed this way reached
+#: neither branch of `name_faults` and failed in the browser instead (#175 R6). Only the
+#: loader's own call is read this way: a wrapper takes the name positionally and forwards
+#: `**argument` to the page, where `name=` is a value the probe reads, not a probe.
+NAME_KEYWORD = "name"
 
 
 def probe_trees(files: Iterable[str]) -> dict[str, list[str]]:
@@ -95,6 +100,22 @@ def callers(root: str, python: Iterable[str]) -> list[str]:
     return [path for path in python if PurePosixPath(path).is_relative_to(base)]
 
 
+def node_callers(root: str, scripts: Iterable[str]) -> list[str]:
+    """The Node scripts beside a probe root, which name probes the way Python does.
+
+    A probe a `.mjs` test exercises and no Python file mentions read as dead, because only
+    `.py` was searched for its name (lane L4). This answers question 2 for those; questions
+    1 and 3 are Python's, since only Python loads a probe into a page.
+    """
+    base = PurePosixPath(root).parent
+    return [
+        path
+        for path in scripts
+        if PurePosixPath(path).is_relative_to(base)
+        and DIRECTORY not in PurePosixPath(path).parts
+    ]
+
+
 @dataclass
 class Caller:
     """What one Python file says about probes."""
@@ -105,10 +126,15 @@ class Caller:
     imported: set[str] = field(default_factory=set[str])
     #: Every name the file calls, as `_called` spells it.
     called: set[str] = field(default_factory=set[str])
-    #: Each call with string literals among its positional arguments: the name, the literals.
+    #: Each call with string literals among its arguments: the name, the literals. Keyword
+    #: arguments count -- `probe(ROOT, name="newgroup/absent")` reached neither branch of
+    #: `name_faults` and failed at the far end of a browser run instead (#175 R6).
     literal_calls: list[tuple[str, tuple[str, ...]]] = field(
         default_factory=list[tuple[str, tuple[str, ...]]]
     )
+    #: Each call that reaches a loader with no literal name in it, as `path:line`: the
+    #: analysis could not read what it loads, which is not the same as clean (lane L1).
+    unread_calls: list[tuple[str, int]] = field(default_factory=list[tuple[str, int]])
     #: Each function that passes one of its own parameters to a call: its name, the callee.
     forwards: set[tuple[str, str]] = field(default_factory=set[tuple[str, str]])
 
@@ -145,13 +171,22 @@ def read_caller(source: str, filename: str = "<caller>") -> Caller:
             case ast.Call():
                 name = _called(node)
                 caller.called.add(name)
+                named = [kw.value for kw in node.keywords if kw.arg == NAME_KEYWORD]
+                arguments = [*node.args, *(named if name in caller.imported else [])]
                 literals = tuple(
                     a.value
-                    for a in node.args
+                    for a in arguments
                     if isinstance(a, ast.Constant) and isinstance(a.value, str)
                 )
                 if literals:
                     caller.literal_calls.append((name, literals))
+                elif any(
+                    isinstance(a, ast.JoinedStr | ast.BinOp | ast.Call) for a in arguments
+                ):
+                    # A name assembled rather than written out, which leaves no literal
+                    # for either branch of `name_faults` to check (lane L1). A plain name
+                    # and a subscript of a literal table both leave one, so both stay quiet.
+                    caller.unread_calls.append((name, node.lineno))
             case _:
                 pass
     return caller
@@ -196,13 +231,23 @@ def _loads(called: str, loaders: set[str]) -> bool:
     return called in loaders or called.rsplit(".", 1)[-1] in loaders
 
 
-def name_faults(files: Mapping[str, Caller], have: set[str]) -> tuple[list[str], list[str]]:
-    """Names a caller uses that no file answers, and files no caller names."""
+def name_faults(
+    files: Mapping[str, Caller], have: set[str], also_used: Iterable[str] = ()
+) -> tuple[list[str], list[str], list[str]]:
+    """Names a caller uses that no file answers, files no caller names, and calls that
+    reach a loader with a name this cannot read.
+
+    The third list is not a fault: a wrapper forwarding its own parameter is the supported
+    way to load a probe. It is printed because an assembled name -- `probe(f"{group}/x")` --
+    is invisible to the missing-name half of the check, so "could not read" has to look
+    different from "clean" (lane L1).
+    """
     forwarding = wrappers(files)
     groups = {name.split("/")[0] for name in have if "/" in name}
     wanted: set[str] = set()
     used: set[str] = set()
-    for caller in files.values():
+    unread: list[str] = []
+    for path, caller in sorted(files.items()):
         used |= caller.literals
         loaders = caller.imported | forwarding
         # Handed straight to a loader: must resolve, whatever its group.
@@ -215,7 +260,12 @@ def name_faults(files: Mapping[str, Caller], have: set[str]) -> tuple[list[str],
         # Looks like a probe, in a file that loads probes: must resolve too.
         if caller.imported or any(_loads(called, loaders) for called in caller.called):
             wanted.update(s for s in caller.literals if "/" in s and s.split("/")[0] in groups)
-    return sorted(wanted - have), sorted(have - used)
+        unread.extend(
+            f"{path}:{line}: {called}(...) loads a probe whose name this cannot read"
+            for called, line in caller.unread_calls
+            if _loads(called, loaders)
+        )
+    return sorted(wanted - have), sorted(have - used - set(also_used)), sorted(unread)
 
 
 def inspect(repo: Path, paths: list[str]) -> dict[str, dict[str, str]]:
@@ -240,12 +290,24 @@ def inspect(repo: Path, paths: list[str]) -> dict[str, dict[str, str]]:
     return verdicts
 
 
-def faults(repo: Path) -> tuple[list[str], int, int]:
-    """Every fault, the number of probes read, and the number of trees they are in."""
+@dataclass(frozen=True)
+class Report:
+    """What the check found: faults, the notes beside them, and what it read."""
+
+    faults: list[str]
+    unread: list[str]
+    probes: int
+    trees: int
+
+
+def faults(repo: Path) -> Report:
+    """Every fault, every loader call whose name could not be read, and what was read."""
     trees = probe_trees(repository_files(repo, SUFFIX))
     python = repository_files(repo, ".py")
+    scripts = [*repository_files(repo, ".mjs"), *repository_files(repo, ".cjs")]
     parsed: dict[str, Caller] = {}
     found: list[str] = []
+    unread: list[str] = []
     count = 0
     for root, files in sorted(trees.items()):
         count += len(files)
@@ -259,7 +321,9 @@ def faults(repo: Path) -> tuple[list[str], int, int]:
                 parsed[path] = read_caller((repo / path).read_text(encoding="utf-8"), path)
         beside = {path: parsed[path] for path in callers(root, python)}
         have = {probe_name(root, path) for path in files}
-        missing, unnamed = name_faults(beside, have)
+        named_in_node = _named_in_node(repo, node_callers(root, scripts), have)
+        missing, unnamed, opaque = name_faults(beside, have, named_in_node)
+        unread.extend(opaque)
         found.extend(
             f"{root}/{name}{SUFFIX}: named by a Python file beside {root}, and no such file"
             for name in missing
@@ -267,22 +331,44 @@ def faults(repo: Path) -> tuple[list[str], int, int]:
         found.extend(
             f"{root}/{name}{SUFFIX}: no Python file beside {root} names it" for name in unnamed
         )
-    return found, count, len(trees)
+    return Report(faults=found, unread=unread, probes=count, trees=len(trees))
+
+
+def _named_in_node(repo: Path, scripts: Iterable[str], have: set[str]) -> set[str]:
+    """The probe names a Node script beside the tree writes out, read as text.
+
+    Text rather than a parse: these are the same whole names Python writes, and a JavaScript
+    parser here would be a second inspector to keep.
+    """
+    named: set[str] = set()
+    for path in scripts:
+        text = (repo / path).read_text(encoding="utf-8")
+        named.update(name for name in have if name in text)
+    return named
 
 
 def main() -> int:
-    found, count, trees = faults(REPO)
-    if count == 0:
+    report = faults(REPO)
+    found = report.faults
+    if report.probes == 0:
         # The repository has probes by construction; finding none means the scan broke.
         found.append(f"no probe files found under {REPO}")
+    for note in report.unread:
+        print(f"NOTE  {note}")
     for fault in found:
         print(f"FAIL  {fault}")
+    read = f"{report.probes} probes in {report.trees} tree(s)"
+    unread = (
+        f"; {len(report.unread)} loader call(s) whose name could not be read"
+        if report.unread
+        else ""
+    )
     if found:
-        print(f"\n{len(found)} fault(s) over {count} probes in {trees} tree(s)")
+        print(f"\n{len(found)} fault(s) over {read}{unread}")
         return 1
     print(
-        f"OK: {count} probes in {trees} tree(s), every one a function that evaluates and is "
-        "named by a Python file beside it"
+        f"OK: {read}, every one a function that evaluates and is named by a file beside "
+        f"it{unread}"
     )
     return 0
 

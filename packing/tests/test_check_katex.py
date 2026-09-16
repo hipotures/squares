@@ -1,9 +1,12 @@
 """Real-renderer controls prevent an unsupported formula from receiving a pass."""
 
+import subprocess
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 
+from devtools import check_katex
 from devtools.check_katex import check_files, main
 
 
@@ -34,6 +37,31 @@ def test_empty_or_missing_inputs_cannot_pass(tmp_path: Path) -> None:
     empty.write_text("No formulas here.")
     assert main([str(empty)]) == 2
     assert main([str(tmp_path / "missing.md")]) == 2
+
+
+def test_missing_or_failed_node_driver_names_the_cause(tmp_path: Path) -> None:
+    document = tmp_path / "math.md"
+    document.write_text("$x$")
+    missing = tmp_path / "missing-driver.mjs"
+    with (
+        patch.object(check_katex, "PARSE", missing),
+        pytest.raises(FileNotFoundError, match=r"missing-driver[.]mjs"),
+    ):
+        check_files([document])
+
+    failed = tmp_path / "failed-driver.mjs"
+    failed.touch()
+    failure = subprocess.CalledProcessError(
+        7,
+        ["node", str(failed)],
+        stderr="driver exploded",
+    )
+    with (
+        patch.object(check_katex, "PARSE", failed),
+        patch.object(check_katex.subprocess, "run", side_effect=failure),
+        pytest.raises(ValueError, match="driver exploded"),
+    ):
+        check_files([document])
 
 
 def test_display_only_syntax_is_rejected_in_inline_math(tmp_path: Path) -> None:

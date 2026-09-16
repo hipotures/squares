@@ -30,8 +30,14 @@ const face = {
   status: "error",
 };
 
-/** @type {(spec: string, text: string) => { ready: boolean, outcome: string, faces: { status: string }[], error?: string }} */
-const observe = probe("devtools/probes/math/library.js")().fontLoadObserver(load);
+/**
+ * @typedef {(spec: string, text: string) => { ready: boolean, outcome: string,
+ *   faces: { status: string }[], error?: string }} Observer
+ */
+const observe =
+  /** @type {() => { fontLoadObserver(loader: (spec: string, text: string) => Promise<object[]>): Observer }} */ (
+    probe("devtools/probes/math/library.js")
+  )().fontLoadObserver(load);
 /** @param {number} index */
 const request = (index) => /** @type {(typeof requests)[number]} */ (requests[index]);
 

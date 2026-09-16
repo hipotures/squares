@@ -1,0 +1,19 @@
+{
+  // The explainer's classic page scripts were legacy inline programs until PR #181.
+  // They now live in files and inherit the shared floor. `think-7f3p` tracks removing
+  // the four legacy inference relaxations after their DOM contracts gain full JSDoc.
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "noUncheckedIndexedAccess": false,
+    "exactOptionalPropertyTypes": false
+  },
+  "include": [
+    "packing/devtools/explainer/**/*.js",
+    "packing/devtools/explainer/**/*.d.ts",
+    "packing/devtools/probes/compare_math_fonts/types.d.ts",
+    "packing/devtools/probes/explainer.d.ts",
+    "packing/devtools/probes/math/types.d.ts"
+  ]
+}

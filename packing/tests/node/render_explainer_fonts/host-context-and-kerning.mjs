@@ -77,7 +77,9 @@ Object.assign(globalThis, {
   kpressMathText,
 });
 
-probe("devtools/probes/render_explainer/host_math_init.js")(wrappers);
+/** @type {(wrappers: string | undefined) => void} */ (
+  probe("devtools/probes/render_explainer/host_math_init.js")
+)(wrappers);
 /** @type {{ render(el: Stand, source: string, display: boolean): Promise<boolean>, settled(): Promise<void>, context: Context }} */
 const squaresMath = Reflect.get(globalThis, "squaresMath");
 

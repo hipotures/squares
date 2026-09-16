@@ -353,31 +353,41 @@ agenda:
     purpose: research
     owner_focus: insight
     instances: [11]
-    state: ready
+    state: in_progress
     priority: 0
     question: >-
-      Can the T-025/T-026 witness at side 3.82 be compressed into a small exact
-      certificate described by a few D4-orbit, weight, and tight-cell templates?
+      Does T-025's exact atom-support universe admit a certificate at side 3.82 with at
+      most 23 positive D4-orbit representatives and unchanged exact coverage?
+    hypotheses: [H-163]
     budget: >-
-      First, one separate no-target admission PR freezes T-025 as the control, an
-      at-most-23 active-orbit ceiling or another independently quantified complexity
-      metric, one sparse or quantized template family, mutation controls, and an
-      accept-or-park rule. Only a later fresh branch may optimize and replay a candidate.
+      First, one separate no-target admission PR freezes T-025 as the control, its
+      119-orbit support universe, the at-most-23 positive-orbit ceiling, deterministic
+      decompression, mutation controls, and exact accept, unresolved, refute, and park
+      meanings. Only a later fresh branch may register an experiment, optimize, or
+      replay a candidate.
     entry: >-
-      BC-354 stops at the Route A representation boundary, and the unmodified T-025/T-026
-      receipt is available as the Route S control.
+      BC-354 stops at the Route A representation boundary, T-025 is available as the
+      matched Route S control, and T-026 is available as a support and rescaling
+      provenance sentinel.
     exit: >-
-      A fivefold reduction in orbit representatives or comparable independent geometric
-      complexity, with a human-statable generating rule and exact replay, or a recorded
-      obstruction that parks the selected template family.
+      H-163 is confirmed by a certificate with at most 23 positive orbit
+      representatives, a human-statable generating rule, budget below eleven, and both
+      exact coverage routes agreeing; or exact infeasibility refutes it. Bounded search
+      without a candidate may park only this family as unresolved.
     bead: think-a1e8
-    depends_on: [BC-353]
+    depends_on: [BC-354]
     next_evidence: >-
-      Open a separate no-target admission PR that freezes the unmodified control, the
-      at-most-23 orbit ceiling or another predeclared metric, one template family,
-      mutation controls, and an accept-or-park rule before changing any atom.
-    workflows: [insight-iteration, research-loop]
+      Merge the source-distinct reviewed no-target admission after exact-head fast and
+      deferred gates. Then use a fresh branch to register exp-161, its target budget,
+      accept rule, and stop rule before changing any weight or running coverage.
+    workflows: [pipeline-improvement, factual-review, research-loop]
     program: n11-strategy-reset
+    artifacts:
+    - packing/campaign/explorations/X-032-route-s-threshold-compression.md
+    - packing/campaign/hypotheses/H-163-route-s-threshold-compression.md
+    - packing/campaign/agent-sessions/session-134-n11-route-s-admission.md
+    - packing/campaign/agent-sessions/session-135-n11-route-s-guard-discharge.md
+    - packing/cases/n11_threshold_certificate/route-s-compression-admission-receipt.json
     parallel_group: proof-simplification
   - id: BC-344
     purpose: research
@@ -557,18 +567,28 @@ BC-340 and BC-353 are complete.
 BC-354 stopped at Route A’s representation boundary: the complete physical root, matched
 exact baseline, conditional gate, and independent replay were not admitted.
 No target ran and no physical root closed.
-Route S / BC-343 is now the sole next entry; its first PR is a no-target admission that
-freezes the compression metric and controls.
+Route S / BC-343 is now in progress.
+Its no-target PR freezes T-025’s exact 119-orbit support universe, the at-most-23
+positive-orbit metric, deterministic decompression, and target-blind controls.
+Session 135 discharged all four obligations retained by Session 134: complete T-025 and
+T-026 contents bound to a declared Git revision and repository-relative paths, both
+T-026 sentinels, a canonical source-bound manifest, and the complete X-032 mutation
+matrix.
+A fresh source-distinct audit found one symlink-alias hole; the repaired boundary
+and regression passed re-audit, so the instrument is admitted.
+No target, candidate, coverage route, optimizer, or experiment ran.
+X-032 and H-163 own the source and hypothesis records; T-026 is only a
+support-and-rescaling provenance sentinel.
 BC-341 remains tentative behind a future W10 reselection and the named representation
 gaps.
 
 The W10 review originally mapped six active hours into five sequential PR-bounded
 blocks. BC-340 and BC-353 completed, and BC-354 activated the selected-route admission’s
 guard-refusal branch.
-The remaining conditional path begins with BC-343’s separate no-target admission PR,
-then permits one compression discriminator only if that contract is admitted, followed
-by review and replanning.
-No later branch starts before the prior PR merges.
+The remaining conditional path begins with exact-head certification and merge of
+BC-343’s no-target admission PR. A fresh branch may then register one compression
+discriminator and its budget before any target access, followed by review and
+replanning. No later branch starts before the prior PR merges.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

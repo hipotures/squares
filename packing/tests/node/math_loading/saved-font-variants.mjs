@@ -19,8 +19,9 @@ const variant = (contexts, parent = plain) => ({
   },
 });
 
-/** @type {{ activeVariant: (node: object) => boolean }} */
-const { activeVariant: active } = probe("devtools/probes/math/library.js")();
+const { activeVariant: active } = /** @type {() => { activeVariant(node: object): boolean }} */ (
+  probe("devtools/probes/math/library.js")
+)();
 
 for (const fontSet of ["custom", "system"]) {
   for (const proseFont of ["serif", "sans"]) {

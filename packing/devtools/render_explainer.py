@@ -96,6 +96,17 @@ RESULT_ID = "t-018"
 TEMPLATES = Path(__file__).with_name("templates")
 TEMPLATE = TEMPLATES / "explainer-shell.html"
 MARKDOWN = TEMPLATES / "explainer-article.md"
+#: First-party classic scripts inlined by the shell. The HTML carries placeholders only;
+#: these files are the sources Biome, ESLint and tsc check.
+EXPLAINER_SCRIPTS = Path(__file__).with_name("explainer")
+INLINE_SCRIPT_ASSETS = {
+    "NATIVE_MATH_METRICS": EXPLAINER_SCRIPTS / "native-math-metrics.js",
+    "RESERVE_MATH": EXPLAINER_SCRIPTS / "reserve-math.js",
+    "KPRESS_CLIENT_SCRIPT": EXPLAINER_SCRIPTS / "kpress-client.js",
+    "EXPLAINER_PAGE_SCRIPT": EXPLAINER_SCRIPTS / "page.js",
+    "CERTIFICATE_SCRIPT": EXPLAINER_SCRIPTS / "certificate.js",
+    "FINISH_MATH": EXPLAINER_SCRIPTS / "finish-math.js",
+}
 #: The browser code this module hands the page, one file each under `probes/`.
 PROBES = Path(__file__).resolve().parent / "probes"
 VERIFIER_CLAIM = CASE / "verify_claim.py"
@@ -785,14 +796,9 @@ KPRESS_API = {
     "code-copy.js": "initKpressCodeCopy",
 }
 
-# The script element the flattened modules land in is written by the shell, around this
-# placeholder: the strict-mode IIFE they share, and the epilogue after them that hands the
-# page only half of what kpress registers. Overriding a behavior with a no-op bind is
-# kpress's own seam (`behaviors.override`), and running it there -- at script evaluation,
-# before the runtime's ready pass -- is what keeps the built-in link previews from ever
-# binding. The render still owns every refusal, so `kpress_client_js` reads that frame
-# back out of the shell and holds all of it to the `</script` rule, not only the modules.
-CLIENT_PLACEHOLDER = "{{KPRESS_CLIENT_JS}}"
+# The checked script file is valid on its own because this is a function call. At render
+# time the call is replaced by the flattened module declarations, inside the file's IIFE.
+CLIENT_PLACEHOLDER = "__SQUARES_KPRESS_CLIENT_JS__();"
 
 
 def kpress_client_modules() -> str:
@@ -801,39 +807,34 @@ def kpress_client_modules() -> str:
 
 
 def client_script_frame() -> tuple[str, str]:
-    """The shell's own text inside the script element the flattened modules land in.
+    """The checked script asset around the sentinel where flattened modules land.
 
-    Before the placeholder, from the element's opening tag; after it, up to the last
-    closing tag before the next element opens. Read that far rather than to the first
-    closing tag, because a stray `</script` in the shell's own frame would be that first
-    one: a browser ends the element there, and a frame cut at the same place would hide
-    the text it cuts off instead of refusing it.
+    The whole asset is read so the closing-tag guard below also checks the frame around
+    the generated bundle.
     """
-    shell = TEMPLATE.read_text(encoding="utf-8")
-    if shell.count(CLIENT_PLACEHOLDER) != 1:
-        raise SystemExit(f"{TEMPLATE.name} must carry {CLIENT_PLACEHOLDER} exactly once")
-    at = shell.index(CLIENT_PLACEHOLDER)
+    source = INLINE_SCRIPT_ASSETS["KPRESS_CLIENT_SCRIPT"].read_text(encoding="utf-8")
+    if source.count(CLIENT_PLACEHOLDER) != 1:
+        raise SystemExit(
+            f"{INLINE_SCRIPT_ASSETS['KPRESS_CLIENT_SCRIPT'].name} must carry "
+            f"{CLIENT_PLACEHOLDER} exactly once"
+        )
+    at = source.index(CLIENT_PLACEHOLDER)
     after = at + len(CLIENT_PLACEHOLDER)
-    following = shell.find("<script", after)
-    opening = shell.rfind("<script>", 0, at)
-    closing = shell.rfind("</script>", after, len(shell) if following == -1 else following)
-    if opening == -1 or closing == -1:
-        raise SystemExit(f"{TEMPLATE.name}: {CLIENT_PLACEHOLDER} is outside any script element")
-    return shell[opening + len("<script>") : at], shell[after:closing]
+    return source[:at], source[after:]
 
 
 def kpress_client_js(static: Path) -> str:
-    """kpress's client modules as the body of one classic script, which the shell wraps.
+    """kpress's client modules inside the checked classic-script frame.
 
     Concatenates `KPRESS_MODULES` in order, dropping the imports (every name they
     bind is already in scope by the time it is used) and the `export` keyword. The
-    shell writes the rest of the script around `{{KPRESS_CLIENT_JS}}`: the IIFE the
-    modules share and the epilogue that exposes the two boots. Refuses to produce a
+    checked asset writes the rest of the script around one sentinel: the IIFE the modules
+    share and the epilogue that exposes the two boots. Refuses to produce a
     bundle it cannot vouch for: an import or export form it does not rewrite, an
     imported name the source module no longer exports, a module-only construct, a
     `KPRESS_API` name that is gone, two modules declaring the same top-level name —
     which sharing one scope would silently resolve to whichever came last — or a
-    `</script` anywhere in the element, the shell's own frame included.
+    `</script` anywhere in the generated program, including its checked frame.
     """
     exported: dict[str, set[str]] = {}
     declared: dict[str, str] = {}
@@ -906,13 +907,15 @@ def kpress_client_js(static: Path) -> str:
 
     bundle = "\n".join(parts)
     before, after = client_script_frame()
-    element = before.replace("{{KPRESS_CLIENT_MODULES}}", kpress_client_modules())
-    if re.search(r"</script", element + bundle + after, re.IGNORECASE):
+    element = (
+        before.replace("{{KPRESS_CLIENT_MODULES}}", kpress_client_modules()) + bundle + after
+    )
+    if re.search(r"</script", element, re.IGNORECASE):
         raise SystemExit(
-            "the kpress client script carries `</script`, in a module or in the shell's "
+            "the kpress client script carries `</script`, in a module or in its checked "
             "frame; it cannot be inlined"
         )
-    return bundle
+    return element
 
 
 def icon_sprite(static: Path) -> str:
@@ -2257,8 +2260,12 @@ def shell_substitutions(static: Path, shared: dict[str, str], body: str) -> dict
         "RELATION_CSS": relation_face_css(static),
         "THEME_BOOTSTRAP": theme_bootstrap(static),
         "KATEX_JS": katex_js(static),
-        "KPRESS_CLIENT_MODULES": kpress_client_modules(),
-        "KPRESS_CLIENT_JS": kpress_client_js(static),
+        **{
+            key: path.read_text(encoding="utf-8")
+            for key, path in INLINE_SCRIPT_ASSETS.items()
+            if key not in {"KPRESS_CLIENT_SCRIPT", "CERTIFICATE_SCRIPT"}
+        },
+        "KPRESS_CLIENT_SCRIPT": kpress_client_js(static),
         **shared,
         "BODY_HTML": body,
     }
@@ -2380,6 +2387,30 @@ def fill(block: str, values: dict[str, str], *, where: str) -> str:
     return block
 
 
+CERTIFICATE_SCRIPT_SENTINELS = {
+    "__SQUARES_ATOMS__": "ATOMS",
+    "__SQUARES_SCALE__": "SCALE_JS",
+    "__SQUARES_L__": "L_JS",
+    "__SQUARES_B__": "B_JS",
+    "__SQUARES_LIMIT_NUM__": "LIMIT_NUM",
+    "__SQUARES_LIMIT_DEN__": "LIMIT_DEN",
+    "__SQUARES_STEPS__": "N_DIRECTIONS_MAX",
+    "__SQUARES_TIGHT__": "TIGHT_JS",
+    "__SQUARES_WITNESS_X__": "WITNESS_X_JS",
+    "__SQUARES_WITNESS_Y__": "WITNESS_Y_JS",
+}
+
+
+def certificate_script(values: dict[str, str]) -> str:
+    """One checked certificate program, with its numeric sentinels materialized."""
+    source = INLINE_SCRIPT_ASSETS["CERTIFICATE_SCRIPT"].read_text(encoding="utf-8")
+    for sentinel, key in CERTIFICATE_SCRIPT_SENTINELS.items():
+        if source.count(sentinel) != 1:
+            raise SystemExit(f"certificate.js must carry {sentinel} exactly once")
+        source = source.replace(sentinel, values[key])
+    return fill(source, values, where=f"certificate.js {values['SLUG']}")
+
+
 def drop_block(text: str, name: str) -> str:
     """Remove a marked block and its markers, wherever it stands; a no-op if absent."""
     return re.sub(rf"<!--BEGIN:{name}-->.*?<!--END:{name}-->", "", text, flags=re.DOTALL)
@@ -2480,6 +2511,7 @@ RENDER_INPUTS = (
     CASE,
     THRESHOLD_CASE,
     Path(__file__),
+    EXPLAINER_SCRIPTS,
     PACKING / "devtools" / "prepare_explainer_math.py",
     PACKING / "devtools" / "measure_net_coarsening.py",
     PACKING / "devtools" / "build_composite_figure_data.py",
@@ -2865,6 +2897,8 @@ def render(certificate_paths: tuple[Path, ...], *, full_sweep: bool = False) -> 
     per_certificate = [
         certificate_substitutions(f, default=facts[0], toggle=toggle) for f in facts
     ]
+    for values in per_certificate:
+        values["CERTIFICATE_SCRIPT"] = certificate_script(values)
 
     shared = shared_substitutions(facts, headline, facts[0])
     claimed = (

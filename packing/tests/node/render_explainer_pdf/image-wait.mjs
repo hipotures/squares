@@ -6,8 +6,9 @@
 import assert from "node:assert/strict";
 import { probe } from "../probe.mjs";
 
-/** @type {() => Promise<void>} */
-const waitForImages = probe("devtools/probes/render_explainer_pdf/images_decoded.js");
+const waitForImages = /** @type {() => Promise<void>} */ (
+  probe("devtools/probes/render_explainer_pdf/images_decoded.js")
+);
 /** @param {object} document */
 const install = (document) => Object.assign(globalThis, { document });
 
@@ -63,7 +64,7 @@ const CASES = {
           loading: "eager",
           complete: true,
           naturalWidth: 0,
-          naturalHeight: 0,
+          naturalHeight: 480,
           currentSrc: "file:///empty-atlas.svg",
           src: "file:///empty-atlas.svg",
           async decode() {},
@@ -73,7 +74,7 @@ const CASES = {
     await assert.rejects(waitForImages(), (/** @type {Error} */ error) => {
       assert.match(error.message, /2 required images are not drawable after decode/);
       assert.match(error.message, /missing-atlas[.]svg.*complete=false.*0x0.*request failed/);
-      assert.match(error.message, /empty-atlas[.]svg.*complete=true.*0x0/);
+      assert.match(error.message, /empty-atlas[.]svg.*complete=true.*0x480/);
       return true;
     });
   },

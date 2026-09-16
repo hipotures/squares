@@ -5,7 +5,9 @@
 import assert from "node:assert/strict";
 import { probe } from "../probe.mjs";
 
-probe("devtools/probes/prepare_explainer_math/geometry_font_trace.js")();
+/** @type {() => void} */ (
+  probe("devtools/probes/prepare_explainer_math/geometry_font_trace.js")
+)();
 
 /** @type {[string, string, number][]} */
 const starts = [];

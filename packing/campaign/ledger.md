@@ -148,6 +148,8 @@ Each entry summarizes one user-level research window. Cycle slots are wall-clock
 | [session-131](agent-sessions/session-131-n11-w5-validation-efficiency.md) | stopped | contemporaneous | `efficiency-loop` (efficiency) | `efficiency-loop` (efficiency) | 1 | think-1ydi | Merge PR 174, then start BC-353 under think-d3h5 from the merged origin/main and select exactly one scientific admission route. |
 | [session-132](agent-sessions/session-132-n11-post-w5-route-selection.md) | stopped | contemporaneous | `review-planning-oversight` (process) | `review-planning-oversight` (process) | 1 | think-d3h5 | Merge PR 176, then start BC-354 under think-0t5y from the merged origin/main. |
 | [session-133](agent-sessions/session-133-n11-route-a-admission.md) | stopped | contemporaneous | `pipeline-improvement` (process) | `pipeline-improvement` (process) | 1 | think-0t5y | Open a separate no-target Route S admission pull request under BC-343 / think-a1e8, and run no compression target before that admission PR merges. |
+| [session-134](agent-sessions/session-134-n11-route-s-admission.md) | stopped | contemporaneous | `pipeline-improvement` (correctness) | `factual-review` (process) | 4 | think-a1e8 | Under think-so4g, certify and merge the exact admitted PR 182 head; do not create exp-161 or run a compression target before that admission merges. |
+| [session-135](agent-sessions/session-135-n11-route-s-guard-discharge.md) | stopped | contemporaneous | `pipeline-improvement` (correctness) | `pipeline-improvement` (correctness) | 1 | think-r55v | Under think-so4g, certify and merge PR 182 at its exact reviewed head. Only afterward may a fresh planning block register exp-161 and authorize a bounded Route S target. |
 
 ### Workflow summary
 
@@ -156,12 +158,12 @@ Declared counts are contemporaneous contracts; retrospective counts are reconstr
 | workflow | declared entries | retrospective entries | declared phases | retrospective phases |
 | --- | ---: | ---: | ---: | ---: |
 | `research-survey` | 2 | 2 | 13 | 2 |
-| `factual-review` | 6 | 0 | 49 | 2 |
+| `factual-review` | 6 | 0 | 51 | 2 |
 | `insight-iteration` | 24 | 1 | 79 | 3 |
 | `process-review` | 16 | 4 | 64 | 6 |
 | `efficiency-loop` | 10 | 1 | 36 | 1 |
 | `research-loop` | 26 | 4 | 96 | 8 |
-| `pipeline-improvement` | 30 | 1 | 147 | 4 |
+| `pipeline-improvement` | 32 | 1 | 150 | 4 |
 | `documentation-pass` | 1 | 0 | 22 | 1 |
 | `remediation` | 0 | 1 | 0 | 1 |
 | `review-planning-oversight` | 3 | 0 | 16 | 1 |
@@ -748,7 +750,7 @@ Status: **active**. Reconcile the merged research record, then choose among rout
 | BC-354 | tool_validation | 11 | complete | 0 | think-0t5y | Reopen only after one proposal supplies the complete 80-stratum negative-root producer, a rows-complete matched baseline, and two method-distinct exact coverage routes with shared physical variables. |
 | BC-341 | research | 11 | tentative | 1 | think-9y6q | Preserve the named Route A gaps and reconsider this discriminator only through a future W10 after a complete representation discharges them. |
 | BC-342 | research | 6, 11 | tentative | 1 | think-ol1z | Specify the n=6 control and the conflict-edge soundness obligation before selecting a solver. |
-| BC-343 | research | 11 | ready | 0 | think-a1e8 | Open a separate no-target admission PR that freezes the unmodified control, the at-most-23 orbit ceiling or another predeclared metric, one template family, mutation controls, and an accept-or-park rule before changing any atom. |
+| BC-343 | research | 11 | in_progress | 0 | think-a1e8 | Merge the source-distinct reviewed no-target admission after exact-head fast and deferred gates. Then use a fresh branch to register exp-161, its target budget, accept rule, and stop rule before changing any weight or running coverage. |
 | BC-344 | research | 11 | tentative | 2 | think-29ch | Reproduce the 6+5 control at Trump's angle before interpreting any solver infeasibility. |
 | BC-345 | research | 11 | tentative | 3 | think-7n2w | Design the positive-control and endpoint-polishing contract before allocating the background search. |
 | BC-348 | research | 11 | tentative | 1 | think-u15l | Test the valid angle-count rows against the entire retained optimal face before building a larger certificate. |
@@ -905,6 +907,7 @@ Status: **active**. Reconcile the merged research record, then choose among rout
 | H-160 | blocked | proof | On the frozen BC293 377-atom measure and every one of the 182 eligible |  | 1 |  |  |
 | H-161 | refuted | proof | In the frozen BC303 377-atom measure, the closed literal parent Q0=[0, |  | 1 |  | 0s wall |
 | H-162 | blocked | proof | On the frozen BC293 377-atom measure and every one of the 182 eligible |  | 1 |  |  |
+| H-163 | open | proof | T-025's exact 119-orbit atom-support universe admits a D4-symmetric no |  | 0 |  |  |
 | H-201 | refuted | search | With a simultaneous perturbation proposal added to the ordinary move m | n: 5 10 11* 17 19 26 27 29 37 50 52 | 2 |  | 155m agent + 105.7m wall |
 | H-202 | refuted | search | Adding an aggregate inward wall-pressure term to the annealing energy, | n: 5 10 11* 17 19 26 27 29 37 50 52 | 1 |  | 25m agent + 39.1m wall |
 | H-203 | confirmed | search | At an equal budget of refined local optima, basin hopping -- perturbin | n: 5 10 11* 17 19 | 1 |  | 40m agent + 81.2m wall |

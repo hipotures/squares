@@ -31,7 +31,9 @@ Object.assign(globalThis, {
   requestAnimationFrame: () => {},
 });
 
-const library = probe("devtools/probes/math/library.js")();
+const library = /** @type {() => Record<string, unknown>} */ (
+  probe("devtools/probes/math/library.js")
+)();
 Object.assign(globalThis, {
   __squaresMathProbes: {
     ...library,
@@ -42,5 +44,5 @@ Object.assign(globalThis, {
     },
   },
 });
-probe("devtools/probes/check_math_loading/first_paint.js")();
+/** @type {() => void} */ (probe("devtools/probes/check_math_loading/first_paint.js"))();
 assert.deepEqual(checked, ["plain-hidden-certificate", "selected"]);

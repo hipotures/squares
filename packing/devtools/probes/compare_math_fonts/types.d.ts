@@ -14,3 +14,11 @@ interface CompareMathFontsKatexNode {
 interface CompareMathFontsKatexTree extends CompareMathFontsKatexNode {
   toNode(): Node;
 }
+
+/** The internal tree builder only this probe group uses. */
+interface SquaresKatex {
+  __renderToDomTree(
+    expression: string,
+    options: { throwOnError: boolean; displayMode: boolean },
+  ): CompareMathFontsKatexTree;
+}
