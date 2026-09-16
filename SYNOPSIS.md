@@ -138,8 +138,8 @@ hypothesis status and summarizes experiment verdicts, and the
 | Record | Count | State at the cutoff |
 | --- | ---: | --- |
 | Agendas | 35 | 15 active; 14 completed; 5 paused; 1 superseded |
-| Commitments | 343 | 177 complete; 59 stopped; 64 blocked; 15 ready; 20 tentative; 8 in progress |
-| Sessions | 135 | 84 completed; 51 stopped; all terminal |
+| Commitments | 344 | 177 complete; 59 stopped; 64 blocked; 15 ready; 20 tentative; 9 in progress |
+| Sessions | 136 | 84 completed; 51 stopped; 1 nonterminal |
 | Explorations | 32 | 19 linked to proposed hypotheses; 13 uncodified |
 | Hypotheses | 150 | 26 confirmed; 27 refuted; 50 blocked; 12 unresolved; 5 open; 27 open questions; 2 result registered; 1 abandoned; 0 running |
 | Experiments | 126 | 39 accepted; 32 rejected; 30 unresolved; 12 baseline; 11 blocked; 2 abandoned; 0 in progress |
@@ -159,12 +159,13 @@ now-paused incremental follow-ups.
 current strategy-reset queue.
 The generated agenda map, not this narrative, summarizes commitment state.
 
-All recorded sessions are terminal; Session 135 is the latest handoff.
+Session 136 is the active CI-topology reconciliation record; Session 135 remains the
+latest terminal handoff.
 `stopped` is not a scientific failure; it includes time limits, guarded refusals,
 administrative handoffs, and work deliberately ended after its next evidence was
 identified. The late-session arc moved from certificate production and exact dilation
 through owner geometry and bounded negative tests, then through the T-025/T-026
-publication stack and this reconciliation.
+publication stack, research-state reconciliation, and the current CI-efficiency block.
 Use the generated close report for individual session clocks and never add child-session
 resource totals to their parent roll-up.
 
@@ -203,17 +204,30 @@ Its three alternating local pairs reduced the rollup’s median from 47.72 to 2.
 seconds, and the first candidate hosted checks tier passed in 106.38 seconds against the
 unchanged 195-second ceiling.
 This is validation evidence, not new mathematics.
+BC-355 / `think-97we` is now reconciling the later Pages, Packing, budgeting, and
+validation-lane work into one exact-head topology.
+[Session 136](packing/campaign/agent-sessions/session-136-ci-topology-reconciliation.md)
+remains in progress until both required aggregates pass inside the 180-second wall
+budget and an independent reviewer accepts that same head.
+The block runs no scientific target and changes no theorem, hypothesis verdict, n=11
+bound, or frontier record.
 The current order is:
 
-1. BC-354 / `think-0t5y` stopped at Route A’s representation boundary.
+1. BC-355 / `think-97we` is the active pipeline-improvement block.
+   Its lane contract keeps ordinary research iterations on focused checks, runs the push
+   tier once before a push, preserves the complete seven-part fast pull-request surface,
+   and reserves slow, exhaustive, deferred, golden, and strict work for explicit
+   checkpoints. Hosted exact-head measurements and re-review remain open.
+2. BC-354 / `think-0t5y` stopped at Route A’s representation boundary.
    Its source inventories found no complete 80-stratum negative-root producer, matched
    exact baseline, conditional gate, or method-distinct replay.
    No target ran and no physical root closed.
-2. BC-343 remains the active research commitment; `think-ufmk` is its sole operational
-   entry. [X-032](packing/campaign/explorations/X-032-route-s-threshold-compression.md)
-   and [H-163](packing/campaign/hypotheses/H-163-route-s-threshold-compression.md)
-   freeze T-025 as the sole matched control, its exact 119-orbit support universe, and
-   the at-most-23 positive-orbit criterion.
+3. BC-343 remains the active scientific commitment; `think-ufmk` is its sole scientific
+   entry after BC-355 closes.
+   [X-032](packing/campaign/explorations/X-032-route-s-threshold-compression.md) and
+   [H-163](packing/campaign/hypotheses/H-163-route-s-threshold-compression.md) freeze
+   T-025 as the sole matched control, its exact 119-orbit support universe, and the
+   at-most-23 positive-orbit criterion.
    T-026 is only a support-and-rescaling sentinel.
    Session 134’s source-distinct review refused the first admission checkpoint.
    Session 135 then discharged all four retained guards: complete source contents bound
@@ -223,14 +237,14 @@ The current order is:
    PR 182 merged the instrument as `1d9c49c4` from reviewed head `609d7d62` after
    exact-head validation.
    No optimizer, candidate, coverage target, or `exp-161` has run.
-3. Treat A, S, global angular resources, and B as the first advisory tier.
+4. Treat A, S, global angular resources, and B as the first advisory tier.
    A is the strongest route to a material `n = 11` lower bound; S is the best bounded
    deliverable; angular resources offer a cheap optimal-face screen; and B is the
    strongest alternative mechanism after its soundness controls.
-4. Retain stronger charge algebra, geometry-dependent budgets, an `n = 12` exact-value
+5. Retain stronger charge algebra, geometry-dependent budgets, an `n = 12` exact-value
    program, and orientation structure as second-tier candidates whose first blocks must
    pay for missing premises.
-5. Keep constructive search separately budgeted after an oblique proposer control, and
+6. Keep constructive search separately budgeted after an oblique proposer control, and
    treat geometric waste accounting as a speculative candidate requiring both a local
    lemma and a non-double-counting global rule.
 
@@ -239,8 +253,8 @@ The detailed
 originally allocated five sequential merge-bounded blocks.
 BC-354 activated that schedule’s guard-refusal branch, so the Route A discriminator no
 longer follows it. BC-343’s no-target Route S instrument is admitted and merged.
-The remaining path begins with the `think-ufmk` planning block, which may register
-`exp-161` and authorize one bounded target.
+After BC-355 closes, the scientific path resumes with the `think-ufmk` planning block,
+which may register `exp-161` and authorize one bounded target.
 Each block starts from the preceding merge on a fresh branch and gets its own session,
 bead disposition, validation receipt, and pull request.
 
@@ -907,6 +921,11 @@ controller, not permission to blur contracts.
 
 ### Current Handoff
 
+[Session 136](packing/campaign/agent-sessions/session-136-ci-topology-reconciliation.md)
+is an active pipeline-improvement record under BC-355 / `think-97we`. It reconciles CI,
+budgeting, validation, and developer validation lanes before the next scientific
+planning block. It is not a terminal handoff: exact-head hosted evidence and independent
+re-review are still pending, and it changes no mathematical result.
 [Session 135](packing/campaign/agent-sessions/session-135-n11-route-s-guard-discharge.md)
 is the latest terminal handoff on the no-target Route S admission branch.
 It discharged the four guards retained by
@@ -942,8 +961,11 @@ the T-026 lower bound remains the frontier.
 **Selected next entry:** `think-ufmk`, the BC-343 planning block that must register
 `exp-161`, its exact target, budget, accept rule, stop rule, and review boundary before
 any bounded compression target runs.
+BC-355 must close before that scientific entry resumes.
 
 BC-340, BC-353, and BC-354 are terminal.
+BC-355 is an in-progress pipeline block under `think-97we`; it carries no scientific
+authority and changes no mathematical state.
 BC-341 remains tentative behind a future W10 reselection and the named Route A
 representation gaps.
 BC-343’s no-target PR freezes Route S’s complexity metric, fixed support universe,

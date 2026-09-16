@@ -35,7 +35,7 @@ owns preregistered comparisons, raw timing receipts, and generated results.
 
 - Preserve distinct contracts, boundary cases, negative controls, exact decisions, and
   useful failure localization while reducing repeated work.
-- Keep cheap coverage on every commit.
+- Keep the edit loop focused and run the complete fast surface on every pull request.
   Preserve the PR target of two to two and a half minutes, with three minutes triggering
   investigation; improve below it when justified.
 - Separate immediate feedback from final pre-merge evidence, identifying the source and
@@ -119,9 +119,9 @@ This makes the shards complete and disjoint without a maintained file list, admi
 modules automatically, and preserves module-scoped fixture reuse through
 `--dist=loadfile`.
 
-The ordinary gate now has 78 steps, 67 of them on the PR fast surface: 50 checks, two
-frontend steps, nine geometry steps, one step in each suite shard, and four sweeps.
-The six jobs all feed the existing `packing-required` aggregate.
+The ordinary gate now has 80 steps, 69 of them on the PR fast surface: 50 checks, three
+frontend steps, one typecheck step, nine geometry steps, one step in each suite shard,
+and four sweeps. The seven jobs all feed the existing `packing-required` aggregate.
 Each suite shard retains its 180-second predeclared ceiling.
 On PR 175 exact head `dee68bc8`, two green readings put shard A at 151.11 and 149.97
 seconds and shard B at 133.13 and 107.34 seconds.
@@ -198,10 +198,25 @@ Link these records from this spec as they are created.
 ### Feedback and checkpoint placement
 
 Keep records, edit, and change-reachable push checks usable independently of long
-checkpoint work. Ordinary PR feedback retains cheap coverage.
+checkpoint work. Ordinary PR feedback retains the complete fast surface.
 Run the complete checkpoint when the PR is ready for final review and after changes
 invalidate its evidence; identify the checked source, merge/base identity, and selected
 surfaces.
+
+The standing fast-loop contract is:
+
+- During a research or implementation loop, run the narrowest relevant tool or `--edit`.
+  Do not put slow, exhaustive, deferred, golden, or strict work in each edit cycle.
+- Run `--push` once immediately before each push.
+  The pull request then runs all seven parts of `--fast` concurrently: `--checks`,
+  `--frontend`, `--typecheck`, `--geometry`, `--suite-a`, `--suite-b`, and `--sweeps`.
+- Reserve the full and deferred checkpoints for final review, research or merge
+  checkpoints, block close, `main`, daily CI, and explicit on-demand validation.
+  Run golden rebuilds and strict checkpoints only when their stronger contract is
+  required. Repeat any checkpoint whose source or inputs changed afterward.
+- Keep a check on the pull-request surface unless measurement shows that it is
+  unavoidably slow. Occasional usefulness at a checkpoint does not justify adding it to
+  every edit cycle; optimize avoidable cost before deferring coverage.
 
 Review repeated main and daily work for sound reuse without treating an incomplete
 `touches` map as a safe skip map.
@@ -242,17 +257,21 @@ Changed contracts also require focused regression evidence at their actual execu
 boundary. An unaffected mathematical family cannot discharge a newly changed worker or
 CPU-accounting contract.
 Report why each family ran or was reused and retain links to both kinds of evidence.
-The first implementation slice does not enable automatic reuse or change the deep-label
-triggers; the current full checkpoint remains the entry point until the coverage union
-is implemented and validated.
+Exact-tree reuse is operational for fast steps on the positive allowlist: after a
+successful pull-request run proves the same Git tree and passes `packing-required`, the
+post-merge run may omit those steps.
+Deferred and unclassified fast steps still run, and missing, stale, failed, or
+mismatched evidence falls back to execution.
+Exhaustive-family selection and reuse remain planned; the current full checkpoint
+remains their entry point until the coverage union is implemented and validated.
 
 ### Naming and documentation ownership
 
 | Term | Meaning and existing interface |
 | --- | --- |
-| PR fast surface | `--fast`, partitioned into `--checks`, `--frontend`, `--geometry`, `--suite-a`, `--suite-b`, and `--sweeps` |
+| PR fast surface | `--fast`, partitioned into `--checks`, `--frontend`, `--typecheck`, `--geometry`, `--suite-a`, `--suite-b`, and `--sweeps` |
 | Full checkpoint | All ordinary steps, selected by the default command |
-| Deferred checkpoint | Four steps outside PR fast coverage; the `Deferred checkpoint` workflow, retaining the `deep-gate` label and filename |
+| Deferred checkpoint | Eleven steps outside PR fast coverage; the `Deferred checkpoint` workflow, retaining the `deep-gate` label and filename |
 | Golden rebuild | `--deep`; fresh golden basin-map production and comparison |
 | Strict checkpoint | `--strict`; full checkpoint, golden rebuild, and refusal of skips |
 
@@ -366,7 +385,7 @@ A filed proposal is not an accepted guideline.
   final checkpoint; accept rollout only with equivalent coverage and useful savings.
 
 These are planned additional cleanups in this block, tracked with `think-xejq`; they are
-not claims that selection or reuse is already operational.
+not claims that exhaustive-family selection or reuse is already operational.
 
 The coordinator owns shared records, integration, commits, and external updates.
 Sub-agents own bounded investigations or disjoint code paths.

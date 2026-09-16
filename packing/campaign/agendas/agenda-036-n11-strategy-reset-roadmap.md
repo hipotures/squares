@@ -8,7 +8,7 @@ softschema:
 agenda:
   id: agenda-036
   title: N11 Strategy-Reset Roadmap
-  updated: '2026-09-15'
+  updated: '2026-09-16'
   status: active
   objective: >-
     Reconcile the merged research record, then choose among routes that can either
@@ -223,6 +223,45 @@ agenda:
       - packing/devtools/read_tier_walls.py
       disposition: defer-dependency
       follow_up: think-97we
+  - id: BC-355
+    purpose: tool_validation
+    owner_focus: efficiency
+    instances: [11]
+    state: in_progress
+    priority: 0
+    question: >-
+      Can the CI topology, gate-cost register, and validation-lane contract keep
+      ordinary research feedback within 180 seconds while reserving slow, exhaustive,
+      deferred, golden, and strict checks for explicit checkpoints?
+    budget: >-
+      One W7 pipeline-improvement block over the reconciled pull-request topology, with
+      measured W5 decisions and an independent W2 review. Preserve the complete
+      seven-part fast surface; move work off the critical path only when an equivalence
+      guard retains its coverage and failure behavior.
+    entry: >-
+      BC-340's correction assigns current-topology measurements to think-97we, while
+      PRs 183, 185, and 186 carry overlapping Pages, Packing, and wall-budget changes
+      that cannot be merged as independent final designs.
+    exit: >-
+      Exact-head hosted Packing and Pages aggregates pass within 180 seconds; every
+      fast partition remains represented; budget history, attribution, tree reuse, and
+      artifact synchronization fail closed; the edit, push, pull-request, and
+      checkpoint lanes are documented; and superseded pull requests and beads have an
+      explicit disposition.
+    bead: think-97we
+    depends_on: [BC-340]
+    next_evidence: >-
+      Complete exact-head hosted measurements and independent re-review, then resume
+      BC-343 under think-ufmk without changing H-163, allocating exp-161, or running a
+      scientific target.
+    workflows: [pipeline-improvement, efficiency-loop, factual-review]
+    program: gate-cost
+    artifacts:
+    - packing/campaign/agent-sessions/session-136-ci-topology-reconciliation.md
+    - docs/project/specs/active/plan-2026-09-06-validation-efficiency-and-checkpoints.md
+    - development.md
+    - packing/devtools/gate-budgets.yaml
+    parallel_group: ci-topology-reconciliation
   - id: BC-353
     purpose: tool_validation
     owner_focus: process
