@@ -977,11 +977,9 @@ Two checks hold the rule, and both run in `--edit` and on every pull request as 
 - `devtools.check_no_embedded_js` parses every Python file and fails on a built script
   argument to Playwright’s evaluate family, a string that matches a JavaScript
   signature, or a `<script>` body written in Python.
-  Its signatures and its ratchet allowlist are in
-  `packing/devtools/embedded-javascript.yaml`. The allowlist names each file that still
-  offends, its site count, and the bead that removes them; the check fails when a count
-  moves in either direction without the entry moving with it, and when a listed file is
-  clean. `--inventory` prints every site.
+  Its signatures and enforced empty allowlist are in
+  `packing/devtools/embedded-javascript.yaml`. Any detected site fails the check;
+  `--inventory` prints every site.
 - `devtools.check_probes` fails on a probe that does not evaluate to a function, one no
   Python file beside its tree names, and a name no file answers.
 
