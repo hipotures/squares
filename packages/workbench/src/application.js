@@ -4020,16 +4020,19 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       trace = openSide(p.n);
       seen = 1 - ramp(t, sc.moveStart * (1 - BOUND_CLEAR), sc.moveStart);
       held = trace;
-    } else if (!optimizing && t < sc.containerEnd) {
+    } else if (!optimizing && t < Math.max(sc.moveEnd, sc.containerEnd)) {
       const grown = sc.containerEnd;
+      const settleStart = Math.max(sc.moveEnd, grown);
+      const clearEnd = Math.min(settleStart, grown + (sc.moveEnd - sc.moveStart) * BOUND_FADE);
       const opening = easeInOut(ramp(t, sc.containerStart, grown));
       box = Math.max(sceneSide, lerp(from, open, opening));
       trace = from;
-      seen = 1 - ramp(t, grown, grown + (sc.moveEnd - sc.moveStart) * BOUND_FADE);
+      seen = 1 - ramp(t, grown, clearEnd);
       held = Math.max(box, lerp(openSide(p.n), open, opening));
     } else if (!optimizing) {
+      const settleStart = Math.max(sc.moveEnd, sc.containerEnd);
       trace = Math.max(sceneSide, open);
-      box = Math.max(sceneSide, lerp(trace, to, easeInOut(ramp(t, sc.containerEnd, sc.end))));
+      box = Math.max(sceneSide, lerp(trace, to, easeInOut(ramp(t, settleStart, sc.end))));
       seen = 1;
       held = trace;
     }

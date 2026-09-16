@@ -145,10 +145,10 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
 
         # The box on the stage: black on its way, green once locked at the best known side,
         # with a black trace where it just was and a triangle over the gap bar at its side. On
-        # 10 -> 11 the box rests at 3.707 with 9 -> 10's trace outside it at 4, grows to 4
-        # leaving a trace at 3.707, clears that trace before the new square arrives, and
-        # settles at 3.877 with a trace outside at 4. 6 -> 7 is a grid fill, where the box
-        # never changes size.
+        # 10 -> 11 the box rests at 3.707 with 9 -> 10's trace outside it at 4. The new
+        # square appears first; after the configured lead the box grows to 4, leaving and
+        # then clearing a trace at 3.707, before it settles at 3.877 with a trace outside
+        # at 4. 6 -> 7 is a grid fill, where the box never changes size.
         def at(seconds: float) -> tuple[float, float, float]:
             call("seek", seconds)
             drawn = page.evaluate(probe("stage/box-state"))
@@ -171,7 +171,18 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
             f"n = 10 does not rest at 3.707 inside the last step's trace at 4: {rest}",
         )
         require(locked() == (True, True), f"n = 10 at rest is not locked green: {locked()}")
-        grown = at(step["moveStart"] + 0.2 * span)
+        lead = at((step["arrive"] + step["containerStart"]) / 2)
+        arriving = float(
+            page.locator('#squares g[data-identity="11"]').get_attribute("opacity") or "nan"
+        )
+        require(
+            step["containerStart"] > step["arrive"]
+            and 0 < arriving <= 1
+            and abs(lead[1] - 3.707106781) < 1e-6,
+            f"the arriving square does not visibly lead the delayed box resize: "
+            f"{lead}, opacity {arriving}, {step}",
+        )
+        grown = at(step["containerEnd"])
         moving = float(page.locator("#container").get_attribute("width") or "nan")
         require(
             abs(grown[0] - 3.707106781) < 1e-6
@@ -184,14 +195,15 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
             and page.evaluate(probe("stage/box-state"))["boxStroke"] == "#000000",
             f"the growing box or its pointer is not black: {locked()}",
         )
-        cleared = at(step["moveStart"] + 0.32 * span)
-        arriving = page.locator('#squares g[data-identity="11"]').get_attribute("opacity")
-        require(
-            cleared[2] == 0 and step["arrive"] >= step["moveStart"] + 0.32 * span - 1e-9,
-            f"the inner trace is not gone before the new square arrives: {cleared}, {step}",
+        clear_end = min(
+            max(step["moveEnd"], step["containerEnd"]),
+            step["containerEnd"] + 0.12 * span,
         )
+        cleared = at(clear_end)
         require(
-            arriving == "0", f"the new square appeared before the box was ready: {arriving}"
+            cleared[2] == 0
+            and step["containerEnd"] < clear_end <= max(step["moveEnd"], step["containerEnd"]),
+            f"the inner trace did not clear after the delayed resize: {cleared}, {step}",
         )
         settled = at(call("duration", into[11]))
         require(
