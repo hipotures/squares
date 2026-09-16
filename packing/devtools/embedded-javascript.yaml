@@ -65,18 +65,6 @@ script_code: '[A-Za-z_$][\w$]*\s*[(.=;]'
 # one. The grouping those three carried is in this comment, where it cannot go stale
 # silently.
 allowlist:
-  - path: packages/workbench/tests/test_self_contained.py
-    sites: 1
-    bead: think-m0zb
-  - path: packages/workbench/tools/workbench_tools/check_accessibility.py
-    sites: 2
-    bead: think-m0zb
-  - path: packages/workbench/tools/workbench_tools/check_candidate.py
-    sites: 4
-    bead: think-m0zb
-  - path: packages/workbench/tools/workbench_tools/check_pack_panel.py
-    sites: 7
-    bead: think-m0zb
   - path: packing/atlas/known-best/video/spikes/v1-slideshow/build_candidate.py
     sites: 2
     bead: think-m0zb
