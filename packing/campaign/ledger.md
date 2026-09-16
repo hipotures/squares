@@ -150,6 +150,7 @@ Each entry summarizes one user-level research window. Cycle slots are wall-clock
 | [session-133](agent-sessions/session-133-n11-route-a-admission.md) | stopped | contemporaneous | `pipeline-improvement` (process) | `pipeline-improvement` (process) | 1 | think-0t5y | Open a separate no-target Route S admission pull request under BC-343 / think-a1e8, and run no compression target before that admission PR merges. |
 | [session-134](agent-sessions/session-134-n11-route-s-admission.md) | stopped | contemporaneous | `pipeline-improvement` (correctness) | `factual-review` (process) | 4 | think-a1e8 | Continue BC-343 under think-ufmk. A separate preregistered block must allocate exp-161 before any compression target runs; this record authorizes no target work. |
 | [session-135](agent-sessions/session-135-n11-route-s-guard-discharge.md) | stopped | contemporaneous | `pipeline-improvement` (correctness) | `pipeline-improvement` (correctness) | 1 | think-r55v | Continue BC-343 under think-ufmk. Only a fresh planning block may register exp-161 and authorize a bounded Route S target; this record authorizes no target work. |
+| [session-136](agent-sessions/session-136-ci-topology-reconciliation.md) | stopped | contemporaneous | `pipeline-improvement` (efficiency) | `pipeline-improvement` (efficiency) | 1 | think-97we | Complete think-97we by satisfying every pending closeout check on the same final source, then resume BC-343 under think-ufmk without changing its scientific claim or allocating exp-161 from this block. |
 
 ### Workflow summary
 
@@ -163,7 +164,7 @@ Declared counts are contemporaneous contracts; retrospective counts are reconstr
 | `process-review` | 16 | 4 | 64 | 6 |
 | `efficiency-loop` | 10 | 1 | 36 | 1 |
 | `research-loop` | 26 | 4 | 96 | 8 |
-| `pipeline-improvement` | 32 | 1 | 150 | 4 |
+| `pipeline-improvement` | 33 | 1 | 151 | 4 |
 | `documentation-pass` | 1 | 0 | 22 | 1 |
 | `remediation` | 0 | 1 | 0 | 1 |
 | `review-planning-oversight` | 3 | 0 | 16 | 1 |
@@ -746,6 +747,7 @@ Status: **active**. Reconcile the merged research record, then choose among rout
 | BC-347 | research | 6, 7, 10, 11, 13 | complete | 0 | think-oj12 | BC-346 compares the audited prerequisites, first discriminators, payoff, and cost and selects exactly one execution entry. |
 | BC-346 | tool_validation | 11 | complete | 0 | think-9y7p | Reconstruct the W5 cadence, then compare any due checkpoint with Routes A, S, E, B, F1, F2, N, C, D, and G using their declared first discriminators; select one block rather than a multi-lane research promise. |
 | BC-340 | measurement_validation | 11 | complete | 0 | think-1ydi | Reconstruct the cadence from active daytime blocks and retained gate receipts; administrative work does not reset the cadence. |
+| BC-355 | tool_validation | 11 | in_progress | 0 | think-97we | Complete exact-head hosted measurements and independent re-review, then resume BC-343 under think-ufmk without changing H-163, allocating exp-161, or running a scientific target. |
 | BC-353 | tool_validation | 11 | complete | 0 | think-d3h5 | Reconsider Route A at side 3.84 first, Route S as its admission fallback, and Route E in the first tier, while incorporating BC-340's measured result. |
 | BC-354 | tool_validation | 11 | complete | 0 | think-0t5y | Reopen only after one proposal supplies the complete 80-stratum negative-root producer, a rows-complete matched baseline, and two method-distinct exact coverage routes with shared physical variables. |
 | BC-341 | research | 11 | tentative | 1 | think-9y6q | Preserve the named Route A gaps and reconsider this discriminator only through a future W10 after a complete representation discharges them. |

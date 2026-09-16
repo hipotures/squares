@@ -24,6 +24,7 @@ from workbench_tools.build_site import RENDER_INPUTS, REPO
 
 WORKBENCH_STEP = "workbench browser behavior in Chromium"
 BROWSER_FLOOR_STEP = "browser floor (biome, eslint, tsc, node:test)"
+KATEX_STEP = "X-027 mathematics parses with pinned KaTeX"
 
 # One representative path per source region. Every step must be selected by at least one
 # of these; a step selected by none has a pattern set that matches nothing real, which is
@@ -271,6 +272,25 @@ def test_an_omitted_workbench_input_is_detected() -> None:
     explainer = REPO / "packing/devtools/render_explainer.py"
     assert explainer in RENDER_INPUTS
     assert not _selects(_render_input_probe(explainer), WORKBENCH_STEP, without)
+
+
+def test_the_node_katex_checker_selects_the_x027_math_check() -> None:
+    assert _selects("packing/devtools/node/check-katex.mjs", KATEX_STEP)
+
+
+def test_an_omitted_node_katex_checker_is_detected() -> None:
+    """The negative control: remove the executable the Python driver invokes."""
+    (step,) = [step for step in STEPS if step.name == KATEX_STEP]
+    without = tuple(
+        pattern
+        for pattern in step.touches
+        if pattern != "packing/devtools/node/check-katex.mjs"
+    )
+    assert not _selects(
+        "packing/devtools/node/check-katex.mjs",
+        KATEX_STEP,
+        without,
+    )
 
 
 def test_browser_floor_inputs_select_the_browser_floor() -> None:

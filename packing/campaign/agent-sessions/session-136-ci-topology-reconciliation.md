@@ -11,13 +11,22 @@ session:
   date: '2026-09-16'
   started_at: '2026-09-16T17:23:12Z'
   deadline_at: '2026-09-16T20:23:12Z'
+  ended_at: '2026-09-16T18:58:15Z'
   branch: codex/ci-topology-reconcile
   primary_bead: think-97we
-  status: in_progress
+  status: stopped
   goal: >-
     Reconcile the overlapping CI branches into one measured topology that preserves the
     complete fast validation surface, keeps ordinary research feedback within the
     180-second wall budget, and assigns slower checks to explicit checkpoints.
+  resource_usage_unmeasured:
+    reason: native_harness_data_unavailable
+    detail: >-
+      The collaboration harness exposed delegated task status but no native task-tree
+      resource receipt or log identifier from which a repository roll-up could be
+      generated.
+    disposition_bead: think-97we
+    handoff_role: work_handoff
   budget:
     wall_minutes: 180
     max_cycles: 4
@@ -46,7 +55,7 @@ session:
     objective: >-
       Reconcile Pages, Packing, cost history, and wall enforcement into one measured,
       fail-closed pull-request topology.
-    status: in_progress
+    status: stopped
     entered_by: session_start
     switch_reason: null
     budget_minutes: 150
@@ -64,14 +73,20 @@ session:
     fallback: >-
       Retain the last reviewed topology, record the measured overrun or missing margin,
       and leave think-97we open with the exact unresolved critical path.
-    outcome: null
+    outcome: >-
+      The branch reconciles the edit, push, seven-part pull-request, full, deferred,
+      golden, and strict lanes and retains the pipeline-improvement record. Final-source
+      checkpoint evidence, exact-head hosted aggregates, independent review, and merge
+      remain explicit certification work under think-97we.
     evidence:
     - .github/workflows/packing-validation.yml
     - .github/workflows/pages.yml
     - packing/devtools/gate-budgets.yaml
     - packing/devtools/read_tier_walls.py
     - packing/devtools/check_pr_wall.py
-    stop_reason: null
+    stop_reason: >-
+      The integrated topology and its durable record reached a reviewable stopping
+      point before final-source certification and merge evidence were available.
     next_action: >-
       Obtain green exact-head hosted aggregates, retain their measurements, and request
       a fresh independent review before terminalizing BC-355.
@@ -82,7 +97,10 @@ session:
     before: >-
       Three overlapping CI branches split the intended topology, required aggregates
       lacked stable budget margin, and current-topology hosted history was incomplete.
-    after: null
+    after: >-
+      One reconciliation branch owns the topology, cost history, validation-lane
+      contract, and closeout record. Exact final-source evidence remains pending and is
+      not represented as a pass.
   delegations:
   - task: Review the merged prerequisite research PR before the CI reconciliation base changed.
     operator: Codex PR 180 review sub-agent, read-only
@@ -190,21 +208,40 @@ session:
   - .github/workflows/pages.yml
   - packing/devtools/gate-budgets.yaml
   checks:
-  - No scientific target, optimizer, candidate, certificate, or frontier update belongs to this block.
-  - Exact-head hosted Packing and Pages measurements are pending.
-  - Independent approval of the repaired exact head is pending.
-  stop_reason: null
+  - >-
+    PENDING CLOSEOUT CHECK: run the complete full checkpoint on the final source SHA and
+    record its canonical passing declaration.
+  - >-
+    PENDING CLOSEOUT CHECK: obtain green final-head Packing and Pages required
+    aggregates within the declared wall budget and retain their run identifiers and
+    measurements.
+  - >-
+    PENDING CLOSEOUT CHECK: obtain a fresh independent review of the exact head covered
+    by the hosted evidence and resolve every prior finding.
+  - >-
+    PENDING CLOSEOUT CHECK: merge PR 188, then disposition superseded pull requests and
+    tracked beads from the merged revision.
+  - >-
+    PENDING CLOSEOUT CHECK: confirm the final diff contains no scientific target,
+    optimizer, candidate, certificate, frontier update, or experiment allocation.
+  resource_rollups: []
+  stop_reason: >-
+    The pipeline reconciliation reached a durable stopping point, but exact final-source
+    certification, hosted wall evidence, independent review, and merge remain open.
   next_action: >-
-    Complete BC-355 under think-97we with exact-head hosted evidence and independent
-    re-review, then resume BC-343 under think-ufmk without changing its scientific
-    claim or allocating exp-161 from this block.
+    Complete think-97we by satisfying every pending closeout check on the same final
+    source, then resume BC-343 under think-ufmk without changing its scientific claim or
+    allocating exp-161 from this block.
+  certification_pending: think-97we
 ---
 # Session 136: CI Topology Reconciliation
 
-This active pipeline-improvement session reconciles CI topology, budgeting, validation,
-and developer validation lanes.
-It records no mathematical result: the n=11 bracket, H-163, and the frontier remain
-unchanged.
+This stopped pipeline-improvement session records the reconciled CI topology, budgeting,
+validation, and developer validation lanes.
+Its certification debt remains under `think-97we`; none of the pending receipts is
+represented as a pass.
+The final closeout check must confirm that the n=11 bracket, H-163, and the frontier
+remain unchanged.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

@@ -139,8 +139,12 @@ record checks was a judgement call, and at four there is no argument for skippin
 **Use `--edit` while editing.** `BC-079` split it out of `--fast`, which had stopped
 being fast at `499s` with one step 94% of it.
 `--edit` is 33 seconds and runs everything except that step.
-`--fast` is what a block boundary is for, and CI runs the full gate on every push
-regardless, so the split moves feedback latency and not coverage.
+`--fast` is what a block boundary is for, and each pull request runs its complete
+seven-part surface as concurrent checks, frontend, typecheck, geometry, suite A, suite
+B, and sweeps jobs. Slow, exhaustive, deferred, golden-rebuild, and strict evidence
+belongs at explicit research, final-review, merge, daily, or on-demand checkpoints
+rather than in every edit cycle.
+The split changes feedback latency without thinning the fast surface.
 
 **The waste this rule names is measured now, and it is the coordinator’s, not the
 gate’s.** The evidence is the retained rollup

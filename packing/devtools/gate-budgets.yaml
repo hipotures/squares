@@ -493,14 +493,23 @@ tiers:
 
 - id: suite_a
   command: packing-validate --suite-a
-  ceiling_seconds: 180.0
-  measured_seconds: 150.54
-  measured_on: '2026-09-15'
+  ceiling_seconds: 168.0
+  measured_seconds: 84.0
+  measured_on: '2026-09-16'
   measured_where: >-
-    The geometric mean of two green readings at the reference shape -- 151.11s and
-    149.97s -- from run 35044761025, attempts 1 and 3, on PR 175 exact head dee68bc8.
-    Each selected 3,056 tests under the predecessor whole-module partition: 3,050 passed
-    and 6 skipped. Observed spread 1.01x. Refresh from the exact reconciliation topology.
+    Run 35128357992, job suite-a, on PR 188 exact head c5a33270: 84.00 s at
+    the reference shape, selecting 2,362 tests under the first recorded-cost partition.
+    All tests passed; the job failed only because this reading was below the stale-record
+    boundary. Refresh from the final exact-head hosted cohort after the record is rebuilt
+    from schema-v2 reports.
+  history:
+  - measured_seconds: 150.54
+    measured_on: '2026-09-15'
+    measured_where: >-
+      The geometric mean of two green readings at the reference shape -- 151.11s and
+      149.97s -- from run 35044761025, attempts 1 and 3, on PR 175 exact head dee68bc8.
+      Each selected 3,056 tests under the predecessor whole-module partition: 3,050
+      passed and 6 skipped. Observed spread 1.01x.
   reference: {jobs: 1, inner_jobs: 1, cpus: 4}
   argument: >-
     Pre-collection shard A of the quick behavioural lane. `devtools.suite_files` packs
@@ -509,22 +518,41 @@ tiers:
     writes a fresh per-file cost report beside its timing artifact. It keeps full Git
     history for history-reading tests but installs no Node toolchain; browser liveness
     belongs to `frontend`. `packing-required` preserves coverage by requiring both shard
-    jobs, and the 180-second ceiling remains the absolute bound.
+    jobs, and the declared 168-second ceiling is the absolute bound.
 
 - id: suite_b
   command: packing-validate --suite-b
   ceiling_seconds: 180.0
-  measured_seconds: 119.54
-  measured_on: '2026-09-15'
+  measured_seconds: 143.98
+  measured_on: '2026-09-16'
   measured_where: >-
-    The geometric mean of two green readings at the reference shape -- 133.13s and
-    107.34s -- from run 35044761025, attempts 1 and 2, on PR 175 exact head dee68bc8.
-    Each ran 3,055 tests under the predecessor whole-module partition. Observed spread
-    1.24x. A 145.68s predecessor-head
-    attempt is excluded: it failed the unchanged per-test backstop in a quick test that
-    still carried research-scale solver overrides, so it measured a superseded test
-    composition rather than this exact head. Refresh from the exact reconciliation
-    topology.
+    Run 35128357992, job suite-b, on PR 188 exact head c5a33270: 143.98 s at
+    the reference shape, selecting 3,983 tests under the first recorded-cost partition;
+    3,977 passed and 6 skipped. Refresh from the final exact-head hosted cohort after the
+    record is rebuilt from schema-v2 reports.
+  history:
+  - measured_seconds: 119.54
+    measured_on: '2026-09-15'
+    measured_where: >-
+      The geometric mean of two green readings at the reference shape -- 133.13s and
+      107.34s -- from run 35044761025, attempts 1 and 2, on PR 175 exact head dee68bc8.
+      Each ran 3,055 tests under the predecessor whole-module partition. Observed spread
+      1.24x. A 145.68s predecessor-head attempt is excluded: it failed the unchanged
+      per-test backstop in a quick test that still carried research-scale solver
+      overrides, so it measured a superseded test composition rather than this exact
+      head.
+  attribution:
+    cause: >-
+      The first recorded-cost repartition moved 154 of 325 test files using one hosted
+      cohort. That cohort's accumulated per-file time was balanced in its old assignment,
+      but under the new assignment the next run split 257.91 versus 468.08 test-seconds.
+      The suite-wide work did not grow; its distribution did.
+    unit: job-seconds
+    source: >-
+      Test-file cost reports from jobs suite-a and suite-b in run 35128357992; both
+      reports carry run, attempt and merge-SHA provenance.
+    grew:
+    - {name: suite-b tier, before: 119.54, after: 143.98}
   reference: {jobs: 1, inner_jobs: 1, cpus: 4}
   argument: >-
     Pre-collection shard B under the same complete and disjoint assignment as shard A.

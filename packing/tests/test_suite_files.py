@@ -16,13 +16,16 @@ from devtools.suite_files import RecordedCosts, Shard, SuiteFilesError
 from sqpack.cli import validate
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+REPO = PROJECT_ROOT.parent
+TEST_ROOTS = (PROJECT_ROOT / "tests", REPO / "packages/workbench/tests")
 
 
 def _test_files() -> set[str]:
-    """Every file pytest would collect as a test module under `tests`, repository-relative."""
+    """Every file in either behavioural root, repository-relative."""
     return {
         suite_files.repository_path(path)
-        for path in (PROJECT_ROOT / "tests").rglob("test_*.py")
+        for root in TEST_ROOTS
+        for path in root.rglob("test_*.py")
         if "__pycache__" not in path.parts
     }
 
@@ -40,6 +43,7 @@ def test_the_suite_shards_partition_every_test_file() -> None:
     assert costs.shards == validate.SUITE_SHARDS
     packed = suite_files.pack(costs)
     files = _test_files()
+    assert any(name.startswith("packages/workbench/tests/") for name in files)
     shards = [
         {name for name in files if suite_files.shard_of(name, costs, packed) == index}
         for index in range(1, costs.shards + 1)
@@ -90,18 +94,19 @@ def test_record_takes_each_files_geometric_mean_and_names_its_sources() -> None:
             {"packing/tests/test_a.py": (3, 2.0), "packing/tests/test_b.py": (1, 0.0)},
             shard=None,
             environment={"GITHUB_RUN_ID": "1", "GITHUB_JOB": "suite-1-of-2"},
+            exit_status=0,
         ),
         suite_files.report_document(
-            {"packing/tests/test_a.py": (3, 8.0), "packing/tests/test_c.py": (2, 1.5)},
+            {"packing/tests/test_a.py": (3, 8.0), "packing/tests/test_b.py": (1, 0.0)},
             shard=None,
             environment={},
+            exit_status=0,
         ),
     ]
     document = suite_files.record(reports, shards=2)
     assert document["files"] == {
         "packing/tests/test_a.py": 4.0,
         "packing/tests/test_b.py": 0.0,
-        "packing/tests/test_c.py": 1.5,
     }
     assert document["recorded_from"] == [
         "the whole lane: GITHUB_JOB=suite-1-of-2, GITHUB_RUN_ID=1",
@@ -112,10 +117,22 @@ def test_record_takes_each_files_geometric_mean_and_names_its_sources() -> None:
 
 
 def _shard_report(
-    index: int, *, run: str = "1", attempt: str = "1", sha: str = "abc"
+    index: int,
+    *,
+    run: str = "1",
+    attempt: str = "1",
+    sha: str = "abc",
+    seconds: float | None = None,
+    exit_status: int = 0,
+    file: str | None = None,
 ) -> dict[str, object]:
     return suite_files.report_document(
-        {f"packing/tests/test_{index}.py": (1, float(index))},
+        {
+            file or f"packing/tests/test_{index}.py": (
+                1,
+                float(index) if seconds is None else seconds,
+            )
+        },
         shard=Shard(index, 2),
         environment={
             "GITHUB_RUN_ID": run,
@@ -123,6 +140,7 @@ def _shard_report(
             "GITHUB_JOB": f"suite-{index}",
             "GITHUB_SHA": sha,
         },
+        exit_status=exit_status,
     )
 
 
@@ -136,16 +154,101 @@ def test_record_requires_one_complete_coherent_shard_cohort() -> None:
         suite_files.record(complete[:1], shards=2)
     with pytest.raises(SuiteFilesError, match="each shard exactly once"):
         suite_files.record([complete[0], complete[0]], shards=2)
-    with pytest.raises(SuiteFilesError, match="mix run id, attempt, or SHA"):
+    with pytest.raises(SuiteFilesError, match="each sharded cohort"):
         suite_files.record([complete[0], _shard_report(2, run="2")], shards=2)
-    with pytest.raises(SuiteFilesError, match="mix run id, attempt, or SHA"):
+    with pytest.raises(SuiteFilesError, match="each sharded cohort"):
         suite_files.record([complete[0], _shard_report(2, attempt="2")], shards=2)
-    with pytest.raises(SuiteFilesError, match="mix run id, attempt, or SHA"):
+    with pytest.raises(SuiteFilesError, match="each sharded cohort"):
         suite_files.record([complete[0], _shard_report(2, sha="def")], shards=2)
 
 
+def test_record_combines_complete_sharded_cohorts() -> None:
+    reports = [
+        _shard_report(1, run="1", seconds=2.0),
+        _shard_report(2, run="1", seconds=8.0),
+        _shard_report(1, run="2", seconds=8.0),
+        _shard_report(2, run="2", seconds=2.0),
+    ]
+    document = suite_files.record(reports, shards=2)
+    assert document["files"] == {
+        "packing/tests/test_1.py": 4.0,
+        "packing/tests/test_2.py": 4.0,
+    }
+    assert len(document["recorded_from"]) == 4
+
+
+def test_record_refuses_an_incomplete_second_sharded_cohort() -> None:
+    reports = [_shard_report(1), _shard_report(2), _shard_report(1, run="2", sha="def")]
+    with pytest.raises(SuiteFilesError, match="each sharded cohort"):
+        suite_files.record(reports, shards=2)
+
+
+def test_record_refuses_complete_cohorts_from_different_source_revisions() -> None:
+    reports = [
+        _shard_report(1, run="1", sha="abc"),
+        _shard_report(2, run="1", sha="abc"),
+        _shard_report(1, run="2", sha="def"),
+        _shard_report(2, run="2", sha="def"),
+    ]
+    with pytest.raises(SuiteFilesError, match="one GITHUB_SHA"):
+        suite_files.record(reports, shards=2)
+
+
+def test_record_refuses_unsuccessful_or_legacy_reports() -> None:
+    unsuccessful = _shard_report(1, exit_status=int(pytest.ExitCode.TESTS_FAILED))
+    with pytest.raises(SuiteFilesError, match="not successful"):
+        suite_files.record([unsuccessful, _shard_report(2)], shards=2)
+
+    legacy = _shard_report(1)
+    del legacy["exit_status"]
+    with pytest.raises(SuiteFilesError, match="exit_status"):
+        suite_files.record([legacy, _shard_report(2)], shards=2)
+
+
+def test_record_refuses_malformed_file_rows_and_totals() -> None:
+    duplicate = _shard_report(1)
+    duplicate["files"] = [*duplicate["files"], *duplicate["files"]]  # type: ignore[index]
+    duplicate["tests"] = 2
+    duplicate["seconds"] = 2.0
+    with pytest.raises(SuiteFilesError, match="duplicate file"):
+        suite_files.record([duplicate, _shard_report(2)], shards=2)
+
+    invalid_seconds = _shard_report(1)
+    invalid_seconds["files"][0]["seconds"] = -1.0  # type: ignore[index]
+    with pytest.raises(SuiteFilesError, match="not finite seconds"):
+        suite_files.record([invalid_seconds, _shard_report(2)], shards=2)
+
+    wrong_total = _shard_report(1)
+    wrong_total["tests"] = 2
+    with pytest.raises(SuiteFilesError, match="rows total"):
+        suite_files.record([wrong_total, _shard_report(2)], shards=2)
+
+
+def test_record_refuses_overlapping_shards_and_inconsistent_cohort_coverage() -> None:
+    overlap = [
+        _shard_report(1, file="packing/tests/test_shared.py"),
+        _shard_report(2, file="packing/tests/test_shared.py"),
+    ]
+    with pytest.raises(SuiteFilesError, match="more than one shard"):
+        suite_files.record(overlap, shards=2)
+
+    inconsistent = [
+        _shard_report(1),
+        _shard_report(2),
+        _shard_report(1, run="2"),
+        _shard_report(2, run="2", file="packing/tests/test_3.py"),
+    ]
+    with pytest.raises(SuiteFilesError, match="same file coverage"):
+        suite_files.record(inconsistent, shards=2)
+
+
 def test_record_refuses_mixed_whole_lane_and_sharded_reports() -> None:
-    whole = suite_files.report_document({}, shard=None, environment={})
+    whole = suite_files.report_document(
+        {"packing/tests/test_whole.py": (1, 1.0)},
+        shard=None,
+        environment={},
+        exit_status=0,
+    )
     with pytest.raises(SuiteFilesError, match="cannot mix"):
         suite_files.record([whole, _shard_report(1)], shards=2)
 
@@ -159,8 +262,15 @@ _PROBE_FILES = {
 }
 
 
-def _probe(tmp_path: Path, *arguments: str) -> subprocess.Popen[str]:
+def _probe(
+    tmp_path: Path,
+    *arguments: str,
+    rootdir: Path | None = None,
+    test_root: Path | None = None,
+) -> subprocess.Popen[str]:
     """Start one pytest run under the plugin; the three runs below overlap to stay cheap."""
+    rootdir = tmp_path if rootdir is None else rootdir
+    test_root = tmp_path / "suite" if test_root is None else test_root
     return subprocess.Popen(
         [
             sys.executable,
@@ -172,10 +282,10 @@ def _probe(tmp_path: Path, *arguments: str) -> subprocess.Popen[str]:
             "-p",
             "devtools.suite_files",
             "--rootdir",
-            str(tmp_path),
+            str(rootdir),
             "-c",
             os.devnull,
-            str(tmp_path / "suite"),
+            str(test_root),
             *arguments,
         ],
         stdout=subprocess.PIPE,
@@ -234,6 +344,7 @@ def test_the_plugin_collects_each_file_in_exactly_one_shard_and_reports_its_cost
         document = json.loads(report.read_text(encoding="utf-8"))
         assert document["schema"] == suite_files.REPORT_SCHEMA
         assert document["shard"] == f"{index}/2"
+        assert document["exit_status"] == 0
         collected.append({row["file"] for row in document["files"]})
         for row in document["files"]:
             assert set(row) == {"file", "tests", "seconds"}
@@ -247,6 +358,28 @@ def test_the_plugin_collects_each_file_in_exactly_one_shard_and_reports_its_cost
     status, output = _finish(refused)
     assert status != 0
     assert "re-record" in output
+
+
+def test_the_report_uses_the_actual_location_for_a_test_outside_rootdir(tmp_path: Path) -> None:
+    rootdir = tmp_path / "root"
+    rootdir.mkdir()
+    external = tmp_path / "external/test_external.py"
+    external.parent.mkdir()
+    external.write_text("def test_external():\n    pass\n", encoding="utf-8")
+    report = tmp_path / "external-report.json"
+
+    run = _probe(
+        tmp_path,
+        f"--test-file-costs={report}",
+        rootdir=rootdir,
+        test_root=external,
+    )
+    status, output = _finish(run)
+
+    assert status == 0, output
+    document = json.loads(report.read_text(encoding="utf-8"))
+    assert document["exit_status"] == 0
+    assert [row["file"] for row in document["files"]] == [suite_files.repository_path(external)]
 
 
 @pytest.mark.parametrize(

@@ -1,0 +1,6 @@
+reference: stored artifact
+replay: fresh draw 1
+raw bytes: 843258 then 843259
+normalised bytes: 843258 then 843259
+
+explainer PDF does not reproduce itself: 843258 then 843259 bytes, normalised; length delta 1. The cause is unknown; D-490 records the host-qualified readiness controls. first difference at byte 507824, in object 137: b'/Filter /FlateDecode\n/Length 5233>> stream\nx\x9c\xed=\xdb\x8e\x1d7r\xef\xf3\x15\xfd\x1c\xc0TU\xf1\x0e\x08\x02' against b'/Filter /FlateDecode\n/Length 5234>> stream\nx\x9c\xed=\xdb\x8e\x1d7r\xef\xf3\x15\xfd\x1c\xc0TU\xf1\x0e\x08\x02'

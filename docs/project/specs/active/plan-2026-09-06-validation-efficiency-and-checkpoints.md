@@ -11,7 +11,8 @@ status: active
 
 **Status:** Active; investigation and implementation authorized by the repository owner.
 
-**Workflow entry:** W5 `efficiency-loop`. **Tracking:** `think-rwte`.
+**Workflow entry:** W5 `efficiency-loop`. **Tracking:** `think-rwte`. Phase 2 closeout
+is BC-355 under `think-97we` on `codex/ci-topology-reconcile`.
 
 ## Overview
 
@@ -112,22 +113,26 @@ The default scheduler took 302.70 seconds, `loadscope` took 318.54 seconds, and
 The alternatives were 5.2 and 6.9 percent slower than the default, respectively, and did
 not address the one-job wall.
 
-The current recovery splits the quick lane into `suite-a` and `suite-b`. Each job
-collects the complete selection; a deterministic largest-first assignment by collected
-item count places every module in exactly one shard.
-This makes the shards complete and disjoint without a maintained file list, admits new
-modules automatically, and preserves module-scoped fixture reuse through
-`--dist=loadfile`.
+The current recovery splits the quick lane into `suite-a` and `suite-b` before
+collection.
+A deterministic largest-first assignment packs recorded per-file hosted costs
+across the two shards; files absent from the record use a stable path-derived fallback.
+Every module belongs to exactly one shard, new modules are admitted without a maintained
+file list, and `--dist=loadfile` preserves module-scoped fixture reuse inside each
+shard.
+The cost recorder accepts only successful, complete, coverage-matched cohorts with
+run, attempt, and source provenance.
 
 The ordinary gate now has 80 steps, 69 of them on the PR fast surface: 50 checks, three
 frontend steps, one typecheck step, nine geometry steps, one step in each suite shard,
 and four sweeps. The seven jobs all feed the existing `packing-required` aggregate.
-Each suite shard retains its 180-second predeclared ceiling.
-On PR 175 exact head `dee68bc8`, two green readings put shard A at 151.11 and 149.97
-seconds and shard B at 133.13 and 107.34 seconds.
-Their geometric means, 150.54 and 119.54 seconds, are now the recorded baselines.
-Every reading preserved the complete 6,111-item selection: 3,050 passes and 6 skips in
-shard A, and 3,055 passes in shard B.
+The reconciliation register currently declares a 168-second ceiling for suite A and a
+180-second ceiling for suite B. Its first exact-head hosted run at `c5a33270` measured
+84.00 and 143.98 seconds over the complete 6,345-item selection: 2,362 passes in suite
+A, and 3,977 passes with 6 skips in suite B. Those readings are interim until two
+successful schema-v2 cohorts rebuild the cost record and final-head hosted runs refresh
+the baselines. The PR 175 geometric means, 150.54 and 119.54 seconds, remain in the
+register as predecessor history rather than current evidence.
 
 One predecessor-head shard-B attempt completed all tests in 145.68 seconds but failed
 the unchanged 12-second per-test backstop when a divide-and-concur case took 12.76
@@ -357,6 +362,10 @@ A filed proposal is not an accepted guideline.
 
 ### Phase 2: Consistency and end-to-end validation
 
+BC-355 performs this closeout on `codex/ci-topology-reconcile`. The checked items
+describe integrated implementation; the unchecked items are required closeout evidence
+and must not be inferred from an earlier head.
+
 - [x] Reconcile workflow/help names and feedback versus final-checkpoint placement.
 - [x] Correct stale counts, timings, wall-time thresholds, and calibration claims.
 - [x] Link this plan from the development guide, W5 entry, predecessor plans, and map.
@@ -366,10 +375,18 @@ A filed proposal is not an accepted guideline.
 - [x] Verify changed selection, concurrency, failure, and naming contracts.
 - [ ] Run affected checks and the full final checkpoint on integrated source, reporting
   golden-rebuild and strict evidence separately.
-- [ ] Publish a PR, verify fast CI and checkpoint results, generate the experiment
-  report, and close or explicitly defer each item with evidence.
+- [ ] Verify the final exact head through both hosted required aggregates, obtain a
+  fresh independent review of that same head, merge the PR, and close or explicitly
+  defer every tracked item with evidence.
+- [ ] Confirm from the final diff and campaign record that this pipeline-improvement
+  block changed no scientific result, certificate, frontier claim, or experiment
+  allocation.
 
 ### Phase 3: Explained selection and complete checkpoint coverage
+
+Phase 3 is a successor block under `think-xejq` after BC-355 closes.
+The work below is not unfinished BC-355 scope and does not delay the current topology
+closeout.
 
 - [ ] Extend the existing selector with exhaustive-family planning in reporting mode;
   demonstrate complete node membership and declared code/data/fixture inputs.
@@ -384,8 +401,8 @@ A filed proposal is not an accepted guideline.
 - [ ] Measure total feedback latency and runner work across ordinary pushes and the
   final checkpoint; accept rollout only with equivalent coverage and useful savings.
 
-These are planned additional cleanups in this block, tracked with `think-xejq`; they are
-not claims that exhaustive-family selection or reuse is already operational.
+These are planned successor changes tracked with `think-xejq`; they are not claims that
+exhaustive-family selection or reuse is already operational.
 
 The coordinator owns shared records, integration, commits, and external updates.
 Sub-agents own bounded investigations or disjoint code paths.
@@ -412,7 +429,7 @@ Two independent reviews accepted the narrow W4 repair documented in
 An explicitly stopped checkpoint can retain certification debt without counting as
 certified. Completed handovers and current full pre-merge coverage remain required.
 The checker, schema and positive/negative controls are implemented; independent review,
-static checks and64 combined certification, diagnostic and session-clock tests passed.
+static checks, combined certification, diagnostic tests, and session-clock tests passed.
 Current integrated push and full-checkpoint results remain outstanding.
 
 `think-ph9v` retains the local full-checkpoint failures and serialized
@@ -435,7 +452,7 @@ producers merely to refresh a summary.
 
 ## Rollout Plan
 
-Land coherent changes through a PR from `codex/validation-efficiency-block`, with
+Land the Phase 2 reconciliation through a PR from `codex/ci-topology-reconcile`, with
 measured results, coverage mappings, unresolved cases, and the final command matrix.
 The coordinated suite migration replaces `--suite` with `--suite-a` and `--suite-b`; the
 `packing-required` aggregate remains the stable merge context.

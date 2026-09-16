@@ -30,7 +30,9 @@ setup, call and teardown seconds -- the quantity a junit `time` attribute carrie
 growth in the lane is priced by file on the run that introduced it. Under xdist the
 controller receives every worker's reports, and only the controller writes.
 
-Record the partition's costs from those reports, never by hand:
+Record the partition's costs from those reports, never by hand. Each hosted cohort must
+include all shards; passing several complete cohorts makes the record use each file's
+geometric mean across them rather than chase one runner's assignment:
 
     uv run --frozen --all-extras --group dev python -m devtools.suite_files record \\
         REPORT.json [REPORT.json ...]
@@ -46,6 +48,7 @@ import os
 import sys
 import zlib
 from collections import defaultdict
+from collections.abc import Mapping
 from dataclasses import dataclass
 from fnmatch import fnmatch
 from functools import cache
@@ -55,14 +58,14 @@ from typing import TYPE_CHECKING, Any, Final
 import pytest
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Mapping, Sequence
+    from collections.abc import Iterable, Sequence
 
 ROOT = Path(__file__).resolve().parent.parent
 REPO = ROOT.parent
 #: The recorded per-file costs the partition packs, keyed by repository-relative path.
 COSTS = Path(__file__).with_name("suite-file-costs.json")
 COSTS_SCHEMA: Final = "packing.squares:SuiteFileCosts/1"
-REPORT_SCHEMA: Final = "packing.squares:TestFileCosts/1"
+REPORT_SCHEMA: Final = "packing.squares:TestFileCosts/2"
 #: The GitHub environment a report carries, so a record can name the runs it came from.
 _PROVENANCE_ENVIRONMENT: Final = (
     "GITHUB_RUN_ID",
@@ -267,15 +270,19 @@ class FileCostReport:
     def pytest_runtest_logreport(self, report: pytest.TestReport) -> None:
         if report.when not in {"setup", "call", "teardown"}:
             return
-        name = repository_path(self.rootpath / report.nodeid.split("::", 1)[0])
+        location = Path(report.location[0])
+        if not location.is_absolute():
+            location = self.rootpath / location
+        name = repository_path(location)
         self.seconds[name] += report.duration
         self.tests[name].add(report.nodeid)
 
-    def pytest_sessionfinish(self) -> None:
+    def pytest_sessionfinish(self, exitstatus: int | pytest.ExitCode) -> None:
         document = report_document(
             {name: (len(self.tests[name]), seconds) for name, seconds in self.seconds.items()},
             shard=self.shard,
             environment=os.environ,
+            exit_status=int(exitstatus),
         )
         self.target.parent.mkdir(parents=True, exist_ok=True)
         self.target.write_text(json.dumps(document, indent=2) + "\n", encoding="utf-8")
@@ -286,8 +293,9 @@ def report_document(
     *,
     shard: Shard | None,
     environment: Mapping[str, str],
+    exit_status: int,
 ) -> dict[str, Any]:
-    """The report's one shape: `files` is a list of `{file, tests, seconds}` rows."""
+    """The report's one shape, including pytest's process exit status."""
     rows = [
         {"file": name, "tests": tests, "seconds": round(seconds, 3)}
         for name, (tests, seconds) in sorted(files.items())
@@ -298,6 +306,7 @@ def report_document(
         "provenance": {
             key: environment[key] for key in _PROVENANCE_ENVIRONMENT if key in environment
         },
+        "exit_status": exit_status,
         "tests": sum(int(row["tests"]) for row in rows),
         "seconds": round(sum(float(row["seconds"]) for row in rows), 3),
         "files": rows,
@@ -317,6 +326,94 @@ def read_report(path: Path) -> dict[str, Any]:
     return document
 
 
+def _validated_files(report: Mapping[str, Any], *, position: int) -> dict[str, float]:
+    """Return a report's unique file costs or refuse a report that cannot be evidence."""
+    label = f"cost report {position}"
+    if report.get("schema") != REPORT_SCHEMA:
+        raise SuiteFilesError(f"{label} is not a {REPORT_SCHEMA} report")
+    exit_status = report.get("exit_status")
+    if not isinstance(exit_status, int) or isinstance(exit_status, bool):
+        raise SuiteFilesError(f"{label} has no integer pytest exit_status")
+    if exit_status != int(pytest.ExitCode.OK):
+        raise SuiteFilesError(
+            f"{label} is not successful: pytest exit_status is {exit_status}, not 0"
+        )
+    provenance = report.get("provenance")
+    if not isinstance(provenance, Mapping) or any(
+        not isinstance(key, str) or not isinstance(value, str)
+        for key, value in provenance.items()
+    ):
+        raise SuiteFilesError(f"{label} has no string-to-string provenance mapping")
+    rows = report.get("files")
+    if not isinstance(rows, list) or not rows:
+        raise SuiteFilesError(f"{label} has no non-empty files list")
+
+    files: dict[str, float] = {}
+    total_tests = 0
+    total_seconds = 0.0
+    for row_position, row in enumerate(rows, start=1):
+        row_label = f"{label} file row {row_position}"
+        if not isinstance(row, Mapping):
+            raise SuiteFilesError(f"{row_label} is not a mapping")
+        name = row.get("file")
+        tests = row.get("tests")
+        seconds = row.get("seconds")
+        if not isinstance(name, str) or not name:
+            raise SuiteFilesError(f"{row_label} has no file path")
+        if name in files:
+            raise SuiteFilesError(f"{label} contains duplicate file {name!r}")
+        if not isinstance(tests, int) or isinstance(tests, bool) or tests < 1:
+            raise SuiteFilesError(f"{row_label} records {tests!r}, not a positive test count")
+        if (
+            not isinstance(seconds, int | float)
+            or isinstance(seconds, bool)
+            or seconds < 0
+            or not math.isfinite(seconds)
+        ):
+            raise SuiteFilesError(f"{row_label} records {seconds!r}, not finite seconds")
+        files[name] = float(seconds)
+        total_tests += tests
+        total_seconds += float(seconds)
+
+    reported_tests = report.get("tests")
+    if (
+        not isinstance(reported_tests, int)
+        or isinstance(reported_tests, bool)
+        or reported_tests != total_tests
+    ):
+        raise SuiteFilesError(
+            f"{label} reports {reported_tests!r} tests but its rows total {total_tests}"
+        )
+    reported_seconds = report.get("seconds")
+    if (
+        not isinstance(reported_seconds, int | float)
+        or isinstance(reported_seconds, bool)
+        or not math.isfinite(reported_seconds)
+        or round(float(reported_seconds), 3) != round(total_seconds, 3)
+    ):
+        raise SuiteFilesError(
+            f"{label} reports {reported_seconds!r} seconds but its rows total "
+            f"{round(total_seconds, 3)!r}"
+        )
+    return files
+
+
+def _require_same_coverage(coverages: Sequence[tuple[str, set[str]]]) -> None:
+    """Refuse cohorts that would give some files fewer observations than others."""
+    if not coverages:
+        return
+    reference_label, reference = coverages[0]
+    for label, files in coverages[1:]:
+        if files == reference:
+            continue
+        missing = sorted(reference - files)
+        unexpected = sorted(files - reference)
+        raise SuiteFilesError(
+            f"{label} does not have the same file coverage as {reference_label}: "
+            f"missing {missing[:5]}, unexpected {unexpected[:5]}"
+        )
+
+
 def record(reports: Iterable[Mapping[str, Any]], *, shards: int) -> dict[str, Any]:
     """Combine reports into a record: each file's geometric mean over the reports naming it.
 
@@ -330,6 +427,10 @@ def record(reports: Iterable[Mapping[str, Any]], *, shards: int) -> dict[str, An
         raise SuiteFilesError("record needs at least one cost report")
     if shards < 1:
         raise SuiteFilesError(f"record needs a positive shard count, found {shards}")
+    validated = [
+        _validated_files(report, position=position)
+        for position, report in enumerate(reports, start=1)
+    ]
     raw_shards = [report.get("shard") for report in reports]
     if any(part is None for part in raw_shards) and not all(
         part is None for part in raw_shards
@@ -342,16 +443,10 @@ def record(reports: Iterable[Mapping[str, Any]], *, shards: int) -> dict[str, An
             raise SuiteFilesError(
                 f"reports describe shard count(s) {sorted(counts)}, not the requested {shards}"
             )
-        indexes = [part.index for part in parsed]
         expected = set(range(1, shards + 1))
-        if set(indexes) != expected or len(indexes) != shards:
-            raise SuiteFilesError(
-                f"reports must contain each shard exactly once; found {indexes}, expected "
-                f"{sorted(expected)}"
-            )
         cohort_keys = ("GITHUB_RUN_ID", "GITHUB_RUN_ATTEMPT", "GITHUB_SHA")
-        cohorts: set[tuple[str, ...]] = set()
-        for report in reports:
+        cohorts: defaultdict[tuple[str, ...], list[tuple[int, set[str]]]] = defaultdict(list)
+        for report, part, files in zip(reports, parsed, validated, strict=True):
             provenance = report.get("provenance")
             if not isinstance(provenance, dict):
                 raise SuiteFilesError("a sharded report has no provenance mapping")
@@ -360,24 +455,60 @@ def record(reports: Iterable[Mapping[str, Any]], *, shards: int) -> dict[str, An
                 raise SuiteFilesError(
                     "a sharded report is missing cohort provenance: " + ", ".join(missing)
                 )
-            cohorts.add(tuple(str(provenance[key]) for key in cohort_keys))
-        if len(cohorts) != 1:
-            raise SuiteFilesError(
-                "sharded reports mix run id, attempt, or SHA; record one complete cohort"
+            cohort = tuple(str(provenance[key]) for key in cohort_keys)
+            cohorts[cohort].append((part.index, set(files)))
+        incomplete: list[tuple[tuple[str, ...], list[int]]] = []
+        for cohort, parts in cohorts.items():
+            indexes = [index for index, _files in parts]
+            if set(indexes) != expected or len(indexes) != shards:
+                incomplete.append((cohort, indexes))
+        if incomplete:
+            cohort, indexes = incomplete[0]
+            identity = ", ".join(
+                f"{key}={value}" for key, value in zip(cohort_keys, cohort, strict=True)
             )
+            raise SuiteFilesError(
+                "each sharded cohort must contain each shard exactly once; "
+                f"{identity} has {indexes}, expected {sorted(expected)}"
+            )
+        source_shas = {cohort[2] for cohort in cohorts}
+        if len(source_shas) != 1:
+            raise SuiteFilesError(
+                f"sharded cohorts must all describe one GITHUB_SHA; found {sorted(source_shas)}"
+            )
+        coverages: list[tuple[str, set[str]]] = []
+        for cohort, parts in cohorts.items():
+            identity = ", ".join(
+                f"{key}={value}" for key, value in zip(cohort_keys, cohort, strict=True)
+            )
+            coverage: set[str] = set()
+            for index, files in parts:
+                overlap = coverage & files
+                if overlap:
+                    raise SuiteFilesError(
+                        f"sharded cohort {identity} records files in more than one shard: "
+                        f"{sorted(overlap)[:5]} (including shard {index})"
+                    )
+                coverage.update(files)
+            coverages.append((f"sharded cohort {identity}", coverage))
+        _require_same_coverage(coverages)
+    else:
+        _require_same_coverage(
+            [
+                (f"whole-lane report {position}", set(files))
+                for position, files in enumerate(validated, start=1)
+            ]
+        )
 
     observed: defaultdict[str, list[float]] = defaultdict(list)
     sources: list[str] = []
-    for report in reports:
-        rows = report.get("files")
-        if not isinstance(rows, list):
-            raise SuiteFilesError("a cost report has no files list")
+    for report, files in zip(reports, validated, strict=True):
         provenance = report.get("provenance") or {}
         label = ", ".join(f"{key}={value}" for key, value in sorted(provenance.items()))
         part = f"shard {report['shard']}" if report.get("shard") else "the whole lane"
         sources.append(f"{part}: {label or 'no CI provenance'}")
-        for row in rows:
-            observed[str(row["file"])].append(float(row["seconds"]))
+        for name, seconds in files.items():
+            observed[name].append(seconds)
     files = {
         name: round(math.exp(sum(math.log(value) for value in values) / len(values)), 3)
         if all(value > 0 for value in values)

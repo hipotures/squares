@@ -9,7 +9,7 @@ from fnmatch import fnmatchcase
 from pathlib import Path
 from typing import Any
 
-from devtools.pages_scope import BUILDER_INPUTS, pull_request_jobs
+from devtools.pages_scope import BUILDER_INPUTS, declared_inputs, pull_request_jobs
 from sqpack.yamlio import safe_load
 
 REPO = Path(__file__).resolve().parents[2]
@@ -61,6 +61,42 @@ def browser_check_jobs(jobs: Mapping[str, Mapping[str, Any]]) -> list[str]:
         if name not in {"prepare", *DEPLOY_PATH}
         and any("playwright install" in step.get("run", "") for step in job.get("steps", []))
     ]
+
+
+def page_probe_inputs() -> dict[str, list[str]]:
+    """Probe inputs the page builders or their own workflow checks actually consume."""
+    sources: dict[str, list[str]] = {}
+    for inputs in declared_inputs().values():
+        for path in inputs:
+            relative = path.relative_to(REPO)
+            if "probes" not in relative.parts:
+                continue
+            files = (
+                [
+                    item.relative_to(REPO).as_posix()
+                    for item in path.rglob("*")
+                    if item.is_file()
+                ]
+                if path.is_dir()
+                else [relative.as_posix()]
+            )
+            sources[relative.as_posix()] = sorted(files)
+    return dict(sorted(sources.items()))
+
+
+def missing_page_probe_inputs(patterns: list[str]) -> dict[str, list[str]]:
+    """Declared probe inputs whose files no Pages push pattern covers."""
+    return {
+        root: missing
+        for root, files in page_probe_inputs().items()
+        if (
+            missing := [
+                path
+                for path in files
+                if not any(fnmatchcase(path, pattern) for pattern in patterns)
+            ]
+        )
+    }
 
 
 def test_the_push_filter_covers_the_developer_tools_its_jobs_run() -> None:
@@ -189,16 +225,27 @@ def test_pages_filters_cover_the_probes_its_tools_and_controls_load() -> None:
     filter remains the one outer trigger that must be checked directly.
     """
     workflow = safe_load((REPO / ".github/workflows/pages.yml").read_text("utf-8"))
-    probes = sorted(
-        path.relative_to(REPO).as_posix()
-        for tree in ("packing/devtools/probes", "packing/tests/probes/pdf_math_browser")
-        for path in (REPO / tree).rglob("*")
-        if path.is_file()
-    )
-    assert probes
     patterns = workflow["on"]["push"]["paths"]
-    missing = [probe for probe in probes if not any(fnmatchcase(probe, p) for p in patterns)]
-    assert not missing, f"push: probes outside the workflow path filter: {missing}"
+    trees = page_probe_inputs()
+    assert trees
+    assert not missing_page_probe_inputs(patterns), (
+        "push: declared page probe inputs outside the workflow path filter: "
+        f"{missing_page_probe_inputs(patterns)}"
+    )
+
+
+def test_pages_filter_contract_rejects_each_omitted_declared_probe_input() -> None:
+    """The coverage check must fail when an actual page probe input loses its trigger."""
+    patterns = load()["on"]["push"]["paths"]
+    trees = page_probe_inputs()
+    for root, files in trees.items():
+        covering = {
+            pattern for pattern in patterns if any(fnmatchcase(path, pattern) for path in files)
+        }
+        assert covering, f"test setup: {root} has no covering push pattern"
+        without_tree = [pattern for pattern in patterns if pattern not in covering]
+        missing = missing_page_probe_inputs(without_tree)
+        assert root in missing, f"test setup: removing {covering} did not expose {root}"
 
 
 def test_deployment_waits_for_the_cross_browser_loading_checks() -> None:
@@ -221,15 +268,29 @@ def test_page_check_setup_overlaps_prepare_then_joins_its_exact_artifact() -> No
         assert job["if"] == "needs.scope.outputs.explainer == 'true'"
         assert job["permissions"] == {"contents": "read", "actions": "read"}
         steps = job["steps"]
+        install_index = max(
+            index
+            for index, step in enumerate(steps)
+            if "playwright install" in step.get("run", "")
+        )
         wait = next(step for step in steps if step.get("name") == "Wait for the prepared page")
         download = next(step for step in steps if step.get("name") == "Use the prepared page")
-        assert steps.index(wait) < steps.index(download)
+        assert install_index < steps.index(wait) < steps.index(download)
+        assert wait["id"] == "prepared"
         assert wait["env"]["GH_TOKEN"] == "${{ github.token }}"
         command = wait["run"]
         assert "python -m devtools.wait_for_run_artifact" in command
         assert '--repository "$GITHUB_REPOSITORY"' in command
         assert '--run-id "$GITHUB_RUN_ID"' in command
-        assert "--name prepared-page --producer prepare --timeout 600" in command
+        assert '--run-attempt "$GITHUB_RUN_ATTEMPT"' in command
+        assert "--name prepared-page" in command
+        assert "--producer prepare" in command
+        assert '--github-output "$GITHUB_OUTPUT"' in command
+        assert "--timeout 600" in command
+        assert download["with"] == {
+            "artifact-ids": "${{ steps.prepared.outputs.artifact_id }}",
+            "path": "packing/site",
+        }
 
 
 def test_saved_font_geometry_runs_as_two_bounded_pairs() -> None:
@@ -318,10 +379,21 @@ def test_publication_assembles_the_three_checked_products_and_only_main_uploads_
         if step.get("uses", "").startswith("actions/download-artifact@")
     ]
     assert downloads == [
-        {"name": "prepared-page", "path": "packing/site"},
+        {
+            "artifact-ids": "${{ needs.prepare.outputs.prepared_artifact_id }}",
+            "path": "packing/site",
+        },
         {"name": "explainer-pdf", "path": "packing/site"},
         {"name": "workbench-page", "path": "packing/site/workbench"},
     ]
+    prepare = jobs["prepare"]
+    assert prepare["outputs"] == {
+        "prepared_artifact_id": "${{ steps.prepared-page-upload.outputs.artifact-id }}"
+    }
+    prepared_upload = next(
+        step for step in prepare["steps"] if step.get("with", {}).get("name") == "prepared-page"
+    )
+    assert prepared_upload["id"] == "prepared-page-upload"
     produced = {
         step["with"]["name"]: (name, step["with"]["path"])
         for name, job in jobs.items()
@@ -441,7 +513,7 @@ def test_pages_runs_real_math_failure_controls_on_the_pdf_it_draws() -> None:
         before
         for before, candidate in enumerate(steps)
         if candidate.get("uses", "").startswith("actions/download-artifact@")
-        and candidate["with"] == {"name": "prepared-page", "path": "packing/site"}
+        and candidate.get("name") == "Use the prepared page"
     ]
     installs = [
         before
@@ -679,14 +751,23 @@ def test_every_browser_checks_the_same_prepared_publication() -> None:
     for name in checks:
         if name in OVERLAPPED_PREPARED_PAGE_JOBS:
             assert needs_of(jobs[name]) == ["scope"], name
+            artifact_id = "${{ steps.prepared.outputs.artifact_id }}"
         else:
             assert needs_of(jobs[name]) == ["prepare"], name
+            artifact_id = "${{ needs.prepare.outputs.prepared_artifact_id }}"
         downloads = [
             step["with"]
             for step in jobs[name]["steps"]
             if step.get("uses", "").startswith("actions/download-artifact@")
         ]
-        assert downloads == [{"name": uploads[0]["name"], "path": "packing/site"}], name
+        assert downloads == [{"artifact-ids": artifact_id, "path": "packing/site"}], name
+
+    assert not any(
+        step.get("with", {}).get("name") == "prepared-page"
+        for job in jobs.values()
+        for step in job.get("steps", [])
+        if step.get("uses", "").startswith("actions/download-artifact@")
+    )
 
 
 def test_the_partial_checkouts_keep_the_directories_the_render_links() -> None:

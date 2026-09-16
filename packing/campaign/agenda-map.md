@@ -2,7 +2,7 @@
 
 # Agenda map
 
-343 agenda commitments across 35 agendas, as declared in each agenda's own frontmatter.
+344 agenda commitments across 35 agendas, as declared in each agenda's own frontmatter.
 Source of truth is [`agendas/`](agendas/); this view is regenerated, never edited.
 
 An agenda's queue owns priority ordering, so this map preserves each agenda's
@@ -10,7 +10,7 @@ order rather than imposing one across them.
 
 ## The short version
 
-- **8** in_progress, **15** ready, **20** tentative, **64** blocked, **59** stopped, **177** complete.
+- **9** in_progress, **15** ready, **20** tentative, **64** blocked, **59** stopped, **177** complete.
 
 - **23 blocked commitments carry a manual condition** (`BC-016`, `BC-025`, `BC-033`, `BC-050`, `BC-115`, `BC-170`, `BC-204`, `BC-205`, `BC-212`, `BC-207`, `BC-208`, `BC-209`, `BC-215`, `BC-217`, `BC-221`, `BC-238`, `BC-248`, `BC-270`, `BC-306`, `BC-337`, `BC-327`, `BC-329`, `BC-330`). Dependency edges alone cannot make these ready; each condition is named in the table below and must be explicitly cleared.
 
@@ -53,6 +53,7 @@ Commitments a session may take now, in each agenda's declared order.
 | agenda-027 | `BC-266` | tentative | 3 | insight | research | Does the shared certificate interface make a complete two-angle family under H-113 worth attempting, with… | `think-bgsz` |
 | agenda-028 | `BC-272` | tentative | 2 | insight | research | Does retaining the common anchor remove a diagnosed H119 correlation loss? | `think-cy6g` |
 | agenda-028 | `BC-274` | tentative | 2 | insight | research | What concrete implication could establish or obstruct the existential H121 normal form? | `think-5hmt` |
+| agenda-036 | `BC-355` | in_progress | 0 | efficiency | tool_validation | Can the CI topology, gate-cost register, and validation-lane contract keep ordinary research feedback within… | `think-97we` |
 | agenda-036 | `BC-343` | in_progress | 0 | insight | research | Does T-025's exact atom-support universe admit a certificate at side 3.82 with at most 23 positive D4-orbit… | `think-ufmk` |
 | agenda-036 | `BC-341` | tentative | 1 | insight | research | At side 3.84, can one complete difficult occupancy or wall-contact root family be closed by proved capacity… | `think-9y6q` |
 | agenda-036 | `BC-342` | tentative | 1 | insight | research | Does a sound theta-prime or level-two pairwise relaxation pass the n=6 formulation controls and improve… | `think-ol1z` |
@@ -191,7 +192,7 @@ A commitment whose exit another agenda's commitment satisfied. Recorded as an ed
 | agenda-032 | completed |  |  |  |  |  | 6 | 6 |
 | agenda-033 | completed |  |  |  |  | 1 | 8 | 9 |
 | agenda-035 | paused |  |  |  | 4 | 2 | 8 | 14 |
-| agenda-036 | active | 1 |  | 9 |  |  | 6 | 16 |
+| agenda-036 | active | 2 |  | 9 |  |  | 6 | 17 |
 
 ## By program
 
@@ -206,8 +207,9 @@ A program is a line of work that spans agendas; its cells carry one `program` sl
 | agenda-023 | `BC-216` | ready | What check would have caught the 499 s to 1370 s regression in the week it happened, and does it… |
 | agenda-023 | `BC-217` | blocked | Can the records gate certify that the full gate actually ran on the commit a block handed over, so… |
 | agenda-023 | `BC-218` | ready | How much of the gate's remaining wall is sequencing rather than work, and what does it cost to run… |
+| agenda-036 | `BC-355` | in_progress | Can the CI topology, gate-cost register, and validation-lane contract keep ordinary research… |
 
-Open frontier: `BC-214`, `BC-215`, `BC-216`, `BC-217`, `BC-218`.
+Open frontier: `BC-214`, `BC-215`, `BC-216`, `BC-217`, `BC-218`, `BC-355`.
 
 ### `grid-frontier-exact-values`
 

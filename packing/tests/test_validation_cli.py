@@ -680,6 +680,7 @@ def test_fast_behavioral_step_excludes_exhaustive_exact_tests(
         "not exhaustive_exact and not slow",
         "-n",
         "4",
+        "--dist=loadfile",
         "-p",
         "devtools.suite_files",
         "--suite-shard=1/2",
@@ -1882,6 +1883,69 @@ def test_push_tests_forward_the_shared_worker_allocation(
             "4",
         )
     ]
+
+
+@pytest.mark.parametrize(
+    ("broad", "arguments", "environment_jobs", "expected_jobs", "expected_inner_jobs"),
+    [
+        (True, (), None, 1, 1),
+        (False, (), None, 8, 2),
+        (True, ("--jobs", "3"), None, 3, 1),
+        (True, (), "3", 3, 1),
+        (True, ("--inner-jobs", "7"), None, 1, 7),
+    ],
+)
+def test_only_an_implicit_broad_push_gives_the_test_step_the_machine(
+    monkeypatch: pytest.MonkeyPatch,
+    *,
+    broad: bool,
+    arguments: tuple[str, ...],
+    environment_jobs: str | None,
+    expected_jobs: int,
+    expected_inner_jobs: int,
+) -> None:
+    """The expensive fallback gets every cpu without slowing ordinary narrow pushes."""
+    if environment_jobs is None:
+        monkeypatch.delenv("PACKING_VALIDATE_JOBS", raising=False)
+    else:
+        monkeypatch.setenv("PACKING_VALIDATE_JOBS", environment_jobs)
+    monkeypatch.delenv("PACKING_VALIDATE_INNER_JOBS", raising=False)
+    monkeypatch.setattr(validate.os, "process_cpu_count", lambda: 8)
+    monkeypatch.setattr(
+        validate,
+        "_push_test_step",
+        lambda _base: validate.Step(
+            name="reachable behavioral tests",
+            action=lambda _context: "",
+            fast=True,
+            broad=broad,
+        ),
+    )
+    monkeypatch.setattr(validate, "_begin_artifacts", lambda _context, _selected: None)
+    observed: list[validate.Context] = []
+
+    def capture(
+        selected: list[validate.Step],
+        context: validate.Context,
+        *_narrowing: object,
+    ) -> validate.RunSummary:
+        observed.append(context)
+        return validate.RunSummary(
+            results=[],
+            wall_seconds=0,
+            selected_count=len(selected),
+            total_count=len(validate.STEPS),
+        )
+
+    monkeypatch.setattr(validate, "_run_selected", capture)
+
+    status, _stdout, stderr = _invoke("--push", *arguments)
+
+    assert status == 0
+    assert stderr == ""
+    assert len(observed) == 1
+    assert observed[0].jobs == expected_jobs
+    assert observed[0].inner_jobs == expected_inner_jobs
 
 
 def test_the_edit_tier_cannot_under_run() -> None:

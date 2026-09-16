@@ -1335,6 +1335,7 @@ _SUITE_FILES_PLUGIN = "devtools.suite_files"
 
 def _quick_lane_command(jobs: int, shard: int) -> tuple[str, ...]:
     distribution = _xdist_distribution(jobs)
+    loadfile = ("--dist=loadfile",) if distribution else ()
     return (
         sys.executable,
         "-m",
@@ -1345,6 +1346,7 @@ def _quick_lane_command(jobs: int, shard: int) -> tuple[str, ...]:
         "-m",
         QUICK_TESTS,
         *distribution,
+        *loadfile,
         "-p",
         _SUITE_FILES_PLUGIN,
         f"--suite-shard={shard}/{SUITE_SHARDS}",
@@ -3847,6 +3849,7 @@ STEPS: tuple[Step, ...] = (
             *_X027_MATH,
             *_CORE,
             "packing/devtools/check_katex.py",
+            "packing/devtools/node/check-katex.mjs",
             "packing/devtools/check_math_spans.py",
             "packing/devtools/render_explainer.py",
             "packing/pyproject.toml",
@@ -5210,6 +5213,15 @@ def main(argv: Sequence[str] | None = None) -> int:
         if namespace.push:
             base = namespace.since or "origin/main"
             step = _push_test_step(base)
+            # A broad fallback is one test step followed by a short tail.  With the
+            # ordinary cpu-wide outer default, that step receives one pytest worker and
+            # leaves the machine idle after the tail finishes.  Give only the implicit
+            # broad shape one outer slot; narrow selections and explicit resource choices
+            # retain their existing shape.
+            if step.broad and jobs_value is None:
+                jobs = 1
+                if inner_value is None:
+                    inner_jobs = 1
             selected = [*selected, step]
             scope = "the whole suite" if step.broad else "a reachable subset"
             print(f"== pre-push floor against {base}: tests select {scope} ==\n")

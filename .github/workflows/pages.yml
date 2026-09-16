@@ -208,6 +208,8 @@ jobs:
     needs: scope
     if: needs.scope.outputs.explainer == 'true'
     runs-on: ubuntu-latest
+    outputs:
+      prepared_artifact_id: ${{ steps.prepared-page-upload.outputs.artifact-id }}
     defaults:
       run:
         working-directory: packing
@@ -287,6 +289,7 @@ jobs:
           echo "two renders agree; one file, $(du -h site/index.html | cut -f1)"
 
       - name: Share the prepared page with all browser checks
+        id: prepared-page-upload
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: prepared-page
@@ -424,17 +427,19 @@ jobs:
         run: uv run --frozen --group dev python -m playwright install --only-shell chromium
 
       - name: Wait for the prepared page
+        id: prepared
         env:
           GH_TOKEN: ${{ github.token }}
         run: >-
           uv run --frozen --group dev python -m devtools.wait_for_run_artifact
           --repository "$GITHUB_REPOSITORY" --run-id "$GITHUB_RUN_ID"
-          --name prepared-page --producer prepare --timeout 600
+          --run-attempt "$GITHUB_RUN_ATTEMPT" --name prepared-page
+          --producer prepare --github-output "$GITHUB_OUTPUT" --timeout 600
 
       - name: Use the prepared page
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: prepared-page
+          artifact-ids: ${{ steps.prepared.outputs.artifact_id }}
           path: packing/site
 
       # After the page, not beside it: the exporter loads `site/index.html` from disk,
@@ -578,17 +583,19 @@ jobs:
         run: uv run --frozen --group dev python -m playwright install --only-shell chromium
 
       - name: Wait for the prepared page
+        id: prepared
         env:
           GH_TOKEN: ${{ github.token }}
         run: >-
           uv run --frozen --group dev python -m devtools.wait_for_run_artifact
           --repository "$GITHUB_REPOSITORY" --run-id "$GITHUB_RUN_ID"
-          --name prepared-page --producer prepare --timeout 600
+          --run-attempt "$GITHUB_RUN_ATTEMPT" --name prepared-page
+          --producer prepare --github-output "$GITHUB_OUTPUT" --timeout 600
 
       - name: Use the prepared page
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: prepared-page
+          artifact-ids: ${{ steps.prepared.outputs.artifact_id }}
           path: packing/site
 
       # Reproducibility is not correctness: the PDF artifact check would have passed on
@@ -646,17 +653,19 @@ jobs:
         run: uv run --frozen --group dev python -m playwright install --only-shell chromium
 
       - name: Wait for the prepared page
+        id: prepared
         env:
           GH_TOKEN: ${{ github.token }}
         run: >-
           uv run --frozen --group dev python -m devtools.wait_for_run_artifact
           --repository "$GITHUB_REPOSITORY" --run-id "$GITHUB_RUN_ID"
-          --name prepared-page --producer prepare --timeout 600
+          --run-attempt "$GITHUB_RUN_ATTEMPT" --name prepared-page
+          --producer prepare --github-output "$GITHUB_OUTPUT" --timeout 600
 
       - name: Use the prepared page
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: prepared-page
+          artifact-ids: ${{ steps.prepared.outputs.artifact_id }}
           path: packing/site
 
       - name: Check every comparison variant measures the font it draws
@@ -743,17 +752,19 @@ jobs:
         run: uv run --frozen --group dev python -m playwright install --only-shell chromium
 
       - name: Wait for the prepared page
+        id: prepared
         env:
           GH_TOKEN: ${{ github.token }}
         run: >-
           uv run --frozen --group dev python -m devtools.wait_for_run_artifact
           --repository "$GITHUB_REPOSITORY" --run-id "$GITHUB_RUN_ID"
-          --name prepared-page --producer prepare --timeout 600
+          --run-attempt "$GITHUB_RUN_ATTEMPT" --name prepared-page
+          --producer prepare --github-output "$GITHUB_OUTPUT" --timeout 600
 
       - name: Use the prepared page
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: prepared-page
+          artifact-ids: ${{ steps.prepared.outputs.artifact_id }}
           path: packing/site
 
       # Which composite draws each expression, which metric table laid it out, and
@@ -831,17 +842,19 @@ jobs:
         run: uv run --frozen --group dev python -m playwright install --only-shell chromium
 
       - name: Wait for the prepared page
+        id: prepared
         env:
           GH_TOKEN: ${{ github.token }}
         run: >-
           uv run --frozen --group dev python -m devtools.wait_for_run_artifact
           --repository "$GITHUB_REPOSITORY" --run-id "$GITHUB_RUN_ID"
-          --name prepared-page --producer prepare --timeout 600
+          --run-attempt "$GITHUB_RUN_ATTEMPT" --name prepared-page
+          --producer prepare --github-output "$GITHUB_OUTPUT" --timeout 600
 
       - name: Use the prepared page
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: prepared-page
+          artifact-ids: ${{ steps.prepared.outputs.artifact_id }}
           path: packing/site
 
       # The trap: see the print geometry step in `typography`.
@@ -949,17 +962,19 @@ jobs:
       # Provisioning is independent of the page and starts beside `prepare`. Join only
       # at the first consumer, with a bounded tool that also observes producer failure.
       - name: Wait for the prepared page
+        id: prepared
         env:
           GH_TOKEN: ${{ github.token }}
         run: >-
           uv run --frozen --group dev python -m devtools.wait_for_run_artifact
           --repository "$GITHUB_REPOSITORY" --run-id "$GITHUB_RUN_ID"
-          --name prepared-page --producer prepare --timeout 600
+          --run-attempt "$GITHUB_RUN_ATTEMPT" --name prepared-page
+          --producer prepare --github-output "$GITHUB_OUTPUT" --timeout 600
 
       - name: Use the prepared page
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: prepared-page
+          artifact-ids: ${{ steps.prepared.outputs.artifact_id }}
           path: packing/site
 
       - name: Check mobile font loading on the published artifact
@@ -1070,17 +1085,19 @@ jobs:
           sudo chown -R "$(id -u):$(id -g)" ~/apt-archives
 
       - name: Wait for the prepared page
+        id: prepared
         env:
           GH_TOKEN: ${{ github.token }}
         run: >-
           uv run --frozen --group dev python -m devtools.wait_for_run_artifact
           --repository "$GITHUB_REPOSITORY" --run-id "$GITHUB_RUN_ID"
-          --name prepared-page --producer prepare --timeout 600
+          --run-attempt "$GITHUB_RUN_ATTEMPT" --name prepared-page
+          --producer prepare --github-output "$GITHUB_OUTPUT" --timeout 600
 
       - name: Use the prepared page
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: prepared-page
+          artifact-ids: ${{ steps.prepared.outputs.artifact_id }}
           path: packing/site
 
       - name: Check reload preserves the reading position in both viewports
@@ -1153,7 +1170,7 @@ jobs:
       - name: Use the prepared page
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: prepared-page
+          artifact-ids: ${{ needs.prepare.outputs.prepared_artifact_id }}
           path: packing/site
 
       - name: Cache the Playwright browser
@@ -1211,7 +1228,7 @@ jobs:
       - name: Use the prepared page
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: prepared-page
+          artifact-ids: ${{ needs.prepare.outputs.prepared_artifact_id }}
           path: packing/site
 
       - name: Use the checked PDF

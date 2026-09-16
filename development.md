@@ -140,7 +140,7 @@ process execution.
 A **tier** selects validation steps; a **lane** selects tests within a behavioural step.
 The
 [validation efficiency plan](docs/project/specs/active/plan-2026-09-06-validation-efficiency-and-checkpoints.md)
-owns the current W5 work on cost, naming, and checkpoint placement.
+owns the current work on cost, naming, and checkpoint placement.
 
 Use **PR fast surface** for `--fast`, **full checkpoint** for the default command, and
 **deferred checkpoint** for the eleven steps outside PR fast coverage.
@@ -164,14 +164,14 @@ alone is not full pre-merge evidence.
 | --- | --- | ---: | ---: | --- |
 | `--records` | contributor, before touching a registry; also every pull request | 33 of 80 | 300 s | 11.0 s |
 | `--edit` | contributor, in the edit loop | 48 of 80 | 240 s | 59.4 s |
-| `--push` | contributor, before a push — the edit tier plus tests reachable from the diff (`--since`) | varies with the diff | 1800 s | about a minute for a narrow code change; a broad diff selects the whole suite and needs `--jobs 1`, see below |
+| `--push` | contributor, once before a push — the edit tier plus tests reachable from the diff (`--since`) | varies with the diff | 1800 s | about a minute for a narrow code change; an implicitly configured broad diff selects the whole suite and assigns one outer job so pytest can use the host, see below |
 | `--fast` | contributor, at a block boundary; the union of the seven tiers below | 69 of 80 | 600 s | record cleared 2026-09-07 when the corpus widened; 229.1 s locally, only the ceiling applies |
 | `--checks` | **CI, on every pull request**, in the `validate` job | 50 of 80 | 195 s | 158.82 s on the predecessor topology; refresh from the exact reconciliation head |
 | `--frontend` | **CI, on every pull request**, in the `frontend` job, concurrently | 3 of 80 | 150 s | 85.25 s on the three-step, two-worker topology, the mean of two readings |
 | `--typecheck` | **CI, on every pull request**, in the `typecheck` job, concurrently | 1 of 80 | 130 s | 67.26 s on CI, the mean of two readings |
 | `--geometry` | **CI, on every pull request**, in the `geometry` job, concurrently | 9 of 80 | 180 s | 102.73 s on the predecessor topology, the mean of seven readings |
-| `--suite-a` | **CI, on every pull request**, in the `suite-a` job, concurrently | 1 of 80 | 180 s | 150.54 s on the predecessor sharder; refresh from the exact reconciliation head |
-| `--suite-b` | **CI, on every pull request**, in the `suite-b` job, concurrently | 1 of 80 | 180 s | 119.54 s on the predecessor sharder; refresh from the exact reconciliation head |
+| `--suite-a` | **CI, on every pull request**, in the `suite-a` job, concurrently | 1 of 80 | 168 s | interim 84.00 s on reconciliation head `c5a33270`; refresh after the schema-v2 rebuild |
+| `--suite-b` | **CI, on every pull request**, in the `suite-b` job, concurrently | 1 of 80 | 180 s | interim 143.98 s on reconciliation head `c5a33270`; refresh after the schema-v2 rebuild |
 | `--sweeps` | **CI, on every pull request**, in the `sweeps` job, concurrently | 4 of 80 | 210 s | 119.72 s before reconciliation; PR 180’s predecessor topology read 138.84 s |
 | *(no flag)* | Full checkpoint before final review and at block close; main, dispatch, and daily CI | 80 of 80 | 3600 s | split across four jobs; not clocked whole |
 
@@ -204,13 +204,14 @@ Each file belongs to exactly one shard and each runner imports only its own file
 Both jobs retain full Git history for history-reading tests, but neither installs Node.
 Browser-floor liveness runs under `--frontend`, on the runner that owns the pinned Node
 toolchain. Each shard writes a per-file cost report beside its JUnit and timing
-artifacts; the recorder rejects partial, duplicated, and mixed-run shard sets.
-The two 180-second ceilings remain the predeclared absolute bounds.
-At PR 175 exact head `dee68bc8`, `--suite-a` measured 151.11 and 149.97 seconds, and
-`--suite-b` measured 133.13 and 107.34 seconds.
-Their recorded baselines are the geometric means, 150.54 and 119.54 seconds.
-Each sample preserved the complete 6,111-item quick selection: 3,050 passes and 6 skips
-in shard A, and 3,055 passes in shard B.
+artifacts; the recorder accepts complete coherent cohorts and rejects failed, partial,
+duplicated, coverage-mismatched, and mixed-provenance evidence.
+The current declared ceilings are 168 seconds for suite A and 180 seconds for suite B.
+The first PR 188 integration run at exact head `c5a33270` measured 84.00 and 143.98
+seconds, respectively, over the complete 6,345-item quick selection: 2,362 passes in
+suite A, and 3,977 passes with 6 skips in suite B. Those are interim baselines pending a
+schema-v2 cost rebuild and final-head hosted cohorts; the predecessor PR 175 readings
+and their geometric means remain in the budget register as history.
 
 `--sweeps`, `--checks`, and `--frontend` have no recorded cost.
 The corpus widening of 2026-09-07 invalidated the first two baselines.
@@ -302,11 +303,12 @@ test satisfies exactly one, so no test can be in two lanes and none can be in ze
 
 | Lane | Marker | Tests at last count | Runs in | Bound |
 | --- | --- | ---: | --- | --- |
-| quick | neither | 6,111 selected (6,105 passed; 6 skipped) | PR fast surface: file shards in `suite-a` and `suite-b`, browser-floor liveness in `frontend` | fails a test whose `call` phase reaches 12 s |
+| quick | neither | 6,345 selected (6,339 passed; 6 skipped) | PR fast surface: file shards in `suite-a` and `suite-b`, browser-floor liveness in `frontend` | fails a test whose `call` phase reaches 12 s |
 | slow | `slow` | 97 | full checkpoint, under xdist in CI | fails a test whose `call` phase is under 1 s |
 | exhaustive | `exhaustive_exact` | 55 | its own CI job | its own 3600 s budget |
 
-The quick count is from PR 175 run 35044761025 on 2026-09-15, after the lane was split.
+The quick count is from PR 188 run 35128357992 on 2026-09-16, after the first
+recorded-cost repartition.
 The slow and exhaustive counts are `--collect-only` readings from 2026-09-08 against the
 n = 1..324 corpus. These are measurements rather than fixed membership; marker
 expressions determine the three lanes, and counts move with the corpus.
@@ -548,21 +550,23 @@ defensible. Each of 2026-08-30’s three red pushes broke a test reachable this 
 the changed paths ([D-381, D-393](defects.md)), and the floor would have caught all
 three.
 
-**On a broad diff, run it as `packing-validate --push --jobs 1`.** A changed workflow
-file or suite configuration expands the selector to everything, and everything here is
-the quick lane and the slow lane in one step, against `FAST_SUITE_BUDGET_SECONDS`. Plain
-`packing-validate --push` gives that step one worker — `--jobs` defaults to the cpu
-count and the distribution is `cpus - jobs + 1` — and on a four-cpu box one worker does
-not finish it: the step is killed at 1800 s and the tier returns red on a change that is
-fine, without naming a failing test.
-At `--jobs 1` the same selection took 1403 s, inside the cap.
+**A broad diff receives one outer job automatically.** A changed workflow file or suite
+configuration expands the selector to everything, and everything here is the quick lane
+and the slow lane in one step, against `FAST_SUITE_BUDGET_SECONDS`. With the normal
+CPU-wide outer default that single step would receive one pytest worker because the
+distribution is `cpus - jobs + 1`; the short outer-check tail would finish and leave the
+host idle. When the broad selection and resource settings are both implicit, the CLI
+therefore uses one outer job so pytest can use the host.
+Narrow selections keep the CPU-wide outer default, and explicit `--jobs` or
+`PACKING_VALIDATE_JOBS` choices remain authoritative.
 
 [D-488](defects.md) is that timeout, and what it fixed is narrower than the failure:
 until it, `_xdist_distribution`’s flag never reached the selector’s pytest at all, so
 `--jobs 1` was serial too and there was no shape that worked.
-There is one now, but it is not the default, and it is not the `{jobs: 2, cpus: 2}`
-reference shape `gate-budgets.yaml` declares for this tier, which also yields one
-worker. Choosing what the tier should default to is open on `think-uswr`.
+There is one now, and the implicit broad selection chooses it.
+The historical 1403-second reading used that one-outer-job shape and finished inside the
+cap; the reconciliation branch still owes its final-source push and full-checkpoint
+receipts before closeout.
 
 The `.gate-running` marker is a load lock protecting calibrated step budgets, not a
 correctness lock — no step mutates the working tree.
