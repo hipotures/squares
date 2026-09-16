@@ -9,7 +9,7 @@ from fnmatch import fnmatchcase
 from pathlib import Path
 from typing import Any
 
-from devtools.pages_scope import pull_request_jobs
+from devtools.pages_scope import BUILDER_INPUTS, pull_request_jobs
 from sqpack.yamlio import safe_load
 
 REPO = Path(__file__).resolve().parents[2]
@@ -602,8 +602,10 @@ def test_the_partial_checkouts_keep_the_directories_the_render_links() -> None:
     The renderer writes the archive's link as a `tree/` URL because `packing/resources`
     is a directory; a checkout without that directory would publish a `blob/` URL with
     every check green. So the sparse patterns exclude the two trees' subdirectories and
-    keep their top-level files, and the workbench -- which stamps the checkout's
-    cleanliness into its page -- keeps the whole tree.
+    keep their top-level files. The workbench stamps the checkout's cleanliness into its
+    page, but Git's sparse checkout keeps omitted tracked files at `skip-worktree`: a clean
+    sparse checkout is still clean, and downloading 504 MB of unrelated archive and
+    campaign data cannot make that answer more honest.
     """
     jobs = load()["jobs"]
     patterns = "/*\n!/packing/resources/*/\n!/packing/campaign/*/\n"
@@ -618,8 +620,17 @@ def test_the_partial_checkouts_keep_the_directories_the_render_links() -> None:
                 assert settings["sparse-checkout-cone-mode"] is False, name
                 assert settings["filter"] == "blob:none", name
                 sparse.append(name)
-    assert "workbench" not in sparse
-    assert {"scope", "prepare", *browser_check_jobs(jobs)} <= set(sparse)
+    assert {"scope", "prepare", "workbench", *browser_check_jobs(jobs)} <= set(sparse)
+    omitted_roots = (REPO / "packing/resources", REPO / "packing/campaign")
+    for half, builder in BUILDER_INPUTS.items():
+        omitted = []
+        for declared in builder():
+            for root in omitted_roots:
+                if declared.is_relative_to(root):
+                    relative = declared.relative_to(root)
+                    if relative.parts and (root / relative.parts[0]).is_dir():
+                        omitted.append(declared.relative_to(REPO).as_posix())
+        assert omitted == [], f"{half}: render inputs omitted by sparse checkout: {omitted}"
     assert (REPO / "packing/resources/README.md").is_file()
     assert (REPO / "packing/campaign/README.md").is_file()
 

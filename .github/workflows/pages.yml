@@ -292,10 +292,11 @@ jobs:
 
   # The workbench is a second page inside the same artifact, and it reads nothing the
   # explainer's jobs produce, so it builds beside `prepare` rather than at the end of a
-  # queue of explainer checks where it used to sit. It does no browser work. Its checkout
-  # is the whole tree, as before: the builder stamps whether the checkout is dirty into
-  # the published page, and that is not a reading to change for a few seconds of a job
-  # that is not on the critical path.
+  # queue of explainer checks where it used to sit. It does no browser work. The builder
+  # stamps whether the checkout is dirty into the published page; a sparse checkout keeps
+  # omitted tracked files at `skip-worktree`, so `git status` gives the same clean answer
+  # without downloading the 504 MB literature archive and campaign. Run 35052785989 made
+  # this job the critical path when its full checkout took 171 s.
   workbench:
     needs: scope
     if: needs.scope.outputs.workbench == 'true'
@@ -309,6 +310,12 @@ jobs:
         with:
           submodules: true
           persist-credentials: false
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/packing/resources/*/
+            !/packing/campaign/*/
 
       - name: Install uv and Python 3.14
         uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
