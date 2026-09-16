@@ -20,6 +20,7 @@
     visible: visible(target),
     semantic_visible: visible(semantic),
     raw_box_visible: visible(render),
+    // biome-ignore lint/nursery/useDomNodeTextContent: this probe compares rendered text with raw DOM text, so their different visibility semantics are the subject of the test.
     visible_text: target?.innerText,
     raw_text: target?.textContent,
     katex_count: target?.querySelectorAll(".katex").length,

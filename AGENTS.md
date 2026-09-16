@@ -133,7 +133,7 @@ Four things worth knowing before changing any of it:
 - `packages/workbench/` is strict TypeScript and uses pinned esbuild to emit classic
   browser bundles. The retained scripts remain checked JavaScript with `allowJs` +
   `checkJs` + `noEmit` and JSDoc types.
-  `tsconfig.base.json` holds the shared floor; each retained global program has its own
+  `tsconfig.base.json` holds the shared floor; each retained browser program has its own
   `tsconfig.*.json`, while the package has a strict module program.
   The browser-floor step also runs the package’s Node tests.
 

@@ -1493,29 +1493,6 @@ def _lint_floor(context: Context) -> str:
     )
 
 
-#: Where the ESLint promise overlay runs. Biome takes `**/*.js`, the type programs take
-#: globs, and `devtools.check_probes` walks for probe trees; only this half of the floor
-#: names directories, which is why a probe tree outside it was formatted and type-checked
-#: and never saw `no-floating-promises` (#175 R4, and #179 R3 where the cost showed: a new
-#: tree had to be added here by hand). ESLint resolves a whole directory against its own
-#: config, so the entries are directories rather than files; what holds them to the config's
-#: own reach is `test_the_promise_floor_reaches_every_file_its_config_covers`, which fails
-#: when a file the config lints lies outside every entry here.
-ESLINT_PATHS = (
-    # The whole package: its config types every workbench JavaScript file, so naming files
-    # here would leave a new one outside the promise floor.
-    "packages/workbench",
-    "packing/src/sqpack/motion_lab/assets",
-    "packing/atlas/known-best/video/spikes/v1-slideshow",
-    "packing/atlas/known-best/video/spikes/v2-transitions",
-    "packing/devtools/probes",
-    "packing/devtools/explainer",
-    "packing/devtools/node",
-    "packing/tests/node",
-    "packing/tests/probes",
-)
-
-
 def _browser_floor(context: Context) -> str:
     """Biome, the promise overlay, `tsc`, and Node tests over browser source.
 
@@ -1555,7 +1532,11 @@ def _browser_floor(context: Context) -> str:
             (str(biome), "ci", "--error-on-warnings", "."),
             (
                 str(eslint),
-                *ESLINT_PATHS,
+                # The whole repository, as Biome is given it. The config holds every owned
+                # JavaScript file to the promise rules and ignores only what is not ours.
+                # A directory list here had to grow with every new tree and repeatedly left
+                # checked source outside the promise floor while the gate stayed green.
+                ".",
                 "--config",
                 "packages/workbench/eslint.config.js",
                 "--max-warnings",
@@ -1607,12 +1588,22 @@ def _workbench_frontend(context: Context) -> str:
     the repository without a hand-kept list of callers; the `browser code lives in files`
     step runs it too, so the edit tier sees it, and this run keeps the frontend job's own
     early failure.
+
+    The Motion Lab pages run here too, because this is the job with Chromium: four seconds
+    for both labs, and until think-6o9n nothing loaded them in a browser at all.
     """
     return _commands(
         context,
         (
             (sys.executable, "-m", "devtools.check_probes"),
             (sys.executable, "-m", "workbench_tools.check_frontend"),
+            (
+                sys.executable,
+                "-m",
+                "devtools.check_motion_lab_pages",
+                "--golden",
+                "tests/golden/motion-lab-pages.json",
+            ),
         ),
     )
 
@@ -2952,6 +2943,14 @@ _WORKBENCH_INPUTS = (
     "package-lock.json",
     ".node-version",
     "vendor/kpress/*",
+    # The Motion Lab pages the same step drives: their assets, renderers and checker.
+    "packing/src/sqpack/motion_lab/*",
+    "packing/devtools/render_packing_motion_lab.py",
+    "packing/devtools/render_general_motion_lab.py",
+    "packing/devtools/packing_motion_studies.py",
+    "packing/devtools/check_motion_lab_pages.py",
+    "packing/devtools/probes/check_motion_lab_pages/*",
+    "packing/tests/golden/motion-lab-pages.json",
     *_TOOLCHAIN,
 )
 
