@@ -473,6 +473,11 @@ def test_a_bytes_script_argument_fails(script: str) -> None:
         "page.evaluate(''.join(parts))\n",
         "page.evaluate([SCRIPT][0])\n",
         "def build():\n    return 'planted'\n\npage.add_init_script(build())\n",
+        (
+            "from pathlib import Path\n"
+            "def build():\n    return Path('planted.txt').read_text()\n\n"
+            "page.evaluate(build())\n"
+        ),
         "async def go(page):\n    return page.evaluate(await build())\n",
     ],
 )
@@ -493,6 +498,11 @@ def test_an_unclassifiable_script_argument_fails(source: str) -> None:
         (
             "from sqpack.probes import probe\nSCRIPT = probe(ROOT, 'tool/name')\n"
             "OTHER = probe(ROOT, 'tool/other')\npage.evaluate(SCRIPT if flag else OTHER)\n"
+        ),
+        (
+            "from sqpack.probes import probe\n"
+            "def build():\n    return probe(ROOT, 'tool/name')\n\n"
+            "page.evaluate(build())\n"
         ),
     ],
 )

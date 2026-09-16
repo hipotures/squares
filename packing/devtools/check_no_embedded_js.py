@@ -547,12 +547,17 @@ class _Scanner:
                 # `.replace()`, and the allowlist of method names is what let a bytes
                 # constant through (#175 R1).
                 verdict = "built"
-            case ast.Name(id=name) if any(
-                self.text(returned) is not None for returned in self.returns.get(name, [])
-            ):
-                # A helper in this module that returns text: the bypass is one `return`
-                # away, and signature-evading text came back through exactly that (L6).
-                verdict = "built"
+            case ast.Name(id=name) if name in self.returns:
+                # A helper in this module is not opaque: its returns are available here.
+                # Accept it only when every value it can return is loader-backed. A literal
+                # was the original bypass (L6), but treating only literal returns as local
+                # let `return Path(...).read_text()` recreate the same hole one call away.
+                returned = (
+                    {self.classify(value, seen | {name}) for value in self.returns[name]}
+                    if name not in seen
+                    else {"unknown"}
+                )
+                verdict = "loader" if returned == {"loader"} else "built"
             case _ if any(self.text(argument) is not None for argument in node.args):
                 # A call handed text and returning a script is building one: `str(b"...")`,
                 # `b64decode("...")`, `dedent(...)` under any alias.
