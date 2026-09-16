@@ -221,6 +221,8 @@ def test_every_page_says_why_it_was_skipped(declared: dict[str, tuple[Path, ...]
     for decision in decisions:
         assert not decision.in_scope
         assert decision.reason.startswith("none of the 2 changed files is among the ")
+    (single,) = decide(["README.md"], declared)[:1]
+    assert single.reason.startswith("none of the 1 changed file is among the ")
 
 
 def test_the_workflow_outputs_and_summary_are_written(

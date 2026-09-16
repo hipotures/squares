@@ -275,10 +275,8 @@ def decide(changed: Sequence[str], declared: Mapping[str, tuple[Path, ...]]) -> 
             more = f" and {len(touched) - 1} more" if len(touched) > 1 else ""
             reason = f"{touched[0]}{more} changed, among the {half}'s {len(inputs)} inputs"
         else:
-            reason = (
-                f"none of the {len(changed)} changed files is among the {half}'s "
-                f"{len(inputs)} declared inputs"
-            )
+            files = f"{len(changed)} changed file" + ("s" if len(changed) != 1 else "")
+            reason = f"none of the {files} is among the {half}'s {len(inputs)} declared inputs"
         decisions.append(Decision(half, bool(touched), reason, tuple(touched)))
     return decisions
 

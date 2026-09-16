@@ -539,7 +539,8 @@ def test_every_browser_checks_the_same_prepared_publication() -> None:
     checks = browser_check_jobs(jobs)
     assert {
         "pdf",
-        "print-and-typography",
+        "print-layout",
+        "typography",
         "screen",
         "geometry",
         "font-loading",
@@ -624,7 +625,7 @@ def test_prepared_geometry_checks_cover_each_browser_and_their_controls() -> Non
         "chromium": [name for name in measuring if "strategy" not in jobs[name]],
         "matrix-browser": [name for name in measuring if "strategy" in jobs[name]],
     }
-    assert set(browsers["chromium"]) == {"geometry", "print-and-typography"}
+    assert set(browsers["chromium"]) == {"geometry", "typography"}
     assert set(browsers["matrix-browser"]) == {"font-loading", "browser-geometry"}
     for name in browsers["matrix-browser"]:
         assert set(jobs[name]["strategy"]["matrix"]["browser"]) == {"firefox", "webkit"}
@@ -707,7 +708,7 @@ def test_prepared_geometry_checks_cover_each_browser_and_their_controls() -> Non
 
 def test_reload_guard_covers_both_viewports_on_the_published_artifact() -> None:
     jobs = load()["jobs"]
-    for name in ("screen", "font-loading"):
+    for name in ("screen", "browser-geometry"):
         steps = jobs[name]["steps"]
         commands = [
             line
@@ -719,7 +720,7 @@ def test_reload_guard_covers_both_viewports_on_the_published_artifact() -> None:
         assert all(" site/index.html " in command for command in commands)
         assert any("--self-test" in command for command in commands)
         assert any("--width 390" in command for command in commands)
-        if name == "font-loading":
+        if name == "browser-geometry":
             assert all("--browser ${{ matrix.browser }}" in command for command in commands)
         uploads = [
             step
@@ -777,7 +778,7 @@ def test_dispatch_timing_uses_frozen_pairs_and_retains_failed_measurements() -> 
     assert option(controls[0][1], "--output") == "/tmp/math-startup-timing/controls.json"
     assert any(
         "--self-test" in command and option(command, "--mode") == "parameters"
-        for _, command in commands("screen")
+        for _, command in commands("typography")
     ), "the low-overhead observer's controls must also run on ordinary pull requests"
 
     pairs = [(step, command) for step, command in timing if "--self-test" not in command]

@@ -93,7 +93,8 @@ concurrency:
 #          ├─ workbench-unchanged                  (only when the workbench is skipped)
 #          ├─ workbench ───────────────────────────────┐
 #          └─ prepare ─┬─ pdf ─────────────────────────┼─ publish ─┐
-#                      ├─ print-and-typography         │           ├─ pages-required ─ (pr-wall)
+#                      ├─ print-layout                 │           ├─ pages-required ─ (pr-wall)
+#                      ├─ typography                   │           │
 #                      ├─ screen                       │           │
 #                      ├─ geometry                     │           │
 #                      ├─ font-loading (ff, wk)        │           │
@@ -104,12 +105,12 @@ concurrency:
 # A pull request waits for its slowest job, so what sets its wall is the longest chain,
 # and until 2026-09-15 that chain was `prepare` then one `build` job running about 300 s
 # of Chromium checks one after another on a four-cpu runner: 472 s median on the
-# workbench stack's pull requests, 381 s on pull requests into `main`
-# (attic audit of runs 34918609212 to 34993754160). None of those checks reads another's
-# result -- each loads the one prepared page -- so they are split into jobs balanced by
-# their measured step times, and the long pole is now `prepare` plus one check job.
-# Every check that ran before still runs, on the same prepared artifact; nothing moved
-# off the pull request (`OR-13`).
+# workbench stack's pull requests, 381 s on pull requests into `main`, and 471 s on the
+# push to `main` that merged the stack (run 35017781374). None of those checks reads
+# another's result -- each loads the one prepared page -- so they are split into jobs
+# balanced by their measured step times, and the long pole is now `scope`, `prepare` and
+# one check job. Every check that ran before still runs, on the same prepared artifact;
+# nothing moved off the pull request (`OR-13`).
 jobs:
   # Which of the two pages this change can affect. A pull request that touches neither
   # page's inputs does no browser work at all, and a workbench-only change no longer
@@ -345,20 +346,23 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-  # The four Chromium check jobs below were one `build` job. Their split is by measured
-  # step time, medians over eight pull-request runs into `main` (attic audit, 2026-09-15),
-  # so that no job's checks exceed about 80 s on top of about 18 s of setup:
+  # The five Chromium check jobs below were one `build` job of about 300 s. Their split is
+  # by measured step time, and the readings are this workflow's own, from run 35039248281
+  # (the first run of the split shape) rather than from the queue it replaced:
   #
-  #   pdf                   print faces 10, PDF draw 4, PDF controls 20, artifact check 5,
-  #                         print layout 30                                     about 69 s
-  #   print-and-typography  print-layout probe control 31, typography 30,
-  #                         print geometry 4 x 4.2                              about 78 s
-  #   screen                math faces 26, font loading 18, startup 16, reload 10  about 70 s
-  #   geometry              controls 41, seven screen settings and the alternate
-  #                         certificate 8 x 4.2                                 about 74 s
+  #   pdf           print faces 10, PDF draw 5, PDF controls 22, artifact check 5     42 s
+  #   print-layout  print layout 30, the page-width overflow control 34               64 s
+  #   typography    typography 30, comparison variants 0, print geometry 4 x 4.5,
+  #                 startup controls 17                                               65 s
+  #   screen        math faces 30, font loading 19, reload 10                         59 s
+  #   geometry      controls 41, seven screen settings and the alternate
+  #                 certificate 8 x 3                                                 64 s
   #
-  # Each job downloads the one prepared page, so all of them check the bytes that are
-  # published, and a failure now names its job rather than a step in a 388 s queue.
+  # on about 17 s of setup each. The grouping follows the measurement where it has to:
+  # the startup controls are a screen check and sit in `typography` because that job was
+  # the shortest, which is what balanced by cost means. Each job downloads the one
+  # prepared page, so all of them check the bytes that are published, and a failure now
+  # names its job rather than a step in a 388 s queue.
 
   # Everything the PDF is: drawn once, from the prepared page, then checked in place and
   # handed to `publish` unchanged.
@@ -469,14 +473,6 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
-      # Reproducibility is not correctness: the check above would have passed on all
-      # three print defects a reader found in the finished PDF, because two identical
-      # renders of a wrong page still agree. This one measures the print layout -- the
-      # blocks the page declares centred, where the list markers sit, whether a footnote
-      # reference opens a line -- at the column the PDF actually has.
-      - name: Check the print layout
-        run: uv run --frozen --group dev python -m devtools.check_print_layout
-
       # The checked bytes, unchanged: `publish` puts this file beside the prepared page.
       - name: Share the checked PDF with the publication
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
@@ -486,7 +482,7 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-  print-and-typography:
+  print-layout:
     needs: prepare
     runs-on: ubuntu-latest
     defaults:
@@ -529,8 +525,61 @@ jobs:
       - name: Install the pinned Chromium headless shell
         run: uv run --frozen --group dev python -m playwright install --only-shell chromium
 
+      # Reproducibility is not correctness: the PDF artifact check would have passed on
+      # all three print defects a reader found in the finished PDF, because two identical
+      # renders of a wrong page still agree. This one measures the print layout -- the
+      # blocks the page declares centred, where the list markers sit, whether a footnote
+      # reference opens a line -- at the column the PDF actually has, and the second
+      # measures the same thing on a page mutated to overflow, so the probe is held to
+      # catching what it exists to catch.
+      - name: Check the print layout
+        run: uv run --frozen --group dev python -m devtools.check_print_layout
+
       - name: Check the print-layout probe still catches a page-width overflow
         run: uv run --frozen --group dev python -m devtools.check_print_layout --self-check
+
+  typography:
+    needs: prepare
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packing
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          submodules: true
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/packing/resources/*/
+            !/packing/campaign/*/
+
+      - name: Install uv and Python 3.14
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: "0.12.8"
+          python-version: "3.14.7"
+          working-directory: packing
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+
+      - name: Use the prepared page
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: prepared-page
+          path: packing/site
+
+      - name: Cache the Playwright browser
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('packing/uv.lock') }}
+
+      - name: Install the pinned Chromium headless shell
+        run: uv run --frozen --group dev python -m playwright install --only-shell chromium
 
       - name: Check every comparison variant measures the font it draws
         run: uv run --frozen --group dev python -m devtools.compare_math_fonts check
@@ -540,6 +589,15 @@ jobs:
           uv run --frozen --group dev python -m devtools.inspect_explainer_typography --self-test
           uv run --frozen --group dev python -m devtools.inspect_explainer_typography --check-supporting --check-math --theme light
           uv run --frozen --group dev python -m devtools.inspect_explainer_typography --check-supporting --check-math --theme dark --width 390
+
+      # Timings remain descriptive: machine speed is not a correctness gate. The
+      # probe's retained controls make missing targets or unobserved content fail.
+      - name: Check normal math startup and the measurement controls
+        run: |
+          uv run --frozen --group dev python -m devtools.check_math_startup --self-test
+          uv run --frozen --group dev python -m devtools.check_math_startup --mode parameters --self-test
+          uv run --frozen --group dev python -m devtools.check_math_startup --runs 1 --output /tmp/math-startup-desktop.json
+          uv run --frozen --group dev python -m devtools.check_math_startup --runs 1 --width 390 --output /tmp/math-startup-mobile.json
 
       # The print half of the saved-setting geometry; the screen half is `geometry`.
       # The trap is what lets a cancelled run stop here: `uv run` turns the runner's
@@ -567,6 +625,7 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
+  # Math faces, font loading and the reading position, all on the prepared page.
   screen:
     needs: prepare
     runs-on: ubuntu-latest
@@ -625,15 +684,6 @@ jobs:
           uv run --frozen --group dev python -m devtools.check_math_loading --self-test
           uv run --frozen --group dev python -m devtools.check_math_loading
 
-      # Timings remain descriptive: machine speed is not a correctness gate. The
-      # probe's retained controls make missing targets or unobserved content fail.
-      - name: Check normal math startup and the measurement controls
-        run: |
-          uv run --frozen --group dev python -m devtools.check_math_startup --self-test
-          uv run --frozen --group dev python -m devtools.check_math_startup --mode parameters --self-test
-          uv run --frozen --group dev python -m devtools.check_math_startup --runs 1 --output /tmp/math-startup-desktop.json
-          uv run --frozen --group dev python -m devtools.check_math_startup --runs 1 --width 390 --output /tmp/math-startup-mobile.json
-
       - name: Check reload preserves the reading position
         run: |
           uv run --frozen --group dev python -m devtools.check_scroll_restoration site/index.html --self-test --output /tmp/scroll-restoration/chromium-1280.json
@@ -650,8 +700,8 @@ jobs:
 
   # Saved font settings select different prepared variants before the page hydrates, and
   # every setting must retain its own geometry on this same artifact. The first setting
-  # carries the host check and the negative controls (about 41 s of this job's 74); the
-  # print settings run in `print-and-typography`.
+  # carries the host check and the negative controls, about 41 s of this job's 64; the
+  # print settings run in `typography`.
   geometry:
     needs: prepare
     runs-on: ubuntu-latest
@@ -695,7 +745,7 @@ jobs:
       - name: Install the pinned Chromium headless shell
         run: uv run --frozen --group dev python -m playwright install --only-shell chromium
 
-      # The trap: see the print geometry step in `print-and-typography`.
+      # The trap: see the print geometry step in `typography`.
       - name: Check reserved math geometry under every saved font setting
         run: |
           trap 'exit 130' INT TERM
@@ -721,11 +771,12 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-  # The same prepared page in Firefox and WebKit: mobile font loading, reload position,
-  # and the saved font settings at 1280 px. The 390 px settings are `browser-geometry`,
-  # which halves the geometry each of these jobs waits on -- WebKit's page loads are
-  # about 7 s against Firefox's 5, and eight of them made WebKit the next long pole once
-  # the Chromium queue was split.
+  # The same prepared page in Firefox and WebKit: mobile font loading and the saved font
+  # settings at 1280 px here, the 390 px settings and the reload position in
+  # `browser-geometry`. WebKit's page loads are about 7 s against Firefox's 5, and the
+  # eight settings in one job made WebKit the longest job of run 35039248281 at 120 s;
+  # split this way its two jobs are about 80 s each, on top of an install that the
+  # package cache below takes from 30 s to about 14 s.
   font-loading:
     needs: prepare
     runs-on: ubuntu-latest
@@ -806,21 +857,7 @@ jobs:
         run: |
           uv run --frozen --group dev python -m devtools.check_math_loading --browser ${{ matrix.browser }} --width 390
 
-      - name: Check reload preserves the reading position in both viewports
-        run: |
-          uv run --frozen --group dev python -m devtools.check_scroll_restoration site/index.html --browser ${{ matrix.browser }} --self-test --output /tmp/scroll-restoration/${{ matrix.browser }}-1280.json
-          uv run --frozen --group dev python -m devtools.check_scroll_restoration site/index.html --browser ${{ matrix.browser }} --width 390 --output /tmp/scroll-restoration/${{ matrix.browser }}-390.json
-
-      - name: Retain browser reload observations
-        if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        with:
-          name: scroll-restoration-${{ matrix.browser }}
-          path: /tmp/scroll-restoration
-          if-no-files-found: error
-          retention-days: 7
-
-      # The trap: see the print geometry step in `print-and-typography`.
+      # The trap: see the print geometry step in `typography`.
       - name: Check saved font settings retain geometry at 1280 px
         run: |
           trap 'exit 130' INT TERM
@@ -917,7 +954,21 @@ jobs:
           name: prepared-page
           path: packing/site
 
-      # The trap: see the print geometry step in `print-and-typography`.
+      - name: Check reload preserves the reading position in both viewports
+        run: |
+          uv run --frozen --group dev python -m devtools.check_scroll_restoration site/index.html --browser ${{ matrix.browser }} --self-test --output /tmp/scroll-restoration/${{ matrix.browser }}-1280.json
+          uv run --frozen --group dev python -m devtools.check_scroll_restoration site/index.html --browser ${{ matrix.browser }} --width 390 --output /tmp/scroll-restoration/${{ matrix.browser }}-390.json
+
+      - name: Retain browser reload observations
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: scroll-restoration-${{ matrix.browser }}
+          path: /tmp/scroll-restoration
+          if-no-files-found: error
+          retention-days: 7
+
+      # The trap: see the print geometry step in `typography`.
       - name: Check saved font settings retain geometry at 390 px
         run: |
           trap 'exit 130' INT TERM
@@ -1071,7 +1122,8 @@ jobs:
       - prepare
       - workbench
       - pdf
-      - print-and-typography
+      - print-layout
+      - typography
       - screen
       - geometry
       - font-loading
