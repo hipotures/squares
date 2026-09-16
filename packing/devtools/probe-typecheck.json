@@ -1,0 +1,41 @@
+{
+  "probeRoots": [
+    {
+      "path": "packing/devtools/probes",
+      "commonDeclarations": ["packing/devtools/probes/explainer.d.ts"],
+      "dependencies": {
+        "check_math_faces": [
+          "packing/devtools/probes/math/types.d.ts",
+          "packing/devtools/probes/check_math_loading/types.d.ts"
+        ],
+        "check_math_loading": ["packing/devtools/probes/math/types.d.ts"],
+        "check_math_startup": ["packing/devtools/probes/math/types.d.ts"],
+        "check_print_layout": ["packing/devtools/probes/math/types.d.ts"],
+        "check_published_site": ["packages/workbench/probes/atlas-transitions.d.ts"],
+        "prepare_explainer_math": ["packing/devtools/probes/math/types.d.ts"],
+        "render_explainer_pdf": ["packing/devtools/probes/math/types.d.ts"]
+      }
+    },
+    {
+      "path": "packing/tests/probes",
+      "commonDeclarations": ["packing/devtools/probes/explainer.d.ts"]
+    },
+    {
+      "path": "packing/atlas/known-best/video/spikes/v1-slideshow/probes",
+      "commonDeclarations": [
+        "packing/atlas/known-best/video/spikes/v1-slideshow/probes/atlas-video.d.ts"
+      ]
+    },
+    {
+      "path": "packing/atlas/known-best/video/spikes/v2-transitions/probes",
+      "commonDeclarations": ["packages/workbench/probes/atlas-transitions.d.ts"]
+    }
+  ],
+  "standalonePrograms": [
+    {
+      "name": "v1-slideshow",
+      "sources": ["packing/atlas/known-best/video/spikes/v1-slideshow/assets/slideshow.js"],
+      "declarations": ["packing/atlas/known-best/video/spikes/v1-slideshow/probes/atlas-video.d.ts"]
+    }
+  ]
+}

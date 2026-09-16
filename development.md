@@ -962,12 +962,17 @@ An init script takes no argument and so no handle; it reads the global an earlie
 script installs, as `check_math_loading.MATH_LIBRARY_INIT` installs the library for
 `FIRST_PAINT_SCRIPT`.
 
-The probes are in Biome’s scope, in the strict `tsconfig.packing-probes.json` program,
-and under the ESLint promise overlay.
-A Node script a Python tool runs goes in `packing/devtools/node/`, and one a test runs
-goes in `packing/tests/node/<test module>/`, both under `tsconfig.devtools-node.json`. A
-test script that exercises a probe against stand-ins loads the probe file itself through
-`packing/tests/node/probe.mjs`, so what runs under Node is what runs in the page.
+The probes are in Biome’s scope and under the ESLint promise overlay.
+`packing/devtools/probe-typecheck.json` assigns each group to its own strict TypeScript
+program, so ambient declarations in an unrelated group cannot satisfy a probe.
+The manifest names each intentional shared declaration, and
+`packing/devtools/node/typecheck-probe-groups.mjs` discovers every probe in those
+groups.
+A Node script a Python tool runs goes in `packing/devtools/node/`, and one a test
+runs goes in `packing/tests/node/<test module>/`, both under
+`tsconfig.devtools-node.json`. A test script that exercises a probe against stand-ins
+loads the probe file itself through `packing/tests/node/probe.mjs`, so what runs under
+Node is what runs in the page.
 The workbench package’s `workbench_tools.probes` is the same loader bound to
 `packages/workbench/probes/`.
 

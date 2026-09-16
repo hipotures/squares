@@ -694,7 +694,6 @@ review. [`epistemics.md`](epistemics.md) owns whole-result classifications.
 ├── tsconfig.explainer.json The checked classic scripts in the standalone explainer
 ├── tsconfig.json           The retained workbench script during package migration
 ├── tsconfig.motion-lab.json  The motion lab's assets and the slideshow harness
-├── tsconfig.packing-probes.json  The probes Python tools under packing/ run in a page
 └── tsconfig.probes.json    The workbench checkers' probes
 ```
 

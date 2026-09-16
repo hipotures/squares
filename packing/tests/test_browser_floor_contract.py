@@ -2,8 +2,8 @@
 
 The JavaScript and CSS this repository serves have the same shape of floor the Python
 does: a formatter that owns layout, a linter at zero tolerance, and a separate type gate.
-`tbd guidelines typescript-lint-format-rules` defines it and `biome.json` plus the
-`tsconfig*.json` set implement it.
+`tbd guidelines typescript-lint-format-rules` defines it and `biome.json`, the
+`tsconfig*.json` set, and the isolated probe-program manifest implement it.
 
 Two different things are checked here, and the second is the one that matters.
 
@@ -47,6 +47,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from nodejs_wheel import node
 
 from devtools import render_explainer
 from devtools.check_bead_tree import ISSUES, MAPPINGS, REFS, parse_aliases
@@ -63,6 +64,8 @@ TSC = REPOSITORY_ROOT / "node_modules/.bin/tsc"
 TSCONFIG_BASE = REPOSITORY_ROOT / "tsconfig.base.json"
 ROOT_PACKAGE = REPOSITORY_ROOT / "package.json"
 WORKBENCH_PACKAGE = REPOSITORY_ROOT / "packages/workbench/package.json"
+PROBE_TYPECHECK = REPOSITORY_ROOT / "packing/devtools/node/typecheck-probe-groups.mjs"
+PROBE_TYPECHECK_MANIFEST = REPOSITORY_ROOT / "packing/devtools/probe-typecheck.json"
 WORKFLOWS = (
     REPOSITORY_ROOT / ".github/workflows/packing-validation.yml",
     REPOSITORY_ROOT / ".github/workflows/deep-gate.yml",
@@ -255,6 +258,42 @@ def _covered_scripts(configs: list[Path]) -> set[str]:
         for pattern in _jsonc(config).get("include", [])
         for path in _tracked(_include_pattern(config, pattern))
     }
+
+
+def _probe_typecheck_sources() -> set[str]:
+    """The scripts the probe manifest assigns to isolated type programs."""
+    manifest = json.loads(PROBE_TYPECHECK_MANIFEST.read_text(encoding="utf-8"))
+    sources: set[str] = set()
+    for specification in manifest["probeRoots"]:
+        root = REPOSITORY_ROOT / specification["path"]
+        for group in root.iterdir():
+            if group.is_dir():
+                sources.update(
+                    path.relative_to(REPOSITORY_ROOT).as_posix() for path in group.rglob("*.js")
+                )
+    for program in manifest.get("standalonePrograms", []):
+        sources.update(program["sources"])
+    return sources
+
+
+def _probe_typecheck_files() -> set[str]:
+    """Every explicit source and declaration input in the isolated programs."""
+    manifest = json.loads(PROBE_TYPECHECK_MANIFEST.read_text(encoding="utf-8"))
+    files = _probe_typecheck_sources()
+    for specification in manifest["probeRoots"]:
+        root = REPOSITORY_ROOT / specification["path"]
+        files.update(
+            path.relative_to(REPOSITORY_ROOT).as_posix()
+            for group in root.iterdir()
+            if group.is_dir()
+            for path in group.rglob("*.d.ts")
+        )
+        files.update(specification.get("commonDeclarations", []))
+        for declarations in specification.get("dependencies", {}).values():
+            files.update(declarations)
+    for program in manifest.get("standalonePrograms", []):
+        files.update(program.get("declarations", []))
+    return files
 
 
 def _relaxed_flags(config: Path) -> list[str]:
@@ -510,6 +549,8 @@ def test_biome_names_every_floor_rule() -> None:
     for suffix in (*SCRIPT_SUFFIXES, *STYLE_SUFFIXES):
         assert f"**/*{suffix}" in includes, f"Biome does not include {suffix} source"
     assert "packages/workbench/**/*.json" in includes
+    assert "eslint.probes.json" in includes
+    assert "packing/devtools/probe-typecheck.json" in includes
 
 
 def test_the_node_toolchain_is_exactly_pinned_and_runtime_bounded() -> None:
@@ -684,12 +725,79 @@ def test_an_untracked_relaxation_is_detected(tmp_path: Path) -> None:
 def test_every_first_party_script_is_in_a_type_program() -> None:
     """A file under the lint floor but in no `tsconfig` include is half covered, and the
     half that is missing is the one that catches type errors."""
-    covered = _covered_scripts(_tsconfigs())
+    covered = _covered_scripts(_tsconfigs()) | _probe_typecheck_files()
     tracked = _tracked(*(f"*{suffix}" for suffix in SCRIPT_SUFFIXES))
     uncovered = sorted(path for path in set(tracked) - covered if not _declared_excluded(path))
     assert not uncovered, f"tracked JavaScript in no type-check program: {uncovered}"
     typed_samples = sorted(path for path in covered if _declared_excluded(path))
     assert not typed_samples, f"a program type-checks a sample that must fail: {typed_samples}"
+
+
+def test_the_probe_checker_and_contract_name_the_same_sources() -> None:
+    """A new group is discovered automatically, while a stale manifest/tool join cannot
+    make the coverage contract claim a source the executable gate never reads."""
+    _require_tool(TSC)
+    completed = node(
+        [str(PROBE_TYPECHECK), "--list-sources"],
+        return_completed_process=True,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0, completed.stderr
+    assert set(json.loads(completed.stdout)) == _probe_typecheck_sources()
+
+
+def test_a_probe_cannot_see_a_foreign_groups_ambient_types(tmp_path: Path) -> None:
+    """Negative control: the old monolithic program accepted this exact dependency."""
+    _require_tool(TSC)
+    alpha = tmp_path / "probes/alpha"
+    beta = tmp_path / "probes/beta"
+    alpha.mkdir(parents=True)
+    beta.mkdir(parents=True)
+    (alpha / "types.d.ts").write_text(
+        "interface AlphaOnly { value: string; }\n", encoding="utf-8"
+    )
+    (alpha / "read.js").write_text(
+        '() => /** @type {AlphaOnly} */ ({ value: "owned" });\n', encoding="utf-8"
+    )
+    (beta / "read.js").write_text(
+        '() => /** @type {AlphaOnly} */ ({ value: "leaked" });\n', encoding="utf-8"
+    )
+    (tmp_path / "manifest.json").write_text(
+        json.dumps({"probeRoots": [{"path": "probes"}]}), encoding="utf-8"
+    )
+    (tmp_path / "tsconfig.json").write_text(
+        json.dumps(
+            {
+                "compilerOptions": {
+                    "allowJs": True,
+                    "checkJs": True,
+                    "noEmit": True,
+                    "strict": True,
+                    "target": "ES2022",
+                    "lib": ["ES2022", "DOM"],
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+    completed = node(
+        [
+            str(PROBE_TYPECHECK),
+            "--root",
+            str(tmp_path),
+            "--manifest",
+            "manifest.json",
+            "--config",
+            "tsconfig.json",
+        ],
+        return_completed_process=True,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode != 0
+    assert "probes/beta/read.js" in completed.stderr
+    assert "Cannot find name 'AlphaOnly'" in completed.stderr
 
 
 def test_the_explainer_shell_owns_no_inline_programs() -> None:
