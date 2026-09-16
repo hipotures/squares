@@ -240,19 +240,38 @@ def _tsconfigs() -> list[Path]:
     )
 
 
-def _include_pattern(config: Path, pattern: str) -> str:
-    parent = config.parent.relative_to(REPOSITORY_ROOT).as_posix()
-    rooted = f"{parent}/{pattern}" if parent != "." else pattern
-    return rooted.replace("**/*", "*")
+def _program_files(config: Path) -> set[Path]:
+    """The source files TypeScript actually includes after resolving the config."""
+    completed = subprocess.run(
+        [str(TSC), "-p", str(config), "--listFilesOnly"],
+        cwd=REPOSITORY_ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    return {
+        Path(line).resolve()
+        for line in completed.stdout.splitlines()
+        if line.endswith(SCRIPT_SUFFIXES)
+    }
 
 
 def _covered_scripts(configs: list[Path]) -> set[str]:
-    return {
-        path
-        for config in configs
-        for pattern in _jsonc(config).get("include", [])
-        for path in _tracked(_include_pattern(config, pattern))
-    }
+    _require_tool(TSC)
+    tracked = set(_tracked(*(f"*{suffix}" for suffix in SCRIPT_SUFFIXES)))
+    covered: set[str] = set()
+    for config in configs:
+        if config == TSCONFIG_BASE:
+            continue
+        for path in _program_files(config):
+            try:
+                relative = path.relative_to(REPOSITORY_ROOT).as_posix()
+            except ValueError:
+                continue
+            if relative in tracked:
+                covered.add(relative)
+    return covered
 
 
 def _relaxed_flags(config: Path) -> list[str]:
@@ -781,6 +800,29 @@ def test_the_package_program_is_required_for_package_typescript() -> None:
     assert source not in _covered_scripts(
         [config for config in configs if config.parent == REPOSITORY_ROOT]
     )
+
+
+def test_type_coverage_respects_effective_exclusions(tmp_path: Path) -> None:
+    """A raw include glob must not conceal a file that TypeScript actually excludes."""
+    _require_tool(TSC)
+    included = tmp_path / "included.ts"
+    excluded = tmp_path / "excluded.ts"
+    included.write_text("export const included = 1;\n", encoding="utf-8")
+    excluded.write_text("export const excluded = 1;\n", encoding="utf-8")
+    config = tmp_path / "tsconfig.json"
+    config.write_text(
+        json.dumps(
+            {
+                "compilerOptions": {"noEmit": True},
+                "include": ["*.ts"],
+                "exclude": ["excluded.ts"],
+            }
+        ),
+        encoding="utf-8",
+    )
+    resolved = _program_files(config)
+    assert included.resolve() in resolved
+    assert excluded.resolve() not in resolved
 
 
 def test_every_job_running_the_liveness_tests_installs_node() -> None:
