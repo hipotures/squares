@@ -53,14 +53,16 @@ it.
 | `v2-transitions/transition-stats.json`, `v2-transitions/stats-summary.md` | **Frozen historical output**, last regenerated at `0281a508`: per pair, the matching method, the identity chain, block statistics, displacements and turns, and their summary. Nothing rebuilds them or compares them with a build. At `f3874426` a fresh record differed from this one only in `generated_by`; the summary’s closing run times omit `correct`, where the generator now prints the run time the page reports |
 | `v2-transitions/compare_palette.py`, `dump_fills.py`, `experiment_*.py`, `grade_motion.py`, `measure_*.py`, `smoke_styles.py` | The instruments that produced the measured tables in the notes |
 
-**Retired: `v2-transitions/calibrate.py`**, on 2026-09-14 (`think-53dt`). It swept eight
+**Retired: `v2-transitions/calibrate.py`**, on 2026-09-14 (`think-cqfc`). It swept eight
 arms over six cases by driving Pack through `window.atlasTransitions`, which the
 workbench now refuses outside the Animate view, so it no longer ran against any page
 this repository builds.
-Its 48 runs, and the guards they argued for, are recorded under Revision 16 of the v2
-notes, and the held-out semantics a real Calibrate needs belong to `think-gfqt`,
-`think-vhgz` and `think-3yma`. The source is kept by history:
-`git show 7dd0233d:packing/atlas/known-best/video/spikes/v2-transitions/calibrate.py`.
+Revision 16 of the v2 notes records its 48 runs and the guards they argued for.
+The source at
+`git show 7dd0233d:packing/atlas/known-best/video/spikes/v2-transitions/calibrate.py`
+completes the retired instrument’s provenance.
+The held-out semantics a real Calibrate needs belong to `think-gfqt`, `think-vhgz` and
+`think-3yma`.
 
 The moved check, `workbench_tools.check_candidate`, is not run by any tier and fails on
 stale text needles (`think-tn0j`). Its browser checks run only once every other
