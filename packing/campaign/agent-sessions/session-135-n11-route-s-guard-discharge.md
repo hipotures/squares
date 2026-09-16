@@ -15,7 +15,6 @@ session:
   branch: codex/n11-route-s-admission
   primary_bead: think-r55v
   status: stopped
-  certification_pending: think-so4g
   goal: >-
     Discharge the four source-distinct Route S admission guards, preserve a target-blind
     exact replay boundary, and either admit the instrument or retain a precise refusal
@@ -259,26 +258,31 @@ session:
   resource_rollups:
   - packing/campaign/resource-usage/codex-task-tree-session-135.yaml
   checks:
-  - All 63 focused Route S tests pass under the project Python 3.14 environment.
+  - All 59 focused Route S tests pass under the project Python 3.14 environment.
   - Scoped Ruff and BasedPyright pass with zero findings.
   - The admitted receipt reproduces byte for byte through the fast and records step.
-  - Enforced schemas validate and all 164 negative-control anchors still resolve once.
+  - Enforced schemas validate and all 167 negative-control anchors still resolve once.
   - No exp-161, optimizer, candidate, coverage target, event-cell sweep, or interval replay ran.
+  - >-
+    full gate: fast at 609d7d629db97c322a021399602f1a20951c4864: passed (GitHub
+    Actions run 35068030416 passed packing-required on the exact PR 182 head before
+    merge 1d9c49c4)
   stop_reason: >-
     The source-distinct ADMIT verdict closed every retained guard. Session 135 stops at
-    the instrument boundary with exact-head PR certification and merge pending under
-    think-so4g; all scientific work remains for a later preregistered branch.
+    the instrument boundary. Exact-head validation and the later PR 182 merge discharged
+    the certification debt; all scientific work remains for a later preregistered branch.
   next_action: >-
-    Under think-so4g, certify and merge PR 182 at its exact reviewed head. Only afterward
-    may a fresh planning block register exp-161 and authorize a bounded Route S target.
+    Continue BC-343 under think-ufmk. Only a fresh planning block may register exp-161
+    and authorize a bounded Route S target; this record authorizes no target work.
 ---
 # Session 135: N11 Route S Guard Discharge
 
 This target-blind session admits the Route S instrument after an independent review and
 one repaired path-alias finding.
 It does not establish that a compressed certificate exists, covers the domain, or
-improves any bound. Those questions require a separate registered experiment after this
-admission checkpoint merges.
+improves any bound. PR 182 merged the certified instrument as `1d9c49c4` from reviewed
+head `609d7d62`. A separate registered experiment under `think-ufmk` owns any target
+work.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

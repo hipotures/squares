@@ -374,12 +374,12 @@ agenda:
       representatives, a human-statable generating rule, budget below eleven, and both
       exact coverage routes agreeing; or exact infeasibility refutes it. Bounded search
       without a candidate may park only this family as unresolved.
-    bead: think-a1e8
+    bead: think-ufmk
     depends_on: [BC-354]
     next_evidence: >-
-      Merge the source-distinct reviewed no-target admission after exact-head fast and
-      deferred gates. Then use a fresh branch to register exp-161, its target budget,
-      accept rule, and stop rule before changing any weight or running coverage.
+      Under think-ufmk, use a fresh branch to register exp-161, its exact source, target
+      budget, accept rule, stop rule, independent-review boundary, and retained evidence
+      paths before changing any weight or running coverage.
     workflows: [pipeline-improvement, factual-review, research-loop]
     program: n11-strategy-reset
     artifacts:
@@ -567,9 +567,10 @@ BC-340 and BC-353 are complete.
 BC-354 stopped at Route A’s representation boundary: the complete physical root, matched
 exact baseline, conditional gate, and independent replay were not admitted.
 No target ran and no physical root closed.
-Route S / BC-343 is now in progress.
-Its no-target PR freezes T-025’s exact 119-orbit support universe, the at-most-23
-positive-orbit metric, deterministic decompression, and target-blind controls.
+Route S / BC-343 is now in progress under `think-ufmk`. Its no-target PR merged as
+`1d9c49c4` from reviewed head `609d7d62`, freezing T-025’s exact 119-orbit support
+universe, the at-most-23 positive-orbit metric, deterministic decompression, and
+target-blind controls.
 Session 135 discharged all four obligations retained by Session 134: complete T-025 and
 T-026 contents bound to a declared Git revision and repository-relative paths, both
 T-026 sentinels, a canonical source-bound manifest, and the complete X-032 mutation
@@ -585,10 +586,11 @@ gaps.
 The W10 review originally mapped six active hours into five sequential PR-bounded
 blocks. BC-340 and BC-353 completed, and BC-354 activated the selected-route admission’s
 guard-refusal branch.
-The remaining conditional path begins with exact-head certification and merge of
-BC-343’s no-target admission PR. A fresh branch may then register one compression
-discriminator and its budget before any target access, followed by review and
-replanning. No later branch starts before the prior PR merges.
+The remaining conditional path begins with a fresh planning branch under `think-ufmk`.
+That branch must register `exp-161`, its exact target, budget, accept rule, stop rule,
+and review boundary before any target access.
+Review and replanning follow the bounded run; no later branch starts before the prior PR
+merges.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

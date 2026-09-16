@@ -53,7 +53,7 @@ Commitments a session may take now, in each agenda's declared order.
 | agenda-027 | `BC-266` | tentative | 3 | insight | research | Does the shared certificate interface make a complete two-angle family under H-113 worth attempting, with… | `think-bgsz` |
 | agenda-028 | `BC-272` | tentative | 2 | insight | research | Does retaining the common anchor remove a diagnosed H119 correlation loss? | `think-cy6g` |
 | agenda-028 | `BC-274` | tentative | 2 | insight | research | What concrete implication could establish or obstruct the existential H121 normal form? | `think-5hmt` |
-| agenda-036 | `BC-343` | in_progress | 0 | insight | research | Does T-025's exact atom-support universe admit a certificate at side 3.82 with at most 23 positive D4-orbit… | `think-a1e8` |
+| agenda-036 | `BC-343` | in_progress | 0 | insight | research | Does T-025's exact atom-support universe admit a certificate at side 3.82 with at most 23 positive D4-orbit… | `think-ufmk` |
 | agenda-036 | `BC-341` | tentative | 1 | insight | research | At side 3.84, can one complete difficult occupancy or wall-contact root family be closed by proved capacity… | `think-9y6q` |
 | agenda-036 | `BC-342` | tentative | 1 | insight | research | Does a sound theta-prime or level-two pairwise relaxation pass the n=6 formulation controls and improve… | `think-ol1z` |
 | agenda-036 | `BC-348` | tentative | 1 | insight | research | Do H-131's proved aggregate angle-count caps, admitted as coherent global resources, remove the retained… | `think-u15l` |
