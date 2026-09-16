@@ -50,10 +50,50 @@ def test_an_invisible_drawing_fails_even_when_its_markup_changes() -> None:
     exact[0]["plane_visible"] = False
     general[1]["accepted_visible"] = False
 
-    assert checker.faults(exact, general, []) == [
+    assert checker.faults(exact, general, [], {"exact": True, "general": True}) == [
         "exact lab: the drawing is not visible",
         "general lab: the drawing is not visible",
     ]
+
+
+def test_an_unpainted_drawing_fails_even_when_visible_and_its_markup_changes() -> None:
+    exact, general = _reports()
+
+    assert checker.faults(exact, general, [], {"exact": False, "general": False}) == [
+        "exact lab: the drawing has no painted geometry",
+        "general lab: the drawing has no painted geometry",
+    ]
+
+
+def test_a_live_negative_control_rejects_a_vacuous_paint_probe(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    inserted: list[str] = []
+
+    class StyleStub:
+        def evaluate(self, source: str) -> None:
+            assert source == checker.REMOVE_ELEMENT
+
+    class PageStub:
+        def add_style_tag(self, *, content: str) -> StyleStub:
+            inserted.append(content)
+            return StyleStub()
+
+    monkeypatch.setattr(
+        checker,
+        "_painted_geometry",
+        lambda *_arguments: checker.PaintObservation(painted=True, restored=True),
+    )
+
+    fault = checker._negative_control_fault(  # noqa: SLF001  # pyright: ignore[reportPrivateUsage]
+        PageStub(),  # type: ignore[arg-type]
+        checker.EXACT_PAINT,
+        name="opacity-zero",
+        css=checker.EXACT_PAINT.opacity_zero_css,
+    )
+
+    assert fault == "the paint check accepted its opacity-zero negative control"
+    assert inserted == [checker.EXACT_PAINT.opacity_zero_css]
 
 
 def test_a_wrong_computation_fails_the_committed_report(tmp_path: Path) -> None:
@@ -79,6 +119,7 @@ def test_the_committed_report_is_nonempty_and_covers_every_driven_state() -> Non
     assert len(report["general"]) == 12
     assert all("plane_visible" in state for state in report["exact"])
     assert all("accepted_visible" in state for state in report["general"])
+    assert report["painted"] == {"exact": True, "general": True}
 
 
 def test_a_diagnostic_report_cannot_overwrite_the_golden(

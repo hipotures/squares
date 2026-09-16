@@ -4,10 +4,12 @@ The labs had no browser check: their tests read the rendered HTML and run the mo
 Node, so nothing proved that a page's scripts run in a page. That mattered when the
 scripts became module scripts (think-6o9n), which changes how a browser runs them. This
 loads each page from a file, works its controls through Playwright's own input and locator
-calls, and fails on an uncaught error, a console error, an invisible drawing, or a readout
-the page script never wrote. Every observation must match the committed golden report, so a
-model that computes a different state fails even when it still draws. `--report` writes the
-observed JSON for diagnosis.
+calls, and fails on an uncaught error, a console error, an unpainted primary drawing, or a
+readout the page script never wrote. The paint check compares actual stage pixels with and
+without the primary square layer, then proves itself against opacity-zero and transparent
+paint controls. Every observation must match the committed golden report, so a model that
+computes a different state fails even when it still draws. `--report` writes the observed
+JSON for diagnosis.
 
 The general lab's numerical run needs its loopback service, so only its editor is driven
 here: selection, keyboard moves and rotations, snapping, and reset, all of which go through
@@ -28,11 +30,12 @@ import json
 import sys
 import tempfile
 from collections.abc import Callable
+from dataclasses import dataclass
 from itertools import islice
 from pathlib import Path
-from typing import Any
+from typing import Any, TypedDict
 
-from playwright.sync_api import ConsoleMessage, Error, Page, sync_playwright
+from playwright.sync_api import ConsoleMessage, Error, Locator, Page, sync_playwright
 
 from devtools.render_general_motion_lab import (
     DEFAULT_SEED,
@@ -41,8 +44,11 @@ from devtools.render_general_motion_lab import (
     render_general_motion_lab,
 )
 from devtools.render_packing_motion_lab import render_motion_lab
+from sqpack.probes import probe
 
 GOLDEN_REPORT = Path(__file__).resolve().parents[1] / "tests/golden/motion-lab-pages.json"
+PROBES = Path(__file__).resolve().parent / "probes"
+REMOVE_ELEMENT = probe(PROBES, "check_motion_lab_pages/remove_element")
 
 #: The exact lab's readouts, each written by the page script's first update.
 EXACT_READOUTS = (
@@ -75,6 +81,95 @@ GENERAL_READOUTS = (
 )
 
 State = dict[str, Any]
+
+
+class Painted(TypedDict):
+    """Whether each page's representative primary geometry changes its stage pixels."""
+
+    exact: bool
+    general: bool
+
+
+@dataclass(frozen=True)
+class PaintObservation:
+    """One stage differential and whether removing its fixture restored the baseline."""
+
+    painted: bool
+    restored: bool
+
+
+@dataclass(frozen=True)
+class PaintProbe:
+    """One SVG stage, its primary geometry, and the mutations that must blank it."""
+
+    stage: str
+    geometry: str
+    hidden_css: str
+    opacity_zero_css: str
+    transparent_css: str
+
+
+EXACT_PAINT = PaintProbe(
+    stage="#motion-stage",
+    geometry="#square-layer",
+    hidden_css="#square-layer { opacity: 0 !important; }",
+    opacity_zero_css=(
+        "#math-plane, #label-layer, #obstruction-badge { opacity: 0 !important; }"
+    ),
+    transparent_css=(
+        "#square-layer .square { fill: transparent !important; "
+        "stroke: transparent !important; }"
+    ),
+)
+GENERAL_PAINT = PaintProbe(
+    stage="#free-stage",
+    geometry="#accepted-layer",
+    hidden_css="#accepted-layer { opacity: 0 !important; }",
+    opacity_zero_css="#free-math-plane, #free-label-layer { opacity: 0 !important; }",
+    transparent_css=(
+        "#accepted-layer .editor-square { fill: transparent !important; "
+        "stroke: transparent !important; }"
+    ),
+)
+
+
+def _stage_pixels(stage: Locator) -> bytes:
+    return stage.screenshot(animations="disabled", caret="hide", scale="css")
+
+
+def _painted_geometry(page: Page, paint: PaintProbe) -> PaintObservation:
+    """Whether removing representative geometry changes the pixels of its SVG stage."""
+    stage = page.locator(paint.stage)
+    geometry = page.locator(paint.geometry)
+    if stage.count() != 1 or geometry.count() != 1 or not stage.is_visible():
+        return PaintObservation(painted=False, restored=True)
+    baseline = _stage_pixels(stage)
+    hidden_style = page.add_style_tag(content=paint.hidden_css)
+    try:
+        without_geometry = _stage_pixels(stage)
+    finally:
+        hidden_style.evaluate(REMOVE_ELEMENT)
+    restored = _stage_pixels(stage)
+    return PaintObservation(
+        painted=baseline != without_geometry,
+        restored=baseline == restored,
+    )
+
+
+def _negative_control_fault(
+    page: Page, paint: PaintProbe, *, name: str, css: str
+) -> str | None:
+    """Apply one live paint mutation and report an oracle that accepts it."""
+    control_style = page.add_style_tag(content=css)
+    try:
+        observed = _painted_geometry(page, paint)
+    finally:
+        control_style.evaluate(REMOVE_ELEMENT)
+    if not observed.restored:
+        return f"the paint check did not restore its {name} fixture"
+    if observed.painted:
+        return f"the paint check accepted its {name} negative control"
+    return None
 
 
 def _exact_state(page: Page, step: str) -> State:
@@ -155,8 +250,10 @@ def drive_general(page: Page) -> list[State]:
     return states
 
 
-def run_page(path: Path, drive: Callable[[Page], list[State]]) -> tuple[list[State], list[str]]:
-    """Load one page from its file, drive it, and return its states and its errors."""
+def run_page(
+    path: Path, drive: Callable[[Page], list[State]], paint: PaintProbe
+) -> tuple[list[State], list[str], bool]:
+    """Load one page, drive it, and return its states, errors, and paint verdict."""
     errors: list[str] = []
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch()
@@ -174,12 +271,23 @@ def run_page(path: Path, drive: Callable[[Page], list[State]]) -> tuple[list[Sta
             page.on("pageerror", on_error)
             page.goto(path.resolve().as_uri(), wait_until="load")
             states = drive(page)
+            observation = _painted_geometry(page, paint)
+            if not observation.restored:
+                errors.append("the paint check did not restore its positive fixture")
+            for name, css in (
+                ("opacity-zero", paint.opacity_zero_css),
+                ("transparent-paint", paint.transparent_css),
+            ):
+                if control_fault := _negative_control_fault(page, paint, name=name, css=css):
+                    errors.append(control_fault)
         finally:
             browser.close()
-    return states, errors
+    return states, errors, observation.painted
 
 
-def faults(exact: list[State], general: list[State], errors: list[str]) -> list[str]:
+def faults(
+    exact: list[State], general: list[State], errors: list[str], painted: Painted
+) -> list[str]:
     """What says a page script did not run, or ran and failed."""
     found = list(errors)
     opened = exact[0]["readouts"]
@@ -190,12 +298,16 @@ def faults(exact: list[State], general: list[State], errors: list[str]) -> list[
         found.append("exact lab: no control changed the drawing")
     if not all(state["plane_visible"] for state in exact):
         found.append("exact lab: the drawing is not visible")
+    if not painted["exact"]:
+        found.append("exact lab: the drawing has no painted geometry")
     if general[0]["readouts"]["diagnostics-value"] in {None, "", "Checking…"}:
         found.append("general lab: the setup diagnostics were never written")
     if len({state["accepted"] for state in general}) < 2:
         found.append("general lab: no edit changed the drawing")
     if not all(state["accepted_visible"] for state in general):
         found.append("general lab: the drawing is not visible")
+    if not painted["general"]:
+        found.append("general lab: the drawing has no painted geometry")
     return found
 
 
@@ -262,9 +374,12 @@ def main(argv: list[str] | None = None) -> int:
                 ),
                 encoding="utf-8",
             )
-        exact, exact_errors = run_page(exact_page, drive_exact)
-        general, general_errors = run_page(general_page, drive_general)
-    report = {"exact": exact, "general": general}
+        exact, exact_errors, exact_painted = run_page(exact_page, drive_exact, EXACT_PAINT)
+        general, general_errors, general_painted = run_page(
+            general_page, drive_general, GENERAL_PAINT
+        )
+    painted: Painted = {"exact": exact_painted, "general": general_painted}
+    report = {"exact": exact, "general": general, "painted": painted}
     if arguments.report is not None:
         arguments.report.write_text(
             json.dumps(report, indent=2, sort_keys=True), encoding="utf-8"
@@ -274,6 +389,7 @@ def main(argv: list[str] | None = None) -> int:
         general,
         [f"exact lab {error}" for error in exact_errors]
         + [f"general lab {error}" for error in general_errors],
+        painted,
     )
     problems.extend(_golden_faults(report, arguments.golden))
     if problems:

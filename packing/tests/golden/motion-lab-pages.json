@@ -986,5 +986,9 @@
       "rotate_disabled": true,
       "step": "reset"
     }
-  ]
+  ],
+  "painted": {
+    "exact": true,
+    "general": true
+  }
 }
