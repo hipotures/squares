@@ -11,6 +11,7 @@ const parent = (family) => ({
 const composite = '"KPress Math, Text Sans",KaTeX_Main,serif';
 const nodes = [
   { textContent: "x1", parentElement: parent(composite) },
+  { textContent: "  ", parentElement: parent(composite) },
   { textContent: "1≈", parentElement: parent(composite) },
   { textContent: "∑", parentElement: parent("KaTeX_Size2") },
 ];
@@ -69,3 +70,13 @@ assert.equal(
 );
 assert.equal(result[2]?.ready, true);
 assert.equal(result[3]?.ready, true);
+
+const rejected = probe("devtools/probes/math/library.js")().requiredFonts(math, () => {
+  throw new Error("observer failed");
+});
+assert.equal(rejected.length, 4);
+for (const requirement of rejected) {
+  assert.equal(requirement.ready, false);
+  assert.equal(requirement.outcome, "rejected");
+  assert.match(requirement.error ?? "", /observer failed/);
+}

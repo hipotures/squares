@@ -67,15 +67,24 @@ def check_files(paths: Sequence[Path]) -> Report:
     node = shutil.which("node")
     if node is None:
         raise ValueError("Node.js is required to run the pinned KaTeX bundle")
+    if not PARSE.is_file():
+        raise FileNotFoundError(f"KaTeX driver not found: {PARSE}")
     bundle = kpress_static() / "katex" / "katex.min.js"
-    result = subprocess.run(
-        [node, str(PARSE)],
-        input=json.dumps({"bundle": str(bundle), "files": files}),
-        text=True,
-        capture_output=True,
-        check=True,
-        timeout=60,
-    )
+    try:
+        result = subprocess.run(
+            [node, str(PARSE)],
+            input=json.dumps({"bundle": str(bundle), "files": files}),
+            text=True,
+            capture_output=True,
+            check=True,
+            timeout=60,
+        )
+    except subprocess.CalledProcessError as error:
+        detail = (error.stderr or error.stdout or "").strip()
+        suffix = f": {detail}" if detail else ""
+        raise ValueError(
+            f"KaTeX driver {PARSE} failed with exit {error.returncode}{suffix}"
+        ) from error
     return cast(Report, json.loads(result.stdout))
 
 
