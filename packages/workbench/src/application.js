@@ -7,6 +7,36 @@
 // module that this one imports. Strict mode is a module's, and the bundle keeps it: esbuild opens
 // the script with the directive, and `application-build.test.ts` holds the build to that.
 import * as workbenchBundle from "./api/browser-entry.js";
+import {
+  ANNEAL_SETTINGS,
+  annealConfiguration,
+  BLIND_SETTINGS,
+  BODY_PHYSICS_SETTINGS,
+  BOUND_CLEAR,
+  BOUND_FADE,
+  CONTAINER_DELAY_BOUNDS,
+  DEFAULT_ANIMATE_STYLE,
+  DEFAULT_CONTAINER_DELAY_FRACTION,
+  DEFAULT_MOTION_RESPONSE,
+  DEFAULT_PACK_STYLE,
+  DEFAULT_PAIR_LAW,
+  DEFAULT_STATIC_STEP_TIMING,
+  DEFAULT_STEP_TIMING,
+  DEFAULT_WALL_LAW,
+  LAW_PARAMETER_DEFINITIONS,
+  MOTION_RESPONSE_BOUNDS,
+  motionControlScope,
+  NEW_FRACTION,
+  PAIR_LAW_BOUNDS,
+  PAIR_LAW_PRESETS,
+  PHYSICS_SETTINGS,
+  pairLawPreset,
+  physicalPresentationNeedsTrajectory,
+  physicalPresentationState,
+  ROLL_MAX,
+  trajectoryPhysicsConfiguration,
+  WALL_LAW_BOUNDS,
+} from "./motion-settings.js";
 
 export * from "./api/browser-entry.js";
 
@@ -33,6 +63,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   } = SQUARES_WORKBENCH_CORE;
   const {
     forceAtGap: forceOf,
+    forceLawAnimationIntegration: animationIntegration,
     forceLawAttracts: attractsOf,
     forceLawSteep: steepOf,
   } = workbenchBundle.simulation;
@@ -63,7 +94,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   } = workbenchBundle.timeline;
   const { measureFrameGeometry } = workbenchBundle.geometry;
   const { createColourSystem } = workbenchBundle.colour;
-  const { buildTrajectory, sampleTrajectoryPose, sampleTrajectorySide } =
+  const { buildTrajectory, sampleTrajectoryPose, sampleTrajectorySide, trajectoryByteLength } =
     workbenchBundle.trajectory;
   const {
     advancePackRun,
@@ -101,6 +132,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   /** @typedef {import("./api/workbench-api.js").AtlasInitial} AtlasInitial */
   /** @typedef {import("./api/workbench-api.js").AtlasLaw} AtlasLaw */
   /** @typedef {import("./api/workbench-api.js").AtlasLawBounds} AtlasLawBounds */
+  /** @typedef {import("./api/workbench-api.js").AtlasMotionResponse} AtlasMotionResponse */
+  /** @typedef {import("./api/workbench-api.js").AtlasContainerDelay} AtlasContainerDelay */
   /** @typedef {import("./api/workbench-api.js").AtlasPaintScheme} AtlasPaintScheme */
   /** @typedef {import("./api/workbench-api.js").AtlasRelationshipKind} AtlasRelationshipKind */
   /** @typedef {import("./api/workbench-api.js").AtlasScheme} AtlasScheme */
@@ -122,8 +155,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   const PHASES = DATA.motion_phases; // add-then-move (the default), move-then-add, simultaneous, rotate-first, slide-first
   const ARRIVAL_FRACTION = DATA.arrival_fraction; // the share of the move the new square takes to arrive in the two staged modes
   const PAD = 0.045; // container-side fraction of breathing room inside the 1000 px box
-  const NEW_FRACTION = 1 / 3; // in the three unstaged modes the new square fades in over the last third of the move
-  const ROLL_MAX = 0.4; // seconds for the panel's handover to the next n, from the moment the new square starts to appear
+  // Tween staging constants come from the shared, headless-safe motion settings module.
   const MARK_FADE = 0.15; // fraction of the move over which the previous pair's scarlet outline gives way to the normal stroke
   const MARK_WIDE = 4,
     MARK_THIN = 2; // scarlet outline widths, px: at arrival, and through the following dwell
@@ -171,24 +203,20 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // reason: there is no motion to mute.
   // The box's beat on a step (see `drawBounds`): the fraction of the dwell over which the last
   // step's outer trace clears, of the move over which the box grows, and of the move over which
-  // the inner trace then fades. Nothing is added or moved until both are done, which is
-  // BOX_FIRST of every move.
-  const BOUND_CLEAR = 0.3;
-  const BOUND_GROW = 0.2;
-  const BOUND_FADE = 0.12;
-  const BOX_FIRST = BOUND_GROW + BOUND_FADE;
+  // the inner trace then fades. The arriving square leads the resize by the configured delay.
   const CONTINUOUS = {
     // The owner's beat of 2026-09-13, the same as the single-step timing the builder supplies.
     // The moving span is split: the free rearrangement and then the landing.
-    dwell: 0.6,
-    move: 0.5,
-    correct: 0.4,
-    settle: 0.3,
-    staticDwell: 0.4,
-    staticMove: 0.28,
-    staticCorrect: 0.12,
-    staticSettle: 0.35,
+    dwell: DEFAULT_STEP_TIMING.dwell,
+    move: DEFAULT_STEP_TIMING.move,
+    correct: DEFAULT_STEP_TIMING.correct,
+    settle: DEFAULT_STEP_TIMING.settle,
+    staticDwell: DEFAULT_STATIC_STEP_TIMING.dwell,
+    staticMove: DEFAULT_STATIC_STEP_TIMING.move,
+    staticCorrect: DEFAULT_STATIC_STEP_TIMING.correct,
+    staticSettle: DEFAULT_STATIC_STEP_TIMING.settle,
   };
+  let containerDelayFraction = DEFAULT_CONTAINER_DELAY_FRACTION;
   // Revision 7, feature 2: the annealing dial. It ran 0 to 10 with a default of 3, the revision-6
   // shake; on 2026-09-13 the owner widened it to 0 to 20 and moved the default to 9. Levels 0..10
   // mean exactly what they did. Three things rise with the level, and all three are stated here
@@ -200,21 +228,18 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   //              let the shake die; at 0.35 it is still at 57% of its amplitude four fifths of
   //              the way through instead of 9%;
   //   span       the run is 1 move long up to level 3 and lengthens by a tenth of a move a level
-  //              after that, to 1.7 moves at 10 and 2.7 at 20 — extra sub-steps at the same dt
-  //              (the wall clock of a step stays 1/120 s), so a high level buys more simulated
-  //              time to settle in rather than a faster shake in the same time. The move on the
-  //              clock lengthens with it, which is why `timing` takes the style: only B and C are
-  //              annealed.
+  //              after that, to 1.7 moves at 10 and 2.7 at 20 — extra stored states at the same
+  //              nominal 120 Hz cadence. Every stored interval is integrated using the adaptive
+  //              force-law substeps in the trajectory receipt, so a high level buys more simulated
+  //              time to settle rather than a faster shake in the same time. The move on the clock
+  //              lengthens with it, which is why `timing` takes the style: only B and C are annealed.
   const ANNEAL = {
-    min: 0,
-    max: 20,
-    dflt: 9,
-    /** @type {(level: number) => number} */
-    amplitude: (L) => (L <= 3 ? L / 3 : 1 + (L - 3) * (2 / 7)),
-    /** @type {(level: number) => number} */
-    decayPower: (L) => (L <= 3 ? 1.5 : 1.5 - (Math.min(L, 10) - 3) * (1.15 / 7)),
-    /** @type {(level: number) => number} */
-    span: (L) => (L <= 3 ? 1 : 1 + (L - 3) * 0.1),
+    min: ANNEAL_SETTINGS.min,
+    max: ANNEAL_SETTINGS.max,
+    dflt: ANNEAL_SETTINGS.defaultLevel,
+    amplitude: ANNEAL_SETTINGS.amplitude,
+    decayPower: ANNEAL_SETTINGS.decayPower,
+    span: ANNEAL_SETTINGS.span,
   };
   // Revision 9: the playback speed. The ends are the owner's — slow enough to watch a settle
   // (0.05x, twenty seconds of wall clock for a one-second move) and fast enough to skim (2x). The
@@ -255,11 +280,11 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     },
     phase: PHASES[0],
     /** @type {AtlasStyle} */
-    style: "tween", // 'tween' (style A, the block tween), 'physics' (B) or 'bodies' (C)
+    style: DEFAULT_ANIMATE_STYLE, // 'tween' (style A, the block tween), 'physics' (B) or 'bodies' (C)
     desaturate: true, // drain the fills' chroma while the pair moves, lock the colour back in over the settle
     snap: true, // blend the physics onto the record's poses over the last of the move, and end on them exactly
     blind: false, // run the physics with no knowledge of the target poses at all
-    anneal: ANNEAL.dflt, // how hard and how long the physical styles shake: 0 none, 20 the loudest
+    anneal: /** @type {number} */ (ANNEAL.dflt), // how hard and how long the physical styles shake: 0 none, 20 the loudest
     links: false,
     // Revision 12: the stage takes two different press-drag-release gestures, and a toggle is what
     // keeps them apart. Off — the shipped behaviour — a press picks a square up and moves it. On, a
@@ -1178,7 +1203,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       pairs: PAIRS,
       simple: SIMPLE,
       fastSimple: state.continuous.fastSimple,
-      boxFirst: BOX_FIRST,
+      containerDelay: containerDelayFraction,
       timing: state.timing,
       continuous: {
         on: state.continuous.on,
@@ -1331,78 +1356,24 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   }
 
   // ---------------------------------------------------------------- styles B and C: physics, bodies
-  // Style B ("physics"): a deterministic fixed-timestep simulation of all n + 1 squares, each its
-  // own body. Style C ("bodies"): the same simulation with every matched block one rigid body whose
+  // Style B ("physics"): a deterministic fixed-storage-cadence simulation of all n + 1 squares,
+  // each its own body. Style C ("bodies"): the same simulation with every matched block one rigid
+  // body whose
   // members are fixed in the body frame (their poses at n relative to the block's centroid); riders,
   // squares that move alone and the new square are single-square bodies. A trajectory is
   // precomputed once per style, pair and move length and cached; seek(t) samples the cache, so a
   // frame is a pure function of t and the same in every run. The simulation's clock is the move:
   // every constant below is stated per move length, so a longer move plays the same trajectory
-  // more slowly. At the default 1.4 s move that is 168 steps of 1/120 s. Semi-implicit Euler; unit
-  // mass per square; angles in radians inside. The targets are the pair's correspondence: square i
-  // of n goes to B.squares[map[i]], the new square is identity n + 1 at its own pose.
-  const PHYS = {
-    stepsPerSecond: 120,
-    omega: 10, // spring natural frequency per move (k = 100): the time constant is a tenth of the move
-    zeta: 0.85, // damping ratio, a little under critical, so a square arrives with a hint of overshoot
-    springRamp: 0.25, // the spring's stiffness rises (smoothstep) over this first fraction of the move, so
-    // squares do not rush before the container has made room
-    // Revision 11: the push-apart's stiffness (2500 per unit of penetration, per move^2) and its
-    // cap (0.15, past which it stopped growing) left this table and became `LAW.repulsion` and
-    // `LAW.rigidity`, which the owner can edit. They were the defaults until 2026-09-13.
-    contactDamping: 20, // damping on the closing speed of two overlapping squares
-    contactTorque: 0.15, // fraction of a contact's or wall's torque applied to a single square (the push acts at a
-    // corner); the rest yields to the angle spring. A block takes the whole torque about its centroid.
-    lockIn: 0.7, // from this fraction of the move the push-apart fades out, gone where the final blend begins
-    // **Room to move, and then a tightening.** Two measured problems, and one beat each.
-    //
-    // Room: on 164 of the 323 steps the record's side does not grow at all -- the box at n is the
-    // box at n + 1 -- and at the perfect squares there is not even area to give, `side^2 - n` being
-    // exactly 0 at n = 100 and at n = 324. Squares with nowhere to go shove rather than pass, and
-    // the measure of that is WANDER: how far a square strays from the straight line between where
-    // it starts and where it ends, which separates thrashing from travel (a square that legitimately
-    // moves 1.2 sides is not wandering). Median wander over the matched steps was 0.66 of a side and
-    // the worst 1.07 -- a square swinging a whole square-width out of its way. So the container
-    // breathes: it opens past the side it is heading for, holds while the squares rearrange, and is
-    // closed again before the blend. The squares are not scaled; the walls move and the repulsion
-    // spreads the packing into the room on its own.
-    //
-    // Tightening: with the room taken the run still ended a visible distance from the record and the
-    // blend then carried it the rest of the way, so the last thing a viewer saw was a correction
-    // rather than an arrival. Between the push-apart fading and the blend beginning, the spring
-    // toward the target is stiffened: the same spring, harder, over a window where nothing else is
-    // competing with it.
-    open: 0.3, // sides the container opens past its target at the widest
-    openBy: 0.3, // fraction of the move by which it is fully open
-    shutFrom: 0.62, // fraction of the move from which it closes again, done at `1 - blend`
-    tighten: 16.0, // the spring's stiffness multiplier at the end of the tightening window
-    // Where the correction begins, as a fraction of the simulation's own progress. The
-    // rearrangement is everything before it and the landing everything after, and the beat's
-    // `move` and `correct` are how many seconds the reader spends on each side of it.
-    tightenFrom: 0.68,
-    wall: 2500, // the container's walls: stiffness per unit of corner overhang, per move^2
-    wallCap: 0.25,
-    inertia: 1 / 6, // a unit square of unit mass about its centre
-    grow: 0.5, // the container reaches n + 1's side at this fraction of the move (ease-out, so room opens early)
-    jiggle: 20, // jiggle acceleration amplitude per move^2 at the start, decaying as (1 - tau)^1.5
-    jiggleTorque: 12, // jiggle angular acceleration amplitude, rad per move^2, decaying the same way
-    jiggleHz: [2.5, 4], // a body's jiggle frequency, cycles per move, drawn per axis
-    drop: 0, // how far above its target the new square starts (at its target angle). 0: it inflates in
-    // place. A drop of 0.5 was tried in the physics spike: where the target is wedged with no
-    // clearance the square jams flat on its neighbours and only the lock-in carries it through.
-    appear: 0.15, // fraction of the move over which the new square fades in and inflates to full size
-    inflateFrom: 0.3, // its side when it first appears
-    // The last fraction of the simulation's progress that eases each pose onto its exact
-    // target (smoothstep). Inside the correction, so a longer `correct` gives it more
-    // seconds without giving it more of the run.
-    blend: 0.12,
-    maxSpeed: 40, // units per move, per body
-    maxSpin: 20, // radians per move, per body
-    cell: 1.5, // broad-phase grid cell; two unit squares can only overlap within sqrt 2 of each other
-  };
-  // What style C changes: the shake is the point of the style, so its jiggle is twice B's. A body's
-  // jiggle is an acceleration, the same for every body whatever its mass, as a shaken table gives.
-  const BODIES = { jiggle: 40, jiggleTorque: 24 };
+  // more slowly. At the default anneal level the 1.44 s run is stored in 173 intervals at a nominal
+  // 120 Hz; semi-implicit Euler integrates each interval with the adaptive substep count reported
+  // by `physics().integration`. Mass is one per square and angles are radians inside. The targets
+  // are the pair's correspondence: square i of n goes to B.squares[map[i]], the new square is
+  // identity n + 1 at its own pose.
+  const PHYS = PHYSICS_SETTINGS;
+  const MOTION_RESPONSE = Object.assign({}, DEFAULT_MOTION_RESPONSE);
+  // Style C changes grouping, not hidden forcing: it shares B's annealing amplitude so a B/C
+  // comparison isolates individual squares against matched rigid bodies.
+  const BODIES = BODY_PHYSICS_SETTINGS;
 
   // ---------------------------------------------------------------- the force law (revision 11)
   // One law, a function of the signed gap `d` between two squares along the separating axis the
@@ -1426,8 +1397,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // measurements of revisions 6 to 10 reproduce under `{rigidity: 0.15, repulsion: 2500,
   // attraction: 0, range: 0}`. On 2026-09-13 the owner chose a softer, slightly sticky default.
   // Below the shipped rigidity the shared law's slope past the knee climbs linearly, so the
-  // hardest setting is a knee at two thousandths of a side with eight times the stiffness past it:
-  // effectively rigid at this timestep, and measured stable.
+  // hardest setting is a knee at two thousandths of a side with eight times the stiffness past it.
+  // Animate derives a bounded adaptive integration cadence from that slope and reports when the
+  // bound is insufficient.
   // ------------------------------------------------------------------ the laws, declared once
   //
   // A law is four numbers describing a force against a signed gap, and there are two of them,
@@ -1441,63 +1413,24 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // cache key, the reset and the API method all follow. Nothing downstream enumerates them, so
   // nothing downstream can fall out of step -- and a check that wanted to know "what parameters
   // are there" asks this rather than listing what it saw.
-  const LAW_PARAMS = [
-    {
-      key: "rigidity",
-      label: "rigidity",
-      step: 0.001,
-      decimals: 3,
-      says: "the penetration tolerated before the repulsion climbs",
-    },
-    {
-      key: "repulsion",
-      label: "repulsion",
-      step: 50,
-      decimals: 0,
-      says: "the push when penetrating",
-    },
-    {
-      key: "attraction",
-      label: "attraction",
-      step: 5,
-      decimals: 0,
-      says: "the pull when separated but close; zero is none",
-    },
-    {
-      key: "range",
-      label: "range",
-      step: 0.005,
-      decimals: 3,
-      says: "the gap width the attraction acts over; zero beyond",
-    },
-  ];
+  const LAW_PARAMS = LAW_PARAMETER_DEFINITIONS;
   const LAW_KEYS = LAW_PARAMS.map((d) => d.key);
   /** @type {AtlasLaw} */
-  const LAW_DEFAULT = { rigidity: 0.35, repulsion: 950, attraction: 80, range: 0.15 };
+  const LAW_DEFAULT = DEFAULT_PAIR_LAW;
   /** @type {AtlasLawBounds} */
-  const LAW_BOUNDS = {
-    rigidity: [0.002, 0.4], // the penetration tolerated before the repulsion climbs steeply
-    repulsion: [200, 8000], // the push per unit of tolerated penetration
-    attraction: [0, 400], // the pull when separated but close; zero is none
-    range: [0, 0.5], // the gap width the attraction acts over; zero beyond
-  };
+  const LAW_BOUNDS = PAIR_LAW_BOUNDS;
   const LAW = Object.assign({}, LAW_DEFAULT);
-  // The named shapes the owner asked for. `rigid` is a knee at a hundredth of a side with a strong
-  // push and seven and a half times the slope past it; `soft` lets a pair sink a third of a side
-  // before the push even reaches its knee, and its push is weak enough that the resting overlap of
-  // a settle is visibly deeper; `sticky` keeps a firm push and adds a pull reaching a quarter of a
-  // side. Measured over 2,400 steps from the grid start (`measure_law.py --laws`).
+  // The preset keys are retained API names, while the visible labels state the parameter each one
+  // actually changes. `rigid` is low give plus a strong post-knee push; `soft` lowers repulsion;
+  // `sticky` adds attraction over a quarter-side range. No macro outcome (penetration, contacts,
+  // or final clustering) is promised by those shorthand keys: the measured response also depends
+  // on crowding, walls, forcing and solver style. Nothing in the integrator branches on a preset.
   //
-  // The rigid preset stops at a hundredth of a side rather than at the slider's own hard end
-  // because the timestep is fixed at 1/120 s: below about that knee the law is stiffer than the
-  // integrator can hold and the run throws squares out of the box — at rigidity 0.004 with
-  // repulsion 4000, n = 17 ends needing a side of 6.82 around a box of 5.34 with a 0.21 overlap.
-  // The slider still reaches there; the readout says what happened, and the notes say why.
-  const LAW_PRESETS = {
-    rigid: { rigidity: 0.01, repulsion: 4000, attraction: 0, range: 0 },
-    soft: { rigidity: 0.35, repulsion: 400, attraction: 0, range: 0 },
-    sticky: { rigidity: 0.08, repulsion: 2500, attraction: 120, range: 0.25 },
-  };
+  // The rigid preset stops at a hundredth of a side rather than at the slider's own hard end. The
+  // old one-step integrator could not hold the lower knees; Animate now subdivides each stored
+  // interval adaptively, caps that work at twelve, and discloses both its recommendation and any
+  // under-resolution warning. The slider still reaches the full experimental range.
+  const LAW_PRESETS = PAIR_LAW_PRESETS;
   // Revision 15: the law is a function of the signed gap, and there are two relationships it can
   // describe -- square against square, and square against wall. They are the same shape and want
   // different numbers, so the shape takes the law it is evaluating rather than reading one global.
@@ -1511,13 +1444,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // steepening past it, since a rigidity at the shared reference gives a slope of zero there.
   // Attraction is
   // off, so a wall still only pushes until the owner asks otherwise.
-  const WALL_DEFAULT = { rigidity: 0.25, repulsion: 2500, attraction: 0, range: 0 };
-  const WALL_BOUNDS = {
-    rigidity: [0.002, 0.5],
-    repulsion: [0, 8000], // zero is a legitimate setting here: walls that do not push at all
-    attraction: [0, 400],
-    range: [0, 0.5],
-  };
+  const WALL_DEFAULT = DEFAULT_WALL_LAW;
+  const WALL_BOUNDS = WALL_LAW_BOUNDS;
   const WALLLAW = Object.assign({}, WALL_DEFAULT);
   // The two laws, and everything a generic routine needs to serve either: where its controls
   // live, what its bounds are, and what it means. `pair` is masked by the relationship graph;
@@ -1555,6 +1483,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   function setLawOf(name, next) {
     const spec = lawSpec(name),
       o = next || {};
+    let changed = false;
     for (const d of LAW_PARAMS) {
       if (o[d.key] === undefined) {
         continue;
@@ -1567,11 +1496,17 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       // Rounded to the slider's own resolution, so the number shown is the number in use and a
       // law reached twice keys the cache identically both times.
       const q = 10 ** d.decimals;
-      spec.law[d.key] = Math.round(Math.max(lo, Math.min(hi, v)) * q) / q;
+      const value = Math.round(Math.max(lo, Math.min(hi, v)) * q) / q;
+      changed ||= value !== spec.law[d.key];
+      spec.law[d.key] = value;
+    }
+    if (!changed) {
+      updateSegments();
+      return Object.assign({}, spec.law);
     }
     // The same tail setLaw runs: the trajectory cache is keyed by the law, so a changed wall law
     // needs its run rebuilt exactly as a changed pair law does.
-    markGapBar();
+    restartForTrajectoryChange();
     if (isPhysical(state.style)) {
       ensureTrajectory(state.pair, state.style);
     }
@@ -1584,18 +1519,16 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   //
   // Semi-implicit Euler is stable only while dt < 2/omega, and omega = sqrt(k/m). The law's
   // stiffest slope is `repulsion` inside the knee and `repulsion * steep` past it, so a stiff
-  // setting can demand a step the fixed 1/120 s cannot give. That is the whole of the bouncing
-  // the rigid preset produced: at rigidity 0.01 and repulsion 4000 the slope reaches about
-  // 30,000, so omega is near 173 and the limit near 11.5 ms against a step of 8.3 ms -- already
-  // marginal for one contact, and contact forces SUM, so a square wedged against four neighbours
-  // sees about four times that and a limit near 5.8 ms. Hence the safety factor: it is not
-  // timidity, it is the number of contacts one square can carry.
+  // setting can demand a smaller step than one nominal 1/120 s stored interval. That caused the
+  // rigid preset's cap-to-cap bouncing under one-step integration: at rigidity 0.01 and repulsion
+  // 4000 the slope reaches about 30,000, and contact forces sum when a square is wedged among
+  // neighbours. The trajectory now integrates each stored interval with the maximum recommendation
+  // from the pair and wall laws, including the attractive slope.
   //
-  // Substepping costs time and nothing else, and it is exact where it is not needed: at the
-  // defaults the slope is 2500, omega is 50, the limit is 40 ms, and this returns 1, so the
-  // shipped trajectory is unchanged to the bit. A true rigid contact is a constraint rather than
-  // a stiff spring and wants projection instead (think-r2qd); this makes the spring honest in the
-  // meantime rather than letting the slider reach settings the integrator cannot hold.
+  // Adaptive is bounded at twelve kernel steps per stored interval. The receipt retains requested,
+  // effective and uncapped recommended counts and warns when that bound is not enough. A true rigid
+  // contact is a constraint rather than a stiff spring and still wants projection (think-r2qd);
+  // this mitigation makes the existing spring integration explicit and reproducible.
   // How the moving span divides. `tightenFrom` is where the correction starts, which is just
   // the two timings' ratio; `blend` is the last part of the correction, at the share it has
   // always had of it -- 0.12 of a span whose correction was 0.32 is three eighths of the
@@ -1606,7 +1539,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   //
   // The two move timings are deliberately NOT in this key. `move` and `correct` are two
   // TIMES -- how long the reader watches the rearrangement, and how long the landing -- and
-  // the simulation they play is the same one either way; `moveProgress` warps the clock over
+  // the simulation they play is the same one either way; `presentationState` warps the clock over
   // it rather than rebuilding it. Deriving the physics' own fractions from the timings was
   // tried and measured: it put the ratio in this key, which every timing change then
   // invalidated, and took the gate from 90 seconds to over 17 minutes of rebuilding
@@ -1619,13 +1552,13 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // jiggle. The contraction clock only runs while the deepest overlap is within `overlapTol`, so a
   // jammed packing stops the squeeze rather than crushing through it.
   const BLIND = {
-    inflate: 1.12, // the container starts at this multiple of the record side (adjustable)
-    inflateDefault: 1.12, // ... and what `reset` puts it back to
-    open: 0.12, // the fraction of the move the picture takes to open from the record of n to that box
-    hold: 0.2, // the container holds while the new square inflates, then contraction begins
-    close: 0.9, // and would reach the record's side here, if nothing jammed
-    overlapTol: 0.08, // contraction pauses while two full-size squares overlap by more than this
-    gridStep: 0.25, // the coarse grid of candidate centres for the new square
+    inflate: /** @type {number} */ (BLIND_SETTINGS.inflate), // the container starts at this multiple of the record side (adjustable)
+    inflateDefault: BLIND_SETTINGS.inflate, // ... and what `reset` puts it back to
+    open: BLIND_SETTINGS.open, // the fraction of the move the picture takes to open from the record of n to that box
+    hold: BLIND_SETTINGS.hold, // the container holds while the new square inflates, then contraction begins
+    close: BLIND_SETTINGS.close, // and would reach the record's side here, if nothing jammed
+    overlapTol: BLIND_SETTINGS.overlapTolerance, // contraction pauses while overlap is too deep
+    gridStep: BLIND_SETTINGS.gridStep, // the coarse grid of candidate centres for the new square
   };
   const PAD_MIN = 0.012; // the least breathing room the held view keeps around the growing container
   /** @type {AtlasStyle[]} */
@@ -1673,9 +1606,11 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     const A = FRAMES[String(p.n)];
     const B = FRAMES[String(p.n + 1)];
     level = level === undefined ? state.anneal : level;
-    const amp = ANNEAL.amplitude(level);
-    const decayPower = ANNEAL.decayPower(level);
-    const span = ANNEAL.span(level);
+    const anneal = annealConfiguration(level);
+    level = anneal.level;
+    const amp = anneal.amplitude;
+    const decayPower = anneal.decayPower;
+    const span = anneal.span;
     const physicalStyle = style === "bodies" ? "bodies" : "physics";
     const simulationMode = MODES.includes(mode) ? mode : simMode();
     const label = `${physicalStyle}/${simulationMode}/a${level} precompute ${p.n} -> ${p.n + 1} (${steps} steps)`;
@@ -1694,32 +1629,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       wallLaw: Object.assign({}, WALLLAW),
       relatedMask: maskFor(pairIndex),
       anneal: { level, amplitude: amp, decayPower, span },
-      physics: {
-        omega: PHYS.omega,
-        zeta: PHYS.zeta,
-        springRamp: PHYS.springRamp,
-        contactDamping: PHYS.contactDamping,
-        contactTorque: PHYS.contactTorque,
-        lockIn: PHYS.lockIn,
-        open: PHYS.open,
-        openBy: PHYS.openBy,
-        shutFrom: PHYS.shutFrom,
-        tighten: PHYS.tighten,
-        tightenFrom: PHYS.tightenFrom,
-        grow: PHYS.grow,
-        jiggle: PHYS.jiggle,
-        jiggleTorque: PHYS.jiggleTorque,
-        bodiesJiggle: BODIES.jiggle,
-        bodiesJiggleTorque: BODIES.jiggleTorque,
-        jiggleHz: [PHYS.jiggleHz[0], PHYS.jiggleHz[1]],
-        drop: PHYS.drop,
-        appear: PHYS.appear,
-        inflateFrom: PHYS.inflateFrom,
-        blend: PHYS.blend,
-        maxSpeed: PHYS.maxSpeed,
-        maxSpin: PHYS.maxSpin,
-        cell: PHYS.cell,
-      },
+      physics: trajectoryPhysicsConfiguration(MOTION_RESPONSE),
       blind: {
         inflate: BLIND.inflate,
         hold: BLIND.hold,
@@ -1739,8 +1649,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       annealDecay: decayPower,
     });
   }
-  // The step count: 120 a second of the annealed move, so a level that lengthens the move buys sub-
-  // steps at the same dt rather than a finer integration of the same span.
+  // The stored-state count: nominally 120 a second of the annealed move. Kernel work is this count
+  // multiplied by the trajectory's force-law integration substeps.
   function physicsSteps(pairIndex, style) {
     // The whole moving span, not just the rearrangement: the physics runs through the landing
     // too, and `move` stopped being the whole of it when the correction got its own time.
@@ -1785,6 +1695,10 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       (mode === "blind" ? `:${BLIND.inflate}` : "") +
       "/a" +
       state.anneal +
+      "/V" +
+      MOTION_RESPONSE.speedLimit +
+      ":" +
+      MOTION_RESPONSE.contactDamping +
       "/L" +
       lawKey() +
       "/R" +
@@ -1812,32 +1726,11 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // deterministic. Setting one drops nothing: the cache is keyed rather than cleared, so going back
   // to a law already run is instant and gives the same trajectory it gave before.
   function setLaw(next) {
-    const o = next || {};
-    for (const key of ["rigidity", "repulsion", "attraction", "range"]) {
-      if (o[key] === undefined) {
-        continue;
-      }
-      const v = Number(o[key]);
-      if (!Number.isFinite(v)) {
-        continue;
-      }
-      const [lo, hi] = LAW_BOUNDS[key];
-      // Rounded to the slider's own resolution, so the number shown is the number in use and the
-      // cache key of a law reached twice is the same string both times.
-      const q = key === "rigidity" ? 1000 : key === "range" ? 1000 : 1;
-      LAW[key] = Math.round(Math.max(lo, Math.min(hi, v)) * q) / q;
-    }
-    markGapBar();
-    if (isPhysical(state.style)) {
-      ensureTrajectory(state.pair, state.style);
-    }
-    drawLawPlot();
-    updateSegments();
-    render();
+    setLawOf("pair", next);
     return lawState();
   }
   function setLawPreset(name) {
-    const preset = LAW_PRESETS[name] || (name === "default" ? LAW_DEFAULT : null);
+    const preset = pairLawPreset(name) || (name === "default" ? LAW_PRESETS.balanced : null);
     if (preset === null) {
       return lawState();
     }
@@ -1996,6 +1889,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     }
     const svgEl = lawPlot.svg;
     svgEl.addEventListener("pointerdown", (ev) => {
+      if (!currentMotionControlScope().active) {
+        return;
+      }
       const pt = lpPoint(ev);
       if (pt === null) {
         return;
@@ -2162,14 +2058,13 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     };
   }
   // ---------------------------------------------------------------- reset (revision 11)
-  // Every physics parameter back to its default, and the run restarted from the arrangement the
-  // page is already showing. It does not touch n, the aspect, or which start is chosen: what is on
-  // the stage stays what is on the stage, and only the physics acting on it is put back.
+  // Every physics parameter back to its default, and the run restarted from the selected start.
+  // It does not touch n, the aspect, or which start is chosen.
   function resetPhysics() {
-    LAW.rigidity = LAW_DEFAULT.rigidity;
-    LAW.repulsion = LAW_DEFAULT.repulsion;
-    LAW.attraction = LAW_DEFAULT.attraction;
-    LAW.range = LAW_DEFAULT.range;
+    Object.assign(LAW, LAW_DEFAULT);
+    Object.assign(WALLLAW, WALL_DEFAULT);
+    Object.assign(MOTION_RESPONSE, DEFAULT_MOTION_RESPONSE);
+    containerDelayFraction = DEFAULT_CONTAINER_DELAY_FRACTION;
     relKind = "general";
     targetEdges = null;
     // The target goes back to the record's graph and the drawing mode comes off, but
@@ -2186,38 +2081,32 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     state.blind = false;
     state.snap = true;
     BLIND.inflate = BLIND.inflateDefault;
-    markGapBar();
-    // Restart from the start the page is on, without changing which start that is. A timeline that
-    // was not optimizing is left as a timeline. Revision 14: a reset never starts the clock —
-    // in Pack every stage is a run now, and a button that says `reset physics` must not also press
-    // play, so a run that was paused comes back paused.
-    if (state.optimizing) {
-      const was = state.playing;
-      optimize(true);
-      if (!was) {
-        pause();
-      }
-    } else {
-      pause();
-      if (isPhysical(state.style)) {
-        ensureTrajectory(state.pair, state.style);
-      }
-      drawLawPlot();
-      updateSegments();
-      render();
+    // Reset follows the same bounded continuity rule as editing one parameter and never starts the
+    // clock on the owner's behalf.
+    restartForTrajectoryChange();
+    if (isPhysical(state.style)) {
+      ensureTrajectory(state.pair, state.style);
     }
+    drawLawPlot();
+    updateSegments();
+    render();
     return {
       law: lawState(),
+      wallLaw: Object.assign({}, WALLLAW),
+      motionResponse: motionResponseState(),
+      containerDelay: containerDelayState(),
       relationship: relationshipState(),
       growth: growthState(),
       anneal: state.anneal,
+      snap: state.snap,
+      blind: state.blind,
+      blindInflate: BLIND.inflate,
     };
   }
 
   // ---------------------------------------------------------------- choosing the relationship
-  // Setting the graph is cheap — it neither clears the trajectory cache nor restarts a run — but it
-  // does change what a run does next, so the trajectory key carries it and a live run picks the new
-  // mask up on its next step.
+  // The relationship participates in the trajectory key. Changing it pauses and restarts the
+  // current step so the page never splices two different force graphs at one playhead.
   function setRelationship(kind) {
     const next = RELATIONSHIPS.includes(kind) ? kind : "general";
     if (next === relKind) {
@@ -2226,7 +2115,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     }
     relKind = next;
     relCache.clear();
-    markGapBar();
+    restartForTrajectoryChange();
     if (isPhysical(state.style)) {
       ensureTrajectory(state.pair, state.style);
     }
@@ -2266,7 +2155,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // handed to `setEdges` would drive a run exactly as a drawn one does.
   function graphChanged() {
     relCache.clear();
-    markGapBar();
+    restartForTrajectoryChange();
     if (isPhysical(state.style)) {
       ensureTrajectory(state.pair, state.style);
     }
@@ -2935,7 +2824,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   /** @type {AtlasInitial[]} */
   const INITIALS = ["previous", "random", "grid", "record"];
   const OPT = {
-    stepsPerSecond: 120, // the simulated rate, the same dt the cached simulator integrates at
+    stepsPerSecond: 120, // nominal search ticks per simulated second; the force law may substep each tick
     budgetMs: 9, // the wall clock one frame's chunk of steps may take
     maxChunk: 400,
     minChunk: 1,
@@ -3060,6 +2949,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     const B = FRAMES[String(p.n + 1)];
     const N = p.n + 1;
     const springs = optSprings(kind);
+    const anneal = annealConfiguration(state.anneal);
     const start =
       startOverride === undefined
         ? initialArrangement(kind, p, A, B, springs)
@@ -3083,18 +2973,18 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
         stepsPerSecond: OPT.stepsPerSecond,
         omega: PHYS.omega,
         zeta: PHYS.zeta,
-        contactDamping: PHYS.contactDamping,
+        contactDamping: MOTION_RESPONSE.contactDamping,
         contactTorque: PHYS.contactTorque,
         jiggle: state.style === "bodies" ? BODIES.jiggle : PHYS.jiggle,
         jiggleTorque: state.style === "bodies" ? BODIES.jiggleTorque : PHYS.jiggleTorque,
         jiggleHz: [PHYS.jiggleHz[0], PHYS.jiggleHz[1]],
-        maxSpeed: PHYS.maxSpeed,
+        maxSpeed: MOTION_RESPONSE.speedLimit,
         maxSpin: PHYS.maxSpin,
         cell: PHYS.cell,
       },
       anneal: {
-        amplitude: ANNEAL.amplitude(state.anneal),
-        decayPower: ANNEAL.decayPower(state.anneal),
+        amplitude: anneal.amplitude,
+        decayPower: anneal.decayPower,
         tau: OPT.tau,
         floor: OPT.floor,
       },
@@ -3122,6 +3012,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
 
   function optAdvance(o, steps) {
     const rigidStyle = state.style === "bodies";
+    const anneal = annealConfiguration(state.anneal);
     updatePackRun(o, {
       pairLaw: LAW,
       wallLaw: WALLLAW,
@@ -3131,8 +3022,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
         jiggleTorque: rigidStyle ? BODIES.jiggleTorque : PHYS.jiggleTorque,
       },
       anneal: {
-        amplitude: ANNEAL.amplitude(state.anneal),
-        decayPower: ANNEAL.decayPower(state.anneal),
+        amplitude: anneal.amplitude,
+        decayPower: anneal.decayPower,
       },
       growth: { on: GROWTH.on, rate: GROWTH.rate, rule: GROWTH.rule },
     });
@@ -3792,43 +3683,63 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // the run's first 68 per cent and `correct` seconds on its last 32, so the two phases have
   // independent durations while the run they play is the same one. Lengthening the search no
   // longer lengthens the landing with it, which was the whole complaint.
-  // The run waits out the box's BOX_FIRST of the move, like every other motion on a step.
-  function moveProgress(sc, t) {
+  // The physical run follows the selected phase's body-motion interval. Container presentation is
+  // separate: its resize starts after the new square appears, at `sc.containerStart`.
+  function presentationState(sc, t) {
     const tm = timing();
-    const start = sc.moveStart + (sc.moveEnd - sc.moveStart) * BOX_FIRST;
-    const span = sc.moveEnd - start;
-    const total = tm.move + tm.correct;
-    if (span <= 0 || total <= 0) {
-      return ramp(t, start, sc.moveEnd);
-    }
-    const knee = start + span * (tm.move / total);
-    return t < knee
-      ? ramp(t, start, knee) * PHYS.tightenFrom
-      : PHYS.tightenFrom + ramp(t, knee, sc.moveEnd) * (1 - PHYS.tightenFrom);
+    // A maximally delayed resize may continue into settle. Use the full presentation interval for
+    // every fraction so the body, arrival and container clocks keep their declared absolute
+    // boundaries instead of being rescaled independently.
+    const span = Math.max(sc.moveEnd, sc.containerEnd) - sc.moveStart;
+    const motionStart = span <= 0 ? 0 : (sc.blocksStart - sc.moveStart) / span;
+    const motionEnd = span <= 0 ? 1 : (sc.blocksEnd - sc.moveStart) / span;
+    const containerStart = span <= 0 ? 0 : (sc.containerStart - sc.moveStart) / span;
+    const containerEnd = span <= 0 ? 1 : (sc.containerEnd - sc.moveStart) / span;
+    const arrivalStart = span <= 0 ? 0 : (sc.arrive - sc.moveStart) / span;
+    const arrivalEnd = span <= 0 ? 0 : (sc.arrived - sc.moveStart) / span;
+    return physicalPresentationState(t - sc.moveStart, span, tm, {
+      motionStartFraction: motionStart,
+      motionEndFraction: motionEnd,
+      containerStartFraction: containerStart,
+      containerEndFraction: containerEnd,
+      arrivalStartFraction: arrivalStart,
+      arrivalEndFraction: arrivalEnd,
+    });
   }
   // Where the physical styles put every square at `t`, written into the three pose buffers, and
   // the container around them. The stage draws this answer and the moving palette's checkpoints
   // read it, so a run's colours are measured on the same poses the stage shows.
   function physicsFrame(p, A, B, sc, t, xs, ys, as) {
-    const u = moveProgress(sc, t);
+    const presentation = presentationState(sc, t);
+    const u = presentation.trajectoryProgress;
+    const containerU = presentation.containerProgress;
     const moving = u > 0 && u < 1;
     // With the snap off the simulation's own final state is what the pair comes to rest at, so the
     // trajectory is read through the settle as well, not only while the squares are on the move.
     const mode = simMode();
     const blind = mode === "blind";
-    const tr =
-      moving || (mode !== "snap" && u > 0) ? ensureTrajectory(state.pair, state.style, mode) : null;
+    // The arriving square is part of the physical run even before body motion begins. Loading the
+    // trajectory through this interval keeps it on sample zero instead of drawing it at the target
+    // pose and jumping back to the run's initial pose at `blocksStart`.
+    const tr = physicalPresentationNeedsTrajectory(presentation, mode === "snap")
+      ? ensureTrajectory(state.pair, state.style, mode)
+      : null;
     // A blind run opens its container before it begins: over the first BLIND.open of the move the
     // picture eases from the record of n to the run's own first state, the box inflated and the
     // packing recentred inside it. After that the move is the simulation's own clock.
     const oe = blind ? easeInOut(clamp01(u / BLIND.open)) : 1;
+    const containerOpen = blind ? easeInOut(clamp01(containerU / BLIND.open)) : 1;
     const su = blind ? clamp01((u - BLIND.open) / (1 - BLIND.open)) : Math.min(u, 1);
+    const containerSu = blind
+      ? clamp01((containerU - BLIND.open) / (1 - BLIND.open))
+      : Math.min(containerU, 1);
     let side, fit;
     if (blind && tr !== null) {
-      side = oe < 1 ? lerp(A.side, tr.sides[0], oe) : sampleSide(tr, su);
+      side =
+        containerOpen < 1 ? lerp(A.side, tr.sides[0], containerOpen) : sampleSide(tr, containerSu);
       fit = Math.max(B.side, tr.miss.side);
     } else {
-      side = u >= 1 ? B.side : containerSide(A.side, B.side, u);
+      side = containerU >= 1 ? B.side : containerSide(A.side, B.side, containerU);
       fit = B.side;
     }
     for (let i = 0; i < motion.length; i++) {
@@ -3860,14 +3771,14 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     // The new square, identity n + 1: it fades and inflates in over the first part of the move
     // where the simulation puts it.
     const nb = newPose;
-    const appear = u <= 0 ? 0 : easeOut(clamp01(su / PHYS.appear));
+    const appear = presentation.appearanceProgress;
     let scale = 1;
     if (appear > 0 && tr !== null) {
       const pose = samplePose(tr, su, p.n);
       xs[p.n] = pose[0];
       ys[p.n] = pose[1];
       as[p.n] = pose[2];
-      scale = lerp(PHYS.inflateFrom, 1, clamp01(su / PHYS.appear));
+      scale = lerp(PHYS.inflateFrom, 1, appear);
     } else {
       xs[p.n] = nb[0];
       ys[p.n] = nb[1];
@@ -4059,12 +3970,13 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // of where it just was, so every change of size is seen from both ends.
   //   dwell   green rests at n's best known side; the trace the last step left outside it clears
   //           over the dwell's last BOUND_CLEAR.
-  //   grow    over the first BOUND_GROW of the move green opens up and to the right to the room
+  //   grow    after the new square appears and its configured delay passes, green opens over
+  //           BOUND_GROW of the move up and to the right to the room
   //           n + 1 can always use -- ceil(sqrt(n + 1)), the grid, or the best known side where that
   //           is wider -- riding out further wherever the moving container breathes past it. The
   //           trace stays inside at n's side.
-  //   clear   the inner trace fades over the next BOUND_FADE, leaving room for the new square,
-  //           which the schedule holds back, with every other motion, until BOX_FIRST.
+  //   clear   the inner trace fades over the next BOUND_FADE. The square-to-resize ordering is
+  //           explicit in the schedule and does not depend on which solver draws the squares.
   //   settle  green contracts to n + 1's best known side and the trace stays outside it, where the
   //           box was, until the next step clears it.
   // Where the grid is the best known packing the box never changes size and stays green. An
@@ -4108,17 +4020,16 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       trace = openSide(p.n);
       seen = 1 - ramp(t, sc.moveStart * (1 - BOUND_CLEAR), sc.moveStart);
       held = trace;
-    } else if (!optimizing && t < sc.moveEnd) {
-      const span = sc.moveEnd - sc.moveStart;
-      const grown = sc.moveStart + span * BOUND_GROW;
-      const opening = easeInOut(ramp(t, sc.moveStart, grown));
+    } else if (!optimizing && t < sc.containerEnd) {
+      const grown = sc.containerEnd;
+      const opening = easeInOut(ramp(t, sc.containerStart, grown));
       box = Math.max(sceneSide, lerp(from, open, opening));
       trace = from;
-      seen = 1 - ramp(t, grown, grown + span * BOUND_FADE);
+      seen = 1 - ramp(t, grown, grown + (sc.moveEnd - sc.moveStart) * BOUND_FADE);
       held = Math.max(box, lerp(openSide(p.n), open, opening));
     } else if (!optimizing) {
       trace = Math.max(sceneSide, open);
-      box = Math.max(sceneSide, lerp(trace, to, easeInOut(ramp(t, sc.moveEnd, sc.end))));
+      box = Math.max(sceneSide, lerp(trace, to, easeInOut(ramp(t, sc.containerEnd, sc.end))));
       seen = 1;
       held = trace;
     }
@@ -4139,7 +4050,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     // physics 5 -> 6 flickered as the container breathed past it. So through a move the box locks
     // only on a step whose box does not change size, a grid fill, where it rests from end to end.
     const best = FRAMES[String(state.liveN)].side;
-    const resting = t <= sc.moveStart || t >= sc.moveEnd || (from === to && open === to);
+    const resting = t <= sc.moveStart || t >= sc.end || (from === to && open === to);
     boxLocked =
       !optimizing && resting && Math.abs(box - best) <= PACKING_VALIDITY.penetrationTolerance;
     boxRect.setAttribute("stroke", boxLocked ? MET : "#000000");
@@ -4364,6 +4275,25 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     }
   }
   const styleSelect = /** @type {HTMLSelectElement} */ (selectNode("style-select"));
+  function currentMotionControlScope() {
+    const view = searchPanel?.visible() ? "search" : state.mode;
+    return motionControlScope(state.style, state.mode === "animate" && isStillPair(), view);
+  }
+  function syncMotionControlScope() {
+    const scope = currentMotionControlScope();
+    htmlNode("motion-scope-note").textContent = scope.note;
+    document.querySelectorAll('[data-motion-control="physics"]').forEach((host) => {
+      host.classList.toggle("is-inert", !scope.active);
+      host.setAttribute("aria-disabled", scope.active ? "false" : "true");
+      host.setAttribute("title", scope.active ? "" : scope.note);
+      host.querySelectorAll("button, input, select").forEach((control) => {
+        /** @type {HTMLButtonElement | HTMLInputElement | HTMLSelectElement} */ (control).disabled =
+          !scope.active;
+      });
+    });
+    svgNode("law-plot").setAttribute("aria-disabled", scope.active ? "false" : "true");
+    return scope;
+  }
   function updateSegments() {
     const searching = searchPanel?.visible() ?? false;
     animationPanel?.setVisible(!searching && state.mode === "animate");
@@ -4378,7 +4308,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     // the page opens in Pack with the tween already selected as the first style, so no mode
     // change ever ran and the chooser showed A while offering only B and C.
     if (!offered.includes(state.style)) {
-      state.style = offered.includes("physics") ? "physics" : offered[0];
+      state.style = offered.includes(DEFAULT_PACK_STYLE) ? DEFAULT_PACK_STYLE : offered[0];
       solverNote = TWEEN_NOTE;
     }
     Array.from(styleSelect.options).forEach((o) => {
@@ -4391,6 +4321,12 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     // The timing and the phasing describe a step. Pack has none, so the group goes — in place, so
     // that nothing else on the panel moves and the stage keeps its size (see the stylesheet).
     htmlNode("step-anim-box").classList.toggle("is-off", state.mode === "pack");
+    // These tune the catalogue trajectory and its presentation. Independent Pack owns a separate
+    // controller and must not show controls that do not reach it.
+    htmlNode("motion-advanced-box").classList.toggle(
+      "is-off",
+      searching || state.mode !== "animate",
+    );
     // The mode sub-panel. Two buttons drawn as tabs: the pressed one names the aspect on show.
     document.querySelectorAll("#mode-tabs button").forEach((b) => {
       const on =
@@ -4422,12 +4358,44 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       fmt(an.span, 2) +
       " move" +
       (isPhysical(state.style) ? "" : " (styles B and C only)");
+    const response = motionResponseState();
+    const speedLimit = /** @type {HTMLInputElement} */ (inputNode("motion-speed-limit"));
+    speedLimit.min = String(MOTION_RESPONSE_BOUNDS.speedLimit[0]);
+    speedLimit.max = String(MOTION_RESPONSE_BOUNDS.speedLimit[1]);
+    speedLimit.step = "0.5";
+    speedLimit.value = String(response.speedLimit);
+    htmlNode("motion-speed-limit-val").textContent = `${fmt(response.speedLimit, 1)} side/s`;
+    const contactDamping = /** @type {HTMLInputElement} */ (inputNode("motion-contact-damping"));
+    contactDamping.min = String(MOTION_RESPONSE_BOUNDS.contactDamping[0]);
+    contactDamping.max = String(MOTION_RESPONSE_BOUNDS.contactDamping[1]);
+    contactDamping.step = "1";
+    contactDamping.value = String(response.contactDamping);
+    htmlNode("motion-contact-damping-val").textContent = fmt(response.contactDamping, 0);
+    const containerDelay = /** @type {HTMLInputElement} */ (inputNode("motion-container-delay"));
+    const delay = containerDelayState();
+    containerDelay.min = String(CONTAINER_DELAY_BOUNDS[0]);
+    containerDelay.max = String(CONTAINER_DELAY_BOUNDS[1]);
+    containerDelay.step = "0.05";
+    containerDelay.value = String(delay.fraction);
+    htmlNode("motion-container-delay-val").textContent =
+      `${fmt(delay.effectiveSeconds, 2)} s · square first`;
+    const currentIntegration = isPhysical(state.style)
+      ? animationIntegration(LAW, WALLLAW, response.storedTimestep)
+      : null;
+    const integrationWarning =
+      currentIntegration?.warning === "below-adaptive-stability-bound"
+        ? ` · integration cap ${currentIntegration.effective} < ${currentIntegration.recommended} recommended`
+        : "";
+    htmlNode("motion-response-info").textContent =
+      `stored step ${fmt(response.storedTimestep, 4)} sim s · speed cap permits ` +
+      `${fmt(response.impliedStoredStepCap, 3)} side per stored step · resize delay ` +
+      `${fmt(delay.percent, 0)}% of move${integrationWarning}`;
     syncLawRows();
     document.querySelectorAll("#law-preset-seg button").forEach((b) => {
-      const preset = LAW_PRESETS[/** @type {HTMLElement} */ (b).dataset.law];
+      const preset = pairLawPreset(/** @type {HTMLElement} */ (b).dataset.law);
       b.classList.toggle(
         "on",
-        preset !== undefined &&
+        preset !== null &&
           ["rigidity", "repulsion", "attraction", "range"].every(
             (k) => Math.abs(preset[k] - LAW[k]) < ROUNDING,
           ),
@@ -4436,7 +4404,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     // Revision 12: every live readout is written to fit its slot, a slot that overruns clipping
     // rather than pushing what is next to it. This one is at most 44 characters.
     htmlNode("law-info").textContent =
-      "knee " +
+      "give " +
+      fmt(LAW.rigidity, 3) +
+      " · push " +
       Math.round(LAW.repulsion * LAW.rigidity) +
       " · slope ×" +
       fmt(1 + lawSteep(), 1) +
@@ -4558,6 +4528,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       "aria-label",
       state.playing ? "Restart the run" : "Back to the start",
     );
+    syncMotionControlScope();
   }
   // ---------------------------------------------------------------- the chooser for n (revision 9)
   // One spine: a `from` and a `to`, both stated as the n being stepped *into*, so choosing 17 shows
@@ -4925,14 +4896,29 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     updateSegments();
     render();
   }
+  // Every setting that changes a trajectory has one continuity policy: stop the clock and return
+  // the current step to its first frame. A different cached trajectory is never swapped under an
+  // old playhead, which made a parameter edit look like an unexplained jump. Pack restages its
+  // chosen start under the new settings; Animate keeps the current pair and resets only its clock.
+  function restartForTrajectoryChange() {
+    pause();
+    state.t = 0;
+    preparedFor = -1;
+    state.optimizing = false;
+    opt = null;
+    if (state.mode === "pack") {
+      stagePack();
+    }
+    markGapBar();
+  }
   // The beat, whichever one is running. Under continuous play this edits CONTINUOUS, which is what
   // a range is actually paced by; otherwise it edits the single-step timing. Both are clamped the
   // same way, and a move of zero is refused in both -- a move has to have a duration for anything
   // to be seen happening in it.
   function setTiming(timing) {
     timing = timing || {};
-    const frac = duration() > 0 ? state.t / duration() : 0;
     const beat = state.continuous.on ? CONTINUOUS : state.timing;
+    const before = [beat.dwell, beat.move, beat.correct, beat.settle].join(":");
     if (timing.dwell !== undefined) {
       beat.dwell = Math.max(0, Number(timing.dwell) || 0);
     }
@@ -4945,7 +4931,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     if (timing.settle !== undefined) {
       beat.settle = Math.max(0, Number(timing.settle) || 0);
     }
-    state.t = frac * duration();
+    if (before !== [beat.dwell, beat.move, beat.correct, beat.settle].join(":")) {
+      restartForTrajectoryChange();
+    }
     updateSegments();
     render();
   }
@@ -4978,8 +4966,11 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     return colorScheme;
   }
   function setPhase(phase) {
-    markGapBar();
-    state.phase = PHASES.includes(phase) ? phase : PHASES[0];
+    const next = PHASES.includes(phase) ? phase : PHASES[0];
+    if (next !== state.phase) {
+      state.phase = next;
+      restartForTrajectoryChange();
+    }
     updateSegments();
     render();
   }
@@ -4995,7 +4986,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     markGapBar();
     let next = STYLES.includes(style) ? style : STYLES[0];
     if (state.mode === "pack" && next === "tween") {
-      next = "physics";
+      next = DEFAULT_PACK_STYLE;
       solverNote = TWEEN_NOTE;
     } else {
       solverNote = "";
@@ -5004,8 +4995,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       // Each style drives the new square and the mark from scratch; drop what the other left on
       // the mark's hidden node, so a style's frame does not depend on which style ran before it.
       mark.removeAttribute("transform");
+      state.style = next;
+      restartForTrajectoryChange();
     }
-    state.style = next;
     if (isPhysical(state.style)) {
       ensureTrajectory(state.pair, state.style);
     }
@@ -5016,7 +5008,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // under a style (the current physical style by default; B when the tween is showing).
   function physics(index, style, mode) {
     index = Math.max(0, Math.min(PAIRS.length - 1, index | 0));
-    style = isPhysical(style) ? style : isPhysical(state.style) ? state.style : "physics";
+    style = isPhysical(style) ? style : isPhysical(state.style) ? state.style : DEFAULT_PACK_STYLE;
     const tr = ensureTrajectory(index, style, mode);
     const N = tr.n + 1;
     const o = tr.steps * N * 3;
@@ -5045,13 +5037,14 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       bodies: tr.bodies,
       steps: tr.steps,
       ms: tr.ms,
-      bytes: tr.states.byteLength,
+      bytes: trajectoryByteLength(tr),
       maxSpeedPerMove: maxSpeed,
       maxPenetration: tr.maxPenetration,
       maxPenetrationLate: tr.maxPenetrationLate,
       anneal: tr.anneal,
       annealSpan: tr.annealSpan,
       annealAmplitude: tr.annealAmplitude,
+      integration: Object.assign({}, tr.receipt.configuration.integration),
       miss: Object.assign({}, tr.miss),
       final,
     };
@@ -5065,8 +5058,13 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // With the snap off, styles B and C run to the end of the move with no blend and no snap, and the
   // pair comes to rest wherever the physics left it. Style A is unaffected.
   function setSnap(on) {
-    markGapBar();
-    state.snap = !!on;
+    const next = !!on;
+    if (next === state.snap) {
+      updateSegments();
+      return;
+    }
+    state.snap = next;
+    restartForTrajectoryChange();
     if (isPhysical(state.style)) {
       ensureTrajectory(state.pair, state.style);
     }
@@ -5076,8 +5074,13 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // The blind run: the simulation is told nothing about where the squares belong. It overrides the
   // snap, there being nothing to snap to.
   function setBlind(on) {
-    markGapBar();
-    state.blind = !!on;
+    const next = !!on;
+    if (next === state.blind) {
+      updateSegments();
+      return;
+    }
+    state.blind = next;
+    restartForTrajectoryChange();
     if (isPhysical(state.style)) {
       ensureTrajectory(state.pair, state.style);
     }
@@ -5088,16 +5091,13 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // and lengthens the run, so the trajectory cache is keyed by it and the clock has to be rescaled
   // where the move's length changes under a playing pair.
   function setAnneal(level) {
-    markGapBar();
-    const v = Math.round(Number(level));
-    const next = Math.max(ANNEAL.min, Math.min(ANNEAL.max, Number.isFinite(v) ? v : state.anneal));
+    const v = Number(level);
+    const next = Number.isFinite(v) ? annealConfiguration(v).level : state.anneal;
     if (next === state.anneal) {
       return annealState();
     }
-    const d = duration();
-    const frac = d > 0 ? state.t / d : 0;
     state.anneal = next;
-    state.t = frac * duration();
+    restartForTrajectoryChange();
     if (isPhysical(state.style)) {
       ensureTrajectory(state.pair, state.style);
     }
@@ -5106,19 +5106,106 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     return annealState();
   }
   function annealState() {
+    const effective = annealConfiguration(state.anneal);
     return {
       level: state.anneal,
       min: ANNEAL.min,
       max: ANNEAL.max,
       dflt: ANNEAL.dflt,
-      amplitude: ANNEAL.amplitude(state.anneal),
-      decayPower: ANNEAL.decayPower(state.anneal),
-      span: ANNEAL.span(state.anneal),
+      amplitude: effective.amplitude,
+      decayPower: effective.decayPower,
+      span: effective.span,
       // The whole moving span the run is drawn over on the clock. `move` alone stopped being
       // that when the correction got its own time. `steps` counts the base span's work, which a
       // simple transition's speed-up does not shorten.
       move: timing().move + timing().correct,
       steps: physicsSteps(state.pair, state.style),
+    };
+  }
+  function setMotionResponse(next) {
+    const o = next || {};
+    let speedLimit = MOTION_RESPONSE.speedLimit;
+    let contactDamping = MOTION_RESPONSE.contactDamping;
+    if (o.speedLimit !== undefined) {
+      const v = Number(o.speedLimit);
+      if (Number.isFinite(v)) {
+        const [lo, hi] = MOTION_RESPONSE_BOUNDS.speedLimit;
+        speedLimit = Math.round(Math.max(lo, Math.min(hi, v)) * 2) / 2;
+      }
+    }
+    if (o.contactDamping !== undefined) {
+      const v = Number(o.contactDamping);
+      if (Number.isFinite(v)) {
+        const [lo, hi] = MOTION_RESPONSE_BOUNDS.contactDamping;
+        contactDamping = Math.round(Math.max(lo, Math.min(hi, v)));
+      }
+    }
+    if (
+      speedLimit === MOTION_RESPONSE.speedLimit &&
+      contactDamping === MOTION_RESPONSE.contactDamping
+    ) {
+      updateSegments();
+      return motionResponseState();
+    }
+    MOTION_RESPONSE.speedLimit = speedLimit;
+    MOTION_RESPONSE.contactDamping = contactDamping;
+    restartForTrajectoryChange();
+    if (isPhysical(state.style)) {
+      ensureTrajectory(state.pair, state.style);
+    }
+    updateSegments();
+    render();
+    return motionResponseState();
+  }
+  /** @returns {AtlasMotionResponse} */
+  function motionResponseState() {
+    const style = isPhysical(state.style) ? state.style : DEFAULT_PACK_STYLE;
+    const steps = physicsSteps(state.pair, style);
+    const storedTimestep = annealConfiguration(state.anneal).span / steps;
+    return {
+      speedLimit: MOTION_RESPONSE.speedLimit,
+      contactDamping: MOTION_RESPONSE.contactDamping,
+      defaults: Object.assign({}, DEFAULT_MOTION_RESPONSE),
+      bounds: {
+        speedLimit: [MOTION_RESPONSE_BOUNDS.speedLimit[0], MOTION_RESPONSE_BOUNDS.speedLimit[1]],
+        contactDamping: [
+          MOTION_RESPONSE_BOUNDS.contactDamping[0],
+          MOTION_RESPONSE_BOUNDS.contactDamping[1],
+        ],
+      },
+      storedTimestep,
+      impliedStoredStepCap: MOTION_RESPONSE.speedLimit * storedTimestep,
+    };
+  }
+  function setContainerDelay(value) {
+    const v = Number(value);
+    if (!Number.isFinite(v)) {
+      return containerDelayState();
+    }
+    const next =
+      Math.round(
+        Math.max(CONTAINER_DELAY_BOUNDS[0], Math.min(CONTAINER_DELAY_BOUNDS[1], v)) * 100,
+      ) / 100;
+    if (next === containerDelayFraction) {
+      updateSegments();
+      return containerDelayState();
+    }
+    containerDelayFraction = next;
+    restartForTrajectoryChange();
+    updateSegments();
+    render();
+    return containerDelayState();
+  }
+  /** @returns {AtlasContainerDelay} */
+  function containerDelayState() {
+    const tm = timing();
+    return {
+      fraction: containerDelayFraction,
+      percent: containerDelayFraction * 100,
+      effectiveSeconds: (tm.move + tm.correct) * containerDelayFraction,
+      dflt: DEFAULT_CONTAINER_DELAY_FRACTION,
+      bounds: [CONTAINER_DELAY_BOUNDS[0], CONTAINER_DELAY_BOUNDS[1]],
+      direction: "square first",
     };
   }
   // The run's seed. An integer; anything else is ignored rather than silently turned into
@@ -5128,27 +5215,25 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     if (k === null) {
       return state.seed;
     }
-    state.seed = k;
-    // A new seed is a new run: the staged arrangement and any open-ended run belong to the old one.
-    // The run is ended through `endRun`, so the clock stops with it rather than playing on with no
-    // run behind it; a Pack run starts again from its own start under the new seed. Trajectories
-    // are keyed by the seed, so the next frame reads the new seed's.
-    const running = state.optimizing && opt !== null;
-    endRun();
-    if (running && state.mode === "pack") {
-      state.optimizing = true;
-      opt = newOptimizer(state.initial);
+    if (k === state.seed) {
+      return state.seed;
     }
-    markGapBar();
-    stagePack();
+    state.seed = k;
+    // A new seed is a new run. It follows the same bounded policy as every trajectory setting:
+    // pause and restart from the selected start, never continue an old seed's clock.
+    restartForTrajectoryChange();
     updateSegments();
     render();
     return state.seed;
   }
   function setBlindInflate(factor) {
-    markGapBar();
     const v = Number(factor);
-    BLIND.inflate = Math.max(1, Math.min(2, Number.isFinite(v) ? v : BLIND.inflate));
+    const next = Math.max(1, Math.min(2, Number.isFinite(v) ? v : BLIND.inflate));
+    if (next === BLIND.inflate) {
+      return;
+    }
+    BLIND.inflate = next;
+    restartForTrajectoryChange();
     if (state.blind && isPhysical(state.style)) {
       ensureTrajectory(state.pair, state.style);
     }
@@ -5457,7 +5542,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     // physics and leaves the reason under the select; leaving Pack clears the note, the choice
     // being available again.
     if (transition.aspect === "pack" && state.style === "tween") {
-      state.style = "physics";
+      state.style = DEFAULT_PACK_STYLE;
       solverNote = TWEEN_NOTE;
     }
     if (transition.aspect === "animate") {
@@ -5764,6 +5849,10 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     // Revision 7, feature 2: the annealing dial.
     setAnneal,
     anneal: annealState,
+    setMotionResponse,
+    motionResponse: motionResponseState,
+    setContainerDelay,
+    containerDelay: containerDelayState,
     // Revision 11: the one force law, its presets, its sampled shape, and the two draggable control
     // points of the plot driven without a pointer.
     setLaw,
@@ -5873,6 +5962,11 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       blindInflate: BLIND.inflate,
       mode: simMode(),
       anneal: state.anneal,
+      motionResponse: {
+        speedLimit: MOTION_RESPONSE.speedLimit,
+        contactDamping: MOTION_RESPONSE.contactDamping,
+      },
+      containerDelay: containerDelayFraction,
       speed: state.speed,
       initial: state.initial,
       optimizing: state.optimizing,
@@ -5946,6 +6040,19 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     .addEventListener("input", (ev) =>
       setAnneal(/** @type {HTMLInputElement} */ (ev.target).value),
     );
+  inputNode("motion-speed-limit").addEventListener("change", (ev) => {
+    setMotionResponse({
+      speedLimit: /** @type {HTMLInputElement} */ (ev.target).value,
+    });
+  });
+  inputNode("motion-contact-damping").addEventListener("change", (ev) => {
+    setMotionResponse({
+      contactDamping: /** @type {HTMLInputElement} */ (ev.target).value,
+    });
+  });
+  inputNode("motion-container-delay").addEventListener("change", (ev) => {
+    setContainerDelay(/** @type {HTMLInputElement} */ (ev.target).value);
+  });
   document.querySelectorAll("#law-preset-seg button").forEach((b) => {
     b.addEventListener("click", () => setLawPreset(/** @type {HTMLElement} */ (b).dataset.law));
   });

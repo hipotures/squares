@@ -884,7 +884,7 @@ input[type="number"] {
    widest *option*, and Pack offers one option fewer: without this, hiding `tween` would resize the
    control. */
 #solver-box {
-  width: 232px;
+  width: 264px;
   box-sizing: border-box;
 }
 /* Revision 15: the note under the select was clipping mid-word in a 152px box. A fixed
@@ -899,6 +899,55 @@ input[type="number"] {
   height: 15px;
   line-height: 15px;
 }
+#motion-scope-note {
+  height: 32px;
+  line-height: 16px;
+  white-space: normal;
+}
+/* A strategy control that cannot affect the current step is visibly and mechanically off. The
+   fixed opacity and note slot keep switching solvers from reflowing the panel. */
+[data-motion-control="physics"].is-inert {
+  opacity: 0.56;
+}
+[data-motion-control="physics"].is-inert details {
+  pointer-events: none;
+}
+[data-motion-control="physics"] :disabled {
+  cursor: not-allowed;
+}
+.motion-advanced {
+  box-sizing: border-box;
+  padding: 1px 10px 5px;
+  color: var(--label);
+  font-size: 12.5px;
+}
+#motion-advanced-box {
+  width: 478px;
+  box-sizing: border-box;
+}
+.motion-advanced summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.motion-advanced-body {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+  padding-top: 4px;
+}
+.motion-response-controls {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+.motion-advanced-body input[type="range"] {
+  width: 100px;
+}
+#motion-response-info {
+  color: var(--muted);
+}
 /* The step animation's own group — dwell, move, settle, the motion phasing and the full beat —
    describes a step, and Pack has no steps, so it is hidden there. Hidden *in place*: `display: none`
    would take its box out of this wrapping row, the boxes after it would rewrap onto fewer lines, the
@@ -908,7 +957,8 @@ input[type="number"] {
 /* Revision 15: `visibility: hidden` kept this box's 1145px in the flow, so the row wrapped
    around a box nobody could see and the view fell to a line of its own. It is a whole group
    in its own row, so removing it moves nothing beside it. */
-#step-anim-box.is-off {
+#step-anim-box.is-off,
+#motion-advanced-box.is-off {
   display: none;
 }
 #pair-select {
@@ -985,6 +1035,10 @@ input[type="number"] {
   height: 116px;
   touch-action: none;
   cursor: crosshair;
+}
+[data-motion-control="physics"].is-inert #law-plot {
+  pointer-events: none;
+  cursor: default;
 }
 #law-plot .lp-field {
   fill: #fbfcfd;

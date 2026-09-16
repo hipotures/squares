@@ -1281,10 +1281,20 @@ def force_law(session: Session) -> str:
         and segment == ["pair:0.123:3333:250:0.375"],
         f"the law does not clamp, round-trip and ignore junk: {moved}",
     )
+    nondefault_presets = [name for name in presets if laws[name] != laws["default"]]
+    session.require(
+        len(nondefault_presets) >= 2,
+        f"fewer than two presets differ from the balanced default: {presets}",
+    )
     keyed = session.look(
         "law/cache-key",
         n=17,
-        presets={"a": "default", "b": presets[0], "c": "default", "d": presets[1]},
+        presets={
+            "a": "default",
+            "b": nondefault_presets[0],
+            "c": "default",
+            "d": nondefault_presets[1],
+        },
     )
     session.require(
         len({keyed["a"], keyed["b"], keyed["d"]}) == 3 and keyed["a"] == keyed["c"],
@@ -1393,12 +1403,76 @@ def force_law(session: Session) -> str:
         )
     session.api(("setLawPreset", "default"))
     session.require(
-        session.look("dom/count", selector="#law-preset-seg button.on") == 0,
-        "a preset is still lit with the default law in use",
+        session.look("dom/count", selector="#law-preset-seg button.on") == 1,
+        "the default law did not light exactly its named balanced preset",
     )
     restore(session, found, "force_law")
     return (
         f"the law matches its formula under {len(laws)} laws and never pulls over {len(grid)}"
+    )
+
+
+def motion_controls_and_arrival(session: Session) -> str:
+    """Physical controls tell the truth, restart paths, and preserve square-first continuity."""
+    scoped = session.look("controls/motion-scope")
+    for label in ("tween", "staticStep"):
+        state = scoped[label]
+        session.require(
+            state["containerDelayDisabled"] is False
+            and all(
+                group["inert"] and group["aria"] == "true" and group["disabled"]
+                for group in state["groups"]
+            ),
+            f"{label} does not disable exactly the physical controls: {state}",
+        )
+    physical = scoped["physics"]
+    session.require(
+        not physical["advancedHidden"]
+        and physical["containerDelayDisabled"] is False
+        and all(
+            not group["inert"] and group["aria"] == "false" and not group["disabled"]
+            for group in physical["groups"]
+        ),
+        f"physics does not enable its controls: {physical}",
+    )
+    for label, owner in (("pack", "own controller"), ("search", "own plan")):
+        state = scoped[label]
+        session.require(
+            state["advancedHidden"]
+            and all(
+                group["inert"] and group["aria"] == "true" and group["disabled"]
+                for group in state["groups"]
+            )
+            and owner in state["note"],
+            f"catalogue-only motion controls remain active in {label}: {state}",
+        )
+
+    restarted = session.look("controls/trajectory-setting-restart")
+    bad_restarts = {
+        name: states
+        for name, states in restarted.items()
+        if not (
+            states["before"]["playing"]
+            and states["before"]["t"] > 0
+            and not states["after"]["playing"]
+            and states["after"]["t"] == 0
+        )
+    }
+    session.require(
+        not bad_restarts,
+        f"trajectory settings spliced a live path: {bad_restarts}",
+    )
+
+    arrival = session.look("controls/arrival-continuity")
+    schedule = arrival["schedule"]
+    session.require(
+        schedule["arrive"] < schedule["containerStart"]
+        and schedule["containerStart"] < schedule["containerEnd"] <= schedule["end"]
+        and arrival["jump"] <= 0.01,
+        f"the arriving square or delayed container is discontinuous: {arrival}",
+    )
+    return (
+        "physical controls are scoped; changes restart; square-first arrival stays continuous"
     )
 
 
@@ -1465,7 +1539,7 @@ def relationship_graph(session: Session) -> str:
     )
     drawn = {}
     for kind in kinds:
-        session.api(("setRelationship", kind))
+        session.look("page/seek-to-end", calls=[["setRelationship", kind]])
         drawn[kind] = session.look("mask/links")
     relationship = session.api(("relationship",))
     contact = drawn["contact"]
@@ -1697,6 +1771,7 @@ SECTIONS: tuple[Callable[[Session], str], ...] = (
     hand_and_keys,
     stage_layout,
     force_law,
+    motion_controls_and_arrival,
     relationship_graph,
     drawn_graph,
 )

@@ -129,7 +129,7 @@ __WORKBENCH_CSS__
         <button id="optimize" class="primary" title="Run the current settings from the chosen start until pause">Optimize</button>
       </div>
       <div class="row">
-        <div class="subpanel lawbox" id="law-box">
+        <div class="subpanel lawbox" id="law-box" data-motion-control="physics">
           <div class="law-plot-wrap">
             <span class="box-title">force law</span>
             <svg id="law-plot" viewBox="0 0 300 132" role="img" aria-label="the force against the signed gap between two squares">
@@ -151,15 +151,16 @@ __WORKBENCH_CSS__
             <div class="law-rows" data-law="pair"></div>
             <div class="law-presets">
               <span class="seg" id="law-preset-seg">
-                <button data-law="rigid" title="A knee at four thousandths of a side and a strong push: effectively rigid">rigid</button>
-                <button data-law="soft" title="A third of a side of interpenetration before the push reaches its knee">soft</button>
-                <button data-law="sticky" title="A firm push with a pull that reaches a quarter of a side">sticky</button>
+                <button data-law="balanced" title="The balanced default: moderate give, push, and short-range pull">balanced</button>
+                <button data-law="rigid" title="Low contact give and a strong push; the legacy API name is rigid">low give</button>
+                <button data-law="soft" title="A lower repulsion coefficient; the legacy API name is soft">gentle push</button>
+                <button data-law="sticky" title="Attraction over a quarter-side range; the legacy API name is sticky">attractive</button>
               </span>
               <span class="hint readout readout-line" id="law-info"></span>
             </div>
           </div>
         </div>
-        <div class="subpanel groupbox" id="wall-box">
+        <div class="subpanel groupbox" id="wall-box" data-motion-control="physics">
           <span class="box-title">walls</span>
           <div class="group-body stack">
             <div class="law-rows" data-law="wall"></div>
@@ -178,9 +179,10 @@ __WORKBENCH_CSS__
               <option value="bodies">C · bodies</option>
             </select>
             <span class="hint readout readout-line" id="solver-note"></span>
+            <span class="hint readout readout-line" id="motion-scope-note" aria-live="polite"></span>
           </div>
         </div>
-        <div class="subpanel relbox">
+        <div class="subpanel relbox" id="relationship-box" data-motion-control="physics">
           <span class="box-title">who attracts whom</span>
           <div class="rel-body">
             <div class="law-row"><span>graph</span>
@@ -206,7 +208,7 @@ __WORKBENCH_CSS__
             <div class="law-row"><span></span><span class="hint readout" id="rel-info"></span></div>
           </div>
         </div>
-        <div class="subpanel relbox">
+        <div class="subpanel relbox" id="growth-box" data-motion-control="physics">
           <span class="box-title">start small and grow</span>
           <div class="rel-body">
             <div class="law-row"><span>size</span><input type="range" id="grow-size" aria-label="the size every square starts at, as a fraction of a unit side"><span class="law-val" id="grow-size-val"></span></div>
@@ -252,7 +254,7 @@ __WORKBENCH_CSS__
       <!-- Revision 15: the timing group is alone in its row, so removing it in Pack
            cannot reflow anything beside it. -->
       <div class="row">
-      <div class="subpanel groupbox" id="shake-box">
+      <div class="subpanel groupbox" id="shake-box" data-motion-control="physics">
         <span class="box-title">the shake</span>
         <div class="group-body">
           <label title="How hard and how long the two physical styles shake: 0 none, 9 the default, 20 the loudest and longest">annealing
@@ -262,6 +264,29 @@ __WORKBENCH_CSS__
           <label>inflate <input type="number" id="blind-inflate" min="1" max="2" step="0.01"></label>
           <span class="hint readout readout-line" id="anneal-info"></span>
         </div>
+      </div>
+      <div class="subpanel groupbox" id="motion-advanced-box">
+        <span class="box-title">motion controls</span>
+          <details class="motion-advanced" id="motion-advanced">
+            <summary>Advanced motion</summary>
+            <div class="motion-advanced-body">
+              <div class="motion-response-controls" id="motion-response-controls" data-motion-control="physics">
+                <label title="Maximum centre speed in square sides per simulated second">speed limit
+                  <input type="range" id="motion-speed-limit">
+                  <span class="law-val" id="motion-speed-limit-val"></span>
+                </label>
+                <label title="Damping applied when overlapping bodies are moving into each other">contact damping
+                  <input type="range" id="motion-contact-damping">
+                  <span class="law-val" id="motion-contact-damping-val"></span>
+                </label>
+              </div>
+              <label title="Delay after the new square first appears before the container starts to resize, shown in seconds for this step">resize delay
+                <input type="range" id="motion-container-delay">
+                <span class="law-val" id="motion-container-delay-val"></span>
+              </label>
+              <span class="hint readout readout-line" id="motion-response-info"></span>
+            </div>
+          </details>
       </div>
       <div class="subpanel groupbox">
         <span class="box-title">the view</span>

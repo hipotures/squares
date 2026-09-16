@@ -93,11 +93,11 @@ export function illustrationFrame(input: IllustrationInput): SceneFrame {
   const progress = ramp(seconds, schedule.blocksStart, schedule.blocksEnd);
   const phased = phaseProgress(input.phase, progress);
   const arrival = easeOut(ramp(seconds, schedule.arrive, schedule.arrived));
-  const growth =
-    input.phase === "add-then-move"
-      ? phaseProgress("simultaneous", ramp(seconds, schedule.arrive, schedule.arrived)).e
-      : phased.e;
-  const side = lerp(input.fromSide, input.toSide, growth);
+  const containerGrowth = phaseProgress(
+    "simultaneous",
+    ramp(seconds, schedule.containerStart, schedule.containerEnd),
+  ).e;
+  const side = lerp(input.fromSide, input.toSide, containerGrowth);
   const view = side * (1 + 2 * input.padding);
   const squares: SceneSquare[] = input.tracks.map((track, index) => {
     const [x, y, angleDegrees] = interpolateBlockPose(track, phased);
