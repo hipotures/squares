@@ -375,12 +375,20 @@ jobs:
   # spread over three jobs, because balanced by cost is what keeps the longest job short.
   # Each job downloads the one prepared page, so all of them check the bytes that are
   # published, and a failure now names its job rather than a step in a 388 s queue.
+  # Their checkout, Python and browser provisioning do not consume the page, so those
+  # steps start beside `prepare`; each job joins the exact `prepared-page` artifact only
+  # after setup. Run 35127260004 showed that leaving this setup behind `prepare` made
+  # `typography` the new 194 s critical path after the cross-browser jobs were overlapped.
 
   # Everything the PDF is: drawn once, from the prepared page, then checked in place and
   # handed to `publish` unchanged.
   pdf:
-    needs: prepare
+    needs: scope
+    if: needs.scope.outputs.explainer == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
     defaults:
       run:
         working-directory: packing
@@ -406,12 +414,6 @@ jobs:
           enable-cache: true
           cache-dependency-glob: uv.lock
 
-      - name: Use the prepared page
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-        with:
-          name: prepared-page
-          path: packing/site
-
       - name: Cache the Playwright browser
         uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
         with:
@@ -420,6 +422,20 @@ jobs:
 
       - name: Install the pinned Chromium headless shell
         run: uv run --frozen --group dev python -m playwright install --only-shell chromium
+
+      - name: Wait for the prepared page
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          uv run --frozen --group dev python -m devtools.wait_for_run_artifact
+          --repository "$GITHUB_REPOSITORY" --run-id "$GITHUB_RUN_ID"
+          --name prepared-page --producer prepare --timeout 600
+
+      - name: Use the prepared page
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: prepared-page
+          path: packing/site
 
       # After the page, not beside it: the exporter loads `site/index.html` from disk,
       # and Figure 2 references the composite that the render copies into `site/` on its
@@ -521,8 +537,12 @@ jobs:
           retention-days: 7
 
   print-layout:
-    needs: prepare
+    needs: scope
+    if: needs.scope.outputs.explainer == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
     defaults:
       run:
         working-directory: packing
@@ -548,12 +568,6 @@ jobs:
           enable-cache: true
           cache-dependency-glob: uv.lock
 
-      - name: Use the prepared page
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-        with:
-          name: prepared-page
-          path: packing/site
-
       - name: Cache the Playwright browser
         uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
         with:
@@ -562,6 +576,20 @@ jobs:
 
       - name: Install the pinned Chromium headless shell
         run: uv run --frozen --group dev python -m playwright install --only-shell chromium
+
+      - name: Wait for the prepared page
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          uv run --frozen --group dev python -m devtools.wait_for_run_artifact
+          --repository "$GITHUB_REPOSITORY" --run-id "$GITHUB_RUN_ID"
+          --name prepared-page --producer prepare --timeout 600
+
+      - name: Use the prepared page
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: prepared-page
+          path: packing/site
 
       # Reproducibility is not correctness: the PDF artifact check would have passed on
       # all three print defects a reader found in the finished PDF, because two identical
@@ -577,8 +605,12 @@ jobs:
         run: uv run --frozen --group dev python -m devtools.check_print_layout --self-check
 
   typography:
-    needs: prepare
+    needs: scope
+    if: needs.scope.outputs.explainer == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
     defaults:
       run:
         working-directory: packing
@@ -604,12 +636,6 @@ jobs:
           enable-cache: true
           cache-dependency-glob: uv.lock
 
-      - name: Use the prepared page
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-        with:
-          name: prepared-page
-          path: packing/site
-
       - name: Cache the Playwright browser
         uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
         with:
@@ -618,6 +644,20 @@ jobs:
 
       - name: Install the pinned Chromium headless shell
         run: uv run --frozen --group dev python -m playwright install --only-shell chromium
+
+      - name: Wait for the prepared page
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          uv run --frozen --group dev python -m devtools.wait_for_run_artifact
+          --repository "$GITHUB_REPOSITORY" --run-id "$GITHUB_RUN_ID"
+          --name prepared-page --producer prepare --timeout 600
+
+      - name: Use the prepared page
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: prepared-page
+          path: packing/site
 
       - name: Check every comparison variant measures the font it draws
         run: uv run --frozen --group dev python -m devtools.compare_math_fonts check
@@ -662,8 +702,12 @@ jobs:
 
   # Math faces, font loading and the reading position, all on the prepared page.
   screen:
-    needs: prepare
+    needs: scope
+    if: needs.scope.outputs.explainer == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
     defaults:
       run:
         working-directory: packing
@@ -689,12 +733,6 @@ jobs:
           enable-cache: true
           cache-dependency-glob: uv.lock
 
-      - name: Use the prepared page
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-        with:
-          name: prepared-page
-          path: packing/site
-
       - name: Cache the Playwright browser
         uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
         with:
@@ -703,6 +741,20 @@ jobs:
 
       - name: Install the pinned Chromium headless shell
         run: uv run --frozen --group dev python -m playwright install --only-shell chromium
+
+      - name: Wait for the prepared page
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          uv run --frozen --group dev python -m devtools.wait_for_run_artifact
+          --repository "$GITHUB_REPOSITORY" --run-id "$GITHUB_RUN_ID"
+          --name prepared-page --producer prepare --timeout 600
+
+      - name: Use the prepared page
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: prepared-page
+          path: packing/site
 
       # Which composite draws each expression, which metric table laid it out, and
       # whether the faces were loaded before the first one was painted. None of the three
@@ -738,8 +790,12 @@ jobs:
   # carries the host check and the negative controls, about 41 s of this job's 61; the
   # mobile settings run in `typography` and the print settings in `pdf`.
   geometry:
-    needs: prepare
+    needs: scope
+    if: needs.scope.outputs.explainer == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
     defaults:
       run:
         working-directory: packing
@@ -765,12 +821,6 @@ jobs:
           enable-cache: true
           cache-dependency-glob: uv.lock
 
-      - name: Use the prepared page
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-        with:
-          name: prepared-page
-          path: packing/site
-
       - name: Cache the Playwright browser
         uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
         with:
@@ -779,6 +829,20 @@ jobs:
 
       - name: Install the pinned Chromium headless shell
         run: uv run --frozen --group dev python -m playwright install --only-shell chromium
+
+      - name: Wait for the prepared page
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          uv run --frozen --group dev python -m devtools.wait_for_run_artifact
+          --repository "$GITHUB_REPOSITORY" --run-id "$GITHUB_RUN_ID"
+          --name prepared-page --producer prepare --timeout 600
+
+      - name: Use the prepared page
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: prepared-page
+          path: packing/site
 
       # The trap: see the print geometry step in `typography`.
       - name: Check reserved math geometry under every saved font setting

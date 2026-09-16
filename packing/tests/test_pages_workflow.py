@@ -19,6 +19,18 @@ REGISTER = REPO / "packing/devtools/gate-budgets.yaml"
 #: starts, and the dispatch-only timing experiment.
 DEPLOY_PATH = {"deploy", "verify-deployment"}
 
+# These jobs can provision Python and their browser without the rendered page. They
+# start beside `prepare`, then join its exact artifact before the first page consumer.
+OVERLAPPED_PREPARED_PAGE_JOBS = {
+    "pdf",
+    "print-layout",
+    "typography",
+    "screen",
+    "geometry",
+    "font-loading",
+    "browser-geometry",
+}
+
 
 def load() -> dict[str, Any]:
     return safe_load((REPO / ".github/workflows/pages.yml").read_text("utf-8"))
@@ -109,7 +121,7 @@ def test_every_pull_request_job_is_scoped_to_its_page_or_says_why() -> None:
         for half in halves
     }
     assert gated == {
-        "explainer": {"prepare", "font-loading", "browser-geometry"},
+        "explainer": {"prepare", *OVERLAPPED_PREPARED_PAGE_JOBS},
         "workbench": {"workbench"},
     }
     for half, roots in gated.items():
@@ -200,10 +212,10 @@ def test_deployment_waits_for_the_cross_browser_loading_checks() -> None:
     )
 
 
-def test_cross_browser_setup_overlaps_prepare_then_joins_its_exact_artifact() -> None:
+def test_page_check_setup_overlaps_prepare_then_joins_its_exact_artifact() -> None:
     """Independent provisioning starts early; no page consumer can outrun prepare."""
     jobs = load()["jobs"]
-    for name in ("font-loading", "browser-geometry"):
+    for name in OVERLAPPED_PREPARED_PAGE_JOBS:
         job = jobs[name]
         assert needs_of(job) == ["scope"]
         assert job["if"] == "needs.scope.outputs.explainer == 'true'"
@@ -665,7 +677,7 @@ def test_every_browser_checks_the_same_prepared_publication() -> None:
         "startup-timing",
     } <= set(checks)
     for name in checks:
-        if name in {"font-loading", "browser-geometry"}:
+        if name in OVERLAPPED_PREPARED_PAGE_JOBS:
             assert needs_of(jobs[name]) == ["scope"], name
         else:
             assert needs_of(jobs[name]) == ["prepare"], name

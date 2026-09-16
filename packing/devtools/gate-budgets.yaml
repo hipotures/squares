@@ -308,7 +308,12 @@ tiers:
   # `frontend` and the ceiling stayed, because raising it would turn the check that
   # caught this into slack. `measured_seconds` stays empty: those readings include a
   # step this tier no longer runs.
-  ceiling_seconds: 195.0
+  # 2026-09-16: the exact reconciliation topology removed the standalone type floor
+  # from this tier. Run 35127260063 measured the resulting 50-step selection at 94.65 s
+  # and tripped the stale-record rule against 158.82 s. The 189 s ceiling is just under
+  # rule 2's 2x headroom and remains outside the 180 s required-workflow wall because
+  # that wall includes checkout, setup, queueing and the aggregator as well as this tier.
+  ceiling_seconds: 189.0
   # Cleared, on the same rule that cleared 1369.60s and 409.0s from the `fast` entry and
   # 107.05s from `sweeps`: the figure measures a tier that no longer exists. It measured
   # this one twice over -- the four readings predate the corpus widening, and the widened
@@ -318,12 +323,12 @@ tiers:
   # reading at the reference shape of the tier this change replaced, so recording it
   # would arm the stale rule against every honest run of the new one. The gate prints the
   # line to paste the first time a run at the reference shape measures the new tier.
-  measured_seconds: 158.82
+  measured_seconds: 94.65
   measured_on: '2026-09-16'
   measured_where: >-
-    Run 35078515837, job validate, on PR 180 exact head f4cfa5be: 158.82 s at
-    the reference shape, selecting 51 of 79 steps. Refresh after the standalone type
-    floor leaves this tier in the reconciliation topology.
+    Run 35127260063, job validate, on PR 188 exact head 2f619303: 94.65 s at
+    the reference shape, selecting 50 of 80 steps. The tier's checks all passed; the job
+    failed only because this reading was below the stale-record boundary.
   history:
   - measured_seconds: 99.39
     measured_on: '2026-09-06'
@@ -361,6 +366,12 @@ tiers:
       - {name: soft-schema validation, before: 7.88, after: 14.23}
       - {name: soundness perimeter, before: 65.15, after: 70.88}
       - {name: synopsis agrees with the artifacts, before: 0.0, after: 5.40}
+  - measured_seconds: 158.82
+    measured_on: '2026-09-16'
+    measured_where: >-
+      Run 35078515837, job validate, on PR 180 exact head f4cfa5be: 158.82 s at
+      the reference shape, selecting 51 of 79 steps, before the type floor moved to its
+      own required partition.
   reference: {jobs: 3, inner_jobs: 1, cpus: 4}
   argument: >-
     The part of the pull-request surface that is none of the other six: every floor,
