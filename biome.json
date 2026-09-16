@@ -43,18 +43,52 @@
     "enabled": true,
     "rules": {
       "preset": "recommended",
+      "complexity": {
+        "noExtraBooleanCast": "error",
+        "noFlatMapIdentity": "error",
+        "noUselessCatch": "error",
+        "noUselessConstructor": "error",
+        "noUselessContinue": "error",
+        "noUselessEmptyExport": "error",
+        "noUselessEscapeInRegex": "error",
+        "noUselessFragments": "error",
+        "noUselessLabel": "error",
+        "noUselessLoneBlockStatements": "error",
+        "noUselessRename": "error",
+        "noUselessStringRaw": "error",
+        "noUselessSwitchCase": "error",
+        "noUselessTernary": "error",
+        "noUselessThisAlias": "error",
+        "noUselessTypeConstraint": "error",
+        "noUselessUndefinedInitialization": "error",
+        "useFlatMap": "error",
+        "useIndexOf": "error",
+        "useLiteralKeys": "error"
+      },
       "style": {
+        "useArrayLiterals": "error",
         "useBlockStatements": "error",
-        "useImportType": "error"
+        "useExponentiationOperator": "error",
+        "useImportType": "error",
+        "useNodejsImportProtocol": "error",
+        "useShorthandFunctionType": "error",
+        "useTemplate": "error"
       },
       "correctness": {
         "noUnusedVariables": "error",
-        "noUnusedImports": "error"
+        "noUnusedImports": "error",
+        "useParseIntRadix": "error"
       },
       "nursery": {
+        "noInvalidPropertyInitValue": "error",
         "noFloatingPromises": "error",
         "noMisusedPromises": "error",
+        "useDomNodeTextContent": "error",
         "useAwaitThenable": "error"
+      },
+      "suspicious": {
+        "noDuplicateFields": "error",
+        "noQuickfixBiome": "error"
       }
     }
   },

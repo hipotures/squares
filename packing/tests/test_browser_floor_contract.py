@@ -44,6 +44,7 @@ import re
 import shlex
 import shutil
 import subprocess
+from collections import Counter
 from collections.abc import Callable, Iterable, Mapping
 from pathlib import Path
 from typing import Any
@@ -202,6 +203,116 @@ JAVASCRIPT_SUFFIXES = (".js", ".jsx", ".mjs", ".cjs")
 
 #: The language sections of `biome.json` that can switch a tool off for a whole language.
 LANGUAGES = ("javascript", "css", "json")
+
+#: Biome's pinned recommended preset includes these rules at `info`, which does not fail
+#: `biome ci --error-on-warnings`. Naming them at `error` makes "zero findings" literal.
+#: The exact Biome version is pinned and tested below, so a version upgrade must update this
+#: declaration together with any changed preset.
+RECOMMENDED_INFO_RULES = {
+    "complexity": frozenset(
+        {
+            "noExtraBooleanCast",
+            "noFlatMapIdentity",
+            "noUselessCatch",
+            "noUselessConstructor",
+            "noUselessContinue",
+            "noUselessEmptyExport",
+            "noUselessEscapeInRegex",
+            "noUselessFragments",
+            "noUselessLabel",
+            "noUselessLoneBlockStatements",
+            "noUselessRename",
+            "noUselessStringRaw",
+            "noUselessSwitchCase",
+            "noUselessTernary",
+            "noUselessThisAlias",
+            "noUselessTypeConstraint",
+            "noUselessUndefinedInitialization",
+            "useFlatMap",
+            "useIndexOf",
+            "useLiteralKeys",
+        }
+    ),
+    "correctness": frozenset({"useParseIntRadix"}),
+    "nursery": frozenset({"noInvalidPropertyInitValue", "useDomNodeTextContent"}),
+    "style": frozenset(
+        {
+            "useArrayLiterals",
+            "useExponentiationOperator",
+            "useNodejsImportProtocol",
+            "useShorthandFunctionType",
+            "useTemplate",
+        }
+    ),
+    "suspicious": frozenset({"noDuplicateFields", "noQuickfixBiome"}),
+}
+
+#: Per-file suppressions are exceptions to the floor even when no config override exists.
+#: The two source exceptions implement reduced-motion accessibility; the generated page
+#: repeats them byte for byte. Exact text is deliberate: a missing reason or broadened rule
+#: changes the census and fails.
+DECLARED_SUPPRESSIONS = Counter(
+    {
+        (
+            "packing/src/sqpack/motion_lab/assets/motion-lab.css",
+            (
+                "/* biome-ignore lint/complexity/noImportantStyles: `*` has the lowest "
+                "specificity, so only !important beats `select, button { transition }` for a "
+                "viewer who asked for no motion. */"
+            ),
+        ): 1,
+        (
+            "packing/src/sqpack/motion_lab/assets/motion-lab.css",
+            (
+                "/* biome-ignore lint/complexity/noImportantStyles: as above; without it "
+                "the controls still animate under reduced motion. */"
+            ),
+        ): 1,
+        (
+            "packing/atlas/rendering/n5-motion-lab.html",
+            (
+                "/* biome-ignore lint/complexity/noImportantStyles: `*` has the lowest "
+                "specificity, so only !important beats `select, button { transition }` for a "
+                "viewer who asked for no motion. */"
+            ),
+        ): 1,
+        (
+            "packing/atlas/rendering/n5-motion-lab.html",
+            (
+                "/* biome-ignore lint/complexity/noImportantStyles: as above; without it "
+                "the controls still animate under reduced motion. */"
+            ),
+        ): 1,
+        (
+            "packing/tests/probes/pdf_math_browser/fault_state.js",
+            (
+                "// biome-ignore lint/nursery/useDomNodeTextContent: this probe compares "
+                "rendered text with raw DOM text, so their different visibility semantics "
+                "are the subject of the test."
+            ),
+        ): 1,
+    }
+)
+SUPPRESSION_MARKERS = (
+    "biome-ignore",
+    "eslint-disable",
+    "@ts-nocheck",
+    "@ts-ignore",
+    "@ts-expect-error",
+)
+SUPPRESSION_SUFFIXES = (*SCRIPT_SUFFIXES, *STYLE_SUFFIXES, ".html")
+
+#: Every package boundary and the module interpretation it is allowed to impose. The only
+#: CommonJS subtree is the retained classic slideshow; adding another package boundary is a
+#: reviewable floor change rather than an implicit Biome override.
+DECLARED_PACKAGE_MODES: dict[str, tuple[str | None, str]] = {
+    "package.json": (None, "private tooling workspace root"),
+    "packages/workbench/package.json": ("module", "Node and workbench ES modules"),
+    "packing/atlas/known-best/video/spikes/v1-slideshow/assets/package.json": (
+        "commonjs",
+        "retained slideshow page script intentionally runs as a classic script",
+    ),
+}
 
 #: How every file must be read by `tsc`: in its own scope, so no two files share a name by it.
 MODULE_DETECTION = "force"
@@ -415,6 +526,59 @@ def _biome_downgrade_faults(config: Mapping[str, Any]) -> list[str]:
     return faults
 
 
+def _biome_configuration_faults(
+    config: Mapping[str, Any], config_paths: Iterable[str]
+) -> list[str]:
+    """Every configuration layer that can replace the inspected root rules."""
+    faults = ["root Biome config declares extends"] if "extends" in config else []
+    faults.extend(
+        f"nested Biome config: {path}" for path in sorted(set(config_paths) - {"biome.json"})
+    )
+    return faults
+
+
+def _suppression_faults(
+    files: Mapping[str, str],
+    declared: Counter[tuple[str, str]],
+) -> list[str]:
+    """Every undeclared suppression and every declared suppression no longer present."""
+    observed: Counter[tuple[str, str]] = Counter()
+    for path, text in files.items():
+        for line in text.splitlines():
+            stripped = line.strip()
+            if any(marker in stripped for marker in SUPPRESSION_MARKERS):
+                observed[(path, stripped)] += 1
+    faults = [
+        f"undeclared suppression ({count}): {path}: {text}"
+        for (path, text), count in sorted((observed - declared).items())
+    ]
+    faults.extend(
+        f"declared suppression missing ({count}): {path}: {text}"
+        for (path, text), count in sorted((declared - observed).items())
+    )
+    return faults
+
+
+def _package_mode_faults(
+    packages: Mapping[str, Mapping[str, Any]],
+    declared: Mapping[str, tuple[str | None, str]],
+) -> list[str]:
+    """Every undeclared package boundary, missing boundary, and changed module mode."""
+    faults = [
+        f"undeclared package boundary: {path}" for path in sorted(set(packages) - set(declared))
+    ]
+    faults.extend(
+        f"declared package boundary missing: {path}"
+        for path in sorted(set(declared) - set(packages))
+    )
+    faults.extend(
+        f"{path}: package type {packages[path].get('type')!r}, expected {mode!r} ({reason})"
+        for path, (mode, reason) in sorted(declared.items())
+        if path in packages and packages[path].get("type") != mode
+    )
+    return faults
+
+
 # ---------------------------------------------------------------------------------------
 # ESLint
 
@@ -612,6 +776,74 @@ def test_biome_has_no_override_and_no_rule_turned_down() -> None:
     assert _biome_override_faults(config) == []
     assert _biome_downgrade_faults(config) == []
     assert _biome_exclusion_faults(config) == []
+
+
+def test_biome_has_one_literal_root_configuration() -> None:
+    """The contract reads the root file literally, so no inherited or nested config may
+    change the rules Biome resolves without changing that file."""
+    configs = _tracked("biome.json", "**/biome.json", "biome.jsonc", "**/biome.jsonc")
+    assert _biome_configuration_faults(_jsonc(BIOME_CONFIG), configs) == []
+
+
+def test_an_extended_or_nested_biome_configuration_is_refused() -> None:
+    config = {**_jsonc(BIOME_CONFIG), "extends": ["./house.jsonc"]}
+    assert _biome_configuration_faults(
+        config, ["biome.json", "packing/src/sqpack/motion_lab/assets/biome.json"]
+    ) == [
+        "root Biome config declares extends",
+        "nested Biome config: packing/src/sqpack/motion_lab/assets/biome.json",
+    ]
+
+
+def test_every_recommended_biome_info_rule_is_promoted_to_error() -> None:
+    """`--error-on-warnings` does not fail on `info`; explicit promotion makes every
+    diagnostic from the pinned recommended preset blocking."""
+    rules = _jsonc(BIOME_CONFIG)["linter"]["rules"]
+    missing = [
+        f"{group}.{rule}"
+        for group, names in sorted(RECOMMENDED_INFO_RULES.items())
+        for rule in sorted(names)
+        if rules.get(group, {}).get(rule) != "error"
+    ]
+    assert not missing, f"recommended Biome rules still report only info: {missing}"
+
+
+def test_suppressions_are_exactly_the_declared_accessibility_exceptions() -> None:
+    paths = _tracked(*(f"*{suffix}" for suffix in SUPPRESSION_SUFFIXES))
+    files = {
+        path: (REPOSITORY_ROOT / path).read_text(encoding="utf-8")
+        for path in paths
+        if (REPOSITORY_ROOT / path).is_file()
+    }
+    assert _suppression_faults(files, DECLARED_SUPPRESSIONS) == []
+
+
+def test_an_undeclared_or_unreasoned_suppression_is_refused() -> None:
+    files = {
+        "x.ts": "// @ts-nocheck\n",
+        "y.js": "// eslint-disable-next-line no-undef: generated host global\ny();\n",
+    }
+    assert _suppression_faults(files, Counter()) == [
+        "undeclared suppression (1): x.ts: // @ts-nocheck",
+        (
+            "undeclared suppression (1): y.js: // eslint-disable-next-line no-undef: "
+            "generated host global"
+        ),
+    ]
+
+
+def test_package_boundaries_are_exactly_the_declared_module_modes() -> None:
+    paths = _tracked("package.json", "**/package.json")
+    packages = {path: _jsonc(REPOSITORY_ROOT / path) for path in paths}
+    assert _package_mode_faults(packages, DECLARED_PACKAGE_MODES) == []
+
+
+def test_an_undeclared_commonjs_boundary_is_refused() -> None:
+    packages = {path: _jsonc(REPOSITORY_ROOT / path) for path in DECLARED_PACKAGE_MODES}
+    packages["packing/devtools/probes/zz/package.json"] = {"type": "commonjs"}
+    assert _package_mode_faults(packages, DECLARED_PACKAGE_MODES) == [
+        "undeclared package boundary: packing/devtools/probes/zz/package.json"
+    ]
 
 
 @pytest.mark.parametrize(
@@ -1030,6 +1262,28 @@ def test_the_checked_javascript_overlay_rejects_a_floating_promise() -> None:
     )
     assert done.returncode != 0, "ESLint accepted a floating Promise in checked JavaScript"
     assert "@typescript-eslint/no-floating-promises" in done.stdout + done.stderr
+
+
+def test_biome_rejects_a_floating_promise_in_typescript(tmp_path: Path) -> None:
+    """Biome's type-domain rule needs a project root. A scratch project keeps the known
+    violation out of the source tree while exercising the pinned root configuration."""
+    _require_tool(BIOME)
+    for source in (BIOME_CONFIG, ROOT_PACKAGE, TSCONFIG_BASE, REPOSITORY_ROOT / ".gitignore"):
+        shutil.copyfile(source, tmp_path / source.name)
+    sample = tmp_path / "sample.ts"
+    shutil.copyfile(FLOOR_SAMPLES / "floating-promise.js.txt", sample)
+    done = subprocess.run(
+        [str(BIOME), "check", f"--config-path={tmp_path}", str(sample)],
+        check=False,
+        capture_output=True,
+        text=True,
+        cwd=tmp_path,
+    )
+    output = done.stdout + done.stderr
+    assert done.returncode != 0, "Biome accepted a floating Promise in TypeScript"
+    assert "noFloatingPromises" in output, (
+        "Biome complained, but not about the promise rule:\n" + output
+    )
 
 
 def test_the_braces_rule_actually_rejects_a_violation(tmp_path: Path) -> None:

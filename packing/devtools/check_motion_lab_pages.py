@@ -4,9 +4,10 @@ The labs had no browser check: their tests read the rendered HTML and run the mo
 Node, so nothing proved that a page's scripts run in a page. That mattered when the
 scripts became module scripts (think-6o9n), which changes how a browser runs them. This
 loads each page from a file, works its controls through Playwright's own input and locator
-calls, and fails on an uncaught error, a console error, or a readout the page script never
-wrote. `--report` writes every observation as JSON, so two builds of a page can be compared
-value for value.
+calls, and fails on an uncaught error, a console error, an invisible drawing, or a readout
+the page script never wrote. Every observation must match the committed golden report, so a
+model that computes a different state fails even when it still draws. `--report` writes the
+observed JSON for diagnosis.
 
 The general lab's numerical run needs its loopback service, so only its editor is driven
 here: selection, keyboard moves and rotations, snapping, and reset, all of which go through
@@ -15,16 +16,19 @@ the editor model the page script reads from `globalThis.MotionLabEditor`.
 Usage, from `packing/`:
     uv run --frozen --all-extras --group dev python -m devtools.check_motion_lab_pages
     uv run --frozen --all-extras --group dev python -m devtools.check_motion_lab_pages \\
-        --exact EXACT.html --general GENERAL.html --report REPORT.json
+        --exact EXACT.html --general GENERAL.html --report REPORT.json \\
+        --golden GOLDEN.json
 """
 
 from __future__ import annotations
 
 import argparse
+import difflib
 import json
 import sys
 import tempfile
 from collections.abc import Callable
+from itertools import islice
 from pathlib import Path
 from typing import Any
 
@@ -37,6 +41,8 @@ from devtools.render_general_motion_lab import (
     render_general_motion_lab,
 )
 from devtools.render_packing_motion_lab import render_motion_lab
+
+GOLDEN_REPORT = Path(__file__).resolve().parents[1] / "tests/golden/motion-lab-pages.json"
 
 #: The exact lab's readouts, each written by the page script's first update.
 EXACT_READOUTS = (
@@ -53,9 +59,9 @@ EXACT_READOUTS = (
     "live-region",
 )
 EXACT_TOGGLES = ("ids-toggle", "contacts-toggle", "trails-toggle", "tangent-toggle")
-#: Readouts the exact lab's markup leaves empty, so an empty one after load means the page
-#: script did not run.
-EXACT_WRITTEN = ("scene-value", "parameter-value", "angle-value", "stage-description")
+#: The one readout the exact lab's markup leaves empty. The golden below holds every readout;
+#: this sentinel gives a direct diagnostic when the page script did not run at all.
+EXACT_WRITTEN = ("angle-value",)
 
 #: The general lab's setup readouts, written by `renderSetup` through the editor model.
 GENERAL_READOUTS = (
@@ -77,6 +83,7 @@ def _exact_state(page: Page, step: str) -> State:
         "readouts": {name: page.locator(f"#{name}").text_content() for name in EXACT_READOUTS},
         "valuetext": page.locator("#parameter-input").get_attribute("aria-valuetext"),
         "plane": page.locator("#math-plane").inner_html(),
+        "plane_visible": page.locator("#math-plane").is_visible(),
         "labels": page.locator("#label-layer").inner_html(),
         "branch_hidden": page.locator("#branch-panel").is_hidden(),
         "owner_disabled": page.locator("#owner-select").is_disabled(),
@@ -119,6 +126,7 @@ def _general_state(page: Page, step: str) -> State:
             name: page.locator(f"#{name}").text_content() for name in GENERAL_READOUTS
         },
         "accepted": page.locator("#accepted-layer").inner_html(),
+        "accepted_visible": page.locator("#accepted-layer").is_visible(),
         "labels": page.locator("#free-label-layer").inner_html(),
         "rotate_disabled": page.locator("#rotate-left-button").is_disabled(),
     }
@@ -180,11 +188,42 @@ def faults(exact: list[State], general: list[State], errors: list[str]) -> list[
     )
     if len({state["plane"] for state in exact}) < 2:
         found.append("exact lab: no control changed the drawing")
+    if not all(state["plane_visible"] for state in exact):
+        found.append("exact lab: the drawing is not visible")
     if general[0]["readouts"]["diagnostics-value"] in {None, "", "Checking…"}:
         found.append("general lab: the setup diagnostics were never written")
     if len({state["accepted"] for state in general}) < 2:
         found.append("general lab: no edit changed the drawing")
+    if not all(state["accepted_visible"] for state in general):
+        found.append("general lab: the drawing is not visible")
     return found
+
+
+def _golden_faults(report: State, golden_path: Path) -> list[str]:
+    """Describe a missing, invalid, or behaviorally different committed report."""
+    try:
+        expected = json.loads(golden_path.read_text(encoding="utf-8"))
+    except OSError as error:
+        return [f"motion lab golden is unreadable: {golden_path}: {error}"]
+    except json.JSONDecodeError as error:
+        return [f"motion lab golden is invalid JSON: {golden_path}: {error}"]
+    if expected == report:
+        return []
+    expected_lines = json.dumps(expected, indent=2, sort_keys=True).splitlines()
+    actual_lines = json.dumps(report, indent=2, sort_keys=True).splitlines()
+    preview = "\n".join(
+        islice(
+            difflib.unified_diff(
+                expected_lines,
+                actual_lines,
+                fromfile=str(golden_path),
+                tofile="actual motion lab report",
+                lineterm="",
+            ),
+            24,
+        )
+    )
+    return [f"motion lab report differs from {golden_path}:\n{preview}"]
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -196,7 +235,19 @@ def main(argv: list[str] | None = None) -> int:
         "--general", type=Path, help="the general lab; rendered fresh if omitted"
     )
     parser.add_argument("--report", type=Path, help="write every observation here as JSON")
+    parser.add_argument(
+        "--golden",
+        type=Path,
+        default=GOLDEN_REPORT,
+        help="committed report every observation must match",
+    )
     arguments = parser.parse_args(argv)
+    if (
+        arguments.report is not None
+        and arguments.report.resolve() == arguments.golden.resolve()
+    ):
+        print("FAIL: --report must not overwrite the --golden evidence", file=sys.stderr)
+        return 2
     with tempfile.TemporaryDirectory(prefix="squares-motion-lab-") as scratch:
         exact_page = arguments.exact
         if exact_page is None:
@@ -224,12 +275,13 @@ def main(argv: list[str] | None = None) -> int:
         [f"exact lab {error}" for error in exact_errors]
         + [f"general lab {error}" for error in general_errors],
     )
+    problems.extend(_golden_faults(report, arguments.golden))
     if problems:
         print("FAIL:\n  " + "\n  ".join(problems), file=sys.stderr)
         return 1
     print(
         f"OK: exact lab drove {len(exact)} states and the general lab {len(general)}, "
-        "with no page error and every readout written"
+        "with visible drawings matching the committed report"
     )
     return 0
 

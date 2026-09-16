@@ -1592,7 +1592,13 @@ def _workbench_frontend(context: Context) -> str:
         (
             (sys.executable, "-m", "devtools.check_probes"),
             (sys.executable, "-m", "workbench_tools.check_frontend"),
-            (sys.executable, "-m", "devtools.check_motion_lab_pages"),
+            (
+                sys.executable,
+                "-m",
+                "devtools.check_motion_lab_pages",
+                "--golden",
+                "tests/golden/motion-lab-pages.json",
+            ),
         ),
     )
 
@@ -2931,6 +2937,7 @@ _WORKBENCH_INPUTS = (
     "packing/devtools/render_general_motion_lab.py",
     "packing/devtools/packing_motion_studies.py",
     "packing/devtools/check_motion_lab_pages.py",
+    "packing/tests/golden/motion-lab-pages.json",
     *_TOOLCHAIN,
 )
 
