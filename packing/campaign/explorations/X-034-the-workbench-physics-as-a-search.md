@@ -251,6 +251,11 @@ What this shows:
 
 ## 6. What Follows
 
+- **Animation kinetics now have their own measured surface.**
+  [X-035](X-035-animation-kinetics-without-pixels.md) separates stored-path smoothness,
+  penetration, contacts and integration work from rendered appearance.
+  Its CLI is also the mechanism instrument for any later test connecting these values to
+  Search outcomes; packing validity and best valid side remain the guards and outcome.
 - **Re-measure before reusing any number here.** From #160 on, the package benchmark
   keeps each trial’s raw and repaired poses and reports disjoint seed blocks, which is
   what these observations lack.

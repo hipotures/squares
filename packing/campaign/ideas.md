@@ -552,11 +552,18 @@ in the finite optimum.
 | 172 | no parameter set in the workbench’s own space reaches a record | registered | [H-209](hypotheses/H-209-no-parameters-reach-a-record.md) | [X-034](explorations/X-034-the-workbench-physics-as-a-search.md) | Re-measure with retained final poses and disjoint seed blocks before reusing any number. |
 | 173 | the blind physics never settles to a valid packing | registered | [H-210](hypotheses/H-210-no-valid-packing.md) | [X-034](explorations/X-034-the-workbench-physics-as-a-search.md) | Re-measure with retained final poses and disjoint seed blocks before reusing any number. |
 | 174 | the shake has a sweet spot, and the shipped value is far below it | registered | [H-211](hypotheses/H-211-the-shake-has-a-sweet-spot.md) | [X-034](explorations/X-034-the-workbench-physics-as-a-search.md) | Re-measure with retained final poses and disjoint seed blocks before reusing any number. |
+| 180 | adaptive Animate integration removes clamp ringing | registered | [H-213](hypotheses/H-213-adaptive-animate-integration.md) | [X-035](explorations/X-035-animation-kinetics-without-pixels.md) | Compare a one-step control with law-driven substeps through the committed trajectory CLI; decide on displacement, reversal and validity guards rather than screenshots. |
+| 181 | Animate presets have distinct, correctly ordered kinetics | registered | [H-214](hypotheses/H-214-presets-have-distinct-kinetics.md) | [X-035](explorations/X-035-animation-kinetics-without-pixels.md) | Test whether hard, soft, balanced and sticky move the penetration, contact and gap axes their names claim, while each stays inside the continuity budget. |
 
 [H-212](hypotheses/H-212-the-workbench-physics-as-a-search.md) is the open question
 X-034 explored, not an idea.
 It holds exp-208, exp-209 and exp-210, the exploratory rounds H-210 and H-211 were
 registered from, so neither of those has been tested.
+
+[H-215](hypotheses/H-215-kinetics-predict-search-quality.md) is the open question from
+[X-035](explorations/X-035-animation-kinetics-without-pixels.md): whether any headless
+kinetic metric predicts independently valid Search outcomes under equal work.
+It is not an idea with a predicted direction.
 
 Idea 169, that the blind physics closes a constant fraction of the record-to-grid gap,
 was retired on 2026-09-14. Its premise came from arrangements that were never checked to

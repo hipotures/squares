@@ -486,17 +486,18 @@ Kinetic metrics may explain or reject a run, while packing validity and best val
 remain the Search guards and outcome.
 `X-035` and `H-213` through `H-215` carry the associated research record.
 
-**Status, 2026-09-16:** the headless instrument and its 48-cell preset matrix are ready,
-but Phase 2A remains open.
+**Status, 2026-09-16:** the safe tween default, headless instrument,
+adaptive-integration receipt, bounded experimental controls and square-first container
+timing are implemented at `9cca493c`, but Phase 2A remains open.
 [Exp-211](../../../../packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-211-h213-adaptive-animate-integration.md)
-rejects its historical dirty-checkpoint adaptive path because every solver-transition
-group misses at least one 60 Hz budget.
+rejects that exact commit’s adaptive path because every solver-transition group misses
+at least one 60 Hz budget.
 [Exp-212](../../../../packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-212-h214-preset-signatures.md)
-rejects the claimed universal preset ordering at the same checkpoint.
+rejects the claimed universal preset ordering in its frozen 48-cell matrix.
 These are measured failures, not completion evidence for `think-o4wo` or `think-5tyy`.
-They predate the later constant-resize-duration, presentation-span and tween-parity
-fixes and are not evidence for the eventual branch commit.
-That final revision must rerun the same frozen seed matrix before either bead can close.
+The next physical-response experiment needs a Bodies member/rotational normalization or
+an equivalent named control, followed by the same frozen seed matrix before either bead
+can close.
 
 ### Phase 3: Consolidate the Live Package
 
