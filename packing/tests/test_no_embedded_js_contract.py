@@ -158,6 +158,23 @@ def test_the_probe_loader_and_non_scripts_pass(source: str) -> None:
     assert _sites(source) == []
 
 
+@pytest.mark.parametrize(
+    "source",
+    [
+        (
+            "from sqpack.probes import applied\n"
+            "page.add_init_script(applied('location.reload()'))\n"
+        ),
+        (
+            "import sqpack.probes as probes\n"
+            "page.add_init_script(probes.applied('location.reload()'))\n"
+        ),
+    ],
+)
+def test_applied_accepts_only_file_backed_probe_source(source: str) -> None:
+    assert _rules(source) == ["script argument"]
+
+
 def test_documentation_is_not_a_site() -> None:
     documented = f'"""A module.\n\n    {PLANTED}\n"""\n\n\nclass A:\n    """{PLANTED}"""\n'
     assert _sites(documented) == []
