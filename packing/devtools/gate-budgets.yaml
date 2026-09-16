@@ -306,8 +306,8 @@ tiers:
   # against 2.80s over 5.5). Exact verification rose 11% with no change to its inputs,
   # which is contention for the runner rather than new work. The step moved to
   # `frontend` and the ceiling stayed, because raising it would turn the check that
-  # caught this into slack. `measured_seconds` stays empty: those readings include a
-  # step this tier no longer runs.
+  # caught this into slack. At that point `measured_seconds` stayed empty: those
+  # readings included a step this tier no longer runs.
   # 2026-09-16: the exact reconciliation topology removed the standalone type floor
   # from this tier. Run 35127260063 measured the resulting 50-step selection at 94.65 s
   # and tripped the stale-record rule against 158.82 s. The 189 s ceiling is just under
@@ -399,11 +399,10 @@ tiers:
   # Keeping those two frontend units in `checks` made that lane's existing ceiling
   # impossible; appending them to the 160s behavioural suite would create the same queue.
   #
-  # 150s is an initial fail-safe, not a hosted baseline. It is four times the observed
-  # source floor and leaves a similar amount for the build/browser contract plus ordinary
-  # runner setup variance. `measured_seconds` remains empty until this exact partition
-  # runs on its reference runner; the first hosted result supplies the record and tests
-  # the estimate instead of being made to agree with it.
+  # 150s began as a fail-safe at four times the observed source floor. The hosted
+  # baseline below now replaces that estimate; the ceiling leaves room for the
+  # build/browser contract and ordinary runner variance without exceeding the
+  # pull-request wall.
   ceiling_seconds: 150.0
   measured_seconds: 85.25
   measured_on: '2026-09-16'
@@ -450,11 +449,10 @@ tiers:
   # 42.73s, well under the 81s the queue divides to, so this tier does not set its own
   # floor either.
   #
-  # 200s is a shade over twice that reading, on the same three edges the entry above
-  # uses: it clears a runner a third slower (124s), it is under the drift rule's reach,
-  # and it is below the 243.81s of step time this tier costs if its pool stops
-  # parallelising -- which is the regression a ceiling on an outer-parallel tier is
-  # actually for.
+  # 180s is 1.75x the current 102.73s hosted mean. It clears a runner a third slower
+  # (about 137s), stays inside the pull-request wall, and remains below the 243.81s of
+  # step time this tier costs if its pool stops parallelising -- the regression a
+  # ceiling on an outer-parallel tier is actually for.
   ceiling_seconds: 180.0
   # Hosted samples at the reference shape establish the baseline below.
   measured_seconds: 102.73
@@ -617,7 +615,7 @@ tiers:
   # longest unit either way: the census is, and it is now both this job's floor and the
   # floor under the whole pull-request surface.
   #
-  # 240s stands through that. It is still below the roughly 258s of step time this tier
+  # 210s stands through that. It is still below the roughly 258s of step time this tier
   # costs if the pool stops parallelising, so serial degeneration still fails here, and
   # it still has to hold whatever the escape screen costs on a bad day -- which is why it
   # is not tightened to the new prediction.
@@ -756,10 +754,12 @@ tiers:
   argument: >-
     The complete gate. Never clocked end to end on the reference runner in one piece -- CI
     splits it across jobs -- so only the ceiling applies, and it is argued from the parts
-    rather than from another tier: the pull-request surface at 409s, the exhaustive tier
-    at 892s on the same runner (run 33932095609), the slow lane BC-214 moved here, and the
-    rest. 3600s is roughly twice that sum, which is the room a tier growing one
-    certificate at a time needs before anyone has clocked it whole.
+    rather than from another tier. The original argument used the historical
+    pull-request surface at 409s, the exhaustive tier at 892s on the same runner (run
+    33932095609), the slow lane BC-214 moved here, and the rest. The current 180s
+    pull-request wall is separate. The 3600s checkpoint ceiling is roughly twice that
+    historical component sum, which leaves room for a tier that has never been clocked
+    whole.
 
 # The certificate page's pull-request jobs. The tiers above budget `packing-validate`'s
 # steps; this workflow runs none of them, and until 2026-09-15 nothing budgeted it at all.
