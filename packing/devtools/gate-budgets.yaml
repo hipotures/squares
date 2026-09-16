@@ -705,23 +705,23 @@ tiers:
 pages:
   reference: {runner: ubuntu-latest, cpus: 4, caches: warm}
   wall:
-    measured_seconds: 208.0
+    measured_seconds: 186.0
     measured_on: 2026-09-16
     measured_where: >-
-      run 35040456480 (185 s), run 35050591623 (173 s), and exact-head run 35052785989
-      (281 s), the geometric mean of the three final-shape readings, measured from the
-      run's creation to the `pages-required` aggregator's start
+      exact-head run 35056004552 after the workbench checkout became sparse, measured
+      from the run's creation to the `pages-required` aggregator's start; the preceding
+      exact-head run 35052785989 took 281 s before that cut
     ceiling_seconds: 250.0
     argument: >-
       Before the split this workflow was `prepare` then a single `build` of about 300 s of
       serial Chromium checks: a 472 s median on the workbench stack's pull requests, 381 s
       on pull requests into main. The checks now run as thirteen jobs beside each other,
-      and the wall is `prepare` plus the longest of them. 250 s is 1.2x the reading, which
-      leaves modest room for hosted-runner variance without leaving room for another
-      doubling. The latest exact-head run took 281 s, so the workflow still violates its
-      own ceiling and `OR-14`'s two to two and a half minute target. Its 234 s workbench
-      job spent about 174 s in checkout, making checkout and cache setup the next measured
-      cut rather than another split between jobs.
+      and the wall is `prepare` plus the longest of them. 250 s is 1.34x the final-shape
+      reading, which leaves modest room for hosted-runner variance without leaving room
+      for another doubling. Sparse checkout removed the 281 s run's anomalous workbench
+      fetch from the critical path, but 186 s remains above `OR-14`'s two to two and a
+      half minute target. The floor is back in the browser jobs: after `prepare`, the
+      slowest full browser cell took 97 s.
   jobs:
   - id: scope
     measured_seconds: 20.2
@@ -741,15 +741,18 @@ pages:
       Renders the explainer twice -- the publication draw and the determinism control --
       and hands both to the jobs below as artifacts, so nothing downstream renders again.
   - id: workbench
-    measured_seconds: 89.5
+    measured_seconds: 53.0
     measured_on: 2026-09-16
     measured_where: >-
-      run 35040456480, run 35039923396, run 35039248281, and exact-head run 35052785989;
-      the latest job took 234 s, including about 174 s in checkout
+      exact-head run 35056004552 after sparse checkout: 53 s for the job and 7 s for
+      checkout, against 234 s and about 174 s respectively in run 35052785989
     ceiling_seconds: 104.0
     argument: >-
       Builds the workbench page under `--check`, which builds it twice and requires the
-      two to match byte for byte. It runs beside `prepare` rather than after it.
+      two to match byte for byte. It runs beside `prepare` rather than after it. The
+      blobless sparse checkout omits 504 MB in `packing/resources/` and
+      `packing/campaign/`; a contract test proves those omitted trees contain no declared
+      workbench or explainer build input.
   - id: pdf
     measured_seconds: 73.3
     measured_on: 2026-09-16
