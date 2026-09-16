@@ -46,6 +46,7 @@ import shutil
 import subprocess
 from collections import Counter
 from collections.abc import Iterable, Mapping
+from functools import cache
 from pathlib import Path
 from typing import Any
 
@@ -364,8 +365,9 @@ def _floor_configs() -> list[Path]:
     return [*_tsconfigs(), ESLINT_PROBES]
 
 
-def _program_files(config: Path) -> set[Path]:
-    """The source files TypeScript actually includes after resolving the config."""
+@cache
+def _program_files(config: Path) -> frozenset[Path]:
+    """The source files TypeScript includes, resolved once per immutable test config."""
     completed = subprocess.run(
         [str(TSC), "-p", str(config), "--listFilesOnly"],
         cwd=REPOSITORY_ROOT,
@@ -374,11 +376,11 @@ def _program_files(config: Path) -> set[Path]:
         text=True,
     )
     assert completed.returncode == 0, completed.stdout + completed.stderr
-    return {
+    return frozenset(
         Path(line).resolve()
         for line in completed.stdout.splitlines()
         if line.endswith(SCRIPT_SUFFIXES)
-    }
+    )
 
 
 def _covered_scripts(configs: list[Path]) -> set[str]:
