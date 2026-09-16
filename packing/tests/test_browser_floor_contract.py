@@ -807,8 +807,8 @@ def test_type_coverage_respects_effective_exclusions(tmp_path: Path) -> None:
     _require_tool(TSC)
     included = tmp_path / "included.ts"
     excluded = tmp_path / "excluded.ts"
-    included.write_text("export const included = 1;\n", encoding="utf-8")
-    excluded.write_text("export const excluded = 1;\n", encoding="utf-8")
+    included.write_text("interface Included { value: number }\n", encoding="utf-8")
+    excluded.write_text("interface Excluded { value: number }\n", encoding="utf-8")
     config = tmp_path / "tsconfig.json"
     config.write_text(
         json.dumps(
