@@ -76,6 +76,15 @@ export default [
     rules: promiseRules,
   },
   {
+    files: ["packing/devtools/explainer/**/*.js"],
+    languageOptions: {
+      parser,
+      parserOptions: { project: "./tsconfig.explainer.json" },
+    },
+    plugins,
+    rules: promiseRules,
+  },
+  {
     files: [
       "packing/src/sqpack/motion_lab/assets/**/*.js",
       "packing/atlas/known-best/video/spikes/v1-slideshow/*.js",

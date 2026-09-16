@@ -48,6 +48,7 @@ from typing import Any
 
 import pytest
 
+from devtools import render_explainer
 from devtools.check_bead_tree import ISSUES, MAPPINGS, REFS, parse_aliases
 from sqpack.cli import validate
 from sqpack.yamlio import safe_load
@@ -66,6 +67,8 @@ WORKFLOWS = (
     REPOSITORY_ROOT / ".github/workflows/packing-validation.yml",
     REPOSITORY_ROOT / ".github/workflows/deep-gate.yml",
 )
+SCRIPT_ELEMENT = re.compile(r"<script(?:\s[^>]*)?>(.*?)</script>", re.DOTALL)
+SCRIPT_PLACEHOLDER = re.compile(r"\s*\{\{([A-Z_]+)\}\}\s*")
 
 #: The lint rules the shared floor names, each of which the recommended preset does NOT
 #: enable on its own. That is the whole reason they are written out: a project that only
@@ -432,6 +435,15 @@ def _outside_scope(tracked: Iterable[str], processed: set[str]) -> list[str]:
     return sorted(path for path in tracked if path not in processed)
 
 
+def _literal_inline_scripts(source: str) -> list[str]:
+    """Script bodies that are executable source rather than one asset placeholder."""
+    return [
+        body.strip().splitlines()[0]
+        for body in SCRIPT_ELEMENT.findall(source)
+        if SCRIPT_PLACEHOLDER.fullmatch(body) is None
+    ]
+
+
 # ---------------------------------------------------------------------------------------
 # Workflows
 
@@ -665,6 +677,29 @@ def test_every_first_party_script_is_in_a_type_program() -> None:
     assert not uncovered, f"tracked JavaScript in no type-check program: {uncovered}"
     typed_samples = sorted(path for path in covered if _declared_excluded(path))
     assert not typed_samples, f"a program type-checks a sample that must fail: {typed_samples}"
+
+
+def test_the_explainer_shell_owns_no_inline_programs() -> None:
+    """HTML is not a Biome/ESLint/tsc input, so every executable body comes from a file."""
+    source = render_explainer.TEMPLATE.read_text(encoding="utf-8")
+    assert _literal_inline_scripts(source) == []
+    placeholders = {
+        match.group(1)
+        for body in SCRIPT_ELEMENT.findall(source)
+        if (match := SCRIPT_PLACEHOLDER.fullmatch(body)) is not None
+    }
+    assert placeholders == {
+        "THEME_BOOTSTRAP",
+        "KATEX_JS",
+        *render_explainer.INLINE_SCRIPT_ASSETS,
+    }
+
+
+def test_a_literal_explainer_program_is_refused() -> None:
+    """Negative control: a program written back into the HTML cannot escape the floor."""
+    source = render_explainer.TEMPLATE.read_text(encoding="utf-8")
+    planted = source.replace("{{NATIVE_MATH_METRICS}}", "literal program", 1)
+    assert _literal_inline_scripts(planted) == ["literal program"]
 
 
 def test_the_package_program_is_required_for_package_typescript() -> None:

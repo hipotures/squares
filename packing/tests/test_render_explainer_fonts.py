@@ -476,27 +476,35 @@ def test_host_batches_keep_queued_and_unsubmitted_boot_work_pending() -> None:
 
 def test_static_math_prioritizes_active_panels_and_preserves_native_fallback() -> None:
     """The real static producer uses semantic priority and waits for queued boot work."""
-    assert _run_node("static-math-priority.mjs", str(render_explainer.TEMPLATE)) == "complete"
+    source = render_explainer.INLINE_SCRIPT_ASSETS["EXPLAINER_PAGE_SCRIPT"]
+    assert _run_node("static-math-priority.mjs", str(source)) == "complete"
 
 
 def test_math_bootstrap_reservation_surrounds_independent_certificate_scripts() -> None:
     """The final release still executes if one certificate's script throws."""
     source = render_explainer.TEMPLATE.read_text()
     scripts = re.findall(r"<script>(.*?)</script>", source, flags=re.DOTALL)
-    reserve = next(i for i, script in enumerate(scripts) if "squaresMath.reserve()" in script)
-    shared = next(i for i, script in enumerate(scripts) if "async function typeset()" in script)
-    boot = next(i for i, script in enumerate(scripts) if "/* Certificate {{ID}} */" in script)
-    release = next(i for i, script in enumerate(scripts) if "finishMathBootstrap();" in script)
+    reserve = scripts.index("{{RESERVE_MATH}}")
+    shared = scripts.index("{{EXPLAINER_PAGE_SCRIPT}}")
+    boot = scripts.index("{{CERTIFICATE_SCRIPT}}")
+    release = scripts.index("{{FINISH_MATH}}")
     assert reserve < shared < boot < release
-    assert scripts[release].strip() == "finishMathBootstrap();"
-    assert scripts[shared].index("show(location.hash.slice(1), false);") < scripts[
-        shared
-    ].index("typeset();")
+    reserve_source = render_explainer.INLINE_SCRIPT_ASSETS["RESERVE_MATH"].read_text()
+    release_source = render_explainer.INLINE_SCRIPT_ASSETS["FINISH_MATH"].read_text()
+    assert "finishMathBootstrap" in reserve_source
+    assert "reserve()" in reserve_source
+    assert "finishMathBootstrap" in release_source
+    assert "reserve" not in release_source
+    shared_source = render_explainer.INLINE_SCRIPT_ASSETS["EXPLAINER_PAGE_SCRIPT"].read_text()
+    assert shared_source.index("show(location.hash.slice(1), false);") < shared_source.index(
+        "void typeset();"
+    )
 
 
 def test_heat_map_waits_for_math_and_cancels_a_hidden_certificates_queued_draw() -> None:
     """Expensive canvas work starts after the required math settles and a paint occurs."""
-    _run_node("heat-map-schedule.mjs", str(render_explainer.TEMPLATE))
+    source = render_explainer.INLINE_SCRIPT_ASSETS["CERTIFICATE_SCRIPT"]
+    _run_node("heat-map-schedule.mjs", str(source))
 
 
 def _sans_face(family: str, weight: int) -> str:

@@ -1,10 +1,10 @@
-// The shell's static math producer, `typeset` in `explainer-shell.html`: formulas go to the
+// The checked page asset's static math producer, `typeset` in `explainer/page.js`: formulas go to the
 // shared renderer by semantic priority (active panels, then the visible paper, then hidden
 // copies), a failed native formula keeps its semantic fallback, and completion waits for the
-// later certificate boots. Evaluated from the template itself, so the test reads the script
+// later certificate boots. Evaluated from the source file, so the test reads the script
 // the page ships. Prints `complete`.
 //
-// Usage: node static-math-priority.mjs <explainer-shell.html>
+// Usage: node static-math-priority.mjs <explainer/page.js>
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { runInThisContext } from "node:vm";
