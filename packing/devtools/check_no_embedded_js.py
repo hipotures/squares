@@ -285,7 +285,11 @@ class _Scanner:
         # runs, `ast.walk` is most of the cost, and seven walks per file cost seven times one.
         self.nodes = list(ast.walk(tree))
         self.bindings = _bindings(self.nodes)
-        self.loader_functions, self.loader_modules = _loader_names(self.nodes)
+        (
+            self.loader_functions,
+            self.wrapper_functions,
+            self.loader_modules,
+        ) = _loader_names(self.nodes)
 
     # -- string text -------------------------------------------------------------------
 
@@ -374,12 +378,23 @@ class _Scanner:
         func = node.func
         if isinstance(func, ast.Name) and func.id in self.loader_functions:
             return "loader"
+        if isinstance(func, ast.Name) and func.id in self.wrapper_functions:
+            return self._classify_wrapper(node, seen)
         if isinstance(func, ast.Attribute):
-            if _dotted(func.value) in self.loader_modules:
+            if _dotted(func.value) in self.loader_modules and func.attr == "probe":
                 return "loader"
+            if _dotted(func.value) in self.loader_modules and func.attr == "applied":
+                return self._classify_wrapper(node, seen)
             if func.attr in STRING_METHODS and self.classify(func.value, seen) != "unknown":
                 return "built"
         return "unknown"
+
+    def _classify_wrapper(self, node: ast.Call, seen: frozenset[str]) -> Verdict:
+        """Accept `applied` only when its source came from the probe loader."""
+        if not node.args:
+            return "unknown"
+        source = self.classify(node.args[0], seen)
+        return "loader" if source == "loader" else source
 
     def script_arguments(self) -> Iterator[ast.expr]:
         for node in self.nodes:
@@ -492,17 +507,22 @@ def _bindings(nodes: Sequence[ast.AST]) -> dict[str, list[ast.expr]]:
     return bound
 
 
-def _loader_names(nodes: Sequence[ast.AST]) -> tuple[frozenset[str], frozenset[str]]:
-    """The names this module calls the probe loader by: functions, and module aliases."""
+def _loader_names(
+    nodes: Sequence[ast.AST],
+) -> tuple[frozenset[str], frozenset[str], frozenset[str]]:
+    """Local names for `probe`, its `applied` wrapper, and loader module aliases."""
     functions: set[str] = set()
+    wrappers: set[str] = set()
     modules: set[str] = set()
     for node in nodes:
         match node:
             case ast.ImportFrom(module=str() as module, names=names, level=0):
                 for alias in names:
                     local = alias.asname or alias.name
-                    if module in LOADER_MODULES:
+                    if module in LOADER_MODULES and alias.name == "probe":
                         functions.add(local)
+                    elif module in LOADER_MODULES and alias.name == "applied":
+                        wrappers.add(local)
                     elif f"{module}.{alias.name}" in LOADER_MODULES:
                         modules.add(local)
             case ast.Import(names=names):
@@ -511,7 +531,7 @@ def _loader_names(nodes: Sequence[ast.AST]) -> tuple[frozenset[str], frozenset[s
                         modules.add(alias.asname or alias.name)
             case _:
                 pass
-    return frozenset(functions), frozenset(modules)
+    return frozenset(functions), frozenset(wrappers), frozenset(modules)
 
 
 def scan_source(path: str, source: str, policy: Policy) -> list[Site]:
