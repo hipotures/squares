@@ -1,6 +1,6 @@
 # Synopsis: The `s(n)` Program
 
-**Date:** 2026-09-14
+**Date:** 2026-09-15
 
 **Status:** Living document, revised whenever a result lands.
 
@@ -138,10 +138,10 @@ hypothesis status and summarizes experiment verdicts, and the
 | Record | Count | State at the cutoff |
 | --- | ---: | --- |
 | Agendas | 35 | 15 active; 14 completed; 5 paused; 1 superseded |
-| Commitments | 343 | 177 complete; 59 stopped; 64 blocked; 16 ready; 20 tentative; 7 in progress |
-| Sessions | 133 | 84 completed; 49 stopped; all terminal |
-| Explorations | 31 | 18 linked to proposed hypotheses; 13 uncodified |
-| Hypotheses | 149 | 26 confirmed; 27 refuted; 50 blocked; 12 unresolved; 4 open; 27 open questions; 2 result registered; 1 abandoned; 0 running |
+| Commitments | 343 | 177 complete; 59 stopped; 64 blocked; 15 ready; 20 tentative; 8 in progress |
+| Sessions | 135 | 84 completed; 51 stopped; all terminal |
+| Explorations | 32 | 19 linked to proposed hypotheses; 13 uncodified |
+| Hypotheses | 150 | 26 confirmed; 27 refuted; 50 blocked; 12 unresolved; 5 open; 27 open questions; 2 result registered; 1 abandoned; 0 running |
 | Experiments | 126 | 39 accepted; 32 rejected; 30 unresolved; 12 baseline; 11 blocked; 2 abandoned; 0 in progress |
 | Frontier results | 26 | 26 registered |
 
@@ -159,7 +159,7 @@ now-paused incremental follow-ups.
 current strategy-reset queue.
 The generated agenda map, not this narrative, summarizes commitment state.
 
-All recorded sessions are terminal.
+All recorded sessions are terminal; Session 135 is the latest handoff.
 `stopped` is not a scientific failure; it includes time limits, guarded refusals,
 administrative handoffs, and work deliberately ended after its next evidence was
 identified. The late-session arc moved from certificate production and exact dilation
@@ -174,17 +174,20 @@ Some explorations link forward through `proposes`, while others remain uncodifie
 observations or strategy notes.
 The most consequential recent synthesis is X-027’s ceiling for pure point/density
 certificates, followed by X-028’s strategy portfolio and the scoped BC303 drafts
-X-029–X-031. A draft or proposed direction is not a registered hypothesis, and a
-registered hypothesis is not a frontier result.
+X-029–X-031, followed by X-032’s no-target Route S compression contract.
+A draft or proposed direction is not a registered hypothesis, and a registered
+hypothesis is not a frontier result.
 
 Scientifically, the current bracket is unchanged:
 `3.826447410572939… <= s(11) <= 3.877083590022814…`. T-026 closes about 43% of the older
 Stromquist-to-Trump interval.
 The pure point/density ceiling `38200/9977 ≈ 3.8288` lies only about `0.00236` above
 T-026, so additional heavy work for microscopic gains in that language is paused.
-H-160/exp-158 and H-162/exp-160 are registered but blocked before target invocation;
-their source and control work is retained, and their blocked status carries no
-scientific verdict.
+H-160/exp-158 and H-162/exp-160 are registered but blocked before target invocation.
+H-163 is registered and open but untested; its target-blind instrument is admitted
+locally, and no `exp-161` exists.
+Exact-head certification and merge remain the gate before any target is authorized.
+The retained source and control work carries no scientific verdict.
 
 BC-339’s W7 pipeline-improvement and W8 reconciliation are complete and certified.
 BC-347’s source-bound
@@ -206,10 +209,20 @@ The current order is:
    Its source inventories found no complete 80-stratum negative-root producer, matched
    exact baseline, conditional gate, or method-distinct replay.
    No target ran and no physical root closed.
-2. Run BC-343 / `think-a1e8` as the sole next entry.
-   Its first PR is a no-target Route S admission: freeze the unmodified T-025/T-026
-   control, an at-most-23-orbit ceiling or another quantitative metric, one candidate
-   family, mutation controls, and its accept-or-park rule before optimization.
+2. BC-343 / `think-a1e8` remains the active research commitment; `think-so4g` is its
+   sole operational entry.
+   [X-032](packing/campaign/explorations/X-032-route-s-threshold-compression.md) and
+   [H-163](packing/campaign/hypotheses/H-163-route-s-threshold-compression.md) freeze
+   T-025 as the sole matched control, its exact 119-orbit support universe, and the
+   at-most-23 positive-orbit criterion.
+   T-026 is only a support-and-rescaling sentinel.
+   Session 134’s source-distinct review refused the first admission checkpoint.
+   Session 135 then discharged all four retained guards: complete source contents bound
+   to a declared Git revision and repository-relative paths, both T-026 sentinels, a
+   canonical selection-manifest boundary, and the complete X-032 mutation matrix.
+   Its source-distinct re-audit returned ADMIT after one symlink-alias boundary repair.
+   No optimizer, candidate, coverage target, or `exp-161` is authorized before the exact
+   admitted PR head is certified and merged.
 3. Treat A, S, global angular resources, and B as the first advisory tier.
    A is the strongest route to a material `n = 11` lower bound; S is the best bounded
    deliverable; angular resources offer a cheap optimal-face screen; and B is the
@@ -225,10 +238,11 @@ The detailed
 [six-hour execution schedule](docs/project/reviews/review-2026-09-14-n11-post-w5-route-selection.md#six-active-hours-after-this-planning-merge)
 originally allocated five sequential merge-bounded blocks.
 BC-354 activated that schedule’s guard-refusal branch, so the Route A discriminator no
-longer follows it. The remaining path begins with BC-343’s no-target Route S admission;
-only an admitted compression contract may proceed to a target, independent audit, and
-closeout. Each block starts from the preceding merge on a fresh branch and gets its own
-session, bead disposition, validation receipt, and pull request.
+longer follows it. BC-343’s no-target Route S instrument is now admitted locally; the
+remaining path begins with exact-head certification and merge, followed by a separate
+planning block that may register `exp-161` and authorize one bounded target.
+Each block starts from the preceding merge on a fresh branch and gets its own session,
+bead disposition, validation receipt, and pull request.
 
 The audit’s linear advisory order is A, S, angular resources, B, stronger charge
 algebra, geometry-dependent budgets, `n = 12`, C, D, then geometric waste.
@@ -893,8 +907,24 @@ controller, not permission to blur contracts.
 
 ### Current Handoff
 
+[Session 135](packing/campaign/agent-sessions/session-135-n11-route-s-guard-discharge.md)
+is the latest terminal handoff on the no-target Route S admission branch.
+It discharged the four guards retained by
+[Session 134](packing/campaign/agent-sessions/session-134-n11-route-s-admission.md):
+complete T-025/T-026 contents bound to a declared Git revision and repository-relative
+paths, both T-026 sentinels, a canonical source-bound nonempty selection manifest, and
+every declared mutation refusal.
+A fresh source-distinct audit found one path-alias hole; the repaired symlink refusal
+and its regression passed re-audit.
+The retained receipt therefore admits the instrument.
+No optimizer, candidate, coverage target, experiment, or scientific verdict was
+produced. [X-032](packing/campaign/explorations/X-032-route-s-threshold-compression.md)
+owns the source and verdict boundary, and
+[H-163](packing/campaign/hypotheses/H-163-route-s-threshold-compression.md) owns the
+prospective scientific claim.
+T-026 is only a support-and-rescaling provenance sentinel.
 [Session 133](packing/campaign/agent-sessions/session-133-n11-route-a-admission.md) is
-the latest terminal handoff.
+the latest terminal predecessor.
 It began BC-354 from post-W5 planning merge `a9de8a705d785e5b7b6ac46f28c11b6f5a45d7c6`,
 after
 [Session 132](packing/campaign/agent-sessions/session-132-n11-post-w5-route-selection.md)
@@ -909,15 +939,20 @@ The scientific evidence cutoff remains main revision
 `80bcdbb0819504354e1278c37f211dd8cc2158fb`, where the latest merged stack is green and
 the T-026 lower bound remains the frontier.
 
-**Selected next entry:** `think-a1e8`, the BC-343 Route S admission phase.
+**Selected next entry:** `think-so4g`, the exact-head certification and merge child of
+BC-343 / `think-a1e8`. Only after that checkpoint merges may a fresh branch register
+`exp-161` and its bounded compression target.
 
 BC-340, BC-353, and BC-354 are terminal.
 BC-341 remains tentative behind a future W10 reselection and the named Route A
 representation gaps.
-BC-343 begins with a separate no-target PR that freezes Route S’s complexity metric,
-candidate family, controls, and verdict rules.
-No scientific compression target has execution authority before that admission PR
-merges.
+BC-343 has a separate no-target PR that freezes Route S’s complexity metric, fixed
+support universe, controls, and verdict rules.
+Its retained receipt is admitted after source-distinct review, but exact-head fast and
+deferred certification and merge remain the current gate.
+No scientific compression target has execution authority before that merge and a
+separate experiment registration; no optimizer, candidate, coverage target, or `exp-161`
+has run.
 
 The older BC329, weighted-atom stages 3–4, and BC303 H-160/H-162 target lanes are
 paused. Their admitted implementations, registrations, and controls remain evidence; no
@@ -3820,6 +3855,7 @@ round that names the hypothesis, control roles included.
 | [H-160](packing/campaign/hypotheses/H-160-bc303-t2-charge-filters.md) | blocked | Every frozen BC303 C charge is at least 4524200 and every S first-owner strip charge is at least 4524185 | 1 | exp-158 paused before target invocation; no scientific verdict |
 | [H-161](packing/campaign/hypotheses/H-161-bc303-literal-parent-union.md) | refuted | The frozen literal closed Q0 has integer mass `N>=4262074`, excluding the named four-corner tuple under the imported BC303 floor | 1 | exp-159: `N=4000015`; neither the four-corner nor one-parent threshold rejects |
 | [H-162](packing/campaign/hypotheses/H-162-bc303-floor-normalized-t2-filter.md) | blocked | Frozen BC303 C and S first-owner strip minima are each at least 4524132 | 1 | exp-160 paused without an exp-158 receipt; no scientific verdict |
+| [H-163](packing/campaign/hypotheses/H-163-route-s-threshold-compression.md) | open | T-025’s exact support universe admits a certificate with at most 23 positive D4 orbit representatives | 0 | Target-blind instrument admitted; no exp-161, candidate, optimizer, coverage target, or scientific verdict |
 | [H-201](packing/campaign/hypotheses/H-201-simultaneous-perturbation-move.md) | refuted | A collective move takes n = 17 from the trivial grid to within 0.002 of Bidwell cold, and is inert above n = 26 | 2 | 105.7m wall |
 | [H-202](packing/campaign/hypotheses/H-202-wall-pressure-dense-objective.md) | refuted | Isotropic wall pressure optimises a disc, returning exactly 2*sqrt(2) at n = 5, so pressure must be directional | 1 | 39.2m wall |
 | [H-203](packing/campaign/hypotheses/H-203-basin-hopping-over-the-lp-quench.md) | confirmed | Basin hopping beats multistart at an equal budget of refined local optima | 1 | 81.2m wall |
@@ -4099,14 +4135,16 @@ in separate tables: their units differ, and the same work can appear in both.
 | `codex-task-tree-session-131.yaml` | session-131 | 313 | 1.24 h | 0.75 h | 0.75 h | yes |
 | `codex-task-tree-session-132.yaml` | session-132 | 274 | 1.03 h | 0.72 h | 0.72 h | yes |
 | `codex-task-tree-session-133.yaml` | session-133 | 101 | 0.37 h | 0.2 h | 13.6 h | yes |
+| `codex-task-tree-session-134.yaml` | session-134 | 497 | 4.88 h | 1.21 h | 1.21 h | yes |
+| `codex-task-tree-session-135.yaml` | session-135 | 437 | 1.53 h | 0.48 h | 0.48 h | yes |
 | `codex-task-tree-pr137-publication-tail.yaml` | unattributed | 610 | 4.39 h | 1.77 h | 1.82 h | yes |
 | `codex-task-tree-pr142-publication-tail.yaml` | unattributed | 136 | 0.87 h | 0.41 h | 0.58 h | yes |
 
 | Coverage | sessions |
 | --- | ---: |
-| measured | 85 |
+| measured | 87 |
 | unmeasured | 48 |
-| **total** | **133** |
+| **total** | **135** |
 
 <!-- END GENERATED: session-close-report -->
 
