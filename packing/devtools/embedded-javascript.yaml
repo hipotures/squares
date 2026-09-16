@@ -48,85 +48,90 @@ script_code: '[A-Za-z_$][\w$]*\s*[(.=;]'
 # The ratchet: each file that still embeds JavaScript, the number of sites the guard counts
 # in it, and the bead that removes them. The check fails when a count grows, when a count
 # shrinks without its entry being lowered to match, when a file not listed here offends, and
-# when a listed file no longer offends. Entries only ever leave, and the list is empty when
-# think-m0zb closes.
+# when a listed file no longer offends. Entries only ever leave, which `--since REF` checks
+# against the list at that revision, and the list is empty when think-m0zb closes. Every
+# bead named below has to be a live bead; the contract test resolves each one in the store.
 #
 # Written from `--inventory` on 2026-09-14 at 477 sites in 48 files, and lowered as files
-# came off it. This comment carries no running total, because every file that leaves the list
-# would make one stale; `--inventory` prints the current totals by bead.
+# come off it. No running total is kept here: it went stale with every child branch that
+# emptied a file. Run `--inventory` for the count as the scan sees it.
+#
+# Every entry names `think-m0zb`, the live epic under which the list empties. Earlier
+# delivery beads closed before the full inventory did, so they no longer own individual
+# rows; the executable contract refuses any closed or unknown bead here.
 allowlist:
   - path: packing/devtools/check_katex.py
     sites: 1
-    bead: think-3pox
+    bead: think-m0zb
   - path: packing/devtools/check_math_faces.py
     sites: 34
-    bead: think-3pox
+    bead: think-m0zb
   - path: packing/devtools/check_math_loading.py
     sites: 20
-    bead: think-3pox
+    bead: think-m0zb
   - path: packing/devtools/check_math_startup.py
-    sites: 6
-    bead: think-3pox
+    sites: 7
+    bead: think-m0zb
   - path: packing/devtools/check_print_layout.py
     sites: 37
-    bead: think-3pox
+    bead: think-m0zb
   - path: packing/devtools/check_scroll_restoration.py
     sites: 11
-    bead: think-3pox
+    bead: think-m0zb
   - path: packing/devtools/compare_math_fonts.py
     sites: 6
-    bead: think-3pox
+    bead: think-m0zb
   - path: packing/devtools/inspect_explainer_typography.py
     sites: 27
-    bead: think-3pox
+    bead: think-m0zb
   - path: packing/devtools/prepare_explainer_math.py
     sites: 51
-    bead: think-3pox
+    bead: think-m0zb
   - path: packing/devtools/render_explainer.py
-    sites: 4
-    bead: think-3pox
+    sites: 6
+    bead: think-m0zb
   - path: packing/devtools/render_explainer_pdf.py
     sites: 18
-    bead: think-3pox
+    bead: think-m0zb
   - path: packing/devtools/sans_instances.py
     sites: 7
-    bead: think-3pox
+    bead: think-m0zb
   - path: packing/tests/test_browser_floor_contract.py
     sites: 2
-    bead: think-3pox
+    bead: think-m0zb
   - path: packing/tests/test_check_print_layout.py
-    sites: 21
-    bead: think-3pox
+    sites: 23
+    bead: think-m0zb
   - path: packing/tests/test_check_published_site.py
     sites: 1
-    bead: think-3pox
+    bead: think-m0zb
   - path: packing/tests/test_codex_log_rollup.py
     sites: 3
-    bead: think-3pox
+    bead: think-m0zb
   - path: packing/tests/test_math_loading.py
     sites: 24
-    bead: think-3pox
+    bead: think-m0zb
   - path: packing/tests/test_math_startup.py
     sites: 2
-    bead: think-3pox
+    bead: think-m0zb
   - path: packing/tests/test_motion_lab.py
     sites: 1
-    bead: think-3pox
+    bead: think-m0zb
   - path: packing/tests/test_motion_lab_interactive.py
     sites: 3
-    bead: think-3pox
+    bead: think-m0zb
   - path: packing/tests/test_pdf_math_browser.py
-    sites: 11
-    bead: think-3pox
+    sites: 12
+    bead: think-m0zb
   - path: packing/tests/test_prepare_explainer_math.py
-    sites: 4
-    bead: think-3pox
+    sites: 5
+    bead: think-m0zb
   - path: packing/tests/test_render_explainer_fonts.py
     sites: 13
-    bead: think-3pox
+    bead: think-m0zb
   - path: packing/tests/test_render_explainer_pdf.py
     sites: 15
-    bead: think-3pox
+    bead: think-m0zb
   - path: packing/tests/test_sans_instances.py
     sites: 2
-    bead: think-3pox
+    bead: think-m0zb

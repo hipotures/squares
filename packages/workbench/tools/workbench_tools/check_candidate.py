@@ -478,10 +478,9 @@ def staging_checks(
     pool = {"selector": "#squares g[data-identity]"}
 
     # The pool: one element per identity, created once, never re-keyed, hidden beyond n + 1.
-    shown = probe("candidate/shown_identities")
     page.evaluate(probe("candidate/select"), {"index": index_of[4]})
     check(
-        page.evaluate(shown) == [1, 2, 3, 4, 5],
+        page.evaluate(probe("candidate/shown_identities")) == [1, 2, 3, 4, 5],
         "pair 4->5 does not show exactly identities 1..5",
     )
     check(page.evaluate(total, pool) >= 5, "pair 4->5 has no pool at all")
