@@ -569,8 +569,8 @@ def test_host_fault_control_is_independent_of_rendered_source_formatting(
         }
 
     monkeypatch.setattr(prepare_explainer_math, "check_host_math", check)
-    report, print_rejected, fallback_rejected = (
-        prepare_explainer_math.host_regression_control(source, browser_name="webkit")
+    report, print_rejected, fallback_rejected = prepare_explainer_math.host_regression_control(
+        source, browser_name="webkit"
     )
     assert calls == [(source, "webkit", True)]
     assert len(report["findings"]) == 2

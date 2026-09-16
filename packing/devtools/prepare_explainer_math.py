@@ -981,9 +981,7 @@ _PREPARATION_METRICS = probe(PROBES, "prepare_explainer_math/preparation_metrics
 _SUPPRESS_HIDDEN_PRINT_HEAT = applied(
     probe(PROBES, "prepare_explainer_math/suppress_hidden_print_heat")
 )
-_BREAK_NATIVE_FALLBACKS = probe(
-    PROBES, "prepare_explainer_math/break_native_fallbacks"
-)
+_BREAK_NATIVE_FALLBACKS = probe(PROBES, "prepare_explainer_math/break_native_fallbacks")
 
 
 def _head_script(source: str, script: str) -> str:
@@ -1052,9 +1050,7 @@ def host_regression_control(
     """Run both file-backed host faults and report whether each oracle rejected it."""
     control = check_host_math(source, browser_name=browser_name, fault_control=True)
     print_rejected = any("print heat map" in finding for finding in control["findings"])
-    fallback_rejected = any(
-        "semantic MathML" in finding for finding in control["findings"]
-    )
+    fallback_rejected = any("semantic MathML" in finding for finding in control["findings"])
     return control, print_rejected, fallback_rejected
 
 
