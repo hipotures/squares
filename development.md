@@ -162,21 +162,22 @@ alone is not full pre-merge evidence.
 
 | Tier | Who runs it, and when | Steps | Ceiling | Cost when last measured |
 | --- | --- | ---: | ---: | --- |
-| `--records` | contributor, before touching a registry; also every pull request | 32 of 77 | 300 s | 11.0 s |
-| `--edit` | contributor, in the edit loop | 47 of 77 | 240 s | 59.4 s |
+| `--records` | contributor, before touching a registry; also every pull request | 32 of 78 | 300 s | 11.0 s |
+| `--edit` | contributor, in the edit loop | 47 of 78 | 240 s | 59.4 s |
 | `--push` | contributor, before a push — the edit tier plus tests reachable from the diff (`--since`) | varies with the diff | 1800 s | about a minute for a narrow code change; a broad diff selects the whole suite and needs `--jobs 1`, see below |
-| `--fast` | contributor, at a block boundary; the union of the five tiers below | 66 of 77 | 600 s | record cleared 2026-09-07 when the corpus widened; 229.1 s locally, only the ceiling applies |
-| `--checks` | **CI, on every pull request**, in the `validate` job | 50 of 77 | 195 s | composition changed after two PR 160 runs exceeded the ceiling, which did not end the overruns (`think-lrs0`); only the ceiling applies |
-| `--frontend` | **CI, on every pull request**, in the `frontend` job, concurrently | 2 of 77 | 150 s | new partition; the first hosted run establishes its baseline |
-| `--geometry` | **CI, on every pull request**, in the `geometry` job, concurrently | 9 of 77 | 180 s | 91.6 s on CI, the mean of four readings |
-| `--suite` | **CI, on every pull request**, in the `suite` job, concurrently | 1 of 77 | 275 s | 183.4 s on CI, one reading of the lane as it now stands |
-| `--sweeps` | **CI, on every pull request**, in the `sweeps` job, concurrently | 4 of 77 | 210 s | record cleared 2026-09-07 when two of its four steps were split; 58.5 s locally, only the ceiling applies |
-| *(no flag)* | Full checkpoint before final review and at block close; main, dispatch, and daily CI | 77 of 77 | 3600 s | split across four jobs; not clocked whole |
+| `--fast` | contributor, at a block boundary; the union of the six tiers below | 67 of 78 | 600 s | record cleared 2026-09-07 when the corpus widened; 229.1 s locally, only the ceiling applies |
+| `--checks` | **CI, on every pull request**, in the `validate` job | 50 of 78 | 195 s | composition changed after two PR 160 runs exceeded the ceiling, which did not end the overruns (`think-lrs0`); only the ceiling applies |
+| `--frontend` | **CI, on every pull request**, in the `frontend` job, concurrently | 2 of 78 | 150 s | new partition; the first hosted run establishes its baseline |
+| `--geometry` | **CI, on every pull request**, in the `geometry` job, concurrently | 9 of 78 | 180 s | 91.6 s on CI, the mean of four readings |
+| `--suite-a` | **CI, on every pull request**, in the `suite-a` job, concurrently | 1 of 78 | 180 s | unmeasured; the first exact-head hosted run establishes its baseline |
+| `--suite-b` | **CI, on every pull request**, in the `suite-b` job, concurrently | 1 of 78 | 180 s | unmeasured; the first exact-head hosted run establishes its baseline |
+| `--sweeps` | **CI, on every pull request**, in the `sweeps` job, concurrently | 4 of 78 | 210 s | record cleared 2026-09-07 when two of its four steps were split; 58.5 s locally, only the ceiling applies |
+| *(no flag)* | Full checkpoint before final review and at block close; main, dispatch, and daily CI | 78 of 78 | 3600 s | split across four jobs; not clocked whole |
 
 `--geometry`’s cost is a geometric mean of four readings at the reference shape.
-`--suite`’s is a single reading, because the lane it measures is new: merging PR 137
-brought sixteen test files and the threshold work four more, taking the quick selection
-from 4,283 tests to 4,639, and
+The superseded `--suite` tier’s final record was a single reading: merging PR 137
+brought sixteen test files and the threshold work four more, taking that quick selection
+from 4,283 tests to 4,639.
 [run 34326478984](https://github.com/jlevy/squares/actions/runs/34326478984) cost 183.44
 s where the previous 118.72 s mean would have failed the drift rule at 1.55x. Nothing
 regressed: no test’s `call` phase reaches the per-test backstop, and the growth is in
@@ -187,10 +188,26 @@ and
 [88.84 s](https://github.com/jlevy/squares/actions/runs/34288782986/job/102270405743),
 whose 1.79x spread was runner variation rather than a code speedup — stays in the
 register as history of the previous selection.
-Refresh the means as comparable measurements accumulate; a recorded band would represent
-that variation better than a point.
-`--sweeps`, `--checks`, and `--frontend` have no recorded cost.
-The corpus widening of 2026-09-07 invalidated the first two baselines.
+
+The unsplit lane later grew to 6,096 passing tests and exceeded its 275-second ceiling
+twice, at 280.83 seconds and 278.93 seconds on exact-head hosted runs.
+The second run also reported six skips.
+Changing only xdist’s scheduler did not recover the target: the local default measured
+302.70 seconds, `loadscope` measured 318.54 seconds, and `worksteal` measured 323.69
+seconds. The latter two were rejected as 5.2 and 6.9 percent slower than the default.
+
+The current surface therefore runs two whole-module shards.
+Both jobs collect the complete quick lane; a deterministic largest-first assignment by
+collected item count places every module in exactly one shard, including newly added
+modules. `--dist=loadfile` keeps each module together inside its shard so module-scoped
+fixtures remain reusable.
+Both jobs install the browser toolchain and fetch full Git history because rebalancing
+may move any module between them.
+The two 180-second ceilings are premeasurement bounds: `--suite-a` and `--suite-b` have
+no hosted baselines until exact-head runs establish them.
+
+`--sweeps`, `--checks`, `--frontend`, `--suite-a`, and `--suite-b` have no recorded
+cost. The corpus widening of 2026-09-07 invalidated the first two baselines.
 Two of the sweeps tier’s four steps were split that day, so the tier those readings
 measured no longer exists.
 The `checks` record was cleared the same day and by its own rule firing rather than by
@@ -215,10 +232,10 @@ After `main` merged into the stack, #160 read 200.68 s and 199.74 s at `72629c03
   [D-472](defects.md) retains the calibration history, and `think-be1s` tracks the band
   representation.
 
-**The pull-request surface is `--checks`, `--frontend`, `--geometry`, `--suite` and
-`--sweeps` together, run as five concurrent CI jobs**, so a pull request waits for the
-longest part rather than for their sum.
-All five feed the stable `packing-required` aggregate context.
+**The pull-request surface is `--checks`, `--frontend`, `--geometry`, `--suite-a`,
+`--suite-b`, and `--sweeps` together, run as six concurrent CI jobs**, so a pull request
+waits for the longest part rather than for their sum.
+All six feed the stable `packing-required` aggregate context.
 Repository protection settings determine whether GitHub requires that context before a
 merge. `test_the_pull_request_jobs_partition_the_surface` reads the workflow and checks
 that they are pairwise disjoint and that they cover every step of `--fast` — so the
@@ -242,8 +259,9 @@ comparisons:
 
 All three runs are from 2026-09-06. The durations are observations, not necessary lower
 bounds or enforced tier baselines.
-The [tier table](#the-tiers) lists the current declarations: `--geometry` and `--suite`
-have measured baselines; `--checks`, `--frontend`, and `--sweeps` remain unmeasured.
+The [tier table](#the-tiers) lists the current declarations: `--geometry` has a measured
+baseline; `--checks`, `--frontend`, `--suite-a`, `--suite-b`, and `--sweeps` remain
+unmeasured.
 
 ### The behavioural lanes
 
@@ -251,19 +269,19 @@ have measured baselines; `--checks`, `--frontend`, and `--sweeps` remain unmeasu
 marker expressions over `slow` and `exhaustive_exact`. They are **complements**: every
 test satisfies exactly one, so no test can be in two lanes and none can be in zero.
 
-| Lane | Marker | Tests | Runs in | Bound |
+| Lane | Marker | Tests at last count | Runs in | Bound |
 | --- | --- | ---: | --- | --- |
-| quick | neither | 4,151 | PR fast surface | fails a test whose `call` phase reaches 12 s |
+| quick | neither | 6,102 selected (6,096 passed; 6 skipped) | PR fast surface, split across `suite-a` and `suite-b` | fails a test whose `call` phase reaches 12 s |
 | slow | `slow` | 97 | full checkpoint, under xdist in CI | fails a test whose `call` phase is under 1 s |
 | exhaustive | `exhaustive_exact` | 55 | its own CI job | its own 3600 s budget |
 
-Counts are a `--collect-only` of the three marker expressions on 2026-09-08, against the
-n = 1..324 corpus.
-They sum to the 4,303 tests the suite collects, which is the partition
-property above; they are not a fixed membership, and they move with the corpus.
-The quick lane read 3,944 here until 2026-09-08, when a re-count against the same
-expressions returned 4,151; a stale count in this table is how [D-488](defects.md)’s
-cause stayed invisible, since the tests grew and the budget bounding them did not.
+The quick count is from the second 2026-09-15 hosted run that exposed the unsplit lane’s
+timing failure. The slow and exhaustive counts are `--collect-only` readings from
+2026-09-08 against the n = 1..324 corpus.
+These are measurements rather than fixed membership; marker expressions determine the
+three lanes, and counts move with the corpus.
+A stale quick count in this table is how [D-488](defects.md)’s cause stayed invisible,
+since the tests grew and the budget bounding them did not.
 [Main run 34025346801](https://github.com/jlevy/squares/actions/runs/34025346801)
 reported 2,197 quick and 95 slow on 2026-09-06, before the corpus expansion of
 2026-09-07. The marker expressions determine current membership.
@@ -414,16 +432,17 @@ uv run --frozen --all-extras --group dev packing-validate --edit
 uv run --frozen --all-extras --group dev packing-validate --push
 
 # The pull-request surface: the edit tier plus every behavioral test under the
-# per-test ceiling. CI runs it as the five parts below, one per runner; run it whole
+# per-test ceiling. CI runs it as the six parts below, one per runner; run it whole
 # here, where there is only one machine and nothing to overlap with.
 uv run --frozen --all-extras --group dev packing-validate --fast
 
-# The five parts CI runs concurrently on a pull request. They partition --fast, so
-# running all five is running the surface and running one is running a part of it.
+# The six parts CI runs concurrently on a pull request. They partition --fast, so
+# running all six is running the surface and running one is running a part of it.
 uv run --frozen --all-extras --group dev packing-validate --checks
 uv run --frozen --all-extras --group dev packing-validate --frontend
 uv run --frozen --all-extras --group dev packing-validate --geometry
-uv run --frozen --all-extras --group dev packing-validate --suite
+uv run --frozen --all-extras --group dev packing-validate --suite-a
+uv run --frozen --all-extras --group dev packing-validate --suite-b
 uv run --frozen --all-extras --group dev packing-validate --sweeps
 
 # One named component. --only is repeatable and matches displayed step names.
