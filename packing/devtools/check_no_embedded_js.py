@@ -362,7 +362,11 @@ class _Scanner:
         self.nodes = list(ast.walk(tree))
         self.bindings = _bindings(self.nodes)
         self.returns = _returns(self.nodes)
-        self.loader_functions, self.loader_modules = _loader_names(self.nodes)
+        (
+            self.loader_functions,
+            self.wrapper_functions,
+            self.loader_modules,
+        ) = _loader_names(self.nodes)
 
     # -- string text -------------------------------------------------------------------
 
@@ -523,9 +527,17 @@ class _Scanner:
         func = node.func
         match func:
             case ast.Name(id=name) if name in self.loader_functions:
-                return "loader"
-            case ast.Attribute(value=receiver) if _dotted(receiver) in self.loader_modules:
-                return "loader"
+                verdict: Verdict = "loader"
+            case ast.Name(id=name) if name in self.wrapper_functions:
+                verdict = self._classify_wrapper(node, seen)
+            case ast.Attribute(value=receiver, attr="probe") if (
+                _dotted(receiver) in self.loader_modules
+            ):
+                verdict = "loader"
+            case ast.Attribute(value=receiver, attr="applied") if (
+                _dotted(receiver) in self.loader_modules
+            ):
+                verdict = self._classify_wrapper(node, seen)
             case ast.Attribute(value=receiver) if self.classify(receiver, seen) in {
                 "built",
                 "loader",
@@ -534,23 +546,35 @@ class _Scanner:
                 # method is named: `.decode()` and `.lower()` are no different from
                 # `.replace()`, and the allowlist of method names is what let a bytes
                 # constant through (#175 R1).
-                return "built"
+                verdict = "built"
             case ast.Name(id=name) if any(
                 self.text(returned) is not None for returned in self.returns.get(name, [])
             ):
                 # A helper in this module that returns text: the bypass is one `return`
                 # away, and signature-evading text came back through exactly that (L6).
-                return "built"
+                verdict = "built"
             case _ if any(self.text(argument) is not None for argument in node.args):
                 # A call handed text and returning a script is building one: `str(b"...")`,
                 # `b64decode("...")`, `dedent(...)` under any alias.
-                return "built"
+                verdict = "built"
             case _:
                 # A call to something written in another module. Rule 2 reads its text where
                 # that module writes it, which is also why `polynomial.evaluate(origin)` is
                 # not reported: `evaluate` is a name mathematics uses too, and calling a
                 # value nothing here can read a script would be a guess.
-                return "opaque"
+                verdict = "opaque"
+        return verdict
+
+    def _classify_wrapper(self, node: ast.Call, seen: frozenset[str]) -> Verdict:
+        """Accept `applied` only when its source came from the probe loader."""
+        named = [keyword.value for keyword in node.keywords if keyword.arg == "source"]
+        if node.args and not isinstance(node.args[0], ast.Starred) and not named:
+            source = node.args[0]
+        elif not node.args and len(named) == 1:
+            source = named[0]
+        else:
+            return "built"
+        return "loader" if self.classify(source, seen) == "loader" else "built"
 
     def _names_a_script_file(self, node: ast.expr, seen: frozenset[str] = frozenset()) -> bool:
         """Whether a `path=` expression reaches a literal naming a `.js` or `.ts` file."""
@@ -779,9 +803,12 @@ def _returns(nodes: Sequence[ast.AST]) -> dict[str, list[ast.expr]]:
     return returned
 
 
-def _loader_names(nodes: Sequence[ast.AST]) -> tuple[frozenset[str], frozenset[str]]:
-    """The names this module calls the probe loader by: functions, and module aliases."""
-    functions: set[str] = set()
+def _loader_names(
+    nodes: Sequence[ast.AST],
+) -> tuple[frozenset[str], frozenset[str], frozenset[str]]:
+    """The local names of `probe`, `applied`, and their module aliases."""
+    loaders: set[str] = set()
+    wrappers: set[str] = set()
     modules: set[str] = set()
     for node in nodes:
         match node:
@@ -789,7 +816,10 @@ def _loader_names(nodes: Sequence[ast.AST]) -> tuple[frozenset[str], frozenset[s
                 for alias in names:
                     local = alias.asname or alias.name
                     if module in LOADER_MODULES:
-                        functions.add(local)
+                        if alias.name == "probe":
+                            loaders.add(local)
+                        elif alias.name == "applied":
+                            wrappers.add(local)
                     elif f"{module}.{alias.name}" in LOADER_MODULES:
                         modules.add(local)
             case ast.Import(names=names):
@@ -798,7 +828,7 @@ def _loader_names(nodes: Sequence[ast.AST]) -> tuple[frozenset[str], frozenset[s
                         modules.add(alias.asname or alias.name)
             case _:
                 pass
-    return frozenset(functions), frozenset(modules)
+    return frozenset(loaders), frozenset(wrappers), frozenset(modules)
 
 
 def scan_source(path: str, source: str, policy: Policy) -> list[Site]:
