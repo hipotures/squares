@@ -10,13 +10,18 @@ tier through the CLI's own parser; the step table; the verdict; and the step cou
 says which tier the reading is of.
 """
 
+# The hosted-job filter is part of the reader's trust boundary, so it is tested directly.
+# ruff: noqa: SLF001
+# pyright: reportPrivateUsage=false
 from __future__ import annotations
 
 import math
 from pathlib import Path
+from typing import Any
 
 import pytest
 
+from devtools import read_tier_walls
 from devtools.read_tier_walls import geometric_mean, growth, parse_log, same_shape, step_means
 
 EXCERPT = (
@@ -31,6 +36,15 @@ def excerpt() -> str:
     return EXCERPT.read_text(encoding="utf-8")
 
 
+def budget_only_failure() -> str:
+    return excerpt().replace(
+        "49 of 74 STEPS PASSED (a named tier; this is not the full gate)",
+        "THE TIER IS OUTSIDE ITS DECLARED COST BAND:\n"
+        "  - the checks tier's recorded cost is stale\n"
+        "49 of 74 STEPS PASSED (the budget verdict alone failed)",
+    )
+
+
 def test_the_tier_and_its_wall_are_read_from_the_log() -> None:
     """The tier comes from the command, not from the job's name.
 
@@ -42,6 +56,48 @@ def test_the_tier_and_its_wall_are_read_from_the_log() -> None:
     assert reading.wall_seconds == 135.71
     assert reading.enforced
     assert reading.steps == "49 of 74"
+
+
+def test_a_budget_only_failed_job_remains_a_tier_reading(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class Client:
+        def jobs(self, _run_id: int) -> list[dict[str, Any]]:
+            return [
+                {
+                    "id": 123,
+                    "name": "validate",
+                    "status": "completed",
+                    "conclusion": "failure",
+                }
+            ]
+
+    monkeypatch.setattr(read_tier_walls, "_log", lambda _client, _job: budget_only_failure())
+
+    (reading,) = read_tier_walls._collect(Client(), [456], [])  # type: ignore[arg-type]
+
+    assert reading.run == 456
+    assert reading.steps == "49 of 74"
+    assert reading.budget_only_failure
+
+
+def test_an_ordinary_failed_job_is_not_a_tier_reading(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class Client:
+        def jobs(self, _run_id: int) -> list[dict[str, Any]]:
+            return [
+                {
+                    "id": 123,
+                    "name": "validate",
+                    "status": "completed",
+                    "conclusion": "failure",
+                }
+            ]
+
+    monkeypatch.setattr(read_tier_walls, "_log", lambda _client, _job: excerpt())
+
+    assert read_tier_walls._collect(Client(), [456], []) == []  # type: ignore[arg-type]
 
 
 def test_a_reading_off_the_reference_shape_is_not_counted() -> None:

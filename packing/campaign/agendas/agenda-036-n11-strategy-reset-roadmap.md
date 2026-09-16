@@ -408,7 +408,7 @@ agenda:
     purpose: research
     owner_focus: insight
     instances: [11]
-    state: in_progress
+    state: blocked
     priority: 0
     question: >-
       Does T-025's exact atom-support universe admit a certificate at side 3.82 with at
@@ -430,11 +430,11 @@ agenda:
       exact coverage routes agreeing; or exact infeasibility refutes it. Bounded search
       without a candidate may park only this family as unresolved.
     bead: think-ufmk
-    depends_on: [BC-354]
+    depends_on: [BC-354, BC-355]
     next_evidence: >-
-      Under think-ufmk, use a fresh branch to register exp-161, its exact source, target
-      budget, accept rule, stop rule, independent-review boundary, and retained evidence
-      paths before changing any weight or running coverage.
+      After BC-355 closes, under think-ufmk, use a fresh branch to register exp-161, its
+      exact source, target budget, accept rule, stop rule, independent-review boundary,
+      and retained evidence paths before changing any weight or running coverage.
     workflows: [pipeline-improvement, factual-review, research-loop]
     program: n11-strategy-reset
     artifacts:
@@ -622,10 +622,10 @@ BC-340 and BC-353 are complete.
 BC-354 stopped at Route A’s representation boundary: the complete physical root, matched
 exact baseline, conditional gate, and independent replay were not admitted.
 No target ran and no physical root closed.
-Route S / BC-343 is now in progress under `think-ufmk`. Its no-target PR merged as
-`1d9c49c4` from reviewed head `609d7d62`, freezing T-025’s exact 119-orbit support
-universe, the at-most-23 positive-orbit metric, deterministic decompression, and
-target-blind controls.
+Route S / BC-343 has an admitted no-target instrument and is blocked on BC-355’s
+closeout under `think-97we`. Its no-target PR merged as `1d9c49c4` from reviewed head
+`609d7d62`, freezing T-025’s exact 119-orbit support universe, the at-most-23
+positive-orbit metric, deterministic decompression, and target-blind controls.
 Session 135 discharged all four obligations retained by Session 134: complete T-025 and
 T-026 contents bound to a declared Git revision and repository-relative paths, both
 T-026 sentinels, a canonical source-bound manifest, and the complete X-032 mutation
@@ -641,9 +641,9 @@ gaps.
 The W10 review originally mapped six active hours into five sequential PR-bounded
 blocks. BC-340 and BC-353 completed, and BC-354 activated the selected-route admission’s
 guard-refusal branch.
-The remaining conditional path begins with a fresh planning branch under `think-ufmk`.
-That branch must register `exp-161`, its exact target, budget, accept rule, stop rule,
-and review boundary before any target access.
+After BC-355 closes, the remaining conditional path begins with a fresh planning branch
+under `think-ufmk`. That branch must register `exp-161`, its exact target, budget,
+accept rule, stop rule, and review boundary before any target access.
 Review and replanning follow the bounded run; no later branch starts before the prior PR
 merges.
 

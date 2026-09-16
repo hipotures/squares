@@ -59,6 +59,7 @@ STEP = re.compile(r"^\s*(?P<seconds>[0-9.]+)s  (?P<name>.+)$")
 COUNT = re.compile(r"^(?P<selected>\d+) of (?P<total>\d+) STEPS ")
 TIMESTAMP = re.compile(r"^\d{4}-\d\d-\d\dT[0-9:.]+Z ")
 UNENFORCED = "reported and not enforced"
+BUDGET_ONLY_FAILURE = "THE TIER IS OUTSIDE ITS DECLARED COST BAND:"
 TIMINGS = "== where the time went =="
 TOTAL = "TOTAL (wall)"
 #: Growth rows the attribution block names; the rest are summarised in the table.
@@ -72,6 +73,7 @@ class Reading:
     enforced: bool
     steps: str
     step_seconds: dict[str, float] = field(default_factory=dict)
+    budget_only_failure: bool = False
     run: int = 0
     job: str = ""
 
@@ -113,6 +115,8 @@ def parse_log(text: str) -> list[Reading]:
         notes: list[str] = []
         steps = "unknown"
         for following in lines[index + 1 :]:
+            if COMMAND.search(following):
+                break
             counted = COUNT.match(following)
             if counted:
                 steps = f"{counted.group('selected')} of {counted.group('total')}"
@@ -125,6 +129,7 @@ def parse_log(text: str) -> list[Reading]:
                 enforced=not any(UNENFORCED in note for note in notes),
                 steps=steps,
                 step_seconds=dict(timings),
+                budget_only_failure=any(BUDGET_ONLY_FAILURE in note for note in notes),
             )
         )
     return readings
@@ -177,9 +182,12 @@ def _collect(client: Client, run_ids: Sequence[int], tiers: Sequence[str]) -> li
     readings: list[Reading] = []
     for run_id in run_ids:
         for job in client.jobs(run_id):
-            if job.get("conclusion") != "success":
+            conclusion = job.get("conclusion")
+            if job.get("status") != "completed" or conclusion not in {"success", "failure"}:
                 continue
             for parsed in parse_log(_log(client, int(job["id"]))):
+                if conclusion == "failure" and not parsed.budget_only_failure:
+                    continue
                 if tiers and parsed.tier not in tiers:
                     continue
                 reading = Reading(**{**parsed.__dict__, "run": run_id, "job": str(job["name"])})

@@ -266,6 +266,60 @@ def test_a_partial_rerun_cannot_reuse_old_jobs_to_report_a_near_zero_wall(
     assert exit_status(verdict) == 1
 
 
+def test_a_partial_rerun_cannot_reuse_an_old_wall_endpoint(tmp_path: Path) -> None:
+    """The aggregator can lag onto a new attempt after its prerequisites settle."""
+    walls = load_walls(register(tmp_path))
+    entry = walls.workflow("packing-validation")
+    run, jobs = recorded(IN_BAND)
+    mixed = deepcopy(jobs)
+    aggregator = next(job for job in mixed if job["name"] == "packing-required")
+    prior_attempt = "2000-01-01T00:00:00+00:00"
+    aggregator["started_at"] = prior_attempt
+    aggregator["steps"].insert(
+        -1,
+        {
+            "name": check_pr_wall.WALL_STEP,
+            "conclusion": "success",
+            "started_at": prior_attempt,
+            "completed_at": prior_attempt,
+        },
+    )
+
+    measurement = measure(run, mixed, entry, walls.policy, kind="main")
+    verdict = judge(measurement, entry, walls.policy)
+
+    assert measurement.wall_seconds is None
+    assert verdict.status == "unmeasurable"
+    assert any(
+        "packing-required" in note and "partial rerun" in note for note in verdict.unjudged
+    )
+    assert any(check_pr_wall.WALL_STEP in note for note in verdict.unjudged)
+    assert exit_status(verdict) == 1
+
+
+def test_reversed_job_and_step_timestamps_are_unmeasurable(tmp_path: Path) -> None:
+    walls = load_walls(register(tmp_path))
+    entry = walls.workflow("packing-validation")
+    run, jobs = recorded(IN_BAND)
+    corrupted = deepcopy(jobs)
+    suite = next(job for job in corrupted if job["name"] == "suite")
+    suite["completed_at"] = "2000-01-01T00:00:00+00:00"
+    first_step = suite["steps"][0]
+    first_step["completed_at"] = "2000-01-01T00:00:00+00:00"
+
+    measurement = measure(run, corrupted, entry, walls.policy, kind="main")
+    verdict = judge(measurement, entry, walls.policy)
+
+    assert verdict.status == "unmeasurable"
+    assert any("`suite` completed before it started" in note for note in verdict.unjudged)
+    assert any(
+        "`suite` step" in note and "completed before it started" in note
+        for note in verdict.unjudged
+    )
+    suite_timing = next(timing for timing in measurement.jobs if timing.name == "suite")
+    assert suite_timing.wall_seconds is None
+
+
 def test_a_reported_aggregator_without_a_start_is_not_historical_fallback(
     tmp_path: Path,
 ) -> None:
@@ -559,6 +613,22 @@ def test_fractional_integer_fields_are_refused(
     assert old in document
     path.write_text(document.replace(old, new, 1), encoding="utf-8")
     with pytest.raises(WallError, match=rf"{field}.*positive integer"):
+        load_walls(path)
+
+
+@pytest.mark.parametrize(
+    "declaration",
+    ["    regression_ratio: 1.2\n", "    budget_seconds: 180.0\n"],
+)
+def test_duplicate_wall_fields_are_refused(tmp_path: Path, declaration: str) -> None:
+    path = register(tmp_path)
+    document = path.read_text(encoding="utf-8")
+    assert declaration in document
+    path.write_text(
+        document.replace(declaration, declaration + declaration, 1), encoding="utf-8"
+    )
+
+    with pytest.raises(WallError, match="duplicate key"):
         load_walls(path)
 
 

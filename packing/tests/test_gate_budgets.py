@@ -569,6 +569,34 @@ def test_an_attribution_that_names_no_growth_is_refused(tmp_path: Path) -> None:
         gate_budgets.load(spec)
 
 
+@pytest.mark.parametrize("field", ["jobs", "inner_jobs", "cpus"])
+def test_fractional_reference_resources_are_refused(tmp_path: Path, field: str) -> None:
+    spec = fabricated(tmp_path, ceiling=200.0, measured="100.0")
+    document = spec.read_text(encoding="utf-8")
+    old = f"{field}: 2" if field in {"jobs", "cpus"} else f"{field}: 1"
+    assert old in document
+    spec.write_text(document.replace(old, f"{field}: 1.5", 1), encoding="utf-8")
+
+    with pytest.raises(BudgetError, match=rf"reference\.{field}.*positive integer"):
+        gate_budgets.load(spec)
+
+
+@pytest.mark.parametrize(
+    "declaration",
+    ["  max_headroom: 2.0\n", "  ceiling_seconds: 200.0\n"],
+)
+def test_duplicate_budget_fields_are_refused(tmp_path: Path, declaration: str) -> None:
+    spec = fabricated(tmp_path, ceiling=200.0, measured="100.0")
+    document = spec.read_text(encoding="utf-8")
+    assert declaration in document
+    spec.write_text(
+        document.replace(declaration, declaration + declaration, 1), encoding="utf-8"
+    )
+
+    with pytest.raises(BudgetError, match="duplicate key"):
+        gate_budgets.load(spec)
+
+
 @pytest.mark.parametrize("before", [".nan", ".inf", "-.inf"])
 def test_an_attribution_before_cost_must_be_finite(tmp_path: Path, before: str) -> None:
     spec = fabricated(tmp_path, ceiling=200.0, measured="100.0")

@@ -138,7 +138,7 @@ hypothesis status and summarizes experiment verdicts, and the
 | Record | Count | State at the cutoff |
 | --- | ---: | --- |
 | Agendas | 35 | 15 active; 14 completed; 5 paused; 1 superseded |
-| Commitments | 344 | 177 complete; 59 stopped; 64 blocked; 15 ready; 20 tentative; 9 in progress |
+| Commitments | 344 | 177 complete; 59 stopped; 65 blocked; 15 ready; 20 tentative; 8 in progress |
 | Sessions | 136 | 84 completed; 52 stopped; all terminal |
 | Explorations | 33 | 20 linked to proposed hypotheses; 13 uncodified |
 | Hypotheses | 153 | 26 confirmed; 29 refuted; 50 blocked; 12 unresolved; 5 open; 28 open questions; 2 result registered; 1 abandoned; 0 running |
@@ -223,8 +223,8 @@ The current order is:
    Its source inventories found no complete 80-stratum negative-root producer, matched
    exact baseline, conditional gate, or method-distinct replay.
    No target ran and no physical root closed.
-3. BC-343 remains the active scientific commitment; `think-ufmk` is its sole scientific
-   entry after BC-355 closes.
+3. BC-343 remains the selected scientific commitment, blocked until BC-355 closes;
+   `think-ufmk` is its sole scientific entry after that closeout.
    [X-032](packing/campaign/explorations/X-032-route-s-threshold-compression.md) and
    [H-163](packing/campaign/hypotheses/H-163-route-s-threshold-compression.md) freeze
    T-025 as the sole matched control, its exact 119-orbit support universe, and the
@@ -957,9 +957,10 @@ shared-parent domain, rows-complete matched baseline, conditional-domain gate, o
 independent exact replay.
 No target ran, zero of the 16 physical roots closed, and this is not evidence against a
 future complete Route A representation.
-The scientific evidence cutoff remains main revision
-`80bcdbb0819504354e1278c37f211dd8cc2158fb`, where the latest merged stack is green and
-the T-026 lower bound remains the frontier.
+For the n = 11 Route A/Route S decision, the scientific evidence cutoff remains main
+revision `80bcdbb0819504354e1278c37f211dd8cc2158fb`. Later merged campaign and workbench
+records are included in the repository-wide roll-up above; none promotes an n = 11
+frontier result, so T-026 remains the n = 11 lower-bound frontier.
 
 **Immediate closeout action:** complete `think-97we` on the exact merged source.
 

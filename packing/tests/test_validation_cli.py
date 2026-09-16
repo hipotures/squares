@@ -1584,6 +1584,54 @@ def test_failure_summary_uses_singular_step_for_one_failure() -> None:
     assert "1 STEP FAILED:" in stdout.getvalue()
 
 
+@pytest.mark.parametrize(("tier", "expected_status"), [("typecheck", 1), (None, 0)])
+def test_an_unknown_budget_fails_only_a_whole_tier(
+    tier: str | None, expected_status: int
+) -> None:
+    summary = validate.RunSummary(
+        results=[],
+        wall_seconds=0.1,
+        selected_count=1,
+        total_count=1,
+        budget=gate_budgets.Verdict(
+            tier=tier,
+            wall_seconds=0.1,
+            status="unknown",
+            notes=("the tier register could not be read",),
+        ),
+    )
+    stdout = io.StringIO()
+
+    with redirect_stdout(stdout):
+        status = validate._render_text(summary, strict=False)
+
+    assert status == expected_status
+    if tier is not None:
+        assert "DECLARED COST COULD NOT BE JUDGED" in stdout.getvalue()
+
+
+def test_a_budget_only_failure_prints_a_machine_readable_pass_count() -> None:
+    summary = validate.RunSummary(
+        results=[],
+        wall_seconds=10.0,
+        selected_count=49,
+        total_count=80,
+        budget=gate_budgets.Verdict(
+            tier="checks",
+            wall_seconds=10.0,
+            status="failed",
+            failures=("the recorded cost is stale",),
+        ),
+    )
+    stdout = io.StringIO()
+
+    with redirect_stdout(stdout):
+        status = validate._render_text(summary, strict=False)
+
+    assert status == 1
+    assert "49 of 80 STEPS PASSED (the budget verdict alone failed)" in stdout.getvalue()
+
+
 def test_lint_floor_reaches_the_handwritten_skill_assets(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:

@@ -752,7 +752,7 @@ Status: **active**. Reconcile the merged research record, then choose among rout
 | BC-354 | tool_validation | 11 | complete | 0 | think-0t5y | Reopen only after one proposal supplies the complete 80-stratum negative-root producer, a rows-complete matched baseline, and two method-distinct exact coverage routes with shared physical variables. |
 | BC-341 | research | 11 | tentative | 1 | think-9y6q | Preserve the named Route A gaps and reconsider this discriminator only through a future W10 after a complete representation discharges them. |
 | BC-342 | research | 6, 11 | tentative | 1 | think-ol1z | Specify the n=6 control and the conflict-edge soundness obligation before selecting a solver. |
-| BC-343 | research | 11 | in_progress | 0 | think-ufmk | Under think-ufmk, use a fresh branch to register exp-161, its exact source, target budget, accept rule, stop rule, independent-review boundary, and retained evidence paths before changing any weight or running coverage. |
+| BC-343 | research | 11 | blocked | 0 | think-ufmk | After BC-355 closes, under think-ufmk, use a fresh branch to register exp-161, its exact source, target budget, accept rule, stop rule, independent-review boundary, and retained evidence paths before changing any weight or running coverage. |
 | BC-344 | research | 11 | tentative | 2 | think-29ch | Reproduce the 6+5 control at Trump's angle before interpreting any solver infeasibility. |
 | BC-345 | research | 11 | tentative | 3 | think-7n2w | Design the positive-control and endpoint-polishing contract before allocating the background search. |
 | BC-348 | research | 11 | tentative | 1 | think-u15l | Test the valid angle-count rows against the entire retained optimal face before building a larger certificate. |

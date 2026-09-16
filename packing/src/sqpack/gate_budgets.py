@@ -40,8 +40,10 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Literal
 
+import yaml
+
 from sqpack.project import configured_project_root
-from sqpack.yamlio import safe_load
+from sqpack.yamlio import load_yaml
 
 BUDGETS = configured_project_root() / "devtools/gate-budgets.yaml"
 #: How many of the slowest steps a verdict names. One is usually the whole story -- the
@@ -217,6 +219,13 @@ def _positive(value: object, what: str) -> float:
     return number
 
 
+def _positive_integer(value: object, what: str) -> int:
+    number = _positive(value, what)
+    if not number.is_integer():
+        raise BudgetError(f"{what} must be a positive integer, found {value!r}")
+    return int(number)
+
+
 def _optional_positive(value: object, what: str) -> float | None:
     return None if value is None else _positive(value, what)
 
@@ -321,11 +330,11 @@ def _tier_from(raw: object, index: int) -> TierBudget:
         command=_text(entry.get("command"), f"{where}.command"),
         ceiling_seconds=_positive(entry.get("ceiling_seconds"), f"{where}.ceiling_seconds"),
         reference=Reference(
-            jobs=int(_positive(reference.get("jobs"), f"{where}.reference.jobs")),
-            inner_jobs=int(
-                _positive(reference.get("inner_jobs"), f"{where}.reference.inner_jobs")
+            jobs=_positive_integer(reference.get("jobs"), f"{where}.reference.jobs"),
+            inner_jobs=_positive_integer(
+                reference.get("inner_jobs"), f"{where}.reference.inner_jobs"
             ),
-            cpus=int(_positive(reference.get("cpus"), f"{where}.reference.cpus")),
+            cpus=_positive_integer(reference.get("cpus"), f"{where}.reference.cpus"),
         ),
         argument=_text(entry.get("argument"), f"{where}.argument"),
         measured_seconds=measured,
@@ -343,7 +352,10 @@ def load(path: Path | None = None) -> Register:
         text = source.read_text(encoding="utf-8")
     except OSError as error:
         raise BudgetError(f"the tier register is unreadable at {source}: {error}") from error
-    document = _require_mapping(safe_load(text), str(source))
+    try:
+        document = _require_mapping(load_yaml(text), str(source))
+    except yaml.YAMLError as error:
+        raise BudgetError(f"the tier register is invalid YAML at {source}: {error}") from error
     policy_entry = _require_mapping(document.get("policy"), "policy")
     policy = Policy(
         max_headroom=_positive(policy_entry.get("max_headroom"), "policy.max_headroom"),

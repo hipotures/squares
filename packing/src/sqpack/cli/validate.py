@@ -4914,8 +4914,11 @@ def _render_early_exit(namespace: argparse.Namespace, selected: Sequence[Step]) 
 def _summary_status(summary: RunSummary, *, strict: bool) -> int:
     failed = any(result.status == "failed" for result in summary.results)
     skipped = any(result.status == "skipped" for result in summary.results)
-    over_budget = summary.budget is not None and summary.budget.failed
-    return 1 if failed or over_budget or (strict and skipped) else 0
+    budget_blocks = summary.budget is not None and (
+        summary.budget.failed
+        or (summary.budget.status == "unknown" and summary.budget.tier is not None)
+    )
+    return 1 if failed or budget_blocks or (strict and skipped) else 0
 
 
 def _render_text(summary: RunSummary, *, strict: bool) -> int:
@@ -4951,6 +4954,18 @@ def _render_text(summary: RunSummary, *, strict: bool) -> int:
         print("THE TIER IS OUTSIDE ITS DECLARED COST BAND:")
         for reason in budget.failures:
             print(f"  - {reason}")
+        print(
+            f"{summary.selected_count} of {summary.total_count} STEPS PASSED "
+            "(the budget verdict alone failed)"
+        )
+        return _summary_status(summary, strict=strict)
+    if (
+        budget is not None
+        and budget.status == "unknown"
+        and budget.tier is not None
+        and not failed
+    ):
+        print("THE TIER'S DECLARED COST COULD NOT BE JUDGED")
         return _summary_status(summary, strict=strict)
     if failed:
         noun = "STEP" if len(failed) == 1 else "STEPS"

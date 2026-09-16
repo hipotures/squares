@@ -64,10 +64,12 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Literal, Protocol
+from typing import Any, Literal, Protocol, override
 
 try:
     import yaml
+    from yaml.constructor import ConstructorError
+    from yaml.nodes import MappingNode
 except ImportError:  # pragma: no cover - only on an interpreter without PyYAML
     print(
         f"check_pr_wall: PyYAML is not importable by {sys.executable}; the register "
@@ -75,6 +77,35 @@ except ImportError:  # pragma: no cover - only on an interpreter without PyYAML
         file=sys.stderr,
     )
     raise SystemExit(2) from None
+
+
+class UniqueKeyLoader(yaml.CSafeLoader):
+    """The standalone wall checker's safe loader, with duplicate-key refusal."""
+
+    @override
+    def construct_mapping(self, node: MappingNode, deep: bool = False) -> dict[Any, Any]:
+        mapping: dict[Any, Any] = {}
+        for key_node, value_node in node.value:
+            key = self.construct_object(key_node, deep=deep)
+            try:
+                duplicated = key in mapping
+            except TypeError as error:
+                raise ConstructorError(
+                    "while constructing a mapping",
+                    node.start_mark,
+                    "found an unhashable mapping key",
+                    key_node.start_mark,
+                ) from error
+            if duplicated:
+                raise ConstructorError(
+                    "while constructing a mapping",
+                    node.start_mark,
+                    f"found duplicate key {key!r}",
+                    key_node.start_mark,
+                )
+            mapping[key] = self.construct_object(value_node, deep=deep)
+        return mapping
+
 
 REGISTER = Path(__file__).resolve().parent / "gate-budgets.yaml"
 API = "https://api.github.com"
@@ -258,14 +289,13 @@ def _kind_from(raw: object, where: str) -> KindRecord:
 def load_walls(path: Path = REGISTER) -> WallRegister:
     """Read `pull_request_walls` from the register, refusing what no rule could apply to."""
     try:
-        loader = getattr(yaml, "CSafeLoader", None)
-        if loader is None:
-            raise WallError("PyYAML has no C safe loader; refusing the slow fallback")
         document = _mapping(
-            yaml.load(path.read_text(encoding="utf-8"), Loader=loader), str(path)
+            yaml.load(path.read_text(encoding="utf-8"), Loader=UniqueKeyLoader), str(path)
         )
     except OSError as error:
         raise WallError(f"the register is unreadable at {path}: {error}") from error
+    except yaml.YAMLError as error:
+        raise WallError(f"the register is invalid YAML at {path}: {error}") from error
     section = _mapping(document.get("pull_request_walls"), "pull_request_walls")
     raw_policy = _mapping(section.get("policy"), "pull_request_walls.policy")
     ratio = _number(raw_policy.get("regression_ratio"), "policy.regression_ratio")
@@ -325,9 +355,9 @@ def _instant(value: object) -> datetime | None:
 
 def _span(start: object, end: object) -> float | None:
     begun, finished = _instant(start), _instant(end)
-    if begun is None or finished is None:
+    if begun is None or finished is None or finished < begun:
         return None
-    return max(0.0, (finished - begun).total_seconds())
+    return (finished - begun).total_seconds()
 
 
 def _job_id(name: str) -> str:
@@ -393,6 +423,15 @@ def measure(
             reasons.append(f"`{job['name']}` has no start time")
         if job.get("status") == "completed" and job_end is None:
             reasons.append(f"`{job['name']}` completed without an end time")
+        if job_start is not None and job_end is not None and job_end < job_start:
+            reasons.append(f"`{job['name']}` completed before it started")
+        for step in job.get("steps") or []:
+            step_start = _instant(step.get("started_at"))
+            step_end = _instant(step.get("completed_at"))
+            if step_start is not None and step_end is not None and step_end < step_start:
+                reasons.append(
+                    f"`{job['name']}` step {step.get('name')!r} completed before it started"
+                )
         if job.get("status") != "completed":
             reasons.append(f"`{job['name']}` has not completed ({job.get('status')})")
         elif job.get("conclusion") != "success":
@@ -416,6 +455,17 @@ def measure(
         else None
     )
     wall_step_start = _instant(wall_step.get("started_at")) if wall_step else None
+    if start is not None and aggregator_start is not None and aggregator_start < start:
+        reasons.append(
+            f"`{workflow.aggregator}` started before this attempt at "
+            f"{run.get('run_started_at')}; the jobs API mixed a prior attempt into a "
+            "partial rerun"
+        )
+    if start is not None and wall_step_start is not None and wall_step_start < start:
+        reasons.append(
+            f"`{WALL_STEP}` started before this attempt at {run.get('run_started_at')}; "
+            "the jobs API mixed a prior attempt into a partial rerun"
+        )
     if wall_step_start is not None:
         end, ends_at = wall_step_start, f"the start of `{WALL_STEP}`"
     elif (
@@ -434,7 +484,16 @@ def measure(
         ends_at = f"the last gating job's completion (this run has no `{workflow.aggregator}`)"
     else:
         end, ends_at = None, "nowhere: no gating job completed"
-    wall = None if start is None or end is None else max(0.0, (end - start).total_seconds())
+    if start is None or end is None:
+        wall = None
+    elif end < start:
+        wall = None
+        reasons.append(
+            f"the wall endpoint ({ends_at}) predates this attempt at "
+            f"{run.get('run_started_at')}"
+        )
+    else:
+        wall = (end - start).total_seconds()
     return Measurement(
         run_id=int(run["id"]),
         workflow=workflow.id,
