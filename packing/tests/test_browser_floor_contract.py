@@ -176,11 +176,12 @@ REMOVED_BIOME_OVERRIDES: tuple[dict[str, Any], ...] = (
 
 #: The liveness samples: code that breaks the floor on purpose, one for each tool -- a
 #: braceless `if` for Biome, a floating Promise for ESLint, a type error for `tsc` -- with the
-#: most bytes each may grow to. They are test data rather than source, so each is named
+#: exact byte count each must keep. They are test data rather than source, so each is named
 #: `.js.txt`: no tool's scope reaches it and no exclusion has to keep it out, which is what
 #: lets the floor have no exceptions. A test hands its tool a copy named as JavaScript under
 #: `tmp_path`, or its text on stdin. Declaring the files and their sizes keeps the tree to three
-#: minimal violations: a fourth file, or a sample that stops being minimal, fails the contract.
+#: minimal violations: a fourth file, or a sample that changes in either direction, fails the
+#: contract.
 FLOOR_SAMPLES = PROJECT_ROOT / "tests/fixtures/browser-floor"
 FLOOR_SAMPLE_BYTES = {
     "braceless-if.js.txt": 36,
@@ -191,6 +192,8 @@ FLOOR_SAMPLE_BYTES = {
 #: The only exclusions Biome's `files.includes` may write: what is not ours to hold to a floor,
 #: and minified output, of which none is tracked. Any other `!` pattern skips owned code.
 BIOME_EXCLUSIONS = frozenset({"!**/node_modules", "!vendor", "!**/.venv", "!**/*.min.js"})
+
+TYPE_ERROR_DIAGNOSTIC = "sample.js(1,12): error TS2345:"
 
 #: Directories whose JavaScript is not ours to hold to a floor: third-party code, vendored
 #: or installed. Minified files are excluded from Biome too, and none is tracked.
@@ -633,18 +636,27 @@ def _eslint_faults(tracked: Iterable[str], resolved: Iterable[Mapping[str, Any]]
 
 
 def _biome_exclusion_faults(config: Mapping[str, Any]) -> list[str]:
-    """Every `files.includes` exclusion beyond what is not ours: an owned tree Biome skips."""
-    return [
-        f"Biome excludes {pattern}"
+    """Every added or removed `files.includes` exclusion.
+
+    The declaration is exact in both directions: an extra exclusion can skip owned code, while
+    a missing exclusion silently puts installed, vendored, or generated code under the floor.
+    """
+    observed = frozenset(
+        pattern
         for pattern in config.get("files", {}).get("includes", [])
-        if pattern.startswith("!") and pattern not in BIOME_EXCLUSIONS
-    ]
+        if pattern.startswith("!")
+    )
+    faults = [f"Biome excludes {pattern}" for pattern in sorted(observed - BIOME_EXCLUSIONS)]
+    faults.extend(
+        f"Biome exclusion missing: {pattern}" for pattern in sorted(BIOME_EXCLUSIONS - observed)
+    )
+    return faults
 
 
 def _floor_sample_faults(tree: Path, declared: Mapping[str, int]) -> list[str]:
     """Every way the samples' tree differs from its declaration: a file it does not name, a
-    file it names that is gone, a file over its bytes, or a file named as source, which a
-    tool's scope would reach."""
+    file it names that is gone, a changed exact byte count, or a file named as source, which
+    a tool's scope would reach."""
     held = {
         path.relative_to(tree).as_posix(): path.stat().st_size
         for path in tree.rglob("*")
@@ -657,9 +669,9 @@ def _floor_sample_faults(tree: Path, declared: Mapping[str, int]) -> list[str]:
         f"declares {name}, which is not held" for name in sorted(set(declared) - set(held))
     )
     faults.extend(
-        f"{name} is {size} bytes, over the {declared[name]} declared"
+        f"{name} is {size} bytes, expected exactly {declared[name]}"
         for name, size in sorted(held.items())
-        if name in declared and size > declared[name]
+        if name in declared and size != declared[name]
     )
     faults.extend(
         f"{name} is named as source"
@@ -667,6 +679,15 @@ def _floor_sample_faults(tree: Path, declared: Mapping[str, int]) -> list[str]:
         if name.endswith((*SCRIPT_SUFFIXES, *STYLE_SUFFIXES))
     )
     return faults
+
+
+def _type_liveness_faults(returncode: int, output: str) -> list[str]:
+    """Refuse both a clean type-error sample and a nonzero exit for an unrelated reason."""
+    if returncode == 0:
+        return ["tsc accepted a type error under the floor's own options"]
+    if TYPE_ERROR_DIAGNOSTIC not in output:
+        return ["tsc failed without the intended sample.js TS2345 type error"]
+    return []
 
 
 def _biome_listed(command: str) -> set[str]:
@@ -887,22 +908,29 @@ def test_an_owned_tree_excluded_from_biome_is_refused() -> None:
     ]
 
 
+def test_a_declared_biome_exclusion_cannot_silently_disappear() -> None:
+    config = json.loads(json.dumps(_jsonc(BIOME_CONFIG)))
+    config["files"]["includes"].remove("!vendor")
+    assert _biome_exclusion_faults(config) == ["Biome exclusion missing: !vendor"]
+
+
 def test_the_floor_samples_are_exactly_the_declared_data() -> None:
     assert _floor_sample_faults(FLOOR_SAMPLES, FLOOR_SAMPLE_BYTES) == []
 
 
-def test_a_grown_or_sourced_sample_tree_is_refused(tmp_path: Path) -> None:
-    """The negative control: a tree that has grown a file, lost one, let a sample grow past
-    its size, and named one as source."""
+def test_a_changed_or_sourced_sample_tree_is_refused(tmp_path: Path) -> None:
+    """The negative control: a tree with an added file, a missing file, samples changed in
+    both byte-count directions, and one sample named as source."""
     for name in FLOOR_SAMPLE_BYTES:
         shutil.copyfile(FLOOR_SAMPLES / name, tmp_path / name)
     shutil.copyfile(FLOOR_SAMPLES / "type-error.js.txt", tmp_path / "type-error.js")
-    declared = {"braceless-if.js.txt": 35, "floating-promise.js.txt": 67, "gone.js.txt": 1}
+    declared = {"braceless-if.js.txt": 35, "floating-promise.js.txt": 68, "gone.js.txt": 1}
     assert _floor_sample_faults(tmp_path, declared) == [
         "holds type-error.js, which is not declared",
         "holds type-error.js.txt, which is not declared",
         "declares gone.js.txt, which is not held",
-        "braceless-if.js.txt is 36 bytes, over the 35 declared",
+        "braceless-if.js.txt is 36 bytes, expected exactly 35",
+        "floating-promise.js.txt is 67 bytes, expected exactly 68",
         "type-error.js is named as source",
     ]
 
@@ -1328,7 +1356,13 @@ def test_the_type_gate_actually_rejects_a_type_error(tmp_path: Path) -> None:
         text=True,
         cwd=tmp_path,
     )
-    assert done.returncode != 0, "tsc accepted a type error under the floor's own options"
+    assert _type_liveness_faults(done.returncode, done.stdout + done.stderr) == []
+
+
+def test_an_unrelated_tsc_failure_does_not_satisfy_the_type_liveness_control() -> None:
+    assert _type_liveness_faults(2, "error TS18003: No inputs were found in config file") == [
+        "tsc failed without the intended sample.js TS2345 type error"
+    ]
 
 
 # ---------------------------------------------------------------------------------------
