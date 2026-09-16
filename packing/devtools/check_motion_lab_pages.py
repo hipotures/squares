@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import argparse
 import difflib
+import io
 import json
 import sys
 import tempfile
@@ -35,6 +36,9 @@ from itertools import islice
 from pathlib import Path
 from typing import Any, TypedDict
 
+import numpy as np
+from numpy.typing import NDArray
+from PIL import Image
 from playwright.sync_api import ConsoleMessage, Error, Locator, Page, sync_playwright
 
 from devtools.render_general_motion_lab import (
@@ -49,6 +53,17 @@ from sqpack.probes import probe
 GOLDEN_REPORT = Path(__file__).resolve().parents[1] / "tests/golden/motion-lab-pages.json"
 PROBES = Path(__file__).resolve().parent / "probes"
 REMOVE_ELEMENT = probe(PROBES, "check_motion_lab_pages/remove_element")
+
+# Run 35075455272 showed that two Linux Chromium PNG encodings of the restored exact
+# stage need not be byte-identical. Decoded-pixel measurements on both pages changed at
+# least 176,572 pixels when the primary layer was removed, and zero for both live
+# mutants. Ignore a small antialiasing-channel delta, require substantive painted area,
+# and permit only a negligible restoration fringe.
+PIXEL_CHANNEL_TOLERANCE = 8
+MIN_PAINTED_PIXELS = 10_000
+MAX_RESTORATION_PIXELS = 256
+
+ImagePixels = NDArray[np.int16]
 
 #: The exact lab's readouts, each written by the page script's first update.
 EXACT_READOUTS = (
@@ -96,6 +111,8 @@ class PaintObservation:
 
     painted: bool
     restored: bool
+    painted_pixels: int | None = None
+    restoration_pixels: int | None = None
 
 
 @dataclass(frozen=True)
@@ -137,6 +154,42 @@ def _stage_pixels(stage: Locator) -> bytes:
     return stage.screenshot(animations="disabled", caret="hide", scale="css")
 
 
+def _image_pixels(content: bytes) -> ImagePixels:
+    with Image.open(io.BytesIO(content)) as image:
+        return np.asarray(image.convert("RGB"), dtype=np.int16)
+
+
+def _changed_pixels(left: bytes, right: bytes) -> int | None:
+    """Count materially changed pixels, or refuse screenshots with different shapes."""
+    left_pixels = _image_pixels(left)
+    right_pixels = _image_pixels(right)
+    if left_pixels.shape != right_pixels.shape:
+        return None
+    channel_delta = np.abs(left_pixels - right_pixels).max(axis=2)
+    return int(np.count_nonzero(channel_delta > PIXEL_CHANNEL_TOLERANCE))
+
+
+def _paint_observation(
+    baseline: bytes, without_geometry: bytes, restored: bytes
+) -> PaintObservation:
+    painted_pixels = _changed_pixels(baseline, without_geometry)
+    restoration_pixels = _changed_pixels(baseline, restored)
+    return PaintObservation(
+        painted=painted_pixels is not None and painted_pixels >= MIN_PAINTED_PIXELS,
+        restored=(
+            restoration_pixels is not None and restoration_pixels <= MAX_RESTORATION_PIXELS
+        ),
+        painted_pixels=painted_pixels,
+        restoration_pixels=restoration_pixels,
+    )
+
+
+def _difference_detail(changed: int | None) -> str:
+    if changed is None:
+        return "different screenshot dimensions"
+    return f"{changed} materially changed pixels"
+
+
 def _painted_geometry(page: Page, paint: PaintProbe) -> PaintObservation:
     """Whether removing representative geometry changes the pixels of its SVG stage."""
     stage = page.locator(paint.stage)
@@ -150,10 +203,7 @@ def _painted_geometry(page: Page, paint: PaintProbe) -> PaintObservation:
     finally:
         hidden_style.evaluate(REMOVE_ELEMENT)
     restored = _stage_pixels(stage)
-    return PaintObservation(
-        painted=baseline != without_geometry,
-        restored=baseline == restored,
-    )
+    return _paint_observation(baseline, without_geometry, restored)
 
 
 def _negative_control_fault(
@@ -166,9 +216,15 @@ def _negative_control_fault(
     finally:
         control_style.evaluate(REMOVE_ELEMENT)
     if not observed.restored:
-        return f"the paint check did not restore its {name} fixture"
+        return (
+            f"the paint check did not restore its {name} fixture: "
+            f"{_difference_detail(observed.restoration_pixels)}"
+        )
     if observed.painted:
-        return f"the paint check accepted its {name} negative control"
+        return (
+            f"the paint check accepted its {name} negative control: "
+            f"{_difference_detail(observed.painted_pixels)}"
+        )
     return None
 
 
@@ -273,7 +329,10 @@ def run_page(
             states = drive(page)
             observation = _painted_geometry(page, paint)
             if not observation.restored:
-                errors.append("the paint check did not restore its positive fixture")
+                errors.append(
+                    "the paint check did not restore its positive fixture: "
+                    f"{_difference_detail(observation.restoration_pixels)}"
+                )
             for name, css in (
                 ("opacity-zero", paint.opacity_zero_css),
                 ("transparent-paint", paint.transparent_css),

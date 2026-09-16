@@ -71,6 +71,10 @@ dev = [
     # fetches from Playwright's CDN on `playwright install`. The revision is pinned by
     # the wheel; the bytes at that URL are not hashed here.
     "playwright==1.62.0",
+    # Decodes Playwright's Motion Lab screenshots before comparing their pixels. This
+    # direct pin makes the devtool's import explicit rather than relying on CairoSVG's
+    # transitive dependency. 12.3.0 was published 77 days before adoption.
+    "pillow==12.3.0",
     # Renders the certificate explainer page: kpress supplies the design tokens,
     # the reading faces and the KaTeX distribution, all inlined into one file.
     # In `dev` rather than a group of its own because the type floor covers

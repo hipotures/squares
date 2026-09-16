@@ -4,10 +4,12 @@ from __future__ import annotations
 
 import json
 from copy import deepcopy
+from io import BytesIO
 from pathlib import Path
 from typing import Any
 
 import pytest
+from PIL import Image
 
 from devtools import check_motion_lab_pages as checker
 from sqpack.cli import validate
@@ -82,7 +84,12 @@ def test_a_live_negative_control_rejects_a_vacuous_paint_probe(
     monkeypatch.setattr(
         checker,
         "_painted_geometry",
-        lambda *_arguments: checker.PaintObservation(painted=True, restored=True),
+        lambda *_arguments: checker.PaintObservation(
+            painted=True,
+            restored=True,
+            painted_pixels=checker.MIN_PAINTED_PIXELS,
+            restoration_pixels=0,
+        ),
     )
 
     fault = checker._negative_control_fault(  # noqa: SLF001  # pyright: ignore[reportPrivateUsage]
@@ -92,8 +99,102 @@ def test_a_live_negative_control_rejects_a_vacuous_paint_probe(
         css=checker.EXACT_PAINT.opacity_zero_css,
     )
 
-    assert fault == "the paint check accepted its opacity-zero negative control"
+    assert fault == (
+        "the paint check accepted its opacity-zero negative control: "
+        f"{checker.MIN_PAINTED_PIXELS} materially changed pixels"
+    )
     assert inserted == [checker.EXACT_PAINT.opacity_zero_css]
+
+
+def _png(
+    pixels: list[tuple[int, int, int]], *, size: tuple[int, int], compression: int
+) -> bytes:
+    image = Image.new("RGB", size)
+    image.putdata(pixels)
+    encoded = BytesIO()
+    image.save(encoded, format="PNG", compress_level=compression)
+    return encoded.getvalue()
+
+
+def test_the_paint_oracle_compares_decoded_pixels_with_bounded_noise() -> None:
+    width = checker.MIN_PAINTED_PIXELS + checker.MAX_RESTORATION_PIXELS + 1
+    white = [(255, 255, 255)] * width
+    baseline = _png(white, size=(width, 1), compression=0)
+    reencoded = _png(white, size=(width, 1), compression=9)
+    assert baseline != reencoded
+
+    hidden_pixels = [(0, 0, 0)] * checker.MIN_PAINTED_PIXELS + white[
+        checker.MIN_PAINTED_PIXELS :
+    ]
+    hidden = _png(hidden_pixels, size=(width, 1), compression=0)
+    tolerated_pixels = white.copy()
+    tolerated_pixels[: checker.MAX_RESTORATION_PIXELS] = [(0, 0, 0)] * (
+        checker.MAX_RESTORATION_PIXELS
+    )
+    tolerated = _png(tolerated_pixels, size=(width, 1), compression=0)
+    rejected_pixels = tolerated_pixels.copy()
+    rejected_pixels[checker.MAX_RESTORATION_PIXELS] = (0, 0, 0)
+    rejected = _png(rejected_pixels, size=(width, 1), compression=0)
+
+    assert checker._paint_observation(  # noqa: SLF001  # pyright: ignore[reportPrivateUsage]
+        baseline, hidden, reencoded
+    ) == checker.PaintObservation(
+        painted=True,
+        restored=True,
+        painted_pixels=checker.MIN_PAINTED_PIXELS,
+        restoration_pixels=0,
+    )
+    assert checker._paint_observation(  # noqa: SLF001  # pyright: ignore[reportPrivateUsage]
+        baseline, hidden, tolerated
+    ).restored
+    assert not checker._paint_observation(  # noqa: SLF001  # pyright: ignore[reportPrivateUsage]
+        baseline, hidden, rejected
+    ).restored
+    assert not checker._paint_observation(  # noqa: SLF001  # pyright: ignore[reportPrivateUsage]
+        baseline, reencoded, reencoded
+    ).painted
+
+
+def test_the_pixel_metric_has_an_exact_channel_boundary_and_fails_closed() -> None:
+    baseline = _png([(100, 100, 100)], size=(1, 1), compression=0)
+    accepted = _png(
+        [(100 + checker.PIXEL_CHANNEL_TOLERANCE, 100, 100)],
+        size=(1, 1),
+        compression=0,
+    )
+    counted = _png(
+        [(100 + checker.PIXEL_CHANNEL_TOLERANCE + 1, 100, 100)],
+        size=(1, 1),
+        compression=0,
+    )
+    wider = _png([(100, 100, 100)] * 2, size=(2, 1), compression=0)
+
+    assert (
+        checker._changed_pixels(  # noqa: SLF001  # pyright: ignore[reportPrivateUsage]
+            baseline, accepted
+        )
+        == 0
+    )
+    assert (
+        checker._changed_pixels(  # noqa: SLF001  # pyright: ignore[reportPrivateUsage]
+            baseline, counted
+        )
+        == 1
+    )
+    assert (
+        checker._changed_pixels(  # noqa: SLF001  # pyright: ignore[reportPrivateUsage]
+            baseline, wider
+        )
+        is None
+    )
+    assert checker._paint_observation(  # noqa: SLF001  # pyright: ignore[reportPrivateUsage]
+        baseline, wider, wider
+    ) == checker.PaintObservation(
+        painted=False,
+        restored=False,
+        painted_pixels=None,
+        restoration_pixels=None,
+    )
 
 
 def test_a_wrong_computation_fails_the_committed_report(tmp_path: Path) -> None:
