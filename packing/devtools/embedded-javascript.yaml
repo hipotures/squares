@@ -1,4 +1,4 @@
-# No JavaScript in Python: what counts as JavaScript, and the files that still hold some.
+# No JavaScript in Python: what counts as JavaScript, with no recorded exceptions.
 #
 # Read by `devtools.check_no_embedded_js`, where the three rules are argued. The patterns
 # are data rather than Python constants for a reason the rule itself creates: a regular

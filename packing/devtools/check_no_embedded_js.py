@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""No JavaScript in Python strings: the guard, and the ratchet that retires what is left.
+"""No JavaScript in Python strings: the guard and its enforced empty exception set.
 
     uv run --frozen --all-extras --group dev python -m devtools.check_no_embedded_js
     uv run --frozen --all-extras --group dev python -m devtools.check_no_embedded_js --inventory
@@ -40,15 +40,10 @@ Each occurrence is one *site*:
 A bare string statement -- a docstring, or the attribute docstrings under a dataclass
 field -- is never a site: it is documentation, and it cannot reach a browser.
 
-**The ratchet.** The same YAML file lists each file that still offends, with its site count
-and the bead that removes them. The check fails when a file not on the list offends, when a
-count grows, when a count shrinks without the list being lowered to match, and when a
-listed file no longer offends at all. `--since REF` adds the other half, which the YAML's
-"Entries only ever leave" used to assert without checking: no entry the base does not have,
-and no count above the base's. Failing on an unrecorded shrink is deliberate: a
-count left above the real number is headroom a later edit can fill without anything
-objecting. `--inventory` prints every site and the list as the scan sees it, which is how
-the list was first written.
+**The exception check.** The YAML's enforced exception set is empty, so any site fails.
+The ratchet machinery remains because older revisions had recorded exceptions and
+`--since REF` must still prove that a branch did not reintroduce one or raise a historical
+count. `--inventory` prints every detected site.
 
 Files are the repository's tracked and untracked-but-unignored `*.py`, as git lists them.
 A source snapshot with no git of its own, which is what the negative controls run in, is
@@ -487,8 +482,17 @@ class _Scanner:
                 verdict = "built" if "built" in sides else "opaque"
             case ast.IfExp(body=body, orelse=orelse):
                 verdict = _merged({self.classify(body, seen), self.classify(orelse, seen)})
+            case ast.BoolOp(values=values):
+                # `a or b` and `a and b` return an operand, not a Boolean. A file-backed
+                # probe combined with built text can therefore still hand that text to
+                # Playwright; merge every possible value just as for a conditional.
+                verdict = _merged({self.classify(value, seen) for value in values})
             case ast.Name(id=name):
                 verdict = self._classify_name(name, seen)
+            case ast.Lambda():
+                # A callable handed directly to Playwright is executable source, and a
+                # called lambda is handled from `_classify_call` below.
+                verdict = "unknown"
             case ast.Subscript() | ast.Attribute() | ast.Starred() | ast.Await():
                 # A value this declines to follow, and every one of them can hold text:
                 # `S["a"]`, `self.SCRIPT`, `*args`, `await build()` (#175 R3).
@@ -504,7 +508,6 @@ class _Scanner:
                 | ast.DictComp()
                 | ast.GeneratorExp()
                 | ast.Compare()
-                | ast.BoolOp()
                 | ast.UnaryOp()
             ):
                 # Not text, so not a script: a number, a container, a predicate. Any string
@@ -526,6 +529,11 @@ class _Scanner:
     def _classify_call(self, node: ast.Call, seen: frozenset[str]) -> Verdict:
         func = node.func
         match func:
+            case ast.Lambda(body=body):
+                # Unlike an imported callable, this function's return expression is
+                # visible here. Treat it by the same default-deny rules as a named local
+                # helper rather than accepting it as an opaque external call.
+                verdict = self.classify(body, seen)
             case ast.Name(id=name) if name in self.loader_functions:
                 verdict: Verdict = "loader"
             case ast.Name(id=name) if name in self.wrapper_functions:
@@ -582,20 +590,63 @@ class _Scanner:
         return "loader" if self.classify(source, seen) == "loader" else "built"
 
     def _names_a_script_file(self, node: ast.expr, seen: frozenset[str] = frozenset()) -> bool:
-        """Whether a `path=` expression reaches a literal naming a `.js` or `.ts` file."""
-        for inner in ast.walk(node):
-            match inner:
-                case ast.Constant(value=str() as value) if value.endswith(SCRIPT_SUFFIXES):
-                    return True
+        """Whether the *effective* `path=` expression names checked browser source.
+
+        This is deliberately an outer-expression analysis, not an AST walk: in
+        `Path("decoy.js").with_suffix(".txt")`, the descendant `.js` literal is not the
+        suffix Playwright opens. Unknown transformations fail closed.
+        """
+        text = self.text(node)
+        if text is not None:
+            accepted = text.endswith(SCRIPT_SUFFIXES)
+        else:
+            match node:
                 case ast.Name(id=name) if name not in seen:
-                    if any(
-                        self._names_a_script_file(value, seen | {name})
-                        for value in self.bindings.get(name, [])
-                    ):
-                        return True
+                    values = self.bindings.get(name, [])
+                    accepted = bool(values) and all(
+                        self._names_a_script_file(value, seen | {name}) for value in values
+                    )
+                case ast.BinOp(op=ast.Div() | ast.Add(), right=right):
+                    # For pathlib joins and string concatenation, the final component owns
+                    # the suffix. `text` above already handled a fully readable string.
+                    accepted = self._names_a_script_file(right, seen)
+                case ast.IfExp(body=body, orelse=orelse):
+                    accepted = self._names_a_script_file(
+                        body, seen
+                    ) and self._names_a_script_file(orelse, seen)
+                case ast.BoolOp(values=values):
+                    accepted = bool(values) and all(
+                        self._names_a_script_file(value, seen) for value in values
+                    )
+                case ast.Call(func=ast.Name(id=name), args=[first, *_]) if name in {
+                    "Path",
+                    "PurePath",
+                    "str",
+                }:
+                    accepted = self._names_a_script_file(first, seen)
+                case ast.Call(
+                    func=ast.Attribute(attr="with_suffix"),
+                    args=[suffix, *_],
+                ):
+                    accepted = self._names_a_script_file(suffix, seen)
+                case ast.Call(
+                    func=ast.Attribute(attr="with_name"),
+                    args=[name, *_],
+                ):
+                    accepted = self._names_a_script_file(name, seen)
+                case ast.Call(
+                    func=ast.Attribute(attr="joinpath"),
+                    args=[*_, last],
+                ):
+                    accepted = self._names_a_script_file(last, seen)
+                case ast.Call(
+                    func=ast.Attribute(value=value, attr="resolve" | "absolute" | "expanduser"),
+                    args=[],
+                ):
+                    accepted = self._names_a_script_file(value, seen)
                 case _:
-                    pass
-        return False
+                    accepted = False
+        return accepted
 
     def refused_arguments(self) -> Iterator[ast.expr]:
         """The arguments refused without being classified, because there is nothing to read.
