@@ -341,14 +341,16 @@ on.
 It is not the next thing, because a reassessment of what to search is queued in front
 of it.
 
-For the next supervised exact-research goal, certify and merge BC-343 through
-`think-so4g` on the separate no-target Route S admission pull request.
+For the next supervised exact-research goal, continue BC-343 under `think-ufmk` on a
+fresh Route S planning branch.
 BC-354 stopped at Route A’s representation boundary without running a target or closing
 a physical root. Session 135 admitted the fixed T-025 support family after checker-owned
 T-025/T-026 anchors, both T-026 sentinels, the at-most-23 active-orbit ceiling, a
 canonical manifest, the complete mutation controls, and a source-distinct re-audit all
-passed. No optimizer, candidate, coverage target, or experiment ran.
-A fresh branch must register `exp-161` before scientific target access.
+passed.
+PR 182 then merged the instrument as `1d9c49c4` from reviewed head `609d7d62`. No
+optimizer, candidate, coverage target, or experiment ran.
+The fresh branch must register `exp-161` before scientific target access.
 BC-341 remains tentative behind a future W10 reselection and the complete Route A
 representation it still lacks.
 The current evidence, candidate dispositions, and post-W5 scientific order are in the
