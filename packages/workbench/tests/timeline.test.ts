@@ -50,9 +50,9 @@ function near(actual: number, expected: number): void {
 test("four-span timing preserves correction in single, continuous and annealed paths", () => {
   const config = configuration();
   near(pairDuration(config, 0, "tween"), 1.15);
-  near(pairDuration(config, 1, "physics"), 2.4);
+  near(pairDuration(config, 1, "physics"), 2.64);
   config.anneal = 8;
-  near(pairDuration(config, 1, "physics"), 2.8);
+  near(pairDuration(config, 1, "physics"), 3.16);
   near(pairDuration(config, 1, "tween"), 2.4);
   near(continuousTiming(config, 0, "bodies").correct, 0.12);
   config.continuous.on = false;
@@ -69,6 +69,7 @@ test("simple transitions play every phase at double speed only while the setting
   config.simple = [true, false, true, false];
   const full = [0, 1, 2, 3].map((index) => pairDuration(config, index, "tween"));
   const fullSequence = sequenceDuration(config, "tween");
+  const fullRange = rangeDuration(config, { from: 2, to: 18 }, "tween");
   config.fastSimple = true;
   assert.deepEqual(
     [0, 1, 2, 3].map((index) => isSpedUpPair(config, index)),
@@ -80,6 +81,10 @@ test("simple transitions play every phase at double speed only while the setting
   near(
     sequenceDuration(config, "tween"),
     fullSequence - ((full[0] ?? Number.NaN) + (full[2] ?? Number.NaN)) / 2,
+  );
+  near(
+    rangeDuration(config, { from: 2, to: 18 }, "tween"),
+    fullRange - ((full[0] ?? Number.NaN) + (full[2] ?? Number.NaN)) / 2,
   );
   const beat = pairTiming(config, 2, "tween");
   near(beat.dwell, 0.2);
@@ -137,22 +142,76 @@ test("staging exposes arrival, free movement, correction and facts-panel count",
   near(pairSchedule(config, 1, "tween").arrive, 0.8 + (0.8 * 2) / 3);
 });
 
-test("box-first holds arrival and block motion until its share of the move has passed", () => {
+test("physical staged phases add arrival time without compressing body motion", () => {
+  const config = configuration();
+  const addFirst = pairSchedule(config, 1, "physics");
+  near(addFirst.moveStart, 0.8);
+  near(addFirst.arrive, 0.8);
+  near(addFirst.arrived, 1.04);
+  near(addFirst.blocksStart, 1.04);
+  near(addFirst.blocksEnd - addFirst.blocksStart, 0.8);
+  near(addFirst.moveEnd, 1.84);
+  near(addFirst.end, 2.64);
+
+  config.phase = "move-then-add";
+  const addLast = pairSchedule(config, 1, "bodies");
+  near(addLast.blocksStart, 0.8);
+  near(addLast.blocksEnd, 1.6);
+  near(addLast.arrive, 1.6);
+  near(addLast.arrived, 1.84);
+  near(addLast.moveEnd, 1.84);
+  near(addLast.end, 2.64);
+
+  config.phase = "simultaneous";
+  near(pairDuration(config, 1, "physics"), 2.4);
+  config.phase = "add-then-move";
+  near(pairDuration(config, 0, "physics"), 1.15);
+});
+
+test("container delay starts resize after the square appears without shifting square motion", () => {
   const config = configuration();
   const plain = pairSchedule(config, 1, "tween");
-  config.boxFirst = 0.32;
-  const held = pairSchedule(config, 1, "tween");
+  config.containerDelay = 0.2;
+  const delayed = pairSchedule(config, 1, "tween");
   const span = plain.moveEnd - plain.moveStart;
-  near(held.moveStart, plain.moveStart);
-  near(held.moveEnd, plain.moveEnd);
-  near(held.arrive, plain.moveStart + 0.32 * span);
-  near(held.arrived, held.arrive + 0.68 * span * 0.3);
-  near(held.blocksStart, held.arrived);
-  near(held.blocksEnd, plain.moveEnd);
+  near(delayed.moveStart, plain.moveStart);
+  near(delayed.moveEnd, plain.moveEnd);
+  near(delayed.arrive, plain.arrive);
+  near(delayed.arrived, plain.arrived);
+  near(delayed.blocksStart, plain.blocksStart);
+  near(delayed.blocksEnd, plain.blocksEnd);
+  near(delayed.containerStart, delayed.arrive + 0.2 * span);
+  assert.ok(delayed.arrive < delayed.containerStart);
+  config.phase = "move-then-add";
+  const afterMotion = pairSchedule(config, 1, "physics");
+  near(afterMotion.containerStart, afterMotion.arrive + 0.2 * span);
   config.phase = "simultaneous";
-  near(pairSchedule(config, 1, "tween").blocksStart, plain.moveStart + 0.32 * span);
-  config.boxFirst = 1.5;
-  assert.throws(() => pairSchedule(config, 1, "tween"), /box-first fraction/);
+  const together = pairSchedule(config, 1, "bodies");
+  near(together.containerStart, together.arrive + 0.2 * span);
+  config.phase = "move-then-add";
+  config.containerDelay = 0.25;
+  const almostLatest = pairSchedule(config, 1, "physics");
+  config.containerDelay = 0.3;
+  const settleResize = pairSchedule(config, 1, "physics");
+  near(
+    almostLatest.containerEnd - almostLatest.containerStart,
+    settleResize.containerEnd - settleResize.containerStart,
+  );
+  near(settleResize.containerStart, settleResize.moveEnd);
+  near(settleResize.containerEnd, settleResize.moveEnd + span * 0.3);
+  assert.ok(settleResize.containerEnd > settleResize.containerStart);
+  assert.ok(settleResize.end > settleResize.containerEnd);
+  config.continuous.on = false;
+  config.timing.settle = 0;
+  const noSettle = pairSchedule(config, 1, "tween");
+  assert.ok(noSettle.containerEnd > noSettle.containerStart);
+  near(noSettle.end, noSettle.containerEnd);
+  near(pairDuration(config, 1, "tween"), noSettle.end);
+  config.continuous.on = true;
+  config.continuous.beat.settle = 0;
+  near(rangeDuration(config, { from: 3, to: 3 }, "tween"), pairDuration(config, 1, "tween"));
+  config.containerDelay = 1.5;
+  assert.throws(() => pairSchedule(config, 1, "tween"), /container-delay fraction/);
 });
 
 test("rotation-first and slide-first are distinct pure schedules", () => {
@@ -169,6 +228,8 @@ test("sequence seeking and sparse ranges share endpoint ownership", () => {
   const config = configuration();
   near(sequenceDuration(config, "tween"), 7.1);
   near(rangeDuration(config, { from: 2, to: 18 }, "tween"), 7.1);
+  near(sequenceDuration(config, "physics"), 7.58);
+  near(rangeDuration(config, { from: 2, to: 18 }, "physics"), 7.58);
   assert.deepEqual(seekSequence(config, "tween", 1.15), { index: 1, time: 0 });
   const end = seekSequence(config, "tween", 999);
   assert.equal(end.index, 3);

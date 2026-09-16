@@ -6,6 +6,7 @@ import {
   interpolateBlockPose,
   type MotionTrack,
 } from "../src/animation/illustration.ts";
+import { pairSchedule, type TimelineConfiguration } from "../src/animation/timeline.ts";
 import { captureIllustration, captureTimes } from "../src/app/capture.ts";
 import type { PaintedSceneFrame } from "../src/view/scene-types.js";
 import {
@@ -41,6 +42,8 @@ const input: IllustrationInput = {
     end: 5,
     arrive: 3,
     arrived: 4,
+    containerStart: 3.2,
+    containerEnd: 4,
     blocksStart: 1,
     blocksEnd: 3,
     roll: 0.4,
@@ -80,16 +83,21 @@ function stage(): StageTargets & { svg: Target } {
   };
 }
 
-test("an illustration preserves explicit arrival, variable side, rotation and the final pose", () => {
+test("an illustration presents the arriving square before the delayed container resize", () => {
   const before = seek(0).scene;
   const moving = seek(2).scene;
+  const squareFirst = seek(3.1).scene;
+  const resizing = seek(3.3).scene;
   const arrived = seek(4).scene;
   const end = seek(5).scene;
   assert.equal(before.containerSide, 1);
   assert.equal(before.squares[1]?.opacity, 0);
   assert.equal(moving.squares[0]?.angleDegrees, 45);
-  assert.equal(moving.containerSide, 1.5);
+  assert.equal(moving.containerSide, 1);
   assert.equal(moving.squares[1]?.opacity, 0);
+  assert.ok((squareFirst.squares[1]?.opacity ?? 0) > 0);
+  assert.equal(squareFirst.containerSide, 1);
+  assert.ok(resizing.containerSide > 1);
   assert.equal(arrived.squares[1]?.opacity, 1);
   assert.equal(arrived.containerSide, 2);
   assert.deepEqual(
@@ -102,6 +110,81 @@ test("an illustration preserves explicit arrival, variable side, rotation and th
   assert.equal(end.presentation.newTint, 0);
   assert.equal(end.motion, "direct-illustration");
   assert.deepEqual(seek(2), seek(2));
+});
+
+test("a resize delayed to the move boundary remains continuous through settle", () => {
+  const delayed = (seconds: number) =>
+    illustrationFrame({
+      ...input,
+      seconds,
+      schedule: {
+        ...input.schedule,
+        containerStart: input.schedule.moveEnd,
+        containerEnd: 4.5,
+      },
+    });
+  assert.equal(delayed(4).containerSide, 1);
+  assert.ok(delayed(4 + Number.EPSILON * 4).containerSide >= 1);
+  assert.ok(delayed(4.25).containerSide > 1);
+  assert.ok(delayed(4.25).containerSide < 2);
+  assert.equal(delayed(4.5).containerSide, 2);
+});
+
+test("adjacent late delay settings retain the same smooth 60 Hz resize", () => {
+  const timing = { dwell: 0, move: 0.55, correct: 0.25, settle: 0.8 };
+  const configuration: TimelineConfiguration = {
+    pairs: [{ n: 2, kind: "matched" }],
+    timing,
+    continuous: { on: false, fullBeat: false, beat: timing, staticBeat: timing },
+    anneal: 3,
+    phase: "move-then-add",
+    arrivalFraction: 0.3,
+    newFraction: 1 / 3,
+    rollMax: 0.4,
+  };
+  const maximumSteps: number[] = [];
+  for (const delay of [0.25, 0.3]) {
+    configuration.containerDelay = delay;
+    const schedule = pairSchedule(configuration, 0, "tween");
+    const sides: number[] = [];
+    for (
+      let seconds = schedule.containerStart;
+      seconds < schedule.containerEnd;
+      seconds += 1 / 60
+    ) {
+      sides.push(illustrationFrame({ ...input, schedule, seconds }).containerSide);
+    }
+    sides.push(
+      illustrationFrame({ ...input, schedule, seconds: schedule.containerEnd }).containerSide,
+    );
+    maximumSteps.push(
+      Math.max(...sides.slice(1).map((side, index) => side - (sides[index] ?? side))),
+    );
+  }
+  const first = maximumSteps[0];
+  const second = maximumSteps[1];
+  assert.ok(first !== undefined && second !== undefined);
+  assert.ok(first < 0.22);
+  assert.ok(second < 0.22);
+  assert.ok(Math.abs(first - second) < 1e-12);
+
+  configuration.timing.settle = 0;
+  configuration.continuous.beat.settle = 0;
+  configuration.continuous.staticBeat.settle = 0;
+  const noSettle = pairSchedule(configuration, 0, "tween");
+  assert.ok(noSettle.containerEnd > noSettle.moveEnd);
+  const start = illustrationFrame({
+    ...input,
+    schedule: noSettle,
+    seconds: noSettle.containerStart,
+  }).containerSide;
+  const firstFrame = illustrationFrame({
+    ...input,
+    schedule: noSettle,
+    seconds: noSettle.containerStart + 1 / 60,
+  }).containerSide;
+  assert.equal(start, input.fromSide);
+  assert.ok(firstFrame > start && firstFrame - start < 0.22);
 });
 
 test("block members follow a common pivot with their own target residual", () => {
@@ -131,6 +214,8 @@ test("zero duration arrival is a deterministic step and the previous mark disapp
       end: 1,
       arrive: 1,
       arrived: 1,
+      containerStart: 1,
+      containerEnd: 1,
       blocksStart: 1,
       blocksEnd: 1,
       roll: 0,
@@ -147,7 +232,7 @@ test("DOM and standalone SVG use the same transforms and reject bad input before
   renderStage(targets, frame);
   const view = targets.svg.attributes.get("viewBox")?.split(" ").map(Number);
   assert.ok(view !== undefined);
-  for (const [index, expected] of [-0.0675, -1.5675, 1.635, 1.635].entries()) {
+  for (const [index, expected] of [-0.045, -1.045, 1.09, 1.09].entries()) {
     const observed = view[index];
     assert.ok(observed !== undefined && Math.abs(observed - expected) < 1e-12);
   }

@@ -140,9 +140,9 @@ hypothesis status and summarizes experiment verdicts, and the
 | Agendas | 35 | 15 active; 14 completed; 5 paused; 1 superseded |
 | Commitments | 344 | 177 complete; 59 stopped; 64 blocked; 15 ready; 20 tentative; 9 in progress |
 | Sessions | 136 | 84 completed; 52 stopped; all terminal |
-| Explorations | 32 | 19 linked to proposed hypotheses; 13 uncodified |
-| Hypotheses | 150 | 26 confirmed; 27 refuted; 50 blocked; 12 unresolved; 5 open; 27 open questions; 2 result registered; 1 abandoned; 0 running |
-| Experiments | 126 | 39 accepted; 32 rejected; 30 unresolved; 12 baseline; 11 blocked; 2 abandoned; 0 in progress |
+| Explorations | 33 | 20 linked to proposed hypotheses; 13 uncodified |
+| Hypotheses | 153 | 26 confirmed; 29 refuted; 50 blocked; 12 unresolved; 5 open; 28 open questions; 2 result registered; 1 abandoned; 0 running |
+| Experiments | 128 | 39 accepted; 34 rejected; 30 unresolved; 12 baseline; 11 blocked; 2 abandoned; 0 in progress |
 | Frontier results | 26 | 26 registered |
 
 <!-- END CURRENT-RESEARCH-STATUS -->
@@ -3899,6 +3899,9 @@ round that names the hypothesis, control roles included.
 | [H-210](packing/campaign/hypotheses/H-210-no-valid-packing.md) | open | the blind physics never settles to a valid packing; registered from exp-210’s runs, so untested | 0 | — |
 | [H-211](packing/campaign/hypotheses/H-211-the-shake-has-a-sweet-spot.md) | open | the shake has a sweet spot, and the shipped value is far below it; registered from exp-208’s table, so untested | 0 | — |
 | [H-212](packing/campaign/hypotheses/H-212-the-workbench-physics-as-a-search.md) | open question | what the workbench’s blind physics does, measured as a search; holds the exploratory rounds exp-208 to exp-210 | 3 | 3 rounds unrecorded |
+| [H-213](packing/campaign/hypotheses/H-213-adaptive-animate-integration.md) | refuted | Law-driven integration substeps remove Animate’s cap-to-cap contact ringing at the registered transitions while retaining mean motion | 1 | Shared frozen-commit matrix |
+| [H-214](packing/campaign/hypotheses/H-214-presets-have-distinct-kinetics.md) | refuted | Rigid has less penetration than soft and sticky gathers more contacts than balanced in every registered solver-transition cell | 1 | 86.689s frozen-commit matrix |
+| [H-215](packing/campaign/hypotheses/H-215-kinetics-predict-search-quality.md) | open question | Which headless kinetic measurements, if any, predict that a fixed-budget search setting will produce better valid packings? | 0 | — |
 
 ### Confirmed
 
@@ -4192,9 +4195,9 @@ The relevant generator writes the receipt, and the entry fills in on the next
 
 ## Experiments Conducted
 
-There are 126 rounds registered in `series-000`.
+There are 128 rounds registered in `series-000`.
 
-They record 2512.1 agent-minutes and 1798.3 wall-minutes.
+They record 2512.1 agent-minutes and 1799.7 wall-minutes.
 These totals exclude four historical annealing rounds with unrecorded timing; their wall
 and operator costs are unknown, not zero.
 Exp129 closed as blocked without invocation and contributes zero scientific elapsed
@@ -4362,6 +4365,8 @@ archive beside it.
 | [exp-208](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-208-h211-the-shake-dial.md) | 11 | target | H-212 | The shake dial from level 0 to 10, on repaired runs | At levels 0, 2 and 4 no repaired run in 3,000 beat the grid at n = 5, 10 or 11, and at levels 6, 8 and 10 the best run did in eight of nine cells, the ninth within 5,000 seeds, but each value is one prefix from one seed stream and the page’s own level 3 was not measured on repaired runs. | unresolved |
 | [exp-209](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-209-h211-an-unretained-compaction-pass.md) | 11 | target | H-212 | A compaction pass over repaired runs, run inline and not kept | The compaction program, its inputs and its outputs were not kept, so the observation cannot be reproduced and supports no conclusion about whether repaired arrangements are locally compact. | unresolved |
 | [exp-210](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-210-h210-blind-runs-are-not-packings.md) | 11 | target | H-212 | Blind runs of the workbench’s physics end with squares overlapping | Every blind run observed ended overlapping, but the snapped control was measured once with a probe variant that was not kept, and neither the trials nor their final poses are in the repository, so the observation cannot be re-checked from it. | unresolved |
+| [exp-211](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-211-h213-adaptive-animate-integration.md) | 17, 90 | target | H-213 | Headless raw and presented Animate kinetics across balanced and rigid laws | Every solver-transition group at the frozen commit misses at least one 60 Hz presentation budget; physical tuning remains open | rejected |
+| [exp-212](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-212-h214-preset-signatures.md) | 17, 90 | target | H-214 | Preset penetration and contact signatures across both physical solvers | Rigid-versus-soft penetration and sticky-versus-balanced contact order reverse by solver or transition at the frozen commit | rejected |
 
 ### Cost and provenance
 
@@ -4493,10 +4498,12 @@ archive beside it.
 | exp-208 | 900 s harness default per run, in the recorded command | unrecorded | unrecorded | dependency: timing receipt lost (D-067) | `88d452f1` (mapped source) |
 | exp-209 | not recorded | unrecorded | unrecorded | dependency: timing receipt lost (D-067) | `f91fc7d4` (mapped source) |
 | exp-210 | 900 s harness default, in the recorded command | unrecorded | unrecorded | dependency: timing receipt lost (D-067) | `d3c3a778` (mapped source) |
+| exp-211 | 24 deterministic trajectory cells shared with exp-212 | shared; no duplicate charge | — | criterion | `9cca493c17ab61d5efb3e1032f32c54a9b87320e` |
+| exp-212 | 48 deterministic trajectory cells | 86.689 s | — | criterion | `9cca493c17ab61d5efb3e1032f32c54a9b87320e` |
 
-### What the 126 rounds jointly establish
+### What the 128 rounds jointly establish
 
-The 126 rounds use 2512.1 agent-minutes and 1798.3 wall-minutes under the campaign’s
+The 128 rounds use 2512.1 agent-minutes and 1799.7 wall-minutes under the campaign’s
 retained effort accounting.
 The never-invoked exp129 adds no scientific result or execution time.
 Exp-114 contributes 2.46 seconds of target/replay effort; its readiness work is recorded

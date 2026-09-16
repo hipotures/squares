@@ -7,13 +7,14 @@ author: Claude and Codex agents, for the repository maintainer
 
 **Date:** 2026-09-11
 
-**Updated:** 2026-09-14
+**Updated:** 2026-09-16
 
 **Status:** Active; PR #160 adds independent Pack and bounded Search, phase gates open
 
 **Workflow:** W7 pipeline improvement
 
-**Tracking:** `think-ooi2` (product epic), `think-zisr` (standalone package)
+**Tracking:** `think-ooi2` (product epic), `think-zisr` (standalone package),
+`think-4uu3` (Animate kinetics and timing)
 
 **Reviewed baseline:** `6e191a35`; prior committed checkpoint `0f2ac8ce`, with findings
 in the
@@ -67,7 +68,7 @@ packing-validity contract (`ec0a0604`, page readouts `c0d9db2b`).
 | --- | --- | --- |
 | O1 — One owned package | Build and maintain the application, numerical core, animation, tests, probes, and workbench-specific tools in `packages/workbench/`. | Package commands run independently; all live consumers have migrated; no production build or command reads the spike tree. |
 | O2 — Usable Pack | Choose any `n` in a declared measured range, start from generic or supplied poses, manipulate squares, run, pause, restart, reset, resolve, and replay a visible seed. A known record is optional. | Cases with and without catalogue records work; exactly `n` squares are present; raw and repaired scores match displayed geometry; stale/cancelled runs cannot overwrite current state. |
-| O3 — Reusable experiments | Change proposal, contact/force model, annealing or container schedule, repair, objective, and run budget through typed configurations; compare runs under equal work. | Browser and headless callers use one kernel and effective configuration; two strategy variants run through it; receipts retain work, seed, validity and provenance. No better packing is promised as a software acceptance condition. |
+| O3 — Reusable experiments | Change proposal, contact/force model, annealing or container schedule, repair, objective, and run budget through typed configurations; compare runs under equal work. Inspect Animate trajectories numerically without loading or judging a rendered page. | Browser and headless callers use one kernel and effective configuration; two strategy variants run through it; receipts retain work, seed, validity and provenance. A deterministic CLI emits the same Animate trajectory and its displacement, acceleration, reversal, penetration, contact, gap, endpoint and work metrics. No better packing is promised as a software acceptance condition. |
 | O4 — Clean illustration engine | Replay a trace or author an illustration, seek deterministically, draw SVG, and capture frames/video with explicit timing, arrival, side and rotation. | Drawing a frame needs no solver; seek and capture agree; direct and physically generated motion retain their labels; illustrative frames never acquire numerical assurance. |
 | O5 — Experimental Search | Run many Pack trials, cancel with honest partial accounting, inspect the best valid arrangement and outcome distributions, and use calibration/held-out presets. | The same trial matches Pack and headless output; manifests reproduce disjoint-block reports; invalid outcomes never rank; tuning and held-out cohorts are explicit. Search ships after the clean Pack/Animate release boundary. |
 | O6 — Clear, accessible UI | Use mode-specific controls and presentation/research layers, readable responsive layout, keyboard interaction and reduced-motion playback. | Browser checks exercise startup, tab switches, focus, transport, labels and representative viewport sizes; the consumer audit dispositions existing UI defects and preserves working behavior. |
@@ -320,6 +321,18 @@ browser uses:
 The browser supplies clocks, events, SVG nodes, and paint scheduling through adapters.
 The command-line benchmark calls this entry point directly, so it measures simulation
 cost without loading Playwright or copying physics into a probe.
+Animate has the same rule: its kinetic trace command calls the trajectory adapter
+directly and can emit either summary JSON or the full per-frame pose trace.
+It records the named solver, preset, effective force law, annealing schedule, timing,
+seed, integration work and metric units.
+Browser and command-line defaults come from one source module.
+A physical trace keeps three layers distinct: raw kernel states diagnose the solver,
+corrected stored states show the path retained for playback, and deterministic 60 Hz
+presentation samples reproduce the positions the browser supplies to its painter.
+The command reports all three; presentation samples, not an internal timestep, decide
+whether the user-visible path meets its continuity budget.
+A browser screenshot is never required to decide whether a path rings, jumps,
+penetrates, settles or preserves contacts.
 
 ### Simulation Boundary
 
@@ -444,6 +457,47 @@ prerequisites for broad extraction.
 Pages runtime (`think-l6l4`) and project-subpath navigation (`think-5wnw`) can be
 repaired alongside these tasks.
 Their final integration is checked after the package build moves.
+
+### Phase 2A: Make Animate Kinetics Headless and Controllable
+
+This measured repair phase was added after owner testing on 2026-09-16. It runs on the
+already extracted simulation modules and blocks Animate merge readiness, but it does not
+retroactively block unrelated Phase 3 package slices.
+
+| Bead | Deliverable | Done when |
+| --- | --- | --- |
+| `think-o4wo` | Stable physical trajectories. | Animate derives enough integration substeps for every active force law while retaining one stored sample per animation step. The `n = 17` and crowded `n = 90` controls meet the preregistered displacement, reversal, penetration, determinism, endpoint and work budgets. |
+| `think-5tyy` | Truthful presets and continuous setting changes. | Tween and other nonphysical states disable force-law and annealing controls; contact give and perturbation are named separately; balanced, rigid, soft and sticky presets have measured effects; a trajectory-defining change pauses and restarts instead of replacing the path at an old playhead. |
+| `think-syjo` | Deterministic kinetic trace and scoring CLI. | A Node command uses the same corpus, settings and trajectory implementation as the browser; stable JSON exposes per-frame poses and summary kinetics; positive controls and a cap-to-cap ringing control prove the metrics fire; browser and CLI effective configurations agree. |
+| `think-e9uo` | New-square-to-resize timing control. | Animate exposes the gap between the arriving square and container resize with a bounded, named timing value shared by the public API, presentation schedule, browser and headless configuration. The default leaves a longer readable pause than the prior fixed staging. |
+
+The default is selected from the headless record, not from one visual impression.
+Acceptance uses an exploratory conditions comparison over at least three seeds per
+condition. The default path must keep the current mean movement within 20%, keep the
+largest displacement between deterministic 60 Hz presentation samples at or below 0.1
+square sides, and keep the presentation reversal ratio at or below 0.03. The rigid
+preset may use limits of 0.15 and 0.05. The same report retains raw and corrected stored
+metrics so a renderer fix cannot conceal solver ringing.
+Every accepted path must remain finite and deterministic, reach the retained endpoint
+when snap is enabled, and report pair and wall penetration and integration work.
+
+The CLI is also a Search instrument, not a substitute for Search outcomes.
+Kinetic metrics may explain or reject a run, while packing validity and best valid side
+remain the Search guards and outcome.
+`X-035` and `H-213` through `H-215` carry the associated research record.
+
+**Status, 2026-09-16:** the safe tween default, headless instrument,
+adaptive-integration receipt, bounded experimental controls and square-first container
+timing are implemented at `9cca493c`, but Phase 2A remains open.
+[Exp-211](../../../../packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-211-h213-adaptive-animate-integration.md)
+rejects that exact commit’s adaptive path because every solver-transition group misses
+at least one 60 Hz budget.
+[Exp-212](../../../../packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-212-h214-preset-signatures.md)
+rejects the claimed universal preset ordering in its frozen 48-cell matrix.
+These are measured failures, not completion evidence for `think-o4wo` or `think-5tyy`.
+The next physical-response experiment needs a Bodies member/rotational normalization or
+an equivalent named control, followed by the same frozen seed matrix before either bead
+can close.
 
 ### Phase 3: Consolidate the Live Package
 
@@ -599,6 +653,7 @@ No unresolved required outcome may survive merely as an unnamed follow-up in pro
 | Extraction changes the published picture or timing | Fixed-seed frame comparisons, retained workbench probes, and deterministic capture at each slice |
 | A shared kernel erases real differences between Pack and Animate | Share numerical primitives and the step kernel; keep mode-specific adapters and receipts |
 | Browser and benchmark results drift | One DOM-free API, browser/Node parity vectors, and one exact seed contract |
+| A visually acceptable animation hides solver ringing or inert controls | Headless trajectory metrics, a cap-to-cap negative control, shared effective settings and browser/CLI parity checks |
 | Invalid geometry acquires evidential status | Versioned import validation plus frame-level evidence and provenance checks |
 | “Arbitrary n” hides an accidental resource limit | Declare, measure, expose, and test the supported envelope; reject values outside it |
 | Cleanup deletes a unique check or reproduction route | Consumer inventory, replacement assertion, and full validation before each deletion slice |

@@ -765,7 +765,7 @@ Status: **active**. Reconcile the merged research record, then choose among rout
 
 | id | status | title | rounds | opened because |
 | --- | --- | --- | --- | --- |
-| series-000 | open | S0: smoke and calibration — prove the machinery, establish every baseline metric | 126 | First series. There is no prior instrument, so not |
+| series-000 | open | S0: smoke and calibration — prove the machinery, establish every baseline metric | 128 | First series. There is no prior instrument, so not |
 
 ## Registry
 
@@ -921,6 +921,9 @@ Status: **active**. Reconcile the merged research record, then choose among rout
 | H-210 | open | search | No blind run of the workbench's physics ends on a valid packing. At ev | n: 5 10 11 17 26 29 | 0 |  |  |
 | H-211 | open | search | The workbench's shake dial has a maximum for search quality between le | n: 5 10 11 17 26 29 | 0 |  |  |
 | H-212 | open question | search | What does the workbench's blind physics do when its runs are measured  |  | 3 |  | 3 rounds unrecorded |
+| H-213 | refuted | search | Law-driven integration substeps remove Animate's cap-to-cap contact ri | transition: 16-to-17 89-to-90 | 1 |  |  |
+| H-214 | refuted | search | On the stable physical solver, rigid produces less penetration than so | transition: 16-to-17 89-to-90 | 1 |  | 1.4m wall |
+| H-215 | open question | search | Which headless kinetic measurements, if any, predict that a fixed-budg |  | 0 |  |  |
 
 ## Needs review — held for a human, not decided
 
@@ -930,7 +933,7 @@ Status: **active**. Reconcile the merged research record, then choose among rout
 
 ## Rounds
 
-### rejected (32)
+### rejected (34)
 
 | id | series | instance | operator | hypotheses | reason |
 | --- | --- | --- | --- | --- | --- |
@@ -966,6 +969,8 @@ Status: **active**. Reconcile the merged research record, then choose among rout
 | exp-202 | series-000 | 11 | claude-opus-5 | H-201 | The criterion was measured and missed: three cells of eleven meet both clauses and four meet the threshold, against the six declared -- but the four where it works it works by 0.017 to 0.29, and the six where it does nothing it does exactly nothing, so the move is not weak, it is inapplicable above n = 26 at this budget. |
 | exp-203 | series-000 | 11 | claude-opus-5 | H-202 | The criterion was measured and missed in the wrong direction: one cell of eleven improves and three regress, including both proved controls, so the aggregate compaction surrogate is not a weak version of the inflation formulation but a different and worse objective, and it should not be carried. |
 | exp-205 | series-000 | 11 | claude-opus-5 | H-204 | The criterion was measured and missed -- three cells of eleven against the six declared -- but a parameter that costs nothing to carry recovers three quarters of what the new move family recovers, which contradicts the design input hard enough that the schedule axis has to be swept properly before any further move is built. |
+| exp-211 | series-000 | 17 | Codex with delegated measurement agents | H-213 | Every solver-transition group at the frozen commit misses at least one required 60 Hz budget; the instrument is ready, but physical tuning remains open. |
+| exp-212 | series-000 | 17 | Codex with delegated measurement agents | H-214 | Both predicted orders reverse in at least one transition: rigid exceeds soft penetration in Physics at n = 90, and sticky has fewer mean contacts than balanced at n = 90 in both solvers; continuity guards also fail at the frozen commit. |
 
 ### abandoned (2)
 
@@ -1113,7 +1118,7 @@ Status: **active**. Reconcile the merged research record, then choose among rout
 
 ## Effort
 
-126 rounds, 2512.1 agent-minutes, 1798.3 wall-minutes.
+128 rounds, 2512.1 agent-minutes, 1799.7 wall-minutes.
 
 These totals exclude 4 historical rounds with unrecorded timing; their cost is unknown, not zero.
 

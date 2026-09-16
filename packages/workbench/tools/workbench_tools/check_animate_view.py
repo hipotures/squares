@@ -630,6 +630,7 @@ def readouts_claim_only_packings(session: Session) -> str:
             f"{out['label']}: a readout claims a packing for {reason}: {out}",
         )
 
+    session.api(("setStyle", "physics"))
     require_record(read("dwell of the step into 16", ("pause",), ("setStepN", 16), ("seek", 0)))
     require_record(read("rest of the step into 16", ("seek", session.api(("duration",)))))
     pair = session.look("animate/touching-pair", n=16)
@@ -656,7 +657,12 @@ def readouts_claim_only_packings(session: Session) -> str:
         shrunk["growInfo"].endswith("not a packing"),
         f"the growth readout compares a non-packing with the record: {shrunk['growInfo']!r}",
     )
-    session.api(("setGrowth", {"on": False, "size": 1}), ("pause",), ("seek", 0))
+    session.api(
+        ("setGrowth", {"on": False, "size": 1}),
+        ("setStyle", "tween"),
+        ("pause",),
+        ("seek", 0),
+    )
     return "no readout claims a packing for a 5e-9 overlap or half-size squares"
 
 

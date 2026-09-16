@@ -382,7 +382,14 @@ ROOT_DOCUMENTS = (
 # Allow 160 MiB, which is 31.1 MiB of headroom rather than 0.9, so the guard fires on a
 # gigabyte of data and not on a research round; three portable workers remain bounded at
 # 480 MiB.
-SNAPSHOT_MAX_BYTES = 160 * 1024 * 1024
+#
+# 2026-09-16, after the workbench and its compact kinetics records landed: the tracked
+# snapshot measured 168,058,379 bytes, 286,219 bytes past the 160 MiB ceiling. This is
+# the ordinary source growth `think-t1lk` predicted, not cache drift or an accidental
+# generated tree. Reset the same roughly-32-MiB operating headroom at 192 MiB while that
+# bead retains the durable audit of generated files that no mutation control reads.
+# Three portable workers remain bounded at 576 MiB.
+SNAPSHOT_MAX_BYTES = 192 * 1024 * 1024
 DEFAULT_CONTROL_TIMEOUT_SECONDS = 120.0
 TERMINATION_GRACE_SECONDS = 1.0
 # Directories that must be walked into rather than bulk-copied, because something

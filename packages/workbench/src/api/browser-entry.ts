@@ -10,6 +10,7 @@ export { navigation } from "../core/navigation.js";
 export { workbenchCore as core } from "../core/runtime-contracts.js";
 export * as animationData from "../data/animation.js";
 export { corpusData as data } from "../data/corpus.js";
+export * as motionSettings from "../motion-settings.js";
 export { forceLaw as simulation } from "../simulation/force-law.js";
 export { simulationKernel as kernel } from "../simulation/kernel.js";
 export { packSimulation as pack } from "../simulation/pack.js";

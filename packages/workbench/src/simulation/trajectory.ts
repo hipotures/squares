@@ -3,6 +3,7 @@ import type { GeometryReceipt, GeometrySnapshot } from "../core/geometry.js";
 import { measurePackingGeometry } from "../core/geometry.ts";
 import { assessPackingSnapshot } from "../core/runtime-contracts.ts";
 import type { CorpusFrame, CorpusPair } from "../data/corpus.js";
+import { forceLawAnimationIntegration, MAX_FORCE_LAW_SUBSTEPS } from "./force-law.ts";
 import {
   advanceSimulation,
   createSimulationState,
@@ -76,6 +77,8 @@ export interface TrajectoryRequest {
   anneal: AnnealConfiguration;
   physics: TrajectoryPhysicsConfiguration;
   blind: BlindTrajectoryConfiguration;
+  /** Omit or use `adaptive` for the force-law stability bound; a number is an experiment override. */
+  integrationSubsteps?: "adaptive" | number;
 }
 
 export interface TrajectoryFeasibility {
@@ -94,11 +97,26 @@ export interface TrajectoryReceipt {
     guided: boolean;
     effectiveSeed: number;
     anneal: AnnealConfiguration;
+    integration: {
+      requested: "adaptive" | number;
+      effective: number;
+      recommended: number;
+      warning: "below-adaptive-stability-bound" | null;
+    };
   };
   arithmetic: "float64";
+  /** Time between stored animation states. */
+  storedTimestep: number;
+  /** Time integrated by each simulation kernel call. */
   timestep: number;
   work: SimulationWork;
   residual: { maxLinearSpeed: number; maxAngularSpeed: number };
+  penetration: {
+    growthEpoch: number;
+    activeFullSize: number;
+    lateFullSize: number;
+    finalFullSize: number;
+  };
   forcing: { active: boolean; finalScale: number };
   termination: { reason: "step-limit"; converged: false; stationary: false };
 }
@@ -110,12 +128,21 @@ export interface Trajectory {
   style: PhysicalStyle;
   mode: AtlasSimMode;
   bodies: number;
+  /** Kernel states before the optional snap correction; aliases `states` when no snap is applied. */
+  rawStates: Float64Array;
+  /** Presented states after the optional snap correction. */
   states: Float64Array;
   sides: Float64Array;
+  /** Side of the arriving square at every stored state; all existing squares have side one. */
+  newSizes: Float64Array;
+  /** Deepest pair penetration at each stored interval, including the growing square. */
+  allPens: Float32Array;
+  /** Deepest pair penetration at each stored interval among full-size squares only. */
   pens: Float32Array;
   nears: Float32Array;
   maxPenetration: number;
   maxPenetrationLate: number;
+  maxPenetrationGrowth: number;
   squeeze: number;
   squeezeDone: boolean;
   side0: number;
@@ -218,6 +245,17 @@ function validateConfiguration(request: TrajectoryRequest): void {
   if (!Number.isSafeInteger(request.steps) || request.steps < 1) {
     throw new RangeError("trajectory step budget must be a positive integer");
   }
+  if (
+    request.integrationSubsteps !== undefined &&
+    request.integrationSubsteps !== "adaptive" &&
+    (!Number.isSafeInteger(request.integrationSubsteps) ||
+      request.integrationSubsteps < 1 ||
+      request.integrationSubsteps > MAX_FORCE_LAW_SUBSTEPS)
+  ) {
+    throw new RangeError(
+      `trajectory integration substeps must be adaptive or an integer from 1 to ${MAX_FORCE_LAW_SUBSTEPS}`,
+    );
+  }
   const { pair, physics, blind, anneal } = request;
   validateFrame(request.source, pair.n, "source");
   validateFrame(request.target, pair.n + 1, "target");
@@ -239,7 +277,6 @@ function validateConfiguration(request: TrajectoryRequest): void {
     omega: physics.omega,
     zeta: physics.zeta,
     springRamp: physics.springRamp,
-    contactDamping: physics.contactDamping,
     contactTorque: physics.contactTorque,
     open: physics.open,
     tighten: physics.tighten,
@@ -258,6 +295,8 @@ function validateConfiguration(request: TrajectoryRequest): void {
   })) {
     positive(value, label);
   }
+  // Zero deliberately disables impact damping and is exposed by both the UI and headless API.
+  nonNegative(physics.contactDamping, "contactDamping");
   // Level zero on the annealing dial is amplitude zero: an unforced run, reported as such.
   nonNegative(anneal.amplitude, "annealAmplitude");
   for (const [label, value] of Object.entries({
@@ -350,16 +389,31 @@ function prepareTrajectory(request: TrajectoryRequest): PreparedTrajectory {
     });
   }
   const arriving = squareAt(target, pair.new, "target");
+  const arrivingAngle = arriving[2] * DEGREES_TO_RADIANS;
+  const arrivingRadius =
+    (physics.inflateFrom / 2) *
+    (Math.abs(Math.cos(arrivingAngle)) + Math.abs(Math.sin(arrivingAngle)));
+  const initialArrivingX =
+    request.mode === "blind"
+      ? arriving[0]
+      : Math.max(arrivingRadius, Math.min(source.side - arrivingRadius, arriving[0]));
+  const initialArrivingY =
+    request.mode === "blind"
+      ? arriving[1] + physics.drop
+      : Math.max(
+          arrivingRadius,
+          Math.min(source.side - arrivingRadius, arriving[1] + physics.drop),
+        );
   poses.push({
-    x: arriving[0],
-    y: arriving[1] + physics.drop,
-    angle: arriving[2] * DEGREES_TO_RADIANS,
+    x: initialArrivingX,
+    y: initialArrivingY,
+    angle: arrivingAngle,
     size: physics.inflateFrom,
   });
   targets.push({
     x: arriving[0],
     y: arriving[1],
-    angle: arriving[2] * DEGREES_TO_RADIANS,
+    angle: arrivingAngle,
   });
 
   const blind = request.mode === "blind";
@@ -524,6 +578,40 @@ function addWork(total: SimulationWork, step: SimulationWork): void {
   total.wallForces += step.wallForces;
 }
 
+/** Replace a noisy physical tail with one C2-continuous, monotone landing from a fixed anchor. */
+function applySnapLanding(
+  states: Float64Array,
+  targets: readonly SimulationTarget[],
+  squareCount: number,
+  steps: number,
+  startProgress: number,
+): void {
+  const startStep = Math.min(steps - 1, Math.floor(clamp01(startProgress) * steps));
+  const landingSteps = steps - startStep;
+  for (let storedStep = startStep + 1; storedStep <= steps; storedStep++) {
+    const weight = smootherstep((storedStep - startStep) / landingSteps);
+    for (let index = 0; index < squareCount; index++) {
+      const anchorOffset = (startStep * squareCount + index) * 3;
+      const offset = (storedStep * squareCount + index) * 3;
+      const target = targets[index];
+      if (target === undefined) {
+        throw new RangeError("trajectory target is missing during correction");
+      }
+      states[offset] = lerp(numberAt(states, anchorOffset, "snap anchor"), target.x, weight);
+      states[offset + 1] = lerp(
+        numberAt(states, anchorOffset + 1, "snap anchor"),
+        target.y,
+        weight,
+      );
+      states[offset + 2] = lerp(
+        numberAt(states, anchorOffset + 2, "snap anchor"),
+        target.angle,
+        weight,
+      );
+    }
+  }
+}
+
 /** Build a deterministic cached Animate trajectory through the shared step kernel. */
 export function buildTrajectory(request: TrajectoryRequest): Trajectory {
   validateConfiguration(request);
@@ -539,13 +627,24 @@ export function buildTrajectory(request: TrajectoryRequest): Trajectory {
   });
   const states = new Float64Array((request.steps + 1) * squareCount * 3);
   const sides = new Float64Array(request.steps + 1);
+  const newSizes = new Float64Array(request.steps + 1);
+  const allPens = new Float32Array(request.steps + 1);
   const pens = new Float32Array(request.steps + 1);
   const nears = new Float32Array(request.steps + 1);
   sides[0] = prepared.side0;
+  newSizes[0] = physics.inflateFrom;
   storeState(states, 0, squareCount, simulationSnapshot(simulation));
   const stiffness = physics.omega ** 2;
   const damping = 2 * physics.zeta * physics.omega;
-  const timestep = anneal.span / request.steps;
+  const storedTimestep = anneal.span / request.steps;
+  const integration = forceLawAnimationIntegration(
+    request.pairLaw,
+    request.wallLaw,
+    storedTimestep,
+    request.integrationSubsteps ?? "adaptive",
+  );
+  const substeps = integration.effective;
+  const timestep = storedTimestep / substeps;
   const rigid = request.style === "bodies";
   const jiggle = (rigid ? physics.bodiesJiggle : physics.jiggle) * anneal.amplitude;
   const jiggleTorque =
@@ -555,104 +654,100 @@ export function buildTrajectory(request: TrajectoryRequest): Trajectory {
   let maximumAngularSpeed = 0;
   let maxPenetration = 0;
   let maxPenetrationLate = 0;
+  let maxPenetrationGrowth = 0;
+  let previousAnyPenetration = 0;
   let previousPenetration = 0;
   let squeeze = 0;
   let squeezeDone = false;
   const blind = request.mode === "blind";
   for (let storedStep = 1; storedStep <= request.steps; storedStep++) {
-    const progress = (storedStep - 1) / request.steps;
-    let side: number;
-    if (blind) {
-      if (
-        progress >= request.blind.hold &&
-        previousPenetration <= request.blind.overlapTolerance &&
-        squeeze < 1
-      ) {
-        squeeze = Math.min(
-          1,
-          squeeze + 1 / request.steps / (request.blind.close - request.blind.hold),
-        );
-        squeezeDone ||= squeeze >= 1;
+    let side = numberAt(sides, storedStep - 1, "trajectory side");
+    let nearPairs = 0;
+    let newSize = numberAt(newSizes, storedStep - 1, "arriving square size");
+    for (let substep = 0; substep < substeps; substep++) {
+      // Start-of-interval sampling preserves the prior trajectory exactly when substeps is one.
+      const progress = (storedStep - 1 + substep / substeps) / request.steps;
+      if (blind) {
+        if (
+          progress >= request.blind.hold &&
+          previousPenetration <= request.blind.overlapTolerance &&
+          squeeze < 1
+        ) {
+          squeeze = Math.min(
+            1,
+            squeeze + 1 / request.steps / substeps / (request.blind.close - request.blind.hold),
+          );
+          squeezeDone ||= squeeze >= 1;
+        }
+        const nextSide = lerp(prepared.side0, request.target.side, smoothstep(squeeze));
+        const shift = (nextSide - side) / 2;
+        if (shift !== 0) {
+          translateSimulation(simulation, shift, shift);
+        }
+        side = nextSide;
+      } else {
+        side = containerSide(request.source.side, request.target.side, progress, physics);
       }
-      side = lerp(prepared.side0, request.target.side, smoothstep(squeeze));
-      const previousSide = numberAt(sides, storedStep - 1, "trajectory side");
-      const shift = (side - previousSide) / 2;
-      if (shift !== 0) {
-        translateSimulation(simulation, shift, shift);
+      const decay = (1 - progress) ** anneal.decayPower;
+      const tight = blind ? 1 : tightenScale(progress, physics);
+      const springStiffness = blind
+        ? 0
+        : stiffness * smoothstep(progress / physics.springRamp) * tight;
+      const springDamping = damping * Math.sqrt(tight);
+      const contactScale =
+        request.mode === "snap"
+          ? 1 - clamp01((progress - physics.lockIn) / (1 - physics.blend - physics.lockIn))
+          : 1;
+      newSize = lerp(physics.inflateFrom, 1, clamp01(progress / physics.appear));
+      setSimulationSquareSize(simulation, prepared.newSquare, newSize);
+      const step = advanceSimulation(simulation, {
+        timestep,
+        container: { originX: 0, originY: 0, side },
+        pairLaw: request.pairLaw,
+        wallLaw: request.wallLaw,
+        relatedMask: request.relatedMask,
+        baseCell: physics.cell,
+        contactDamping: physics.contactDamping,
+        contactScale,
+        spring: { stiffness: springStiffness, damping: springDamping, quarterTurn: false },
+        forcing: {
+          linear: jiggle * decay,
+          angular: jiggleTorque * decay,
+          time: progress * anneal.span,
+        },
+        maxSpeed: physics.maxSpeed,
+        maxSpin: physics.maxSpin,
+      });
+      previousAnyPenetration = step.deepestPairPenetration;
+      previousPenetration = step.deepestFullSizePairPenetration;
+      nearPairs = step.nearPairs;
+      if (newSize < 1) {
+        maxPenetrationGrowth = Math.max(maxPenetrationGrowth, previousAnyPenetration);
       }
-    } else {
-      side = containerSide(request.source.side, request.target.side, progress, physics);
+      if (contactScale >= 1) {
+        maxPenetration = Math.max(maxPenetration, previousPenetration);
+      } else {
+        maxPenetrationLate = Math.max(maxPenetrationLate, previousPenetration);
+      }
+      maximumLinearSpeed = step.maxLinearSpeed;
+      maximumAngularSpeed = step.maxAngularSpeed;
+      addWork(work, step.work);
     }
     sides[storedStep] = side;
-    const decay = (1 - progress) ** anneal.decayPower;
-    const tight = blind ? 1 : tightenScale(progress, physics);
-    const springStiffness = blind
-      ? 0
-      : stiffness * smoothstep(progress / physics.springRamp) * tight;
-    const springDamping = damping * Math.sqrt(tight);
-    const contactScale =
-      request.mode === "snap"
-        ? 1 - clamp01((progress - physics.lockIn) / (1 - physics.blend - physics.lockIn))
-        : 1;
-    const newSize = lerp(physics.inflateFrom, 1, clamp01(progress / physics.appear));
-    setSimulationSquareSize(simulation, prepared.newSquare, newSize);
-    const step = advanceSimulation(simulation, {
-      timestep,
-      container: { originX: 0, originY: 0, side },
-      pairLaw: request.pairLaw,
-      wallLaw: request.wallLaw,
-      relatedMask: request.relatedMask,
-      baseCell: physics.cell,
-      contactDamping: physics.contactDamping,
-      contactScale,
-      spring: { stiffness: springStiffness, damping: springDamping, quarterTurn: false },
-      forcing: {
-        linear: jiggle * decay,
-        angular: jiggleTorque * decay,
-        time: progress * anneal.span,
-      },
-      maxSpeed: physics.maxSpeed,
-      maxSpin: physics.maxSpin,
-    });
-    previousPenetration = step.deepestFullSizePairPenetration;
+    newSizes[storedStep] = newSize;
+    allPens[storedStep] = previousAnyPenetration;
     pens[storedStep] = previousPenetration;
-    nears[storedStep] = step.nearPairs;
-    if (contactScale >= 1) {
-      maxPenetration = Math.max(maxPenetration, previousPenetration);
-    } else {
-      maxPenetrationLate = Math.max(maxPenetrationLate, previousPenetration);
-    }
-    maximumLinearSpeed = step.maxLinearSpeed;
-    maximumAngularSpeed = step.maxAngularSpeed;
-    addWork(work, step.work);
+    nears[storedStep] = nearPairs;
     storeState(states, storedStep, squareCount, simulationSnapshot(simulation));
   }
 
+  const rawStates = request.mode === "snap" ? states.slice() : states;
   if (request.mode === "snap") {
-    const blendStart = 1 - physics.blend;
-    for (let storedStep = 0; storedStep <= request.steps; storedStep++) {
-      const progress = storedStep / request.steps;
-      if (progress <= blendStart) {
-        continue;
-      }
-      const weight =
-        storedStep === request.steps ? 1 : smoothstep((progress - blendStart) / physics.blend);
-      for (let index = 0; index < squareCount; index++) {
-        const offset = (storedStep * squareCount + index) * 3;
-        const target = prepared.targets[index];
-        if (target === undefined) {
-          throw new RangeError("trajectory target is missing during correction");
-        }
-        states[offset] =
-          weight >= 1 ? target.x : lerp(numberAt(states, offset, "state"), target.x, weight);
-        states[offset + 1] =
-          weight >= 1 ? target.y : lerp(numberAt(states, offset + 1, "state"), target.y, weight);
-        states[offset + 2] =
-          weight >= 1
-            ? target.angle
-            : lerp(numberAt(states, offset + 2, "state"), target.angle, weight);
-      }
-    }
+    // The visible correction interval begins at tightenFrom. Anchor once there instead of
+    // repeatedly blending each noisy raw sample, which otherwise preserves solver reversals and
+    // can turn the exact endpoint into an apparent last-frame snap.
+    const landingStart = Math.min(physics.tightenFrom, 1 - physics.blend);
+    applySnapLanding(states, prepared.targets, squareCount, request.steps, landingStart);
   }
 
   const snapshot = finalSnapshot(
@@ -673,13 +768,21 @@ export function buildTrajectory(request: TrajectoryRequest): Trajectory {
       guided: !blind,
       effectiveSeed: request.effectiveSeed,
       anneal: { ...anneal },
+      integration,
     },
     arithmetic: "float64",
+    storedTimestep,
     timestep,
     work,
     residual: {
       maxLinearSpeed: maximumLinearSpeed,
       maxAngularSpeed: maximumAngularSpeed,
+    },
+    penetration: {
+      growthEpoch: maxPenetrationGrowth,
+      activeFullSize: maxPenetration,
+      lateFullSize: maxPenetrationLate,
+      finalFullSize: previousPenetration,
     },
     forcing: {
       active: anneal.amplitude > 0,
@@ -694,12 +797,16 @@ export function buildTrajectory(request: TrajectoryRequest): Trajectory {
     style: request.style,
     mode: request.mode,
     bodies: simulation.bodyCount,
+    rawStates,
     states,
     sides,
+    newSizes,
+    allPens,
     pens,
     nears,
     maxPenetration,
     maxPenetrationLate,
+    maxPenetrationGrowth,
     squeeze,
     squeezeDone,
     side0: prepared.side0,
@@ -757,10 +864,32 @@ export function sampleTrajectorySide(trajectory: Trajectory, progress: number): 
   );
 }
 
+/** Exact bytes retained by one cached trajectory, counting aliased typed-array buffers once. */
+export function trajectoryByteLength(trajectory: Trajectory): number {
+  const buffers = new Set<ArrayBufferLike>();
+  for (const values of [
+    trajectory.states,
+    trajectory.rawStates,
+    trajectory.sides,
+    trajectory.newSizes,
+    trajectory.allPens,
+    trajectory.pens,
+    trajectory.nears,
+  ]) {
+    buffers.add(values.buffer);
+  }
+  let bytes = 0;
+  for (const buffer of buffers) {
+    bytes += buffer.byteLength;
+  }
+  return bytes;
+}
+
 export const trajectorySimulation = Object.freeze({
   buildTrajectory,
   sampleTrajectoryPose,
   sampleTrajectorySide,
+  trajectoryByteLength,
 });
 
 export type TrajectorySimulationModule = typeof trajectorySimulation;
