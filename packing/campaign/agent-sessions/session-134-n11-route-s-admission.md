@@ -15,7 +15,6 @@ session:
   branch: codex/n11-route-s-admission
   primary_bead: think-a1e8
   status: stopped
-  certification_pending: think-so4g
   goal: >-
     Admit or refuse one fixed-geometry support-sparse T-025 certificate family, its
     exact provenance and complexity metrics, and a reusable checker before any
@@ -383,26 +382,32 @@ session:
   - The retained blocked receipt replays deterministically through the fast/records step.
   - Synopsis, agenda-map, ledger, control-anchor, and enforced schema checks pass.
   - >-
+    full gate: fast at 609d7d629db97c322a021399602f1a20951c4864: passed (GitHub
+    Actions run 35068030416 passed packing-required on the exact PR 182 head before
+    merge 1d9c49c4)
+  - >-
     The full local records tier has two unrelated environmental failures: the user-owned
     vendor/kpress checkout lacks a referenced document, and an ambient .claude worktree
     is scanned by the README checker. Hosted CI remains the certification owner.
   stop_reason: >-
     The no-target admission guard fired after independent review found four live
-    contract gaps. Session 134 stops without admitting the instrument, allocating an
-    experiment, running a target, or reaching a scientific verdict.
+    contract gaps. Session 134 stopped without admitting the instrument, allocating an
+    experiment, running a target, or reaching a scientific verdict. Session 135 later
+    discharged the gaps, and exact-head validation and the PR 182 merge discharged this
+    record's certification debt.
   next_action: >-
-    Under think-so4g, certify and merge the exact admitted PR 182 head; do not create
-    exp-161 or run a compression target before that admission merges.
+    Continue BC-343 under think-ufmk. A separate preregistered block must allocate
+    exp-161 before any compression target runs; this record authorizes no target work.
 ---
 # N11 Route S Compression Admission
 
 This block attempted to admit the instrument and stopped at its review guard.
 It freezes one fixed-support family derived from T-025, with at most 23 positive
 $D_4$-orbit representatives, while T-026 serves only as a support and rescaling
-provenance control. No optimizer, coverage target, candidate, or scientific experiment
-runs before this admission pull request merges.
-The retained checkpoint remains blocked on immutable source digests, both T-026
-sentinels, a canonical selection manifest, and the complete X-032 mutation matrix.
+provenance control. Session 135 later discharged the checkpoint’s four admission gaps,
+and PR 182 merged the certified instrument as `1d9c49c4` from reviewed head `609d7d62`.
+H-163 remains untested, exp-161 remains unallocated, and this record authorizes no
+target work.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

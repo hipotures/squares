@@ -184,10 +184,10 @@ Stromquist-to-Trump interval.
 The pure point/density ceiling `38200/9977 ≈ 3.8288` lies only about `0.00236` above
 T-026, so additional heavy work for microscopic gains in that language is paused.
 H-160/exp-158 and H-162/exp-160 are registered but blocked before target invocation.
-H-163 is registered and open but untested; its target-blind instrument is admitted
-locally, and no `exp-161` exists.
-Exact-head certification and merge remain the gate before any target is authorized.
-The retained source and control work carries no scientific verdict.
+H-163 is registered and open but untested; its target-blind instrument merged in PR 182,
+and no `exp-161` exists.
+The `think-ufmk` planning block must register that experiment before any target is
+authorized. The retained source and control work carries no scientific verdict.
 
 BC-339’s W7 pipeline-improvement and W8 reconciliation are complete and certified.
 BC-347’s source-bound
@@ -209,20 +209,20 @@ The current order is:
    Its source inventories found no complete 80-stratum negative-root producer, matched
    exact baseline, conditional gate, or method-distinct replay.
    No target ran and no physical root closed.
-2. BC-343 / `think-a1e8` remains the active research commitment; `think-so4g` is its
-   sole operational entry.
-   [X-032](packing/campaign/explorations/X-032-route-s-threshold-compression.md) and
-   [H-163](packing/campaign/hypotheses/H-163-route-s-threshold-compression.md) freeze
-   T-025 as the sole matched control, its exact 119-orbit support universe, and the
-   at-most-23 positive-orbit criterion.
+2. BC-343 remains the active research commitment; `think-ufmk` is its sole operational
+   entry. [X-032](packing/campaign/explorations/X-032-route-s-threshold-compression.md)
+   and [H-163](packing/campaign/hypotheses/H-163-route-s-threshold-compression.md)
+   freeze T-025 as the sole matched control, its exact 119-orbit support universe, and
+   the at-most-23 positive-orbit criterion.
    T-026 is only a support-and-rescaling sentinel.
    Session 134’s source-distinct review refused the first admission checkpoint.
    Session 135 then discharged all four retained guards: complete source contents bound
    to a declared Git revision and repository-relative paths, both T-026 sentinels, a
    canonical selection-manifest boundary, and the complete X-032 mutation matrix.
    Its source-distinct re-audit returned ADMIT after one symlink-alias boundary repair.
-   No optimizer, candidate, coverage target, or `exp-161` is authorized before the exact
-   admitted PR head is certified and merged.
+   PR 182 merged the instrument as `1d9c49c4` from reviewed head `609d7d62` after
+   exact-head validation.
+   No optimizer, candidate, coverage target, or `exp-161` has run.
 3. Treat A, S, global angular resources, and B as the first advisory tier.
    A is the strongest route to a material `n = 11` lower bound; S is the best bounded
    deliverable; angular resources offer a cheap optimal-face screen; and B is the
@@ -238,9 +238,9 @@ The detailed
 [six-hour execution schedule](docs/project/reviews/review-2026-09-14-n11-post-w5-route-selection.md#six-active-hours-after-this-planning-merge)
 originally allocated five sequential merge-bounded blocks.
 BC-354 activated that schedule’s guard-refusal branch, so the Route A discriminator no
-longer follows it. BC-343’s no-target Route S instrument is now admitted locally; the
-remaining path begins with exact-head certification and merge, followed by a separate
-planning block that may register `exp-161` and authorize one bounded target.
+longer follows it. BC-343’s no-target Route S instrument is admitted and merged.
+The remaining path begins with the `think-ufmk` planning block, which may register
+`exp-161` and authorize one bounded target.
 Each block starts from the preceding merge on a fresh branch and gets its own session,
 bead disposition, validation receipt, and pull request.
 
@@ -939,19 +939,19 @@ The scientific evidence cutoff remains main revision
 `80bcdbb0819504354e1278c37f211dd8cc2158fb`, where the latest merged stack is green and
 the T-026 lower bound remains the frontier.
 
-**Selected next entry:** `think-so4g`, the exact-head certification and merge child of
-BC-343 / `think-a1e8`. Only after that checkpoint merges may a fresh branch register
-`exp-161` and its bounded compression target.
+**Selected next entry:** `think-ufmk`, the BC-343 planning block that must register
+`exp-161`, its exact target, budget, accept rule, stop rule, and review boundary before
+any bounded compression target runs.
 
 BC-340, BC-353, and BC-354 are terminal.
 BC-341 remains tentative behind a future W10 reselection and the named Route A
 representation gaps.
-BC-343 has a separate no-target PR that freezes Route S’s complexity metric, fixed
-support universe, controls, and verdict rules.
-Its retained receipt is admitted after source-distinct review, but exact-head fast and
-deferred certification and merge remain the current gate.
-No scientific compression target has execution authority before that merge and a
-separate experiment registration; no optimizer, candidate, coverage target, or `exp-161`
+BC-343’s no-target PR freezes Route S’s complexity metric, fixed support universe,
+controls, and verdict rules.
+It merged as `1d9c49c4` from reviewed head `609d7d62` after source-distinct review and
+exact-head validation.
+No scientific compression target has execution authority before the separate experiment
+registration under `think-ufmk`; no optimizer, candidate, coverage target, or `exp-161`
 has run.
 
 The older BC329, weighted-atom stages 3–4, and BC303 H-160/H-162 target lanes are

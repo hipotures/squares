@@ -123,9 +123,9 @@ BC-354 stopped at Route A’s representation boundary without running a target o
 a physical root; the complete 80-stratum negative-root producer, matched exact baseline,
 conditional gate, and independent replay remain absent.
 BC-343 remains the active research commitment.
-Session 135 completed the guard-discharge work; its exact-head certification and merge
-child `think-so4g` is the sole current entry for the no-target Route S admission
-checkpoint.
+Session 135 completed the guard-discharge work, and PR 182 merged the instrument as
+`1d9c49c4` from reviewed head `609d7d62` after exact-head validation.
+`think-ufmk` is the sole current entry for the separate Route S planning block.
 [X-032](../../../../packing/campaign/explorations/X-032-route-s-threshold-compression.md)
 freezes T-025 as the sole matched control, its exact 79 point-orbit and 40
 two-of-three-threshold-orbit support universe, and the at-most-23 positive-orbit
@@ -136,9 +136,11 @@ T-026 is only a support-and-rescaling provenance sentinel.
 Session 135 discharged the four obligations from Session 134 with checker-owned source
 anchors, both T-026 sentinels, a canonical source-bound manifest, and the complete X-032
 mutation matrix. Its source-distinct audit found and then cleared one symlink-alias
-finding. The instrument is admitted for exact-head certification; the branch contains no
-optimizer, candidate, coverage target, or `exp-161`. BC-341 remains tentative behind a
-future W10 reselection and the missing Route A representation.
+finding.
+The instrument is admitted and merged; no optimizer, candidate, coverage target,
+or `exp-161` has run.
+BC-341 remains tentative behind a future W10 reselection and the missing Route A
+representation.
 
 The planning candidates are:
 
