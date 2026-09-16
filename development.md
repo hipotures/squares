@@ -169,8 +169,8 @@ alone is not full pre-merge evidence.
 | `--checks` | **CI, on every pull request**, in the `validate` job | 50 of 78 | 195 s | composition changed after two PR 160 runs exceeded the ceiling, which did not end the overruns (`think-lrs0`); only the ceiling applies |
 | `--frontend` | **CI, on every pull request**, in the `frontend` job, concurrently | 2 of 78 | 150 s | new partition; the first hosted run establishes its baseline |
 | `--geometry` | **CI, on every pull request**, in the `geometry` job, concurrently | 9 of 78 | 180 s | 91.6 s on CI, the mean of four readings |
-| `--suite-a` | **CI, on every pull request**, in the `suite-a` job, concurrently | 1 of 78 | 180 s | unmeasured; the first exact-head hosted run establishes its baseline |
-| `--suite-b` | **CI, on every pull request**, in the `suite-b` job, concurrently | 1 of 78 | 180 s | unmeasured; the first exact-head hosted run establishes its baseline |
+| `--suite-a` | **CI, on every pull request**, in the `suite-a` job, concurrently | 1 of 78 | 180 s | 150.54 s on CI, the mean of two exact-head readings |
+| `--suite-b` | **CI, on every pull request**, in the `suite-b` job, concurrently | 1 of 78 | 180 s | 119.54 s on CI, the mean of two exact-head readings |
 | `--sweeps` | **CI, on every pull request**, in the `sweeps` job, concurrently | 4 of 78 | 210 s | record cleared 2026-09-07 when two of its four steps were split; 58.5 s locally, only the ceiling applies |
 | *(no flag)* | Full checkpoint before final review and at block close; main, dispatch, and daily CI | 78 of 78 | 3600 s | split across four jobs; not clocked whole |
 
@@ -203,11 +203,15 @@ modules. `--dist=loadfile` keeps each module together inside its shard so module
 fixtures remain reusable.
 Both jobs install the browser toolchain and fetch full Git history because rebalancing
 may move any module between them.
-The two 180-second ceilings are premeasurement bounds: `--suite-a` and `--suite-b` have
-no hosted baselines until exact-head runs establish them.
+The two 180-second ceilings remain the predeclared absolute bounds.
+At PR 175 exact head `dee68bc8`, `--suite-a` measured 151.11 and 149.97 seconds, and
+`--suite-b` measured 133.13 and 107.34 seconds.
+Their recorded baselines are the geometric means, 150.54 and 119.54 seconds.
+Each sample preserved the complete 6,111-item quick selection: 3,050 passes and 6 skips
+in shard A, and 3,055 passes in shard B.
 
-`--sweeps`, `--checks`, `--frontend`, `--suite-a`, and `--suite-b` have no recorded
-cost. The corpus widening of 2026-09-07 invalidated the first two baselines.
+`--sweeps`, `--checks`, and `--frontend` have no recorded cost.
+The corpus widening of 2026-09-07 invalidated the first two baselines.
 Two of the sweeps tier’s four steps were split that day, so the tier those readings
 measured no longer exists.
 The `checks` record was cleared the same day and by its own rule firing rather than by
@@ -220,8 +224,8 @@ ceiling. The second run spent 132.21 s in exact verification, 106.34 s in BasedP
 62.74 s in the soundness perimeter, and 37.31 s in the browser floor.
 The browser floor and the new full-page accessibility check now form `--frontend`,
 leaving every verdict in `--fast` while removing that work from the saturated queue.
-The first hosted run of each changed partition supplies its new baseline.
-That change did not end the overruns.
+The first hosted run of each still-unmeasured changed partition supplies its new
+baseline. That change did not end the overruns.
 After `main` merged into the stack, #160 read 200.68 s and 199.74 s at `72629c03`.
 `think-lrs0` records three causes:
 - runner speed, which moved every step of one branch by about 1.3x together;
@@ -259,8 +263,8 @@ comparisons:
 
 All three runs are from 2026-09-06. The durations are observations, not necessary lower
 bounds or enforced tier baselines.
-The [tier table](#the-tiers) lists the current declarations: `--geometry` has a measured
-baseline; `--checks`, `--frontend`, `--suite-a`, `--suite-b`, and `--sweeps` remain
+The [tier table](#the-tiers) lists the current declarations: `--geometry`, `--suite-a`,
+and `--suite-b` have measured baselines; `--checks`, `--frontend`, and `--sweeps` remain
 unmeasured.
 
 ### The behavioural lanes
@@ -271,15 +275,14 @@ test satisfies exactly one, so no test can be in two lanes and none can be in ze
 
 | Lane | Marker | Tests at last count | Runs in | Bound |
 | --- | --- | ---: | --- | --- |
-| quick | neither | 6,102 selected (6,096 passed; 6 skipped) | PR fast surface, split across `suite-a` and `suite-b` | fails a test whose `call` phase reaches 12 s |
+| quick | neither | 6,111 selected (6,105 passed; 6 skipped) | PR fast surface, split across `suite-a` and `suite-b` | fails a test whose `call` phase reaches 12 s |
 | slow | `slow` | 97 | full checkpoint, under xdist in CI | fails a test whose `call` phase is under 1 s |
 | exhaustive | `exhaustive_exact` | 55 | its own CI job | its own 3600 s budget |
 
-The quick count is from the second 2026-09-15 hosted run that exposed the unsplit lane’s
-timing failure. The slow and exhaustive counts are `--collect-only` readings from
-2026-09-08 against the n = 1..324 corpus.
-These are measurements rather than fixed membership; marker expressions determine the
-three lanes, and counts move with the corpus.
+The quick count is from PR 175 run 35044761025 on 2026-09-15, after the lane was split.
+The slow and exhaustive counts are `--collect-only` readings from 2026-09-08 against the
+n = 1..324 corpus. These are measurements rather than fixed membership; marker
+expressions determine the three lanes, and counts move with the corpus.
 A stale quick count in this table is how [D-488](defects.md)’s cause stayed invisible,
 since the tests grew and the budget bounding them did not.
 [Main run 34025346801](https://github.com/jlevy/squares/actions/runs/34025346801)

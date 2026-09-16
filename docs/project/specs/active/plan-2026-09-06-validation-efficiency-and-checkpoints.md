@@ -122,9 +122,22 @@ modules automatically, and preserves module-scoped fixture reuse through
 The ordinary gate now has 78 steps, 67 of them on the PR fast surface: 50 checks, two
 frontend steps, nine geometry steps, one step in each suite shard, and four sweeps.
 The six jobs all feed the existing `packing-required` aggregate.
-Each suite shard has a 180-second premeasurement ceiling and no recorded baseline; the
-first exact-head hosted runs establish those baselines and decide whether the split is
-admissible. The local observations motivate the design but do not establish a speedup.
+Each suite shard retains its 180-second predeclared ceiling.
+On PR 175 exact head `dee68bc8`, two green readings put shard A at 151.11 and 149.97
+seconds and shard B at 133.13 and 107.34 seconds.
+Their geometric means, 150.54 and 119.54 seconds, are now the recorded baselines.
+Every reading preserved the complete 6,111-item selection: 3,050 passes and 6 skips in
+shard A, and 3,055 passes in shard B.
+
+One predecessor-head shard-B attempt completed all tests in 145.68 seconds but failed
+the unchanged 12-second per-test backstop when a divide-and-concur case took 12.76
+seconds. The test had overridden the shipped solver defaults with research-scale
+iteration limits and had already measured 10.97–11.36 seconds before sharding.
+Removing only those overrides preserved both parameter cases, the 30-seed sweep, and the
+independent feasibility check; it did not raise the guard or move coverage off the PR
+surface.
+The failed predecessor sample is retained as variance evidence but excluded from
+the corrected-head baseline.
 
 ## Design
 

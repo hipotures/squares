@@ -421,9 +421,12 @@ tiers:
 - id: suite_a
   command: packing-validate --suite-a
   ceiling_seconds: 180.0
-  measured_seconds: null
-  measured_on: null
-  measured_where: null
+  measured_seconds: 150.54
+  measured_on: '2026-09-15'
+  measured_where: >-
+    The geometric mean of two green readings at the reference shape -- 151.11s and
+    149.97s -- from run 35044761025, attempts 1 and 3, on PR 175 exact head dee68bc8.
+    Each selected 3,056 tests: 3,050 passed and 6 skipped. Observed spread 1.01x.
   reference: {jobs: 1, inner_jobs: 1, cpus: 4}
   argument: >-
     Whole-module shard A of the quick behavioural lane. Both shard jobs collect the same
@@ -433,17 +436,23 @@ tiers:
     shard B, whose ideal four-worker floors are 104.92s and 123.97s. The unsplit job had
     failed at 280.83s and 278.93s. Scheduler-only alternatives did not solve it:
     loadscope took 318.54s and worksteal 323.69s against the 302.70s default. The 180s
-    ceiling is therefore a premeasurement bound, not a claimed reading; the null baseline
-    prevents relative drift checks until an exact-shape hosted run exists. The reference
-    matches CI's `--jobs 1 --inner-jobs 1` four-cpu invocation, and `packing-required`
-    preserves coverage by requiring both shard jobs.
+    ceiling remains the predeclared absolute bound; the hosted mean above now arms the
+    relative drift and stale-record checks. The reference matches CI's `--jobs 1
+    --inner-jobs 1` four-cpu invocation, and `packing-required` preserves coverage by
+    requiring both shard jobs.
 
 - id: suite_b
   command: packing-validate --suite-b
   ceiling_seconds: 180.0
-  measured_seconds: null
-  measured_on: null
-  measured_where: null
+  measured_seconds: 119.54
+  measured_on: '2026-09-15'
+  measured_where: >-
+    The geometric mean of two green readings at the reference shape -- 133.13s and
+    107.34s -- from run 35044761025, attempts 1 and 2, on PR 175 exact head dee68bc8.
+    Each ran all 3,055 selected tests. Observed spread 1.24x. A 145.68s predecessor-head
+    attempt is excluded: it failed the unchanged per-test backstop in a quick test that
+    still carried research-scale solver overrides, so it measured a superseded test
+    composition rather than this exact head.
   reference: {jobs: 1, inner_jobs: 1, cpus: 4}
   argument: >-
     Whole-module shard B under the same complete and disjoint assignment as shard A.
@@ -451,10 +460,10 @@ tiers:
     assigns 495.89s to this shard and 419.69s to shard A, for ideal four-worker floors of
     123.97s and 104.92s. `--dist=loadfile` preserves module-scoped fixture reuse, while
     collection-derived membership places every new module in exactly one shard. The 180s
-    ceiling is a premeasurement bound above the larger ideal floor, not a baseline. The
-    null measurement disables relative rules until an exact-shape hosted reading exists;
-    the reference matches CI's `--jobs 1 --inner-jobs 1` four-cpu invocation, and
-    `packing-required` requires both shards so aggregation cannot hide lost coverage.
+    ceiling remains the predeclared absolute bound above the larger ideal floor; the
+    hosted mean above now arms the relative drift and stale-record checks. The reference
+    matches CI's `--jobs 1 --inner-jobs 1` four-cpu invocation, and `packing-required`
+    requires both shards so aggregation cannot hide lost coverage.
 
 - id: sweeps
   command: packing-validate --sweeps
