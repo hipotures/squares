@@ -19,6 +19,7 @@
     "check": "npm run build && npm run lint && npm run typecheck && npm test",
     "lint": "cd ../.. && biome ci --error-on-warnings packages/workbench && npm run lint:promises --workspace @squares/workbench",
     "lint:promises": "cd ../.. && eslint . --config packages/workbench/eslint.config.js --max-warnings 0",
+    "measure:kinetics": "node tools/measure-kinetics.ts",
     "test": "node --test tests/*.test.ts",
     "typecheck": "tsc -p tsconfig.json"
   }

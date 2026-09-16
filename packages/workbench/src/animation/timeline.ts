@@ -19,10 +19,10 @@ export interface TimelineConfiguration {
   /** Play simple transitions, every phase, at `SIMPLE_TRANSITION_SPEED`. */
   fastSimple?: boolean;
   /**
-   * The fraction of the moving span kept at its start for the box to grow, before the new square
-   * arrives or any square moves. Zero, the default, starts both with the move.
+   * Fraction of the moving span between the new square first appearing and the container starting
+   * to resize. The square is always first; the default zero starts the resize with its appearance.
    */
-  boxFirst?: number;
+  containerDelay?: number;
   timing: AtlasTiming;
   continuous: ContinuousTiming;
   anneal: number;
@@ -38,6 +38,10 @@ export interface PairSchedule {
   end: number;
   arrive: number;
   arrived: number;
+  /** When the container starts to resize, at or after `arrive`. */
+  containerStart: number;
+  /** When the container resize completes; a late start may use the first half of settle. */
+  containerEnd: number;
   blocksStart: number;
   blocksEnd: number;
   roll: number;
@@ -157,35 +161,53 @@ export function timingDuration(timing: AtlasTiming): number {
   return finiteNonnegative(duration, "total duration");
 }
 
-export function pairDuration(
+function stagedPhysicalArrivalDuration(
   configuration: TimelineConfiguration,
   index: number,
   style: AtlasStyle,
+  timing: AtlasTiming,
 ): number {
-  return timingDuration(pairTiming(configuration, index, style));
+  if (
+    style === "tween" ||
+    isStillPair(configuration, index) ||
+    (configuration.phase !== "add-then-move" && configuration.phase !== "move-then-add")
+  ) {
+    return 0;
+  }
+  const arrivalFraction = fraction(configuration.arrivalFraction, "arrival fraction");
+  return (timing.move + timing.correct) * arrivalFraction;
 }
 
-/** Arrival, movement, and correction are explicit intervals, including zero-duration beats. */
-export function pairSchedule(
+function scheduleForTiming(
   configuration: TimelineConfiguration,
   index: number,
   style: AtlasStyle,
+  timing: AtlasTiming,
 ): PairSchedule {
-  const timing = pairTiming(configuration, index, style);
   const span = timing.move + timing.correct;
+  const stagedArrival = stagedPhysicalArrivalDuration(configuration, index, style, timing);
   const moveStart = timing.dwell;
-  const moveEnd = moveStart + span;
-  const end = timingDuration(timing);
+  const moveEnd = moveStart + span + stagedArrival;
+  const nominalEnd = moveEnd + timing.settle;
   const arrivalFraction = fraction(configuration.arrivalFraction, "arrival fraction");
   const newFraction = fraction(configuration.newFraction, "new fraction");
-  const reserved = span * fraction(configuration.boxFirst ?? 0, "box-first fraction");
-  const workStart = moveStart + reserved;
-  const work = span - reserved;
+  const workStart = moveStart;
+  const work = span;
   let arrive: number;
   let arrived: number;
   let blocksStart: number;
   let blocksEnd: number;
-  if (configuration.phase === "add-then-move") {
+  if (configuration.phase === "add-then-move" && stagedArrival > 0) {
+    arrive = workStart;
+    arrived = workStart + stagedArrival;
+    blocksStart = arrived;
+    blocksEnd = blocksStart + span;
+  } else if (configuration.phase === "move-then-add" && stagedArrival > 0) {
+    blocksStart = workStart;
+    blocksEnd = workStart + span;
+    arrive = blocksEnd;
+    arrived = arrive + stagedArrival;
+  } else if (configuration.phase === "add-then-move") {
     arrive = workStart;
     arrived = workStart + work * arrivalFraction;
     blocksStart = arrived;
@@ -201,16 +223,46 @@ export function pairSchedule(
     arrive = workStart + work * (1 - newFraction);
     arrived = moveEnd;
   }
+  const containerStart = Math.min(
+    moveEnd,
+    arrive + span * fraction(configuration.containerDelay ?? 0, "container-delay fraction"),
+  );
+  // Delay controls when resizing begins, not how quickly it happens. Keep its duration fixed as the
+  // delay moves through the beat so adjacent values cannot collapse the resize and then jump to a
+  // longer animation at the move boundary. A late resize extends the pair beyond its nominal end;
+  // choosing a zero settle never turns positive-duration motion into an instantaneous box jump.
+  const containerResizeDuration = span * 0.3;
+  const containerEnd = containerStart + containerResizeDuration;
+  const end = Math.max(nominalEnd, containerEnd);
   return {
     moveStart,
     moveEnd,
     end,
     arrive,
     arrived,
+    containerStart,
+    containerEnd,
     blocksStart,
     blocksEnd,
     roll: Math.min(finiteNonnegative(configuration.rollMax, "roll maximum"), end - arrive),
   };
+}
+
+export function pairDuration(
+  configuration: TimelineConfiguration,
+  index: number,
+  style: AtlasStyle,
+): number {
+  return pairSchedule(configuration, index, style).end;
+}
+
+/** Arrival, movement, and correction are explicit intervals, including zero-duration beats. */
+export function pairSchedule(
+  configuration: TimelineConfiguration,
+  index: number,
+  style: AtlasStyle,
+): PairSchedule {
+  return scheduleForTiming(configuration, index, style, pairTiming(configuration, index, style));
 }
 
 export function clampUnit(value: number): number {
@@ -266,7 +318,11 @@ export function rangeDuration(
   );
   let duration = 0;
   for (let index = bounds.first; index <= bounds.last; index += 1) {
-    duration += timingDuration(continuousTiming(configuration, index, style));
+    const continuous = continuousTiming(configuration, index, style);
+    const timing = isSpedUpPair(configuration, index)
+      ? spedTiming(continuous, SIMPLE_TRANSITION_SPEED)
+      : continuous;
+    duration += scheduleForTiming(configuration, index, style, timing).end;
   }
   return finiteNonnegative(duration, "range duration");
 }

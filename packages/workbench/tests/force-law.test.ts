@@ -2,6 +2,9 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
   forceAtGap,
+  forceLawAnimationIntegration,
+  forceLawAnimationRequiredSubsteps,
+  forceLawAnimationSubsteps,
   forceLawAttracts,
   forceLawSteep,
   forceLawSubsteps,
@@ -29,8 +32,41 @@ test("rigid and sticky settings use the same curve in both simulation modes", ()
   assert.equal(forceAtGap(STICKY_LAW, 1), 0);
 });
 
-test("law-driven substeps retain the legacy default and bound stiff settings", () => {
+test("Pack retains its established substep bound", () => {
   assert.equal(forceLawSubsteps(DEFAULT_LAW, 1 / 120), 1);
   assert.equal(forceLawSubsteps(RIGID_LAW, 1 / 120), 2);
   assert.equal(forceLawSubsteps({ ...RIGID_LAW, repulsion: Number.MAX_VALUE }, 1), 12);
+});
+
+test("Animate adds a visible-path margin and accounts for attractive stiffness", () => {
+  assert.equal(forceLawAnimationSubsteps(DEFAULT_LAW, 1 / 120), 2);
+  assert.equal(forceLawAnimationSubsteps(RIGID_LAW, 1 / 120), 4);
+  assert.equal(
+    forceLawAnimationSubsteps(
+      { rigidity: 0.35, repulsion: 200, attraction: 400, range: 0.005 },
+      1 / 120,
+    ),
+    12,
+  );
+  assert.equal(forceLawAnimationSubsteps({ ...RIGID_LAW, repulsion: Number.MAX_VALUE }, 1), 12);
+  assert.equal(
+    forceLawAnimationRequiredSubsteps({ ...RIGID_LAW, repulsion: Number.MAX_VALUE }, 1),
+    Number.MAX_SAFE_INTEGER,
+  );
+  assert.ok(
+    forceLawAnimationRequiredSubsteps({ ...RIGID_LAW, repulsion: 1_000_000 }, 1) >
+      forceLawAnimationSubsteps({ ...RIGID_LAW, repulsion: 1_000_000 }, 1),
+  );
+});
+
+test("an uncached underresolved selection reports the adaptive cap immediately", () => {
+  const integration = forceLawAnimationIntegration(
+    { ...RIGID_LAW, repulsion: 1_000_000 },
+    DEFAULT_LAW,
+    1,
+  );
+  assert.equal(integration.requested, "adaptive");
+  assert.equal(integration.effective, 12);
+  assert.ok(integration.recommended > integration.effective);
+  assert.equal(integration.warning, "below-adaptive-stability-bound");
 });
