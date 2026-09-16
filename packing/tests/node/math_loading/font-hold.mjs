@@ -33,7 +33,7 @@ const document = {
 Object.assign(globalThis, { document });
 assert.equal("FontFaceSet" in globalThis, false);
 
-probe("devtools/probes/check_math_loading/hold_fonts.js")();
+/** @type {() => void} */ (probe("devtools/probes/check_math_loading/hold_fonts.js"))();
 /** @type {{ heldLoads: number, release(): void, nativeLoad(spec: string): Promise<unknown> }} */
 const control = Reflect.get(globalThis, "__mathLoadControl");
 const FontFace = Reflect.get(globalThis, "FontFace");

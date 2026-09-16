@@ -131,10 +131,13 @@ if (overflow) {
  * @typedef {{ phase: string, font_status: string, fonts: { family: string }[], token_limit: number, truncated: boolean, formulas: { formula: number, source: string, boxes: { rect: { y: number }, vertical_align: string }[], bases: { line_height: string }[], struts: { height: string }[] }[], tokens: { text: string, text_truncated: boolean }[] }} Snapshot
  * @typedef {{ error?: string, snapshots: Snapshot[], intervention: { status: string, applied: boolean, selected_count: number, mutated_count: number, html_unchanged: boolean, selected: object[], mutated: object[], after_selected: object[] } }} Intervention
  */
-/** @type {(phase: string, selected?: object[] | null) => Snapshot} */
-const snapshotter = probe("devtools/probes/render_explainer_pdf/math_snapshot.js")();
-/** @type {(o: { rebuild: boolean, snapshot: typeof snapshotter }) => Intervention} */
-const intervention = probe("devtools/probes/render_explainer_pdf/prepared_text_intervention.js");
+const snapshotter = /** @type {() => (phase: string, selected?: object[] | null) => Snapshot} */ (
+  probe("devtools/probes/render_explainer_pdf/math_snapshot.js")
+)();
+const intervention =
+  /** @type {(o: { rebuild: boolean, snapshot: typeof snapshotter }) => Intervention} */ (
+    probe("devtools/probes/render_explainer_pdf/prepared_text_intervention.js")
+  );
 /** @param {boolean} rebuild */
 const intervene = (rebuild) => intervention({ rebuild, snapshot: snapshotter });
 

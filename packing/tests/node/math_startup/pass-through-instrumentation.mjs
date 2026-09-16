@@ -55,8 +55,12 @@ Object.assign(globalThis, {
 Object.assign(globalThis, { window: globalThis });
 assert.equal(Reflect.get(globalThis, "FontFaceSet"), undefined);
 
-probe("devtools/probes/math/library.js")({ install: true });
-probe("devtools/probes/check_math_startup/startup.js")({ mode: "full" });
+/** @type {(options: { install: boolean }) => object} */ (probe("devtools/probes/math/library.js"))(
+  { install: true },
+);
+/** @type {(options: { mode: string }) => void} */ (
+  probe("devtools/probes/check_math_startup/startup.js")
+)({ mode: "full" });
 
 const katexResult = Symbol("katex result");
 Object.assign(globalThis, {

@@ -4,12 +4,16 @@
 // `sig` is a stand-in and `round` is `naming.js`'s own. Prints `{boxes, ordered, hidden}`.
 import { probe } from "../probe.mjs";
 
-const { round } = probe("devtools/probes/check_print_layout/naming.js")();
-/** @type {{ bulletBox: (li: object, before: object) => object | null }} */
-const { bulletBox } = probe("devtools/probes/check_print_layout/layout_helpers.js")({
-  sig: () => "ul[0] > li[0]",
-  round,
-});
+const { round } = /** @type {() => { round(value: number): number }} */ (
+  probe("devtools/probes/check_print_layout/naming.js")
+)();
+const { bulletBox } =
+  /** @type {(naming: { sig(el: object): string, round(value: number): number }) => { bulletBox(li: object, before: object): object | null }} */ (
+    probe("devtools/probes/check_print_layout/layout_helpers.js")
+  )({
+    sig: () => "ul[0] > li[0]",
+    round,
+  });
 
 const item = { parentElement: { tagName: "UL" }, getClientRects: () => [{}] };
 const square = {

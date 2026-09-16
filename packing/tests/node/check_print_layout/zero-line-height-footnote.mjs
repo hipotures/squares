@@ -59,8 +59,12 @@ Object.assign(globalThis, {
   },
 });
 
-/** @type {{ firstLineBox: (el: object) => object | null }} */
-const { firstLineBox } = probe("devtools/probes/check_print_layout/layout_helpers.js")(
-  probe("devtools/probes/check_print_layout/naming.js")(),
-);
+const { firstLineBox } =
+  /** @type {(naming: { sig(el: object): string, round(value: number): number }) => { firstLineBox(el: object): object | null }} */ (
+    probe("devtools/probes/check_print_layout/layout_helpers.js")
+  )(
+    /** @type {() => { sig(el: object): string, round(value: number): number }} */ (
+      probe("devtools/probes/check_print_layout/naming.js")
+    )(),
+  );
 process.stdout.write(JSON.stringify(firstLineBox(el)));

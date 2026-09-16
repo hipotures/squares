@@ -191,9 +191,14 @@ DECLARED_BIOME_OVERRIDES: tuple[dict[str, Any], ...] = (
 DECLARED_BIOME_EXCLUSIONS: tuple[dict[str, Any], ...] = (
     {
         "reason": "the liveness samples break the floor on purpose: a braceless `if` for "
-        "Biome, a floating Promise for ESLint, and a type error for `tsc`",
+        "Biome, a floating Promise for ESLint, and type errors for `tsc`",
         "exclusion": "!packing/tests/fixtures/browser-floor",
-        "files": {"braceless-if.js": 36, "floating-promise.js": 67, "type-error.js": 22},
+        "files": {
+            "braceless-if.js": 36,
+            "floating-promise.js": 67,
+            "probe-undeclared-member.mjs": 162,
+            "type-error.js": 22,
+        },
     },
 )
 FLOOR_SAMPLES = REPOSITORY_ROOT / DECLARED_BIOME_EXCLUSIONS[0]["exclusion"].removeprefix("!")
@@ -562,12 +567,20 @@ def test_a_broad_or_undeclared_biome_override_is_refused() -> None:
     dropped["files"]["includes"].remove(DECLARED_BIOME_EXCLUSIONS[0]["exclusion"])
     assert len(_declared_exclusion_faults(dropped, DECLARED_BIOME_EXCLUSIONS)) == 1
     narrowed = [
-        {**entry, "files": {"braceless-if.js": 35, "type-error.js": 22, "gone.js": 1}}
+        {
+            **entry,
+            "files": {
+                "braceless-if.js": 35,
+                "floating-promise.js": 67,
+                "probe-undeclared-member.mjs": 162,
+                "gone.js": 1,
+            },
+        }
         for entry in DECLARED_BIOME_EXCLUSIONS
     ]
     faults = _declared_exclusion_faults(config, narrowed)
     assert len(faults) == 3, faults
-    assert "holds floating-promise.js, which the exception does not declare" in faults[0]
+    assert "holds type-error.js, which the exception does not declare" in faults[0]
     assert "declares gone.js, which the tree does not hold" in faults[1]
     assert "braceless-if.js is 36 bytes, over the 35 declared" in faults[2]
 
@@ -880,3 +893,33 @@ def test_the_type_gate_actually_rejects_a_type_error(tmp_path: Path) -> None:
         cwd=tmp_path,
     )
     assert done.returncode != 0, "tsc accepted a type error under the floor's own options"
+
+
+def test_the_probe_loader_refuses_an_undeclared_member(tmp_path: Path) -> None:
+    """A probe result stays unknown until its caller states the exact shape it consumes."""
+    _require_tool(TSC)
+    loader = REPOSITORY_ROOT / "packing/tests/node/probe.mjs"
+    shutil.copyfile(FLOOR_SAMPLES / "probe-undeclared-member.mjs", tmp_path / "sample.mjs")
+    shutil.copyfile(loader, tmp_path / "probe.mjs")
+    (tmp_path / "tsconfig.json").write_text(
+        json.dumps(
+            {
+                "extends": str(REPOSITORY_ROOT / "tsconfig.devtools-node.json"),
+                "compilerOptions": {
+                    "typeRoots": [str(REPOSITORY_ROOT / "node_modules/@types")]
+                },
+                "include": ["sample.mjs"],
+            }
+        ),
+        encoding="utf-8",
+    )
+    done = subprocess.run(
+        [str(TSC), "-p", "tsconfig.json"],
+        check=False,
+        capture_output=True,
+        text=True,
+        cwd=tmp_path,
+    )
+    output = done.stdout + done.stderr
+    assert done.returncode != 0, "tsc accepted an undeclared member on a narrowed probe"
+    assert "Property 'undeclared' does not exist on type '{ declared: number; }'" in output

@@ -27,8 +27,9 @@ Object.assign(globalThis, {
   },
 });
 
-/** @type {readonly { id: string, value: string }[]} */
-const targets = probe("devtools/probes/check_math_loading/early_events.js")();
+const targets = /** @type {() => readonly { id: string, value: string }[]} */ (
+  probe("devtools/probes/check_math_loading/early_events.js")
+)();
 assert.equal(Object.isFrozen(targets), true);
 assert.equal(new Set(targets.map((target) => target.value)).size, sliders.length);
 for (const [i, target] of targets.entries()) {

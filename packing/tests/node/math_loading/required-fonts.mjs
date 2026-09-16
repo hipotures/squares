@@ -54,8 +54,11 @@ const observe = (spec, text) => {
   return { ready: !spec.includes("KaTeX_Main") };
 };
 
-/** @type {{ ready: boolean }[]} */
-const result = probe("devtools/probes/math/library.js")().requiredFonts(math, observe);
+const library =
+  /** @type {() => { requiredFonts(math: object, observe: (spec: string, text: string) => { ready: boolean }): { ready: boolean, outcome?: string, error?: string }[] }} */ (
+    probe("devtools/probes/math/library.js")
+  )();
+const result = library.requiredFonts(math, observe);
 assert.deepEqual(checked, [
   { spec: 'normal 400 16px "KPress Math, Text Sans"', text: "x1≈" },
   { spec: "normal 400 16px KaTeX_Main", text: "x1≈" },
@@ -71,7 +74,7 @@ assert.equal(
 assert.equal(result[2]?.ready, true);
 assert.equal(result[3]?.ready, true);
 
-const rejected = probe("devtools/probes/math/library.js")().requiredFonts(math, () => {
+const rejected = library.requiredFonts(math, () => {
   throw new Error("observer failed");
 });
 assert.equal(rejected.length, 4);

@@ -32,8 +32,9 @@ const wrapper = element(null, [first]);
 const glyph = element(first);
 const text = { nodeType: 3, parentElement: glyph };
 
-/** @type {(records?: object[]) => Iterable<object>} */
-const affected = probe("devtools/probes/math/library.js")().mutatedMath;
+const affected = /** @type {() => { mutatedMath(records?: object[]): Iterable<object> }} */ (
+  probe("devtools/probes/math/library.js")
+)().mutatedMath;
 
 assert.deepEqual([...affected()], [first, second]);
 assert.deepEqual([...affected([{ type: "attributes", target: wrapper }])], [first]);

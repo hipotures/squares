@@ -87,11 +87,15 @@ Object.assign(globalThis, {
   getComputedStyle: (node) => node.style,
 });
 
-const { round } = probe("devtools/probes/check_print_layout/naming.js")();
-/** @type {{ widestRun: (root: object) => object | null }} */
-const { widestRun } = probe("devtools/probes/check_print_layout/layout_helpers.js")({
-  /** @param {Stand} node */
-  sig: (node) => node.name,
-  round,
-});
+const { round } = /** @type {() => { round(value: number): number }} */ (
+  probe("devtools/probes/check_print_layout/naming.js")
+)();
+const { widestRun } =
+  /** @type {(naming: { sig(el: Stand): string, round(value: number): number }) => { widestRun(root: object): object | null }} */ (
+    probe("devtools/probes/check_print_layout/layout_helpers.js")
+  )({
+    /** @param {Stand} node */
+    sig: (node) => node.name,
+    round,
+  });
 process.stdout.write(JSON.stringify(widestRun(root) ?? null));

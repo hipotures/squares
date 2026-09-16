@@ -33,8 +33,9 @@ Object.assign(globalThis, {
   },
 });
 
-/** @type {(observe?: (phase: string) => unknown) => Promise<void>} */
-const settle = probe("devtools/probes/render_explainer_pdf/settled.js")();
+const settle = /** @type {() => (observe?: (phase: string) => unknown) => Promise<void>} */ (
+  probe("devtools/probes/render_explainer_pdf/settled.js")
+)();
 /** @type {string[]} */
 const phases = [];
 await settle((phase) => phases.push(phase));

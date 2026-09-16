@@ -53,7 +53,8 @@ Object.assign(globalThis, {
   getComputedStyle: (el) => el,
 });
 
-const math = probe("devtools/probes/math/library.js")();
-/** @type {(o: { math: object }) => string[]} */
-const proverLayout = probe("devtools/probes/check_print_layout/prover_layout.js");
+const math = /** @type {() => object} */ (probe("devtools/probes/math/library.js"))();
+const proverLayout = /** @type {(o: { math: object }) => string[]} */ (
+  probe("devtools/probes/check_print_layout/prover_layout.js")
+);
 process.stdout.write(JSON.stringify(proverLayout({ math })));

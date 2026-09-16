@@ -6,8 +6,9 @@
 import assert from "node:assert/strict";
 import { probe } from "../probe.mjs";
 
-/** @type {() => Promise<void>} */
-const waitForImages = probe("devtools/probes/render_explainer_pdf/images_decoded.js");
+const waitForImages = /** @type {() => Promise<void>} */ (
+  probe("devtools/probes/render_explainer_pdf/images_decoded.js")
+);
 /** @param {object} document */
 const install = (document) => Object.assign(globalThis, { document });
 

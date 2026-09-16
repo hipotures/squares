@@ -47,9 +47,10 @@ const readout = {
   ],
 };
 
-const math = probe("devtools/probes/math/library.js")();
-/** @type {(el: object, o: { math: object }) => string} */
-const readoutText = probe("devtools/probes/check_print_layout/readout_text.js");
+const math = /** @type {() => object} */ (probe("devtools/probes/math/library.js"))();
+const readoutText = /** @type {(el: object, o: { math: object }) => string} */ (
+  probe("devtools/probes/check_print_layout/readout_text.js")
+);
 /** @param {{ nodes: object[] }} el */
 const text = (el) => readoutText(el, { math });
 
