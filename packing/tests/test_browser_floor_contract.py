@@ -728,8 +728,10 @@ def test_a_probe_cannot_see_a_foreign_groups_ambient_types(tmp_path: Path) -> No
         text=True,
     )
     assert completed.returncode != 0
-    assert "probes/beta/read.js" in completed.stderr
-    assert "Cannot find name 'AlphaOnly'" in completed.stderr
+    stderr = completed.stderr
+    assert isinstance(stderr, str)
+    assert "probes/beta/read.js" in stderr
+    assert "Cannot find name 'AlphaOnly'" in stderr
 
 
 def test_the_explainer_shell_owns_no_inline_programs() -> None:
