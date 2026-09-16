@@ -477,7 +477,7 @@ def test_ci_jobs_fetch_provenance_history_and_key_the_uv_cache_from_the_lock() -
     assert sweep_checkout_options["persist-credentials"] is False
     sparse = set(str(sweep_checkout_options["sparse-checkout"]).splitlines())
     assert {
-        "!/packing/campaign/",
+        "!/packing/campaign/*/",
         "!/packing/resources/",
         "/packing/resources/web/kingbird-squares-in-squares.html",
         "/packing/resources/web/known-best-packings/",

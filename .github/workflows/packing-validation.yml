@@ -684,18 +684,19 @@ jobs:
             /vendor/kpress/
             /packages/workbench/
             /packing/
-            !/packing/campaign/
+            !/packing/campaign/*/
             !/packing/resources/
             /packing/resources/
-            !/packing/resources/*/
+            !/packing/resources/*
+            /packing/resources/README.md
             /packing/resources/web/
-            !/packing/resources/web/*/
+            !/packing/resources/web/*
             /packing/resources/web/kingbird-squares-in-squares.html
             /packing/resources/web/known-best-packings/
             /packing/resources/web/prospective-packings/
             /packing/resources/web/unitsquare-release1-2026/
             /packing/resources/papers/
-            !/packing/resources/papers/*/
+            !/packing/resources/papers/*
             /packing/resources/papers/kingbird-square-29-provenance.svg
 
       - name: Install uv and Python 3.14
