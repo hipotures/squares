@@ -9,9 +9,11 @@ from fnmatch import fnmatchcase
 from pathlib import Path
 from typing import Any
 
+from devtools.pages_scope import pull_request_jobs
 from sqpack.yamlio import safe_load
 
 REPO = Path(__file__).resolve().parents[2]
+REGISTER = REPO / "packing/devtools/gate-budgets.yaml"
 
 #: The jobs a pull request never runs: the deploy path, which only a push to `main`
 #: starts, and the dispatch-only timing experiment.
@@ -276,6 +278,43 @@ def test_publication_assembles_the_three_checked_products_and_only_main_uploads_
     )
     assert build < share
     assert "--check" in shlex.split(workbench[build]["run"])
+
+
+def test_every_page_job_a_pull_request_runs_is_budgeted() -> None:
+    """A page job with no recorded cost is a job that can double without anything objecting.
+
+    That is what happened to this workflow: the register budgets the validation tiers and
+    said nothing about Pages, which reached 472 s on a pull request with every check green
+    (`think-xfqk`). The tiers' own rule, asked of these jobs: every job a pull request runs
+    has an entry, every entry names a job that exists, every entry carries a cost measured
+    on named runs, and every ceiling is inside the register's `max_headroom` of that cost.
+    A matrix job is one entry per cell, because that is what a runner runs.
+
+    Enforcement against a live run belongs to the pull-request wall tool; this is the
+    declaration check, and like `check_gate_budgets` it needs no clock.
+    """
+    register = safe_load(REGISTER.read_text("utf-8"))
+    pages = register["pages"]
+    workflow = load()
+    jobs = workflow["jobs"]
+    expected: set[str] = set()
+    for name in pull_request_jobs(workflow):
+        matrix = jobs[name].get("strategy", {}).get("matrix", {}).get("browser")
+        expected |= {f"{name} ({cell})" for cell in matrix} if matrix else {name}
+    assert {entry["id"] for entry in pages["jobs"]} == expected
+    assert pages["reference"] == {"runner": "ubuntu-latest", "cpus": 4, "caches": "warm"}
+    headroom = register["policy"]["max_headroom"]
+    for entry in [*pages["jobs"], pages["wall"]]:
+        where = entry.get("id", "wall")
+        assert entry["measured_seconds"] > 0, where
+        assert entry["measured_on"], where
+        assert re.search(r"run \d{8,}", entry["measured_where"]), where
+        assert entry["ceiling_seconds"] >= entry["measured_seconds"], where
+        assert entry["ceiling_seconds"] <= headroom * entry["measured_seconds"], where
+        assert entry["argument"].strip(), where
+    assert pages["wall"]["measured_seconds"] >= max(
+        entry["measured_seconds"] for entry in pages["jobs"]
+    ), "the wall is at least the longest job"
 
 
 def test_pages_runs_real_math_failure_controls_on_the_pdf_it_draws() -> None:
@@ -625,7 +664,7 @@ def test_prepared_geometry_checks_cover_each_browser_and_their_controls() -> Non
         "chromium": [name for name in measuring if "strategy" not in jobs[name]],
         "matrix-browser": [name for name in measuring if "strategy" in jobs[name]],
     }
-    assert set(browsers["chromium"]) == {"geometry", "typography"}
+    assert set(browsers["chromium"]) == {"geometry", "typography", "pdf"}
     assert set(browsers["matrix-browser"]) == {"font-loading", "browser-geometry"}
     for name in browsers["matrix-browser"]:
         assert set(jobs[name]["strategy"]["matrix"]["browser"]) == {"firefox", "webkit"}
@@ -703,7 +742,7 @@ def test_prepared_geometry_checks_cover_each_browser_and_their_controls() -> Non
                 context(command) for command in commands if "--print" in command
             } >= settings
             assert any("--alternate-certificate" in command for command in commands)
-    assert len(artifact_names) == 4, "each job's observations are retained under its own name"
+    assert len(artifact_names) == 5, "each job's observations are retained under its own name"
 
 
 def test_reload_guard_covers_both_viewports_on_the_published_artifact() -> None:

@@ -347,22 +347,23 @@ jobs:
           retention-days: 7
 
   # The five Chromium check jobs below were one `build` job of about 300 s. Their split is
-  # by measured step time, and the readings are this workflow's own, from run 35039248281
-  # (the first run of the split shape) rather than from the queue it replaced:
+  # by measured step time, and the readings are this workflow's own -- run 35039923396,
+  # the second run of the split shape -- rather than the queue's they replaced:
   #
-  #   pdf           print faces 10, PDF draw 5, PDF controls 22, artifact check 5     42 s
-  #   print-layout  print layout 30, the page-width overflow control 34               64 s
-  #   typography    typography 30, comparison variants 0, print geometry 4 x 4.5,
-  #                 startup controls 17                                               65 s
-  #   screen        math faces 30, font loading 19, reload 10                         59 s
-  #   geometry      controls 41, seven screen settings and the alternate
-  #                 certificate 8 x 3                                                 64 s
+  #   pdf           print faces 9, PDF draw 4, PDF controls 22, artifact check 6,
+  #                 print geometry 4 x 4.3                                            58 s
+  #   print-layout  print layout 35, the page-width overflow control 31               66 s
+  #   typography    typography 33, comparison variants 1, startup controls 17,
+  #                 mobile screen geometry 4 x 5                                       70 s
+  #   screen        math faces 29, font loading 18, reload 9                          56 s
+  #   geometry      controls 41, three desktop settings and the alternate
+  #                 certificate 4 x 5                                                 61 s
   #
-  # on about 17 s of setup each. The grouping follows the measurement where it has to:
-  # the startup controls are a screen check and sit in `typography` because that job was
-  # the shortest, which is what balanced by cost means. Each job downloads the one
-  # prepared page, so all of them check the bytes that are published, and a failure now
-  # names its job rather than a step in a 388 s queue.
+  # on 15 to 30 s of setup each. The grouping follows the measurement where it has to:
+  # the startup controls are a screen check, and the fourteen geometry configurations are
+  # spread over three jobs, because balanced by cost is what keeps the longest job short.
+  # Each job downloads the one prepared page, so all of them check the bytes that are
+  # published, and a failure now names its job rather than a step in a 388 s queue.
 
   # Everything the PDF is: drawn once, from the prepared page, then checked in place and
   # handed to `publish` unchanged.
@@ -471,6 +472,32 @@ jobs:
           name: explainer-pdf-check
           path: /tmp/explainer-pdf-check
           if-no-files-found: ignore
+          retention-days: 7
+
+      # The print half of the saved-setting geometry; the screen half is `geometry`.
+      # The trap is what lets a cancelled run stop here: `uv run` turns the runner's
+      # interrupt into an ordinary exit status, which `|| geometry_status=1` absorbed, so
+      # a superseded run kept measuring one setting after another for about 50 s and held
+      # the concurrency group for all of it (run 34993121513). The trap exits once the
+      # command in flight returns.
+      - name: Check reserved print geometry under every saved font setting
+        run: |
+          trap 'exit 130' INT TERM
+          mkdir -p /tmp/math-geometry
+          geometry_status=0
+          uv run --frozen --group dev python -m devtools.prepare_explainer_math site/index.html --print --output /tmp/math-geometry/chromium-1280-custom-serif-print.json || geometry_status=1
+          uv run --frozen --group dev python -m devtools.prepare_explainer_math site/index.html --prose-font sans --print --output /tmp/math-geometry/chromium-1280-custom-sans-print.json || geometry_status=1
+          uv run --frozen --group dev python -m devtools.prepare_explainer_math site/index.html --font-set system --print --output /tmp/math-geometry/chromium-1280-system-serif-print.json || geometry_status=1
+          uv run --frozen --group dev python -m devtools.prepare_explainer_math site/index.html --font-set system --prose-font sans --print --output /tmp/math-geometry/chromium-1280-system-sans-print.json || geometry_status=1
+          exit "$geometry_status"
+
+      - name: Retain Chromium print geometry observations
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: math-geometry-chromium-print
+          path: /tmp/math-geometry
+          if-no-files-found: error
           retention-days: 7
 
       # The checked bytes, unchanged: `publish` puts this file beside the prepared page.
@@ -599,28 +626,25 @@ jobs:
           uv run --frozen --group dev python -m devtools.check_math_startup --runs 1 --output /tmp/math-startup-desktop.json
           uv run --frozen --group dev python -m devtools.check_math_startup --runs 1 --width 390 --output /tmp/math-startup-mobile.json
 
-      # The print half of the saved-setting geometry; the screen half is `geometry`.
-      # The trap is what lets a cancelled run stop here: `uv run` turns the runner's
-      # interrupt into an ordinary exit status, which `|| geometry_status=1` absorbed, so
-      # a superseded run kept measuring one setting after another for about 50 s and held
-      # the concurrency group for all of it (run 34993121513). The trap exits once the
-      # command in flight returns.
-      - name: Check reserved print geometry under every saved font setting
+      # The mobile half of the saved-setting screen geometry, here rather than in
+      # `geometry` because that job's nine configurations were 80 s of its 100 against
+      # this job's 50 (run 35039923396). The trap: see `geometry`.
+      - name: Check reserved math geometry at 390 px under every saved font setting
         run: |
           trap 'exit 130' INT TERM
           mkdir -p /tmp/math-geometry
           geometry_status=0
-          uv run --frozen --group dev python -m devtools.prepare_explainer_math site/index.html --print --output /tmp/math-geometry/chromium-1280-custom-serif-print.json || geometry_status=1
-          uv run --frozen --group dev python -m devtools.prepare_explainer_math site/index.html --prose-font sans --print --output /tmp/math-geometry/chromium-1280-custom-sans-print.json || geometry_status=1
-          uv run --frozen --group dev python -m devtools.prepare_explainer_math site/index.html --font-set system --print --output /tmp/math-geometry/chromium-1280-system-serif-print.json || geometry_status=1
-          uv run --frozen --group dev python -m devtools.prepare_explainer_math site/index.html --font-set system --prose-font sans --print --output /tmp/math-geometry/chromium-1280-system-sans-print.json || geometry_status=1
+          uv run --frozen --group dev python -m devtools.prepare_explainer_math site/index.html --width 390 --output /tmp/math-geometry/chromium-390-custom-serif-screen.json || geometry_status=1
+          uv run --frozen --group dev python -m devtools.prepare_explainer_math site/index.html --prose-font sans --width 390 --output /tmp/math-geometry/chromium-390-custom-sans-screen.json || geometry_status=1
+          uv run --frozen --group dev python -m devtools.prepare_explainer_math site/index.html --font-set system --width 390 --output /tmp/math-geometry/chromium-390-system-serif-screen.json || geometry_status=1
+          uv run --frozen --group dev python -m devtools.prepare_explainer_math site/index.html --font-set system --prose-font sans --width 390 --output /tmp/math-geometry/chromium-390-system-sans-screen.json || geometry_status=1
           exit "$geometry_status"
 
-      - name: Retain Chromium print geometry observations
+      - name: Retain Chromium mobile geometry observations
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: math-geometry-chromium-print
+          name: math-geometry-chromium-390
           path: /tmp/math-geometry
           if-no-files-found: error
           retention-days: 7
@@ -700,8 +724,8 @@ jobs:
 
   # Saved font settings select different prepared variants before the page hydrates, and
   # every setting must retain its own geometry on this same artifact. The first setting
-  # carries the host check and the negative controls, about 41 s of this job's 64; the
-  # print settings run in `typography`.
+  # carries the host check and the negative controls, about 41 s of this job's 61; the
+  # mobile settings run in `typography` and the print settings in `pdf`.
   geometry:
     needs: prepare
     runs-on: ubuntu-latest
@@ -752,13 +776,9 @@ jobs:
           mkdir -p /tmp/math-geometry
           geometry_status=0
           uv run --frozen --group dev python -m devtools.prepare_explainer_math site/index.html --host-check --self-test --output /tmp/math-geometry/chromium-1280-custom-serif-screen-controls.json || geometry_status=1
-          uv run --frozen --group dev python -m devtools.prepare_explainer_math site/index.html --width 390 --output /tmp/math-geometry/chromium-390-custom-serif-screen.json || geometry_status=1
           uv run --frozen --group dev python -m devtools.prepare_explainer_math site/index.html --prose-font sans --output /tmp/math-geometry/chromium-1280-custom-sans-screen.json || geometry_status=1
-          uv run --frozen --group dev python -m devtools.prepare_explainer_math site/index.html --prose-font sans --width 390 --output /tmp/math-geometry/chromium-390-custom-sans-screen.json || geometry_status=1
           uv run --frozen --group dev python -m devtools.prepare_explainer_math site/index.html --font-set system --output /tmp/math-geometry/chromium-1280-system-serif-screen.json || geometry_status=1
-          uv run --frozen --group dev python -m devtools.prepare_explainer_math site/index.html --font-set system --width 390 --output /tmp/math-geometry/chromium-390-system-serif-screen.json || geometry_status=1
           uv run --frozen --group dev python -m devtools.prepare_explainer_math site/index.html --font-set system --prose-font sans --output /tmp/math-geometry/chromium-1280-system-sans-screen.json || geometry_status=1
-          uv run --frozen --group dev python -m devtools.prepare_explainer_math site/index.html --font-set system --prose-font sans --width 390 --output /tmp/math-geometry/chromium-390-system-sans-screen.json || geometry_status=1
           uv run --frozen --group dev python -m devtools.prepare_explainer_math site/index.html --alternate-certificate --output /tmp/math-geometry/chromium-1280-custom-serif-screen-alternate-certificate.json || geometry_status=1
           exit "$geometry_status"
 
