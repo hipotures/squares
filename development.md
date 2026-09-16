@@ -178,7 +178,8 @@ alone is not full pre-merge evidence.
 | `--sweeps` | **CI, on every pull request**, in the `sweeps` job, concurrently | 4 of 80 | 210 s | 119.72 s before reconciliation; PR 180’s predecessor topology read 138.84 s |
 | *(no flag)* | Full checkpoint before final review and at block close; main, dispatch, and daily CI | 80 of 80 | 3600 s | split across four jobs; not clocked whole |
 
-`--geometry`’s cost is a geometric mean of four readings at the reference shape.
+`--geometry`’s current cost is the geometric mean of seven readings at the reference
+shape. The earlier four-reading baseline remains in the register’s history.
 The superseded `--suite` tier’s final record was a single reading: merging PR 137
 brought sixteen test files and the threshold work four more, taking that quick selection
 from 4,283 tests to 4,639.
@@ -216,8 +217,8 @@ suite A, and 3,977 passes with 6 skips in suite B. Those are interim baselines p
 schema-v2 cost rebuild and final-head hosted cohorts; the predecessor PR 175 readings
 and their geometric means remain in the budget register as history.
 
-`--sweeps`, `--checks`, and `--frontend` have no recorded cost.
-The corpus widening of 2026-09-07 invalidated the first two baselines.
+Before the reconciliation runs, `--sweeps`, `--checks`, and `--frontend` had no current
+recorded cost. The corpus widening of 2026-09-07 invalidated the first two baselines.
 Two of the sweeps tier’s four steps were split that day, so the tier those readings
 measured no longer exists.
 The `checks` record was cleared the same day and by its own rule firing rather than by
@@ -230,8 +231,10 @@ ceiling. The second run spent 132.21 s in exact verification, 106.34 s in BasedP
 62.74 s in the soundness perimeter, and 37.31 s in the browser floor.
 The browser floor and the new full-page accessibility check now form `--frontend`,
 leaving every verdict in `--fast` while removing that work from the saturated queue.
-The first hosted run of each still-unmeasured changed partition supplies its new
-baseline. That change did not end the overruns.
+At that point, the first hosted run of each changed partition supplied its new baseline.
+The table above now carries those readings; the final reconciliation head must refresh
+any entry whose topology changed.
+Splitting the partitions did not end the overruns.
 After `main` merged into the stack, #160 read 200.68 s and 199.74 s at `72629c03`.
 `think-lrs0` records three causes:
 - runner speed, which moved every step of one branch by about 1.3x together;
