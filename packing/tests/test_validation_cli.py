@@ -185,7 +185,11 @@ def test_artifact_provenance_includes_untracked_source(
         strict=False,
         jobs=1,
         inner_jobs=1,
-        environment={**os.environ, "PACKING_VALIDATION_ARTIFACT_DIR": str(artifacts)},
+        environment={
+            **os.environ,
+            "PACKING_VALIDATION_ARTIFACT_DIR": str(artifacts),
+            "DYLD_FALLBACK_LIBRARY_PATH": "/opt/homebrew/lib",
+        },
     )
     monkeypatch.setattr(validate, "REPOSITORY_ROOT", repo)
     validate._begin_artifacts(context, [])
@@ -195,6 +199,7 @@ def test_artifact_provenance_includes_untracked_source(
     assert receipt["untracked_hashes"] == {
         "untracked.py": hashlib.sha256(source.read_bytes()).hexdigest(),
     }
+    assert receipt["environment"]["DYLD_FALLBACK_LIBRARY_PATH"] == "/opt/homebrew/lib"
     assert "untracked.py" in receipt["git_status"]
 
 
@@ -1334,6 +1339,93 @@ def test_strict_mode_enables_deep_validation(monkeypatch: pytest.MonkeyPatch) ->
     assert observed is not None
     if not observed.deep:
         pytest.fail("strict mode did not enable deep validation")
+
+
+@pytest.mark.parametrize(
+    ("host_system", "library_name"),
+    [("Linux", "libcairo.2.dylib"), ("Darwin", None)],
+    ids=["non-macos", "missing-library"],
+)
+def test_validation_environment_changes_only_a_macos_host_with_homebrew_cairo(
+    tmp_path: Path, host_system: str, library_name: str | None
+) -> None:
+    library_directory = tmp_path / "lib"
+    library_directory.mkdir()
+    if library_name is not None:
+        (library_directory / library_name).touch()
+
+    environment = validate._validation_environment(
+        {"PATH": "/usr/bin"},
+        host_system=host_system,
+        cairo_library_directories=(library_directory,),
+    )
+
+    assert environment == {"PATH": "/usr/bin"}
+
+
+def test_validation_environment_adds_discovered_homebrew_cairo(tmp_path: Path) -> None:
+    library_directory = tmp_path / "lib"
+    library_directory.mkdir()
+    (library_directory / "libcairo.2.dylib").touch()
+
+    environment = validate._validation_environment(
+        {"PATH": "/usr/bin"},
+        host_system="Darwin",
+        cairo_library_directories=(library_directory,),
+    )
+
+    assert environment["DYLD_FALLBACK_LIBRARY_PATH"] == str(library_directory)
+
+
+def test_validation_environment_preserves_an_explicit_cairo_loader_path(
+    tmp_path: Path,
+) -> None:
+    library_directory = tmp_path / "lib"
+    library_directory.mkdir()
+    (library_directory / "libcairo.2.dylib").touch()
+
+    environment = validate._validation_environment(
+        {"DYLD_FALLBACK_LIBRARY_PATH": ""},
+        host_system="Darwin",
+        cairo_library_directories=(library_directory,),
+    )
+
+    assert environment["DYLD_FALLBACK_LIBRARY_PATH"] == ""
+
+
+def test_main_passes_the_discovered_cairo_path_to_validation_children(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    library_directory = tmp_path / "lib"
+    library_directory.mkdir()
+    (library_directory / "libcairo.2.dylib").touch()
+    monkeypatch.delenv("DYLD_FALLBACK_LIBRARY_PATH", raising=False)
+    monkeypatch.setattr(validate.platform, "system", lambda: "Darwin")
+    monkeypatch.setattr(validate, "MACOS_CAIRO_LIBRARY_DIRECTORIES", (library_directory,))
+    observed: validate.Context | None = None
+
+    def capture_context(
+        selected: list[validate.Step],
+        context: validate.Context,
+        *_narrowing: object,
+    ) -> validate.RunSummary:
+        nonlocal observed
+        observed = context
+        return validate.RunSummary(
+            results=[],
+            wall_seconds=0,
+            selected_count=len(selected),
+            total_count=len(validate.STEPS),
+        )
+
+    monkeypatch.setattr(validate, "_run_selected", capture_context)
+
+    status, _, stderr = _invoke("--edit")
+
+    assert status == 0
+    assert stderr == ""
+    assert observed is not None
+    assert observed.environment["DYLD_FALLBACK_LIBRARY_PATH"] == str(library_directory)
 
 
 def test_existing_activity_marker_explains_safe_recovery(tmp_path: Path) -> None:
@@ -2507,8 +2599,8 @@ def test_a_verified_merge_repeats_everything_not_positively_tree_reusable() -> N
     assert validate_job["permissions"] == {"contents": "read", "actions": "read"}
 
 
-def test_the_engine_cache_backdates_sources_only_for_their_exact_compiler_build() -> None:
-    """A partial target restore must rebuild changed source instead of serving its binary."""
+def test_the_engine_cache_backdates_and_saves_only_a_build_for_its_exact_key() -> None:
+    """A partial restore or verified-main skip must not bless an old target as current."""
     document = safe_load(WORKFLOW.read_text(encoding="utf-8"))
     steps = document["jobs"]["validate"]["steps"]
 
@@ -2525,6 +2617,7 @@ def test_the_engine_cache_backdates_sources_only_for_their_exact_compiler_build(
         if step.get("name") == "Cache the Rust build for the engine"
     )
     assert cache["id"] == "engine-cache"
+    assert "actions/cache/restore@" in cache["uses"]
     cache_key = cache["with"]["key"]
     assert "${{ runner.os }}-sqsearch-" in cache_key
     assert "${{ steps.engine-key.outputs.rustc }}" in cache_key
@@ -2533,10 +2626,47 @@ def test_the_engine_cache_backdates_sources_only_for_their_exact_compiler_build(
         "${{ runner.os }}-sqsearch-${{ steps.engine-key.outputs.rustc }}-"
     )
 
-    repair = steps[cache_index + 1]
+    populate = steps[cache_index + 1]
+    assert populate["name"] == "Populate the engine cache for this exact tree"
+    assert populate["if"] == "steps.engine-cache.outputs.cache-hit != 'true'"
+    assert populate["working-directory"] == "packing/sqsearch"
+    assert populate["run"] == "cargo build --locked --release --quiet"
+
+    repair = steps[cache_index + 2]
     assert repair["name"] == "Date the engine sources before the build restored for them"
     assert repair["if"] == "steps.engine-cache.outputs.cache-hit == 'true'"
     assert repair["run"] == ("git ls-files -z -- sqsearch | xargs -0 touch -t 200001010000")
+
+    save = next(
+        step
+        for step in steps
+        if step.get("name") == "Save the Rust build for the exact engine tree"
+    )
+    assert "actions/cache/save@" in save["uses"]
+    assert save["if"] == ("success() && steps.engine-cache.outputs.cache-hit != 'true'")
+    assert save["with"] == {
+        "path": cache["with"]["path"],
+        "key": "${{ steps.engine-cache.outputs.cache-primary-key }}",
+    }
+    gate_indices = [
+        index
+        for index, step in enumerate(steps)
+        if step.get("name")
+        in {"Run the required pull-request checks", "Run the complete integration surface"}
+    ]
+    assert steps.index(save) > max(gate_indices)
+    assert steps.index(save) < next(
+        index
+        for index, step in enumerate(steps)
+        if step.get("name") == "Preserve validation timings and partial logs"
+    )
+
+    # This is the formerly unsafe path: a verified main push narrows away every
+    # validation-owned engine step. The explicit miss build above still runs first.
+    assert any(step.needs_engine for step in validate.STEPS)
+    assert not any(
+        step.needs_engine for step in validate._after_verified_pull_request(validate.STEPS)
+    )
 
 
 def test_browser_floor_liveness_runs_only_with_the_frontend_node_toolchain() -> None:

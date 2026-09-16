@@ -142,9 +142,14 @@ jobs:
       # build was made from byte-identical sources by the same compiler, so dating them
       # before it is true. A partial restore leaves the checkout's mtimes alone and cargo
       # rebuilds; backdating a changed file was measured to serve the old binary, which is
-      # why the `if:` below is not optional. The old key was `Cargo.lock` alone, so the one
-      # entry saved on 09-06 was never replaced. `rustc -vV` also installs the pinned
-      # toolchain from `rust-toolchain.toml` here rather than inside the gate's build.
+      # why the `if:` below is not optional. Restore and save are separate because a
+      # verified main push can skip every validation-owned engine step. An automatic
+      # post-job save after that skip could bind a partially restored old target to the
+      # new exact key. The explicit build on a miss makes the exact-key claim true before
+      # any event can skip validation work; the later validation build is then a no-op.
+      # The old key was `Cargo.lock` alone, so the one entry saved on 09-06 was never
+      # replaced. `rustc -vV` also installs the pinned toolchain from
+      # `rust-toolchain.toml` here rather than inside the gate's build.
       - name: Key the engine cache on its sources and its compiler
         id: engine-key
         working-directory: packing/sqsearch
@@ -155,7 +160,7 @@ jobs:
 
       - name: Cache the Rust build for the engine
         id: engine-cache
-        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
         with:
           path: |
             ~/.cargo/registry
@@ -166,6 +171,11 @@ jobs:
             steps.engine-key.outputs.tree }}
           restore-keys: |
             ${{ runner.os }}-sqsearch-${{ steps.engine-key.outputs.rustc }}-
+
+      - name: Populate the engine cache for this exact tree
+        if: "steps.engine-cache.outputs.cache-hit != 'true'"
+        working-directory: packing/sqsearch
+        run: cargo build --locked --release --quiet
 
       - name: Date the engine sources before the build restored for them
         if: "steps.engine-cache.outputs.cache-hit == 'true'"
@@ -325,6 +335,18 @@ jobs:
           --skip "slow behavioral tests"
           --skip "single-square translation escape screen"
           --jobs 1 --inner-jobs 2
+
+      - name: Save the Rust build for the exact engine tree
+        if: >-
+          success() && steps.engine-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            packing/sqsearch/target
+          key: >-
+            ${{ steps.engine-cache.outputs.cache-primary-key }}
 
       - name: Preserve validation timings and partial logs
         if: always()

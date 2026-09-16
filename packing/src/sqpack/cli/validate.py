@@ -131,6 +131,11 @@ TIER_IDS = (*TIER_FLAGS, "full")
 SUITE_SHARDS = 2
 #: The pull-request run whose required gate succeeded on this exact tracked tree.
 TREE_VERIFIED_ENVIRONMENT = "PACKING_VALIDATE_TREE_VERIFIED_BY_RUN"
+#: Homebrew's two default prefixes. CairoSVG loads `libcairo` through ctypes, which
+#: does not find either directory on a stock macOS loader path even when brew has
+#: installed the library. `packing-validate` supplies the first prefix that actually
+#: contains Cairo to its children; direct tool invocations remain the caller's concern.
+MACOS_CAIRO_LIBRARY_DIRECTORIES = (Path("/opt/homebrew/lib"), Path("/usr/local/lib"))
 #: The subprocess cap reserved for non-exhaustive selections that can approach the whole
 #: suite: the slow behavioural lane and `--push` when its selector expands to everything
 #: (D-432). The pull-request quick shards have their own measured tier ceilings and do not
@@ -870,6 +875,7 @@ def _begin_artifacts(context: Context, selected: Sequence[Step]) -> None:
                     "VECLIB_MAXIMUM_THREADS",
                     "NUMEXPR_NUM_THREADS",
                     "BLIS_NUM_THREADS",
+                    "DYLD_FALLBACK_LIBRARY_PATH",
                     "GITHUB_SHA",
                     "GITHUB_RUN_ID",
                     "GITHUB_RUN_ATTEMPT",
@@ -4241,6 +4247,35 @@ def _environment_flag(name: str) -> bool:
     return value == "1"
 
 
+def _validation_environment(
+    source: dict[str, str] | None = None,
+    *,
+    host_system: str | None = None,
+    cairo_library_directories: Sequence[Path] | None = None,
+) -> dict[str, str]:
+    """Return the child environment, adding a discovered Homebrew Cairo path on macOS.
+
+    An explicitly present `DYLD_FALLBACK_LIBRARY_PATH`, including an empty value, is a
+    developer choice and wins. The narrow library-existence probe avoids changing Linux,
+    non-Homebrew macOS hosts, or a machine that does not need the workaround.
+    """
+    environment = dict(os.environ if source is None else source)
+    if (
+        host_system or platform.system()
+    ) != "Darwin" or "DYLD_FALLBACK_LIBRARY_PATH" in environment:
+        return environment
+    directories = (
+        MACOS_CAIRO_LIBRARY_DIRECTORIES
+        if cairo_library_directories is None
+        else cairo_library_directories
+    )
+    for directory in directories:
+        if (directory / "libcairo.2.dylib").is_file():
+            environment["DYLD_FALLBACK_LIBRARY_PATH"] = str(directory)
+            break
+    return environment
+
+
 @dataclass(frozen=True)
 class Selection:
     """Which steps a set of changed paths reaches, and why."""
@@ -5243,7 +5278,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             print()
         if namespace.budgets or namespace.list:
             return _render_early_exit(namespace, selected)
-        environment = os.environ.copy()
+        environment = _validation_environment()
         environment["PACK_JOBS"] = str(inner_jobs)
         # A nested validator proves its own selection and must not inherit this proof.
         _ = environment.pop(TREE_VERIFIED_ENVIRONMENT, None)

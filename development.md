@@ -43,10 +43,13 @@ development environment; the explicit development group prevents an ambient uv
 configuration from omitting the test and quality tools.
 
 The atlas rasters and the composite PDF are drawn by `cairosvg`, which needs the
-system’s `libcairo`. CI installs it; on macOS with Homebrew it is installed but not on
-the loader’s path, so export `DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib` before
-rebuilding the atlas or running the push tier, whose reachable tests otherwise abort at
-collection on the three modules that import it.
+system’s `libcairo`. CI installs it.
+On macOS, `packing-validate` detects Cairo in the default Apple Silicon and Intel
+Homebrew prefixes and supplies the corresponding loader path to its child processes,
+unless the caller set `DYLD_FALLBACK_LIBRARY_PATH` explicitly.
+Direct renderer commands do not pass through the validator; export
+`DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib` before running them when Homebrew’s
+library is otherwise outside the loader’s path.
 
 ## Code Maturity and Placement
 

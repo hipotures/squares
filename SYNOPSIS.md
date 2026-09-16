@@ -159,8 +159,9 @@ now-paused incremental follow-ups.
 current strategy-reset queue.
 The generated agenda map, not this narrative, summarizes commitment state.
 
-Session 136 is the latest terminal handoff: it stopped with final-source certification,
-hosted wall evidence, independent review, and merge still owned by `think-97we`.
+Session 136 is the latest terminal handoff: it stopped before final-source
+certification, hosted wall evidence, independent review, and merge.
+The still-open `think-97we` bead owns those closeout receipts.
 `stopped` is not a scientific failure; it includes time limits, guarded refusals,
 administrative handoffs, and work deliberately ended after its next evidence was
 identified. The late-session arc moved from certificate production and exact dilation
@@ -207,10 +208,10 @@ This is validation evidence, not new mathematics.
 BC-355 / `think-97we` is now reconciling the later Pages, Packing, budgeting, and
 validation-lane work into one exact-head topology.
 [Session 136](packing/campaign/agent-sessions/session-136-ci-topology-reconciliation.md)
-remains in progress until both required aggregates pass inside the 180-second wall
-budget and an independent reviewer accepts that same head.
-The block runs no scientific target and changes no theorem, hypothesis verdict, n=11
-bound, or frontier record.
+stopped after the implementation handoff; BC-355 remains in progress until both required
+aggregates pass inside the 180-second wall budget and an independent reviewer accepts
+that same head. The block runs no scientific target and changes no theorem, hypothesis
+verdict, n=11 bound, or frontier record.
 The current order is:
 
 1. BC-355 / `think-97we` is the active pipeline-improvement block.
@@ -922,12 +923,14 @@ controller, not permission to blur contracts.
 ### Current Handoff
 
 [Session 136](packing/campaign/agent-sessions/session-136-ci-topology-reconciliation.md)
-is an active pipeline-improvement record under BC-355 / `think-97we`. It reconciles CI,
-budgeting, validation, and developer validation lanes before the next scientific
-planning block. It is not a terminal handoff: exact-head hosted evidence and independent
-re-review are still pending, and it changes no mathematical result.
+is the latest terminal work handoff.
+The session stopped after reconciling CI, budgeting, validation, and developer
+validation lanes, but BC-355 / `think-97we` remains open for exact-head certification,
+hosted wall evidence, independent re-review, and merge.
+The stopped session is therefore terminal but uncertified, and it changes no
+mathematical result.
 [Session 135](packing/campaign/agent-sessions/session-135-n11-route-s-guard-discharge.md)
-is the latest terminal handoff on the no-target Route S admission branch.
+is the latest terminal scientific handoff on the no-target Route S admission branch.
 It discharged the four guards retained by
 [Session 134](packing/campaign/agent-sessions/session-134-n11-route-s-admission.md):
 complete T-025/T-026 contents bound to a declared Git revision and repository-relative
@@ -958,14 +961,17 @@ The scientific evidence cutoff remains main revision
 `80bcdbb0819504354e1278c37f211dd8cc2158fb`, where the latest merged stack is green and
 the T-026 lower bound remains the frontier.
 
-**Selected next entry:** `think-ufmk`, the BC-343 planning block that must register
-`exp-161`, its exact target, budget, accept rule, stop rule, and review boundary before
-any bounded compression target runs.
+**Immediate closeout action:** complete `think-97we` on the exact merged source.
+
+**Selected next entry:** `think-ufmk`, the subsequent BC-343 planning block that must
+register `exp-161`, its exact target, budget, accept rule, stop rule, and review
+boundary before any bounded compression target runs.
 BC-355 must close before that scientific entry resumes.
 
 BC-340, BC-353, and BC-354 are terminal.
-BC-355 is an in-progress pipeline block under `think-97we`; it carries no scientific
-authority and changes no mathematical state.
+BC-355 is an in-progress, uncertified pipeline block under `think-97we`; Session 136
+stopped, but the block’s evidence and merge closeout remain active.
+It carries no scientific authority and changes no mathematical state.
 BC-341 remains tentative behind a future W10 reselection and the named Route A
 representation gaps.
 BC-343’s no-target PR freezes Route S’s complexity metric, fixed support universe,
