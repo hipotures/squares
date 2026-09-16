@@ -69,6 +69,7 @@ name: Certificate page
       - packages/workbench/**
       - packing/devtools/check_published_site.py
       - packing/devtools/pages_scope.py
+      - packing/devtools/probes/check_published_site/**
       - packing/atlas/known-best/manifest.json
       - .github/workflows/pages.yml
   # A pull request builds and checks the pages without deploying them, so a change that

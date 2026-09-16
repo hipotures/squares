@@ -229,12 +229,9 @@ def check(page_path: Path) -> str:
         browser = playwright.chromium.launch(
             headless=True, executable_path=os.environ.get("SQUARES_BROWSER_EXECUTABLE")
         )
-        # `bypass_csp`: the mobile-fit wait below is an expression-string predicate, which
-        # Playwright compiles inside the page, and the published policy grants no
-        # `'unsafe-eval'`. `check_page_policy` loads the page without the bypass. It can go
-        # once that predicate is a probe file (think-xvjf).
+        # No `bypass_csp`: the page runs under its published policy, as the public loads it.
         page = browser.new_page(
-            reduced_motion="reduce", viewport={"width": 1440, "height": 1000}, bypass_csp=True
+            reduced_motion="reduce", viewport={"width": 1440, "height": 1000}
         )
         page.on("pageerror", lambda error: errors.append(str(error)))
         page.goto(page_path.resolve().as_uri())
@@ -274,44 +271,19 @@ def check(page_path: Path) -> str:
             f"Pack count did not reach 7: {squares.count()} nodes; "
             f"{page.locator('#pack-status').inner_text()}",
         )
-        random_poses = squares.evaluate_all(
-            "nodes => nodes.map(node => node.getAttribute('transform'))"
-        )
-        stepped = page.evaluate("() => window.packWorkbench.step(1)")
+        random_poses = squares.evaluate_all(probe("dom/transforms"))
+        stepped = _look(page, "pack/apply", calls=[["step", 1]])
         require(stepped["latest"]["work"]["baseSteps"] == 1, "Pack API step did not advance")
-        scene_match = page.evaluate(
-            """() => {
-              const snapshot = window.packWorkbench.state().snapshot;
-              const nodes = [...document.querySelectorAll('#pack-squares > g')];
-              if (nodes.length !== snapshot.poses.length) return false;
-              return snapshot.poses.every((pose, index) => {
-                const match = nodes[index].getAttribute('transform')?.match(
-                  /^translate\\(([^ ]+) ([^)]+)\\) rotate\\(([^)]+)\\)/
-                );
-                if (!match) return false;
-                return Math.abs(Number(match[1]) - (pose.x - snapshot.container.originX)) < 1e-9
-                  && Math.abs(Number(match[2]) - (pose.y - snapshot.container.originY)) < 1e-9
-                  && Math.abs(Number(match[3]) - pose.angle * 180 / Math.PI) < 1e-9;
-              });
-            }"""
-        )
+        scene_match = _look(page, "pack/scene-matches-snapshot")
         require(scene_match, "Pack API snapshot does not match the visible square transforms")
-        hidden_legacy = page.evaluate(
-            """() => {
-              try { window.atlasTransitions.optimizeStep(1); return null; }
-              catch (error) { return String(error); }
-            }"""
-        )
+        hidden_legacy = _look(page, "api/refusal", calls=[["optimizeStep", 1]])
         require(
             isinstance(hidden_legacy, str) and "packWorkbench" in hidden_legacy,
             f"legacy optimizer advanced behind the Pack scene: {hidden_legacy}",
         )
         page.locator("#pack-apply").click()
         require(
-            random_poses
-            == squares.evaluate_all(
-                "nodes => nodes.map(node => node.getAttribute('transform'))"
-            ),
+            random_poses == squares.evaluate_all(probe("dom/transforms")),
             "the same random seed does not reproduce its starting arrangement",
         )
         page.locator("#pack-run").click()
@@ -321,10 +293,7 @@ def check(page_path: Path) -> str:
             "0 steps" in page.locator("#pack-status").inner_text(), "Restart did not rewind"
         )
         require(
-            random_poses
-            == squares.evaluate_all(
-                "nodes => nodes.map(node => node.getAttribute('transform'))"
-            ),
+            random_poses == squares.evaluate_all(probe("dom/transforms")),
             "Restart did not recover the same start",
         )
 
@@ -374,10 +343,8 @@ def check(page_path: Path) -> str:
         page.set_viewport_size({"width": 390, "height": 844})
         # Chromium delivers the resize event after set_viewport_size returns. Wait for
         # the stage's JS scale to reflect the new viewport before testing overflow.
-        page.wait_for_function(
-            "document.querySelector('#stage-wrap').getBoundingClientRect().width <= innerWidth"
-        )
-        width = page.evaluate("document.documentElement.scrollWidth")
+        page.wait_for_function(probe("pack/stage-fits-viewport"))
+        width = _look(page, "layout/scroll-width")
         require(width <= 390, f"Pack overflows the mobile viewport: {width}px")
         _check_quiet_live_regions(browser, page_path, errors)
         require(not errors, "page errors: " + "; ".join(errors))

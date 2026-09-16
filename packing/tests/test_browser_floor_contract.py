@@ -35,13 +35,13 @@ import os
 import re
 import shlex
 import subprocess
-from collections.abc import Callable, Iterable, Mapping
-from pathlib import Path
+from collections.abc import Iterable, Mapping, Sequence
+from pathlib import Path, PurePosixPath
 from typing import Any
 
 import pytest
 
-from devtools.check_bead_tree import ISSUES, MAPPINGS, REFS, parse_aliases
+from devtools import bead_state
 from sqpack.cli import validate
 from sqpack.yamlio import safe_load
 
@@ -131,10 +131,6 @@ RATCHET_FLAGS = frozenset(
 #: so every config that turns a floor flag off has to name a bead in its own text.
 TRACKER = re.compile(r"\bthink-[a-z0-9]{4}\b")
 
-#: The bead states that still track work. A closed bead tracks nothing, which is how the
-#: relaxations came to name the closed `think-4cwy` with every check green (#160 R24).
-LIVE_BEAD_STATES = frozenset({"open", "in_progress", "blocked"})
-
 #: Every Biome override the floor tolerates, exactly as `biome.json` writes it, with the
 #: bead that removes it. An override is floor rule 7's scoped exception only if it is one of
 #: these. Any other override fails until it is declared here, where a reviewer reads it --
@@ -176,8 +172,11 @@ NOT_OURS = ("vendor/", "node_modules/")
 SCRIPT_SUFFIXES = (".js", ".jsx", ".mjs", ".cjs", ".ts", ".tsx", ".mts", ".cts")
 STYLE_SUFFIXES = (".css",)
 
-#: Reads one repository-relative path from the bead store, or None when it is absent.
-BeadReader = Callable[[str], str | None]
+#: Reads one repository-relative path from the bead store, or None when it is absent. The
+#: reader, the state lookup and the fixture store are `devtools.bead_state`: the guard's
+#: allowlist resolves its trackers the same way (#175 R2), and one implementation is what
+#: keeps the two from drifting.
+BeadReader = bead_state.Reader
 
 
 def _jsonc(path: Path) -> dict[str, Any]:
@@ -256,75 +255,13 @@ def _require_tool(tool: Path) -> None:
 # Bead store
 
 
-def _bead_store() -> BeadReader | None:
-    """A reader over the bead store: the local sync worktree, else the sync branch.
-
-    Read straight from the store rather than through the `tbd` binary, which CI does not
-    install. Every CI job that clones full history fetches `origin/tbd-sync`.
-    """
-    common = _git("rev-parse", "--path-format=absolute", "--git-common-dir")
-    if common.returncode == 0:
-        worktree = Path(common.stdout.strip()) / "tbd" / "data-sync-worktree"
-        if (worktree / MAPPINGS).is_file():
-
-            def from_worktree(path: str) -> str | None:
-                target = worktree / path
-                return target.read_text(encoding="utf-8") if target.is_file() else None
-
-            return from_worktree
-    for ref in REFS:
-        if _git("cat-file", "-e", f"{ref}:{MAPPINGS}").returncode == 0:
-
-            def from_ref(path: str, ref: str = ref) -> str | None:
-                shown = _git("show", f"{ref}:{path}")
-                return shown.stdout if shown.returncode == 0 else None
-
-            return from_ref
-    return None
-
-
-def _bead_state(alias: str, read: BeadReader) -> str | None:
-    """The status of the bead a `think-xxxx` alias names, or None if there is no such bead."""
-    tail = parse_aliases(read(MAPPINGS) or "").get(alias.removeprefix("think-"))
-    if tail is None:
-        return None
-    text = read(f"{ISSUES}/is-{tail}.md")
-    if text is None or not text.startswith("---\n"):
-        return None
-    front = safe_load(text[4 : text.index("\n---", 4)])
-    return str(front.get("status")) if isinstance(front, dict) else None
-
-
-def _dead_trackers(aliases: Iterable[str], read: BeadReader) -> list[str]:
-    """Each named tracker that is not a live bead, with what it is instead."""
-    faults: list[str] = []
-    for alias in sorted(set(aliases)):
-        state = _bead_state(alias, read)
-        if state is None:
-            faults.append(f"{alias}: no such bead")
-        elif state not in LIVE_BEAD_STATES:
-            faults.append(f"{alias}: {state}")
-    return faults
-
-
 def _require_bead_store() -> BeadReader:
-    read = _bead_store()
-    if read is not None:
-        return read
-    message = "no bead store is reachable (no tbd sync worktree, no tbd-sync branch)"
-    if os.environ.get("CI"):
-        pytest.fail(f"{message}; the job must fetch full history to check trackers")
-    pytest.skip(message)
-
-
-def _fixture_store(states: Mapping[str, str]) -> BeadReader:
-    """A bead store holding one bead per alias, in the given state."""
-    files = {MAPPINGS: "".join(f"{alias}: tail{alias}\n" for alias in states)}
-    for alias, state in states.items():
-        files[f"{ISSUES}/is-tail{alias}.md"] = (
-            f"---\nid: is-tail{alias}\nstatus: {state}\n---\n"
-        )
-    return files.get
+    try:
+        return bead_state.require_store()
+    except bead_state.UnavailableError as error:
+        if os.environ.get("CI"):
+            pytest.fail(f"{error}; the job must fetch full history to check trackers")
+        return pytest.skip(str(error))
 
 
 # ---------------------------------------------------------------------------------------
@@ -398,7 +335,8 @@ def _jobs_without_node(document: Mapping[str, Any], step_name: str) -> list[str]
                 checks=namespace.checks,
                 frontend=namespace.frontend,
                 sweeps=namespace.sweeps,
-                suite=namespace.suite,
+                suite_a=namespace.suite_a,
+                suite_b=namespace.suite_b,
                 geometry=namespace.geometry,
             )
             if step_name in {chosen.name for chosen in selected} and not (node and npm):
@@ -540,15 +478,17 @@ def test_every_relaxed_flag_names_an_open_tracker() -> None:
     }
     named["biome.json overrides"] = [entry["tracker"] for entry in DECLARED_BIOME_OVERRIDES]
     for source, aliases in named.items():
-        assert _dead_trackers(aliases, read) == [], f"{source} names a tracker that is not open"
+        assert bead_state.dead_trackers(aliases, read) == [], (
+            f"{source} names a tracker that is not open"
+        )
 
 
 def test_a_closed_or_unknown_tracker_is_refused(tmp_path: Path) -> None:
     """The negative control for the tracker check, on a fixture store, so it runs wherever
     the real store does not."""
-    read = _fixture_store({"aaaa": "open", "bbbb": "in_progress", "cccc": "closed"})
-    assert _dead_trackers(["think-aaaa", "think-bbbb"], read) == []
-    assert _dead_trackers(["think-aaaa", "think-cccc", "think-zzzz"], read) == [
+    read = bead_state.fixture_store({"aaaa": "open", "bbbb": "in_progress", "cccc": "closed"})
+    assert bead_state.dead_trackers(["think-aaaa", "think-bbbb"], read) == []
+    assert bead_state.dead_trackers(["think-aaaa", "think-cccc", "think-zzzz"], read) == [
         "think-cccc: closed",
         "think-zzzz: no such bead",
     ]
@@ -558,9 +498,8 @@ def test_a_closed_or_unknown_tracker_is_refused(tmp_path: Path) -> None:
         encoding="utf-8",
     )
     assert _relaxed_flags(config) == ["strictNullChecks"]
-    assert _dead_trackers(TRACKER.findall(config.read_text(encoding="utf-8")), read) == [
-        "think-cccc: closed"
-    ]
+    named = TRACKER.findall(config.read_text(encoding="utf-8"))
+    assert bead_state.dead_trackers(named, read) == ["think-cccc: closed"]
 
 
 def test_an_untracked_relaxation_is_detected(tmp_path: Path) -> None:
@@ -591,23 +530,25 @@ def test_the_package_program_is_required_for_package_typescript() -> None:
 
 
 def test_every_job_running_the_liveness_tests_installs_node() -> None:
-    """The liveness tests below run in `fast behavioral tests` and fail under `CI` without
-    Node, so every job that selects that step must install the pinned toolchain first."""
+    """Both behavioral shards may own liveness modules and therefore install Node."""
     for workflow in WORKFLOWS:
         document = safe_load(workflow.read_text(encoding="utf-8"))
-        assert _jobs_without_node(document, "fast behavioral tests") == [], workflow.name
+        for shard in ("fast behavioral tests, shard A", "fast behavioral tests, shard B"):
+            assert _jobs_without_node(document, shard) == [], workflow.name
 
 
-def test_a_behavioral_job_without_node_is_detected() -> None:
-    """The negative control: the pull-request `suite` job with its Node steps removed."""
+@pytest.mark.parametrize("job_name", ["suite-a", "suite-b"])
+def test_a_behavioral_job_without_node_is_detected(job_name: str) -> None:
+    """The negative control: either behavioral job without Node is detected."""
     document = safe_load(WORKFLOWS[0].read_text(encoding="utf-8"))
-    document["jobs"]["suite"]["steps"] = [
+    document["jobs"][job_name]["steps"] = [
         step
-        for step in document["jobs"]["suite"]["steps"]
+        for step in document["jobs"][job_name]["steps"]
         if "setup-node" not in str(step.get("uses", ""))
         and "npm ci" not in str(step.get("run"))
     ]
-    assert _jobs_without_node(document, "fast behavioral tests") == ["suite"]
+    shard = "A" if job_name == "suite-a" else "B"
+    assert _jobs_without_node(document, f"fast behavioral tests, shard {shard}") == [job_name]
 
 
 def test_a_missing_tool_fails_under_ci_and_skips_locally(
@@ -657,11 +598,47 @@ def test_a_file_outside_biome_scope_is_detected() -> None:
     ]
 
 
+def test_the_promise_floor_reaches_every_file_its_config_covers() -> None:
+    """#175 R4, and #179 R3 where the cost showed. Biome takes `**/*.js`, each type program
+    takes a glob and `devtools.check_probes` walks; only the ESLint half names directories,
+    so a file the config lints from outside them is formatted and type-checked and never
+    sees `no-floating-promises`. `test_the_checked_javascript_promise_overlay_is_effective`
+    asks six representative files whether the rules apply to them, which is a different
+    question from whether the invocation reaches every file that would answer yes.
+    """
+    assert _linted_outside(validate.ESLINT_PATHS) == []
+    # Live, not merely configured: drop one entry and the files under it are outside.
+    dropped = tuple(p for p in validate.ESLINT_PATHS if p != "packing/devtools/probes")
+    assert _linted_outside(dropped), "dropping a directory left nothing outside the list"
+
+
+def _linted_outside(listed: Sequence[str]) -> list[str]:
+    """Every tracked file the ESLint config lints that no listed directory reaches."""
+    config = ESLINT_CONFIG.read_text(encoding="utf-8")
+    globs = re.findall(r'"([^"]*\*[^"]*\.(?:js|mjs|cjs|ts|tsx))"', config)
+    assert globs, "no `files` globs were read out of the ESLint config"
+    ignored = ("node_modules/", "vendor/", "packages/workbench/dist/")
+    covered = [
+        path
+        for path in _tracked(*(f"*{suffix}" for suffix in SCRIPT_SUFFIXES))
+        if not path.startswith(ignored)
+        and any(PurePosixPath(path).full_match(glob) for glob in globs)
+    ]
+    assert covered, "the ESLint config's globs matched no tracked file"
+    return sorted(
+        path
+        for path in covered
+        if not any(path == entry or path.startswith(f"{entry}/") for entry in listed)
+    )
+
+
 def test_the_checked_javascript_promise_overlay_is_effective() -> None:
     _require_tool(ESLINT)
     representatives = (
         "packages/workbench/src/application.js",
         "packages/workbench/probes/api/apply.js",
+        "packing/devtools/probes/check_published_site/startup.js",
+        "packing/devtools/node/inspect-probes.mjs",
         "packing/src/sqpack/motion_lab/assets/free-quench.js",
         "packing/atlas/known-best/video/spikes/v1-slideshow/timeline_harness.js",
     )

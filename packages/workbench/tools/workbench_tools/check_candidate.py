@@ -478,10 +478,9 @@ def staging_checks(
     pool = {"selector": "#squares g[data-identity]"}
 
     # The pool: one element per identity, created once, never re-keyed, hidden beyond n + 1.
-    shown = probe("candidate/shown_identities")
     page.evaluate(probe("candidate/select"), {"index": index_of[4]})
     check(
-        page.evaluate(shown) == [1, 2, 3, 4, 5],
+        page.evaluate(probe("candidate/shown_identities")) == [1, 2, 3, 4, 5],
         "pair 4->5 does not show exactly identities 1..5",
     )
     check(page.evaluate(total, pool) >= 5, "pair 4->5 has no pool at all")
@@ -742,6 +741,10 @@ def browser_checks(page_path: Path, check) -> None:
                 "console", lambda msg: errors.append(msg.text) if msg.type == "error" else None
             )
             page.goto(page_path.as_uri(), wait_until="load")
+            check(
+                page.evaluate(probe("benchmark/page-api-ready")),
+                "index.html does not expose the review API",
+            )
             page.evaluate(probe("candidate/fonts_ready"))
             page.evaluate(probe("candidate/set_capture"), {"on": True})
 
@@ -1337,7 +1340,6 @@ def main() -> int:
         "Date.now" not in html and "Math.random" not in html,
         "index.html uses a wall clock or randomness",
     )
-    check("window.atlasTransitions" in html, "index.html does not expose the review API")
     for n in (
         4,
         9,
@@ -1612,17 +1614,12 @@ def main() -> int:
     )
     check("tildePath" not in html, "the two-tilde approximately-equal drawing survives")
 
-    # Revision 11: one colouring and no rule to choose. The angle map is in the page — the
-    # half-degree class tolerance, the slot a tilt takes, the eighteen free slots the quarter
-    # turn is cut into and the contact count's shade — and the teal-to-citron sweep it
-    # replaced is not.
-    for needle in (
-        "const ANGLE_TOL = 0.5;",
-        "function slotForAngle(",
-        "const FREE_SLOTS = PALETTE.length - 2;",
-        "function shadeForContacts(",
-    ):
-        check(needle in html, f"index.html lacks the angle map's {needle}")
+    # Revision 11: one colouring and no rule to choose, and the teal-to-citron sweep it replaced
+    # is not in the page. The angle map's half-degree class tolerance is the page's data. The
+    # slot a tilt takes, the eighteen free slots the quarter turn is cut into and the contact
+    # count's shade are `src/view/colour.ts`, and `tests/colour.test.ts` checks what they do.
+    tolerance = payload["colour"]["angleToleranceDegrees"]
+    check(tolerance == 0.5, f"the angle map's class tolerance is {tolerance}, not 0.5")
     check(
         "LONG_ARC" not in html and "Math.min(angle, 90 - angle)" not in html,
         "the old teal-to-citron sweep survives in the page",
