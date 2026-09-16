@@ -544,6 +544,24 @@ def test_nonfinite_wall_numbers_are_refused(tmp_path: Path) -> None:
         load_walls(path)
 
 
+@pytest.mark.parametrize(
+    ("old", "new", "field"),
+    [
+        ("min_samples: 15", "min_samples: 1.5", "policy.min_samples"),
+        ("run: 1, seconds:", "run: 1.5, seconds:", "run"),
+    ],
+)
+def test_fractional_integer_fields_are_refused(
+    tmp_path: Path, old: str, new: str, field: str
+) -> None:
+    path = register(tmp_path, median=110.0)
+    document = path.read_text(encoding="utf-8")
+    assert old in document
+    path.write_text(document.replace(old, new, 1), encoding="utf-8")
+    with pytest.raises(WallError, match=rf"{field}.*positive integer"):
+        load_walls(path)
+
+
 def test_the_live_register_declares_a_wall_for_both_workflows() -> None:
     """Read from the register rather than asserted here, because both are measurements.
 

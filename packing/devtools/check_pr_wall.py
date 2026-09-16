@@ -212,6 +212,13 @@ def _number(value: object, what: str) -> float:
     return float(value)
 
 
+def _positive_integer(value: object, what: str) -> int:
+    number = _number(value, what)
+    if not number.is_integer():
+        raise WallError(f"{what} must be a positive integer, found {value!r}")
+    return int(number)
+
+
 def _text(value: object, what: str) -> str:
     if not isinstance(value, str) or not value.strip():
         raise WallError(f"{what} must be a non-empty string, found {value!r}")
@@ -226,7 +233,9 @@ def _kind_from(raw: object, where: str) -> KindRecord:
         raise WallError(f"{where} ({kind}) must list the runs its median was taken from")
     samples = tuple(
         Sample(
-            run=int(_number(_mapping(item, f"{where}.samples").get("run"), f"{where} run")),
+            run=_positive_integer(
+                _mapping(item, f"{where}.samples").get("run"), f"{where} run"
+            ),
             seconds=_number(item.get("seconds"), f"{where} seconds"),
         )
         for item in raw_samples
@@ -267,7 +276,7 @@ def load_walls(path: Path = REGISTER) -> WallRegister:
         raise WallError("policy.setup_steps must list the step-name patterns that are setup")
     policy = WallPolicy(
         regression_ratio=ratio,
-        min_samples=int(_number(raw_policy.get("min_samples"), "policy.min_samples")),
+        min_samples=_positive_integer(raw_policy.get("min_samples"), "policy.min_samples"),
         main_branch=_text(raw_policy.get("main_branch"), "policy.main_branch"),
         setup_steps=tuple(
             re.compile(_text(item, "a setup_steps pattern")) for item in patterns
