@@ -15,17 +15,18 @@ The rule is a proof about the tree, not trust in a label:
   commit that run checked out -- GitHub's test merge, which is what its jobs validated;
 * after a push, this looks up artifacts by the pushed commit's tree id and accepts a run
   only if it is a completed, successful `pull_request` run of this workflow in this
-  repository, from a branch of this repository rather than a fork. Success is the run's
-  conclusion, so every job in it passed, not just the one that uploaded the artifact;
+  repository, from a branch of this repository rather than a fork, whose explicit
+  `packing-required` job completed successfully. A workflow can conclude successfully
+  while jobs were skipped, so the required job is checked directly;
 * anything else -- no artifact, an expired one, a failed or cancelled run, an API error --
   names no run, and the complete surface runs as before. Every failure of this tool
   fails toward repeating work, never toward skipping it.
 
 What the named run licenses is narrow, and `sqpack.cli.validate` applies it: only `fast`
-steps are left out, and not the ones that read beyond the tree
-(`Step.reads_beyond_tree`). Every deferred step still runs after the merge, so `OR-13`
-is unchanged: the fast checks ran in CI on these bytes before the merge, and the slow
-ones run on them after it.
+steps positively named in `TREE_REUSABLE_FAST_STEPS` are left out. An unclassified new
+fast step repeats after merge, and every deferred step still runs, so `OR-13` is
+unchanged: the fast checks ran in CI on these bytes before the merge, and the slow ones
+run on them after it.
 
 Usage, from the post-merge `validate` job:
 
@@ -50,6 +51,7 @@ ROOT = Path(__file__).resolve().parent.parent
 REPO = ROOT.parent
 ARTIFACT_PREFIX: Final = "pull-request-tree-"
 WORKFLOW_PATH: Final = ".github/workflows/packing-validation.yml"
+REQUIRED_JOB: Final = "packing-required"
 
 type Api = Callable[[str], Any]
 
@@ -100,6 +102,22 @@ def refusal(run: Mapping[str, Any], *, repository: str) -> str | None:
     return "; ".join(failed) if failed else None
 
 
+def required_job_refusal(document: Mapping[str, Any]) -> str | None:
+    """Why the explicit required gate does not license reuse, or ``None`` when it does."""
+    required = [job for job in document.get("jobs", []) if job.get("name") == REQUIRED_JOB]
+    if not required:
+        return f"no {REQUIRED_JOB!r} job"
+    if any(
+        job.get("status") == "completed" and job.get("conclusion") == "success"
+        for job in required
+    ):
+        return None
+    states = ", ".join(
+        f"status={job.get('status')!r} conclusion={job.get('conclusion')!r}" for job in required
+    )
+    return f"{REQUIRED_JOB!r} did not complete successfully ({states})"
+
+
 def verify(tree: str, *, repository: str, api: Api) -> Verdict:
     """Search the artifacts named for `tree` and return the newest run that proves it."""
     reasons: list[str] = []
@@ -130,10 +148,22 @@ def verify(tree: str, *, repository: str, api: Api) -> Verdict:
             reasons.append(f"run {run_id}: lookup failed: {error}")
             continue
         refused = refusal(run, repository=repository)
-        if refused is None:
-            reasons.append(f"run {run_id}: a successful pull-request run of this tree")
-            return Verdict(tree, run_id, tuple(reasons))
-        reasons.append(f"run {run_id}: {refused}")
+        if refused is not None:
+            reasons.append(f"run {run_id}: {refused}")
+            continue
+        try:
+            jobs = api(f"repos/{repository}/actions/runs/{run_id}/jobs?per_page=100")
+        except (OSError, ValueError, subprocess.SubprocessError) as error:
+            reasons.append(f"run {run_id}: required-job lookup failed: {error}")
+            continue
+        required_refusal = required_job_refusal(jobs)
+        if required_refusal is not None:
+            reasons.append(f"run {run_id}: {required_refusal}")
+            continue
+        reasons.append(
+            f"run {run_id}: a successful pull-request run whose {REQUIRED_JOB} passed"
+        )
+        return Verdict(tree, run_id, tuple(reasons))
     return Verdict(tree, None, tuple(reasons))
 
 

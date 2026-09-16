@@ -41,6 +41,7 @@ PATTERN_PROBES = (
     "packing/devtools/check_soundness_perimeter.py",
     "packing/devtools/render_research_tables.py",
     "packing/tests/test_verify.py",
+    "packing/tests/test_browser_floor_contract.py",
     "packing/campaign/agendas/agenda-008-x.md",
     "packing/campaign/schemas/agenda.schema.yaml",
     "packing/campaign/series/series-000-smoke-and-calibration/results/bc-083-n5-identity-pair.json",

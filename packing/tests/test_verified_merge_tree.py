@@ -28,7 +28,22 @@ def _run(run_id: int, **overrides: Any) -> dict[str, Any]:
     return run
 
 
-def _api(runs: list[dict[str, Any]], *, expired: frozenset[int] = frozenset()) -> tool.Api:
+def _required_job(**overrides: Any) -> dict[str, Any]:
+    job: dict[str, Any] = {
+        "name": tool.REQUIRED_JOB,
+        "status": "completed",
+        "conclusion": "success",
+    }
+    job.update(overrides)
+    return job
+
+
+def _api(
+    runs: list[dict[str, Any]],
+    *,
+    expired: frozenset[int] = frozenset(),
+    jobs: dict[int, list[dict[str, Any]]] | None = None,
+) -> tool.Api:
     artifacts = [
         {
             "name": tool.artifact_name(TREE),
@@ -43,6 +58,10 @@ def _api(runs: list[dict[str, Any]], *, expired: frozenset[int] = frozenset()) -
         if path.startswith(f"repos/{REPOSITORY}/actions/artifacts?"):
             assert f"name={tool.artifact_name(TREE)}" in path
             return {"artifacts": artifacts}
+        if "/jobs?" in path:
+            run_id = int(path.split("/actions/runs/", 1)[1].split("/", 1)[0])
+            selected = [_required_job()] if jobs is None else jobs.get(run_id, [])
+            return {"jobs": selected}
         return by_id[int(path.rsplit("/", 1)[-1])]
 
     return api
@@ -76,6 +95,40 @@ def test_a_refused_newer_run_does_not_hide_an_older_proof() -> None:
     runs = [_run(4), _run(8, conclusion="failure")]
     verdict = tool.verify(TREE, repository=REPOSITORY, api=_api(runs))
     assert verdict.run_id == 4
+
+
+@pytest.mark.parametrize(
+    "jobs",
+    [
+        [],
+        [_required_job(status="completed", conclusion="skipped")],
+        [_required_job(status="completed", conclusion="failure")],
+        [_required_job(status="in_progress", conclusion=None)],
+    ],
+)
+def test_a_successful_workflow_without_a_successful_required_job_licenses_nothing(
+    jobs: list[dict[str, Any]],
+) -> None:
+    verdict = tool.verify(
+        TREE,
+        repository=REPOSITORY,
+        api=_api([_run(6)], jobs={6: jobs}),
+    )
+    assert verdict.run_id is None
+    assert any(tool.REQUIRED_JOB in reason for reason in verdict.reasons)
+
+
+def test_a_required_job_lookup_failure_licenses_nothing() -> None:
+    base = _api([_run(6)])
+
+    def api(path: str) -> Any:
+        if "/jobs?" in path:
+            raise OSError("jobs unavailable")
+        return base(path)
+
+    verdict = tool.verify(TREE, repository=REPOSITORY, api=api)
+    assert verdict.run_id is None
+    assert any("required-job lookup failed" in reason for reason in verdict.reasons)
 
 
 def test_no_artifact_an_expired_one_or_an_api_error_all_fail_toward_the_full_surface() -> None:
@@ -114,6 +167,8 @@ def test_main_writes_the_named_run_or_an_empty_one_to_the_step_output(
                     }
                 ]
             }
+        if "/jobs?" in path:
+            return {"jobs": [_required_job()]}
         return _run(42)
 
     assert (

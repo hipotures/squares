@@ -350,7 +350,7 @@ def test_ci_jobs_fetch_provenance_history_and_key_the_uv_cache_from_the_lock() -
 
     validate_steps = _mapping(jobs["validate"])["steps"]
     assert isinstance(validate_steps, list)
-    # The pull-request surface is six concurrent jobs after the workbench package took
+    # The pull-request surface is seven concurrent jobs after the workbench package took
     # its frontend contracts out of the checks queue and the suite became two shards:
     # `--checks` here, `--frontend` in the `frontend` job, `--geometry` in the `geometry`
     # job, `--suite-a` and `--suite-b` in their shard jobs, and `--sweeps` in the
@@ -393,6 +393,19 @@ def test_ci_jobs_fetch_provenance_history_and_key_the_uv_cache_from_the_lock() -
     )
     assert " ".join(str(frontend_step["run"]).split()) == (
         "uv run --frozen --all-extras --group dev packing-validate --frontend "
+        "--jobs 2 --inner-jobs 1"
+    )
+    typecheck_job = _mapping(jobs["typecheck"])
+    assert typecheck_job["if"] == "github.event_name == 'pull_request'"
+    typecheck_steps = typecheck_job["steps"]
+    assert isinstance(typecheck_steps, list)
+    typecheck_step = next(
+        _mapping(step)
+        for step in typecheck_steps
+        if _mapping(step).get("name") == "Run the required pull-request type floor"
+    )
+    assert " ".join(str(typecheck_step["run"]).split()) == (
+        "uv run --frozen --all-extras --group dev packing-validate --typecheck "
         "--jobs 1 --inner-jobs 1"
     )
     geometry_job = _mapping(jobs["geometry"])
@@ -438,6 +451,10 @@ def test_ci_jobs_fetch_provenance_history_and_key_the_uv_cache_from_the_lock() -
             if str(_mapping(step).get("uses", "")).startswith("actions/checkout@")
         )
         assert _mapping(suite_checkout["with"])["fetch-depth"] == 0
+        assert not any(
+            "setup-node" in str(_mapping(step).get("uses", "")) for step in suite_steps
+        )
+        assert not any("npm ci" in str(_mapping(step).get("run", "")) for step in suite_steps)
     sweep_steps = _mapping(jobs["sweeps"])["steps"]
     assert isinstance(sweep_steps, list)
     sweep_step = next(
@@ -515,12 +532,13 @@ def test_ci_jobs_fetch_provenance_history_and_key_the_uv_cache_from_the_lock() -
     required_job = _mapping(jobs["packing-required"])
     # Every part of the pull-request surface, and this is the assertion that keeps them
     # mandatory. Splitting `--fast` across concurrent jobs buys wall time only if a pull
-    # request still cannot merge without all of them, so a `needs` naming five of the
-    # six would turn the sixth into an advisory check that nothing blocks on -- the
+    # request still cannot merge without all of them, so a `needs` naming six of the
+    # seven would turn the seventh into an advisory check that nothing blocks on -- the
     # failure mode the split is otherwise a clean win against.
     assert required_job["needs"] == [
         "validate",
         "frontend",
+        "typecheck",
         "geometry",
         "suite-a",
         "suite-b",
@@ -537,13 +555,14 @@ def test_ci_jobs_fetch_provenance_history_and_key_the_uv_cache_from_the_lock() -
     assert "continue-on-error" not in required_job
     required_job_steps = required_job["steps"]
     assert isinstance(required_job_steps, list)
-    # One `test` per prerequisite, and all six of them, because `needs` alone does not
+    # One `test` per prerequisite, and all seven of them, because `needs` alone does not
     # make a job's failure fatal here: this job runs under `!cancelled()`, so it is reached
     # even when a prerequisite failed, and it is the shell that decides. A missing line
     # would leave that part of the surface green whatever it reported.
     required_command = " ".join(str(_mapping(required_job_steps[0])["run"]).split())
     assert required_command == (
         'test "$VALIDATE_RESULT" = "success" test "$FRONTEND_RESULT" = "success" '
+        'test "$TYPECHECK_RESULT" = "success" '
         'test "$GEOMETRY_RESULT" = "success" test "$SUITE_A_RESULT" = "success" '
         'test "$SUITE_B_RESULT" = "success" '
         'test "$SWEEPS_RESULT" = "success"'
@@ -552,11 +571,25 @@ def test_ci_jobs_fetch_provenance_history_and_key_the_uv_cache_from_the_lock() -
     assert required_env == {
         "VALIDATE_RESULT": "${{ needs.validate.result }}",
         "FRONTEND_RESULT": "${{ needs.frontend.result }}",
+        "TYPECHECK_RESULT": "${{ needs.typecheck.result }}",
         "GEOMETRY_RESULT": "${{ needs.geometry.result }}",
         "SUITE_A_RESULT": "${{ needs.suite-a.result }}",
         "SUITE_B_RESULT": "${{ needs.suite-b.result }}",
         "SWEEPS_RESULT": "${{ needs.sweeps.result }}",
     }
+    wall_step = next(
+        _mapping(step)
+        for step in required_job_steps
+        if _mapping(step).get("name") == "Hold the pull request's wall to its budget"
+    )
+    assert wall_step["if"] == "always() && github.event_name == 'pull_request'"
+    assert _mapping(wall_step["env"])["EXPECTED_PREREQUISITES"] == "${{ toJSON(needs) }}"
+    wall_checkout = next(
+        _mapping(step)
+        for step in required_job_steps
+        if _mapping(step).get("name") == "Check out the wall budget and its register"
+    )
+    assert _mapping(wall_checkout["with"])["filter"] == "blob:none"
 
     # The macOS job is a second-architecture smoke check, not a second full gate.
     # It used to run the whole surface, which reached the composite-PDF step, whose

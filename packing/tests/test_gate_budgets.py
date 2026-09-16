@@ -340,6 +340,9 @@ def test_the_tier_of_an_invocation_is_always_one_the_register_declares() -> None
         ["--fast"],
         ["--push"],
         ["--records", "--fast"],
+        ["--typecheck"],
+        ["--suite-a"],
+        ["--suite-b"],
     ):
         namespace = validate._parser().parse_args(flags)
         tier = validate._tier_id(namespace)
@@ -483,22 +486,12 @@ def test_a_record_that_falls_needs_no_attribution() -> None:
     assert (problems, grandfathered) == ([], [])
 
 
-def test_the_ratchet_before_the_rule_is_shown_and_not_failed() -> None:
-    """The register shows 102 -> 183 rather than being edited to look tidy.
-
-    `conventions.md` section 7: the record is corrected by addition. The rule did not exist
-    when those records were written, so the check reports them, and they stay the baseline
-    the next rise answers for.
-    """
+def test_the_live_register_has_no_unresolved_or_grandfathered_rise() -> None:
+    """The current measured topology starts each new tier with attributed evidence."""
     register = live()
     problems, grandfathered = gate_budgets.ratchet_problems(register)
     assert problems == []
-    suite = register.tier("suite")
-    assert suite is not None
-    assert len(suite.records) >= 2
-    first, last = suite.records[0], suite.records[-1]
-    assert last.seconds > first.seconds * (register.policy.max_unattributed_rise or 1.0)
-    assert any("suite" in note for note in grandfathered)
+    assert grandfathered == []
 
 
 def test_a_wall_budget_past_or14s_outer_edge_is_refused(tmp_path: Path) -> None:
