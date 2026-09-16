@@ -16,6 +16,7 @@ from workbench_tools.build_candidate import (
 )
 
 APPLICATION = PACKAGE_ROOT / "src/application.js"
+MOTION_SETTINGS = PACKAGE_ROOT / "src/motion-settings.ts"
 
 SPANS = {"dwell", "move", "correct", "settle"}
 
@@ -44,14 +45,14 @@ def test_static_appends_take_the_static_beat_and_nothing_follows_the_last_pair()
     assert "4 × 15 = 60.00 s" in lines[1]  # noqa: RUF001
 
 
-def _page_continuous() -> dict[str, float]:
-    """The page's `CONTINUOUS` beat, read from its source as numbers."""
-    source = APPLICATION.read_text(encoding="utf-8")
-    block = re.search(r"\bCONTINUOUS = \{(.*?)\};", source, flags=re.DOTALL)
-    assert block is not None, "the page no longer declares its continuous beat"
+def _shared_timing(name: str) -> dict[str, float]:
+    """One exported timing object, read from the browser/CLI shared settings."""
+    source = MOTION_SETTINGS.read_text(encoding="utf-8")
+    block = re.search(rf"export const {name} = \{{(.*?)\}} as const;", source, flags=re.DOTALL)
+    assert block is not None, f"the shared settings no longer declare {name}"
     return {
-        name: float(value)
-        for name, value in re.findall(r"^\s*(\w+):\s*([0-9.]+),", block.group(1), re.MULTILINE)
+        key: float(value)
+        for key, value in re.findall(r"^\s*(\w+):\s*([0-9.]+),", block.group(1), re.MULTILINE)
     }
 
 
@@ -62,9 +63,12 @@ def test_the_build_prices_the_beats_the_page_plays() -> None:
     2..324, and 775.2 s at the full beat, its `continuous().total`; the old summary said
     695.3 s. The figures move with the beat, and this keeps the two sources in step.
     """
-    page = _page_continuous()
-    assert {span: page[span] for span in SPANS} == TIMING
-    assert {span: page[f"static{span.capitalize()}"] for span in SPANS} == STATIC_TIMING
+    page = APPLICATION.read_text(encoding="utf-8")
+    for span in SPANS:
+        assert f"{span}: DEFAULT_STEP_TIMING.{span}" in page
+        assert f"static{span.capitalize()}: DEFAULT_STATIC_STEP_TIMING.{span}" in page
+    assert _shared_timing("DEFAULT_STEP_TIMING") == TIMING
+    assert _shared_timing("DEFAULT_STATIC_STEP_TIMING") == STATIC_TIMING
     lines = run_time_lines(CORPUS_KINDS)
     moving = beat_seconds(TIMING)
     static = beat_seconds(STATIC_TIMING)
