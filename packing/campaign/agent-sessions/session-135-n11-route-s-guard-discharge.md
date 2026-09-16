@@ -48,8 +48,8 @@ session:
     commitment: BC-343
     bead: think-r55v
     objective: >-
-      Implement and integrate checker-owned source anchors, both T-026 sentinels, the
-      canonical selection-manifest boundary, and the complete X-032 mutation matrix.
+      Bind complete repository-owned source contents to a declared Git revision and
+      path, integrate both T-026 sentinels, and complete the X-032 mutation matrix.
     status: stopped
     entered_by: session_start
     switch_reason: null
@@ -64,9 +64,10 @@ session:
       tests/test_threshold_compression.py tests/test_admit_threshold_compression.py &&
       uv run --frozen --all-extras --group dev packing-validate --records
     kill_condition: >-
-      Stop and retain a blocked checkpoint if any digest remains self-attested, either
-      sentinel is unbound, the manifest has an ambiguous canonical form, a named
-      mutation can pass, or the phase deadline arrives before source-distinct review.
+      Stop and retain a blocked checkpoint if any source cannot be reproduced in full
+      from its declared Git revision and path, either sentinel is unbound, the manifest
+      has an ambiguous canonical form, a named mutation can pass, or the phase deadline
+      arrives before source-distinct review.
     fallback: >-
       Preserve the smallest checked primitives, record the exact surviving guard, and
       leave PR 182 draft with H-163 instrument_ready false.
@@ -142,14 +143,15 @@ session:
     - optimizer
     - coverage target
     - candidate generation
-  - task: Bind checker-owned source anchors and both T-026 sentinels.
+  - task: Bind reviewed Git source contents and both T-026 sentinels.
     operator: Codex admission-integration sub-agent
     status: completed
     recording: contemporaneous
     outcome: >-
-      Bound T-025 and both T-026 sources to checker-owned byte and catalogue constants,
-      authenticated both corollaries, replayed both exact support-and-scale relations,
-      and integrated the manifest controls into a deterministic retained receipt.
+      Bound T-025 and both T-026 sources by complete-content comparison at one declared
+      Git revision and repository-relative path, authenticated both corollaries,
+      replayed both exact support-and-scale relations, and integrated the manifest
+      controls into a deterministic retained receipt.
     evidence:
     - packing/devtools/admit_threshold_compression.py
     - packing/tests/test_admit_threshold_compression.py
@@ -166,8 +168,8 @@ session:
     - The retained admission receipt reproduces byte for byte.
     - Scoped Ruff and BasedPyright pass with zero findings.
     uncertainty: >-
-      File-byte and canonical-catalogue anchors serve different drift classes; both must
-      be checked without adding a second mutable JSON source of authority.
+      Git owns repository integrity. The canonical catalogue identifier remains only as
+      the selection-manifest protocol namespace, not as a second source authenticator.
     elapsed_seconds: null
     elapsed_quality: unavailable
     next_action: Keep the receipt blocked until source-distinct review returns no finding.
@@ -175,7 +177,7 @@ session:
     budget_minutes: 45
     started_at: '2026-09-15T19:23:07Z'
     deadline_at: '2026-09-15T20:08:07Z'
-    expected_output: Both sentinel relations and every file/catalogue digest anchored in code.
+    expected_output: Both sentinel relations and every source reproduced from Git.
     validation_command: >-
       cd packing && uv run --frozen --all-extras --group dev pytest -q
       tests/test_admit_threshold_compression.py
@@ -209,7 +211,7 @@ session:
     checks:
     - All 63 focused tests pass after the symlink repair.
     - The retained receipt replays byte for byte and the records tier passes.
-    - Direct SHA-256 readings match every checker-owned T-025/T-026 byte anchor.
+    - Complete T-025/T-026 contents match the declared Git revision and paths.
     - Scoped Ruff and BasedPyright pass with zero findings.
     uncertainty: >-
       Admission establishes only instrument integrity. It supplies no evidence that an

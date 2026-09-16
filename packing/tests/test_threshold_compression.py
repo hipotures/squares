@@ -275,13 +275,9 @@ def test_full_t025_selection_decompresses_to_a_canonical_equivalent() -> None:
 
     manifest = serialize_selection_manifest(inventory, points, thresholds)
     parsed_points, parsed_thresholds = parse_selection_manifest(manifest, inventory)
-    rebuilt = decompress_selection(
-        inventory, parsed_points, parsed_thresholds, source_policy
-    )
+    rebuilt = decompress_selection(inventory, parsed_points, parsed_thresholds, source_policy)
 
-    assert manifest == serialize_selection_manifest(
-        inventory, parsed_points, parsed_thresholds
-    )
+    assert manifest == serialize_selection_manifest(inventory, parsed_points, parsed_thresholds)
     assert len(selection_manifest_record(inventory, points, thresholds)["orbits"]) == 119
     assert canonical_catalog_record(inventory_certificate(rebuilt)) == (
         canonical_catalog_record(inventory)
@@ -307,9 +303,7 @@ def test_default_policy_accepts_a_synthetic_23_orbit_boundary() -> None:
             inventory.threshold_orbits[0].representative, Fraction(1, 30000)
         ),
     )
-    manifest = serialize_selection_manifest(
-        inventory, point_selections, threshold_selections
-    )
+    manifest = serialize_selection_manifest(inventory, point_selections, threshold_selections)
     parsed_points, parsed_thresholds = parse_selection_manifest(manifest, inventory)
 
     metrics = measure_selection(inventory, parsed_points, parsed_thresholds)
@@ -361,22 +355,14 @@ def test_default_policy_refuses_24_orbits_before_decompression() -> None:
 
 def test_selection_manifest_is_canonical_source_bound_and_nonempty() -> None:
     inventory = inventory_certificate(t025_certificate())
-    first = PointOrbitSelection(
-        inventory.point_orbits[0].representative, Fraction(1, 17)
-    )
-    second = PointOrbitSelection(
-        inventory.point_orbits[1].representative, Fraction(1, 19)
-    )
+    first = PointOrbitSelection(inventory.point_orbits[0].representative, Fraction(1, 17))
+    second = PointOrbitSelection(inventory.point_orbits[1].representative, Fraction(1, 19))
     threshold = ThresholdOrbitSelection(
         inventory.threshold_orbits[0].representative, Fraction(1, 23)
     )
 
-    canonical = serialize_selection_manifest(
-        inventory, (first, second), (threshold,)
-    )
-    reordered = serialize_selection_manifest(
-        inventory, (second, first), (threshold,)
-    )
+    canonical = serialize_selection_manifest(inventory, (first, second), (threshold,))
+    reordered = serialize_selection_manifest(inventory, (second, first), (threshold,))
     record = json.loads(canonical)
 
     assert canonical == reordered
@@ -389,9 +375,7 @@ def test_selection_manifest_is_canonical_source_bound_and_nonempty() -> None:
     with pytest.raises(ValueError, match="at least one positive orbit"):
         selection_manifest_record(inventory, (), ())
     with pytest.raises(SelectionManifestError, match="canonically serialized"):
-        parse_selection_manifest(
-            json.dumps(record, separators=(",", ":")).encode(), inventory
-        )
+        parse_selection_manifest(json.dumps(record, separators=(",", ":")).encode(), inventory)
 
 
 @pytest.mark.parametrize(
@@ -409,17 +393,13 @@ def test_selection_manifest_is_canonical_source_bound_and_nonempty() -> None:
         ("foreign-catalog", "foreign source catalog"),
     ],
 )
-def test_selection_manifest_refuses_x032_mutations(
-    mutation: str, message: str
-) -> None:
+def test_selection_manifest_refuses_x032_mutations(mutation: str, message: str) -> None:
     inventory = inventory_certificate(_tiny_certificate())
     point = PointOrbitSelection(inventory.point_orbits[0].representative, Fraction(1, 7))
     threshold = ThresholdOrbitSelection(
         inventory.threshold_orbits[0].representative, Fraction(2, 11)
     )
-    record: dict[str, Any] = selection_manifest_record(
-        inventory, (point,), (threshold,)
-    )
+    record: dict[str, Any] = selection_manifest_record(inventory, (point,), (threshold,))
     rows = cast(list[dict[str, Any]], record["orbits"])
     point_row, threshold_row = rows
 

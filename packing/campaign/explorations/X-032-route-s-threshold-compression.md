@@ -40,9 +40,9 @@ T-025 and T-026 retain their existing results and assurance levels.
 ## Frozen Control
 
 The control is the exact T-025 endpoint certificate
-[`certificate.json`](../../cases/n11_threshold_certificate/certificate.json), SHA-256
-`3935651af614eb3e9a1926179925f98643beb17ed1764a323fe83a527f4bad5c`. It fixes all of the
-following:
+[`certificate.json`](../../cases/n11_threshold_certificate/certificate.json), compared
+in full at that repository-relative path with Git revision
+`5ce2839f17b2f5a337260dc3f649e05ab974bd25`. It fixes all of the following:
 
 - container side `L = 191/50`, core side `B = 9977/10000`, 181 net directions, and D4
   symmetry;
@@ -90,8 +90,8 @@ Omitting an inactive orbit is canonical, not an error.
 The admission analyzer must reject an unknown, duplicated, incomplete, or incorrectly
 expanded orbit before any coverage decision.
 The decompressed T-025 control must reproduce the frozen source bytes or a
-field-for-field canonical equivalent with the same authenticated digest recorded in its
-receipt.
+field-for-field canonical equivalent in the same source-catalog namespace recorded in
+its receipt.
 
 ## Preregistered Complexity and Verdict
 

@@ -608,9 +608,7 @@ def selection_manifest_record(
     :func:`measure_selection` and :func:`decompress_selection` before coverage.
     """
 
-    points, thresholds = _selected_orbits(
-        inventory, point_selections, threshold_selections
-    )
+    points, thresholds = _selected_orbits(inventory, point_selections, threshold_selections)
     if not points and not thresholds:
         raise ValueError("a selection manifest must contain at least one positive orbit")
     orbits: list[dict[str, Any]] = [
@@ -643,9 +641,7 @@ def serialize_selection_manifest(
 ) -> bytes:
     """Serialize one selection to its unique UTF-8 JSON representation."""
 
-    record = selection_manifest_record(
-        inventory, point_selections, threshold_selections
-    )
+    record = selection_manifest_record(inventory, point_selections, threshold_selections)
     return (
         json.dumps(
             record,
@@ -658,18 +654,14 @@ def serialize_selection_manifest(
     ).encode()
 
 
-def _manifest_object(
-    value: object, expected: set[str], label: str
-) -> dict[str, Any]:
+def _manifest_object(value: object, expected: set[str], label: str) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise SelectionManifestError(f"{label} must be a JSON object")
     actual = set(value)
     if actual != expected:
         missing = sorted(expected - actual)
         extra = sorted(actual - expected)
-        raise SelectionManifestError(
-            f"{label} fields differ: missing={missing}, extra={extra}"
-        )
+        raise SelectionManifestError(f"{label} fields differ: missing={missing}, extra={extra}")
     return cast(dict[str, Any], value)
 
 
@@ -689,9 +681,7 @@ def _manifest_integer(raw: str) -> int:
 
 
 def _manifest_inexact(raw: str) -> Never:
-    raise SelectionManifestError(
-        f"floating or nonfinite JSON number {raw!r} is forbidden"
-    )
+    raise SelectionManifestError(f"floating or nonfinite JSON number {raw!r} is forbidden")
 
 
 def _manifest_fraction(value: object, label: str) -> Fraction:
@@ -701,7 +691,7 @@ def _manifest_fraction(value: object, label: str) -> Fraction:
         raise SelectionManifestError(f"{label} exceeds the rational character limit")
     try:
         result = Fraction(value)
-    except (ValueError, ZeroDivisionError):
+    except ValueError, ZeroDivisionError:
         raise SelectionManifestError(f"{label} is not an exact rational") from None
     if str(result) != value:
         raise SelectionManifestError(f"{label} is not canonically spelled")
@@ -726,9 +716,7 @@ def _manifest_threshold_key(value: object, label: str) -> ThresholdKey:
     for index, raw_site in enumerate(raw_sites):
         site_label = f"{label}.weighted_points[{index}]"
         if not isinstance(raw_site, list) or len(raw_site) != 3:
-            raise SelectionManifestError(
-                f"{site_label} must be an [x, y, count] JSON array"
-            )
+            raise SelectionManifestError(f"{site_label} must be an [x, y, count] JSON array")
         count = raw_site[2]
         if not isinstance(count, int) or isinstance(count, bool) or count < 1:
             raise SelectionManifestError(f"{site_label}[2] must be a positive integer")
@@ -762,9 +750,7 @@ def _manifest_kind(value: object, label: str) -> str:
 
 def parse_selection_manifest(
     data: bytes, inventory: OrbitInventory
-) -> tuple[
-    tuple[PointOrbitSelection, ...], tuple[ThresholdOrbitSelection, ...]
-]:
+) -> tuple[tuple[PointOrbitSelection, ...], tuple[ThresholdOrbitSelection, ...]]:
     """Parse and authenticate one canonical selection manifest against ``inventory``.
 
     The parser accepts exactly the bytes emitted by :func:`serialize_selection_manifest`.
@@ -813,9 +799,7 @@ def parse_selection_manifest(
     try:
         for index, value in enumerate(rows):
             label = f"selection manifest orbit {index}"
-            row = _manifest_object(
-                value, {"kind", "representative", "weight"}, label
-            )
+            row = _manifest_object(value, {"kind", "representative", "weight"}, label)
             weight = _manifest_fraction(row["weight"], f"{label}.weight")
             kind = _manifest_kind(row["kind"], f"{label}.kind")
             if kind == "point":
@@ -842,9 +826,7 @@ def parse_selection_manifest(
     except (TypeError, ValueError) as error:
         raise SelectionManifestError(str(error)) from None
 
-    expected = serialize_selection_manifest(
-        inventory, point_selections, threshold_selections
-    )
+    expected = serialize_selection_manifest(inventory, point_selections, threshold_selections)
     if data != expected:
         raise SelectionManifestError("selection manifest is not canonically serialized")
     return point_selections, threshold_selections

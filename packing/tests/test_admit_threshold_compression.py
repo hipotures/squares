@@ -5,7 +5,6 @@
 from __future__ import annotations
 
 import json
-from dataclasses import replace
 from pathlib import Path
 from typing import cast
 
@@ -102,18 +101,12 @@ def test_output_is_byte_identical_to_the_retained_receipt(tmp_path: Path) -> Non
 @pytest.mark.parametrize(
     ("keys", "value"),
     [
+        (("source_revision",), "0" * 40),
         (("control", "path"), "../certificate.json"),
-        (("control", "sha256"), "0" * 64),
         (("control", "catalog_sha256"), "a" * 64),
         (("sentinels", 0, "path"), "/tmp/corollary.json"),
         (("sentinels", 0, "direction_steps"), 1440),
-        (("sentinels", 0, "sha256"), "b" * 64),
         (("sentinels", 0, "source_path"), "/tmp/certificate.json"),
-        (("sentinels", 0, "source_sha256"), "c" * 64),
-        (("sentinels", 0, "catalog_sha256"), "d" * 64),
-        (("sentinels", 1, "sha256"), "e" * 64),
-        (("sentinels", 1, "source_sha256"), "f" * 64),
-        (("sentinels", 1, "catalog_sha256"), "0" * 64),
         (("family", "max_orbits"), 24),
         (("execution_boundary", "target_ran"), True),
         (("quantization_control", "denominator"), 29_999),
@@ -169,37 +162,63 @@ def test_bound_input_path_cannot_resolve_through_a_symlink(
         )
 
 
-def test_checker_owned_source_anchors_are_not_self_attested() -> None:
-    source_path = admission.REPOSITORY / admission.SOURCE_PATH
-    with pytest.raises(admission.AdmissionError, match="byte anchor"):
-        admission._authenticate_inventory(  # noqa: SLF001
-            path=source_path,
-            label="T-025 mutation control",
-            byte_sha256="0" * 64,
-            catalog_digest=admission.T025_CATALOG_SHA256,
-        )
-    with pytest.raises(admission.AdmissionError, match="catalogue anchor"):
-        admission._authenticate_inventory(  # noqa: SLF001
-            path=source_path,
-            label="T-025 mutation control",
-            byte_sha256=admission.T025_CERTIFICATE_SHA256,
-            catalog_digest="0" * 64,
+def test_all_repository_sources_match_the_declared_git_revision() -> None:
+    paths = [
+        admission.SOURCE_PATH,
+        *(anchor.path for anchor in admission.SENTINELS),
+        *(anchor.source_path for anchor in admission.SENTINELS),
+    ]
+
+    for relative in paths:
+        admission._bind_repository_source(  # noqa: SLF001
+            admission.REPOSITORY / relative,
+            admission.SOURCE_REVISION,
+            label=relative,
         )
 
 
-@pytest.mark.parametrize("anchor", admission.SENTINELS)
-def test_each_sentinel_has_three_independent_checker_owned_anchors(
-    anchor: admission.SentinelAnchor,
+def test_missing_historical_git_path_is_refused() -> None:
+    with pytest.raises(admission.AdmissionError, match="cannot read missing source"):
+        admission._git_content(  # noqa: SLF001
+            admission.SOURCE_REVISION,
+            "packing/cases/n11_threshold_certificate/does-not-exist.json",
+            label="missing source",
+        )
+
+
+def test_current_source_drift_is_refused(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    with pytest.raises(admission.AdmissionError, match=r"record.*anchor"):
-        admission._authenticate_sentinel(replace(anchor, sha256="0" * 64))  # noqa: SLF001
-    with pytest.raises(admission.AdmissionError, match="byte anchor"):
-        admission._authenticate_sentinel(  # noqa: SLF001
-            replace(anchor, source_sha256="0" * 64)
+    source = tmp_path / "source.json"
+    source.write_bytes(b"reviewed\nchanged\n")
+    monkeypatch.setattr(admission, "REPOSITORY", tmp_path)
+    monkeypatch.setattr(
+        admission,
+        "_git_content",
+        lambda _revision, _path, *, label: b"reviewed\n" if label else b"",
+    )
+
+    with pytest.raises(admission.AdmissionError, match="declared Git revision"):
+        admission._bind_repository_source(  # noqa: SLF001
+            source, admission.SOURCE_REVISION, label="changed source"
         )
-    with pytest.raises(admission.AdmissionError, match="catalogue anchor"):
-        admission._authenticate_sentinel(  # noqa: SLF001
-            replace(anchor, catalog_sha256="0" * 64)
+
+
+def test_historical_source_mismatch_is_refused(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source = tmp_path / "source.json"
+    source.write_bytes(b"current\n")
+    monkeypatch.setattr(admission, "REPOSITORY", tmp_path)
+    monkeypatch.setattr(
+        admission,
+        "_git_content",
+        lambda _revision, _path, *, label: b"other historical content\n" if label else b"",
+    )
+
+    with pytest.raises(admission.AdmissionError, match="declared Git revision"):
+        admission._bind_repository_source(  # noqa: SLF001
+            source, admission.SOURCE_REVISION, label="mismatched source"
         )
 
 

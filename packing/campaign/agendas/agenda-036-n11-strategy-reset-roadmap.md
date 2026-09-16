@@ -570,11 +570,12 @@ No target ran and no physical root closed.
 Route S / BC-343 is now in progress.
 Its no-target PR freezes T-025’s exact 119-orbit support universe, the at-most-23
 positive-orbit metric, deterministic decompression, and target-blind controls.
-Session 135 discharged all four obligations retained by Session 134: checker-owned
-T-025/T-026 anchors, both T-026 sentinels, a canonical source-bound manifest, and the
-complete X-032 mutation matrix.
-A fresh source-distinct audit found one symlink-alias hole; the repaired boundary and
-regression passed re-audit, so the instrument is admitted.
+Session 135 discharged all four obligations retained by Session 134: complete T-025 and
+T-026 contents bound to a declared Git revision and repository-relative paths, both
+T-026 sentinels, a canonical source-bound manifest, and the complete X-032 mutation
+matrix.
+A fresh source-distinct audit found one symlink-alias hole; the repaired boundary
+and regression passed re-audit, so the instrument is admitted.
 No target, candidate, coverage route, optimizer, or experiment ran.
 X-032 and H-163 own the source and hypothesis records; T-026 is only a
 support-and-rescaling provenance sentinel.

@@ -15,6 +15,7 @@ import hashlib
 import json
 import os
 import stat
+import subprocess
 import sys
 from collections.abc import Sequence
 from copy import deepcopy
@@ -59,36 +60,14 @@ ADMISSION_PATH: Final = (
     "packing/cases/n11_threshold_certificate/route-s-compression-admission.json"
 )
 SOURCE_PATH: Final = "packing/cases/n11_threshold_certificate/certificate.json"
-T025_CERTIFICATE_SHA256: Final = (
-    "3935651af614eb3e9a1926179925f98643beb17ed1764a323fe83a527f4bad5c"
-)
-T025_CATALOG_SHA256: Final = (
-    "8de1d9646efef5c49367b679a78ff20961f7f5c1d43b11ff28b5f9a6b41f0e75"
-)
-T026_NET720_CERTIFICATE_SHA256: Final = (
-    "fff8b2bcab95a0041e69fec30c704dd708908125883b6ed645bc2c653ecbf8cf"
-)
-T026_NET720_COROLLARY_SHA256: Final = (
-    "c955057bddc1ae45775d66f094781d54cd7c07e1c0d75a2691f48ab73130298b"
-)
-T026_NET720_CATALOG_SHA256: Final = (
-    "b797cdf458d60623cf49e063df9f2c73ffc4a3c3f7be1f17f57fda32dc76e3f2"
-)
-T026_NET1440_CERTIFICATE_SHA256: Final = (
-    "dc2da20c75d952690c93d67fb4b3eb8552e879585902fde98eedc9b3179ed3d0"
-)
-T026_NET1440_COROLLARY_SHA256: Final = (
-    "04fd6bbca1941671ddbabbe359219011b8217818b0a291f4c9a00f5fa7834f8e"
-)
-T026_NET1440_CATALOG_SHA256: Final = (
-    "43c2b94f932bb233c71191940447a6d761387041637dab72c9a1a5ed89aea925"
-)
+SOURCE_REVISION: Final = "5ce2839f17b2f5a337260dc3f649e05ab974bd25"
 SCHEMA: Final = "packing.squares:ThresholdCompressionAdmission/v1"
 RECEIPT_SCHEMA: Final = "packing.squares:ThresholdCompressionAdmissionReceipt/v1"
 MAX_JSON_BYTES: Final = 256 * 1024
 MAX_JSON_DEPTH: Final = 16
 MAX_INTEGER_DIGITS: Final = 6
 SHA256_LENGTH: Final = 64
+REVISION_LENGTH: Final = 40
 MAX_CERTIFICATE_BYTES: Final = 2 * 1024 * 1024
 QUANTIZATION_DENOMINATOR: Final = 30_000
 SYNTHETIC_WEIGHT: Final = Fraction(1, QUANTIZATION_DENOMINATOR)
@@ -96,15 +75,12 @@ SYNTHETIC_WEIGHT: Final = Fraction(1, QUANTIZATION_DENOMINATOR)
 
 @dataclass(frozen=True, slots=True)
 class SentinelAnchor:
-    """Checker-owned identity for one independently authenticated T-026 sentinel."""
+    """Paths for one independently authenticated T-026 sentinel."""
 
     direction_steps: int
     role: str
     path: str
-    sha256: str
     source_path: str
-    source_sha256: str
-    catalog_sha256: str
 
 
 SENTINELS: Final = (
@@ -112,35 +88,34 @@ SENTINELS: Final = (
         direction_steps=720,
         role="T-026 720-step support and rescaling sentinel",
         path=(
-            "packing/cases/n11_threshold_certificate/"
-            "t-026-net720-dilation-limit-corollary.json"
+            "packing/cases/n11_threshold_certificate/t-026-net720-dilation-limit-corollary.json"
         ),
-        sha256=T026_NET720_COROLLARY_SHA256,
-        source_path=(
-            "packing/cases/n11_threshold_certificate/certificate-191-50-net720.json"
-        ),
-        source_sha256=T026_NET720_CERTIFICATE_SHA256,
-        catalog_sha256=T026_NET720_CATALOG_SHA256,
+        source_path=("packing/cases/n11_threshold_certificate/certificate-191-50-net720.json"),
     ),
     SentinelAnchor(
         direction_steps=1440,
         role="T-026 1440-step support and rescaling sentinel",
-        path=(
-            "packing/cases/n11_threshold_certificate/"
-            "t-026-dilation-limit-corollary.json"
-        ),
-        sha256=T026_NET1440_COROLLARY_SHA256,
-        source_path=(
-            "packing/cases/n11_threshold_certificate/certificate-191-50-net1440.json"
-        ),
-        source_sha256=T026_NET1440_CERTIFICATE_SHA256,
-        catalog_sha256=T026_NET1440_CATALOG_SHA256,
+        path=("packing/cases/n11_threshold_certificate/t-026-dilation-limit-corollary.json"),
+        source_path=("packing/cases/n11_threshold_certificate/certificate-191-50-net1440.json"),
     ),
 )
 
 
 class AdmissionError(ValueError):
     """The admission record or one of its bound sources is not admissible."""
+
+
+def _git_content(revision: str, path: str, *, label: str) -> bytes:
+    try:
+        return subprocess.run(
+            ["git", "show", f"{revision}:{path}"],
+            cwd=REPOSITORY,
+            check=True,
+            capture_output=True,
+        ).stdout
+    except subprocess.CalledProcessError as error:
+        detail = error.stderr.decode(errors="replace").strip() or "git show failed"
+        raise AdmissionError(f"cannot read {label} at {revision}: {detail}") from error
 
 
 def _sha256(data: bytes) -> str:
@@ -262,6 +237,29 @@ def _repo_path(value: object, *, expected: str, label: str) -> Path:
     return path
 
 
+def _revision(value: object, *, label: str) -> str:
+    if (
+        not isinstance(value, str)
+        or len(value) != REVISION_LENGTH
+        or any(char not in "0123456789abcdef" for char in value)
+    ):
+        raise AdmissionError(f"{label} must be a full lowercase Git revision")
+    return value
+
+
+def _bind_repository_source(path: Path, revision: str, *, label: str) -> None:
+    """Compare complete input bytes with one Git revision and path."""
+    _revision(revision, label="source revision")
+    try:
+        relative = path.resolve().relative_to(REPOSITORY.resolve()).as_posix()
+    except ValueError as error:
+        raise AdmissionError(f"{label} is outside the repository") from error
+    current = _bounded_regular_bytes(path, limit=MAX_CERTIFICATE_BYTES, label=label)
+    reviewed = _git_content(revision, relative, label=label)
+    if current != reviewed:
+        raise AdmissionError(f"{label} differs from its declared Git revision and path")
+
+
 def _digest(value: object, *, label: str) -> str:
     if (
         not isinstance(value, str)
@@ -293,9 +291,7 @@ def _expected_admission(
     if len(sentinel_inventories) != len(SENTINELS):
         raise AdmissionError("the ordered T-026 sentinel inventory is incomplete")
     sentinel_records: list[dict[str, Any]] = []
-    for anchor, sentinel_inventory in zip(
-        SENTINELS, sentinel_inventories, strict=True
-    ):
+    for anchor, sentinel_inventory in zip(SENTINELS, sentinel_inventories, strict=True):
         relation = compare_scaled_support(source_inventory, sentinel_inventory)
         if not relation.matches:
             raise AdmissionError(
@@ -307,10 +303,7 @@ def _expected_admission(
                 "direction_steps": anchor.direction_steps,
                 "role": anchor.role,
                 "path": anchor.path,
-                "sha256": anchor.sha256,
                 "source_path": anchor.source_path,
-                "source_sha256": anchor.source_sha256,
-                "catalog_sha256": anchor.catalog_sha256,
                 "point_support_equal": relation.point_support_equal,
                 "threshold_support_equal": relation.threshold_support_equal,
                 "common_weight_scale": str(relation.common_weight_scale),
@@ -323,16 +316,16 @@ def _expected_admission(
         raise AdmissionError("the denominator-30000 upward-rounding control exceeds budget")
     return {
         "schema": SCHEMA,
+        "source_revision": SOURCE_REVISION,
         "control": {
             "role": "matched T-025 control",
             "path": SOURCE_PATH,
-            "sha256": T025_CERTIFICATE_SHA256,
             "n": source_inventory.n,
             "outer_side": str(source_inventory.outer_side),
             "square_side": str(source_inventory.square_side),
             "symmetry": source_inventory.symmetry,
             "total_budget": str(source_inventory.total_budget),
-            "catalog_sha256": T025_CATALOG_SHA256,
+            "catalog_sha256": catalog_sha256(source_inventory),
             "point_orbits": source_inventory.point_orbit_count,
             "threshold_orbits": source_inventory.threshold_orbit_count,
             "orbits": source_inventory.orbit_count,
@@ -379,14 +372,15 @@ def _expected_admission(
     }
 
 
-def _validate_paths_and_digests(
+def _validate_paths_and_bindings(
     admission: dict[str, Any],
 ) -> None:
-    """Refuse path aliases and any substitution for a checker-owned digest anchor."""
+    """Refuse path aliases and substitutions for the tracked Git inputs."""
     _keys(
         admission,
         {
             "schema",
+            "source_revision",
             "control",
             "sentinels",
             "family",
@@ -397,12 +391,13 @@ def _validate_paths_and_digests(
     )
     if admission["schema"] != SCHEMA:
         raise AdmissionError(f"admission schema must be {SCHEMA!r}")
+    if _revision(admission["source_revision"], label="source_revision") != SOURCE_REVISION:
+        raise AdmissionError("admission source_revision differs from the reviewed source")
     control = _keys(
         admission["control"],
         {
             "role",
             "path",
-            "sha256",
             "n",
             "outer_side",
             "square_side",
@@ -419,16 +414,7 @@ def _validate_paths_and_digests(
         "control",
     )
     _repo_path(control["path"], expected=SOURCE_PATH, label="control.path")
-    declared = _digest(control["sha256"], label="control.sha256")
-    if declared != T025_CERTIFICATE_SHA256:
-        raise AdmissionError("control digest differs from the checker-owned T-025 anchor")
-    if (
-        _digest(control["catalog_sha256"], label="control.catalog_sha256")
-        != T025_CATALOG_SHA256
-    ):
-        raise AdmissionError(
-            "control catalogue digest differs from the checker-owned T-025 anchor"
-        )
+    _digest(control["catalog_sha256"], label="control.catalog_sha256")
     sentinels = admission["sentinels"]
     if not isinstance(sentinels, list) or len(sentinels) != len(SENTINELS):
         raise AdmissionError("sentinels must be the ordered 720-step and 1440-step pair")
@@ -440,10 +426,7 @@ def _validate_paths_and_digests(
                 "direction_steps",
                 "role",
                 "path",
-                "sha256",
                 "source_path",
-                "source_sha256",
-                "catalog_sha256",
                 "point_support_equal",
                 "threshold_support_equal",
                 "common_weight_scale",
@@ -460,24 +443,6 @@ def _validate_paths_and_digests(
             expected=anchor.source_path,
             label=f"{label}.source_path",
         )
-        if _digest(sentinel["sha256"], label=f"{label}.sha256") != anchor.sha256:
-            raise AdmissionError(
-                f"{label} digest differs from the checker-owned corollary anchor"
-            )
-        if (
-            _digest(sentinel["source_sha256"], label=f"{label}.source_sha256")
-            != anchor.source_sha256
-        ):
-            raise AdmissionError(
-                f"{label} source digest differs from the checker-owned certificate anchor"
-            )
-        if (
-            _digest(sentinel["catalog_sha256"], label=f"{label}.catalog_sha256")
-            != anchor.catalog_sha256
-        ):
-            raise AdmissionError(
-                f"{label} catalogue digest differs from the checker-owned catalogue anchor"
-            )
 
 
 def _manifest_roundtrip(
@@ -489,16 +454,11 @@ def _manifest_roundtrip(
     tuple[ThresholdOrbitSelection, ...],
     bytes,
 ]:
-    manifest = serialize_selection_manifest(
-        inventory, point_selections, threshold_selections
-    )
+    manifest = serialize_selection_manifest(inventory, point_selections, threshold_selections)
     parsed_points, parsed_thresholds = parse_selection_manifest(manifest, inventory)
     if (parsed_points, parsed_thresholds) != (point_selections, threshold_selections):
         raise AdmissionError("selection-manifest round trip changed the selected orbits")
-    if (
-        serialize_selection_manifest(inventory, parsed_points, parsed_thresholds)
-        != manifest
-    ):
+    if serialize_selection_manifest(inventory, parsed_points, parsed_thresholds) != manifest:
         raise AdmissionError("selection-manifest serialization is not byte stable")
     return parsed_points, parsed_thresholds, manifest
 
@@ -534,9 +494,7 @@ def _synthetic_decompressor_check(inventory: OrbitInventory) -> dict[str, Any]:
         inventory, points, thresholds
     )
     metrics = measure_selection(inventory, parsed_points, parsed_thresholds, policy)
-    decompressed = decompress_selection(
-        inventory, parsed_points, parsed_thresholds, policy
-    )
+    decompressed = decompress_selection(inventory, parsed_points, parsed_thresholds, policy)
     reconstructed = _loaded_inventory(decompressed)
     if reconstructed.atom_count != metrics.expanded_atoms:
         raise AdmissionError("synthetic decompressor disagrees with its exact atom metric")
@@ -640,9 +598,7 @@ def _mutation_controls(inventory: OrbitInventory) -> dict[str, bool]:
     off_support_rows[0]["representative"] = ["1/7", "1/11"]
     wrong_type_rows = cast(list[dict[str, Any]], mutations["wrong_type"]["orbits"])
     wrong_type_rows[0]["kind"] = "threshold"
-    wrong_threshold_rows = cast(
-        list[dict[str, Any]], mutations["wrong_threshold"]["orbits"]
-    )
+    wrong_threshold_rows = cast(list[dict[str, Any]], mutations["wrong_threshold"]["orbits"])
     wrong_threshold_rep = cast(
         dict[str, Any], wrong_threshold_rows[threshold_index]["representative"]
     )
@@ -690,37 +646,28 @@ def _policy_boundary_check(inventory: OrbitInventory) -> dict[str, Any]:
     }
 
 
-def _authenticate_inventory(
-    *, path: Path, label: str, byte_sha256: str, catalog_digest: str
-) -> OrbitInventory:
-    certificate, certificate_bytes = _load_certificate(path, label=label)
-    actual_digest = _sha256(certificate_bytes)
-    if actual_digest != byte_sha256:
-        raise AdmissionError(f"{label} differs from its checker-owned byte anchor")
-    inventory = inventory_certificate(certificate)  # type: ignore[arg-type]
-    if catalog_sha256(inventory) != catalog_digest:
-        raise AdmissionError(f"{label} differs from its checker-owned catalogue anchor")
-    return inventory
+def _authenticate_inventory(*, path: Path, label: str, revision: str) -> OrbitInventory:
+    _bind_repository_source(path, revision, label=label)
+    certificate, _ = _load_certificate(path, label=label)
+    return inventory_certificate(certificate)  # type: ignore[arg-type]
 
 
 def _authenticate_sentinel(anchor: SentinelAnchor) -> OrbitInventory:
-    """Authenticate one T-026 corollary, source, net size, and catalogue independently."""
+    """Authenticate one T-026 corollary, source, and net size independently."""
     record_path = _repo_path(anchor.path, expected=anchor.path, label="sentinel path")
     source_path = _repo_path(
         anchor.source_path, expected=anchor.source_path, label="sentinel source path"
     )
-    record, record_bytes = load_json(
-        record_path, label=f"T-026 net-{anchor.direction_steps} limit record"
+    _bind_repository_source(
+        record_path,
+        SOURCE_REVISION,
+        label=f"T-026 net-{anchor.direction_steps} limit record",
     )
-    if _sha256(record_bytes) != anchor.sha256:
-        raise AdmissionError(
-            f"T-026 net-{anchor.direction_steps} record differs from its checker-owned anchor"
-        )
+    record, _ = load_json(record_path, label=f"T-026 net-{anchor.direction_steps} limit record")
     inventory = _authenticate_inventory(
         path=source_path,
         label=f"T-026 net-{anchor.direction_steps} source certificate",
-        byte_sha256=anchor.source_sha256,
-        catalog_digest=anchor.catalog_sha256,
+        revision=SOURCE_REVISION,
     )
     source = _keys(
         record.get("source"),
@@ -746,13 +693,7 @@ def _authenticate_sentinel(anchor: SentinelAnchor) -> OrbitInventory:
         expected=anchor.source_path,
         label=f"T-026 net-{anchor.direction_steps} source.certificate",
     )
-    if (
-        _digest(source["sha256"], label=f"T-026 net-{anchor.direction_steps} source.sha256")
-        != anchor.source_sha256
-    ):
-        raise AdmissionError(
-            f"T-026 net-{anchor.direction_steps} record does not bind its source anchor"
-        )
+    _digest(source["sha256"], label=f"T-026 net-{anchor.direction_steps} source.sha256")
     if len(inventory.half_tangents) - 1 != anchor.direction_steps:
         raise AdmissionError(
             f"T-026 net-{anchor.direction_steps} certificate has the wrong direction net"
@@ -762,11 +703,12 @@ def _authenticate_sentinel(anchor: SentinelAnchor) -> OrbitInventory:
 
 def build_receipt(admission_path: Path = ADMISSION) -> dict[str, Any]:
     """Recompute the complete admission receipt without any scientific target work."""
-    admission, admission_bytes = load_json(admission_path, label="admission record")
+    admission, _ = load_json(admission_path, label="admission record")
     top = _keys(
         admission,
         {
             "schema",
+            "source_revision",
             "control",
             "sentinels",
             "family",
@@ -778,13 +720,12 @@ def build_receipt(admission_path: Path = ADMISSION) -> dict[str, Any]:
     if not isinstance(top["control"], dict) or not isinstance(top["sentinels"], list):
         raise AdmissionError("control must be an object and sentinels must be an array")
     control = cast(dict[str, Any], top["control"])
-    _validate_paths_and_digests(admission)
+    _validate_paths_and_bindings(admission)
     source_path = _repo_path(control.get("path"), expected=SOURCE_PATH, label="control.path")
     source_inventory = _authenticate_inventory(
         path=source_path,
         label="T-025 certificate",
-        byte_sha256=T025_CERTIFICATE_SHA256,
-        catalog_digest=T025_CATALOG_SHA256,
+        revision=SOURCE_REVISION,
     )
     sentinel_inventories = tuple(_authenticate_sentinel(anchor) for anchor in SENTINELS)
     source_support = ordered_support(source_inventory)
@@ -804,10 +745,7 @@ def build_receipt(admission_path: Path = ADMISSION) -> dict[str, Any]:
             {
                 "direction_steps": anchor.direction_steps,
                 "path": anchor.path,
-                "sha256": anchor.sha256,
                 "source_path": anchor.source_path,
-                "source_sha256": anchor.source_sha256,
-                "catalog_sha256": anchor.catalog_sha256,
                 "point_support_equal": relation.point_support_equal,
                 "threshold_support_equal": relation.threshold_support_equal,
                 "support_equal": relation.support_equal,
@@ -818,16 +756,16 @@ def build_receipt(admission_path: Path = ADMISSION) -> dict[str, Any]:
         )
     return {
         "schema": RECEIPT_SCHEMA,
+        "source_revision": SOURCE_REVISION,
         "status": "admitted",
         "admission_blockers": [],
         "admission": {
             "path": ADMISSION_PATH,
-            "sha256": _sha256(admission_bytes),
+            "exact_derived_contract": True,
         },
         "control": {
             "path": SOURCE_PATH,
-            "sha256": T025_CERTIFICATE_SHA256,
-            "catalog_sha256": T025_CATALOG_SHA256,
+            "catalog_sha256": catalog_sha256(source_inventory),
             "support_keys": len(source_support),
             "orbits": source_inventory.orbit_count,
             "atoms": source_inventory.atom_count,

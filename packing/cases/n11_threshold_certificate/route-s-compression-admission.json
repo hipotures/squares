@@ -9,7 +9,6 @@
     "point_atoms": 584,
     "point_orbits": 79,
     "role": "matched T-025 control",
-    "sha256": "3935651af614eb3e9a1926179925f98643beb17ed1764a323fe83a527f4bad5c",
     "square_side": "9977/10000",
     "symmetry": "D4",
     "threshold_atoms": 320,
@@ -46,31 +45,26 @@
     "rounded_budget": "82373/7500"
   },
   "schema": "packing.squares:ThresholdCompressionAdmission/v1",
+  "source_revision": "5ce2839f17b2f5a337260dc3f649e05ab974bd25",
   "sentinels": [
     {
-      "catalog_sha256": "b797cdf458d60623cf49e063df9f2c73ffc4a3c3f7be1f17f57fda32dc76e3f2",
       "common_weight_scale": "500000000/498684619",
       "direction_steps": 720,
       "path": "packing/cases/n11_threshold_certificate/t-026-net720-dilation-limit-corollary.json",
       "point_support_equal": true,
       "role": "T-026 720-step support and rescaling sentinel",
-      "sha256": "c955057bddc1ae45775d66f094781d54cd7c07e1c0d75a2691f48ab73130298b",
       "source_path": "packing/cases/n11_threshold_certificate/certificate-191-50-net720.json",
-      "source_sha256": "fff8b2bcab95a0041e69fec30c704dd708908125883b6ed645bc2c653ecbf8cf",
       "support_equal": true,
       "threshold_support_equal": true,
       "weights_have_common_scale": true
     },
     {
-      "catalog_sha256": "43c2b94f932bb233c71191940447a6d761387041637dab72c9a1a5ed89aea925",
       "common_weight_scale": "500000000/498684619",
       "direction_steps": 1440,
       "path": "packing/cases/n11_threshold_certificate/t-026-dilation-limit-corollary.json",
       "point_support_equal": true,
       "role": "T-026 1440-step support and rescaling sentinel",
-      "sha256": "04fd6bbca1941671ddbabbe359219011b8217818b0a291f4c9a00f5fa7834f8e",
       "source_path": "packing/cases/n11_threshold_certificate/certificate-191-50-net1440.json",
-      "source_sha256": "dc2da20c75d952690c93d67fb4b3eb8552e879585902fde98eedc9b3179ed3d0",
       "support_equal": true,
       "threshold_support_equal": true,
       "weights_have_common_scale": true
