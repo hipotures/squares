@@ -125,31 +125,51 @@ jobs:
           uv run --frozen --all-extras --group dev
           python -m playwright install --with-deps --only-shell chromium
 
-      # Only this job builds the engine, and `_build_engine` runs it *before* the
-      # executor rather than inside it, so a cold `cargo build --locked --release` is a
-      # serial prefix on this job's whole wall -- about 25s of it. Nothing else in the
-      # workflow caches cargo, so every run paid that from scratch.
+      # Only this job builds the engine, and `_build_engine` runs it *before* the executor
+      # rather than inside it, so `cargo build --locked --release` is a serial prefix on
+      # this job's whole wall.
       #
-      # This does not shorten the surface today: at 112s this job is not the critical
-      # path, `geometry` at 122s is. What it removes is variance. A cold build swings
-      # this job by 25-40s, which is enough to make it the critical path on a bad run,
-      # and a pull-request wall that moves 30 per cent between runs on nothing the author
-      # changed is the thing `OR-14` is actually about.
+      # **The cache hit on every run from 2026-09-06 to 09-15 and the build still cost
+      # 12.6-13.5s**, with nothing under `packing/sqsearch` committed since 09-05. Cargo
+      # judges a path crate by mtime: checkout dates `src/*.rs` now, and the restored
+      # `dep-bin-sqsearch` fingerprint keeps the date of the run that saved it, so every
+      # restore was older than its sources and the whole crate relinked under
+      # `lto = "fat"`. Reproduced locally with `CARGO_LOG=cargo::core::compiler::fingerprint
+      # =info`: `stale: changed src/main.rs` against `dep-bin-sqsearch`, one unit rebuilt.
       #
-      # Keyed on `Cargo.lock` so a dependency change misses deliberately; the restore
-      # keys let an unrelated lockfile bump start from the previous build rather than
-      # from nothing. `actions/cache` is already pinned at this sha in `pages.yml`, so
-      # this adds no new action to vet.
+      # So the key is the tracked `packing/sqsearch` tree id plus `rustc -vV`, and only an
+      # exact hit backdates the files that tree id covers. On an exact hit the restored
+      # build was made from byte-identical sources by the same compiler, so dating them
+      # before it is true. A partial restore leaves the checkout's mtimes alone and cargo
+      # rebuilds; backdating a changed file was measured to serve the old binary, which is
+      # why the `if:` below is not optional. The old key was `Cargo.lock` alone, so the one
+      # entry saved on 09-06 was never replaced. `rustc -vV` also installs the pinned
+      # toolchain from `rust-toolchain.toml` here rather than inside the gate's build.
+      - name: Key the engine cache on its sources and its compiler
+        id: engine-key
+        working-directory: packing/sqsearch
+        run: |
+          rustc_vv="$(rustc -vV)"
+          echo "tree=$(git rev-parse HEAD:packing/sqsearch)" >> "$GITHUB_OUTPUT"
+          echo "rustc=$(printf '%s' "$rustc_vv" | sha256sum | cut -c1-16)" >> "$GITHUB_OUTPUT"
+
       - name: Cache the Rust build for the engine
+        id: engine-cache
         uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
         with:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
             packing/sqsearch/target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('packing/sqsearch/Cargo.lock') }}
+          key: >-
+            ${{ runner.os }}-sqsearch-${{ steps.engine-key.outputs.rustc }}-${{
+            steps.engine-key.outputs.tree }}
           restore-keys: |
-            ${{ runner.os }}-cargo-
+            ${{ runner.os }}-sqsearch-${{ steps.engine-key.outputs.rustc }}-
+
+      - name: Date the engine sources before the build restored for them
+        if: "steps.engine-cache.outputs.cache-hit == 'true'"
+        run: git ls-files -z -- sqsearch | xargs -0 touch -t 200001010000
 
       # `--fast` is the pull-request surface, and two separate pieces of work in one day
       # made it what it is. They pull in opposite directions on purpose.

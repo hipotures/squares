@@ -159,8 +159,8 @@ now-paused incremental follow-ups.
 current strategy-reset queue.
 The generated agenda map, not this narrative, summarizes commitment state.
 
-Session 136 is the active CI-topology reconciliation record; Session 135 remains the
-latest terminal handoff.
+Session 136 is the latest terminal handoff: it stopped with final-source certification,
+hosted wall evidence, independent review, and merge still owned by `think-97we`.
 `stopped` is not a scientific failure; it includes time limits, guarded refusals,
 administrative handoffs, and work deliberately ended after its next evidence was
 identified. The late-session arc moved from certificate production and exact dilation

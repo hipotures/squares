@@ -159,8 +159,10 @@ session:
     recording: contemporaneous
     outcome: >-
       The audit routes the work through BC-355 under think-97we, leaves BC-343 as the
-      scientific continuation, and requires Session 136 to remain nonterminal until
-      exact-hosted evidence and independent review exist.
+      scientific continuation, and requires pending exact-hosted evidence and independent
+      review to remain explicit certification debt. Session 136 later stopped as a
+      terminal handoff without representing either pending receipt as a pass; think-97we
+      retains ownership of both.
     evidence:
     - packing/campaign/agendas/agenda-036-n11-strategy-reset-roadmap.md
     - packing/campaign/agent-sessions/session-136-ci-topology-reconciliation.md
@@ -178,16 +180,22 @@ session:
     phase: 1
   - task: Review the final exact head after both required aggregates pass.
     operator: Independent final review sub-agent, read-only
-    status: queued
+    status: canceled
     recording: contemporaneous
-    outcome: null
-    evidence: null
+    outcome: >-
+      Deferred without execution when Session 136 stopped; think-97we retains the review
+      obligation for the exact head that produces the required hosted evidence.
+    evidence:
+    - packing/campaign/agent-sessions/session-136-ci-topology-reconciliation.md
     files: []
-    checks: null
-    uncertainty: The review cannot begin until exact-head hosted evidence exists.
+    checks:
+    - Confirmed that no exact-head hosted evidence existed before the terminal handoff; the review did not run.
+    uncertainty: The review did not begin because exact-head hosted evidence did not exist.
     elapsed_seconds: null
     elapsed_quality: unavailable
-    next_action: Return an approve or changes-requested verdict against the exact hosted head.
+    next_action: >-
+      think-97we owns dispatching a fresh review that returns an approve or
+      changes-requested verdict against the exact hosted head.
     phase: 1
     budget_minutes: 30
     started_at: null

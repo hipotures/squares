@@ -2507,6 +2507,38 @@ def test_a_verified_merge_repeats_everything_not_positively_tree_reusable() -> N
     assert validate_job["permissions"] == {"contents": "read", "actions": "read"}
 
 
+def test_the_engine_cache_backdates_sources_only_for_their_exact_compiler_build() -> None:
+    """A partial target restore must rebuild changed source instead of serving its binary."""
+    document = safe_load(WORKFLOW.read_text(encoding="utf-8"))
+    steps = document["jobs"]["validate"]["steps"]
+
+    key_step = next(step for step in steps if step.get("id") == "engine-key")
+    assert key_step["working-directory"] == "packing/sqsearch"
+    key_program = key_step["run"]
+    assert 'rustc_vv="$(rustc -vV)"' in key_program
+    assert "git rev-parse HEAD:packing/sqsearch" in key_program
+    assert "sha256sum | cut -c1-16" in key_program
+
+    cache_index, cache = next(
+        (index, step)
+        for index, step in enumerate(steps)
+        if step.get("name") == "Cache the Rust build for the engine"
+    )
+    assert cache["id"] == "engine-cache"
+    cache_key = cache["with"]["key"]
+    assert "${{ runner.os }}-sqsearch-" in cache_key
+    assert "${{ steps.engine-key.outputs.rustc }}" in cache_key
+    assert cache_key.endswith("${{ steps.engine-key.outputs.tree }}")
+    assert cache["with"]["restore-keys"].strip() == (
+        "${{ runner.os }}-sqsearch-${{ steps.engine-key.outputs.rustc }}-"
+    )
+
+    repair = steps[cache_index + 1]
+    assert repair["name"] == "Date the engine sources before the build restored for them"
+    assert repair["if"] == "steps.engine-cache.outputs.cache-hit == 'true'"
+    assert repair["run"] == ("git ls-files -z -- sqsearch | xargs -0 touch -t 200001010000")
+
+
 def test_browser_floor_liveness_runs_only_with_the_frontend_node_toolchain() -> None:
     document = safe_load(WORKFLOW.read_text(encoding="utf-8"))
     selections = _workflow_selections(pull_request=True)
