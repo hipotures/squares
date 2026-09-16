@@ -265,6 +265,8 @@ def test_browser_floor_inputs_select_the_browser_floor() -> None:
     """Declarations, scripts, and nested manifests are browser-floor inputs
     (#125 F36): editing one must select the floor on a `--since` run."""
     for path in (
+        "eslint.probes.json",
+        "packing/devtools/probe-typecheck.json",
         "packages/workbench/probes/atlas-transitions.d.ts",
         "packing/atlas/known-best/video/spikes/v1-slideshow/node-harness.d.ts",
         "packing/atlas/known-best/video/spikes/v1-slideshow/assets/package.json",

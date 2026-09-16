@@ -84,6 +84,8 @@ def test_a_string_literal_script_argument_fails_for_every_method(
         "SCRIPT.replace('a', 'b')",
         "probe(ROOT, 'tool/name').replace('a', 'b')",
         "probe(ROOT, 'tool/name') + ';'",
+        "probe(ROOT, 'tool/name') or 'planted'",
+        "(lambda: 'planted')()",
         "'planted' if flag else probe(ROOT, 'tool/name')",
     ],
 )
@@ -520,6 +522,7 @@ def test_the_content_of_an_added_script_tag_is_a_script_argument() -> None:
     """R5: `add_script_tag(content=...)` puts a script in the page and was not read."""
     assert _rules("page.add_script_tag(content='planted')\n") == ["script argument"]
     assert _sites("BUNDLE = D / 'b.js'\npage.add_script_tag(path=str(BUNDLE))\n") == []
+    assert _sites("page.add_init_script(path=Path('a.txt').with_suffix('.js'))\n") == []
 
 
 @pytest.mark.parametrize(
@@ -528,6 +531,11 @@ def test_the_content_of_an_added_script_tag_is_a_script_argument() -> None:
         "page.add_init_script(path=ROOT / 'tool' / 'init.txt')\n",
         "page.add_script_tag(path=str(ROOT / 'bundle.data'))\n",
         "BUNDLE = ROOT / 'bundle.txt'\npage.add_script_tag(path=str(BUNDLE))\n",
+        "page.add_init_script(path=Path('actual.js').with_suffix('.txt'))\n",
+        (
+            "BUNDLE = ROOT / ('bundle.js' if checked else 'bundle.txt')\n"
+            "page.add_script_tag(path=BUNDLE)\n"
+        ),
         "page.add_init_script(path=chosen_path())\n",
     ],
 )

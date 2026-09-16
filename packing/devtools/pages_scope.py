@@ -190,7 +190,12 @@ def _conftests(test: Path) -> set[Path]:
 
 
 def commands_run(jobs: Iterable[Mapping[str, Any]]) -> set[Path]:
-    """The first-party modules and test files the given jobs execute."""
+    """The first-party modules, tests, and convention-bound test assets jobs execute.
+
+    A test's browser probes live under `tests/probes/<test module without test_>/`.
+    They are executable inputs to that test even though Python imports cannot reach
+    them, so the existing directory convention brings them into the same page scope.
+    """
     files: set[Path] = set()
     for job in jobs:
         for step in job.get("steps", []):
@@ -202,6 +207,9 @@ def commands_run(jobs: Iterable[Mapping[str, Any]]) -> set[Path]:
                     raise SystemExit(f"{WORKFLOW.name} runs pytest on {test}, which is gone")
                 files.add(path)
                 files.update(_conftests(path))
+                probes = path.parent / "probes" / path.stem.removeprefix("test_")
+                if probes.is_dir():
+                    files.add(probes)
     return files
 
 

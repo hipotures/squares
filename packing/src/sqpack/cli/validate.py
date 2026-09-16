@@ -1507,9 +1507,11 @@ ESLINT_PATHS = (
     "packages/workbench",
     "packing/src/sqpack/motion_lab/assets",
     "packing/atlas/known-best/video/spikes/v1-slideshow",
-    "packing/atlas/known-best/video/spikes/v2-transitions/probes",
+    "packing/atlas/known-best/video/spikes/v2-transitions",
     "packing/devtools/probes",
+    "packing/devtools/explainer",
     "packing/devtools/node",
+    "packing/tests/node",
     "packing/tests/probes",
 )
 
@@ -1525,9 +1527,10 @@ def _browser_floor(context: Context) -> str:
     `--error-on-warnings` because plain `ci` passes on warnings and this floor configures
     warning-severity rules. Fixing is `npm run lint:fix`, at a commit hook or by hand.
 
-    The type gate is separate from the lint gate (floor rule 3) and runs once per program:
-    each legacy global program remains separate so unrelated assets do not collide. The
-    module-based workbench package has its own strict program.
+    The type gate is separate from the lint gate (floor rule 3). Legacy global programs
+    remain separate, and page probes are split one program per probe group so one group's
+    ambient declarations cannot hide a foreign dependency. The module-based workbench
+    package has its own strict program.
 
     Node is not a `uv` dependency, so this asks for the pinned local binaries rather than
     anything on PATH. `npm ci` at the repository root is what puts them there.
@@ -1563,6 +1566,7 @@ def _browser_floor(context: Context) -> str:
                 for path in type_programs
                 if path != base
             ),
+            (npm, "run", "typecheck:packing-probes"),
             (npm, "test", "--workspace", "@squares/workbench"),
         ),
         cwd=REPOSITORY_ROOT,
@@ -3075,9 +3079,9 @@ STEPS: tuple[Step, ...] = (
     ),
     Step("lint floor (ruff)", _lint_floor, fast=True, records=True, touches=_ANY_PYTHON),
     Step("type floor (basedpyright)", _type_floor, fast=True, touches=_ANY_PYTHON),
-    # Under two seconds for 190 files: Biome is one compiled binary and the three
-    # type-check programs are small. Cheap enough for the edit tier, but `fast` rather
-    # than unconditional because it needs a Node toolchain the Python tiers do not.
+    # Biome is one compiled binary and the type programs remain small enough for the edit
+    # tier. `fast` rather than unconditional because it needs a Node toolchain the Python
+    # tiers do not.
     Step(
         "browser floor (biome, eslint, tsc, node:test)",
         _browser_floor,
@@ -3085,6 +3089,8 @@ STEPS: tuple[Step, ...] = (
         frontend=True,
         touches=(
             "biome.json",
+            "eslint.probes.json",
+            "packing/devtools/probe-typecheck.json",
             "tsconfig*.json",
             "package.json",
             "**/package.json",

@@ -2,8 +2,8 @@
 
 The JavaScript and CSS this repository serves have the same shape of floor the Python
 does: a formatter that owns layout, a linter at zero tolerance, and a separate type gate.
-`tbd guidelines typescript-lint-format-rules` defines it and `biome.json` plus the
-`tsconfig*.json` set implement it.
+`tbd guidelines typescript-lint-format-rules` defines it and `biome.json`, the
+`tsconfig*.json` set, and the isolated probe-program manifest implement it.
 
 Two different things are checked here, and the second is the one that matters.
 
@@ -22,10 +22,16 @@ A configured rule is a claim; a rule that rejects a violation is a fact.
 The liveness tests need the pinned Node tools. Locally, a checkout without `npm ci` skips
 them; under `CI` a missing tool fails, because a liveness test that skips on the surface
 that runs it proves nothing (#125 F20, #160 R19). A workflow check below keeps a Node
-toolchain on every job that runs this file. No fixture is written into the source tree:
-the ESLint probe reaches its in-scope path through `--stdin-filename`, and the other
-fixtures live under pytest's `tmp_path`, so nothing here can race a test that lists the
-tree (#160 R18).
+toolchain on every job that runs this file.
+
+The samples those tests hand their tools are checked in, under
+`packing/tests/fixtures/browser-floor/`, and they are the floor's one declared exception:
+each must fail the floor, so Biome skips their tree and no type program includes it, and
+the contract holds that tree to exactly those samples at their sizes. No test writes into
+the source tree, and none hands a tool the checked-in path, which the tree's own scope rules
+would exempt: the ESLint probe reads its sample on stdin under an in-scope
+`--stdin-filename`, and Biome and `tsc` read a copy under pytest's `tmp_path`, so nothing
+here can race a test that lists the tree (#160 R18).
 """
 
 from __future__ import annotations
@@ -34,14 +40,16 @@ import json
 import os
 import re
 import shlex
+import shutil
 import subprocess
 from collections.abc import Iterable, Mapping, Sequence
 from pathlib import Path, PurePosixPath
 from typing import Any
 
 import pytest
+from nodejs_wheel import node
 
-from devtools import bead_state
+from devtools import bead_state, render_explainer
 from sqpack.cli import validate
 from sqpack.yamlio import safe_load
 
@@ -55,10 +63,14 @@ TSC = REPOSITORY_ROOT / "node_modules/.bin/tsc"
 TSCONFIG_BASE = REPOSITORY_ROOT / "tsconfig.base.json"
 ROOT_PACKAGE = REPOSITORY_ROOT / "package.json"
 WORKBENCH_PACKAGE = REPOSITORY_ROOT / "packages/workbench/package.json"
+PROBE_TYPECHECK = REPOSITORY_ROOT / "packing/devtools/node/typecheck-probe-groups.mjs"
+PROBE_TYPECHECK_MANIFEST = REPOSITORY_ROOT / "packing/devtools/probe-typecheck.json"
 WORKFLOWS = (
     REPOSITORY_ROOT / ".github/workflows/packing-validation.yml",
     REPOSITORY_ROOT / ".github/workflows/deep-gate.yml",
 )
+SCRIPT_ELEMENT = re.compile(r"<script(?:\s[^>]*)?>(.*?)</script>", re.DOTALL)
+SCRIPT_PLACEHOLDER = re.compile(r"\s*\{\{([A-Z_]+)\}\}\s*")
 
 #: The lint rules the shared floor names, each of which the recommended preset does NOT
 #: enable on its own. That is the whole reason they are written out: a project that only
@@ -167,6 +179,29 @@ DECLARED_BIOME_OVERRIDES: tuple[dict[str, Any], ...] = (
     },
 )
 
+#: Every tree of first-party source Biome is told to skip, exactly as `biome.json`'s
+#: `files.includes` writes the exclusion, with why, and with every file the tree may hold and
+#: the most bytes each may grow to. There is one, and it is permanent rather than tracked:
+#: the liveness samples below must be rejected by the tool each proves live, so no tool may
+#: be configured to accept them. Declaring the files as well as the tree is what keeps the
+#: exception from growing -- a fourth file, or a sample that stops being minimal, fails the
+#: contract before it can carry anything but a violation.
+DECLARED_BIOME_EXCLUSIONS: tuple[dict[str, Any], ...] = (
+    {
+        "reason": "the liveness samples break the floor on purpose: a braceless `if` for "
+        "Biome, a floating Promise for ESLint, and type errors for `tsc`",
+        "exclusion": "!packing/tests/fixtures/browser-floor",
+        "files": {
+            "braceless-if.js": 36,
+            "floating-promise.js": 67,
+            "probe-undeclared-member.mjs": 162,
+            "type-error.js": 22,
+        },
+    },
+)
+FLOOR_SAMPLES = REPOSITORY_ROOT / DECLARED_BIOME_EXCLUSIONS[0]["exclusion"].removeprefix("!")
+PROBE_GROUP_SAMPLES = REPOSITORY_ROOT / "packing/tests/fixtures/probe-typecheck"
+
 #: Directories whose JavaScript is not ours to hold to a floor.
 NOT_OURS = ("vendor/", "node_modules/")
 SCRIPT_SUFFIXES = (".js", ".jsx", ".mjs", ".cjs", ".ts", ".tsx", ".mts", ".cts")
@@ -222,6 +257,42 @@ def _covered_scripts(configs: list[Path]) -> set[str]:
         for pattern in _jsonc(config).get("include", [])
         for path in _tracked(_include_pattern(config, pattern))
     }
+
+
+def _probe_typecheck_sources() -> set[str]:
+    """The scripts the probe manifest assigns to isolated type programs."""
+    manifest = json.loads(PROBE_TYPECHECK_MANIFEST.read_text(encoding="utf-8"))
+    sources: set[str] = set()
+    for specification in manifest["probeRoots"]:
+        root = REPOSITORY_ROOT / specification["path"]
+        for group in root.iterdir():
+            if group.is_dir():
+                sources.update(
+                    path.relative_to(REPOSITORY_ROOT).as_posix() for path in group.rglob("*.js")
+                )
+    for program in manifest.get("standalonePrograms", []):
+        sources.update(program["sources"])
+    return sources
+
+
+def _probe_typecheck_files() -> set[str]:
+    """Every explicit source and declaration input in the isolated programs."""
+    manifest = json.loads(PROBE_TYPECHECK_MANIFEST.read_text(encoding="utf-8"))
+    files = _probe_typecheck_sources()
+    for specification in manifest["probeRoots"]:
+        root = REPOSITORY_ROOT / specification["path"]
+        files.update(
+            path.relative_to(REPOSITORY_ROOT).as_posix()
+            for group in root.iterdir()
+            if group.is_dir()
+            for path in group.rglob("*.d.ts")
+        )
+        files.update(specification.get("commonDeclarations", []))
+        for declarations in specification.get("dependencies", {}).values():
+            files.update(declarations)
+    for program in manifest.get("standalonePrograms", []):
+        files.update(program.get("declarations", []))
+    return files
 
 
 def _relaxed_flags(config: Path) -> list[str]:
@@ -280,6 +351,49 @@ def _biome_override_faults(
     ]
 
 
+def _declared_exclusion_faults(
+    config: Mapping[str, Any], declared: Iterable[Mapping[str, Any]]
+) -> list[str]:
+    """Every declared exclusion `config` does not write, and every way its tree differs from
+    the declaration: a file it does not name, a file it names that is gone, or a file over
+    the bytes it allows."""
+    faults: list[str] = []
+    includes = config.get("files", {}).get("includes", [])
+    for entry in declared:
+        exclusion = entry["exclusion"]
+        if exclusion not in includes:
+            faults.append(f"declared Biome exclusion not in biome.json: {exclusion}")
+        tree = REPOSITORY_ROOT / exclusion.removeprefix("!")
+        held = {
+            path.relative_to(tree).as_posix(): path.stat().st_size
+            for path in tree.rglob("*")
+            if path.is_file()
+        }
+        allowed: Mapping[str, int] = entry["files"]
+        faults.extend(
+            f"{exclusion}: holds {name}, which the exception does not declare"
+            for name in sorted(set(held) - set(allowed))
+        )
+        faults.extend(
+            f"{exclusion}: declares {name}, which the tree does not hold"
+            for name in sorted(set(allowed) - set(held))
+        )
+        faults.extend(
+            f"{exclusion}: {name} is {size} bytes, over the {allowed[name]} declared"
+            for name, size in sorted(held.items())
+            if name in allowed and size > allowed[name]
+        )
+    return faults
+
+
+def _declared_excluded(path: str) -> bool:
+    """Whether a repository-relative path lies in a tree a declared exclusion skips."""
+    return any(
+        path.startswith(entry["exclusion"].removeprefix("!") + "/")
+        for entry in DECLARED_BIOME_EXCLUSIONS
+    )
+
+
 def _biome_listed(command: str) -> set[str]:
     """The files `biome <command>` processes, as it reports them under `--verbose`."""
     done = subprocess.run(
@@ -300,6 +414,15 @@ def _biome_listed(command: str) -> set[str]:
 
 def _outside_scope(tracked: Iterable[str], processed: set[str]) -> list[str]:
     return sorted(path for path in tracked if path not in processed)
+
+
+def _literal_inline_scripts(source: str) -> list[str]:
+    """Script bodies that are executable source rather than one asset placeholder."""
+    return [
+        body.strip().splitlines()[0]
+        for body in SCRIPT_ELEMENT.findall(source)
+        if SCRIPT_PLACEHOLDER.fullmatch(body) is None
+    ]
 
 
 # ---------------------------------------------------------------------------------------
@@ -363,6 +486,8 @@ def test_biome_names_every_floor_rule() -> None:
     for suffix in (*SCRIPT_SUFFIXES, *STYLE_SUFFIXES):
         assert f"**/*{suffix}" in includes, f"Biome does not include {suffix} source"
     assert "packages/workbench/**/*.json" in includes
+    assert "eslint.probes.json" in includes
+    assert "packing/devtools/probe-typecheck.json" in includes
 
 
 def test_the_node_toolchain_is_exactly_pinned_and_runtime_bounded() -> None:
@@ -385,6 +510,7 @@ def test_every_biome_exception_is_declared() -> None:
     downgrade. A rule turned off at the top level, or over a whole tree, would be a
     different floor wearing this one's name."""
     assert _biome_override_faults(_jsonc(BIOME_CONFIG), DECLARED_BIOME_OVERRIDES) == []
+    assert _declared_exclusion_faults(_jsonc(BIOME_CONFIG), DECLARED_BIOME_EXCLUSIONS) == []
     tracked = _tracked(*(f"*{suffix}" for suffix in (*SCRIPT_SUFFIXES, *STYLE_SUFFIXES)))
     for entry in DECLARED_BIOME_OVERRIDES:
         for pattern in entry["override"]["includes"]:
@@ -412,6 +538,29 @@ def test_a_broad_or_undeclared_biome_override_is_refused() -> None:
     widened = json.loads(json.dumps(config))
     widened["overrides"][0]["includes"].append("packages/**/*.js")
     assert len(_biome_override_faults(widened, DECLARED_BIOME_OVERRIDES)) == 1
+
+    # The exclusion's own controls: dropped from `biome.json`, and a tree that has grown a
+    # file, lost one, and let a sample grow past its size.
+    dropped = json.loads(json.dumps(config))
+    dropped["files"]["includes"].remove(DECLARED_BIOME_EXCLUSIONS[0]["exclusion"])
+    assert len(_declared_exclusion_faults(dropped, DECLARED_BIOME_EXCLUSIONS)) == 1
+    narrowed = [
+        {
+            **entry,
+            "files": {
+                "braceless-if.js": 35,
+                "floating-promise.js": 67,
+                "probe-undeclared-member.mjs": 162,
+                "gone.js": 1,
+            },
+        }
+        for entry in DECLARED_BIOME_EXCLUSIONS
+    ]
+    faults = _declared_exclusion_faults(config, narrowed)
+    assert len(faults) == 3, faults
+    assert "holds type-error.js, which the exception does not declare" in faults[0]
+    assert "declares gone.js, which the tree does not hold" in faults[1]
+    assert "braceless-if.js is 36 bytes, over the 35 declared" in faults[2]
 
 
 def test_the_type_floor_is_declared_once_and_extended() -> None:
@@ -514,10 +663,98 @@ def test_an_untracked_relaxation_is_detected(tmp_path: Path) -> None:
 def test_every_first_party_script_is_in_a_type_program() -> None:
     """A file under the lint floor but in no `tsconfig` include is half covered, and the
     half that is missing is the one that catches type errors."""
-    covered = _covered_scripts(_tsconfigs())
+    covered = _covered_scripts(_tsconfigs()) | _probe_typecheck_files()
     tracked = _tracked(*(f"*{suffix}" for suffix in SCRIPT_SUFFIXES))
-    uncovered = sorted(set(tracked) - covered)
+    uncovered = sorted(path for path in set(tracked) - covered if not _declared_excluded(path))
     assert not uncovered, f"tracked JavaScript in no type-check program: {uncovered}"
+    typed_samples = sorted(path for path in covered if _declared_excluded(path))
+    assert not typed_samples, f"a program type-checks a sample that must fail: {typed_samples}"
+
+
+def test_the_probe_checker_and_contract_name_the_same_sources() -> None:
+    """A new group is discovered automatically, while a stale manifest/tool join cannot
+    make the coverage contract claim a source the executable gate never reads."""
+    _require_tool(TSC)
+    completed = node(
+        [str(PROBE_TYPECHECK), "--list-sources"],
+        return_completed_process=True,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0, completed.stderr
+    assert set(json.loads(completed.stdout)) == _probe_typecheck_sources()
+
+
+def test_a_probe_cannot_see_a_foreign_groups_ambient_types(tmp_path: Path) -> None:
+    """Negative control: the old monolithic program accepted this exact dependency."""
+    _require_tool(TSC)
+    alpha = tmp_path / "probes/alpha"
+    beta = tmp_path / "probes/beta"
+    alpha.mkdir(parents=True)
+    beta.mkdir(parents=True)
+    shutil.copyfile(PROBE_GROUP_SAMPLES / "alpha-types.txt", alpha / "types.d.ts")
+    shutil.copyfile(PROBE_GROUP_SAMPLES / "alpha-read.txt", alpha / "read.js")
+    shutil.copyfile(PROBE_GROUP_SAMPLES / "beta-read.txt", beta / "read.js")
+    (tmp_path / "manifest.json").write_text(
+        json.dumps({"probeRoots": [{"path": "probes"}]}), encoding="utf-8"
+    )
+    (tmp_path / "tsconfig.json").write_text(
+        json.dumps(
+            {
+                "compilerOptions": {
+                    "allowJs": True,
+                    "checkJs": True,
+                    "noEmit": True,
+                    "strict": True,
+                    "target": "ES2022",
+                    "lib": ["ES2022", "DOM"],
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+    completed = node(
+        [
+            str(PROBE_TYPECHECK),
+            "--root",
+            str(tmp_path),
+            "--manifest",
+            "manifest.json",
+            "--config",
+            "tsconfig.json",
+        ],
+        return_completed_process=True,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode != 0
+    stderr = completed.stderr
+    assert isinstance(stderr, str)
+    assert "probes/beta/read.js" in stderr
+    assert "Cannot find name 'AlphaOnly'" in stderr
+
+
+def test_the_explainer_shell_owns_no_inline_programs() -> None:
+    """HTML is not a Biome/ESLint/tsc input, so every executable body comes from a file."""
+    source = render_explainer.TEMPLATE.read_text(encoding="utf-8")
+    assert _literal_inline_scripts(source) == []
+    placeholders = {
+        match.group(1)
+        for body in SCRIPT_ELEMENT.findall(source)
+        if (match := SCRIPT_PLACEHOLDER.fullmatch(body)) is not None
+    }
+    assert placeholders == {
+        "THEME_BOOTSTRAP",
+        "KATEX_JS",
+        *render_explainer.INLINE_SCRIPT_ASSETS,
+    }
+
+
+def test_a_literal_explainer_program_is_refused() -> None:
+    """Negative control: a program written back into the HTML cannot escape the floor."""
+    source = render_explainer.TEMPLATE.read_text(encoding="utf-8")
+    planted = source.replace("{{NATIVE_MATH_METRICS}}", "literal program", 1)
+    assert _literal_inline_scripts(planted) == ["literal program"]
 
 
 def test_the_package_program_is_required_for_package_typescript() -> None:
@@ -586,9 +823,14 @@ def test_every_tracked_script_and_stylesheet_is_in_biome_scope() -> None:
         and (REPOSITORY_ROOT / path).is_file()
     ]
     assert tracked
+    held = [path for path in tracked if not _declared_excluded(path)]
+    samples = [path for path in tracked if _declared_excluded(path)]
     for command in ("lint", "format"):
-        outside = _outside_scope(tracked, _biome_listed(command))
+        listed = _biome_listed(command)
+        outside = _outside_scope(held, listed)
         assert outside == [], f"tracked source outside `biome {command}`: {outside}"
+        linted = sorted(set(samples) & listed)
+        assert linted == [], f"`biome {command}` reaches a declared exclusion: {linted}"
 
 
 def test_a_file_outside_biome_scope_is_detected() -> None:
@@ -663,7 +905,7 @@ def test_the_checked_javascript_promise_overlay_is_effective() -> None:
 
 def test_the_checked_javascript_overlay_rejects_a_floating_promise() -> None:
     """Linted at an in-scope path through stdin, so the config's own `files` globs decide
-    whether the rule applies, and no fixture is ever written into the source tree."""
+    whether the rule applies, whatever tree the sample is checked in under."""
     _require_tool(ESLINT)
     done = subprocess.run(
         [
@@ -674,7 +916,7 @@ def test_the_checked_javascript_overlay_rejects_a_floating_promise() -> None:
             "--config",
             str(ESLINT_CONFIG),
         ],
-        input="/** @returns {Promise<void>} */\nasync function later() {}\nlater();\n",
+        input=(FLOOR_SAMPLES / "floating-promise.js").read_text(encoding="utf-8"),
         check=False,
         capture_output=True,
         text=True,
@@ -687,11 +929,11 @@ def test_the_checked_javascript_overlay_rejects_a_floating_promise() -> None:
 def test_the_braces_rule_actually_rejects_a_violation(tmp_path: Path) -> None:
     """The liveness check. `useBlockStatements` being written in the config proves only
     that someone wrote it; what proves the floor is live is Biome refusing a braceless
-    `if`. The fixture is written outside the repository so no real file has to be broken
-    and so the repository's own scope rules cannot accidentally exempt it."""
+    `if`. The sample is copied outside the repository so no real file has to be broken and
+    so the repository's own scope rules, which skip the samples' tree, cannot exempt it."""
     _require_tool(BIOME)
     sample = tmp_path / "sample.js"
-    sample.write_text("if (globalThis.x) globalThis.y = 1;\n", encoding="utf-8")
+    shutil.copyfile(FLOOR_SAMPLES / "braceless-if.js", sample)
     done = subprocess.run(
         [str(BIOME), "check", f"--config-path={REPOSITORY_ROOT}", str(sample)],
         check=False,
@@ -709,7 +951,7 @@ def test_the_type_gate_actually_rejects_a_type_error(tmp_path: Path) -> None:
     """The same liveness question for the type gate. A `tsconfig` whose `include` matches
     nothing reports zero errors and looks exactly like a clean program."""
     _require_tool(TSC)
-    (tmp_path / "sample.js").write_text("Math.round(Math.max);\n", encoding="utf-8")
+    shutil.copyfile(FLOOR_SAMPLES / "type-error.js", tmp_path / "sample.js")
     (tmp_path / "tsconfig.json").write_text(
         json.dumps(
             {
@@ -727,3 +969,33 @@ def test_the_type_gate_actually_rejects_a_type_error(tmp_path: Path) -> None:
         cwd=tmp_path,
     )
     assert done.returncode != 0, "tsc accepted a type error under the floor's own options"
+
+
+def test_the_probe_loader_refuses_an_undeclared_member(tmp_path: Path) -> None:
+    """A probe result stays unknown until its caller states the exact shape it consumes."""
+    _require_tool(TSC)
+    loader = REPOSITORY_ROOT / "packing/tests/node/probe.mjs"
+    shutil.copyfile(FLOOR_SAMPLES / "probe-undeclared-member.mjs", tmp_path / "sample.mjs")
+    shutil.copyfile(loader, tmp_path / "probe.mjs")
+    (tmp_path / "tsconfig.json").write_text(
+        json.dumps(
+            {
+                "extends": str(REPOSITORY_ROOT / "tsconfig.devtools-node.json"),
+                "compilerOptions": {
+                    "typeRoots": [str(REPOSITORY_ROOT / "node_modules/@types")]
+                },
+                "include": ["sample.mjs"],
+            }
+        ),
+        encoding="utf-8",
+    )
+    done = subprocess.run(
+        [str(TSC), "-p", "tsconfig.json"],
+        check=False,
+        capture_output=True,
+        text=True,
+        cwd=tmp_path,
+    )
+    output = done.stdout + done.stderr
+    assert done.returncode != 0, "tsc accepted an undeclared member on a narrowed probe"
+    assert "Property 'undeclared' does not exist on type '{ declared: number; }'" in output

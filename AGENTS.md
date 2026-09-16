@@ -126,7 +126,7 @@ Four things worth knowing before changing any of it:
   `probes/` directory beside the tool — with `sqpack.probes.probe(root, name)`, and
   passes values as its one argument, never by formatting them into the text.
   `devtools.check_no_embedded_js` fails the gate on a script string anywhere, and its
-  allowlist in `packing/devtools/embedded-javascript.yaml` only shrinks.
+  allowlist in `packing/devtools/embedded-javascript.yaml` is empty.
   [development.md → Browser Code Lives in Files](development.md#browser-code-lives-in-files)
   is how to add a probe.
 

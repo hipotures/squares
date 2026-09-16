@@ -961,11 +961,31 @@ A Python tool that drives a page uses a **probe**:
    `devtools.check_probes` reads names from string literals, and a probe no literal
    names fails as unused.
 
-The probes are in Biome’s scope, in the strict `tsconfig.packing-probes.json` program,
-and under the ESLint promise overlay.
-A Node script a Python tool runs goes in `packing/devtools/node/`, under
-`tsconfig.devtools-node.json`. The workbench package’s `workbench_tools.probes` is the
-same loader bound to `packages/workbench/probes/`.
+**One probe that needs another’s function takes a handle to it, never its text.**
+Playwright calls a function-valued evaluation, so a probe other probes compose is a
+*reference probe* whose file returns the function, or an object of functions, rather
+than being one. A composer receives it in its argument as
+`page.evaluate_handle(REFERENCE)`, and a direct caller evaluates `applied(REFERENCE)`,
+which is the function itself.
+`probes/math/library.js` is the explainer’s: `activeVariant`, `exposed`,
+`requiredFonts`, `fontLoadObserver` and `mutatedMath`, written once for every checker.
+An init script takes no argument and so no handle; it reads the global an earlier init
+script installs, as `check_math_loading.MATH_LIBRARY_INIT` installs the library for
+`FIRST_PAINT_SCRIPT`.
+
+The probes are in Biome’s scope and under the ESLint promise overlay.
+`packing/devtools/probe-typecheck.json` assigns each group to its own strict TypeScript
+program, so ambient declarations in an unrelated group cannot satisfy a probe.
+The manifest names each intentional shared declaration, and
+`packing/devtools/node/typecheck-probe-groups.mjs` discovers every probe in those
+groups.
+A Node script a Python tool runs goes in `packing/devtools/node/`, and one a test
+runs goes in `packing/tests/node/<test module>/`, both under
+`tsconfig.devtools-node.json`. A test script that exercises a probe against stand-ins
+loads the probe file itself through `packing/tests/node/probe.mjs`, so what runs under
+Node is what runs in the page.
+The workbench package’s `workbench_tools.probes` is the same loader bound to
+`packages/workbench/probes/`.
 
 Two checks hold the rule, and both run in `--edit` and on every pull request as the
 `browser code lives in files` step:
@@ -973,11 +993,9 @@ Two checks hold the rule, and both run in `--edit` and on every pull request as 
 - `devtools.check_no_embedded_js` parses every Python file and fails on a built script
   argument to Playwright’s evaluate family, a string that matches a JavaScript
   signature, or a `<script>` body written in Python.
-  Its signatures and its ratchet allowlist are in
-  `packing/devtools/embedded-javascript.yaml`. The allowlist names each file that still
-  offends, its site count, and the bead that removes them; the check fails when a count
-  moves in either direction without the entry moving with it, and when a listed file is
-  clean. `--inventory` prints every site.
+  Its signatures and enforced empty allowlist are in
+  `packing/devtools/embedded-javascript.yaml`. Any detected site fails the check;
+  `--inventory` prints every site.
 - `devtools.check_probes` fails on a probe that does not evaluate to a function, one no
   Python file beside its tree names, and a name no file answers.
 

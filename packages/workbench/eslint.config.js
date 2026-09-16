@@ -53,24 +53,34 @@ export default [
   },
   {
     // The probes the Python tools under `packing/` load through `sqpack.probes`, with the v1
-    // slideshow's page script that shares their program, and the Node scripts those tools run.
-    // Both programs are strict; neither inherits a relaxation.
+    // slideshow's page script. This broad project only supplies type information to the
+    // promise rules; `typecheck-probe-groups.mjs` is the type gate and isolates ambient
+    // declarations group by group.
     files: [
       "packing/**/probes/**/*.js",
       "packing/atlas/known-best/video/spikes/v1-slideshow/assets/*.js",
     ],
     languageOptions: {
       parser,
-      parserOptions: { project: "./tsconfig.packing-probes.json" },
+      parserOptions: { project: "./eslint.probes.json" },
     },
     plugins,
     rules: promiseRules,
   },
   {
-    files: ["packing/devtools/node/**/*.mjs"],
+    files: ["packing/devtools/node/**/*.mjs", "packing/tests/node/**/*.mjs"],
     languageOptions: {
       parser,
       parserOptions: { project: "./tsconfig.devtools-node.json" },
+    },
+    plugins,
+    rules: promiseRules,
+  },
+  {
+    files: ["packing/devtools/explainer/**/*.js"],
+    languageOptions: {
+      parser,
+      parserOptions: { project: "./tsconfig.explainer.json" },
     },
     plugins,
     rules: promiseRules,

@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.base.json",
+  "include": [
+    "packing/**/probes/**/*.js",
+    "packing/**/probes/**/*.d.ts",
+    "packing/atlas/known-best/video/spikes/v1-slideshow/assets/*.js",
+    "packages/workbench/probes/atlas-transitions.d.ts"
+  ]
+}
