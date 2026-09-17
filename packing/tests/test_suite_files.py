@@ -125,6 +125,7 @@ def _shard_report(
     seconds: float | None = None,
     exit_status: int = 0,
     file: str | None = None,
+    count: int = 2,
 ) -> dict[str, object]:
     return suite_files.report_document(
         {
@@ -133,7 +134,7 @@ def _shard_report(
                 float(index) if seconds is None else seconds,
             )
         },
-        shard=Shard(index, 2),
+        shard=Shard(index, count),
         environment={
             "GITHUB_RUN_ID": run,
             "GITHUB_RUN_ATTEMPT": attempt,
@@ -160,6 +161,18 @@ def test_record_requires_one_complete_coherent_shard_cohort() -> None:
         suite_files.record([complete[0], _shard_report(2, attempt="2")], shards=2)
     with pytest.raises(SuiteFilesError, match="each sharded cohort"):
         suite_files.record([complete[0], _shard_report(2, sha="def")], shards=2)
+
+
+def test_record_refuses_reports_cut_for_another_shard_count() -> None:
+    """Shards `1/2` and `2/3` would otherwise pass as one complete cohort of two."""
+    complete = [_shard_report(1), _shard_report(2)]
+    with pytest.raises(SuiteFilesError, match=r"shard count\(s\) \[2\], not the requested 3"):
+        suite_files.record(complete, shards=3)
+    mixed = [_shard_report(1), _shard_report(2, count=3)]
+    with pytest.raises(
+        SuiteFilesError, match=r"shard count\(s\) \[2, 3\], not the requested 2"
+    ):
+        suite_files.record(mixed, shards=2)
 
 
 def test_record_combines_complete_sharded_cohorts() -> None:

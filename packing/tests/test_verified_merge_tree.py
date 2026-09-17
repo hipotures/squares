@@ -103,6 +103,7 @@ def test_a_refused_newer_run_does_not_hide_an_older_proof() -> None:
         [],
         [_required_job(status="completed", conclusion="skipped")],
         [_required_job(status="completed", conclusion="failure")],
+        [_required_job(status="completed", conclusion="cancelled")],
         [_required_job(status="in_progress", conclusion=None)],
     ],
 )

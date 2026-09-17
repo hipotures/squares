@@ -26,6 +26,7 @@ are its own shape and its own rules, which is what `check_gate_budgets` enforces
 from __future__ import annotations
 
 import json
+import re
 from copy import deepcopy
 from pathlib import Path
 from typing import Any
@@ -33,6 +34,7 @@ from typing import Any
 import pytest
 
 from devtools import check_pr_wall
+from devtools.check_gate_budgets import wall_problems
 from devtools.check_pr_wall import (
     WallError,
     WorkflowWall,
@@ -587,15 +589,46 @@ def test_a_median_that_disagrees_with_its_own_samples_is_refused(tmp_path: Path)
         load_walls(path)
 
 
-def test_nonfinite_wall_numbers_are_refused(tmp_path: Path) -> None:
+@pytest.mark.parametrize("value", [".nan", ".inf", "-.inf"])
+@pytest.mark.parametrize(
+    ("declaration", "number", "field"),
+    [
+        ("regression_ratio: 1.2", "1.2", "policy.regression_ratio"),
+        ("min_samples: 15", "15", "policy.min_samples"),
+        ("budget_seconds: 180.0", "180.0", ".budget_seconds"),
+        ("median_seconds: 110.0", "110.0", ".median_seconds"),
+        ("run: 1, seconds: 110.0", "110.0", "kinds[0] seconds"),
+        ("run: 1, seconds", "1", "kinds[0] run"),
+    ],
+)
+def test_nonfinite_wall_numbers_are_refused(
+    tmp_path: Path, declaration: str, number: str, field: str, value: str
+) -> None:
+    """A NaN compares false with every bound, so no later range check would catch one."""
+    path = register(tmp_path, median=110.0)
+    document = path.read_text(encoding="utf-8")
+    assert declaration in document
+    path.write_text(
+        document.replace(declaration, declaration.replace(number, value), 1),
+        encoding="utf-8",
+    )
+    with pytest.raises(WallError, match=rf"{re.escape(field)} must be a positive number"):
+        load_walls(path)
+
+
+@pytest.mark.parametrize("value", [".nan", ".inf"])
+def test_a_nonfinite_budget_fails_the_static_wall_check(tmp_path: Path, value: str) -> None:
+    """The static check compares a budget with `OR-14`'s edge, and `nan > 180` is false."""
     path = register(tmp_path)
     document = path.read_text(encoding="utf-8")
     path.write_text(
-        document.replace("budget_seconds: 180.0", "budget_seconds: .nan"),
+        document.replace("budget_seconds: 180.0", f"budget_seconds: {value}"),
         encoding="utf-8",
     )
-    with pytest.raises(WallError, match="positive number"):
-        load_walls(path)
+    problems = wall_problems(path)
+    assert len(problems) == 1, problems
+    assert problems[0].startswith("pull_request_walls: "), problems
+    assert ".budget_seconds must be a positive number" in problems[0], problems
 
 
 @pytest.mark.parametrize(
