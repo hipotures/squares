@@ -143,8 +143,11 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
             f"the simple-transition speed-up changed the physics work: {work}",
         )
 
-        # The box on the stage: black on its way, green once locked at the best known side,
-        # with a black trace where it just was and a triangle over the gap bar at its side. On
+        # The box on the stage: the frames' grey on its way, green once locked at the best known
+        # side, with the lightest grey trace where it just was and a triangle over the gap bar
+        # at its side (the owner, 2026-09-17: every frame one width, and only the lock is a
+        # colour change). Both colours are the stylesheet's `--scene-frame-*`, which the probe
+        # compares the drawn stroke with, so this asks for the token rather than for a hex. On
         # 10 -> 11 the box rests at 3.707 with 9 -> 10's trace outside it at 4. As the move
         # opens the box grows to 4, leaving and then clearing a trace at 3.707; the new square
         # shows only once the arrival delay after that has passed, and the step settles at
@@ -211,10 +214,11 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
             0 < arriving() < 1,
             f"the new square is not fading in after the delay: {arriving()}, {step}",
         )
+        growing = page.evaluate(probe("stage/box-state"))
         require(
-            locked() == (False, False)
-            and page.evaluate(probe("stage/box-state"))["boxStroke"] == "#000000",
-            f"the growing box or its pointer is not black: {locked()}",
+            locked() == (False, False) and growing["grey"],
+            f"the growing box or its pointer is not the frames' grey: {locked()}, "
+            f"{growing['boxStroke']}",
         )
         clear_end = min(
             max(step["moveEnd"], step["containerEnd"]),

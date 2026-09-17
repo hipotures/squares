@@ -78,7 +78,7 @@ export function mountAnimationPanel(options: AnimationPanelOptions): AnimationPa
   const catalogueSquares = element(document, "squares", SVGGElement);
   const traceSquares = document.createElementNS(SVG_NS, "g");
   traceSquares.id = "animation-squares";
-  traceSquares.style.display = "none";
+  traceSquares.toggleAttribute("hidden", true);
   world.append(traceSquares);
   const squareNodes = new Map<number, { node: SVGGElement; shape: SVGRectElement }>();
   const targets = {
@@ -212,8 +212,8 @@ export function mountAnimationPanel(options: AnimationPanelOptions): AnimationPa
       options.enter();
       current = editor.document();
       active = true;
-      catalogueSquares.style.display = "none";
-      traceSquares.style.display = "";
+      catalogueSquares.toggleAttribute("hidden", true);
+      traceSquares.toggleAttribute("hidden", false);
       document.body.classList.add("trace-active");
       refresh();
       return controller.state();
@@ -235,8 +235,8 @@ export function mountAnimationPanel(options: AnimationPanelOptions): AnimationPa
       captureGeneration++;
       playback.pause();
       active = false;
-      traceSquares.style.display = "none";
-      catalogueSquares.style.display = "";
+      traceSquares.toggleAttribute("hidden", true);
+      catalogueSquares.toggleAttribute("hidden", false);
       document.body.classList.remove("trace-active");
       options.restore();
     },

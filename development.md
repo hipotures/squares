@@ -951,6 +951,14 @@ hand-written skill assets under `.agents/skills` are also under the same two flo
 Comments explain non-obvious intent, invariants, units, evidence limits, and rejected
 alternatives—not a line-by-line translation of the code.
 
+The workbench’s stylesheet is under a design contract as well as Biome.
+Its design values live only in the token block at the top of
+`packages/workbench/assets/workbench.css`, and inline style writes are counted.
+`npm run check` enforces both, along with WCAG AA contrast.
+`check_frontend` measures the page’s shared layout at three viewports.
+See the package README’s [Design system](packages/workbench/README.md#design-system)
+section before changing either.
+
 Markdown is owned by Flowmark at repository root.
 Durable documentation follows the common documentation guidelines and carries their
 footer. Run the repository hook or `make format`; do not introduce a second Markdown

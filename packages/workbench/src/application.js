@@ -254,9 +254,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   const DEG = Math.PI / 180;
   const _QUARTER = Math.PI / 2;
   // Scarlet is defined once, in the stylesheet, and read back here for the fill tint.
-  const SCARLET = getComputedStyle(document.documentElement).getPropertyValue("--new").trim();
-  // The best known upper bound's green, which the stage's box turns when it locks at that side.
-  const MET = getComputedStyle(document.documentElement).getPropertyValue("--met").trim();
+  const SCARLET = getComputedStyle(document.documentElement)
+    .getPropertyValue("--scene-proved")
+    .trim();
 
   const state = {
     // Revision 9: one view. Revision 8's two tabs were the same operation over a different span, so
@@ -602,8 +602,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // that line is measured rather than computed: it is one constant string, and a measurement
   // cannot disagree with the face the browser actually loaded -- which a build-time advance
   // sum could, since `=` may come from the symbols face with its own size-adjust. Taken at
-  // startup and again on `document.fonts.ready`, as the figure width beside it is.
-  let numeralLeft = 152; // the fallback, close enough for the frame before the faces land
+  // startup and again on `document.fonts.ready`, as the figure width beside it is. Until then the
+  // stylesheet's `--stage-numeral-left` is the fallback, close enough for the frame before the
+  // faces land.
   //: The row the headline is centred in: the packing's own box, so `n = 26` sits under the picture
   //: it names rather than under the panel.
   const HEADLINE_ROW = 1000;
@@ -624,10 +625,65 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       shown.offsetWidth +
       (current?.textContent ? current.offsetWidth / Math.max(1, current.textContent.length) : 0) *
         Math.max(0, digits - (current?.textContent ? current.textContent.length : digits));
-    numeralLeft = Math.max(0, (HEADLINE_ROW - widest) / 2);
-    document.querySelectorAll(".numeral").forEach((el) => {
-      /** @type {HTMLElement} */ (el).style.left = `${numeralLeft}px`;
-    });
+    const numeralLeft = Math.max(0, (HEADLINE_ROW - widest) / 2);
+    // One property on the row, which every numeral in its three slots reads, rather than a `left`
+    // written into each numeral: a numeral built later starts in the right place without being told.
+    htmlNode("headline").style.setProperty("--stage-numeral-left", `${numeralLeft}px`);
+    placeAttribution();
+  }
+  // The attribution (the owner, 2026-09-17): the repository's address, standing on the headline's
+  // baseline and ending where the gap bar's rail ends. Both anchors are read off what is drawn --
+  // the empty inline block `buildFacts` puts on the headline's line, and the rail's own box -- and
+  // written in stage pixels as the SVG text's `y` (its baseline) and `x` (its end). Neither moves
+  // with n, the window or the separator, because the stage is laid out at 1920 x 1080 and only
+  // scaled; they move only when the faces land. So this runs with the headline's measurement, at
+  // startup and on `document.fonts.ready`, and `layout` repeats it until a placement has been made
+  // with the faces in, which covers a page that is in Pack or Search when they arrive, where the
+  // headline and the rail are not drawn to measure. Until the first placement the text is hidden.
+  // A resize measures nothing again: it redraws what was measured (`drawAttribution`), which is
+  // also what keeps the overlay painted, and works in Pack and Search where nothing is drawn to
+  // measure from.
+  const attribution = svgNode("stage-attribution");
+  const attributionText = svgNode("stage-attribution-text");
+  //: Where the attribution stands, in stage pixels: the rail's right end and the headline's
+  //: baseline, once both have been drawn to measure. Null until then, which is why the text is
+  //: hidden rather than drawn at a guess.
+  let attributionAt = null;
+  let attributionSettled = false;
+  function placeAttribution() {
+    const baseline = document.querySelector("#numeral-static .numeral .baseline");
+    const rail = document.querySelector("#gapbar .track");
+    if (
+      baseline === null ||
+      rail === null ||
+      baseline.getClientRects().length === 0 ||
+      rail.getClientRects().length === 0 ||
+      stage.offsetWidth === 0
+    ) {
+      return;
+    }
+    const frame = stage.getBoundingClientRect();
+    const scale = frame.width / stage.offsetWidth;
+    attributionAt = [
+      (rail.getBoundingClientRect().right - frame.left) / scale,
+      (baseline.getBoundingClientRect().top - frame.top) / scale,
+    ];
+    attributionSettled = !("fonts" in document) || document.fonts.status === "loaded";
+    drawAttribution();
+  }
+  // Writing the measured place back, which is also what makes the overlay repaint. Chromium does
+  // not repaint this nested SVG when the transform above it changes: narrowed through the review
+  // viewports to 390 px the text was simply left unpainted, while its own boxes read right
+  // (measured 2026-09-17, `attic/borders`). Writing the two attributes it is placed by is the
+  // change that invalidates it, and writing the same numbers back is enough, so `setStageScale`
+  // calls this whenever the stage's scale moves. It costs two attribute writes per resize.
+  function drawAttribution() {
+    if (attributionAt === null) {
+      return;
+    }
+    attributionText.setAttribute("x", fmt(attributionAt[0], 2));
+    attributionText.setAttribute("y", fmt(attributionAt[1], 2));
+    attribution.classList.add("is-placed");
   }
   //: The width of one figure in the face the gap bar sets its two numbers in, used to decide
   //: whether the record's label would sit on top of the lower bound's. The fallback is Source Sans
@@ -689,11 +745,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // panel. The star is the atlas's polygon; the approximately-equal sign is KaTeX_Main's U+2248
   // outline (the latin subset of Source Sans 3 has none), extracted at build time and drawn as a
   // path centred on its own ink, as the slideshow candidate draws it.
-  const { buildFacts } = workbenchBundle.factsView.createFactsView(
-    document,
-    DATA,
-    () => numeralLeft,
-  );
+  const { buildFacts } = workbenchBundle.factsView.createFactsView(document, DATA);
   let numeralA = null;
   //: Per slot of the facts panel, whether the n layer and the n + 1 layer draw it identically.
   //: An identical slot hands over at the midpoint, which cannot be seen; only a slot that
@@ -4054,7 +4106,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     const resting = t <= sc.moveStart || t >= sc.end || (from === to && open === to);
     boxLocked =
       !optimizing && resting && Math.abs(box - best) <= PACKING_VALIDITY.penetrationTolerance;
-    boxRect.setAttribute("stroke", boxLocked ? MET : "#000000");
+    // The colour is the stylesheet's: green locked, grey on its way (`--scene-frame-*`).
+    boxRect.classList.toggle("is-locked", boxLocked);
   }
 
   // Style A, the block tween of revision 5: poses tween between the two frames, a block's members
@@ -4709,9 +4762,25 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   function stageBounds() {
     return { min: STAGE_MIN, max: window.innerHeight - CONTROLS_MIN };
   }
+  // The layout is two numbers the stylesheet turns into boxes: `--stage-scale`, which sizes the
+  // stage and its wrapper, and `--controls-height`, which a separator-sized column takes while it
+  // is `.is-sized`. Written as custom properties on `#viewport` rather than as each box's width,
+  // height and transform, so the geometry stays in the stylesheet and only the numbers are live.
+  const viewportNode = htmlNode("viewport");
+  let stageScale = null;
+  function setStageScale(/** @type {number} */ scale) {
+    viewportNode.style.setProperty("--stage-scale", String(scale));
+    if (scale !== stageScale) {
+      stageScale = scale;
+      drawAttribution();
+    }
+  }
   function layout() {
     if (document.hidden) {
       return;
+    }
+    if (!attributionSettled) {
+      placeAttribution();
     }
     const vw = window.innerWidth,
       vh = window.innerHeight;
@@ -4720,16 +4789,13 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     if (sized) {
       const height = clampSeparator(stageShare * vh, stageBounds());
       const scale = Math.min(vw / 1920, height / 1080);
-      stage.style.transform = `scale(${scale})`;
-      stageWrap.style.width = `${1920 * scale}px`;
-      stageWrap.style.height = `${1080 * scale}px`;
-      controls.style.height = `${vh - 1080 * scale}px`;
-      controls.style.maxHeight = "none";
+      setStageScale(scale);
+      viewportNode.style.setProperty("--controls-height", `${vh - 1080 * scale}px`);
+      controls.classList.add("is-sized");
       stageHandle?.sync();
       return;
     }
-    controls.style.height = "";
-    controls.style.maxHeight = "";
+    controls.classList.remove("is-sized");
     let ch = state.capture ? 0 : controls.offsetHeight;
     if (!state.capture) {
       // A hidden document is not laid out, so `offsetHeight` reads zero in a background tab;
@@ -4739,10 +4805,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       }
       ch = Math.min(controlsHeight, vh * CONTROLS_SHARE);
     }
-    const s = Math.min(vw / 1920, (vh - ch) / 1080);
-    stage.style.transform = `scale(${s})`;
-    stageWrap.style.width = `${1920 * s}px`;
-    stageWrap.style.height = `${1080 * s}px`;
+    setStageScale(Math.min(vw / 1920, (vh - ch) / 1080));
     stageHandle?.sync();
   }
 
@@ -6189,6 +6252,10 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       return;
     }
     const target = ev.target instanceof Element ? ev.target : null;
+    // A link on the stage (the attribution) takes its own Enter.
+    if (target?.closest("a[href]")) {
+      return;
+    }
     const rawIndex = target?.getAttribute("data-square-index");
     const squareIndex = rawIndex === null || rawIndex === undefined ? -1 : Number(rawIndex);
     const squareFocused = Number.isInteger(squareIndex) && squareIndex >= 0;

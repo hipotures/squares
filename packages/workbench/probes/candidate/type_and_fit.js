@@ -34,15 +34,7 @@
       sizes.set(size, names);
     }
   };
-  const SLOTS = [
-    ".numeral",
-    ".head-proved",
-    ".side",
-    ".star-line",
-    ".badges",
-    ".head-open",
-    ".open-items",
-  ];
+  const SLOTS = [".numeral", ".head-proved", ".side", ".badges", ".head-open", ".open-items"];
   const fits = [];
   const count = api.pairs().length;
   for (let i = 0; i < count; i++) {
