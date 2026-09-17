@@ -1654,6 +1654,84 @@ def test_lint_floor_reaches_the_handwritten_skill_assets(
         validate._handwritten_skill_directories()
 
 
+def test_concurrent_commands_join_in_declared_order_and_report_the_first_declared_failure(
+    tmp_path: Path,
+) -> None:
+    """`exact verification`'s seventeen subprocesses run at once and must read as serial.
+
+    The step checks its joined output for substrings, so the join is in declared order
+    whichever command finishes first; and a failure reports the earliest declared command
+    that failed -- the one the serial loop would have stopped on -- so which error a run
+    names does not depend on scheduling.
+    """
+    context = _budget_context(timeout_seconds=30, explicit=False)
+    slow_first = (
+        (sys.executable, "-c", "import time; time.sleep(0.4); print('first')"),
+        (sys.executable, "-c", "print('second')"),
+        (sys.executable, "-c", "print('third')"),
+    )
+    started = time.perf_counter()
+    output = validate._concurrent_commands(context, slow_first, workers=3)
+    assert output.splitlines() == ["first", "second", "third"]
+    assert time.perf_counter() - started < 2.0
+
+    marker = tmp_path / "never-started"
+    failing = (
+        (sys.executable, "-c", "import time; time.sleep(0.4); raise SystemExit(11)"),
+        (sys.executable, "-c", "raise SystemExit(12)"),
+        (sys.executable, "-c", "import time; time.sleep(1.5)"),
+        (sys.executable, "-c", f"from pathlib import Path; Path({str(marker)!r}).touch()"),
+    )
+    with pytest.raises(validate.StepFailureError, match="command exited 11"):
+        validate._concurrent_commands(context, failing, workers=2)
+    # The 1.5s command held a worker, so the fourth was still queued when the first
+    # failure arrived and was cancelled rather than started.
+    assert not marker.exists()
+    # A failure inside the step is the step's own: unlike `_command_groups`, it does not
+    # stop the validation run, so the gate's other steps can still start subprocesses.
+    assert not context.processes.stopping
+
+
+def test_exact_verification_takes_the_cpus_its_neighbours_leave(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Two of four cpus at the pull request's `--checks --jobs 3`, serial where `--jobs`
+    already fills the machine -- the same `cpus - jobs + 1` the quick lane sizes by.
+
+    And the step asks for that bound rather than running its list serially: the pool was
+    dropped once without a recorded decision (`think-5hfr`), and nothing failed.
+    """
+    monkeypatch.setattr(os, "process_cpu_count", lambda: 4)
+    assert validate._command_workers(3) == 2
+    assert validate._command_workers(4) == 1
+    assert validate._command_workers(1) == 4
+
+    requested: list[tuple[int, int]] = []
+
+    def record(
+        _context: validate.Context,
+        commands: tuple[tuple[str, ...], ...],
+        *,
+        workers: int,
+        **_options: object,
+    ) -> str:
+        requested.append((len(commands), workers))
+        raise validate.StepFailureError("recorded")
+
+    def serial(*_arguments: object, **_options: object) -> str:
+        message = "exact verification ran its members serially"
+        raise AssertionError(message)
+
+    monkeypatch.setattr(validate, "_concurrent_commands", record)
+    monkeypatch.setattr(validate, "_commands", serial)
+    context = validate.Context(deep=False, strict=False, jobs=3, inner_jobs=1, environment={})
+    with pytest.raises(validate.StepFailureError, match="recorded"):
+        validate._exact_verification(context)
+    [(count, workers)] = requested
+    assert count > 1
+    assert workers == 2
+
+
 def test_multi_command_step_stops_at_first_failure_without_printing_success(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
