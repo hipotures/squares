@@ -28,6 +28,7 @@ from pathlib import Path
 
 import pytest
 
+from devtools import bead_state
 from devtools.check_gate_budgets import (
     OR_14_OUTER_EDGE_SECONDS,
     attribute_files,
@@ -543,12 +544,112 @@ def test_the_pages_wall_cannot_declare_a_second_budget(tmp_path: Path) -> None:
     assert any("same metric" in problem for problem in problems)
 
 
+def advisory_walls(tmp_path: Path, *, bead: str = "think-aaaa", budget: float = 180.0) -> Path:
+    """A wall register in `tmp_path` whose one wall is advisory under `bead`."""
+    register = tmp_path / "gate-budgets.yaml"
+    register.write_text(
+        "pull_request_walls:\n"
+        "  policy:\n"
+        "    regression_ratio: 1.2\n"
+        "    min_samples: 15\n"
+        "    main_branch: main\n"
+        "    setup_steps: ['^Set up job$']\n"
+        "  workflows:\n"
+        "  - id: packing-validation\n"
+        "    file: .github/workflows/packing-validation.yml\n"
+        "    aggregator: packing-required\n"
+        "    not_gating: [macos-portability]\n"
+        f"    budget_seconds: {budget}\n"
+        "    enforcement: advisory\n"
+        f"    tracking_bead: {bead}\n"
+        "    advisory_reason: a fabricated owner decision\n"
+        "    argument: a fabricated register\n",
+        encoding="utf-8",
+    )
+    return register
+
+
+def test_an_advisory_wall_must_be_tracked_by_an_open_bead(tmp_path: Path) -> None:
+    """An advisory wall is a relaxation, and a relaxation names the work that ends it.
+
+    A closed bead means that work is claimed done while the wall is still not enforced; an
+    unknown one never tracked anything. Both are the lower floor `think-4cwy` became for
+    the `tsconfig` flags, and both are refused on a fixture store so this runs anywhere.
+    """
+    read = bead_state.fixture_store({"aaaa": "open", "bbbb": "in_progress", "cccc": "closed"})
+    assert wall_problems(advisory_walls(tmp_path, bead="think-aaaa"), read) == []
+    assert wall_problems(advisory_walls(tmp_path, bead="think-bbbb"), read) == []
+    closed = wall_problems(advisory_walls(tmp_path, bead="think-cccc"), read)
+    assert len(closed) == 1, closed
+    assert "advisory under think-cccc: closed" in closed[0]
+    unknown = wall_problems(advisory_walls(tmp_path, bead="think-zzzz"), read)
+    assert len(unknown) == 1, unknown
+    assert "advisory under think-zzzz: no such bead" in unknown[0]
+
+
+def test_an_advisory_wall_with_no_bead_store_to_ask_is_refused(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A tracker nothing can resolve is not trusted; an enforcing wall never asks."""
+    monkeypatch.setattr(bead_state, "store", lambda: None)
+    problems = wall_problems(advisory_walls(tmp_path))
+    assert len(problems) == 1, problems
+    assert "no bead store is reachable" in problems[0]
+
+    enforcing = advisory_walls(tmp_path)
+    document = enforcing.read_text(encoding="utf-8")
+    enforcing.write_text(
+        document.replace("    enforcement: advisory\n", "")
+        .replace("    tracking_bead: think-aaaa\n", "")
+        .replace("    advisory_reason: a fabricated owner decision\n", ""),
+        encoding="utf-8",
+    )
+
+    def unreachable() -> None:
+        raise AssertionError("an enforcing wall must not need the bead store")
+
+    monkeypatch.setattr(bead_state, "store", unreachable)
+    assert wall_problems(enforcing) == []
+
+
+def test_an_advisory_wall_keeps_or14s_outer_edge(tmp_path: Path) -> None:
+    """Advisory relaxes what a wall over the budget does, never the budget itself."""
+    read = bead_state.fixture_store({"aaaa": "open"})
+    problems = wall_problems(
+        advisory_walls(tmp_path, budget=OR_14_OUTER_EDGE_SECONDS * 2), read
+    )
+    assert any("outer edge" in problem for problem in problems), problems
+
+
+@pytest.mark.parametrize(
+    ("old", "new", "message"),
+    [
+        ("    tracking_bead: think-aaaa\n", "", "tracking_bead: think-xxxx"),
+        ("    advisory_reason: a fabricated owner decision\n", "", "advisory_reason"),
+        ("enforcement: advisory", "enforcement: lenient", "enforcement must be one of"),
+    ],
+)
+def test_the_static_check_reports_a_malformed_enforcement(
+    tmp_path: Path, old: str, new: str, message: str
+) -> None:
+    """The records tier fails on the declaration before any pull request reads it."""
+    path = advisory_walls(tmp_path)
+    document = path.read_text(encoding="utf-8")
+    assert old in document
+    path.write_text(document.replace(old, new, 1), encoding="utf-8")
+    problems = wall_problems(path, bead_state.fixture_store({"aaaa": "open"}))
+    assert len(problems) == 1, problems
+    assert problems[0].startswith("pull_request_walls: "), problems
+    assert message in problems[0], problems
+
+
 def test_each_workflow_still_runs_the_wall_check_it_declares() -> None:
     """Rule 7's wiring: a budget nothing runs is a budget nothing enforces.
 
     Both job graphs are being restructured as this lands, so the check is that each
     workflow's declared aggregator still invokes the tool -- not that the graph has a
-    particular shape.
+    particular shape. An advisory wall's tracker is resolved in the checkout's real bead
+    store here, which is why the jobs that run this file fetch full history.
     """
     assert wall_problems() == []
 

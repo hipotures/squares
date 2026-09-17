@@ -20,8 +20,12 @@ rules added on 2026-09-15 are each named for how that one got through:
   went through a 1.5x drift rule. `gate_budgets.rise_findings` is the rule; the history it
   reads is kept in the register.
 * **The pull-request wall is declared and wired.** `OR-14` targets PR wall, and no tier
-  sees it. `devtools.check_pr_wall` enforces it on every run; this checks its budgets
+  sees it. `devtools.check_pr_wall` measures it on every run; this checks its budgets
   stay inside `OR-14`'s outer edge and that each workflow's aggregator still runs it.
+  A wall declared `enforcement: advisory` reports its size without failing the run, so
+  it must name a tracking bead that is still open: a closed or unknown bead means the
+  relaxation has outlived the work that was to end it. That is the ratchet a relaxed
+  `tsconfig` flag is held to, read from the same bead store.
 
 Nothing here runs a tier or looks at a clock, so it cannot be dismissed as a busy runner.
 It asserts, about `devtools/gate-budgets.yaml`:
@@ -32,7 +36,9 @@ It asserts, about `devtools/gate-budgets.yaml`:
 * every ceiling is within `policy.max_headroom` of the cost recorded for that tier;
 * every tier a pull-request job runs has a recorded cost that cites a hosted run;
 * no record rose past `policy.max_unattributed_rise` without an attribution;
-* every pull-request wall budget is inside `OR-14`'s three minutes, and runs; and
+* every pull-request wall budget is inside `OR-14`'s three minutes, and runs, whatever
+  its enforcement;
+* every advisory pull-request wall names a live tracking bead; and
 * `development.md` names every tier.
 
 Usage:
@@ -58,7 +64,8 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
-from devtools.check_pr_wall import WallError, load_walls
+from devtools import bead_state
+from devtools.check_pr_wall import WallError, WallRegister, load_walls
 from sqpack.cli.validate import TIER_IDS, _tier_id
 from sqpack.cli.validate import _parser as _validate_parser
 from sqpack.gate_budgets import (
@@ -185,8 +192,47 @@ def unrecorded_problems(register: Register, tiers: dict[str, str]) -> list[str]:
     return problems
 
 
-def wall_problems(register_path: Path = REGISTER) -> list[str]:
-    """The pull-request wall budgets: readable, inside `OR-14`, and actually run."""
+def advisory_problems(walls: WallRegister, read: bead_state.Reader | None = None) -> list[str]:
+    """Advisory walls whose tracking bead no longer tracks re-enforcement.
+
+    `load_walls` already refuses an advisory wall with no bead alias or no reason. What it
+    cannot see, from the aggregator's two-file sparse checkout, is whether that bead is
+    live. With no bead store to ask this fails rather than trusting the name, since a
+    relaxation nothing can confirm is exactly the state an advisory wall must not reach.
+    """
+    advisory = [
+        (workflow.id, declared)
+        for workflow in walls.workflows
+        if (declared := workflow.advisory) is not None
+    ]
+    if not advisory:
+        return []
+    store = read if read is not None else bead_state.store()
+    if store is None:
+        return [
+            f"pull-request wall {workflow_id!r} is advisory under "
+            f"{declared.tracking_bead}, and no bead store is reachable (no tbd sync "
+            "worktree, no tbd-sync branch) to confirm that bead is still open; fetch full "
+            "history"
+            for workflow_id, declared in advisory
+        ]
+    return [
+        f"pull-request wall {workflow_id!r} is advisory under {fault}, so nothing tracks "
+        "switching it back on; set `enforcement: enforcing` and drop its tracker, or name "
+        "the open bead that will re-enforce it"
+        for workflow_id, declared in advisory
+        for fault in bead_state.dead_trackers([declared.tracking_bead], store)
+    ]
+
+
+def wall_problems(
+    register_path: Path = REGISTER, read: bead_state.Reader | None = None
+) -> list[str]:
+    """The pull-request wall budgets: readable, inside `OR-14`, actually run, and tracked.
+
+    `read` is the bead store an advisory wall's tracker is resolved in; None finds the
+    checkout's own.
+    """
     try:
         walls = load_walls(register_path)
         document = safe_load(register_path.read_text(encoding="utf-8"))
@@ -194,7 +240,7 @@ def wall_problems(register_path: Path = REGISTER) -> list[str]:
         return [f"pull_request_walls: {error}"]
     except (OSError, TypeError) as error:
         return [f"pull_request_walls: cannot read duplicate wall declarations: {error}"]
-    problems: list[str] = []
+    problems: list[str] = advisory_problems(walls, read)
     for workflow in walls.workflows:
         label = f"pull-request wall {workflow.id!r}"
         if workflow.budget_seconds > OR_14_OUTER_EDGE_SECONDS:
@@ -308,13 +354,19 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 1
     for note in grandfathered:
         print(f"note: {note}")
+    for workflow in load_walls(REGISTER).workflows:
+        if workflow.advisory is not None:
+            print(
+                f"note: pull-request wall {workflow.id!r} is advisory under live bead "
+                f"{workflow.advisory.tracking_bead}: {workflow.advisory.reason}"
+            )
     recorded = sum(1 for tier in register.tiers if tier.measured_seconds is not None)
     print(
         f"gate budget declaration passed: {len(register.tiers)} tiers, {recorded} with a "
         f"recorded cost, all ceilings within {register.policy.max_headroom:g}x of it, every "
         f"pull-request tier ({', '.join(sorted(tiers))}) recorded from hosted runs, no "
-        "unattributed rise, the pull-request walls inside OR-14 and wired, all named in "
-        f"{GUIDE.name}"
+        "unattributed rise, the pull-request walls inside OR-14 and wired with every "
+        f"advisory wall tracked by a live bead, all named in {GUIDE.name}"
     )
     return 0
 

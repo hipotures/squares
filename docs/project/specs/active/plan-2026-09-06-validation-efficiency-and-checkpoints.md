@@ -147,6 +147,31 @@ surface.
 The failed predecessor sample is retained as variance evidence but excluded from
 the corrected-head baseline.
 
+### September 17 advisory pull-request wall
+
+Five hosted runs of PR 188’s Packing workflow measured the pull-request wall at 194,
+189, 178, 166, and 216 seconds against OR-14’s 180-second budget: runs 35127260063,
+35128357992 and 35175474610, and attempts 1 and 2 of run 35176748398. Hosted runner
+speed varied about 1.6–1.8x on identical code, and one full-history fetch took 45
+seconds. The `frontend` job alone ran 158–180 seconds end to end.
+Balanced two-shard suites still come to about 185–210 seconds on a 1.8x runner or with a
+slow fetch.
+
+On 2026-09-17 the owner made the wall check advisory until `think-g4n9` brings the worst
+case under 180 seconds and switches enforcement back on.
+The register declares this per workflow, as `enforcement: advisory` with a
+`tracking_bead` and an `advisory_reason`. A `continue-on-error` on the workflow step was
+rejected because it would also have passed unmeasurable runs and missing prerequisites.
+The wall is still measured and reported on every pull request.
+A wall over its budget or its regression ratio now raises a warning naming the bead
+instead of failing the aggregator.
+Unmeasurable or missing evidence, missing prerequisites, malformed register entries and
+the tier ceilings still block, and the budget remains 180 seconds.
+The Pages wall is advisory under the same decision, which covers the pull-request wall
+generally; Pages has also measured 189 seconds.
+`devtools.check_gate_budgets` refuses an advisory wall whose tracking bead is closed, so
+the relaxation cannot outlive `think-g4n9`.
+
 ## Design
 
 ### Review value before changing coverage
@@ -375,6 +400,9 @@ and must not be inferred from an earlier head.
   The prose is current; the register still carries the predecessor PR 180 wall medians
   (208 and 189 seconds) and PR 185 frontend and typecheck readings until final-head
   hosted runs replace them.
+  Both wall checks are advisory under `think-g4n9`
+  ([September 17](#september-17-advisory-pull-request-wall)); re-enforcing them is that
+  bead’s work, not this item’s.
 - [x] Link this plan from the development guide, W5 entry, predecessor plans, and map.
 - [x] Complete the documentation matrix, including durable long-run timing rules.
 - [x] Review upstream tbd guidance, choose a dedicated guideline or focused additions,

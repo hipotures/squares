@@ -28,6 +28,15 @@ another branch). When the regression cannot be judged -- too few recorded runs, 
 record for the kind, or a run that was cancelled or failed -- it says so, as a GitHub
 warning annotation and in the step summary, and does not pass silently.
 
+A workflow the register declares `enforcement: advisory` keeps both of those size rules
+and their diagnosis, but a wall over them exits 0 with a warning annotation naming the
+declared `tracking_bead`, whose work switches enforcement back on. Nothing else is
+relaxed. An unmeasurable run, a missing prerequisite and a malformed register still fail,
+because an advisory wall nobody could measure is a wall nobody sees. The owner made both
+walls advisory on 2026-09-17 under `think-g4n9`, after five hosted Packing walls of 194,
+189, 178, 166 and 216 s on identical code; `devtools.check_gate_budgets` refuses an
+advisory wall whose bead is closed or does not exist.
+
 It runs under the project's pinned Python through `uv`, with an exact PyYAML version and
 a sparse checkout, so the aggregator does not sync the project environment.
 
@@ -131,10 +140,27 @@ STEP_FIELDS = ("name", "conclusion", "started_at", "completed_at")
 SETTLE_ATTEMPTS = 3
 SETTLE_SECONDS = 3.0
 WALL_STEP = "Hold the pull request's wall to its budget"
+#: What a wall's size verdict does to the run. Absent means `enforcing`.
+ENFORCEMENT = ("enforcing", "advisory")
+#: A bead alias, the only thing an advisory wall may name as its tracker.
+TRACKING_BEAD = re.compile(r"think-[a-z0-9]{4}")
 
 
 class WallError(Exception):
     """The register or the API cannot supply what a verdict needs."""
+
+
+@dataclass(frozen=True)
+class Advisory:
+    """Why a wall over its budget does not fail the run, and the bead that ends it.
+
+    This is a ratchet in the sense the relaxed `tsconfig` flags are: it names the bead
+    tracking its removal, and it relaxes the size verdict only. Measurement failures are
+    not size verdicts and still fail.
+    """
+
+    tracking_bead: str
+    reason: str
 
 
 @dataclass(frozen=True)
@@ -161,6 +187,8 @@ class WorkflowWall:
     not_gating: tuple[str, ...]
     budget_seconds: float
     kinds: tuple[KindRecord, ...]
+    #: Set when the register declares `enforcement: advisory`; None is enforcing.
+    advisory: Advisory | None = None
 
     def record(self, kind: str | None) -> KindRecord | None:
         return next((record for record in self.kinds if record.kind == kind), None)
@@ -218,12 +246,16 @@ class Measurement:
 
 @dataclass(frozen=True)
 class WallVerdict:
-    status: Literal["passed", "failed", "unmeasurable"]
+    #: `advisory` is a wall that failed a size rule on a workflow whose enforcement is
+    #: advisory: the failures are real and reported, and the run is not failed for them.
+    status: Literal["passed", "failed", "advisory", "unmeasurable"]
     failures: tuple[str, ...] = ()
     notes: tuple[str, ...] = ()
     #: Rules that were not applied, and why. They render as warnings, because a rule that
     #: silently did not run reads exactly like a rule that passed.
     unjudged: tuple[str, ...] = ()
+    #: The workflow's advisory declaration, carried so every rendering can say so.
+    advisory: Advisory | None = None
 
 
 def _mapping(value: object, what: str) -> dict[str, Any]:
@@ -286,6 +318,47 @@ def _kind_from(raw: object, where: str) -> KindRecord:
     )
 
 
+def _advisory_from(entry: dict[str, Any], where: str) -> Advisory | None:
+    """The wall's enforcement: None when enforcing, its declaration when advisory.
+
+    An advisory wall must name its tracking bead and its reason. An enforcing wall may name
+    neither, so re-enforcing a wall removes its tracker instead of leaving one behind that
+    reads as if the relaxation were still in force. Whether the bead is live needs the bead
+    store, which the aggregator's sparse checkout does not have; that half is
+    `devtools.check_gate_budgets`.
+    """
+    enforcement = entry.get("enforcement", "enforcing")
+    if enforcement not in ENFORCEMENT:
+        raise WallError(
+            f"{where}.enforcement must be one of {', '.join(ENFORCEMENT)}, "
+            f"found {enforcement!r}"
+        )
+    bead, reason = entry.get("tracking_bead"), entry.get("advisory_reason")
+    if enforcement == "enforcing":
+        stale = [
+            name
+            for name, value in (("tracking_bead", bead), ("advisory_reason", reason))
+            if value is not None
+        ]
+        if stale:
+            raise WallError(
+                f"{where} is enforcing but declares {' and '.join(stale)}; an enforcing "
+                "wall names no tracker, so remove them when enforcement returns"
+            )
+        return None
+    if not isinstance(bead, str) or not TRACKING_BEAD.fullmatch(bead.strip()):
+        raise WallError(
+            f"{where} is advisory and must name the bead tracking its return to "
+            f"enforcement as `tracking_bead: think-xxxx`, found {bead!r}"
+        )
+    if not isinstance(reason, str) or not reason.strip():
+        raise WallError(
+            f"{where} is advisory and must say why in a non-empty advisory_reason, "
+            f"found {reason!r}"
+        )
+    return Advisory(tracking_bead=bead.strip(), reason=" ".join(reason.split()))
+
+
 def load_walls(path: Path = REGISTER) -> WallRegister:
     """Read `pull_request_walls` from the register, refusing what no rule could apply to."""
     try:
@@ -335,6 +408,7 @@ def load_walls(path: Path = REGISTER) -> WallRegister:
                     _kind_from(kind, f"{where}.kinds[{position}]")
                     for position, kind in enumerate(entry.get("kinds") or [])
                 ),
+                advisory=_advisory_from(entry, where),
             )
         )
     return WallRegister(policy=policy, workflows=tuple(workflows))
@@ -535,7 +609,12 @@ def critical_split(measurement: Measurement) -> str:
 
 
 def judge(measurement: Measurement, workflow: WorkflowWall, policy: WallPolicy) -> WallVerdict:
-    """Apply the budget and the regression rule, and name every rule that did not run."""
+    """Apply the budget and the regression rule, and name every rule that did not run.
+
+    An advisory workflow's size failures are kept word for word and marked `advisory`.
+    An unmeasurable run stays `unmeasurable` whatever the enforcement, because the
+    relaxation covers the wall's size and not the evidence it is read from.
+    """
     if measurement.unmeasurable or measurement.wall_seconds is None:
         return WallVerdict(
             status="unmeasurable",
@@ -543,6 +622,7 @@ def judge(measurement: Measurement, workflow: WorkflowWall, policy: WallPolicy) 
                 *measurement.unmeasurable,
                 "neither the budget nor the regression rule was applied to this run",
             ),
+            advisory=workflow.advisory,
         )
     wall = measurement.wall_seconds
     failures: list[str] = []
@@ -585,11 +665,15 @@ def judge(measurement: Measurement, workflow: WorkflowWall, policy: WallPolicy) 
             )
         else:
             notes.append(described)
+    status: Literal["passed", "failed", "advisory"] = "passed"
+    if failures:
+        status = "failed" if workflow.advisory is None else "advisory"
     return WallVerdict(
-        status="failed" if failures else "passed",
+        status=status,
         failures=tuple(failures),
         notes=tuple(notes),
         unjudged=tuple(unjudged),
+        advisory=workflow.advisory,
     )
 
 
@@ -599,6 +683,18 @@ def _jobs_by_wall(measurement: Measurement) -> list[JobTiming]:
 
 def _seconds(value: float | None, missing: str) -> str:
     return missing if value is None else f"{value:.0f}"
+
+
+def _failure_label(verdict: WallVerdict) -> str:
+    return "FAIL (advisory, not enforced)" if verdict.status == "advisory" else "FAIL"
+
+
+def _enforcement_note(advisory: Advisory) -> str:
+    reason = advisory.reason if advisory.reason.endswith(".") else f"{advisory.reason}."
+    return (
+        f"the wall is advisory under {advisory.tracking_bead}: {reason} Only its budget "
+        "and regression verdicts are relaxed; an unmeasurable run still fails."
+    )
 
 
 def render(measurement: Measurement, verdict: WallVerdict) -> list[str]:
@@ -619,17 +715,23 @@ def render(measurement: Measurement, verdict: WallVerdict) -> list[str]:
         f"{job.work_seconds:>6.0f} {_seconds(job.wall_seconds, '-'):>6}"
         for job in _jobs_by_wall(measurement)
     )
-    lines.extend(f"  FAIL: {failure}" for failure in verdict.failures)
+    label = _failure_label(verdict)
+    lines.extend(f"  {label}: {failure}" for failure in verdict.failures)
     lines.extend(f"  NOT JUDGED: {note}" for note in verdict.unjudged)
     lines.extend(f"  note: {note}" for note in verdict.notes)
+    if verdict.advisory is not None:
+        lines.append(f"  enforcement: {_enforcement_note(verdict.advisory)}")
     lines.append(f"  verdict: {verdict.status}")
     return lines
 
 
 def summary_markdown(measurement: Measurement, verdict: WallVerdict) -> str:
     """The same verdict, for `$GITHUB_STEP_SUMMARY`."""
+    heading = verdict.status
+    if verdict.status == "advisory" and verdict.advisory is not None:
+        heading = f"advisory (failed, not enforced under `{verdict.advisory.tracking_bead}`)"
     rows = [
-        f"### Pull-request wall: {verdict.status}",
+        f"### Pull-request wall: {heading}",
         "",
         (
             f"{_seconds(measurement.wall_seconds, 'unmeasured')} s from the run's start to "
@@ -645,9 +747,12 @@ def summary_markdown(measurement: Measurement, verdict: WallVerdict) -> str:
         for job in _jobs_by_wall(measurement)
     )
     rows.append("")
-    rows.extend(f"- **Fail:** {failure}" for failure in verdict.failures)
+    label = _failure_label(verdict)
+    rows.extend(f"- **{label.capitalize()}:** {failure}" for failure in verdict.failures)
     rows.extend(f"- **Not judged:** {note}" for note in verdict.unjudged)
     rows.extend(f"- {note}" for note in verdict.notes)
+    if verdict.advisory is not None:
+        rows.append(f"- **Enforcement:** {_enforcement_note(verdict.advisory)}")
     return "\n".join(rows) + "\n"
 
 
@@ -758,8 +863,12 @@ def _parser() -> argparse.ArgumentParser:
 
 
 def exit_status(verdict: WallVerdict) -> int:
-    """A run the tool could not measure is not a successful wall check."""
-    return 0 if verdict.status == "passed" else 1
+    """A run the tool could not measure is not a successful wall check.
+
+    An `advisory` verdict exits 0: its failures are size verdicts the register has switched
+    off under a named bead. `unmeasurable` exits 1 on every workflow, advisory or not.
+    """
+    return 0 if verdict.status in ("passed", "advisory") else 1
 
 
 def _reported_job_ids(jobs: Sequence[dict[str, Any]], workflow: WorkflowWall) -> set[str]:
@@ -894,8 +1003,16 @@ def _annotate(measurement: Measurement, verdict: WallVerdict) -> None:
     """GitHub annotations and a step summary, so a rule that did not run is seen."""
     if os.environ.get("GITHUB_ACTIONS") != "true":
         return
+    advisory = verdict.advisory if verdict.status == "advisory" else None
     for failure in verdict.failures:
-        print(f"::error title=Pull-request wall::{failure}")
+        if advisory is None:
+            print(f"::error title=Pull-request wall::{failure}")
+        else:
+            print(
+                f"::warning title=Pull-request wall (advisory under "
+                f"{advisory.tracking_bead})::{failure}. Not enforced until "
+                f"{advisory.tracking_bead} switches enforcement back on: {advisory.reason}"
+            )
     for note in verdict.unjudged:
         print(f"::warning title=Pull-request wall not judged::{note}")
     summary = os.environ.get("GITHUB_STEP_SUMMARY")

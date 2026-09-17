@@ -541,8 +541,11 @@ A new observation could simply replace the old baseline, turning the drift rule 
 ratchet. Finally, the complete wall had no machine-read budget.
 The pull-request wall checker now measures that wait on every run and fails closed when
 the current run cannot be measured.
-It always enforces the 180-second wall; after 15 comparable samples establish a
-kind-specific median, it also fails at a 1.2-fold regression.
+It judges the 180-second wall; after 15 comparable samples establish a kind-specific
+median, it also judges a 1.2-fold regression.
+Since 2026-09-17 both walls are advisory under `think-g4n9`: an over-budget wall warns
+rather than fails until that bead holds them at or under 180 seconds, while unmeasurable
+evidence still fails.
 Missing median evidence is reported explicitly rather than represented as a passed
 relative check. [The validation guide](development.md#validation-tiers) defines the
 measurement and the register contracts.

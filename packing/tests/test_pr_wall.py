@@ -68,8 +68,24 @@ def register(
     samples: int = 15,
     ratio: float = 1.2,
     minimum: int = 15,
+    enforcement: str | None = None,
+    tracking_bead: str | None = None,
+    reason: str | None = None,
 ) -> Path:
-    """A whole wall register in `tmp_path`, so a test can declare what it needs to fail."""
+    """A whole wall register in `tmp_path`, so a test can declare what it needs to fail.
+
+    `enforcement`, `tracking_bead` and `reason` are written only when given, so the
+    default register is the one with no enforcement declared at all.
+    """
+    declared = "".join(
+        f"    {key}: {value}\n"
+        for key, value in (
+            ("enforcement", enforcement),
+            ("tracking_bead", tracking_bead),
+            ("advisory_reason", reason),
+        )
+        if value is not None
+    )
     kinds = ""
     if median is not None:
         rows = "\n".join(
@@ -98,10 +114,28 @@ def register(
         "    aggregator: packing-required\n"
         "    not_gating: [macos-portability]\n"
         f"    budget_seconds: {budget}\n"
-        "    argument: a fabricated register\n" + kinds,
+        f"{declared}"
+        "    argument: a fabricated register\n"
+        f"{kinds}",
         encoding="utf-8",
     )
     return path
+
+
+#: The fabricated advisory tracker. Whether it is live is `check_gate_budgets`'s question,
+#: asked of a fixture store in `test_gate_budgets`; the standalone checker reads its shape.
+TRACKER = "think-aaaa"
+
+
+def advisory_register(tmp_path: Path, *, budget: float = 180.0) -> Path:
+    """The fabricated register with its wall declared advisory under `TRACKER`."""
+    return register(
+        tmp_path,
+        budget=budget,
+        enforcement="advisory",
+        tracking_bead=TRACKER,
+        reason="a fabricated owner decision",
+    )
 
 
 def verdict_of(
@@ -662,6 +696,232 @@ def test_duplicate_wall_fields_are_refused(tmp_path: Path, declaration: str) -> 
     )
 
     with pytest.raises(WallError, match="duplicate key"):
+        load_walls(path)
+
+
+# --- advisory enforcement, the owner's 2026-09-17 decision under think-g4n9 ---------------
+
+
+class _RecordedClient:
+    """The API reads `main` makes, answered from one recorded run."""
+
+    def __init__(self, run: dict[str, Any], jobs: list[dict[str, Any]]) -> None:
+        self._run = run
+        self._jobs = jobs
+
+    def run(self, run_id: int) -> dict[str, Any]:
+        _ = run_id
+        return self._run
+
+    def jobs(self, run_id: int) -> list[dict[str, Any]]:
+        _ = run_id
+        return self._jobs
+
+
+def run_main(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    argv: list[str],
+    run: dict[str, Any],
+    jobs: list[dict[str, Any]],
+) -> tuple[int, str]:
+    """`main` inside a simulated Actions job: its exit status and its step summary."""
+    client = _RecordedClient(run, jobs)
+    summary = tmp_path / "step-summary.md"
+    monkeypatch.setattr(check_pr_wall, "Client", lambda _repository, _token: client)
+    monkeypatch.setattr(check_pr_wall, "github_token", lambda: None)
+    monkeypatch.setattr(check_pr_wall.time, "sleep", lambda _seconds: None)
+    monkeypatch.setenv("GITHUB_ACTIONS", "true")
+    monkeypatch.setenv("GITHUB_STEP_SUMMARY", str(summary))
+    status = check_pr_wall.main(["--workflow", "packing-validation", *argv])
+    return status, summary.read_text(encoding="utf-8") if summary.exists() else ""
+
+
+def historical(path: Path, run_id: int) -> list[str]:
+    """The arguments that judge one recorded run afterwards, against `path`."""
+    return ["--register", str(path), "--run-id", str(run_id), "--base-ref", "main"]
+
+
+def test_an_advisory_wall_over_its_budget_warns_names_its_bead_and_exits_zero(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Five hosted walls read 194, 189, 178, 166 and 216 s on identical code.
+
+    The owner's answer was to keep measuring and reporting the wall and to stop failing
+    the aggregator on its size until `think-g4n9` brings it under 180 s. The diagnosis is
+    the enforcing one word for word, so nothing a reader needs is hidden: only the exit
+    status and the annotation's level change, and the warning names the bead.
+    """
+    _, enforcing = verdict_of(register(tmp_path), OVER_BUDGET)
+    path = advisory_register(tmp_path)
+    measurement, verdict = verdict_of(path, OVER_BUDGET)
+    assert verdict.status == "advisory"
+    assert verdict.failures == enforcing.failures
+    assert exit_status(verdict) == 0
+    assert render(measurement, verdict)[-1] == "  verdict: advisory"
+
+    run, jobs = recorded(OVER_BUDGET)
+    status, summary = run_main(tmp_path, monkeypatch, historical(path, OVER_BUDGET), run, jobs)
+    printed = capsys.readouterr().out.splitlines()
+    assert status == 0
+    assert not any(line.startswith("::error") for line in printed)
+    warnings = [
+        line
+        for line in printed
+        if line.startswith(f"::warning title=Pull-request wall (advisory under {TRACKER})::")
+    ]
+    assert len(warnings) == len(enforcing.failures)
+    assert any("180s budget" in warning for warning in warnings)
+    assert all(f"Not enforced until {TRACKER}" in warning for warning in warnings)
+    assert any(
+        line.startswith("  FAIL (advisory, not enforced): the pull request waited")
+        for line in printed
+    )
+    assert any(
+        line.startswith(f"  enforcement: the wall is advisory under {TRACKER}")
+        for line in printed
+    )
+    assert "  verdict: advisory" in printed
+    assert summary.startswith(
+        f"### Pull-request wall: advisory (failed, not enforced under `{TRACKER}`)"
+    )
+    assert "- **Fail (advisory, not enforced):** the pull request waited" in summary
+    assert f"- **Enforcement:** the wall is advisory under {TRACKER}" in summary
+
+
+@pytest.mark.parametrize("evidence", ["cancelled", "partial rerun", "prerequisite running"])
+def test_an_advisory_wall_still_fails_a_run_it_cannot_measure(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    evidence: str,
+) -> None:
+    """Advisory relaxes the wall's size, never the evidence the size is read from.
+
+    Otherwise a broken measurement would read as a wall that merely ran long, and an
+    advisory wall would become the way to stop seeing the wall at all.
+    """
+    path = advisory_register(tmp_path)
+    run_id = SUPERSEDED if evidence == "cancelled" else OVER_BUDGET
+    run, jobs = recorded(run_id)
+    if evidence == "partial rerun":
+        aggregator = next(job for job in jobs if job["name"] == "packing-required")
+        run["run_attempt"], run["run_started_at"] = 2, aggregator["started_at"]
+    elif evidence == "prerequisite running":
+        suite = next(job for job in jobs if job["name"] == "suite")
+        suite["status"], suite["conclusion"], suite["completed_at"] = "in_progress", None, None
+
+    status, summary = run_main(tmp_path, monkeypatch, historical(path, run_id), run, jobs)
+    printed = capsys.readouterr().out.splitlines()
+    assert status == 1
+    assert "  verdict: unmeasurable" in printed
+    assert not any(
+        line.startswith("::warning title=Pull-request wall (advisory") for line in printed
+    )
+    assert any("an unmeasurable run still fails" in line for line in printed)
+    assert summary.startswith("### Pull-request wall: unmeasurable\n")
+
+
+@pytest.mark.parametrize(
+    ("fault", "refusal"),
+    [
+        ("no prerequisites", "EXPECTED_PREREQUISITES is not set"),
+        ("stale aggregator", "did not report live aggregator `packing-required`"),
+        ("nonfinite budget", ".budget_seconds must be a positive number"),
+    ],
+)
+def test_an_advisory_wall_still_refuses_what_the_live_check_cannot_read(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    fault: str,
+    refusal: str,
+) -> None:
+    """A missing prerequisite set, a stale jobs view and a malformed register exit 2."""
+    path = advisory_register(tmp_path)
+    run, jobs = recorded(OVER_BUDGET)
+    argv = ["--register", str(path)]
+    monkeypatch.setenv("GITHUB_RUN_ID", str(OVER_BUDGET))
+    monkeypatch.setenv("GITHUB_JOB", "packing-required")
+    monkeypatch.setenv("GITHUB_BASE_REF", "main")
+    monkeypatch.setenv("EXPECTED_PREREQUISITES", json.dumps({"validate": {}, "suite": {}}))
+    if fault == "no prerequisites":
+        monkeypatch.delenv("EXPECTED_PREREQUISITES")
+    elif fault == "stale aggregator":
+        jobs = [job for job in jobs if job["name"] != "packing-required"]
+    else:
+        document = path.read_text(encoding="utf-8")
+        path.write_text(
+            document.replace("budget_seconds: 180.0", "budget_seconds: .nan"), encoding="utf-8"
+        )
+    status, _ = run_main(tmp_path, monkeypatch, argv, run, jobs)
+    assert status == 2
+    assert refusal in capsys.readouterr().err
+
+
+@pytest.mark.parametrize("enforcement", [None, "enforcing"])
+def test_an_enforcing_wall_fails_exactly_as_before(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    enforcement: str | None,
+) -> None:
+    """No declaration and `enforcement: enforcing` are the same wall check as before."""
+    path = register(tmp_path, enforcement=enforcement)
+    assert load_walls(path).workflow("packing-validation").advisory is None
+    run, jobs = recorded(OVER_BUDGET)
+    status, summary = run_main(tmp_path, monkeypatch, historical(path, OVER_BUDGET), run, jobs)
+    printed = capsys.readouterr().out
+    assert status == 1
+    assert "::error title=Pull-request wall::the pull request waited" in printed
+    assert "  FAIL: the pull request waited" in printed
+    assert "advisory" not in printed
+    assert "  verdict: failed" in printed.splitlines()
+    assert summary.startswith("### Pull-request wall: failed\n")
+    assert "- **Fail:** the pull request waited" in summary
+    assert "advisory" not in summary
+
+
+@pytest.mark.parametrize(
+    ("bead", "reason", "match"),
+    [
+        (None, "a reason", "tracking_bead: think-xxxx"),
+        ("gn49", "a reason", "tracking_bead: think-xxxx"),
+        ("think-g4n9 and think-aaaa", "a reason", "tracking_bead: think-xxxx"),
+        (TRACKER, None, "a non-empty advisory_reason"),
+        (TRACKER, "''", "a non-empty advisory_reason"),
+    ],
+)
+def test_an_advisory_wall_must_name_its_tracking_bead_and_its_reason(
+    tmp_path: Path, bead: str | None, reason: str | None, match: str
+) -> None:
+    """The ratchet a relaxed `tsconfig` flag is held to: name the bead that removes it."""
+    path = register(tmp_path, enforcement="advisory", tracking_bead=bead, reason=reason)
+    with pytest.raises(WallError, match=re.escape(match)):
+        load_walls(path)
+
+
+@pytest.mark.parametrize("value", ["lenient", "Advisory", "null", "false"])
+def test_an_unknown_enforcement_is_refused(tmp_path: Path, value: str) -> None:
+    """A misspelt enforcement would otherwise be a third mode nobody defined."""
+    path = register(tmp_path, enforcement=value, tracking_bead=TRACKER, reason="a reason")
+    with pytest.raises(WallError, match="enforcement must be one of enforcing, advisory"):
+        load_walls(path)
+
+
+@pytest.mark.parametrize(
+    ("enforcement", "bead", "reason", "stale"),
+    [
+        ("enforcing", TRACKER, None, "tracking_bead"),
+        (None, None, "a reason", "advisory_reason"),
+    ],
+)
+def test_an_enforcing_wall_names_no_tracker(
+    tmp_path: Path, enforcement: str | None, bead: str | None, reason: str | None, stale: str
+) -> None:
+    """Re-enforcing a wall removes its tracker, so none reads as a relaxation in force."""
+    path = register(tmp_path, enforcement=enforcement, tracking_bead=bead, reason=reason)
+    with pytest.raises(WallError, match=f"is enforcing but declares {stale}"):
         load_walls(path)
 
 

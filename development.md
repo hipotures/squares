@@ -285,14 +285,35 @@ start of the wall-check step inside its required aggregator, `packing-required` 
 transfer, and the aggregator’s queue, result assertion, blobless checkout, and pinned
 Python setup; it excludes the wall check itself and subsequent teardown.
 
-`packing/devtools/check_pr_wall.py` runs inside both aggregators and fails above OR-14’s
-absolute 180-second budget.
+`packing/devtools/check_pr_wall.py` runs inside both aggregators and judges the wall
+against OR-14’s absolute 180-second budget.
 Once a pull-request kind (`main` or `stacked`) has at least 15 recorded samples, it also
-fails at 1.2 times that kind’s median.
+judges the wall against 1.2 times that kind’s median.
 An unmeasurable current run fails closed.
 A missing or undersampled median produces an explicit warning while the absolute budget
-remains enforced. Partial reruns, missing jobs or timestamps, an incomplete jobs-API
-page, and non-finite register values cannot produce a passing measurement.
+still applies. Partial reruns, missing jobs or timestamps, an incomplete jobs-API page,
+and non-finite register values cannot produce a passing measurement.
+
+**Both walls are currently advisory under `think-g4n9`.** Each workflow’s entry in
+`pull_request_walls` declares its `enforcement`. Absent means `enforcing`: a wall over
+the budget or the regression ratio fails `packing-required` or `pages-required`. An
+`advisory` entry must also name a `tracking_bead` and an `advisory_reason`. The checker
+then prints the same diagnosis, marks the verdict advisory in the log and the step
+summary, raises a warning annotation that names the bead, and exits successfully.
+Nothing else is relaxed.
+Unmeasurable runs, missing prerequisites and malformed register entries still fail, the
+tier ceilings are unaffected, and the budget stays at 180 seconds.
+`devtools.check_gate_budgets` refuses an advisory wall whose bead is closed or unknown,
+and an enforcing wall that still names a tracker.
+
+The owner made both walls advisory on 2026-09-17, after five hosted Packing walls on PR
+188 read 194, 189, 178, 166, and 216 seconds.
+Hosted runner speed varied about 1.6–1.8x on identical code, and the `frontend` job
+alone ran 158–180 seconds end to end.
+The decision covers the pull-request wall generally, so the Pages wall is advisory too;
+it has also read over 180 seconds, at 189 seconds in run 35078515689. `think-g4n9`
+switches both walls back to enforcing once a declared number of consecutive exact-head
+hosted runs hold them at or under 180 seconds.
 
 On a push to `main`, the integration job looks for a successful pull-request run that
 validated the exact same Git tree and explicitly passed `packing-required`. A match
