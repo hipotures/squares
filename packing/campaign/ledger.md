@@ -150,7 +150,8 @@ Each entry summarizes one user-level research window. Cycle slots are wall-clock
 | [session-133](agent-sessions/session-133-n11-route-a-admission.md) | stopped | contemporaneous | `pipeline-improvement` (process) | `pipeline-improvement` (process) | 1 | think-0t5y | Open a separate no-target Route S admission pull request under BC-343 / think-a1e8, and run no compression target before that admission PR merges. |
 | [session-134](agent-sessions/session-134-n11-route-s-admission.md) | stopped | contemporaneous | `pipeline-improvement` (correctness) | `factual-review` (process) | 4 | think-a1e8 | Continue BC-343 under think-ufmk. A separate preregistered block must allocate exp-161 before any compression target runs; this record authorizes no target work. |
 | [session-135](agent-sessions/session-135-n11-route-s-guard-discharge.md) | stopped | contemporaneous | `pipeline-improvement` (correctness) | `pipeline-improvement` (correctness) | 1 | think-r55v | Continue BC-343 under think-ufmk. Only a fresh planning block may register exp-161 and authorize a bounded Route S target; this record authorizes no target work. |
-| [session-136](agent-sessions/session-136-ci-topology-reconciliation.md) | stopped | contemporaneous | `pipeline-improvement` (efficiency) | `pipeline-improvement` (efficiency) | 1 | think-97we | Complete think-97we by satisfying every pending closeout check on the same final source, then resume BC-343 under think-ufmk without changing its scientific claim or allocating exp-161 from this block. |
+| [session-136](agent-sessions/session-136-ci-topology-reconciliation.md) | stopped | contemporaneous | `pipeline-improvement` (efficiency) | `pipeline-improvement` (efficiency) | 1 | think-97we | Complete think-97we by satisfying every pending closeout check on the same final source, as carried forward by Session 137, then resume BC-343 under think-ufmk without changing its scientific claim or allocating exp-161 from this block. |
+| [session-137](agent-sessions/session-137-ci-topology-continuation-recovery.md) | stopped | retrospective | `pipeline-improvement` (correctness) | `remediation` (correctness) | 2 | think-97we | Complete think-97we by pushing the local head and satisfying every pending closeout check on one exact source, then resume BC-343 under think-ufmk without changing its scientific claim or allocating exp-161 from this block. |
 
 ### Workflow summary
 
@@ -164,9 +165,9 @@ Declared counts are contemporaneous contracts; retrospective counts are reconstr
 | `process-review` | 16 | 4 | 64 | 6 |
 | `efficiency-loop` | 10 | 1 | 36 | 1 |
 | `research-loop` | 26 | 4 | 96 | 8 |
-| `pipeline-improvement` | 33 | 1 | 151 | 4 |
+| `pipeline-improvement` | 33 | 2 | 151 | 5 |
 | `documentation-pass` | 1 | 0 | 22 | 1 |
-| `remediation` | 0 | 1 | 0 | 1 |
+| `remediation` | 0 | 1 | 0 | 2 |
 | `review-planning-oversight` | 3 | 0 | 16 | 1 |
 | `general-improvement` | 1 | 0 | 7 | 1 |
 

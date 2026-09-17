@@ -189,8 +189,13 @@ session:
     - packing/campaign/agent-sessions/session-136-ci-topology-reconciliation.md
     files: []
     checks:
-    - Confirmed that no exact-head hosted evidence existed before the terminal handoff; the review did not run.
-    uncertainty: The review did not begin because exact-head hosted evidence did not exist.
+    - >-
+      Confirmed that no exact head had green Packing and Pages required aggregates before
+      the terminal handoff; the review did not run. Hosted runs existed on exact heads
+      2f619303 and c5a33270, but packing-required failed in runs 35127260063 and
+      35128357992.
+    uncertainty: >-
+      The review did not begin because no exact head had both required aggregates green.
     elapsed_seconds: null
     elapsed_quality: unavailable
     next_action: >-
@@ -238,8 +243,8 @@ session:
     certification, hosted wall evidence, independent review, and merge remain open.
   next_action: >-
     Complete think-97we by satisfying every pending closeout check on the same final
-    source, then resume BC-343 under think-ufmk without changing its scientific claim or
-    allocating exp-161 from this block.
+    source, as carried forward by Session 137, then resume BC-343 under think-ufmk without
+    changing its scientific claim or allocating exp-161 from this block.
   certification_pending: think-97we
 ---
 # Session 136: CI Topology Reconciliation
@@ -248,8 +253,17 @@ This stopped pipeline-improvement session records the reconciled CI topology, bu
 validation, and developer validation lanes.
 Its certification debt remains under `think-97we`; none of the pending receipts is
 represented as a pass.
+[Session 137](session-137-ci-topology-continuation-recovery.md) records the continuation
+and crash recovery after this stop, and later facts about BC-355 belong there.
 The final closeout check must confirm that the n=11 bracket, H-163, and the frontier
 remain unchanged.
+
+**Correction, 2026-09-17.** The canceled final-review row said no exact-head hosted
+evidence existed at the handoff.
+Hosted runs had already finished on exact heads `2f619303` and `c5a33270`, and
+`gate-budgets.yaml` cites both.
+What was missing is a head with green Packing and Pages required aggregates, and the row
+now says so.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

@@ -133,6 +133,9 @@ A, and 3,977 passes with 6 skips in suite B. Those readings are interim until tw
 successful schema-v2 cohorts rebuild the cost record and final-head hosted runs refresh
 the baselines. The PR 175 geometric means, 150.54 and 119.54 seconds, remain in the
 register as predecessor history rather than current evidence.
+The cost record behind the current partition comes from one cohort (run 35127260063),
+and the next run split its files 257.91 against 468.08 test-seconds, so the final-head
+refresh must rebalance the partition as well as re-measure it.
 
 One predecessor-head shard-B attempt completed all tests in 145.68 seconds but failed
 the unchanged 12-second per-test backstop when a divide-and-concur case took 12.76
@@ -262,7 +265,8 @@ Changed contracts also require focused regression evidence at their actual execu
 boundary. An unaffected mathematical family cannot discharge a newly changed worker or
 CPU-accounting contract.
 Report why each family ran or was reused and retain links to both kinds of evidence.
-Exact-tree reuse is operational for fast steps on the positive allowlist: after a
+Exact-tree reuse is implemented on `codex/ci-topology-reconcile` for fast steps on the
+positive allowlist, and first runs on a push to `main` after that branch merges: after a
 successful pull-request run proves the same Git tree and passes `packing-required`, the
 post-merge run may omit those steps.
 Deferred and unclassified fast steps still run, and missing, stale, failed, or
@@ -367,12 +371,17 @@ describe integrated implementation; the unchecked items are required closeout ev
 and must not be inferred from an earlier head.
 
 - [x] Reconcile workflow/help names and feedback versus final-checkpoint placement.
-- [x] Correct stale counts, timings, wall-time thresholds, and calibration claims.
+- [ ] Correct stale counts, timings, wall-time thresholds, and calibration claims.
+  The prose is current; the register still carries the predecessor PR 180 wall medians
+  (208 and 189 seconds) and PR 185 frontend and typecheck readings until final-head
+  hosted runs replace them.
 - [x] Link this plan from the development guide, W5 entry, predecessor plans, and map.
 - [x] Complete the documentation matrix, including durable long-run timing rules.
 - [x] Review upstream tbd guidance, choose a dedicated guideline or focused additions,
   and prepare the reusable proposal and cross-links for upstream review.
 - [x] Verify changed selection, concurrency, failure, and naming contracts.
+  Last verified locally by the pre-push gate at `da2259fb` (2026-09-16: 6,577 passed, 9
+  skipped); the final head’s hosted aggregates repeat it.
 - [ ] Run affected checks and the full final checkpoint on integrated source, reporting
   golden-rebuild and strict evidence separately.
 - [ ] Verify the final exact head through both hosted required aggregates, obtain a

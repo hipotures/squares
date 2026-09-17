@@ -139,7 +139,7 @@ hypothesis status and summarizes experiment verdicts, and the
 | --- | ---: | --- |
 | Agendas | 35 | 15 active; 14 completed; 5 paused; 1 superseded |
 | Commitments | 344 | 177 complete; 59 stopped; 65 blocked; 15 ready; 20 tentative; 8 in progress |
-| Sessions | 136 | 84 completed; 52 stopped; all terminal |
+| Sessions | 137 | 84 completed; 53 stopped; all terminal |
 | Explorations | 33 | 20 linked to proposed hypotheses; 13 uncodified |
 | Hypotheses | 153 | 26 confirmed; 29 refuted; 50 blocked; 12 unresolved; 5 open; 28 open questions; 2 result registered; 1 abandoned; 0 running |
 | Experiments | 128 | 39 accepted; 34 rejected; 30 unresolved; 12 baseline; 11 blocked; 2 abandoned; 0 in progress |
@@ -922,13 +922,15 @@ controller, not permission to blur contracts.
 
 ### Current Handoff
 
-[Session 136](packing/campaign/agent-sessions/session-136-ci-topology-reconciliation.md)
+[Session 137](packing/campaign/agent-sessions/session-137-ci-topology-continuation-recovery.md)
 is the latest terminal work handoff.
-The session stopped after reconciling CI, budgeting, validation, and developer
-validation lanes, but BC-355 / `think-97we` remains open for exact-head certification,
-hosted wall evidence, independent re-review, and merge.
-The stopped session is therefore terminal but uncertified, and it changes no
-mathematical result.
+It records the continuation of
+[Session 136](packing/campaign/agent-sessions/session-136-ci-topology-reconciliation.md)
+by two concurrent Codex threads, their interruption, and the recovery that restored the
+160 MiB snapshot cap, passed the pre-push gate at `da2259fb`, and repaired the Pages
+deploy that had not run since PR 183. BC-355 / `think-97we` remains open for exact-head
+hosted wall evidence, independent re-review, and merge, so both stopped sessions are
+terminal but uncertified, and neither changes a mathematical result.
 [Session 135](packing/campaign/agent-sessions/session-135-n11-route-s-guard-discharge.md)
 is the latest terminal scientific handoff on the no-target Route S admission branch.
 It discharged the four guards retained by
@@ -4179,8 +4181,8 @@ in separate tables: their units differ, and the same work can appear in both.
 | Coverage | sessions |
 | --- | ---: |
 | measured | 87 |
-| unmeasured | 49 |
-| **total** | **136** |
+| unmeasured | 50 |
+| **total** | **137** |
 
 <!-- END GENERATED: session-close-report -->
 

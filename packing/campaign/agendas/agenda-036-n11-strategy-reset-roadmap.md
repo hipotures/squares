@@ -258,6 +258,7 @@ agenda:
     program: gate-cost
     artifacts:
     - packing/campaign/agent-sessions/session-136-ci-topology-reconciliation.md
+    - packing/campaign/agent-sessions/session-137-ci-topology-continuation-recovery.md
     - docs/project/specs/active/plan-2026-09-06-validation-efficiency-and-checkpoints.md
     - development.md
     - packing/devtools/gate-budgets.yaml
