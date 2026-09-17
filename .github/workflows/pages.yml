@@ -441,6 +441,7 @@ jobs:
         with:
           artifact-ids: ${{ steps.prepared.outputs.artifact_id }}
           path: packing/site
+          merge-multiple: true
 
       # After the page, not beside it: the exporter loads `site/index.html` from disk,
       # and Figure 2 references the composite that the render copies into `site/` on its
@@ -597,6 +598,7 @@ jobs:
         with:
           artifact-ids: ${{ steps.prepared.outputs.artifact_id }}
           path: packing/site
+          merge-multiple: true
 
       # Reproducibility is not correctness: the PDF artifact check would have passed on
       # all three print defects a reader found in the finished PDF, because two identical
@@ -667,6 +669,7 @@ jobs:
         with:
           artifact-ids: ${{ steps.prepared.outputs.artifact_id }}
           path: packing/site
+          merge-multiple: true
 
       - name: Check every comparison variant measures the font it draws
         run: uv run --frozen --group dev python -m devtools.compare_math_fonts check
@@ -766,6 +769,7 @@ jobs:
         with:
           artifact-ids: ${{ steps.prepared.outputs.artifact_id }}
           path: packing/site
+          merge-multiple: true
 
       # Which composite draws each expression, which metric table laid it out, and
       # whether the faces were loaded before the first one was painted. None of the three
@@ -856,6 +860,7 @@ jobs:
         with:
           artifact-ids: ${{ steps.prepared.outputs.artifact_id }}
           path: packing/site
+          merge-multiple: true
 
       # The trap: see the print geometry step in `typography`.
       - name: Check reserved math geometry under every saved font setting
@@ -976,6 +981,7 @@ jobs:
         with:
           artifact-ids: ${{ steps.prepared.outputs.artifact_id }}
           path: packing/site
+          merge-multiple: true
 
       - name: Check mobile font loading on the published artifact
         run: |
@@ -1099,6 +1105,7 @@ jobs:
         with:
           artifact-ids: ${{ steps.prepared.outputs.artifact_id }}
           path: packing/site
+          merge-multiple: true
 
       - name: Check reload preserves the reading position in both viewports
         run: |
@@ -1172,6 +1179,7 @@ jobs:
         with:
           artifact-ids: ${{ needs.prepare.outputs.prepared_artifact_id }}
           path: packing/site
+          merge-multiple: true
 
       - name: Cache the Playwright browser
         uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
@@ -1230,6 +1238,7 @@ jobs:
         with:
           artifact-ids: ${{ needs.prepare.outputs.prepared_artifact_id }}
           path: packing/site
+          merge-multiple: true
 
       - name: Use the checked PDF
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0

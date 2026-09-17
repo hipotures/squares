@@ -256,6 +256,25 @@ def test_the_deploy_path_does_not_inherit_skips_from_its_ancestors() -> None:
     ]
 
 
+def test_every_download_by_artifact_id_extracts_into_its_path() -> None:
+    """`download-artifact` v4 puts an id download under `<path>/<artifact name>/`.
+
+    Only a download by `name` or with `merge-multiple` extracts into `path` itself. Run
+    35175474665 downloaded the prepared page to `packing/site/prepared-page/`, and every
+    browser check then failed to find `site/index.html`.
+    """
+    downloads = [
+        (name, step["with"])
+        for name, job in load()["jobs"].items()
+        for step in job.get("steps", [])
+        if step.get("uses", "").startswith("actions/download-artifact@")
+        and "artifact-ids" in step.get("with", {})
+    ]
+    assert len(downloads) >= 9
+    for name, arguments in downloads:
+        assert arguments.get("merge-multiple") is True, name
+
+
 def test_pages_filters_cover_the_probes_its_tools_and_controls_load() -> None:
     """The page's tools and its PDF controls hand the browser JavaScript from probe files, and
     the render inlines some of them; an edit to one is an edit to the tool that loads it.
@@ -329,6 +348,7 @@ def test_page_check_setup_overlaps_prepare_then_joins_its_exact_artifact() -> No
         assert download["with"] == {
             "artifact-ids": "${{ steps.prepared.outputs.artifact_id }}",
             "path": "packing/site",
+            "merge-multiple": True,
         }
 
 
@@ -421,6 +441,7 @@ def test_publication_assembles_the_three_checked_products_and_only_main_uploads_
         {
             "artifact-ids": "${{ needs.prepare.outputs.prepared_artifact_id }}",
             "path": "packing/site",
+            "merge-multiple": True,
         },
         {"name": "explainer-pdf", "path": "packing/site"},
         {"name": "workbench-page", "path": "packing/site/workbench"},
@@ -799,7 +820,9 @@ def test_every_browser_checks_the_same_prepared_publication() -> None:
             for step in jobs[name]["steps"]
             if step.get("uses", "").startswith("actions/download-artifact@")
         ]
-        assert downloads == [{"artifact-ids": artifact_id, "path": "packing/site"}], name
+        assert downloads == [
+            {"artifact-ids": artifact_id, "path": "packing/site", "merge-multiple": True}
+        ], name
 
     assert not any(
         step.get("with", {}).get("name") == "prepared-page"
