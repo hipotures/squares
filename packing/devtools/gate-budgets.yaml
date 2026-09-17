@@ -812,21 +812,27 @@ tiers:
 pages:
   reference: {runner: ubuntu-latest, cpus: 4, caches: warm}
   wall:
-    measured_seconds: 189.0
-    measured_on: 2026-09-16
+    # 2026-09-17: replaced PR 180's single reading, 189.0 s measured 2026-09-16 on
+    # exact-head run 35078515689 to the legacy `pages-required` aggregator-start
+    # endpoint. This record keeps no history, so the superseded reading is kept here.
+    measured_seconds: 176.0
+    measured_on: 2026-09-17
     measured_where: >-
-      Exact-head run 35078515689 on PR 180, measured from the workflow run's start to
-      the legacy `pages-required` aggregator-start endpoint.
+      The median of PR 188's two exact-head readings, run 35182460356 at be28ad5a (182 s)
+      and run 35187007572 at 16d5e14d (170 s), each measured by `devtools.check_pr_wall`
+      from the workflow run's start to the start of the wall-check step in
+      `pages-required`: the figure `pull_request_walls` records below.
     ceiling_seconds: 180.0
     argument: >-
       Before the split this workflow was `prepare` then a single `build` of about 300 s of
       serial Chromium checks: a 472 s median on the workbench stack's pull requests, 381 s
       on pull requests into main. The checks now run as thirteen jobs beside each other,
       and the wall is `prepare` plus the longest of them. OR-14's 180-second outer edge is
-      the one authority for this wall, shared with `pull_request_walls` below. Run
-      35078515689 missed it by nine seconds; that run spent 39 seconds on four serial
-      saved-font variants, which now run as two bounded pairs. The reconciliation run
-      replaces this over-budget predecessor reading.
+      the one authority for this wall, shared with `pull_request_walls` below. PR 180's
+      run 35078515689 missed it by nine seconds; that run spent 39 seconds on four serial
+      saved-font variants, which now run as two bounded pairs. Of PR 188's two readings
+      since, run 35182460356 still missed it by two seconds and run 35187007572 was ten
+      seconds inside it.
   jobs:
   - id: scope
     measured_seconds: 20.2
@@ -957,9 +963,8 @@ pages:
 # aggregates every required prerequisite. It therefore includes prerequisite queues,
 # checkout, setup, work and artifact transfer, plus the aggregator's queue, blobless
 # checkout and pinned Python setup, without including the check itself. The absolute
-# budget is OR-14's 180-second outer edge. The recorded medians below use the predecessor
-# aggregator-start endpoint; the reconciliation PR replaces them with the first exact
-# wall-step-start readings.
+# budget is OR-14's 180-second outer edge. The recorded medians below are PR 188's
+# exact-head readings at that wall-step-start endpoint, at be28ad5a and 16d5e14d.
 #
 # `enforcement` is `enforcing` when absent. `enforcement: advisory` keeps the wall
 # measured, diagnosed and reported on every pull request, but a wall over its budget or
@@ -970,8 +975,8 @@ pages:
 # still fail, and the budget stays at OR-14's edge. On 2026-09-17 the owner made both
 # walls advisory under think-g4n9, after five hosted Packing walls on PR 188 read 194,
 # 189, 178, 166 and 216 s: runner speed varied 1.6-1.8x on identical code, and the
-# frontend job alone ran 158-180 s. think-g4n9 switches both back once consecutive
-# exact-head runs hold them at or under 180 s.
+# frontend job alone ran 158-180 s. think-g4n9 switches both back once five consecutive
+# exact-head hosted runs hold both walls at or under 180 s.
 pull_request_walls:
   policy:
     regression_ratio: 1.2
@@ -1004,11 +1009,15 @@ pull_request_walls:
       pre-collection partition, and the type floor has its own runner; packing-required
       waits for every lane and judges this wall.
     kinds:
+    # 2026-09-17: replaced PR 180's single reading, 208 s on run 35078515837, measured
+    # 2026-09-16 to the predecessor aggregator-start endpoint. A kind record keeps no
+    # history, so the superseded reading is kept here.
     - kind: main
-      median_seconds: 208
-      measured_on: '2026-09-16'
+      median_seconds: 175.5
+      measured_on: '2026-09-17'
       samples:
-      - {run: 35078515837, seconds: 208}
+      - {run: 35182460400, seconds: 168}
+      - {run: 35187007544, seconds: 183}
   - id: certificate-page
     file: .github/workflows/pages.yml
     aggregator: pages-required
@@ -1018,14 +1027,18 @@ pull_request_walls:
     tracking_bead: think-g4n9
     advisory_reason: >-
       Owner decision 2026-09-17 covers the pull-request wall generally, and this wall
-      has also read over 180 s on the same hosted runners (189 s, run 35078515689), so
-      it is reported rather than enforced until think-g4n9 re-enforces both walls.
+      has also read over 180 s on PR 188 itself (182 s, run 35182460356), so it is
+      reported rather than enforced until think-g4n9 re-enforces both walls.
     argument: >-
       The page build and browser checks through pages-required. Saved-font variants run
       in two bounded pairs so the slow WebKit cell no longer carries four serial draws.
     kinds:
+    # 2026-09-17: replaced PR 180's single reading, 189 s on run 35078515689, measured
+    # 2026-09-16 to the predecessor aggregator-start endpoint. A kind record keeps no
+    # history, so the superseded reading is kept here.
     - kind: main
-      median_seconds: 189
-      measured_on: '2026-09-16'
+      median_seconds: 176
+      measured_on: '2026-09-17'
       samples:
-      - {run: 35078515689, seconds: 189}
+      - {run: 35182460356, seconds: 182}
+      - {run: 35187007572, seconds: 170}

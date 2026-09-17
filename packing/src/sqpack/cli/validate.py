@@ -4496,7 +4496,6 @@ TREE_REUSABLE_FAST_STEPS = frozenset(
         "every session's cost is attributed",
         "the branch cost rollup renders",
         "control anchors still resolve",
-        "tier ceilings are declared and not slack",
         "the borrowed lower bounds re-derive",
         "the inventory agrees with the register",
         "results rungs are earned and the view agrees",

@@ -173,8 +173,8 @@ alone is not full pre-merge evidence.
 | `--frontend` | **CI, on every pull request**, in the `frontend` job, concurrently | 3 of 80 | 150 s | 85.25 s on the three-step, two-worker topology, the mean of two readings |
 | `--typecheck` | **CI, on every pull request**, in the `typecheck` job, concurrently | 1 of 80 | 130 s | 67.26 s on CI, the mean of two readings |
 | `--geometry` | **CI, on every pull request**, in the `geometry` job, concurrently | 9 of 80 | 180 s | 102.73 s on the predecessor topology, the mean of seven readings |
-| `--suite-a` | **CI, on every pull request**, in the `suite-a` job, concurrently | 1 of 80 | 168 s | interim 84.00 s on reconciliation head `c5a33270`; refresh after the schema-v2 rebuild |
-| `--suite-b` | **CI, on every pull request**, in the `suite-b` job, concurrently | 1 of 80 | 180 s | interim 143.98 s on reconciliation head `c5a33270`; refresh after the schema-v2 rebuild |
+| `--suite-a` | **CI, on every pull request**, in the `suite-a` job, concurrently | 1 of 80 | 168 s | 109.92 s on exact head `be28ad5a`, the geometric mean of attempts 1–3 of run 35182460400 |
+| `--suite-b` | **CI, on every pull request**, in the `suite-b` job, concurrently | 1 of 80 | 180 s | 124.78 s on exact head `be28ad5a`, the geometric mean of attempts 2–3 of run 35182460400 |
 | `--sweeps` | **CI, on every pull request**, in the `sweeps` job, concurrently | 4 of 80 | 210 s | 119.72 s before reconciliation; PR 180’s predecessor topology read 138.84 s |
 | *(no flag)* | Full checkpoint before final review and at block close; main, dispatch, and daily CI | 80 of 80 | 3600 s | split across four jobs; not clocked whole |
 
@@ -213,9 +213,15 @@ duplicated, coverage-mismatched, and mixed-provenance evidence.
 The current declared ceilings are 168 seconds for suite A and 180 seconds for suite B.
 The first PR 188 integration run at exact head `c5a33270` measured 84.00 and 143.98
 seconds, respectively, over the complete 6,345-item quick selection: 2,362 passes in
-suite A, and 3,977 passes with 6 skips in suite B. Those are interim baselines pending a
-schema-v2 cost rebuild and final-head hosted cohorts; the predecessor PR 175 readings
-and their geometric means remain in the budget register as history.
+suite A, and 3,977 passes with 6 skips in suite B. `c4f0660d` rebuilt the cost record
+from same-speed cohort 35175474610 and rebalanced the shards.
+At exact head `be28ad5a`, run 35182460400 then set the current records.
+Suite A records 109.92 seconds, the geometric mean of 81.26, 133.91 and 122.06 seconds
+over attempts 1–3, with 3,422 tests passing each time.
+Suite B records 124.78 seconds, the geometric mean of attempts 2–3, with 3,008 passes
+and 6 skips; attempt 1 is excluded because a gate-budget test failed there.
+The `c5a33270` readings and the predecessor PR 175 geometric means remain in the budget
+register as history.
 
 Before the reconciliation runs, `--sweeps`, `--checks`, and `--frontend` had no current
 recorded cost. The corpus widening of 2026-09-07 invalidated the first two baselines.
@@ -297,23 +303,27 @@ and non-finite register values cannot produce a passing measurement.
 **Both walls are currently advisory under `think-g4n9`.** Each workflow’s entry in
 `pull_request_walls` declares its `enforcement`. Absent means `enforcing`: a wall over
 the budget or the regression ratio fails `packing-required` or `pages-required`. An
-`advisory` entry must also name a `tracking_bead` and an `advisory_reason`. The checker
-then prints the same diagnosis, marks the verdict advisory in the log and the step
-summary, raises a warning annotation that names the bead, and exits successfully.
+`advisory` entry must also name a `tracking_bead` and an `advisory_reason`, and a wall
+over its budget or its regression ratio then warns rather than fails.
+The checker prints the same diagnosis, marks the verdict advisory in the log and the
+step summary, raises a warning annotation that names the bead, and exits successfully.
 Nothing else is relaxed.
 Unmeasurable runs, missing prerequisites and malformed register entries still fail, the
 tier ceilings are unaffected, and the budget stays at 180 seconds.
 `devtools.check_gate_budgets` refuses an advisory wall whose bead is closed or unknown,
 and an enforcing wall that still names a tracker.
+With no bead store to read, it fails under `CI` and prints a skip note on a local
+checkout.
 
 The owner made both walls advisory on 2026-09-17, after five hosted Packing walls on PR
 188 read 194, 189, 178, 166, and 216 seconds.
 Hosted runner speed varied about 1.6–1.8x on identical code, and the `frontend` job
 alone ran 158–180 seconds end to end.
 The decision covers the pull-request wall generally, so the Pages wall is advisory too;
-it has also read over 180 seconds, at 189 seconds in run 35078515689. `think-g4n9`
-switches both walls back to enforcing once a declared number of consecutive exact-head
-hosted runs hold them at or under 180 seconds.
+it has also read over 180 seconds on PR 188, at 182 seconds in run 35182460356.
+`think-g4n9` switches both walls back to enforcing once five consecutive exact-head
+hosted runs hold both walls at or under 180 seconds.
+Five is the planned default, and `think-g4n9` owns it.
 
 On a push to `main`, the integration job looks for a successful pull-request run that
 validated the exact same Git tree and explicitly passed `packing-required`. A match
@@ -1275,17 +1285,19 @@ rule and none of them is about `touches`:
 **The exact content address here is the git tree id, not a pattern.** Equal tree ids
 mean equal bytes for every tracked file, including the code that does the verifying —
 which is strictly stronger than hashing the artifacts a step reads.
-**But it addresses only the tree**, and three steps in this gate answer to something
+**But it addresses only the tree**, and four steps in this gate answer to something
 else. `campaign record` judges four refusals — an expired lease and a passed session,
 workflow-phase or delegation deadline — against a reference instant, which until `D-468`
 was the wall clock and is now HEAD’s committer date; two runs of one commit therefore
 agree, and two commits carrying the same tree still need not.
 `bead tree` reads the bead store in `.git/tbd/data-sync-worktree`, which is not in any
-tree, and `provenance: recorded commits are reachable` reads the git graph and the clone
-depth — `D-226` is the run where CI discarded the history its own provenance gate
-needed. A rule that skips on tree identity has to keep running those three; what `D-468`
-licenses is narrower and exact, that a scheduled rerun of the *same commit* now agrees
-with the run before it, which is what the unmoved-tree count above is made of.
+tree, and so does `tier ceilings are declared and not slack`, which refuses an advisory
+pull-request wall whose tracking bead is closed or unknown.
+`provenance: recorded commits are reachable` reads the git graph and the clone depth —
+`D-226` is the run where CI discarded the history its own provenance gate needed.
+A rule that skips on tree identity has to keep running those four; what `D-468` licenses
+is narrower and exact, that a scheduled rerun of the *same commit* now agrees with the
+run before it, which is what the unmoved-tree count above is made of.
 `tests/test_gate_repetition.py` holds that agreement as an assertion rather than a
 paragraph.
 

@@ -932,9 +932,8 @@ PR 183, pending the first main deploy.
 It then took PR 188 to green hosted CI at `be28ad5a`: the suite shards were rebalanced,
 and by owner decision the pull-request walls are advisory under `think-g4n9` until they
 hold 180 s on hosted runners.
-BC-355 / `think-97we` remains open for a review of the final delta and merge, so both
-stopped sessions are terminal but uncertified, and neither changes a mathematical
-result.
+BC-355 / `think-97we` remains open for the full checkpoint and merge, so both stopped
+sessions are terminal but uncertified, and neither changes a mathematical result.
 [Session 135](packing/campaign/agent-sessions/session-135-n11-route-s-guard-discharge.md)
 is the latest terminal scientific handoff on the no-target Route S admission branch.
 It discharged the four guards retained by

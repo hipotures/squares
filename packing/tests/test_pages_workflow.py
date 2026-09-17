@@ -231,14 +231,25 @@ def conjuncts(condition: str) -> list[str] | None:
     """The whole clauses an `if:` joins with `&&`, or None if it is not only a conjunction.
 
     Under `||` no clause is necessary, so finding one in the text proves nothing about
-    what the condition requires.
+    what the condition requires. The same holds inside a group: `!(a && b)` or
+    `(a && b) == false` splits into clauses that read as required and are not. So a clause
+    whose parentheses do not balance, or that negates a group, refuses the whole condition.
     """
     text = condition.strip()
     if text.startswith("${{") and text.endswith("}}"):
         text = text[3:-2]
     if "||" in text:
         return None
-    return [" ".join(clause.split()) for clause in text.split("&&")]
+    clauses = [" ".join(clause.split()) for clause in text.split("&&")]
+    for clause in clauses:
+        depth = 0
+        for character in clause:
+            depth += {"(": 1, ")": -1}.get(character, 0)
+            if depth < 0:
+                return None
+        if depth or clause.replace(" ", "").startswith("!("):
+            return None
+    return clauses
 
 
 def implicit_success_gaps(jobs: Mapping[str, Mapping[str, Any]], name: str) -> list[str]:
@@ -295,6 +306,24 @@ def test_the_deploy_path_does_not_inherit_skips_from_its_ancestors() -> None:
     ):
         assert all(clause in weakened for clause in required), weakened
         assert implicit_success_gaps(deploying_if(weakened), "deploy") == required, weakened
+    # Each required clause is a whole `&&` split of these, which a plain split accepted, but
+    # inside a negated group none of them is required.
+    body = fixed.strip()[3:-2].strip()
+    ref = "github.ref == 'refs/heads/main'"
+    for negated in (
+        f"${{{{ !({ref} && {body} && {ref}) }}}}",
+        f"${{{{ ({ref} && {body} && {ref}) == false }}}}",
+    ):
+        split = {" ".join(clause.split()) for clause in negated[3:-2].split("&&")}
+        assert set(required) <= split, negated
+        assert conjuncts(negated) is None, negated
+        assert implicit_success_gaps(deploying_if(negated), "deploy") == required, negated
+    # A whole clause in harmless parentheses is still a conjunct.
+    grouped = f"${{{{ {body} && ({ref}) }}}}"
+    whole = conjuncts(fixed)
+    assert whole is not None
+    assert conjuncts(grouped) == [*whole, f"({ref})"]
+    assert implicit_success_gaps(deploying_if(grouped), "deploy") == []
 
 
 def test_every_download_by_artifact_id_extracts_into_its_path() -> None:
@@ -394,6 +423,16 @@ def test_every_download_by_artifact_id_is_refused_without_an_id() -> None:
             "skippable download": [
                 *steps[: index + 1],
                 {**download, "if": "steps.prepared.outputs.artifact_id != ''"},
+                *steps[index + 2 :],
+            ],
+            "guard allowed to fail": [
+                *steps[:index],
+                {**guard, "continue-on-error": True},
+                *steps[index + 1 :],
+            ],
+            "download allowed to fail": [
+                *steps[: index + 1],
+                {**download, "continue-on-error": True},
                 *steps[index + 2 :],
             ],
         }

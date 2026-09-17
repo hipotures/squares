@@ -10,7 +10,7 @@ session:
   title: CI Topology Continuation and Crash Recovery
   date: '2026-09-16'
   started_at: '2026-09-16T18:58:15Z'
-  ended_at: '2026-09-17T05:44:00Z'
+  ended_at: '2026-09-17T06:52:38Z'
   branch: codex/ci-topology-reconcile
   primary_bead: think-97we
   status: stopped
@@ -76,9 +76,9 @@ session:
       turn committed cb705c67 for think-f5cc with the snapshot cap restored to 160 MiB,
       and an independent review accepted it. The workbench thread read that cap as a
       stray test mutation and amended the commit to 27a53a8a with 192 MiB; the two
-      commits differ only in the cap and its dated comment. The pre-push gate at 27a53a8a passed 6,558 tests
-      with 28 skipped and every Python, record, and exact-verification check, and failed
-      the browser floor because the worktree had no node_modules.
+      commits differ only in the cap and its dated comment. The pre-push gate at 27a53a8a
+      passed 6,558 tests with 28 skipped and every Python, record, and exact-verification
+      check, and failed the browser floor because the worktree had no node_modules.
     evidence:
     - https://github.com/jlevy/squares/pull/188
     - packing/devtools/run_negative_controls.py
@@ -158,7 +158,7 @@ session:
     status: stopped
     entered_by: user_request
     switch_reason: >-
-      The recovery pushed 21642ed8, and its first hosted runs replaced local certainty with
+      The recovery pushed 7d76b044, and its first hosted runs replaced local certainty with
       hosted evidence. The disk filled at about 03:10Z and stopped every command; once
       space was freed the user asked to bring PRs 188 and 190 to a mergeable state.
     budget_minutes: null
@@ -172,9 +172,10 @@ session:
     kill_condition: null
     fallback: null
     outcome: >-
-      Pages run 35175474665 failed every browser check because downloads by artifact id
-      extracted the page into packing/site/prepared-page/; 21642ed8 sets merge-multiple
-      and adds a contract test, and Pages run 35176748416 passed. Packing run 35176748398
+      At 7d76b044, Packing run 35175474610 passed with a 178 s wall, and Pages run
+      35175474665 failed every browser check because downloads by artifact id extracted
+      the page into packing/site/prepared-page/; 21642ed8 sets merge-multiple and adds a
+      contract test, and Pages run 35176748416 passed. Packing run 35176748398
       passed every test but failed twice for opposite reasons on identical code: attempt 1
       read suite_b at 82.64 s (stale against 143.98 s), and attempt 2 passed suite_b at
       138.20 s but held the wall at 216 s against 180 s. An independent review of
@@ -188,7 +189,11 @@ session:
       be28ad5a makes both pull-request walls advisory under think-g4n9, which owns bringing
       them under 180 s and re-enforcing them. The bead had to reach the sync branch before
       CI could read it. At be28ad5a, attempt 3 of run 35182460400 passed every job, and the
-      suite_a and suite_b records were recalibrated from that run's readings.
+      suite_a and suite_b records were recalibrated from that run's readings. At 16d5e14d,
+      Packing run 35187007544 passed with an advisory 183 s wall and Pages run
+      35187007572 passed at 170 s. An independent review of 21642ed8..16d5e14d approved it
+      with nits and no blockers, a second checked that every earlier finding was resolved,
+      and the final-review fixes answer both.
     evidence:
     - .github/workflows/pages.yml
     - packing/tests/test_pages_workflow.py
@@ -198,12 +203,13 @@ session:
     - packing/devtools/gate-budgets.yaml
     - https://github.com/jlevy/squares/pull/188
     stop_reason: >-
-      Both required aggregates passed at be28ad5a and the suite records now admit every
-      exact-head reading, so what remains is a hosted run on the record commit, a review of
-      the final delta, and the merge.
+      Both required aggregates passed at be28ad5a and again at 16d5e14d, the suite records
+      admit every exact-head reading, and the final review found no blocker, so what
+      remains is green aggregates on the fix commit, the full checkpoint, and the merge.
     next_action: >-
-      Confirm the required aggregates on the final head, merge PR 188, close PR 185 under
-      think-lop3, and confirm the first Pages deployment under think-w7oy.
+      Confirm the required aggregates on the fix commit, run the Deferred checkpoint
+      through the deep-gate label, merge PR 188, close out PR 185 under think-lop3 as a
+      stacked follow-up, and confirm the first Pages deployment under think-w7oy.
   progress:
     metric: >-
       Readiness of PR 188 for certification: every reviewed repair committed on one exact
@@ -213,11 +219,14 @@ session:
       Session 136 stopped with c5a33270 pushed to PR 188. The Packing required aggregate
       had failed on that exact head, and every closeout check was pending.
     after: >-
-      PR 188 holds be28ad5a, which contains main 035d84c6. The push tier passed there with
-      6,628 tests, and attempt 3 of hosted Packing run 35182460400 passed every job,
-      including the required aggregate, beside a green Pages run. The pull-request walls
-      are advisory under think-g4n9. Review of the final delta, merge, and the first Pages
-      deployment remain pending, and none is represented as a pass.
+      At the final review PR 188 held 16d5e14d, which contains main 035d84c6. The push
+      tier passed at
+      be28ad5a with 6,628 tests, and attempt 3 of hosted Packing run 35182460400 passed
+      every job, including the required aggregate, beside a green Pages run; both workflows
+      passed again at 16d5e14d. The pull-request walls are advisory under think-g4n9. The
+      final review approved 16d5e14d with nits and no blockers. The full checkpoint, green
+      aggregates on the fix commit, the merge, and the first Pages deployment remain
+      pending, and none is represented as a pass.
   delegations:
   - task: Review the integration checkpoint before commit 1fae8298.
     operator: Codex independent review sub-agent of the Session 136 task, read-only
@@ -462,12 +471,21 @@ session:
   - >-
     Before 2def8265 was committed, 273 focused Pages workflow tests passed and
     packing-validate --edit passed 48 of 80 steps on the uncommitted repair over
-    da2259fb. No gate tier has run on 2def8265 or 9bac5b7f.
+    da2259fb. No gate tier ran on 2def8265 or 9bac5b7f alone; the push tier at 7d76b044,
+    which contains both, passed.
+  - >-
+    full gate: push at 7d76b044: passed (6,599 passed and 9 skipped, 49 of 80 steps, at
+    --jobs 4 --inner-jobs 1)
   - >-
     full gate: push at be28ad5a: passed (6,628 passed and 9 skipped, 49 of 80 steps,
     run beside hosted CI at --jobs 4 --inner-jobs 1)
   - >-
-    The local head was pushed: 21642ed8, then 957e37af, c4f0660d and be28ad5a.
+    The local head was pushed four times: 7d76b044, then 21642ed8, then be28ad5a with
+    957e37af and c4f0660d, then 16d5e14d.
+  - >-
+    Hosted at 7d76b044: Packing run 35175474610 passed with a 178 s wall; Pages run
+    35175474665 failed every browser check on the artifact-id extraction bug that
+    21642ed8 fixes.
   - >-
     Hosted at 21642ed8: Pages run 35176748416 passed; Packing run 35176748398 passed
     every test and failed its aggregate on attempt 1 (suite_b stale at 82.64 s) and on
@@ -480,20 +498,34 @@ session:
     in this record; the blocker is answered by c4f0660d, be28ad5a and the recalibration.
   - >-
     The pull-request walls are advisory under think-g4n9 by owner decision, so the
-    180-second wall is reported rather than enforced. The wall medians still hold PR 180's
-    208-second and 189-second readings.
+    180-second wall is reported rather than enforced. The wall medians now hold PR 188's
+    exact-head readings at be28ad5a and 16d5e14d: Packing 175.5 s from 168 and 183 s,
+    and Pages 176 s from 182 and 170 s. PR 180's 208-second and 189-second readings are
+    kept as dated register comments.
+  - >-
+    Hosted at 16d5e14d: Packing run 35187007544 passed with an advisory 183 s wall, and
+    Pages run 35187007572 passed at 170 s.
+  - >-
+    An independent review of 21642ed8..16d5e14d returned APPROVE WITH NITS with no
+    blockers, and a second review checked the resolution of every earlier finding. The
+    fix commit that carries this entry answers both: the bead-reading tier-ceiling step
+    leaves the post-merge reuse allowlist, the wall records and advisory reasons cite PR
+    188's own readings, the suite-record prose drops its interim figures, re-enforcement
+    is stated as five consecutive exact-head runs, the gate-budget tracker check skips
+    locally and fails under CI without a bead store, the Pages workflow tests refuse a
+    negated if-group and catch continue-on-error on an artifact-id guard or download, the
+    dead suite_shard module is deleted, and this record is corrected.
   - >-
     PENDING CLOSEOUT CHECK: obtain green Packing and Pages required aggregates on the
-    commit that carries the suite recalibration.
+    commit that carries the final-review fixes.
   - >-
-    PENDING CLOSEOUT CHECK: run the complete full checkpoint on the final source SHA and
-    record its canonical passing declaration.
+    PENDING CLOSEOUT CHECK: run the complete full checkpoint (the Deferred checkpoint,
+    through the deep-gate label) on the final source SHA and record its canonical
+    passing declaration.
   - >-
-    PENDING CLOSEOUT CHECK: obtain a fresh independent review of the same exact head and
-    resolve every prior finding.
-  - >-
-    PENDING CLOSEOUT CHECK: merge PR 188, close PR 185 as superseded under think-lop3, and
-    disposition the remaining child beads from the merged revision.
+    PENDING CLOSEOUT CHECK: merge PR 188, close out PR 185 under think-lop3 (it is being
+    rebuilt as a stacked follow-up rather than closed), and disposition the remaining
+    child beads from the merged revision.
   - >-
     PENDING CLOSEOUT CHECK: confirm that the first main push after the merge deploys
     GitHub Pages and passes verify-deployment, closing think-w7oy.
@@ -502,10 +534,11 @@ session:
     optimizer, candidate, certificate, frontier update, or experiment allocation.
   resource_rollups: []
   stop_reason: >-
-    PR 188 is pushed, push-tier certified and green in hosted CI at be28ad5a, with the
-    walls advisory under think-g4n9 and the suite records recalibrated. The full
-    checkpoint, a review of the final delta, the merge, and the first Pages deployment
-    remain open.
+    PR 188 is pushed, push-tier certified at be28ad5a and green in hosted CI at be28ad5a
+    and 16d5e14d, with the walls advisory under think-g4n9 and the suite records
+    recalibrated. The final review approved 16d5e14d with nits and no blockers. The full
+    checkpoint, green aggregates on the fix commit, the merge, and the first Pages
+    deployment remain open.
   next_action: >-
     Complete think-97we by satisfying the remaining closeout checks on the final head,
     then resume BC-343 under think-ufmk without changing its scientific claim or
@@ -599,10 +632,12 @@ This record does not cover that work.
 
 ## After the Push
 
-The first hosted runs found what local runs could not.
-Downloads by artifact id put the prepared page one directory too deep, so every Pages
-browser check failed; `21642ed8` fixes that and Pages then passed.
-Packing then failed twice on identical code, in opposite directions.
+The first push was `7d76b044`, after its push tier passed with 6,599 tests and 9
+skipped, and its hosted runs found what local runs could not.
+Packing passed there with a 178 s wall, but downloads by artifact id put the prepared
+page one directory too deep, so every Pages browser check failed; `21642ed8` fixes that
+and Pages then passed.
+Packing then failed twice at `21642ed8` on identical code, in opposite directions.
 Attempt 1 read `suite_b` at 82.64 s, stale against its 143.98 s record, and attempt 2
 passed it at 138.20 s but held the wall at 216 s against 180 s.
 
@@ -627,15 +662,34 @@ The `suite_a` and `suite_b` records were then recalibrated from that run’s thr
 attempts, and the earlier `suite_b` attribution gained a correction, because its
 “unbalanced partition” was a slow runner.
 
+## Final Review
+
+`16d5e14d` carries that recalibration, and both workflows passed on it: Packing with an
+advisory 183 s wall and Pages at 170 s. An independent review of `21642ed8..16d5e14d`
+approved it with nits and no blockers, and a second review checked that every earlier
+finding was resolved.
+The fix commit that carries this section answers both:
+
+- The tier-ceiling step reads the bead store since `be28ad5a`, so it leaves the
+  post-merge reuse allowlist.
+- The wall records now hold PR 188’s exact-head readings, 175.5 s for Packing and 176 s
+  for Pages, with PR 180’s readings kept as dated register comments.
+- The suite-record prose cites the recalibrated records.
+- Re-enforcement is stated as five consecutive exact-head runs under 180 s.
+- Without a bead store the gate-budget tracker check skips locally and fails under CI.
+- The Pages workflow tests refuse a negated `if:` group and show that
+  `continue-on-error` on an artifact-id guard or its download is caught.
+- The dead `suite_shard` module is deleted.
+- This record’s push order and gate claims are corrected.
+
 ## Still Pending
 
 The pending checks above are open obligations, not results.
-The commit that carries the recalibration still needs green required aggregates, and no
-review has seen that final delta.
-The walls stay advisory until `think-g4n9` holds them at or under 180 s, and the wall
-medians still hold PR 180’s 208 s and 189 s readings.
-Merge, closing PR 185 under `think-lop3`, and the first Pages deployment under
-`think-w7oy` remain.
+The fix commit still needs green required aggregates, and the full checkpoint, the
+Deferred checkpoint run through the `deep-gate` label, has not run on the final source.
+The walls stay advisory until `think-g4n9` holds them at or under 180 s. Merge, closing
+out PR 185 under `think-lop3`, which is being rebuilt as a stacked follow-up rather than
+closed, and the first Pages deployment under `think-w7oy` remain.
 Session 136 carries the same certification debt under `think-97we`.
 
 <!-- This document follows common-doc-guidelines.md.

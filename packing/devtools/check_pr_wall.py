@@ -33,9 +33,10 @@ and their diagnosis, but a wall over them exits 0 with a warning annotation nami
 declared `tracking_bead`, whose work switches enforcement back on. Nothing else is
 relaxed. An unmeasurable run, a missing prerequisite and a malformed register still fail,
 because an advisory wall nobody could measure is a wall nobody sees. The owner made both
-walls advisory on 2026-09-17 under `think-g4n9`, after five hosted Packing walls of 194,
-189, 178, 166 and 216 s on identical code; `devtools.check_gate_budgets` refuses an
-advisory wall whose bead is closed or does not exist.
+walls advisory on 2026-09-17 under `think-g4n9`, after five hosted Packing walls on PR
+188 read 194, 189, 178, 166 and 216 s, two of them attempts on identical code;
+`devtools.check_gate_budgets` refuses an advisory wall whose bead is closed or does not
+exist.
 
 It runs under the project's pinned Python through `uv`, with an exact PyYAML version and
 a sparse checkout, so the aggregator does not sync the project environment.

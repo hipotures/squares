@@ -2625,6 +2625,8 @@ def test_a_verified_merge_repeats_everything_not_positively_tree_reusable() -> N
         "bead tree",
         "provenance: recorded commits are reachable",
         "campaign record",
+        # An advisory wall's tracking bead is read from the bead store, not the tree.
+        "tier ceilings are declared and not slack",
     }
 
     # Fail closed: a new fast step is repeated until explicitly classified.

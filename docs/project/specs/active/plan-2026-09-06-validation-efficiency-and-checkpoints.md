@@ -129,13 +129,16 @@ and four sweeps. The seven jobs all feed the existing `packing-required` aggrega
 The reconciliation register currently declares a 168-second ceiling for suite A and a
 180-second ceiling for suite B. Its first exact-head hosted run at `c5a33270` measured
 84.00 and 143.98 seconds over the complete 6,345-item selection: 2,362 passes in suite
-A, and 3,977 passes with 6 skips in suite B. Those readings are interim until two
-successful schema-v2 cohorts rebuild the cost record and final-head hosted runs refresh
-the baselines. The PR 175 geometric means, 150.54 and 119.54 seconds, remain in the
-register as predecessor history rather than current evidence.
-The cost record behind the current partition comes from one cohort (run 35127260063),
-and the next run split its files 257.91 against 468.08 test-seconds, so the final-head
-refresh must rebalance the partition as well as re-measure it.
+A, and 3,977 passes with 6 skips in suite B. The cost record behind that partition came
+from one cohort (run 35127260063), and the next run split its files 257.91 against
+468.08 test-seconds.
+`c4f0660d` rebuilt the record from same-speed cohort 35175474610 and rebalanced the
+shards.
+Run 35182460400 at exact head `be28ad5a` then set the current records: suite A at
+109.92 seconds, the geometric mean of 81.26, 133.91 and 122.06 seconds over attempts
+1–3, and suite B at 124.78 seconds, the geometric mean of attempts 2–3. The `c5a33270`
+readings and the PR 175 geometric means, 150.54 and 119.54 seconds, remain in the
+register as history rather than current evidence.
 
 One predecessor-head shard-B attempt completed all tests in 145.68 seconds but failed
 the unchanged 12-second per-test backstop when a divide-and-concur case took 12.76
@@ -159,6 +162,8 @@ slow fetch.
 
 On 2026-09-17 the owner made the wall check advisory until `think-g4n9` brings the worst
 case under 180 seconds and switches enforcement back on.
+Re-enforcement needs five consecutive exact-head hosted runs with both walls at or under
+180 seconds. Five is the planned default, and `think-g4n9` owns it.
 The register declares this per workflow, as `enforcement: advisory` with a
 `tracking_bead` and an `advisory_reason`. A `continue-on-error` on the workflow step was
 rejected because it would also have passed unmeasurable runs and missing prerequisites.
@@ -168,7 +173,7 @@ instead of failing the aggregator.
 Unmeasurable or missing evidence, missing prerequisites, malformed register entries and
 the tier ceilings still block, and the budget remains 180 seconds.
 The Pages wall is advisory under the same decision, which covers the pull-request wall
-generally; Pages has also measured 189 seconds.
+generally; Pages has also measured 182 seconds on PR 188, in run 35182460356.
 `devtools.check_gate_budgets` refuses an advisory wall whose tracking bead is closed, so
 the relaxation cannot outlive `think-g4n9`.
 

@@ -57,6 +57,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import shlex
 import sys
@@ -197,8 +198,10 @@ def advisory_problems(walls: WallRegister, read: bead_state.Reader | None = None
 
     `load_walls` already refuses an advisory wall with no bead alias or no reason. What it
     cannot see, from the aggregator's two-file sparse checkout, is whether that bead is
-    live. With no bead store to ask this fails rather than trusting the name, since a
-    relaxation nothing can confirm is exactly the state an advisory wall must not reach.
+    live. With no bead store to ask, this follows `check_bead_tree` and the tracker tests:
+    under `CI` it fails rather than trusting the name, since a relaxation nothing can
+    confirm is exactly the state an advisory wall must not reach, and on a local checkout
+    without the `tbd-sync` branch, which is a normal state, it prints a loud skip instead.
     """
     advisory = [
         (workflow.id, declared)
@@ -209,13 +212,17 @@ def advisory_problems(walls: WallRegister, read: bead_state.Reader | None = None
         return []
     store = read if read is not None else bead_state.store()
     if store is None:
-        return [
+        unconfirmed = [
             f"pull-request wall {workflow_id!r} is advisory under "
             f"{declared.tracking_bead}, and no bead store is reachable (no tbd sync "
-            "worktree, no tbd-sync branch) to confirm that bead is still open; fetch full "
-            "history"
+            "worktree, no tbd-sync branch) to confirm that bead is still open"
             for workflow_id, declared in advisory
         ]
+        if os.environ.get("CI"):
+            return [f"{problem}; fetch full history" for problem in unconfirmed]
+        for problem in unconfirmed:
+            print(f"SKIP {problem}; the tracker is unchecked here, and CI fails on it")
+        return []
     return [
         f"pull-request wall {workflow_id!r} is advisory under {fault}, so nothing tracks "
         "switching it back on; set `enforcement: enforcing` and drop its tracker, or name "
@@ -340,13 +347,14 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 1
     tiers = pull_request_tiers()
     ratchets, grandfathered = ratchet_problems(register)
+    store = bead_state.store()
     problems = (
         coverage_problems(register)
         + declaration_problems(register)
         + documentation_problems(register)
         + unrecorded_problems(register, tiers)
         + ratchets
-        + wall_problems()
+        + wall_problems(read=store)
     )
     if problems:
         for problem in problems:
@@ -354,19 +362,26 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 1
     for note in grandfathered:
         print(f"note: {note}")
+    # Reached with no store only off CI, where the trackers were skipped rather than read.
+    tracked = "live bead" if store is not None else "unchecked bead"
     for workflow in load_walls(REGISTER).workflows:
         if workflow.advisory is not None:
             print(
-                f"note: pull-request wall {workflow.id!r} is advisory under live bead "
+                f"note: pull-request wall {workflow.id!r} is advisory under {tracked} "
                 f"{workflow.advisory.tracking_bead}: {workflow.advisory.reason}"
             )
     recorded = sum(1 for tier in register.tiers if tier.measured_seconds is not None)
+    trackers = (
+        "tracked by a live bead"
+        if store is not None
+        else "naming a bead no store here could confirm"
+    )
     print(
         f"gate budget declaration passed: {len(register.tiers)} tiers, {recorded} with a "
         f"recorded cost, all ceilings within {register.policy.max_headroom:g}x of it, every "
         f"pull-request tier ({', '.join(sorted(tiers))}) recorded from hosted runs, no "
         "unattributed rise, the pull-request walls inside OR-14 and wired with every "
-        f"advisory wall tracked by a live bead, all named in {GUIDE.name}"
+        f"advisory wall {trackers}, all named in {GUIDE.name}"
     )
     return 0
 

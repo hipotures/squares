@@ -23,6 +23,7 @@ Those are history and cannot drift.
 from __future__ import annotations
 
 import json
+import os
 from dataclasses import replace
 from pathlib import Path
 
@@ -37,6 +38,7 @@ from devtools.check_gate_budgets import (
     unrecorded_problems,
     wall_problems,
 )
+from devtools.check_pr_wall import load_walls
 from sqpack import gate_budgets
 from sqpack.cli import validate
 from sqpack.gate_budgets import BudgetError, Register, TierBudget
@@ -544,6 +546,28 @@ def test_the_pages_wall_cannot_declare_a_second_budget(tmp_path: Path) -> None:
     assert any("same metric" in problem for problem in problems)
 
 
+def _require_bead_store() -> bead_state.Reader:
+    """The checkout's bead store: skipped without one locally, failed without one under `CI`."""
+    try:
+        return bead_state.require_store()
+    except bead_state.UnavailableError as error:
+        if os.environ.get("CI"):
+            pytest.fail(f"{error}; the job must fetch full history to check trackers")
+        return pytest.skip(str(error))
+
+
+def test_a_missing_bead_store_fails_under_ci_and_skips_locally(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(bead_state, "store", lambda: None)
+    monkeypatch.setenv("CI", "true")
+    with pytest.raises(pytest.fail.Exception, match="must fetch full history"):
+        _require_bead_store()
+    monkeypatch.delenv("CI")
+    with pytest.raises(pytest.skip.Exception, match="no bead store is reachable"):
+        _require_bead_store()
+
+
 def advisory_walls(tmp_path: Path, *, bead: str = "think-aaaa", budget: float = 180.0) -> Path:
     """A wall register in `tmp_path` whose one wall is advisory under `bead`."""
     register = tmp_path / "gate-budgets.yaml"
@@ -587,14 +611,28 @@ def test_an_advisory_wall_must_be_tracked_by_an_open_bead(tmp_path: Path) -> Non
     assert "advisory under think-zzzz: no such bead" in unknown[0]
 
 
-def test_an_advisory_wall_with_no_bead_store_to_ask_is_refused(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+def test_an_advisory_wall_with_no_bead_store_fails_under_ci_and_skips_locally(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    """A tracker nothing can resolve is not trusted; an enforcing wall never asks."""
+    """A tracker nothing can resolve is not trusted in CI; an enforcing wall never asks.
+
+    Locally a checkout without the `tbd-sync` branch is a normal state, so the check says
+    loudly that it skipped, the way `check_bead_tree` does, rather than failing a laptop.
+    """
     monkeypatch.setattr(bead_state, "store", lambda: None)
+    monkeypatch.setenv("CI", "true")
     problems = wall_problems(advisory_walls(tmp_path))
     assert len(problems) == 1, problems
     assert "no bead store is reachable" in problems[0]
+    assert "fetch full history" in problems[0]
+
+    monkeypatch.delenv("CI")
+    capsys.readouterr()
+    assert wall_problems(advisory_walls(tmp_path)) == []
+    printed = capsys.readouterr().out
+    assert printed.startswith("SKIP "), printed
+    assert "no bead store is reachable" in printed
+    assert "think-aaaa" in printed
 
     enforcing = advisory_walls(tmp_path)
     document = enforcing.read_text(encoding="utf-8")
@@ -648,10 +686,18 @@ def test_each_workflow_still_runs_the_wall_check_it_declares() -> None:
 
     Both job graphs are being restructured as this lands, so the check is that each
     workflow's declared aggregator still invokes the tool -- not that the graph has a
-    particular shape. An advisory wall's tracker is resolved in the checkout's real bead
-    store here, which is why the jobs that run this file fetch full history.
+    particular shape. The wiring is checked everywhere, against a store in which every
+    declared tracker is open. An advisory wall's tracker is then resolved in the
+    checkout's real bead store, which is why the jobs that run this file fetch full
+    history; without one that half skips locally and fails under `CI`.
     """
-    assert wall_problems() == []
+    trackers = {
+        workflow.advisory.tracking_bead.removeprefix("think-"): "open"
+        for workflow in load_walls().workflows
+        if workflow.advisory is not None
+    }
+    assert wall_problems(read=bead_state.fixture_store(trackers)) == []
+    assert wall_problems(read=_require_bead_store()) == []
 
 
 def test_an_attribution_that_names_no_growth_is_refused(tmp_path: Path) -> None:
@@ -698,6 +744,7 @@ def test_duplicate_budget_fields_are_refused(tmp_path: Path, declaration: str) -
         gate_budgets.load(spec)
 
 
+# `-.inf` adds no regression coverage: 5ca38b03 already refused it as a negative cost.
 @pytest.mark.parametrize("before", [".nan", ".inf", "-.inf"])
 def test_an_attribution_before_cost_must_be_finite(tmp_path: Path, before: str) -> None:
     spec = fabricated(tmp_path, ceiling=200.0, measured="100.0")
