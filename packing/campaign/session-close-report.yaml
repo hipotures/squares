@@ -2275,7 +2275,7 @@ sessions:
   title: "CI Topology Continuation and Crash Recovery"
   status: stopped
   primary_bead: think-97we
-  phases: 2
+  phases: 3
   measured: false
   unmeasured_reason: >-
     native harness data unavailable; No receipt measures this interval as one attributable cost. In the same window the Codex workbench task 01a0a837 also merged PR 189 and drafted PR 190, work on other branches, so no delta from its log belongs to this branch alone. A delta from the Session 136 Codex task 01a0a0b5 would omit that thread's share, and the Claude recovery log was still live when this record stopped, so each available source yields only a partial lower bound.

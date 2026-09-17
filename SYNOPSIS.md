@@ -927,10 +927,14 @@ is the latest terminal work handoff.
 It records the continuation of
 [Session 136](packing/campaign/agent-sessions/session-136-ci-topology-reconciliation.md)
 by two concurrent Codex threads, their interruption, and the recovery that restored the
-160 MiB snapshot cap, passed the pre-push gate at `da2259fb`, and repaired the Pages
-deploy that had not run since PR 183. BC-355 / `think-97we` remains open for exact-head
-hosted wall evidence, independent re-review, and merge, so both stopped sessions are
-terminal but uncertified, and neither changes a mathematical result.
+160 MiB snapshot cap and committed a repair for the Pages deploy that had not run since
+PR 183, pending the first main deploy.
+It then took PR 188 to green hosted CI at `be28ad5a`: the suite shards were rebalanced,
+and by owner decision the pull-request walls are advisory under `think-g4n9` until they
+hold 180 s on hosted runners.
+BC-355 / `think-97we` remains open for a review of the final delta and merge, so both
+stopped sessions are terminal but uncertified, and neither changes a mathematical
+result.
 [Session 135](packing/campaign/agent-sessions/session-135-n11-route-s-guard-discharge.md)
 is the latest terminal scientific handoff on the no-target Route S admission branch.
 It discharged the four guards retained by
