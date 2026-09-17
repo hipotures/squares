@@ -1021,10 +1021,11 @@ def test_the_slow_marker_is_declared_only_by_measured_nodes() -> None:
         "test_n54_source_contract_independent.py": {
             "test_author_and_verifier_are_normal_optimized_byte_identical",  # 7.6s
         },
-        # 11s of call time across 2.
+        # 8s of call time across 1 when measured; 1.92s locally after the fixture cuts.
+        # `test_a_declared_count_disagreement_blocks_readiness` left at 0.67s on hosted
+        # run 35208147744, below the slow floor, and runs on the pull-request surface.
         "test_n5_local_rigidity.py": {
             "test_every_control_rejects",  # 8.0s
-            "test_a_declared_count_disagreement_blocks_readiness",  # 2.6s
         },
         # 8s of call time across 1; 8.15s on the hosted PR runner. This directly copies
         # the source tree into a worker and has no shared builder whose cost can move to

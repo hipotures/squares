@@ -417,7 +417,6 @@ def test_the_active_margin_guard_recomputes_rather_than_trusting_the_record(
         require_active_margins_zero(forged)
 
 
-@pytest.mark.slow
 def test_a_declared_count_disagreement_blocks_readiness(chart: Chart, t012) -> None:
     """The receipt printed the comparison; now a verdict reads it."""
     wrong, _ = assess(chart, t012, audit=False, expected_counts={"active_total": 19})
