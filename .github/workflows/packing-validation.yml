@@ -42,6 +42,9 @@ concurrency:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
     defaults:
       run:
         working-directory: packing
@@ -68,11 +71,31 @@ jobs:
       - name: Synchronize the locked development environment
         run: uv sync --frozen --all-extras --group dev
 
+      - name: Record the tree this pull-request run validates
+        id: pull-request-tree
+        if: "github.event_name == 'pull_request'"
+        run: |
+          tree="$(git rev-parse 'HEAD^{tree}')"
+          mkdir -p "$RUNNER_TEMP/pull-request-tree"
+          printf '%s\n' "$tree" > "$RUNNER_TEMP/pull-request-tree/tree"
+          echo "tree=$tree" >> "$GITHUB_OUTPUT"
+
+      - name: Publish the validated tree id
+        if: "github.event_name == 'pull_request'"
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: pull-request-tree-${{ steps.pull-request-tree.outputs.tree }}
+          path: ${{ runner.temp }}/pull-request-tree/tree
+          if-no-files-found: error
+          retention-days: 30
+          overwrite: true
+
       # The browser floor's tools. Node is on the runner already, but pinned here for the
       # same reason the Python version is: a floor that moves under you is not a floor. The
       # version is the one the vendored kpress pins, so the repository has one answer to
       # "which Node".
       - name: Install Node
+        if: "github.event_name != 'pull_request'"
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: "24.18.0"
@@ -85,6 +108,7 @@ jobs:
       # `--ignore-scripts`, which `.npmrc` also sets by default: a package's install script
       # is arbitrary code from the supply chain.
       - name: Install the pinned browser toolchain
+        if: "github.event_name != 'pull_request'"
         working-directory: .
         run: npm ci --ignore-scripts
 
@@ -101,31 +125,61 @@ jobs:
           uv run --frozen --all-extras --group dev
           python -m playwright install --with-deps --only-shell chromium
 
-      # Only this job builds the engine, and `_build_engine` runs it *before* the
-      # executor rather than inside it, so a cold `cargo build --locked --release` is a
-      # serial prefix on this job's whole wall -- about 25s of it. Nothing else in the
-      # workflow caches cargo, so every run paid that from scratch.
+      # Only this job builds the engine, and `_build_engine` runs it *before* the executor
+      # rather than inside it, so `cargo build --locked --release` is a serial prefix on
+      # this job's whole wall.
       #
-      # This does not shorten the surface today: at 112s this job is not the critical
-      # path, `geometry` at 122s is. What it removes is variance. A cold build swings
-      # this job by 25-40s, which is enough to make it the critical path on a bad run,
-      # and a pull-request wall that moves 30 per cent between runs on nothing the author
-      # changed is the thing `OR-14` is actually about.
+      # **The cache hit on every run from 2026-09-06 to 09-15 and the build still cost
+      # 12.6-13.5s**, with nothing under `packing/sqsearch` committed since 09-05. Cargo
+      # judges a path crate by mtime: checkout dates `src/*.rs` now, and the restored
+      # `dep-bin-sqsearch` fingerprint keeps the date of the run that saved it, so every
+      # restore was older than its sources and the whole crate relinked under
+      # `lto = "fat"`. Reproduced locally with `CARGO_LOG=cargo::core::compiler::fingerprint
+      # =info`: `stale: changed src/main.rs` against `dep-bin-sqsearch`, one unit rebuilt.
       #
-      # Keyed on `Cargo.lock` so a dependency change misses deliberately; the restore
-      # keys let an unrelated lockfile bump start from the previous build rather than
-      # from nothing. `actions/cache` is already pinned at this sha in `pages.yml`, so
-      # this adds no new action to vet.
+      # So the key is the tracked `packing/sqsearch` tree id plus `rustc -vV`, and only an
+      # exact hit backdates the files that tree id covers. On an exact hit the restored
+      # build was made from byte-identical sources by the same compiler, so dating them
+      # before it is true. A partial restore leaves the checkout's mtimes alone and cargo
+      # rebuilds; backdating a changed file was measured to serve the old binary, which is
+      # why the `if:` below is not optional. Restore and save are separate because a
+      # verified main push can skip every validation-owned engine step. An automatic
+      # post-job save after that skip could bind a partially restored old target to the
+      # new exact key. The explicit build on a miss makes the exact-key claim true before
+      # any event can skip validation work; the later validation build is then a no-op.
+      # The old key was `Cargo.lock` alone, so the one entry saved on 09-06 was never
+      # replaced. `rustc -vV` also installs the pinned toolchain from
+      # `rust-toolchain.toml` here rather than inside the gate's build.
+      - name: Key the engine cache on its sources and its compiler
+        id: engine-key
+        working-directory: packing/sqsearch
+        run: |
+          rustc_vv="$(rustc -vV)"
+          echo "tree=$(git rev-parse HEAD:packing/sqsearch)" >> "$GITHUB_OUTPUT"
+          echo "rustc=$(printf '%s' "$rustc_vv" | sha256sum | cut -c1-16)" >> "$GITHUB_OUTPUT"
+
       - name: Cache the Rust build for the engine
-        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        id: engine-cache
+        uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
         with:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
             packing/sqsearch/target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('packing/sqsearch/Cargo.lock') }}
+          key: >-
+            ${{ runner.os }}-sqsearch-${{ steps.engine-key.outputs.rustc }}-${{
+            steps.engine-key.outputs.tree }}
           restore-keys: |
-            ${{ runner.os }}-cargo-
+            ${{ runner.os }}-sqsearch-${{ steps.engine-key.outputs.rustc }}-
+
+      - name: Populate the engine cache for this exact tree
+        if: "steps.engine-cache.outputs.cache-hit != 'true'"
+        working-directory: packing/sqsearch
+        run: cargo build --locked --release --quiet
+
+      - name: Date the engine sources before the build restored for them
+        if: "steps.engine-cache.outputs.cache-hit == 'true'"
+        run: git ls-files -z -- sqsearch | xargs -0 touch -t 200001010000
 
       # `--fast` is the pull-request surface, and two separate pieces of work in one day
       # made it what it is. They pull in opposite directions on purpose.
@@ -166,9 +220,9 @@ jobs:
       # 501.97s at commit `30706bcb`, of which `known-best n=1..100 atlas` was 254.92s and
       # `prospective n=101..324 source map and safe seed` 213.19s. Reverting the promotion
       # was refused on coverage grounds, so the cost is bought with more runners instead:
-      # `--checks` here, then `--frontend`, `--geometry`, `--suite-a`, `--suite-b`, and
-      # `--sweeps` below. The six are a partition of `--fast`, they run concurrently, and
-      # a pull request waits for the longest of them rather than for their sum. All six
+      # `--checks` here, then `--frontend`, `--typecheck`, `--geometry`, `--suite-a`,
+      # `--suite-b`, and `--sweeps` below. The seven are a partition of `--fast`, they run
+      # concurrently, and a pull request waits for the longest rather than their sum. All seven
       # are required through `packing-required`.
       #
       # **Two runners were not enough, and the second cut is measured too.** Run
@@ -220,7 +274,7 @@ jobs:
       # measured, so a second core of headroom would cost this job more than the fourth
       # worker ever cost it.
       #
-      # Nothing left the surface to buy any of this. The six jobs still select every
+      # Nothing left the surface to buy any of this. The seven jobs still select every
       # step `--fast` does, which is what
       # `test_the_pull_request_jobs_partition_the_surface` checks -- `OR-13`, and the
       # same refusal recorded two paragraphs up.
@@ -230,15 +284,15 @@ jobs:
       # been judged against `--fast`'s recorded 502.3s and failed for finishing early;
       # `--only` reports no tier at all and would have left every part of the
       # pull-request surface with no declared ceiling, which is `D-466` exactly.
-      # `--checks`, `--frontend`, `--geometry`, `--suite-a`, `--suite-b`, and `--sweeps`
-      # each carry an entry in `devtools/gate-budgets.yaml`.
+      # `--checks`, `--frontend`, `--typecheck`, `--geometry`, `--suite-a`, `--suite-b`,
+      # and `--sweeps` each carry an entry in `devtools/gate-budgets.yaml`.
       #
       # `test_the_pull_request_jobs_partition_the_surface` reads this file, parses these
-      # six commands with the CLI's own parser and resolves them through its own
-      # selector, and requires the six selections to be pairwise disjoint and to cover
+      # seven commands with the CLI's own parser and resolves them through its own
+      # selector, and requires the seven selections to be pairwise disjoint and to cover
       # every step outside the four
       # `test_the_pull_request_surface_defers_only_what_was_measured` pins. A step added
-      # tomorrow lands in one of the six jobs or fails that test.
+      # tomorrow lands in one of the seven jobs or fails that test.
       - name: Run the required pull-request checks
         if: "github.event_name == 'pull_request'"
         run: >-
@@ -261,14 +315,38 @@ jobs:
       # 34183723509 completed it in 1069.84s.
       # The slow lane also gets its own runner: run 34177317419 timed it out at 1800s
       # while it shared the deferred job. This changes scheduling, not coverage.
+      - name: Find the pull-request run that already passed this tree
+        id: verified-tree
+        if: "github.event_name == 'push'"
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          uv run --frozen --all-extras --group dev python -m devtools.verified_merge_tree
+          --sha "$GITHUB_SHA" --repository "$GITHUB_REPOSITORY"
+          --github-output "$GITHUB_OUTPUT"
+
       - name: Run the complete integration surface
         if: "github.event_name != 'pull_request'"
+        env:
+          PACKING_VALIDATE_TREE_VERIFIED_BY_RUN: ${{ steps.verified-tree.outputs.run }}
         run: >-
           uv run --frozen --all-extras --group dev
           packing-validate --skip "exhaustive exact behavioral tests"
           --skip "slow behavioral tests"
           --skip "single-square translation escape screen"
           --jobs 1 --inner-jobs 2
+
+      - name: Save the Rust build for the exact engine tree
+        if: >-
+          success() && steps.engine-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            packing/sqsearch/target
+          key: >-
+            ${{ steps.engine-cache.outputs.cache-primary-key }}
 
       - name: Preserve validation timings and partial logs
         if: always()
@@ -323,12 +401,9 @@ jobs:
           retention-days: 30
 
   suite-a:
-    # Both behavioural jobs collect the complete quick lane. The pytest plugin assigns
-    # whole modules by deterministic largest-first item count, so the selections are
-    # complete and disjoint without a maintained file list. Keeping modules whole
-    # preserves module-scoped fixture reuse; `--dist=loadfile` preserves it within each
-    # shard. Scheduling-only variants were refused by measurement: default 302.70s,
-    # loadscope 318.54s, worksteal 323.69s.
+    # The measured per-file partition filters before collection, so each runner imports
+    # only its own complete and disjoint half of the quick lane. Every run also emits the
+    # costs needed to refresh that partition.
     if: "github.event_name == 'pull_request'"
     runs-on: ubuntu-latest
     defaults:
@@ -338,8 +413,14 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          # The behavioural lane includes tests that read git history rather than only
-          # the worktree, so this job clones the same way `validate` does.
+          # Full history with every blob, as `validate` clones. Both cheaper clones were
+          # run against the whole quick lane at 21642ed8 and refused. Blobless saves about
+          # 100 MB of a ~520 MB fetch, most of which is the tree at HEAD, but leaves 11
+          # historical objects to fetch one round trip at a time from inside tests: 66
+          # tests fail without them, and two of the fetches fall in a call the 5 s ceiling
+          # times. Dropping `packing/resources/*/` and `packing/campaign/*/` from a sparse
+          # checkout fetches 36 MB, and 426 tests in 70 files then fail and three more
+          # skip, because the lane opens and scans both trees. The shard B job is the same.
           fetch-depth: 0
           # kpress is vendored at vendor/kpress and installed from that path, so
           # the environment does not resolve without the submodule checked out.
@@ -356,21 +437,6 @@ jobs:
 
       - name: Synchronize the locked development environment
         run: uv sync --frozen --all-extras --group dev
-
-      # The browser floor's liveness tests (`test_browser_floor_contract.py`) run in this
-      # lane and prove Biome, ESLint and `tsc` reject a violation. Without the pinned tools
-      # they skipped here on every pull request (#125 F20, #160 R19); they now fail under
-      # `CI` instead, so this job installs the same toolchain `validate` and `frontend` do.
-      - name: Install Node
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
-        with:
-          node-version: "24.18.0"
-          cache: npm
-          cache-dependency-path: package-lock.json
-
-      - name: Install the pinned browser toolchain
-        working-directory: .
-        run: npm ci --ignore-scripts
 
       - name: Run required pull-request behavioral shard A
         run: >-
@@ -411,21 +477,50 @@ jobs:
       - name: Synchronize the locked development environment
         run: uv sync --frozen --all-extras --group dev
 
-      - name: Install Node
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
-        with:
-          node-version: "24.18.0"
-          cache: npm
-          cache-dependency-path: package-lock.json
-
-      - name: Install the pinned browser toolchain
-        working-directory: .
-        run: npm ci --ignore-scripts
-
       - name: Run required pull-request behavioral shard B
         run: >-
           uv run --frozen --all-extras --group dev
           packing-validate --suite-b --jobs 1 --inner-jobs 1
+
+      - name: Preserve validation timings and partial logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: validation-timings-${{ github.job }}-${{ github.run_attempt }}
+          path: ${{ env.PACKING_VALIDATION_ARTIFACT_DIR }}
+          if-no-files-found: warn
+          retention-days: 30
+
+  typecheck:
+    # BasedPyright is one process outer `--jobs` cannot divide, so the pull request gives
+    # the existing type-floor step an independent required runner.
+    if: "github.event_name == 'pull_request'"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packing
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          submodules: true
+
+      - name: Install uv and Python 3.14
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: "0.12.8"
+          python-version: "3.14.7"
+          working-directory: packing
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+
+      - name: Synchronize the locked development environment
+        run: uv sync --frozen --all-extras --group dev
+
+      - name: Run the required pull-request type floor
+        run: >-
+          uv run --frozen --all-extras --group dev
+          packing-validate --typecheck --jobs 1 --inner-jobs 1
 
       - name: Preserve validation timings and partial logs
         if: always()
@@ -493,7 +588,7 @@ jobs:
       - name: Run the frontend source and built-page contracts
         run: >-
           uv run --frozen --all-extras --group dev
-          packing-validate --frontend --jobs 1 --inner-jobs 1
+          packing-validate --frontend --jobs 2 --inner-jobs 1
 
       - name: Preserve validation timings and partial logs
         if: always()
@@ -568,7 +663,7 @@ jobs:
 
   sweeps:
     # One part of the pull-request surface, on its own runner and at the same time as
-    # the other five.
+    # the other six.
     #
     # Four steps, all of one kind: each re-derives a retained atlas from the witnesses
     # under it and compares the result byte for byte. They are the class `D-369` measured
@@ -623,6 +718,34 @@ jobs:
           # kpress is vendored at vendor/kpress and installed from that path, so
           # the environment does not resolve without the submodule checked out.
           submodules: true
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          # These four steps consume the package, tools, exact case/frontier/atlas
+          # records and a small declared slice of the source archive. They do not read
+          # the 130 MB campaign history or the rest of the 329 MB papers archive. Keep
+          # this list paired with the workflow contract in test_module_boundaries.py.
+          sparse-checkout: |
+            /*
+            !/*/
+            /.gitmodules
+            /vendor/kpress/
+            /packages/workbench/
+            /packing/
+            !/packing/campaign/*/
+            !/packing/resources/
+            /packing/resources/
+            !/packing/resources/*
+            /packing/resources/README.md
+            /packing/resources/web/
+            !/packing/resources/web/*
+            /packing/resources/web/kingbird-squares-in-squares.html
+            /packing/resources/web/known-best-packings/
+            /packing/resources/web/prospective-packings/
+            /packing/resources/web/unitsquare-release1-2026/
+            /packing/resources/papers/
+            !/packing/resources/papers/*
+            /packing/resources/papers/kingbird-square-29-provenance.svg
 
       - name: Install uv and Python 3.14
         uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
@@ -793,20 +916,24 @@ jobs:
     # single required context is the reason the split is allowed to exist: `BC-218` set
     # that as the condition for any fan-out, because `D-380` records what a fan-out of
     # separately required checks did to this repository once. A reviewer still watches one
-    # context; it just has six prerequisites now.
+    # context; it just has seven prerequisites now.
     #
     # `needs` alone is not enough, which is why every prerequisite also has a `test` line
     # below. This job runs under `!cancelled()`, so it is reached even when a prerequisite
     # failed, and it is the shell that decides -- a job named in `needs` and missing from
     # the script is an advisory check nothing blocks on.
     if: "!cancelled() && github.event_name == 'pull_request'"
-    needs: [validate, frontend, geometry, suite-a, suite-b, sweeps]
+    needs: [validate, frontend, typecheck, geometry, suite-a, suite-b, sweeps]
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
     steps:
       - name: Require every pull-request prerequisite
         env:
           VALIDATE_RESULT: ${{ needs.validate.result }}
           FRONTEND_RESULT: ${{ needs.frontend.result }}
+          TYPECHECK_RESULT: ${{ needs.typecheck.result }}
           GEOMETRY_RESULT: ${{ needs.geometry.result }}
           SUITE_A_RESULT: ${{ needs.suite-a.result }}
           SUITE_B_RESULT: ${{ needs.suite-b.result }}
@@ -814,10 +941,39 @@ jobs:
         run: |
           test "$VALIDATE_RESULT" = "success"
           test "$FRONTEND_RESULT" = "success"
+          test "$TYPECHECK_RESULT" = "success"
           test "$GEOMETRY_RESULT" = "success"
           test "$SUITE_A_RESULT" = "success"
           test "$SUITE_B_RESULT" = "success"
           test "$SWEEPS_RESULT" = "success"
+
+      - name: Check out the wall budget and its register
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            packing/devtools/check_pr_wall.py
+            packing/devtools/gate-budgets.yaml
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+
+      - name: Install uv and Python 3.14
+        if: always() && github.event_name == 'pull_request'
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: "0.12.8"
+          python-version: "3.14.7"
+          enable-cache: false
+
+      - name: Hold the pull request's wall to its budget
+        if: always() && github.event_name == 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          EXPECTED_PREREQUISITES: ${{ toJSON(needs) }}
+        run: >-
+          uv run --no-project --python 3.14.7 --with PyYAML==6.0.3 python
+          packing/devtools/check_pr_wall.py --workflow packing-validation
 
   macos-portability:
     # A second-architecture smoke check, deliberately minimal.

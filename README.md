@@ -389,15 +389,17 @@ uv run --frozen python -m cases.trump11.verify_exact
 uv run --frozen --all-extras --group dev packing-validate --edit
 ```
 
-`--edit` is the smallest of five validation tiers.
+`--records`, `--edit`, `--push`, `--fast`, and the full checkpoint are the five
+lifecycle tiers. `--edit` is the ordinary inner loop; pull-request CI executes `--fast`
+as seven disjoint required parts.
 Which steps each tier runs, what it costs, and which of the three behavioral lanes a
 test lands in are tabulated in
 [**development.md → Validation Loops**](development.md#validation-tiers); the ceilings
 themselves are data the gate reads, in
 [`packing/devtools/gate-budgets.yaml`](packing/devtools/gate-budgets.yaml).
 In short: a contributor runs `--edit` while editing and `--push` before pushing, every
-pull request runs `--fast`, and the complete gate runs on `main` and at the end of a
-research block.
+pull request runs all seven parts of `--fast`, and the complete gate runs on `main` and
+at the end of a research block.
 
 [`Witness/v2`](packing/witnesses/witness.schema.yaml) is the interchange format for
 supported rational, algebraic, and decimal witnesses.

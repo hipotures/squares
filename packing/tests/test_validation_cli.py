@@ -185,7 +185,11 @@ def test_artifact_provenance_includes_untracked_source(
         strict=False,
         jobs=1,
         inner_jobs=1,
-        environment={**os.environ, "PACKING_VALIDATION_ARTIFACT_DIR": str(artifacts)},
+        environment={
+            **os.environ,
+            "PACKING_VALIDATION_ARTIFACT_DIR": str(artifacts),
+            "DYLD_FALLBACK_LIBRARY_PATH": "/opt/homebrew/lib",
+        },
     )
     monkeypatch.setattr(validate, "REPOSITORY_ROOT", repo)
     validate._begin_artifacts(context, [])
@@ -195,6 +199,7 @@ def test_artifact_provenance_includes_untracked_source(
     assert receipt["untracked_hashes"] == {
         "untracked.py": hashlib.sha256(source.read_bytes()).hexdigest(),
     }
+    assert receipt["environment"]["DYLD_FALLBACK_LIBRARY_PATH"] == "/opt/homebrew/lib"
     assert "untracked.py" in receipt["git_status"]
 
 
@@ -219,6 +224,8 @@ def test_ci_keeps_each_gate_jobs_timing_artifacts_even_on_failure() -> None:
                 step
                 for step in steps
                 if str(step.get("uses", "")).startswith("actions/upload-artifact@")
+                and step.get("with", {}).get("path")
+                == "${{ env.PACKING_VALIDATION_ARTIFACT_DIR }}"
             ]
             assert len(upload) == 1, name
             assert upload[0]["if"] == "always()", name
@@ -665,7 +672,7 @@ def test_fast_behavioral_step_excludes_exhaustive_exact_tests(
 
     monkeypatch.setattr(validate, "_pytest_workers", lambda _jobs: 4)
 
-    validate._fast_tests(context, 0)
+    validate._fast_tests(context, 1)
 
     assert observed == (
         sys.executable,
@@ -673,14 +680,15 @@ def test_fast_behavioral_step_excludes_exhaustive_exact_tests(
         "pytest",
         "-q",
         *validate.BEHAVIORAL_TEST_ROOTS,
+        f"--ignore={validate.BROWSER_FLOOR_LIVENESS_TESTS}",
         "-m",
         "not exhaustive_exact and not slow",
         "-n",
         "4",
         "--dist=loadfile",
         "-p",
-        "devtools.suite_shard",
-        "--suite-shard=0",
+        "devtools.suite_files",
+        "--suite-shard=1/2",
         # The plugin that prints the cpu section, loaded by name across the subprocess
         # boundary because `sqpack.cli` may not import `devtools`.
         "-p",
@@ -705,7 +713,7 @@ def test_the_quick_lane_asks_for_no_xdist_worker_on_a_single_core_machine(
     """
     monkeypatch.setattr(validate, "_pytest_workers", lambda _jobs: 1)
 
-    command = validate._quick_lane_command(1, 0)
+    command = validate._quick_lane_command(1, 1)
 
     assert "-n" not in command
     assert "--dist=loadfile" not in command
@@ -1333,6 +1341,93 @@ def test_strict_mode_enables_deep_validation(monkeypatch: pytest.MonkeyPatch) ->
         pytest.fail("strict mode did not enable deep validation")
 
 
+@pytest.mark.parametrize(
+    ("host_system", "library_name"),
+    [("Linux", "libcairo.2.dylib"), ("Darwin", None)],
+    ids=["non-macos", "missing-library"],
+)
+def test_validation_environment_changes_only_a_macos_host_with_homebrew_cairo(
+    tmp_path: Path, host_system: str, library_name: str | None
+) -> None:
+    library_directory = tmp_path / "lib"
+    library_directory.mkdir()
+    if library_name is not None:
+        (library_directory / library_name).touch()
+
+    environment = validate._validation_environment(
+        {"PATH": "/usr/bin"},
+        host_system=host_system,
+        cairo_library_directories=(library_directory,),
+    )
+
+    assert environment == {"PATH": "/usr/bin"}
+
+
+def test_validation_environment_adds_discovered_homebrew_cairo(tmp_path: Path) -> None:
+    library_directory = tmp_path / "lib"
+    library_directory.mkdir()
+    (library_directory / "libcairo.2.dylib").touch()
+
+    environment = validate._validation_environment(
+        {"PATH": "/usr/bin"},
+        host_system="Darwin",
+        cairo_library_directories=(library_directory,),
+    )
+
+    assert environment["DYLD_FALLBACK_LIBRARY_PATH"] == str(library_directory)
+
+
+def test_validation_environment_preserves_an_explicit_cairo_loader_path(
+    tmp_path: Path,
+) -> None:
+    library_directory = tmp_path / "lib"
+    library_directory.mkdir()
+    (library_directory / "libcairo.2.dylib").touch()
+
+    environment = validate._validation_environment(
+        {"DYLD_FALLBACK_LIBRARY_PATH": ""},
+        host_system="Darwin",
+        cairo_library_directories=(library_directory,),
+    )
+
+    assert environment["DYLD_FALLBACK_LIBRARY_PATH"] == ""
+
+
+def test_main_passes_the_discovered_cairo_path_to_validation_children(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    library_directory = tmp_path / "lib"
+    library_directory.mkdir()
+    (library_directory / "libcairo.2.dylib").touch()
+    monkeypatch.delenv("DYLD_FALLBACK_LIBRARY_PATH", raising=False)
+    monkeypatch.setattr(validate.platform, "system", lambda: "Darwin")
+    monkeypatch.setattr(validate, "MACOS_CAIRO_LIBRARY_DIRECTORIES", (library_directory,))
+    observed: validate.Context | None = None
+
+    def capture_context(
+        selected: list[validate.Step],
+        context: validate.Context,
+        *_narrowing: object,
+    ) -> validate.RunSummary:
+        nonlocal observed
+        observed = context
+        return validate.RunSummary(
+            results=[],
+            wall_seconds=0,
+            selected_count=len(selected),
+            total_count=len(validate.STEPS),
+        )
+
+    monkeypatch.setattr(validate, "_run_selected", capture_context)
+
+    status, _, stderr = _invoke("--edit")
+
+    assert status == 0
+    assert stderr == ""
+    assert observed is not None
+    assert observed.environment["DYLD_FALLBACK_LIBRARY_PATH"] == str(library_directory)
+
+
 def test_existing_activity_marker_explains_safe_recovery(tmp_path: Path) -> None:
     marker = tmp_path / ".gate-running"
     marker.mkdir()
@@ -1489,6 +1584,54 @@ def test_failure_summary_uses_singular_step_for_one_failure() -> None:
     assert "1 STEP FAILED:" in stdout.getvalue()
 
 
+@pytest.mark.parametrize(("tier", "expected_status"), [("typecheck", 1), (None, 0)])
+def test_an_unknown_budget_fails_only_a_whole_tier(
+    tier: str | None, expected_status: int
+) -> None:
+    summary = validate.RunSummary(
+        results=[],
+        wall_seconds=0.1,
+        selected_count=1,
+        total_count=1,
+        budget=gate_budgets.Verdict(
+            tier=tier,
+            wall_seconds=0.1,
+            status="unknown",
+            notes=("the tier register could not be read",),
+        ),
+    )
+    stdout = io.StringIO()
+
+    with redirect_stdout(stdout):
+        status = validate._render_text(summary, strict=False)
+
+    assert status == expected_status
+    if tier is not None:
+        assert "DECLARED COST COULD NOT BE JUDGED" in stdout.getvalue()
+
+
+def test_a_budget_only_failure_prints_a_machine_readable_pass_count() -> None:
+    summary = validate.RunSummary(
+        results=[],
+        wall_seconds=10.0,
+        selected_count=49,
+        total_count=80,
+        budget=gate_budgets.Verdict(
+            tier="checks",
+            wall_seconds=10.0,
+            status="failed",
+            failures=("the recorded cost is stale",),
+        ),
+    )
+    stdout = io.StringIO()
+
+    with redirect_stdout(stdout):
+        status = validate._render_text(summary, strict=False)
+
+    assert status == 1
+    assert "49 of 80 STEPS PASSED (the budget verdict alone failed)" in stdout.getvalue()
+
+
 def test_lint_floor_reaches_the_handwritten_skill_assets(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
@@ -1542,6 +1685,43 @@ def test_multi_command_step_stops_at_first_failure_without_printing_success(
     assert "1 STEP FAILED:" in stdout
     assert "ALL CHECKS PASSED" not in stdout
     assert not marker.exists()
+
+
+def test_independent_command_groups_overlap_but_keep_serial_order_within_each(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    entered: set[str] = set()
+    finished: list[str] = []
+
+    def run(_context: validate.Context, command: tuple[str, ...], **_options: object) -> str:
+        name = command[0]
+        entered.add(name)
+        if name in {"a1", "b1"}:
+            deadline = time.monotonic() + 1
+            while len(entered & {"a1", "b1"}) < 2 and time.monotonic() < deadline:
+                time.sleep(0.001)
+            assert entered & {"a1", "b1"} == {"a1", "b1"}
+        finished.append(name)
+        return name
+
+    monkeypatch.setattr(validate, "_run", run)
+    context = validate.Context(
+        deep=False,
+        strict=False,
+        jobs=1,
+        inner_jobs=1,
+        environment={},
+    )
+    output = validate._command_groups(
+        context,
+        (
+            (("a1",), ("a2",)),
+            (("b1",), ("b2",)),
+        ),
+    )
+    assert finished.index("a1") < finished.index("a2")
+    assert finished.index("b1") < finished.index("b2")
+    assert output.splitlines() == ["a1", "a2", "b1", "b2"]
 
 
 def test_frontier_contract_accepts_the_declared_schema_metadata(
@@ -1845,6 +2025,69 @@ def test_push_tests_forward_the_shared_worker_allocation(
     ]
 
 
+@pytest.mark.parametrize(
+    ("broad", "arguments", "environment_jobs", "expected_jobs", "expected_inner_jobs"),
+    [
+        (True, (), None, 1, 1),
+        (False, (), None, 8, 2),
+        (True, ("--jobs", "3"), None, 3, 1),
+        (True, (), "3", 3, 1),
+        (True, ("--inner-jobs", "7"), None, 1, 7),
+    ],
+)
+def test_only_an_implicit_broad_push_gives_the_test_step_the_machine(
+    monkeypatch: pytest.MonkeyPatch,
+    *,
+    broad: bool,
+    arguments: tuple[str, ...],
+    environment_jobs: str | None,
+    expected_jobs: int,
+    expected_inner_jobs: int,
+) -> None:
+    """The expensive fallback gets every cpu without slowing ordinary narrow pushes."""
+    if environment_jobs is None:
+        monkeypatch.delenv("PACKING_VALIDATE_JOBS", raising=False)
+    else:
+        monkeypatch.setenv("PACKING_VALIDATE_JOBS", environment_jobs)
+    monkeypatch.delenv("PACKING_VALIDATE_INNER_JOBS", raising=False)
+    monkeypatch.setattr(validate.os, "process_cpu_count", lambda: 8)
+    monkeypatch.setattr(
+        validate,
+        "_push_test_step",
+        lambda _base: validate.Step(
+            name="reachable behavioral tests",
+            action=lambda _context: "",
+            fast=True,
+            broad=broad,
+        ),
+    )
+    monkeypatch.setattr(validate, "_begin_artifacts", lambda _context, _selected: None)
+    observed: list[validate.Context] = []
+
+    def capture(
+        selected: list[validate.Step],
+        context: validate.Context,
+        *_narrowing: object,
+    ) -> validate.RunSummary:
+        observed.append(context)
+        return validate.RunSummary(
+            results=[],
+            wall_seconds=0,
+            selected_count=len(selected),
+            total_count=len(validate.STEPS),
+        )
+
+    monkeypatch.setattr(validate, "_run_selected", capture)
+
+    status, _stdout, stderr = _invoke("--push", *arguments)
+
+    assert status == 0
+    assert stderr == ""
+    assert len(observed) == 1
+    assert observed[0].jobs == expected_jobs
+    assert observed[0].inner_jobs == expected_inner_jobs
+
+
 def test_the_edit_tier_cannot_under_run() -> None:
     """Tiers must nest, or a narrower tier could contain a step a wider one lacks.
 
@@ -1869,6 +2112,7 @@ def test_the_edit_tier_cannot_under_run() -> None:
     suite_a = names(fast=False, suite_a=True)
     suite_b = names(fast=False, suite_b=True)
     geometry = names(fast=False, geometry=True)
+    typecheck = names(fast=False, typecheck=True)
 
     assert records <= edit <= fast <= everything
     assert fast - edit == {step.name for step in validate.STEPS if step.broad}, (
@@ -1877,16 +2121,19 @@ def test_the_edit_tier_cannot_under_run() -> None:
     # The pull request's jobs are a partition of `--fast` rather than independent filters,
     # which is what makes it safe to run them on separate runners: no step can be in two
     # and none in none.
-    parts = [checks, frontend, geometry, suite_a, suite_b, sweeps]
+    parts = [checks, frontend, typecheck, geometry, suite_a, suite_b, sweeps]
     assert set().union(*parts) == fast
     for index, part in enumerate(parts):
         for other in parts[index + 1 :]:
             assert not part & other
     # The cheap frontend source floor remains in `--edit`; the full-page browser contract
     # is broad. The other partition lanes remain wholly broad.
-    assert edit <= checks | frontend
+    assert edit <= checks | frontend | typecheck
     assert {step.name for step in validate.STEPS if step.frontend and not step.broad} == {
         "browser floor (biome, eslint, tsc, node:test)",
+    }
+    assert {step.name for step in validate.STEPS if step.typecheck} == {
+        "type floor (basedpyright)",
     }
     assert all(step.broad for step in validate.STEPS if step.geometry), (
         "a non-broad step in --geometry would put part of --edit on a second runner"
@@ -2121,8 +2368,8 @@ def test_the_pull_request_surface_defers_only_what_was_measured() -> None:
 def test_the_pull_request_runs_its_sweeps_and_its_suite_apart() -> None:
     """Which steps leave the `checks` job for a runner of their own, and why each did.
 
-    `frontend`, `sweep`, `suite_a`, `suite_b`, and `geometry` decide which pull-request
-    job runs a step. All five default to False, so the failure mode of forgetting one is
+    `frontend`, `sweep`, `suite_a`, `suite_b`, `geometry`, and `typecheck` decide which
+    pull-request job runs a step. All six default to False, so forgetting one makes
     a slower `checks` job rather than a step nobody runs -- the safe direction, as with
     `broad` and `touches`. What needs a guard is the other direction: a step moved out to
     make the `checks` job look fast. Adding a name below means typing a number next to it.
@@ -2170,9 +2417,9 @@ def test_the_pull_request_runs_its_sweeps_and_its_suite_apart() -> None:
       `--jobs 1` on a runner of its own.
 
     That measurement justified extracting the lane. The current lane has two step
-    instances, one for each deterministic whole-module shard. Both collect the same
-    quick marker selection and the shard plugin assigns every module to exactly one of
-    them. Their separate jobs reduce the lane wall without dropping a test.
+    instances, one for each measured file shard. The plugin filters before collection
+    and assigns every module to exactly one of them. Their separate jobs reduce the lane
+    wall without dropping a test or importing the other shard.
 
     The `geometry` half became the fourth job at that stage, and its rule was neither kind
     nor floor but a queue. What was left in `checks` once the lane moved out was 57 steps
@@ -2207,7 +2454,7 @@ def test_the_pull_request_runs_its_sweeps_and_its_suite_apart() -> None:
     That leaves 269.60s in `checks`, two halves within two per cent of each other. At the
     reference shape on the same box the two walls are 93.27s and 86.20s.
 
-    The current surface exposes six tier readings instead of one queue, and no coverage
+    The current surface exposes seven tier readings instead of one queue, and no coverage
     change at all: every one of these steps runs on every pull request exactly as it did
     before, which is what
     `test_the_pull_request_surface_defers_only_what_was_measured` re-checks from the
@@ -2227,7 +2474,11 @@ def test_the_pull_request_runs_its_sweeps_and_its_suite_apart() -> None:
     }
     assert {step.name for step in validate.STEPS if step.frontend} == {
         "browser floor (biome, eslint, tsc, node:test)",
+        "browser floor liveness tests",
         "workbench browser behavior in Chromium",
+    }
+    assert {step.name for step in validate.STEPS if step.typecheck} == {
+        "type floor (basedpyright)",
     }
     assert {step.name for step in validate.STEPS if step.geometry} == {
         "D-034's n=5 identity pair still reproduces",
@@ -2250,11 +2501,17 @@ def test_the_pull_request_runs_its_sweeps_and_its_suite_apart() -> None:
         {step.name for step in validate.STEPS if step.suite_a},
         {step.name for step in validate.STEPS if step.suite_b},
         {step.name for step in validate.STEPS if step.geometry},
+        {step.name for step in validate.STEPS if step.typecheck},
     ]
     assert all(
         step.fast
         for step in validate.STEPS
-        if step.frontend or step.sweep or step.suite_a or step.suite_b or step.geometry
+        if step.frontend
+        or step.sweep
+        or step.suite_a
+        or step.suite_b
+        or step.geometry
+        or step.typecheck
     )
     for index, marked in enumerate(marks):
         for other in marks[index + 1 :]:
@@ -2302,6 +2559,7 @@ def _workflow_selections(*, pull_request: bool) -> dict[str, set[str]]:
                     suite_a=namespace.suite_a,
                     suite_b=namespace.suite_b,
                     geometry=namespace.geometry,
+                    typecheck=namespace.typecheck,
                 )
             }
     return selections
@@ -2322,12 +2580,12 @@ def test_the_pull_request_jobs_partition_the_surface() -> None:
     shape is shortened by cpus and by nothing else.
 
     What a split like this risks is the gap `D-455` came through in the other direction --
-    a step in no selection, run by nobody, reported by nothing -- so the six commands are
+    a step in no selection, run by nobody, reported by nothing -- so the seven commands are
     read from the workflow and checked to be a partition rather than trusted to be.
 
     `--checks`, `--frontend`, `--geometry`, both suite shards and `--sweeps` partition
     `_select_steps` by construction, so this is really a check on the YAML: that the
-    workflow invokes all six, on a pull request, and narrows none of them with `--only`
+    workflow invokes all seven, on a pull request, and narrows none of them with `--only`
     or `--skip`.
 
     Pairwise disjointness is asserted rather than inferred from the union. Two jobs make
@@ -2344,6 +2602,7 @@ def test_the_pull_request_jobs_partition_the_surface() -> None:
         "suite-a",
         "suite-b",
         "sweeps",
+        "typecheck",
     }
     names = list(selections)
     for index, job in enumerate(names):
@@ -2357,6 +2616,122 @@ def test_the_pull_request_jobs_partition_the_surface() -> None:
     assert selections["suite-b"] == {step.name for step in validate.STEPS if step.suite_b}
     assert selections["geometry"] == {step.name for step in validate.STEPS if step.geometry}
     assert selections["frontend"] == {step.name for step in validate.STEPS if step.frontend}
+    assert selections["typecheck"] == {step.name for step in validate.STEPS if step.typecheck}
+
+
+def test_a_verified_merge_repeats_everything_not_positively_tree_reusable() -> None:
+    narrowed = validate._after_verified_pull_request(validate.STEPS)
+    assert {step.name for step in narrowed if step.fast} == {
+        "bead tree",
+        "provenance: recorded commits are reachable",
+        "campaign record",
+        # An advisory wall's tracking bead is read from the bead store, not the tree.
+        "tier ceilings are declared and not slack",
+    }
+
+    # Fail closed: a new fast step is repeated until explicitly classified.
+    unclassified = validate.Step("unclassified probe", lambda _context: "", fast=True)
+    assert validate._after_verified_pull_request([unclassified]) == [unclassified]
+
+    document = safe_load(WORKFLOW.read_text(encoding="utf-8"))
+    validate_job = document["jobs"]["validate"]
+    [finder] = [step for step in validate_job["steps"] if step.get("id") == "verified-tree"]
+    assert finder["if"] == "github.event_name == 'push'"
+    assert "devtools.verified_merge_tree" in finder["run"]
+    [gate] = [
+        step
+        for step in validate_job["steps"]
+        if step.get("name") == "Run the complete integration surface"
+    ]
+    assert gate["env"] == {
+        validate.TREE_VERIFIED_ENVIRONMENT: "${{ steps.verified-tree.outputs.run }}"
+    }
+    assert validate_job["permissions"] == {"contents": "read", "actions": "read"}
+
+
+def test_the_engine_cache_backdates_and_saves_only_a_build_for_its_exact_key() -> None:
+    """A partial restore or verified-main skip must not bless an old target as current."""
+    document = safe_load(WORKFLOW.read_text(encoding="utf-8"))
+    steps = document["jobs"]["validate"]["steps"]
+
+    key_step = next(step for step in steps if step.get("id") == "engine-key")
+    assert key_step["working-directory"] == "packing/sqsearch"
+    key_program = key_step["run"]
+    assert 'rustc_vv="$(rustc -vV)"' in key_program
+    assert "git rev-parse HEAD:packing/sqsearch" in key_program
+    assert "sha256sum | cut -c1-16" in key_program
+
+    cache_index, cache = next(
+        (index, step)
+        for index, step in enumerate(steps)
+        if step.get("name") == "Cache the Rust build for the engine"
+    )
+    assert cache["id"] == "engine-cache"
+    assert "actions/cache/restore@" in cache["uses"]
+    cache_key = cache["with"]["key"]
+    assert "${{ runner.os }}-sqsearch-" in cache_key
+    assert "${{ steps.engine-key.outputs.rustc }}" in cache_key
+    assert cache_key.endswith("${{ steps.engine-key.outputs.tree }}")
+    assert cache["with"]["restore-keys"].strip() == (
+        "${{ runner.os }}-sqsearch-${{ steps.engine-key.outputs.rustc }}-"
+    )
+
+    populate = steps[cache_index + 1]
+    assert populate["name"] == "Populate the engine cache for this exact tree"
+    assert populate["if"] == "steps.engine-cache.outputs.cache-hit != 'true'"
+    assert populate["working-directory"] == "packing/sqsearch"
+    assert populate["run"] == "cargo build --locked --release --quiet"
+
+    repair = steps[cache_index + 2]
+    assert repair["name"] == "Date the engine sources before the build restored for them"
+    assert repair["if"] == "steps.engine-cache.outputs.cache-hit == 'true'"
+    assert repair["run"] == ("git ls-files -z -- sqsearch | xargs -0 touch -t 200001010000")
+
+    save = next(
+        step
+        for step in steps
+        if step.get("name") == "Save the Rust build for the exact engine tree"
+    )
+    assert "actions/cache/save@" in save["uses"]
+    assert save["if"] == ("success() && steps.engine-cache.outputs.cache-hit != 'true'")
+    assert save["with"] == {
+        "path": cache["with"]["path"],
+        "key": "${{ steps.engine-cache.outputs.cache-primary-key }}",
+    }
+    gate_indices = [
+        index
+        for index, step in enumerate(steps)
+        if step.get("name")
+        in {"Run the required pull-request checks", "Run the complete integration surface"}
+    ]
+    assert steps.index(save) > max(gate_indices)
+    assert steps.index(save) < next(
+        index
+        for index, step in enumerate(steps)
+        if step.get("name") == "Preserve validation timings and partial logs"
+    )
+
+    # This is the formerly unsafe path: a verified main push narrows away every
+    # validation-owned engine step. The explicit miss build above still runs first.
+    assert any(step.needs_engine for step in validate.STEPS)
+    assert not any(
+        step.needs_engine for step in validate._after_verified_pull_request(validate.STEPS)
+    )
+
+
+def test_browser_floor_liveness_runs_only_with_the_frontend_node_toolchain() -> None:
+    document = safe_load(WORKFLOW.read_text(encoding="utf-8"))
+    selections = _workflow_selections(pull_request=True)
+    owners = [
+        name
+        for name, selected in selections.items()
+        if "browser floor liveness tests" in selected
+    ]
+    assert owners == ["frontend"]
+    for job_name in ("suite-a", "suite-b"):
+        steps = document["jobs"][job_name]["steps"]
+        assert not any("setup-node" in str(step.get("uses", "")) for step in steps)
+        assert not any("npm ci" in str(step.get("run", "")) for step in steps)
 
 
 def test_every_tier_band_is_declared_for_the_shape_ci_runs() -> None:
@@ -2411,6 +2786,7 @@ def test_every_tier_band_is_declared_for_the_shape_ci_runs() -> None:
         "suite_a",
         "suite_b",
         "sweeps",
+        "typecheck",
     }
 
 
@@ -2559,6 +2935,7 @@ def test_broad_is_opt_out_so_a_new_step_joins_the_edit_tier() -> None:
     assert {step.name for step in validate.STEPS if step.broad} == {
         "fast behavioral tests, shard A",
         "fast behavioral tests, shard B",
+        "browser floor liveness tests",
         "workbench browser behavior in Chromium",
         # Measured 2026-08-30: 31.6s in CI against a 43s edit tier, so carrying it there
         # would nearly double the tier for a record that changes when a witness is
