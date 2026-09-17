@@ -7,12 +7,12 @@ softschema:
   schema: schemas/session-close-report.schema.yaml
   envelope: null
   status: enforced
-count: 135
+count: 136
 generated_by: >-
   uv run --frozen --all-extras --group dev python -m devtools.close_session --render
 totals:
   sessions_measured: 87
-  sessions_unmeasured: 48
+  sessions_unmeasured: 49
   attributed:
     rollups: 129
     turns: 40048
@@ -2261,3 +2261,13 @@ sessions:
     active_union_hours: 0.48
     wall_hours: 0.48
     snapshot_incomplete: true
+- id: session-138
+  title: "N11 Overnight Review"
+  status: stopped
+  primary_bead: think-4woh
+  phases: 6
+  measured: false
+  unmeasured_reason: >-
+    native harness data unavailable; The coordinator's Claude session was still live when this record was written, and its single log also carries the parallel pull-request threads and a session-quota exhaustion from about 00:15 to 02:50 PT. No per-log receipt was generated before terminalization, and the native log does not separate this program's usage from the pull-request work that shares it.
+  rollups: []
+  codex_receipts: []

@@ -341,20 +341,21 @@ on.
 It is not the next thing, because a reassessment of what to search is queued in front
 of it.
 
-For the next supervised exact-research goal, continue BC-343 under `think-ufmk` on a
-fresh Route S planning branch.
-BC-354 stopped at Route A’s representation boundary without running a target or closing
-a physical root. Session 135 admitted the fixed T-025 support family after checker-owned
-T-025/T-026 anchors, both T-026 sentinels, the at-most-23 active-orbit ceiling, a
-canonical manifest, the complete mutation controls, and a source-distinct re-audit all
-passed.
-PR 182 then merged the instrument as `1d9c49c4` from reviewed head `609d7d62`. No
-optimizer, candidate, coverage target, or experiment ran.
-The fresh branch must register `exp-161` before scientific target access.
-BC-341 remains tentative behind a future W10 reselection and the complete Route A
-representation it still lacks.
-The current evidence, candidate dispositions, and post-W5 scientific order are in the
-synopsis’s
+For the next supervised exact-research goal, take BC-357 under `think-qqzs` after the
+owner answers the five decisions recorded in
+[X-037](../../../../packing/campaign/explorations/X-037-n11-overnight-review-and-route-slate.md):
+close the n=6 calibration bracket at 299/100 once the G5 site-merge fix is a guarded
+tool. Session 138’s overnight review measured M1 and M7 at stated scope and moved no
+bound;
+[agenda-037](../../../../packing/campaign/agendas/agenda-037-n11-relational-certificate-program.md)
+owns its queue.
+Route S (BC-343) stays open in agenda-036: Session 135 admitted the fixed
+T-025 support family, PR 182 merged the instrument as `1d9c49c4` from reviewed head
+`609d7d62`, and its fresh planning branch must register `exp-161` before scientific
+target access. BC-354 stopped at Route A’s representation boundary, and BC-341 remains
+tentative behind a future W10 reselection and the complete Route A representation it
+still lacks. The current evidence, candidate dispositions, and post-W5 scientific order
+are in the synopsis’s
 [Research Program Status and Roadmap](../../../../SYNOPSIS.md#research-program-status-and-roadmap),
 and
 [agenda-036](../../../../packing/campaign/agendas/agenda-036-n11-strategy-reset-roadmap.md)

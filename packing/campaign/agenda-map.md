@@ -2,7 +2,7 @@
 
 # Agenda map
 
-343 agenda commitments across 35 agendas, as declared in each agenda's own frontmatter.
+348 agenda commitments across 36 agendas, as declared in each agenda's own frontmatter.
 Source of truth is [`agendas/`](agendas/); this view is regenerated, never edited.
 
 An agenda's queue owns priority ordering, so this map preserves each agenda's
@@ -10,9 +10,9 @@ order rather than imposing one across them.
 
 ## The short version
 
-- **8** in_progress, **15** ready, **20** tentative, **64** blocked, **59** stopped, **177** complete.
+- **8** in_progress, **16** ready, **21** tentative, **65** blocked, **60** stopped, **178** complete.
 
-- **23 blocked commitments carry a manual condition** (`BC-016`, `BC-025`, `BC-033`, `BC-050`, `BC-115`, `BC-170`, `BC-204`, `BC-205`, `BC-212`, `BC-207`, `BC-208`, `BC-209`, `BC-215`, `BC-217`, `BC-221`, `BC-238`, `BC-248`, `BC-270`, `BC-306`, `BC-337`, `BC-327`, `BC-329`, `BC-330`). Dependency edges alone cannot make these ready; each condition is named in the table below and must be explicitly cleared.
+- **24 blocked commitments carry a manual condition** (`BC-016`, `BC-025`, `BC-033`, `BC-050`, `BC-115`, `BC-170`, `BC-204`, `BC-205`, `BC-212`, `BC-207`, `BC-208`, `BC-209`, `BC-215`, `BC-217`, `BC-221`, `BC-238`, `BC-248`, `BC-270`, `BC-306`, `BC-337`, `BC-327`, `BC-329`, `BC-330`, `BC-358`). Dependency edges alone cannot make these ready; each condition is named in the table below and must be explicitly cleared.
 
 ## Live queue
 
@@ -63,6 +63,8 @@ Commitments a session may take now, in each agenda's declared order.
 | agenda-036 | `BC-350` | tentative | 2 | insight | research | Can one uniform boundary-capacity or deformation lemma for L = 4 - epsilon turn the open n12 bracket into a… | `think-0z9b` |
 | agenda-036 | `BC-345` | tentative | 3 | insight | research | What competing local optima appear under a serious orientation-profile-organized n=11 search, and can any… | `think-7n2w` |
 | agenda-036 | `BC-351` | tentative | 3 | insight | research | Can an orientation-sensitive two- or three-parent gap lemma be summed without double counting to prove… | `think-gzjq` |
+| agenda-037 | `BC-357` | ready | 1 | correctness | measurement_validation | Does a helper-free weighted-point certificate exist for n=6 at side 299/100 with B = 9977/10000 on the… | `think-qqzs` |
+| agenda-037 | `BC-359` | tentative | 2 | insight | research | Is the integral piercing number of the T-018 site set at side 3.80 on a 37-direction net at most 11, as a… | `think-k4vb` |
 
 ## Blocked, and on what
 
@@ -134,6 +136,7 @@ A commitment blocked by other commitments names them; one blocked by something e
 | agenda-035 | `BC-337` | 2 | `BC-326` | yes | No admitted source-bound constructor derives K_TR from all 181 frames and eight signed SAT axes per frame, and no… |
 | agenda-035 | `BC-327` | 2 | `BC-325` | yes | Multiplicity semantics are not admitted across the producer, loader, capacity reader and both coverage routes; the… |
 | agenda-035 | `BC-330` | 2 | — | no | The restricted-domain threshold gate and complete matched point baseline are not admitted. |
+| agenda-037 | `BC-358` | 1 | — | no | The owner’s atom-format decision (think-g3j7): verify_claim.py accepts only unweighted 2-of-3 atoms. Also the… |
 
 ## Discharged elsewhere
 
@@ -192,6 +195,7 @@ A commitment whose exit another agenda's commitment satisfied. Recorded as an ed
 | agenda-033 | completed |  |  |  |  | 1 | 8 | 9 |
 | agenda-035 | paused |  |  |  | 4 | 2 | 8 | 14 |
 | agenda-036 | active | 1 |  | 9 |  |  | 6 | 16 |
+| agenda-037 | active |  | 1 | 1 | 1 | 1 | 1 | 5 |
 
 ## By program
 
@@ -373,8 +377,13 @@ Open frontier: `BC-221`, `BC-222`, `BC-223`, `BC-224`, `BC-225`.
 | agenda-036 | `BC-354` | complete | Can one complete same-corner availability-blocker root at side 96/25 be frozen with shared physical… |
 | agenda-036 | `BC-341` | tentative | At side 3.84, can one complete difficult occupancy or wall-contact root family be closed by proved… |
 | agenda-036 | `BC-343` | in_progress | Does T-025's exact atom-support universe admit a certificate at side 3.82 with at most 23 positive… |
+| agenda-037 | `BC-356` | complete | Which mechanisms could give a significant n=11 result beyond the one-body ceiling, how do they… |
+| agenda-037 | `BC-357` | ready | Does a helper-free weighted-point certificate exist for n=6 at side 299/100 with B = 9977/10000 on… |
+| agenda-037 | `BC-358` | blocked | Is the rows-complete covering LP with weighted-majority and floor atoms on arrangement-vertex sites… |
+| agenda-037 | `BC-359` | tentative | Is the integral piercing number of the T-018 site set at side 3.80 on a 37-direction net at most… |
+| agenda-037 | `BC-360` | stopped | Should mechanisms M2, M4, M5, M6, and M8 from the overnight slate run as lanes? |
 
-Open frontier: `BC-342`, `BC-344`, `BC-345`, `BC-348`, `BC-349`, `BC-350`, `BC-351`, `BC-352`, `BC-341`, `BC-343`.
+Open frontier: `BC-342`, `BC-344`, `BC-345`, `BC-348`, `BC-349`, `BC-350`, `BC-351`, `BC-352`, `BC-341`, `BC-343`, `BC-357`, `BC-358`, `BC-359`.
 
 ### `n11-structure-and-conditional-dots`
 
