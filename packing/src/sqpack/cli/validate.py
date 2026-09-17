@@ -122,9 +122,20 @@ TIER_FLAGS = (
     "checks",
     "sweeps",
     "geometry",
+    "typecheck",
     "fast",
 )
 TIER_IDS = (*TIER_FLAGS, "full")
+#: The measured quick-lane partition.  Keep the public tier names (`suite_a` and
+#: `suite_b`) stable; this count is the shared contract with `devtools.suite_files`.
+SUITE_SHARDS = 2
+#: The pull-request run whose required gate succeeded on this exact tracked tree.
+TREE_VERIFIED_ENVIRONMENT = "PACKING_VALIDATE_TREE_VERIFIED_BY_RUN"
+#: Homebrew's two default prefixes. CairoSVG loads `libcairo` through ctypes, which
+#: does not find either directory on a stock macOS loader path even when brew has
+#: installed the library. `packing-validate` supplies the first prefix that actually
+#: contains Cairo to its children; direct tool invocations remain the caller's concern.
+MACOS_CAIRO_LIBRARY_DIRECTORIES = (Path("/opt/homebrew/lib"), Path("/usr/local/lib"))
 #: The subprocess cap reserved for non-exhaustive selections that can approach the whole
 #: suite: the slow behavioural lane and `--push` when its selector expands to everything
 #: (D-432). The pull-request quick shards have their own measured tier ceilings and do not
@@ -148,6 +159,9 @@ FAST_SUITE_BUDGET_SECONDS = 1800.0
 #: the detection was, and deferring the whole lane would have thrown away nearly all of
 #: the value for nearly none of the cost.
 QUICK_TESTS = "not exhaustive_exact and not slow"
+#: Browser-floor liveness follows the Node toolchain to the frontend job rather than
+#: making both behavioural shards install Node.
+BROWSER_FLOOR_LIVENESS_TESTS = "tests/test_browser_floor_contract.py"
 SLOW_TESTS = "slow and not exhaustive_exact"
 EXHAUSTIVE_TESTS = "exhaustive_exact"
 BEHAVIORAL_TEST_ROOTS = ("tests", "../packages/workbench/tests")
@@ -480,10 +494,10 @@ class Step:
     enough that the pull request runs it on its own runner rather than beside the rest.
 
     `fast` says *whether* a pull request runs a step; this field, `frontend`,
-    `suite_a`, `suite_b`, and `geometry` say *which pull-request job* runs it. Every
-    sweep is also `fast`, the six selections are complements within `--fast`, and
+    `suite_a`, `suite_b`, `geometry`, and `typecheck` say *which pull-request job* runs
+    it. Every sweep is also `fast`, the seven selections are complements within `--fast`, and
     `test_the_pull_request_jobs_partition_the_surface` reads the workflow and checks all
-    six against what CI actually invokes -- so a step cannot land in no job, and no
+    seven against what CI actually invokes -- so a step cannot land in no job, and no
     step is paid for twice.
 
     The boundary is a measurement, not a topic. Four steps carry it, and on CI's
@@ -528,11 +542,11 @@ class Step:
     suite_b: bool = False
     """Assigns this step to shard B of the pull request's behavioural lane.
 
-    The two shards collect the same quick suite and use ``devtools.suite_shard`` to make
-    a deterministic, complete, disjoint whole-module assignment. Each runs alone on a
-    runner so xdist can have every cpu while module-scoped fixtures remain reusable.
+    ``devtools.suite_files`` assigns each test file to one shard from recorded costs and
+    filters before collection. The two selections are complete and disjoint, and each
+    runs alone so xdist can use every cpu while module-scoped fixtures remain reusable.
 
-    Two step instances carry these fields, one per deterministic whole-module shard.
+    Two step instances carry these fields, one per measured file shard.
     Their separate runners follow from arithmetic rather than kind. `_pytest_workers`
     sizes the lane to `cpus - jobs + 1`, because a lane that asks for every cpu beside
     two other steps oversubscribes the runner and fails ordinary tests against the
@@ -552,6 +566,13 @@ class Step:
     Like `sweep` both fields default to False, so forgetting one makes the `checks` job
     slower rather than leaving a step unrun. Their membership is pinned by the workflow
     partition contracts."""
+
+    typecheck: bool = False
+    """Assigns the type floor to its own pull-request runner.
+
+    BasedPyright is one process that outer ``--jobs`` cannot divide.  This remains part
+    of ``--edit`` locally; the flag changes only which required pull-request job owns it.
+    """
 
     geometry: bool = False
     """This step runs in the pull request's second half of `checks`, on a fourth runner.
@@ -680,6 +701,8 @@ class Step:
             tags.append("suite-a")
         elif self.suite_b:
             tags.append("suite-b")
+        elif self.typecheck:
+            tags.append("typecheck")
         elif self.geometry:
             tags.append("geometry")
         elif self.fast:
@@ -852,6 +875,7 @@ def _begin_artifacts(context: Context, selected: Sequence[Step]) -> None:
                     "VECLIB_MAXIMUM_THREADS",
                     "NUMEXPR_NUM_THREADS",
                     "BLIS_NUM_THREADS",
+                    "DYLD_FALLBACK_LIBRARY_PATH",
                     "GITHUB_SHA",
                     "GITHUB_RUN_ID",
                     "GITHUB_RUN_ATTEMPT",
@@ -880,6 +904,8 @@ def _run(
         # `--durations-min` is its ceiling, and pytest would take the last value given.
         if not any(argument.startswith("--durations") for argument in arguments):
             arguments.extend(("--durations=0", "--durations-min=0"))
+        if _SUITE_FILES_PLUGIN in arguments:
+            arguments.append(f"--test-file-costs={stem}.test-files.json")
         arguments.append(f"--junitxml={stem}.junit.xml")
     environment = dict(context.environment)
     # Nested test subprocesses must not reuse this gate's artifact configuration.
@@ -1018,6 +1044,121 @@ def _commands(
     context: Context, commands: Sequence[Sequence[str]], *, cwd: Path = PROJECT_ROOT
 ) -> str:
     outputs = [_run(context, command, cwd=cwd) for command in commands]
+    return "\n".join(output for output in outputs if output)
+
+
+def _command_groups(
+    context: Context,
+    groups: Sequence[Sequence[Sequence[str]]],
+    *,
+    cwd: Path = PROJECT_ROOT,
+) -> str:
+    """Run independent serial command groups together and retain declared output order.
+
+    Some validation contracts contain one long producer followed by several independent
+    record checks. Making each command a gate step would change the public step inventory
+    and tier shape; leaving one serial list creates an avoidable tail. Groups expose the
+    real dependency boundary while `_commands` preserves fail-fast order inside each
+    group.
+
+    An ordinary failure -- a nonzero exit, a timeout, any `Exception` -- is this step's
+    own, which is how `_run_selected` treats a failed step: the other groups run to
+    completion and the earliest declared failure is raised, so the error a run names does
+    not depend on which group finished first. Only an exception that is not an
+    `Exception`, such as `KeyboardInterrupt`, stops every subprocess the validation run
+    owns, as `_run_selected` does for the same exceptions. Stopping the shared registry
+    on an ordinary failure killed the steps running beside this one and refused every
+    subprocess started after it (`think-63ra`).
+    """
+    if not groups:
+        return ""
+    outputs: dict[int, str] = {}
+    failures: list[tuple[int, Exception]] = []
+    with ThreadPoolExecutor(max_workers=len(groups)) as pool:
+        futures = {
+            pool.submit(_commands, context, commands, cwd=cwd): index
+            for index, commands in enumerate(groups)
+        }
+        try:
+            for future in as_completed(futures):
+                index = futures[future]
+                try:
+                    outputs[index] = future.result()
+                except Exception as error:  # noqa: BLE001 - re-raised below, earliest first
+                    failures.append((index, error))
+        except BaseException:
+            for future in futures:
+                future.cancel()
+            context.processes.stop()
+            raise
+    if failures:
+        raise min(failures, key=lambda failure: failure[0])[1]
+    return "\n".join(output for index in range(len(groups)) if (output := outputs[index]))
+
+
+def _command_workers(jobs: int) -> int:
+    """How many of a step's independent subprocesses may run at once: what the box has left.
+
+    The same `cpus - jobs + 1` `_pytest_workers` argues, for the same reason: this step is
+    one of the `jobs` outer slots, so it may take the cpus the other slots leave and no
+    more, and total concurrency lands at about the cpu count rather than over it. At a
+    pull request's `--checks --jobs 3` on four cpus that is two; locally, where `--jobs`
+    defaults to the cpu count, it is one and the step runs exactly as it did serially.
+    """
+    return _pytest_workers(jobs)
+
+
+def _concurrent_commands(
+    context: Context,
+    commands: Sequence[Sequence[str]],
+    *,
+    workers: int,
+    cwd: Path = PROJECT_ROOT,
+) -> str:
+    """`_commands` for subprocesses that share nothing: the same joined output, sooner.
+
+    Each command is already its own process, so the pool here only decides how many wait
+    at once; a process pool around `subprocess` would add a process per command and
+    nothing else. Outputs are joined in declared order, whatever order they finish in, so
+    a substring check over the result reads what the serial run printed.
+
+    A failure stops what has not started and lets what is running finish, and the error
+    raised is the earliest declared command's -- the one the serial loop would have
+    stopped on -- so which failure a run reports does not depend on scheduling.
+
+    The failure rule is `_command_groups`': an ordinary failure stays inside the step, so
+    the gate's other steps keep their own verdicts, and only an exception that is not an
+    `Exception`, such as `KeyboardInterrupt`, stops every subprocess the run owns. What
+    differs is the bound: `_command_groups` starts every group at once, and this starts
+    at most `workers` commands.
+    """
+    if workers <= 1:
+        return _commands(context, commands, cwd=cwd)
+    outputs = [""] * len(commands)
+    failures: list[tuple[int, Exception]] = []
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        futures = {
+            pool.submit(_run, context, command, cwd=cwd): index
+            for index, command in enumerate(commands)
+        }
+        try:
+            for future in as_completed(futures):
+                index = futures[future]
+                if future.cancelled():
+                    continue
+                try:
+                    outputs[index] = future.result()
+                except Exception as error:  # noqa: BLE001 - re-raised below, earliest first
+                    failures.append((index, error))
+                    for pending in futures:
+                        _ = pending.cancel()
+        except BaseException:
+            for future in futures:
+                _ = future.cancel()
+            context.processes.stop()
+            raise
+    if failures:
+        raise min(failures, key=lambda failure: failure[0])[1]
     return "\n".join(output for output in outputs if output)
 
 
@@ -1276,25 +1417,26 @@ def _xdist_distribution(jobs: int) -> tuple[str, ...]:
     return () if workers == 1 else ("-n", str(workers))
 
 
+_SUITE_FILES_PLUGIN = "devtools.suite_files"
+
+
 def _quick_lane_command(jobs: int, shard: int) -> tuple[str, ...]:
     distribution = _xdist_distribution(jobs)
     loadfile = ("--dist=loadfile",) if distribution else ()
-    sharding = (
-        *loadfile,
-        "-p",
-        "devtools.suite_shard",
-        f"--suite-shard={shard}",
-    )
     return (
         sys.executable,
         "-m",
         "pytest",
         "-q",
         *BEHAVIORAL_TEST_ROOTS,
+        f"--ignore={BROWSER_FLOOR_LIVENESS_TESTS}",
         "-m",
         QUICK_TESTS,
         *distribution,
-        *sharding,
+        *loadfile,
+        "-p",
+        _SUITE_FILES_PLUGIN,
+        f"--suite-shard={shard}/{SUITE_SHARDS}",
         "-p",
         _CPU_DURATIONS_PLUGIN,
         "--durations=0",
@@ -1328,13 +1470,13 @@ def _fast_tests(context: Context, shard: int) -> str:
 
 
 def _fast_tests_a(context: Context) -> str:
-    """Run deterministic whole-module shard A of the quick lane."""
-    return _fast_tests(context, 0)
+    """Run measured pre-collection shard A of the quick lane."""
+    return _fast_tests(context, 1)
 
 
 def _fast_tests_b(context: Context) -> str:
-    """Run deterministic whole-module shard B of the quick lane."""
-    return _fast_tests(context, 1)
+    """Run measured pre-collection shard B of the quick lane."""
+    return _fast_tests(context, 2)
 
 
 #: Under xdist, exit 5 can also mean every worker failed before collection. Only a
@@ -1554,6 +1696,22 @@ def _browser_floor(context: Context) -> str:
     )
 
 
+def _browser_floor_liveness(context: Context) -> str:
+    """Exercise the pinned browser tools on the frontend runner that installs them."""
+    return _run(
+        context,
+        (
+            sys.executable,
+            "-m",
+            "pytest",
+            "-q",
+            "-p",
+            "no:cacheprovider",
+            BROWSER_FLOOR_LIVENESS_TESTS,
+        ),
+    )
+
+
 def _browser_code_in_files(context: Context) -> str:
     """No JavaScript in a Python string, and every probe file is a used function.
 
@@ -1758,45 +1916,63 @@ def _known_best_atlas(context: Context) -> str:
 
     So the seven stay here and the rebuild leaves, and what replaces it is `--sample`
     rather than nothing: the whole record layer re-derived, and a fixed recorded slice of
-    the cases rebuilt byte for byte. `known-best n=1..324 atlas rebuild` on the deferred
-    surface is the rest, and `benchmarks/gate-cost-at-324/` retains the readings.
+    the cases rebuilt byte for byte. Exact run 35123561888 later measured the sample at
+    113.69s and the seven independent record checks at 16.30s after it. They now run as
+    two command groups under this same step, so the record tail fits beneath the sample
+    without changing the tier or moving a check. `known-best n=1..324 atlas rebuild` on
+    the deferred surface is the rest, and `benchmarks/gate-cost-at-324/` retains the
+    earlier readings.
     """
-    output = _commands(
+    output = _command_groups(
         context,
         (
             (
-                sys.executable,
-                "-m",
-                "devtools.build_known_best_atlas",
-                "--check",
-                "--sample",
-            ),
-            (sys.executable, "-m", "devtools.build_composite_figure_data", "--check"),
-            (sys.executable, "-m", "devtools.render_composite_pdf", "--check"),
-            (
-                sys.executable,
-                "-m",
-                "devtools.render_known_best_contact_overlays",
-                "--check",
+                (
+                    sys.executable,
+                    "-m",
+                    "devtools.build_known_best_atlas",
+                    "--check",
+                    "--sample",
+                ),
             ),
             (
-                sys.executable,
-                "-m",
-                "devtools.profile_known_best_chunks",
-                "--check",
-            ),
-            (sys.executable, "-m", "devtools.price_contact_enumeration", "--check"),
-            (
-                sys.executable,
-                "-m",
-                "devtools.generate_contact_full_cell_control",
-                "--check",
-            ),
-            (
-                sys.executable,
-                "-m",
-                "devtools.generate_contact_structures",
-                "--check",
+                (
+                    sys.executable,
+                    "-m",
+                    "devtools.build_composite_figure_data",
+                    "--check",
+                ),
+                (sys.executable, "-m", "devtools.render_composite_pdf", "--check"),
+                (
+                    sys.executable,
+                    "-m",
+                    "devtools.render_known_best_contact_overlays",
+                    "--check",
+                ),
+                (
+                    sys.executable,
+                    "-m",
+                    "devtools.profile_known_best_chunks",
+                    "--check",
+                ),
+                (
+                    sys.executable,
+                    "-m",
+                    "devtools.price_contact_enumeration",
+                    "--check",
+                ),
+                (
+                    sys.executable,
+                    "-m",
+                    "devtools.generate_contact_full_cell_control",
+                    "--check",
+                ),
+                (
+                    sys.executable,
+                    "-m",
+                    "devtools.generate_contact_structures",
+                    "--check",
+                ),
             ),
         ),
     )
@@ -2115,13 +2291,24 @@ def _stromquist_rejection(context: Context) -> str:
 def _exact_verification(context: Context) -> str:
     """The exact certificates, and a sampled stand-in for the grid replay among them.
 
-    `_commands` runs its list in one process after another, so this step's wall is the
-    sum of seventeen subcommands and the gate's `--jobs` pool cannot see inside it. At
-    `n=1..324` the step was 84.21s on an idle ten-cpu box (three readings, spread 0.7 per
-    cent) and 133.4s on CI, where it was 70.6 per cent of a `checks` job that ran 189.09s
-    against a 195s ceiling. One member grows with the corpus and it is the one that grew:
-    `check_basic_bounds` at 34.81s of the 84.21s, against 3.58s when it arrived here
-    under `D-370`.
+    **The seventeen run concurrently, up to `_command_workers`.** They share no state --
+    none reads another's output, and the only coupling is the order-independent substring
+    check at the end -- and serially they were the floor under the `checks` job: 82.90s
+    and 96.29s of hosted step time on runs 35127260063 and 35182460400, the longest step
+    of that tier both times, in a queue whose wall was 94.65s and 96.35s. At `--checks
+    --jobs 3` on four cpus this takes the two cpus the other slots leave, so the step's
+    wall is bounded by its longest member and half the serial sum rather than by the whole
+    sum. PR #185 measured this form once, on an earlier 48-step selection: 74.96s for this
+    step in run 35050021006, where the soundness perimeter became the tier's longest unit
+    instead. That is one reading on a different selection, not a record for this tier.
+
+    Before that, `_commands` ran the list one process after another, so this step's wall
+    was the sum of seventeen subcommands and the gate's `--jobs` pool could not see inside
+    it. At `n=1..324` the step was 84.21s on an idle ten-cpu box (three readings, spread
+    0.7 per cent) and 133.4s on CI, where it was 70.6 per cent of a `checks` job that ran
+    189.09s against a 195s ceiling. One member grows with the corpus and it is the one
+    that grew: `check_basic_bounds` at 34.81s of the 84.21s, against 3.58s when it arrived
+    here under `D-370`.
 
     So the replay is sampled here and run whole on the deferred surface, as `exact
     rational grid replay`. `benchmarks/gate-cost-at-324/` retains the readings and
@@ -2131,7 +2318,7 @@ def _exact_verification(context: Context) -> str:
     when the corpus widens. The largest is now `dilation_corollary` at 26.35s, which is
     where the next second on this step would have to come from.
     """
-    output = _commands(
+    output = _concurrent_commands(
         context,
         (
             (
@@ -2228,6 +2415,7 @@ def _exact_verification(context: Context) -> str:
                 "witnesses/schadt-n029-2025-rational.yaml",
             ),
         ),
+        workers=_command_workers(context.jobs),
     )
     _require_text(
         output,
@@ -2654,11 +2842,14 @@ def _pr_rollup(context: Context) -> str:
 
 
 def _gate_budgets(context: Context) -> str:
-    # Sub-second: it reads one register and compares two sets. Records tier because it
-    # checks the declaration rather than the clock -- that every tier this command can
-    # select carries a ceiling, and that no ceiling has drifted more than the declared
-    # headroom above the cost recorded for its tier. The run's own wall is checked
-    # separately, by `gate_budgets.judge`, at the end of every whole-tier run.
+    # Sub-second: it reads one register and two workflows. Records tier because it checks
+    # the declaration rather than the clock -- that every tier this command can select
+    # carries a ceiling, that no ceiling has drifted more than the declared headroom above
+    # the cost recorded for its tier, that every pull-request tier has a recorded cost,
+    # that no record rose without attribution, and that each pull-request wall budget is
+    # inside `OR-14` and still run. The run's own wall is checked separately, by
+    # `gate_budgets.judge` at the end of every whole-tier run and by
+    # `devtools/check_pr_wall.py` in each workflow's aggregating job.
     output = _module(context, "devtools.check_gate_budgets")
     _require_text(output, "gate budget declaration passed")
     return output
@@ -3077,7 +3268,13 @@ STEPS: tuple[Step, ...] = (
         touches=(*_CORE, *_ENGINE_SRC, "packing/devtools/check_soundness_perimeter.py"),
     ),
     Step("lint floor (ruff)", _lint_floor, fast=True, records=True, touches=_ANY_PYTHON),
-    Step("type floor (basedpyright)", _type_floor, fast=True, touches=_ANY_PYTHON),
+    Step(
+        "type floor (basedpyright)",
+        _type_floor,
+        fast=True,
+        typecheck=True,
+        touches=_ANY_PYTHON,
+    ),
     # Biome is one compiled binary and the type programs remain small enough for the edit
     # tier. `fast` rather than unconditional because it needs a Node toolchain the Python
     # tiers do not.
@@ -3104,6 +3301,21 @@ STEPS: tuple[Step, ...] = (
             "**/*.mts",
             "**/*.cts",
             "**/*.css",
+        ),
+    ),
+    Step(
+        "browser floor liveness tests",
+        _browser_floor_liveness,
+        fast=True,
+        broad=True,
+        frontend=True,
+        touches=(
+            "packing/tests/test_browser_floor_contract.py",
+            "biome.json",
+            "packages/workbench/eslint.config.js",
+            "tsconfig*.json",
+            "package.json",
+            "package-lock.json",
         ),
     ),
     # 2.5s locally for 892 Python files and 188 probes: the guard parses every Python file
@@ -3405,9 +3617,9 @@ STEPS: tuple[Step, ...] = (
     # one hung test, and this step is now ordinary enough to live under it. What the lane
     # is allowed to *cost*, as against how long one hung subprocess may hang, is
     # `devtools/gate-budgets.yaml`.
-    # The pull request runs two complete collections on separate runners and the plugin
-    # assigns each module to exactly one shard. This preserves every quick test and the
-    # module fixture boundary while removing the one-job wall that exceeded its band.
+    # The pull request runs two pre-collection file selections on separate runners. The
+    # measured plugin assigns each module to exactly one shard, preserving every quick
+    # test and its fixture boundary without importing the other shard's files.
     # Scheduling-only variants were measured and refused: default 302.70s, loadscope
     # 318.54s (+5.2%), worksteal 323.69s (+6.9%).
     Step(
@@ -3736,6 +3948,7 @@ STEPS: tuple[Step, ...] = (
             *_X027_MATH,
             *_CORE,
             "packing/devtools/check_katex.py",
+            "packing/devtools/node/check-katex.mjs",
             "packing/devtools/check_math_spans.py",
             "packing/devtools/render_explainer.py",
             "packing/pyproject.toml",
@@ -3916,10 +4129,15 @@ STEPS: tuple[Step, ...] = (
         touches=(
             *_CORE,
             "packing/devtools/check_gate_budgets.py",
+            "packing/devtools/check_pr_wall.py",
             "packing/devtools/gate-budgets.yaml",
             # The step also checks that the guide still names every tier, so editing the
             # guide has to be able to fail it.
             "development.md",
+            # And it reads which tiers a pull request runs, and whether each aggregator
+            # still runs the wall check, from the workflows themselves.
+            ".github/workflows/packing-validation.yml",
+            ".github/workflows/pages.yml",
         ),
     ),
     Step(
@@ -4122,6 +4340,35 @@ def _environment_flag(name: str) -> bool:
     return value == "1"
 
 
+def _validation_environment(
+    source: dict[str, str] | None = None,
+    *,
+    host_system: str | None = None,
+    cairo_library_directories: Sequence[Path] | None = None,
+) -> dict[str, str]:
+    """Return the child environment, adding a discovered Homebrew Cairo path on macOS.
+
+    An explicitly present `DYLD_FALLBACK_LIBRARY_PATH`, including an empty value, is a
+    developer choice and wins. The narrow library-existence probe avoids changing Linux,
+    non-Homebrew macOS hosts, or a machine that does not need the workaround.
+    """
+    environment = dict(os.environ if source is None else source)
+    if (
+        host_system or platform.system()
+    ) != "Darwin" or "DYLD_FALLBACK_LIBRARY_PATH" in environment:
+        return environment
+    directories = (
+        MACOS_CAIRO_LIBRARY_DIRECTORIES
+        if cairo_library_directories is None
+        else cairo_library_directories
+    )
+    for directory in directories:
+        if (directory / "libcairo.2.dylib").is_file():
+            environment["DYLD_FALLBACK_LIBRARY_PATH"] = str(directory)
+            break
+    return environment
+
+
 @dataclass(frozen=True)
 class Selection:
     """Which steps a set of changed paths reaches, and why."""
@@ -4282,6 +4529,81 @@ def _push_test_step(base: str) -> Step:
     )
 
 
+#: Fast steps whose verdict is a pure function of the tracked tree and may therefore be
+#: reused after an exact-tree pull-request proof.  This is a positive allow-list: a new
+#: fast step is repeated after merge until somebody explicitly classifies it here, so a
+#: forgotten clock, network, git-graph, or side-worktree dependency fails closed.
+TREE_REUSABLE_FAST_STEPS = frozenset(
+    {
+        "soundness perimeter",
+        "lint floor (ruff)",
+        "type floor (basedpyright)",
+        "browser floor (biome, eslint, tsc, node:test)",
+        "browser floor liveness tests",
+        "browser code lives in files (embedded JavaScript, probes)",
+        "workbench browser behavior in Chromium",
+        "basin atlas",
+        "basin event record and replay",
+        "historical regressions",
+        "small-n exact models and local geometry",
+        "deterministic SVG rendering",
+        "known-best atlas records and sample",
+        "known-best chunk census",
+        "prospective n=101..324 source map",
+        "prospective n=101..324 safe seed",
+        "translation escape screen records and sample",
+        "abstract size-five contact-scaffold atlas",
+        "fixed-angle cell is an LP, rebuilt independently",
+        "fast behavioral tests, shard A",
+        "fast behavioral tests, shard B",
+        "golden basin maps (proved cases, checked against mathematics)",
+        "basin identity",
+        "soft-schema validation",
+        "derivation (needs sympy)",
+        "search engine (sqsearch)",
+        "lint floor (rust)",
+        "Trump exact branchwise linearized cones",
+        "H-041 Stromquist repaired-cover exact certificate",
+        "H-010 Stromquist printed-cover exact rejection",
+        "exact verification",
+        "Route S compression admission checkpoint is consistent",
+        "verifier perturbation limits",
+        "frontier corpus",
+        "frontier rigidity assessed here",
+        "generated tables in sync with frontier/",
+        "strategy catalogues",
+        "defect log",
+        "skills mirrored between .agents and .claude",
+        "X-027 mathematics parses with pinned KaTeX",
+        "synopsis agrees with the artifacts",
+        "README agrees with the directory",
+        "AGENTS.md mirrors the operating rules",
+        "agenda map agrees with the agendas",
+        "D-034's n=5 identity pair still reproduces",
+        "the decimal route still cannot price an exact pose",
+        "work accounting agrees on one unit",
+        "assembly coverage agrees with the contract",
+        "chunk taxonomy agrees with the corpus",
+        "session clocks are readable",
+        "n=5 rigidity certificates still verify",
+        "every session's cost is attributed",
+        "the branch cost rollup renders",
+        "control anchors still resolve",
+        "the borrowed lower bounds re-derive",
+        "the inventory agrees with the register",
+        "results rungs are earned and the view agrees",
+        "the synopsis headline carries every result",
+        "exact certificates are named by their records",
+        "rung figures agree with their certificates",
+        "case prose agrees with its own front matter",
+        "terminal sessions name what they cost",
+        "terminal sessions name the gate that certified them",
+        "Goebel's family reaches the sizes it reaches",
+        "differential: search energy vs validity oracle",
+    }
+)
+
+
 def _select_steps(
     *,
     only: list[str],
@@ -4294,19 +4616,18 @@ def _select_steps(
     suite_a: bool = False,
     suite_b: bool = False,
     geometry: bool = False,
+    typecheck: bool = False,
     skip: Sequence[str] = (),
 ) -> list[Step]:
     """The steps a tier and its name filters select.
 
-    `--checks`, `--frontend`, `--suite-a`, `--suite-b`, `--sweeps`, and `--geometry`
-    are the parts of `--fast`, and they exist because the pull request runs them as
-    concurrent GitHub jobs. They are a partition by construction here: five select the
-    corresponding `frontend`, `suite_a`, `suite_b`, `sweep`, or `geometry` field, and
-    `--checks` selects fast steps marked with none of those fields. No step can be in two
-    parts or in none, which is the same property that makes the quick and slow
-    behavioural lanes safe.
+    `--checks`, `--frontend`, `--suite-a`, `--suite-b`, `--sweeps`, `--geometry`, and
+    `--typecheck` are the parts of `--fast`, and they exist because the pull request runs
+    them as concurrent GitHub jobs. They are a partition by construction here: six
+    select their placement field and `--checks` selects fast steps marked with none of
+    them. No step can be in two parts or in none.
 
-    Six jobs could have divided the tier with `--only` and `--skip` instead, and that
+    Seven jobs could have divided the tier with `--only` and `--skip` instead, and that
     was rejected on the register rather than on taste. A subset of a tier has no
     declared cost: `--only` reports no tier at all, and `--skip` reports the tier it
     narrowed, so a part-tier run would have been judged against the whole tier's
@@ -4343,13 +4664,20 @@ def _select_steps(
         selected = [step for step in STEPS if step.suite_b]
     elif geometry:
         selected = [step for step in STEPS if step.geometry]
+    elif typecheck:
+        selected = [step for step in STEPS if step.typecheck]
     elif checks:
         selected = [
             step
             for step in STEPS
             if step.fast
             and not (
-                step.frontend or step.sweep or step.suite_a or step.suite_b or step.geometry
+                step.frontend
+                or step.sweep
+                or step.suite_a
+                or step.suite_b
+                or step.geometry
+                or step.typecheck
             )
         ]
     else:
@@ -4386,6 +4714,39 @@ def _select_steps(
             "`packing-validate --list` shows names"
         )
     return selected
+
+
+def _after_verified_pull_request(selected: Sequence[Step]) -> list[Step]:
+    """Keep deferred steps and anything not positively classified as tree-reusable."""
+    fast_names = {step.name for step in STEPS if step.fast}
+    unknown = TREE_REUSABLE_FAST_STEPS - fast_names
+    if unknown:
+        raise StepFailureError(
+            "tree-reuse allow-list names no current fast step: " + ", ".join(sorted(unknown))
+        )
+    return [
+        step for step in selected if not step.fast or step.name not in TREE_REUSABLE_FAST_STEPS
+    ]
+
+
+def _unless_verified(namespace: argparse.Namespace, selected: list[Step]) -> list[Step]:
+    """Apply an exact-tree proof only to the complete post-merge surface."""
+    verified_run = os.environ.get(TREE_VERIFIED_ENVIRONMENT, "").strip()
+    if not verified_run:
+        return selected
+    if _tier_id(namespace) != "full" or namespace.push:
+        raise UsageError(
+            f"{TREE_VERIFIED_ENVIRONMENT} narrows the complete surface after a merge; "
+            "it is not combined with a tier, --only or --since"
+        )
+    narrowed = _after_verified_pull_request(selected)
+    print(
+        f"== pull-request run {verified_run} passed this exact tree: "
+        f"{len(selected) - len(narrowed)} tree-reusable fast steps are not repeated, "
+        f"and {len(narrowed)} deferred or fail-closed steps still run ==\n",
+        file=sys.stderr if namespace.format == "json" else sys.stdout,
+    )
+    return narrowed
 
 
 def _execute_step(step: Step, context: Context) -> StepResult:
@@ -4645,8 +5006,11 @@ def _render_early_exit(namespace: argparse.Namespace, selected: Sequence[Step]) 
 def _summary_status(summary: RunSummary, *, strict: bool) -> int:
     failed = any(result.status == "failed" for result in summary.results)
     skipped = any(result.status == "skipped" for result in summary.results)
-    over_budget = summary.budget is not None and summary.budget.failed
-    return 1 if failed or over_budget or (strict and skipped) else 0
+    budget_blocks = summary.budget is not None and (
+        summary.budget.failed
+        or (summary.budget.status == "unknown" and summary.budget.tier is not None)
+    )
+    return 1 if failed or budget_blocks or (strict and skipped) else 0
 
 
 def _render_text(summary: RunSummary, *, strict: bool) -> int:
@@ -4682,6 +5046,18 @@ def _render_text(summary: RunSummary, *, strict: bool) -> int:
         print("THE TIER IS OUTSIDE ITS DECLARED COST BAND:")
         for reason in budget.failures:
             print(f"  - {reason}")
+        print(
+            f"{summary.selected_count} of {summary.total_count} STEPS PASSED "
+            "(the budget verdict alone failed)"
+        )
+        return _summary_status(summary, strict=strict)
+    if (
+        budget is not None
+        and budget.status == "unknown"
+        and budget.tier is not None
+        and not failed
+    ):
+        print("THE TIER'S DECLARED COST COULD NOT BE JUDGED")
         return _summary_status(summary, strict=strict)
     if failed:
         noun = "STEP" if len(failed) == 1 else "STEPS"
@@ -4732,7 +5108,7 @@ def _parser() -> ArgumentParser:
         "--checks",
         action="store_true",
         help=(
-            "run the part of --fast that is none of the other five: the Python and Rust "
+            "run the part of --fast that is none of the other six: the Python and Rust "
             "record checks, and everything that needs the Rust engine"
         ),
     )
@@ -4755,12 +5131,20 @@ def _parser() -> ArgumentParser:
     parser.add_argument(
         "--suite-a",
         action="store_true",
-        help=("run whole-module shard A of the quick behavioral lane"),
+        help=("run measured file shard A of the quick behavioral lane"),
     )
     parser.add_argument(
         "--suite-b",
         action="store_true",
-        help=("run whole-module shard B of the quick behavioral lane"),
+        help=("run measured file shard B of the quick behavioral lane"),
+    )
+    parser.add_argument(
+        "--typecheck",
+        action="store_true",
+        help=(
+            "run the part of --fast that is the type floor; the pull request gives it "
+            "a runner of its own"
+        ),
     )
     parser.add_argument(
         "--sweeps",
@@ -4862,33 +5246,34 @@ def _validate_invocation(
     suite_a: bool = False,
     suite_b: bool = False,
     geometry: bool = False,
+    typecheck: bool = False,
     since: str | None = None,
     push: bool = False,
     skip: Sequence[str] = (),
 ) -> None:
-    parts = checks or frontend or sweeps or suite_a or suite_b or geometry
+    parts = checks or frontend or sweeps or suite_a or suite_b or geometry or typecheck
     narrowed = only or skip or fast or records or edit or parts or since or push
     if strict and narrowed:
         raise UsageError(
             "--strict cannot be combined with --only, --skip, --fast, --checks, "
-            "--frontend, --suite-a, --suite-b, --sweeps, --geometry, --records, --edit, "
-            "--push, or --since"
+            "--frontend, --suite-a, --suite-b, --sweeps, --geometry, --typecheck, "
+            "--records, --edit, --push, or --since"
         )
     if edit and fast:
         raise UsageError(
             "--edit and --fast select different tiers; --fast is the wider of the two"
         )
-    if [checks, frontend, sweeps, suite_a, suite_b, geometry].count(True) > 1:
+    if [checks, frontend, sweeps, suite_a, suite_b, geometry, typecheck].count(True) > 1:
         raise UsageError(
-            "--checks, --frontend, --geometry, --suite-a, --suite-b and --sweeps are "
-            "parts of --fast; "
-            "ask for --fast to run them all, or for one of them to run that part"
+            "--checks, --frontend, --geometry, --suite-a, --suite-b, --sweeps and "
+            "--typecheck are the seven parts of --fast; ask for --fast to run them all, "
+            "or for one of them to run that part"
         )
     if parts and (fast or records or edit or push):
         raise UsageError(
-            "--checks, --frontend, --geometry, --suite-a, --suite-b and --sweeps are "
-            "parts of --fast "
-            "and are not combined with another tier; --fast is all six of them"
+            "--checks, --frontend, --geometry, --suite-a, --suite-b, --sweeps and "
+            "--typecheck are parts of --fast and are not combined with another tier; "
+            "--fast is all seven of them"
         )
     if push and (fast or records or edit):
         raise UsageError(
@@ -4921,6 +5306,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             suite_a=namespace.suite_a,
             suite_b=namespace.suite_b,
             geometry=namespace.geometry,
+            typecheck=namespace.typecheck,
             since=namespace.since,
             push=namespace.push,
             skip=namespace.skip,
@@ -4962,11 +5348,22 @@ def main(argv: Sequence[str] | None = None) -> int:
             suite_a=namespace.suite_a,
             suite_b=namespace.suite_b,
             geometry=namespace.geometry,
+            typecheck=namespace.typecheck,
             skip=namespace.skip,
         )
+        selected = _unless_verified(namespace, selected)
         if namespace.push:
             base = namespace.since or "origin/main"
             step = _push_test_step(base)
+            # A broad fallback is one test step followed by a short tail.  With the
+            # ordinary cpu-wide outer default, that step receives one pytest worker and
+            # leaves the machine idle after the tail finishes.  Give only the implicit
+            # broad shape one outer slot; narrow selections and explicit resource choices
+            # retain their existing shape.
+            if step.broad and jobs_value is None:
+                jobs = 1
+                if inner_value is None:
+                    inner_jobs = 1
             selected = [*selected, step]
             scope = "the whole suite" if step.broad else "a reachable subset"
             print(f"== pre-push floor against {base}: tests select {scope} ==\n")
@@ -4988,8 +5385,10 @@ def main(argv: Sequence[str] | None = None) -> int:
             print()
         if namespace.budgets or namespace.list:
             return _render_early_exit(namespace, selected)
-        environment = os.environ.copy()
+        environment = _validation_environment()
         environment["PACK_JOBS"] = str(inner_jobs)
+        # A nested validator proves its own selection and must not inherit this proof.
+        _ = environment.pop(TREE_VERIFIED_ENVIRONMENT, None)
         context = Context(
             deep=deep,
             strict=strict,

@@ -138,8 +138,8 @@ hypothesis status and summarizes experiment verdicts, and the
 | Record | Count | State at the cutoff |
 | --- | ---: | --- |
 | Agendas | 36 | 16 active; 14 completed; 5 paused; 1 superseded |
-| Commitments | 348 | 178 complete; 60 stopped; 65 blocked; 16 ready; 21 tentative; 8 in progress |
-| Sessions | 136 | 84 completed; 52 stopped; all terminal |
+| Commitments | 349 | 178 complete; 60 stopped; 66 blocked; 16 ready; 21 tentative; 8 in progress |
+| Sessions | 138 | 84 completed; 54 stopped; all terminal |
 | Explorations | 34 | 20 linked to proposed hypotheses; 14 uncodified |
 | Hypotheses | 153 | 26 confirmed; 29 refuted; 50 blocked; 12 unresolved; 5 open; 28 open questions; 2 result registered; 1 abandoned; 0 running |
 | Experiments | 128 | 39 accepted; 34 rejected; 30 unresolved; 12 baseline; 11 blocked; 2 abandoned; 0 in progress |
@@ -156,15 +156,19 @@ Agendas 024–028 built on the `3.81` result with adaptive and structural routes
 Agendas 029–033 and 035 developed conditional-owner geometry, T-025/T-026, and the
 now-paused incremental follow-ups.
 [Agenda 036](packing/campaign/agendas/agenda-036-n11-strategy-reset-roadmap.md) is the
-current strategy-reset queue.
+strategy-reset queue, and
+[Agenda 037](packing/campaign/agendas/agenda-037-n11-relational-certificate-program.md)
+is the current relational-certificate queue opened by the overnight review.
 The generated agenda map, not this narrative, summarizes commitment state.
 
-All recorded sessions are terminal; Session 135 is the latest handoff.
+Session 138 is the latest terminal handoff: it stopped with its own certification
+pending under `think-4woh` and five owner decisions outstanding.
 `stopped` is not a scientific failure; it includes time limits, guarded refusals,
 administrative handoffs, and work deliberately ended after its next evidence was
 identified. The late-session arc moved from certificate production and exact dilation
 through owner geometry and bounded negative tests, then through the T-025/T-026
-publication stack and this reconciliation.
+publication stack, research-state reconciliation, the CI-efficiency block, and the
+overnight n=11 route review.
 Use the generated close report for individual session clocks and never add child-session
 resource totals to their parent roll-up.
 
@@ -174,7 +178,8 @@ Some explorations link forward through `proposes`, while others remain uncodifie
 observations or strategy notes.
 The most consequential recent synthesis is X-027’s ceiling for pure point/density
 certificates, followed by X-028’s strategy portfolio and the scoped BC303 drafts
-X-029–X-031, followed by X-032’s no-target Route S compression contract.
+X-029–X-031, followed by X-032’s no-target Route S compression contract and X-037’s
+ranked relational-certificate slate.
 A draft or proposed direction is not a registered hypothesis, and a registered
 hypothesis is not a frontier result.
 
@@ -203,17 +208,33 @@ Its three alternating local pairs reduced the rollup’s median from 47.72 to 2.
 seconds, and the first candidate hosted checks tier passed in 106.38 seconds against the
 unchanged 195-second ceiling.
 This is validation evidence, not new mathematics.
-The current order is:
+BC-355 / `think-97we` reconciled the later Pages, Packing, budgeting, and
+validation-lane work into one exact-head topology.
+[Session 136](packing/campaign/agent-sessions/session-136-ci-topology-reconciliation.md)
+stopped after the implementation handoff and
+[Session 137](packing/campaign/agent-sessions/session-137-ci-topology-continuation-recovery.md)
+recovered it; PR 188 merged as `042e791c` and PR 185 merged as `d7f9d94d`, and
+`think-97we` is closed.
+What that closure did not carry is the 180-second hosted wall: by owner decision the
+pull-request walls are advisory under the open `think-g4n9` until they hold on hosted
+runners, so BC-355’s agenda cell still records `in_progress`. The block ran no
+scientific target and changed no theorem, hypothesis verdict, n=11 bound, or frontier
+record. The current order is:
 
-1. BC-354 / `think-0t5y` stopped at Route A’s representation boundary.
+1. BC-357 / `think-qqzs` is the active block, opened by the overnight review in
+   [agenda-037](packing/campaign/agendas/agenda-037-n11-relational-certificate-program.md).
+   It closes M7’s n=6 point bracket at 299/100 after the G5 site-merge fix, a tooling
+   slice that needs no experiment registration.
+2. BC-354 / `think-0t5y` stopped at Route A’s representation boundary.
    Its source inventories found no complete 80-stratum negative-root producer, matched
    exact baseline, conditional gate, or method-distinct replay.
    No target ran and no physical root closed.
-2. BC-343 remains the active research commitment; `think-ufmk` is its sole operational
-   entry. [X-032](packing/campaign/explorations/X-032-route-s-threshold-compression.md)
-   and [H-163](packing/campaign/hypotheses/H-163-route-s-threshold-compression.md)
-   freeze T-025 as the sole matched control, its exact 119-orbit support universe, and
-   the at-most-23 positive-orbit criterion.
+3. BC-343 remains the standing Route S commitment; `think-ufmk` is its sole scientific
+   entry, on a fresh planning branch.
+   [X-032](packing/campaign/explorations/X-032-route-s-threshold-compression.md) and
+   [H-163](packing/campaign/hypotheses/H-163-route-s-threshold-compression.md) freeze
+   T-025 as the sole matched control, its exact 119-orbit support universe, and the
+   at-most-23 positive-orbit criterion.
    T-026 is only a support-and-rescaling sentinel.
    Session 134’s source-distinct review refused the first admission checkpoint.
    Session 135 then discharged all four retained guards: complete source contents bound
@@ -223,14 +244,14 @@ The current order is:
    PR 182 merged the instrument as `1d9c49c4` from reviewed head `609d7d62` after
    exact-head validation.
    No optimizer, candidate, coverage target, or `exp-161` has run.
-3. Treat A, S, global angular resources, and B as the first advisory tier.
+4. Treat A, S, global angular resources, and B as the first advisory tier.
    A is the strongest route to a material `n = 11` lower bound; S is the best bounded
    deliverable; angular resources offer a cheap optimal-face screen; and B is the
    strongest alternative mechanism after its soundness controls.
-4. Retain stronger charge algebra, geometry-dependent budgets, an `n = 12` exact-value
+5. Retain stronger charge algebra, geometry-dependent budgets, an `n = 12` exact-value
    program, and orientation structure as second-tier candidates whose first blocks must
    pay for missing premises.
-5. Keep constructive search separately budgeted after an oblique proposer control, and
+6. Keep constructive search separately budgeted after an oblique proposer control, and
    treat geometric waste accounting as a speculative candidate requiring both a local
    lemma and a non-double-counting global rule.
 
@@ -239,8 +260,9 @@ The detailed
 originally allocated five sequential merge-bounded blocks.
 BC-354 activated that schedule’s guard-refusal branch, so the Route A discriminator no
 longer follows it. BC-343’s no-target Route S instrument is admitted and merged.
-The remaining path begins with the `think-ufmk` planning block, which may register
-`exp-161` and authorize one bounded target.
+Its remaining Route S path is the `think-ufmk` planning block, which may register
+`exp-161` and authorize one bounded target; agenda-037’s relational-certificate queue
+now runs ahead of it.
 Each block starts from the preceding merge on a fresh branch and gets its own session,
 bead disposition, validation receipt, and pull request.
 
@@ -908,7 +930,7 @@ controller, not permission to blur contracts.
 ### Current Handoff
 
 [Session 138](packing/campaign/agent-sessions/session-138-n11-overnight-review.md) is
-the latest terminal scientific handoff on the overnight review branch.
+the latest terminal handoff, and the latest scientific one.
 It reviewed the n=11 record, ranked eight mechanisms that price relations between
 squares, subjected them to an independent adversarial review, and measured two.
 [X-037](packing/campaign/explorations/X-037-n11-overnight-review-and-route-slate.md)
@@ -941,17 +963,55 @@ BC-358, Route F1 relational atoms, is blocked on `think-g3j7`, `think-3xbr`, and
 `think-gyzw`. BC-359, the M3 kill test under `think-k4vb`, is tentative.
 BC-360 retires M2, M4, M5, M6, and M8 with reasons.
 
+[Session 137](packing/campaign/agent-sessions/session-137-ci-topology-continuation-recovery.md)
+is the preceding terminal handoff and the last pipeline one.
+It records the continuation of
+[Session 136](packing/campaign/agent-sessions/session-136-ci-topology-reconciliation.md)
+by two concurrent Codex threads, their interruption, and the recovery that restored the
+160 MiB snapshot cap and committed a repair for the Pages deploy that had not run since
+PR 183, pending the first main deploy.
+It then took PR 188 to green hosted CI at `be28ad5a`: the suite shards were rebalanced,
+and by owner decision the pull-request walls are advisory under `think-g4n9` until they
+hold 180 s on hosted runners.
+PR 188 merged as `042e791c` and the stacked PR 185 as `d7f9d94d`, and `think-97we` is
+closed; BC-355’s cell stays `in_progress` for those advisory walls alone.
+Neither stopped CI session changes a mathematical result.
+
 [Session 135](packing/campaign/agent-sessions/session-135-n11-route-s-guard-discharge.md)
 remains the latest Route S handoff.
-It admitted the no-target Route S instrument, and PR 182 merged it as `1d9c49c4` from
-reviewed head `609d7d62`. BC-343 stays open in
+It discharged the four guards retained by
+[Session 134](packing/campaign/agent-sessions/session-134-n11-route-s-admission.md):
+complete T-025/T-026 contents bound to a declared Git revision and repository-relative
+paths, both T-026 sentinels, a canonical source-bound nonempty selection manifest, and
+every declared mutation refusal.
+A fresh source-distinct audit found one path-alias hole; the repaired symlink refusal
+and its regression passed re-audit, so the retained receipt admits the instrument, and
+PR 182 merged it as `1d9c49c4` from reviewed head `609d7d62`. No optimizer, candidate,
+coverage target, experiment, or scientific verdict was produced.
+[X-032](packing/campaign/explorations/X-032-route-s-threshold-compression.md) owns the
+source and verdict boundary,
+[H-163](packing/campaign/hypotheses/H-163-route-s-threshold-compression.md) owns the
+prospective scientific claim, and T-026 is only a support-and-rescaling provenance
+sentinel. BC-343 stays open in
 [agenda-036](packing/campaign/agendas/agenda-036-n11-strategy-reset-roadmap.md) under
-`think-ufmk`, and its fresh planning branch must register `exp-161` before any target
-access. BC-341 remains tentative behind a future W10 reselection and the named Route A
-representation gaps.
-The scientific evidence cutoff remains main revision
-`80bcdbb0819504354e1278c37f211dd8cc2158fb`, where the T-026 lower bound remains the
-frontier.
+`think-ufmk`, whose fresh planning branch must register `exp-161` before any target
+access.
+
+BC-340, BC-353, and BC-354 are terminal.
+BC-341 remains tentative behind a future W10 reselection and the named Route A
+representation gaps, which
+[Session 133](packing/campaign/agent-sessions/session-133-n11-route-a-admission.md)
+found when it stopped BC-354 at the frozen Route A representation boundary: three source
+inventories turned up no complete 80-stratum negative-root producer, seam-safe
+shared-parent domain, rows-complete matched baseline, conditional-domain gate, or
+independent exact replay.
+No target ran, zero of the 16 physical roots closed, and that is not evidence against a
+future complete Route A representation.
+
+For the n = 11 Route A/Route S decision, the scientific evidence cutoff remains main
+revision `80bcdbb0819504354e1278c37f211dd8cc2158fb`. Later merged campaign, CI and
+workbench records are included in the repository-wide roll-up above; none promotes a
+frontier result at n = 11, so T-026 remains the n = 11 lower-bound frontier.
 
 The older BC329, weighted-atom stages 3–4, and BC303 H-160/H-162 target lanes are
 paused. Their admitted implementations, registrations, and controls remain evidence; no
@@ -1607,9 +1667,9 @@ resume the completed efficiency block.
 
 PR 93 subsequently landed two operational guards on `main` without changing this
 research entry point.
-The on-demand [`deep-gate.yml`](.github/workflows/deep-gate.yml) runs the four deferred
-checks against a pull request before merge; because it is advisory, the post-merge full
-gate remains the backstop for a pull request that does not request it.
+The on-demand [`deep-gate.yml`](.github/workflows/deep-gate.yml) runs the 11 deferred
+steps in four jobs against a pull request before merge; because it is advisory, the
+post-merge full gate remains the backstop for a pull request that does not request it.
 The push-triggered
 [`branch-mergeability.yml`](.github/workflows/branch-mergeability.yml) now reports a
 branch that cannot be merge-built even when GitHub cannot create its pull-request merge
@@ -1619,8 +1679,12 @@ push. Session 087 retains the full-gate evidence from run `34010683180` at `c743
 The later upstream efficiency corrections preserve that historical accounting.
 Session 087 reduced the then-required CI surface from `1369.60 s` to about `221.70 s`
 without removing checks.
-The R1 tree-id cache remains a separate efficiency task: 20.2 percent of measured
-deep-run work repeated, and 92 percent of that repetition came from unchanged trees.
+Exact-tree reuse is now fail-closed.
+A matching successful `packing-required` proof lets the post-merge integration job omit
+only explicitly allowlisted tree-pure fast steps; deferred and unclassified steps still
+run, and any lookup or proof failure repeats the complete surface.
+The work was motivated by the earlier measurement that 20.2 percent of deep-run work
+repeated and 92 percent of that repetition came from unchanged trees.
 Per-test CPU readings are diagnostic because child costs cannot yet be attributed
 reliably; the `12 s` call-wall backstop remains enforced.
 [D-472](defects.md) records why one hosted timing sample cannot establish a speedup.
@@ -4143,8 +4207,8 @@ in separate tables: their units differ, and the same work can appear in both.
 | Coverage | sessions |
 | --- | ---: |
 | measured | 87 |
-| unmeasured | 49 |
-| **total** | **136** |
+| unmeasured | 51 |
+| **total** | **138** |
 
 <!-- END GENERATED: session-close-report -->
 

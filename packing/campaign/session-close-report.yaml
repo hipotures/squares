@@ -7,12 +7,12 @@ softschema:
   schema: schemas/session-close-report.schema.yaml
   envelope: null
   status: enforced
-count: 136
+count: 138
 generated_by: >-
   uv run --frozen --all-extras --group dev python -m devtools.close_session --render
 totals:
   sessions_measured: 87
-  sessions_unmeasured: 49
+  sessions_unmeasured: 51
   attributed:
     rollups: 129
     turns: 40048
@@ -2261,6 +2261,26 @@ sessions:
     active_union_hours: 0.48
     wall_hours: 0.48
     snapshot_incomplete: true
+- id: session-136
+  title: "CI Topology Reconciliation"
+  status: stopped
+  primary_bead: think-97we
+  phases: 1
+  measured: false
+  unmeasured_reason: >-
+    native harness data unavailable; The collaboration harness exposed delegated task status but no native task-tree resource receipt or log identifier from which a repository roll-up could be generated.
+  rollups: []
+  codex_receipts: []
+- id: session-137
+  title: "CI Topology Continuation and Crash Recovery"
+  status: stopped
+  primary_bead: think-97we
+  phases: 3
+  measured: false
+  unmeasured_reason: >-
+    native harness data unavailable; No receipt measures this interval as one attributable cost. In the same window the Codex workbench task 01a0a837 also merged PR 189 and drafted PR 190, work on other branches, so no delta from its log belongs to this branch alone. A delta from the Session 136 Codex task 01a0a0b5 would omit that thread's share, and the Claude recovery log was still live when this record stopped, so each available source yields only a partial lower bound.
+  rollups: []
+  codex_receipts: []
 - id: session-138
   title: "N11 Overnight Review"
   status: stopped
