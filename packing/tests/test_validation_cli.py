@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import io
 import json
@@ -14,6 +15,7 @@ import signal
 import subprocess
 import sys
 import time
+from collections.abc import Callable
 from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 from textwrap import dedent
@@ -134,6 +136,14 @@ def test_artifacts_keep_a_steps_own_durations_filter(
     assert quick.count("--durations=0") == 1
     assert bare[-3:-1] == ["--durations=0", "--durations-min=0"]
     assert all(command[-1].startswith("--junitxml=") for command in commands)
+    # The quick lane also writes its per-file cost report into the same artifact, under the
+    # junit file's stem, and a pytest command without the plugin is not asked for one.
+    # `devtools.suite_files record` rebuilds the shard partition from those reports, so
+    # losing the argument would leave the next recalibration with nothing to read.
+    [costs] = [argument for argument in quick if argument.startswith("--test-file-costs=")]
+    stem = quick[-1].removeprefix("--junitxml=").removesuffix(".junit.xml")
+    assert costs == f"--test-file-costs={stem}.test-files.json"
+    assert not any(argument.startswith("--test-file-costs=") for argument in bare)
 
 
 def test_artifact_provenance_reports_a_git_failure_as_a_step_failure(
@@ -1654,6 +1664,84 @@ def test_lint_floor_reaches_the_handwritten_skill_assets(
         validate._handwritten_skill_directories()
 
 
+def test_concurrent_commands_join_in_declared_order_and_report_the_first_declared_failure(
+    tmp_path: Path,
+) -> None:
+    """`exact verification`'s seventeen subprocesses run at once and must read as serial.
+
+    The step checks its joined output for substrings, so the join is in declared order
+    whichever command finishes first; and a failure reports the earliest declared command
+    that failed -- the one the serial loop would have stopped on -- so which error a run
+    names does not depend on scheduling.
+    """
+    context = _budget_context(timeout_seconds=30, explicit=False)
+    slow_first = (
+        (sys.executable, "-c", "import time; time.sleep(0.4); print('first')"),
+        (sys.executable, "-c", "print('second')"),
+        (sys.executable, "-c", "print('third')"),
+    )
+    started = time.perf_counter()
+    output = validate._concurrent_commands(context, slow_first, workers=3)
+    assert output.splitlines() == ["first", "second", "third"]
+    assert time.perf_counter() - started < 2.0
+
+    marker = tmp_path / "never-started"
+    failing = (
+        (sys.executable, "-c", "import time; time.sleep(0.4); raise SystemExit(11)"),
+        (sys.executable, "-c", "raise SystemExit(12)"),
+        (sys.executable, "-c", "import time; time.sleep(1.5)"),
+        (sys.executable, "-c", f"from pathlib import Path; Path({str(marker)!r}).touch()"),
+    )
+    with pytest.raises(validate.StepFailureError, match="command exited 11"):
+        validate._concurrent_commands(context, failing, workers=2)
+    # The 1.5s command held a worker, so the fourth was still queued when the first
+    # failure arrived and was cancelled rather than started.
+    assert not marker.exists()
+    # A failure inside the step is the step's own: it does not stop the validation run, so
+    # the gate's other steps can still start subprocesses.
+    assert not context.processes.stopping
+
+
+def test_exact_verification_takes_the_cpus_its_neighbours_leave(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Two of four cpus at the pull request's `--checks --jobs 3`, serial where `--jobs`
+    already fills the machine -- the same `cpus - jobs + 1` the quick lane sizes by.
+
+    And the step asks for that bound rather than running its list serially: the pool was
+    dropped once without a recorded decision (`think-5hfr`), and nothing failed.
+    """
+    monkeypatch.setattr(os, "process_cpu_count", lambda: 4)
+    assert validate._command_workers(3) == 2
+    assert validate._command_workers(4) == 1
+    assert validate._command_workers(1) == 4
+
+    requested: list[tuple[int, int]] = []
+
+    def record(
+        _context: validate.Context,
+        commands: tuple[tuple[str, ...], ...],
+        *,
+        workers: int,
+        **_options: object,
+    ) -> str:
+        requested.append((len(commands), workers))
+        raise validate.StepFailureError("recorded")
+
+    def serial(*_arguments: object, **_options: object) -> str:
+        message = "exact verification ran its members serially"
+        raise AssertionError(message)
+
+    monkeypatch.setattr(validate, "_concurrent_commands", record)
+    monkeypatch.setattr(validate, "_commands", serial)
+    context = validate.Context(deep=False, strict=False, jobs=3, inner_jobs=1, environment={})
+    with pytest.raises(validate.StepFailureError, match="recorded"):
+        validate._exact_verification(context)
+    [(count, workers)] = requested
+    assert count > 1
+    assert workers == 2
+
+
 def test_multi_command_step_stops_at_first_failure_without_printing_success(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
@@ -1722,6 +1810,155 @@ def test_independent_command_groups_overlap_but_keep_serial_order_within_each(
     assert finished.index("a1") < finished.index("a2")
     assert finished.index("b1") < finished.index("b2")
     assert output.splitlines() == ["a1", "a2", "b1", "b2"]
+
+
+def _python(source: str) -> tuple[str, ...]:
+    return (sys.executable, "-c", source)
+
+
+def _isolated_context(jobs: int) -> validate.Context:
+    """A context whose subprocesses write no gate artifacts, whatever runs this test."""
+    environment = os.environ.copy()
+    environment.pop("PACKING_VALIDATION_ARTIFACT_DIR", None)
+    return validate.Context(
+        deep=False, strict=False, jobs=jobs, inner_jobs=1, environment=environment
+    )
+
+
+def _failing_groups_step() -> validate.Step:
+    """A step whose command groups fail with an ordinary nonzero exit (`think-63ra`)."""
+
+    def action(context: validate.Context) -> str:
+        return validate._command_groups(
+            context,
+            (
+                (_python("import time; time.sleep(0.3); raise SystemExit(3)"),),
+                (_python("print('sibling group')"),),
+            ),
+        )
+
+    return validate.Step("command groups that fail", action, fast=True)
+
+
+def test_a_failing_command_group_finishes_its_siblings_and_names_the_first_declared(
+    tmp_path: Path,
+) -> None:
+    """Running groups finish, and the error is the earliest declared group's, whichever
+    group failed first -- so the failure a run reports does not depend on scheduling."""
+    marker = tmp_path / "sibling-finished"
+    context = _isolated_context(jobs=1)
+    with pytest.raises(validate.StepFailureError, match="command exited 3"):
+        validate._command_groups(
+            context,
+            (
+                (_python("import time; time.sleep(0.6); raise SystemExit(3)"),),
+                (_python("raise SystemExit(4)"),),
+                (
+                    _python(
+                        "import time; from pathlib import Path; time.sleep(1.2); "
+                        f"Path({str(marker)!r}).touch()"
+                    ),
+                ),
+            ),
+        )
+    assert marker.exists()
+    assert not context.processes.stopping
+
+
+def test_a_failing_command_group_does_not_kill_a_concurrent_step(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """At `--jobs 2`, a group's nonzero exit fails its own step and nothing beside it.
+
+    Before `think-63ra` the failure stopped the run-wide process registry, and the
+    unrelated step running beside it reported `command exited -15`.
+    """
+    monkeypatch.setattr(validate, "ACTIVITY_MARKER", tmp_path / ".gate-running")
+
+    def neighbour(context: validate.Context) -> str:
+        return validate._run(context, _python("import time; time.sleep(2); print('ok')"))
+
+    steps = [
+        _failing_groups_step(),
+        validate.Step("an unrelated concurrent step", neighbour, fast=True),
+    ]
+    summary = validate._run_selected(steps, _isolated_context(jobs=2), [])
+    failing, unrelated = summary.results
+    assert failing.status == "failed"
+    assert "command exited 3" in failing.reason
+    assert (unrelated.status, unrelated.reason) == ("passed", "")
+
+
+def test_a_failing_command_group_does_not_refuse_later_steps(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """At `--jobs 1`, a step that starts after a group's failure still runs its commands.
+
+    Before `think-63ra` the registry stayed stopping for the rest of the run, so every
+    later step reported `validation is stopping; rejected new subprocess`.
+    """
+    monkeypatch.setattr(validate, "ACTIVITY_MARKER", tmp_path / ".gate-running")
+
+    def later(context: validate.Context) -> str:
+        return validate._run(context, _python("print('later step ran')"))
+
+    steps = [_failing_groups_step(), validate.Step("a later step", later, fast=True)]
+    summary = validate._run_selected(steps, _isolated_context(jobs=1), [])
+    failing, following = summary.results
+    assert failing.status == "failed"
+    assert (following.status, following.output) == ("passed", "later step ran")
+
+
+class _Interrupt(KeyboardInterrupt):
+    """A `KeyboardInterrupt`-class exception raised from inside one group or command."""
+
+
+def _groups_pool(
+    context: validate.Context, first: tuple[str, ...], second: tuple[str, ...]
+) -> str:
+    return validate._command_groups(context, ((first,), (second,)))
+
+
+def _bounded_pool(
+    context: validate.Context, first: tuple[str, ...], second: tuple[str, ...]
+) -> str:
+    return validate._concurrent_commands(context, (first, second), workers=2)
+
+
+@pytest.mark.parametrize("pool", [_groups_pool, _bounded_pool], ids=["groups", "bounded"])
+def test_an_interrupt_inside_a_command_pool_still_stops_the_whole_run(
+    pool: Callable[[validate.Context, tuple[str, ...], tuple[str, ...]], str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Only an exception that is not an `Exception` stops every subprocess the run owns.
+
+    The other half of `think-63ra`: keeping ordinary failures inside the step must not
+    also keep an interrupt there. A 30-second sibling is killed rather than awaited, and
+    the registry refuses anything started afterwards.
+    """
+    run = validate._run
+
+    def interrupting(
+        context: validate.Context,
+        command: tuple[str, ...],
+        *,
+        cwd: Path = validate.PROJECT_ROOT,
+    ) -> str:
+        if command == ("interrupt",):
+            deadline = time.monotonic() + 5
+            while not context.processes._pids and time.monotonic() < deadline:
+                time.sleep(0.01)
+            raise _Interrupt
+        return run(context, command, cwd=cwd)
+
+    monkeypatch.setattr(validate, "_run", interrupting)
+    context = _isolated_context(jobs=1)
+    sleeper = _python("import time; time.sleep(30)")
+    started = time.monotonic()
+    with pytest.raises(_Interrupt):
+        pool(context, sleeper, ("interrupt",))
+    assert time.monotonic() - started < 15
+    assert context.processes.stopping
 
 
 def test_frontier_contract_accepts_the_declared_schema_metadata(
@@ -2518,6 +2755,29 @@ def test_the_pull_request_runs_its_sweeps_and_its_suite_apart() -> None:
             assert not marked & other
 
 
+def _workflow_commands(*, pull_request: bool) -> dict[str, argparse.Namespace]:
+    """Each Linux gate job's parsed `packing-validate` command on this event, by job name.
+
+    `macos-portability` is excluded here for the reason `_workflow_selections` gives.
+    """
+    condition = "github.event_name == 'pull_request'"
+    negation = "github.event_name != 'pull_request'"
+    excluded = negation if pull_request else condition
+    document = safe_load(WORKFLOW.read_text(encoding="utf-8"))
+    commands: dict[str, argparse.Namespace] = {}
+    for job_name, job in document["jobs"].items():
+        if job_name == "macos-portability" or excluded in str(job.get("if", "")):
+            continue
+        for step in job.get("steps", []):
+            command = str(step.get("run", ""))
+            if "packing-validate" not in command or excluded in str(step.get("if", "")):
+                continue
+            tokens = shlex.split(command)
+            arguments = tokens[tokens.index("packing-validate") + 1 :]
+            commands[job_name] = validate._parser().parse_args(arguments)
+    return commands
+
+
 def _workflow_selections(*, pull_request: bool) -> dict[str, set[str]]:
     """What each Linux gate job actually selects on this event, by job name.
 
@@ -2530,39 +2790,26 @@ def _workflow_selections(*, pull_request: bool) -> dict[str, set[str]]:
     jobs also do, so it is not part of either partition -- and the tests that call this
     assert which jobs exist, so a new one cannot join either surface unnoticed.
     """
-    condition = "github.event_name == 'pull_request'"
-    negation = "github.event_name != 'pull_request'"
-    excluded = negation if pull_request else condition
-    document = safe_load(WORKFLOW.read_text(encoding="utf-8"))
-    selections: dict[str, set[str]] = {}
-    for job_name, job in document["jobs"].items():
-        if job_name == "macos-portability" or excluded in str(job.get("if", "")):
-            continue
-        for step in job.get("steps", []):
-            command = str(step.get("run", ""))
-            if "packing-validate" not in command or excluded in str(step.get("if", "")):
-                continue
-            tokens = shlex.split(command)
-            arguments = tokens[tokens.index("packing-validate") + 1 :]
-            namespace = validate._parser().parse_args(arguments)
-            selections[job_name] = {
-                selected.name
-                for selected in validate._select_steps(
-                    only=namespace.only,
-                    skip=namespace.skip,
-                    fast=namespace.fast,
-                    records=namespace.records,
-                    edit=namespace.edit,
-                    checks=namespace.checks,
-                    frontend=namespace.frontend,
-                    sweeps=namespace.sweeps,
-                    suite_a=namespace.suite_a,
-                    suite_b=namespace.suite_b,
-                    geometry=namespace.geometry,
-                    typecheck=namespace.typecheck,
-                )
-            }
-    return selections
+    return {
+        job_name: {
+            selected.name
+            for selected in validate._select_steps(
+                only=namespace.only,
+                skip=namespace.skip,
+                fast=namespace.fast,
+                records=namespace.records,
+                edit=namespace.edit,
+                checks=namespace.checks,
+                frontend=namespace.frontend,
+                sweeps=namespace.sweeps,
+                suite_a=namespace.suite_a,
+                suite_b=namespace.suite_b,
+                geometry=namespace.geometry,
+                typecheck=namespace.typecheck,
+            )
+        }
+        for job_name, namespace in _workflow_commands(pull_request=pull_request).items()
+    }
 
 
 def test_the_pull_request_jobs_partition_the_surface() -> None:
@@ -2647,6 +2894,44 @@ def test_a_verified_merge_repeats_everything_not_positively_tree_reusable() -> N
         validate.TREE_VERIFIED_ENVIRONMENT: "${{ steps.verified-tree.outputs.run }}"
     }
     assert validate_job["permissions"] == {"contents": "read", "actions": "read"}
+
+
+def test_a_tree_proof_narrows_only_the_complete_post_merge_surface(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """The CLI half of the post-merge reuse: where the proof applies, and what it leaves.
+
+    `_after_verified_pull_request` decides which fast steps a proof may leave out. What
+    keeps that from narrowing anything else is `_unless_verified`: a tier, `--only`,
+    `--since` or `--push` run that inherited the variable refuses rather than quietly
+    dropping part of a declared selection, and the complete surface the workflow runs
+    after a push lists exactly the narrowed selection.
+    """
+    monkeypatch.setenv(validate.TREE_VERIFIED_ENVIRONMENT, "12345")
+    for arguments in (
+        ["--checks"],
+        ["--only", "exact verification"],
+        ["--since", "HEAD"],
+        ["--push"],
+    ):
+        assert main([*arguments, "--list"]) == 2, arguments
+        assert validate.TREE_VERIFIED_ENVIRONMENT in capsys.readouterr().err, arguments
+
+    post_merge = _workflow_commands(pull_request=False)["validate"]
+    complete = _workflow_selections(pull_request=False)["validate"]
+    narrowed = {
+        step.name
+        for step in validate._after_verified_pull_request(
+            [step for step in validate.STEPS if step.name in complete]
+        )
+    }
+    assert narrowed < complete
+    skips = [part for pattern in post_merge.skip for part in ("--skip", pattern)]
+    assert main([*skips, "--list", "--format", "json"]) == 0
+    captured = capsys.readouterr()
+    assert {entry["name"] for entry in json.loads(captured.out)} == narrowed
+    # The announcement goes to stderr under `--format json`, never into the document.
+    assert "passed this exact tree" in captured.err
 
 
 def test_the_engine_cache_backdates_and_saves_only_a_build_for_its_exact_key() -> None:

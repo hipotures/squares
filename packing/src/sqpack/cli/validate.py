@@ -1059,12 +1059,21 @@ def _command_groups(
     record checks. Making each command a gate step would change the public step inventory
     and tier shape; leaving one serial list creates an avoidable tail. Groups expose the
     real dependency boundary while `_commands` preserves fail-fast order inside each
-    group. Any failure stops every subprocess owned by the validation run, as a failure
-    in the outer step pool does.
+    group.
+
+    An ordinary failure -- a nonzero exit, a timeout, any `Exception` -- is this step's
+    own, which is how `_run_selected` treats a failed step: the other groups run to
+    completion and the earliest declared failure is raised, so the error a run names does
+    not depend on which group finished first. Only an exception that is not an
+    `Exception`, such as `KeyboardInterrupt`, stops every subprocess the validation run
+    owns, as `_run_selected` does for the same exceptions. Stopping the shared registry
+    on an ordinary failure killed the steps running beside this one and refused every
+    subprocess started after it (`think-63ra`).
     """
     if not groups:
         return ""
     outputs: dict[int, str] = {}
+    failures: list[tuple[int, Exception]] = []
     with ThreadPoolExecutor(max_workers=len(groups)) as pool:
         futures = {
             pool.submit(_commands, context, commands, cwd=cwd): index
@@ -1072,13 +1081,85 @@ def _command_groups(
         }
         try:
             for future in as_completed(futures):
-                outputs[futures[future]] = future.result()
+                index = futures[future]
+                try:
+                    outputs[index] = future.result()
+                except Exception as error:  # noqa: BLE001 - re-raised below, earliest first
+                    failures.append((index, error))
         except BaseException:
             for future in futures:
                 future.cancel()
             context.processes.stop()
             raise
+    if failures:
+        raise min(failures, key=lambda failure: failure[0])[1]
     return "\n".join(output for index in range(len(groups)) if (output := outputs[index]))
+
+
+def _command_workers(jobs: int) -> int:
+    """How many of a step's independent subprocesses may run at once: what the box has left.
+
+    The same `cpus - jobs + 1` `_pytest_workers` argues, for the same reason: this step is
+    one of the `jobs` outer slots, so it may take the cpus the other slots leave and no
+    more, and total concurrency lands at about the cpu count rather than over it. At a
+    pull request's `--checks --jobs 3` on four cpus that is two; locally, where `--jobs`
+    defaults to the cpu count, it is one and the step runs exactly as it did serially.
+    """
+    return _pytest_workers(jobs)
+
+
+def _concurrent_commands(
+    context: Context,
+    commands: Sequence[Sequence[str]],
+    *,
+    workers: int,
+    cwd: Path = PROJECT_ROOT,
+) -> str:
+    """`_commands` for subprocesses that share nothing: the same joined output, sooner.
+
+    Each command is already its own process, so the pool here only decides how many wait
+    at once; a process pool around `subprocess` would add a process per command and
+    nothing else. Outputs are joined in declared order, whatever order they finish in, so
+    a substring check over the result reads what the serial run printed.
+
+    A failure stops what has not started and lets what is running finish, and the error
+    raised is the earliest declared command's -- the one the serial loop would have
+    stopped on -- so which failure a run reports does not depend on scheduling.
+
+    The failure rule is `_command_groups`': an ordinary failure stays inside the step, so
+    the gate's other steps keep their own verdicts, and only an exception that is not an
+    `Exception`, such as `KeyboardInterrupt`, stops every subprocess the run owns. What
+    differs is the bound: `_command_groups` starts every group at once, and this starts
+    at most `workers` commands.
+    """
+    if workers <= 1:
+        return _commands(context, commands, cwd=cwd)
+    outputs = [""] * len(commands)
+    failures: list[tuple[int, Exception]] = []
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        futures = {
+            pool.submit(_run, context, command, cwd=cwd): index
+            for index, command in enumerate(commands)
+        }
+        try:
+            for future in as_completed(futures):
+                index = futures[future]
+                if future.cancelled():
+                    continue
+                try:
+                    outputs[index] = future.result()
+                except Exception as error:  # noqa: BLE001 - re-raised below, earliest first
+                    failures.append((index, error))
+                    for pending in futures:
+                        _ = pending.cancel()
+        except BaseException:
+            for future in futures:
+                _ = future.cancel()
+            context.processes.stop()
+            raise
+    if failures:
+        raise min(failures, key=lambda failure: failure[0])[1]
+    return "\n".join(output for output in outputs if output)
 
 
 def _require_text(output: str, *needles: str) -> None:
@@ -2210,13 +2291,24 @@ def _stromquist_rejection(context: Context) -> str:
 def _exact_verification(context: Context) -> str:
     """The exact certificates, and a sampled stand-in for the grid replay among them.
 
-    `_commands` runs its list in one process after another, so this step's wall is the
-    sum of seventeen subcommands and the gate's `--jobs` pool cannot see inside it. At
-    `n=1..324` the step was 84.21s on an idle ten-cpu box (three readings, spread 0.7 per
-    cent) and 133.4s on CI, where it was 70.6 per cent of a `checks` job that ran 189.09s
-    against a 195s ceiling. One member grows with the corpus and it is the one that grew:
-    `check_basic_bounds` at 34.81s of the 84.21s, against 3.58s when it arrived here
-    under `D-370`.
+    **The seventeen run concurrently, up to `_command_workers`.** They share no state --
+    none reads another's output, and the only coupling is the order-independent substring
+    check at the end -- and serially they were the floor under the `checks` job: 82.90s
+    and 96.29s of hosted step time on runs 35127260063 and 35182460400, the longest step
+    of that tier both times, in a queue whose wall was 94.65s and 96.35s. At `--checks
+    --jobs 3` on four cpus this takes the two cpus the other slots leave, so the step's
+    wall is bounded by its longest member and half the serial sum rather than by the whole
+    sum. PR #185 measured this form once, on an earlier 48-step selection: 74.96s for this
+    step in run 35050021006, where the soundness perimeter became the tier's longest unit
+    instead. That is one reading on a different selection, not a record for this tier.
+
+    Before that, `_commands` ran the list one process after another, so this step's wall
+    was the sum of seventeen subcommands and the gate's `--jobs` pool could not see inside
+    it. At `n=1..324` the step was 84.21s on an idle ten-cpu box (three readings, spread
+    0.7 per cent) and 133.4s on CI, where it was 70.6 per cent of a `checks` job that ran
+    189.09s against a 195s ceiling. One member grows with the corpus and it is the one
+    that grew: `check_basic_bounds` at 34.81s of the 84.21s, against 3.58s when it arrived
+    here under `D-370`.
 
     So the replay is sampled here and run whole on the deferred surface, as `exact
     rational grid replay`. `benchmarks/gate-cost-at-324/` retains the readings and
@@ -2226,7 +2318,7 @@ def _exact_verification(context: Context) -> str:
     when the corpus widens. The largest is now `dilation_corollary` at 26.35s, which is
     where the next second on this step would have to come from.
     """
-    output = _commands(
+    output = _concurrent_commands(
         context,
         (
             (
@@ -2323,6 +2415,7 @@ def _exact_verification(context: Context) -> str:
                 "witnesses/schadt-n029-2025-rational.yaml",
             ),
         ),
+        workers=_command_workers(context.jobs),
     )
     _require_text(
         output,
