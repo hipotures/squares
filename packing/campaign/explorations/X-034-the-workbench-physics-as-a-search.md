@@ -267,8 +267,9 @@ What this shows:
   graph and rigid clusters.
 - **Continuation, 2026-09-16:** [X-036](X-036-graded-guidance-for-annealing.md) turns
   those levels into a staged, fixed-work program.
-  It separates ordinary pair stickiness from structural guidance, adds shuffled and
-  damaged-structure controls, and requires a valid-side improvement before target
+  It separates ordinary pair stickiness from structural guidance, adds controls that
+  change the supplied information (split-merge partitions, rewired graphs and
+  wrong-feature assignments), and requires a valid-side improvement before target
   recovery can support a search claim.
 
 ## Evidence

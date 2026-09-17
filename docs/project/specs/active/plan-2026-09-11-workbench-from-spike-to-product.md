@@ -16,7 +16,7 @@ physical-response acceptance and the Phase 5/5A Search and guidance gates remain
 
 **Tracking:** `think-ooi2` (product epic), `think-zisr` (standalone package),
 `think-4uu3` (Animate kinetics and timing), `think-c0rm` (graded guidance), `think-0epc`
-(stickiness and guidance experiments)
+(systematic guided sweep, a research consumer)
 
 **Reviewed baseline:** `6e191a35`; prior committed checkpoint `0f2ac8ce`, with findings
 in the
@@ -77,13 +77,13 @@ packing-validity contract (`ec0a0604`, page readouts `c0d9db2b`).
 | O5 — Experimental Search | Run many Pack trials, cancel with honest partial accounting, inspect the best valid arrangement and outcome distributions, and use calibration/held-out presets. | The same trial matches Pack and headless output; manifests reproduce disjoint-block reports; invalid outcomes never rank; tuning and held-out cohorts are explicit. Search ships after the clean Pack/Animate release boundary. |
 | O6 — Clear, accessible UI | Use mode-specific controls and presentation/research layers, readable responsive layout, keyboard interaction and reduced-motion playback. | Browser checks exercise startup, tab switches, focus, transport, labels and representative viewport sizes; the consumer audit dispositions existing UI defects and preserves working behavior. |
 | O7 — Reproducible publication and maintenance | Follow a package quickstart, build a static Pages artifact, and verify the deployed workbench under `/squares/workbench/`. | Strict Python/TS/JS floors discover all live source; required CI and full checkpoint pass; source/build identity and post-deploy behavior agree; the explainer link stays under `/squares/`. |
-| O8 — Graded structural guidance | Run and compare unguided, touching-component-partition, contact-graph, and oriented-face-pairs targets at controlled strengths and schedules. Inspect the supplied structure and the structure the run realizes. | Node and browser consume one versioned target and application configuration; a zero-strength canonical receipt is byte-for-byte the unguided receipt, and the un-normalized and small-strength kernel controls pass. A replayable demonstration cohort, covering each tier with its zero-strength arm on a declared known-answer cell, produces the same canonical receipts, overlays and reports in Node and the pinned Chromium build. No packing improvement is an acceptance condition. |
+| O8 — Graded structural guidance | Run and compare unguided, touching-component-partition, contact-graph, and oriented-face-pairs targets at controlled strengths and schedules. Inspect the supplied structure and the structure the run realizes. | Node and browser consume one versioned target and application configuration; a zero-strength canonical receipt is byte-for-byte the unguided receipt, and the un-normalized and small-strength kernel controls pass. A replayable demonstration cohort, covering each tier with its zero-strength arm on a declared known-answer cell, produces the same canonical receipts and reports in Node and the pinned Chromium build (`think-10yz`), and the browser draws its overlays from those receipts (`think-czav`). No packing improvement is an acceptance condition. |
 
 The Phase 4 checkpoint delivers O1, O2, O4, O6 and O7 with a reusable single-run core.
-Phase 5 completes O3 and O5. Phase 5A completes O8, then reruns the complete outcome set;
-its guided Search receipts follow the base Search scheduler, which follows Pack/Animate
-merge readiness and so Phase 2A. The research sweeps that consume Phase 5A are not
-product outcomes.
+Phase 5 completes O3 and O5. Phase 5A completes O8, then reruns the complete outcome
+set; its guided Search receipts follow the base Search scheduler, which follows
+Pack/Animate merge readiness and so Phase 2A. The research sweeps that consume Phase 5A
+are not product outcomes.
 Local Python/Rust services, universal cross-language trajectory identity, new
 mathematical discoveries, and unbounded resource support are separate future work; the
 browser exposes only the capabilities implemented by its static build.
@@ -347,15 +347,14 @@ checks use. The application configuration carries, per use, the strength where t
 has one, its schedule, and the policy for non-target pairs.
 The requested configuration is kept in a requested-guidance record beside the receipt.
 The canonical effective receipt omits inert uses, so a zero-strength run’s canonical
-receipt is byte-for-byte identical to the unguided control’s.
-Because that tests canonicalization, the kernel also runs un-normalized at strength
-exactly zero, which must reproduce the unguided trajectory, and at a declared descending
-ladder of small strengths, whose short-horizon pose difference must shrink toward zero.
+receipt is byte-for-byte identical to the unguided control’s. Because that tests
+canonicalization, the kernel also runs un-normalized at strength exactly zero, which
+must reproduce the unguided trajectory, and at a declared descending ladder of small
+strengths, whose short-horizon pose difference must shrink toward zero.
 Measured CPU and wall time sit beside the receipt, not in it; CPU time is measured in
-Node only.
-A physical trace keeps three layers distinct: raw kernel states diagnose the solver,
-corrected stored states show the path retained for playback, and deterministic 60 Hz
-presentation samples reproduce the positions the browser supplies to its painter.
+Node only. A physical trace keeps three layers distinct: raw kernel states diagnose the
+solver, corrected stored states show the path retained for playback, and deterministic
+60 Hz presentation samples reproduce the positions the browser supplies to its painter.
 The command reports all three; presentation samples, not an internal timestep, decide
 whether the user-visible path meets its continuity budget.
 A browser screenshot is never required to decide whether a path rings, jumps,
@@ -615,10 +614,10 @@ outcome at this boundary.
 
 | Bead | Deliverable | Done when |
 | --- | --- | --- |
-| `think-gfqt` | Bounded experimental multi-run scheduler. | Configurations from `think-6qxx` vary proposal, force/contact model, annealing/container schedule, repair and objective; repeated Pack runs report progress, cancellation and exact work/seed manifests without blocking interaction. The current `n ≤ 32`, eight-seed, 5,000-step preview does not meet this responsiveness or configuration contract. |
+| `think-gfqt` | Bounded experimental multi-run scheduler. | Configurations from `think-6qxx` vary proposal, force/contact model, annealing/container schedule, repair and objective; repeated Pack runs report progress, cancellation and exact work/seed manifests without blocking interaction; a Node command runs a Search plan headlessly and writes the ledger that `think-i5pg` re-admits. The current `n ≤ 32`, eight-seed, 5,000-step preview does not meet this responsiveness or configuration contract. |
 | `think-i5pg` | Make Search ledgers independently checkable. | Decode and re-admit each outcome, derive block, budget and `n` from the plan, isolate nonfinite partial encoding failures, and make growth settings effective or reject them. A forged outcome cannot change the summary by supplying its own plan fields. |
 | `think-vhgz` | Complete Search over the shared scheduler. | Best valid poses, rates, status counts, disjoint-block distributions and replay/export agree with headless output; empty or interrupted cohorts are explicit. The preview tab remains exploratory until these views and controls pass. |
-| `think-3yma` | Calibration and held-out presets. | Campaign manifest fixes tuning/held-out partitions before execution; configuration-level distributions and individual best poses are distinguished; replay preserves the partition. |
+| `think-3yma` | Calibration and held-out presets. | Presets load a tuning/held-out partition declared in a campaign manifest before execution, tested on a fixture manifest, and do not wait for any research partition; configuration-level distributions and individual best poses are distinguished; replay preserves the partition. |
 | `think-wln2` | Final end-to-end acceptance. | Every O1–O8 journey passes, documentation matches the product, required/full checks pass, and the released revision has a live smoke receipt. |
 
 `think-gfqt` starts after Phase 4 readiness and the corrected reporter/registry;
@@ -627,16 +626,18 @@ outcome at this boundary.
 calibration, the Phase 5A product deliverables and release verification.
 The existing research harness `think-k2fr`, hypothesis work `think-a87q`, and later
 sweeps `think-fj07` consume these contracts rather than adding another engine.
-The graded-guidance rounds (`think-0epc` and the unguided stickiness curve) are consumers
-in the same way.
+The graded-guidance rounds (`think-0epc` and the unguided stickiness curve) are
+consumers in the same way.
 Research run authorization and pre-registration remain separate from shipping the
 instruments.
 
 A registered cohort sets `timeoutMs` to null, because `SearchSlot.timeoutMs` lets a
 wall-clock deadline change a slot’s status and partial result
-(`packages/workbench/src/search/scheduler.ts`).
-Receipt identity hashes the canonical `SearchTrialValue` or its versioned successor,
-never `SearchOutcome`, whose `elapsedMs` is wall time.
+(`packages/workbench/src/search/scheduler.ts`). Receipt identity hashes the canonical
+`SearchTrialValue` or its versioned successor, never `SearchOutcome`, whose `elapsedMs`
+is wall time. That successor stores the canonical effective configuration; today
+`SearchTrialValue.configuration` copies the declared configuration and adds the seeds
+(`packages/workbench/src/search/pack-runner.ts`).
 
 The objective always reports absolute side for valid geometry.
 Reference-relative metrics require an identified finite reference and a positive
@@ -654,17 +655,19 @@ A comparison may vary both, but its requested-guidance record, receipt and repor
 keep the two axes separate.
 They are one control today: the kernel’s `relatedMask` restricts ordinary pair-law
 attraction to masked pairs, Search accepts `related_mask`, and the page builds masks
-from blocks and contact graphs. `think-8ocb` moves that path into the target and
-application contracts, and registered cohorts refuse a non-null `related_mask` until
-`think-os1n` adds a separate guidance force.
+from blocks and contact graphs.
+`think-8ocb` moves that path into the target and application contracts, and registered
+cohorts refuse a non-null `related_mask` until `think-os1n` adds a separate guidance
+force.
 
 The phase’s order is not one gate.
 Contract, extraction and kernel work (`think-8ocb`, `think-rey9`, `think-os1n`) needs
 neither Phase 2A nor the Search scheduler and can start now.
 The headless loop (`think-qx88`) follows it.
-Guided Search receipts follow the loop and the base Phase 5 scheduler (`think-gfqt`),
-which itself follows Pack/Animate merge readiness and therefore Phase 2A.
-The controls and overlays (`think-czav`) follow the guided receipts and the Search mode.
+Guided Search receipts (`think-10yz`) follow the loop and the base Phase 5 scheduler
+(`think-gfqt`), which itself follows Pack/Animate merge readiness and therefore Phase
+2A. The controls and overlays (`think-czav`) follow the guided receipts and the Search
+mode.
 
 `GuidanceTarget/v1` is one JSON-safe target shared by Node and the browser.
 Its four product tiers are `none`, `touching-component-partition`, `contact-graph`, and
@@ -679,10 +682,10 @@ reports the degrees of freedom it leaves.
 | --- | --- | --- |
 | `think-8ocb` | Version the target and application contracts and map them into PackingStrategy phases. | Supported tiers and uses round-trip through JSON; malformed or unsupported targets fail before execution; target data and application policy remain separate; `relatedMask` construction moves into them; the registered controls exist in the strategy format. |
 | `think-rey9` | Extract targets from known records. | Component, contact and oriented-face targets carry declared tolerances, symmetry/correspondence rules and ambiguity or refusal results that Python and TypeScript read identically; each record reports its component counts, feature coverage and remaining degrees of freedom. |
-| `think-os1n` | Apply scheduled guidance in the shared kernel. | A guidance force separate from the pair law composes explicitly with stickiness, collision, containment and annealing; the zero-strength canonical receipt matches the unguided receipt, and the un-normalized strength-zero and small-strength controls pass; positive, negative, symmetry and schedule-transition controls pass. |
+| `think-os1n` | Apply scheduled guidance in the shared kernel. | A guidance force separate from the pair law, applied in its own pass so it cannot change the broad-phase cell or the pair-law summation order, composes explicitly with stickiness, collision, containment and annealing; the zero-strength canonical receipt matches the unguided receipt, and the un-normalized strength-zero and small-strength controls pass; positive, negative, symmetry and schedule-transition controls pass. |
 | `think-qx88` | Run guided configurations through the headless loop and CLI. | Raw trajectories, target-recovery metrics, work, validity, stop conditions and canonical receipts replay identically in Node and the pinned Chromium build. |
-| `think-10yz` | Carry the same guided configuration through the base Search scheduler. | Search slots record the requested-guidance record beside the canonical `SearchTrialValue` receipt; Node and pinned-Chromium Search replay match the headless loop; the O8 demonstration cohort passes. |
-| `think-czav` | Expose controls and overlays in Pack and Search. | Controls show tier, source, strength and schedule; overlays distinguish requested and realized components, contacts and oriented faces; disabled states and render-cost bounds are tested. |
+| `think-10yz` | Carry the same guided configuration through the base Search scheduler. | Search slots record the requested-guidance record beside the canonical `SearchTrialValue` receipt; Node and pinned-Chromium Search replay match the headless loop; the O8 demonstration cohort’s canonical receipts and reports are identical in Node and the pinned Chromium build. Overlays are `think-czav`’s. |
+| `think-czav` | Expose controls and overlays in Pack and Search. | Controls show tier, source, strength and schedule; overlays distinguish requested and realized components, contacts and oriented faces; the O8 demonstration cohort’s overlays are drawn from its canonical receipts in the pinned Chromium build; disabled states and render-cost bounds are tested. |
 
 The shared nonvisual TypeScript kernel, configuration, seed and receipt are the source
 for both the CLI and browser.
@@ -693,11 +696,14 @@ inspect trajectories before a browser session exists.
 `think-c0rm` owns the phase.
 `think-wln2` cannot close while O8 is required and the deliverables above are
 incomplete. It does not wait for research.
-Registration (`think-gdkd`) and a headless partition freeze follow extraction, and the
-unguided stickiness curve and the systematic sweep (`think-0epc`) follow them.
-All four are research, like `think-fj07`, and gate no product outcome.
-The two measured rounds also wait on `think-o4wo` and `think-5tyy`, because their
-reports replay trials in Animate under the Phase 2A budgets.
+Registration (`think-gdkd`) and the headless partition freeze (`think-05o4`) follow
+extraction, and the unguided stickiness curve (`think-9hdg`) and the systematic guided
+sweep (`think-0epc`) follow them.
+All four are research, like `think-fj07`, and gate no product outcome; Search’s presets
+(`think-3yma`) do not wait for the partition freeze.
+The measured rounds have no kinetic guard, because Search trials run through Pack, which
+keeps no trajectory to replay in Animate.
+They reach Phase 2A only through the base scheduler, as guided receipts do.
 The annealing plan owns the detailed rung, experiment, known-answer and registration
 contracts.
 

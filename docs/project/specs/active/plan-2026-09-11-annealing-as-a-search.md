@@ -11,10 +11,10 @@ author: Claude (agent), for the repository maintainer
 
 **Author:** Claude (agent), for the repository maintainer
 
-**Status:** Active; a bounded Search preview and the headless kinetics CLI exist, but the
-shared search instrument (`think-gfqt`, `think-qx88`) does not yet meet its contract, and
-registration, physical-response and graded-guidance prerequisites block the first
-registered comparison
+**Status:** Active; a bounded Search preview and the headless kinetics CLI exist, but
+the shared search instrument (`think-gfqt`, `think-qx88`) does not yet meet its
+contract, and registration, physical-response and graded-guidance prerequisites block
+the first registered comparison
 
 **Workflow:** W7 instrument repair, W2 evidence review, then W6 for separately
 registered measurement rounds.
@@ -183,10 +183,9 @@ how much of the record does each have to be given?** Tracking: `think-c0rm`.
 Ordinary global stickiness and structural guidance are different experimental axes.
 Stickiness is a force-law parameter between nearby squares and requires no knowledge of
 a target packing. Structural guidance supplies selected relationships extracted from a
-known record.
-A run may combine them, but its requested-guidance record and its report name each
-independently, and its canonical receipt names the stickiness and whatever guidance is in
-effect.
+known record. A run may combine them, but its requested-guidance record and its report
+name each independently, and its canonical receipt names the stickiness and whatever
+guidance is in effect.
 
 **Today the two axes are one control.** The kernel’s `relatedMask`
 (`packages/workbench/src/simulation/kernel.ts`) restricts ordinary pair-law attraction
@@ -195,10 +194,10 @@ Search’s Pack configuration accepts `related_mask`
 (`packages/workbench/src/search/pack-runner.ts`), and the page builds masks from blocks
 and from a record or drawn contact graph (`AtlasRelationshipKind` in
 `packages/workbench/src/api/workbench-api.ts`, built in
-`packages/workbench/src/application.js`).
-The only guidance strength is therefore the pair law’s attraction and range.
-`think-8ocb` names this path and moves mask construction into `GuidanceTarget/v1` and the
-application configuration.
+`packages/workbench/src/application.js`). The only guidance strength is therefore the
+pair law’s attraction and range.
+`think-8ocb` names this path and moves mask construction into `GuidanceTarget/v1` and
+the application configuration.
 Until `think-os1n` adds a guidance force separate from the pair law, registered cohorts
 refuse a non-null `related_mask`.
 
@@ -220,9 +219,9 @@ A separate guidance-application configuration states, for each use:
 
 Strength belongs to a use.
 `attract`, including its aligning torque, takes a continuous strength.
-`start`, `weld` and `shake` are discrete, so each names its unguided control instead: the
-unguided proposal at the same seed, the same run with no weld, and the uniform shake.
-Constraint bands keep the strategy schema’s `band` and `weight`.
+`start`, `weld` and `shake` are discrete, so each names its unguided control instead:
+the unguided proposal at the same seed, the same run with no weld, and the uniform
+shake. Constraint bands keep the strategy schema’s `band` and `weight`.
 
 A run keeps two records.
 The **requested-guidance record** carries the target content hash, the tier and the
@@ -230,15 +229,21 @@ application configuration as requested, zero strengths included.
 It sits beside the receipt and never enters receipt identity.
 The **canonical effective receipt** omits every inert use, so for the same base
 configuration and seed a zero-strength run’s canonical receipt is byte-for-byte the
-unguided receipt.
-That identity tests the canonicalizer, not the physics, so two kernel controls go with
-it. An un-normalized run, with the target loaded and every strength exactly zero, must
+unguided receipt. That identity tests the canonicalizer, not the physics, so two kernel
+controls go with it.
+An un-normalized run, with the target loaded and every strength exactly zero, must
 reproduce the unguided trajectory, validity and outcome exactly; its guidance-evaluation
 count may differ and is reported.
+Exactness requires the guidance force to run as its own pass after the pair-law pass:
+folded into the pair loop, a guidance range could widen the broad-phase cell or change
+the order in which forces are summed, and either can change the path at zero strength.
 Over a declared short horizon, the largest pose difference from the unguided trajectory
-must shrink toward zero along a declared descending strength ladder.
-Scheduled guidance composes explicitly with ordinary stickiness, collision, containment
-and annealing.
+must not increase down a declared descending strength ladder, and at the smallest
+strength must be within a declared bound.
+The planned defaults are strengths of 1e-2, 1e-4, 1e-6 and 1e-8 of the declared unit, a
+10-step horizon, differences below 1e-12 counted as zero, and a bound of 1e-6 square
+sides. Scheduled guidance composes explicitly with ordinary stickiness, collision,
+containment and annealing.
 
 The product exposes four comparable target tiers.
 This table is also the naming table: prose uses the tier ids, and the names in the last
@@ -268,13 +273,12 @@ is not `blind` and flag their samples `guided`
 (`packages/workbench/src/simulation/trajectory.ts`); `snap` also lands on the record.
 Pack’s open-ended run does the same when its `springs` flag is on (`AtlasOptimize` in
 `packages/workbench/src/api/workbench-api.ts`), which a Search configuration requests
-with `targets: record`.
-The rung stays outside `GuidanceTarget/v1`, and a report that uses it names that rung
-rather than a guidance tier.
+with `targets: record`. The rung stays outside `GuidanceTarget/v1`, and a report that
+uses it names that rung rather than a guidance tier.
 Whether the `guided` and `springs` flags are folded into the new guidance fields is
-decided with the target contract under `think-8ocb`.
-Extraction declares symmetry and correspondence rules and refuses a requested tier when
-ambiguity cannot be resolved under those rules (`think-rey9`).
+decided with the target contract under `think-8ocb`. Extraction declares symmetry and
+correspondence rules and refuses a requested tier when ambiguity cannot be resolved
+under those rules (`think-rey9`).
 
 ### The format already exists, and the physics is outside it
 
@@ -347,7 +351,7 @@ Four additions make every approach a document (`think-8ocb`):
 3. **Rungs, controls and capabilities.** The rung list grows to cover what the runs
    actually use. The `control` enum, today `none`, `thinned` and `rewired`, gains the
    controls registered below: `shuffled` membership, a split-merge partition, a
-   wrong-feature assignment and a thinned graph’s rewired twin at equal `keep`.
+   wrong-feature assignment and a thinned graph’s rewired twin.
    Each executor declares the mechanisms and uses it supports.
    A document runs only where every phase is supported, and is refused before running
    anywhere else.
@@ -401,19 +405,21 @@ The loop is the benchmark generalised from one method’s parameters to strategi
 
 The metric vector is registered before the first round (`think-gdkd`). Search outcomes
 are packing validity, best valid side and the known-result gap.
-Guards cover independent validity, finiteness, deterministic replay, the zero-strength
-controls and, on Animate replays of the trials a report shows, the Phase 2A continuity
-budgets. Cost is the enforced Search budget and the charged pair-level work below.
+Guards cover independent validity, finiteness, deterministic replay and the
+zero-strength controls.
+Cost is the enforced Search budget and the charged pair-level work below.
 Component recovery, contact precision/recall, false contacts, oriented-face recovery and
-kinetic gaps explain mechanisms; they cannot accept a search claim without a valid-side
+contact gaps explain mechanisms; they cannot accept a search claim without a valid-side
 improvement.
 
-The first measured round is an unguided ordinary-stickiness response curve.
-The systematic sweep (`think-0epc`) then compares true targets with the controls
-registered for each tier.
-A headless partition freeze divides known-answer cases into calibration and held-out
-cells before any tuning; Search’s presets (`think-3yma`) read that partition rather than
-define it. Every rejected, invalid and no-effect round remains in the experiment record.
+The first measured round is an unguided ordinary-stickiness response curve
+(`think-9hdg`). The systematic guided sweep (`think-0epc`) then compares true targets
+with the controls registered for each tier.
+A headless partition freeze (`think-05o4`) divides known-answer cases into calibration
+and held-out cells before any tuning.
+Search’s presets (`think-3yma`) can load that partition, or any other manifest
+partition, but they do not define it and do not wait for it.
+Every rejected, invalid and no-effect round remains in the experiment record.
 
 A result names its strategy and guidance.
 A sentence of the form “given `merged-near-flush` as a start, with a release phase, the
@@ -441,43 +447,60 @@ The choices in this section are planned defaults, not results.
 No guided-versus-unguided comparison is admissible until it has declared the work
 currency.
 
-**What the partition tier carries.** Search’s `grid` and `random` proposals are
-label-agnostic: the squares are identical and their indices say nothing about the
-record, so a size-preserving relabelling of a partition changes nothing the run can use.
-At such a start the tier’s information is its component-size profile, and any
-difference between a true partition and its relabelling reflects square numbering, not
-the record.
-Membership carries information only at a label-dependent start, one that reads the
-record by square ID: `previous`, `blocks`, or a structure start that keeps the record’s
-internal offsets. A `shuffled` membership control is therefore run only at those starts.
+**Label-agnostic starts.** Search’s proposals are `grid`, `random` and `record-append`.
+Only seeded `random` has interchangeable labels on its own.
+`grid` is unseeded and places square `i` in cell `i` (`createGridPackStart` in
+`packages/workbench/src/simulation/pack.ts`), so square numbering fixes the starting
+adjacency identically in every block.
+Record IDs are not in random order either: in `contact-structures.json` the two angle
+classes at `n = 11` are squares 0–5 and 6–10. A true partition or true graph at `grid`
+could inherit that order as a head start.
+Every structural arm at `grid` or `random` therefore relabels its target by a
+permutation derived from the slot’s seed, the same permutation for every arm on that
+seed, and only then are those starts label-agnostic.
+Search’s one label-dependent start is `record-append`, which reads the previous record
+by square ID; the strategy format’s `blocks` and a structure start that keeps the
+record’s internal offsets (`think-y3o8`) would be label-dependent too.
+
+**What the partition tier carries.** At a label-agnostic start the squares are identical
+and their relabelled indices say nothing about the record, so the tier’s information is
+its component-size profile.
+Membership carries information only at a label-dependent start, so a `shuffled`
+membership control is run only there.
 At every start the information-changing control is a split-merge partition: split one
 true component in two, then merge one piece with another component, keeping `n` and
 choosing sizes so the number of within-component pairs stays as close to the truth’s as
-they allow.
-A record that is one touching component gives the partition `{n}`, which carries nothing
-beyond `n`; an `attract` use over it is the same all-pairs attraction as ordinary
-stickiness. Such cells are excluded from the partition contrast.
+they allow. A record that is one touching component gives the partition `{n}`, which
+carries nothing beyond `n`; an `attract` use over it is the same all-pairs attraction as
+ordinary stickiness.
+Such cells are excluded from the partition contrast.
 Both records with typed contact features are single components: 14 pair contacts join
 all 11 squares at `n = 11`, and 52 join all 29 at `n = 29`
-(`packing/atlas/known-best/contact-structures.json`).
-`think-rey9` reports every record’s component count and sizes before cells are frozen.
+(`packing/atlas/known-best/contact-structures.json`). `think-rey9` reports every
+record’s component count and sizes before cells are frozen.
 If no test-set cell has two or more components, `think-gdkd` drops the partition
 contrast or replaces it with `merged-near-flush` before the first round.
 
-**Graph controls.** `rewired` keeps the edge count and moves `keep` edges to pairs that
-do not touch at the record, so it is the contact graph’s information control.
-`thinned` keeps `keep` true edges and so changes the edge count; it never stands alone
-as an information control, and a thinned true graph is compared with its rewired twin at
-the same `keep`.
+**Graph controls.** The schema’s `keep` means different things for the two controls: for
+`thinned` it counts the true edges kept, and for `rewired` the edges moved.
+`rewired` keeps the edge count and moves `keep` edges to pairs that do not touch at the
+record, so it is the contact graph’s information control; the planned default moves
+every edge. `thinned` changes the edge count, so it never stands alone as an information
+control. Its twin is defined explicitly: take the thinned true graph with its `k` kept
+edges, then move the same fraction of those `k` edges that the full `rewired` control
+moves, which by default is all of them.
 
 **Oriented face pairs.** Face alignment is defined only for edge-edge contacts.
 A corner-edge contact states which corner meets which edge, one scalar equation; a
 corner-corner contact states which corners coincide, two.
 Neither carries an alignment, and the aligning torque never acts on them.
-The tier’s decision control is a wrong-feature assignment on the same pairs at the same
-torque strength, range and schedule, so only the information differs.
-Its mechanism control is the untyped graph with a label-free nearest-face torque at that
-strength, range and schedule. The oriented arm must beat both.
+The wrong-feature control keeps the same pairs and permutes features within each contact
+kind, so an edge-edge contact names a different edge pair and a corner-edge contact a
+different corner or edge; contact kinds, torque strength, range and schedule stay the
+same, and only the information differs.
+The mechanism control is the untyped graph with a label-free nearest-face torque at that
+strength, range and schedule.
+Both are deciding comparators.
 
 **Known-answer coverage.** Each tier has these known-answer cells today:
 
@@ -489,29 +512,47 @@ strength, range and schedule. The oriented arm must beat both.
 | `oriented-face-pairs` | `n = 11` and 29 only: 66 pair contacts, of which 35 are edge-edge, 25 corner-edge and 6 corner-corner |
 
 With two cells, the oriented tier can put at most one `n` on each side of the split, so
-its held-out result is a single `n` unless `think-rey9` extends feature extraction first.
+its held-out result is a single `n` unless `think-rey9` extends feature extraction
+first.
 
-**Contrasts.** Every contrast keeps the unguided arm and the zero-strength controls.
+**Contrasts.** A candidate is accepted only if it beats every deciding comparator in its
+row. Reported arms are measured and recorded but cannot accept or reject it.
+The zero-strength controls are guards, not arms.
+A contrast runs only if it has at least one eligible calibration cell and one eligible
+held-out cell; otherwise it is recorded as ineligible, which is not a negative result.
 
-| idea | candidate | decision comparator | other required arms | eligible cells |
+| idea | candidate | deciding comparators | reported arms | eligible cells |
 | --- | --- | --- | --- | --- |
 | 182 | each level on a declared ordinary-stickiness grid | the base pair law with zero attraction | — | every frozen cell |
-| 183 | true touching-component partition | split-merge partition | `shuffled` membership, at label-dependent starts only | cells with two or more components |
-| 184 | true contact graph | rewired graph at equal edge count | thinned true graph against its rewired twin at equal `keep` | cells with a declared contact graph |
-| 185 | oriented face pairs | wrong-feature assignment at equal torque | untyped graph with a nearest-face torque | cells with features |
-| 186 | each declared decay or release schedule | constant schedule with the same target and law | — | cells where the scheduled tier carried a setting forward |
+| 183 | true touching-component partition | the unguided arm; a split-merge partition; at label-dependent starts, `shuffled` membership | — | cells with two or more components |
+| 184 | true contact graph | the unguided arm; a rewired graph at equal edge count | — | cells with a declared contact graph |
+| 184, thinned | thinned true graph | the unguided arm; its rewired twin | the full true graph | cells with a declared contact graph |
+| 185 | oriented face pairs | the unguided arm; a wrong-feature assignment; the untyped graph with a nearest-face torque | the untyped graph without torque | cells with features |
+| 186 | each declared decay or release schedule | constant schedule with the same target and law | the unguided arm | cells of a tier that carried a strength forward; with no such tier, 186 is ineligible |
 
 **Work currency.** Arms in one contrast share the enforced Search budget: the same
-`physicsSteps`, `proposalAttempts` and `repairIterations` per slot (`SearchWorkBudget` in
-`packages/workbench/src/search/contracts.ts`) and the same slots per block.
+`physicsSteps`, `proposalAttempts` and `repairIterations` per slot (`SearchWorkBudget`
+in `packages/workbench/src/search/contracts.ts`) and the same base slots per block, on
+the same paired seeds.
 Guidance work is charged, not exempt.
 Each slot reports its pair candidates, guidance-force evaluations and repair pair tests,
 and their sum is its pair-level work.
-Stickiness alone changes that sum at fixed steps, because the kernel widens its
-broad-phase cell by the attraction reach.
-When a candidate’s median pair-level work per block exceeds its comparator’s, the
-comparator gets enough extra slots per block to match it, a number fixed from a
-work-only pilot on calibration cells that reads no outcome.
+Stickiness can change that sum at fixed steps.
+Any change of path changes which pairs are candidates, and the kernel widens its
+broad-phase cell once √2 × square size plus the attraction range exceeds the base cell,
+which for unit squares at Search’s default cell of 1.5 means a range above about 0.086.
+
+When a candidate’s median pair-level work per block exceeds a comparator’s, that
+comparator also runs compensation slots in every block.
+Their seeds come from a reserved range disjoint from every base, pilot, calibration and
+held-out seed, and the comparator’s block-best is taken over its base and compensation
+slots together. The number of compensation slots is a multiplier fixed for each contrast
+and candidate setting before any calibration round, from a work-only pilot on its own
+reserved seeds that reads no outcome.
+Every report states the realized work ratio, the comparator’s median pair-level work per
+block over the candidate’s, for calibration and held-out cells separately.
+A comparison whose realized ratio is below 1, or above a declared tolerance (planned
+default 1.25), is invalid; it is recorded and not re-tuned.
 A win that holds only at equal steps is reported and cannot be accepted.
 For guided rounds this replaces the search-proposer rule’s `pair_tests` currency, which
 the workbench kernel does not produce.
@@ -520,11 +561,12 @@ the workbench kernel does not produce.
 [search-proposer accept rule](../../../../packing/campaign/README.md#the-search-proposer-accept-rule)
 to held-out cells, with each paired seed block in place of a seed and its best valid
 side as `best_side`. Over at least five blocks per cell, the candidate’s median must be
-below the comparator’s and the two min–max ranges must not overlap, on every eligible
-held-out cell. A block with no valid state ranks worst.
-The clause’s `reached_basin` alternative does not decide a guided round; basin counts
-are reported as mechanism. Paired block differences are reported as spread and decide
-nothing.
+below each deciding comparator’s and the two min–max ranges must not overlap, on every
+eligible held-out cell.
+A block with no valid state has a best valid side of +∞. Ranges that share an endpoint
+overlap. The clause’s `reached_basin` alternative does not decide a guided round; basin
+counts are reported as mechanism.
+Paired block differences are reported as spread and decide nothing.
 
 **Guards.** Clauses 3 and 4 of that rule name `sqsearch` controls, so guided rounds
 replace them. Clause 3 becomes: every ranked state passes the shared validity contract
@@ -536,31 +578,46 @@ run, reaches a valid state within `1e-2` of a known record side; no valid state 
 same build.
 
 The runner is Search’s Pack runner (`packages/workbench/src/search/pack-runner.ts` over
-`packages/workbench/src/simulation/pack.ts`), driven from Node.
-Pack integrates with `forceLawSubsteps`, while the X-035 continuity budgets are defined
-on Animate’s 60 Hz presentation samples
-(`packages/workbench/src/simulation/trajectory.ts`).
-Those budgets are therefore guards on Animate replays of the trials a report shows, not
-on Pack trials; a Pack trial’s guards are finiteness, validity and deterministic replay.
-That replay guard is why `think-o4wo` and `think-5tyy`, still open after Exp-211 and
-Exp-212 rejected their first candidates, block the measured rounds.
-They do not block contract, extraction, kernel or receipt work.
+`packages/workbench/src/simulation/pack.ts`), driven from Node by a command that
+`think-gfqt` delivers; no such command exists yet.
+A Pack trial’s guards are finiteness, validity and deterministic replay.
+The X-035 continuity budgets are not guards on these rounds.
+They are defined on Animate’s 60 Hz presentation samples of a corpus transition
+(`TrajectoryRequest` in `packages/workbench/src/simulation/trajectory.ts`), and a Search
+trial has no equivalent: it starts from `grid`, `random` or `record-append` under a
+squeezing container, Pack keeps no trajectory, and Pack deliberately integrates with its
+own stability bound (`forceLawSubsteps`), so re-integrating a trial in Animate would
+produce a different path.
+Kinetic metrics on Search trials would need a retained Pack trajectory resampled at
+presentation rate; that instrument does not exist, and H-215 is where it would be
+registered. The measured rounds therefore do not wait on `think-o4wo` and `think-5tyy`
+for a kinetic guard.
+They and the guided Search receipts still wait on them through the base Phase 5
+scheduler, which follows Pack/Animate merge readiness (`think-9sdr`); contract,
+extraction and kernel work does not.
 
 Registered cohorts set `timeoutMs` to null, so a wall-clock deadline cannot change a
 slot’s status or partial result.
 Receipt identity hashes the canonical `SearchTrialValue` or its versioned successor,
-never `SearchOutcome`, which carries `elapsedMs`.
+never `SearchOutcome`, which carries `elapsedMs`. The successor must store the canonical
+effective configuration: today `SearchTrialValue.configuration` is a copy of the
+declared configuration plus the requested and effective seeds (`effectiveConfiguration`
+in `pack-runner.ts`), which would carry a zero-strength target into receipt identity.
 CPU time, measured in Node only, and wall time are operational context; neither enters
 receipt identity, the budget or the decision.
 
 **Selection and the held-out gate.** On calibration cells only, each stage carries
 forward the setting (a stickiness level, a guidance strength or a schedule) with the
-lowest median known-result gap over its blocks; ties go to lower pair-level work, then to
-weaker guidance. A setting carries forward only if that median is below its
-comparator’s. Otherwise the stage is recorded as a calibration no-effect and is not run
-on held-out cells.
-Guided arms use the stickiness level the first stage confirmed on held-out cells, or zero
-attraction if it confirmed none. Carried-forward settings are frozen before any held-out cell runs.
+lowest pooled median relative gap.
+For each calibration block that gap is the block-best valid side minus the record side,
+divided by the record side, or +∞ for a block with no valid state, and the median is
+taken over every block of every eligible calibration cell together.
+Ties go to lower pair-level work, then to weaker guidance.
+A setting carries forward only if its pooled median is below each deciding comparator’s.
+Otherwise the stage is recorded as a calibration no-effect and is not run on held-out
+cells. Guided arms use the stickiness level the first stage confirmed on held-out cells,
+or zero attraction if it confirmed none.
+Carried-forward settings are frozen before any held-out cell runs.
 Held-out confirmation, run once per stage with those settings, is the only decision
 gate; calibration produces no verdict.
 
@@ -573,22 +630,25 @@ gate; calibration produces no verdict.
    a record at declared tolerances, in one implementation that Python and TypeScript
    read, with every record’s component counts, feature coverage and remaining degrees of
    freedom.
-3. **Kernel mechanics** (`think-os1n`): a guidance force separate from the pair law, weld
-   and release, aligning torque, attraction range, shake per body, partial pins, and the
-   zero-strength and small-strength controls.
+3. **Kernel mechanics** (`think-os1n`): a guidance force separate from the pair law and
+   applied in its own pass, weld and release, aligning torque, attraction range, shake
+   per body, partial pins, and the zero-strength and small-strength controls.
 4. **Starts from structure** (`think-y3o8`) that keep the record’s internal offsets.
-5. **The evaluation loop and CLI** (`think-qx88`), then **guided Search receipts** (`think-10yz`) that carry the same configuration and canonical receipt
-   through the base Phase 5 scheduler (`think-gfqt`).
+5. **The evaluation loop and CLI** (`think-qx88`), then **guided Search receipts**
+   (`think-10yz`) that carry the same configuration and canonical receipt through the
+   base Phase 5 scheduler (`think-gfqt`).
 6. **Strategies in Pack and Search** (`think-czav`), with controls and overlays labelled
    by guidance.
-7. **Registration** (`think-gdkd`) and a **headless partition freeze** (`think-05o4`) that fixes calibration and held-out cells from `think-rey9`’s coverage
-   and the registered eligibility rules.
+7. **Registration** (`think-gdkd`) and a **headless partition freeze** (`think-05o4`)
+   that fixes calibration and held-out cells from `think-rey9`’s coverage and the
+   registered eligibility rules.
 8. **The measured rounds**, which consume these instruments rather than gate the
-   product. The **unguided stickiness curve** (`think-9hdg`) needs item
-   7, the Search cohort CLI and checkable ledgers (`think-gfqt`, `think-i5pg`), the
-   successor series (`think-i08r`), and `think-o4wo` and `think-5tyy` for its Animate
-   replays. The **systematic sweep** (`think-0epc`) needs the same, items 1–5, and the
-   curve’s held-out result, which fixes the stickiness level guided arms use. Neither needs the browser controls of item 6.
+   product. The **unguided stickiness curve** (`think-9hdg`) needs item 7, the base
+   scheduler with its Node command (`think-gfqt`), checkable ledgers (`think-i5pg`) and
+   the successor series (`think-i08r`). The **systematic guided sweep** (`think-0epc`)
+   needs the same, items 1–5, and the curve’s held-out result, which fixes the
+   stickiness level guided arms use.
+   Neither needs the browser controls of item 6, and neither has a kinetic guard.
 
 The same extraction serves `think-hk37`, the rigidity marks.
 The shared-language plan owns the format change (`think-8ocb`) and takes this section’s
@@ -682,14 +742,15 @@ The mode does not introduce another resolver, validator or physics path.
 ### E. Strategies with declared guidance — `think-c0rm`
 
 Contract, extraction and kernel work (`think-8ocb`, `think-rey9`, `think-w9pb`,
-`think-os1n`, `think-y3o8`) needs neither Phase 2A nor the Search scheduler and can start
-now. The evaluation loop (`think-qx88`) follows that work and phase C’s shared validity
-contract. Guided Search receipts follow the loop and the base Phase 5 scheduler, and the
-Pack and Search controls follow those receipts and the Search mode.
-Registration and the headless partition freeze follow extraction.
-The measured rounds follow item 8 of
-[What must be built](#what-must-be-built), and every hypothesis, contrast, selection rule
-and calibration or held-out cell is frozen before the first of them.
+`think-os1n`, `think-y3o8`) needs neither Phase 2A nor the Search scheduler and can
+start now. The evaluation loop (`think-qx88`) follows that work and phase C’s shared
+validity contract. Guided Search receipts (`think-10yz`) follow the loop and the base
+Phase 5 scheduler, which follows Pack/Animate merge readiness and so Phase 2A; the Pack
+and Search controls (`think-czav`) follow those receipts and the Search mode.
+Registration (`think-gdkd`) and the headless partition freeze (`think-05o4`) follow
+extraction. The measured rounds follow item 8 of
+[What must be built](#what-must-be-built), and every hypothesis, contrast, selection
+rule and calibration or held-out cell is frozen before the first of them.
 The workbench controls and overlays consume the same configuration and receipt as the
 headless loop.
 
