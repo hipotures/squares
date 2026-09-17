@@ -11,7 +11,8 @@ status: active
 
 **Status:** Active; investigation and implementation authorized by the repository owner.
 
-**Workflow entry:** W5 `efficiency-loop`. **Tracking:** `think-rwte`.
+**Workflow entry:** W5 `efficiency-loop`. **Tracking:** `think-rwte`. Phase 2 closeout
+is BC-355 under `think-97we` on `codex/ci-topology-reconcile`.
 
 ## Overview
 
@@ -35,7 +36,7 @@ owns preregistered comparisons, raw timing receipts, and generated results.
 
 - Preserve distinct contracts, boundary cases, negative controls, exact decisions, and
   useful failure localization while reducing repeated work.
-- Keep cheap coverage on every commit.
+- Keep the edit loop focused and run the complete fast surface on every pull request.
   Preserve the PR target of two to two and a half minutes, with three minutes triggering
   investigation; improve below it when justified.
 - Separate immediate feedback from final pre-merge evidence, identifying the source and
@@ -112,22 +113,32 @@ The default scheduler took 302.70 seconds, `loadscope` took 318.54 seconds, and
 The alternatives were 5.2 and 6.9 percent slower than the default, respectively, and did
 not address the one-job wall.
 
-The current recovery splits the quick lane into `suite-a` and `suite-b`. Each job
-collects the complete selection; a deterministic largest-first assignment by collected
-item count places every module in exactly one shard.
-This makes the shards complete and disjoint without a maintained file list, admits new
-modules automatically, and preserves module-scoped fixture reuse through
-`--dist=loadfile`.
+The current recovery splits the quick lane into `suite-a` and `suite-b` before
+collection.
+A deterministic largest-first assignment packs recorded per-file hosted costs
+across the two shards; files absent from the record use a stable path-derived fallback.
+Every module belongs to exactly one shard, new modules are admitted without a maintained
+file list, and `--dist=loadfile` preserves module-scoped fixture reuse inside each
+shard.
+The cost recorder accepts only successful, complete, coverage-matched cohorts with
+run, attempt, and source provenance.
 
-The ordinary gate now has 78 steps, 67 of them on the PR fast surface: 50 checks, two
-frontend steps, nine geometry steps, one step in each suite shard, and four sweeps.
-The six jobs all feed the existing `packing-required` aggregate.
-Each suite shard retains its 180-second predeclared ceiling.
-On PR 175 exact head `dee68bc8`, two green readings put shard A at 151.11 and 149.97
-seconds and shard B at 133.13 and 107.34 seconds.
-Their geometric means, 150.54 and 119.54 seconds, are now the recorded baselines.
-Every reading preserved the complete 6,111-item selection: 3,050 passes and 6 skips in
-shard A, and 3,055 passes in shard B.
+The ordinary gate now has 80 steps, 69 of them on the PR fast surface: 50 checks, three
+frontend steps, one typecheck step, nine geometry steps, one step in each suite shard,
+and four sweeps. The seven jobs all feed the existing `packing-required` aggregate.
+The reconciliation register currently declares a 168-second ceiling for suite A and a
+180-second ceiling for suite B. Its first exact-head hosted run at `c5a33270` measured
+84.00 and 143.98 seconds over the complete 6,345-item selection: 2,362 passes in suite
+A, and 3,977 passes with 6 skips in suite B. The cost record behind that partition came
+from one cohort (run 35127260063), and the next run split its files 257.91 against
+468.08 test-seconds.
+`c4f0660d` rebuilt the record from same-speed cohort 35175474610 and rebalanced the
+shards.
+Run 35182460400 at exact head `be28ad5a` then set the current records: suite A at
+109.92 seconds, the geometric mean of 81.26, 133.91 and 122.06 seconds over attempts
+1–3, and suite B at 124.78 seconds, the geometric mean of attempts 2–3. The `c5a33270`
+readings and the PR 175 geometric means, 150.54 and 119.54 seconds, remain in the
+register as history rather than current evidence.
 
 One predecessor-head shard-B attempt completed all tests in 145.68 seconds but failed
 the unchanged 12-second per-test backstop when a divide-and-concur case took 12.76
@@ -138,6 +149,33 @@ independent feasibility check; it did not raise the guard or move coverage off t
 surface.
 The failed predecessor sample is retained as variance evidence but excluded from
 the corrected-head baseline.
+
+### September 17 advisory pull-request wall
+
+Five hosted runs of PR 188’s Packing workflow measured the pull-request wall at 194,
+189, 178, 166, and 216 seconds against OR-14’s 180-second budget: runs 35127260063,
+35128357992 and 35175474610, and attempts 1 and 2 of run 35176748398. Hosted runner
+speed varied about 1.6–1.8x on identical code, and one full-history fetch took 45
+seconds. The `frontend` job alone ran 158–180 seconds end to end.
+Balanced two-shard suites still come to about 185–210 seconds on a 1.8x runner or with a
+slow fetch.
+
+On 2026-09-17 the owner made the wall check advisory until `think-g4n9` brings the worst
+case under 180 seconds and switches enforcement back on.
+Re-enforcement needs five consecutive exact-head hosted runs with both walls at or under
+180 seconds. Five is the planned default, and `think-g4n9` owns it.
+The register declares this per workflow, as `enforcement: advisory` with a
+`tracking_bead` and an `advisory_reason`. A `continue-on-error` on the workflow step was
+rejected because it would also have passed unmeasurable runs and missing prerequisites.
+The wall is still measured and reported on every pull request.
+A wall over its budget or its regression ratio now raises a warning naming the bead
+instead of failing the aggregator.
+Unmeasurable or missing evidence, missing prerequisites, malformed register entries and
+the tier ceilings still block, and the budget remains 180 seconds.
+The Pages wall is advisory under the same decision, which covers the pull-request wall
+generally; Pages has also measured 182 seconds on PR 188, in run 35182460356.
+`devtools.check_gate_budgets` refuses an advisory wall whose tracking bead is closed, so
+the relaxation cannot outlive `think-g4n9`.
 
 ## Design
 
@@ -198,10 +236,25 @@ Link these records from this spec as they are created.
 ### Feedback and checkpoint placement
 
 Keep records, edit, and change-reachable push checks usable independently of long
-checkpoint work. Ordinary PR feedback retains cheap coverage.
+checkpoint work. Ordinary PR feedback retains the complete fast surface.
 Run the complete checkpoint when the PR is ready for final review and after changes
 invalidate its evidence; identify the checked source, merge/base identity, and selected
 surfaces.
+
+The standing fast-loop contract is:
+
+- During a research or implementation loop, run the narrowest relevant tool or `--edit`.
+  Do not put slow, exhaustive, deferred, golden, or strict work in each edit cycle.
+- Run `--push` once immediately before each push.
+  The pull request then runs all seven parts of `--fast` concurrently: `--checks`,
+  `--frontend`, `--typecheck`, `--geometry`, `--suite-a`, `--suite-b`, and `--sweeps`.
+- Reserve the full and deferred checkpoints for final review, research or merge
+  checkpoints, block close, `main`, daily CI, and explicit on-demand validation.
+  Run golden rebuilds and strict checkpoints only when their stronger contract is
+  required. Repeat any checkpoint whose source or inputs changed afterward.
+- Keep a check on the pull-request surface unless measurement shows that it is
+  unavoidably slow. Occasional usefulness at a checkpoint does not justify adding it to
+  every edit cycle; optimize avoidable cost before deferring coverage.
 
 Review repeated main and daily work for sound reuse without treating an incomplete
 `touches` map as a safe skip map.
@@ -242,17 +295,22 @@ Changed contracts also require focused regression evidence at their actual execu
 boundary. An unaffected mathematical family cannot discharge a newly changed worker or
 CPU-accounting contract.
 Report why each family ran or was reused and retain links to both kinds of evidence.
-The first implementation slice does not enable automatic reuse or change the deep-label
-triggers; the current full checkpoint remains the entry point until the coverage union
-is implemented and validated.
+Exact-tree reuse is implemented on `codex/ci-topology-reconcile` for fast steps on the
+positive allowlist, and first runs on a push to `main` after that branch merges: after a
+successful pull-request run proves the same Git tree and passes `packing-required`, the
+post-merge run may omit those steps.
+Deferred and unclassified fast steps still run, and missing, stale, failed, or
+mismatched evidence falls back to execution.
+Exhaustive-family selection and reuse remain planned; the current full checkpoint
+remains their entry point until the coverage union is implemented and validated.
 
 ### Naming and documentation ownership
 
 | Term | Meaning and existing interface |
 | --- | --- |
-| PR fast surface | `--fast`, partitioned into `--checks`, `--frontend`, `--geometry`, `--suite-a`, `--suite-b`, and `--sweeps` |
+| PR fast surface | `--fast`, partitioned into `--checks`, `--frontend`, `--typecheck`, `--geometry`, `--suite-a`, `--suite-b`, and `--sweeps` |
 | Full checkpoint | All ordinary steps, selected by the default command |
-| Deferred checkpoint | Four steps outside PR fast coverage; the `Deferred checkpoint` workflow, retaining the `deep-gate` label and filename |
+| Deferred checkpoint | Eleven steps outside PR fast coverage; the `Deferred checkpoint` workflow, retaining the `deep-gate` label and filename |
 | Golden rebuild | `--deep`; fresh golden basin-map production and comparison |
 | Strict checkpoint | `--strict`; full checkpoint, golden rebuild, and refusal of skips |
 
@@ -338,19 +396,39 @@ A filed proposal is not an accepted guideline.
 
 ### Phase 2: Consistency and end-to-end validation
 
+BC-355 performs this closeout on `codex/ci-topology-reconcile`. The checked items
+describe integrated implementation; the unchecked items are required closeout evidence
+and must not be inferred from an earlier head.
+
 - [x] Reconcile workflow/help names and feedback versus final-checkpoint placement.
-- [x] Correct stale counts, timings, wall-time thresholds, and calibration claims.
+- [ ] Correct stale counts, timings, wall-time thresholds, and calibration claims.
+  The prose is current; the register still carries the predecessor PR 180 wall medians
+  (208 and 189 seconds) and PR 185 frontend and typecheck readings until final-head
+  hosted runs replace them.
+  Both wall checks are advisory under `think-g4n9`
+  ([September 17](#september-17-advisory-pull-request-wall)); re-enforcing them is that
+  bead’s work, not this item’s.
 - [x] Link this plan from the development guide, W5 entry, predecessor plans, and map.
 - [x] Complete the documentation matrix, including durable long-run timing rules.
 - [x] Review upstream tbd guidance, choose a dedicated guideline or focused additions,
   and prepare the reusable proposal and cross-links for upstream review.
 - [x] Verify changed selection, concurrency, failure, and naming contracts.
+  Last verified locally by the pre-push gate at `da2259fb` (2026-09-16: 6,577 passed, 9
+  skipped); the final head’s hosted aggregates repeat it.
 - [ ] Run affected checks and the full final checkpoint on integrated source, reporting
   golden-rebuild and strict evidence separately.
-- [ ] Publish a PR, verify fast CI and checkpoint results, generate the experiment
-  report, and close or explicitly defer each item with evidence.
+- [ ] Verify the final exact head through both hosted required aggregates, obtain a
+  fresh independent review of that same head, merge the PR, and close or explicitly
+  defer every tracked item with evidence.
+- [ ] Confirm from the final diff and campaign record that this pipeline-improvement
+  block changed no scientific result, certificate, frontier claim, or experiment
+  allocation.
 
 ### Phase 3: Explained selection and complete checkpoint coverage
+
+Phase 3 is a successor block under `think-xejq` after BC-355 closes.
+The work below is not unfinished BC-355 scope and does not delay the current topology
+closeout.
 
 - [ ] Extend the existing selector with exhaustive-family planning in reporting mode;
   demonstrate complete node membership and declared code/data/fixture inputs.
@@ -365,8 +443,8 @@ A filed proposal is not an accepted guideline.
 - [ ] Measure total feedback latency and runner work across ordinary pushes and the
   final checkpoint; accept rollout only with equivalent coverage and useful savings.
 
-These are planned additional cleanups in this block, tracked with `think-xejq`; they are
-not claims that selection or reuse is already operational.
+These are planned successor changes tracked with `think-xejq`; they are not claims that
+exhaustive-family selection or reuse is already operational.
 
 The coordinator owns shared records, integration, commits, and external updates.
 Sub-agents own bounded investigations or disjoint code paths.
@@ -393,7 +471,7 @@ Two independent reviews accepted the narrow W4 repair documented in
 An explicitly stopped checkpoint can retain certification debt without counting as
 certified. Completed handovers and current full pre-merge coverage remain required.
 The checker, schema and positive/negative controls are implemented; independent review,
-static checks and64 combined certification, diagnostic and session-clock tests passed.
+static checks, combined certification, diagnostic tests, and session-clock tests passed.
 Current integrated push and full-checkpoint results remain outstanding.
 
 `think-ph9v` retains the local full-checkpoint failures and serialized
@@ -416,7 +494,7 @@ producers merely to refresh a summary.
 
 ## Rollout Plan
 
-Land coherent changes through a PR from `codex/validation-efficiency-block`, with
+Land the Phase 2 reconciliation through a PR from `codex/ci-topology-reconcile`, with
 measured results, coverage mappings, unresolved cases, and the final command matrix.
 The coordinated suite migration replaces `--suite` with `--suite-a` and `--suite-b`; the
 `packing-required` aggregate remains the stable merge context.

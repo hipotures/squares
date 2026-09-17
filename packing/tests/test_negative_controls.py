@@ -278,6 +278,18 @@ def test_generator_owned_prospective_outputs_stay_out_of_mutation_snapshots() ->
         in PRUNE
     )
     assert ROOT / "campaign/series/series-000-smoke-and-calibration/results/agenda-025" in PRUNE
+    output_roots = {
+        ROOT / "campaign/series/series-000-smoke-and-calibration/results" / name
+        for name in (
+            "agenda-031",
+            "agenda-033",
+            "agenda-034",
+            "agenda-035",
+            "exp-201-arm-calibration",
+            "exp-202-round-1",
+        )
+    }
+    assert output_roots <= PRUNE
     assert CORNER_DUAL_SALVAGE_RECEIPT in PRUNE
     assert snapshot_source_bytes() < SNAPSHOT_MAX_BYTES
 

@@ -1,0 +1,58 @@
+{
+  "artifacts": {
+    "explainer-pdf-check": {
+      "id": 10460415626
+    },
+    "prepared-page": {
+      "id": 10460305456
+    }
+  },
+  "files": {
+    "index.html.gz": {
+      "bytes": 1051055,
+      "compression": "gzip",
+      "gzip_compresslevel": 9,
+      "gzip_mtime": 0,
+      "sha256": "dae9d94db73ea93579ec36b84165b67cc6cb07abfb9b8a13882caac17561365a",
+      "source_artifact": "prepared-page",
+      "source_path": "index.html",
+      "uncompressed_bytes": 3182688,
+      "uncompressed_sha256": "49b20b33739c7fd57e08766f9f05f79d17c40747e5eb6e08c4f23c656a65dcea"
+    },
+    "reference.pdf": {
+      "bytes": 843258,
+      "sha256": "c49cbc6a8287d88e680531b28a83a4ee75a9b8e3bcdd166405a8e8f254133631",
+      "source_artifact": "explainer-pdf-check",
+      "source_path": "pdf-check-w8rpxqy2/reference.pdf"
+    },
+    "replay.pdf": {
+      "bytes": 843259,
+      "sha256": "9c0a292791992aca43f18051edf42cc0f576ca45fa5d2b52d55ca666592e2f68",
+      "source_artifact": "explainer-pdf-check",
+      "source_path": "pdf-check-w8rpxqy2/replay.pdf"
+    },
+    "report.txt": {
+      "bytes": 572,
+      "sha256": "6a8ddd14d17b285de90a42b69b1ed08ad803c76b3fbf635815703282088ff268",
+      "source_artifact": "explainer-pdf-check",
+      "source_path": "pdf-check-w8rpxqy2/report.txt"
+    }
+  },
+  "purpose": "Retain the original inputs for a D-490 recurrence; no causal attribution.",
+  "scope": "The PDFs and diagnostic are copied without modification. index.html.gz is deterministic gzip of the exact prepared HTML. The pair establishes one sub-point text-position difference, not its upstream cause.",
+  "source": {
+    "checkout_revision": "edeff69c794ce7d9301450b793f5a55fd42ba5a5",
+    "git_tree": "2f50f40ef5106ad46e17b9e790933ec0f73f0b8e",
+    "pr_head_revision": "2f6193031169dc5b3bc312cead2cc1246c81977d",
+    "prepared_html_sha256": "49b20b33739c7fd57e08766f9f05f79d17c40747e5eb6e08c4f23c656a65dcea"
+  },
+  "workflow": {
+    "attempt": 1,
+    "conclusion": "failure",
+    "event": "pull_request",
+    "name": "Certificate page",
+    "repository": "jlevy/squares",
+    "run_id": 35127260004,
+    "url": "https://github.com/jlevy/squares/actions/runs/35127260004"
+  }
+}
