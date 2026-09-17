@@ -418,11 +418,11 @@ substitutions, planned in the annealing plan’s
 [registration defaults](../../docs/project/specs/active/plan-2026-09-11-annealing-as-a-search.md#planned-registration-defaults)
 and frozen or revised by `think-gdkd` before the first measured round.
 The budget currency is the enforced Search budget with guidance work charged, not
-`pair_tests`, which the workbench kernel does not count: a comparator that does less
-pair-level work than its candidate runs compensation slots from reserved seeds, and a
-realized work ratio outside the declared tolerance invalidates the comparison.
-Clause 1 decides on held-out cells with seed blocks in place of seeds, against every
-deciding comparator; paired block differences are reported only.
+`pair_tests`, which the workbench kernel does not count: the lighter arm of a comparison
+runs compensation slots from reserved seeds, a realized work ratio outside the declared
+band invalidates the comparison, and an invalid held-out comparison makes its stage
+invalid. Clause 1 decides on held-out cells with seed blocks in place of seeds, against
+every deciding comparator; paired block differences are reported only.
 Clauses 3 and 4 become the shared validity contract with its Python re-check and fixture
 tests, a declared positive control, the proved `n = 16` not-below control, and rejected
 invalid fixtures. No guided-versus-unguided comparison is admissible until that currency

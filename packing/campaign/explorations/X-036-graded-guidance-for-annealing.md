@@ -181,6 +181,9 @@ which `think-gdkd` freezes or revises before the first measured round.
    schedules at fixed work.
 
 Every stage retains the unguided arm.
+After stage 1 it runs at the stickiness level `think-9hdg` confirmed on held-out cells,
+or at zero attraction if it confirmed none.
+
 A later tier cannot replace an earlier negative result, and a stage does not advance
 merely because it reconstructs more of the target.
 The unguided stickiness curve is its own task; `think-0epc` owns the guided sweep after
@@ -205,12 +208,14 @@ They share the enforced Search budget: physics steps, proposal attempts and repa
 iterations per slot, and the same base slots per block on the same paired seeds.
 Guidance work is charged rather than exempt.
 Each slot reports pair candidates, guidance-force evaluations and repair pair tests.
-When a candidate’s pair-level work exceeds a comparator’s, that comparator also runs
-compensation slots from a reserved seed range disjoint from every other seed, in a
-number fixed per contrast and candidate setting by a work-only pilot before calibration.
+When two arms differ in pair-level work, the lighter arm, candidate or comparator, also
+runs compensation slots from a reserved seed range disjoint from every other seed, in a
+number fixed per contrast, arm and setting by a work-only pilot that runs on every
+frozen cell before calibration and reads no outcome.
 Reports state the realized work ratio for calibration and held-out cells; a comparison
-outside the declared tolerance is invalid and is not re-tuned, and a win that holds only
-at equal steps is not accepted.
+outside the declared band is invalid and is not re-tuned, any invalid held-out
+comparison makes its stage invalid rather than accepted or rejected, and a win that
+holds only at equal steps is not accepted.
 No guided-versus-unguided comparison is admissible until `think-gdkd` has declared this
 currency. Registered cohorts leave `timeoutMs` unset, and receipt identity hashes the
 canonical trial value rather than the Search outcome that carries `elapsedMs`. CPU time,

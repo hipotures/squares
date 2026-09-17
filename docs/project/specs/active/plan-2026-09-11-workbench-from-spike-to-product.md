@@ -350,7 +350,8 @@ The canonical effective receipt omits inert uses, so a zero-strength run’s can
 receipt is byte-for-byte identical to the unguided control’s. Because that tests
 canonicalization, the kernel also runs un-normalized at strength exactly zero, which
 must reproduce the unguided trajectory, and at a declared descending ladder of small
-strengths, whose short-horizon pose difference must shrink toward zero.
+strengths, whose short-horizon pose difference must not increase down the ladder and
+must end within a declared bound.
 Measured CPU and wall time sit beside the receipt, not in it; CPU time is measured in
 Node only. A physical trace keeps three layers distinct: raw kernel states diagnose the
 solver, corrected stored states show the path retained for playback, and deterministic

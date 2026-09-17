@@ -240,10 +240,11 @@ the order in which forces are summed, and either can change the path at zero str
 Over a declared short horizon, the largest pose difference from the unguided trajectory
 must not increase down a declared descending strength ladder, and at the smallest
 strength must be within a declared bound.
-The planned defaults are strengths of 1e-2, 1e-4, 1e-6 and 1e-8 of the declared unit, a
-10-step horizon, differences below 1e-12 counted as zero, and a bound of 1e-6 square
-sides. Scheduled guidance composes explicitly with ordinary stickiness, collision,
-containment and annealing.
+The planned defaults, once `think-8ocb` declares each use’s strength unit, are strengths
+of 1e-2, 1e-4, 1e-6 and 1e-8 of that unit, a horizon of 10 base physics steps,
+differences below 1e-12 counted as zero, and a bound of 1e-6 square sides.
+Scheduled guidance composes explicitly with ordinary stickiness, collision, containment
+and annealing.
 
 The product exposes four comparable target tiers.
 This table is also the naming table: prose uses the tier ids, and the names in the last
@@ -530,6 +531,10 @@ held-out cell; otherwise it is recorded as ineligible, which is not a negative r
 | 185 | oriented face pairs | the unguided arm; a wrong-feature assignment; the untyped graph with a nearest-face torque | the untyped graph without torque | cells with features |
 | 186 | each declared decay or release schedule | constant schedule with the same target and law | the unguided arm | cells of a tier that carried a strength forward; with no such tier, 186 is ineligible |
 
+In every contrast after 182, the unguided arm runs the base pair law at the stickiness
+level `think-9hdg` confirmed on held-out cells, or at zero attraction if it confirmed
+none, and every guided arm uses that same level.
+
 **Work currency.** Arms in one contrast share the enforced Search budget: the same
 `physicsSteps`, `proposalAttempts` and `repairIterations` per slot (`SearchWorkBudget`
 in `packages/workbench/src/search/contracts.ts`) and the same base slots per block, on
@@ -542,17 +547,20 @@ Any change of path changes which pairs are candidates, and the kernel widens its
 broad-phase cell once √2 × square size plus the attraction range exceeds the base cell,
 which for unit squares at Search’s default cell of 1.5 means a range above about 0.086.
 
-When a candidate’s median pair-level work per block exceeds a comparator’s, that
-comparator also runs compensation slots in every block.
+When the two arms of a comparison differ in median pair-level work per block, the
+lighter arm, candidate or comparator, also runs compensation slots in every block.
 Their seeds come from a reserved range disjoint from every base, pilot, calibration and
-held-out seed, and the comparator’s block-best is taken over its base and compensation
-slots together. The number of compensation slots is a multiplier fixed for each contrast
+held-out seed, and that arm’s block-best is taken over its base and compensation slots
+together. The number of compensation slots is a multiplier fixed for each contrast, arm
 and candidate setting before any calibration round, from a work-only pilot on its own
-reserved seeds that reads no outcome.
+reserved seeds that runs on every frozen cell, held-out included, and reads no outcome.
 Every report states the realized work ratio, the comparator’s median pair-level work per
-block over the candidate’s, for calibration and held-out cells separately.
-A comparison whose realized ratio is below 1, or above a declared tolerance (planned
-default 1.25), is invalid; it is recorded and not re-tuned.
+block over the candidate’s with compensation slots included, for calibration and
+held-out cells separately.
+A comparison whose realized ratio falls outside a declared band (planned default 0.8 to
+1.25) is invalid; it is recorded and not re-tuned.
+If any held-out comparison in a stage is invalid, the stage result is invalid: it is
+recorded and neither accepted nor rejected.
 A win that holds only at equal steps is reported and cannot be accepted.
 For guided rounds this replaces the search-proposer rule’s `pair_tests` currency, which
 the workbench kernel does not produce.
