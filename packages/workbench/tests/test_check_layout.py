@@ -248,9 +248,9 @@ def test_new_result_is_the_one_badge_label_in_the_stars_scarlet() -> None:
     ] == [f"the `new result` label is {GREY}, not the star's scarlet {SCARLET}"]
     spread = _layer(star=True, open_items=2)
     spread["badges"][1]["color"] = SCARLET
-    assert [
-        item for item in facts_findings(spread, star=True) if "the label grey" in item
-    ] == [f"the `exact` label is {SCARLET}, not the label grey {GREY}"]
+    assert [item for item in facts_findings(spread, star=True) if "the label grey" in item] == [
+        f"the `exact` label is {SCARLET}, not the label grey {GREY}"
+    ]
     # The colour is the only thing that differs: a `new result` in a second size is still one.
     resized = _layer(star=True, open_items=2)
     resized["badges"][0]["size"] = "26px"
