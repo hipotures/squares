@@ -551,7 +551,8 @@ When the two arms of a comparison differ in median pair-level work per block, th
 lighter arm, candidate or comparator, also runs compensation slots in every block.
 Their seeds come from a reserved range disjoint from every base, pilot, calibration and
 held-out seed, and that arm’s block-best is taken over its base and compensation slots
-together. The number of compensation slots is a multiplier fixed for each contrast, arm
+together. Compensation is decided per comparison, so a candidate with several deciding
+comparators has a separate block-best for each. The number of compensation slots is a multiplier fixed for each contrast, arm
 and candidate setting before any calibration round, from a work-only pilot on its own
 reserved seeds that runs on every frozen cell, held-out included, and reads no outcome.
 Every report states the realized work ratio, the comparator’s median pair-level work per
@@ -625,7 +626,7 @@ A setting carries forward only if its pooled median is below each deciding compa
 Otherwise the stage is recorded as a calibration no-effect and is not run on held-out
 cells. Guided arms use the stickiness level the first stage confirmed on held-out cells,
 or zero attraction if it confirmed none.
-Carried-forward settings are frozen before any held-out cell runs.
+Carried-forward settings are frozen before any held-out outcome run.
 Held-out confirmation, run once per stage with those settings, is the only decision
 gate; calibration produces no verdict.
 
