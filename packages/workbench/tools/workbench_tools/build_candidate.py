@@ -142,8 +142,8 @@ DOC_FOOTER = (
 
 #: The beat, in seconds. `move` is the free rearrangement and `correct` the landing; they
 #: used to be one span with the landing hidden inside it as a fraction. The owner set this
-#: beat on 2026-09-13, replacing 0.8 + 0.55 + 0.25 + 0.8, and shortened the landing from 0.4 s to
-#: 0.2 s on 2026-09-17.
+#: beat on 2026-09-13, replacing 0.8 + 0.55 + 0.25 + 0.8, and shortened the landing
+#: from 0.4 s to 0.2 s on 2026-09-17.
 TIMING = {"dwell": 0.6, "move": 0.5, "correct": 0.2, "settle": 0.3}
 # Revision 5 staging: in the default motion (add, then make room) the new square arrives over
 # the first ARRIVAL_FRACTION of the move while the container grows, and the existing squares
