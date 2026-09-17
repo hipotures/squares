@@ -8,11 +8,11 @@ import { mixUint32Seed } from "../src/core/runtime-contracts.ts";
 import { type Corpus, type CorpusPair, decodeCorpus, frameAt, pairAt } from "../src/data/corpus.ts";
 import {
   ANNEAL_SETTINGS,
+  ARRIVAL_DELAY_BOUNDS,
   annealConfiguration,
   BLIND_TRAJECTORY_SETTINGS,
-  CONTAINER_DELAY_BOUNDS,
   DEFAULT_ANIMATE_STYLE,
-  DEFAULT_CONTAINER_DELAY_FRACTION,
+  DEFAULT_ARRIVAL_DELAY_FRACTION,
   DEFAULT_MOTION_RESPONSE,
   DEFAULT_STEP_TIMING,
   DEFAULT_WALL_LAW,
@@ -75,7 +75,7 @@ interface KineticsOptions {
   seed: number;
   stepsPerSecond: number;
   sampleRate: number;
-  containerDelay: number;
+  arrivalDelay: number;
   integrationSubsteps: "adaptive" | number;
   motionResponse: { speedLimit: number; contactDamping: number };
   jiggleHz: readonly [number, number];
@@ -185,7 +185,7 @@ export function parseKineticsArguments(arguments_: readonly string[]): KineticsO
     seed: 0,
     stepsPerSecond: STEPS_PER_SECOND,
     sampleRate: 60,
-    containerDelay: DEFAULT_CONTAINER_DELAY_FRACTION,
+    arrivalDelay: DEFAULT_ARRIVAL_DELAY_FRACTION,
     integrationSubsteps: "adaptive",
     motionResponse: { ...DEFAULT_MOTION_RESPONSE },
     jiggleHz: TRAJECTORY_PHYSICS_SETTINGS.jiggleHz,
@@ -244,14 +244,14 @@ export function parseKineticsArguments(arguments_: readonly string[]): KineticsO
       if (options.sampleRate <= 0) {
         throw new RangeError("sample rate must be positive");
       }
-    } else if (flag === "--container-delay") {
-      options.containerDelay = numberArgument(value, "container delay");
+    } else if (flag === "--arrival-delay") {
+      options.arrivalDelay = numberArgument(value, "arrival delay");
       if (
-        options.containerDelay < CONTAINER_DELAY_BOUNDS[0] ||
-        options.containerDelay > CONTAINER_DELAY_BOUNDS[1]
+        options.arrivalDelay < ARRIVAL_DELAY_BOUNDS[0] ||
+        options.arrivalDelay > ARRIVAL_DELAY_BOUNDS[1]
       ) {
         throw new RangeError(
-          `container delay must be between ${CONTAINER_DELAY_BOUNDS[0]} and ${CONTAINER_DELAY_BOUNDS[1]}`,
+          `arrival delay must be between ${ARRIVAL_DELAY_BOUNDS[0]} and ${ARRIVAL_DELAY_BOUNDS[1]}`,
         );
       }
     } else if (flag === "--substeps") {
@@ -453,7 +453,7 @@ function tweenFrames(
   timing: AtlasTiming,
   phase: AtlasPhase,
   steps: number,
-  containerDelay: number,
+  arrivalDelay: number,
 ): MotionFrame[] {
   const pair = pairAt(corpus, pairIndex);
   const source = frameAt(corpus, pair.n);
@@ -467,7 +467,7 @@ function tweenFrames(
     arrivalFraction: corpus.arrival_fraction,
     newFraction: NEW_FRACTION,
     rollMax: ROLL_MAX,
-    containerDelay,
+    arrivalDelay,
   };
   const schedule = pairSchedule(configuration, pairIndex, "tween");
   const tracks = motionTracks(corpus, pair);
@@ -672,7 +672,6 @@ function physicalPresentedFrames(
         x: sampled[0],
         y: sampled[1],
         angleRadians: (sampled[2] * Math.PI) / 180,
-        size: interpolate(physics.inflateFrom, 1, appearance),
       });
     } else {
       poses.push({ ...expectedNew, active: appearance > 0 });
@@ -747,7 +746,7 @@ export async function measureKinetics(options: KineticsOptions): Promise<Record<
     arrivalFraction: corpus.arrival_fraction,
     newFraction: NEW_FRACTION,
     rollMax: ROLL_MAX,
-    containerDelay: options.containerDelay,
+    arrivalDelay: options.arrivalDelay,
   };
   const schedule = pairSchedule(timelineConfiguration, pairIndex, effectiveSolver);
   const presentationDuration =
@@ -789,7 +788,7 @@ export async function measureKinetics(options: KineticsOptions): Promise<Record<
       timing,
       options.phase,
       presentationSteps,
-      options.containerDelay,
+      options.arrivalDelay,
     );
     wallMilliseconds = stableNumber(performance.now() - started);
     const replay = tweenFrames(
@@ -798,7 +797,7 @@ export async function measureKinetics(options: KineticsOptions): Promise<Record<
       timing,
       options.phase,
       presentationSteps,
-      options.containerDelay,
+      options.arrivalDelay,
     );
     deterministic = identicalMotionFrames(presentedFrames, replay);
     work = {
@@ -1035,7 +1034,7 @@ export async function measureKinetics(options: KineticsOptions): Promise<Record<
       effectiveSeed: effectiveSolver === "tween" ? "not_applicable" : effectiveSeed,
       stepsPerSecond: effectiveSolver === "tween" ? "not_applicable" : options.stepsPerSecond,
       presentationSampleRate: options.sampleRate,
-      containerDelayFraction: options.containerDelay,
+      arrivalDelayFraction: options.arrivalDelay,
       integrationSubsteps:
         effectiveSolver === "tween" ? "not_applicable" : options.integrationSubsteps,
       steps: storedSteps ?? "not_applicable",
@@ -1116,7 +1115,7 @@ experiment inputs:
   --seed N                      nonnegative integer (default: 0)
   --steps-per-second N          stored trajectory sampling rate (default: ${STEPS_PER_SECOND})
   --sample-rate N               presented wall-time sampling rate (default: 60)
-  --container-delay 0..0.3      moving-span delay from square appearance to container resize (default: ${DEFAULT_CONTAINER_DELAY_FRACTION})
+  --arrival-delay 0..0.6      moving-span delay from container resize to the new square fading in (default: ${DEFAULT_ARRIVAL_DELAY_FRACTION})
   --substeps adaptive|1..${MAX_FORCE_LAW_SUBSTEPS}     integrator substeps (default: adaptive)
 
 law overrides:

@@ -6,8 +6,17 @@ import {
   interpolateBlockPose,
   type MotionTrack,
 } from "../src/animation/illustration.ts";
-import { pairSchedule, type TimelineConfiguration } from "../src/animation/timeline.ts";
+import {
+  type PairSchedule,
+  pairSchedule,
+  type TimelineConfiguration,
+} from "../src/animation/timeline.ts";
 import { captureIllustration, captureTimes } from "../src/app/capture.ts";
+import {
+  DEFAULT_ARRIVAL_DELAY_FRACTION,
+  DEFAULT_STEP_TIMING,
+  NEW_FRACTION,
+} from "../src/motion-settings.ts";
 import type { PaintedSceneFrame } from "../src/view/scene-types.js";
 import {
   type AttributeTarget,
@@ -40,10 +49,10 @@ const input: IllustrationInput = {
     moveStart: 1,
     moveEnd: 4,
     end: 5,
-    arrive: 3,
+    arrive: 3.2,
     arrived: 4,
-    containerStart: 3.2,
-    containerEnd: 4,
+    containerStart: 1,
+    containerEnd: 1.6,
     blocksStart: 1,
     blocksEnd: 3,
     roll: 0.4,
@@ -83,21 +92,29 @@ function stage(): StageTargets & { svg: Target } {
   };
 }
 
-test("an illustration presents the arriving square before the delayed container resize", () => {
+test("an illustration resizes the container, waits, then fades the square in at full size", () => {
   const before = seek(0).scene;
+  const resizing = seek(1.3).scene;
   const moving = seek(2).scene;
-  const squareFirst = seek(3.1).scene;
-  const resizing = seek(3.3).scene;
+  const waiting = seek(3.1).scene;
+  const fading = seek(3.6).scene;
   const arrived = seek(4).scene;
   const end = seek(5).scene;
   assert.equal(before.containerSide, 1);
   assert.equal(before.squares[1]?.opacity, 0);
+  assert.ok(resizing.containerSide > 1 && resizing.containerSide < 2);
+  assert.equal(resizing.squares[1]?.opacity, 0);
   assert.equal(moving.squares[0]?.angleDegrees, 45);
-  assert.equal(moving.containerSide, 1);
+  assert.equal(moving.containerSide, 2);
   assert.equal(moving.squares[1]?.opacity, 0);
-  assert.ok((squareFirst.squares[1]?.opacity ?? 0) > 0);
-  assert.equal(squareFirst.containerSide, 1);
-  assert.ok(resizing.containerSide > 1);
+  // The resize is over and the delay is not: the picture has shrunk and nothing has arrived.
+  assert.equal(waiting.containerSide, 2);
+  assert.equal(waiting.squares[1]?.opacity, 0);
+  assert.equal(waiting.presentation.mark, null);
+  const square = fading.squares[1];
+  assert.ok(square !== undefined && square.opacity > 0 && square.opacity < 1);
+  assert.deepEqual([square.x, square.y, square.angleDegrees, square.scale], [0.5, 1.5, 0, 1]);
+  assert.equal(fading.presentation.mark?.scale, 1);
   assert.equal(arrived.squares[1]?.opacity, 1);
   assert.equal(arrived.containerSide, 2);
   assert.deepEqual(
@@ -112,79 +129,123 @@ test("an illustration presents the arriving square before the delayed container 
   assert.deepEqual(seek(2), seek(2));
 });
 
-test("a resize delayed to the move boundary remains continuous through settle", () => {
-  const delayed = (seconds: number) =>
-    illustrationFrame({
-      ...input,
+function defaultConfiguration(): TimelineConfiguration {
+  return {
+    pairs: [{ n: 2, kind: "matched" }],
+    timing: { ...DEFAULT_STEP_TIMING },
+    continuous: {
+      on: false,
+      fullBeat: false,
+      beat: { ...DEFAULT_STEP_TIMING },
+      staticBeat: { ...DEFAULT_STEP_TIMING },
+    },
+    anneal: 3,
+    phase: "add-then-move",
+    arrivalFraction: 0.3,
+    newFraction: NEW_FRACTION,
+    rollMax: 0.4,
+    arrivalDelay: DEFAULT_ARRIVAL_DELAY_FRACTION,
+  };
+}
+
+/** Every 60 Hz instant of a step, plus the schedule's own instants, in order. */
+function instants(schedule: PairSchedule): number[] {
+  const ticks = Array.from({ length: Math.floor(schedule.end * 60) + 1 }, (_, frame) => frame / 60);
+  const named = Object.entries(schedule)
+    .filter(([key]) => key !== "roll")
+    .map(([, value]) => value);
+  return [...ticks, ...named].sort((a, b) => a - b);
+}
+
+//: The largest opacity change the default fade may make between two 60 Hz frames. The ease's
+//: steepest slope is 1.5 per fade, and the default fade is 0.4 of the 0.7 s moving span, 0.28 s
+//: since the correct beat went from 0.4 s to 0.2 s on 2026-09-17 (it was 0.36 s), so 0.0893 is
+//: what it takes; the cubic ease-out it replaced jumped 0.17 on its first frame.
+const LARGEST_OPACITY_STEP = 0.09;
+//: The most the first visible 60 Hz frame may show: it lands at most 1/60 s into the 0.28 s fade,
+//: 0.0595 of it, where the smoothstep is 0.0102. At the 0.36 s fade this bound was 0.01.
+const FIRST_VISIBLE_OPACITY = 0.011;
+
+test("in every phase the new square fades in smoothly, at full size and in place", () => {
+  const configuration = defaultConfiguration();
+  for (const phase of ["add-then-move", "move-then-add", "simultaneous"] as const) {
+    configuration.phase = phase;
+    const schedule = pairSchedule(configuration, 0, "tween");
+    const frames = instants(schedule).map((seconds) => ({
       seconds,
-      schedule: {
-        ...input.schedule,
-        containerStart: input.schedule.moveEnd,
-        containerEnd: 4.5,
-      },
-    });
-  assert.equal(delayed(4).containerSide, 1);
-  assert.ok(delayed(4 + Number.EPSILON * 4).containerSide >= 1);
-  assert.ok(delayed(4.25).containerSide > 1);
-  assert.ok(delayed(4.25).containerSide < 2);
-  assert.equal(delayed(4.5).containerSide, 2);
+      square: illustrationFrame({ ...input, phase, schedule, seconds }).squares[1],
+    }));
+    let previous = 0;
+    let firstVisible: number | null = null;
+    const ticks = frames.filter(
+      ({ seconds }) => Math.abs(seconds * 60 - Math.round(seconds * 60)) < 1e-9,
+    );
+    for (const { seconds, square } of frames) {
+      assert.ok(square !== undefined);
+      assert.equal(square.scale, 1, `${phase}: scaled at ${seconds}`);
+      assert.deepEqual([square.x, square.y, square.angleDegrees], [0.5, 1.5, 0]);
+      assert.ok(square.opacity >= previous, `${phase}: opacity fell at ${seconds}`);
+      if (seconds <= schedule.arrive) {
+        assert.equal(square.opacity, 0, `${phase}: visible before the delay ended at ${seconds}`);
+      }
+      if (square.opacity > 0 && firstVisible === null) {
+        firstVisible = square.opacity;
+      }
+      previous = square.opacity;
+    }
+    assert.equal(previous, 1);
+    // A smooth start: the first visible frame is nearly transparent.
+    assert.ok(
+      firstVisible !== null && firstVisible < FIRST_VISIBLE_OPACITY,
+      `${phase}: first ${firstVisible}`,
+    );
+    const steps = ticks
+      .slice(1)
+      .map(({ square }, index) => (square?.opacity ?? 0) - (ticks[index]?.square?.opacity ?? 0));
+    assert.ok(Math.max(...steps) <= LARGEST_OPACITY_STEP, `${phase}: steps ${Math.max(...steps)}`);
+    // Symmetric: half way through the fade the square is half in.
+    const middle = illustrationFrame({
+      ...input,
+      phase,
+      schedule,
+      seconds: (schedule.arrive + schedule.arrived) / 2,
+    }).squares[1];
+    assert.ok(middle !== undefined && Math.abs(middle.opacity - 0.5) < 1e-12);
+  }
 });
 
-test("adjacent late delay settings retain the same smooth 60 Hz resize", () => {
-  const timing = { dwell: 0, move: 0.55, correct: 0.25, settle: 0.8 };
-  const configuration: TimelineConfiguration = {
-    pairs: [{ n: 2, kind: "matched" }],
-    timing,
-    continuous: { on: false, fullBeat: false, beat: timing, staticBeat: timing },
-    anneal: 3,
-    phase: "move-then-add",
-    arrivalFraction: 0.3,
-    newFraction: 1 / 3,
-    rollMax: 0.4,
-  };
-  const maximumSteps: number[] = [];
-  for (const delay of [0.25, 0.3]) {
-    configuration.containerDelay = delay;
+test("the arrival delay moves the fade and never the resize, which stays smooth at 60 Hz", () => {
+  const configuration = defaultConfiguration();
+  const sides: number[][] = [];
+  const arrivals: number[] = [];
+  for (const delay of [0, DEFAULT_ARRIVAL_DELAY_FRACTION, 0.6]) {
+    configuration.arrivalDelay = delay;
     const schedule = pairSchedule(configuration, 0, "tween");
-    const sides: number[] = [];
-    for (
-      let seconds = schedule.containerStart;
-      seconds < schedule.containerEnd;
-      seconds += 1 / 60
-    ) {
-      sides.push(illustrationFrame({ ...input, schedule, seconds }).containerSide);
+    const drawn: number[] = [];
+    for (let frame = 0; frame / 60 <= schedule.containerEnd; frame++) {
+      drawn.push(illustrationFrame({ ...input, schedule, seconds: frame / 60 }).containerSide);
     }
-    sides.push(
+    drawn.push(
       illustrationFrame({ ...input, schedule, seconds: schedule.containerEnd }).containerSide,
     );
-    maximumSteps.push(
-      Math.max(...sides.slice(1).map((side, index) => side - (sides[index] ?? side))),
+    sides.push(drawn);
+    const seen = instants(schedule).find(
+      (seconds) =>
+        (illustrationFrame({ ...input, schedule, seconds }).squares[1]?.opacity ?? 0) > 0,
     );
+    // The delay is a share of the moving span, not seconds: the old `delay * 0.9` only matched the
+    // delay in seconds while the span was 0.9 s, before the correct beat shrank to 0.2 s.
+    const span = configuration.timing.move + configuration.timing.correct;
+    assert.ok(Math.abs(schedule.arrive - schedule.containerEnd - delay * span) < 1e-12);
+    assert.ok(seen !== undefined && seen > schedule.arrive);
+    arrivals.push(seen);
+    const steps = drawn.slice(1).map((side, index) => side - (drawn[index] ?? side));
+    assert.ok(Math.min(...steps) >= 0 && Math.max(...steps) < 0.22);
+    assert.equal(drawn.at(-1), input.toSide);
   }
-  const first = maximumSteps[0];
-  const second = maximumSteps[1];
-  assert.ok(first !== undefined && second !== undefined);
-  assert.ok(first < 0.22);
-  assert.ok(second < 0.22);
-  assert.ok(Math.abs(first - second) < 1e-12);
-
-  configuration.timing.settle = 0;
-  configuration.continuous.beat.settle = 0;
-  configuration.continuous.staticBeat.settle = 0;
-  const noSettle = pairSchedule(configuration, 0, "tween");
-  assert.ok(noSettle.containerEnd > noSettle.moveEnd);
-  const start = illustrationFrame({
-    ...input,
-    schedule: noSettle,
-    seconds: noSettle.containerStart,
-  }).containerSide;
-  const firstFrame = illustrationFrame({
-    ...input,
-    schedule: noSettle,
-    seconds: noSettle.containerStart + 1 / 60,
-  }).containerSide;
-  assert.equal(start, input.fromSide);
-  assert.ok(firstFrame > start && firstFrame - start < 0.22);
+  assert.deepEqual(sides[1], sides[0]);
+  assert.deepEqual(sides[2], sides[0]);
+  assert.ok((arrivals[0] ?? 0) < (arrivals[1] ?? 0) && (arrivals[1] ?? 0) < (arrivals[2] ?? 0));
 });
 
 test("block members follow a common pivot with their own target residual", () => {
@@ -232,7 +293,7 @@ test("DOM and standalone SVG use the same transforms and reject bad input before
   renderStage(targets, frame);
   const view = targets.svg.attributes.get("viewBox")?.split(" ").map(Number);
   assert.ok(view !== undefined);
-  for (const [index, expected] of [-0.045, -1.045, 1.09, 1.09].entries()) {
+  for (const [index, expected] of [-0.09, -2.09, 2.18, 2.18].entries()) {
     const observed = view[index];
     assert.ok(observed !== undefined && Math.abs(observed - expected) < 1e-12);
   }
@@ -292,6 +353,42 @@ test("capture and interactive seek agree at every frame with no simulation depen
   );
   assert.equal(receipt.frames.length, 5);
   assert.deepEqual(receipt.source, source);
+});
+
+test("captured SVG frames fade the new square in without ever scaling it", async () => {
+  const written: string[] = [];
+  const arrival = {
+    ...timing,
+    startSeconds: 3,
+    durationSeconds: 1,
+    framesPerSecond: 10,
+    maxFrames: 11,
+  };
+  const receipt = await captureIllustration({
+    source,
+    timing: arrival,
+    seek,
+    cancelled: () => false,
+    writeFrame: async (frame) => {
+      written.push(frame.svg);
+    },
+  });
+  assert.equal(receipt.status, "completed");
+  const opacities = written.map((svg) => {
+    // The only scale in a frame is the stage's own y-flip; no square is ever scaled.
+    assert.doesNotMatch(svg, /rotate\([^)]*\) scale\(/);
+    const found =
+      /data-identity="2" transform="translate\(0\.5 1\.5\) rotate\(0\)" opacity="([^"]+)"/.exec(
+        svg,
+      );
+    assert.ok(found !== null, svg);
+    return Number(found[1]);
+  });
+  assert.deepEqual(opacities.slice(0, 3), [0, 0, 0]);
+  assert.ok(
+    opacities.every((opacity, index) => index === 0 || opacity >= (opacities[index - 1] ?? 0)),
+  );
+  assert.equal(opacities.at(-1), 1);
 });
 
 test("capture cancellation preserves exactly the frames already written", async () => {

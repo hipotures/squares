@@ -12,8 +12,8 @@
     note: document.getElementById("motion-scope-note")?.textContent ?? "",
     advancedHidden:
       window.getComputedStyle(document.getElementById("motion-advanced-box")).display === "none",
-    containerDelayDisabled: /** @type {HTMLInputElement | null} */ (
-      document.getElementById("motion-container-delay")
+    arrivalDelayDisabled: /** @type {HTMLInputElement | null} */ (
+      document.getElementById("motion-arrival-delay")
     )?.disabled,
     groups: Array.from(document.querySelectorAll('[data-motion-control="physics"]')).map(
       (host) => ({
