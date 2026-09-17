@@ -12,7 +12,7 @@ exploration:
   author: Codex
   campaign: packing.squares
   brief: >-
-    Plan a measured ladder from ordinary pair stickiness through connected-component,
+    Plan a measured ladder from ordinary pair stickiness through touching-component,
     contact-graph and oriented face-pair guidance, using one headless simulation kernel,
     known-answer calibration, held-out cells and matched structural controls.
   sources:
@@ -51,6 +51,12 @@ must record the ordinary pair law it used.
 Animate, Pack, Search and the command line must resolve the same effective
 configuration.
 
+Today the axes are one control: the kernel’s `relatedMask` restricts ordinary pair-law
+attraction to masked pairs, Search accepts `related_mask`, and the page builds masks from
+blocks and contact graphs, so the only guidance strength is the pair law’s attraction.
+`think-8ocb` moves that path into the target and application contracts, and registered
+cohorts refuse `related_mask` until `think-os1n` adds a separate guidance force.
+
 ## Target and Application Contracts
 
 One JSON-safe `GuidanceTarget/v1` describes *what is known*. A separate application
@@ -61,36 +67,53 @@ The target has four admitted information tiers:
 
 1. `none`: no target relationships;
 2. `touching-component-partition`: square membership in touching components, without
-   edges inside a component;
+   edges inside a component; at a label-agnostic start only the component-size profile
+   is usable;
 3. `contact-graph`: selected square pairs, without a prescribed pose; and
-4. `oriented-face-pairs`: selected square pairs plus the two contacting features and
-   their relative face alignment.
+4. `oriented-face-pairs`: selected square pairs plus the two contacting features and,
+   for edge-edge contacts, their face alignment.
 
-The oriented tier constrains relative features and alignment, not absolute position or
-angle. It may attract and turn two squares toward a declared face-to-face relation, but
-it may not pin either square to the record pose.
+The annealing plan’s
+[tier table](../../../docs/project/specs/active/plan-2026-09-11-annealing-as-a-search.md#one-target-contract-separate-application-policy)
+is the naming table for these tiers and their strategy rungs.
+
+The oriented tier stores relative features and alignment, not absolute position or
+angle, and it may not pin either square to the record pose.
+It can still determine the record: where the contact equations are rigid, a complete
+target fixes the poses locally up to congruence, so each target reports the degrees of
+freedom it leaves. Corner-edge and corner-corner contacts carry their feature incidence
+and no alignment.
 Square identities, symmetry handling, ambiguous feature assignments, source tolerances
 and typed refusals belong in the target contract under `think-rey9`; the existing
 contact-atlas feature vocabulary (`contact`, `left_feature` and `right_feature`) should
 be reused rather than translated into a second face notation.
 
-The application configuration records at least:
+The application configuration records, for each use:
 
-- guidance strength, in units fixed before measurement;
-- a time or progress schedule, including constant, decay and release forms;
 - the use made of the target, such as start construction, attraction, alignment, weld or
-  release; and
+  release;
+- where the use has a strength, that strength in units fixed before measurement, with a
+  time or progress schedule including constant, decay and release forms; and
 - the policy for pairs absent from the target.
+
+Attraction and alignment take a continuous strength.
+Start construction, welds and per-body shake are discrete, so each names its unguided
+control: the unguided proposal at the same seed, no weld, and uniform shake.
 
 `think-8ocb` owns the format and capability declarations; `think-os1n` owns the kernel
 mechanics and schedule composition.
 Unsupported tiers or uses are refused before a run.
 
-Strength zero is the identity control.
-Canonicalization must erase an inert target before execution identity is computed, so
-zero-strength guidance produces exactly the unguided trajectory, counters, outcome and
-canonical receipt for the same effective configuration and seed.
+Strength zero is the identity control, tested at the receipt and in the kernel.
+The requested configuration, zero strengths included, is kept in a requested-guidance
+record beside the receipt. The canonical effective receipt omits inert uses, so a
+zero-strength run’s canonical receipt is byte-for-byte the unguided receipt.
+That identity only tests canonicalization, so the kernel also runs un-normalized with
+the target loaded and every strength exactly zero, and must reproduce the unguided
+trajectory, validity and outcome exactly.
 A numerically close result is a failed guard.
+A declared descending ladder of small strengths must then show the short-horizon pose
+difference from the unguided trajectory shrinking toward zero.
 
 ## One Nonvisual Instrument
 
@@ -103,64 +126,98 @@ The headless path must make every comparison possible without pixels:
 
 - run one configuration or a fixed seed block;
 - emit raw, corrected and presentation trajectories where applicable;
-- retain the target content hash, effective application configuration and exact work;
+- retain the requested-guidance record, the canonical effective receipt and exact work;
 - recompute outcome, guard, cost and mechanism metrics from the retained trace; and
-- replay the same receipt through browser and command-line adapters.
+- replay the same receipt through command-line and browser adapters in Node and the
+  pinned Chromium build; other browsers are not claimed to replay bit for bit.
 
 `think-qx88` owns the shared evaluation and metric surface, `think-gfqt` the bounded
-multi-run scheduler and replayable receipts, and `think-czav` the workbench controls and
-overlays. The application may add no browser-only force path.
+multi-run scheduler, a new guided Search receipts task the guided configuration and
+receipts that scheduler carries, and `think-czav` the workbench controls and overlays.
+The application may add no browser-only force path.
 
 ## Experiment Ladder
 
-The program advances one information increment at a time:
+The program advances one information increment at a time.
+The controls, eligible cells, work currency, deciding statistic and selection rule below
+are the planned defaults in the annealing plan’s
+[registration defaults](../../../docs/project/specs/active/plan-2026-09-11-annealing-as-a-search.md#planned-registration-defaults),
+which `think-gdkd` freezes or revises before the first measured round.
 
-1. **Stabilize the unguided response.** Close the physical-response prerequisites
-   `think-o4wo` and `think-5tyy`; then measure ordinary stickiness across a fixed range
-   with no structural target.
-2. **Add components.** Compare a true touching-component partition with no target and
-   with shuffled partitions that preserve component sizes.
-3. **Add graph edges.** Compare the true contact graph with matched thinned and rewired
-   graphs. Controls preserve declared edge-count or degree properties so “more forces” is
-   not confused with “correct structure.”
-4. **Add oriented faces.** Compare typed face-pair guidance with the same graph stripped
-   to untyped edges. The contrast measures the added alignment information.
+1. **Measure the unguided response.** Sweep ordinary stickiness across a fixed range
+   with no structural target, through Search’s Pack runner in Node. This round needs no
+   guidance contract; it waits for registration, the frozen partition, the Search cohort
+   CLI, and `think-o4wo` and `think-5tyy`, whose Animate budgets guard the replays of the
+   trials it reports.
+2. **Add components.** At Search’s label-agnostic `grid` and `random` starts a partition
+   carries only its component-size profile, so compare the true touching-component
+   partition with a split-merge partition that changes that profile at a near-equal
+   count of within-component pairs. A size-preserving membership shuffle is a control
+   only at label-dependent starts (`previous`, `blocks`, or a start that keeps record
+   offsets). A record that is one touching component, as `n = 11` and 29 both are,
+   gives a partition that carries nothing beyond `n`, so its cells are excluded.
+3. **Add graph edges.** Compare the true contact graph with a rewired graph of the same
+   edge count, and a thinned true graph with its rewired twin at the same `keep`, so
+   “more forces” is not confused with “correct structure.”
+4. **Add oriented faces.** Compare typed face-pair guidance with a wrong-feature
+   assignment at the same torque strength, range and schedule, and with the untyped
+   graph under a label-free nearest-face torque. The first contrast isolates the feature
+   information; the second keeps the new torque from being credited to it.
 5. **Vary the schedule.** Compare constant guidance with predeclared decay and release
    schedules at fixed work.
 
 Every stage retains the unguided arm.
 A later tier cannot replace an earlier negative result, and a stage does not advance
 merely because it reconstructs more of the target.
-`think-0epc` owns the sweep after the contracts and instrument pass their guards.
+The unguided stickiness curve is its own task; `think-0epc` owns the guided sweep after
+the contracts and instrument pass their guards and the curve has fixed the stickiness
+level that guided arms use.
 
 ## Calibration, Controls and Work
 
-The campaign manifest freezes known-answer calibration cells and held-out cells before
-the first target run (`think-3yma`). Parameter choices use only the calibration side;
-the held-out side decides whether a setting transfers.
+A headless partition freeze fixes known-answer calibration cells and held-out cells in
+the campaign manifest before the first measured round; Search’s presets (`think-3yma`)
+read that partition rather than define it.
+It uses `think-rey9`’s per-tier coverage, which today is thin: typed features exist only
+for `n = 11` and 29, whose 66 pair contacts are 35 edge-edge, 25 corner-edge and 6
+corner-corner, and both records are single touching components.
+Parameter choices use only the calibration side, under a selection rule frozen with the
+contrasts; held-out confirmation is the only decision gate.
 True structures come from known records under the frozen extractor, so each result
 states how much of the answer the run received.
 
 Configuration arms use paired seed blocks and execute in an interleaved order.
-They receive the same declared work budget.
-Pair tests remain the primary cross-proposer currency once enforcement exists; the
-receipt also reports candidates, kernel steps and guidance-force work.
-CPU time and wall time are recorded beside the receipt, as Search outcomes already carry
-`elapsedMs`, so they never enter receipt identity or the zero-strength comparison.
-A comparison with unequal effective work is invalid rather than suggestive.
+They share the enforced Search budget: physics steps, proposal attempts and repair
+iterations per slot, and slots per block.
+Guidance work is charged rather than exempt.
+Each slot reports pair candidates, guidance-force evaluations and repair pair tests; when
+a candidate’s pair-level work exceeds its comparator’s, the comparator gets enough extra
+slots per block to match it, and a win that holds only at equal steps is not accepted.
+No guided-versus-unguided comparison is admissible until `think-gdkd` has declared this
+currency. Registered cohorts leave `timeoutMs` unset, and receipt identity hashes the
+canonical trial value rather than the Search outcome that carries `elapsedMs`.
+CPU time, measured in Node only, and wall time are operational context beside the
+receipt; they never enter receipt identity, the budget or the zero-strength comparison.
 
 Required controls are:
 
-- unguided execution and the exact zero-strength identity;
-- true versus shuffled component partitions;
-- true versus thinned and rewired contact graphs;
-- oriented face pairs versus the same untyped graph;
+- unguided execution and the zero-strength canonical-receipt, un-normalized and
+  small-strength controls;
+- true versus split-merge component partitions, and true versus shuffled membership at
+  label-dependent starts only;
+- true versus rewired contact graphs at equal edge count, and thinned true versus
+  thinned rewired graphs at equal `keep`;
+- oriented face pairs versus a wrong-feature assignment and versus the untyped graph
+  under a nearest-face torque;
 - constant versus decay and release schedules;
 - deterministic replay, nonfinite and malformed-target mutations; and
-- the X-035 trajectory continuity and penetration guards.
+- the X-035 trajectory continuity and penetration budgets on Animate replays of the
+  reported trials, since Search trials run through Pack rather than the Animate
+  trajectory.
 
-`think-gdkd` freezes each directional hypothesis, metric mapping and accept rule before
-measurement. No post-result threshold or preferred seed block may enter the same round.
+`think-gdkd` freezes each directional hypothesis, the full contrast list, metric mapping,
+selection rule, work currency and accept rule before measurement.
+No post-result threshold or preferred seed block may enter the same round.
 
 ## Metric Vector and Verdict Boundary
 
@@ -169,39 +226,52 @@ The planned guided-search vector has five roles:
 | Role | Required measurements |
 | --- | --- |
 | outcome | valid success count per seed block; block-best valid side and gap to the declared comparator |
-| guard | independent geometry validity, finiteness, deterministic replay, exact zero-strength equivalence and X-035 continuity budgets |
-| cost | pair tests, candidates, kernel steps, guidance-force work, CPU time and wall time |
+| guard | independent geometry validity, finiteness, deterministic replay, the zero-strength controls, and X-035 continuity budgets on Animate replays of reported trials |
+| cost | the enforced Search budget (physics steps, proposal attempts, repair iterations) and charged pair-level work (pair candidates, guidance-force evaluations, repair pair tests); CPU time from Node and wall time as operational context only |
 | mechanism | component recovery, contact precision and recall, false contacts, oriented-face recovery, contacts, gaps and trajectory kinetics |
-| spread | paired differences over predeclared, interleaved seed blocks; calibration and held-out results reported separately |
+| spread | paired differences over predeclared, interleaved seed blocks, reported but not deciding; calibration and held-out results reported separately |
 
 Target recovery is explanatory.
 Better component recovery, contact recall or face-assignment recovery cannot accept a
 search claim unless the candidate also improves the preregistered valid-side outcome
 under equal work and all guards pass.
 A smooth or visually convincing trace has the same limitation.
+The planned deciding statistic is the search-proposer accept rule’s clause 1 on held-out
+cells, with seed blocks in place of seeds and block-best valid side in place of
+`best_side`: a lower median and non-overlapping ranges.
 
 ## Record and Ownership
 
 The first measured round must open a truthful successor series under `think-i08r`.
 Guidance targets, new work accounting and the shared trajectory/receipt contract change
 the regime enough that appending these rounds to `series-000` would imply false
-comparability. Until the contract, strength units, instrument and hypotheses are frozen,
-there is no experiment artifact to allocate.
+comparability. Until the work currency, instrument, partition and hypotheses are frozen,
+and for a guided round also the target contract and strength units, there is no
+experiment artifact to allocate.
 
 The tracked program is:
 
 - `think-c0rm`: graded-guidance program and strategy comparisons;
-- `think-8ocb`: `GuidanceTarget/v1`, application configuration and capabilities;
+- `think-8ocb`: `GuidanceTarget/v1`, application configuration, the `relatedMask`
+  migration, registered controls and capabilities;
 - `think-rey9`: component, graph and oriented-feature extraction with ambiguity and
-  refusal semantics;
-- `think-os1n`: attraction, alignment, weld, decay and release mechanics;
+  refusal semantics, per-record component counts, feature coverage and remaining degrees
+  of freedom;
+- `think-os1n`: a separate guidance force, attraction, alignment, weld, decay and release
+  mechanics;
 - `think-qx88`: shared command-line evaluation, trajectories and target metrics;
-- `think-gdkd`: preregistered metric vector and hypotheses;
-- `think-3yma`: calibration and held-out split;
+- `think-10yz`, guided Search receipts: the same configuration and
+  canonical receipt through the base scheduler;
+- `think-gdkd`: preregistered metric vector, hypotheses, contrasts, selection rule and
+  work currency;
+- `think-05o4`, the headless partition freeze: calibration and held-out
+  cells, which `think-3yma`’s Search presets later read;
 - `think-gfqt`: bounded scheduling, hashes and replay parity;
 - `think-czav`: workbench controls, overlays and replay;
-- `think-0epc`: the systematic sweep after admission; and
-- `think-o4wo` and `think-5tyy`: stable physical-response prerequisites.
+- `think-9hdg`, the unguided stickiness curve: the first measured round;
+- `think-0epc`: the systematic guided sweep after admission; and
+- `think-o4wo` and `think-5tyy`: the physical-response work whose Animate budgets guard
+  the rounds’ replays.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

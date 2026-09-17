@@ -400,18 +400,32 @@ the universal fields above.
 
 | Metric | Role | Required content |
 | --- | --- | --- |
-| guidance identity | identity | `GuidanceTarget/v1` content hash, information tier and the separate effective application configuration; an unguided arm records no target |
+| guidance identity | identity | a requested-guidance record (`GuidanceTarget/v1` content hash, information tier and the requested application configuration) beside the canonical effective receipt; an unguided arm records no target, and a zero-strength arm’s canonical receipt equals the unguided one |
 | valid block outcome | **outcome** | valid successes and block-best valid side and comparator gap for each predeclared seed block |
-| exact execution controls | **guard** | independent geometry validity, finiteness, deterministic replay, exact zero-strength equivalence and the applicable X-035 trajectory budgets |
-| guidance work | cost | pair tests, candidates, kernel steps, guidance-force work, CPU time and wall time under one fixed-work comparison |
+| exact execution controls | **guard** | independent geometry validity, finiteness, deterministic replay, the zero-strength canonical-receipt, un-normalized and small-strength controls, and the X-035 trajectory budgets on Animate replays of reported trials |
+| guidance work | cost | the enforced Search budget (physics steps, proposal attempts, repair iterations) and charged pair-level work (pair candidates, guidance-force evaluations, repair pair tests); CPU time, from Node only, and wall time are operational context |
 | target recovery | mechanism | component recovery, contact precision and recall, false contacts and oriented-face recovery, alongside contacts, gaps and kinetic metrics |
-| paired spread | spread | paired differences over interleaved seed blocks, with calibration and held-out cells reported separately |
+| paired spread | spread | paired differences over interleaved seed blocks, reported but not deciding, with calibration and held-out cells reported separately |
 
 Target-recovery metrics explain how a guided run behaved; they do not decide search
 quality. A guided arm can satisfy the search-proposer accept rule only through an
 improvement in the preregistered valid-side outcome at equal work, with every guard
 passing. Recovering more true contacts or oriented faces without that improvement is a
 mechanism result, not an accepted search strategy.
+
+The rule below names `sqsearch`’s currency and controls, so a guided round needs three
+substitutions,
+planned in the annealing plan’s
+[registration defaults](../../docs/project/specs/active/plan-2026-09-11-annealing-as-a-search.md#planned-registration-defaults)
+and frozen or revised by `think-gdkd` before the first measured round.
+The budget currency is the enforced Search budget with guidance work charged, not
+`pair_tests`, which the workbench kernel does not count.
+Clause 1 decides on held-out cells with seed blocks in place of seeds; paired block
+differences are reported only.
+Clauses 3 and 4 become the shared validity contract with its Python re-check and fixture
+tests, a declared positive control, the proved `n = 16` not-below control, and rejected
+invalid fixtures.
+No guided-versus-unguided comparison is admissible until that currency is declared.
 
 ## The Search-Proposer Accept Rule
 
@@ -682,8 +696,9 @@ The graded-guidance program in
 trajectory, receipt and work-accounting regime.
 Its first measured round must open a truthful successor series under `think-i08r`,
 rather than append incomparable results to `series-000`. No experiment artifact is
-allocated until the target contract, strength units, instrument and preregistered
-contrasts are frozen.
+allocated until the work currency, instrument, partition and preregistered contrasts are
+frozen, and for a guided round also the target contract and strength units.
+The first round is the unguided stickiness curve, which needs no guidance contract.
 
 ## Campaign Scope and Related Records
 
