@@ -75,8 +75,8 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
                 page.locator(f"#t-{key}").input_value()
                 for key in ("dwell", "move", "correct", "settle")
             ]
-            == ["0.6", "0.5", "0.4", "0.3"],
-            "the timing inputs do not show the 0.6 / 0.5 / 0.4 / 0.3 beat",
+            == ["0.6", "0.5", "0.2", "0.3"],
+            "the timing inputs do not show the 0.6 / 0.5 / 0.2 / 0.3 beat",
         )
 
         # 6 -> 7 fills the last row of a 3 x 3 grid; 4 -> 5 tilts its squares.

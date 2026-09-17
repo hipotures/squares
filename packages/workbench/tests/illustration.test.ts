@@ -158,9 +158,13 @@ function instants(schedule: PairSchedule): number[] {
 }
 
 //: The largest opacity change the default fade may make between two 60 Hz frames. The ease's
-//: steepest slope is 1.5 per fade, and the default fade is 0.36 s, so 0.07 is what it takes; the
-//: cubic ease-out it replaced jumped 0.17 on its first frame.
-const LARGEST_OPACITY_STEP = 0.08;
+//: steepest slope is 1.5 per fade, and the default fade is 0.4 of the 0.7 s moving span, 0.28 s
+//: since the correct beat went from 0.4 s to 0.2 s on 2026-09-17 (it was 0.36 s), so 0.0893 is
+//: what it takes; the cubic ease-out it replaced jumped 0.17 on its first frame.
+const LARGEST_OPACITY_STEP = 0.09;
+//: The most the first visible 60 Hz frame may show: it lands at most 1/60 s into the 0.28 s fade,
+//: 0.0595 of it, where the smoothstep is 0.0102. At the 0.36 s fade this bound was 0.01.
+const FIRST_VISIBLE_OPACITY = 0.011;
 
 test("in every phase the new square fades in smoothly, at full size and in place", () => {
   const configuration = defaultConfiguration();
@@ -191,7 +195,10 @@ test("in every phase the new square fades in smoothly, at full size and in place
     }
     assert.equal(previous, 1);
     // A smooth start: the first visible frame is nearly transparent.
-    assert.ok(firstVisible !== null && firstVisible < 0.01, `${phase}: first ${firstVisible}`);
+    assert.ok(
+      firstVisible !== null && firstVisible < FIRST_VISIBLE_OPACITY,
+      `${phase}: first ${firstVisible}`,
+    );
     const steps = ticks
       .slice(1)
       .map(({ square }, index) => (square?.opacity ?? 0) - (ticks[index]?.square?.opacity ?? 0));
@@ -226,7 +233,11 @@ test("the arrival delay moves the fade and never the resize, which stays smooth 
       (seconds) =>
         (illustrationFrame({ ...input, schedule, seconds }).squares[1]?.opacity ?? 0) > 0,
     );
-    assert.ok(seen !== undefined && seen > schedule.containerEnd + delay * 0.9);
+    // The delay is a share of the moving span, not seconds: the old `delay * 0.9` only matched the
+    // delay in seconds while the span was 0.9 s, before the correct beat shrank to 0.2 s.
+    const span = configuration.timing.move + configuration.timing.correct;
+    assert.ok(Math.abs(schedule.arrive - schedule.containerEnd - delay * span) < 1e-12);
+    assert.ok(seen !== undefined && seen > schedule.arrive);
     arrivals.push(seen);
     const steps = drawn.slice(1).map((side, index) => side - (drawn[index] ?? side));
     assert.ok(Math.min(...steps) >= 0 && Math.max(...steps) < 0.22);

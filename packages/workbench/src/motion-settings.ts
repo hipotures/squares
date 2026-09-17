@@ -142,7 +142,7 @@ export function annealConfiguration(level: number): AnnealConfiguration {
 export const DEFAULT_STEP_TIMING = {
   dwell: 0.6,
   move: 0.5,
-  correct: 0.4,
+  correct: 0.2,
   settle: 0.3,
 } as const;
 
@@ -245,7 +245,7 @@ export const BOUND_FADE = 0.12;
 /**
  * Share of the moving span between the container finishing its resize, which is when the picture
  * stops shrinking, and the new square starting to fade in. The direction is resize first, square
- * second. At the default beat 0.2 is 0.18 s, against the 0.108 s gap box-first staging left.
+ * second. At the default beat 0.2 is 0.14 s, against the 0.084 s gap box-first staging left.
  */
 export const DEFAULT_ARRIVAL_DELAY_FRACTION = 0.2;
 export const ARRIVAL_DELAY_BOUNDS: readonly [number, number] = [0, 0.6];
