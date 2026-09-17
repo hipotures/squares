@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import re
 import shlex
+import shutil
+import subprocess
 from collections.abc import Mapping
 from fnmatch import fnmatchcase
 from pathlib import Path
@@ -30,6 +32,14 @@ OVERLAPPED_PREPARED_PAGE_JOBS = {
     "font-loading",
     "browser-geometry",
 }
+
+#: The step right before every download by artifact id, reading the same id expression.
+#: With `merge-multiple`, an empty `artifact-ids` downloads every artifact in the run.
+ARTIFACT_ID_GUARD = "Require the prepared page's artifact id"
+ARTIFACT_ID_CHECK = (
+    '[[ "$ARTIFACT_ID" =~ ^[1-9][0-9]*$ ]] '
+    '|| { echo "::error::the prepared page has no artifact id to download"; exit 1; }'
+)
 
 
 def load() -> dict[str, Any]:
@@ -217,43 +227,74 @@ def test_the_required_aggregate_passes_a_justified_skip_and_nothing_else() -> No
     assert set(needs_of(jobs["deploy"])) == {"publish", "pages-required"}
 
 
+def conjuncts(condition: str) -> list[str] | None:
+    """The whole clauses an `if:` joins with `&&`, or None if it is not only a conjunction.
+
+    Under `||` no clause is necessary, so finding one in the text proves nothing about
+    what the condition requires.
+    """
+    text = condition.strip()
+    if text.startswith("${{") and text.endswith("}}"):
+        text = text[3:-2]
+    if "||" in text:
+        return None
+    return [" ".join(clause.split()) for clause in text.split("&&")]
+
+
 def implicit_success_gaps(jobs: Mapping[str, Mapping[str, Any]], name: str) -> list[str]:
-    """What `name`'s `if:` lacks when an ancestor can skip on a push.
+    """The clauses `name`'s `if:` does not require when an ancestor can skip on a push.
 
     Without a status function GitHub applies `success()` over every ancestor, so one
-    skipped ancestor skips the job however its direct `needs:` ended.
+    skipped ancestor skips the job however its direct `needs:` ended. Each clause must be
+    a whole conjunct of the condition, and a condition with `||` requires none of them.
     """
     if not any(jobs[ancestor].get("if") for ancestor in upstream(jobs, name)):
         return []
-    condition = str(jobs[name].get("if", ""))
+    clauses = conjuncts(str(jobs[name].get("if", "")))
     required = [
         "!cancelled()",
         *(f"needs.{need}.result == 'success'" for need in needs_of(jobs[name])),
     ]
-    return [clause for clause in required if clause not in condition]
+    return [clause for clause in required if clauses is None or clause not in clauses]
 
 
 def test_the_deploy_path_does_not_inherit_skips_from_its_ancestors() -> None:
     """From #183 to this fix every push to `main` skipped `deploy`.
 
     The dispatch-only timing job and one job of each `*-unchanged` pair skip on a push, and
-    `deploy` carried no status function, so its implicit `success()` saw those skips.
+    `deploy` carried no status function, so its implicit `success()` saw those skips. The
+    conditions are pinned whole, so the fix cannot also drop the push-to-`main` gate.
     """
     jobs = load()["jobs"]
+    assert jobs["deploy"]["if"] == (
+        "${{ !cancelled() && github.ref == 'refs/heads/main' "
+        "&& github.event_name != 'pull_request' "
+        "&& needs.publish.result == 'success' && needs.pages-required.result == 'success' }}"
+    )
+    assert jobs["verify-deployment"]["if"] == (
+        "${{ !cancelled() && needs.deploy.result == 'success' }}"
+    )
     for name in sorted(DEPLOY_PATH):
         assert not implicit_success_gaps(jobs, name), (name, implicit_success_gaps(jobs, name))
-    before = {
-        **jobs,
-        "deploy": {
-            **jobs["deploy"],
-            "if": "github.ref == 'refs/heads/main' && github.event_name != 'pull_request'",
-        },
-    }
-    assert implicit_success_gaps(before, "deploy") == [
+
+    def deploying_if(condition: str) -> dict[str, Any]:
+        return {**jobs, "deploy": {**jobs["deploy"], "if": condition}}
+
+    required = [
         "!cancelled()",
         "needs.publish.result == 'success'",
         "needs.pages-required.result == 'success'",
     ]
+    before = "github.ref == 'refs/heads/main' && github.event_name != 'pull_request'"
+    assert implicit_success_gaps(deploying_if(before), "deploy") == required
+    # Every clause is in the text of each of these, which a substring match accepted.
+    fixed = str(jobs["deploy"]["if"])
+    for weakened in (
+        fixed.replace("!cancelled()", "always() || !cancelled()"),
+        fixed.replace("&& needs.publish.result", "|| needs.publish.result"),
+    ):
+        assert all(clause in weakened for clause in required), weakened
+        assert implicit_success_gaps(deploying_if(weakened), "deploy") == required, weakened
 
 
 def test_every_download_by_artifact_id_extracts_into_its_path() -> None:
@@ -273,6 +314,92 @@ def test_every_download_by_artifact_id_extracts_into_its_path() -> None:
     assert len(downloads) >= 9
     for name, arguments in downloads:
         assert arguments.get("merge-multiple") is True, name
+
+
+def unguarded_downloads_by_id(jobs: Mapping[str, Mapping[str, Any]]) -> list[str]:
+    """Downloads by artifact id that an empty id would not stop.
+
+    Each must follow, immediately, the guard step reading its own id expression, and
+    neither step may be skippable or allowed to fail.
+    """
+    unguarded: list[str] = []
+    for name, job in jobs.items():
+        steps = job.get("steps", [])
+        for index, step in enumerate(steps):
+            if not (
+                step.get("uses", "").startswith("actions/download-artifact@")
+                and "artifact-ids" in step.get("with", {})
+            ):
+                continue
+            guard = {
+                "name": ARTIFACT_ID_GUARD,
+                "env": {"ARTIFACT_ID": step["with"]["artifact-ids"]},
+                "run": ARTIFACT_ID_CHECK,
+            }
+            preceding = steps[index - 1] if index else None
+            if preceding != guard or "if" in step or "continue-on-error" in step:
+                unguarded.append(f"{name}: step {index}")
+    return unguarded
+
+
+def test_every_download_by_artifact_id_is_refused_without_an_id() -> None:
+    """`artifact-ids: ''` with `merge-multiple` is not an error; it downloads everything.
+
+    Every artifact in the run would land in `packing/site`, the workbench's `index.html`
+    over the explainer's, and the checks after it would read the wrong page. Skipping the
+    download would leave them reading no page, so the step before it fails the job instead.
+    """
+    jobs = load()["jobs"]
+    assert not unguarded_downloads_by_id(jobs)
+    guarded = [
+        (name, index)
+        for name, job in jobs.items()
+        for index, step in enumerate(job.get("steps", []))
+        if step.get("name") == ARTIFACT_ID_GUARD
+    ]
+    downloads = [
+        name
+        for name, job in jobs.items()
+        for step in job.get("steps", [])
+        if "artifact-ids" in step.get("with", {})
+    ]
+    assert len(guarded) == len(downloads) >= 9
+    bash = shutil.which("bash")
+    assert bash
+    for value, status in (("", 1), (" ", 1), ("0", 1), ("12abc", 1), ("35175474665", 0)):
+        result = subprocess.run(
+            (bash, "-e", "-c", ARTIFACT_ID_CHECK),
+            env={"ARTIFACT_ID": value},
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        assert result.returncode == status, (value, result)
+
+    for name, index in guarded:
+        steps = jobs[name]["steps"]
+        guard, download = steps[index], steps[index + 1]
+        mutations = {
+            "no guard": [*steps[:index], *steps[index + 1 :]],
+            "another id": [
+                *steps[:index],
+                {**guard, "env": {"ARTIFACT_ID": "${{ steps.other.outputs.artifact_id }}"}},
+                *steps[index + 1 :],
+            ],
+            "skippable guard": [
+                *steps[:index],
+                {**guard, "if": "always()"},
+                *steps[index + 1 :],
+            ],
+            "skippable download": [
+                *steps[: index + 1],
+                {**download, "if": "steps.prepared.outputs.artifact_id != ''"},
+                *steps[index + 2 :],
+            ],
+        }
+        for mutation, mutated in mutations.items():
+            changed = {**jobs, name: {**jobs[name], "steps": mutated}}
+            assert unguarded_downloads_by_id(changed), (name, mutation)
 
 
 def test_pages_filters_cover_the_probes_its_tools_and_controls_load() -> None:
@@ -332,8 +459,12 @@ def test_page_check_setup_overlaps_prepare_then_joins_its_exact_artifact() -> No
             if "playwright install" in step.get("run", "")
         )
         wait = next(step for step in steps if step.get("name") == "Wait for the prepared page")
+        guard = next(step for step in steps if step.get("name") == ARTIFACT_ID_GUARD)
         download = next(step for step in steps if step.get("name") == "Use the prepared page")
-        assert install_index < steps.index(wait) < steps.index(download)
+        assert (
+            install_index < steps.index(wait) < steps.index(guard) == steps.index(download) - 1
+        )
+        assert guard["env"] == {"ARTIFACT_ID": "${{ steps.prepared.outputs.artifact_id }}"}
         assert wait["id"] == "prepared"
         assert wait["env"]["GH_TOKEN"] == "${{ github.token }}"
         command = wait["run"]
@@ -432,6 +563,10 @@ def test_publication_assembles_the_three_checked_products_and_only_main_uploads_
     publish = jobs["publish"]
     assert set(needs_of(publish)) == {"prepare", "pdf", "workbench"}
     steps = publish["steps"]
+    assert steps[0]["name"] == ARTIFACT_ID_GUARD
+    assert steps[0]["env"] == {
+        "ARTIFACT_ID": "${{ needs.prepare.outputs.prepared_artifact_id }}"
+    }
     downloads = [
         step["with"]
         for step in steps

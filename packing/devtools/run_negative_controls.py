@@ -391,7 +391,8 @@ ROOT_DOCUMENTS = (
 # Three portable workers remain bounded at 576 MiB.
 #
 # 2026-09-16, the same day, merging that raise into the pipeline closeout block: it was
-# measured before the agenda 031--035 and exp-201/202 output roots joined `PRUNE` above.
+# measured before the output roots of agendas 031 and 033--035 and of exp-201/202 joined
+# `PRUNE` above. Agenda 032 is not among them: only its exp-137 receipt is pruned.
 # With them pruned, the merged snapshot measures 144,637,123 bytes (137.9 MiB), 22.1 MiB
 # under 160 MiB. The raise answered a breach this branch removes by pruning, so it is
 # undone rather than kept as slack that would hide the next one. Three portable workers

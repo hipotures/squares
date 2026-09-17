@@ -436,6 +436,15 @@ jobs:
           --run-attempt "$GITHUB_RUN_ATTEMPT" --name prepared-page
           --producer prepare --github-output "$GITHUB_OUTPUT" --timeout 600
 
+      # With `merge-multiple`, an empty `artifact-ids` downloads every artifact in the
+      # run into `packing/site`, the workbench's `index.html` among them. Refuse it here.
+      - name: Require the prepared page's artifact id
+        env:
+          ARTIFACT_ID: ${{ steps.prepared.outputs.artifact_id }}
+        run: >-
+          [[ "$ARTIFACT_ID" =~ ^[1-9][0-9]*$ ]]
+          || { echo "::error::the prepared page has no artifact id to download"; exit 1; }
+
       - name: Use the prepared page
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
@@ -593,6 +602,15 @@ jobs:
           --run-attempt "$GITHUB_RUN_ATTEMPT" --name prepared-page
           --producer prepare --github-output "$GITHUB_OUTPUT" --timeout 600
 
+      # With `merge-multiple`, an empty `artifact-ids` downloads every artifact in the
+      # run into `packing/site`, the workbench's `index.html` among them. Refuse it here.
+      - name: Require the prepared page's artifact id
+        env:
+          ARTIFACT_ID: ${{ steps.prepared.outputs.artifact_id }}
+        run: >-
+          [[ "$ARTIFACT_ID" =~ ^[1-9][0-9]*$ ]]
+          || { echo "::error::the prepared page has no artifact id to download"; exit 1; }
+
       - name: Use the prepared page
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
@@ -663,6 +681,15 @@ jobs:
           --repository "$GITHUB_REPOSITORY" --run-id "$GITHUB_RUN_ID"
           --run-attempt "$GITHUB_RUN_ATTEMPT" --name prepared-page
           --producer prepare --github-output "$GITHUB_OUTPUT" --timeout 600
+
+      # With `merge-multiple`, an empty `artifact-ids` downloads every artifact in the
+      # run into `packing/site`, the workbench's `index.html` among them. Refuse it here.
+      - name: Require the prepared page's artifact id
+        env:
+          ARTIFACT_ID: ${{ steps.prepared.outputs.artifact_id }}
+        run: >-
+          [[ "$ARTIFACT_ID" =~ ^[1-9][0-9]*$ ]]
+          || { echo "::error::the prepared page has no artifact id to download"; exit 1; }
 
       - name: Use the prepared page
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
@@ -764,6 +791,15 @@ jobs:
           --run-attempt "$GITHUB_RUN_ATTEMPT" --name prepared-page
           --producer prepare --github-output "$GITHUB_OUTPUT" --timeout 600
 
+      # With `merge-multiple`, an empty `artifact-ids` downloads every artifact in the
+      # run into `packing/site`, the workbench's `index.html` among them. Refuse it here.
+      - name: Require the prepared page's artifact id
+        env:
+          ARTIFACT_ID: ${{ steps.prepared.outputs.artifact_id }}
+        run: >-
+          [[ "$ARTIFACT_ID" =~ ^[1-9][0-9]*$ ]]
+          || { echo "::error::the prepared page has no artifact id to download"; exit 1; }
+
       - name: Use the prepared page
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
@@ -854,6 +890,15 @@ jobs:
           --repository "$GITHUB_REPOSITORY" --run-id "$GITHUB_RUN_ID"
           --run-attempt "$GITHUB_RUN_ATTEMPT" --name prepared-page
           --producer prepare --github-output "$GITHUB_OUTPUT" --timeout 600
+
+      # With `merge-multiple`, an empty `artifact-ids` downloads every artifact in the
+      # run into `packing/site`, the workbench's `index.html` among them. Refuse it here.
+      - name: Require the prepared page's artifact id
+        env:
+          ARTIFACT_ID: ${{ steps.prepared.outputs.artifact_id }}
+        run: >-
+          [[ "$ARTIFACT_ID" =~ ^[1-9][0-9]*$ ]]
+          || { echo "::error::the prepared page has no artifact id to download"; exit 1; }
 
       - name: Use the prepared page
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
@@ -975,6 +1020,15 @@ jobs:
           --repository "$GITHUB_REPOSITORY" --run-id "$GITHUB_RUN_ID"
           --run-attempt "$GITHUB_RUN_ATTEMPT" --name prepared-page
           --producer prepare --github-output "$GITHUB_OUTPUT" --timeout 600
+
+      # With `merge-multiple`, an empty `artifact-ids` downloads every artifact in the
+      # run into `packing/site`, the workbench's `index.html` among them. Refuse it here.
+      - name: Require the prepared page's artifact id
+        env:
+          ARTIFACT_ID: ${{ steps.prepared.outputs.artifact_id }}
+        run: >-
+          [[ "$ARTIFACT_ID" =~ ^[1-9][0-9]*$ ]]
+          || { echo "::error::the prepared page has no artifact id to download"; exit 1; }
 
       - name: Use the prepared page
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
@@ -1100,6 +1154,15 @@ jobs:
           --run-attempt "$GITHUB_RUN_ATTEMPT" --name prepared-page
           --producer prepare --github-output "$GITHUB_OUTPUT" --timeout 600
 
+      # With `merge-multiple`, an empty `artifact-ids` downloads every artifact in the
+      # run into `packing/site`, the workbench's `index.html` among them. Refuse it here.
+      - name: Require the prepared page's artifact id
+        env:
+          ARTIFACT_ID: ${{ steps.prepared.outputs.artifact_id }}
+        run: >-
+          [[ "$ARTIFACT_ID" =~ ^[1-9][0-9]*$ ]]
+          || { echo "::error::the prepared page has no artifact id to download"; exit 1; }
+
       - name: Use the prepared page
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
@@ -1174,6 +1237,15 @@ jobs:
           enable-cache: true
           cache-dependency-glob: uv.lock
 
+      # With `merge-multiple`, an empty `artifact-ids` downloads every artifact in the
+      # run into `packing/site`, the workbench's `index.html` among them. Refuse it here.
+      - name: Require the prepared page's artifact id
+        env:
+          ARTIFACT_ID: ${{ needs.prepare.outputs.prepared_artifact_id }}
+        run: >-
+          [[ "$ARTIFACT_ID" =~ ^[1-9][0-9]*$ ]]
+          || { echo "::error::the prepared page has no artifact id to download"; exit 1; }
+
       - name: Use the prepared page
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
@@ -1233,6 +1305,15 @@ jobs:
     needs: [prepare, pdf, workbench]
     runs-on: ubuntu-latest
     steps:
+      # With `merge-multiple`, an empty `artifact-ids` downloads every artifact in the
+      # run into `packing/site`, the workbench's `index.html` among them. Refuse it here.
+      - name: Require the prepared page's artifact id
+        env:
+          ARTIFACT_ID: ${{ needs.prepare.outputs.prepared_artifact_id }}
+        run: >-
+          [[ "$ARTIFACT_ID" =~ ^[1-9][0-9]*$ ]]
+          || { echo "::error::the prepared page has no artifact id to download"; exit 1; }
+
       - name: Use the prepared page
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
