@@ -217,6 +217,45 @@ def test_the_required_aggregate_passes_a_justified_skip_and_nothing_else() -> No
     assert set(needs_of(jobs["deploy"])) == {"publish", "pages-required"}
 
 
+def implicit_success_gaps(jobs: Mapping[str, Mapping[str, Any]], name: str) -> list[str]:
+    """What `name`'s `if:` lacks when an ancestor can skip on a push.
+
+    Without a status function GitHub applies `success()` over every ancestor, so one
+    skipped ancestor skips the job however its direct `needs:` ended.
+    """
+    if not any(jobs[ancestor].get("if") for ancestor in upstream(jobs, name)):
+        return []
+    condition = str(jobs[name].get("if", ""))
+    required = [
+        "!cancelled()",
+        *(f"needs.{need}.result == 'success'" for need in needs_of(jobs[name])),
+    ]
+    return [clause for clause in required if clause not in condition]
+
+
+def test_the_deploy_path_does_not_inherit_skips_from_its_ancestors() -> None:
+    """From #183 to this fix every push to `main` skipped `deploy`.
+
+    The dispatch-only timing job and one job of each `*-unchanged` pair skip on a push, and
+    `deploy` carried no status function, so its implicit `success()` saw those skips.
+    """
+    jobs = load()["jobs"]
+    for name in sorted(DEPLOY_PATH):
+        assert not implicit_success_gaps(jobs, name), (name, implicit_success_gaps(jobs, name))
+    before = {
+        **jobs,
+        "deploy": {
+            **jobs["deploy"],
+            "if": "github.ref == 'refs/heads/main' && github.event_name != 'pull_request'",
+        },
+    }
+    assert implicit_success_gaps(before, "deploy") == [
+        "!cancelled()",
+        "needs.publish.result == 'success'",
+        "needs.pages-required.result == 'success'",
+    ]
+
+
 def test_pages_filters_cover_the_probes_its_tools_and_controls_load() -> None:
     """The page's tools and its PDF controls hand the browser JavaScript from probe files, and
     the render inlines some of them; an edit to one is an edit to the tool that loads it.

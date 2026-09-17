@@ -1324,9 +1324,15 @@ jobs:
           uv run --no-project --python 3.14.7 --with PyYAML==6.0.3 python
           packing/devtools/check_pr_wall.py --workflow certificate-page
 
+  # A job with no status function in its `if:` implicitly requires `success()`, which
+  # GitHub evaluates over every ancestor, not just `needs:`. The dispatch-only timing job
+  # and one job of each `*-unchanged` pair skip on every push, so without explicit result
+  # checks these two jobs skip too: from 2026-09-16 no push to `main` deployed.
   deploy:
     needs: [publish, pages-required]
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    if: >-
+      ${{ !cancelled() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+      && needs.publish.result == 'success' && needs.pages-required.result == 'success' }}
     runs-on: ubuntu-latest
     outputs:
       page-url: ${{ steps.deployment.outputs.page_url }}
@@ -1349,6 +1355,7 @@ jobs:
 
   verify-deployment:
     needs: deploy
+    if: ${{ !cancelled() && needs.deploy.result == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repository
