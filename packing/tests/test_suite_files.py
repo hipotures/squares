@@ -53,6 +53,20 @@ def test_the_suite_shards_partition_every_test_file() -> None:
     assert all(shards)
 
 
+def test_the_record_names_only_files_under_the_behavioural_roots() -> None:
+    """A recorded path outside both roots matches no collected file and still takes weight.
+
+    Schema-v1 reports derived the file from a nodeid relative to `packing/`, so the
+    workbench tests were recorded as `packing/test_*.py`: sixteen entries and 15.05
+    recorded seconds that the packing balanced while the real files fell back to their
+    path hash. A rename or a deletion may still leave a stale row, which the design
+    tolerates; a row under no behavioural root is a mislabelled report.
+    """
+    roots = tuple(f"{suite_files.repository_path(root)}/" for root in TEST_ROOTS)
+    costs = suite_files.load_costs()
+    assert sorted(name for name in costs.seconds if not name.startswith(roots)) == []
+
+
 def test_the_packing_depends_only_on_the_record() -> None:
     """The same record in any order packs the same way, and a new file moves nothing."""
     costs = suite_files.load_costs()

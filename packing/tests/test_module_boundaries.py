@@ -451,6 +451,12 @@ def test_ci_jobs_fetch_provenance_history_and_key_the_uv_cache_from_the_lock() -
             if str(_mapping(step).get("uses", "")).startswith("actions/checkout@")
         )
         assert _mapping(suite_checkout["with"])["fetch-depth"] == 0
+        # Neither partial form. Both were run against the whole lane, and the suite-a
+        # checkout comment has the counts: a blobless clone makes 66 tests fetch history
+        # over the network, and a sparse checkout without `packing/resources/*/` and
+        # `packing/campaign/*/` fails 426 tests and quietly skips three more.
+        assert "filter" not in _mapping(suite_checkout["with"])
+        assert "sparse-checkout" not in _mapping(suite_checkout["with"])
         assert not any(
             "setup-node" in str(_mapping(step).get("uses", "")) for step in suite_steps
         )

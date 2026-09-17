@@ -413,8 +413,14 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          # The behavioural lane includes tests that read git history rather than only
-          # the worktree, so this job clones the same way `validate` does.
+          # Full history with every blob, as `validate` clones. Both cheaper clones were
+          # run against the whole quick lane at 21642ed8 and refused. Blobless saves about
+          # 100 MB of a ~520 MB fetch, most of which is the tree at HEAD, but leaves 11
+          # historical objects to fetch one round trip at a time from inside tests: 66
+          # tests fail without them, and two of the fetches fall in a call the 5 s ceiling
+          # times. Dropping `packing/resources/*/` and `packing/campaign/*/` from a sparse
+          # checkout fetches 36 MB, and 426 tests in 70 files then fail and three more
+          # skip, because the lane opens and scans both trees. The shard B job is the same.
           fetch-depth: 0
           # kpress is vendored at vendor/kpress and installed from that path, so
           # the environment does not resolve without the submodule checked out.
