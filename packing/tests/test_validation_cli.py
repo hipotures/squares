@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import io
 import json
@@ -134,6 +135,14 @@ def test_artifacts_keep_a_steps_own_durations_filter(
     assert quick.count("--durations=0") == 1
     assert bare[-3:-1] == ["--durations=0", "--durations-min=0"]
     assert all(command[-1].startswith("--junitxml=") for command in commands)
+    # The quick lane also writes its per-file cost report into the same artifact, under the
+    # junit file's stem, and a pytest command without the plugin is not asked for one.
+    # `devtools.suite_files record` rebuilds the shard partition from those reports, so
+    # losing the argument would leave the next recalibration with nothing to read.
+    [costs] = [argument for argument in quick if argument.startswith("--test-file-costs=")]
+    stem = quick[-1].removeprefix("--junitxml=").removesuffix(".junit.xml")
+    assert costs == f"--test-file-costs={stem}.test-files.json"
+    assert not any(argument.startswith("--test-file-costs=") for argument in bare)
 
 
 def test_artifact_provenance_reports_a_git_failure_as_a_step_failure(
@@ -2596,6 +2605,29 @@ def test_the_pull_request_runs_its_sweeps_and_its_suite_apart() -> None:
             assert not marked & other
 
 
+def _workflow_commands(*, pull_request: bool) -> dict[str, argparse.Namespace]:
+    """Each Linux gate job's parsed `packing-validate` command on this event, by job name.
+
+    `macos-portability` is excluded here for the reason `_workflow_selections` gives.
+    """
+    condition = "github.event_name == 'pull_request'"
+    negation = "github.event_name != 'pull_request'"
+    excluded = negation if pull_request else condition
+    document = safe_load(WORKFLOW.read_text(encoding="utf-8"))
+    commands: dict[str, argparse.Namespace] = {}
+    for job_name, job in document["jobs"].items():
+        if job_name == "macos-portability" or excluded in str(job.get("if", "")):
+            continue
+        for step in job.get("steps", []):
+            command = str(step.get("run", ""))
+            if "packing-validate" not in command or excluded in str(step.get("if", "")):
+                continue
+            tokens = shlex.split(command)
+            arguments = tokens[tokens.index("packing-validate") + 1 :]
+            commands[job_name] = validate._parser().parse_args(arguments)
+    return commands
+
+
 def _workflow_selections(*, pull_request: bool) -> dict[str, set[str]]:
     """What each Linux gate job actually selects on this event, by job name.
 
@@ -2608,39 +2640,26 @@ def _workflow_selections(*, pull_request: bool) -> dict[str, set[str]]:
     jobs also do, so it is not part of either partition -- and the tests that call this
     assert which jobs exist, so a new one cannot join either surface unnoticed.
     """
-    condition = "github.event_name == 'pull_request'"
-    negation = "github.event_name != 'pull_request'"
-    excluded = negation if pull_request else condition
-    document = safe_load(WORKFLOW.read_text(encoding="utf-8"))
-    selections: dict[str, set[str]] = {}
-    for job_name, job in document["jobs"].items():
-        if job_name == "macos-portability" or excluded in str(job.get("if", "")):
-            continue
-        for step in job.get("steps", []):
-            command = str(step.get("run", ""))
-            if "packing-validate" not in command or excluded in str(step.get("if", "")):
-                continue
-            tokens = shlex.split(command)
-            arguments = tokens[tokens.index("packing-validate") + 1 :]
-            namespace = validate._parser().parse_args(arguments)
-            selections[job_name] = {
-                selected.name
-                for selected in validate._select_steps(
-                    only=namespace.only,
-                    skip=namespace.skip,
-                    fast=namespace.fast,
-                    records=namespace.records,
-                    edit=namespace.edit,
-                    checks=namespace.checks,
-                    frontend=namespace.frontend,
-                    sweeps=namespace.sweeps,
-                    suite_a=namespace.suite_a,
-                    suite_b=namespace.suite_b,
-                    geometry=namespace.geometry,
-                    typecheck=namespace.typecheck,
-                )
-            }
-    return selections
+    return {
+        job_name: {
+            selected.name
+            for selected in validate._select_steps(
+                only=namespace.only,
+                skip=namespace.skip,
+                fast=namespace.fast,
+                records=namespace.records,
+                edit=namespace.edit,
+                checks=namespace.checks,
+                frontend=namespace.frontend,
+                sweeps=namespace.sweeps,
+                suite_a=namespace.suite_a,
+                suite_b=namespace.suite_b,
+                geometry=namespace.geometry,
+                typecheck=namespace.typecheck,
+            )
+        }
+        for job_name, namespace in _workflow_commands(pull_request=pull_request).items()
+    }
 
 
 def test_the_pull_request_jobs_partition_the_surface() -> None:
@@ -2725,6 +2744,44 @@ def test_a_verified_merge_repeats_everything_not_positively_tree_reusable() -> N
         validate.TREE_VERIFIED_ENVIRONMENT: "${{ steps.verified-tree.outputs.run }}"
     }
     assert validate_job["permissions"] == {"contents": "read", "actions": "read"}
+
+
+def test_a_tree_proof_narrows_only_the_complete_post_merge_surface(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """The CLI half of the post-merge reuse: where the proof applies, and what it leaves.
+
+    `_after_verified_pull_request` decides which fast steps a proof may leave out. What
+    keeps that from narrowing anything else is `_unless_verified`: a tier, `--only`,
+    `--since` or `--push` run that inherited the variable refuses rather than quietly
+    dropping part of a declared selection, and the complete surface the workflow runs
+    after a push lists exactly the narrowed selection.
+    """
+    monkeypatch.setenv(validate.TREE_VERIFIED_ENVIRONMENT, "12345")
+    for arguments in (
+        ["--checks"],
+        ["--only", "exact verification"],
+        ["--since", "HEAD"],
+        ["--push"],
+    ):
+        assert main([*arguments, "--list"]) == 2, arguments
+        assert validate.TREE_VERIFIED_ENVIRONMENT in capsys.readouterr().err, arguments
+
+    post_merge = _workflow_commands(pull_request=False)["validate"]
+    complete = _workflow_selections(pull_request=False)["validate"]
+    narrowed = {
+        step.name
+        for step in validate._after_verified_pull_request(
+            [step for step in validate.STEPS if step.name in complete]
+        )
+    }
+    assert narrowed < complete
+    skips = [part for pattern in post_merge.skip for part in ("--skip", pattern)]
+    assert main([*skips, "--list", "--format", "json"]) == 0
+    captured = capsys.readouterr()
+    assert {entry["name"] for entry in json.loads(captured.out)} == narrowed
+    # The announcement goes to stderr under `--format json`, never into the document.
+    assert "passed this exact tree" in captured.err
 
 
 def test_the_engine_cache_backdates_and_saves_only_a_build_for_its_exact_key() -> None:
