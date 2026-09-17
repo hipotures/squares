@@ -389,7 +389,14 @@ ROOT_DOCUMENTS = (
 # generated tree. Reset the same roughly-32-MiB operating headroom at 192 MiB while that
 # bead retains the durable audit of generated files that no mutation control reads.
 # Three portable workers remain bounded at 576 MiB.
-SNAPSHOT_MAX_BYTES = 192 * 1024 * 1024
+#
+# 2026-09-16, the same day, merging that raise into the pipeline closeout block: it was
+# measured before the agenda 031--035 and exp-201/202 output roots joined `PRUNE` above.
+# With them pruned, the merged snapshot measures 144,637,123 bytes (137.9 MiB), 22.1 MiB
+# under 160 MiB. The raise answered a breach this branch removes by pruning, so it is
+# undone rather than kept as slack that would hide the next one. Three portable workers
+# return to 480 MiB.
+SNAPSHOT_MAX_BYTES = 160 * 1024 * 1024
 DEFAULT_CONTROL_TIMEOUT_SECONDS = 120.0
 TERMINATION_GRACE_SECONDS = 1.0
 # Directories that must be walked into rather than bulk-copied, because something
