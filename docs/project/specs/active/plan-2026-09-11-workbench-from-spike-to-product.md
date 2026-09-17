@@ -343,6 +343,7 @@ and the browser. The application configuration carries strength, schedule, use a
 policy for non-target pairs.
 Zero strength normalizes to the unguided effective configuration, so the trajectory and
 receipt are byte-for-byte identical to the unguided control.
+Measured CPU and wall time sit beside the receipt, not in it.
 A physical trace keeps three layers distinct: raw kernel states diagnose the solver,
 corrected stored states show the path retained for playback, and deterministic 60 Hz
 presentation samples reproduce the positions the browser supplies to its painter.

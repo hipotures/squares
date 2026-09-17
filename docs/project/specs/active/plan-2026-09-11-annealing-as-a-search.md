@@ -219,6 +219,11 @@ The product exposes four comparable target tiers:
 
 Oriented face pairs constrain relative features and alignment.
 They do not supply absolute centers, absolute angles or a rigid destination pose.
+The `full poses` rung below is the existing Animate `guide` and snap path (destination
+targets, `guided` trajectory samples and the `springs` option), not a fifth product tier.
+It stays outside `GuidanceTarget/v1`, and a report that uses it names that rung rather
+than a guidance tier. Whether its `guided` flag is folded into the new guidance fields
+is decided with the target contract under `think-8ocb`.
 Extraction declares symmetry and correspondence rules and refuses a requested tier when
 ambiguity cannot be resolved under those rules (`think-rey9`).
 

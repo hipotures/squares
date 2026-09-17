@@ -144,8 +144,10 @@ states how much of the answer the run received.
 Configuration arms use paired seed blocks and execute in an interleaved order.
 They receive the same declared work budget.
 Pair tests remain the primary cross-proposer currency once enforcement exists; the
-receipt also reports candidates, kernel steps, guidance-force work, CPU time and wall
-time. A comparison with unequal effective work is invalid rather than suggestive.
+receipt also reports candidates, kernel steps and guidance-force work.
+CPU time and wall time are recorded beside the receipt, as Search outcomes already carry
+`elapsedMs`, so they never enter receipt identity or the zero-strength comparison.
+A comparison with unequal effective work is invalid rather than suggestive.
 
 Required controls are:
 
