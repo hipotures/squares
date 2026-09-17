@@ -71,6 +71,5 @@
 }
 
 .important {
-  /* biome-ignore lint/complexity/noImportantStyles: the policy must see through !important */
   letter-spacing: 0.02em !important;
 }

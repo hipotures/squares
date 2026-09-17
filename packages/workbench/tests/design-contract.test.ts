@@ -24,10 +24,11 @@ import {
  * finds nothing proves nothing on its own, so every rule here has a negative control (a fixture that
  * smuggles the thing past it) as well as a positive one.
  *
- * The CSS fixtures are real `.css` files under Biome, which lints CSS here; the one Biome rule a
- * negative control has to break (`noImportantStyles`) is suppressed in place. The script and markup
- * fixtures end in `.txt` so that neither Biome nor `tsc` compiles them: they hold deliberate inline
- * style writes, and are only ever read as text.
+ * The positive control `clean.css` is a real `.css` file under Biome. Every fixture that breaks the
+ * floor on purpose ends in `.txt` so that neither Biome nor `tsc` compiles it, and is only ever read
+ * as text: the raw-value stylesheet carries an `!important` that Biome's `noImportantStyles` refuses,
+ * and the repository admits no suppression outside its declared accessibility exceptions; the script
+ * and markup fixtures hold deliberate inline style writes.
  */
 const FIXTURES = join(import.meta.dirname, "fixtures", "design");
 
@@ -120,7 +121,7 @@ test("the reader keeps selectors, at-rules, lines and !important through comment
 });
 
 test("the token block is the first top-level :root rule, and only its custom properties", () => {
-  const css = fixture("raw-values.css");
+  const css = fixture("raw-values.css.txt");
   const block = tokenBlock(css);
   assert(block !== null);
   assert.equal(block.startLine, lineOf(css, ":root {"));
@@ -138,7 +139,7 @@ test("the token block is the first top-level :root rule, and only its custom pro
 });
 
 test("each kind of smuggled raw value is found where it is, and nothing in the token block", () => {
-  const css = fixture("raw-values.css");
+  const css = fixture("raw-values.css.txt");
   const expected: [string, string, string, string[], string | null][] = [
     [".hex", "color", "colour", ["#fff"], null],
     [".rgb", "background-color", "colour", ["rgb(0 0 0 / 50%)"], null],
@@ -232,7 +233,7 @@ test("calc, custom properties, font families and descriptors follow the policy's
 });
 
 test("an allow entry suppresses exactly its finding, needs a reason, and is reported unused", () => {
-  const css = fixture("raw-values.css");
+  const css = fixture("raw-values.css.txt");
   const all = rawValueFindings(css, []).findings;
   const hex = { selector: ".hex", property: "color", value: "#fff", reason: "the print sheet" };
   const spaced = {
