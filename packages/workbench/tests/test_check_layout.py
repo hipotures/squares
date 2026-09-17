@@ -13,10 +13,24 @@ from typing import Any
 
 import pytest
 
-from workbench_tools.check_layout import facts_findings, findings
+from workbench_tools.check_layout import (
+    attribution_findings,
+    facts_findings,
+    findings,
+    frames_findings,
+)
 
 TYPE = {"family": '"Source Sans 3", sans-serif', "size": "28px", "weight": "500"}
-LABEL = {**TYPE, "color": "rgb(71, 82, 95)"}
+#: The label grey (`--scene-label`) and the star's scarlet (`--scene-proved`), as a computed
+#: colour is reported. `new result` is the one badge label set in the second.
+GREY = "rgb(71, 82, 95)"
+SCARLET = "rgb(163, 18, 63)"
+LABEL = {**TYPE, "color": GREY}
+STARRED = {**TYPE, "color": SCARLET}
+#: The frames' three colours: `--scene-frame`, `--scene-frame-locked`, `--scene-trace`.
+FRAME = "rgb(125, 133, 144)"
+LOCKED = "rgb(23, 121, 74)"
+TRACE = "rgb(223, 227, 231)"
 
 
 def _panel(name: str, left: float, right: float, top: float, bottom: float) -> dict[str, Any]:
@@ -73,11 +87,56 @@ def _page() -> dict[str, Any]:
 def _layer(*, star: bool, open_items: int) -> dict[str, Any]:
     badges = [{"icon": "badge badge-solid", "text": "exact", **LABEL}]
     if star:
-        badges.insert(0, {"icon": "badge badge-star", "text": "new result", **LABEL})
+        badges.insert(0, {"icon": "badge badge-star", "text": "new result", **STARRED})
     return {
         "heads": ["Proven", "Open"] if open_items else ["Proven"],
         "openItems": open_items,
+        "colours": {"starred": SCARLET, "label": GREY},
         "badges": badges,
+    }
+
+
+def _frames(*, locked: bool = True, catalogue: bool = True) -> dict[str, Any]:
+    """The stage's three outer container borders as the catalogue or as Pack draws them."""
+    return {
+        "container": {
+            "shown": not catalogue,
+            "stroke": FRAME,
+            "strokeWidth": "4px",
+            "locked": False,
+        },
+        "box": {
+            "shown": catalogue,
+            "stroke": LOCKED if locked else FRAME,
+            "strokeWidth": "4px",
+            "locked": locked,
+        },
+        "trace": {"shown": catalogue, "stroke": TRACE, "strokeWidth": "4px", "locked": False},
+        "tokens": {"width": "4px", "frame": FRAME, "locked": LOCKED, "trace": TRACE},
+    }
+
+
+def _attribution() -> dict[str, Any]:
+    """The address on the headline's baseline, ending at the rail, over nothing."""
+    return {
+        "placed": True,
+        "shown": True,
+        "right": 1846.0,
+        "baseline": 1033.0,
+        "headlineBaseline": 1033.0,
+        "railRight": 1846.0,
+        "ink": {"left": 1568.4, "right": 1846.0, "top": 1007.3, "bottom": 1044.4},
+        "frame": {"left": 0.0, "top": 0.0, "right": 1920.0, "bottom": 1080.0},
+        "screen": {"x": 932.9, "y": 352.5, "width": 97.2, "height": 13.0},
+        "family": '"Source Sans 3", sans-serif',
+        "size": "26px",
+        "weight": "400",
+        "fill": FRAME,
+        "obstacles": [
+            {"name": "#packing-svg", "left": 60, "right": 1060, "top": 12, "bottom": 983},
+            {"name": "div.numeral", "left": 476, "right": 680.8, "top": 973, "bottom": 1074},
+            {"name": "#site-note", "left": 0, "right": 1860, "top": 2500, "bottom": 2560},
+        ],
     }
 
 
@@ -85,6 +144,11 @@ def test_a_page_that_keeps_every_rule_passes() -> None:
     assert findings(_page()) == []
     assert facts_findings(_layer(star=True, open_items=2), star=True) == []
     assert facts_findings(_layer(star=False, open_items=0), star=False) == []
+    assert frames_findings(_frames()) == []
+    assert frames_findings(_frames(locked=False)) == []
+    assert frames_findings(_frames(catalogue=False)) == []
+    assert attribution_findings(_attribution(), aligned=True) == []
+    assert attribution_findings(_attribution(), aligned=False) == []
 
 
 def _set(path: str, value: Any) -> Callable[[dict[str, Any]], None]:
@@ -173,3 +237,103 @@ def test_new_result_is_a_badge_in_the_badges_own_type() -> None:
         "where no bound was first proved" in item
         for item in facts_findings(unearned, star=False)
     )
+
+
+def test_new_result_is_the_one_badge_label_in_the_stars_scarlet() -> None:
+    """The owner's colour, 2026-09-17: scarlet for `new result`, the label grey for the rest."""
+    greyed = _layer(star=True, open_items=2)
+    greyed["badges"][0]["color"] = GREY
+    assert [
+        item for item in facts_findings(greyed, star=True) if "the star's scarlet" in item
+    ] == [f"the `new result` label is {GREY}, not the star's scarlet {SCARLET}"]
+    spread = _layer(star=True, open_items=2)
+    spread["badges"][1]["color"] = SCARLET
+    assert [
+        item for item in facts_findings(spread, star=True) if "the label grey" in item
+    ] == [f"the `exact` label is {SCARLET}, not the label grey {GREY}"]
+    # The colour is the only thing that differs: a `new result` in a second size is still one.
+    resized = _layer(star=True, open_items=2)
+    resized["badges"][0]["size"] = "26px"
+    assert any("2 different types" in item for item in facts_findings(resized, star=True))
+
+
+@pytest.mark.parametrize(
+    ("change", "expected"),
+    [
+        (_set("box.strokeWidth", "1.5px"), "the box frame is 1.5px wide, not 4.0 px"),
+        (_set("trace.strokeWidth", "1.5px"), "the trace frame is 1.5px wide, not 4.0 px"),
+        (_set("container.strokeWidth", "2px"), "the container frame is 2px wide, not 4.0 px"),
+        (_set("tokens.width", None), "declares no pixel --scene-frame-width"),
+        (_set("box.stroke", "rgb(0, 0, 0)"), "the box is rgb(0, 0, 0), not the best known"),
+        (_set("trace.stroke", "rgb(0, 0, 0)"), "the trace is rgb(0, 0, 0), not the lightest"),
+    ],
+)
+def test_each_frame_rule_refuses_the_stage_that_breaks_it(
+    change: Callable[[dict[str, Any]], None], expected: str
+) -> None:
+    frames = copy.deepcopy(_frames())
+    change(frames)
+    found = frames_findings(frames)
+    assert any(expected in item for item in found), found
+
+
+def test_the_box_is_grey_on_its_way_and_green_only_where_it_locks() -> None:
+    """One width, and the lock is the only colour change (the owner, 2026-09-17)."""
+    green_on_its_way = _frames(locked=False)
+    green_on_its_way["box"]["stroke"] = LOCKED
+    assert frames_findings(green_on_its_way) == [
+        f"the box is {LOCKED}, not the frames' grey {FRAME}"
+    ]
+    grey_at_rest = _frames()
+    grey_at_rest["box"]["stroke"] = FRAME
+    assert frames_findings(grey_at_rest) == [
+        f"the box is {FRAME}, not the best known side's green {LOCKED}"
+    ]
+    black_container = _frames(catalogue=False)
+    black_container["container"]["stroke"] = "rgb(0, 0, 0)"
+    assert frames_findings(black_container) == [
+        f"the container is rgb(0, 0, 0), not the frames' grey {FRAME}"
+    ]
+
+
+@pytest.mark.parametrize(
+    ("change", "expected"),
+    [
+        (_set("baseline", 1029.0), "baseline is at 1029.00, 4.00 stage px"),
+        (_set("right", 1840.0), "right edge is at 1840.00, 6.00 stage px"),
+        (_set("headlineBaseline", None), "baseline cannot be measured against the headline"),
+        (_set("railRight", None), "right edge cannot be measured against the gap bar's rail"),
+        # The overlay's units are stage pixels only because its box is the stage's; a box that
+        # is not makes the two numbers above mean something else.
+        (_set("frame.right", 1024.0), "overlay is not the stage's own box"),
+    ],
+)
+def test_each_attribution_anchor_refuses_the_stage_that_breaks_it(
+    change: Callable[[dict[str, Any]], None], expected: str
+) -> None:
+    attribution = copy.deepcopy(_attribution())
+    change(attribution)
+    found = attribution_findings(attribution, aligned=True)
+    assert any(expected in item for item in found), found
+
+
+def test_the_attribution_is_drawn_and_clears_what_the_stage_draws() -> None:
+    hidden = _attribution()
+    hidden["placed"] = False
+    assert attribution_findings(hidden, aligned=True) == [
+        "the stage's attribution is not drawn"
+    ]
+    # A stage laid out so that the packing reaches into the address's corner.
+    over_the_packing = copy.deepcopy(_attribution())
+    over_the_packing["obstacles"][0]["right"] = 1600
+    over_the_packing["obstacles"][0]["bottom"] = 1050
+    assert any(
+        "drawn over #packing-svg" in item
+        for item in attribution_findings(over_the_packing, aligned=True)
+    )
+    # A misalignment is not checked where the headline and the rail are not drawn, but what it
+    # is drawn over still is: Pack keeps the placement the catalogue measured.
+    drifted = copy.deepcopy(_attribution())
+    drifted["baseline"] = 900.0
+    drifted["headlineBaseline"] = None
+    assert attribution_findings(drifted, aligned=False) == []

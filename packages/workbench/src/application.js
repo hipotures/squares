@@ -257,8 +257,6 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   const SCARLET = getComputedStyle(document.documentElement)
     .getPropertyValue("--scene-proved")
     .trim();
-  // The best known upper bound's green, which the stage's box turns when it locks at that side.
-  const MET = getComputedStyle(document.documentElement).getPropertyValue("--scene-best").trim();
 
   const state = {
     // Revision 9: one view. Revision 8's two tabs were the same operation over a different span, so
@@ -631,6 +629,61 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     // One property on the row, which every numeral in its three slots reads, rather than a `left`
     // written into each numeral: a numeral built later starts in the right place without being told.
     htmlNode("headline").style.setProperty("--stage-numeral-left", `${numeralLeft}px`);
+    placeAttribution();
+  }
+  // The attribution (the owner, 2026-09-17): the repository's address, standing on the headline's
+  // baseline and ending where the gap bar's rail ends. Both anchors are read off what is drawn --
+  // the empty inline block `buildFacts` puts on the headline's line, and the rail's own box -- and
+  // written in stage pixels as the SVG text's `y` (its baseline) and `x` (its end). Neither moves
+  // with n, the window or the separator, because the stage is laid out at 1920 x 1080 and only
+  // scaled; they move only when the faces land. So this runs with the headline's measurement, at
+  // startup and on `document.fonts.ready`, and `layout` repeats it until a placement has been made
+  // with the faces in, which covers a page that is in Pack or Search when they arrive, where the
+  // headline and the rail are not drawn to measure. Until the first placement the text is hidden.
+  // A resize measures nothing again: it redraws what was measured (`drawAttribution`), which is
+  // also what keeps the overlay painted, and works in Pack and Search where nothing is drawn to
+  // measure from.
+  const attribution = svgNode("stage-attribution");
+  const attributionText = svgNode("stage-attribution-text");
+  //: Where the attribution stands, in stage pixels: the rail's right end and the headline's
+  //: baseline, once both have been drawn to measure. Null until then, which is why the text is
+  //: hidden rather than drawn at a guess.
+  let attributionAt = null;
+  let attributionSettled = false;
+  function placeAttribution() {
+    const baseline = document.querySelector("#numeral-static .numeral .baseline");
+    const rail = document.querySelector("#gapbar .track");
+    if (
+      baseline === null ||
+      rail === null ||
+      baseline.getClientRects().length === 0 ||
+      rail.getClientRects().length === 0 ||
+      stage.offsetWidth === 0
+    ) {
+      return;
+    }
+    const frame = stage.getBoundingClientRect();
+    const scale = frame.width / stage.offsetWidth;
+    attributionAt = [
+      (rail.getBoundingClientRect().right - frame.left) / scale,
+      (baseline.getBoundingClientRect().top - frame.top) / scale,
+    ];
+    attributionSettled = !("fonts" in document) || document.fonts.status === "loaded";
+    drawAttribution();
+  }
+  // Writing the measured place back, which is also what makes the overlay repaint. Chromium does
+  // not repaint this nested SVG when the transform above it changes: narrowed through the review
+  // viewports to 390 px the text was simply left unpainted, while its own boxes read right
+  // (measured 2026-09-17, `attic/borders`). Writing the two attributes it is placed by is the
+  // change that invalidates it, and writing the same numbers back is enough, so `setStageScale`
+  // calls this whenever the stage's scale moves. It costs two attribute writes per resize.
+  function drawAttribution() {
+    if (attributionAt === null) {
+      return;
+    }
+    attributionText.setAttribute("x", fmt(attributionAt[0], 2));
+    attributionText.setAttribute("y", fmt(attributionAt[1], 2));
+    attribution.classList.add("is-placed");
   }
   //: The width of one figure in the face the gap bar sets its two numbers in, used to decide
   //: whether the record's label would sit on top of the lower bound's. The fallback is Source Sans
@@ -4053,7 +4106,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     const resting = t <= sc.moveStart || t >= sc.end || (from === to && open === to);
     boxLocked =
       !optimizing && resting && Math.abs(box - best) <= PACKING_VALIDITY.penetrationTolerance;
-    boxRect.setAttribute("stroke", boxLocked ? MET : "#000000");
+    // The colour is the stylesheet's: green locked, grey on its way (`--scene-frame-*`).
+    boxRect.classList.toggle("is-locked", boxLocked);
   }
 
   // Style A, the block tween of revision 5: poses tween between the two frames, a block's members
@@ -4713,12 +4767,20 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // is `.is-sized`. Written as custom properties on `#viewport` rather than as each box's width,
   // height and transform, so the geometry stays in the stylesheet and only the numbers are live.
   const viewportNode = htmlNode("viewport");
+  let stageScale = null;
   function setStageScale(/** @type {number} */ scale) {
     viewportNode.style.setProperty("--stage-scale", String(scale));
+    if (scale !== stageScale) {
+      stageScale = scale;
+      drawAttribution();
+    }
   }
   function layout() {
     if (document.hidden) {
       return;
+    }
+    if (!attributionSettled) {
+      placeAttribution();
     }
     const vw = window.innerWidth,
       vh = window.innerHeight;
@@ -6190,6 +6252,10 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       return;
     }
     const target = ev.target instanceof Element ? ev.target : null;
+    // A link on the stage (the attribution) takes its own Enter.
+    if (target?.closest("a[href]")) {
+      return;
+    }
     const rawIndex = target?.getAttribute("data-square-index");
     const squareIndex = rawIndex === null || rawIndex === undefined ? -1 : Number(rawIndex);
     const squareFocused = Number.isInteger(squareIndex) && squareIndex >= 0;

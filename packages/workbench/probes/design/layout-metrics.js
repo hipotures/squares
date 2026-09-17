@@ -11,6 +11,15 @@
 //   held to, resolved to pixels.
 // - `facts`: each stage facts layer's section heads, OPEN items and badges, with each badge
 //   label's computed type, while the catalogue owns the stage.
+// - `frames`: the three outer container borders the stage draws -- the catalogue's box and the
+//   trace under it, and the container Pack and the animation studio draw -- as drawn, beside the
+//   tokens they are held to. Null where no stage is shown.
+// - `attribution`: the repository's address in the stage's bottom right, its baseline and right
+//   end beside the two things they are set from (the headline's baseline and the gap bar's rail),
+//   its type, and the boxes it must not be drawn over. Null where no stage is shown.
+//
+// The stage is a 1920 x 1080 poster drawn at `--stage-scale`, so `frames` and `attribution` are
+// measured in stage pixels: a rule in them holds at every window size rather than at one.
 () => {
   /** @param {Element} e */
   const shown = (e) => {
@@ -39,6 +48,18 @@
   const root = getComputedStyle(document.documentElement);
   /** @param {string} token */
   const token = (token) => root.getPropertyValue(token).trim() || null;
+  /** A `#rrggbb` token as the `rgb(...)` a computed colour is reported in. @param {string} v */
+  const rgb = (v) => {
+    const packed = Number.parseInt(v.slice(1), 16);
+    return `rgb(${(packed >> 16) & 255}, ${(packed >> 8) & 255}, ${packed & 255})`;
+  };
+  // The two colours a badge label is set in: the star's scarlet for `new result`, the label grey
+  // for every other (the owner, 2026-09-17). Carried with each layer's labels so that the rule
+  // over them is a rule over one layer.
+  const badgeColours = {
+    starred: rgb(root.getPropertyValue("--scene-proved").trim()),
+    label: rgb(root.getPropertyValue("--scene-label").trim()),
+  };
   if (controls == null) {
     throw new Error("layout-metrics requires #controls");
   }
@@ -103,6 +124,7 @@
     return {
       heads: [...root.querySelectorAll(".section-head")].map((e) => e.textContent),
       openItems: root.querySelectorAll(".open-items .open-item").length,
+      colours: badgeColours,
       badges: [...root.querySelectorAll(".badges .badge-item")].map((e) => {
         const label = e.querySelector(".label");
         const type = label == null ? null : getComputedStyle(label);
@@ -115,6 +137,126 @@
           color: type?.color ?? null,
         };
       }),
+    };
+  };
+  // The stage, in its own 1920 x 1080 pixels. `--stage-scale` is on the wrapper as a transform,
+  // so a client rect divided by it is where the thing is on the poster, whatever the window.
+  const stage = document.getElementById("stage");
+  const poster = stage === null || !shown(stage) ? null : stage.getBoundingClientRect();
+  const scale = stage === null || poster === null ? 1 : poster.width / stage.offsetWidth;
+  /** @param {DOMRect} r */
+  const staged = (r) => ({
+    left: Math.round(((r.left - (poster?.left ?? 0)) / scale) * 100) / 100,
+    top: Math.round(((r.top - (poster?.top ?? 0)) / scale) * 100) / 100,
+    right: Math.round(((r.right - (poster?.left ?? 0)) / scale) * 100) / 100,
+    bottom: Math.round(((r.bottom - (poster?.top ?? 0)) / scale) * 100) / 100,
+  });
+  /** @param {string} id */
+  const frame = (id) => {
+    const e = document.getElementById(id);
+    if (e == null) {
+      throw new Error(`layout-metrics requires #${id}`);
+    }
+    const style = getComputedStyle(e);
+    return {
+      shown: shown(e) && style.display !== "none" && style.stroke !== "none",
+      stroke: style.stroke,
+      strokeWidth: style.strokeWidth,
+      locked: e.classList.contains("is-locked"),
+    };
+  };
+  const frames = () => ({
+    container: frame("container"),
+    box: frame("bound-box"),
+    trace: frame("bound-trace"),
+    tokens: {
+      width: token("--scene-frame-width"),
+      frame: rgb(root.getPropertyValue("--scene-frame").trim()),
+      locked: rgb(root.getPropertyValue("--scene-frame-locked").trim()),
+      trace: rgb(root.getPropertyValue("--scene-trace").trim()),
+    },
+  });
+  // Where the attribution's baseline and right end land, taken from the laid-out text rather than
+  // from the `x` and `y` that were written into it, beside the two things those are set from: the
+  // empty inline block standing on the headline's baseline, and the gap bar's rail.
+  //
+  // The end of the last character is read in the text's own user units, which are stage pixels:
+  // the overlay is a 1920 x 1080 box over a 1920 x 1080 viewBox, and `frame` reports that box in
+  // stage pixels so a caller can hold the mapping to 1:1 rather than assume it. Not through
+  // `getScreenCTM`, which Chromium leaves stale for a frame after the stage's scale changes
+  // (measured 2026-09-17: read right after a narrowing it reported the scale before it).
+  //
+  // The obstacles are what it must not be drawn over -- the numeral, the packing, everything the
+  // facts panels actually draw, and the page's own fixed note, which is outside the stage and so
+  // maps to stage pixels outside it.
+  const attribution = () => {
+    const holder = document.getElementById("stage-attribution");
+    const text = /** @type {SVGTextElement | null} */ (
+      document.querySelector("#stage-attribution-text")
+    );
+    if (holder == null || text == null) {
+      throw new Error("layout-metrics requires #stage-attribution and its text");
+    }
+    const characters = text.getNumberOfChars();
+    let end = null;
+    if (characters > 0) {
+      const p = text.getEndPositionOfChar(characters - 1);
+      end = { right: Math.round(p.x * 100) / 100, baseline: Math.round(p.y * 100) / 100 };
+    }
+    const marker = document.querySelector("#numeral-static .numeral .baseline");
+    const numeral = document.querySelector("#numeral-static .numeral");
+    const rail = document.querySelector("#gapbar .track");
+    const type = getComputedStyle(text);
+    /** @type {Element[]} */
+    const near = [];
+    for (const id of ["packing-svg", "facts-a", "facts-b", "pack-stage-facts"]) {
+      const held = document.getElementById(id);
+      if (held === null || !shown(held)) {
+        continue;
+      }
+      // A facts layer is an empty full-stage box; what it draws is its leaves.
+      const leaves = [...held.querySelectorAll("*")].filter((e) => e.children.length === 0);
+      near.push(...(id === "packing-svg" ? [held] : leaves));
+    }
+    if (numeral !== null) {
+      near.push(numeral);
+    }
+    const note = document.getElementById("site-note");
+    if (note !== null && shown(note)) {
+      near.push(note);
+    }
+    return {
+      placed: holder.classList.contains("is-placed"),
+      shown: shown(holder),
+      ...(end ?? { right: null, baseline: null }),
+      headlineBaseline:
+        marker === null || marker.getClientRects().length === 0
+          ? null
+          : staged(marker.getBoundingClientRect()).top,
+      railRight:
+        rail === null || rail.getClientRects().length === 0
+          ? null
+          : staged(rail.getBoundingClientRect()).right,
+      ink: staged(text.getBoundingClientRect()),
+      frame: staged(holder.getBoundingClientRect()),
+      // The same ink box in the page's own pixels, which is what a screenshot is clipped to.
+      screen: (() => {
+        const r = text.getBoundingClientRect();
+        return {
+          x: r.left + window.scrollX,
+          y: r.top + window.scrollY,
+          width: r.width,
+          height: r.height,
+        };
+      })(),
+      family: type.fontFamily,
+      size: type.fontSize,
+      weight: type.fontWeight,
+      fill: type.fill,
+      obstacles: near
+        .filter((e) => shown(e))
+        .map((e) => ({ name: name(e), ...staged(e.getBoundingClientRect()) }))
+        .filter((b) => b.right - b.left > 0 && b.bottom - b.top > 0),
     };
   };
   return {
@@ -144,5 +286,7 @@
       facts == null || getComputedStyle(facts).display === "none" || !shown(stageOf(facts))
         ? null
         : { "facts-a": layer("facts-a"), "facts-b": layer("facts-b") },
+    frames: poster === null ? null : frames(),
+    attribution: poster === null ? null : attribution(),
   };
 };

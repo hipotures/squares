@@ -60,6 +60,13 @@ The block has three families:
 - **Scene and plot colours** (`--scene-*`, `--plot-*`): what is drawn rather than the
   chrome. Square fills are data from `sqpack.render` and are not tokens.
 
+The stage draws one frame around the packing, whichever mode owns it.
+The catalogue’s box, the trace of where it just was and the container Pack and the
+animation studio draw are all `--scene-frame-width` wide, and the colour is the only
+thing that changes: the box is `--scene-frame-locked` where it rests at the best known
+side and `--scene-frame` on its way, the trace is `--scene-trace`, and the container is
+`--scene-frame`.
+
 The page has one structure in every mode.
 The controls are a single column inside `--layout-gutter`. Every block in it (the mode
 panel, a `.panel-row` of `.subpanel`s, a `.workspace`) spans the same two edges and sits
@@ -75,10 +82,12 @@ Three contracts hold it:
   only shrink. It checks every text, control, focus and stage colour pair against WCAG
   AA. The machinery is in [`tools/design-contract.ts`](tools/design-contract.ts), with
   its negative fixtures in `tests/design-contract.test.ts`.
-- `workbench_tools.check_layout` measures Animate, the animation studio, Pack and Search
-  in Chromium at 1440 × 900, 1024 × 768 and 390 × 844. It checks the shared edges,
-  gutters and gaps, one height per control kind, horizontal overflow, panel overlap, and
-  the stage panel’s OPEN and badge rules.
+- `workbench_tools.check_layout` measures Animate at rest and mid-step, the animation
+  studio, Pack and Search in Chromium at 1440 × 900, 1024 × 768 and 390 × 844. It checks
+  the shared edges, gutters and gaps, one height per control kind, horizontal overflow,
+  panel overlap, the stage panel’s OPEN and badge rules (one type, with `new result`
+  alone in the star’s scarlet), the one frame width in its three colours, and that the
+  attribution stands on the headline’s baseline and ends at the gap bar’s rail.
   It runs inside `check_stage_resize`’s browser session in `check_frontend`, and
   `tests/test_check_layout.py` proves each rule refuses a page that breaks it.
 - `workbench_tools.layout_gallery` photographs every view at every review viewport and

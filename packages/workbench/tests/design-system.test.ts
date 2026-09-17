@@ -9,10 +9,12 @@ import {
   type AllowEntry,
   type ContrastPair,
   checkContrast,
+  contrastRatio,
   type InlineAllowEntry,
   inlineStyleFindings,
   matchInlineAllow,
   rawValueFindings,
+  resolveToken,
   tokenBlock,
 } from "../tools/design-contract.ts";
 
@@ -170,7 +172,50 @@ const PAIRS: ContrastPair[] = [
   { fg: "--scene-heading", bg: "--scene-paper", min: LARGE_OR_COMPONENT, role: "stage heads" },
   { fg: "--scene-proved", bg: "--scene-paper", min: TEXT, role: "the proved lower bound" },
   { fg: "--scene-best", bg: "--scene-paper", min: TEXT, role: "the best known bound" },
+  {
+    fg: "--scene-frame",
+    bg: "--scene-paper",
+    min: LARGE_OR_COMPONENT,
+    role: "the stage's frame",
+  },
 ];
+
+/**
+ * The owner's frames, 2026-09-17: every outer container border the stage draws is one width --
+ * the width the box already had -- and the only thing that changes between them is the colour.
+ * The names are pinned to the chrome roles they take, and "medium" and "lightest" are pinned as
+ * measurements rather than as words: against the page's white paper the trace is quieter than
+ * the quietest line the chrome draws, and the frame sits between that line and the stage's ink.
+ */
+test("the stage's frames are one width in three named colours", () => {
+  const block = tokenBlock(read(STYLESHEET));
+  assert.ok(block !== null, "the stylesheet has no :root token block");
+  const tokens = block.tokens;
+  assert.equal(tokens.get("--scene-frame-width"), "4px");
+  for (const [scene, role] of [
+    ["--scene-frame", "--color-border-control"],
+    ["--scene-frame-locked", "--color-status-best"],
+    ["--scene-trace", "--color-divider"],
+    ["--scene-proved", "--color-status-new"],
+  ] as const) {
+    assert.equal(
+      resolveToken(scene, tokens),
+      resolveToken(role, tokens),
+      `${scene} is not ${role}`,
+    );
+  }
+  const onPaper = (name: string): number =>
+    contrastRatio(resolveToken(name, tokens), resolveToken("--scene-paper", tokens));
+  assert.ok(
+    onPaper("--scene-trace") < onPaper("--color-border"),
+    "the trace is not the lightest line the page draws",
+  );
+  assert.ok(
+    onPaper("--color-border") < onPaper("--scene-frame") &&
+      onPaper("--scene-frame") < onPaper("--scene-ink"),
+    "the frame's grey is not between the page's lines and its ink",
+  );
+});
 
 test("every text and component colour pair meets WCAG AA", () => {
   const block = tokenBlock(read(STYLESHEET));

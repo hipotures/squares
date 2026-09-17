@@ -18,12 +18,24 @@ first proved here, Animate with nothing open, the animation studio, Pack and Sea
   segments tall inside its border;
 - **no overlapping panels**;
 - on the stage, **OPEN only when something is open**, and **one badge type**: every badge
-  label, `new result` included, in the same family, size, weight and colour.
+  label, `new result` included, in the same family, size and weight, each in the colour its
+  badge calls for -- the star's scarlet for `new result`, the label grey for every other (the
+  owner, 2026-09-17);
+- on the stage, **one frame**: the catalogue's box, the trace of where it just was and the
+  container Pack and the animation studio draw are all `--scene-frame-width` wide, and each is
+  drawn in the colour its state calls for -- the best known side's green where the box locks
+  there, the frames' grey where it does not and for the container, the lightest grey for the
+  trace (the owner, 2026-09-17);
+- on the stage, **the attribution** stands on the headline's baseline and ends where the gap
+  bar's rail ends, both within `ATTRIBUTION_SLACK` stage pixels, and is drawn over nothing.
 
-`findings` is a pure function of the probe's output, so `tests/test_check_layout.py` proves each
-rule refuses a page that breaks it without a browser. `check_open` runs the views in a page a
-caller already has open, which is how `check_frontend` adds this to a browser session it has
-already paid for; `check` opens its own. From `packing/`::
+`findings`, `facts_findings`, `frames_findings` and `attribution_findings` are pure functions of
+the probe's output, so `tests/test_check_layout.py` proves each rule refuses a page that breaks
+it without a browser. One rule cannot be: `_painted` reads the pixels once, at the narrowest
+viewport, because an overlay Chromium has left unpainted still reports every box correctly.
+
+`check_open` runs the views in a page a caller already has open, which is how `check_frontend`
+adds this to a browser session it has already paid for; `check` opens its own. From `packing/`::
 
     uv run --frozen --all-extras --group dev python -m workbench_tools.check_layout \\
         [--page PAGE]
@@ -32,6 +44,7 @@ already paid for; `check` opens its own. From `packing/`::
 from __future__ import annotations
 
 import argparse
+import io
 import itertools
 import os
 import tempfile
@@ -40,7 +53,9 @@ from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
-from playwright.sync_api import Page, sync_playwright
+import numpy as np
+from PIL import Image
+from playwright.sync_api import FloatRect, Page, sync_playwright
 
 from workbench_tools.build_site import build
 from workbench_tools.probes import probe
@@ -57,7 +72,15 @@ AT_CONTROL_HEIGHT = frozenset({"button", "select", "input-number", "input-text",
 #: A bound first proved here (n = 17) and an n with nothing open (n = 16).
 STAR_N = 17
 OPEN_NONE_N = 16
+#: The step the one moving view is paused in. At rest the box is locked at the best known side
+#: and drawn green, so a step on its way is the only place the frames' grey is drawn.
+MOVING_N = 11
 NEW_RESULT = "new result"
+
+#: How far the attribution may sit from what it is set against, in stage pixels. The stage is a
+#: 1920 x 1080 poster drawn at `--stage-scale`, so this is one pixel of the poster at every
+#: window size rather than one device pixel at some.
+ATTRIBUTION_SLACK = 1.0
 
 Metrics = Mapping[str, Any]
 
@@ -234,17 +257,148 @@ def facts_findings(layer: Metrics, *, star: bool | None = None) -> list[str]:
             f"{layer['openItems']} open items"
         )
     badges = layer["badges"]
-    types = {(b["family"], b["size"], b["weight"], b["color"]) for b in badges}
+    types = {(b["family"], b["size"], b["weight"]) for b in badges}
     if len(types) > 1:
         found.append(
             f"the badge labels are set in {len(types)} different types: {sorted(types)}"
         )
+    # One type, two colours: `new result` is the star's scarlet and every other badge the label
+    # grey, which is the one thing that tells the row's one new claim from its standing ones.
+    colours = layer["colours"]
+    for badge in badges:
+        starred = badge["text"] == NEW_RESULT
+        wanted = colours["starred"] if starred else colours["label"]
+        if badge["color"] != wanted:
+            role = "the star's scarlet" if starred else "the label grey"
+            found.append(
+                f"the `{badge['text']}` label is {badge['color']}, not {role} {wanted}"
+            )
     new = [b for b in badges if b["text"] == NEW_RESULT]
     if star is True and not (len(new) == 1 and "badge-star" in (new[0]["icon"] or "").split()):
         found.append(f"a bound first proved here has no `{NEW_RESULT}` star badge: {badges}")
     if star is False and new:
         found.append(f"`{NEW_RESULT}` is drawn where no bound was first proved: {badges}")
     return found
+
+
+def frames_findings(frames: Metrics) -> list[str]:
+    """Every way the stage's outer container borders break the one-frame rule.
+
+    Three elements draw one: the catalogue's box, the trace of where it just was under it, and
+    the container Pack and the animation studio draw. All three are one width, and the colour
+    is the only thing that changes -- the box is the best known side's green where it locks
+    there and the frames' grey on its way, the trace is the lightest grey the page draws a line
+    in, and the container is the frames' grey. Widths are read on all three whether or not they
+    are drawn, because a hidden element still computes one; colours only where they are drawn.
+    """
+    found = []
+    tokens = frames["tokens"]
+    width = _px(tokens.get("width"))
+    if width is None:
+        found.append(f"the page declares no pixel --scene-frame-width: {tokens}")
+    parts = {name: frames[name] for name in ("container", "box", "trace")}
+    for name, part in parts.items():
+        measured = _px(part["strokeWidth"])
+        if width is None or measured is None or not _near(measured, width):
+            found.append(f"the {name} frame is {part['strokeWidth']} wide, not {width} px")
+    box = parts["box"]
+    if box["shown"]:
+        wanted = tokens["locked"] if box["locked"] else tokens["frame"]
+        role = "the best known side's green" if box["locked"] else "the frames' grey"
+        if box["stroke"] != wanted:
+            found.append(f"the box is {box['stroke']}, not {role} {wanted}")
+    if parts["trace"]["shown"] and parts["trace"]["stroke"] != tokens["trace"]:
+        found.append(
+            f"the trace is {parts['trace']['stroke']}, not the lightest grey {tokens['trace']}"
+        )
+    if parts["container"]["shown"] and parts["container"]["stroke"] != tokens["frame"]:
+        found.append(
+            f"the container is {parts['container']['stroke']}, not the frames' grey "
+            f"{tokens['frame']}"
+        )
+    return found
+
+
+def attribution_findings(attribution: Metrics, *, aligned: bool) -> list[str]:
+    """Every way the stage's attribution sits wrong; `aligned` says what it is set against.
+
+    The repository's address stands on the headline's baseline and ends where the gap bar's
+    rail ends, both read off what is drawn. Pack and the animation studio draw neither, so
+    there `aligned` is false and only the placement it kept and what it clears are checked.
+    """
+    found = []
+    if not (attribution["placed"] and attribution["shown"]):
+        return ["the stage's attribution is not drawn"]
+    # The two numbers above are read in the overlay's own units, which are stage pixels only
+    # because it is a 1920 x 1080 box over a 1920 x 1080 viewBox. That is measured, not assumed.
+    poster = attribution["frame"]
+    if not (
+        _near(poster["left"], 0)
+        and _near(poster["top"], 0)
+        and _near(poster["right"], 1920)
+        and _near(poster["bottom"], 1080)
+    ):
+        found.append(f"the attribution's overlay is not the stage's own box: {poster}")
+    if aligned:
+        for label, at, against, of in (
+            ("baseline", attribution["baseline"], attribution["headlineBaseline"], "headline"),
+            ("right edge", attribution["right"], attribution["railRight"], "gap bar's rail"),
+        ):
+            if at is None or against is None:
+                found.append(
+                    f"the attribution's {label} cannot be measured against the {of}: "
+                    f"{at} and {against}"
+                )
+            elif abs(at - against) > ATTRIBUTION_SLACK:
+                found.append(
+                    f"the attribution's {label} is at {at:.2f}, {abs(at - against):.2f} stage "
+                    f"px from the {of}'s {against:.2f}"
+                )
+    ink = attribution["ink"]
+    for other in attribution["obstacles"]:
+        width = min(ink["right"], other["right"]) - max(ink["left"], other["left"])
+        height = min(ink["bottom"], other["bottom"]) - max(ink["top"], other["top"])
+        if width > SLACK and height > SLACK:
+            found.append(
+                f"the attribution is drawn over {other['name']} by {width:.1f} x {height:.1f}"
+            )
+    return found
+
+
+#: The sum of an RGB pixel's channels under which it counts as ink rather than paper. White is
+#: 765 and the attribution's grey is 402, so a region of paper alone never reaches it.
+INK = 720
+
+
+def _painted(page: Page, attribution: Metrics) -> list[str]:
+    """The attribution is painted, not merely laid out.
+
+    Chromium leaves this nested SVG unpainted when the transform above it changes: narrowed
+    through the review viewports to 390 px, the text vanished from the picture while every box
+    it reports stayed right (measured 2026-09-17). The page answers by rewriting the two
+    attributes it is placed by whenever the stage's scale moves, and nothing in the DOM shows
+    the difference, so this reads the pixels instead, once, at the narrowest viewport a sweep
+    ends on.
+    """
+    screen = attribution["screen"]
+    if screen["width"] <= 0 or screen["height"] <= 0:
+        return [f"the attribution has no box to photograph: {screen}"]
+    clip: FloatRect = {
+        "x": max(0.0, float(screen["x"]) - 2),
+        "y": max(0.0, float(screen["y"]) - 2),
+        "width": float(screen["width"]) + 4,
+        "height": float(screen["height"]) + 4,
+    }
+    image = np.asarray(Image.open(io.BytesIO(page.screenshot(clip=clip))).convert("RGB"))
+    darkest = int(image.astype(int).sum(axis=2).min())
+    if darkest > INK:
+        return [
+            (
+                f"the attribution is laid out at {clip} but nothing is painted there "
+                f"(darkest pixel {darkest} of 765)"
+            )
+        ]
+    return []
 
 
 def findings(m: Metrics) -> list[str]:
@@ -267,6 +421,22 @@ def _stage_n(n: int) -> Callable[[Page], None]:
     return drive
 
 
+def _moving(n: int) -> Callable[[Page], None]:
+    """Animate paused in the step into n where the container has just finished growing.
+
+    The box is on its way rather than resting at the best known side, so this is the one view
+    that draws it in the frames' grey; everywhere else it is locked and green.
+    """
+
+    def drive(page: Page) -> None:
+        if _api(page, ["mode"]) != "animate":
+            page.locator("#mode-animate").click()
+        schedule = _api(page, ["pause"], ["setStepN", n], ["schedule"])
+        _api(page, ["seek", schedule["containerEnd"]], ["pause"])
+
+    return drive
+
+
 def _studio(page: Page) -> None:
     _stage_n(STAR_N)(page)
     page.locator("#animation-example").click()
@@ -276,15 +446,17 @@ def _leave_studio(page: Page) -> None:
     page.locator("#animation-catalogue").click()
 
 
-#: The views, each with how to reach it and how to leave it, and the facts it must show.
+#: The views, each with how to reach it and how to leave it, the facts it must show, and whether
+#: it draws the headline and the gap bar the attribution is set against.
 VIEWS: tuple[
-    tuple[str, Callable[[Page], None], Callable[[Page], None] | None, bool | None], ...
+    tuple[str, Callable[[Page], None], Callable[[Page], None] | None, bool | None, bool], ...
 ] = (
-    ("animate at n = 17", _stage_n(STAR_N), None, True),
-    ("animate at n = 16", _stage_n(OPEN_NONE_N), None, False),
-    ("the animation studio", _studio, _leave_studio, None),
-    ("pack", lambda page: page.locator("#mode-pack").click(), None, None),
-    ("search", lambda page: page.locator("#mode-search").click(), None, None),
+    ("animate at n = 17", _stage_n(STAR_N), None, True, True),
+    ("animate at n = 16", _stage_n(OPEN_NONE_N), None, False, True),
+    (f"animate mid-step into n = {MOVING_N}", _moving(MOVING_N), None, None, True),
+    ("the animation studio", _studio, _leave_studio, None, False),
+    ("pack", lambda page: page.locator("#mode-pack").click(), None, None, False),
+    ("search", lambda page: page.locator("#mode-search").click(), None, None, False),
 )
 
 
@@ -297,7 +469,10 @@ def check_open(page: Page, viewports: Sequence[tuple[int, int]] = VIEWPORTS) -> 
     original = page.viewport_size
     failures: list[str] = []
     measured = 0
-    for label, enter, leave, star in VIEWS:
+    #: Whether the box was seen locked and seen on its way. Its two colours are one rule, and a
+    #: sweep that only ever saw it at rest would pass without the frames' grey being drawn once.
+    locks: set[bool] = set()
+    for label, enter, leave, star, aligned in VIEWS:
         enter(page)
         for width, height in viewports:
             page.set_viewport_size({"width": width, "height": height})
@@ -310,10 +485,34 @@ def check_open(page: Page, viewports: Sequence[tuple[int, int]] = VIEWPORTS) -> 
                     found.append("the stage's facts panel is not drawn")
                 else:
                     found.extend(facts_findings(metrics["facts"]["facts-a"], star=star))
+            if metrics["frames"] is not None:
+                found.extend(frames_findings(metrics["frames"]))
+                if metrics["frames"]["box"]["shown"]:
+                    locks.add(bool(metrics["frames"]["box"]["locked"]))
+            if metrics["attribution"] is not None:
+                found.extend(attribution_findings(metrics["attribution"], aligned=aligned))
             failures.extend(f"{label} at {width} x {height}: {item}" for item in found)
         if leave is not None:
             leave(page)
+    if locks != {True, False}:
+        failures.append(
+            f"the sweep never saw the box both locked and on its way, so only one of its two "
+            f"colours was measured: locked states seen {sorted(locks)}"
+        )
     page.locator("#mode-animate").click()
+    # The stage at its smallest, having been resized through every viewport above, which is the
+    # state the overlay was found unpainted in.
+    narrowest = min(viewports, key=lambda size: size[0])
+    page.set_viewport_size({"width": narrowest[0], "height": narrowest[1]})
+    page.evaluate(probe("design/frames"))
+    smallest = page.evaluate(probe("design/layout-metrics"))["attribution"]
+    if smallest is None:
+        failures.append(f"no stage at {narrowest[0]} x {narrowest[1]} to photograph")
+    else:
+        failures.extend(
+            f"animate at {narrowest[0]} x {narrowest[1]}: {item}"
+            for item in _painted(page, smallest)
+        )
     if original is not None:
         page.set_viewport_size(original)
     if failures:
@@ -321,7 +520,9 @@ def check_open(page: Page, viewports: Sequence[tuple[int, int]] = VIEWPORTS) -> 
     return (
         f"one gutter, edge, stack gap and control height across {len(VIEWS)} views at "
         f"{len(viewports)} viewports ({measured} measurements, "
-        f"{time.perf_counter() - started:.1f}s), OPEN only when open, one badge type"
+        f"{time.perf_counter() - started:.1f}s), OPEN only when open, one badge type with "
+        f"`{NEW_RESULT}` alone in the star's scarlet, one frame width in its three colours, "
+        f"and the attribution on the headline's baseline at the rail's end"
     )
 
 

@@ -12,8 +12,12 @@ this is a tool rather than a session's script. From `packing/`::
 `capture` loads the page once per view in a reduced-motion window, drives it to the view with
 the page's own controls, and writes `<view>/<width>x<height>.jpg` at each viewport. When the
 controls scroll, a second picture, `<width>x<height>-end.jpg`, shows them scrolled to their
-end. Beside the pictures it writes `metrics.json`: the `design/layout-metrics` measurements
-of every view at every viewport, which is what `check_layout` asserts over.
+end. A view with a stage also gets `<view>/stage.png`, the stage alone in a 1920 x 1080
+window, which is where a stroke a pixel or two wide can be judged: in capture preview, at the
+stage's own size, where the catalogue owns the page, and with the controls showing in Pack,
+whose page API has no capture preview. Beside the pictures it writes `metrics.json`: the
+`design/layout-metrics` measurements of every view at every viewport, which is what
+`check_layout` asserts over.
 
 `compare` writes one self-contained HTML page with no script, grouping the two sets by view
 and viewport and linking the pictures by relative path.
@@ -30,7 +34,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from playwright.sync_api import Page, sync_playwright
+from playwright.sync_api import Browser, Page, sync_playwright
 
 from workbench_tools.build_site import OUT
 from workbench_tools.check_search_panel import run_plan
@@ -45,6 +49,9 @@ VIEWPORTS: tuple[tuple[int, int], ...] = (
     (390, 844),
 )
 
+#: The stage's own size, the window `stage.png` is taken in.
+STAGE = (1920, 1080)
+
 
 def _api(page: Page, *calls: list[Any]) -> Any:
     return page.evaluate(probe("api/apply"), {"calls": list(calls)})
@@ -56,6 +63,20 @@ def _show_n(n: int) -> Callable[[Page], None]:
     def drive(page: Page) -> None:
         duration = _api(page, ["pause"], ["setStepN", n], ["duration"])
         _api(page, ["seek", duration], ["pause"])
+
+    return drive
+
+
+def _box_moving(n: int) -> Callable[[Page], None]:
+    """Animate paused in the step into `n` where its container has just finished growing.
+
+    The catalogue's box is on its way there, drawn over the trace of where it was, so this is
+    the one view that shows the box unlocked.
+    """
+
+    def drive(page: Page) -> None:
+        schedule = _api(page, ["pause"], ["setStepN", n], ["schedule"])
+        _api(page, ["seek", schedule["containerEnd"]], ["pause"])
 
     return drive
 
@@ -99,6 +120,8 @@ VIEWS: tuple[View, ...] = (
     View("animate", "Animate, as the page opens", lambda _page: None),
     View("animate-star", "Animate at n = 17, a new result", _show_n(17)),
     View("animate-open-none", "Animate at n = 16, nothing open", _show_n(16)),
+    View("animate-11", "Animate at n = 11", _show_n(11)),
+    View("animate-moving", "Animate into n = 11, the box on its way", _box_moving(11)),
     View("animate-advanced", "Animate with Advanced motion open", _advanced),
     View("studio", "Animate with an illustration in the studio", _studio),
     View("pack", "Pack", _pack),
@@ -110,6 +133,38 @@ VIEWS: tuple[View, ...] = (
 
 def _slug(size: tuple[int, int]) -> str:
     return f"{size[0]}x{size[1]}"
+
+
+def _open(browser: Browser, page_path: Path, size: tuple[int, int], view: View) -> Page:
+    """A fresh reduced-motion page at `size`, driven to `view`."""
+    context = browser.new_context(
+        reduced_motion="reduce", viewport={"width": size[0], "height": size[1]}
+    )
+    page = context.new_page()
+    page.goto(page_path.resolve().as_uri())
+    page.wait_for_function(probe("benchmark/page-api-ready"))
+    page.evaluate(probe("capture/fonts-ready"))
+    view.drive(page)
+    return page
+
+
+def _stage_still(browser: Browser, page_path: Path, view: View, path: Path) -> None:
+    """Photograph the stage alone, from a page opened at the stage's own size.
+
+    A page of its own rather than the one the viewports were taken in: Chromium keeps drawing
+    the gap bar's SVG text at the size it was last laid out at when the stage's scale grows
+    under it, so a page narrowed to 390 px and widened again draws those numbers at about half
+    their size, while its DOM reports the right one.
+    """
+    page = _open(browser, page_path, STAGE, view)
+    try:
+        if page.locator("#stage").is_visible():
+            if _api(page, ["mode"]) == "animate":
+                _api(page, ["setCapture", True])
+            page.evaluate(probe("design/frames"))
+            page.locator("#stage").screenshot(path=path)
+    finally:
+        page.context.close()
 
 
 def capture(page_path: Path, out: Path, views: tuple[View, ...] = VIEWS) -> dict[str, Any]:
@@ -127,15 +182,7 @@ def capture(page_path: Path, out: Path, views: tuple[View, ...] = VIEWS) -> dict
         )
         try:
             for view in views:
-                width, height = VIEWPORTS[0]
-                context = browser.new_context(
-                    reduced_motion="reduce", viewport={"width": width, "height": height}
-                )
-                page = context.new_page()
-                page.goto(page_path.resolve().as_uri())
-                page.wait_for_function(probe("benchmark/page-api-ready"))
-                page.evaluate(probe("capture/fonts-ready"))
-                view.drive(page)
+                page = _open(browser, page_path, VIEWPORTS[0], view)
                 folder = out / view.name
                 folder.mkdir(parents=True, exist_ok=True)
                 metrics[view.name] = {}
@@ -152,7 +199,8 @@ def capture(page_path: Path, out: Path, views: tuple[View, ...] = VIEWS) -> dict
                         page.screenshot(
                             path=folder / f"{_slug(size)}-end.jpg", type="jpeg", quality=80
                         )
-                context.close()
+                page.context.close()
+                _stage_still(browser, page_path, view, folder / "stage.png")
         finally:
             browser.close()
     out.mkdir(parents=True, exist_ok=True)
@@ -201,6 +249,12 @@ def compare(before: Path, after: Path, out: Path) -> Path:
     ]
     for view in VIEWS:
         parts.append(f'<h2 id="{view.name}">{html.escape(view.title)}</h2>')
+        first, second = before / view.name / "stage.png", after / view.name / "stage.png"
+        if first.is_file() or second.is_file():
+            parts.append(f"<h3>the stage at {STAGE[0]} &times; {STAGE[1]}</h3><div class=pair>")
+            parts.append(_figure(root, first, "before"))
+            parts.append(_figure(root, second, "after"))
+            parts.append("</div>")
         for size in VIEWPORTS:
             for suffix, label in (("", ""), ("-end", ", controls scrolled to the end")):
                 name = f"{_slug(size)}{suffix}.jpg"

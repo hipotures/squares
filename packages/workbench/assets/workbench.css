@@ -58,6 +58,16 @@
   --scene-badge: var(--color-text-muted);
   --scene-badge-query: #c9cfd5;
   --scene-shadow: 0 8px 40px rgb(23 32 42 / 18%);
+  /* Scene: the frames around the packing, all one width (the owner, 2026-09-17). The catalogue's
+     box is green where it locks at the best known side and medium grey on its way; the container
+     Pack and the animation studio draw is that grey too; the trace of where the box just was is
+     the lightest grey the page draws a line in. */
+  --scene-frame-width: 4px;
+  --scene-frame: var(--color-border-control);
+  --scene-frame-locked: var(--scene-best);
+  --scene-trace: var(--color-divider);
+  /* Scene: the repository's address at the stage's bottom right, in the frames' grey. */
+  --scene-attribution: var(--scene-frame);
   /* Plot: the force-law editor's drawing. */
   --plot-field: #fbfcfd;
   --plot-zero: var(--scene-reference);
@@ -306,6 +316,23 @@ body.dragging #packing-svg #squares {
 body.drawing #packing-svg #squares {
   cursor: crosshair;
 }
+/* The frames around the packing, one width whatever draws them. The box's colour is its lock, which
+   `drawBounds` sets as `is-locked`; `#container` keeps its `stroke="none"` in the catalogue, which
+   draws the box and trace instead, and is stroked by the mode rules below where it is drawn. */
+#bound-box,
+#bound-trace,
+#container {
+  stroke-width: var(--scene-frame-width);
+}
+#bound-box {
+  stroke: var(--scene-frame);
+}
+#bound-box.is-locked {
+  stroke: var(--scene-frame-locked);
+}
+#bound-trace {
+  stroke: var(--scene-trace);
+}
 #ghost rect {
   stroke: var(--scene-ghost);
 }
@@ -420,7 +447,8 @@ body.drawing #packing-svg #squares {
   stroke: var(--scene-best);
 }
 /* The stage's box, pointed at from above the rail: black while it moves, green once it locks at
-   the best known side, as the box itself does. */
+   the best known side, when the box itself turns green. On its way the box is drawn grey and the
+   pointer stays black, a mark on the bar beside the bold black bound rules. */
 .gapbar-plot .box-pointer {
   fill: var(--scene-black);
 }
@@ -503,6 +531,44 @@ body.drawing #packing-svg #squares {
 #numeral-b .katex .mrel,
 #numeral-static .katex .mord.mathbf {
   visibility: hidden;
+}
+/* An empty inline block on the headline's line sits on its baseline, so its top is where the
+   headline's letters stand. `placeAttribution` reads it; it draws nothing. */
+.numeral .baseline {
+  display: inline-block;
+}
+/* The attribution, the owner's (2026-09-17): the repository's address in the stage's bottom right,
+   standing on the headline's baseline and ending where the gap bar ends. It is SVG text because
+   SVG text is placed by its baseline and its end, which are the two things said about it:
+   `placeAttribution` measures the headline's baseline and the rail's right end once the faces
+   land and writes them as the text's `y` and `x` in stage pixels. Hidden until then, rather than
+   drawn at a guess. It is on the stage in every mode, so a captured frame carries it; the overlay
+   takes no pointer events but the link's own. */
+#stage-attribution {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  overflow: visible;
+  pointer-events: none;
+}
+#stage-attribution:not(.is-placed) {
+  visibility: hidden;
+}
+#stage-attribution a {
+  cursor: pointer;
+  pointer-events: auto;
+}
+#stage-attribution text {
+  font-family: var(--font-sans);
+  font-size: var(--stage-text-number);
+  font-weight: var(--stage-weight-regular);
+  fill: var(--scene-attribution);
+}
+#stage-attribution a:hover text,
+#stage-attribution a:focus-visible text {
+  text-decoration: underline;
 }
 /* The panel says what is proved about n and, when anything is, what is open, under headings in
    the gap bar's head style. Every slot is fixed, so nothing jumps between n: PROVEN's bound and
@@ -590,6 +656,10 @@ body.drawing #packing-svg #squares {
   font-weight: var(--stage-weight-label);
   color: var(--scene-label);
   letter-spacing: var(--stage-tracking-label);
+}
+/* `new result` is set in the badges' type, in the star's scarlet (the owner, 2026-09-17). */
+.badge-item.is-new-result {
+  color: var(--scene-proved);
 }
 .badge-item svg {
   width: 36px;
@@ -869,7 +939,8 @@ select:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
 summary:focus-visible,
-#stage:focus-visible {
+#stage:focus-visible,
+#stage-attribution a:focus-visible {
   outline: var(--focus-ring-width) solid var(--color-focus);
   outline-offset: var(--focus-ring-offset);
 }
@@ -1358,7 +1429,7 @@ body.trace-active #bound-trace {
 }
 body.pack-independent #container,
 body.trace-active #container {
-  stroke: var(--scene-black);
+  stroke: var(--scene-frame);
 }
 /* Search: no stage, and only its own workspace under the tabs. */
 body.search-active #stage-wrap,

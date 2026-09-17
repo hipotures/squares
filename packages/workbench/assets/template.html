@@ -21,13 +21,15 @@ __WORKBENCH_CSS__
         <g id="world" transform="scale(1 -1)">
           <!-- In the catalogue the container is geometry only: the scene keeps its size, and the
                two bounds below are what is drawn. Pack and the animation studio draw no box, so
-               there the stylesheet hides the bounds and draws this, 2 px black. -->
-          <rect id="container" x="0" y="0" width="1" height="1" fill="none" stroke="none" stroke-width="2" vector-effect="non-scaling-stroke" />
+               there the stylesheet hides the bounds and draws this, in the frames' grey. Every
+               frame's width and colour is the stylesheet's (`--scene-frame-*`). -->
+          <rect id="container" x="0" y="0" width="1" height="1" fill="none" stroke="none" vector-effect="non-scaling-stroke" />
           <g id="squares"></g>
-          <!-- The box, over the squares: bold where it is, turning the page's green when it locks at
-               the best known side, and a thin black trace of where it just was, under it. -->
-          <rect id="bound-trace" x="0" y="0" width="1" height="1" fill="none" stroke="#000000" stroke-width="1.5" vector-effect="non-scaling-stroke" pointer-events="none" />
-          <rect id="bound-box" x="0" y="0" width="1" height="1" fill="none" stroke-width="4" vector-effect="non-scaling-stroke" pointer-events="none" />
+          <!-- The box, over the squares: grey where it is, turning the page's green when it locks at
+               the best known side, and a light grey trace of where it just was, under it, at the
+               same width. -->
+          <rect id="bound-trace" x="0" y="0" width="1" height="1" fill="none" vector-effect="non-scaling-stroke" pointer-events="none" />
+          <rect id="bound-box" x="0" y="0" width="1" height="1" fill="none" vector-effect="non-scaling-stroke" pointer-events="none" />
           <g id="links"></g>
           <g id="mask-links"></g>
           <line id="draw-line" x1="0" y1="0" x2="0" y2="0" vector-effect="non-scaling-stroke" stroke-linecap="round" style="display: none" />
@@ -72,6 +74,13 @@ __WORKBENCH_CSS__
         <div class="numeral-slot" id="numeral-a"></div>
         <div class="numeral-slot" id="numeral-b"></div>
       </div>
+      <!-- The attribution: placed on the headline's baseline and at the gap bar's right end by
+           `placeAttribution`, and hidden until it has been. -->
+      <svg id="stage-attribution" viewBox="0 0 1920 1080" role="none">
+        <a id="stage-attribution-link" href="https://github.com/jlevy/squares" aria-label="github.com/jlevy/squares, the project's repository on GitHub">
+          <text id="stage-attribution-text" text-anchor="end">github.com/jlevy/squares</text>
+        </a>
+      </svg>
       <div id="pack-stage-facts" hidden></div>
       <p class="sr-only" id="pack-announcement" aria-live="polite" aria-atomic="true"></p>
     </div>

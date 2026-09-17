@@ -54,6 +54,13 @@ export function planFacts(facts: CorpusFacts, n: number): FactsPlan {
   return { badges, open };
 }
 
+/** A badge item's classes: `new result` is set in the star's colour, every other in the label's. */
+export function badgeClass(badge: { glyph: string; style: string }): string {
+  return badge.glyph === NEW_RESULT_BADGE.glyph && badge.style === NEW_RESULT_BADGE.style
+    ? "badge-item is-new-result"
+    : "badge-item";
+}
+
 function badgeLabel(badge: { glyph: string; style: string }, n: number): string {
   const label = BADGE_LABELS[`${badge.glyph}/${badge.style}`];
   if (label === undefined) {
@@ -169,6 +176,9 @@ export function createFactsView(document: Document, DATA: Corpus) {
     } else {
       numeral.appendChild(text("span", "n-val", String(n)));
     }
+    // An empty inline block on the line stands on its baseline, which is where the stage's
+    // attribution is set (`placeAttribution`). It has no width and no text.
+    numeral.appendChild(text("span", "baseline"));
     const slot = requireHtml(document, layer.id === "facts-a" ? "numeral-a" : "numeral-b");
     slot.textContent = "";
     slot.appendChild(numeral);
@@ -210,7 +220,7 @@ export function createFactsView(document: Document, DATA: Corpus) {
     // form to the bound it belongs to.
     const badges = text("div", "badges");
     for (const b of plan.badges) {
-      badges.appendChild(badgeItem("badge-item", b.glyph, b.style, b.label));
+      badges.appendChild(badgeItem(badgeClass(b), b.glyph, b.style, b.label));
     }
     layer.appendChild(badges);
     // OPEN, only when something is open. The two layers are compared slot by slot, and OPEN's
