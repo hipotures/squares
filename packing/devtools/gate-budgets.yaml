@@ -310,10 +310,29 @@ tiers:
   # readings included a step this tier no longer runs.
   # 2026-09-16: the exact reconciliation topology removed the standalone type floor
   # from this tier. Run 35127260063 measured the resulting 50-step selection at 94.65 s
-  # and tripped the stale-record rule against 158.82 s. The 189 s ceiling is just under
-  # rule 2's 2x headroom and remains outside the 180 s required-workflow wall because
-  # that wall includes checkout, setup, queueing and the aggregator as well as this tier.
-  ceiling_seconds: 189.0
+  # and tripped the stale-record rule against 158.82 s. The 189 s ceiling written that
+  # day was just under rule 2's 2x headroom against that record.
+  #
+  # 2026-09-17: 140 s, and the ceiling came down because the record did rather than
+  # because anything about this tier got worse. PR #185 (`think-5hfr`, merged as
+  # d7f9d94d) runs `exact verification`'s subprocesses concurrently, and the step read
+  # 67.51 s and 46.01 s in the two hosted runs of that code against 82.90 s and 96.29 s
+  # serial. Against the 75.67 s record below, 189 s would be 2.50x of headroom where
+  # rule 2 allows 2.0x, so the declaration check refuses it: a tightened ceiling is not
+  # optional here, it is what the register's own static rule demands.
+  #
+  # 140 s is 1.85x of the record, and the two edges it sits between are the usual ones.
+  # It is above the drift rule's 1.5x (113.5 s), so the record-relative rule -- which
+  # names the step that grew -- still speaks before the ceiling does, and the ceiling is
+  # not what a regression trips first. It is below the step time this tier costs if its
+  # pool stops parallelising: the eight steps the faster run's log names already sum to
+  # 148.23 s over 42 more it does not name, so serial degeneration fails here rather
+  # than passing quietly. Both properties are what the 189 s and the 195 s before it
+  # were argued from, so the argument is unchanged and only the numbers moved.
+  #
+  # It remains outside the 180 s required-workflow wall, which includes checkout, setup,
+  # queueing and the aggregator as well as this tier.
+  ceiling_seconds: 140.0
   # Cleared, on the same rule that cleared 1369.60s and 409.0s from the `fast` entry and
   # 107.05s from `sweeps`: the figure measures a tier that no longer exists. It measured
   # this one twice over -- the four readings predate the corpus widening, and the widened
@@ -323,12 +342,24 @@ tiers:
   # reading at the reference shape of the tier this change replaced, so recording it
   # would arm the stale rule against every honest run of the new one. The gate prints the
   # line to paste the first time a run at the reference shape measures the new tier.
-  measured_seconds: 94.65
-  measured_on: '2026-09-16'
+  #
+  # 2026-09-17: the field has not been cleared again. What follows is a fall, not a
+  # re-scoping -- the tier selects the same 50 steps and the work inside it is the same
+  # work, run concurrently -- so the 94.65 s it supersedes moves into `history:`
+  # unchanged, and a fall owes the ratchet rule no attribution.
+  measured_seconds: 75.67
+  measured_on: '2026-09-17'
   measured_where: >-
-    Run 35127260063, job validate, on PR 188 exact head 2f619303: 94.65 s at
-    the reference shape, selecting 50 of 80 steps. The tier's checks all passed; the job
-    failed only because this reading was below the stale-record boundary.
+    The geometric mean of two readings at the reference shape -- 90.19 s in run
+    35210073404 at head e8c79fe4 and 63.48 s in run 35213759889 at head 80a5976f, job
+    validate on PR 185, each selecting 50 of 80 steps, each green. Observed spread
+    1.42x. The fall is PR #185's concurrent `exact verification` (`think-5hfr`, merged
+    as d7f9d94d): that step read 67.51 s and 46.01 s in those two runs against 82.90 s
+    in run 35127260063 and 96.29 s in run 35182460400 on the serial code this tier ran
+    before, and nothing else in the selection changed. 90.19 s is 1.19x of this record
+    and 63.48 s is 0.84x, so both readings sit inside the drift and the stale rules the
+    record arms. Two readings is the minimum this convention accepts; the first hosted
+    run at the reference shape after this lands gives a third and can refine it.
   history:
   - measured_seconds: 99.39
     measured_on: '2026-09-06'
@@ -372,6 +403,14 @@ tiers:
       Run 35078515837, job validate, on PR 180 exact head f4cfa5be: 158.82 s at
       the reference shape, selecting 51 of 79 steps, before the type floor moved to its
       own required partition.
+  - measured_seconds: 94.65
+    measured_on: '2026-09-16'
+    measured_where: >-
+      Run 35127260063, job validate, on PR 188 exact head 2f619303: 94.65 s at
+      the reference shape, selecting 50 of 80 steps. The tier's checks all passed; the job
+      failed only because this reading was below the stale-record boundary.
+      Superseded on 2026-09-17: it is a reading of the same 50 steps with `exact
+      verification` still serial, and PR #185 made that step concurrent.
   reference: {jobs: 3, inner_jobs: 1, cpus: 4}
   argument: >-
     The part of the pull-request surface that is none of the other six: every floor,
