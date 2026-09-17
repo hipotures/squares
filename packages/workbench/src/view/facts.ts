@@ -1,24 +1,72 @@
-import type { Corpus } from "../data/corpus.js";
+import type { Corpus, CorpusFacts } from "../data/corpus.js";
 import { createDom, requireHtml } from "./dom.ts";
 
+/** The label under each badge the panel draws, keyed `glyph/style`. */
+export const BADGE_LABELS: Readonly<Record<string, string>> = {
+  "★/star": "new result",
+  "O/solid": "optimal",
+  "=/solid": "exact",
+  "≈/muted": "numerical",
+  "R/solid": "rigid",
+  "R/muted": "rigid (catalogue)",
+};
+/** The badge that says the lower bound on the stage was first proved here. */
+export const NEW_RESULT_BADGE = Object.freeze({ glyph: "★", style: "star" });
+const OPEN_LABELS: Readonly<Record<string, string>> = {
+  optimality: "optimality",
+  "exact value": "exact value",
+  rigidity: "rigidity",
+};
+
+export interface FactsBadge {
+  glyph: string;
+  style: string;
+  label: string;
+}
+/** What the panel says about one n, before any of it is drawn. */
+export interface FactsPlan {
+  /** PROVEN's badges, in order: `new result` first when the lower bound was first proved here. */
+  badges: FactsBadge[];
+  /** OPEN's items, or null when nothing is open and the section is left out, heading and all. */
+  open: FactsBadge[] | null;
+}
+
+/**
+ * The panel's content for one n.
+ *
+ * A bound first proved here is a badge of its own, `new result` under the red star, in the same
+ * row and the same type as every other badge; it used to be a separate serif line under the
+ * bound. OPEN is drawn only when something is open: a heading over the word "none" said nothing
+ * the absence of the section does not.
+ */
+export function planFacts(facts: CorpusFacts, n: number): FactsPlan {
+  const badges: FactsBadge[] = [];
+  if (facts.star) {
+    badges.push({ ...NEW_RESULT_BADGE, label: badgeLabel(NEW_RESULT_BADGE, n) });
+  }
+  for (const badge of facts.badges) {
+    badges.push({ glyph: badge.glyph, style: badge.style, label: badgeLabel(badge, n) });
+  }
+  const open =
+    facts.open.length === 0
+      ? null
+      : facts.open.map((key) => ({ glyph: "?", style: "query", label: OPEN_LABELS[key] ?? key }));
+  return { badges, open };
+}
+
+function badgeLabel(badge: { glyph: string; style: string }, n: number): string {
+  const label = BADGE_LABELS[`${badge.glyph}/${badge.style}`];
+  if (label === undefined) {
+    throw new Error(`unknown badge ${badge.glyph}/${badge.style} for n = ${n}`);
+  }
+  return label;
+}
+
 /** Catalogue fact panels only render trusted, build-time mathematical markup. */
-export function createFactsView(document: Document, DATA: Corpus, numeralLeft: () => number) {
+export function createFactsView(document: Document, DATA: Corpus) {
   const { el, text } = createDom(document);
   const FACTS = DATA.facts;
   const METRICS = DATA.metrics;
-  const BADGE_LABELS: Record<string, string> = {
-    "O/solid": "optimal",
-    "=/solid": "exact",
-    "≈/muted": "numerical",
-    "R/solid": "rigid",
-    "R/muted": "rigid (catalogue)",
-  };
-  const STAR_LABEL = "new lower bound";
-  const OPEN_LABELS: Record<string, string> = {
-    optimality: "optimality",
-    "exact value": "exact value",
-    rigidity: "rigidity",
-  };
   function glyphBaseline(glyph: string) {
     const b = METRICS.badge_baseline;
     return /[A-Za-z]/.test(glyph) ? b.letter : glyph === "?" ? b.query : b.math;
@@ -113,9 +161,9 @@ export function createFactsView(document: Document, DATA: Corpus, numeralLeft: (
     // included. It belongs to the picture rather than to the panel, but it rolls with the layer
     // whose facts it names, so it is built here and placed in that layer's headline slot. Each
     // rolling slot draws only the number; a third, still slot draws `n =` and never fades (see
-    // `buildPair` and the stylesheet), because a step changes the number and nothing else.
+    // `buildPair` and the stylesheet), because a step changes the number and nothing else. Where it
+    // starts is the headline's `--stage-numeral-left`, which the page measures once the faces land.
     const numeral = text("div", "numeral");
-    numeral.style.left = `${numeralLeft()}px`;
     if (f.html_headline) {
       numeral.innerHTML = f.html_headline;
     } else {
@@ -139,10 +187,11 @@ export function createFactsView(document: Document, DATA: Corpus, numeralLeft: (
       }
       return line;
     }
-    // PROVED, in the order a reader wants it: the chained bound on the side, the scarlet note when
-    // its lower bound was first proved here, and the badges. Both bounds are proved facts -- a
+    // PROVED, in the order a reader wants it: the chained bound on the side, then the badges, led by
+    // `new result` when its lower bound was first proved here. Both bounds are proved facts -- a
     // construction proves its upper bound -- so both belong here, and OPEN below carries the
     // questions.
+    const plan = planFacts(f, n);
     layer.appendChild(text("div", "section-head head-proved", "Proven"));
     // The bound is one chained statement now, so it is one row. The star sits to the LEFT of
     // the lower bound it marks, inside a slot that is always the star's width whether or not
@@ -155,36 +204,26 @@ export function createFactsView(document: Document, DATA: Corpus, numeralLeft: (
     }
     bound.insertBefore(starSlot, bound.firstChild);
     layer.appendChild(bound);
-    const starLine = text("div", "star-line");
-    if (f.star) {
-      starLine.appendChild(text("span", "note", STAR_LABEL));
-    }
-    layer.appendChild(starLine);
     // No closed-form line. It sat under a chain of two bounds and did not say which bound it was
     // the value of -- 108 of the 110 n that had one show `lower <= s(n) <= upper` -- so the owner
     // asked for it to go. The data keeps `html_exact` and `degree` for a design that attaches a
     // form to the bound it belongs to.
     const badges = text("div", "badges");
-    for (const b of f.badges) {
-      const label = BADGE_LABELS[`${b.glyph}/${b.style}`];
-      if (label === undefined) {
-        throw new Error(`unknown badge ${b.glyph}/${b.style} for n = ${n}`);
-      }
-      badges.appendChild(badgeItem("badge-item", b.glyph, b.style, label));
+    for (const b of plan.badges) {
+      badges.appendChild(badgeItem("badge-item", b.glyph, b.style, b.label));
     }
     layer.appendChild(badges);
-    // OPEN, always headed even when nothing is open, so the pair of headings is the panel's
-    // shape rather than something that appears for some n and not others.
-    layer.appendChild(text("div", "section-head head-open", "Open"));
-    const items = text("div", "open-items");
-    if (f.open.length === 0) {
-      items.appendChild(text("span", "open-none", "none"));
-    } else {
-      for (const key of f.open) {
-        items.appendChild(badgeItem("open-item", "?", "query", OPEN_LABELS[key] || key));
+    // OPEN, only when something is open. The two layers are compared slot by slot, and OPEN's
+    // slots come last, so a layer without them lines up with one that has them: those two slots
+    // fade in or out whole while every slot before them hands over as before.
+    if (plan.open !== null) {
+      layer.appendChild(text("div", "section-head head-open", "Open"));
+      const items = text("div", "open-items");
+      for (const item of plan.open) {
+        items.appendChild(badgeItem("open-item", item.glyph, item.style, item.label));
       }
+      layer.appendChild(items);
     }
-    layer.appendChild(items);
     return numeral;
   }
   return { buildFacts };

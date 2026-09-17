@@ -14,7 +14,7 @@
   const trace = element("bound-trace");
   const box = element("bound-box");
   const pointer = /** @type {SVGGraphicsElement} */ (element("gapbar-box"));
-  const met = getComputedStyle(document.documentElement).getPropertyValue("--met").trim();
+  const met = getComputedStyle(document.documentElement).getPropertyValue("--scene-best").trim();
   const matrix = pointer.transform.baseVal.consolidate()?.matrix ?? null;
   return {
     trace: Number(trace.getAttribute("width")),

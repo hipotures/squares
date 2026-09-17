@@ -8,7 +8,7 @@
   const api = window.atlasTransitions;
   const box = /** @type {Element} */ (document.getElementById("bound-box"));
   const pointer = /** @type {Element} */ (document.getElementById("gapbar-box"));
-  const met = getComputedStyle(document.documentElement).getPropertyValue("--met").trim();
+  const met = getComputedStyle(document.documentElement).getPropertyValue("--scene-best").trim();
   api.pause();
   api.setStyle(o.style);
   const pairs = api.pairs();

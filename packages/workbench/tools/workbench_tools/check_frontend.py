@@ -16,7 +16,10 @@ from workbench_tools.check_stage_resize import check as check_stage_resize
 
 
 def main() -> int:
-    """Share the deterministic build across the Chromium checks."""
+    """Share the deterministic build across the Chromium checks.
+
+    The layout contract (`check_layout`) runs inside `check_stage_resize`'s browser session.
+    """
     with tempfile.TemporaryDirectory(prefix="squares-workbench-frontend-") as scratch:
         page = Path(scratch) / "workbench" / "index.html"
         build(page.parent)

@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+  <body>
+    <div id="a" style="display: none"></div>
+    <svg><line x1="0" y1="0" STYLE='stroke: red' /></svg>
+    <input type="range" data-style="x" title="style=nope">
+    <!-- <div style="color: red"></div> -->
+    <p>Prose that mentions style="x" is text, not an attribute.</p>
+    <script>
+      document.body.style.opacity = "0";
+      // document.body.style.left = "0";
+    </script>
+    <style>
+      .x[style="a"] { color: red; }
+    </style>
+  </body>
+</html>

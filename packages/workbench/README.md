@@ -44,6 +44,46 @@ checks the generated full corpus and that the page is self-contained, stamps the
 revision, and with `--check` requires two builds to match byte for byte.
 The GitHub Pages deployment is owned by the repository workflow.
 
+## Design system
+
+Every colour, space, type size, weight, line height, radius, border width, shadow, layer
+and duration the page uses is a custom property in the `:root` block at the top of
+[`assets/workbench.css`](assets/workbench.css).
+The rest of the stylesheet refers to those tokens and nothing else.
+The block has three families:
+
+- **UI chrome** (`--color-*`, `--space-*`, `--font-*`, `--radius-*`, `--control-*`,
+  `--layout-*`): semantic colour roles, a 4 px spacing scale, a five-step type scale and
+  one control height. The font families and their names follow kpress.
+- **The stage** (`--stage-*`): the 1920 × 1080 poster the video is captured from, in
+  stage pixels.
+- **Scene and plot colours** (`--scene-*`, `--plot-*`): what is drawn rather than the
+  chrome. Square fills are data from `sqpack.render` and are not tokens.
+
+The page has one structure in every mode.
+The controls are a single column inside `--layout-gutter`. Every block in it (the mode
+panel, a `.panel-row` of `.subpanel`s, a `.workspace`) spans the same two edges and sits
+`--layout-stack-gap` from the next.
+Within a block, a `.row` holds controls and a `.box-title` names a panel.
+
+Three contracts hold it:
+
+- [`tests/design-system.test.ts`](tests/design-system.test.ts) refuses a raw design
+  value outside the token block.
+  It also refuses an inline style write in `src/` or the template beyond the counted,
+  reasoned allowances in [`design-allowlist.json`](design-allowlist.json), which may
+  only shrink. It checks every text, control, focus and stage colour pair against WCAG
+  AA. The machinery is in [`tools/design-contract.ts`](tools/design-contract.ts), with
+  its negative fixtures in `tests/design-contract.test.ts`.
+- `workbench_tools.check_layout` measures Animate, the animation studio, Pack and Search
+  in Chromium at 1440 × 900, 1024 × 768 and 390 × 844. It checks the shared edges,
+  gutters and gaps, one height per control kind, horizontal overflow, panel overlap, and
+  the stage panel’s OPEN and badge rules.
+  It runs inside `check_stage_resize`’s browser session in `check_frontend`, and
+  `tests/test_check_layout.py` proves each rule refuses a page that breaks it.
+- `workbench_tools.layout_gallery` photographs every view at every review viewport and
+  writes a side-by-side comparison page for design review.
+
 ## Contracts and ownership
 
 - `src/api` defines the public browser API. Runtime installation and probe declarations

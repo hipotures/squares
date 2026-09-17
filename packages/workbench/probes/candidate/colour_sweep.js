@@ -43,6 +43,6 @@
     fills: Array.from(seen),
     shades: colour.shades,
     palette: colour.palette,
-    reserved: [token("--new"), token("--met")],
+    reserved: [token("--scene-proved"), token("--scene-best")],
   };
 };

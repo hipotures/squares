@@ -79,7 +79,7 @@ __WORKBENCH_CSS__
   <div id="stage-resize" class="resize-handle" role="separator" aria-orientation="horizontal" aria-controls="stage-wrap" aria-label="Resize the stage against the controls" title="Drag to resize the stage, or double-click to size it automatically" tabindex="0"></div>
   <div id="controls">
     <div id="panel">
-      <div class="subpanel">
+      <div class="subpanel is-flush" id="mode-subpanel">
         <div class="mode-tabs" id="mode-tabs" role="group" aria-label="what the page is showing">
           <button type="button" id="mode-animate" data-mode="animate" aria-pressed="true" title="A range of n, played from end to end">Animate</button>
           <button type="button" id="mode-pack" data-mode="pack" aria-pressed="false" title="One fixed n: press play and the chosen strategy packs it until you pause">Pack</button>
@@ -96,39 +96,39 @@ __WORKBENCH_CSS__
           <span class="step-label readout" id="step-label"></span>
           <span class="chips" id="step-chips"></span>
         </div>
+        <div class="mode-body row" id="transport-row">
+          <button id="play" class="primary transport" title="Play or pause (space)" aria-label="Play">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path class="glyph-play" d="M7.5 4.5 L19.5 12 L7.5 19.5 Z" />
+              <g class="glyph-pause"><rect x="6.6" y="4.5" width="4.2" height="15" rx="1.1" /><rect x="13.2" y="4.5" width="4.2" height="15" rx="1.1" /></g>
+            </svg>
+          </button>
+          <button id="restart" class="transport" title="Back to the beginning of what play would play: in Pack the starting arrangement with every setting kept, in Animate the first step of the range" aria-label="Restart">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <g class="glyph-play"><rect x="4.6" y="4.5" width="3.4" height="15" rx="1.1" /><path d="M20 4.5 L20 19.5 L9.4 12 Z" /></g>
+              <g class="glyph-pause"><path d="M12 5.2 a6.8 6.8 0 1 1 -6.8 6.8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" /><path d="M5.2 12 L5.2 6.6 L10.6 12 Z" /></g>
+            </svg>
+          </button>
+          <span id="clock" class="readout">0.00 s &middot; 0 steps</span>
+          <label title="How fast the clock runs while playing: 0.05x to watch a settle closely, 2x to skim">speed
+            <input type="range" id="speed" min="0" max="1000" step="1" aria-label="playback speed">
+            <span class="hint readout" id="speed-info"></span>
+          </label>
+          <span class="range-figure readout" id="range-duration"></span>
+          <span class="range-figure readout" id="range-position"></span>
+          <button id="refresh-gap" title="Redraw the gap bar against what is on the stage now">update gap bar</button>
+          <label>start
+            <span class="seg" id="initial-seg">
+              <button data-initial="previous" title="The retained packing of n-1 with the new square added">previous packing</button>
+              <button data-initial="random" title="n squares at seeded pseudo-random centres and angles in a box larger than the record">random</button>
+              <button data-initial="grid" title="n squares axis-aligned in rows from the bottom-left, in the grid's own box">ordered fill</button>
+              <button data-initial="record" title="The retained best-known packing of n itself, in its own box. Press play to see whether the current law holds a known optimum still">best known</button>
+            </span>
+          </label>
+          <button id="optimize" class="primary" title="Run the current settings from the chosen start until pause">Optimize</button>
+        </div>
       </div>
-      <div class="row">
-        <button id="play" class="primary transport" title="Play or pause (space)" aria-label="Play">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path class="glyph-play" d="M7.5 4.5 L19.5 12 L7.5 19.5 Z" />
-            <g class="glyph-pause"><rect x="6.6" y="4.5" width="4.2" height="15" rx="1.1" /><rect x="13.2" y="4.5" width="4.2" height="15" rx="1.1" /></g>
-          </svg>
-        </button>
-        <button id="restart" class="transport" title="Back to the beginning of what play would play: in Pack the starting arrangement with every setting kept, in Animate the first step of the range" aria-label="Restart">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <g class="glyph-play"><rect x="4.6" y="4.5" width="3.4" height="15" rx="1.1" /><path d="M20 4.5 L20 19.5 L9.4 12 Z" /></g>
-            <g class="glyph-pause"><path d="M12 5.2 a6.8 6.8 0 1 1 -6.8 6.8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" /><path d="M5.2 12 L5.2 6.6 L10.6 12 Z" /></g>
-          </svg>
-        </button>
-        <span id="clock" class="readout">0.00 s &middot; 0 steps</span>
-        <label title="How fast the clock runs while playing: 0.05x to watch a settle closely, 2x to skim">speed
-          <input type="range" id="speed" min="0" max="1000" step="1" aria-label="playback speed">
-          <span class="hint readout" id="speed-info"></span>
-        </label>
-        <span class="range-figure readout" id="range-duration"></span>
-        <span class="range-figure readout" id="range-position"></span>
-        <button id="refresh-gap" title="Redraw the gap bar against what is on the stage now">update gap bar</button>
-        <label>start
-          <span class="seg" id="initial-seg">
-            <button data-initial="previous" title="The retained packing of n-1 with the new square added">previous packing</button>
-            <button data-initial="random" title="n squares at seeded pseudo-random centres and angles in a box larger than the record">random</button>
-            <button data-initial="grid" title="n squares axis-aligned in rows from the bottom-left, in the grid's own box">ordered fill</button>
-            <button data-initial="record" title="The retained best-known packing of n itself, in its own box. Press play to see whether the current law holds a known optimum still">best known</button>
-          </span>
-        </label>
-        <button id="optimize" class="primary" title="Run the current settings from the chosen start until pause">Optimize</button>
-      </div>
-      <div class="row">
+      <div class="panel-row">
         <div class="subpanel lawbox" id="law-box" data-motion-control="physics">
           <div class="law-plot-wrap">
             <span class="box-title">force law</span>
@@ -169,7 +169,7 @@ __WORKBENCH_CSS__
       </div>
       <!-- Revision 15: the law gets a line of its own; the solver and the two graphs share
            the next, so a wide plot is not squeezed beside three narrow boxes. -->
-      <div class="row">
+      <div class="panel-row">
         <div class="subpanel groupbox" id="solver-box">
           <span class="box-title">solver</span>
           <div class="group-body">
@@ -229,7 +229,62 @@ __WORKBENCH_CSS__
         <span class="hint readout readout-line" id="step-note"></span>
       </div>
     </div>
-    <div class="row">
+    <section id="pack-workspace" class="subpanel workspace" aria-labelledby="pack-workspace-title" hidden>
+      <h2 id="pack-workspace-title">Pack one arrangement</h2>
+      <div class="row">
+        <label>Squares <input id="pack-count" type="number" min="1" max="400" step="1" value="17"></label>
+        <label>Seed <input id="pack-seed" type="number" min="0" max="4294967295" step="1" value="1"></label>
+        <label>Start <select id="pack-start"><option value="grid">Grid</option><option value="random">Random</option><option value="given" disabled>Imported or edited arrangement</option></select></label>
+        <label>Shake <input id="pack-shake" type="range" min="0" max="10" step="1" value="3"><output id="pack-shake-value">3</output></label>
+        <button type="button" id="pack-apply">Apply settings</button>
+      </div>
+      <div class="row">
+        <button type="button" id="pack-run" class="primary">Run</button>
+        <button type="button" id="pack-pause">Pause</button>
+        <button type="button" id="pack-restart" title="Return to the current start with the same seed and settings">Restart</button>
+        <button type="button" id="pack-reset" title="Restore default settings and the grid start">Reset settings</button>
+        <button type="button" id="pack-resolve" title="Attempt a bounded overlap repair on the displayed arrangement">Resolve</button>
+        <button type="button" id="pack-export">Export snapshot</button>
+      </div>
+      <details>
+        <summary>Import a starting arrangement</summary>
+        <label for="pack-json">Snapshot JSON: square side, container, and centre/angle poses in radians</label>
+        <textarea id="pack-json" rows="5" spellcheck="false"></textarea>
+        <button type="button" id="pack-load">Load snapshot</button>
+      </details>
+      <output id="pack-status" aria-live="off"></output>
+      <output id="pack-repair-status" aria-live="off"></output>
+    </section>
+    <section id="search-workspace" class="subpanel workspace" aria-labelledby="search-workspace-title" hidden>
+      <h2 id="search-workspace-title">Experimental search</h2>
+      <p>Compare repeatable packing runs with a fixed physics budget. These browser results are exploratory; export a ledger to keep the exact plan and outcomes.</p>
+      <div class="row">
+        <label>Squares <input id="search-n" type="number" min="1" max="32" step="1" value="5"></label>
+        <label>Seeds <input id="search-seeds" type="text" value="0,1,2,3" aria-describedby="search-seed-help"></label>
+        <span id="search-seed-help">1–8 unique seeds, separated by commas</span>
+        <label>Physics steps <input id="search-steps" type="number" min="1" max="5000" step="1" value="500"></label>
+        <label>Start <select id="search-proposal"><option value="grid">Grid</option><option value="random">Random</option></select></label>
+        <label><input id="search-repair" type="checkbox"> Attempt Resolve</label>
+      </div>
+      <div class="row">
+        <button type="button" id="search-start" class="primary">Run search</button>
+        <button type="button" id="search-cancel" disabled>Cancel</button>
+        <button type="button" id="search-export" disabled>Export ledger</button>
+      </div>
+      <output id="search-status" aria-live="polite"></output>
+      <output id="search-progress" aria-live="polite"></output>
+      <table id="search-table">
+        <thead><tr><th scope="col">Seed</th><th scope="col">Status</th><th scope="col">Packing</th><th scope="col">Side</th><th scope="col">Stationary</th></tr></thead>
+        <tbody id="search-results"></tbody>
+      </table>
+      <details>
+        <summary>Resume a saved plan</summary>
+        <label for="search-import">Ledger JSON</label>
+        <textarea id="search-import" rows="5" spellcheck="false"></textarea>
+        <button type="button" id="search-resume">Validate and resume</button>
+      </details>
+    </section>
+    <div class="panel-row">
       <div class="subpanel groupbox" id="step-anim-box">
         <span class="box-title">the step animation</span>
         <div class="group-body">
@@ -253,12 +308,12 @@ __WORKBENCH_CSS__
       </div>
       <!-- Revision 15: the timing group is alone in its row, so removing it in Pack
            cannot reflow anything beside it. -->
-      <div class="row">
+      <div class="panel-row">
       <div class="subpanel groupbox" id="shake-box" data-motion-control="physics">
         <span class="box-title">the shake</span>
         <div class="group-body">
           <label title="How hard and how long the two physical styles shake: 0 none, 9 the default, 20 the loudest and longest">annealing
-            <input type="range" id="anneal" min="0" max="20" step="1" style="width: 130px">
+            <input type="range" id="anneal" min="0" max="20" step="1">
           </label>
           <label><input type="checkbox" id="blind-toggle"> blind, no target</label>
           <label>inflate <input type="number" id="blind-inflate" min="1" max="2" step="0.01"></label>
@@ -311,62 +366,7 @@ __WORKBENCH_CSS__
       </div>
       <span class="hint readout readout-line" id="continuous-info"></span>
     </div>
-      <section id="pack-workspace" aria-labelledby="pack-workspace-title" hidden>
-        <h2 id="pack-workspace-title">Pack one arrangement</h2>
-        <div class="row">
-          <label>Squares <input id="pack-count" type="number" min="1" max="400" step="1" value="17"></label>
-          <label>Seed <input id="pack-seed" type="number" min="0" max="4294967295" step="1" value="1"></label>
-          <label>Start <select id="pack-start"><option value="grid">Grid</option><option value="random">Random</option><option value="given" disabled>Imported or edited arrangement</option></select></label>
-          <label>Shake <input id="pack-shake" type="range" min="0" max="10" step="1" value="3"><output id="pack-shake-value">3</output></label>
-          <button type="button" id="pack-apply">Apply settings</button>
-        </div>
-        <div class="row">
-          <button type="button" id="pack-run" class="primary">Run</button>
-          <button type="button" id="pack-pause">Pause</button>
-          <button type="button" id="pack-restart" title="Return to the current start with the same seed and settings">Restart</button>
-          <button type="button" id="pack-reset" title="Restore default settings and the grid start">Reset settings</button>
-          <button type="button" id="pack-resolve" title="Attempt a bounded overlap repair on the displayed arrangement">Resolve</button>
-          <button type="button" id="pack-export">Export snapshot</button>
-        </div>
-        <details>
-          <summary>Import a starting arrangement</summary>
-          <label for="pack-json">Snapshot JSON: square side, container, and centre/angle poses in radians</label>
-          <textarea id="pack-json" rows="5" spellcheck="false"></textarea>
-          <button type="button" id="pack-load">Load snapshot</button>
-        </details>
-        <output id="pack-status" aria-live="off"></output>
-        <output id="pack-repair-status" aria-live="off"></output>
-      </section>
-      <section id="search-workspace" aria-labelledby="search-workspace-title" hidden>
-        <h2 id="search-workspace-title">Experimental search</h2>
-        <p>Compare repeatable packing runs with a fixed physics budget. These browser results are exploratory; export a ledger to keep the exact plan and outcomes.</p>
-        <div class="row">
-          <label>Squares <input id="search-n" type="number" min="1" max="32" step="1" value="5"></label>
-          <label>Seeds <input id="search-seeds" type="text" value="0,1,2,3" aria-describedby="search-seed-help"></label>
-          <span id="search-seed-help">1–8 unique seeds, separated by commas</span>
-          <label>Physics steps <input id="search-steps" type="number" min="1" max="5000" step="1" value="500"></label>
-          <label>Start <select id="search-proposal"><option value="grid">Grid</option><option value="random">Random</option></select></label>
-          <label><input id="search-repair" type="checkbox"> Attempt Resolve</label>
-        </div>
-        <div class="row">
-          <button type="button" id="search-start" class="primary">Run search</button>
-          <button type="button" id="search-cancel" disabled>Cancel</button>
-          <button type="button" id="search-export" disabled>Export ledger</button>
-        </div>
-        <output id="search-status" aria-live="polite"></output>
-        <output id="search-progress" aria-live="polite"></output>
-        <table id="search-table">
-          <thead><tr><th scope="col">Seed</th><th scope="col">Status</th><th scope="col">Packing</th><th scope="col">Side</th><th scope="col">Stationary</th></tr></thead>
-          <tbody id="search-results"></tbody>
-        </table>
-        <details>
-          <summary>Resume a saved plan</summary>
-          <label for="search-import">Ledger JSON</label>
-          <textarea id="search-import" rows="5" spellcheck="false"></textarea>
-          <button type="button" id="search-resume">Validate and resume</button>
-        </details>
-      </section>
-      <section id="animation-editor" aria-labelledby="animation-editor-title" hidden>
+      <section id="animation-editor" class="subpanel workspace" aria-labelledby="animation-editor-title" hidden>
         <h2 id="animation-editor-title">Animation studio</h2>
         <p>Replay and edit a packing trace, or return to the catalogue for record-to-record illustrations. Positions are square centres; angles are radians.</p>
         <div class="row">

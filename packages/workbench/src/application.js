@@ -254,9 +254,11 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   const DEG = Math.PI / 180;
   const _QUARTER = Math.PI / 2;
   // Scarlet is defined once, in the stylesheet, and read back here for the fill tint.
-  const SCARLET = getComputedStyle(document.documentElement).getPropertyValue("--new").trim();
+  const SCARLET = getComputedStyle(document.documentElement)
+    .getPropertyValue("--scene-proved")
+    .trim();
   // The best known upper bound's green, which the stage's box turns when it locks at that side.
-  const MET = getComputedStyle(document.documentElement).getPropertyValue("--met").trim();
+  const MET = getComputedStyle(document.documentElement).getPropertyValue("--scene-best").trim();
 
   const state = {
     // Revision 9: one view. Revision 8's two tabs were the same operation over a different span, so
@@ -602,8 +604,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // that line is measured rather than computed: it is one constant string, and a measurement
   // cannot disagree with the face the browser actually loaded -- which a build-time advance
   // sum could, since `=` may come from the symbols face with its own size-adjust. Taken at
-  // startup and again on `document.fonts.ready`, as the figure width beside it is.
-  let numeralLeft = 152; // the fallback, close enough for the frame before the faces land
+  // startup and again on `document.fonts.ready`, as the figure width beside it is. Until then the
+  // stylesheet's `--stage-numeral-left` is the fallback, close enough for the frame before the
+  // faces land.
   //: The row the headline is centred in: the packing's own box, so `n = 26` sits under the picture
   //: it names rather than under the panel.
   const HEADLINE_ROW = 1000;
@@ -624,10 +627,10 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       shown.offsetWidth +
       (current?.textContent ? current.offsetWidth / Math.max(1, current.textContent.length) : 0) *
         Math.max(0, digits - (current?.textContent ? current.textContent.length : digits));
-    numeralLeft = Math.max(0, (HEADLINE_ROW - widest) / 2);
-    document.querySelectorAll(".numeral").forEach((el) => {
-      /** @type {HTMLElement} */ (el).style.left = `${numeralLeft}px`;
-    });
+    const numeralLeft = Math.max(0, (HEADLINE_ROW - widest) / 2);
+    // One property on the row, which every numeral in its three slots reads, rather than a `left`
+    // written into each numeral: a numeral built later starts in the right place without being told.
+    htmlNode("headline").style.setProperty("--stage-numeral-left", `${numeralLeft}px`);
   }
   //: The width of one figure in the face the gap bar sets its two numbers in, used to decide
   //: whether the record's label would sit on top of the lower bound's. The fallback is Source Sans
@@ -689,11 +692,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // panel. The star is the atlas's polygon; the approximately-equal sign is KaTeX_Main's U+2248
   // outline (the latin subset of Source Sans 3 has none), extracted at build time and drawn as a
   // path centred on its own ink, as the slideshow candidate draws it.
-  const { buildFacts } = workbenchBundle.factsView.createFactsView(
-    document,
-    DATA,
-    () => numeralLeft,
-  );
+  const { buildFacts } = workbenchBundle.factsView.createFactsView(document, DATA);
   let numeralA = null;
   //: Per slot of the facts panel, whether the n layer and the n + 1 layer draw it identically.
   //: An identical slot hands over at the midpoint, which cannot be seen; only a slot that
@@ -4709,6 +4708,14 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   function stageBounds() {
     return { min: STAGE_MIN, max: window.innerHeight - CONTROLS_MIN };
   }
+  // The layout is two numbers the stylesheet turns into boxes: `--stage-scale`, which sizes the
+  // stage and its wrapper, and `--controls-height`, which a separator-sized column takes while it
+  // is `.is-sized`. Written as custom properties on `#viewport` rather than as each box's width,
+  // height and transform, so the geometry stays in the stylesheet and only the numbers are live.
+  const viewportNode = htmlNode("viewport");
+  function setStageScale(/** @type {number} */ scale) {
+    viewportNode.style.setProperty("--stage-scale", String(scale));
+  }
   function layout() {
     if (document.hidden) {
       return;
@@ -4720,16 +4727,13 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     if (sized) {
       const height = clampSeparator(stageShare * vh, stageBounds());
       const scale = Math.min(vw / 1920, height / 1080);
-      stage.style.transform = `scale(${scale})`;
-      stageWrap.style.width = `${1920 * scale}px`;
-      stageWrap.style.height = `${1080 * scale}px`;
-      controls.style.height = `${vh - 1080 * scale}px`;
-      controls.style.maxHeight = "none";
+      setStageScale(scale);
+      viewportNode.style.setProperty("--controls-height", `${vh - 1080 * scale}px`);
+      controls.classList.add("is-sized");
       stageHandle?.sync();
       return;
     }
-    controls.style.height = "";
-    controls.style.maxHeight = "";
+    controls.classList.remove("is-sized");
     let ch = state.capture ? 0 : controls.offsetHeight;
     if (!state.capture) {
       // A hidden document is not laid out, so `offsetHeight` reads zero in a background tab;
@@ -4739,10 +4743,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       }
       ch = Math.min(controlsHeight, vh * CONTROLS_SHARE);
     }
-    const s = Math.min(vw / 1920, (vh - ch) / 1080);
-    stage.style.transform = `scale(${s})`;
-    stageWrap.style.width = `${1920 * s}px`;
-    stageWrap.style.height = `${1080 * s}px`;
+    setStageScale(Math.min(vw / 1920, (vh - ch) / 1080));
     stageHandle?.sync();
   }
 

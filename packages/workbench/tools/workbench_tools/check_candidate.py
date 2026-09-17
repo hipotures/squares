@@ -827,8 +827,8 @@ def browser_checks(page_path: Path, check) -> None:
             # the settle, retained through the next pair's dwell, gone once the next move is
             # under way. Scarlet comes from the stylesheet.
             page.evaluate(probe("candidate/set_phase"), {"phase": "simultaneous"})
-            scarlet = page.evaluate(probe("candidate/token"), {"name": "--new"})
-            check(scarlet == "#a3123f", f"--new is {scarlet!r}")
+            scarlet = page.evaluate(probe("candidate/token"), {"name": "--scene-proved"})
+            check(scarlet == "#a3123f", f"--scene-proved is {scarlet!r}")
             mark_state = probe("candidate/mark_state")
             page.evaluate(probe("candidate/seek"), {"t": 1.7})
             opacity, _, _ = page.evaluate(mark_state)
@@ -868,7 +868,7 @@ def browser_checks(page_path: Path, check) -> None:
             labels = page.evaluate(
                 probe("candidate/texts_of"), {"selector": "#facts-a .badge-item .label"}
             )
-            check(labels == ["new lower bound", "exact"], f"badge labels for n=17 are {labels}")
+            check(labels == ["new result", "exact"], f"badge labels for n=17 are {labels}")
             check(
                 page.evaluate(
                     probe("candidate/count_of"), {"selector": "#facts-a .badge-star polygon"}
