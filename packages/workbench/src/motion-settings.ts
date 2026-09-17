@@ -233,17 +233,22 @@ export const BLIND_SETTINGS = {
 
 export const BLIND_TRAJECTORY_SETTINGS = BLIND_SETTINGS;
 
-export const NEW_FRACTION = 1 / 3;
+/**
+ * Share of the moving span over which the new square fades in, in every phase. It fades at its
+ * final size: opacity is the only thing that changes (owner request, 2026-09-17).
+ */
+export const NEW_FRACTION = 0.4;
 export const ROLL_MAX = 0.4;
 export const BOUND_CLEAR = 0.3;
 export const BOUND_GROW = 0.2;
 export const BOUND_FADE = 0.12;
 /**
- * Share of the moving span between the first visible pixel of the arriving square and the start
- * of the container resize. The direction is deliberately square first, container second.
+ * Share of the moving span between the container finishing its resize, which is when the picture
+ * stops shrinking, and the new square starting to fade in. The direction is resize first, square
+ * second. At the default beat 0.2 is 0.18 s, against the 0.108 s gap box-first staging left.
  */
-export const DEFAULT_CONTAINER_DELAY_FRACTION = 0.2;
-export const CONTAINER_DELAY_BOUNDS: readonly [number, number] = [0, 0.3];
+export const DEFAULT_ARRIVAL_DELAY_FRACTION = 0.2;
+export const ARRIVAL_DELAY_BOUNDS: readonly [number, number] = [0, 0.6];
 
 /** Constants that define the illustrated tween's staging rather than the physical integrator. */
 export const TWEEN_ILLUSTRATION_SETTINGS = {
@@ -252,8 +257,18 @@ export const TWEEN_ILLUSTRATION_SETTINGS = {
   boundClear: BOUND_CLEAR,
   boundGrow: BOUND_GROW,
   boundFade: BOUND_FADE,
-  containerDelay: DEFAULT_CONTAINER_DELAY_FRACTION,
+  arrivalDelay: DEFAULT_ARRIVAL_DELAY_FRACTION,
 } as const;
+
+/**
+ * How far in the new square is at `progress` through its fade: smoothstep, symmetric, with zero
+ * slope at both ends, so the first visible frame is nearly transparent and the square settles
+ * into full opacity rather than stopping on it. The square is never scaled.
+ */
+export function newSquareOpacity(progress: number): number {
+  const value = Math.max(0, Math.min(1, progress));
+  return value * value * (3 - 2 * value);
+}
 
 export interface PhysicalPresentationTiming {
   move: number;
@@ -298,7 +313,7 @@ export interface PhysicalPresentationSchedule {
   containerStartFraction: number;
   /** Fraction of the presented moving span at which visible container motion completes. */
   containerEndFraction?: number;
-  /** Fractions over which the arriving square fades and inflates into view. */
+  /** Fractions over which the arriving square fades into view at its final size. */
   arrivalStartFraction: number;
   arrivalEndFraction: number;
 }
@@ -355,17 +370,25 @@ export function physicalPresentationState(
       schedule.containerStartFraction,
       schedule.containerEndFraction ?? 1,
     ),
-    appearanceProgress: 1 - (1 - arrival) ** 3,
+    appearanceProgress: newSquareOpacity(arrival),
   };
 }
 
-/** Whether a physical frame needs its trajectory, including the square-first arrival interval. */
+/**
+ * Whether a physical frame needs its trajectory. The container resizes first, before any body
+ * moves or the new square shows, and a run that does not snap to the record (a blind one) sizes
+ * its container from the trajectory, so from the resize on it needs the trajectory too.
+ */
 export function physicalPresentationNeedsTrajectory(
   state: PhysicalPresentationState,
   snapToRecord: boolean,
 ): boolean {
   const moving = state.trajectoryProgress > 0 && state.trajectoryProgress < 1;
-  return state.appearanceProgress > 0 || moving || (!snapToRecord && state.trajectoryProgress > 0);
+  return (
+    state.appearanceProgress > 0 ||
+    moving ||
+    (!snapToRecord && (state.trajectoryProgress > 0 || state.containerProgress > 0))
+  );
 }
 
 export type MotionControlScopeReason = "active" | "pack" | "search" | "tween" | "static";

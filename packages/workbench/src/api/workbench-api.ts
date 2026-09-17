@@ -156,14 +156,15 @@ export interface AtlasMotionResponse extends AtlasMotionResponseValues {
   impliedStoredStepCap: number;
 }
 
-export interface AtlasContainerDelay {
-  /** Share of the moving span from the new square's appearance to container resize. */
+export interface AtlasArrivalDelay {
+  /** Share of the moving span from the container finishing its resize to the new square fading in. */
   fraction: number;
   percent: number;
+  /** The delay in seconds for the step on the stage, which the beat and the speed-up scale. */
   effectiveSeconds: number;
   dflt: number;
   bounds: [number, number];
-  direction: "square first";
+  direction: "resize first";
 }
 
 /** What the gap bar is showing, which is keyed to the n on the panel. */
@@ -423,17 +424,23 @@ export interface AtlasContinuous {
   remaining: number;
 }
 
-/** The instants of one step, in seconds from its start. */
+/**
+ * The instants of one step, in seconds from its start, ordered
+ * `moveStart = containerStart <= containerEnd <= arrive <= arrived <= moveEnd <= end`.
+ */
 export interface AtlasSchedule {
   moveStart: number;
   moveEnd: number;
   end: number;
-  /** When the new square starts to appear, and when it has arrived. */
+  /**
+   * When the new square starts to fade in, at its final size, and when it is fully in. `arrive` is
+   * never earlier than the arrival delay after `containerEnd`.
+   */
   arrive: number;
   arrived: number;
-  /** When the container starts to resize; never earlier than `arrive`. */
+  /** When the container starts to resize: the start of the move. */
   containerStart: number;
-  /** When the container finishes resizing; it may extend past `moveEnd` into settle. */
+  /** When the container finishes resizing, which shrinks the picture; never later than `arrive`. */
   containerEnd: number;
   blocksStart: number;
   blocksEnd: number;
@@ -494,7 +501,7 @@ export interface AtlasReset {
   law: AtlasLawState;
   wallLaw: AtlasLaw;
   motionResponse: AtlasMotionResponse;
-  containerDelay: AtlasContainerDelay;
+  arrivalDelay: AtlasArrivalDelay;
   relationship: AtlasRelationship;
   growth: AtlasGrowth;
   anneal: number;
@@ -521,7 +528,7 @@ export interface AtlasState {
   phase: AtlasPhase;
   style: AtlasStyle;
   motionResponse: AtlasMotionResponseValues;
-  containerDelay: number;
+  arrivalDelay: number;
   links: boolean;
   capture: boolean;
   timing: AtlasTiming;
@@ -645,8 +652,8 @@ export interface AtlasTransitions {
   anneal(): AtlasAnneal;
   setMotionResponse(next?: AtlasMotionResponseInput | null): AtlasMotionResponse;
   motionResponse(): AtlasMotionResponse;
-  setContainerDelay(fraction: number): AtlasContainerDelay;
-  containerDelay(): AtlasContainerDelay;
+  setArrivalDelay(fraction: number): AtlasArrivalDelay;
+  arrivalDelay(): AtlasArrivalDelay;
 
   // The one force law, its presets, its sampled shape, and its two draggable control points.
   setLaw(next?: AtlasLawInput | null): AtlasLawState;

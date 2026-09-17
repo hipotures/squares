@@ -9,14 +9,14 @@
 import * as workbenchBundle from "./api/browser-entry.js";
 import {
   ANNEAL_SETTINGS,
+  ARRIVAL_DELAY_BOUNDS,
   annealConfiguration,
   BLIND_SETTINGS,
   BODY_PHYSICS_SETTINGS,
   BOUND_CLEAR,
   BOUND_FADE,
-  CONTAINER_DELAY_BOUNDS,
   DEFAULT_ANIMATE_STYLE,
-  DEFAULT_CONTAINER_DELAY_FRACTION,
+  DEFAULT_ARRIVAL_DELAY_FRACTION,
   DEFAULT_MOTION_RESPONSE,
   DEFAULT_PACK_STYLE,
   DEFAULT_PAIR_LAW,
@@ -133,7 +133,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   /** @typedef {import("./api/workbench-api.js").AtlasLaw} AtlasLaw */
   /** @typedef {import("./api/workbench-api.js").AtlasLawBounds} AtlasLawBounds */
   /** @typedef {import("./api/workbench-api.js").AtlasMotionResponse} AtlasMotionResponse */
-  /** @typedef {import("./api/workbench-api.js").AtlasContainerDelay} AtlasContainerDelay */
+  /** @typedef {import("./api/workbench-api.js").AtlasArrivalDelay} AtlasArrivalDelay */
   /** @typedef {import("./api/workbench-api.js").AtlasPaintScheme} AtlasPaintScheme */
   /** @typedef {import("./api/workbench-api.js").AtlasRelationshipKind} AtlasRelationshipKind */
   /** @typedef {import("./api/workbench-api.js").AtlasScheme} AtlasScheme */
@@ -203,7 +203,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // reason: there is no motion to mute.
   // The box's beat on a step (see `drawBounds`): the fraction of the dwell over which the last
   // step's outer trace clears, of the move over which the box grows, and of the move over which
-  // the inner trace then fades. The arriving square leads the resize by the configured delay.
+  // the inner trace then fades. The resize leads the arriving square by the configured delay.
   const CONTINUOUS = {
     // The owner's beat of 2026-09-13, the same as the single-step timing the builder supplies.
     // The moving span is split: the free rearrangement and then the landing.
@@ -216,7 +216,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     staticCorrect: DEFAULT_STATIC_STEP_TIMING.correct,
     staticSettle: DEFAULT_STATIC_STEP_TIMING.settle,
   };
-  let containerDelayFraction = DEFAULT_CONTAINER_DELAY_FRACTION;
+  let arrivalDelayFraction = DEFAULT_ARRIVAL_DELAY_FRACTION;
   // Revision 7, feature 2: the annealing dial. It ran 0 to 10 with a default of 3, the revision-6
   // shake; on 2026-09-13 the owner widened it to 0 to 20 and moved the default to 9. Levels 0..10
   // mean exactly what they did. Three things rise with the level, and all three are stated here
@@ -1203,7 +1203,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       pairs: PAIRS,
       simple: SIMPLE,
       fastSimple: state.continuous.fastSimple,
-      containerDelay: containerDelayFraction,
+      arrivalDelay: arrivalDelayFraction,
       timing: state.timing,
       continuous: {
         on: state.continuous.on,
@@ -1267,12 +1267,14 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       state.style,
     );
   }
-  // The instants of one pair. In the default staging the new square arrives over the first
-  // ARRIVAL_FRACTION of the move (`arrive` to `arrived`) while the container grows, and the
-  // existing squares move, as blocks, over the rest (`blocksStart` to `blocksEnd`); `move-then-add`
-  // is the same split the other way round; the three unstaged modes move everything through the
-  // whole move and fade the new square in over its last third. The panel's text leaves and
-  // returns over `roll` seconds from `arrive`, the moment the new square starts to appear.
+  // The instants of one pair. Every move opens with the container's resize (`containerStart` to
+  // `containerEnd`), which shrinks the picture; the arrival delay follows; then the new square
+  // fades in at its final size over NEW_FRACTION of the move (`arrive` to `arrived`). In the
+  // default staging the existing squares move, as blocks, after it (`blocksStart` to `blocksEnd`);
+  // `move-then-add` moves them first; the three unstaged modes move everything through the whole
+  // move and finish the fade with it, unless the delay holds the square later. The panel's text
+  // leaves and returns over `roll` seconds from `arrive`, the moment the new square starts to
+  // appear.
   // The n the stage is showing at t: the pair's own n through the dwell and the first half of the
   // roll, and the next one after that. One function, so the panel's numeral, the announcement and
   // the gap bar cannot disagree about which packing is on screen.
@@ -2064,7 +2066,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     Object.assign(LAW, LAW_DEFAULT);
     Object.assign(WALLLAW, WALL_DEFAULT);
     Object.assign(MOTION_RESPONSE, DEFAULT_MOTION_RESPONSE);
-    containerDelayFraction = DEFAULT_CONTAINER_DELAY_FRACTION;
+    arrivalDelayFraction = DEFAULT_ARRIVAL_DELAY_FRACTION;
     relKind = "general";
     targetEdges = null;
     // The target goes back to the record's graph and the drawing mode comes off, but
@@ -2094,7 +2096,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       law: lawState(),
       wallLaw: Object.assign({}, WALLLAW),
       motionResponse: motionResponseState(),
-      containerDelay: containerDelayState(),
+      arrivalDelay: arrivalDelayState(),
       relationship: relationshipState(),
       growth: growthState(),
       anneal: state.anneal,
@@ -3676,20 +3678,20 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // Styles B and C. The world-to-stage scale is held at n's through the move, so the container
   // visibly grows and no square changes size (the picture shrinks only where n + 1's container
   // would not fit at that scale, which happens on the tiny pairs); over the settle the whole
-  // picture eases down to n + 1's fit. The new square inflates in place from the start of the
-  // move, tinted scarlet as in A. Every square is the pool's element for its identity.
+  // picture eases down to n + 1's fit. The new square fades in at full size where the run starts
+  // it, tinted scarlet as in A. Every square is the pool's element for its identity.
   // The simulation's own progress at wall-clock `t`. Piecewise linear with its knee at
   // `PHYS.tightenFrom`, which is where the landing begins: the reader spends `move` seconds on
   // the run's first 68 per cent and `correct` seconds on its last 32, so the two phases have
   // independent durations while the run they play is the same one. Lengthening the search no
   // longer lengthens the landing with it, which was the whole complaint.
   // The physical run follows the selected phase's body-motion interval. Container presentation is
-  // separate: its resize starts after the new square appears, at `sc.containerStart`.
+  // separate: its resize opens the move, at `sc.containerStart`, and ends before the new square
+  // starts to fade in.
   function presentationState(sc, t) {
     const tm = timing();
-    // A maximally delayed resize may continue into settle. Use the full presentation interval for
-    // every fraction so the body, arrival and container clocks keep their declared absolute
-    // boundaries instead of being rescaled independently.
+    // Use the full presentation interval for every fraction so the body, arrival and container
+    // clocks keep their declared absolute boundaries instead of being rescaled independently.
     const span = Math.max(sc.moveEnd, sc.containerEnd) - sc.moveStart;
     const motionStart = span <= 0 ? 0 : (sc.blocksStart - sc.moveStart) / span;
     const motionEnd = span <= 0 ? 1 : (sc.blocksEnd - sc.moveStart) / span;
@@ -3768,26 +3770,25 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       ys[i] = y;
       as[i] = ang;
     }
-    // The new square, identity n + 1: it fades and inflates in over the first part of the move
-    // where the simulation puts it.
+    // The new square, identity n + 1: once the resize and the arrival delay are over it fades in
+    // where the simulation puts it, at full size. The simulated body still inflates over the
+    // run's start; the drawing never does (owner request, 2026-09-17).
     const nb = newPose;
     const appear = presentation.appearanceProgress;
-    let scale = 1;
     if (appear > 0 && tr !== null) {
       const pose = samplePose(tr, su, p.n);
       xs[p.n] = pose[0];
       ys[p.n] = pose[1];
       as[p.n] = pose[2];
-      scale = lerp(PHYS.inflateFrom, 1, appear);
     } else {
       xs[p.n] = nb[0];
       ys[p.n] = nb[1];
       as[p.n] = nb[2];
     }
-    return { u, moving, blind, tr, su, side, fit, appear, scale };
+    return { u, moving, blind, tr, su, side, fit, appear };
   }
   function renderPhysicsScene(p, A, B, _tm, sc, t) {
-    const { u, moving, blind, tr, su, side, fit, appear, scale } = physicsFrame(
+    const { u, moving, blind, tr, su, side, fit, appear } = physicsFrame(
       p,
       A,
       B,
@@ -3822,13 +3823,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     }
     // The new square's fill leans toward scarlet until the settle ends.
     const [x, y, ang] = [poseX[p.n], poseY[p.n], poseA[p.n]];
-    if (appear > 0) {
-      newNode.setAttribute("opacity", appear);
-      newNode.setAttribute("transform", `translate(${x} ${y}) rotate(${ang}) scale(${scale})`);
-    } else {
-      newNode.setAttribute("opacity", 0);
-      newNode.setAttribute("transform", `translate(${x} ${y}) rotate(${ang})`);
-    }
+    newNode.setAttribute("opacity", appear);
+    newNode.setAttribute("transform", `translate(${x} ${y}) rotate(${ang})`);
     // At rest through the dwell and from the instant the settle ends, which are the two frames a
     // Animate leaves a viewer looking at.
     paintSquares(
@@ -3970,13 +3966,15 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // of where it just was, so every change of size is seen from both ends.
   //   dwell   green rests at n's best known side; the trace the last step left outside it clears
   //           over the dwell's last BOUND_CLEAR.
-  //   grow    after the new square appears and its configured delay passes, green opens over
-  //           BOUND_GROW of the move up and to the right to the room
+  //   grow    as the move opens, over the schedule's resize (`containerStart` to `containerEnd`),
+  //           green opens up and to the right to the room
   //           n + 1 can always use -- ceil(sqrt(n + 1)), the grid, or the best known side where that
   //           is wider -- riding out further wherever the moving container breathes past it. The
-  //           trace stays inside at n's side.
-  //   clear   the inner trace fades over the next BOUND_FADE. The square-to-resize ordering is
-  //           explicit in the schedule and does not depend on which solver draws the squares.
+  //           trace stays inside at n's side, and the view widens with the box, which is the
+  //           picture shrinking.
+  //   clear   the inner trace fades over the next BOUND_FADE of the move, as the arrival delay
+  //           passes. The resize-to-square ordering is explicit in the schedule and does not
+  //           depend on which solver draws the squares.
   //   settle  green contracts to n + 1's best known side and the trace stays outside it, where the
   //           box was, until the next step clears it.
   // Where the grid is the best known packing the box never changes size and stays green. An
@@ -4374,14 +4372,14 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     contactDamping.step = "1";
     contactDamping.value = String(response.contactDamping);
     htmlNode("motion-contact-damping-val").textContent = fmt(response.contactDamping, 0);
-    const containerDelay = /** @type {HTMLInputElement} */ (inputNode("motion-container-delay"));
-    const delay = containerDelayState();
-    containerDelay.min = String(CONTAINER_DELAY_BOUNDS[0]);
-    containerDelay.max = String(CONTAINER_DELAY_BOUNDS[1]);
-    containerDelay.step = "0.05";
-    containerDelay.value = String(delay.fraction);
-    htmlNode("motion-container-delay-val").textContent =
-      `${fmt(delay.effectiveSeconds, 2)} s · square first`;
+    const arrivalDelay = /** @type {HTMLInputElement} */ (inputNode("motion-arrival-delay"));
+    const delay = arrivalDelayState();
+    arrivalDelay.min = String(ARRIVAL_DELAY_BOUNDS[0]);
+    arrivalDelay.max = String(ARRIVAL_DELAY_BOUNDS[1]);
+    arrivalDelay.step = "0.05";
+    arrivalDelay.value = String(delay.fraction);
+    htmlNode("motion-arrival-delay-val").textContent =
+      `${fmt(delay.effectiveSeconds, 2)} s · after resize`;
     const currentIntegration = isPhysical(state.style)
       ? animationIntegration(LAW, WALLLAW, response.storedTimestep)
       : null;
@@ -4391,7 +4389,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
         : "";
     htmlNode("motion-response-info").textContent =
       `stored step ${fmt(response.storedTimestep, 4)} sim s · speed cap permits ` +
-      `${fmt(response.impliedStoredStepCap, 3)} side per stored step · resize delay ` +
+      `${fmt(response.impliedStoredStepCap, 3)} side per stored step · arrival delay ` +
       `${fmt(delay.percent, 0)}% of move${integrationWarning}`;
     syncLawRows();
     document.querySelectorAll("#law-preset-seg button").forEach((b) => {
@@ -5180,35 +5178,34 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       impliedStoredStepCap: MOTION_RESPONSE.speedLimit * storedTimestep,
     };
   }
-  function setContainerDelay(value) {
+  function setArrivalDelay(value) {
     const v = Number(value);
     if (!Number.isFinite(v)) {
-      return containerDelayState();
+      return arrivalDelayState();
     }
     const next =
-      Math.round(
-        Math.max(CONTAINER_DELAY_BOUNDS[0], Math.min(CONTAINER_DELAY_BOUNDS[1], v)) * 100,
-      ) / 100;
-    if (next === containerDelayFraction) {
+      Math.round(Math.max(ARRIVAL_DELAY_BOUNDS[0], Math.min(ARRIVAL_DELAY_BOUNDS[1], v)) * 100) /
+      100;
+    if (next === arrivalDelayFraction) {
       updateSegments();
-      return containerDelayState();
+      return arrivalDelayState();
     }
-    containerDelayFraction = next;
+    arrivalDelayFraction = next;
     restartForTrajectoryChange();
     updateSegments();
     render();
-    return containerDelayState();
+    return arrivalDelayState();
   }
-  /** @returns {AtlasContainerDelay} */
-  function containerDelayState() {
+  /** @returns {AtlasArrivalDelay} */
+  function arrivalDelayState() {
     const tm = timing();
     return {
-      fraction: containerDelayFraction,
-      percent: containerDelayFraction * 100,
-      effectiveSeconds: (tm.move + tm.correct) * containerDelayFraction,
-      dflt: DEFAULT_CONTAINER_DELAY_FRACTION,
-      bounds: [CONTAINER_DELAY_BOUNDS[0], CONTAINER_DELAY_BOUNDS[1]],
-      direction: "square first",
+      fraction: arrivalDelayFraction,
+      percent: arrivalDelayFraction * 100,
+      effectiveSeconds: (tm.move + tm.correct) * arrivalDelayFraction,
+      dflt: DEFAULT_ARRIVAL_DELAY_FRACTION,
+      bounds: [ARRIVAL_DELAY_BOUNDS[0], ARRIVAL_DELAY_BOUNDS[1]],
+      direction: "resize first",
     };
   }
   // The run's seed. An integer; anything else is ignored rather than silently turned into
@@ -5854,8 +5851,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     anneal: annealState,
     setMotionResponse,
     motionResponse: motionResponseState,
-    setContainerDelay,
-    containerDelay: containerDelayState,
+    setArrivalDelay,
+    arrivalDelay: arrivalDelayState,
     // Revision 11: the one force law, its presets, its sampled shape, and the two draggable control
     // points of the plot driven without a pointer.
     setLaw,
@@ -5969,7 +5966,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
         speedLimit: MOTION_RESPONSE.speedLimit,
         contactDamping: MOTION_RESPONSE.contactDamping,
       },
-      containerDelay: containerDelayFraction,
+      arrivalDelay: arrivalDelayFraction,
       speed: state.speed,
       initial: state.initial,
       optimizing: state.optimizing,
@@ -6053,8 +6050,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       contactDamping: /** @type {HTMLInputElement} */ (ev.target).value,
     });
   });
-  inputNode("motion-container-delay").addEventListener("change", (ev) => {
-    setContainerDelay(/** @type {HTMLInputElement} */ (ev.target).value);
+  inputNode("motion-arrival-delay").addEventListener("change", (ev) => {
+    setArrivalDelay(/** @type {HTMLInputElement} */ (ev.target).value);
   });
   document.querySelectorAll("#law-preset-seg button").forEach((b) => {
     b.addEventListener("click", () => setLawPreset(/** @type {HTMLElement} */ (b).dataset.law));
