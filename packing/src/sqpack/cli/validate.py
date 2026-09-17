@@ -1059,12 +1059,21 @@ def _command_groups(
     record checks. Making each command a gate step would change the public step inventory
     and tier shape; leaving one serial list creates an avoidable tail. Groups expose the
     real dependency boundary while `_commands` preserves fail-fast order inside each
-    group. Any failure stops every subprocess owned by the validation run, as a failure
-    in the outer step pool does.
+    group.
+
+    An ordinary failure -- a nonzero exit, a timeout, any `Exception` -- is this step's
+    own, which is how `_run_selected` treats a failed step: the other groups run to
+    completion and the earliest declared failure is raised, so the error a run names does
+    not depend on which group finished first. Only an exception that is not an
+    `Exception`, such as `KeyboardInterrupt`, stops every subprocess the validation run
+    owns, as `_run_selected` does for the same exceptions. Stopping the shared registry
+    on an ordinary failure killed the steps running beside this one and refused every
+    subprocess started after it (`think-63ra`).
     """
     if not groups:
         return ""
     outputs: dict[int, str] = {}
+    failures: list[tuple[int, Exception]] = []
     with ThreadPoolExecutor(max_workers=len(groups)) as pool:
         futures = {
             pool.submit(_commands, context, commands, cwd=cwd): index
@@ -1072,12 +1081,18 @@ def _command_groups(
         }
         try:
             for future in as_completed(futures):
-                outputs[futures[future]] = future.result()
+                index = futures[future]
+                try:
+                    outputs[index] = future.result()
+                except Exception as error:  # noqa: BLE001 - re-raised below, earliest first
+                    failures.append((index, error))
         except BaseException:
             for future in futures:
                 future.cancel()
             context.processes.stop()
             raise
+    if failures:
+        raise min(failures, key=lambda failure: failure[0])[1]
     return "\n".join(output for index in range(len(groups)) if (output := outputs[index]))
 
 
@@ -1111,9 +1126,11 @@ def _concurrent_commands(
     raised is the earliest declared command's -- the one the serial loop would have
     stopped on -- so which failure a run reports does not depend on scheduling.
 
-    Unlike `_command_groups`, which runs every group at once and stops the whole
-    validation run's subprocesses on any failure, this is bounded by `workers` and a
-    failure stays inside the step: the gate's other steps keep their own verdicts.
+    The failure rule is `_command_groups`': an ordinary failure stays inside the step, so
+    the gate's other steps keep their own verdicts, and only an exception that is not an
+    `Exception`, such as `KeyboardInterrupt`, stops every subprocess the run owns. What
+    differs is the bound: `_command_groups` starts every group at once, and this starts
+    at most `workers` commands.
     """
     if workers <= 1:
         return _commands(context, commands, cwd=cwd)
@@ -1124,16 +1141,22 @@ def _concurrent_commands(
             pool.submit(_run, context, command, cwd=cwd): index
             for index, command in enumerate(commands)
         }
-        for future in as_completed(futures):
-            index = futures[future]
-            if future.cancelled():
-                continue
-            try:
-                outputs[index] = future.result()
-            except Exception as error:  # noqa: BLE001 - re-raised below, earliest first
-                failures.append((index, error))
-                for pending in futures:
-                    _ = pending.cancel()
+        try:
+            for future in as_completed(futures):
+                index = futures[future]
+                if future.cancelled():
+                    continue
+                try:
+                    outputs[index] = future.result()
+                except Exception as error:  # noqa: BLE001 - re-raised below, earliest first
+                    failures.append((index, error))
+                    for pending in futures:
+                        _ = pending.cancel()
+        except BaseException:
+            for future in futures:
+                _ = future.cancel()
+            context.processes.stop()
+            raise
     if failures:
         raise min(failures, key=lambda failure: failure[0])[1]
     return "\n".join(output for output in outputs if output)
