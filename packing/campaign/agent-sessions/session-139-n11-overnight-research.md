@@ -358,6 +358,12 @@ named site sets. Next: scout #3, denser grids at `191/50`.
 not a superset of the historical 6637-site exact-eleven grid. Next: auto `(25,34,41)`
 plus count 60 (6961 sites).
 
+## Hour 1 auto+60 (2026-09-18T06:44Z)
+
+`--grid-counts 25,34,41,60` at `191/50` converged at `11.106195` on 6961 sites. More
+sites than the historical exact-eleven grid, worse optimum. Next: T-025-seeded auto+60
+at the same side, then M3 selftest.
+
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
 -->
