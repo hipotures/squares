@@ -465,6 +465,14 @@ T-026-fractional-seeded auto-plus-60 at `191/50` converged `11.033743` in
 (11.018646). Site set refuted. 381/100 still sitting at exactly eleven;
 n=18 T-019 seed still below 18.
 
+## Hour 3 n=11 381/100 (2026-09-18T08:08Z)
+
+T-025-seeded auto-plus-60 at `381/100` sat at `11.000000` from LP round 7
+through the 60-round limit (120 still violated, `least_covered` 0.992). Never
+crossed above eleven. Site set refuted, unconverged; new covering side 3.81.
+Covering-values now 26 sides. n=18 T-019 seed row loop reached `17.875567`
+with violated 0; column generation still running.
+
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
 -->

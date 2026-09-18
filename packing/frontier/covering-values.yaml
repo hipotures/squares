@@ -51,6 +51,30 @@ values:
       Nothing was frozen into packing/cases/. Does not move s(6)=3 and is not an n=11
       result. Float LP objective 6.076773566569485; no cell sweep.
   - n: 11
+    side: '381/100'
+    side_decimal: '3.81'
+    objective: '11.000000'
+    site_set: t025-auto-25-33-41-60
+    sites: 7413
+    rows: 13008
+    rounds: 60
+    converged: false
+    stop_reason: >-
+      The 60-round limit stopped the row loop after 60 LP rounds with 120 placements
+      still violated. The objective sat at 11.000000 from round 7 onward and never
+      crossed above eleven. Wall 585.9 s on 7413 sites / 988 orbits, including 584
+      T-025 seed sites scaled from 191/50.
+    least_covered_mass: '0.992102'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-381-100-t025-auto60-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 T-025-seeded auto-plus-60 probe at 381/100, T-018's container side.
+      Unconverged mass 11.000000 refutes this site set only; remaining rows can only
+      raise it. Adding sites can still lower the covering value, so 381/100 is not
+      barred. No covering freeze was retained.
+  - n: 11
     side: '191/50'
     side_decimal: '3.82'
     objective: '11.000000'

@@ -450,6 +450,7 @@ case or experiment separately.
 | [n=11 191/50 T-025-Seeded Auto-Plus-60 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-191-50-t025-auto60-receipt.md) | research synthesis | record | retained | — |
 | [n=11 191/50 T-025-Seeded Auto-Plus-60 Window-Lattice Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-191-50-t025-windows5-receipt.md) | research synthesis | record | retained | — |
 | [n=11 191/50 T-026-Seeded Auto-Plus-60 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-191-50-t026-auto60-receipt.md) | research synthesis | record | retained | — |
+| [n=11 381/100 T-025-Seeded Auto-Plus-60 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-381-100-t025-auto60-receipt.md) | research synthesis | record | retained | — |
 | [n=11 77/20 T-025-Seeded Auto-Plus-60 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-77-20-t025-auto60-receipt.md) | research synthesis | record | retained | — |
 | [n=11 31/8 T-025-Seeded Auto-Plus-60 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-31-8-t025-auto60-receipt.md) | research synthesis | record | retained | — |
 | [n=11 96/25 T-025-Seeded Auto-Plus-60 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-96-25-t025-auto60-receipt.md) | research synthesis | record | retained | — |
@@ -5431,14 +5432,16 @@ the best known packing runs near half a unit — eleven cases above `+0.49`, hea
 `n = 51` at `+0.5364`, then `68`, `84`, `39`, `86`, `66`, `38`, `83`, `37`, `53` and
 `26`. Two cautions travel with that ranking.
 The prize is what the *ceiling* allows; the real limit is the covering value at that
-side. 25 values have been reported for the restricted program, at sides `2.99`, `3.82`,
+side. 26 values have been reported for the restricted program, at sides `2.99`, `3.81`, `3.82`,
 `3.83`, `3.84`, `3.85`, `3.875`, `3.95`, `3.96`, `3.969`, `3.97`, `3.98`, `3.985`, `3.99`, `4.58`, `4.59`,
 `4.6`, `4.67`, `4.68`, `4.80`, `4.825`, `4.85`, `4.865`, `4.875`, `4.895` and `4.985` — the first eight
 reports, not measurements this repository can reproduce, since no covering-search run log
 or solver checkpoint was retained for any of them; the ten added on 2026-09-05 by Agenda
 021’s `BC-200` and `BC-197` and Agenda 022’s `BC-213` and `BC-206` carry run logs; the
 `2.99` pair added on 2026-09-18 by session-139 is H-216 calibration at n=6 (covering
-`6.08216` and `6.07724` on two named site sets, both ≥ 6, not a bound); `3.82` also has the session-139 T-025-seeded auto-plus-60 plus `--seed-windows 5` at
+`6.08216` and `6.07724` on two named site sets, both ≥ 6, not a bound); `3.81` is the
+session-139 T-025-seeded auto-plus-60 at 381/100, covering `11.000000` unconverged on
+the eleven plateau, site set refuted, side open; `3.82` also has the session-139 T-025-seeded auto-plus-60 plus `--seed-windows 5` at
 191/50, covering `11.018646` converged, closest session-139 point-atom construction,
 site set refuted; T-026-seeded auto-plus-60 at the same side converged `11.033743`,
 worse than the threshold seed; `3.83` is the
