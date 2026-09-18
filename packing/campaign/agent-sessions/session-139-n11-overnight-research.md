@@ -854,8 +854,13 @@ stopped unconverged at `19.808958` after 953.1 s (34 LP rounds, 321
 violated). Seed from `certificate-24-5.json`; seed sites 2836 (2260 T-020
 plus 576 lattice). Crossed nineteen at round 5 and climbed. No freeze.
 Site set refuted; side open. T-020 unchanged. T-021's n=20 pointer
-untouched. T-028 not landed. Waiter done. Covering queue empty. Closeout
-after 18:00Z.
+untouched. T-028 not landed. Waiter done. Covering queue empty.
+
+## Hour 9 (2026-09-18T16:28Z)
+
+Post-encode covering queue finished. Encode-only timeout unresolved. No
+`--search`. T-028 not landed. `packing-ledger check` OK. `packing-validate
+--records` 33/80 steps passed on `70c73070`. Closeout after 18:00Z.
 
 ## Block 8 closeout (after covering; original window 12:53–13:33Z)
 
