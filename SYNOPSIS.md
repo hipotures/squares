@@ -472,6 +472,7 @@ case or experiment separately.
 | [n=17 23/5 Grid Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-grid-receipt.md) | research synthesis | record | retained | — |
 | [n=17 23/5 T-019-Seeded Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-t019-seed-receipt.md) | research synthesis | record | retained | — |
 | [n=17 23/5 T-019-Seeded Window-Lattice Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-t019-windows5-receipt.md) | research synthesis | record | retained | — |
+| [n=17 23/5 T-019-Seeded Window-6 Lattice Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-t019-windows6-receipt.md) | research synthesis | record | retained | — |
 | [G4 n=11 191/50 Nine-Direction Threshold-Atom Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/g4-n11-191-50-net9/g4-n11-191-50-net9-receipt.md) | research synthesis | record | retained | — |
 | [Exp-161 Blocks 5–7 Command](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/exp-161-block57-command.md) | research synthesis | record | retained | — |
 | [M3 T-018 9-Direction Search After Span-Sweep Encoding](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/m3-t018-net8-span/README.md) | research synthesis | record | retained | — |

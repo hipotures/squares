@@ -590,6 +590,32 @@ values:
       seeded 17.049597 by 0.007. Unconverged mass 17.042346 still refutes this site
       set only; remaining rows can only raise it. Adding sites can still lower the
       covering value, so 23/5 is not barred. No covering freeze was retained.
+  - n: 17
+    side: '23/5'
+    side_decimal: '4.6'
+    objective: '17.048472'
+    site_set: t019-seed-auto-32-42-52-windows6
+    sites: 7244
+    rows: 12899
+    rounds: 46
+    converged: false
+    stop_reason: >-
+      The 900 s deadline stopped the row loop after 46 LP rounds with 54 placements
+      still violated. The objective crossed 17 at round 12 (17.000000), sat there
+      through round 18, and finished at 17.048472 on 7244 sites / 951 orbits,
+      including 1760 seed sites (1184 T-019 plus 576 ceiling-window lattice sites
+      from --seed-windows 6).
+    least_covered_mass: '0.999569'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-t019-windows6-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 T-019-seeded auto-grid plus windows 6 at 23/5. Finished slightly
+      worse than windows 5 (17.042346). Unconverged mass 17.048472 still refutes
+      this site set only; remaining rows can only raise it. Adding sites can still
+      lower the covering value, so 23/5 is not barred. No covering freeze was
+      retained.
   - n: 18
     side: '467/100'
     side_decimal: '4.67'

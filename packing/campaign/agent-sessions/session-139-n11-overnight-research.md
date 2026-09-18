@@ -829,6 +829,15 @@ T-017-seeded four-grid `(26, 35, 43, 48)` at `397/100` stopped unconverged at
 round 8. No freeze. Site set refuted; side open. T-017 unchanged. Waiter
 started n=17 `23/5` windows 6 at 15:40Z.
 
+## n=17 23/5 windows 6 (2026-09-18T15:55Z)
+
+T-019-seeded auto `(32, 42, 52)` plus `--seed-windows 6` at `23/5` stopped
+unconverged at `17.048472` after 920.4 s (46 LP rounds, 54 violated). Seed
+sites 1760 (1184 T-019 plus 576 lattice). Crossed seventeen at round 12 and
+sat at 17 through round 18, then climbed. Slightly worse than windows 5
+(`17.042346`). No freeze. Site set refuted; side open. T-019 unchanged.
+Waiter started windows 7 at 15:55Z; then n=19 `97/20` if still above 17.
+
 ## Block 8 closeout (after covering; original window 12:53–13:33Z)
 
 Owner continue at 15:04Z moved this after the 18:00Z covering deadline.
