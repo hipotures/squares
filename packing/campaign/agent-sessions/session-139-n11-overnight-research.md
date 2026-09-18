@@ -637,6 +637,14 @@ Sweeps composite-figure.json was regenerated at 09:39Z for n=18 4.67
 (`7b9a4deb`). Do not paste the suite-b 74.1s sample into
 `gate-budgets.yaml`; that job's tests passed.
 
+## Hour 5 (2026-09-18T09:41Z)
+
+Blocks 5–7. Encode-only still running in tmux `exp-161-encode` (pid 347502,
+elapsed 08:41, ~100% CPU, peak RSS 2.45 GiB). No encoding JSON yet; the
+producer writes at the end. Log still empty. No `--search`. Covering colgen
+stays off this CPU. Post-encode queue is the n=12 `397/100` four-grid then
+n=17 windows 6. CI on HEAD is in flight after the composite-figure refresh.
+
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
 -->
