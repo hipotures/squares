@@ -22,7 +22,7 @@ experiment:
       devtools.decide_threshold_certificate
     assurance: verified
     method: exact-algebraic
-    host_system: Cloud agent; project Python 3.14; no target has run
+    host_system: Cloud agent; project Python 3.14; encode-only timed out; no --search
   instance: {axis: n, point: 11, role: target}
   method:
     control: >-
@@ -72,12 +72,31 @@ experiment:
       replay is inside the three-hour cap. No second attempt without a new
       experiment id.
     record: packing/campaign/series/series-000-smoke-and-calibration/results/agenda-036/exp-161-route-s-threshold-compression.json
-  lease:
-    expires: '2026-09-18T18:40:00Z'
-    host: cursor
-  results: []
+  effort:
+    timebox: 3h
+    wall_seconds: 10806
+    stopped_by: timebox
+  results:
+  - shape: determination
+    role: outcome
+    question: >-
+      Does encode-only coverage of U025 under --authorize-target exp-161 emit a
+      candidate with N+ <= 23 before the three-hour scientific wall?
+    outcome: no_progress
+    checked_by: >-
+      timeout 10800 exited 2026-09-18T15:24:31Z with no JSON; the producer log
+      was empty; --search did not run
+  - shape: record
+    role: outcome
+    metric: positive D4 orbit representatives after encode-only
+    direction: lower
+    score: 119
+    standing_best: 23
+    standing_best_source: H-163 registered N+ <= 23 criterion
+    beat_record: false
+    runs: 1
   verdict:
-    decision: in-progress
+    decision: unresolved
     primary_criterion: >-
       Confirm H-163 only at N+ <= 23 with total budget < 11, least charge >= 1 from
       agreeing exact event-cell and interval routes, source-distinct manifest
@@ -85,9 +104,10 @@ experiment:
       SHA-256 that is not an admission-control; refute only by exact infeasibility
       of those constraints for every N+ <= 23 family member
     reason: >-
-      The round is registered and leased; no optimizer, candidate, or coverage route
-      has run. The 2026-09-18 adversarial review closed the admission-synthetic
-      accept hole in this artifact; the N+ <= 23 metric is unchanged.
+      Encode-only hit timeout 10800 at 15:24:31Z with no JSON and no candidate.
+      Timeout is unresolved, never rejected. No --search.
+    resume_from: >-
+      Re-run encode-only under a new lease; no partial encoding was written.
 ---
 # Exp-161: Route S Fixed-Support Compression Target
 
@@ -98,6 +118,8 @@ Sessions [134](../../../agent-sessions/session-134-n11-route-s-admission.md) and
 [135](../../../agent-sessions/session-135-n11-route-s-guard-discharge.md) admitted the
 target-blind instrument; PR 182 merged it as `1d9c49c4` from reviewed head `609d7d62`.
 Until this artifact existed, no optimizer, candidate, or coverage target was allowed.
+Session 139 ran encode-only; `timeout` 10800 exited at 15:24:31Z with no JSON.
+That timeout is unresolved. `--search` did not run.
 
 ## Source
 

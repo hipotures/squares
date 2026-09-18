@@ -2293,11 +2293,11 @@ sessions:
   codex_receipts: []
 - id: session-139
   title: "N11 Overnight Research"
-  status: in_progress
+  status: stopped
   primary_bead: think-mcb6
-  phases: 3
+  phases: 4
   measured: false
   unmeasured_reason: >-
-    declares no resource measurement
+    native harness data unavailable; This Cursor cloud-agent run has no ClaudeEfficiencyRollup or CodexTaskTreeDelta receipt. Session clocks and the encode and covering walls are not a substitute.
   rollups: []
   codex_receipts: []

@@ -11,13 +11,21 @@ session:
   date: '2026-09-18'
   started_at: '2026-09-18T05:33:00Z'
   deadline_at: '2026-09-18T18:40:00Z'
+  ended_at: '2026-09-18T18:17:33Z'
   branch: cursor/n11-overnight-8h-f02a
   primary_bead: think-mcb6
-  status: in_progress
+  status: stopped
   goal: >-
     Make significant progress on unresolved small-n questions, especially n=11: register
     and then test Route S (H-163 / exp-161), close or tightly bound the H-216 n=6
     calibration, and land the think-g3j7 relational reader that unblocks Route F1.
+  resource_usage_unmeasured:
+    reason: native_harness_data_unavailable
+    detail: >-
+      This Cursor cloud-agent run has no ClaudeEfficiencyRollup or CodexTaskTreeDelta
+      receipt. Session clocks and the encode and covering walls are not a substitute.
+    disposition_bead: think-mcb6
+    handoff_role: work_handoff
   workflow_phases:
   - workflow: research-loop
     focus: insight
@@ -110,7 +118,7 @@ session:
       Owner-extended covering after encode exit: n=12 397/100 T-017 four-grid,
       n=17 23/5 windows 6 then 7 if still above 17, n=19 97/20. Copy the encode
       JSON if present. Do not --search. Hand to closeout at 18:00Z.
-    status: in_progress
+    status: completed
     entered_by: user_request
     switch_reason: >-
       Owner continue at 15:04Z after the original 12:53Z work deadline and
@@ -128,13 +136,63 @@ session:
       Stop new probes at 18:00Z. Do not --search. Do not close think-qqzs,
       think-g3j7, think-gyzw, or think-jwb1.
     fallback: Retain covering receipts and an unresolved encode, then closeout.
-    outcome: null
-    evidence: []
-    stop_reason: null
+    outcome: >-
+      Encode-only timed out at 15:24:31Z with no JSON. No --search. Post-encode
+      covering finished: n=12 397/100 four-grid 12.122748; n=17 23/5 windows 6
+      17.048472 and windows 7 17.046923 (windows 5 remains best at 17.042346);
+      n=19 97/20 19.808958. No freeze below n. T-028 not landed. Covering
+      register 60 restricted optima at 28 sides. T-027 from phase 2 stands.
+    evidence:
+      - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-161-h163-route-s-threshold-compression.md
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n12-397-100-t017-grid4-receipt.md
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-t019-windows6-receipt.md
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-t019-windows7-receipt.md
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n19-97-20-t020-windows6-receipt.md
+    stop_reason: phase deadline
     next_action: >-
-      Leave encode until process exit or timeout 10800. Copy the JSON. Then
-      n=12 397/100, n=17 windows 6 then 7 if needed, n=19 97/20. Closeout after
-      18:00Z.
+      Block 8 closeout. Do not --search. Do not close think-qqzs, think-g3j7,
+      think-gyzw, or think-jwb1.
+  - workflow: documentation-pass
+    focus: process
+    recording: contemporaneous
+    clock_role: finalization
+    bead: think-mcb6
+    objective: >-
+      Terminalize this session, mark exp-161 unresolved, regenerate the campaign
+      views, and run the records check.
+    status: stopped
+    entered_by: planned_checkpoint
+    switch_reason: >-
+      Phase 3 covering deadline 18:00Z. Encode timeout unresolved. Covering
+      queue empty. T-028 not landed.
+    budget_minutes: 40
+    started_at: '2026-09-18T18:00:00Z'
+    deadline_at: '2026-09-18T18:40:00Z'
+    expected_output: >-
+      Terminal session-139, exp-161 unresolved without a lease, regenerated
+      ledger and session-close report, records-tier pass.
+    validation_command: >-
+      cd packing && uv run --frozen --all-extras --group dev packing-ledger check &&
+      uv run --frozen --all-extras --group dev packing-validate --records &&
+      uv run --frozen --all-extras --group dev python -m devtools.close_session --check
+    kill_condition: >-
+      Stop at 18:40Z even if a generated view is stale. Do not --search. Do not
+      close think-qqzs, think-g3j7, think-gyzw, or think-jwb1.
+    fallback: Leave the records uncommitted with the failing check named.
+    outcome: >-
+      Session stopped at 18:17:33Z. exp-161 encode-only timeout is unresolved;
+      the lease is dropped. T-027 stands. T-028 was not landed. Native harness
+      usage is unmeasured.
+    evidence:
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+      - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-161-h163-route-s-threshold-compression.md
+      - packing/cases/n18_fractional_certificate/certificate.json
+    stop_reason: >-
+      Covering deadline passed, encode unresolved, and the closeout records
+      are written.
+    next_action: >-
+      Re-run Route S encode-only before --search. Next covering is n=17 23/5.
+      Do not close think-qqzs, think-g3j7, think-gyzw, or think-jwb1.
   budget:
     wall_minutes: 787
     max_cycles: 8
@@ -161,7 +219,13 @@ session:
       exp-161 unallocated; H-163 open and untested; H-216 open with only attic scratch
       at n=6 299/100; F1 blocked on a missing reader, sites-1 checkpoint, and guarded
       colgen; PR walls advisory under think-g4n9.
-    after: null
+    after: >-
+      exp-161 encode-only timed out unresolved (no JSON, no --search); H-163 is
+      unresolved on this family and still open for a later encode. H-216 stays
+      open: two named n=6 site sets covering >= 6, not an n=11 result.
+      think-g3j7 stays open with a relational colgen skeleton. T-027 retained
+      s(18) >= 467/100. Covering register 60 restricted optima at 28 sides.
+      n=11 stays T-026. T-028 not landed. PR walls remain advisory.
   delegations:
   - task: Register exp-161 for H-163 with source, target, budget, accept, stop, review
       boundary, and evidence paths. Build no optimizer and run no coverage until that
@@ -310,12 +374,25 @@ session:
   - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/h216-n6-299-100-family-polished.json
   - packing/devtools/compress_threshold_certificate.py
   - packing/src/sqpack/fractional/relational.py
-  checks: []
-  stop_reason: null
+  - packing/cases/n18_fractional_certificate/certificate.json
+  - packing/frontier/RESULTS.md
+  resource_rollups: []
+  checks:
+  - Encode-only timed out at 15:24:31Z with no JSON; no --search.
+  - T-027 retained s(18) >= 467/100; T-028 was not landed.
+  - Covering register has 60 restricted optima at 28 unique sides.
+  - packing-ledger check and packing-validate --records passed on 70c73070 before closeout.
+  - >-
+    full gate: fast at f98ff7811d0b8afe678d8f81ce413c989e0b1d57: passed (GitHub
+    Actions run 35371189375; packing-required success on the hour-10 head)
+  stop_reason: >-
+    The owner-extended covering deadline was 18:00Z. Encode-only timed out
+    unresolved. T-027 is retained. T-028 was not landed. Native harness usage
+    is unmeasured.
   next_action: >-
-    Leave encode until process exit. Copy the JSON. Do not --search. Then n=12
-    397/100, n=17 windows 6 then 7 if needed, n=19 97/20. Closeout after 18:00Z.
-    Do not close think-qqzs, think-g3j7, think-gyzw, or think-jwb1.
+    Re-run Route S encode-only before --search. Next covering is n=17 23/5
+    (best probe 17.042346 on windows 5). Do not close think-qqzs, think-g3j7,
+    think-gyzw, or think-jwb1. Do not allocate exp-161 to F1 or M7.
 ---
 # Session 139: N11 Overnight Research
 
@@ -872,11 +949,10 @@ Covering queue still empty. No colgen. Encode-only still unresolved. No
 `gate-budgets.yaml` untouched. packing-required cascaded. HEAD
 `4e7dfb47` CI still in flight. Closeout after 18:00Z.
 
-## Morning report draft (2026-09-18T16:55Z)
+## Morning report (2026-09-18T18:17Z)
 
-Fill `ended_at` and phase-3 outcome at 18:00Z. Do not `--search`. Do not
-merge. Do not close `think-qqzs`, `think-g3j7`, `think-gyzw`, or
-`think-jwb1`. Do not allocate exp-161 to F1/M7.
+Do not `--search`. Do not merge. Do not close `think-qqzs`, `think-g3j7`,
+`think-gyzw`, or `think-jwb1`. Do not allocate exp-161 to F1/M7.
 
 **Needs review.** T-027 landing (`s(18) >= 467/100`). W5 Chromium-early.
 Atlas composites now print n=18 at 4.67.
@@ -899,20 +975,16 @@ H-216 is not an n=11 result.
 `--search`. n=17 `23/5` open; n=19 `97/20` open; n=11 stays T-026
 ~3.826447. packing-campaign numeric remains NO-GO.
 
-**Health.** `packing-ledger check` OK. `packing-validate --records` passed
-on `70c73070`. Local `--push` browser floor `.ts` failures are Node v22
-versus workbench `>=24.18` on this VM.
+**Health.** `packing-ledger check` OK before this closeout.
+`packing-validate --records` passed on `70c73070`. Hosted packing-required
+on `f98ff781` succeeded (run 35371189375). Local `--push` browser floor
+`.ts` failures are Node v22 versus workbench `>=24.18` on this VM.
 
-## Block 8 closeout (after 18:00Z)
+## Block 8 closeout (2026-09-18T18:17Z)
 
-1. Encode JSON is absent; timeout unresolved.
-2. Morning report is drafted above.
-3. Terminalize this session (`ended_at`, status `completed` or `stopped`,
-   phase 3 outcome). Add a finalization phase 18:00–18:40 if the ledger
-   requires it.
-4. From `packing/`: `packing-ledger check`, `packing-validate --records`,
-   `python -m devtools.close_session --render`.
-5. Unsubscribe `overnight-priority-check`. Commit, push, update PR #199.
+Encode JSON is absent; timeout unresolved. This record is terminal
+(`ended_at` 18:17:33Z, status `stopped`, phase 4 finalization). exp-161
+drops its lease. Native harness usage is unmeasured.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

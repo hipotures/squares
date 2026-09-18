@@ -59,12 +59,12 @@ hypothesis:
     promise that a compressed certificate retains the stronger dilation-limit bound.
     A bounded search with no candidate remains unresolved and may park only this frozen
     family. Smaller files, simpler denominators, or fewer distinct weights do not meet
-    the registered N+ criterion. 2026-09-18 session-139 registered exp-161 as
-    in-progress with a live lease and named
-    packing/devtools/compress_threshold_certificate.py as the producer. The producer
-    is in-tree and emits no candidate; no optimizer, candidate, or coverage route has
-    run. The three admission-control manifest SHA-256 values in exp-161 cannot confirm
-    this claim.
+    the registered N+ criterion. 2026-09-18 session-139 registered exp-161 and ran
+    encode-only; that process timed out at 15:24:31Z with no JSON. The verdict is
+    unresolved. The producer
+    packing/devtools/compress_threshold_certificate.py is in-tree and emits no
+    candidate. No --search ran. The three admission-control manifest SHA-256 values
+    in exp-161 cannot confirm this claim.
 ---
 # H-163: T-025 Fixed-Support Compression
 
@@ -79,10 +79,11 @@ image, domain parameter, and budget coefficient remains fixed.
 remains untested.** The admission artifact created no experiment.
 Session 139 registered
 [exp-161](../series/series-000-smoke-and-calibration/experiments/exp-161-h163-route-s-threshold-compression.md)
-as in-progress with a live lease and named
-`packing/devtools/compress_threshold_certificate.py` as the producer.
-That file is in-tree; it authenticates U025 and does not emit a candidate.
-No optimizer, candidate certificate, or coverage target has run.
+and ran encode-only. That process timed out at 15:24:31Z with no JSON; the
+verdict is unresolved.
+`packing/devtools/compress_threshold_certificate.py` authenticates U025 and
+does not emit a candidate.
+No `--search` ran.
 The admission-control manifests recorded in exp-161 cannot confirm this claim.
 
 The acceptance boundary is literal.
