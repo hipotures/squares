@@ -449,6 +449,7 @@ case or experiment separately.
 | [n=11 191/50 Auto-Plus-60 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-191-50-auto60-receipt.md) | research synthesis | record | retained | — |
 | [n=11 191/50 T-025-Seeded Auto-Plus-60 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-191-50-t025-auto60-receipt.md) | research synthesis | record | retained | — |
 | [n=11 191/50 T-025-Seeded Auto-Plus-60 Window-Lattice Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-191-50-t025-windows5-receipt.md) | research synthesis | record | retained | — |
+| [n=11 191/50 T-026-Seeded Auto-Plus-60 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-191-50-t026-auto60-receipt.md) | research synthesis | record | retained | — |
 | [n=11 77/20 T-025-Seeded Auto-Plus-60 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-77-20-t025-auto60-receipt.md) | research synthesis | record | retained | — |
 | [n=11 31/8 T-025-Seeded Auto-Plus-60 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-31-8-t025-auto60-receipt.md) | research synthesis | record | retained | — |
 | [n=11 96/25 T-025-Seeded Auto-Plus-60 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-96-25-t025-auto60-receipt.md) | research synthesis | record | retained | — |
@@ -5439,7 +5440,8 @@ or solver checkpoint was retained for any of them; the ten added on 2026-09-05 b
 `2.99` pair added on 2026-09-18 by session-139 is H-216 calibration at n=6 (covering
 `6.08216` and `6.07724` on two named site sets, both ≥ 6, not a bound); `3.82` also has the session-139 T-025-seeded auto-plus-60 plus `--seed-windows 5` at
 191/50, covering `11.018646` converged, closest session-139 point-atom construction,
-site set refuted; `3.83` is the
+site set refuted; T-026-seeded auto-plus-60 at the same side converged `11.033743`,
+worse than the threshold seed; `3.83` is the
 session-139 n=11 probes at 383/100, covering `11.192598` (auto grids), `11.142857`
 (four-grid), and `11.140351` (T-025-seeded four-grid), all site sets refuted, side open;
 `3.84` is the same T-025-seeded auto-plus-60 construction at 96/25, covering

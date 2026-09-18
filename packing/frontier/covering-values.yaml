@@ -219,6 +219,29 @@ values:
       point-atom construction, still above eleven on a converged loop. No covering
       freeze was retained.
   - n: 11
+    side: '191/50'
+    side_decimal: '3.82'
+    objective: '11.033743'
+    site_set: t026-seeded-auto-plus-60
+    sites: 8081
+    rows: 8324
+    rounds: 35
+    converged: true
+    stop_reason: >-
+      The row loop converged at LP round 35 (violated 0) at 11.033743 on 8081 sites
+      / 1069 orbits, including 1121 T-026 seed sites scaled from 381/100. Rounds
+      5-13 sat at 11.000000; it crossed eleven at round 14 (11.002509). Column
+      generation then added one orbit and stopped; wall 265.4 s.
+    least_covered_mass: '1'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-191-50-t026-auto60-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 T-026-fractional-seeded auto-plus-60 at 191/50. Worse than the
+      T-025 seed (11.020212) and the T-025 plus window lattice (11.018646). Still
+      above eleven on a converged loop. No covering freeze was retained.
+  - n: 11
     side: '383/100'
     side_decimal: '3.83'
     objective: '11.192598'

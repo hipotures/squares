@@ -458,6 +458,13 @@ T-019-seeded auto grids at `23/5` stopped unconverged at `17.049597` after 628 s
 Site set refuted; side open. T-026 seed at 191/50 and T-025 auto-plus-60 at
 381/100 still in flight.
 
+## Hour 3 T-026 seed (2026-09-18T08:03Z)
+
+T-026-fractional-seeded auto-plus-60 at `191/50` converged `11.033743` in
+265.4 s on 8081 sites. Worse than T-025 (11.020212) and T-025 plus windows
+(11.018646). Site set refuted. 381/100 still sitting at exactly eleven;
+n=18 T-019 seed still below 18.
+
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
 -->
