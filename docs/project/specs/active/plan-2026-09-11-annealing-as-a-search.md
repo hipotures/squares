@@ -552,8 +552,9 @@ lighter arm, candidate or comparator, also runs compensation slots in every bloc
 Their seeds come from a reserved range disjoint from every base, pilot, calibration and
 held-out seed, and that arm’s block-best is taken over its base and compensation slots
 together. Compensation is decided per comparison, so a candidate with several deciding
-comparators has a separate block-best for each. The number of compensation slots is a multiplier fixed for each contrast, arm
-and candidate setting before any calibration round, from a work-only pilot on its own
+comparators has a separate block-best for each.
+The number of compensation slots is a multiplier fixed for each contrast, arm and
+candidate setting before any calibration round, from a work-only pilot on its own
 reserved seeds that runs on every frozen cell, held-out included, and reads no outcome.
 Every report states the realized work ratio, the comparator’s median pair-level work per
 block over the candidate’s with compensation slots included, for calibration and

@@ -14,7 +14,7 @@ session:
   branch: claude/n11-overnight-2026-09-17
   primary_bead: think-4woh
   status: stopped
-  certification_pending: think-4woh
+  certification_pending: think-qqzs
   goal: >-
     Find and test a route to a significant n=11 result beyond the one-body ceiling L* =
     38200/9977: review the record, delegate a Fable max ideation and an independent
@@ -504,17 +504,25 @@ session:
     retired-workflow-identifier scan does not prune attic, and lane D's raw tbd dump
     there contains the retired identifier.
   - >-
-    No full gate ran on a committed head; certification is pending under think-4woh.
+    No full gate ran on a committed head; certification was pending under think-4woh
+    until PR 193 merged, and now sits under think-qqzs.
   stop_reason: >-
     The overnight program reached its wind-up with measurements and dispositions, not
     a bound. Registration and route selection wait for owner decisions, and no gate has
     run on a committed head, so the session stops with certification pending.
   next_action: >-
-    The owner answers the five decisions in X-037 under think-4woh; the next executable
-    entry is BC-357 under think-qqzs, closing M7's n=6 bracket at 299/100 after the G5
-    site-merge fix.
+    Close M7's n=6 bracket at 299/100 under BC-357 / think-qqzs after the G5 site-merge
+    fix. The five owner decisions in X-037 remain open and do not block that tooling
+    slice.
 ---
 # Session 138: N11 Overnight Review
+
+**Certification moved, 2026-09-18.** This record’s `certification_pending` named
+`think-4woh`, which closed when PR 193 merged as `4ad98e90`. A closed bead owes nothing,
+so the marker now names `think-qqzs`, the open bead that owns the next executable entry:
+BC-357’s n=6 calibration after the G5 site-merge fix.
+Nothing else in this record becomes a pass, and the five owner decisions in X-037 stay
+open.
 
 The owner asked on 2026-09-16 at 23:50 PT for a deep overnight push toward a significant
 n=11 result by new mechanisms, closed by morning.
@@ -576,10 +584,9 @@ receipt separates the n=11 program’s cost.
 
 ## Handoff
 
-The session stops with certification pending under `think-4woh`: nothing is committed
-and no gate has run on a committed head.
-The owner’s five decisions come first (X-037, “Owner Decisions Needed”). BC-357 under
-`think-qqzs` is the next executable entry, and its tooling slice needs no registration.
+The session’s records landed when PR 193 merged as `4ad98e90`. Certification debt now
+sits under `think-qqzs`. The owner’s five decisions remain open (X-037, “Owner Decisions
+Needed”) and do not block BC-357’s tooling slice.
 BC-358 stays blocked on `think-g3j7`, `think-3xbr`, and `think-gyzw`. Route S (BC-343,
 `think-ufmk`) remains open in agenda-036.
 

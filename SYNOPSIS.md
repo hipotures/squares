@@ -161,8 +161,9 @@ strategy-reset queue, and
 is the current relational-certificate queue opened by the overnight review.
 The generated agenda map, not this narrative, summarizes commitment state.
 
-Session 138 is the latest terminal handoff: it stopped with its own certification
-pending under `think-4woh` and five owner decisions outstanding.
+Session 138 is the latest terminal handoff: PR 193 merged its records as `4ad98e90`,
+`think-4woh` is closed, and certification debt now sits under `think-qqzs`. Five owner
+decisions in X-037 remain outstanding.
 `stopped` is not a scientific failure; it includes time limits, guarded refusals,
 administrative handoffs, and work deliberately ended after its next evidence was
 identified. The late-session arc moved from certificate production and exact dilation
@@ -952,9 +953,10 @@ them is retained.
   The n=6 covering value at 299/100 lies between 83/14 (exact) and 6.006571 (float).
   The two-route gate accepts only crossings weaker than the proved values.
 
-Session 138 stops with certification pending under `think-4woh`, and five owner
-decisions come first: the atom format under `think-g3j7`, registering M7’s n=6
-statement, M1 as Route F1, an M6 Route D campaign, and an SDP dependency for M2.
+Session 138’s records landed when PR 193 merged as `4ad98e90`; `think-4woh` is closed
+and certification debt now sits under `think-qqzs`. Five owner decisions remain open:
+the atom format under `think-g3j7`, registering M7’s n=6 statement, M1 as Route F1, an
+M6 Route D campaign, and an SDP dependency for M2.
 
 **Selected next entry:** `think-qqzs`, BC-357: close M7’s n=6 bracket at 299/100 after
 the G5 site-merge fix, which needs no registration for its tooling slice.
