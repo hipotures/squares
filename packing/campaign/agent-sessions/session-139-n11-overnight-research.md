@@ -568,6 +568,13 @@ unconverged at `17.042346` after 931.6 s (42 rounds, 9 violated), 0.007 below
 the seed without windows. Site sets refuted; sides open. 4.68 windows and 4.69
 seed still in flight.
 
+## Hour 4 T-027 seed (2026-09-18T09:10Z)
+
+T-019-seeded auto plus windows at `117/25` locked `18.000000` unconverged after
+912.6 s (57 rounds, 495 violated). T-019-seeded auto at `469/100` locked
+`18.000000` unconverged after 921.5 s (59 rounds, 288 violated). T-027-seeded
+auto at `117/25` started 09:09Z. Route S encode-only remains 09:33Z.
+
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
 -->

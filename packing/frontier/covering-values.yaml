@@ -732,6 +732,54 @@ values:
       carry a certificate. Adding sites can still lower a restricted optimum, so
       117/25 is not barred. No covering freeze was retained.
   - n: 18
+    side: '117/25'
+    side_decimal: '4.68'
+    objective: '18.000000'
+    site_set: t019-seed-auto-32-43-53-windows5
+    sites: 7253
+    rows: 18858
+    rounds: 57
+    converged: false
+    stop_reason: >-
+      The 900 s deadline stopped the row loop after 57 LP rounds with 495 placements
+      still violated. The objective crossed 18 at round 10 (18.000000) and held that
+      value through the stop on 7253 sites / 975 orbits, including 1584 seed sites
+      (1184 T-019 plus 400 ceiling-window lattice sites from --seed-windows 5).
+    least_covered_mass: '0.960216'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-117-25-t019-windows5-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 T-019-seeded auto-grid plus windows at 117/25, grids (32, 43, 53).
+      Unconverged mass 18.000000 cannot confirm; remaining rows can only raise it.
+      Adding sites can still lower a restricted optimum, so 117/25 is not barred. No
+      covering freeze was retained.
+  - n: 18
+    side: '469/100'
+    side_decimal: '4.69'
+    objective: '18.000000'
+    site_set: t019-seed-auto-32-43-53
+    sites: 6853
+    rows: 17282
+    rounds: 59
+    converged: false
+    stop_reason: >-
+      The 900 s deadline stopped the row loop after 59 LP rounds with 288 placements
+      still violated. The objective crossed 18 at round 8 (18.000000) and held that
+      value through the stop on 6853 sites / 920 orbits, including 1184 T-019 seed
+      sites scaled from 459/100.
+    least_covered_mass: '0.981532'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-469-100-t019-seed-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 T-019-seeded auto-grid at 469/100, between T-027 at 467/100 and the
+      117/25 lock. Unconverged mass 18.000000 cannot confirm; remaining rows can only
+      raise it. Adding sites can still lower a restricted optimum, so 469/100 is not
+      barred. No covering freeze was retained.
+  - n: 18
     side: '47/10'
     side_decimal: '4.7'
     objective: '18.165413'

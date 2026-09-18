@@ -461,7 +461,9 @@ case or experiment separately.
 | [n=18 467/100 Auto-Grid Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-467-100-grid-receipt.md) | research synthesis | record | retained | — |
 | [n=18 467/100 T-019-Seeded Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-467-100-t019-seed-receipt.md) | research synthesis | record | retained | — |
 | [n=18 117/25 T-019-Seeded Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-117-25-t019-seed-receipt.md) | research synthesis | record | retained | — |
+| [n=18 117/25 T-019-Seeded Window-Lattice Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-117-25-t019-windows5-receipt.md) | research synthesis | record | retained | — |
 | [n=18 47/10 T-019-Seeded Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-47-10-t019-seed-receipt.md) | research synthesis | record | retained | — |
+| [n=18 469/100 T-019-Seeded Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-469-100-t019-seed-receipt.md) | research synthesis | record | retained | — |
 | [M3 T-018 Selftest Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/m3-t018-selftest/README.md) | research synthesis | record | retained | — |
 | [M3 T-018 9-Direction Search Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/m3-t018-net8/README.md) | research synthesis | record | retained | — |
 | [M3 T-018 Selftest After Span-Sweep Encoding](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/m3-t018-selftest-span/README.md) | research synthesis | record | retained | — |
@@ -5438,9 +5440,9 @@ the best known packing runs near half a unit — eleven cases above `+0.49`, hea
 `n = 51` at `+0.5364`, then `68`, `84`, `39`, `86`, `66`, `38`, `83`, `37`, `53` and
 `26`. Two cautions travel with that ranking.
 The prize is what the *ceiling* allows; the real limit is the covering value at that
-side. 27 values have been reported for the restricted program, at sides `2.99`, `3.81`, `3.82`,
+side. 28 values have been reported for the restricted program, at sides `2.99`, `3.81`, `3.82`,
 `3.83`, `3.84`, `3.85`, `3.875`, `3.95`, `3.96`, `3.969`, `3.97`, `3.98`, `3.985`, `3.99`, `4.58`, `4.59`,
-`4.6`, `4.67`, `4.68`, `4.7`, `4.80`, `4.825`, `4.85`, `4.865`, `4.875`, `4.895` and `4.985` — the first eight
+`4.6`, `4.67`, `4.68`, `4.69`, `4.7`, `4.80`, `4.825`, `4.85`, `4.865`, `4.875`, `4.895` and `4.985` — the first eight
 reports, not measurements this repository can reproduce, since no covering-search run log
 or solver checkpoint was retained for any of them; the ten added on 2026-09-05 by Agenda
 021’s `BC-200` and `BC-197` and Agenda 022’s `BC-213` and `BC-206` carry run logs; the
@@ -5462,7 +5464,7 @@ unconverged, still above twelve; T-017-seeded four-grid at the same side dropped
 covering `17.331710` unconverged, site set refuted, side open; the T-019-seeded auto
 grid at the same side dropped to `17.049597` unconverged, still above seventeen; T-019-seeded auto plus `--seed-windows 5` dropped to `17.042346` unconverged; `4.67` is the session-139
 n=18 auto-grid probe at 467/100, covering `18.000000` unconverged, cannot confirm; the
-T-019-seeded auto grid at the same side converged `17.875567` with least_covered 1, freeze-then-decide retained `T-027` at `s(18) >= 467/100`; `4.68` T-019-seeded auto-grid locked at exact mass `18.000043` converged, cannot confirm; `4.7` T-019-seeded auto-grid converged `18.165413`, cannot confirm;
+T-019-seeded auto grid at the same side converged `17.875567` with least_covered 1, freeze-then-decide retained `T-027` at `s(18) >= 467/100`; `4.68` T-019-seeded auto-grid locked at exact mass `18.000043` converged, cannot confirm; T-019-seeded auto plus `--seed-windows 5` at `4.68` locked `18.000000` unconverged; `4.69` T-019-seeded auto-grid locked `18.000000` unconverged; `4.7` T-019-seeded auto-grid converged `18.165413`, cannot confirm;
 retained checkpoint and frozen-certificate availability differs by row.
 Several sides are reported more than once from site sets built differently, which is the
 point of reporting them that way: at `4.85` the difference is between a wall and the

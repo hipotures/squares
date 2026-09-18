@@ -103,7 +103,9 @@ documents:
   - {path: packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-467-100-grid-receipt.md, role: research-report, authority: record, lifecycle: retained}
   - {path: packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-467-100-t019-seed-receipt.md, role: research-report, authority: record, lifecycle: retained}
   - {path: packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-117-25-t019-seed-receipt.md, role: research-report, authority: record, lifecycle: retained}
+  - {path: packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-117-25-t019-windows5-receipt.md, role: research-report, authority: record, lifecycle: retained}
   - {path: packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-47-10-t019-seed-receipt.md, role: research-report, authority: record, lifecycle: retained}
+  - {path: packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-469-100-t019-seed-receipt.md, role: research-report, authority: record, lifecycle: retained}
   - {path: packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/m3-t018-selftest/README.md, role: research-report, authority: record, lifecycle: retained}
   - {path: packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/m3-t018-net8/README.md, role: research-report, authority: record, lifecycle: retained}
   - {path: packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/m3-t018-selftest-span/README.md, role: research-report, authority: record, lifecycle: retained}
