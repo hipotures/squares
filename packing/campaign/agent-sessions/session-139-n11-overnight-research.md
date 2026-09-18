@@ -847,6 +847,16 @@ Between windows 5 (`17.042346`) and windows 6 (`17.048472`). No freeze.
 Site set refuted; side open. T-019 unchanged. Waiter started n=19 `97/20`
 T-020 windows 6 at 16:10Z.
 
+## n=19 97/20 T-020 windows 6 (2026-09-18T16:26Z)
+
+T-020-seeded auto `(34, 45, 56)` plus `--seed-windows 6` at `97/20` for n=19
+stopped unconverged at `19.808958` after 953.1 s (34 LP rounds, 321
+violated). Seed from `certificate-24-5.json`; seed sites 2836 (2260 T-020
+plus 576 lattice). Crossed nineteen at round 5 and climbed. No freeze.
+Site set refuted; side open. T-020 unchanged. T-021's n=20 pointer
+untouched. T-028 not landed. Waiter done. Covering queue empty. Closeout
+after 18:00Z.
+
 ## Block 8 closeout (after covering; original window 12:53–13:33Z)
 
 Owner continue at 15:04Z moved this after the 18:00Z covering deadline.

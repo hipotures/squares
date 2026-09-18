@@ -877,6 +877,31 @@ values:
       above 18, so this site set cannot carry a certificate. Adding sites can still
       lower a restricted optimum, so 47/10 is not barred. No covering freeze was
       retained.
+  - n: 19
+    side: '97/20'
+    side_decimal: '4.85'
+    objective: '19.808958'
+    site_set: t020-seed-auto-34-45-56-windows6
+    sites: 8865
+    rows: 11546
+    rounds: 34
+    converged: false
+    stop_reason: >-
+      The 900 s deadline stopped the row loop after 34 LP rounds with 321 placements
+      still violated. The objective crossed 19 at round 5 (19.114379) and finished at
+      19.808958 on 8865 sites / 1172 orbits, including 2836 seed sites (2260 T-020
+      plus 576 ceiling-window lattice sites from --seed-windows 6).
+    least_covered_mass: '0.974389'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n19-97-20-t020-windows6-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 T-020-seeded auto-grid plus windows 6 at 97/20 for n=19, seeded
+      from certificate-24-5.json. Unconverged mass 19.808958 still refutes this site
+      set only; remaining rows can only raise it. Adding sites can still lower the
+      covering value, so 97/20 is not barred for n=19. No covering freeze was
+      retained. T-020 at 24/5 is unchanged.
   - n: 21
     side: '997/200'
     side_decimal: '4.985'
