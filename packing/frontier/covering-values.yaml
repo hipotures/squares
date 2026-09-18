@@ -150,6 +150,29 @@ values:
       adding sites can only lower it, so the side is not barred. No covering freeze was
       retained.
   - n: 11
+    side: '383/100'
+    side_decimal: '3.83'
+    objective: '11.142857'
+    site_set: four-grid-25-34-41-48
+    sites: 5665
+    rows: 6317
+    rounds: 23
+    converged: true
+    stop_reason: >-
+      The row loop converged at LP round 23 (violated 0) at 11.142857 on 5665 sites
+      / 756 orbits. Rounds 3-5 sat at 11.000000; it crossed eleven at round 6
+      (11.020986). Column generation then added one orbit and stopped; wall 81.7 s.
+    least_covered_mass: '1'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-383-100-grid4-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 denser named site set at 383/100 after auto-25-34-41. About 2,300 extra
+      sites dropped the restricted optimum by 0.050. Still above eleven on a converged
+      loop, so this site set carries no certificate; the side is not barred. No covering
+      freeze was retained.
+  - n: 11
     side: '77/20'
     side_decimal: '3.85'
     objective: '11.227631'

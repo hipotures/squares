@@ -443,6 +443,7 @@ case or experiment separately.
 | [H-216 n=6 299/100 Sites2 Freeze Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/h216-n6-299-100-sites2-receipt.md) | research synthesis | record | retained | — |
 | [n=12 3969/1000 Grid Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n12-3969-1000-grid-receipt.md) | research synthesis | record | retained | — |
 | [n=11 383/100 Grid Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-383-100-grid-receipt.md) | research synthesis | record | retained | — |
+| [n=11 383/100 Four-Grid Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-383-100-grid4-receipt.md) | research synthesis | record | retained | — |
 | [Unit-Parent Centre Restriction: Author-Lane Proof Check](docs/project/reviews/review-2026-09-10-n11-parent-centre-author-check.md) | dated review record | record | retained | — |
 | [N11 Research: Definitions, Findings, and the Inference Chain](docs/project/research/research-2026-09-09-n11-evidence-and-inference.md) | research synthesis | record | retained | — |
 | [Inference Audit: Owner Geometry and Fixed-D Continuation](docs/project/research/research-2026-09-09-n11-inference-audit.md) | research synthesis | record | retained | — |
@@ -5417,8 +5418,9 @@ or solver checkpoint was retained for any of them; the ten added on 2026-09-05 b
 021’s `BC-200` and `BC-197` and Agenda 022’s `BC-213` and `BC-206` carry run logs; the
 `2.99` pair added on 2026-09-18 by session-139 is H-216 calibration at n=6 (covering
 `6.08216` and `6.07724` on two named site sets, both ≥ 6, not a bound); `3.83` is the
-session-139 auto-grid probe at n=11, 383/100, covering `11.192598` (site set refuted,
-side open); retained checkpoint and frozen-certificate availability differs by row.
+session-139 n=11 pair at 383/100, covering `11.192598` (auto grids) and `11.142857`
+(four-grid), both site sets refuted, side open; retained checkpoint and
+frozen-certificate availability differs by row.
 Several sides are reported more than once from site sets built differently, which is the
 point of reporting them that way: at `4.85` the difference is between a wall and the
 certificate `T-021` rests on, at `4.865` it is two independent walls, and at `3.97` it

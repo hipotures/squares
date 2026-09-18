@@ -340,6 +340,12 @@ n=11 auto grids `(25, 34, 41)` at `383/100` converged in 82.2 s at restricted op
 refuted; side open. T-025 and T-026 unchanged. Next cheap probe: denser grids at the
 same side. G4 and M3 sources are on disk, uncommitted until their tests pass.
 
+## Hour 1 four-grid (2026-09-18T06:36Z)
+
+n=11 `--grid-counts 25,34,41,48` at `383/100` converged in 81.7 s at `11.142857`
+(rationalised `2228577/200000`). About 2,300 extra sites dropped 0.050 from the auto
+grid. Still above eleven. Next: T-025-seeded grids at the same side. G4 and M3 landed.
+
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
 -->
