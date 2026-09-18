@@ -15,9 +15,9 @@ Claim decided, four conditions:
      the mirror (1 - t) / (1 + t) of a net half-tangent, with a non-negative weight;
   K1 every placement lies in the closed container [0, L]^2 (its four corners, exactly);
   K2 the depth d(p) = sum of the weights of the closed placements containing p has
-     maximum exactly 1 over the container, decided at every vertex of the arrangement cut
+     maximum at most 1 over the container, decided at every vertex of the arrangement cut
      by the placements' edge lines and the four container walls;
-  K3 the total weight is exactly n.
+  K3 the total weight is at least n.
 Then, by weak duality (the statement is in the docstring of sqpack/fractional/ceiling.py),
 no D4-symmetric measure of mass below n gives mass >= 1 to every closed B-square at a net
 angle inside [0, L]^2: for this net and every net containing the angles used, for this B
@@ -351,7 +351,7 @@ def check_k2(record: Record) -> dict[str, Any]:
             str(Fraction(witness[1], witness[2])),
         ]
     return {
-        "holds": best == 1,
+        "holds": bool(vertices) and best <= 1,
         "max_depth": str(best),
         "max_depth_float": float(best),
         "attaining_vertices": attaining,
@@ -369,7 +369,7 @@ def check_k2(record: Record) -> dict[str, Any]:
 
 def check_k3(record: Record) -> dict[str, Any]:
     total = sum((sq.weight for sq in record.squares), Fraction(0))
-    return {"holds": total == record.n, "total_weight": str(total), "n": record.n}
+    return {"holds": total >= record.n, "total_weight": str(total), "n": record.n}
 
 
 def check_d4(record: Record) -> dict[str, Any]:
@@ -466,7 +466,7 @@ def controls(record: Record) -> list[dict[str, Any]]:
     )
     outcomes: list[dict[str, Any]] = []
     for name, perturbed, must_fail in (
-        ("weights scaled by 8/7", scaled, ("K2", "K3")),
+        ("weights scaled by 8/7", scaled, ("K2",)),
         ("first centre shifted by L", shifted, ("K1",)),
         ("first half-tangent set to 1/3", tilted, ("K0",)),
     ):
