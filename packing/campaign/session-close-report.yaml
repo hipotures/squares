@@ -7,12 +7,12 @@ softschema:
   schema: schemas/session-close-report.schema.yaml
   envelope: null
   status: enforced
-count: 137
+count: 138
 generated_by: >-
   uv run --frozen --all-extras --group dev python -m devtools.close_session --render
 totals:
   sessions_measured: 87
-  sessions_unmeasured: 50
+  sessions_unmeasured: 51
   attributed:
     rollups: 129
     turns: 40048
@@ -2279,5 +2279,15 @@ sessions:
   measured: false
   unmeasured_reason: >-
     native harness data unavailable; No receipt measures this interval as one attributable cost. In the same window the Codex workbench task 01a0a837 also merged PR 189 and drafted PR 190, work on other branches, so no delta from its log belongs to this branch alone. A delta from the Session 136 Codex task 01a0a0b5 would omit that thread's share, and the Claude recovery log was still live when this record stopped, so each available source yields only a partial lower bound.
+  rollups: []
+  codex_receipts: []
+- id: session-138
+  title: "N11 Overnight Review"
+  status: stopped
+  primary_bead: think-4woh
+  phases: 6
+  measured: false
+  unmeasured_reason: >-
+    native harness data unavailable; The coordinator's Claude session was still live when this record was written, and its single log also carries the parallel pull-request threads and a session-quota exhaustion from about 00:15 to 02:50 PT. No per-log receipt was generated before terminalization, and the native log does not separate this program's usage from the pull-request work that shares it.
   rollups: []
   codex_receipts: []

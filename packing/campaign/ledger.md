@@ -152,6 +152,7 @@ Each entry summarizes one user-level research window. Cycle slots are wall-clock
 | [session-135](agent-sessions/session-135-n11-route-s-guard-discharge.md) | stopped | contemporaneous | `pipeline-improvement` (correctness) | `pipeline-improvement` (correctness) | 1 | think-r55v | Continue BC-343 under think-ufmk. Only a fresh planning block may register exp-161 and authorize a bounded Route S target; this record authorizes no target work. |
 | [session-136](agent-sessions/session-136-ci-topology-reconciliation.md) | stopped | contemporaneous | `pipeline-improvement` (efficiency) | `pipeline-improvement` (efficiency) | 1 | think-97we | think-97we closed when PR 188 and PR 185 merged, and the pending closeout checks it carried -- as carried forward by Session 137 -- now sit under think-g4n9: hold both pull-request walls at or under 180 s over the declared run of consecutive exact-head hosted runs, then switch the wall check back to enforcing. Then resume BC-343 under think-ufmk without changing its scientific claim or allocating exp-161 from this block. |
 | [session-137](agent-sessions/session-137-ci-topology-continuation-recovery.md) | stopped | retrospective | `pipeline-improvement` (correctness) | `remediation` (correctness) | 3 | think-97we | think-97we closed when PR 188 and PR 185 merged, and the remaining closeout debt on the final head now sits under think-g4n9: hold both pull-request walls at or under 180 s over the declared run of consecutive exact-head hosted runs, then switch the wall check back to enforcing. Then resume BC-343 under think-ufmk without changing its scientific claim or allocating exp-161 from this block. |
+| [session-138](agent-sessions/session-138-n11-overnight-review.md) | stopped | mixed | `factual-review` (insight) | `documentation-pass` (process) | 6 | think-4woh | The owner answers the five decisions in X-037 under think-4woh; the next executable entry is BC-357 under think-qqzs, closing M7's n=6 bracket at 299/100 after the G5 site-merge fix. |
 
 ### Workflow summary
 
@@ -160,15 +161,15 @@ Declared counts are contemporaneous contracts; retrospective counts are reconstr
 | workflow | declared entries | retrospective entries | declared phases | retrospective phases |
 | --- | ---: | ---: | ---: | ---: |
 | `research-survey` | 2 | 2 | 13 | 2 |
-| `factual-review` | 6 | 0 | 51 | 2 |
-| `insight-iteration` | 24 | 1 | 79 | 3 |
+| `factual-review` | 7 | 0 | 52 | 2 |
+| `insight-iteration` | 24 | 1 | 80 | 4 |
 | `process-review` | 16 | 4 | 64 | 6 |
 | `efficiency-loop` | 10 | 1 | 36 | 1 |
 | `research-loop` | 26 | 4 | 96 | 8 |
 | `pipeline-improvement` | 33 | 2 | 151 | 5 |
-| `documentation-pass` | 1 | 0 | 22 | 1 |
+| `documentation-pass` | 1 | 0 | 23 | 1 |
 | `remediation` | 0 | 1 | 0 | 3 |
-| `review-planning-oversight` | 3 | 0 | 16 | 1 |
+| `review-planning-oversight` | 3 | 0 | 17 | 2 |
 | `general-improvement` | 1 | 0 | 7 | 1 |
 
 ## Experiment agendas
@@ -762,6 +763,18 @@ Status: **active**. Reconcile the merged research record, then choose among rout
 | BC-350 | research | 6, 12, 13 | tentative | 2 | think-0z9b | Reuse H-039 and the existing n12 lane with its obsolete pre-T-017 target explicitly superseded. |
 | BC-351 | research | 6, 11 | tentative | 3 | think-gzjq | Register no hypothesis until W10 selects one concrete local lemma and domain. |
 
+### [agenda-037](agendas/agenda-037-n11-relational-certificate-program.md) — N11 Relational-Certificate Program
+
+Status: **active**. Pursue n=11 results beyond the one-body ceiling L* = 38200/9977 through certificates that price relations between squares, starting from the overnight route slate in X-037. Calibrate the certificate machinery at the solved cases n=6 and n=10, keep Route F1 relational atoms blocked until their format, checkpoint, and convergence tool exist, and record the retired mechanisms so they are not proposed again.
+
+| item | purpose | n | state | priority | bead | next evidence |
+| --- | --- | --- | --- | ---: | --- | --- |
+| BC-356 | research | 6, 10, 11 | complete | 0 | think-4woh | The owner answers the five decisions in X-037; BC-357 closes M7’s n=6 bracket. |
+| BC-357 | measurement_validation | 6, 10 | ready | 1 | think-qqzs | A guarded site-merge step that lets the gate decide the 298/100 candidate, then a polish of the 1,128-placement union with the exact vertex rebuild fixed. |
+| BC-358 | research | 11 | blocked | 1 | think-gyzw | The owner’s format decision, then the guarded colgen tool run to one of its two terminal states. |
+| BC-359 | research | 11 | tentative | 2 | think-k4vb | The integer program’s optimum on the coarse net, with the winner decided exactly at full angle. |
+| BC-360 | research | 11 | stopped | 4 | think-4woh | None; reopen a mechanism only when its stated reopening condition holds. |
+
 ## Series
 
 | id | status | title | rounds | opened because |
@@ -1139,6 +1152,7 @@ These totals exclude 4 historical rounds with unrecorded timing; their cost is u
 - X-030 — Draft N11 Proof Obligations After the T1 Local Witness
 - X-031 — Floor-Normalized BC303 T2 Helper and H-161 Local Stability
 - X-036 — Graded Guidance for Annealing
+- X-037 — N11 Overnight Review and Route Slate
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

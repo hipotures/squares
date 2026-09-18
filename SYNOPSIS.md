@@ -137,10 +137,10 @@ hypothesis status and summarizes experiment verdicts, and the
 
 | Record | Count | State at the cutoff |
 | --- | ---: | --- |
-| Agendas | 35 | 15 active; 14 completed; 5 paused; 1 superseded |
-| Commitments | 344 | 177 complete; 59 stopped; 65 blocked; 15 ready; 20 tentative; 8 in progress |
-| Sessions | 137 | 84 completed; 53 stopped; all terminal |
-| Explorations | 34 | 20 linked to proposed hypotheses; 14 uncodified |
+| Agendas | 36 | 16 active; 14 completed; 5 paused; 1 superseded |
+| Commitments | 349 | 178 complete; 60 stopped; 66 blocked; 16 ready; 21 tentative; 8 in progress |
+| Sessions | 138 | 84 completed; 54 stopped; all terminal |
+| Explorations | 35 | 20 linked to proposed hypotheses; 15 uncodified |
 | Hypotheses | 153 | 26 confirmed; 29 refuted; 50 blocked; 12 unresolved; 5 open; 28 open questions; 2 result registered; 1 abandoned; 0 running |
 | Experiments | 128 | 39 accepted; 34 rejected; 30 unresolved; 12 baseline; 11 blocked; 2 abandoned; 0 in progress |
 | Frontier results | 26 | 26 registered |
@@ -156,17 +156,19 @@ Agendas 024–028 built on the `3.81` result with adaptive and structural routes
 Agendas 029–033 and 035 developed conditional-owner geometry, T-025/T-026, and the
 now-paused incremental follow-ups.
 [Agenda 036](packing/campaign/agendas/agenda-036-n11-strategy-reset-roadmap.md) is the
-current strategy-reset queue.
+strategy-reset queue, and
+[Agenda 037](packing/campaign/agendas/agenda-037-n11-relational-certificate-program.md)
+is the current relational-certificate queue opened by the overnight review.
 The generated agenda map, not this narrative, summarizes commitment state.
 
-Session 136 is the latest terminal handoff: it stopped before final-source
-certification, hosted wall evidence, independent review, and merge.
-The still-open `think-97we` bead owns those closeout receipts.
+Session 138 is the latest terminal handoff: it stopped with its own certification
+pending under `think-4woh` and five owner decisions outstanding.
 `stopped` is not a scientific failure; it includes time limits, guarded refusals,
 administrative handoffs, and work deliberately ended after its next evidence was
 identified. The late-session arc moved from certificate production and exact dilation
 through owner geometry and bounded negative tests, then through the T-025/T-026
-publication stack, research-state reconciliation, and the current CI-efficiency block.
+publication stack, research-state reconciliation, the CI-efficiency block, and the
+overnight n=11 route review.
 Use the generated close report for individual session clocks and never add child-session
 resource totals to their parent roll-up.
 
@@ -176,7 +178,8 @@ Some explorations link forward through `proposes`, while others remain uncodifie
 observations or strategy notes.
 The most consequential recent synthesis is X-027’s ceiling for pure point/density
 certificates, followed by X-028’s strategy portfolio and the scoped BC303 drafts
-X-029–X-031, followed by X-032’s no-target Route S compression contract.
+X-029–X-031, followed by X-032’s no-target Route S compression contract and X-037’s
+ranked relational-certificate slate.
 A draft or proposed direction is not a registered hypothesis, and a registered
 hypothesis is not a frontier result.
 
@@ -205,26 +208,29 @@ Its three alternating local pairs reduced the rollup’s median from 47.72 to 2.
 seconds, and the first candidate hosted checks tier passed in 106.38 seconds against the
 unchanged 195-second ceiling.
 This is validation evidence, not new mathematics.
-BC-355 / `think-97we` is now reconciling the later Pages, Packing, budgeting, and
+BC-355 / `think-97we` reconciled the later Pages, Packing, budgeting, and
 validation-lane work into one exact-head topology.
 [Session 136](packing/campaign/agent-sessions/session-136-ci-topology-reconciliation.md)
-stopped after the implementation handoff; BC-355 remains in progress until both required
-aggregates pass inside the 180-second wall budget and an independent reviewer accepts
-that same head. The block runs no scientific target and changes no theorem, hypothesis
-verdict, n=11 bound, or frontier record.
-The current order is:
+stopped after the implementation handoff and
+[Session 137](packing/campaign/agent-sessions/session-137-ci-topology-continuation-recovery.md)
+recovered it; PR 188 merged as `042e791c` and PR 185 merged as `d7f9d94d`, and
+`think-97we` is closed.
+What that closure did not carry is the 180-second hosted wall: by owner decision the
+pull-request walls are advisory under the open `think-g4n9` until they hold on hosted
+runners, so BC-355’s agenda cell still records `in_progress`. The block ran no
+scientific target and changed no theorem, hypothesis verdict, n=11 bound, or frontier
+record. The current order is:
 
-1. BC-355 / `think-97we` is the active pipeline-improvement block.
-   Its lane contract keeps ordinary research iterations on focused checks, runs the push
-   tier once before a push, preserves the complete seven-part fast pull-request surface,
-   and reserves slow, exhaustive, deferred, golden, and strict work for explicit
-   checkpoints. Hosted exact-head measurements and re-review remain open.
+1. BC-357 / `think-qqzs` is the active block, opened by the overnight review in
+   [agenda-037](packing/campaign/agendas/agenda-037-n11-relational-certificate-program.md).
+   It closes M7’s n=6 point bracket at 299/100 after the G5 site-merge fix, a tooling
+   slice that needs no experiment registration.
 2. BC-354 / `think-0t5y` stopped at Route A’s representation boundary.
    Its source inventories found no complete 80-stratum negative-root producer, matched
    exact baseline, conditional gate, or method-distinct replay.
    No target ran and no physical root closed.
-3. BC-343 remains the selected scientific commitment, blocked until BC-355 closes;
-   `think-ufmk` is its sole scientific entry after that closeout.
+3. BC-343 remains the standing Route S commitment; `think-ufmk` is its sole scientific
+   entry, on a fresh planning branch.
    [X-032](packing/campaign/explorations/X-032-route-s-threshold-compression.md) and
    [H-163](packing/campaign/hypotheses/H-163-route-s-threshold-compression.md) freeze
    T-025 as the sole matched control, its exact 119-orbit support universe, and the
@@ -254,8 +260,9 @@ The detailed
 originally allocated five sequential merge-bounded blocks.
 BC-354 activated that schedule’s guard-refusal branch, so the Route A discriminator no
 longer follows it. BC-343’s no-target Route S instrument is admitted and merged.
-After BC-355 closes, the scientific path resumes with the `think-ufmk` planning block,
-which may register `exp-161` and authorize one bounded target.
+Its remaining Route S path is the `think-ufmk` planning block, which may register
+`exp-161` and authorize one bounded target; agenda-037’s relational-certificate queue
+now runs ahead of it.
 Each block starts from the preceding merge on a fresh branch and gets its own session,
 bead disposition, validation receipt, and pull request.
 
@@ -922,8 +929,42 @@ controller, not permission to blur contracts.
 
 ### Current Handoff
 
+[Session 138](packing/campaign/agent-sessions/session-138-n11-overnight-review.md) is
+the latest terminal handoff, and the latest scientific one.
+It reviewed the n=11 record, ranked eight mechanisms that price relations between
+squares, subjected them to an independent adversarial review, and measured two.
+[X-037](packing/campaign/explorations/X-037-n11-overnight-review-and-route-slate.md)
+records the findings at their scope, and
+[agenda-037](packing/campaign/agendas/agenda-037-n11-relational-certificate-program.md)
+owns the resulting queue.
+No bound moved, no covering value was measured above 191/50, and no hypothesis was
+registered.
+The measurements come from scratch lanes and need guarded tools before any of
+them is retained.
+
+- **M1 (clique and majority atoms at 153/40).** All 44 heavy cliques of the A6 64-family
+  are budget-one threshold atoms.
+  Fixed supports fell below 11, but column generation rebuilt a mass-11 family after
+  every cut, and the decisive rows-complete LP was blocked by the unretained `sites-1`
+  checkpoint.
+- **M7 (helper-free point certificates).** n=10 at 37/10 is foreclosed exactly by an
+  integer ceiling family.
+  The n=6 covering value at 299/100 lies between 83/14 (exact) and 6.006571 (float).
+  The two-route gate accepts only crossings weaker than the proved values.
+
+Session 138 stops with certification pending under `think-4woh`, and five owner
+decisions come first: the atom format under `think-g3j7`, registering M7’s n=6
+statement, M1 as Route F1, an M6 Route D campaign, and an SDP dependency for M2.
+
+**Selected next entry:** `think-qqzs`, BC-357: close M7’s n=6 bracket at 299/100 after
+the G5 site-merge fix, which needs no registration for its tooling slice.
+
+BC-358, Route F1 relational atoms, is blocked on `think-g3j7`, `think-3xbr`, and
+`think-gyzw`. BC-359, the M3 kill test under `think-k4vb`, is tentative.
+BC-360 retires M2, M4, M5, M6, and M8 with reasons.
+
 [Session 137](packing/campaign/agent-sessions/session-137-ci-topology-continuation-recovery.md)
-is the latest terminal work handoff.
+is the preceding terminal handoff and the last pipeline one.
 It records the continuation of
 [Session 136](packing/campaign/agent-sessions/session-136-ci-topology-reconciliation.md)
 by two concurrent Codex threads, their interruption, and the recovery that restored the
@@ -932,69 +973,51 @@ PR 183, pending the first main deploy.
 It then took PR 188 to green hosted CI at `be28ad5a`: the suite shards were rebalanced,
 and by owner decision the pull-request walls are advisory under `think-g4n9` until they
 hold 180 s on hosted runners.
-BC-355 / `think-97we` remains open for the full checkpoint and merge, so both stopped
-sessions are terminal but uncertified, and neither changes a mathematical result.
+PR 188 merged as `042e791c` and the stacked PR 185 as `d7f9d94d`, and `think-97we` is
+closed; BC-355’s cell stays `in_progress` for those advisory walls alone.
+Neither stopped CI session changes a mathematical result.
+
 [Session 135](packing/campaign/agent-sessions/session-135-n11-route-s-guard-discharge.md)
-is the latest terminal scientific handoff on the no-target Route S admission branch.
+remains the latest Route S handoff.
 It discharged the four guards retained by
 [Session 134](packing/campaign/agent-sessions/session-134-n11-route-s-admission.md):
 complete T-025/T-026 contents bound to a declared Git revision and repository-relative
 paths, both T-026 sentinels, a canonical source-bound nonempty selection manifest, and
 every declared mutation refusal.
 A fresh source-distinct audit found one path-alias hole; the repaired symlink refusal
-and its regression passed re-audit.
-The retained receipt therefore admits the instrument.
-No optimizer, candidate, coverage target, experiment, or scientific verdict was
-produced. [X-032](packing/campaign/explorations/X-032-route-s-threshold-compression.md)
-owns the source and verdict boundary, and
+and its regression passed re-audit, so the retained receipt admits the instrument, and
+PR 182 merged it as `1d9c49c4` from reviewed head `609d7d62`. No optimizer, candidate,
+coverage target, experiment, or scientific verdict was produced.
+[X-032](packing/campaign/explorations/X-032-route-s-threshold-compression.md) owns the
+source and verdict boundary,
 [H-163](packing/campaign/hypotheses/H-163-route-s-threshold-compression.md) owns the
-prospective scientific claim.
-T-026 is only a support-and-rescaling provenance sentinel.
-[Session 133](packing/campaign/agent-sessions/session-133-n11-route-a-admission.md) is
-the latest terminal predecessor.
-It began BC-354 from post-W5 planning merge `a9de8a705d785e5b7b6ac46f28c11b6f5a45d7c6`,
-after
-[Session 132](packing/campaign/agent-sessions/session-132-n11-post-w5-route-selection.md)
-selected Route A admission with Route S as the explicit fallback.
-Session 133 stopped BC-354 at the frozen Route A representation boundary.
-Three source inventories found no complete 80-stratum negative-root producer, seam-safe
-shared-parent domain, rows-complete matched baseline, conditional-domain gate, or
-independent exact replay.
-No target ran, zero of the 16 physical roots closed, and this is not evidence against a
-future complete Route A representation.
-For the n = 11 Route A/Route S decision, the scientific evidence cutoff remains main
-revision `80bcdbb0819504354e1278c37f211dd8cc2158fb`. Later merged campaign and workbench
-records are included in the repository-wide roll-up above; none promotes an n = 11
-frontier result, so T-026 remains the n = 11 lower-bound frontier.
-
-**Immediate closeout action:** complete `think-97we` on the exact merged source.
-
-**Selected next entry:** `think-ufmk`, the subsequent BC-343 planning block that must
-register `exp-161`, its exact target, budget, accept rule, stop rule, and review
-boundary before any bounded compression target runs.
-BC-355 must close before that scientific entry resumes.
+prospective scientific claim, and T-026 is only a support-and-rescaling provenance
+sentinel. BC-343 stays open in
+[agenda-036](packing/campaign/agendas/agenda-036-n11-strategy-reset-roadmap.md) under
+`think-ufmk`, whose fresh planning branch must register `exp-161` before any target
+access.
 
 BC-340, BC-353, and BC-354 are terminal.
-BC-355 is an in-progress, uncertified pipeline block under `think-97we`; Session 136
-stopped, but the block’s evidence and merge closeout remain active.
-It carries no scientific authority and changes no mathematical state.
 BC-341 remains tentative behind a future W10 reselection and the named Route A
-representation gaps.
-BC-343’s no-target PR freezes Route S’s complexity metric, fixed support universe,
-controls, and verdict rules.
-It merged as `1d9c49c4` from reviewed head `609d7d62` after source-distinct review and
-exact-head validation.
-No scientific compression target has execution authority before the separate experiment
-registration under `think-ufmk`; no optimizer, candidate, coverage target, or `exp-161`
-has run.
+representation gaps, which
+[Session 133](packing/campaign/agent-sessions/session-133-n11-route-a-admission.md)
+found when it stopped BC-354 at the frozen Route A representation boundary: three source
+inventories turned up no complete 80-stratum negative-root producer, seam-safe
+shared-parent domain, rows-complete matched baseline, conditional-domain gate, or
+independent exact replay.
+No target ran, zero of the 16 physical roots closed, and that is not evidence against a
+future complete Route A representation.
+
+For the n = 11 Route A/Route S decision, the scientific evidence cutoff remains main
+revision `80bcdbb0819504354e1278c37f211dd8cc2158fb`. Later merged campaign, CI and
+workbench records are included in the repository-wide roll-up above; none promotes a
+frontier result at n = 11, so T-026 remains the n = 11 lower-bound frontier.
 
 The older BC329, weighted-atom stages 3–4, and BC303 H-160/H-162 target lanes are
 paused. Their admitted implementations, registrations, and controls remain evidence; no
 exp-158 or exp-160 target receipt exists, so none carries a scientific verdict.
 The current inventory and candidate roadmap are in
-[Research Program Status and Roadmap](#research-program-status-and-roadmap), and
-[agenda-036](packing/campaign/agendas/agenda-036-n11-strategy-reset-roadmap.md) owns the
-queue.
+[Research Program Status and Roadmap](#research-program-status-and-roadmap).
 
 ## Handoff Record
 
@@ -4184,8 +4207,8 @@ in separate tables: their units differ, and the same work can appear in both.
 | Coverage | sessions |
 | --- | ---: |
 | measured | 87 |
-| unmeasured | 50 |
-| **total** | **137** |
+| unmeasured | 51 |
+| **total** | **138** |
 
 <!-- END GENERATED: session-close-report -->
 
