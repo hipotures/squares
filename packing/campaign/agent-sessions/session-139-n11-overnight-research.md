@@ -605,7 +605,7 @@ probe n=11 at or below 3.826.
    at 12.016263; session has only `3969/1000` four-grid so far.
 2. n=17 `23/5` T-019 auto `(32,42,52)` plus `--seed-windows 6` (CLI
    `per_window`; windows5 was 17.042346 with 9 violated). Then windows 7 if
-   still above 17.
+   windows 6 stays above 17 (adds lattice sites; do not re-run windows 5).
 3. If wall remains: n=19 at T-021's recorded `97/20`, seeded from T-020's
    `certificate-24-5.json`, aiming for mass below 19. Not another `24/5`
    covering. Do not invent a new n=19 side.
@@ -637,6 +637,22 @@ uv run --frozen --all-extras --group dev python -m devtools.run_fractional_colge
   --json campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-t019-windows6-run.json \
   --row-log campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-t019-windows6-rows.jsonl \
   --log campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-t019-windows6.log
+```
+
+Windows 7 only if windows 6 did not freeze below 17. Same grids, `--seed-windows 7`:
+
+```bash
+uv run --frozen --all-extras --group dev python -m devtools.run_fractional_colgen \
+  --n 17 --side 23/5 --shrink 9977/10000 --direction-steps 181 \
+  --grid-counts 32,42,52 --scale 4000000 --support-cap 32 \
+  --column-rounds 1 --max-rounds 60 --deadline-seconds 900 \
+  --seed-certificate cases/n17_fractional_certificate/certificate.json --seed-map scale \
+  --seed-windows 7 \
+  --freeze campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-t019-windows7-certificate.json \
+  --freeze-family campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-t019-windows7-family.json \
+  --json campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-t019-windows7-run.json \
+  --row-log campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-t019-windows7-rows.jsonl \
+  --log campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-t019-windows7.log
 ```
 
 ```bash
