@@ -122,25 +122,42 @@ def columns_of(matrix: sparse.csr_matrix) -> int:
     return int(matrix.get_shape()[1])
 
 
+def fold_half_tangent(half_tangent: Fraction) -> Fraction:
+    """``t = 1`` is the same axis-parallel square as ``t = 0``.
+
+    Reflection of an upright square produces half-tangent ``(1 - 0) / (1 + 0) = 1``.
+    Records store that geometry as ``t = 0``; looking up the raw ``t = 1`` image
+    then claims a D4 orbit is missing. The independent ceiling reader folds the
+    same way.
+    """
+
+    return Fraction(0) if half_tangent == 1 else half_tangent
+
+
 def placement_key(p: Placement) -> tuple[Fraction, Fraction, Fraction, Fraction]:
-    return (p.half_tangent, p.centre_x, p.centre_y, p.side)
+    return (fold_half_tangent(p.half_tangent), p.centre_x, p.centre_y, p.side)
 
 
 def d4_placement_images(
     p: Placement, side: Fraction
 ) -> tuple[tuple[Fraction, Fraction, Fraction, Fraction], ...]:
     """The eight D4 images of a placement's geometry, as `cutting.symmetric_placements`
-    spreads them: rotations keep the half-tangent, reflections mirror it."""
+    spreads them: rotations keep the half-tangent, reflections mirror it.
+
+    Axis-parallel squares fold ``t = 1`` to ``t = 0``, so a record that stores
+    every upright placement as ``t = 0`` still closes under reflection.
+    """
 
     x, y = p.centre_x, p.centre_y
     far_x, far_y = side - x, side - y
     t = p.half_tangent
     mirrored = (1 - t) / (1 + t)
     images = [
-        (t, px, py, p.side) for px, py in ((x, y), (far_y, x), (far_x, far_y), (y, far_x))
+        (fold_half_tangent(t), px, py, p.side)
+        for px, py in ((x, y), (far_y, x), (far_x, far_y), (y, far_x))
     ]
     images.extend(
-        (mirrored, px, py, p.side)
+        (fold_half_tangent(mirrored), px, py, p.side)
         for px, py in ((far_x, y), (x, far_y), (y, x), (far_y, far_x))
     )
     return tuple(images)

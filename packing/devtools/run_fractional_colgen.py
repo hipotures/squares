@@ -24,6 +24,7 @@ from dataclasses import dataclass
 from fractions import Fraction
 from pathlib import Path
 
+from sqpack.fractional.ceiling import CeilingCertificate
 from sqpack.fractional.certificate import Certificate, verify
 from sqpack.fractional.colgen import (
     AdaptiveLog,
@@ -31,6 +32,9 @@ from sqpack.fractional.colgen import (
     generate_adaptive,
     site_counts_for_side,
 )
+from sqpack.fractional.cutting import SupportEntry, family_record, symmetric_placements
+from sqpack.fractional.generate import net_half_tangents
+from sqpack.fractional.site_merge import MergeReceipt, merge_near_atoms
 
 # The net every retained fractional certificate carries, and the shrink they
 # are all built at. Defaults rather than constants: a run that changes them is
@@ -63,6 +67,8 @@ class RunSettings:
     seed_map: str = "scale"
     # Sites per ceiling window, see ``window_lattice``; 0 adds none.
     seed_windows: int = 0
+    # Heaviest dual rows kept for pricing; ``None`` keeps every positive row.
+    support_cap: int | None = 32
 
     def as_dict(self) -> dict[str, object]:
         return {
@@ -82,6 +88,7 @@ class RunSettings:
             ),
             "seed_map": self.seed_map,
             "seed_windows": self.seed_windows,
+            "support_cap": self.support_cap,
         }
 
 
@@ -266,6 +273,8 @@ def run(
     verify_serial: bool = False,
     row_log: Path | None = None,
     deadline_seconds: float | None = None,
+    freeze_family: Path | None = None,
+    merge_radius: Fraction | None = None,
 ) -> dict[str, object]:
     started = time.perf_counter()
     deadline = None if deadline_seconds is None else started + deadline_seconds
@@ -290,6 +299,7 @@ def run(
         max_rounds=settings.max_rounds,
         column_rounds=settings.column_rounds,
         rows_per_direction=settings.rows_per_direction,
+        support_cap=settings.support_cap,
         log_path=log_path,
         # Never here. The retention boundary is freeze-then-decide, and an
         # in-memory verdict is not evidence about any file (D-433, D-441).
@@ -301,6 +311,11 @@ def run(
     seconds = time.perf_counter() - started
     if isinstance(timings, RowLog):
         timings.close()
+    merge_receipt: MergeReceipt | None = None
+    if candidate is not None and merge_radius is not None:
+        candidate, merge_receipt = merge_near_atoms(candidate, radius=merge_radius)
+        if log.total_mass is not None:
+            log.total_mass = candidate.total_mass
     frozen: Path | None = None
     least_cell_mass: str | None = None
     if candidate is not None and freeze is not None:
@@ -311,8 +326,24 @@ def run(
         freeze.parent.mkdir(parents=True, exist_ok=True)
         freeze.write_text(certificate_json(candidate, least_cell_mass))
         frozen = freeze
+    family_frozen = _freeze_priced_family(settings, log, freeze_family)
     result = summary(settings, log, candidate, seconds, frozen)
     result["least_cell_mass"] = least_cell_mass
+    result["family_frozen"] = None if family_frozen is None else str(family_frozen)
+    result["priced_support_rows"] = (
+        None if log.priced_support is None else len(log.priced_support)
+    )
+    result["merge"] = (
+        None
+        if merge_receipt is None
+        else {
+            "radius": str(merge_receipt.radius),
+            "atoms_before": merge_receipt.atoms_before,
+            "atoms_after": merge_receipt.atoms_after,
+            "components": merge_receipt.components,
+            "collapsed": merge_receipt.collapsed,
+        }
+    )
     result["seed_sites"] = len(seed)
     result["lp_log"] = [
         {
@@ -328,6 +359,36 @@ def run(
         for timing in timings
     ]
     return result
+
+
+def _freeze_priced_family(
+    settings: RunSettings, log: AdaptiveLog, path: Path | None
+) -> Path | None:
+    """Write the priced dual as a ceiling-family record, or skip if there is none."""
+
+    if path is None or not log.priced_support:
+        return None
+    half_tangents = net_half_tangents(settings.angle_limit, settings.direction_steps)
+    entries = tuple(
+        SupportEntry(direction, half_tangents[direction], x, y, weight)
+        for direction, x, y, weight in log.priced_support
+    )
+    family = CeilingCertificate(
+        settings.n,
+        settings.outer_side,
+        settings.square_side,
+        half_tangents,
+        symmetric_placements(entries, settings.outer_side, settings.square_side),
+    )
+    provenance = {
+        "tool": "devtools.run_fractional_colgen",
+        "settings": settings.as_dict(),
+        "stopped": log.stopped,
+        "support_rows": len(log.priced_support),
+    }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(family_record(family, provenance), indent=1) + "\n")
+    return path
 
 
 def certificate_json(certificate: Certificate, least_cell_mass: str | None) -> str:
@@ -380,8 +441,20 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--column-rounds", type=int, default=8)
     parser.add_argument("--max-rounds", type=int, default=60)
     parser.add_argument("--rows-per-direction", type=int, default=3)
+    parser.add_argument(
+        "--support-cap",
+        type=int,
+        default=32,
+        help="heaviest dual rows kept for pricing; 0 keeps every positive row",
+    )
     parser.add_argument("--log", type=Path, default=None, help="append the round lines here")
     parser.add_argument("--freeze", type=Path, default=None, help="write the candidate here")
+    parser.add_argument(
+        "--freeze-family",
+        type=Path,
+        default=None,
+        help="write the priced dual as a ceiling-family record",
+    )
     parser.add_argument("--json", type=Path, default=None, help="write the run summary here")
     parser.add_argument(
         "--verify-serial",
@@ -418,7 +491,15 @@ def main(argv: list[str] | None = None) -> int:
         default=None,
         help="append one line per LP round here as it lands, so a killed run leaves a table",
     )
+    parser.add_argument(
+        "--merge-radius",
+        type=Fraction,
+        default=None,
+        help="Chebyshev radius for merging near atoms before freeze; omit to keep every site",
+    )
     args = parser.parse_args(argv)
+    if args.support_cap < 0:
+        parser.error("--support-cap must be non-negative")
 
     settings = RunSettings(
         n=args.n,
@@ -435,6 +516,7 @@ def main(argv: list[str] | None = None) -> int:
         seed_certificate=args.seed_certificate,
         seed_map=args.seed_map,
         seed_windows=args.seed_windows,
+        support_cap=None if args.support_cap == 0 else args.support_cap,
     )
     print(json.dumps(settings.as_dict(), indent=1), flush=True)
     result = run(
@@ -444,6 +526,8 @@ def main(argv: list[str] | None = None) -> int:
         verify_serial=args.verify_serial,
         row_log=args.row_log,
         deadline_seconds=args.deadline_seconds,
+        freeze_family=args.freeze_family,
+        merge_radius=args.merge_radius,
     )
     print(round_table_from(result), flush=True)
     print(
@@ -455,6 +539,8 @@ def main(argv: list[str] | None = None) -> int:
         f"atoms: {result['atoms']}\n"
         f"seed sites: {result['seed_sites']}\n"
         f"frozen: {result['frozen']}\n"
+        f"family frozen: {result.get('family_frozen')}\n"
+        f"priced support rows: {result.get('priced_support_rows')}\n"
         f"seconds: {result['seconds']:.1f}",
         flush=True,
     )

@@ -518,6 +518,34 @@ def test_stalled_interval_boxes_stop_before_the_exact_sweep(
     assert "boxes stalled" in capsys.readouterr().out
 
 
+def test_dump_stalls_writes_boxes_and_still_refuses_a_stalled_certificate(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    path = write(tmp_path, lambda _record: None)
+    dump = tmp_path / "stalls.json"
+
+    def fake_interval(
+        _certificate: object,
+        *,
+        enclose: bool = True,
+        stall_log: dict[str, list[list[float]]] | None = None,
+        **_unused: object,
+    ) -> FakeIntervalVerdict:
+        del enclose
+        if stall_log is not None:
+            stall_log["0"] = [[0.0, 1e-13, 0.0, 1e-13]]
+        return FakeIntervalVerdict(directions=(FakeDirection(stalled=1),))
+
+    monkeypatch.setattr(retention, "verify_by_intervals", fake_interval)
+    monkeypatch.setattr(retention, "verify", bomb)
+    assert decide(path, quick=True, dump_stalls=dump) is False
+    assert "boxes stalled" in capsys.readouterr().out
+    record = json.loads(dump.read_text())
+    assert record["stalled"] == 1
+    assert record["directions"]["0"]["count"] == 1
+    assert record["directions"]["0"]["boxes"] == [[0.0, 1e-13, 0.0, 1e-13]]
+
+
 def test_an_interval_decision_error_is_a_refusal_before_exact(
     capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -802,8 +830,9 @@ def test_main_skips_a_duplicate_path_before_any_second_decision(
 ) -> None:
     calls: list[Path] = []
 
-    def record(path: Path, *, quick: bool) -> bool:
+    def record(path: Path, *, quick: bool, dump_stalls: Path | None = None) -> bool:
         assert quick is True
+        assert dump_stalls is None
         calls.append(path)
         return True
 

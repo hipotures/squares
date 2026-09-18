@@ -816,6 +816,20 @@ def test_perturbing_the_coincidence_away_lets_the_same_search_certify() -> None:
     assert verdict.conditions[-1].status == "undecided"
 
 
+def test_collecting_stall_boxes_does_not_change_the_grid_verdict() -> None:
+    """The dump is diagnostic: the same boxes, the same refusal."""
+
+    certificate = _grid_certificate(Fraction(1, 2))
+    stalls: dict[str, list[list[float]]] = {}
+    with_log = verify_by_intervals(certificate, directions=("0",), stall_log=stalls)
+    without = verify_by_intervals(certificate, directions=("0",))
+    assert with_log.directions[0].stalled == without.directions[0].stalled
+    assert with_log.directions[0].status == without.directions[0].status
+    assert with_log.accepted == without.accepted
+    assert stalls["0"]
+    assert len(stalls["0"][0]) == 4
+
+
 # --- Burns's control: the seam the interval route cannot close --------------
 
 

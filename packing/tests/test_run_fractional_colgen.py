@@ -227,6 +227,83 @@ def test_the_row_log_holds_one_line_per_lp_round_as_it_lands(tmp_path: Path) -> 
     assert recorded["seed_windows"] == 2
 
 
+def test_freeze_family_writes_the_priced_dual_as_a_ceiling_record(tmp_path: Path) -> None:
+    """G1: the driver can freeze the dual family, not only the covering candidate."""
+
+    settings = RunSettings(
+        n=1,
+        outer_side=Fraction(2),
+        square_side=Fraction(1),
+        grid_counts=(3,),
+        inset=Fraction(1, 2),
+        angle_limit=Fraction(1, 10),
+        direction_steps=1,
+        scale=1000,
+        column_rounds=1,
+        max_rounds=4,
+        rows_per_direction=2,
+        support_cap=None,
+    )
+    family_path = tmp_path / "family.json"
+    result = run(
+        settings,
+        log_path=None,
+        freeze=None,
+        verify_serial=False,
+        freeze_family=family_path,
+    )
+    if not result["converged"]:
+        raise AssertionError(f"the n=1 control did not converge: {result['stopped']}")
+    assert family_path.exists()
+    record = json.loads(family_path.read_text())
+    assert record["n"] == 1
+    assert record["placements"]
+    assert record["provenance"]["tool"] == "devtools.run_fractional_colgen"
+    assert result["family_frozen"] == str(family_path)
+    assert result["priced_support_rows"] == record["provenance"]["support_rows"]
+    assert len(record["placements"]) == 8 * record["provenance"]["support_rows"]
+    assert result["settings"]["support_cap"] is None
+
+
+def test_support_cap_zero_on_the_command_line_means_every_row(tmp_path: Path) -> None:
+    output = tmp_path / "summary.json"
+    exit_code = main(
+        [
+            "--n",
+            "1",
+            "--side",
+            "2",
+            "--shrink",
+            "1",
+            "--grid-counts",
+            "3",
+            "--inset",
+            "1/2",
+            "--angle-limit",
+            "1/10",
+            "--direction-steps",
+            "1",
+            "--scale",
+            "1000",
+            "--column-rounds",
+            "1",
+            "--max-rounds",
+            "4",
+            "--rows-per-direction",
+            "2",
+            "--support-cap",
+            "0",
+            "--deadline-seconds",
+            "-1",
+            "--json",
+            str(output),
+        ]
+    )
+    assert exit_code == 0
+    record = json.loads(output.read_text())
+    assert record["settings"]["support_cap"] is None
+
+
 def test_a_deadline_stop_leaves_the_table_and_no_candidate(tmp_path: Path) -> None:
     """No clock buys no round, and the run says so rather than converging."""
 
