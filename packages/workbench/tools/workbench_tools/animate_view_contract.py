@@ -1418,7 +1418,7 @@ def motion_controls_and_arrival(session: Session) -> str:
     for label in ("tween", "staticStep"):
         state = scoped[label]
         session.require(
-            state["containerDelayDisabled"] is False
+            state["arrivalDelayDisabled"] is False
             and all(
                 group["inert"] and group["aria"] == "true" and group["disabled"]
                 for group in state["groups"]
@@ -1428,7 +1428,7 @@ def motion_controls_and_arrival(session: Session) -> str:
     physical = scoped["physics"]
     session.require(
         not physical["advancedHidden"]
-        and physical["containerDelayDisabled"] is False
+        and physical["arrivalDelayDisabled"] is False
         and all(
             not group["inert"] and group["aria"] == "false" and not group["disabled"]
             for group in physical["groups"]
@@ -1465,15 +1465,57 @@ def motion_controls_and_arrival(session: Session) -> str:
 
     arrival = session.look("controls/arrival-continuity")
     schedule = arrival["schedule"]
+    delay = arrival["delay"]["effectiveSeconds"]
     session.require(
-        schedule["arrive"] < schedule["containerStart"]
-        and schedule["containerStart"] < schedule["containerEnd"] <= schedule["end"]
+        schedule["moveStart"] == schedule["containerStart"]
+        and schedule["containerStart"] < schedule["containerEnd"] < schedule["arrive"]
+        and abs(schedule["arrive"] - schedule["containerEnd"] - delay) < 1e-9
+        and schedule["arrive"] < schedule["arrived"] <= schedule["end"]
         and arrival["jump"] <= 0.01,
-        f"the arriving square or delayed container is discontinuous: {arrival}",
+        f"the resize, arrival delay and continuous arrival are out of order: {arrival}",
     )
-    return (
-        "physical controls are scoped; changes restart; square-first arrival stays continuous"
+    # Drawn, not only scheduled: nothing of the square shows until the delay after the resize
+    # has passed, it is never scaled, and its opacity only rises.
+    samples = arrival["samples"]
+    opacities = [opacity for _, opacity, _ in samples]
+    session.require(
+        all(opacity == 0 for t, opacity, _ in samples if t <= schedule["arrive"])
+        and not any(scaled for _, _, scaled in samples)
+        and all(b >= a for a, b in pairwise(opacities))
+        and opacities[-1] > 0.99,
+        f"the new square does not fade in at full size after the delay: {samples}",
     )
+    trip = session.look("controls/arrival-delay-round-trip")
+    initial, moved = trip["initial"], trip["moved"]
+
+    def gap(read: dict[str, Any]) -> float:
+        """The drawn delay: from the end of the resize to the square starting to fade in."""
+        return read["schedule"]["arrive"] - read["schedule"]["containerEnd"]
+
+    session.require(
+        initial["delay"]["fraction"] == initial["delay"]["dflt"] == 0.2
+        and initial["delay"]["bounds"] == [0, 0.6]
+        and initial["delay"]["direction"] == "resize first"
+        and initial["input"] == {"value": "0.2", "min": "0", "max": "0.6", "step": "0.05"}
+        and abs(gap(initial) - initial["delay"]["effectiveSeconds"]) < 1e-9,
+        f"the arrival delay does not open at its default: {initial}",
+    )
+    session.require(
+        moved["delay"]["fraction"] == 0.4
+        and moved["input"]["value"] == "0.4"
+        and abs(gap(moved) - moved["delay"]["effectiveSeconds"]) < 1e-9
+        and abs(moved["delay"]["effectiveSeconds"] - 2 * initial["delay"]["effectiveSeconds"])
+        < 1e-9
+        and abs(moved["duration"] - initial["duration"] - (gap(moved) - gap(initial))) < 1e-9
+        and moved["schedule"]["containerEnd"] == initial["schedule"]["containerEnd"]
+        and moved["readout"] == f"{moved['delay']['effectiveSeconds']:.2f} s · after resize",
+        f"moving the arrival-delay control did not move the square's arrival: {trip}",
+    )
+    session.require(
+        (trip["clamped"], trip["ignored"], trip["lowest"]) == (0.6, 0.6, 0),
+        f"the arrival delay is not clamped to its bounds: {trip}",
+    )
+    return "physical controls are scoped; changes restart; resize, delay, then a full-size fade"
 
 
 def _grid(axes: list[list[float]]) -> list[list[float]]:

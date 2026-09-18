@@ -75,8 +75,8 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
                 page.locator(f"#t-{key}").input_value()
                 for key in ("dwell", "move", "correct", "settle")
             ]
-            == ["0.6", "0.5", "0.4", "0.3"],
-            "the timing inputs do not show the 0.6 / 0.5 / 0.4 / 0.3 beat",
+            == ["0.6", "0.5", "0.2", "0.3"],
+            "the timing inputs do not show the 0.6 / 0.5 / 0.2 / 0.3 beat",
         )
 
         # 6 -> 7 fills the last row of a 3 x 3 grid; 4 -> 5 tilts its squares.
@@ -143,12 +143,16 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
             f"the simple-transition speed-up changed the physics work: {work}",
         )
 
-        # The box on the stage: black on its way, green once locked at the best known side,
-        # with a black trace where it just was and a triangle over the gap bar at its side. On
-        # 10 -> 11 the box rests at 3.707 with 9 -> 10's trace outside it at 4. The new
-        # square appears first; after the configured lead the box grows to 4, leaving and
-        # then clearing a trace at 3.707, before it settles at 3.877 with a trace outside
-        # at 4. 6 -> 7 is a grid fill, where the box never changes size.
+        # The box on the stage: the frames' grey on its way, green once locked at the best known
+        # side, with the lightest grey trace where it just was and a triangle over the gap bar
+        # at its side (the owner, 2026-09-17: every frame one width, and only the lock is a
+        # colour change). Both colours are the stylesheet's `--scene-frame-*`, which the probe
+        # compares the drawn stroke with, so this asks for the token rather than for a hex. On
+        # 10 -> 11 the box rests at 3.707 with 9 -> 10's trace outside it at 4. As the move
+        # opens the box grows to 4, leaving and then clearing a trace at 3.707; the new square
+        # shows only once the arrival delay after that has passed, and the step settles at
+        # 3.877 with a trace outside at 4. 6 -> 7 is a grid fill, where the box never changes
+        # size.
         def at(seconds: float) -> tuple[float, float, float]:
             call("seek", seconds)
             drawn = page.evaluate(probe("stage/box-state"))
@@ -171,29 +175,50 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
             f"n = 10 does not rest at 3.707 inside the last step's trace at 4: {rest}",
         )
         require(locked() == (True, True), f"n = 10 at rest is not locked green: {locked()}")
-        lead = at((step["arrive"] + step["containerStart"]) / 2)
-        arriving = float(
-            page.locator('#squares g[data-identity="11"]').get_attribute("opacity") or "nan"
-        )
+
+        def arriving() -> float:
+            return float(
+                page.locator('#squares g[data-identity="11"]').get_attribute("opacity") or "nan"
+            )
+
         require(
-            step["containerStart"] > step["arrive"]
-            and 0 < arriving <= 1
-            and abs(lead[1] - 3.707106781) < 1e-6,
-            f"the arriving square does not visibly lead the delayed box resize: "
-            f"{lead}, opacity {arriving}, {step}",
+            step["containerStart"] == step["moveStart"]
+            and step["containerEnd"] < step["arrive"],
+            f"the box resize does not open the move ahead of the new square: {step}",
+        )
+        # Half way through the resize the box is on its way out (a physical container can
+        # breathe past 4 before it settles there) and nothing has arrived.
+        opening = at((step["containerStart"] + step["containerEnd"]) / 2)
+        require(
+            opening[1] > 3.707106781 + 1e-6 and arriving() == 0,
+            f"the box is not growing, alone, half way through its resize: "
+            f"{opening}, new square at {arriving()}, {step}",
         )
         grown = at(step["containerEnd"])
         moving = float(page.locator("#container").get_attribute("width") or "nan")
         require(
             abs(grown[0] - 3.707106781) < 1e-6
             and abs(grown[1] - max(4, moving)) < 1e-9
-            and grown[2] == 1,
-            f"the box did not grow to 4 over a trace of where it was: {grown}",
+            and grown[2] == 1
+            and arriving() == 0,
+            f"the box did not grow to 4 over a trace of where it was before the new square "
+            f"showed: {grown}, new square at {arriving()}",
         )
+        waiting = at((step["containerEnd"] + step["arrive"]) / 2)
         require(
-            locked() == (False, False)
-            and page.evaluate(probe("stage/box-state"))["boxStroke"] == "#000000",
-            f"the growing box or its pointer is not black: {locked()}",
+            abs(waiting[1] - grown[1]) < 1e-9 and arriving() == 0,
+            f"the new square shows during the arrival delay: {waiting}, {arriving()}",
+        )
+        at((step["arrive"] + step["arrived"]) / 2)
+        require(
+            0 < arriving() < 1,
+            f"the new square is not fading in after the delay: {arriving()}, {step}",
+        )
+        growing = page.evaluate(probe("stage/box-state"))
+        require(
+            locked() == (False, False) and growing["grey"],
+            f"the growing box or its pointer is not the frames' grey: {locked()}, "
+            f"{growing['boxStroke']}",
         )
         clear_end = min(
             max(step["moveEnd"], step["containerEnd"]),

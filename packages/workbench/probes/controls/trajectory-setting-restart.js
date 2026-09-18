@@ -5,7 +5,7 @@
   const before = api.state();
   const beforeLaw = api.law();
   const beforeResponse = api.motionResponse();
-  const beforeDelay = api.containerDelay();
+  const beforeDelay = api.arrivalDelay();
   const moving = api
     .pairs()
     .find((pair) => pair.kind !== "prefix" && pair.kind !== "shared-picture");
@@ -38,9 +38,9 @@
     const response = api.motionResponse();
     api.setMotionResponse({ speedLimit: response.speedLimit === 10 ? 11 : 10 });
   });
-  check("container delay", () => {
-    const delay = api.containerDelay();
-    api.setContainerDelay(delay.fraction === 0.2 ? 0.25 : 0.2);
+  check("arrival delay", () => {
+    const delay = api.arrivalDelay();
+    api.setArrivalDelay(delay.fraction === 0.2 ? 0.25 : 0.2);
   });
   check("phase", () => {
     const next = api.phases().find((phase) => phase !== api.state().phase);
@@ -53,7 +53,7 @@
   api.setLaw(beforeLaw);
   api.setAnneal(before.anneal);
   api.setMotionResponse(beforeResponse);
-  api.setContainerDelay(beforeDelay.fraction);
+  api.setArrivalDelay(beforeDelay.fraction);
   api.setPhase(before.phase);
   api.setStepN(before.n + 1);
   api.setStyle(before.style);

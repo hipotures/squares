@@ -242,17 +242,27 @@ session:
     The pipeline reconciliation reached a durable stopping point, but exact final-source
     certification, hosted wall evidence, independent review, and merge remain open.
   next_action: >-
-    Complete think-97we by satisfying every pending closeout check on the same final
-    source, as carried forward by Session 137, then resume BC-343 under think-ufmk without
-    changing its scientific claim or allocating exp-161 from this block.
-  certification_pending: think-97we
+    think-97we closed when PR 188 and PR 185 merged, and the pending closeout checks it
+    carried -- as carried forward by Session 137 -- now sit under think-g4n9: hold both
+    pull-request walls at or under 180 s over the declared run of consecutive exact-head
+    hosted runs, then switch the wall check back to enforcing. Then resume BC-343 under
+    think-ufmk without changing its scientific claim or allocating exp-161 from this
+    block.
+  certification_pending: think-g4n9
 ---
 # Session 136: CI Topology Reconciliation
 
 This stopped pipeline-improvement session records the reconciled CI topology, budgeting,
 validation, and developer validation lanes.
-Its certification debt remains under `think-97we`; none of the pending receipts is
-represented as a pass.
+Its certification debt remains open; none of the pending receipts is represented as a
+pass.
+
+**Certification moved, 2026-09-17.** This record’s `certification_pending` named
+`think-97we`, which closed when PR 188 and PR 185 merged.
+A closed bead owes nothing, so the marker now names `think-g4n9`, the open bead that
+still carries this work’s debt: bringing both pull-request walls under 180 s and
+switching the wall check back to enforcing.
+Nothing else in this record changes, and none of its pending receipts becomes a pass.
 [Session 137](session-137-ci-topology-continuation-recovery.md) records the continuation
 and crash recovery after this stop, and later facts about BC-355 belong there.
 The final closeout check must confirm that the n=11 bracket, H-163, and the frontier

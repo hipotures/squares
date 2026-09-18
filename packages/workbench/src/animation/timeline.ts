@@ -19,28 +19,41 @@ export interface TimelineConfiguration {
   /** Play simple transitions, every phase, at `SIMPLE_TRANSITION_SPEED`. */
   fastSimple?: boolean;
   /**
-   * Fraction of the moving span between the new square first appearing and the container starting
-   * to resize. The square is always first; the default zero starts the resize with its appearance.
+   * Fraction of the moving span between the container finishing its resize and the new square
+   * starting to fade in. The resize is always first; the default zero fades the square in as soon
+   * as the resize completes.
    */
-  containerDelay?: number;
+  arrivalDelay?: number;
   timing: AtlasTiming;
   continuous: ContinuousTiming;
   anneal: number;
   phase: AtlasPhase;
+  /** In the illustrated staged phases, the share of the moving span block motion gives up. */
   arrivalFraction: number;
+  /** The share of the moving span the new square takes to fade in, in every phase. */
   newFraction: number;
   rollMax: number;
 }
 
+/** The share of the moving span the container takes to resize, whatever the delay or phase. */
+export const CONTAINER_RESIZE_FRACTION = 0.3;
+
+/**
+ * Every instant is in seconds from the pair's start, and they are ordered
+ * `moveStart = containerStart <= containerEnd <= arrive <= arrived <= moveEnd <= end`, with
+ * `blocksStart <= blocksEnd <= moveEnd`. The new square starts to fade in at least the arrival
+ * delay after the resize completes, and exactly then unless a phase holds it for block motion.
+ */
 export interface PairSchedule {
   moveStart: number;
   moveEnd: number;
   end: number;
+  /** When the new square starts to fade in, and when it is fully in. */
   arrive: number;
   arrived: number;
-  /** When the container starts to resize, at or after `arrive`. */
+  /** When the container starts to resize: the start of the move, before the new square shows. */
   containerStart: number;
-  /** When the container resize completes; a late start may use the first half of settle. */
+  /** When the container resize completes, which is the arrival delay before `arrive` or earlier. */
   containerEnd: number;
   blocksStart: number;
   blocksEnd: number;
@@ -161,23 +174,27 @@ export function timingDuration(timing: AtlasTiming): number {
   return finiteNonnegative(duration, "total duration");
 }
 
-function stagedPhysicalArrivalDuration(
+/** A physical style simulates a staged step's bodies over the whole moving span. */
+function isStagedPhysicalPair(
   configuration: TimelineConfiguration,
   index: number,
   style: AtlasStyle,
-  timing: AtlasTiming,
-): number {
-  if (
-    style === "tween" ||
-    isStillPair(configuration, index) ||
-    (configuration.phase !== "add-then-move" && configuration.phase !== "move-then-add")
-  ) {
-    return 0;
-  }
-  const arrivalFraction = fraction(configuration.arrivalFraction, "arrival fraction");
-  return (timing.move + timing.correct) * arrivalFraction;
+): boolean {
+  return (
+    style !== "tween" &&
+    !isStillPair(configuration, index) &&
+    (configuration.phase === "add-then-move" || configuration.phase === "move-then-add")
+  );
 }
 
+/**
+ * The owner's order of 2026-09-17: the container resizes, which shrinks the picture; the arrival
+ * delay passes; then the new square fades in at its final size. Every duration is a share of the
+ * moving span, so the speed-up and the beat scale all of them together. Block motion keeps its
+ * phase: before the square in `move-then-add`, after it in `add-then-move`, and across the whole
+ * span in the unstaged phases, whose square finishes with the blocks unless the delay holds it.
+ * The step grows by whatever the resize and the delay add in front of the square.
+ */
 function scheduleForTiming(
   configuration: TimelineConfiguration,
   index: number,
@@ -185,55 +202,37 @@ function scheduleForTiming(
   timing: AtlasTiming,
 ): PairSchedule {
   const span = timing.move + timing.correct;
-  const stagedArrival = stagedPhysicalArrivalDuration(configuration, index, style, timing);
   const moveStart = timing.dwell;
-  const moveEnd = moveStart + span + stagedArrival;
-  const nominalEnd = moveEnd + timing.settle;
   const arrivalFraction = fraction(configuration.arrivalFraction, "arrival fraction");
-  const newFraction = fraction(configuration.newFraction, "new fraction");
-  const workStart = moveStart;
-  const work = span;
+  const fade = span * fraction(configuration.newFraction, "new fraction");
+  const delay = span * fraction(configuration.arrivalDelay ?? 0, "arrival-delay fraction");
+  const containerStart = moveStart;
+  const containerEnd = containerStart + span * CONTAINER_RESIZE_FRACTION;
+  const earliestArrival = containerEnd + delay;
+  // The illustrated staged phases have always given the arrival a share of the span; a physical
+  // style simulates its bodies over all of it.
+  const stagedBlocks = isStagedPhysicalPair(configuration, index, style)
+    ? span
+    : span * (1 - arrivalFraction);
   let arrive: number;
-  let arrived: number;
   let blocksStart: number;
   let blocksEnd: number;
-  if (configuration.phase === "add-then-move" && stagedArrival > 0) {
-    arrive = workStart;
-    arrived = workStart + stagedArrival;
-    blocksStart = arrived;
-    blocksEnd = blocksStart + span;
-  } else if (configuration.phase === "move-then-add" && stagedArrival > 0) {
-    blocksStart = workStart;
-    blocksEnd = workStart + span;
-    arrive = blocksEnd;
-    arrived = arrive + stagedArrival;
-  } else if (configuration.phase === "add-then-move") {
-    arrive = workStart;
-    arrived = workStart + work * arrivalFraction;
-    blocksStart = arrived;
-    blocksEnd = moveEnd;
+  if (configuration.phase === "add-then-move") {
+    arrive = earliestArrival;
+    blocksStart = arrive + fade;
+    blocksEnd = blocksStart + stagedBlocks;
   } else if (configuration.phase === "move-then-add") {
-    blocksStart = workStart;
-    blocksEnd = workStart + work * (1 - arrivalFraction);
-    arrive = blocksEnd;
-    arrived = moveEnd;
+    blocksStart = moveStart;
+    blocksEnd = moveStart + stagedBlocks;
+    arrive = Math.max(blocksEnd, earliestArrival);
   } else {
-    blocksStart = workStart;
-    blocksEnd = moveEnd;
-    arrive = workStart + work * (1 - newFraction);
-    arrived = moveEnd;
+    blocksStart = moveStart;
+    blocksEnd = moveStart + span;
+    arrive = Math.max(blocksEnd - fade, earliestArrival);
   }
-  const containerStart = Math.min(
-    moveEnd,
-    arrive + span * fraction(configuration.containerDelay ?? 0, "container-delay fraction"),
-  );
-  // Delay controls when resizing begins, not how quickly it happens. Keep its duration fixed as the
-  // delay moves through the beat so adjacent values cannot collapse the resize and then jump to a
-  // longer animation at the move boundary. A late resize extends the pair beyond its nominal end;
-  // choosing a zero settle never turns positive-duration motion into an instantaneous box jump.
-  const containerResizeDuration = span * 0.3;
-  const containerEnd = containerStart + containerResizeDuration;
-  const end = Math.max(nominalEnd, containerEnd);
+  const arrived = arrive + fade;
+  const moveEnd = Math.max(blocksEnd, arrived);
+  const end = moveEnd + timing.settle;
   return {
     moveStart,
     moveEnd,

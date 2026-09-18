@@ -169,7 +169,7 @@ alone is not full pre-merge evidence.
 | `--edit` | contributor, in the edit loop | 48 of 80 | 240 s | 59.4 s |
 | `--push` | contributor, once before a push — the edit tier plus tests reachable from the diff (`--since`) | varies with the diff | 1800 s | about a minute for a narrow code change; an implicitly configured broad diff selects the whole suite and assigns one outer job so pytest can use the host, see below |
 | `--fast` | contributor, at a block boundary; the union of the seven tiers below | 69 of 80 | 600 s | record cleared 2026-09-07 when the corpus widened; 229.1 s locally, only the ceiling applies |
-| `--checks` | **CI, on every pull request**, in the `validate` job | 50 of 80 | 189 s | interim 94.65 s on reconciliation head `2f619303`; refresh from the final exact head |
+| `--checks` | **CI, on every pull request**, in the `validate` job | 50 of 80 | 140 s | 75.67 s, the geometric mean of 90.19 s and 63.48 s on PR 185 heads `e8c79fe4` and `80a5976f`, the first two readings with `exact verification` concurrent |
 | `--frontend` | **CI, on every pull request**, in the `frontend` job, concurrently | 3 of 80 | 150 s | 85.25 s on the three-step, two-worker topology, the mean of two readings |
 | `--typecheck` | **CI, on every pull request**, in the `typecheck` job, concurrently | 1 of 80 | 130 s | 67.26 s on CI, the mean of two readings |
 | `--geometry` | **CI, on every pull request**, in the `geometry` job, concurrently | 9 of 80 | 180 s | 102.73 s on the predecessor topology, the mean of seven readings |
@@ -950,6 +950,14 @@ library module reports through `logging`. Python under `packages/workbench/` and
 hand-written skill assets under `.agents/skills` are also under the same two floors.
 Comments explain non-obvious intent, invariants, units, evidence limits, and rejected
 alternatives—not a line-by-line translation of the code.
+
+The workbench’s stylesheet is under a design contract as well as Biome.
+Its design values live only in the token block at the top of
+`packages/workbench/assets/workbench.css`, and inline style writes are counted.
+`npm run check` enforces both, along with WCAG AA contrast.
+`check_frontend` measures the page’s shared layout at three viewports.
+See the package README’s [Design system](packages/workbench/README.md#design-system)
+section before changing either.
 
 Markdown is owned by Flowmark at repository root.
 Durable documentation follows the common documentation guidelines and carries their

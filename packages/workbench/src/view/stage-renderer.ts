@@ -133,6 +133,16 @@ export function renderStage(targets: StageTargets, frame: PaintedSceneFrame): vo
   targets.ghost.setAttribute("opacity", String(presentation.ghostOpacity));
 }
 
+/**
+ * The container border a portable illustration draws, in the frames' grey.
+ *
+ * The one place the stage's `--scene-frame` is written outside the stylesheet, because an
+ * exported SVG carries no stylesheet to read it from. The width stays in scene units: the
+ * stage's frames share `--scene-frame-width` in stage pixels, which an illustration rendered at
+ * whatever size its viewer gives it has no equivalent of.
+ */
+const EXPORT_FRAME = "#7d8590";
+
 /** A portable illustration uses the same view and square transforms as the live stage. */
 export function sceneSvg(frame: PaintedSceneFrame): string {
   validatePaintedScene(frame);
@@ -145,5 +155,5 @@ export function sceneSvg(frame: PaintedSceneFrame): string {
     mark === null
       ? ""
       : `<g transform="${squareTransform(mark)}" opacity="${mark.opacity}"><rect x="-.5" y="-.5" width="1" height="1" fill="none" stroke="#cc3344" stroke-width="${mark.strokeWidth}"/></g>`;
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox(frame.scene)}" role="img" aria-label="Packing illustration for n = ${frame.scene.n}"><g transform="scale(1 -1)"><rect width="${frame.scene.containerSide}" height="${frame.scene.containerSide}" fill="none" stroke="#444444" stroke-width=".01"/>${rectangles.join("")}${outline}</g></svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox(frame.scene)}" role="img" aria-label="Packing illustration for n = ${frame.scene.n}"><g transform="scale(1 -1)"><rect width="${frame.scene.containerSide}" height="${frame.scene.containerSide}" fill="none" stroke="${EXPORT_FRAME}" stroke-width=".01"/>${rectangles.join("")}${outline}</g></svg>`;
 }

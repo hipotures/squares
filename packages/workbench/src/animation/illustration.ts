@@ -1,5 +1,6 @@
 import type { AtlasPhase } from "../api/workbench-api.js";
 import type { CorpusBlock } from "../data/corpus.js";
+import { newSquareOpacity } from "../motion-settings.ts";
 import type { SceneFrame, SceneMark, SceneSquare } from "../view/scene-types.js";
 import { type PairSchedule, phaseProgress, ramp } from "./timeline.ts";
 
@@ -92,7 +93,8 @@ export function illustrationFrame(input: IllustrationInput): SceneFrame {
   const { schedule, seconds } = input;
   const progress = ramp(seconds, schedule.blocksStart, schedule.blocksEnd);
   const phased = phaseProgress(input.phase, progress);
-  const arrival = easeOut(ramp(seconds, schedule.arrive, schedule.arrived));
+  // The new square fades in where it ends up and at its own size: opacity is all that changes.
+  const arrival = newSquareOpacity(ramp(seconds, schedule.arrive, schedule.arrived));
   const containerGrowth = phaseProgress(
     "simultaneous",
     ramp(seconds, schedule.containerStart, schedule.containerEnd),
@@ -110,7 +112,7 @@ export function illustrationFrame(input: IllustrationInput): SceneFrame {
     y: input.arriving.pose[1],
     angleDegrees: input.arriving.pose[2],
     opacity: arrival,
-    scale: arrival > 0 ? lerp(0.8, 1, arrival) : 1,
+    scale: 1,
   };
   const settled = easeOut(ramp(seconds, schedule.moveEnd, schedule.end));
   const mark: SceneMark | null =

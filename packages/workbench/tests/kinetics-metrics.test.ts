@@ -190,19 +190,21 @@ test("the CLI makes a static step's nonphysical behavior explicit", () => {
     anneal: "not_applicable",
     timing: { dwell: 0, move: 0.2, correct: 0.1, settle: 0 },
     solverDurationSeconds: 0.3,
-    presentationDurationSeconds: 0.3,
+    // The resize (0.09 s), the default arrival delay (0.06 s) and the fade (0.12 s) come before the
+    // static step's blocks (0.21 s), so the presentation is longer than the solver span.
+    presentationDurationSeconds: 0.48,
     instance: 2,
     transition: { from: 1, to: 2, pairIndex: 0 },
     seed: 17,
     effectiveSeed: "not_applicable",
     stepsPerSecond: "not_applicable",
     presentationSampleRate: 60,
-    containerDelayFraction: 0.2,
+    arrivalDelayFraction: 0.2,
     integrationSubsteps: "not_applicable",
     steps: "not_applicable",
-    presentationSteps: 18,
+    presentationSteps: 29,
   });
-  assert.equal(report.frames.length, 19);
+  assert.equal(report.frames.length, 30);
   assert.equal(report.frames[0].poses.length, 2);
   assert.equal(report.frames[0].poses[1].active, false);
   const firstVisible = report.frames.find(
@@ -212,12 +214,13 @@ test("the CLI makes a static step's nonphysical behavior explicit", () => {
   assert.ok(firstVisible !== undefined);
   const arriving = firstVisible.poses[1];
   assert.ok(arriving !== undefined);
-  assert.ok(arriving.size >= 0.8 && arriving.size < 1);
-  assert.equal(report.summary.samples.frames, 19);
+  // The new square fades in at full size; it used to be drawn from 0.8 and grown.
+  assert.equal(arriving.size, 1);
+  assert.equal(report.summary.samples.frames, 30);
   assert.equal(report.summary.translation.appearances.count, 1);
   assert.equal(report.summary.endpoint.maximumCenterError, 0);
   assert.equal(report.determinism.identical, true);
-  assert.equal(report.determinism.comparedFrames, 19);
+  assert.equal(report.determinism.comparedFrames, 30);
   assert.equal(report.work.storedSteps, "not_applicable");
   assert.equal(report.work.integrationSteps, 0);
   assert(report.runtime.wallMilliseconds >= 0);

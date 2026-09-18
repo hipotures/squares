@@ -1,0 +1,46 @@
+/* A positive control for the raw-value policy: tokens, and nothing outside them but var(), zero and
+   the allowed keywords. The quoted family names hold a semicolon and a brace, which a reader that
+   ignored strings would split on. */
+:root {
+  --ink: #17202a;
+  --muted: #5c6673;
+  --paper: #fff;
+  --space-1: 4px;
+  --space-2: 8px;
+  --radius: 4px;
+  --leading: 1.4;
+  --layer-overlay: 10;
+  --duration: 150ms;
+  --easing: cubic-bezier(0.2, 0, 0, 1);
+  --serif: "Semi; Colon {Serif}", "PT Serif", serif;
+}
+
+.card {
+  margin: 0;
+  padding: var(--space-2) var(--space-1);
+  gap: calc(var(--space-1) + var(--space-2));
+  margin-inline: calc(var(--space-2) * -1);
+  padding-block: calc(var(--space-2) / 2);
+  color: var(--ink, var(--muted, #000));
+  background: transparent;
+  border: 0 solid currentColor;
+  border-radius: var(--radius);
+  font-family: var(--serif, "Odd; Name}", serif);
+  line-height: var(--leading);
+  transition: opacity var(--duration) var(--easing);
+  z-index: var(--layer-overlay);
+  box-shadow: none;
+}
+
+.card:hover {
+  --card-edge: var(--ink);
+  border-color: var(--card-edge);
+  outline: none;
+  font-style: italic;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+}

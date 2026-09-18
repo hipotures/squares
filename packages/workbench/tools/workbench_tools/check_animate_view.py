@@ -446,8 +446,18 @@ def headline_roll(session: Session) -> str:
     return "`n =` holds while the number crossfades in place"
 
 
-#: The elements whose text the stage may draw: the gap bar, the facts panel and the headline.
-DRAWN_TEXT_OWNERS = ("gapbar", "facts-a", "facts-b", "numeral-static", "numeral-a", "numeral-b")
+#: The elements whose text the stage may draw: the gap bar, the facts panel, the headline, and
+#: the repository's address in the stage's bottom right (the owner, 2026-09-17), which is on the
+#: stage in every mode so that a captured frame carries it.
+DRAWN_TEXT_OWNERS = (
+    "gapbar",
+    "facts-a",
+    "facts-b",
+    "numeral-static",
+    "numeral-a",
+    "numeral-b",
+    "stage-attribution",
+)
 
 
 def stage_says_only_facts(session: Session) -> str:
@@ -477,9 +487,12 @@ def stage_says_only_facts(session: Session) -> str:
                     session.require(
                         not strays, f"{label}: the stage draws other text: {strays[:4]}"
                     )
+                    # Three slots a layer at the least -- PROVEN's head, the bound and the
+                    # badges -- and two more where anything is open, so n = 16 (nothing open)
+                    # beside 17 draws eight.
                     lines = session.look("facts/slot-lines")
                     session.require(
-                        len(lines) >= 10 and all(slot["lines"] <= 1 for slot in lines),
+                        len(lines) >= 6 and all(slot["lines"] <= 1 for slot in lines),
                         f"{label}: a facts slot draws more than one line: "
                         f"{[slot for slot in lines if slot['lines'] > 1]}",
                     )

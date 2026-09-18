@@ -540,10 +540,12 @@ session:
     checkpoint, green aggregates on the fix commit, the merge, and the first Pages
     deployment remain open.
   next_action: >-
-    Complete think-97we by satisfying the remaining closeout checks on the final head,
-    then resume BC-343 under think-ufmk without changing its scientific claim or
-    allocating exp-161 from this block.
-  certification_pending: think-97we
+    think-97we closed when PR 188 and PR 185 merged, and the remaining closeout debt on
+    the final head now sits under think-g4n9: hold both pull-request walls at or under
+    180 s over the declared run of consecutive exact-head hosted runs, then switch the
+    wall check back to enforcing. Then resume BC-343 under think-ufmk without changing
+    its scientific claim or allocating exp-161 from this block.
+  certification_pending: think-g4n9
 ---
 # Session 137: CI Topology Continuation and Crash Recovery
 
@@ -551,6 +553,13 @@ This stopped record covers BC-355 from Session 136’s recorded stop at 18:58:15
 2026-09-16 to the end of the Claude recovery on 2026-09-17. It is written after the fact
 from Git history, `tbd`, and the retained agent logs, so every phase is marked
 retrospective and carries no invented deadline or budget.
+
+**Certification moved, 2026-09-17.** This record’s `certification_pending` named
+`think-97we`, which closed when PR 188 and PR 185 merged.
+A closed bead owes nothing, so the marker now names `think-g4n9` — already the owner of
+the advisory pull-request walls throughout this record — as the open bead that still
+carries the debt: both walls under 180 s, and the wall check switched back to enforcing.
+Nothing else in this record changes, and none of its pending receipts becomes a pass.
 The 180-minute budget is Session 136’s block budget carried forward; the continuation
 alone ran nearly two hours past Session 136’s 20:23:12Z deadline.
 The block changes no mathematical result, certificate, frontier entry, or experiment
