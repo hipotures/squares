@@ -289,6 +289,30 @@ values:
       only raise it. Retained as a measurement of where the loop stood. The prior
       six-decimal display 9.049861 rounded the exact lower bound upward; this record now
       preserves the exact rational and its approximate decimal.
+  - n: 11
+    side: '77/20'
+    side_decimal: '3.85'
+    objective: '11.456576'
+    site_set: t025-auto-25-34-42-60
+    sites: 7705
+    rows: 7194
+    rounds: 26
+    converged: true
+    stop_reason: >-
+      The row loop converged at LP round 26 (violated 0) at 11.456576 on 7705 sites
+      / 1014 orbits, including 584 T-025 seed sites scaled to 77/20. It crossed eleven
+      at round 2 (11.000000). Column generation then added one orbit and stopped; wall
+      196.0 s.
+    least_covered_mass: '1'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-77-20-t025-auto60-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 T-025-seeded auto-plus-60 probe at 77/20, a different site set from
+      BC-200's vertex-seeded unconverged 11.227631. Above eleven on a converged loop, so
+      this site set carries no certificate; the side is not barred. No covering freeze
+      was retained.
   - n: 12
     side: '79/20'
     side_decimal: '3.95'
@@ -398,6 +422,29 @@ values:
       at 117/25. Unconverged mass 17.331710 on 5484 sites / 716 orbits refutes this
       site set only; remaining rows can only raise it. Adding sites can still lower
       the covering value, so 23/5 is not barred. No covering freeze was retained.
+  - n: 18
+    side: '467/100'
+    side_decimal: '4.67'
+    objective: '18.000000'
+    site_set: auto-32-43-53
+    sites: 5669
+    rows: 16426
+    rounds: 57
+    converged: false
+    stop_reason: >-
+      The 600 s deadline stopped the row loop after 57 LP rounds with 336 placements
+      still violated. The objective crossed 18 at round 15 (18.000000) and held that
+      value through the stop.
+    least_covered_mass: '0.973636'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-467-100-grid-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 auto-grid probe at 467/100, just below the historical n=18 probes at
+      117/25. Unconverged mass 18.000000 on 5669 sites / 763 orbits cannot confirm;
+      remaining rows can only raise it. Adding sites can still lower the covering
+      value, so 467/100 is not barred. No covering freeze was retained.
   - n: 18
     side: '117/25'
     side_decimal: '4.68'
@@ -701,6 +748,29 @@ values:
       Same auto grids (26, 35, 43) and scale 4,000,000 as BC-206. Above twelve on a
       converged loop, so this site set carries no certificate at 3.969; adding sites
       can only lower it, so the side is not barred. No covering freeze was retained.
+  - n: 12
+    side: '3969/1000'
+    side_decimal: '3.969'
+    objective: '12.118036'
+    site_set: t017-seed-auto-26-35-43
+    sites: 5833
+    rows: 8148
+    rounds: 29
+    converged: false
+    stop_reason: >-
+      The 600 s deadline stopped the row loop after 29 LP rounds with 186 placements
+      still violated. The objective had already crossed 12 at round 8 (12.003410).
+    least_covered_mass: '0.993700'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n12-3969-1000-t017-seed-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 T-017-seeded auto-grid probe at 3969/1000. The seed dropped the
+      restricted optimum from the unseeded 12.363498 to 12.118036. Unconverged mass
+      still above twelve refutes this site set only; remaining rows can only raise it.
+      Adding sites can still lower the covering value, so 3969/1000 is not barred. No
+      covering freeze was retained.
   - n: 12
     side: '397/100'
     side_decimal: '3.97'

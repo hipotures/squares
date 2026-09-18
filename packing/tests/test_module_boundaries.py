@@ -409,12 +409,8 @@ def test_ci_jobs_fetch_provenance_history_and_key_the_uv_cache_from_the_lock() -
     assert 'wait "$playwright_pid"' in install_run
     assert 'test "$npm_status" -eq 0' in install_run
     assert 'test "$playwright_status" -eq 0' in install_run
-    assert install_run.index("npm ci --ignore-scripts &") < install_run.index(
-        'wait "$npm_pid"'
-    )
-    assert install_run.index("playwright install") < install_run.index(
-        'wait "$playwright_pid"'
-    )
+    assert install_run.index("npm ci --ignore-scripts &") < install_run.index('wait "$npm_pid"')
+    assert install_run.index("playwright install") < install_run.index('wait "$playwright_pid"')
     frontend_names = [_mapping(step).get("name") for step in frontend_steps]
     assert frontend_names.index(install["name"]) < frontend_names.index(frontend_step["name"])
     typecheck_job = _mapping(jobs["typecheck"])

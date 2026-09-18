@@ -416,6 +416,22 @@ follow-on. Tests: `test_workbench_chromium_starts_ahead_of_the_other_frontend_st
 frontend install overlap in `test_module_boundaries.py`,
 `test_print_layout_runs_the_overflow_self_check_beside_the_page`.
 
+## Hour 2 covering probes (2026-09-18T07:33Z)
+
+Three named site sets, none a certificate.
+
+- n=11 at `77/20` (3.85), T-025-seeded auto `(25, 34, 42)` plus 60: converged
+  `11.456576` in 196 s on 7705 sites. Crossed eleven at round 2. Site set refuted.
+  BC-200's vertex-seeded unconverged `11.227631` at this side is a different set.
+- n=12 at `3969/1000`, T-017-seeded auto `(26, 35, 43)`: unconverged `12.118036` at
+  600 s (29 LP rounds). Seed dropped the unseeded `12.363498` by 0.245. Still above
+  twelve. Site set refuted; side open.
+- n=18 at `467/100` (4.67), auto `(32, 43, 53)`: unconverged `18.000000` at 600 s
+  (57 LP rounds; locked from round 15). Cannot confirm. Covering-values now 23 sides.
+
+Point-atom covering at 3.82/3.85 stays at or above eleven on every session-139 set.
+Blocks 5-7 Route S encode-only remains 09:33Z.
+
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
 -->
