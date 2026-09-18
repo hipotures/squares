@@ -346,6 +346,12 @@ n=11 `--grid-counts 25,34,41,48` at `383/100` converged in 81.7 s at `11.142857`
 (rationalised `2228577/200000`). About 2,300 extra sites dropped 0.050 from the auto
 grid. Still above eleven. Next: T-025-seeded grids at the same side. G4 and M3 landed.
 
+## Hour 1 T-025 seed (2026-09-18T06:39Z)
+
+Four-grid union T-025 (584 seed sites, 6249 total) converged at `11.140351` in 107.9 s.
+Drop from four-grid: 0.0025. Point-atom covering at `383/100` is above eleven on three
+named site sets. Next: scout #3, denser grids at `191/50`.
+
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
 -->
