@@ -304,7 +304,7 @@ def _prepare_candidate(
     return frozen, certificate, record, Fraction(total, scale)
 
 
-def decide(path: Path, *, quick: bool) -> bool:
+def decide(path: Path, *, quick: bool, dump_stalls: Path | None = None) -> bool:
     try:
         frozen, certificate, record, mass = _prepare_candidate(path)
     except CandidateRefusalError as error:
@@ -349,10 +349,33 @@ def decide(path: Path, *, quick: bool) -> bool:
 
     start = time.time()
     interval = None
+    stall_log: dict[str, list[list[float]]] = {}
     try:
-        interval = verify_by_intervals(certificate, enclose=True)
+        interval = verify_by_intervals(
+            certificate, enclose=True, stall_log=stall_log if dump_stalls is not None else None
+        )
     except IntervalInputError as error:
         problems.append(f"the interval route could not decide it: {error}")
+    if dump_stalls is not None:
+        dump_stalls.parent.mkdir(parents=True, exist_ok=True)
+        dump_stalls.write_text(
+            json.dumps(
+                {
+                    "path": str(path),
+                    "stalled": (
+                        0
+                        if interval is None
+                        else sum(outcome.stalled for outcome in interval.directions)
+                    ),
+                    "directions": {
+                        label: {"boxes": boxes, "count": len(boxes)}
+                        for label, boxes in stall_log.items()
+                    },
+                },
+                indent=1,
+            )
+            + "\n"
+        )
     enclosure: tuple[Fraction, Fraction] | None = None
     if interval is not None:
         boxes = sum(outcome.boxes for outcome in interval.directions)
@@ -432,6 +455,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument(
         "--quick", action="store_true", help="interval route only; cannot retain"
     )
+    parser.add_argument(
+        "--dump-stalls",
+        type=Path,
+        default=None,
+        help="write stalled interval boxes as JSON; does not change the verdict",
+    )
     args = parser.parse_args(argv)
     ok = True
     seen: set[Path] = set()
@@ -440,7 +469,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             print(f"{path}: SKIPPED duplicate path", flush=True)
             continue
         seen.add(path)
-        ok = decide(path, quick=args.quick) and ok
+        ok = decide(path, quick=args.quick, dump_stalls=args.dump_stalls) and ok
     return 0 if ok else 1
 
 

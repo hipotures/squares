@@ -354,6 +354,7 @@ def test_generate_adaptive_produces_a_certificate_the_exact_verifier_accepts() -
     )
     assert certificate is not None, log.stopped
     assert log.ceiling is not None
+    assert log.priced_support is not None
     assert log.accepted, log.failures
     verdict = verify(certificate)
     assert verdict.accepted, verdict.failures
@@ -389,6 +390,23 @@ def test_generate_adaptive_returns_before_deciding_so_the_candidate_can_be_froze
     assert certificate is not None, log.stopped
     assert log.accepted is False
     assert log.least_cell_mass is None
+
+
+def test_dual_support_none_keeps_every_positive_row() -> None:
+    """A cap of one discards weight; ``None`` keeps the three positive rows."""
+
+    rows = colgen.Rows()
+    rows.directions.extend((0, 0, 0))
+    rows.centres.extend(((1.0, 1.0), (1.2, 1.0), (1.4, 1.0)))
+    duals = np.array([0.5, 0.3, 0.1])
+    tangents = (Fraction(0), Fraction(1, 5))
+    outer, side = Fraction(2), Fraction(1)
+    capped = colgen.dual_support(rows, duals, tangents, outer, side, support_cap=1)
+    full = colgen.dual_support(rows, duals, tangents, outer, side, support_cap=None)
+    assert len(capped) == 1
+    assert len(full) == 3
+    assert full[0][3] >= full[1][3] >= full[2][3]
+    assert capped[0] == full[0]
 
 
 def _centred(

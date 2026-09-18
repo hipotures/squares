@@ -567,7 +567,9 @@ class DirectionSearch:
             return np.empty((0, 4)), stalled
         return np.concatenate(children), stalled
 
-    def search(self, *, prune_at: int | None) -> DirectionOutcome:
+    def search(
+        self, *, prune_at: int | None, stall_boxes: list[list[float]] | None = None
+    ) -> DirectionOutcome:
         """Bound the least covered mass over the admissible centres.
 
         With ``prune_at`` given, a box is settled once its lower bound reaches
@@ -638,6 +640,8 @@ class DirectionSearch:
             children, stuck = self._split(unresolved)
             if len(stuck):
                 stuck_bounds.extend(int(value) for value in self.lower_bound(stuck))
+                if stall_boxes is not None:
+                    stall_boxes.extend(stuck.tolist())
             if len(children):
                 pending.append(children)
         if stuck_bounds:
@@ -760,11 +764,15 @@ def verify_by_intervals(
     *,
     enclose: bool = False,
     directions: tuple[str, ...] | None = None,
+    stall_log: dict[str, list[list[float]]] | None = None,
 ) -> IntervalVerdict:
     """Decide the certificate; ``enclose`` also pins the least covered mass.
 
     ``directions`` restricts ``Condition 5`` to the named labels of the doubled net (a
     sub-net decides a weaker statement and is for controls, not for claims).
+    ``stall_log``, when given, is filled with the stalled boxes of each searched
+    direction as ``[u_lo, u_hi, v_lo, v_hi]`` rows. Collecting them does not
+    change the verdict.
     """
     if any(t >= 1 for t in certificate.half_tangents):
         raise IntervalInputError(
@@ -781,7 +789,13 @@ def verify_by_intervals(
         if directions is not None and search.label not in directions:
             continue
         with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
-            outcome = search.search(prune_at=None if enclose else atoms.scale)
+            boxes: list[list[float]] = []
+            outcome = search.search(
+                prune_at=None if enclose else atoms.scale,
+                stall_boxes=boxes if stall_log is not None else None,
+            )
+        if stall_log is not None:
+            stall_log[search.label] = boxes
         outcomes.append(outcome)
         if outcomes[-1].status == "refuted":
             break

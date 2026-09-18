@@ -649,31 +649,33 @@ def solve_rows(
     return solution
 
 
-def dual_squares(
+#: One dual row after snapping: net direction index, absolute centre, weight.
+type DualSupportRow = tuple[int, Fraction, Fraction, Fraction]
+
+
+def dual_support(
     rows: Rows,
     duals: np.ndarray,
     half_tangents: tuple[Fraction, ...],
     outer_side: Fraction,
     square_side: Fraction,
     *,
-    support_cap: int,
+    support_cap: int | None,
     denominator: int = 10**6,
-) -> tuple[tuple[Square, Fraction], ...]:
-    """The dual support as exact reachable squares with exact weights.
+) -> tuple[DualSupportRow, ...]:
+    """The dual support as exact centres and weights, heaviest rows first.
 
-    The rows were found in floating point, so both the centre and the weight
-    are rationalised here; the centre is then clamped into the exact centre
-    domain, because a square whose centre has drifted outside it is not a
-    placement and would make any ceiling read from it worthless. Truncating the
-    support to the heaviest ``support_cap`` rows only discards weight, which
-    weakens both uses of the dual without making either unsound.
+    ``None`` keeps every positive dual row; an integer cap discards lighter
+    rows, which weakens both uses of the dual without making either unsound.
     """
 
     directions = direction_net(half_tangents)
     order = [index for index in np.argsort(-duals) if duals[index] > 1e-9]
-    weighted: list[tuple[Square, Fraction]] = []
-    for index in order[:support_cap]:
-        direction = directions[rows.directions[index]]
+    selected = order if support_cap is None else order[:support_cap]
+    entries: list[DualSupportRow] = []
+    for index in selected:
+        direction_index = rows.directions[index]
+        direction = directions[direction_index]
         cu, cv = rows.centres[index]
         cosine, sine = float(direction.ux), float(direction.uy)
         x = Fraction(cosine * cu - sine * cv).limit_denominator(denominator)
@@ -684,8 +686,47 @@ def dual_squares(
         weight = Fraction(float(duals[index])).limit_denominator(denominator)
         if weight <= 0:
             continue
-        weighted.append((square_at(direction, (x, y), outer_side, square_side), weight))
-    return tuple(weighted)
+        entries.append((direction_index, x, y, weight))
+    return tuple(entries)
+
+
+def dual_squares(
+    rows: Rows,
+    duals: np.ndarray,
+    half_tangents: tuple[Fraction, ...],
+    outer_side: Fraction,
+    square_side: Fraction,
+    *,
+    support_cap: int | None,
+    denominator: int = 10**6,
+) -> tuple[tuple[Square, Fraction], ...]:
+    """The dual support as exact reachable squares with exact weights.
+
+    The rows were found in floating point, so both the centre and the weight
+    are rationalised here; the centre is then clamped into the exact centre
+    domain, because a square whose centre has drifted outside it is not a
+    placement and would make any ceiling read from it worthless. Truncating the
+    support to the heaviest ``support_cap`` rows only discards weight, which
+    weakens both uses of the dual without making either unsound. ``None`` keeps
+    every positive row.
+    """
+
+    directions = direction_net(half_tangents)
+    return tuple(
+        (
+            square_at(directions[direction_index], (x, y), outer_side, square_side),
+            weight,
+        )
+        for direction_index, x, y, weight in dual_support(
+            rows,
+            duals,
+            half_tangents,
+            outer_side,
+            square_side,
+            support_cap=support_cap,
+            denominator=denominator,
+        )
+    )
 
 
 def _float_squares(
@@ -1047,6 +1088,9 @@ class AdaptiveLog:
     failures: tuple[str, ...] = ()
     least_cell_mass: Fraction | None = None
     least_covered: float = float("inf")
+    # The snapped dual rows the last converged solve priced with, so a driver
+    # can freeze the family `family_record` expects without re-running the LP.
+    priced_support: tuple[DualSupportRow, ...] | None = None
 
 
 logger = logging.getLogger(__name__)
@@ -1076,7 +1120,7 @@ def generate_adaptive(
     column_rounds: int = 8,
     columns_per_round: int = 1,
     rows_per_direction: int = 3,
-    support_cap: int = 32,
+    support_cap: int | None = 32,
     settle: float = 0.0,
     log_path: Path | None = None,
     decide: bool = False,
@@ -1109,7 +1153,9 @@ def generate_adaptive(
     the run is still going gets it; the list is the only thing it touches.
     ``deadline`` is a ``time.perf_counter`` value handed to `solve_rows`: past
     it no row round starts, the loop returns unconverged, and the log carries
-    what was reached -- a wall, never a convergence criterion.
+    what was reached -- a wall, never a convergence criterion. ``support_cap``
+    is the heaviest dual rows kept for pricing; ``None`` keeps every positive
+    row, which is what a driver asks for when it needs the untruncated family.
     """
 
     half_tangents = net_half_tangents(angle_limit, direction_steps)
@@ -1200,6 +1246,14 @@ def generate_adaptive(
         log.stopped = solution.stopped
         log.least_covered = solution.least_covered
         if solution.converged:
+            log.priced_support = dual_support(
+                rows,
+                solution.duals,
+                half_tangents,
+                outer_side,
+                square_side,
+                support_cap=support_cap,
+            )
             weighted = dual_squares(
                 rows,
                 solution.duals,
@@ -1284,6 +1338,7 @@ __all__ = [
     "Candidate",
     "CeilingResult",
     "ColumnRound",
+    "DualSupportRow",
     "LpSolution",
     "RoundTiming",
     "Rows",
@@ -1293,6 +1348,7 @@ __all__ = [
     "check_ceiling",
     "d4_orbit",
     "dual_squares",
+    "dual_support",
     "generate_adaptive",
     "orbit_column",
     "placement_cells",
