@@ -864,6 +864,14 @@ Post-encode covering queue finished. Encode-only timeout unresolved. No
 showed n=18 at 4.59; `build_known_best_atlas --update` wrote 4.67.
 Closeout after 18:00Z.
 
+## Hour 10 (2026-09-18T16:53Z)
+
+Covering queue still empty. No colgen. Encode-only still unresolved. No
+`--search`. T-028 not landed. CI on `f2696657`: suite-b tests passed
+(3106); the job failed the cost band (72.1 s vs recorded 124.78 s).
+`gate-budgets.yaml` untouched. packing-required cascaded. HEAD
+`4e7dfb47` CI still in flight. Closeout after 18:00Z.
+
 ## Morning report draft (2026-09-18T16:55Z)
 
 Fill `ended_at` and phase-3 outcome at 18:00Z. Do not `--search`. Do not
