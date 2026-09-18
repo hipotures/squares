@@ -273,7 +273,9 @@ H-216 freeze covering total `76027/12500 = 6.08216` does not confirm. Polish the
 ceiling readers: exact total `76/13`, max depth 1, K3 fails. That does not kill.
 H-216 stays open; not an n=11 result. exp-161 accept hole closed. Producer is in-tree
 and emits no candidate. F1 reader modules are in-tree with the 2-of-5 versus floor
-charge test. Hosted typecheck band is now 55.67 s / ceiling 111 s.
+charge test. Hosted typecheck band is now 55.67 s / ceiling 111 s. Head `876dd80f`
+is hosted-green (37 checks). A second H-216 site set on grids 18/24/29/34 froze
+covering `151931/25000` = 6.07724 (does not confirm).
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

@@ -59,7 +59,9 @@ hypothesis:
     2026-09-18 session-139 froze a covering of total 76027/12500 = 6.08216 on grids
     18/24/29 (1785 sites, 132 atoms). That covering is above 6 and does not confirm.
     Polish of the merged family then both ceiling readers agreed: exact total 76/13,
-    max depth 1, K3 fails. That does not kill. The claim stays open. Not an n=11 result.
+    max depth 1, K3 fails. That does not kill. A second named site set on grids
+    18/24/29/34 (2941 sites, 160 atoms) froze covering 151931/25000 = 6.07724, lower
+    by 123/25000 and still above 6. The claim stays open. Not an n=11 result.
 ---
 # H-216: Point Certificate at n=6, 299/100
 

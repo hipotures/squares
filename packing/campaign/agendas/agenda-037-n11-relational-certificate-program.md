@@ -121,8 +121,10 @@ agenda:
       Session 139 froze covering total 76027/12500 = 6.08216 (does not confirm) and
       polished a depth-one family of exact total 76/13 that both
       independent_ceiling_reader and verify_ceiling accept as depth <= 1 and reject
-      on K3 (does not kill). H-216 stays open. Confirm still needs covering < 6 on a
-      named site set that both decide_certificate routes accept. Not an n=11 result.
+      on K3 (does not kill). A second named site set on grids 18/24/29/34 froze
+      covering 151931/25000 = 6.07724 (does not confirm). H-216 stays open. Confirm
+      still needs covering < 6 on a named site set that both decide_certificate
+      routes accept. Not an n=11 result. Exit the chase at 08:33Z.
     workflows: [pipeline-improvement, research-loop]
     program: n11-strategy-reset
     artifacts:
@@ -136,6 +138,8 @@ agenda:
     - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/h216-n6-299-100-independent.json
     - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/h216-n6-299-100-verify-ceiling.json
     - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/h216-n6-299-100-receipt.md
+    - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/h216-n6-299-100-sites2-covering.json
+    - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/h216-n6-299-100-sites2-receipt.md
     parallel_group: solved-case-calibration
     note: >-
       Calibration only, under H-216. Certificates at n=6 and n=10 are weaker than the
