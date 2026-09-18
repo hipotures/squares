@@ -814,6 +814,14 @@ JSON. Log empty. No `--search`. Waiter cutoff is 18:00Z. Campaign-record
 clocks extended to 18:40Z (`c3d28cfd`). Queue unchanged. Do not land T-028
 during encode.
 
+## Encode timeout (2026-09-18T15:24Z)
+
+Encode-only exited at 15:24:31Z with no JSON. Timeout unresolved. Log still
+empty. No `--search`. Waiter started n=12 `397/100` T-017 four-grid
+(`--support-cap 32`, deadline 900 s). Then n=17 windows 6, windows 7 if
+needed, n=19 `97/20`. Covering deadline 18:00Z. Freeze-then-decide if mass
+< n. T-028 only if RETAINABLE.
+
 ## Block 8 closeout (after covering; original window 12:53–13:33Z)
 
 Owner continue at 15:04Z moved this after the 18:00Z covering deadline.
