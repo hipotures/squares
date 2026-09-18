@@ -92,8 +92,9 @@ session:
     evidence: []
     stop_reason: null
     next_action: >-
-      Covering until 09:33Z. Then live --check and encode-only from
-      exp-161-block57-command.md.
+      Encode-only until process exit or 12:33Z. Copy the JSON. Do not --search.
+      Then n=12 397/100 T-017 four-grid, then n=17 23/5 windows6. Block 8
+      closeout 12:53–13:33Z.
   budget:
     wall_minutes: 480
     max_cycles: 8
@@ -605,8 +606,9 @@ probe n=11 at or below 3.826.
 2. n=17 `23/5` T-019 auto `(32,42,52)` plus `--seed-windows 6` (CLI
    `per_window`; windows5 was 17.042346 with 9 violated). Then windows 7 if
    still above 17.
-3. If wall remains: n=19 next rung above T-020 `24/5`, not another 24/5
-   covering of an already certified side.
+3. If wall remains: n=19 at T-021's recorded `97/20`, seeded from T-020's
+   `certificate-24-5.json`, aiming for mass below 19. Not another `24/5`
+   covering. Do not invent a new n=19 side.
 
 From `packing/`, `OMP_NUM_THREADS=OPENBLAS_NUM_THREADS=MKL_NUM_THREADS=1`:
 
@@ -637,6 +639,12 @@ Sweeps composite-figure.json was regenerated at 09:39Z for n=18 4.67
 (`7b9a4deb`). Do not paste the suite-b 74.1s sample into
 `gate-budgets.yaml`; that job's tests passed.
 
+If wall remains after those two probes: n=19's recorded next side above T-020
+`24/5` is T-021's `97/20`, seeded from
+`cases/n20_fractional_certificate/certificate-24-5.json`, aiming for mass
+below 19. T-021's atoms at that side are 19.848723 and do not carry n=19.
+Do not invent a new n=19 side. Do not re-cover `24/5`.
+
 ## Hour 5 (2026-09-18T09:41Z)
 
 Blocks 5–7. Encode-only still running in tmux `exp-161-encode` (pid 347502,
@@ -644,6 +652,12 @@ elapsed 08:41, ~100% CPU, peak RSS 2.45 GiB). No encoding JSON yet; the
 producer writes at the end. Log still empty. No `--search`. Covering colgen
 stays off this CPU. Post-encode queue is the n=12 `397/100` four-grid then
 n=17 windows 6. CI on HEAD is in flight after the composite-figure refresh.
+
+Packing validation on `335e8028` completed success at 09:45Z (suite-a, suite-b,
+typecheck, validate, geometry, macos-portability, sweeps, frontend,
+packing-required). A waiter in tmux `post-encode-covering` starts that queue
+when encode pid 347502 exits, copies the encode JSON, and will not start a
+probe inside the Block 8 closeout (12:53Z). No `--search`.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
