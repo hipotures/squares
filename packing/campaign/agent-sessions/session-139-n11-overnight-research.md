@@ -581,6 +581,18 @@ T-027-seeded auto at `117/25` locked `18.000000` unconverged after 819.5 s
 (60 rounds, 465 violated, 769 seed sites). Same wall as the T-019 seed.
 T-027 at `467/100` is unchanged. Route S encode-only remains 09:33Z.
 
+## Hour 4 Blocks 5–7 start (2026-09-18T09:33Z)
+
+Live `admit_threshold_compression --check` and producer `--selftest` both
+exited 0 at 09:31:37Z. Encode-only (`--authorize-target exp-161
+--encode-coverage`, no `--search`) started 09:33:00Z under `timeout` 10800 in
+tmux `exp-161-encode`. Scientific wall 09:33–12:33Z; receipt copy until 12:53Z.
+Timeout is unresolved. No covering colgen beside this process.
+
+T-027 `--push` contracts: n=18 DS7 verified bound `4.67`; n=18 interval
+doubled-net registered in the exhaustive marker set; Chromium-early is the
+first unbudgeted `start_early` step ahead of exact verification.
+
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
 -->
