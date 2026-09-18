@@ -377,6 +377,13 @@ T-018 5-direction event-cell encoding hit the 20 s limit before HiGHS ran
 (`timeout` / `unresolved`). Not a kill. A 36-net search needs a larger encoding budget.
 Receipt path is packing-relative. Block 4 W5 remains 08:33Z.
 
+## Hour 1 M3 9-dir (2026-09-18T06:53Z)
+
+`--direction-steps 8` (9 directions) with 180 s also timed out in event-cell encoding
+before HiGHS. Encoding is the cost, not the MIP. Do not spend another M3 wall on a
+finer net until encoding is cheaper. Point-atom densification at 3.82/3.83 is done
+for this phase. Block 4 at 08:33Z.
+
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
 -->
