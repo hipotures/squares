@@ -3,11 +3,12 @@
 
 This command authenticates the frozen T-025 source, inventories U025, and replays the
 admitted 23-orbit accept / 24-orbit reject policy.  It does not run a coverage verifier
-and does not emit a candidate certificate.  ``--authorize-target exp-161`` is the only
-flag that may later permit a search; without it the receipt records ``target_ran:
-false`` after the controls.  A cardinality-and-budget HiGHS MIP is formulated only as an
-incomplete sketch: it does not encode closed-core coverage, so this producer never
-treats a feasible N+ from that program as an H-163 result.
+on a decompressed candidate and does not emit a candidate certificate.  ``--authorize-target
+exp-161`` is the only flag that may formulate the coverage MIP; ``--encode-coverage``
+enumerates the frozen ``A w >= 1`` rows; ``--search`` may run the encoded HiGHS MIP only
+after that enumeration.  The default authorized path still emits no candidate, and even
+``--search`` leaves ``n_plus`` null.  Closed-core coverage is linear in the frozen U025
+orbit weights.  A coverage-free MIP is never solved and never reported as N+.
 """
 
 # pyright: reportPrivateUsage=false
@@ -44,6 +45,11 @@ from sqpack.fractional.threshold_compression import (
     OrbitInventory,
     catalog_sha256,
     inventory_certificate,
+)
+from sqpack.fractional.threshold_coverage_encoding import (
+    encode_frozen_coverage,
+    encoding_record,
+    solve_feasibility_mip,
 )
 
 PACKING = Path(__file__).resolve().parent.parent
@@ -247,9 +253,10 @@ def cardinality_budget_sketch(inventory: OrbitInventory) -> dict[str, Any]:
     """Describe the coverage-free HiGHS MIP.  Do not solve it.
 
     Nonnegative reweighting of U025 with N+ <= 23 and budget < 11 is feasible by putting
-    a tiny positive weight on any 23 orbits.  Closed-core coverage is not a linear
-    constraint on those weights.  Solving this program, or reporting its N+, would be a
-    lying scientific result.
+    a tiny positive weight on any 23 orbits.  This sketch exists only as the named
+    forbidden program: it does not encode closed-core coverage.  Solving it, or reporting
+    its N+, would be a lying scientific result.  The authorized instrument uses
+    :func:`coverage_search_instrument` instead.
     """
     coefficients = [
         orbit.budget_coefficient
@@ -274,11 +281,98 @@ def cardinality_budget_sketch(inventory: OrbitInventory) -> dict[str, Any]:
         "search_status": "instrument_incomplete",
         "optimizer_ran": False,
         "reason": (
-            "Coverage of T-025 closed cores is not a linear function of orbit weights, "
-            "so this MIP cannot certify H-163. Budget-and-cardinality feasibility is "
-            "trivial for positive weights and would be a lying N+ if reported."
+            "This sketch is coverage-free on purpose and must not be solved. Frozen "
+            "closed-core coverage is linear in U025 orbit weights; the authorized path "
+            "encodes A w >= 1 rather than reporting a lying N+ from this program."
         ),
     }
+
+
+_COVERAGE_CONSTRAINTS: Final = (
+    "sum_i budget_coefficient_i * w_i < 11",
+    "sum_i z_i <= 23",
+    "w_i >= 0",
+    "z_i in {0, 1}",
+    "w_i = 0 when z_i = 0",
+    "A w >= 1 on every reachable frozen event cell (Pareto-reduced rows)",
+    "D4 tying: one nonnegative weight per source U025 orbit",
+)
+
+
+def coverage_search_instrument(
+    inventory: OrbitInventory,
+    *,
+    enumerate_coverage: bool,
+    search: bool,
+) -> dict[str, Any]:
+    """Formulate the linear coverage MIP; enumerate or solve only when asked.
+
+    Default authorized use describes the linear system and enumerates nothing.
+    ``enumerate_coverage`` builds the frozen ``A`` rows.  ``search`` may run only after
+    that enumeration; it still does not write a candidate certificate or set ``n_plus``.
+    """
+    if search and not enumerate_coverage:
+        raise CompressionError(
+            "--search requires --encode-coverage so the MIP includes A w >= 1; "
+            "refusing a coverage-free solve"
+        )
+    coefficients = [
+        orbit.budget_coefficient
+        for orbit in (*inventory.point_orbits, *inventory.threshold_orbits)
+    ]
+    record: dict[str, Any] = {
+        "kind": "highs_mip_frozen_orbit_coverage",
+        "orbit_count": inventory.orbit_count,
+        "binary_indicators": inventory.orbit_count,
+        "max_orbits": FROZEN_MAX_ORBITS,
+        "budget_below": FROZEN_BUDGET_BELOW,
+        "least_charge": FROZEN_LEAST_CHARGE,
+        "budget_coefficients": coefficients,
+        "constraints": list(_COVERAGE_CONSTRAINTS),
+        "includes_coverage": True,
+        "coverage_linear": True,
+        "coverage_enumerated": False,
+        "solver": "highs",
+        "search_status": "encoding_ready",
+        "optimizer_ran": False,
+        "float_incumbent": None,
+        "reason": (
+            "With atoms and sites frozen, T-025 closed-core charge is A w on the event "
+            "cells of the full U025 arrangement. D4 tying is one weight per orbit. "
+            "Omitted orbits equal zero weights on that arrangement. This instrument does "
+            "not emit a candidate or treat a float incumbent as N+."
+        ),
+    }
+    if not enumerate_coverage:
+        return record
+    encoding = encode_frozen_coverage(inventory)
+    record["coverage_enumerated"] = True
+    record["search_status"] = "encoding_complete"
+    record["encoding"] = encoding_record(encoding)
+    if not search:
+        return record
+    outcome = solve_feasibility_mip(
+        encoding, max_orbits=FROZEN_MAX_ORBITS, budget_below=FROZEN_BUDGET_BELOW
+    )
+    if outcome.status == "timeout_unresolved":
+        record["search_status"] = "timeout_unresolved"
+        record["optimizer_ran"] = True
+    elif outcome.status == "float_infeasible_unresolved":
+        record["search_status"] = "float_infeasible_unresolved"
+        record["optimizer_ran"] = True
+    elif outcome.status == "solver_error_unresolved":
+        record["search_status"] = "solver_error_unresolved"
+        record["optimizer_ran"] = False
+    else:
+        record["search_status"] = "float_incumbent_unverified"
+        record["optimizer_ran"] = True
+    record["float_incumbent"] = {
+        "status": outcome.status,
+        "n_plus": outcome.n_plus,
+        "objective": outcome.objective,
+        "message": outcome.message,
+    }
+    return record
 
 
 def build_receipt(
@@ -290,9 +384,15 @@ def build_receipt(
     budget_below: int = FROZEN_BUDGET_BELOW,
     least_charge: int = FROZEN_LEAST_CHARGE,
     authorize_target: str | None = None,
+    encode_coverage: bool = False,
+    search: bool = False,
 ) -> dict[str, Any]:
-    """Run source, catalog, and policy controls; never emit a candidate in this producer."""
+    """Run source, catalog, and policy controls; emit no candidate on the default path."""
     authorization = _require_authorization(authorize_target)
+    if (encode_coverage or search) and authorization != AUTHORIZED_TARGET:
+        raise CompressionError(
+            "--encode-coverage and --search require --authorize-target exp-161"
+        )
     _require_frozen_policy(
         max_orbits=max_orbits, budget_below=budget_below, least_charge=least_charge
     )
@@ -308,17 +408,21 @@ def build_receipt(
         expect_catalog_sha256=expect_catalog_sha256,
     )
     controls = run_selftest_controls(inventory)
-    search: dict[str, Any] | None = None
+    search_record: dict[str, Any] | None = None
     search_status = "not_run"
+    optimizer_ran = False
     if authorization == AUTHORIZED_TARGET:
-        search = cardinality_budget_sketch(inventory)
-        search_status = cast(str, search["search_status"])
+        search_record = coverage_search_instrument(
+            inventory, enumerate_coverage=encode_coverage, search=search
+        )
+        search_status = cast(str, search_record["search_status"])
+        optimizer_ran = bool(search_record["optimizer_ran"])
     return {
         "schema": RECEIPT_SCHEMA,
         "source_revision": SOURCE_REVISION,
         "catalog_sha256": catalog_sha256(inventory),
         "target_ran": False,
-        "optimizer_ran": False,
+        "optimizer_ran": optimizer_ran,
         "candidate_created": False,
         "coverage_ran": False,
         "n_plus": None,
@@ -330,12 +434,13 @@ def build_receipt(
         "max_orbits": FROZEN_MAX_ORBITS,
         "budget_below": FROZEN_BUDGET_BELOW,
         "least_charge": FROZEN_LEAST_CHARGE,
-        "search": search,
+        "search": search_record,
         "controls": controls,
         "scope": (
             "Source authentication, U025 catalog identity, and the admitted 23/24-orbit "
-            "policy boundary. No coverage route, optimizer solve, candidate certificate, "
-            "or H-163 verdict is established."
+            "policy boundary. Frozen closed-core coverage is linear in orbit weights. "
+            "No candidate certificate, exact coverage route, or H-163 verdict is "
+            "established on this path."
         ),
     }
 
@@ -382,7 +487,20 @@ def parser() -> argparse.ArgumentParser:
     command.add_argument(
         "--authorize-target",
         default=None,
-        help="must be exp-161 to permit a later search; this producer still emits no candidate",
+        help="must be exp-161 to formulate the coverage MIP; default still emits no candidate",
+    )
+    command.add_argument(
+        "--encode-coverage",
+        action="store_true",
+        help="enumerate frozen A w >= 1 rows; requires --authorize-target exp-161",
+    )
+    command.add_argument(
+        "--search",
+        action="store_true",
+        help=(
+            "run the encoded HiGHS MIP after --encode-coverage; still writes no candidate "
+            "and does not set n_plus"
+        ),
     )
     command.add_argument(
         "--selftest",
@@ -411,6 +529,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             budget_below=options.budget_below,
             least_charge=options.least_charge,
             authorize_target=options.authorize_target,
+            encode_coverage=bool(options.encode_coverage),
+            search=bool(options.search),
         )
         encoded = _canonical_json(receipt)
         if options.output is not None:

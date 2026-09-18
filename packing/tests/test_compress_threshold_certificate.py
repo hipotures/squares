@@ -7,6 +7,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import numpy as np
 import pytest
 
 from devtools import compress_threshold_certificate as producer
@@ -110,7 +111,7 @@ def test_unauthorized_authorize_target_is_refused() -> None:
     assert producer.main(["--authorize-target", "H-216", "--selftest"]) == 2
 
 
-def test_authorized_exp161_formulates_an_incomplete_sketch_without_a_candidate(
+def test_authorized_exp161_formulates_linear_coverage_without_a_candidate(
     tmp_path: Path,
 ) -> None:
     output = tmp_path / "authorized.json"
@@ -122,14 +123,105 @@ def test_authorized_exp161_formulates_an_incomplete_sketch_without_a_candidate(
     assert receipt["target_ran"] is False
     assert receipt["optimizer_ran"] is False
     assert receipt["candidate_created"] is False
+    assert receipt["coverage_ran"] is False
     assert receipt["n_plus"] is None
-    assert receipt["search_status"] == "instrument_incomplete"
+    assert receipt["search_status"] == "encoding_ready"
     search = receipt["search"]
     assert search["solver"] == "highs"
-    assert search["includes_coverage"] is False
+    assert search["includes_coverage"] is True
+    assert search["coverage_linear"] is True
+    assert search["coverage_enumerated"] is False
     assert search["optimizer_ran"] is False
     assert search["orbit_count"] == 119
     assert len(search["budget_coefficients"]) == 119
+    assert "A w >= 1" in " ".join(search["constraints"])
+    assert search["float_incumbent"] is None
+
+
+def test_search_without_encode_coverage_is_refused() -> None:
+    assert producer.main(["--authorize-target", "exp-161", "--search", "--selftest"]) == 2
+
+
+def test_encode_coverage_without_authorization_is_refused() -> None:
+    assert producer.main(["--encode-coverage", "--selftest"]) == 2
+
+
+def test_authorized_encode_coverage_stub_still_emits_no_candidate(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from sqpack.fractional.threshold_coverage_encoding import FrozenCoverageEncoding
+
+    encoding = FrozenCoverageEncoding(
+        orbit_count=119,
+        direction_count=1,
+        reachable_cells=1,
+        direction_unique_rows=1,
+        pareto_rows=np.array([[1] + [0] * 118], dtype=np.uint8),
+        budget_coefficients=(1,) * 119,
+        rows_sha256="ab" * 32,
+    )
+    monkeypatch.setattr(producer, "encode_frozen_coverage", lambda _inventory: encoding)
+    output = tmp_path / "encoded.json"
+
+    assert (
+        producer.main(
+            ["--authorize-target", "exp-161", "--encode-coverage", "--output", str(output)]
+        )
+        == 0
+    )
+
+    receipt = json.loads(output.read_text(encoding="utf-8"))
+    assert receipt["candidate_created"] is False
+    assert receipt["coverage_ran"] is False
+    assert receipt["n_plus"] is None
+    assert receipt["search_status"] == "encoding_complete"
+    assert receipt["search"]["coverage_enumerated"] is True
+    assert receipt["search"]["encoding"]["pareto_row_count"] == 1
+    assert receipt["forbidden_control_manifests"] == [
+        "53fbe28bd6dd022600515663ea1e3609ed2bd36a83e69e350b4bb3b45d7b7176",
+        "007b394f48b0b11565ca87d09ad961258534c426bfd623a3e9bfc15aa6495e8a",
+        "194f1f9f47fc94e7f945920c38a4efdb43476719eba025ea446a1d7b91fde27e",
+    ]
+
+
+def test_authorized_search_after_stub_encoding_still_emits_no_candidate(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from sqpack.fractional.threshold_coverage_encoding import FrozenCoverageEncoding
+
+    encoding = FrozenCoverageEncoding(
+        orbit_count=119,
+        direction_count=1,
+        reachable_cells=1,
+        direction_unique_rows=1,
+        pareto_rows=np.array([[1] + [0] * 118], dtype=np.uint8),
+        budget_coefficients=(1,) * 119,
+        rows_sha256="ab" * 32,
+    )
+    monkeypatch.setattr(producer, "encode_frozen_coverage", lambda _inventory: encoding)
+    output = tmp_path / "searched.json"
+
+    assert (
+        producer.main(
+            [
+                "--authorize-target",
+                "exp-161",
+                "--encode-coverage",
+                "--search",
+                "--output",
+                str(output),
+            ]
+        )
+        == 0
+    )
+
+    receipt = json.loads(output.read_text(encoding="utf-8"))
+    assert receipt["candidate_created"] is False
+    assert receipt["coverage_ran"] is False
+    assert receipt["n_plus"] is None
+    assert receipt["search"]["optimizer_ran"] is True
+    assert receipt["search"]["float_incumbent"] is not None
+    assert receipt["search"]["float_incumbent"]["n_plus"] is not None
 
 
 def test_output_cannot_overwrite_the_bound_source() -> None:
