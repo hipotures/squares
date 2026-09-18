@@ -153,7 +153,7 @@ Each entry summarizes one user-level research window. Cycle slots are wall-clock
 | [session-136](agent-sessions/session-136-ci-topology-reconciliation.md) | stopped | contemporaneous | `pipeline-improvement` (efficiency) | `pipeline-improvement` (efficiency) | 1 | think-97we | think-97we closed when PR 188 and PR 185 merged, and the pending closeout checks it carried -- as carried forward by Session 137 -- now sit under think-g4n9: hold both pull-request walls at or under 180 s over the declared run of consecutive exact-head hosted runs, then switch the wall check back to enforcing. Then resume BC-343 under think-ufmk without changing its scientific claim or allocating exp-161 from this block. |
 | [session-137](agent-sessions/session-137-ci-topology-continuation-recovery.md) | stopped | retrospective | `pipeline-improvement` (correctness) | `remediation` (correctness) | 3 | think-97we | think-97we closed when PR 188 and PR 185 merged, and the remaining closeout debt on the final head now sits under think-g4n9: hold both pull-request walls at or under 180 s over the declared run of consecutive exact-head hosted runs, then switch the wall check back to enforcing. Then resume BC-343 under think-ufmk without changing its scientific claim or allocating exp-161 from this block. |
 | [session-138](agent-sessions/session-138-n11-overnight-review.md) | stopped | mixed | `factual-review` (insight) | `documentation-pass` (process) | 6 | think-4woh | Close M7's n=6 bracket at 299/100 under BC-357 / think-qqzs. H-216 is the registered determination. G1, G2, G3, and G5 are on main; G4 remains on this bead. |
-| [session-139](agent-sessions/session-139-n11-overnight-research.md) | in_progress | contemporaneous | `research-loop` (insight) | `research-loop` (insight) | 1 | think-mcb6 | Continue Blocks 1–3 until 08:33Z: H-216 freeze/polish retained and open; keep the F1 reader tests green; producer exists but emits no candidate. Then Block 4 think-g4n9, Blocks 5–7 Route S only with --authorize-target exp-161 after a live --check, Block 8 closeout. |
+| [session-139](agent-sessions/session-139-n11-overnight-research.md) | in_progress | contemporaneous | `research-loop` (insight) | `research-loop` (insight) | 2 | think-mcb6 | Blocks 5–7 at 09:33Z: live --check then exp-161 encode-only. Covering continues until then. W5 already landed. Block 8 closeout. Do not close think-qqzs, think-g3j7, think-gyzw, or think-jwb1. |
 
 ### Workflow summary
 
@@ -166,7 +166,7 @@ Declared counts are contemporaneous contracts; retrospective counts are reconstr
 | `insight-iteration` | 24 | 1 | 80 | 4 |
 | `process-review` | 16 | 4 | 64 | 6 |
 | `efficiency-loop` | 10 | 1 | 36 | 1 |
-| `research-loop` | 27 | 4 | 97 | 8 |
+| `research-loop` | 27 | 4 | 98 | 8 |
 | `pipeline-improvement` | 33 | 2 | 151 | 5 |
 | `documentation-pass` | 1 | 0 | 23 | 1 |
 | `remediation` | 0 | 1 | 0 | 3 |

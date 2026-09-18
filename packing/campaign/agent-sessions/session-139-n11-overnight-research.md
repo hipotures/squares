@@ -29,7 +29,7 @@ session:
       Freeze this session, register exp-161 for H-163, and dispatch three disjoint
       lanes: H-216 freeze/polish at n=6 299/100, the think-g3j7 new reader, and Route S
       preregistration. H-216 must exit this phase.
-    status: in_progress
+    status: completed
     entered_by: session_start
     switch_reason: null
     budget_minutes: 180
@@ -49,12 +49,51 @@ session:
     fallback: >-
       Retain whatever freeze, reader tests, and exp-161 contract exist, then spend
       Block 4 on think-g4n9 and Blocks 5–7 on Route S if exp-161 exists else the reader.
+    outcome: >-
+      exp-161 registered with a live lease. H-216 two named site sets both covering
+      >= 6; freeze retained; H-216 stays open. Relational colgen skeleton landed;
+      think-g3j7 stays open. W5 Chromium-early landed ahead of 08:33Z. Covering
+      research filled the remaining wall: 26 covering sides, closest n=11 point-atom
+      11.018646 at 191/50 with windows.
+    evidence:
+      - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-161-h163-route-s-threshold-compression.md
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/h216-n6-299-100-receipt.md
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/exp-161-block57-command.md
+    stop_reason: phase deadline
+    next_action: >-
+      Blocks 5–7 at 09:33Z run exp-161 encode-only. Covering continues until then.
+      Block 8 is closeout. Do not close think-qqzs, think-g3j7, think-gyzw, think-jwb1.
+  - workflow: research-loop
+    focus: insight
+    recording: contemporaneous
+    clock_role: work
+    commitment: BC-357
+    bead: think-mcb6
+    objective: >-
+      Covering probes until 09:33Z, then exp-161 encode-only for H-163, then
+      closeout. Do not treat H-216 as an n=11 result.
+    status: in_progress
+    entered_by: planned_checkpoint
+    switch_reason: phase 1 deadline; W5 already landed
+    budget_minutes: 267
+    started_at: '2026-09-18T08:26:00Z'
+    deadline_at: '2026-09-18T12:53:00Z'
+    expected_output: >-
+      Covering register updates, exp-161 encode receipt or unresolved timeout,
+      morning report.
+    validation_command: >-
+      cd packing && uv run --frozen --all-extras --group dev packing-ledger check &&
+      uv run --frozen --all-extras --group dev packing-validate --records
+    kill_condition: >-
+      Stop at 13:33Z. Do not --search until encode-only exists. Do not close
+      think-qqzs, think-g3j7, think-gyzw, or think-jwb1.
+    fallback: Retain covering receipts and an unresolved encode.
     outcome: null
     evidence: []
     stop_reason: null
     next_action: >-
-      Block 4 is W5 think-g4n9. Blocks 5–7 run the exp-161 target if the artifact
-      exists; otherwise continue the F1 reader. Block 8 is closeout.
+      Covering until 09:33Z. Then live --check and encode-only from
+      exp-161-block57-command.md.
   budget:
     wall_minutes: 480
     max_cycles: 8
@@ -133,19 +172,27 @@ session:
   - task: Freeze and polish a helper-free point family at n=6, side 299/100, B=9977/10000,
       181-net, and hand it to both ceiling readers or both decide_certificate routes.
     operator: Cursor Lane A H-216
-    status: in_progress
+    status: completed
     recording: contemporaneous
-    outcome: null
-    evidence: null
-    files: null
-    checks: null
+    outcome: >-
+      Two named site sets at n=6 299/100 both covering >= 6 (6.08216 and 6.07724).
+      Polished family 76/13 fails K3 and does not kill. H-216 stays open. Not an
+      n=11 result.
+    evidence:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/h216-n6-299-100-receipt.md
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/h216-n6-299-100-sites2-receipt.md
+    files:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/h216-n6-299-100-covering.json
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/h216-n6-299-100-sites2-covering.json
+    checks:
+      - packing-ledger check after freeze receipts
+      - both site sets covering >= 6; polished 76/13 K3 fail recorded
     uncertainty: >-
       X-037 attic numbers [83/14, 6.006571] are V0/C0. A float LP or incomplete row set
       decides neither direction.
     elapsed_seconds: null
     elapsed_quality: unavailable
-    next_action: Freeze covering 6.08216 does not confirm; polished family 76/13
-      depth-one fails K3 and does not kill. H-216 stays open. Exit at 08:33Z.
+    next_action: Leave H-216 open. Do not chase further this session. Not an n=11 result.
     phase: 1
     budget_minutes: 180
     started_at: '2026-09-18T05:33:00Z'
@@ -171,19 +218,26 @@ session:
   - task: Land a new relational-certificate reader for weighted-majority, k-of-S, and
       floor atoms without mutating T-025/T-026 verify_claim.py.
     operator: Cursor Lane B F1 reader
-    status: in_progress
+    status: completed
     recording: contemporaneous
-    outcome: null
-    evidence: null
-    files: null
-    checks: null
+    outcome: >-
+      Relational colgen skeleton landed. Full production reader for think-g3j7 is
+      still open. T-025/T-026 verify_claim.py were not mutated.
+    evidence:
+      - packing/src/sqpack/fractional/relational.py
+      - packing/devtools/run_relational_colgen.py
+    files:
+      - packing/src/sqpack/fractional/relational.py
+      - packing/devtools/decide_relational_certificate.py
+    checks:
+      - pytest tests/test_run_relational_colgen.py
+    next_action: Leave think-g3j7 open. Do not mutate T-025/T-026 verify_claim.py.
     uncertainty: >-
       think-h1ju and think-k1pe passed a private review whose candidate lived under
       /private/tmp/n11-floor-atom-prep, which is not in this checkout. Production
       adoption still has to happen in-tree.
     elapsed_seconds: null
     elapsed_quality: unavailable
-    next_action: Implement the new reader and controls; do not start covering LP.
     phase: 1
     budget_minutes: 180
     started_at: '2026-09-18T05:33:00Z'
@@ -218,10 +272,9 @@ session:
   checks: []
   stop_reason: null
   next_action: >-
-    Continue Blocks 1–3 until 08:33Z: H-216 freeze/polish retained and open;
-    keep the F1 reader tests green; producer exists but emits no candidate.
-    Then Block 4 think-g4n9, Blocks 5–7 Route S only with --authorize-target
-    exp-161 after a live --check, Block 8 closeout.
+    Blocks 5–7 at 09:33Z: live --check then exp-161 encode-only. Covering continues
+    until then. W5 already landed. Block 8 closeout. Do not close think-qqzs,
+    think-g3j7, think-gyzw, or think-jwb1.
 ---
 # Session 139: N11 Overnight Research
 
@@ -472,6 +525,13 @@ through the 60-round limit (120 still violated, `least_covered` 0.992). Never
 crossed above eleven. Site set refuted, unconverged; new covering side 3.81.
 Covering-values now 26 sides. n=18 T-019 seed row loop reached `17.875567`
 with violated 0; column generation still running.
+
+## Hour 3 phase-1 exit (2026-09-18T08:33Z)
+
+H-216 exits open: two named site sets covering >= 6, not an n=11 result.
+think-g3j7 stays open. W5 already landed. Next is Route S encode-only at
+09:33Z. Covering continues: n=18 T-019 seed row loop at 17.875567 with
+violated 0, still in column generation; n=12 T-017 four-grid in flight.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
