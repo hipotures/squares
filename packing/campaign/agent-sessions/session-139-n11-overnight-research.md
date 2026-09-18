@@ -558,6 +558,16 @@ n=17. n=19 stays 4.80 (T-020). H-216 is not an n=11 result. Route S encode-only
 remains 09:33Z. Covering continues at 117/25 (locked 18.000000 on the T-019 seed;
 windows in flight) and 469/100.
 
+## Hour 4 covering register (2026-09-18T09:05Z)
+
+T-027 committed (`3461922d`). T-019-seeded auto at `117/25` converged with exact
+mass `18000043/1000000 = 18.000043` (float 17.999999999552305) in 180 s; cannot
+certify. T-019-seeded auto at `47/10` converged `18.165413` in 390 s; cannot
+certify. T-019-seeded auto plus `--seed-windows 5` at n=17 `23/5` stopped
+unconverged at `17.042346` after 931.6 s (42 rounds, 9 violated), 0.007 below
+the seed without windows. Site sets refuted; sides open. 4.68 windows and 4.69
+seed still in flight.
+
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
 -->
