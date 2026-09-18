@@ -727,6 +727,13 @@ n=12 `397/100` four-grid, n=17 windows 6 then 7 if still above 17, n=19
 `97/20` T-020 windows 6; freeze at `--support-cap 32`, declare-then-decide
 if mass < n. CI on `9c0156eb` succeeded. Do not land T-028 during encode.
 
+## Hour 7 (2026-09-18T11:08Z)
+
+Encode-only still running (pid 347502, elapsed 1:35:22, ~100% CPU, RSS
+cycling 0.13–1.00 GiB per direction, peak 2.45 GiB). No JSON. Log empty. No
+`--search`. Waiter still waiting on that pid. Covering queue unchanged. Do
+not land T-028 during encode. Scientific wall ends 12:33Z; closeout 12:53Z.
+
 ## Block 8 closeout (12:53–13:33Z)
 
 Stop new research. Do not `--search`. Do not merge. Do not close
