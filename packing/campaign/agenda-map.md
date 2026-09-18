@@ -137,7 +137,7 @@ A commitment blocked by other commitments names them; one blocked by something e
 | agenda-035 | `BC-327` | 2 | `BC-325` | yes | Multiplicity semantics are not admitted across the producer, loader, capacity reader and both coverage routes; the… |
 | agenda-035 | `BC-330` | 2 | — | no | The restricted-domain threshold gate and complete matched point baseline are not admitted. |
 | agenda-036 | `BC-343` | 0 | `BC-354`, `BC-355` | no | — |
-| agenda-037 | `BC-358` | 1 | — | no | The owner’s atom-format decision (think-g3j7): verify_claim.py accepts only unweighted 2-of-3 atoms. Also the… |
+| agenda-037 | `BC-358` | 1 | — | no | The retained verifier still accepts only unweighted 2-of-3 atoms (think-g3j7 implementation). Also the unretained… |
 
 ## Discharged elsewhere
 

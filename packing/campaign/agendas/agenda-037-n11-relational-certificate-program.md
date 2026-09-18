@@ -8,14 +8,14 @@ softschema:
 agenda:
   id: agenda-037
   title: N11 Relational-Certificate Program
-  updated: '2026-09-17'
+  updated: '2026-09-18'
   status: active
   objective: >-
     Pursue n=11 results beyond the one-body ceiling L* = 38200/9977 through certificates
     that price relations between squares, starting from the overnight route slate in
-    X-037. Calibrate the certificate machinery at the solved cases n=6 and n=10, keep
-    Route F1 relational atoms blocked until their format, checkpoint, and convergence
-    tool exist, and record the retired mechanisms so they are not proposed again.
+    X-037. Calibrate the certificate machinery at the solved cases n=6 and n=10 under
+    H-216, keep Route F1 / H-217 blocked until the widened verifier, sites-1 checkpoint,
+    and convergence tool exist, and leave M2, M4, M5, M6, and M8 retired.
   items:
   - id: BC-356
     purpose: research
@@ -43,7 +43,8 @@ agenda:
     bead: think-4woh
     depends_on: [BC-347]
     next_evidence: >-
-      The owner answers the five decisions in X-037; BC-357 closes M7’s n=6 bracket.
+      The five X-037 decisions are resolved; H-216 and H-217 are registered. BC-357
+      closes the n=6 bracket under H-216.
     workflows: [factual-review, insight-iteration, review-planning-oversight]
     program: n11-strategy-reset
     artifacts:
@@ -101,15 +102,14 @@ agenda:
       Does a helper-free weighted-point certificate exist for n=6 at side 299/100 with
       B = 9977/10000 on the 181-direction net, and how far do point certificates reach
       at n=10 with B in (0.99808, 0.99885]?
+    hypotheses: [H-216]
     budget: >-
-      One block of two to three hours: G5 site merging before freeze, G1 and G2 as
-      guarded changes to the stock drivers, then the n=6 bracket at 299/100 with
-      checkpointed cutting runs. An n-parameterised threshold producer (about 2–3 h)
-      follows for the threshold language at n=6.
+      One block of two to three hours on the stock drivers: freeze and polish at 299/100,
+      then either an exact ceiling family of total at least 6 or a rows-complete covering
+      below 6 decided by both gate routes. An n-parameterised threshold producer (about
+      2–3 h) follows for the threshold language at n=6 and is not H-216's instrument.
     entry: >-
-      BC-356 is complete. The first slice changes tools and needs no registration;
-      registering the n=6 statement as a hypothesis is owner decision 2 in X-037 and
-      precedes any claim.
+      BC-356 is complete. H-216 is registered. G1, G2, G3, and G5 are on main.
     exit: >-
       Either an exact depth-one family of total at least 6 at 299/100, which proves no
       point certificate exists at this scope, or a rows-complete value below 6 on a
@@ -118,17 +118,17 @@ agenda:
     bead: think-qqzs
     depends_on: [BC-356]
     next_evidence: >-
-      A guarded site-merge step that lets the gate decide the 298/100 candidate, then a
-      polish of the 1,128-placement union with the exact vertex rebuild fixed.
+      An exact polish of a large placement union at 299/100, or a rows-complete covering
+      below 6 on a named site set that both routes of decide_certificate accept.
     workflows: [pipeline-improvement, research-loop]
     program: n11-strategy-reset
     artifacts:
     - packing/campaign/explorations/X-037-n11-overnight-review-and-route-slate.md
     parallel_group: solved-case-calibration
     note: >-
-      Calibration only. Certificates at n=6 and n=10 are weaker than the proved values
-      and are not new results; the question is whether helpers are necessary at a
-      solved case.
+      Calibration only, under H-216. Certificates at n=6 and n=10 are weaker than the
+      proved values and are not new results; the question is whether helpers are
+      necessary at a solved case.
   - id: BC-358
     purpose: research
     owner_focus: insight
@@ -138,13 +138,14 @@ agenda:
     question: >-
       Is the rows-complete covering LP with weighted-majority and floor atoms on
       arrangement-vertex sites below 11 at 153/40 (B = 9977/10000, 181-direction net)?
+    hypotheses: [H-217]
     budget: >-
       Tooling first (checkpointed column generation with an independent reader, about a
       day), then a convergence run of several checkpointed hours.
     entry: >-
-      The owner decides the atom format under think-g3j7, the sites-1 checkpoint is
-      retained or regenerated under think-3xbr, and the column-generation loop is a
-      guarded tool under think-gyzw.
+      X-037 admits the atom classes. The sites-1 checkpoint is retained or regenerated
+      under think-3xbr, the column-generation loop is a guarded tool under think-gyzw,
+      and think-g3j7 lands a retained verifier for those classes.
     exit: >-
       Either a depth-one mass-11 family with no violated majority or floor atom on its
       own vertices, which kills the route at this scope, or a dual with no cell below 1,
@@ -152,11 +153,11 @@ agenda:
     bead: think-gyzw
     depends_on: []
     blocked_on: >-
-      The owner’s atom-format decision (think-g3j7): verify_claim.py accepts only
-      unweighted 2-of-3 atoms. Also the unretained sites-1 checkpoint (think-3xbr) and
-      the missing convergence tool (think-gyzw).
+      The retained verifier still accepts only unweighted 2-of-3 atoms (think-g3j7
+      implementation). Also the unretained sites-1 checkpoint (think-3xbr) and the
+      missing convergence tool (think-gyzw).
     next_evidence: >-
-      The owner’s format decision, then the guarded colgen tool run to one of its two
+      The think-g3j7 verifier, then the guarded colgen tool run to one of H-217's two
       terminal states.
     workflows: [pipeline-improvement, research-loop]
     program: n11-strategy-reset
@@ -165,7 +166,7 @@ agenda:
     parallel_group: route-f1-relational-atoms
     note: >-
       This is Route F1 from the BC-347 audit, widened by the overnight adversarial
-      review. Registering it as a hypothesis is owner decision 3 in X-037.
+      review and registered as H-217.
   - id: BC-359
     purpose: research
     owner_focus: insight
@@ -229,8 +230,9 @@ agenda:
       result: >-
         Retired for feasibility. Theta needs an SDP solver and an exact PSD certificate
         (15–27 h), and alpha on the retained supports is trivially 10 or 9. It survives
-        as a record note: M1, M8, and M2 relax one integer set-packing object. Reopen
-        only if the owner admits an SDP dependency.
+        as a record note: M1, M8, and M2 relax one integer set-packing object. Resolved
+        2026-09-18: SDP is not admitted; theta without exact PSD is at most V1 and
+        cannot support a bound. Reopen only with an exact PSD route that can reach C3.
       evidence:
       - packing/campaign/explorations/X-037-n11-overnight-review-and-route-slate.md
       disposition: retire-negative
@@ -258,9 +260,10 @@ agenda:
     - scope: M6, LP-relaxation rounding as an n=11 proof route.
       classification: bounded-negative
       result: >-
-        Retired as a proof route; its ν*(U) diagnostic is ill-posed as stated. It
-        survives only as a Route D search hypothesis with Trump’s packing as the exact
-        control, which is owner decision 4 in X-037.
+        Retired as a proof route; its ν*(U) diagnostic is ill-posed as stated. Resolved
+        2026-09-18: no Route D search hypothesis. Reopen only with a criterion that can
+        be wrong, Trump’s packing as the exact control, and an instrument, named before
+        a run.
       evidence:
       - packing/campaign/explorations/X-037-n11-overnight-review-and-route-slate.md
       disposition: retire-negative
@@ -280,8 +283,11 @@ agenda:
 
 This agenda carries the queue that came out of the 2026-09-17 overnight review
 ([X-037](../explorations/X-037-n11-overnight-review-and-route-slate.md),
-[session-138](../agent-sessions/session-138-n11-overnight-review.md)). It records
-measurements and dispositions only: no bound moved and no hypothesis was registered.
+[session-138](../agent-sessions/session-138-n11-overnight-review.md)). The overnight
+program moved no bound.
+The 2026-09-18 addition to X-037 resolves the five owner decisions and registers
+[H-216](../hypotheses/H-216-no-point-certificate-at-n6-299-100.md) and
+[H-217](../hypotheses/H-217-route-f1-majority-floor-at-153-40.md).
 
 ## Relation to Agenda-036
 
@@ -297,19 +303,19 @@ Agenda-036 was not edited, because an open pull request also edits it.
 
 - **BC-356 (complete).** The overnight review, the adversarial verdicts, and the M1 and
   M7 measurements at their stated scope.
-- **BC-357 (ready).** M7 calibration under `think-qqzs`: close the n=6 bracket at
-  299/100 after the G5 site-merge fix.
-  This is the next executable entry; registering the n=6 statement waits for the owner.
-- **BC-358 (blocked).** Route F1 relational atoms at 153/40. Blocked on the atom-format
-  decision (`think-g3j7`), the `sites-1` checkpoint (`think-3xbr`), and a guarded
-  convergence tool (`think-gyzw`).
+  The five owner decisions are resolved in X-037.
+- **BC-357 (ready).** M7 calibration under `think-qqzs` / H-216: close the n=6 bracket
+  at 299/100. G1, G2, G3, and G5 are on main.
+  G4 remains on this bead and is not H-216’s instrument.
+- **BC-358 (blocked).** Route F1 / H-217 at 153/40. The language is admitted.
+  The cell waits on the `think-g3j7` verifier, the `sites-1` checkpoint (`think-3xbr`),
+  and a guarded convergence tool (`think-gyzw`).
 - **BC-359 (tentative).** The M3 kill test under `think-k4vb`.
-- **BC-360 (stopped).** M2, M4, M5, M6, and M8, retired with reasons and reopening
-  conditions.
+- **BC-360 (stopped).** M2, M4, M5, M6, and M8, retired with reasons.
+  SDP is not admitted.
+  No Route D search hypothesis.
 
-Five owner decisions come before any registration: the atom format, the n=6 calibration
-statement, M1 as Route F1, an M6 Route D campaign, and an SDP dependency for M2. X-037
-lists them.
+`exp-161` remains Route S in agenda-036.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

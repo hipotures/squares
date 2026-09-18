@@ -35,6 +35,8 @@ exploration:
   - packing/devtools/polish_ceiling_family.py
   - packing/devtools/independent_ceiling_reader.py
   - packing/src/sqpack/fractional/colgen.py
+  - epistemics.md
+  proposes: [H-216, H-217]
 ---
 # X-037: N11 Overnight Review and Route Slate
 
@@ -42,9 +44,17 @@ exploration:
 ([session-138](../agent-sessions/session-138-n11-overnight-review.md), bead
 `think-4woh`) reviewed the n=11 record, ranked eight new mechanisms, reviewed them
 adversarially, and ran two of them.
-No bound moved, no hypothesis was registered, and nothing was measured above side 191/50
-in core units. [agenda-037](../agendas/agenda-037-n11-relational-certificate-program.md)
-holds the resulting queue.
+No bound moved, no hypothesis was registered that night, and nothing was measured above
+side 191/50 in core units.
+[agenda-037](../agendas/agenda-037-n11-relational-certificate-program.md) holds the
+resulting queue.
+
+**Resolutions, 2026-09-18.** The five owner decisions are resolved under
+[`epistemics.md`](../../../epistemics.md).
+[H-216](../hypotheses/H-216-no-point-certificate-at-n6-299-100.md) and
+[H-217](../hypotheses/H-217-route-f1-majority-floor-at-153-40.md) are registered.
+The overnight numbers remain scratch until a guarded tool reproduces them.
+No bound moved.
 
 ## Evidence Boundary
 
@@ -394,6 +404,8 @@ The coordinator filed follow-up beads for the tooling:
 
 ## Owner Decisions Needed
 
+Resolved 2026-09-18; see [Resolutions](#resolutions-2026-09-18). The questions as asked:
+
 1. **Atom format (`think-g3j7`).** Should the retained threshold verifier accept
    weighted-majority, k-of-S, and floor atoms?
    Without that no M1 atom can enter a retained certificate.
@@ -408,6 +420,88 @@ The coordinator filed follow-up beads for the tooling:
    hypothesis with Trump’s packing as the exact control, or left retired?
 5. **The M2 SDP dependency.** Should an SDP solver be admitted under the supply-chain
    rules so that theta can serve as a diagnostic?
+
+## Resolutions (2026-09-18)
+
+Classifications follow [`epistemics.md`](../../../epistemics.md).
+A compound claim takes the minimum rung of its load-bearing parts.
+Significance never gates.
+Attic scratch under `attic/overnight/` is V0/C0 and is not repository evidence.
+A draft is not a hypothesis, and a hypothesis is not a result.
+`exp-161` stays reserved for Route S.
+
+| # | Question | Resolution | Record |
+| --- | --- | --- | --- |
+| 1 | Atom format | Admit weighted-majority, k-of-S, and floor atoms as a certificate language. Do not reread T-025 or T-026. A new class needs two-route C4 before a T-id. Admission is not a bound. | `think-g3j7` implements; `verify_claim.py` still refuses until that lands |
+| 2 | n=6 statement | Do not promote the attic negative to a result. Register it as a determination. | [H-216](../hypotheses/H-216-no-point-certificate-at-n6-299-100.md) |
+| 3 | M1 as Route F1 | Register the rows-complete majority-and-floor LP at 153/40 with the adversarial kill rule. The instrument does not exist yet. | [H-217](../hypotheses/H-217-route-f1-majority-floor-at-153-40.md) |
+| 4 | M6 as Route D | Leave retired. Do not register a search hypothesis. | BC-360 |
+| 5 | M2 SDP | Do not admit an SDP solver. M2 stays retired. | BC-360 |
+
+### 1. Atom format — admit the language
+
+Weighted-majority, k-of-S, and floor atoms are a method, not a statement about `s(n)`.
+Admitting them does not create a result and carries no V/C rung.
+
+T-025 and T-026 are V4/C5 in the 2-of-3 (+ point) language.
+Their frozen bytes stay in that language.
+Rereading them as majority or floor certificates would be a new compound claim and would
+take the minimum rung of a part that has no two-route evidence.
+
+A certificate in the new classes can support a bound only at V4/C3, and C4 needs two
+distinct methods. Until `think-g3j7` lands a retained verifier, no M1 atom can enter a
+certificate. Format admission unblocks that implementation.
+It does not unblock BC-358’s covering run, which still waits on the verifier,
+`think-3xbr`, and `think-gyzw`.
+
+### 2. n=6 statement — hypothesis, not a result
+
+The attic claim “no point certificate at n=6, 299/100, for any site set” is V0/C0.
+Registering it as already true would treat scratch as evidence.
+
+[H-216](../hypotheses/H-216-no-point-certificate-at-n6-299-100.md) is the same sentence
+stated so it can be wrong.
+Confirm with an exact depth-one family of total at least 6 that both ceiling readers
+accept. Refute with a frozen covering below 6 on a named site set that both routes of
+`decide_certificate` accept.
+The overnight bracket `[83/14, 6.006571]` does not decide either side.
+
+G1, G2, G3, and G5 are on main, so the instrument exists.
+G4 is a threshold producer and is not this measurement.
+A decided H-216 is calibration at a solved case; `s(6) = 3` does not move.
+
+### 3. M1 as Route F1 — register, blocked on tools
+
+The rows-complete majority-and-floor LP at 153/40 is a claim that can be wrong.
+[H-217](../hypotheses/H-217-route-f1-majority-floor-at-153-40.md) takes the adversarial
+kill rule as its criterion: a depth-one mass-11 family with no violated majority or
+floor atom kills the route at this scope; a dual with no cell below 1, accepted by both
+gate routes, confirms.
+
+The overnight chase did not terminate.
+Surviving an informal kill, and every fixed-support value below 11, is not evidence that
+the covering LP is below 11. `instrument_ready` is false until the three named tools
+exist.
+
+### 4. M6 — stay retired
+
+The proof-route diagnostic ν*(U) is ill-posed as stated.
+A Route D search hypothesis would need a criterion that can be wrong, Trump’s packing as
+the exact control, and an instrument that proposes LP-rounded seeds.
+None of those exists.
+Significance never gates, so the low judged P2 is not why this stays retired.
+A draft is not a hypothesis.
+Reopen only with those three pieces named before a run.
+
+### 5. M2 SDP — do not admit
+
+Lovász theta without an exact PSD certificate is at most V1. A bound in this repository
+needs V4/C3, so theta cannot support one.
+An SDP solver would be a new dependency without a confirmation path, which is not a
+package the supply-chain rules say to add.
+M1, M8, and M2 remain one integer set-packing object at increasing relaxation strength,
+as the record note already says.
+M2 stays retired until an owner-approved exact PSD route exists.
 
 ## What This Program Did Not Establish
 
