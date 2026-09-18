@@ -63,6 +63,7 @@ def merge_near_atoms(
         return certificate, empty
 
     atoms = certificate.atoms
+    side = certificate.outer_side
     parent = list(range(len(atoms)))
 
     def find(index: int) -> int:
@@ -76,24 +77,28 @@ def merge_near_atoms(
         if root_left != root_right:
             parent[root_right] = root_left
 
-    pairs: list[tuple[int, int]] = []
+    # A D4-symmetric orbit has to be one component before collapse. Emitting a
+    # full orbit from each singleton re-writes the same eight sites eight times
+    # and breaks Condition 1 on a source that already held it.
+    index_of: dict[tuple[Fraction, Fraction], list[int]] = defaultdict(list)
+    for index, atom in enumerate(atoms):
+        index_of[(atom.x, atom.y)].append(index)
+    for index, atom in enumerate(atoms):
+        for image in d4_images(atom.x, atom.y, side):
+            for found in index_of.get(image, ()):
+                union(index, found)
+
     for i, first in enumerate(atoms):
         for j in range(i + 1, len(atoms)):
             second = atoms[j]
             if abs(first.x - second.x) <= radius and abs(first.y - second.y) <= radius:
                 union(i, j)
-                pairs.append((i, j))
-
-    side = certificate.outer_side
-    index_of = {(atom.x, atom.y): index for index, atom in enumerate(atoms)}
-    for i, j in pairs:
-        first_images = d4_images(atoms[i].x, atoms[i].y, side)
-        second_images = d4_images(atoms[j].x, atoms[j].y, side)
-        for image_i, image_j in zip(first_images, second_images, strict=True):
-            left = index_of.get(image_i)
-            right = index_of.get(image_j)
-            if left is not None and right is not None:
-                union(left, right)
+                first_images = d4_images(first.x, first.y, side)
+                second_images = d4_images(second.x, second.y, side)
+                for image_i, image_j in zip(first_images, second_images, strict=True):
+                    for left in index_of.get(image_i, ()):
+                        for right in index_of.get(image_j, ()):
+                            union(left, right)
 
     groups: dict[int, list[int]] = defaultdict(list)
     for index in range(len(atoms)):

@@ -262,7 +262,9 @@ def test_freeze_family_writes_the_priced_dual_as_a_ceiling_record(tmp_path: Path
     assert result["family_frozen"] == str(family_path)
     assert result["priced_support_rows"] == record["provenance"]["support_rows"]
     assert len(record["placements"]) == 8 * record["provenance"]["support_rows"]
-    assert result["settings"]["support_cap"] is None
+    recorded = result["settings"]
+    assert isinstance(recorded, dict)
+    assert recorded["support_cap"] is None
 
 
 def test_support_cap_zero_on_the_command_line_means_every_row(tmp_path: Path) -> None:

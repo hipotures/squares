@@ -37,7 +37,9 @@ def _grid_certificate(square_side: Fraction) -> Certificate:
     )
 
 
-def _orbit_atoms(x: Fraction, y: Fraction, weight: Fraction, side: Fraction) -> tuple[Atom, ...]:
+def _orbit_atoms(
+    x: Fraction, y: Fraction, weight: Fraction, side: Fraction
+) -> tuple[Atom, ...]:
     return tuple(
         Atom(f"{index:04d}", px, py, weight)
         for index, (px, py) in enumerate(dict.fromkeys(d4_images(x, y, side)))
@@ -57,6 +59,7 @@ def test_a_radius_below_the_grid_spacing_does_not_clear_the_seam_stall() -> None
 
     certificate = _grid_certificate(Fraction(1, 2))
     merged, receipt = merge_near_atoms(certificate, radius=Fraction(1, 10))
+    assert merged is certificate
     assert receipt.collapsed == 0
     assert site_weights(merged) == site_weights(certificate)
     stalled = verify_by_intervals(merged, directions=("0",))
