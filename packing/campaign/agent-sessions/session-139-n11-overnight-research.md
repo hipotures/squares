@@ -665,6 +665,24 @@ appears only on a converged row loop. If its `total_mass` is below n, run
 `declare_least_cell_mass` then `decide_certificate` on those bytes. Do not
 `--verify-serial` during colgen. Do not `--search`.
 
+If `decide_certificate` prints RETAINABLE, the next T-id is **T-028**. Do not
+use BC-357. `produced_by.session` is `session-139`. Score S3 (same generator;
+T-020 calibration). Copy the T-027 landing, not a new case class:
+
+- n=12 `397/100`: add `cases/n12_fractional_certificate/certificate-397-100.json`
+  and point `certificate.json` at it. Current verified lower is T-017 `99/25`.
+  Keep the 99/25 bytes as a named lower rung.
+- n=17 `23/5`: add a named rung under `cases/n17_fractional_certificate/`.
+  T-019 `459/100` stays the n=17 bound until mass is below 17 at 23/5.
+- n=19 `97/20`: new bytes, not T-021's `certificate.json` (mass 19.848723).
+  Seed was `certificate-24-5.json`. T-020 stays until mass is below 19.
+
+Then: receipt, `results.yaml`, `evidence.yaml`, `n-0NN.md` verified lower,
+covering-values `frozen_artifact` matching `^packing/cases/.+\.json$`,
+`python -m devtools.render_results --update`, `render_certificate_reach`,
+`python -m devtools.build_composite_figure_data --update`, DS7/interval
+`--push` contracts, `packing-validate --push`. Not during encode.
+
 Sweeps composite-figure.json was regenerated at 09:39Z for n=18 4.67
 (`7b9a4deb`). Do not paste the suite-b 74.1s sample into
 `gate-budgets.yaml`; that job's tests passed.
