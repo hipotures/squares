@@ -277,6 +277,34 @@ charge test. Hosted typecheck band is now 55.67 s / ceiling 111 s. Head `876dd80
 is hosted-green (37 checks). A second H-216 site set on grids 18/24/29/34 froze
 covering `151931/25000` = 6.07724 (does not confirm).
 
+## Block 4 W5 plan (`think-g4n9`, 08:33Z)
+
+Packing wall pole is **frontend** (6 of the last 8 exact-head successes). Pages
+full-build is usually ≤180 s; the newest explainer-in-scope head was 190 s on
+print-layout. Both walls stay **advisory**. Do not flip enforcement. Do not add
+`suite-c` in this block: a third shard leaves the frontend job at 168–189 s.
+
+Slice: start Chromium early with the existing `_submission_order` / `start_early`
+tool, and stop serializing independent Chromium work.
+
+- `packing/src/sqpack/cli/validate.py`: `start_early=True` on workbench Chromium
+  behavior (hosted pair 59.09 s / 91.69 s).
+- `.github/workflows/packing-validation.yml`: `playwright install --with-deps`
+  in parallel with uv/Node after checkout; apt-archive cache like Pages.
+- `.github/workflows/pages.yml`: print-layout self-check concurrent with
+  `check_print_layout`; typography paper/startup/geometry as concurrent groups.
+- Tests: `test_validation_cli.py`, `test_module_boundaries.py`,
+  `test_pages_workflow.py`.
+- Do not edit `gate-budgets.yaml` in the first commit.
+
+Predicted packing wall ~150 s typical / ~169 s at 1.8× of fast Chromium, still
+failing on suite-a slow runners and queue ≥30 s. `suite-c` is the follow-on.
+Re-enforcement still needs five consecutive exact-head runs with **both** walls
+≤180 s.
+
+Live `admit_threshold_compression --check` passed at 2026-09-18T06:05Z (exit 0).
+That receipt is not yet on the branch.
+
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
 -->
