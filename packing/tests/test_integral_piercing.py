@@ -24,8 +24,10 @@ from sqpack.fractional.integral_piercing import (
     load_unique_sites,
     m3_verdict_for,
     solve_integral_set_cover,
+    span_and_broadcast_cover_rows,
     t018_certificate_path,
 )
+from sqpack.fractional.threshold_coverage_encoding import unique_rows
 
 PACKING = Path(__file__).resolve().parents[1]
 
@@ -95,6 +97,25 @@ def test_timeout_is_unresolved_never_a_kill(monkeypatch: pytest.MonkeyPatch) -> 
     assert outcome.search_status is SearchStatus.timeout
     assert outcome.piercing is None
     assert m3_verdict_for(outcome.search_status, outcome.piercing) is M3Verdict.unresolved
+
+
+def test_span_cover_matches_cell_broadcast() -> None:
+    sites = (
+        (Fraction(1), Fraction(1)),
+        (Fraction(2), Fraction(1)),
+        (Fraction(1), Fraction(2)),
+        (Fraction(5, 2), Fraction(5, 2)),
+    )
+    span_rows, chunk_rows = span_and_broadcast_cover_rows(
+        sites, outer_side=Fraction(4), square_side=Fraction(1), direction=axis_aligned()
+    )
+
+    def row_keys(rows: np.ndarray) -> set[bytes]:
+        if rows.size == 0:
+            return set()
+        return {bytes(row.tobytes()) for row in unique_rows(rows)}
+
+    assert row_keys(span_rows) == row_keys(chunk_rows)
 
 
 def test_tiny_event_cell_instance_has_piercing_one() -> None:

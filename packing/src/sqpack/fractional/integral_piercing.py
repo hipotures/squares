@@ -288,6 +288,118 @@ def _chunk_cover_rows(
     return accumulated
 
 
+def _remember_cover_row(seen: dict[bytes, np.ndarray], row: np.ndarray) -> bool:
+    """Store a nonzero covering row. True when the segment is uncovered."""
+
+    if not bool(row.any()):
+        return True
+    key = row.tobytes()
+    if key not in seen:
+        seen[key] = row.copy()
+    return False
+
+
+def _span_cover_rows(
+    spans: tuple[tuple[int, int, int], ...],
+    rectangles: tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray],
+    *,
+    deadline_monotonic: float | None = None,
+) -> np.ndarray:
+    """Unique covering rows of reachable spans, without expanding every event cell.
+
+    Coverage is constant between a site rectangle's v-events, so a per-column sweep
+    emits one row per segment instead of one row per cell. An uncovered reachable
+    cell still returns a single zero row, matching ``_chunk_cover_rows``.
+    """
+
+    left, right, bottom, top = rectangles
+    n_sites = int(left.size)
+    if not spans:
+        return np.zeros((0, n_sites), dtype=np.uint8)
+    seen: dict[bytes, np.ndarray] = {}
+    uncovered = False
+    for i, j0, j1 in spans:
+        if uncovered:
+            break
+        if _deadline_hit(deadline_monotonic):
+            raise CoverEncodingTimeoutError("event-cell encoding hit the search deadline")
+        if j1 < j0:
+            continue
+        active = np.flatnonzero((left <= i) & (i < right))
+        starts = np.maximum(bottom[active], j0) if active.size else np.zeros(0, dtype=np.int64)
+        ends = np.minimum(top[active], j1 + 1) if active.size else np.zeros(0, dtype=np.int64)
+        live = starts < ends
+        if active.size == 0 or not bool(np.any(live)):
+            uncovered = True
+            break
+        site_ids = active[live]
+        start_j = starts[live].astype(np.int64, copy=False)
+        end_j = ends[live].astype(np.int64, copy=False)
+        event_j = np.concatenate((start_j, end_j))
+        n_live = int(site_ids.size)
+        event_kind = np.concatenate(
+            (np.zeros(n_live, dtype=np.int8), np.ones(n_live, dtype=np.int8))
+        )
+        event_site = np.concatenate((site_ids, site_ids))
+        order = np.lexsort((event_kind, event_j))
+        current = np.zeros(n_sites, dtype=np.uint8)
+        cursor = int(j0)
+        for index in order:
+            event_at = int(event_j[index])
+            if event_at > cursor:
+                last_cell = min(event_at - 1, int(j1))
+                if cursor <= last_cell and _remember_cover_row(seen, current):
+                    uncovered = True
+                    break
+                cursor = event_at
+                if cursor > j1:
+                    break
+            if event_kind[index] == 0:
+                current[int(event_site[index])] = 1
+            else:
+                current[int(event_site[index])] = 0
+        if uncovered:
+            break
+        if cursor <= j1 and _remember_cover_row(seen, current):
+            uncovered = True
+            break
+        if len(seen) > MAX_UNIQUE_ROWS:
+            stacked = np.vstack(tuple(seen.values()))
+            kept = _maybe_truncate(unique_rows(stacked))
+            seen = {row.tobytes(): row for row in kept}
+    if uncovered:
+        return np.zeros((1, n_sites), dtype=np.uint8)
+    if not seen:
+        return np.zeros((0, n_sites), dtype=np.uint8)
+    return unique_rows(np.vstack(tuple(seen.values())))
+
+
+def span_and_broadcast_cover_rows(
+    sites: Sequence[Point],
+    *,
+    outer_side: Fraction,
+    square_side: Fraction,
+    direction: Direction,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Span-sweep and expanded-cell covering rows of one direction.
+
+    Both arrays are unique 0/1 rows, or a single zero row when a reachable cell
+    is uncovered. The expanded-cell path is the original encoder; they must agree.
+    """
+
+    if not sites:
+        raise PiercingError("a piercing instance needs at least one site")
+    if outer_side <= 0 or square_side <= 0:
+        raise PiercingError("sides must be positive")
+    atoms = _event_atoms(sites)
+    reduction = reduce_to_spans(atoms, direction, outer_side, square_side)
+    rectangles = _index_rectangles(reduction)
+    span_rows = _span_cover_rows(reduction.spans, rectangles)
+    cells = _reachable_cells(reduction.spans)
+    chunk_rows = _chunk_cover_rows(cells, rectangles)
+    return span_rows, chunk_rows
+
+
 def _maybe_truncate(rows: np.ndarray) -> np.ndarray:
     if rows.shape[0] <= MAX_UNIQUE_ROWS:
         return rows
@@ -352,11 +464,10 @@ def encode_event_cell_covers(
             raise CoverEncodingTimeoutError("event-cell encoding hit the search deadline")
         direction = rotation_from_half_tangent(str(index), tangent)
         reduction = reduce_to_spans(atoms, direction, outer_side, square_side)
-        cell_i, cell_j = _reachable_cells(reduction.spans)
-        reachable += int(cell_i.size)
+        reachable += sum(j1 - j0 + 1 for _column, j0, j1 in reduction.spans)
         rectangles = _index_rectangles(reduction)
-        rows = _chunk_cover_rows(
-            (cell_i, cell_j), rectangles, deadline_monotonic=deadline_monotonic
+        rows = _span_cover_rows(
+            reduction.spans, rectangles, deadline_monotonic=deadline_monotonic
         )
         if rows.shape[0] == 0:
             continue
