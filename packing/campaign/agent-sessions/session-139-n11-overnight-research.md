@@ -699,6 +699,18 @@ covering-values `frozen_artifact` matching `^packing/cases/.+\.json$`,
 `python -m devtools.build_composite_figure_data --update`, DS7/interval
 `--push` contracts, `packing-validate --push`. Not during encode.
 
+T-027's `produced_by` is `session: session-139` only (no `agenda_cell`). Copy
+that. Do not invent a cell. `certificate.json` at n=12 **is** the 99/25
+bytes; there is no `certificate-99-25.json`. Before replacing the live file,
+copy it to that name. Same at n=17: live file is 459/100, no
+`certificate-459-100.json` yet. n=19 has no case package; create
+`cases/n19_fractional_certificate/` on the n=18 pattern. Do not overwrite
+`cases/n20_fractional_certificate/certificate.json` (T-021's 97/20, mass
+19.848723). `test_fractional_certificate.py` asserts the live n=12 claim is
+`s(12) >= 99/25`; that line moves with the pointer. DS7 hardcodes verified
+lowers only for n=17 (`4.59`) and n=18 (`4.67`). Covering `side_decimal`
+`3.97`, `4.6`, and `4.85` are already in the SYNOPSIS unique-side list.
+
 Sweeps composite-figure.json was regenerated at 09:39Z for n=18 4.67
 (`7b9a4deb`). Do not paste the suite-b 74.1s sample into
 `gate-budgets.yaml`; that job's tests passed.
