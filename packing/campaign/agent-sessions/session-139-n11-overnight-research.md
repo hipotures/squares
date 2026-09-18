@@ -547,6 +547,17 @@ loop at `17.875567` (`least_covered` 1) on 6853 sites. Unseeded locked at 18.
 Freeze re-run started with `--support-cap 32`. First session-139 covering
 strictly below n on a named site set.
 
+## Hour 4 T-027 (2026-09-18T08:47Z)
+
+`declare_least_cell_mass` then `decide_certificate` accepted the freeze:
+769 atoms, mass `8937839/500000 = 17.875678`, least cell mass `2000007/2000000`,
+sha256 `3a11b6303e0663b502b6c1e3fc9d8da285104e199b17022937369bc781479059`.
+Landed as `cases/n18_fractional_certificate/` and T-027. Verified
+`s(18) >= 467/100 = 4.67`, +0.08 over T-019's 4.59 at n=18. T-019 unchanged at
+n=17. n=19 stays 4.80 (T-020). H-216 is not an n=11 result. Route S encode-only
+remains 09:33Z. Covering continues at 117/25 (locked 18.000000 on the T-019 seed;
+windows in flight) and 469/100.
+
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
 -->

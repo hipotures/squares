@@ -605,15 +605,17 @@ values:
       (--support-cap 0) and was interrupted after 31 minutes; run.json was not written.
       Wall of the row loop 420.5 s.
     least_covered_mass: '1'
-    frozen_artifact: null
+    frozen_artifact: packing/cases/n18_fractional_certificate/certificate.json
     recorded_in:
       - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-467-100-t019-seed-receipt.md
       - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+      - packing/frontier/n-018.md
     notes: >-
       Session-139 T-019-seeded auto-grid at 467/100. The seed dropped the unseeded
-      locked 18.000000 to a converged 17.875567. This site set can carry a certificate
-      at 4.67 if a freeze-then-decide succeeds. No covering freeze was retained on
-      this invocation.
+      locked 18.000000 to a converged 17.875567. Freeze-then-decide retained the
+      candidate: 769 atoms, total mass 8937839/500000 = 17.875678, least cell mass
+      2000007/2000000. Both decide_certificate routes accept. T-027. The covering
+      objective and the artifact mass are different numbers.
   - n: 18
     side: '117/25'
     side_decimal: '4.68'
