@@ -24,7 +24,7 @@ known packing, otherwise whichever of the two the limit is.
 **`prize` is what the limit allows, not what a search will reach.** The real
 limit is the covering value: a certificate exists at side `L` only where the
 least total mass that covers every admissible `B`-square falls below `n`, and
-that value can bind well below either cap. 37 restricted optima
+that value can bind well below either cap. 38 restricted optima
 have been reported at 21 sides, one per site set, and
 `frontier/covering-values.yaml` registers each with whether its row loop
 converged; every one is at best an upper bound on the unrestricted covering
@@ -40,6 +40,7 @@ at all:
 | 11 | 3.82 | vertex-seeded | 11.055617 | yes | The row loop converged at cutting-plane iteration 5 (11.055617 on 12,761 sites after the arrangement vertices of the dual family were added as site orbits) and held that value through iteration 8; the cutting-plane loop itself stopped on its 36-minute wall with the exact depth-scaled total approximately 9.907905594982566. | nothing frozen here. BC-200 of agenda 021 (exp-060). Sites are the grid at BC-191's density plus the violating arrangement vertices the cutting-plane loop added, which is why this site set's optimum sits above the two earlier site sets' exactly eleven: the quantity is a restricted optimum on that set, an upper bound on the covering value. The run log and the resumable state are retained beside the summary. The prior six-decimal display 9.907906 rounded the exact lower bound upward; this record now preserves its approximate status. |
 | 11 | 3.82 | four-grid-26-35-43-48 | 11.142857 | yes | The row loop converged at LP round 31 (violated 0) at 11.142857 on 6037 sites / 810 orbits. Rounds 4-7 sat at 11.000000; it crossed eleven at round 8 (11.010582). Column generation then added one orbit and stopped; wall 125.8 s. | nothing frozen here. Session-139 named set at 191/50. Counts 26,35,43,48 are not a superset of the historical 6637-site grid that sat at exactly eleven, nor of BC-191 auto (25,34,41). Restricted optimum 11.142857 therefore does not raise the historical plateau. No covering freeze was retained. |
 | 11 | 3.82 | auto-plus-60 | 11.106195 | yes | The row loop converged at LP round 21 (violated 0) at 11.106195 on 6961 sites / 921 orbits. Rounds 3-7 sat at 11.000000; it crossed eleven at round 8 (11.035354). Column generation then added one orbit and stopped; wall 84.7 s. | nothing frozen here. Session-139 BC-191 auto (25,34,41) plus count 60. A superset of auto, 6961 sites, more than the historical 6637-site exact-eleven grid, and a worse restricted optimum. Site geometry matters more than count. No covering freeze was retained. |
+| 11 | 3.82 | t025-seeded-auto-plus-60 | 11.020212 | yes | The row loop converged at LP round 29 (violated 0) at 11.020212 on 7249 sites / 958 orbits, including 584 T-025 seed sites. Rounds 3-16 sat at 11.000000; it crossed eleven at round 17 (11.004716). Column generation then added one orbit and stopped; wall 132.3 s. | nothing frozen here. Session-139 closest point-atom construction at 191/50 besides the historical exact-eleven grid. Auto (25,34,41) plus 60, union T-025. Still above eleven on a converged loop. No covering freeze was retained. |
 | 11 | 3.83 | auto-25-34-41 | 11.192598 | yes | The row loop converged at LP round 24 (violated 0) at 11.192598 on 3365 sites / 457 orbits. Round 4 sat at 11.000000; it crossed eleven at round 6 (11.096552). Column generation then added one orbit and stopped; wall 82.2 s. | nothing frozen here. Session-139 scout probe above T-025 at 191/50 and T-026's certified side 3.826447. Same auto grids (25, 34, 41) and scale 4,000,000 as BC-191 at this n. Above eleven on a converged loop, so this site set carries no certificate at 3.83; adding sites can only lower it, so the side is not barred. No covering freeze was retained. |
 | 11 | 3.83 | four-grid-25-34-41-48 | 11.142857 | yes | The row loop converged at LP round 23 (violated 0) at 11.142857 on 5665 sites / 756 orbits. Rounds 3-5 sat at 11.000000; it crossed eleven at round 6 (11.020986). Column generation then added one orbit and stopped; wall 81.7 s. | nothing frozen here. Session-139 denser named site set at 383/100 after auto-25-34-41. About 2,300 extra sites dropped the restricted optimum by 0.050. Still above eleven on a converged loop, so this site set carries no certificate; the side is not barred. No covering freeze was retained. |
 | 11 | 3.83 | t025-seeded-four-grid | 11.140351 | yes | The row loop converged at LP round 28 (violated 0) at 11.140351 on 6249 sites / 835 orbits, including 584 T-025 seed sites scaled from 191/50. Rounds 3-5 sat at 11.000000; it crossed eleven at round 6 (11.020202). Column generation then added one orbit and stopped; wall 107.9 s. | nothing frozen here. Session-139 T-025-seeded union at 383/100 after four-grid-25-34-41-48. The seed dropped the restricted optimum by 0.0025. Still above eleven on a converged loop, so this site set carries no certificate; the side is not barred. No covering freeze was retained. |
@@ -80,10 +81,10 @@ the reported value the artifact's own mass; at `3.96`, `4.58`, `4.59`, `4.80` an
 artifact's mass and the reported objective are different numbers.
 
 They are also reports of different kinds rather than one series measured the same
-way, and the `converged` column is where the difference lives: 17 of
-the 37 ran their row loop to convergence, and the rest stopped for the
+way, and the `converged` column is where the difference lives: 18 of
+the 38 ran their row loop to convergence, and the rest stopped for the
 reason beside each — or for none the record kept — and stand as upper bounds on
-their own site sets only. 37 heterogeneous reports across a side band
+their own site sets only. 38 heterogeneous reports across a side band
 2.00 wide do not support a growth trend or a fitted curve, and no rung in
 this register has ever been claimed from one. Rank on `prize` to choose where to
 look; measure and retain the run before believing any extrapolation.

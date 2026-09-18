@@ -171,6 +171,29 @@ values:
       more than the historical 6637-site exact-eleven grid, and a worse restricted
       optimum. Site geometry matters more than count. No covering freeze was retained.
   - n: 11
+    side: '191/50'
+    side_decimal: '3.82'
+    objective: '11.020212'
+    site_set: t025-seeded-auto-plus-60
+    sites: 7249
+    rows: 7956
+    rounds: 29
+    converged: true
+    stop_reason: >-
+      The row loop converged at LP round 29 (violated 0) at 11.020212 on 7249 sites
+      / 958 orbits, including 584 T-025 seed sites. Rounds 3-16 sat at 11.000000; it
+      crossed eleven at round 17 (11.004716). Column generation then added one orbit
+      and stopped; wall 132.3 s.
+    least_covered_mass: '1'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-191-50-t025-auto60-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 closest point-atom construction at 191/50 besides the historical
+      exact-eleven grid. Auto (25,34,41) plus 60, union T-025. Still above eleven on a
+      converged loop. No covering freeze was retained.
+  - n: 11
     side: '383/100'
     side_decimal: '3.83'
     objective: '11.192598'
