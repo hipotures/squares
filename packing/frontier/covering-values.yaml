@@ -126,6 +126,29 @@ values:
       prior six-decimal display 9.907906 rounded the exact lower bound upward; this
       record now preserves its approximate status.
   - n: 11
+    side: '191/50'
+    side_decimal: '3.82'
+    objective: '11.142857'
+    site_set: four-grid-26-35-43-48
+    sites: 6037
+    rows: 7677
+    rounds: 31
+    converged: true
+    stop_reason: >-
+      The row loop converged at LP round 31 (violated 0) at 11.142857 on 6037 sites
+      / 810 orbits. Rounds 4-7 sat at 11.000000; it crossed eleven at round 8
+      (11.010582). Column generation then added one orbit and stopped; wall 125.8 s.
+    least_covered_mass: '1'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-191-50-grid4-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 named set at 191/50. Counts 26,35,43,48 are not a superset of the
+      historical 6637-site grid that sat at exactly eleven, nor of BC-191 auto
+      (25,34,41). Restricted optimum 11.142857 therefore does not raise the historical
+      plateau. No covering freeze was retained.
+  - n: 11
     side: '383/100'
     side_decimal: '3.83'
     objective: '11.192598'

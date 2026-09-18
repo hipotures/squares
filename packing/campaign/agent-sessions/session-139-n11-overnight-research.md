@@ -352,6 +352,12 @@ Four-grid union T-025 (584 seed sites, 6249 total) converged at `11.140351` in 1
 Drop from four-grid: 0.0025. Point-atom covering at `383/100` is above eleven on three
 named site sets. Next: scout #3, denser grids at `191/50`.
 
+## Hour 1 191/50 four-grid (2026-09-18T06:42Z)
+
+`--grid-counts 26,35,43,48` at `191/50` converged at `11.142857` on 6037 sites. That is
+not a superset of the historical 6637-site exact-eleven grid. Next: auto `(25,34,41)`
+plus count 60 (6961 sites).
+
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
 -->
