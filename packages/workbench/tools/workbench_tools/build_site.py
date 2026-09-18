@@ -92,16 +92,7 @@ hand, so `test_build_site_inputs.py` derives what this module and `build_candida
 imports, modules run, paths joined, Node tools and their imports -- and requires this list
 to cover it."""
 
-NOTE = """<style>
-#site-note {
-  position: fixed; right: 12px; bottom: 8px; z-index: 30;
-  font-family: var(--sans); font-size: 11px; line-height: 1.4;
-  color: var(--quiet); text-align: right; pointer-events: none;
-}
-#site-note a { color: inherit; text-decoration: underline; pointer-events: auto; }
-body.capture #site-note { display: none; }
-</style>
-<div id="site-note">
+NOTE = """<div id="site-note">
 The animation model is still moving, so a number here is not evidence
 &mdash; <a href="../">the explainer</a> is the published work.
 </div>"""
@@ -115,10 +106,14 @@ Where it sits and how it looks are both deliberate, and both are corrections. It
 full-width strip in warning yellow at the top of `<body>` -- which put it outside
 `#viewport`, the absolutely-positioned element that covers the whole window, so it showed
 through against the chrome rather than sitting above the page. Now it is fixed to the
-bottom right in the page's own `--quiet` grey at 11px, in the corner the timing readout
-does not use, and `pointer-events` stay off everywhere but the link so it cannot swallow a
-drag. `body.capture` hides it, because a note about the page does not belong in a frame of
-the video.
+bottom right in the page's muted text colour at the caption size, in the corner the timing
+readout does not use, and `pointer-events` stay off everywhere but the link so it cannot
+swallow a drag. `body.capture` hides it, because a note about the page does not belong in a
+frame of the video.
+
+Only the element is injected. How it looks is `#site-note` in `assets/workbench.css`, in the
+page's design tokens like everything else, and the controls end `--site-note-clearance` above
+the window's floor so their last row is never under it.
 """
 
 #: What the published page may load, which is nothing from the network. Scripts and styles

@@ -1,0 +1,48 @@
+{
+  "$comment": "What the design contract (tests/design-system.test.ts) lets through, each with its reason. Entries only ever leave: a count may only fall, an entry that no longer matches fails the test, and the test refuses an entry or a count that origin/main does not have.",
+  "stylesheet": [],
+  "inlineStyles": [
+    {
+      "path": "assets/template.html",
+      "property": "style",
+      "count": 1,
+      "reason": "#draw-line starts hidden with the same inline display the scene code toggles while an edge is drawn, and check_animate_view reads that inline display back."
+    },
+    {
+      "path": "src/application.js",
+      "property": "display",
+      "count": 12,
+      "reason": "Scene visibility, per frame: squares outside the pair, the correspondence links and ghost, the relationship mask, the edge being drawn and the law plot's pull handle. Fourteen probes count what is drawn by reading style.display, so moving these to the hidden attribute is a change to the scene and its instruments, not to the design."
+    },
+    {
+      "path": "src/application.js",
+      "property": "opacity",
+      "count": 9,
+      "reason": "The facts panel's and the headline's handover: an opacity computed every frame from how far the roll has run."
+    },
+    {
+      "path": "src/application.js",
+      "property": "left",
+      "count": 2,
+      "reason": "The gap bar's two end labels sit under marks whose places on the bar are computed per n from the record's bounds."
+    },
+    {
+      "path": "src/application.js",
+      "property": "--stage-numeral-left",
+      "count": 1,
+      "reason": "Where the headline's number starts, measured from the loaded faces and read by .numeral."
+    },
+    {
+      "path": "src/application.js",
+      "property": "--stage-scale",
+      "count": 1,
+      "reason": "The stage's scale, computed from the window and the controls by layout() and read by #stage and #stage-wrap."
+    },
+    {
+      "path": "src/application.js",
+      "property": "--controls-height",
+      "count": 1,
+      "reason": "The controls' height while the separator fixes the stage's share of the window, read by #controls.is-sized."
+    }
+  ]
+}

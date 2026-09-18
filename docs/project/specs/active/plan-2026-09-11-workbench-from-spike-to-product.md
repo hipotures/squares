@@ -9,12 +9,14 @@ author: Claude and Codex agents, for the repository maintainer
 
 **Updated:** 2026-09-16
 
-**Status:** Active; PR #160 adds independent Pack and bounded Search, phase gates open
+**Status:** Active; the package and bounded Search preview exist, while Phase 2A
+physical-response acceptance and the Phase 5/5A Search and guidance gates remain open
 
 **Workflow:** W7 pipeline improvement
 
 **Tracking:** `think-ooi2` (product epic), `think-zisr` (standalone package),
-`think-4uu3` (Animate kinetics and timing)
+`think-4uu3` (Animate kinetics and timing), `think-c0rm` (graded guidance), `think-0epc`
+(systematic guided sweep, a research consumer)
 
 **Reviewed baseline:** `6e191a35`; prior committed checkpoint `0f2ac8ce`, with findings
 in the
@@ -51,6 +53,8 @@ The workbench becomes a standalone browser package at `packages/workbench/`. It 
 Pack and Animate application, reusable geometry and simulation code, the animation
 timeline and rendering, a browser-free Node API, package-local checks, and a
 deterministic static build.
+The same numerical kernel supports unguided runs and graded structural guidance without
+requiring the renderer.
 Workbench-specific build, benchmark, capture, and Python adapters live inside the same
 package. Existing general-purpose `sqpack` libraries remain dependencies.
 
@@ -68,14 +72,18 @@ packing-validity contract (`ec0a0604`, page readouts `c0d9db2b`).
 | --- | --- | --- |
 | O1 — One owned package | Build and maintain the application, numerical core, animation, tests, probes, and workbench-specific tools in `packages/workbench/`. | Package commands run independently; all live consumers have migrated; no production build or command reads the spike tree. |
 | O2 — Usable Pack | Choose any `n` in a declared measured range, start from generic or supplied poses, manipulate squares, run, pause, restart, reset, resolve, and replay a visible seed. A known record is optional. | Cases with and without catalogue records work; exactly `n` squares are present; raw and repaired scores match displayed geometry; stale/cancelled runs cannot overwrite current state. |
-| O3 — Reusable experiments | Change proposal, contact/force model, annealing or container schedule, repair, objective, and run budget through typed configurations; compare runs under equal work. Inspect Animate trajectories numerically without loading or judging a rendered page. | Browser and headless callers use one kernel and effective configuration; two strategy variants run through it; receipts retain work, seed, validity and provenance. A deterministic CLI emits the same Animate trajectory and its displacement, acceleration, reversal, penetration, contact, gap, endpoint and work metrics. No better packing is promised as a software acceptance condition. |
+| O3 — Reusable experiments | Change proposal, contact/force model, ordinary stickiness, annealing or container schedule, repair, objective, and run budget through typed configurations; compare runs under equal work. Inspect Animate trajectories numerically without loading or judging a rendered page. | Browser and headless callers use one kernel and effective configuration; two strategy variants run through it; receipts retain work, seed, validity and provenance. A deterministic CLI emits the same Animate trajectory and its displacement, acceleration, reversal, penetration, contact, gap, endpoint and work metrics. No better packing is promised as a software acceptance condition. |
 | O4 — Clean illustration engine | Replay a trace or author an illustration, seek deterministically, draw SVG, and capture frames/video with explicit timing, arrival, side and rotation. | Drawing a frame needs no solver; seek and capture agree; direct and physically generated motion retain their labels; illustrative frames never acquire numerical assurance. |
 | O5 — Experimental Search | Run many Pack trials, cancel with honest partial accounting, inspect the best valid arrangement and outcome distributions, and use calibration/held-out presets. | The same trial matches Pack and headless output; manifests reproduce disjoint-block reports; invalid outcomes never rank; tuning and held-out cohorts are explicit. Search ships after the clean Pack/Animate release boundary. |
 | O6 — Clear, accessible UI | Use mode-specific controls and presentation/research layers, readable responsive layout, keyboard interaction and reduced-motion playback. | Browser checks exercise startup, tab switches, focus, transport, labels and representative viewport sizes; the consumer audit dispositions existing UI defects and preserves working behavior. |
 | O7 — Reproducible publication and maintenance | Follow a package quickstart, build a static Pages artifact, and verify the deployed workbench under `/squares/workbench/`. | Strict Python/TS/JS floors discover all live source; required CI and full checkpoint pass; source/build identity and post-deploy behavior agree; the explainer link stays under `/squares/`. |
+| O8 — Graded structural guidance | Run and compare unguided, touching-component-partition, contact-graph, and oriented-face-pairs targets at controlled strengths and schedules. Inspect the supplied structure and the structure the run realizes. | Node and browser consume one versioned target and application configuration; a zero-strength canonical receipt is byte-for-byte the unguided receipt, and the un-normalized and small-strength kernel controls pass. A replayable demonstration cohort, covering each tier with its zero-strength arm on a declared known-answer cell, produces the same canonical receipts and reports in Node and the pinned Chromium build (`think-10yz`), and the browser draws its overlays from those receipts (`think-czav`). No packing improvement is an acceptance condition. |
 
 The Phase 4 checkpoint delivers O1, O2, O4, O6 and O7 with a reusable single-run core.
-Phase 5 completes O3 and O5 and reruns the complete outcome set.
+Phase 5 completes O3 and O5. Phase 5A completes O8, then reruns the complete outcome
+set; its guided Search receipts follow the base Search scheduler, which follows
+Pack/Animate merge readiness and so Phase 2A. The research sweeps that consume Phase 5A
+are not product outcomes.
 Local Python/Rust services, universal cross-language trajectory identity, new
 mathematical discoveries, and unbounded resource support are separate future work; the
 browser exposes only the capabilities implemented by its static build.
@@ -232,14 +240,19 @@ The product has three aspects with one set of computational building blocks:
   It runs a single trajectory and supports direct manipulation.
   `n` is independent of the presence of an atlas transition pair; the supported resource
   envelope is explicit and tested.
+  A guided Pack run identifies the supplied target, strength, schedule, use and
+  non-target policy in its controls and its requested-guidance record, which sits beside
+  the canonical receipt.
 - **Search** asks Pack’s browser-free trial function for many seeded runs and summarizes
   validity, best-of-k, and the outcome distribution.
   It does not have its own physics engine.
-  Search ships only after the annealing plan’s measurements and resolver are in order.
+  Search treats ordinary stickiness and structural guidance as separate sweep axes and
+  ships only after the annealing plan’s measurements and resolver are in order.
 - **Animate** presents imported records and deterministic trajectories on a timeline.
   Retained record poses remain authoritative at integer frames.
   Any simulated motion between them is labelled illustrative and cannot create numerical
-  evidence.
+  evidence. Guidance overlays describe what a physical trace was given and what it
+  realized; they do not grant assurance.
 
 The older unbuilt **Calibrate** concept becomes a set of Search presets, such as a
 parameter sweep over cases with known records.
@@ -317,6 +330,8 @@ browser uses:
 - resolve an overlapping arrangement without claiming an improvement
 - advance one seeded simulation and collect a trajectory
 - run one Pack trial and return its receipt
+- validate a `GuidanceTarget/v1` and advance a guided trial from a separate application
+  configuration
 
 The browser supplies clocks, events, SVG nodes, and paint scheduling through adapters.
 The command-line benchmark calls this entry point directly, so it measures simulation
@@ -326,9 +341,21 @@ directly and can emit either summary JSON or the full per-frame pose trace.
 It records the named solver, preset, effective force law, annealing schedule, timing,
 seed, integration work and metric units.
 Browser and command-line defaults come from one source module.
-A physical trace keeps three layers distinct: raw kernel states diagnose the solver,
-corrected stored states show the path retained for playback, and deterministic 60 Hz
-presentation samples reproduce the positions the browser supplies to its painter.
+A guided run uses the same target, application configuration, seed and receipt in Node
+and the browser; replay identity is claimed for Node and the pinned Chromium build the
+checks use. The application configuration carries, per use, the strength where the use
+has one, its schedule, and the policy for non-target pairs.
+The requested configuration is kept in a requested-guidance record beside the receipt.
+The canonical effective receipt omits inert uses, so a zero-strength run’s canonical
+receipt is byte-for-byte identical to the unguided control’s. Because that tests
+canonicalization, the kernel also runs un-normalized at strength exactly zero, which
+must reproduce the unguided trajectory, and at a declared descending ladder of small
+strengths, whose short-horizon pose difference must not increase down the ladder and
+must end within a declared bound.
+Measured CPU and wall time sit beside the receipt, not in it; CPU time is measured in
+Node only. A physical trace keeps three layers distinct: raw kernel states diagnose the
+solver, corrected stored states show the path retained for playback, and deterministic
+60 Hz presentation samples reproduce the positions the browser supplies to its painter.
 The command reports all three; presentation samples, not an internal timestep, decide
 whether the user-visible path meets its continuity budget.
 A browser screenshot is never required to decide whether a path rings, jumps,
@@ -588,20 +615,30 @@ outcome at this boundary.
 
 | Bead | Deliverable | Done when |
 | --- | --- | --- |
-| `think-gfqt` | Bounded experimental multi-run scheduler. | Configurations from `think-6qxx` vary proposal, force/contact model, annealing/container schedule, repair and objective; repeated Pack runs report progress, cancellation and exact work/seed manifests without blocking interaction. The current `n ≤ 32`, eight-seed, 5,000-step preview does not meet this responsiveness or configuration contract. |
+| `think-gfqt` | Bounded experimental multi-run scheduler. | Configurations from `think-6qxx` vary proposal, force/contact model, annealing/container schedule, repair and objective; repeated Pack runs report progress, cancellation and exact work/seed manifests without blocking interaction; a Node command runs a Search plan headlessly and writes the ledger that `think-i5pg` re-admits. The current `n ≤ 32`, eight-seed, 5,000-step preview does not meet this responsiveness or configuration contract. |
 | `think-i5pg` | Make Search ledgers independently checkable. | Decode and re-admit each outcome, derive block, budget and `n` from the plan, isolate nonfinite partial encoding failures, and make growth settings effective or reject them. A forged outcome cannot change the summary by supplying its own plan fields. |
 | `think-vhgz` | Complete Search over the shared scheduler. | Best valid poses, rates, status counts, disjoint-block distributions and replay/export agree with headless output; empty or interrupted cohorts are explicit. The preview tab remains exploratory until these views and controls pass. |
-| `think-3yma` | Calibration and held-out presets. | Campaign manifest fixes tuning/held-out partitions before execution; configuration-level distributions and individual best poses are distinguished; replay preserves the partition. |
-| `think-wln2` | Final end-to-end acceptance. | Every O1–O7 journey passes, documentation matches the product, required/full checks pass, and the released revision has a live smoke receipt. |
+| `think-3yma` | Calibration and held-out presets. | Presets load a tuning/held-out partition declared in a campaign manifest before execution, tested on a fixture manifest, and do not wait for any research partition; configuration-level distributions and individual best poses are distinguished; replay preserves the partition. |
+| `think-wln2` | Final end-to-end acceptance. | Every O1–O8 journey passes, documentation matches the product, required/full checks pass, and the released revision has a live smoke receipt. |
 
 `think-gfqt` starts after Phase 4 readiness and the corrected reporter/registry;
 `think-i5pg` is required before Search’s saved manifests can certify acceptance;
-`think-vhgz` follows it, calibration follows Search, and final acceptance follows both
-calibration and release verification.
+`think-vhgz` follows it, calibration follows Search, and final acceptance follows
+calibration, the Phase 5A product deliverables and release verification.
 The existing research harness `think-k2fr`, hypothesis work `think-a87q`, and later
 sweeps `think-fj07` consume these contracts rather than adding another engine.
+The graded-guidance rounds (`think-0epc` and the unguided stickiness curve) are
+consumers in the same way.
 Research run authorization and pre-registration remain separate from shipping the
 instruments.
+
+A registered cohort sets `timeoutMs` to null, because `SearchSlot.timeoutMs` lets a
+wall-clock deadline change a slot’s status and partial result
+(`packages/workbench/src/search/scheduler.ts`). Receipt identity hashes the canonical
+`SearchTrialValue` or its versioned successor, never `SearchOutcome`, whose `elapsedMs`
+is wall time. That successor stores the canonical effective configuration; today
+`SearchTrialValue.configuration` copies the declared configuration and adds the seeds
+(`packages/workbench/src/search/pack-runner.ts`).
 
 The objective always reports absolute side for valid geometry.
 Reference-relative metrics require an identified finite reference and a positive
@@ -610,6 +647,66 @@ State whether feasible but nonstationary runs can rank; invalid and cancelled re
 cannot. Terminal-status counts remain separate from validity counts.
 Compare completed work over fixed seed blocks, and preserve unsuccessful blocks in
 budget-success statistics.
+
+### Phase 5A: Add Graded Structural Guidance
+
+Ordinary global stickiness remains a force-law parameter that applies without a target.
+Structural guidance supplies record-derived relationships.
+A comparison may vary both, but its requested-guidance record, receipt and report must
+keep the two axes separate.
+They are one control today: the kernel’s `relatedMask` restricts ordinary pair-law
+attraction to masked pairs, Search accepts `related_mask`, and the page builds masks
+from blocks and contact graphs.
+`think-8ocb` moves that path into the target and application contracts, and registered
+cohorts refuse a non-null `related_mask` until `think-os1n` adds a separate guidance
+force.
+
+The phase’s order is not one gate.
+Contract, extraction and kernel work (`think-8ocb`, `think-rey9`, `think-os1n`) needs
+neither Phase 2A nor the Search scheduler and can start now.
+The headless loop (`think-qx88`) follows it.
+Guided Search receipts (`think-10yz`) follow the loop and the base Phase 5 scheduler
+(`think-gfqt`), which itself follows Pack/Animate merge readiness and therefore Phase
+2A. The controls and overlays (`think-czav`) follow the guided receipts and the Search
+mode.
+
+`GuidanceTarget/v1` is one JSON-safe target shared by Node and the browser.
+Its four product tiers are `none`, `touching-component-partition`, `contact-graph`, and
+`oriented-face-pairs`; the annealing plan’s tier table is also the naming table.
+A separate application configuration states, per use, the strength and schedule where
+the use has one, and the non-target policy.
+Oriented face pairs do not store or pin absolute destination poses, but a complete
+target can determine them where the record’s contact equations are rigid, so each target
+reports the degrees of freedom it leaves.
+
+| Bead | Deliverable | Done when |
+| --- | --- | --- |
+| `think-8ocb` | Version the target and application contracts and map them into PackingStrategy phases. | Supported tiers and uses round-trip through JSON; malformed or unsupported targets fail before execution; target data and application policy remain separate; `relatedMask` construction moves into them; the registered controls exist in the strategy format. |
+| `think-rey9` | Extract targets from known records. | Component, contact and oriented-face targets carry declared tolerances, symmetry/correspondence rules and ambiguity or refusal results that Python and TypeScript read identically; each record reports its component counts, feature coverage and remaining degrees of freedom. |
+| `think-os1n` | Apply scheduled guidance in the shared kernel. | A guidance force separate from the pair law, applied in its own pass so it cannot change the broad-phase cell or the pair-law summation order, composes explicitly with stickiness, collision, containment and annealing; the zero-strength canonical receipt matches the unguided receipt, and the un-normalized strength-zero and small-strength controls pass; positive, negative, symmetry and schedule-transition controls pass. |
+| `think-qx88` | Run guided configurations through the headless loop and CLI. | Raw trajectories, target-recovery metrics, work, validity, stop conditions and canonical receipts replay identically in Node and the pinned Chromium build. |
+| `think-10yz` | Carry the same guided configuration through the base Search scheduler. | Search slots record the requested-guidance record beside the canonical `SearchTrialValue` receipt; Node and pinned-Chromium Search replay match the headless loop; the O8 demonstration cohort’s canonical receipts and reports are identical in Node and the pinned Chromium build. Overlays are `think-czav`’s. |
+| `think-czav` | Expose controls and overlays in Pack and Search. | Controls show tier, source, strength and schedule; overlays distinguish requested and realized components, contacts and oriented faces; the O8 demonstration cohort’s overlays are drawn from its canonical receipts in the pinned Chromium build; disabled states and render-cost bounds are tested. |
+
+The shared nonvisual TypeScript kernel, configuration, seed and receipt are the source
+for both the CLI and browser.
+The workbench visualizes the same run; it does not carry a second guidance
+implementation. Backend support must therefore be sufficient to tune mechanisms and
+inspect trajectories before a browser session exists.
+
+`think-c0rm` owns the phase.
+`think-wln2` cannot close while O8 is required and the deliverables above are
+incomplete. It does not wait for research.
+Registration (`think-gdkd`) and the headless partition freeze (`think-05o4`) follow
+extraction, and the unguided stickiness curve (`think-9hdg`) and the systematic guided
+sweep (`think-0epc`) follow them.
+All four are research, like `think-fj07`, and gate no product outcome; Search’s presets
+(`think-3yma`) do not wait for the partition freeze.
+The measured rounds have no kinetic guard, because Search trials run through Pack, which
+keeps no trajectory to replay in Animate.
+They reach Phase 2A only through the base scheduler, as guided receipts do.
+The annealing plan owns the detailed rung, experiment, known-answer and registration
+contracts.
 
 ### Legacy Task Reconciliation
 
@@ -642,7 +739,7 @@ This plan owns required outcomes and ordering, including any decision to defer s
 
 Close `think-zisr` only after its implementation children and package acceptance pass.
 Close the Pages epic after observed release verification.
-Close product delivery only after `think-wln2` verifies O1–O7; completing the narrower
+Close product delivery only after `think-wln2` verifies O1–O8; completing the narrower
 Phase 4 release does not imply Search is delivered.
 No unresolved required outcome may survive merely as an unnamed follow-up in prose.
 
@@ -654,6 +751,8 @@ No unresolved required outcome may survive merely as an unnamed follow-up in pro
 | A shared kernel erases real differences between Pack and Animate | Share numerical primitives and the step kernel; keep mode-specific adapters and receipts |
 | Browser and benchmark results drift | One DOM-free API, browser/Node parity vectors, and one exact seed contract |
 | A visually acceptable animation hides solver ringing or inert controls | Headless trajectory metrics, a cap-to-cap negative control, shared effective settings and browser/CLI parity checks |
+| Ordinary stickiness and target guidance become one uninterpretable control; today `relatedMask` makes them one | Separate base-force and guidance configurations, orthogonal sweep axes, records that name both, and refusal of `related_mask` in registered cohorts until a separate guidance force exists |
+| A face target determines the known solution without storing it | Reject absolute destination poses from `GuidanceTarget/v1`, report each target’s remaining degrees of freedom, and compare tiers by that count |
 | Invalid geometry acquires evidential status | Versioned import validation plus frame-level evidence and provenance checks |
 | “Arbitrary n” hides an accidental resource limit | Declare, measure, expose, and test the supported envelope; reject values outside it |
 | Cleanup deletes a unique check or reproduction route | Consumer inventory, replacement assertion, and full validation before each deletion slice |

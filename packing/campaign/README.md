@@ -391,6 +391,43 @@ for “found the right combinatorial class”, not a proof of it; confirming the
 a separately scoped structural check or formal certificate.
 Rounds that claim `reached_basin` should say which they mean.
 
+### Guided Pose-Search Extension
+
+A numerical pose-search round that compares ordinary stickiness or graded structural
+guidance adds the vector below.
+This extension does not apply to unrelated numerical search rounds and does not change
+the universal fields above.
+
+| Metric | Role | Required content |
+| --- | --- | --- |
+| guidance identity | identity | a requested-guidance record (`GuidanceTarget/v1` content hash, information tier and the requested application configuration) beside the canonical effective receipt; an unguided arm records no target, and a zero-strength arm’s canonical receipt equals the unguided one |
+| valid block outcome | **outcome** | valid successes and block-best valid side and comparator gap for each predeclared seed block |
+| exact execution controls | **guard** | independent geometry validity, finiteness, deterministic replay, and the zero-strength canonical-receipt, un-normalized and small-strength controls; X-035 trajectory budgets do not apply, because a Search trial runs through Pack and keeps no trajectory |
+| guidance work | cost | the enforced Search budget (physics steps, proposal attempts, repair iterations) and charged pair-level work (pair candidates, guidance-force evaluations, repair pair tests); CPU time, from Node only, and wall time are operational context |
+| target recovery | mechanism | component recovery, contact precision and recall, false contacts and oriented-face recovery, alongside contacts and gaps; kinetic metrics only once Search retains a Pack trajectory |
+| paired spread | spread | paired differences over interleaved seed blocks, reported but not deciding, with calibration and held-out cells reported separately |
+
+Target-recovery metrics explain how a guided run behaved; they do not decide search
+quality. A guided arm can satisfy the search-proposer accept rule only through an
+improvement in the preregistered valid-side outcome at equal work, with every guard
+passing. Recovering more true contacts or oriented faces without that improvement is a
+mechanism result, not an accepted search strategy.
+
+The rule below names `sqsearch`’s currency and controls, so a guided round needs three
+substitutions, planned in the annealing plan’s
+[registration defaults](../../docs/project/specs/active/plan-2026-09-11-annealing-as-a-search.md#planned-registration-defaults)
+and frozen or revised by `think-gdkd` before the first measured round.
+The budget currency is the enforced Search budget with guidance work charged, not
+`pair_tests`, which the workbench kernel does not count: the lighter arm of a comparison
+runs compensation slots from reserved seeds, a realized work ratio outside the declared
+band invalidates the comparison, and an invalid held-out comparison makes its stage
+invalid. Clause 1 decides on held-out cells with seed blocks in place of seeds, against
+every deciding comparator; paired block differences are reported only.
+Clauses 3 and 4 become the shared validity contract with its Python re-check and fixture
+tests, a declared positive control, the proved `n = 16` not-below control, and rejected
+invalid fixtures. No guided-versus-unguided comparison is admissible until that currency
+is declared.
+
 ## The Search-Proposer Accept Rule
 
 This rule applies when a round compares numerical packing proposers.
@@ -654,6 +691,16 @@ A series is earned by a tooling or regime change that affects comparability, rec
 
 S6 *interleaves* with S1 rather than following it: S1’s basin byproducts are the
 census’s inputs.
+
+The graded-guidance program in
+[X-036](explorations/X-036-graded-guidance-for-annealing.md) changes the target,
+trajectory, receipt and work-accounting regime.
+Its first measured round must open a truthful successor series under `think-i08r`,
+rather than append incomparable results to `series-000`. No experiment artifact is
+allocated until the work currency, instrument, partition and preregistered contrasts are
+frozen, and for a guided round also the target contract and strength units.
+The first round is the unguided stickiness curve (`think-9hdg`), which needs no guidance
+contract.
 
 ## Campaign Scope and Related Records
 

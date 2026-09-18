@@ -1,4 +1,8 @@
-"""Drag, key, reload and reset the separator between the stage and the controls."""
+"""Drag, key, reload and reset the separator between the stage and the controls.
+
+The same page then runs `check_layout`'s views and viewports, so the layout contract costs the
+frontend job no browser launch or page load of its own.
+"""
 
 from __future__ import annotations
 
@@ -11,6 +15,7 @@ from typing import Any
 from playwright.sync_api import Page, sync_playwright
 
 from workbench_tools.build_site import build
+from workbench_tools.check_layout import check_open as check_layout_open
 from workbench_tools.probes import probe
 
 KEY = "squares.workbench.stageShare"
@@ -169,12 +174,13 @@ def check(page_path: Path) -> str:
         require(not handle.is_visible(), "the separator shows over Search")
         page.locator("#mode-animate").click()
         require(handle.is_visible(), "the separator did not come back with Animate")
+        layout_report = check_layout_open(page)
         require(not errors, "page errors: " + "; ".join(errors))
         browser.close()
     return (
         "stage separator drag, arrows, Home and End with the step and an imported animation "
         "left where they were, reload persistence, re-clamping in a shorter window, "
-        "double-click reset and Search hiding"
+        f"double-click reset and Search hiding; {layout_report}"
     )
 
 
