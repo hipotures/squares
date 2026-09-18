@@ -860,7 +860,9 @@ untouched. T-028 not landed. Waiter done. Covering queue empty.
 
 Post-encode covering queue finished. Encode-only timeout unresolved. No
 `--search`. T-028 not landed. `packing-ledger check` OK. `packing-validate
---records` 33/80 steps passed on `70c73070`. Closeout after 18:00Z.
+--records` 33/80 steps passed on `70c73070`. Atlas composites still
+showed n=18 at 4.59; `build_known_best_atlas --update` wrote 4.67.
+Closeout after 18:00Z.
 
 ## Block 8 closeout (after covering; original window 12:53–13:33Z)
 
