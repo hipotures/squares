@@ -153,6 +153,7 @@ Each entry summarizes one user-level research window. Cycle slots are wall-clock
 | [session-136](agent-sessions/session-136-ci-topology-reconciliation.md) | stopped | contemporaneous | `pipeline-improvement` (efficiency) | `pipeline-improvement` (efficiency) | 1 | think-97we | think-97we closed when PR 188 and PR 185 merged, and the pending closeout checks it carried -- as carried forward by Session 137 -- now sit under think-g4n9: hold both pull-request walls at or under 180 s over the declared run of consecutive exact-head hosted runs, then switch the wall check back to enforcing. Then resume BC-343 under think-ufmk without changing its scientific claim or allocating exp-161 from this block. |
 | [session-137](agent-sessions/session-137-ci-topology-continuation-recovery.md) | stopped | retrospective | `pipeline-improvement` (correctness) | `remediation` (correctness) | 3 | think-97we | think-97we closed when PR 188 and PR 185 merged, and the remaining closeout debt on the final head now sits under think-g4n9: hold both pull-request walls at or under 180 s over the declared run of consecutive exact-head hosted runs, then switch the wall check back to enforcing. Then resume BC-343 under think-ufmk without changing its scientific claim or allocating exp-161 from this block. |
 | [session-138](agent-sessions/session-138-n11-overnight-review.md) | stopped | mixed | `factual-review` (insight) | `documentation-pass` (process) | 6 | think-4woh | Close M7's n=6 bracket at 299/100 under BC-357 / think-qqzs. H-216 is the registered determination. G1, G2, G3, and G5 are on main; G4 remains on this bead. |
+| [session-139](agent-sessions/session-139-n11-overnight-research.md) | in_progress | contemporaneous | `research-loop` (insight) | `research-loop` (insight) | 1 | think-mcb6 | Continue Blocks 1–3: finish exp-161, run the H-216 freeze, and land the F1 reader. Then Block 4 think-g4n9, Blocks 5–7 Route S if exp-161 exists, Block 8 closeout. |
 
 ### Workflow summary
 
@@ -165,7 +166,7 @@ Declared counts are contemporaneous contracts; retrospective counts are reconstr
 | `insight-iteration` | 24 | 1 | 80 | 4 |
 | `process-review` | 16 | 4 | 64 | 6 |
 | `efficiency-loop` | 10 | 1 | 36 | 1 |
-| `research-loop` | 26 | 4 | 96 | 8 |
+| `research-loop` | 27 | 4 | 97 | 8 |
 | `pipeline-improvement` | 33 | 2 | 151 | 5 |
 | `documentation-pass` | 1 | 0 | 23 | 1 |
 | `remediation` | 0 | 1 | 0 | 3 |
@@ -754,7 +755,7 @@ Status: **active**. Reconcile the merged research record, then choose among rout
 | BC-354 | tool_validation | 11 | complete | 0 | think-0t5y | Reopen only after one proposal supplies the complete 80-stratum negative-root producer, a rows-complete matched baseline, and two method-distinct exact coverage routes with shared physical variables. |
 | BC-341 | research | 11 | tentative | 1 | think-9y6q | Preserve the named Route A gaps and reconsider this discriminator only through a future W10 after a complete representation discharges them. |
 | BC-342 | research | 6, 11 | tentative | 1 | think-ol1z | Specify the n=6 control and the conflict-edge soundness obligation before selecting a solver. |
-| BC-343 | research | 11 | blocked | 0 | think-ufmk | After BC-355 closes, under think-ufmk, use a fresh branch to register exp-161, its exact source, target budget, accept rule, stop rule, independent-review boundary, and retained evidence paths before changing any weight or running coverage. |
+| BC-343 | research | 11 | blocked | 0 | think-ufmk | Session 139 registered exp-161 on 2026-09-18 with source, target, budget, accept rule, stop rule, independent-review boundary, and evidence paths. The producer named there must exist before any weight changes or coverage. BC-355's pull-request walls remain advisory under think-g4n9; that does not reopen the admitted instrument. |
 | BC-344 | research | 11 | tentative | 2 | think-29ch | Reproduce the 6+5 control at Trump's angle before interpreting any solver infeasibility. |
 | BC-345 | research | 11 | tentative | 3 | think-7n2w | Design the positive-control and endpoint-polishing contract before allocating the background search. |
 | BC-348 | research | 11 | tentative | 1 | think-u15l | Test the valid angle-count rows against the entire retained optimal face before building a larger certificate. |
@@ -770,7 +771,7 @@ Status: **active**. Pursue n=11 results beyond the one-body ceiling L* = 38200/9
 | item | purpose | n | state | priority | bead | next evidence |
 | --- | --- | --- | --- | ---: | --- | --- |
 | BC-356 | research | 6, 10, 11 | complete | 0 | think-4woh | The five X-037 decisions are resolved; H-216 and H-217 are registered. BC-357 closes the n=6 bracket under H-216. |
-| BC-357 | measurement_validation | 6, 10 | ready | 1 | think-qqzs | A rows-complete covering below 6 on a named site set that both routes of decide_certificate accept, or an exact polish of a large placement union at 299/100 whose ceiling family has total at least 6. |
+| BC-357 | measurement_validation | 6, 10 | in_progress | 1 | think-qqzs | A rows-complete covering below 6 on a named site set that both routes of decide_certificate accept, or an exact polish of a large placement union at 299/100 whose ceiling family has total at least 6. |
 | BC-358 | research | 11 | blocked | 1 | think-gyzw | The think-g3j7 reader, then the guarded colgen tool run to one of H-217's two terminal states. |
 | BC-359 | research | 11 | tentative | 2 | think-k4vb | The integer program’s optimum on the coarse net, with the winner decided exactly at full angle. |
 | BC-360 | research | 11 | stopped | 4 | think-4woh | None; reopen a mechanism only when its stated reopening condition holds. |
@@ -779,7 +780,7 @@ Status: **active**. Pursue n=11 results beyond the one-body ceiling L* = 38200/9
 
 | id | status | title | rounds | opened because |
 | --- | --- | --- | --- | --- |
-| series-000 | open | S0: smoke and calibration — prove the machinery, establish every baseline metric | 128 | First series. There is no prior instrument, so not |
+| series-000 | open | S0: smoke and calibration — prove the machinery, establish every baseline metric | 129 | First series. There is no prior instrument, so not |
 
 ## Registry
 
@@ -923,7 +924,7 @@ Status: **active**. Pursue n=11 results beyond the one-body ceiling L* = 38200/9
 | H-160 | blocked | proof | On the frozen BC293 377-atom measure and every one of the 182 eligible |  | 1 |  |  |
 | H-161 | refuted | proof | In the frozen BC303 377-atom measure, the closed literal parent Q0=[0, |  | 1 |  | 0s wall |
 | H-162 | blocked | proof | On the frozen BC293 377-atom measure and every one of the 182 eligible |  | 1 |  |  |
-| H-163 | open | proof | T-025's exact 119-orbit atom-support universe admits a D4-symmetric no |  | 0 |  |  |
+| H-163 | running | proof | T-025's exact 119-orbit atom-support universe admits a D4-symmetric no |  | 1 |  |  |
 | H-201 | refuted | search | With a simultaneous perturbation proposal added to the ordinary move m | n: 5 10 11* 17 19 26 27 29 37 50 52 | 2 |  | 155m agent + 105.7m wall |
 | H-202 | refuted | search | Adding an aggregate inward wall-pressure term to the annealing energy, | n: 5 10 11* 17 19 26 27 29 37 50 52 | 1 |  | 25m agent + 39.1m wall |
 | H-203 | confirmed | search | At an equal budget of refined local optima, basin hopping -- perturbin | n: 5 10 11* 17 19 | 1 |  | 40m agent + 81.2m wall |
@@ -1107,6 +1108,12 @@ Status: **active**. Pursue n=11 results beyond the one-body ceiling L* = 38200/9
 | exp-032 | series-000 | 3 | openai-codex | H-021 | The exact connected and isolated controls pass, every declared conflation fails, and all unsupported floating-point observations remain unresolved. |
 | exp-201 | series-000 | 18 | claude-opus-5 | H-201 | Calibration, not a scored round: it freezes p_perturb = 1.0, perturb_scale = 2 and a flat mu = 5 for exp-202 and exp-203, and it turned up a schedule-length effect that is now registered as H-204 rather than folded into an arm. |
 
+### in-progress (1)
+
+| id | series | instance | operator | hypotheses | reason |
+| --- | --- | --- | --- | --- | --- |
+| exp-161 | series-000 | 11 | Cursor session-139 Lane C | H-163 | The round is registered and leased; no optimizer, candidate, or coverage route has run. |
+
 ## Resumable — stopped on the clock, not on an answer
 
 | id | hypotheses | spent | stopped by | resume from | reopen when |
@@ -1134,7 +1141,7 @@ Status: **active**. Pursue n=11 results beyond the one-body ceiling L* = 38200/9
 
 ## Effort
 
-128 rounds, 2512.1 agent-minutes, 1799.7 wall-minutes.
+129 rounds, 2512.1 agent-minutes, 1799.7 wall-minutes.
 
 These totals exclude 4 historical rounds with unrecorded timing; their cost is unknown, not zero.
 

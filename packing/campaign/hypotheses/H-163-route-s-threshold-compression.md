@@ -56,7 +56,8 @@ hypothesis:
     promise that a compressed certificate retains the stronger dilation-limit bound.
     A bounded search with no candidate remains unresolved and may park only this frozen
     family. Smaller files, simpler denominators, or fewer distinct weights do not meet
-    the registered N+ criterion.
+    the registered N+ criterion. 2026-09-18 session-139 registered exp-161 as
+    in-progress with a live lease; no optimizer, candidate, or coverage route has run.
 ---
 # H-163: T-025 Fixed-Support Compression
 
@@ -68,11 +69,11 @@ Candidate weights may be zero but every coordinate, threshold triple, symmetry
 image, domain parameter, and budget coefficient remains fixed.
 
 **Status after admission: the target-blind instrument is ready, and the scientific claim
-remains untested.** This artifact creates no experiment and carries no scientific
-result. In particular, `exp-161` is unallocated; no optimizer, candidate certificate, or
-coverage target has run.
-A separate target branch still requires a preregistered experiment and the admission
-pull request merged into `main`.
+remains untested.** The admission artifact created no experiment.
+Session 139 registered
+[exp-161](../series/series-000-smoke-and-calibration/experiments/exp-161-h163-route-s-threshold-compression.md)
+as in-progress with a live lease.
+No optimizer, candidate certificate, or coverage target has run.
 
 The acceptance boundary is literal.
 At most 23 orbit representatives may have strictly positive rational weight, the exact

@@ -96,7 +96,7 @@ agenda:
     purpose: measurement_validation
     owner_focus: correctness
     instances: [6, 10]
-    state: ready
+    state: in_progress
     priority: 1
     question: >-
       Does a helper-free point-atom certificate exist for n=6 at side 299/100 with
@@ -125,6 +125,8 @@ agenda:
     program: n11-strategy-reset
     artifacts:
     - packing/campaign/explorations/X-037-n11-overnight-review-and-route-slate.md
+    - packing/campaign/hypotheses/H-216-point-certificate-at-n6-299-100.md
+    - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
     parallel_group: solved-case-calibration
     note: >-
       Calibration only, under H-216. Certificates at n=6 and n=10 are weaker than the
@@ -299,8 +301,8 @@ The 2026-09-18 addition to X-037 resolves the five owner decisions and registers
 [agenda-036](agenda-036-n11-strategy-reset-roadmap.md) stays the controller for the
 strategy reset. This agenda continues BC-347’s route audit with a new mechanism slate,
 and its cells share agenda-036’s `n11-strategy-reset` program.
-BC-343, Route S under `think-ufmk`, remains open there; nothing here changes its state
-or its `exp-161` registration requirement.
+BC-343, Route S under `think-ufmk`, remains open there; session 139 registered `exp-161`
+and has not run a target.
 BC-358 is Route F1 from BC-347’s audit, widened by tonight’s adversarial review.
 Agenda-036 was not edited, because an open pull request also edits it.
 
@@ -309,8 +311,8 @@ Agenda-036 was not edited, because an open pull request also edits it.
 - **BC-356 (complete).** The overnight review, the adversarial verdicts, and the M1 and
   M7 measurements at their stated scope.
   The five owner decisions are resolved in X-037.
-- **BC-357 (ready).** M7 calibration under `think-qqzs` / H-216: close the n=6 bracket
-  at 299/100. G1, G2, G3, and G5 are on main.
+- **BC-357 (in progress).** M7 calibration under `think-qqzs` / H-216: close the n=6
+  bracket at 299/100. G1, G2, G3, and G5 are on main.
   G4 remains on this bead and is not H-216’s instrument.
 - **BC-358 (blocked).** Route F1 / H-217 at 153/40. The language is admitted.
   The cell waits on the `think-g3j7` reader, the `sites-1` checkpoint (`think-3xbr`),
@@ -320,7 +322,7 @@ Agenda-036 was not edited, because an open pull request also edits it.
   SDP is not admitted.
   No Route D search hypothesis.
 
-`exp-161` remains Route S in agenda-036.
+`exp-161` is registered for Route S in agenda-036 and has not run a target.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

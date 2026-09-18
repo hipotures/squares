@@ -30,12 +30,14 @@ exploration:
 ---
 # X-032: Route S Fixed-Support Threshold-Certificate Compression
 
-**Status: target-blind instrument admitted, with no scientific target.** This report
-fixes the objects, metric, and verdict boundary for BC-343 before any compression
+**Status: target-blind instrument admitted; exp-161 registered and untested.** This
+report fixes the objects, metric, and verdict boundary for BC-343 before any compression
 candidate is produced.
-It registers H-163 but does not allocate `exp-161`, run an optimizer, change an atom,
-replay candidate coverage, or make a compression claim.
-T-025 and T-026 retain their existing results and assurance levels.
+It registered H-163 without a round.
+Session 139 later allocated
+[exp-161](../series/series-000-smoke-and-calibration/experiments/exp-161-h163-route-s-threshold-compression.md)
+as in-progress. No optimizer, candidate, coverage replay, or compression claim exists
+yet. T-025 and T-026 retain their existing results and assurance levels.
 
 ## Frozen Control
 
