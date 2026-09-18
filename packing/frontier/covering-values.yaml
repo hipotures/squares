@@ -616,6 +616,31 @@ values:
       this site set only; remaining rows can only raise it. Adding sites can still
       lower the covering value, so 23/5 is not barred. No covering freeze was
       retained.
+  - n: 17
+    side: '23/5'
+    side_decimal: '4.6'
+    objective: '17.046923'
+    site_set: t019-seed-auto-32-42-52-windows7
+    sites: 7452
+    rows: 12379
+    rounds: 42
+    converged: false
+    stop_reason: >-
+      The 900 s deadline stopped the row loop after 42 LP rounds with 186 placements
+      still violated. The objective crossed 17 at round 19 (17.001965) and finished
+      at 17.046923 on 7452 sites / 978 orbits, including 1968 seed sites (1184 T-019
+      plus 784 ceiling-window lattice sites from --seed-windows 7).
+    least_covered_mass: '0.995294'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-t019-windows7-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 T-019-seeded auto-grid plus windows 7 at 23/5. Finished between
+      windows 5 (17.042346) and windows 6 (17.048472). Unconverged mass 17.046923
+      still refutes this site set only; remaining rows can only raise it. Adding
+      sites can still lower the covering value, so 23/5 is not barred. No covering
+      freeze was retained.
   - n: 18
     side: '467/100'
     side_decimal: '4.67'

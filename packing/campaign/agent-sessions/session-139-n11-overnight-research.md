@@ -838,6 +838,15 @@ sat at 17 through round 18, then climbed. Slightly worse than windows 5
 (`17.042346`). No freeze. Site set refuted; side open. T-019 unchanged.
 Waiter started windows 7 at 15:55Z; then n=19 `97/20` if still above 17.
 
+## n=17 23/5 windows 7 (2026-09-18T16:10Z)
+
+T-019-seeded auto `(32, 42, 52)` plus `--seed-windows 7` at `23/5` stopped
+unconverged at `17.046923` after 904.2 s (42 LP rounds, 186 violated). Seed
+sites 1968 (1184 T-019 plus 784 lattice). Crossed seventeen at round 19.
+Between windows 5 (`17.042346`) and windows 6 (`17.048472`). No freeze.
+Site set refuted; side open. T-019 unchanged. Waiter started n=19 `97/20`
+T-020 windows 6 at 16:10Z.
+
 ## Block 8 closeout (after covering; original window 12:53–13:33Z)
 
 Owner continue at 15:04Z moved this after the 18:00Z covering deadline.
