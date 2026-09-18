@@ -313,6 +313,30 @@ values:
       BC-200's vertex-seeded unconverged 11.227631. Above eleven on a converged loop, so
       this site set carries no certificate; the side is not barred. No covering freeze
       was retained.
+  - n: 11
+    side: '31/8'
+    side_decimal: '3.875'
+    objective: '11.561186'
+    site_set: t025-auto-25-34-42-60
+    sites: 7705
+    rows: 8892
+    rounds: 38
+    converged: true
+    stop_reason: >-
+      The row loop converged at LP round 38 (violated 0) at 11.561186 on 7705 sites
+      / 1014 orbits, including 584 T-025 seed sites scaled to 31/8. It crossed eleven
+      at round 2 (11.000000). Column generation then added one orbit and stopped; wall
+      234.3 s.
+    least_covered_mass: '1'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-31-8-t025-auto60-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 T-025-seeded auto-plus-60 probe at 31/8, 0.002 below the known-best
+      packing. Same construction as the 77/20 probe. Above eleven on a converged loop, so
+      this site set carries no certificate; the side is not barred. No covering freeze
+      was retained.
   - n: 12
     side: '79/20'
     side_decimal: '3.95'

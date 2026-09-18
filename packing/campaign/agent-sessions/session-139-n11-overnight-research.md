@@ -432,6 +432,13 @@ Three named site sets, none a certificate.
 Point-atom covering at 3.82/3.85 stays at or above eleven on every session-139 set.
 Blocks 5-7 Route S encode-only remains 09:33Z.
 
+## Hour 2 n=11 31/8 (2026-09-18T07:40Z)
+
+Same T-025-seeded auto-plus-60 construction at `31/8` = 3.875, 0.002 below the
+known-best packing. Converged `11.561186` in 234.3 s on 7705 sites. Crossed eleven
+at round 2. Site set refuted; side open. Covering-values now 24 sides. Point-atom
+grids plus T-025 sites do not capture the packing geometry even this close to it.
+
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
 -->
