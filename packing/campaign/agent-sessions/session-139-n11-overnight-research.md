@@ -439,6 +439,25 @@ known-best packing. Converged `11.561186` in 234.3 s on 7705 sites. Crossed elev
 at round 2. Site set refuted; side open. Covering-values now 24 sides. Point-atom
 grids plus T-025 sites do not capture the packing geometry even this close to it.
 
+## Hour 2 windows and 3.84 (2026-09-18T07:52Z)
+
+`--seed-windows 5` on the T-025-seeded auto-plus-60 set at `191/50` converged
+`11.018646` in 176.2 s on 7473 sites (809 seed). Dropped the no-windows
+`11.020212` by 0.0016. Closest session-139 point-atom construction; still above
+eleven. Same construction at `96/25` = 3.84 converged `11.371819` in 222.9 s.
+Restricted opt at 3.82 / 3.83 / 3.84 / 3.85 / 3.875 is monotone up. G4 at
+`31/8` net9 dipped to 10.17 on seed rows then restored to 14.00; same overfit,
+stop G4. Covering-values now 25 sides. Next: T-026-seeded auto-plus-60 at
+191/50 and T-025-seeded auto-plus-60 at 381/100. n=17 T-019 seed still in
+flight. Route S encode-only remains 09:33Z.
+
+## Hour 2 n=17 T-019 seed (2026-09-18T07:59Z)
+
+T-019-seeded auto grids at `23/5` stopped unconverged at `17.049597` after 628 s
+(40 LP rounds, 183 violated). Seed dropped the unseeded `17.331710` by 0.282.
+Site set refuted; side open. T-026 seed at 191/50 and T-025 auto-plus-60 at
+381/100 still in flight.
+
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
 -->

@@ -194,6 +194,31 @@ values:
       exact-eleven grid. Auto (25,34,41) plus 60, union T-025. Still above eleven on a
       converged loop. No covering freeze was retained.
   - n: 11
+    side: '191/50'
+    side_decimal: '3.82'
+    objective: '11.018646'
+    site_set: t025-seeded-auto-plus-60-windows5
+    sites: 7473
+    rows: 7832
+    rounds: 35
+    converged: true
+    stop_reason: >-
+      The row loop converged at LP round 35 (violated 0) at 11.018646 on 7473 sites
+      / 993 orbits, including 809 seed sites (584 T-025 plus 225 ceiling-window
+      lattice sites from --seed-windows 5). Rounds 6-16 sat at 11.000000; it crossed
+      eleven at round 17 (11.008586). Column generation then added one orbit and
+      stopped; wall 176.2 s.
+    least_covered_mass: '1'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-191-50-t025-windows5-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 T-025-seeded auto-plus-60 plus a 5-per-window ceiling lattice at
+      191/50. Dropped the no-windows 11.020212 by 0.0016. Closest session-139
+      point-atom construction, still above eleven on a converged loop. No covering
+      freeze was retained.
+  - n: 11
     side: '383/100'
     side_decimal: '3.83'
     objective: '11.192598'
@@ -264,6 +289,30 @@ values:
       dropped the restricted optimum by 0.0025. Still above eleven on a converged loop,
       so this site set carries no certificate; the side is not barred. No covering freeze
       was retained.
+  - n: 11
+    side: '96/25'
+    side_decimal: '3.84'
+    objective: '11.371819'
+    site_set: t025-auto-25-34-42-60
+    sites: 7705
+    rows: 8793
+    rounds: 38
+    converged: true
+    stop_reason: >-
+      The row loop converged at LP round 38 (violated 0) at 11.371819 on 7705 sites
+      / 1014 orbits, including 584 T-025 seed sites scaled to 96/25. Rounds 2-3 sat
+      at 11.000000; it crossed eleven at round 4 (11.064417). Column generation then
+      added one orbit and stopped; wall 222.9 s.
+    least_covered_mass: '1'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-96-25-t025-auto60-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 T-025-seeded auto-plus-60 probe at 96/25, between the 383/100 and
+      77/20 probes. Same construction. Restricted opt 11.371819 sits between those
+      two. Above eleven on a converged loop, so this site set carries no certificate;
+      the side is not barred. No covering freeze was retained.
   - n: 11
     side: '77/20'
     side_decimal: '3.85'
@@ -446,6 +495,30 @@ values:
       at 117/25. Unconverged mass 17.331710 on 5484 sites / 716 orbits refutes this
       site set only; remaining rows can only raise it. Adding sites can still lower
       the covering value, so 23/5 is not barred. No covering freeze was retained.
+  - n: 17
+    side: '23/5'
+    side_decimal: '4.6'
+    objective: '17.049597'
+    site_set: t019-seed-auto-32-42-52
+    sites: 6668
+    rows: 11189
+    rounds: 40
+    converged: false
+    stop_reason: >-
+      The 600 s deadline stopped the row loop after 40 LP rounds with 183 placements
+      still violated. The objective crossed 17 at round 16 (17.002464) and finished at
+      17.049597 on 6668 sites / 873 orbits, including 1184 T-019 seed sites scaled
+      from 459/100.
+    least_covered_mass: '0.993656'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-t019-seed-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 T-019-seeded auto-grid at 23/5. The seed dropped the unseeded
+      17.331710 by 0.282. Unconverged mass 17.049597 still refutes this site set
+      only; remaining rows can only raise it. Adding sites can still lower the
+      covering value, so 23/5 is not barred. No covering freeze was retained.
   - n: 18
     side: '467/100'
     side_decimal: '4.67'
