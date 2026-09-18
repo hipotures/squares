@@ -593,6 +593,50 @@ T-027 `--push` contracts: n=18 DS7 verified bound `4.67`; n=18 interval
 doubled-net registered in the exhaustive marker set; Chromium-early is the
 first unbudgeted `start_early` step ahead of exact verification.
 
+## Post-encode covering queue (after 12:33Z)
+
+Do not invent an n=17 four-grid. Do not spend another wall on the same
+windows5 site set: remaining rows can only raise 17.042346. Do not probe
+n=18 at 4.68/4.69 (locked 18 on T-019, windows, and T-027 seeds). Do not
+probe n=11 at or below 3.826.
+
+1. n=12 `397/100` T-017 four-grid `(26,35,43,48)`. BC-206 seeded auto crossed
+   at 12.016263; session has only `3969/1000` four-grid so far.
+2. n=17 `23/5` T-019 auto `(32,42,52)` plus `--seed-windows 6` (CLI
+   `per_window`; windows5 was 17.042346 with 9 violated). Then windows 7 if
+   still above 17.
+3. If wall remains: n=19 next rung above T-020 `24/5`, not another 24/5
+   covering of an already certified side.
+
+From `packing/`, `OMP_NUM_THREADS=OPENBLAS_NUM_THREADS=MKL_NUM_THREADS=1`:
+
+```bash
+uv run --frozen --all-extras --group dev python -m devtools.run_fractional_colgen \
+  --n 12 --side 397/100 --shrink 9977/10000 --direction-steps 181 \
+  --grid-counts 26,35,43,48 --scale 4000000 --support-cap 32 \
+  --column-rounds 1 --max-rounds 60 --deadline-seconds 900 \
+  --seed-certificate cases/n12_fractional_certificate/certificate.json --seed-map scale \
+  --json campaign/series/series-000-smoke-and-calibration/results/agenda-037/n12-397-100-t017-grid4-run.json \
+  --row-log campaign/series/series-000-smoke-and-calibration/results/agenda-037/n12-397-100-t017-grid4-rows.jsonl \
+  --log campaign/series/series-000-smoke-and-calibration/results/agenda-037/n12-397-100-t017-grid4.log
+```
+
+```bash
+uv run --frozen --all-extras --group dev python -m devtools.run_fractional_colgen \
+  --n 17 --side 23/5 --shrink 9977/10000 --direction-steps 181 \
+  --grid-counts 32,42,52 --scale 4000000 --support-cap 32 \
+  --column-rounds 1 --max-rounds 60 --deadline-seconds 900 \
+  --seed-certificate cases/n17_fractional_certificate/certificate.json --seed-map scale \
+  --seed-windows 6 \
+  --json campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-t019-windows6-run.json \
+  --row-log campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-t019-windows6-rows.jsonl \
+  --log campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-t019-windows6.log
+```
+
+Sweeps composite-figure.json was regenerated at 09:39Z for n=18 4.67
+(`7b9a4deb`). Do not paste the suite-b 74.1s sample into
+`gate-budgets.yaml`; that job's tests passed.
+
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
 -->
