@@ -92,9 +92,9 @@ session:
     evidence: []
     stop_reason: null
     next_action: >-
-      Encode-only until process exit or 12:33Z. Copy the JSON. Do not --search.
-      Then n=12 397/100 T-017 four-grid, then n=17 23/5 windows6. Block 8
-      closeout 12:53–13:33Z.
+      Encode-only until process exit or timeout 10800. Copy the JSON. Do not
+      --search. Then n=12 397/100 T-017 four-grid, n=17 23/5 windows6 then 7
+      if still above 17, n=19 97/20. Covering deadline 18:00Z. Then closeout.
   budget:
     wall_minutes: 480
     max_cycles: 8
@@ -734,9 +734,23 @@ cycling 0.13–1.00 GiB per direction, peak 2.45 GiB). No JSON. Log empty. No
 `--search`. Waiter still waiting on that pid. Covering queue unchanged. Do
 not land T-028 during encode. Scientific wall ends 12:33Z; closeout 12:53Z.
 
-## Block 8 closeout (12:53–13:33Z)
+## Late continue (2026-09-18T15:06Z)
 
-Stop new research. Do not `--search`. Do not merge. Do not close
+Owner continue after the 12:33Z and 13:35Z timers. Encode-only still running
+(pid 347502, process elapsed ~2:42 from `lstart` 12:24:25Z, ~18 min left on
+timeout 10800). START marker is 09:33Z; the timeout is process-relative after
+the clock pause. No JSON. Log empty. No `--search`.
+
+The 12:53Z waiter cutoff is past and would skip every probe. Replaced
+`CLOSEOUT_EPOCH` with 18:00Z and restarted tmux `post-encode-covering`. Queue
+unchanged: n=12 `397/100` four-grid, n=17 windows 6 then 7 if still above 17,
+n=19 `97/20`. Freeze at `--support-cap 32`; declare-then-decide if mass < n.
+Closeout after covering. Do not land T-028 during encode.
+
+## Block 8 closeout (after covering; original window 12:53–13:33Z)
+
+Owner continue at 15:04Z moved this after the 18:00Z covering deadline.
+Stop new research then. Do not `--search`. Do not merge. Do not close
 `think-qqzs`, `think-g3j7`, `think-gyzw`, or `think-jwb1`. Do not allocate
 exp-161 to F1/M7. Unsubscribe `overnight-priority-check`.
 
