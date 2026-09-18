@@ -175,7 +175,7 @@ alone is not full pre-merge evidence.
 | `--geometry` | **CI, on every pull request**, in the `geometry` job, concurrently | 9 of 80 | 180 s | 102.73 s on the predecessor topology, the mean of seven readings |
 | `--suite-a` | **CI, on every pull request**, in the `suite-a` job, concurrently | 1 of 80 | 168 s | 109.92 s on exact head `be28ad5a`, the geometric mean of attempts 1–3 of run 35182460400 |
 | `--suite-b` | **CI, on every pull request**, in the `suite-b` job, concurrently | 1 of 80 | 180 s | 124.78 s on exact head `be28ad5a`, the geometric mean of attempts 2–3 of run 35182460400 |
-| `--sweeps` | **CI, on every pull request**, in the `sweeps` job, concurrently | 4 of 80 | 210 s | 119.72 s before reconciliation; PR 180’s predecessor topology read 138.84 s |
+| `--sweeps` | **CI, on every pull request**, in the `sweeps` job, concurrently | 4 of 80 | 200 s | 101.51 s, the geometric mean of six 4-of-80 hosted readings (66.36–130.77 s, spread 1.97x); the 119.72 s seven-reading mean and PR 180’s 138.84 s predecessor remain in the register as history |
 | *(no flag)* | Full checkpoint before final review and at block close; main, dispatch, and daily CI | 80 of 80 | 3600 s | split across four jobs; not clocked whole |
 
 `--geometry`’s current cost is the geometric mean of seven readings at the reference
