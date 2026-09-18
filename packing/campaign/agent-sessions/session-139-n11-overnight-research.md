@@ -575,6 +575,12 @@ T-019-seeded auto plus windows at `117/25` locked `18.000000` unconverged after
 `18.000000` unconverged after 921.5 s (59 rounds, 288 violated). T-027-seeded
 auto at `117/25` started 09:09Z. Route S encode-only remains 09:33Z.
 
+## Hour 4 T-027 seed result (2026-09-18T09:24Z)
+
+T-027-seeded auto at `117/25` locked `18.000000` unconverged after 819.5 s
+(60 rounds, 465 violated, 769 seed sites). Same wall as the T-019 seed.
+T-027 at `467/100` is unchanged. Route S encode-only remains 09:33Z.
+
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
 -->

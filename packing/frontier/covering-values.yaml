@@ -756,6 +756,30 @@ values:
       Adding sites can still lower a restricted optimum, so 117/25 is not barred. No
       covering freeze was retained.
   - n: 18
+    side: '117/25'
+    side_decimal: '4.68'
+    objective: '18.000000'
+    site_set: t027-seed-auto-32-43-54
+    sites: 6549
+    rows: 19241
+    rounds: 60
+    converged: false
+    stop_reason: >-
+      The 60-round limit stopped the row loop after 60 LP rounds with 465 placements
+      still violated. The objective crossed 18 at round 7 (18.000000) and held that
+      value through the stop on 6549 sites / 868 orbits, including 769 T-027 seed
+      sites scaled from 467/100. Wall 819.5 s.
+    least_covered_mass: '0.970596'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-117-25-t027-seed-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 T-027-seeded auto-grid at 117/25, the atoms that certified 467/100.
+      Unconverged mass 18.000000 cannot confirm; remaining rows can only raise it.
+      Adding sites can still lower a restricted optimum, so 117/25 is not barred. No
+      covering freeze was retained.
+  - n: 18
     side: '469/100'
     side_decimal: '4.69'
     objective: '18.000000'

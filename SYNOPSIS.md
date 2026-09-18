@@ -462,6 +462,7 @@ case or experiment separately.
 | [n=18 467/100 T-019-Seeded Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-467-100-t019-seed-receipt.md) | research synthesis | record | retained | — |
 | [n=18 117/25 T-019-Seeded Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-117-25-t019-seed-receipt.md) | research synthesis | record | retained | — |
 | [n=18 117/25 T-019-Seeded Window-Lattice Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-117-25-t019-windows5-receipt.md) | research synthesis | record | retained | — |
+| [n=18 117/25 T-027-Seeded Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-117-25-t027-seed-receipt.md) | research synthesis | record | retained | — |
 | [n=18 47/10 T-019-Seeded Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-47-10-t019-seed-receipt.md) | research synthesis | record | retained | — |
 | [n=18 469/100 T-019-Seeded Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-469-100-t019-seed-receipt.md) | research synthesis | record | retained | — |
 | [M3 T-018 Selftest Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/m3-t018-selftest/README.md) | research synthesis | record | retained | — |
@@ -5464,7 +5465,7 @@ unconverged, still above twelve; T-017-seeded four-grid at the same side dropped
 covering `17.331710` unconverged, site set refuted, side open; the T-019-seeded auto
 grid at the same side dropped to `17.049597` unconverged, still above seventeen; T-019-seeded auto plus `--seed-windows 5` dropped to `17.042346` unconverged; `4.67` is the session-139
 n=18 auto-grid probe at 467/100, covering `18.000000` unconverged, cannot confirm; the
-T-019-seeded auto grid at the same side converged `17.875567` with least_covered 1, freeze-then-decide retained `T-027` at `s(18) >= 467/100`; `4.68` T-019-seeded auto-grid locked at exact mass `18.000043` converged, cannot confirm; T-019-seeded auto plus `--seed-windows 5` at `4.68` locked `18.000000` unconverged; `4.69` T-019-seeded auto-grid locked `18.000000` unconverged; `4.7` T-019-seeded auto-grid converged `18.165413`, cannot confirm;
+T-019-seeded auto grid at the same side converged `17.875567` with least_covered 1, freeze-then-decide retained `T-027` at `s(18) >= 467/100`; `4.68` T-019-seeded auto-grid locked at exact mass `18.000043` converged, cannot confirm; T-019-seeded auto plus `--seed-windows 5` at `4.68` locked `18.000000` unconverged; T-027-seeded auto at the same side locked `18.000000` unconverged; `4.69` T-019-seeded auto-grid locked `18.000000` unconverged; `4.7` T-019-seeded auto-grid converged `18.165413`, cannot confirm;
 retained checkpoint and frozen-certificate availability differs by row.
 Several sides are reported more than once from site sets built differently, which is the
 point of reporting them that way: at `4.85` the difference is between a wall and the
