@@ -2295,7 +2295,7 @@ sessions:
   title: "N11 Overnight Research"
   status: in_progress
   primary_bead: think-mcb6
-  phases: 1
+  phases: 2
   measured: false
   unmeasured_reason: >-
     declares no resource measurement

@@ -158,7 +158,11 @@ def test_n12_replay_refuses_declared_value_drift(
     assert message in capsys.readouterr().out
 
 
-@pytest.mark.parametrize("replay", [replay_n17, replay_n18, replay_n20], ids=["n17", "n18", "n20"])
+@pytest.mark.parametrize(
+    "replay",
+    [replay_n17, replay_n18, replay_n20],
+    ids=["n17", "n18", "n20"],
+)
 @pytest.mark.parametrize("mutation", DECLARED_VALUE_DRIFT)
 def test_n17_and_n20_replays_refuse_declared_value_drift(
     tmp_path: Path,

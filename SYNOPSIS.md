@@ -144,7 +144,7 @@ hypothesis status and summarizes experiment verdicts, and the
 | Explorations | 35 | 21 linked to proposed hypotheses; 14 uncodified |
 | Hypotheses | 155 | 26 confirmed; 29 refuted; 51 blocked; 12 unresolved; 5 open; 28 open questions; 2 result registered; 1 abandoned; 1 running |
 | Experiments | 129 | 39 accepted; 34 rejected; 30 unresolved; 12 baseline; 11 blocked; 2 abandoned; 1 in progress |
-| Frontier results | 26 | 26 registered |
+| Frontier results | 27 | 27 registered |
 
 <!-- END CURRENT-RESEARCH-STATUS -->
 
