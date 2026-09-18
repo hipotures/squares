@@ -376,6 +376,28 @@ values:
       The reported objective has no raw run, and it is not the artifact's mass. X-013's
       list of six omits this side. The record names no site set and retains no site,
       row or round count.
+  - n: 17
+    side: '23/5'
+    side_decimal: '4.6'
+    objective: '17.331710'
+    site_set: auto-32-42-52
+    sites: 5484
+    rows: 10302
+    rounds: 39
+    converged: false
+    stop_reason: >-
+      The 300 s deadline stopped the row loop after 39 LP rounds with 72 placements
+      still violated. The objective had already crossed 17 at round 7 (17.000094).
+    least_covered_mass: '0.994279'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-grid-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 auto-grid probe at 23/5, between T-019 at 459/100 and the n=18 probe
+      at 117/25. Unconverged mass 17.331710 on 5484 sites / 716 orbits refutes this
+      site set only; remaining rows can only raise it. Adding sites can still lower
+      the covering value, so 23/5 is not barred. No covering freeze was retained.
   - n: 18
     side: '117/25'
     side_decimal: '4.68'

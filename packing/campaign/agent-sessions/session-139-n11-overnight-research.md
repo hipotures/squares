@@ -87,19 +87,25 @@ session:
       boundary, and evidence paths. Build no optimizer and run no coverage until that
       artifact exists.
     operator: Cursor coordinator Lane C
-    status: in_progress
+    status: completed
     recording: contemporaneous
-    outcome: null
-    evidence: null
-    files: null
-    checks: null
+    outcome: >-
+      exp-161 is registered with a live lease. The producer is in-tree, live --check
+      passed, and the default path is encoding_ready with no candidate. Coverage
+      encoding waits for Blocks 5–7; that is not this 90-minute registration slice.
+    evidence:
+      - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-161-h163-route-s-threshold-compression.md
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/exp-161-block57-command.md
+    files:
+      - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-161-h163-route-s-threshold-compression.md
+    checks:
+      - packing-ledger check (records) after exp-161 registration; live admit_threshold_compression --check exit 0 at 2026-09-18T06:05Z
     uncertainty: >-
-      BC-343 remains agenda-blocked on BC-355's advisory walls. The owner authorized
-      Route S registration tonight; think-97we is closed and the instrument is admitted.
+      The 181-direction encode may exceed the three-hour scientific wall. Timeout is
+      unresolved. Float HiGHS is never an H-163 verdict.
     elapsed_seconds: null
     elapsed_quality: unavailable
-    next_action: Producer is in-tree and emits no candidate. Do not run coverage.
-      A coverage-encoding search still waits. Admission-control manifests are excluded.
+    next_action: At 09:33Z run agenda-037/exp-161-block57-command.md encode-only. Do not search until that receipt exists.
     phase: 1
     budget_minutes: 90
     started_at: '2026-09-18T05:33:00Z'
@@ -383,6 +389,21 @@ Receipt path is packing-relative. Block 4 W5 remains 08:33Z.
 before HiGHS. Encoding is the cost, not the MIP. Do not spend another M3 wall on a
 finer net until encoding is cheaper. Point-atom densification at 3.82/3.83 is done
 for this phase. Block 4 at 08:33Z.
+
+## Hour 2 (2026-09-18T07:08Z)
+
+Span-sweep encoding landed: covering sets are frozensets, unique rows cap at 4096,
+Pareto skipped on wide site sets. T-018 5-direction selftest now finishes in 14.6 s
+with HiGHS feasible piercing 9 on 19,072 truncated rows (`unresolved`, not a kill,
+not an eleven-candidate). G4 n=11 at 191/50, 9 directions, grids 8/12/16: seed-row
+LP dipped to 9.97 after 30 threshold-atom orbits, then two row rounds restored
+11.61. Not a freeze. n=17 auto grids at 23/5: unconverged 17.331710 in 315 s, site
+set refuted, side open. Blocks 5–7 Route S command is in
+`agenda-037/exp-161-block57-command.md` (encode-only first; 181-direction Pareto may
+exceed the 3 h wall). G4 follow-up at 17 directions, grids 10/14/18, eight row
+rounds: seed-row LP dipped to 9.64, then row rounds finished at 11.45. M3 9-dir
+45 s search: piercing 9 on 31,940 truncated rows, still unresolved. Block 4 W5
+remains 08:33Z.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

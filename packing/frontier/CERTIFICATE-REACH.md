@@ -24,8 +24,8 @@ known packing, otherwise whichever of the two the limit is.
 **`prize` is what the limit allows, not what a search will reach.** The real
 limit is the covering value: a certificate exists at side `L` only where the
 least total mass that covers every admissible `B`-square falls below `n`, and
-that value can bind well below either cap. 38 restricted optima
-have been reported at 21 sides, one per site set, and
+that value can bind well below either cap. 39 restricted optima
+have been reported at 22 sides, one per site set, and
 `frontier/covering-values.yaml` registers each with whether its row loop
 converged; every one is at best an upper bound on the unrestricted covering
 value there. What survives here beside each is a frozen certificate or nothing
@@ -49,6 +49,7 @@ at all:
 | 12 | 3.96 | unrecorded | 11.9936 | yes | Converged toward 11.9936 before rationalisation lifted the mass to the frozen certificate's 149987/12500 = 11.998960, per X-013; T-017's own record gives no stop reason for this rung. | frozen 2,097-atom certificate, feasible mass 11.998960. The reported objective has no raw run, and it is not the artifact's mass: the difference is consistent with the documented rounding-up rule. The record names no site set and retains no site, row or round count. |
 | 17 | 4.58 | unrecorded | 16.9628 | yes | Reported converged by X-013. T-019's own record gives no stop reason for any of its n = 17 builds; the stop its next_rung narrates belongs to the n = 18 probe at 117/25 (D-443). | frozen 1,173-atom certificate, feasible mass 16.965735. The reported objective has no raw run, and it is not the artifact's mass. The record names no site set and retains no site, row or round count. |
 | 17 | 4.59 | unrecorded | 16.9303 | no | Not recorded. Agenda-019 quotes the objective and no source says whether the run converged (D-443), so the row stands as an upper bound only. | frozen 1,184-atom certificate, feasible mass 16.933080. The reported objective has no raw run, and it is not the artifact's mass. X-013's list of six omits this side. The record names no site set and retains no site, row or round count. |
+| 17 | 4.6 | auto-32-42-52 | 17.331710 | no | The 300 s deadline stopped the row loop after 39 LP rounds with 72 placements still violated. The objective had already crossed 17 at round 7 (17.000094). | nothing frozen here. Session-139 auto-grid probe at 23/5, between T-019 at 459/100 and the n=18 probe at 117/25. Unconverged mass 17.331710 on 5484 sites / 716 orbits refutes this site set only; remaining rows can only raise it. Adding sites can still lower the covering value, so 23/5 is not barred. No covering freeze was retained. |
 | 18 | 4.68 | 538-orbits | 18.000000 | no | Followed by a larger site set at the same side after returning exactly 18.000000; whether its own row loop exhausted is not recorded. | nothing frozen here. 538 orbits under D4; the site count is not recorded, nor rows or rounds. No raw run was retained and nothing was frozen: an objective of exactly eighteen admits no certificate. Across the three site sets the optimum did not move at all. |
 | 18 | 4.68 | 578-orbits | 18.000000 | no | Followed by a larger site set at the same side after returning exactly 18.000000; whether its own row loop exhausted is not recorded. | nothing frozen here. 578 orbits under D4; the site count is not recorded, nor rows or rounds. No raw run was retained and nothing was frozen: an objective of exactly eighteen admits no certificate. |
 | 18 | 4.68 | 618-orbits | 18.000000 | no | Stopped on cost after 157 row-generation rounds and 7056 s, the last round two hours, before the run could separate a covering value at or above eighteen from a site set still short of one. | nothing frozen here. 618 orbits under D4; the site count is not recorded. The row set grew from 15888 to 27516 over the run. Both readings stay open, a covering value at or above eighteen or an optimum on a degenerate vertex, which the collapse of pricing from 90 s to 1--3 s suggests. No raw run was retained and nothing was frozen. |
@@ -82,9 +83,9 @@ artifact's mass and the reported objective are different numbers.
 
 They are also reports of different kinds rather than one series measured the same
 way, and the `converged` column is where the difference lives: 18 of
-the 38 ran their row loop to convergence, and the rest stopped for the
+the 39 ran their row loop to convergence, and the rest stopped for the
 reason beside each — or for none the record kept — and stand as upper bounds on
-their own site sets only. 38 heterogeneous reports across a side band
+their own site sets only. 39 heterogeneous reports across a side band
 2.00 wide do not support a growth trend or a fitted curve, and no rung in
 this register has ever been claimed from one. Rank on `prize` to choose where to
 look; measure and retain the run before believing any extrapolation.
