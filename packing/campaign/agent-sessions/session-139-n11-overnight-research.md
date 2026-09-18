@@ -533,6 +533,20 @@ think-g3j7 stays open. W5 already landed. Next is Route S encode-only at
 09:33Z. Covering continues: n=18 T-019 seed row loop at 17.875567 with
 violated 0, still in column generation; n=12 T-017 four-grid in flight.
 
+## Hour 3 n=12 four-grid (2026-09-18T08:28Z)
+
+T-017-seeded four-grid at `3969/1000` stopped unconverged at `12.116115` after
+634.8 s (29 LP rounds, 330 violated). Dropped the seeded auto `12.118036` by
+0.002. Site set refuted; side open.
+
+## Hour 3 n=18 T-019 seed (2026-09-18T08:31Z)
+
+T-019-seeded auto grids at `467/100` with `--support-cap 0` converged the row
+loop at `17.875567` (`least_covered` 1) on 6853 sites. Unseeded locked at 18.
+`check_ceiling` on the untruncated dual was interrupted after 31 minutes.
+Freeze re-run started with `--support-cap 32`. First session-139 covering
+strictly below n on a named site set.
+
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
 -->

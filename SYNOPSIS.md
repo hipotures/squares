@@ -456,7 +456,9 @@ case or experiment separately.
 | [n=11 96/25 T-025-Seeded Auto-Plus-60 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-96-25-t025-auto60-receipt.md) | research synthesis | record | retained | — |
 | [G4 n=11 31/8 Nine-Direction Threshold-Atom Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/g4-n11-31-8-net9/g4-n11-31-8-net9-receipt.md) | research synthesis | record | retained | — |
 | [n=12 3969/1000 T-017-Seeded Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n12-3969-1000-t017-seed-receipt.md) | research synthesis | record | retained | — |
+| [n=12 3969/1000 T-017-Seeded Four-Grid Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n12-3969-1000-t017-grid4-receipt.md) | research synthesis | record | retained | — |
 | [n=18 467/100 Auto-Grid Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-467-100-grid-receipt.md) | research synthesis | record | retained | — |
+| [n=18 467/100 T-019-Seeded Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-467-100-t019-seed-receipt.md) | research synthesis | record | retained | — |
 | [M3 T-018 Selftest Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/m3-t018-selftest/README.md) | research synthesis | record | retained | — |
 | [M3 T-018 9-Direction Search Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/m3-t018-net8/README.md) | research synthesis | record | retained | — |
 | [M3 T-018 Selftest After Span-Sweep Encoding](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/m3-t018-selftest-span/README.md) | research synthesis | record | retained | — |
@@ -5451,11 +5453,13 @@ session-139 n=11 probes at 383/100, covering `11.192598` (auto grids), `11.14285
 `11.371819` converged, site set refuted; `3.85` also has the session-139 T-025-seeded auto-plus-60 at 77/20, covering `11.456576`
 converged, site set refuted; `3.875` is the same construction at 31/8, covering
 `11.561186` converged, site set refuted, 0.002 below the packing; `3.969` T-017-seeded auto-grid dropped to `12.118036`
-unconverged, still above twelve; `4.6` is the session-139 n=17 auto-grid probe at 23/5,
+unconverged, still above twelve; T-017-seeded four-grid at the same side dropped to
+`12.116115` unconverged; `4.6` is the session-139 n=17 auto-grid probe at 23/5,
 covering `17.331710` unconverged, site set refuted, side open; the T-019-seeded auto
 grid at the same side dropped to `17.049597` unconverged, still above seventeen; `4.67` is the session-139
-n=18 auto-grid probe at 467/100, covering `18.000000` unconverged, cannot confirm, side
-open;
+n=18 auto-grid probe at 467/100, covering `18.000000` unconverged, cannot confirm; the
+T-019-seeded auto grid at the same side converged `17.875567` with least_covered 1, so
+this site set can carry a certificate if freeze-then-decide succeeds, side open;
 retained checkpoint and frozen-certificate availability differs by row.
 Several sides are reported more than once from site sets built differently, which is the
 point of reporting them that way: at `4.85` the difference is between a wall and the
