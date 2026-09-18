@@ -511,9 +511,8 @@ session:
     a bound. Registration and route selection wait for owner decisions, and no gate has
     run on a committed head, so the session stops with certification pending.
   next_action: >-
-    Close M7's n=6 bracket at 299/100 under BC-357 / think-qqzs after the G5 site-merge
-    fix. The five owner decisions in X-037 remain open and do not block that tooling
-    slice.
+    Close M7's n=6 bracket at 299/100 under BC-357 / think-qqzs. H-216 is the registered
+    determination. G1, G2, G3, and G5 are on main; G4 remains on this bead.
 ---
 # Session 138: N11 Overnight Review
 
@@ -521,8 +520,15 @@ session:
 `think-4woh`, which closed when PR 193 merged as `4ad98e90`. A closed bead owes nothing,
 so the marker now names `think-qqzs`, the open bead that owns the next executable entry:
 BC-357’s n=6 calibration after the G5 site-merge fix.
-Nothing else in this record becomes a pass, and the five owner decisions in X-037 stay
-open.
+Nothing else in this record becomes a pass.
+
+**X-037 decisions resolved, 2026-09-18.** The five owner decisions are resolved in
+[X-037](../explorations/X-037-n11-overnight-review-and-route-slate.md) under
+[`epistemics.md`](../../../epistemics.md).
+[H-216](../hypotheses/H-216-point-certificate-at-n6-299-100.md) and
+[H-217](../hypotheses/H-217-route-f1-majority-floor-at-153-40.md) are registered.
+This session registered neither; the YAML `next_action` still names BC-357 /
+`think-qqzs`.
 
 The owner asked on 2026-09-16 at 23:50 PT for a deep overnight push toward a significant
 n=11 result by new mechanisms, closed by morning.
@@ -585,10 +591,11 @@ receipt separates the n=11 program’s cost.
 ## Handoff
 
 The session’s records landed when PR 193 merged as `4ad98e90`. Certification debt now
-sits under `think-qqzs`. The owner’s five decisions remain open (X-037, “Owner Decisions
-Needed”) and do not block BC-357’s tooling slice.
-BC-358 stays blocked on `think-g3j7`, `think-3xbr`, and `think-gyzw`. Route S (BC-343,
-`think-ufmk`) remains open in agenda-036.
+sits under `think-qqzs`. The five X-037 decisions are resolved; H-216 and H-217 are
+registered. BC-357 / `think-qqzs` remains the next executable entry.
+BC-358 stays blocked on the `think-g3j7` reader, `think-3xbr`, and `think-gyzw`. Route S
+(BC-343, `think-ufmk`) remains open in agenda-036 and still needs `exp-161` before a
+target.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

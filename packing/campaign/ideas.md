@@ -627,6 +627,18 @@ T-026 is only a support-and-rescaling provenance sentinel.
 | --- | --- | --- | --- | --- |
 | 166 | Compress T-025 on its exact support universe to at most 23 positive D4 orbits | registered | [H-163](hypotheses/H-163-route-s-threshold-compression.md) | A literal fivefold reduction from T-025’s 119 positive orbit representatives requires `N+ <= 23`. Confirmation also requires exact budget below eleven, agreement of the unchanged complete coverage routes, deterministic decompression, and source-distinct replay. The admission branch allocates no experiment and runs no target. |
 
+## N11 Overnight Route Slate — X-037
+
+[X-037](explorations/X-037-n11-overnight-review-and-route-slate.md) ranked mechanisms
+that price relations between squares, ran two overnight, and left five owner decisions.
+The 2026-09-18 addition resolves them under [`epistemics.md`](../../epistemics.md).
+M2, M4, M5, M6, and M8 stay retired in agenda-037 BC-360. `exp-161` remains Route S.
+
+| # | Idea | Status | H | Crux |
+| --- | --- | --- | --- | --- |
+| 187 | A helper-free point-atom certificate exists for n=6 at side 299/100 | registered | [H-216](hypotheses/H-216-point-certificate-at-n6-299-100.md) | Confirm with a frozen covering below 6 that both decide_certificate routes accept; kill with an exact depth-one family of total at least 6. Attic scratch does not decide it. Calibration only; s(6)=3 does not move. |
+| 188 | Rows-complete majority, k-of-S, and floor covering at 153/40 falls below 11 | registered | [H-217](hypotheses/H-217-route-f1-majority-floor-at-153-40.md) | Kill with a depth-one mass-11 family feasible for every admitted majority, k-of-S, and floor atom; confirm with decide_threshold_certificate (or the think-g3j7 successor) at budget < 11 and least charge >= 1. Blocked on the new reader, sites-1, and guarded colgen. |
+
 ## Dead ends
 
 Killed without spending a round, with the reason.
@@ -661,6 +673,18 @@ This section is why the campaign does not rediscover its own mistakes.
 
 - **Squared overlap penalty.** Gradient vanishes as the overlap closes, so it never
   quite reaches zero. A linear penalty has an exact finite-`lambda` constrained optimum.
+
+- **M6, LP-rounding as an n=11 proof or search route.** The ν*(U) diagnostic is
+  ill-posed as stated.
+  A search hypothesis would need a criterion that can be wrong, Trump’s packing as the
+  exact control, and an instrument that proposes LP-rounded seeds, named before a run.
+  None of those exists.
+  Significance never gates; the judged P2 is not why this stays retired.
+
+- **M2, Lovász theta without an exact PSD certificate.** Theta is at most V1. A bound
+  here needs `V4/C3`, and a T-id needs two-route C4. An SDP solver would be a new
+  dependency without a confirmation path.
+  Reopen only with an owner-approved exact PSD route.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
