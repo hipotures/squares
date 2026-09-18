@@ -750,6 +750,13 @@ copy it to that name. Same at n=17: live file is 459/100, no
 `s(12) >= 99/25`; that line moves with the pointer. DS7 hardcodes verified
 lowers only for n=17 (`4.59`) and n=18 (`4.67`). Covering `side_decimal`
 `3.97`, `4.6`, and `4.85` are already in the SYNOPSIS unique-side list.
+Map any new receipt Markdown in `document-map.yaml` (T-027's receipt was
+mapped when the covering run was recorded). A T-id landing moves the
+CURRENT-RESEARCH-STATUS frontier count from 27 to 28; unique covering sides
+stay 28 unless a new `side_decimal` appears. Raised `n-0NN.md` bounds must
+mark the displaced figure with a historical token (`superseded`,
+`previously`, `was`, `until`). `frozen_artifact` must also appear in some
+result's `artifacts`.
 
 Sweeps composite-figure.json was regenerated at 09:39Z for n=18 4.67
 (`7b9a4deb`). Do not paste the suite-b 74.1s sample into
