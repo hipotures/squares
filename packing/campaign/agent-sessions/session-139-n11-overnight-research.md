@@ -718,6 +718,15 @@ when encode pid 347502 exits, copies the encode JSON, and will not start a
 probe inside the Block 8 closeout (12:53Z). No `--search`. The waiter then
 runs n=19 `97/20` T-020 windows 6 if wall remains.
 
+## Hour 6 (2026-09-18T10:10Z)
+
+Encode-only still running (pid 347502, elapsed 37:41, ~100% CPU, RSS cycling
+0.13–0.98 GiB per direction, peak 2.39 GiB). No JSON. Log empty. No `--search`.
+Waiter `post-encode-covering` still waiting on that pid. Queue after encode:
+n=12 `397/100` four-grid, n=17 windows 6 then 7 if still above 17, n=19
+`97/20` T-020 windows 6; freeze at `--support-cap 32`, declare-then-decide
+if mass < n. CI on `9c0156eb` succeeded. Do not land T-028 during encode.
+
 ## Block 8 closeout (12:53–13:33Z)
 
 Stop new research. Do not `--search`. Do not merge. Do not close
