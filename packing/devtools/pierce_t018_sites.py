@@ -52,6 +52,7 @@ from sqpack.fractional.integral_piercing import (
     solve_integral_set_cover,
     t018_certificate_path,
 )
+from sqpack.project import require_project_root
 
 RECEIPT_NAME = "pierce-t018-receipt.json"
 SELFTEST_DIRECTION_STEPS = 4
@@ -60,6 +61,16 @@ SELFTEST_TIME_LIMIT_S = 20.0
 
 def _point_strings(points: Sequence[Point]) -> list[list[str]]:
     return [[str(x), str(y)] for x, y in points]
+
+
+def _certificate_field(certificate: Path) -> str:
+    """Packing-relative when the file sits in this project; otherwise the given path."""
+
+    resolved = certificate.resolve()
+    try:
+        return resolved.relative_to(require_project_root().resolve()).as_posix()
+    except ValueError:
+        return certificate.as_posix()
 
 
 def _write_receipt(path: Path, record: dict[str, Any]) -> None:
@@ -113,7 +124,7 @@ def build_receipt(
         "direction_count": direction_steps + 1,
         "unique_sites": len(all_sites),
         "sites_in_container": len(sites),
-        "certificate": certificate.as_posix(),
+        "certificate": _certificate_field(certificate),
         "optimizer_ran": False,
         "search_status": SearchStatus.encoding_ready.value,
         "piercing": None,
