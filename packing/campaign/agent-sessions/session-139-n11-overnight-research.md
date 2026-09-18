@@ -333,6 +333,13 @@ site set refuted; side open). n=11 at `383/100` is next. Guarded
 `devtools.run_relational_colgen` refuses covering without sites-1 (`think-gyzw` remains
 open).
 
+## Hour 1 n=11 383/100 (2026-09-18T06:32Z)
+
+n=11 auto grids `(25, 34, 41)` at `383/100` converged in 82.2 s at restricted optimum
+`11.192598` (rationalised `44770567/4000000`). Crossed eleven at LP round 6. Site set
+refuted; side open. T-025 and T-026 unchanged. Next cheap probe: denser grids at the
+same side. G4 and M3 sources are on disk, uncommitted until their tests pass.
+
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
 -->

@@ -126,6 +126,30 @@ values:
       prior six-decimal display 9.907906 rounded the exact lower bound upward; this
       record now preserves its approximate status.
   - n: 11
+    side: '383/100'
+    side_decimal: '3.83'
+    objective: '11.192598'
+    site_set: auto-25-34-41
+    sites: 3365
+    rows: 5233
+    rounds: 24
+    converged: true
+    stop_reason: >-
+      The row loop converged at LP round 24 (violated 0) at 11.192598 on 3365 sites
+      / 457 orbits. Round 4 sat at 11.000000; it crossed eleven at round 6
+      (11.096552). Column generation then added one orbit and stopped; wall 82.2 s.
+    least_covered_mass: '1'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-383-100-grid-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 scout probe above T-025 at 191/50 and T-026's certified side
+      3.826447. Same auto grids (25, 34, 41) and scale 4,000,000 as BC-191 at this n.
+      Above eleven on a converged loop, so this site set carries no certificate at 3.83;
+      adding sites can only lower it, so the side is not barred. No covering freeze was
+      retained.
+  - n: 11
     side: '77/20'
     side_decimal: '3.85'
     objective: '11.227631'
