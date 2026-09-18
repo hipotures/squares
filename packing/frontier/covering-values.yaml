@@ -1149,6 +1149,29 @@ values:
       Rows only raise a restricted optimum, so this site set's converged optimum is at
       least 12.016263.
   - n: 12
+    side: '397/100'
+    side_decimal: '3.97'
+    objective: '12.122748'
+    site_set: t017-seed-four-grid-26-35-43-48
+    sites: 8133
+    rows: 9290
+    rounds: 33
+    converged: false
+    stop_reason: >-
+      The 900 s deadline stopped the row loop after 33 LP rounds with 108 placements
+      still violated. The objective crossed 12 at round 8 (12.001574) and finished at
+      12.122748 on 8133 sites / 1120 orbits, including 2097 T-017 seed sites.
+    least_covered_mass: '0.987523'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n12-397-100-t017-grid4-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 T-017-seeded four-grid at 397/100. Unconverged mass still above
+      twelve refutes this site set only; remaining rows can only raise it. Adding
+      sites can still lower the covering value, so 397/100 is not barred. No
+      covering freeze was retained.
+  - n: 12
     side: '398/100'
     side_decimal: '3.98'
     objective: '16.000000'

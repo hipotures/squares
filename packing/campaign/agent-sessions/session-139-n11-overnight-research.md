@@ -822,6 +822,13 @@ empty. No `--search`. Waiter started n=12 `397/100` T-017 four-grid
 needed, n=19 `97/20`. Covering deadline 18:00Z. Freeze-then-decide if mass
 < n. T-028 only if RETAINABLE.
 
+## n=12 397/100 four-grid (2026-09-18T15:40Z)
+
+T-017-seeded four-grid `(26, 35, 43, 48)` at `397/100` stopped unconverged at
+`12.122748` after 939.9 s (33 LP rounds, 108 violated). Crossed twelve at
+round 8. No freeze. Site set refuted; side open. T-017 unchanged. Waiter
+started n=17 `23/5` windows 6 at 15:40Z.
+
 ## Block 8 closeout (after covering; original window 12:53–13:33Z)
 
 Owner continue at 15:04Z moved this after the 18:00Z covering deadline.
