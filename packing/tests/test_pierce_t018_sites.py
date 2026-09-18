@@ -5,10 +5,16 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import numpy as np
 import pytest
 
+import devtools.pierce_t018_sites as pierce
 from devtools.pierce_t018_sites import RECEIPT_NAME, check_sites, main
-from sqpack.fractional.integral_piercing import load_unique_sites, t018_certificate_path
+from sqpack.fractional.integral_piercing import (
+    CoverEncoding,
+    load_unique_sites,
+    t018_certificate_path,
+)
 
 
 def test_check_reports_the_certificate_unique_site_count(
@@ -75,3 +81,53 @@ def test_search_on_a_one_site_synthetic(tmp_path: Path) -> None:
     assert record["m3_verdict"] == "eleven_candidate"
     assert record["interval_audit"]["ran"] is False
     assert record["float_lp_used"] is False
+
+
+def test_search_does_not_solve_when_encoding_consumed_the_wall(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    certificate = tmp_path / "tiny.json"
+    certificate.write_text(
+        json.dumps({"atoms": [["1", "1", "1"]]}) + "\n",
+        encoding="utf-8",
+    )
+    encoding = CoverEncoding(
+        rows=np.eye(1, dtype=np.uint8),
+        reachable_cells=1,
+        direction_count=1,
+        site_count=1,
+        truncated=False,
+    )
+    monkeypatch.setattr(pierce, "encode_event_cell_covers", lambda *_args, **_kwargs: encoding)
+    clock = iter((100.0, 200.0))
+    monkeypatch.setattr(pierce.time, "monotonic", lambda: next(clock))
+
+    def fail_solve(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("milp must not run after the encoding wall")
+
+    monkeypatch.setattr(pierce, "solve_integral_set_cover", fail_solve)
+    output = tmp_path / "out"
+    assert (
+        main(
+            [
+                "--certificate",
+                str(certificate),
+                "--side",
+                "2",
+                "--direction-steps",
+                "1",
+                "--time-limit-s",
+                "5",
+                "--search",
+                "--output-dir",
+                str(output),
+            ]
+        )
+        == 0
+    )
+    record = json.loads((output / RECEIPT_NAME).read_text(encoding="utf-8"))
+    assert record["optimizer_ran"] is False
+    assert record["search_status"] == "timeout"
+    assert record["m3_verdict"] == "unresolved"
+    assert record["cover_rows"] == 1
+    assert record["reachable_cells"] == 1

@@ -595,7 +595,8 @@ def solve_integral_set_cover(
     """Minimise the number of sites that hit every covering row, with 0/1 indicators.
 
     HiGHS is a float MIP. A feasible incumbent is re-checked in integers before it
-    is reported. A timeout is unresolved. The LP relaxation is never solved.
+    is reported. A timeout or a non-infeasible solver failure is unresolved. Only
+    HiGHS status 2 is treated as infeasible. The LP relaxation is never solved.
     """
 
     if rows.ndim != 2:
@@ -655,7 +656,7 @@ def solve_integral_set_cover(
     if status == 1:
         search_status = SearchStatus.timeout
         message = "HiGHS reached its time limit; timeout is unresolved, never a kill"
-    elif status == 2 or (not result.success and result.x is None):
+    elif status == 2:
         search_status = SearchStatus.infeasible
         message = "integer HiGHS reported infeasible on the coarse net (kill-test measurement)"
     elif result.success and result.x is not None:
@@ -669,6 +670,11 @@ def solve_integral_set_cover(
             )
         else:
             message = "HiGHS incumbent failed the integer cover check; not a verdict"
+    else:
+        message = (
+            f"HiGHS returned status {status} with no usable incumbent; "
+            "solver error is unresolved, never a kill"
+        )
     return SetCoverOutcome(search_status, piercing, selected, message, optimizer_ran=True)
 
 

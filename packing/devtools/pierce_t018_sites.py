@@ -3,8 +3,9 @@
 
 Default is encode-ready, not a search. ``--search`` runs a HiGHS set-cover MIP
 with integrality on site indicators. A coarse-net optimum ≥ 12 is
-``killed_coarse_net``; a feasible 11-set is ``eleven_candidate``. Timeout is
-unresolved. The float LP relaxation is never solved and is not a verdict.
+``killed_coarse_net``; a feasible 11-set is ``eleven_candidate``. Timeout and
+non-infeasible solver failures are unresolved. The float LP relaxation is never
+solved and is not a verdict.
 
 ``--check`` loads T-018, reports the unique site count, and writes nothing.
 ``--certify`` (off by default) may call ``cases.green17.interval_audit.certify``
@@ -161,7 +162,16 @@ def build_receipt(
         record["m3_verdict"] = M3Verdict.unresolved.value
         record["message"] = "event-cell encoding hit the time limit; timeout is unresolved"
         return record
-    remaining = max(0.0, deadline - time.monotonic())
+    record["reachable_cells"] = encoding.reachable_cells
+    record["cover_rows"] = int(encoding.rows.shape[0])
+    record["truncated_rows"] = encoding.truncated
+    remaining = deadline - time.monotonic()
+    if remaining <= 0:
+        record["search_status"] = SearchStatus.timeout.value
+        record["m3_verdict"] = M3Verdict.unresolved.value
+        record["optimizer_ran"] = False
+        record["message"] = "encoding consumed the wall; timeout is unresolved"
+        return record
     outcome = solve_integral_set_cover(encoding.rows, time_limit_s=remaining)
     verdict = m3_verdict_for(
         outcome.search_status, outcome.piercing, truncated=encoding.truncated

@@ -99,6 +99,20 @@ def test_timeout_is_unresolved_never_a_kill(monkeypatch: pytest.MonkeyPatch) -> 
     assert m3_verdict_for(outcome.search_status, outcome.piercing) is M3Verdict.unresolved
 
 
+def test_solver_error_without_incumbent_is_unresolved_never_a_kill(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def error_milp(*_args: object, **_kwargs: object) -> OptimizeResult:
+        return OptimizeResult(success=False, status=4, x=None, fun=None, message="other")
+
+    monkeypatch.setattr(piercing, "milp", error_milp)
+    outcome = solve_integral_set_cover(np.eye(3, dtype=np.uint8))
+    assert outcome.search_status is SearchStatus.encoding_ready
+    assert outcome.piercing is None
+    assert outcome.optimizer_ran is True
+    assert m3_verdict_for(outcome.search_status, outcome.piercing) is M3Verdict.unresolved
+
+
 def test_span_cover_matches_cell_broadcast() -> None:
     sites = (
         (Fraction(1), Fraction(1)),
