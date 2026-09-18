@@ -371,6 +371,12 @@ eleven through LP round 16. Closest session-139 point construction at 3.82; stil
 below eleven. Point-atom densification at 3.82/3.83 is exhausted for this phase. Next:
 M3 selftest.
 
+## Hour 1 M3 selftest (2026-09-18T06:48Z)
+
+T-018 5-direction event-cell encoding hit the 20 s limit before HiGHS ran
+(`timeout` / `unresolved`). Not a kill. A 36-net search needs a larger encoding budget.
+Receipt path is packing-relative. Block 4 W5 remains 08:33Z.
+
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
 -->
