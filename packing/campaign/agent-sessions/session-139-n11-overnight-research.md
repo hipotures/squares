@@ -618,6 +618,8 @@ uv run --frozen --all-extras --group dev python -m devtools.run_fractional_colge
   --grid-counts 26,35,43,48 --scale 4000000 --support-cap 32 \
   --column-rounds 1 --max-rounds 60 --deadline-seconds 900 \
   --seed-certificate cases/n12_fractional_certificate/certificate.json --seed-map scale \
+  --freeze campaign/series/series-000-smoke-and-calibration/results/agenda-037/n12-397-100-t017-grid4-certificate.json \
+  --freeze-family campaign/series/series-000-smoke-and-calibration/results/agenda-037/n12-397-100-t017-grid4-family.json \
   --json campaign/series/series-000-smoke-and-calibration/results/agenda-037/n12-397-100-t017-grid4-run.json \
   --row-log campaign/series/series-000-smoke-and-calibration/results/agenda-037/n12-397-100-t017-grid4-rows.jsonl \
   --log campaign/series/series-000-smoke-and-calibration/results/agenda-037/n12-397-100-t017-grid4.log
@@ -630,6 +632,8 @@ uv run --frozen --all-extras --group dev python -m devtools.run_fractional_colge
   --column-rounds 1 --max-rounds 60 --deadline-seconds 900 \
   --seed-certificate cases/n17_fractional_certificate/certificate.json --seed-map scale \
   --seed-windows 6 \
+  --freeze campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-t019-windows6-certificate.json \
+  --freeze-family campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-t019-windows6-family.json \
   --json campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-t019-windows6-run.json \
   --row-log campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-t019-windows6-rows.jsonl \
   --log campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-t019-windows6.log
@@ -642,6 +646,8 @@ uv run --frozen --all-extras --group dev python -m devtools.run_fractional_colge
   --column-rounds 1 --max-rounds 60 --deadline-seconds 900 \
   --seed-certificate cases/n20_fractional_certificate/certificate-24-5.json --seed-map scale \
   --seed-windows 6 \
+  --freeze campaign/series/series-000-smoke-and-calibration/results/agenda-037/n19-97-20-t020-windows6-certificate.json \
+  --freeze-family campaign/series/series-000-smoke-and-calibration/results/agenda-037/n19-97-20-t020-windows6-family.json \
   --json campaign/series/series-000-smoke-and-calibration/results/agenda-037/n19-97-20-t020-windows6-run.json \
   --row-log campaign/series/series-000-smoke-and-calibration/results/agenda-037/n19-97-20-t020-windows6-rows.jsonl \
   --log campaign/series/series-000-smoke-and-calibration/results/agenda-037/n19-97-20-t020-windows6.log
@@ -653,6 +659,11 @@ the 24/5 atoms and `seed_windows: 0`; remaining rows raise, so windows 6 is
 the site-set change. Seed the immutable `certificate-24-5.json`, not the
 moving `certificate.json` pointer (now 97/20). Do not invent a new n=19
 side. Do not re-cover `24/5`. Session covering stays on the 181-net.
+
+`--freeze` is on each probe (`--support-cap 32`, never 0). A freeze file
+appears only on a converged row loop. If its `total_mass` is below n, run
+`declare_least_cell_mass` then `decide_certificate` on those bytes. Do not
+`--verify-serial` during colgen. Do not `--search`.
 
 Sweeps composite-figure.json was regenerated at 09:39Z for n=18 4.67
 (`7b9a4deb`). Do not paste the suite-b 74.1s sample into
