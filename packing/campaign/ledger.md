@@ -153,7 +153,7 @@ Each entry summarizes one user-level research window. Cycle slots are wall-clock
 | [session-136](agent-sessions/session-136-ci-topology-reconciliation.md) | stopped | contemporaneous | `pipeline-improvement` (efficiency) | `pipeline-improvement` (efficiency) | 1 | think-97we | think-97we closed when PR 188 and PR 185 merged, and the pending closeout checks it carried -- as carried forward by Session 137 -- now sit under think-g4n9: hold both pull-request walls at or under 180 s over the declared run of consecutive exact-head hosted runs, then switch the wall check back to enforcing. Then resume BC-343 under think-ufmk without changing its scientific claim or allocating exp-161 from this block. |
 | [session-137](agent-sessions/session-137-ci-topology-continuation-recovery.md) | stopped | retrospective | `pipeline-improvement` (correctness) | `remediation` (correctness) | 3 | think-97we | think-97we closed when PR 188 and PR 185 merged, and the remaining closeout debt on the final head now sits under think-g4n9: hold both pull-request walls at or under 180 s over the declared run of consecutive exact-head hosted runs, then switch the wall check back to enforcing. Then resume BC-343 under think-ufmk without changing its scientific claim or allocating exp-161 from this block. |
 | [session-138](agent-sessions/session-138-n11-overnight-review.md) | stopped | mixed | `factual-review` (insight) | `documentation-pass` (process) | 6 | think-4woh | Close M7's n=6 bracket at 299/100 under BC-357 / think-qqzs. H-216 is the registered determination. G1, G2, G3, and G5 are on main; G4 remains on this bead. |
-| [session-139](agent-sessions/session-139-n11-overnight-research.md) | in_progress | contemporaneous | `research-loop` (insight) | `research-loop` (insight) | 1 | think-mcb6 | Continue Blocks 1–3: finish exp-161, run the H-216 freeze, and land the F1 reader. Then Block 4 think-g4n9, Blocks 5–7 Route S if exp-161 exists, Block 8 closeout. |
+| [session-139](agent-sessions/session-139-n11-overnight-research.md) | in_progress | contemporaneous | `research-loop` (insight) | `research-loop` (insight) | 1 | think-mcb6 | Continue Blocks 1–3 until 08:33Z: H-216 freeze/polish retained and open; keep the F1 reader tests green; producer exists but emits no candidate. Then Block 4 think-g4n9, Blocks 5–7 Route S only with --authorize-target exp-161 after a live --check, Block 8 closeout. |
 
 ### Workflow summary
 
@@ -755,7 +755,7 @@ Status: **active**. Reconcile the merged research record, then choose among rout
 | BC-354 | tool_validation | 11 | complete | 0 | think-0t5y | Reopen only after one proposal supplies the complete 80-stratum negative-root producer, a rows-complete matched baseline, and two method-distinct exact coverage routes with shared physical variables. |
 | BC-341 | research | 11 | tentative | 1 | think-9y6q | Preserve the named Route A gaps and reconsider this discriminator only through a future W10 after a complete representation discharges them. |
 | BC-342 | research | 6, 11 | tentative | 1 | think-ol1z | Specify the n=6 control and the conflict-edge soundness obligation before selecting a solver. |
-| BC-343 | research | 11 | blocked | 0 | think-ufmk | Session 139 registered exp-161 on 2026-09-18 with source, target, budget, accept rule, stop rule, independent-review boundary, and evidence paths. The producer named there must exist before any weight changes or coverage. BC-355's pull-request walls remain advisory under think-g4n9; that does not reopen the admitted instrument. |
+| BC-343 | research | 11 | blocked | 0 | think-ufmk | Session 139 registered exp-161 on 2026-09-18 and closed the admission-synthetic accept hole: live `admit_threshold_compression --check`, `--authorize-target exp-161`, forbidden control-manifest SHA-256 values, `generating_account`, and timeout maps to unresolved. The named producer is in-tree and emits no candidate; a coverage-encoding search is still required before any scientific target. BC-355's pull-request walls remain advisory under think-g4n9; that does not reopen the admitted instrument. |
 | BC-344 | research | 11 | tentative | 2 | think-29ch | Reproduce the 6+5 control at Trump's angle before interpreting any solver infeasibility. |
 | BC-345 | research | 11 | tentative | 3 | think-7n2w | Design the positive-control and endpoint-polishing contract before allocating the background search. |
 | BC-348 | research | 11 | tentative | 1 | think-u15l | Test the valid angle-count rows against the entire retained optimal face before building a larger certificate. |
@@ -771,8 +771,8 @@ Status: **active**. Pursue n=11 results beyond the one-body ceiling L* = 38200/9
 | item | purpose | n | state | priority | bead | next evidence |
 | --- | --- | --- | --- | ---: | --- | --- |
 | BC-356 | research | 6, 10, 11 | complete | 0 | think-4woh | The five X-037 decisions are resolved; H-216 and H-217 are registered. BC-357 closes the n=6 bracket under H-216. |
-| BC-357 | measurement_validation | 6, 10 | in_progress | 1 | think-qqzs | A rows-complete covering below 6 on a named site set that both routes of decide_certificate accept, or an exact polish of a large placement union at 299/100 whose ceiling family has total at least 6. |
-| BC-358 | research | 11 | blocked | 1 | think-gyzw | The think-g3j7 reader, then the guarded colgen tool run to one of H-217's two terminal states. |
+| BC-357 | measurement_validation | 6, 10 | in_progress | 1 | think-qqzs | Session 139 froze covering total 76027/12500 = 6.08216 (does not confirm) and polished a depth-one family of exact total 76/13 that both independent_ceiling_reader and verify_ceiling accept as depth <= 1 and reject on K3 (does not kill). H-216 stays open. Confirm still needs covering < 6 on a named site set that both decide_certificate routes accept. Not an n=11 result. |
+| BC-358 | research | 11 | blocked | 1 | think-gyzw | Session 139 landed packing/src/sqpack/fractional/relational.py and packing/devtools/decide_relational_certificate.py without mutating T-025/T-026 verify_claim.py. Remaining: retain or regenerate the sites-1 checkpoint (think-3xbr), then the guarded colgen tool (think-gyzw). Do not close think-g3j7 or think-gyzw. |
 | BC-359 | research | 11 | tentative | 2 | think-k4vb | The integer program’s optimum on the coarse net, with the winner decided exactly at full angle. |
 | BC-360 | research | 11 | stopped | 4 | think-4woh | None; reopen a mechanism only when its stated reopening condition holds. |
 
@@ -1112,7 +1112,7 @@ Status: **active**. Pursue n=11 results beyond the one-body ceiling L* = 38200/9
 
 | id | series | instance | operator | hypotheses | reason |
 | --- | --- | --- | --- | --- | --- |
-| exp-161 | series-000 | 11 | Cursor session-139 Lane C | H-163 | The round is registered and leased; no optimizer, candidate, or coverage route has run. |
+| exp-161 | series-000 | 11 | Cursor session-139 Lane C | H-163 | The round is registered and leased; no optimizer, candidate, or coverage route has run. The 2026-09-18 adversarial review closed the admission-synthetic accept hole in this artifact; the N+ <= 23 metric is unchanged. |
 
 ## Resumable — stopped on the clock, not on an answer
 

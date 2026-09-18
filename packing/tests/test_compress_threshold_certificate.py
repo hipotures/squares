@@ -90,6 +90,13 @@ def test_default_invocation_without_authorize_target_does_not_create_a_candidate
     assert receipt["candidate_created"] is False
     assert receipt["coverage_ran"] is False
     assert receipt["n_plus"] is None
+    assert receipt["selected_orbits"] is None
+    assert receipt["generating_account"] is None
+    assert receipt["forbidden_control_manifests"] == [
+        "53fbe28bd6dd022600515663ea1e3609ed2bd36a83e69e350b4bb3b45d7b7176",
+        "007b394f48b0b11565ca87d09ad961258534c426bfd623a3e9bfc15aa6495e8a",
+        "194f1f9f47fc94e7f945920c38a4efdb43476719eba025ea446a1d7b91fde27e",
+    ]
     assert receipt["search_status"] == "not_run"
     assert receipt["authorization"] is None
     assert receipt["search"] is None

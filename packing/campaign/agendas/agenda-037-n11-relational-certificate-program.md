@@ -118,15 +118,24 @@ agenda:
     bead: think-qqzs
     depends_on: [BC-356]
     next_evidence: >-
-      A rows-complete covering below 6 on a named site set that both routes of
-      decide_certificate accept, or an exact polish of a large placement union at
-      299/100 whose ceiling family has total at least 6.
+      Session 139 froze covering total 76027/12500 = 6.08216 (does not confirm) and
+      polished a depth-one family of exact total 76/13 that both
+      independent_ceiling_reader and verify_ceiling accept as depth <= 1 and reject
+      on K3 (does not kill). H-216 stays open. Confirm still needs covering < 6 on a
+      named site set that both decide_certificate routes accept. Not an n=11 result.
     workflows: [pipeline-improvement, research-loop]
     program: n11-strategy-reset
     artifacts:
     - packing/campaign/explorations/X-037-n11-overnight-review-and-route-slate.md
     - packing/campaign/hypotheses/H-216-point-certificate-at-n6-299-100.md
     - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/h216-n6-299-100-covering.json
+    - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/h216-n6-299-100-family.json
+    - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/h216-n6-299-100-run.json
+    - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/h216-n6-299-100-family-polished.json
+    - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/h216-n6-299-100-independent.json
+    - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/h216-n6-299-100-verify-ceiling.json
+    - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/h216-n6-299-100-receipt.md
     parallel_group: solved-case-calibration
     note: >-
       Calibration only, under H-216. Certificates at n=6 and n=10 are weaker than the
@@ -164,8 +173,11 @@ agenda:
       mutating T-025/T-026 verify_claim.py. Also the unretained sites-1 checkpoint
       (think-3xbr) and the missing convergence tool (think-gyzw).
     next_evidence: >-
-      The think-g3j7 reader, then the guarded colgen tool run to one of H-217's two
-      terminal states.
+      Session 139 landed packing/src/sqpack/fractional/relational.py and
+      packing/devtools/decide_relational_certificate.py without mutating T-025/T-026
+      verify_claim.py. Remaining: retain or regenerate the sites-1 checkpoint
+      (think-3xbr), then the guarded colgen tool (think-gyzw). Do not close
+      think-g3j7 or think-gyzw.
     workflows: [pipeline-improvement, research-loop]
     program: n11-strategy-reset
     artifacts:

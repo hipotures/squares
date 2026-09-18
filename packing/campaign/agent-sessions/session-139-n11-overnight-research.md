@@ -98,7 +98,8 @@ session:
       Route S registration tonight; think-97we is closed and the instrument is admitted.
     elapsed_seconds: null
     elapsed_quality: unavailable
-    next_action: Commit exp-161, then build the named producer before any target.
+    next_action: Producer is in-tree and emits no candidate. Do not run coverage.
+      A coverage-encoding search still waits. Admission-control manifests are excluded.
     phase: 1
     budget_minutes: 90
     started_at: '2026-09-18T05:33:00Z'
@@ -137,7 +138,8 @@ session:
       decides neither direction.
     elapsed_seconds: null
     elapsed_quality: unavailable
-    next_action: Run freeze-family with support-cap 0, then polish, then both readers.
+    next_action: Freeze covering 6.08216 does not confirm; polished family 76/13
+      depth-one fails K3 and does not kill. H-216 stays open. Exit at 08:33Z.
     phase: 1
     budget_minutes: 180
     started_at: '2026-09-18T05:33:00Z'
@@ -202,11 +204,18 @@ session:
     - python3
   outputs:
   - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+  - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-161-h163-route-s-threshold-compression.md
+  - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/h216-n6-299-100-covering.json
+  - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/h216-n6-299-100-family-polished.json
+  - packing/devtools/compress_threshold_certificate.py
+  - packing/src/sqpack/fractional/relational.py
   checks: []
   stop_reason: null
   next_action: >-
-    Continue Blocks 1–3: finish exp-161, run the H-216 freeze, and land the F1 reader.
-    Then Block 4 think-g4n9, Blocks 5–7 Route S if exp-161 exists, Block 8 closeout.
+    Continue Blocks 1–3 until 08:33Z: H-216 freeze/polish retained and open;
+    keep the F1 reader tests green; producer exists but emits no candidate.
+    Then Block 4 think-g4n9, Blocks 5–7 Route S only with --authorize-target
+    exp-161 after a live --check, Block 8 closeout.
 ---
 # Session 139: N11 Overnight Research
 
@@ -255,6 +264,16 @@ A T-id in the new class needs two-route C4.
 target. Confirm only at `N+ <= 23`, budget < 11, least charge ≥ 1, both exact routes,
 source-distinct replay.
 Refute only by exact infeasibility of every `N+ <= 23` family member.
+The three admission-control manifests cannot confirm.
+Timeout is unresolved, never rejected.
+
+## Hour 1 note (2026-09-18T05:55Z)
+
+H-216 freeze covering total `76027/12500 = 6.08216` does not confirm. Polish then both
+ceiling readers: exact total `76/13`, max depth 1, K3 fails. That does not kill.
+H-216 stays open; not an n=11 result. exp-161 accept hole closed. Producer is in-tree
+and emits no candidate. F1 reader modules are in-tree with the 2-of-5 versus floor
+charge test. Hosted typecheck band is now 55.67 s / ceiling 111 s.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

@@ -30,33 +30,46 @@ experiment:
       5ce2839f17b2f5a337260dc3f649e05ab974bd25, inventory catalog SHA-256
       8de1d9646efef5c49367b679a78ff20961f7f5c1d43b11ff28b5f9a6b41f0e75, N+=119,
       exact budget 685457679/62500000. T-026 720- and 1440-step certificates are
-      provenance sentinels only. Replay the admitted target-blind controls in
-      packing/cases/n11_threshold_certificate/route-s-compression-admission-receipt.json
-      before any optimizer. Refuse a changed source, catalog, or failed mutation
-      control before constructing a candidate.
+      provenance sentinels only. Before any optimizer, recompute the admission
+      receipt with `python -m devtools.admit_threshold_compression --check` and
+      refuse on mismatch. A retained receipt JSON is not a live check. Refuse a
+      changed source, catalog, or failed mutation control before constructing a
+      candidate. The three admission-control manifests cannot confirm H-163:
+      full T-025 control
+      53fbe28bd6dd022600515663ea1e3609ed2bd36a83e69e350b4bb3b45d7b7176,
+      synthetic 23-orbit decompressor control
+      007b394f48b0b11565ca87d09ad961258534c426bfd623a3e9bfc15aa6495e8a, and
+      rejected 24-orbit policy control
+      194f1f9f47fc94e7f945920c38a4efdb43476719eba025ea446a1d7b91fde27e.
     candidate: >-
       A D4-symmetric nonnegative rational reweighting of U025 with N+ <= 23 strictly
       positive orbit representatives, produced only by the admitted deterministic
-      decompressor from a canonical nonempty selection manifest. Weights may be zero
+      decompressor from a canonical nonempty selection manifest whose SHA-256 is
+      none of the three admission-control manifests above. Weights may be zero
       by omission; every coordinate, threshold triple, symmetry image, domain
       parameter, and budget coefficient stays fixed. The all-zero family is outside
-      the manifest language.
+      the manifest language. The receipt must carry generating_account (X-032
+      clause 5: a short generating account of the retained orbit pattern, not a
+      restatement of N+) and selected_orbits equal to N+.
     runs_per_condition: 1
     interleaved: false
     operator: Cursor session-139 Lane C
     entry_point: packing/devtools/compress_threshold_certificate.py
     command: >-
       cd packing && uv run --frozen --all-extras --group dev python -m
-      devtools.compress_threshold_certificate
+      devtools.admit_threshold_compression --check && uv run --frozen --all-extras
+      --group dev python -m devtools.compress_threshold_certificate
+      --authorize-target exp-161
       --source cases/n11_threshold_certificate/certificate.json
       --expect-source-revision 5ce2839f17b2f5a337260dc3f649e05ab974bd25
       --expect-catalog-sha256 8de1d9646efef5c49367b679a78ff20961f7f5c1d43b11ff28b5f9a6b41f0e75
       --max-orbits 23 --budget-below 11 --least-charge 1
       --output campaign/series/series-000-smoke-and-calibration/results/agenda-036/exp-161-route-s-threshold-compression.json
     budget: >-
-      One overnight target attempt after this registration, wall cap three hours once
-      the producer exists. Independent source-distinct replay is inside the cap.
-      No second attempt without a new experiment id.
+      One overnight target attempt after this registration. The scientific wall is
+      three hours once the producer exists; the lease to 13:33Z is the overnight
+      claim, not that wall. Independent source-distinct replay is inside the
+      three-hour cap. No second attempt without a new experiment id.
     record: packing/campaign/series/series-000-smoke-and-calibration/results/agenda-036/exp-161-route-s-threshold-compression.json
   lease:
     expires: '2026-09-18T13:33:00Z'
@@ -66,12 +79,14 @@ experiment:
     decision: in-progress
     primary_criterion: >-
       Confirm H-163 only at N+ <= 23 with total budget < 11, least charge >= 1 from
-      agreeing exact event-cell and interval routes, and source-distinct manifest
-      replay; refute only by exact infeasibility of those constraints for every
-      N+ <= 23 family member
+      agreeing exact event-cell and interval routes, source-distinct manifest
+      replay, a generating_account, selected_orbits equal to N+, and a manifest
+      SHA-256 that is not an admission-control; refute only by exact infeasibility
+      of those constraints for every N+ <= 23 family member
     reason: >-
       The round is registered and leased; no optimizer, candidate, or coverage route
-      has run.
+      has run. The 2026-09-18 adversarial review closed the admission-synthetic
+      accept hole in this artifact; the N+ <= 23 metric is unchanged.
 ---
 # Exp-161: Route S Fixed-Support Compression Target
 
@@ -104,20 +119,33 @@ the net or shrink.
 
 ## Accept, stop, refuse
 
+The N+ <= 23 metric, budget < 11 rule, and least-charge >= 1 rule are unchanged.
+What follows operationalizes X-032’s five confirmation clauses and the statement that
+admission controls cannot resolve H-163.
+
 - **Accept H-163** only when all five X-032 confirmation clauses hold, including
   source-distinct replay of the manifest, reconstructed certificate, and both coverage
-  routes. Smaller files, simpler denominators, or fewer distinct weights do not meet
-  `N+`.
-- **Refute H-163** only with an exact infeasibility certificate that no family member
-  with `N+ <= 23` meets the frozen budget and coverage constraints.
-- **Unresolved** if the timebox expires, the search saturates without a candidate, or a
-  coverage route disagrees.
-  Park only this frozen family.
-- **Invalid / no scientific verdict** if the source, catalog, mutation controls, or
-  decompressor fail, or if a candidate is built by any path other than the admitted
-  decompressor.
+  routes; the live `admit_threshold_compression --check` passed immediately before the
+  target; the receipt carries `generating_account` and `selected_orbits` equal to `N+`;
+  and the candidate manifest SHA-256 is none of
+  `53fbe28bd6dd022600515663ea1e3609ed2bd36a83e69e350b4bb3b45d7b7176`,
+  `007b394f48b0b11565ca87d09ad961258534c426bfd623a3e9bfc15aa6495e8a`, or
+  `194f1f9f47fc94e7f945920c38a4efdb43476719eba025ea446a1d7b91fde27e`.
+  Smaller files, simpler denominators, or fewer distinct weights do not meet `N+`.
+  Decompressing, coverage-checking, and scoring an admission-control manifest is not
+  confirmation.
+- **Refute H-163** (`rejected`) only with an exact infeasibility certificate that no
+  family member with `N+ <= 23` meets the frozen budget and coverage constraints.
+- **Unresolved** if the three-hour scientific wall expires, the overnight lease expires
+  first, the search saturates without a candidate, or a coverage route disagrees.
+  Park only this frozen family. Timeout is never `rejected`.
+- **Blocked** (no scientific verdict) if the live `--check` fails, the source, catalog,
+  mutation controls, or decompressor fail, `--authorize-target exp-161` is missing, a
+  candidate is built by any path other than the admitted decompressor, or the candidate
+  manifest is one of the three admission-control SHA-256 values.
 
 A bounded unsuccessful search is not a negative.
+A failed control is not a negative.
 
 ## Independent-review boundary
 
@@ -138,9 +166,9 @@ T-025 and T-026 `verify_claim.py` are not this round’s reader and must not be 
   allocation).
 
 The named producer `devtools.compress_threshold_certificate` is part of this round and
-must exist before the command runs.
+must exist before the target half of the command runs.
 Building it is not a target.
-Running it is.
+Running it under `--authorize-target exp-161` after a live `--check` is.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

@@ -433,11 +433,13 @@ agenda:
     bead: think-ufmk
     depends_on: [BC-354, BC-355]
     next_evidence: >-
-      Session 139 registered exp-161 on 2026-09-18 with source, target, budget, accept
-      rule, stop rule, independent-review boundary, and evidence paths. The producer
-      named there must exist before any weight changes or coverage. BC-355's pull-request
-      walls remain advisory under think-g4n9; that does not reopen the admitted
-      instrument.
+      Session 139 registered exp-161 on 2026-09-18 and closed the admission-synthetic
+      accept hole: live `admit_threshold_compression --check`, `--authorize-target
+      exp-161`, forbidden control-manifest SHA-256 values, `generating_account`, and
+      timeout maps to unresolved. The named producer is in-tree and emits no candidate;
+      a coverage-encoding search is still required before any scientific target.
+      BC-355's pull-request walls remain advisory under think-g4n9; that does not
+      reopen the admitted instrument.
     workflows: [pipeline-improvement, factual-review, research-loop]
     program: n11-strategy-reset
     artifacts:

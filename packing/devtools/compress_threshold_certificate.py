@@ -57,6 +57,11 @@ FROZEN_BUDGET_BELOW: Final = 11
 FROZEN_LEAST_CHARGE: Final = 1
 AUTHORIZED_TARGET: Final = "exp-161"
 RECEIPT_SCHEMA: Final = "packing.squares:ThresholdCompressionProducerReceipt/v1"
+FORBIDDEN_CONTROL_MANIFESTS: Final = (
+    "53fbe28bd6dd022600515663ea1e3609ed2bd36a83e69e350b4bb3b45d7b7176",
+    "007b394f48b0b11565ca87d09ad961258534c426bfd623a3e9bfc15aa6495e8a",
+    "194f1f9f47fc94e7f945920c38a4efdb43476719eba025ea446a1d7b91fde27e",
+)
 
 
 class CompressionError(ValueError):
@@ -317,6 +322,9 @@ def build_receipt(
         "candidate_created": False,
         "coverage_ran": False,
         "n_plus": None,
+        "selected_orbits": None,
+        "generating_account": None,
+        "forbidden_control_manifests": list(FORBIDDEN_CONTROL_MANIFESTS),
         "search_status": search_status,
         "authorization": authorization,
         "max_orbits": FROZEN_MAX_ORBITS,

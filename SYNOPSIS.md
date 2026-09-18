@@ -192,10 +192,12 @@ Stromquist-to-Trump interval.
 The pure point/density ceiling `38200/9977 ≈ 3.8288` lies only about `0.00236` above
 T-026, so additional heavy work for microscopic gains in that language is paused.
 H-160/exp-158 and H-162/exp-160 are registered but blocked before target invocation.
-H-163 is registered and open but untested; its target-blind instrument merged in PR 182,
-and no `exp-161` exists.
-The `think-ufmk` planning block must register that experiment before any target is
-authorized. The retained source and control work carries no scientific verdict.
+H-163 is registered and running via exp-161; its target-blind instrument merged in PR
+182. No optimizer, candidate, or coverage target has run.
+`think-ufmk` registered that experiment; a scientific target still requires the live
+`--check`, `--authorize-target exp-161`, and a coverage-encoding search that is not an
+admission-control manifest. The retained source and control work carries no scientific
+verdict.
 
 BC-339’s W7 pipeline-improvement and W8 reconciliation are complete and certified.
 BC-347’s source-bound
@@ -246,7 +248,8 @@ record. The current order is:
    Its source-distinct re-audit returned ADMIT after one symlink-alias boundary repair.
    PR 182 merged the instrument as `1d9c49c4` from reviewed head `609d7d62` after
    exact-head validation.
-   No optimizer, candidate, coverage target, or `exp-161` has run.
+   Session 139 registered exp-161 and landed the named producer, which emits no
+   candidate. No optimizer, candidate, or coverage target has run.
 4. Treat A, S, global angular resources, and B as the first advisory tier.
    A is the strongest route to a material `n = 11` lower bound; S is the best bounded
    deliverable; angular resources offer a cheap optimal-face screen; and B is the
@@ -263,9 +266,10 @@ The detailed
 originally allocated five sequential merge-bounded blocks.
 BC-354 activated that schedule’s guard-refusal branch, so the Route A discriminator no
 longer follows it. BC-343’s no-target Route S instrument is admitted and merged.
-Its remaining Route S path is the `think-ufmk` planning block, which may register
-`exp-161` and authorize one bounded target; agenda-037’s relational-certificate queue
-now runs ahead of it.
+Its remaining Route S path is the `think-ufmk` planning block, which registered
+`exp-161`; the named producer exists and emits no candidate. One bounded target may
+run only after a live `--check` and `--authorize-target exp-161`; agenda-037’s
+relational-certificate queue now runs ahead of it.
 Each block starts from the preceding merge on a fresh branch and gets its own session,
 bead disposition, validation receipt, and pull request.
 
@@ -435,6 +439,7 @@ case or experiment separately.
 | [Exact Threshold-Atom Orbit Admission](packing/cases/n11_fractional_certificate/threshold-atom-orbit-admission.md) | research synthesis | record | retained | — |
 | [H157 and Conditional-Claim Review at ee98c4ba](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-034/h157-independent-review/review.md) | dated review record | record | retained | — |
 | [Bounded Review of the H157 Corrections](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-034/h157-independent-review/correction-review.md) | dated review record | record | retained | — |
+| [H-216 n=6 299/100 Freeze Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/h216-n6-299-100-receipt.md) | research synthesis | record | retained | — |
 | [Unit-Parent Centre Restriction: Author-Lane Proof Check](docs/project/reviews/review-2026-09-10-n11-parent-centre-author-check.md) | dated review record | record | retained | — |
 | [N11 Research: Definitions, Findings, and the Inference Chain](docs/project/research/research-2026-09-09-n11-evidence-and-inference.md) | research synthesis | record | retained | — |
 | [Inference Audit: Owner Geometry and Fixed-D Continuation](docs/project/research/research-2026-09-09-n11-inference-audit.md) | research synthesis | record | retained | — |

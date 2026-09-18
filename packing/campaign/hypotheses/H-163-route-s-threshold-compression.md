@@ -27,9 +27,12 @@ hypothesis:
       only by exact infeasibility of those constraints for every N+ <= 23 family member
     threshold: N+ <= 23 positive D4 orbit representatives
   instrument: >-
-    The BC-343 admission analyzer and deterministic U025 decompressor, followed in a
-    later target branch by devtools.decide_threshold_certificate and a source-distinct
-    manifest replay. No target producer or optimizer is admitted in this registration.
+    The BC-343 admission analyzer (`devtools.admit_threshold_compression --check`) and
+    deterministic U025 decompressor, then packing/devtools/compress_threshold_certificate.py
+    as the exp-161 producer, then devtools.decide_threshold_certificate and a
+    source-distinct manifest replay. The N+ <= 23 metric is unchanged.
+    Admission-control manifests cannot confirm. The producer authenticates U025 and
+    does not emit a candidate; a coverage-encoding search is still required.
   instrument_ready: true
   regime: >-
     n=11; T-025 endpoint domain L=191/50, B=9977/10000, angle limit 207107/500000,
@@ -57,7 +60,11 @@ hypothesis:
     A bounded search with no candidate remains unresolved and may park only this frozen
     family. Smaller files, simpler denominators, or fewer distinct weights do not meet
     the registered N+ criterion. 2026-09-18 session-139 registered exp-161 as
-    in-progress with a live lease; no optimizer, candidate, or coverage route has run.
+    in-progress with a live lease and named
+    packing/devtools/compress_threshold_certificate.py as the producer. The producer
+    is in-tree and emits no candidate; no optimizer, candidate, or coverage route has
+    run. The three admission-control manifest SHA-256 values in exp-161 cannot confirm
+    this claim.
 ---
 # H-163: T-025 Fixed-Support Compression
 
@@ -72,8 +79,11 @@ image, domain parameter, and budget coefficient remains fixed.
 remains untested.** The admission artifact created no experiment.
 Session 139 registered
 [exp-161](../series/series-000-smoke-and-calibration/experiments/exp-161-h163-route-s-threshold-compression.md)
-as in-progress with a live lease.
+as in-progress with a live lease and named
+`packing/devtools/compress_threshold_certificate.py` as the producer.
+That file is in-tree; it authenticates U025 and does not emit a candidate.
 No optimizer, candidate certificate, or coverage target has run.
+The admission-control manifests recorded in exp-161 cannot confirm this claim.
 
 The acceptance boundary is literal.
 At most 23 orbit representatives may have strictly positive rational weight, the exact
