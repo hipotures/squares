@@ -3216,7 +3216,7 @@ def test_workbench_chromium_starts_ahead_of_the_other_frontend_steps() -> None:
     assert chromium.start_early is True
     assert chromium.frontend is True
     frontend = [step for step in validate.STEPS if step.frontend]
-    assert [step.name for step in validate._submission_order(frontend)][0] == chromium.name
+    assert next(step.name for step in validate._submission_order(frontend)) == chromium.name
     assert {step.name for step in validate.STEPS if step.start_early} == {
         "exact verification",
         "workbench browser behavior in Chromium",

@@ -558,7 +558,9 @@ def test_print_layout_runs_the_overflow_self_check_beside_the_page() -> None:
     assert 'wait "$self_pid"' in command
     assert 'test "$layout_status" -eq 0' in command
     assert 'test "$self_status" -eq 0' in command
-    assert max(lines.index(line) for line in launches) < min(lines.index(line) for line in waits)
+    last_launch = max(lines.index(line) for line in launches)
+    first_wait = min(lines.index(line) for line in waits)
+    assert last_launch < first_wait
 
 
 def test_every_browser_check_waits_for_deployment() -> None:
