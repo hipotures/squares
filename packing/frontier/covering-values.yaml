@@ -517,6 +517,30 @@ values:
       The artifact named here is the immutable 24/5 rung, not the package's moving
       certificate.json pointer, which now holds the heavier 97/20 rung.
   - n: 12
+    side: '3969/1000'
+    side_decimal: '3.969'
+    objective: '12.363498'
+    site_set: grid
+    sites: 3737
+    rows: 5226
+    rounds: 25
+    converged: true
+    stop_reason: >-
+      The row loop converged at LP round 25 (violated 0) at 12.363498 on 3737 sites
+      / 511 orbits. It crossed twelve at round 4 (12.043810). A later column-generation
+      pricing round was killed after the 600 s deadline while adding one orbit and did
+      not change the reported optimum.
+    least_covered_mass: '1'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n12-3969-1000-grid-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 scout probe between T-017 at 99/25 and BC-206's 397/100 grid wall.
+      Same auto grids (26, 35, 43) and scale 4,000,000 as BC-206. Above twelve on a
+      converged loop, so this site set carries no certificate at 3.969; adding sites
+      can only lower it, so the side is not barred. No covering freeze was retained.
+  - n: 12
     side: '397/100'
     side_decimal: '3.97'
     objective: '12.364038'

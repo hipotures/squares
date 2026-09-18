@@ -24,8 +24,8 @@ known packing, otherwise whichever of the two the limit is.
 **`prize` is what the limit allows, not what a search will reach.** The real
 limit is the covering value: a certificate exists at side `L` only where the
 least total mass that covers every admissible `B`-square falls below `n`, and
-that value can bind well below either cap. 31 restricted optima
-have been reported at 19 sides, one per site set, and
+that value can bind well below either cap. 32 restricted optima
+have been reported at 20 sides, one per site set, and
 `frontier/covering-values.yaml` registers each with whether its row loop
 converged; every one is at best an upper bound on the unrestricted covering
 value there. What survives here beside each is a frozen certificate or nothing
@@ -55,6 +55,7 @@ at all:
 | 20 | 4.865 | grid | 20.001502 | no | Stopped by the cell on the crossing at LP round 16, least covered mass 0.890041 with 543 placements still violated, after 74.0 s of round time. | nothing frozen here. BC-213 of agenda 022 (exp-062). Grid counts (34, 46, 56), 806 orbits. Rows only raise a restricted optimum, so this site set's converged optimum is at least 20.001502; the value was not computed and the criterion does not ask for it. The run continued to round 24 at 20.095294 because a kill on the uv wrapper did not reach its python child, and those rounds are kept rather than trimmed. |
 | 20 | 4.865 | certificate-seeded | 20.000223 | no | Stopped by the cell on the crossing at LP round 34 with 213 placements still violated, after 1072.6 s of round time. | nothing frozen here. BC-213 of agenda 022 (exp-062). The grids above unioned with T-021's 1680 atoms scaled by 973/970. Both constructions walling here closes H-062's bracket to [97/20, 973/200], width 0.015 against the registered 0.02, and 0.1235 below the ceiling 9977/2000 -- so at m = 5 the covering value binds and the ceiling never does. This is the closest crossing in the register: it cleared twenty by 2.23 parts in a hundred thousand, against four parts in ten thousand for the grid at 97/20, on a walk of 19.996458, 19.997545, 19.998396, 19.999167, 19.999837, 20.000223 with the violated count collapsing at 480, 363, 381, 279, 213. The pre-registered rule does not read margins and was applied as written; a denser site set is where any doubt about this rung would go, since adding sites lowers a restricted optimum. |
 | 20 | 4.80 | unrecorded | 18.916941 | no | Halted at round 9 on projected cost: four more rounds would have cost about 3.75 h to buy margin nothing needed. The side above it was never attempted. | frozen 2,260-atom certificate, feasible mass 18.922620. A single resumed column-generation run; the record names no site set and retains no site or row count. The reported objective has no raw run, and it is not the artifact's mass, 946131/50000 = 18.922620, which certifies n = 19 upward and is what keeps n = 19 standing at 24/5 after T-021 raised n = 20 and n = 21 to 97/20. The artifact named here is the immutable 24/5 rung, not the package's moving certificate.json pointer, which now holds the heavier 97/20 rung. |
+| 12 | 3.969 | grid | 12.363498 | yes | The row loop converged at LP round 25 (violated 0) at 12.363498 on 3737 sites / 511 orbits. It crossed twelve at round 4 (12.043810). A later column-generation pricing round was killed after the 600 s deadline while adding one orbit and did not change the reported optimum. | nothing frozen here. Session-139 scout probe between T-017 at 99/25 and BC-206's 397/100 grid wall. Same auto grids (26, 35, 43) and scale 4,000,000 as BC-206. Above twelve on a converged loop, so this site set carries no certificate at 3.969; adding sites can only lower it, so the side is not barred. No covering freeze was retained. |
 | 12 | 3.97 | grid | 12.364038 | yes | Converged at LP round 26 -- the row loop stopped for want of a violated placement -- at 12.364038 over 625 atoms, 117.4 s. | nothing frozen here. BC-206 of agenda 022. Above twelve on a converged loop, so this site set carries no certificate at 3.97; adding sites can only lower it, so the side is not barred. Rationalised at scale 4,000,000 to 12364129/1000000, loss 0.000091. Frozen as a refuted set and kept outside the case package. |
 | 12 | 3.97 | certificate-seeded | 12.016263 | no | Crossed twelve at LP round 8 with placements still violated; the loop reached 12.095824 by round 14 before the cell stopped it. 213 s. | nothing frozen here. BC-206 of agenda 022. The grids unioned with T-017's 2097 atoms scaled to the side. Rows only raise a restricted optimum, so this site set's converged optimum is at least 12.016263. |
 | 12 | 3.98 | grid | 16.000000 | no | Locked at exactly 16.000000 from LP round 5 and held it to round 16; 128 s. | nothing frozen here. BC-206 of agenda 022. The round value is the site set's artefact and not the covering value, one order below BC-197's 25.000000 at m = 5: with delta = 4B - L, a support missing all three windows [L - (4 - k)B, kB] admits sixteen dual-feasible unit weights whatever the covering value is. The auto grid places 43 to 44 sites per axis where those windows need hundreds to thousands. |
@@ -74,10 +75,10 @@ the reported value the artifact's own mass; at `3.96`, `4.58`, `4.59`, `4.80` an
 artifact's mass and the reported objective are different numbers.
 
 They are also reports of different kinds rather than one series measured the same
-way, and the `converged` column is where the difference lives: 11 of
-the 31 ran their row loop to convergence, and the rest stopped for the
+way, and the `converged` column is where the difference lives: 12 of
+the 32 ran their row loop to convergence, and the rest stopped for the
 reason beside each — or for none the record kept — and stand as upper bounds on
-their own site sets only. 31 heterogeneous reports across a side band
+their own site sets only. 32 heterogeneous reports across a side band
 2.00 wide do not support a growth trend or a fitted curve, and no rung in
 this register has ever been claimed from one. Rank on `prize` to choose where to
 look; measure and retain the run before believing any extrapolation.

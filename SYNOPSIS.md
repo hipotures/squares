@@ -441,6 +441,7 @@ case or experiment separately.
 | [Bounded Review of the H157 Corrections](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-034/h157-independent-review/correction-review.md) | dated review record | record | retained | — |
 | [H-216 n=6 299/100 Freeze Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/h216-n6-299-100-receipt.md) | research synthesis | record | retained | — |
 | [H-216 n=6 299/100 Sites2 Freeze Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/h216-n6-299-100-sites2-receipt.md) | research synthesis | record | retained | — |
+| [n=12 3969/1000 Grid Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n12-3969-1000-grid-receipt.md) | research synthesis | record | retained | — |
 | [Unit-Parent Centre Restriction: Author-Lane Proof Check](docs/project/reviews/review-2026-09-10-n11-parent-centre-author-check.md) | dated review record | record | retained | — |
 | [N11 Research: Definitions, Findings, and the Inference Chain](docs/project/research/research-2026-09-09-n11-evidence-and-inference.md) | research synthesis | record | retained | — |
 | [Inference Audit: Owner Geometry and Fixed-D Continuation](docs/project/research/research-2026-09-09-n11-inference-audit.md) | research synthesis | record | retained | — |
@@ -5407,9 +5408,9 @@ the best known packing runs near half a unit — eleven cases above `+0.49`, hea
 `n = 51` at `+0.5364`, then `68`, `84`, `39`, `86`, `66`, `38`, `83`, `37`, `53` and
 `26`. Two cautions travel with that ranking.
 The prize is what the *ceiling* allows; the real limit is the covering value at that
-side. 19 values have been reported for the restricted program, at sides `2.99`, `3.82`,
-`3.85`, `3.95`, `3.96`, `3.97`, `3.98`, `3.985`, `3.99`, `4.58`, `4.59`, `4.68`, `4.80`,
-`4.825`, `4.85`, `4.865`, `4.875`, `4.895` and `4.985` — the first eight reports, not
+side. 20 values have been reported for the restricted program, at sides `2.99`, `3.82`,
+`3.85`, `3.95`, `3.96`, `3.969`, `3.97`, `3.98`, `3.985`, `3.99`, `4.58`, `4.59`, `4.68`,
+`4.80`, `4.825`, `4.85`, `4.865`, `4.875`, `4.895` and `4.985` — the first eight reports, not
 measurements this repository can reproduce, since no covering-search run log or solver
 checkpoint was retained for any of them; the ten added on 2026-09-05 by Agenda 021’s
 `BC-200` and `BC-197` and Agenda 022’s `BC-213` and `BC-206` carry run logs; the

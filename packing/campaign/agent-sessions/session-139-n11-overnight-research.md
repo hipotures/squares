@@ -325,6 +325,14 @@ G4 n-parameterised threshold producer (in-tree rewrite of the agenda-034 separat
 a `.py.txt` promotion), and the M3 piercing tool. Do not start another H-216 freeze.
 `--encode-coverage` waits for Blocks 5–7.
 
+## Hour 1 scout follow-up (2026-09-18T06:18Z)
+
+H-216 third freeze is not started (phase exit). n=7–9 are proved and have no covering
+rows. n=12 grid covering at `3969/1000` converged at `12.363498` (crossed 12 at round 4;
+site set refuted; side open). n=11 at `383/100` is next. Guarded
+`devtools.run_relational_colgen` refuses covering without sites-1 (`think-gyzw` remains
+open).
+
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
 -->
