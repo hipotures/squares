@@ -56,9 +56,7 @@ def merge_near_atoms(
 
     if radius < 0:
         raise ValueError(f"merge radius must be non-negative, not {radius}")
-    empty = MergeReceipt(
-        len(certificate.atoms), len(certificate.atoms), 0, 0, radius
-    )
+    empty = MergeReceipt(len(certificate.atoms), len(certificate.atoms), 0, 0, radius)
     if radius == 0 or not certificate.atoms:
         return certificate, empty
 

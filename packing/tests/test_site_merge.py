@@ -76,7 +76,8 @@ def test_near_sites_collapse_to_one_d4_orbit() -> None:
         n=20,
         outer_side=SIDE,
         square_side=B,
-        atoms=first + tuple(
+        atoms=first
+        + tuple(
             Atom(f"{len(first) + index:04d}", atom.x, atom.y, atom.weight)
             for index, atom in enumerate(second)
         ),
