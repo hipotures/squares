@@ -21,8 +21,8 @@ from sqpack.fractional.threshold_compression import inventory_certificate
 from sqpack.fractional.threshold_coverage_encoding import (
     FrozenCoverageEncoding,
     _paint,
-    frozen_coverage_geometry,
     encode_frozen_coverage,
+    frozen_coverage_geometry,
     minimum_encoded_charge,
     orbit_weights,
     pareto_minimal_rows,

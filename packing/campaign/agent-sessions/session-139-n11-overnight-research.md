@@ -303,7 +303,18 @@ Re-enforcement still needs five consecutive exact-head runs with **both** walls
 ≤180 s.
 
 Live `admit_threshold_compression --check` passed at 2026-09-18T06:05Z (exit 0).
-That receipt is not yet on the branch.
+Coverage on frozen U025 is linear in orbit weights; the producer formulates `A w >= 1`
+under `--authorize-target exp-161` and enumerates only with `--encode-coverage`.
+Default still emits no candidate. sites-1 regeneration refuses: the 15,021-row matrix
+and sepcore/lp383 APIs are unretained (`missing-inputs`).
+
+## Hour 1 watchdog (2026-09-18T06:07Z)
+
+H-216 chase is done for this phase: two named site sets, both covering ≥ 6. Not n=11.
+Lane B: `devtools.regenerate_sites1_checkpoint` is in-tree and refuses. Lane C: live
+`--check` passed; coverage encoding landed. Next: `think-gyzw` guarded colgen skeleton
+(refuses without sites-1), G4 n-parameterised threshold producer, M3 `think-k4vb` kill
+test if cheap. Block 4 at 08:33Z is Chromium-early.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

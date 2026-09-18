@@ -118,15 +118,13 @@ def frozen_coverage_geometry(inventory: OrbitInventory) -> FrozenCoverageGeometr
             members_paint.append(_ThresholdMemberPaint(threshold, tuple(painted)))
         threshold_orbits.append(tuple(members_paint))
 
-    return FrozenCoverageGeometry(
-        tuple(events), tuple(point_orbits), tuple(threshold_orbits)
-    )
+    return FrozenCoverageGeometry(tuple(events), tuple(point_orbits), tuple(threshold_orbits))
 
 
 def _paint(
     target: np.ndarray,
-    u_index: dict[object, int],
-    v_index: dict[object, int],
+    u_index: dict[Fraction, int],
+    v_index: dict[Fraction, int],
     rectangle: tuple[Fraction, ...],
     value: int,
 ) -> None:
@@ -257,6 +255,12 @@ def budget_coefficients(inventory: OrbitInventory) -> tuple[int, ...]:
     )
 
 
+def _solver_bound(values: np.ndarray) -> Any:
+    """scipy's stubs type constraint bounds as scalars; HiGHS takes arrays."""
+
+    return values
+
+
 def minimum_encoded_charge(rows: np.ndarray, weights: Sequence[Fraction]) -> Fraction:
     """Exact ``min A_cell · w`` over the supplied integer rows."""
 
@@ -267,7 +271,10 @@ def minimum_encoded_charge(rows: np.ndarray, weights: Sequence[Fraction]) -> Fra
     best: Fraction | None = None
     for row in rows:
         charge = sum(
-            (int(coefficient) * weight for coefficient, weight in zip(row, weights, strict=True)),
+            (
+                int(coefficient) * weight
+                for coefficient, weight in zip(row, weights, strict=True)
+            ),
             start=Fraction(0),
         )
         if best is None or charge < best:
@@ -363,16 +370,18 @@ def solve_feasibility_mip(
         links[index, index] = 1.0
         links[index, n_orbits + index] = -_WEIGHT_UPPER
     constraints = [
-        LinearConstraint(coverage_block, ub=np.full(coverage.shape[0], -1.0)),
+        LinearConstraint(coverage_block, ub=_solver_bound(np.full(coverage.shape[0], -1.0))),
         LinearConstraint(budget, ub=_BUDGET_UPPER),
         LinearConstraint(cardinality, ub=float(max_orbits)),
-        LinearConstraint(links, ub=np.zeros(n_orbits)),
+        LinearConstraint(links, ub=_solver_bound(np.zeros(n_orbits))),
     ]
     bounds = Bounds(
-        lb=np.zeros(2 * n_orbits),
-        ub=np.concatenate([np.full(n_orbits, _WEIGHT_UPPER), np.ones(n_orbits)]),
+        lb=_solver_bound(np.zeros(2 * n_orbits)),
+        ub=_solver_bound(np.concatenate([np.full(n_orbits, _WEIGHT_UPPER), np.ones(n_orbits)])),
     )
-    integrality = np.concatenate([np.zeros(n_orbits, dtype=np.int8), np.ones(n_orbits, dtype=np.int8)])
+    integrality = np.concatenate(
+        [np.zeros(n_orbits, dtype=np.int8), np.ones(n_orbits, dtype=np.int8)]
+    )
     cost = np.concatenate([np.zeros(n_orbits), np.ones(n_orbits)])
     options: dict[str, Any] = {}
     if time_limit_s is not None:
@@ -407,8 +416,7 @@ def solve_feasibility_mip(
             "float MIP reported infeasible; this is not an exact infeasibility certificate",
         )
     weights = tuple(float(value) for value in result.x[:n_orbits])
-    indicators = result.x[n_orbits:]
-    n_plus = int(round(sum(indicators)))
+    n_plus = sum(1 for value in result.x[n_orbits:] if float(value) > 0.5)
     return CoverageMipOutcome(
         "feasible_unverified",
         n_plus,

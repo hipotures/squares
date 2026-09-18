@@ -11,6 +11,7 @@ import numpy as np
 import pytest
 
 from devtools import compress_threshold_certificate as producer
+from sqpack.fractional.threshold_coverage_encoding import FrozenCoverageEncoding
 
 
 def test_source_revision_mismatch_is_refused(
@@ -149,7 +150,6 @@ def test_encode_coverage_without_authorization_is_refused() -> None:
 def test_authorized_encode_coverage_stub_still_emits_no_candidate(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    from sqpack.fractional.threshold_coverage_encoding import FrozenCoverageEncoding
 
     encoding = FrozenCoverageEncoding(
         orbit_count=119,
@@ -187,7 +187,6 @@ def test_authorized_encode_coverage_stub_still_emits_no_candidate(
 def test_authorized_search_after_stub_encoding_still_emits_no_candidate(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    from sqpack.fractional.threshold_coverage_encoding import FrozenCoverageEncoding
 
     encoding = FrozenCoverageEncoding(
         orbit_count=119,
