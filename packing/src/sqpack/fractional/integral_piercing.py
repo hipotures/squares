@@ -288,15 +288,99 @@ def _chunk_cover_rows(
     return accumulated
 
 
-def _remember_cover_row(seen: dict[bytes, np.ndarray], row: np.ndarray) -> bool:
-    """Store a nonzero covering row. True when the segment is uncovered."""
+def _remember_covering(
+    seen: dict[frozenset[int], None],
+    covering: set[int],
+    *,
+    cap: int,
+    worst_weight: list[int],
+    hit_cap: list[bool],
+) -> bool:
+    """Store a competitive nonzero covering set. True when the segment is uncovered.
 
-    if not bool(row.any()):
+    Once ``cap`` unique rows are held, only a strictly lighter set replaces a
+    heaviest one. That is a lower-bound row set: enough to kill, not to nominate.
+    """
+
+    weight = len(covering)
+    if weight == 0:
         return True
-    key = row.tobytes()
-    if key not in seen:
-        seen[key] = row.copy()
+    if cap > 0 and len(seen) >= cap and weight >= worst_weight[0]:
+        hit_cap[0] = True
+        return False
+    key = frozenset(covering)
+    if key in seen:
+        return False
+    if cap > 0 and len(seen) >= cap:
+        hit_cap[0] = True
+        drop = next(old for old in seen if len(old) == worst_weight[0])
+        del seen[drop]
+        seen[key] = None
+        worst_weight[0] = max(len(old) for old in seen)
+        return False
+    seen[key] = None
+    worst_weight[0] = max(worst_weight[0], weight)
     return False
+
+
+def _rows_from_covers(seen: dict[frozenset[int], None], n_sites: int) -> np.ndarray:
+    rows = np.zeros((len(seen), n_sites), dtype=np.uint8)
+    for index, key in enumerate(seen):
+        if key:
+            rows[index, np.fromiter(key, dtype=np.intp, count=len(key))] = 1
+    return rows
+
+
+def _sweep_span(
+    *,
+    j0: int,
+    j1: int,
+    site_ids: np.ndarray,
+    start_j: np.ndarray,
+    end_j: np.ndarray,
+    seen: dict[frozenset[int], None],
+    row_cap: int,
+    worst_weight: list[int],
+    hit_cap: list[bool],
+) -> bool:
+    """Sweep one reachable column. True when a reachable cell is uncovered."""
+
+    event_j = np.concatenate((start_j, end_j))
+    n_live = int(site_ids.size)
+    event_kind = np.concatenate(
+        (np.zeros(n_live, dtype=np.int8), np.ones(n_live, dtype=np.int8))
+    )
+    event_site = np.concatenate((site_ids, site_ids))
+    order = np.lexsort((event_kind, event_j))
+    covering: set[int] = set()
+    cursor = int(j0)
+    for index in order:
+        event_at = int(event_j[index])
+        if event_at > cursor:
+            last_cell = min(event_at - 1, int(j1))
+            if cursor <= last_cell and _remember_covering(
+                seen,
+                covering,
+                cap=row_cap,
+                worst_weight=worst_weight,
+                hit_cap=hit_cap,
+            ):
+                return True
+            cursor = event_at
+            if cursor > j1:
+                break
+        site = int(event_site[index])
+        if event_kind[index] == 0:
+            covering.add(site)
+        else:
+            covering.discard(site)
+    return cursor <= j1 and _remember_covering(
+        seen,
+        covering,
+        cap=row_cap,
+        worst_weight=worst_weight,
+        hit_cap=hit_cap,
+    )
 
 
 def _span_cover_rows(
@@ -304,74 +388,64 @@ def _span_cover_rows(
     rectangles: tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray],
     *,
     deadline_monotonic: float | None = None,
-) -> np.ndarray:
+    row_cap: int = MAX_UNIQUE_ROWS,
+    span_cap: int | None = None,
+) -> tuple[np.ndarray, bool]:
     """Unique covering rows of reachable spans, without expanding every event cell.
 
     Coverage is constant between a site rectangle's v-events, so a per-column sweep
     emits one row per segment instead of one row per cell. An uncovered reachable
     cell still returns a single zero row, matching ``_chunk_cover_rows``.
+    ``span_cap`` keeps the hardest columns and marks the row set truncated.
     """
 
     left, right, bottom, top = rectangles
     n_sites = int(left.size)
+    empty = np.zeros((0, n_sites), dtype=np.uint8)
     if not spans:
-        return np.zeros((0, n_sites), dtype=np.uint8)
-    seen: dict[bytes, np.ndarray] = {}
-    uncovered = False
+        return empty, False
+    ranked: list[tuple[int, int, int, int]] = []
     for i, j0, j1 in spans:
-        if uncovered:
-            break
         if _deadline_hit(deadline_monotonic):
             raise CoverEncodingTimeoutError("event-cell encoding hit the search deadline")
         if j1 < j0:
             continue
+        active_count = int(np.count_nonzero((left <= i) & (i < right)))
+        if active_count == 0:
+            return np.zeros((1, n_sites), dtype=np.uint8), False
+        ranked.append((active_count, i, j0, j1))
+    ranked.sort(key=lambda item: item[0])
+    hit_span_cap = False
+    if span_cap is not None and len(ranked) > span_cap:
+        ranked = ranked[:span_cap]
+        hit_span_cap = True
+    seen: dict[frozenset[int], None] = {}
+    worst_weight = [0]
+    hit_cap = [False]
+    for _count, i, j0, j1 in ranked:
+        if _deadline_hit(deadline_monotonic):
+            raise CoverEncodingTimeoutError("event-cell encoding hit the search deadline")
         active = np.flatnonzero((left <= i) & (i < right))
-        starts = np.maximum(bottom[active], j0) if active.size else np.zeros(0, dtype=np.int64)
-        ends = np.minimum(top[active], j1 + 1) if active.size else np.zeros(0, dtype=np.int64)
+        starts = np.maximum(bottom[active], j0)
+        ends = np.minimum(top[active], j1 + 1)
         live = starts < ends
-        if active.size == 0 or not bool(np.any(live)):
-            uncovered = True
-            break
-        site_ids = active[live]
-        start_j = starts[live].astype(np.int64, copy=False)
-        end_j = ends[live].astype(np.int64, copy=False)
-        event_j = np.concatenate((start_j, end_j))
-        n_live = int(site_ids.size)
-        event_kind = np.concatenate(
-            (np.zeros(n_live, dtype=np.int8), np.ones(n_live, dtype=np.int8))
-        )
-        event_site = np.concatenate((site_ids, site_ids))
-        order = np.lexsort((event_kind, event_j))
-        current = np.zeros(n_sites, dtype=np.uint8)
-        cursor = int(j0)
-        for index in order:
-            event_at = int(event_j[index])
-            if event_at > cursor:
-                last_cell = min(event_at - 1, int(j1))
-                if cursor <= last_cell and _remember_cover_row(seen, current):
-                    uncovered = True
-                    break
-                cursor = event_at
-                if cursor > j1:
-                    break
-            if event_kind[index] == 0:
-                current[int(event_site[index])] = 1
-            else:
-                current[int(event_site[index])] = 0
-        if uncovered:
-            break
-        if cursor <= j1 and _remember_cover_row(seen, current):
-            uncovered = True
-            break
-        if len(seen) > MAX_UNIQUE_ROWS:
-            stacked = np.vstack(tuple(seen.values()))
-            kept = _maybe_truncate(unique_rows(stacked))
-            seen = {row.tobytes(): row for row in kept}
-    if uncovered:
-        return np.zeros((1, n_sites), dtype=np.uint8)
+        if not bool(np.any(live)):
+            return np.zeros((1, n_sites), dtype=np.uint8), False
+        if _sweep_span(
+            j0=j0,
+            j1=j1,
+            site_ids=active[live],
+            start_j=starts[live].astype(np.int64, copy=False),
+            end_j=ends[live].astype(np.int64, copy=False),
+            seen=seen,
+            row_cap=row_cap,
+            worst_weight=worst_weight,
+            hit_cap=hit_cap,
+        ):
+            return np.zeros((1, n_sites), dtype=np.uint8), False
     if not seen:
-        return np.zeros((0, n_sites), dtype=np.uint8)
-    return unique_rows(np.vstack(tuple(seen.values())))
+        return empty, hit_span_cap or hit_cap[0]
+    return unique_rows(_rows_from_covers(seen, n_sites)), hit_span_cap or hit_cap[0]
 
 
 def span_and_broadcast_cover_rows(
@@ -394,7 +468,7 @@ def span_and_broadcast_cover_rows(
     atoms = _event_atoms(sites)
     reduction = reduce_to_spans(atoms, direction, outer_side, square_side)
     rectangles = _index_rectangles(reduction)
-    span_rows = _span_cover_rows(reduction.spans, rectangles)
+    span_rows, _hit_cap = _span_cover_rows(reduction.spans, rectangles)
     cells = _reachable_cells(reduction.spans)
     chunk_rows = _chunk_cover_rows(cells, rectangles)
     return span_rows, chunk_rows
@@ -466,9 +540,13 @@ def encode_event_cell_covers(
         reduction = reduce_to_spans(atoms, direction, outer_side, square_side)
         reachable += sum(j1 - j0 + 1 for _column, j0, j1 in reduction.spans)
         rectangles = _index_rectangles(reduction)
-        rows = _span_cover_rows(
-            reduction.spans, rectangles, deadline_monotonic=deadline_monotonic
+        rows, hit_cap = _span_cover_rows(
+            reduction.spans,
+            rectangles,
+            deadline_monotonic=deadline_monotonic,
+            row_cap=_PARETO_ROW_LIMIT,
         )
+        truncated = truncated or hit_cap
         if rows.shape[0] == 0:
             continue
         if not bool(np.all(rows.any(axis=1))):
@@ -486,9 +564,10 @@ def encode_event_cell_covers(
             truncated = True
     if accumulated.shape[0] == 0:
         raise PiercingError("the centre domain produced no event cell")
-    reduced = _maybe_pareto(accumulated)
-    if reduced.shape[0] < accumulated.shape[0]:
-        accumulated = reduced
+    if accumulated.shape[0] <= _PARETO_ROW_LIMIT and n_sites <= 64:
+        reduced = _maybe_pareto(accumulated)
+        if reduced.shape[0] < accumulated.shape[0]:
+            accumulated = reduced
     return CoverEncoding(
         accumulated, reachable, len(half_tangents), n_sites, truncated=truncated
     )
