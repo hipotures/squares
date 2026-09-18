@@ -635,15 +635,28 @@ uv run --frozen --all-extras --group dev python -m devtools.run_fractional_colge
   --log campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-t019-windows6.log
 ```
 
+```bash
+uv run --frozen --all-extras --group dev python -m devtools.run_fractional_colgen \
+  --n 19 --side 97/20 --shrink 9977/10000 --direction-steps 181 \
+  --grid-counts 34,45,56 --scale 4000000 --support-cap 32 \
+  --column-rounds 1 --max-rounds 60 --deadline-seconds 900 \
+  --seed-certificate cases/n20_fractional_certificate/certificate-24-5.json --seed-map scale \
+  --seed-windows 6 \
+  --json campaign/series/series-000-smoke-and-calibration/results/agenda-037/n19-97-20-t020-windows6-run.json \
+  --row-log campaign/series/series-000-smoke-and-calibration/results/agenda-037/n19-97-20-t020-windows6-rows.jsonl \
+  --log campaign/series/series-000-smoke-and-calibration/results/agenda-037/n19-97-20-t020-windows6.log
+```
+
+Grid counts `34,45,56` are BC-197's recorded auto counts at `97/20`
+(`bc-197-r2t.json`). T-021 converged at 19.848723 on that grid unioned with
+the 24/5 atoms and `seed_windows: 0`; remaining rows raise, so windows 6 is
+the site-set change. Seed the immutable `certificate-24-5.json`, not the
+moving `certificate.json` pointer (now 97/20). Do not invent a new n=19
+side. Do not re-cover `24/5`. Session covering stays on the 181-net.
+
 Sweeps composite-figure.json was regenerated at 09:39Z for n=18 4.67
 (`7b9a4deb`). Do not paste the suite-b 74.1s sample into
 `gate-budgets.yaml`; that job's tests passed.
-
-If wall remains after those two probes: n=19's recorded next side above T-020
-`24/5` is T-021's `97/20`, seeded from
-`cases/n20_fractional_certificate/certificate-24-5.json`, aiming for mass
-below 19. T-021's atoms at that side are 19.848723 and do not carry n=19.
-Do not invent a new n=19 side. Do not re-cover `24/5`.
 
 ## Hour 5 (2026-09-18T09:41Z)
 
@@ -657,7 +670,23 @@ Packing validation on `335e8028` completed success at 09:45Z (suite-a, suite-b,
 typecheck, validate, geometry, macos-portability, sweeps, frontend,
 packing-required). A waiter in tmux `post-encode-covering` starts that queue
 when encode pid 347502 exits, copies the encode JSON, and will not start a
-probe inside the Block 8 closeout (12:53Z). No `--search`.
+probe inside the Block 8 closeout (12:53Z). No `--search`. The waiter then
+runs n=19 `97/20` T-020 windows 6 if wall remains.
+
+## Block 8 closeout (12:53–13:33Z)
+
+Stop new research. Do not `--search`. Do not merge. Do not close
+`think-qqzs`, `think-g3j7`, `think-gyzw`, or `think-jwb1`. Do not allocate
+exp-161 to F1/M7. Unsubscribe `overnight-priority-check`.
+
+1. Copy encode JSON if present; timeout is unresolved.
+2. Morning report in this file: needs-review, what ran, what moved, what
+   died, queue after, health.
+3. Terminalize this session (`ended_at`, status `completed` or `stopped`,
+   phase 2 outcome).
+4. From `packing/`: `packing-ledger check`, `packing-validate --records`,
+   `python -m devtools.close_session --render`.
+5. Commit, push, update PR #199. H-216 is not an n=11 result.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
