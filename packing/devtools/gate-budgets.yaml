@@ -759,21 +759,38 @@ tiers:
   # -- over 688.74s of cpu against the 691.19s the serial run spent, so the pool divided
   # the work rather than adding any, and `--check` still passed, which is what makes the
   # parallel build byte-identical rather than merely fast.
-  ceiling_seconds: 210.0
+  #
+  # 2026-09-18: 200 s, and the ceiling came down because the record did. Six hosted
+  # readings at the current 4-of-80 selection include two fast runners at 66.36 s and
+  # 68.66 s, which fail the stale rule against 119.72 s (0.55x and 0.57x). The work is
+  # the same four steps; the fall is runner spread, not a re-scope, so 119.72 s moves
+  # into `history:` and owes the ratchet no attribution. 210 s would be 2.07x of the new
+  # record where rule 2 allows 2.0x, so the declaration check refuses it.
+  #
+  # 200 s is 1.97x of the record. It sits above the drift rule's 1.5x (152.3 s), so the
+  # record-relative rule still speaks first, and below the ~400 s this tier costs if the
+  # two sampled steps lose their inner workers, so serial degeneration still fails here
+  # rather than passing quietly.
+  ceiling_seconds: 200.0
   # Cleared, and the reason is the one that cleared 1369.60s and 409.0s from the `fast`
   # entry: the figure measured a tier that no longer exists. Two of these four steps are
   # new names running different work, so 107.05s is not a record of this tier, and
   # leaving it here would fail the stale rule on every honest run of the new one. The
   # gate prints the line to paste the first time it runs at the reference shape.
-  measured_seconds: 119.72
-  measured_on: '2026-09-15'
+  #
+  # 2026-09-18: the field has not been cleared again. What follows is a fall on the same
+  # four steps, not a re-scoping, so the 119.72 s it supersedes moves into `history:`
+  # unchanged.
+  measured_seconds: 101.51
+  measured_on: '2026-09-18'
   measured_where: >-
-    The geometric mean of seven readings at the reference shape -- 111.63, 137.76,
-    127.28, 139.41, 131.41, 97.75 and 100.58 -- across runs 34924677097, 34925616821,
-    34926777301, 34929890466, 34930296150, 35012847055 and 35013703659, each selecting
-    4 of the gate's 76 steps. Observed spread 1.43x. Refresh from the exact
-    reconciliation topology; PR 180's 138.84-second predecessor reading is not the
-    current seven-part surface.
+    The geometric mean of six readings at the reference shape -- 66.36, 68.66, 130.77,
+    129.82, 118.45 and 119.45 -- across runs 35295629265, 35294834934, 35294680332,
+    35275396658, 35273908145 and 35272781729, each selecting 4 of 80 steps. Observed
+    spread 1.97x. The two fast walls (66.36 s, 68.66 s) completed the four steps and
+    failed only the stale rule against 119.72 s; they are readings, not incomplete
+    runs. 66.36 s is 0.65x of this record and 130.77 s is 1.29x, so every counted
+    reading sits inside the drift and the stale rules the record arms.
   history:
   - measured_seconds: 107.05
     measured_on: '2026-09-06'
@@ -781,6 +798,15 @@ tiers:
       The geometric mean of four readings -- 108.91, 108.62, 106.15 and 104.57 --
       across runs 34023002068, 34032566385, 34037168378 and 34040196689, over the
       n=1..100 workload. Cleared on 2026-09-07 when two of the four steps were split.
+  - measured_seconds: 119.72
+    measured_on: '2026-09-15'
+    measured_where: >-
+      The geometric mean of seven readings at the reference shape -- 111.63, 137.76,
+      127.28, 139.41, 131.41, 97.75 and 100.58 -- across runs 34924677097, 34925616821,
+      34926777301, 34929890466, 34930296150, 35012847055 and 35013703659, each selecting
+      4 of the gate's 76 steps. Observed spread 1.43x. Refresh from the exact
+      reconciliation topology; PR 180's 138.84-second predecessor reading is not the
+      current seven-part surface.
   reference: {jobs: 4, inner_jobs: 2, cpus: 4}
   argument: >-
     The pull request's record sweeps, on their own runner: the known-best atlas's record
@@ -796,14 +822,14 @@ tiers:
     surface's floor. And this tier is what removes the contention that failed five
     ordinary tests against the quick lane's 5s per-test ceiling -- those tests were never
     slow, they were sharing four cpus with 468s of atlas rendering.
-    210s stands through the 2026-09-07 re-scoping without being re-tightened, and that is
-    a decision rather than an oversight. The predicted wall is the census's, near 90s on
-    this runner, so a ceiling at 210s has real margin for a slow day; and it is still
-    below the step time this tier costs if its pool stops parallelising altogether --
-    about 400s once the two sampled steps lose their inner workers -- so serial
-    degeneration fails here rather than passing quietly, which is the regression a
-    ceiling on an outer-parallel tier is actually for. Tightening it against a prediction
-    rather than a reading is what `OR-14` calls advertising an aspiration.
+    210s stood through the 2026-09-07 re-scoping without being re-tightened. On
+    2026-09-18 the record fell to 101.51s on the same four steps (hosted spread 1.97x),
+    and 210s became 2.07x of headroom where rule 2 allows 2.0x, so the ceiling moved to
+    200s with the record. The predicted wall is still the census's on a slow runner;
+    200s keeps margin for a slow day and is still below the ~400s this tier costs if
+    its pool stops parallelising, so serial degeneration fails here rather than passing
+    quietly. Tightening it against a prediction rather than a reading is what `OR-14`
+    calls advertising an aspiration.
 
 - id: push
   command: packing-validate --push
