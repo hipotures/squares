@@ -158,6 +158,16 @@ and `think-5tyy` remain open because the default budgets and preset claims are r
   produce better valid Search outcomes.
   It is an open question; attractive motion is not evidence of a better packing.
 
+**Continuation, 2026-09-16.** [X-036](X-036-graded-guidance-for-annealing.md) carries
+that open question into a planned response curve for unguided stickiness and a separate
+ladder of structural guidance.
+Its first measurement, the unguided stickiness curve (`think-9hdg`), needs no guidance
+contract: it waits for registration, a frozen partition, a headless Search runner and a
+new comparable campaign series, and guided rounds also wait for a frozen guidance
+contract. Those rounds carry no kinetic guard from this exploration, because a Search
+trial runs through Pack and keeps no trajectory; whether kinetics predict Search quality
+stays H-215’s open question.
+
 ## Limits
 
 This investigation covers deterministic raw, corrected and 60 Hz presentation
