@@ -316,6 +316,15 @@ Lane B: `devtools.regenerate_sites1_checkpoint` is in-tree and refuses. Lane C: 
 (refuses without sites-1), G4 n-parameterised threshold producer, M3 `think-k4vb` kill
 test if cheap. Block 4 at 08:33Z is Chromium-early.
 
+## Hour 1 continuation (2026-09-18T06:15Z)
+
+Coverage encoding is ruff-clean and type-clean; 24 tests passed.
+Authorized producer default path is on the branch (`encoding_ready`, no candidate).
+Three implementation lanes plus a low-n scout are in flight: guarded relational colgen,
+G4 n-parameterised threshold producer (in-tree rewrite of the agenda-034 separator, not
+a `.py.txt` promotion), and the M3 piercing tool. Do not start another H-216 freeze.
+`--encode-coverage` waits for Blocks 5–7.
+
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
 -->

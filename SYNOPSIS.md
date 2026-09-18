@@ -5407,12 +5407,14 @@ the best known packing runs near half a unit — eleven cases above `+0.49`, hea
 `n = 51` at `+0.5364`, then `68`, `84`, `39`, `86`, `66`, `38`, `83`, `37`, `53` and
 `26`. Two cautions travel with that ranking.
 The prize is what the *ceiling* allows; the real limit is the covering value at that
-side. 18 values have been reported for the restricted program, at sides `3.82`, `3.85`,
-`3.95`, `3.96`, `3.97`, `3.98`, `3.985`, `3.99`, `4.58`, `4.59`, `4.68`, `4.80`,
+side. 19 values have been reported for the restricted program, at sides `2.99`, `3.82`,
+`3.85`, `3.95`, `3.96`, `3.97`, `3.98`, `3.985`, `3.99`, `4.58`, `4.59`, `4.68`, `4.80`,
 `4.825`, `4.85`, `4.865`, `4.875`, `4.895` and `4.985` — the first eight reports, not
 measurements this repository can reproduce, since no covering-search run log or solver
 checkpoint was retained for any of them; the ten added on 2026-09-05 by Agenda 021’s
-`BC-200` and `BC-197` and Agenda 022’s `BC-213` and `BC-206` carry run logs; retained
+`BC-200` and `BC-197` and Agenda 022’s `BC-213` and `BC-206` carry run logs; the
+`2.99` pair added on 2026-09-18 by session-139 is H-216 calibration at n=6 (covering
+`6.08216` and `6.07724` on two named site sets, both ≥ 6, not a bound); retained
 checkpoint and frozen-certificate availability differs by row.
 Several sides are reported more than once from site sets built differently, which is the
 point of reporting them that way: at `4.85` the difference is between a wall and the

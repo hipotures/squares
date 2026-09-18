@@ -2,8 +2,54 @@ softschema:
   contract: packing.squares:CoveringValues/v1
   schema: covering-values.schema.yaml
   status: enforced
-last_reviewed: '2026-09-06'
+last_reviewed: '2026-09-18'
 values:
+  - n: 6
+    side: '299/100'
+    side_decimal: '2.99'
+    objective: '6.08216'
+    site_set: auto-18-24-29
+    sites: 1785
+    rows: 2020
+    rounds: 8
+    converged: true
+    stop_reason: >-
+      The row loop converged: every placement covers mass 1. Column generation
+      stopped at round 7 with 248 orbits; covering freeze mass 76027/12500.
+    least_covered_mass: null
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/h216-n6-299-100-receipt.md
+      - packing/campaign/hypotheses/H-216-point-certificate-at-n6-299-100.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 H-216 calibration on BC-191 auto grids (18, 24, 29). Covering freeze
+      retained under agenda-037; mass 76027/12500 is not strictly below 6, so it cannot
+      confirm. Nothing was frozen into packing/cases/. Does not move s(6)=3 and is not
+      an n=11 result. Float LP objective 6.08188585608286; no cell sweep.
+  - n: 6
+    side: '299/100'
+    side_decimal: '2.99'
+    objective: '6.07724'
+    site_set: four-grid-18-24-29-34
+    sites: 2941
+    rows: 2797
+    rounds: 8
+    converged: true
+    stop_reason: >-
+      The row loop converged: every placement covers mass 1. Column generation
+      stopped at round 7 with 400 orbits; covering freeze mass 151931/25000.
+    least_covered_mass: null
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/h216-n6-299-100-sites2-receipt.md
+      - packing/campaign/hypotheses/H-216-point-certificate-at-n6-299-100.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 H-216 second named site set, `--grid-counts 18,24,29,34`. Covering
+      freeze retained under agenda-037; mass 151931/25000 is not strictly below 6.
+      Nothing was frozen into packing/cases/. Does not move s(6)=3 and is not an n=11
+      result. Float LP objective 6.076773566569485; no cell sweep.
   - n: 11
     side: '191/50'
     side_decimal: '3.82'

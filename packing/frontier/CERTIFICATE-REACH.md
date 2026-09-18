@@ -24,8 +24,8 @@ known packing, otherwise whichever of the two the limit is.
 **`prize` is what the limit allows, not what a search will reach.** The real
 limit is the covering value: a certificate exists at side `L` only where the
 least total mass that covers every admissible `B`-square falls below `n`, and
-that value can bind well below either cap. 29 restricted optima
-have been reported at 18 sides, one per site set, and
+that value can bind well below either cap. 31 restricted optima
+have been reported at 19 sides, one per site set, and
 `frontier/covering-values.yaml` registers each with whether its row loop
 converged; every one is at best an upper bound on the unrestricted covering
 value there. What survives here beside each is a frozen certificate or nothing
@@ -33,6 +33,8 @@ at all:
 
 | n | side | site set | reported value | converged | stopped because | evidence retained here |
 | ---: | ---: | --- | ---: | --- | --- | --- |
+| 6 | 2.99 | auto-18-24-29 | 6.08216 | yes | The row loop converged: every placement covers mass 1. Column generation stopped at round 7 with 248 orbits; covering freeze mass 76027/12500. | nothing frozen here. Session-139 H-216 calibration on BC-191 auto grids (18, 24, 29). Covering freeze retained under agenda-037; mass 76027/12500 is not strictly below 6, so it cannot confirm. Nothing was frozen into packing/cases/. Does not move s(6)=3 and is not an n=11 result. Float LP objective 6.08188585608286; no cell sweep. |
+| 6 | 2.99 | four-grid-18-24-29-34 | 6.07724 | yes | The row loop converged: every placement covers mass 1. Column generation stopped at round 7 with 400 orbits; covering freeze mass 151931/25000. | nothing frozen here. Session-139 H-216 second named site set, `--grid-counts 18,24,29,34`. Covering freeze retained under agenda-037; mass 151931/25000 is not strictly below 6. Nothing was frozen into packing/cases/. Does not move s(6)=3 and is not an n=11 result. Float LP objective 6.076773566569485; no cell sweep. |
 | 11 | 3.82 | grid | 11.000000 | yes | The row loop ran to convergence: the objective descended to exactly 11.000000 from 11.6 over twelve rounds and never crossed below it. | nothing frozen here. Result narrative only: no run log or checkpoint was retained, and nothing was frozen at this side, since an objective of exactly eleven admits no certificate. The least covered mass at the stop is not recorded for this set. |
 | 11 | 3.82 | certificate-seeded | 11.000000 | no | Stopped with violated placements remaining: the objective had stood at 11.000000 through twenty-four row rounds while the least covered mass climbed from 0.8490 to 0.9997, and the loop had not exhausted. It did not need to, since adding rows can only raise a restricted optimum already at eleven. | nothing frozen here. Seeded from the retained 381/100 certificate's own 1121 atoms. Result narrative only: no run log or checkpoint was retained and nothing was frozen at this side. |
 | 11 | 3.82 | vertex-seeded | 11.055617 | yes | The row loop converged at cutting-plane iteration 5 (11.055617 on 12,761 sites after the arrangement vertices of the dual family were added as site orbits) and held that value through iteration 8; the cutting-plane loop itself stopped on its 36-minute wall with the exact depth-scaled total approximately 9.907905594982566. | nothing frozen here. BC-200 of agenda 021 (exp-060). Sites are the grid at BC-191's density plus the violating arrangement vertices the cutting-plane loop added, which is why this site set's optimum sits above the two earlier site sets' exactly eleven: the quantity is a restricted optimum on that set, an upper bound on the covering value. The run log and the resumable state are retained beside the summary. The prior six-decimal display 9.907906 rounded the exact lower bound upward; this record now preserves its approximate status. |
@@ -72,11 +74,11 @@ the reported value the artifact's own mass; at `3.96`, `4.58`, `4.59`, `4.80` an
 artifact's mass and the reported objective are different numbers.
 
 They are also reports of different kinds rather than one series measured the same
-way, and the `converged` column is where the difference lives: 9 of
-the 29 ran their row loop to convergence, and the rest stopped for the
+way, and the `converged` column is where the difference lives: 11 of
+the 31 ran their row loop to convergence, and the rest stopped for the
 reason beside each — or for none the record kept — and stand as upper bounds on
-their own site sets only. 29 heterogeneous reports across a side band
-1.17 wide do not support a growth trend or a fitted curve, and no rung in
+their own site sets only. 31 heterogeneous reports across a side band
+2.00 wide do not support a growth trend or a fitted curve, and no rung in
 this register has ever been claimed from one. Rank on `prize` to choose where to
 look; measure and retain the run before believing any extrapolation.
 
