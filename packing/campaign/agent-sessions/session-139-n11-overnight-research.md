@@ -864,21 +864,47 @@ Post-encode covering queue finished. Encode-only timeout unresolved. No
 showed n=18 at 4.59; `build_known_best_atlas --update` wrote 4.67.
 Closeout after 18:00Z.
 
-## Block 8 closeout (after covering; original window 12:53–13:33Z)
+## Morning report draft (2026-09-18T16:55Z)
 
-Owner continue at 15:04Z moved this after the 18:00Z covering deadline.
-Stop new research then. Do not `--search`. Do not merge. Do not close
-`think-qqzs`, `think-g3j7`, `think-gyzw`, or `think-jwb1`. Do not allocate
-exp-161 to F1/M7. Unsubscribe `overnight-priority-check`.
+Fill `ended_at` and phase-3 outcome at 18:00Z. Do not `--search`. Do not
+merge. Do not close `think-qqzs`, `think-g3j7`, `think-gyzw`, or
+`think-jwb1`. Do not allocate exp-161 to F1/M7.
 
-1. Copy encode JSON if present; timeout is unresolved.
-2. Morning report in this file: needs-review, what ran, what moved, what
-   died, queue after, health.
+**Needs review.** T-027 landing (`s(18) >= 467/100`). W5 Chromium-early.
+Atlas composites now print n=18 at 4.67.
+
+**What ran.** H-216 two named n=6 site sets, both covering ≥ 6. Relational
+colgen skeleton. G4 n-parameterised producer. M3 T-018 piercing. W5
+efficiency block. Route S encode-only (09:33Z start, 15:24:31Z timeout,
+no JSON). Post-encode covering: n=12 `397/100` four-grid; n=17 `23/5`
+windows 5/6/7; n=19 `97/20` T-020 windows 6. No `--search`.
+
+**What moved.** T-027 retained. Atlas labels follow it. Covering register
+grew to 60 restricted optima at 28 sides.
+
+**What died.** Encode-only unresolved. n=12 `397/100` four-grid 12.122748.
+n=17 windows 5/6/7 all above 17 (best windows 5 at 17.042346). n=19
+`97/20` 19.808958. n=18 4.68/4.69/4.70 cannot certify. T-028 not landed.
+H-216 is not an n=11 result.
+
+**Queue after.** Route S still needs a successful encode before
+`--search`. n=17 `23/5` open; n=19 `97/20` open; n=11 stays T-026
+~3.826447. packing-campaign numeric remains NO-GO.
+
+**Health.** `packing-ledger check` OK. `packing-validate --records` passed
+on `70c73070`. Local `--push` browser floor `.ts` failures are Node v22
+versus workbench `>=24.18` on this VM.
+
+## Block 8 closeout (after 18:00Z)
+
+1. Encode JSON is absent; timeout unresolved.
+2. Morning report is drafted above.
 3. Terminalize this session (`ended_at`, status `completed` or `stopped`,
-   phase 2 outcome).
+   phase 3 outcome). Add a finalization phase 18:00–18:40 if the ledger
+   requires it.
 4. From `packing/`: `packing-ledger check`, `packing-validate --records`,
    `python -m devtools.close_session --render`.
-5. Commit, push, update PR #199. H-216 is not an n=11 result.
+5. Unsubscribe `overnight-priority-check`. Commit, push, update PR #199.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
