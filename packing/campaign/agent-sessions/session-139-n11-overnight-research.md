@@ -405,6 +405,17 @@ rounds: seed-row LP dipped to 9.64, then row rounds finished at 11.45. M3 9-dir
 45 s search: piercing 9 on 31,940 truncated rows, still unresolved. Block 4 W5
 remains 08:33Z.
 
+## Block 4 W5 Chromium-early (2026-09-18T07:20Z)
+
+Landed ahead of the 08:33Z window. `start_early=True` on workbench Chromium so
+`--frontend --jobs 2` submits it before biome and liveness. Frontend install overlaps
+`npm ci --ignore-scripts` with Playwright Chromium apt and waits both statuses.
+Pages `print-layout` runs `check_print_layout` and `--self-check` at once, same wait
+rule. No `gate-budgets.yaml` edit. No wall-enforcement flip. `suite-c` remains the
+follow-on. Tests: `test_workbench_chromium_starts_ahead_of_the_other_frontend_steps`,
+frontend install overlap in `test_module_boundaries.py`,
+`test_print_layout_runs_the_overflow_self_check_beside_the_page`.
+
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
 -->

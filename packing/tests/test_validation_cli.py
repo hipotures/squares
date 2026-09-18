@@ -3208,6 +3208,21 @@ def test_submission_order_does_not_change_the_reported_order(
     ]
 
 
+def test_workbench_chromium_starts_ahead_of_the_other_frontend_steps() -> None:
+    """`--jobs 2` otherwise starts biome and liveness, and Chromium is the late tail."""
+    chromium = next(
+        step for step in validate.STEPS if step.name == "workbench browser behavior in Chromium"
+    )
+    assert chromium.start_early is True
+    assert chromium.frontend is True
+    frontend = [step for step in validate.STEPS if step.frontend]
+    assert [step.name for step in validate._submission_order(frontend)][0] == chromium.name
+    assert {step.name for step in validate.STEPS if step.start_early} == {
+        "exact verification",
+        "workbench browser behavior in Chromium",
+    }
+
+
 def test_broad_is_opt_out_so_a_new_step_joins_the_edit_tier() -> None:
     """Forgetting the marker must make the tier slower, never blinder.
 

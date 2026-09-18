@@ -395,6 +395,28 @@ def test_ci_jobs_fetch_provenance_history_and_key_the_uv_cache_from_the_lock() -
         "uv run --frozen --all-extras --group dev packing-validate --frontend "
         "--jobs 2 --inner-jobs 1"
     )
+    install = next(
+        _mapping(step)
+        for step in frontend_steps
+        if _mapping(step).get("name")
+        == "Install the npm toolchain and the pinned Chromium shell"
+    )
+    assert install.get("working-directory") == "."
+    install_run = str(install["run"])
+    assert "npm ci --ignore-scripts &" in install_run
+    assert "python -m playwright install --with-deps --only-shell chromium" in install_run
+    assert 'wait "$npm_pid"' in install_run
+    assert 'wait "$playwright_pid"' in install_run
+    assert 'test "$npm_status" -eq 0' in install_run
+    assert 'test "$playwright_status" -eq 0' in install_run
+    assert install_run.index("npm ci --ignore-scripts &") < install_run.index(
+        'wait "$npm_pid"'
+    )
+    assert install_run.index("playwright install") < install_run.index(
+        'wait "$playwright_pid"'
+    )
+    frontend_names = [_mapping(step).get("name") for step in frontend_steps]
+    assert frontend_names.index(install["name"]) < frontend_names.index(frontend_step["name"])
     typecheck_job = _mapping(jobs["typecheck"])
     assert typecheck_job["if"] == "github.event_name == 'pull_request'"
     typecheck_steps = typecheck_job["steps"]
