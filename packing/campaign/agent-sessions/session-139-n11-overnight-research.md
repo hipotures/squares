@@ -806,6 +806,14 @@ unchanged: n=12 `397/100` four-grid, n=17 windows 6 then 7 if still above 17,
 n=19 `97/20`. Freeze at `--support-cap 32`; declare-then-decide if mass < n.
 Closeout after covering. Do not land T-028 during encode.
 
+## Hour 8 (2026-09-18T15:15Z)
+
+Encode-only still running (pid 347502, process elapsed 2:50 from `lstart`
+12:24:25Z, ~9 min left on timeout 10800, RSS 1.0 GiB, peak 2.46 GiB). No
+JSON. Log empty. No `--search`. Waiter cutoff is 18:00Z. Campaign-record
+clocks extended to 18:40Z (`c3d28cfd`). Queue unchanged. Do not land T-028
+during encode.
+
 ## Block 8 closeout (after covering; original window 12:53–13:33Z)
 
 Owner continue at 15:04Z moved this after the 18:00Z covering deadline.
