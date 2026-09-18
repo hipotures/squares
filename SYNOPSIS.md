@@ -140,10 +140,10 @@ hypothesis status and summarizes experiment verdicts, and the
 | --- | ---: | --- |
 | Agendas | 36 | 16 active; 14 completed; 5 paused; 1 superseded |
 | Commitments | 349 | 178 complete; 60 stopped; 66 blocked; 15 ready; 21 tentative; 9 in progress |
-| Sessions | 139 | 84 completed; 54 stopped; 1 nonterminal |
+| Sessions | 139 | 84 completed; 55 stopped; all terminal |
 | Explorations | 35 | 21 linked to proposed hypotheses; 14 uncodified |
-| Hypotheses | 155 | 26 confirmed; 29 refuted; 51 blocked; 12 unresolved; 5 open; 28 open questions; 2 result registered; 1 abandoned; 1 running |
-| Experiments | 129 | 39 accepted; 34 rejected; 30 unresolved; 12 baseline; 11 blocked; 2 abandoned; 1 in progress |
+| Hypotheses | 155 | 26 confirmed; 29 refuted; 51 blocked; 13 unresolved; 5 open; 28 open questions; 2 result registered; 1 abandoned; 0 running |
+| Experiments | 129 | 39 accepted; 34 rejected; 31 unresolved; 12 baseline; 11 blocked; 2 abandoned; 0 in progress |
 | Frontier results | 27 | 27 registered |
 
 <!-- END CURRENT-RESEARCH-STATUS -->
@@ -165,8 +165,8 @@ The generated agenda map, not this narrative, summarizes commitment state.
 Session 138 is the latest terminal handoff: PR 193 merged its records as `4ad98e90`,
 `think-4woh` is closed, and certification debt now sits under `think-qqzs`. The five
 X-037 owner decisions are resolved under [`epistemics.md`](epistemics.md).
-[Session 139](packing/campaign/agent-sessions/session-139-n11-overnight-research.md) is
-the live overnight executing that next entry.
+[Session 139](packing/campaign/agent-sessions/session-139-n11-overnight-research.md)
+stopped after encode-only timed out unresolved; `think-qqzs` remains the next entry.
 `stopped` is not a scientific failure; it includes time limits, guarded refusals,
 administrative handoffs, and work deliberately ended after its next evidence was
 identified. The late-session arc moved from certificate production and exact dilation
@@ -193,8 +193,8 @@ Stromquist-to-Trump interval.
 The pure point/density ceiling `38200/9977 ≈ 3.8288` lies only about `0.00236` above
 T-026, so additional heavy work for microscopic gains in that language is paused.
 H-160/exp-158 and H-162/exp-160 are registered but blocked before target invocation.
-H-163 is registered and running via exp-161; its target-blind instrument merged in PR
-182. No optimizer, candidate, or coverage target has run.
+H-163 is registered and unresolved via exp-161; its target-blind instrument merged in PR
+182. Encode-only timed out with no JSON. `--search` did not run.
 `think-ufmk` registered that experiment; a scientific target still requires the live
 `--check`, `--authorize-target exp-161`, and a coverage-encoding search that is not an
 admission-control manifest. The retained source and control work carries no scientific
@@ -250,7 +250,7 @@ record. The current order is:
    PR 182 merged the instrument as `1d9c49c4` from reviewed head `609d7d62` after
    exact-head validation.
    Session 139 registered exp-161 and landed the named producer, which emits no
-   candidate. No optimizer, candidate, or coverage target has run.
+   candidate. Encode-only timed out unresolved. `--search` did not run.
 4. Treat A, S, global angular resources, and B as the first advisory tier.
    A is the strongest route to a material `n = 11` lower bound; S is the best bounded
    deliverable; angular resources offer a cheap optimal-face screen; and B is the
@@ -268,9 +268,10 @@ originally allocated five sequential merge-bounded blocks.
 BC-354 activated that schedule’s guard-refusal branch, so the Route A discriminator no
 longer follows it. BC-343’s no-target Route S instrument is admitted and merged.
 Its remaining Route S path is the `think-ufmk` planning block, which registered
-`exp-161`; the named producer exists and emits no candidate. One bounded target may
-run only after a live `--check` and `--authorize-target exp-161`; agenda-037’s
-relational-certificate queue now runs ahead of it.
+`exp-161`; the named producer exists and emits no candidate. Encode-only timed out
+unresolved. A later encode still needs a live `--check` and `--authorize-target
+exp-161` before `--search`; agenda-037’s relational-certificate queue now runs
+ahead of it.
 Each block starts from the preceding merge on a fresh branch and gets its own session,
 bead disposition, validation receipt, and pull request.
 
@@ -1013,8 +1014,9 @@ admitted and M2 stays retired.
 **Selected next entry:** `think-qqzs`, BC-357: close M7’s n=6 bracket at 299/100 under
 H-216. G1, G2, G3, and G5 are on main.
 G4 remains on this bead and is not H-216’s instrument.
-[Session 139](packing/campaign/agent-sessions/session-139-n11-overnight-research.md) is
-executing that entry live, in parallel with Route S `exp-161` and the F1 reader.
+[Session 139](packing/campaign/agent-sessions/session-139-n11-overnight-research.md)
+stopped after encode-only timed out unresolved and T-027 retained `s(18) >= 467/100`.
+H-216 stays open. `think-qqzs` remains the next entry.
 
 BC-358, Route F1 / H-217, is blocked on the `think-g3j7` reader, `think-3xbr`, and
 `think-gyzw`. BC-359, the M3 kill test under `think-k4vb`, is tentative.
@@ -1055,8 +1057,8 @@ sentinel. BC-343 stays open in
 `think-ufmk`.
 [Session 139](packing/campaign/agent-sessions/session-139-n11-overnight-research.md)
 registered
-[exp-161](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-161-h163-route-s-threshold-compression.md);
-no optimizer or coverage target has run.
+[exp-161](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-161-h163-route-s-threshold-compression.md)
+and ran encode-only; that process timed out unresolved. `--search` did not run.
 
 BC-340, BC-353, and BC-354 are terminal.
 BC-341 remains tentative behind a future W10 reselection and the named Route A
@@ -3977,7 +3979,7 @@ round that names the hypothesis, control roles included.
 | [H-160](packing/campaign/hypotheses/H-160-bc303-t2-charge-filters.md) | blocked | Every frozen BC303 C charge is at least 4524200 and every S first-owner strip charge is at least 4524185 | 1 | exp-158 paused before target invocation; no scientific verdict |
 | [H-161](packing/campaign/hypotheses/H-161-bc303-literal-parent-union.md) | refuted | The frozen literal closed Q0 has integer mass `N>=4262074`, excluding the named four-corner tuple under the imported BC303 floor | 1 | exp-159: `N=4000015`; neither the four-corner nor one-parent threshold rejects |
 | [H-162](packing/campaign/hypotheses/H-162-bc303-floor-normalized-t2-filter.md) | blocked | Frozen BC303 C and S first-owner strip minima are each at least 4524132 | 1 | exp-160 paused without an exp-158 receipt; no scientific verdict |
-| [H-163](packing/campaign/hypotheses/H-163-route-s-threshold-compression.md) | running | T-025’s exact support universe admits a certificate with at most 23 positive D4 orbit representatives | 1 | exp-161 in-progress; no optimizer, candidate, coverage target, or scientific verdict |
+| [H-163](packing/campaign/hypotheses/H-163-route-s-threshold-compression.md) | unresolved | T-025’s exact support universe admits a certificate with at most 23 positive D4 orbit representatives | 1 | exp-161 encode-only timeout; 180.1m wall |
 | [H-201](packing/campaign/hypotheses/H-201-simultaneous-perturbation-move.md) | refuted | A collective move takes n = 17 from the trivial grid to within 0.002 of Bidwell cold, and is inert above n = 26 | 2 | 105.7m wall |
 | [H-202](packing/campaign/hypotheses/H-202-wall-pressure-dense-objective.md) | refuted | Isotropic wall pressure optimises a disc, returning exactly 2*sqrt(2) at n = 5, so pressure must be directional | 1 | 39.2m wall |
 | [H-203](packing/campaign/hypotheses/H-203-basin-hopping-over-the-lp-quench.md) | confirmed | Basin hopping beats multistart at an equal budget of refined local optima | 1 | 81.2m wall |
@@ -4289,7 +4291,7 @@ The relevant generator writes the receipt, and the entry fills in on the next
 
 There are 129 rounds registered in `series-000`.
 
-They record 2512.1 agent-minutes and 1799.7 wall-minutes.
+They record 2512.1 agent-minutes and 1979.8 wall-minutes.
 These totals exclude four historical annealing rounds with unrecorded timing; their wall
 and operator costs are unknown, not zero.
 Exp129 closed as blocked without invocation and contributes zero scientific elapsed
@@ -4447,7 +4449,7 @@ archive beside it.
 | [exp-158](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-158-bc303-t2-charge-filters.md) | 11 | target | H-160 | Prospective exact all-chart C and S first-owner charge filters after source and synthetic-control admission | Paused by strategy reset before target invocation; no scientific result | blocked |
 | [exp-159](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-159-bc303-literal-parent-union.md) | 11 | target | H-161 | Source-bound exact mass of closed `Q0=[0,1]^2` against frozen one-parent and four-corner budgets | `N=4000015`; both tests retain `1048233` units of slack | rejected |
 | [exp-160](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-160-bc303-floor-normalized-t2-filter-analysis.md) | 11 | target | H-162 | Prospective receipt-only comparison of admitted exp-158 C and S-strip minima with 4524132 | Paused without an exp-158 receipt; no comparison or scientific result | blocked |
-| [exp-161](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-161-h163-route-s-threshold-compression.md) | 11 | target | H-163 | T-025 U025 reweighting to at most 23 positive D4 orbits | Registered; no optimizer, candidate, or coverage | in-progress |
+| [exp-161](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-161-h163-route-s-threshold-compression.md) | 11 | target | H-163 | T-025 U025 reweighting to at most 23 positive D4 orbits | Encode-only timed out with no JSON; no --search | unresolved |
 | [exp-201](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-201-arm-calibration.md) | 18 | control | H-201 | Sparsity of the single-square move set at a trivial grid | At every scale tried no single-square proposal lowers the container side; the grid is a strict local minimum under the whole move set | baseline |
 | [exp-202](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-202-round-1-perturbation.md) | 11 | target | H-201 | Gensane’s simultaneous all-square perturbation on the ordinary move menu | Takes n = 17 from exactly 5.0 to within 0.002 of Bidwell cold, and is inert above n = 26 | rejected |
 | [exp-203](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-203-round-1-pressure.md) | 11 | target | H-202 | Aggregate wall-pressure term against the plain required-side objective | Isotropic pressure optimises a disc, returning exactly 2*sqrt(2) at n = 5, so pressure must be directional | rejected |
@@ -4581,7 +4583,7 @@ archive beside it.
 | exp-158 | one all-chart invocation, at most 30 minutes after controls | — | — | not started | source and control admission pending; no target charge |
 | exp-159 | one source-bound literal target invocation; no pose sweep or retry | 0.16s | — | criterion | execution head `f27c8ec7`; independent 377-atom and D4 audit retained |
 | exp-160 | one admitted retained exp-158 receipt; zero new charge sweeps | — | — | not started | future receipt-only H-162 comparison; source admission remains separate |
-| exp-161 | one overnight target after this registration; 3h once the producer exists | — | — | not started | registered 2026-09-18; no optimizer or coverage |
+| exp-161 | one overnight target after this registration; 3h once the producer exists | — | 10806s | timebox | encode-only timeout 2026-09-18; no JSON; no --search |
 | exp-201 | 1.25e9 pair tests per chain, 8 chains, 5 seeds | 2681.0 s | 95 m | criterion | `9ae7700` |
 | exp-202 | 1.25e9 pair tests per chain, 8 chains, 5 seeds, 11 cells | 3663.0 s | 60 m | criterion | `9ae7700` |
 | exp-203 | 400,000 steps per anneal, 5 seeds, 5 cells | 2349.0 s | 25 m | criterion | `9ae7700` |
@@ -4597,7 +4599,7 @@ archive beside it.
 
 ### What the 129 rounds jointly establish
 
-The 129 rounds use 2512.1 agent-minutes and 1799.7 wall-minutes under the campaign’s
+The 129 rounds use 2512.1 agent-minutes and 1979.8 wall-minutes under the campaign’s
 retained effort accounting.
 The never-invoked exp129 adds no scientific result or execution time.
 Exp-114 contributes 2.46 seconds of target/replay effort; its readiness work is recorded

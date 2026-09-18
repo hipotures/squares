@@ -191,8 +191,7 @@ session:
       Covering deadline passed, encode unresolved, and the closeout records
       are written.
     next_action: >-
-      Re-run Route S encode-only before --search. Next covering is n=17 23/5.
-      Do not close think-qqzs, think-g3j7, think-gyzw, or think-jwb1.
+      Continue H-216 under think-qqzs. Route S encode-only timed out unresolved.
   budget:
     wall_minutes: 787
     max_cycles: 8
@@ -390,9 +389,8 @@ session:
     unresolved. T-027 is retained. T-028 was not landed. Native harness usage
     is unmeasured.
   next_action: >-
-    Re-run Route S encode-only before --search. Next covering is n=17 23/5
-    (best probe 17.042346 on windows 5). Do not close think-qqzs, think-g3j7,
-    think-gyzw, or think-jwb1. Do not allocate exp-161 to F1 or M7.
+    Continue H-216 under think-qqzs. Route S encode-only timed out unresolved;
+    a later block re-runs encode before --search.
 ---
 # Session 139: N11 Overnight Research
 
