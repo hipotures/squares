@@ -67,12 +67,13 @@ experiment:
       --output campaign/series/series-000-smoke-and-calibration/results/agenda-036/exp-161-route-s-threshold-compression.json
     budget: >-
       One overnight target attempt after this registration. The scientific wall is
-      three hours once the producer exists; the lease to 13:33Z is the overnight
-      claim, not that wall. Independent source-distinct replay is inside the
-      three-hour cap. No second attempt without a new experiment id.
+      three hours once the producer exists; the lease to 18:40Z is the
+      owner-extended overnight claim, not that wall. Independent source-distinct
+      replay is inside the three-hour cap. No second attempt without a new
+      experiment id.
     record: packing/campaign/series/series-000-smoke-and-calibration/results/agenda-036/exp-161-route-s-threshold-compression.json
   lease:
-    expires: '2026-09-18T13:33:00Z'
+    expires: '2026-09-18T18:40:00Z'
     host: cursor
   results: []
   verdict:

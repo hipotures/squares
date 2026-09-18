@@ -33,7 +33,7 @@ Producer `--selftest` exit 0 in 0.70 s at 07:01:10Z (historical
 
 Scientific wall is three hours from this process, 09:33–12:33Z if started on time.
 Blocks 5–7 run until 12:53Z; the extra twenty minutes are for copying the receipt, not
-more search. The overnight lease 13:33Z is not this wall.
+more search. The overnight lease 18:40Z is not this wall.
 Timeout is unresolved.
 
 ```bash

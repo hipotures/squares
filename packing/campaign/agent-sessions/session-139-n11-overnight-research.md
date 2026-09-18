@@ -10,7 +10,7 @@ session:
   title: N11 Overnight Research
   date: '2026-09-18'
   started_at: '2026-09-18T05:33:00Z'
-  deadline_at: '2026-09-18T13:33:00Z'
+  deadline_at: '2026-09-18T18:40:00Z'
   branch: cursor/n11-overnight-8h-f02a
   primary_bead: think-mcb6
   status: in_progress
@@ -72,7 +72,7 @@ session:
     objective: >-
       Covering probes until 09:33Z, then exp-161 encode-only for H-163, then
       closeout. Do not treat H-216 as an n=11 result.
-    status: in_progress
+    status: completed
     entered_by: planned_checkpoint
     switch_reason: phase 1 deadline; W5 already landed
     budget_minutes: 267
@@ -88,22 +88,62 @@ session:
       Stop at 13:33Z. Do not --search until encode-only exists. Do not close
       think-qqzs, think-g3j7, think-gyzw, or think-jwb1.
     fallback: Retain covering receipts and an unresolved encode.
+    outcome: >-
+      T-027 retained s(18) >= 467/100. Encode-only started 09:33Z and was still
+      running at this phase deadline (timeout 10800; process later measured from
+      lstart 12:24:25Z after a clock pause). No encode JSON. No --search. The
+      12:53Z waiter cutoff would have skipped the covering queue.
+    evidence:
+      - packing/cases/n18_fractional_certificate/certificate.json
+      - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-161-h163-route-s-threshold-compression.md
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/exp-161-block57-command.md
+    stop_reason: phase deadline
+    next_action: >-
+      Owner continue after the missed 12:53/13:33 timers. Leave encode until
+      process exit. Then the covering queue. Do not --search.
+  - workflow: research-loop
+    focus: insight
+    recording: contemporaneous
+    clock_role: work
+    bead: think-mcb6
+    objective: >-
+      Owner-extended covering after encode exit: n=12 397/100 T-017 four-grid,
+      n=17 23/5 windows 6 then 7 if still above 17, n=19 97/20. Copy the encode
+      JSON if present. Do not --search. Hand to closeout at 18:00Z.
+    status: in_progress
+    entered_by: user_request
+    switch_reason: >-
+      Owner continue at 15:04Z after the original 12:53Z work deadline and
+      13:33Z session deadline. Encode-only still running; covering deferred.
+    budget_minutes: 176
+    started_at: '2026-09-18T15:04:00Z'
+    deadline_at: '2026-09-18T18:00:00Z'
+    expected_output: >-
+      Encode receipt or unresolved timeout, covering freeze receipts, T-028 only
+      if decide_certificate prints RETAINABLE.
+    validation_command: >-
+      cd packing && uv run --frozen --all-extras --group dev packing-ledger check &&
+      uv run --frozen --all-extras --group dev packing-validate --records
+    kill_condition: >-
+      Stop new probes at 18:00Z. Do not --search. Do not close think-qqzs,
+      think-g3j7, think-gyzw, or think-jwb1.
+    fallback: Retain covering receipts and an unresolved encode, then closeout.
     outcome: null
     evidence: []
     stop_reason: null
     next_action: >-
-      Encode-only until process exit or timeout 10800. Copy the JSON. Do not
-      --search. Then n=12 397/100 T-017 four-grid, n=17 23/5 windows6 then 7
-      if still above 17, n=19 97/20. Covering deadline 18:00Z. Then closeout.
+      Leave encode until process exit or timeout 10800. Copy the JSON. Then
+      n=12 397/100, n=17 windows 6 then 7 if needed, n=19 97/20. Closeout after
+      18:00Z.
   budget:
-    wall_minutes: 480
+    wall_minutes: 787
     max_cycles: 8
     orientation_minutes: 15
     checkpoint_minutes: 60
     slice_minutes: 180
     finalization_minutes: 40
   stop_conditions:
-  - Close by 2026-09-18T13:33:00Z with records, regenerated views, and a morning report.
+  - Close by 2026-09-18T18:40:00Z with records, regenerated views, and a morning report.
   - Do not close think-qqzs, think-g3j7, think-gyzw, or think-jwb1.
   - Do not allocate exp-161 to F1 or M7; it is H-163 Route S only.
   - Do not mutate T-025 or T-026 verify_claim.py.
@@ -273,9 +313,9 @@ session:
   checks: []
   stop_reason: null
   next_action: >-
-    Blocks 5–7 at 09:33Z: live --check then exp-161 encode-only. Covering continues
-    until then. W5 already landed. Block 8 closeout. Do not close think-qqzs,
-    think-g3j7, think-gyzw, or think-jwb1.
+    Leave encode until process exit. Copy the JSON. Do not --search. Then n=12
+    397/100, n=17 windows 6 then 7 if needed, n=19 97/20. Closeout after 18:00Z.
+    Do not close think-qqzs, think-g3j7, think-gyzw, or think-jwb1.
 ---
 # Session 139: N11 Overnight Research
 
