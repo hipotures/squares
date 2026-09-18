@@ -44,14 +44,13 @@ exploration:
 ([session-138](../agent-sessions/session-138-n11-overnight-review.md), bead
 `think-4woh`) reviewed the n=11 record, ranked eight new mechanisms, reviewed them
 adversarially, and ran two of them.
-No bound moved, no hypothesis was registered that night, and nothing was measured above
-side 191/50 in core units.
-[agenda-037](../agendas/agenda-037-n11-relational-certificate-program.md) holds the
-resulting queue.
+No bound moved, no hypothesis was registered, and nothing was measured above side 191/50
+in core units. [agenda-037](../agendas/agenda-037-n11-relational-certificate-program.md)
+holds the resulting queue.
 
 **Resolutions, 2026-09-18.** The five owner decisions are resolved under
 [`epistemics.md`](../../../epistemics.md).
-[H-216](../hypotheses/H-216-no-point-certificate-at-n6-299-100.md) and
+[H-216](../hypotheses/H-216-point-certificate-at-n6-299-100.md) and
 [H-217](../hypotheses/H-217-route-f1-majority-floor-at-153-40.md) are registered.
 The overnight numbers remain scratch until a guarded tool reproduces them.
 No bound moved.
@@ -432,9 +431,9 @@ A draft is not a hypothesis, and a hypothesis is not a result.
 
 | # | Question | Resolution | Record |
 | --- | --- | --- | --- |
-| 1 | Atom format | Admit weighted-majority, k-of-S, and floor atoms as a certificate language. Do not reread T-025 or T-026. A new class needs two-route C4 before a T-id. Admission is not a bound. | `think-g3j7` implements; `verify_claim.py` still refuses until that lands |
-| 2 | n=6 statement | Do not promote the attic negative to a result. Register it as a determination. | [H-216](../hypotheses/H-216-no-point-certificate-at-n6-299-100.md) |
-| 3 | M1 as Route F1 | Register the rows-complete majority-and-floor LP at 153/40 with the adversarial kill rule. The instrument does not exist yet. | [H-217](../hypotheses/H-217-route-f1-majority-floor-at-153-40.md) |
+| 1 | Atom format | Admit weighted-majority, k-of-S, and floor atoms as a certificate language. k-of-S is already T-025’s `(S, k, w)`. Floor is a new class. Do not reread T-025 or T-026, and do not mutate their `verify_claim.py`. A T-id in a new class needs two-route C4. Admission is not a bound. | `think-g3j7` lands a new reader |
+| 2 | n=6 statement | Do not promote the attic negative to a result. Register the two-sided existence determination. | [H-216](../hypotheses/H-216-point-certificate-at-n6-299-100.md) |
+| 3 | M1 as Route F1 | Register the rows-complete covering at 153/40. Kill every admitted class. Confirm with the threshold gate. The instrument does not exist yet. | [H-217](../hypotheses/H-217-route-f1-majority-floor-at-153-40.md) |
 | 4 | M6 as Route D | Leave retired. Do not register a search hypothesis. | BC-360 |
 | 5 | M2 SDP | Do not admit an SDP solver. M2 stays retired. | BC-360 |
 
@@ -443,28 +442,40 @@ A draft is not a hypothesis, and a hypothesis is not a result.
 Weighted-majority, k-of-S, and floor atoms are a method, not a statement about `s(n)`.
 Admitting them does not create a result and carries no V/C rung.
 
+k-of-S is already T-025’s language: an atom `(S, k, w)` charges `w` to every core
+holding at least `k` points of `S`, at budget `w floor(|S| / k)`. T-025 is the
+`(S, k, w) = (3, 2, w)` case.
+Floor atoms are a new class.
+`devtools.decide_threshold_certificate` already decides general `(S, k, w)`. T-025’s and
+T-026’s embedded
+[`verify_claim.py`](../../cases/n11_threshold_certificate/verify_claim.py) is a 2-of-3
+reader for those frozen bytes.
+Do not mutate it. Land a new reader under `think-g3j7`.
+
 T-025 and T-026 are V4/C5 in the 2-of-3 (+ point) language.
 Their frozen bytes stay in that language.
 Rereading them as majority or floor certificates would be a new compound claim and would
 take the minimum rung of a part that has no two-route evidence.
 
-A certificate in the new classes can support a bound only at V4/C3, and C4 needs two
-distinct methods. Until `think-g3j7` lands a retained verifier, no M1 atom can enter a
+A T-id in a new class needs two-route C4 (`V4/C4`): two `C3` evidence entries with
+different `method` values, which is the retained gate.
+`V4/C3` is one machine-confirmed route and is not enough for a T-id.
+Until `think-g3j7` lands the new reader, no floor or weighted-majority atom can enter a
 certificate. Format admission unblocks that implementation.
-It does not unblock BC-358’s covering run, which still waits on the verifier,
+It does not unblock BC-358’s covering run, which still waits on the reader,
 `think-3xbr`, and `think-gyzw`.
 
 ### 2. n=6 statement — hypothesis, not a result
 
 The attic claim “no point certificate at n=6, 299/100, for any site set” is V0/C0.
-Registering it as already true would treat scratch as evidence.
+Registering that negative as already true would treat scratch as evidence.
 
-[H-216](../hypotheses/H-216-no-point-certificate-at-n6-299-100.md) is the same sentence
+[H-216](../hypotheses/H-216-point-certificate-at-n6-299-100.md) is the existence claim,
 stated so it can be wrong.
-Confirm with an exact depth-one family of total at least 6 that both ceiling readers
-accept. Refute with a frozen covering below 6 on a named site set that both routes of
+Confirm with a frozen covering below 6 on a named site set that both routes of
 `decide_certificate` accept.
-The overnight bracket `[83/14, 6.006571]` does not decide either side.
+Kill with an exact depth-one family of total at least 6 that both ceiling readers
+accept. The overnight bracket `[83/14, 6.006571]` does not decide either side.
 
 G1, G2, G3, and G5 are on main, so the instrument exists.
 G4 is a threshold producer and is not this measurement.
@@ -472,11 +483,14 @@ A decided H-216 is calibration at a solved case; `s(6) = 3` does not move.
 
 ### 3. M1 as Route F1 — register, blocked on tools
 
-The rows-complete majority-and-floor LP at 153/40 is a claim that can be wrong.
-[H-217](../hypotheses/H-217-route-f1-majority-floor-at-153-40.md) takes the adversarial
-kill rule as its criterion: a depth-one mass-11 family with no violated majority or
-floor atom kills the route at this scope; a dual with no cell below 1, accepted by both
-gate routes, confirms.
+The rows-complete covering at 153/40, in the admitted language, is a claim that can be
+wrong.
+[H-217](../hypotheses/H-217-route-f1-majority-floor-at-153-40.md) takes that claim
+as its criterion: a depth-one mass-11 family feasible for every admitted majority,
+k-of-S, and floor atom kills the route at this scope; a frozen certificate of total
+budget strictly below 11 and least charge at least 1, accepted by both routes of
+`decide_threshold_certificate` or of the `think-g3j7` successor, confirms.
+`decide_certificate` is the point gate and is not this instrument.
 
 The overnight chase did not terminate.
 Surviving an informal kill, and every fixed-support value below 11, is not evidence that
@@ -496,7 +510,7 @@ Reopen only with those three pieces named before a run.
 ### 5. M2 SDP — do not admit
 
 Lovász theta without an exact PSD certificate is at most V1. A bound in this repository
-needs V4/C3, so theta cannot support one.
+needs `V4/C3`, and a T-id needs two-route C4, so theta cannot support one.
 An SDP solver would be a new dependency without a confirmation path, which is not a
 package the supply-chain rules say to add.
 M1, M8, and M2 remain one integer set-packing object at increasing relaxation strength,

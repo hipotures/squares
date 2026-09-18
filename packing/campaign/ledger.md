@@ -765,13 +765,13 @@ Status: **active**. Reconcile the merged research record, then choose among rout
 
 ### [agenda-037](agendas/agenda-037-n11-relational-certificate-program.md) — N11 Relational-Certificate Program
 
-Status: **active**. Pursue n=11 results beyond the one-body ceiling L* = 38200/9977 through certificates that price relations between squares, starting from the overnight route slate in X-037. Calibrate the certificate machinery at the solved cases n=6 and n=10 under H-216, keep Route F1 / H-217 blocked until the widened verifier, sites-1 checkpoint, and convergence tool exist, and leave M2, M4, M5, M6, and M8 retired.
+Status: **active**. Pursue n=11 results beyond the one-body ceiling L* = 38200/9977 through certificates that price relations between squares, starting from the overnight route slate in X-037. Calibrate the certificate machinery at the solved cases n=6 and n=10 under H-216, keep Route F1 / H-217 blocked until the new reader, sites-1 checkpoint, and convergence tool exist, and leave M2, M4, M5, M6, and M8 retired.
 
 | item | purpose | n | state | priority | bead | next evidence |
 | --- | --- | --- | --- | ---: | --- | --- |
 | BC-356 | research | 6, 10, 11 | complete | 0 | think-4woh | The five X-037 decisions are resolved; H-216 and H-217 are registered. BC-357 closes the n=6 bracket under H-216. |
-| BC-357 | measurement_validation | 6, 10 | ready | 1 | think-qqzs | An exact polish of a large placement union at 299/100, or a rows-complete covering below 6 on a named site set that both routes of decide_certificate accept. |
-| BC-358 | research | 11 | blocked | 1 | think-gyzw | The think-g3j7 verifier, then the guarded colgen tool run to one of H-217's two terminal states. |
+| BC-357 | measurement_validation | 6, 10 | ready | 1 | think-qqzs | A rows-complete covering below 6 on a named site set that both routes of decide_certificate accept, or an exact polish of a large placement union at 299/100 whose ceiling family has total at least 6. |
+| BC-358 | research | 11 | blocked | 1 | think-gyzw | The think-g3j7 reader, then the guarded colgen tool run to one of H-217's two terminal states. |
 | BC-359 | research | 11 | tentative | 2 | think-k4vb | The integer program’s optimum on the coarse net, with the winner decided exactly at full angle. |
 | BC-360 | research | 11 | stopped | 4 | think-4woh | None; reopen a mechanism only when its stated reopening condition holds. |
 
@@ -938,8 +938,8 @@ Status: **active**. Pursue n=11 results beyond the one-body ceiling L* = 38200/9
 | H-213 | refuted | search | Law-driven integration substeps remove Animate's cap-to-cap contact ri | transition: 16-to-17 89-to-90 | 1 |  |  |
 | H-214 | refuted | search | On the stable physical solver, rigid produces less penetration than so | transition: 16-to-17 89-to-90 | 1 |  | 1.4m wall |
 | H-215 | open question | search | Which headless kinetic measurements, if any, predict that a fixed-budg |  | 0 |  |  |
-| H-216 | open | proof | No helper-free point-atom certificate exists for n=6 at container side |  | 0 |  |  |
-| H-217 | blocked | proof | The rows-complete covering LP with weighted-majority and floor atoms o |  | 0 |  |  |
+| H-216 | open | proof | A helper-free point-atom certificate exists for n=6 at container side  |  | 0 |  |  |
+| H-217 | blocked | proof | The rows-complete covering LP with weighted-majority, k-of-S, and floo |  | 0 |  |  |
 
 ## Needs review — held for a human, not decided
 

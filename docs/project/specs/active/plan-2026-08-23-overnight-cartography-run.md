@@ -343,7 +343,7 @@ of it.
 
 For the next supervised exact-research goal, take BC-357 under `think-qqzs`: close the
 n=6 calibration bracket at 299/100 under
-[H-216](../../../../packing/campaign/hypotheses/H-216-no-point-certificate-at-n6-299-100.md).
+[H-216](../../../../packing/campaign/hypotheses/H-216-point-certificate-at-n6-299-100.md).
 G1, G2, G3, and G5 are on main; G4 remains on that bead and is not H-216’s instrument.
 The five X-037 owner decisions are resolved in
 [X-037](../../../../packing/campaign/explorations/X-037-n11-overnight-review-and-route-slate.md).

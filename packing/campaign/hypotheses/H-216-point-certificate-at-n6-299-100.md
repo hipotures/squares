@@ -1,5 +1,5 @@
 ---
-title: H-216 — no helper-free point certificate at n=6, side 299/100
+title: H-216 — a helper-free point certificate at n=6, side 299/100
 softschema:
   contract: packing.squares:Hypothesis/v1
   schema: ../schemas/hypothesis.schema.yaml
@@ -9,27 +9,24 @@ hypothesis:
   id: H-216
   kind: hypothesis
   claim: >-
-    No helper-free point-atom certificate exists for n=6 at container side 299/100 with
-    B = 9977/10000 on the 181-direction net, for any site set. A depth-one family of
-    total at least 6 that is feasible for every point atom on the container proves the
-    covering value is at least 6; a rows-complete covering below 6 on a named site set,
-    frozen and accepted by both routes of the gate, proves a certificate exists.
+    A helper-free point-atom certificate exists for n=6 at container side 299/100 with
+    B = 9977/10000 on the 181-direction net, on some named site set.
   lane: proof
   derived_from: [X-037]
   strategy_refs: ['proof:22']
   criterion:
     shape: determination
     metric: >-
-      Either the exact total of a depth-one ceiling family at (n, L, B, net) =
-      (6, 299/100, 9977/10000, 181 directions), or the covering value of a
-      rows-complete point-atom LP on a named site set that then freezes to a
-      certificate the two-route gate accepts
+      The covering value of a rows-complete point-atom LP on a named site set at
+      (n, L, B, net) = (6, 299/100, 9977/10000, 181 directions), against the exact
+      total of a depth-one ceiling family feasible for every point atom
     direction: >-
-      Confirm only with an exact depth-one family of total at least 6 that
-      independent_ceiling_reader and verify_ceiling both accept. Refute only with a
-      frozen point-atom covering of value strictly below 6 on a named site set that
-      both routes of decide_certificate accept. A float LP, a stalled interval route,
-      an incomplete row set, or an attic scratch number decides neither direction.
+      Confirm only with a frozen point-atom covering of value strictly below 6 on a
+      named site set that both routes of decide_certificate accept. Kill, and refute
+      the claim at this scope, with an exact depth-one family of total at least 6 that
+      independent_ceiling_reader and verify_ceiling both accept. A float LP, a stalled
+      interval route, an incomplete row set, or an attic scratch number decides neither
+      direction.
     threshold: 6
   instrument: >-
     devtools.run_fractional_colgen with --freeze-family writes a dual family;
@@ -55,25 +52,23 @@ hypothesis:
   registered: '2026-09-18'
   notes: >-
     X-037's attic M7 lane bracketed the covering value in [83/14 exact, 6.006571 float]
-    and did not decide this claim. Those numbers are scratch, not evidence. Registering
-    the adversarial statement as a hypothesis is not a result: the statement can still
-    be wrong, and nothing here moves s(6)=3. A later certificate at this side would be
+    and did not decide this claim. Those numbers are scratch, not evidence. The attic
+    wrote the universal negative; this artifact is the existence claim, which can still
+    be wrong. Nothing here moves s(6)=3. A later certificate at this side would be
     weaker than the proved value. G1, G2, G3, and G5 landed on main in PRs 196 and 197.
 ---
-# H-216: No Point Certificate at n=6, 299/100
+# H-216: Point Certificate at n=6, 299/100
 
 X-037’s M7 lane asked whether a helper-free point certificate exists at a solved case.
-The adversarial review wrote the universal negative: no such certificate at side
-`299/100` with `B = 9977/10000` on the 181-step net, for any site set.
-That sentence was scratch.
-This artifact is the determination whose criterion can decide it.
+The attic wrote the universal negative: no such certificate at side `299/100` with
+`B = 9977/10000` on the 181-step net, for any site set.
+That sentence is V0/C0 scratch.
+This artifact is the existence claim.
 
-A depth-one family of total at least 6 that is feasible for every point atom is a
-statement about the language, not about one site set.
-It confirms the claim.
 A rows-complete covering below 6 on a named site set, frozen and accepted by both routes
-of `devtools.decide_certificate`, is a certificate.
-It refutes the claim.
+of `devtools.decide_certificate`, confirms it.
+An exact depth-one family of total at least 6 that is feasible for every point atom
+kills it: that is a statement about the language, not about one site set.
 An incomplete row set, a float value, a stalled interval route, or a number that lived
 only under `attic/overnight/` does neither.
 

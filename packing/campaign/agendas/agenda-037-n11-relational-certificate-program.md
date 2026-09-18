@@ -14,7 +14,7 @@ agenda:
     Pursue n=11 results beyond the one-body ceiling L* = 38200/9977 through certificates
     that price relations between squares, starting from the overnight route slate in
     X-037. Calibrate the certificate machinery at the solved cases n=6 and n=10 under
-    H-216, keep Route F1 / H-217 blocked until the widened verifier, sites-1 checkpoint,
+    H-216, keep Route F1 / H-217 blocked until the new reader, sites-1 checkpoint,
     and convergence tool exist, and leave M2, M4, M5, M6, and M8 retired.
   items:
   - id: BC-356
@@ -99,7 +99,7 @@ agenda:
     state: ready
     priority: 1
     question: >-
-      Does a helper-free weighted-point certificate exist for n=6 at side 299/100 with
+      Does a helper-free point-atom certificate exist for n=6 at side 299/100 with
       B = 9977/10000 on the 181-direction net, and how far do point certificates reach
       at n=10 with B in (0.99808, 0.99885]?
     hypotheses: [H-216]
@@ -111,15 +111,16 @@ agenda:
     entry: >-
       BC-356 is complete. H-216 is registered. G1, G2, G3, and G5 are on main.
     exit: >-
-      Either an exact depth-one family of total at least 6 at 299/100, which proves no
-      point certificate exists at this scope, or a rows-complete value below 6 on a
-      named site set, with the candidate decided by the two-route gate. Or a recorded
-      stall with its exact bracket and tooling receipts.
+      Either a frozen point-atom covering below 6 on a named site set that both
+      decide_certificate routes accept, which confirms H-216, or an exact depth-one
+      family of total at least 6 that both ceiling readers accept, which refutes it.
+      Or a recorded stall with its exact bracket and tooling receipts.
     bead: think-qqzs
     depends_on: [BC-356]
     next_evidence: >-
-      An exact polish of a large placement union at 299/100, or a rows-complete covering
-      below 6 on a named site set that both routes of decide_certificate accept.
+      A rows-complete covering below 6 on a named site set that both routes of
+      decide_certificate accept, or an exact polish of a large placement union at
+      299/100 whose ceiling family has total at least 6.
     workflows: [pipeline-improvement, research-loop]
     program: n11-strategy-reset
     artifacts:
@@ -136,8 +137,9 @@ agenda:
     state: blocked
     priority: 1
     question: >-
-      Is the rows-complete covering LP with weighted-majority and floor atoms on
-      arrangement-vertex sites below 11 at 153/40 (B = 9977/10000, 181-direction net)?
+      Is the rows-complete covering LP with weighted-majority, k-of-S, and floor atoms
+      on arrangement-vertex sites below 11 at 153/40 (B = 9977/10000, 181-direction
+      net)?
     hypotheses: [H-217]
     budget: >-
       Tooling first (checkpointed column generation with an independent reader, about a
@@ -145,19 +147,22 @@ agenda:
     entry: >-
       X-037 admits the atom classes. The sites-1 checkpoint is retained or regenerated
       under think-3xbr, the column-generation loop is a guarded tool under think-gyzw,
-      and think-g3j7 lands a retained verifier for those classes.
+      and think-g3j7 lands a new reader for those classes without mutating T-025 or
+      T-026.
     exit: >-
-      Either a depth-one mass-11 family with no violated majority or floor atom on its
-      own vertices, which kills the route at this scope, or a dual with no cell below 1,
-      which the two-route gate then decides.
+      Either a depth-one mass-11 family feasible for every admitted majority, k-of-S,
+      and floor atom on its own vertices, which kills the route at this scope, or a
+      frozen certificate of total budget strictly below 11 and least charge at least 1
+      that both routes of decide_threshold_certificate, or of the think-g3j7 successor,
+      accept.
     bead: think-gyzw
     depends_on: []
     blocked_on: >-
-      The retained verifier still accepts only unweighted 2-of-3 atoms (think-g3j7
-      implementation). Also the unretained sites-1 checkpoint (think-3xbr) and the
-      missing convergence tool (think-gyzw).
+      think-g3j7 must land a new reader for weighted-majority and floor atoms without
+      mutating T-025/T-026 verify_claim.py. Also the unretained sites-1 checkpoint
+      (think-3xbr) and the missing convergence tool (think-gyzw).
     next_evidence: >-
-      The think-g3j7 verifier, then the guarded colgen tool run to one of H-217's two
+      The think-g3j7 reader, then the guarded colgen tool run to one of H-217's two
       terminal states.
     workflows: [pipeline-improvement, research-loop]
     program: n11-strategy-reset
@@ -286,7 +291,7 @@ This agenda carries the queue that came out of the 2026-09-17 overnight review
 [session-138](../agent-sessions/session-138-n11-overnight-review.md)). The overnight
 program moved no bound.
 The 2026-09-18 addition to X-037 resolves the five owner decisions and registers
-[H-216](../hypotheses/H-216-no-point-certificate-at-n6-299-100.md) and
+[H-216](../hypotheses/H-216-point-certificate-at-n6-299-100.md) and
 [H-217](../hypotheses/H-217-route-f1-majority-floor-at-153-40.md).
 
 ## Relation to Agenda-036
@@ -308,7 +313,7 @@ Agenda-036 was not edited, because an open pull request also edits it.
   at 299/100. G1, G2, G3, and G5 are on main.
   G4 remains on this bead and is not H-216’s instrument.
 - **BC-358 (blocked).** Route F1 / H-217 at 153/40. The language is admitted.
-  The cell waits on the `think-g3j7` verifier, the `sites-1` checkpoint (`think-3xbr`),
+  The cell waits on the `think-g3j7` reader, the `sites-1` checkpoint (`think-3xbr`),
   and a guarded convergence tool (`think-gyzw`).
 - **BC-359 (tentative).** The M3 kill test under `think-k4vb`.
 - **BC-360 (stopped).** M2, M4, M5, M6, and M8, retired with reasons.

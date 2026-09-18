@@ -956,9 +956,10 @@ retained.
 Session 138’s records landed when PR 193 merged as `4ad98e90`; `think-4woh` is closed
 and certification debt now sits under `think-qqzs`. The five X-037 owner decisions are
 resolved under [`epistemics.md`](epistemics.md): weighted-majority, k-of-S, and floor
-atoms are an admitted language (`think-g3j7` still implements the verifier);
-[H-216](packing/campaign/hypotheses/H-216-no-point-certificate-at-n6-299-100.md) is the
-n=6 determination;
+atoms are an admitted language (`think-g3j7` still lands a new reader, and does not
+mutate T-025/T-026 `verify_claim.py`);
+[H-216](packing/campaign/hypotheses/H-216-point-certificate-at-n6-299-100.md) is the n=6
+existence determination;
 [H-217](packing/campaign/hypotheses/H-217-route-f1-majority-floor-at-153-40.md) is Route
 F1, blocked on tools; M6 stays retired with no Route D search hypothesis; SDP is not
 admitted and M2 stays retired.
@@ -967,7 +968,7 @@ admitted and M2 stays retired.
 H-216. G1, G2, G3, and G5 are on main.
 G4 remains on this bead and is not H-216’s instrument.
 
-BC-358, Route F1 / H-217, is blocked on the `think-g3j7` verifier, `think-3xbr`, and
+BC-358, Route F1 / H-217, is blocked on the `think-g3j7` reader, `think-3xbr`, and
 `think-gyzw`. BC-359, the M3 kill test under `think-k4vb`, is tentative.
 BC-360 retires M2, M4, M5, M6, and M8 with reasons.
 `exp-161` remains Route S in agenda-036.
@@ -3940,8 +3941,8 @@ round that names the hypothesis, control roles included.
 | [H-213](packing/campaign/hypotheses/H-213-adaptive-animate-integration.md) | refuted | Law-driven integration substeps remove Animate’s cap-to-cap contact ringing at the registered transitions while retaining mean motion | 1 | Shared frozen-commit matrix |
 | [H-214](packing/campaign/hypotheses/H-214-presets-have-distinct-kinetics.md) | refuted | Rigid has less penetration than soft and sticky gathers more contacts than balanced in every registered solver-transition cell | 1 | 86.689s frozen-commit matrix |
 | [H-215](packing/campaign/hypotheses/H-215-kinetics-predict-search-quality.md) | open question | Which headless kinetic measurements, if any, predict that a fixed-budget search setting will produce better valid packings? | 0 | — |
-| [H-216](packing/campaign/hypotheses/H-216-no-point-certificate-at-n6-299-100.md) | open | No helper-free point-atom certificate exists for n=6 at side 299/100 with B = 9977/10000 on the 181-direction net | 0 | — |
-| [H-217](packing/campaign/hypotheses/H-217-route-f1-majority-floor-at-153-40.md) | blocked | The rows-complete covering LP with weighted-majority and floor atoms on arrangement-vertex sites is below 11 at 153/40 | 0 | — |
+| [H-216](packing/campaign/hypotheses/H-216-point-certificate-at-n6-299-100.md) | open | A helper-free point-atom certificate exists for n=6 at side 299/100 with B = 9977/10000 on the 181-direction net, on some named site set | 0 | — |
+| [H-217](packing/campaign/hypotheses/H-217-route-f1-majority-floor-at-153-40.md) | blocked | The rows-complete covering LP with weighted-majority, k-of-S, and floor atoms on arrangement-vertex sites is below 11 at 153/40 | 0 | — |
 
 ### Confirmed
 

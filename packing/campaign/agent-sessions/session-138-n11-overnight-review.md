@@ -525,7 +525,7 @@ Nothing else in this record becomes a pass.
 **X-037 decisions resolved, 2026-09-18.** The five owner decisions are resolved in
 [X-037](../explorations/X-037-n11-overnight-review-and-route-slate.md) under
 [`epistemics.md`](../../../epistemics.md).
-[H-216](../hypotheses/H-216-no-point-certificate-at-n6-299-100.md) and
+[H-216](../hypotheses/H-216-point-certificate-at-n6-299-100.md) and
 [H-217](../hypotheses/H-217-route-f1-majority-floor-at-153-40.md) are registered.
 This session registered neither; the YAML `next_action` still names BC-357 /
 `think-qqzs`.
@@ -593,8 +593,8 @@ receipt separates the n=11 program’s cost.
 The session’s records landed when PR 193 merged as `4ad98e90`. Certification debt now
 sits under `think-qqzs`. The five X-037 decisions are resolved; H-216 and H-217 are
 registered. BC-357 / `think-qqzs` remains the next executable entry.
-BC-358 stays blocked on the `think-g3j7` verifier, `think-3xbr`, and `think-gyzw`. Route
-S (BC-343, `think-ufmk`) remains open in agenda-036 and still needs `exp-161` before a
+BC-358 stays blocked on the `think-g3j7` reader, `think-3xbr`, and `think-gyzw`. Route S
+(BC-343, `think-ufmk`) remains open in agenda-036 and still needs `exp-161` before a
 target.
 
 <!-- This document follows common-doc-guidelines.md.
