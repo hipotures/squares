@@ -64,9 +64,11 @@ hypothesis:
     finished without RETAINABLE, Session-141 continues on this sweep at n=19
     481/100 T-020 four-grid (34,45,56,64) plus windows 7 as exp-174, which
     stopped at 19.111435 unconverged after crossing 19; remaining rows raise.
-    leftover auto plus windows 6 at 481/100 already crossed 19. Follow-up is
-    exp-175 at n=12 793/200 T-017 auto plus windows 7. Do not replay the
-    Session-141 four-grid at 481/100.
+    leftover auto plus windows 6 at 481/100 already crossed 19. Follow-up
+    exp-175 at n=12 793/200 T-017 auto plus windows 7 stopped at 12.067502
+    unconverged after crossing 12; remaining rows raise. Follow-up is exp-176
+    at n=12 397/100 T-017 auto plus windows 7. Do not replay the Session-141
+    four-grid at 481/100 or auto at 793/200.
 ---
 # H-218: Stock Colgen Raises One Small-n Floor
 

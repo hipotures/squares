@@ -1951,3 +1951,30 @@ values:
       Unconverged mass still below 44 is not a covering below 44; remaining rows
       can only raise it. T-030 was not offered. The eight queued Nagamochi sides
       are measured. H-220 stays unconfirmed. Do not more-wall this set.
+  - n: 12
+    side: '793/200'
+    side_decimal: '3.965'
+    objective: '12.067502'
+    site_set: t017-seed-auto-26-35-43-windows7
+    sites: 6269
+    rows: 9171
+    rounds: 38
+    converged: false
+    stop_reason: >-
+      The 1200 s deadline stopped the row loop after 38 LP rounds with 102 placements
+      still violated. The objective crossed 12 at round 11 (12.005485) and finished at
+      12.067502 on 6269 sites / 885 orbits, including 2533 T-017 plus window-lattice
+      seed sites. Auto resolved to (26, 35, 43). The objective sat at 12.067502 from
+      round 32.
+    least_covered_mass: '0.989127'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n12-793-200-t017-auto-windows7-receipt.md
+      - packing/campaign/agent-sessions/session-141-n100-research.md
+    notes: >-
+      Session-141 exp-175. First first-party covering row at 793/200. T-017 seed plus
+      auto (26, 35, 43) plus windows 7, one two-hundredth above T-017. Unconverged
+      mass still above twelve refutes this site set only; remaining rows can only
+      raise it. Closer than four-grid plus windows 7 at 397/100 (12.133391) and
+      3969/1000 (12.091168). T-017 is unchanged. T-030 was not offered. H-218
+      stays unconfirmed. Do not more-wall this set.

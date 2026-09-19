@@ -79,25 +79,30 @@ untried `(n, side, site_set)`”.
 | 9 | H-220 | 29 | `548/100` | auto, windows 5, no seed | 1200 s | done; freeze 26.0409395; interval refused |
 | 10 | H-220 | 45 | `684/100` | auto, windows 5, no seed | 1200 s | done; 42.137360 unconverged |
 | 11 | H-220 | 44 | `675/100` | auto, windows 5, no seed | 1200 s | done; 41.236782 unconverged |
+| 12 | H-218 | 19 | `481/100` | T-020 seed, four-grid `(34,45,56,64)`, windows 7 | 1200 s | done; 19.111435 unconverged; crossed 19 |
+| 13 | H-218 | 12 | `793/200` | T-017 seed, auto, windows 7 | 1200 s | done; 12.067502 unconverged; crossed 12 |
+| 14 | H-218 | 12 | `397/100` | T-017 seed, auto, windows 7 | 1200 s | live as exp-176 |
 
-n=18 is off the H-218 sweep `{12, 17, 19, 20}`. A retain at `1871/400` is the next T-id
+n=18 is off the H-218 sweep `{12, 17, 19, 20}`. A retain at `1871/400` is T-029
 and does not confirm H-218. Rank 2 finished `19.857588` unconverged; remaining rows
 raise. Rank 3 finished `19.887914` unconverged; remaining rows raise. H-218 stays
 unconfirmed. exp-162 is abandoned; the reopen is exp-164 then exp-165, both
 unresolved. exp-171 at n=29 `548/100` converged and froze; the interval route
 refused. exp-173 at n=44 `675/100` finished `41.236782` unconverged. The eight
-H-220 sides are measured. The next probe is exp-174 / H-218 at n=19 `481/100`
-four-grid plus windows 7.
+H-220 sides are measured. exp-174 crossed 19 at `19.111435`. exp-175 crossed 12
+at `12.067502`. The next probe is exp-176 / H-218 at n=12 `397/100` auto plus
+windows 7.
 
 n=11 stays T-026. H-216 at n=6 is calibration, not an n=11 result. n=21 `97/20` is the
 same verified side as T-021.
 
 The 68 open sizes include `26–32`, `37–45`, `50–61`, `65–78`, and `82–100` with no
 first-party covering. This session takes the eight queued Nagamochi sides after n=18 and
-the n=20 new-site probe. After those, `rank-queue.yaml` walks n=19 `481/100` four-grid plus windows 7,
-n=12 `793/200` auto plus windows 7, n=12 `397/100` auto plus windows 7, n=19
-`241/50` four-grid plus windows 7, n=12 `793/200` four-grid plus windows 7, and
-n=18 `4679/1000` T-029-seeded auto plus windows 5. n=17 `231/50` stays off the
+the n=20 new-site probe. After those, `rank-queue.yaml` walked n=19 `481/100`
+four-grid plus windows 7 and n=12 `793/200` auto plus windows 7, both above `n`.
+It is now on n=12 `397/100` auto plus windows 7, then n=19 `241/50` four-grid
+plus windows 7, n=12 `793/200` four-grid plus windows 7, and n=18 `4679/1000`
+T-029-seeded auto plus windows 5. n=17 `231/50` stays off the
 walker: nearby auto plus windows 5 already crossed 17 at `461/100`. n=13–16 and
 n=22–25 are proved; no runway. n=28, n=61, and n=78 stay deferred. Register a
 new experiment before the n=18 `4679/1000` probe starts.
@@ -109,7 +114,7 @@ One CPU. Sequential colgen. Sub-agents own audit, registration, and W5.
 | Claim | This session | Why |
 | --- | --- | --- |
 | H-219 | first covering probe | Same class as T-028; unused leftover side |
-| H-218 | live after exp-174 | exp-164/165 unconverged below 20; exp-174 n=19 `481/100` four-grid `19.111435` crossed 19; next probe n=12 `793/200` auto as exp-175 |
+| H-218 | live after exp-175 | exp-164/165 unconverged below 20; exp-174 n=19 four-grid crossed 19; exp-175 n=12 `793/200` auto `12.067502` crossed 12; next probe n=12 `397/100` auto as exp-176 |
 | H-220 | eight sides measured | exp-166–170, exp-172, and exp-173 unconverged; exp-171 n=29 freeze interval-refused; no RETAINABLE |
 | H-221 | after ranked H-218 long-shots | T-029-seeded next rung at `4679/1000` |
 | H-210 / H-211 | off-CPU if Node permits | Workbench determinations; not a floor |
