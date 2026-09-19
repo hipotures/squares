@@ -1,7 +1,12 @@
 # Session-141 optional probes. Start only after a coordinator decision.
 # Rank 1b: leftover n=18 still below 18 unconverged on auto plus windows 5.
-# Rank 3: n=20 971/200 new four-grid stayed below 20 and did not retain.
-# Long-shots: new sides at n=12/17/19 after the ranked queue.
+#   Do not start: rank 1 retained T-029.
+# n=20 243/50: insert into rank-queue.yaml only if rank 2 stays below 20
+#   unconverged. Same four-grid plus windows 7.
+# n=19 481/100 four-grid and n=12 793/200 now sit at the end of
+#   rank-queue.yaml (ranks 11–12). Do not start this file as a second walker.
+# n=17 231/50 stays here and is not walked: 461/100 auto plus windows 5
+#   already crossed 17.
 probes:
   - id: n18-1871-400-t028-grid4-windows5
     n: 18

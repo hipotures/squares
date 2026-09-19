@@ -85,3 +85,24 @@ probes:
     deadline_seconds: 1200
     bead: think-coet
     hypothesis: H-220
+  # H-218 long-shots after Nagamochi. n=17 231/50 stays off this file: nearby
+  # auto plus windows 5 already crossed 17 at 461/100. n=20 243/50 stays in
+  # optional-queue.yaml until rank 2 finishes below 20 unconverged.
+  - id: n19-481-100-t020-grid4-windows7
+    n: 19
+    side: '481/100'
+    grid_counts: '34,45,56,64'
+    seed_certificate: cases/n20_fractional_certificate/certificate-24-5.json
+    seed_windows: 7
+    deadline_seconds: 1200
+    bead: think-so2k
+    hypothesis: H-218
+  - id: n12-793-200-t017-auto-windows7
+    n: 12
+    side: '793/200'
+    grid_counts: auto
+    seed_certificate: cases/n12_fractional_certificate/certificate.json
+    seed_windows: 7
+    deadline_seconds: 1200
+    bead: think-so2k
+    hypothesis: H-218

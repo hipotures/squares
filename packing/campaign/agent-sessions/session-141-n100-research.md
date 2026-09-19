@@ -87,7 +87,7 @@ session:
       - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n18-1871-400-t028-auto-windows5-receipt.md
       - packing/frontier/n-018.md
     stop_reason: null
-    next_action: Claim exp-164 and start n=20 971/200 new four-grid under think-so2k.
+    next_action: Finish n=20 971/200 four-grid under think-so2k; then Nagamochi H-220.
   budget:
     wall_minutes: 520
     max_cycles: 8
@@ -267,17 +267,17 @@ H-210 and H-211 use the workbench harness, not HiGHS. H-163 is
 `admit_threshold_compression --check` only. Do not `--search`. Do not encode beside
 covering.
 
-## T-029 recipe
+## T-id recipe
 
-Next T-id is T-029. Copy the T-028 landing pattern, not a new case class. Score S3.
-`produced_by.session` is `session-141`.
+T-029 is landed: `s(18) >= 1871/400`. Next T-id is T-030. Copy the T-029 landing
+pattern, not a new case class. Score S3. `produced_by.session` is `session-141`.
 
-- n=18 `1871/400` RETAINABLE confirms H-219, not H-218. Copy live `certificate.json` to
-  `certificate-187-40.json` before replacing the pointer.
-- n=20 `971/200` RETAINABLE confirms H-218. Copy live n=20 `certificate.json` to
-  `certificate-97-20.json` before replacing the pointer. The claim is also
-  `s(21) >= 971/200`.
-- Do not mint T-029 on an unconverged freeze, a freeze with mass `>= n`, or n=21
+- n=20 `971/200` RETAINABLE confirms H-218 / exp-164. Copy live n=20
+  `certificate.json` to `certificate-97-20.json` before replacing the pointer. The
+  claim is also `s(21) >= 971/200`. T-030 artifacts list only the live pointer.
+- A later Nagamochi RETAINABLE (H-220) is T-030 if n=20 does not retain, else T-031.
+  There is no n=32 case package yet.
+- Do not mint a T-id on an unconverged freeze, a freeze with mass `>= n`, or n=21
   `97/20`.
 
 ## Constraints

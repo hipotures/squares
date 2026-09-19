@@ -83,7 +83,10 @@ same verified side as T-021.
 
 The 68 open sizes include `26–32`, `37–45`, `50–61`, `65–78`, and `82–100` with no
 first-party covering. This session takes the eight queued Nagamochi sides after n=18 and
-the n=20 new-site probe. n=28, n=61, and n=78 stay deferred.
+the n=20 new-site probe. After those, `rank-queue.yaml` walks n=19 `481/100` four-grid
+plus windows 7 and n=12 `793/200` auto plus windows 7 (H-218 long-shots). n=17
+`231/50` stays off the walker: nearby auto plus windows 5 already crossed 17 at
+`461/100`. n=28, n=61, and n=78 stay deferred.
 
 ## Other hypotheses beside the covering core
 

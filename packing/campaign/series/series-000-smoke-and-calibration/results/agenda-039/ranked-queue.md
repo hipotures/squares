@@ -14,10 +14,14 @@ an untried side or an untried site set.
 | 1 | think-u11x | H-219 | 18 | `1871/400` | T-028 auto plus windows 5 | **T-029 retained** |
 | 2 | think-so2k | H-218 | 20 | `971/200` | T-021 four-grid `(34,46,56,64)` plus windows 7 | 2400 s |
 | 3–10 | think-coet | H-220 | 32…44 | queued Nagamochi sides | auto plus windows 5, no seed | 1200 s |
+| 11 | think-so2k | H-218 | 19 | `481/100` | T-020 four-grid `(34,45,56,64)` plus windows 7 | 1200 s |
+| 12 | think-so2k | H-218 | 12 | `793/200` | T-017 auto plus windows 7 | 1200 s |
 
 Insert optional rank 1b (n=18 four-grid plus windows 5, 1800 s) only if rank 1 stays
 below 18 unconverged. Insert optional n=20 `243/50` only if rank 2 stays below 20 and
-does not retain.
+does not retain. Do not walk n=17 `231/50`: nearby auto plus windows 5 already crossed
+17 at `461/100`. The live walker loaded the file before ranks 11–12 were appended;
+the 11:26Z resume picks them up.
 
 First walker `--stop-at 2026-09-19T10:26:00Z`. Resume the same file after W5 with
 `--stop-at 2026-09-19T15:26:00Z`. Halt on freeze mass `< n`. T-id only on `RETAINABLE`.
