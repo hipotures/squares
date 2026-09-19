@@ -52,3 +52,11 @@ probes:
     seed_windows: 7
     deadline_seconds: 2400
     bead: think-d2ad
+  - id: n21-97-20-t021-auto-windows6
+    n: 21
+    side: '97/20'
+    grid_counts: auto
+    seed_certificate: cases/n20_fractional_certificate/certificate.json
+    seed_windows: 6
+    deadline_seconds: 1200
+    bead: think-b6n9

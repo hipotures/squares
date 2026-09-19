@@ -54,7 +54,7 @@ seven of them:
 | --- | ---: | ---: | ---: | --- |
 | 11 | T-026 `3.826447…` | Trump `3.877083…` | 0.051 | Yes. Closest point-atom construction above T-026 is `11.14` at `383/100`. |
 | 12 | T-017 `99/25` | grid `4` | 0.040 | Yes. Certificate-seeded `397/100` stopped at `12.016263` unconverged. |
-| 17 | T-019 `459/100` | grid `5` (reported packing `4.675…`) | 0.410 | Yes. T-019-seed plus windows 5 at `23/5` stopped at `17.042346`. |
+| 17 | T-019 `459/100` | grid `5` (reported packing `4.675…`) | 0.410 | Yes. T-019-seed plus windows 5 at `23/5` stopped at `17.042346`. Session-140 four-grid plus windows 8 stopped at `17.120106`. |
 | 18 | T-027 `467/100` | `(7/2)+(1/2)sqrt(7)` | 0.153 | Yes. `117/25` sits on the `18.000000` plateau. |
 | 19 | T-020 `24/5` | `4.885618…` | 0.086 | One probe: T-020-seed windows 6 at `97/20` stopped at `19.808958`. |
 | 20 | T-021 `97/20` | grid `5` | 0.150 | Yes. Certificate-seeded `973/200` crossed at `20.000223` unconverged. |
@@ -112,8 +112,10 @@ n=11 stays T-026. H-216 stays a calibration at n=6. exp-161 stays unresolved wit
 One coordinator owns identifiers, covering-values, T-id landing, ledger render, and
 the stacked PR. Each probe bead owns one `(n, side)` family and writes under
 `packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/`.
-Kill a probe at its deadline. If the freeze mass is below `n`, stop new probes and
-run the retain recipe. If not, record the row and take the next rank.
+The walker is `python -m devtools.run_covering_queue` over `first-wave-queue.yaml`,
+then `second-wave-queue.yaml`. Kill a probe at its deadline. If the freeze mass is
+below `n`, stop new probes and run the retain recipe. If not, record the row and
+take the next rank.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

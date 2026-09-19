@@ -71,8 +71,9 @@ experiment:
     reason: >-
       X-038 and the ranked queue are registered. The first probes have not finished.
     resume_from: >-
-      Rank 1: n=20 at 973/200 with T-021 seed, four-grid, and windows 7. Then n=12
-      at 397/100, n=17 at 23/5, n=19 at 481/100.
+      Rank 4: n=19 at 481/100 with T-020 24/5 seed, auto grids, and windows 6.
+      Then n=18 at 4675/1000, then the n=20 2400 s follow-up. n=12 and n=17 named
+      first-wave site sets finished above n.
 ---
 # Exp-162: First-Wave Stock Colgen
 
