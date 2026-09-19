@@ -704,7 +704,7 @@ values:
       (--support-cap 0) and was interrupted after 31 minutes; run.json was not written.
       Wall of the row loop 420.5 s.
     least_covered_mass: '1'
-    frozen_artifact: packing/cases/n18_fractional_certificate/certificate.json
+    frozen_artifact: packing/cases/n18_fractional_certificate/certificate-467-100.json
     recorded_in:
       - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-467-100-t019-seed-receipt.md
       - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
@@ -714,7 +714,33 @@ values:
       locked 18.000000 to a converged 17.875567. Freeze-then-decide retained the
       candidate: 769 atoms, total mass 8937839/500000 = 17.875678, least cell mass
       2000007/2000000. Both decide_certificate routes accept. T-027. The covering
-      objective and the artifact mass are different numbers.
+      objective and the artifact mass are different numbers. The live pointer later
+      moved to T-028; these bytes stay at certificate-467-100.json.
+  - n: 18
+    side: '187/40'
+    side_decimal: '4.675'
+    objective: '17.879034'
+    site_set: t027-seed-auto-32-43-53-windows5
+    sites: 6837
+    rows: 9607
+    rounds: 38
+    converged: true
+    stop_reason: >-
+      The row loop converged at LP round 38 (violated 0) at 17.879034 on 6837 sites
+      / 921 orbits, including 1169 T-027 seed sites scaled from 467/100 plus
+      windows 5. least_covered 1. Never crossed 18. Wall 319.6 s.
+    least_covered_mass: '1'
+    frozen_artifact: packing/cases/n18_fractional_certificate/certificate.json
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n18-4675-1000-t027-auto-windows5-receipt.md
+      - packing/campaign/agent-sessions/session-140-lb-survey.md
+      - packing/frontier/n-018.md
+    notes: >-
+      Session-140 T-027-seeded auto-grid plus windows 5 at 187/40. Freeze-then-decide
+      retained the candidate: 725 atoms, total mass 35758287/2000000 = 17.8791435,
+      least cell mass 4000013/4000000. Both decide_certificate routes accept. T-028.
+      The covering objective and the artifact mass are different numbers. n=18 is
+      off the H-218 sweep, so this retain does not confirm that claim.
   - n: 18
     side: '117/25'
     side_decimal: '4.68'

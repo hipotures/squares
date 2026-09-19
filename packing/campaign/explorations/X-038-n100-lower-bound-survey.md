@@ -55,7 +55,7 @@ seven of them:
 | 11 | T-026 `3.826447…` | Trump `3.877083…` | 0.051 | Yes. Closest point-atom construction above T-026 is `11.14` at `383/100`. |
 | 12 | T-017 `99/25` | grid `4` | 0.040 | Yes. Certificate-seeded `397/100` stopped at `12.016263` unconverged. |
 | 17 | T-019 `459/100` | grid `5` (reported packing `4.675…`) | 0.410 | Yes. T-019-seed plus windows 5 at `23/5` stopped at `17.042346`. Session-140 four-grid plus windows 8 stopped at `17.120106`. |
-| 18 | T-027 `467/100` | `(7/2)+(1/2)sqrt(7)` | 0.153 | Yes. `117/25` sits on the `18.000000` plateau. |
+| 18 | T-028 `187/40` | `(7/2)+(1/2)sqrt(7)` | 0.148 | Rank 5 retained as T-028. `117/25` still sits on the `18.000000` plateau. |
 | 19 | T-020 `24/5` | `4.885618…` | 0.086 | Two probes. T-020-seed windows 6 at `97/20` stopped at `19.808958`. Session-140 same construction at `481/100` stopped at `19.132115`. |
 | 20 | T-021 `97/20` | grid `5` | 0.150 | Yes. Certificate-seeded `973/200` crossed at `20.000223` unconverged. |
 | 21 | T-020 `24/5` | grid `5` | 0.150 | One unusable grid row at `997/200`. |
@@ -79,7 +79,7 @@ the current floor”, then remaining gap, then whether a seed certificate exists
 | 2 | think-h02v | 12 | `397/100` | Surplus `0.016263` on the old seed. Remaining window to the grid is `0.04`. | T-017 seed, grids `28,38,46,54`, windows 7 |
 | 3 | think-5q81 | 17 | `23/5` | Surplus `0.042346` on windows 5. Reported packing sits at `4.675`, so `4.60` is still inside the interesting interval. | T-019 seed, grids `34,45,56,64`, windows 8 |
 | 4 | think-zoq4 | 19 | `481/100` then `97/20` | Only one probe, and it is `0.81` above 19. A side just above `24/5` is the cheap test. | T-020 `certificate-24-5.json`, auto plus windows 6 |
-| 5 | think-15qo | 18 | `4675/1000` | `4.68` already plateaus at 18. An intermediate side is the only remaining stock move. | T-027 seed, auto plus windows 5 |
+| 5 | think-15qo | 18 | `187/40` | Retained as T-028. `4.68` still plateaus at 18. | T-027 seed, auto plus windows 5 |
 | 6 | think-b6n9 | 21 | `97/20` | Same certificates as n=20, almost no covering data. Run only if the n=20 lane is idle. | T-021 seed, auto plus windows 6 |
 | 7 | — | 11 | none this block | Point covering at sides above T-026 is already `11.14` and rising. Not this campaign’s win condition. | — |
 
@@ -101,8 +101,9 @@ sets. `think-b6n9` owns the triage note, not a T-id.
 
 A covering row on a new `(n, side, site_set)` is progress even when it stays above `n`.
 A verified floor moves only after a freeze with mass `< n` that both routes of
-`decide_certificate` accept. The next T-id is T-028. Session-139 left a landing recipe;
-this session copies it and does not invent a case class.
+`decide_certificate` accept. Session-140 landed T-028 at n=18 (`187/40`). That retain
+is off the H-218 sweep and does not confirm H-218. Session-139 left the landing
+recipe; this session copied it and did not invent a case class.
 
 n=11 stays T-026. H-216 stays a calibration at n=6. exp-161 stays unresolved with no
 `--search`.

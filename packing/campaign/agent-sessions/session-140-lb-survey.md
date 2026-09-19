@@ -80,7 +80,7 @@ session:
     evidence: []
     stop_reason: null
     next_action: >-
-      Rank 1 n=20 at 973/200, then n=12 at 397/100. T-028 only if RETAINABLE.
+      T-028 retained. Finish the n=20 2400 s follow-up, then n=21.
   budget:
     wall_minutes: 260
     max_cycles: 2
@@ -272,16 +272,23 @@ session:
       - packing-campaign
   - task: n=18 4675/1000 T-027 auto plus windows 5
     operator: session-140 covering lane
-    status: in_progress
+    status: completed
     recording: contemporaneous
-    outcome: null
-    evidence: null
-    files: null
-    checks: null
-    uncertainty: null
-    elapsed_seconds: null
-    elapsed_quality: unavailable
-    next_action: Finish the named site set under think-15qo.
+    outcome: >-
+      Converged 17.879034; freeze mass 35758287/2000000. decide_certificate
+      printed RETAINABLE. T-028 lands s(18) >= 187/40. Does not confirm H-218.
+    evidence:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n18-4675-1000-t027-auto-windows5-receipt.md
+    files:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n18-4675-1000-t027-auto-windows5-run.json
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n18-4675-1000-t027-auto-windows5-receipt.md
+      - packing/cases/n18_fractional_certificate/certificate.json
+    checks:
+      - run JSON converged true; total_mass 35758287/2000000; decide_certificate RETAINABLE
+    uncertainty: n=18 is off the H-218 sweep.
+    elapsed_seconds: 320
+    elapsed_quality: platform_measured
+    next_action: Land T-028; start the n=20 2400 s follow-up.
     phase: 2
     budget_minutes: 40
     started_at: '2026-09-19T04:05:23Z'
@@ -297,6 +304,70 @@ session:
       - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/
     excluded_commands:
       - packing-campaign
+  - task: Land T-028 n=18 187/40
+    operator: session-140 coordinator
+    status: completed
+    recording: contemporaneous
+    outcome: >-
+      T-028 retained s(18) >= 187/40 = 4.675 at V4/C4/S3. T-027 bytes moved to
+      certificate-467-100.json. H-218 remains unconfirmed.
+    evidence:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n18-4675-1000-t027-auto-windows5-receipt.md
+      - packing/frontier/results.yaml
+    files:
+      - packing/cases/n18_fractional_certificate/certificate.json
+      - packing/cases/n18_fractional_certificate/certificate-187-40.json
+      - packing/cases/n18_fractional_certificate/certificate-467-100.json
+    checks:
+      - decide_certificate RETAINABLE; sha256 9507659fa55a48869f060bff07e8d0e4f088cf70320f571afdca1bb460d9bb7b
+    uncertainty: C5 is not claimed; no mapped review.
+    elapsed_seconds: 1800
+    elapsed_quality: platform_measured
+    next_action: Leave think-8ujs closable; keep the n=20 2400 s probe running.
+    phase: 2
+    budget_minutes: 40
+    started_at: '2026-09-19T04:13:00Z'
+    deadline_at: '2026-09-19T04:53:00Z'
+    expected_output: >-
+      T-028 in results.yaml, n-018.md verified_lower 187/40, covering-values row
+      with frozen_artifact on the live n=18 certificate.
+    validation_command: >-
+      test -f packing/cases/n18_fractional_certificate/certificate-187-40.json
+    kill_condition: Do not land unless decide_certificate printed RETAINABLE.
+    fallback: Keep the freeze under agenda-038 and do not mint a T-id.
+    write_scope:
+      - packing/cases/n18_fractional_certificate/
+      - packing/frontier/
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/
+    excluded_commands:
+      - packing-campaign
+  - task: n=20 973/200 four-grid plus windows 7, 2400 s
+    operator: session-140 covering lane
+    status: in_progress
+    recording: contemporaneous
+    outcome: null
+    evidence: null
+    files: null
+    checks: null
+    uncertainty: null
+    elapsed_seconds: null
+    elapsed_quality: unavailable
+    next_action: Finish the longer wall under think-d2ad.
+    phase: 2
+    budget_minutes: 50
+    started_at: '2026-09-19T04:15:36Z'
+    deadline_at: '2026-09-19T05:05:36Z'
+    expected_output: >-
+      agenda-038 n=20 973/200 four-grid plus windows 7 2400 s run JSON and a
+      receipt if the loop stops.
+    validation_command: >-
+      test -f packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n20-973-200-t021-grid4-windows7-2400-run.json
+    kill_condition: Stop at 2400 s or when the row loop converges.
+    fallback: Record the restricted optimum and take n=21.
+    write_scope:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/
+    excluded_commands:
+      - packing-campaign
   outputs:
   - packing/campaign/explorations/X-038-n100-lower-bound-survey.md
   - packing/campaign/hypotheses/H-218-existing-colgen-raises-a-small-n-floor.md
@@ -305,6 +376,7 @@ session:
   - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n12-397-100-t017-grid4-windows7-receipt.md
   - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n17-23-5-t019-grid4-windows8-receipt.md
   - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n19-481-100-t020-auto-windows6-receipt.md
+  - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n18-4675-1000-t027-auto-windows5-receipt.md
   checks:
   - Planning artifacts written; research phase open.
   - >-
@@ -312,11 +384,12 @@ session:
     freeze. n=12 397/100 converged at 12.133391, freeze above 12, no retain.
     n=17 23/5 four-grid plus windows 8 stopped at 17.120106 unconverged, no
     freeze. n=19 481/100 T-020 auto plus windows 6 stopped at 19.132115
-    unconverged, no freeze; new covering side 4.81. n=18 4675/1000 started
-    04:05Z.
+    unconverged, no freeze; new covering side 4.81. n=18 4675/1000 converged
+    17.879034, freeze mass 35758287/2000000, RETAINABLE; T-028 lands 187/40.
+    n=20 2400 s follow-up started 04:15Z. H-218 unconfirmed.
   stop_reason: null
   next_action: >-
-    Run the X-038 ranked queue under think-8x4t. Do not close think-qqzs.
+    Finish the n=20 2400 s probe, then n=21. Do not close think-qqzs.
 ---
 # Session 140: N<=100 Lower-Bound Survey
 

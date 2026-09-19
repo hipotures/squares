@@ -50,7 +50,8 @@ hypothesis:
     at 20.000223. H-062 walled that side on two named site sets; this claim is about
     a different construction class, not a replay of those two. n=18 is on the survey
     queue but not on this sweep: 117/25 already plateaus at 18. n=11 is excluded;
-    T-026 stands. T-028 is the retain id if the gate accepts.
+    T-026 stands. Session-140 landed T-028 at n=18; that retain is off this sweep
+    and does not confirm the claim.
 ---
 # H-218: Stock Colgen Raises One Small-n Floor
 
@@ -65,7 +66,8 @@ A site set that finishes above `n` is a negative about that construction, not ab
 side. H-062’s wall at `973/200` binds the two site sets it named. It does not bind a
 windows lattice or a four-grid.
 
-Confirm only on `RETAINABLE`. The retain id is T-028. n=11 and n=6 are out of scope.
+Confirm only on `RETAINABLE` at an n on this sweep. n=11 and n=6 are out of scope.
+T-028 at n=18 is off-sweep and does not confirm this claim.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
