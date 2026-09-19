@@ -946,6 +946,7 @@ Status: **active**. Pursue n=11 results beyond the one-body ceiling L* = 38200/9
 | H-218 | abandoned | proof | A rows-complete covering of mass strictly below n exists at a containe | n: 12 17 19 20* | 2 |  | 238.0m wall |
 | H-219 | confirmed | proof | A rows-complete covering of mass strictly below 18 exists at a contain | n: 18* | 1 |  | 11.7m wall |
 | H-220 | open | proof | A rows-complete covering of mass strictly below n exists at a containe | n: 32 31 30 26 27 29 45 44 | 0 |  |  |
+| H-221 | open | proof | A rows-complete covering of mass strictly below 18 exists at a contain | n: 18 | 0 |  |  |
 
 ## Needs review — held for a human, not decided
 

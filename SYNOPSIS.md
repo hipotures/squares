@@ -144,7 +144,7 @@ hypothesis status and summarizes experiment verdicts, and the
 | Commitments | 349 | 178 complete; 60 stopped; 66 blocked; 15 ready; 21 tentative; 9 in progress |
 | Sessions | 141 | 84 completed; 56 stopped; 1 nonterminal |
 | Explorations | 37 | 23 linked to proposed hypotheses; 14 uncodified |
-| Hypotheses | 158 | 27 confirmed; 29 refuted; 51 blocked; 13 unresolved; 6 open; 28 open questions; 2 result registered; 2 abandoned; 0 running |
+| Hypotheses | 159 | 27 confirmed; 29 refuted; 51 blocked; 13 unresolved; 7 open; 28 open questions; 2 result registered; 2 abandoned; 0 running |
 | Experiments | 132 | 40 accepted; 34 rejected; 31 unresolved; 12 baseline; 11 blocked; 3 abandoned; 1 in progress |
 | Frontier results | 29 | 29 registered |
 
@@ -4036,6 +4036,7 @@ round that names the hypothesis, control roles included.
 | [H-218](packing/campaign/hypotheses/H-218-existing-colgen-raises-a-small-n-floor.md) | abandoned | A rows-complete covering of mass strictly below n exists at a container side strictly above the current verified floor for at least one n in {12, 17, 19, 20} | 2 | exp-162 abandoned; exp-164 reopen claimed |
 | [H-219](packing/campaign/hypotheses/H-219-t028-seeded-colgen-raises-s18.md) | confirmed | A rows-complete covering of mass strictly below 18 exists at a container side in (187/40, 117/25) on a T-028-seeded stock-colgen site set | 1 | T-029 |
 | [H-220](packing/campaign/hypotheses/H-220-seedless-colgen-raises-nagamochi-floor.md) | open | A rows-complete covering of mass strictly below n exists at a queued Nagamochi-only side on a seedless stock-colgen site set | 0 | — |
+| [H-221](packing/campaign/hypotheses/H-221-t029-seeded-colgen-raises-s18.md) | open | A rows-complete covering of mass strictly below 18 exists at a container side in (1871/400, 117/25) on a T-029-seeded stock-colgen site set | 0 | — |
 
 ### Confirmed
 

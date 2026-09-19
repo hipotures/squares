@@ -133,7 +133,7 @@ probes:
     deadline_seconds: 1200
     bead: think-so2k
     hypothesis: H-218
-  # H-219 next-rung. Register a new experiment before this probe starts
+  # H-221 next-rung. Register a new experiment before this probe starts
   # (exp-164 must be terminal). Seed is the live T-029 pointer.
   - id: n18-4679-1000-t029-auto-windows5
     n: 18
@@ -143,4 +143,4 @@ probes:
     seed_windows: 5
     deadline_seconds: 1200
     bead: think-u11x
-    hypothesis: H-219
+    hypothesis: H-221

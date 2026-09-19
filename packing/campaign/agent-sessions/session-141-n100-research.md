@@ -277,6 +277,8 @@ pattern, not a new case class. Score S3. `produced_by.session` is `session-141`.
   claim is also `s(21) >= 971/200`. T-030 artifacts list only the live pointer.
 - A later Nagamochi RETAINABLE (H-220) is T-030 if n=20 does not retain, else T-031.
   There is no n=32 case package yet.
+- n=18 `4679/1000` is H-221, not a replay of H-219. Claim a new experiment before
+  that probe starts.
 - Do not mint a T-id on an unconverged freeze, a freeze with mass `>= n`, or n=21
   `97/20`.
 

@@ -27,7 +27,7 @@ exploration:
   - packing/frontier/n-019.md
   - packing/frontier/n-020.md
   - packing/frontier/n-021.md
-  proposes: [H-219, H-220]
+  proposes: [H-219, H-220, H-221]
 ---
 # X-039: What Session-140 Changed About the n<100 Queue
 
@@ -100,6 +100,7 @@ One CPU. Sequential colgen. Sub-agents own audit, registration, and W5.
 | H-219 | first covering probe | Same class as T-028; unused leftover side |
 | H-218 | reopen after exp-163 terminals | New site set at n=20 `971/200`; do not replay leftover auto plus windows 6 |
 | H-220 | after n=18 and n=20 new sites | Seedless Nagamochi floors |
+| H-221 | after ranked H-218 long-shots | T-029-seeded next rung at `4679/1000` |
 | H-210 / H-211 | off-CPU if Node permits | Workbench determinations; not a floor |
 | H-163 / exp-161 | `--check` only | Encode already timed out; no `--search`; do not steal the covering core |
 | H-217 | reader tests only | Blocked on sites-1; do not close `think-g3j7` or `think-gyzw` |
