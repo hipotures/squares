@@ -143,7 +143,7 @@ hypothesis status and summarizes experiment verdicts, and the
 | --- | ---: | --- |
 | Agendas | 36 | 16 active; 14 completed; 5 paused; 1 superseded |
 | Commitments | 349 | 178 complete; 60 stopped; 66 blocked; 15 ready; 21 tentative; 9 in progress |
-| Sessions | 141 | 84 completed; 56 stopped; 1 nonterminal |
+| Sessions | 141 | 84 completed; 57 stopped; all terminal |
 | Explorations | 37 | 23 linked to proposed hypotheses; 14 uncodified |
 | Hypotheses | 159 | 28 confirmed; 29 refuted; 51 blocked; 14 unresolved; 5 open; 28 open questions; 2 result registered; 2 abandoned; 0 running |
 | Experiments | 147 | 41 accepted; 34 rejected; 46 unresolved; 12 baseline; 11 blocked; 3 abandoned; 0 in progress |
@@ -165,29 +165,15 @@ strategy-reset queue, and
 is the current relational-certificate queue opened by the overnight review.
 The generated agenda map, not this narrative, summarizes commitment state.
 
-[Session 139](packing/campaign/agent-sessions/session-139-n11-overnight-research.md)
-is the latest terminal closeout: encode-only timed out unresolved, T-027 retained
-`s(18) >= 467/100`, and `think-qqzs` remains the next entry.
+[Session 141](packing/campaign/agent-sessions/session-141-n100-research.md)
+is the latest terminal closeout: T-029 retained `s(18) >= 1871/400`, T-030
+retained `s(18) >= 4679/1000`, H-218 and H-220 stay unconfirmed, and
+`think-qqzs` remains the next entry.
 [Session 140](packing/campaign/agent-sessions/session-140-lb-survey.md) closed the
 stacked-PR survey of `n <= 100` lower bounds; it retained T-028 `s(18) >= 187/40`
-and does not replace that handoff. It does not confirm H-218.
-[Session 141](packing/campaign/agent-sessions/session-141-n100-research.md) is the
-live stacked continuation: X-039 re-ranks those floors, exp-163 accepted leftover
-n=18 as T-029 `s(18) >= 1871/400`, exp-164 and exp-165 left H-218 unconfirmed
-at n=20 `19.857588` and `19.887914`, exp-166 left H-220 unconfirmed at n=32
-`29.803318`, exp-167 left H-220 unconfirmed at n=31 `28.331329`, exp-168 left
-H-220 unconfirmed at n=30 `27.178193`, exp-169 left H-220 unconfirmed at n=26
-`25.000000`, exp-170 left H-220 unconfirmed at n=27 `25.000000`, exp-171 left
-H-220 unconfirmed at n=29 after a freeze the interval route refused, exp-172 left
-H-220 unconfirmed at n=45 `42.137360`, exp-173 left
-H-220 unconfirmed at n=44 `41.236782`, exp-174 left
-H-218 unconfirmed at n=19 `19.111435`, exp-175 left
-H-218 unconfirmed at n=12 `12.067502`, exp-176 left
-H-218 unconfirmed at n=12 `12.097146`, exp-177 left
-H-218 unconfirmed at n=19 `19.224565`, exp-178 left
-H-218 unconfirmed at n=12 `12.066995`, exp-179 accepted
-H-221 as T-030 `s(18) >= 4679/1000`,
-and `think-qqzs` stays the selected next entry when this session terminals.
+and does not confirm H-218.
+[Session 139](packing/campaign/agent-sessions/session-139-n11-overnight-research.md)
+retained T-027 `s(18) >= 467/100` after encode-only timed out unresolved.
 [Session 138](packing/campaign/agent-sessions/session-138-n11-overnight-review.md)
 is the preceding route-selection handoff: PR 193 merged its records as `4ad98e90`,
 `think-4woh` is closed, and certification debt now sits under `think-qqzs`. The five
@@ -1034,12 +1020,14 @@ controller, not permission to blur contracts.
 
 ### Current Handoff
 
-[Session 140](packing/campaign/agent-sessions/session-140-lb-survey.md)
-closed the stacked-PR n<=100 lower-bound survey. It retained T-028
-`s(18) >= 187/40`, abandoned exp-162, and left H-218 unconfirmed.
-`think-qqzs` remains the selected next entry.
 [Session 141](packing/campaign/agent-sessions/session-141-n100-research.md)
-is the live stacked continuation and does not replace this handoff.
+closed the stacked n<100 research loop. It retained T-029
+`s(18) >= 1871/400` and T-030 `s(18) >= 4679/1000`, confirmed H-219 and
+H-221, and left H-218 and H-220 unconfirmed.
+`think-qqzs` remains the selected next entry.
+[Session 140](packing/campaign/agent-sessions/session-140-lb-survey.md)
+closed the preceding stacked-PR n<=100 survey and retained T-028
+`s(18) >= 187/40`.
 
 [Session 139](packing/campaign/agent-sessions/session-139-n11-overnight-research.md)
 is the preceding overnight scientific closeout.

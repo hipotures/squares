@@ -155,7 +155,7 @@ Each entry summarizes one user-level research window. Cycle slots are wall-clock
 | [session-138](agent-sessions/session-138-n11-overnight-review.md) | stopped | mixed | `factual-review` (insight) | `documentation-pass` (process) | 6 | think-4woh | Close M7's n=6 bracket at 299/100 under BC-357 / think-qqzs. H-216 is the registered determination. G1, G2, G3, and G5 are on main; G4 remains on this bead. |
 | [session-139](agent-sessions/session-139-n11-overnight-research.md) | stopped | contemporaneous | `research-loop` (insight) | `documentation-pass` (process) | 4 | think-mcb6 | Continue H-216 under think-qqzs. Route S encode-only timed out unresolved; a later block re-runs encode before --search. |
 | [session-140](agent-sessions/session-140-lb-survey.md) | stopped | contemporaneous | `review-planning-oversight` (process) | `review-planning-oversight` (process) | 3 | think-8x4t | Continue H-216 under think-qqzs. |
-| [session-141](agent-sessions/session-141-n100-research.md) | in_progress | contemporaneous | `review-planning-oversight` (process) | `research-loop` (insight) | 2 | think-ul7y | think-q1r3 |
+| [session-141](agent-sessions/session-141-n100-research.md) | stopped | contemporaneous | `review-planning-oversight` (process) | `review-planning-oversight` (process) | 3 | think-ul7y | Continue H-216 under think-qqzs. |
 
 ### Workflow summary
 
@@ -172,7 +172,7 @@ Declared counts are contemporaneous contracts; retrospective counts are reconstr
 | `pipeline-improvement` | 33 | 2 | 151 | 5 |
 | `documentation-pass` | 1 | 0 | 24 | 1 |
 | `remediation` | 0 | 1 | 0 | 3 |
-| `review-planning-oversight` | 5 | 0 | 20 | 2 |
+| `review-planning-oversight` | 5 | 0 | 21 | 2 |
 | `general-improvement` | 1 | 0 | 7 | 1 |
 
 ## Experiment agendas

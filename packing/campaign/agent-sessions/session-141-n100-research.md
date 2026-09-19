@@ -11,14 +11,23 @@ session:
   date: '2026-09-19'
   started_at: '2026-09-19T07:26:00Z'
   deadline_at: '2026-09-19T16:06:00Z'
+  ended_at: '2026-09-19T15:26:00Z'
   branch: cursor/session-141-n100-research-f02a
   primary_bead: think-ul7y
-  status: in_progress
+  status: stopped
   goal: >-
     Re-rank every open s(n) floor at n<100 from Session-140 evidence, iterate the
     stock covering loop on the highest-likelihood unused constructions, and test
     the other runnable hypotheses beside that core, for eight hours on a stacked PR.
     Land the next T-id only if decide_certificate prints RETAINABLE.
+  resource_usage_unmeasured:
+    reason: native_harness_data_unavailable
+    detail: >-
+      This Cursor cloud-agent run has no ClaudeEfficiencyRollup or CodexTaskTreeDelta
+      receipt. Session clocks and covering walls are not a substitute.
+    disposition_bead: think-ul7y
+    handoff_role: work_handoff
+  resource_rollups: []
   workflow_phases:
   - workflow: review-planning-oversight
     focus: process
@@ -65,7 +74,7 @@ session:
       Walk the X-039 ranked covering queue. Record every restricted optimum.
       Freeze and decide only when mass is below n. Land the next T-id only on
       RETAINABLE. Pause new probes for Block 4 W5.
-    status: in_progress
+    status: completed
     entered_by: planned_checkpoint
     switch_reason: Planning artifacts and beads are in the tree.
     budget_minutes: 472
@@ -82,12 +91,55 @@ session:
       15:26Z. Do not --search. Do not close think-qqzs, think-g3j7, think-gyzw,
       or think-jwb1. Do not land a non-retainable freeze.
     fallback: Keep the re-rank, the finished covering rows, and a terminal exp-163.
-    outcome: null
+    outcome: >-
+      Ranked queue walked. T-029 and T-030 retained at n=18. H-219 and H-221
+      confirmed. H-218 unconfirmed after the n=20/19/12 long-shots. H-220
+      unconfirmed after eight Nagamochi sides (n=29 freeze interval-refused).
+      No unused ranked (n, side, site_set) remains. Do not more-wall 4679/1000.
     evidence:
       - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n18-1871-400-t028-auto-windows5-receipt.md
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n18-4679-1000-t029-auto-windows5-receipt.md
       - packing/frontier/n-018.md
-    stop_reason: null
-    next_action: Land T-030; no more-wall on 4679/1000.
+    stop_reason: Research wall 15:26Z. Ranked queue empty. No pending retain.
+    next_action: Closeout under phase 3. Do not close think-qqzs.
+  - workflow: review-planning-oversight
+    focus: process
+    recording: contemporaneous
+    clock_role: finalization
+    bead: think-q1r3
+    objective: >-
+      Terminalize this session, regenerate the campaign views, and leave a
+      reviewable stacked PR.
+    status: stopped
+    entered_by: planned_checkpoint
+    switch_reason: >-
+      Research wall 15:26Z. Ranked queue empty. T-029 and T-030 retained. No
+      pending freeze.
+    budget_minutes: 40
+    started_at: '2026-09-19T15:26:00Z'
+    deadline_at: '2026-09-19T16:06:00Z'
+    expected_output: >-
+      Terminal session-141, regenerated ledger and session-close report, and a
+      reviewable stacked PR.
+    validation_command: >-
+      cd packing && uv run --frozen --all-extras --group dev packing-ledger check &&
+      uv run --frozen --all-extras --group dev packing-validate --records &&
+      uv run --frozen --all-extras --group dev python -m devtools.close_session --check
+    kill_condition: >-
+      Stop at 16:06Z even if a generated view is stale. Do not --search. Do not
+      close think-qqzs, think-g3j7, think-gyzw, or think-jwb1.
+    fallback: Leave the records uncommitted with the failing check named.
+    outcome: >-
+      Session stopped at 15:26:00Z. T-029 and T-030 stand. H-218 and H-220 stay
+      unconfirmed. H-219 and H-221 confirmed. Native harness usage is unmeasured.
+    evidence:
+      - packing/campaign/agent-sessions/session-141-n100-research.md
+      - packing/cases/n18_fractional_certificate/certificate.json
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n18-4679-1000-t029-auto-windows5-receipt.md
+    stop_reason: >-
+      Research wall passed, ranked queue empty, and the closeout records are
+      written.
+    next_action: Continue H-216 under think-qqzs.
   budget:
     wall_minutes: 520
     max_cycles: 8
@@ -115,7 +167,12 @@ session:
     before: >-
       Session-140 closed with T-028 at n=18. H-218 unconfirmed. Leftover n=18
       1871/400 and the Nagamochi second wave did not start. Unique covering sides 33.
-    after: null
+    after: >-
+      T-029 retained s(18) >= 1871/400. T-030 retained s(18) >= 4679/1000.
+      H-219 and H-221 confirmed. H-218 unconfirmed after the n=20/19/12
+      long-shots. H-220 unconfirmed after eight Nagamochi sides (n=29 freeze
+      interval-refused). Unique covering sides 45. think-qqzs stays the
+      selected next entry.
   delegations:
   - task: Re-rank n<100 covering from Session-140 masses
     operator: session-141 covering-rank lane
@@ -591,6 +648,28 @@ session:
     budget_minutes: 20
     started_at: '2026-09-19T14:31:00Z'
     deadline_at: '2026-09-19T14:51:00Z'
+  - task: Closeout session-141
+    operator: session-141 coordinator
+    status: completed
+    recording: contemporaneous
+    outcome: >-
+      Session stopped at 15:26:00Z. T-029 and T-030 stand. Native harness usage
+      is unmeasured. think-qqzs remains the next entry.
+    evidence:
+      - packing/campaign/agent-sessions/session-141-n100-research.md
+    files:
+      - packing/campaign/agent-sessions/session-141-n100-research.md
+      - packing/campaign/session-close-report.yaml
+    checks:
+      - packing-ledger check and close_session --check after render
+    uncertainty: Hosted suite-b cost-band reds on earlier heads left unfixed.
+    elapsed_seconds: 900
+    elapsed_quality: operator_reported_approximate
+    next_action: Continue H-216 under think-qqzs.
+    phase: 3
+    budget_minutes: 40
+    started_at: '2026-09-19T15:26:00Z'
+    deadline_at: '2026-09-19T16:06:00Z'
   outputs:
     - packing/campaign/explorations/X-039-n100-re-rank-after-session-140.md
     - packing/campaign/hypotheses/H-219-t028-seeded-colgen-raises-s18.md
@@ -616,15 +695,26 @@ session:
     - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n12-793-200-t017-grid4-windows7-receipt.md
     - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n18-4679-1000-t029-auto-windows5-receipt.md
     - packing/campaign/agent-sessions/session-141-n100-research.md
-  checks: []
-  stop_reason: null
-  next_action: think-q1r3
+  checks:
+  - Planning artifacts written; research phase closed at 15:26Z.
+  - >-
+    full gate: fast at f9049cc7: passed (GitHub Actions packing-required success
+    on the T-030 head)
+  - >-
+    T-029 retained s(18) >= 1871/400. T-030 retained s(18) >= 4679/1000.
+    H-219 and H-221 confirmed. H-218 unconfirmed. H-220 unconfirmed after eight
+    Nagamochi sides. Ranked queue empty. Do not more-wall 4679/1000.
+  stop_reason: >-
+    Research wall 15:26Z. T-029 and T-030 are retained. Native harness usage is
+    unmeasured.
+  next_action: Continue H-216 under think-qqzs.
 ---
 # Session-141: Eight-Hour n<100 Research Loop
 
-Stacked on Session-140 / PR 200. Branch `cursor/session-141-n100-research-f02a`.
-Workflow entry is planning, then the research loop. Primary bead is `think-ul7y`, not
-`think-qqzs`.
+This record is the closed eight-hour stacked PR. Stacked on Session-140 / PR 200.
+Branch `cursor/session-141-n100-research-f02a`. Workflow entry was planning, then the
+research loop. Primary bead is `think-ul7y`, not `think-qqzs`. The selected next
+entry remains `think-qqzs`.
 
 [X-039](../explorations/X-039-n100-re-rank-after-session-140.md) is the re-rank.
 [H-219](../hypotheses/H-219-t028-seeded-colgen-raises-s18.md) is leftover n=18.

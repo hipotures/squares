@@ -402,7 +402,9 @@ def test_the_retained_n18_certificate_is_accepted_on_the_full_doubled_net() -> N
     verdict = verify_by_intervals(certificate, enclose=True)
     assert verdict.accepted, verdict.failures
     assert not any(o.budget_exhausted for o in verdict.directions)
-    assert len(verdict.directions) == 361
+    # 181 steps inclusive of both ends is 182 half-tangents; the doubled net
+    # drops only the upright reflection, so 2 * 182 - 1 = 363.
+    assert len(verdict.directions) == 363
     assert sum(outcome.stalled for outcome in verdict.directions) == 0
     enclosure = verdict.enclosure
     assert enclosure == (Fraction(200001, 200000), Fraction(200001, 200000))
