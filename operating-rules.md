@@ -322,11 +322,15 @@ Agenda chronology may support that account; it may not stand in for it.
 
 **The description is the template.**
 [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md) is the section
-order. `devtools.check_pr_description` refuses a body that drops those headings or
-replaces the disposition table with a session chronology.
-Session-141’s first [#201](https://github.com/jlevy/squares/pull/201) draft was that
-chronology; [#196](https://github.com/jlevy/squares/pull/196) and
-[#197](https://github.com/jlevy/squares/pull/197) are the filled template.
+order.
+`devtools.check_pr_description` refuses a body that drops those headings, replaces
+the disposition table with a session chronology, or opens Cost with every experiment
+wall. Session-141’s first [#201](https://github.com/jlevy/squares/pull/201) draft was a
+heading-less chronology; the first rewrite had the headings and still listed fifteen
+covering walls. [#196](https://github.com/jlevy/squares/pull/196) and
+[#197](https://github.com/jlevy/squares/pull/197) are the filled template: Cost is two
+to four sentences of what the slice is, what it cost, and what it does not do.
+Dispositions are one row per decision, not per probe.
 A contextual dump is an unfinished pull request, the same as a missing cost block.
 From `packing/`:
 

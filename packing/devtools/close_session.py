@@ -774,7 +774,8 @@ def _run(options: argparse.Namespace) -> int:
             print()
             print(
                 "The cost block is not the pull request. Fill "
-                ".github/PULL_REQUEST_TEMPLATE.md and run "
+                ".github/PULL_REQUEST_TEMPLATE.md (Cost is 2-4 sentences, "
+                "not a probe list) and run "
                 "`python -m devtools.check_pr_description --file BODY.md`."
             )
         return status

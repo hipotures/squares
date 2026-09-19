@@ -32,7 +32,7 @@ FILLED = "\n".join(
     (
         "## What this branch cost",
         "",
-        "Not a terminal agenda close. G3 of BC-357 / think-qqzs.",
+        "Not a terminal agenda close. G3 of BC-357 / think-qqzs. It does not move s(11).",
         "",
         "## New Results and Their Significance",
         "",
@@ -89,6 +89,23 @@ T-030 retains `s(18) >= 4679/1000`. H-218 stays unconfirmed.
 Do not merge. Do not close think-qqzs.
 """
 
+_COST_WALLS = """\
+Not a terminal agenda close. Session-141 records unmeasured usage.
+
+- Wall: 07:26Z-15:26Z on 2026-09-19 (deadline 16:06Z).
+- T-029 retain: covering about 650 s plus decide.
+- T-030 / exp-179: 494 s.
+- Recorded covering walls that did not retain: exp-164 2516 s, exp-165 1269 s, \
+exp-166 1206 s, exp-167 1285 s, exp-168 1213 s, exp-169 1209 s, exp-170 1201 s, \
+exp-171 1180 s, exp-172 1254 s, exp-173 1300 s, exp-174 1285 s, exp-175 1222 s, \
+exp-176 1213 s, exp-177 1257 s, exp-178 1217 s.
+"""
+
+COST_DUMP = FILLED.replace(
+    "Not a terminal agenda close. G3 of BC-357 / think-qqzs. It does not move s(11).",
+    _COST_WALLS.rstrip(),
+)
+
 
 def test_the_in_tree_template_still_carries_the_or9_headings() -> None:
     problems = check(TEMPLATE.read_text(encoding="utf-8"), filled=False)
@@ -104,6 +121,20 @@ def test_a_session_chronology_is_refused() -> None:
     problems = check(CHRONOLOGY, filled=True)
     assert problems
     assert any("no `##` headings" in item for item in problems)
+
+
+def test_a_headed_cost_that_lists_every_experiment_is_refused() -> None:
+    problems = check(COST_DUMP, filled=True)
+    assert any("Cost names" in item for item in problems)
+    assert any("probe list" in item for item in problems)
+
+
+def test_a_generated_rollup_cost_is_not_a_probe_list() -> None:
+    body = FILLED.replace(
+        "Not a terminal agenda close. G3 of BC-357 / think-qqzs. It does not move s(11).",
+        "No rollup records any turn on `cursor/example-f02a`.",
+    )
+    assert check(body, filled=True) == []
 
 
 def test_the_cost_heading_has_to_come_first() -> None:

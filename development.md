@@ -793,7 +793,8 @@ uv run --frozen --all-extras --group dev python -m devtools.check_pr_description
 ```
 
 The same command with no arguments checks that the template still carries the required
-headings. `OR-9` treats a chronology dump as unfinished.
+headings. Filled mode also refuses a Cost that enumerates every experiment wall.
+`OR-9` treats that dump as unfinished, headings or not.
 
 **The attribution is a bound and the block says so.** `turns.by_branch` is the only
 branch-aware field in `ClaudeEfficiencyRollup`, so a log that ran on more than one

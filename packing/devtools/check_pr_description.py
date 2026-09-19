@@ -8,11 +8,16 @@ Session-139/#199 and Session-140/#200 descriptions, opened with a cost sentence 
 probe list. #196 and #197 filled the template. The difference is scannable from the
 headings alone.
 
-This check is that heading contract. Template mode asks only that the file still
-carries the required sections and table columns. Filled mode also asks for one data
-row in each table, a selected next entry, Local and Hosted validation, and a Limits
-section that is not empty. Extra headings are allowed; the required ones must appear
-in order, and the first `##` heading must be the cost block.
+This check is that heading contract plus the Cost grain. Template mode asks only
+that the file still carries the required sections and table columns. Filled mode
+also asks for one data row in each table, a selected next entry, Local and Hosted
+validation, a Limits section that is not empty, and a Cost that is not a probe
+list. Extra headings are allowed; the required ones must appear in order, and the
+first `##` heading must be the cost block.
+
+The first #201 rewrite had the headings and still opened Cost with every covering
+wall. #196 and #197 open Cost with what the slice is and what it does not do.
+Filled mode refuses the former.
 
 Usage, from `packing/`:
 
@@ -36,6 +41,13 @@ TEMPLATE = REPO / ".github" / "PULL_REQUEST_TEMPLATE.md"
 COMMENT = re.compile(r"<!--.*?-->", re.DOTALL)
 HEADING = re.compile(r"^## (.+)$", re.MULTILINE)
 TABLE_ROW = re.compile(r"^\|(.+)\|\s*$", re.MULTILINE)
+EXPERIMENT = re.compile(r"\bexp-\d+\b")
+WALL_BULLET = re.compile(
+    r"^[-*]\s+.*(?:\bexp-\d+\b|\b\d{1,2}:\d{2}Z\b|\b\d+\s*s\b)",
+    re.MULTILINE,
+)
+MAX_COST_EXPERIMENTS = 3
+MAX_COST_WALL_BULLETS = 3
 
 REQUIRED_HEADINGS = (
     "What this branch cost",
@@ -153,6 +165,7 @@ def check(text: str, *, filled: bool) -> list[str]:
         problems.append("Changes by Purpose has no data row")
 
     if filled:
+        problems.extend(_cost_problems(_section(body, REQUIRED_HEADINGS[0])))
         validation = _section(body, "Validation")
         if not re.search(r"\bLocal\b", validation):
             problems.append("Validation does not name Local")
@@ -165,6 +178,25 @@ def check(text: str, *, filled: bool) -> list[str]:
         if not limits:
             problems.append("Limits is empty")
 
+    return problems
+
+
+def _cost_problems(cost: str) -> list[str]:
+    """A Cost that lists every experiment is the chronology dump under a heading."""
+    problems: list[str] = []
+    named = EXPERIMENT.findall(cost)
+    if len(named) > MAX_COST_EXPERIMENTS:
+        problems.append(
+            f"Cost names {len(named)} experiments; summarize the wall "
+            f"(at most {MAX_COST_EXPERIMENTS} ids) and put the probes in "
+            "Results and Dispositions"
+        )
+    bullets = WALL_BULLET.findall(cost)
+    if len(bullets) > MAX_COST_WALL_BULLETS:
+        problems.append(
+            "Cost is a probe list; write 2-4 sentences of what the branch "
+            "is, what it cost, and what it does not do"
+        )
     return problems
 
 
