@@ -83,9 +83,11 @@ session:
       or think-jwb1. Do not land a non-retainable freeze.
     fallback: Keep the re-rank, the finished covering rows, and a terminal exp-163.
     outcome: null
-    evidence: []
+    evidence:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n18-1871-400-t028-auto-windows5-receipt.md
+      - packing/frontier/n-018.md
     stop_reason: null
-    next_action: Start leftover n=18 1871/400 on rank-queue.yaml.
+    next_action: Claim exp-164 and start n=20 971/200 new four-grid under think-so2k.
   budget:
     wall_minutes: 520
     max_cycles: 8
@@ -182,16 +184,40 @@ session:
     budget_minutes: 15
     started_at: '2026-09-19T07:26:00Z'
     deadline_at: '2026-09-19T07:41:00Z'
+  - task: Land T-029 n=18 1871/400
+    operator: session-141 coordinator
+    status: completed
+    recording: contemporaneous
+    outcome: >-
+      T-029 retained s(18) >= 1871/400 = 4.6775 at V4/C4/S3. T-028 bytes sit at
+      certificate-187-40.json. Confirms H-219 / exp-163. Does not confirm H-218.
+    evidence:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n18-1871-400-t028-auto-windows5-receipt.md
+    files:
+      - packing/cases/n18_fractional_certificate/certificate.json
+      - packing/frontier/results.yaml
+      - packing/frontier/n-018.md
+    checks:
+      - decide_certificate printed RETAINABLE; sha256 dd06c0e39639f06af475459a2a63f9fc8d5836b0b83ea3b6c3a4de8f212892d4
+    uncertainty: C5 still requires a mapped review.
+    elapsed_seconds: 800
+    elapsed_quality: operator_reported_approximate
+    next_action: Claim exp-164 for H-218 n=20 971/200 new four-grid.
+    phase: 2
+    budget_minutes: 20
+    started_at: '2026-09-19T07:46:00Z'
+    deadline_at: '2026-09-19T08:06:00Z'
   outputs:
     - packing/campaign/explorations/X-039-n100-re-rank-after-session-140.md
     - packing/campaign/hypotheses/H-219-t028-seeded-colgen-raises-s18.md
     - packing/campaign/hypotheses/H-220-seedless-colgen-raises-nagamochi-floor.md
     - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-163-h219-t028-next-rung.md
     - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/ranked-queue.md
+    - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n18-1871-400-t028-auto-windows5-receipt.md
     - packing/campaign/agent-sessions/session-141-n100-research.md
   checks: []
   stop_reason: null
-  next_action: Continue leftover n=18 under think-u11x.
+  next_action: think-so2k
 ---
 # Session-141: Eight-Hour n<100 Research Loop
 

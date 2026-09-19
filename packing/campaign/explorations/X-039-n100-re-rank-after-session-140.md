@@ -44,7 +44,7 @@ covering still exists only on `11, 12, 17, 18, 19, 20, 21`.
 | n | Side | Named site set | Mass | Crossed `n` |
 | ---: | --- | --- | ---: | --- |
 | 18 | `187/40` | T-027 auto `(32,43,53)` plus windows 5 | `17.879034` | no; **T-028 retained** |
-| 18 | `1871/400` | T-028 auto plus windows 5 | not started | — |
+| 18 | `1871/400` | T-028 auto plus windows 5 | `17.889237` | no; **T-029 retained** |
 | 20 | `973/200` | T-021 four-grid `(34,46,56,64)` plus windows 7 | `19.939212` after 2400 s | no |
 | 20 | `971/200` | T-021 auto `(34,45,56)` plus windows 6 | `19.910044` | no |
 | 12 | `397/100` | T-017 four-grid plus windows 7 | `12.133391` | yes; converged |

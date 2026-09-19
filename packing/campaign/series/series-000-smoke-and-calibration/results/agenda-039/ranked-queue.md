@@ -11,7 +11,7 @@ an untried side or an untried site set.
 
 | Rank | Bead | Claim | n | Side | Site set | Deadline |
 | ---: | --- | --- | ---: | --- | --- | ---: |
-| 1 | think-u11x | H-219 | 18 | `1871/400` | T-028 auto plus windows 5 | 1200 s |
+| 1 | think-u11x | H-219 | 18 | `1871/400` | T-028 auto plus windows 5 | **T-029 retained** |
 | 2 | think-so2k | H-218 | 20 | `971/200` | T-021 four-grid `(34,46,56,64)` plus windows 7 | 2400 s |
 | 3–10 | think-coet | H-220 | 32…44 | queued Nagamochi sides | auto plus windows 5, no seed | 1200 s |
 
@@ -27,6 +27,7 @@ First walker `--stop-at 2026-09-19T10:26:00Z`. Resume the same file after W5 wit
 | n | Side | Site set | Why |
 | ---: | --- | --- | --- |
 | 18 | `187/40` | T-027 auto plus windows 5 | T-028 retained at `17.879034` |
+| 18 | `1871/400` | T-028 auto plus windows 5 | T-029 retained at `17.889237` |
 | 18 | `117/25` | every named seed | Locked at `18.000000` |
 | 18 | `469/100`, `47/10` | T-019 auto | Plateau or above 18 |
 | 20 | `971/200` | T-021 auto plus windows 6 | `19.910044` unconverged; remaining rows raise |

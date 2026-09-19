@@ -656,7 +656,7 @@ new claim. H-218 stays row 189; its reopen is a new site set at n=20, not a repl
 
 | # | Idea | Status | H | Crux |
 | --- | --- | --- | --- | --- |
-| 190 | T-028-seeded colgen raises s(18) above 187/40 | registered | [H-219](hypotheses/H-219-t028-seeded-colgen-raises-s18.md) | First named set is leftover 1871/400, auto plus windows 5. Confirm only on RETAINABLE. Off the H-218 sweep. |
+| 190 | T-028-seeded colgen raises s(18) above 187/40 | confirmed | [H-219](hypotheses/H-219-t028-seeded-colgen-raises-s18.md) | T-029 retained leftover 1871/400, auto plus windows 5. Off the H-218 sweep. |
 | 191 | Seedless colgen raises a Nagamochi-only floor in {32, 31, 30, 26, 27, 29, 45, 44} | registered | [H-220](hypotheses/H-220-seedless-colgen-raises-nagamochi-floor.md) | First probe is n=32 at 29/5, auto plus windows 5, no seed. Confirm only on RETAINABLE. |
 
 ## Dead ends

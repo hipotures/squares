@@ -46,9 +46,9 @@ hypothesis:
   replication: true
   registered: '2026-09-19'
   notes: >-
-    Session-140 leftover rank 5 never started. T-028 converged at 17.879034 in
-    319.6 s on auto plus windows 5 at 187/40. 1871/400 is the next 400-denominator
-    rung. Off the H-218 sweep. A retain here does not confirm H-218.
+    Session-141 leftover 1871/400 T-028-seeded auto plus windows 5 converged at
+    17.889237 and freeze-then-decide retained T-029. Confirmed. Off the H-218
+    sweep. This retain does not confirm H-218.
 ---
 # H-219: T-028-Seeded Colgen Raises s(18)
 

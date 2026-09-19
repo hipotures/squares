@@ -48,23 +48,33 @@ experiment:
       Session-141 research wall to 2026-09-19T15:26:00Z. First probe family only.
       No second attempt at a (n, side, site_set) already on covering-values.yaml.
     record: packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/
-  lease:
-    expires: '2026-09-19T16:06:00Z'
-    host: cursor-cloud-session-141
   results:
   - shape: determination
     role: outcome
     question: >-
       Does a T-028-seeded freeze at a side in (187/40, 117/25) have mass strictly
       below 18 and print RETAINABLE?
-    outcome: invalid
-    checked_by: Not yet measured; the round is claimed.
+    outcome: criterion_met
+    checked_by: >-
+      decide_certificate printed RETAINABLE on the leftover 1871/400 freeze:
+      mass 17889361/1000000 = 17.889361, least cell mass 250001/250000, sha256
+      dd06c0e39639f06af475459a2a63f9fc8d5836b0b83ea3b6c3a4de8f212892d4. T-029.
   verdict:
-    decision: in-progress
+    decision: accepted
     primary_criterion: >-
       Confirm H-219 only when decide_certificate prints RETAINABLE on a freeze with
       mass < 18 at a side in (187/40, 117/25)
-    reason: Claimed; leftover n=18 1871/400 is the first Session-141 probe.
+    reason: >-
+      Leftover n=18 1871/400 T-028-seeded auto plus windows 5 converged at
+      17.889237 and freeze-then-decide retained T-029. Confirms H-219. Does not
+      confirm H-218.
+    budget_spent: >-
+      Covering 650.3 s, declare 19 s, decide 33 s on one core.
+    best_reached: T-029 s(18) >= 1871/400 = 4.6775 at V4/C4/S3
+  effort:
+    timebox: Session-141 first probe family
+    wall_seconds: 702
+    stopped_by: criterion
 ---
 # Exp-163: Next Rung Above T-028
 
