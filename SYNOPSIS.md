@@ -144,8 +144,8 @@ hypothesis status and summarizes experiment verdicts, and the
 | Commitments | 349 | 178 complete; 60 stopped; 66 blocked; 15 ready; 21 tentative; 9 in progress |
 | Sessions | 141 | 84 completed; 56 stopped; 1 nonterminal |
 | Explorations | 37 | 23 linked to proposed hypotheses; 14 uncodified |
-| Hypotheses | 159 | 27 confirmed; 29 refuted; 51 blocked; 14 unresolved; 6 open; 28 open questions; 2 result registered; 2 abandoned; 0 running |
-| Experiments | 146 | 40 accepted; 34 rejected; 45 unresolved; 12 baseline; 11 blocked; 3 abandoned; 1 in progress |
+| Hypotheses | 159 | 27 confirmed; 29 refuted; 51 blocked; 14 unresolved; 5 open; 28 open questions; 2 result registered; 2 abandoned; 1 running |
+| Experiments | 147 | 40 accepted; 34 rejected; 46 unresolved; 12 baseline; 11 blocked; 3 abandoned; 1 in progress |
 | Frontier results | 29 | 29 registered |
 
 <!-- END CURRENT-RESEARCH-STATUS -->
@@ -183,8 +183,9 @@ H-220 unconfirmed at n=44 `41.236782`, exp-174 left
 H-218 unconfirmed at n=19 `19.111435`, exp-175 left
 H-218 unconfirmed at n=12 `12.067502`, exp-176 left
 H-218 unconfirmed at n=12 `12.097146`, exp-177 left
-H-218 unconfirmed at n=19 `19.224565`, exp-178 is
-the next n=12 four-grid probe,
+H-218 unconfirmed at n=19 `19.224565`, exp-178 left
+H-218 unconfirmed at n=12 `12.066995`, exp-179 is
+the H-221 n=18 next-rung probe,
 and `think-qqzs` stays the selected next entry when this session terminals.
 [Session 138](packing/campaign/agent-sessions/session-138-n11-overnight-review.md)
 is the preceding route-selection handoff: PR 193 merged its records as `4ad98e90`,
@@ -520,6 +521,7 @@ case or experiment separately.
 | [n=12 793/200 T-017 Auto Window-7 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n12-793-200-t017-auto-windows7-receipt.md) | research synthesis | record | retained | — |
 | [n=12 397/100 T-017 Auto Window-7 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n12-397-100-t017-auto-windows7-receipt.md) | research synthesis | record | retained | — |
 | [n=19 241/50 T-020 Four-Grid Window-7 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n19-241-50-t020-grid4-windows7-receipt.md) | research synthesis | record | retained | — |
+| [n=12 793/200 T-017 Four-Grid Window-7 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n12-793-200-t017-grid4-windows7-receipt.md) | research synthesis | record | retained | — |
 | [n=20 973/200 T-021-Seeded Four-Grid Window-7 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n20-973-200-t021-grid4-windows7-receipt.md) | research synthesis | record | retained | — |
 | [n=20 973/200 T-021-Seeded Four-Grid Window-7 2400 s Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n20-973-200-t021-grid4-windows7-2400-receipt.md) | research synthesis | record | retained | — |
 | [n=21 97/20 T-021-Seeded Auto Window-6 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n21-97-20-t021-auto-windows6-receipt.md) | research synthesis | record | retained | — |
@@ -4060,10 +4062,10 @@ round that names the hypothesis, control roles included.
 | [H-215](packing/campaign/hypotheses/H-215-kinetics-predict-search-quality.md) | open question | Which headless kinetic measurements, if any, predict that a fixed-budget search setting will produce better valid packings? | 0 | — |
 | [H-216](packing/campaign/hypotheses/H-216-point-certificate-at-n6-299-100.md) | open | A helper-free point-atom certificate exists for n=6 at side 299/100 with B = 9977/10000 on the 181-direction net, on some named site set | 0 | — |
 | [H-217](packing/campaign/hypotheses/H-217-route-f1-majority-floor-at-153-40.md) | blocked | The rows-complete covering LP with weighted-majority, k-of-S, and floor atoms on arrangement-vertex sites is below 11 at 153/40 | 0 | — |
-| [H-218](packing/campaign/hypotheses/H-218-existing-colgen-raises-a-small-n-floor.md) | abandoned | A rows-complete covering of mass strictly below n exists at a container side strictly above the current verified floor for at least one n in {12, 17, 19, 20} | 8 | exp-162 abandoned; exp-164 unresolved at 19.857588; exp-165 unresolved at 19.887914; exp-174 unresolved at 19.111435; exp-175 unresolved at 12.067502; exp-176 unresolved at 12.097146; exp-177 unresolved at 19.224565; exp-178 claimed at n=12 793/200 four-grid |
+| [H-218](packing/campaign/hypotheses/H-218-existing-colgen-raises-a-small-n-floor.md) | abandoned | A rows-complete covering of mass strictly below n exists at a container side strictly above the current verified floor for at least one n in {12, 17, 19, 20} | 8 | exp-162 abandoned; exp-164 unresolved at 19.857588; exp-165 unresolved at 19.887914; exp-174 unresolved at 19.111435; exp-175 unresolved at 12.067502; exp-176 unresolved at 12.097146; exp-177 unresolved at 19.224565; exp-178 unresolved at 12.066995 |
 | [H-219](packing/campaign/hypotheses/H-219-t028-seeded-colgen-raises-s18.md) | confirmed | A rows-complete covering of mass strictly below 18 exists at a container side in (187/40, 117/25) on a T-028-seeded stock-colgen site set | 1 | T-029 |
 | [H-220](packing/campaign/hypotheses/H-220-seedless-colgen-raises-nagamochi-floor.md) | unresolved | A rows-complete covering of mass strictly below n exists at a queued Nagamochi-only side on a seedless stock-colgen site set | 8 | exp-166 unresolved at 29.803318; exp-167 unresolved at 28.331329; exp-168 unresolved at 27.178193; exp-169 unresolved at 25.000000; exp-170 unresolved at 25.000000; exp-171 unresolved, freeze interval-refused; exp-172 unresolved at 42.137360; exp-173 unresolved at 41.236782 |
-| [H-221](packing/campaign/hypotheses/H-221-t029-seeded-colgen-raises-s18.md) | open | A rows-complete covering of mass strictly below 18 exists at a container side in (1871/400, 117/25) on a T-029-seeded stock-colgen site set | 0 | — |
+| [H-221](packing/campaign/hypotheses/H-221-t029-seeded-colgen-raises-s18.md) | running | A rows-complete covering of mass strictly below 18 exists at a container side in (1871/400, 117/25) on a T-029-seeded stock-colgen site set | 1 | exp-179 claimed at n=18 4679/1000 |
 
 ### Confirmed
 
@@ -4357,9 +4359,9 @@ The relevant generator writes the receipt, and the entry fills in on the next
 
 ## Experiments Conducted
 
-There are 146 rounds registered in `series-000`.
+There are 147 rounds registered in `series-000`.
 
-They record 2512.1 agent-minutes and 2539.7 wall-minutes.
+They record 2512.1 agent-minutes and 2560.0 wall-minutes.
 These totals exclude four historical annealing rounds with unrecorded timing; their wall
 and operator costs are unknown, not zero.
 Exp129 closed as blocked without invocation and contributes zero scientific elapsed
@@ -4534,7 +4536,8 @@ archive beside it.
 | [exp-175](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-175-h218-n12-793-200-t017-auto.md) | 12 | target | H-218 | T-017 auto plus windows 7 at 793/200 | 12.067502 unconverged above 12; no freeze | unresolved |
 | [exp-176](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-176-h218-n12-397-100-t017-auto.md) | 12 | target | H-218 | T-017 auto plus windows 7 at 397/100 | 12.097146 unconverged above 12; no freeze | unresolved |
 | [exp-177](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-177-h218-n19-241-50-four-grid.md) | 19 | target | H-218 | T-020 four-grid plus windows 7 at 241/50 | 19.224565 unconverged above 19; no freeze | unresolved |
-| [exp-178](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-178-h218-n12-793-200-t017-four-grid.md) | 12 | target | H-218 | T-017 four-grid plus windows 7 at 793/200 | Claimed after exp-177 crossed 19 at 19.224565 | in-progress |
+| [exp-178](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-178-h218-n12-793-200-t017-four-grid.md) | 12 | target | H-218 | T-017 four-grid plus windows 7 at 793/200 | 12.066995 unconverged above 12; no freeze | unresolved |
+| [exp-179](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-179-h221-n18-4679-1000-t029-auto.md) | 18 | target | H-221 | T-029 auto plus windows 5 at 4679/1000 | Claimed after exp-178 crossed 12 at 12.066995 | in-progress |
 | [exp-201](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-201-arm-calibration.md) | 18 | control | H-201 | Sparsity of the single-square move set at a trivial grid | At every scale tried no single-square proposal lowers the container side; the grid is a strict local minimum under the whole move set | baseline |
 | [exp-202](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-202-round-1-perturbation.md) | 11 | target | H-201 | Gensane’s simultaneous all-square perturbation on the ordinary move menu | Takes n = 17 from exactly 5.0 to within 0.002 of Bidwell cold, and is inert above n = 26 | rejected |
 | [exp-203](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-203-round-1-pressure.md) | 11 | target | H-202 | Aggregate wall-pressure term against the plain required-side objective | Isotropic pressure optimises a disc, returning exactly 2*sqrt(2) at n = 5, so pressure must be directional | rejected |
@@ -4685,7 +4688,8 @@ archive beside it.
 | exp-175 | Session-141 n=12 793/200 T-017 auto plus windows 7 | 1222s | — | timebox | 12.067502 unconverged; crossed 12 |
 | exp-176 | Session-141 n=12 397/100 T-017 auto plus windows 7 | 1213s | — | timebox | 12.097146 unconverged; crossed 12 |
 | exp-177 | Session-141 n=19 241/50 T-020 four-grid plus windows 7 | 1257s | — | timebox | 19.224565 unconverged; crossed 19 |
-| exp-178 | Session-141 n=12 793/200 T-017 four-grid plus windows 7 | — | — | claimed | not yet measured |
+| exp-178 | Session-141 n=12 793/200 T-017 four-grid plus windows 7 | 1217s | — | timebox | 12.066995 unconverged; crossed 12 |
+| exp-179 | Session-141 n=18 4679/1000 T-029 auto plus windows 5 | — | — | claimed | not yet measured |
 | exp-201 | 1.25e9 pair tests per chain, 8 chains, 5 seeds | 2681.0 s | 95 m | criterion | `9ae7700` |
 | exp-202 | 1.25e9 pair tests per chain, 8 chains, 5 seeds, 11 cells | 3663.0 s | 60 m | criterion | `9ae7700` |
 | exp-203 | 400,000 steps per anneal, 5 seeds, 5 cells | 2349.0 s | 25 m | criterion | `9ae7700` |
@@ -4699,9 +4703,9 @@ archive beside it.
 | exp-211 | 24 deterministic trajectory cells shared with exp-212 | shared; no duplicate charge | — | criterion | `9cca493c17ab61d5efb3e1032f32c54a9b87320e` |
 | exp-212 | 48 deterministic trajectory cells | 86.689 s | — | criterion | `9cca493c17ab61d5efb3e1032f32c54a9b87320e` |
 
-### What the 146 rounds jointly establish
+### What the 147 rounds jointly establish
 
-The 146 rounds use 2512.1 agent-minutes and 2539.7 wall-minutes under the campaign’s
+The 147 rounds use 2512.1 agent-minutes and 2560.0 wall-minutes under the campaign’s
 retained effort accounting.
 The never-invoked exp129 adds no scientific result or execution time.
 Exp-114 contributes 2.46 seconds of target/replay effort; its readiness work is recorded
@@ -5567,7 +5571,7 @@ session-139 n=11 probes at 383/100, covering `11.192598` (auto grids), `11.14285
 `3.84` is the same T-025-seeded auto-plus-60 construction at 96/25, covering
 `11.371819` converged, site set refuted; `3.85` also has the session-139 T-025-seeded auto-plus-60 at 77/20, covering `11.456576`
 converged, site set refuted; `3.875` is the same construction at 31/8, covering
-`11.561186` converged, site set refuted, 0.002 below the packing; `3.965` is the session-141 n=12 T-017-seeded auto plus windows 7 at 793/200, covering `12.067502` unconverged, still above twelve, the first first-party covering row at that side; `3.969` T-017-seeded auto-grid dropped to `12.118036`
+`11.561186` converged, site set refuted, 0.002 below the packing; `3.965` is the session-141 n=12 T-017-seeded auto plus windows 7 at 793/200, covering `12.067502` unconverged, still above twelve, the first first-party covering row at that side; a session-141 T-017-seeded four-grid plus windows 7 finished at `12.066995` unconverged, still above twelve; `3.969` T-017-seeded auto-grid dropped to `12.118036`
 unconverged, still above twelve; T-017-seeded four-grid at the same side dropped to
 `12.116115` unconverged; a session-140 leftover T-017-seeded four-grid plus windows 7
 finished at `12.091168` unconverged, still above twelve; `4.6` is the session-139 n=17 auto-grid probe at 23/5,

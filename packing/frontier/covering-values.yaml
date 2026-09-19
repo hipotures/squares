@@ -2029,3 +2029,29 @@ values:
       raise it. Closer than four-grid plus windows 7 at 397/100 (12.133391) and
       3969/1000 (12.091168). T-017 is unchanged. T-030 was not offered. H-218
       stays unconfirmed. Do not more-wall this set.
+  - n: 12
+    side: '793/200'
+    side_decimal: '3.965'
+    objective: '12.066995'
+    site_set: t017-seed-four-grid-26-35-43-48-windows7
+    sites: 8569
+    rows: 9701
+    rounds: 35
+    converged: false
+    stop_reason: >-
+      The 1200 s deadline stopped the row loop after 35 LP rounds with 192 placements
+      still violated. The objective crossed 12 at round 13 (12.016486) and finished at
+      12.066995 on 8569 sites / 1184 orbits, including 2533 T-017 plus window-lattice
+      seed sites. Four-grid resolved to (26, 35, 43, 48). The objective sat at
+      12.06699 from round 32.
+    least_covered_mass: '0.988078'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n12-793-200-t017-grid4-windows7-receipt.md
+      - packing/campaign/agent-sessions/session-141-n100-research.md
+    notes: >-
+      Session-141 exp-178. T-017 seed plus four-grid (26, 35, 43, 48) plus windows 7
+      at 793/200. Unconverged mass still above twelve refutes this site set only;
+      remaining rows can only raise it. Closer than leftover auto plus windows 7 at
+      this side (12.067502). T-017 is unchanged. T-030 was not offered. H-218 stays
+      unconfirmed. Do not more-wall this set.

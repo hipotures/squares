@@ -47,7 +47,9 @@ hypothesis:
   notes: >-
     H-219 is confirmed at T-029. This is the next rung, not a replay of 1871/400.
     First named set is leftover-interval 4679/1000 auto plus windows 5. Off the
-    H-218 sweep. Do not claim an experiment until exp-164 is terminal.
+    H-218 sweep. Session-141 claimed exp-179 for that set after exp-178
+    finished above 12. Confirm only on RETAINABLE. A retain is T-030 and does
+    not confirm H-218.
 ---
 # H-221: T-029-Seeded Colgen Raises s(18)
 
