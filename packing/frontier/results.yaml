@@ -1637,7 +1637,6 @@ results:
       - E-fractional-interval-decision
     artifacts:
       - packing/cases/n18_fractional_certificate/certificate.json
-      - packing/cases/n18_fractional_certificate/certificate-187-40.json
       - packing/src/sqpack/fractional/colgen.py
       - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n18-4675-1000-t027-auto-windows5-receipt.md
     controls:
