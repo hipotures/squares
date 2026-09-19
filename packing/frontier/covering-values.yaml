@@ -2,7 +2,7 @@ softschema:
   contract: packing.squares:CoveringValues/v1
   schema: covering-values.schema.yaml
   status: enforced
-last_reviewed: '2026-09-18'
+last_reviewed: '2026-09-19'
 values:
   - n: 6
     side: '299/100'
@@ -1089,6 +1089,30 @@ values:
       pre-registered rule does not read margins and was applied as written; a denser
       site set is where any doubt about this rung would go, since adding sites lowers a
       restricted optimum.
+  - n: 20
+    side: '973/200'
+    side_decimal: '4.865'
+    objective: '19.930198'
+    site_set: t021-seed-four-grid-34-46-56-64-windows7
+    sites: 12676
+    rows: 12984
+    rounds: 34
+    converged: false
+    stop_reason: >-
+      The 1200 s deadline stopped the row loop after 34 LP rounds with 492 placements
+      still violated. The objective finished at 19.930198 on 12676 sites / 1646 orbits,
+      including 2464 T-021 seed sites, and did not cross 20.
+    least_covered_mass: '0.978980'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n20-973-200-t021-grid4-windows7-receipt.md
+      - packing/campaign/agent-sessions/session-140-lb-survey.md
+    notes: >-
+      Session-140 X-038 rank 1. T-021 seed plus four-grid (34, 46, 56, 64) plus
+      windows 7. Unconverged mass still below twenty is not a covering below 20;
+      remaining rows can only raise it. H-062's two named site sets at this side
+      already crossed. This construction is a third named site set, not a replay of
+      those walls. No covering freeze was retained.
   - n: 20
     side: '24/5'
     side_decimal: '4.80'

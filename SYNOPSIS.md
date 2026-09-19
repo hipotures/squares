@@ -5483,7 +5483,8 @@ T-019-seeded auto grid at the same side converged `17.875567` with least_covered
 retained checkpoint and frozen-certificate availability differs by row.
 Several sides are reported more than once from site sets built differently, which is the
 point of reporting them that way: at `4.85` the difference is between a wall and the
-certificate `T-021` rests on, at `4.865` it is two independent walls, and at `3.97` it
+certificate `T-021` rests on, at `4.865` it is two independent walls plus a session-140 four-grid-plus-windows-7
+construction that stopped at `19.930198` unconverged without crossing, and at `3.97` it
 is a converged grid optimum of `12.364038` above a cutting-plane row LP of `12.248227`
 with a historical reported floor of `10.845594`. That floor cannot currently be replayed
 because its generating family and state are missing; [D-478](defects.md) records the
