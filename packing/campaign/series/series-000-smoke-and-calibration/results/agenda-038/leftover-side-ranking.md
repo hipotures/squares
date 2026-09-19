@@ -41,6 +41,7 @@ Leftover n=20 `971/200` finished at `19.910044` unconverged, still below 20.
 | 20 | `971/200` four-grid plus windows 7 | Session-141 exp-164 stopped at `19.857588` unconverged below 20. Remaining rows raise. |
 | 20 | `243/50` four-grid plus windows 7 | Session-141 exp-165 stopped at `19.887914` unconverged below 20. Remaining rows raise. |
 | 32 | `29/5` seedless auto plus windows 5 | Session-141 exp-166 stopped at `29.803318` unconverged below 32. Remaining rows raise. |
+| 31 | `57/10` seedless auto plus windows 5 | Session-141 exp-167 stopped at `28.331329` unconverged below 31. Remaining rows raise. |
 | 20 | `973/200` H-062 sets | Auto-grid `20.001502` and cert-seed `20.000223` already crossed. |
 | 21 | `997/200` | Grid artifact at `25.000000`. |
 | 11 | any side above T-026 | Covering-only. Not this campaign’s floor win. |
@@ -60,10 +61,12 @@ n=61 and n=78 stay deferred.
 Leftover n=12 filled the `06:42Z` wall. Leftover n=18 `1871/400` and
 `second-wave-queue.yaml` did not start (`remain=-4s`). Session-141 later
 retained leftover n=18 as T-029 and ran n=20 `971/200` and `243/50`
-four-grid plus windows 7 to `19.857588` and `19.887914` unconverged. Do not
-replay n=17 `23/5` or `461/100`, n=20 `971/200` leftover auto or four-grid,
-n=20 `243/50` four-grid, or n=12 `3969/1000` four-grid plus windows 7, for
-more wall.
+four-grid plus windows 7 to `19.857588` and `19.887914` unconverged, then
+n=32 `29/5` to `29.803318` and n=31 `57/10` to `28.331329` unconverged. Do
+not replay n=17 `23/5` or `461/100`, n=20 `971/200` leftover auto or
+four-grid, n=20 `243/50` four-grid, n=32 `29/5` seedless auto plus
+windows 5, n=31 `57/10` seedless auto plus windows 5, or n=12 `3969/1000`
+four-grid plus windows 7, for more wall.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

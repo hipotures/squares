@@ -15,7 +15,8 @@ an untried side or an untried site set.
 | 2 | think-so2k | H-218 | 20 | `971/200` | T-021 four-grid `(34,46,56,64)` plus windows 7 | **19.857588 unconverged** |
 | 2b | think-so2k | H-218 | 20 | `243/50` | same four-grid plus windows 7 | **19.887914 unconverged** |
 | 3 | think-coet | H-220 | 32 | `29/5` | auto plus windows 5, no seed | **29.803318 unconverged** |
-| 4–10 | think-coet | H-220 | 31…44 | remaining Nagamochi sides | auto plus windows 5, no seed | 1200 s |
+| 4 | think-coet | H-220 | 31 | `57/10` | auto plus windows 5, no seed | **28.331329 unconverged** |
+| 5–10 | think-coet | H-220 | 30…44 | remaining Nagamochi sides | auto plus windows 5, no seed | 1200 s |
 | 11 | think-so2k | H-218 | 19 | `481/100` | T-020 four-grid `(34,45,56,64)` plus windows 7 | 1200 s |
 | 12 | think-so2k | H-218 | 12 | `793/200` | T-017 auto plus windows 7 | 1200 s |
 | 13 | think-so2k | H-218 | 12 | `397/100` | T-017 auto plus windows 7 | 1200 s |
@@ -38,6 +39,7 @@ First walker `--stop-at 2026-09-19T10:26:00Z`. Resume the same file after W5 wit
 | ---: | --- | --- | --- |
 | 18 | `187/40` | T-027 auto plus windows 5 | T-028 retained at `17.879034` |
 | 32 | `29/5` | seedless auto plus windows 5 | Session-141 `29.803318` unconverged; remaining rows raise |
+| 31 | `57/10` | seedless auto plus windows 5 | Session-141 `28.331329` unconverged; remaining rows raise |
 | 18 | `1871/400` | T-028 auto plus windows 5 | T-029 retained at `17.889237` |
 | 18 | `117/25` | every named seed | Locked at `18.000000` |
 | 18 | `469/100`, `47/10` | T-019 auto | Plateau or above 18 |

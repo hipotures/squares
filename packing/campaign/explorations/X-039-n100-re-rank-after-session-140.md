@@ -71,13 +71,14 @@ untried `(n, side, site_set)`”.
 | 2 | H-218 | 20 | `971/200` | T-021 seed, four-grid `(34,46,56,64)`, windows 7 | 2400 s | done; 19.857588 unconverged |
 | 3 | H-218 | 20 | `243/50` | same four-grid plus windows 7 | 1200 s | done; 19.887914 unconverged |
 | 4 | H-220 | 32 | `29/5` | auto, windows 5, no seed | 1200 s | done; 29.803318 unconverged |
-| 5–11 | H-220 | 31, 30, 26, 27, 29, 45, 44 | queued Nagamochi sides | auto, windows 5, no seed | 1200 s | low |
+| 5 | H-220 | 31 | `57/10` | auto, windows 5, no seed | 1200 s | done; 28.331329 unconverged |
+| 6–11 | H-220 | 30, 26, 27, 29, 45, 44 | queued Nagamochi sides | auto, windows 5, no seed | 1200 s | low |
 
 n=18 is off the H-218 sweep `{12, 17, 19, 20}`. A retain at `1871/400` is the next T-id
 and does not confirm H-218. Rank 2 finished `19.857588` unconverged; remaining rows
 raise. Rank 3 finished `19.887914` unconverged; remaining rows raise. H-218 stays
 unconfirmed. exp-162 is abandoned; the reopen is exp-164 then exp-165, both
-unresolved. The live probe is exp-166 / H-220 at n=32 `29/5`.
+unresolved. The live probe is exp-168 / H-220 at n=30 `559/100`.
 
 n=11 stays T-026. H-216 at n=6 is calibration, not an n=11 result. n=21 `97/20` is the
 same verified side as T-021.
@@ -100,7 +101,7 @@ One CPU. Sequential colgen. Sub-agents own audit, registration, and W5.
 | --- | --- | --- |
 | H-219 | first covering probe | Same class as T-028; unused leftover side |
 | H-218 | reopen after exp-163 terminals | exp-164 at `971/200` four-grid `19.857588` and exp-165 at `243/50` `19.887914` unconverged; do not replay those sets |
-| H-220 | live after exp-166 | exp-166 at n=32 `29/5` `29.803318` unconverged; live probe n=31 `57/10` as exp-167 |
+| H-220 | live after exp-167 | exp-166 at n=32 `29/5` `29.803318` and exp-167 at n=31 `57/10` `28.331329` unconverged; live probe n=30 `559/100` as exp-168 |
 | H-221 | after ranked H-218 long-shots | T-029-seeded next rung at `4679/1000` |
 | H-210 / H-211 | off-CPU if Node permits | Workbench determinations; not a floor |
 | H-163 / exp-161 | `--check` only | Encode already timed out; no `--search`; do not steal the covering core |
