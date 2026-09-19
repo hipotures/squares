@@ -44,6 +44,7 @@ Leftover n=20 `971/200` finished at `19.910044` unconverged, still below 20.
 | 31 | `57/10` seedless auto plus windows 5 | Session-141 exp-167 stopped at `28.331329` unconverged below 31. Remaining rows raise. |
 | 30 | `559/100` seedless auto plus windows 5 | Session-141 exp-168 stopped at `27.178193` unconverged below 30. Remaining rows raise. |
 | 26 | `513/100` seedless auto plus windows 5 | Session-141 exp-169 stopped at `25.000000` unconverged below 26. Remaining rows raise. |
+| 27 | `525/100` seedless auto plus windows 5 | Session-141 exp-170 stopped at `25.000000` unconverged below 27. Remaining rows raise. |
 | 20 | `973/200` H-062 sets | Auto-grid `20.001502` and cert-seed `20.000223` already crossed. |
 | 21 | `997/200` | Grid artifact at `25.000000`. |
 | 11 | any side above T-026 | Covering-only. Not this campaign’s floor win. |
@@ -69,8 +70,8 @@ to `27.178193`, and n=26 `513/100` to `25.000000` unconverged. Do not replay
 n=17 `23/5` or `461/100`, n=20 `971/200` leftover auto or four-grid, n=20
 `243/50` four-grid, n=32 `29/5` seedless auto plus windows 5, n=31 `57/10`
 seedless auto plus windows 5, n=30 `559/100` seedless auto plus windows 5,
-n=26 `513/100` seedless auto plus windows 5, or n=12 `3969/1000` four-grid
-plus windows 7, for more wall.
+n=26 `513/100` seedless auto plus windows 5, n=27 `525/100` seedless auto
+plus windows 5, or n=12 `3969/1000` four-grid plus windows 7, for more wall.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

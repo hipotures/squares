@@ -24,8 +24,8 @@ known packing, otherwise whichever of the two the limit is.
 **`prize` is what the limit allows, not what a search will reach.** The real
 limit is the covering value: a certificate exists at side `L` only where the
 least total mass that covers every admissible `B`-square falls below `n`, and
-that value can bind well below either cap. 77 restricted optima
-have been reported at 39 sides, one per site set, and
+that value can bind well below either cap. 78 restricted optima
+have been reported at 40 sides, one per site set, and
 `frontier/covering-values.yaml` registers each with whether its row loop
 converged; every one is at best an upper bound on the unrestricted covering
 value there. What survives here beside each is a frozen certificate or nothing
@@ -110,6 +110,7 @@ at all:
 | 31 | 5.7 | auto-41-55-68-windows5 | 28.331329 | no | The 1200 s deadline stopped the row loop after 38 LP rounds with 462 placements still violated. The objective finished at 28.331329 on 9941 sites / 1318 orbits, including 625 window-lattice seed sites. Auto resolved to (41, 55, 68). It did not cross 31. | nothing frozen here. Session-141 exp-167. First first-party covering row at n=31. Seedless auto plus windows 5 at 57/10, above the Nagamochi floor 1 + sqrt(22). Unconverged mass still below 31 is not a covering below 31; remaining rows can only raise it. T-030 was not offered. H-220 stays unconfirmed. Do not more-wall this set. |
 | 30 | 5.59 | auto-40-54-67-windows5 | 27.178193 | no | The 1200 s deadline stopped the row loop after 50 LP rounds with 93 placements still violated. The objective finished at 27.178193 on 9609 sites / 1269 orbits, including 625 window-lattice seed sites. Auto resolved to (40, 54, 67). It did not cross 30. | nothing frozen here. Session-141 exp-168. First first-party covering row at n=30. Seedless auto plus windows 5 at 559/100, above the Nagamochi floor 1 + sqrt(21). Unconverged mass still below 30 is not a covering below 30; remaining rows can only raise it. T-030 was not offered. H-220 stays unconfirmed. Do not more-wall this set. |
 | 26 | 5.13 | auto-36-49-60-windows5 | 25.000000 | no | The 1200 s deadline stopped the row loop after 42 LP rounds with 546 placements still violated. The objective sat at 25.000000 from round 11 and finished there on 7913 sites / 1049 orbits, including 625 window-lattice seed sites. Auto resolved to (36, 49, 60). It did not cross 26. | nothing frozen here. Session-141 exp-169. First first-party covering row at n=26. Seedless auto plus windows 5 at 513/100, above the Nagamochi floor 1 + sqrt(17). The 25.000000 plateau with 546 still violated is not a covering below 26; remaining rows can only raise it. T-030 was not offered. H-220 stays unconfirmed. Do not more-wall this set. |
+| 27 | 5.25 | auto-37-50-62-windows5 | 25.000000 | no | The 1200 s deadline stopped the row loop after 38 LP rounds with 546 placements still violated. The objective sat at 25.000000 and finished there on 8329 sites / 1099 orbits, including 625 window-lattice seed sites. Auto resolved to (37, 50, 62). It did not cross 27. | nothing frozen here. Session-141 exp-170. First first-party covering row at n=27. Seedless auto plus windows 5 at 525/100, above the Nagamochi floor 1 + sqrt(18). The 25.000000 plateau with 546 still violated is not a covering below 27; remaining rows can only raise it. T-030 was not offered. H-220 stays unconfirmed. Do not more-wall this set. |
 
 No covering-search run log or solver checkpoint was retained for any of them, so
 not one of the reported values can be recomputed here. What a frozen certificate
@@ -121,9 +122,9 @@ artifact's mass and the reported objective are different numbers.
 
 They are also reports of different kinds rather than one series measured the same
 way, and the `converged` column is where the difference lives: 29 of
-the 77 ran their row loop to convergence, and the rest stopped for the
+the 78 ran their row loop to convergence, and the rest stopped for the
 reason beside each — or for none the record kept — and stand as upper bounds on
-their own site sets only. 77 heterogeneous reports across a side band
+their own site sets only. 78 heterogeneous reports across a side band
 2.81 wide do not support a growth trend or a fitted curve, and no rung in
 this register has ever been claimed from one. Rank on `prize` to choose where to
 look; measure and retain the run before believing any extrapolation.
