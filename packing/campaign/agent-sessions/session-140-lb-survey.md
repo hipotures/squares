@@ -168,16 +168,22 @@ session:
       - packing-campaign
   - task: n=12 397/100 four-grid plus windows 7
     operator: session-140 covering lane
-    status: in_progress
+    status: completed
     recording: contemporaneous
-    outcome: null
-    evidence: null
-    files: null
-    checks: null
-    uncertainty: null
-    elapsed_seconds: null
-    elapsed_quality: unavailable
-    next_action: Finish the named site set under think-h02v.
+    outcome: >-
+      Converged 12.133391; freeze mass 48534459/4000000. Site set refuted. No
+      retain.
+    evidence:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n12-397-100-t017-grid4-windows7-receipt.md
+    files:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n12-397-100-t017-grid4-windows7-run.json
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n12-397-100-t017-grid4-windows7-receipt.md
+    checks:
+      - run JSON converged true; total_mass 48534459/4000000; decide_certificate not run
+    uncertainty: Adding sites can still lower the covering value at 397/100.
+    elapsed_seconds: 1079
+    elapsed_quality: platform_measured
+    next_action: Leave think-h02v open for a different site set; n=17 is next.
     phase: 2
     budget_minutes: 40
     started_at: '2026-09-19T03:06:01Z'
@@ -193,16 +199,45 @@ session:
       - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/
     excluded_commands:
       - packing-campaign
+  - task: n=17 23/5 four-grid plus windows 8
+    operator: session-140 covering lane
+    status: in_progress
+    recording: contemporaneous
+    outcome: null
+    evidence: null
+    files: null
+    checks: null
+    uncertainty: null
+    elapsed_seconds: null
+    elapsed_quality: unavailable
+    next_action: Finish the named site set under think-5q81.
+    phase: 2
+    budget_minutes: 40
+    started_at: '2026-09-19T03:24:40Z'
+    deadline_at: '2026-09-19T03:44:40Z'
+    expected_output: >-
+      agenda-038 n=17 23/5 four-grid plus windows 8 run JSON and a receipt if
+      the loop stops.
+    validation_command: >-
+      test -f packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n17-23-5-t019-grid4-windows8-run.json
+    kill_condition: Stop at 1200 s or when the row loop converges.
+    fallback: Record the restricted optimum and take rank 4.
+    write_scope:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/
+    excluded_commands:
+      - packing-campaign
   outputs:
   - packing/campaign/explorations/X-038-n100-lower-bound-survey.md
   - packing/campaign/hypotheses/H-218-existing-colgen-raises-a-small-n-floor.md
   - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-162-h218-stock-colgen-small-n-floors.md
   - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n20-973-200-t021-grid4-windows7-receipt.md
+  - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n12-397-100-t017-grid4-windows7-receipt.md
   checks:
   - Planning artifacts written; research phase open.
   - >-
     n=20 973/200 four-grid plus windows 7 stopped at 19.930198 unconverged, no
-    freeze. n=12 397/100 probe started 03:06Z.
+    freeze. n=12 397/100 converged at 12.133391, freeze above 12, no retain.
+    n=17 23/5 probe started 03:24Z.
   stop_reason: null
   next_action: >-
     Run the X-038 ranked queue under think-8x4t. Do not close think-qqzs.

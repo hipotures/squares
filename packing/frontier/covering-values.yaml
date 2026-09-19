@@ -1272,6 +1272,29 @@ values:
       sites can still lower the covering value, so 397/100 is not barred. No
       covering freeze was retained.
   - n: 12
+    side: '397/100'
+    side_decimal: '3.97'
+    objective: '12.133391'
+    site_set: t017-seed-four-grid-28-38-46-54-windows7
+    sites: 9685
+    rows: 9678
+    rounds: 36
+    converged: true
+    stop_reason: >-
+      The row loop converged: every placement covers mass 1. Objective 12.133391
+      on 9685 sites / 1307 orbits, including 2533 T-017 seed sites. Freeze mass
+      48534459/4000000.
+    least_covered_mass: '1'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n12-397-100-t017-grid4-windows7-receipt.md
+      - packing/campaign/agent-sessions/session-140-lb-survey.md
+    notes: >-
+      Session-140 X-038 rank 2. T-017 seed plus four-grid (28, 38, 46, 54) plus
+      windows 7. Converged above twelve refutes this site set. Adding sites can
+      still lower the covering value, so 397/100 is not barred. The freeze sits
+      under agenda-038 and is not a retained case. T-017 is unchanged.
+  - n: 12
     side: '398/100'
     side_decimal: '3.98'
     objective: '16.000000'

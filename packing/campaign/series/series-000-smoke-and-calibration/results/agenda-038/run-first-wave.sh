@@ -49,9 +49,30 @@ run_probe() {
   )
   local rc=$?
   echo "$(ts) EXIT ${id} rc=${rc}" | tee -a "$LOG"
-  if [[ -f "${prefix}-certificate.json" ]]; then
-    echo "$(ts) ${id}: freeze written; coordinator must decide_certificate" | tee -a "$LOG"
-    return 3
+  if [[ -f "${prefix}-certificate.json" && -f "${prefix}-run.json" ]]; then
+    local below
+    below="$(
+      cd "$PACKING" && uv run --frozen python - "$n" "${prefix}-run.json" <<'PY'
+from __future__ import annotations
+
+import json
+import sys
+from fractions import Fraction
+
+n = int(sys.argv[1])
+payload = json.loads(open(sys.argv[2]).read())
+mass = payload.get("total_mass")
+if mass is None:
+    raise SystemExit(2)
+print("yes" if Fraction(mass) < n else "no")
+PY
+    )"
+    if [[ "$below" == "yes" ]]; then
+      echo "$(ts) ${id}: freeze mass < ${n}; coordinator must decide_certificate" | tee -a "$LOG"
+      return 3
+    fi
+    echo "$(ts) ${id}: freeze mass >= ${n}; site set refuted, continue" | tee -a "$LOG"
+    return 0
   fi
   echo "$(ts) ${id}: no freeze (unconverged or mass not rationalised)" | tee -a "$LOG"
   return 0

@@ -24,7 +24,7 @@ known packing, otherwise whichever of the two the limit is.
 **`prize` is what the limit allows, not what a search will reach.** The real
 limit is the covering value: a certificate exists at side `L` only where the
 least total mass that covers every admissible `B`-square falls below `n`, and
-that value can bind well below either cap. 61 restricted optima
+that value can bind well below either cap. 62 restricted optima
 have been reported at 28 sides, one per site set, and
 `frontier/covering-values.yaml` registers each with whether its row loop
 converged; every one is at best an upper bound on the unrestricted covering
@@ -87,6 +87,7 @@ at all:
 | 12 | 3.97 | grid | 12.364038 | yes | Converged at LP round 26 -- the row loop stopped for want of a violated placement -- at 12.364038 over 625 atoms, 117.4 s. | nothing frozen here. BC-206 of agenda 022. Above twelve on a converged loop, so this site set carries no certificate at 3.97; adding sites can only lower it, so the side is not barred. Rationalised at scale 4,000,000 to 12364129/1000000, loss 0.000091. Frozen as a refuted set and kept outside the case package. |
 | 12 | 3.97 | certificate-seeded | 12.016263 | no | Crossed twelve at LP round 8 with placements still violated; the loop reached 12.095824 by round 14 before the cell stopped it. 213 s. | nothing frozen here. BC-206 of agenda 022. The grids unioned with T-017's 2097 atoms scaled to the side. Rows only raise a restricted optimum, so this site set's converged optimum is at least 12.016263. |
 | 12 | 3.97 | t017-seed-four-grid-26-35-43-48 | 12.122748 | no | The 900 s deadline stopped the row loop after 33 LP rounds with 108 placements still violated. The objective crossed 12 at round 8 (12.001574) and finished at 12.122748 on 8133 sites / 1120 orbits, including 2097 T-017 seed sites. | nothing frozen here. Session-139 T-017-seeded four-grid at 397/100. Unconverged mass still above twelve refutes this site set only; remaining rows can only raise it. Adding sites can still lower the covering value, so 397/100 is not barred. No covering freeze was retained. |
+| 12 | 3.97 | t017-seed-four-grid-28-38-46-54-windows7 | 12.133391 | yes | The row loop converged: every placement covers mass 1. Objective 12.133391 on 9685 sites / 1307 orbits, including 2533 T-017 seed sites. Freeze mass 48534459/4000000. | nothing frozen here. Session-140 X-038 rank 2. T-017 seed plus four-grid (28, 38, 46, 54) plus windows 7. Converged above twelve refutes this site set. Adding sites can still lower the covering value, so 397/100 is not barred. The freeze sits under agenda-038 and is not a retained case. T-017 is unchanged. |
 | 12 | 3.98 | grid | 16.000000 | no | Locked at exactly 16.000000 from LP round 5 and held it to round 16; 128 s. | nothing frozen here. BC-206 of agenda 022. The round value is the site set's artefact and not the covering value, one order below BC-197's 25.000000 at m = 5: with delta = 4B - L, a support missing all three windows [L - (4 - k)B, kB] admits sixteen dual-feasible unit weights whatever the covering value is. The auto grid places 43 to 44 sites per axis where those windows need hundreds to thousands. |
 | 12 | 3.985 | grid | 16.000000 | no | Locked at exactly 16.000000 from LP round 6 and held it to round 12; 55 s. | nothing frozen here. BC-206 of agenda 022. The round value is the site set's artefact and not the covering value, one order below BC-197's 25.000000 at m = 5: with delta = 4B - L, a support missing all three windows [L - (4 - k)B, kB] admits sixteen dual-feasible unit weights whatever the covering value is. The auto grid places 43 to 44 sites per axis where those windows need hundreds to thousands. |
 | 12 | 3.99 | grid | 16.000000 | no | Locked at exactly 16.000000 from LP round 7 and held it to round 12; 60 s. | nothing frozen here. BC-206 of agenda 022. The round value is the site set's artefact and not the covering value, one order below BC-197's 25.000000 at m = 5: with delta = 4B - L, a support missing all three windows [L - (4 - k)B, kB] admits sixteen dual-feasible unit weights whatever the covering value is. The auto grid places 43 to 44 sites per axis where those windows need hundreds to thousands. |
@@ -104,10 +105,10 @@ the reported value the artifact's own mass; at `3.96`, `4.58`, `4.59`, `4.67`, `
 artifact's mass and the reported objective are different numbers.
 
 They are also reports of different kinds rather than one series measured the same
-way, and the `converged` column is where the difference lives: 26 of
-the 61 ran their row loop to convergence, and the rest stopped for the
+way, and the `converged` column is where the difference lives: 27 of
+the 62 ran their row loop to convergence, and the rest stopped for the
 reason beside each — or for none the record kept — and stand as upper bounds on
-their own site sets only. 61 heterogeneous reports across a side band
+their own site sets only. 62 heterogeneous reports across a side band
 2.00 wide do not support a growth trend or a fitted curve, and no rung in
 this register has ever been claimed from one. Rank on `prize` to choose where to
 look; measure and retain the run before believing any extrapolation.
