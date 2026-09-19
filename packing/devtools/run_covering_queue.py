@@ -38,7 +38,7 @@ class Probe:
     n: int
     side: str
     grid_counts: str
-    seed_certificate: str
+    seed_certificate: str | None
     seed_windows: int
     deadline_seconds: int
 
@@ -85,13 +85,19 @@ def _require_int(item: Mapping[object, object], key: str, path: Path, index: int
     return value
 
 
+def _optional_str(item: Mapping[object, object], key: str, path: Path, index: int) -> str | None:
+    if key not in item or item[key] is None or item[key] == "":
+        return None
+    return _require_str(item, key, path, index)
+
+
 def _probe_from(item: Mapping[object, object], path: Path, index: int) -> Probe:
     return Probe(
         id=_require_str(item, "id", path, index),
         n=_require_int(item, "n", path, index),
         side=_require_str(item, "side", path, index),
         grid_counts=_require_str(item, "grid_counts", path, index),
-        seed_certificate=_require_str(item, "seed_certificate", path, index),
+        seed_certificate=_optional_str(item, "seed_certificate", path, index),
         seed_windows=_require_int(item, "seed_windows", path, index),
         deadline_seconds=_require_int(item, "deadline_seconds", path, index),
     )
@@ -124,7 +130,7 @@ def freeze_mass_below_n(n: int, run_path: Path) -> bool:
 
 
 def colgen_command(probe: Probe, prefix: Path) -> list[str]:
-    return [
+    command = [
         sys.executable,
         "-m",
         "devtools.run_fractional_colgen",
@@ -148,10 +154,6 @@ def colgen_command(probe: Probe, prefix: Path) -> list[str]:
         "60",
         "--deadline-seconds",
         str(probe.deadline_seconds),
-        "--seed-certificate",
-        probe.seed_certificate,
-        "--seed-map",
-        "scale",
         "--seed-windows",
         str(probe.seed_windows),
         "--freeze",
@@ -165,6 +167,11 @@ def colgen_command(probe: Probe, prefix: Path) -> list[str]:
         "--log",
         f"{prefix}.log",
     ]
+    if probe.seed_certificate is not None:
+        command.extend(
+            ["--seed-certificate", probe.seed_certificate, "--seed-map", "scale"]
+        )
+    return command
 
 
 def run_colgen(probe: Probe, prefix: Path) -> int:

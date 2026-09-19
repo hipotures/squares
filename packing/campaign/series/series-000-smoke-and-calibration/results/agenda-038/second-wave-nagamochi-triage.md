@@ -21,8 +21,9 @@ n=61 (gap 0.072 to 8) and n=78 (gap 0.063 to 9) are tighter integer windows and 
 worse fit for this session: no seed, larger placement sets, and they are not low n.
 They stay on the triage list, not on the four-hour queue.
 
-Do not start any of these while a first-wave probe is on the core. Do not treat a
-float LP as a floor.
+The machine form is `second-wave-queue.yaml`, walked by
+`python -m devtools.run_covering_queue`. Do not start it while a first-wave probe
+is on the core. Do not treat a float LP as a floor.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

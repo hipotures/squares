@@ -47,6 +47,7 @@ def test_load_queue_reads_named_fields(tmp_path: Path) -> None:
     assert probes[0].n == 12
     assert probes[0].grid_counts == "28,38,46,54"
     assert probes[1].seed_windows == 8
+    assert probes[0].seed_certificate is not None
 
 
 def test_freeze_mass_compare(tmp_path: Path) -> None:
@@ -123,3 +124,26 @@ def test_remain_and_command_use_the_project_interpreter() -> None:
     assert command[1:3] == ["-m", "devtools.run_fractional_colgen"]
     assert "--n" in command and "20" in command
     assert "python3" not in Path(command[0]).name
+    assert "--seed-certificate" in command
+
+
+def test_omitted_seed_certificate_drops_the_seed_flags(tmp_path: Path) -> None:
+    path = tmp_path / "queue.yaml"
+    path.write_text(
+        """
+probes:
+  - id: n32-auto
+    n: 32
+    side: '29/5'
+    grid_counts: auto
+    seed_windows: 5
+    deadline_seconds: 1200
+""",
+        encoding="utf-8",
+    )
+    probe = load_queue(path)[0]
+    assert probe.seed_certificate is None
+    command = colgen_command(probe, tmp_path / "n32-auto")
+    assert "--seed-certificate" not in command
+    assert "--seed-map" not in command
+    assert command[command.index("--seed-windows") + 1] == "5"
