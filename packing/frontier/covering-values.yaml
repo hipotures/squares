@@ -1166,27 +1166,30 @@ values:
   - n: 20
     side: '973/200'
     side_decimal: '4.865'
-    objective: '19.930198'
+    objective: '19.939212'
     site_set: t021-seed-four-grid-34-46-56-64-windows7
     sites: 12676
-    rows: 12984
-    rounds: 34
+    rows: 15731
+    rounds: 45
     converged: false
     stop_reason: >-
-      The 1200 s deadline stopped the row loop after 34 LP rounds with 492 placements
-      still violated. The objective finished at 19.930198 on 12676 sites / 1646 orbits,
-      including 2464 T-021 seed sites, and did not cross 20.
-    least_covered_mass: '0.978980'
+      The 2400 s follow-up stopped the row loop after 45 LP rounds with 255 placements
+      still violated. The objective finished at 19.939212 on 12676 sites / 1646 orbits,
+      including 2464 T-021 seed sites, and did not cross 20. The 1200 s run of the same
+      site set stopped at 19.930198 after 34 rounds.
+    least_covered_mass: '0.989323'
     frozen_artifact: null
     recorded_in:
       - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n20-973-200-t021-grid4-windows7-receipt.md
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n20-973-200-t021-grid4-windows7-2400-receipt.md
       - packing/campaign/agent-sessions/session-140-lb-survey.md
     notes: >-
-      Session-140 X-038 rank 1. T-021 seed plus four-grid (34, 46, 56, 64) plus
-      windows 7. Unconverged mass still below twenty is not a covering below 20;
-      remaining rows can only raise it. H-062's two named site sets at this side
-      already crossed. This construction is a third named site set, not a replay of
-      those walls. No covering freeze was retained.
+      Session-140 X-038 rank 1 and its 2400 s follow-up. T-021 seed plus four-grid
+      (34, 46, 56, 64) plus windows 7. Unconverged mass still below twenty is not a
+      covering below 20; remaining rows can only raise it. More wall on this set
+      raised 19.930198 to 19.939212 and did not converge. H-062's two named site
+      sets at this side already crossed. No covering freeze was retained. H-218
+      stays unconfirmed.
   - n: 20
     side: '24/5'
     side_decimal: '4.80'

@@ -8,8 +8,9 @@ Remaining rows raise that value.
 Adding sites can still lower it, so the side stays open, but leftover wall goes to an
 untried side or an untried site set, not to a replay that is already above `n`.
 
-The in-flight n=20 `973/200` four-grid plus windows 7 run is the exception: it is still
-below 20. That follow-up stays on `first-wave-queue.yaml`.
+The n=20 `973/200` four-grid plus windows 7 2400 s follow-up stopped at `19.939212`
+unconverged. That set stays below 20 and is not a retain.
+Leftover n=20 is `971/200`.
 
 ## Queue
 

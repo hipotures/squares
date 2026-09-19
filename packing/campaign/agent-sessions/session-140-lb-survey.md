@@ -80,7 +80,7 @@ session:
     evidence: []
     stop_reason: null
     next_action: >-
-      T-028 retained. Finish the n=20 2400 s follow-up, then n=21, then leftover.
+      T-028 retained. n=20 2400 s finished unconverged. Finish n=21, then leftover.
   budget:
     wall_minutes: 260
     max_cycles: 2
@@ -343,16 +343,25 @@ session:
       - packing-campaign
   - task: n=20 973/200 four-grid plus windows 7, 2400 s
     operator: session-140 covering lane
-    status: in_progress
+    status: completed
     recording: contemporaneous
-    outcome: null
-    evidence: null
-    files: null
-    checks: null
-    uncertainty: null
-    elapsed_seconds: null
-    elapsed_quality: unavailable
-    next_action: Finish the longer wall under think-d2ad.
+    outcome: >-
+      Unconverged 19.939212 after 45 LP rounds, 255 still violated, no crossing.
+      Same site set as the 1200 s run; more wall raised 19.930198 to 19.939212.
+      Not a freeze. T-021 unchanged. H-218 unconfirmed.
+    evidence:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n20-973-200-t021-grid4-windows7-2400-receipt.md
+    files:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n20-973-200-t021-grid4-windows7-2400-run.json
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n20-973-200-t021-grid4-windows7-2400-receipt.md
+    checks:
+      - run JSON objective 19.93921181902003; no freeze file
+    uncertainty: >-
+      Remaining rows can only raise the restricted optimum, so this is not a
+      covering below 20.
+    elapsed_seconds: 2535
+    elapsed_quality: platform_measured
+    next_action: Leave think-d2ad open for leftover 971/200; n=21 is next.
     phase: 2
     budget_minutes: 50
     started_at: '2026-09-19T04:15:36Z'
@@ -368,6 +377,35 @@ session:
       - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/
     excluded_commands:
       - packing-campaign
+  - task: n=21 97/20 T-021 auto plus windows 6
+    operator: session-140 covering lane
+    status: in_progress
+    recording: contemporaneous
+    outcome: null
+    evidence: null
+    files: null
+    checks: null
+    uncertainty: >-
+      A freeze at 97/20 with mass in [20, 21) would re-certificate T-021's side,
+      not raise a floor. Do not mint T-029 on that freeze.
+    elapsed_seconds: null
+    elapsed_quality: unavailable
+    next_action: Finish n=21, then leftover-queue.yaml.
+    phase: 2
+    budget_minutes: 25
+    started_at: '2026-09-19T04:57:51Z'
+    deadline_at: '2026-09-19T05:22:51Z'
+    expected_output: >-
+      agenda-038 n=21 97/20 T-021 auto plus windows 6 run JSON and a receipt if
+      the loop stops.
+    validation_command: >-
+      test -f packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n21-97-20-t021-auto-windows6-run.json
+    kill_condition: Stop at 1200 s or when the row loop converges.
+    fallback: Record the restricted optimum and start leftover-queue.yaml.
+    write_scope:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/
+    excluded_commands:
+      - packing-campaign
   outputs:
   - packing/campaign/explorations/X-038-n100-lower-bound-survey.md
   - packing/campaign/hypotheses/H-218-existing-colgen-raises-a-small-n-floor.md
@@ -378,20 +416,20 @@ session:
   - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n19-481-100-t020-auto-windows6-receipt.md
   - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n18-4675-1000-t027-auto-windows5-receipt.md
   - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/leftover-side-ranking.md
+  - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n20-973-200-t021-grid4-windows7-2400-receipt.md
   checks:
   - Planning artifacts written; research phase open.
   - >-
-    n=20 973/200 four-grid plus windows 7 stopped at 19.930198 unconverged, no
-    freeze. n=12 397/100 converged at 12.133391, freeze above 12, no retain.
-    n=17 23/5 four-grid plus windows 8 stopped at 17.120106 unconverged, no
-    freeze. n=19 481/100 T-020 auto plus windows 6 stopped at 19.132115
+    n=20 973/200 four-grid plus windows 7 stopped at 19.939212 unconverged after
+    2400 s, no freeze. n=12 397/100 converged at 12.133391, freeze above 12, no
+    retain. n=17 23/5 four-grid plus windows 8 stopped at 17.120106 unconverged,
+    no freeze. n=19 481/100 T-020 auto plus windows 6 stopped at 19.132115
     unconverged, no freeze; new covering side 4.81. n=18 4675/1000 converged
     17.879034, freeze mass 35758287/2000000, RETAINABLE; T-028 lands 187/40.
-    n=20 2400 s follow-up started 04:15Z. H-218 unconfirmed.
+    n=21 97/20 started 04:57Z. H-218 unconfirmed.
   stop_reason: null
   next_action: >-
-    Finish the n=20 2400 s probe, then n=21, then leftover-queue.yaml.
-    Do not close think-qqzs.
+    Finish n=21, then leftover-queue.yaml. Do not close think-qqzs.
 ---
 # Session 140: N<=100 Lower-Bound Survey
 
