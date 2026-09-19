@@ -37,7 +37,8 @@ masses. It does not replay a named site set whose restricted optimum is already 
 `n`, and it does not treat a still-below-`n` unconverged loop as a retain.
 
 Thirty-two sizes in `1..100` stay proved equal. Sixty-eight stay open. First-party
-covering still exists only on `11, 12, 17, 18, 19, 20, 21`.
+covering exists on `11, 12, 17, 18, 19, 20, 21` and now also on
+`26, 27, 29, 30, 31, 32, 44, 45`. None of those Nagamochi rows retained.
 
 ## Session-140 masses that decide the next spend
 
@@ -77,14 +78,16 @@ untried `(n, side, site_set)`”.
 | 8 | H-220 | 27 | `525/100` | auto, windows 5, no seed | 1200 s | done; 25.000000 unconverged |
 | 9 | H-220 | 29 | `548/100` | auto, windows 5, no seed | 1200 s | done; freeze 26.0409395; interval refused |
 | 10 | H-220 | 45 | `684/100` | auto, windows 5, no seed | 1200 s | done; 42.137360 unconverged |
-| 11 | H-220 | 44 | `675/100` | auto, windows 5, no seed | 1200 s | live as exp-173 |
+| 11 | H-220 | 44 | `675/100` | auto, windows 5, no seed | 1200 s | done; 41.236782 unconverged |
 
 n=18 is off the H-218 sweep `{12, 17, 19, 20}`. A retain at `1871/400` is the next T-id
 and does not confirm H-218. Rank 2 finished `19.857588` unconverged; remaining rows
 raise. Rank 3 finished `19.887914` unconverged; remaining rows raise. H-218 stays
 unconfirmed. exp-162 is abandoned; the reopen is exp-164 then exp-165, both
 unresolved. exp-171 at n=29 `548/100` converged and froze; the interval route
-refused. The next probe is exp-173 / H-220 at n=44 `675/100`.
+refused. exp-173 at n=44 `675/100` finished `41.236782` unconverged. The eight
+H-220 sides are measured. The next probe is exp-174 / H-218 at n=19 `481/100`
+four-grid plus windows 7.
 
 n=11 stays T-026. H-216 at n=6 is calibration, not an n=11 result. n=21 `97/20` is the
 same verified side as T-021.
@@ -106,8 +109,8 @@ One CPU. Sequential colgen. Sub-agents own audit, registration, and W5.
 | Claim | This session | Why |
 | --- | --- | --- |
 | H-219 | first covering probe | Same class as T-028; unused leftover side |
-| H-218 | reopen after exp-163 terminals | exp-164 at `971/200` four-grid `19.857588` and exp-165 at `243/50` `19.887914` unconverged; do not replay those sets |
-| H-220 | live after exp-172 | exp-166–170 and exp-172 unconverged; exp-171 n=29 freeze interval-refused; next probe n=44 `675/100` as exp-173 |
+| H-218 | live after H-220 | exp-164 at `971/200` four-grid `19.857588` and exp-165 at `243/50` `19.887914` unconverged; next probe n=19 `481/100` four-grid as exp-174 |
+| H-220 | eight sides measured | exp-166–170, exp-172, and exp-173 unconverged; exp-171 n=29 freeze interval-refused; no RETAINABLE |
 | H-221 | after ranked H-218 long-shots | T-029-seeded next rung at `4679/1000` |
 | H-210 / H-211 | off-CPU if Node permits | Workbench determinations; not a floor |
 | H-163 / exp-161 | `--check` only | Encode already timed out; no `--search`; do not steal the covering core |

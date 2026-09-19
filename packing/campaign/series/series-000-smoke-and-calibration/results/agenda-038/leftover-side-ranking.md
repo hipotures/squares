@@ -47,6 +47,7 @@ Leftover n=20 `971/200` finished at `19.910044` unconverged, still below 20.
 | 27 | `525/100` seedless auto plus windows 5 | Session-141 exp-170 stopped at `25.000000` unconverged below 27. Remaining rows raise. |
 | 29 | `548/100` seedless auto plus windows 5 | Session-141 exp-171 converged at `26.040745`, freeze mass `26.0409395`; interval refused. Do not more-wall. |
 | 45 | `684/100` seedless auto plus windows 5 | Session-141 exp-172 stopped at `42.137360` unconverged below 45. Remaining rows raise. |
+| 44 | `675/100` seedless auto plus windows 5 | Session-141 exp-173 stopped at `41.236782` unconverged below 44. Remaining rows raise. |
 | 20 | `973/200` H-062 sets | Auto-grid `20.001502` and cert-seed `20.000223` already crossed. |
 | 21 | `997/200` | Grid artifact at `25.000000`. |
 | 11 | any side above T-026 | Covering-only. Not this campaign’s floor win. |
@@ -58,8 +59,8 @@ They are not the first leftover spend: each already has a restricted optimum abo
 
 ## Second wave
 
-`second-wave-nagamochi-triage.md` keeps n=32, 31, 30, 26, 27, 29, 45, 44. An audit left
-those eight sides in the floor-to-ceiling interval.
+`second-wave-nagamochi-triage.md` keeps n=32, 31, 30, 26, 27, 29, 45, 44. Session-141
+measured all eight. None printed `RETAINABLE`.
 n=28 is in the 26–32 block and is omitted.
 n=61 and n=78 stay deferred.
 
@@ -74,7 +75,8 @@ n=17 `23/5` or `461/100`, n=20 `971/200` leftover auto or four-grid, n=20
 seedless auto plus windows 5, n=30 `559/100` seedless auto plus windows 5,
 n=26 `513/100` seedless auto plus windows 5, n=27 `525/100` seedless auto
 plus windows 5, n=29 `548/100` seedless auto plus windows 5, n=45 `684/100` seedless auto
-plus windows 5, or n=12 `3969/1000` four-grid plus windows 7, for more wall.
+plus windows 5, n=44 `675/100` seedless auto plus windows 5, or n=12 `3969/1000`
+four-grid plus windows 7, for more wall.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

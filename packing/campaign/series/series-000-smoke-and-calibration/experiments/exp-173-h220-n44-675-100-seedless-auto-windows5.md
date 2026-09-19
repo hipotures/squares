@@ -49,23 +49,35 @@ experiment:
       Do not replay n=32 29/5, n=31 57/10, n=30 559/100, n=26 513/100, n=27 525/100,
       n=29 548/100, or n=45 684/100 auto plus windows 5.
     record: packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/
-  lease:
-    expires: '2026-09-19T16:06:00Z'
-    host: cursor-cloud-session-141
   results:
   - shape: determination
     role: outcome
     question: >-
       Does a seedless auto plus windows-5 freeze at 675/100 have mass strictly below 44
       and print RETAINABLE?
-    outcome: invalid
-    checked_by: Not yet measured; the round is claimed.
+    outcome: criterion_missed
+    checked_by: >-
+      1200 s deadline stopped the row loop after 28 LP rounds at 41.236782 with
+      546 placements still violated. No freeze. Did not cross 44.
   verdict:
-    decision: in-progress
+    decision: unresolved
     primary_criterion: >-
       Confirm H-220 only when decide_certificate prints RETAINABLE on a freeze with
       mass < 44 at a side strictly above the Nagamochi floor
-    reason: Claimed; eighth Nagamochi probe after exp-172 n=45 684/100 stayed at 42.137360 unconverged.
+    reason: >-
+      Seedless auto plus windows 5 at 675/100 finished unconverged below 44.
+      Remaining rows raise. That site set is not a retain. The eight queued
+      Nagamochi sides are measured. H-220 stays unconfirmed.
+    budget_spent: Covering 1300.3 s on one core.
+    best_reached: restricted optimum 41.236782 unconverged, no freeze
+    resume_from: >-
+      Do not replay n=44 675/100 auto plus windows 5. The next named set is
+      exp-174 at n=19 481/100 T-020 four-grid plus windows 7. Remaining rows
+      raise this set.
+  effort:
+    timebox: Session-141 n=44 675/100 seedless auto plus windows 5
+    wall_seconds: 1300
+    stopped_by: timebox
 ---
 # Exp-173: H-220 Eighth Nagamochi Probe
 
@@ -73,6 +85,11 @@ This is the eighth scientific round of
 [H-220](../../../hypotheses/H-220-seedless-colgen-raises-nagamochi-floor.md), after
 [exp-172](exp-172-h220-n45-684-100-seedless-auto-windows5.md) stopped at `42.137360`
 unconverged below 45. Remaining rows raise that set.
+
+Auto resolved to `(50, 67, 83)`. The 1200 s run stopped at `41.236782`
+unconverged below 44 after 28 LP rounds. No freeze. T-030 was not offered. The
+eight queued Nagamochi sides are measured. The follow-up is exp-174 at n=19
+`481/100` four-grid plus windows 7.
 
 Confirm only on `RETAINABLE`. There is no n=44 case package.
 

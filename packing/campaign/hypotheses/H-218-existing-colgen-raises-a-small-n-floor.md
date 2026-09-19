@@ -60,7 +60,10 @@ hypothesis:
     follow-up exp-165 at 243/50 on the same four-grid stopped at 19.887914
     unconverged below 20; remaining rows raise. Do not replay leftover auto plus
     windows 6 at 971/200 or the Session-141 four-grid at 971/200 or 243/50.
-    T-029 does not confirm this claim.
+    T-029 does not confirm this claim. After the eight H-220 Nagamochi sides
+    finished without RETAINABLE, Session-141 continues on this sweep at n=19
+    481/100 T-020 four-grid (34,45,56,64) plus windows 7 as exp-174. leftover
+    auto plus windows 6 at 481/100 already crossed 19; this is a new site set.
 ---
 # H-218: Stock Colgen Raises One Small-n Floor
 

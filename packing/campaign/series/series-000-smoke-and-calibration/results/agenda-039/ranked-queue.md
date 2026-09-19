@@ -21,7 +21,7 @@ an untried side or an untried site set.
 | 7 | think-coet | H-220 | 27 | `525/100` | auto plus windows 5, no seed | **25.000000 unconverged** |
 | 8 | think-coet | H-220 | 29 | `548/100` | auto plus windows 5, no seed | **26.040745 freeze; interval refused** |
 | 9 | think-coet | H-220 | 45 | `684/100` | auto plus windows 5, no seed | **42.137360 unconverged** |
-| 10 | think-coet | H-220 | 44 | `675/100` | auto plus windows 5, no seed | 1200 s |
+| 10 | think-coet | H-220 | 44 | `675/100` | auto plus windows 5, no seed | **41.236782 unconverged** |
 | 11 | think-so2k | H-218 | 19 | `481/100` | T-020 four-grid `(34,45,56,64)` plus windows 7 | 1200 s |
 | 12 | think-so2k | H-218 | 12 | `793/200` | T-017 auto plus windows 7 | 1200 s |
 | 13 | think-so2k | H-218 | 12 | `397/100` | T-017 auto plus windows 7 | 1200 s |
@@ -50,6 +50,7 @@ First walker `--stop-at 2026-09-19T10:26:00Z`. Resume the same file after W5 wit
 | 27 | `525/100` | seedless auto plus windows 5 | Session-141 `25.000000` unconverged; remaining rows raise |
 | 29 | `548/100` | seedless auto plus windows 5 | Session-141 freeze mass `26.0409395`; interval refused; do not more-wall |
 | 45 | `684/100` | seedless auto plus windows 5 | Session-141 `42.137360` unconverged; remaining rows raise |
+| 44 | `675/100` | seedless auto plus windows 5 | Session-141 `41.236782` unconverged; remaining rows raise |
 | 18 | `1871/400` | T-028 auto plus windows 5 | T-029 retained at `17.889237` |
 | 18 | `117/25` | every named seed | Locked at `18.000000` |
 | 18 | `469/100`, `47/10` | T-019 auto | Plateau or above 18 |
