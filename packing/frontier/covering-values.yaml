@@ -1600,6 +1600,32 @@ values:
       still lower the covering value, so 397/100 is not barred. The freeze sits
       under agenda-038 and is not a retained case. T-017 is unchanged.
   - n: 12
+    side: '397/100'
+    side_decimal: '3.97'
+    objective: '12.097146'
+    site_set: t017-seed-auto-26-35-43-windows7
+    sites: 6269
+    rows: 8086
+    rounds: 34
+    converged: false
+    stop_reason: >-
+      The 1200 s deadline stopped the row loop after 34 LP rounds with 33 placements
+      still violated. The objective crossed 12 at round 8 (12.021858) and finished at
+      12.097146 on 6269 sites / 885 orbits, including 2533 T-017 plus window-lattice
+      seed sites. Auto resolved to (26, 35, 43). The objective sat at 12.097146 from
+      round 32.
+    least_covered_mass: '0.998924'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n12-397-100-t017-auto-windows7-receipt.md
+      - packing/campaign/agent-sessions/session-141-n100-research.md
+    notes: >-
+      Session-141 exp-176. T-017 seed plus auto (26, 35, 43) plus windows 7 at
+      397/100. Unconverged mass still above twelve refutes this site set only;
+      remaining rows can only raise it. Closer than four-grid plus windows 7 at
+      this side (12.133391). Side 3.97 already exists. T-017 is unchanged. T-030
+      was not offered. H-218 stays unconfirmed. Do not more-wall this set.
+  - n: 12
     side: '398/100'
     side_decimal: '3.98'
     objective: '16.000000'

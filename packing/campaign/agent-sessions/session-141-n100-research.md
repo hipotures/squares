@@ -87,7 +87,7 @@ session:
       - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n18-1871-400-t028-auto-windows5-receipt.md
       - packing/frontier/n-018.md
     stop_reason: null
-    next_action: Walk n=12 397/100 T-017 auto under think-so2k / exp-176.
+    next_action: Walk n=19 241/50 T-020 four-grid under think-so2k / exp-177.
   budget:
     wall_minutes: 520
     max_cycles: 8
@@ -496,6 +496,30 @@ session:
     budget_minutes: 41
     started_at: '2026-09-19T13:02:00Z'
     deadline_at: '2026-09-19T13:23:00Z'
+  - task: Record n=12 397/100 T-017 auto and claim exp-177
+    operator: session-141 coordinator
+    status: completed
+    recording: contemporaneous
+    outcome: >-
+      exp-176 stopped at 12.097146 unconverged above 12 after 34 rounds / 1213 s.
+      Crossed 12 at round 8. No freeze. T-030 not offered. H-218 unconfirmed.
+      Walker started n=19 241/50 T-020 four-grid as exp-177.
+    evidence:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n12-397-100-t017-auto-windows7-receipt.md
+    files:
+      - packing/frontier/covering-values.yaml
+      - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-176-h218-n12-397-100-t017-auto.md
+      - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-177-h218-n19-241-50-four-grid.md
+    checks:
+      - decide_certificate not run; no freeze below 12
+    uncertainty: Remaining rows on n=12 397/100 auto raise; new site set at existing 3.97.
+    elapsed_seconds: 1213
+    elapsed_quality: operator_reported_approximate
+    next_action: think-so2k
+    phase: 2
+    budget_minutes: 40
+    started_at: '2026-09-19T13:23:00Z'
+    deadline_at: '2026-09-19T13:43:00Z'
   outputs:
     - packing/campaign/explorations/X-039-n100-re-rank-after-session-140.md
     - packing/campaign/hypotheses/H-219-t028-seeded-colgen-raises-s18.md
@@ -516,6 +540,7 @@ session:
     - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n44-675-100-auto-windows5-receipt.md
     - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n19-481-100-t020-grid4-windows7-receipt.md
     - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n12-793-200-t017-auto-windows7-receipt.md
+    - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n12-397-100-t017-auto-windows7-receipt.md
     - packing/campaign/agent-sessions/session-141-n100-research.md
   checks: []
   stop_reason: null
@@ -590,6 +615,8 @@ pattern, not a new case class. Score S3. `produced_by.session` is `session-141`.
 - n=19 `481/100` four-grid finished `19.111435` unconverged after crossing 19;
   do not replay that set.
 - n=12 `793/200` auto finished `12.067502` unconverged after crossing 12;
+  do not replay that set.
+- n=12 `397/100` auto finished `12.097146` unconverged after crossing 12;
   do not replay that set.
 - A H-218 RETAINABLE at n=19, 12, or 18 `4679/1000` (H-221) is T-030.
   n=19 already has T-020. Copy the T-029 landing pattern. T-030 artifacts
