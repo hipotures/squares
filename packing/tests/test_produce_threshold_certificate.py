@@ -146,7 +146,9 @@ def test_covering_timeout_is_unresolved_never_refused(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     def timeout_linprog(*_args: object, **_kwargs: object) -> OptimizeResult:
-        return OptimizeResult(success=False, status=1, x=None, ineqlin=None, message="time limit")
+        return OptimizeResult(
+            success=False, status=1, x=None, ineqlin=None, message="time limit"
+        )
 
     monkeypatch.setattr(producer, "linprog", timeout_linprog)
     outcome = solve_covering(sparse.csr_matrix([[1.0, 0.0], [0.0, 1.0]]), np.array([1.0, 1.0]))
