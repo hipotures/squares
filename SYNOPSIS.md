@@ -144,8 +144,8 @@ hypothesis status and summarizes experiment verdicts, and the
 | Commitments | 349 | 178 complete; 60 stopped; 66 blocked; 15 ready; 21 tentative; 9 in progress |
 | Sessions | 141 | 84 completed; 56 stopped; 1 nonterminal |
 | Explorations | 37 | 23 linked to proposed hypotheses; 14 uncodified |
-| Hypotheses | 158 | 27 confirmed; 29 refuted; 51 blocked; 13 unresolved; 6 open; 28 open questions; 2 result registered; 2 abandoned |
-| Experiments | 131 | 40 accepted; 34 rejected; 31 unresolved; 12 baseline; 11 blocked; 3 abandoned |
+| Hypotheses | 158 | 27 confirmed; 29 refuted; 51 blocked; 13 unresolved; 6 open; 28 open questions; 2 result registered; 2 abandoned; 0 running |
+| Experiments | 131 | 40 accepted; 34 rejected; 31 unresolved; 12 baseline; 11 blocked; 3 abandoned; 0 in progress |
 | Frontier results | 29 | 29 registered |
 
 <!-- END CURRENT-RESEARCH-STATUS -->
@@ -4331,7 +4331,7 @@ The relevant generator writes the receipt, and the entry fills in on the next
 
 There are 131 rounds registered in `series-000`.
 
-They record 2512.1 agent-minutes and 2217.8 wall-minutes.
+They record 2512.1 agent-minutes and 2229.5 wall-minutes.
 These totals exclude four historical annealing rounds with unrecorded timing; their wall
 and operator costs are unknown, not zero.
 Exp129 closed as blocked without invocation and contributes zero scientific elapsed
@@ -4643,7 +4643,7 @@ archive beside it.
 
 ### What the 131 rounds jointly establish
 
-The 131 rounds use 2512.1 agent-minutes and 2217.8 wall-minutes under the campaign’s
+The 131 rounds use 2512.1 agent-minutes and 2229.5 wall-minutes under the campaign’s
 retained effort accounting.
 The never-invoked exp129 adds no scientific result or execution time.
 Exp-114 contributes 2.46 seconds of target/replay effort; its readiness work is recorded

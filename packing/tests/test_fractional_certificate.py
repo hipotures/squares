@@ -36,8 +36,7 @@ from cases.n17_fractional_certificate.replay import declared as n17_declared
 from cases.n17_fractional_certificate.replay import load as n17_load
 from cases.n17_weighted_certificate.fixture import load_retained_fixture
 from cases.n18_fractional_certificate.__main__ import replay as replay_n18
-from cases.n18_fractional_certificate.replay import RUNG_187_40_PATH
-from cases.n18_fractional_certificate.replay import RUNG_467_100_PATH
+from cases.n18_fractional_certificate.replay import RUNG_187_40_PATH, RUNG_467_100_PATH
 from cases.n18_fractional_certificate.replay import declared as n18_declared
 from cases.n18_fractional_certificate.replay import load as n18_load
 from cases.n20_fractional_certificate.__main__ import replay as replay_n20
