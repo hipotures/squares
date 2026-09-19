@@ -1,6 +1,6 @@
 # Session-140 first-wave covering queue. The producer is
 # devtools.run_fractional_colgen; this file is the ranked list X-038 named.
-# A row already running or recorded is skipped by run-first-wave.sh.
+# A row already recorded is skipped by `python -m devtools.run_covering_queue`.
 probes:
   - id: n20-973-200-t021-grid4-windows7
     n: 20

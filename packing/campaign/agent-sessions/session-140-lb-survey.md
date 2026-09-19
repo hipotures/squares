@@ -237,7 +237,8 @@ session:
   - >-
     n=20 973/200 four-grid plus windows 7 stopped at 19.930198 unconverged, no
     freeze. n=12 397/100 converged at 12.133391, freeze above 12, no retain.
-    n=17 23/5 probe started 03:24Z.
+    n=17 23/5 probe started 03:24Z. The first-wave waiter is
+    `python -m devtools.run_covering_queue`; the shell script is gone.
   stop_reason: null
   next_action: >-
     Run the X-038 ranked queue under think-8x4t. Do not close think-qqzs.
