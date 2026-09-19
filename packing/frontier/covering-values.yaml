@@ -1876,3 +1876,28 @@ values:
       plus windows 5 at 548/100, above the Nagamochi floor 1 + sqrt(20). The
       first Nagamochi freeze with mass below n. Interval route refused; T-030
       was not offered. H-220 stays unconfirmed. Do not more-wall this set.
+  - n: 45
+    side: '684/100'
+    side_decimal: '6.84'
+    objective: '42.137360'
+    site_set: auto-51-68-84-windows5
+    sites: 15173
+    rows: 9572
+    rounds: 26
+    converged: false
+    stop_reason: >-
+      The 1200 s deadline stopped the row loop after 26 LP rounds with 546 placements
+      still violated. The objective finished at 42.137360 on 15173 sites / 1967
+      orbits, including 900 window-lattice seed sites. Auto resolved to (51, 68,
+      84). It did not cross 45.
+    least_covered_mass: '0.879972'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n45-684-100-auto-windows5-receipt.md
+      - packing/campaign/agent-sessions/session-141-n100-research.md
+    notes: >-
+      Session-141 exp-172. First first-party covering row at n=45. Seedless auto
+      plus windows 5 at 684/100, above the Nagamochi floor 1 + sqrt(34).
+      Unconverged mass still below 45 is not a covering below 45; remaining rows
+      can only raise it. T-030 was not offered. H-220 stays unconfirmed. Do not
+      more-wall this set.

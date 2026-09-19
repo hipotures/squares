@@ -87,7 +87,7 @@ session:
       - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n18-1871-400-t028-auto-windows5-receipt.md
       - packing/frontier/n-018.md
     stop_reason: null
-    next_action: Walk n=45 684/100 seedless auto under think-coet / exp-172.
+    next_action: Walk n=44 675/100 seedless auto under think-coet / exp-173.
   budget:
     wall_minutes: 520
     max_cycles: 8
@@ -400,6 +400,30 @@ session:
     budget_minutes: 20
     started_at: '2026-09-19T11:44:00Z'
     deadline_at: '2026-09-19T12:04:00Z'
+  - task: Record n=45 684/100 seedless and claim exp-173
+    operator: session-141 coordinator
+    status: completed
+    recording: contemporaneous
+    outcome: >-
+      exp-172 stopped at 42.137360 unconverged below 45 after 26 rounds / 1254 s.
+      No freeze. T-030 not offered. H-220 unconfirmed. Walker started n=44
+      675/100 as exp-173.
+    evidence:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n45-684-100-auto-windows5-receipt.md
+    files:
+      - packing/frontier/covering-values.yaml
+      - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-172-h220-n45-684-100-seedless-auto-windows5.md
+      - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-173-h220-n44-675-100-seedless-auto-windows5.md
+    checks:
+      - decide_certificate not run; no freeze below 45
+    uncertainty: Remaining rows on n=45 684/100 raise; first first-party covering row at n=45.
+    elapsed_seconds: 1254
+    elapsed_quality: operator_reported_approximate
+    next_action: think-coet
+    phase: 2
+    budget_minutes: 42
+    started_at: '2026-09-19T11:58:00Z'
+    deadline_at: '2026-09-19T12:40:00Z'
   outputs:
     - packing/campaign/explorations/X-039-n100-re-rank-after-session-140.md
     - packing/campaign/hypotheses/H-219-t028-seeded-colgen-raises-s18.md
@@ -416,6 +440,7 @@ session:
     - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/w5-think-g4n9-hosted-walls.md
     - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n27-525-100-auto-windows5-receipt.md
     - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n29-548-100-auto-windows5-receipt.md
+    - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n45-684-100-auto-windows5-receipt.md
     - packing/campaign/agent-sessions/session-141-n100-research.md
   checks: []
   stop_reason: null
@@ -484,7 +509,8 @@ pattern, not a new case class. Score S3. `produced_by.session` is `session-141`.
 - n=27 `525/100` finished `25.000000` unconverged; do not replay that set.
 - n=29 `548/100` converged and froze at mass `26.0409395`; interval refused;
   do not replay that set.
-- A Nagamochi RETAINABLE at n=45 or later (H-220) is T-030. There is no n=26,
+- n=45 `684/100` finished `42.137360` unconverged; do not replay that set.
+- A Nagamochi RETAINABLE at n=44 (H-220) is T-030. There is no n=26,
   n=27, n=29, n=30, n=31, or n=32 case package yet. Copy the T-029 landing
   pattern into a new `cases/nNN_fractional_certificate/` tree. T-030 artifacts
   list only the live pointer.
