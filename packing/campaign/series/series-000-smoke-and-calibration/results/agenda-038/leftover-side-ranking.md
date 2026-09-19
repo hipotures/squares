@@ -33,6 +33,7 @@ Leftover n=20 `971/200` finished at `19.910044` unconverged, still below 20.
 | 12 | `397/100` auto plus windows 7 | Session-141 exp-176 stopped at `12.097146` unconverged above 12. Remaining rows raise. |
 | 12 | `793/200` auto plus windows 7 | Session-141 exp-175 stopped at `12.067502` unconverged above 12. Remaining rows raise. |
 | 19 | `241/50` | Session-140 leftover auto plus windows 6 stopped at `19.247109`. |
+| 19 | `241/50` four-grid plus windows 7 | Session-141 exp-177 stopped at `19.224565` unconverged above 19. Remaining rows raise. |
 | 19 | `481/100` | Session-140 auto plus windows 6 stopped at `19.132115`. |
 | 19 | `481/100` four-grid plus windows 7 | Session-141 exp-174 stopped at `19.111435` unconverged above 19. Remaining rows raise. |
 | 19 | `97/20` | `19.808958`, worse than `481/100`. |
@@ -80,8 +81,8 @@ n=26 `513/100` seedless auto plus windows 5, n=27 `525/100` seedless auto
 plus windows 5, n=29 `548/100` seedless auto plus windows 5, n=45 `684/100` seedless auto
 plus windows 5, n=44 `675/100` seedless auto plus windows 5, n=19 `481/100`
 four-grid plus windows 7, n=12 `793/200` auto plus windows 7, n=12
-`397/100` auto plus windows 7, or n=12 `3969/1000` four-grid plus windows 7,
-for more wall.
+`397/100` auto plus windows 7, n=19 `241/50` four-grid plus windows 7, or
+n=12 `3969/1000` four-grid plus windows 7, for more wall.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
