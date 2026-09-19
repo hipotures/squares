@@ -3,8 +3,9 @@
 #   Do not start: rank 1 retained T-029.
 # n=20 243/50: insert into rank-queue.yaml only if rank 2 stays below 20
 #   unconverged. Same four-grid plus windows 7.
-# n=19 481/100 four-grid and n=12 793/200 now sit at the end of
-#   rank-queue.yaml (ranks 11–12). Do not start this file as a second walker.
+# n=19 481/100 four-grid, n=12 793/200, n=12 397/100 auto, n=19 241/50
+#   four-grid, n=12 793/200 four-grid, and n=18 4679/1000 now sit on
+#   rank-queue.yaml (ranks 11–16). Do not start this file as a second walker.
 # n=17 231/50 stays here and is not walked: 461/100 auto plus windows 5
 #   already crossed 17.
 probes:

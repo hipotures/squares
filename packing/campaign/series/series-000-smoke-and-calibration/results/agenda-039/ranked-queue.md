@@ -16,6 +16,10 @@ an untried side or an untried site set.
 | 3–10 | think-coet | H-220 | 32…44 | queued Nagamochi sides | auto plus windows 5, no seed | 1200 s |
 | 11 | think-so2k | H-218 | 19 | `481/100` | T-020 four-grid `(34,45,56,64)` plus windows 7 | 1200 s |
 | 12 | think-so2k | H-218 | 12 | `793/200` | T-017 auto plus windows 7 | 1200 s |
+| 13 | think-so2k | H-218 | 12 | `397/100` | T-017 auto plus windows 7 | 1200 s |
+| 14 | think-so2k | H-218 | 19 | `241/50` | T-020 four-grid `(34,45,56,64)` plus windows 7 | 1200 s |
+| 15 | think-so2k | H-218 | 12 | `793/200` | T-017 four-grid `(26,35,43,48)` plus windows 7 | 1200 s |
+| 16 | think-u11x | H-219 | 18 | `4679/1000` | T-029 auto plus windows 5 | 1200 s |
 
 Insert optional rank 1b (n=18 four-grid plus windows 5, 1800 s) only if rank 1 stays
 below 18 unconverged. Insert optional n=20 `243/50` only if rank 2 stays below 20 and
