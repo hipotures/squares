@@ -155,7 +155,7 @@ Each entry summarizes one user-level research window. Cycle slots are wall-clock
 | [session-138](agent-sessions/session-138-n11-overnight-review.md) | stopped | mixed | `factual-review` (insight) | `documentation-pass` (process) | 6 | think-4woh | Close M7's n=6 bracket at 299/100 under BC-357 / think-qqzs. H-216 is the registered determination. G1, G2, G3, and G5 are on main; G4 remains on this bead. |
 | [session-139](agent-sessions/session-139-n11-overnight-research.md) | stopped | contemporaneous | `research-loop` (insight) | `documentation-pass` (process) | 4 | think-mcb6 | Continue H-216 under think-qqzs. Route S encode-only timed out unresolved; a later block re-runs encode before --search. |
 | [session-140](agent-sessions/session-140-lb-survey.md) | stopped | contemporaneous | `review-planning-oversight` (process) | `review-planning-oversight` (process) | 3 | think-8x4t | Continue H-216 under think-qqzs. |
-| [session-141](agent-sessions/session-141-n100-research.md) | in_progress | contemporaneous | `review-planning-oversight` (process) | `research-loop` (insight) | 2 | think-ul7y | think-u11x |
+| [session-141](agent-sessions/session-141-n100-research.md) | in_progress | contemporaneous | `review-planning-oversight` (process) | `research-loop` (insight) | 2 | think-ul7y | think-q1r3 |
 
 ### Workflow summary
 
@@ -946,7 +946,7 @@ Status: **active**. Pursue n=11 results beyond the one-body ceiling L* = 38200/9
 | H-218 | abandoned | proof | A rows-complete covering of mass strictly below n exists at a containe | n: 12* 17 19* 20* | 8 |  | 404.3m wall |
 | H-219 | confirmed | proof | A rows-complete covering of mass strictly below 18 exists at a contain | n: 18* | 1 |  | 11.7m wall |
 | H-220 | unresolved | proof | A rows-complete covering of mass strictly below n exists at a containe | n: 32* 31* 30* 26* 27* 29* 45* 44* | 8 |  | 164.1m wall |
-| H-221 | running | proof | A rows-complete covering of mass strictly below 18 exists at a contain | n: 18 | 1 |  |  |
+| H-221 | confirmed | proof | A rows-complete covering of mass strictly below 18 exists at a contain | n: 18* | 1 |  | 8.2m wall |
 
 ## Needs review — held for a human, not decided
 
@@ -1070,7 +1070,7 @@ Status: **active**. Pursue n=11 results beyond the one-body ceiling L* = 38200/9
 | exp-158 | series-000 | 11 | Codex BC303 T2 charge-sweep agent | H-160 | The September 14 strategy reset paused this route before the target charge ran; no target receipt or scientific verdict exists. |
 | exp-160 | series-000 | 11 | Codex BC303 H-162 retained-receipt analyst | H-162 | The September 14 strategy reset paused this route with no exp-158 target receipt; no H-162 comparison or scientific verdict exists. |
 
-### accepted (40)
+### accepted (41)
 
 | id | series | instance | operator | hypotheses | reason |
 | --- | --- | --- | --- | --- | --- |
@@ -1113,6 +1113,7 @@ Status: **active**. Pursue n=11 results beyond the one-body ceiling L* = 38200/9
 | exp-152 | series-000 | 11 | GPT-6 Astra coordinator; implementation by GPT-5.6 Sol extra high; mathematical admission by GPT-6 Astra max | H-150 | A nonempty two-dimensional four-vertex region survives the two necessary core constraints. This accepts only the two-witness screen, not any all-direction cover or tuple exclusion. |
 | exp-155 | series-000 | 11 | Claude Fable measurement lane; retrospectively registered from the retained exact lane and T-026 proof packet without a new run | H-156 | T-026 proves the first disjunct of H-156 at V4. Its two finite decision methods supplied C4 at registration; the later mapped review of the complete self-contained claim supplies its current C5. Its exact conclusion is s(11) >= 955000*sqrt(518400042893309449)/179696714646249. |
 | exp-163 | series-000 | 18 | Cursor session-141 | H-219 | Leftover n=18 1871/400 T-028-seeded auto plus windows 5 converged at 17.889237 and freeze-then-decide retained T-029. Confirms H-219. Does not confirm H-218. |
+| exp-179 | series-000 | 18 | Cursor session-141 | H-221 | T-029-seeded auto plus windows 5 at n=18 4679/1000 converged at 17.893285 and freeze-then-decide retained T-030. Confirms H-221. Does not confirm H-218. |
 | exp-204 | series-000 | 11 | claude-opus-5 | H-203 | The proposal structure is worth its complexity at this budget: H-203 declared three of five cells improving by 0.01 and four did, two of them with disjoint seed ranges, but the other two overlap and no run came within 1e-2 of any record, so this accepts a proposer and settles nothing about record-finding. |
 
 ### baseline (12)
@@ -1131,12 +1132,6 @@ Status: **active**. Pursue n=11 results beyond the one-body ceiling L* = 38200/9
 | exp-031 | series-000 | 10 | openai-codex | H-002 | All four source perturbations satisfy every declared condition and return to the proved side within floating-point precision. This confirms the narrow known-answer control without reopening H-002's refuted universal claim. |
 | exp-032 | series-000 | 3 | openai-codex | H-021 | The exact connected and isolated controls pass, every declared conflation fails, and all unsupported floating-point observations remain unresolved. |
 | exp-201 | series-000 | 18 | claude-opus-5 | H-201 | Calibration, not a scored round: it freezes p_perturb = 1.0, perturb_scale = 2 and a flat mu = 5 for exp-202 and exp-203, and it turned up a schedule-length effect that is now registered as H-204 rather than folded into an arm. |
-
-### in-progress (1)
-
-| id | series | instance | operator | hypotheses | reason |
-| --- | --- | --- | --- | --- | --- |
-| exp-179 | series-000 | 18 | Cursor session-141 | H-221 | Claimed; first H-221 probe after exp-178 n=12 793/200 four-grid crossed 12 at 12.066995. |
 
 ## Resumable — stopped on the clock, not on an answer
 
@@ -1181,7 +1176,7 @@ Status: **active**. Pursue n=11 results beyond the one-body ceiling L* = 38200/9
 
 ## Effort
 
-147 rounds, 2512.1 agent-minutes, 2560.0 wall-minutes.
+147 rounds, 2512.1 agent-minutes, 2568.2 wall-minutes.
 
 These totals exclude 4 historical rounds with unrecorded timing; their cost is unknown, not zero.
 

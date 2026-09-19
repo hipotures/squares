@@ -782,7 +782,7 @@ values:
       windows 5. least_covered 1. Never crossed 18. Wall 650.3 s. Auto resolved to
       (32, 43, 54), not T-028's (32, 43, 53).
     least_covered_mass: '1'
-    frozen_artifact: packing/cases/n18_fractional_certificate/certificate.json
+    frozen_artifact: packing/cases/n18_fractional_certificate/certificate-1871-400.json
     recorded_in:
       - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n18-1871-400-t028-auto-windows5-receipt.md
       - packing/campaign/agent-sessions/session-141-n100-research.md
@@ -793,6 +793,34 @@ values:
       17889361/1000000 = 17.889361, least cell mass 250001/250000. Both
       decide_certificate routes accept. T-029. The covering objective and the
       artifact mass are different numbers. Confirms H-219. n=18 is off the H-218
+      sweep, so this retain does not confirm that claim. The live pointer later
+      moved to T-030; these bytes stay at certificate-1871-400.json.
+  - n: 18
+    side: '4679/1000'
+    side_decimal: '4.679'
+    objective: '17.893285'
+    site_set: t029-seed-auto-32-43-54-windows5
+    sites: 6985
+    rows: 10098
+    rounds: 39
+    converged: true
+    stop_reason: >-
+      The row loop converged at LP round 39 (violated 0) at 17.893285 on 6985 sites
+      / 929 orbits, including 1204 T-029 seed sites scaled from 1871/400 plus
+      windows 5. least_covered 1. Never crossed 18. Wall 432.9 s. Auto resolved to
+      (32, 43, 54), the same triple T-029 used.
+    least_covered_mass: '1'
+    frozen_artifact: packing/cases/n18_fractional_certificate/certificate.json
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n18-4679-1000-t029-auto-windows5-receipt.md
+      - packing/campaign/agent-sessions/session-141-n100-research.md
+      - packing/frontier/n-018.md
+    notes: >-
+      Session-141 H-221 T-029-seeded auto-grid plus windows 5 at 4679/1000.
+      Freeze-then-decide retained the candidate: 957 atoms, total mass
+      71573611/4000000 = 17.89340275, least cell mass 200001/200000. Both
+      decide_certificate routes accept. T-030. The covering objective and the
+      artifact mass are different numbers. Confirms H-221. n=18 is off the H-218
       sweep, so this retain does not confirm that claim.
   - n: 18
     side: '117/25'

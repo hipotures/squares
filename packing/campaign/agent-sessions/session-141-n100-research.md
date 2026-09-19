@@ -87,7 +87,7 @@ session:
       - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n18-1871-400-t028-auto-windows5-receipt.md
       - packing/frontier/n-018.md
     stop_reason: null
-    next_action: Walk n=18 4679/1000 T-029 auto under think-u11x / exp-179.
+    next_action: Land T-030; no more-wall on 4679/1000.
   budget:
     wall_minutes: 520
     max_cycles: 8
@@ -568,6 +568,29 @@ session:
     budget_minutes: 41
     started_at: '2026-09-19T14:04:00Z'
     deadline_at: '2026-09-19T14:24:00Z'
+  - task: Land T-030 n=18 4679/1000
+    operator: session-141 coordinator
+    status: completed
+    recording: contemporaneous
+    outcome: >-
+      T-030 retained s(18) >= 4679/1000 = 4.679 at V4/C4/S3. T-029 bytes sit at
+      certificate-1871-400.json. Confirms H-221 / exp-179. Does not confirm H-218.
+    evidence:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n18-4679-1000-t029-auto-windows5-receipt.md
+    files:
+      - packing/cases/n18_fractional_certificate/certificate.json
+      - packing/frontier/results.yaml
+      - packing/frontier/n-018.md
+    checks:
+      - decide_certificate printed RETAINABLE; sha256 b62ead6f5b6aed68704487ad6a1b78beb7a3e585676e55825c6f84942c39cd63
+    uncertainty: C5 still requires a mapped review. Remaining interval to 117/25 is 0.001.
+    elapsed_seconds: 800
+    elapsed_quality: operator_reported_approximate
+    next_action: think-q1r3
+    phase: 2
+    budget_minutes: 20
+    started_at: '2026-09-19T14:31:00Z'
+    deadline_at: '2026-09-19T14:51:00Z'
   outputs:
     - packing/campaign/explorations/X-039-n100-re-rank-after-session-140.md
     - packing/campaign/hypotheses/H-219-t028-seeded-colgen-raises-s18.md
@@ -591,10 +614,11 @@ session:
     - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n12-397-100-t017-auto-windows7-receipt.md
     - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n19-241-50-t020-grid4-windows7-receipt.md
     - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n12-793-200-t017-grid4-windows7-receipt.md
+    - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n18-4679-1000-t029-auto-windows5-receipt.md
     - packing/campaign/agent-sessions/session-141-n100-research.md
   checks: []
   stop_reason: null
-  next_action: think-u11x
+  next_action: think-q1r3
 ---
 # Session-141: Eight-Hour n<100 Research Loop
 
@@ -646,7 +670,7 @@ covering.
 
 ## T-id recipe
 
-T-029 is landed: `s(18) >= 1871/400`. Next T-id is T-030. Copy the T-029 landing
+T-030 is landed: `s(18) >= 4679/1000`. Next T-id is T-031. Copy the T-030 landing
 pattern, not a new case class. Score S3. `produced_by.session` is `session-141`.
 
 - n=20 `243/50` finished `19.887914` unconverged; do not replay that set.
@@ -672,9 +696,9 @@ pattern, not a new case class. Score S3. `produced_by.session` is `session-141`.
   do not replay that set.
 - n=12 `793/200` four-grid finished `12.066995` unconverged after crossing 12;
   do not replay that set.
-- A H-221 RETAINABLE at n=18 `4679/1000` is T-030. n=18 already has T-029.
-  Copy the T-029 landing pattern. T-030 artifacts list only the live pointer.
-- n=18 `4679/1000` is H-221, not a replay of H-219. exp-179 is claimed.
+- A H-221 RETAINABLE at n=18 `4679/1000` is T-030 and is landed. Do not
+  more-wall 4679/1000. Remaining interval to 117/25 is 0.001.
+- n=18 `4679/1000` is H-221, not a replay of H-219. exp-179 accepted T-030.
 - Do not mint a T-id on an unconverged freeze, a freeze with mass `>= n`, or n=21
   `97/20`.
 

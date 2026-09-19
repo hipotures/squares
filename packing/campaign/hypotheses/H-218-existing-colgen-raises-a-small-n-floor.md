@@ -72,9 +72,10 @@ hypothesis:
     241/50 T-020 four-grid plus windows 7 stopped at 19.224565 unconverged
     after crossing 19; remaining rows raise. Follow-up exp-178 at n=12
     793/200 T-017 four-grid plus windows 7 stopped at 12.066995 unconverged
-    after crossing 12; remaining rows raise. Follow-up is exp-179 / H-221 at
-    n=18 4679/1000 T-029 auto plus windows 5. Do not replay the Session-141
-    four-grid at 481/100 or 241/50 or 793/200 or auto at 793/200 or 397/100.
+    after crossing 12; remaining rows raise. Follow-up exp-179 / H-221 retained
+    T-030 at n=18 4679/1000. Do not replay the Session-141 four-grid at 481/100
+    or 241/50 or 793/200 or auto at 793/200 or 397/100. Do not more-wall
+    4679/1000.
 ---
 # H-218: Stock Colgen Raises One Small-n Floor
 

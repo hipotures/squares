@@ -27,7 +27,7 @@ an untried side or an untried site set.
 | 13 | think-so2k | H-218 | 12 | `397/100` | T-017 auto plus windows 7 | **12.097146 unconverged; crossed 12** |
 | 14 | think-so2k | H-218 | 19 | `241/50` | T-020 four-grid `(34,45,56,64)` plus windows 7 | **19.224565 unconverged; crossed 19** |
 | 15 | think-so2k | H-218 | 12 | `793/200` | T-017 four-grid `(26,35,43,48)` plus windows 7 | **12.066995 unconverged; crossed 12** |
-| 16 | think-u11x | H-221 | 18 | `4679/1000` | T-029 auto plus windows 5 | 1200 s |
+| 16 | think-u11x | H-221 | 18 | `4679/1000` | T-029 auto plus windows 5 | **T-030 retained** |
 
 Insert optional rank 1b (n=18 four-grid plus windows 5, 1800 s) only if rank 1 stays
 below 18 unconverged. Insert optional n=20 `243/50` only if rank 2 stays below 20 and
@@ -52,6 +52,7 @@ First walker `--stop-at 2026-09-19T10:26:00Z`. Resume the same file after W5 wit
 | 45 | `684/100` | seedless auto plus windows 5 | Session-141 `42.137360` unconverged; remaining rows raise |
 | 44 | `675/100` | seedless auto plus windows 5 | Session-141 `41.236782` unconverged; remaining rows raise |
 | 18 | `1871/400` | T-028 auto plus windows 5 | T-029 retained at `17.889237` |
+| 18 | `4679/1000` | T-029 auto plus windows 5 | T-030 retained at `17.893285` |
 | 18 | `117/25` | every named seed | Locked at `18.000000` |
 | 18 | `469/100`, `47/10` | T-019 auto | Plateau or above 18 |
 | 20 | `971/200` | T-021 auto plus windows 6 | `19.910044` unconverged; remaining rows raise |
@@ -71,8 +72,9 @@ First walker `--stop-at 2026-09-19T10:26:00Z`. Resume the same file after W5 wit
 | 19 | `241/50`, `481/100`, `97/20` | T-020 auto plus windows 6 | Already above 19 |
 | 11 | any side above T-026 | stock covering | Covering-only; T-026 stands |
 
-n=18 `1871/400` does not confirm H-218. n=20 `971/200` and `243/50`
-four-grid did not. H-218 stays unconfirmed.
+n=18 `1871/400` does not confirm H-218. n=18 `4679/1000` retained T-030
+and does not confirm H-218. n=20 `971/200` and `243/50` four-grid did not.
+H-218 stays unconfirmed.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

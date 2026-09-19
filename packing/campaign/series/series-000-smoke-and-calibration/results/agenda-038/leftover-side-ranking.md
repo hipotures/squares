@@ -39,6 +39,7 @@ Leftover n=20 `971/200` finished at `19.910044` unconverged, still below 20.
 | 19 | `481/100` four-grid plus windows 7 | Session-141 exp-174 stopped at `19.111435` unconverged above 19. Remaining rows raise. |
 | 19 | `97/20` | `19.808958`, worse than `481/100`. |
 | 18 | `1871/400` | Session-141 leftover auto plus windows 5 retained T-029. |
+| 18 | `4679/1000` | Session-141 T-029 auto plus windows 5 retained T-030. |
 | 18 | `117/25` | Locked at `18.000000` on every named seed. |
 | 18 | `469/100`, `47/10` | Plateau or above 18. |
 | 12 | `398/100`, `3985/1000`, `399/100` | Grid rows at `16.000000` are dual-feasibility artifacts. |
@@ -83,7 +84,8 @@ plus windows 5, n=29 `548/100` seedless auto plus windows 5, n=45 `684/100` seed
 plus windows 5, n=44 `675/100` seedless auto plus windows 5, n=19 `481/100`
 four-grid plus windows 7, n=12 `793/200` auto plus windows 7, n=12
 `397/100` auto plus windows 7, n=19 `241/50` four-grid plus windows 7,
-n=12 `793/200` four-grid plus windows 7, or n=12 `3969/1000` four-grid plus
+n=12 `793/200` four-grid plus windows 7, n=18 `4679/1000` T-029 auto plus
+windows 5 (T-030 retained), or n=12 `3969/1000` four-grid plus
 windows 7, for more wall.
 
 <!-- This document follows common-doc-guidelines.md.

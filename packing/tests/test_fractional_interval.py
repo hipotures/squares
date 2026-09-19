@@ -392,9 +392,9 @@ def test_the_retained_n20_certificate_is_accepted_on_the_full_doubled_net() -> N
 
 @pytest.mark.exhaustive_exact
 def test_the_retained_n18_certificate_is_accepted_on_the_full_doubled_net() -> None:
-    """The interval-certified decision of s(18) >= 1871/400, every direction.
+    """The interval-certified decision of s(18) >= 4679/1000, every direction.
 
-    T-029 stands at C4 on the strength of this route. The decide_certificate
+    T-030 stands at C4 on the strength of this route. The decide_certificate
     gate already accepted these bytes; this test is the named replay
     E-fractional-interval-decision points at for the new rung.
     """
@@ -405,9 +405,9 @@ def test_the_retained_n18_certificate_is_accepted_on_the_full_doubled_net() -> N
     assert len(verdict.directions) == 361
     assert sum(outcome.stalled for outcome in verdict.directions) == 0
     enclosure = verdict.enclosure
-    assert enclosure == (Fraction(250001, 250000), Fraction(250001, 250000))
+    assert enclosure == (Fraction(200001, 200000), Fraction(200001, 200000))
     assert enclosure is not None
-    assert certificate.bounded_side == Fraction(1871, 400)
+    assert certificate.bounded_side == Fraction(4679, 1000)
     assert declared_n18()["least_cell_mass"] == str(enclosure[0])
 
 
