@@ -632,6 +632,9 @@ session:
   checks:
   - Planning artifacts written; research phase closed at 06:42Z.
   - >-
+    full gate: fast at 9748caa255eed7e432d0ac25340b503a0a7c7e24: passed (GitHub
+    Actions packing-required success on the leftover n=17 docs head)
+  - >-
     n=20 973/200 four-grid plus windows 7 stopped at 19.939212 unconverged after
     2400 s, no freeze. n=12 397/100 converged at 12.133391, freeze above 12, no
     retain. n=17 23/5 four-grid plus windows 8 stopped at 17.120106 unconverged,
