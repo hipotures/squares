@@ -133,18 +133,21 @@ session:
     deadline_at: '2026-09-19T02:57:00Z'
   - task: n=20 973/200 four-grid plus windows 7
     operator: session-140 covering lane
-    status: queued
+    status: in_progress
     recording: contemporaneous
     outcome: null
     evidence: null
-    files: null
+    files:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n20-973-200-t021-grid4-windows7-rows.jsonl
     checks: null
     uncertainty: null
     elapsed_seconds: null
     elapsed_quality: unavailable
-    next_action: Start the named site set under think-d2ad.
+    next_action: Finish the named site set under think-d2ad.
     phase: 2
     budget_minutes: 40
+    started_at: '2026-09-19T02:45:23Z'
+    deadline_at: '2026-09-19T03:05:23Z'
     expected_output: >-
       agenda-038 n=20 973/200 four-grid plus windows 7 run JSON, log, and a receipt
       if the loop stops.

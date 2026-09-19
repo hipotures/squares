@@ -1,0 +1,44 @@
+# Session-140 first-wave covering queue. The producer is
+# devtools.run_fractional_colgen; this file is the ranked list X-038 named.
+# A row already running or recorded is skipped by run-first-wave.sh.
+probes:
+  - id: n20-973-200-t021-grid4-windows7
+    n: 20
+    side: '973/200'
+    grid_counts: '34,46,56,64'
+    seed_certificate: cases/n20_fractional_certificate/certificate.json
+    seed_windows: 7
+    deadline_seconds: 1200
+    bead: think-d2ad
+  - id: n12-397-100-t017-grid4-windows7
+    n: 12
+    side: '397/100'
+    grid_counts: '28,38,46,54'
+    seed_certificate: cases/n12_fractional_certificate/certificate.json
+    seed_windows: 7
+    deadline_seconds: 1200
+    bead: think-h02v
+  - id: n17-23-5-t019-grid4-windows8
+    n: 17
+    side: '23/5'
+    grid_counts: '34,45,56,64'
+    seed_certificate: cases/n17_fractional_certificate/certificate.json
+    seed_windows: 8
+    deadline_seconds: 1200
+    bead: think-5q81
+  - id: n19-481-100-t020-auto-windows6
+    n: 19
+    side: '481/100'
+    grid_counts: '34,45,56'
+    seed_certificate: cases/n20_fractional_certificate/certificate-24-5.json
+    seed_windows: 6
+    deadline_seconds: 1200
+    bead: think-zoq4
+  - id: n18-4675-1000-t027-auto-windows5
+    n: 18
+    side: '4675/1000'
+    grid_counts: auto
+    seed_certificate: cases/n18_fractional_certificate/certificate.json
+    seed_windows: 5
+    deadline_seconds: 1200
+    bead: think-15qo
