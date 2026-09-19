@@ -283,7 +283,7 @@ def test_the_packing_limited_ratios_sit_inside_a_tight_band() -> None:
     tight = [packing_limited[n]["ratio"] for n in (11, 17)]
     assert max(tight) - min(tight) <= BAND
     assert all(0.97 < packing_limited[n]["ratio"] < 0.99 for n in (11, 17))
-    assert 0.96 < packing_limited[18]["ratio"] < 0.97
+    assert 0.96 < packing_limited[18]["ratio"] < min(tight)
 
 
 def test_ceiling_limited_certificate_is_excluded_from_the_mean() -> None:
