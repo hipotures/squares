@@ -59,7 +59,7 @@ First-party fractional certificates sit on seven of them:
 | 18 | T-028 `187/40` | `(7/2)+(1/2)sqrt(7)` | 0.148 | Rank 5 retained as T-028. `117/25` still sits on the `18.000000` plateau. |
 | 19 | T-020 `24/5` | `4.885618…` | 0.086 | Two probes. T-020-seed windows 6 at `97/20` stopped at `19.808958`. Session-140 same construction at `481/100` stopped at `19.132115`. |
 | 20 | T-021 `97/20` | grid `5` | 0.150 | Yes. Old cert-seed crossed at `20.000223`. Session-140 four-grid plus windows 7 stopped at `19.939212` unconverged after 2400 s. |
-| 21 | T-021 `97/20` | grid `5` | 0.150 | One unusable grid row at `997/200`. Auto plus windows 6 at `97/20` is in flight. A freeze here would re-certificate T-021’s side, not raise the floor. |
+| 21 | T-021 `97/20` | grid `5` | 0.150 | Session-140 auto plus windows 6 stopped at `19.814820` unconverged. Same side as T-021; not a floor raise. |
 
 A restricted optimum above `n` refutes that site set only.
 Remaining rows can only raise it.

@@ -1001,6 +1001,29 @@ values:
       sites only, and no uniform inset-1/2 grid the lane could afford puts a site in
       every strip, so twenty-five unit weights are dual-feasible whatever the covering
       value is. A second construction, the 24/5 atoms scaled, reached 24.315238 unconverged.
+  - n: 21
+    side: '97/20'
+    side_decimal: '4.85'
+    objective: '19.814820'
+    site_set: t021-seed-auto-34-45-56-windows6
+    sites: 7197
+    rows: 11277
+    rounds: 45
+    converged: false
+    stop_reason: >-
+      The 1200 s deadline stopped the row loop after 45 LP rounds with 162 placements
+      still violated. The objective finished at 19.814820 on 7197 sites / 950 orbits,
+      including 2256 T-021 seed sites, and sat on that value from round 39. It did
+      not cross 21.
+    least_covered_mass: '0.984206'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n21-97-20-t021-auto-windows6-receipt.md
+      - packing/campaign/agent-sessions/session-140-lb-survey.md
+    notes: >-
+      Session-140 X-038 rank 6. T-021 seed plus auto (34, 45, 56) plus windows 6 at
+      the already-verified 97/20 side. Unconverged mass still below 21 is a covering
+      measurement, not a floor raise. T-021 is unchanged. T-029 was not offered.
   - n: 20
     side: '979/200'
     side_decimal: '4.895'
