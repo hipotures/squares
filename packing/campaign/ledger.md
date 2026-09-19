@@ -782,7 +782,7 @@ Status: **active**. Pursue n=11 results beyond the one-body ceiling L* = 38200/9
 
 | id | status | title | rounds | opened because |
 | --- | --- | --- | --- | --- |
-| series-000 | open | S0: smoke and calibration — prove the machinery, establish every baseline metric | 131 | First series. There is no prior instrument, so not |
+| series-000 | open | S0: smoke and calibration — prove the machinery, establish every baseline metric | 132 | First series. There is no prior instrument, so not |
 
 ## Registry
 
@@ -943,7 +943,7 @@ Status: **active**. Pursue n=11 results beyond the one-body ceiling L* = 38200/9
 | H-215 | open question | search | Which headless kinetic measurements, if any, predict that a fixed-budg |  | 0 |  |  |
 | H-216 | open | proof | A helper-free point-atom certificate exists for n=6 at container side  |  | 0 |  |  |
 | H-217 | blocked | proof | The rows-complete covering LP with weighted-majority, k-of-S, and floo |  | 0 |  |  |
-| H-218 | abandoned | proof | A rows-complete covering of mass strictly below n exists at a containe | n: 12 17 19 20* | 1 |  | 238.0m wall |
+| H-218 | abandoned | proof | A rows-complete covering of mass strictly below n exists at a containe | n: 12 17 19 20* | 2 |  | 238.0m wall |
 | H-219 | confirmed | proof | A rows-complete covering of mass strictly below 18 exists at a contain | n: 18* | 1 |  | 11.7m wall |
 | H-220 | open | proof | A rows-complete covering of mass strictly below n exists at a containe | n: 32 31 30 26 27 29 45 44 | 0 |  |  |
 
@@ -1116,6 +1116,12 @@ Status: **active**. Pursue n=11 results beyond the one-body ceiling L* = 38200/9
 | exp-032 | series-000 | 3 | openai-codex | H-021 | The exact connected and isolated controls pass, every declared conflation fails, and all unsupported floating-point observations remain unresolved. |
 | exp-201 | series-000 | 18 | claude-opus-5 | H-201 | Calibration, not a scored round: it freezes p_perturb = 1.0, perturb_scale = 2 and a flat mu = 5 for exp-202 and exp-203, and it turned up a schedule-length effect that is now registered as H-204 rather than folded into an arm. |
 
+### in-progress (1)
+
+| id | series | instance | operator | hypotheses | reason |
+| --- | --- | --- | --- | --- | --- |
+| exp-164 | series-000 | 20 | Cursor session-141 | H-218 | Claimed; n=20 971/200 new four-grid is the first Session-141 H-218 probe. |
+
 ## Resumable — stopped on the clock, not on an answer
 
 | id | hypotheses | spent | stopped by | resume from | reopen when |
@@ -1145,7 +1151,7 @@ Status: **active**. Pursue n=11 results beyond the one-body ceiling L* = 38200/9
 
 ## Effort
 
-131 rounds, 2512.1 agent-minutes, 2229.5 wall-minutes.
+132 rounds, 2512.1 agent-minutes, 2229.5 wall-minutes.
 
 These totals exclude 4 historical rounds with unrecorded timing; their cost is unknown, not zero.
 

@@ -145,7 +145,7 @@ hypothesis status and summarizes experiment verdicts, and the
 | Sessions | 141 | 84 completed; 56 stopped; 1 nonterminal |
 | Explorations | 37 | 23 linked to proposed hypotheses; 14 uncodified |
 | Hypotheses | 158 | 27 confirmed; 29 refuted; 51 blocked; 13 unresolved; 6 open; 28 open questions; 2 result registered; 2 abandoned; 0 running |
-| Experiments | 131 | 40 accepted; 34 rejected; 31 unresolved; 12 baseline; 11 blocked; 3 abandoned; 0 in progress |
+| Experiments | 132 | 40 accepted; 34 rejected; 31 unresolved; 12 baseline; 11 blocked; 3 abandoned; 1 in progress |
 | Frontier results | 29 | 29 registered |
 
 <!-- END CURRENT-RESEARCH-STATUS -->
@@ -172,8 +172,8 @@ stacked-PR survey of `n <= 100` lower bounds; it retained T-028 `s(18) >= 187/40
 and does not replace that handoff. It does not confirm H-218.
 [Session 141](packing/campaign/agent-sessions/session-141-n100-research.md) is the
 live stacked continuation: X-039 re-ranks those floors, exp-163 accepted leftover
-n=18 as T-029 `s(18) >= 1871/400`, and `think-qqzs` stays the selected next entry
-when this session terminals.
+n=18 as T-029 `s(18) >= 1871/400`, exp-164 reopens H-218 at n=20, and
+`think-qqzs` stays the selected next entry when this session terminals.
 [Session 138](packing/campaign/agent-sessions/session-138-n11-overnight-review.md)
 is the preceding route-selection handoff: PR 193 merged its records as `4ad98e90`,
 `think-4woh` is closed, and certification debt now sits under `think-qqzs`. The five
@@ -4033,7 +4033,7 @@ round that names the hypothesis, control roles included.
 | [H-215](packing/campaign/hypotheses/H-215-kinetics-predict-search-quality.md) | open question | Which headless kinetic measurements, if any, predict that a fixed-budget search setting will produce better valid packings? | 0 | — |
 | [H-216](packing/campaign/hypotheses/H-216-point-certificate-at-n6-299-100.md) | open | A helper-free point-atom certificate exists for n=6 at side 299/100 with B = 9977/10000 on the 181-direction net, on some named site set | 0 | — |
 | [H-217](packing/campaign/hypotheses/H-217-route-f1-majority-floor-at-153-40.md) | blocked | The rows-complete covering LP with weighted-majority, k-of-S, and floor atoms on arrangement-vertex sites is below 11 at 153/40 | 0 | — |
-| [H-218](packing/campaign/hypotheses/H-218-existing-colgen-raises-a-small-n-floor.md) | abandoned | A rows-complete covering of mass strictly below n exists at a container side strictly above the current verified floor for at least one n in {12, 17, 19, 20} | 1 | exp-162 abandoned |
+| [H-218](packing/campaign/hypotheses/H-218-existing-colgen-raises-a-small-n-floor.md) | abandoned | A rows-complete covering of mass strictly below n exists at a container side strictly above the current verified floor for at least one n in {12, 17, 19, 20} | 2 | exp-162 abandoned; exp-164 reopen claimed |
 | [H-219](packing/campaign/hypotheses/H-219-t028-seeded-colgen-raises-s18.md) | confirmed | A rows-complete covering of mass strictly below 18 exists at a container side in (187/40, 117/25) on a T-028-seeded stock-colgen site set | 1 | T-029 |
 | [H-220](packing/campaign/hypotheses/H-220-seedless-colgen-raises-nagamochi-floor.md) | open | A rows-complete covering of mass strictly below n exists at a queued Nagamochi-only side on a seedless stock-colgen site set | 0 | — |
 
@@ -4329,7 +4329,7 @@ The relevant generator writes the receipt, and the entry fills in on the next
 
 ## Experiments Conducted
 
-There are 131 rounds registered in `series-000`.
+There are 132 rounds registered in `series-000`.
 
 They record 2512.1 agent-minutes and 2229.5 wall-minutes.
 These totals exclude four historical annealing rounds with unrecorded timing; their wall
@@ -4492,6 +4492,7 @@ archive beside it.
 | [exp-161](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-161-h163-route-s-threshold-compression.md) | 11 | target | H-163 | T-025 U025 reweighting to at most 23 positive D4 orbits | Encode-only timed out with no JSON; no --search | unresolved |
 | [exp-162](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-162-h218-stock-colgen-small-n-floors.md) | 20 | target | H-218 | Restricted covering optima at n in {12, 17, 19, 20} on named stock-colgen site sets | Session-140 wall expired; no H-218 RETAINABLE freeze | abandoned |
 | [exp-163](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-163-h219-t028-next-rung.md) | 18 | target | H-219 | T-028-seeded covering at 1871/400 | T-029 retained at 1871/400; mass 17.889361 | accepted |
+| [exp-164](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-164-h218-n20-971-200-new-four-grid.md) | 20 | target | H-218 | T-021 four-grid plus windows 7 at 971/200 | Claimed; new named set after leftover auto plus windows 6 | in-progress |
 | [exp-201](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-201-arm-calibration.md) | 18 | control | H-201 | Sparsity of the single-square move set at a trivial grid | At every scale tried no single-square proposal lowers the container side; the grid is a strict local minimum under the whole move set | baseline |
 | [exp-202](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-202-round-1-perturbation.md) | 11 | target | H-201 | Gensane’s simultaneous all-square perturbation on the ordinary move menu | Takes n = 17 from exactly 5.0 to within 0.002 of Bidwell cold, and is inert above n = 26 | rejected |
 | [exp-203](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-203-round-1-pressure.md) | 11 | target | H-202 | Aggregate wall-pressure term against the plain required-side objective | Isotropic pressure optimises a disc, returning exactly 2*sqrt(2) at n = 5, so pressure must be directional | rejected |
@@ -4628,6 +4629,7 @@ archive beside it.
 | exp-161 | one overnight target after this registration; 3h once the producer exists | — | 10806s | timebox | encode-only timeout 2026-09-18; no JSON; no --search |
 | exp-162 | Session-140 research wall to 06:42Z; one probe family per ranked n | — | 14280s | timebox | leftover n=20 19.910044; leftover n=12 12.091168; T-028 off-sweep |
 | exp-163 | Session-141 first leftover n=18 probe | 702s | — | criterion | T-029 RETAINABLE |
+| exp-164 | Session-141 research wall to 15:26Z; n=20 new four-grid | — | — | claimed | not yet measured |
 | exp-201 | 1.25e9 pair tests per chain, 8 chains, 5 seeds | 2681.0 s | 95 m | criterion | `9ae7700` |
 | exp-202 | 1.25e9 pair tests per chain, 8 chains, 5 seeds, 11 cells | 3663.0 s | 60 m | criterion | `9ae7700` |
 | exp-203 | 400,000 steps per anneal, 5 seeds, 5 cells | 2349.0 s | 25 m | criterion | `9ae7700` |
@@ -4641,9 +4643,9 @@ archive beside it.
 | exp-211 | 24 deterministic trajectory cells shared with exp-212 | shared; no duplicate charge | — | criterion | `9cca493c17ab61d5efb3e1032f32c54a9b87320e` |
 | exp-212 | 48 deterministic trajectory cells | 86.689 s | — | criterion | `9cca493c17ab61d5efb3e1032f32c54a9b87320e` |
 
-### What the 131 rounds jointly establish
+### What the 132 rounds jointly establish
 
-The 131 rounds use 2512.1 agent-minutes and 2229.5 wall-minutes under the campaign’s
+The 132 rounds use 2512.1 agent-minutes and 2229.5 wall-minutes under the campaign’s
 retained effort accounting.
 The never-invoked exp129 adds no scientific result or execution time.
 Exp-114 contributes 2.46 seconds of target/replay effort; its readiness work is recorded

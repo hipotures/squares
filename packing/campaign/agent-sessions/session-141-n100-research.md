@@ -202,7 +202,7 @@ session:
     uncertainty: C5 still requires a mapped review.
     elapsed_seconds: 800
     elapsed_quality: operator_reported_approximate
-    next_action: Claim exp-164 for H-218 n=20 971/200 new four-grid.
+    next_action: think-so2k
     phase: 2
     budget_minutes: 20
     started_at: '2026-09-19T07:46:00Z'
