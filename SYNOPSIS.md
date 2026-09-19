@@ -5458,9 +5458,9 @@ the best known packing runs near half a unit — eleven cases above `+0.49`, hea
 `n = 51` at `+0.5364`, then `68`, `84`, `39`, `86`, `66`, `38`, `83`, `37`, `53` and
 `26`. Two cautions travel with that ranking.
 The prize is what the *ceiling* allows; the real limit is the covering value at that
-side. 28 values have been reported for the restricted program, at sides `2.99`, `3.81`, `3.82`,
+side. 29 values have been reported for the restricted program, at sides `2.99`, `3.81`, `3.82`,
 `3.83`, `3.84`, `3.85`, `3.875`, `3.95`, `3.96`, `3.969`, `3.97`, `3.98`, `3.985`, `3.99`, `4.58`, `4.59`,
-`4.6`, `4.67`, `4.68`, `4.69`, `4.7`, `4.80`, `4.825`, `4.85`, `4.865`, `4.875`, `4.895` and `4.985` — the first eight
+`4.6`, `4.67`, `4.68`, `4.69`, `4.7`, `4.80`, `4.81`, `4.825`, `4.85`, `4.865`, `4.875`, `4.895` and `4.985` — the first eight
 reports, not measurements this repository can reproduce, since no covering-search run log
 or solver checkpoint was retained for any of them; the ten added on 2026-09-05 by Agenda
 021’s `BC-200` and `BC-197` and Agenda 022’s `BC-213` and `BC-206` carry run logs; the
@@ -5484,6 +5484,9 @@ grid at the same side dropped to `17.049597` unconverged, still above seventeen;
 n=18 auto-grid probe at 467/100, covering `18.000000` unconverged, cannot confirm; the
 T-019-seeded auto grid at the same side converged `17.875567` with least_covered 1, freeze-then-decide retained `T-027` at `s(18) >= 467/100`; `4.68` T-019-seeded auto-grid locked at exact mass `18.000043` converged, cannot confirm; T-019-seeded auto plus `--seed-windows 5` at `4.68` locked `18.000000` unconverged; T-027-seeded auto at the same side locked `18.000000` unconverged; `4.69` T-019-seeded auto-grid locked `18.000000` unconverged; `4.7` T-019-seeded auto-grid converged `18.165413`, cannot confirm;
 retained checkpoint and frozen-certificate availability differs by row.
+`4.81` is the session-140 n=19 T-020-seeded auto plus windows 6 at 481/100,
+covering `19.132115` unconverged, closer than the same construction at `4.85`
+(`19.808958`).
 Several sides are reported more than once from site sets built differently, which is the
 point of reporting them that way: at `4.85` the difference is between a wall and the
 certificate `T-021` rests on, at `4.865` it is two independent walls plus a session-140 four-grid-plus-windows-7

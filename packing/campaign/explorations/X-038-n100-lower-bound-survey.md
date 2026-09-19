@@ -56,7 +56,7 @@ seven of them:
 | 12 | T-017 `99/25` | grid `4` | 0.040 | Yes. Certificate-seeded `397/100` stopped at `12.016263` unconverged. |
 | 17 | T-019 `459/100` | grid `5` (reported packing `4.675…`) | 0.410 | Yes. T-019-seed plus windows 5 at `23/5` stopped at `17.042346`. Session-140 four-grid plus windows 8 stopped at `17.120106`. |
 | 18 | T-027 `467/100` | `(7/2)+(1/2)sqrt(7)` | 0.153 | Yes. `117/25` sits on the `18.000000` plateau. |
-| 19 | T-020 `24/5` | `4.885618…` | 0.086 | One probe: T-020-seed windows 6 at `97/20` stopped at `19.808958`. |
+| 19 | T-020 `24/5` | `4.885618…` | 0.086 | Two probes. T-020-seed windows 6 at `97/20` stopped at `19.808958`. Session-140 same construction at `481/100` stopped at `19.132115`. |
 | 20 | T-021 `97/20` | grid `5` | 0.150 | Yes. Certificate-seeded `973/200` crossed at `20.000223` unconverged. |
 | 21 | T-020 `24/5` | grid `5` | 0.150 | One unusable grid row at `997/200`. |
 

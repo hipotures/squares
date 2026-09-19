@@ -237,16 +237,24 @@ session:
       - packing-campaign
   - task: n=19 481/100 T-020 auto plus windows 6
     operator: session-140 covering lane
-    status: in_progress
+    status: completed
     recording: contemporaneous
-    outcome: null
-    evidence: null
-    files: null
-    checks: null
-    uncertainty: null
-    elapsed_seconds: null
-    elapsed_quality: unavailable
-    next_action: Finish the named site set under think-zoq4.
+    outcome: >-
+      Unconverged 19.132115 after 37 LP rounds, 333 still violated, crossed 19 at
+      round 16. Closer than 97/20 at 19.808958. No freeze. T-020 unchanged.
+    evidence:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n19-481-100-t020-auto-windows6-receipt.md
+    files:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n19-481-100-t020-auto-windows6-run.json
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n19-481-100-t020-auto-windows6-receipt.md
+    checks:
+      - run JSON objective 19.132114728968762; no freeze file
+    uncertainty: >-
+      Remaining rows can only raise the restricted optimum, so this is not a
+      covering below 19.
+    elapsed_seconds: 1227
+    elapsed_quality: platform_measured
+    next_action: Leave think-zoq4 open for more wall or 97/20; n=18 is next.
     phase: 2
     budget_minutes: 40
     started_at: '2026-09-19T03:44:56Z'
@@ -262,6 +270,33 @@ session:
       - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/
     excluded_commands:
       - packing-campaign
+  - task: n=18 4675/1000 T-027 auto plus windows 5
+    operator: session-140 covering lane
+    status: in_progress
+    recording: contemporaneous
+    outcome: null
+    evidence: null
+    files: null
+    checks: null
+    uncertainty: null
+    elapsed_seconds: null
+    elapsed_quality: unavailable
+    next_action: Finish the named site set under think-15qo.
+    phase: 2
+    budget_minutes: 40
+    started_at: '2026-09-19T04:05:23Z'
+    deadline_at: '2026-09-19T04:25:23Z'
+    expected_output: >-
+      agenda-038 n=18 4675/1000 T-027 auto plus windows 5 run JSON and a receipt
+      if the loop stops.
+    validation_command: >-
+      test -f packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n18-4675-1000-t027-auto-windows5-run.json
+    kill_condition: Stop at 1200 s or when the row loop converges.
+    fallback: Record the restricted optimum and take the n=20 longer wall.
+    write_scope:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/
+    excluded_commands:
+      - packing-campaign
   outputs:
   - packing/campaign/explorations/X-038-n100-lower-bound-survey.md
   - packing/campaign/hypotheses/H-218-existing-colgen-raises-a-small-n-floor.md
@@ -269,14 +304,16 @@ session:
   - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n20-973-200-t021-grid4-windows7-receipt.md
   - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n12-397-100-t017-grid4-windows7-receipt.md
   - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n17-23-5-t019-grid4-windows8-receipt.md
+  - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n19-481-100-t020-auto-windows6-receipt.md
   checks:
   - Planning artifacts written; research phase open.
   - >-
     n=20 973/200 four-grid plus windows 7 stopped at 19.930198 unconverged, no
     freeze. n=12 397/100 converged at 12.133391, freeze above 12, no retain.
     n=17 23/5 four-grid plus windows 8 stopped at 17.120106 unconverged, no
-    freeze. The first-wave waiter is `python -m devtools.run_covering_queue`;
-    the shell script is gone. n=19 481/100 started 03:44Z.
+    freeze. n=19 481/100 T-020 auto plus windows 6 stopped at 19.132115
+    unconverged, no freeze; new covering side 4.81. n=18 4675/1000 started
+    04:05Z.
   stop_reason: null
   next_action: >-
     Run the X-038 ranked queue under think-8x4t. Do not close think-qqzs.
