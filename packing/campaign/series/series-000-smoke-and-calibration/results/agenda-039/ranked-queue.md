@@ -22,7 +22,7 @@ an untried side or an untried site set.
 | 8 | think-coet | H-220 | 29 | `548/100` | auto plus windows 5, no seed | **26.040745 freeze; interval refused** |
 | 9 | think-coet | H-220 | 45 | `684/100` | auto plus windows 5, no seed | **42.137360 unconverged** |
 | 10 | think-coet | H-220 | 44 | `675/100` | auto plus windows 5, no seed | **41.236782 unconverged** |
-| 11 | think-so2k | H-218 | 19 | `481/100` | T-020 four-grid `(34,45,56,64)` plus windows 7 | 1200 s |
+| 11 | think-so2k | H-218 | 19 | `481/100` | T-020 four-grid `(34,45,56,64)` plus windows 7 | **19.111435 unconverged; crossed 19** |
 | 12 | think-so2k | H-218 | 12 | `793/200` | T-017 auto plus windows 7 | 1200 s |
 | 13 | think-so2k | H-218 | 12 | `397/100` | T-017 auto plus windows 7 | 1200 s |
 | 14 | think-so2k | H-218 | 19 | `241/50` | T-020 four-grid `(34,45,56,64)` plus windows 7 | 1200 s |
@@ -57,6 +57,7 @@ First walker `--stop-at 2026-09-19T10:26:00Z`. Resume the same file after W5 wit
 | 20 | `971/200` | T-021 auto plus windows 6 | `19.910044` unconverged; remaining rows raise |
 | 20 | `971/200` | T-021 four-grid plus windows 7 | Session-141 `19.857588` unconverged; remaining rows raise |
 | 20 | `243/50` | T-021 four-grid plus windows 7 | Session-141 `19.887914` unconverged; remaining rows raise |
+| 19 | `481/100` | T-020 four-grid plus windows 7 | Session-141 `19.111435` unconverged; crossed 19; remaining rows raise |
 | 20 | `973/200` | T-021 four-grid plus windows 7 | `19.939212` after 2400 s; remaining rows raise |
 | 20 | `973/200` | H-062 auto-grid and cert-seed | Already crossed 20 |
 | 21 | `97/20` | T-021 auto plus windows 6 | Same side as T-021 |

@@ -1030,6 +1030,31 @@ values:
       Closer than the same construction at 97/20 (19.808958). Adding sites can still
       lower the covering value, so 481/100 is not barred. T-020 is unchanged.
   - n: 19
+    side: '481/100'
+    side_decimal: '4.81'
+    objective: '19.111435'
+    site_set: t020-seed-four-grid-34-45-56-64-windows7
+    sites: 13153
+    rows: 11449
+    rounds: 34
+    converged: false
+    stop_reason: >-
+      The 1200 s deadline stopped the row loop after 34 LP rounds with 369 placements
+      still violated. The objective crossed 19 at round 15 (19.017579) and finished at
+      19.111435 on 13153 sites / 1724 orbits, including 3044 T-020 plus window-lattice
+      seed sites. Four-grid resolved to (34, 45, 56, 64).
+    least_covered_mass: '0.966385'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n19-481-100-t020-grid4-windows7-receipt.md
+      - packing/campaign/agent-sessions/session-141-n100-research.md
+    notes: >-
+      Session-141 exp-174. T-020 24/5 seed plus four-grid (34, 45, 56, 64) plus
+      windows 7 at 481/100. Unconverged mass still above nineteen refutes this site
+      set only; remaining rows can only raise it. Closer than leftover auto plus
+      windows 6 at this side (19.132115). T-020 is unchanged. T-030 was not
+      offered. H-218 stays unconfirmed. Do not more-wall this set.
+  - n: 19
     side: '241/50'
     side_decimal: '4.82'
     objective: '19.247109'

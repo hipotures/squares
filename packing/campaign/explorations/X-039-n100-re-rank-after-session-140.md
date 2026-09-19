@@ -109,7 +109,7 @@ One CPU. Sequential colgen. Sub-agents own audit, registration, and W5.
 | Claim | This session | Why |
 | --- | --- | --- |
 | H-219 | first covering probe | Same class as T-028; unused leftover side |
-| H-218 | live after H-220 | exp-164 at `971/200` four-grid `19.857588` and exp-165 at `243/50` `19.887914` unconverged; next probe n=19 `481/100` four-grid as exp-174 |
+| H-218 | live after exp-174 | exp-164/165 unconverged below 20; exp-174 n=19 `481/100` four-grid `19.111435` crossed 19; next probe n=12 `793/200` auto as exp-175 |
 | H-220 | eight sides measured | exp-166–170, exp-172, and exp-173 unconverged; exp-171 n=29 freeze interval-refused; no RETAINABLE |
 | H-221 | after ranked H-218 long-shots | T-029-seeded next rung at `4679/1000` |
 | H-210 / H-211 | off-CPU if Node permits | Workbench determinations; not a floor |
