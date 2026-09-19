@@ -1264,6 +1264,31 @@ values:
       sets at this side already crossed. No covering freeze was retained. H-218
       stays unconfirmed.
   - n: 20
+    side: '971/200'
+    side_decimal: '4.855'
+    objective: '19.910044'
+    site_set: t021-seed-auto-34-45-56-windows6
+    sites: 8285
+    rows: 11818
+    rounds: 48
+    converged: false
+    stop_reason: >-
+      The 1200 s deadline stopped the row loop after 48 LP rounds with 6 placements
+      still violated. The objective finished at 19.910044 on 8285 sites / 1093 orbits,
+      including 2256 T-021 seed sites, and sat on that value from round 40. It did
+      not cross 20.
+    least_covered_mass: '0.990063'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n20-971-200-t021-auto-windows6-receipt.md
+      - packing/campaign/agent-sessions/session-140-lb-survey.md
+    notes: >-
+      Session-140 leftover rank 3. T-021 seed plus auto (34, 45, 56) plus windows 6
+      at 971/200, between the T-021 floor and 973/200. Unconverged mass still below
+      twenty is not a covering below 20; remaining rows can only raise it. Adding
+      sites can still lower the covering value, so 971/200 is not barred. T-021 is
+      unchanged. T-029 was not offered. H-218 stays unconfirmed.
+  - n: 20
     side: '24/5'
     side_decimal: '4.80'
     objective: '18.916941'

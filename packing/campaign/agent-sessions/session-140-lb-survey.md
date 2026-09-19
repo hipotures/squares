@@ -80,7 +80,8 @@ session:
     evidence: []
     stop_reason: null
     next_action: >-
-      T-028 retained. Leftover n=19 and n=17 finished above n. Finish leftover n=20.
+      T-028 retained. Leftover n=19, n=17, and n=20 finished without a retain.
+      Finish leftover n=12.
   budget:
     wall_minutes: 260
     max_cycles: 2
@@ -486,18 +487,25 @@ session:
       - packing-campaign
   - task: leftover n=20 971/200 T-021 auto plus windows 6
     operator: session-140 covering lane
-    status: in_progress
+    status: completed
     recording: contemporaneous
-    outcome: null
-    evidence: null
-    files: null
-    checks: null
+    outcome: >-
+      Unconverged 19.910044 after 48 LP rounds, 6 still violated. Sat on
+      19.910044 from round 40. Did not cross 20. No freeze. T-021 unchanged.
+      T-029 not offered. H-218 unconfirmed. New covering side 4.855.
+    evidence:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n20-971-200-t021-auto-windows6-receipt.md
+    files:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n20-971-200-t021-auto-windows6-run.json
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n20-971-200-t021-auto-windows6-receipt.md
+    checks:
+      - run JSON objective 19.91004422499408; no freeze file
     uncertainty: >-
-      Early leftover rounds were still below 20 (19.400554 at round 8). This is
-      the remaining H-218 retain path on an untried side.
-    elapsed_seconds: null
-    elapsed_quality: unavailable
-    next_action: Finish leftover rank 3 under think-d2ad.
+      Remaining rows can only raise the restricted optimum, so this is not a
+      covering below 20.
+    elapsed_seconds: 1243
+    elapsed_quality: platform_measured
+    next_action: Leave think-d2ad open for a different site set; leftover n=12 is next.
     phase: 2
     budget_minutes: 25
     started_at: '2026-09-19T06:00:29Z'
@@ -509,6 +517,35 @@ session:
       test -f packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n20-971-200-t021-auto-windows6-run.json
     kill_condition: Stop at 1200 s or when the row loop converges.
     fallback: Record the restricted optimum and take leftover n=12 3969/1000.
+    write_scope:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/
+    excluded_commands:
+      - packing-campaign
+  - task: leftover n=12 3969/1000 T-017 four-grid plus windows 7
+    operator: session-140 covering lane
+    status: in_progress
+    recording: contemporaneous
+    outcome: null
+    evidence: null
+    files: null
+    checks: null
+    uncertainty: >-
+      Crossed 12 at round 11 (12.000732). Remaining rows raise. Existing
+      four-grid without windows finished at 12.116115.
+    elapsed_seconds: null
+    elapsed_quality: unavailable
+    next_action: Finish leftover rank 4 under think-h02v.
+    phase: 2
+    budget_minutes: 21
+    started_at: '2026-09-19T06:21:12Z'
+    deadline_at: '2026-09-19T06:42:00Z'
+    expected_output: >-
+      agenda-038 n=12 3969/1000 T-017 four-grid plus windows 7 run JSON and a
+      receipt if the loop stops.
+    validation_command: >-
+      test -f packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n12-3969-1000-t017-grid4-windows7-run.json
+    kill_condition: Stop at 1200 s, at 06:42Z, or when the row loop converges.
+    fallback: Record the restricted optimum. Start leftover n=18 only if remain is at least 60 s.
     write_scope:
       - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/
     excluded_commands:
@@ -527,6 +564,7 @@ session:
   - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n21-97-20-t021-auto-windows6-receipt.md
   - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n19-241-50-t020-auto-windows6-receipt.md
   - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n17-461-100-t019-auto-windows5-receipt.md
+  - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n20-971-200-t021-auto-windows6-receipt.md
   checks:
   - Planning artifacts written; research phase open.
   - >-
@@ -539,7 +577,9 @@ session:
     n=21 97/20 stopped at 19.814820 unconverged. Leftover n=19 241/50 stopped at
     19.247109 unconverged, new covering side 4.82. Leftover n=17 461/100 stopped
     at 17.195968 unconverged, new covering side 4.61. Leftover n=20 971/200
-    started 06:00Z still below 20 at early rounds. H-218 unconfirmed.
+    stopped at 19.910044 unconverged, still below 20, new covering side 4.855.
+    Leftover n=12 3969/1000 started 06:21Z and crossed 12 at round 11. H-218
+    unconfirmed.
   stop_reason: null
   next_action: >-
     Finish leftover-queue.yaml. Do not close think-qqzs.
@@ -603,8 +643,8 @@ See
 [leftover-side-ranking.md](../series/series-000-smoke-and-calibration/results/agenda-038/leftover-side-ranking.md).
 A restricted optimum already above `n` cannot retain on more wall of the same site set.
 After n=21, walk `leftover-queue.yaml`: n=19 `241/50` (done, `19.247109`), n=17
-`461/100` (done, `17.195968`), n=20 `971/200` (running), n=12 `3969/1000`
-four-grid plus windows 7, n=18 `1871/400`.
+`461/100` (done, `17.195968`), n=20 `971/200` (done, `19.910044`), n=12
+`3969/1000` four-grid plus windows 7 (running), n=18 `1871/400`.
 
 ## T-029 leftover recipes
 
@@ -612,11 +652,7 @@ T-029 is still free. Confirm H-218 only on `RETAINABLE` at n in `{12, 17, 19, 20
 
 - Leftover n=19 `241/50` did not retain. Do not mint T-029 from that probe.
 - Leftover n=17 `461/100` did not retain. Do not mint T-029 from that probe.
-- Leftover n=20 `971/200`: copy the T-021 landing only if `RETAINABLE` with freeze
-  mass in `[19, 20)`. Copy live n=20 `certificate.json` to `certificate-97-20.json`
-  first. Live plus `certificate-971-200.json` hold the new bytes. Do not overwrite
-  `certificate-24-5.json`. Claim is `s(20) >= 971/200` and `s(21) >= 971/200`.
-  T-020 still holds n=19. This would confirm H-218.
+- Leftover n=20 `971/200` did not retain. Do not mint T-029 from that probe.
 - Leftover n=12 `3969/1000` four-grid plus windows 7: copy T-017 only if `RETAINABLE`
   with freeze mass `< 12`. That would also confirm H-218.
 - Leftover n=18 `1871/400` is off the H-218 sweep. A retain there is the next T-id
