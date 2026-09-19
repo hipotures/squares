@@ -145,7 +145,7 @@ hypothesis status and summarizes experiment verdicts, and the
 | Sessions | 141 | 84 completed; 56 stopped; 1 nonterminal |
 | Explorations | 37 | 23 linked to proposed hypotheses; 14 uncodified |
 | Hypotheses | 159 | 27 confirmed; 29 refuted; 51 blocked; 14 unresolved; 6 open; 28 open questions; 2 result registered; 2 abandoned; 0 running |
-| Experiments | 137 | 40 accepted; 34 rejected; 36 unresolved; 12 baseline; 11 blocked; 3 abandoned; 1 in progress |
+| Experiments | 138 | 40 accepted; 34 rejected; 37 unresolved; 12 baseline; 11 blocked; 3 abandoned; 1 in progress |
 | Frontier results | 29 | 29 registered |
 
 <!-- END CURRENT-RESEARCH-STATUS -->
@@ -175,7 +175,8 @@ live stacked continuation: X-039 re-ranks those floors, exp-163 accepted leftove
 n=18 as T-029 `s(18) >= 1871/400`, exp-164 and exp-165 left H-218 unconfirmed
 at n=20 `19.857588` and `19.887914`, exp-166 left H-220 unconfirmed at n=32
 `29.803318`, exp-167 left H-220 unconfirmed at n=31 `28.331329`, exp-168 left
-H-220 unconfirmed at n=30 `27.178193`, exp-169 is the live n=26 probe,
+H-220 unconfirmed at n=30 `27.178193`, exp-169 left H-220 unconfirmed at n=26
+`25.000000`, exp-170 is the live n=27 probe,
 and `think-qqzs` stays the selected next entry when this session terminals.
 [Session 138](packing/campaign/agent-sessions/session-138-n11-overnight-review.md)
 is the preceding route-selection handoff: PR 193 merged its records as `4ad98e90`,
@@ -501,6 +502,8 @@ case or experiment separately.
 | [n=32 29/5 Seedless Auto Window-5 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n32-29-5-auto-windows5-receipt.md) | research synthesis | record | retained | — |
 | [n=31 57/10 Seedless Auto Window-5 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n31-57-10-auto-windows5-receipt.md) | research synthesis | record | retained | — |
 | [n=30 559/100 Seedless Auto Window-5 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n30-559-100-auto-windows5-receipt.md) | research synthesis | record | retained | — |
+| [n=26 513/100 Seedless Auto Window-5 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n26-513-100-auto-windows5-receipt.md) | research synthesis | record | retained | — |
+| [Session-141 Block 4 W5: `think-g4n9` hosted walls](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/w5-think-g4n9-hosted-walls.md) | research synthesis | record | retained | — |
 | [n=20 973/200 T-021-Seeded Four-Grid Window-7 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n20-973-200-t021-grid4-windows7-receipt.md) | research synthesis | record | retained | — |
 | [n=20 973/200 T-021-Seeded Four-Grid Window-7 2400 s Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n20-973-200-t021-grid4-windows7-2400-receipt.md) | research synthesis | record | retained | — |
 | [n=21 97/20 T-021-Seeded Auto Window-6 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n21-97-20-t021-auto-windows6-receipt.md) | research synthesis | record | retained | — |
@@ -4043,7 +4046,7 @@ round that names the hypothesis, control roles included.
 | [H-217](packing/campaign/hypotheses/H-217-route-f1-majority-floor-at-153-40.md) | blocked | The rows-complete covering LP with weighted-majority, k-of-S, and floor atoms on arrangement-vertex sites is below 11 at 153/40 | 0 | — |
 | [H-218](packing/campaign/hypotheses/H-218-existing-colgen-raises-a-small-n-floor.md) | abandoned | A rows-complete covering of mass strictly below n exists at a container side strictly above the current verified floor for at least one n in {12, 17, 19, 20} | 3 | exp-162 abandoned; exp-164 unresolved at 19.857588; exp-165 unresolved at 19.887914 |
 | [H-219](packing/campaign/hypotheses/H-219-t028-seeded-colgen-raises-s18.md) | confirmed | A rows-complete covering of mass strictly below 18 exists at a container side in (187/40, 117/25) on a T-028-seeded stock-colgen site set | 1 | T-029 |
-| [H-220](packing/campaign/hypotheses/H-220-seedless-colgen-raises-nagamochi-floor.md) | unresolved | A rows-complete covering of mass strictly below n exists at a queued Nagamochi-only side on a seedless stock-colgen site set | 4 | exp-166 unresolved at 29.803318; exp-167 unresolved at 28.331329; exp-168 unresolved at 27.178193; exp-169 claimed at n=26 513/100 |
+| [H-220](packing/campaign/hypotheses/H-220-seedless-colgen-raises-nagamochi-floor.md) | unresolved | A rows-complete covering of mass strictly below n exists at a queued Nagamochi-only side on a seedless stock-colgen site set | 5 | exp-166 unresolved at 29.803318; exp-167 unresolved at 28.331329; exp-168 unresolved at 27.178193; exp-169 unresolved at 25.000000; exp-170 claimed at n=27 525/100 |
 | [H-221](packing/campaign/hypotheses/H-221-t029-seeded-colgen-raises-s18.md) | open | A rows-complete covering of mass strictly below 18 exists at a container side in (1871/400, 117/25) on a T-029-seeded stock-colgen site set | 0 | — |
 
 ### Confirmed
@@ -4338,9 +4341,9 @@ The relevant generator writes the receipt, and the entry fills in on the next
 
 ## Experiments Conducted
 
-There are 137 rounds registered in `series-000`.
+There are 138 rounds registered in `series-000`.
 
-They record 2512.1 agent-minutes and 2354.3 wall-minutes.
+They record 2512.1 agent-minutes and 2374.5 wall-minutes.
 These totals exclude four historical annealing rounds with unrecorded timing; their wall
 and operator costs are unknown, not zero.
 Exp129 closed as blocked without invocation and contributes zero scientific elapsed
@@ -4506,7 +4509,8 @@ archive beside it.
 | [exp-166](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-166-h220-n32-29-5-seedless-auto-windows5.md) | 32 | target | H-220 | Seedless auto plus windows 5 at 29/5 | 29.803318 unconverged below 32; no freeze | unresolved |
 | [exp-167](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-167-h220-n31-57-10-seedless-auto-windows5.md) | 31 | target | H-220 | Seedless auto plus windows 5 at 57/10 | 28.331329 unconverged below 31; no freeze | unresolved |
 | [exp-168](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-168-h220-n30-559-100-seedless-auto-windows5.md) | 30 | target | H-220 | Seedless auto plus windows 5 at 559/100 | 27.178193 unconverged below 30; no freeze | unresolved |
-| [exp-169](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-169-h220-n26-513-100-seedless-auto-windows5.md) | 26 | target | H-220 | Seedless auto plus windows 5 at 513/100 | Claimed after exp-168 stayed below 30 unconverged | in-progress |
+| [exp-169](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-169-h220-n26-513-100-seedless-auto-windows5.md) | 26 | target | H-220 | Seedless auto plus windows 5 at 513/100 | 25.000000 unconverged below 26; no freeze | unresolved |
+| [exp-170](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-170-h220-n27-525-100-seedless-auto-windows5.md) | 27 | target | H-220 | Seedless auto plus windows 5 at 525/100 | Claimed after exp-169 stayed at 25.000000 unconverged | in-progress |
 | [exp-201](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-201-arm-calibration.md) | 18 | control | H-201 | Sparsity of the single-square move set at a trivial grid | At every scale tried no single-square proposal lowers the container side; the grid is a strict local minimum under the whole move set | baseline |
 | [exp-202](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-202-round-1-perturbation.md) | 11 | target | H-201 | Gensane’s simultaneous all-square perturbation on the ordinary move menu | Takes n = 17 from exactly 5.0 to within 0.002 of Bidwell cold, and is inert above n = 26 | rejected |
 | [exp-203](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-203-round-1-pressure.md) | 11 | target | H-202 | Aggregate wall-pressure term against the plain required-side objective | Isotropic pressure optimises a disc, returning exactly 2*sqrt(2) at n = 5, so pressure must be directional | rejected |
@@ -4648,7 +4652,8 @@ archive beside it.
 | exp-166 | Session-141 n=32 29/5 seedless auto plus windows 5 | 1206s | — | timebox | 29.803318 unconverged; no freeze |
 | exp-167 | Session-141 n=31 57/10 seedless auto plus windows 5 | 1285s | — | timebox | 28.331329 unconverged; no freeze |
 | exp-168 | Session-141 n=30 559/100 seedless auto plus windows 5 | 1213s | — | timebox | 27.178193 unconverged; no freeze |
-| exp-169 | Session-141 n=26 513/100 seedless auto plus windows 5 | — | — | claimed | not yet measured |
+| exp-169 | Session-141 n=26 513/100 seedless auto plus windows 5 | 1209s | — | timebox | 25.000000 unconverged; no freeze |
+| exp-170 | Session-141 n=27 525/100 seedless auto plus windows 5 | — | — | claimed | not yet measured |
 | exp-201 | 1.25e9 pair tests per chain, 8 chains, 5 seeds | 2681.0 s | 95 m | criterion | `9ae7700` |
 | exp-202 | 1.25e9 pair tests per chain, 8 chains, 5 seeds, 11 cells | 3663.0 s | 60 m | criterion | `9ae7700` |
 | exp-203 | 400,000 steps per anneal, 5 seeds, 5 cells | 2349.0 s | 25 m | criterion | `9ae7700` |
@@ -4662,9 +4667,9 @@ archive beside it.
 | exp-211 | 24 deterministic trajectory cells shared with exp-212 | shared; no duplicate charge | — | criterion | `9cca493c17ab61d5efb3e1032f32c54a9b87320e` |
 | exp-212 | 48 deterministic trajectory cells | 86.689 s | — | criterion | `9cca493c17ab61d5efb3e1032f32c54a9b87320e` |
 
-### What the 137 rounds jointly establish
+### What the 138 rounds jointly establish
 
-The 137 rounds use 2512.1 agent-minutes and 2354.3 wall-minutes under the campaign’s
+The 138 rounds use 2512.1 agent-minutes and 2374.5 wall-minutes under the campaign’s
 retained effort accounting.
 The never-invoked exp129 adds no scientific result or execution time.
 Exp-114 contributes 2.46 seconds of target/replay effort; its readiness work is recorded
@@ -5512,9 +5517,9 @@ the best known packing runs near half a unit — eleven cases above `+0.49`, hea
 `n = 51` at `+0.5364`, then `68`, `84`, `39`, `86`, `66`, `38`, `83`, `37`, `53` and
 `26`. Two cautions travel with that ranking.
 The prize is what the *ceiling* allows; the real limit is the covering value at that
-side. 38 values have been reported for the restricted program, at sides `2.99`, `3.81`, `3.82`,
+side. 39 values have been reported for the restricted program, at sides `2.99`, `3.81`, `3.82`,
 `3.83`, `3.84`, `3.85`, `3.875`, `3.95`, `3.96`, `3.969`, `3.97`, `3.98`, `3.985`, `3.99`, `4.58`, `4.59`,
-`4.6`, `4.61`, `4.67`, `4.675`, `4.6775`, `4.68`, `4.69`, `4.7`, `4.80`, `4.81`, `4.82`, `4.825`, `4.85`, `4.855`, `4.86`, `4.865`, `4.875`, `4.895`, `4.985`, `5.59`, `5.7` and `5.8` — the first eight
+`4.6`, `4.61`, `4.67`, `4.675`, `4.6775`, `4.68`, `4.69`, `4.7`, `4.80`, `4.81`, `4.82`, `4.825`, `4.85`, `4.855`, `4.86`, `4.865`, `4.875`, `4.895`, `4.985`, `5.13`, `5.59`, `5.7` and `5.8` — the first eight
 reports, not measurements this repository can reproduce, since no covering-search run log
 or solver checkpoint was retained for any of them; the ten added on 2026-09-05 by Agenda
 021’s `BC-200` and `BC-197` and Agenda 022’s `BC-213` and `BC-206` carry run logs; the
@@ -5548,6 +5553,9 @@ covering `19.247109` unconverged, farther than `4.81` on the same site set.
 covering `19.910044` unconverged, still below 20.
 `4.86` is the session-141 n=20 T-021-seeded four-grid plus windows 7 at 243/50,
 covering `19.887914` unconverged, still below 20.
+`5.13` is the session-141 n=26 seedless auto plus windows 5 at 513/100, covering
+`25.000000` unconverged, still below 26, the first first-party covering row at
+that size.
 `5.59` is the session-141 n=30 seedless auto plus windows 5 at 559/100, covering
 `27.178193` unconverged, still below 30, the first first-party covering row at
 that size.

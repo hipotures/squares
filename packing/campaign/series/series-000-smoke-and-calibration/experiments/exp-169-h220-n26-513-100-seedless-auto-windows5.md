@@ -48,30 +48,46 @@ experiment:
       Session-141 research wall to 2026-09-19T15:26:00Z. Fourth H-220 probe only.
       Do not replay n=32 29/5, n=31 57/10, or n=30 559/100 auto plus windows 5.
     record: packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/
-  lease:
-    expires: '2026-09-19T16:06:00Z'
-    host: cursor-cloud-session-141
   results:
   - shape: determination
     role: outcome
     question: >-
       Does a seedless auto plus windows-5 freeze at 513/100 have mass strictly below 26
       and print RETAINABLE?
-    outcome: invalid
-    checked_by: Not yet measured; the round is claimed.
+    outcome: criterion_missed
+    checked_by: >-
+      1200 s deadline stopped the row loop after 42 LP rounds at 25.000000 with
+      546 placements still violated. Sat on 25.000000 from round 11. No freeze.
+      Did not cross 26.
   verdict:
-    decision: in-progress
+    decision: unresolved
     primary_criterion: >-
       Confirm H-220 only when decide_certificate prints RETAINABLE on a freeze with
       mass < 26 at a side strictly above the Nagamochi floor
-    reason: Claimed; fourth Nagamochi probe after exp-168 n=30 559/100 stayed below 30 unconverged.
+    reason: >-
+      Seedless auto plus windows 5 at 513/100 finished unconverged below 26 on a
+      25.000000 plateau. Remaining rows raise. That site set is not a retain.
+      H-220 stays unconfirmed.
+    budget_spent: Covering 1208.6 s on one core.
+    best_reached: restricted optimum 25.000000 unconverged, no freeze
+    resume_from: >-
+      Do not replay n=26 513/100 auto plus windows 5. The next named set is exp-170
+      at n=27 525/100 seedless auto plus windows 5. Remaining rows raise this set.
+  effort:
+    timebox: Session-141 n=26 513/100 seedless auto plus windows 5
+    wall_seconds: 1209
+    stopped_by: timebox
 ---
 # Exp-169: H-220 Fourth Nagamochi Probe
 
 This is the fourth scientific round of
 [H-220](../../../hypotheses/H-220-seedless-colgen-raises-nagamochi-floor.md), after
 [exp-168](exp-168-h220-n30-559-100-seedless-auto-windows5.md) stopped at `27.178193`
-unconverged below 30. Remaining rows raise that set.
+unconverged below 30.
+
+Auto resolved to `(36, 49, 60)`. The 1200 s run stopped at `25.000000`
+unconverged below 26 after 42 LP rounds. It sat on that plateau from round 11.
+No freeze. T-030 was not offered. The follow-up is exp-170 at n=27 `525/100`.
 
 Confirm only on `RETAINABLE`. There is no n=26 case package.
 
