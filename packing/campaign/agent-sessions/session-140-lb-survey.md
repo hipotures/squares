@@ -425,6 +425,23 @@ Hourly watchdog: `lb-survey-hourly`. Closeout timer: `lb-survey-4h-closeout`.
 See [X-038](../explorations/X-038-n100-lower-bound-survey.md). First probe: n=20 at
 `973/200` with the T-021 seed, a four-grid, and windows 7.
 
+## T-029 recipe if the 2400 s n=20 freeze is RETAINABLE
+
+n=20 is on the H-218 sweep. Confirm H-218 only if `decide_certificate` prints
+`RETAINABLE` at `973/200`. Copy the T-021 landing, not a new case class.
+
+- Copy live `cases/n20_fractional_certificate/certificate.json` to
+  `certificate-97-20.json` before replacing the pointer. There is no named 97/20
+  file today.
+- Live plus `certificate-973-200.json` hold the new bytes.
+- Do not overwrite `certificate-24-5.json`.
+- `produced_by.session` is `session-140`. Score S3.
+- If freeze mass is in `[19, 20)`, the claim is `s(20) >= 973/200` and
+  `s(21) >= 973/200`. T-020 still holds n=19.
+- DS7 hardcodes n=21 verified `4.85`; that line moves with the pointer.
+- `4.865` is already a covering unique side.
+- Next T-id is T-029. Do not mint it on an unconverged or above-20 freeze.
+
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
 -->

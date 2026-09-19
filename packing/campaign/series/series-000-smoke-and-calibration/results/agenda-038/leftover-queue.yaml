@@ -1,0 +1,21 @@
+# Session-140 leftover first-wave probes. Start only after first-wave-queue.yaml
+# finishes (n=20 2400 s, then n=21). Sides sit between a verified floor and a
+# named covering row that stayed above n. No seed_certificate on n=21 beyond
+# the queued 97/20 row.
+probes:
+  - id: n19-241-50-t020-auto-windows6
+    n: 19
+    side: '241/50'
+    grid_counts: auto
+    seed_certificate: cases/n20_fractional_certificate/certificate-24-5.json
+    seed_windows: 6
+    deadline_seconds: 1200
+    bead: think-zoq4
+  - id: n17-461-100-t019-auto-windows5
+    n: 17
+    side: '461/100'
+    grid_counts: auto
+    seed_certificate: cases/n17_fractional_certificate/certificate.json
+    seed_windows: 5
+    deadline_seconds: 1200
+    bead: think-5q81

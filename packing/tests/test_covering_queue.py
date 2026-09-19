@@ -87,7 +87,7 @@ def test_walk_skips_existing_run_json(tmp_path: Path) -> None:
 def test_walk_halts_when_freeze_mass_is_below_n(tmp_path: Path) -> None:
     probe = Probe("n18-hit", 18, "467/100", "auto", "cert.json", 5, 1200)
 
-    def fake(probe: Probe, prefix: Path) -> int:
+    def fake(_probe: Probe, prefix: Path) -> int:
         Path(f"{prefix}-run.json").write_text(
             json.dumps({"total_mass": "17/1"}), encoding="utf-8"
         )
@@ -122,9 +122,26 @@ def test_remain_and_command_use_the_project_interpreter() -> None:
     probe = Probe("n20", 20, "973/200", "34,46,56,64", "cases/n20.json", 7, 1200)
     command = colgen_command(probe, Path("/tmp/n20"))
     assert command[1:3] == ["-m", "devtools.run_fractional_colgen"]
-    assert "--n" in command and "20" in command
+    assert "--n" in command
+    assert "20" in command
     assert "python3" not in Path(command[0]).name
     assert "--seed-certificate" in command
+
+
+def test_session_140_queue_files_parse() -> None:
+    """The live leftover and second-wave lists must stay walker-readable."""
+
+    agenda = (
+        Path(__file__).resolve().parent.parent
+        / "campaign/series/series-000-smoke-and-calibration/results/agenda-038"
+    )
+    leftover = load_queue(agenda / "leftover-queue.yaml")
+    second = load_queue(agenda / "second-wave-queue.yaml")
+    assert leftover[0].n == 19
+    assert leftover[0].side == "241/50"
+    assert leftover[1].n == 17
+    assert second[0].seed_certificate is None
+    assert second[0].n == 32
 
 
 def test_omitted_seed_certificate_drops_the_seed_flags(tmp_path: Path) -> None:

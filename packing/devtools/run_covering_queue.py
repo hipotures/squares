@@ -46,7 +46,10 @@ class Probe:
 def parse_stop_at(text: str) -> datetime:
     """ISO-8601 instant; a trailing Z is UTC."""
 
-    return datetime.fromisoformat(text.replace("Z", "+00:00")).astimezone(UTC)
+    parsed = datetime.fromisoformat(text)
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=UTC)
+    return parsed.astimezone(UTC)
 
 
 def remain_seconds(stop_at: datetime, now: datetime | None = None) -> int:
@@ -59,21 +62,25 @@ def load_queue(path: Path) -> list[Probe]:
 
     payload = safe_load(path.read_text(encoding="utf-8"))
     if not isinstance(payload, dict):
-        raise ValueError(f"{path}: queue root must be a mapping")
+        raise TypeError(f"{path}: queue root must be a mapping")
     raw = payload.get("probes")
-    if not isinstance(raw, list) or not raw:
+    if not isinstance(raw, list):
+        raise TypeError(f"{path}: needs a nonempty probes list")
+    if not raw:
         raise ValueError(f"{path}: needs a nonempty probes list")
     probes: list[Probe] = []
     for index, item in enumerate(raw):
         if not isinstance(item, dict):
-            raise ValueError(f"{path}: probes[{index}] must be a mapping")
+            raise TypeError(f"{path}: probes[{index}] must be a mapping")
         probes.append(_probe_from(item, path, index))
     return probes
 
 
 def _require_str(item: Mapping[object, object], key: str, path: Path, index: int) -> str:
     value = item.get(key)
-    if not isinstance(value, str) or not value:
+    if not isinstance(value, str):
+        raise TypeError(f"{path}: probes[{index}].{key} must be a nonempty string")
+    if not value:
         raise ValueError(f"{path}: probes[{index}].{key} must be a nonempty string")
     return value
 
@@ -81,11 +88,13 @@ def _require_str(item: Mapping[object, object], key: str, path: Path, index: int
 def _require_int(item: Mapping[object, object], key: str, path: Path, index: int) -> int:
     value = item.get(key)
     if isinstance(value, bool) or not isinstance(value, int):
-        raise ValueError(f"{path}: probes[{index}].{key} must be an int")
+        raise TypeError(f"{path}: probes[{index}].{key} must be an int")
     return value
 
 
-def _optional_str(item: Mapping[object, object], key: str, path: Path, index: int) -> str | None:
+def _optional_str(
+    item: Mapping[object, object], key: str, path: Path, index: int
+) -> str | None:
     if key not in item or item[key] is None or item[key] == "":
         return None
     return _require_str(item, key, path, index)
@@ -120,12 +129,12 @@ def freeze_mass_below_n(n: int, run_path: Path) -> bool:
 
     payload = json.loads(run_path.read_text(encoding="utf-8"))
     if not isinstance(payload, dict):
-        raise ValueError(f"{run_path}: run JSON must be a mapping")
+        raise TypeError(f"{run_path}: run JSON must be a mapping")
     mass = payload.get("total_mass")
     if mass is None:
         return False
     if not isinstance(mass, str | int):
-        raise ValueError(f"{run_path}: total_mass must be a string or int")
+        raise TypeError(f"{run_path}: total_mass must be a string or int")
     return Fraction(mass) < n
 
 
@@ -263,7 +272,11 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     queue_path = args.queue.resolve()
     probes = load_queue(queue_path)
-    log_path = args.log.resolve() if args.log is not None else queue_path.parent / "covering-queue.log"
+    log_path = (
+        args.log.resolve()
+        if args.log is not None
+        else queue_path.parent / "covering-queue.log"
+    )
     return walk_queue(probes, queue_path.parent, parse_stop_at(args.stop_at), log_path)
 
 
