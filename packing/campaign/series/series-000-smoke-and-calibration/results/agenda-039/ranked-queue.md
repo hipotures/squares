@@ -1,0 +1,46 @@
+# Session-141 Ranked Covering Queue
+
+Status: **ranked**. Walker file is `rank-queue.yaml`. Optional follow-ups are
+`optional-queue.yaml`. Do not walk agenda-038 leftover or first-wave queues.
+
+A restricted optimum already above `n` cannot retain on more wall of the same site set.
+Remaining rows raise that value. Adding sites can still lower it. Leftover wall goes to
+an untried side or an untried site set.
+
+## Ranked queue
+
+| Rank | Bead | Claim | n | Side | Site set | Deadline |
+| ---: | --- | --- | ---: | --- | --- | ---: |
+| 1 | think-u11x | H-219 | 18 | `1871/400` | T-028 auto plus windows 5 | 1200 s |
+| 2 | think-so2k | H-218 | 20 | `971/200` | T-021 four-grid `(34,46,56,64)` plus windows 7 | 2400 s |
+| 3–10 | think-coet | H-220 | 32…44 | queued Nagamochi sides | auto plus windows 5, no seed | 1200 s |
+
+Insert optional rank 1b (n=18 four-grid plus windows 5, 1800 s) only if rank 1 stays
+below 18 unconverged. Insert optional n=20 `243/50` only if rank 2 stays below 20 and
+does not retain.
+
+First walker `--stop-at 2026-09-19T10:26:00Z`. Resume the same file after W5 with
+`--stop-at 2026-09-19T15:26:00Z`. Halt on freeze mass `< n`. T-id only on `RETAINABLE`.
+
+## Do not replay
+
+| n | Side | Site set | Why |
+| ---: | --- | --- | --- |
+| 18 | `187/40` | T-027 auto plus windows 5 | T-028 retained at `17.879034` |
+| 18 | `117/25` | every named seed | Locked at `18.000000` |
+| 18 | `469/100`, `47/10` | T-019 auto | Plateau or above 18 |
+| 20 | `971/200` | T-021 auto plus windows 6 | `19.910044` unconverged; remaining rows raise |
+| 20 | `973/200` | T-021 four-grid plus windows 7 | `19.939212` after 2400 s; remaining rows raise |
+| 20 | `973/200` | H-062 auto-grid and cert-seed | Already crossed 20 |
+| 21 | `97/20` | T-021 auto plus windows 6 | Same side as T-021 |
+| 12 | `397/100` | T-017 four-grid plus windows 7 | Converged `12.133391` |
+| 12 | `3969/1000` | T-017 four-grid `(26,35,43,48)` plus windows 7 | `12.091168`, crossed 12 |
+| 17 | `23/5`, `461/100` | Session-140 named sets | Already above 17 |
+| 19 | `241/50`, `481/100`, `97/20` | T-020 auto plus windows 6 | Already above 19 |
+| 11 | any side above T-026 | stock covering | Covering-only; T-026 stands |
+
+n=18 `1871/400` does not confirm H-218. n=20 `971/200` on the new four-grid set would.
+
+<!-- This document follows common-doc-guidelines.md.
+See github.com/jlevy/practical-prose and review guidelines before editing.
+-->

@@ -54,6 +54,9 @@ hypothesis:
     and does not confirm the claim. Session-140 leftover n=20 971/200 stopped at
     19.910044 unconverged below 20, and leftover n=12 3969/1000 stopped at
     12.091168 after crossing 12. Neither freeze was offered. The claim stays open.
+    Session-141 reopens it only on a new named set: n=20 971/200 with T-021 four-grid
+    (34,46,56,64) plus windows 7, after exp-163 terminals. Do not replay leftover
+    auto plus windows 6 at 971/200.
 ---
 # H-218: Stock Colgen Raises One Small-n Floor
 

@@ -1,0 +1,269 @@
+---
+title: session-141 — n<100 research loop
+softschema:
+  contract: packing.squares:AgentSession/v2
+  schema: ../schemas/agent-session.schema.yaml
+  envelope: session
+  status: enforced
+session:
+  id: session-141
+  title: N<100 Research Loop
+  date: '2026-09-19'
+  started_at: '2026-09-19T07:26:00Z'
+  deadline_at: '2026-09-19T16:06:00Z'
+  branch: cursor/session-141-n100-research-f02a
+  primary_bead: think-ul7y
+  status: in_progress
+  goal: >-
+    Re-rank every open s(n) floor at n<100 from Session-140 evidence, iterate the
+    stock covering loop on the highest-likelihood unused constructions, and test
+    the other runnable hypotheses beside that core, for eight hours on a stacked PR.
+    Land the next T-id only if decide_certificate prints RETAINABLE.
+  workflow_phases:
+  - workflow: review-planning-oversight
+    focus: process
+    recording: contemporaneous
+    clock_role: work
+    bead: think-evlf
+    objective: >-
+      Write X-039, register H-219 and H-220, claim exp-163, file the ranked queue,
+      and open the stacked PR off the Session-140 branch.
+    status: completed
+    entered_by: session_start
+    switch_reason: null
+    budget_minutes: 60
+    started_at: '2026-09-19T07:26:00Z'
+    deadline_at: '2026-09-19T08:26:00Z'
+    expected_output: >-
+      X-039, H-219, H-220, exp-163 with a live lease, session-141, agenda-039
+      ranked queue, beads under think-ul7y, and a draft stacked PR.
+    validation_command: >-
+      cd packing && uv run --frozen --all-extras --group dev packing-ledger check &&
+      uv run --frozen --all-extras --group dev packing-validate --records
+    kill_condition: >-
+      Stop planning at 08:26Z even if the PR is still drafting. Do not start a
+      covering LP before X-039 names the ranked queue.
+    fallback: Keep the re-rank and beads and start the research phase on leftover n=18.
+    outcome: >-
+      X-039 re-ranks leftover n=18 first, then n=20 971/200 on a new four-grid,
+      then seedless n=32. H-219, H-220, and exp-163 are registered. Parent bead
+      think-ul7y. think-evlf closed.
+    evidence:
+      - packing/campaign/explorations/X-039-n100-re-rank-after-session-140.md
+      - packing/campaign/hypotheses/H-219-t028-seeded-colgen-raises-s18.md
+      - packing/campaign/hypotheses/H-220-seedless-colgen-raises-nagamochi-floor.md
+      - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-163-h219-t028-next-rung.md
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/ranked-queue.md
+    stop_reason: Planning artifacts written; research phase opened.
+    next_action: Run leftover n=18 1871/400 under think-u11x.
+  - workflow: research-loop
+    focus: insight
+    recording: contemporaneous
+    clock_role: work
+    bead: think-u11x
+    objective: >-
+      Walk the X-039 ranked covering queue. Record every restricted optimum.
+      Freeze and decide only when mass is below n. Land the next T-id only on
+      RETAINABLE. Pause new probes for Block 4 W5.
+    status: in_progress
+    entered_by: planned_checkpoint
+    switch_reason: Planning artifacts and beads are in the tree.
+    budget_minutes: 472
+    started_at: '2026-09-19T07:34:00Z'
+    deadline_at: '2026-09-19T15:26:00Z'
+    expected_output: >-
+      Covering receipts under agenda-039, covering-values rows for every finished
+      probe, and a T-id landing only if the gate accepts.
+    validation_command: >-
+      cd packing && uv run --frozen --all-extras --group dev packing-ledger check &&
+      uv run --frozen --all-extras --group dev packing-validate --records
+    kill_condition: >-
+      Stop new probes at 10:26Z for W5, resume at 11:26Z, and stop new probes at
+      15:26Z. Do not --search. Do not close think-qqzs, think-g3j7, think-gyzw,
+      or think-jwb1. Do not land a non-retainable freeze.
+    fallback: Keep the re-rank, the finished covering rows, and a terminal exp-163.
+    outcome: null
+    evidence: []
+    stop_reason: null
+    next_action: Start leftover n=18 1871/400 on rank-queue.yaml.
+  budget:
+    wall_minutes: 520
+    max_cycles: 8
+    orientation_minutes: 20
+    checkpoint_minutes: 60
+    slice_minutes: 60
+    finalization_minutes: 40
+  stop_conditions:
+  - Close by 2026-09-19T16:06:00Z with records and a reviewable stacked PR.
+  - Stop new covering probes at 2026-09-19T15:26:00Z.
+  - Block 4 (10:26Z–11:26Z) is the W5 efficiency block under think-36n1 / think-g4n9.
+  - Do not close think-qqzs, think-g3j7, think-gyzw, or think-jwb1.
+  - Do not allocate exp-161 to this session; do not --search.
+  - Do not mutate T-025 or T-026 verify_claim.py.
+  - Do not change accept rules, thresholds, or metrics.
+  - packing-campaign numeric unattended remains NO-GO.
+  - Do not edit gate-budgets.yaml; do not flip wall enforcement.
+  - Next T-id only if decide_certificate prints RETAINABLE.
+  - n=11 stays T-026; H-216 is not an n=11 result.
+  - n=18 does not confirm H-218.
+  progress:
+    metric: >-
+      Open n<100 floors re-ranked, and covering rows recorded on untried
+      constructions; a verified floor moves only on RETAINABLE
+    before: >-
+      Session-140 closed with T-028 at n=18. H-218 unconfirmed. Leftover n=18
+      1871/400 and the Nagamochi second wave did not start. Unique covering sides 33.
+    after: null
+  delegations:
+  - task: Re-rank n<100 covering from Session-140 masses
+    operator: session-141 covering-rank lane
+    status: completed
+    recording: contemporaneous
+    outcome: >-
+      First spend is leftover n=18 1871/400 (H-219), then n=20 971/200 on a new
+      four-grid plus windows 7 (H-218), then seedless n=32 29/5 (H-220).
+    evidence:
+      - packing/campaign/explorations/X-039-n100-re-rank-after-session-140.md
+    files:
+      - packing/campaign/explorations/X-039-n100-re-rank-after-session-140.md
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/ranked-queue.md
+    checks:
+      - Session-140 leftover ranking and covering-values rows quoted in X-039
+    uncertainty: >-
+      n=18 historically retained in 320 s; 117/25 still plateaus at 18, so 1871/400
+      can lock.
+    elapsed_seconds: 900
+    elapsed_quality: operator_reported_approximate
+    next_action: Register H-219 and write rank-queue.yaml.
+    phase: 1
+    budget_minutes: 20
+    started_at: '2026-09-19T07:26:00Z'
+    deadline_at: '2026-09-19T07:46:00Z'
+  - task: Survey other open hypotheses besides H-218
+    operator: session-141 hypothesis-survey lane
+    status: completed
+    recording: contemporaneous
+    outcome: >-
+      H-219 and H-220 are the new covering claims. H-210 and H-211 can run off-CPU.
+      H-163 is --check only. H-216 stays parked as n=11. Block 4 is think-g4n9.
+    evidence:
+      - packing/campaign/explorations/X-039-n100-re-rank-after-session-140.md
+    files:
+      - packing/campaign/explorations/X-039-n100-re-rank-after-session-140.md
+    checks:
+      - think-qqzs, think-g3j7, think-gyzw, think-jwb1 left open
+    uncertainty: >-
+      Workbench H-210/H-211 need Node >= 24.18; this VM has been on Node 22.
+    elapsed_seconds: 900
+    elapsed_quality: operator_reported_approximate
+    next_action: Keep covering on one core; park exp-161 encode.
+    phase: 1
+    budget_minutes: 20
+    started_at: '2026-09-19T07:26:00Z'
+    deadline_at: '2026-09-19T07:46:00Z'
+  - task: Extract session and experiment registration fields
+    operator: session-141 schema lane
+    status: completed
+    recording: contemporaneous
+    outcome: >-
+      Next ids are session-141, X-039, exp-163, H-219. Agenda drop is agenda-039.
+      In-progress experiment needs a live lease and no effort block.
+    evidence:
+      - packing/campaign/agent-sessions/session-141-n100-research.md
+    files:
+      - packing/campaign/agent-sessions/session-141-n100-research.md
+    checks:
+      - packing.squares AgentSession/v2 and Experiment/v2 required fields
+    uncertainty: Hypothesis status is ledger-derived, not a YAML field.
+    elapsed_seconds: 600
+    elapsed_quality: operator_reported_approximate
+    next_action: Write the live records and open the stacked PR.
+    phase: 1
+    budget_minutes: 15
+    started_at: '2026-09-19T07:26:00Z'
+    deadline_at: '2026-09-19T07:41:00Z'
+  outputs:
+    - packing/campaign/explorations/X-039-n100-re-rank-after-session-140.md
+    - packing/campaign/hypotheses/H-219-t028-seeded-colgen-raises-s18.md
+    - packing/campaign/hypotheses/H-220-seedless-colgen-raises-nagamochi-floor.md
+    - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-163-h219-t028-next-rung.md
+    - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/ranked-queue.md
+    - packing/campaign/agent-sessions/session-141-n100-research.md
+  checks: []
+  stop_reason: null
+  next_action: Continue leftover n=18 under think-u11x.
+---
+# Session-141: Eight-Hour n<100 Research Loop
+
+Stacked on Session-140 / PR 200. Branch `cursor/session-141-n100-research-f02a`.
+Workflow entry is planning, then the research loop. Primary bead is `think-ul7y`, not
+`think-qqzs`.
+
+[X-039](../explorations/X-039-n100-re-rank-after-session-140.md) is the re-rank.
+[H-219](../hypotheses/H-219-t028-seeded-colgen-raises-s18.md) is leftover n=18.
+[H-220](../hypotheses/H-220-seedless-colgen-raises-nagamochi-floor.md) is the Nagamochi
+wave. H-218 stays the n=12/17/19/20 claim; exp-162 is abandoned, and a new n=20 site
+set is the reopen path after exp-163 terminals.
+
+## Eight-hour schedule
+
+| Block | Window (UTC) | Workflow | Focus |
+| ---: | --- | --- | --- |
+| 1 | 07:26–08:26 | W10 | Plan, register, stacked PR |
+| 2 | 08:26–09:26 | W6 | H-219 leftover n=18 `1871/400` |
+| 3 | 09:26–10:26 | W6 | H-218 n=20 `971/200` new four-grid, or continue n=18 |
+| 4 | 10:26–11:26 | W5 | `think-g4n9` hosted walls; covering paused |
+| 5 | 11:26–12:26 | W6 | Resume covering; H-210/H-211 off-CPU if Node permits |
+| 6 | 12:26–13:26 | W6 | H-220 second wave or optional follow-ups |
+| 7 | 13:26–14:26 | W6 | Remaining ranked probes |
+| 8 | 14:26–15:26 | W6 | Last research hour |
+| closeout | 15:26–16:06 | W10 | Terminalize; 40-minute reserve |
+
+Covering may start as soon as X-039 names the queue, before 08:26. First walker
+`--stop-at 2026-09-19T10:26:00Z`. A probe already on the core at 10:26 finishes; no new
+probe starts until 11:26.
+
+OR-12: Block 4 is the efficiency block. The record says so here and on `think-36n1`.
+
+## Research loop
+
+1. Pick the top open cell on [ranked-queue.md](../series/series-000-smoke-and-calibration/results/agenda-039/ranked-queue.md).
+2. Restate the claim (H-219, then H-218, then H-220). Register a new experiment before
+   measuring a claim exp-163 does not own. Only one in-progress experiment at a time.
+3. Run `run_covering_queue` on one core.
+4. Record every restricted optimum on `covering-values.yaml`.
+5. If freeze mass `< n`, stop the queue and run both decide routes.
+6. Land a T-id only on `RETAINABLE`.
+7. Re-screen: a retain eats later sides on that n; a crossing above n kills more wall
+   on that site set.
+
+H-210 and H-211 use the workbench harness, not HiGHS. H-163 is
+`admit_threshold_compression --check` only. Do not `--search`. Do not encode beside
+covering.
+
+## T-029 recipe
+
+Next T-id is T-029. Copy the T-028 landing pattern, not a new case class. Score S3.
+`produced_by.session` is `session-141`.
+
+- n=18 `1871/400` RETAINABLE confirms H-219, not H-218. Copy live `certificate.json` to
+  `certificate-187-40.json` before replacing the pointer.
+- n=20 `971/200` RETAINABLE confirms H-218. Copy live n=20 `certificate.json` to
+  `certificate-97-20.json` before replacing the pointer. The claim is also
+  `s(21) >= 971/200`.
+- Do not mint T-029 on an unconverged freeze, a freeze with mass `>= n`, or n=21
+  `97/20`.
+
+## Constraints
+
+- Do not close `think-qqzs`, `think-g3j7`, `think-gyzw`, or `think-jwb1`.
+- Do not allocate exp-161. Do not `--search`.
+- Do not mutate T-025 or T-026 `verify_claim.py`.
+- packing-campaign numeric unattended remains NO-GO.
+- Do not edit `gate-budgets.yaml`.
+- n=11 stays T-026. H-216 is not an n=11 result.
+- Attic scratch is V0/C0.
+
+<!-- This document follows common-doc-guidelines.md.
+See github.com/jlevy/practical-prose and review guidelines before editing.
+-->
