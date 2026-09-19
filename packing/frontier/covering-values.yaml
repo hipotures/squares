@@ -976,6 +976,31 @@ values:
       above nineteen refutes this site set only; remaining rows can only raise it.
       Closer than the same construction at 97/20 (19.808958). Adding sites can still
       lower the covering value, so 481/100 is not barred. T-020 is unchanged.
+  - n: 19
+    side: '241/50'
+    side_decimal: '4.82'
+    objective: '19.247109'
+    site_set: t020-seed-auto-34-45-56-windows6
+    sites: 8865
+    rows: 11317
+    rounds: 38
+    converged: false
+    stop_reason: >-
+      The 1200 s deadline stopped the row loop after 38 LP rounds with 291 placements
+      still violated. The objective crossed 19 at round 12 (19.011201) and finished at
+      19.247109 on 8865 sites / 1172 orbits, including 2836 T-020 seed sites.
+    least_covered_mass: '0.976285'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n19-241-50-t020-auto-windows6-receipt.md
+      - packing/campaign/agent-sessions/session-140-lb-survey.md
+    notes: >-
+      Session-140 leftover rank 1. T-020 24/5 seed plus auto (34, 45, 56) plus windows
+      6 at 241/50, two hundredths above the verified floor. Unconverged mass still
+      above nineteen refutes this site set only; remaining rows can only raise it.
+      Farther than the same construction at 481/100 (19.132115), closer than 97/20
+      (19.808958). Adding sites can still lower the covering value, so 241/50 is not
+      barred. T-020 is unchanged. T-029 was not offered.
   - n: 21
     side: '997/200'
     side_decimal: '4.985'

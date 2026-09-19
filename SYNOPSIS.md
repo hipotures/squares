@@ -492,6 +492,7 @@ case or experiment separately.
 | [n=12 397/100 T-017-Seeded Four-Grid Window-7 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n12-397-100-t017-grid4-windows7-receipt.md) | research synthesis | record | retained | — |
 | [n=17 23/5 T-019-Seeded Four-Grid Window-8 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n17-23-5-t019-grid4-windows8-receipt.md) | research synthesis | record | retained | — |
 | [n=19 481/100 T-020-Seeded Auto Window-6 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n19-481-100-t020-auto-windows6-receipt.md) | research synthesis | record | retained | — |
+| [n=19 241/50 T-020-Seeded Auto Window-6 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n19-241-50-t020-auto-windows6-receipt.md) | research synthesis | record | retained | — |
 | [n=18 187/40 T-027-Seeded Auto Window-5 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n18-4675-1000-t027-auto-windows5-receipt.md) | research synthesis | record | retained | — |
 | [M3 T-018 9-Direction Search After Span-Sweep Encoding](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/m3-t018-net8-span/README.md) | research synthesis | record | retained | — |
 | [G4 n=11 191/50 Seventeen-Direction Threshold-Atom Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/g4-n11-191-50-net17/g4-n11-191-50-net17-receipt.md) | research synthesis | record | retained | — |
@@ -5469,9 +5470,9 @@ the best known packing runs near half a unit — eleven cases above `+0.49`, hea
 `n = 51` at `+0.5364`, then `68`, `84`, `39`, `86`, `66`, `38`, `83`, `37`, `53` and
 `26`. Two cautions travel with that ranking.
 The prize is what the *ceiling* allows; the real limit is the covering value at that
-side. 30 values have been reported for the restricted program, at sides `2.99`, `3.81`, `3.82`,
+side. 31 values have been reported for the restricted program, at sides `2.99`, `3.81`, `3.82`,
 `3.83`, `3.84`, `3.85`, `3.875`, `3.95`, `3.96`, `3.969`, `3.97`, `3.98`, `3.985`, `3.99`, `4.58`, `4.59`,
-`4.6`, `4.67`, `4.675`, `4.68`, `4.69`, `4.7`, `4.80`, `4.81`, `4.825`, `4.85`, `4.865`, `4.875`, `4.895` and `4.985` — the first eight
+`4.6`, `4.67`, `4.675`, `4.68`, `4.69`, `4.7`, `4.80`, `4.81`, `4.82`, `4.825`, `4.85`, `4.865`, `4.875`, `4.895` and `4.985` — the first eight
 reports, not measurements this repository can reproduce, since no covering-search run log
 or solver checkpoint was retained for any of them; the ten added on 2026-09-05 by Agenda
 021’s `BC-200` and `BC-197` and Agenda 022’s `BC-213` and `BC-206` carry run logs; the
@@ -5498,6 +5499,8 @@ retained checkpoint and frozen-certificate availability differs by row.
 `4.81` is the session-140 n=19 T-020-seeded auto plus windows 6 at 481/100,
 covering `19.132115` unconverged, closer than the same construction at `4.85`
 (`19.808958`).
+`4.82` is the session-140 leftover n=19 T-020-seeded auto plus windows 6 at 241/50,
+covering `19.247109` unconverged, farther than `4.81` on the same site set.
 Several sides are reported more than once from site sets built differently, which is the
 point of reporting them that way: at `4.85` the difference is between a wall and the
 certificate `T-021` rests on, at `4.865` it is two independent walls plus a session-140 four-grid-plus-windows-7
