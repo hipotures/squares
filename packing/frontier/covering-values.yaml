@@ -1850,3 +1850,29 @@ values:
       25.000000 plateau with 546 still violated is not a covering below 27;
       remaining rows can only raise it. T-030 was not offered. H-220 stays
       unconfirmed. Do not more-wall this set.
+  - n: 29
+    side: '548/100'
+    side_decimal: '5.48'
+    objective: '26.040745'
+    site_set: auto-39-53-65-windows5
+    sites: 9145
+    rows: 14722
+    rounds: 52
+    converged: true
+    stop_reason: >-
+      The row loop converged at LP round 52 (violated 0) at 26.040745 on 9145 sites
+      / 1230 orbits, including 625 window-lattice seed sites. least_covered 1.
+      Freeze mass 52081879/2000000 = 26.0409395. Never crossed 29. Wall 1068.7 s.
+      Auto resolved to (39, 53, 65). declare_least_cell_mass accepted least
+      4000013/4000000. decide_certificate refused the interval route: 272 stalled
+      boxes, Condition 5, enclosure (398409/400000, 4000013/4000000).
+    least_covered_mass: '1'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n29-548-100-auto-windows5-receipt.md
+      - packing/campaign/agent-sessions/session-141-n100-research.md
+    notes: >-
+      Session-141 exp-171. First first-party covering row at n=29. Seedless auto
+      plus windows 5 at 548/100, above the Nagamochi floor 1 + sqrt(20). The
+      first Nagamochi freeze with mass below n. Interval route refused; T-030
+      was not offered. H-220 stays unconfirmed. Do not more-wall this set.

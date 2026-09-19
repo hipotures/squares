@@ -49,33 +49,47 @@ experiment:
       Starts after the 11:26Z W5 resume. Do not replay n=32 29/5, n=31 57/10,
       n=30 559/100, n=26 513/100, or n=27 525/100 auto plus windows 5.
     record: packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/
-  lease:
-    expires: '2026-09-19T16:06:00Z'
-    host: cursor-cloud-session-141
   results:
   - shape: determination
     role: outcome
     question: >-
       Does a seedless auto plus windows-5 freeze at 548/100 have mass strictly below 29
       and print RETAINABLE?
-    outcome: invalid
-    checked_by: Not yet measured; the round is claimed.
+    outcome: criterion_missed
+    checked_by: >-
+      Covering converged at 26.040745 with freeze mass 52081879/2000000 = 26.0409395
+      and 1329 atoms. declare_least_cell_mass accepted least 4000013/4000000.
+      decide_certificate refused the interval route: Condition 5, 272 stalled boxes,
+      enclosure (398409/400000, 4000013/4000000). Not RETAINABLE.
   verdict:
-    decision: in-progress
+    decision: unresolved
     primary_criterion: >-
       Confirm H-220 only when decide_certificate prints RETAINABLE on a freeze with
       mass < 29 at a side strictly above the Nagamochi floor
-    reason: Claimed; sixth Nagamochi probe after exp-170 n=27 525/100 stayed at 25.000000 unconverged.
+    reason: >-
+      Seedless auto plus windows 5 at 548/100 converged below 29 and froze, but
+      the interval route refused the freeze. T-030 was not offered. H-220 stays
+      unconfirmed.
+    budget_spent: Covering 1068.7 s, declare 45 s, decide 66 s on one core.
+    best_reached: freeze mass 26.0409395; interval refused
+    resume_from: >-
+      Do not replay n=29 548/100 auto plus windows 5. The next named set is exp-172
+      at n=45 684/100 seedless auto plus windows 5.
+  effort:
+    timebox: Session-141 n=29 548/100 seedless auto plus windows 5
+    wall_seconds: 1180
+    stopped_by: criterion
 ---
 # Exp-171: H-220 Sixth Nagamochi Probe
 
 This is the sixth scientific round of
 [H-220](../../../hypotheses/H-220-seedless-colgen-raises-nagamochi-floor.md), after
 [exp-170](exp-170-h220-n27-525-100-seedless-auto-windows5.md) stopped at `25.000000`
-unconverged below 27. Remaining rows raise that set.
+unconverged below 27.
 
-The walker stopped before this cell at the 10:26Z W5 cut. Start it after
-11:26Z.
+Auto resolved to `(39, 53, 65)`. The row loop converged at `26.040745` with freeze
+mass `52081879/2000000`. `decide_certificate` refused the interval route. T-030
+was not offered. The follow-up is exp-172 at n=45 `684/100`.
 
 Confirm only on `RETAINABLE`. There is no n=29 case package.
 

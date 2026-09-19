@@ -75,13 +75,15 @@ untried `(n, side, site_set)`”.
 | 6 | H-220 | 30 | `559/100` | auto, windows 5, no seed | 1200 s | done; 27.178193 unconverged |
 | 7 | H-220 | 26 | `513/100` | auto, windows 5, no seed | 1200 s | done; 25.000000 unconverged |
 | 8 | H-220 | 27 | `525/100` | auto, windows 5, no seed | 1200 s | done; 25.000000 unconverged |
-| 9–11 | H-220 | 29, 45, 44 | queued Nagamochi sides | auto, windows 5, no seed | 1200 s | low |
+| 9 | H-220 | 29 | `548/100` | auto, windows 5, no seed | 1200 s | done; freeze 26.0409395; interval refused |
+| 10–11 | H-220 | 45, 44 | queued Nagamochi sides | auto, windows 5, no seed | 1200 s | low |
 
 n=18 is off the H-218 sweep `{12, 17, 19, 20}`. A retain at `1871/400` is the next T-id
 and does not confirm H-218. Rank 2 finished `19.857588` unconverged; remaining rows
 raise. Rank 3 finished `19.887914` unconverged; remaining rows raise. H-218 stays
 unconfirmed. exp-162 is abandoned; the reopen is exp-164 then exp-165, both
-unresolved. The next probe is exp-171 / H-220 at n=29 `548/100` after 11:26Z.
+unresolved. exp-171 at n=29 `548/100` converged and froze; the interval route
+refused. The next probe is exp-172 / H-220 at n=45 `684/100`.
 
 n=11 stays T-026. H-216 at n=6 is calibration, not an n=11 result. n=21 `97/20` is the
 same verified side as T-021.
@@ -104,7 +106,7 @@ One CPU. Sequential colgen. Sub-agents own audit, registration, and W5.
 | --- | --- | --- |
 | H-219 | first covering probe | Same class as T-028; unused leftover side |
 | H-218 | reopen after exp-163 terminals | exp-164 at `971/200` four-grid `19.857588` and exp-165 at `243/50` `19.887914` unconverged; do not replay those sets |
-| H-220 | live after exp-170 | exp-166–170 at n=32 `29.803318`, n=31 `28.331329`, n=30 `27.178193`, n=26/27 `25.000000` unconverged; next probe n=29 `548/100` as exp-171 after 11:26Z |
+| H-220 | live after exp-171 | exp-166–170 unconverged; exp-171 n=29 freeze interval-refused; next probe n=45 `684/100` as exp-172 |
 | H-221 | after ranked H-218 long-shots | T-029-seeded next rung at `4679/1000` |
 | H-210 / H-211 | off-CPU if Node permits | Workbench determinations; not a floor |
 | H-163 / exp-161 | `--check` only | Encode already timed out; no `--search`; do not steal the covering core |
