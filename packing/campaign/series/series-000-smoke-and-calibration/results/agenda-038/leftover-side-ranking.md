@@ -40,6 +40,7 @@ Leftover n=20 `971/200` finished at `19.910044` unconverged, still below 20.
 | 20 | `971/200` | Session-140 leftover auto plus windows 6 stopped at `19.910044` unconverged below 20. Remaining rows raise. |
 | 20 | `971/200` four-grid plus windows 7 | Session-141 exp-164 stopped at `19.857588` unconverged below 20. Remaining rows raise. |
 | 20 | `243/50` four-grid plus windows 7 | Session-141 exp-165 stopped at `19.887914` unconverged below 20. Remaining rows raise. |
+| 32 | `29/5` seedless auto plus windows 5 | Session-141 exp-166 stopped at `29.803318` unconverged below 32. Remaining rows raise. |
 | 20 | `973/200` H-062 sets | Auto-grid `20.001502` and cert-seed `20.000223` already crossed. |
 | 21 | `997/200` | Grid artifact at `25.000000`. |
 | 11 | any side above T-026 | Covering-only. Not this campaign’s floor win. |

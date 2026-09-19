@@ -1728,3 +1728,27 @@ values:
       3.96004 and the claim that the gap to the fixed-B ceiling 4B = 3.9908 was exhausted
       are withdrawn. The recorded run log preserves that historical inference; the
       attainable part of the remaining 0.0308 below the ceiling is unresolved.
+  - n: 32
+    side: '29/5'
+    side_decimal: '5.8'
+    objective: '29.803318'
+    site_set: auto-42-56-70-windows5
+    sites: 10417
+    rows: 11974
+    rounds: 35
+    converged: false
+    stop_reason: >-
+      The 1200 s deadline stopped the row loop after 35 LP rounds with 546 placements
+      still violated. The objective finished at 29.803318 on 10417 sites / 1356 orbits,
+      including 625 window-lattice seed sites. Auto resolved to (42, 56, 70). It did
+      not cross 32.
+    least_covered_mass: '0.929890'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n32-29-5-auto-windows5-receipt.md
+      - packing/campaign/agent-sessions/session-141-n100-research.md
+    notes: >-
+      Session-141 exp-166. First first-party covering row at n=32. Seedless auto
+      plus windows 5 at 29/5, above the Nagamochi floor 1 + sqrt(23). Unconverged
+      mass still below 32 is not a covering below 32; remaining rows can only raise
+      it. T-030 was not offered. H-220 stays unconfirmed. Do not more-wall this set.

@@ -48,8 +48,9 @@ hypothesis:
   notes: >-
     Session-140 second-wave queue never started. n=28, n=61, and n=78 stay
     deferred. Calibration: no seed, larger placement sets. Different n and
-    construction class from H-218. Session-141 claimed exp-166 after exp-165
-    stopped at 19.887914 unconverged. First probe is n=32 29/5 auto plus
+    construction class from H-218. Session-141 exp-166 at n=32 29/5 auto plus
+    windows 5 stopped at 29.803318 unconverged below 32; remaining rows raise.
+    Follow-up is exp-167 at n=31 57/10. Do not replay n=32 29/5 auto plus
     windows 5. Confirm only on RETAINABLE.
 ---
 # H-220: Seedless Colgen Raises a Nagamochi-Only Floor

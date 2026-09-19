@@ -24,8 +24,8 @@ known packing, otherwise whichever of the two the limit is.
 **`prize` is what the limit allows, not what a search will reach.** The real
 limit is the covering value: a certificate exists at side `L` only where the
 least total mass that covers every admissible `B`-square falls below `n`, and
-that value can bind well below either cap. 73 restricted optima
-have been reported at 35 sides, one per site set, and
+that value can bind well below either cap. 74 restricted optima
+have been reported at 36 sides, one per site set, and
 `frontier/covering-values.yaml` registers each with whether its row loop
 converged; every one is at best an upper bound on the unrestricted covering
 value there. What survives here beside each is a frozen certificate or nothing
@@ -106,6 +106,7 @@ at all:
 | 12 | 3.985 | certificate-seeded | 12.104043 | no | Crossed twelve at LP round 3 with placements still violated; the loop reached 12.414845 by round 13 before the cell stopped it. 115 s. | nothing frozen here. BC-206 of agenda 022. Across the four tested sides, the seeded constructions crossed twelve at rounds 8, 5, 3, 3. No higher certified rung was found in these runs; they do not exclude other constructions above 99/25. |
 | 12 | 3.99 | certificate-seeded | 12.056180 | no | Crossed twelve at LP round 3 with placements still violated; the loop reached 12.398218 by round 8 before the cell stopped it. 150 s. | nothing frozen here. BC-206 of agenda 022. Across the four tested sides, the seeded constructions crossed twelve at rounds 8, 5, 3, 3. No higher certified rung was found in these runs; they do not exclude other constructions above 99/25. |
 | 12 | 3.97 | cutting-plane | 12.248227 | yes | The row LP reportedly converged at 12.248227 under devtools.run_fractional_cutting, the instrument BC-200 used. The log also reports a depth-scaled floor, but its generating family and state were not retained for replay. | nothing frozen here. BC-206 of agenda 022, unregistered follow-up at a pre-registered side. The log reports a cutting floor of approximately 10.845594 and a converged row-LP value of 12.248227 at 3.97. The floor has not been replayed after the D-476 and D-477 cutting corrections because its generating family and state were not retained. This does not show the historical floor invalid, but the log supplies no revalidated exact bracket. The side remains undecided. The retained certificate at 3.96 gives an upper bound of 11.998960 on its covering value. Subtracting two upper bounds does not bound the increase in the true optima. These data establish neither a lower slope bound nor the side where the covering value reaches twelve. Correction, 2026-09-06: the previous endpoint estimate 3.96004 and the claim that the gap to the fixed-B ceiling 4B = 3.9908 was exhausted are withdrawn. The recorded run log preserves that historical inference; the attainable part of the remaining 0.0308 below the ceiling is unresolved. |
+| 32 | 5.8 | auto-42-56-70-windows5 | 29.803318 | no | The 1200 s deadline stopped the row loop after 35 LP rounds with 546 placements still violated. The objective finished at 29.803318 on 10417 sites / 1356 orbits, including 625 window-lattice seed sites. Auto resolved to (42, 56, 70). It did not cross 32. | nothing frozen here. Session-141 exp-166. First first-party covering row at n=32. Seedless auto plus windows 5 at 29/5, above the Nagamochi floor 1 + sqrt(23). Unconverged mass still below 32 is not a covering below 32; remaining rows can only raise it. T-030 was not offered. H-220 stays unconfirmed. Do not more-wall this set. |
 
 No covering-search run log or solver checkpoint was retained for any of them, so
 not one of the reported values can be recomputed here. What a frozen certificate
@@ -117,10 +118,10 @@ artifact's mass and the reported objective are different numbers.
 
 They are also reports of different kinds rather than one series measured the same
 way, and the `converged` column is where the difference lives: 29 of
-the 73 ran their row loop to convergence, and the rest stopped for the
+the 74 ran their row loop to convergence, and the rest stopped for the
 reason beside each — or for none the record kept — and stand as upper bounds on
-their own site sets only. 73 heterogeneous reports across a side band
-2.00 wide do not support a growth trend or a fitted curve, and no rung in
+their own site sets only. 74 heterogeneous reports across a side band
+2.81 wide do not support a growth trend or a fitted curve, and no rung in
 this register has ever been claimed from one. Rank on `prize` to choose where to
 look; measure and retain the run before believing any extrapolation.
 
