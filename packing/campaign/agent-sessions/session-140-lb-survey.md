@@ -80,7 +80,7 @@ session:
     evidence: []
     stop_reason: null
     next_action: >-
-      T-028 retained. Finish the n=20 2400 s follow-up, then n=21.
+      T-028 retained. Finish the n=20 2400 s follow-up, then n=21, then leftover.
   budget:
     wall_minutes: 260
     max_cycles: 2
@@ -377,6 +377,7 @@ session:
   - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n17-23-5-t019-grid4-windows8-receipt.md
   - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n19-481-100-t020-auto-windows6-receipt.md
   - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n18-4675-1000-t027-auto-windows5-receipt.md
+  - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/leftover-side-ranking.md
   checks:
   - Planning artifacts written; research phase open.
   - >-
@@ -389,7 +390,8 @@ session:
     n=20 2400 s follow-up started 04:15Z. H-218 unconfirmed.
   stop_reason: null
   next_action: >-
-    Finish the n=20 2400 s probe, then n=21. Do not close think-qqzs.
+    Finish the n=20 2400 s probe, then n=21, then leftover-queue.yaml.
+    Do not close think-qqzs.
 ---
 # Session 140: N<=100 Lower-Bound Survey
 
@@ -414,7 +416,8 @@ Hourly watchdog: `lb-survey-hourly`. Closeout timer: `lb-survey-4h-closeout`.
 
 - Project Python 3.14 via `uv run --frozen` from `packing/` only.
 - Do not close `think-qqzs`, `think-g3j7`, `think-gyzw`, or `think-jwb1`.
-- `exp-161` is not this session. Do not `--search`.
+- `exp-161` is not this session.
+  Do not `--search`.
 - Do not mutate T-025/T-026 `verify_claim.py`.
 - `packing-campaign` numeric unattended is NO-GO.
 - T-028 only if `decide_certificate` prints `RETAINABLE`.
@@ -422,17 +425,18 @@ Hourly watchdog: `lb-survey-hourly`. Closeout timer: `lb-survey-4h-closeout`.
 
 ## Ranked queue
 
-See [X-038](../explorations/X-038-n100-lower-bound-survey.md). First probe: n=20 at
-`973/200` with the T-021 seed, a four-grid, and windows 7.
+See [X-038](../explorations/X-038-n100-lower-bound-survey.md).
+First probe: n=20 at `973/200` with the T-021 seed, a four-grid, and windows 7.
 
 ## T-029 recipe if the 2400 s n=20 freeze is RETAINABLE
 
-n=20 is on the H-218 sweep. Confirm H-218 only if `decide_certificate` prints
-`RETAINABLE` at `973/200`. Copy the T-021 landing, not a new case class.
+n=20 is on the H-218 sweep.
+Confirm H-218 only if `decide_certificate` prints `RETAINABLE` at `973/200`. Copy the
+T-021 landing, not a new case class.
 
 - Copy live `cases/n20_fractional_certificate/certificate.json` to
-  `certificate-97-20.json` before replacing the pointer. There is no named 97/20
-  file today.
+  `certificate-97-20.json` before replacing the pointer.
+  There is no named 97/20 file today.
 - Live plus `certificate-973-200.json` hold the new bytes.
 - Do not overwrite `certificate-24-5.json`.
 - `produced_by.session` is `session-140`. Score S3.
@@ -441,6 +445,14 @@ n=20 is on the H-218 sweep. Confirm H-218 only if `decide_certificate` prints
 - DS7 hardcodes n=21 verified `4.85`; that line moves with the pointer.
 - `4.865` is already a covering unique side.
 - Next T-id is T-029. Do not mint it on an unconverged or above-20 freeze.
+
+## Leftover ranking
+
+See
+[leftover-side-ranking.md](../series/series-000-smoke-and-calibration/results/agenda-038/leftover-side-ranking.md).
+A restricted optimum already above `n` cannot retain on more wall of the same site set.
+After n=21, walk `leftover-queue.yaml`: n=19 `241/50`, n=17 `461/100`, n=20 `971/200`,
+n=12 `3969/1000` four-grid plus windows 7, n=18 `1871/400`.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

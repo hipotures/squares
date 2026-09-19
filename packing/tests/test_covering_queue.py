@@ -140,6 +140,12 @@ def test_session_140_queue_files_parse() -> None:
     assert leftover[0].n == 19
     assert leftover[0].side == "241/50"
     assert leftover[1].n == 17
+    assert leftover[1].side == "461/100"
+    assert leftover[2].n == 20
+    assert leftover[2].side == "971/200"
+    assert leftover[3].n == 12
+    assert leftover[4].n == 18
+    assert leftover[4].side == "1871/400"
     assert second[0].seed_certificate is None
     assert second[0].n == 32
 

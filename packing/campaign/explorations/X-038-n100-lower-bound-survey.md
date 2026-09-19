@@ -27,14 +27,15 @@ exploration:
   - packing/frontier/covering-values.yaml
   - packing/frontier/RESULTS.md
   - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+  - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/leftover-side-ranking.md
   - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-062-h-062-m5-midpoint-rung.md
   - packing/devtools/run_fractional_colgen.py
   proposes: [H-218]
 ---
 # X-038: Which Lower Bounds the Stock Tools Can Still Move
 
-Session-140 asked one question: of the open `s(n)` floors at `n <= 100`, which ones
-can the instruments already on the branch still raise?
+Session-140 asked one question: of the open `s(n)` floors at `n <= 100`, which ones can
+the instruments already on the branch still raise?
 
 The instruments are `devtools.run_fractional_colgen` (auto grids, explicit four-grids,
 `--seed-certificate`, `--seed-windows`), then `declare_least_cell_mass` and
@@ -46,9 +47,9 @@ Nothing here is a bound.
 Thirty-two sizes in `1..100` are proved equal (`n = 1..10`, `13..16`, `22..25`,
 `33..36`, `46..49`, `62..64`, `79..81`). Their floors are not a covering target.
 
-Sixty-eight sizes are open. Most of those floors are the Nagamochi formula
-`1 + sqrt(n - 2 floor(sqrt(n)) + 1)`. First-party fractional certificates sit on
-seven of them:
+Sixty-eight sizes are open.
+Most of those floors are the Nagamochi formula `1 + sqrt(n - 2 floor(sqrt(n)) + 1)`.
+First-party fractional certificates sit on seven of them:
 
 | n | Verified floor | Verified ceiling | Gap | Covering already tried above the floor |
 | --- | ---: | ---: | ---: | --- |
@@ -60,13 +61,15 @@ seven of them:
 | 20 | T-021 `97/20` | grid `5` | 0.150 | Yes. Old cert-seed crossed at `20.000223`. Session-140 four-grid plus windows 7 stopped at `19.930198` unconverged; a 2400 s rerun is in flight. |
 | 21 | T-021 `97/20` | grid `5` | 0.150 | One unusable grid row at `997/200`. Auto plus windows 6 at `97/20` is queued. |
 
-A restricted optimum above `n` refutes that site set only. Remaining rows can only
-raise it. Adding sites can still lower it. Session-139’s `397/100`, `23/5`, and
-`97/20` rows are therefore open rungs, not walls.
+A restricted optimum above `n` refutes that site set only.
+Remaining rows can only raise it.
+Adding sites can still lower it.
+Session-139’s `397/100`, `23/5`, and `97/20` rows are therefore open rungs, not walls.
 
-H-062 already accepted a wall at `n = 20`, side `973/200`, on the two site sets it
-named (auto grid and the 97/20 seed). That wall does not bind a windows lattice or a
-four-grid. Those are new named site sets of the same producer.
+H-062 already accepted a wall at `n = 20`, side `973/200`, on the two site sets it named
+(auto grid and the 97/20 seed).
+That wall does not bind a windows lattice or a four-grid.
+Those are new named site sets of the same producer.
 
 ## Ranked Queue
 
@@ -83,40 +86,45 @@ the current floor”, then remaining gap, then whether a seed certificate exists
 | 6 | think-b6n9 | 21 | `97/20` | Same certificates as n=20, almost no covering data. Run only if the n=20 lane is idle. | T-021 seed, auto plus windows 6 |
 | 7 | — | 11 | none this block | Point covering at sides above T-026 is already `11.14` and rising. Not this campaign’s win condition. | — |
 
-`think-8ujs` is not a probe. It is the retain step, and it stays idle unless
-`decide_certificate` prints `RETAINABLE`.
+`think-8ujs` is not a probe.
+It is the retain step, and it stays idle unless `decide_certificate` prints
+`RETAINABLE`.
 
 ## Second Wave: Nagamochi-Only Floors
 
-The remaining open sizes have no first-party covering row. The smallest block is
-`n = 26..32` (floors `5.12..5.80`, ceilings 6 or a published packing). After that
-`n = 37..45`, `50..61`, `65..78`, `82..100`.
+The remaining open sizes have no first-party covering row.
+The smallest block is `n = 26..32` (floors `5.12..5.80`, ceilings 6 or a published
+packing). After that `n = 37..45`, `50..61`, `65..78`, `82..100`.
 
-Those sizes need a seed. The stock move is the same producer with `--grid-counts auto`
-at a side just above the Nagamochi floor. That is a calibration, not a promised bound,
-and it is deferred until ranks 1–5 have either frozen or exhausted their named site
-sets. `think-b6n9` owns the triage note, not a T-id.
+Those sizes need a seed.
+The stock move is the same producer with `--grid-counts auto` at a side just above the
+Nagamochi floor. That is a calibration, not a promised bound, and it is deferred until
+ranks 1–5 have either frozen or exhausted their named site sets.
+`think-b6n9` owns the triage note, not a T-id.
 
 ## What Would Count as Progress
 
 A covering row on a new `(n, side, site_set)` is progress even when it stays above `n`.
 A verified floor moves only after a freeze with mass `< n` that both routes of
-`decide_certificate` accept. Session-140 landed T-028 at n=18 (`187/40`). That retain
-is off the H-218 sweep and does not confirm H-218. Session-139 left the landing
-recipe; this session copied it and did not invent a case class.
+`decide_certificate` accept.
+Session-140 landed T-028 at n=18 (`187/40`). That retain is off the H-218 sweep and does
+not confirm H-218. Session-139 left the landing recipe; this session copied it and did
+not invent a case class.
 
 n=11 stays T-026. H-216 stays a calibration at n=6. exp-161 stays unresolved with no
 `--search`.
 
 ## Autonomous Loop
 
-One coordinator owns identifiers, covering-values, T-id landing, ledger render, and
-the stacked PR. Each probe bead owns one `(n, side)` family and writes under
-`packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/`.
-The walker is `python -m devtools.run_covering_queue` over `first-wave-queue.yaml`,
-then `leftover-queue.yaml`, then `second-wave-queue.yaml`. Kill a probe at its deadline. If the freeze mass is
-below `n`, stop new probes and run the retain recipe. If not, record the row and
-take the next rank.
+One coordinator owns identifiers, covering-values, T-id landing, ledger render, and the
+stacked PR. Each probe bead owns one `(n, side)` family and writes under
+`packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/`. The
+walker is `python -m devtools.run_covering_queue` over `first-wave-queue.yaml`, then
+`leftover-queue.yaml`, then `second-wave-queue.yaml`. Ranking for the leftover list is
+`leftover-side-ranking.md`: untried sides or site sets only.
+Do not replay a set whose restricted optimum is already above `n`. Kill a probe at its
+deadline. If the freeze mass is below `n`, stop new probes and run the retain recipe.
+If not, record the row and take the next rank.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
