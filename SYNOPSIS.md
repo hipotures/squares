@@ -166,7 +166,7 @@ The generated agenda map, not this narrative, summarizes commitment state.
 [Session 139](packing/campaign/agent-sessions/session-139-n11-overnight-research.md)
 is the latest terminal closeout: encode-only timed out unresolved, T-027 retained
 `s(18) >= 467/100`, and `think-qqzs` remains the next entry.
-[Session 140](packing/campaign/agent-sessions/session-140-lb-survey.md) is the live
+[Session 140](packing/campaign/agent-sessions/session-140-lb-survey.md) closed the
 stacked-PR survey of `n <= 100` lower bounds; it retained T-028 `s(18) >= 187/40`
 and does not replace that handoff. It does not confirm H-218.
 [Session 138](packing/campaign/agent-sessions/session-138-n11-overnight-review.md)
