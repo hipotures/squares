@@ -57,9 +57,10 @@ hypothesis:
     Session-141 reopens it on a new named set: n=20 971/200 with T-021 four-grid
     (34,46,56,64) plus windows 7, as exp-164, after exp-163 accepted T-029. That
     probe stopped at 19.857588 unconverged below 20; remaining rows raise. The
-    follow-up is exp-165 at 243/50 on the same four-grid. Do not replay leftover
-    auto plus windows 6 at 971/200 or the Session-141 four-grid at 971/200. T-029
-    does not confirm this claim.
+    follow-up exp-165 at 243/50 on the same four-grid stopped at 19.887914
+    unconverged below 20; remaining rows raise. Do not replay leftover auto plus
+    windows 6 at 971/200 or the Session-141 four-grid at 971/200 or 243/50.
+    T-029 does not confirm this claim.
 ---
 # H-218: Stock Colgen Raises One Small-n Floor
 

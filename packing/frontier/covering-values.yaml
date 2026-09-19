@@ -1341,8 +1341,32 @@ values:
       remaining rows can only raise it. The mass is below leftover auto plus
       windows 6 at this side (19.910044) and below the same four-grid at 973/200
       (19.939212). T-021 is unchanged. T-030 was not offered. H-218 stays
-      unconfirmed. Optional 243/50 uses this four-grid class on a thinner unused
-      side.
+      unconfirmed. The same four-grid at 243/50 finished 19.887914 unconverged.
+  - n: 20
+    side: '243/50'
+    side_decimal: '4.86'
+    objective: '19.887914'
+    site_set: t021-seed-four-grid-34-46-56-64-windows7
+    sites: 12676
+    rows: 13250
+    rounds: 36
+    converged: false
+    stop_reason: >-
+      The 1200 s deadline stopped the row loop after 36 LP rounds with 459 placements
+      still violated. The objective finished at 19.887914 on 12676 sites / 1646 orbits,
+      including 2464 T-021 seed sites. It did not cross 20.
+    least_covered_mass: '0.965974'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n20-243-50-t021-grid4-windows7-receipt.md
+      - packing/campaign/agent-sessions/session-141-n100-research.md
+    notes: >-
+      Session-141 exp-165. T-021 seed plus four-grid (34, 46, 56, 64) plus windows 7
+      at 243/50. Unconverged mass still below twenty is not a covering below 20;
+      remaining rows can only raise it. The mass is above the same four-grid at
+      971/200 (19.857588) and below leftover auto plus windows 6 at 971/200
+      (19.910044). T-021 is unchanged. T-030 was not offered. H-218 stays
+      unconfirmed. Do not more-wall this set.
   - n: 20
     side: '24/5'
     side_decimal: '4.80'

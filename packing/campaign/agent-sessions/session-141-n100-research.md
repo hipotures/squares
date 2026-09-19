@@ -87,7 +87,7 @@ session:
       - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n18-1871-400-t028-auto-windows5-receipt.md
       - packing/frontier/n-018.md
     stop_reason: null
-    next_action: Run n=20 243/50 four-grid under think-so2k / exp-165; then Nagamochi H-220.
+    next_action: Run n=32 29/5 seedless auto under think-coet / exp-166; then remaining Nagamochi.
   budget:
     wall_minutes: 520
     max_cycles: 8
@@ -231,6 +231,30 @@ session:
     budget_minutes: 20
     started_at: '2026-09-19T08:38:00Z'
     deadline_at: '2026-09-19T08:58:00Z'
+  - task: Record n=20 243/50 four-grid and claim exp-166
+    operator: session-141 coordinator
+    status: completed
+    recording: contemporaneous
+    outcome: >-
+      exp-165 stopped at 19.887914 unconverged below 20 after 36 rounds / 1269 s.
+      No freeze. T-030 not offered. H-218 unconfirmed. Walker started n=32 29/5
+      as exp-166 / H-220.
+    evidence:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n20-243-50-t021-grid4-windows7-receipt.md
+    files:
+      - packing/frontier/covering-values.yaml
+      - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-165-h218-n20-243-50-four-grid.md
+      - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-166-h220-n32-29-5-seedless-auto-windows5.md
+    checks:
+      - decide_certificate not run; no freeze below 20
+    uncertainty: Remaining rows on 243/50 four-grid raise; H-220 is a new n and class.
+    elapsed_seconds: 1300
+    elapsed_quality: operator_reported_approximate
+    next_action: think-coet
+    phase: 2
+    budget_minutes: 20
+    started_at: '2026-09-19T09:02:00Z'
+    deadline_at: '2026-09-19T09:22:00Z'
   outputs:
     - packing/campaign/explorations/X-039-n100-re-rank-after-session-140.md
     - packing/campaign/hypotheses/H-219-t028-seeded-colgen-raises-s18.md
@@ -239,10 +263,11 @@ session:
     - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/ranked-queue.md
     - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n18-1871-400-t028-auto-windows5-receipt.md
     - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n20-971-200-t021-grid4-windows7-receipt.md
+    - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n20-243-50-t021-grid4-windows7-receipt.md
     - packing/campaign/agent-sessions/session-141-n100-research.md
   checks: []
   stop_reason: null
-  next_action: think-so2k
+  next_action: think-coet
 ---
 # Session-141: Eight-Hour n<100 Research Loop
 
@@ -297,13 +322,12 @@ covering.
 T-029 is landed: `s(18) >= 1871/400`. Next T-id is T-030. Copy the T-029 landing
 pattern, not a new case class. Score S3. `produced_by.session` is `session-141`.
 
-- n=20 `243/50` RETAINABLE confirms H-218 / exp-165. Copy live n=20
-  `certificate.json` to `certificate-97-20.json` before replacing the pointer. The
-  claim is also `s(21) >= 243/50`. Unique side `4.86`. T-030 artifacts list only
-  the live pointer. n=20 `971/200` four-grid finished `19.857588` unconverged;
-  do not replay that set.
-- A later Nagamochi RETAINABLE (H-220) is T-030 if n=20 does not retain, else T-031.
-  There is no n=32 case package yet.
+- n=20 `243/50` finished `19.887914` unconverged; do not replay that set.
+  n=20 `971/200` four-grid finished `19.857588` unconverged; do not replay that
+  set. H-218 stays unconfirmed.
+- A Nagamochi RETAINABLE (H-220) is T-030. There is no n=32 case package yet.
+  Copy the T-029 landing pattern into a new `cases/n32_fractional_certificate/`
+  tree. T-030 artifacts list only the live pointer.
 - n=18 `4679/1000` is H-221, not a replay of H-219. Claim a new experiment before
   that probe starts.
 - Do not mint a T-id on an unconverged freeze, a freeze with mass `>= n`, or n=21

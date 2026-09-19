@@ -13,7 +13,7 @@ an untried side or an untried site set.
 | ---: | --- | --- | ---: | --- | --- | ---: |
 | 1 | think-u11x | H-219 | 18 | `1871/400` | T-028 auto plus windows 5 | **T-029 retained** |
 | 2 | think-so2k | H-218 | 20 | `971/200` | T-021 four-grid `(34,46,56,64)` plus windows 7 | **19.857588 unconverged** |
-| 2b | think-so2k | H-218 | 20 | `243/50` | same four-grid plus windows 7 | 1200 s |
+| 2b | think-so2k | H-218 | 20 | `243/50` | same four-grid plus windows 7 | **19.887914 unconverged** |
 | 3–10 | think-coet | H-220 | 32…44 | queued Nagamochi sides | auto plus windows 5, no seed | 1200 s |
 | 11 | think-so2k | H-218 | 19 | `481/100` | T-020 four-grid `(34,45,56,64)` plus windows 7 | 1200 s |
 | 12 | think-so2k | H-218 | 12 | `793/200` | T-017 auto plus windows 7 | 1200 s |
@@ -41,6 +41,7 @@ First walker `--stop-at 2026-09-19T10:26:00Z`. Resume the same file after W5 wit
 | 18 | `469/100`, `47/10` | T-019 auto | Plateau or above 18 |
 | 20 | `971/200` | T-021 auto plus windows 6 | `19.910044` unconverged; remaining rows raise |
 | 20 | `971/200` | T-021 four-grid plus windows 7 | Session-141 `19.857588` unconverged; remaining rows raise |
+| 20 | `243/50` | T-021 four-grid plus windows 7 | Session-141 `19.887914` unconverged; remaining rows raise |
 | 20 | `973/200` | T-021 four-grid plus windows 7 | `19.939212` after 2400 s; remaining rows raise |
 | 20 | `973/200` | H-062 auto-grid and cert-seed | Already crossed 20 |
 | 21 | `97/20` | T-021 auto plus windows 6 | Same side as T-021 |
@@ -50,8 +51,8 @@ First walker `--stop-at 2026-09-19T10:26:00Z`. Resume the same file after W5 wit
 | 19 | `241/50`, `481/100`, `97/20` | T-020 auto plus windows 6 | Already above 19 |
 | 11 | any side above T-026 | stock covering | Covering-only; T-026 stands |
 
-n=18 `1871/400` does not confirm H-218. n=20 `971/200` four-grid did not.
-n=20 `243/50` on the same four-grid class would.
+n=18 `1871/400` does not confirm H-218. n=20 `971/200` and `243/50`
+four-grid did not. H-218 stays unconfirmed.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
