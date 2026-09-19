@@ -770,6 +770,13 @@ def _run(options: argparse.Namespace) -> int:
         print("=" * 78)
         print()
         print(pr_description, end="")
+        if not options.agenda:
+            print()
+            print(
+                "The cost block is not the pull request. Fill "
+                ".github/PULL_REQUEST_TEMPLATE.md and run "
+                "`python -m devtools.check_pr_description --file BODY.md`."
+            )
         return status
 
     if options.update:

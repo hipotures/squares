@@ -1,3 +1,7 @@
+<!-- A description that is not this section order is unfinished (OR-9).
+From packing/: `python -m devtools.check_pr_description --file BODY.md`
+-->
+
 ## What this branch cost
 
 <!-- Replace this placeholder with the exact generated cost block.
