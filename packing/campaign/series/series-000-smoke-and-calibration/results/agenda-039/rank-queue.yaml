@@ -21,6 +21,15 @@ probes:
     deadline_seconds: 2400
     bead: think-so2k
     hypothesis: H-218
+  - id: n20-243-50-t021-grid4-windows7
+    n: 20
+    side: '243/50'
+    grid_counts: '34,46,56,64'
+    seed_certificate: cases/n20_fractional_certificate/certificate.json
+    seed_windows: 7
+    deadline_seconds: 1200
+    bead: think-so2k
+    hypothesis: H-218
   - id: n32-29-5-auto-windows5
     n: 32
     side: '29/5'

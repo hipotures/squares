@@ -1317,6 +1317,33 @@ values:
       sites can still lower the covering value, so 971/200 is not barred. T-021 is
       unchanged. T-029 was not offered. H-218 stays unconfirmed.
   - n: 20
+    side: '971/200'
+    side_decimal: '4.855'
+    objective: '19.857588'
+    site_set: t021-seed-four-grid-34-46-56-64-windows7
+    sites: 12676
+    rows: 15378
+    rounds: 48
+    converged: false
+    stop_reason: >-
+      The 2400 s deadline stopped the row loop after 48 LP rounds with 225 placements
+      still violated. The objective finished at 19.857588 on 12676 sites / 1646 orbits,
+      including 2464 T-021 seed sites, and sat near that value from round 41. It did
+      not cross 20.
+    least_covered_mass: '0.991565'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n20-971-200-t021-grid4-windows7-receipt.md
+      - packing/campaign/agent-sessions/session-141-n100-research.md
+    notes: >-
+      Session-141 exp-164. T-021 seed plus four-grid (34, 46, 56, 64) plus windows 7
+      at 971/200. Unconverged mass still below twenty is not a covering below 20;
+      remaining rows can only raise it. The mass is below leftover auto plus
+      windows 6 at this side (19.910044) and below the same four-grid at 973/200
+      (19.939212). T-021 is unchanged. T-030 was not offered. H-218 stays
+      unconfirmed. Optional 243/50 uses this four-grid class on a thinner unused
+      side.
+  - n: 20
     side: '24/5'
     side_decimal: '4.80'
     objective: '18.916941'

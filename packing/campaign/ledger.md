@@ -782,7 +782,7 @@ Status: **active**. Pursue n=11 results beyond the one-body ceiling L* = 38200/9
 
 | id | status | title | rounds | opened because |
 | --- | --- | --- | --- | --- |
-| series-000 | open | S0: smoke and calibration — prove the machinery, establish every baseline metric | 132 | First series. There is no prior instrument, so not |
+| series-000 | open | S0: smoke and calibration — prove the machinery, establish every baseline metric | 133 | First series. There is no prior instrument, so not |
 
 ## Registry
 
@@ -943,7 +943,7 @@ Status: **active**. Pursue n=11 results beyond the one-body ceiling L* = 38200/9
 | H-215 | open question | search | Which headless kinetic measurements, if any, predict that a fixed-budg |  | 0 |  |  |
 | H-216 | open | proof | A helper-free point-atom certificate exists for n=6 at container side  |  | 0 |  |  |
 | H-217 | blocked | proof | The rows-complete covering LP with weighted-majority, k-of-S, and floo |  | 0 |  |  |
-| H-218 | abandoned | proof | A rows-complete covering of mass strictly below n exists at a containe | n: 12 17 19 20* | 2 |  | 238.0m wall |
+| H-218 | abandoned | proof | A rows-complete covering of mass strictly below n exists at a containe | n: 12 17 19 20* | 3 |  | 279.9m wall |
 | H-219 | confirmed | proof | A rows-complete covering of mass strictly below 18 exists at a contain | n: 18* | 1 |  | 11.7m wall |
 | H-220 | open | proof | A rows-complete covering of mass strictly below n exists at a containe | n: 32 31 30 26 27 29 45 44 | 0 |  |  |
 | H-221 | open | proof | A rows-complete covering of mass strictly below 18 exists at a contain | n: 18 | 0 |  |  |
@@ -1003,7 +1003,7 @@ Status: **active**. Pursue n=11 results beyond the one-body ceiling L* = 38200/9
 | exp-070 | series-000 | 11 | Codex /root/fractional_t2_manager at max reasoning, BC-232, think-gmdy | H-064 | The one authorized leg improved the exact lower endpoint but expired before reaching eleven; the bracket is still open and the frozen four-CPU-hour routing rule forbids a continuation decision from this 105-minute partial budget alone. |
 | exp-162 | series-000 | 20 | Cursor session-140 | H-218 | The Session-140 research wall expired with no RETAINABLE freeze on the H-218 sweep. Closest masses were leftover n=20 971/200 at 19.910044 unconverged and leftover n=12 3969/1000 at 12.091168 after crossing 12. T-028 at n=18 does not confirm H-218. |
 
-### unresolved (31)
+### unresolved (32)
 
 | id | series | instance | operator | hypotheses | reason |
 | --- | --- | --- | --- | --- | --- |
@@ -1033,6 +1033,7 @@ Status: **active**. Pursue n=11 results beyond the one-body ceiling L* = 38200/9
 | exp-148 | series-000 | 11 | GPT-6 Astra coordinator; implementation by GPT-5.6 Sol extra high; mathematical admission by GPT-6 Astra max | H-146 | The seed-stage guard expired before any complete seed direction or candidate check. Two valid retained escapes give reusable negative evidence for49152 labels, but neither a new cover nor an all-label refutation was completed. |
 | exp-156 | series-000 | 11 | Codex root coordinator; prospective strategy independently audited by GPT-6 Astra Max | H-158 | The sole run found that the old B-only model already excludes the first selected owner, making parent-domain gain impossible there by set inclusion. The later owners were not tested, so this complete fixed-protocol result neither accepts nor rejects H-158. |
 | exp-161 | series-000 | 11 | Cursor session-139 Lane C | H-163 | Encode-only hit timeout 10800 at 15:24:31Z with no JSON and no candidate. Timeout is unresolved, never rejected. No --search. |
+| exp-164 | series-000 | 20 | Cursor session-141 | H-218 | The new four-grid plus windows 7 at 971/200 finished unconverged below 20. Remaining rows raise. That site set is not a retain. H-218 stays unconfirmed. |
 | exp-206 | series-000 | 11 | claude-opus-5 | H-205 | The guard clause is met decisively and is the point of the round: 16 of 16 runs end on packings that an independent oracle confirms, against 0 of 48 for the penalty physics, which settles the precondition the 2026-09-08 calibration failed. The accuracy clause is missed by three cells of four. The failure is localised rather than diffuse -- every failed run failed at the first tightening and never moved -- so the repair is in the container schedule and the restart policy, not in the projections. |
 | exp-207 | series-000 | 5 | claude-opus-5, unattended | H-207 | At n = 5 the best of the first 1,000 repaired runs is 0.28% above the record while a single run is worse than the grid, but these are prefix values from one seed stream with no spread, and no schedule was compared at equal cost, so H-207's criterion was not tested. |
 | exp-208 | series-000 | 11 | claude-opus-5, unattended | H-212 | At levels 0, 2 and 4 no repaired run in 3,000 beat the grid at n = 5, 10 or 11, and at levels 6, 8 and 10 the best run did in eight of nine cells, the ninth within 5,000 seeds, but each value is one prefix from one seed stream and the page's own level 3 was not measured on repaired runs. |
@@ -1121,7 +1122,7 @@ Status: **active**. Pursue n=11 results beyond the one-body ceiling L* = 38200/9
 
 | id | series | instance | operator | hypotheses | reason |
 | --- | --- | --- | --- | --- | --- |
-| exp-164 | series-000 | 20 | Cursor session-141 | H-218 | Claimed; n=20 971/200 new four-grid is the first Session-141 H-218 probe. |
+| exp-165 | series-000 | 20 | Cursor session-141 | H-218 | Claimed; n=20 243/50 same four-grid after 971/200 stayed below 20 unconverged. |
 
 ## Resumable — stopped on the clock, not on an answer
 
@@ -1145,6 +1146,7 @@ Status: **active**. Pursue n=11 results beyond the one-body ceiling L* = 38200/9
 | exp-160 | H-162 |  | dependency |  |  |
 | exp-161 | H-163 | 180.1m wall | timebox | Re-run encode-only under a new lease; no partial encoding wa |  |
 | exp-162 | H-218 | 238.0m wall | timebox | Leftover n=18 1871/400 T-028 auto plus windows 5, then secon | A new named site set at n in {12, 17, 19, 20} whose restrict |
+| exp-164 | H-218 | 41.9m wall | timebox | Do not replay 971/200 four-grid plus windows 7. The next nam |  |
 | exp-207 | H-207 | 1 round unrecorded | dependency |  |  |
 | exp-208 | H-212 | 1 round unrecorded | dependency |  |  |
 | exp-209 | H-212 | 1 round unrecorded | dependency |  |  |
@@ -1152,7 +1154,7 @@ Status: **active**. Pursue n=11 results beyond the one-body ceiling L* = 38200/9
 
 ## Effort
 
-132 rounds, 2512.1 agent-minutes, 2229.5 wall-minutes.
+133 rounds, 2512.1 agent-minutes, 2271.5 wall-minutes.
 
 These totals exclude 4 historical rounds with unrecorded timing; their cost is unknown, not zero.
 

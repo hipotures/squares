@@ -66,17 +66,17 @@ untried `(n, side, site_set)`”.
 
 | Rank | Claim | n | Side | Site set | Deadline | Likelihood |
 | ---: | --- | ---: | --- | --- | ---: | --- |
-| 1 | H-219 | 18 | `1871/400` | T-028 seed, auto, windows 5 | 1200 s | high |
+| 1 | H-219 | 18 | `1871/400` | T-028 seed, auto, windows 5 | 1200 s | T-029 retained |
 | 1b | H-219 | 18 | `1871/400` | T-028 seed, four-grid `(32,43,53,60)`, windows 5 | 1800 s | medium; only if rank 1 stays below 18 unconverged |
-| 2 | H-218 | 20 | `971/200` | T-021 seed, four-grid `(34,46,56,64)`, windows 7 | 2400 s | medium |
-| 3 | H-218 | 20 | `243/50` | same four-grid plus windows 7 | 1200 s | medium if rank 2 stayed below 20 |
+| 2 | H-218 | 20 | `971/200` | T-021 seed, four-grid `(34,46,56,64)`, windows 7 | 2400 s | done; 19.857588 unconverged |
+| 3 | H-218 | 20 | `243/50` | same four-grid plus windows 7 | 1200 s | medium; rank 2 stayed below 20 at 19.857588 |
 | 4 | H-220 | 32 | `29/5` | auto, windows 5, no seed | 1200 s | low–medium |
 | 5–11 | H-220 | 31, 30, 26, 27, 29, 45, 44 | queued Nagamochi sides | auto, windows 5, no seed | 1200 s | low |
 
 n=18 is off the H-218 sweep `{12, 17, 19, 20}`. A retain at `1871/400` is the next T-id
-and does not confirm H-218. A retain at n=20 `971/200` on the new four-grid set would
-confirm H-218. exp-162 is abandoned; that reopen is a later experiment after exp-163
-terminals.
+and does not confirm H-218. Rank 2 finished `19.857588` unconverged; remaining rows
+raise. A retain at n=20 `243/50` on the same four-grid class would confirm H-218.
+exp-162 is abandoned; the reopen is exp-164 then exp-165 after exp-163 accepted.
 
 n=11 stays T-026. H-216 at n=6 is calibration, not an n=11 result. n=21 `97/20` is the
 same verified side as T-021.
@@ -98,7 +98,7 @@ One CPU. Sequential colgen. Sub-agents own audit, registration, and W5.
 | Claim | This session | Why |
 | --- | --- | --- |
 | H-219 | first covering probe | Same class as T-028; unused leftover side |
-| H-218 | reopen after exp-163 terminals | New site set at n=20 `971/200`; do not replay leftover auto plus windows 6 |
+| H-218 | reopen after exp-163 terminals | exp-164 at `971/200` four-grid `19.857588` unconverged; live probe `243/50`; do not replay leftover auto or that four-grid |
 | H-220 | after n=18 and n=20 new sites | Seedless Nagamochi floors |
 | H-221 | after ranked H-218 long-shots | T-029-seeded next rung at `4679/1000` |
 | H-210 / H-211 | off-CPU if Node permits | Workbench determinations; not a floor |

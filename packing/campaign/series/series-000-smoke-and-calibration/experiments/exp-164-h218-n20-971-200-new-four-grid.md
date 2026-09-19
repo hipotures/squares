@@ -50,23 +50,34 @@ experiment:
       Do not replay leftover auto plus windows 6 at 971/200 or four-grid plus
       windows 7 at 973/200.
     record: packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/
-  lease:
-    expires: '2026-09-19T16:06:00Z'
-    host: cursor-cloud-session-141
   results:
   - shape: determination
     role: outcome
     question: >-
       Does a T-021 four-grid plus windows-7 freeze at 971/200 have mass strictly
       below 20 and print RETAINABLE?
-    outcome: invalid
-    checked_by: Not yet measured; the round is claimed.
+    outcome: criterion_missed
+    checked_by: >-
+      2400 s deadline stopped the row loop after 48 LP rounds at 19.857588 with
+      225 placements still violated. No freeze. Did not cross 20.
   verdict:
-    decision: in-progress
+    decision: unresolved
     primary_criterion: >-
       Confirm H-218 only when decide_certificate prints RETAINABLE on a freeze with
       mass < 20 at a side above T-021
-    reason: Claimed; n=20 971/200 new four-grid is the first Session-141 H-218 probe.
+    reason: >-
+      The new four-grid plus windows 7 at 971/200 finished unconverged below 20.
+      Remaining rows raise. That site set is not a retain. H-218 stays unconfirmed.
+    budget_spent: Covering 2516.1 s on one core.
+    best_reached: restricted optimum 19.857588 unconverged, no freeze
+    resume_from: >-
+      Do not replay 971/200 four-grid plus windows 7. The next named set is
+      exp-165 at 243/50 on the same four-grid plus windows 7. Remaining rows
+      raise this set.
+  effort:
+    timebox: Session-141 n=20 971/200 four-grid plus windows 7
+    wall_seconds: 2516
+    stopped_by: timebox
 ---
 # Exp-164: H-218 Reopen on a New n=20 Site Set
 
@@ -75,6 +86,9 @@ This is the Session-141 reopen of
 exp-162 is abandoned. The leftover auto plus windows 6 construction at `971/200`
 finished at `19.910044` unconverged; remaining rows raise. This round uses a
 different named set: T-021 four-grid `(34, 46, 56, 64)` plus windows 7.
+
+The 2400 s run stopped at `19.857588` unconverged below 20 after 48 LP rounds.
+No freeze. T-030 was not offered. The follow-up is exp-165 at `243/50`.
 
 Confirm only on `RETAINABLE`. n=18 T-029 does not confirm H-218.
 
