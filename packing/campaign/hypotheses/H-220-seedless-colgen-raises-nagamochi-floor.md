@@ -51,9 +51,11 @@ hypothesis:
     construction class from H-218. Session-141 exp-166 at n=32 29/5 auto plus
     windows 5 stopped at 29.803318 unconverged below 32; remaining rows raise.
     Session-141 exp-167 at n=31 57/10 auto plus windows 5 stopped at 28.331329
-    unconverged below 31; remaining rows raise. Follow-up is exp-168 at n=30
-    559/100. Do not replay n=32 29/5 or n=31 57/10 auto plus windows 5. Confirm
-    only on RETAINABLE.
+    unconverged below 31; remaining rows raise. Session-141 exp-168 at n=30
+    559/100 auto plus windows 5 stopped at 27.178193 unconverged below 30;
+    remaining rows raise. Follow-up is exp-169 at n=26 513/100. Do not replay
+    n=32 29/5, n=31 57/10, or n=30 559/100 auto plus windows 5. Confirm only on
+    RETAINABLE.
 ---
 # H-220: Seedless Colgen Raises a Nagamochi-Only Floor
 
@@ -61,8 +63,8 @@ hypothesis:
 Nagamochi sides Session-140 queued and did not start.
 
 The first probe is n=32 at `29/5`, auto plus windows 5, no certificate seed.
-The second is n=31 at `57/10`. A float LP above `n` refutes that site set
-only. The live probe is n=30 at `559/100`.
+The second is n=31 at `57/10`. The third is n=30 at `559/100`. A float LP
+above `n` refutes that site set only. The live probe is n=26 at `513/100`.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

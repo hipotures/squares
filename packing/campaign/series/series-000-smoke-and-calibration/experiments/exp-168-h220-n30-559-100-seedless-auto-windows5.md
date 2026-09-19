@@ -48,30 +48,44 @@ experiment:
       Session-141 research wall to 2026-09-19T15:26:00Z. Third H-220 probe only.
       Do not replay n=32 29/5 or n=31 57/10 auto plus windows 5.
     record: packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/
-  lease:
-    expires: '2026-09-19T16:06:00Z'
-    host: cursor-cloud-session-141
   results:
   - shape: determination
     role: outcome
     question: >-
       Does a seedless auto plus windows-5 freeze at 559/100 have mass strictly below 30
       and print RETAINABLE?
-    outcome: invalid
-    checked_by: Not yet measured; the round is claimed.
+    outcome: criterion_missed
+    checked_by: >-
+      1200 s deadline stopped the row loop after 50 LP rounds at 27.178193 with
+      93 placements still violated. No freeze. Did not cross 30.
   verdict:
-    decision: in-progress
+    decision: unresolved
     primary_criterion: >-
       Confirm H-220 only when decide_certificate prints RETAINABLE on a freeze with
       mass < 30 at a side strictly above the Nagamochi floor
-    reason: Claimed; third Nagamochi probe after exp-167 n=31 57/10 stayed below 31 unconverged.
+    reason: >-
+      Seedless auto plus windows 5 at 559/100 finished unconverged below 30.
+      Remaining rows raise. That site set is not a retain. H-220 stays unconfirmed.
+    budget_spent: Covering 1213.0 s on one core.
+    best_reached: restricted optimum 27.178193 unconverged, no freeze
+    resume_from: >-
+      Do not replay n=30 559/100 auto plus windows 5. The next named set is exp-169
+      at n=26 513/100 seedless auto plus windows 5. Remaining rows raise this set.
+  effort:
+    timebox: Session-141 n=30 559/100 seedless auto plus windows 5
+    wall_seconds: 1213
+    stopped_by: timebox
 ---
 # Exp-168: H-220 Third Nagamochi Probe
 
 This is the third scientific round of
 [H-220](../../../hypotheses/H-220-seedless-colgen-raises-nagamochi-floor.md), after
 [exp-167](exp-167-h220-n31-57-10-seedless-auto-windows5.md) stopped at `28.331329`
-unconverged below 31. Remaining rows raise that set.
+unconverged below 31.
+
+Auto resolved to `(40, 54, 67)`. The 1200 s run stopped at `27.178193`
+unconverged below 30 after 50 LP rounds. No freeze. T-030 was not offered. The
+follow-up is exp-169 at n=26 `513/100`.
 
 Confirm only on `RETAINABLE`. There is no n=30 case package.
 

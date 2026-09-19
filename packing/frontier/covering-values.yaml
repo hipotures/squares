@@ -1776,3 +1776,27 @@ values:
       plus windows 5 at 57/10, above the Nagamochi floor 1 + sqrt(22). Unconverged
       mass still below 31 is not a covering below 31; remaining rows can only raise
       it. T-030 was not offered. H-220 stays unconfirmed. Do not more-wall this set.
+  - n: 30
+    side: '559/100'
+    side_decimal: '5.59'
+    objective: '27.178193'
+    site_set: auto-40-54-67-windows5
+    sites: 9609
+    rows: 15704
+    rounds: 50
+    converged: false
+    stop_reason: >-
+      The 1200 s deadline stopped the row loop after 50 LP rounds with 93 placements
+      still violated. The objective finished at 27.178193 on 9609 sites / 1269 orbits,
+      including 625 window-lattice seed sites. Auto resolved to (40, 54, 67). It did
+      not cross 30.
+    least_covered_mass: '0.971793'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n30-559-100-auto-windows5-receipt.md
+      - packing/campaign/agent-sessions/session-141-n100-research.md
+    notes: >-
+      Session-141 exp-168. First first-party covering row at n=30. Seedless auto
+      plus windows 5 at 559/100, above the Nagamochi floor 1 + sqrt(21). Unconverged
+      mass still below 30 is not a covering below 30; remaining rows can only raise
+      it. T-030 was not offered. H-220 stays unconfirmed. Do not more-wall this set.
