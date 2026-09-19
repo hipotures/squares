@@ -154,6 +154,7 @@ Each entry summarizes one user-level research window. Cycle slots are wall-clock
 | [session-137](agent-sessions/session-137-ci-topology-continuation-recovery.md) | stopped | retrospective | `pipeline-improvement` (correctness) | `remediation` (correctness) | 3 | think-97we | think-97we closed when PR 188 and PR 185 merged, and the remaining closeout debt on the final head now sits under think-g4n9: hold both pull-request walls at or under 180 s over the declared run of consecutive exact-head hosted runs, then switch the wall check back to enforcing. Then resume BC-343 under think-ufmk without changing its scientific claim or allocating exp-161 from this block. |
 | [session-138](agent-sessions/session-138-n11-overnight-review.md) | stopped | mixed | `factual-review` (insight) | `documentation-pass` (process) | 6 | think-4woh | Close M7's n=6 bracket at 299/100 under BC-357 / think-qqzs. H-216 is the registered determination. G1, G2, G3, and G5 are on main; G4 remains on this bead. |
 | [session-139](agent-sessions/session-139-n11-overnight-research.md) | stopped | contemporaneous | `research-loop` (insight) | `documentation-pass` (process) | 4 | think-mcb6 | Continue H-216 under think-qqzs. Route S encode-only timed out unresolved; a later block re-runs encode before --search. |
+| [session-140](agent-sessions/session-140-lb-survey.md) | in_progress | contemporaneous | `review-planning-oversight` (process) | `research-loop` (insight) | 2 | think-8x4t | Run the X-038 ranked queue under think-8x4t. Do not close think-qqzs. |
 
 ### Workflow summary
 
@@ -166,11 +167,11 @@ Declared counts are contemporaneous contracts; retrospective counts are reconstr
 | `insight-iteration` | 24 | 1 | 80 | 4 |
 | `process-review` | 16 | 4 | 64 | 6 |
 | `efficiency-loop` | 10 | 1 | 36 | 1 |
-| `research-loop` | 27 | 4 | 99 | 8 |
+| `research-loop` | 27 | 4 | 100 | 8 |
 | `pipeline-improvement` | 33 | 2 | 151 | 5 |
 | `documentation-pass` | 1 | 0 | 24 | 1 |
 | `remediation` | 0 | 1 | 0 | 3 |
-| `review-planning-oversight` | 3 | 0 | 17 | 2 |
+| `review-planning-oversight` | 4 | 0 | 18 | 2 |
 | `general-improvement` | 1 | 0 | 7 | 1 |
 
 ## Experiment agendas
@@ -780,7 +781,7 @@ Status: **active**. Pursue n=11 results beyond the one-body ceiling L* = 38200/9
 
 | id | status | title | rounds | opened because |
 | --- | --- | --- | --- | --- |
-| series-000 | open | S0: smoke and calibration — prove the machinery, establish every baseline metric | 129 | First series. There is no prior instrument, so not |
+| series-000 | open | S0: smoke and calibration — prove the machinery, establish every baseline metric | 130 | First series. There is no prior instrument, so not |
 
 ## Registry
 
@@ -941,6 +942,7 @@ Status: **active**. Pursue n=11 results beyond the one-body ceiling L* = 38200/9
 | H-215 | open question | search | Which headless kinetic measurements, if any, predict that a fixed-budg |  | 0 |  |  |
 | H-216 | open | proof | A helper-free point-atom certificate exists for n=6 at container side  |  | 0 |  |  |
 | H-217 | blocked | proof | The rows-complete covering LP with weighted-majority, k-of-S, and floo |  | 0 |  |  |
+| H-218 | running | proof | A rows-complete covering of mass strictly below n exists at a containe | n: 12 17 19 20 | 1 |  |  |
 
 ## Needs review — held for a human, not decided
 
@@ -1109,6 +1111,12 @@ Status: **active**. Pursue n=11 results beyond the one-body ceiling L* = 38200/9
 | exp-032 | series-000 | 3 | openai-codex | H-021 | The exact connected and isolated controls pass, every declared conflation fails, and all unsupported floating-point observations remain unresolved. |
 | exp-201 | series-000 | 18 | claude-opus-5 | H-201 | Calibration, not a scored round: it freezes p_perturb = 1.0, perturb_scale = 2 and a flat mu = 5 for exp-202 and exp-203, and it turned up a schedule-length effect that is now registered as H-204 rather than folded into an arm. |
 
+### in-progress (1)
+
+| id | series | instance | operator | hypotheses | reason |
+| --- | --- | --- | --- | --- | --- |
+| exp-162 | series-000 | 20 | Cursor session-140 | H-218 | X-038 and the ranked queue are registered. The first probes have not finished. |
+
 ## Resumable — stopped on the clock, not on an answer
 
 | id | hypotheses | spent | stopped by | resume from | reopen when |
@@ -1137,7 +1145,7 @@ Status: **active**. Pursue n=11 results beyond the one-body ceiling L* = 38200/9
 
 ## Effort
 
-129 rounds, 2512.1 agent-minutes, 1979.8 wall-minutes.
+130 rounds, 2512.1 agent-minutes, 1979.8 wall-minutes.
 
 These totals exclude 4 historical rounds with unrecorded timing; their cost is unknown, not zero.
 

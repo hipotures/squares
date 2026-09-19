@@ -140,10 +140,10 @@ hypothesis status and summarizes experiment verdicts, and the
 | --- | ---: | --- |
 | Agendas | 36 | 16 active; 14 completed; 5 paused; 1 superseded |
 | Commitments | 349 | 178 complete; 60 stopped; 66 blocked; 15 ready; 21 tentative; 9 in progress |
-| Sessions | 139 | 84 completed; 55 stopped; all terminal |
-| Explorations | 35 | 21 linked to proposed hypotheses; 14 uncodified |
-| Hypotheses | 155 | 26 confirmed; 29 refuted; 51 blocked; 13 unresolved; 5 open; 28 open questions; 2 result registered; 1 abandoned; 0 running |
-| Experiments | 129 | 39 accepted; 34 rejected; 31 unresolved; 12 baseline; 11 blocked; 2 abandoned; 0 in progress |
+| Sessions | 140 | 84 completed; 55 stopped; 1 nonterminal |
+| Explorations | 36 | 22 linked to proposed hypotheses; 14 uncodified |
+| Hypotheses | 156 | 26 confirmed; 29 refuted; 51 blocked; 13 unresolved; 5 open; 28 open questions; 2 result registered; 1 abandoned; 1 running |
+| Experiments | 130 | 39 accepted; 34 rejected; 31 unresolved; 12 baseline; 11 blocked; 2 abandoned; 1 in progress |
 | Frontier results | 27 | 27 registered |
 
 <!-- END CURRENT-RESEARCH-STATUS -->
@@ -165,6 +165,8 @@ The generated agenda map, not this narrative, summarizes commitment state.
 [Session 139](packing/campaign/agent-sessions/session-139-n11-overnight-research.md)
 is the latest terminal closeout: encode-only timed out unresolved, T-027 retained
 `s(18) >= 467/100`, and `think-qqzs` remains the next entry.
+[Session 140](packing/campaign/agent-sessions/session-140-lb-survey.md) is the live
+stacked-PR survey of `n <= 100` lower bounds; it does not replace that handoff.
 [Session 138](packing/campaign/agent-sessions/session-138-n11-overnight-review.md)
 is the preceding route-selection handoff: PR 193 merged its records as `4ad98e90`,
 `think-4woh` is closed, and certification debt now sits under `think-qqzs`. The five
