@@ -177,9 +177,7 @@ def colgen_command(probe: Probe, prefix: Path) -> list[str]:
         f"{prefix}.log",
     ]
     if probe.seed_certificate is not None:
-        command.extend(
-            ["--seed-certificate", probe.seed_certificate, "--seed-map", "scale"]
-        )
+        command.extend(["--seed-certificate", probe.seed_certificate, "--seed-map", "scale"])
     return command
 
 
@@ -273,9 +271,7 @@ def main(argv: list[str] | None = None) -> int:
     queue_path = args.queue.resolve()
     probes = load_queue(queue_path)
     log_path = (
-        args.log.resolve()
-        if args.log is not None
-        else queue_path.parent / "covering-queue.log"
+        args.log.resolve() if args.log is not None else queue_path.parent / "covering-queue.log"
     )
     return walk_queue(probes, queue_path.parent, parse_stop_at(args.stop_at), log_path)
 
