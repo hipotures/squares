@@ -11,13 +11,22 @@ session:
   date: '2026-09-19'
   started_at: '2026-09-19T02:42:00Z'
   deadline_at: '2026-09-19T07:02:00Z'
+  ended_at: '2026-09-19T06:53:00Z'
   branch: cursor/lb-survey-stacked-f02a
   primary_bead: think-8x4t
-  status: in_progress
+  status: stopped
   goal: >-
     Survey every n<=100 verified lower bound, rank which open floors the stock colgen
     can still raise, and run that queue for at least four hours on a stacked PR.
     Land T-028 only if decide_certificate prints RETAINABLE.
+  resource_usage_unmeasured:
+    reason: native_harness_data_unavailable
+    detail: >-
+      This Cursor cloud-agent run has no ClaudeEfficiencyRollup or CodexTaskTreeDelta
+      receipt. Session clocks and covering walls are not a substitute.
+    disposition_bead: think-8x4t
+    handoff_role: work_handoff
+  resource_rollups: []
   workflow_phases:
   - workflow: review-planning-oversight
     focus: process
@@ -60,7 +69,7 @@ session:
     objective: >-
       Run the X-038 first-wave probes. Record every restricted optimum. Freeze and
       decide only when mass is below n. Land T-028 only on RETAINABLE.
-    status: in_progress
+    status: completed
     entered_by: planned_checkpoint
     switch_reason: Planning artifacts and beads are in the tree.
     budget_minutes: 238
@@ -76,15 +85,57 @@ session:
       Stop new probes at 06:42Z. Do not --search. Do not close think-qqzs,
       think-g3j7, think-gyzw, or think-jwb1. Do not land a non-retainable freeze.
     fallback: Keep the survey, the finished covering rows, and an unresolved exp-162.
-    outcome: null
-    evidence: []
-    stop_reason: null
-    next_action: >-
-      T-028 retained. Leftover n=19, n=17, and n=20 finished without a retain.
-      Finish leftover n=12.
+    outcome: >-
+      T-028 retained s(18) >= 187/40. First-wave and leftover n=19, n=17, n=20,
+      and n=12 finished without an H-218 retain. Leftover n=18 and second-wave
+      did not start.
+    evidence:
+      - packing/cases/n18_fractional_certificate/certificate.json
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/leftover-side-ranking.md
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n12-3969-1000-t017-grid4-windows7-receipt.md
+    stop_reason: Research wall 06:42Z. Leftover n=12 exited with remain -4 s.
+    next_action: Closeout under phase 3. Do not close think-qqzs.
+  - workflow: review-planning-oversight
+    focus: process
+    recording: contemporaneous
+    clock_role: finalization
+    bead: think-8x4t
+    objective: >-
+      Terminalize this session, mark exp-162 abandoned, regenerate the campaign
+      views, and leave a reviewable stacked PR.
+    status: stopped
+    entered_by: planned_checkpoint
+    switch_reason: >-
+      Research wall 06:42Z. Leftover n=12 finished above 12. No pending retain.
+    budget_minutes: 20
+    started_at: '2026-09-19T06:42:00Z'
+    deadline_at: '2026-09-19T07:02:00Z'
+    expected_output: >-
+      Terminal session-140, exp-162 abandoned without a lease, leftover n=12
+      row recorded, regenerated ledger and session-close report.
+    validation_command: >-
+      cd packing && uv run --frozen --all-extras --group dev packing-ledger check &&
+      uv run --frozen --all-extras --group dev packing-validate --records &&
+      uv run --frozen --all-extras --group dev python -m devtools.close_session --check
+    kill_condition: >-
+      Stop at 07:02Z even if a generated view is stale. Do not --search. Do not
+      close think-qqzs, think-g3j7, think-gyzw, or think-jwb1.
+    fallback: Leave the records uncommitted with the failing check named.
+    outcome: >-
+      Session stopped at 06:53:00Z. T-028 stands. exp-162 is abandoned; H-218
+      is unconfirmed. Leftover n=18 and second-wave did not start. Native
+      harness usage is unmeasured.
+    evidence:
+      - packing/campaign/agent-sessions/session-140-lb-survey.md
+      - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-162-h218-stock-colgen-small-n-floors.md
+      - packing/cases/n18_fractional_certificate/certificate.json
+    stop_reason: >-
+      Research wall passed, leftover queue stopped, and the closeout records
+      are written.
+    next_action: Continue H-216 under think-qqzs.
   budget:
     wall_minutes: 260
-    max_cycles: 2
+    max_cycles: 3
     orientation_minutes: 20
     checkpoint_minutes: 60
     slice_minutes: 40
@@ -105,7 +156,11 @@ session:
     before: >-
       Session-139 closed with T-027 at n=18. Covering register has rows at n=6, 11,
       12, 17, 18, 19, 20, 21. No n<=100 survey. T-028 not landed.
-    after: null
+    after: >-
+      T-028 retained s(18) >= 187/40. H-218 unconfirmed: leftover n=20 971/200
+      stopped at 19.910044 unconverged below 20; leftover n=12 3969/1000 stopped
+      at 12.091168 after crossing 12. Covering unique sides 33. Leftover n=18
+      and second-wave did not start. think-qqzs stays the selected next entry.
   delegations:
   - task: Extract n<=100 verified gaps and covering surplus
     operator: session-140 coordinator
@@ -523,18 +578,26 @@ session:
       - packing-campaign
   - task: leftover n=12 3969/1000 T-017 four-grid plus windows 7
     operator: session-140 covering lane
-    status: in_progress
+    status: completed
     recording: contemporaneous
-    outcome: null
-    evidence: null
-    files: null
-    checks: null
+    outcome: >-
+      Unconverged 12.091168 after 36 LP rounds, 54 still violated. Crossed 12
+      at round 11 (12.000732). Lower than the no-windows four-grid 12.116115.
+      No freeze. T-017 unchanged. T-029 not offered. H-218 unconfirmed.
+      Leftover n=18 did not start (remain -4 s).
+    evidence:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n12-3969-1000-t017-grid4-windows7-receipt.md
+    files:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n12-3969-1000-t017-grid4-windows7-run.json
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n12-3969-1000-t017-grid4-windows7-receipt.md
+    checks:
+      - run JSON objective 12.091167832966642; no freeze file
     uncertainty: >-
-      Crossed 12 at round 11 (12.000732). Remaining rows raise. Existing
-      four-grid without windows finished at 12.116115.
-    elapsed_seconds: null
-    elapsed_quality: unavailable
-    next_action: Finish leftover rank 4 under think-h02v.
+      Remaining rows can only raise the restricted optimum, so this is not a
+      covering below 12.
+    elapsed_seconds: 1252
+    elapsed_quality: platform_measured
+    next_action: Leave think-h02v open for a different site set. Closeout is next.
     phase: 2
     budget_minutes: 21
     started_at: '2026-09-19T06:21:12Z'
@@ -565,8 +628,9 @@ session:
   - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n19-241-50-t020-auto-windows6-receipt.md
   - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n17-461-100-t019-auto-windows5-receipt.md
   - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n20-971-200-t021-auto-windows6-receipt.md
+  - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n12-3969-1000-t017-grid4-windows7-receipt.md
   checks:
-  - Planning artifacts written; research phase open.
+  - Planning artifacts written; research phase closed at 06:42Z.
   - >-
     n=20 973/200 four-grid plus windows 7 stopped at 19.939212 unconverged after
     2400 s, no freeze. n=12 397/100 converged at 12.133391, freeze above 12, no
@@ -578,15 +642,16 @@ session:
     19.247109 unconverged, new covering side 4.82. Leftover n=17 461/100 stopped
     at 17.195968 unconverged, new covering side 4.61. Leftover n=20 971/200
     stopped at 19.910044 unconverged, still below 20, new covering side 4.855.
-    Leftover n=12 3969/1000 started 06:21Z and crossed 12 at round 11. H-218
-    unconfirmed.
-  stop_reason: null
-  next_action: >-
-    Finish leftover-queue.yaml. Do not close think-qqzs.
+    Leftover n=12 3969/1000 stopped at 12.091168 unconverged after crossing 12.
+    Leftover n=18 and second-wave did not start. H-218 unconfirmed.
+  stop_reason: >-
+    Research wall 06:42Z. T-028 is retained. exp-162 is abandoned. Native
+    harness usage is unmeasured.
+  next_action: Continue H-216 under think-qqzs.
 ---
 # Session 140: N<=100 Lower-Bound Survey
 
-Workflow entry: **W10 planning, then a research loop**. This record is the live
+Workflow entry: **W10 planning, then a research loop**. This record is the closed
 four-hour stacked PR. The latest terminal handoff remains
 [session-139](session-139-n11-overnight-research.md); its selected next entry is still
 `think-qqzs`. This session does not close that bead.
@@ -644,7 +709,8 @@ See
 A restricted optimum already above `n` cannot retain on more wall of the same site set.
 After n=21, walk `leftover-queue.yaml`: n=19 `241/50` (done, `19.247109`), n=17
 `461/100` (done, `17.195968`), n=20 `971/200` (done, `19.910044`), n=12
-`3969/1000` four-grid plus windows 7 (running), n=18 `1871/400`.
+`3969/1000` four-grid plus windows 7 (done, `12.091168`), n=18 `1871/400`
+(not started).
 
 ## T-029 leftover recipes
 
@@ -653,8 +719,7 @@ T-029 is still free. Confirm H-218 only on `RETAINABLE` at n in `{12, 17, 19, 20
 - Leftover n=19 `241/50` did not retain. Do not mint T-029 from that probe.
 - Leftover n=17 `461/100` did not retain. Do not mint T-029 from that probe.
 - Leftover n=20 `971/200` did not retain. Do not mint T-029 from that probe.
-- Leftover n=12 `3969/1000` four-grid plus windows 7: copy T-017 only if `RETAINABLE`
-  with freeze mass `< 12`. That would also confirm H-218.
+- Leftover n=12 `3969/1000` did not retain. Do not mint T-029 from that probe.
 - Leftover n=18 `1871/400` is off the H-218 sweep. A retain there is the next T-id
   and does not confirm H-218.
 

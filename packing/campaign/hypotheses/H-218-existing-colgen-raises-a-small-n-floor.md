@@ -51,7 +51,9 @@ hypothesis:
     a different construction class, not a replay of those two. n=18 is on the survey
     queue but not on this sweep: 117/25 already plateaus at 18. n=11 is excluded;
     T-026 stands. Session-140 landed T-028 at n=18; that retain is off this sweep
-    and does not confirm the claim.
+    and does not confirm the claim. Session-140 leftover n=20 971/200 stopped at
+    19.910044 unconverged below 20, and leftover n=12 3969/1000 stopped at
+    12.091168 after crossing 12. Neither freeze was offered. The claim stays open.
 ---
 # H-218: Stock Colgen Raises One Small-n Floor
 

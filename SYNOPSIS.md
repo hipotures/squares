@@ -495,6 +495,7 @@ case or experiment separately.
 | [n=19 241/50 T-020-Seeded Auto Window-6 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n19-241-50-t020-auto-windows6-receipt.md) | research synthesis | record | retained | — |
 | [n=17 461/100 T-019-Seeded Auto Window-5 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n17-461-100-t019-auto-windows5-receipt.md) | research synthesis | record | retained | — |
 | [n=20 971/200 T-021-Seeded Auto Window-6 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n20-971-200-t021-auto-windows6-receipt.md) | research synthesis | record | retained | — |
+| [n=12 3969/1000 T-017-Seeded Four-Grid Window-7 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n12-3969-1000-t017-grid4-windows7-receipt.md) | research synthesis | record | retained | — |
 | [n=18 187/40 T-027-Seeded Auto Window-5 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n18-4675-1000-t027-auto-windows5-receipt.md) | research synthesis | record | retained | — |
 | [M3 T-018 9-Direction Search After Span-Sweep Encoding](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/m3-t018-net8-span/README.md) | research synthesis | record | retained | — |
 | [G4 n=11 191/50 Seventeen-Direction Threshold-Atom Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/g4-n11-191-50-net17/g4-n11-191-50-net17-receipt.md) | research synthesis | record | retained | — |
@@ -5492,7 +5493,8 @@ session-139 n=11 probes at 383/100, covering `11.192598` (auto grids), `11.14285
 converged, site set refuted; `3.875` is the same construction at 31/8, covering
 `11.561186` converged, site set refuted, 0.002 below the packing; `3.969` T-017-seeded auto-grid dropped to `12.118036`
 unconverged, still above twelve; T-017-seeded four-grid at the same side dropped to
-`12.116115` unconverged; `4.6` is the session-139 n=17 auto-grid probe at 23/5,
+`12.116115` unconverged; a session-140 leftover T-017-seeded four-grid plus windows 7
+finished at `12.091168` unconverged, still above twelve; `4.6` is the session-139 n=17 auto-grid probe at 23/5,
 covering `17.331710` unconverged, site set refuted, side open; the T-019-seeded auto
 grid at the same side dropped to `17.049597` unconverged, still above seventeen; T-019-seeded auto plus `--seed-windows 5` dropped to `17.042346` unconverged; a session-140 T-019-seeded four-grid plus windows 8 finished at `17.120106` unconverged, still above seventeen; `4.61` is the session-140 leftover n=17 T-019-seeded auto plus windows 5 at 461/100, covering `17.195968` unconverged, one cent above `23/5`; `4.67` is the session-139
 n=18 auto-grid probe at 467/100, covering `18.000000` unconverged, cannot confirm; the

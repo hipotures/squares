@@ -49,10 +49,10 @@ experiment:
       Session-140 research wall to 2026-09-19T06:42:00Z. One probe family per ranked
       n. No second attempt at a (n, side, site_set) already on covering-values.yaml.
     record: packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/
-  lease:
-    expires: '2026-09-19T07:02:00Z'
-    host: cursor
-    pid: 486108
+  effort:
+    timebox: 238m
+    wall_seconds: 14280
+    stopped_by: timebox
   results:
   - shape: determination
     role: outcome
@@ -61,19 +61,34 @@ experiment:
       verified floor and print RETAINABLE?
     outcome: no_progress
     checked_by: >-
-      Round in progress; no freeze has been offered to decide_certificate under
-      session-140
+      Session-140 first-wave and leftover probes at n in {12, 17, 19, 20} produced
+      no freeze with mass below n. T-028 retained at n=18, which is off the H-218
+      sweep. decide_certificate was not offered an H-218 freeze.
   verdict:
-    decision: in-progress
+    decision: abandoned
     primary_criterion: >-
       Confirm H-218 only when decide_certificate prints RETAINABLE on a freeze with
       mass < n at a side above the current floor for some n in {12, 17, 19, 20}
     reason: >-
-      X-038 and the ranked queue are registered. The first probes have not finished.
+      The Session-140 research wall expired with no RETAINABLE freeze on the H-218
+      sweep. Closest masses were leftover n=20 971/200 at 19.910044 unconverged
+      and leftover n=12 3969/1000 at 12.091168 after crossing 12. T-028 at n=18
+      does not confirm H-218.
+    budget_spent: >-
+      Session-140 research wall 238 minutes on one core. Leftover n=18 and the
+      second-wave Nagamochi queue did not start.
+    best_reached: >-
+      T-028 s(18) >= 187/40 off-sweep. H-218 sweep closest: leftover n=20
+      971/200 at 19.910044 unconverged below 20; leftover n=12 3969/1000 at
+      12.091168 after crossing 12.
+    reopen_when: >-
+      A new named site set at n in {12, 17, 19, 20} whose restricted optimum is
+      still below n, or leftover n=18 1871/400.
     resume_from: >-
-      Rank 5: n=18 at 4675/1000 with T-027 seed, auto grids, and windows 5.
-      Then the n=20 2400 s follow-up and n=21 at 97/20. n=12, n=17, and n=19
-      named first-wave site sets finished above n.
+      Leftover n=18 1871/400 T-028 auto plus windows 5, then second-wave
+      Nagamochi n=32 29/5. Do not replay leftover n=12 3969/1000 four-grid plus
+      windows 7, leftover n=20 971/200, leftover n=17 461/100, or leftover n=19
+      241/50.
 ---
 # Exp-162: First-Wave Stock Colgen
 

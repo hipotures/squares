@@ -1,7 +1,7 @@
 # Leftover First-Wave Sides
 
-Status: **walking**. `think-7igz` closed. Ranks 1–3 finished. Rank 3 stayed
-below 20 and did not converge. `leftover-queue.yaml` is on rank 4 (`3969/1000`).
+Status: **leftover wall ended**. `think-7igz` closed. Ranks 1–4 finished. Rank 5
+(`1871/400`) did not start: leftover n=12 exited at 06:42:04Z with remain −4 s.
 
 A restricted optimum already above `n` cannot retain on more wall of the same site set.
 Remaining rows raise that value.
@@ -19,8 +19,8 @@ Leftover n=20 `971/200` finished at `19.910044` unconverged, still below 20.
 | 1 | think-zoq4 | 19 | `241/50` | T-020 auto plus windows 6 | Done. Stopped at `19.247109` unconverged after 38 rounds. Crossed 19 at round 12. |
 | 2 | think-5q81 | 17 | `461/100` | T-019 auto plus windows 5 | Done. Stopped at `17.195968` unconverged after 56 rounds. Crossed 17 at round 11. |
 | 3 | think-d2ad | 20 | `971/200` | T-021 auto plus windows 6 | Done. Stopped at `19.910044` unconverged after 48 rounds. Did not cross 20. |
-| 4 | think-h02v | 12 | `3969/1000` | T-017 four-grid `(26,35,43,48)` plus windows 7 | Running from 06:21:12Z. Crossed 12 at round 11 (`12.000732`). Auto and four-grid without windows reached `12.116`. |
-| 5 | think-avmz | 18 | `1871/400` | T-028 auto plus windows 5 | One step above `187/40`. `117/25` still sits on the `18.000000` plateau. |
+| 4 | think-h02v | 12 | `3969/1000` | T-017 four-grid `(26,35,43,48)` plus windows 7 | Done. Stopped at `12.091168` unconverged after 36 rounds. Crossed 12 at round 11. Lower than the no-windows four-grid `12.116115`. |
+| 5 | think-avmz | 18 | `1871/400` | T-028 auto plus windows 5 | Not started. Remain after leftover n=12 was −4 s. One step above `187/40`. |
 
 ## Do not replay
 
@@ -28,6 +28,7 @@ Leftover n=20 `971/200` finished at `19.910044` unconverged, still below 20.
 | ---: | --- | --- |
 | 17 | `461/100` | Session-140 leftover auto plus windows 5 stopped at `17.195968`. |
 | 17 | `23/5` | Best stock row is `17.042346` (windows 5, 9 violated). Already above 17. |
+| 12 | `3969/1000` | Session-140 leftover four-grid plus windows 7 stopped at `12.091168`. |
 | 12 | `397/100` | Cert-seed `12.016263`; session-140 four-grid plus windows 7 converged at `12.133391`. |
 | 19 | `241/50` | Session-140 leftover auto plus windows 6 stopped at `19.247109`. |
 | 19 | `481/100` | Session-140 auto plus windows 6 stopped at `19.132115`. |
@@ -52,10 +53,10 @@ those eight sides in the floor-to-ceiling interval.
 n=28 is in the 26–32 block and is omitted.
 n=61 and n=78 stay deferred.
 
-Remaining leftover (`3969/1000`, then `1871/400`) fills the `06:42Z` wall.
-Do not start `second-wave-queue.yaml` this session unless leftover prints
-`EXIT_DONE` with at least 60 s remain. If only one slot appears, take n=32
-`29/5`. Do not replay n=17 `23/5` or `461/100`, or n=20 `971/200`, for more wall.
+Leftover n=12 filled the `06:42Z` wall. Leftover n=18 `1871/400` and
+`second-wave-queue.yaml` did not start (`remain=-4s`). A later session can take
+n=18 `1871/400`, then n=32 `29/5`. Do not replay n=17 `23/5` or `461/100`, n=20
+`971/200`, or n=12 `3969/1000` four-grid plus windows 7, for more wall.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

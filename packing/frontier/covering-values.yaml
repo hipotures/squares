@@ -1383,6 +1383,32 @@ values:
       only; remaining rows can only raise it. Adding sites can still lower the
       covering value, so 3969/1000 is not barred. No covering freeze was retained.
   - n: 12
+    side: '3969/1000'
+    side_decimal: '3.969'
+    objective: '12.091168'
+    site_set: t017-seed-four-grid-26-35-43-48-windows7
+    sites: 8569
+    rows: 10040
+    rounds: 36
+    converged: false
+    stop_reason: >-
+      The 1200 s deadline stopped the row loop after 36 LP rounds with 54 placements
+      still violated. The objective crossed 12 at round 11 (12.000732) and finished at
+      12.091168 on 8569 sites / 1184 orbits, including 2533 T-017 seed sites. It sat
+      near 12.091 from round 32.
+    least_covered_mass: '0.997200'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n12-3969-1000-t017-grid4-windows7-receipt.md
+      - packing/campaign/agent-sessions/session-140-lb-survey.md
+    notes: >-
+      Session-140 leftover rank 4. T-017 seed plus four-grid (26, 35, 43, 48) plus
+      windows 7 at 3969/1000. Lower than the Session-139 four-grid without windows
+      (12.116115) at the same side. Unconverged mass still above twelve refutes this
+      site set only; remaining rows can only raise it. Adding sites can still lower
+      the covering value, so 3969/1000 is not barred. Side 3.969 already exists.
+      T-017 is unchanged. T-029 was not offered. H-218 stays unconfirmed.
+  - n: 12
     side: '397/100'
     side_decimal: '3.97'
     objective: '12.364038'

@@ -24,7 +24,7 @@ known packing, otherwise whichever of the two the limit is.
 **`prize` is what the limit allows, not what a search will reach.** The real
 limit is the covering value: a certificate exists at side `L` only where the
 least total mass that covers every admissible `B`-square falls below `n`, and
-that value can bind well below either cap. 69 restricted optima
+that value can bind well below either cap. 70 restricted optima
 have been reported at 33 sides, one per site set, and
 `frontier/covering-values.yaml` registers each with whether its row loop
 converged; every one is at best an upper bound on the unrestricted covering
@@ -91,6 +91,7 @@ at all:
 | 12 | 3.969 | grid | 12.363498 | yes | The row loop converged at LP round 25 (violated 0) at 12.363498 on 3737 sites / 511 orbits. It crossed twelve at round 4 (12.043810). A later column-generation pricing round was killed after the 600 s deadline while adding one orbit and did not change the reported optimum. | nothing frozen here. Session-139 scout probe between T-017 at 99/25 and BC-206's 397/100 grid wall. Same auto grids (26, 35, 43) and scale 4,000,000 as BC-206. Above twelve on a converged loop, so this site set carries no certificate at 3.969; adding sites can only lower it, so the side is not barred. No covering freeze was retained. |
 | 12 | 3.969 | t017-seed-auto-26-35-43 | 12.118036 | no | The 600 s deadline stopped the row loop after 29 LP rounds with 186 placements still violated. The objective had already crossed 12 at round 8 (12.003410). | nothing frozen here. Session-139 T-017-seeded auto-grid probe at 3969/1000. The seed dropped the restricted optimum from the unseeded 12.363498 to 12.118036. Unconverged mass still above twelve refutes this site set only; remaining rows can only raise it. Adding sites can still lower the covering value, so 3969/1000 is not barred. No covering freeze was retained. |
 | 12 | 3.969 | t017-seed-four-grid-26-35-43-48 | 12.116115 | no | The 600 s deadline stopped the row loop after 29 LP rounds with 330 placements still violated. The objective crossed 12 at round 8 (12.005274) and finished at 12.116115 on 8133 sites / 1120 orbits, including 2097 T-017 seed sites. | nothing frozen here. Session-139 T-017-seeded four-grid at 3969/1000. Dropped the seeded auto 12.118036 by 0.002. Unconverged mass still above twelve refutes this site set only; remaining rows can only raise it. Adding sites can still lower the covering value, so 3969/1000 is not barred. No covering freeze was retained. |
+| 12 | 3.969 | t017-seed-four-grid-26-35-43-48-windows7 | 12.091168 | no | The 1200 s deadline stopped the row loop after 36 LP rounds with 54 placements still violated. The objective crossed 12 at round 11 (12.000732) and finished at 12.091168 on 8569 sites / 1184 orbits, including 2533 T-017 seed sites. It sat near 12.091 from round 32. | nothing frozen here. Session-140 leftover rank 4. T-017 seed plus four-grid (26, 35, 43, 48) plus windows 7 at 3969/1000. Lower than the Session-139 four-grid without windows (12.116115) at the same side. Unconverged mass still above twelve refutes this site set only; remaining rows can only raise it. Adding sites can still lower the covering value, so 3969/1000 is not barred. Side 3.969 already exists. T-017 is unchanged. T-029 was not offered. H-218 stays unconfirmed. |
 | 12 | 3.97 | grid | 12.364038 | yes | Converged at LP round 26 -- the row loop stopped for want of a violated placement -- at 12.364038 over 625 atoms, 117.4 s. | nothing frozen here. BC-206 of agenda 022. Above twelve on a converged loop, so this site set carries no certificate at 3.97; adding sites can only lower it, so the side is not barred. Rationalised at scale 4,000,000 to 12364129/1000000, loss 0.000091. Frozen as a refuted set and kept outside the case package. |
 | 12 | 3.97 | certificate-seeded | 12.016263 | no | Crossed twelve at LP round 8 with placements still violated; the loop reached 12.095824 by round 14 before the cell stopped it. 213 s. | nothing frozen here. BC-206 of agenda 022. The grids unioned with T-017's 2097 atoms scaled to the side. Rows only raise a restricted optimum, so this site set's converged optimum is at least 12.016263. |
 | 12 | 3.97 | t017-seed-four-grid-26-35-43-48 | 12.122748 | no | The 900 s deadline stopped the row loop after 33 LP rounds with 108 placements still violated. The objective crossed 12 at round 8 (12.001574) and finished at 12.122748 on 8133 sites / 1120 orbits, including 2097 T-017 seed sites. | nothing frozen here. Session-139 T-017-seeded four-grid at 397/100. Unconverged mass still above twelve refutes this site set only; remaining rows can only raise it. Adding sites can still lower the covering value, so 397/100 is not barred. No covering freeze was retained. |
@@ -113,9 +114,9 @@ artifact's mass and the reported objective are different numbers.
 
 They are also reports of different kinds rather than one series measured the same
 way, and the `converged` column is where the difference lives: 28 of
-the 69 ran their row loop to convergence, and the rest stopped for the
+the 70 ran their row loop to convergence, and the rest stopped for the
 reason beside each — or for none the record kept — and stand as upper bounds on
-their own site sets only. 69 heterogeneous reports across a side band
+their own site sets only. 70 heterogeneous reports across a side band
 2.00 wide do not support a growth trend or a fitted curve, and no rung in
 this register has ever been claimed from one. Rank on `prize` to choose where to
 look; measure and retain the run before believing any extrapolation.
