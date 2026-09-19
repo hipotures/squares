@@ -55,7 +55,7 @@ First-party fractional certificates sit on seven of them:
 | --- | ---: | ---: | ---: | --- |
 | 11 | T-026 `3.826447…` | Trump `3.877083…` | 0.051 | Yes. Closest point-atom construction above T-026 is `11.14` at `383/100`. |
 | 12 | T-017 `99/25` | grid `4` | 0.040 | Yes. Certificate-seeded `397/100` stopped at `12.016263` unconverged. Session-140 four-grid plus windows 7 converged at `12.133391` (site set refuted). |
-| 17 | T-019 `459/100` | grid `5` (reported packing `4.675…`) | 0.410 | Yes. T-019-seed plus windows 5 at `23/5` stopped at `17.042346`. Session-140 four-grid plus windows 8 stopped at `17.120106`. Leftover `461/100` (`4.61`, above `23/5`) is the untried side. |
+| 17 | T-019 `459/100` | grid `5` (reported packing `4.675…`) | 0.410 | Yes. T-019-seed plus windows 5 at `23/5` stopped at `17.042346`. Session-140 four-grid plus windows 8 stopped at `17.120106`. Leftover `461/100` stopped at `17.195968`. |
 | 18 | T-028 `187/40` | `(7/2)+(1/2)sqrt(7)` | 0.148 | Rank 5 retained as T-028. `117/25` still sits on the `18.000000` plateau. |
 | 19 | T-020 `24/5` | `4.885618…` | 0.086 | Three probes. T-020-seed windows 6 at `97/20` stopped at `19.808958`. Session-140 same construction at `481/100` stopped at `19.132115`. Leftover `241/50` stopped at `19.247109`. |
 | 20 | T-021 `97/20` | grid `5` | 0.150 | Yes. Old cert-seed crossed at `20.000223`. Session-140 four-grid plus windows 7 stopped at `19.939212` unconverged after 2400 s. |
