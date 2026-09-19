@@ -88,7 +88,7 @@ experiment:
       was empty; --search did not run
   - shape: record
     role: outcome
-    metric: positive D4 orbit representatives after encode-only
+    metric: source U025 N+ (encode-only produced no JSON)
     direction: lower
     score: 119
     standing_best: 23
@@ -119,7 +119,8 @@ Sessions [134](../../../agent-sessions/session-134-n11-route-s-admission.md) and
 target-blind instrument; PR 182 merged it as `1d9c49c4` from reviewed head `609d7d62`.
 Until this artifact existed, no optimizer, candidate, or coverage target was allowed.
 Session 139 ran encode-only; `timeout` 10800 exited at 15:24:31Z with no JSON.
-That timeout is unresolved. `--search` did not run.
+That timeout is unresolved. `--search` did not run. The record-shape row scores
+source U025 `N+=119`, not a post-encode measurement.
 
 ## Source
 

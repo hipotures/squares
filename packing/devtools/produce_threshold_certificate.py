@@ -67,6 +67,16 @@ _FORBIDDEN_MODULE_MARKERS = ("sepcore", "lp383")
 
 
 @dataclass(frozen=True, slots=True)
+class CoveringSolve:
+    """HiGHS covering-LP outcome. Timeout is unresolved, not infeasible."""
+
+    status: str
+    weights: np.ndarray | None = None
+    duals: np.ndarray | None = None
+    objective: float | None = None
+
+
+@dataclass(frozen=True, slots=True)
 class ProducerSettings:
     """Search knobs. Defaults stay tiny so a test run finishes in seconds."""
 
@@ -183,14 +193,12 @@ def _matrix_cols(matrix: sparse.csr_matrix) -> int:
     return int(matrix.get_shape()[1])
 
 
-def solve_covering(
-    matrix: sparse.csr_matrix, costs: np.ndarray
-) -> tuple[np.ndarray, np.ndarray, float] | None:
+def solve_covering(matrix: sparse.csr_matrix, costs: np.ndarray) -> CoveringSolve:
     """Point-or-atom covering LP: minimise cost, every row covered at least once."""
 
     n_rows = _matrix_rows(matrix)
     if n_rows == 0:
-        return None
+        return CoveringSolve("infeasible")
     result = linprog(
         c=costs,
         A_ub=-matrix,
@@ -198,10 +206,17 @@ def solve_covering(
         bounds=(0.0, None),
         method="highs",
     )
+    if int(result.status) == 1:
+        return CoveringSolve("unresolved")
     if not result.success or result.ineqlin is None or result.x is None:
-        return None
+        return CoveringSolve("infeasible")
     duals = np.maximum(-np.asarray(result.ineqlin.marginals, dtype=float), 0.0)
-    return np.asarray(result.x, dtype=float), duals, float(result.fun)
+    return CoveringSolve(
+        "ok",
+        np.asarray(result.x, dtype=float),
+        duals,
+        float(result.fun),
+    )
 
 
 def _receipt(
@@ -402,9 +417,20 @@ def produce(
         matrix = _csr(sparse.hstack([a_sites, a_atoms])) if atom_width else a_sites
         costs = np.concatenate([sizes, atom_costs]) if atom_width else sizes
         solved_round = solve_covering(matrix, costs)
-        if solved_round is None:
+        if solved_round.status == "unresolved":
+            return "unresolved:covering LP hit a HiGHS time or iteration limit"
+        if (
+            solved_round.status != "ok"
+            or solved_round.weights is None
+            or solved_round.duals is None
+            or solved_round.objective is None
+        ):
             return "covering LP is infeasible after adding threshold-atom columns"
-        x, duals, objective = solved_round
+        x, duals, objective = (
+            solved_round.weights,
+            solved_round.duals,
+            solved_round.objective,
+        )
         atom_mass = float(atom_costs @ x[n_site_orbits:]) if _matrix_cols(a_atoms) else 0.0
         trajectory.append(
             {
@@ -593,16 +619,18 @@ def produce(
                 break
 
     if stop_reason is not None:
+        unresolved = stop_reason.startswith("unresolved:")
+        reason = stop_reason.removeprefix("unresolved:") if unresolved else stop_reason
         receipt = _receipt(
             n=settings.n,
-            status="refused",
+            status="unresolved" if unresolved else "refused",
             covering_ran=covering_ran,
             objective=objective,
-            reason=stop_reason,
+            reason=reason,
             extra={**extra, "rows": len(exact_rows), "atom_orbits": len(orbits)},
         )
         _write_json(output_dir / "receipt.json", receipt)
-        _log(log, f"REFUSED: {stop_reason}")
+        _log(log, f"{'UNRESOLVED' if unresolved else 'REFUSED'}: {reason}")
         return receipt
 
     checkpoint("final")

@@ -65,13 +65,19 @@ def _point_strings(points: Sequence[Point]) -> list[list[str]]:
 
 
 def _certificate_field(certificate: Path) -> str:
-    """Packing-relative when the file sits in this project; otherwise the given path."""
+    """Repository-relative when the file sits in this checkout; otherwise the given path."""
 
     resolved = certificate.resolve()
-    try:
-        return resolved.relative_to(require_project_root().resolve()).as_posix()
-    except ValueError:
-        return certificate.as_posix()
+    packing = require_project_root().resolve()
+    for root in (packing.parent, packing):
+        try:
+            relative = resolved.relative_to(root).as_posix()
+        except ValueError:
+            continue
+        if root == packing:
+            return f"packing/{relative}"
+        return relative
+    return certificate.as_posix()
 
 
 def _write_receipt(path: Path, record: dict[str, Any]) -> None:

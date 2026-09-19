@@ -45,7 +45,7 @@ def test_default_receipt_does_not_run_the_optimizer(tmp_path: Path) -> None:
     assert record["float_lp_used"] is False
     assert record["using_unit_squares"] is True
     assert record["unique_sites"] == len(load_unique_sites())
-    assert record["certificate"] == "cases/n11_fractional_certificate/certificate.json"
+    assert record["certificate"] == "packing/cases/n11_fractional_certificate/certificate.json"
     assert (t018_certificate_path()).is_file()
 
 

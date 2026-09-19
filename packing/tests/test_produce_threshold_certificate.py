@@ -12,6 +12,12 @@ import json
 from fractions import Fraction
 from pathlib import Path
 
+import numpy as np
+import pytest
+from scipy import sparse
+from scipy.optimize import OptimizeResult
+
+import devtools.produce_threshold_certificate as producer
 from devtools import check_no_embedded_js as guard
 from devtools.produce_threshold_certificate import (
     ProducerSettings,
@@ -20,6 +26,7 @@ from devtools.produce_threshold_certificate import (
     produce,
     refuse_scratch_imports,
     scientific_refuse,
+    solve_covering,
 )
 
 MODULE = Path(__file__).resolve().parents[1] / "devtools/produce_threshold_certificate.py"
@@ -133,3 +140,15 @@ def test_producer_does_not_import_scratch() -> None:
         assert "lp383" not in names
         assert ".py.txt" not in names
         assert ".txt" not in names
+
+
+def test_covering_timeout_is_unresolved_never_refused(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def timeout_linprog(*_args: object, **_kwargs: object) -> OptimizeResult:
+        return OptimizeResult(success=False, status=1, x=None, ineqlin=None, message="time limit")
+
+    monkeypatch.setattr(producer, "linprog", timeout_linprog)
+    outcome = solve_covering(sparse.csr_matrix([[1.0, 0.0], [0.0, 1.0]]), np.array([1.0, 1.0]))
+    assert outcome.status == "unresolved"
+    assert outcome.weights is None

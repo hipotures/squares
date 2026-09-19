@@ -162,11 +162,13 @@ strategy-reset queue, and
 is the current relational-certificate queue opened by the overnight review.
 The generated agenda map, not this narrative, summarizes commitment state.
 
-Session 138 is the latest terminal handoff: PR 193 merged its records as `4ad98e90`,
+[Session 139](packing/campaign/agent-sessions/session-139-n11-overnight-research.md)
+is the latest terminal closeout: encode-only timed out unresolved, T-027 retained
+`s(18) >= 467/100`, and `think-qqzs` remains the next entry.
+[Session 138](packing/campaign/agent-sessions/session-138-n11-overnight-review.md)
+is the preceding route-selection handoff: PR 193 merged its records as `4ad98e90`,
 `think-4woh` is closed, and certification debt now sits under `think-qqzs`. The five
 X-037 owner decisions are resolved under [`epistemics.md`](epistemics.md).
-[Session 139](packing/campaign/agent-sessions/session-139-n11-overnight-research.md)
-stopped after encode-only timed out unresolved; `think-qqzs` remains the next entry.
 `stopped` is not a scientific failure; it includes time limits, guarded refusals,
 administrative handoffs, and work deliberately ended after its next evidence was
 identified. The late-session arc moved from certificate production and exact dilation
@@ -977,8 +979,12 @@ controller, not permission to blur contracts.
 
 ### Current Handoff
 
-[Session 138](packing/campaign/agent-sessions/session-138-n11-overnight-review.md) is
-the latest terminal handoff, and the latest scientific one.
+[Session 139](packing/campaign/agent-sessions/session-139-n11-overnight-research.md)
+is the latest terminal scientific closeout.
+It retained T-027 `s(18) >= 467/100`, stopped after Route S encode-only timed out
+unresolved, and left H-216 open.
+[Session 138](packing/campaign/agent-sessions/session-138-n11-overnight-review.md)
+is the preceding route-selection handoff.
 It reviewed the n=11 record, ranked eight mechanisms that price relations between
 squares, subjected them to an independent adversarial review, and measured two.
 [X-037](packing/campaign/explorations/X-037-n11-overnight-review-and-route-slate.md)
