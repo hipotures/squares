@@ -2,7 +2,7 @@ softschema:
   contract: packing.squares:FrontierEvidenceSet/v1
   schema: frontier-evidence.schema.yaml
   status: enforced
-last_reviewed: '2026-09-18'
+last_reviewed: '2026-09-20'
 evidence:
   - id: E-green-ds7-theorem9-reported-lower
     claim: lower-bound
@@ -3344,3 +3344,91 @@ evidence:
       of seven additional squares is neither assumed nor asserted. Other owner
       combinations remain open and no n=11 verified bound field changes.
     source_reviewed: '2026-09-09'
+  - id: E-n011-corner-class-96-25-exact-decision
+    claim: derived-structure
+    scope:
+      n_values:
+        - 11
+    assurance: verified
+    method: exact-algebraic
+    performed_by: repository
+    relationship_to_generator: same-implementation
+    origin: audited-here
+    novelty: apparently-novel
+    certificate: cases/n11_corner_class_certificate/certificate.json
+    replay: uv run --frozen --all-extras --group dev python -m devtools.decide_certificate --corner-clip 1/2 cases/n11_corner_class_certificate/certificate.json
+    replay_status: passed
+    limitations: >-
+      The exact event-cell sweep of sqpack.fractional.certificate on the row domain
+      clipped by the four corner triangles at depth 1/2, the clip entering as extra
+      half-planes on each slab's centre range so that every kept centre is swept.
+      It decides Condition 5 on the clipped domain only: the least charge
+      2000013/2000000 is over closed B-squares at net directions whose minimum of
+      x + y is at least 1/2 in every corner frame, and nothing is claimed about a core
+      that meets a corner triangle. Conditions 1 to 4 are decided exactly before the
+      sweep. The record declares variant class and corner_clip 1/2 and the gate
+      refuses it without --corner-clip, so the bytes cannot be read as a bound. The
+      site set is a property of the certificate found, not a condition of the
+      statement; the net enters only through which core a square is assigned, and
+      Condition 4 keeps that core strictly inside its square at every angle. Shares
+      the Certificate parser and the closed-form conditions with the interval route.
+    source_reviewed: '2026-09-20'
+    novelty_basis:
+      corpus: >-
+        packing/resources/ as retained on 2026-09-20 (27 papers with faithful .raw.md
+        transcriptions and 22 archived web sources, including [Friedman DS7],
+        [Stromquist 2003], Trump 2023, Bentz 2010/2016, Nagamochi 2005 and the Kingbird
+        catalogue), plus the repository's own certificate record T-018 to T-030
+      novel_object: >-
+        A weighted fractional unavoidable-set certificate whose row domain is clipped
+        by corner triangles, excluding one corner-bin class of eleven-square packings
+        at side 96/25; the corpus contains no conditioned point certificate of this
+        shape and no statement that every eleven-square packing at 3.84 has a square
+        meeting a corner triangle of depth 1/2
+      searched: >-
+        The corner-conditioned language is this repository's own construction (X-040
+        lane 1, Theorem B of lane-a); the archived sources were searched by the
+        Session 143 lanes for corner-penetration case splits at n = 11 and found
+        Stromquist's and Friedman's wall arguments only, neither of which conditions
+        on corner depth. No priority search beyond the corpus was performed.
+      gaps: >-
+        Trump's personal site and the unarchived Kingbird pages are not retained; an
+        unpublished corner case split at n = 11 would not be found here. The
+        conditioning is a proof device rather than a result about s(11), so apparent
+        novelty concerns the certificate and its instrument, not a bound.
+  - id: E-n011-corner-class-96-25-interval-decision
+    claim: derived-structure
+    scope:
+      n_values:
+        - 11
+    assurance: verified
+    method: interval-certified
+    performed_by: repository
+    relationship_to_generator: independent-implementation
+    origin: audited-here
+    novelty: apparently-novel
+    certificate: cases/n11_corner_class_certificate/certificate.json
+    replay: uv run --frozen --all-extras --group dev python -m devtools.decide_certificate --corner-clip 1/2 cases/n11_corner_class_certificate/certificate.json
+    replay_status: passed
+    limitations: >-
+      The second decision of the same frozen bytes by the interval branch and bound of
+      sqpack.fractional.interval over boxes of centres on the doubled net, with a box
+      dropped only when an outward-rounded bound proves it inside the excluded corner
+      set, so an unresolved box is kept rather than assumed excluded. On this file its
+      enclosure of the least charge is (2000013/2000000, 2000013/2000000) over
+      1,743,736 boxes with none stalled, the value the exact sweep reports. It shares
+      the certificate object and the closed-form conditions with the exact route and no
+      part of how Condition 5 is decided; both routes decide the same clipped set only
+      because the clip is D4-invariant and folded. It adds no bound and no protection
+      against a wrong theorem statement, which both routes share.
+    source_reviewed: '2026-09-20'
+    novelty_basis:
+      corpus: >-
+        The same corpus as E-n011-corner-class-96-25-exact-decision.
+      novel_object: >-
+        The same certificate decided by an independent interval route on the clipped
+        domain.
+      searched: >-
+        As for the exact decision; no separate search.
+      gaps: >-
+        As for the exact decision.

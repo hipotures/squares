@@ -233,6 +233,13 @@ erratum.
   squares fit. The endpoint-containment premise is explicit: this result does not by
   itself improve the unconditional `n = 11` lower bound.
 
+- **T-031: the octagon corner class excluded at `n = 11`, side `96/25` (`S2`).** A
+  weighted fractional certificate on the row domain clipped by the four corner triangles
+  of depth `1/2` shows that every packing of eleven unit squares in a square of side
+  `3.84` has a square meeting an open corner triangle `x + y < 1/2`; decided by both
+  gate routes on the frozen bytes.
+  The exclusion is conditional on the corner class and changes no bound.
+
 - **T-005: an erratum in Bentz 2010.** Lemma 10’s middle replacement point is transposed
   in print. An exact escape certificate refutes the printed point, and the corrected
   reading certifies exactly against the journal page image.

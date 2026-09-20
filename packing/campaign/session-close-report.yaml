@@ -7,12 +7,12 @@ softschema:
   schema: schemas/session-close-report.schema.yaml
   envelope: null
   status: enforced
-count: 146
+count: 147
 generated_by: >-
   uv run --frozen --all-extras --group dev python -m devtools.close_session --render
 totals:
   sessions_measured: 92
-  sessions_unmeasured: 54
+  sessions_unmeasured: 55
   attributed:
     rollups: 151
     turns: 43229
@@ -2417,4 +2417,14 @@ sessions:
   tool_errors: 5
   one_off_code: 87
   wall_hours: 7.94
+  codex_receipts: []
+- id: session-147
+  title: "Overnight Chunk 4 — The BC-367 Registration Entry"
+  status: in_progress
+  primary_bead: think-b7pr
+  phases: 1
+  measured: false
+  unmeasured_reason: >-
+    declares no resource measurement
+  rollups: []
   codex_receipts: []

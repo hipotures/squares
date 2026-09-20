@@ -8,9 +8,9 @@ ours, which rest on someone else's argument, and how far each has been checked.
 
 ## The short version
 
-- **83** evidence records. **67** are formal; **61** of those were established here.
+- **85** evidence records. **69** are formal; **63** of those were established here.
 - **11** rest on an argument made elsewhere, of which **8** have been read by nobody here.
-- **30** claim to be first established here. **8** make no novelty statement at all - not assessed, which is not the same as not novel.
+- **32** claim to be first established here. **8** make no novelty statement at all - not assessed, which is not the same as not novel.
 
 A formal claim on an unread external proof is still formal: the proof proves its
 claim whether or not we read it. The count above is not a doubt about those
@@ -103,12 +103,14 @@ results, it is a statement about what this repository has itself examined.
 | `E-n011-wall-owner-footprints` | 0 | derived-structure | verified | equalities and inequalities, no tolerance | here | - | *not assessed* |
 | `E-n011-wall-owner-containment` | 0 | derived-structure | verified | equalities and inequalities, no tolerance | here | - | *not assessed* |
 | `E-n011-five-dot-physical-transfer` | 0 | derived-structure | verified | whatever its theorem states | here | - | apparently-novel |
+| `E-n011-corner-class-96-25-exact-decision` | 0 | derived-structure | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
+| `E-n011-corner-class-96-25-interval-decision` | 0 | derived-structure | verified | strict inequalities only | here | - | apparently-novel |
 
 ## What the register rests on
 
-- **assurance**: numerically-checked 4, reported 12, verified 67
-- **method**: exact-algebraic 53, interval-certified 6, numerical-multiprecision 4, proof-audited 2, published-proof 6, reported 12
-- **novelty**: apparently-novel 30, common-knowledge 4, not assessed 8, previously-published 41
+- **assurance**: numerically-checked 4, reported 12, verified 69
+- **method**: exact-algebraic 54, interval-certified 7, numerical-multiprecision 4, proof-audited 2, published-proof 6, reported 12
+- **novelty**: apparently-novel 32, common-knowledge 4, not assessed 8, previously-published 41
 
 The `cases` column is how many frontier records cite each piece of evidence, and it is the reason to read this table rather than count records. Ranked below are the *formal* records only: a `reported` record cited across the frontier may be a shared catalogue and is labelled as such, which is the register working rather than risk. The risk is a verified claim resting on an argument nobody has examined.
 
@@ -133,6 +135,8 @@ Claims marked `apparently-novel`: first established here as far as the archived 
 | `E-n029-interval-certified-upper` | 29 | An interval certificate for a square-in-square bound; the packing is Kingbird's | 1 | verified |
 | `E-n040-first-order-flexibility` | 40 | That the tilted block turns at first order and every turn is refused at second; DS7 asserts n = 40 is rigid and this refines rather than contradicts it | 1 | verified |
 | `E-green17-sixteen-point-lower` | 17, 18 | The certified object: sixteen rational points unavoidable in [0, 4426213/1000000]^2, every decision an exact rational sign. The bound's value sits below Green's reported number, so what is new is the verified certificate, not the frontier of reported claims. | 0 | verified |
+| `E-n011-corner-class-96-25-exact-decision` | 11 | A weighted fractional unavoidable-set certificate whose row domain is clipped by corner triangles, excluding one corner-bin class of eleven-square packings at side 96/25; the corpus contains no conditioned point certificate of this shape and no statement that every eleven-square packing at 3.84 has a square meeting a corner triangle of depth 1/2 | 0 | verified |
+| `E-n011-corner-class-96-25-interval-decision` | 11 | The same certificate decided by an independent interval route on the clipped domain. | 0 | verified |
 | `E-n011-five-dot-physical-transfer` | 11 | The explicit four-rational-footprint, five-rational-dot conditional certificate at q=96/25 confirmed by exp144; not ownership arguments, unavoidable points, or the general weighted-cover method. | 0 | verified |
 | `E-n011-fractional-certificate` | 11 | The certificate and the bound. The resource lineage runs through Göbel's integral unavoidable points, Kearney and Shiu's dual lattices, Nagamochi's weighted points, segments and area, and Bentz's resource-starvation account. This certificate uses the exact-rational, pure-atomic direction-net architecture posted by Burns and then developed by Massaccesi, while the generator is this project's. What is new is an instance at n = 11 and side 381/100, the first located public improvement to this case's lower bound since 2003. | 0 | verified |
 | `E-n011-fractional-dilation-limit` | 11 | The exact lower-bound value obtained by combining the retained T-018 source with a sharpened trigonometric containment lemma, every strict rational uniform dilation it admits, rational density, and upward embedding. The source certificate and dilation operation are not new objects; the registered dilation-limit corollary is. | 0 | verified |
