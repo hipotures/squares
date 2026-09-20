@@ -143,10 +143,10 @@ hypothesis status and summarizes experiment verdicts, and the
 | --- | ---: | --- |
 | Agendas | 37 | 17 active; 14 completed; 5 paused; 1 superseded |
 | Commitments | 355 | 178 complete; 61 stopped; 68 blocked; 18 ready; 21 tentative; 9 in progress |
-| Sessions | 144 | 86 completed; 57 stopped; 1 nonterminal |
+| Sessions | 145 | 86 completed; 57 stopped; 2 nonterminal |
 | Explorations | 38 | 24 linked to proposed hypotheses; 14 uncodified |
 | Hypotheses | 169 | 28 confirmed; 29 refuted; 57 blocked; 14 unresolved; 5 open; 29 open questions; 2 result registered; 2 abandoned; 3 running |
-| Experiments | 150 | 41 accepted; 34 rejected; 46 unresolved; 12 baseline; 11 blocked; 3 abandoned; 3 in progress |
+| Experiments | 151 | 41 accepted; 34 rejected; 46 unresolved; 12 baseline; 11 blocked; 3 abandoned; 4 in progress |
 | Frontier results | 30 | 30 registered |
 
 <!-- END CURRENT-RESEARCH-STATUS -->
@@ -4607,6 +4607,7 @@ archive beside it.
 | [exp-213](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-213-h224-n17-23-5-ceiling-family.md) | 17 | target | H-224 | T-019-seeded ceiling family at 23/5 | in progress | in-progress |
 | [exp-214](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-214-h223-n13-399-100-window-covering.md) | 13 | calibration | H-223 | Window-seeded point covering at 399/100 | in progress | in-progress |
 | [exp-215](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-215-h225-n26-53-10-seeded-covering.md) | 26 | target | H-225 | Window-seeded point covering at 53/10 | in progress | in-progress |
+| [exp-219](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-219-h222-n11-96-25-octagon-class.md) | 11 | target | H-222 | Corner-clipped covering at 96/25, d = 1/2 | in progress | in-progress |
 
 ### Cost and provenance
 
@@ -4762,6 +4763,7 @@ archive beside it.
 | exp-213 | One run of at most 2400 s, polish, two readers | — | — | in progress | — |
 | exp-214 | One run of at most 2400 s and the gate or the readers | — | — | in progress | — |
 | exp-215 | One run of at most 3600 s and the gate | — | — | in progress | — |
+| exp-219 | One run of at most 2400 s, then the gate or the readers | — | — | in progress | — |
 
 ### What the 150 rounds jointly establish
 
