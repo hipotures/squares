@@ -240,9 +240,7 @@ def colgen_command(probe: Probe, prefix: Path) -> list[str]:
     return command
 
 
-def run_colgen(
-    probe: Probe, prefix: Path, ownership_fds: Sequence[int] = ()
-) -> int:
+def run_colgen(probe: Probe, prefix: Path, ownership_fds: Sequence[int] = ()) -> int:
     env = os.environ.copy()
     env["OMP_NUM_THREADS"] = "1"
     env["OPENBLAS_NUM_THREADS"] = "1"

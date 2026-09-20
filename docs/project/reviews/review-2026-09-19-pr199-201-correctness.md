@@ -202,9 +202,15 @@ Full checkpoints were launched for the actual PR merge refs:
 | 200 | `41947f0ba06b9284f6bd9d99194e9e3bc56e16bd` | [35476506427](https://github.com/jlevy/squares/actions/runs/35476506427) |
 | 201 | `b9cc9ce737d3e26681eb77d0c3feb71764d78c54` | [35476507563](https://github.com/jlevy/squares/actions/runs/35476507563) |
 
-Checkpoint status will be recorded at the final review snapshot.
-A pending run is not a passing checkpoint, and later fixes or base changes invalidate
-affected evidence.
+All three checkpoints completed with failures.
+PR 199 failed only the incorrect 363-versus-361 exhaustive assertion; its slow lane and
+deferred steps passed.
+PR 200 failed that assertion and both atlas rebuild surfaces.
+PR 201 passed the exhaustive mathematical lane, but failed the slow atlas test and the
+deferred atlas rebuild.
+Its remaining deferred checks passed, including 167 negative controls, finer-net and
+threshold records, and the n=40 rigidity check.
+Later fixes or base changes require fresh evidence for the affected checks.
 
 The initial recommendation was to repair each owning layer and restack.
 The user subsequently requested a new correction PR above 201 instead.
@@ -232,6 +238,14 @@ implementation addresses R2–R9, the repeated R1 evidence counts, and all three
 findings. It adds computational boundary and queue-ownership regression tests without
 changing retained certificate payloads or the scientific acceptance criteria.
 Final validation and finding dispositions will be recorded after integration.
+
+The first integrated fast checkpoint at `d1c54a6a` passed every behavioral assertion,
+but failed the Ruff formatting check and a per-test duration ceiling.
+The allowlist existence test spent 12.38 seconds generating a full reference report
+despite using only declared constant names.
+It now reads the declarations directly; reference matching remains covered by the
+existing positive and negative controls.
+No timeout ceiling or slow-test exemption was changed.
 
 The integration pass also corrected exp-171’s numerical restricted-optimum subject and
 its verification follow-up.
