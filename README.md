@@ -60,6 +60,8 @@ cited evidence, and **C**, what this repository has recorded or performed itself
 The gate checks the structural support for both classifications.
 `apparently-novel` means a recorded source search did not find the named contribution;
 it is not a claim of priority.
+`confirmed-novel` means priority was confirmed outside this repository.
+The New Results section covers both labels.
 
 Each result also carries **S**, a significance score from `1` to `5` against the same
 file’s rubric. The two groups below are split on it rather than on taste: `S4` is its
@@ -131,8 +133,9 @@ Results first established here, as far as the recorded source searches show:
   a model-written proof.
   One certificate covers all three sizes without a monotonicity step: only `Condition 2`
   mentions `n`, so an atom set certifies its side for every integer above its own mass.
-  `T-020` has since carried `n = 19` past it; `n = 17` and `n = 18` are this result’s
-  alone, being too small for the heavier atom set that moved the other three.
+  `T-020` has since carried `n = 19` past it, and `T-030` has carried `n = 18` to
+  `4679/1000 = 4.679`. The `n = 17` bound remains this result’s alone, because the
+  heavier atom sets do not apply there.
 - **T-020: `s(19), s(20), s(21) ≥ 24/5`, improving the verified register (`S4`).** The
   verified fields for twenty and twenty-one squares previously carried Nagamochi’s 2005
   general formula, `1 + √13 = 4.6055…` and `1 + √14 = 4.7416…`. The
@@ -187,11 +190,23 @@ erratum.
   It raises each bound by `0.05` above `T-020`; the heavier atom set does not apply to
   `n = 19`.
 
+- **T-027 / T-028 / T-029 / T-030: `s(18) ≥ 4.67, 4.675, 4.6775, 4.679` (`S3`).** Four
+  retained weighted fractional unavoidable-set certificates form the latest `n = 18`
+  ladder. Each passed both the exact weighted-sum replay and an independent interval
+  coverage replay. The last rung, `T-030` at `4679/1000`, is the current survey lower
+  bound; the stronger `4.68` candidate did not certify and is not a result.
+
 - **T-001 / T-002: `s(17) ≥ 4.426213` and `s(18) ≥ 4.426213`.** A sixteen-point
   unavoidable set is certified by exact rational cover verification and an independent
   interval branch-and-bound over the full pose space.
   Both are superseded as the verified lower bound: first by the source-backed `4.5058`
   adopted on 2026-09-03, and now by `T-019`, which proves more than either.
+
+- **T-003: the sixteen-point construction’s ceiling is bracketed (`S2`).** Exact
+  certification at `4426213/1000000` and an exact escaping pose at `4427/1000` locate
+  the ceiling in that half-open interval.
+  The proposed equality at `753/250 + sqrt(2)` remains analysis rather than part of the
+  registered claim.
 
 - **T-009: `s(29) ≤ 5.93383346267692918974379895098`.** A Krawczyk interval certificate
   encloses a unique exact solution around a rational witness.
@@ -211,6 +226,12 @@ erratum.
   The side is fixed throughout; nothing is claimed about an isolation radius, about any
   other `n = 5` optimum, or about global uniqueness, and nothing follows for the side as
   a variable: with the side free the obstruction fails, which X-007 measured.
+
+- **T-023: a conditional five-square exclusion at `n = 11` (`S3`).** At `q = 96/25`, if
+  four distinct unit squares have selected strict cores of side `B = 9977/10000`
+  containing the four retained rational endpoint patches, at most five further unit
+  squares fit. The endpoint-containment premise is explicit: this result does not by
+  itself improve the unconditional `n = 11` lower bound.
 
 - **T-005: an erratum in Bentz 2010.** Lemma 10’s middle replacement point is transposed
   in print. An exact escape certificate refutes the printed point, and the corrected
@@ -239,6 +260,8 @@ fields. Its source is one schema-validated case file under
 [`packing/frontier/`](packing/frontier/README.md); the generated
 [status table](packing/frontier/STATUS.md) is the reader view, and the atlas above
 renders every retained known-best packing.
+The current `n = 18` survey row records the independently verified lower bound
+`4679/1000 = 4.679` from `T-030`.
 
 The [literature archive](packing/resources/README.md) retains each primary source, a
 cleaned Markdown transcription, and the unedited extraction used to check it.
