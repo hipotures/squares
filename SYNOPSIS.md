@@ -143,7 +143,7 @@ hypothesis status and summarizes experiment verdicts, and the
 | --- | ---: | --- |
 | Agendas | 36 | 16 active; 14 completed; 5 paused; 1 superseded |
 | Commitments | 349 | 178 complete; 60 stopped; 66 blocked; 15 ready; 21 tentative; 9 in progress |
-| Sessions | 142 | 84 completed; 57 stopped; 1 nonterminal |
+| Sessions | 142 | 85 completed; 57 stopped; all terminal |
 | Explorations | 37 | 23 linked to proposed hypotheses; 14 uncodified |
 | Hypotheses | 159 | 28 confirmed; 29 refuted; 51 blocked; 14 unresolved; 5 open; 28 open questions; 2 result registered; 2 abandoned; 0 running |
 | Experiments | 147 | 41 accepted; 34 rejected; 46 unresolved; 12 baseline; 11 blocked; 3 abandoned; 0 in progress |
@@ -165,8 +165,13 @@ strategy-reset queue, and
 is the current relational-certificate queue opened by the overnight review.
 The generated agenda map, not this narrative, summarizes commitment state.
 
-[Session 141](packing/campaign/agent-sessions/session-141-n100-research.md) is the
-latest terminal closeout: T-029 retained `s(18) >= 1871/400`, T-030 retained
+[Session 142](packing/campaign/agent-sessions/session-142-stack-correctness.md) is the
+latest terminal closeout: its correctness review replayed all four retained n=18
+certificates, repaired the stack in PR 202, and preserved `think-qqzs` as the next
+entry. The corrected code passed the full checkpoint; unchanged lower PR heads remain
+independently unready.
+[Session 141](packing/campaign/agent-sessions/session-141-n100-research.md) closed the
+preceding research pass: T-029 retained `s(18) >= 1871/400`, T-030 retained
 `s(18) >= 4679/1000`, H-218 and H-220 stay unconfirmed, and `think-qqzs` remains the
 next entry. [Session 140](packing/campaign/agent-sessions/session-140-lb-survey.md)
 closed the stacked-PR survey of `n <= 100` lower bounds; it retained T-028
@@ -1020,6 +1025,17 @@ stop. Long autonomous sessions use the same rule; autonomy changes the duration 
 controller, not permission to blur contracts.
 
 ### Current Handoff
+
+[Session 142](packing/campaign/agent-sessions/session-142-stack-correctness.md)
+completed the correctness review and bounded pipeline repairs in
+[PR 202](https://github.com/jlevy/squares/pull/202). All four retained n=18 certificates
+passed both routes, and the corrected code passed the matching fast and deferred
+checkpoints.
+The original PRs 199–201 remain unchanged and are not independently ready to
+merge; landing must retain the corrections at the cumulative tip.
+The n=29 candidate remains interval-unresolved and unpromoted.
+Costly partial-selection scheduling remains open under `think-1i1x`; it does not replace
+the selected H-216 continuation.
 
 [Session 141](packing/campaign/agent-sessions/session-141-n100-research.md) closed the
 stacked n<100 research loop.
@@ -4327,7 +4343,7 @@ in separate tables: their units differ, and the same work can appear in both.
 | `codex-task-tree-session-133.yaml` | session-133 | 101 | 0.37 h | 0.2 h | 13.6 h | yes |
 | `codex-task-tree-session-134.yaml` | session-134 | 497 | 4.88 h | 1.21 h | 1.21 h | yes |
 | `codex-task-tree-session-135.yaml` | session-135 | 437 | 1.53 h | 0.48 h | 0.48 h | yes |
-| `session-142-stack-correctness.yaml` | session-142 | 917 | 3.87 h | 1.63 h | 1.65 h | yes |
+| `session-142-stack-correctness.yaml` | session-142 | 1,186 | 5.01 h | 2.29 h | 2.3 h | yes |
 | `codex-task-tree-pr137-publication-tail.yaml` | unattributed | 610 | 4.39 h | 1.77 h | 1.82 h | yes |
 | `codex-task-tree-pr142-publication-tail.yaml` | unattributed | 136 | 0.87 h | 0.41 h | 0.58 h | yes |
 
@@ -4903,7 +4919,7 @@ table above.
 
 Kept with the same discipline as the experiment record, because the aggregate says
 things no individual bug report can.
-The log contains 501 defects, [one line each](defects.md), generated from `defects.yaml`
+The log contains 504 defects, [one line each](defects.md), generated from `defects.yaml`
 and checked in the gate.
 
 | Class | Count | The system … |
@@ -4911,8 +4927,8 @@ and checked in the gate.
 | soundness | 100 | asserted something false about the mathematics |
 | validity | 127 | was correct, but the measurement did not bear on the question |
 | bookkeeping | 190 | recorded something its own evidence contradicts |
-| robustness | 66 | did not finish, or finished only by luck |
-| performance | 18 | worked, but cost far more than it should |
+| robustness | 68 | did not finish, or finished only by luck |
+| performance | 19 | worked, but cost far more than it should |
 
 One entry is filed under a class it only half fits, and the table reads accordingly.
 [D-484](defects.md) carries two defects with a single cause: an escape screen that
@@ -4923,16 +4939,23 @@ It is filed as `robustness`, for the half that took `main` red, so the `performa
 here reads one low. The entry names that call rather than leaving it implicit; the
 alternative was two ids sharing every other field.
 
+[D-502](defects.md) remains open: the implicit local pre-push allocation left a costly
+partial reachable-test selection serial until its 900-second command cap.
+A ten-worker retry completed below that cap under a different `PACK_JOBS` shape, so it
+is an observed workaround rather than a controlled speedup or validation of the proposed
+cost-aware allocation.
+That allocation remains unimplemented and needs measurement.
+
 Two observations the log exists to make.
 
 **79 of the 100 soundness defects pointed in the *flattering* direction**, where the
 error looks like a success.
 That is the dangerous class, and it is the majority of it.
 
-**The automated gate has caught seventy-seven defects in 501, and no soundness defect
-ever.** Every soundness failure was found by a control cell whose answer was known in
-advance, a rule written down before the measurement, a generated view contradicting its
-source, or someone reading carefully.
+**The automated gate has caught eighty defects in 504, and no soundness defect ever.**
+Every soundness failure was found by a control cell whose answer was known in advance, a
+rule written down before the measurement, a generated view contradicting its source, or
+someone reading carefully.
 Gates confirm what you already thought to check; these were found by devices built to be
 *surprised*. Gate-detected entries here are mechanical process, implementation, or
 test-validity failures, found by contiguity, integration, mutation-anchor,
@@ -5280,7 +5303,7 @@ It is contained rather than fixed — such delegations are recorded on completio
 `read_only` flag is better than permitting an empty list that would be ambiguous between
 “writes nothing” and “nobody filled this in”.
 
-114 fixes left no regression check behind.
+116 fixes left no regression check behind.
 [D-300](defects.md) remains open: the yielded session id, output, timeout/final poll,
 and exit survived, but invalid `gdate` precision left the start and end fields empty, so
 [D-202](defects.md), [D-217](defects.md), and `think-b3bm` remain open.

@@ -15,7 +15,8 @@ session:
   primary_bead: think-gz4k
   resource_rollups:
   - packing/campaign/resource-usage/session-142-stack-correctness.yaml
-  status: in_progress
+  status: completed
+  ended_at: '2026-09-20T01:49:13Z'
   goal: >-
     Audit Sessions 139–141 one PR at a time, replay their mathematical claims,
     correct confirmed defects in a new layer above PR 201, and report merge readiness.
@@ -55,7 +56,7 @@ session:
     recording: contemporaneous
     clock_role: work
     objective: Validate the integrated repairs and publish the new stacked correction PR.
-    status: in_progress
+    status: completed
     entered_by: evidence_checkpoint
     switch_reason: >-
       All implementation lanes are complete, including the publication defect found
@@ -68,10 +69,17 @@ session:
       cd packing && uv run --frozen --all-extras --group dev packing-validate --fast
     kill_condition: A validation failure contradicts a claimed repair or retained mathematical result.
     fallback: Reopen the specific finding, repair it, and repeat the affected validation.
-    outcome: null
-    evidence: []
-    stop_reason: null
-    next_action: Commit the integrated tree, run validation, and publish above PR 201.
+    outcome: >-
+      PR 202 repairs all confirmed findings at the stack tip. Final code 8dbc1068
+      passed the matching hosted fast and deferred checkpoints; the original lower
+      heads remain unchanged and are not independently ready to merge.
+    evidence:
+    - docs/project/reviews/review-2026-09-19-pr199-201-correctness.md
+    - https://github.com/jlevy/squares/pull/202
+    - https://github.com/jlevy/squares/actions/runs/35480879196
+    - https://github.com/jlevy/squares/actions/runs/35480905141
+    stop_reason: Corrected code passed the full checkpoint; remaining publication changes record the observed results.
+    next_action: Return to the selected H-216 research entry.
   budget:
     wall_minutes: 120
   stop_conditions:
@@ -82,7 +90,7 @@ session:
   progress:
     metric: Confirmed review findings corrected and validated
     before: Eight findings and three smaller corrections across the open stack.
-    after: null
+    after: Nine findings and three smaller corrections repaired; four retained certificates replayed; final code passes all 80 checkpoint steps.
   delegations:
   - task: Independent review of PR 199 mathematics and new computational boundaries
     operator: review_199_math; GPT-6 Astra max
@@ -214,14 +222,14 @@ session:
     status: completed
     recording: retrospective
     phase: 2
-    outcome: Prepared review and PR proposals preserving original-head verdicts and pending final-head validation.
+    outcome: Prepared publication records and independently audited hosted receipts against the final source tree and full step union.
     evidence: [docs/project/reviews/review-2026-09-19-pr199-201-correctness.md]
     files: []
-    checks: [Documentation guidelines and Flowmark applied to proposals; no source edits or tests.]
+    checks: [Documentation guidelines applied; fast, macOS and deferred receipts audited; no duplicate mathematical replays.]
     uncertainty: Root owns final integration and verification of CI outcomes.
     elapsed_seconds: null
     elapsed_quality: unavailable
-    next_action: Root publishes the measured final dispositions.
+    next_action: Publish the measured final dispositions and preserve original-head limits.
   - task: Diagnose partial-selection scheduling and repair the timeout fixture
     operator: final_pipeline_analysis; GPT-5.6 Sol xhigh
     status: completed
@@ -233,7 +241,7 @@ session:
       at the artifact-journaling boundary; real subprocess coverage remains separate.
     evidence: [packing/tests/test_validation_cli.py]
     files: [packing/tests/test_validation_cli.py]
-    checks: [125 validation CLI tests passed; Ruff passed; BasedPyright reported zero findings.]
+    checks: [125 validation CLI tests passed; Ruff and BasedPyright passed; D-502 through D-504 reconciled with the defect register and SYNOPSIS.]
     uncertainty: Automatic worker allocation remains an open efficiency follow-up.
     elapsed_seconds: null
     elapsed_quality: unavailable
@@ -244,10 +252,16 @@ session:
   checks:
   - T-027, T-028, T-029 and T-030 passed exact and interval replay with zero stalled boxes.
   - Targeted original-stack engineering tests passed; the lower PR direction-count assertion is wrong.
-  - 'full gate: fast at 4c202aeb: passed (hosted run 35479932912; merge 564d5dbc has the same Git tree as the head).'
+  - 'full gate: fast at 4c202aeb: passed (hosted run 35479932912; merge 564d5dbc has the same Git tree as the head)'
   - The final solver fix passes 52 boundary and queue tests; the deterministic timeout fixture passes all 125 validation CLI tests.
-  stop_reason: null
-  next_action: Finish think-gz4k, then return to H-216 under think-qqzs.
+  - 'full gate: full at 8dbc1068: passed (hosted fast 35480879196 plus deferred 35480905141; clean merge 8ac5a340 has the identical source tree)'
+  - Final local push passed 49 selected steps and 1619 affected tests in 392.33 seconds.
+  - Seven defect-log and eleven synopsis negative controls passed after D-502 through D-504 were added.
+  stop_reason: >-
+    Review and bounded correctness repairs are complete and published as PR 202.
+    Original lower-head failures remain explicit; costly partial-selection allocation
+    is deferred under think-1i1x. No merge or new research was performed.
+  next_action: Return to H-216 under think-qqzs.
 ---
 # Session 142: Stack Correctness Pass
 
@@ -258,7 +272,7 @@ n=18 certificates passed both routes, and eight findings plus three smaller corr
 were filed under `think-x2n7`. It preceded this clocked integration session and is not
 presented as a preregistered phase.
 The user then requested a new correction PR and explicit correctness-workflow tracking.
-A final W2 pass will audit the integrated repairs.
+The final W2 pass audited the integrated repairs and their matching full checkpoint.
 
 The bounded **W7 pipeline-improvement** phase addresses the reproduced solver,
 input-domain and scheduler defects.

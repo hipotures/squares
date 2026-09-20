@@ -11,7 +11,7 @@ softschema:
   schema: defects.schema.yaml
   envelope: null
   status: enforced
-count: 501
+count: 504
 defects:
 - id: D-001
   title: Fixed-side search never left the grid basin
@@ -16598,4 +16598,88 @@ defects:
   consequence: Published graphics and their exports disagreed with the accepted result while fast checks stayed green.
   fix: Regenerate the owned composite export families and add a cheap claim-label drift check to the existing fast atlas surface.
   regression: The existing slow composite rebuild caught the drift on PR 201 checkpoint 35476507563; the correction adds a fast stale-label negative control.
+  recorded_in: docs/project/reviews/review-2026-09-19-pr199-201-correctness.md
+- id: D-502
+  title: Costly partial pre-push selections kept pytest serial until the command timed out
+  date: '2026-09-19'
+  layer: tooling
+  class: robustness
+  detected_by: gate
+  latent_for: >-
+    D-488 documented that the default local shape still assigned the reachable-test step
+    one worker. That follow-up remained unimplemented until this 72-file selection hit
+    the cap.
+  severity: high
+  status: outstanding
+  recurrence_of: D-488
+  bead: think-1i1x
+  what: >-
+    On a ten-CPU host, an implicit pre-push run selected 72 of 350 test files, including
+    seven files with measured slow tests, but retained ten outer jobs. The worker
+    distribution therefore assigned the long-lived reachable-test step one pytest worker
+    after the short outer steps had finished.
+  consequence: >-
+    Every other pre-push step passed, while the serial reachable selection reached the
+    900-second subprocess cap after 901.012 seconds and produced no final traceback or
+    summary. A direct ten-worker retry of the same selection completed in 814.31 seconds,
+    showing that this selection can finish below the cap under a different resource shape.
+    The retry also changed `PACK_JOBS` and was not a controlled timing comparison, so it
+    establishes neither a speedup nor the proposed allocation as the cause.
+  fix: >-
+    None yet. The proposed repair is to extend only the implicit push allocation: classify
+    partial selections from measured slow-test coverage and the committed file-cost
+    record, then give costly selections the existing whole-suite jobs=1, inner_jobs=1
+    shape. That allocation remains unimplemented and needs a measured validation. Keep
+    cheap partial selections, explicit resource choices, and the 900-second and
+    1,800-second ceilings unchanged. Missing cost evidence must fail conservatively.
+  regression: none
+  recorded_in: docs/project/reviews/review-2026-09-19-pr199-201-correctness.md
+- id: D-503
+  title: Artifact timeout test assumed a Python child could print within 200 milliseconds
+  date: '2026-09-19'
+  layer: tooling
+  class: robustness
+  detected_by: gate
+  severity: medium
+  status: fixed
+  bead: think-u5zn
+  what: >-
+    The artifact-journaling timeout test launched a fresh Python interpreter with a
+    200-millisecond deadline and required it to print and flush partial output before that
+    deadline. Under ten-worker contention, timeout could occur during interpreter startup,
+    leaving the asserted log empty.
+  consequence: >-
+    The diagnostic retry reported a false test failure after more than thirteen minutes,
+    obscuring the scheduling measurement and making artifact retention appear broken even
+    though the child had never emitted the required output.
+  fix: >-
+    Replace the startup race with a deterministic `_run_command` boundary fixture that
+    writes and flushes partial output to the real artifact stream before raising
+    `StepTimeoutError`. The separate slow integration control continues to exercise real
+    subprocess output transfer and process-tree termination.
+  regression: none
+  recorded_in: docs/project/reviews/review-2026-09-19-pr199-201-correctness.md
+- id: D-504
+  title: Allowlist existence test generated a full declared-bound reference report
+  date: '2026-09-19'
+  layer: tooling
+  class: performance
+  detected_by: gate
+  severity: medium
+  status: fixed
+  bead: think-emgt
+  what: >-
+    A test whose assertion needed only the declared bound keys called the full
+    declared-bounds report, including repository-wide reference matching and evidence
+    construction that the test never inspected.
+  consequence: >-
+    The test took 12.38 seconds and failed the fast lane's per-test duration ceiling,
+    making an otherwise passing integrated checkpoint red and slowing every run of that
+    file.
+  fix: >-
+    Read keys directly from `declared_bounds` for the allowlist existence assertion.
+    Reference matching remains exercised by the existing positive and negative controls;
+    the single existence check fell to 0.44 seconds and the focused 12-test file completed
+    in 12.70 seconds without changing any ceiling or exemption.
+  regression: none
   recorded_in: docs/project/reviews/review-2026-09-19-pr199-201-correctness.md

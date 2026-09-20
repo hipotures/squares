@@ -2323,7 +2323,7 @@ sessions:
   codex_receipts: []
 - id: session-142
   title: "Correctness Review of PRs 199–201"
-  status: in_progress
+  status: completed
   primary_bead: think-gz4k
   phases: 2
   measured: true
@@ -2336,8 +2336,8 @@ sessions:
   wall_hours: null
   codex_receipts:
   - path: packing/campaign/resource-usage/session-142-stack-correctness.yaml
-    model_responses: 917
-    agent_hours: 3.87
-    active_union_hours: 1.63
-    wall_hours: 1.65
+    model_responses: 1186
+    agent_hours: 5.01
+    active_union_hours: 2.29
+    wall_hours: 2.3
     snapshot_incomplete: true

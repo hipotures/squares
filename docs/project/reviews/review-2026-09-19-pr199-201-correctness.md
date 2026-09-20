@@ -7,6 +7,12 @@ The lower two PRs nevertheless contain a failing exhaustive assertion, and the s
 research classification, provenance, and scheduler defects.
 Green fast checks do not establish full merge readiness.
 
+**Correction-tip verdict:** [PR 202](https://github.com/jlevy/squares/pull/202) repairs
+the confirmed findings, and final code `8dbc1068` passes the matching fast and deferred
+checkpoints. This supports the corrected cumulative tree.
+It does not make the unchanged lower PR heads safe to land individually; their recorded
+failures still require the corrections to travel with the stack.
+
 | PR | Reviewed head | Base | Layer size | Verdict |
 | --- | --- | --- | --- | --- |
 | [199](https://github.com/jlevy/squares/pull/199) | `c877006b` | main `fb14f517` | 238 files | Request changes: R1, R2, R8 |
@@ -174,7 +180,7 @@ The n=29 frozen candidate deserves a separate disposition.
 A fresh exact-only replay accepts all five conditions at side `137/25 = 5.48`, mass
 `52081879/2000000 < 27`, and minimum `4000013/4000000`. If the independent interval
 route can also complete, the certificate would improve the current verified floors for
-n=27,28,29. The retained interval attempt stalled in 272 directions.
+n=27,28,29. The retained interval attempt stalled in 272 boxes.
 **It remains unpromoted under the two-route retention policy.** This is a possible
 follow-up, not a replacement for the owner’s selected next entry `think-qqzs`.
 
@@ -257,8 +263,27 @@ At baseline `4c202aeb`, hosted fast validation
 build [35479932911](https://github.com/jlevy/squares/actions/runs/35479932911) passed.
 The hosted merge revision `564d5dbc437bc0aa9801d210d2ae4de91bf101c3` has the same Git
 tree as that head. These checks do not certify the subsequent final-review edits.
-The first deferred dispatch was cancelled for those edits; final-head validation remains
-pending.
+The first deferred dispatch was cancelled for those edits and is not passing evidence.
+
+Final code `8dbc1068` passed hosted fast validation
+[35480879196](https://github.com/jlevy/squares/actions/runs/35480879196) and the page
+build [35480879181](https://github.com/jlevy/squares/actions/runs/35480879181). The fast
+receipts cover 69 unique passing steps on merge revision
+`8ac5a340354275f9b5b8160e31ccd6e1fc52dc91`, whose Git tree matches the source head.
+The macOS portability checks also passed.
+The dispatched
+[deferred checkpoint](https://github.com/jlevy/squares/actions/runs/35480905141) passed
+the remaining 11 steps on the same merge revision: the combined checkpoint covers all 80
+steps. The slow lane passed all 146 tests, all 167 negative controls fired, and the full
+324-case atlas rebuild passed.
+The exhaustive mathematical lane passed too.
+The ordinary PR workflow’s skipped deferred jobs do not supply that evidence.
+
+The final local pre-push selection passed all 49 selected validation steps and 1,619
+affected tests in 392.33 seconds, with two outer jobs, two inner jobs and an explicit
+1,800-second command timeout.
+This validates the final changes; it is not a controlled performance comparison with the
+earlier selection.
 
 The first integrated fast checkpoint at `d1c54a6a` passed every behavioral assertion,
 but failed the Ruff formatting check and a per-test duration ceiling.
@@ -277,6 +302,11 @@ real-subprocess controls still cover output transfer and process-tree terminatio
 All 125 validation CLI tests pass.
 Worker allocation for costly partial selections is tracked separately under
 `think-1i1x`; no global ceiling is relaxed by this correction.
+The defect register records that open allocation issue as D-502, the repaired timeout
+fixture as D-503, and the repaired allowlist scan as D-504. After those metadata
+additions, all seven defect-log and eleven synopsis mutation controls passed.
+Temporary snapshots used external scratch storage after local disk pressure prevented
+the first attempt from starting; that attempt ran no controls.
 
 The final adversarial mathematical review found one additional malformed-solver case:
 clipping a positive infinite marginal turned it into zero before the finiteness check.
@@ -294,6 +324,10 @@ Its rational freeze passes the exact route, but that does not make the floating 
 optimum exact or resolve the stalled interval route.
 Sixteen numerical subjects are corrected in total; accepted certificate results retain
 their existing assurance.
+
+The closure commit changes documentation and workflow records only.
+Validation of those final records is separate from the expensive code checkpoint, which
+remains explicitly attributed to `8dbc1068`.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
