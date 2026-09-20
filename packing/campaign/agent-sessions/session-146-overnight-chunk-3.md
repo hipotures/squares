@@ -10,7 +10,7 @@ session:
   title: Overnight Chunk 3 — The exp-219 Registration Review and the Fold Tool
   date: '2026-09-20'
   started_at: '2026-09-20T12:52:00Z'
-  deadline_at: '2026-09-20T14:55:00Z'
+  deadline_at: '2026-09-20T14:52:00Z'
   branch: claude/kind-wright-whxxn6-chunk3
   primary_bead: think-b7pr
   status: in_progress
@@ -37,7 +37,7 @@ session:
     switch_reason: null
     budget_minutes: 95
     started_at: '2026-09-20T12:52:00Z'
-    deadline_at: '2026-09-20T14:30:00Z'
+    deadline_at: '2026-09-20T14:27:00Z'
     expected_output: >-
       A review receipt under results/agenda-040 with a registration verdict, the
       H-222 notes updated to the reviewed scope, the fold tool with tests, and the
@@ -58,7 +58,7 @@ session:
   stop_conditions:
   - No registration without a REGISTER or REGISTER WITH CORRECTIONS verdict, and every correction applied before the record says registered.
   - The fold tool is retained only if its --check matches both retained merged families exactly.
-  - The chunk closes by 14:55Z with its records validated, committed, and pushed as a stacked draft pull request.
+  - The chunk closes by 14:52Z with its records validated, committed, and pushed as a stacked draft pull request.
   progress:
     metric: BC-367 items decided
     before: exp-219 accepted but its conditional exclusion is unreviewed for registration; the family fold is a scratch script.
@@ -78,7 +78,7 @@ session:
     elapsed_quality: unavailable
     next_action: Coordinator writes the receipt and the H-222 notes from the verdict.
     started_at: '2026-09-20T12:52:00Z'
-    deadline_at: '2026-09-20T13:55:00Z'
+    deadline_at: '2026-09-20T13:52:00Z'
     budget_minutes: 60
     write_scope: [session scratchpad chunk3-review/]
     excluded_commands: [git commit, git push, any edit under the repository tree, any LP or column-generation target run]
@@ -100,7 +100,7 @@ session:
     elapsed_quality: unavailable
     next_action: Coordinator runs the tests and the records tier.
     started_at: '2026-09-20T12:52:00Z'
-    deadline_at: '2026-09-20T13:35:00Z'
+    deadline_at: '2026-09-20T13:32:00Z'
     budget_minutes: 40
     write_scope: [packing/devtools/fold_ceiling_family.py, packing/tests/test_fold_ceiling_family.py, packing/tests/test_module_boundaries.py, packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-214-n13-399-100-receipt.md, packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-218-n17-23-5-receipt.md]
     excluded_commands: [git commit, git push, any edit to a retained family file]
