@@ -14,13 +14,23 @@ experiment:
   tier: exploratory
   subject:
     label: >-
-      Restricted covering optima at n=45 on the 181-direction net at B = 9977/10000,
+      Restricted covering optima at n=45 on the 182-direction net made by 181 steps at B = 9977/10000,
       at side 684/100, on auto grids plus windows 5 with no certificate seed
     engine: >-
       sqpack.fractional.colgen through devtools.run_fractional_colgen; retain by
       declare_least_cell_mass then both routes of decide_certificate
-    assurance: verified
-    method: exact-algebraic
+    assurance: numerically-checked
+    method: numerical-f64
+    precision:
+      binary_bits: 64
+      rounding: IEEE 754 binary64 in NumPy and SciPy HiGHS
+    tolerance: >-
+      Row addition used 1e-9; convergence also accepts an already-held row within
+      LP_FEASIBILITY = 1e-7. No float comparison certifies a packing bound.
+    migration_annotation: >-
+      2026-09-19 correctness review: this hypothesis disposition rests on float64
+      LP and separation output; no accepted exact freeze decided the stated claim.
+      The original verified/exact-algebraic labels overstated its assurance.
     host_system: Cursor cloud agent; project Python 3.14; no packing-campaign runner
   instance: {axis: n, point: 45, role: target}
   method:
@@ -46,7 +56,7 @@ experiment:
       --json results/agenda-039/n45-684-100-auto-windows5-run.json
     budget: >-
       Session-141 research wall to 2026-09-19T15:26:00Z. Seventh H-220 probe only.
-      Do not replay n=32 29/5, n=31 57/10, n=30 559/100, n=26 513/100, n=27 525/100,
+      Session-141 did not allocate another run to n=32 29/5, n=31 57/10, n=30 559/100, n=26 513/100, n=27 525/100,
       or n=29 548/100 auto plus windows 5.
     record: packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/
   results:
@@ -55,7 +65,7 @@ experiment:
     question: >-
       Does a seedless auto plus windows-5 freeze at 684/100 have mass strictly below 45
       and print RETAINABLE?
-    outcome: criterion_missed
+    outcome: no_progress
     checked_by: >-
       1200 s deadline stopped the row loop after 26 LP rounds at 42.137360 with
       546 placements still violated. No freeze. Did not cross 45.
@@ -66,12 +76,13 @@ experiment:
       mass < 45 at a side strictly above the Nagamochi floor
     reason: >-
       Seedless auto plus windows 5 at 684/100 finished unconverged below 45.
-      Remaining rows raise. That site set is not a retain. H-220 stays unconfirmed.
+      Remaining rows can raise the objective, but the completed optimum could still
+      stay below 45. The site set and H-220 remain unresolved.
     budget_spent: Covering 1253.8 s on one core.
     best_reached: restricted optimum 42.137360 unconverged, no freeze
     resume_from: >-
-      Do not replay n=45 684/100 auto plus windows 5. The next named set is exp-173
-      at n=44 675/100 seedless auto plus windows 5. Remaining rows raise this set.
+      Session-141 deferred this site set after spending its 1200 s allocation and
+      moved to exp-173 at n=44 675/100. A future H-220 budget may resume it.
   effort:
     timebox: Session-141 n=45 684/100 seedless auto plus windows 5
     wall_seconds: 1254
@@ -84,15 +95,16 @@ This is the seventh scientific round of
 [exp-171](exp-171-h220-n29-548-100-seedless-auto-windows5.md) converged below 29 and
 `decide_certificate` refused the freeze on the interval route.
 
-Auto resolved to `(51, 68, 84)`. The 1200 s run stopped at `42.137360`
-unconverged below 45 after 26 LP rounds. No freeze. T-030 was not offered. The
-follow-up is exp-173 at n=44 `675/100`.
+Auto resolved to `(51, 68, 84)`. The 1200 s run stopped at `42.137360` unconverged below
+45 after 26 LP rounds.
+No freeze. T-030 was not offered.
+The follow-up is exp-173 at n=44 `675/100`.
 
 Confirm only on `RETAINABLE`. There is no n=45 case package.
 
-exp-161 is not this round. Do not `--search`. Do not mutate T-025 or T-026
-`verify_claim.py`. Do not close `think-qqzs`, `think-g3j7`, `think-gyzw`, or
-`think-jwb1`.
+exp-161 is not this round.
+Do not `--search`. Do not mutate T-025 or T-026 `verify_claim.py`. Do not close
+`think-qqzs`, `think-g3j7`, `think-gyzw`, or `think-jwb1`.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

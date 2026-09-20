@@ -14,13 +14,23 @@ experiment:
   tier: exploratory
   subject:
     label: >-
-      Restricted covering optima at n=31 on the 181-direction net at B = 9977/10000,
+      Restricted covering optima at n=31 on the 182-direction net made by 181 steps at B = 9977/10000,
       at side 57/10, on auto grids plus windows 5 with no certificate seed
     engine: >-
       sqpack.fractional.colgen through devtools.run_fractional_colgen; retain by
       declare_least_cell_mass then both routes of decide_certificate
-    assurance: verified
-    method: exact-algebraic
+    assurance: numerically-checked
+    method: numerical-f64
+    precision:
+      binary_bits: 64
+      rounding: IEEE 754 binary64 in NumPy and SciPy HiGHS
+    tolerance: >-
+      Row addition used 1e-9; convergence also accepts an already-held row within
+      LP_FEASIBILITY = 1e-7. No float comparison certifies a packing bound.
+    migration_annotation: >-
+      2026-09-19 correctness review: this hypothesis disposition rests on float64
+      LP and separation output; no accepted exact freeze decided the stated claim.
+      The original verified/exact-algebraic labels overstated its assurance.
     host_system: Cursor cloud agent; project Python 3.14; no packing-campaign runner
   instance: {axis: n, point: 31, role: target}
   method:
@@ -46,7 +56,7 @@ experiment:
       --json results/agenda-039/n31-57-10-auto-windows5-run.json
     budget: >-
       Session-141 research wall to 2026-09-19T15:26:00Z. Second H-220 probe only.
-      Do not replay n=32 29/5 auto plus windows 5.
+      Session-141 did not allocate another run to n=32 29/5 auto plus windows 5.
     record: packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/
   results:
   - shape: determination
@@ -54,7 +64,7 @@ experiment:
     question: >-
       Does a seedless auto plus windows-5 freeze at 57/10 have mass strictly below 31
       and print RETAINABLE?
-    outcome: criterion_missed
+    outcome: no_progress
     checked_by: >-
       1200 s deadline stopped the row loop after 38 LP rounds at 28.331329 with
       462 placements still violated. No freeze. Did not cross 31.
@@ -65,12 +75,13 @@ experiment:
       mass < 31 at a side strictly above the Nagamochi floor
     reason: >-
       Seedless auto plus windows 5 at 57/10 finished unconverged below 31.
-      Remaining rows raise. That site set is not a retain. H-220 stays unconfirmed.
+      Remaining rows can raise the objective, but the completed optimum could still
+      stay below 31. The site set and H-220 remain unresolved.
     budget_spent: Covering 1284.5 s on one core.
     best_reached: restricted optimum 28.331329 unconverged, no freeze
     resume_from: >-
-      Do not replay n=31 57/10 auto plus windows 5. The next named set is exp-168
-      at n=30 559/100 seedless auto plus windows 5. Remaining rows raise this set.
+      Session-141 deferred this site set after spending its 1200 s allocation and
+      moved to exp-168 at n=30 559/100. A future H-220 budget may resume it.
   effort:
     timebox: Session-141 n=31 57/10 seedless auto plus windows 5
     wall_seconds: 1285
@@ -83,15 +94,16 @@ This is the second scientific round of
 [exp-166](exp-166-h220-n32-29-5-seedless-auto-windows5.md) stopped at `29.803318`
 unconverged below 32.
 
-Auto resolved to `(41, 55, 68)`. The 1200 s run stopped at `28.331329`
-unconverged below 31 after 38 LP rounds. No freeze. T-030 was not offered. The
-follow-up is exp-168 at n=30 `559/100`.
+Auto resolved to `(41, 55, 68)`. The 1200 s run stopped at `28.331329` unconverged below
+31 after 38 LP rounds.
+No freeze. T-030 was not offered.
+The follow-up is exp-168 at n=30 `559/100`.
 
 Confirm only on `RETAINABLE`. There is no n=31 case package.
 
-exp-161 is not this round. Do not `--search`. Do not mutate T-025 or T-026
-`verify_claim.py`. Do not close `think-qqzs`, `think-g3j7`, `think-gyzw`, or
-`think-jwb1`.
+exp-161 is not this round.
+Do not `--search`. Do not mutate T-025 or T-026 `verify_claim.py`. Do not close
+`think-qqzs`, `think-g3j7`, `think-gyzw`, or `think-jwb1`.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

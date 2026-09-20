@@ -28,6 +28,7 @@ from devtools.produce_threshold_certificate import (
     scientific_refuse,
     solve_covering,
 )
+from sqpack.fractional.colgen import LpSolution, Rows, SiteSet
 
 MODULE = Path(__file__).resolve().parents[1] / "devtools/produce_threshold_certificate.py"
 LIBRARY = Path(__file__).resolve().parents[1] / "src/sqpack/fractional/threshold_separation.py"
@@ -154,3 +155,122 @@ def test_covering_timeout_is_unresolved_never_refused(
     outcome = solve_covering(sparse.csr_matrix([[1.0, 0.0], [0.0, 1.0]]), np.array([1.0, 1.0]))
     assert outcome.status == "unresolved"
     assert outcome.weights is None
+    assert outcome.solver_status == 1
+    assert outcome.solver_message == "time limit"
+
+
+@pytest.mark.parametrize("status", [3, 4])
+def test_unsuccessful_covering_states_are_unresolved_never_infeasible(
+    monkeypatch: pytest.MonkeyPatch,
+    status: int,
+) -> None:
+    def failed_linprog(*_args: object, **_kwargs: object) -> OptimizeResult:
+        return OptimizeResult(
+            success=False,
+            status=status,
+            x=None,
+            ineqlin=None,
+            message="HiGHS could not resolve the model",
+        )
+
+    monkeypatch.setattr(producer, "linprog", failed_linprog)
+    outcome = solve_covering(sparse.csr_matrix([[1.0]]), np.array([1.0]))
+    assert outcome.status == "unresolved"
+    assert outcome.solver_status == status
+    assert outcome.solver_message == "HiGHS could not resolve the model"
+
+
+def test_only_highs_status_two_reports_covering_infeasibility(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def infeasible_linprog(*_args: object, **_kwargs: object) -> OptimizeResult:
+        return OptimizeResult(
+            success=False,
+            status=2,
+            x=None,
+            ineqlin=None,
+            message="the model is infeasible",
+        )
+
+    monkeypatch.setattr(producer, "linprog", infeasible_linprog)
+    outcome = solve_covering(sparse.csr_matrix([[0.0]]), np.array([1.0]))
+    assert outcome.status == "infeasible"
+    assert outcome.solver_status == 2
+    assert outcome.solver_message == "the model is infeasible"
+
+
+@pytest.mark.parametrize(
+    ("status", "weights", "marginals", "objective"),
+    [
+        pytest.param(4, [1.0], [-1.0], 1.0, id="nonoptimal-status"),
+        pytest.param(0, [float("nan")], [-1.0], 1.0, id="nonfinite-weights"),
+        pytest.param(0, [1.0], [float("nan")], 1.0, id="nonfinite-duals"),
+        pytest.param(0, [1.0], [-1.0], float("inf"), id="nonfinite-objective"),
+        pytest.param(0, [[1.0]], [-1.0], 1.0, id="weights-not-a-vector"),
+        pytest.param(0, [1.0], [[-1.0]], 1.0, id="duals-not-a-vector"),
+        pytest.param(0, [1.0, 2.0], [-1.0], 1.0, id="wrong-weight-count"),
+        pytest.param(0, [1.0], [-1.0, -2.0], 1.0, id="wrong-dual-count"),
+    ],
+)
+def test_malformed_successful_covering_result_is_unresolved(
+    monkeypatch: pytest.MonkeyPatch,
+    status: int,
+    weights: object,
+    marginals: object,
+    objective: float,
+) -> None:
+    def malformed_linprog(*_args: object, **_kwargs: object) -> OptimizeResult:
+        return OptimizeResult(
+            success=True,
+            status=status,
+            x=np.array(weights),
+            ineqlin=OptimizeResult(marginals=np.array(marginals)),
+            fun=objective,
+            message="synthetic malformed success",
+        )
+
+    monkeypatch.setattr(producer, "linprog", malformed_linprog)
+    outcome = solve_covering(sparse.csr_matrix([[1.0]]), np.array([1.0]))
+    assert outcome.status == "unresolved"
+    assert outcome.weights is None
+    assert outcome.duals is None
+    assert outcome.objective is None
+    assert outcome.solver_status == status
+    assert outcome.solver_message == "synthetic malformed success"
+
+
+def test_initial_covering_failure_preserves_unresolved_solver_diagnostics(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    def seed_one_row(
+        sites: SiteSet,
+        _square_side: Fraction,
+        _half_tangents: tuple[Fraction, ...],
+        rows: Rows,
+        **_kwargs: object,
+    ) -> LpSolution:
+        rows.add(0, (1.0, 1.0), np.ones(len(sites.orbits)))
+        return LpSolution(
+            np.zeros(len(sites.orbits)),
+            np.zeros(1),
+            stopped="seeded for solver classification",
+        )
+
+    monkeypatch.setattr(producer, "solve_rows", seed_one_row)
+    monkeypatch.setattr(
+        producer,
+        "solve_covering",
+        lambda *_args: producer.CoveringSolve(
+            "unresolved",
+            solver_status=4,
+            solver_message="numerical difficulties",
+        ),
+    )
+
+    receipt = produce(ProducerSettings(n=2), tmp_path / "out")
+
+    assert receipt["status"] == "unresolved"
+    assert receipt["covering_ran"] is True
+    assert receipt["covering_solver_status"] == 4
+    assert receipt["covering_solver_message"] == "numerical difficulties"

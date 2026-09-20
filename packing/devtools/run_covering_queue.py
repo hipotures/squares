@@ -2,8 +2,8 @@
 
 The producer is already `devtools.run_fractional_colgen`. A one-core host still
 needs a scheduler that skips a probe whose run JSON exists, refuses to start a
-second generator, and halts only when a freeze mass is strictly below n — that
-is the retain boundary, not a freeze that sits above n.
+second owner of any generator output, and halts only when a freeze mass is
+strictly below n — that is the retain boundary, not a freeze that sits above n.
 
 A shell waiter is not an entry point this repository keeps.
 """
@@ -11,11 +11,13 @@ A shell waiter is not an entry point this repository keeps.
 from __future__ import annotations
 
 import argparse
+import fcntl
 import json
 import os
 import subprocess
 import sys
 from collections.abc import Callable, Mapping, Sequence
+from contextlib import ExitStack
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from fractions import Fraction
@@ -28,6 +30,11 @@ DEFAULT_STOP_AT = "2026-09-19T06:42:00Z"
 EXIT_DONE = 0
 EXIT_STOP = 2
 EXIT_FREEZE_BELOW = 3
+EXIT_BUSY = 4
+
+
+class _QueueBusyError(RuntimeError):
+    """Another queue walker owns an output this walk would mutate."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -124,6 +131,58 @@ def freeze_path(prefix: Path) -> Path:
     return Path(f"{prefix}-certificate.json")
 
 
+def _probe_output_paths(prefix: Path) -> tuple[Path, ...]:
+    return (
+        freeze_path(prefix),
+        Path(f"{prefix}-family.json"),
+        run_json_path(prefix),
+        Path(f"{prefix}-rows.jsonl"),
+        Path(f"{prefix}.log"),
+    )
+
+
+def _ownership_lock_path(output: Path) -> Path:
+    resolved = output.resolve()
+    return resolved.with_name(f".{resolved.name}.covering-queue.lock")
+
+
+def _outputs_to_claim(
+    probes: Sequence[Probe], queue_dir: Path, log_path: Path
+) -> tuple[Path, ...]:
+    outputs = {log_path.resolve()}
+    for probe in probes:
+        prefix = prefix_for(queue_dir, probe.id).resolve()
+        if run_json_path(prefix).is_file():
+            continue
+        outputs.update(_probe_output_paths(prefix))
+    return tuple(sorted(outputs, key=str))
+
+
+def _claim_outputs(
+    probes: Sequence[Probe], queue_dir: Path, log_path: Path
+) -> tuple[ExitStack, tuple[int, ...]]:
+    """Nonblockingly own every output until the returned stack closes.
+
+    Lock-file presence carries no ownership meaning. The kernel-held advisory lock is
+    released when the stack closes or the process dies, so recovery never guesses
+    whether a recorded PID is stale. The descriptors pass into the generator subprocess,
+    so it retains ownership if its queue walker dies first. Direct invocations of the
+    underlying generator do not participate in this queue-walker lease.
+    """
+
+    with ExitStack() as pending:
+        descriptors: list[int] = []
+        for output in _outputs_to_claim(probes, queue_dir, log_path):
+            lock_path = _ownership_lock_path(output)
+            handle = pending.enter_context(lock_path.open("a+b"))
+            try:
+                fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError as error:
+                raise _QueueBusyError(f"output already owned: {output}") from error
+            descriptors.append(handle.fileno())
+        return pending.pop_all(), tuple(descriptors)
+
+
 def freeze_mass_below_n(n: int, run_path: Path) -> bool:
     """Halt only when the freeze total is strictly below n."""
 
@@ -181,7 +240,9 @@ def colgen_command(probe: Probe, prefix: Path) -> list[str]:
     return command
 
 
-def run_colgen(probe: Probe, prefix: Path) -> int:
+def run_colgen(
+    probe: Probe, prefix: Path, ownership_fds: Sequence[int] = ()
+) -> int:
     env = os.environ.copy()
     env["OMP_NUM_THREADS"] = "1"
     env["OPENBLAS_NUM_THREADS"] = "1"
@@ -191,6 +252,7 @@ def run_colgen(probe: Probe, prefix: Path) -> int:
         cwd=PACKING,
         env=env,
         check=False,
+        pass_fds=tuple(ownership_fds),
     )
     return completed.returncode
 
@@ -211,41 +273,57 @@ def walk_queue(
     queue_dir: Path,
     stop_at: datetime,
     log_path: Path,
-    runner: Callable[[Probe, Path], int] = run_colgen,
+    runner: Callable[[Probe, Path], int] | None = None,
 ) -> int:
-    """Skip existing run JSON; halt on freeze mass < n or when the stop instant lands."""
+    """Own unfinished outputs, then skip runs and halt on mass < n or the stop time."""
 
-    emit(log_path, f"waiter start; stop_at={stop_at.strftime('%Y-%m-%dT%H:%M:%SZ')}")
-    for probe in probes:
-        prefix = prefix_for(queue_dir, probe.id)
-        if run_json_path(prefix).is_file():
-            emit(log_path, f"SKIP {probe.id}: run JSON exists")
-            continue
-        remain = remain_seconds(stop_at)
-        if remain < 60:
-            emit(log_path, f"STOP before {probe.id}: remain={remain}s")
-            return EXIT_STOP
-        emit(
-            log_path,
-            f"START {probe.id} deadline={probe.deadline_seconds}s remain={remain}s",
-        )
-        rc = runner(probe, prefix)
-        emit(log_path, f"EXIT {probe.id} rc={rc}")
-        if rc != 0:
-            return rc
-        run_path = run_json_path(prefix)
-        if freeze_path(prefix).is_file() and run_path.is_file():
-            if freeze_mass_below_n(probe.n, run_path):
+    try:
+        ownership, ownership_fds = _claim_outputs(probes, queue_dir, log_path)
+    except _QueueBusyError as error:
+        print(f"{stamp()} REFUSE: {error}", file=sys.stderr, flush=True)
+        return EXIT_BUSY
+
+    with ownership:
+        emit(log_path, f"waiter start; stop_at={stop_at.strftime('%Y-%m-%dT%H:%M:%SZ')}")
+        for probe in probes:
+            prefix = prefix_for(queue_dir, probe.id)
+            if run_json_path(prefix).is_file():
+                emit(log_path, f"SKIP {probe.id}: run JSON exists")
+                continue
+            remain = remain_seconds(stop_at)
+            if remain < 60:
+                emit(log_path, f"STOP before {probe.id}: remain={remain}s")
+                return EXIT_STOP
+            emit(
+                log_path,
+                f"START {probe.id} deadline={probe.deadline_seconds}s remain={remain}s",
+            )
+            rc = (
+                run_colgen(probe, prefix, ownership_fds)
+                if runner is None
+                else runner(probe, prefix)
+            )
+            emit(log_path, f"EXIT {probe.id} rc={rc}")
+            if rc != 0:
+                return rc
+            run_path = run_json_path(prefix)
+            if freeze_path(prefix).is_file() and run_path.is_file():
+                if freeze_mass_below_n(probe.n, run_path):
+                    emit(
+                        log_path,
+                        f"{probe.id}: freeze mass < {probe.n}; "
+                        "coordinator must decide_certificate",
+                    )
+                    return EXIT_FREEZE_BELOW
                 emit(
                     log_path,
-                    f"{probe.id}: freeze mass < {probe.n}; coordinator must decide_certificate",
+                    f"{probe.id}: freeze mass >= {probe.n}; "
+                    "no below-target certificate, continue",
                 )
-                return EXIT_FREEZE_BELOW
-            emit(log_path, f"{probe.id}: freeze mass >= {probe.n}; site set refuted, continue")
-            continue
-        emit(log_path, f"{probe.id}: no freeze (unconverged or mass not rationalised)")
-    emit(log_path, "waiter done")
-    return EXIT_DONE
+                continue
+            emit(log_path, f"{probe.id}: no freeze (unconverged or mass not rationalised)")
+        emit(log_path, "waiter done")
+        return EXIT_DONE
 
 
 def main(argv: list[str] | None = None) -> int:

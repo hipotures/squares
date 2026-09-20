@@ -14,13 +14,24 @@ experiment:
   tier: exploratory
   subject:
     label: >-
-      Restricted covering optima at n=20 on the 181-direction net at B = 9977/10000,
-      at side 971/200, on the T-021 four-grid (34, 46, 56, 64) plus windows 7
+      Restricted covering optima at n=20 on the 182-direction net made by 181 steps at
+      B = 9977/10000, at side 971/200, on the T-021 four-grid (34, 46, 56, 64)
+      plus windows 7
     engine: >-
       sqpack.fractional.colgen through devtools.run_fractional_colgen; retain by
       declare_least_cell_mass then both routes of decide_certificate
-    assurance: verified
-    method: exact-algebraic
+    assurance: numerically-checked
+    method: numerical-f64
+    precision:
+      binary_bits: 64
+      rounding: IEEE 754 binary64 in NumPy and SciPy HiGHS
+    tolerance: >-
+      Row addition used 1e-9; convergence also accepts an already-held row within
+      LP_FEASIBILITY = 1e-7. No float comparison certifies a packing bound.
+    migration_annotation: >-
+      2026-09-19 correctness review: this hypothesis disposition rests on float64
+      LP and separation output; no accepted exact freeze decided the stated claim.
+      The original verified/exact-algebraic labels overstated its assurance.
     host_system: Cursor cloud agent; project Python 3.14; no packing-campaign runner
   instance: {axis: n, point: 20, role: target}
   method:
@@ -47,7 +58,7 @@ experiment:
       --json results/agenda-039/n20-971-200-t021-grid4-windows7-run.json
     budget: >-
       Session-141 research wall to 2026-09-19T15:26:00Z. This named site set only.
-      Do not replay leftover auto plus windows 6 at 971/200 or four-grid plus
+      Session-141 did not allocate another run to leftover auto plus windows 6 at 971/200 or four-grid plus
       windows 7 at 973/200.
     record: packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/
   results:
@@ -56,7 +67,7 @@ experiment:
     question: >-
       Does a T-021 four-grid plus windows-7 freeze at 971/200 have mass strictly
       below 20 and print RETAINABLE?
-    outcome: criterion_missed
+    outcome: no_progress
     checked_by: >-
       2400 s deadline stopped the row loop after 48 LP rounds at 19.857588 with
       225 placements still violated. No freeze. Did not cross 20.
@@ -67,13 +78,13 @@ experiment:
       mass < 20 at a side above T-021
     reason: >-
       The new four-grid plus windows 7 at 971/200 finished unconverged below 20.
-      Remaining rows raise. That site set is not a retain. H-218 stays unconfirmed.
+      Remaining rows can raise the objective, but the completed optimum could still
+      stay below 20. The site set and H-218 remain unresolved.
     budget_spent: Covering 2516.1 s on one core.
     best_reached: restricted optimum 19.857588 unconverged, no freeze
     resume_from: >-
-      Do not replay 971/200 four-grid plus windows 7. The next named set is
-      exp-165 at 243/50 on the same four-grid plus windows 7. Remaining rows
-      raise this set.
+      Session-141 deferred this site set after spending its 2400 s allocation and
+      moved to exp-165 at 243/50. A future H-218 budget may resume it.
   effort:
     timebox: Session-141 n=20 971/200 four-grid plus windows 7
     wall_seconds: 2516
@@ -83,18 +94,21 @@ experiment:
 
 This is the Session-141 reopen of
 [H-218](../../../hypotheses/H-218-existing-colgen-raises-a-small-n-floor.md).
-exp-162 is abandoned. The leftover auto plus windows 6 construction at `971/200`
-finished at `19.910044` unconverged; remaining rows raise. This round uses a
-different named set: T-021 four-grid `(34, 46, 56, 64)` plus windows 7.
+exp-162 is abandoned.
+The leftover auto plus windows 6 construction at `971/200` finished at `19.910044`
+unconverged; remaining rows raise.
+This round uses a different named set: T-021 four-grid `(34, 46, 56, 64)` plus windows
+7\.
 
 The 2400 s run stopped at `19.857588` unconverged below 20 after 48 LP rounds.
-No freeze. T-030 was not offered. The follow-up is exp-165 at `243/50`.
+No freeze. T-030 was not offered.
+The follow-up is exp-165 at `243/50`.
 
 Confirm only on `RETAINABLE`. n=18 T-029 does not confirm H-218.
 
-exp-161 is not this round. Do not `--search`. Do not mutate T-025 or T-026
-`verify_claim.py`. Do not close `think-qqzs`, `think-g3j7`, `think-gyzw`, or
-`think-jwb1`.
+exp-161 is not this round.
+Do not `--search`. Do not mutate T-025 or T-026 `verify_claim.py`. Do not close
+`think-qqzs`, `think-g3j7`, `think-gyzw`, or `think-jwb1`.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

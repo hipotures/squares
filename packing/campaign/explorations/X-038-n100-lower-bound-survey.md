@@ -44,10 +44,11 @@ Nothing here is a bound.
 
 ## What the Register Already Knows
 
-Thirty-two sizes in `1..100` are proved equal (`n = 1..10`, `13..16`, `22..25`,
-`33..36`, `46..49`, `62..64`, `79..81`). Their floors are not a covering target.
+Thirty-five sizes in `1..100` are proved equal (`n = 1..10`, `13..16`, `22..25`,
+`33..36`, `46..49`, `62..64`, `79..81`, `98..100`). Their floors are not a covering
+target.
 
-Sixty-eight sizes are open.
+Sixty-five sizes are open.
 Most of those floors are the Nagamochi formula `1 + sqrt(n - 2 floor(sqrt(n)) + 1)`.
 First-party fractional certificates sit on seven of them:
 
@@ -61,10 +62,11 @@ First-party fractional certificates sit on seven of them:
 | 20 | T-021 `97/20` | grid `5` | 0.150 | Yes. Old cert-seed crossed at `20.000223`. Session-140 four-grid plus windows 7 stopped at `19.939212` unconverged after 2400 s. Leftover `971/200` stopped at `19.910044` unconverged. |
 | 21 | T-021 `97/20` | grid `5` | 0.150 | Session-140 auto plus windows 6 stopped at `19.814820` unconverged. Same side as T-021; not a floor raise. |
 
-A restricted optimum above `n` refutes that site set only.
-Remaining rows can only raise it.
-Adding sites can still lower it.
-Session-139’s `397/100`, `23/5`, and `97/20` rows are therefore open rungs, not walls.
+A verified lower bound on a restricted optimum above `n` would rule out that site set
+only.
+The recorded float objectives and feasible frozen masses are not such lower bounds.
+Remaining rows can raise a row-generation objective, and adding sites can lower it.
+Session-139’s `397/100`, `23/5`, and `97/20` rows are numerical evidence, not walls.
 
 H-062 already accepted a wall at `n = 20`, side `973/200`, on the two site sets it named
 (auto grid and the 97/20 seed).
@@ -94,7 +96,7 @@ It is the retain step, and it stays idle unless `decide_certificate` prints
 
 The remaining open sizes have no first-party covering row.
 The smallest block is `n = 26..32` (floors `5.12..5.80`, ceilings 6 or a published
-packing). After that `n = 37..45`, `50..61`, `65..78`, `82..100`.
+packing). After that `n = 37..45`, `50..61`, `65..78`, `82..97`.
 
 Those sizes need a seed.
 The stock move is the same producer with `--grid-counts auto` at a side just above the
@@ -122,13 +124,20 @@ stacked PR. Each probe bead owns one `(n, side)` family and writes under
 walker is `python -m devtools.run_covering_queue` over `first-wave-queue.yaml`, then
 `leftover-queue.yaml`, then `second-wave-queue.yaml`. Ranking for the leftover list is
 `leftover-side-ranking.md`: untried sides or site sets only.
-Do not replay a set whose restricted optimum is already above `n`. Kill a probe at its
-deadline. If the freeze mass is below `n`, stop new probes and run the retain recipe.
-If not, record the row and take the next rank.
+Within this session budget, record a set whose float objective crossed `n` and spend the
+next allocation on another rank.
+That scheduling choice is not a lower bound on the restricted optimum and does not
+refute the site set.
+Kill a probe at its deadline.
+If the freeze mass is below `n`, stop new probes and run the retain recipe.
 
 Session-141 re-ranks from these masses in
-[X-039](X-039-n100-re-rank-after-session-140.md). Leftover n=18 `1871/400` and the
-Nagamochi second wave did not start here.
+[X-039](X-039-n100-re-rank-after-session-140.md).
+Leftover n=18 `1871/400` and the Nagamochi second wave did not start here.
+
+Correctness review (2026-09-19): the original census omitted the proved `n = 98..100`
+cases, whose lower and upper bounds both equal 10. The corrected census is 35 proved and
+65 open; the last open block ends at 97.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

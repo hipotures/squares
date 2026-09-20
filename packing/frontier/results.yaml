@@ -1569,7 +1569,7 @@ results:
       event-cell sweep and the interval branch and bound, both run in this repository on
       the frozen bytes. As with T-020 there is no independent evaluator and no review
       artifact, so C5 -- review-ready, a mapped review -- is as far away here as there.
-      produced_by:
+    produced_by:
       session: session-139
     evidence:
       - E-n018-fractional-certificate
@@ -1776,4 +1776,3 @@ results:
       packing is 4.82287566, so the real runway is 0.1439 to the packing. C5 is
       review-ready under epistemics.md -- a mapped, non-superseded review artifact
       -- and none has been written for this result.
-

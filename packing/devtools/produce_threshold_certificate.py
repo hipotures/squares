@@ -34,7 +34,7 @@ from scipy.optimize import linprog
 from strif import atomic_write_text
 
 from sqpack.fractional.ceiling import CeilingCertificate, Placement
-from sqpack.fractional.colgen import Rows, site_set_from_grids, solve_lp, solve_rows
+from sqpack.fractional.colgen import Rows, site_set_from_grids, solve_rows
 from sqpack.fractional.cutting import ExactRow, coverage_matrix, rows_from_exact, snap_centre
 from sqpack.fractional.generate import build_site_grid, direction_net, net_half_tangents
 from sqpack.fractional.model import Atom
@@ -68,12 +68,14 @@ _FORBIDDEN_MODULE_MARKERS = ("sepcore", "lp383")
 
 @dataclass(frozen=True, slots=True)
 class CoveringSolve:
-    """HiGHS covering-LP outcome. Timeout is unresolved, not infeasible."""
+    """HiGHS covering-LP outcome with the solver's diagnostic intact."""
 
     status: str
     weights: np.ndarray | None = None
     duals: np.ndarray | None = None
     objective: float | None = None
+    solver_status: int | None = None
+    solver_message: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -198,7 +200,7 @@ def solve_covering(matrix: sparse.csr_matrix, costs: np.ndarray) -> CoveringSolv
 
     n_rows = _matrix_rows(matrix)
     if n_rows == 0:
-        return CoveringSolve("infeasible")
+        return CoveringSolve("unresolved", solver_message="covering matrix has no rows")
     result = linprog(
         c=costs,
         A_ub=-matrix,
@@ -206,16 +208,49 @@ def solve_covering(matrix: sparse.csr_matrix, costs: np.ndarray) -> CoveringSolv
         bounds=(0.0, None),
         method="highs",
     )
-    if int(result.status) == 1:
-        return CoveringSolve("unresolved")
-    if not result.success or result.ineqlin is None or result.x is None:
-        return CoveringSolve("infeasible")
-    duals = np.maximum(-np.asarray(result.ineqlin.marginals, dtype=float), 0.0)
+    solver_status = int(result.status)
+    solver_message = str(result.message)
+    if solver_status == 2:
+        return CoveringSolve(
+            "infeasible",
+            solver_status=solver_status,
+            solver_message=solver_message,
+        )
+    marginals = None if result.ineqlin is None else result.ineqlin.get("marginals")
+    if (
+        solver_status != 0
+        or not result.success
+        or result.x is None
+        or result.fun is None
+        or marginals is None
+    ):
+        return CoveringSolve(
+            "unresolved",
+            solver_status=solver_status,
+            solver_message=solver_message,
+        )
+    weights = np.asarray(result.x, dtype=float)
+    duals = np.maximum(-np.asarray(marginals, dtype=float), 0.0)
+    objective = float(result.fun)
+    if (
+        weights.shape != (_matrix_cols(matrix),)
+        or duals.shape != (n_rows,)
+        or not bool(np.all(np.isfinite(weights)))
+        or not bool(np.all(np.isfinite(duals)))
+        or not math.isfinite(objective)
+    ):
+        return CoveringSolve(
+            "unresolved",
+            solver_status=solver_status,
+            solver_message=solver_message,
+        )
     return CoveringSolve(
         "ok",
-        np.asarray(result.x, dtype=float),
+        weights,
         duals,
-        float(result.fun),
+        objective,
+        solver_status,
+        solver_message,
     )
 
 
@@ -340,22 +375,43 @@ def produce(
         rows, settings.outer_side, settings.square_side, half_tangents
     )
     held = rows_from_exact(exact_rows, sites, half_tangents, settings.square_side)
-    solved = solve_lp(sites, held)
-    if solved is None:
-        reason = "point-only covering LP is infeasible on the snapped rows"
+    initial = solve_covering(_csr(held.matrix), sites.sizes())
+    if (
+        initial.status != "ok"
+        or initial.weights is None
+        or initial.duals is None
+        or initial.objective is None
+    ):
+        solver_detail = (
+            f"HiGHS status {initial.solver_status}: {initial.solver_message}"
+            if initial.solver_status is not None
+            else initial.solver_message or "no solver diagnostic"
+        )
+        infeasible = initial.status == "infeasible"
+        reason = (
+            "point-only covering LP is infeasible on the snapped rows"
+            if infeasible
+            else "point-only covering LP is unresolved on the snapped rows"
+        )
+        reason = f"{reason} ({solver_detail})"
         receipt = _receipt(
             n=settings.n,
-            status="refused",
-            covering_ran=False,
+            status="refused" if infeasible else "unresolved",
+            covering_ran=True,
             objective=None,
             reason=reason,
-            extra={**extra, "rows": len(exact_rows)},
+            extra={
+                **extra,
+                "rows": len(exact_rows),
+                "covering_solver_status": initial.solver_status,
+                "covering_solver_message": initial.solver_message,
+            },
         )
         _write_json(output_dir / "receipt.json", receipt)
-        _log(log, f"REFUSED: {reason}")
+        _log(log, f"{'REFUSED' if infeasible else 'UNRESOLVED'}: {reason}")
         return receipt
 
-    weights, duals, objective = solved
+    weights, duals, objective = initial.weights, initial.duals, initial.objective
     covering_ran = True
     a_sites = _csr(held.matrix)
     sizes = sites.sizes()
@@ -418,14 +474,28 @@ def produce(
         costs = np.concatenate([sizes, atom_costs]) if atom_width else sizes
         solved_round = solve_covering(matrix, costs)
         if solved_round.status == "unresolved":
-            return "unresolved:covering LP hit a HiGHS time or iteration limit"
+            extra["covering_solver_status"] = solved_round.solver_status
+            extra["covering_solver_message"] = solved_round.solver_message
+            detail = (
+                f"HiGHS status {solved_round.solver_status}: {solved_round.solver_message}"
+                if solved_round.solver_status is not None
+                else solved_round.solver_message or "no solver diagnostic"
+            )
+            return f"unresolved:covering LP unresolved after adding columns ({detail})"
         if (
             solved_round.status != "ok"
             or solved_round.weights is None
             or solved_round.duals is None
             or solved_round.objective is None
         ):
-            return "covering LP is infeasible after adding threshold-atom columns"
+            extra["covering_solver_status"] = solved_round.solver_status
+            extra["covering_solver_message"] = solved_round.solver_message
+            detail = (
+                f"HiGHS status {solved_round.solver_status}: {solved_round.solver_message}"
+                if solved_round.solver_status is not None
+                else solved_round.solver_message or "no solver diagnostic"
+            )
+            return f"covering LP is infeasible after adding columns ({detail})"
         x, duals, objective = (
             solved_round.weights,
             solved_round.duals,

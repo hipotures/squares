@@ -1,19 +1,19 @@
 # n=18 187/40 T-027-Seeded Auto Window-5 Covering Receipt
 
 Status: **retained**. `s(18) >= 187/40` is T-028. Canonical bytes:
-`packing/cases/n18_fractional_certificate/certificate.json`. The previous
-T-027 bytes sit at `certificate-467-100.json`.
+`packing/cases/n18_fractional_certificate/certificate.json`. The previous T-027 bytes
+sit at `certificate-467-100.json`.
 
-Session-140 rank-5 probe: BC-191 auto grids `(32, 43, 53)` unioned with T-027's
-769 atom sites scaled from `467/100` to `187/40` (`4675/1000` in the queue),
-plus `--seed-windows 5`, `(n, L, B, net) = (18, 187/40, 9977/10000, 181
-directions)`. Seed sites 1169. The row loop never crossed 18 and converged at
-`17.879034` with `least_covered = 1` (38 LP rounds, 6837 sites / 921 orbits).
-`declare_least_cell_mass` then `decide_certificate` accepted both routes at
+Session-140 rank-5 probe: BC-191 auto grids `(32, 43, 53)` unioned with T-027’s 769 atom
+sites scaled from `467/100` to `187/40` (`4675/1000` in the queue), plus
+`--seed-windows 5`, `(n, L, B, net) = (18, 187/40, 9977/10000, 182
+directions from 181 steps)`. Seed sites 1169. The row loop never crossed 18 and
+converged at `17.879034` with `least_covered = 1` (38 LP rounds, 6837 sites / 921
+orbits). `declare_least_cell_mass` then `decide_certificate` accepted both routes at
 least cell mass `4000013/4000000`. sha256
-`9507659fa55a48869f060bff07e8d0e4f088cf70320f571afdca1bb460d9bb7b`.
-T-027 at `467/100` remains the previous n=18 rung. This retain does not
-confirm H-218: n=18 is off that sweep.
+`9507659fa55a48869f060bff07e8d0e4f088cf70320f571afdca1bb460d9bb7b`. T-027 at `467/100`
+remains the previous n=18 rung.
+This retain does not confirm H-218: n=18 is off that sweep.
 
 ## Command
 
@@ -33,7 +33,7 @@ uv run --frozen --all-extras --group dev python -m devtools.run_fractional_colge
   --log campaign/series/series-000-smoke-and-calibration/results/agenda-038/n18-4675-1000-t027-auto-windows5.log
 ```
 
-The seed path was T-027's live pointer at run time (`467/100`, 769 atoms).
+The seed path was T-027’s live pointer at run time (`467/100`, 769 atoms).
 The live pointer now holds T-028.
 
 Declare then decide:

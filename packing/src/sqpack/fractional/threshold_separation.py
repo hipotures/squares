@@ -576,9 +576,17 @@ def atom_columns(
 
     Coefficient: how many images in the orbit the row's placement charges (contains at
     least ``k`` of the image's points), with the LP's loosening. Cost: orbit size times
-    ``floor(|S|/k)``.
+    ``floor(|S|/k)``. This path represents one token per site and refuses weighted site
+    multiplicities rather than silently flattening them.
     """
 
+    if any(
+        multiplicity != 1
+        for orbit in orbits
+        for image in orbit
+        for multiplicity in image.multiplicities
+    ):
+        raise ValueError("atom_columns accepts only all-ones threshold atoms")
     costs = np.array(
         [len(orbit) * (orbit[0].size // orbit[0].threshold) for orbit in orbits],
         dtype=float,

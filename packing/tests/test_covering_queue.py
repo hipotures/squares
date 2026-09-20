@@ -3,10 +3,19 @@
 from __future__ import annotations
 
 import json
+import os
+import signal
+import sys
+import time
+from contextlib import suppress
 from datetime import UTC, datetime
+from multiprocessing import get_context
 from pathlib import Path
+from unittest.mock import patch
 
+from devtools import run_covering_queue as covering_queue
 from devtools.run_covering_queue import (
+    EXIT_BUSY,
     EXIT_DONE,
     EXIT_FREEZE_BELOW,
     EXIT_STOP,
@@ -37,6 +46,22 @@ probes:
     seed_windows: 8
     deadline_seconds: 1200
 """
+
+
+def _run_queue_owner(
+    probe: Probe,
+    results_dir: Path,
+    waiter_log: Path,
+    child_command: list[str],
+) -> None:
+    os.setsid()
+    with patch.object(covering_queue, "colgen_command", return_value=child_command):
+        walk_queue(
+            [probe],
+            results_dir,
+            parse_stop_at("2099-01-01T00:00:00Z"),
+            waiter_log,
+        )
 
 
 def test_load_queue_reads_named_fields(tmp_path: Path) -> None:
@@ -116,15 +141,133 @@ def test_walk_stops_when_the_budget_is_gone(tmp_path: Path) -> None:
     assert rc == EXIT_STOP
 
 
+def test_orphaned_generator_retains_ownership_until_it_exits(
+    tmp_path: Path,
+) -> None:
+    probe = Probe("n20-shared", 20, "973/200", "auto", None, 5, 1200)
+    context = get_context("spawn")
+    child_pid_path = tmp_path / "generator.pid"
+    child_command = [
+        sys.executable,
+        "-c",
+        (
+            "import os, sys, time; from pathlib import Path; "
+            "Path(sys.argv[1]).write_text(str(os.getpid()), encoding='utf-8'); "
+            "time.sleep(60)"
+        ),
+        str(child_pid_path),
+    ]
+
+    process = context.Process(
+        target=_run_queue_owner,
+        args=(probe, tmp_path, tmp_path / "first-waiter.log", child_command),
+    )
+    process_started = False
+    orphan_pid: int | None = None
+    second_started: list[str] = []
+    try:
+        process.start()
+        process_started = True
+        deadline = time.monotonic() + 5
+        while True:
+            if child_pid_path.is_file():
+                child_pid_text = child_pid_path.read_text(encoding="utf-8")
+                if child_pid_text:
+                    orphan_pid = int(child_pid_text)
+                    break
+            if not process.is_alive():
+                raise AssertionError("queue walker exited before starting its generator")
+            if time.monotonic() >= deadline:
+                raise AssertionError("queue walker did not start its generator")
+            time.sleep(0.01)
+        process.kill()
+        process.join(timeout=5)
+        assert not process.is_alive()
+        os.kill(orphan_pid, 0)
+
+        rc = walk_queue(
+            [probe],
+            tmp_path,
+            parse_stop_at("2099-01-01T00:00:00Z"),
+            tmp_path / "second-waiter.log",
+            runner=lambda candidate, _prefix: second_started.append(candidate.id) or 0,
+        )
+        assert rc == EXIT_BUSY
+        assert second_started == []
+
+        os.kill(orphan_pid, signal.SIGKILL)
+        orphan_pid = None
+        deadline = time.monotonic() + 5
+        while True:
+            rc = walk_queue(
+                [probe],
+                tmp_path,
+                parse_stop_at("2099-01-01T00:00:00Z"),
+                tmp_path / "after-death-waiter.log",
+                runner=lambda candidate, _prefix: second_started.append(candidate.id) or 0,
+            )
+            if rc != EXIT_BUSY:
+                break
+            if time.monotonic() >= deadline:
+                raise AssertionError("orphaned generator did not release queue ownership")
+            time.sleep(0.01)
+        assert rc == EXIT_DONE
+        assert second_started == [probe.id]
+    finally:
+        if process_started:
+            if process.is_alive():
+                process.kill()
+            process.join(timeout=5)
+        process_pid = process.pid
+        if process_pid is not None:
+            with suppress(ProcessLookupError):
+                os.killpg(process_pid, signal.SIGKILL)
+        if orphan_pid is not None:
+            with suppress(ProcessLookupError):
+                os.kill(orphan_pid, signal.SIGKILL)
+
+
+def test_queue_ownership_is_released_when_the_runner_raises(tmp_path: Path) -> None:
+    probe = Probe("n21-error", 21, "5", "auto", None, 5, 1200)
+
+    def fail(_probe: Probe, _prefix: Path) -> int:
+        raise RuntimeError("runner failed")
+
+    try:
+        walk_queue(
+            [probe],
+            tmp_path,
+            parse_stop_at("2099-01-01T00:00:00Z"),
+            tmp_path / "failed-waiter.log",
+            runner=fail,
+        )
+    except RuntimeError as error:
+        assert str(error) == "runner failed"
+    else:
+        raise AssertionError("runner failure did not escape")
+
+    started: list[str] = []
+    rc = walk_queue(
+        [probe],
+        tmp_path,
+        parse_stop_at("2099-01-01T00:00:00Z"),
+        tmp_path / "retry-waiter.log",
+        runner=lambda candidate, _prefix: started.append(candidate.id) or 0,
+    )
+    assert rc == EXIT_DONE
+    assert started == [probe.id]
+
+
 def test_remain_and_command_use_the_project_interpreter() -> None:
     stop = parse_stop_at("2099-01-01T00:00:00Z")
     assert remain_seconds(stop, now=datetime(2098, 12, 31, 23, 59, 0, tzinfo=UTC)) == 60
     probe = Probe("n20", 20, "973/200", "34,46,56,64", "cases/n20.json", 7, 1200)
     command = colgen_command(probe, Path("/tmp/n20"))
+    assert command[0] == sys.executable
+    assert sys.version_info[:2] == (3, 14)
     assert command[1:3] == ["-m", "devtools.run_fractional_colgen"]
     assert "--n" in command
     assert "20" in command
-    assert "python3" not in Path(command[0]).name
     assert "--seed-certificate" in command
 
 

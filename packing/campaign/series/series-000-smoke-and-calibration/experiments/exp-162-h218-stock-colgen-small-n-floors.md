@@ -14,14 +14,24 @@ experiment:
   tier: exploratory
   subject:
     label: >-
-      Restricted covering optima at n in {12, 17, 19, 20} on the 181-direction net at
-      B = 9977/10000, at sides strictly above the current verified floors, on named
-      site sets built by run_fractional_colgen
+      Restricted covering optima at n in {12, 17, 19, 20} on the 182-direction net
+      made by 181 steps at B = 9977/10000, at sides strictly above the current
+      verified floors, on named site sets built by run_fractional_colgen
     engine: >-
       sqpack.fractional.colgen through devtools.run_fractional_colgen; retain by
       declare_least_cell_mass then both routes of decide_certificate
-    assurance: verified
-    method: exact-algebraic
+    assurance: numerically-checked
+    method: numerical-f64
+    precision:
+      binary_bits: 64
+      rounding: IEEE 754 binary64 in NumPy and SciPy HiGHS
+    tolerance: >-
+      Row addition used 1e-9; convergence also accepts an already-held row within
+      LP_FEASIBILITY = 1e-7. No float comparison certifies a packing bound.
+    migration_annotation: >-
+      2026-09-19 correctness review: this hypothesis disposition rests on float64
+      LP and separation output; no accepted exact freeze decided the stated claim.
+      The original verified/exact-algebraic labels overstated its assurance.
     host_system: Cursor cloud agent; project Python 3.14; no packing-campaign runner
   instance: {axis: n, point: 20, role: target}
   method:
@@ -73,7 +83,8 @@ experiment:
       The Session-140 research wall expired with no RETAINABLE freeze on the H-218
       sweep. Closest masses were leftover n=20 971/200 at 19.910044 unconverged
       and leftover n=12 3969/1000 at 12.091168 after crossing 12. T-028 at n=18
-      does not confirm H-218.
+      does not confirm H-218. The unfinished float LPs remain unresolved; their
+      objectives do not refute their site sets.
     budget_spent: >-
       Session-140 research wall 238 minutes on one core. Leftover n=18 and the
       second-wave Nagamochi queue did not start.
@@ -82,13 +93,12 @@ experiment:
       971/200 at 19.910044 unconverged below 20; leftover n=12 3969/1000 at
       12.091168 after crossing 12.
     reopen_when: >-
-      A new named site set at n in {12, 17, 19, 20} whose restricted optimum is
-      still below n, or leftover n=18 1871/400.
+      A future H-218 budget for an unfinished or new named site set at n in
+      {12, 17, 19, 20}.
     resume_from: >-
-      Leftover n=18 1871/400 T-028 auto plus windows 5, then second-wave
-      Nagamochi n=32 29/5. Do not replay leftover n=12 3969/1000 four-grid plus
-      windows 7, leftover n=20 971/200, leftover n=17 461/100, or leftover n=19
-      241/50.
+      Session-141 chose leftover n=18 1871/400 T-028 auto plus windows 5, then
+      second-wave Nagamochi n=32 29/5. That was a budget allocation. The unfinished
+      H-218 sets remain eligible for a future registered round.
 ---
 # Exp-162: First-Wave Stock Colgen
 
@@ -97,13 +107,13 @@ This is the first scientific round of
 [X-038](../../../explorations/X-038-n100-lower-bound-survey.md) ranks the sides.
 [Session 140](../../../agent-sessions/session-140-lb-survey.md) owns the clock.
 
-The accept rule is the gate, not the float LP. A restricted optimum above `n` is a
-site-set negative and is recorded on `covering-values.yaml`. T-028 is landed only on
-`RETAINABLE`.
+The accept rule is the gate, not the float LP. A float objective or feasible frozen mass
+above `n` is not a verified lower bound on the restricted optimum and does not refute
+the site set. T-028 is landed only on `RETAINABLE`.
 
-exp-161 is not this round. Do not `--search`. Do not mutate T-025 or T-026
-`verify_claim.py`. Do not close `think-qqzs`, `think-g3j7`, `think-gyzw`, or
-`think-jwb1`.
+exp-161 is not this round.
+Do not `--search`. Do not mutate T-025 or T-026 `verify_claim.py`. Do not close
+`think-qqzs`, `think-g3j7`, `think-gyzw`, or `think-jwb1`.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

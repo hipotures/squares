@@ -32,12 +32,16 @@ exploration:
 # X-039: What Session-140 Changed About the n<100 Queue
 
 [X-038](X-038-n100-lower-bound-survey.md) ranked the stock colgen against every open
-floor at `n <= 100`. Session-140 ran that queue. This report re-ranks from those
-masses. It does not replay a named site set whose restricted optimum is already above
-`n`, and it does not treat a still-below-`n` unconverged loop as a retain.
+floor at `n <= 100`. Session-140 ran that queue.
+This report re-ranks from those masses.
+Within this session’s budget it does not replay a named site set whose float objective
+already crossed `n`; that scheduling choice does not establish a lower bound on the
+restricted optimum. It also does not treat a still-below-`n` unconverged loop as a
+retain.
 
-Thirty-two sizes in `1..100` stay proved equal. Sixty-eight stay open. First-party
-covering exists on `11, 12, 17, 18, 19, 20, 21` and now also on
+Thirty-five sizes in `1..100` stay proved equal.
+Sixty-five stay open.
+First-party covering exists on `11, 12, 17, 18, 19, 20, 21` and now also on
 `26, 27, 29, 30, 31, 32, 44, 45`. None of those Nagamochi rows retained.
 
 ## Session-140 masses that decide the next spend
@@ -56,9 +60,13 @@ covering exists on `11, 12, 17, 18, 19, 20, 21` and now also on
 | 19 | `241/50` | T-020 auto plus windows 6 | `19.247109` | yes |
 | 21 | `97/20` | T-021 auto plus windows 6 | `19.814820` | no; same side as T-021 |
 
-Raise-only: remaining rows on a named set raise that restricted optimum. Adding sites
-can still lower it. More wall on leftover n=20 `971/200` auto plus windows 6, or on
-n=20 `973/200` four-grid plus windows 7, cannot retain.
+Raise-only: remaining rows on a named set raise that restricted optimum.
+Adding sites can still lower it.
+The leftover n=20 `971/200` auto plus windows 6 run stopped at `19.910044`, and the n=20
+`973/200` four-grid plus windows 7 run stopped at `19.939212`; both were unconverged
+below 20. They remain unresolved.
+Session-141 deferred more wall on those sets so its bounded budget could measure new
+sets.
 
 ## Ranked probes
 
@@ -76,7 +84,7 @@ untried `(n, side, site_set)`”.
 | 6 | H-220 | 30 | `559/100` | auto, windows 5, no seed | 1200 s | done; 27.178193 unconverged |
 | 7 | H-220 | 26 | `513/100` | auto, windows 5, no seed | 1200 s | done; 25.000000 unconverged |
 | 8 | H-220 | 27 | `525/100` | auto, windows 5, no seed | 1200 s | done; 25.000000 unconverged |
-| 9 | H-220 | 29 | `548/100` | auto, windows 5, no seed | 1200 s | done; freeze 26.0409395; interval refused |
+| 9 | H-220 | 29 | `548/100` | auto, windows 5, no seed | 1200 s | done; freeze 26.0409395; interval stalled; unresolved |
 | 10 | H-220 | 45 | `684/100` | auto, windows 5, no seed | 1200 s | done; 42.137360 unconverged |
 | 11 | H-220 | 44 | `675/100` | auto, windows 5, no seed | 1200 s | done; 41.236782 unconverged |
 | 12 | H-218 | 19 | `481/100` | T-020 seed, four-grid `(34,45,56,64)`, windows 7 | 1200 s | done; 19.111435 unconverged; crossed 19 |
@@ -86,41 +94,44 @@ untried `(n, side, site_set)`”.
 | 16 | H-218 | 12 | `793/200` | T-017 seed, four-grid `(26,35,43,48)`, windows 7 | 1200 s | done; 12.066995 unconverged; crossed 12 |
 | 17 | H-221 | 18 | `4679/1000` | T-029 seed, auto, windows 5 | 1200 s | T-030 retained |
 
-n=18 is off the H-218 sweep `{12, 17, 19, 20}`. A retain at `1871/400` is T-029
-and does not confirm H-218. Rank 2 finished `19.857588` unconverged; remaining rows
-raise. Rank 3 finished `19.887914` unconverged; remaining rows raise. H-218 stays
-unconfirmed. exp-162 is abandoned; the reopen is exp-164 then exp-165, both
-unresolved. exp-171 at n=29 `548/100` converged and froze; the interval route
-refused. exp-173 at n=44 `675/100` finished `41.236782` unconverged. The eight
-H-220 sides are measured. exp-174 crossed 19 at `19.111435`. exp-175 crossed 12
-at `12.067502`. exp-176 crossed 12 at `12.097146`. exp-177 crossed 19 at
-`19.224565`. exp-178 crossed 12 at `12.066995`. exp-179 retained T-030 at
-n=18 `4679/1000`. Do not more-wall that set. The remaining interval to
-`117/25` is `0.001`.
+n=18 is off the H-218 sweep `{12, 17, 19, 20}`. A retain at `1871/400` is T-029 and does
+not confirm H-218. Rank 2 finished `19.857588` unconverged; remaining rows raise.
+Rank 3 finished `19.887914` unconverged; remaining rows raise.
+H-218 stays unconfirmed.
+exp-162 is abandoned; the reopen is exp-164 then exp-165, both unresolved.
+exp-171 at n=29 `548/100` converged and froze; the interval route stalled, so the
+decision remains unresolved.
+exp-173 at n=44 `675/100` finished `41.236782` unconverged.
+The eight H-220 sides are measured but unresolved.
+exp-174 crossed 19 at `19.111435`. exp-175 crossed 12 at `12.067502`. exp-176 crossed 12
+at `12.097146`. exp-177 crossed 19 at `19.224565`. exp-178 crossed 12 at `12.066995`.
+exp-179 retained T-030 at n=18 `4679/1000`. Do not more-wall that set.
+The remaining interval to `117/25` is `0.001`.
 
-n=11 stays T-026. H-216 at n=6 is calibration, not an n=11 result. n=21 `97/20` is the
-same verified side as T-021.
+n=11 stays T-026. H-216 at n=6 is calibration, not an n=11 result.
+n=21 `97/20` is the same verified side as T-021.
 
-The 68 open sizes include `26–32`, `37–45`, `50–61`, `65–78`, and `82–100` with no
-first-party covering. This session takes the eight queued Nagamochi sides after n=18 and
-the n=20 new-site probe. After those, `rank-queue.yaml` walked n=19 `481/100`
-four-grid plus windows 7 and n=12 `793/200` auto plus windows 7, both above `n`.
-It walked n=12 `397/100` auto plus windows 7 above `n` and n=19
-`241/50` four-grid plus windows 7 above `n` and n=12 `793/200`
-four-grid plus windows 7 above `n`, then retained n=18 `4679/1000`
-T-029-seeded auto plus windows 5 as T-030. n=17 `231/50` stays off the
-walker: nearby auto plus windows 5 already crossed 17 at `461/100`. n=13–16 and
-n=22–25 are proved; no runway. n=28, n=61, and n=78 stay deferred.
+The exact open census is `11..12`, `17..21`, `26..32`, `37..45`, `50..61`, `65..78`, and
+`82..97`. This session takes eight queued Nagamochi sides after n=18 and the n=20
+new-site probe. After those, `rank-queue.yaml` walked n=19 `481/100` four-grid plus
+windows 7 and n=12 `793/200` auto plus windows 7, both above `n`. It walked n=12
+`397/100` auto plus windows 7 above `n` and n=19 `241/50` four-grid plus windows 7 above
+`n` and n=12 `793/200` four-grid plus windows 7 above `n`, then retained n=18
+`4679/1000` T-029-seeded auto plus windows 5 as T-030. n=17 `231/50` stays off the
+walker: nearby auto plus windows 5 already crossed 17 at `461/100`. n=13–16 and n=22–25
+are proved; no runway.
+n=28, n=61, and n=78 stay deferred.
 
 ## Other hypotheses beside the covering core
 
-One CPU. Sequential colgen. Sub-agents own audit, registration, and W5.
+One CPU. Sequential colgen.
+Sub-agents own audit, registration, and W5.
 
 | Claim | This session | Why |
 | --- | --- | --- |
 | H-219 | first covering probe | Same class as T-028; unused leftover side |
 | H-218 | long-shots measured | exp-164/165 unconverged below 20; exp-174 n=19 four-grid crossed 19; exp-175 n=12 `793/200` auto `12.067502` crossed 12; exp-176 n=12 `397/100` auto `12.097146` crossed 12; exp-177 n=19 `241/50` four-grid `19.224565` crossed 19; exp-178 n=12 `793/200` four-grid `12.066995` crossed 12 |
-| H-220 | eight sides measured | exp-166–170, exp-172, and exp-173 unconverged; exp-171 n=29 freeze interval-refused; no RETAINABLE |
+| H-220 | eight sides measured | exp-166–170, exp-172, and exp-173 unconverged; exp-171 n=29 freeze has a stalled interval decision; all remain unresolved; no RETAINABLE |
 | H-221 | confirmed T-030 | T-029-seeded next rung at `4679/1000` retained; do not more-wall |
 | H-210 / H-211 | off-CPU if Node permits | Workbench determinations; not a floor |
 | H-163 / exp-161 | `--check` only | Encode already timed out; no `--search`; do not steal the covering core |
@@ -131,17 +142,24 @@ One CPU. Sequential colgen. Sub-agents own audit, registration, and W5.
 Block 4 is the efficiency block: harvest hosted Packing and Pages walls under
 `think-g4n9`. Do not edit `gate-budgets.yaml`. Do not flip enforcement.
 
+Correctness review (2026-09-19): the original census omitted proved cases `n = 98..100`.
+It also treated unfinished below-`n` LPs and the stalled n=29 interval decision as if
+they had ruled out their site sets.
+Float objectives and feasible frozen masses are not verified lower bounds on restricted
+optima. The corrected dispositions keep those probes unresolved and record the decision
+to stop them as a session-budget choice.
+
 ## Autonomous loop
 
-`python -m devtools.run_covering_queue` over
-`results/agenda-039/rank-queue.yaml`. Skip a probe whose run JSON exists. Halt on freeze
-mass `< n`, then `declare_least_cell_mass` and `decide_certificate`. T-id only on
-`RETAINABLE`. First walker `--stop-at` is the Block 4 start. Resume the same queue after
-W5. Do not walk `leftover-queue.yaml` (ranks 1–4 already have run JSONs; its default
-`stop_at` is Session-140’s wall).
+`python -m devtools.run_covering_queue` over `results/agenda-039/rank-queue.yaml`. Skip
+a probe whose run JSON exists.
+Halt on freeze mass `< n`, then `declare_least_cell_mass` and `decide_certificate`. T-id
+only on `RETAINABLE`. First walker `--stop-at` is the Block 4 start.
+Resume the same queue after W5. Do not walk `leftover-queue.yaml` (ranks 1–4 already
+have run JSONs; its default `stop_at` is Session-140’s wall).
 
-Coordinator owns identifiers, covering-values, T-id landing, ledger, and the stacked
-PR. Covering stays one process, `OMP_NUM_THREADS=OPENBLAS_NUM_THREADS=MKL_NUM_THREADS=1`.
+Coordinator owns identifiers, covering-values, T-id landing, ledger, and the stacked PR.
+Covering stays one process, `OMP_NUM_THREADS=OPENBLAS_NUM_THREADS=MKL_NUM_THREADS=1`.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

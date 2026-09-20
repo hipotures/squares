@@ -94,7 +94,8 @@ session:
     outcome: >-
       Ranked queue walked. T-029 and T-030 retained at n=18. H-219 and H-221
       confirmed. H-218 unconfirmed after the n=20/19/12 long-shots. H-220
-      unconfirmed after eight Nagamochi sides (n=29 freeze interval-refused).
+      unconfirmed after eight Nagamochi sides (the n=29 interval route reported
+      REFUSED because 272 boxes stalled, so its verification decision is unresolved).
       No unused ranked (n, side, site_set) remains. Do not more-wall 4679/1000.
     evidence:
       - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n18-1871-400-t028-auto-windows5-receipt.md
@@ -170,9 +171,10 @@ session:
     after: >-
       T-029 retained s(18) >= 1871/400. T-030 retained s(18) >= 4679/1000.
       H-219 and H-221 confirmed. H-218 unconfirmed after the n=20/19/12
-      long-shots. H-220 unconfirmed after eight Nagamochi sides (n=29 freeze
-      interval-refused). Unique covering sides 45. think-qqzs stays the
-      selected next entry.
+      long-shots. H-220 unconfirmed after eight Nagamochi sides (the n=29
+      interval route reported REFUSED because 272 boxes stalled, so the
+      verification decision is unresolved). Unique covering sides 45.
+      think-qqzs stays the selected next entry.
   delegations:
   - task: Re-rank n<100 covering from Session-140 masses
     operator: session-141 covering-rank lane
@@ -438,9 +440,9 @@ session:
     recording: contemporaneous
     outcome: >-
       exp-171 converged at 26.040745 with freeze mass 52081879/2000000.
-      declare accepted; decide interval refused (272 stalled, Condition 5).
-      T-030 not offered. H-220 unconfirmed. Walker started n=45 684/100 as
-      exp-172.
+      declare accepted; decide reported REFUSED because 272 boxes stalled in
+      Condition 5, leaving verification unresolved. T-030 not offered. H-220
+      unconfirmed. Walker started n=45 684/100 as exp-172.
     evidence:
       - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n29-548-100-auto-windows5-receipt.md
     files:
@@ -711,16 +713,16 @@ session:
 ---
 # Session-141: Eight-Hour n<100 Research Loop
 
-This record is the closed eight-hour stacked PR. Stacked on Session-140 / PR 200.
-Branch `cursor/session-141-n100-research-f02a`. Workflow entry was planning, then the
-research loop. Primary bead is `think-ul7y`, not `think-qqzs`. The selected next
-entry remains `think-qqzs`.
+This record is the closed eight-hour stacked PR. Stacked on Session-140 / PR 200. Branch
+`cursor/session-141-n100-research-f02a`. Workflow entry was planning, then the research
+loop. Primary bead is `think-ul7y`, not `think-qqzs`. The selected next entry remains
+`think-qqzs`.
 
 [X-039](../explorations/X-039-n100-re-rank-after-session-140.md) is the re-rank.
 [H-219](../hypotheses/H-219-t028-seeded-colgen-raises-s18.md) is leftover n=18.
 [H-220](../hypotheses/H-220-seedless-colgen-raises-nagamochi-floor.md) is the Nagamochi
-wave. H-218 stays the n=12/17/19/20 claim; exp-162 is abandoned, and a new n=20 site
-set is the reopen path after exp-163 terminals.
+wave. H-218 stays the n=12/17/19/20 claim; exp-162 is abandoned, and a new n=20 site set
+is the reopen path after exp-163 terminals.
 
 ## Eight-hour schedule
 
@@ -740,57 +742,73 @@ Covering may start as soon as X-039 names the queue, before 08:26. First walker
 `--stop-at 2026-09-19T10:26:00Z`. A probe already on the core at 10:26 finishes; no new
 probe starts until 11:26.
 
-OR-12: Block 4 is the efficiency block. The record says so here and on `think-36n1`.
+OR-12: Block 4 is the efficiency block.
+The record says so here and on `think-36n1`.
 
 ## Research loop
 
-1. Pick the top open cell on [ranked-queue.md](../series/series-000-smoke-and-calibration/results/agenda-039/ranked-queue.md).
+1. Pick the top open cell on
+   [ranked-queue.md](../series/series-000-smoke-and-calibration/results/agenda-039/ranked-queue.md).
 2. Restate the claim (H-219, then H-218, then H-220). Register a new experiment before
-   measuring a claim exp-163 does not own. Only one in-progress experiment at a time.
+   measuring a claim exp-163 does not own.
+   Only one in-progress experiment at a time.
 3. Run `run_covering_queue` on one core.
 4. Record every restricted optimum on `covering-values.yaml`.
 5. If freeze mass `< n`, stop the queue and run both decide routes.
 6. Land a T-id only on `RETAINABLE`.
-7. Re-screen: a retain eats later sides on that n; a crossing above n kills more wall
-   on that site set.
+7. Re-screen: a retain eats later sides on that n. A float crossing above n is a
+   numerical observation and may guide the remaining session budget; it does not
+   establish a lower bound on the restricted optimum.
 
 H-210 and H-211 use the workbench harness, not HiGHS. H-163 is
-`admit_threshold_compression --check` only. Do not `--search`. Do not encode beside
-covering.
+`admit_threshold_compression --check` only.
+Do not `--search`. Do not encode beside covering.
 
 ## T-id recipe
 
 T-030 is landed: `s(18) >= 4679/1000`. Next T-id is T-031. Copy the T-030 landing
-pattern, not a new case class. Score S3. `produced_by.session` is `session-141`.
+pattern, not a new case class.
+Score S3. `produced_by.session` is `session-141`.
 
-- n=20 `243/50` finished `19.887914` unconverged; do not replay that set.
-  n=20 `971/200` four-grid finished `19.857588` unconverged; do not replay that
-  set. H-218 stays unconfirmed.
-- n=32 `29/5` finished `29.803318` unconverged; do not replay that set.
-- n=31 `57/10` finished `28.331329` unconverged; do not replay that set.
-- n=30 `559/100` finished `27.178193` unconverged; do not replay that set.
-- n=26 `513/100` finished `25.000000` unconverged; do not replay that set.
-- n=27 `525/100` finished `25.000000` unconverged; do not replay that set.
-- n=29 `548/100` converged and froze at mass `26.0409395`; interval refused;
-  do not replay that set.
-- n=45 `684/100` finished `42.137360` unconverged; do not replay that set.
-- n=44 `675/100` finished `41.236782` unconverged; do not replay that set.
-  The eight H-220 Nagamochi sides are measured. None retained.
+- n=20 `243/50` finished `19.887914` unconverged, and n=20 `971/200` four-grid finished
+  `19.857588` unconverged.
+  Both sets remain unresolved; the session deferred them after their allocations.
+  H-218 stays unconfirmed.
+- n=32 `29/5`, n=31 `57/10`, n=30 `559/100`, n=26 `513/100`, and n=27 `525/100` all
+  finished unconverged below `n`. Session-141 deferred them after their 1200 s
+  allocations; none is a site-set refutation.
+- n=29 `548/100` converged and froze at mass `26.0409395`; the interval route stalled.
+  The LP need not be rerun, but the verification decision is unresolved.
+- n=45 `684/100` finished `42.137360` unconverged, and n=44 `675/100` finished
+  `41.236782` unconverged.
+  Session-141 deferred them after their allocations.
+  The eight H-220 Nagamochi sides are measured and unresolved.
+  None retained.
 - n=19 `481/100` four-grid finished `19.111435` unconverged after crossing 19;
-  do not replay that set.
-- n=12 `793/200` auto finished `12.067502` unconverged after crossing 12;
-  do not replay that set.
-- n=12 `397/100` auto finished `12.097146` unconverged after crossing 12;
-  do not replay that set.
+  Session-141 deferred another run after its allocation.
+  The site set is unresolved.
+- n=12 `793/200` auto finished `12.067502` unconverged after crossing 12; Session-141
+  deferred another run after its allocation.
+  The site set is unresolved.
+- n=12 `397/100` auto finished `12.097146` unconverged after crossing 12; Session-141
+  deferred another run after its allocation.
+  The site set is unresolved.
 - n=19 `241/50` four-grid finished `19.224565` unconverged after crossing 19;
-  do not replay that set.
+  Session-141 deferred another run after its allocation.
+  The site set is unresolved.
 - n=12 `793/200` four-grid finished `12.066995` unconverged after crossing 12;
-  do not replay that set.
-- A H-221 RETAINABLE at n=18 `4679/1000` is T-030 and is landed. Do not
-  more-wall 4679/1000. Remaining interval to 117/25 is 0.001.
+  Session-141 deferred another run after its allocation.
+  The site set is unresolved.
+- A H-221 RETAINABLE at n=18 `4679/1000` is T-030 and is landed.
+  Do not more-wall 4679/1000. Remaining interval to 117/25 is 0.001.
 - n=18 `4679/1000` is H-221, not a replay of H-219. exp-179 accepted T-030.
 - Do not mint a T-id on an unconverged freeze, a freeze with mass `>= n`, or n=21
   `97/20`.
+
+Correctness review (2026-09-19): the original closeout treated every stopped below-`n`
+LP and the stalled n=29 interval route as a terminal site-set result.
+Those runs are unresolved.
+Session-141’s choice to move on remains recorded as a bounded budget allocation.
 
 ## Constraints
 

@@ -147,6 +147,27 @@ def test_tiny_event_cell_instance_has_piercing_one() -> None:
     assert m3_verdict_for(outcome.search_status, outcome.piercing) is M3Verdict.eleven_candidate
 
 
+def test_event_cell_encoding_refuses_half_tangents_beyond_the_first_quadrant() -> None:
+    sites = ((Fraction(1), Fraction(1)),)
+    with pytest.raises(piercing.PiercingError, match="at most 1"):
+        encode_event_cell_covers(
+            sites,
+            outer_side=Fraction(2),
+            square_side=Fraction(1),
+            direction_steps=2,
+            angle_limit=Fraction(2),
+        )
+
+    encoding = encode_event_cell_covers(
+        sites,
+        outer_side=Fraction(2),
+        square_side=Fraction(1),
+        direction_steps=2,
+        angle_limit=Fraction(1, 2),
+    )
+    assert encoding.rows.tolist() == [[1]]
+
+
 def test_unit_square_is_the_ownership_object() -> None:
     fields = geometry_fields(DEFAULT_SQUARE_SIDE)
     assert fields["using_unit_squares"] is True

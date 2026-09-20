@@ -12,6 +12,7 @@ from fractions import Fraction
 from pathlib import Path
 
 import numpy as np
+import pytest
 
 from sqpack.fractional.ceiling import CeilingCertificate, Placement
 from sqpack.fractional.threshold import ThresholdAtom
@@ -120,6 +121,26 @@ def test_atom_column_cost_is_orbit_size_times_floor_size_over_k() -> None:
     assert columns.shape == (1, 1)
     assert costs.shape == (1,)
     assert costs[0] == len(orbit) * (atom.size // atom.threshold)
+
+
+def test_atom_columns_refuses_non_unit_token_multiplicities() -> None:
+    weighted = ThresholdAtom(
+        (
+            (Fraction(2), Fraction(2)),
+            (Fraction(3), Fraction(2)),
+        ),
+        2,
+        Fraction(1),
+        (2, 1),
+    )
+
+    with pytest.raises(ValueError, match="only all-ones threshold atoms"):
+        atom_columns(
+            ((weighted,),),
+            [(0, Fraction(3), Fraction(3))],
+            NET,
+            SQUARE,
+        )
 
 
 def test_empty_dual_is_not_a_family() -> None:

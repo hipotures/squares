@@ -1,21 +1,22 @@
 # n=18 4679/1000 T-029-Seeded Auto Window-5 Covering Receipt
 
 Status: **retained**. `s(18) >= 4679/1000` is T-030. Canonical bytes:
-`packing/cases/n18_fractional_certificate/certificate.json`. The previous
-T-029 bytes sit at `certificate-1871-400.json`. T-028 remains at
-`certificate-187-40.json`. T-027 remains at `certificate-467-100.json`.
+`packing/cases/n18_fractional_certificate/certificate.json`. The previous T-029 bytes
+sit at `certificate-1871-400.json`. T-028 remains at `certificate-187-40.json`. T-027
+remains at `certificate-467-100.json`.
 
-Session-141 H-221 / exp-179: BC-191 auto grids `(32, 43, 54)` unioned
-with T-029's 804 atom sites scaled from `1871/400` to `4679/1000`, plus
-`--seed-windows 5`, `(n, L, B, net) = (18, 4679/1000, 9977/10000, 181
-directions)`. Seed sites 1204. Auto at this side resolved to `(32, 43, 54)`,
-the same triple T-029 used. The row loop never crossed 18 and converged at
-`17.893285` with `least_covered = 1` (39 LP rounds, 6985 sites / 929 orbits).
-`declare_least_cell_mass` then `decide_certificate` accepted both routes at
-least cell mass `200001/200000`. sha256
-`b62ead6f5b6aed68704487ad6a1b78beb7a3e585676e55825c6f84942c39cd63`.
-T-029 at `1871/400` remains the previous n=18 rung. This retain confirms H-221
-and does not confirm H-218: n=18 is off that sweep.
+Session-141 H-221 / exp-179: BC-191 auto grids `(32, 43, 54)` unioned with T-029’s 804
+atom sites scaled from `1871/400` to `4679/1000`, plus `--seed-windows 5`,
+`(n, L, B, net) = (18, 4679/1000, 9977/10000, 182
+directions from 181 steps)`. Seed sites 1204. Auto at this side resolved to
+`(32, 43, 54)`, the same triple T-029 used.
+The row loop never crossed 18 and converged at `17.893285` with `least_covered = 1` (39
+LP rounds, 6985 sites / 929 orbits).
+`declare_least_cell_mass` then `decide_certificate` accepted both routes at least cell
+mass `200001/200000`. sha256
+`b62ead6f5b6aed68704487ad6a1b78beb7a3e585676e55825c6f84942c39cd63`. T-029 at `1871/400`
+remains the previous n=18 rung.
+This retain confirms H-221 and does not confirm H-218: n=18 is off that sweep.
 
 ## Command
 
@@ -35,7 +36,7 @@ uv run --frozen --all-extras --group dev python -m devtools.run_fractional_colge
   --log campaign/series/series-000-smoke-and-calibration/results/agenda-039/n18-4679-1000-t029-auto-windows5.log
 ```
 
-The seed path was T-029's live pointer at run time (`1871/400`, 804 atoms).
+The seed path was T-029’s live pointer at run time (`1871/400`, 804 atoms).
 The live pointer now holds T-030.
 
 Declare then decide:

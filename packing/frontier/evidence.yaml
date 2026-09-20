@@ -2727,9 +2727,10 @@ evidence:
     limitations: >-
       Decides five conditions in exact rational arithmetic over 769 atoms on a
       D4-symmetric site set: the atom multiset is closed under the container's D4 group,
-      the total mass is 8937839/500000 = 17.875678, the 181-direction net reaches
-      pi/4, containment B(1 + D) < 1 holds at B = 9977/10000, and every reachable event
-      cell at every net direction carries mass at least 1, the least being 2000007/2000000.
+      the total mass is 8937839/500000 = 17.875678, the 182-direction net produced by
+      181 steps reaches pi/4, containment B(1 + D) < 1 holds at B = 9977/10000, and
+      every reachable event cell at every net direction carries mass at least 1, the
+      least being 2000007/2000000.
       The bound proved is the container side itself, 467/100.
       The live n = 18 pointer later moved to T-028 at 187/40; these bytes stay at
       certificate-467-100.json.
@@ -2740,7 +2741,7 @@ evidence:
       the certificate is true there and weaker.
       It was decided from its bytes by two verifiers that fail differently. The exact
       event-cell sweep accepted in 9 s at 2000007/2000000; the interval branch and bound
-      certified all 361 doubled-net directions in 2,543,909 boxes with none stalled and
+      certified all 363 doubled-net directions in 2,543,909 boxes with none stalled and
       an enclosure equal to that same value, in 24 s. Both were run by this repository
       on the frozen file, and the sha256 the gate printed on acceptance is
       3a11b6303e0663b502b6c1e3fc9d8da285104e199b17022937369bc781479059.
@@ -2796,9 +2797,10 @@ evidence:
     limitations: >-
       Decides five conditions in exact rational arithmetic over 725 atoms on a
       D4-symmetric site set: the atom multiset is closed under the container's D4 group,
-      the total mass is 35758287/2000000 = 17.8791435, the 181-direction net reaches
-      pi/4, containment B(1 + D) < 1 holds at B = 9977/10000, and every reachable event
-      cell at every net direction carries mass at least 1, the least being 4000013/4000000.
+      the total mass is 35758287/2000000 = 17.8791435, the 182-direction net produced
+      by 181 steps reaches pi/4, containment B(1 + D) < 1 holds at B = 9977/10000,
+      and every reachable event cell at every net direction carries mass at least 1,
+      the least being 4000013/4000000.
       The bound proved is the container side itself, 187/40.
       The live n = 18 pointer later moved to T-029 at 1871/400; these bytes stay at
       certificate-187-40.json.
@@ -2809,7 +2811,7 @@ evidence:
       the certificate is true there and weaker.
       It was decided from its bytes by two verifiers that fail differently. The exact
       event-cell sweep accepted in 5 s at 4000013/4000000; the interval branch and bound
-      certified all 361 doubled-net directions in 2,684,845 boxes with none stalled and
+      certified all 363 doubled-net directions in 2,684,845 boxes with none stalled and
       an enclosure equal to that same value, in 23 s. Both were run by this repository
       on the frozen file, and the sha256 the gate printed on acceptance is
       9507659fa55a48869f060bff07e8d0e4f088cf70320f571afdca1bb460d9bb7b.
@@ -2865,9 +2867,10 @@ evidence:
     limitations: >-
       Decides five conditions in exact rational arithmetic over 804 atoms on a
       D4-symmetric site set: the atom multiset is closed under the container's D4 group,
-      the total mass is 17889361/1000000 = 17.889361, the 181-direction net reaches
-      pi/4, containment B(1 + D) < 1 holds at B = 9977/10000, and every reachable event
-      cell at every net direction carries mass at least 1, the least being 250001/250000.
+      the total mass is 17889361/1000000 = 17.889361, the 182-direction net produced
+      by 181 steps reaches pi/4, containment B(1 + D) < 1 holds at B = 9977/10000,
+      and every reachable event cell at every net direction carries mass at least 1,
+      the least being 250001/250000.
       The bound proved is the container side itself, 1871/400.
       The live n = 18 pointer later moved to T-030 at 4679/1000; these bytes stay at
       certificate-1871-400.json.
@@ -2878,7 +2881,7 @@ evidence:
       the certificate is true there and weaker.
       It was decided from its bytes by two verifiers that fail differently. The exact
       event-cell sweep accepted in 5 s at 250001/250000; the interval branch and bound
-      certified all 361 doubled-net directions in 2,997,789 boxes with none stalled and
+      certified all 363 doubled-net directions in 2,997,789 boxes with none stalled and
       an enclosure equal to that same value, in 28 s. Both were run by this repository
       on the frozen file, and the sha256 the gate printed on acceptance is
       dd06c0e39639f06af475459a2a63f9fc8d5836b0b83ea3b6c3a4de8f212892d4.
@@ -2936,9 +2939,10 @@ evidence:
     limitations: >-
       Decides five conditions in exact rational arithmetic over 957 atoms on a
       D4-symmetric site set: the atom multiset is closed under the container's D4 group,
-      the total mass is 71573611/4000000 = 17.89340275, the 181-direction net reaches
-      pi/4, containment B(1 + D) < 1 holds at B = 9977/10000, and every reachable event
-      cell at every net direction carries mass at least 1, the least being 200001/200000.
+      the total mass is 71573611/4000000 = 17.89340275, the 182-direction net produced
+      by 181 steps reaches pi/4, containment B(1 + D) < 1 holds at B = 9977/10000,
+      and every reachable event cell at every net direction carries mass at least 1,
+      the least being 200001/200000.
       The bound proved is the container side itself, 4679/1000.
       One size, and not by monotonicity. Only Condition 2 mentions n among the five
       conditions, so this atom set certifies its side for every integer strictly above
@@ -2947,7 +2951,7 @@ evidence:
       the certificate is true there and weaker.
       It was decided from its bytes by two verifiers that fail differently. The exact
       event-cell sweep accepted in 7 s at 200001/200000; the interval branch and bound
-      certified all 361 doubled-net directions in 3,449,053 boxes with none stalled and
+      certified all 363 doubled-net directions in 3,449,053 boxes with none stalled and
       an enclosure equal to that same value, in 36 s. Both were run by this repository
       on the frozen file, and the sha256 the gate printed on acceptance is
       b62ead6f5b6aed68704487ad6a1b78beb7a3e585676e55825c6f84942c39cd63.

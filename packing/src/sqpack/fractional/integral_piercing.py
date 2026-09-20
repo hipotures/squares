@@ -525,8 +525,8 @@ def encode_event_cell_covers(
         raise PiercingError("sides must be positive")
     if direction_steps < 1:
         raise PiercingError("the direction net needs at least one step")
-    if angle_limit <= 0:
-        raise PiercingError("angle_limit must be positive")
+    if angle_limit <= 0 or angle_limit > 1:
+        raise PiercingError("angle_limit must be positive and at most 1")
     half_tangents = net_half_tangents(angle_limit, direction_steps)
     atoms = _event_atoms(sites)
     n_sites = len(sites)

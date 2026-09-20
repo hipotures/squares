@@ -11,7 +11,7 @@ softschema:
   schema: defects.schema.yaml
   envelope: null
   status: enforced
-count: 491
+count: 501
 defects:
 - id: D-001
   title: Fixed-side search never left the grid basin
@@ -16459,3 +16459,143 @@ defects:
     returned no finding. Firefox and WebKit run the same geometry oracle in hosted CI; the
     Chromium self-test also runs the independent queue-watchdog control.
   recorded_in: packing/devtools/prepare_explainer_math.py
+- id: D-492
+  title: Threshold producer called solver errors infeasible
+  date: '2026-09-19'
+  layer: tooling
+  class: validity
+  direction: conservative
+  detected_by: review
+  severity: high
+  status: fixed
+  bead: think-qpcq
+  what: HiGHS failures other than a time limit were reported as an infeasible covering LP, including solver errors.
+  consequence: An unresolved computation could be recorded as a scientific refusal.
+  fix: Only status 2 is infeasible; other unsuccessful outcomes are unresolved and preserve solver diagnostics, including the initial snapped-row solve.
+  regression: Synthetic solver-status controls in packing/tests/test_produce_threshold_certificate.py.
+  recorded_in: packing/devtools/produce_threshold_certificate.py
+- id: D-493
+  title: Event-cell geometry accepted directions outside its quadrant
+  date: '2026-09-19'
+  layer: verifier
+  class: soundness
+  direction: conservative
+  detected_by: review
+  severity: high
+  status: fixed
+  bead: think-sole
+  what: The event encoder accepted half-tangent limits above 1 although containment assumed nonnegative sine and cosine.
+  consequence: At limit 2 the centre of a side-2 container acquired an impossible empty cover row and a false infeasibility verdict.
+  fix: Reject angle limits outside the positive first-quadrant domain, at most 1.
+  regression: The centre-piercing control and invalid-limit rejection in packing/tests/test_integral_piercing.py.
+  recorded_in: packing/src/sqpack/fractional/integral_piercing.py
+- id: D-494
+  title: Covering queue had no atomic writer ownership
+  date: '2026-09-19'
+  layer: tooling
+  class: robustness
+  detected_by: review
+  severity: medium
+  status: fixed
+  bead: think-ox9l
+  what: Two walkers could both observe a missing final run and start the same output prefix concurrently.
+  consequence: Duplicate generators could consume the host and overwrite one another's evidence.
+  fix: Add process-held ownership before starting work; the generator inherits it and release waits for all owning processes to exit.
+  regression: Concurrent-walker exclusion and crash-release controls in packing/tests/test_covering_queue.py.
+  recorded_in: packing/devtools/run_covering_queue.py
+- id: D-495
+  title: Unfinished covering and interval checks were treated as refutations
+  date: '2026-09-19'
+  layer: record
+  class: validity
+  direction: conservative
+  detected_by: review
+  severity: high
+  status: fixed
+  bead: think-ujkz
+  what: Hypothesis stop rules and rankings treated unconverged below-target LPs or stalled interval verification as killing the construction.
+  consequence: Viable unresolved work could be excluded by a claimed mathematical obstruction that had not been established.
+  fix: Correct the operational dispositions to unresolved or deferred and distinguish budget decisions from proof; annotate the historical correction.
+  regression: none
+  recorded_in: docs/project/reviews/review-2026-09-19-pr199-201-correctness.md
+- id: D-496
+  title: Floating solver subjects were labelled exact and verified
+  date: '2026-09-19'
+  layer: record
+  class: bookkeeping
+  detected_by: review
+  severity: medium
+  status: fixed
+  bead: think-1436
+  what: Sixteen restricted-optimum experiment subjects declared exact-algebraic verification although their optima came from floating HiGHS runs; exp-171's separately verified rational freeze did not make its LP optimum exact.
+  fix: Use numerical assurance and numerical-f64 provenance for those subjects without changing accepted certificate records.
+  regression: Schema validation checks the corrected assurance shape; no automatic detector infers evidence strength from prose.
+  recorded_in: docs/project/reviews/review-2026-09-19-pr199-201-correctness.md
+- id: D-497
+  title: T-027 provenance was swallowed by a YAML prose scalar
+  date: '2026-09-19'
+  layer: record
+  class: bookkeeping
+  detected_by: review
+  severity: medium
+  status: fixed
+  bead: think-cat2
+  what: The produced_by block was indented inside composition and parsed as text instead of structured provenance.
+  fix: Restore produced_by as a mapping on T-027.
+  regression: Parsed result provenance was inspected during the correctness pass; the register validates its restored mapping.
+  recorded_in: packing/frontier/results.yaml
+- id: D-498
+  title: Survey census omitted the three proved cases at 98 through 100
+  date: '2026-09-19'
+  layer: record
+  class: bookkeeping
+  detected_by: review
+  severity: medium
+  status: fixed
+  bead: think-fixz
+  what: X-038 and its follow-on records reported 32 proved and 68 open cases and treated 82 through 100 as open.
+  fix: Reconcile against the frontier's 35 proved and 65 open cases through 100; the final open range ends at 97.
+  regression: The frontier census remains checked by packing-validate; no prose-wide census parser was added.
+  recorded_in: packing/campaign/explorations/X-038-n100-lower-bound-survey.md
+- id: D-499
+  title: Doubled certificate direction count was copied incorrectly
+  date: '2026-09-19'
+  layer: record
+  class: bookkeeping
+  detected_by: review
+  severity: medium
+  status: fixed
+  bead: think-7061
+  what: A 181-step net has 182 half-tangents and 363 doubled directions, but the PR 199 exhaustive test asserted 361 and receipts repeated the wrong counts.
+  fix: PR 201 already corrected the assertion; this correction layer reconciles the evidence prose. Historical PR 199 and PR 200 heads remain failing revisions.
+  regression: The corrected exhaustive direction-count assertion and fresh exact and interval certificate replays.
+  recorded_in: docs/project/reviews/review-2026-09-19-pr199-201-correctness.md
+- id: D-500
+  title: Threshold columns silently discarded site multiplicities
+  date: '2026-09-19'
+  layer: tooling
+  class: soundness
+  direction: flattering
+  detected_by: review
+  severity: medium
+  status: fixed
+  bead: think-lygv
+  what: atom_columns accepted weighted threshold atoms but charged and costed them as one token per site.
+  consequence: Multiplicities (3,3) at threshold 2 were assigned budget 1 instead of 3 and a wrong row charge.
+  fix: Reject every non-unit site multiplicity at this currently unweighted producer boundary.
+  regression: Weighted-atom rejection and ordinary-column controls in packing/tests/test_threshold_separation.py.
+  recorded_in: packing/src/sqpack/fractional/threshold_separation.py
+- id: D-501
+  title: Retained atlas graphics lagged behind the T-030 bound
+  date: '2026-09-19'
+  layer: record
+  class: bookkeeping
+  detected_by: gate
+  severity: medium
+  status: fixed
+  bead: think-63r2
+  what: The n=18 case and composite figure data said 4.679, but both retained composite SVGs still displayed the older 4.67 bound.
+  consequence: Published graphics and their exports disagreed with the accepted result while fast checks stayed green.
+  fix: Regenerate the owned composite export families and add a cheap claim-label drift check to the existing fast atlas surface.
+  regression: The existing slow composite rebuild caught the drift on PR 201 checkpoint 35476507563; the correction adds a fast stale-label negative control.
+  recorded_in: docs/project/reviews/review-2026-09-19-pr199-201-correctness.md

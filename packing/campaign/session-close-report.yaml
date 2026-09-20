@@ -7,11 +7,11 @@ softschema:
   schema: schemas/session-close-report.schema.yaml
   envelope: null
   status: enforced
-count: 141
+count: 142
 generated_by: >-
   uv run --frozen --all-extras --group dev python -m devtools.close_session --render
 totals:
-  sessions_measured: 87
+  sessions_measured: 88
   sessions_unmeasured: 54
   attributed:
     rollups: 129
@@ -35,9 +35,9 @@ totals:
     one_off_code: 4407
     wall_hours: 421.83
 codex_receipts:
-  attributed: 55
+  attributed: 56
   unattributed: 2
-  measured: 57
+  measured: 58
 # Per-session figures below are the logs each session DECLARES. They overlap when
 # sessions share a harness log, so they do not sum to `attributed` above.
 sessions:
@@ -2321,3 +2321,23 @@ sessions:
     native harness data unavailable; This Cursor cloud-agent run has no ClaudeEfficiencyRollup or CodexTaskTreeDelta receipt. Session clocks and covering walls are not a substitute.
   rollups: []
   codex_receipts: []
+- id: session-142
+  title: "Correctness Review of PRs 199–201"
+  status: in_progress
+  primary_bead: think-gz4k
+  phases: 2
+  measured: true
+  rollups:
+  - packing/campaign/resource-usage/session-142-stack-correctness.yaml
+  turns: null
+  tool_calls: null
+  tool_errors: null
+  one_off_code: null
+  wall_hours: null
+  codex_receipts:
+  - path: packing/campaign/resource-usage/session-142-stack-correctness.yaml
+    model_responses: 601
+    agent_hours: 2.44
+    active_union_hours: 0.75
+    wall_hours: 0.77
+    snapshot_incomplete: true

@@ -143,7 +143,7 @@ hypothesis status and summarizes experiment verdicts, and the
 | --- | ---: | --- |
 | Agendas | 36 | 16 active; 14 completed; 5 paused; 1 superseded |
 | Commitments | 349 | 178 complete; 60 stopped; 66 blocked; 15 ready; 21 tentative; 9 in progress |
-| Sessions | 141 | 84 completed; 57 stopped; all terminal |
+| Sessions | 142 | 84 completed; 57 stopped; 1 nonterminal |
 | Explorations | 37 | 23 linked to proposed hypotheses; 14 uncodified |
 | Hypotheses | 159 | 28 confirmed; 29 refuted; 51 blocked; 14 unresolved; 5 open; 28 open questions; 2 result registered; 2 abandoned; 0 running |
 | Experiments | 147 | 41 accepted; 34 rejected; 46 unresolved; 12 baseline; 11 blocked; 3 abandoned; 0 in progress |
@@ -165,17 +165,16 @@ strategy-reset queue, and
 is the current relational-certificate queue opened by the overnight review.
 The generated agenda map, not this narrative, summarizes commitment state.
 
-[Session 141](packing/campaign/agent-sessions/session-141-n100-research.md)
-is the latest terminal closeout: T-029 retained `s(18) >= 1871/400`, T-030
-retained `s(18) >= 4679/1000`, H-218 and H-220 stay unconfirmed, and
-`think-qqzs` remains the next entry.
-[Session 140](packing/campaign/agent-sessions/session-140-lb-survey.md) closed the
-stacked-PR survey of `n <= 100` lower bounds; it retained T-028 `s(18) >= 187/40`
-and does not confirm H-218.
+[Session 141](packing/campaign/agent-sessions/session-141-n100-research.md) is the
+latest terminal closeout: T-029 retained `s(18) >= 1871/400`, T-030 retained
+`s(18) >= 4679/1000`, H-218 and H-220 stay unconfirmed, and `think-qqzs` remains the
+next entry. [Session 140](packing/campaign/agent-sessions/session-140-lb-survey.md)
+closed the stacked-PR survey of `n <= 100` lower bounds; it retained T-028
+`s(18) >= 187/40` and does not confirm H-218.
 [Session 139](packing/campaign/agent-sessions/session-139-n11-overnight-research.md)
 retained T-027 `s(18) >= 467/100` after encode-only timed out unresolved.
-[Session 138](packing/campaign/agent-sessions/session-138-n11-overnight-review.md)
-is the preceding route-selection handoff: PR 193 merged its records as `4ad98e90`,
+[Session 138](packing/campaign/agent-sessions/session-138-n11-overnight-review.md) is
+the preceding route-selection handoff: PR 193 merged its records as `4ad98e90`,
 `think-4woh` is closed, and certification debt now sits under `think-qqzs`. The five
 X-037 owner decisions are resolved under [`epistemics.md`](epistemics.md).
 `stopped` is not a scientific failure; it includes time limits, guarded refusals,
@@ -205,11 +204,11 @@ The pure point/density ceiling `38200/9977 ≈ 3.8288` lies only about `0.00236`
 T-026, so additional heavy work for microscopic gains in that language is paused.
 H-160/exp-158 and H-162/exp-160 are registered but blocked before target invocation.
 H-163 is registered and unresolved via exp-161; its target-blind instrument merged in PR
-182. Encode-only timed out with no JSON. `--search` did not run.
+182\. Encode-only timed out with no JSON. `--search` did not run.
 `think-ufmk` registered that experiment; a scientific target still requires the live
 `--check`, `--authorize-target exp-161`, and a coverage-encoding search that is not an
-admission-control manifest. The retained source and control work carries no scientific
-verdict.
+admission-control manifest.
+The retained source and control work carries no scientific verdict.
 
 BC-339’s W7 pipeline-improvement and W8 reconciliation are complete and certified.
 BC-347’s source-bound
@@ -261,7 +260,8 @@ record. The current order is:
    PR 182 merged the instrument as `1d9c49c4` from reviewed head `609d7d62` after
    exact-head validation.
    Session 139 registered exp-161 and landed the named producer, which emits no
-   candidate. Encode-only timed out unresolved. `--search` did not run.
+   candidate. Encode-only timed out unresolved.
+   `--search` did not run.
 4. Treat A, S, global angular resources, and B as the first advisory tier.
    A is the strongest route to a material `n = 11` lower bound; S is the best bounded
    deliverable; angular resources offer a cheap optimal-face screen; and B is the
@@ -279,12 +279,12 @@ originally allocated five sequential merge-bounded blocks.
 BC-354 activated that schedule’s guard-refusal branch, so the Route A discriminator no
 longer follows it. BC-343’s no-target Route S instrument is admitted and merged.
 Its remaining Route S path is the `think-ufmk` planning block, which registered
-`exp-161`; the named producer exists and emits no candidate. Encode-only timed out
-unresolved. A later encode still needs a live `--check` and `--authorize-target
-exp-161` before `--search`; agenda-037’s relational-certificate queue now runs
-ahead of it.
-Each block starts from the preceding merge on a fresh branch and gets its own session,
-bead disposition, validation receipt, and pull request.
+`exp-161`; the named producer exists and emits no candidate.
+Encode-only timed out unresolved.
+A later encode still needs a live `--check` and `--authorize-target
+exp-161` before `--search`; agenda-037’s relational-certificate queue now runs ahead of
+it. Each block starts from the preceding merge on a fresh branch and gets its own
+session, bead disposition, validation receipt, and pull request.
 
 The audit’s linear advisory order is A, S, angular resources, B, stronger charge
 algebra, geometry-dependent budgets, `n = 12`, C, D, then geometric waste.
@@ -379,6 +379,7 @@ case or experiment separately.
 
 | Document or collection | Role | Authority | Lifecycle | Current replacement |
 | --- | --- | --- | --- | --- |
+| [Senior Review of PRs 199–201](docs/project/reviews/review-2026-09-19-pr199-201-correctness.md) | dated review record | record | retained | — |
 | [Square-packing workbench](packages/workbench/README.md) | component scope and use | current | maintained | — |
 | [The checkers’ probes](packages/workbench/probes/README.md) | component scope and use | supporting | maintained | — |
 | [Foundation Benchmark Replay Fixture](packages/workbench/tests/fixtures/benchmark-foundation/README.md) | component scope and use | supporting | maintained | — |
@@ -1020,21 +1021,20 @@ controller, not permission to blur contracts.
 
 ### Current Handoff
 
-[Session 141](packing/campaign/agent-sessions/session-141-n100-research.md)
-closed the stacked n<100 research loop. It retained T-029
-`s(18) >= 1871/400` and T-030 `s(18) >= 4679/1000`, confirmed H-219 and
-H-221, and left H-218 and H-220 unconfirmed.
+[Session 141](packing/campaign/agent-sessions/session-141-n100-research.md) closed the
+stacked n<100 research loop.
+It retained T-029 `s(18) >= 1871/400` and T-030 `s(18) >= 4679/1000`, confirmed H-219
+and H-221, and left H-218 and H-220 unconfirmed.
 `think-qqzs` remains the selected next entry.
-[Session 140](packing/campaign/agent-sessions/session-140-lb-survey.md)
-closed the preceding stacked-PR n<=100 survey and retained T-028
-`s(18) >= 187/40`.
+[Session 140](packing/campaign/agent-sessions/session-140-lb-survey.md) closed the
+preceding stacked-PR n<=100 survey and retained T-028 `s(18) >= 187/40`.
 
-[Session 139](packing/campaign/agent-sessions/session-139-n11-overnight-research.md)
-is the preceding overnight scientific closeout.
+[Session 139](packing/campaign/agent-sessions/session-139-n11-overnight-research.md) is
+the preceding overnight scientific closeout.
 It retained T-027 `s(18) >= 467/100`, stopped after Route S encode-only timed out
 unresolved, and left H-216 open.
-[Session 138](packing/campaign/agent-sessions/session-138-n11-overnight-review.md)
-is the preceding route-selection handoff.
+[Session 138](packing/campaign/agent-sessions/session-138-n11-overnight-review.md) is
+the preceding route-selection handoff.
 It reviewed the n=11 record, ranked eight mechanisms that price relations between
 squares, subjected them to an independent adversarial review, and measured two.
 [X-037](packing/campaign/explorations/X-037-n11-overnight-review-and-route-slate.md)
@@ -1114,7 +1114,8 @@ sentinel. BC-343 stays open in
 [Session 139](packing/campaign/agent-sessions/session-139-n11-overnight-research.md)
 registered
 [exp-161](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-161-h163-route-s-threshold-compression.md)
-and ran encode-only; that process timed out unresolved. `--search` did not run.
+and ran encode-only; that process timed out unresolved.
+`--search` did not run.
 
 BC-340, BC-353, and BC-354 are terminal.
 BC-341 remains tentative behind a future W10 reselection and the named Route A
@@ -4326,14 +4327,15 @@ in separate tables: their units differ, and the same work can appear in both.
 | `codex-task-tree-session-133.yaml` | session-133 | 101 | 0.37 h | 0.2 h | 13.6 h | yes |
 | `codex-task-tree-session-134.yaml` | session-134 | 497 | 4.88 h | 1.21 h | 1.21 h | yes |
 | `codex-task-tree-session-135.yaml` | session-135 | 437 | 1.53 h | 0.48 h | 0.48 h | yes |
+| `session-142-stack-correctness.yaml` | session-142 | 601 | 2.44 h | 0.75 h | 0.77 h | yes |
 | `codex-task-tree-pr137-publication-tail.yaml` | unattributed | 610 | 4.39 h | 1.77 h | 1.82 h | yes |
 | `codex-task-tree-pr142-publication-tail.yaml` | unattributed | 136 | 0.87 h | 0.41 h | 0.58 h | yes |
 
 | Coverage | sessions |
 | --- | ---: |
-| measured | 87 |
+| measured | 88 |
 | unmeasured | 54 |
-| **total** | **141** |
+| **total** | **142** |
 
 <!-- END GENERATED: session-close-report -->
 
@@ -4901,15 +4903,15 @@ table above.
 
 Kept with the same discipline as the experiment record, because the aggregate says
 things no individual bug report can.
-The log contains 491 defects, [one line each](defects.md), generated from `defects.yaml`
+The log contains 501 defects, [one line each](defects.md), generated from `defects.yaml`
 and checked in the gate.
 
 | Class | Count | The system … |
 | --- | ---: | --- |
-| soundness | 98 | asserted something false about the mathematics |
-| validity | 125 | was correct, but the measurement did not bear on the question |
-| bookkeeping | 185 | recorded something its own evidence contradicts |
-| robustness | 65 | did not finish, or finished only by luck |
+| soundness | 100 | asserted something false about the mathematics |
+| validity | 127 | was correct, but the measurement did not bear on the question |
+| bookkeeping | 190 | recorded something its own evidence contradicts |
+| robustness | 66 | did not finish, or finished only by luck |
 | performance | 18 | worked, but cost far more than it should |
 
 One entry is filed under a class it only half fits, and the table reads accordingly.
@@ -4923,11 +4925,11 @@ alternative was two ids sharing every other field.
 
 Two observations the log exists to make.
 
-**Seventy-eight of the ninety-eight soundness defects pointed in the *flattering*
-direction**, where the error looks like a success.
+**79 of the 100 soundness defects pointed in the *flattering* direction**, where the
+error looks like a success.
 That is the dangerous class, and it is the majority of it.
 
-**The automated gate has caught seventy-six defects in 491, and no soundness defect
+**The automated gate has caught seventy-seven defects in 501, and no soundness defect
 ever.** Every soundness failure was found by a control cell whose answer was known in
 advance, a rule written down before the measurement, a generated view contradicting its
 source, or someone reading carefully.
@@ -5278,7 +5280,7 @@ It is contained rather than fixed — such delegations are recorded on completio
 `read_only` flag is better than permitting an empty list that would be ambiguous between
 “writes nothing” and “nobody filled this in”.
 
-113 fixes left no regression check behind.
+114 fixes left no regression check behind.
 [D-300](defects.md) remains open: the yielded session id, output, timeout/final poll,
 and exit survived, but invalid `gdate` precision left the start and end fields empty, so
 [D-202](defects.md), [D-217](defects.md), and `think-b3bm` remain open.
@@ -5543,79 +5545,93 @@ the best known packing runs near half a unit — eleven cases above `+0.49`, hea
 `n = 51` at `+0.5364`, then `68`, `84`, `39`, `86`, `66`, `38`, `83`, `37`, `53` and
 `26`. Two cautions travel with that ranking.
 The prize is what the *ceiling* allows; the real limit is the covering value at that
-side. 45 values have been reported for the restricted program, at sides `2.99`, `3.81`, `3.82`,
-`3.83`, `3.84`, `3.85`, `3.875`, `3.95`, `3.96`, `3.965`, `3.969`, `3.97`, `3.98`, `3.985`, `3.99`, `4.58`, `4.59`,
-`4.6`, `4.61`, `4.67`, `4.675`, `4.6775`, `4.679`, `4.68`, `4.69`, `4.7`, `4.80`, `4.81`, `4.82`, `4.825`, `4.85`, `4.855`, `4.86`, `4.865`, `4.875`, `4.895`, `4.985`, `5.13`, `5.25`, `5.48`, `5.59`, `5.7`, `5.8`, `6.75` and `6.84` — the first eight
-reports, not measurements this repository can reproduce, since no covering-search run log
-or solver checkpoint was retained for any of them; the ten added on 2026-09-05 by Agenda
-021’s `BC-200` and `BC-197` and Agenda 022’s `BC-213` and `BC-206` carry run logs; the
-`2.99` pair added on 2026-09-18 by session-139 is H-216 calibration at n=6 (covering
-`6.08216` and `6.07724` on two named site sets, both ≥ 6, not a bound); `3.81` is the
-session-139 T-025-seeded auto-plus-60 at 381/100, covering `11.000000` unconverged on
-the eleven plateau, site set refuted, side open; `3.82` also has the session-139 T-025-seeded auto-plus-60 plus `--seed-windows 5` at
+side. 45 values have been reported for the restricted program, at sides `2.99`, `3.81`,
+`3.82`, `3.83`, `3.84`, `3.85`, `3.875`, `3.95`, `3.96`, `3.965`, `3.969`, `3.97`,
+`3.98`, `3.985`, `3.99`, `4.58`, `4.59`, `4.6`, `4.61`, `4.67`, `4.675`, `4.6775`,
+`4.679`, `4.68`, `4.69`, `4.7`, `4.80`, `4.81`, `4.82`, `4.825`, `4.85`, `4.855`,
+`4.86`, `4.865`, `4.875`, `4.895`, `4.985`, `5.13`, `5.25`, `5.48`, `5.59`, `5.7`,
+`5.8`, `6.75` and `6.84` — the first eight reports, not measurements this repository can
+reproduce, since no covering-search run log or solver checkpoint was retained for any of
+them; the ten added on 2026-09-05 by Agenda 021’s `BC-200` and `BC-197` and Agenda 022’s
+`BC-213` and `BC-206` carry run logs; the `2.99` pair added on 2026-09-18 by session-139
+is H-216 calibration at n=6 (covering `6.08216` and `6.07724` on two named site sets,
+both ≥ 6, not a bound); `3.81` is the session-139 T-025-seeded auto-plus-60 at 381/100,
+covering `11.000000` unconverged on the eleven plateau, site set refuted, side open;
+`3.82` also has the session-139 T-025-seeded auto-plus-60 plus `--seed-windows 5` at
 191/50, covering `11.018646` converged, closest session-139 point-atom construction,
 site set refuted; T-026-seeded auto-plus-60 at the same side converged `11.033743`,
-worse than the threshold seed; `3.83` is the
-session-139 n=11 probes at 383/100, covering `11.192598` (auto grids), `11.142857`
-(four-grid), and `11.140351` (T-025-seeded four-grid), all site sets refuted, side open;
-`3.84` is the same T-025-seeded auto-plus-60 construction at 96/25, covering
-`11.371819` converged, site set refuted; `3.85` also has the session-139 T-025-seeded auto-plus-60 at 77/20, covering `11.456576`
-converged, site set refuted; `3.875` is the same construction at 31/8, covering
-`11.561186` converged, site set refuted, 0.002 below the packing; `3.965` is the session-141 n=12 T-017-seeded auto plus windows 7 at 793/200, covering `12.067502` unconverged, still above twelve, the first first-party covering row at that side; a session-141 T-017-seeded four-grid plus windows 7 finished at `12.066995` unconverged, still above twelve; `3.969` T-017-seeded auto-grid dropped to `12.118036`
+worse than the threshold seed; `3.83` is the session-139 n=11 probes at 383/100,
+covering `11.192598` (auto grids), `11.142857` (four-grid), and `11.140351`
+(T-025-seeded four-grid), all site sets refuted, side open; `3.84` is the same
+T-025-seeded auto-plus-60 construction at 96/25, covering `11.371819` converged, site
+set refuted; `3.85` also has the session-139 T-025-seeded auto-plus-60 at 77/20,
+covering `11.456576` converged, site set refuted; `3.875` is the same construction at
+31/8, covering `11.561186` converged, site set refuted, 0.002 below the packing; `3.965`
+is the session-141 n=12 T-017-seeded auto plus windows 7 at 793/200, covering
+`12.067502` unconverged, still above twelve, the first first-party covering row at that
+side; a session-141 T-017-seeded four-grid plus windows 7 finished at `12.066995`
+unconverged, still above twelve; `3.969` T-017-seeded auto-grid dropped to `12.118036`
 unconverged, still above twelve; T-017-seeded four-grid at the same side dropped to
 `12.116115` unconverged; a session-140 leftover T-017-seeded four-grid plus windows 7
-finished at `12.091168` unconverged, still above twelve; `4.6` is the session-139 n=17 auto-grid probe at 23/5,
-covering `17.331710` unconverged, site set refuted, side open; the T-019-seeded auto
-grid at the same side dropped to `17.049597` unconverged, still above seventeen; T-019-seeded auto plus `--seed-windows 5` dropped to `17.042346` unconverged; a session-140 T-019-seeded four-grid plus windows 8 finished at `17.120106` unconverged, still above seventeen; `4.61` is the session-140 leftover n=17 T-019-seeded auto plus windows 5 at 461/100, covering `17.195968` unconverged, one cent above `23/5`; `4.67` is the session-139
-n=18 auto-grid probe at 467/100, covering `18.000000` unconverged, cannot confirm; the
-T-019-seeded auto grid at the same side converged `17.875567` with least_covered 1, freeze-then-decide retained `T-027` at `s(18) >= 467/100`; `4.675` is the session-140 T-027-seeded auto plus windows 5 at 187/40, freeze-then-decide retained `T-028` at `s(18) >= 187/40`; `4.6775` is the session-141 leftover T-028-seeded auto plus windows 5 at 1871/400, freeze-then-decide retained `T-029` at `s(18) >= 1871/400`; `4.679` is the session-141 T-029-seeded auto plus windows 5 at 4679/1000, freeze-then-decide retained `T-030` at `s(18) >= 4679/1000`; `4.68` T-019-seeded auto-grid locked at exact mass `18.000043` converged, cannot confirm; T-019-seeded auto plus `--seed-windows 5` at `4.68` locked `18.000000` unconverged; T-027-seeded auto at the same side locked `18.000000` unconverged; `4.69` T-019-seeded auto-grid locked `18.000000` unconverged; `4.7` T-019-seeded auto-grid converged `18.165413`, cannot confirm;
-retained checkpoint and frozen-certificate availability differs by row.
-`4.81` is the session-140 n=19 T-020-seeded auto plus windows 6 at 481/100,
-covering `19.132115` unconverged, closer than the same construction at `4.85`
-(`19.808958`); a session-141 T-020-seeded four-grid plus windows 7 finished at
-`19.111435` unconverged, still above nineteen.
+finished at `12.091168` unconverged, still above twelve; `4.6` is the session-139 n=17
+auto-grid probe at 23/5, covering `17.331710` unconverged, site set refuted, side open;
+the T-019-seeded auto grid at the same side dropped to `17.049597` unconverged, still
+above seventeen; T-019-seeded auto plus `--seed-windows 5` dropped to `17.042346`
+unconverged; a session-140 T-019-seeded four-grid plus windows 8 finished at `17.120106`
+unconverged, still above seventeen; `4.61` is the session-140 leftover n=17 T-019-seeded
+auto plus windows 5 at 461/100, covering `17.195968` unconverged, one cent above `23/5`;
+`4.67` is the session-139 n=18 auto-grid probe at 467/100, covering `18.000000`
+unconverged, cannot confirm; the T-019-seeded auto grid at the same side converged
+`17.875567` with least_covered 1, freeze-then-decide retained `T-027` at
+`s(18) >= 467/100`; `4.675` is the session-140 T-027-seeded auto plus windows 5 at
+187/40, freeze-then-decide retained `T-028` at `s(18) >= 187/40`; `4.6775` is the
+session-141 leftover T-028-seeded auto plus windows 5 at 1871/400, freeze-then-decide
+retained `T-029` at `s(18) >= 1871/400`; `4.679` is the session-141 T-029-seeded auto
+plus windows 5 at 4679/1000, freeze-then-decide retained `T-030` at
+`s(18) >= 4679/1000`; `4.68` T-019-seeded auto-grid locked at exact mass `18.000043`
+converged, cannot confirm; T-019-seeded auto plus `--seed-windows 5` at `4.68` locked
+`18.000000` unconverged; T-027-seeded auto at the same side locked `18.000000`
+unconverged; `4.69` T-019-seeded auto-grid locked `18.000000` unconverged; `4.7`
+T-019-seeded auto-grid converged `18.165413`, cannot confirm; retained checkpoint and
+frozen-certificate availability differs by row.
+`4.81` is the session-140 n=19 T-020-seeded auto plus windows 6 at 481/100, covering
+`19.132115` unconverged, closer than the same construction at `4.85` (`19.808958`); a
+session-141 T-020-seeded four-grid plus windows 7 finished at `19.111435` unconverged,
+still above nineteen.
 `4.82` is the session-140 leftover n=19 T-020-seeded auto plus windows 6 at 241/50,
-covering `19.247109` unconverged, farther than `4.81` on the same site set;
-a session-141 T-020-seeded four-grid plus windows 7 finished at `19.224565`
-unconverged, still above nineteen.
+covering `19.247109` unconverged, farther than `4.81` on the same site set; a
+session-141 T-020-seeded four-grid plus windows 7 finished at `19.224565` unconverged,
+still above nineteen.
 `4.855` is the session-140 leftover n=20 T-021-seeded auto plus windows 6 at 971/200,
-covering `19.910044` unconverged, still below 20.
-`4.86` is the session-141 n=20 T-021-seeded four-grid plus windows 7 at 243/50,
-covering `19.887914` unconverged, still below 20.
-`5.13` is the session-141 n=26 seedless auto plus windows 5 at 513/100, covering
-`25.000000` unconverged, still below 26, the first first-party covering row at
-that size.
-`5.25` is the session-141 n=27 seedless auto plus windows 5 at 525/100, covering
-`25.000000` unconverged, still below 27, the first first-party covering row at
-that size.
-`5.48` is the session-141 n=29 seedless auto plus windows 5 at 548/100, covering
-`26.040745` converged with freeze mass `26.0409395`; the interval route refused
+covering `19.910044` unconverged, still below 20. `4.86` is the session-141 n=20
+T-021-seeded four-grid plus windows 7 at 243/50, covering `19.887914` unconverged, still
+below 20. `5.13` is the session-141 n=26 seedless auto plus windows 5 at 513/100,
+covering `25.000000` unconverged, still below 26, the first first-party covering row at
+that size. `5.25` is the session-141 n=27 seedless auto plus windows 5 at 525/100,
+covering `25.000000` unconverged, still below 27, the first first-party covering row at
+that size. `5.48` is the session-141 n=29 seedless auto plus windows 5 at 548/100,
+covering `26.040745` converged with freeze mass `26.0409395`; the interval route refused
 the freeze, the first first-party covering row at that size.
 `5.59` is the session-141 n=30 seedless auto plus windows 5 at 559/100, covering
-`27.178193` unconverged, still below 30, the first first-party covering row at
-that size.
-`5.7` is the session-141 n=31 seedless auto plus windows 5 at 57/10, covering
-`28.331329` unconverged, still below 31, the first first-party covering row at
-that size.
-`5.8` is the session-141 n=32 seedless auto plus windows 5 at 29/5, covering
-`29.803318` unconverged, still below 32, the first first-party covering row at
-that size.
-`6.75` is the session-141 n=44 seedless auto plus windows 5 at 675/100, covering
-`41.236782` unconverged, still below 44, the first first-party covering row at
-that size.
-`6.84` is the session-141 n=45 seedless auto plus windows 5 at 684/100, covering
-`42.137360` unconverged, still below 45, the first first-party covering row at
-that size.
-Several sides are reported more than once from site sets built differently, which is the
-point of reporting them that way: at `4.85` the difference is between a wall and the
-certificate `T-021` rests on, at `4.865` it is two independent walls plus a session-140 four-grid-plus-windows-7
-construction that stopped at `19.930198` unconverged without crossing, and at `3.97` it
-is a converged grid optimum of `12.364038` above a cutting-plane row LP of `12.248227`
-and a session-140 T-017-seeded four-grid-plus-windows-7 freeze at `12.133391`,
-and a session-141 T-017-seeded auto-plus-windows-7 row at `12.097146` unconverged,
-with a historical reported floor of `10.845594`. That floor cannot currently be replayed
-because its generating family and state are missing; [D-478](defects.md) records the
-evidence gap.
+`27.178193` unconverged, still below 30, the first first-party covering row at that
+size. `5.7` is the session-141 n=31 seedless auto plus windows 5 at 57/10, covering
+`28.331329` unconverged, still below 31, the first first-party covering row at that
+size. `5.8` is the session-141 n=32 seedless auto plus windows 5 at 29/5, covering
+`29.803318` unconverged, still below 32, the first first-party covering row at that
+size. `6.75` is the session-141 n=44 seedless auto plus windows 5 at 675/100, covering
+`41.236782` unconverged, still below 44, the first first-party covering row at that
+size. `6.84` is the session-141 n=45 seedless auto plus windows 5 at 684/100, covering
+`42.137360` unconverged, still below 45, the first first-party covering row at that
+size. Several sides are reported more than once from site sets built differently, which
+is the point of reporting them that way: at `4.85` the difference is between a wall and
+the certificate `T-021` rests on, at `4.865` it is two independent walls plus a
+session-140 four-grid-plus-windows-7 construction that stopped at `19.930198`
+unconverged without crossing, and at `3.97` it is a converged grid optimum of
+`12.364038` above a cutting-plane row LP of `12.248227` and a session-140 T-017-seeded
+four-grid-plus-windows-7 freeze at `12.133391`, and a session-141 T-017-seeded
+auto-plus-windows-7 row at `12.097146` unconverged, with a historical reported floor of
+`10.845594`. That floor cannot currently be replayed because its generating family and
+state are missing; [D-478](defects.md) records the evidence gap.
 
 The middle tier is built and works within the explicit boundaries above.
 Two instruments now agree on the cell decomposition to `4.4e-16` and on the corner’s

@@ -22,18 +22,20 @@ hypothesis:
       decide_certificate on a freeze whose total_mass is strictly below 18 at a side
       in (187/40, 117/25)
     direction: >-
-      Confirm only when decide_certificate prints RETAINABLE. A restricted optimum
-      above 18, an unconverged loop, a freeze above 18, or a stalled interval route
-      does not refute the claim; it refutes that site set at that side. 117/25 is
-      not in the interval.
+      Confirm only when decide_certificate prints RETAINABLE. An unfinished float LP,
+      a float objective or feasible frozen mass above 18, and a stalled interval route
+      are unresolved; none refutes the site set or the claim. A verified lower bound
+      on the restricted optimum above 18 would rule out that site set at that side.
+      117/25 is not in the interval.
     threshold: 1
   instrument: >-
     devtools.run_fractional_colgen with --freeze; declare_least_cell_mass; then
     both routes of decide_certificate. No packing-campaign runner. No new atom class.
   instrument_ready: true
   regime: >-
-    B = 9977/10000, 181-direction net, D4-symmetric nonnegative point-atom weights,
-    exact rational freeze; T-028 seed; sides in (187/40, 117/25)
+    B = 9977/10000, 182-direction net from 181 steps, D4-symmetric nonnegative
+    point-atom weights, exact rational freeze; T-028 seed; sides in
+    (187/40, 117/25)
   instance: {axis: n, point: 18}
   sweep:
     axis: n
@@ -48,7 +50,9 @@ hypothesis:
   notes: >-
     Session-141 leftover 1871/400 T-028-seeded auto plus windows 5 converged at
     17.889237 and freeze-then-decide retained T-029. Confirmed. Off the H-218
-    sweep. This retain does not confirm H-218.
+    sweep. This retain does not confirm H-218. Correctness review 2026-09-19:
+    the criterion now distinguishes accepted exact decisions from float objectives
+    and stalled interval routes.
 ---
 # H-219: T-028-Seeded Colgen Raises s(18)
 

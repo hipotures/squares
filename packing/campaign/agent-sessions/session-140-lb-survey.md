@@ -167,7 +167,7 @@ session:
     status: completed
     recording: contemporaneous
     outcome: >-
-      32 proved, 68 open. First-wave ranks n=20 at 973/200, n=12 at 397/100, n=17 at
+      35 proved, 65 open. First-wave ranks n=20 at 973/200, n=12 at 397/100, n=17 at
       23/5, n=19 at 481/100.
     evidence:
       - packing/campaign/explorations/X-038-n100-lower-bound-survey.md
@@ -227,8 +227,9 @@ session:
     status: completed
     recording: contemporaneous
     outcome: >-
-      Converged 12.133391; freeze mass 48534459/4000000. Site set refuted. No
-      retain.
+      Converged float objective 12.133391; feasible freeze mass
+      48534459/4000000. No retain; the numerical result does not refute the site
+      set.
     evidence:
       - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n12-397-100-t017-grid4-windows7-receipt.md
     files:
@@ -709,22 +710,32 @@ T-021 landing, not a new case class.
 
 See
 [leftover-side-ranking.md](../series/series-000-smoke-and-calibration/results/agenda-038/leftover-side-ranking.md).
-A restricted optimum already above `n` cannot retain on more wall of the same site set.
+A float objective above `n` was a session-budget reason to move to another site set; it
+does not establish a lower bound on the restricted optimum.
 After n=21, walk `leftover-queue.yaml`: n=19 `241/50` (done, `19.247109`), n=17
-`461/100` (done, `17.195968`), n=20 `971/200` (done, `19.910044`), n=12
-`3969/1000` four-grid plus windows 7 (done, `12.091168`), n=18 `1871/400`
-(not started).
+`461/100` (done, `17.195968`), n=20 `971/200` (done, `19.910044`), n=12 `3969/1000`
+four-grid plus windows 7 (done, `12.091168`), n=18 `1871/400` (not started).
+
+Correctness review (2026-09-19): the original n<=100 census omitted proved cases
+`n = 98..100`; the corrected count is 35 proved and 65 open.
+The n=20 runs that stopped below 20 remain unresolved.
+Their stop was a session-budget decision, not a site-set refutation.
 
 ## T-029 leftover recipes
 
-T-029 is still free. Confirm H-218 only on `RETAINABLE` at n in `{12, 17, 19, 20}`.
+T-029 is still free.
+Confirm H-218 only on `RETAINABLE` at n in `{12, 17, 19, 20}`.
 
-- Leftover n=19 `241/50` did not retain. Do not mint T-029 from that probe.
-- Leftover n=17 `461/100` did not retain. Do not mint T-029 from that probe.
-- Leftover n=20 `971/200` did not retain. Do not mint T-029 from that probe.
-- Leftover n=12 `3969/1000` did not retain. Do not mint T-029 from that probe.
-- Leftover n=18 `1871/400` is off the H-218 sweep. A retain there is the next T-id
-  and does not confirm H-218.
+- Leftover n=19 `241/50` did not retain.
+  Do not mint T-029 from that probe.
+- Leftover n=17 `461/100` did not retain.
+  Do not mint T-029 from that probe.
+- Leftover n=20 `971/200` did not retain.
+  Do not mint T-029 from that probe.
+- Leftover n=12 `3969/1000` did not retain.
+  Do not mint T-029 from that probe.
+- Leftover n=18 `1871/400` is off the H-218 sweep.
+  A retain there is the next T-id and does not confirm H-218.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
