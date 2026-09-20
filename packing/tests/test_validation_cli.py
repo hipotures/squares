@@ -39,7 +39,9 @@ WORKFLOW = Path(__file__).resolve().parents[2] / ".github/workflows/packing-vali
 partition of `STEPS`. Repository-relative from `packing/tests/`, so two levels up."""
 
 
-def test_artifacts_keep_partial_subprocess_output_after_timeout(tmp_path: Path) -> None:
+def test_artifacts_keep_partial_subprocess_output_after_timeout(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     artifacts = tmp_path / "artifacts"
     context = validate.Context(
         deep=False,
@@ -47,13 +49,20 @@ def test_artifacts_keep_partial_subprocess_output_after_timeout(tmp_path: Path) 
         jobs=1,
         inner_jobs=1,
         environment={**os.environ, "PACKING_VALIDATION_ARTIFACT_DIR": str(artifacts)},
-        timeout_seconds=0.2,
     )
+
+    def time_out_after_partial_output(
+        _context: validate.Context, _command: list[str], **options: object
+    ) -> str:
+        stream = options["output_stream"]
+        assert isinstance(stream, io.TextIOBase)
+        stream.write("partial\n")
+        stream.flush()
+        raise validate.StepTimeoutError("command timed out after partial output")
+
+    monkeypatch.setattr(validate, "_run_command", time_out_after_partial_output)
     with pytest.raises(validate.StepFailureError, match="timed out"):
-        validate._run(
-            context,
-            [sys.executable, "-c", "import time; print('partial', flush=True); time.sleep(60)"],
-        )
+        validate._run(context, [sys.executable, "-c", "pass"])
     assert "partial" in next(artifacts.glob("*.log")).read_text()
     end = json.loads(next(artifacts.glob("*.end.json")).read_text())
     assert end["status"] == "timed_out"

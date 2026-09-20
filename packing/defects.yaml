@@ -16471,8 +16471,8 @@ defects:
   bead: think-qpcq
   what: HiGHS failures other than a time limit were reported as an infeasible covering LP, including solver errors.
   consequence: An unresolved computation could be recorded as a scientific refusal.
-  fix: Only status 2 is infeasible; other unsuccessful outcomes are unresolved and preserve solver diagnostics, including the initial snapped-row solve.
-  regression: Synthetic solver-status controls in packing/tests/test_produce_threshold_certificate.py.
+  fix: Only status 2 is infeasible; other unsuccessful outcomes are unresolved and preserve solver diagnostics, including the initial snapped-row solve. Raw solver vectors are checked for shape and finiteness before clipping marginal signs.
+  regression: Synthetic solver-status and malformed-vector controls, including both signs of infinite marginals, in packing/tests/test_produce_threshold_certificate.py.
   recorded_in: packing/devtools/produce_threshold_certificate.py
 - id: D-493
   title: Event-cell geometry accepted directions outside its quadrant

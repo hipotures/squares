@@ -230,13 +230,13 @@ def solve_covering(matrix: sparse.csr_matrix, costs: np.ndarray) -> CoveringSolv
             solver_message=solver_message,
         )
     weights = np.asarray(result.x, dtype=float)
-    duals = np.maximum(-np.asarray(marginals, dtype=float), 0.0)
+    raw_marginals = np.asarray(marginals, dtype=float)
     objective = float(result.fun)
     if (
         weights.shape != (_matrix_cols(matrix),)
-        or duals.shape != (n_rows,)
+        or raw_marginals.shape != (n_rows,)
         or not bool(np.all(np.isfinite(weights)))
-        or not bool(np.all(np.isfinite(duals)))
+        or not bool(np.all(np.isfinite(raw_marginals)))
         or not math.isfinite(objective)
     ):
         return CoveringSolve(
@@ -247,7 +247,7 @@ def solve_covering(matrix: sparse.csr_matrix, costs: np.ndarray) -> CoveringSolv
     return CoveringSolve(
         "ok",
         weights,
-        duals,
+        np.maximum(-raw_marginals, 0.0),
         objective,
         solver_status,
         solver_message,

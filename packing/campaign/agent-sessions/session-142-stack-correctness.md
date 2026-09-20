@@ -181,12 +181,71 @@ session:
     elapsed_seconds: null
     elapsed_quality: unavailable
     next_action: Final integrated validation; no duplicate whole-corpus rebuild in this lane.
+  - task: Independently review the integrated computational boundaries
+    operator: fix_queue_ownership; GPT-5.6 Sol xhigh
+    status: completed
+    recording: retrospective
+    phase: 2
+    outcome: No further interaction defect found in solver diagnostics, queue lifetime, geometry guards, or atlas labels.
+    evidence: [docs/project/reviews/review-2026-09-19-pr199-201-correctness.md]
+    files: []
+    checks: [Read-only review of 2aaa296d through 4c202aeb; no duplicate tests.]
+    uncertainty: Static review is not a replacement for the final checkpoint.
+    elapsed_seconds: null
+    elapsed_quality: unavailable
+    next_action: Complete final mathematical review and validation.
+  - task: Adversarial final review of proof arguments and corrected boundaries
+    operator: final_math_adversarial; GPT-6 Astra max
+    status: completed
+    recording: retrospective
+    phase: 2
+    outcome: >-
+      Found positive-infinite marginals being clipped before validation and an n=29
+      receipt inconsistency. No additional flaw in the retained proof arguments.
+    evidence: [packing/tests/test_produce_threshold_certificate.py, docs/project/reviews/review-2026-09-19-pr199-201-correctness.md]
+    files: []
+    checks: [Positive-infinity counterexample reproduced; proof bridge and n=29 assurance reviewed without duplicate certificate replays.]
+    uncertainty: No external novelty search or new proof of the unchanged verifier.
+    elapsed_seconds: null
+    elapsed_quality: unavailable
+    next_action: Root integrates the two findings and repeats affected validation.
+  - task: Prepare correction-layer dispositions and publication records
+    operator: final_publication_records; GPT-5.6 Sol high
+    status: completed
+    recording: retrospective
+    phase: 2
+    outcome: Prepared review and PR proposals preserving original-head verdicts and pending final-head validation.
+    evidence: [docs/project/reviews/review-2026-09-19-pr199-201-correctness.md]
+    files: []
+    checks: [Documentation guidelines and Flowmark applied to proposals; no source edits or tests.]
+    uncertainty: Root owns final integration and verification of CI outcomes.
+    elapsed_seconds: null
+    elapsed_quality: unavailable
+    next_action: Root publishes the measured final dispositions.
+  - task: Diagnose partial-selection scheduling and repair the timeout fixture
+    operator: final_pipeline_analysis; GPT-5.6 Sol xhigh
+    status: completed
+    recording: retrospective
+    phase: 2
+    outcome: >-
+      Tracked costly narrow-selection scheduling under think-1i1x. Replaced the
+      200-millisecond child-startup assumption with deterministic timeout injection
+      at the artifact-journaling boundary; real subprocess coverage remains separate.
+    evidence: [packing/tests/test_validation_cli.py]
+    files: [packing/tests/test_validation_cli.py]
+    checks: [125 validation CLI tests passed; Ruff passed; BasedPyright reported zero findings.]
+    uncertainty: Automatic worker allocation remains an open efficiency follow-up.
+    elapsed_seconds: null
+    elapsed_quality: unavailable
+    next_action: Final hosted checkpoint; preserve H-216 as the selected research entry.
   outputs:
   - docs/project/reviews/review-2026-09-19-pr199-201-correctness.md
   - packing/campaign/agent-sessions/session-142-stack-correctness.md
   checks:
   - T-027, T-028, T-029 and T-030 passed exact and interval replay with zero stalled boxes.
   - Targeted original-stack engineering tests passed; the lower PR direction-count assertion is wrong.
+  - 'full gate: fast at 4c202aeb: passed (hosted run 35479932912; merge 564d5dbc has the same Git tree as the head).'
+  - The final solver fix passes 52 boundary and queue tests; the deterministic timeout fixture passes all 125 validation CLI tests.
   stop_reason: null
   next_action: Finish think-gz4k, then return to H-216 under think-qqzs.
 ---

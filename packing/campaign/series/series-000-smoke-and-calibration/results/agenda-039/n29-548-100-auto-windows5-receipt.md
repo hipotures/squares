@@ -5,8 +5,8 @@ accepted. `decide_certificate` refused the interval route.
 T-030 was not offered.
 
 Session-141 exp-171: seedless auto grids plus `--seed-windows 5`,
-`(n, L, B, net) = (29, 548/100, 9977/10000, 181 directions)`. Auto resolved to
-`(39, 53, 65)`. Seed sites 625 (windows only).
+`(n, L, B, net) = (29, 548/100, 9977/10000, 181 steps / 182 directions)`. Auto resolved
+to `(39, 53, 65)`. Seed sites 625 (windows only).
 The row loop converged at LP round 52 (violated 0) at `26.040745` on 9145 sites / 1230
 orbits. Freeze mass `52081879/2000000 = 26.0409395`. 1329 atoms.
 Never crossed 29.
@@ -15,13 +15,14 @@ Declare accepted least cell mass `4000013/4000000`. Decide interval: `accepted=F
 enclosure `(398409/400000, 4000013/4000000)`, 4,960,181 boxes, 272 stalled (65 s).
 Condition 5 refused.
 The enclosure has width.
-Exact route did not run.
-`EXIT:1`. Not `RETAINABLE`.
+The exact route did not run in this original decision; the later replay is recorded
+below. `EXIT:1`. Not `RETAINABLE`.
 
 This is the first first-party covering row at n=29, and the first Nagamochi freeze with
 mass `< n`. A freeze that the interval route refuses is not a verified floor.
-Do not more-wall this set.
-Nagamochi `1 + sqrt(20)` stands.
+The original scheduling decision deferred more work on this set.
+No new LP run is needed for the existing candidate; a future interval-verification
+budget may retry it as specified by exp-171. Nagamochi `1 + sqrt(20)` stands.
 H-220 stays unconfirmed.
 
 ## Command

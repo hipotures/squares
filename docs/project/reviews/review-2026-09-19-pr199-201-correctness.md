@@ -1,7 +1,8 @@
 # Senior Review of PRs 199–201
 
-Reviewed 2026-09-19. **Verdict: request changes; the stack is not ready to merge.** The
-four retained n=18 certificates pass fresh mathematical replays.
+Reviewed 2026-09-19. **Original-head verdict: request changes; PRs 199–201 are not
+independently ready to merge.** The four retained n=18 certificates pass fresh
+mathematical replays.
 The lower two PRs nevertheless contain a failing exhaustive assertion, and the stack has
 research classification, provenance, and scheduler defects.
 Green fast checks do not establish full merge readiness.
@@ -216,8 +217,8 @@ The initial recommendation was to repair each owning layer and restack.
 The user subsequently requested a new correction PR above 201 instead.
 That instruction governs implementation: the old heads remain unchanged, and checks on
 the corrected tip do not retroactively validate the two lower heads.
-Review tracking is `think-x2n7`, with the eight findings tracked individually above.
-The selected research continuation and the existing open beads `think-qqzs`,
+Review tracking is `think-x2n7`, with the initial eight findings tracked individually
+above. The selected research continuation and the existing open beads `think-qqzs`,
 `think-g3j7`, `think-gyzw`, `think-jwb1`, and `think-g4n9` remain open.
 
 ## Correction Pass
@@ -237,7 +238,27 @@ records the W2 correctness review and a bounded W7 pipeline-improvement phase un
 implementation addresses R2–R9, the repeated R1 evidence counts, and all three smaller
 findings. It adds computational boundary and queue-ownership regression tests without
 changing retained certificate payloads or the scientific acceptance criteria.
-Final validation and finding dispositions will be recorded after integration.
+[PR 202](https://github.com/jlevy/squares/pull/202) publishes this correction layer.
+The following dispositions apply to the corrected tip, not the unchanged lower heads:
+
+| Finding | Correction-layer disposition |
+| --- | --- |
+| R1 | The top already contains the corrected exhaustive assertion; repeated evidence counts are reconciled. Lower PRs 199–200 still fail their original assertions. |
+| R2 | Solver status and diagnostics are preserved; malformed vectors remain unresolved. Raw marginal shape and finiteness are checked before sign clipping. |
+| R3–R4 | Unfinished computations remain unresolved, and sixteen numerical subjects carry numerical assurance. |
+| R5 | Kernel-held leases prevent overlapping queue writers and survive walker death while the generator is alive. |
+| R6–R7 | T-027 provenance and the 35-proved/65-open census are corrected. |
+| R8 | Unsupported half-angle limits are rejected before first-quadrant geometry. |
+| R9 | Eight atlas exports are regenerated; fast checks now reject stale visible bound labels. |
+| Smaller findings | Weighted column inputs are refused, the T-029 receipt pins its own certificate, and the queue test uses the project interpreter. |
+
+At baseline `4c202aeb`, hosted fast validation
+[35479932912](https://github.com/jlevy/squares/actions/runs/35479932912) and the page
+build [35479932911](https://github.com/jlevy/squares/actions/runs/35479932911) passed.
+The hosted merge revision `564d5dbc437bc0aa9801d210d2ae4de91bf101c3` has the same Git
+tree as that head. These checks do not certify the subsequent final-review edits.
+The first deferred dispatch was cancelled for those edits; final-head validation remains
+pending.
 
 The first integrated fast checkpoint at `d1c54a6a` passed every behavioral assertion,
 but failed the Ruff formatting check and a per-test duration ceiling.
@@ -246,6 +267,26 @@ despite using only declared constant names.
 It now reads the declarations directly; reference matching remains covered by the
 existing positive and negative controls.
 No timeout ceiling or slow-test exemption was changed.
+
+The pre-push non-test floor passed at `4c202aeb`. Its serial selection of 72 of 350 test
+files hit the 900-second command timeout without a reported assertion failure.
+A ten-worker retry completed in 814.31 seconds with 1,858 passes and one failure: a
+timeout fixture assumed a Python child would print within 200 milliseconds under load.
+The fixture now injects a timeout after writing to the real artifact stream; separate
+real-subprocess controls still cover output transfer and process-tree termination.
+All 125 validation CLI tests pass.
+Worker allocation for costly partial selections is tracked separately under
+`think-1i1x`; no global ceiling is relaxed by this correction.
+
+The final adversarial mathematical review found one additional malformed-solver case:
+clipping a positive infinite marginal turned it into zero before the finiteness check.
+The new positive-infinity regression failed on the old code; both infinity signs are now
+checked before clipping.
+All four boundary/queue suites pass together with 52 tests.
+The review found no further flaw in the retained proof arguments.
+The n=29 receipt now states 181 steps and 182 directions and distinguishes its
+historical decision from the later exact replay and possible future
+interval-verification budget.
 
 The integration pass also corrected exp-171’s numerical restricted-optimum subject and
 its verification follow-up.

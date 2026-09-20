@@ -2336,8 +2336,8 @@ sessions:
   wall_hours: null
   codex_receipts:
   - path: packing/campaign/resource-usage/session-142-stack-correctness.yaml
-    model_responses: 601
-    agent_hours: 2.44
-    active_union_hours: 0.75
-    wall_hours: 0.77
+    model_responses: 917
+    agent_hours: 3.87
+    active_union_hours: 1.63
+    wall_hours: 1.65
     snapshot_incomplete: true

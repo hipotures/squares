@@ -205,6 +205,8 @@ def test_only_highs_status_two_reports_covering_infeasibility(
         pytest.param(4, [1.0], [-1.0], 1.0, id="nonoptimal-status"),
         pytest.param(0, [float("nan")], [-1.0], 1.0, id="nonfinite-weights"),
         pytest.param(0, [1.0], [float("nan")], 1.0, id="nonfinite-duals"),
+        pytest.param(0, [1.0], [float("inf")], 1.0, id="positive-infinite-marginal"),
+        pytest.param(0, [1.0], [float("-inf")], 1.0, id="negative-infinite-marginal"),
         pytest.param(0, [1.0], [-1.0], float("inf"), id="nonfinite-objective"),
         pytest.param(0, [[1.0]], [-1.0], 1.0, id="weights-not-a-vector"),
         pytest.param(0, [1.0], [[-1.0]], 1.0, id="duals-not-a-vector"),
