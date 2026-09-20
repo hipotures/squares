@@ -144,7 +144,7 @@ hypothesis status and summarizes experiment verdicts, and the
 | --- | ---: | --- |
 | Agendas | 37 | 17 active; 14 completed; 5 paused; 1 superseded |
 | Commitments | 356 | 181 complete; 61 stopped; 68 blocked; 16 ready; 21 tentative; 9 in progress |
-| Sessions | 147 | 89 completed; 57 stopped; 1 nonterminal |
+| Sessions | 147 | 90 completed; 57 stopped; all terminal |
 | Explorations | 38 | 24 linked to proposed hypotheses; 14 uncodified |
 | Hypotheses | 169 | 29 confirmed; 31 refuted; 54 blocked; 17 unresolved; 5 open; 29 open questions; 2 result registered; 2 abandoned; 0 running |
 | Experiments | 155 | 43 accepted; 36 rejected; 50 unresolved; 12 baseline; 11 blocked; 3 abandoned; 0 in progress |
@@ -1047,6 +1047,18 @@ controller, not permission to blur contracts.
 
 ### Current Handoff
 
+[Session 147](packing/campaign/agent-sessions/session-147-overnight-chunk-4.md)
+completed overnight chunk 4 of agenda-040 in
+[PR 208](https://github.com/jlevy/squares/pull/208), stacked on PR 207: T-031 registers
+the `exp-220` exclusion of the octagon corner class at 96/25 at the scope Session 146’s
+review accepted, V4/C4 on the two gate routes, significance 2, with a case package and a
+control test. The overnight loop closed on its clock after four chunks; no bound moved.
+
+**Selected next entry:** `think-b7pr`, BC-367: the four mixed corner classes at 96/25
+under the admitted instrument with a box cut, and a second n=26 site set, in Session 148
+on the next stacked branch.
+BC-357 / H-216 stays the registered n=6 calibration entry in agenda-037.
+
 [Session 146](packing/campaign/agent-sessions/session-146-overnight-chunk-3.md)
 completed overnight chunk 3 of agenda-040 in
 [PR 207](https://github.com/jlevy/squares/pull/207), stacked on PR 206. A Fable
@@ -1060,10 +1072,8 @@ and `exp-220` re-froze the same 680-atom covering under the class claim with bot
 accepting. The ceiling-family fold is retained as `devtools.fold_ceiling_family`. No
 bound moved.
 
-**Selected next entry:** `think-b7pr`, BC-367: write the registration entry at the
-reviewed scope, then the four mixed corner classes at 96/25 and a second n=26 site set,
-in Session 147 on the next stacked branch.
-BC-357 / H-216 stays the registered n=6 calibration entry in agenda-037.
+The selected entry at that cutoff was `think-b7pr`, BC-367: write the registration entry
+at the reviewed scope, then the four mixed corner classes and a second n=26 site set.
 
 [Session 145](packing/campaign/agent-sessions/session-145-overnight-chunk-2.md)
 completed overnight chunk 2 of agenda-040 in
@@ -4344,9 +4354,9 @@ in separate tables: their units differ, and the same work can appear in both.
 
 | Rollups | count | turns | tool calls | errors | one-off code | wall |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| claimed by a session | 151 | 43,229 | 23,721 | 471 | 3,748 | 386.02 h |
+| claimed by a session | 151 | 43,282 | 23,755 | 472 | 3,755 | 386.29 h |
 | claimed by none | 60 | 11,110 | 6,539 | 156 | 946 | 51.75 h |
-| **measured** | **211** | **54,339** | **30,260** | **627** | **4,694** | **437.77 h** |
+| **measured** | **211** | **54,392** | **30,294** | **628** | **4,701** | **438.04 h** |
 
 | Session | Phases | Rollups | Turns | Tool calls | Errors | Wall |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -4391,7 +4401,8 @@ in separate tables: their units differ, and the same work can appear in both.
 | [session-144](packing/campaign/agent-sessions/session-144-overnight-chunk-1.md) | 1 | 6 | 675 | 392 | 9 | 4.03 h |
 | [session-145](packing/campaign/agent-sessions/session-145-overnight-chunk-2.md) | 1 | 4 | 649 | 391 | 6 | 1.54 h |
 | [session-146](packing/campaign/agent-sessions/session-146-overnight-chunk-3.md) | 1 | 3 | 283 | 174 | 4 | 0.62 h |
-| *shared by 41 sessions* | — | 7 | 23,792 | 12,963 | 281 | 300.56 h |
+| [session-147](packing/campaign/agent-sessions/session-147-overnight-chunk-4.md) | 1 | 0 | 0 | 0 | 0 | 0 h |
+| *shared by 42 sessions* | — | 7 | 23,845 | 12,997 | 282 | 300.83 h |
 
 | Codex interval receipt | declaring sessions | model responses | agent time | active union | wall window | live lower bound |
 | --- | --- | ---: | ---: | ---: | ---: | --- |
@@ -4456,8 +4467,8 @@ in separate tables: their units differ, and the same work can appear in both.
 
 | Coverage | sessions |
 | --- | ---: |
-| measured | 92 |
-| unmeasured | 55 |
+| measured | 93 |
+| unmeasured | 54 |
 | **total** | **147** |
 
 <!-- END GENERATED: session-close-report -->

@@ -341,9 +341,9 @@ on.
 It is not the next thing, because a reassessment of what to search is queued in front
 of it.
 
-For the next supervised exact-research goal, take BC-367 under `think-b7pr`: write the
-registration entry for the `exp-220` exclusion of the octagon class at the scope Session
-146’s review accepted, clip the four mixed corner classes at 96/25 under
+For the next supervised exact-research goal, take BC-367 under `think-b7pr`: with the
+`exp-220` exclusion registered as T-031, clip the four mixed corner classes at 96/25
+under
 [H-222](../../../../packing/campaign/hypotheses/H-222-n11-octagon-class-at-96-25.md)
 with the admitted instrument, and give n=26 a second site set under
 [H-225](../../../../packing/campaign/hypotheses/H-225-n26-seeded-certificate-at-53-10.md),
