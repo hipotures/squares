@@ -10,7 +10,7 @@ session:
   title: Overnight Chunk 1 — Stock-Instrument Determinations at n=13, 17, 26
   date: '2026-09-20'
   started_at: '2026-09-20T07:10:00Z'
-  deadline_at: '2026-09-20T09:35:00Z'
+  deadline_at: '2026-09-20T09:10:00Z'
   branch: claude/kind-wright-whxxn6-chunk1
   primary_bead: think-pogj
   status: in_progress
@@ -36,7 +36,7 @@ session:
     switch_reason: null
     budget_minutes: 100
     started_at: '2026-09-20T07:10:00Z'
-    deadline_at: '2026-09-20T09:15:00Z'
+    deadline_at: '2026-09-20T08:50:00Z'
     expected_output: >-
       Three decided or explicitly unresolved experiment records with receipts under
       results/agenda-040, any RETAINABLE freeze registered only after both routes
@@ -57,7 +57,7 @@ session:
   stop_conditions:
   - Every experiment id opened in this chunk has a verdict other than in-progress, or a recorded lease expiry and resume note.
   - No hypothesis is confirmed without RETAINABLE from both decide_certificate routes, and no ceiling family is accepted without both readers.
-  - The chunk closes by 09:35Z with its records validated, committed, and pushed as a stacked draft pull request.
+  - The chunk closes by 09:10Z with its records validated, committed, and pushed as a stacked draft pull request.
   progress:
     metric: Experiments decided under BC-361 and BC-362 steps completed
     before: exp-213, exp-214, exp-215 registered in-progress; no replay of Bentz 2016 at the printed constants exists.
@@ -77,7 +77,7 @@ session:
     elapsed_quality: unavailable
     next_action: Coordinator reads the receipts and updates the experiment records.
     started_at: '2026-09-20T07:10:00Z'
-    deadline_at: '2026-09-20T09:15:00Z'
+    deadline_at: '2026-09-20T08:50:00Z'
     budget_minutes: 100
     write_scope: [packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/]
     excluded_commands: [git commit, git push, any edit outside results/agenda-040, any change to a registered command]
@@ -99,7 +99,7 @@ session:
     elapsed_quality: unavailable
     next_action: Coordinator moves the tool into devtools under OR-1 and a Fable reviewer checks the replay.
     started_at: '2026-09-20T06:55:00Z'
-    deadline_at: '2026-09-20T09:15:00Z'
+    deadline_at: '2026-09-20T08:50:00Z'
     budget_minutes: 115
     write_scope: [session scratchpad chunk1-math/]
     excluded_commands: [git commit, git push, any edit under the repository tree]
