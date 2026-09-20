@@ -1,0 +1,785 @@
+softschema:
+  contract: packing.squares:ClaudeEfficiencyRollup/v1
+  schema: ../schemas/claude-efficiency-rollup.schema.yaml
+  envelope: rollup
+  status: enforced
+rollup:
+  source:
+    harness: claude-code
+    filename: a5a0fa0629343ea04.output
+    sha256: a3333bc8e52d74bef623ba921373a70c96550b5667cdb583ec1bde75b77b378b
+    bytes: 914676
+    records: 250
+    session_id: 5e071e1a-5ab8-5bae-a5c0-c3687815bf4a
+    harness_versions:
+    - 2.1.278
+  span:
+    started_at: '2026-09-20T06:12:29.010Z'
+    ended_at: '2026-09-20T06:23:36.066Z'
+    wall_seconds: 667.056
+  turns:
+    assistant: 115
+    sidechain: 115
+    by_model:
+      claude-opus-5: 115
+    by_thinking_level:
+      medium: 115
+    by_model_and_thinking_level:
+      claude-opus-5 @ medium: 115
+    by_branch:
+      claude/kind-wright-whxxn6: 115
+    latency:
+      count: 115
+      total_seconds: 611.505
+      median_seconds: 1.888
+      max_seconds: 287.606
+  tokens:
+    cache_creation_input_tokens: 491045
+    cache_read_input_tokens: 12582115
+    ephemeral_1h_input_tokens: 0
+    ephemeral_5m_input_tokens: 491045
+    input_tokens: 230
+    output_tokens: 48466
+    thinking_tokens: 3864
+  tokens_by_thinking_level:
+    medium:
+      cache_creation_input_tokens: 491045
+      cache_read_input_tokens: 12582115
+      ephemeral_1h_input_tokens: 0
+      ephemeral_5m_input_tokens: 491045
+      input_tokens: 230
+      output_tokens: 48466
+      thinking_tokens: 3864
+  tool_calls:
+    total: 72
+    total_seconds: 64.391
+    share_of_wall: 0.0965
+    errors: 1
+    denied: 0
+    unpaired_results: 0
+    outstanding_at_snapshot: 0
+    one_off_code:
+      count: 8
+      total_seconds: 9.11
+      median_seconds: 0.982
+      max_seconds: 2.103
+    by_tool:
+      Bash:
+        count: 71
+        total_seconds: 63.169
+        median_seconds: 0.108
+        max_seconds: 7.105
+      SubagentHandback:
+        count: 1
+        total_seconds: 1.222
+        median_seconds: 1.222
+        max_seconds: 1.222
+    by_command:
+      timeout npx:
+        count: 4
+        total_seconds: 14.762
+        median_seconds: 3.589
+        max_seconds: 4.093
+      npx && npx:
+        count: 2
+        total_seconds: 13.829
+        median_seconds: 6.915
+        max_seconds: 7.105
+      sed:
+        count: 17
+        total_seconds: 8.896
+        median_seconds: 0.074
+        max_seconds: 3.165
+      head:
+        count: 11
+        total_seconds: 4.988
+        median_seconds: 0.146
+        max_seconds: 1.631
+      find && ls:
+        count: 2
+        total_seconds: 2.298
+        median_seconds: 1.149
+        max_seconds: 1.281
+      ? "interpreter && Field && Value && Driver && run_fractional_colgen.py` && Library &&\
+        \ colgen.py` && Takes && `--n`, && Emits && a && `least_cell_mass` && Decides && **nothing.**\
+        \ && Verification && producer && no && Arbitrary && Yes. && it && Cost && from &&\
+        \ Known && **point && Scheduler: && Gate && Path && Language && Routes && Refuses\
+        \ && `decide_certificate` && decide_certificate.py` && unconditional && exact && both\
+        \ && any && `class` && `decide_threshold_certificate` && decide_threshold_certificate.py`\
+        \ && point && S && k)` && interval && any && `decide_relational_certificate` && decide_relational_certificate.py`\
+        \ && v1`: && **two && malformed && `declare_least_cell_mass` && declare_least_cell_mass.py`\
+        \ && fills && none && leaves && the && atom-orbit && orbit && · && S && k)`. && library\
+        \ && does && addressed && `--search` && `--check` && `--certify` && the && t-026-…json`,\
+        \ && Instrument && Path && What && Separating-axis && verify.py:1-19` && validity\
+        \ && `float_sign` && Contact && contacts.py`, && exact && Contact && contact_assembly.py`,\
+        \ && contact-structure && Cross-record && assurance.py` && rules && Stromquist &&\
+        \ ` && audits && Trump && ` && green17 && ` && `interval_audit.py:1-22`: && exhaustive\
+        \ && ### && neighborhood && `instrument_ready: && cannot decide H-036 && the && exploratory\
+        \ finite-direction instrument: its float objectives do not certify a\n  packing bound,\
+        \ and no arm is silently promoted to an all-direction result && exact derived-domain\
+        \ adapter... does not\n  load target receipts or run a scientific target), && exact\
+        \ && Source-bound\n  exact C charge sweep and S first-owner filter... A low S strip\
+        \ charge is only failure of\n  a sufficient test, not an S witness) && analyze_bc303_h162_receipt.py`,\
+        \ && self-contained && File && What && `certificate.json` && T-018: && `certificate-19-5.json`,\
+        \ && the && `certificate-381-100-net720.json`, && T-024 && `t-022-…`, && dilation-limit\
+        \ && `verify_claim.py` && standalone, && exit && `minimal_verify.py` && the && **≈3\
+        \ && `replay.py` && loads && decides && ` && reader && the && ` && `Kernel.lean`,\
+        \ && ` && `verify.py`, && `threshold-atom-orbit-admission.md`, && admission && ###\
+        \ && it && n && side && site && value && sites && rows && rounds && conv. && least\
+        \ && frozen && 6 && 100 && auto-18-24-29 && 6.08216 && 1785 && 2020 && 8 && yes &&\
+        \ — && none && 6 && 100 && four-grid-18-24-29-34 && 6.07724 && 2941 && 2797 && 8 &&\
+        \ yes && — && none && 10 && — && — && — && — && — && — && — && — && **no && foreclosed\
+        \ && 11 && 100 && t025-auto-25-33-41-60 && 11.000000 && 7413 && 13008 && 60 && no\
+        \ && 0.992102 && none && 11 && 50 && grid && 11.000000 && 6637 && 14820 && 12 && **yes**\
+        \ && — && none && 11 && 50 && certificate-seeded && 11.000000 && 24069 && 30240 &&\
+        \ 24 && no && 0.9997 && none && 11 && 50 && vertex-seeded && 11.055617 && 12761 &&\
+        \ 9868 && 9 && yes && 1 && none && 11 && 50 && four-grid-26-35-43-48 && 11.142857\
+        \ && 6037 && 7677 && 31 && yes && 1 && none && 11 && 50 && auto-plus-60 && 11.106195\
+        \ && 6961 && 6041 && 21 && yes && 1 && none && 11 && 50 && t025-seeded-auto-plus-60\
+        \ && 11.020212 && 7249 && 7956 && 29 && yes && 1 && none && 11 && 50 && t025-seeded-auto-plus-60-windows5\
+        \ && 11.018646 && 7473 && 7832 && 35 && yes && 1 && none && 11 && 50 && t026-seeded-auto-plus-60\
+        \ && 11.033743 && 8081 && 8324 && 35 && yes && 1 && none && 11 && 100 && auto-25-34-41\
+        \ && 11.192598 && 3365 && 5233 && 24 && yes && 1 && none && 11 && 100 && four-grid-25-34-41-48\
+        \ && 11.142857 && 5665 && 6317 && 23 && yes && 1 && none && 11 && 100 && t025-seeded-four-grid\
+        \ && 11.140351 && 6249 && 6753 && 28 && yes && 1 && none && 11 && 25 && t025-auto-25-34-42-60\
+        \ && 11.371819 && 7705 && 8793 && 38 && yes && 1 && none && 11 && 20 && vertex-seeded\
+        \ && 11.227631 && 22625 && 14215 && 3 && no && — && none && 11 && 20 && t025-auto-25-34-42-60\
+        \ && 11.456576 && 7705 && 7194 && 26 && yes && 1 && none && 11 && 8 && t025-auto-25-34-42-60\
+        \ && 11.561186 && 7705 && 8892 && 38 && yes && 1 && none && 12 && 20 && unrecorded\
+        \ && 11.9706 && — && — && — && yes && — && certificate-79-20.json` && 12 && 25 &&\
+        \ unrecorded && 11.9936 && — && — && — && yes && — && certificate.json` && 12 && 1000\
+        \ && grid && 12.363498 && 3737 && 5226 && 25 && yes && 1 && none && 12 && 1000 &&\
+        \ t017-seed-auto-26-35-43 && 12.118036 && 5833 && 8148 && 29 && no && 0.993700 &&\
+        \ none && 12 && 1000 && t017-seed-four-grid-26-35-43-48 && 12.116115 && 8133 && 9056\
+        \ && 29 && no && 0.990495 && none && 12 && 1000 && t017-seed-four-grid-…-windows7\
+        \ && 12.091168 && 8569 && 10040 && 36 && no && 0.997200 && none && 12 && 100 && grid\
+        \ && 12.364038 && — && — && 26 && yes && — && none && 12 && 100 && certificate-seeded\
+        \ && 12.016263 && — && — && 8 && no && — && none && 12 && 100 && t017-seed-four-grid-26-35-43-48\
+        \ && 12.122748 && 8133 && 9290 && 33 && no && 0.987523 && none && 12 && 100 && t017-seed-four-grid-28-38-46-54-w7\
+        \ && 12.133391 && 9685 && 9678 && yes && 36 && 1 && none && 12 && 100 && t017-seed-auto-26-35-43-windows7\
+        \ && 12.097146 && 6269 && 8086 && 34 && no && 0.998924 && none && 12 && 100 && cutting-plane\
+        \ && 12.248227 && — && — && — && yes && — && none && 12 && 200 && t017-seed-auto-26-35-43-w7\
+        \ && 12.067502 && 6269 && 9171 && 38 && no && 0.989127 && none && 12 && 200 && t017-seed-four-grid-…-w7\
+        \ && 12.066995 && 8569 && 9701 && 35 && no && 0.988078 && none && 12 && 100, && grid\
+        \ && 16.000000 && — && — && 12 && no && — && none && 12 && 100, && certificate-seeded\
+        \ && 12.130682 && — && — && 3 && no && — && none && 17 && 50 && unrecorded && 16.9628\
+        \ && — && — && — && yes && — && certificate-229-50.json` && 17 && 100 && unrecorded\
+        \ && 16.9303 && — && — && — && **no** && — && certificate.json` && 17 && 5 && auto-32-42-52\
+        \ && 17.331710 && 5484 && 10302 && 39 && no && 0.994279 && none && 17 && 5 && t019-seed-auto-32-42-52\
+        \ && 17.049597 && 6668 && 11189 && 40 && no && 0.993656 && none && 17 && 5 && t019-seed-…-windows5\
+        \ && 17.042346 && 7068 && 10672 && 42 && no && 0.998191 && none && 17 && 5 && t019-seed-…-windows6\
+        \ && 17.048472 && 7244 && 12899 && 46 && no && 0.999569 && none && 17 && 5 && t019-seed-…-windows7\
+        \ && 17.046923 && 7452 && 12379 && 42 && no && 0.995294 && none && 17 && 5 && t019-seed-four-grid-34-45-56-64-w8\
+        \ && 17.120106 && 12317 && 16278 && 46 && no && 0.986645 && none && 17 && 100 && t019-seed-auto-32-43-53-w5\
+        \ && 17.195968 && 7253 && 14077 && 56 && no && 0.997823 && none && 18 && 100 && auto-32-43-53\
+        \ && 18.000000 && 5669 && 16426 && 57 && no && 0.973636 && none && 18 && 100 && t019-seed-auto-32-43-53\
+        \ && 17.875567 && 6853 && 11528 && 44 && yes && 1 && `certificate-467-100.json` &&\
+        \ 18 && 40 && t027-seed-…-w5 && 17.879034 && 6837 && 9607 && 38 && yes && 1 && `certificate-187-40.json`\
+        \ && 18 && 400 && t028-seed-…-w5 && 17.889237 && 6905 && 12165 && 56 && yes && 1 &&\
+        \ `certificate-1871-400.json` && 18 && 1000 && t029-seed-…-w5 && 17.893285 && 6985\
+        \ && 10098 && 39 && yes && 1 && certificate.json` && 18 && 25 && five && 18.000000\
+        \ && 6549–7253 && 10990–27516 && 35–157 && mixed && 0.960–1 && none && 18 && 100 &&\
+        \ t019-seed-auto-32-43-53 && 18.000000 && 6853 && 17282 && 59 && no && 0.981532 &&\
+        \ none && 18 && 10 && t019-seed-auto-33-44-54 && 18.165413 && 7117 && 11265 && 44\
+        \ && yes && 1 && none && 19 && 20 && t020-seed-…-w6 && 19.808958 && 8865 && 11546\
+        \ && 34 && no && 0.974389 && none && 19 && 100 && t020-seed-…-w6 && 19.132115 && 8865\
+        \ && 10697 && 37 && no && 0.951 && none && 19 && 50 && t020-seed-…-w6 && 19.247109\
+        \ && 8865 && 11317 && 38 && no && 0.976 && none && 20 && 5 && unrecorded && 18.916941\
+        \ && — && — && 9 && no && — && certificate-24-5.json` && 20 && 40 && grid && 19.862092\
+        \ && 6029 && 11083 && 54 && **yes** && 1 && certificate-193-40.json` && 20 && 20 &&\
+        \ certificate-seeded && 19.848723 && 8289 && — && — && **yes** && 1 && certificate.json`\
+        \ && 20 && 20 && grid && 20.000439 && 6029 && 9803 && 32 && no && 0.984497 && none\
+        \ && 20 && 200 && t021-seed-…-w6 && 19.910044 && 8285 && 11818 && 48 && no && 0.990\
+        \ && none && 20 && 200 && grid && 20.001502 && 6216–12676 && 5519–15731 && 16–45 &&\
+        \ no && 0.890 && none && 20 && 50 && t021-seed-four-grid-w7 && 19.887914 && 12676\
+        \ && 13250 && 36 && no && 0.965974 && none && 20 && 8, && grid && 20.016349 && 6216\
+        \ && 4259 && 12 && no && 0.864 && none && 21 && 20 && t021-seed-auto-34-45-56-w6 &&\
+        \ 19.814820 && 7197 && 11277 && 45 && no && 0.984206 && none && 21 && 200 && grid\
+        \ && 25.000000 && 6785 && 8692 && 24 && no && 0.841490 && none && adding && floor\
+        \ && conditional && class && the && consecutive && direction && n && m && lower &&\
+        \ best && ceiling && cap && limit && limited && prize && 11 && 4 && 3.8264 && 3.8771\
+        \ && 3.9908 && 3.8690 && 3.8690 && cap && +0.0426 && 12 && 4 && 3.9600 && 4.0000 &&\
+        \ 3.9908 && 3.9908 && 3.9908 && ceiling && +0.0308 && 17 && 5 && 4.5900 && 4.6755\
+        \ && 4.9885 && 4.6710 && 4.6710 && cap && +0.0810 && 18 && 5 && 4.6790 && 4.8229 &&\
+        \ 4.9885 && 4.8216 && 4.8216 && cap && +0.1426 && 19 && 5 && 4.8000 && 4.8856 && 4.9885\
+        \ && — && 4.9885 && packing && +0.0856 && 20 && 5 && 4.8500 && 5.0000 && 4.9885 &&\
+        \ 4.9885 && 4.9885 && ceiling && +0.1385 && 21 && 5 && 4.8500 && 5.0000 && 4.9885\
+        \ && 4.9885 && 4.9885 && ceiling && +0.1385 && **What && Family && Maximal && Max\
+        \ && Clique-LP && Independence && 88-placement && 205 && 8 && 3 && 10 && A6 && 69\
+        \ && 2 && 9 && 9 && 11 && four && plateau_reader && rank-two && it && # && Missing\
+        \ && Nearest && Why && Est. && G-1 && `decide_certificate.py` && `classcert.py` &&\
+        \ No && G-2 && **Contact-graph && contact_assembly.py`, && All && none && 3–6 && G-3\
+        \ && **Unshrunk && interval_audit.py` && `integral_piercing.py` && green17 && 2–3\
+        \ && the && G-4 && **Rational && *nothing.* && No && 3–5 && G-5 && **Rows-complete\
+        \ && `regenerate_sites1_checkpoint.py` && currently && Missing && 1–2 && G-6 && **Relational-certificate\
+        \ && `threshold_interval.py` && `relational.py:30-33` && G-7 && **Relational && `run_relational_colgen.py`\
+        \ && `threshold_separation.py` && `plateau_reader.py` && The && nothing && 2–3 &&\
+        \ G-8 && **n-parameterised && `produce_threshold_certificate.py` && 2-of-3, && Cannot\
+        \ && 1 && G-9 && 25+ && Every && several && 4–8 && this && G-10 && **Exact && bead\
+        \ && `cutting.py` && Without && 2–4 && the && G-11 && **Interval-route && `interval.py`\
+        \ && Refuses && 780 && 3–5 && unknown && G-12 && **11-point && none && `integral_piercing.py:3-7`\
+        \ && Only && Out && the && ## && `search` && # && ID && Status && Title && Blockers\
+        \ && 1 && `think-g3j7` && in_progress && Certificate format cannot express two atom\
+        \ classes: K5 clique and K6 floor && **`think-h1ju`** && 2 && `think-gyzw` && open\
+        \ && 40: run replacement-support column generation to convergence as a checkpointed\
+        \ tool. && `think-g3j7` && must && 3 && `think-3xbr` && open && 40. && missing &&\
+        \ 4 && `think-qqzs` && in_progress && H-216 && G5 && remaining && **`think-177v`**\
+        \ && 5 && `think-k4vb` && open && Expected && no && none && 6 && `think-ufmk` && in_progress\
+        \ && Preregister and authorize the Route S exp-161 target. && **`think-97we`** &&\
+        \ 7 && `think-2kyl` && open && Admit fixed-Q0 conditional certificate discriminator\
+        \ && `think-08tp`, && 8 && `think-1bht` && open && Derive an exact continuum-row oracle\
+        \ for fixed-Q0 certificates && `think-xhnq` && 9 && `think-ol1z` && open && — && none\
+        \ && **no && 10 && `think-9y6q` && open && contact family at side 3.84 && none &&\
+        \ Also && is && C4 && it && `minimal_verify` && colgen && scratch && several && it\
+        \ && only && escape"
+      : count: 1
+        total_seconds: 2.103
+        median_seconds: 2.103
+        max_seconds: 2.103
+      ^###:
+        count: 1
+        total_seconds: 1.255
+        median_seconds: 1.255
+        max_seconds: 1.255
+      ? ',v[n], && ,v[side], && ,v[site_set], && ,v[objective], && ,v[sites], && ,v[rows],
+        && ,v[rounds], && ,v[converged], && ,v[least_covered_mass], && ,v[frozen_artifact],'
+      : count: 1
+        total_seconds: 1.235
+        median_seconds: 1.235
+        max_seconds: 1.235
+      416,430p && (6 && 10 && 11 && 12 && 17 && 18 && 19 && 20 && (5:
+        count: 1
+        total_seconds: 1.154
+        median_seconds: 1.154
+        max_seconds: 1.154
+      ? "python3 && def && T-013 && T-014 && the && `t-026-…`, && exploratory finite-direction\
+        \ instrument: its float objectives do not certify a packing\n  bound, and no arm is\
+        \ silently promoted to an all-direction result && exact derived-domain adapter...\
+        \ does not load\n  target receipts or run a scientific target), && exact && Source-bound\
+        \ exact C\n  charge sweep and S first-owner filter... A low S strip charge is only\
+        \ failure of a\n  sufficient test, not an S witness) && analyze_bc303_h162_receipt.py`,\
+        \ && self-contained && 11 && four"
+      : count: 1
+        total_seconds: 1.075
+        median_seconds: 1.075
+        max_seconds: 1.075
+      mkdir && python3:
+        count: 1
+        total_seconds: 1.026
+        median_seconds: 1.026
+        max_seconds: 1.026
+      ls && ls:
+        count: 2
+        total_seconds: 0.958
+        median_seconds: 0.479
+        max_seconds: 0.886
+      ls && (ls:
+        count: 1
+        total_seconds: 0.957
+        median_seconds: 0.957
+        max_seconds: 0.957
+      ? python3 && out.append(ln) && i && i<len(out) && x && res.append(marker+w[0]) && res.extend(  +x
+        && Path(lane4-machinery.md).write_text(\n.join(res))
+      : count: 1
+        total_seconds: 0.938
+        median_seconds: 0.938
+        max_seconds: 0.938
+      ? "python3 && def && 11 && 50 && vertex-seeded,  && 11 && 100 && auto-25-34-41,\n &&\
+        \ 11 && 50 && vertex-seeded && four-grid-26-35-43-48 && auto-plus-60 && 11.055617\
+        \ && 11.142857 && 11.106195 && 6037–12761 && 6041–9868 && 9–31 && yes && 1 && none\
+        \ && 11 && 50 && t025-seeded-auto-plus-60 && t026-seeded-auto-plus-60 && 11.020212\
+        \ && 11.018646 && 11.033743 && 7249–8081 && 7832–8324 && 29–35 && yes && 1 && none\
+        \ && )\ncut( && 11 && 100 && auto-25-34-41,  && 11 && 25 && ,\n && 11 && 100 && auto-25-34-41\
+        \ && four-grid-25-34-41-48 && t025-seeded-four-grid && 11.192598 && 11.142857 && 11.140351\
+        \ && 3365–6249 && 5233–6753 && 23–28 && yes && 1 && none && )\ncut( && 17 && 5 &&\
+        \ t019-seed-auto-32-42-52 && ,  && 17 && 100 && ,\n && 17 && 5 && t019-seed-auto-32-42-52,\
+        \ && 17.049597 && 17.042346 && 17.048472 && 17.046923 && 6668–7452 && 10672–12899\
+        \ && 40–46 && **no** && 0.9937–0.9996 && none && 17 && 5 && t019-seed-four-grid-34-45-56-64-windows8\
+        \ && 17.120106 && 12317 && 16278 && 46 && no && 0.986645 && none && )\ncut( && 19\
+        \ && 100 && ,  && 21 && 20 && ,\n && 19 && 100 && 50 && t020-seed && 19.111435 &&\
+        \ 8865 && 10697–11500 && 34–38 && **no** && 0.951–0.976 && none && )\n\n# Section\
+        \ 1.3: trim\ncut(Adjacent && library && does && cannot decide H-036 && the && the\
+        \ && direction && rank-two && print(len(t.split(\\n)))"
+      : count: 1
+        total_seconds: 0.936
+        median_seconds: 0.936
+        max_seconds: 0.936
+      ? "python3 && 12 && 12 && 20 && 12 && 100, && 12 && 20 && unrecorded && 11.9706 && —\
+        \ && — && — && yes && — && certificate-79-20.json` && ,\n  && 12 && 25 && unrecorded\
+        \ && 11.9936 && — && — && — && yes && — && certificate.json` && ,\n  && 12 && 1000\
+        \ && grid && t017-seed && 12.363498 && 12.118036 && 3737–8569 && 5226–10040 && 25–36\
+        \ && yes && no && 1 && 0.9937 && none && ,\n  && 12 && 100 && grid && cert-seeded\
+        \ && t017-seed && cutting-plane && 12.364038 && 12.016263 && 12.122748 && 12.248227\
+        \ && ≤9685 && ≤9678 && 8–36 && mixed && ≤1 && none && ,\n  && 12 && 200 && t017-seed\
+        \ && 12.067502 && 6269 && 9171 && 38 && no && 0.9891 && none && ,\n  && 12 && 100,\
+        \ && grid && certificate-seeded && 12.130682 && — && — && 3–16 && no && — && none\
+        \ && 18 && 25 && five && 18 && 10 && 18 && 25 && 618-orbits, && 18.000000 && 6549–7253\
+        \ && 10990–27516 && 35–157 && 1 && 0.960–1 && none && ,\n  && 18 && 10 && t019-seed-auto-33-44-54\
+        \ && 18.165413 && 7117 && 11265 && 44 && yes && 1 && none && 20 && 20 && grid && 20\
+        \ && 8, && 20 && 20 && 200 && 200 && 50 && 8 && 200 && grid, && 19.857588 && 6029–12676\
+        \ && 3270–15731 && 8–48 && all && 0.729–0.992 && none"
+      : count: 1
+        total_seconds: 0.915
+        median_seconds: 0.915
+        max_seconds: 0.915
+      python3 && out.append(ln):
+        count: 1
+        total_seconds: 0.882
+        median_seconds: 0.882
+        max_seconds: 0.882
+      grep:
+        count: 5
+        total_seconds: 0.684
+        median_seconds: 0.088
+        max_seconds: 0.274
+      ls:
+        count: 6
+        total_seconds: 0.469
+        median_seconds: 0.076
+        max_seconds: 0.089
+      cat:
+        count: 2
+        total_seconds: 0.113
+        median_seconds: 0.057
+        max_seconds: 0.057
+      git log:
+        count: 1
+        total_seconds: 0.108
+        median_seconds: 0.108
+        max_seconds: 0.108
+      ls && ls && ls:
+        count: 1
+        total_seconds: 0.088
+        median_seconds: 0.088
+        max_seconds: 0.088
+      git && git && ls && ls:
+        count: 1
+        total_seconds: 0.075
+        median_seconds: 0.075
+        max_seconds: 0.075
+      ls && find:
+        count: 1
+        total_seconds: 0.074
+        median_seconds: 0.074
+        max_seconds: 0.074
+      fold:
+        count: 1
+        total_seconds: 0.064
+        median_seconds: 0.064
+        max_seconds: 0.064
+      cd:
+        count: 1
+        total_seconds: 0.063
+        median_seconds: 0.063
+        max_seconds: 0.063
+      cut:
+        count: 1
+        total_seconds: 0.063
+        median_seconds: 0.063
+        max_seconds: 0.063
+      270,300p:
+        count: 1
+        total_seconds: 0.058
+        median_seconds: 0.058
+        max_seconds: 0.058
+    by_command_family:
+      other:
+        count: 13
+        total_seconds: 34.523
+        median_seconds: 2.103
+        max_seconds: 7.105
+      inspection:
+        count: 48
+        total_seconds: 19.525
+        median_seconds: 0.08
+        max_seconds: 3.165
+      toolchain:
+        count: 5
+        total_seconds: 4.746
+        median_seconds: 0.936
+        max_seconds: 1.075
+      filesystem:
+        count: 1
+        total_seconds: 1.026
+        median_seconds: 1.026
+        max_seconds: 1.026
+      vcs:
+        count: 2
+        total_seconds: 0.183
+        median_seconds: 0.091
+        max_seconds: 0.108
+      shell:
+        count: 1
+        total_seconds: 0.063
+        median_seconds: 0.063
+        max_seconds: 0.063
+    invoked:
+      none: 72
+      —: 62
+      echo: 54
+      head: 51
+      'no': 39
+      sed: 35
+      'yes': 33
+      '12': 30
+      '1': 29
+      '11': 27
+      '20': 25
+      '100': 25
+      ls: 19
+      '50': 16
+      '5': 16
+      '17': 15
+      '18': 14
+      grep: 13
+      the: 13
+      grid: 13
+      '4.9885': 10
+      cd: 9
+      '200': 9
+      timeout npx: 8
+      '25': 8
+      '10': 7
+      '19': 7
+      '8': 7
+      unrecorded: 7
+      open: 7
+      python3: 6
+      '`': 6
+      '38': 6
+      '1000': 6
+      ? ",\n "
+      : 6
+      cut: 5
+      it: 5
+      certificate-seeded: 5
+      '9': 5
+      '21': 5
+      certificate.json`: 5
+      exact: 4
+      '11.142857': 4
+      '3': 4
+      100,: 4
+      '18.000000': 4
+      '8865': 4
+      ceiling: 4
+      cap: 4
+      '3.9908': 4
+      wc: 3
+      find: 3
+      cat: 3
+      '6': 3
+      '11.000000': 3
+      '**yes**': 3
+      '24': 3
+      vertex-seeded: 3
+      '29': 3
+      '35': 3
+      t025-auto-25-34-42-60: 3
+      '7705': 3
+      '36': 3
+      '6269': 3
+      '**no**': 3
+      '40': 3
+      '46': 3
+      '44': 3
+      t020-seed-…-w6: 3
+      '4': 3
+      in_progress: 3
+      t017-seed: 3
+      ? ')
+
+        cut('
+      : 3
+      ? ',
+
+        '
+      : 3
+      git log: 2
+      awk: 2
+      Path: 2
+      Refuses: 2
+      any: 2
+      S: 2
+      library: 2
+      does: 2
+      What: 2
+      Contact: 2
+      contact_assembly.py`,: 2
+      green17: 2
+      '###': 2
+      cannot decide H-036: 2
+      analyze_bc303_h162_receipt.py`,: 2
+      self-contained: 2
+      n: 2
+      '**no': 2
+      '11.055617': 2
+      four-grid-26-35-43-48: 2
+      auto-plus-60: 2
+      '11.106195': 2
+      t025-seeded-auto-plus-60: 2
+      '11.020212': 2
+      '11.018646': 2
+      t026-seeded-auto-plus-60: 2
+      '11.033743': 2
+      auto-25-34-41: 2
+      '11.192598': 2
+      four-grid-25-34-41-48: 2
+      t025-seeded-four-grid: 2
+      '11.140351': 2
+      '26': 2
+      '11.9706': 2
+      certificate-79-20.json`: 2
+      '11.9936': 2
+      '12.363498': 2
+      '12.118036': 2
+      t017-seed-four-grid-26-35-43-48: 2
+      '8133': 2
+      '8569': 2
+      '12.364038': 2
+      '12.016263': 2
+      '12.122748': 2
+      '34': 2
+      cutting-plane: 2
+      '12.248227': 2
+      '12.067502': 2
+      '9171': 2
+      '12.130682': 2
+      '39': 2
+      t019-seed-auto-32-42-52: 2
+      '17.049597': 2
+      '17.042346': 2
+      '42': 2
+      '17.048472': 2
+      '17.046923': 2
+      '17.120106': 2
+      '12317': 2
+      '16278': 2
+      '0.986645': 2
+      '56': 2
+      t019-seed-auto-32-43-53: 2
+      '6853': 2
+      five: 2
+      6549–7253: 2
+      10990–27516: 2
+      35–157: 2
+      mixed: 2
+      0.960–1: 2
+      t019-seed-auto-33-44-54: 2
+      '18.165413': 2
+      '7117': 2
+      '11265': 2
+      '6029': 2
+      8,: 2
+      direction: 2
+      '3.8690': 2
+      '4.6710': 2
+      '4.8216': 2
+      '4.8500': 2
+      '5.0000': 2
+      '+0.1385': 2
+      '2': 2
+      four: 2
+      rank-two: 2
+      '#': 2
+      Missing: 2
+      'No': 2
+      2–3: 2
+      3–5: 2
+      several: 2
+      '`think-g3j7`': 2
+      def: 2
+      ', ': 2
+      out.append(ln): 2
+      git branch: 1
+      416,430p: 1
+      (6: 1
+      (5: 1
+      (ls: 1
+      tail: 1
+      ',v[n],': 1
+      ',v[side],': 1
+      ',v[site_set],': 1
+      ',v[objective],': 1
+      ',v[sites],': 1
+      ',v[rows],': 1
+      ',v[rounds],': 1
+      ',v[converged],': 1
+      ',v[least_covered_mass],': 1
+      ',v[frozen_artifact],': 1
+      fold: 1
+      mkdir: 1
+      interpreter: 1
+      Field: 1
+      Value: 1
+      Driver: 1
+      run_fractional_colgen.py`: 1
+      Library: 1
+      colgen.py`: 1
+      Takes: 1
+      '`--n`,': 1
+      Emits: 1
+      a: 1
+      '`least_cell_mass`': 1
+      Decides: 1
+      '**nothing.**': 1
+      Verification: 1
+      producer: 1
+      Arbitrary: 1
+      Yes.: 1
+      Cost: 1
+      from: 1
+      Known: 1
+      '**point': 1
+      'Scheduler:': 1
+      Gate: 1
+      Language: 1
+      Routes: 1
+      '`decide_certificate`': 1
+      decide_certificate.py`: 1
+      unconditional: 1
+      both: 1
+      '`class`': 1
+      '`decide_threshold_certificate`': 1
+      decide_threshold_certificate.py`: 1
+      point: 1
+      k)`: 1
+      interval: 1
+      '`decide_relational_certificate`': 1
+      decide_relational_certificate.py`: 1
+      'v1`:': 1
+      '**two': 1
+      malformed: 1
+      '`declare_least_cell_mass`': 1
+      declare_least_cell_mass.py`: 1
+      fills: 1
+      leaves: 1
+      atom-orbit: 1
+      orbit: 1
+      ·: 1
+      k)`.: 1
+      addressed: 1
+      '`--search`': 1
+      '`--check`': 1
+      '`--certify`': 1
+      t-026-…json`,: 1
+      Instrument: 1
+      Separating-axis: 1
+      verify.py:1-19`: 1
+      validity: 1
+      '`float_sign`': 1
+      contacts.py`,: 1
+      contact-structure: 1
+      Cross-record: 1
+      assurance.py`: 1
+      rules: 1
+      Stromquist: 1
+      audits: 1
+      Trump: 1
+      '`interval_audit.py:1-22`:': 1
+      (other): 421
+    invoked_families:
+      other: 1344
+      inspection: 130
+      shell: 63
+      toolchain: 6
+      vcs: 3
+      filesystem: 1
+    by_shell_shape:
+      compound:
+        count: 43
+        total_seconds: 36.42
+        median_seconds: 0.1
+        max_seconds: 7.105
+      pipeline:
+        count: 14
+        total_seconds: 17.267
+        median_seconds: 0.116
+        max_seconds: 4.093
+      python_heredoc:
+        count: 6
+        total_seconds: 6.849
+        median_seconds: 0.937
+        max_seconds: 2.103
+      python_inline:
+        count: 2
+        total_seconds: 2.261
+        median_seconds: 1.131
+        max_seconds: 1.235
+      simple:
+        count: 6
+        total_seconds: 0.372
+        median_seconds: 0.061
+        max_seconds: 0.071
+    by_thinking_level:
+      medium:
+        count: 72
+        total_seconds: 64.391
+        median_seconds: 0.115
+        max_seconds: 7.105
+    shell_traits:
+      pipes: 49
+      substitutes: 6
+      redirects_output: 6
+  session_events:
+    compact_boundaries: 0
+    stop_hook_summaries: 0
+    queue_operations: {}
+  semantics:
+    wall_seconds: First to last timestamped record. It is elapsed session time and includes
+      every interval in which nothing was running, so it is an upper bound on work and never
+      a measure of it.
+    tool_call_seconds: From the assistant record issuing a tool_use to the user record carrying
+      its tool_result. It therefore includes harness scheduling and any permission wait, not
+      only the tool's own execution.
+    model_seconds: UNAVAILABLE for this harness. Claude Code's transcript records no timed
+      model-stream items and no first-token latency, so model time cannot be separated from
+      the interval before a turn's record is written. It is absent rather than zero, and a
+      consumer that sums it with a harness that does report it must carry the gap forward.
+    turns.latency: 'From a turn''s parent record to the turn itself. It is the closest thing
+      here to model time and is NOT model time: it also carries queueing, the user''s own
+      thinking time before a reply, and any wait for a permission prompt. Read the median,
+      not the maximum.'
+    share_of_wall: tool_call_seconds over wall_seconds. Concurrent calls are summed independently,
+      so on a session that backgrounds work this can exceed one and is a load figure, not
+      an occupancy figure.
+    tokens: 'As the harness reported them per turn, summed. Cache creation and cache read
+      are distinct from input tokens and are not double-counted here, but no cost is derived:
+      pricing is not this record''s and a stored price goes stale silently.'
+    tokens_by_thinking_level: The same counters split by the effort the harness recorded for
+      each turn. This is what makes OR-2's 'matched to the task' claim answerable rather than
+      asserted.
+    by_shell_shape: Structural classification of shell commands in a fixed priority order,
+      so a Python heredoc that also pipes counts as a Python heredoc. `python_heredoc` and
+      `python_inline` are the shapes OR-1 calls one-off code; a session with many of them
+      was writing scripts where it should have been building a tool.
+    by_command: 'The tool a shell command actually runs. Every chain is split into components,
+      shell bookkeeping and text munging are dropped, and what is left names the command:
+      one component and it takes the full invoked form, so `uv run packing-validate` keeps
+      its runner and `grep -rn x . | head -5` is `grep`; several and the name is the chain
+      of bare tools, so `make format && git add -A && git push` is `make && git && git`. Peeling
+      matters more than it sounds: keyed on the leading word instead, `cd` led 524 of 882
+      commands here. Past 256 distinct names the tail folds into `(other)`, which is a long
+      tail of odd commands or a resolver bug rather than anything to act on.'
+    invoked: 'Every tool reached for, counted across all segments of every command, not just
+      the one a call''s time was attributed to. Counts and never elapsed: most commands here
+      run several tools and the transcript times the call rather than the pipeline, so how
+      often a CLI was used is knowable and its share of the clock is not. This is the table
+      that answers which instruments a session actually uses; `by_command` answers where its
+      measured time went.'
+    by_command_family: Our own instruments against everything else. `project` is this repository's
+      CLIs and modules, `toolchain` the language tooling, `inspection` the reading and searching
+      a session does to orient itself. Time in `packing-validate` and time in `grep` are both
+      real and are not the same kind of cost.
+    errors: tool_result blocks the harness marked is_error. A failed call still spends its
+      elapsed time, and the count is here so a rising failure rate is visible rather than
+      hidden inside the total.
+    unpaired_results: tool_result blocks whose tool_use was not seen, which is normal for
+      a log that begins mid-session after a compaction. A large count means the elapsed figures
+      cover less than the session does.
+    session_events.queue_operations: Messages queued and withdrawn while a turn was running.
+      An enqueue is an interjection, which is a signal about the session's pacing rather than
+      about any tool.
+    excluded: 'Every prose body: assistant text, thinking text, user messages, tool stdout
+      and stderr, file contents, and diffs. This record is not a transcript and cannot be
+      read as one.'

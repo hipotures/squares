@@ -341,10 +341,19 @@ on.
 It is not the next thing, because a reassessment of what to search is queued in front
 of it.
 
-For the next supervised exact-research goal, take BC-357 under `think-qqzs`: close the
-n=6 calibration bracket at 299/100 under
-[H-216](../../../../packing/campaign/hypotheses/H-216-point-certificate-at-n6-299-100.md).
-G1, G2, G3, and G5 are on main; G4 remains on that bead and is not H-216’s instrument.
+For the next supervised exact-research goal, take BC-361 under `think-pogj`: decide
+[H-223](../../../../packing/campaign/hypotheses/H-223-n13-point-covering-at-399-100.md),
+[H-224](../../../../packing/campaign/hypotheses/H-224-n17-ceiling-family-at-23-5.md),
+and
+[H-225](../../../../packing/campaign/hypotheses/H-225-n26-seeded-certificate-at-53-10.md)
+on the stock instruments in Session 144 under `exp-213` to `exp-215`, with the BC-362
+Bentz 2016 replay lane beside it; the queue is
+[agenda-040](../../../../packing/campaign/agendas/agenda-040-overnight-lower-bound-loop.md)
+and the review that produced it is
+[X-040](../../../../packing/campaign/explorations/X-040-lower-bound-mechanisms-beyond-the-one-body-ceiling.md).
+BC-357 stays the registered n=6 calibration entry in agenda-037 under
+[H-216](../../../../packing/campaign/hypotheses/H-216-point-certificate-at-n6-299-100.md);
+G1, G2, G3, and G5 are on main and G4 remains on its bead and is not H-216’s instrument.
 The five X-037 owner decisions are resolved in
 [X-037](../../../../packing/campaign/explorations/X-037-n11-overnight-review-and-route-slate.md).
 Session 138’s overnight review measured M1 and M7 at stated scope and moved no bound;
