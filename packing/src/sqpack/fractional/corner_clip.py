@@ -81,6 +81,23 @@ type HalfPlane = tuple[Fraction, Fraction, Fraction]
 #: The four corner sign patterns, in the order (0,0), (L,0), (0,L), (L,L).
 _CORNERS: tuple[tuple[int, int], ...] = ((1, 1), (-1, 1), (1, -1), (-1, -1))
 
+#: What a record declares itself to be. A record with no ``variant`` is the
+#: unconditional theorem, which is what every reader here decided before the corner
+#: class existed; ``class`` is that one class, and ``conditional`` is reserved so a
+#: record declaring it is refused by name rather than read as the unconditional
+#: program. ``devtools.decide_certificate`` imports these so the gate's vocabulary and
+#: the readers' are one list, and ``devtools.independent_ceiling_reader`` restates them
+#: under its stdlib-only contract with a test pinning the two copies together.
+UNCONDITIONAL = "unconditional"
+CLASS = "class"
+CERTIFICATE_VARIANTS = (UNCONDITIONAL, CLASS, "conditional")
+#: The variants a reader-side clip reconciliation can decide. Everything else in
+#: ``CERTIFICATE_VARIANTS`` names a program no reader here implements, and anything
+#: outside it names nothing at all; both are refused before any clip is reconciled
+#: (review finding H1), because falling through to the requested clip would decide the
+#: unconditional program over bytes that declared something else.
+DECIDABLE_VARIANTS = (UNCONDITIONAL, CLASS)
+
 
 class EmptyClippedDomainError(ValueError):
     """The clip leaves no admissible centre at some direction.
@@ -297,21 +314,47 @@ def class_certificate_id(n: int, outer_side: Fraction, depth: Fraction) -> str:
     )
 
 
+def require_decidable_variant(variant: object) -> None:
+    """Refuse any declared variant these readers do not implement, naming it.
+
+    Absent means the unconditional theorem, and ``class`` is the one class implemented
+    here. Every other name is refused *before* the clip is reconciled: a reader that
+    asked only ``variant == "class"`` let ``conditional`` -- a name the gate's own
+    vocabulary already knows -- and every misspelling fall through to the requested clip
+    and be decided as the unconditional program (review finding H1). That mirrors
+    ``decide_certificate._require_declared_variant``, which has refused the same set at
+    the gate all along.
+    """
+
+    if variant is None or variant in DECIDABLE_VARIANTS:
+        return
+    if isinstance(variant, str) and variant in CERTIFICATE_VARIANTS:
+        raise ValueError(
+            f"the record declares variant: {variant}, and this reader decides only the "
+            f"unconditional program and the corner class; a {variant} record cannot be "
+            "read here"
+        )
+    raise ValueError(f"field 'variant' must be one of {CERTIFICATE_VARIANTS}, got {variant!r}")
+
+
 def declared_class_clip(record: Mapping[str, object]) -> Fraction | None:
     """The clip a record declares at its top level, or ``None`` for an unclipped one.
 
     The two fields go together: ``variant: class`` says the bytes decide a class, and
     ``corner_clip`` says which one. Half a declaration is refused rather than read as
-    either, so no record can lose its hypothesis by leaving a field out.
+    either, so no record can lose its hypothesis by leaving a field out. A variant this
+    reader does not implement is refused first, by name, so no unknown hypothesis is
+    read as the unconditional one either.
     """
 
     variant = record.get("variant")
+    require_decidable_variant(variant)
     declared = record.get("corner_clip")
     if declared is None:
-        if variant == "class":
+        if variant == CLASS:
             raise ValueError("a record declaring variant: class must declare corner_clip")
         return None
-    if variant != "class":
+    if variant != CLASS:
         raise ValueError("a record declaring corner_clip must declare variant: class")
     return Fraction(str(declared))
 
@@ -346,6 +389,10 @@ def agreed_class_clip(
 
 
 __all__ = [
+    "CERTIFICATE_VARIANTS",
+    "CLASS",
+    "DECIDABLE_VARIANTS",
+    "UNCONDITIONAL",
     "CornerClip",
     "EmptyClippedDomainError",
     "HalfPlane",
@@ -354,4 +401,5 @@ __all__ = [
     "class_claim",
     "clip_from_optional",
     "declared_class_clip",
+    "require_decidable_variant",
 ]

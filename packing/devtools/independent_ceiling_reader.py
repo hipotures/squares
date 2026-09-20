@@ -75,6 +75,18 @@ DEFAULT_RECORD = (
 )
 RETAINED_SHA256 = "95cf06473f185764076d21021b75cc65962ef6b68dc717c045c2c7d76ae12427"
 
+# What a record declares itself to be, restated rather than imported: this reader is
+# stdlib-only by contract and must not import ``sqpack``, whose
+# ``fractional.corner_clip`` holds the same two tuples for the tools that may. Neither
+# copy may grow a name the other lacks, and
+# ``tests/test_fractional_corner_clip.py`` fails if the two copies drift, in
+# ``test_the_reader_s_variant_vocabulary_matches_sqpack_s``.
+CERTIFICATE_VARIANTS = ("unconditional", "class", "conditional")
+# The variants this reader implements. Everything else is refused by name before any
+# clip is reconciled; reading a declared variant this reader does not implement as the
+# unconditional theorem is review finding H1.
+DECIDABLE_VARIANTS = ("unconditional", "class")
+
 type Point = tuple[Fraction, Fraction]
 # A x + B y = C over the integers, (A, B) != (0, 0), normalised by gcd and sign.
 type Line = tuple[int, int, int]
@@ -579,6 +591,28 @@ def controls(record: Record) -> list[dict[str, Any]]:
 # ----------------------------------------------------------------------------- CLI
 
 
+def require_decidable_variant(variant: object) -> None:
+    """Refuse any declared variant this reader does not implement, naming it.
+
+    Absent means the unconditional theorem and ``class`` means the corner class; every
+    other name -- ``conditional``, which the gate's vocabulary knows, or a misspelling,
+    which nothing knows -- is refused here rather than falling through to the requested
+    clip and being decided as the unconditional program (review finding H1). The same
+    allowlist is stated at the gate in ``decide_certificate._require_declared_variant``
+    and for the importing tools in ``sqpack.fractional.corner_clip``.
+    """
+
+    if variant is None or variant in DECIDABLE_VARIANTS:
+        return
+    if isinstance(variant, str) and variant in CERTIFICATE_VARIANTS:
+        raise ValueError(
+            f"the record declares variant: {variant}, and this reader decides only the "
+            f"unconditional theorem and the corner class; a {variant} record cannot be "
+            "read here"
+        )
+    raise ValueError(f"field 'variant' must be one of {CERTIFICATE_VARIANTS}, got {variant!r}")
+
+
 def agreed_corner_clip(fields: dict[str, Any], requested: Fraction | None) -> Fraction | None:
     """Reconcile the clip the record declares with the one the command line asked for.
 
@@ -588,10 +622,12 @@ def agreed_corner_clip(fields: dict[str, Any], requested: Fraction | None) -> Fr
     declares ``variant: class`` without ``--corner-clip`` would print this reader's
     unconditional theorem sentence over bytes that claim only a class, which is review
     defect D4, so that combination is refused. Asking for a clip on a record that
-    declares none stays allowed: that is this reader deciding K4 itself.
+    declares none stays allowed: that is this reader deciding K4 itself. A variant this
+    reader does not implement is refused first, by name.
     """
 
     variant = fields.get("variant")
+    require_decidable_variant(variant)
     declared_field = fields.get("corner_clip")
     if declared_field is None:
         if variant == "class":
