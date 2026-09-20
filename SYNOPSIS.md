@@ -1063,10 +1063,10 @@ H-230) is derived and reaches the 7.11 degree orbit but cuts no weighted pair of
 Two partial ports (the corner clip on the threshold routes, the gap_wedge tool) are
 retained as patches under results/agenda-040. No bound moved.
 
-**Selected next entry:** `think-b7pr`, BC-367: resume under `think-n1v2` from the
-retained patches and the wedge derivation (its review, exp-221 for H-230, BC-364’s
-disposition, the threshold clip), then H-232’s fixed-support screen under `think-qq32`,
-in Session 149 on the next stacked branch.
+**Selected next entry:** `think-n1v2`: resume chunk 5 from the retained patches and the
+wedge derivation (its review, exp-221 for H-230 and BC-364’s disposition, the threshold
+clip and the gap_wedge port), then H-232’s fixed-support screen, in Session 149 on the
+next stacked branch.
 BC-357 / H-216 stays the registered n=6 calibration entry in agenda-037.
 
 [Session 147](packing/campaign/agent-sessions/session-147-overnight-chunk-4.md)
