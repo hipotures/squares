@@ -811,6 +811,11 @@ on exactly that edge.
 
 ## Publishing the Explainer
 
+For every newly retained result, first complete the
+[new result publication sequence](packing/campaign/documentation-pass.md#new-result-publication):
+update the frontier, README and survey, and regenerate affected survey SVG/PDF/PNG
+exports together. That sequence also applies when no explainer edition changes.
+
 The explainer at <https://jlevy.github.io/squares/> is not checked in.
 GitHub Pages builds it from `main` in `.github/workflows/pages.yml`, on every push that
 touches one of the renderer’s declared inputs (`RENDER_INPUTS` in

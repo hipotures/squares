@@ -58,6 +58,70 @@ reverse: a pass that starts from the prose inherits the prose’s mistakes.
   witness is not a bound on `s(n)`. These are the sentences most likely to be smoothed
   away, and the ones that must not be.
 
+## New Result Publication
+
+Publish a newly retained result in the same change as its registration.
+Start from the accepted evidence and its scope; an unfinished search or a certificate
+awaiting a required verification route stays unresolved.
+For each result, complete this sequence before declaring the change ready to land:
+
+1. Update the owning case under `packing/frontier/`, `evidence.yaml`, and
+   `results.yaml`, as applicable, with the accepted claim, verification level,
+   provenance, and retained receipts.
+   Preserve earlier rungs and historical decisions.
+   Validate those source records before rendering, from `packing/`:
+
+   ```shell
+   uv run --frozen python -m devtools.validate_schemas
+   uv run --frozen python -m devtools.check_results
+   ```
+
+2. Render the result register, evidence inventory, frontier tables, and synopsis
+   headline from those records.
+   From `packing/`:
+
+   ```shell
+   uv run --frozen python -m devtools.render_results --update
+   uv run --frozen python -m devtools.render_evidence_inventory --update
+   uv run --frozen python -m devtools.render_research_tables
+   uv run --frozen python -m devtools.render_results_headline
+   ```
+
+3. When a result changes an atlas value, badge, label, or geometry, regenerate both
+   survey composites and all their exports together:
+
+   ```shell
+   uv run --frozen --all-extras --group dev python -m devtools.build_known_best_atlas --update
+   ```
+
+   This refreshes the figure data, both composite SVGs and PDFs, and all declared PNG
+   exports for `known-best-1-100` and `known-best-1-324`. Inspect the affected cards in
+   the SVG and PDF and confirm their values and evidence status against the frontier.
+   If a result does not affect those figures, record that disposition instead of
+   rebuilding unchanged geometry.
+
+4. Reconcile the README’s New Results and Survey sections, the synopsis’s current
+   claims, and affected tutorial or survey prose against the refreshed artifacts.
+   Each result marked `apparently-novel` or `confirmed-novel` needs an explicit result
+   ID and a scoped summary in the README; related rungs may share a paragraph.
+   Check older summaries that still call a superseded bound current.
+   Link to the record for detail, and distinguish a new bound from a solved case.
+   Append dated updates to historical reports instead of rewriting their original
+   conclusions.
+
+5. Run the renderers’ check modes, README and synopsis checks, and the applicable
+   [validation tiers](../../development.md#validation-tiers).
+   The atlas `--check --sample` checks every retained record, composite label, and
+   export receipt while rebuilding sampled case geometry; the full `--check` belongs in
+   the deferred checkpoint.
+   Retain the checked source/base and name each publication surface as updated or
+   checked current in the closeout.
+   A stacked PR must publish the results present at its own layer.
+
+README result-ID coverage catches an omitted novel result; it does not prove its
+handwritten summary correct.
+The editorial comparison and generated-artifact checks remain separate obligations.
+
 ## Synopsis Research-Status Roll-Up
 
 The synopsis owns the current, reader-facing synthesis of the research program.
@@ -141,11 +205,12 @@ its time context.
 **Generated graphics.** Figures drift the way prose does, and they drift more quietly
 because nobody rereads them.
 
-- Run each generator’s own check, which is the cheap half:
-  `build_known_best_atlas --check`, `check_svg_rendering --check`,
-  `render_known_best_contact_overlays --check`, `build_prospective_atlas --check`,
-  `build_composite_figure_data --check`, `render_document_map --check`. A failure here
-  means the stored artifact no longer matches its inputs.
+- Run the applicable generators’ checks: `build_known_best_atlas --check --sample`,
+  `check_svg_rendering --check`, `render_known_best_contact_overlays --check`,
+  `build_prospective_atlas --check`, `build_composite_figure_data --check`,
+  `render_document_map --check`. A failure here means the stored artifact no longer
+  matches its inputs. The full atlas geometry rebuild runs in the deferred checkpoint; it
+  is not a cheap documentation check.
 - Then the half no checker does: **a figure can be byte-identical to its inputs and
   still be stale in meaning.** If the record now says something the figure was drawn
   before: a bound moved, a case was added, a claim narrowed.
@@ -153,9 +218,10 @@ because nobody rereads them.
   Read each figure against the sentence that introduces it.
 - Never hand-edit a generated artifact.
   If it is wrong, the generator is wrong.
-- Two known limits, so a pass does not rediscover them: the composite PNG needs macOS
-  `sips` or ImageMagick 7 and cannot be regenerated on a stock Linux runner, and
-  emission precision is pinned at 28 ([D-359](../../defects.md)) with a related check
+- Composite PNGs and PDFs use the locked CairoSVG dependency and the system Cairo
+  library described in
+  [Supported Environment](../../development.md#supported-environment).
+  Emission precision is pinned at 28 ([D-359](../../defects.md)) with a related check
   still open ([D-362](../../defects.md)); a pass that finds a figure needing a precision
   change is looking at that defect, not at a figure bug.
 
