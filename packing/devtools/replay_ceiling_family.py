@@ -33,6 +33,7 @@ from pathlib import Path
 from typing import Any
 
 from sqpack.fractional.ceiling import CeilingCertificate, CeilingVerdict, verify_ceiling
+from sqpack.fractional.corner_clip import clip_from_optional
 
 
 @dataclass(frozen=True)
@@ -133,12 +134,28 @@ def main(argv: Sequence[str] | None = None) -> int:
         action="store_true",
         help="fail unless the replay reproduces what each record claims",
     )
+    parser.add_argument(
+        "--corner-clip",
+        type=Fraction,
+        default=None,
+        metavar="d",
+        help=(
+            "also decide K4: every placement avoids the corner triangles x + y <= d, "
+            "which is what makes the family a ceiling for lane-a Theorem B's "
+            "free-corner class rather than for the unconditional program"
+        ),
+    )
     arguments = parser.parse_args(argv)
+    if arguments.corner_clip is not None and not 0 < arguments.corner_clip <= 1:
+        parser.error("--corner-clip must satisfy 0 < d <= 1")
     failed = False
     for path in arguments.paths:
         certificate, expectation = load_family(path)
         started = time.perf_counter()
-        verdict = verify_ceiling(certificate)
+        clip = clip_from_optional(
+            arguments.corner_clip, certificate.outer_side, certificate.square_side
+        )
+        verdict = verify_ceiling(certificate, clip=clip)
         line = report(path, certificate, verdict, expectation, time.perf_counter() - started)
         if arguments.check:
             problems = compare(verdict, expectation)

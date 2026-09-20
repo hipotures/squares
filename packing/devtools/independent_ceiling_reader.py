@@ -372,6 +372,76 @@ def check_k3(record: Record) -> dict[str, Any]:
     return {"holds": total >= record.n, "total_weight": str(total), "n": record.n}
 
 
+def check_k4(record: Record, depth: Fraction) -> dict[str, Any]:
+    """K4: every placement avoids the four closed corner triangles ``x + y <= depth``.
+
+    Written from the statement, like the rest of this file. For a closed square of side
+    S centred at (x, y) at angle theta, the linear functional x + y is extreme at the
+    four vertices, where it takes the values x + y + S * {cos, sin, -sin, -cos}; so its
+    minimum over the square is x + y - S * max(|cos|, |sin|). The folded maximum, not
+    the cosine: this record stores mirrored placements whose stated angle is near a
+    quarter turn while the square itself is near axis-parallel, and reading cos there
+    would put a flush corner square deep in the container. The other three corners are
+    the same statement in the frames that put them at the origin, i.e. with x replaced
+    by L - x, y by L - y, or both.
+
+    A family is a ceiling for the *clipped* covering program only if every placement is
+    a constraint of that program, and a placement meeting a corner triangle is not: the
+    free class removed it from the row domain.
+    """
+
+    reached: list[dict[str, str]] = []
+    worst: Fraction | None = None
+    for index, sq in enumerate(record.squares):
+        c, s = sq.frame()
+        reach = sq.side * max(abs(c), abs(s))
+        x, y, side = sq.centre_x, sq.centre_y, record.outer_side
+        penetration = min(
+            x + y - reach,
+            (side - x) + y - reach,
+            x + (side - y) - reach,
+            (side - x) + (side - y) - reach,
+        )
+        if worst is None or penetration < worst:
+            worst = penetration
+        if penetration <= depth:
+            reached.append({"index": str(index), "penetration": str(penetration)})
+    return {
+        "holds": not reached,
+        "depth": str(depth),
+        "least_penetration": None if worst is None else str(worst),
+        "placements_meeting_a_triangle": reached[:8],
+        "count_meeting_a_triangle": len(reached),
+    }
+
+
+def clipped_residual(record: Record, depth: Fraction) -> dict[str, Any]:
+    """The weight the family keeps and loses to the clip, exactly.
+
+    Not a condition: a reading. It is what makes the reader usable as the control on
+    the predicate itself -- the retained 88-family transported to 96/25 keeps exactly 7
+    of its 11 at ``depth = 1/2``, which is the number R1 measured.
+    """
+
+    kept = Fraction(0)
+    removed = Fraction(0)
+    for sq in record.squares:
+        c, s = sq.frame()
+        reach = sq.side * max(abs(c), abs(s))
+        x, y, side = sq.centre_x, sq.centre_y, record.outer_side
+        penetration = min(
+            x + y - reach,
+            (side - x) + y - reach,
+            x + (side - y) - reach,
+            (side - x) + (side - y) - reach,
+        )
+        if penetration <= depth:
+            removed += sq.weight
+        else:
+            kept += sq.weight
+    return {"depth": str(depth), "kept": str(kept), "removed": str(removed)}
+
+
 def check_d4(record: Record) -> dict[str, Any]:
     """Both multisets, corner sets and folded triples, under each of the eight isometries."""
     corner_sets = Counter((frozenset(sq.corners()), sq.weight) for sq in record.squares)
@@ -402,8 +472,21 @@ def check_d4(record: Record) -> dict[str, Any]:
     }
 
 
-def theorem(record: Record, k0: dict[str, Any]) -> str:
+def theorem(record: Record, k0: dict[str, Any], corner_clip: Fraction | None = None) -> str:
     used = ", ".join(str(k) for k in k0["net_indices_used"])
+    if corner_clip is not None:
+        return (
+            f"For n = {record.n}, L = {record.outer_side}, B = {record.square_side}, and "
+            f"the corner threshold d = {corner_clip}: no D4-symmetric measure on "
+            f"[0, L]^2 of total mass below {record.n} gives mass >= 1 to every closed "
+            f"B-square at a net angle inside [0, L]^2 that avoids all four closed corner "
+            f"triangles x + y <= d, for this net and every net containing the net angles "
+            f"with indices {used}. Hence no point-atom certificate conditioned on lane-a "
+            f"Theorem B's all-free corner class certifies s({record.n}) >= "
+            f"{record.outer_side} at this shrink and net, on any site set. It says "
+            f"nothing about the unconditional program, about the other bin classes, or "
+            f"about whether {record.n} unit squares fit in side {record.outer_side}."
+        )
     return (
         f"For n = {record.n}, L = {record.outer_side}, B = {record.square_side}: no "
         f"D4-symmetric measure on [0, L]^2 of total mass below {record.n} gives mass >= 1 "
@@ -417,14 +500,17 @@ def theorem(record: Record, k0: dict[str, Any]) -> str:
     )
 
 
-def decide(record: Record) -> dict[str, Any]:
+def decide(record: Record, corner_clip: Fraction | None = None) -> dict[str, Any]:
     started = time.perf_counter()
     k0 = check_k0(record)
     k1 = check_k1(record)
     k2 = check_k2(record)
     k3 = check_k3(record)
+    k4 = None if corner_clip is None else check_k4(record, corner_clip)
     d4 = check_d4(record)
     proved = k0["holds"] and k1["holds"] and k2["holds"] and k3["holds"]
+    if k4 is not None:
+        proved = proved and k4["holds"]
     return {
         "n": record.n,
         "outer_side": str(record.outer_side),
@@ -435,11 +521,15 @@ def decide(record: Record) -> dict[str, Any]:
         "K1": k1,
         "K2": k2,
         "K3": k3,
+        "K4": k4,
+        "corner_clip_residual": (
+            None if corner_clip is None else clipped_residual(record, corner_clip)
+        ),
         "D4": d4,
         "regime": "net" if k0["holds"] else "invalid",
         "symmetric_only": k0["mirror_placements"] > 0,
         "proved": proved,
-        "theorem": theorem(record, k0) if proved else None,
+        "theorem": theorem(record, k0, corner_clip) if proved else None,
         "seconds": round(time.perf_counter() - started, 3),
     }
 
@@ -517,10 +607,24 @@ def main(argv: Sequence[str] | None = None) -> int:
         action="store_true",
         help="also run the three perturbed records and require each to be rejected",
     )
+    parser.add_argument(
+        "--corner-clip",
+        type=Fraction,
+        default=None,
+        metavar="d",
+        help=(
+            "also decide K4: every placement avoids the four closed corner triangles "
+            "x + y <= d, which is what makes the family a ceiling for lane-a Theorem "
+            "B's free-corner class rather than for the unconditional program. The "
+            "kept and removed weight are reported either way"
+        ),
+    )
     args = parser.parse_args(argv)
+    if args.corner_clip is not None and not 0 < args.corner_clip <= 1:
+        parser.error("--corner-clip must satisfy 0 < d <= 1")
     try:
         record, digest = read_record(args.record, args.expect_sha256)
-        result = decide(record)
+        result = decide(record, args.corner_clip)
         result["record"] = str(args.record)
         result["sha256"] = digest
         result["retained_sha256_matches"] = digest == RETAINED_SHA256

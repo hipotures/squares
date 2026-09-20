@@ -52,6 +52,7 @@ import numpy as np
 from scipy.optimize import linprog
 
 from sqpack.fractional.certificate import Certificate, d4_images, verify
+from sqpack.fractional.corner_clip import CornerClip
 from sqpack.fractional.generate import (
     LP_FEASIBILITY,
     build_site_grid,
@@ -282,6 +283,24 @@ def square_at(
     )
 
 
+def square_excluded(square: Square, clip: CornerClip, outer_side: Fraction) -> bool:
+    """Whether this placement meets one of the four corner triangles.
+
+    The square is stored as two orthonormal slabs in coordinates from the container
+    centre, and a D4 image has its axes permuted and signed, so the predicate is asked
+    over the axes rather than over an angle no image carries.
+    """
+
+    half = outer_side / 2
+    x = square.ax * square.u + square.bx * square.v
+    y = square.ay * square.u + square.by * square.v
+    return clip.excludes_square(
+        (square.ax, square.ay, square.bx, square.by),
+        (x + half, y + half),
+        square.half,
+    )
+
+
 def symmetrise(
     weighted: tuple[tuple[Square, Fraction], ...],
 ) -> tuple[tuple[Square, Fraction], ...]:
@@ -476,6 +495,7 @@ def solve_rows(
     tolerance: float = 1e-9,
     timings: list[RoundTiming] | None = None,
     deadline: float | None = None,
+    clip: CornerClip | None = None,
 ) -> LpSolution:
     """Row-generate on a fixed site set until no placement is short of mass 1.
 
@@ -556,7 +576,13 @@ def solve_rows(
         least_covered = float("inf")
         for index, direction in enumerate(directions):
             for mass, cu, cv, covers in placement_cells(
-                points, site_weights, direction, outer, side, keep=rows_per_direction
+                points,
+                site_weights,
+                direction,
+                outer,
+                side,
+                keep=rows_per_direction,
+                clip=clip,
             ):
                 # Cells arrive in ascending mass, so the first at a direction is
                 # that direction's least covered placement whether or not it is
@@ -662,6 +688,7 @@ def dual_support(
     *,
     support_cap: int | None,
     denominator: int = 10**6,
+    clip: CornerClip | None = None,
 ) -> tuple[DualSupportRow, ...]:
     """The dual support as exact centres and weights, heaviest rows first.
 
@@ -685,6 +712,13 @@ def dual_support(
         y = min(max(y, extent), outer_side - extent)
         weight = Fraction(float(duals[index])).limit_denominator(denominator)
         if weight <= 0:
+            continue
+        if clip is not None and clip.excludes(x, y, direction.ux, direction.uy):
+            # Snapping a float centre to a rational can carry it across the cut. A
+            # placement outside the clipped domain is not a constraint of the clipped
+            # program, so it is dropped rather than frozen into a family that would
+            # then fail the readers' K4 -- and dropping only lowers the total, which is
+            # the harmless direction for a ceiling.
             continue
         entries.append((direction_index, x, y, weight))
     return tuple(entries)
@@ -938,6 +972,7 @@ def check_ceiling(
     outer_side: Fraction,
     *,
     screen: float = 1e-7,
+    clip: CornerClip | None = None,
 ) -> CeilingResult:
     """Decide whether a dual bars every atom measure of mass below ``n``.
 
@@ -955,6 +990,12 @@ def check_ceiling(
     when the raw total was bought by double-covering part of the container.
     """
 
+    if clip is not None:
+        weighted = tuple(
+            (square, weight)
+            for square, weight in weighted
+            if not square_excluded(square, clip, outer_side)
+        )
     if not weighted:
         return CeilingResult(
             proved=False,
@@ -1127,6 +1168,7 @@ def generate_adaptive(
     seed_points: Iterable[tuple[Fraction, Fraction]] = (),
     timings: list[RoundTiming] | None = None,
     deadline: float | None = None,
+    clip: CornerClip | None = None,
 ) -> tuple[Certificate | None, AdaptiveLog]:
     """Row- and column-generate; decide the result exactly only when asked.
 
@@ -1182,6 +1224,7 @@ def generate_adaptive(
                 rows_per_direction=rows_per_direction,
                 timings=timings,
                 deadline=deadline,
+                clip=clip,
             )
             seconds = time.perf_counter() - started
             note = solution.stopped
@@ -1253,6 +1296,7 @@ def generate_adaptive(
                 outer_side,
                 square_side,
                 support_cap=support_cap,
+                clip=clip,
             )
             weighted = dual_squares(
                 rows,
@@ -1262,7 +1306,7 @@ def generate_adaptive(
                 square_side,
                 support_cap=support_cap,
             )
-            log.ceiling = check_ceiling(n, symmetrise(weighted), outer_side)
+            log.ceiling = check_ceiling(n, symmetrise(weighted), outer_side, clip=clip)
             _write(handle, f"ceiling: proved={log.ceiling.proved} {log.ceiling.detail}")
         if not solution.converged:
             return None, log
@@ -1287,7 +1331,7 @@ def generate_adaptive(
             f"over {len(atoms)} atoms",
         )
         if decide:
-            verdict = verify(candidate_certificate)
+            verdict = verify(candidate_certificate, clip=clip)
             log.accepted = verdict.accepted
             log.failures = verdict.failures
             log.least_cell_mass = verdict.minimum_cell_mass
@@ -1361,6 +1405,7 @@ __all__ = [
     "solve_lp",
     "solve_rows",
     "square_at",
+    "square_excluded",
     "symmetrise",
     "verify",
 ]
