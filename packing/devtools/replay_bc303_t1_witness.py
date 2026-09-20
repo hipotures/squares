@@ -26,7 +26,7 @@ from typing import cast
 from strif import atomic_write_text
 
 SCHEMA = "bc303-literal-t1-witness/v1"
-SOURCE_REVISION = "39714308ce2081abbd76624387d134fee4be6deb"
+SOURCE_REVISION = "8f4eca7d23cdfc32091b9f783fdcadf7cb269615"
 READER_PATH = "packing/devtools/replay_bc303_t1_witness.py"
 MEASURE_PATH = (
     "packing/campaign/series/series-000-smoke-and-calibration/results/agenda-030/"
@@ -109,6 +109,9 @@ class Measure:
     weight_scale: int
 
 
+# 2026-09-20: re-bound to 8f4eca7d after the corner-clip instrument (Session 145,
+# PR 206) changed these modules on clip-free-identical code paths; the replay
+# reproduced the retained determination unchanged.
 SOURCES = (
     SourceSpec(
         "docs/project/research/research-2026-09-12-n11-selection-routing-first-principles.md",
@@ -151,13 +154,13 @@ SOURCES = (
     ),
     SourceSpec(
         "packing/src/sqpack/fractional/certificate.py",
-        "902d19e7f9914d9d53c422c2cd050c787ea685d5",
-        20_972,
+        "5c48d1709b19fc65d39e3abe89cfad43e2123cbe",
+        22_423,
     ),
     SourceSpec(
         "packing/src/sqpack/fractional/sweep.py",
-        "6bd5c56564a8f1a0681213c9b083cf62e4621a95",
-        17_536,
+        "81aaa87307d88f7397051eacaa6518b525e0dffc",
+        19_453,
     ),
     SourceSpec(
         "packing/src/sqpack/fractional/adaptive.py",
@@ -196,8 +199,8 @@ SOURCES = (
     ),
     SourceSpec(
         "packing/src/sqpack/fractional/generate.py",
-        "d6e90df695d3c3f59db6529ab904955cdd20f3a5",
-        21_285,
+        "179d1d11b58b4127b6475046fc988cf3bff60f10",
+        23_474,
     ),
 )
 

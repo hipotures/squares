@@ -43,11 +43,14 @@ S_FIRST_POSITIVE = 4_524_185
 ATOM_COUNT = 377
 TOTAL_INTEGER_MASS = 45_048_398
 DIRECTION_STEPS = 180
-SOURCE_REVISION = "39714308ce2081abbd76624387d134fee4be6deb"
+SOURCE_REVISION = "8f4eca7d23cdfc32091b9f783fdcadf7cb269615"
 SOURCE_PATH = (
     "packing/campaign/series/series-000-smoke-and-calibration/results/agenda-030/"
     "bc-293-measure-free-96-25.json"
 )
+# 2026-09-20: re-bound to 8f4eca7d after the corner-clip instrument (Session 145,
+# PR 206) changed these modules on clip-free-identical code paths; the replay
+# reproduced the retained determination unchanged.
 SOURCE_FILES = (
     SOURCE_PATH,
     "packing/devtools/owner_footprints.py",

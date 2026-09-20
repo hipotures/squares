@@ -47,6 +47,9 @@ RETAINED_FAMILY_PATH = RETAINED_ROOT / "ceiling-family-191-50.json"
 RETAINED_BIN16_PATH = RETAINED_ROOT / "lane-x4-nbins.py.txt"
 PUBLISHED_CHILDREN_PATH = RETAINED_ROOT / "lane-x4-survivors-16.json"
 
+# 2026-09-20: re-bound to 8f4eca7d after the corner-clip instrument (Session 145,
+# PR 206) changed these modules on clip-free-identical code paths; the replay
+# reproduced the retained determination unchanged.
 SOURCE_BLOBS: tuple[tuple[str, Path, str], ...] = (
     (
         "retained ceiling family",
@@ -81,7 +84,7 @@ SOURCE_BLOBS: tuple[tuple[str, Path, str], ...] = (
     (
         "ceiling-family reader",
         Path("packing/src/sqpack/fractional/ceiling.py"),
-        "f026bd04186787096fb57128517e319e7ee1ae00",
+        "e74916c02303f368798b2bcee6b36f9442cb0375",
     ),
     (
         "exact direction model",
