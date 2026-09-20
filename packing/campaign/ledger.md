@@ -162,6 +162,7 @@ Each entry summarizes one user-level research window. Cycle slots are wall-clock
 | [session-145](agent-sessions/session-145-overnight-chunk-2.md) | completed | contemporaneous | `pipeline-improvement` (correctness) | `pipeline-improvement` (correctness) | 1 | think-ni3v | Session 146 under think-b7pr takes BC-367 on the next stacked branch. |
 | [session-146](agent-sessions/session-146-overnight-chunk-3.md) | completed | contemporaneous | `research-loop` (insight) | `research-loop` (insight) | 1 | think-b7pr | Session 147 under think-b7pr writes the BC-367 registration entry at the reviewed scope, then the mixed classes and n=26. |
 | [session-147](agent-sessions/session-147-overnight-chunk-4.md) | completed | contemporaneous | `research-loop` (insight) | `research-loop` (insight) | 1 | think-b7pr | Session 148 under think-b7pr takes BC-367's mixed classes and the n=26 second site set on the next stacked branch. |
+| [session-148](agent-sessions/session-148-overnight-chunk-5.md) | in_progress | contemporaneous | `insight-iteration` (insight) | `insight-iteration` (insight) | 1 | think-b7pr | Close the record with the hosted gate on this tree; BC-367's runs stay on think-b7pr. |
 
 ### Workflow summary
 
@@ -171,7 +172,7 @@ Declared counts are contemporaneous contracts; retrospective counts are reconstr
 | --- | ---: | ---: | ---: | ---: |
 | `research-survey` | 2 | 2 | 13 | 2 |
 | `factual-review` | 7 | 0 | 53 | 2 |
-| `insight-iteration` | 25 | 1 | 81 | 4 |
+| `insight-iteration` | 26 | 1 | 82 | 4 |
 | `process-review` | 16 | 4 | 64 | 6 |
 | `efficiency-loop` | 10 | 1 | 36 | 1 |
 | `research-loop` | 30 | 4 | 104 | 8 |

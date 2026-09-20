@@ -7,12 +7,12 @@ softschema:
   schema: schemas/session-close-report.schema.yaml
   envelope: null
   status: enforced
-count: 147
+count: 148
 generated_by: >-
   uv run --frozen --all-extras --group dev python -m devtools.close_session --render
 totals:
   sessions_measured: 93
-  sessions_unmeasured: 54
+  sessions_unmeasured: 55
   attributed:
     rollups: 151
     turns: 43282
@@ -2431,4 +2431,14 @@ sessions:
   tool_errors: 2
   one_off_code: 79
   wall_hours: 7.59
+  codex_receipts: []
+- id: session-148
+  title: "Chunk 5 — The Second Stage Inside the All-Deep Class, and the Gap-g Wedge"
+  status: in_progress
+  primary_bead: think-b7pr
+  phases: 1
+  measured: false
+  unmeasured_reason: >-
+    declares no resource measurement
+  rollups: []
   codex_receipts: []
