@@ -141,11 +141,11 @@ hypothesis status and summarizes experiment verdicts, and the
 
 | Record | Count | State at the cutoff |
 | --- | ---: | --- |
-| Agendas | 36 | 16 active; 14 completed; 5 paused; 1 superseded |
-| Commitments | 349 | 178 complete; 60 stopped; 66 blocked; 15 ready; 21 tentative; 9 in progress |
+| Agendas | 37 | 17 active; 14 completed; 5 paused; 1 superseded |
+| Commitments | 355 | 178 complete; 61 stopped; 68 blocked; 18 ready; 21 tentative; 9 in progress |
 | Sessions | 143 | 85 completed; 57 stopped; 1 nonterminal |
-| Explorations | 38 | 23 linked to proposed hypotheses; 15 uncodified |
-| Hypotheses | 159 | 28 confirmed; 29 refuted; 51 blocked; 14 unresolved; 5 open; 28 open questions; 2 result registered; 2 abandoned; 0 running |
+| Explorations | 38 | 24 linked to proposed hypotheses; 14 uncodified |
+| Hypotheses | 169 | 28 confirmed; 29 refuted; 57 blocked; 14 unresolved; 8 open; 29 open questions; 2 result registered; 2 abandoned; 0 running |
 | Experiments | 147 | 41 accepted; 34 rejected; 46 unresolved; 12 baseline; 11 blocked; 3 abandoned; 0 in progress |
 | Frontier results | 30 | 30 registered |
 
@@ -4073,6 +4073,16 @@ round that names the hypothesis, control roles included.
 | [H-219](packing/campaign/hypotheses/H-219-t028-seeded-colgen-raises-s18.md) | confirmed | A rows-complete covering of mass strictly below 18 exists at a container side in (187/40, 117/25) on a T-028-seeded stock-colgen site set | 1 | T-029 |
 | [H-220](packing/campaign/hypotheses/H-220-seedless-colgen-raises-nagamochi-floor.md) | unresolved | A rows-complete covering of mass strictly below n exists at a queued Nagamochi-only side on a seedless stock-colgen site set | 8 | exp-166 unresolved at 29.803318; exp-167 unresolved at 28.331329; exp-168 unresolved at 27.178193; exp-169 unresolved at 25.000000; exp-170 unresolved at 25.000000; exp-171 unresolved, freeze interval-refused; exp-172 unresolved at 42.137360; exp-173 unresolved at 41.236782 |
 | [H-221](packing/campaign/hypotheses/H-221-t029-seeded-colgen-raises-s18.md) | confirmed | A rows-complete covering of mass strictly below 18 exists at a container side in (1871/400, 117/25) on a T-029-seeded stock-colgen site set | 1 | T-030 |
+| [H-222](packing/campaign/hypotheses/H-222-n11-octagon-class-at-96-25.md) | blocked | The all-free corner class at n=11, 96/25, d = 1/2 has restricted covering value below 11; blocked on a convex corner-clip domain predicate | 0 | — |
+| [H-223](packing/campaign/hypotheses/H-223-n13-point-covering-at-399-100.md) | open | A point-atom certificate exists at n=13, 399/100 on a window-seeded site set; calibration under s(13) = 4 | 0 | — |
+| [H-224](packing/campaign/hypotheses/H-224-n17-ceiling-family-at-23-5.md) | open | A depth-one ceiling family of total 17 exists at n=17, 23/5, closing the fixed-shrink point route there for every site set | 0 | — |
+| [H-225](packing/campaign/hypotheses/H-225-n26-seeded-certificate-at-53-10.md) | open | A seeded point certificate exists at n=26, 53/10, a first-party floor above Nagamochi’s 5 | 0 | — |
+| [H-226](packing/campaign/hypotheses/H-226-n21-one-spare-wall-charge-lemma.md) | blocked | The one-spare wall-charge lemma closes n=21 after the Theorem 11 replay at the printed constant; blocked on the enumeration tool | 0 | — |
+| [H-227](packing/campaign/hypotheses/H-227-n32-one-spare-wall-charge-lemma.md) | blocked | The one-spare wall-charge lemma closes n=32; blocked on the same tool | 0 | — |
+| [H-228](packing/campaign/hypotheses/H-228-n12-unshrunk-covering-at-side-4.md) | blocked | An unshrunk covering below 12 exists at n=12, side 4; blocked on an unshrunk verifier | 0 | — |
+| [H-229](packing/campaign/hypotheses/H-229-n11-tilted-anchor-case-at-96-25.md) | blocked | The tilted-anchor case containing the 29° slot has covering value below 10 at 96/25; blocked on the non-convex domain instrument | 0 | — |
+| [H-230](packing/campaign/hypotheses/H-230-a6-family-violates-a-gap-wedge-conflict.md) | blocked | A gap-g wall-wedge conflict edge cuts the A6 64-family; blocked on the gap extension and a conflict-edge atom class | 0 | — |
+| [H-231](packing/campaign/hypotheses/H-231-theta-on-pose-cells.md) | open question | Theta on a sound pose-cell graph at n=11; stays retired under X-037’s condition | 0 | — |
 
 ### Confirmed
 
@@ -4919,12 +4929,12 @@ table above.
 
 Kept with the same discipline as the experiment record, because the aggregate says
 things no individual bug report can.
-The log contains 504 defects, [one line each](defects.md), generated from `defects.yaml`
+The log contains 506 defects, [one line each](defects.md), generated from `defects.yaml`
 and checked in the gate.
 
 | Class | Count | The system … |
 | --- | ---: | --- |
-| soundness | 100 | asserted something false about the mathematics |
+| soundness | 102 | asserted something false about the mathematics |
 | validity | 127 | was correct, but the measurement did not bear on the question |
 | bookkeeping | 190 | recorded something its own evidence contradicts |
 | robustness | 68 | did not finish, or finished only by luck |
@@ -4948,11 +4958,11 @@ That allocation remains unimplemented and needs measurement.
 
 Two observations the log exists to make.
 
-**79 of the 100 soundness defects pointed in the *flattering* direction**, where the
+**79 of the 102 soundness defects pointed in the *flattering* direction**, where the
 error looks like a success.
 That is the dangerous class, and it is the majority of it.
 
-**The automated gate has caught eighty defects in 504, and no soundness defect ever.**
+**The automated gate has caught eighty defects in 506, and no soundness defect ever.**
 Every soundness failure was found by a control cell whose answer was known in advance, a
 rule written down before the measurement, a generated view contradicting its source, or
 someone reading carefully.
@@ -5303,7 +5313,7 @@ It is contained rather than fixed — such delegations are recorded on completio
 `read_only` flag is better than permitting an empty list that would be ambiguous between
 “writes nothing” and “nobody filled this in”.
 
-116 fixes left no regression check behind.
+118 fixes left no regression check behind.
 [D-300](defects.md) remains open: the yielded session id, output, timeout/final poll,
 and exit survived, but invalid `gdate` precision left the start and end fields empty, so
 [D-202](defects.md), [D-217](defects.md), and `think-b3bm` remain open.

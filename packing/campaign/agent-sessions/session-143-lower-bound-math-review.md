@@ -30,7 +30,7 @@ session:
       n=11 relational mathematics beyond the one-body ceiling; mechanisms beyond the
       current route slate; material targets at n=17 and other n; and the machinery
       and evidence map that prices each first discriminator.
-    status: in_progress
+    status: completed
     entered_by: session_start
     switch_reason: null
     budget_minutes: 150
@@ -48,12 +48,42 @@ session:
     fallback: >-
       Record the negative as an exploration outcome, keep think-qqzs / H-216 as the
       selected entry, and close the block with dispositions only.
+    outcome: >-
+      Four lane reports (n=11 relational, mechanisms beyond the slate, other n,
+      machinery map) and three Fable adversarial reviews; R1 killed the corner
+      deep branches at the target side, R2 killed the theta screen and the stress
+      theorem as stated, R3 found the Bentz 2016 transcription defect (D-505) and
+      corrected the one-spare case tree. X-040 integrates all seven.
+    evidence:
+    - packing/campaign/explorations/X-040-lower-bound-mechanisms-beyond-the-one-body-ceiling.md
+    - packing/defects.yaml
+    stop_reason: Lanes and reviews complete; integration and replanning move to W10.
+    next_action: Register the adapted hypotheses and the overnight agenda.
+  - workflow: review-planning-oversight
+    focus: insight
+    recording: contemporaneous
+    clock_role: work
+    objective: >-
+      Register the adapted hypotheses H-222 to H-231, open agenda-040 with the
+      overnight queue and the five retirements, correct the Bentz 2016 transcription
+      under D-505 and D-506, close the session record, and select the next entry.
+    status: in_progress
+    entered_by: evidence_checkpoint
+    switch_reason: All four lanes and three reviews reported.
+    budget_minutes: 60
+    started_at: '2026-09-20T07:05:00Z'
+    deadline_at: '2026-09-20T08:05:00Z'
+    expected_output: >-
+      Ten hypothesis records, agenda-040, D-505 and D-506 with the corrected
+      transcription, a closed session record, and PR 204 ready for review.
+    validation_command: >-
+      cd packing && uv run --frozen --all-extras --group dev packing-validate --fast
+    kill_condition: A registration cannot state a kill rule, or a record check refuses the tree.
+    fallback: Register what can be stated, leave the rest as open questions, and close.
     outcome: null
     evidence: []
     stop_reason: null
-    next_action: >-
-      Adversarial review wave over the lane reports, then integration into X-040 and
-      an agenda-037 item.
+    next_action: Open Session 144 on a stacked branch and run BC-361.
   budget:
     wall_minutes: 240
     finalization_minutes: 40
@@ -69,20 +99,12 @@ session:
   delegations:
   - task: n=11 relational mathematics beyond the one-body ceiling, conditioned certificate program
     operator: lane1_n11_relational; Claude Fable max
-    status: in_progress
+    status: completed
     recording: contemporaneous
     phase: 1
-    started_at: '2026-09-20T06:12:00Z'
-    deadline_at: '2026-09-20T08:15:00Z'
-    write_scope: [session scratchpad lanes/lane1-n11-relational.md]
-    excluded_commands: [run_fractional_colgen, run_covering_queue, produce_threshold_certificate, git commit, git push, any edit under the repository tree]
-    budget_minutes: 123
-    expected_output: A lane report in the session scratchpad with a 15-line summary.
-    validation_command: Coordinator reads the report and checks every cited path exists.
-    kill_condition: The lane exceeds its deadline or proposes only mechanisms already on the X-037 or BC-347 slate.
-    fallback: Record the lane as stopped and integrate whatever partial report exists.
-    outcome: null
-    evidence: []
+    outcome: >-
+      Eleven-orbit reading of the 88-family, saturation of every one-body cap, ring–centre relation named, corner tree and tilted-anchor tree proposed with exact gains on the fixed families.
+    evidence: [packing/campaign/explorations/X-040-lower-bound-mechanisms-beyond-the-one-body-ceiling.md]
     files: []
     checks: []
     uncertainty: A lane report is evidence, not a verdict; every derived lemma needs independent review before registration.
@@ -91,20 +113,12 @@ session:
     next_action: Adversarial review and integration into X-040.
   - task: Mechanisms different in kind from the shrunken-core fixed-net certificate
     operator: lane2_new_mechanisms; Claude Fable max
-    status: in_progress
+    status: completed
     recording: contemporaneous
     phase: 1
-    started_at: '2026-09-20T06:12:00Z'
-    deadline_at: '2026-09-20T08:15:00Z'
-    write_scope: [session scratchpad lanes/lane2-new-mechanisms.md]
-    excluded_commands: [run_fractional_colgen, run_covering_queue, produce_threshold_certificate, git commit, git push, any edit under the repository tree]
-    budget_minutes: 123
-    expected_output: A lane report in the session scratchpad with a 15-line summary.
-    validation_command: Coordinator reads the report and checks every cited path exists.
-    kill_condition: The lane exceeds its deadline or proposes only mechanisms already on the X-037 or BC-347 slate.
-    fallback: Record the lane as stopped and integrate whatever partial report exists.
-    outcome: null
-    evidence: []
+    outcome: >-
+      Eleven mechanisms evaluated; theta, stress, uniform m^2-3, unshrunk verifier, Bentz idiom at 12, and wedge conflicts ranked; wall-wedge lemma derived.
+    evidence: [packing/campaign/explorations/X-040-lower-bound-mechanisms-beyond-the-one-body-ceiling.md]
     files: []
     checks: []
     uncertainty: Literature-derived lemmas need source checks against the archived copies before use.
@@ -113,20 +127,12 @@ session:
     next_action: Adversarial review and integration into X-040.
   - task: Material lower-bound or exact-value targets at n=17 and other n
     operator: lane3_other_n; Claude Fable extra
-    status: in_progress
+    status: completed
     recording: contemporaneous
     phase: 1
-    started_at: '2026-09-20T06:12:00Z'
-    deadline_at: '2026-09-20T08:15:00Z'
-    write_scope: [session scratchpad lanes/lane3-other-n.md]
-    excluded_commands: [run_fractional_colgen, run_covering_queue, produce_threshold_certificate, git commit, git push, any edit under the repository tree]
-    budget_minutes: 123
-    expected_output: A lane report in the session scratchpad with a 15-line summary.
-    validation_command: Coordinator reads the report and checks every cited path exists.
-    kill_condition: The lane exceeds its deadline or proposes only mechanisms already on the X-037 or BC-347 slate.
-    fallback: Record the lane as stopped and integrate whatever partial report exists.
-    outcome: null
-    evidence: []
+    outcome: >-
+      Hex-set count m^2 - ceil(m/2) derived; one-spare cases 21, 32, 45 identified; n=17 cap and Bidwell geometry analysed; n=26 and n=12 priced.
+    evidence: [packing/campaign/explorations/X-040-lower-bound-mechanisms-beyond-the-one-body-ceiling.md]
     files: []
     checks: []
     uncertainty: Reach estimates are judgments, not measured covering values.
@@ -135,38 +141,101 @@ session:
     next_action: Adversarial review and integration into X-040.
   - task: Instrument, evidence, and ceiling map to price every first discriminator
     operator: lane4_machinery; Claude Opus high
-    status: in_progress
+    status: completed
     recording: contemporaneous
     phase: 1
-    started_at: '2026-09-20T06:12:00Z'
-    deadline_at: '2026-09-20T08:15:00Z'
-    write_scope: [session scratchpad lanes/lane4-machinery.md]
-    excluded_commands: [run_fractional_colgen, run_covering_queue, produce_threshold_certificate, git commit, git push, any edit under the repository tree]
-    budget_minutes: 123
-    expected_output: A lane report in the session scratchpad with a 15-line summary.
-    validation_command: Coordinator reads the report and checks every cited path exists.
-    kill_condition: The lane exceeds its deadline or proposes only mechanisms already on the X-037 or BC-347 slate.
-    fallback: Record the lane as stopped and integrate whatever partial report exists.
-    outcome: null
-    evidence: []
+    outcome: >-
+      Instrument, evidence, ceiling, and gap map; only the unconditional point language is fully instrumented; no run log retained for any restricted optimum.
+    evidence: [packing/campaign/explorations/X-040-lower-bound-mechanisms-beyond-the-one-body-ceiling.md]
     files: []
     checks: []
     uncertainty: Build-cost estimates are not measured receipts.
     elapsed_seconds: null
     elapsed_quality: unavailable
     next_action: Integration into X-040's machinery section.
+  - task: Adversarial review of lane 1
+    operator: review1_of_lane1; Claude Fable max
+    status: completed
+    recording: contemporaneous
+    phase: 1
+    outcome: >-
+      Every lane number reproduced; transported to 96/25 and 77/20 the corner deep
+      branches are exactly neutral; cell-24 edge corrected to 6.4537°; anchor gain at
+      most 1.5 per cell; first measurement is the octagon class.
+    evidence: [packing/campaign/explorations/X-040-lower-bound-mechanisms-beyond-the-one-body-ceiling.md]
+    files: []
+    checks: [Strict-interior overlap recount; exact homothety transport with depth verified; strip constants re-derived.]
+    uncertainty: H-131 used without replay; the record's transport was not compared with the reviewer's homothety.
+    elapsed_seconds: null
+    elapsed_quality: unavailable
+    next_action: Integrated into X-040 and H-222, H-229.
+  - task: Adversarial review of lane 2
+    operator: review2_of_lane2; Claude Fable max
+    status: completed
+    recording: contemporaneous
+    phase: 1
+    outcome: >-
+      Theta chain correct but the screen cannot discriminate and the dual matrix is
+      dense (44% edge density at 3.83); stress theorem false as stated; wedge lemma
+      confirmed (0.3203) with the 64-family's 7.11° orbit at gap 0.016 leaving the
+      kill unmet; s(12) reach estimate and the m = 5, 6 uniform test rejected.
+    evidence: [packing/campaign/explorations/X-040-lower-bound-mechanisms-beyond-the-one-body-ceiling.md]
+    files: []
+    checks: [Wedge brute force; Trump wedge check on the exact build; Monte Carlo pose-pair density.]
+    uncertainty: Several literature citations and the 19-per-unit-side slope unverified.
+    elapsed_seconds: null
+    elapsed_quality: unavailable
+    next_action: Integrated into X-040, H-223, H-230, H-231.
+  - task: Adversarial review of lane 3
+    operator: review3_of_lane3; Claude Fable max
+    status: completed
+    recording: contemporaneous
+    phase: 1
+    outcome: >-
+      Cap and hex-set count verified; Bentz 2016 transcription prints (sqrt 2 - 1)/2
+      where the PDF prints sqrt 2 - 1/2, and the proof closes only with the printed
+      constant; n=45 is (0, 1) and blocked by the m = 7 height budget; n=21 has up to
+      six stationary points; Green's numbers verified.
+    evidence: [packing/campaign/explorations/X-040-lower-bound-mechanisms-beyond-the-one-body-ceiling.md, packing/defects.yaml]
+    files: []
+    checks: [Chord minima on the printed line replayed (1.0000 full, 0.8468 partial); rendered PDF pages 6 and 7 compared by the coordinator.]
+    uncertainty: Whether an alternative m = 7 layout restores the 0.1 slide.
+    elapsed_seconds: null
+    elapsed_quality: unavailable
+    next_action: D-505 and H-226, H-227.
+  - task: Correct the Bentz 2016 transcription and file D-505 and D-506
+    operator: fix_bentz_transcription; Claude Opus high
+    status: completed
+    recording: contemporaneous
+    phase: 2
+    outcome: >-
+      Fifteen LaTeX spans corrected to the PDF's constants (D-505) and Lemma 7's
+      0.505 sqrt 2 and Lemma 5 reference restored (D-506), each with inline notes;
+      README annotation row 3 to 7; defects.md and the synopsis defect counts
+      regenerated; glyph positions read from the PDF with pdfminer confirm both.
+    evidence: [packing/defects.yaml, packing/resources/papers/bentz-2016-optimal-packings-22-and-33.md, packing/resources/README.md]
+    files: [packing/resources/papers/bentz-2016-optimal-packings-22-and-33.md, packing/resources/README.md, packing/defects.yaml, defects.md, SYNOPSIS.md]
+    checks: [check_synopsis, check_rung_figures, and check_math_spans (467 spans, 0 changed) passed; flowmark check clean.]
+    uncertainty: The raw extraction is ambiguous at the same spots, so the corrections are read from the PDF's glyph positions and the rendered pages.
+    elapsed_seconds: null
+    elapsed_quality: unavailable
+    next_action: Coordinator verifies the diff against the rendered pages and commits.
   outputs:
   - packing/campaign/agent-sessions/session-143-lower-bound-math-review.md
+  - packing/campaign/explorations/X-040-lower-bound-mechanisms-beyond-the-one-body-ceiling.md
+  - packing/campaign/agendas/agenda-040-overnight-lower-bound-loop.md
+  - packing/campaign/hypotheses/H-222-n11-octagon-class-at-96-25.md
+  - packing/campaign/hypotheses/H-226-n21-one-spare-wall-charge-lemma.md
   checks: []
   stop_reason: null
   next_action: Integrate the lane reports after the adversarial review wave.
 ---
 # Session 143: Deeper Mathematical Review of Lower-Bound Routes
 
-The entry point is **W3 insight-iteration**, requested by the owner from the top of
-PR 202. The synopsis handoff names `think-qqzs` / H-216 as the next scientific entry;
-this block is an owner-directed deviation from that order under OR-4, recorded here so
-the deviation is visible rather than silent.
+The entry point is **W3 insight-iteration**, requested by the owner from the top of PR
+202\. The synopsis handoff names `think-qqzs` / H-216 as the next scientific entry; this
+block is an owner-directed deviation from that order under OR-4, recorded here so the
+deviation is visible rather than silent.
 
 The block asks a strategic question rather than running a target: where have the
 lower-bound results been, and what deeper mathematics could move them materially.
