@@ -21,9 +21,10 @@ experiment:
       under the corner class hypothesis, and freeze-family for the ceiling readers
     engine: >-
       sqpack.fractional.colgen through devtools.run_fractional_colgen --corner-clip 1/2;
-      declare_least_cell_mass; both routes of decide_certificate --corner-clip 1/2;
-      polish_ceiling_family, independent_ceiling_reader --corner-clip 1/2 and
-      replay_ceiling_family --corner-clip 1/2 (condition K4)
+      declare_least_cell_mass; both routes of decide_certificate --corner-clip 1/2. The
+      ceiling readers (polish_ceiling_family, independent_ceiling_reader and
+      replay_ceiling_family with --corner-clip 1/2, condition K4) were not run: the
+      frozen family's total 8.94 is below the kill line
     assurance: verified
     method: exact-algebraic
     host_system: Claude cloud session 145; project Python 3.14.7; four CPUs

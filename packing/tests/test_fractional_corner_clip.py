@@ -25,11 +25,14 @@ import pytest
 from devtools.decide_certificate import main as gate_main
 from devtools.declare_least_cell_mass import declare
 from devtools.independent_ceiling_reader import decide as read_ceiling
+from devtools.independent_ceiling_reader import main as ceiling_reader_main
 from devtools.independent_ceiling_reader import parse_record
-from devtools.run_fractional_colgen import certificate_json
+from devtools.polish_ceiling_family import load_family as load_polishable_family
+from devtools.replay_ceiling_family import main as replay_family_main
+from devtools.run_fractional_colgen import RunSettings, certificate_json, freeze_priced_family
 from sqpack.fractional.ceiling import CeilingCertificate, verify_ceiling
 from sqpack.fractional.certificate import Certificate, verify
-from sqpack.fractional.colgen import square_at, square_excluded
+from sqpack.fractional.colgen import AdaptiveLog, square_at, square_excluded
 from sqpack.fractional.corner_clip import CornerClip, EmptyClippedDomainError
 from sqpack.fractional.interval import verify_by_intervals
 from sqpack.fractional.model import Atom, rotation_from_half_tangent
@@ -421,3 +424,158 @@ def test_the_declaration_tool_reads_the_clip_out_of_the_record(tmp_path: Path) -
     assert accepted
     assert "under the corner clip d = 1" in detail
     assert json.loads(path.read_text())["least_cell_mass"] == "1"
+
+
+# --- the strings the bytes carry (review defects D1 and D4) -------------------
+
+
+def test_an_unclipped_freeze_keeps_the_theorem_s_claim_and_id_byte_for_byte() -> None:
+    """The unconditional strings are the ones every retained candidate already has."""
+    record = json.loads(certificate_json(_tiny_certificate(), "1"))
+    assert record["claim"] == "s(5) >= 19/10"
+    assert record["id"] == "C-n005-fractional-19-10"
+    assert "variant" not in record
+    assert "corner_clip" not in record
+
+
+def test_a_clipped_freeze_claims_the_class_and_cannot_be_read_as_a_bound() -> None:
+    """D1: ``variant`` was the only field between these bytes and ``s(n) >= L``."""
+    clip = CornerClip(TINY_SIDE, TINY_SHRINK, Fraction(1))
+    record = json.loads(certificate_json(_tiny_certificate(), "1", clip=clip))
+    assert record["claim"] == "corner class d = 1 excluded at s(5) >= 19/10"
+    # The one property a reader scanning for bounds depends on.
+    assert not str(record["claim"]).startswith("s(")
+    assert record["id"] == "C-n005-fractional-19-10-clip-1-1"
+    assert record["variant"] == "class"
+    assert record["corner_clip"] == "1"
+
+
+def test_the_gate_refuses_the_unconditional_claim_on_a_class_record(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """The shape of the exp-219 bytes: variant: class, theorem claim. Refused, by name."""
+    path = _frozen(tmp_path, CornerClip(TINY_SIDE, TINY_SHRINK, Fraction(1)))
+    record = json.loads(path.read_text())
+    record["claim"] = "s(5) >= 19/10"
+    path.write_text(json.dumps(record, indent=1) + "\n")
+    assert gate_main([str(path), "--corner-clip", "1"]) == 1
+    printed = capsys.readouterr().out
+    assert "is the unconditional theorem conclusion on a variant: class record" in printed
+    assert "corner class d = 1 excluded at s(5) >= 19/10" in printed
+
+
+def test_the_gate_refuses_a_class_record_carrying_the_unconditional_id(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    path = _frozen(tmp_path, CornerClip(TINY_SIDE, TINY_SHRINK, Fraction(1)))
+    record = json.loads(path.read_text())
+    record["id"] = "C-n005-fractional-19-10"
+    path.write_text(json.dumps(record, indent=1) + "\n")
+    assert gate_main([str(path), "--corner-clip", "1"]) == 1
+    printed = capsys.readouterr().out
+    assert "!= class id 'C-n005-fractional-19-10-clip-1-1'" in printed
+
+
+def test_the_gate_accepts_the_class_claim_and_id_under_the_flag(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """What the driver writes is what the gate expects, on the same bytes."""
+    path = _frozen(tmp_path, CornerClip(TINY_SIDE, TINY_SHRINK, Fraction(1)))
+    assert gate_main([str(path), "--corner-clip", "1"]) == 0
+    assert "RETAINABLE UNDER THE CORNER CLASS HYPOTHESIS" in capsys.readouterr().out
+
+
+def test_the_unconditional_claim_check_is_unchanged_without_the_flag(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    path = _frozen(tmp_path, None)
+    record = json.loads(path.read_text())
+    record["claim"] = "s(5) >= 2"
+    path.write_text(json.dumps(record, indent=1) + "\n")
+    assert gate_main([str(path)]) == 1
+    assert "!= theorem conclusion 's(5) >= 19/10'" in capsys.readouterr().out
+
+
+# --- the family record and the readers that print sentences about it ----------
+
+
+def _priced_family(tmp_path: Path, depth: Fraction | None) -> Path:
+    """One priced support row frozen as a ceiling family, clipped or not."""
+    centre = TINY_SIDE / 2
+    settings = RunSettings(
+        n=5,
+        outer_side=TINY_SIDE,
+        square_side=TINY_SHRINK,
+        grid_counts=(2,),
+        inset=Fraction(1, 2),
+        angle_limit=TINY_NET[-1],
+        direction_steps=1,
+        scale=1000,
+        column_rounds=1,
+        max_rounds=1,
+        rows_per_direction=1,
+        corner_clip=depth,
+    )
+    log = AdaptiveLog(stopped="test", priced_support=((0, centre, centre, Fraction(1)),))
+    tmp_path.mkdir(parents=True, exist_ok=True)
+    path = freeze_priced_family(settings, log, tmp_path / "family.json")
+    assert path is not None
+    return path
+
+
+def test_a_clipped_family_declares_the_class_at_its_top_level(tmp_path: Path) -> None:
+    """D4: the clip was reachable only through ``provenance.settings``."""
+    record = json.loads(_priced_family(tmp_path / "clipped", Fraction(1)).read_text())
+    assert record["variant"] == "class"
+    assert record["corner_clip"] == "1"
+    assert record["provenance"]["settings"]["corner_clip"] == "1"
+    plain = json.loads(_priced_family(tmp_path / "plain", None).read_text())
+    assert "variant" not in plain
+    assert "corner_clip" not in plain
+    assert "corner_clip" not in plain["provenance"]["settings"]
+
+
+def test_the_replay_refuses_a_class_family_until_it_is_asked_for_that_clip(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    path = _priced_family(tmp_path, Fraction(1))
+    assert replay_family_main([str(path)]) == 1
+    printed = capsys.readouterr().out
+    assert "declares variant: class at corner clip d = 1" in printed
+    assert replay_family_main([str(path), "--corner-clip", "1/2"]) == 1
+    assert "declared corner_clip 1 != the requested 1/2" in capsys.readouterr().out
+    assert replay_family_main([str(path), "--corner-clip", "1"]) == 0
+    assert '"corner_clip": "1"' in capsys.readouterr().out
+
+
+def test_the_independent_reader_refuses_a_class_family_without_the_flag(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    path = _priced_family(tmp_path, Fraction(1))
+    assert ceiling_reader_main([str(path)]) == 2
+    printed = capsys.readouterr().out
+    assert "variant: class at corner clip d = 1" in printed
+    # Whatever it printed, it is not this reader's unconditional theorem sentence.
+    assert "no D4-symmetric measure" not in printed
+
+
+def test_the_polisher_refuses_a_class_family_rather_than_dropping_the_clip(
+    tmp_path: Path,
+) -> None:
+    path = _priced_family(tmp_path, Fraction(1))
+    with pytest.raises(ValueError, match="decides the unconditional program only"):
+        load_polishable_family(path, None)
+    # An unclipped family is polishable exactly as before.
+    assert load_polishable_family(_priced_family(tmp_path / "plain", None), None) is not None
+
+
+def test_the_declaration_tool_refuses_a_class_record_with_no_threshold(
+    tmp_path: Path,
+) -> None:
+    path = _frozen(tmp_path, CornerClip(TINY_SIDE, TINY_SHRINK, Fraction(1)))
+    record = json.loads(path.read_text())
+    del record["corner_clip"]
+    record["least_cell_mass"] = None
+    path.write_text(json.dumps(record, indent=1) + "\n")
+    with pytest.raises(ValueError, match="must declare corner_clip"):
+        declare(path)

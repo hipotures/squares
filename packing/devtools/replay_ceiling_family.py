@@ -33,7 +33,7 @@ from pathlib import Path
 from typing import Any
 
 from sqpack.fractional.ceiling import CeilingCertificate, CeilingVerdict, verify_ceiling
-from sqpack.fractional.corner_clip import clip_from_optional
+from sqpack.fractional.corner_clip import agreed_class_clip, clip_from_optional
 
 
 @dataclass(frozen=True)
@@ -49,8 +49,13 @@ class Expectation:
         return self.vertices is None and self.max_depth is None and self.scaled_total is None
 
 
-def load_family(path: Path) -> tuple[CeilingCertificate, Expectation]:
-    """The family a frozen record or a state file carries, and what it claims."""
+def load_family(path: Path) -> tuple[CeilingCertificate, Expectation, dict[str, Any]]:
+    """The family a frozen record or a state file carries, what it claims, and its record.
+
+    The record itself comes back because its top-level ``variant`` and ``corner_clip``
+    say which program the family is a ceiling for, and a replay that ignored them would
+    report an unconditional verdict over bytes that declare a class (review defect D4).
+    """
     data = json.loads(path.read_text())
     if "best_family" in data:
         record = data["best_family"]
@@ -63,7 +68,7 @@ def load_family(path: Path) -> tuple[CeilingCertificate, Expectation]:
             vertices=None if "vertices" not in recorded else int(recorded["vertices"]),
             max_depth=None if "max_depth" not in recorded else _rational(recorded["max_depth"]),
         )
-    return CeilingCertificate.from_record(record), expectation
+    return CeilingCertificate.from_record(record), expectation, record
 
 
 def _rational(value: Any) -> Fraction:
@@ -150,13 +155,21 @@ def main(argv: Sequence[str] | None = None) -> int:
         parser.error("--corner-clip must satisfy 0 < d <= 1")
     failed = False
     for path in arguments.paths:
-        certificate, expectation = load_family(path)
+        certificate, expectation, record = load_family(path)
         started = time.perf_counter()
-        clip = clip_from_optional(
-            arguments.corner_clip, certificate.outer_side, certificate.square_side
-        )
+        try:
+            depth = agreed_class_clip(
+                record, arguments.corner_clip, reader="devtools.replay_ceiling_family"
+            )
+        except ValueError as error:
+            print(json.dumps({"path": str(path), "refused": str(error)}))
+            failed = True
+            continue
+        clip = clip_from_optional(depth, certificate.outer_side, certificate.square_side)
         verdict = verify_ceiling(certificate, clip=clip)
         line = report(path, certificate, verdict, expectation, time.perf_counter() - started)
+        # Which program this line is about, in the line itself.
+        line["corner_clip"] = None if clip is None else str(clip.depth)
         if arguments.check:
             problems = compare(verdict, expectation)
             if expectation.empty:

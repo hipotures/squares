@@ -70,6 +70,7 @@ is rational and no angle, tolerance or float takes part in the predicate.
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
 from fractions import Fraction
 
@@ -267,9 +268,90 @@ def clip_from_optional(
     return CornerClip(outer_side, square_side, depth)
 
 
+def class_claim(n: int, bounded_side: Fraction, depth: Fraction) -> str:
+    """What a candidate frozen under the clip claims, in words no reader can misread.
+
+    A clipped run decides one class and not the theorem, so the string it freezes must
+    not be the theorem's. The unconditional claim is ``s(n) >= L``; this one names the
+    class first and never begins with ``s(``, so a reader scanning claim strings for a
+    bound cannot pick it up as one (review defect D1). ``excluded`` is the verdict on
+    the class: no packing of ``n`` unit squares into side ``bounded_side`` keeps all
+    four corner triangles ``x + y <= depth`` free.
+    """
+
+    return f"corner class d = {depth} excluded at s({n}) >= {bounded_side}"
+
+
+def class_certificate_id(n: int, outer_side: Fraction, depth: Fraction) -> str:
+    """The id of a clipped candidate: the unconditional id plus the threshold.
+
+    The unconditional id is ``C-n011-fractional-96-25``; a clip at ``1/2`` makes it
+    ``C-n011-fractional-96-25-clip-1-2``. Two candidates at the same side and different
+    thresholds are then different records, and neither can be mistaken for the
+    unconditional one by its id alone.
+    """
+
+    return (
+        f"C-n{n:03d}-fractional-{outer_side.numerator}-{outer_side.denominator}"
+        f"-clip-{depth.numerator}-{depth.denominator}"
+    )
+
+
+def declared_class_clip(record: Mapping[str, object]) -> Fraction | None:
+    """The clip a record declares at its top level, or ``None`` for an unclipped one.
+
+    The two fields go together: ``variant: class`` says the bytes decide a class, and
+    ``corner_clip`` says which one. Half a declaration is refused rather than read as
+    either, so no record can lose its hypothesis by leaving a field out.
+    """
+
+    variant = record.get("variant")
+    declared = record.get("corner_clip")
+    if declared is None:
+        if variant == "class":
+            raise ValueError("a record declaring variant: class must declare corner_clip")
+        return None
+    if variant != "class":
+        raise ValueError("a record declaring corner_clip must declare variant: class")
+    return Fraction(str(declared))
+
+
+def agreed_class_clip(
+    record: Mapping[str, object], requested: Fraction | None, *, reader: str
+) -> Fraction | None:
+    """Reconcile what a record declares with the clip a command line asked for.
+
+    A reader handed a class record without ``--corner-clip`` would otherwise decide the
+    unconditional program over clipped bytes and print the unconditional sentence
+    (review defect D4), so that combination raises. Asking for a clip on a record that
+    declares none stays allowed: that is a reader deciding the class itself, on a family
+    that never claimed it. Asking for a different threshold than the bytes declare is a
+    disagreement about what is being decided, and raises.
+    """
+
+    declared = declared_class_clip(record)
+    if declared is None:
+        return requested
+    if requested is None:
+        raise ValueError(
+            f"{reader}: the record declares variant: class at corner clip d = {declared}, "
+            f"and reading it without --corner-clip {declared} would state the "
+            "unconditional conclusion over bytes that never claimed it"
+        )
+    if requested != declared:
+        raise ValueError(
+            f"{reader}: declared corner_clip {declared} != the requested {requested}"
+        )
+    return declared
+
+
 __all__ = [
     "CornerClip",
     "EmptyClippedDomainError",
     "HalfPlane",
+    "agreed_class_clip",
+    "class_certificate_id",
+    "class_claim",
     "clip_from_optional",
+    "declared_class_clip",
 ]

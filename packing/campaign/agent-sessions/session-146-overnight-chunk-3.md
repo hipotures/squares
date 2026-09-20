@@ -66,13 +66,24 @@ session:
   delegations:
   - task: Adversarial review of the exp-219 conditional exclusion for registration, with the second-stage discriminator
     operator: chunk3_reviewer; Claude Fable max
-    status: in_progress
+    status: completed
     recording: contemporaneous
     phase: 1
-    outcome: null
-    evidence: []
+    outcome: >-
+      REGISTER WITH CORRECTIONS. The gate replays byte-for-byte (both routes at
+      2000013/2000000, 0 stalled boxes); the predicate, D4 invariance and polygon
+      membership checked independently on 8,400 centres; the theorem stated with every
+      hypothesis explicit and its direction confirmed against the code, lossless from
+      cores to unit squares. Six bookkeeping defects, none of soundness: the bytes
+      carry an unconditional claim string (D1, re-frozen as exp-220), BC-367 and the
+      receipt overstate what remains open (D2), wording (D3, D5, D6), and the engine
+      field lists readers that never ran (D4). The all-deep class is already outside
+      the point language (BC-366), so the corner tree cannot close at 96/25 by
+      clipping alone; the second stage is a 2-of-3 threshold atom on ring-centre
+      overlaps inside the all-deep class.
+    evidence: [packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/h222-registration-review.md]
     files: []
-    checks: []
+    checks: [Gate replayed with and without the flag; 8,400-centre predicate check; conditions 1 to 4 recomputed; unclipped least mass 2819857/4000000 measured.]
     uncertainty: A review is evidence for the record's wording, not a replay; the replay command it names is what a successor runs.
     elapsed_seconds: null
     elapsed_quality: unavailable
@@ -114,8 +125,42 @@ session:
     validation_command: cd packing && uv run --frozen --all-extras --group dev pytest tests/test_fold_ceiling_family.py -q
     kill_condition: The fold of a retained raw family differs from the retained merged file.
     fallback: Report the difference and leave the scratch script named as the record.
+  - task: Write the class claim and id under a corner clip, make the gate expect them, and re-freeze exp-219 as exp-220
+    operator: chunk3_claim_strings; Claude Opus high
+    status: completed
+    recording: contemporaneous
+    phase: 1
+    outcome: >-
+      Under a corner clip the driver writes the claim "corner class d = 1/2 excluded
+      at s(11) >= 96/25" and the id C-n011-fractional-96-25-clip-1-2, the family
+      record carries variant and corner_clip at top level, the gate expects the class
+      strings under the flag and names a mismatch, and the four readers refuse a
+      class record without the flag; eleven new tests. exp-220 re-froze the covering
+      in 262.9 s with all 680 atoms equal to exp-219's; both routes accept at
+      2000013/2000000 (sha256 876820dd...7a461) and the gate refuses without the flag.
+      The checkpoint path still has no clip parameter (think-bxu1).
+    evidence: [packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-220-n11-96-25-class-decide.stdout, packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-220-n11-96-25-class-decide-noflag.stdout]
+    files: [packing/src/sqpack/fractional/corner_clip.py, packing/devtools/run_fractional_colgen.py, packing/devtools/decide_certificate.py, packing/devtools/declare_least_cell_mass.py, packing/devtools/replay_ceiling_family.py, packing/devtools/independent_ceiling_reader.py, packing/devtools/polish_ceiling_family.py, packing/tests/test_fractional_corner_clip.py]
+    checks: [ruff, ruff format and basedpyright clean on the eight files; 115 tests across the six affected test files; 680 atoms compared as exact Fractions.]
+    uncertainty: The re-freeze should reproduce exp-219's placements exactly; a difference is a finding, not a failure of the fix.
+    elapsed_seconds: null
+    elapsed_quality: unavailable
+    next_action: Coordinator decides exp-220 from the two gate outputs and pins the new SHA.
+    started_at: '2026-09-20T13:10:00Z'
+    deadline_at: '2026-09-20T13:55:00Z'
+    budget_minutes: 45
+    write_scope: [packing/devtools/run_fractional_colgen.py, packing/devtools/decide_certificate.py, packing/devtools/declare_least_cell_mass.py, packing/devtools/polish_ceiling_family.py, packing/devtools/independent_ceiling_reader.py, packing/devtools/replay_ceiling_family.py, packing/tests/, packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-220-n11-96-25-class-*]
+    excluded_commands: [git commit, git push, any edit to exp-219's retained files, any change to the registered exp-220 command]
+    expected_output: The corrected driver and gate with tests, the exp-220 run files, and the two gate outputs.
+    validation_command: cd packing && uv run --frozen --all-extras --group dev pytest tests/test_fractional_corner_clip.py -q
+    kill_condition: The registered command refuses on a guard.
+    fallback: Record the refusal on exp-220 and leave exp-219's bytes as the record.
   outputs:
   - packing/campaign/agent-sessions/session-146-overnight-chunk-3.md
+  - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/h222-registration-review.md
+  - packing/devtools/fold_ceiling_family.py
+  - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-220-h222-n11-96-25-class-refreeze.md
+  - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-220-n11-96-25-class-receipt.md
   checks: []
   stop_reason: null
   next_action: Close the record with the hosted gate on this tree; BC-367's runs stay on think-b7pr.

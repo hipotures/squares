@@ -65,7 +65,7 @@ from fractions import Fraction
 from itertools import combinations, pairwise
 from math import gcd, lcm
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 PACKING = Path(__file__).resolve().parent.parent
 DEFAULT_RECORD = (
@@ -579,8 +579,49 @@ def controls(record: Record) -> list[dict[str, Any]]:
 # ----------------------------------------------------------------------------- CLI
 
 
-def read_record(path: Path, expected_sha256: str | None = None) -> tuple[Record, str]:
-    """The parsed record and its SHA-256, refused when the digest is not the expected one."""
+def agreed_corner_clip(fields: dict[str, Any], requested: Fraction | None) -> Fraction | None:
+    """Reconcile the clip the record declares with the one the command line asked for.
+
+    Kept here in the standard library rather than imported from ``sqpack``, which this
+    reader does not use by design; ``sqpack.fractional.corner_clip.agreed_class_clip``
+    states the same policy for the tools that may import it. Reading a record that
+    declares ``variant: class`` without ``--corner-clip`` would print this reader's
+    unconditional theorem sentence over bytes that claim only a class, which is review
+    defect D4, so that combination is refused. Asking for a clip on a record that
+    declares none stays allowed: that is this reader deciding K4 itself.
+    """
+
+    variant = fields.get("variant")
+    declared_field = fields.get("corner_clip")
+    if declared_field is None:
+        if variant == "class":
+            raise ValueError("a record declaring variant: class must declare corner_clip")
+        return requested
+    if variant != "class":
+        raise ValueError("a record declaring corner_clip must declare variant: class")
+    declared = Fraction(str(declared_field))
+    if requested is None:
+        raise ValueError(
+            f"the record declares variant: class at corner clip d = {declared}, and "
+            f"reading it without --corner-clip {declared} would state the unconditional "
+            "theorem over bytes that never claimed it"
+        )
+    if requested != declared:
+        raise ValueError(f"declared corner_clip {declared} != the requested {requested}")
+    return declared
+
+
+def read_record(
+    path: Path, expected_sha256: str | None = None
+) -> tuple[Record, str, dict[str, Any]]:
+    """The parsed record, its SHA-256 and its raw fields.
+
+    The digest is refused when it is not the expected one. The raw fields come back
+    because the record's top-level ``variant`` and ``corner_clip`` say which program it
+    is a ceiling for: this reader prints a theorem sentence, and printing the
+    unconditional one over bytes that declare a class is the misreading review defect
+    D4 names, so the caller reconciles the two before deciding anything.
+    """
     raw = path.read_bytes()
     digest = hashlib.sha256(raw).hexdigest()
     if expected_sha256 is not None and digest != expected_sha256.lower():
@@ -588,7 +629,8 @@ def read_record(path: Path, expected_sha256: str | None = None) -> tuple[Record,
     data = json.loads(raw)
     if not isinstance(data, dict):
         raise TypeError("record is not a JSON object")
-    return parse_record(data), digest
+    fields = cast(dict[str, Any], data)
+    return parse_record(fields), digest, fields
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -623,8 +665,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.corner_clip is not None and not 0 < args.corner_clip <= 1:
         parser.error("--corner-clip must satisfy 0 < d <= 1")
     try:
-        record, digest = read_record(args.record, args.expect_sha256)
-        result = decide(record, args.corner_clip)
+        record, digest, fields = read_record(args.record, args.expect_sha256)
+        depth = agreed_corner_clip(fields, args.corner_clip)
+        result = decide(record, depth)
         result["record"] = str(args.record)
         result["sha256"] = digest
         result["retained_sha256_matches"] = digest == RETAINED_SHA256

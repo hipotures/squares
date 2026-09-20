@@ -46,7 +46,12 @@ That restricts Condition 5 on *both* routes to lane-a Theorem B's free-corner do
 the cores avoiding every corner triangle ``x + y <= d`` and its three D4 images. The
 record must itself declare ``variant: class`` and the same ``corner_clip``, so the
 hypothesis lives in the bytes that are decided and the flag only says which hypothesis
-the operator meant. Without the flag a ``class`` record is refused exactly as before,
+the operator meant. It must also carry the class's own ``claim`` and ``id`` -- the
+claim names the class and never reads ``s(n) >= L``, the id carries the threshold --
+because ``variant`` alone is one field between a class record and a reader who takes a
+claim string for a bound (review defect D1). A record declaring ``variant: class``
+while claiming the unconditional conclusion is refused under the flag, by name.
+Without the flag a ``class`` record is refused exactly as before,
 and a positive verdict under the flag prints RETAINABLE UNDER THE CORNER CLASS
 HYPOTHESIS rather than the bare word.
 """
@@ -70,7 +75,11 @@ from sqpack.fractional.certificate import (
     least_size_certified,
     verify,
 )
-from sqpack.fractional.corner_clip import clip_from_optional
+from sqpack.fractional.corner_clip import (
+    class_certificate_id,
+    class_claim,
+    clip_from_optional,
+)
 from sqpack.fractional.interval import (
     MAX_INTERVAL_ATOMS,
     IntervalInputError,
@@ -381,12 +390,37 @@ def decide(
     )
 
     problems: list[str] = []
-    expected_claim = f"s({certificate.n}) >= {side}"
+    # What the bytes have to claim. Unclipped, that is the theorem's conclusion and the
+    # comparison this gate has always made. Under the clip it is the class's own claim,
+    # so a record cannot be decided as a class while carrying the theorem's sentence:
+    # ``variant`` was the only field saying so, and a reader scanning claim strings
+    # never saw it (review defect D1).
+    theorem_claim = f"s({certificate.n}) >= {side}"
+    expected_claim = (
+        theorem_claim if clip is None else class_claim(certificate.n, side, clip.depth)
+    )
     declared_claim = _exact_string(record, "claim")
     if declared_claim != expected_claim:
-        problems.append(
-            f"declared claim {declared_claim!r} != theorem conclusion {expected_claim!r}"
-        )
+        if clip is not None and declared_claim == theorem_claim:
+            problems.append(
+                f"declared claim {declared_claim!r} is the unconditional theorem "
+                f"conclusion on a variant: class record; a candidate decided under the "
+                f"corner clip d = {clip.depth} must claim {expected_claim!r}"
+            )
+        else:
+            problems.append(
+                f"declared claim {declared_claim!r} != "
+                + (
+                    f"theorem conclusion {expected_claim!r}"
+                    if clip is None
+                    else f"class claim {expected_claim!r}"
+                )
+            )
+    if clip is not None:
+        expected_id = class_certificate_id(certificate.n, side, clip.depth)
+        declared_id = _exact_string(record, "id")
+        if declared_id != expected_id:
+            problems.append(f"declared id {declared_id!r} != class id {expected_id!r}")
     declared_mass = _exact_rational(record, "total_mass")
     if declared_mass != mass:
         problems.append(f"declared total_mass {declared_mass} != recomputed {mass}")

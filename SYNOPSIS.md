@@ -146,7 +146,7 @@ hypothesis status and summarizes experiment verdicts, and the
 | Sessions | 146 | 88 completed; 57 stopped; 1 nonterminal |
 | Explorations | 38 | 24 linked to proposed hypotheses; 14 uncodified |
 | Hypotheses | 169 | 29 confirmed; 31 refuted; 54 blocked; 17 unresolved; 5 open; 29 open questions; 2 result registered; 2 abandoned; 0 running |
-| Experiments | 154 | 42 accepted; 36 rejected; 50 unresolved; 12 baseline; 11 blocked; 3 abandoned; 0 in progress |
+| Experiments | 155 | 43 accepted; 36 rejected; 50 unresolved; 12 baseline; 11 blocked; 3 abandoned; 0 in progress |
 | Frontier results | 30 | 30 registered |
 
 <!-- END CURRENT-RESEARCH-STATUS -->
@@ -533,6 +533,8 @@ case or experiment separately.
 | [Exp-214 n=13 399/100 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-214-n13-399-100-receipt.md) | research synthesis | record | retained | — |
 | [Exp-215 n=26 53/10 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-215-n26-53-10-receipt.md) | research synthesis | record | retained | — |
 | [n=17 23/5 T-019-Seeded Ceiling-Family Receipt (exp-218)](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-218-n17-23-5-receipt.md) | research synthesis | record | retained | — |
+| [Exp-220 n=11 96/25 Class Re-Freeze Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-220-n11-96-25-class-receipt.md) | research synthesis | record | retained | — |
+| [H-222 Registration Review of exp-219 (Session 146, chunk 3)](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/h222-registration-review.md) | research synthesis | record | retained | — |
 | [n=11 96/25 Corner-Clipped Covering Receipt (exp-219)](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-219-n11-96-25-clip-receipt.md) | research synthesis | record | retained | — |
 | [n=20 973/200 T-021-Seeded Four-Grid Window-7 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n20-973-200-t021-grid4-windows7-receipt.md) | research synthesis | record | retained | — |
 | [n=20 973/200 T-021-Seeded Four-Grid Window-7 2400 s Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n20-973-200-t021-grid4-windows7-2400-receipt.md) | research synthesis | record | retained | — |
@@ -1048,10 +1050,11 @@ controller, not permission to blur contracts.
 completed overnight chunk 2 of agenda-040 in
 [PR 206](https://github.com/jlevy/squares/pull/206), stacked on PR 205. The convex
 corner-clip instrument was admitted after an adversarial review, and `exp-219` confirmed
-H-222 at its scope: every packing of 11 unit squares at side 96/25 has a square meeting
-a corner triangle x + y <= 1/2, RETAINABLE under the corner class hypothesis from both
-routes at mass 10.868617. That excludes the octagon class at 3.84 conditionally on the
-corner partition; it is not a bound.
+H-222 at its scope: every packing of 11 unit squares in a square of side 96/25 has a
+square meeting the open corner triangle x + y < 1/2 at some corner, RETAINABLE under the
+corner class hypothesis from both routes at mass 10.868617. That excludes the octagon
+class at 3.84; it is not a bound, and the all-deep class is already outside the point
+language (BC-366), so the corner tree cannot close at 96/25 by clipping alone.
 The three retained replay readers are re-bound to the instrument’s revision with their
 determinations reproduced.
 The overnight loop closed on its clock after two of four chunks; BC-361, BC-362 and
@@ -4145,7 +4148,7 @@ round that names the hypothesis, control roles included.
 | [H-219](packing/campaign/hypotheses/H-219-t028-seeded-colgen-raises-s18.md) | confirmed | A rows-complete covering of mass strictly below 18 exists at a container side in (187/40, 117/25) on a T-028-seeded stock-colgen site set | 1 | T-029 |
 | [H-220](packing/campaign/hypotheses/H-220-seedless-colgen-raises-nagamochi-floor.md) | unresolved | A rows-complete covering of mass strictly below n exists at a queued Nagamochi-only side on a seedless stock-colgen site set | 8 | exp-166 unresolved at 29.803318; exp-167 unresolved at 28.331329; exp-168 unresolved at 27.178193; exp-169 unresolved at 25.000000; exp-170 unresolved at 25.000000; exp-171 unresolved, freeze interval-refused; exp-172 unresolved at 42.137360; exp-173 unresolved at 41.236782 |
 | [H-221](packing/campaign/hypotheses/H-221-t029-seeded-colgen-raises-s18.md) | confirmed | A rows-complete covering of mass strictly below 18 exists at a container side in (1871/400, 117/25) on a T-029-seeded stock-colgen site set | 1 | T-030 |
-| [H-222](packing/campaign/hypotheses/H-222-n11-octagon-class-at-96-25.md) | confirmed | The all-free corner class at n=11, 96/25, d = 1/2 has restricted covering value below 11; blocked on a convex corner-clip domain predicate | 1 | exp-219 accepted |
+| [H-222](packing/campaign/hypotheses/H-222-n11-octagon-class-at-96-25.md) | confirmed | The all-free corner class at n=11, 96/25, d = 1/2 has restricted covering value below 11; blocked on a convex corner-clip domain predicate | 2 | exp-219 accepted |
 | [H-223](packing/campaign/hypotheses/H-223-n13-point-covering-at-399-100.md) | unresolved | A point-atom certificate exists at n=13, 399/100 on a window-seeded site set; calibration under s(13) = 4 | 1 | exp-214 unresolved at 15.565562 |
 | [H-224](packing/campaign/hypotheses/H-224-n17-ceiling-family-at-23-5.md) | unresolved | A depth-one ceiling family of total 17 exists at n=17, 23/5, closing the fixed-shrink point route there for every site set | 2 | exp-213 unresolved (lost mid-run); exp-218 unresolved at family total 13.999999984 |
 | [H-225](packing/campaign/hypotheses/H-225-n26-seeded-certificate-at-53-10.md) | unresolved | A seeded point certificate exists at n=26, 53/10, a first-party floor above Nagamochi’s 5 | 1 | exp-215 unresolved at 25.000000 |
@@ -4452,9 +4455,9 @@ The relevant generator writes the receipt, and the entry fills in on the next
 
 ## Experiments Conducted
 
-There are 154 rounds registered in `series-000`.
+There are 155 rounds registered in `series-000`.
 
-They record 2512.1 agent-minutes and 2691.8 wall-minutes.
+They record 2512.1 agent-minutes and 2696.2 wall-minutes.
 These totals exclude four historical annealing rounds with unrecorded timing; their wall
 and operator costs are unknown, not zero.
 Exp129 closed as blocked without invocation and contributes zero scientific elapsed
@@ -4650,6 +4653,7 @@ archive beside it.
 | [exp-217](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-217-h227-n32-one-spare-inventory.md) | 32 | target | H-227 | The one-spare inventory at n=32 | 11,699 of 12,100 raw pairs are kills; n=33 control forced | rejected |
 | [exp-218](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-218-h224-n17-23-5-ceiling-family-cap32.md) | 17 | target | H-224 | T-019-seeded ceiling family at 23/5, support cap 32 | restricted optimum 17.0423; accepted family total 13.999999984 < 17 | unresolved |
 | [exp-219](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-219-h222-n11-96-25-octagon-class.md) | 11 | target | H-222 | Corner-clipped covering at 96/25, d = 1/2 | RETAINABLE UNDER THE CORNER CLASS HYPOTHESIS; mass 10.868617 | accepted |
+| [exp-220](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-220-h222-n11-96-25-class-refreeze.md) | 11 | target | H-222 | Re-freeze of the exp-219 class certificate under the class claim strings | RETAINABLE UNDER THE CORNER CLASS HYPOTHESIS; the same 680 atoms; mass 10.868617 | accepted |
 
 ### Cost and provenance
 
@@ -4809,10 +4813,11 @@ archive beside it.
 | exp-217 | Runs beside exp-216 on the same tool | 16 s | — | criterion | `8d8eed3c` |
 | exp-218 | One run of at most 2400 s plus polish and two readers | 1639 s | — | criterion | `8d8eed3c` |
 | exp-219 | One run of at most 2400 s, then the gate | 307 s | — | criterion | `8f4eca7d` |
+| exp-220 | One run of at most 2400 s, then the gate twice | 263 s | — | criterion | `ea7ea453` |
 
-### What the 154 rounds jointly establish
+### What the 155 rounds jointly establish
 
-The 154 rounds use 2512.1 agent-minutes and 2691.8 wall-minutes under the campaign’s
+The 155 rounds use 2512.1 agent-minutes and 2696.2 wall-minutes under the campaign’s
 retained effort accounting.
 The never-invoked exp129 adds no scientific result or execution time.
 Exp-114 contributes 2.46 seconds of target/replay effort; its readiness work is recorded

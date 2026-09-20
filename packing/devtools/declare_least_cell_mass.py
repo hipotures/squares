@@ -24,7 +24,7 @@ from fractions import Fraction
 from pathlib import Path
 
 from sqpack.fractional.certificate import Certificate, verify
-from sqpack.fractional.corner_clip import CornerClip, clip_from_optional
+from sqpack.fractional.corner_clip import CornerClip, clip_from_optional, declared_class_clip
 from sqpack.fractional.model import Atom
 
 
@@ -35,16 +35,13 @@ def corner_clip_of(record: dict[str, object], certificate: Certificate) -> Corne
     lane-a Theorem B's free-corner hypothesis carries ``variant: class`` and
     ``corner_clip``, and the number declared here has to be the one the gate will then
     recompute from the same bytes under the same domain. A flag would let the two
-    disagree silently.
+    disagree silently. ``variant: class`` without ``corner_clip`` is refused for the
+    same reason: a class record that swept the full domain would declare a number the
+    gate never recomputes.
     """
 
-    declared = record.get("corner_clip")
-    if declared is None:
-        return None
-    if record.get("variant") != "class":
-        raise ValueError("a record declaring corner_clip must declare variant: class")
     return clip_from_optional(
-        Fraction(str(declared)), certificate.outer_side, certificate.square_side
+        declared_class_clip(record), certificate.outer_side, certificate.square_side
     )
 
 

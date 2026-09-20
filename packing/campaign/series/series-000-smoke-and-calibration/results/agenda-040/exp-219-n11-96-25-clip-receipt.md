@@ -38,7 +38,7 @@ uv run --frozen --all-extras --group dev python -m devtools.decide_certificate \
 | LP rounds in round 0 | 32 |
 | Objective | `10.868522955888936` (float LP) |
 | Least covered mass at the stop | `0.9999999999860997` (float; the exact sweep below decides) |
-| Stop | `converged: every placement covers mass 1` after one column round added one orbit |
+| Stop | `converged: every placement covers mass 1`; the last column round added one orbit without a further solve, so the freeze is the round-0 row-converged solution |
 | Frozen mass | `10868617/1000000 = 10.868617` over 680 atoms |
 | Frozen least cell mass (serial clipped sweep) | `2000013/2000000` |
 | Record fields | `variant: class`, `corner_clip: 1/2` |
@@ -68,8 +68,18 @@ H-222 is **confirmed** at its registered scope.
   Equivalently, every such packing has a square whose corner penetration exceeds `1/2`
   at some corner.
 - This is a conditional exclusion for the all-free (octagon) class of lane-a Theorem B
-  at side `3.84`; the other fifteen corner-bin classes are untouched, and nothing here
-  bounds `s(11)`.
+  in a square of side `3.84`; the structural statement itself is unconditional (every
+  packing of eleven unit squares in that square has a square meeting the open corner
+  triangle x + y < 1/2 at some corner), the exclusion is what is conditional, and
+  nothing here bounds `s(11)`. Of the other fifteen bin vectors, the all-deep class is
+  already outside the point language for every site set (BC-366, review R1), so fourteen
+  vectors in four mixed D4 classes remain open and the corner tree cannot close at
+  `96/25` by clipping alone ([registration review](h222-registration-review.md)).
+- The corrected gate (Session 146) refuses these bytes on their unconditional claim
+  string `s(11) >= 96/25` (review defect D1); the same 680-atom covering re-frozen under
+  the class claim is [exp-220](exp-220-n11-96-25-class-receipt.md), sha256
+  `876820dde8d55c727dec73c85f245db27661556bb3c7aa06ffb15b01ec97a461`, which supersedes
+  this file as the record of the exclusion.
 - The retained 88-family transported to `96/25` keeps mass 7 on this domain, so the
   one-body ceiling does not obstruct this class; the clipped covering found mass
   `10.8686`, about `0.13` below the requirement.
