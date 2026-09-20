@@ -88,13 +88,19 @@ session:
     fallback: Report that and stop.
   - task: Retain devtools.fold_ceiling_family with tests and a --check against the retained merged families
     operator: chunk3_fold_tool; Claude Opus high
-    status: in_progress
+    status: completed
     recording: contemporaneous
     phase: 1
-    outcome: null
-    evidence: []
-    files: []
-    checks: []
+    outcome: >-
+      devtools.fold_ceiling_family retained with a pure fold keyed on the polisher's
+      own fold_half_tangent, a --check that refuses to overwrite its inputs, and seven
+      tests; --check re-folds exp-214 (312 placements, 8 folded, total 298314/19165)
+      and exp-218 (256 placements, 0 folded) to the retained merged files with 0
+      differences, and the exp-214 refold is byte-identical outside the provenance
+      block. Both receipts name the tool.
+    evidence: [packing/devtools/fold_ceiling_family.py, packing/tests/test_fold_ceiling_family.py]
+    files: [packing/devtools/fold_ceiling_family.py, packing/tests/test_fold_ceiling_family.py, packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-214-n13-399-100-receipt.md, packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-218-n17-23-5-receipt.md]
+    checks: [7 tests pass; ruff, ruff format and basedpyright clean; check_no_embedded_js and test_module_boundaries pass; --check exit 0 on both retained pairs.]
     uncertainty: The retained merged files were written by the scratch script; the check proves the tool reproduces them, not that the rule is the right one.
     elapsed_seconds: null
     elapsed_quality: unavailable

@@ -135,7 +135,9 @@ def test_check_reports_a_difference_and_exits_one(
 ) -> None:
     source = tmp_path / "family.json"
     source.write_text(
-        json.dumps(family([["0", "1/4", "1/4", "1/3", "1/2"], ["1", "1/4", "1/4", "1/6", "1/2"]])),
+        json.dumps(
+            family([["0", "1/4", "1/4", "1/3", "1/2"], ["1", "1/4", "1/4", "1/6", "1/2"]])
+        ),
         encoding="utf-8",
     )
     expected = tmp_path / "merged.json"
