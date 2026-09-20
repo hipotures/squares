@@ -137,7 +137,8 @@ Now consider a simultaneous vertical movement of a row $r_i$. Such a move will p
 
 With regard to a given configuration, for $i = 2, \ldots, 5$, let $m_1 = v(r_1, r_2)$, $m_i = \max\{v(r_i, r_{i+1}), v(r_i, r_{i-1})\}$, for $i = 2, \ldots, 5$, and $m_6 = v(r_6, r_5)$. Clearly, for $i = 1, \ldots, 6$, there exists a unique configuration $F_i$ that minimizes $m_i$ and that is reachable from $F_a$ by vertical movement of rows, such that unavoidability is preserved throughout. Let $y_1, \ldots, y_6$ be the second coordinate values of the points in the $i$-th row in $F_i$ (the exact values of $y_i$ can be easily calculated, but are not needed). As
 
-$$\left(\sqrt{2} - \frac{1}{2}\right) + 2 \cdot 0.8 + 3 \cdot \frac{\sqrt{3}}{2} > 6,$$
+$$2\left(\sqrt{2} - \frac{1}{2}\right) + 2 \cdot 0.8 + 3 \cdot \frac{\sqrt{3}}{2} > 6,$$
+<!-- NOTE: Corrected 2026-09-20 against the archived PDF. This transcription dropped the leading factor 2, printing $\left(\sqrt{2} - \frac{1}{2}\right) + 2 \cdot 0.8 + 3 \cdot \frac{\sqrt{3}}{2} \approx 5.1123$, which is less than 6, so the inequality as transcribed is false and the sentence it feeds establishes nothing. Rendered PDF page 5 prints $2\left(\sqrt{2} - \frac{1}{2}\right) + 2 \cdot 0.8 + 3 \cdot \frac{1}{2}\sqrt{3} \approx 6.0265 > 6$, the last term written as one half times $\sqrt{3}$ rather than as a fraction, which is the same value and is left in the transcription's form. The factor 2 is what the count needs: six rows in a square of side 6 leave seven vertical gaps, two to the walls at most $\sqrt{2} - \frac{1}{2}$ each, two at most 0.8 and three at most $\frac{\sqrt{3}}{2}$, and it is because those maxima total more than 6 that no reachable configuration holds them all, which is the $v(r_i, r_{i-1}), v(r_i, r_{i+1}) \leq 0.8$ concluded next. With the transcribed left side the sum is under 6 and nothing follows. -->
 
 we note that in $F_i$, we have $v(r_i, r_{i-1}), v(r_i, r_{i+1}) \leq 0.8$, wherever defined.
 
@@ -193,6 +194,7 @@ Let $l$ be the line segment $\left\{\sqrt{2} - \frac{1}{2}\right\} \times [0, 5]
    Let $m$ be the midpoint of $B_1$. As before we can conclude that $m$ lies on the opposite side of $l$ from the point $(0.5, \sqrt{2} - \frac{1}{2})$, with a distance of at least $\frac{1}{2}\sqrt{2} - \frac{1}{2}$ from $l$, but within a distance of $0.505\sqrt{2}$ of $(0.5, \sqrt{2} - \frac{1}{2})$. These constraints intersect at approximately $(1.13, 0.56)$ and $(1.13, 1.24)$.
 
    The resulting area is depicted in Figure 5 and lies completely within a distance of $\frac{1}{2}$ from the point $\left(\sqrt{2} - \frac{1}{2}, 1\right)$.
+<!-- NOTE: Not a transcription slip: rendered PDF page 8 prints the end point as $\left(0.5, \sqrt{2} - \frac{1}{2}\right)$ in both places in this case, and it is transcribed as printed. Figure 3 puts the left-most point of the first row at $(0.5, 0.9)$, and $y_1 = 0.9$ throughout the rest of the proof, so the printed second coordinate is a slip of the source for 0.9. The step holds with either value: the resulting midpoint region lies within $0.49733$ of $\left(\sqrt{2} - \frac{1}{2}, 1\right)$ at $y_1 = 0.9$ and within $0.48444$ at the printed point, both under the $\frac{1}{2}$ the next sentence needs. The text is left as the source has it, since archived source is not edited to read correctly. -->
 
    It follows that $\left(\sqrt{2} - \frac{1}{2}, 1\right)$ lies in $B_1$. However, the point is denied to $B_1$, for a contradiction.
 

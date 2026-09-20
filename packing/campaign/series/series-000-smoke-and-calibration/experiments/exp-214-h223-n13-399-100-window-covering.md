@@ -50,17 +50,41 @@ experiment:
       --log campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-214-n13-399-100.log
     budget: One run of at most 2400 s and the gate or the readers; Session 144 wall.
     record: packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/
-  lease:
-    expires: '2026-09-20T09:30:00Z'
-    host: claude-session-144
-  results: []
+  effort:
+    timebox: 2400 s run plus the gate or the readers
+    wall_seconds: 80.1
+    stopped_by: criterion
+  results:
+  - shape: determination
+    role: outcome
+    question: >-
+      Does a window-seeded freeze at n=13, 399/100 have mass strictly below 13 and print
+      RETAINABLE, or does a depth-one family of total at least 13 kill the claim?
+    outcome: criterion_missed
+    checked_by: >-
+      Row loop converged at round 0 with objective 15.565562222801985 and least covered
+      mass 1.000000000 (548 orbits, 4053 sites, 80.1 s); frozen covering mass
+      15565619/1000000; decide_certificate not invoked; the merged and polished family
+      is accepted by independent_ceiling_reader and replay_ceiling_family with exact
+      total 85/8 and maximum depth 1, which is below 13 (receipt
+      exp-214-n13-399-100-receipt.md)
+  - shape: record
+    role: outcome
+    metric: restricted covering optimum on auto grids (26, 35, 44) plus windows 5 (float; the frozen mass is 15565619/1000000)
+    direction: lower
+    score: 15.565562222801985
+    standing_best: 13
+    standing_best_source: H-223 criterion (a certificate needs mass strictly below 13)
+    beat_record: false
+    runs: 1
   verdict:
-    decision: in-progress
+    decision: unresolved
     primary_criterion: >-
       Confirm H-223 only on RETAINABLE below 13 from both decide_certificate routes;
       refute at this scope only with a depth-one family of total at least 13 accepted
       by both ceiling readers.
-    reason: Registered before the run; no number yet.
+    reason: >-
+      The converged restricted optimum 15.5656 refutes this site set only, and the accepted depth-one family has total 85/8, below 13, so H-223 is neither confirmed nor killed at this scope.
 ---
 # Exp-214: Window-Seeded Point Covering at n=13, 399/100
 

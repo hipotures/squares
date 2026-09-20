@@ -1,0 +1,203 @@
+{
+ "tool": "devtools.bentz2016.replay_theorem11",
+ "line_x": "-1/2 + sqrt(2)",
+ "line_x_decimal": "0.914213562373",
+ "negative_control": false,
+ "rows": [
+  {
+   "number": 1,
+   "step": "Red set unavoidable (Lemmas 1, 2, 6 tiling of [0,5]^2)",
+   "exact": "area 25, 0 overlaps",
+   "decimal": "",
+   "holds": true,
+   "note": "area 25 == 25, no overlaps"
+  },
+  {
+   "number": 2,
+   "step": "Blue set unavoidable (Lemmas 1, 2, 6 tiling of [0,5]^2)",
+   "exact": "area 25, 0 overlaps",
+   "decimal": "",
+   "holds": true,
+   "note": "area 25 == 25, no overlaps"
+  },
+  {
+   "number": 3,
+   "step": "Unavoidability under the row moves (red rows 2, 4; blue rows 1, 3, 5)",
+   "exact": "all lemma hypotheses hold at every grid parameter",
+   "decimal": "",
+   "holds": true,
+   "note": "red: five-point rows [2, 4]: 248 configurations, shifts in [-1/10, 1/10] and end points in [1/2, 1], all tile; blue: five-point rows [1, 3, 5]: 371 configurations, shifts in [-1/10, 1/10] and end points in [1/2, 1], all tile; 619 configurations"
+  },
+  {
+   "number": 4,
+   "step": "Row spacing 0.8 <= sqrt3/2 (Lemma 1)",
+   "exact": "-4/5 + sqrt(3)/2",
+   "decimal": "0.066025",
+   "holds": true,
+   "note": "Lemma 1 needs sqrt(1/4 + v^2) <= 1 for the zigzag triangles"
+  },
+  {
+   "number": 5,
+   "step": "Wall distance 0.9 <= sqrt2 - 1/2 (Lemma 2, a = 1)",
+   "exact": "-7/5 + sqrt(2)",
+   "decimal": "0.014214",
+   "holds": true,
+   "note": "a + 2b <= 2 sqrt2 at a = 1 is b <= sqrt2 - 1/2; independent of l"
+  },
+  {
+   "number": 6,
+   "step": "Shift 0.1 at spacing 0.8: triangle side sqrt(0.36 + 0.64)",
+   "exact": "1",
+   "decimal": "1.000000",
+   "holds": true,
+   "note": "exactly 1; Lemma 1 allows <= 1, so the equality is admissible"
+  },
+  {
+   "number": 7,
+   "step": "Lemma 6 needs a = 0.8 < 2 sqrt2 - 2",
+   "exact": "-14/5 + 2*sqrt(2)",
+   "decimal": "0.028427",
+   "holds": true,
+   "note": "the quadrilateral at the wall beside a shifted five-point row"
+  },
+  {
+   "number": 8,
+   "step": "Lemma 6 needs (0.8, 0.4) within 1 of (0, 1)",
+   "exact": "1",
+   "decimal": "1.000000",
+   "holds": true,
+   "note": "distance exactly 1 at b = 0.4, the shifted leftmost point"
+  },
+  {
+   "number": 9,
+   "step": "Lemma 2 a = 1, b = 0.9: a + 2b <= 2 sqrt2",
+   "exact": "-14/5 + 2*sqrt(2)",
+   "decimal": "0.028427",
+   "holds": true,
+   "note": "the edge rectangles against the bottom and top walls"
+  },
+  {
+   "number": 10,
+   "step": "Two blue points in one box are closer than the diagonal",
+   "exact": "101*sqrt(2)/100",
+   "decimal": "1.428356",
+   "holds": true,
+   "note": "definition: the diagonal of a maximal box of side 1.01 (line 170)"
+  },
+  {
+   "number": 11,
+   "step": "Lemma 5 on wall x = 0 and l: 2 sqrt2 - 2d at d = c",
+   "exact": "1",
+   "decimal": "1.000000",
+   "holds": true,
+   "note": "the wall chord is empty, so the common chord is min{1, 1} = 1 on l"
+  },
+  {
+   "number": 12,
+   "step": "Lemma 7 needs dist((0.4, y), l) > 0.51",
+   "exact": "-9/10 + sqrt(2)",
+   "decimal": "0.514214",
+   "holds": true,
+   "note": "the covered point on the far side of l from the midpoint"
+  },
+  {
+   "number": 13,
+   "step": "Lemma 7 proof: 0.505 sqrt2 - 0.51 < (sqrt2-1)/2",
+   "exact": "-51/100 + 101*sqrt(2)/200",
+   "decimal": "0.204178",
+   "holds": true,
+   "note": "(sqrt2-1)/2 = 0.207107; the bound repaired by D-506"
+  },
+  {
+   "number": 14,
+   "step": "Lemma 7 with the actual distance: 0.505 sqrt2 - dist((0.4, y), l)",
+   "exact": "9/10 - 99*sqrt(2)/200",
+   "decimal": "0.199964",
+   "holds": true,
+   "note": "how far past l the midpoint of a box covering (0.4, y) can sit"
+  },
+  {
+   "number": 15,
+   "step": "Chord infimum on l, boxes in S containing [0.4, 1] x {y}",
+   "exact": "1",
+   "decimal": "1.000000",
+   "holds": true,
+   "note": "branches min{s/cos th, 2(c - 0.4), 2(sqrt2 - c)}, minimised as s -> 1 by the axis-parallel box and by the wall-touching 45-degree box; screen 1.000000, minimiser 1.028427127"
+  },
+  {
+   "number": 16,
+   "step": "Chord infimum on l, boxes in S containing [0.5, 1] x {y}",
+   "exact": "-2 + 2*sqrt(2)",
+   "decimal": "0.828427",
+   "holds": true,
+   "note": "the 45-degree box with a vertex at (0.5, y), any s; below 1, so a partial box need not charge more than 1 and the finish is needed; screen 0.839677, minimiser 0.828427127"
+  },
+  {
+   "number": 17,
+   "step": "Standoff sqrt2/2 - 1/2 equals Lemma 4's (sqrt2-1)/2",
+   "exact": "-1/2 + sqrt(2)/2",
+   "decimal": "0.207107",
+   "holds": true,
+   "note": "the PDF writes Lemma 4's threshold the other way round (D-505)"
+  },
+  {
+   "number": 18,
+   "step": "Left edge of the shaded regions, c + standoff",
+   "exact": "-1 + 3*sqrt(2)/2",
+   "decimal": "1.121320",
+   "holds": true,
+   "note": "printed 1.12 beside Figure 4; deviation 0.001320"
+  },
+  {
+   "number": 19,
+   "step": "Figure 4 corners on the line",
+   "exact": "see note",
+   "decimal": "",
+   "holds": true,
+   "note": "(1.121320, 2.455090), (1.121320, 2.544910); printed [('112/100', '245/100'), ('112/100', '255/100')], worst deviation 0.005090"
+  },
+  {
+   "number": 20,
+   "step": "Figure 4 corners on the big circle",
+   "exact": "see note",
+   "decimal": "",
+   "holds": true,
+   "note": "(1.207795, 2.404734), (1.207795, 2.595266); printed [('12/10', '24/10'), ('12/10', '26/10')], worst deviation 0.007795"
+  },
+  {
+   "number": 21,
+   "step": "Case 1: the region lies within 1/2 of (1.5, 2.5)",
+   "exact": "sqrt(-28*sqrt(2) - 2*sqrt(2)*sqrt(-1 + sqrt(2)) + 42)/2",
+   "decimal": "0.381333",
+   "holds": true,
+   "note": "sup of the distance over the exact region; forced when below 1/2"
+  },
+  {
+   "number": 22,
+   "step": "Figure 5 corners at y_1 = 0.9",
+   "exact": "see note",
+   "decimal": "",
+   "holds": true,
+   "note": "(1.121320, 1.252152), (1.121320, 0.547848); printed [('113/100', '56/100'), ('113/100', '124/100')], worst deviation 0.012152; consistent with x rounded up to 1.13"
+  },
+  {
+   "number": 23,
+   "step": "Case 2: the region lies within 1/2 of (c, 1), y_1 = 0.9",
+   "exact": "sqrt(-219198 + 40*sqrt(2)*sqrt(-124799 + 90000*sqrt(2)) + 160000*sqrt(2))/200",
+   "decimal": "0.497328",
+   "holds": true,
+   "note": "Figure 3 puts the end point of row 1 at (0.5, 0.9)"
+  },
+  {
+   "number": 24,
+   "step": "Case 2 with the PDF's (0.5, sqrt2 - 1/2) in place of (0.5, 0.9)",
+   "exact": "sqrt(10000*(1 - sqrt(2))**2 + (-200*sqrt(2) + sqrt(2)*sqrt(-124799 + 90000*sqrt(2)) + 300)**2)/200",
+   "decimal": "0.484441",
+   "holds": true,
+   "note": "the paper's own slip; the step holds with either value, so no defect is filed against the source and the transcription is not edited"
+  }
+ ],
+ "rows_total": 24,
+ "rows_failed": [],
+ "all_hold": true
+}
