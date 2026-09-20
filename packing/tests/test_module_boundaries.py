@@ -1076,6 +1076,14 @@ def test_the_slow_marker_is_declared_only_by_measured_nodes() -> None:
         "test_negative_controls.py": {
             "test_build_caches_leave_the_counted_surface_and_the_worker_trees",  # 8.15s on CI
         },
+        # 3s of call time across 1, measured 2026-09-20: `git worktree add --detach` of
+        # Session 148's opening commit -- a whole checkout of the tree -- and then
+        # `git apply --check` of both retained partial diffs in it. The file's two other
+        # tests read the patches' header lines and cost nothing. It needs the base
+        # commit, so it belongs in the lane that checks out with `fetch-depth: 0`.
+        "test_retained_patches_apply.py": {
+            "test_every_retained_patch_applies_to_its_declared_base",  # 3.3s
+        },
         # 16s of call time across 1.
         "test_promote_elimination.py": {
             "test_promote_elimination",  # 15.7s

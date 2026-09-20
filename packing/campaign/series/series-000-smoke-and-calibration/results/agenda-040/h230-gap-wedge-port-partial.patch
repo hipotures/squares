@@ -1,3 +1,5 @@
+Retained partial diff from Session 148, taken against base revision 19cdd4f8e21a28b058c21f04636dc6f6f82cb33c; apply with `git apply` from the repository root. Measured by tests/test_retained_patches_apply.py.
+
 diff --git a/packing/devtools/gap_wedge/__init__.py b/packing/devtools/gap_wedge/__init__.py
 new file mode 100644
 index 00000000..c84b4a1d

@@ -1,3 +1,4 @@
+# Retained Session 148 scratch (H-230 gap-wedge lane), not a maintained tool: run as written against packing/ at 19cdd4f8, kept as .py.txt so it stays off the import path and out of the Ruff/BasedPyright floor.
 """Exact pairwise wedge-conflict test of the A6 64-family (nominal unit squares)."""
 import json, sys, math
 from fractions import Fraction as F

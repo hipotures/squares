@@ -1,3 +1,5 @@
+Retained partial diff from Session 148, taken against base revision 19cdd4f8e21a28b058c21f04636dc6f6f82cb33c; apply with `git apply` from the repository root. Measured by tests/test_retained_patches_apply.py.
+
 diff --git a/packing/devtools/decide_threshold_certificate.py b/packing/devtools/decide_threshold_certificate.py
 index 63341cea..8d44cbaa 100644
 --- a/packing/devtools/decide_threshold_certificate.py

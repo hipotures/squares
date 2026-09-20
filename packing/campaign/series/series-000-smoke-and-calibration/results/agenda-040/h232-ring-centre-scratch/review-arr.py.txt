@@ -1,3 +1,4 @@
+# Retained Session 148 scratch (H-232 ring-centre lane), not a maintained tool: run as written against packing/ at 19cdd4f8, kept as .py.txt so it stays off the import path and out of the Ruff/BasedPyright floor.
 """Own arrangement of the 56 residual cores; max 2-of-3 charge over maximal vertex traces; random sanity search."""
 import json, itertools, time, random, sys
 from fractions import Fraction as F

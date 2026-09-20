@@ -150,7 +150,7 @@ session:
     status: canceled
     recording: contemporaneous
     phase: 1
-    outcome: Stopped by the owner at 17:02Z on the relaunch with the clip threaded through the sweep and interval routes but the CLI and tests unfinished; the diff is retained as h232-threshold-clip-partial.patch and the code tree restored to HEAD.
+    outcome: Stopped by the owner at 17:02Z on the relaunch with the clip threaded through the sweep and interval routes but the CLI and tests unfinished; the diff is retained as h232-threshold-clip-partial.patch and the code tree restored to HEAD, which was 19cdd4f8e21a28b058c21f04636dc6f6f82cb33c (this session's opening commit) -- the patch's base revision, recorded in its header line and checked by tests/test_retained_patches_apply.py.
     evidence: [packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/h230-gap-wedge-derivation.md]
     files: []
     checks: []
@@ -226,7 +226,7 @@ session:
     status: canceled
     recording: contemporaneous
     phase: 1
-    outcome: Stopped by the owner at 17:02Z with the geometry module begun; the diff is retained as h230-gap-wedge-port-partial.patch and the lane's exact-check scripts as .py.txt under h230-gap-wedge-scratch.
+    outcome: Stopped by the owner at 17:02Z with the geometry module begun; the diff is retained as h230-gap-wedge-port-partial.patch, against the same base revision 19cdd4f8e21a28b058c21f04636dc6f6f82cb33c, and the lane's exact-check scripts as .py.txt under h230-gap-wedge-scratch.
     evidence: [packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/h230-gap-wedge-derivation.md]
     files: []
     checks: []

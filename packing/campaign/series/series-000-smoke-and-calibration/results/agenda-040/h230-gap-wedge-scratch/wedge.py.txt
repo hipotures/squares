@@ -1,3 +1,4 @@
+# Retained Session 148 scratch (H-230 gap-wedge lane), not a maintained tool: run as written against packing/ at 19cdd4f8, kept as .py.txt so it stays off the import path and out of the Ruff/BasedPyright floor.
 """Gap-g wall-wedge lemma: exact tools.
 
 Wall frame: wall is y = 0, container above. Q is a unit square whose lowest vertex is

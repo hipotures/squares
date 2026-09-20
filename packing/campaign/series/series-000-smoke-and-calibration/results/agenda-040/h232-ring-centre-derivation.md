@@ -6,7 +6,12 @@ Status: **INSTRUMENT** (lane verdict), reviewed ADMIT WITH CORRECTIONS in
 The lane’s report follows as delivered; the review notes one unused chord-formula
 sentence in Theorem 2 whose breakpoint should read r = sin t (linear piece) with the
 flat piece on [sin t, cos t], and that the instrument-gap paragraph describes a
-concurrent lane’s uncommitted worktree edits, not HEAD.
+concurrent lane’s uncommitted worktree edits, not HEAD. The review also corrects the
+fixed-support screen’s reading (its finding 7): where sections 3 and 5 say a value >= 7
+“kills the single-orbit instrument on this support”, weak duality plus the domination
+lemma make total >= 7 the full H-232 kill for every site set, not a statement about one
+orbit — which makes the screen the decisive first experiment.
+A value < 7 still decides nothing, since another support may reach 7.
 
 Read-only Fable pass in /home/user/squares-chunk5 (branch
 claude/kind-wright-whxxn6-chunk5, HEAD bfeba117). Nothing under the repository tree was

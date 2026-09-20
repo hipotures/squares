@@ -1,3 +1,4 @@
+# Retained Session 148 scratch (H-232 ring-centre lane), not a maintained tool: run as written against packing/ at 19cdd4f8, kept as .py.txt so it stays off the import path and out of the Ruff/BasedPyright floor.
 import json,sys
 from fractions import Fraction as F
 SP=sys.argv[1]; L=F(96,25)
