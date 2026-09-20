@@ -158,6 +158,7 @@ Each entry summarizes one user-level research window. Cycle slots are wall-clock
 | [session-141](agent-sessions/session-141-n100-research.md) | stopped | contemporaneous | `review-planning-oversight` (process) | `review-planning-oversight` (process) | 3 | think-ul7y | Continue H-216 under think-qqzs. |
 | [session-142](agent-sessions/session-142-stack-correctness.md) | completed | contemporaneous | `pipeline-improvement` (correctness) | `factual-review` (correctness) | 2 | think-gz4k | Return to H-216 under think-qqzs. |
 | [session-143](agent-sessions/session-143-lower-bound-math-review.md) | in_progress | contemporaneous | `insight-iteration` (insight) | `review-planning-oversight` (insight) | 2 | think-srln | Integrate the lane reports after the adversarial review wave. |
+| [session-144](agent-sessions/session-144-overnight-chunk-1.md) | in_progress | contemporaneous | `research-loop` (insight) | `research-loop` (insight) | 1 | think-pogj | Close chunk 1 and open chunk 2 (BC-363) on the next stacked branch. |
 
 ### Workflow summary
 
@@ -170,7 +171,7 @@ Declared counts are contemporaneous contracts; retrospective counts are reconstr
 | `insight-iteration` | 25 | 1 | 81 | 4 |
 | `process-review` | 16 | 4 | 64 | 6 |
 | `efficiency-loop` | 10 | 1 | 36 | 1 |
-| `research-loop` | 27 | 4 | 101 | 8 |
+| `research-loop` | 28 | 4 | 102 | 8 |
 | `pipeline-improvement` | 34 | 2 | 152 | 5 |
 | `documentation-pass` | 1 | 0 | 24 | 1 |
 | `remediation` | 0 | 1 | 0 | 3 |
@@ -797,7 +798,7 @@ Status: **active**. Run the hypotheses X-040 adapted from the Session 143 review
 
 | id | status | title | rounds | opened because |
 | --- | --- | --- | --- | --- |
-| series-000 | open | S0: smoke and calibration — prove the machinery, establish every baseline metric | 147 | First series. There is no prior instrument, so not |
+| series-000 | open | S0: smoke and calibration — prove the machinery, establish every baseline metric | 150 | First series. There is no prior instrument, so not |
 
 ## Registry
 
@@ -963,9 +964,9 @@ Status: **active**. Run the hypotheses X-040 adapted from the Session 143 review
 | H-220 | unresolved | proof | A rows-complete covering of mass strictly below n exists at a containe | n: 32* 31* 30* 26* 27* 29* 45* 44* | 8 |  | 164.1m wall |
 | H-221 | confirmed | proof | A rows-complete covering of mass strictly below 18 exists at a contain | n: 18* | 1 |  | 8.2m wall |
 | H-222 | blocked | proof | At n=11, side 96/25, B = 9977/10000 on the 181-direction net, the rest |  | 0 |  |  |
-| H-223 | open | proof | A point-atom certificate exists for n=13 at container side 399/100 wit |  | 0 |  |  |
-| H-224 | open | proof | At n=17, side 23/5, B = 9977/10000 on the 181-direction net, an exact  |  | 0 |  |  |
-| H-225 | open | proof | A point-atom certificate exists for n=26 at container side 53/10 with  | side: 53/10 107/20 27/5 | 0 |  |  |
+| H-223 | running | proof | A point-atom certificate exists for n=13 at container side 399/100 wit |  | 1 |  |  |
+| H-224 | running | proof | At n=17, side 23/5, B = 9977/10000 on the 181-direction net, an exact  |  | 1 |  |  |
+| H-225 | running | proof | A point-atom certificate exists for n=26 at container side 53/10 with  | side: 53/10 107/20 27/5 | 1 |  |  |
 | H-226 | blocked | proof | In every packing of 21 boxes (open squares of side above 1) in [0, 5]^ |  | 0 |  |  |
 | H-227 | blocked | proof | In every packing of 32 boxes in [0, 6]^2, some wall-parallel line at d |  | 0 |  |  |
 | H-228 | blocked | proof | A weighted measure on [0, 4]^2 of total mass strictly below 12 puts ma |  | 0 |  |  |
@@ -1158,6 +1159,14 @@ Status: **active**. Run the hypotheses X-040 adapted from the Session 143 review
 | exp-032 | series-000 | 3 | openai-codex | H-021 | The exact connected and isolated controls pass, every declared conflation fails, and all unsupported floating-point observations remain unresolved. |
 | exp-201 | series-000 | 18 | claude-opus-5 | H-201 | Calibration, not a scored round: it freezes p_perturb = 1.0, perturb_scale = 2 and a flat mu = 5 for exp-202 and exp-203, and it turned up a schedule-length effect that is now registered as H-204 rather than folded into an arm. |
 
+### in-progress (3)
+
+| id | series | instance | operator | hypotheses | reason |
+| --- | --- | --- | --- | --- | --- |
+| exp-213 | series-000 | 17 | Claude session-144 Opus runner | H-224 | Registered before the run; no number yet. |
+| exp-214 | series-000 | 13 | Claude session-144 Opus runner | H-223 | Registered before the run; no number yet. |
+| exp-215 | series-000 | 26 | Claude session-144 Opus runner | H-225 | Registered before the run; no number yet. |
+
 ## Resumable — stopped on the clock, not on an answer
 
 | id | hypotheses | spent | stopped by | resume from | reopen when |
@@ -1201,7 +1210,7 @@ Status: **active**. Run the hypotheses X-040 adapted from the Session 143 review
 
 ## Effort
 
-147 rounds, 2512.1 agent-minutes, 2568.2 wall-minutes.
+150 rounds, 2512.1 agent-minutes, 2568.2 wall-minutes.
 
 These totals exclude 4 historical rounds with unrecorded timing; their cost is unknown, not zero.
 

@@ -143,10 +143,10 @@ hypothesis status and summarizes experiment verdicts, and the
 | --- | ---: | --- |
 | Agendas | 37 | 17 active; 14 completed; 5 paused; 1 superseded |
 | Commitments | 355 | 178 complete; 61 stopped; 68 blocked; 18 ready; 21 tentative; 9 in progress |
-| Sessions | 143 | 85 completed; 57 stopped; 1 nonterminal |
+| Sessions | 144 | 85 completed; 57 stopped; 2 nonterminal |
 | Explorations | 38 | 24 linked to proposed hypotheses; 14 uncodified |
-| Hypotheses | 169 | 28 confirmed; 29 refuted; 57 blocked; 14 unresolved; 8 open; 29 open questions; 2 result registered; 2 abandoned; 0 running |
-| Experiments | 147 | 41 accepted; 34 rejected; 46 unresolved; 12 baseline; 11 blocked; 3 abandoned; 0 in progress |
+| Hypotheses | 169 | 28 confirmed; 29 refuted; 57 blocked; 14 unresolved; 5 open; 29 open questions; 2 result registered; 2 abandoned; 3 running |
+| Experiments | 150 | 41 accepted; 34 rejected; 46 unresolved; 12 baseline; 11 blocked; 3 abandoned; 3 in progress |
 | Frontier results | 30 | 30 registered |
 
 <!-- END CURRENT-RESEARCH-STATUS -->
@@ -4074,9 +4074,9 @@ round that names the hypothesis, control roles included.
 | [H-220](packing/campaign/hypotheses/H-220-seedless-colgen-raises-nagamochi-floor.md) | unresolved | A rows-complete covering of mass strictly below n exists at a queued Nagamochi-only side on a seedless stock-colgen site set | 8 | exp-166 unresolved at 29.803318; exp-167 unresolved at 28.331329; exp-168 unresolved at 27.178193; exp-169 unresolved at 25.000000; exp-170 unresolved at 25.000000; exp-171 unresolved, freeze interval-refused; exp-172 unresolved at 42.137360; exp-173 unresolved at 41.236782 |
 | [H-221](packing/campaign/hypotheses/H-221-t029-seeded-colgen-raises-s18.md) | confirmed | A rows-complete covering of mass strictly below 18 exists at a container side in (1871/400, 117/25) on a T-029-seeded stock-colgen site set | 1 | T-030 |
 | [H-222](packing/campaign/hypotheses/H-222-n11-octagon-class-at-96-25.md) | blocked | The all-free corner class at n=11, 96/25, d = 1/2 has restricted covering value below 11; blocked on a convex corner-clip domain predicate | 0 | — |
-| [H-223](packing/campaign/hypotheses/H-223-n13-point-covering-at-399-100.md) | open | A point-atom certificate exists at n=13, 399/100 on a window-seeded site set; calibration under s(13) = 4 | 0 | — |
-| [H-224](packing/campaign/hypotheses/H-224-n17-ceiling-family-at-23-5.md) | open | A depth-one ceiling family of total 17 exists at n=17, 23/5, closing the fixed-shrink point route there for every site set | 0 | — |
-| [H-225](packing/campaign/hypotheses/H-225-n26-seeded-certificate-at-53-10.md) | open | A seeded point certificate exists at n=26, 53/10, a first-party floor above Nagamochi’s 5 | 0 | — |
+| [H-223](packing/campaign/hypotheses/H-223-n13-point-covering-at-399-100.md) | running | A point-atom certificate exists at n=13, 399/100 on a window-seeded site set; calibration under s(13) = 4 | 1 | exp-214 in progress |
+| [H-224](packing/campaign/hypotheses/H-224-n17-ceiling-family-at-23-5.md) | running | A depth-one ceiling family of total 17 exists at n=17, 23/5, closing the fixed-shrink point route there for every site set | 1 | exp-213 in progress |
+| [H-225](packing/campaign/hypotheses/H-225-n26-seeded-certificate-at-53-10.md) | running | A seeded point certificate exists at n=26, 53/10, a first-party floor above Nagamochi’s 5 | 1 | exp-215 in progress |
 | [H-226](packing/campaign/hypotheses/H-226-n21-one-spare-wall-charge-lemma.md) | blocked | The one-spare wall-charge lemma closes n=21 after the Theorem 11 replay at the printed constant; blocked on the enumeration tool | 0 | — |
 | [H-227](packing/campaign/hypotheses/H-227-n32-one-spare-wall-charge-lemma.md) | blocked | The one-spare wall-charge lemma closes n=32; blocked on the same tool | 0 | — |
 | [H-228](packing/campaign/hypotheses/H-228-n12-unshrunk-covering-at-side-4.md) | blocked | An unshrunk covering below 12 exists at n=12, side 4; blocked on an unshrunk verifier | 0 | — |
@@ -4360,8 +4360,8 @@ in separate tables: their units differ, and the same work can appear in both.
 | Coverage | sessions |
 | --- | ---: |
 | measured | 88 |
-| unmeasured | 55 |
-| **total** | **143** |
+| unmeasured | 56 |
+| **total** | **144** |
 
 <!-- END GENERATED: session-close-report -->
 
@@ -4377,7 +4377,7 @@ The relevant generator writes the receipt, and the entry fills in on the next
 
 ## Experiments Conducted
 
-There are 147 rounds registered in `series-000`.
+There are 150 rounds registered in `series-000`.
 
 They record 2512.1 agent-minutes and 2568.2 wall-minutes.
 These totals exclude four historical annealing rounds with unrecorded timing; their wall
@@ -4721,9 +4721,9 @@ archive beside it.
 | exp-211 | 24 deterministic trajectory cells shared with exp-212 | shared; no duplicate charge | — | criterion | `9cca493c17ab61d5efb3e1032f32c54a9b87320e` |
 | exp-212 | 48 deterministic trajectory cells | 86.689 s | — | criterion | `9cca493c17ab61d5efb3e1032f32c54a9b87320e` |
 
-### What the 147 rounds jointly establish
+### What the 150 rounds jointly establish
 
-The 147 rounds use 2512.1 agent-minutes and 2568.2 wall-minutes under the campaign’s
+The 150 rounds use 2512.1 agent-minutes and 2568.2 wall-minutes under the campaign’s
 retained effort accounting.
 The never-invoked exp129 adds no scientific result or execution time.
 Exp-114 contributes 2.46 seconds of target/replay effort; its readiness work is recorded

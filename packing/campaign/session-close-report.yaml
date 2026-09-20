@@ -7,12 +7,12 @@ softschema:
   schema: schemas/session-close-report.schema.yaml
   envelope: null
   status: enforced
-count: 143
+count: 144
 generated_by: >-
   uv run --frozen --all-extras --group dev python -m devtools.close_session --render
 totals:
   sessions_measured: 88
-  sessions_unmeasured: 55
+  sessions_unmeasured: 56
   attributed:
     rollups: 129
     turns: 40048
@@ -2346,6 +2346,16 @@ sessions:
   status: in_progress
   primary_bead: think-srln
   phases: 2
+  measured: false
+  unmeasured_reason: >-
+    declares no resource measurement
+  rollups: []
+  codex_receipts: []
+- id: session-144
+  title: "Overnight Chunk 1 — Stock-Instrument Determinations at n=13, 17, 26"
+  status: in_progress
+  primary_bead: think-pogj
+  phases: 1
   measured: false
   unmeasured_reason: >-
     declares no resource measurement
