@@ -7,12 +7,12 @@ softschema:
   schema: schemas/session-close-report.schema.yaml
   envelope: null
   status: enforced
-count: 145
+count: 146
 generated_by: >-
   uv run --frozen --all-extras --group dev python -m devtools.close_session --render
 totals:
   sessions_measured: 91
-  sessions_unmeasured: 54
+  sessions_unmeasured: 55
   attributed:
     rollups: 148
     turns: 42773
@@ -2400,4 +2400,14 @@ sessions:
   tool_errors: 7
   one_off_code: 104
   wall_hours: 7.95
+  codex_receipts: []
+- id: session-146
+  title: "Overnight Chunk 3 — The exp-219 Registration Review and the Fold Tool"
+  status: in_progress
+  primary_bead: think-b7pr
+  phases: 1
+  measured: false
+  unmeasured_reason: >-
+    declares no resource measurement
+  rollups: []
   codex_receipts: []
