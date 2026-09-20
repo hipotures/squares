@@ -4291,9 +4291,9 @@ in separate tables: their units differ, and the same work can appear in both.
 
 | Rollups | count | turns | tool calls | errors | one-off code | wall |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| claimed by a session | 138 | 41,150 | 22,506 | 452 | 3,554 | 373.78 h |
+| claimed by a session | 144 | 42,104 | 23,040 | 461 | 3,652 | 382.84 h |
 | claimed by none | 60 | 11,110 | 6,539 | 156 | 946 | 51.75 h |
-| **measured** | **198** | **52,260** | **29,045** | **608** | **4,500** | **425.53 h** |
+| **measured** | **204** | **53,214** | **29,579** | **617** | **4,598** | **434.59 h** |
 
 | Session | Phases | Rollups | Turns | Tool calls | Errors | Wall |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -4334,8 +4334,9 @@ in separate tables: their units differ, and the same work can appear in both.
 | [session-109](packing/campaign/agent-sessions/session-109-corner-class-at-q.md) | 1 | 1 | 156 | 67 | 0 | 0.53 h |
 | [session-125](packing/campaign/agent-sessions/session-125-past-the-point-atom-ceiling.md) | 4 | 1 | 1,721 | 695 | 16 | 17.59 h |
 | [session-127](packing/campaign/agent-sessions/session-127-weighted-five-site-atom-admission.md) | 2 | 5 | 434 | 269 | 5 | 0.54 h |
-| [session-143](packing/campaign/agent-sessions/session-143-lower-bound-math-review.md) | 2 | 9 | 1,102 | 671 | 12 | 3.7 h |
-| *shared by 38 sessions* | — | 6 | 22,990 | 12,497 | 280 | 293.24 h |
+| [session-143](packing/campaign/agent-sessions/session-143-lower-bound-math-review.md) | 2 | 8 | 772 | 463 | 11 | 2.43 h |
+| [session-144](packing/campaign/agent-sessions/session-144-overnight-chunk-1.md) | 1 | 6 | 675 | 392 | 9 | 4.03 h |
+| *shared by 39 sessions* | — | 7 | 23,599 | 12,847 | 281 | 299.54 h |
 
 | Codex interval receipt | declaring sessions | model responses | agent time | active union | wall window | live lower bound |
 | --- | --- | ---: | ---: | ---: | ---: | --- |
@@ -4400,8 +4401,8 @@ in separate tables: their units differ, and the same work can appear in both.
 
 | Coverage | sessions |
 | --- | ---: |
-| measured | 89 |
-| unmeasured | 55 |
+| measured | 90 |
+| unmeasured | 54 |
 | **total** | **144** |
 
 <!-- END GENERATED: session-close-report -->
