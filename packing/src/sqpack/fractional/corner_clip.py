@@ -75,10 +75,10 @@ each gets the side that is safe for it:
 * ``excludes`` / ``excludes_square`` exclude on ``penetration <= d``, so the set they
   *keep* is the open ``{penetration > d}`` -- the class exactly. Their consumers
   (`colgen.dual_support`, `colgen.check_ceiling` through `colgen.square_excluded`,
-  `ceiling`'s K4 condition, and the independent reader's K4)
-  **drop** what the predicate excludes, and dropping a member of a ceiling family only
-  weakens the ceiling it proves, never invalidates it, so parting with the boundary band
-  there costs at most bound and never soundness.
+  `ceiling`'s K4 condition, and the independent reader's K4) **drop** what the predicate
+  excludes, and dropping a member of a ceiling family only weakens the ceiling it
+  proves, never invalidates it, so parting with the boundary band there costs at most
+  bound and never soundness.
 * ``thresholds`` / ``half_planes`` / ``clip_polygon`` keep the **closed**
   ``{penetration >= d}``: the kept side of each half-plane is ``>=``, so the sweep's
   domain is the class's closure, larger by one measure-zero band. Its consumer
