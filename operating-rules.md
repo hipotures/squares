@@ -221,6 +221,15 @@ Once per block, not per file: per file it re-reads the same guidelines for every
 and churns text that was already conformant, and a block that only touched records or
 code has nothing for it to do.
 
+A newly retained result also completes the
+[publication sequence](packing/campaign/documentation-pass.md#new-result-publication) in
+the same change: the frontier, README, survey, and affected SVG/PDF/PNG exports must
+agree before landing.
+The
+[Session 142 corrections](docs/project/reviews/review-2026-09-19-pr199-201-correctness.md)
+repaired the atlas while the README still omitted T-027–T-030; checking generated views
+alone did not catch the missing narrative.
+
 ## OR-8: A self-declared budget is not a stop condition
 
 Under an open-ended mandate — “don’t stop”, “run through the night”, “until it is done”

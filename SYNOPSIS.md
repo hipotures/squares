@@ -1034,14 +1034,18 @@ checkpoints.
 The original PRs 199–201 remain unchanged and are not independently ready to
 merge; landing must retain the corrections at the cumulative tip.
 The n=29 candidate remains interval-unresolved and unpromoted.
-Costly partial-selection scheduling remains open under `think-1i1x`; it does not replace
-the selected H-216 continuation.
+The owner’s follow-up on 2026-09-19 requires the PR-by-PR landing-readiness block
+`think-n3fl`, then the small W7 correctness and efficiency block `think-177v`, before
+resuming H-216. The pipeline block includes `think-1i1x` and the publication update
+sequence in the
+[documentation runbook](packing/campaign/documentation-pass.md#new-result-publication).
+The current publication audit is tracked by `think-kq00`.
 
 [Session 141](packing/campaign/agent-sessions/session-141-n100-research.md) closed the
 stacked n<100 research loop.
 It retained T-029 `s(18) >= 1871/400` and T-030 `s(18) >= 4679/1000`, confirmed H-219
 and H-221, and left H-218 and H-220 unconfirmed.
-`think-qqzs` remains the selected next entry.
+`think-qqzs` remains the selected scientific continuation after those prerequisites.
 [Session 140](packing/campaign/agent-sessions/session-140-lb-survey.md) closed the
 preceding stacked-PR n<=100 survey and retained T-028 `s(18) >= 187/40`.
 
