@@ -318,8 +318,7 @@ def test_allowlist_entry_registers_a_bound_with_a_reason(tmp_path: pathlib.Path)
 
 def test_every_allowlist_entry_names_a_bound_that_exists() -> None:
     """A registration that no longer matches a declared bound is stale, not silent."""
-    receipt = declared.report(declared.ROOT)
-    declared_keys = {f"{entry['module']}::{entry['name']}" for entry in receipt["bounds"]}
+    declared_keys = {bound.key for bound in declared.declared_bounds(declared.ROOT)}
 
     assert set(declared.ALLOWLIST) <= declared_keys
     for key, reason in declared.ALLOWLIST.items():

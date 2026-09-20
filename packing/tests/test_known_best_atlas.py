@@ -1097,6 +1097,51 @@ def test_only_the_bound_numeral_carries_the_new_result_accent() -> None:
     assert len(plain) > len(accented)
 
 
+def test_fast_composite_check_rejects_a_stale_bound_label(monkeypatch) -> None:
+    canvas = known_best_builder.CompositeCanvas(
+        CompositeSpec(first_n=18, last_n=18, columns=1, stem="synthetic")
+    )
+    expected_lower = "s(18) ≥ 4.679"
+    monkeypatch.setattr(
+        known_best_builder,
+        "_figure_entries",
+        lambda: {
+            18: {
+                "side": {"display": "s(18) ≤ 4.822876"},
+                "lower": {"display": expected_lower, "shown": True},
+            }
+        },
+    )
+    root = ET.fromstring(
+        """<svg xmlns="http://www.w3.org/2000/svg">
+        <g data-feature="packing-card" data-n="18">
+          <text data-feature="packing-label">18</text>
+          <text data-feature="side-bound">s(18) ≤ 4.822876</text>
+          <text data-feature="lower-bound">s(18) ≥ 4.67</text>
+        </g>
+        </svg>"""
+    )
+
+    expected = (
+        "atlas/known-best/synthetic.svg n=18 lower-bound is "
+        "('s(18) ≥ 4.67',); expected ('s(18) ≥ 4.679',)"
+    )
+    problems = known_best_builder._composite_label_problems(  # pyright: ignore[reportPrivateUsage]  # noqa: SLF001
+        canvas, root
+    )
+    assert problems == [expected]
+
+    lower = next(
+        node
+        for node in root.iter("{http://www.w3.org/2000/svg}text")
+        if node.attrib.get("data-feature") == "lower-bound"
+    )
+    lower.text = expected_lower
+    assert not known_best_builder._composite_label_problems(  # pyright: ignore[reportPrivateUsage]  # noqa: SLF001
+        canvas, root
+    )
+
+
 def _unitsquare_digests() -> dict[int, str]:
     release = json.loads(UNITSQUARE_RESULTS.read_text(encoding="utf-8"))
     return {int(record["n"]): str(record["svg_sha256"]) for record in release["results"]}

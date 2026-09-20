@@ -171,7 +171,7 @@ alone is not full pre-merge evidence.
 | `--fast` | contributor, at a block boundary; the union of the seven tiers below | 69 of 80 | 600 s | record cleared 2026-09-07 when the corpus widened; 229.1 s locally, only the ceiling applies |
 | `--checks` | **CI, on every pull request**, in the `validate` job | 50 of 80 | 140 s | 75.67 s, the geometric mean of 90.19 s and 63.48 s on PR 185 heads `e8c79fe4` and `80a5976f`, the first two readings with `exact verification` concurrent |
 | `--frontend` | **CI, on every pull request**, in the `frontend` job, concurrently | 3 of 80 | 150 s | 85.25 s on the three-step, two-worker topology, the mean of two readings |
-| `--typecheck` | **CI, on every pull request**, in the `typecheck` job, concurrently | 1 of 80 | 130 s | 67.26 s on CI, the mean of two readings |
+| `--typecheck` | **CI, on every pull request**, in the `typecheck` job, concurrently | 1 of 80 | 111 s | 55.67 s on CI, the mean of three readings |
 | `--geometry` | **CI, on every pull request**, in the `geometry` job, concurrently | 9 of 80 | 180 s | 102.73 s on the predecessor topology, the mean of seven readings |
 | `--suite-a` | **CI, on every pull request**, in the `suite-a` job, concurrently | 1 of 80 | 168 s | 109.92 s on exact head `be28ad5a`, the geometric mean of attempts 1–3 of run 35182460400 |
 | `--suite-b` | **CI, on every pull request**, in the `suite-b` job, concurrently | 1 of 80 | 180 s | 124.78 s on exact head `be28ad5a`, the geometric mean of attempts 2–3 of run 35182460400 |
@@ -783,6 +783,19 @@ uv run --frozen --all-extras --group dev python -m devtools.close_session \
   --render --session session-NNN --agenda agenda-NNN
 ```
 
+A session that did not close an agenda still fills
+[`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md) by hand.
+The cost block is the opening, not the description.
+Check the filled body before updating the pull request:
+
+```bash
+uv run --frozen --all-extras --group dev python -m devtools.check_pr_description --file BODY.md
+```
+
+The same command with no arguments checks that the template still carries the required
+headings. Filled mode also refuses a Cost that enumerates every experiment wall.
+`OR-9` treats that dump as unfinished, headings or not.
+
 **The attribution is a bound and the block says so.** `turns.by_branch` is the only
 branch-aware field in `ClaudeEfficiencyRollup`, so a log that ran on more than one
 branch has an exact turn count here and no way to split its tokens or tool calls.
@@ -797,6 +810,11 @@ the records, including one no rollup mentions, because a division by a turn coun
 on exactly that edge.
 
 ## Publishing the Explainer
+
+For every newly retained result, first complete the
+[new result publication sequence](packing/campaign/documentation-pass.md#new-result-publication):
+update the frontier, README and survey, and regenerate affected survey SVG/PDF/PNG
+exports together. That sequence also applies when no explainer edition changes.
 
 The explainer at <https://jlevy.github.io/squares/> is not checked in.
 GitHub Pages builds it from `main` in `.github/workflows/pages.yml`, on every push that

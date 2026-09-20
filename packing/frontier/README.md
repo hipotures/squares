@@ -234,13 +234,13 @@ Counts below are computed from the artifacts, not asserted.
 Of the 265 open cases, **258** have Nagamochi’s formula as their independently verified
 lower bound. The other seven use weighted fractional unavoidable-set certificates held
 here: `n = 11` at the exact dilation limit approximately `3.826447410573` of a threshold
-certificate and `n = 12` at `99/25` (`T-026`, `T-017`); `n = 17` and `n = 18` at
-`459/100` (`T-019`); `n = 19` at `24/5` (`T-020`); and `n = 20` and `n = 21` at `97/20`
-(`T-021`). Within the original `n ≤ 100` corpus, the corresponding Nagamochi count fell
-from sixty-three before 2026-09-03 to fifty-eight after those adoptions.
-The count is checked against the case records by `devtools.check_nagamochi_bounds`
-(`D-430`), because the earlier figure of sixty-three outlived the first adoption by a
-day.
+certificate and `n = 12` at `99/25` (`T-026`, `T-017`); `n = 17` at `459/100` (`T-019`);
+`n = 18` at `4679/1000` (`T-030`); `n = 19` at `24/5` (`T-020`); and `n = 20` and
+`n = 21` at `97/20` (`T-021`). Within the original `n ≤ 100` corpus, the corresponding
+Nagamochi count fell from sixty-three before 2026-09-03 to fifty-eight after those
+adoptions. The count is checked against the case records by
+`devtools.check_nagamochi_bounds` (`D-430`), because the earlier figure of sixty-three
+outlived the first adoption by a day.
 
 Of the 265 open cases, 120 are still held by the trivial grid.
 The other 145 carry non-grid constructions.
@@ -276,8 +276,8 @@ technique; the retained source audit found little case-specific treatment.
 
 `n = 11` is still the smallest gap among cases with a *non-trivial* record, but it is no
 longer clear of the field: `n = 17` follows at `0.0855` and `n = 19` at `0.0856`, then
-`n = 18` at `0.2329`. The first-party certificates of 2026-09-04 moved all four, and the
-spread across them is now a factor of three and a half.
+`n = 18` at `0.1439`. First-party certificates moved all four beginning on 2026-09-04;
+the retained `n = 18` ladder reached `4.679` on 2026-09-19.
 
 ## Cross-References
 

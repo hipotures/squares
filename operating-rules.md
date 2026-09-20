@@ -221,6 +221,15 @@ Once per block, not per file: per file it re-reads the same guidelines for every
 and churns text that was already conformant, and a block that only touched records or
 code has nothing for it to do.
 
+A newly retained result also completes the
+[publication sequence](packing/campaign/documentation-pass.md#new-result-publication) in
+the same change: the frontier, README, survey, and affected SVG/PDF/PNG exports must
+agree before landing.
+The
+[Session 142 corrections](docs/project/reviews/review-2026-09-19-pr199-201-correctness.md)
+repaired the atlas while the README still omitted T-027–T-030; checking generated views
+alone did not catch the missing narrative.
+
 ## OR-8: A self-declared budget is not a stop condition
 
 Under an open-ended mandate — “don’t stop”, “run through the night”, “until it is done”
@@ -319,6 +328,24 @@ groups concrete file and interface changes by purpose.
 Validation, documentation decisions, limitations, ranked follow-up candidates, and the
 one selected next entry follow.
 Agenda chronology may support that account; it may not stand in for it.
+
+**The description is the template.**
+[`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md) is the section
+order.
+`devtools.check_pr_description` refuses a body that drops those headings, replaces
+the disposition table with a session chronology, or opens Cost with every experiment
+wall. Session-141’s first [#201](https://github.com/jlevy/squares/pull/201) draft was a
+heading-less chronology; the first rewrite had the headings and still listed fifteen
+covering walls. [#196](https://github.com/jlevy/squares/pull/196) and
+[#197](https://github.com/jlevy/squares/pull/197) are the filled template: Cost is two
+to four sentences of what the slice is, what it cost, and what it does not do.
+Dispositions are one row per decision, not per probe.
+A contextual dump is an unfinished pull request, the same as a missing cost block.
+From `packing/`:
+
+```bash
+uv run --frozen --all-extras --group dev python -m devtools.check_pr_description --file BODY.md
+```
 
 ## OR-10: Treat matched agent and host handoffs as continuation, not a reset
 
