@@ -47,7 +47,7 @@ session:
       is not written and the refusal is recorded on H-222.
     fallback: Record what was written, keep the clocks honest, and leave the entry to BC-367.
     outcome: >-
-      T-031 registered at the reviewed scope, V4/C4 on the two gate routes,
+      T-031 registered at the reviewed scope, V4/C3 on the two gate routes,
       significance 2, apparently novel, with two evidence entries carrying a novelty
       basis, a case package whose certificate.json is the retained exp-220 bytes, a
       control test pinning the digest, and the register views, README and n=11 record
@@ -77,7 +77,7 @@ session:
   checks:
   - 'full gate: fast at e2721b68: passed (hosted run 35514319906; pages run 35514319902)'
   - packing-validate --records passed locally at e2721b68 and on the closeout tree.
-  - check_results derives V4 and C4 from the two machine decisions; check_rung_figures recomputes the mass from the case certificate's atoms.
+  - 'check_results derives V4 and C4 from the two machine decisions and accepts the declared C3 as an explained understatement (the two gate routes are one invocation, PR 208 review finding 1); check_rung_figures recomputes the mass from the case certificate''s atoms.'
   - The case certificate is byte-identical to the retained exp-220 covering and carries its digest.
   stop_reason: >-
     The BC-367 registration entry is on the register with every check passing; the

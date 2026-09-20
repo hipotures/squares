@@ -31,6 +31,17 @@ With the flag, `decide_certificate --corner-clip 1/2` printed:
 RETAINABLE UNDER THE CORNER CLASS HYPOTHESIS (no square meets x + y <= 1/2 in any corner frame): both routes accept and agree at 2000013/2000000; sha256 876820dde8d55c727dec73c85f245db27661556bb3c7aa06ffb15b01ec97a461
 ```
 
+**Erratum (2026-09-20, review defect D5).** The headline above says the hypothesis is
+“no square meets x + y <= 1/2 in any corner frame”, which is `min(x + y) > 1/2` — a
+strictly smaller hypothesis than the set the sweep actually covered.
+What was decided is `min(x + y) >= 1/2`: `corner_clip.half_planes` keeps the boundary on
+the kept side deliberately, since “taking it closed keeps a measure-zero boundary the
+class cannot realise, which is the safe direction”.
+Both readings are sound, and the closed one is the stronger of the two, which is why
+T-031 concludes that some square meets the *open* triangle `x + y < 1/2`. The retained
+`.stdout` is not edited and the gate was not re-run: the string is what the instrument
+printed on the day, and the erratum is the correction layer.
+
 Without the flag it exited 1:
 
 ```

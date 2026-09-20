@@ -985,6 +985,17 @@ def test_the_slow_marker_is_declared_only_by_measured_nodes() -> None:
             # 34139067270) before the surface copy was cut to the atlas sample's stride.
             "test_every_known_best_witness_agrees_with_its_manifest_entry",
         },
+        # 33s of call time across 1, measured 2026-09-20 on a four-cpu box: the T-031
+        # retention gate replayed on the case certificate, both routes over its 680
+        # atoms -- 1,743,736 interval boxes and the exact event-cell sweep of the
+        # clipped row domain. Not a shared build -- the file's three other tests read
+        # the frozen bytes and cost 0.01s between them, and the refusal without
+        # `--corner-clip` never reaches either route, so it stays on the pull-request
+        # surface -- so this pays only for itself. It is the control that makes the two
+        # T-031 evidence atoms' `replay_status: passed` a measurement.
+        "test_n11_corner_class_certificate.py": {
+            "test_the_gate_decides_the_case_certificate_under_the_corner_clip",  # 33.4s
+        },
         # 47s of call time across 1: the interval route over the whole doubled net of the
         # retained threshold certificate, 361 directions and 1,639,903 boxes at one
         # worker. Not a shared build -- the file's other seven tests sweep one direction
