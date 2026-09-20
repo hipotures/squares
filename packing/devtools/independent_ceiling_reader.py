@@ -121,6 +121,33 @@ class Square:
         v = -s * self.centre_x + c * self.centre_y
         return integer_slab(c, s, u - h, u + h), integer_slab(-s, c, v - h, v + h)
 
+    def corner_penetration(self, outer: Fraction) -> Fraction:
+        """The least ``x + y`` this square reaches in any of the four corner frames.
+
+        Written from the statement: for a closed square of side S centred at (x, y) at
+        angle theta the linear functional x + y is extreme at the four vertices, where
+        it takes x + y + S * {cos, sin, -sin, -cos}, so its minimum over the square is
+        x + y - S * max(|cos|, |sin|). The folded maximum, not the cosine: this record
+        stores mirrored placements whose stated angle is near a quarter turn while the
+        square itself is near axis-parallel, and reading cos there would put a flush
+        corner square deep in the container. The other three corners are the same
+        statement in the frames that put them at the origin, i.e. with x replaced by
+        ``outer - x``, y by ``outer - y``, or both.
+
+        One expression, read by K4 and by the clipped residual, so the condition and
+        the reading cannot drift apart. ``outer`` is the *container* side; the reach
+        uses this placement's own ``side``.
+        """
+        cosine, sine = self.frame()
+        reach = self.side * max(abs(cosine), abs(sine))
+        x, y = self.centre_x, self.centre_y
+        return min(
+            x + y - reach,
+            (outer - x) + y - reach,
+            x + (outer - y) - reach,
+            (outer - x) + (outer - y) - reach,
+        )
+
     @property
     def mirror_half_tangent(self) -> Fraction:
         """The half-tangent of ``pi/2 - theta``: the angle of the reflected square."""
@@ -375,33 +402,20 @@ def check_k3(record: Record) -> dict[str, Any]:
 def check_k4(record: Record, depth: Fraction) -> dict[str, Any]:
     """K4: every placement avoids the four closed corner triangles ``x + y <= depth``.
 
-    Written from the statement, like the rest of this file. For a closed square of side
-    S centred at (x, y) at angle theta, the linear functional x + y is extreme at the
-    four vertices, where it takes the values x + y + S * {cos, sin, -sin, -cos}; so its
-    minimum over the square is x + y - S * max(|cos|, |sin|). The folded maximum, not
-    the cosine: this record stores mirrored placements whose stated angle is near a
-    quarter turn while the square itself is near axis-parallel, and reading cos there
-    would put a flush corner square deep in the container. The other three corners are
-    the same statement in the frames that put them at the origin, i.e. with x replaced
-    by L - x, y by L - y, or both.
+    The penetration itself is ``Square.corner_penetration``, written from the statement
+    like the rest of this file and shared with `clipped_residual` so the condition and
+    the reading cannot disagree.
 
     A family is a ceiling for the *clipped* covering program only if every placement is
     a constraint of that program, and a placement meeting a corner triangle is not: the
-    free class removed it from the row domain.
+    free class removed it from the row domain. The test is strict, ``> depth`` to hold:
+    a square touching a closed triangle meets it.
     """
 
     reached: list[dict[str, str]] = []
     worst: Fraction | None = None
     for index, sq in enumerate(record.squares):
-        c, s = sq.frame()
-        reach = sq.side * max(abs(c), abs(s))
-        x, y, side = sq.centre_x, sq.centre_y, record.outer_side
-        penetration = min(
-            x + y - reach,
-            (side - x) + y - reach,
-            x + (side - y) - reach,
-            (side - x) + (side - y) - reach,
-        )
+        penetration = sq.corner_penetration(record.outer_side)
         if worst is None or penetration < worst:
             worst = penetration
         if penetration <= depth:
@@ -426,16 +440,7 @@ def clipped_residual(record: Record, depth: Fraction) -> dict[str, Any]:
     kept = Fraction(0)
     removed = Fraction(0)
     for sq in record.squares:
-        c, s = sq.frame()
-        reach = sq.side * max(abs(c), abs(s))
-        x, y, side = sq.centre_x, sq.centre_y, record.outer_side
-        penetration = min(
-            x + y - reach,
-            (side - x) + y - reach,
-            x + (side - y) - reach,
-            (side - x) + (side - y) - reach,
-        )
-        if penetration <= depth:
+        if sq.corner_penetration(record.outer_side) <= depth:
             removed += sq.weight
         else:
             kept += sq.weight

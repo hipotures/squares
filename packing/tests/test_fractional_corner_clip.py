@@ -22,6 +22,7 @@ from pathlib import Path
 
 import pytest
 
+from cases.n17_weighted_certificate.fixture import load_retained_fixture
 from devtools.decide_certificate import main as gate_main
 from devtools.declare_least_cell_mass import declare
 from devtools.independent_ceiling_reader import decide as read_ceiling
@@ -126,6 +127,48 @@ def test_the_slab_form_agrees_with_the_centre_form_on_every_d4_image() -> None:
     assert all(square_excluded(image, clip, side) == expected for image in square.images())
 
 
+def _on_the_kept_side_of_every_half_plane(
+    clip: CornerClip, x: Fraction, y: Fraction, cosine: Fraction, sine: Fraction
+) -> bool:
+    """Whether the centre survives `half_planes`, which keep the closed side."""
+    u, v = cosine * x + sine * y, -sine * x + cosine * y
+    return all(nu * u + nv * v >= offset for nu, nv, offset in clip.half_planes(cosine, sine))
+
+
+def test_the_two_kept_sets_differ_exactly_on_the_boundary_band() -> None:
+    """The module's two conventions, pinned so neither can be tidied into the other.
+
+    ``excludes`` keeps the open ``penetration > d`` -- the free class exactly -- because
+    its consumers drop what it excludes from a ceiling family, where dropping only
+    weakens the bound. ``half_planes`` keeps the closed ``penetration >= d``, because its
+    consumer quantifies Condition 5 over what is kept, where keeping more rows is the
+    stricter statement. So the two disagree on the boundary band and nowhere else, and
+    aligning them the wrong way -- opening ``half_planes`` -- would drop rows out of a
+    covering program. See "Two boundary conventions, on purpose" in ``corner_clip``.
+    """
+    side, shrink, depth = Fraction(4), Fraction(7, 10), Fraction(1, 2)
+    clip = CornerClip(side, shrink, depth)
+    cosine, sine = Fraction(1), Fraction(0)
+    axes = (Fraction(1), Fraction(0), Fraction(0), Fraction(1))
+    step = Fraction(1, 10**6)
+    on_the_line = (depth + shrink) / 2
+    for offset, excluded, kept_by_the_sweep in (
+        (-step, True, False),
+        (Fraction(0), True, True),
+        (step, False, True),
+    ):
+        centre = on_the_line + offset
+        assert clip.excludes(centre, centre, cosine, sine) is excluded
+        assert clip.excludes_square(axes, (centre, centre), shrink / 2) is excluded
+        assert (
+            _on_the_kept_side_of_every_half_plane(clip, centre, centre, cosine, sine)
+            is kept_by_the_sweep
+        )
+    # Exactly on the band the two conventions disagree, and only there.
+    assert clip.excludes(on_the_line, on_the_line, cosine, sine)
+    assert _on_the_kept_side_of_every_half_plane(clip, on_the_line, on_the_line, cosine, sine)
+
+
 def test_the_clipped_centre_domain_is_an_octagon_with_the_derived_cut() -> None:
     side, shrink, depth = Fraction(96, 25), Fraction(9977, 10000), Fraction(1, 2)
     direction = rotation_from_half_tangent("0", Fraction(0))
@@ -147,6 +190,54 @@ def test_an_absent_clip_leaves_the_centre_domain_byte_for_byte() -> None:
         assert centre_domain(side, shrink, direction, clip=None) == centre_domain(
             side, shrink, direction
         )
+
+
+def _retained_n17(steps: int) -> Certificate:
+    """The retained ``n = 17`` weighted data on a ``steps``-interval net.
+
+    The same re-encoding `test_fractional_certificate.retained_certificate` uses,
+    repeated here so this module's end-to-end pin does not import another test.
+    """
+    fixture = load_retained_fixture()
+    scale = Fraction(fixture.weight_scale)
+    return Certificate(
+        n=17,
+        outer_side=fixture.outer_side,
+        square_side=fixture.square_side,
+        atoms=tuple(
+            Atom(atom.label, atom.x, atom.y, atom.weight / scale) for atom in fixture.atoms
+        ),
+        half_tangents=tuple(fixture.angle_limit * k / steps for k in range(steps + 1)),
+    )
+
+
+def test_an_absent_clip_leaves_both_gate_routes_at_their_unclipped_numbers() -> None:
+    """The end-to-end half of the invariance: a retained decision, ``clip=None``.
+
+    The test above pins one function; this one pins what the risk story actually rests
+    on -- that a certificate decided without the flag gets the number it got before the
+    clip existed, on both routes and over the whole doubled net. The fixture is the
+    retained ``n = 17`` data on a six-interval net: Condition 5 is the clip-sensitive
+    condition and it is decided in full here (13 directions, no stalled box), at a cost
+    of well under a second, while Condition 4 refuses the coarse net -- deliberately, so
+    the fixture stays fast and the assertion stays about the number rather than about a
+    verdict.
+
+    Pinned at ``8f4eca7d``, where the numbers below are also what the pre-clip code
+    produced; the wider evidence is the unclipped re-decision of the retained
+    ``n18-467-100`` certificate recorded in ``devtools/replay_bc303_t1_witness.py``. The
+    interval box count is not asserted: it is a float branch-and-bound count and this
+    suite does not pin one anywhere.
+    """
+    certificate = _retained_n17(6)
+    exact = verify(certificate, workers=1)
+    assert exact.minimum_cell_mass == 1
+    assert exact.failures == ("Condition 4 containment B(1 + D) < 1",)
+    interval = verify_by_intervals(certificate, enclose=True)
+    assert interval.enclosure == (Fraction(1), Fraction(1))
+    assert interval.failures == ("Condition 4 containment B(1 + D) < 1",)
+    assert len(interval.directions) == 13
+    assert sum(outcome.stalled for outcome in interval.directions) == 0
 
 
 # --- R1's control: the retained family restricted to the clipped domain -------
