@@ -144,7 +144,7 @@ hypothesis status and summarizes experiment verdicts, and the
 | --- | ---: | --- |
 | Agendas | 37 | 17 active; 14 completed; 5 paused; 1 superseded |
 | Commitments | 356 | 181 complete; 61 stopped; 68 blocked; 16 ready; 21 tentative; 9 in progress |
-| Sessions | 148 | 90 completed; 57 stopped; 1 nonterminal |
+| Sessions | 148 | 90 completed; 58 stopped; all terminal |
 | Explorations | 38 | 24 linked to proposed hypotheses; 14 uncodified |
 | Hypotheses | 170 | 29 confirmed; 31 refuted; 55 blocked; 17 unresolved; 5 open; 29 open questions; 2 result registered; 2 abandoned; 0 running |
 | Experiments | 155 | 43 accepted; 36 rejected; 50 unresolved; 12 baseline; 11 blocked; 3 abandoned; 0 in progress |
@@ -534,6 +534,7 @@ case or experiment separately.
 | [Exp-214 n=13 399/100 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-214-n13-399-100-receipt.md) | research synthesis | record | retained | — |
 | [Exp-215 n=26 53/10 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-215-n26-53-10-receipt.md) | research synthesis | record | retained | — |
 | [n=17 23/5 T-019-Seeded Ceiling-Family Receipt (exp-218)](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-218-n17-23-5-receipt.md) | research synthesis | record | retained | — |
+| [H-230 Gap-g Wedge Derivation (Session 148, chunk 5)](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/h230-gap-wedge-derivation.md) | research synthesis | record | retained | — |
 | [H-232 Ring-Centre Derivation (Session 148, chunk 5)](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/h232-ring-centre-derivation.md) | research synthesis | record | retained | — |
 | [H-232 Ring-Centre Review (Session 148, chunk 5)](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/h232-ring-centre-review.md) | research synthesis | record | retained | — |
 | [Exp-220 n=11 96/25 Class Re-Freeze Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-220-n11-96-25-class-receipt.md) | research synthesis | record | retained | — |
@@ -1049,6 +1050,25 @@ controller, not permission to blur contracts.
 
 ### Current Handoff
 
+[Session 148](packing/campaign/agent-sessions/session-148-overnight-chunk-5.md), chunk 5
+on [PR 209](https://github.com/jlevy/squares/pull/209), stopped at the owner’s request
+at 17:02Z with its work captured.
+It registered H-232 after an adversarial review: the all-deep corner class at 96/25 is
+pinned (occupant cores contain X', at least three non-occupants at depth at least sqrt 2
+\- 1 from every wall, at most one in the central 1.84-box), the ring-centre 2-of-3 atom
+collects exactly 5/4 against a budget of 1 from the transported 88-family, the maximum,
+and the fixed-support screen is the full kill at value 7. The gap-g wedge lemma (BC-364,
+H-230) is derived and reaches the 7.11 degree orbit but cuts no weighted pair of the
+64-family (CANNOT REACH, unreviewed).
+Two partial ports (the corner clip on the threshold routes, the gap_wedge tool) are
+retained as patches under results/agenda-040. No bound moved.
+
+**Selected next entry:** `think-b7pr`, BC-367: resume under `think-n1v2` from the
+retained patches and the wedge derivation (its review, exp-221 for H-230, BC-364’s
+disposition, the threshold clip), then H-232’s fixed-support screen under `think-qq32`,
+in Session 149 on the next stacked branch.
+BC-357 / H-216 stays the registered n=6 calibration entry in agenda-037.
+
 [Session 147](packing/campaign/agent-sessions/session-147-overnight-chunk-4.md)
 completed overnight chunk 4 of agenda-040 in
 [PR 208](https://github.com/jlevy/squares/pull/208), stacked on PR 207: T-031 registers
@@ -1056,10 +1076,8 @@ the `exp-220` exclusion of the octagon corner class at 96/25 at the scope Sessio
 review accepted, V4/C4 on the two gate routes, significance 2, with a case package and a
 control test. The overnight loop closed on its clock after four chunks; no bound moved.
 
-**Selected next entry:** `think-b7pr`, BC-367: the four mixed corner classes at 96/25
-under the admitted instrument with a box cut, and a second n=26 site set, in Session 148
-on the next stacked branch.
-BC-357 / H-216 stays the registered n=6 calibration entry in agenda-037.
+The selected entry at that cutoff was `think-b7pr`, BC-367: the four mixed corner
+classes at 96/25 and a second n=26 site set.
 
 [Session 146](packing/campaign/agent-sessions/session-146-overnight-chunk-3.md)
 completed overnight chunk 3 of agenda-040 in
@@ -4357,9 +4375,9 @@ in separate tables: their units differ, and the same work can appear in both.
 
 | Rollups | count | turns | tool calls | errors | one-off code | wall |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| claimed by a session | 151 | 43,282 | 23,755 | 472 | 3,755 | 386.29 h |
+| claimed by a session | 160 | 43,909 | 24,112 | 483 | 3,825 | 391.98 h |
 | claimed by none | 60 | 11,110 | 6,539 | 156 | 946 | 51.75 h |
-| **measured** | **211** | **54,392** | **30,294** | **628** | **4,701** | **438.04 h** |
+| **measured** | **220** | **55,019** | **30,651** | **639** | **4,771** | **443.73 h** |
 
 | Session | Phases | Rollups | Turns | Tool calls | Errors | Wall |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -4405,7 +4423,8 @@ in separate tables: their units differ, and the same work can appear in both.
 | [session-145](packing/campaign/agent-sessions/session-145-overnight-chunk-2.md) | 1 | 4 | 649 | 391 | 6 | 1.54 h |
 | [session-146](packing/campaign/agent-sessions/session-146-overnight-chunk-3.md) | 1 | 3 | 283 | 174 | 4 | 0.62 h |
 | [session-147](packing/campaign/agent-sessions/session-147-overnight-chunk-4.md) | 1 | 0 | 0 | 0 | 0 | 0 h |
-| *shared by 42 sessions* | — | 7 | 23,845 | 12,997 | 282 | 300.83 h |
+| [session-148](packing/campaign/agent-sessions/session-148-overnight-chunk-5.md) | 1 | 9 | 524 | 296 | 11 | 2.35 h |
+| *shared by 43 sessions* | — | 7 | 23,948 | 13,058 | 282 | 304.17 h |
 
 | Codex interval receipt | declaring sessions | model responses | agent time | active union | wall window | live lower bound |
 | --- | --- | ---: | ---: | ---: | ---: | --- |
@@ -4470,8 +4489,8 @@ in separate tables: their units differ, and the same work can appear in both.
 
 | Coverage | sessions |
 | --- | ---: |
-| measured | 93 |
-| unmeasured | 55 |
+| measured | 94 |
+| unmeasured | 54 |
 | **total** | **148** |
 
 <!-- END GENERATED: session-close-report -->

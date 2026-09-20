@@ -1,0 +1,31 @@
+import json, sys, math
+from fractions import Fraction as F
+sys.path.insert(0, "/home/user/squares-chunk5/packing/src")
+from sqpack.fractional.ceiling import CeilingCertificate
+base="/home/user/squares-chunk5/packing/campaign/series/series-000-smoke-and-calibration/results/agenda-034/"
+def load(name):
+    return CeilingCertificate.from_record(json.load(open(base+name)))
+def geom(p):
+    t=p.half_tangent; c=(1-t*t)/(1+t*t); s=2*t/(1+t*t); h=p.side/2
+    cx,cy=p.centre_x,p.centre_y
+    verts=[(cx+a*c*h-b*s*h, cy+a*s*h+b*c*h) for a,b in [(1,1),(1,-1),(-1,1),(-1,-1)]]
+    return c,s,verts
+for name in sys.argv[1:]:
+    fam=load(name); L=fam.outer_side
+    print("==",name,"n",fam.n,"L",L,"B",fam.square_side,"placements",len(fam.placements),"total",fam.total_weight)
+    rows=[]
+    for i,p in enumerate(fam.placements):
+        c,s,v=geom(p)
+        xs=[x for x,y in v]; ys=[y for x,y in v]
+        gaps=(min(xs), L-max(xs), min(ys), L-max(ys))
+        theta=math.degrees(2*math.atan(float(p.half_tangent)))
+        rows.append((theta, p.weight, float(min(gaps)), [float(g) for g in gaps], (float(p.centre_x),float(p.centre_y)), i, p.half_tangent, gaps))
+    # group by (theta, weight, sorted gaps) to find D4 orbits
+    from collections import defaultdict
+    orb=defaultdict(list)
+    for r in rows:
+        key=(r[6], r[1], tuple(sorted(r[7])))
+        orb[key].append(r)
+    for key,rs in sorted(orb.items(), key=lambda kv: (kv[0][0], kv[0][2])):
+        t,w,g=key
+        print(f"tilt {math.degrees(2*math.atan(float(t))):7.3f} deg (t={t}) weight {w} x{len(rs)} = mass {w*len(rs)}  gaps(sorted) {[round(float(x),4) for x in g]}  centres {[r[4] for r in rs][:2]}")

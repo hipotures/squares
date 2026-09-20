@@ -341,9 +341,11 @@ on.
 It is not the next thing, because a reassessment of what to search is queued in front
 of it.
 
-For the next supervised exact-research goal, take BC-367 under `think-b7pr`: with the
-`exp-220` exclusion registered as T-031, clip the four mixed corner classes at 96/25
-under
+For the next supervised exact-research goal, take BC-367 under `think-b7pr` (resume bead
+`think-n1v2`): finish the threshold-clip and gap_wedge ports from the retained patches,
+review the gap-g wedge derivation and disposition H-230 and BC-364, run H-232’s
+fixed-support screen under `think-qq32`, then clip the four mixed corner classes at
+96/25 under
 [H-222](../../../../packing/campaign/hypotheses/H-222-n11-octagon-class-at-96-25.md)
 with the admitted instrument, and give n=26 a second site set under
 [H-225](../../../../packing/campaign/hypotheses/H-225-n26-seeded-certificate-at-53-10.md),

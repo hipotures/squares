@@ -364,9 +364,16 @@ on [agenda-040](../agendas/agenda-040-overnight-lower-bound-loop.md).
   reviewed scope, V4/C4 on the two gate routes, significance 2, with a case package and
   a control test.
 
+- **Chunk 5 (Session 148, stopped by the owner).** H-232 registered after review: the
+  all-deep class is pinned, the ring-centre 2-of-3 atom collects 5/4 against budget 1
+  from the transported family (the maximum), and the fixed-support screen is the full
+  kill at 7. The gap-g wedge lemma is derived and reaches the 7.11 degree orbit but cuts
+  no weighted pair of the 64-family (unreviewed).
+  Two partial ports retained as patches.
+
 No bound on `s(n)` moved.
-The next entry is BC-367: the four mixed corner classes at 96/25 and a second n=26 site
-set.
+The next entry is BC-367 under `think-n1v2`: finish the ports, review the wedge
+derivation and disposition H-230 and BC-364, then H-232’s fixed-support screen.
 
 ## Owner Decisions
 

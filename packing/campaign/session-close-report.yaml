@@ -11,15 +11,15 @@ count: 148
 generated_by: >-
   uv run --frozen --all-extras --group dev python -m devtools.close_session --render
 totals:
-  sessions_measured: 93
-  sessions_unmeasured: 55
+  sessions_measured: 94
+  sessions_unmeasured: 54
   attributed:
-    rollups: 151
-    turns: 43282
-    tool_calls: 23755
-    tool_errors: 472
-    one_off_code: 3755
-    wall_hours: 386.29
+    rollups: 160
+    turns: 43909
+    tool_calls: 24112
+    tool_errors: 483
+    one_off_code: 3825
+    wall_hours: 391.98
   unattributed:
     rollups: 60
     turns: 11110
@@ -28,12 +28,12 @@ totals:
     one_off_code: 946
     wall_hours: 51.75
   measured:
-    rollups: 211
-    turns: 54392
-    tool_calls: 30294
-    tool_errors: 628
-    one_off_code: 4701
-    wall_hours: 438.04
+    rollups: 220
+    turns: 55019
+    tool_calls: 30651
+    tool_errors: 639
+    one_off_code: 4771
+    wall_hours: 443.73
 codex_receipts:
   attributed: 56
   unattributed: 2
@@ -2357,11 +2357,11 @@ sessions:
   - packing/campaign/resource-usage/a8b8b405efc053f16.yaml
   - packing/campaign/resource-usage/a68c79e799a3fc678.yaml
   - packing/campaign/resource-usage/a1730fd7bec467b88.yaml
-  turns: 1627
-  tool_calls: 963
+  turns: 1730
+  tool_calls: 1024
   tool_errors: 13
-  one_off_code: 156
-  wall_hours: 10.02
+  one_off_code: 167
+  wall_hours: 13.36
   codex_receipts: []
 - id: session-144
   title: "Overnight Chunk 1 — Stock-Instrument Determinations at n=13, 17, 26"
@@ -2377,11 +2377,11 @@ sessions:
   - packing/campaign/resource-usage/adb95622cef697549.yaml
   - packing/campaign/resource-usage/a5a0195a7e1b20013.yaml
   - packing/campaign/resource-usage/acb53dcd42fbab01e.yaml
-  turns: 1530
-  tool_calls: 892
+  turns: 1633
+  tool_calls: 953
   tool_errors: 11
-  one_off_code: 148
-  wall_hours: 11.62
+  one_off_code: 159
+  wall_hours: 14.96
   codex_receipts: []
 - id: session-145
   title: "Overnight Chunk 2 — The Corner-Clip Instrument and H-222"
@@ -2395,11 +2395,11 @@ sessions:
   - packing/campaign/resource-usage/af9db849f9a1cc845.yaml
   - packing/campaign/resource-usage/a9d7576dad97ca9ab.yaml
   - packing/campaign/resource-usage/a957ff219905b86a7.yaml
-  turns: 1504
-  tool_calls: 891
+  turns: 1607
+  tool_calls: 952
   tool_errors: 8
-  one_off_code: 133
-  wall_hours: 9.13
+  one_off_code: 144
+  wall_hours: 12.47
   codex_receipts: []
 - id: session-146
   title: "Overnight Chunk 3 — The exp-219 Registration Review and the Fold Tool"
@@ -2412,11 +2412,11 @@ sessions:
   - packing/campaign/resource-usage/a57beb19e2ae7ed7b.yaml
   - packing/campaign/resource-usage/a556b81b10ff8b762.yaml
   - packing/campaign/resource-usage/aac63642e9cd0a16e.yaml
-  turns: 1138
-  tool_calls: 674
+  turns: 1241
+  tool_calls: 735
   tool_errors: 6
-  one_off_code: 94
-  wall_hours: 8.21
+  one_off_code: 105
+  wall_hours: 11.55
   codex_receipts: []
 - id: session-147
   title: "Overnight Chunk 4 — The BC-367 Registration Entry"
@@ -2426,19 +2426,32 @@ sessions:
   measured: true
   rollups:
   - packing/campaign/resource-usage/5e071e1a-5ab8-5bae-a5c0-c3687815bf4a.yaml
-  turns: 855
-  tool_calls: 500
+  turns: 958
+  tool_calls: 561
   tool_errors: 2
-  one_off_code: 79
-  wall_hours: 7.59
+  one_off_code: 90
+  wall_hours: 10.93
   codex_receipts: []
 - id: session-148
   title: "Chunk 5 — The Second Stage Inside the All-Deep Class, and the Gap-g Wedge"
-  status: in_progress
+  status: stopped
   primary_bead: think-b7pr
   phases: 1
-  measured: false
-  unmeasured_reason: >-
-    declares no resource measurement
-  rollups: []
+  measured: true
+  rollups:
+  - packing/campaign/resource-usage/5e071e1a-5ab8-5bae-a5c0-c3687815bf4a.yaml
+  - packing/campaign/resource-usage/a559dad08e3059322.yaml
+  - packing/campaign/resource-usage/ab767eaa07325eb5f.yaml
+  - packing/campaign/resource-usage/af80e22bd291ac081.yaml
+  - packing/campaign/resource-usage/aa765fa0c2414bc33.yaml
+  - packing/campaign/resource-usage/a65f1dd01126278cb.yaml
+  - packing/campaign/resource-usage/a2dbeb566572f2219.yaml
+  - packing/campaign/resource-usage/a7d6f9f0f839a3ab3.yaml
+  - packing/campaign/resource-usage/ac77b62ac52bfd061.yaml
+  - packing/campaign/resource-usage/a7cda6271ca02151e.yaml
+  turns: 1482
+  tool_calls: 857
+  tool_errors: 13
+  one_off_code: 149
+  wall_hours: 13.28
   codex_receipts: []

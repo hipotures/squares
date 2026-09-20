@@ -1,0 +1,62 @@
+"""Admissible (in-container) unit squares, distances of non-overlapping cores to the 7.11-orbit pockets,
+and the near-overlap pairs."""
+import json, sys, math
+from fractions import Fraction as F
+sys.path.insert(0, "/home/user/squares-chunk5/packing/src")
+sys.path.insert(0, "/tmp/claude-0/-home-user-squares/5e071e1a-5ab8-5bae-a5c0-c3687815bf4a/scratchpad/chunk5-wedge")
+from sqpack.fractional.ceiling import CeilingCertificate
+from wedge import d_R_upper, pocket_polygons, polys_intersect, penetration, convex_hull_ccw
+from family_test import square, WALLS, wall_frame, pocket_data, shift, fam, L, B, placements, cores, deg
+n=len(placements)
+# admissible unit squares: concentric, then translated into the container if it pokes out
+units=[]
+for i,p in enumerate(placements):
+    U=square(p,F(1))
+    dx=max(F(0),-min(x for x,y in U)) - max(F(0), max(x for x,y in U)-L)
+    dy=max(F(0),-min(y for x,y in U)) - max(F(0), max(y for x,y in U)-L)
+    U=[(x+dx,y+dy) for x,y in U]
+    assert all(0<=x<=L and 0<=y<=L for x,y in U)
+    # core containment: every core vertex inside U (convex): check via SAT-style half-planes
+    P=convex_hull_ccw(U)
+    for cx,cy in cores[i]:
+        for k in range(4):
+            a,b=P[k],P[(k+1)%4]
+            assert (b[0]-a[0])*(cy-a[1])-(b[1]-a[1])*(cx-a[0]) >= 0, ("core not inside shifted unit square", i)
+    units.append(U)
+print("all 64 admissible unit squares built (concentric, shifted into the container where needed); cores contained: OK")
+orbit=[i for i in range(n) if abs(deg[i]-7.111)<0.01 or abs(deg[i]-82.889)<0.01]
+newedges=0; near=[]
+report=[]
+for a in range(n):
+    for w in WALLS:
+        Qa=wall_frame(units[a],w); c,s,g,V=pocket_data(Qa)
+        if g>=1: continue
+        DR=d_R_upper(c,s,g); DL=d_R_upper(s,c,g)
+        S_R,S_L,T_R,T_L=pocket_polygons(c,s,g,DR,DL)
+        polysS=[shift(X,V) for X in (S_R,S_L) if X]; polysT=[shift(X,V) for X in (T_R,T_L) if X]
+        for b in range(n):
+            if b==a: continue
+            if polys_intersect(cores[a],cores[b],strict=True): continue
+            Qb=wall_frame(units[b],w)
+            if any(polys_intersect(Qb,X,strict=True) for X in polysS):
+                newedges+=1; print("NEW EDGE", a,b,w)
+            if a in orbit and g<F(1,2):
+                dT=max(penetration(Qb,X) for X in polysT); dS=max(penetration(Qb,X) for X in polysS)
+                if dT > -F(3,10):
+                    report.append((a,w,b,float(g),float(dT),float(dS),deg[b],str(placements[b].weight), polys_intersect(units[a],units[b],strict=True)))
+print("wedge edges between non-overlapping cores (admissible squares):", newedges)
+print("\n7.11-orbit pockets (g<0.5): non-overlapping cores b whose admissible unit square comes within 0.3 of the pocket T(Q_a)")
+print("  (sep<0 is an exact lower bound on the separation along an edge normal of the pair; T = whole pocket, S = forced-empty part)")
+for r in sorted(report, key=lambda r:(r[0],r[1],-r[4])):
+    print(f"  a={r[0]:2d} wall={r[1]:6s} g={r[3]:.5f}  b={r[2]:2d} ({r[6]:6.2f} deg, w={r[7]})  sep(Q_b,T)={r[4]:+.5f}  sep(Q_b,S)={r[5]:+.5f}  unit_overlap={r[8]}")
+# near-overlap pairs: cores disjoint but admissible unit squares overlap
+print("\nPairs with disjoint cores whose admissible unit squares overlap (near-overlap, not a wedge matter):")
+cnt=0; worst=[]
+for a in range(n):
+    for b in range(a+1,n):
+        if polys_intersect(cores[a],cores[b],strict=True): continue
+        if polys_intersect(units[a],units[b],strict=True):
+            cnt+=1; worst.append((float(penetration(units[a],units[b])), a, b, deg[a], deg[b], str(placements[a].weight), str(placements[b].weight), float(-penetration(cores[a],cores[b]))))
+print("  count:", cnt)
+for x in sorted(worst, reverse=True)[:12]:
+    print(f"  unit overlap depth {x[0]:.5f}  cores {x[1]},{x[2]} ({x[3]:.2f},{x[4]:.2f} deg; w {x[5]},{x[6]}) core separation {x[7]:.5f}")

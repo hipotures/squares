@@ -1,0 +1,85 @@
+"""Independent recomputation for the chunk-5 ring review (exact Fractions)."""
+import json, itertools, time, math
+from fractions import Fraction as F
+SRC="/tmp/claude-0/-home-user-squares/5e071e1a-5ab8-5bae-a5c0-c3687815bf4a/scratchpad/chunk5-ring/family-96-25.json"
+rec=json.load(open(SRC))
+L=F(rec["outer_side"]); B=F(rec["square_side"]); n=rec["n"]
+net=[F(t) for t in rec["half_tangents"]]
+D=net[1]; assert D==F(207107,90000000) and net[0]==0 and len(net)==181
+assert all(net[k]==k*D for k in range(181))
+print("Condition 4: B(1+D) =",B*(1+D),"<1 ?",B*(1+D)<1, float(B*(1+D)))
+beta=B/(1+D); xlo=1-beta/2; xhi=(1+beta)/2
+print("beta",beta,"X' lo",xlo,"hi",xhi, float(xlo),float(xhi))
+assert beta==F(89793000,90207107) and xlo==F(45310607,90207107) and xhi==F(180000107,180414214)
+print("X' inside open box (1/2,1)^2:", F(1,2)<xlo and xhi<1)
+# half-gap: max over k of angle gap = 2(atan t_{k+1}-atan t_k) is at k=0 (float check)
+gaps=[2*(math.atan(float(net[k+1]))-math.atan(float(net[k]))) for k in range(180)]
+print("largest angular gap at k=",gaps.index(max(gaps)),"half-gap tan =",math.tan(max(gaps)/2),"D=",float(D))
+print("net top angle deg", math.degrees(2*math.atan(float(net[-1]))))
+pl=rec["placements"]
+ts=set(F(p[0]) for p in pl); print("distinct t in placements", sorted(ts), "all in net?", all(t in net for t in ts), "all sides B?", all(F(p[4])==B for p in pl))
+# my own core construction: half-diagonal vectors
+def core(p):
+    t,cx,cy,w,s=(F(v) for v in p)
+    c=(1-t*t)/(1+t*t); sn=2*t/(1+t*t); h=s/2
+    u=(c*h,sn*h); v=(-sn*h,c*h)
+    V=[(cx+u[0]+v[0],cy+u[1]+v[1]),(cx-u[0]+v[0],cy-u[1]+v[1]),(cx-u[0]-v[0],cy-u[1]-v[1]),(cx+u[0]-v[0],cy+u[1]-v[1])]
+    return dict(t=t,c=(cx,cy),w=w,V=V,cos=c,sin=sn)
+C=[core(p) for p in pl]
+tot=sum(c["w"] for c in C); print("cores",len(C),"total",tot)
+# containment via square-frame coordinates (different method from the lane's cross-product sign test)
+def contains(c,q):
+    dx=q[0]-c["c"][0]; dy=q[1]-c["c"][1]
+    u=dx*c["cos"]+dy*c["sin"]; v=-dx*c["sin"]+dy*c["cos"]
+    return abs(u)<=B/2 and abs(v)<=B/2
+def in_container(c): return all(0<=x<=L and 0<=y<=L for x,y in c["V"])
+print("all cores in container:",all(in_container(c) for c in C))
+corners=[(F(0),F(0)),(L,F(0)),(F(0),L),(L,L)]
+def frame(j,q):
+    X,Y=corners[j]; return (q[0] if X==0 else L-q[0], q[1] if Y==0 else L-q[1])
+def pen(c,j): return min(sum(frame(j,v)) for v in c["V"])
+# meets open box (1/2,1)^2_j: convex core meets open box iff the core's intersection with the closed box has positive area;
+# alternative exact method: separating-axis test between core and the open box via strict inequalities on the 6 candidate axes
+def meets_open_box(c,j):
+    # core K (closed convex), box O open. K meets O iff no separating axis with K on one closed side and O on the other closed side
+    # (for convex compact K and open convex O disjoint iff a line separates weakly with O open). Test the 4 edge normals of each.
+    bx=[(F(1,2),F(1,2)),(F(1),F(1,2)),(F(1),F(1)),(F(1,2),F(1))]
+    box=[ (lambda p:( (p[0] if corners[j][0]==0 else L-p[0]), (p[1] if corners[j][1]==0 else L-p[1]) ))(p) for p in bx]
+    K=c["V"]
+    axes=[(F(1),F(0)),(F(0),F(1)),(c["cos"],c["sin"]),(-c["sin"],c["cos"])]
+    for a in axes:
+        pk=[a[0]*x+a[1]*y for x,y in K]; pb=[a[0]*x+a[1]*y for x,y in box]
+        if max(pk)<=min(pb) or max(pb)<=min(pk): return False   # weak separation suffices since box is open
+    return True
+half=F(1,2)
+for c in C:
+    c["box"]=[j for j in range(4) if meets_open_box(c,j)]
+    c["deep"]=[j for j in range(4) if pen(c,j)<half]
+    c["walldist"]=min(min(x,y,L-x,L-y) for x,y in c["V"])
+    c["fold"]=min(abs(math.degrees(2*math.atan(float(c["t"]))))%90, 90-abs(math.degrees(2*math.atan(float(c["t"]))))%90)
+cc=[c for c in C if c["box"]]
+print("corner cores",len(cc),"mass",sum(c["w"] for c in cc),"per corner",[sum(c["w"] for c in C if j in c["box"]) for j in range(4)])
+print("box==deep for all cores:",all(bool(c["box"])==bool(c["deep"]) for c in C), "each corner core in exactly one box:", all(len(c["box"])==1 for c in cc))
+Xp=[(xlo,xlo),(xlo,xhi),(xhi,xlo),(xhi,xhi)]
+print("every corner core contains X' (its box corner):", all(all(contains(c,frame(j,q)) for q in Xp) for c in cc for j in c["box"]))
+print("corner core folds", sorted(set(round(c["fold"],4) for c in cc)), "min pen", min(min(pen(c,j) for j in range(4)) for c in cc), float(min(min(pen(c,j) for j in range(4)) for c in cc)))
+res=[c for c in C if not c["box"]]
+print("residual",len(res),"mass",sum(c["w"] for c in res))
+mid=[c for c in res if c["walldist"]<half]; cen=[c for c in res if c["walldist"]>=half]
+print("mid-wall",len(mid),"mass",sum(c["w"] for c in mid),"folds",sorted(set(round(c["fold"],3) for c in mid)))
+print("central",len(cen),"mass",sum(c["w"] for c in cen),"folds",sorted(set(round(c["fold"],3) for c in cen)),"min walldist",float(min(c["walldist"] for c in cen)))
+inside=[c for c in cen if all(1<=x<=L-1 and 1<=y<=L-1 for x,y in c["V"])]
+print("central cores inside [1,L-1]^2:",len(inside),"mass",sum(c["w"] for c in inside),"folds",sorted(set(round(c["fold"],3) for c in inside)))
+frame_mass=sum(c["w"] for c in res if not all(1<=x<=L-1 and 1<=y<=L-1 for x,y in c["V"]))
+print("residual mass meeting the frame:",frame_mass, " central-only:", sum(c["w"] for c in cen)-sum(c["w"] for c in inside))
+# depth-1 check at a few points is done by verify_ceiling; here check the atom
+S=[(F(101,100),F(367,200)),(F(34,25),F(19,10)),(F(101,100),F(401,200))]
+def charge(cores,sites,k=2): return sum(c["w"] for c in cores if sum(contains(c,s) for s in sites)>=k)
+print("charge of A on residual:",charge(res,S),"on full:",charge(C,S),"depths:",[sum(c["w"] for c in C if contains(c,s)) for s in S])
+def d4(p):
+    x,y=p; return [(x,y),(L-x,y),(x,L-y),(L-x,L-y),(y,x),(L-y,x),(y,L-x),(L-y,L-x)]
+imgs=set(frozenset(d4(s)[g] for s in S) for g in range(8))
+print("distinct images",len(imgs),"charges",sorted(set(charge(C,list(im)) for im in imgs)))
+def in_Xp(p): return any(xlo<=frame(j,p)[0]<=xhi and xlo<=frame(j,p)[1]<=xhi for j in range(4))
+print("site in X':",any(in_Xp(s) for im in imgs for s in im))
+json.dump({"res":[i for i,c in enumerate(C) if not c["box"]]},open("classes_mine.json","w"))

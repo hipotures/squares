@@ -1,0 +1,56 @@
+import json,sys,math
+from fractions import Fraction as F
+SP=sys.argv[1]
+cores=json.load(open(f"{SP}/cores.json"))
+for c in cores:
+    c["V"]=[(F(a),F(b)) for a,b in c["V"]]; c["w"]=F(c["w"]); c["wall"]=F(c["wall"])
+def contains(V,q):
+    sgn=0
+    for i in range(4):
+        P=V[i];Q=V[(i+1)%4]
+        cr=(Q[0]-P[0])*(q[1]-P[1])-(Q[1]-P[1])*(q[0]-P[0])
+        if cr==0: continue
+        s=1 if cr>0 else -1
+        if sgn==0: sgn=s
+        elif s!=sgn: return False
+    return True
+sites=[(F('279159003614372962473669510828657838507977/275083497878835227776219525974507710845000'),F('39144349232243628214852057263090827935454310253084233/21198778788908624193134696694326462686502480000000000')),
+(F('525143537374760558765897991544137481352693236799/376482846329196199824739711312666139177114000000'),F('933626042123584595564639747348556118963/482606566366634475537534394041367620000')),
+(F('379094749908033390225026289211679933983832280948551/375748676386362530254388407693206888563335293260000'),F('753661917766442565006980854881186219678596528548599/375748676386362530254388407693206888563335293260000'))]
+def cls(c):
+    if c["box"]: return "corner"
+    return "midwall" if c["wall"]<F(1,2) else "central"
+def desc(i):
+    c=cores[i]; t=F(c["t"]); ang=math.degrees(2*math.atan(float(t))); fold=min(ang%90,90-ang%90)
+    cx=sum(v[0] for v in c["V"])/4; cy=sum(v[1] for v in c["V"])/4
+    return f"#{i} {cls(c)} fold={fold:.3f} centre=({float(cx):.4f},{float(cy):.4f}) w={c['w']}"
+for k,s in enumerate(sites):
+    print(f"site {k+1} ~ ({float(s[0]):.5f},{float(s[1]):.5f})")
+    T=[i for i,c in enumerate(cores) if contains(c["V"],s)]
+    for i in T: print("   ",desc(i))
+# charged cores (>=2 sites)
+ch=[i for i,c in enumerate(cores) if sum(contains(c["V"],s) for s in sites)>=2]
+print("charged cores:",len(ch),"mass",sum(cores[i]["w"] for i in ch))
+print("by class:",{k:sum(1 for i in ch if cls(cores[i])==k) for k in ("corner","midwall","central")})
+# simple rational sites with identical traces?
+def trace(q): return frozenset(i for i,c in enumerate(cores) if contains(c["V"],q))
+targets=[trace(s) for s in sites]
+found=[]
+for k,s in enumerate(sites):
+    best=None
+    for den in (100,200,400,1000,2000,5000,10000):
+        x0=round(float(s[0])*den); y0=round(float(s[1])*den)
+        for dx in range(-3,4):
+            for dy in range(-3,4):
+                q=(F(x0+dx,den),F(y0+dy,den))
+                if trace(q)==targets[k]:
+                    best=q; break
+            if best: break
+        if best: break
+    print(f"site {k+1} simple rational with same trace: {best} ~ ({float(best[0]) if best else None},{float(best[1]) if best else None})")
+    found.append(best)
+if all(found):
+    ch2=[i for i,c in enumerate(cores) if sum(contains(c["V"],s) for s in found)>=2]
+    print("charge with simple sites:",sum(cores[i]["w"] for i in ch2), "same charged set:", set(ch2)==set(ch))
+    json.dump([[str(a),str(b)] for a,b in found],open(f"{SP}/simple_sites.json","w"))
+# also: is the charged set an independent-set-free structure? pairwise overlaps among charged cores

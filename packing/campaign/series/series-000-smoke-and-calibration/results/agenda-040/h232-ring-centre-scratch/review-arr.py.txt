@@ -1,0 +1,55 @@
+"""Own arrangement of the 56 residual cores; max 2-of-3 charge over maximal vertex traces; random sanity search."""
+import json, itertools, time, random, sys
+from fractions import Fraction as F
+sys.path.insert(0,".")
+exec(open("indep.py").read().split("# depth-1 check")[0].replace('print(','(lambda *a,**k:None)('))
+res=[c for c in C if not c["box"]]
+print("mid-wall max walldist", float(max(c["walldist"] for c in res if c["walldist"]<F(1,2))))
+# candidate points: every core vertex and every crossing of two edges from different cores (as line intersections, checked on both segments)
+def cross(P,Q,R,S):
+    d1=(Q[0]-P[0],Q[1]-P[1]); d2=(S[0]-R[0],S[1]-R[1]); den=d1[0]*d2[1]-d1[1]*d2[0]
+    if den==0: return None
+    rx=R[0]-P[0]; ry=R[1]-P[1]; t=(rx*d2[1]-ry*d2[0])/den; u=(rx*d1[1]-ry*d1[0])/den
+    if 0<=t<=1 and 0<=u<=1: return (P[0]+t*d1[0],P[1]+t*d1[1])
+pts=set(v for c in res for v in c["V"])
+E=[(c["V"][i],c["V"][(i+1)%4],k) for k,c in enumerate(res) for i in range(4)]
+for a,b in itertools.combinations(E,2):
+    if a[2]==b[2]: continue
+    p=cross(a[0],a[1],b[0],b[1])
+    if p: pts.add(p)
+pts=list(pts); print("vertices",len(pts))
+tr={}
+for p in pts:
+    m=0
+    for k,c in enumerate(res):
+        if contains(c,p): m|=1<<k
+    if m: tr.setdefault(m,p)
+T=sorted(tr,key=lambda m:-bin(m).count("1"))
+maxi=[m for i,m in enumerate(T) if not any(m&n==m for n in T[:i] if n!=m)]
+maxi=[m for m in maxi if not any((m&n)==m and n!=m for n in maxi)]
+print("traces",len(tr),"maximal",len(maxi),"max depth",max(bin(m).count("1") for m in maxi)/8)
+w=F(1,8)
+best=F(0);arg=None
+sz={m:bin(m).count("1") for m in maxi}
+for a,b,c in itertools.combinations(maxi,3):
+    ch=bin((a&b)|(a&c)|(b&c)).count("1")
+    if ch*w>best: best=ch*w;arg=(a,b,c)
+print("max 2-of-3 over maximal traces:",best, "pairs", [bin(x).count('1') for x in (arg[0]&arg[1],arg[0]&arg[2],arg[1]&arg[2])],"triple",bin(arg[0]&arg[1]&arg[2]).count('1'))
+# how many triples attain 5/4?
+cnt=sum(1 for a,b,c in itertools.combinations(maxi,3) if bin((a&b)|(a&c)|(b&c)).count("1")==10)
+print("triples of maximal traces attaining 5/4:",cnt)
+# random sanity search over all points (not just vertices): 2-of-3 over random triples near the left gap strip
+random.seed(1)
+def trace_pt(p):
+    m=0
+    for k,c in enumerate(res):
+        if contains(c,p): m|=1<<k
+    return m
+samples=[]
+for _ in range(4000):
+    p=(F(random.randint(0,3840),1000),F(random.randint(0,3840),1000))
+    m=trace_pt(p)
+    if m: samples.append(m)
+samples=list(set(samples)); print("random distinct traces",len(samples))
+dom=sum(1 for m in samples if any(m&n==m for n in maxi))
+print("random traces dominated by a maximal vertex trace:",dom,"/",len(samples))

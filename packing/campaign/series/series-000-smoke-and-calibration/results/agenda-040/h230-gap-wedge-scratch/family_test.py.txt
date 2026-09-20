@@ -1,0 +1,111 @@
+"""Exact pairwise wedge-conflict test of the A6 64-family (nominal unit squares)."""
+import json, sys, math
+from fractions import Fraction as F
+sys.path.insert(0, "/home/user/squares-chunk5/packing/src")
+sys.path.insert(0, "/tmp/claude-0/-home-user-squares/5e071e1a-5ab8-5bae-a5c0-c3687815bf4a/scratchpad/chunk5-wedge")
+from sqpack.fractional.ceiling import CeilingCertificate
+from wedge import d_R_upper, d_R_numeric, pocket_polygons, polys_intersect, penetration, convex_hull_ccw
+base="/home/user/squares-chunk5/packing/campaign/series/series-000-smoke-and-calibration/results/agenda-034/"
+fam = CeilingCertificate.from_record(json.load(open(base+"lane-a6-loop-family-1.json")))
+L = fam.outer_side; B = fam.square_side
+
+def square(p, side):
+    t=p.half_tangent; c=(1-t*t)/(1+t*t); s=2*t/(1+t*t); h=F(side)/2
+    return [(p.centre_x+a*c*h-b*s*h, p.centre_y+a*s*h+b*c*h) for a,b in [(1,1),(-1,1),(-1,-1),(1,-1)]]
+
+WALLS = {"bottom": lambda x,y:(x,y), "top": lambda x,y:(x,L-y), "left": lambda x,y:(y,x), "right": lambda x,y:(y,L-x)}
+
+def wall_frame(poly, w):
+    return [WALLS[w](x,y) for x,y in poly]
+
+def pocket_data(Q):
+    """Q: unit square vertices in the wall frame. Returns (c, s, g, V) with the lower-right edge
+    direction (c, s) from the lowest vertex V; ties (axis-parallel) resolved to the left end."""
+    V = min(Q, key=lambda v:(v[1], v[0]))
+    others = [v for v in Q if v != V]
+    # the two neighbours of V are at unit distance
+    nb = [v for v in others if (v[0]-V[0])**2+(v[1]-V[1])**2 == 1]
+    assert len(nb) == 2, nb
+    right = max(nb, key=lambda v: v[0]-V[0])
+    c, s = right[0]-V[0], right[1]-V[1]
+    assert c*c+s*s == 1 and c >= 0 and s >= 0
+    return c, s, V[1], V
+
+def shift(poly, V):
+    return [(x+V[0], y+V[1]) for x,y in poly]
+
+placements = list(fam.placements)
+n = len(placements)
+cores = [square(p, B) for p in placements]
+units = [square(p, F(1)) for p in placements]
+deg = [math.degrees(2*math.atan(float(p.half_tangent))) for p in placements]
+
+if __name__ == "__main__":
+    results = []   # per (a, wall): lemma data
+    pairs = []     # per (a, b, wall): pocket / S contact
+    for a in range(n):
+        for w in WALLS:
+            Qa = wall_frame(units[a], w)
+            c, s, g, V = pocket_data(Qa)
+            if g >= 1:
+                continue
+            DR = d_R_upper(c, s, g); DL = d_R_upper(s, c, g)
+            S_R, S_L, T_R, T_L = pocket_polygons(c, s, g, DR, DL)
+            area = F(0)
+            for S in (S_R, S_L):
+                if S:
+                    # trapezoid area via shoelace
+                    P = convex_hull_ccw(S); A = F(0)
+                    for i in range(len(P)):
+                        x1,y1 = P[i]; x2,y2 = P[(i+1)%len(P)]
+                        A += x1*y2 - x2*y1
+                    area += abs(A)/2
+            results.append(dict(a=a, wall=w, deg=deg[a], weight=placements[a].weight, c=c, s=s, g=g, DR=DR, DL=DL,
+                                wR=(c-DR) - max(F(0), DL-s), wL=(s-DL) - max(F(0), DR-c), area=area))
+            polysS = [shift(S, V) for S in (S_R, S_L) if S]
+            polysT = [shift(T, V) for T in (T_R, T_L) if T]
+            for b in range(n):
+                if b == a: continue
+                Qb = wall_frame(units[b], w); Pb = wall_frame(cores[b], w)
+                hitT = any(polys_intersect(Qb, T, strict=True) for T in polysT)
+                touchT = any(polys_intersect(Qb, T, strict=False) for T in polysT)
+                if not touchT:
+                    continue
+                hitS_unit = any(polys_intersect(Qb, S, strict=True) for S in polysS)
+                hitS_core = any(polys_intersect(Pb, S, strict=True) for S in polysS)
+                core_overlap = polys_intersect(cores[a], cores[b], strict=True)
+                unit_overlap = polys_intersect(units[a], units[b], strict=True)
+                pen = max(penetration(Qb, S) for S in polysS) if polysS else None
+                pairs.append(dict(a=a, b=b, wall=w, hitT=hitT, touchT=touchT, hitS_unit=hitS_unit, hitS_core=hitS_core,
+                                  core_overlap=core_overlap, unit_overlap=unit_overlap, pen=pen,
+                                  wa=placements[a].weight, wb=placements[b].weight, dega=deg[a], degb=deg[b]))
+
+    print(f"{n} placements; pocket records {len(results)}; pairs touching a pocket: {len(pairs)}")
+    print("\nPer-orbit forced-empty area (nominal unit square), walls with g < 0.5:")
+    seen=set()
+    for r in results:
+        key=(round(r['deg'],3), round(float(r['g']),4))
+        if float(r['g'])<0.5 and key not in seen:
+            seen.add(key)
+            print(f"  tilt {r['deg']:7.3f} w={r['weight']} wall={r['wall']:6s} g={float(r['g']):.5f} c={float(r['c']):.4f} s={float(r['s']):.4f} DR<={float(r['DR']):.5f} DL<={float(r['DL']):.5f} wR={float(r['wR']):.5f} wL={float(r['wL']):.5f} A>={float(r['area']):.5f}")
+    from collections import Counter
+    cat = Counter()
+    for q in pairs:
+        cat[(q['hitS_unit'], q['hitS_core'], q['core_overlap'], q['unit_overlap'])] += 1
+    print("\nPair categories (hitS_unit, hitS_core, core_overlap, unit_overlap): count")
+    for k,v in sorted(cat.items()): print("  ", k, v)
+    print("\nPairs with Q_b meeting S(Q_a) and cores NOT overlapping (candidate new edges):")
+    for q in pairs:
+        if q['hitS_unit'] and not q['core_overlap']:
+            print(f"  a={q['a']:2d}({q['dega']:6.2f}deg,w={q['wa']}) b={q['b']:2d}({q['degb']:6.2f}deg,w={q['wb']}) wall={q['wall']:6s} hitS_core={q['hitS_core']} unit_overlap={q['unit_overlap']} pen={float(q['pen']):.5f}")
+    print("\nAll pairs touching a pocket of a 7.11/82.89-degree member (a in that orbit), non-overlapping cores first:")
+    for q in sorted(pairs, key=lambda q:(q['core_overlap'], q['a'], q['wall'])):
+        if abs(q['dega']-7.111)<0.01 or abs(q['dega']-82.889)<0.01:
+            print(f"  a={q['a']:2d}({q['dega']:6.2f}deg) b={q['b']:2d}({q['degb']:6.2f}deg,w={q['wb']}) wall={q['wall']:6s} hitT={q['hitT']} hitS_unit={q['hitS_unit']} core_overlap={q['core_overlap']} unit_overlap={q['unit_overlap']} pen(Q_b,S)={(float(q['pen']) if q['pen'] is not None else float('nan')):.5f}")
+    print("\nPairs where the 7.11-orbit member is b (its unit square entering another's pocket), non-overlapping:")
+    for q in pairs:
+        if (abs(q['degb']-7.111)<0.01 or abs(q['degb']-82.889)<0.01) and not q['core_overlap']:
+            print(f"  a={q['a']:2d}({q['dega']:6.2f}deg,w={q['wa']}) b={q['b']:2d}({q['degb']:6.2f}deg) wall={q['wall']:6s} hitT={q['hitT']} hitS_unit={q['hitS_unit']} unit_overlap={q['unit_overlap']} pen={(float(q['pen']) if q['pen'] is not None else float('nan')):.5f}")
+    json.dump({"results":[{k:(str(v) if isinstance(v,F) else v) for k,v in r.items()} for r in results],
+               "pairs":[{k:(str(v) if isinstance(v,F) else v) for k,v in q.items()} for q in pairs]},
+              open("/tmp/claude-0/-home-user-squares/5e071e1a-5ab8-5bae-a5c0-c3687815bf4a/scratchpad/chunk5-wedge/family_pairs.json","w"), indent=1)
