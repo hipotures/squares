@@ -1,0 +1,537 @@
+{
+ "settings": {
+  "n": 26,
+  "outer_side": "53/10",
+  "square_side": "9977/10000",
+  "grid_counts": [
+   38,
+   51,
+   62
+  ],
+  "inset": "1/2",
+  "angle_limit": "207107/500000",
+  "direction_steps": 181,
+  "scale": 4000000,
+  "column_rounds": 1,
+  "max_rounds": 80,
+  "rows_per_direction": 3,
+  "seed_certificate": null,
+  "seed_map": "scale",
+  "seed_windows": 5,
+  "support_cap": 32
+ },
+ "seconds": 3754.0003325469997,
+ "stopped": "deadline reached after 48 rounds",
+ "converged": false,
+ "objective": 25.000000000040338,
+ "least_covered": 0.9530750900989208,
+ "rounds": [
+  {
+   "index": 0,
+   "rows": 17162,
+   "orbits": 1125,
+   "sites": 8505,
+   "lp_rounds": 48,
+   "objective": 25.000000000040338,
+   "least_covered": 0.9530750900989208,
+   "averaged_depth": null,
+   "reduced_cost": null,
+   "added": 0,
+   "seconds": 3753.8028787740004,
+   "note": "deadline reached after 48 rounds"
+  }
+ ],
+ "total_mass": null,
+ "total_mass_float": null,
+ "atoms": 0,
+ "ceiling_proved": null,
+ "ceiling_detail": null,
+ "frozen": null,
+ "least_cell_mass": null,
+ "family_frozen": null,
+ "priced_support_rows": null,
+ "merge": null,
+ "seed_sites": 625,
+ "lp_log": [
+  {
+   "index": 0,
+   "rows": 508,
+   "added": 508,
+   "violated": 546,
+   "support": 0,
+   "objective": 18.712066242751323,
+   "separation_s": 34.77,
+   "lp_s": 0.364
+  },
+  {
+   "index": 1,
+   "rows": 918,
+   "added": 410,
+   "violated": 546,
+   "support": 376,
+   "objective": 19.85558595318994,
+   "separation_s": 1.657,
+   "lp_s": 0.277
+  },
+  {
+   "index": 2,
+   "rows": 1310,
+   "added": 392,
+   "violated": 546,
+   "support": 340,
+   "objective": 21.183715239154626,
+   "separation_s": 1.241,
+   "lp_s": 0.489
+  },
+  {
+   "index": 3,
+   "rows": 1817,
+   "added": 507,
+   "violated": 546,
+   "support": 296,
+   "objective": 22.404463040446306,
+   "separation_s": 0.895,
+   "lp_s": 0.59
+  },
+  {
+   "index": 4,
+   "rows": 2302,
+   "added": 485,
+   "violated": 546,
+   "support": 380,
+   "objective": 24.28571428571427,
+   "separation_s": 1.533,
+   "lp_s": 0.707
+  },
+  {
+   "index": 5,
+   "rows": 2746,
+   "added": 444,
+   "violated": 546,
+   "support": 220,
+   "objective": 24.999999999999993,
+   "separation_s": 0.55,
+   "lp_s": 1.34
+  },
+  {
+   "index": 6,
+   "rows": 3167,
+   "added": 421,
+   "violated": 546,
+   "support": 376,
+   "objective": 24.999999999999996,
+   "separation_s": 1.981,
+   "lp_s": 2.939
+  },
+  {
+   "index": 7,
+   "rows": 3564,
+   "added": 397,
+   "violated": 546,
+   "support": 572,
+   "objective": 24.99999999999999,
+   "separation_s": 11.651,
+   "lp_s": 5.442
+  },
+  {
+   "index": 8,
+   "rows": 3959,
+   "added": 395,
+   "violated": 546,
+   "support": 588,
+   "objective": 24.999999999999996,
+   "separation_s": 11.354,
+   "lp_s": 8.055
+  },
+  {
+   "index": 9,
+   "rows": 4353,
+   "added": 394,
+   "violated": 546,
+   "support": 752,
+   "objective": 25.0,
+   "separation_s": 20.018,
+   "lp_s": 3.656
+  },
+  {
+   "index": 10,
+   "rows": 4749,
+   "added": 396,
+   "violated": 546,
+   "support": 628,
+   "objective": 24.999999999999996,
+   "separation_s": 6.981,
+   "lp_s": 4.151
+  },
+  {
+   "index": 11,
+   "rows": 5135,
+   "added": 386,
+   "violated": 546,
+   "support": 712,
+   "objective": 25.000000000000018,
+   "separation_s": 9.956,
+   "lp_s": 5.471
+  },
+  {
+   "index": 12,
+   "rows": 5499,
+   "added": 364,
+   "violated": 546,
+   "support": 924,
+   "objective": 24.999999999999993,
+   "separation_s": 18.67,
+   "lp_s": 4.125
+  },
+  {
+   "index": 13,
+   "rows": 5936,
+   "added": 437,
+   "violated": 546,
+   "support": 540,
+   "objective": 25.0,
+   "separation_s": 4.103,
+   "lp_s": 4.406
+  },
+  {
+   "index": 14,
+   "rows": 6338,
+   "added": 402,
+   "violated": 546,
+   "support": 748,
+   "objective": 25.000000000000007,
+   "separation_s": 11.27,
+   "lp_s": 9.475
+  },
+  {
+   "index": 15,
+   "rows": 6703,
+   "added": 365,
+   "violated": 546,
+   "support": 1000,
+   "objective": 25.00000000000001,
+   "separation_s": 24.247,
+   "lp_s": 5.035
+  },
+  {
+   "index": 16,
+   "rows": 7112,
+   "added": 409,
+   "violated": 546,
+   "support": 808,
+   "objective": 24.99999999999998,
+   "separation_s": 12.189,
+   "lp_s": 4.273
+  },
+  {
+   "index": 17,
+   "rows": 7509,
+   "added": 397,
+   "violated": 546,
+   "support": 548,
+   "objective": 25.000000000000014,
+   "separation_s": 4.236,
+   "lp_s": 4.735
+  },
+  {
+   "index": 18,
+   "rows": 7944,
+   "added": 435,
+   "violated": 546,
+   "support": 572,
+   "objective": 24.999999999999932,
+   "separation_s": 4.972,
+   "lp_s": 14.616
+  },
+  {
+   "index": 19,
+   "rows": 8320,
+   "added": 376,
+   "violated": 546,
+   "support": 1584,
+   "objective": 25.000000000000004,
+   "separation_s": 54.534,
+   "lp_s": 10.403
+  },
+  {
+   "index": 20,
+   "rows": 8661,
+   "added": 341,
+   "violated": 546,
+   "support": 964,
+   "objective": 25.0,
+   "separation_s": 21.546,
+   "lp_s": 23.43
+  },
+  {
+   "index": 21,
+   "rows": 8991,
+   "added": 330,
+   "violated": 546,
+   "support": 1408,
+   "objective": 24.999999999999996,
+   "separation_s": 49.321,
+   "lp_s": 10.573
+  },
+  {
+   "index": 22,
+   "rows": 9348,
+   "added": 357,
+   "violated": 546,
+   "support": 1004,
+   "objective": 24.999999999999932,
+   "separation_s": 24.396,
+   "lp_s": 21.685
+  },
+  {
+   "index": 23,
+   "rows": 9700,
+   "added": 352,
+   "violated": 546,
+   "support": 1613,
+   "objective": 25.000000000000007,
+   "separation_s": 66.994,
+   "lp_s": 13.584
+  },
+  {
+   "index": 24,
+   "rows": 10049,
+   "added": 349,
+   "violated": 546,
+   "support": 1332,
+   "objective": 25.00000000000015,
+   "separation_s": 44.509,
+   "lp_s": 19.73
+  },
+  {
+   "index": 25,
+   "rows": 10402,
+   "added": 353,
+   "violated": 546,
+   "support": 1504,
+   "objective": 24.99999999999989,
+   "separation_s": 54.041,
+   "lp_s": 15.51
+  },
+  {
+   "index": 26,
+   "rows": 10736,
+   "added": 334,
+   "violated": 546,
+   "support": 1476,
+   "objective": 25.000000000000732,
+   "separation_s": 54.207,
+   "lp_s": 14.796
+  },
+  {
+   "index": 27,
+   "rows": 11056,
+   "added": 320,
+   "violated": 546,
+   "support": 1392,
+   "objective": 24.999999999930644,
+   "separation_s": 39.58,
+   "lp_s": 21.306
+  },
+  {
+   "index": 28,
+   "rows": 11384,
+   "added": 328,
+   "violated": 546,
+   "support": 1928,
+   "objective": 25.000000000000092,
+   "separation_s": 77.317,
+   "lp_s": 19.045
+  },
+  {
+   "index": 29,
+   "rows": 11711,
+   "added": 327,
+   "violated": 546,
+   "support": 1716,
+   "objective": 24.99999999999141,
+   "separation_s": 66.0,
+   "lp_s": 43.738
+  },
+  {
+   "index": 30,
+   "rows": 12000,
+   "added": 289,
+   "violated": 546,
+   "support": 2120,
+   "objective": 25.000000000010388,
+   "separation_s": 100.735,
+   "lp_s": 42.032
+  },
+  {
+   "index": 31,
+   "rows": 12324,
+   "added": 324,
+   "violated": 546,
+   "support": 2072,
+   "objective": 24.999999999999904,
+   "separation_s": 97.611,
+   "lp_s": 19.252
+  },
+  {
+   "index": 32,
+   "rows": 12654,
+   "added": 330,
+   "violated": 546,
+   "support": 1433,
+   "objective": 24.999999999999964,
+   "separation_s": 48.164,
+   "lp_s": 23.747
+  },
+  {
+   "index": 33,
+   "rows": 12974,
+   "added": 320,
+   "violated": 546,
+   "support": 1697,
+   "objective": 24.999999999999197,
+   "separation_s": 66.197,
+   "lp_s": 31.176
+  },
+  {
+   "index": 34,
+   "rows": 13316,
+   "added": 342,
+   "violated": 546,
+   "support": 2076,
+   "objective": 24.9999999999962,
+   "separation_s": 95.029,
+   "lp_s": 20.374
+  },
+  {
+   "index": 35,
+   "rows": 13622,
+   "added": 306,
+   "violated": 546,
+   "support": 1696,
+   "objective": 24.999999999999964,
+   "separation_s": 67.421,
+   "lp_s": 69.284
+  },
+  {
+   "index": 36,
+   "rows": 13919,
+   "added": 297,
+   "violated": 546,
+   "support": 2172,
+   "objective": 25.000000000002842,
+   "separation_s": 128.465,
+   "lp_s": 71.134
+  },
+  {
+   "index": 37,
+   "rows": 14167,
+   "added": 248,
+   "violated": 543,
+   "support": 2168,
+   "objective": 24.999999999995342,
+   "separation_s": 108.387,
+   "lp_s": 32.24
+  },
+  {
+   "index": 38,
+   "rows": 14451,
+   "added": 284,
+   "violated": 546,
+   "support": 2136,
+   "objective": 24.999999999999556,
+   "separation_s": 102.909,
+   "lp_s": 39.26
+  },
+  {
+   "index": 39,
+   "rows": 14726,
+   "added": 275,
+   "violated": 546,
+   "support": 2128,
+   "objective": 24.999999999995158,
+   "separation_s": 101.401,
+   "lp_s": 19.265
+  },
+  {
+   "index": 40,
+   "rows": 15078,
+   "added": 352,
+   "violated": 546,
+   "support": 1416,
+   "objective": 25.000000000003553,
+   "separation_s": 43.419,
+   "lp_s": 44.235
+  },
+  {
+   "index": 41,
+   "rows": 15368,
+   "added": 290,
+   "violated": 546,
+   "support": 2076,
+   "objective": 25.00000000001693,
+   "separation_s": 100.227,
+   "lp_s": 66.922
+  },
+  {
+   "index": 42,
+   "rows": 15682,
+   "added": 314,
+   "violated": 546,
+   "support": 2340,
+   "objective": 25.000000001507193,
+   "separation_s": 125.425,
+   "lp_s": 57.219
+  },
+  {
+   "index": 43,
+   "rows": 15971,
+   "added": 289,
+   "violated": 546,
+   "support": 2148,
+   "objective": 25.000000000000053,
+   "separation_s": 113.196,
+   "lp_s": 84.681
+  },
+  {
+   "index": 44,
+   "rows": 16245,
+   "added": 274,
+   "violated": 546,
+   "support": 2237,
+   "objective": 25.000000008580816,
+   "separation_s": 137.184,
+   "lp_s": 38.516
+  },
+  {
+   "index": 45,
+   "rows": 16555,
+   "added": 310,
+   "violated": 546,
+   "support": 2069,
+   "objective": 24.999999999999943,
+   "separation_s": 98.499,
+   "lp_s": 26.573
+  },
+  {
+   "index": 46,
+   "rows": 16878,
+   "added": 323,
+   "violated": 546,
+   "support": 1680,
+   "objective": 24.999999999694957,
+   "separation_s": 77.342,
+   "lp_s": 111.254
+  },
+  {
+   "index": 47,
+   "rows": 17162,
+   "added": 284,
+   "violated": 546,
+   "support": 2689,
+   "objective": 25.000000000040338,
+   "separation_s": 250.813,
+   "lp_s": 65.537
+  }
+ ]
+}

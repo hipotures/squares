@@ -1,0 +1,36 @@
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+{
+ "n": 13,
+ "outer_side": "399/100",
+ "square_side": "9977/10000",
+ "grid_counts": [
+  26,
+  35,
+  44
+ ],
+ "inset": "1/2",
+ "angle_limit": "207107/500000",
+ "direction_steps": 181,
+ "scale": 4000000,
+ "column_rounds": 1,
+ "max_rounds": 60,
+ "rows_per_direction": 3,
+ "seed_certificate": null,
+ "seed_map": "scale",
+ "seed_windows": 5,
+ "support_cap": null
+}
+round    rows  orbits   sites lp_rounds     objective least_covered      depth   seconds  note
+----------------------------------------------------------------------------------------------
+    0    4278     548    4053        18     15.565562      1.000000   2.394143      80.1  adding 1 orbits, deepest at (Fraction(432649, 145200), Fraction(432649, 145200))
+stopped: converged: every placement covers mass 1
+objective: 15.565562222801985
+least covered mass: 0.9999999999999998
+total mass: 15565619/1000000 = 15.565619
+least cell mass: None
+atoms: 268
+seed sites: 225
+frozen: campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-214-n13-399-100-covering.json
+family frozen: campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-214-n13-399-100-family.json
+priced support rows: 40
+seconds: 686.9

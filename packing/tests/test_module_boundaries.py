@@ -896,6 +896,19 @@ def test_the_slow_marker_is_declared_only_by_measured_nodes() -> None:
             "test_changed_minimal_polynomial_is_refused",  # 7.4s
             "test_n54_source_formula_closes_in_one_quartic_field",  # 3.2s
         },
+        # 68s of call time across 3, measured 2026-09-20 on a four-cpu box. Two are one
+        # whole run of the Theorem 11 replay table each, and 14s of the 15s is the
+        # unavoidability screen: 619 exact tilings of `[0, 5]^2`, one per configuration
+        # the proof's row moves reach. The third classifies all 167,915 structure pairs
+        # of the n=21 inventory, with the merge propagation on every non-forced one.
+        # Not a shared build -- the two replays differ in the finishing-line constant,
+        # so neither can pay for the other, the inventory shares nothing with them, and
+        # the file's four unmarked tests cost 1.6s between them.
+        "test_bentz2016_tools.py": {
+            "test_the_whole_n21_inventory_reports_both_sides_of_the_propagation",  # 39.0s
+            "test_the_replay_fails_at_the_line_the_transcription_printed_before_d505",  # 14.6s
+            "test_the_replay_table_holds_at_the_printed_constants",  # 14.5s
+        },
         # 4s of call time across 2.
         "test_bentz46.py": {
             "test_certificate_refuses_a_displaced_point",  # 2.2s

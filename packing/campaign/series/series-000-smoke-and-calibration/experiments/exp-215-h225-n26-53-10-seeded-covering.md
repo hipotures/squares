@@ -49,17 +49,44 @@ experiment:
       --log campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-215-n26-53-10.log
     budget: One run of at most 3600 s and the gate; Session 144 wall; one site set under this id.
     record: packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/
-  lease:
-    expires: '2026-09-20T09:30:00Z'
-    host: claude-session-144
-  results: []
+  effort:
+    timebox: 3600 s run and the gate
+    wall_seconds: 3753.8
+    stopped_by: timebox
+  results:
+  - shape: determination
+    role: outcome
+    question: >-
+      Does a window-seeded freeze at n=26, 53/10 have mass strictly below 26 and print
+      RETAINABLE?
+    outcome: no_progress
+    checked_by: >-
+      The 3600 s deadline stopped the row loop inside round 0 after 48 LP rounds at
+      objective 25.000000000040338 with least covered mass 0.953075090 (1125 orbits,
+      8505 sites, 3753.8 s); no freeze was written and decide_certificate did not run
+      (receipt exp-215-n26-53-10-receipt.md)
+  - shape: record
+    role: outcome
+    metric: restricted LP objective at the deadline with rows still violated (an artefact of the incomplete row set, not a covering value)
+    direction: lower
+    score: 25.000000000040338
+    standing_best: 26
+    standing_best_source: H-225 criterion (a certificate needs mass strictly below 26)
+    beat_record: false
+    runs: 1
   verdict:
-    decision: in-progress
+    decision: unresolved
     primary_criterion: >-
       Confirm H-225 only on RETAINABLE below 26 from both decide_certificate routes;
       an unfinished loop or a converged value at or above 26 is unresolved for the
       claim and refutes this site set only.
-    reason: Registered before the run; no number yet.
+    reason: >-
+      The loop hit its deadline with rows still violated at the exact-integer plateau 25.000000 that Session 141 also saw at n=26; an unfinished loop decides nothing and this site set is not even refuted.
+    resume_from: >-
+      packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-215-n26-53-10-rows.jsonl,
+      the row log of the 48 LP rounds reached before the deadline, and the receipt
+      exp-215-n26-53-10-receipt.md, which names the 25.000000 plateau; a successor
+      seeds from the row log or raises the deadline
 ---
 # Exp-215: Window-Seeded Point Covering at n=26, 53/10
 
