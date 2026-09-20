@@ -7,19 +7,19 @@ softschema:
   schema: schemas/session-close-report.schema.yaml
   envelope: null
   status: enforced
-count: 144
+count: 145
 generated_by: >-
   uv run --frozen --all-extras --group dev python -m devtools.close_session --render
 totals:
-  sessions_measured: 90
+  sessions_measured: 91
   sessions_unmeasured: 54
   attributed:
-    rollups: 144
-    turns: 42104
-    tool_calls: 23040
-    tool_errors: 461
-    one_off_code: 3652
-    wall_hours: 382.84
+    rollups: 148
+    turns: 42773
+    tool_calls: 23446
+    tool_errors: 467
+    one_off_code: 3711
+    wall_hours: 384.49
   unattributed:
     rollups: 60
     turns: 11110
@@ -28,12 +28,12 @@ totals:
     one_off_code: 946
     wall_hours: 51.75
   measured:
-    rollups: 204
-    turns: 53214
-    tool_calls: 29579
-    tool_errors: 617
-    one_off_code: 4598
-    wall_hours: 434.59
+    rollups: 208
+    turns: 53883
+    tool_calls: 29985
+    tool_errors: 623
+    one_off_code: 4657
+    wall_hours: 436.24
 codex_receipts:
   attributed: 56
   unattributed: 2
@@ -2357,11 +2357,11 @@ sessions:
   - packing/campaign/resource-usage/a8b8b405efc053f16.yaml
   - packing/campaign/resource-usage/a68c79e799a3fc678.yaml
   - packing/campaign/resource-usage/a1730fd7bec467b88.yaml
-  turns: 1381
-  tool_calls: 813
+  turns: 1401
+  tool_calls: 828
   tool_errors: 12
-  one_off_code: 122
-  wall_hours: 8.73
+  one_off_code: 127
+  wall_hours: 8.84
   codex_receipts: []
 - id: session-144
   title: "Overnight Chunk 1 — Stock-Instrument Determinations at n=13, 17, 26"
@@ -2377,9 +2377,27 @@ sessions:
   - packing/campaign/resource-usage/adb95622cef697549.yaml
   - packing/campaign/resource-usage/a5a0195a7e1b20013.yaml
   - packing/campaign/resource-usage/acb53dcd42fbab01e.yaml
-  turns: 1284
-  tool_calls: 742
+  turns: 1304
+  tool_calls: 757
   tool_errors: 10
-  one_off_code: 114
-  wall_hours: 10.33
+  one_off_code: 119
+  wall_hours: 10.44
+  codex_receipts: []
+- id: session-145
+  title: "Overnight Chunk 2 — The Corner-Clip Instrument and H-222"
+  status: in_progress
+  primary_bead: think-ni3v
+  phases: 1
+  measured: true
+  rollups:
+  - packing/campaign/resource-usage/5e071e1a-5ab8-5bae-a5c0-c3687815bf4a.yaml
+  - packing/campaign/resource-usage/afdde84bfe1625a5f.yaml
+  - packing/campaign/resource-usage/af9db849f9a1cc845.yaml
+  - packing/campaign/resource-usage/a9d7576dad97ca9ab.yaml
+  - packing/campaign/resource-usage/a957ff219905b86a7.yaml
+  turns: 1278
+  tool_calls: 756
+  tool_errors: 7
+  one_off_code: 104
+  wall_hours: 7.95
   codex_receipts: []
