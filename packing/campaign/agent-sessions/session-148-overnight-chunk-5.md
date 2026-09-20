@@ -10,7 +10,7 @@ session:
   title: Chunk 5 — The Second Stage Inside the All-Deep Class, and the Gap-g Wedge
   date: '2026-09-20'
   started_at: '2026-09-20T15:22:00Z'
-  deadline_at: '2026-09-20T17:22:00Z'
+  deadline_at: '2026-09-20T18:22:00Z'
   branch: claude/kind-wright-whxxn6-chunk5
   primary_bead: think-b7pr
   status: in_progress
@@ -35,9 +35,9 @@ session:
     status: in_progress
     entered_by: session_start
     switch_reason: null
-    budget_minutes: 100
+    budget_minutes: 160
     started_at: '2026-09-20T15:22:00Z'
-    deadline_at: '2026-09-20T17:02:00Z'
+    deadline_at: '2026-09-20T18:02:00Z'
     expected_output: >-
       A registered H-232 (or a recorded reason not to), a BC-364 disposition with the
       exact pair check, the threshold clip admitted or a design, and a review record.
@@ -52,12 +52,12 @@ session:
     stop_reason: null
     next_action: Read the three lane reports, launch the review, and close the chunk.
   budget:
-    wall_minutes: 120
+    wall_minutes: 180
     finalization_minutes: 20
   stop_conditions:
   - No hypothesis is registered without an exact check of its family charge on a retained artifact.
   - No LP or column-generation target runs in this chunk.
-  - The chunk closes by 17:22Z with its records validated, committed, and pushed as a stacked draft pull request.
+  - The chunk closes by 18:22Z with its records validated, committed, and pushed as a stacked draft pull request.
   progress:
     metric: BC-367 second-stage items derived and dispositioned
     before: The ring-centre 2-of-3 relation is a review sketch; the gap-g wedge is underived; the threshold routes take no clip.
@@ -65,13 +65,24 @@ session:
   delegations:
   - task: Derive the ring-centre 2-of-3 relation inside the all-deep class at 96/25 with an exact check on the transported 88-family, and write H-232
     operator: chunk5_ring; Claude Fable max
-    status: in_progress
+    status: completed
     recording: contemporaneous
     phase: 1
-    outcome: null
-    evidence: []
+    outcome: >-
+      INSTRUMENT. The all-deep class's forced structure proved from lane-a Lemmas
+      2 to 4 with the sharpened occupant box X' (beta = B/(1+D)); a wall census by
+      chords giving at least three non-occupant squares at depth at least sqrt(2) - 1
+      from every wall, and at most one square in the central 1.84-box; the family
+      transported to 96/25 (verified, total 11) has corner mass exactly 4 and residual
+      7 as 32 mid-wall plus 24 central cores; the ring-centre 2-of-3 atom on three
+      named gap-strip sites collects exactly 5/4 against budget 1 on each of its eight
+      D4 images, the exact maximum over all site triples (the reviewer's 3/2 is not
+      attained; 3-of-4 atoms cut nothing); a counting proof with conditions (C) and
+      (B) and the X' refund; H-232 drafted. The instrument needs a non-convex box cut
+      on both threshold routes with per-cell exclusion, not the convex clip.
+    evidence: [packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/h232-ring-centre-derivation.md, packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/h232-transported-family-96-25.json]
     files: []
-    checks: []
+    checks: [transport_ceiling_family --verify proved at 96/25; the 5/4 charge found as the exact maximum over the 125 inclusion-maximal vertex traces of the 56-core arrangement.]
     uncertainty: A derivation is evidence for a hypothesis, not a verdict; the family charge is a Lemma-D necessary condition.
     elapsed_seconds: null
     elapsed_quality: unavailable
@@ -94,13 +105,13 @@ session:
     evidence: []
     files: []
     checks: []
-    uncertainty: The 7.11 degree orbit at gap 0.016 is the one X-040 names; a reach failure there is a finding, not a failure of the lane.
+    uncertainty: The 7.11 degree orbit at gap 0.016 is the one X-040 names; a reach failure there is a finding, not a failure of the lane. The first attempt was stopped by the owner at 15:46Z after a census only; this is the relaunch.
     elapsed_seconds: null
     elapsed_quality: unavailable
     next_action: Fable review, then the BC-364 disposition.
-    started_at: '2026-09-20T15:22:00Z'
-    deadline_at: '2026-09-20T16:37:00Z'
-    budget_minutes: 75
+    started_at: '2026-09-20T16:36:00Z'
+    deadline_at: '2026-09-20T17:46:00Z'
+    budget_minutes: 70
     write_scope: [session scratchpad chunk5-wedge/]
     excluded_commands: [git commit, git push, any edit under the repository tree, any LP or column-generation target run]
     expected_output: report.md with the lemma, the pairwise condition, the exact pair check, and the verdict.
@@ -116,12 +127,12 @@ session:
     evidence: []
     files: []
     checks: []
-    uncertainty: If the change does not fit the budget the lane delivers a design, not a half-threaded change.
+    uncertainty: If the change does not fit the budget the lane delivers a design, not a half-threaded change. The first attempt was stopped by the owner at 15:46Z with partial edits in the worktree; the relaunch continues from them.
     elapsed_seconds: null
     elapsed_quality: unavailable
     next_action: Coordinator runs the tests; a Fable review before any clipped threshold run.
-    started_at: '2026-09-20T15:22:00Z'
-    deadline_at: '2026-09-20T16:22:00Z'
+    started_at: '2026-09-20T16:36:00Z'
+    deadline_at: '2026-09-20T17:36:00Z'
     budget_minutes: 60
     write_scope: [packing/src/sqpack/fractional/threshold.py, packing/src/sqpack/fractional/threshold_interval.py, packing/src/sqpack/fractional/corner_clip.py, packing/devtools/decide_threshold_certificate.py, packing/tests/test_threshold_corner_clip.py]
     excluded_commands: [git commit, git push, any edit to packing/cases/n11_threshold_certificate/verify_claim.py, any edit to a retained certificate]
@@ -129,6 +140,38 @@ session:
     validation_command: cd packing && uv run --frozen --all-extras --group dev pytest tests/test_threshold_corner_clip.py -q
     kill_condition: T-025's retained certificate decides differently unclipped.
     fallback: Revert and report.
+  - task: Adversarial review of the ring-centre derivation and the H-232 text
+    operator: chunk5_ring_reviewer; Claude Fable max
+    status: completed
+    recording: contemporaneous
+    phase: 1
+    outcome: >-
+      ADMIT WITH CORRECTIONS. Theorems 1 to 3 and Corollary 4 sound (one unused
+      chord-formula sentence corrected); every family number reproduced from
+      independent code; the 5/4 maximality proved by a domination lemma over
+      arrangement vertex traces; the counting proof verified line by line with the
+      refund exact and idle on the kill side. Three required corrections, applied
+      to H-232: the kill rule must name an exact 2-of-3 reader, since the ceiling
+      readers alone pass the transported family; the fixed-support screen with
+      all-triple 2-of-3 constraints is the full kill at value 7 for every site set;
+      and the instrument gap must describe HEAD, where neither threshold route
+      takes a cut.
+    evidence: [packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/h232-ring-centre-review.md]
+    files: []
+    checks: [Independent classification by a separating-axis test; transport replay byte-identical; own arrangement (1552 vertices, 881 traces, 125 maximal); max 3-of-4 charge 1.]
+    uncertainty: The first attempt was stopped by the owner at 15:46Z before reading; this is the relaunch.
+    elapsed_seconds: null
+    elapsed_quality: unavailable
+    next_action: Register H-232 on ADMIT, or record the refusal on the session and X-040.
+    started_at: '2026-09-20T16:36:00Z'
+    deadline_at: '2026-09-20T17:26:00Z'
+    budget_minutes: 50
+    write_scope: [session scratchpad chunk5-ring-review/]
+    excluded_commands: [git commit, git push, any edit under the repository tree, any LP or column-generation target run]
+    expected_output: review.md with a verdict block and numbered findings with fixes.
+    validation_command: Coordinator reads the review file.
+    kill_condition: The lane's report is unreadable.
+    fallback: Report that and stop.
   outputs:
   - packing/campaign/agent-sessions/session-148-overnight-chunk-5.md
   checks: []

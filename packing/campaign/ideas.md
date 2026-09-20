@@ -682,6 +682,7 @@ handed an overnight loop ten registrations
 | 200 | The tilted-anchor case containing the 29° slot has covering value below 10 at 96/25 | registered | [H-229](hypotheses/H-229-n11-tilted-anchor-case-at-96-25.md) | Gain at most 1.5 per case after review; bin edge 6.4537°; blocked on the non-convex domain instrument. |
 | 201 | A gap-g wall-wedge conflict edge cuts the A6 64-family | registered | [H-230](hypotheses/H-230-a6-family-violates-a-gap-wedge-conflict.md) | The family’s 7.11° orbit sits at gap 0.016; the zero-gap lemma is verified, the extension is the question. |
 | 202 | Theta on a sound pose-cell graph at n=11 | open question | [H-231](hypotheses/H-231-theta-on-pose-cells.md) | Stays retired: the screen cannot discriminate and the dual matrix is dense. No owner decision requested. |
+| 203 | The all-deep corner class at n=11, 96/25 under the ring-centre 2-of-3 atom | registered | [H-232](hypotheses/H-232-n11-all-deep-class-ring-centre-atom.md) | The transported 88-family pays 5/4 against a budget of 1 on the named atom, the exact maximum; the counting proof is reviewed; blocked on the box cut, the refund and an exact 2-of-3 reader, with the fixed-support screen decisive on the kill side. |
 
 ## Dead ends
 

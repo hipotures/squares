@@ -978,6 +978,7 @@ Status: **active**. Run the hypotheses X-040 adapted from the Session 143 review
 | H-229 | blocked | proof | At n=11, side 96/25, B = 9977/10000, in the anchor case whose centre b |  | 0 |  |  |
 | H-230 | blocked | proof | There is a proved wall-wedge conflict lemma for a tilted unit square a |  | 0 |  |  |
 | H-231 | open question | proof | Whether a Lovász theta certificate on a sound, non-uniform pose-cell c |  | 0 |  |  |
+| H-232 | blocked | proof | At n=11, side 96/25, B = 9977/10000 on the 181-direction net, the rest |  | 0 |  |  |
 
 ## Needs review — held for a human, not decided
 
