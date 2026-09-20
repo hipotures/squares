@@ -40,7 +40,7 @@ hypothesis:
     T-023-branch replay control); --freeze-family, devtools.polish_ceiling_family,
     devtools.independent_ceiling_reader, sqpack.fractional.ceiling.verify_ceiling;
     devtools.decide_certificate with the clip predicate admitted on both routes
-  instrument_ready: false
+  instrument_ready: true
   regime: >-
     n=11, side 96/25, shrink 9977/10000, 181-direction net, point atoms only,
     D4-symmetric nonnegative weights, exact rational arithmetic, row domain
@@ -60,7 +60,12 @@ hypothesis:
     with headroom (the family's residual there is 7 against a requirement of 11).
     A kill here is a structural negative about corner conditioning in the point
     language; a confirm is a conditional exclusion at 3.84 that still needs the
-    other fifteen bin classes before it is a bound.
+    other fifteen bin classes before it is a bound. 2026-09-20 Session 145: the
+    convex corner-clip instrument was admitted after a Fable review, and exp-219
+    printed RETAINABLE UNDER THE CORNER CLASS HYPOTHESIS on both routes at 96/25 with
+    frozen mass 10868617/1000000 and least charge 2000013/2000000. Confirmed at this
+    scope: every packing of eleven unit squares at side 96/25 has a square meeting a
+    corner triangle x + y <= 1/2. Not a bound on s(11).
 ---
 # H-222: The All-Free Corner Class at n=11, 96/25
 

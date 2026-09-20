@@ -56,25 +56,59 @@ experiment:
       --log campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-219-n11-96-25-clip.log
     budget: One run of at most 2400 s, then the gate or the readers; Session 145 wall.
     record: packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/
-  lease:
-    expires: '2026-09-20T14:00:00Z'
-    host: claude-session-145
-  results: []
+  effort:
+    timebox: 2400 s run, then the gate
+    wall_seconds: 307
+    stopped_by: criterion
+  results:
+  - shape: determination
+    role: outcome
+    question: >-
+      Does a corner-clipped freeze at n=11, 96/25, d = 1/2 have mass strictly below 11
+      and print RETAINABLE UNDER THE CORNER CLASS HYPOTHESIS from both routes?
+    outcome: criterion_met
+    checked_by: >-
+      decide_certificate --corner-clip 1/2 printed "RETAINABLE UNDER THE CORNER CLASS
+      HYPOTHESIS (no square meets x + y <= 1/2 in any corner frame): both routes accept
+      and agree at 2000013/2000000; sha256
+      5813d822d3f83eef98326de0c16e245466afbcb8c4988b039e81a4bcf3d7040d"; interval
+      route enclosure (2000013/2000000, 2000013/2000000) over 1,743,736 boxes with 0
+      stalled in 30 s; exact route least charge 2000013/2000000 in 11 s; the run
+      converged at round 0 (every placement covers mass 1) in 265.8 s on 506 orbits
+      over 3749 sites with frozen mass 10868617/1000000
+  - shape: record
+    role: outcome
+    metric: frozen covering mass on the clipped domain (exact rational)
+    direction: lower
+    score: 10.868617
+    standing_best: 11
+    standing_best_source: H-222 criterion (mass strictly below 11 under the corner class hypothesis)
+    beat_record: false
+    runs: 1
   verdict:
-    decision: in-progress
+    decision: accepted
     primary_criterion: >-
       Confirm H-222 only on RETAINABLE UNDER THE CORNER CLASS HYPOTHESIS from both
       routes on a freeze below 11; kill only with a K4-accepted depth-one family of
       total at least 11 on the clipped domain; a converged value at or above 11 refutes
       this site set only.
-    reason: Registered before the run, after the Fable review admitted the instrument.
+    reason: >-
+      Both gate routes accept the clipped covering of mass 10868617/1000000 < 11 with
+      least charge 2000013/2000000 >= 1 on the corner-clipped domain at 96/25, so no
+      packing of eleven unit squares in a square of side 96/25 has every square
+      avoiding the four corner triangles x + y <= 1/2; this confirms H-222 at its
+      registered scope and is a conditional exclusion, not a bound on s(11).
 ---
 # Exp-219: The All-Free Corner Class at n=11, 96/25
 
 The first round of [H-222](../../../hypotheses/H-222-n11-octagon-class-at-96-25.md)
 under [agenda-040](../../../agendas/agenda-040-overnight-lower-bound-loop.md) BC-363, on
 the convex corner-clip instrument admitted by the Session 145 review.
-A confirm is a conditional exclusion at `3.84` for the octagon class only.
+The gate accepted on both routes: every packing of eleven unit squares in `[0, 96/25]^2`
+has some square meeting a corner triangle `x + y <= 1/2` in its corner frame.
+That is a conditional exclusion at `3.84` for the octagon class only; the other fifteen
+corner-bin classes of lane-a Theorem B are untouched, and `s(11)` does not move.
+Registration as a frontier result is a separate W2 step with its own review.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

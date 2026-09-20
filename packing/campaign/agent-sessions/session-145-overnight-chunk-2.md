@@ -91,7 +91,10 @@ session:
       should-fixes, the byte-for-byte provenance leak fixed by the coordinator.
     evidence: [packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-219-n11-96-25-clip-receipt.md]
     files: []
-    checks: [13,357-point exact random check of point-in-clipped-polygon against penetration; 340 direction and depth pairs convex; base-versus-branch unclipped run compared.]
+    checks:
+    - A 13,357-point exact random check of point-in-clipped-polygon against penetration.
+    - 340 direction and depth pairs convex.
+    - Base-versus-branch unclipped run compared.
     uncertainty: The clipped interval route can stall where the exact route decides; the gate refuses rather than misdecides.
     elapsed_seconds: null
     elapsed_quality: unavailable

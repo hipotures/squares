@@ -145,8 +145,8 @@ hypothesis status and summarizes experiment verdicts, and the
 | Commitments | 355 | 178 complete; 61 stopped; 68 blocked; 18 ready; 21 tentative; 9 in progress |
 | Sessions | 145 | 86 completed; 57 stopped; 2 nonterminal |
 | Explorations | 38 | 24 linked to proposed hypotheses; 14 uncodified |
-| Hypotheses | 169 | 28 confirmed; 29 refuted; 57 blocked; 14 unresolved; 5 open; 29 open questions; 2 result registered; 2 abandoned; 3 running |
-| Experiments | 151 | 41 accepted; 34 rejected; 46 unresolved; 12 baseline; 11 blocked; 3 abandoned; 4 in progress |
+| Hypotheses | 169 | 29 confirmed; 29 refuted; 56 blocked; 14 unresolved; 5 open; 29 open questions; 2 result registered; 2 abandoned; 3 running |
+| Experiments | 151 | 42 accepted; 34 rejected; 46 unresolved; 12 baseline; 11 blocked; 3 abandoned; 3 in progress |
 | Frontier results | 30 | 30 registered |
 
 <!-- END CURRENT-RESEARCH-STATUS -->
@@ -4108,7 +4108,7 @@ round that names the hypothesis, control roles included.
 | [H-219](packing/campaign/hypotheses/H-219-t028-seeded-colgen-raises-s18.md) | confirmed | A rows-complete covering of mass strictly below 18 exists at a container side in (187/40, 117/25) on a T-028-seeded stock-colgen site set | 1 | T-029 |
 | [H-220](packing/campaign/hypotheses/H-220-seedless-colgen-raises-nagamochi-floor.md) | unresolved | A rows-complete covering of mass strictly below n exists at a queued Nagamochi-only side on a seedless stock-colgen site set | 8 | exp-166 unresolved at 29.803318; exp-167 unresolved at 28.331329; exp-168 unresolved at 27.178193; exp-169 unresolved at 25.000000; exp-170 unresolved at 25.000000; exp-171 unresolved, freeze interval-refused; exp-172 unresolved at 42.137360; exp-173 unresolved at 41.236782 |
 | [H-221](packing/campaign/hypotheses/H-221-t029-seeded-colgen-raises-s18.md) | confirmed | A rows-complete covering of mass strictly below 18 exists at a container side in (1871/400, 117/25) on a T-029-seeded stock-colgen site set | 1 | T-030 |
-| [H-222](packing/campaign/hypotheses/H-222-n11-octagon-class-at-96-25.md) | blocked | The all-free corner class at n=11, 96/25, d = 1/2 has restricted covering value below 11; blocked on a convex corner-clip domain predicate | 0 | — |
+| [H-222](packing/campaign/hypotheses/H-222-n11-octagon-class-at-96-25.md) | confirmed | The all-free corner class at n=11, 96/25, d = 1/2 has restricted covering value below 11; blocked on a convex corner-clip domain predicate | 1 | exp-219 accepted |
 | [H-223](packing/campaign/hypotheses/H-223-n13-point-covering-at-399-100.md) | running | A point-atom certificate exists at n=13, 399/100 on a window-seeded site set; calibration under s(13) = 4 | 1 | exp-214 in progress |
 | [H-224](packing/campaign/hypotheses/H-224-n17-ceiling-family-at-23-5.md) | running | A depth-one ceiling family of total 17 exists at n=17, 23/5, closing the fixed-shrink point route there for every site set | 1 | exp-213 in progress |
 | [H-225](packing/campaign/hypotheses/H-225-n26-seeded-certificate-at-53-10.md) | running | A seeded point certificate exists at n=26, 53/10, a first-party floor above Nagamochi’s 5 | 1 | exp-215 in progress |
@@ -4413,9 +4413,9 @@ The relevant generator writes the receipt, and the entry fills in on the next
 
 ## Experiments Conducted
 
-There are 150 rounds registered in `series-000`.
+There are 151 rounds registered in `series-000`.
 
-They record 2512.1 agent-minutes and 2568.2 wall-minutes.
+They record 2512.1 agent-minutes and 2573.3 wall-minutes.
 These totals exclude four historical annealing rounds with unrecorded timing; their wall
 and operator costs are unknown, not zero.
 Exp129 closed as blocked without invocation and contributes zero scientific elapsed
@@ -4607,7 +4607,7 @@ archive beside it.
 | [exp-213](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-213-h224-n17-23-5-ceiling-family.md) | 17 | target | H-224 | T-019-seeded ceiling family at 23/5 | in progress | in-progress |
 | [exp-214](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-214-h223-n13-399-100-window-covering.md) | 13 | calibration | H-223 | Window-seeded point covering at 399/100 | in progress | in-progress |
 | [exp-215](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-215-h225-n26-53-10-seeded-covering.md) | 26 | target | H-225 | Window-seeded point covering at 53/10 | in progress | in-progress |
-| [exp-219](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-219-h222-n11-96-25-octagon-class.md) | 11 | target | H-222 | Corner-clipped covering at 96/25, d = 1/2 | in progress | in-progress |
+| [exp-219](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-219-h222-n11-96-25-octagon-class.md) | 11 | target | H-222 | Corner-clipped covering at 96/25, d = 1/2 | RETAINABLE UNDER THE CORNER CLASS HYPOTHESIS; mass 10.868617 | accepted |
 
 ### Cost and provenance
 
@@ -4763,11 +4763,11 @@ archive beside it.
 | exp-213 | One run of at most 2400 s, polish, two readers | — | — | in progress | — |
 | exp-214 | One run of at most 2400 s and the gate or the readers | — | — | in progress | — |
 | exp-215 | One run of at most 3600 s and the gate | — | — | in progress | — |
-| exp-219 | One run of at most 2400 s, then the gate or the readers | — | — | in progress | — |
+| exp-219 | One run of at most 2400 s, then the gate | 307 s | — | criterion | `8f4eca7d` |
 
-### What the 150 rounds jointly establish
+### What the 151 rounds jointly establish
 
-The 150 rounds use 2512.1 agent-minutes and 2568.2 wall-minutes under the campaign’s
+The 151 rounds use 2512.1 agent-minutes and 2573.3 wall-minutes under the campaign’s
 retained effort accounting.
 The never-invoked exp129 adds no scientific result or execution time.
 Exp-114 contributes 2.46 seconds of target/replay effort; its readiness work is recorded
