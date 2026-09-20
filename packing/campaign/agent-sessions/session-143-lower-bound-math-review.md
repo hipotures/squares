@@ -13,7 +13,8 @@ session:
   deadline_at: '2026-09-20T10:05:00Z'
   branch: claude/kind-wright-whxxn6
   primary_bead: think-srln
-  status: in_progress
+  ended_at: '2026-09-20T07:24:00Z'
+  status: completed
   goal: >-
     Establish where the lower-bound results have been, and which deeper mechanisms,
     especially general geometric arguments combined with point and threshold
@@ -67,7 +68,7 @@ session:
       Register the adapted hypotheses H-222 to H-231, open agenda-040 with the
       overnight queue and the five retirements, correct the Bentz 2016 transcription
       under D-505 and D-506, close the session record, and select the next entry.
-    status: in_progress
+    status: completed
     entered_by: evidence_checkpoint
     switch_reason: All four lanes and three reviews reported.
     budget_minutes: 60
@@ -80,10 +81,27 @@ session:
       cd packing && uv run --frozen --all-extras --group dev packing-validate --fast
     kill_condition: A registration cannot state a kill rule, or a record check refuses the tree.
     fallback: Register what can be stated, leave the rest as open questions, and close.
-    outcome: null
-    evidence: []
-    stop_reason: null
-    next_action: Open Session 144 on a stacked branch and run BC-361.
+    outcome: >-
+      H-222 to H-231 registered with kill rules, agenda-040 opened with BC-361 to
+      BC-366 and five retirements, D-505 and D-506 corrected the transcription, the
+      synopsis rows reconciled, and the closeout commit declares the hosted fast gate
+      on 3dc129e0. Session 144 opened on the stacked branch with exp-213 to exp-215.
+    evidence:
+    - packing/campaign/agendas/agenda-040-overnight-lower-bound-loop.md
+    - packing/campaign/hypotheses/H-222-n11-octagon-class-at-96-25.md
+    - packing/defects.yaml
+    stop_reason: Registrations, corrections, and the gate declaration are complete.
+    next_action: Session 144 runs BC-361 and BC-362 under think-pogj and think-89i1.
+  resource_rollups:
+  - packing/campaign/resource-usage/5e071e1a-5ab8-5bae-a5c0-c3687815bf4a.yaml
+  - packing/campaign/resource-usage/ae3edbd2676fddaf2.yaml
+  - packing/campaign/resource-usage/afc8f6dcbe7aef07d.yaml
+  - packing/campaign/resource-usage/af860c4b4d0468ad0.yaml
+  - packing/campaign/resource-usage/a5a0fa0629343ea04.yaml
+  - packing/campaign/resource-usage/a593739458b58626a.yaml
+  - packing/campaign/resource-usage/a8b8b405efc053f16.yaml
+  - packing/campaign/resource-usage/a68c79e799a3fc678.yaml
+  - packing/campaign/resource-usage/a1730fd7bec467b88.yaml
   budget:
     wall_minutes: 240
     finalization_minutes: 40
@@ -95,7 +113,10 @@ session:
   progress:
     metric: Candidate mechanisms with a disposition and a costed first discriminator
     before: Eight mechanisms M1–M8 and Routes A–D and S, all dispositioned in X-037 and BC-347; no candidate beyond the one-body ceiling has a running instrument.
-    after: null
+    after: >-
+      Nine mechanisms with a disposition and a costed first discriminator (H-222 to
+      H-230), one open question (H-231), five retirements with reopening conditions,
+      and three experiments registered for the first overnight chunk.
   delegations:
   - task: n=11 relational mathematics beyond the one-body ceiling, conditioned certificate program
     operator: lane1_n11_relational; Claude Fable max
@@ -226,9 +247,16 @@ session:
   - packing/campaign/agendas/agenda-040-overnight-lower-bound-loop.md
   - packing/campaign/hypotheses/H-222-n11-octagon-class-at-96-25.md
   - packing/campaign/hypotheses/H-226-n21-one-spare-wall-charge-lemma.md
-  checks: []
-  stop_reason: null
-  next_action: Integrate the lane reports after the adversarial review wave.
+  checks:
+  - 'full gate: fast at 3dc129e0: passed (hosted run 35496205905; pages run 35496205828)'
+  - packing-validate --records passed locally at 3dc129e0 and on the closeout tree.
+  - check_synopsis, check_rung_figures, and check_math_spans (467 spans, 0 changed) passed on the D-505 and D-506 corrections.
+  - Every number in X-040 that is not cited to a retained artifact is marked scratch; no LP, column-generation, or search target ran.
+  stop_reason: >-
+    The review block is complete: X-040 retained, ten hypotheses and agenda-040
+    registered, two transcription defects corrected, PR 204 green on its head.
+    The overnight loop continues in Session 144 on a stacked branch.
+  next_action: Session 144 under think-pogj decides exp-213 to exp-215 for BC-361, with the Bentz 2016 replay lane beside it.
 ---
 # Session 143: Deeper Mathematical Review of Lower-Bound Routes
 
