@@ -1797,7 +1797,7 @@ results:
       n_values:
         - 11
     verification: V4
-    confirmation: C4
+    confirmation: C3
     significance:
       score: 2
       rationale: >-
@@ -1816,14 +1816,24 @@ results:
       The certificate is a weighted fractional unavoidable-set certificate of the
       retained form whose row domain is the D4-symmetric convex clip of the admissible
       core domain by the four corner triangles at depth 1/2, admitted as a domain
-      predicate on the row generator, both gate routes and the ceiling readers in
-      Session 145 with a residual-7 control on the transported 88-family. C4 rests on
-      the two machine decisions of the frozen bytes, which fail differently: the exact
-      event-cell sweep with the clip as extra half-planes on the per-slab centre range,
-      and the interval branch and bound whose boxes are dropped only when provably
-      inside the excluded set; the two decide the same set only because the clip is
-      D4-invariant and folded, which the instrument's tests check. Conditions 1 to 4 are
-      decided exactly before either route runs. The conclusion transfers from the
+      predicate on the row generator and threaded through both gate routes and the
+      ceiling readers in Session 145 with a residual-7 control on the transported
+      88-family. The declared C3 is deliberately below the C4 the two cited atoms
+      derive, and the minimum over parts is what this note claims. The exact event-cell
+      sweep and the interval branch and bound are the two internal routes of one
+      decide_certificate --corner-clip 1/2 invocation, which refuses the file unless
+      both accept: they share the Certificate parser and the closed-form conditions,
+      carry a byte-identical replay string, and the exact leg records
+      relationship_to_generator: same-implementation, so the repository counts the pair
+      as one confirmation and not as two method-distinct derivations. The Session 146
+      registration review says exactly that and recommends V4/C3; a genuinely separate
+      derivation of this clipped decision would earn C4, and none exists. V4 still
+      rests on the two machine decisions of the frozen bytes, which fail differently:
+      the exact event-cell sweep with the clip as extra half-planes on the per-slab
+      centre range, and the interval branch and bound whose boxes are dropped only when
+      provably inside the excluded set; the two decide the same set only because the
+      clip is D4-invariant and folded, which the instrument's tests check. Conditions 1
+      to 4 are decided exactly before either route runs. The conclusion transfers from the
       shrunken cores to the unit squares without loss in the direction that matters,
       because the kept domain is closed and a core lies strictly inside its square by
       Condition 4. The retained bytes declare variant class and the clip, and the gate
@@ -1859,8 +1869,8 @@ results:
       follow-up under BC-367 and need a box cut on the row domain. The instrument that
       could matter is a 2-of-3 threshold atom on ring-centre overlaps inside the
       all-deep class, which needs the clip wired into the threshold routes. C5 needs
-      the registration review mapped under docs/project/reviews and a case directory
-      with the gate as a control test in the T-022 pattern.
+      the registration review mapped under docs/project/reviews; the case directory and
+      the gate control test in the T-022 pattern are retained.
     notes: >-
       Registered at the close of the overnight loop from exp-220, the exp-219 covering
       re-frozen under the class claim strings after the registration review found the
