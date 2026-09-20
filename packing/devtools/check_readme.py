@@ -7,7 +7,7 @@ counts owned by `defects.yaml` and went stale behind them both times. The counts
 gone now, moved to the generated view that owns them. What is left is the part a
 checker can hold: the layout tree, the report index, the links, and the work model.
 
-Five checks:
+Six checks:
 
 1. **Every link resolves**, including anchors into other documents. README and SYNOPSIS
    cross-reference each other heavily and a dead link between them is invisible until
@@ -24,6 +24,9 @@ Five checks:
    workflow entry points, the agent-session schema must be able to record them, the
    synopsis must define the work units those workflows produce, and retired workflow
    identifiers must not survive elsewhere in repository-owned text.
+6. **New results are complete.** Every result classified as `apparently-novel` or
+   `confirmed-novel` appears in the New Results section, and every concrete result ID
+   named there exists in the register.
 
 Usage: uv run --frozen python -m devtools.check_readme
 """
@@ -44,7 +47,10 @@ README = REPO / "README.md"
 SYNOPSIS = REPO / "SYNOPSIS.md"
 RESEARCH = REPO / "docs/project/research"
 DEFECTS = ROOT / "defects.yaml"
+RESULTS = ROOT / "frontier/results.yaml"
 SESSION_SCHEMA = ROOT / "campaign/schemas/agent-session.schema.yaml"
+
+NEW_RESULT_NOVELTY = frozenset({"apparently-novel", "confirmed-novel"})
 
 WORK_UNITS = (
     "Packing exploration",
@@ -299,6 +305,39 @@ def check_defect_summary(text: str) -> list[str]:
     return problems
 
 
+def result_coverage_problems(text: str, results: list[dict[str, object]]) -> list[str]:
+    """Reconcile a New Results section with registered novel results."""
+    section = re.search(
+        r"^## New Results\s*$\n(?P<body>.*?)(?=^##\s|\Z)",
+        text,
+        re.MULTILINE | re.DOTALL,
+    )
+    if section is None:
+        return ["README.md: has no New Results section"]
+
+    registered = {str(result["id"]) for result in results}
+    required = {
+        str(result["id"]) for result in results if result.get("novelty") in NEW_RESULT_NOVELTY
+    }
+    named = set(re.findall(r"\bT-\d{3}\b", section.group("body")))
+
+    problems = [
+        f"README.md: New Results does not name novel result {result_id}"
+        for result_id in sorted(required - named)
+    ]
+    problems.extend(
+        f"README.md: New Results names unregistered result {result_id}"
+        for result_id in sorted(named - registered)
+    )
+    return problems
+
+
+def check_result_coverage(text: str) -> list[str]:
+    """Load the results register and check the curated reader-facing section."""
+    register = safe_load(RESULTS.read_text(encoding="utf-8"))
+    return result_coverage_problems(text, register["results"])
+
+
 def workflow_rows(text: str) -> list[tuple[str, str]]:
     """Numbered workflow rows in a Markdown table."""
     return re.findall(r"^\| (W\d+) \| `([^`]+)` \|", text, re.MULTILINE)
@@ -428,6 +467,7 @@ def main() -> int:
         + check_layout(text)
         + check_reports(text)
         + check_defect_summary(text)
+        + check_result_coverage(text)
         + check_work_model(text)
         + check_retired_workflow_identifiers()
     )
@@ -437,8 +477,8 @@ def main() -> int:
             print(f"  {problem}", file=sys.stderr)
         return 1
     print(
-        "  README.md agrees with the directory, reports, defect source, work model "
-        "and its own links"
+        "  README.md agrees with the directory, reports, defect and result sources, "
+        "work model and its own links"
     )
     return 0
 
