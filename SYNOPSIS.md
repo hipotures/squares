@@ -1043,6 +1043,21 @@ controller, not permission to blur contracts.
 
 ### Current Handoff
 
+[Session 144](packing/campaign/agent-sessions/session-144-overnight-chunk-1.md)
+completed overnight chunk 1 of agenda-040 in
+[PR 205](https://github.com/jlevy/squares/pull/205), stacked on PR 204. None of the
+three stock-instrument determinations reached its target: H-223 and H-224 are unresolved
+with their site sets refuted at 15.566 and 17.042 (`exp-214`, `exp-218`), and H-225
+stopped on the clock at the 25.000000 plateau (`exp-215`). The BC-362 lane replayed
+Bentz 2016 Theorem 11 at the printed constants, retained the one-spare inventory under
+`devtools/bentz2016`, and rejected H-226 and H-227 as stated (`exp-216`, `exp-217`);
+D-507 corrects the Theorem 9 budget.
+No bound moved.
+
+**Selected next entry:** `think-ni3v`, BC-363: the corner-clip instrument and H-222 at
+96/25 in Session 145 under `exp-219`, on the next stacked branch.
+BC-357 / H-216 stays the registered n=6 calibration entry in agenda-037.
+
 [Session 143](packing/campaign/agent-sessions/session-143-lower-bound-math-review.md)
 completed the owner-directed deeper mathematical review of the lower-bound routes in
 [PR 204](https://github.com/jlevy/squares/pull/204).
@@ -1054,10 +1069,9 @@ transcription (D-505, D-506). Ten hypotheses H-222 to H-231 are registered and
 [agenda-040](packing/campaign/agendas/agenda-040-overnight-lower-bound-loop.md) carries
 the overnight loop; no bound moved.
 
-**Selected next entry:** `think-pogj`, BC-361: decide H-223, H-224, and H-225 on the
-stock instruments in Session 144 under `exp-213` to `exp-215`, with the BC-362 Bentz
-2016 replay lane beside it.
-BC-357 / H-216 stays the registered n=6 calibration entry in agenda-037.
+The selected entry at that cutoff was `think-pogj`, BC-361: decide H-223, H-224, and
+H-225 on the stock instruments in Session 144 under `exp-213` to `exp-215`, with the
+BC-362 Bentz 2016 replay lane beside it.
 
 [Session 142](packing/campaign/agent-sessions/session-142-stack-correctness.md)
 completed the correctness review and bounded pipeline repairs in

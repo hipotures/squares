@@ -341,13 +341,15 @@ on.
 It is not the next thing, because a reassessment of what to search is queued in front
 of it.
 
-For the next supervised exact-research goal, take BC-361 under `think-pogj`: decide
+For the next supervised exact-research goal, take BC-363 under `think-ni3v`: the
+corner-clip instrument and
+[H-222](../../../../packing/campaign/hypotheses/H-222-n11-octagon-class-at-96-25.md) at
+96/25 in Session 145 under `exp-219`, after Session 144 left
 [H-223](../../../../packing/campaign/hypotheses/H-223-n13-point-covering-at-399-100.md),
 [H-224](../../../../packing/campaign/hypotheses/H-224-n17-ceiling-family-at-23-5.md),
 and
 [H-225](../../../../packing/campaign/hypotheses/H-225-n26-seeded-certificate-at-53-10.md)
-on the stock instruments in Session 144 under `exp-213` to `exp-215`, with the BC-362
-Bentz 2016 replay lane beside it; the queue is
+unresolved on the stock instruments; the queue is
 [agenda-040](../../../../packing/campaign/agendas/agenda-040-overnight-lower-bound-loop.md)
 and the review that produced it is
 [X-040](../../../../packing/campaign/explorations/X-040-lower-bound-mechanisms-beyond-the-one-body-ceiling.md).
