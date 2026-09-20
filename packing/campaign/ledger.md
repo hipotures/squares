@@ -157,6 +157,7 @@ Each entry summarizes one user-level research window. Cycle slots are wall-clock
 | [session-140](agent-sessions/session-140-lb-survey.md) | stopped | contemporaneous | `review-planning-oversight` (process) | `review-planning-oversight` (process) | 3 | think-8x4t | Continue H-216 under think-qqzs. |
 | [session-141](agent-sessions/session-141-n100-research.md) | stopped | contemporaneous | `review-planning-oversight` (process) | `review-planning-oversight` (process) | 3 | think-ul7y | Continue H-216 under think-qqzs. |
 | [session-142](agent-sessions/session-142-stack-correctness.md) | completed | contemporaneous | `pipeline-improvement` (correctness) | `factual-review` (correctness) | 2 | think-gz4k | Return to H-216 under think-qqzs. |
+| [session-143](agent-sessions/session-143-lower-bound-math-review.md) | in_progress | contemporaneous | `insight-iteration` (insight) | `insight-iteration` (insight) | 1 | think-srln | Integrate the lane reports after the adversarial review wave. |
 
 ### Workflow summary
 
@@ -166,7 +167,7 @@ Declared counts are contemporaneous contracts; retrospective counts are reconstr
 | --- | ---: | ---: | ---: | ---: |
 | `research-survey` | 2 | 2 | 13 | 2 |
 | `factual-review` | 7 | 0 | 53 | 2 |
-| `insight-iteration` | 24 | 1 | 80 | 4 |
+| `insight-iteration` | 25 | 1 | 81 | 4 |
 | `process-review` | 16 | 4 | 64 | 6 |
 | `efficiency-loop` | 10 | 1 | 36 | 1 |
 | `research-loop` | 27 | 4 | 101 | 8 |
