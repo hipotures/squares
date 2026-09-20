@@ -11,9 +11,10 @@ session:
   date: '2026-09-20'
   started_at: '2026-09-20T07:10:00Z'
   deadline_at: '2026-09-20T13:50:00Z'
+  ended_at: '2026-09-20T12:35:00Z'
   branch: claude/kind-wright-whxxn6-chunk1
   primary_bead: think-pogj
-  status: in_progress
+  status: completed
   goal: >-
     Decide H-223, H-224, and H-225 on the stock column-generation and ceiling-family
     instruments under exp-213, exp-214, and exp-215, and run the BC-362 mathematical
@@ -31,7 +32,7 @@ session:
       commands, decide each with the gate or the two ceiling readers, and write the
       receipts; in parallel, the BC-362 Fable lane replays Theorem 11 and builds the
       one-spare inventory tool in the scratchpad.
-    status: in_progress
+    status: completed
     entered_by: session_start
     switch_reason: null
     budget_minutes: 360
@@ -47,10 +48,23 @@ session:
       A run refuses on a guard, or the interval route stalls on every candidate; then
       the record is unresolved with its stop reason and the chunk closes.
     fallback: Record what was measured, keep the leases honest, and hand the rest to chunk 2.
-    outcome: null
-    evidence: []
-    stop_reason: null
-    next_action: Close the record with the hosted gate on this tree and update the stacked pull request.
+    outcome: >-
+      Six experiments recorded: exp-213 lost mid-run at the account spend limit,
+      exp-214 converged at 15.566 with the depth-one family total 85/8, exp-215
+      stopped on the clock at the 25.000000 plateau, exp-218 converged at 17.042
+      with the polished family total 874999999/62500000 and K3 failing; H-223, H-224
+      and H-225 unresolved. The BC-362 lane replayed Theorem 11 at the printed
+      constants (24 rows hold, the negative control fails 12), built the one-spare
+      inventory, and exp-216 and exp-217 reject H-226 and H-227 as stated.
+    evidence:
+    - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-214-n13-399-100-receipt.md
+    - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-218-n17-23-5-receipt.md
+    - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/bentz2016-one-spare-receipt.md
+    stop_reason: >-
+      Every experiment id opened in the chunk has a verdict other than in-progress;
+      the account spend limit at 08:00Z cost the chunk about three and a half hours of
+      wall, which the session clock records.
+    next_action: Close the record and update the stacked pull request.
   resource_rollups:
   - packing/campaign/resource-usage/5e071e1a-5ab8-5bae-a5c0-c3687815bf4a.yaml
   - packing/campaign/resource-usage/a40525ecaabdf057f.yaml
@@ -69,7 +83,10 @@ session:
   progress:
     metric: Experiments decided under BC-361 and BC-362 steps completed
     before: exp-213, exp-214, exp-215 registered in-progress; no replay of Bentz 2016 at the printed constants exists.
-    after: null
+    after: >-
+      exp-213, exp-214, exp-215 and exp-218 unresolved with receipts; exp-216 and
+      exp-217 rejected; the Theorem 11 replay and the one-spare inventory retained
+      under devtools/bentz2016 with seven tests; D-507 filed.
   delegations:
   - task: Run exp-213, exp-214, and exp-215 with the registered commands and write their receipts
     operator: chunk1_runner; Claude Opus high
@@ -245,10 +262,15 @@ session:
   - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/bentz2016-one-spare-receipt.md
   - packing/devtools/bentz2016/one_spare_inventory.py
   checks:
+  - 'full gate: fast at ffb6c2f5: passed (hosted run 35510886230; pages run 35510886214)'
+  - packing-validate --records passed locally at ffb6c2f5 and on the closeout tree; the earlier hosted run on 2aef9421 failed only the campaign-record step, on in-progress deadlines this record then extended.
   - Every RETAINABLE freeze in this chunk was read by both ceiling readers; none reached its target, so no hypothesis was confirmed.
   - exp-213, exp-214 and exp-215 were registered before their commands ran and the commands were not changed after the first number.
-  stop_reason: null
-  next_action: Close the record with the hosted gate on this tree; chunk 2 (BC-363, Session 145) runs on the next stacked branch.
+  stop_reason: >-
+    Every experiment id opened in the chunk has a verdict; H-223, H-224 and H-225
+    are unresolved, H-226 and H-227 rejected as stated, and the Bentz 2016 tools
+    are retained under OR-1.
+  next_action: Session 145 under think-ni3v runs BC-363 on the next stacked branch; the handoff names the remaining agenda-040 items.
 ---
 # Session 144: Overnight Chunk 1
 

@@ -2365,7 +2365,7 @@ sessions:
   codex_receipts: []
 - id: session-144
   title: "Overnight Chunk 1 — Stock-Instrument Determinations at n=13, 17, 26"
-  status: in_progress
+  status: completed
   primary_bead: think-pogj
   phases: 1
   measured: true
