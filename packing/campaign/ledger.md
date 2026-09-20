@@ -158,7 +158,7 @@ Each entry summarizes one user-level research window. Cycle slots are wall-clock
 | [session-141](agent-sessions/session-141-n100-research.md) | stopped | contemporaneous | `review-planning-oversight` (process) | `review-planning-oversight` (process) | 3 | think-ul7y | Continue H-216 under think-qqzs. |
 | [session-142](agent-sessions/session-142-stack-correctness.md) | completed | contemporaneous | `pipeline-improvement` (correctness) | `factual-review` (correctness) | 2 | think-gz4k | Return to H-216 under think-qqzs. |
 | [session-143](agent-sessions/session-143-lower-bound-math-review.md) | completed | contemporaneous | `insight-iteration` (insight) | `review-planning-oversight` (insight) | 2 | think-srln | Session 144 under think-pogj decides exp-213 to exp-215 for BC-361, with the Bentz 2016 replay lane beside it. |
-| [session-144](agent-sessions/session-144-overnight-chunk-1.md) | in_progress | contemporaneous | `research-loop` (insight) | `research-loop` (insight) | 1 | think-pogj | Close chunk 1 and open chunk 2 (BC-363) on the next stacked branch. |
+| [session-144](agent-sessions/session-144-overnight-chunk-1.md) | in_progress | contemporaneous | `research-loop` (insight) | `research-loop` (insight) | 1 | think-pogj | Close the record with the hosted gate on this tree; chunk 2 (BC-363, Session 145) runs on the next stacked branch. |
 
 ### Workflow summary
 
