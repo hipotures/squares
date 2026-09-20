@@ -2385,7 +2385,7 @@ sessions:
   codex_receipts: []
 - id: session-145
   title: "Overnight Chunk 2 — The Corner-Clip Instrument and H-222"
-  status: in_progress
+  status: completed
   primary_bead: think-ni3v
   phases: 1
   measured: true

@@ -323,6 +323,33 @@ delegated to Fable and mechanical work to Opus under a Fable review.
 `think-qqzs` / H-216 stays the registered n=6 calibration entry and can fill an idle CPU
 slot.
 
+## How the Overnight Loop Ended
+
+Two chunks ran before the account’s spend limit and the clock closed the loop
+([Session 144](../agent-sessions/session-144-overnight-chunk-1.md),
+[Session 145](../agent-sessions/session-145-overnight-chunk-2.md)); the dispositions are
+on [agenda-040](../agendas/agenda-040-overnight-lower-bound-loop.md).
+
+- **BC-361.** None of the three stock-instrument determinations reached its target.
+  H-223’s site set converged at 15.566 (exp-214) and H-224’s at 17.042 (exp-218), with
+  depth-one family totals 85/8 and about 14, so both site sets are refuted and the
+  claims untouched; H-225 stopped on the clock at the 25.000000 plateau (exp-215).
+- **BC-362.** Theorem 11 replays exactly at the printed constants.
+  The one-spare inventory has 42,124 D2-orbits at n=21, of which 22,603 need geometry
+  beyond the paper’s toolkit after Theorem 8 co-location propagation, and the n=32 lemma
+  fails on the 0.0265 vertical budget; H-226 and H-227 are rejected as stated (exp-216,
+  exp-217) and the inventories are retained under `devtools/bentz2016`. D-507 records a
+  third transcription defect (Theorem 9’s budget factor 2).
+- **BC-363.** The convex corner-clip instrument was admitted, and exp-219 excludes the
+  octagon class at 96/25: every packing of 11 unit squares at side 3.84 has a square
+  meeting a corner triangle x + y <= 1/2, RETAINABLE under the corner class hypothesis
+  from both routes with mass 10.868617. This is the first decided item of the
+  corner-conditioned point language and is conditional, not a bound.
+
+No bound on `s(n)` moved.
+The next entry is BC-367: register the conditional exclusion after review, clip the
+remaining corner-bin classes, and give n=26 a second site set.
+
 ## Owner Decisions
 
 None are requested. The theta route stays retired under X-037’s condition; the Bentz

@@ -142,8 +142,8 @@ hypothesis status and summarizes experiment verdicts, and the
 | Record | Count | State at the cutoff |
 | --- | ---: | --- |
 | Agendas | 37 | 17 active; 14 completed; 5 paused; 1 superseded |
-| Commitments | 355 | 178 complete; 61 stopped; 68 blocked; 18 ready; 21 tentative; 9 in progress |
-| Sessions | 145 | 87 completed; 57 stopped; 1 nonterminal |
+| Commitments | 356 | 181 complete; 61 stopped; 68 blocked; 16 ready; 21 tentative; 9 in progress |
+| Sessions | 145 | 88 completed; 57 stopped; all terminal |
 | Explorations | 38 | 24 linked to proposed hypotheses; 14 uncodified |
 | Hypotheses | 169 | 29 confirmed; 31 refuted; 54 blocked; 17 unresolved; 5 open; 29 open questions; 2 result registered; 2 abandoned; 0 running |
 | Experiments | 154 | 42 accepted; 36 rejected; 50 unresolved; 12 baseline; 11 blocked; 3 abandoned; 0 in progress |
@@ -1044,6 +1044,24 @@ controller, not permission to blur contracts.
 
 ### Current Handoff
 
+[Session 145](packing/campaign/agent-sessions/session-145-overnight-chunk-2.md)
+completed overnight chunk 2 of agenda-040 in
+[PR 206](https://github.com/jlevy/squares/pull/206), stacked on PR 205. The convex
+corner-clip instrument was admitted after an adversarial review, and `exp-219` confirmed
+H-222 at its scope: every packing of 11 unit squares at side 96/25 has a square meeting
+a corner triangle x + y <= 1/2, RETAINABLE under the corner class hypothesis from both
+routes at mass 10.868617. That excludes the octagon class at 3.84 conditionally on the
+corner partition; it is not a bound.
+The three retained replay readers are re-bound to the instrument’s revision with their
+determinations reproduced.
+The overnight loop closed on its clock after two of four chunks; BC-361, BC-362 and
+BC-363 are dispositioned on agenda-040.
+
+**Selected next entry:** `think-b7pr`, BC-367: register the exp-219 conditional
+exclusion after review, clip the remaining corner-bin classes at 96/25 with the admitted
+instrument, and give n=26 a second site set, in Session 146 on the next stacked branch.
+BC-357 / H-216 stays the registered n=6 calibration entry in agenda-037.
+
 [Session 144](packing/campaign/agent-sessions/session-144-overnight-chunk-1.md)
 completed overnight chunk 1 of agenda-040 in
 [PR 205](https://github.com/jlevy/squares/pull/205), stacked on PR 204. None of the
@@ -1055,9 +1073,8 @@ Bentz 2016 Theorem 11 at the printed constants, retained the one-spare inventory
 D-507 corrects the Theorem 9 budget.
 No bound moved.
 
-**Selected next entry:** `think-ni3v`, BC-363: the corner-clip instrument and H-222 at
-96/25 in Session 145 under `exp-219`, on the next stacked branch.
-BC-357 / H-216 stays the registered n=6 calibration entry in agenda-037.
+The selected entry at that cutoff was `think-ni3v`, BC-363: the corner-clip instrument
+and H-222 at 96/25 in Session 145 under `exp-219`.
 
 [Session 143](packing/campaign/agent-sessions/session-143-lower-bound-math-review.md)
 completed the owner-directed deeper mathematical review of the lower-bound routes in

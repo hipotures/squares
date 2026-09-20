@@ -159,7 +159,7 @@ Each entry summarizes one user-level research window. Cycle slots are wall-clock
 | [session-142](agent-sessions/session-142-stack-correctness.md) | completed | contemporaneous | `pipeline-improvement` (correctness) | `factual-review` (correctness) | 2 | think-gz4k | Return to H-216 under think-qqzs. |
 | [session-143](agent-sessions/session-143-lower-bound-math-review.md) | completed | contemporaneous | `insight-iteration` (insight) | `review-planning-oversight` (insight) | 2 | think-srln | Session 144 under think-pogj decides exp-213 to exp-215 for BC-361, with the Bentz 2016 replay lane beside it. |
 | [session-144](agent-sessions/session-144-overnight-chunk-1.md) | completed | contemporaneous | `research-loop` (insight) | `research-loop` (insight) | 1 | think-pogj | Session 145 under think-ni3v runs BC-363 on the next stacked branch; the handoff names the remaining agenda-040 items. |
-| [session-145](agent-sessions/session-145-overnight-chunk-2.md) | in_progress | contemporaneous | `pipeline-improvement` (correctness) | `pipeline-improvement` (correctness) | 1 | think-ni3v | Close the record with the hosted gate on this tree; the handoff names the remaining agenda-040 items. |
+| [session-145](agent-sessions/session-145-overnight-chunk-2.md) | completed | contemporaneous | `pipeline-improvement` (correctness) | `pipeline-improvement` (correctness) | 1 | think-ni3v | Session 146 under think-b7pr takes BC-367 on the next stacked branch. |
 
 ### Workflow summary
 
@@ -788,9 +788,10 @@ Status: **active**. Run the hypotheses X-040 adapted from the Session 143 review
 
 | item | purpose | n | state | priority | bead | next evidence |
 | --- | --- | --- | --- | ---: | --- | --- |
-| BC-361 | research | 13, 17, 26 | ready | 0 | think-pogj | exp-213, exp-214, and exp-215 receipts under results/agenda-040. |
-| BC-362 | research | 21, 32 | ready | 1 | think-89i1 | The replay receipt and the structure inventory under results/agenda-040. |
-| BC-363 | research | 11 | ready | 1 | think-ni3v | The admitted predicate, its controls, and the H-222 experiment receipt. |
+| BC-361 | research | 13, 17, 26 | complete | 0 | think-pogj | exp-213, exp-214, and exp-215 receipts under results/agenda-040. |
+| BC-362 | research | 21, 32 | complete | 1 | think-89i1 | The replay receipt and the structure inventory under results/agenda-040. |
+| BC-363 | research | 11 | complete | 1 | think-ni3v | The admitted predicate, its controls, and the H-222 experiment receipt. |
+| BC-367 | research | 11, 26 | ready | 0 | think-b7pr | The registration review, the per-class clip receipts, and the n=26 receipt under results/agenda-040. |
 | BC-364 | research | 11 | blocked | 2 | think-z20r | The gap-g derivation note and the pairwise check receipt. |
 | BC-365 | research | 12 | blocked | 3 | think-mmd5 | A verifier admission receipt, or a certified dual of value at least 12 below side 4 from the existing ceiling readers. |
 | BC-366 | research | 11, 45 | stopped | 4 | think-srln | None; reopen an item only when its stated reopening condition holds. |

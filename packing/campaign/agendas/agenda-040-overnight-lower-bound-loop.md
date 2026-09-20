@@ -24,7 +24,7 @@ agenda:
     purpose: research
     owner_focus: insight
     instances: [13, 17, 26]
-    state: ready
+    state: complete
     priority: 0
     question: >-
       What do the stock column-generation and ceiling-family instruments decide at
@@ -55,11 +55,43 @@ agenda:
     note: >-
       H-223 is calibration under a proved value. H-224's confirm is a negative about
       the method, not a bound. H-225 is the one item here that can move a floor.
+    outcomes:
+    - scope: H-223, the n=13 calibration covering at 399/100 on auto grids plus a five-per-window lattice (exp-214).
+      classification: bounded-negative
+      result: >-
+        Converged at 15.565562, above 13; the depth-one family folds to total 85/8, so
+        this site set is refuted and the claim is untouched. Reopen with a different
+        site set or a larger support cap.
+      evidence:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-214-n13-399-100-receipt.md
+      disposition: retire-negative
+      follow_up: null
+    - scope: H-224, the n=17 ceiling family at 23/5 (exp-213 lost mid-run; exp-218 at support cap 32).
+      classification: bounded-negative
+      result: >-
+        Converged at 17.042346; the polished depth-one family totals 874999999/62500000,
+        about 14, and K3 fails, so the family neither kills the route nor reaches 17.
+        Reopen only with a family reader that accepts a larger support.
+      evidence:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-218-n17-23-5-receipt.md
+      disposition: retire-negative
+      follow_up: null
+    - scope: H-225, the window-seeded n=26 covering at 53/10 with a 3600 s deadline (exp-215).
+      classification: time-limited
+      result: >-
+        Stopped inside round 0 after 48 LP rounds at the exact-integer plateau
+        25.000000 with rows still violated, the artefact Session 141 saw at 513/100;
+        nothing is decided. A successor seeds from the retained row log or changes the
+        site set under BC-367.
+      evidence:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-215-n26-53-10-receipt.md
+      disposition: continue
+      follow_up: think-b7pr
   - id: BC-362
     purpose: research
     owner_focus: insight
     instances: [21, 32]
-    state: ready
+    state: complete
     priority: 1
     question: >-
       Does Bentz 2016's Theorem 11 replay exactly at the printed constant
@@ -89,11 +121,26 @@ agenda:
     note: >-
       n=45 and n=44 were dropped: the m = 7 height budget 6.8925 < 7 blocks the 0.1
       slide.
+    outcomes:
+    - scope: The Theorem 11 replay at the printed constants and the one-spare inventory at n=21 and n=32 (exp-216, exp-217).
+      classification: bounded-negative
+      result: >-
+        Theorem 11 replays exactly (24 of 24 rows hold; the negative control fails
+        12). At n=21 the inventory has 42,124 D2-orbits: after Theorem 8 co-location
+        propagation 16,060 are forced, 3,461 killed, and 22,603 need geometry the
+        paper's toolkit does not supply; at n=32 the 0.0265 vertical budget kills
+        11,699 of 12,100 raw structures and the lemma as stated fails. Both rejected as
+        stated; s(21) = 5 and s(32) = 6 untouched. D-507 corrects the Theorem 9 budget.
+      evidence:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/bentz2016-one-spare-receipt.md
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/one-spare-inventory-n21.json
+      disposition: retire-negative
+      follow_up: null
   - id: BC-363
     purpose: research
     owner_focus: insight
     instances: [11]
-    state: ready
+    state: complete
     priority: 1
     question: >-
       Is the restricted covering value of the all-free corner class at 96/25,
@@ -122,6 +169,57 @@ agenda:
       Review R1 killed the deep branches at the target side; the all-free class is
       the only corner branch with headroom and its kill is decisive for the whole
       corner-conditioned point language at this B.
+    outcomes:
+    - scope: The convex corner-clip instrument and H-222 at 96/25, d = 1/2 (exp-219).
+      classification: achieved
+      result: >-
+        The instrument was admitted by an adversarial review (residual 7 reproduced
+        three ways; K4 added to both ceiling readers); exp-219 printed RETAINABLE
+        UNDER THE CORNER CLASS HYPOTHESIS from both routes with mass 10868617/1000000
+        and least charge 2000013/2000000. Every packing of 11 unit squares at side
+        96/25 therefore has a square meeting a corner triangle x + y <= 1/2: the
+        octagon class is excluded at 3.84. Conditional, not a bound; registration as
+        a frontier item after review is BC-367.
+      evidence:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-219-n11-96-25-clip-receipt.md
+      disposition: retire-success
+      follow_up: null
+  - id: BC-367
+    purpose: research
+    owner_focus: insight
+    instances: [11, 26]
+    state: ready
+    priority: 0
+    question: >-
+      Does the corner-clip exclusion extend from the octagon class to the other
+      corner-bin classes at 96/25, so that the corner-conditioned point language
+      closes at 3.84, and does a second site set move the n=26 floor at 53/10?
+    hypotheses: [H-222, H-225]
+    budget: >-
+      Session 146, one to two hours: a W2 review-and-register step for the exp-219
+      conditional exclusion, then clipped runs of about thirty minutes on the
+      remaining corner-bin classes with the admitted instrument, and one n=26 run
+      seeded from exp-215's row log or on a different site set.
+    entry: >-
+      exp-219 is accepted, the instrument is admitted, and the exp-215 row log is
+      retained.
+    exit: >-
+      The conditional exclusion is registered with its scope or refused with the
+      reason recorded; each clipped class has a decided or explicitly unresolved
+      record; the n=26 run has a verdict.
+    bead: think-b7pr
+    depends_on: []
+    next_evidence: >-
+      The registration review, the per-class clip receipts, and the n=26 receipt
+      under results/agenda-040.
+    workflows: [research-loop]
+    program: n11-strategy-reset
+    artifacts:
+    - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-219-n11-96-25-clip-receipt.md
+    parallel_group: overnight-chunk-3
+    note: >-
+      A class that is not excluded stops the corner-conditioned language at this B;
+      a class excluded on every bin is still conditional on the corner partition.
   - id: BC-364
     purpose: research
     owner_focus: insight

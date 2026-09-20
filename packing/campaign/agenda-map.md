@@ -2,7 +2,7 @@
 
 # Agenda map
 
-355 agenda commitments across 37 agendas, as declared in each agenda's own frontmatter.
+356 agenda commitments across 37 agendas, as declared in each agenda's own frontmatter.
 Source of truth is [`agendas/`](agendas/); this view is regenerated, never edited.
 
 An agenda's queue owns priority ordering, so this map preserves each agenda's
@@ -10,7 +10,7 @@ order rather than imposing one across them.
 
 ## The short version
 
-- **9** in_progress, **18** ready, **21** tentative, **68** blocked, **61** stopped, **178** complete.
+- **9** in_progress, **16** ready, **21** tentative, **68** blocked, **61** stopped, **181** complete.
 
 - **26 blocked commitments carry a manual condition** (`BC-016`, `BC-025`, `BC-033`, `BC-050`, `BC-115`, `BC-170`, `BC-204`, `BC-205`, `BC-212`, `BC-207`, `BC-208`, `BC-209`, `BC-215`, `BC-217`, `BC-221`, `BC-238`, `BC-248`, `BC-270`, `BC-306`, `BC-337`, `BC-327`, `BC-329`, `BC-330`, `BC-358`, `BC-364`, `BC-365`). Dependency edges alone cannot make these ready; each condition is named in the table below and must be explicitly cleared.
 
@@ -65,9 +65,7 @@ Commitments a session may take now, in each agenda's declared order.
 | agenda-036 | `BC-351` | tentative | 3 | insight | research | Can an orientation-sensitive two- or three-parent gap lemma be summed without double counting to prove… | `think-gzjq` |
 | agenda-037 | `BC-357` | in_progress | 1 | correctness | measurement_validation | Does a helper-free point-atom certificate exist for n=6 at side 299/100 with B = 9977/10000 on the… | `think-qqzs` |
 | agenda-037 | `BC-359` | tentative | 2 | insight | research | Is the integral piercing number of the T-018 site set at side 3.80 on a 37-direction net at most 11, as a… | `think-k4vb` |
-| agenda-040 | `BC-361` | ready | 0 | insight | research | What do the stock column-generation and ceiling-family instruments decide at n=13 (399/100), n=17 (23/5), and… | `think-pogj` |
-| agenda-040 | `BC-362` | ready | 1 | insight | research | Does Bentz 2016's Theorem 11 replay exactly at the printed constant sqrt(2) - 1/2, and does the one-spare… | `think-89i1` |
-| agenda-040 | `BC-363` | ready | 1 | insight | research | Is the restricted covering value of the all-free corner class at 96/25, d = 1/2, below 11, or does a… | `think-ni3v` |
+| agenda-040 | `BC-367` | ready | 0 | insight | research | Does the corner-clip exclusion extend from the octagon class to the other corner-bin classes at 96/25, so… | `think-b7pr` |
 
 ## Blocked, and on what
 
@@ -141,7 +139,7 @@ A commitment blocked by other commitments names them; one blocked by something e
 | agenda-035 | `BC-330` | 2 | — | no | The restricted-domain threshold gate and complete matched point baseline are not admitted. |
 | agenda-036 | `BC-343` | 0 | `BC-354`, `BC-355` | no | — |
 | agenda-037 | `BC-358` | 1 | — | no | think-g3j7 must land a new reader for weighted-majority and floor atoms without mutating T-025/T-026 verify_claim.py.… |
-| agenda-040 | `BC-364` | 2 | `BC-363` | no | The non-convex box-avoidance domain predicate (BC-204) and a conflict-edge atom class in the relational reader. |
+| agenda-040 | `BC-364` | 2 | `BC-363` | yes | The non-convex box-avoidance domain predicate (BC-204) and a conflict-edge atom class in the relational reader. |
 | agenda-040 | `BC-365` | 3 | — | no | An unshrunk exact-orientation verifier generalised from cases/green17/interval_audit.py and an unshrunk column… |
 
 ## Discharged elsewhere
@@ -202,7 +200,7 @@ A commitment whose exit another agenda's commitment satisfied. Recorded as an ed
 | agenda-035 | paused |  |  |  | 4 | 2 | 8 | 14 |
 | agenda-036 | active | 1 |  | 9 | 1 |  | 6 | 17 |
 | agenda-037 | active | 1 |  | 1 | 1 | 1 | 1 | 5 |
-| agenda-040 | active |  | 3 |  | 2 | 1 |  | 6 |
+| agenda-040 | active |  | 1 |  | 2 | 1 | 3 | 7 |
 
 ## By program
 
@@ -390,14 +388,15 @@ Open frontier: `BC-221`, `BC-222`, `BC-223`, `BC-224`, `BC-225`.
 | agenda-037 | `BC-358` | blocked | Is the rows-complete covering LP with weighted-majority, k-of-S, and floor atoms on… |
 | agenda-037 | `BC-359` | tentative | Is the integral piercing number of the T-018 site set at side 3.80 on a 37-direction net at most… |
 | agenda-037 | `BC-360` | stopped | Should mechanisms M2, M4, M5, M6, and M8 from the overnight slate run as lanes? |
-| agenda-040 | `BC-361` | ready | What do the stock column-generation and ceiling-family instruments decide at n=13 (399/100), n=17… |
-| agenda-040 | `BC-362` | ready | Does Bentz 2016's Theorem 11 replay exactly at the printed constant sqrt(2) - 1/2, and does the… |
-| agenda-040 | `BC-363` | ready | Is the restricted covering value of the all-free corner class at 96/25, d = 1/2, below 11, or does… |
+| agenda-040 | `BC-361` | complete | What do the stock column-generation and ceiling-family instruments decide at n=13 (399/100), n=17… |
+| agenda-040 | `BC-362` | complete | Does Bentz 2016's Theorem 11 replay exactly at the printed constant sqrt(2) - 1/2, and does the… |
+| agenda-040 | `BC-363` | complete | Is the restricted covering value of the all-free corner class at 96/25, d = 1/2, below 11, or does… |
 | agenda-040 | `BC-364` | blocked | Can the tilted-anchor case or a gap-g wedge conflict edge cut the retained n=11 families at 96/25… |
 | agenda-040 | `BC-365` | blocked | Does an unshrunk covering of mass below 12 exist at side exactly 4? |
 | agenda-040 | `BC-366` | stopped | Should the corner-penetration deep branches, the theta screen, the stressed contact-graph theorem,… |
+| agenda-040 | `BC-367` | ready | Does the corner-clip exclusion extend from the octagon class to the other corner-bin classes at… |
 
-Open frontier: `BC-342`, `BC-344`, `BC-345`, `BC-348`, `BC-349`, `BC-350`, `BC-351`, `BC-352`, `BC-341`, `BC-343`, `BC-357`, `BC-358`, `BC-359`, `BC-361`, `BC-362`, `BC-363`, `BC-364`, `BC-365`.
+Open frontier: `BC-342`, `BC-344`, `BC-345`, `BC-348`, `BC-349`, `BC-350`, `BC-351`, `BC-352`, `BC-341`, `BC-343`, `BC-357`, `BC-358`, `BC-359`, `BC-364`, `BC-365`, `BC-367`.
 
 ### `n11-structure-and-conditional-dots`
 

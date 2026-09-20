@@ -11,9 +11,10 @@ session:
   date: '2026-09-20'
   started_at: '2026-09-20T07:30:00Z'
   deadline_at: '2026-09-20T14:10:00Z'
+  ended_at: '2026-09-20T12:48:00Z'
   branch: claude/kind-wright-whxxn6-chunk2
   primary_bead: think-ni3v
-  status: in_progress
+  status: completed
   goal: >-
     Admit the convex corner-clip domain predicate on the row generator, both gate
     routes, and the ceiling readers with a residual-7 control, review it
@@ -29,7 +30,7 @@ session:
       transported 88-family as the acceptance control, keep unclipped behaviour
       byte-for-byte, and pass an adversarial Fable review before any target runs;
       then register exp-219 and run H-222 on the clipped domain.
-    status: in_progress
+    status: completed
     entered_by: session_start
     switch_reason: null
     budget_minutes: 380
@@ -45,10 +46,20 @@ session:
       stalls on every candidate; then the instrument is repaired or the record is
       unresolved with its stop reason.
     fallback: Record what was measured, keep the leases honest, and hand the rest to chunk 2.
-    outcome: null
-    evidence: []
-    stop_reason: null
-    next_action: Close the record with the hosted gate on this tree and update the stacked pull request.
+    outcome: >-
+      The convex corner-clip instrument was built, reviewed adversarially and
+      admitted; exp-219 printed RETAINABLE UNDER THE CORNER CLASS HYPOTHESIS from
+      both routes (mass 10868617/1000000, least charge 2000013/2000000), so H-222 is
+      confirmed at its scope and the octagon class is excluded at 96/25 conditionally
+      on the corner partition. The three retained replay readers were re-bound to the
+      instrument's revision with their determinations reproduced.
+    evidence:
+    - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-219-n11-96-25-clip-receipt.md
+    - packing/src/sqpack/fractional/corner_clip.py
+    stop_reason: >-
+      exp-219 decided and every delegation reported; the loop's clock, not the
+      queue, ends the chunk.
+    next_action: Close the record and update the stacked pull request.
   resource_rollups:
   - packing/campaign/resource-usage/5e071e1a-5ab8-5bae-a5c0-c3687815bf4a.yaml
   - packing/campaign/resource-usage/afdde84bfe1625a5f.yaml
@@ -65,7 +76,10 @@ session:
   progress:
     metric: Instrument admitted and exp-219 decided
     before: No consumer of the point-certificate machinery accepts a domain clip; H-222 has no instrument.
-    after: null
+    after: >-
+      The corner-clip instrument admitted with 19 tests and K4 in both ceiling
+      readers; exp-219 accepted and H-222 confirmed at scope; the replay readers
+      re-bound; BC-367 registered as the next entry.
   delegations:
   - task: Build the convex corner-clip predicate across the row generator, both gate routes, and the ceiling readers
     operator: chunk2_builder; Claude Opus high
@@ -161,10 +175,15 @@ session:
   - packing/src/sqpack/fractional/corner_clip.py
   - packing/tests/test_fractional_corner_clip.py
   checks:
+  - 'full gate: fast at 17136c25: passed (hosted run 35511440297; pages run 35511440298)'
+  - packing-validate --records passed locally at 17136c25 and on the closeout tree.
   - No H-222 target ran before the review returned ADMIT; exp-219 was registered before its command ran.
   - exp-219 printed RETAINABLE UNDER THE CORNER CLASS HYPOTHESIS from both decide_certificate routes; the result is conditional on the corner class and is not a bound.
-  stop_reason: null
-  next_action: Close the record with the hosted gate on this tree; the handoff names the remaining agenda-040 items.
+  stop_reason: >-
+    exp-219 accepted and H-222 confirmed at scope; the instrument, its review and
+    the re-binding are committed; the overnight loop closes on its clock with
+    BC-361, BC-362 and BC-363 dispositioned on agenda-040.
+  next_action: Session 146 under think-b7pr takes BC-367 on the next stacked branch.
 ---
 # Session 145: Overnight Chunk 2
 
@@ -181,3 +200,13 @@ before it started; the review ran again after the limit reset at 11:00Z.
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
 -->
+
+## How the chunk ended
+
+The builder and the first reviewer were cut off by the account’s spend limit; the review
+ran again after 11:33Z and returned ADMIT with one must-fix on the run recipe, which the
+registered command carried.
+exp-219 decided in 307 s. The re-binding lane moved the three retained replay readers to
+the instrument’s revision and reproduced each determination field for field.
+The loop ends here on its clock: two chunks of the planned four ran, and agenda-040
+records the dispositions and the next entry.
