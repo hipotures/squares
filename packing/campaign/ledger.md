@@ -1198,6 +1198,7 @@ These totals exclude 4 historical rounds with unrecorded timing; their cost is u
 - X-030 — Draft N11 Proof Obligations After the T1 Local Witness
 - X-031 — Floor-Normalized BC303 T2 Helper and H-161 Local Stability
 - X-036 — Graded Guidance for Annealing
+- X-040 — Lower-Bound Mechanisms Beyond the One-Body Ceiling
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
