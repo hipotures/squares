@@ -4568,6 +4568,9 @@ archive beside it.
 | [exp-210](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-210-h210-blind-runs-are-not-packings.md) | 11 | target | H-212 | Blind runs of the workbench’s physics end with squares overlapping | Every blind run observed ended overlapping, but the snapped control was measured once with a probe variant that was not kept, and neither the trials nor their final poses are in the repository, so the observation cannot be re-checked from it. | unresolved |
 | [exp-211](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-211-h213-adaptive-animate-integration.md) | 17, 90 | target | H-213 | Headless raw and presented Animate kinetics across balanced and rigid laws | Every solver-transition group at the frozen commit misses at least one 60 Hz presentation budget; physical tuning remains open | rejected |
 | [exp-212](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-212-h214-preset-signatures.md) | 17, 90 | target | H-214 | Preset penetration and contact signatures across both physical solvers | Rigid-versus-soft penetration and sticky-versus-balanced contact order reverse by solver or transition at the frozen commit | rejected |
+| [exp-213](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-213-h224-n17-23-5-ceiling-family.md) | 17 | target | H-224 | T-019-seeded ceiling family at 23/5 | in progress | in-progress |
+| [exp-214](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-214-h223-n13-399-100-window-covering.md) | 13 | calibration | H-223 | Window-seeded point covering at 399/100 | in progress | in-progress |
+| [exp-215](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-215-h225-n26-53-10-seeded-covering.md) | 26 | target | H-225 | Window-seeded point covering at 53/10 | in progress | in-progress |
 
 ### Cost and provenance
 
@@ -4720,6 +4723,9 @@ archive beside it.
 | exp-210 | 900 s harness default, in the recorded command | unrecorded | unrecorded | dependency: timing receipt lost (D-067) | `d3c3a778` (mapped source) |
 | exp-211 | 24 deterministic trajectory cells shared with exp-212 | shared; no duplicate charge | — | criterion | `9cca493c17ab61d5efb3e1032f32c54a9b87320e` |
 | exp-212 | 48 deterministic trajectory cells | 86.689 s | — | criterion | `9cca493c17ab61d5efb3e1032f32c54a9b87320e` |
+| exp-213 | One run of at most 2400 s, polish, two readers | — | — | in progress | — |
+| exp-214 | One run of at most 2400 s and the gate or the readers | — | — | in progress | — |
+| exp-215 | One run of at most 3600 s and the gate | — | — | in progress | — |
 
 ### What the 150 rounds jointly establish
 
