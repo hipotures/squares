@@ -143,7 +143,7 @@ hypothesis status and summarizes experiment verdicts, and the
 | --- | ---: | --- |
 | Agendas | 37 | 17 active; 14 completed; 5 paused; 1 superseded |
 | Commitments | 356 | 181 complete; 61 stopped; 68 blocked; 16 ready; 21 tentative; 9 in progress |
-| Sessions | 146 | 88 completed; 57 stopped; 1 nonterminal |
+| Sessions | 146 | 89 completed; 57 stopped; all terminal |
 | Explorations | 38 | 24 linked to proposed hypotheses; 14 uncodified |
 | Hypotheses | 169 | 29 confirmed; 31 refuted; 54 blocked; 17 unresolved; 5 open; 29 open questions; 2 result registered; 2 abandoned; 0 running |
 | Experiments | 155 | 43 accepted; 36 rejected; 50 unresolved; 12 baseline; 11 blocked; 3 abandoned; 0 in progress |
@@ -1046,6 +1046,24 @@ controller, not permission to blur contracts.
 
 ### Current Handoff
 
+[Session 146](packing/campaign/agent-sessions/session-146-overnight-chunk-3.md)
+completed overnight chunk 3 of agenda-040 in
+[PR 207](https://github.com/jlevy/squares/pull/207), stacked on PR 206. A Fable
+registration review of the `exp-219` exclusion returned REGISTER WITH CORRECTIONS with
+no soundness defect: the gate replays byte-for-byte, the statement is a theorem about
+every packing of eleven unit squares in a square of side 96/25 (some square meets the
+open corner triangle x + y < 1/2), and the all-deep class is already outside the point
+language (BC-366), so the corner tree cannot close at 96/25 by clipping alone.
+The bytes’ unconditional claim string was fixed in the driver, the gate and the readers,
+and `exp-220` re-froze the same 680-atom covering under the class claim with both routes
+accepting. The ceiling-family fold is retained as `devtools.fold_ceiling_family`. No
+bound moved.
+
+**Selected next entry:** `think-b7pr`, BC-367: write the registration entry at the
+reviewed scope, then the four mixed corner classes at 96/25 and a second n=26 site set,
+in Session 147 on the next stacked branch.
+BC-357 / H-216 stays the registered n=6 calibration entry in agenda-037.
+
 [Session 145](packing/campaign/agent-sessions/session-145-overnight-chunk-2.md)
 completed overnight chunk 2 of agenda-040 in
 [PR 206](https://github.com/jlevy/squares/pull/206), stacked on PR 205. The convex
@@ -1060,10 +1078,9 @@ determinations reproduced.
 The overnight loop closed on its clock after two of four chunks; BC-361, BC-362 and
 BC-363 are dispositioned on agenda-040.
 
-**Selected next entry:** `think-b7pr`, BC-367: register the exp-219 conditional
-exclusion after review, clip the remaining corner-bin classes at 96/25 with the admitted
-instrument, and give n=26 a second site set, in Session 146 on the next stacked branch.
-BC-357 / H-216 stays the registered n=6 calibration entry in agenda-037.
+The selected entry at that cutoff was `think-b7pr`, BC-367: register the exp-219
+conditional exclusion after review, clip the remaining corner-bin classes at 96/25, and
+give n=26 a second site set.
 
 [Session 144](packing/campaign/agent-sessions/session-144-overnight-chunk-1.md)
 completed overnight chunk 1 of agenda-040 in
@@ -4326,9 +4343,9 @@ in separate tables: their units differ, and the same work can appear in both.
 
 | Rollups | count | turns | tool calls | errors | one-off code | wall |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| claimed by a session | 148 | 42,773 | 23,446 | 467 | 3,711 | 384.49 h |
+| claimed by a session | 151 | 43,229 | 23,721 | 471 | 3,748 | 386.02 h |
 | claimed by none | 60 | 11,110 | 6,539 | 156 | 946 | 51.75 h |
-| **measured** | **208** | **53,883** | **29,985** | **623** | **4,657** | **436.24 h** |
+| **measured** | **211** | **54,339** | **30,260** | **627** | **4,694** | **437.77 h** |
 
 | Session | Phases | Rollups | Turns | Tool calls | Errors | Wall |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -4372,7 +4389,8 @@ in separate tables: their units differ, and the same work can appear in both.
 | [session-143](packing/campaign/agent-sessions/session-143-lower-bound-math-review.md) | 2 | 8 | 772 | 463 | 11 | 2.43 h |
 | [session-144](packing/campaign/agent-sessions/session-144-overnight-chunk-1.md) | 1 | 6 | 675 | 392 | 9 | 4.03 h |
 | [session-145](packing/campaign/agent-sessions/session-145-overnight-chunk-2.md) | 1 | 4 | 649 | 391 | 6 | 1.54 h |
-| *shared by 40 sessions* | — | 7 | 23,619 | 12,862 | 281 | 299.65 h |
+| [session-146](packing/campaign/agent-sessions/session-146-overnight-chunk-3.md) | 1 | 3 | 283 | 174 | 4 | 0.62 h |
+| *shared by 41 sessions* | — | 7 | 23,792 | 12,963 | 281 | 300.56 h |
 
 | Codex interval receipt | declaring sessions | model responses | agent time | active union | wall window | live lower bound |
 | --- | --- | ---: | ---: | ---: | ---: | --- |
@@ -4437,8 +4455,8 @@ in separate tables: their units differ, and the same work can appear in both.
 
 | Coverage | sessions |
 | --- | ---: |
-| measured | 91 |
-| unmeasured | 55 |
+| measured | 92 |
+| unmeasured | 54 |
 | **total** | **146** |
 
 <!-- END GENERATED: session-close-report -->

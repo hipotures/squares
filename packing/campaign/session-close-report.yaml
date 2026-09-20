@@ -11,15 +11,15 @@ count: 146
 generated_by: >-
   uv run --frozen --all-extras --group dev python -m devtools.close_session --render
 totals:
-  sessions_measured: 91
-  sessions_unmeasured: 55
+  sessions_measured: 92
+  sessions_unmeasured: 54
   attributed:
-    rollups: 148
-    turns: 42773
-    tool_calls: 23446
-    tool_errors: 467
-    one_off_code: 3711
-    wall_hours: 384.49
+    rollups: 151
+    turns: 43229
+    tool_calls: 23721
+    tool_errors: 471
+    one_off_code: 3748
+    wall_hours: 386.02
   unattributed:
     rollups: 60
     turns: 11110
@@ -28,12 +28,12 @@ totals:
     one_off_code: 946
     wall_hours: 51.75
   measured:
-    rollups: 208
-    turns: 53883
-    tool_calls: 29985
-    tool_errors: 623
-    one_off_code: 4657
-    wall_hours: 436.24
+    rollups: 211
+    turns: 54339
+    tool_calls: 30260
+    tool_errors: 627
+    one_off_code: 4694
+    wall_hours: 437.77
 codex_receipts:
   attributed: 56
   unattributed: 2
@@ -2357,11 +2357,11 @@ sessions:
   - packing/campaign/resource-usage/a8b8b405efc053f16.yaml
   - packing/campaign/resource-usage/a68c79e799a3fc678.yaml
   - packing/campaign/resource-usage/a1730fd7bec467b88.yaml
-  turns: 1401
-  tool_calls: 828
+  turns: 1574
+  tool_calls: 929
   tool_errors: 12
-  one_off_code: 127
-  wall_hours: 8.84
+  one_off_code: 149
+  wall_hours: 9.75
   codex_receipts: []
 - id: session-144
   title: "Overnight Chunk 1 — Stock-Instrument Determinations at n=13, 17, 26"
@@ -2377,11 +2377,11 @@ sessions:
   - packing/campaign/resource-usage/adb95622cef697549.yaml
   - packing/campaign/resource-usage/a5a0195a7e1b20013.yaml
   - packing/campaign/resource-usage/acb53dcd42fbab01e.yaml
-  turns: 1304
-  tool_calls: 757
+  turns: 1477
+  tool_calls: 858
   tool_errors: 10
-  one_off_code: 119
-  wall_hours: 10.44
+  one_off_code: 141
+  wall_hours: 11.35
   codex_receipts: []
 - id: session-145
   title: "Overnight Chunk 2 — The Corner-Clip Instrument and H-222"
@@ -2395,19 +2395,26 @@ sessions:
   - packing/campaign/resource-usage/af9db849f9a1cc845.yaml
   - packing/campaign/resource-usage/a9d7576dad97ca9ab.yaml
   - packing/campaign/resource-usage/a957ff219905b86a7.yaml
-  turns: 1278
-  tool_calls: 756
+  turns: 1451
+  tool_calls: 857
   tool_errors: 7
-  one_off_code: 104
-  wall_hours: 7.95
+  one_off_code: 126
+  wall_hours: 8.86
   codex_receipts: []
 - id: session-146
   title: "Overnight Chunk 3 — The exp-219 Registration Review and the Fold Tool"
-  status: in_progress
+  status: completed
   primary_bead: think-b7pr
   phases: 1
-  measured: false
-  unmeasured_reason: >-
-    declares no resource measurement
-  rollups: []
+  measured: true
+  rollups:
+  - packing/campaign/resource-usage/5e071e1a-5ab8-5bae-a5c0-c3687815bf4a.yaml
+  - packing/campaign/resource-usage/a57beb19e2ae7ed7b.yaml
+  - packing/campaign/resource-usage/a556b81b10ff8b762.yaml
+  - packing/campaign/resource-usage/aac63642e9cd0a16e.yaml
+  turns: 1085
+  tool_calls: 640
+  tool_errors: 5
+  one_off_code: 87
+  wall_hours: 7.94
   codex_receipts: []

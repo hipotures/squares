@@ -11,9 +11,10 @@ session:
   date: '2026-09-20'
   started_at: '2026-09-20T12:52:00Z'
   deadline_at: '2026-09-20T14:52:00Z'
+  ended_at: '2026-09-20T13:32:00Z'
   branch: claude/kind-wright-whxxn6-chunk3
   primary_bead: think-b7pr
-  status: in_progress
+  status: completed
   goal: >-
     Take BC-367's first two items in the loop's remaining wall: an adversarial
     Fable review of the exp-219 conditional exclusion for registration, with a
@@ -32,7 +33,7 @@ session:
       the exp-214 and exp-218 families against the retained merged files. The n=26
       second site set and the remaining corner-bin classes stay on BC-367 for the
       next session; no LP or column-generation target runs here.
-    status: in_progress
+    status: completed
     entered_by: session_start
     switch_reason: null
     budget_minutes: 95
@@ -48,10 +49,30 @@ session:
       The review returns DO NOT REGISTER on a soundness finding; then the finding is
       recorded on H-222 and the registration is refused with its reason.
     fallback: Record what was reviewed, keep the clocks honest, and hand the rest to BC-367.
-    outcome: null
-    evidence: []
-    stop_reason: null
-    next_action: Read both lane reports, write the receipt, and close the chunk.
+    outcome: >-
+      The registration review returned REGISTER WITH CORRECTIONS with no soundness
+      defect: the gate replays byte-for-byte, the theorem is stated with every
+      hypothesis explicit, and the all-deep class is already outside the point
+      language (BC-366) so the corner tree cannot close at 96/25 by clipping alone.
+      The bytes' unconditional claim string (D1) was fixed in the driver, the gate and
+      the four readers, and exp-220 re-froze the same 680-atom covering under the
+      class claim with both routes accepting (sha256 876820dd...7a461); D2 to D4 and
+      D6 are applied to the records. devtools.fold_ceiling_family is retained with a
+      --check that reproduces both retained merged families. The registration entry
+      itself, the four mixed classes and the n=26 second site set stay on BC-367.
+    evidence:
+    - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/h222-registration-review.md
+    - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-220-n11-96-25-class-receipt.md
+    - packing/devtools/fold_ceiling_family.py
+    stop_reason: >-
+      Both lanes reported and exp-220 decided; the loop's clock ends the chunk before
+      the registration entry is written.
+    next_action: Close the record and update the stacked pull request.
+  resource_rollups:
+  - packing/campaign/resource-usage/5e071e1a-5ab8-5bae-a5c0-c3687815bf4a.yaml
+  - packing/campaign/resource-usage/a57beb19e2ae7ed7b.yaml
+  - packing/campaign/resource-usage/a556b81b10ff8b762.yaml
+  - packing/campaign/resource-usage/aac63642e9cd0a16e.yaml
   budget:
     wall_minutes: 120
     finalization_minutes: 25
@@ -62,7 +83,10 @@ session:
   progress:
     metric: BC-367 items decided
     before: exp-219 accepted but its conditional exclusion is unreviewed for registration; the family fold is a scratch script.
-    after: null
+    after: >-
+      The exp-219 statement reviewed for registration with corrected scope and the
+      bytes re-frozen under the class claim (exp-220 accepted); the fold tool
+      retained; the registration entry, the mixed classes and n=26 remain on BC-367.
   delegations:
   - task: Adversarial review of the exp-219 conditional exclusion for registration, with the second-stage discriminator
     operator: chunk3_reviewer; Claude Fable max
@@ -161,9 +185,16 @@ session:
   - packing/devtools/fold_ceiling_family.py
   - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-220-h222-n11-96-25-class-refreeze.md
   - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-220-n11-96-25-class-receipt.md
-  checks: []
-  stop_reason: null
-  next_action: Close the record with the hosted gate on this tree; BC-367's runs stay on think-b7pr.
+  checks:
+  - 'full gate: fast at 8ffdf553: passed (hosted run 35513500902; pages run 35513500975)'
+  - packing-validate --records passed locally at 8ffdf553 and on the closeout tree.
+  - No target ran before its experiment record existed; exp-220's command is exp-219's with new output paths, copied verbatim from the record.
+  - The corrected gate refuses exp-219's retained bytes and accepts exp-220's; exp-220's 680 atoms equal exp-219's as exact Fractions.
+  stop_reason: >-
+    BC-367's review and re-freeze items are done and the fold tool is retained; the
+    registration entry, the four mixed corner classes and the n=26 second site set
+    stay on BC-367 under think-b7pr, and the overnight loop closes on its clock.
+  next_action: Session 147 under think-b7pr writes the BC-367 registration entry at the reviewed scope, then the mixed classes and n=26.
 ---
 # Session 146: Overnight Chunk 3
 
@@ -176,3 +207,15 @@ The n=26 second site set and the remaining corner-bin classes stay on BC-367.
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
 -->
+
+## How the chunk ended
+
+Both lanes reported inside their budgets.
+The review found no soundness defect and six bookkeeping ones; the one in the bytes (an
+unconditional claim string on a class record) was fixed in code and demonstrated by
+re-freezing the same covering as exp-220, which the corrected gate accepts under the
+flag and refuses without it, while the same gate now refuses exp-219’s bytes.
+The registration entry at the reviewed scope is the next session’s first item; the
+review’s second-stage analysis says the tree cannot close at 96/25 by clipping alone, so
+the mixed classes are a bounded follow-up and the instrument that could matter is a
+2-of-3 threshold atom inside the all-deep class.
