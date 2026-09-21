@@ -3650,6 +3650,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       restSource,
       restTarget,
       holdsColour,
+      stillPair: isStillPair(),
       movingSlots: groupSlot,
     });
     paintTouching = painted.touching;

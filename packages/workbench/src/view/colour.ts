@@ -50,6 +50,8 @@ export interface SceneColourState {
   restSource: ColourReferenceFrame | null;
   restTarget: ColourReferenceFrame | null;
   holdsColour: ArrayLike<number> | null;
+  /** Whether the step rearranges nothing, so no square needs a moving colour. */
+  stillPair: boolean;
   movingSlots: ArrayLike<number> | null;
 }
 
@@ -620,7 +622,30 @@ export function createColourSystem(config: CorpusColour): ColourSystem {
           state.holdsColour !== null && index < state.holdsColour.length
             ? Boolean(itemAt(state.holdsColour, index, "held-colour flags"))
             : false;
-        if (holds) {
+        const arriving = index === scene.squares.length - 1 && scene.presentation.newTint > 0;
+        if (arriving) {
+          // **One blend, not two.** The arriving square used to take the moving-to-settled
+          // blend and then be blended again toward scarlet, and each of those crosses through
+          // neutral at its own moment. Near the crossings the hue belongs to whichever term
+          // happens to dominate, so it thrashed: measured at the step into 51, frames 83 to 86
+          // read hue 11, then 154, then 12, then 110 -- red, green, red, olive in four frames,
+          // which at speed is the smear the owner sees.
+          //
+          // It has no moving identity to track anyway: it is not a square being followed from
+          // one arrangement to the next, it is a square arriving. So it goes straight from
+          // scarlet to the colour it will keep, in one crossing.
+          fill = desaturate(
+            trim(mix(settled, scarletFill, scene.presentation.newTint), state.stageChroma),
+            scene.presentation.drain,
+            state.desaturationFloor,
+          );
+        } else if (holds || state.stillPair) {
+          // A still pair rearranges nothing -- a prefix or a shared picture, where the only
+          // event is the new square arriving -- so no square needs a moving colour to be
+          // tracked by. Giving them one recoloured the whole packing to the moving palette for
+          // the length of the step, and with the drain off (there being no motion to mute) it
+          // showed at full strength: measured over n = 96..102, 6,735 of 32,676 square-instants
+          // came out at `#a3a580`, an olive, on packings whose own colours are greens.
           fill = trim(settled, state.stageChroma);
         } else {
           const movingSlot =
@@ -637,7 +662,7 @@ export function createColourSystem(config: CorpusColour): ColourSystem {
           );
         }
       }
-      if (index === scene.squares.length - 1 && scene.presentation.newTint > 0) {
+      if (!standardizing && index === scene.squares.length - 1 && scene.presentation.newTint > 0) {
         return mix(fill, scarletFill, scene.presentation.newTint);
       }
       return fill;

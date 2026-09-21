@@ -209,6 +209,7 @@ test("one scene receipt carries fills, contacts, overlap, and touching evidence"
     restSource: null,
     restTarget: null,
     holdsColour: null,
+    stillPair: false,
     movingSlots: null,
   });
   assert.deepEqual(receipt.fills, colours.identityFills(2));
