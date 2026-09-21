@@ -634,10 +634,23 @@ export function createColourSystem(config: CorpusColour): ColourSystem {
           // It has no moving identity to track anyway: it is not a square being followed from
           // one arrangement to the next, it is a square arriving. So it goes straight from
           // scarlet to the colour it will keep, in one crossing.
-          fill = desaturate(
-            trim(mix(settled, scarletFill, scene.presentation.newTint), state.stageChroma),
-            scene.presentation.drain,
-            state.desaturationFloor,
+          //
+          // The drain is applied to the far END of the blend, not to the blend. Draining the
+          // result muted the scarlet along with everything else, and on a matched step -- where
+          // the drain is deepest exactly while the square arrives -- it took the red out
+          // entirely: measured at the step into 51, not one frame of ninety-one carried a
+          // saturated red square. The drain says "this square is unsettled and still looking for
+          // its place", which the arriving square is not. It is arriving, and its redness is the
+          // whole of what that says. So it comes in at full scarlet and crosses to the colour the
+          // rest of the packing is wearing at that moment, drained or not.
+          fill = mix(
+            desaturate(
+              trim(settled, state.stageChroma),
+              scene.presentation.drain,
+              state.desaturationFloor,
+            ),
+            scarletFill,
+            scene.presentation.newTint,
           );
         } else if (holds || state.stillPair) {
           // A still pair rearranges nothing -- a prefix or a shared picture, where the only

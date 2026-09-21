@@ -19,6 +19,15 @@ export interface MotionTrack {
   ry: number;
 }
 
+/**
+ * How much of the room after the square has arrived the cross-over may take.
+ *
+ * The rest is the hold, where the square sits opaque and fully scarlet. Half: a step has to
+ * show the square arriving AND show it taking its place, and on the shortest steps -- a grid
+ * fill at `SIMPLE_TRANSITION_SPEED` -- there are only a few frames for each.
+ */
+const TINT_CROSS_SHARE = 0.5;
+
 export interface IllustrationInput {
   pairIndex: number;
   n: number;
@@ -116,16 +125,22 @@ export function illustrationFrame(input: IllustrationInput): SceneFrame {
     opacity: arrival,
     scale: 1,
   };
-  // The arriving square's scarlet crosses to its own fill over `tintSeconds`, a duration rather
-  // than a share of the settle. A share inherits the step's clock, and a simple grid fill plays
-  // at `SIMPLE_TRANSITION_SPEED`, which left the whole cross-over about three frames at 30 fps --
-  // and on a blend that passes through neutral, three frames is one grey one. It starts no
-  // earlier than the square has finished arriving, so the colour changes on a square that is
-  // already there rather than on one still coming in.
-  const tintFrom =
+  // **The arriving square is saturated scarlet for a beat before it changes** (the owner,
+  // 2026-09-21). It fades in over `arrive` to `arrived`, so while it is arriving it is
+  // translucent over the paper and reads as a pale mauve whatever its fill says; and the
+  // cross-over used to begin the instant the fade finished, which left exactly one frame where
+  // the square was both opaque and fully scarlet. On the step into 9 -- fourteen frames end to
+  // end -- it was measurably red for two, and both of those were part-transparent.
+  //
+  // So the cross-over takes a share of the room after arrival rather than all of it, capped at
+  // `tintSeconds`. What is left in front of it is the hold: the square sits opaque and scarlet,
+  // then crosses to the colour it will keep.
+  const room = Math.max(0, schedule.end - schedule.arrived);
+  const cross =
     input.tintSeconds === undefined
-      ? schedule.moveEnd
-      : Math.max(schedule.arrived, schedule.end - input.tintSeconds);
+      ? Math.max(0, schedule.end - schedule.moveEnd)
+      : Math.min(input.tintSeconds, room * TINT_CROSS_SHARE);
+  const tintFrom = schedule.end - cross;
   const settled = easeOut(ramp(seconds, tintFrom, schedule.end));
   const mark: SceneMark | null =
     arrival > 0

@@ -158,7 +158,11 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   const MARK_WIDE = 4,
     MARK_THIN = 2; // scarlet outline widths, px: at arrival, and through the following dwell
   const TINT = 1.0; // the arriving square starts at the tint colour and settles to its own fill
-  const TINT_CHROMA = 0.6; // the share of the accent's chroma that tint colour carries
+  //: The share of the accent's chroma the arriving square carries. One: the owner asked for it
+  //: to be saturated red whenever it is added (2026-09-21). At 0.6 it arrived a brick `#83424c`
+  //: -- red, but muted enough beside the packing's own greens that it read as another fill
+  //: rather than as the one square that is new.
+  const TINT_CHROMA = 1;
   // Revision 6: while a pair is in motion the fills lose chroma, and lock back in over the settle,
   // so the resting frame is exactly the retained colours and only the moving picture is muted.
   //: The chroma a fill keeps at full desaturation, as a fraction of its own. 1 leaves the colour
