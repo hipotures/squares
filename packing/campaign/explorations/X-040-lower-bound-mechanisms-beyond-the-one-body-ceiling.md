@@ -360,9 +360,13 @@ on [agenda-040](../agendas/agenda-040-overnight-lower-bound-loop.md).
   which needs the clip wired into the threshold routes.
   The fold used by exp-214 and exp-218 is retained as `devtools.fold_ceiling_family`.
 
+- **BC-367, registration (Session 147).** T-031 registers the exp-220 exclusion at the
+  reviewed scope, V4/C4 on the two gate routes, significance 2, with a case package and
+  a control test.
+
 No bound on `s(n)` moved.
-The next entry is BC-367: write the registration entry at the reviewed scope, then the
-four mixed corner classes and a second n=26 site set.
+The next entry is BC-367: the four mixed corner classes at 96/25 and a second n=26 site
+set.
 
 ## Owner Decisions
 

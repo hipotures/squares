@@ -161,6 +161,7 @@ Each entry summarizes one user-level research window. Cycle slots are wall-clock
 | [session-144](agent-sessions/session-144-overnight-chunk-1.md) | completed | contemporaneous | `research-loop` (insight) | `research-loop` (insight) | 1 | think-pogj | Session 145 under think-ni3v runs BC-363 on the next stacked branch; the handoff names the remaining agenda-040 items. |
 | [session-145](agent-sessions/session-145-overnight-chunk-2.md) | completed | contemporaneous | `pipeline-improvement` (correctness) | `pipeline-improvement` (correctness) | 1 | think-ni3v | Session 146 under think-b7pr takes BC-367 on the next stacked branch. |
 | [session-146](agent-sessions/session-146-overnight-chunk-3.md) | completed | contemporaneous | `research-loop` (insight) | `research-loop` (insight) | 1 | think-b7pr | Session 147 under think-b7pr writes the BC-367 registration entry at the reviewed scope, then the mixed classes and n=26. |
+| [session-147](agent-sessions/session-147-overnight-chunk-4.md) | completed | contemporaneous | `research-loop` (insight) | `research-loop` (insight) | 1 | think-b7pr | Session 148 under think-b7pr takes BC-367's mixed classes and the n=26 second site set on the next stacked branch. |
 
 ### Workflow summary
 
@@ -173,7 +174,7 @@ Declared counts are contemporaneous contracts; retrospective counts are reconstr
 | `insight-iteration` | 25 | 1 | 81 | 4 |
 | `process-review` | 16 | 4 | 64 | 6 |
 | `efficiency-loop` | 10 | 1 | 36 | 1 |
-| `research-loop` | 29 | 4 | 103 | 8 |
+| `research-loop` | 30 | 4 | 104 | 8 |
 | `pipeline-improvement` | 35 | 2 | 153 | 5 |
 | `documentation-pass` | 1 | 0 | 24 | 1 |
 | `remediation` | 0 | 1 | 0 | 3 |
@@ -966,7 +967,7 @@ Status: **active**. Run the hypotheses X-040 adapted from the Session 143 review
 | H-219 | confirmed | proof | A rows-complete covering of mass strictly below 18 exists at a contain | n: 18* | 1 |  | 11.7m wall |
 | H-220 | unresolved | proof | A rows-complete covering of mass strictly below n exists at a containe | n: 32* 31* 30* 26* 27* 29* 45* 44* | 8 |  | 164.1m wall |
 | H-221 | confirmed | proof | A rows-complete covering of mass strictly below 18 exists at a contain | n: 18* | 1 |  | 8.2m wall |
-| H-222 | confirmed | proof | At n=11, side 96/25, B = 9977/10000 on the 181-direction net, the rest |  | 2 |  | 9.5m wall |
+| H-222 | confirmed | proof | At n=11, side 96/25, B = 9977/10000 on the 181-direction net, the rest |  | 2 | T-031 | 9.5m wall |
 | H-223 | unresolved | proof | A point-atom certificate exists for n=13 at container side 399/100 wit |  | 1 |  | 1.3m wall |
 | H-224 | unresolved | proof | At n=17, side 23/5, B = 9977/10000 on the 181-direction net, an exact  |  | 2 |  | 53.7m wall |
 | H-225 | unresolved | proof | A point-atom certificate exists for n=26 at container side 53/10 with  | side: 53/10 107/20 27/5 | 1 |  | 62.6m wall |

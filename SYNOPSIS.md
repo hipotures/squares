@@ -114,6 +114,7 @@ action for each are in [`frontier/RESULTS.md`](packing/frontier/RESULTS.md); the
 | [T-003](packing/frontier/RESULTS.md) | 17, 18 | `V4` | `C3` | `S2` | `apparently-novel` | The sixteen-point set’s unavoidability ceiling lies in [4426213/1000000, 4427/1000): certification at the left endpoint, an exact escaping pose at the right, with the top strips’ a + 2b <= 2*sqrt(2) hypothesis identifying the closing mechanism at 753/250 + sqrt(2), inside the bracket. |
 | [T-005](packing/frontier/RESULTS.md) | 13 | `V4` | `C3` | `S2` | `apparently-novel` | Bentz 2010, Lemma 10 is false as printed -- the middle replacement point (1, 1.74) is refuted by an exact escape certificate, and the published page image carries the same transposed text -- and true under the corrected reading (1.74, 1), with all three corrected replacement covers certified exactly. |
 | [T-011](packing/frontier/RESULTS.md) | 11 | `V4` | `C3` | `S2` | `previously-published` | Trump’s 1979 packing is exactly valid: 11 unit squares in a square of side the published degree-8 algebraic number 3.877083590022814 …, with 14 of 55 pairs in exact zero-separation contact and 20 corner coordinates exactly on the boundary, so s(11) <= that side. |
+| [T-031](packing/frontier/RESULTS.md) | 11 | `V4` | `C3` | `S2` | `apparently-novel` | At L = 96/25 and B = 9977/10000 on the 181-direction net (half-tangents k*207107/90000000, k = 0..180), the D4-symmetric point measure of total mass 10868617/1000000 = 10.868617 in cases/n11_corner_class_certificate/certificate.json, the retained exp-220 covering (SHA-256 876820dde8d55c727dec73c85f245db27661556bb3c7aa06ffb15b01ec97a461) charges at least 2000013/2000000 to every closed B-square at a net direction whose minimum of x + y is at least 1/2 in each of the four corner frames, decided by the exact event-cell sweep and by the interval branch and bound, which agree at that value. |
 
 | Significance | What [`epistemics.md`](epistemics.md#significance-and-novelty) anchors it to |
 | --- | --- |
@@ -143,11 +144,11 @@ hypothesis status and summarizes experiment verdicts, and the
 | --- | ---: | --- |
 | Agendas | 37 | 17 active; 14 completed; 5 paused; 1 superseded |
 | Commitments | 356 | 181 complete; 61 stopped; 68 blocked; 16 ready; 21 tentative; 9 in progress |
-| Sessions | 146 | 89 completed; 57 stopped; all terminal |
+| Sessions | 147 | 90 completed; 57 stopped; all terminal |
 | Explorations | 38 | 24 linked to proposed hypotheses; 14 uncodified |
 | Hypotheses | 169 | 29 confirmed; 31 refuted; 54 blocked; 17 unresolved; 5 open; 29 open questions; 2 result registered; 2 abandoned; 0 running |
 | Experiments | 155 | 43 accepted; 36 rejected; 50 unresolved; 12 baseline; 11 blocked; 3 abandoned; 0 in progress |
-| Frontier results | 30 | 30 registered |
+| Frontier results | 31 | 31 registered |
 
 <!-- END CURRENT-RESEARCH-STATUS -->
 
@@ -1046,6 +1047,21 @@ controller, not permission to blur contracts.
 
 ### Current Handoff
 
+[Session 147](packing/campaign/agent-sessions/session-147-overnight-chunk-4.md)
+completed overnight chunk 4 of agenda-040 in
+[PR 208](https://github.com/jlevy/squares/pull/208), stacked on PR 207: T-031 registers
+the `exp-220` exclusion of the octagon corner class at 96/25 at the scope Session 146’s
+review accepted, V4/C3 on the two gate routes — the exact sweep and the interval branch
+and bound are the two internal routes of one gate invocation, so the review counts them
+as one confirmation — significance 2, with a case package and a control test that
+replays the gate. The overnight loop closed on its clock after four chunks; no bound
+moved.
+
+**Selected next entry:** `think-b7pr`, BC-367: the four mixed corner classes at 96/25
+under the admitted instrument with a box cut, and a second n=26 site set, in Session 148
+on the next stacked branch.
+BC-357 / H-216 stays the registered n=6 calibration entry in agenda-037.
+
 [Session 146](packing/campaign/agent-sessions/session-146-overnight-chunk-3.md)
 completed overnight chunk 3 of agenda-040 in
 [PR 207](https://github.com/jlevy/squares/pull/207), stacked on PR 206. A Fable
@@ -1059,10 +1075,8 @@ and `exp-220` re-froze the same 680-atom covering under the class claim with bot
 accepting. The ceiling-family fold is retained as `devtools.fold_ceiling_family`. No
 bound moved.
 
-**Selected next entry:** `think-b7pr`, BC-367: write the registration entry at the
-reviewed scope, then the four mixed corner classes at 96/25 and a second n=26 site set,
-in Session 147 on the next stacked branch.
-BC-357 / H-216 stays the registered n=6 calibration entry in agenda-037.
+The selected entry at that cutoff was `think-b7pr`, BC-367: write the registration entry
+at the reviewed scope, then the four mixed corner classes and a second n=26 site set.
 
 [Session 145](packing/campaign/agent-sessions/session-145-overnight-chunk-2.md)
 completed overnight chunk 2 of agenda-040 in
@@ -4343,9 +4357,9 @@ in separate tables: their units differ, and the same work can appear in both.
 
 | Rollups | count | turns | tool calls | errors | one-off code | wall |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| claimed by a session | 151 | 43,229 | 23,721 | 471 | 3,748 | 386.02 h |
+| claimed by a session | 151 | 43,282 | 23,755 | 472 | 3,755 | 386.29 h |
 | claimed by none | 60 | 11,110 | 6,539 | 156 | 946 | 51.75 h |
-| **measured** | **211** | **54,339** | **30,260** | **627** | **4,694** | **437.77 h** |
+| **measured** | **211** | **54,392** | **30,294** | **628** | **4,701** | **438.04 h** |
 
 | Session | Phases | Rollups | Turns | Tool calls | Errors | Wall |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -4390,7 +4404,8 @@ in separate tables: their units differ, and the same work can appear in both.
 | [session-144](packing/campaign/agent-sessions/session-144-overnight-chunk-1.md) | 1 | 6 | 675 | 392 | 9 | 4.03 h |
 | [session-145](packing/campaign/agent-sessions/session-145-overnight-chunk-2.md) | 1 | 4 | 649 | 391 | 6 | 1.54 h |
 | [session-146](packing/campaign/agent-sessions/session-146-overnight-chunk-3.md) | 1 | 3 | 283 | 174 | 4 | 0.62 h |
-| *shared by 41 sessions* | — | 7 | 23,792 | 12,963 | 281 | 300.56 h |
+| [session-147](packing/campaign/agent-sessions/session-147-overnight-chunk-4.md) | 1 | 0 | 0 | 0 | 0 | 0 h |
+| *shared by 42 sessions* | — | 7 | 23,845 | 12,997 | 282 | 300.83 h |
 
 | Codex interval receipt | declaring sessions | model responses | agent time | active union | wall window | live lower bound |
 | --- | --- | ---: | ---: | ---: | ---: | --- |
@@ -4455,9 +4470,9 @@ in separate tables: their units differ, and the same work can appear in both.
 
 | Coverage | sessions |
 | --- | ---: |
-| measured | 92 |
+| measured | 93 |
 | unmeasured | 54 |
-| **total** | **146** |
+| **total** | **147** |
 
 <!-- END GENERATED: session-close-report -->
 
