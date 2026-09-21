@@ -225,7 +225,7 @@ session:
     next_action: Coordinator states the rung in the retention pull request and withholds C4.
   - task: Retain the Kleddamag artifact with a byte-level manifest and a review document
     operator: retention lane; Opus high
-    status: in_progress
+    status: completed
     recording: contemporaneous
     phase: 3
     budget_minutes: 120
