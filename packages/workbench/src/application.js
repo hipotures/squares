@@ -655,31 +655,27 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   //: hidden rather than drawn at a guess.
   let attributionAt = null;
   let attributionSettled = false;
-  // The attribution stands on the base of the packing beside it and is centred on the column
-  // under it, with the headline above (the owner, 2026-09-21). The rail's own middle is what it
-  // is centred on: the bar is the column's full width, so its middle is the column's. Both anchors are measured off what is drawn -- the drawn
+  //: How far below the legend's last line the attribution's baseline sits, in stage px.
+  const ATTRIBUTION_GAP = 30;
+  // The attribution sits just under the legend and starts where it starts (the owner,
+  // 2026-09-21), so the foot of the column reads as one block left to right. Both anchors are
+  // measured off the legend's own box rather than written down, because the legend's height is
+  // its content's. Both anchors are measured off what is drawn -- the drawn
   // container's own rect, not the SVG element, whose box carries the view's padding -- and
   // written in stage pixels as the SVG text's `y` and `x`. It used to stand on the headline's
   // baseline, which was under the packing; the headline heads the facts column now, so that
   // anchor would have put the repository's address across the top of the frame.
   function placeAttribution() {
-    const rail = document.querySelector("#gapbar .track");
-    const box = document.getElementById("container");
-    if (
-      rail === null ||
-      box === null ||
-      rail.getClientRects().length === 0 ||
-      box.getClientRects().length === 0 ||
-      stage.offsetWidth === 0
-    ) {
+    const legend = document.getElementById("stage-note");
+    if (legend === null || legend.getClientRects().length === 0 || stage.offsetWidth === 0) {
       return;
     }
     const frame = stage.getBoundingClientRect();
     const scale = frame.width / stage.offsetWidth;
-    const railBox = rail.getBoundingClientRect();
+    const legendBox = legend.getBoundingClientRect();
     attributionAt = [
-      (railBox.left + railBox.width / 2 - frame.left) / scale,
-      (box.getBoundingClientRect().bottom - frame.top) / scale,
+      (legendBox.left - frame.left) / scale,
+      (legendBox.bottom - frame.top) / scale + ATTRIBUTION_GAP,
     ];
     attributionSettled = !("fonts" in document) || document.fonts.status === "loaded";
     drawAttribution();

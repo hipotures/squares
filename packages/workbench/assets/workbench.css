@@ -66,8 +66,6 @@
   --scene-frame: var(--color-border-control);
   --scene-frame-locked: var(--scene-best);
   --scene-trace: var(--color-divider);
-  /* Scene: the repository's address at the stage's bottom right, in the frames' grey. */
-  --scene-attribution: var(--scene-frame);
   /* Plot: the force-law editor's drawing. */
   --plot-field: #fbfcfd;
   --plot-zero: var(--scene-reference);
@@ -619,9 +617,9 @@ body.drawing #packing-svg #squares {
 }
 #stage-attribution text {
   font-family: var(--font-sans);
-  font-size: var(--stage-text-number);
+  font-size: var(--stage-text-note);
   font-weight: var(--stage-weight-regular);
-  fill: var(--scene-attribution);
+  fill: var(--scene-ink);
 }
 #stage-attribution a:hover text,
 #stage-attribution a:focus-visible text {
