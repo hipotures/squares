@@ -2,14 +2,15 @@
 
 Status: **site set refuted, unconverged**. The side stays open.
 
-Session-139 probe: four-grid `(26, 35, 43, 48)` unioned with T-017's 2097 atom
-sites scaled from `99/25` to `397/100`,
-`(n, L, B, net) = (12, 397/100, 9977/10000, 181 directions)`.
-The 900 s deadline stopped the row loop after 33 LP rounds at `12.122748`
-(108 still violated). Crossed twelve at round 8 (`12.001574`). BC-206's
-seeded auto at this side crossed at `12.016263`; this four-grid continued
-and finished higher. Remaining rows can only raise this value. Adding sites
-can still lower it, so `397/100` is not barred. T-017 is unchanged.
+Session-139 probe: four-grid `(26, 35, 43, 48)` unioned with T-017’s 2097 atom sites
+scaled from `99/25` to `397/100`,
+`(n, L, B, net) = (12, 397/100, 9977/10000, 181 directions)`. The 900 s deadline stopped
+the row loop after 33 LP rounds at `12.122748` (108 still violated).
+Crossed twelve at round 8 (`12.001574`). BC-206’s seeded auto at this side crossed at
+`12.016263`; this four-grid continued and finished higher.
+Remaining rows can only raise this value.
+Adding sites can still lower it, so `397/100` is not barred.
+T-017 is unchanged.
 
 ## Command
 

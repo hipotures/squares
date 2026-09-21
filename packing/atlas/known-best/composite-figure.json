@@ -17,7 +17,7 @@
           "degree_known": 95,
           "degree_recorded_upstream": 11,
           "exact_value_known": 95,
-          "lower_bound_first_proved_here": 7,
+          "lower_bound_first_proved_here": 6,
           "only_known_numerically": 5,
           "proved_optimal": 35,
           "rigidity_catalogue_annotated": 2,
@@ -40,7 +40,7 @@
           "degree_known": 287,
           "degree_recorded_upstream": 36,
           "exact_value_known": 287,
-          "lower_bound_first_proved_here": 7,
+          "lower_bound_first_proved_here": 6,
           "only_known_numerically": 37,
           "proved_optimal": 59,
           "rigidity_catalogue_annotated": 2,
@@ -873,15 +873,17 @@
           "state": "minimal-polynomial"
         },
         "lower": {
-          "display": "s(17) ≥ 4.59",
+          "display": "s(17) ≥ 4.613046",
           "evidence": [
-            "E-fractional-interval-decision",
-            "E-n017-fractional-certificate"
+            "E-n017-guzhou-r012-interval-decision",
+            "E-n017-guzhou-r012-source-replay",
+            "E-n017-mira-4613-exact-replay",
+            "E-n017-mira-4613-interval-decision"
           ],
-          "first_proved_here": true,
+          "first_proved_here": false,
           "provenance": "frontier",
           "shown": true,
-          "value": "4.59"
+          "value": "4.613046130461"
         },
         "n": 17,
         "optimality": {
@@ -14737,7 +14739,7 @@
       "degree_known": 287,
       "degree_recorded_upstream": 36,
       "exact_value_known": 287,
-      "lower_bound_first_proved_here": 7,
+      "lower_bound_first_proved_here": 6,
       "only_known_numerically": 37,
       "proved_optimal": 59,
       "rigidity_catalogue_annotated": 2,

@@ -79,11 +79,10 @@ image, domain parameter, and budget coefficient remains fixed.
 remains untested.** The admission artifact created no experiment.
 Session 139 registered
 [exp-161](../series/series-000-smoke-and-calibration/experiments/exp-161-h163-route-s-threshold-compression.md)
-and ran encode-only. That process timed out at 15:24:31Z with no JSON; the
-verdict is unresolved.
-`packing/devtools/compress_threshold_certificate.py` authenticates U025 and
-does not emit a candidate.
-No `--search` ran.
+and ran encode-only.
+That process timed out at 15:24:31Z with no JSON; the verdict is unresolved.
+`packing/devtools/compress_threshold_certificate.py` authenticates U025 and does not
+emit a candidate. No `--search` ran.
 The admission-control manifests recorded in exp-161 cannot confirm this claim.
 
 The acceptance boundary is literal.

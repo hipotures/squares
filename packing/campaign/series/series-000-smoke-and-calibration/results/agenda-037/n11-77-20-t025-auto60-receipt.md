@@ -2,12 +2,13 @@
 
 Status: **site set refuted**. The side stays open.
 
-Session-139 probe: BC-191 auto `(25, 34, 42)` plus count 60, unioned with T-025's
-584 atom sites scaled to `77/20`,
-`(n, L, B, net) = (11, 77/20, 9977/10000, 181 directions)`.
-`77/20 = 3.85` already has a BC-200 vertex-seeded row (unconverged `11.227631` on
-22,625 sites). This is a different site set. The row loop crossed eleven at LP
-round 2 (`11.000000`) and converged at `11.456576`. T-025 at `191/50` is unchanged.
+Session-139 probe: BC-191 auto `(25, 34, 42)` plus count 60, unioned with T-025’s 584
+atom sites scaled to `77/20`,
+`(n, L, B, net) = (11, 77/20, 9977/10000, 181 directions)`. `77/20 = 3.85` already has a
+BC-200 vertex-seeded row (unconverged `11.227631` on 22,625 sites).
+This is a different site set.
+The row loop crossed eleven at LP round 2 (`11.000000`) and converged at `11.456576`.
+T-025 at `191/50` is unchanged.
 
 ## Command
 
@@ -24,8 +25,8 @@ uv run --frozen --all-extras --group dev python -m devtools.run_fractional_colge
   --log campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-77-20-t025-auto60.log
 ```
 
-`--freeze-family` was not requested. Column generation added one orbit after the
-row loop and stopped; wall 196.0 s.
+`--freeze-family` was not requested.
+Column generation added one orbit after the row loop and stopped; wall 196.0 s.
 
 ## Covering
 

@@ -1,18 +1,19 @@
 # n=19 241/50 T-020 Four-Grid Window-7 Covering Receipt
 
-Status: **site set still open, unconverged**. The side stays open. No freeze.
+Status: **site set still open, unconverged**. The side stays open.
+No freeze.
 
 Session-141 exp-177: T-020 seed from `certificate-24-5.json` plus four-grid
 `(34, 45, 56, 64)` plus `--seed-windows 7`,
-`(n, L, B, net) = (19, 241/50, 9977/10000, 181 directions)`. Seed sites 3044.
-The 1200 s deadline stopped the row loop after 34 LP rounds at `19.224565`
-(387 still violated). It crossed 19 at round 13 (`19.006821`). Closer than
-leftover auto plus windows 6 at this side (`19.247109`).
+`(n, L, B, net) = (19, 241/50, 9977/10000, 181 directions)`. Seed sites 3044. The 1200 s
+deadline stopped the row loop after 34 LP rounds at `19.224565` (387 still violated).
+It crossed 19 at round 13 (`19.006821`). Closer than leftover auto plus windows 6 at
+this side (`19.247109`).
 
-Remaining rows can only raise this value, so `19.224565` is not a covering
-below 19.
-Do not more-wall this set. T-020 stands. T-030 was not offered. H-218 stays
-unconfirmed.
+Remaining rows can only raise this value, so `19.224565` is not a covering below 19. Do
+not more-wall this set.
+T-020 stands. T-030 was not offered.
+H-218 stays unconfirmed.
 
 ## Command
 
@@ -33,8 +34,8 @@ uv run --frozen --all-extras --group dev python -m devtools.run_fractional_colge
 ```
 
 No freeze file: the 1200 s deadline stopped the row loop after 34 rounds.
-Wall 1256.8 s. The walker then started n=12 `793/200` T-017 four-grid plus
-windows 7 as exp-178.
+Wall 1256.8 s. The walker then started n=12 `793/200` T-017 four-grid plus windows 7 as
+exp-178.
 
 ## Covering
 

@@ -1,15 +1,17 @@
 # M3 T-018 Selftest After Span-Sweep Encoding
 
-Status: **unresolved**. Not a kill. Not an eleven-candidate.
+Status: **unresolved**. Not a kill.
+Not an eleven-candidate.
 
-Session-139 re-ran `devtools.pierce_t018_sites --selftest` after the event-cell
-encoder stopped expanding every cell into an `O(cells × sites)` boolean chunk.
-The 5-direction net encoded 12,702,392 reachable cells to 19,072 unique covering
-rows in under the 20 s limit and HiGHS returned an integral incumbent of 9
-sites. The row set is truncated, so nine is a lower bound on this net only: it
-cannot nominate an eleven-candidate and it is not a kill (`piercing >= 12`).
+Session-139 re-ran `devtools.pierce_t018_sites --selftest` after the event-cell encoder
+stopped expanding every cell into an `O(cells × sites)` boolean chunk.
+The 5-direction net encoded 12,702,392 reachable cells to 19,072 unique covering rows in
+under the 20 s limit and HiGHS returned an integral incumbent of 9 sites.
+The row set is truncated, so nine is a lower bound on this net only: it cannot nominate
+an eleven-candidate and it is not a kill (`piercing >= 12`).
 
-A float LP was not used. T-018's shrink was not the ownership object.
+A float LP was not used.
+T-018’s shrink was not the ownership object.
 
 ## Command
 

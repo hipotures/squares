@@ -1,15 +1,16 @@
 # M3 T-018 9-Direction Search After Span-Sweep Encoding
 
-Status: **unresolved**. Not a kill. Not an eleven-candidate.
+Status: **unresolved**. Not a kill.
+Not an eleven-candidate.
 
-Session-139 re-ran `devtools.pierce_t018_sites --search --direction-steps 8`
-with a 45 s limit after the frozenset encoder landed. The 9-direction net
-encoded 25,223,634 reachable cells to 31,940 unique covering rows. HiGHS
-returned an integral incumbent of 9 sites. The row set is truncated, so nine
-is a lower bound on this net only.
+Session-139 re-ran `devtools.pierce_t018_sites --search --direction-steps 8` with a 45 s
+limit after the frozenset encoder landed.
+The 9-direction net encoded 25,223,634 reachable cells to 31,940 unique covering rows.
+HiGHS returned an integral incumbent of 9 sites.
+The row set is truncated, so nine is a lower bound on this net only.
 
-The 5-direction selftest also returned piercing 9. Extra directions did not
-raise the truncated optimum. A float LP was not used.
+The 5-direction selftest also returned piercing 9. Extra directions did not raise the
+truncated optimum. A float LP was not used.
 
 ## Command
 

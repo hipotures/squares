@@ -5,8 +5,8 @@ Status: **unresolved**. This is not a scientific freeze.
 The 181-net was not run (`--direction-steps 8`).
 
 Session-139 G4 producer on `(n, L, B, net) = (11, 31/8, 9977/10000, 9
-directions)` at `--grid-counts 8,12,16`. Same round budget as the completed
-`191/50` net9 run. Exited 0 in 3.8 s.
+directions)` at `--grid-counts 8,12,16`. Same round budget as the completed `191/50`
+net9 run. Exited 0 in 3.8 s.
 
 ## Command
 
@@ -33,11 +33,11 @@ uv run --frozen --all-extras --group dev python -m devtools.produce_threshold_ce
 | Covering below 11 | no |
 | Seed stopped | round limit 8 reached |
 
-The finished covering is not below 11. On the seed rows the atom loop did drop below
-11 (`atoms-1` `10.666667`, `atoms-2` `10.500000`, `atoms-3` `10.172414`). The two row
+The finished covering is not below 11. On the seed rows the atom loop did drop below 11
+(`atoms-1` `10.666667`, `atoms-2` `10.500000`, `atoms-3` `10.172414`). The two row
 rounds then restored mass to `11.909091` (138 rows) and `14.000000` (156 rows).
-That dip is a covering of the seed rows only. Same overfit shape as `191/50` net9,
-with a larger restore.
+That dip is a covering of the seed rows only.
+Same overfit shape as `191/50` net9, with a larger restore.
 
 Artifacts in this directory: `receipt.json`, `trajectory.json`, `atoms.json`.
 

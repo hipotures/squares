@@ -7,19 +7,19 @@ softschema:
   schema: schemas/session-close-report.schema.yaml
   envelope: null
   status: enforced
-count: 148
+count: 149
 generated_by: >-
   uv run --frozen --all-extras --group dev python -m devtools.close_session --render
 totals:
-  sessions_measured: 94
+  sessions_measured: 95
   sessions_unmeasured: 54
   attributed:
-    rollups: 160
-    turns: 43909
-    tool_calls: 24112
-    tool_errors: 483
-    one_off_code: 3825
-    wall_hours: 391.98
+    rollups: 161
+    turns: 44279
+    tool_calls: 24297
+    tool_errors: 485
+    one_off_code: 3848
+    wall_hours: 410.64
   unattributed:
     rollups: 60
     turns: 11110
@@ -28,12 +28,12 @@ totals:
     one_off_code: 946
     wall_hours: 51.75
   measured:
-    rollups: 220
-    turns: 55019
-    tool_calls: 30651
-    tool_errors: 639
-    one_off_code: 4771
-    wall_hours: 443.73
+    rollups: 221
+    turns: 55389
+    tool_calls: 30836
+    tool_errors: 641
+    one_off_code: 4794
+    wall_hours: 462.39
 codex_receipts:
   attributed: 56
   unattributed: 2
@@ -2454,4 +2454,18 @@ sessions:
   tool_errors: 13
   one_off_code: 149
   wall_hours: 13.28
+  codex_receipts: []
+- id: session-149
+  title: "Intake and Verification of Two External n = 17 Weighted Certificates"
+  status: completed
+  primary_bead: think-pcd0
+  phases: 3
+  measured: true
+  rollups:
+  - packing/campaign/resource-usage/7163c7b2-b4ac-4c82-afcc-ab827886ebd9.yaml
+  turns: 370
+  tool_calls: 185
+  tool_errors: 2
+  one_off_code: 23
+  wall_hours: 18.66
   codex_receipts: []

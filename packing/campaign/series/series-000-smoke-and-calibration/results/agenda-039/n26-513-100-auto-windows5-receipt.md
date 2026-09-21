@@ -1,17 +1,19 @@
 # n=26 513/100 Seedless Auto Window-5 Covering Receipt
 
-Status: **site set still open, unconverged**. The side stays open. No freeze.
+Status: **site set still open, unconverged**. The side stays open.
+No freeze.
 
 Session-141 exp-169: seedless auto grids plus `--seed-windows 5`,
 `(n, L, B, net) = (26, 513/100, 9977/10000, 181 directions)`. Auto resolved to
-`(36, 49, 60)`. Seed sites 625 (windows only). The 1200 s deadline stopped the
-row loop after 42 LP rounds at `25.000000` (546 still violated). It sat on
-`25.000000` from round 11. It did not cross 26.
+`(36, 49, 60)`. Seed sites 625 (windows only).
+The 1200 s deadline stopped the row loop after 42 LP rounds at `25.000000` (546 still
+violated). It sat on `25.000000` from round 11. It did not cross 26.
 
-Remaining rows can only raise this value, so `25.000000` is not a covering
-below 26.
-Do not more-wall this set. Nagamochi `1 + sqrt(17)` stands. T-030 was not
-offered. H-220 stays unconfirmed.
+Remaining rows can only raise this value, so `25.000000` is not a covering below 26. Do
+not more-wall this set.
+Nagamochi `1 + sqrt(17)` stands.
+T-030 was not offered.
+H-220 stays unconfirmed.
 
 This is the first first-party covering row at n=26.
 

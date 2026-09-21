@@ -1,21 +1,22 @@
 # n=12 793/200 T-017 Four-Grid Window-7 Covering Receipt
 
-Status: **site set still open, unconverged**. The side stays open. No freeze.
+Status: **site set still open, unconverged**. The side stays open.
+No freeze.
 
 Session-141 exp-178: T-017 seed plus four-grid `(26, 35, 43, 48)` plus
-`--seed-windows 7`,
-`(n, L, B, net) = (12, 793/200, 9977/10000, 181 directions)`. Seed sites 2533.
-The 1200 s deadline stopped the row loop after 35 LP rounds at `12.066995`
-(192 still violated). It crossed 12 at round 13 (`12.016486`). The objective
-sat at `12.06699` from round 32. Closer than auto plus windows 7 at this side
-(`12.067502`).
+`--seed-windows 7`, `(n, L, B, net) = (12, 793/200, 9977/10000, 181 directions)`. Seed
+sites 2533. The 1200 s deadline stopped the row loop after 35 LP rounds at `12.066995`
+(192 still violated).
+It crossed 12 at round 13 (`12.016486`). The objective sat at `12.06699` from round 32.
+Closer than auto plus windows 7 at this side (`12.067502`).
 
-Remaining rows can only raise this value, so `12.066995` is not a covering
-below 12.
-Do not more-wall this set. T-017 stands. T-030 was not offered. H-218 stays
-unconfirmed.
+Remaining rows can only raise this value, so `12.066995` is not a covering below 12. Do
+not more-wall this set.
+T-017 stands. T-030 was not offered.
+H-218 stays unconfirmed.
 
-Side `3.965` already exists. This is a new named site set at that side.
+Side `3.965` already exists.
+This is a new named site set at that side.
 
 ## Command
 
@@ -36,8 +37,8 @@ uv run --frozen --all-extras --group dev python -m devtools.run_fractional_colge
 ```
 
 No freeze file: the 1200 s deadline stopped the row loop after 35 rounds.
-Wall 1216.8 s. The walker then started n=18 `4679/1000` T-029 auto plus
-windows 5 as exp-179.
+Wall 1216.8 s. The walker then started n=18 `4679/1000` T-029 auto plus windows 5 as
+exp-179.
 
 ## Covering
 

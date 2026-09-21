@@ -2,12 +2,12 @@
 
 Status: **site set refuted**. The side stays open.
 
-Session-139 probe: four-grid `(25, 34, 41, 48)` unioned with T-025's 584 atom
-sites, scaled from `191/50` to `383/100`, at
-`(n, L, B, net) = (11, 383/100, 9977/10000, 181 directions)`.
-The extra seed dropped the restricted optimum by 0.0025 from the four-grid row
-`11.142857`. A restricted optimum at or above 11 on a converged row loop
-refutes this site set only. T-025 and T-026 are unchanged.
+Session-139 probe: four-grid `(25, 34, 41, 48)` unioned with T-025’s 584 atom sites,
+scaled from `191/50` to `383/100`, at
+`(n, L, B, net) = (11, 383/100, 9977/10000, 181 directions)`. The extra seed dropped the
+restricted optimum by 0.0025 from the four-grid row `11.142857`. A restricted optimum at
+or above 11 on a converged row loop refutes this site set only.
+T-025 and T-026 are unchanged.
 
 ## Command
 
@@ -24,8 +24,8 @@ uv run --frozen --all-extras --group dev python -m devtools.run_fractional_colge
   --log campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-383-100-t025-seed.log
 ```
 
-`--freeze-family` was not requested. Column generation added one orbit after the
-row loop and stopped; wall 107.9 s.
+`--freeze-family` was not requested.
+Column generation added one orbit after the row loop and stopped; wall 107.9 s.
 
 ## Covering
 
@@ -41,8 +41,9 @@ row loop and stopped; wall 107.9 s.
 | `least_covered` | 1 |
 | Converged | yes (`violated == 0`) |
 
-Point-atom covering at `383/100` did not fall below eleven on auto grids, the
-four-grid, or this T-025-seeded union. `devtools.decide_certificate` was not run.
+Point-atom covering at `383/100` did not fall below eleven on auto grids, the four-grid,
+or this T-025-seeded union.
+`devtools.decide_certificate` was not run.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

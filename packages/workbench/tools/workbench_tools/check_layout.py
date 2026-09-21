@@ -69,8 +69,10 @@ SLACK = 0.6
 #: Control kinds held to `--control-height`; tabs are held to `--tab-height`.
 AT_CONTROL_HEIGHT = frozenset({"button", "select", "input-number", "input-text", "chip"})
 
-#: A bound first proved here (n = 17) and an n with nothing open (n = 16).
-STAR_N = 17
+#: A bound first proved here (n = 18) and an n with nothing open (n = 16).
+#: It was n = 17 until T-032 adopted an external certificate there, which is exactly the
+#: fact the star reports; the six that still qualify are n = 11, 12, 18, 19, 20 and 21.
+STAR_N = 18
 OPEN_NONE_N = 16
 #: The step the one moving view is paused in. At rest the box is locked at the best known side
 #: and drawn green, so a step on its way is the only place the frames' grey is drawn.
@@ -451,8 +453,8 @@ def _leave_studio(page: Page) -> None:
 VIEWS: tuple[
     tuple[str, Callable[[Page], None], Callable[[Page], None] | None, bool | None, bool], ...
 ] = (
-    ("animate at n = 17", _stage_n(STAR_N), None, True, True),
-    ("animate at n = 16", _stage_n(OPEN_NONE_N), None, False, True),
+    (f"animate at n = {STAR_N}", _stage_n(STAR_N), None, True, True),
+    (f"animate at n = {OPEN_NONE_N}", _stage_n(OPEN_NONE_N), None, False, True),
     (f"animate mid-step into n = {MOVING_N}", _moving(MOVING_N), None, None, True),
     ("the animation studio", _studio, _leave_studio, None, False),
     ("pack", lambda page: page.locator("#mode-pack").click(), None, None, False),

@@ -2,13 +2,13 @@
 
 Status: **site set refuted, unconverged**. Locked at 18. The side stays open.
 
-Session-139 probe: BC-191 auto `(32, 43, 53)` unioned with T-019's 1184 atom
-sites scaled from `459/100` to `469/100`,
-`(n, L, B, net) = (18, 469/100, 9977/10000, 181 directions)`.
-The same seed certified `467/100` as T-027. Here the row loop sat at
-`18.000000` from round 8 through the 900 s deadline (59 LP rounds, 288
-still violated) on 6853 sites / 920 orbits. Remaining rows can only raise
-this value. Adding sites can still lower it, so `469/100` is not barred.
+Session-139 probe: BC-191 auto `(32, 43, 53)` unioned with T-019’s 1184 atom sites
+scaled from `459/100` to `469/100`,
+`(n, L, B, net) = (18, 469/100, 9977/10000, 181 directions)`. The same seed certified
+`467/100` as T-027. Here the row loop sat at `18.000000` from round 8 through the 900 s
+deadline (59 LP rounds, 288 still violated) on 6853 sites / 920 orbits.
+Remaining rows can only raise this value.
+Adding sites can still lower it, so `469/100` is not barred.
 T-027 at `467/100` is unchanged.
 
 ## Command
@@ -26,8 +26,9 @@ uv run --frozen --all-extras --group dev python -m devtools.run_fractional_colge
   --log campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-469-100-t019-seed-log.log
 ```
 
-`--freeze` was not requested. The 900 s deadline stopped the row loop
-after 59 rounds; no column-generation round ran. Wall 921.5 s.
+`--freeze` was not requested.
+The 900 s deadline stopped the row loop after 59 rounds; no column-generation round ran.
+Wall 921.5 s.
 
 ## Covering
 

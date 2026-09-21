@@ -8,7 +8,7 @@ ours, which rest on someone else's argument, and how far each has been checked.
 
 ## The short version
 
-- **85** evidence records. **69** are formal; **63** of those were established here.
+- **89** evidence records. **73** are formal; **67** of those were established here.
 - **11** rest on an argument made elsewhere, of which **8** have been read by nobody here.
 - **32** claim to be first established here. **8** make no novelty statement at all - not assessed, which is not the same as not novel.
 
@@ -72,7 +72,11 @@ results, it is a statement about what this repository has itself examined.
 | `E-n017-burns-control-decision` | 0 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | previously-published |
 | `E-n017-mira-point-certificate-replay` | 0 | lower-bound | verified | equalities and inequalities, no tolerance | here | not-reviewed | previously-published |
 | `E-n017-fort-point-certificate-replay` | 0 | lower-bound | verified | equalities and inequalities, no tolerance | here | not-reviewed | previously-published |
-| `E-n017-anabologyco-weighted-certificate` | 2 | lower-bound | reported | - | elsewhere | not-reviewed | previously-published |
+| `E-n017-anabologyco-weighted-certificate` | 0 | lower-bound | reported | - | elsewhere | not-reviewed | previously-published |
+| `E-n017-mira-4613-exact-replay` | 1 | lower-bound | verified | equalities and inequalities, no tolerance | here | informally-verified | previously-published |
+| `E-n017-mira-4613-interval-decision` | 1 | lower-bound | verified | strict inequalities only | here | - | previously-published |
+| `E-n017-guzhou-r012-source-replay` | 2 | lower-bound | verified | equalities and inequalities, no tolerance | here | informally-verified | previously-published |
+| `E-n017-guzhou-r012-interval-decision` | 2 | lower-bound | verified | strict inequalities only | here | - | previously-published |
 | `E-n017-massaccesi-h052-agreement` | 0 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | previously-published |
 | `E-n012-fractional-certificate` | 1 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
 | `E-n012-independent-verifier` | 0 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
@@ -90,14 +94,14 @@ results, it is a statement about what this repository has itself examined.
 | `E-n011-threshold-net1440-dilation-limit` | 1 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
 | `E-n011-threshold-net720-certificate` | 0 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
 | `E-n011-threshold-net720-dilation-limit` | 0 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
-| `E-n017-fractional-certificate` | 1 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
+| `E-n017-fractional-certificate` | 0 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
 | `E-n018-fractional-certificate` | 0 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
 | `E-n018-t028-fractional-certificate` | 0 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
 | `E-n018-t029-fractional-certificate` | 0 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
 | `E-n018-t030-fractional-certificate` | 1 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
 | `E-n020-fractional-certificate-97-20` | 2 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
 | `E-n020-fractional-certificate` | 1 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
-| `E-fractional-interval-decision` | 6 | lower-bound | verified | strict inequalities only | here | - | previously-published |
+| `E-fractional-interval-decision` | 5 | lower-bound | verified | strict inequalities only | here | - | previously-published |
 | `E-n011-five-dot-full-net` | 0 | derived-structure | verified | equalities and inequalities, no tolerance | here | - | *not assessed* |
 | `E-n011-five-dot-independent-union` | 0 | derived-structure | verified | equalities and inequalities, no tolerance | here | - | *not assessed* |
 | `E-n011-wall-owner-footprints` | 0 | derived-structure | verified | equalities and inequalities, no tolerance | here | - | *not assessed* |
@@ -108,9 +112,9 @@ results, it is a statement about what this repository has itself examined.
 
 ## What the register rests on
 
-- **assurance**: numerically-checked 4, reported 12, verified 69
-- **method**: exact-algebraic 54, interval-certified 7, numerical-multiprecision 4, proof-audited 2, published-proof 6, reported 12
-- **novelty**: apparently-novel 32, common-knowledge 4, not assessed 8, previously-published 41
+- **assurance**: numerically-checked 4, reported 12, verified 73
+- **method**: exact-algebraic 56, interval-certified 9, numerical-multiprecision 4, proof-audited 2, published-proof 6, reported 12
+- **novelty**: apparently-novel 32, common-knowledge 4, not assessed 8, previously-published 45
 
 The `cases` column is how many frontier records cite each piece of evidence, and it is the reason to read this table rather than count records. Ranked below are the *formal* records only: a `reported` record cited across the frontier may be a shared catalogue and is labelled as such, which is the register working rather than risk. The risk is a verified claim resting on an argument nobody has examined.
 
@@ -129,7 +133,6 @@ Claims marked `apparently-novel`: first established here as far as the archived 
 | `E-n011-threshold-net1440-dilation-limit` | 11 | The exact lower-bound value obtained by combining the 1440-step re-certification of T-025's threshold atoms with T-022's sharpened containment lemma, every strict rational uniform dilation it admits, rational density, and upward embedding. The lemma and the dilation argument are T-022's and T-024's; carrying them over threshold atoms needs no new theorem, and the bound is new. | 1 | verified |
 | `E-n011-trump-local-rigidity` | 11 | Local rigidity proved by exhausting all 128 branchwise cones; sources assert rigidity, and zero algebraic freedom does not exclude a branching motion | 1 | verified |
 | `E-n012-fractional-certificate` | 12 | The certificate and the bound it carries, not the method. The weighted fractional unavoidable-set technique is Burns's, with Massaccesi's parameters; what is new here is a first-party certificate ladder at n = 12, reaching 99/25, and the generator that produced it. The first instance was retained at 19/5. Anyone holding Burns's note could have run this search. | 1 | verified |
-| `E-n017-fractional-certificate` | 17, 18, 19 | The certificate and the side. The method is Burns's and the parametrisation is Massaccesi's own; what is new is a denser certificate at a larger side than his, found by this project's generator once its separation oracle was corrected. | 1 | verified |
 | `E-n018-t030-fractional-certificate` | 18 | The certificate and the side. The method is Burns's, the parametrisation Massaccesi's, and the seed T-029's own atoms scaled to 4679/1000 plus a windows-5 lattice; what is new is a certificate at 4679/1000, found after T-029 retained 1871/400 and 117/25 locked at 18.000000. | 1 | verified |
 | `E-n020-fractional-certificate` | 19, 20, 21 | The certificate and the side. The method is Burns's and the parametrisation is Massaccesi's; what is new is a certificate at a side no published bound reaches at any of these three sizes, found by this project's generator. | 1 | verified |
 | `E-n029-interval-certified-upper` | 29 | An interval certificate for a square-in-square bound; the packing is Kingbird's | 1 | verified |
@@ -148,6 +151,7 @@ Claims marked `apparently-novel`: first established here as far as the archived 
 | `E-n011-threshold-net720-certificate` | 11 | The re-certification of the retained T-025 threshold atoms on the 720-step net, which crosses at the same shrink as the 1440-step net and is the control that isolates what halving the half-gap tangent is worth. | 0 | verified |
 | `E-n011-threshold-net720-dilation-limit` | 11 | The exact lower-bound value from the 720-step threshold re-certification under T-022's dilation-limit argument. It is weaker than the registered bound and is retained because its source rung is the control that isolates the effect of the net alone. | 0 | verified |
 | `E-n012-independent-verifier` | 12 | Nothing new in this entry -- it is a second, independent decision of the historical 77/20 rung and its 19/5 calibration certificate. | 0 | verified |
+| `E-n017-fractional-certificate` | 17, 18, 19 | The certificate and the side. The method is Burns's and the parametrisation is Massaccesi's own; what is new is a denser certificate at a larger side than his, found by this project's generator once its separation oracle was corrected. | 0 | verified |
 | `E-n018-fractional-certificate` | 18 | The certificate and the side. The method is Burns's, the parametrisation Massaccesi's, and the seed T-019's own atoms scaled to 467/100; what is new is a certificate at 467/100, found after the uniform grid walled there. | 0 | verified |
 | `E-n018-t028-fractional-certificate` | 18 | The certificate and the side. The method is Burns's, the parametrisation Massaccesi's, and the seed T-027's own atoms scaled to 187/40 plus a windows-5 lattice; what is new is a certificate at 187/40, found after 117/25 locked at 18.000000. | 0 | verified |
 | `E-n018-t029-fractional-certificate` | 18 | The certificate and the side. The method is Burns's, the parametrisation Massaccesi's, and the seed T-028's own atoms scaled to 1871/400 plus a windows-5 lattice; what is new is a certificate at 1871/400, found after T-028 retained 187/40 and 117/25 locked at 18.000000. | 0 | verified |
@@ -161,7 +165,7 @@ The `n` column is what each covers and `cases` is how many frontier records cite
 | `E-basic-grid-upper` | 305 | here | - |
 | `E-basic-area-lower` | 18 | here | - |
 | `E-perfect-square-tiling-rigid` | 18 | here | - |
-| `E-fractional-interval-decision` | 6 | here | - |
+| `E-gobel-strip-upper` | 5 | here | - |
 
 The most-cited argument this repository did not produce is `E-nagamochi-lower`, carrying 307 frontier cases. It is an external proof, and it has been read here: its record carries the review, what was re-derived, and the four things that were not. The arithmetic is what picked it out for reading -- being cited this heavily is the reason to open an argument, not a reason to trust it.
 

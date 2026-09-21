@@ -2,15 +2,16 @@
 
 Status: **site set refuted, unconverged**. Locked at 18. The side stays open.
 
-Session-139 probe: BC-191 auto `(32, 43, 53)` unioned with T-019's 1184 atom
-sites scaled from `459/100` to `117/25`, plus `--seed-windows 5`,
-`(n, L, B, net) = (18, 117/25, 9977/10000, 181 directions)`.
-Seed sites 1584 = 1184 T-019 plus 400 ceiling-window lattice sites.
-The T-019-seeded auto `(32, 43, 54)` without windows converged at exact
-mass `18.000043`. Windows on `(32, 43, 53)` sat at `18.000000` from round
-10 through the 900 s deadline (57 LP rounds, 495 still violated).
-Remaining rows can only raise this value. Adding sites can still lower
-it, so `117/25` is not barred. T-027 at `467/100` is unchanged.
+Session-139 probe: BC-191 auto `(32, 43, 53)` unioned with T-019’s 1184 atom sites
+scaled from `459/100` to `117/25`, plus `--seed-windows 5`,
+`(n, L, B, net) = (18, 117/25, 9977/10000, 181 directions)`. Seed sites 1584 = 1184
+T-019 plus 400 ceiling-window lattice sites.
+The T-019-seeded auto `(32, 43, 54)` without windows converged at exact mass
+`18.000043`. Windows on `(32, 43, 53)` sat at `18.000000` from round 10 through the 900
+s deadline (57 LP rounds, 495 still violated).
+Remaining rows can only raise this value.
+Adding sites can still lower it, so `117/25` is not barred.
+T-027 at `467/100` is unchanged.
 
 ## Command
 
@@ -28,8 +29,9 @@ uv run --frozen --all-extras --group dev python -m devtools.run_fractional_colge
   --log campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-117-25-t019-windows5.log
 ```
 
-`--freeze` was not requested. The 900 s deadline stopped the row loop
-after 57 rounds; no column-generation round ran. Wall 912.6 s.
+`--freeze` was not requested.
+The 900 s deadline stopped the row loop after 57 rounds; no column-generation round ran.
+Wall 912.6 s.
 
 ## Covering
 
