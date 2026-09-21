@@ -187,6 +187,16 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // viewer reads it as a state rather than as a motion, and drawing it slowly reads as a fade
   // rather than as the picture going quiet. The hue takes the longer share of each window, because
   // it has further to go and because it is the change that must not be seen happening.
+  //: How long a square's colour takes to leave and to come back, in SECONDS rather than as a
+  //: fraction of the step (the owner, 2026-09-21). A fraction inherits the step's clock, so
+  //: speeding simple transitions up to 3x squeezed the whole change into about two frames at 30
+  //: fps -- which is a cut, not a transition, and on a blend through neutral it landed as a grey
+  //: flash. Declared in seconds, the colour crosses over at the same rate whatever the step does.
+  //:
+  //: The fade OUT is the slower of the two: the picture is being taken apart, and a viewer needs
+  //: longer to accept a colour leaving than to accept one arriving. The drain finishes before the
+  //: new square arrives, so the scarlet lands on a settled grey rather than into a change.
+  const COLOUR_FADE = { out: 0.45, in: 0.3 };
   const DESAT_IN = 0.14; // fraction of the move the chroma takes to drain
   const HUE_OUT = 0.4; // fraction of the move the hue takes to leave, once drained
   const HUE_IN = 0.7; // fraction of the settle the hue takes, before the chroma returns
@@ -1355,15 +1365,21 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     return pairSchedule(timelineConfiguration(), state.pair, state.style);
   }
   const ramp = timelineRamp;
-  // How much chroma the fills carry at t: all of it through the dwell, drained over the first
-  // DESAT_IN of the move, held through the motion, and back over the LAST part of the settle --
-  // after the hue has finished moving, which is the whole point of the split. A zero-length move
-  // (a static append under a tween) never drains at all.
+  // How much chroma the fills carry at t: all of it through the dwell, drained over
+  // `COLOUR_FADE.out` seconds from the move's start, held through the motion, and back over the
+  // last `COLOUR_FADE.in` seconds of the step.
+  //
+  // **A still pair never drains** (the owner, 2026-09-21). On a prefix or a shared picture
+  // nothing rearranges -- the only thing that happens is the new square arriving -- so there is
+  // no motion to mute, and draining the whole packing to grey and back for it said something was
+  // happening to squares that never moved. Measured over n = 96..100, every frame-to-frame change
+  // is inside one square's cell and nothing spans the packing.
   function chromaLevel(sc, t) {
-    const move = sc.moveEnd - sc.moveStart;
-    const settle = sc.end - sc.moveEnd;
-    const out = smootherstep(ramp(t, sc.moveStart, sc.moveStart + move * DESAT_IN));
-    const back = smootherstep(ramp(t, sc.moveEnd + settle * HUE_IN, sc.end));
+    if (isStillPair()) {
+      return 1;
+    }
+    const out = smootherstep(ramp(t, sc.moveStart, sc.moveStart + COLOUR_FADE.out));
+    const back = smootherstep(ramp(t, sc.end - COLOUR_FADE.in, sc.end));
     return 1 - out * (1 - back);
   }
   // Which hues the fills carry at t: 1 is the atlas's answer, the convention for a finished
@@ -4165,6 +4181,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       resting: clamp01(hueLevel(sc, t)),
       links: state.links,
       tint: TINT,
+      tintSeconds: COLOUR_FADE.in,
       mark: { wide: MARK_WIDE, thin: MARK_THIN, fade: MARK_FADE },
     });
   }
@@ -4565,6 +4582,11 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       const input = /** @type {HTMLInputElement} */ (document.getElementById(`t-${key}`));
       input.disabled = false;
       input.value = state.continuous.on ? CONTINUOUS[key] : state.timing[key];
+    });
+    ["out", "in"].forEach((key) => {
+      const input = /** @type {HTMLInputElement} */ (document.getElementById(`t-colour-${key}`));
+      input.disabled = false;
+      input.value = String(COLOUR_FADE[key]);
     });
     /** @type {HTMLInputElement} */ (inputNode("fullbeat-toggle")).checked =
       state.continuous.fullBeat;
@@ -5077,6 +5099,23 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     updateSegments();
     render();
     return ANIMATE.holdSquare;
+  }
+  // The two colour durations, in seconds. They change what is drawn at t and nothing that is
+  // simulated, so the pair does not have to be rebuilt.
+  function setColourFade(fade) {
+    const next = fade || {};
+    if (next.out !== undefined) {
+      COLOUR_FADE.out = Math.max(0, Number(next.out) || 0);
+    }
+    if (next.in !== undefined) {
+      COLOUR_FADE.in = Math.max(0, Number(next.in) || 0);
+    }
+    updateSegments();
+    render();
+    return { out: COLOUR_FADE.out, in: COLOUR_FADE.in };
+  }
+  function colourFade() {
+    return { out: COLOUR_FADE.out, in: COLOUR_FADE.in };
   }
   function setColorRule() {
     return colorScheme;
@@ -5925,6 +5964,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     identityFills,
     setAnimateStandardize,
     animateStandardize: () => ANIMATE.standardize,
+    colourFade,
+    setColourFade,
     holdSquareColours: () => ANIMATE.holdSquare,
     setHoldSquareColours,
     setPhase,
@@ -6271,6 +6312,13 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       const o = {};
       o[key] = /** @type {HTMLInputElement} */ (ev.target).value;
       setTiming(o);
+    });
+  });
+  ["out", "in"].forEach((key) => {
+    document.getElementById(`t-colour-${key}`).addEventListener("change", (ev) => {
+      const o = {};
+      o[key] = /** @type {HTMLInputElement} */ (ev.target).value;
+      setColourFade(o);
     });
   });
   document

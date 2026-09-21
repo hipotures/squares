@@ -36,6 +36,8 @@ export interface IllustrationInput {
   resting: number;
   links: boolean;
   tint: number;
+  /** Seconds the arriving square's tint takes to reach its own fill. */
+  tintSeconds?: number;
   mark: { wide: number; thin: number; fade: number };
 }
 
@@ -114,7 +116,17 @@ export function illustrationFrame(input: IllustrationInput): SceneFrame {
     opacity: arrival,
     scale: 1,
   };
-  const settled = easeOut(ramp(seconds, schedule.moveEnd, schedule.end));
+  // The arriving square's scarlet crosses to its own fill over `tintSeconds`, a duration rather
+  // than a share of the settle. A share inherits the step's clock, and a simple grid fill plays
+  // at `SIMPLE_TRANSITION_SPEED`, which left the whole cross-over about three frames at 30 fps --
+  // and on a blend that passes through neutral, three frames is one grey one. It starts no
+  // earlier than the square has finished arriving, so the colour changes on a square that is
+  // already there rather than on one still coming in.
+  const tintFrom =
+    input.tintSeconds === undefined
+      ? schedule.moveEnd
+      : Math.max(schedule.arrived, schedule.end - input.tintSeconds);
+  const settled = easeOut(ramp(seconds, tintFrom, schedule.end));
   const mark: SceneMark | null =
     arrival > 0
       ? {

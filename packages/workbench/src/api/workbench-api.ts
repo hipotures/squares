@@ -614,6 +614,8 @@ export interface AtlasTransitions {
   animateStandardize(): boolean;
   holdSquareColours(): boolean;
   setHoldSquareColours(on: boolean): boolean;
+  colourFade(): AtlasColourFade;
+  setColourFade(fade: Partial<AtlasColourFade>): AtlasColourFade;
 
   setPhase(phase: AtlasPhase): void;
   setStyle(style: string): void;
@@ -748,6 +750,12 @@ export interface AtlasTransitions {
   exportAnimationSvg(): string;
   leaveAnimation(): void;
   state(): AtlasState;
+}
+
+/** How long a square's colour takes to leave and to come back, in seconds. */
+export interface AtlasColourFade {
+  out: number;
+  in: number;
 }
 
 /** A browser-like host that can expose the workbench API. */

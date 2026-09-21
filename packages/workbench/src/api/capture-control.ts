@@ -1,5 +1,6 @@
 import type {
   AtlasAspect,
+  AtlasColourFade,
   AtlasEdgeInput,
   AtlasGrowth,
   AtlasInitial,
@@ -39,6 +40,7 @@ export type CaptureCommand =
   | ["setEdges", AtlasEdgeInput]
   | ["setGrowth", Partial<Pick<AtlasGrowth, "on" | "size" | "rate" | "rule">>]
   | ["setHoldSquareColours", boolean]
+  | ["setColourFade", Partial<AtlasColourFade>]
   | ["setInitial", AtlasInitial]
   | ["setLaw", AtlasLawInput]
   | ["setLawPreset", string]
@@ -192,6 +194,9 @@ function apply(api: AtlasTransitions, command: CaptureCommand): void {
       return;
     case "setHoldSquareColours":
       api.setHoldSquareColours(command[1]);
+      return;
+    case "setColourFade":
+      api.setColourFade(command[1]);
       return;
     case "setInitial":
       api.setInitial(command[1]);

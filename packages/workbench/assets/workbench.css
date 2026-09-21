@@ -153,6 +153,8 @@
   --stage-badge-glyph: 15px;
   /* KaTeX inherits the line it is set in, as kpress's `--kpress-katex-size-sans` does. */
   --stage-katex-size: 1em;
+  /* The legend's mathematics, sized so its x-height matches the sentence beside it. */
+  --stage-katex-note: 1.18em;
   --stage-weight-regular: 400;
   --stage-weight-quiet: 450;
   --stage-weight-label: 500;
@@ -584,10 +586,12 @@ body.drawing #packing-svg #squares {
   stroke: var(--scene-ink);
   stroke-width: var(--stage-note-swatch-border);
 }
-/* KaTeX sets its own base at 1.21em, which made `s(n)` read a size larger than the sentence it
-   opens. Held to the line it is set in, so the notation and the words about it are one size. */
+/* Matched by x-height, not by em. At the line's own size KaTeX_Math's `s` inks 11 px against
+   the text's 13 -- measured on a captured frame -- so the letters look small and float even
+   though their baselines agree exactly. 13/11 is 1.18, which is why KaTeX's own default is
+   1.21em: its faces carry a smaller x-height per em than a text face does. */
 .note-math .katex {
-  font-size: var(--stage-katex-size);
+  font-size: var(--stage-katex-note);
 }
 .note-math {
   font-family: var(--font-serif);
