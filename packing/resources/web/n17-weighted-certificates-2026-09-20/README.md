@@ -44,6 +44,19 @@ The table below picks up where that one ends.
 Dates are the sources’ own author timestamps in their own offsets: Mira’s two September
 commits at `-0700`, Guzhou0806’s at `+0800`.
 
+### A later public value this packet does not hold
+
+The table above is where this packet stops, not where the public sequence stops.
+Guzhou0806’s **R038** certificate, in the same repository at commit
+`32edfd3da78bf80a309398f552b3b602b9c45d6c`
+(<https://github.com/Guzhou0806/n17-square-packing/tree/32edfd3da78bf80a309398f552b3b602b9c45d6c/certificates/R038>),
+reports the strict lower bound `461300000000/99974999999 = 4.614153538431…`, above the
+`461300/99999` retained here.
+Its bytes are not in this packet, it has not been replayed here, and nothing this
+repository records rests on it.
+It is named so that no document here implies `461300/99999` is the strongest value
+publicly claimed for `s(17)`; adjudicating R038 is separate work under its own lane.
+
 ## Mira-acc/17squares: `s(17) > 4.613028635886`
 
 Selected tree of <https://github.com/Mira-acc/17squares> at commit
