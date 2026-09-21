@@ -7,19 +7,19 @@ softschema:
   schema: schemas/session-close-report.schema.yaml
   envelope: null
   status: enforced
-count: 142
+count: 143
 generated_by: >-
   uv run --frozen --all-extras --group dev python -m devtools.close_session --render
 totals:
-  sessions_measured: 88
+  sessions_measured: 89
   sessions_unmeasured: 54
   attributed:
-    rollups: 129
-    turns: 40048
-    tool_calls: 21835
-    tool_errors: 440
-    one_off_code: 3461
-    wall_hours: 370.08
+    rollups: 138
+    turns: 41150
+    tool_calls: 22506
+    tool_errors: 452
+    one_off_code: 3554
+    wall_hours: 373.78
   unattributed:
     rollups: 60
     turns: 11110
@@ -28,12 +28,12 @@ totals:
     one_off_code: 946
     wall_hours: 51.75
   measured:
-    rollups: 189
-    turns: 51158
-    tool_calls: 28374
-    tool_errors: 596
-    one_off_code: 4407
-    wall_hours: 421.83
+    rollups: 198
+    turns: 52260
+    tool_calls: 29045
+    tool_errors: 608
+    one_off_code: 4500
+    wall_hours: 425.53
 codex_receipts:
   attributed: 56
   unattributed: 2
@@ -2341,3 +2341,25 @@ sessions:
     active_union_hours: 2.29
     wall_hours: 2.3
     snapshot_incomplete: true
+- id: session-143
+  title: "Deeper Mathematical Review of Lower-Bound Routes"
+  status: completed
+  primary_bead: think-srln
+  phases: 2
+  measured: true
+  rollups:
+  - packing/campaign/resource-usage/5e071e1a-5ab8-5bae-a5c0-c3687815bf4a.yaml
+  - packing/campaign/resource-usage/ae3edbd2676fddaf2.yaml
+  - packing/campaign/resource-usage/afc8f6dcbe7aef07d.yaml
+  - packing/campaign/resource-usage/af860c4b4d0468ad0.yaml
+  - packing/campaign/resource-usage/a5a0fa0629343ea04.yaml
+  - packing/campaign/resource-usage/a593739458b58626a.yaml
+  - packing/campaign/resource-usage/a8b8b405efc053f16.yaml
+  - packing/campaign/resource-usage/a68c79e799a3fc678.yaml
+  - packing/campaign/resource-usage/a1730fd7bec467b88.yaml
+  turns: 1102
+  tool_calls: 671
+  tool_errors: 12
+  one_off_code: 93
+  wall_hours: 3.7
+  codex_receipts: []

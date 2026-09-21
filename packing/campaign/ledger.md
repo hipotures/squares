@@ -157,6 +157,7 @@ Each entry summarizes one user-level research window. Cycle slots are wall-clock
 | [session-140](agent-sessions/session-140-lb-survey.md) | stopped | contemporaneous | `review-planning-oversight` (process) | `review-planning-oversight` (process) | 3 | think-8x4t | Continue H-216 under think-qqzs. |
 | [session-141](agent-sessions/session-141-n100-research.md) | stopped | contemporaneous | `review-planning-oversight` (process) | `review-planning-oversight` (process) | 3 | think-ul7y | Continue H-216 under think-qqzs. |
 | [session-142](agent-sessions/session-142-stack-correctness.md) | completed | contemporaneous | `pipeline-improvement` (correctness) | `factual-review` (correctness) | 2 | think-gz4k | Return to H-216 under think-qqzs. |
+| [session-143](agent-sessions/session-143-lower-bound-math-review.md) | completed | contemporaneous | `insight-iteration` (insight) | `review-planning-oversight` (insight) | 2 | think-srln | Session 144 under think-pogj decides exp-213 to exp-215 for BC-361, with the Bentz 2016 replay lane beside it. |
 
 ### Workflow summary
 
@@ -166,14 +167,14 @@ Declared counts are contemporaneous contracts; retrospective counts are reconstr
 | --- | ---: | ---: | ---: | ---: |
 | `research-survey` | 2 | 2 | 13 | 2 |
 | `factual-review` | 7 | 0 | 53 | 2 |
-| `insight-iteration` | 24 | 1 | 80 | 4 |
+| `insight-iteration` | 25 | 1 | 81 | 4 |
 | `process-review` | 16 | 4 | 64 | 6 |
 | `efficiency-loop` | 10 | 1 | 36 | 1 |
 | `research-loop` | 27 | 4 | 101 | 8 |
 | `pipeline-improvement` | 34 | 2 | 152 | 5 |
 | `documentation-pass` | 1 | 0 | 24 | 1 |
 | `remediation` | 0 | 1 | 0 | 3 |
-| `review-planning-oversight` | 5 | 0 | 21 | 2 |
+| `review-planning-oversight` | 5 | 0 | 22 | 2 |
 | `general-improvement` | 1 | 0 | 7 | 1 |
 
 ## Experiment agendas
@@ -779,6 +780,19 @@ Status: **active**. Pursue n=11 results beyond the one-body ceiling L* = 38200/9
 | BC-359 | research | 11 | tentative | 2 | think-k4vb | The integer program’s optimum on the coarse net, with the winner decided exactly at full angle. |
 | BC-360 | research | 11 | stopped | 4 | think-4woh | None; reopen a mechanism only when its stated reopening condition holds. |
 
+### [agenda-040](agendas/agenda-040-overnight-lower-bound-loop.md) — Overnight Lower-Bound Loop After X-040
+
+Status: **active**. Run the hypotheses X-040 adapted from the Session 143 review as an overnight loop of about eight hours in one- to two-hour chunks, each chunk a fresh session record and a stacked pull request on the previous head. Stock-instrument determinations at n=13, n=17, and n=26 run first; the n=21 and n=32 one-spare lemma runs as a mathematical lane beside them; the n=11 octagon class follows once its convex domain predicate is admitted; the tilted-anchor, wedge-conflict, and unshrunk n=12 items stay blocked on instruments. Mathematics is delegated to Fable and mechanical work to Opus, with a Fable review of every chunk.
+
+| item | purpose | n | state | priority | bead | next evidence |
+| --- | --- | --- | --- | ---: | --- | --- |
+| BC-361 | research | 13, 17, 26 | ready | 0 | think-pogj | exp-213, exp-214, and exp-215 receipts under results/agenda-040. |
+| BC-362 | research | 21, 32 | ready | 1 | think-89i1 | The replay receipt and the structure inventory under results/agenda-040. |
+| BC-363 | research | 11 | ready | 1 | think-ni3v | The admitted predicate, its controls, and the H-222 experiment receipt. |
+| BC-364 | research | 11 | blocked | 2 | think-z20r | The gap-g derivation note and the pairwise check receipt. |
+| BC-365 | research | 12 | blocked | 3 | think-mmd5 | A verifier admission receipt, or a certified dual of value at least 12 below side 4 from the existing ceiling readers. |
+| BC-366 | research | 11, 45 | stopped | 4 | think-srln | None; reopen an item only when its stated reopening condition holds. |
+
 ## Series
 
 | id | status | title | rounds | opened because |
@@ -948,6 +962,16 @@ Status: **active**. Pursue n=11 results beyond the one-body ceiling L* = 38200/9
 | H-219 | confirmed | proof | A rows-complete covering of mass strictly below 18 exists at a contain | n: 18* | 1 |  | 11.7m wall |
 | H-220 | unresolved | proof | A rows-complete covering of mass strictly below n exists at a containe | n: 32* 31* 30* 26* 27* 29* 45* 44* | 8 |  | 164.1m wall |
 | H-221 | confirmed | proof | A rows-complete covering of mass strictly below 18 exists at a contain | n: 18* | 1 |  | 8.2m wall |
+| H-222 | blocked | proof | At n=11, side 96/25, B = 9977/10000 on the 181-direction net, the rest |  | 0 |  |  |
+| H-223 | open | proof | A point-atom certificate exists for n=13 at container side 399/100 wit |  | 0 |  |  |
+| H-224 | open | proof | At n=17, side 23/5, B = 9977/10000 on the 181-direction net, an exact  |  | 0 |  |  |
+| H-225 | open | proof | A point-atom certificate exists for n=26 at container side 53/10 with  | side: 53/10 107/20 27/5 | 0 |  |  |
+| H-226 | blocked | proof | In every packing of 21 boxes (open squares of side above 1) in [0, 5]^ |  | 0 |  |  |
+| H-227 | blocked | proof | In every packing of 32 boxes in [0, 6]^2, some wall-parallel line at d |  | 0 |  |  |
+| H-228 | blocked | proof | A weighted measure on [0, 4]^2 of total mass strictly below 12 puts ma |  | 0 |  |  |
+| H-229 | blocked | proof | At n=11, side 96/25, B = 9977/10000, in the anchor case whose centre b |  | 0 |  |  |
+| H-230 | blocked | proof | There is a proved wall-wedge conflict lemma for a tilted unit square a |  | 0 |  |  |
+| H-231 | open question | proof | Whether a Lovász theta certificate on a sound, non-uniform pose-cell c |  | 0 |  |  |
 
 ## Needs review — held for a human, not decided
 

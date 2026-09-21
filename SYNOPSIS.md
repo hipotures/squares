@@ -141,11 +141,11 @@ hypothesis status and summarizes experiment verdicts, and the
 
 | Record | Count | State at the cutoff |
 | --- | ---: | --- |
-| Agendas | 36 | 16 active; 14 completed; 5 paused; 1 superseded |
-| Commitments | 349 | 178 complete; 60 stopped; 66 blocked; 15 ready; 21 tentative; 9 in progress |
-| Sessions | 142 | 85 completed; 57 stopped; all terminal |
-| Explorations | 37 | 23 linked to proposed hypotheses; 14 uncodified |
-| Hypotheses | 159 | 28 confirmed; 29 refuted; 51 blocked; 14 unresolved; 5 open; 28 open questions; 2 result registered; 2 abandoned; 0 running |
+| Agendas | 37 | 17 active; 14 completed; 5 paused; 1 superseded |
+| Commitments | 355 | 178 complete; 61 stopped; 68 blocked; 18 ready; 21 tentative; 9 in progress |
+| Sessions | 143 | 86 completed; 57 stopped; all terminal |
+| Explorations | 38 | 24 linked to proposed hypotheses; 14 uncodified |
+| Hypotheses | 169 | 28 confirmed; 29 refuted; 57 blocked; 14 unresolved; 8 open; 29 open questions; 2 result registered; 2 abandoned; 0 running |
 | Experiments | 147 | 41 accepted; 34 rejected; 46 unresolved; 12 baseline; 11 blocked; 3 abandoned; 0 in progress |
 | Frontier results | 30 | 30 registered |
 
@@ -162,17 +162,26 @@ now-paused incremental follow-ups.
 [Agenda 036](packing/campaign/agendas/agenda-036-n11-strategy-reset-roadmap.md) is the
 strategy-reset queue, and
 [Agenda 037](packing/campaign/agendas/agenda-037-n11-relational-certificate-program.md)
-is the current relational-certificate queue opened by the overnight review.
+is the relational-certificate queue opened by the overnight review, and
+[Agenda 040](packing/campaign/agendas/agenda-040-overnight-lower-bound-loop.md) is the
+current overnight lower-bound queue opened by Session 143’s review.
 The generated agenda map, not this narrative, summarizes commitment state.
 
-[Session 142](packing/campaign/agent-sessions/session-142-stack-correctness.md) is the
-latest terminal closeout: its correctness review replayed all four retained n=18
+[Session 143](packing/campaign/agent-sessions/session-143-lower-bound-math-review.md) is
+the latest terminal closeout: its four research lanes and three adversarial reviews
+produced
+[X-040](packing/campaign/explorations/X-040-lower-bound-mechanisms-beyond-the-one-body-ceiling.md),
+registered H-222 to H-231, opened agenda-040, corrected the Bentz 2016 transcription
+(D-505, D-506), and selected BC-361 under `think-pogj` as the next entry; no bound
+moved.
+[Session 142](packing/campaign/agent-sessions/session-142-stack-correctness.md) is
+the preceding terminal closeout: its correctness review replayed all four retained n=18
 certificates, repaired the stack in PR 202, and preserved `think-qqzs` as the next
 entry. The corrected code passed the full checkpoint; unchanged lower PR heads remain
 independently unready.
 [Session 141](packing/campaign/agent-sessions/session-141-n100-research.md) closed the
 preceding research pass: T-029 retained `s(18) >= 1871/400`, T-030 retained
-`s(18) >= 4679/1000`, H-218 and H-220 stay unconfirmed, and `think-qqzs` remains the
+`s(18) >= 4679/1000`, H-218 and H-220 stay unconfirmed, and `think-qqzs` remained the
 next entry. [Session 140](packing/campaign/agent-sessions/session-140-lb-survey.md)
 closed the stacked-PR survey of `n <= 100` lower bounds; it retained T-028
 `s(18) >= 187/40` and does not confirm H-218.
@@ -242,10 +251,13 @@ runners, so BC-355’s agenda cell still records `in_progress`. The block ran no
 scientific target and changed no theorem, hypothesis verdict, n=11 bound, or frontier
 record. The current order is:
 
-1. BC-357 / `think-qqzs` is the active block, opened by the overnight review in
-   [agenda-037](packing/campaign/agendas/agenda-037-n11-relational-certificate-program.md).
-   It closes M7’s n=6 point bracket at 299/100 after the G5 site-merge fix, a tooling
-   slice that needs no experiment registration.
+1. BC-361 / `think-pogj` is the active block, opened by Session 143’s review in
+   [agenda-040](packing/campaign/agendas/agenda-040-overnight-lower-bound-loop.md).
+   Session 144 decides H-223, H-224, and H-225 on the stock instruments under `exp-213`
+   to `exp-215`, with the BC-362 Bentz 2016 replay lane beside it.
+   BC-357 / `think-qqzs` stays the registered n=6 calibration entry in agenda-037: it
+   closes M7’s n=6 point bracket at 299/100 after the G5 site-merge fix and can fill an
+   idle slot.
 2. BC-354 / `think-0t5y` stopped at Route A’s representation boundary.
    Its source inventories found no complete 80-stratum negative-root producer, matched
    exact baseline, conditional gate, or method-distinct replay.
@@ -1026,6 +1038,22 @@ controller, not permission to blur contracts.
 
 ### Current Handoff
 
+[Session 143](packing/campaign/agent-sessions/session-143-lower-bound-math-review.md)
+completed the owner-directed deeper mathematical review of the lower-bound routes in
+[PR 204](https://github.com/jlevy/squares/pull/204).
+[X-040](packing/campaign/explorations/X-040-lower-bound-mechanisms-beyond-the-one-body-ceiling.md)
+reads the retained ceiling family as a fractional 8 + 3 packing, shows the corner deep
+branches neutral at the target sides, retires the theta screen and the four-wall stress
+theorem, identifies the one-spare integer cases 21 and 32, and corrects the Bentz 2016
+transcription (D-505, D-506). Ten hypotheses H-222 to H-231 are registered and
+[agenda-040](packing/campaign/agendas/agenda-040-overnight-lower-bound-loop.md) carries
+the overnight loop; no bound moved.
+
+**Selected next entry:** `think-pogj`, BC-361: decide H-223, H-224, and H-225 on the
+stock instruments in Session 144 under `exp-213` to `exp-215`, with the BC-362 Bentz
+2016 replay lane beside it.
+BC-357 / H-216 stays the registered n=6 calibration entry in agenda-037.
+
 [Session 142](packing/campaign/agent-sessions/session-142-stack-correctness.md)
 completed the correctness review and bounded pipeline repairs in
 [PR 202](https://github.com/jlevy/squares/pull/202). All four retained n=18 certificates
@@ -1045,7 +1073,10 @@ The current publication audit is tracked by `think-kq00`.
 stacked n<100 research loop.
 It retained T-029 `s(18) >= 1871/400` and T-030 `s(18) >= 4679/1000`, confirmed H-219
 and H-221, and left H-218 and H-220 unconfirmed.
-`think-qqzs` remains the selected scientific continuation after those prerequisites.
+`think-qqzs` was the selected scientific continuation behind those prerequisites until
+Session 143; H-216 stays the registered n=6 calibration entry, and the owner’s
+2026-09-20 direction runs the overnight lower-bound loop of agenda-040 beside the
+landing-readiness and pipeline blocks.
 [Session 140](packing/campaign/agent-sessions/session-140-lb-survey.md) closed the
 preceding stacked-PR n<=100 survey and retained T-028 `s(18) >= 187/40`.
 
@@ -1087,12 +1118,12 @@ existence determination;
 F1, blocked on tools; M6 stays retired with no Route D search hypothesis; SDP is not
 admitted and M2 stays retired.
 
-**Selected next entry:** `think-qqzs`, BC-357: close M7’s n=6 bracket at 299/100 under
-H-216. G1, G2, G3, and G5 are on main.
+**Selected next entry at that cutoff:** `think-qqzs`, BC-357: close M7’s n=6 bracket at
+299/100 under H-216. G1, G2, G3, and G5 are on main.
 G4 remains on this bead and is not H-216’s instrument.
 [Session 139](packing/campaign/agent-sessions/session-139-n11-overnight-research.md)
 stopped after encode-only timed out unresolved and T-027 retained `s(18) >= 467/100`.
-H-216 stays open. `think-qqzs` remains the next entry.
+H-216 stays open. `think-qqzs` was the next entry until Session 143 selected BC-361.
 
 BC-358, Route F1 / H-217, is blocked on the `think-g3j7` reader, `think-3xbr`, and
 `think-gyzw`. BC-359, the M3 kill test under `think-k4vb`, is tentative.
@@ -4077,6 +4108,16 @@ round that names the hypothesis, control roles included.
 | [H-219](packing/campaign/hypotheses/H-219-t028-seeded-colgen-raises-s18.md) | confirmed | A rows-complete covering of mass strictly below 18 exists at a container side in (187/40, 117/25) on a T-028-seeded stock-colgen site set | 1 | T-029 |
 | [H-220](packing/campaign/hypotheses/H-220-seedless-colgen-raises-nagamochi-floor.md) | unresolved | A rows-complete covering of mass strictly below n exists at a queued Nagamochi-only side on a seedless stock-colgen site set | 8 | exp-166 unresolved at 29.803318; exp-167 unresolved at 28.331329; exp-168 unresolved at 27.178193; exp-169 unresolved at 25.000000; exp-170 unresolved at 25.000000; exp-171 unresolved, freeze interval-refused; exp-172 unresolved at 42.137360; exp-173 unresolved at 41.236782 |
 | [H-221](packing/campaign/hypotheses/H-221-t029-seeded-colgen-raises-s18.md) | confirmed | A rows-complete covering of mass strictly below 18 exists at a container side in (1871/400, 117/25) on a T-029-seeded stock-colgen site set | 1 | T-030 |
+| [H-222](packing/campaign/hypotheses/H-222-n11-octagon-class-at-96-25.md) | blocked | The all-free corner class at n=11, 96/25, d = 1/2 has restricted covering value below 11; blocked on a convex corner-clip domain predicate | 0 | — |
+| [H-223](packing/campaign/hypotheses/H-223-n13-point-covering-at-399-100.md) | open | A point-atom certificate exists at n=13, 399/100 on a window-seeded site set; calibration under s(13) = 4 | 0 | — |
+| [H-224](packing/campaign/hypotheses/H-224-n17-ceiling-family-at-23-5.md) | open | A depth-one ceiling family of total 17 exists at n=17, 23/5, closing the fixed-shrink point route there for every site set | 0 | — |
+| [H-225](packing/campaign/hypotheses/H-225-n26-seeded-certificate-at-53-10.md) | open | A seeded point certificate exists at n=26, 53/10, a first-party floor above Nagamochi’s 5 | 0 | — |
+| [H-226](packing/campaign/hypotheses/H-226-n21-one-spare-wall-charge-lemma.md) | blocked | The one-spare wall-charge lemma closes n=21 after the Theorem 11 replay at the printed constant; blocked on the enumeration tool | 0 | — |
+| [H-227](packing/campaign/hypotheses/H-227-n32-one-spare-wall-charge-lemma.md) | blocked | The one-spare wall-charge lemma closes n=32; blocked on the same tool | 0 | — |
+| [H-228](packing/campaign/hypotheses/H-228-n12-unshrunk-covering-at-side-4.md) | blocked | An unshrunk covering below 12 exists at n=12, side 4; blocked on an unshrunk verifier | 0 | — |
+| [H-229](packing/campaign/hypotheses/H-229-n11-tilted-anchor-case-at-96-25.md) | blocked | The tilted-anchor case containing the 29° slot has covering value below 10 at 96/25; blocked on the non-convex domain instrument | 0 | — |
+| [H-230](packing/campaign/hypotheses/H-230-a6-family-violates-a-gap-wedge-conflict.md) | blocked | A gap-g wall-wedge conflict edge cuts the A6 64-family; blocked on the gap extension and a conflict-edge atom class | 0 | — |
+| [H-231](packing/campaign/hypotheses/H-231-theta-on-pose-cells.md) | open question | Theta on a sound pose-cell graph at n=11; stays retired under X-037’s condition | 0 | — |
 
 ### Confirmed
 
@@ -4245,9 +4286,9 @@ in separate tables: their units differ, and the same work can appear in both.
 
 | Rollups | count | turns | tool calls | errors | one-off code | wall |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| claimed by a session | 129 | 40,048 | 21,835 | 440 | 3,461 | 370.08 h |
+| claimed by a session | 138 | 41,150 | 22,506 | 452 | 3,554 | 373.78 h |
 | claimed by none | 60 | 11,110 | 6,539 | 156 | 946 | 51.75 h |
-| **measured** | **189** | **51,158** | **28,374** | **596** | **4,407** | **421.83 h** |
+| **measured** | **198** | **52,260** | **29,045** | **608** | **4,500** | **425.53 h** |
 
 | Session | Phases | Rollups | Turns | Tool calls | Errors | Wall |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -4288,7 +4329,8 @@ in separate tables: their units differ, and the same work can appear in both.
 | [session-109](packing/campaign/agent-sessions/session-109-corner-class-at-q.md) | 1 | 1 | 156 | 67 | 0 | 0.53 h |
 | [session-125](packing/campaign/agent-sessions/session-125-past-the-point-atom-ceiling.md) | 4 | 1 | 1,721 | 695 | 16 | 17.59 h |
 | [session-127](packing/campaign/agent-sessions/session-127-weighted-five-site-atom-admission.md) | 2 | 5 | 434 | 269 | 5 | 0.54 h |
-| *shared by 37 sessions* | — | 6 | 22,990 | 12,497 | 280 | 293.24 h |
+| [session-143](packing/campaign/agent-sessions/session-143-lower-bound-math-review.md) | 2 | 9 | 1,102 | 671 | 12 | 3.7 h |
+| *shared by 38 sessions* | — | 6 | 22,990 | 12,497 | 280 | 293.24 h |
 
 | Codex interval receipt | declaring sessions | model responses | agent time | active union | wall window | live lower bound |
 | --- | --- | ---: | ---: | ---: | ---: | --- |
@@ -4353,9 +4395,9 @@ in separate tables: their units differ, and the same work can appear in both.
 
 | Coverage | sessions |
 | --- | ---: |
-| measured | 88 |
+| measured | 89 |
 | unmeasured | 54 |
-| **total** | **142** |
+| **total** | **143** |
 
 <!-- END GENERATED: session-close-report -->
 
@@ -4923,12 +4965,12 @@ table above.
 
 Kept with the same discipline as the experiment record, because the aggregate says
 things no individual bug report can.
-The log contains 504 defects, [one line each](defects.md), generated from `defects.yaml`
+The log contains 506 defects, [one line each](defects.md), generated from `defects.yaml`
 and checked in the gate.
 
 | Class | Count | The system … |
 | --- | ---: | --- |
-| soundness | 100 | asserted something false about the mathematics |
+| soundness | 102 | asserted something false about the mathematics |
 | validity | 127 | was correct, but the measurement did not bear on the question |
 | bookkeeping | 190 | recorded something its own evidence contradicts |
 | robustness | 68 | did not finish, or finished only by luck |
@@ -4952,11 +4994,11 @@ That allocation remains unimplemented and needs measurement.
 
 Two observations the log exists to make.
 
-**79 of the 100 soundness defects pointed in the *flattering* direction**, where the
+**79 of the 102 soundness defects pointed in the *flattering* direction**, where the
 error looks like a success.
 That is the dangerous class, and it is the majority of it.
 
-**The automated gate has caught eighty defects in 504, and no soundness defect ever.**
+**The automated gate has caught eighty defects in 506, and no soundness defect ever.**
 Every soundness failure was found by a control cell whose answer was known in advance, a
 rule written down before the measurement, a generated view contradicting its source, or
 someone reading carefully.
@@ -5307,7 +5349,7 @@ It is contained rather than fixed — such delegations are recorded on completio
 `read_only` flag is better than permitting an empty list that would be ambiguous between
 “writes nothing” and “nobody filled this in”.
 
-116 fixes left no regression check behind.
+118 fixes left no regression check behind.
 [D-300](defects.md) remains open: the yielded session id, output, timeout/final poll,
 and exit survived, but invalid `gdate` precision left the start and end fields empty, so
 [D-202](defects.md), [D-217](defects.md), and `think-b3bm` remain open.
