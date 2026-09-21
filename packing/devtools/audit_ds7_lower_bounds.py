@@ -44,6 +44,59 @@ GREEN9 = "E-green-ds7-theorem9-reported-lower"
 GREEN10 = "E-green-ds7-theorem10-reported-lower"
 OPAQUE_TABLE = "E-friedman-ds7-table2-opaque-lower"
 EXTERNAL17 = "E-n017-anabologyco-weighted-certificate"
+EXTERNAL17_R012 = "E-n017-guzhou-r012-source-replay"
+EXTERNAL17_R012_INTERVAL = "E-n017-guzhou-r012-interval-decision"
+
+
+@dataclass(frozen=True)
+class ExternalReport:
+    """An indexed external report for n = 17, with the words its record entry carries."""
+
+    exact_form: str
+    value: str
+    source_key: str
+    note: str
+    scope: str
+    evidence: tuple[str, ...]
+    blocker: str | None
+    resource_local: str
+    resource_url: str
+
+
+EXTERNAL_REPORTS = {
+    EXTERNAL17: ExternalReport(
+        exact_form="9141/2000",
+        value="4.5705",
+        source_key="[GitHub n17 certificates 2026]",
+        note=(
+            "The indexed external v0.2.0 report states s(17) >= 9141/2000 = 4.5705; "
+            "the source checker has not been replayed completely here."
+        ),
+        scope="Source-reported only; no verification promotion.",
+        evidence=(EXTERNAL17,),
+        blocker="The complete source checker has not been independently replayed here.",
+        resource_local="packing/resources/web/n17-github-certificates-2026/README.md",
+        resource_url="https://github.com/anabologyco-maker/square17-lower-bound/tree/396da6f7c112f49b50b5f4563ad2486ef38ac909",
+    ),
+    EXTERNAL17_R012: ExternalReport(
+        exact_form="461300/99999",
+        value="4.613046130461",
+        source_key="[n17 weighted certificates 2026-09-20]",
+        note=(
+            "Guzhou0806's R012 parent-angle certificate of 20 September 2026 states "
+            "s(17) >= 461300/99999 = 4.61304613..., and both its own exact replay and "
+            "this repository's interval decision accept all 2925 catalogue entries."
+        ),
+        scope=(
+            "The source's report. What the replays here decided is recorded in T-031 "
+            "and in the verified field, not in this one."
+        ),
+        evidence=(EXTERNAL17_R012, EXTERNAL17_R012_INTERVAL),
+        blocker=None,
+        resource_local="packing/resources/web/n17-weighted-certificates-2026-09-20/README.md",
+        resource_url="https://github.com/Guzhou0806/n17-square-packing/tree/931a0dfd64302e277057006e99388fe5c00b7f53/certificates/R012",
+    ),
+}
 REVIEW_DATE = "2026-09-07"
 
 
@@ -247,6 +300,16 @@ def candidates(max_n: int = MAX_N) -> tuple[Candidate, ...]:
                 "anabologyco-maker",
             )
         )
+        # Found on 2026-09-20 and stronger than every other report at n17 and n18.
+        found.append(
+            Candidate(
+                "Guzhou0806 R012",
+                17,
+                sp.Rational(461300, 99999),
+                EXTERNAL17_R012,
+                "Guzhou0806",
+            )
+        )
     return tuple(found)
 
 
@@ -270,10 +333,9 @@ def reported_payload(candidate: Candidate, n: int) -> dict[str, Any]:
         raise ValueError(f"no adoption evidence is declared for {candidate.label}")
     exact = str(candidate.expression).replace("**", "^")
     value = str(sp.N(candidate.expression, 13))
-    external = candidate.evidence == EXTERNAL17
+    external = EXTERNAL_REPORTS.get(candidate.evidence)
     note = (
-        "The indexed external v0.2.0 report states s(17) >= 9141/2000 = 4.5705; "
-        "the source checker has not been replayed completely here."
+        external.note
         if external
         else f"Friedman's DS7 survey, {candidate.label}, reports this bound at "
         f"n={candidate.base_n}; reference [8] is Green's private communication (2000). "
@@ -288,15 +350,17 @@ def reported_payload(candidate: Candidate, n: int) -> dict[str, Any]:
             "The source does not explain that tension."
         )
     return {
-        "value": "4.5705" if external else value,
-        "exact_form": "9141/2000" if external else exact,
+        "value": external.value if external else value,
+        "exact_form": external.exact_form if external else exact,
         "kind": "monotonicity" if n != candidate.base_n else "unavoidable-points",
         "proved_by": [candidate.author],
         "proved_year": 2026 if external else 2000,
-        "source_key": "[GitHub n17 certificates 2026]" if external else "[Friedman DS7]",
+        "source_key": external.source_key if external else "[Friedman DS7]",
         "note": note,
-        "scope": "Source-reported only; no verification promotion.",
-        "evidence": [candidate.evidence],
+        "scope": external.scope
+        if external
+        else "Source-reported only; no verification promotion.",
+        "evidence": list(external.evidence) if external else [candidate.evidence],
     }
 
 
@@ -410,10 +474,16 @@ def source_paragraph(n: int, case: Mapping[str, Any]) -> str:
         if exact
         else (f"the decimal `{reported['value']}` for `s({n})`")
     )
+    same = exact is not None and exact == case["verified_lower_bound"].get("exact_form")
+    standing = (
+        "The reported and the independently verified lower bound are the same value here. "
+        if same
+        else "This changes the reported source field only; "
+        f"the independently verified lower bound remains `{verified}`. "
+    )
     return (
         f"The selected external report, {reported['source_key']}, gives {claim}. "
-        f"{reported['note']} This changes the reported source field only; "
-        f"the independently verified lower bound remains `{verified}`. "
+        f"{reported['note']} {standing}"
         "The [source audit](../devtools/audit_ds7_lower_bounds.py) compares the exact "
         "theorem expressions separately from opaque table decimals."
     )
@@ -457,7 +527,17 @@ def update_records(repo: Path, first_n: int = 1, last_n: int = MAX_N) -> list[in
             for evidence in selected["evidence"]:
                 if evidence not in case["evidence"]:
                     case["evidence"].append(evidence)
-            if not any(
+            report = next(
+                (
+                    EXTERNAL_REPORTS[key]
+                    for key in selected["evidence"]
+                    if key in EXTERNAL_REPORTS
+                ),
+                None,
+            )
+            # A report this repository has replayed and verified blocks nothing.
+            needs_blocker = report is None or report.blocker is not None
+            if needs_blocker and not any(
                 set(block.get("evidence", [])) & set(selected["evidence"])
                 for block in case["blockers"]
             ):
@@ -465,9 +545,8 @@ def update_records(repo: Path, first_n: int = 1, last_n: int = MAX_N) -> list[in
                     {
                         "kind": "source-evidence",
                         "detail": (
-                            "The complete source checker has not been independently "
-                            "replayed here."
-                            if EXTERNAL17 in selected["evidence"]
+                            report.blocker
+                            if report is not None and report.blocker is not None
                             else "The exact identity and rounding meaning of this "
                             "reported decimal are not supplied."
                             if OPAQUE_TABLE in selected["evidence"]
@@ -478,20 +557,29 @@ def update_records(repo: Path, first_n: int = 1, last_n: int = MAX_N) -> list[in
                         "evidence": list(selected["evidence"]),
                     }
                 )
-            if selected["source_key"] == "[GitHub n17 certificates 2026]" and not any(
+            if report is not None and not any(
                 resource["key"] == selected["source_key"] for resource in case["resources"]
             ):
                 case["resources"].append(
                     {
                         "key": selected["source_key"],
                         "role": "lower-bound-proof",
-                        "local": "packing/resources/web/n17-github-certificates-2026/README.md",
-                        "url": "https://github.com/anabologyco-maker/square17-lower-bound/tree/396da6f7c112f49b50b5f4563ad2486ef38ac909",
+                        "local": report.resource_local,
+                        "url": report.resource_url,
                         "retrieved": True,
                     }
                 )
             if n <= 100:
                 paragraph = source_paragraph(n, case)
+                # A rerun replaces the paragraph an earlier update wrote, with the
+                # heading this tool added for it, rather than stacking a second one.
+                body = re.sub(
+                    r"(?:## Reported Lower Bound\n\n)?The selected external report,.*?\n\n",
+                    "",
+                    body,
+                    count=1,
+                    flags=re.DOTALL,
+                )
                 marker = "## The lower bound\n"
                 if marker in body:
                     body = body.replace(marker, marker + "\n" + paragraph + "\n", 1)

@@ -1578,6 +1578,184 @@ evidence:
       Provenance per the source's README: built with a language model (GPT 5.6 Sol Pro),
       audited and formalized by "Claude Fable 5 (Anthropic)"; peer review pending.
     source_reviewed: '2026-09-07'
+  - id: E-n017-mira-4613-exact-replay
+    claim: lower-bound
+    scope: {n_values: [17]}
+    assurance: verified
+    method: exact-algebraic
+    performed_by: repository
+    relationship_to_generator: independent-implementation
+    origin: replayed-here
+    novelty: previously-published
+    source_key: '[n17 weighted certificates 2026-09-20]'
+    certificate: resources/web/n17-weighted-certificates-2026-09-20/mira-17squares/certificates/lower_bound_4p613/best-certificate.json
+    replay: uv run --frozen --all-extras --group dev python resources/web/n17-weighted-certificates-2026-09-20/replay_mira_4613_first_party.py
+    replay_status: passed
+    external_review:
+      state: informally-verified
+      date: '2026-09-20'
+      reviewed_by: repository (session-148 proof review)
+      note: >-
+        Mira's PROOF.md sections 3 and 6 were worked through in
+        docs/project/reviews/review-2026-09-20-n17-r012-and-mira-4613-proof-review.md
+        (finding F11). Its containment condition B^2(1+h)^2 < 1+h^2 is correct and is
+        the sharpened form of this repository's Condition 4; its dilation endpoint is
+        this repository's T-022 lemma. Neither is used by this entry, which rests on
+        Condition 4 as this repository states it. Mira's C++ kernel was read and was
+        not compiled or run.
+    limitations: >-
+      Mira's certificate (github.com/Mira-acc/17squares, commit
+      0266c9936a303817ac7da0802364034a34fb2558, 7 September 2026; SHA-256 749f1333...) is
+      in this repository's own certificate schema, because it descends from the T-019
+      certificate, so sqpack.fractional.certificate.verify decides it without a
+      translation layer: 1620 atoms, L = 4613/1000, B = 19997/20000, a 2880-step net.
+      The 2026-09-20 replay passed all five conditions in 423 s: total mass
+      849899249/50000000 < 17; Condition 4 as B(1 + D) = 28799821518679/28800000000000
+      < 1; least cell mass 1000002103/1000000000 at net direction 2194, equal to the
+      value the source declares. The receipt is
+      resources/web/n17-weighted-certificates-2026-09-20/receipts/mira-4613-first-party-exact.json.
+      What this decides is s(17) >= 4613/1000, the container side. Mira's headline is
+      larger, the dilation endpoint 4.61302863588611..., and that step is not replayed
+      here: no T-022-style proof note exists for this certificate, and the value is
+      2.9e-5 above the side.
+      The slack is 2103 parts in 10^9, so the certificate is nearly tight; the control
+      test lightens every weight by three parts in a million and the same sweep refuses
+      it. The generator is Mira's, a covering LP with dual-priced column generation, and
+      it is not trusted or rerun. Mira's package discloses AI assistance and is not peer
+      reviewed.
+    source_reviewed: '2026-09-20'
+  - id: E-n017-mira-4613-interval-decision
+    claim: lower-bound
+    scope: {n_values: [17]}
+    assurance: verified
+    method: interval-certified
+    performed_by: repository
+    relationship_to_generator: independent-implementation
+    origin: replayed-here
+    novelty: previously-published
+    source_key: '[n17 weighted certificates 2026-09-20]'
+    certificate: resources/web/n17-weighted-certificates-2026-09-20/mira-17squares/certificates/lower_bound_4p613/best-certificate.json
+    replay: uv run --frozen --all-extras --group dev python resources/web/n17-weighted-certificates-2026-09-20/replay_mira_4613_first_party.py --interval
+    replay_status: passed
+    limitations: >-
+      The second decision of the same bytes, by sqpack.fractional.interval: branch and
+      bound over boxes of centres in outward-rounded interval arithmetic with exact
+      integer masses, on the doubled net of 5761 directions, so the D4 reflection
+      argument and Condition 1 are not used. It shares the certificate object and the
+      closed-form conditions with E-n017-mira-4613-exact-replay and shares no part of
+      how Condition 5 is decided. The 2026-09-20 run certified all 5761 directions with
+      none refuted and none undecided, none stalled and none out of budget, over
+      70,019,687 boxes in 1702 s, and pinned the least covered mass to the zero-width
+      enclosure [1000002103/1000000000, 1000002103/1000000000], the same value the
+      exact route computed and the source declared, attained at direction 2194. The receipt is
+      resources/web/n17-weighted-certificates-2026-09-20/receipts/mira-4613-first-party-interval.json.
+      As with the exact entry, the statement decided is the container side 4613/1000 and
+      not Mira's dilation endpoint.
+    source_reviewed: '2026-09-20'
+  - id: E-n017-guzhou-r012-source-replay
+    claim: lower-bound
+    scope: {n_values: [17, 18, 19]}
+    assurance: verified
+    method: exact-algebraic
+    performed_by: repository
+    relationship_to_generator: same-implementation
+    origin: replayed-here
+    novelty: previously-published
+    source_key: '[n17 weighted certificates 2026-09-20]'
+    certificate: resources/web/n17-weighted-certificates-2026-09-20/guzhou0806-n17-square-packing/certificates/R012/orbits.json
+    replay: uv run --frozen python -X utf8 -B -S resources/web/n17-weighted-certificates-2026-09-20/guzhou0806-n17-square-packing/certificates/R012/verify.py --workers 4 --output "$(mktemp -d)/run"
+    replay_status: passed
+    external_review:
+      state: informally-verified
+      date: '2026-09-20'
+      reviewed_by: repository (session-148 proof review)
+      note: >-
+        PROOF.md, verify.py and sweep.py were read line by line in
+        docs/project/reviews/review-2026-09-20-n17-r012-and-mira-4613-proof-review.md.
+        No error was found and none of its eleven findings is blocking. The written
+        proof omits two steps, and the review supplies them: that the endpoint-only
+        containment test covers the whole parent-angle interval (F1, monotonicity of
+        cos d + |sin d| on [0, pi/4]), and that [r, L-r]^2 with r from the endpoint
+        minimum of f is exactly the union of legal parent centres (F2, quasi-concavity
+        of f). The review also re-derived all 2925 obligations from orbits.json and
+        catalogue.json alone and decided each with this repository's sweep kernel; the
+        exact minimum agreed with the source's on every entry. That script is review
+        scratch and is not a retained instrument.
+    limitations: >-
+      Replays the source's own pure-Python exact checker over the archived R012 bytes
+      (github.com/Guzhou0806/n17-square-packing, commit
+      931a0dfd64302e277057006e99388fe5c00b7f53, 20 September 2026). The argument is this
+      repository's weighted method with three changes: parents of side A = 99999/100000
+      at L = 4613/1000, rescaled at the end; a catalogue of 2925 closed parent-angle
+      intervals, each choosing its own concentric core direction and side; and coverage
+      required only over the legal parent-centre square for the interval, not over every
+      contained core. The measure is Mira's 1620 atoms rounded to 10^-5, weights rounded
+      up to 10^-6, 1616 atoms in 206 D4 orbits of mass 424969/25000; every core must
+      capture gamma = 250023/250000, and 17 gamma - M = 701/250000 > 0 gives
+      s(17) >= L/A = 461300/99999.
+      The 2026-09-20 replay under Python 3.14.7 printed
+      PASS_COMPLETE_PARENT_CATALOGUE_GLOBAL_LOWER_BOUND in 340 s on 8 workers: all 2925
+      intervals recomputed over 9,231,165 centre strips, catalogue minimum exactly gamma,
+      least containment margin about 2.3e-9. Receipts are
+      resources/web/n17-weighted-certificates-2026-09-20/receipts/guzhou-r012-source-replay-2026-09-20.result.json
+      and the per-entry rows beside it.
+      The source's sweep.py descends from this repository's sqpack.fractional.sweep, so
+      this entry and any decision by that kernel share an ancestor; the method-distinct
+      decision is E-n017-guzhou-r012-interval-decision. R012 does not depend on Mira's
+      certificate being valid: it recomputes every obligation on its own measure. The
+      gain over Mira's endpoint is 1.7e-5. The author discloses AI assistance and
+      asserts neither priority nor peer review.
+      Scope note: the contradiction is 17 gamma > M, so the same measure and catalogue
+      give the same side for every integer above M/gamma, which is 17 and upward. That
+      is why n = 18 and n = 19 are in scope without a monotonicity step; both already
+      hold larger verified values, so nothing there moves.
+    source_reviewed: '2026-09-20'
+  - id: E-n017-guzhou-r012-interval-decision
+    claim: lower-bound
+    scope: {n_values: [17, 18, 19]}
+    assurance: verified
+    method: interval-certified
+    performed_by: repository
+    relationship_to_generator: independent-implementation
+    origin: audited-here
+    novelty: previously-published
+    source_key: '[n17 weighted certificates 2026-09-20]'
+    certificate: resources/web/n17-weighted-certificates-2026-09-20/guzhou0806-n17-square-packing/certificates/R012/catalogue.json
+    replay: uv run --frozen --all-extras --group dev python resources/web/n17-weighted-certificates-2026-09-20/replay_guzhou_r012_first_party.py --entries all --workers 4 --tag 001 --source-coverage resources/web/n17-weighted-certificates-2026-09-20/receipts/guzhou-r012-source-replay-2026-09-20.coverage.jsonl.xz
+    replay_status: passed
+    limitations: >-
+      A first-party decision of R012 that imports nothing from the source. The measure,
+      the catalogue, contiguity from 0 to T with T^2 + 2T - 1 > 0, strict containment of
+      each core at both interval endpoints with the relative angle inside pi/4, each
+      parent-centre inset, 17 gamma - M = 701/250000 and (L/A)^2 above Mira's endpoint
+      squared are rebuilt and checked in exact rational arithmetic. Coverage is decided
+      by sqpack.fractional.interval, the branch and bound over centre boxes, through a
+      subclass that changes one thing: the centre domain is [r, L-r]^2, which the inset
+      check proves is inside the stock contained-core domain. The threshold is the
+      integer 1000092 on the measure's own 10^6 mass scale, which for an integer mass is
+      exactly mass >= gamma.
+      The 2026-09-20 run certified all 2925 entries at or above gamma over 34,465,227
+      boxes in 226 s on 4 workers, none stalled and none out of budget; the least
+      certified lower bound is gamma itself, first at entry 504; and every one of the
+      2925 brackets contains the minimum the source's exact replay reported. Ten
+      negative controls passed: the source's five counterexample recipes come out below
+      one at their stated centres, a threshold one unit above gamma is refuted at an
+      entry that attains gamma, two lightened measures are refuted, and the restricted
+      initial box is shown to enclose the exact domain. The same tool checks the lineage
+      from bytes: R012's 1616 sites are Mira's 1620 atoms snapped to the 10^-5 grid, the
+      largest move 70549/14121900000, and every R012 weight exceeds the summed Mira
+      weight at its site by between 10^-9 and 1.818e-6. The receipt is
+      resources/web/n17-weighted-certificates-2026-09-20/receipts/guzhou-r012-first-party-001.json.
+      What the computation does not decide is the reduction from a packing to these
+      2925 obligations: folding a parent angle into [0, T] by D4, the endpoint
+      containment test, the union of centre squares, the counting step and the rescaling.
+      Those are short arguments, read and closed in the proof review named in
+      E-n017-guzhou-r012-source-replay, and they are a careful reading and not a machine
+      check.
+      Scope note: as with the source replay, the mass gap is what bounds n, so the
+      decision covers every size above M/gamma; n = 18 and n = 19 already hold larger
+      verified values.
+    source_reviewed: '2026-09-20'
   - id: E-n017-massaccesi-h052-agreement
     claim: lower-bound
     scope: {n_values: [17, 18, 19]}

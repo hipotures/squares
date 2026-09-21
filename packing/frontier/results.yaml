@@ -1776,3 +1776,85 @@ results:
       packing is 4.82287566, so the real runway is 0.1439 to the packing. C5 is
       review-ready under epistemics.md -- a mapped, non-superseded review artifact
       -- and none has been written for this result.
+  - id: T-031
+    claim: >-
+      s(17) >= 461300/99999 = 4.61304613..., by Guzhou0806's R012 parent-angle
+      certificate of 20 September 2026, replayed here by the source's exact checker and
+      decided again by this repository's interval branch and bound. Beneath it,
+      s(17) >= 4613/1000 by Mira's 1620-atom weighted certificate of 7 September 2026,
+      which is in this repository's certificate schema and which both stock verifiers
+      accept unchanged. Both are externally produced, previously published and not peer
+      reviewed; both descend from T-019 and credit it; no new first-party mathematics is
+      claimed. The case previously held 459/100 from T-019, and the movement is
+      +0.02305 at the R012 value and +0.023 at Mira's side.
+      The R012 argument is this repository's weighted method with three changes. Parents
+      have side A = 99999/100000 inside [0, L]^2 at L = 4613/1000, and the bound is L/A.
+      A catalogue of 2925 closed parent-angle intervals covers [0, pi/4], and each
+      interval picks its own concentric closed core, by direction and side, strictly
+      inside every parent of the interval. Coverage by the measure is required only over
+      the legal parent-centre square for the interval. The measure is Mira's, rounded to
+      10^-5 with weights rounded up, 1616 atoms of mass 424969/25000; every core
+      captures at least gamma = 250023/250000, and 17 gamma exceeds the mass by
+      701/250000.
+      One size. The measure's mass is just below 17, so the certificate also says
+      s(18) and s(19) are at least this value, and the register already holds 4679/1000
+      and 24/5 there.
+    scope: {n_values: [17]}
+    verification: V4
+    confirmation: C4
+    significance:
+      score: 3
+      rationale: >-
+        Raises the verified lower bound at n = 17 by 0.02305 over T-019 and closes the
+        gap to Bidwell's 4.67553009 to 0.0625. Scored as T-015 was, and for the same
+        reason: an externally proposed, source-backed result that this repository
+        replayed, decided by a second method and read closely, not new first-party
+        mathematics. Two things keep it at S3. The technique is the one T-017 and T-019
+        banked, extended by others; and almost all of the movement is Mira's support and
+        weights, R012's selector and parent-centre restriction adding 1.7e-5 on a fixed
+        measure. What those two extensions are worth on a measure optimised against them
+        is open and is not this result.
+      scored: '2026-09-20'
+      by: session-148 (repository; no independent evaluator)
+    novelty: previously-published
+    composition: >-
+      Primary at n = 17 on the R012 certificate: the bound is L/A from one catalogue and
+      one measure, with no monotonicity step. C4 is earned on that certificate by two
+      evidence entries whose methods differ, the source's exact event-cell replay and
+      this repository's interval decision of all 2925 entries, both passing on the
+      archived bytes. The exact route is the source's own checker, whose sweep descends
+      from this repository's, so its independence is of method from the interval route
+      and not of authorship from the generator; the proof review also decided every
+      entry with this repository's sweep kernel and agreed on all 2925 minima, as review
+      scratch. Mira's certificate carries its own pair of entries, the stock exact
+      verifier and the stock interval verifier, and supports the weaker statement
+      s(17) >= 4613/1000 independently of R012. The reduction from a packing to R012's
+      finite obligations is a read argument, closed in the review artifact, and is what
+      a formal port would address.
+    produced_by:
+      session: session-148
+    review_artifact: docs/project/reviews/review-2026-09-20-n17-r012-and-mira-4613-proof-review.md
+    evidence:
+      - E-n017-guzhou-r012-source-replay
+      - E-n017-guzhou-r012-interval-decision
+      - E-n017-mira-4613-exact-replay
+      - E-n017-mira-4613-interval-decision
+    artifacts:
+      - packing/resources/web/n17-weighted-certificates-2026-09-20/README.md
+      - packing/resources/web/n17-weighted-certificates-2026-09-20/guzhou0806-n17-square-packing/certificates/R012/PROOF.md
+      - packing/resources/web/n17-weighted-certificates-2026-09-20/guzhou0806-n17-square-packing/certificates/R012/verify.py
+      - packing/resources/web/n17-weighted-certificates-2026-09-20/replay_guzhou_r012_first_party.py
+      - packing/resources/web/n17-weighted-certificates-2026-09-20/replay_mira_4613_first_party.py
+      - packing/resources/web/n17-weighted-certificates-2026-09-20/mira-17squares/certificates/lower_bound_4p613/best-certificate.json
+    controls:
+      - packing/tests/test_n17_external_weighted_certificates.py
+    next_rung: >-
+      Mira's dilation endpoint, 4.61302863588611..., needs a T-022-style proof note for
+      this certificate and is superseded by the R012 value in any case. A retained
+      exact-route instrument for R012 that does not share the source's sweep lineage
+      would make the exact leg first-party; the review's scratch pass shows the stock
+      kernel decides every entry in about six minutes once its centre domain is a
+      parameter. V5 by a proof-assistant port of the reduction. The method's open
+      question is what the selector and the parent-centre restriction gain when the
+      measure is optimised against them; Mira reports a failed attempt at 4.615 on the
+      unrestricted test.

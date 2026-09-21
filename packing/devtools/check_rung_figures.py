@@ -100,6 +100,13 @@ PROSE_FIELDS = ("claim", "significance.rationale", "next_rung", "composition")
 #: an immutable historical rung, and the two are never interchangeable here.
 LIVE_CERTIFICATE = "certificate.json"
 
+#: Another author's archived bytes. A result that adopts an external certificate names
+#: it among its artifacts, but the `certificate.json` pointer convention is this
+#: repository's own and the archive is never renamed to satisfy it (T-031 adopts Mira's
+#: `best-certificate.json`), so these are not read as rung pointers. The figures in such
+#: a result's prose are checked by that result's own controls and receipts instead.
+ARCHIVE_PREFIX = "packing/resources/"
+
 #: Enough significant figures for any fraction this register carries (the largest
 #: denominators seen are in the low millions) with wide headroom; matches the pattern
 #: `check_nagamochi_bounds.py` already uses for the same reason.
@@ -387,6 +394,7 @@ def resolve_certificates(result: dict) -> ResolvedCertificates:
         figures
         for artifact in result.get("artifacts", [])
         if isinstance(artifact, str)
+        and not artifact.startswith(ARCHIVE_PREFIX)
         and (path := _repo_relative_path(artifact)) is not None
         and (figures := load_certificate(path)) is not None
     ]

@@ -157,6 +157,7 @@ Each entry summarizes one user-level research window. Cycle slots are wall-clock
 | [session-140](agent-sessions/session-140-lb-survey.md) | stopped | contemporaneous | `review-planning-oversight` (process) | `review-planning-oversight` (process) | 3 | think-8x4t | Continue H-216 under think-qqzs. |
 | [session-141](agent-sessions/session-141-n100-research.md) | stopped | contemporaneous | `review-planning-oversight` (process) | `review-planning-oversight` (process) | 3 | think-ul7y | Continue H-216 under think-qqzs. |
 | [session-142](agent-sessions/session-142-stack-correctness.md) | completed | contemporaneous | `pipeline-improvement` (correctness) | `factual-review` (correctness) | 2 | think-gz4k | Return to H-216 under think-qqzs. |
+| [session-148](agent-sessions/session-148-n17-external-intake.md) | completed | contemporaneous | `research-survey` (correctness) | `documentation-pass` (process) | 3 | think-pcd0 | Open the pull request and reconcile the T-031 identifier with pull request 208, which claims the same number from the open overnight stack. |
 
 ### Workflow summary
 
@@ -164,14 +165,14 @@ Declared counts are contemporaneous contracts; retrospective counts are reconstr
 
 | workflow | declared entries | retrospective entries | declared phases | retrospective phases |
 | --- | ---: | ---: | ---: | ---: |
-| `research-survey` | 2 | 2 | 13 | 2 |
-| `factual-review` | 7 | 0 | 53 | 2 |
+| `research-survey` | 3 | 2 | 14 | 2 |
+| `factual-review` | 7 | 0 | 54 | 2 |
 | `insight-iteration` | 24 | 1 | 80 | 4 |
 | `process-review` | 16 | 4 | 64 | 6 |
 | `efficiency-loop` | 10 | 1 | 36 | 1 |
 | `research-loop` | 27 | 4 | 101 | 8 |
 | `pipeline-improvement` | 34 | 2 | 152 | 5 |
-| `documentation-pass` | 1 | 0 | 24 | 1 |
+| `documentation-pass` | 1 | 0 | 25 | 1 |
 | `remediation` | 0 | 1 | 0 | 3 |
 | `review-planning-oversight` | 5 | 0 | 21 | 2 |
 | `general-improvement` | 1 | 0 | 7 | 1 |

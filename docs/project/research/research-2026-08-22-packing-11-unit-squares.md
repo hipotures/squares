@@ -879,8 +879,8 @@ Use the structured form to query or plot; use these tables to read.
 | --- | --- | --- | --- | --- | --- | --- |
 | 11 | 3.87708359 | hand | 8 | 3.788854 | unavoidable points | 0.0882 |
 | 12 | 4 | grid | — | 3.788854 | monotone from `s(11)` | 0.2111 |
-| 17 | 4.67553009 | hand | 18 | 4.5705 | unavoidable points | 0.105 |
-| 18 | `(7/2) + (1/2)√7` = 4.82287566 | hand | — | 4.5705 | monotone from `s(17)` | 0.2524 |
+| 17 | 4.67553009 | hand | 18 | 4.613046 | unavoidable points | 0.0625 |
+| 18 | `(7/2) + (1/2)√7` = 4.82287566 | hand | — | 4.613046 | monotone from `s(17)` | 0.2098 |
 | 19 | `3 + (4/3)√2` = 4.88561808 | hand | — | 4.617282 | unavoidable points | 0.2683 |
 | 20 | 5 | grid | — | 4.617282 | monotone | 0.3827 |
 | 21 | 5 | grid | — | 4.7438 | unavoidable points | 0.2562 |

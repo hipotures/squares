@@ -101,6 +101,7 @@ action for each are in [`frontier/RESULTS.md`](packing/frontier/RESULTS.md); the
 | [T-028](packing/frontier/RESULTS.md) | 18 | `V4` | `C4` | `S3` | `apparently-novel` | s(18) >= 187/40 = 4.675, from a first-party weighted fractional unavoidable-set certificate at container side 187/40. |
 | [T-029](packing/frontier/RESULTS.md) | 18 | `V4` | `C4` | `S3` | `apparently-novel` | s(18) >= 1871/400 = 4.6775, from a first-party weighted fractional unavoidable-set certificate at container side 1871/400. |
 | [T-030](packing/frontier/RESULTS.md) | 18 | `V4` | `C4` | `S3` | `apparently-novel` | s(18) >= 4679/1000 = 4.679, from a first-party weighted fractional unavoidable-set certificate at container side 4679/1000. |
+| [T-031](packing/frontier/RESULTS.md) | 17 | `V4` | `C4` | `S3` | `previously-published` | s(17) >= 461300/99999 = 4.61304613 …, by Guzhou0806’s R012 parent-angle certificate of 20 September 2026, replayed here by the source’s exact checker and decided again by this repository’s interval branch and bound. |
 | [T-004](packing/frontier/RESULTS.md) | 46 | `V4` | `C3` | `S3` | `previously-published` | Bentz 2010, Theorem 8: the printed 45-point unavoidable-set argument for s(46) >= 7 is correct as printed, machine-audited in full. |
 | [T-008](packing/frontier/RESULTS.md) | 46 | `V4` | `C3` | `S3` | `previously-published` | s(46) = 7: the lower half by T-004’s audited unavoidable set, the upper half by the exact 7 x 7 grid packing of 46 squares. |
 | [T-009](packing/frontier/RESULTS.md) | 29 | `V4` | `C3` | `S3` | `apparently-novel` | s(29) <= 5.93383346267692918974379895098, by a Krawczyk interval certificate over the retained rational 29-square witness at a declared relaxation of 1e-20. |
@@ -385,6 +386,7 @@ case or experiment separately.
 | Document or collection | Role | Authority | Lifecycle | Current replacement |
 | --- | --- | --- | --- | --- |
 | [Senior Review of PRs 199–201](docs/project/reviews/review-2026-09-19-pr199-201-correctness.md) | dated review record | record | retained | — |
+| [Proof Review: R012 `s(17) >= 461300/99999` and Mira’s `4.613` Certificate](docs/project/reviews/review-2026-09-20-n17-r012-and-mira-4613-proof-review.md) | dated review record | record | retained | — |
 | [Square-packing workbench](packages/workbench/README.md) | component scope and use | current | maintained | — |
 | [The checkers’ probes](packages/workbench/probes/README.md) | component scope and use | supporting | maintained | — |
 | [Foundation Benchmark Replay Fixture](packages/workbench/tests/fixtures/benchmark-foundation/README.md) | component scope and use | supporting | maintained | — |

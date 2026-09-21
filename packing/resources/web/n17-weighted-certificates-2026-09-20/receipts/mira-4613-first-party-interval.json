@@ -1,0 +1,81 @@
+{
+  "tool": "packing/resources/web/n17-weighted-certificates-2026-09-20/replay_mira_4613_first_party.py",
+  "generated_at": "2026-09-20T17:05:12.861484+00:00",
+  "certificate": "packing/resources/web/n17-weighted-certificates-2026-09-20/mira-17squares/certificates/lower_bound_4p613/best-certificate.json",
+  "certificate_sha256": "749f13335980a66a27a2304f212b5d8796390c81b962149647a4d9ff43a228ec",
+  "certificate_unchanged_after_replay": true,
+  "source_repository": "github.com/Mira-acc/17squares",
+  "source_commit": "0266c9936a303817ac7da0802364034a34fb2558",
+  "certificate_claim_field": "candidate only; exact replay required",
+  "declared_by_source": {
+    "total_mass": "849899249/50000000",
+    "minimum_mass": "1000002103/1000000000",
+    "slabs": 9116871,
+    "strict_decimal_bound": "4.613028635886"
+  },
+  "interpreter": "3.14.7",
+  "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+  "worktree_commit": "061e9ffbcf3508acb11fc968abd1e1dd762950cd",
+  "wall_seconds": 1702.547,
+  "containment": {
+    "largest_half_gap_tangent": "207107/1440000000",
+    "square_side": "19997/20000",
+    "coarse_product": "28799821518679/28800000000000",
+    "coarse_slack": "178481321/28800000000000",
+    "coarse_holds": true,
+    "sharp_left": "829429719507765981945905041/829440000000000000000000000",
+    "sharp_right": "2073600042893309449/2073600000000000000",
+    "sharp_slack": "3432549852599218031653/276480000000000000000000000",
+    "sharp_holds": true
+  },
+  "result": {
+    "stage": "interval",
+    "sampled_directions": null,
+    "doubled_net_directions": 5761,
+    "wall_seconds": 1702.202,
+    "conditions": [
+      {
+        "name": "Condition 2 total mass below n",
+        "detail": "total 849899249/50000000 against n = 17, exact integers",
+        "status": "holds"
+      },
+      {
+        "name": "Condition 3 net reaches pi/4",
+        "detail": "t_K^2 + 2 t_K - 1 in [1.238e-06, 1.238e-06]",
+        "status": "holds"
+      },
+      {
+        "name": "Condition 4 containment B(1 + D) < 1",
+        "detail": "B(1 + D) in [0.999993802732, 0.999993802732]",
+        "status": "holds"
+      },
+      {
+        "name": "Condition 5 every admissible centre covers mass 1",
+        "detail": "5761 directions, 70019687 boxes, 0 stalled, 0 budget-exhausted; least point mass 1000002103/1000000000 at 2194",
+        "status": "holds"
+      }
+    ],
+    "direction_statuses": {
+      "certified": 5761,
+      "refuted": 0,
+      "undecided": 0
+    },
+    "boxes": 70019687,
+    "stalled": 0,
+    "budget_exhausted": 0,
+    "total_mass": "849899249/50000000",
+    "accepted": true,
+    "enclosure": [
+      "1000002103/1000000000",
+      "1000002103/1000000000"
+    ],
+    "total_mass_check": {
+      "computed": "849899249/50000000",
+      "declared": "849899249/50000000",
+      "agrees": true
+    },
+    "declared_minimum_inside_enclosure": true
+  },
+  "smoke": false,
+  "refusals": []
+}
