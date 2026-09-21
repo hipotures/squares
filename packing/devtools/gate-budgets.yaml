@@ -621,12 +621,22 @@ tiers:
     cent of the 145s ceiling the first two readings had set, and is why that ceiling is
     154s now. Two are the readings the superseded record was built from:
     125.16s and 124.40s in run 35182460400, attempts 2 and 3 (jobs 105078217114 and
-    105079133540), on PR 188 exact head be28ad5a, 3,008 passed and 6 skipped. The
-    2026-09-17 pair stays in the mean rather than being replaced by it, because it is a
-    reading of this same shard -- 162 of its 163 files are the same files -- and because
-    PR 212's own trio settles what the argument was about: the same shard cost 240.2 and
-    449.9 test-seconds hours apart, so a record taken from either edge of the pool starves
-    one rule to feed the other. `D-472` is that lesson from the fast side, and the
+    105079133540), on PR 188 exact head be28ad5a, 3,008 passed and 6 skipped.
+
+    What moved between the two heads is the runner and not the shard, which is why the
+    2026-09-17 pair stays in the mean rather than being replaced by it. Shard B runs more
+    tests than it did (3,008 to 3,140 passing) in less wall, and the obvious reading of
+    that -- the recorded-cost partition rebalanced when the agenda-040 stack added test
+    files -- is wrong twice over. By mechanism: `suite-file-costs.json` has not changed
+    since c4f0660d, the greedy packing reads only that record, so no recorded file can
+    have changed shard, and each of the 10 files added since takes `crc32(path) mod 2`.
+    By measurement: 162 of this shard's 163 files are common to the two heads, the 10
+    added are 117 tests and 1.8 test-seconds between them, and across the 99 common files
+    whose test count did not change the median per-file ratio is 1.91x -- a repartition
+    moves files, it does not make a file that stayed put 1.91x cheaper. PR 212's own trio
+    then settles it without any cross-head comparison at all: one byte-identical shard
+    cost 240.2 and 449.9 test-seconds hours apart on 2026-09-21. So a record taken from
+    either edge of the pool starves one rule to feed the other. `D-472` is that lesson from the fast side, and the
     typecheck entry below is the same repair from this one: its 38.15s stale-rule failure
     went into the mean with the two readings before it rather than over them.
   history:
