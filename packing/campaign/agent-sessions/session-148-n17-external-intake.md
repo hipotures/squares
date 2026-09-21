@@ -192,8 +192,8 @@ session:
     Both certificates are decided, the register states what they support, and both
     authors are credited. No search for a stronger bound was started.
   next_action: >-
-    Open the pull request and reconcile the T-031 identifier with pull request 208,
-    which claims the same number from the open overnight stack.
+    Reconcile the T-031 identifier with pull request 208, which claims the same number
+    from the open overnight stack, under think-pcd0.
 ---
 # Session 148: Two External Certificates at `n = 17`
 

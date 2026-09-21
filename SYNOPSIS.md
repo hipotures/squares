@@ -4247,9 +4247,9 @@ in separate tables: their units differ, and the same work can appear in both.
 
 | Rollups | count | turns | tool calls | errors | one-off code | wall |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| claimed by a session | 129 | 40,048 | 21,835 | 440 | 3,461 | 370.08 h |
+| claimed by a session | 130 | 40,418 | 22,020 | 442 | 3,484 | 388.74 h |
 | claimed by none | 60 | 11,110 | 6,539 | 156 | 946 | 51.75 h |
-| **measured** | **189** | **51,158** | **28,374** | **596** | **4,407** | **421.83 h** |
+| **measured** | **190** | **51,528** | **28,559** | **598** | **4,430** | **440.49 h** |
 
 | Session | Phases | Rollups | Turns | Tool calls | Errors | Wall |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -4290,7 +4290,8 @@ in separate tables: their units differ, and the same work can appear in both.
 | [session-109](packing/campaign/agent-sessions/session-109-corner-class-at-q.md) | 1 | 1 | 156 | 67 | 0 | 0.53 h |
 | [session-125](packing/campaign/agent-sessions/session-125-past-the-point-atom-ceiling.md) | 4 | 1 | 1,721 | 695 | 16 | 17.59 h |
 | [session-127](packing/campaign/agent-sessions/session-127-weighted-five-site-atom-admission.md) | 2 | 5 | 434 | 269 | 5 | 0.54 h |
-| *shared by 37 sessions* | — | 6 | 22,990 | 12,497 | 280 | 293.24 h |
+| [session-148](packing/campaign/agent-sessions/session-148-n17-external-intake.md) | 3 | 1 | 370 | 185 | 2 | 18.66 h |
+| *shared by 38 sessions* | — | 6 | 22,990 | 12,497 | 280 | 293.24 h |
 
 | Codex interval receipt | declaring sessions | model responses | agent time | active union | wall window | live lower bound |
 | --- | --- | ---: | ---: | ---: | ---: | --- |
@@ -4355,9 +4356,9 @@ in separate tables: their units differ, and the same work can appear in both.
 
 | Coverage | sessions |
 | --- | ---: |
-| measured | 88 |
+| measured | 89 |
 | unmeasured | 54 |
-| **total** | **142** |
+| **total** | **143** |
 
 <!-- END GENERATED: session-close-report -->
 
