@@ -582,37 +582,48 @@ tiers:
 
 - id: suite_b
   command: packing-validate --suite-b
-  # 157s, and the first ceiling this entry has set for itself. The three before it were
+  # 145s, and the first ceiling this entry has set for itself. The three before it were
   # all 180: OR-14's pull-request wall, borrowed as an absolute bound because a shard
   # job's wall is a share of that wall. That is the loosest a per-tier ceiling can be --
   # it says only that this one job of seven may spend the whole surface's budget -- and
   # `OR-17` is the rule that a routine gate carries a ceiling of its own rather than the
-  # surface's.
+  # surface's. 35s of the pull-request wall go back to the surface with it.
   #
-  # 157s is 1.50x of the record below, placed just under the drift rule's 157.18s so the
-  # absolute bound never waits for a number the record-relative rule has already passed.
-  # That is the `fast` entry's construction, and it is a band rather than a target from
-  # both edges: it clears the slowest wall this tier has ever read at the reference shape
-  # (125.16s) by a quarter, which is the runner variance this entry's own history prices
-  # at 1.59-1.91x; and it sits far below the roughly 240 test-seconds the shard
-  # accumulates, which is what this job costs if `-n 4 --dist=loadfile` stops dividing --
-  # the regression an absolute ceiling on a pre-collection shard is actually for. Rule 2
-  # would permit 209s. The tier has no use for it, and 23s of the pull-request wall go
-  # back to the surface.
-  ceiling_seconds: 157.0
-  measured_seconds: 104.79
+  # 145s is 1.50x of the record below, which is where the drift rule already sits
+  # (144.56s). The two bounds coincide on purpose, the way the `fast` entry argues: an
+  # absolute ceiling looser than the record-relative rule never gets to speak, and one
+  # tighter than it fails a run the drift rule was willing to explain. Rule 2 would
+  # permit 192s; the tier has no use for it.
+  #
+  # It is a band and not a target, and the band is the runner pool's rather than the
+  # tier's. Four readings at the reference shape span 1.69x on work that changed by 1.8
+  # test-seconds, so the record is placed at the centre and both edges are what is left:
+  # 1.16x of margin above the slowest wall this tier has read (125.16s) and 1.28x below
+  # the fastest (73.90s). That is thinner at the top than a ceiling argued from one
+  # cohort would look, and it is the honest width -- `think-be1s` is the recorded band
+  # that would replace a recorded point, and `D-472` is why neither edge of this one may
+  # be bought by moving the record toward the other. What the absolute number still adds
+  # is the failure the ratios cannot see: roughly 240 test-seconds accumulate in this
+  # shard, so 145s is well under what the job costs if `-n 4 --dist=loadfile` stops
+  # dividing, which is the regression an absolute ceiling on a pre-collection shard is
+  # actually for.
+  ceiling_seconds: 145.0
+  measured_seconds: 96.38
   measured_on: '2026-09-21'
   measured_where: >-
-    The geometric mean of three green readings at the reference shape -- 125.16s and
-    124.40s from run 35182460400, attempts 2 and 3 (jobs 105078217114 and 105079133540),
-    on PR 188 exact head be28ad5a, and 73.90s from run 35634463193, job 106448349232, on
-    PR 212 exact head 6dec6140. Observed spread 1.69x. The two 2026-09-17 readings stay
-    in the mean rather than being replaced by it: they are readings of this same shard,
-    162 of whose 163 files are unchanged between the two heads, and a record taken from
-    the fast edge of a 1.69x runner band starves the drift rule exactly as a record taken
-    from the maximum starves the stale rule -- `D-472`, and `think-be1s` for the recorded
-    band that would end the argument. 3,008 passed and 6 skipped at be28ad5a; 3,140
-    passed and 6 skipped at 6dec6140.
+    The geometric mean of four green readings at the reference shape. Two are PR 212's,
+    on this tier's current content: 73.90s in run 35634463193, job 106448349232, at head
+    c4b493e1 (merge 6dec6140), and 74.98s in run 35637674151, job 106459001378, at head
+    cb821629 (merge df18d48e), each 3,140 passed and 6 skipped, agreeing to 1.015x. Two
+    are the readings the superseded record was built from: 125.16s and 124.40s in run
+    35182460400, attempts 2 and 3 (jobs 105078217114 and 105079133540), on PR 188 exact
+    head be28ad5a, 3,008 passed and 6 skipped. Observed spread 1.69x. The 2026-09-17 pair
+    stays in the mean rather than being replaced by it, because it is a reading of this
+    same shard -- 162 of its 163 files are the same files -- and a record taken from the
+    fast edge of a 1.69x runner band starves the drift rule exactly as a record taken
+    from the maximum starves the stale rule. `D-472` is that lesson in the other
+    direction, and the typecheck entry below is the same repair: its 38.15s stale-rule
+    failure went into the mean with the two readings before it rather than over them.
   history:
   - measured_seconds: 119.54
     measured_on: '2026-09-15'

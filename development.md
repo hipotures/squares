@@ -174,7 +174,7 @@ alone is not full pre-merge evidence.
 | `--typecheck` | **CI, on every pull request**, in the `typecheck` job, concurrently | 1 of 80 | 111 s | 55.67 s on CI, the mean of three readings |
 | `--geometry` | **CI, on every pull request**, in the `geometry` job, concurrently | 9 of 80 | 180 s | 102.73 s on the predecessor topology, the mean of seven readings |
 | `--suite-a` | **CI, on every pull request**, in the `suite-a` job, concurrently | 1 of 80 | 168 s | 109.92 s on exact head `be28ad5a`, the geometric mean of attempts 1–3 of run 35182460400 |
-| `--suite-b` | **CI, on every pull request**, in the `suite-b` job, concurrently | 1 of 80 | 157 s | 104.79 s, the geometric mean of three readings spanning 73.90–125.16 s across runs 35182460400 and 35634463193 |
+| `--suite-b` | **CI, on every pull request**, in the `suite-b` job, concurrently | 1 of 80 | 145 s | 96.38 s, the geometric mean of four readings spanning 73.90–125.16 s across runs 35182460400, 35634463193 and 35637674151 |
 | `--sweeps` | **CI, on every pull request**, in the `sweeps` job, concurrently | 4 of 80 | 200 s | 101.51 s, the geometric mean of six 4-of-80 hosted readings (66.36–130.77 s, spread 1.97x); the 119.72 s seven-reading mean and PR 180’s 138.84 s predecessor remain in the register as history |
 | *(no flag)* | Full checkpoint before final review and at block close; main, dispatch, and daily CI | 80 of 80 | 3600 s | split across four jobs; not clocked whole |
 
@@ -210,7 +210,7 @@ Browser-floor liveness runs under `--frontend`, on the runner that owns the pinn
 toolchain. Each shard writes a per-file cost report beside its JUnit and timing
 artifacts; the recorder accepts complete coherent cohorts and rejects failed, partial,
 duplicated, coverage-mismatched, and mixed-provenance evidence.
-The current declared ceilings are 168 seconds for suite A and 157 seconds for suite B.
+The current declared ceilings are 168 seconds for suite A and 145 seconds for suite B.
 The first PR 188 integration run at exact head `c5a33270` measured 84.00 and 143.98
 seconds, respectively, over the complete 6,345-item quick selection: 2,362 passes in
 suite A, and 3,977 passes with 6 skips in suite B. `c4f0660d` rebuilt the cost record
@@ -220,13 +220,14 @@ Suite A records 109.92 seconds, the geometric mean of 81.26, 133.91 and 122.06 s
 over attempts 1–3, with 3,422 tests passing each time.
 Suite B then read 125.16 and 124.40 seconds over attempts 2–3, with 3,008 passes and 6
 skips; attempt 1 is excluded because a gate-budget test failed there.
-On 2026-09-21 run 35634463193 read the same shard at 73.90 seconds, 0.59x of a record
-built from those two agreeing readings alone, and suite B now records 104.79 seconds —
-the geometric mean of all three, a band 1.69 times wide rather than one cohort’s point.
+On 2026-09-21 runs 35634463193 and 35637674151 read the same shard at 73.90 and 74.98
+seconds, 0.59x of a record built from those two agreeing readings alone, and suite B now
+records 96.38 seconds — the geometric mean of all four, a band 1.69 times wide rather
+than one cohort’s point.
 That fall is runner speed and not a repartition: 162 of the shard’s 163 files are common
 to both heads, and the median per-file ratio across the 99 whose test count did not
 change is 1.91x. Its ceiling came down with it, from OR-14’s 180-second pull-request
-wall to 157 seconds of its own.
+wall to 145 seconds of its own, which is where the drift rule already sits.
 The `c5a33270` readings, the `be28ad5a` record and the predecessor PR 175 geometric
 means remain in the budget register as history.
 
