@@ -194,13 +194,21 @@ PROBE_GROUP_SAMPLES = REPOSITORY_ROOT / "packing/tests/fixtures/probe-typecheck"
 
 #: The only exclusions Biome's `files.includes` may write: what is not ours to hold to a floor,
 #: and minified output, of which none is tracked. Any other `!` pattern skips owned code.
-BIOME_EXCLUSIONS = frozenset({"!**/node_modules", "!vendor", "!**/.venv", "!**/*.min.js"})
+#: `packing/resources` is the literature archive. Its JavaScript is other authors' bytes,
+#: retained verbatim and hash-bound by each packet's own manifest, so the formatter must not
+#: reach it: the pre-commit hook writes Biome's fixes back to staged files, which would edit
+#: archived source to look tidy and void the retention. Ruff excludes the same tree for the
+#: same reason, and `.flowmarkignore` excludes it for the Markdown beside it.
+BIOME_EXCLUSIONS = frozenset(
+    {"!**/node_modules", "!vendor", "!packing/resources", "!**/.venv", "!**/*.min.js"}
+)
 
 TYPE_ERROR_DIAGNOSTIC = "sample.js(1,12): error TS2345:"
 
-#: Directories whose JavaScript is not ours to hold to a floor: third-party code, vendored
-#: or installed. Minified files are excluded from Biome too, and none is tracked.
-NOT_OURS = ("vendor/", "node_modules/")
+#: Directories whose JavaScript is not ours to hold to a floor: third-party code, vendored,
+#: installed, or archived as retained source. Minified files are excluded from Biome too, and
+#: none is tracked.
+NOT_OURS = ("vendor/", "node_modules/", "packing/resources/")
 SCRIPT_SUFFIXES = (".js", ".jsx", ".mjs", ".cjs", ".ts", ".tsx", ".mts", ".cts")
 STYLE_SUFFIXES = (".css",)
 #: The suffixes the ESLint promise overlay covers: checked JavaScript. Biome's own promise
@@ -743,6 +751,7 @@ def _jobs_without_node(document: Mapping[str, Any], step_name: str) -> list[str]
                 suite_a=namespace.suite_a,
                 suite_b=namespace.suite_b,
                 geometry=namespace.geometry,
+                typecheck=namespace.typecheck,
             )
             if step_name in {chosen.name for chosen in selected} and not (node and npm):
                 missing.append(job_name)
@@ -1190,25 +1199,22 @@ def test_type_coverage_respects_effective_exclusions(tmp_path: Path) -> None:
 
 
 def test_every_job_running_the_liveness_tests_installs_node() -> None:
-    """Both behavioral shards may own liveness modules and therefore install Node."""
+    """The frontend owner of browser liveness installs the pinned Node toolchain."""
     for workflow in WORKFLOWS:
         document = safe_load(workflow.read_text(encoding="utf-8"))
-        for shard in ("fast behavioral tests, shard A", "fast behavioral tests, shard B"):
-            assert _jobs_without_node(document, shard) == [], workflow.name
+        assert _jobs_without_node(document, "browser floor liveness tests") == [], workflow.name
 
 
-@pytest.mark.parametrize("job_name", ["suite-a", "suite-b"])
-def test_a_behavioral_job_without_node_is_detected(job_name: str) -> None:
-    """The negative control: either behavioral job without Node is detected."""
+def test_a_frontend_job_without_node_is_detected() -> None:
+    """The negative control: liveness cannot move to a runner without its toolchain."""
     document = safe_load(WORKFLOWS[0].read_text(encoding="utf-8"))
-    document["jobs"][job_name]["steps"] = [
+    document["jobs"]["frontend"]["steps"] = [
         step
-        for step in document["jobs"][job_name]["steps"]
+        for step in document["jobs"]["frontend"]["steps"]
         if "setup-node" not in str(step.get("uses", ""))
         and "npm ci" not in str(step.get("run"))
     ]
-    shard = "A" if job_name == "suite-a" else "B"
-    assert _jobs_without_node(document, f"fast behavioral tests, shard {shard}") == [job_name]
+    assert _jobs_without_node(document, "browser floor liveness tests") == ["frontend"]
 
 
 def test_a_missing_tool_fails_under_ci_and_skips_locally(

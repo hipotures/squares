@@ -552,11 +552,23 @@ in the finite optimum.
 | 172 | no parameter set in the workbench’s own space reaches a record | registered | [H-209](hypotheses/H-209-no-parameters-reach-a-record.md) | [X-034](explorations/X-034-the-workbench-physics-as-a-search.md) | Re-measure with retained final poses and disjoint seed blocks before reusing any number. |
 | 173 | the blind physics never settles to a valid packing | registered | [H-210](hypotheses/H-210-no-valid-packing.md) | [X-034](explorations/X-034-the-workbench-physics-as-a-search.md) | Re-measure with retained final poses and disjoint seed blocks before reusing any number. |
 | 174 | the shake has a sweet spot, and the shipped value is far below it | registered | [H-211](hypotheses/H-211-the-shake-has-a-sweet-spot.md) | [X-034](explorations/X-034-the-workbench-physics-as-a-search.md) | Re-measure with retained final poses and disjoint seed blocks before reusing any number. |
+| 180 | adaptive Animate integration removes clamp ringing | registered | [H-213](hypotheses/H-213-adaptive-animate-integration.md) | [X-035](explorations/X-035-animation-kinetics-without-pixels.md) | Compare a one-step control with law-driven substeps through the committed trajectory CLI; decide on displacement, reversal and validity guards rather than screenshots. |
+| 181 | Animate presets have distinct, correctly ordered kinetics | registered | [H-214](hypotheses/H-214-presets-have-distinct-kinetics.md) | [X-035](explorations/X-035-animation-kinetics-without-pixels.md) | Test whether hard, soft, balanced and sticky move the penetration, contact and gap axes their names claim, while each stays inside the continuity budget. |
+| 182 | Unguided stickiness has a transferable response curve | shaped |  | [X-036](explorations/X-036-graded-guidance-for-annealing.md) | Sweep ordinary pair attraction with no structural target through Search’s Pack runner; compare valid block-best side on frozen calibration and held-out cells at the currency `think-gdkd` registers, which charges any extra pair work attraction causes. Contacts alone cannot accept the claim. |
+| 183 | True touching components outperform information-changing partitions on multi-component records | shaped |  | [X-036](explorations/X-036-graded-guidance-for-annealing.md) | Search’s `grid` start is unseeded and places square `i` in cell `i`, so structural arms at `grid` and `random` relabel their targets by a seed-derived permutation. A partition then carries only its size profile, so the deciding comparators are the unguided arm and a split-merge partition at a near-equal count of within-component pairs; a size-preserving shuffle is a control only at `record-append`. Single-component records, including `n = 11` and 29, are excluded; if no test-set record has two components, `think-gdkd` drops the idea or replaces it with `merged-near-flush`. |
+| 184 | True contact graphs outperform rewired graphs of the same size | shaped |  | [X-036](explorations/X-036-graded-guidance-for-annealing.md) | Compare the true graph with the unguided arm and a rewired graph of equal edge count, and a thinned true graph with its rewired twin, which keeps the same edges and moves the same fraction as the full rewired control; thinning alone changes the edge count and so attributes nothing to structure. |
+| 185 | Oriented face-pair guidance outperforms wrong-feature and generic-torque controls | shaped |  | [X-036](explorations/X-036-graded-guidance-for-annealing.md) | Hold graph edges, torque strength, range and schedule fixed; the deciding comparators are the unguided arm, wrong features permuted within each contact kind, and the untyped graph with a nearest-face torque. Alignment exists only for edge-edge contacts, features only for `n = 11` and 29, and a complete target can determine the poses it does not store, so report its remaining degrees of freedom. |
+| 186 | Decay or release beats constant guidance at equal work | shaped |  | [X-036](explorations/X-036-graded-guidance-for-annealing.md) | Compare predeclared schedules on the same target, force law and interleaved seed blocks; target recovery remains explanatory unless valid side improves. |
 
 [H-212](hypotheses/H-212-the-workbench-physics-as-a-search.md) is the open question
 X-034 explored, not an idea.
 It holds exp-208, exp-209 and exp-210, the exploratory rounds H-210 and H-211 were
 registered from, so neither of those has been tested.
+
+[H-215](hypotheses/H-215-kinetics-predict-search-quality.md) is the open question from
+[X-035](explorations/X-035-animation-kinetics-without-pixels.md): whether any headless
+kinetic metric predicts independently valid Search outcomes under equal work.
+It is not an idea with a predicted direction.
 
 Idea 169, that the blind physics closes a constant fraction of the record-to-grid gap,
 was retired on 2026-09-14. Its premise came from arrangements that were never checked to
@@ -613,7 +625,64 @@ T-026 is only a support-and-rescaling provenance sentinel.
 
 | # | Idea | Status | H | Crux |
 | --- | --- | --- | --- | --- |
-| 166 | Compress T-025 on its exact support universe to at most 23 positive D4 orbits | registered | [H-163](hypotheses/H-163-route-s-threshold-compression.md) | A literal fivefold reduction from T-025’s 119 positive orbit representatives requires `N+ <= 23`. Confirmation also requires exact budget below eleven, agreement of the unchanged complete coverage routes, deterministic decompression, and source-distinct replay. The admission branch allocates no experiment and runs no target. |
+| 166 | Compress T-025 on its exact support universe to at most 23 positive D4 orbits | registered | [H-163](hypotheses/H-163-route-s-threshold-compression.md) | A literal fivefold reduction from T-025’s 119 positive orbit representatives requires `N+ <= 23`. Confirmation also requires exact budget below eleven, agreement of the unchanged complete coverage routes, deterministic decompression, source-distinct replay, a generating account, and a live `admit_threshold_compression --check`. The three admission-control manifests cannot confirm. Session 139 registered [exp-161](series/series-000-smoke-and-calibration/experiments/exp-161-h163-route-s-threshold-compression.md); encode-only timed out unresolved and `--search` did not run. |
+
+## N11 Overnight Route Slate — X-037
+
+[X-037](explorations/X-037-n11-overnight-review-and-route-slate.md) ranked mechanisms
+that price relations between squares, ran two overnight, and left five owner decisions.
+The 2026-09-18 addition resolves them under [`epistemics.md`](../../epistemics.md).
+M2, M4, M5, M6, and M8 stay retired in agenda-037 BC-360. `exp-161` remains Route S.
+
+| # | Idea | Status | H | Crux |
+| --- | --- | --- | --- | --- |
+| 187 | A helper-free point-atom certificate exists for n=6 at side 299/100 | registered | [H-216](hypotheses/H-216-point-certificate-at-n6-299-100.md) | Confirm with a frozen covering below 6 that both decide_certificate routes accept; kill with an exact depth-one family of total at least 6. Attic scratch does not decide it. Calibration only; s(6)=3 does not move. |
+| 188 | Rows-complete majority, k-of-S, and floor covering at 153/40 falls below 11 | registered | [H-217](hypotheses/H-217-route-f1-majority-floor-at-153-40.md) | Kill with a depth-one mass-11 family feasible for every admitted majority, k-of-S, and floor atom; confirm with decide_threshold_certificate (or the think-g3j7 successor) at budget < 11 and least charge >= 1. Blocked on the new reader, sites-1, and guarded colgen. |
+
+## N<=100 lower-bound survey — X-038
+
+[X-038](explorations/X-038-n100-lower-bound-survey.md) ranks the open floors at
+`n <= 100` against the stock colgen.
+Session-140 runs the first wave.
+
+| # | Idea | Status | H | Crux |
+| --- | --- | --- | --- | --- |
+| 189 | Stock colgen raises a verified floor at n in {12, 17, 19, 20} | registered | [H-218](hypotheses/H-218-existing-colgen-raises-a-small-n-floor.md) | Confirm only on RETAINABLE at a side above the current floor. A site set above n is a construction negative, not a wall. n=11 stays T-026. |
+
+## N<100 re-rank after Session-140 — X-039
+
+[X-039](explorations/X-039-n100-re-rank-after-session-140.md) re-ranks the open floors
+from Session-140 masses.
+Leftover n=18 is a new claim.
+The Nagamochi-only sizes are a new claim.
+H-218 stays row 189; its reopen is a new site set at n=20, not a replay.
+
+| # | Idea | Status | H | Crux |
+| --- | --- | --- | --- | --- |
+| 190 | T-028-seeded colgen raises s(18) above 187/40 | confirmed | [H-219](hypotheses/H-219-t028-seeded-colgen-raises-s18.md) | T-029 retained leftover 1871/400, auto plus windows 5. Off the H-218 sweep. |
+| 191 | Seedless colgen raises a Nagamochi-only floor in {32, 31, 30, 26, 27, 29, 45, 44} | registered | [H-220](hypotheses/H-220-seedless-colgen-raises-nagamochi-floor.md) | Session-141 exp-166–173: all eight queued sides measured; n=32/31/30/45/44 unconverged, n=26/27 plateau, n=29 freeze interval-refused. No RETAINABLE. Confirm only on RETAINABLE. |
+| 192 | T-029-seeded colgen raises s(18) above 1871/400 | confirmed | [H-221](hypotheses/H-221-t029-seeded-colgen-raises-s18.md) | T-030 retained 4679/1000, auto plus windows 5. Off the H-218 sweep. |
+
+## Lower-bound mechanisms beyond the one-body ceiling — X-040
+
+Session 143’s owner-directed review ran four lanes and three adversarial reviews and
+handed an overnight loop ten registrations
+([X-040](explorations/X-040-lower-bound-mechanisms-beyond-the-one-body-ceiling.md),
+[agenda-040](agendas/agenda-040-overnight-lower-bound-loop.md)).
+
+| # | Idea | Status | Hypothesis | Notes |
+| --- | --- | --- | --- | --- |
+| 193 | The all-free corner class at n=11, 96/25, d = 1/2 has covering value below 11 | registered | [H-222](hypotheses/H-222-n11-octagon-class-at-96-25.md) | Blocked on a convex corner-clip domain predicate. Kill with a depth-one family of total 11 avoiding all four corner triangles; that closes every corner-conditioned point route at this B. |
+| 194 | A point certificate exists at n=13, 399/100 with window sites | registered | [H-223](hypotheses/H-223-n13-point-covering-at-399-100.md) | Calibration under Bentz’s s(13) = 4. Confirm only on RETAINABLE. |
+| 195 | A depth-one ceiling family of total 17 exists at n=17, 23/5 | registered | [H-224](hypotheses/H-224-n17-ceiling-family-at-23-5.md) | Confirm closes the fixed-shrink point route at n=17 from 4.60 for every site set; a covering below 17 would instead be a new rung. |
+| 196 | A seeded point certificate exists at n=26, 53/10 | registered | [H-225](hypotheses/H-225-n26-seeded-certificate-at-53-10.md) | First-party floor above Nagamochi’s 5; confirm only on RETAINABLE. Two converged seeded site sets at or above 26 park the side. |
+| 197 | The one-spare wall-charge lemma closes n=21 | registered | [H-226](hypotheses/H-226-n21-one-spare-wall-charge-lemma.md) | Replay Theorem 11 at the printed constant sqrt(2) − 1/2 first (D-505), then enumerate the exceptional structures. Kill is a structure with four charges on every wall line. |
+| 198 | The one-spare wall-charge lemma closes n=32 | registered | [H-227](hypotheses/H-227-n32-one-spare-wall-charge-lemma.md) | The (1, 1) sibling of row 197; runs on the same tool. |
+| 199 | An unshrunk covering below 12 exists at n=12, side 4 | registered | [H-228](hypotheses/H-228-n12-unshrunk-covering-at-side-4.md) | Blocked on an unshrunk verifier. Kill with a certified dual of value 12 below side 4. |
+| 200 | The tilted-anchor case containing the 29° slot has covering value below 10 at 96/25 | registered | [H-229](hypotheses/H-229-n11-tilted-anchor-case-at-96-25.md) | Gain at most 1.5 per case after review; bin edge 6.4537°; blocked on the non-convex domain instrument. |
+| 201 | A gap-g wall-wedge conflict edge cuts the A6 64-family | registered | [H-230](hypotheses/H-230-a6-family-violates-a-gap-wedge-conflict.md) | The family’s 7.11° orbit sits at gap 0.016; the zero-gap lemma is verified, the extension is the question. |
+| 202 | Theta on a sound pose-cell graph at n=11 | open question | [H-231](hypotheses/H-231-theta-on-pose-cells.md) | Stays retired: the screen cannot discriminate and the dual matrix is dense. No owner decision requested. |
+| 203 | The all-deep corner class at n=11, 96/25 under the ring-centre 2-of-3 atom | registered | [H-232](hypotheses/H-232-n11-all-deep-class-ring-centre-atom.md) | The transported 88-family pays 5/4 against a budget of 1 on the named atom, the exact maximum; the counting proof is reviewed; blocked on the box cut, the refund and an exact 2-of-3 reader, with the fixed-support screen decisive on the kill side. |
 
 ## Dead ends
 
@@ -649,6 +718,18 @@ This section is why the campaign does not rediscover its own mistakes.
 
 - **Squared overlap penalty.** Gradient vanishes as the overlap closes, so it never
   quite reaches zero. A linear penalty has an exact finite-`lambda` constrained optimum.
+
+- **M6, LP-rounding as an n=11 proof or search route.** The ν*(U) diagnostic is
+  ill-posed as stated.
+  A search hypothesis would need a criterion that can be wrong, Trump’s packing as the
+  exact control, and an instrument that proposes LP-rounded seeds, named before a run.
+  None of those exists.
+  Significance never gates; the judged P2 is not why this stays retired.
+
+- **M2, Lovász theta without an exact PSD certificate.** Theta is at most V1. A bound
+  here needs `V4/C3`, and a T-id needs two-route C4. An SDP solver would be a new
+  dependency without a confirmation path.
+  Reopen only with an owner-approved exact PSD route.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

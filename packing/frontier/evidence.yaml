@@ -2,7 +2,7 @@ softschema:
   contract: packing.squares:FrontierEvidenceSet/v1
   schema: frontier-evidence.schema.yaml
   status: enforced
-last_reviewed: '2026-09-09'
+last_reviewed: '2026-09-20'
 evidence:
   - id: E-green-ds7-theorem9-reported-lower
     claim: lower-bound
@@ -1578,6 +1578,184 @@ evidence:
       Provenance per the source's README: built with a language model (GPT 5.6 Sol Pro),
       audited and formalized by "Claude Fable 5 (Anthropic)"; peer review pending.
     source_reviewed: '2026-09-07'
+  - id: E-n017-mira-4613-exact-replay
+    claim: lower-bound
+    scope: {n_values: [17]}
+    assurance: verified
+    method: exact-algebraic
+    performed_by: repository
+    relationship_to_generator: independent-implementation
+    origin: replayed-here
+    novelty: previously-published
+    source_key: '[n17 weighted certificates 2026-09-20]'
+    certificate: resources/web/n17-weighted-certificates-2026-09-20/mira-17squares/certificates/lower_bound_4p613/best-certificate.json
+    replay: uv run --frozen --all-extras --group dev python resources/web/n17-weighted-certificates-2026-09-20/replay_mira_4613_first_party.py
+    replay_status: passed
+    external_review:
+      state: informally-verified
+      date: '2026-09-20'
+      reviewed_by: repository (session-149 proof review)
+      note: >-
+        Mira's PROOF.md sections 3 and 6 were worked through in
+        docs/project/reviews/review-2026-09-20-n17-r012-and-mira-4613-proof-review.md
+        (finding F11). Its containment condition B^2(1+h)^2 < 1+h^2 is correct and is
+        the sharpened form of this repository's Condition 4; its dilation endpoint is
+        this repository's T-022 lemma. Neither is used by this entry, which rests on
+        Condition 4 as this repository states it. Mira's C++ kernel was read and was
+        not compiled or run.
+    limitations: >-
+      Mira's certificate (github.com/Mira-acc/17squares, commit
+      0266c9936a303817ac7da0802364034a34fb2558, 7 September 2026; SHA-256 749f1333...) is
+      in this repository's own certificate schema, because it descends from the T-019
+      certificate, so sqpack.fractional.certificate.verify decides it without a
+      translation layer: 1620 atoms, L = 4613/1000, B = 19997/20000, a 2880-step net.
+      The 2026-09-20 replay passed all five conditions in 423 s: total mass
+      849899249/50000000 < 17; Condition 4 as B(1 + D) = 28799821518679/28800000000000
+      < 1; least cell mass 1000002103/1000000000 at net direction 2194, equal to the
+      value the source declares. The receipt is
+      resources/web/n17-weighted-certificates-2026-09-20/receipts/mira-4613-first-party-exact.json.
+      What this decides is s(17) >= 4613/1000, the container side. Mira's headline is
+      larger, the dilation endpoint 4.61302863588611..., and that step is not replayed
+      here: no T-022-style proof note exists for this certificate, and the value is
+      2.9e-5 above the side.
+      The slack is 2103 parts in 10^9, so the certificate is nearly tight; the control
+      test lightens every weight by three parts in a million and the same sweep refuses
+      it. The generator is Mira's, a covering LP with dual-priced column generation, and
+      it is not trusted or rerun. Mira's package discloses AI assistance and is not peer
+      reviewed.
+    source_reviewed: '2026-09-20'
+  - id: E-n017-mira-4613-interval-decision
+    claim: lower-bound
+    scope: {n_values: [17]}
+    assurance: verified
+    method: interval-certified
+    performed_by: repository
+    relationship_to_generator: independent-implementation
+    origin: replayed-here
+    novelty: previously-published
+    source_key: '[n17 weighted certificates 2026-09-20]'
+    certificate: resources/web/n17-weighted-certificates-2026-09-20/mira-17squares/certificates/lower_bound_4p613/best-certificate.json
+    replay: uv run --frozen --all-extras --group dev python resources/web/n17-weighted-certificates-2026-09-20/replay_mira_4613_first_party.py --interval
+    replay_status: passed
+    limitations: >-
+      The second decision of the same bytes, by sqpack.fractional.interval: branch and
+      bound over boxes of centres in outward-rounded interval arithmetic with exact
+      integer masses, on the doubled net of 5761 directions, so the D4 reflection
+      argument and Condition 1 are not used. It shares the certificate object and the
+      closed-form conditions with E-n017-mira-4613-exact-replay and shares no part of
+      how Condition 5 is decided. The 2026-09-20 run certified all 5761 directions with
+      none refuted and none undecided, none stalled and none out of budget, over
+      70,019,687 boxes in 1702 s, and pinned the least covered mass to the zero-width
+      enclosure [1000002103/1000000000, 1000002103/1000000000], the same value the
+      exact route computed and the source declared, attained at direction 2194. The receipt is
+      resources/web/n17-weighted-certificates-2026-09-20/receipts/mira-4613-first-party-interval.json.
+      As with the exact entry, the statement decided is the container side 4613/1000 and
+      not Mira's dilation endpoint.
+    source_reviewed: '2026-09-20'
+  - id: E-n017-guzhou-r012-source-replay
+    claim: lower-bound
+    scope: {n_values: [17, 18, 19]}
+    assurance: verified
+    method: exact-algebraic
+    performed_by: repository
+    relationship_to_generator: same-implementation
+    origin: replayed-here
+    novelty: previously-published
+    source_key: '[n17 weighted certificates 2026-09-20]'
+    certificate: resources/web/n17-weighted-certificates-2026-09-20/guzhou0806-n17-square-packing/certificates/R012/orbits.json
+    replay: uv run --frozen python -X utf8 -B -S resources/web/n17-weighted-certificates-2026-09-20/guzhou0806-n17-square-packing/certificates/R012/verify.py --workers 4 --output "$(mktemp -d)/run"
+    replay_status: passed
+    external_review:
+      state: informally-verified
+      date: '2026-09-20'
+      reviewed_by: repository (session-149 proof review)
+      note: >-
+        PROOF.md, verify.py and sweep.py were read line by line in
+        docs/project/reviews/review-2026-09-20-n17-r012-and-mira-4613-proof-review.md.
+        No error was found and none of its eleven findings is blocking. The written
+        proof omits two steps, and the review supplies them: that the endpoint-only
+        containment test covers the whole parent-angle interval (F1, monotonicity of
+        cos d + |sin d| on [0, pi/4]), and that [r, L-r]^2 with r from the endpoint
+        minimum of f is exactly the union of legal parent centres (F2, quasi-concavity
+        of f). The review also re-derived all 2925 obligations from orbits.json and
+        catalogue.json alone and decided each with this repository's sweep kernel; the
+        exact minimum agreed with the source's on every entry. That script is review
+        scratch and is not a retained instrument.
+    limitations: >-
+      Replays the source's own pure-Python exact checker over the archived R012 bytes
+      (github.com/Guzhou0806/n17-square-packing, commit
+      931a0dfd64302e277057006e99388fe5c00b7f53, 20 September 2026). The argument is this
+      repository's weighted method with three changes: parents of side A = 99999/100000
+      at L = 4613/1000, rescaled at the end; a catalogue of 2925 closed parent-angle
+      intervals, each choosing its own concentric core direction and side; and coverage
+      required only over the legal parent-centre square for the interval, not over every
+      contained core. The measure is Mira's 1620 atoms rounded to 10^-5, weights rounded
+      up to 10^-6, 1616 atoms in 206 D4 orbits of mass 424969/25000; every core must
+      capture gamma = 250023/250000, and 17 gamma - M = 701/250000 > 0 gives
+      s(17) >= L/A = 461300/99999.
+      The 2026-09-20 replay under Python 3.14.7 printed
+      PASS_COMPLETE_PARENT_CATALOGUE_GLOBAL_LOWER_BOUND in 340 s on 8 workers: all 2925
+      intervals recomputed over 9,231,165 centre strips, catalogue minimum exactly gamma,
+      least containment margin about 2.3e-9. Receipts are
+      resources/web/n17-weighted-certificates-2026-09-20/receipts/guzhou-r012-source-replay-2026-09-20.result.json
+      and the per-entry rows beside it.
+      The source's sweep.py descends from this repository's sqpack.fractional.sweep, so
+      this entry and any decision by that kernel share an ancestor; the method-distinct
+      decision is E-n017-guzhou-r012-interval-decision. R012 does not depend on Mira's
+      certificate being valid: it recomputes every obligation on its own measure. The
+      gain over Mira's endpoint is 1.7e-5. The author discloses AI assistance and
+      asserts neither priority nor peer review.
+      Scope note: the contradiction is 17 gamma > M, so the same measure and catalogue
+      give the same side for every integer above M/gamma, which is 17 and upward. That
+      is why n = 18 and n = 19 are in scope without a monotonicity step; both already
+      hold larger verified values, so nothing there moves.
+    source_reviewed: '2026-09-20'
+  - id: E-n017-guzhou-r012-interval-decision
+    claim: lower-bound
+    scope: {n_values: [17, 18, 19]}
+    assurance: verified
+    method: interval-certified
+    performed_by: repository
+    relationship_to_generator: independent-implementation
+    origin: audited-here
+    novelty: previously-published
+    source_key: '[n17 weighted certificates 2026-09-20]'
+    certificate: resources/web/n17-weighted-certificates-2026-09-20/guzhou0806-n17-square-packing/certificates/R012/catalogue.json
+    replay: uv run --frozen --all-extras --group dev python resources/web/n17-weighted-certificates-2026-09-20/replay_guzhou_r012_first_party.py --entries all --workers 4 --tag 001 --source-coverage resources/web/n17-weighted-certificates-2026-09-20/receipts/guzhou-r012-source-replay-2026-09-20.coverage.jsonl.xz
+    replay_status: passed
+    limitations: >-
+      A first-party decision of R012 that imports nothing from the source. The measure,
+      the catalogue, contiguity from 0 to T with T^2 + 2T - 1 > 0, strict containment of
+      each core at both interval endpoints with the relative angle inside pi/4, each
+      parent-centre inset, 17 gamma - M = 701/250000 and (L/A)^2 above Mira's endpoint
+      squared are rebuilt and checked in exact rational arithmetic. Coverage is decided
+      by sqpack.fractional.interval, the branch and bound over centre boxes, through a
+      subclass that changes one thing: the centre domain is [r, L-r]^2, which the inset
+      check proves is inside the stock contained-core domain. The threshold is the
+      integer 1000092 on the measure's own 10^6 mass scale, which for an integer mass is
+      exactly mass >= gamma.
+      The 2026-09-20 run certified all 2925 entries at or above gamma over 34,465,227
+      boxes in 226 s on 4 workers, none stalled and none out of budget; the least
+      certified lower bound is gamma itself, first at entry 504; and every one of the
+      2925 brackets contains the minimum the source's exact replay reported. Ten
+      negative controls passed: the source's five counterexample recipes come out below
+      one at their stated centres, a threshold one unit above gamma is refuted at an
+      entry that attains gamma, two lightened measures are refuted, and the restricted
+      initial box is shown to enclose the exact domain. The same tool checks the lineage
+      from bytes: R012's 1616 sites are Mira's 1620 atoms snapped to the 10^-5 grid, the
+      largest move 70549/14121900000, and every R012 weight exceeds the summed Mira
+      weight at its site by between 10^-9 and 1.818e-6. The receipt is
+      resources/web/n17-weighted-certificates-2026-09-20/receipts/guzhou-r012-first-party-001.json.
+      What the computation does not decide is the reduction from a packing to these
+      2925 obligations: folding a parent angle into [0, T] by D4, the endpoint
+      containment test, the union of centre squares, the counting step and the rescaling.
+      Those are short arguments, read and closed in the proof review named in
+      E-n017-guzhou-r012-source-replay, and they are a careful reading and not a machine
+      check.
+      Scope note: as with the source replay, the mass gap is what bounds n, so the
+      decision covers every size above M/gamma; n = 18 and n = 19 already hold larger
+      verified values.
+    source_reviewed: '2026-09-20'
   - id: E-n017-massaccesi-h052-agreement
     claim: lower-bound
     scope: {n_values: [17, 18, 19]}
@@ -2680,6 +2858,285 @@ evidence:
       E-fractional-interval-decision, which decides the same bytes by a different
       method.
     source_reviewed: '2026-09-05'
+  - id: E-n018-fractional-certificate
+    claim: lower-bound
+    source_reviewed: '2026-09-18'
+    scope:
+      n_values:
+        - 18
+    assurance: verified
+    method: exact-algebraic
+    performed_by: repository
+    relationship_to_generator: same-implementation
+    origin: audited-here
+    novelty: apparently-novel
+    novelty_basis:
+      corpus: >-
+        The retained literature archive under packing/resources/ and the frontier source
+        register, which for n = 18 hold Nagamochi's 2005 closed form, Massaccesi's 2026
+        certificate carried by monotonicity as T-016 (22529/5000 = 4.5058), this
+        project's own T-019 at 459/100 = 4.59, Friedman's record tables, anabologyco-maker's
+        GitHub candidate 9141/2000 = 4.5705, and MacIver's 2026 manuscript corollary.
+        The frozen arXiv, Crossref, OpenAlex, and Zenodo search receipts are retained at
+        resources/web/literature-refresh-2026-09-05/README.md. The 2026-09-07 GitHub check
+        that found the three n = 17 certificates is archived under
+        resources/web/n17-github-certificates-2026/.
+      searched: >-
+        Searched the archived corpus and the n = 18 case record for any lower bound on
+        s(18) above T-019's 459/100 = 4.59. Nothing in that corpus sits above 4.59:
+        the strongest public candidate named in n-018.md is 9141/2000 = 4.5705, not
+        replayed here, and MacIver's corollary is approximately 4.4502. This rung
+        raises this project's own T-019 value at n = 18 rather than a published one.
+        No n = 18-specific GitHub search was run on 2026-09-18 beyond the n = 17
+        repositories already archived.
+      novel_object: >-
+        The certificate and the side. The method is Burns's, the parametrisation
+        Massaccesi's, and the seed T-019's own atoms scaled to 467/100; what is new is
+        a certificate at 467/100, found after the uniform grid walled there.
+      gaps: >-
+        The refresh is a bounded public-record search, not an exhaustive review of
+        subscription-only indexes, theses, proceedings, non-English or unindexed sources,
+        private correspondence, or unpublished work. The 2026-09-07 GitHub check closed
+        that hole for n = 17; n = 18 was not searched there separately. The label
+        records apparent novelty within that search, not absolute priority.
+    certificate: cases/n18_fractional_certificate/certificate-467-100.json
+    replay: uv run --frozen --all-extras python -m cases.n18_fractional_certificate cases/n18_fractional_certificate/certificate-467-100.json
+    replay_status: passed
+    limitations: >-
+      Decides five conditions in exact rational arithmetic over 769 atoms on a
+      D4-symmetric site set: the atom multiset is closed under the container's D4 group,
+      the total mass is 8937839/500000 = 17.875678, the 182-direction net produced by
+      181 steps reaches pi/4, containment B(1 + D) < 1 holds at B = 9977/10000, and
+      every reachable event cell at every net direction carries mass at least 1, the
+      least being 2000007/2000000.
+      The bound proved is the container side itself, 467/100.
+      The live n = 18 pointer later moved to T-028 at 187/40; these bytes stay at
+      certificate-467-100.json.
+      One size, and not by monotonicity. Only Condition 2 mentions n among the five
+      conditions, so this atom set certifies its side for every integer strictly above
+      its own mass, which is 18 and upward. It says nothing about n = 17, where 459/100
+      remains the register's bound; from n = 19 on the register already holds 24/5, so
+      the certificate is true there and weaker.
+      It was decided from its bytes by two verifiers that fail differently. The exact
+      event-cell sweep accepted in 9 s at 2000007/2000000; the interval branch and bound
+      certified all 363 doubled-net directions in 2,543,909 boxes with none stalled and
+      an enclosure equal to that same value, in 24 s. Both were run by this repository
+      on the frozen file, and the sha256 the gate printed on acceptance is
+      3a11b6303e0663b502b6c1e3fc9d8da285104e199b17022937369bc781479059.
+      The site set is BC-191 auto grids (32, 43, 53) unioned with T-019's 1184 atom
+      sites scaled from 459/100. The unseeded grid locked at 18.000000; the seed
+      converged below 18.
+  - id: E-n018-t028-fractional-certificate
+    claim: lower-bound
+    source_reviewed: '2026-09-19'
+    scope:
+      n_values:
+        - 18
+    assurance: verified
+    method: exact-algebraic
+    performed_by: repository
+    relationship_to_generator: same-implementation
+    origin: audited-here
+    novelty: apparently-novel
+    novelty_basis:
+      corpus: >-
+        The retained literature archive under packing/resources/ and the frontier source
+        register, which for n = 18 hold Nagamochi's 2005 closed form, Massaccesi's 2026
+        certificate carried by monotonicity as T-016 (22529/5000 = 4.5058), this
+        project's own T-019 at 459/100 = 4.59, T-027 at 467/100 = 4.67, Friedman's
+        record tables, anabologyco-maker's GitHub candidate 9141/2000 = 4.5705, and
+        MacIver's 2026 manuscript corollary. The frozen arXiv, Crossref, OpenAlex, and
+        Zenodo search receipts are retained at
+        resources/web/literature-refresh-2026-09-05/README.md. The 2026-09-07 GitHub check
+        that found the three n = 17 certificates is archived under
+        resources/web/n17-github-certificates-2026/.
+      searched: >-
+        Searched the archived corpus and the n = 18 case record for any lower bound on
+        s(18) above T-027's 467/100 = 4.67. Nothing in that corpus sits above 4.67:
+        the strongest public candidate named in n-018.md is 9141/2000 = 4.5705, not
+        replayed here, and MacIver's corollary is approximately 4.4502. This rung
+        raises this project's own T-027 value at n = 18 rather than a published one.
+        No n = 18-specific GitHub search was run on 2026-09-19 beyond the n = 17
+        repositories already archived.
+      novel_object: >-
+        The certificate and the side. The method is Burns's, the parametrisation
+        Massaccesi's, and the seed T-027's own atoms scaled to 187/40 plus a windows-5
+        lattice; what is new is a certificate at 187/40, found after 117/25 locked at
+        18.000000.
+      gaps: >-
+        The refresh is a bounded public-record search, not an exhaustive review of
+        subscription-only indexes, theses, proceedings, non-English or unindexed sources,
+        private correspondence, or unpublished work. The 2026-09-07 GitHub check closed
+        that hole for n = 17; n = 18 was not searched there separately. The label
+        records apparent novelty within that search, not absolute priority.
+    certificate: cases/n18_fractional_certificate/certificate-187-40.json
+    replay: uv run --frozen --all-extras python -m cases.n18_fractional_certificate cases/n18_fractional_certificate/certificate-187-40.json
+    replay_status: passed
+    limitations: >-
+      Decides five conditions in exact rational arithmetic over 725 atoms on a
+      D4-symmetric site set: the atom multiset is closed under the container's D4 group,
+      the total mass is 35758287/2000000 = 17.8791435, the 182-direction net produced
+      by 181 steps reaches pi/4, containment B(1 + D) < 1 holds at B = 9977/10000,
+      and every reachable event cell at every net direction carries mass at least 1,
+      the least being 4000013/4000000.
+      The bound proved is the container side itself, 187/40.
+      The live n = 18 pointer later moved to T-029 at 1871/400; these bytes stay at
+      certificate-187-40.json.
+      One size, and not by monotonicity. Only Condition 2 mentions n among the five
+      conditions, so this atom set certifies its side for every integer strictly above
+      its own mass, which is 18 and upward. It says nothing about n = 17, where 459/100
+      remains the register's bound; from n = 19 on the register already holds 24/5, so
+      the certificate is true there and weaker.
+      It was decided from its bytes by two verifiers that fail differently. The exact
+      event-cell sweep accepted in 5 s at 4000013/4000000; the interval branch and bound
+      certified all 363 doubled-net directions in 2,684,845 boxes with none stalled and
+      an enclosure equal to that same value, in 23 s. Both were run by this repository
+      on the frozen file, and the sha256 the gate printed on acceptance is
+      9507659fa55a48869f060bff07e8d0e4f088cf70320f571afdca1bb460d9bb7b.
+      The site set is BC-191 auto grids (32, 43, 53) unioned with T-027's 769 atom
+      sites scaled from 467/100 plus a windows-5 lattice (1169 seed sites). The row
+      loop never crossed 18 and converged below it.
+  - id: E-n018-t029-fractional-certificate
+    claim: lower-bound
+    source_reviewed: '2026-09-19'
+    scope:
+      n_values:
+        - 18
+    assurance: verified
+    method: exact-algebraic
+    performed_by: repository
+    relationship_to_generator: same-implementation
+    origin: audited-here
+    novelty: apparently-novel
+    novelty_basis:
+      corpus: >-
+        The retained literature archive under packing/resources/ and the frontier source
+        register, which for n = 18 hold Nagamochi's 2005 closed form, Massaccesi's 2026
+        certificate carried by monotonicity as T-016 (22529/5000 = 4.5058), this
+        project's own T-019 at 459/100 = 4.59, T-027 at 467/100 = 4.67, T-028 at
+        187/40 = 4.675, Friedman's record tables, anabologyco-maker's GitHub candidate
+        9141/2000 = 4.5705, and MacIver's 2026 manuscript corollary. The frozen arXiv,
+        Crossref, OpenAlex, and Zenodo search receipts are retained at
+        resources/web/literature-refresh-2026-09-05/README.md. The 2026-09-07 GitHub check
+        that found the three n = 17 certificates is archived under
+        resources/web/n17-github-certificates-2026/.
+      searched: >-
+        Searched the archived corpus and the n = 18 case record for any lower bound on
+        s(18) above T-028's 187/40 = 4.675. Nothing in that corpus sits above 4.675:
+        the strongest public candidate named in n-018.md is 9141/2000 = 4.5705, not
+        replayed here, and MacIver's corollary is approximately 4.4502. This rung
+        raises this project's own T-028 value at n = 18 rather than a published one.
+        No n = 18-specific GitHub search was run on 2026-09-19 beyond the n = 17
+        repositories already archived.
+      novel_object: >-
+        The certificate and the side. The method is Burns's, the parametrisation
+        Massaccesi's, and the seed T-028's own atoms scaled to 1871/400 plus a windows-5
+        lattice; what is new is a certificate at 1871/400, found after T-028 retained
+        187/40 and 117/25 locked at 18.000000.
+      gaps: >-
+        The refresh is a bounded public-record search, not an exhaustive review of
+        subscription-only indexes, theses, proceedings, non-English or unindexed sources,
+        private correspondence, or unpublished work. The 2026-09-07 GitHub check closed
+        that hole for n = 17; n = 18 was not searched there separately. The label
+        records apparent novelty within that search, not absolute priority.
+    certificate: cases/n18_fractional_certificate/certificate-1871-400.json
+    replay: uv run --frozen --all-extras python -m cases.n18_fractional_certificate cases/n18_fractional_certificate/certificate-1871-400.json
+    replay_status: passed
+    limitations: >-
+      Decides five conditions in exact rational arithmetic over 804 atoms on a
+      D4-symmetric site set: the atom multiset is closed under the container's D4 group,
+      the total mass is 17889361/1000000 = 17.889361, the 182-direction net produced
+      by 181 steps reaches pi/4, containment B(1 + D) < 1 holds at B = 9977/10000,
+      and every reachable event cell at every net direction carries mass at least 1,
+      the least being 250001/250000.
+      The bound proved is the container side itself, 1871/400.
+      The live n = 18 pointer later moved to T-030 at 4679/1000; these bytes stay at
+      certificate-1871-400.json.
+      One size, and not by monotonicity. Only Condition 2 mentions n among the five
+      conditions, so this atom set certifies its side for every integer strictly above
+      its own mass, which is 18 and upward. It says nothing about n = 17, where 459/100
+      remains the register's bound; from n = 19 on the register already holds 24/5, so
+      the certificate is true there and weaker.
+      It was decided from its bytes by two verifiers that fail differently. The exact
+      event-cell sweep accepted in 5 s at 250001/250000; the interval branch and bound
+      certified all 363 doubled-net directions in 2,997,789 boxes with none stalled and
+      an enclosure equal to that same value, in 28 s. Both were run by this repository
+      on the frozen file, and the sha256 the gate printed on acceptance is
+      dd06c0e39639f06af475459a2a63f9fc8d5836b0b83ea3b6c3a4de8f212892d4.
+      The site set is BC-191 auto grids (32, 43, 54) unioned with T-028's 725 atom
+      sites scaled from 187/40 plus a windows-5 lattice (1125 seed sites). The row
+      loop never crossed 18 and converged below it. Auto at 1871/400 resolved to
+      (32, 43, 54), not T-028's (32, 43, 53).
+  - id: E-n018-t030-fractional-certificate
+    claim: lower-bound
+    source_reviewed: '2026-09-19'
+    scope:
+      n_values:
+        - 18
+    assurance: verified
+    method: exact-algebraic
+    performed_by: repository
+    relationship_to_generator: same-implementation
+    origin: audited-here
+    novelty: apparently-novel
+    novelty_basis:
+      corpus: >-
+        The retained literature archive under packing/resources/ and the frontier source
+        register, which for n = 18 hold Nagamochi's 2005 closed form, Massaccesi's 2026
+        certificate carried by monotonicity as T-016 (22529/5000 = 4.5058), this
+        project's own T-019 at 459/100 = 4.59, T-027 at 467/100 = 4.67, T-028 at
+        187/40 = 4.675, T-029 at 1871/400 = 4.6775, Friedman's record tables,
+        anabologyco-maker's GitHub candidate 9141/2000 = 4.5705, and MacIver's 2026
+        manuscript corollary. The frozen arXiv, Crossref, OpenAlex, and Zenodo search
+        receipts are retained at
+        resources/web/literature-refresh-2026-09-05/README.md. The 2026-09-07 GitHub check
+        that found the three n = 17 certificates is archived under
+        resources/web/n17-github-certificates-2026/.
+      searched: >-
+        Searched the archived corpus and the n = 18 case record for any lower bound on
+        s(18) above T-029's 1871/400 = 4.6775. Nothing in that corpus sits above 4.6775:
+        the strongest public candidate named in n-018.md is 9141/2000 = 4.5705, not
+        replayed here, and MacIver's corollary is approximately 4.4502. This rung
+        raises this project's own T-029 value at n = 18 rather than a published one.
+        No n = 18-specific GitHub search was run on 2026-09-19 beyond the n = 17
+        repositories already archived.
+      novel_object: >-
+        The certificate and the side. The method is Burns's, the parametrisation
+        Massaccesi's, and the seed T-029's own atoms scaled to 4679/1000 plus a windows-5
+        lattice; what is new is a certificate at 4679/1000, found after T-029 retained
+        1871/400 and 117/25 locked at 18.000000.
+      gaps: >-
+        The refresh is a bounded public-record search, not an exhaustive review of
+        subscription-only indexes, theses, proceedings, non-English or unindexed sources,
+        private correspondence, or unpublished work. The 2026-09-07 GitHub check closed
+        that hole for n = 17; n = 18 was not searched there separately. The label
+        records apparent novelty within that search, not absolute priority.
+    certificate: cases/n18_fractional_certificate/certificate.json
+    replay: uv run --frozen --all-extras python -m cases.n18_fractional_certificate
+    replay_status: passed
+    limitations: >-
+      Decides five conditions in exact rational arithmetic over 957 atoms on a
+      D4-symmetric site set: the atom multiset is closed under the container's D4 group,
+      the total mass is 71573611/4000000 = 17.89340275, the 182-direction net produced
+      by 181 steps reaches pi/4, containment B(1 + D) < 1 holds at B = 9977/10000,
+      and every reachable event cell at every net direction carries mass at least 1,
+      the least being 200001/200000.
+      The bound proved is the container side itself, 4679/1000.
+      One size, and not by monotonicity. Only Condition 2 mentions n among the five
+      conditions, so this atom set certifies its side for every integer strictly above
+      its own mass, which is 18 and upward. It says nothing about n = 17, where 459/100
+      remains the register's bound; from n = 19 on the register already holds 24/5, so
+      the certificate is true there and weaker.
+      It was decided from its bytes by two verifiers that fail differently. The exact
+      event-cell sweep accepted in 7 s at 200001/200000; the interval branch and bound
+      certified all 363 doubled-net directions in 3,449,053 boxes with none stalled and
+      an enclosure equal to that same value, in 36 s. Both were run by this repository
+      on the frozen file, and the sha256 the gate printed on acceptance is
+      b62ead6f5b6aed68704487ad6a1b78beb7a3e585676e55825c6f84942c39cd63.
+      The site set is BC-191 auto grids (32, 43, 54) unioned with T-029's 804 atom
+      sites scaled from 1871/400 plus a windows-5 lattice (1204 seed sites). The row
+      loop never crossed 18 and converged below it. Auto at 4679/1000 resolved to
+      (32, 43, 54), the same triple T-029 used.
   - id: E-n020-fractional-certificate-97-20
     claim: lower-bound
     source_reviewed: '2026-09-05'
@@ -2849,11 +3306,14 @@ evidence:
       pi/2 - theta_k, 361 directions -- so the D4 reflection argument is never invoked
       and Condition 1 is not needed at all, which matters because interval arithmetic cannot
       establish the equality Condition 1 asserts.
-      Results, 361 of 361 directions certified in every case and none stalled. The four
+      Results, 361 of 361 directions certified in every case and none stalled. The five
       retained top rungs, decided from their frozen bytes: n = 20 at 24/5, 2260 atoms,
-      5,638,343 boxes; n = 17 at 459/100, 1184 atoms,
-      3,683,951 boxes; n = 12 at 99/25, 2097 atoms, 4,448,751 boxes; n = 11 at 381/100,
-      1121 atoms, 1,570,831 boxes. Lower rungs and the control: n = 17 at 229/50 in
+      5,638,343 boxes; n = 18 at 4679/1000, 957 atoms, 3,449,053 boxes; n = 17 at 459/100,
+      1184 atoms, 3,683,951 boxes; n = 12 at 99/25, 2097 atoms, 4,448,751 boxes; n = 11
+      at 381/100, 1121 atoms, 1,570,831 boxes. Lower rungs and the control: n = 18 at
+      1871/400 in 2,997,789 boxes, n = 18 at
+      187/40 in 2,684,845 boxes, n = 18 at
+      467/100 in 2,543,909 boxes, n = 17 at 229/50 in
       2,653,407 boxes, n = 11 at 19/5 in
       1,195,755 boxes, n = 12 at 197/50 in 1,846,439 and at 393/100 in 1,486,159, and
       Massaccesi's published n = 17 certificate -- the control that tests the verifier
@@ -2862,8 +3322,11 @@ evidence:
       because every one of these runs shared a contended machine.
       In minimisation mode every enclosure of the least covered mass has width zero and
       equals the exact verifier's value to the digit: 4001/4000 at n = 11's top rung,
-      12501/12500 at n = 12's, 200009/200000 at n = 17's and 50007/50000 at n = 20's, each matching the
-      least_cell_mass its own certificate declares, and 12501/12500 at the 229/50 rung,
+      12501/12500 at n = 12's, 200009/200000 at n = 17's, 200001/200000 at n = 18's
+      and 50007/50000 at n = 20's, each matching the
+      least_cell_mass its own certificate declares, and 250001/250000 at the 1871/400
+      rung, 4000013/4000000 at the 187/40
+      rung, 12501/12500 at the 229/50 rung,
       50003/50000 and 100003/100000 at the earlier n = 11 and n = 12 rungs. Refusals: the n = 12 atoms in a
       side-4 container are refuted at direction 0 after 407 boxes, and an atom lowered by
       1/10000 after 127.
@@ -3059,3 +3522,91 @@ evidence:
       of seven additional squares is neither assumed nor asserted. Other owner
       combinations remain open and no n=11 verified bound field changes.
     source_reviewed: '2026-09-09'
+  - id: E-n011-corner-class-96-25-exact-decision
+    claim: derived-structure
+    scope:
+      n_values:
+        - 11
+    assurance: verified
+    method: exact-algebraic
+    performed_by: repository
+    relationship_to_generator: same-implementation
+    origin: audited-here
+    novelty: apparently-novel
+    certificate: cases/n11_corner_class_certificate/certificate.json
+    replay: uv run --frozen --all-extras --group dev python -m devtools.decide_certificate --corner-clip 1/2 cases/n11_corner_class_certificate/certificate.json
+    replay_status: passed
+    limitations: >-
+      The exact event-cell sweep of sqpack.fractional.certificate on the row domain
+      clipped by the four corner triangles at depth 1/2, the clip entering as extra
+      half-planes on each slab's centre range so that every kept centre is swept.
+      It decides Condition 5 on the clipped domain only: the least charge
+      2000013/2000000 is over closed B-squares at net directions whose minimum of
+      x + y is at least 1/2 in every corner frame, and nothing is claimed about a core
+      that meets a corner triangle. Conditions 1 to 4 are decided exactly before the
+      sweep. The record declares variant class and corner_clip 1/2 and the gate
+      refuses it without --corner-clip, so the bytes cannot be read as a bound. The
+      site set is a property of the certificate found, not a condition of the
+      statement; the net enters only through which core a square is assigned, and
+      Condition 4 keeps that core strictly inside its square at every angle. Shares
+      the Certificate parser and the closed-form conditions with the interval route.
+    source_reviewed: '2026-09-20'
+    novelty_basis:
+      corpus: >-
+        packing/resources/ as retained on 2026-09-20 (27 papers with faithful .raw.md
+        transcriptions and 22 archived web sources, including [Friedman DS7],
+        [Stromquist 2003], Trump 2023, Bentz 2010/2016, Nagamochi 2005 and the Kingbird
+        catalogue), plus the repository's own certificate record T-018 to T-030
+      novel_object: >-
+        A weighted fractional unavoidable-set certificate whose row domain is clipped
+        by corner triangles, excluding one corner-bin class of eleven-square packings
+        at side 96/25; the corpus contains no conditioned point certificate of this
+        shape and no statement that every eleven-square packing at 3.84 has a square
+        meeting a corner triangle of depth 1/2
+      searched: >-
+        The corner-conditioned language is this repository's own construction (X-040
+        lane 1, Theorem B of lane-a); the archived sources were searched by the
+        Session 143 lanes for corner-penetration case splits at n = 11 and found
+        Stromquist's and Friedman's wall arguments only, neither of which conditions
+        on corner depth. No priority search beyond the corpus was performed.
+      gaps: >-
+        Trump's personal site and the unarchived Kingbird pages are not retained; an
+        unpublished corner case split at n = 11 would not be found here. The
+        conditioning is a proof device rather than a result about s(11), so apparent
+        novelty concerns the certificate and its instrument, not a bound.
+  - id: E-n011-corner-class-96-25-interval-decision
+    claim: derived-structure
+    scope:
+      n_values:
+        - 11
+    assurance: verified
+    method: interval-certified
+    performed_by: repository
+    relationship_to_generator: independent-implementation
+    origin: audited-here
+    novelty: apparently-novel
+    certificate: cases/n11_corner_class_certificate/certificate.json
+    replay: uv run --frozen --all-extras --group dev python -m devtools.decide_certificate --corner-clip 1/2 cases/n11_corner_class_certificate/certificate.json
+    replay_status: passed
+    limitations: >-
+      The second decision of the same frozen bytes by the interval branch and bound of
+      sqpack.fractional.interval over boxes of centres on the doubled net, with a box
+      dropped only when an outward-rounded bound proves it inside the excluded corner
+      set, so an unresolved box is kept rather than assumed excluded. On this file its
+      enclosure of the least charge is (2000013/2000000, 2000013/2000000) over
+      1,743,736 boxes with none stalled, the value the exact sweep reports. It shares
+      the certificate object and the closed-form conditions with the exact route and no
+      part of how Condition 5 is decided; both routes decide the same clipped set only
+      because the clip is D4-invariant and folded. It adds no bound and no protection
+      against a wrong theorem statement, which both routes share.
+    source_reviewed: '2026-09-20'
+    novelty_basis:
+      corpus: >-
+        The same corpus as E-n011-corner-class-96-25-exact-decision.
+      novel_object: >-
+        The same certificate decided by an independent interval route on the clipped
+        domain.
+      searched: >-
+        As for the exact decision; no separate search.
+      gaps: >-
+        As for the exact decision.

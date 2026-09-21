@@ -19,25 +19,42 @@ export interface TimelineConfiguration {
   /** Play simple transitions, every phase, at `SIMPLE_TRANSITION_SPEED`. */
   fastSimple?: boolean;
   /**
-   * The fraction of the moving span kept at its start for the box to grow, before the new square
-   * arrives or any square moves. Zero, the default, starts both with the move.
+   * Fraction of the moving span between the container finishing its resize and the new square
+   * starting to fade in. The resize is always first; the default zero fades the square in as soon
+   * as the resize completes.
    */
-  boxFirst?: number;
+  arrivalDelay?: number;
   timing: AtlasTiming;
   continuous: ContinuousTiming;
   anneal: number;
   phase: AtlasPhase;
+  /** In the illustrated staged phases, the share of the moving span block motion gives up. */
   arrivalFraction: number;
+  /** The share of the moving span the new square takes to fade in, in every phase. */
   newFraction: number;
   rollMax: number;
 }
 
+/** The share of the moving span the container takes to resize, whatever the delay or phase. */
+export const CONTAINER_RESIZE_FRACTION = 0.3;
+
+/**
+ * Every instant is in seconds from the pair's start, and they are ordered
+ * `moveStart = containerStart <= containerEnd <= arrive <= arrived <= moveEnd <= end`, with
+ * `blocksStart <= blocksEnd <= moveEnd`. The new square starts to fade in at least the arrival
+ * delay after the resize completes, and exactly then unless a phase holds it for block motion.
+ */
 export interface PairSchedule {
   moveStart: number;
   moveEnd: number;
   end: number;
+  /** When the new square starts to fade in, and when it is fully in. */
   arrive: number;
   arrived: number;
+  /** When the container starts to resize: the start of the move, before the new square shows. */
+  containerStart: number;
+  /** When the container resize completes, which is the arrival delay before `arrive` or earlier. */
+  containerEnd: number;
   blocksStart: number;
   blocksEnd: number;
   roll: number;
@@ -157,12 +174,85 @@ export function timingDuration(timing: AtlasTiming): number {
   return finiteNonnegative(duration, "total duration");
 }
 
+/** A physical style simulates a staged step's bodies over the whole moving span. */
+function isStagedPhysicalPair(
+  configuration: TimelineConfiguration,
+  index: number,
+  style: AtlasStyle,
+): boolean {
+  return (
+    style !== "tween" &&
+    !isStillPair(configuration, index) &&
+    (configuration.phase === "add-then-move" || configuration.phase === "move-then-add")
+  );
+}
+
+/**
+ * The owner's order of 2026-09-17: the container resizes, which shrinks the picture; the arrival
+ * delay passes; then the new square fades in at its final size. Every duration is a share of the
+ * moving span, so the speed-up and the beat scale all of them together. Block motion keeps its
+ * phase: before the square in `move-then-add`, after it in `add-then-move`, and across the whole
+ * span in the unstaged phases, whose square finishes with the blocks unless the delay holds it.
+ * The step grows by whatever the resize and the delay add in front of the square.
+ */
+function scheduleForTiming(
+  configuration: TimelineConfiguration,
+  index: number,
+  style: AtlasStyle,
+  timing: AtlasTiming,
+): PairSchedule {
+  const span = timing.move + timing.correct;
+  const moveStart = timing.dwell;
+  const arrivalFraction = fraction(configuration.arrivalFraction, "arrival fraction");
+  const fade = span * fraction(configuration.newFraction, "new fraction");
+  const delay = span * fraction(configuration.arrivalDelay ?? 0, "arrival-delay fraction");
+  const containerStart = moveStart;
+  const containerEnd = containerStart + span * CONTAINER_RESIZE_FRACTION;
+  const earliestArrival = containerEnd + delay;
+  // The illustrated staged phases have always given the arrival a share of the span; a physical
+  // style simulates its bodies over all of it.
+  const stagedBlocks = isStagedPhysicalPair(configuration, index, style)
+    ? span
+    : span * (1 - arrivalFraction);
+  let arrive: number;
+  let blocksStart: number;
+  let blocksEnd: number;
+  if (configuration.phase === "add-then-move") {
+    arrive = earliestArrival;
+    blocksStart = arrive + fade;
+    blocksEnd = blocksStart + stagedBlocks;
+  } else if (configuration.phase === "move-then-add") {
+    blocksStart = moveStart;
+    blocksEnd = moveStart + stagedBlocks;
+    arrive = Math.max(blocksEnd, earliestArrival);
+  } else {
+    blocksStart = moveStart;
+    blocksEnd = moveStart + span;
+    arrive = Math.max(blocksEnd - fade, earliestArrival);
+  }
+  const arrived = arrive + fade;
+  const moveEnd = Math.max(blocksEnd, arrived);
+  const end = moveEnd + timing.settle;
+  return {
+    moveStart,
+    moveEnd,
+    end,
+    arrive,
+    arrived,
+    containerStart,
+    containerEnd,
+    blocksStart,
+    blocksEnd,
+    roll: Math.min(finiteNonnegative(configuration.rollMax, "roll maximum"), end - arrive),
+  };
+}
+
 export function pairDuration(
   configuration: TimelineConfiguration,
   index: number,
   style: AtlasStyle,
 ): number {
-  return timingDuration(pairTiming(configuration, index, style));
+  return pairSchedule(configuration, index, style).end;
 }
 
 /** Arrival, movement, and correction are explicit intervals, including zero-duration beats. */
@@ -171,46 +261,7 @@ export function pairSchedule(
   index: number,
   style: AtlasStyle,
 ): PairSchedule {
-  const timing = pairTiming(configuration, index, style);
-  const span = timing.move + timing.correct;
-  const moveStart = timing.dwell;
-  const moveEnd = moveStart + span;
-  const end = timingDuration(timing);
-  const arrivalFraction = fraction(configuration.arrivalFraction, "arrival fraction");
-  const newFraction = fraction(configuration.newFraction, "new fraction");
-  const reserved = span * fraction(configuration.boxFirst ?? 0, "box-first fraction");
-  const workStart = moveStart + reserved;
-  const work = span - reserved;
-  let arrive: number;
-  let arrived: number;
-  let blocksStart: number;
-  let blocksEnd: number;
-  if (configuration.phase === "add-then-move") {
-    arrive = workStart;
-    arrived = workStart + work * arrivalFraction;
-    blocksStart = arrived;
-    blocksEnd = moveEnd;
-  } else if (configuration.phase === "move-then-add") {
-    blocksStart = workStart;
-    blocksEnd = workStart + work * (1 - arrivalFraction);
-    arrive = blocksEnd;
-    arrived = moveEnd;
-  } else {
-    blocksStart = workStart;
-    blocksEnd = moveEnd;
-    arrive = workStart + work * (1 - newFraction);
-    arrived = moveEnd;
-  }
-  return {
-    moveStart,
-    moveEnd,
-    end,
-    arrive,
-    arrived,
-    blocksStart,
-    blocksEnd,
-    roll: Math.min(finiteNonnegative(configuration.rollMax, "roll maximum"), end - arrive),
-  };
+  return scheduleForTiming(configuration, index, style, pairTiming(configuration, index, style));
 }
 
 export function clampUnit(value: number): number {
@@ -261,8 +312,11 @@ export function ramp(time: number, from: number, to: number): number {
  * `playRange` turns continuous play on, so the range is priced from `continuousTiming` whatever
  * the clock is doing now -- and then through the same speed-up a pair actually plays at. Pricing
  * the speed-up here is not a refinement: with `fastSimple` on, a simple grid fill plays at
- * `SIMPLE_TRANSITION_SPEED`, so a range holding any of them was quoted longer than the page ever
- * took to play it, and the figure the panel showed was not the figure the clock ran.
+ * `SIMPLE_TRANSITION_SPEED`, so a range holding any of them is quoted longer than the page ever
+ * takes to play it, and the figure the panel shows is not the figure the clock runs.
+ *
+ * The schedule's own `end` is what a pair costs, rather than the four spans added up, so a
+ * staging that reserves part of the move is priced at what it plays.
  */
 export function rangeDuration(
   configuration: TimelineConfiguration,
@@ -275,10 +329,11 @@ export function rangeDuration(
   );
   let duration = 0;
   for (let index = bounds.first; index <= bounds.last; index += 1) {
-    const timing = continuousTiming(configuration, index, style);
-    duration += timingDuration(
-      isSpedUpPair(configuration, index) ? spedTiming(timing, SIMPLE_TRANSITION_SPEED) : timing,
-    );
+    const continuous = continuousTiming(configuration, index, style);
+    const timing = isSpedUpPair(configuration, index)
+      ? spedTiming(continuous, SIMPLE_TRANSITION_SPEED)
+      : continuous;
+    duration += scheduleForTiming(configuration, index, style, timing).end;
   }
   return finiteNonnegative(duration, "range duration");
 }

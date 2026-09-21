@@ -172,6 +172,22 @@ PRUNE = frozenset(
         ROOT / "campaign/series/series-000-smoke-and-calibration/results/agenda-024",
         ROOT / "campaign/series/series-000-smoke-and-calibration/results/agenda-025",
         ROOT / "campaign/series/series-000-smoke-and-calibration/results/agenda-026",
+        # Later agenda and campaign-calibration directories are the same retained-output
+        # class: numerical receipts, logs and copied scripts, not mutation-control
+        # inputs. `controls.yaml` names none of these paths. Inline-linked and registered
+        # dependencies still return through `snapshot_pruned_targets`, as they do for
+        # agendas 024--026. On 2026-09-16, pruning agenda 034 alone recovered only 596 KB
+        # because 14.7 MB was correctly copied back; these other unused output roots
+        # recover 23.2 MB more. That leaves meaningful margin below the fixed 160 MiB cap
+        # and makes every private-worker copy smaller without removing research evidence
+        # from the repository or a declared dependency from the worker.
+        ROOT / "campaign/series/series-000-smoke-and-calibration/results/agenda-031",
+        ROOT / "campaign/series/series-000-smoke-and-calibration/results/agenda-033",
+        ROOT / "campaign/series/series-000-smoke-and-calibration/results/agenda-034",
+        ROOT / "campaign/series/series-000-smoke-and-calibration/results/agenda-035",
+        ROOT
+        / "campaign/series/series-000-smoke-and-calibration/results/exp-201-arm-calibration",
+        ROOT / "campaign/series/series-000-smoke-and-calibration/results/exp-202-round-1",
         # The n=17 weighted-certificate solver state joins them on 2026-09-03, when the
         # H-052 lane committed exp-059's completion record and its checkpoint and pushed
         # the snapshot to 90,031,065 bytes against the 67,108,864 cap. Counted over the
@@ -366,6 +382,21 @@ ROOT_DOCUMENTS = (
 # Allow 160 MiB, which is 31.1 MiB of headroom rather than 0.9, so the guard fires on a
 # gigabyte of data and not on a research round; three portable workers remain bounded at
 # 480 MiB.
+#
+# 2026-09-16, after the workbench and its compact kinetics records landed: the tracked
+# snapshot measured 168,058,379 bytes, 286,219 bytes past the 160 MiB ceiling. This is
+# the ordinary source growth `think-t1lk` predicted, not cache drift or an accidental
+# generated tree. Reset the same roughly-32-MiB operating headroom at 192 MiB while that
+# bead retains the durable audit of generated files that no mutation control reads.
+# Three portable workers remain bounded at 576 MiB.
+#
+# 2026-09-16, the same day, merging that raise into the pipeline closeout block: it was
+# measured before the output roots of agendas 031 and 033--035 and of exp-201/202 joined
+# `PRUNE` above. Agenda 032 is not among them: only its exp-137 receipt is pruned.
+# With them pruned, the merged snapshot measures 144,637,123 bytes (137.9 MiB), 22.1 MiB
+# under 160 MiB. The raise answered a breach this branch removes by pruning, so it is
+# undone rather than kept as slack that would hide the next one. Three portable workers
+# return to 480 MiB.
 SNAPSHOT_MAX_BYTES = 160 * 1024 * 1024
 DEFAULT_CONTROL_TIMEOUT_SECONDS = 120.0
 TERMINATION_GRACE_SECONDS = 1.0

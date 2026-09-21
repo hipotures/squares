@@ -1,0 +1,75 @@
+/* Negative controls for the raw-value policy. The token block holds raw values, as it must, and
+   none of them is reported; every rule after it smuggles one kind of raw value past the tokens. */
+:root {
+  --ink: #17202a;
+  --paper: rgb(255 255 255);
+  --accent: oklch(54.14% 0.1337 246.71);
+  --space-2: 8px;
+  --leading: 1.4;
+  --weight-strong: 600;
+  --layer-top: 10;
+  --shadow: 0 8px 40px rgb(23 32 42 / 18%);
+  --transition-fast: 150ms ease;
+}
+
+.hex {
+  color: #fff;
+}
+
+.rgb {
+  background-color: rgb(0 0 0 / 50%);
+}
+
+.oklch {
+  border-color: oklch(70% 0.1 200);
+}
+
+.named {
+  outline-color: red;
+}
+
+.padding {
+  padding: 12px var(--space-2);
+}
+
+.margin {
+  margin: 0.5em 0;
+}
+
+.leading {
+  line-height: 1.2;
+}
+
+.weight {
+  font-weight: 600;
+}
+
+.layer {
+  z-index: 3;
+}
+
+.shadow {
+  box-shadow: 0 2px 4px var(--ink);
+}
+
+.motion {
+  transition: opacity 150ms ease;
+}
+
+.calc {
+  margin-inline: calc(var(--space-2) + 4px);
+}
+
+.scoped {
+  --gutter: 4px;
+}
+
+@media (max-width: 600px) {
+  .narrow {
+    gap: 6px;
+  }
+}
+
+.important {
+  letter-spacing: 0.02em !important;
+}

@@ -1,0 +1,36 @@
+// Fixture for the inline style scan. The .txt extension keeps it out of Biome and tsc: it is read
+// as text, never compiled. Each write below is one the scan must find.
+const stage = document.getElementById("stage") as HTMLElement;
+stage.style.display = "none";
+stage.style.left += "px";
+stage.style.backgroundColor = "red";
+stage.style["opacity"] = "0.5";
+stage.style['z-index'] = "2";
+stage.style.setProperty("--stage-scale", String(2));
+stage.style.removeProperty("transform");
+stage.style.cssText = "top: 0";
+stage.setAttribute("style", "top: 0");
+stage.setAttribute('style', "top: 0");
+Object.assign(stage.style, { top: "0" });
+stage.innerHTML = `<span class="x" style="color: red">${stage.id}</span>`;
+const url = "https://example.com/*not-a-comment*/"; stage.style.width = "1px";
+const quoted = /["'`]/.test(url); stage.style.height = "2px";
+stage.style.display = "";
+
+// Reads, data objects and comments the scan must not report.
+const hidden = stage.style.display !== "none";
+const same = stage.style.left === "0px";
+const request = { style: "bodies" };
+if (request.style === "bodies") {
+  request.style = "points";
+}
+const badge = { glyph: "x", style: "y" };
+const label = `${badge.glyph}/${badge.style}`;
+const style = "bodies";
+const text = "stage.style.opacity = '1'";
+const scale = getComputedStyle(stage).getPropertyValue("--stage-scale");
+const selected = document.querySelector(`[style="display: none"]`);
+// stage.style.display = "block";
+/* stage.style.opacity = "1";
+   stage.setAttribute("style", "color: red"); */
+export { hidden, same, label, style, text, scale, quoted, selected };

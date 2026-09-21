@@ -2,7 +2,7 @@ softschema:
   contract: packing.squares:ResultsRegister/v1
   schema: results.schema.yaml
   status: enforced
-last_reviewed: '2026-09-09'
+last_reviewed: '2026-09-20'
 results:
   - id: T-001
     claim: >-
@@ -937,8 +937,8 @@ results:
       above read in the other direction. This result stays true as stated at all three
       of its sizes and keeps its rungs.
       For n = 17 the reading is unchanged and the runway is 0.3985 to the ceiling and
-      0.0855 to the packing. For n = 18 the open question is the one the 117/25 run left
-      open above.
+      0.0855 to the packing. For n = 18, T-030 now certifies 4679/1000; T-029's 1871/400
+      remains as the previous rung. 117/25 remains the open probe this next_rung named.
 
   - id: T-020
     claim: >-
@@ -1526,3 +1526,439 @@ results:
       1440-step certificate, and the exact dilation record; its mapped source-distinct
       review supplies C5. A further assurance step would require proof-assistant
       formalization, external review, or an independently reproduced full decision.
+
+  - id: T-027
+    claim: >-
+      s(18) >= 467/100 = 4.67, from a first-party weighted fractional unavoidable-set
+      certificate at container side 467/100. The case previously held 459/100 = 4.59
+      from T-019; the movement is +0.08. The selected external report 9141/2000 = 4.5705
+      (GitHub, not peer reviewed, not replayed here) lies 0.0995 below this result.
+      One size, and not by monotonicity. Only Condition 2 mentions n among the five
+      conditions, so an atom set of mass 8937839/500000 = 17.875678 certifies the side
+      for every integer strictly above that mass, which is 18 and upward. It does not
+      reach n = 17, where T-019 still holds 459/100. From n = 19 on the register already
+      holds 24/5 = 4.80, so the certificate is true there and weaker.
+      One rung is retained rather than a ladder. The side was reached by seeding the
+      generator's site set with T-019's own atoms scaled from 459/100 after the uniform
+      grid locked at 18.000000.
+    scope:
+      n_values:
+        - 18
+    verification: V4
+    confirmation: C4
+    significance:
+      score: 3
+      rationale: >-
+        Scored at S3 by the calibration note T-020 wrote for exactly this case:
+        "Further sizes from the same generator, absent a new technique or a case that
+        changes character, belong at S3." This is the same generator at n = 18, one
+        size-specific covering rather than T-019's Condition 2 carry, and n = 18 does
+        not change character at 4.67. The movement is +0.08 against T-019's verified
+        field and 0.0995 against the strongest named public candidate. Held below S4
+        because the technique is the one T-017 already banked, the displacement is of
+        this project's own prior rung rather than a published closed form, and n = 18
+        is not the central open case.
+      scored: '2026-09-18'
+      by: session-139 (repository; no independent evaluator, see composition)
+    novelty: apparently-novel
+    composition: >-
+      Primary at n = 18: one certificate, one accepted verdict, the bound being the
+      container side directly, with no monotonicity or composition step between the
+      artifact and the claim.
+      C4 is earned by two evidence entries whose method values differ, the exact
+      event-cell sweep and the interval branch and bound, both run in this repository on
+      the frozen bytes. As with T-020 there is no independent evaluator and no review
+      artifact, so C5 -- review-ready, a mapped review -- is as far away here as there.
+    produced_by:
+      session: session-139
+    evidence:
+      - E-n018-fractional-certificate
+      - E-fractional-interval-decision
+    artifacts:
+      - packing/cases/n18_fractional_certificate/certificate-467-100.json
+      - packing/src/sqpack/fractional/colgen.py
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-467-100-t019-seed-receipt.md
+    controls:
+      - packing/tests/test_fractional_certificate.py
+    next_rung: >-
+      T-028 took the next rung at 187/40 on 2026-09-19. This result stays true as
+      stated and keeps its bytes at certificate-467-100.json. The remaining runway
+      to the packing is now T-028's business. C5 is review-ready under
+      epistemics.md -- a mapped, non-superseded review artifact -- and none has been
+      written for this result.
+
+  - id: T-028
+    claim: >-
+      s(18) >= 187/40 = 4.675, from a first-party weighted fractional unavoidable-set
+      certificate at container side 187/40. The case previously held 467/100 = 4.67
+      from T-027; the movement is +0.005. The selected external report 9141/2000 = 4.5705
+      (GitHub, not peer reviewed, not replayed here) lies 0.1045 below this result.
+      One size, and not by monotonicity. Only Condition 2 mentions n among the five
+      conditions, so an atom set of mass 35758287/2000000 = 17.8791435 certifies the
+      side for every integer strictly above that mass, which is 18 and upward. It does
+      not reach n = 17, where T-019 still holds 459/100. From n = 19 on the register
+      already holds 24/5 = 4.80, so the certificate is true there and weaker.
+      One rung is retained rather than a ladder. The side was reached by seeding the
+      generator's site set with T-027's own atoms scaled from 467/100 and adding a
+      windows-5 lattice after 117/25 locked at 18.000000. n = 18 is off the H-218
+      sweep, so this retain does not confirm that claim.
+    scope:
+      n_values:
+        - 18
+    verification: V4
+    confirmation: C4
+    significance:
+      score: 3
+      rationale: >-
+        Scored at S3 by the calibration note T-020 wrote for exactly this case:
+        "Further sizes from the same generator, absent a new technique or a case that
+        changes character, belong at S3." This is the same generator at n = 18, one
+        size-specific covering rather than T-019's Condition 2 carry, and n = 18 does
+        not change character at 4.675. The movement is +0.005 against T-027's verified
+        field and 0.1045 against the strongest named public candidate. Held below S4
+        because the technique is the one T-017 already banked, the displacement is of
+        this project's own prior rung rather than a published closed form, and n = 18
+        is not the central open case.
+      scored: '2026-09-19'
+      by: session-140 (repository; no independent evaluator, see composition)
+    novelty: apparently-novel
+    composition: >-
+      Primary at n = 18: one certificate, one accepted verdict, the bound being the
+      container side directly, with no monotonicity or composition step between the
+      artifact and the claim.
+      C4 is earned by two evidence entries whose method values differ, the exact
+      event-cell sweep and the interval branch and bound, both run in this repository on
+      the frozen bytes. As with T-027 there is no independent evaluator and no review
+      artifact, so C5 -- review-ready, a mapped review -- is as far away here as there.
+    produced_by:
+      session: session-140
+    evidence:
+      - E-n018-t028-fractional-certificate
+      - E-fractional-interval-decision
+    artifacts:
+      - packing/cases/n18_fractional_certificate/certificate-187-40.json
+      - packing/src/sqpack/fractional/colgen.py
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n18-4675-1000-t027-auto-windows5-receipt.md
+    controls:
+      - packing/tests/test_fractional_certificate.py
+    next_rung: >-
+      T-029 took the next rung at 1871/400 on 2026-09-19. This result stays true as
+      stated and keeps its bytes at certificate-187-40.json. The remaining runway
+      to the packing is now T-029's business. C5 is review-ready under
+      epistemics.md -- a mapped, non-superseded review artifact -- and none has
+      been written for this result.
+
+  - id: T-029
+    claim: >-
+      s(18) >= 1871/400 = 4.6775, from a first-party weighted fractional unavoidable-set
+      certificate at container side 1871/400. The case previously held 187/40 = 4.675
+      from T-028; the movement is +0.0025. The selected external report 9141/2000 = 4.5705
+      (GitHub, not peer reviewed, not replayed here) lies 0.107 below this result.
+      One size, and not by monotonicity. Only Condition 2 mentions n among the five
+      conditions, so an atom set of mass 17889361/1000000 = 17.889361 certifies the
+      side for every integer strictly above that mass, which is 18 and upward. It does
+      not reach n = 17, where T-019 still holds 459/100. From n = 19 on the register
+      already holds 24/5 = 4.80, so the certificate is true there and weaker.
+      One rung is retained rather than a ladder. The side was reached by seeding the
+      generator's site set with T-028's own atoms scaled from 187/40 and adding a
+      windows-5 lattice. Auto at 1871/400 resolved to (32, 43, 54), not T-028's
+      (32, 43, 53). n = 18 is off the H-218 sweep, so this retain confirms H-219,
+      not H-218.
+    scope:
+      n_values:
+        - 18
+    verification: V4
+    confirmation: C4
+    significance:
+      score: 3
+      rationale: >-
+        Scored at S3 by the calibration note T-020 wrote for exactly this case:
+        "Further sizes from the same generator, absent a new technique or a case that
+        changes character, belong at S3." This is the same generator at n = 18, one
+        size-specific covering rather than T-019's Condition 2 carry, and n = 18 does
+        not change character at 4.6775. The movement is +0.0025 against T-028's verified
+        field and 0.107 against the strongest named public candidate. Held below S4
+        because the technique is the one T-017 already banked, the displacement is of
+        this project's own prior rung rather than a published closed form, and n = 18
+        is not the central open case.
+      scored: '2026-09-19'
+      by: session-141 (repository; no independent evaluator, see composition)
+    novelty: apparently-novel
+    composition: >-
+      Primary at n = 18: one certificate, one accepted verdict, the bound being the
+      container side directly, with no monotonicity or composition step between the
+      artifact and the claim.
+      C4 is earned by two evidence entries whose method values differ, the exact
+      event-cell sweep and the interval branch and bound, both run in this repository on
+      the frozen bytes. As with T-028 there is no independent evaluator and no review
+      artifact, so C5 -- review-ready, a mapped review -- is as far away here as there.
+    produced_by:
+      session: session-141
+    evidence:
+      - E-n018-t029-fractional-certificate
+      - E-fractional-interval-decision
+    artifacts:
+      - packing/cases/n18_fractional_certificate/certificate-1871-400.json
+      - packing/src/sqpack/fractional/colgen.py
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n18-1871-400-t028-auto-windows5-receipt.md
+    controls:
+      - packing/tests/test_fractional_certificate.py
+    next_rung: >-
+      T-030 took the next rung at 4679/1000 on 2026-09-19. This result stays true as
+      stated and keeps its bytes at certificate-1871-400.json. The remaining runway
+      to the packing is now T-030's business. C5 is review-ready under
+      epistemics.md -- a mapped, non-superseded review artifact -- and none has
+      been written for this result.
+
+  - id: T-030
+    claim: >-
+      s(18) >= 4679/1000 = 4.679, from a first-party weighted fractional unavoidable-set
+      certificate at container side 4679/1000. The case previously held 1871/400 = 4.6775
+      from T-029; the movement is +0.0015. The selected external report 9141/2000 = 4.5705
+      (GitHub, not peer reviewed, not replayed here) lies 0.1085 below this result.
+      One size, and not by monotonicity. Only Condition 2 mentions n among the five
+      conditions, so an atom set of mass 71573611/4000000 = 17.89340275 certifies the
+      side for every integer strictly above that mass, which is 18 and upward. It does
+      not reach n = 17, where T-019 still holds 459/100. From n = 19 on the register
+      already holds 24/5 = 4.80, so the certificate is true there and weaker.
+      One rung is retained rather than a ladder. The side was reached by seeding the
+      generator's site set with T-029's own atoms scaled from 1871/400 and adding a
+      windows-5 lattice. Auto at 4679/1000 resolved to (32, 43, 54), the same triple
+      T-029 used. n = 18 is off the H-218 sweep, so this retain confirms H-221,
+      not H-218.
+    scope:
+      n_values:
+        - 18
+    verification: V4
+    confirmation: C4
+    significance:
+      score: 3
+      rationale: >-
+        Scored at S3 by the calibration note T-020 wrote for exactly this case:
+        "Further sizes from the same generator, absent a new technique or a case that
+        changes character, belong at S3." This is the same generator at n = 18, one
+        size-specific covering rather than T-019's Condition 2 carry, and n = 18 does
+        not change character at 4.679. The movement is +0.0015 against T-029's verified
+        field and 0.1085 against the strongest named public candidate. Held below S4
+        because the technique is the one T-017 already banked, the displacement is of
+        this project's own prior rung rather than a published closed form, and n = 18
+        is not the central open case.
+      scored: '2026-09-19'
+      by: session-141 (repository; no independent evaluator, see composition)
+    novelty: apparently-novel
+    composition: >-
+      Primary at n = 18: one certificate, one accepted verdict, the bound being the
+      container side directly, with no monotonicity or composition step between the
+      artifact and the claim.
+      C4 is earned by two evidence entries whose method values differ, the exact
+      event-cell sweep and the interval branch and bound, both run in this repository on
+      the frozen bytes. As with T-029 there is no independent evaluator and no review
+      artifact, so C5 -- review-ready, a mapped review -- is as far away here as there.
+    produced_by:
+      session: session-141
+    evidence:
+      - E-n018-t030-fractional-certificate
+      - E-fractional-interval-decision
+    artifacts:
+      - packing/cases/n18_fractional_certificate/certificate.json
+      - packing/src/sqpack/fractional/colgen.py
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n18-4679-1000-t029-auto-windows5-receipt.md
+    controls:
+      - packing/tests/test_fractional_certificate.py
+    next_rung: >-
+      The retained certificate's total is 71573611/4000000 = 17.89340275, leaving
+      426389/4000000 = 0.10659725 below eighteen, and that margin is what a further
+      rung has to be found inside. The side above it, 117/25 = 4.68, locked at
+      18.000000 on the T-019-seeded construction, on T-027's own atoms, on T-028's
+      own atoms, and on three earlier site sets; adding sites can still lower a
+      restricted optimum, so 117/25 is not barred. The remaining interval to that
+      plateau is 0.001. The method's ceiling is 5B = 4.9885, and the best known
+      packing is 4.82287566, so the real runway is 0.1439 to the packing. C5 is
+      review-ready under epistemics.md -- a mapped, non-superseded review artifact
+      -- and none has been written for this result.
+  - id: T-031
+    claim: >-
+      At L = 96/25 and B = 9977/10000 on the 181-direction net (half-tangents
+      k*207107/90000000, k = 0..180), the D4-symmetric point measure of total mass
+      10868617/1000000 = 10.868617 in cases/n11_corner_class_certificate/certificate.json, the retained exp-220 covering (SHA-256
+      876820dde8d55c727dec73c85f245db27661556bb3c7aa06ffb15b01ec97a461) charges at
+      least 2000013/2000000 to every closed B-square at a net direction whose minimum
+      of x + y is at least 1/2 in each of the four corner frames, decided by the exact
+      event-cell sweep and by the interval branch and bound, which agree at that value.
+      Consequently every packing of eleven unit squares in [0, 96/25]^2 contains a
+      unit square whose minimum of x + y in some corner frame is strictly below 1/2,
+      that is, one that meets the open corner triangle x + y < 1/2 at that corner;
+      equivalently, the all-free (octagon) class of lane-a Theorem B at threshold 1/2
+      contains no eleven-square packing at side 96/25. This is a conditional exclusion
+      of one corner-bin class and changes no bound on s(11); the all-deep class is
+      separately known to be outside this language's reach (BC-366), so the corner
+      tree cannot close at 96/25 by clipping alone.
+    scope:
+      n_values:
+        - 11
+    verification: V4
+    confirmation: C3
+    significance:
+      score: 2
+      rationale: >-
+        The first decided item of the corner-conditioned point language at the central
+        open size: one D4 class of the corner tree is excluded at 3.84 by a certificate
+        on a clipped domain, with the structural consequence that every eleven-square
+        packing in a square of side 96/25 has a square meeting an open corner triangle
+        of depth 1/2. It moves no bound, and the registration review shows the tree it
+        belongs to cannot close at this side in the point language alone, since the
+        all-deep class is a Lemma-D theorem for every site set (BC-366); the mixed
+        classes are a bounded follow-up.
+      scored: '2026-09-20'
+      by: Session 146 adversarial registration review (REGISTER WITH CORRECTIONS) and coordinator review
+    novelty: apparently-novel
+    composition: >-
+      The certificate is a weighted fractional unavoidable-set certificate of the
+      retained form whose row domain is the D4-symmetric convex clip of the admissible
+      core domain by the four corner triangles at depth 1/2, admitted as a domain
+      predicate on the row generator and threaded through both gate routes and the
+      ceiling readers in Session 145 with a residual-7 control on the transported
+      88-family. The declared C3 is deliberately below the C4 the two cited atoms
+      derive, and the minimum over parts is what this note claims. The exact event-cell
+      sweep and the interval branch and bound are the two internal routes of one
+      decide_certificate --corner-clip 1/2 invocation, which refuses the file unless
+      both accept: they share the Certificate parser and the closed-form conditions,
+      carry a byte-identical replay string, and the exact leg records
+      relationship_to_generator: same-implementation, so the repository counts the pair
+      as one confirmation and not as two method-distinct derivations. The Session 146
+      registration review says exactly that and recommends V4/C3; a genuinely separate
+      derivation of this clipped decision would earn C4, and none exists. V4 still
+      rests on the two machine decisions of the frozen bytes, which fail differently:
+      the exact event-cell sweep with the clip as extra half-planes on the per-slab
+      centre range, and the interval branch and bound whose boxes are dropped only when
+      provably inside the excluded set; the two decide the same set only because the
+      clip is D4-invariant and folded, which the instrument's tests check. Conditions 1
+      to 4 are decided exactly before either route runs. The conclusion transfers from the
+      shrunken cores to the unit squares without loss in the direction that matters,
+      because the kept domain is closed and a core lies strictly inside its square by
+      Condition 4. The retained bytes declare variant class and the clip, and the gate
+      refuses them without the flag, so the file cannot be read as a bound.
+    produced_by:
+      hypothesis: H-222
+      agenda_cell: BC-367
+      session: session-146
+      experiment: exp-220
+    evidence:
+      - E-n011-corner-class-96-25-exact-decision
+      - E-n011-corner-class-96-25-interval-decision
+    artifacts:
+      - packing/cases/n11_corner_class_certificate/certificate.json
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-220-n11-96-25-class-covering.json
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-220-n11-96-25-class-decide.stdout
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-220-n11-96-25-class-decide-noflag.stdout
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-220-n11-96-25-class-receipt.md
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-219-n11-96-25-clip-receipt.md
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/h222-registration-review.md
+      - packing/src/sqpack/fractional/corner_clip.py
+      - packing/devtools/decide_certificate.py
+    controls:
+      - packing/tests/test_n11_corner_class_certificate.py
+      - packing/tests/test_fractional_corner_clip.py
+      - packing/tests/test_decide_certificate.py
+    next_rung: >-
+      The complementary class, in which some core meets a corner triangle, is the hard
+      one: the all-deep class is a Lemma-D theorem for every site set (the transported
+      88-family keeps residual 7 against a requirement of 7, BC-366), so no point
+      covering excludes it and the corner tree cannot make 96/25 unconditional by
+      clipping. The four mixed D4 classes (fourteen bin vectors) are a bounded
+      follow-up under BC-367 and need a box cut on the row domain. The instrument that
+      could matter is a 2-of-3 threshold atom on ring-centre overlaps inside the
+      all-deep class, which needs the clip wired into the threshold routes. C5 needs
+      the registration review mapped under docs/project/reviews; the case directory and
+      the gate control test in the T-022 pattern are retained.
+    notes: >-
+      Registered at the close of the overnight loop from exp-220, the exp-219 covering
+      re-frozen under the class claim strings after the registration review found the
+      original bytes carried an unconditional claim string (review defect D1). Every
+      atom of exp-220 equals exp-219's as an exact Fraction in the same order; the
+      corrected gate refuses exp-219's bytes and accepts exp-220's. Apparent novelty
+      concerns this explicit clipped-domain certificate; no priority search was
+      performed. The statement itself is unconditional about every packing at 96/25;
+      the exclusion of the class is what is conditional.
+  - id: T-032
+    claim: >-
+      s(17) >= 461300/99999 = 4.61304613..., by Guzhou0806's R012 parent-angle
+      certificate of 20 September 2026, replayed here by the source's exact checker and
+      decided again by this repository's interval branch and bound. Beneath it,
+      s(17) >= 4613/1000 by Mira's 1620-atom weighted certificate of 7 September 2026,
+      which is in this repository's certificate schema and which both stock verifiers
+      accept unchanged. Both are externally produced, previously published and not peer
+      reviewed; both descend from T-019 and credit it; no new first-party mathematics is
+      claimed. The case previously held 459/100 from T-019, and the movement is
+      +0.02305 at the R012 value and +0.023 at Mira's side.
+      The R012 argument is this repository's weighted method with three changes. Parents
+      have side A = 99999/100000 inside [0, L]^2 at L = 4613/1000, and the bound is L/A.
+      A catalogue of 2925 closed parent-angle intervals covers [0, pi/4], and each
+      interval picks its own concentric closed core, by direction and side, strictly
+      inside every parent of the interval. Coverage by the measure is required only over
+      the legal parent-centre square for the interval. The measure is Mira's, rounded to
+      10^-5 with weights rounded up, 1616 atoms of mass 424969/25000; every core
+      captures at least gamma = 250023/250000, and 17 gamma exceeds the mass by
+      701/250000.
+      One size. The measure's mass is just below 17, so the certificate also says
+      s(18) and s(19) are at least this value, and the register already holds 4679/1000
+      and 24/5 there.
+    scope: {n_values: [17]}
+    verification: V4
+    confirmation: C4
+    significance:
+      score: 3
+      rationale: >-
+        Raises the verified lower bound at n = 17 by 0.02305 over T-019 and closes the
+        gap to Bidwell's 4.67553009 to 0.0625. Scored as T-015 was, and for the same
+        reason: an externally proposed, source-backed result that this repository
+        replayed, decided by a second method and read closely, not new first-party
+        mathematics. Two things keep it at S3. The technique is the one T-017 and T-019
+        banked, extended by others; and almost all of the movement is Mira's support and
+        weights, R012's selector and parent-centre restriction adding 1.7e-5 on a fixed
+        measure. What those two extensions are worth on a measure optimised against them
+        is open and is not this result.
+      scored: '2026-09-20'
+      by: session-149 (repository; no independent evaluator)
+    novelty: previously-published
+    composition: >-
+      Primary at n = 17 on the R012 certificate: the bound is L/A from one catalogue and
+      one measure, with no monotonicity step. C4 is earned on that certificate by two
+      evidence entries whose methods differ, the source's exact event-cell replay and
+      this repository's interval decision of all 2925 entries, both passing on the
+      archived bytes. The exact route is the source's own checker, whose sweep descends
+      from this repository's, so its independence is of method from the interval route
+      and not of authorship from the generator; the proof review also decided every
+      entry with this repository's sweep kernel and agreed on all 2925 minima, as review
+      scratch. Mira's certificate carries its own pair of entries, the stock exact
+      verifier and the stock interval verifier, and supports the weaker statement
+      s(17) >= 4613/1000 independently of R012. The reduction from a packing to R012's
+      finite obligations is a read argument, closed in the review artifact, and is what
+      a formal port would address.
+    produced_by:
+      session: session-149
+    review_artifact: docs/project/reviews/review-2026-09-20-n17-r012-and-mira-4613-proof-review.md
+    evidence:
+      - E-n017-guzhou-r012-source-replay
+      - E-n017-guzhou-r012-interval-decision
+      - E-n017-mira-4613-exact-replay
+      - E-n017-mira-4613-interval-decision
+    artifacts:
+      - packing/resources/web/n17-weighted-certificates-2026-09-20/README.md
+      - packing/resources/web/n17-weighted-certificates-2026-09-20/guzhou0806-n17-square-packing/certificates/R012/PROOF.md
+      - packing/resources/web/n17-weighted-certificates-2026-09-20/guzhou0806-n17-square-packing/certificates/R012/verify.py
+      - packing/resources/web/n17-weighted-certificates-2026-09-20/replay_guzhou_r012_first_party.py
+      - packing/resources/web/n17-weighted-certificates-2026-09-20/replay_mira_4613_first_party.py
+      - packing/resources/web/n17-weighted-certificates-2026-09-20/mira-17squares/certificates/lower_bound_4p613/best-certificate.json
+    controls:
+      - packing/tests/test_n17_external_weighted_certificates.py
+    next_rung: >-
+      Mira's dilation endpoint, 4.61302863588611..., needs a T-022-style proof note for
+      this certificate and is superseded by the R012 value in any case. A retained
+      exact-route instrument for R012 that does not share the source's sweep lineage
+      would make the exact leg first-party; the review's scratch pass shows the stock
+      kernel decides every entry in about six minutes once its centre domain is a
+      parameter. V5 by a proof-assistant port of the reduction. The method's open
+      question is what the selector and the parent-centre restriction gain when the
+      measure is optimised against them; Mira reports a failed attempt at 4.615 on the
+      unrestricted test.

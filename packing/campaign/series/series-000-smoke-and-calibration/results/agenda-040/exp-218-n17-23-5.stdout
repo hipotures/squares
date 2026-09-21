@@ -1,0 +1,36 @@
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+{
+ "n": 17,
+ "outer_side": "23/5",
+ "square_side": "9977/10000",
+ "grid_counts": [
+  32,
+  42,
+  52
+ ],
+ "inset": "1/2",
+ "angle_limit": "207107/500000",
+ "direction_steps": 181,
+ "scale": 4000000,
+ "column_rounds": 1,
+ "max_rounds": 60,
+ "rows_per_direction": 3,
+ "seed_certificate": "cases/n17_fractional_certificate/certificate.json",
+ "seed_map": "scale",
+ "seed_windows": 5,
+ "support_cap": 32
+}
+round    rows  orbits   sites lp_rounds     objective least_covered      depth   seconds  note
+----------------------------------------------------------------------------------------------
+    0   10678     928    7068        44     17.042346      1.000000   1.213333    1554.3  adding 1 orbits, deepest at (Fraction(8727706399, 8745740000), Fraction(16358978303, 16392780000))
+stopped: converged: every placement covers mass 1
+objective: 17.04234631807338
+least covered mass: 0.9999999999999963
+total mass: 1704253/100000 = 17.04253
+least cell mass: None
+atoms: 1384
+seed sites: 1584
+frozen: campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-218-n17-23-5-covering.json
+family frozen: campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-218-n17-23-5-family.json
+priced support rows: 32
+seconds: 1562.3

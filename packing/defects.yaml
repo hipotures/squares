@@ -11,7 +11,7 @@ softschema:
   schema: defects.schema.yaml
   envelope: null
   status: enforced
-count: 492
+count: 507
 defects:
 - id: D-001
   title: Fixed-side search never left the grid basin
@@ -16460,34 +16460,335 @@ defects:
     Chromium self-test also runs the independent queue-watchdog control.
   recorded_in: packing/devtools/prepare_explainer_math.py
 - id: D-492
-  title: A range was quoted at a beat it never played
-  date: '2026-09-21'
+  title: Threshold producer called solver errors infeasible
+  date: '2026-09-19'
   layer: tooling
-  class: bookkeeping
-  direction: neutral
-  detected_by: gate
-  latent_for: since the fast-simple speed-up landed; every range holding a simple grid fill
+  class: validity
+  direction: conservative
+  detected_by: review
+  severity: high
+  status: fixed
+  bead: think-qpcq
+  what: HiGHS failures other than a time limit were reported as an infeasible covering LP, including solver errors.
+  consequence: An unresolved computation could be recorded as a scientific refusal.
+  fix: Only status 2 is infeasible; other unsuccessful outcomes are unresolved and preserve solver diagnostics, including the initial snapped-row solve. Raw solver vectors are checked for shape and finiteness before clipping marginal signs.
+  regression: Synthetic solver-status and malformed-vector controls, including both signs of infinite marginals, in packing/tests/test_produce_threshold_certificate.py.
+  recorded_in: packing/devtools/produce_threshold_certificate.py
+- id: D-493
+  title: Event-cell geometry accepted directions outside its quadrant
+  date: '2026-09-19'
+  layer: verifier
+  class: soundness
+  direction: conservative
+  detected_by: review
+  severity: high
+  status: fixed
+  bead: think-sole
+  what: The event encoder accepted half-tangent limits above 1 although containment assumed nonnegative sine and cosine.
+  consequence: At limit 2 the centre of a side-2 container acquired an impossible empty cover row and a false infeasibility verdict.
+  fix: Reject angle limits outside the positive first-quadrant domain, at most 1.
+  regression: The centre-piercing control and invalid-limit rejection in packing/tests/test_integral_piercing.py.
+  recorded_in: packing/src/sqpack/fractional/integral_piercing.py
+- id: D-494
+  title: Covering queue had no atomic writer ownership
+  date: '2026-09-19'
+  layer: tooling
+  class: robustness
+  detected_by: review
   severity: medium
   status: fixed
+  bead: think-ox9l
+  what: Two walkers could both observe a missing final run and start the same output prefix concurrently.
+  consequence: Duplicate generators could consume the host and overwrite one another's evidence.
+  fix: Add process-held ownership before starting work; the generator inherits it and release waits for all owning processes to exit.
+  regression: Concurrent-walker exclusion and crash-release controls in packing/tests/test_covering_queue.py.
+  recorded_in: packing/devtools/run_covering_queue.py
+- id: D-495
+  title: Unfinished covering and interval checks were treated as refutations
+  date: '2026-09-19'
+  layer: record
+  class: validity
+  direction: conservative
+  detected_by: review
+  severity: high
+  status: fixed
+  bead: think-ujkz
+  what: Hypothesis stop rules and rankings treated unconverged below-target LPs or stalled interval verification as killing the construction.
+  consequence: Viable unresolved work could be excluded by a claimed mathematical obstruction that had not been established.
+  fix: Correct the operational dispositions to unresolved or deferred and distinguish budget decisions from proof; annotate the historical correction.
+  regression: none
+  recorded_in: docs/project/reviews/review-2026-09-19-pr199-201-correctness.md
+- id: D-496
+  title: Floating solver subjects were labelled exact and verified
+  date: '2026-09-19'
+  layer: record
+  class: bookkeeping
+  detected_by: review
+  severity: medium
+  status: fixed
+  bead: think-1436
+  what: Sixteen restricted-optimum experiment subjects declared exact-algebraic verification although their optima came from floating HiGHS runs; exp-171's separately verified rational freeze did not make its LP optimum exact.
+  fix: Use numerical assurance and numerical-f64 provenance for those subjects without changing accepted certificate records.
+  regression: Schema validation checks the corrected assurance shape; no automatic detector infers evidence strength from prose.
+  recorded_in: docs/project/reviews/review-2026-09-19-pr199-201-correctness.md
+- id: D-497
+  title: T-027 provenance was swallowed by a YAML prose scalar
+  date: '2026-09-19'
+  layer: record
+  class: bookkeeping
+  detected_by: review
+  severity: medium
+  status: fixed
+  bead: think-cat2
+  what: The produced_by block was indented inside composition and parsed as text instead of structured provenance.
+  fix: Restore produced_by as a mapping on T-027.
+  regression: Parsed result provenance was inspected during the correctness pass; the register validates its restored mapping.
+  recorded_in: packing/frontier/results.yaml
+- id: D-498
+  title: Survey census omitted the three proved cases at 98 through 100
+  date: '2026-09-19'
+  layer: record
+  class: bookkeeping
+  detected_by: review
+  severity: medium
+  status: fixed
+  bead: think-fixz
+  what: X-038 and its follow-on records reported 32 proved and 68 open cases and treated 82 through 100 as open.
+  fix: Reconcile against the frontier's 35 proved and 65 open cases through 100; the final open range ends at 97.
+  regression: The frontier census remains checked by packing-validate; no prose-wide census parser was added.
+  recorded_in: packing/campaign/explorations/X-038-n100-lower-bound-survey.md
+- id: D-499
+  title: Doubled certificate direction count was copied incorrectly
+  date: '2026-09-19'
+  layer: record
+  class: bookkeeping
+  detected_by: review
+  severity: medium
+  status: fixed
+  bead: think-7061
+  what: A 181-step net has 182 half-tangents and 363 doubled directions, but the PR 199 exhaustive test asserted 361 and receipts repeated the wrong counts.
+  fix: PR 201 already corrected the assertion; this correction layer reconciles the evidence prose. Historical PR 199 and PR 200 heads remain failing revisions.
+  regression: The corrected exhaustive direction-count assertion and fresh exact and interval certificate replays.
+  recorded_in: docs/project/reviews/review-2026-09-19-pr199-201-correctness.md
+- id: D-500
+  title: Threshold columns silently discarded site multiplicities
+  date: '2026-09-19'
+  layer: tooling
+  class: soundness
+  direction: flattering
+  detected_by: review
+  severity: medium
+  status: fixed
+  bead: think-lygv
+  what: atom_columns accepted weighted threshold atoms but charged and costed them as one token per site.
+  consequence: Multiplicities (3,3) at threshold 2 were assigned budget 1 instead of 3 and a wrong row charge.
+  fix: Reject every non-unit site multiplicity at this currently unweighted producer boundary.
+  regression: Weighted-atom rejection and ordinary-column controls in packing/tests/test_threshold_separation.py.
+  recorded_in: packing/src/sqpack/fractional/threshold_separation.py
+- id: D-501
+  title: Retained atlas graphics lagged behind the T-030 bound
+  date: '2026-09-19'
+  layer: record
+  class: bookkeeping
+  detected_by: gate
+  severity: medium
+  status: fixed
+  bead: think-63r2
+  what: The n=18 case and composite figure data said 4.679, but both retained composite SVGs still displayed the older 4.67 bound.
+  consequence: Published graphics and their exports disagreed with the accepted result while fast checks stayed green.
+  fix: Regenerate the owned composite export families and add a cheap claim-label drift check to the existing fast atlas surface.
+  regression: The existing slow composite rebuild caught the drift on PR 201 checkpoint 35476507563; the correction adds a fast stale-label negative control.
+  recorded_in: docs/project/reviews/review-2026-09-19-pr199-201-correctness.md
+- id: D-502
+  title: Costly partial pre-push selections kept pytest serial until the command timed out
+  date: '2026-09-19'
+  layer: tooling
+  class: robustness
+  detected_by: gate
+  latent_for: >-
+    D-488 documented that the default local shape still assigned the reachable-test step
+    one worker. That follow-up remained unimplemented until this 72-file selection hit
+    the cap.
+  severity: high
+  status: outstanding
+  recurrence_of: D-488
+  bead: think-1i1x
   what: >-
-    `rangeDuration` priced a range by summing `continuousTiming` directly, while a pair
-    actually plays through `pairTiming`, which halves a simple grid fill when `fastSimple`
-    is on -- the default. So the Animate panel's range figure, and the number the capture
-    tool prices its frame clock against, were the unsped beat, and the page played the
-    range faster than it said it would. Over n = 1 to 6 it quoted 7.05 s for a range it
-    played in 5.90 s.
+    On a ten-CPU host, an implicit pre-push run selected 72 of 350 test files, including
+    seven files with measured slow tests, but retained ten outer jobs. The worker
+    distribution therefore assigned the long-lived reachable-test step one pytest worker
+    after the short outer steps had finished.
   consequence: >-
-    No video could be captured at all: `capture_video.price_steps` refuses a run whose
-    steps do not add up to the page's own figure for the range, which is the check that
-    makes "the video is the page" a fact. Without that check the frame clock would have
-    been stretched over a shorter animation and every step boundary would have drifted off
-    its settled record.
+    Every other pre-push step passed, while the serial reachable selection reached the
+    900-second subprocess cap after 901.012 seconds and produced no final traceback or
+    summary. A direct ten-worker retry of the same selection completed in 814.31 seconds,
+    showing that this selection can finish below the cap under a different resource shape.
+    The retry also changed `PACK_JOBS` and was not a controlled timing comparison, so it
+    establishes neither a speedup nor the proposed allocation as the cause.
   fix: >-
-    `rangeDuration` now applies the same `SIMPLE_TRANSITION_SPEED` speed-up to a sped-up
-    pair that `pairTiming` does, so the quote is the clock `playRange` runs.
+    None yet. The proposed repair is to extend only the implicit push allocation: classify
+    partial selections from measured slow-test coverage and the committed file-cost
+    record, then give costly selections the existing whole-suite jobs=1, inner_jobs=1
+    shape. That allocation remains unimplemented and needs a measured validation. Keep
+    cheap partial selections, explicit resource choices, and the 900-second and
+    1,800-second ceilings unchanged. Missing cost evidence must fail conservatively.
+  regression: none
+  recorded_in: docs/project/reviews/review-2026-09-19-pr199-201-correctness.md
+- id: D-503
+  title: Artifact timeout test assumed a Python child could print within 200 milliseconds
+  date: '2026-09-19'
+  layer: tooling
+  class: robustness
+  detected_by: gate
+  severity: medium
+  status: fixed
+  bead: think-u5zn
+  what: >-
+    The artifact-journaling timeout test launched a fresh Python interpreter with a
+    200-millisecond deadline and required it to print and flush partial output before that
+    deadline. Under ten-worker contention, timeout could occur during interpreter startup,
+    leaving the asserted log empty.
+  consequence: >-
+    The diagnostic retry reported a false test failure after more than thirteen minutes,
+    obscuring the scheduling measurement and making artifact retention appear broken even
+    though the child had never emitted the required output.
+  fix: >-
+    Replace the startup race with a deterministic `_run_command` boundary fixture that
+    writes and flushes partial output to the real artifact stream before raising
+    `StepTimeoutError`. The separate slow integration control continues to exercise real
+    subprocess output transfer and process-tree termination.
+  regression: none
+  recorded_in: docs/project/reviews/review-2026-09-19-pr199-201-correctness.md
+- id: D-504
+  title: Allowlist existence test generated a full declared-bound reference report
+  date: '2026-09-19'
+  layer: tooling
+  class: performance
+  detected_by: gate
+  severity: medium
+  status: fixed
+  bead: think-emgt
+  what: >-
+    A test whose assertion needed only the declared bound keys called the full
+    declared-bounds report, including repository-wide reference matching and evidence
+    construction that the test never inspected.
+  consequence: >-
+    The test took 12.38 seconds and failed the fast lane's per-test duration ceiling,
+    making an otherwise passing integrated checkpoint red and slowing every run of that
+    file.
+  fix: >-
+    Read keys directly from `declared_bounds` for the allowlist existence assertion.
+    Reference matching remains exercised by the existing positive and negative controls;
+    the single existence check fell to 0.44 seconds and the focused 12-test file completed
+    in 12.70 seconds without changing any ceiling or exemption.
+  regression: none
+  recorded_in: docs/project/reviews/review-2026-09-19-pr199-201-correctness.md
+- id: D-505
+  title: Bentz 2016 transcription moved the finishing line of Theorems 9 and 11
+  date: '2026-09-20'
+  layer: docs
+  class: soundness
+  direction: conservative
+  detected_by: review
+  severity: high
+  status: fixed
+  bead: think-srln
+  what: >-
+    The cleaned transcription placed the line l that finishes Theorem 9 (n=33) and
+    Theorem 11 (n=22) at (sqrt(2)-1)/2, about 0.2071, and the Theorem 11 midpoint
+    standoff at 1/(2 sqrt(2)), about 0.3536. Rendered PDF pages 6 to 8 print the line at
+    sqrt(2) minus one half, about 0.9142, the standoff at half sqrt(2) minus one half,
+    about 0.2071, and the closing radius of case 2 as a plain one half. The multi-column
+    raw extraction interleaves every one of those expressions and settles none of them.
+  consequence: >-
+    With the transcribed constants the last step of each proof is false: a box midpoint
+    at 0.2071 no longer lies between two lines a distance at most 1 apart, so Lemma 5
+    does not apply, and the covered point (0.4, y_i) sits 0.193 rather than 0.514 from
+    l, below the 0.51 Lemma 7 requires, so neither lemma closes the argument. A reader
+    of the transcription inherits a false finishing step and a wrong picture of which
+    constant the mechanism needs; Session 143's lane 3 did, reading the line-capacity
+    argument behind the one-spare routes of X-040.
+  fix: >-
+    Read the constants off the glyph positions of the archived PDF, where the "2 -" of
+    the line sits on the text baseline and only the "1" is raised over the "2",
+    corrected all fifteen spans across the two proofs, and added one annotation per
+    theorem giving the raw ambiguity, the printed form, and the numeric check that
+    Lemma 5 on the wall x=0 and l yields 2 sqrt(2) - 2d = 1 exactly at that d, while the
+    printed shaded-region abscissa 1.12 reproduces only as the sum of the two printed
+    constants. The archive annotation census for this file rises from three to five.
+  regression: none
+  recorded_in: packing/campaign/explorations/X-040-lower-bound-mechanisms-beyond-the-one-body-ceiling.md
+- id: D-506
+  title: Bentz 2016 transcription inverted Lemma 7's bound and rewrote its lemma reference
+  date: '2026-09-20'
+  layer: docs
+  class: soundness
+  direction: conservative
+  detected_by: review
+  severity: high
+  status: fixed
+  bead: think-srln
+  what: >-
+    The cleaned transcription of Lemma 7's proof printed the midpoint bound as 0.505
+    divided by sqrt(2), about 0.3571, in both places where archived PDF page 3 prints
+    0.505 times sqrt(2), about 0.7142. The same sentence silently replaced the printed
+    lemma reference, Lemma 5, with Lemma 4. The file's own annotation named the right
+    quantity while the body text carried the wrong one, so the transcription
+    contradicted itself.
+  consequence: >-
+    Subtracting 0.51 from the transcribed bound leaves a negative distance, so the proof
+    as transcribed establishes nothing and a reader cannot tell whether the lemma holds;
+    and the substituted reference concealed a source slip, which matters because Lemma 4
+    is the only lemma here that bears on a line near a box centre and because anyone
+    auditing Bentz's other citations needs to know the printed ones are not reliable.
+  fix: >-
+    Restored 0.505 times sqrt(2) in both places and the printed reference to Lemma 5,
+    read off the glyph positions of PDF page 3, and added two annotations: one
+    superseding the earlier reconstruction note with the printed value and the check
+    that 0.505 times sqrt(2) minus 0.51 is 0.2042, below the 0.2071 threshold the next
+    sentence invokes, and one recording that the source prints Lemma 5 while Lemma 4 is
+    the applicable lemma. The archive annotation census for this file rises from five to
+    seven.
+  regression: none
+  recorded_in: packing/campaign/agent-sessions/session-143-lower-bound-math-review.md
+- id: D-507
+  title: Bentz 2016 transcription dropped the factor 2 from Theorem 9's budget line
+  date: '2026-09-20'
+  layer: docs
+  class: soundness
+  direction: conservative
+  detected_by: review
+  severity: high
+  status: fixed
+  bead: think-srln
+  what: >-
+    The cleaned transcription printed Theorem 9's vertical budget as sqrt(2) minus one
+    half, plus 2 times 0.8, plus 3 times one half sqrt(3), exceeding 6. Rendered PDF page
+    5 prints that same left side with a leading factor 2 on the first term, which is the
+    two wall gaps of a six-row configuration. The transcribed left side is about 5.1123;
+    the printed one is about 6.0265.
+  consequence: >-
+    Without the factor the inequality is false, since about 5.1123 does not exceed 6, so
+    the sentence it supports establishes nothing -- and that sentence is what bounds
+    every interior gap of the minimising configurations by 0.8. That bound is in turn
+    what allows a six-point row to shift 0.1 sideways, the move the rest of Theorem 9
+    runs on and the move the n=32 one-spare model inherits. A reader checking the line
+    finds an arithmetic error where the source has none, and cannot see how little slack
+    the argument leaves: about 0.0265 over the side 6.
+  fix: >-
+    Restored the leading factor 2, read off the archived PDF, and added an annotation
+    giving the transcribed and the printed value, the seven gaps the sum counts -- two to
+    the walls, two at 0.8 and three at one half sqrt(3) -- and the conclusion the
+    inequality feeds. A second annotation of the same date records a slip of the source
+    rather than of the transcription, at the end point of Theorem 11's case 2, where the
+    PDF prints 0.5 and sqrt(2) minus one half while Figure 3 has 0.5 and 0.9; that text
+    is left as printed, and the replay shows the step holds either way, the midpoint
+    region lying within 0.49733 of its target at 0.9 and within 0.48444 at the printed
+    point, both under one half. The archive annotation census for this file rises from
+    seven to nine.
   regression: >-
-    `a range is quoted at the clock it plays on, speed-up included` in
-    `packages/workbench/tests/timeline.test.ts` pins `rangeDuration` to the sum of
-    `pairDuration` over the range with `fastSimple` on, and to `sequenceDuration` over the
-    whole corpus.
-  recorded_in: packages/workbench/src/animation/timeline.ts
+    None over the transcribed text itself. The constant is computed rather than quoted by
+    devtools.bentz2016.m6_model, which prints the printed budget and the transcribed left
+    side beside it on every n=32 run, and the case-2 point is row 24 of
+    devtools.bentz2016.replay_theorem11, evaluated at both values.
+  recorded_in: packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/bentz2016-one-spare-receipt.md

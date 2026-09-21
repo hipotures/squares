@@ -59,6 +59,7 @@ from typing import Any
 
 import numpy as np
 
+from sqpack.fractional.corner_clip import CornerClip
 from sqpack.fractional.model import Direction, rotation_from_half_tangent
 
 # Screening bounds are checked in exact arithmetic; they select a fast path,
@@ -187,6 +188,7 @@ class CeilingVerdict:
     decided_exactly: int
     regime: str
     symmetric_only: bool
+    corner_clip_depth: Fraction | None = None
 
     @property
     def proved(self) -> bool:
@@ -213,11 +215,21 @@ class CeilingVerdict:
                 "for this B and every net containing the angles used, "
                 "every closed B-square at a net angle in the container"
             )
+        clipped = (
+            ""
+            if self.corner_clip_depth is None
+            else (
+                " whose core avoids all four corner triangles x + y <= "
+                f"{self.corner_clip_depth} (lane-a Theorem B's free class, so the "
+                "statement is about that class of packings and not about every packing)"
+            )
+        )
         return (
             f"no {measures} of mass below {self.total_weight} "
             f"({_decimal_approximation(self.total_weight, 6)}) captures mass 1 "
-            f"in {scope}; the fractional method cannot certify this n at this side or "
-            "any larger side, and this says nothing about whether n unit squares fit"
+            f"in {scope}{clipped}; the fractional method cannot certify this n at this "
+            "side or any larger side, and this says nothing about whether n unit "
+            "squares fit"
         )
 
 
@@ -564,11 +576,55 @@ def maximum_depth(
     return worst, decided, where
 
 
-def verify_ceiling(certificate: CeilingCertificate) -> CeilingVerdict:
-    """Decide the ceiling exactly. Never short-circuits: every condition is reported."""
+def _condition_corner_clip(
+    certificate: CeilingCertificate, clip: CornerClip
+) -> ConditionReport:
+    """K4: every placement avoids all four corner triangles at the clip's threshold.
+
+    A family for the *clipped* covering program may only use placements the program
+    constrains. A placement that meets a corner triangle is not one of them -- the free
+    class removed it from the row domain -- so its weight would be counted against a
+    constraint that no longer exists and the total would prove nothing. The predicate
+    is asked over the placement's own slabs, so a mirrored placement at half-tangent
+    ``(1 - t) / (1 + t)`` is folded correctly rather than read as deep in the container.
+    """
+
+    for index, p in enumerate(certificate.placements):
+        ax, ay, _u, bx, by, _v = p.slabs()
+        penetration = clip.square_penetration(
+            (ax, ay, bx, by), (p.centre_x, p.centre_y), p.side / 2
+        )
+        if penetration <= clip.depth:
+            return ConditionReport(
+                "K4 every placement avoids the corner triangles",
+                f"placement {index} reaches x + y = {penetration} "
+                f"({_decimal_approximation(penetration, 9)}) in a corner frame, "
+                f"at or below the threshold {clip.depth}",
+                holds=False,
+            )
+    return ConditionReport(
+        "K4 every placement avoids the corner triangles",
+        f"{len(certificate.placements)} placements clear the threshold {clip.depth} "
+        "in all four corner frames",
+        holds=True,
+    )
+
+
+def verify_ceiling(
+    certificate: CeilingCertificate, *, clip: CornerClip | None = None
+) -> CeilingVerdict:
+    """Decide the ceiling exactly. Never short-circuits: every condition is reported.
+
+    With ``clip`` the verdict is about the *clipped* covering program of lane-a
+    Theorem B's free-corner class: K4 is added, and the statement says which domain
+    the family is a ceiling for, so a clipped verdict can never be quoted as the
+    unconditional one.
+    """
 
     admissible, regime, symmetric_only = _admissibility(certificate)
     conditions = [admissible, _condition_inside(certificate)]
+    if clip is not None:
+        conditions.append(_condition_corner_clip(certificate, clip))
     lines = arrangement_lines(certificate)
     vertices = container_vertices(certificate, lines)
     worst, decided, where = maximum_depth(certificate, vertices)
@@ -597,6 +653,7 @@ def verify_ceiling(certificate: CeilingCertificate) -> CeilingVerdict:
         decided,
         regime,
         symmetric_only,
+        None if clip is None else clip.depth,
     )
 
 

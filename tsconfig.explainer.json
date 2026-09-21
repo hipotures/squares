@@ -1,6 +1,6 @@
 {
   // The explainer's classic page scripts were legacy inline programs until PR #181.
-  // They now live in files and inherit the shared floor. `think-7f3p` tracks removing
+  // They now live in files and inherit the shared floor. `think-4ylo` tracks removing
   // the four legacy inference relaxations after their DOM contracts gain full JSDoc.
   "extends": "./tsconfig.base.json",
   "compilerOptions": {

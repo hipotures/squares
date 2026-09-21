@@ -1,0 +1,76 @@
+"""Load the retained n = 18 certificate and hand it to the exact verifier.
+
+Four certificates are retained. ``certificate.json`` sits at container side
+4679/1000 with total mass 71573611/4000000; ``certificate-1871-400.json`` is the
+rung that was the top until later on 2026-09-19; ``certificate-187-40.json`` is the
+rung that was the top until later on 2026-09-19; ``certificate-467-100.json``
+is the rung that was the top until 2026-09-19. The atoms carry more than one
+registered case each: only Condition 2 mentions n among the five conditions, so a
+set of total mass M certifies its side for every integer strictly above M. All
+four masses lie in [17, 18), so each certifies n = 18 and says nothing about
+n = 17, where T-019's 459/100 certificate still holds the register. From n = 19
+on the register already holds 24/5, so all four certificates are true there and
+weaker.
+
+The JSON carries exact rationals as strings, so a replay reconstructs the same
+object the generator proposed.
+Nothing here decides anything: the verdict comes from
+`sqpack.fractional.certificate.verify`, and this module only feeds it.
+"""
+
+from __future__ import annotations
+
+import json
+from fractions import Fraction
+from pathlib import Path
+
+from sqpack.fractional.certificate import Certificate
+from sqpack.fractional.model import Atom
+
+CERTIFICATE_PATH = Path(__file__).with_name("certificate.json")
+#: The rung that was the top until later on 2026-09-19. Named rather than globbed
+#: so the T-029 replay stays pinned after the live pointer moved to 4679/1000.
+RUNG_1871_400_PATH = Path(__file__).with_name("certificate-1871-400.json")
+#: The rung that was the top until later on 2026-09-19. Named rather than globbed
+#: so the T-028 replay stays pinned after the live pointer moved to 1871/400.
+RUNG_187_40_PATH = Path(__file__).with_name("certificate-187-40.json")
+#: The rung that was the top until 2026-09-19. Named rather than globbed so the
+#: T-027 replay stays pinned after the live pointer moved to 187/40.
+RUNG_467_100_PATH = Path(__file__).with_name("certificate-467-100.json")
+
+
+def _from_record(record: dict) -> Certificate:
+    limit = Fraction(record["angle_limit"])
+    steps = int(record["direction_steps"])
+    return Certificate(
+        n=int(record["n"]),
+        outer_side=Fraction(record["outer_side"]),
+        square_side=Fraction(record["square_side"]),
+        atoms=tuple(
+            Atom(f"{index:04d}", Fraction(x), Fraction(y), Fraction(weight))
+            for index, (x, y, weight) in enumerate(record["atoms"])
+        ),
+        half_tangents=tuple(limit * k / steps for k in range(steps + 1)),
+        symmetry=record["symmetry"],
+    )
+
+
+def snapshot(path: Path = CERTIFICATE_PATH) -> tuple[Certificate, dict[str, str], bytes]:
+    """Parse one byte snapshot into the certificate and its declarations."""
+
+    data = path.read_bytes()
+    record = json.loads(data)
+    declarations = {key: str(record[key]) for key in ("claim", "total_mass", "least_cell_mass")}
+    return _from_record(record), declarations, data
+
+
+def load(path: Path = CERTIFICATE_PATH) -> Certificate:
+    """Rebuild the retained certificate exactly as it was accepted."""
+
+    return snapshot(path)[0]
+
+
+def declared(path: Path = CERTIFICATE_PATH) -> dict[str, str]:
+    """What the record claims, for a replay to compare against."""
+
+    return snapshot(path)[1]

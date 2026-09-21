@@ -10,7 +10,7 @@
 ---
 
 > ⚠️ **Contains reconstructed passages.**
-> This transcription contains **1** annotated passage(s) where the PDF extraction was
+> This transcription contains **2** annotated passage(s) where the PDF extraction was
 > damaged and text or mathematics was reconstructed or marked unrecoverable. Search this
 > file for `GARBLED` and `NOTE` to find them.
 > **Any formula near an annotation must be checked against `bentz-2010-optimal-packings-13-and-46.raw.md`**, which is the

@@ -2,15 +2,15 @@
 
 # Defect log
 
-492 defects recorded across the packing toolchain.
+507 defects recorded across the packing toolchain.
 One line each here; the narrative lives in the artifact named by every row.
 Source of truth is [`defects.yaml`](packing/defects.yaml).
 
 ## The short version
 
-- **98 soundness defects** — the system asserting something false about the mathematics. 78 of them pointed in the *flattering* direction, which is the dangerous one: the error looks like success.
-- **113 fixes left no regression check behind.** That list is the best predictor of what comes back; recorded recurrences are D-017 repeats D-010, D-029 repeats D-023, D-062 repeats D-042, D-065 repeats D-028, D-066 repeats D-042, D-072 repeats D-035, D-075 repeats D-059, D-076 repeats D-034, D-077 repeats D-028, D-078 repeats D-041, D-079 repeats D-063, D-082 repeats D-057, D-085 repeats D-058, D-094 repeats D-084, D-098 repeats D-083, D-104 repeats D-052, D-113 repeats D-100, D-115 repeats D-097, D-117 repeats D-104, D-138 repeats D-006, D-140 repeats D-093, D-148 repeats D-091, D-150 repeats D-086, D-155 repeats D-059, D-160 repeats D-145, D-162 repeats D-030, D-163 repeats D-004, D-164 repeats D-014, D-165 repeats D-132, D-166 repeats D-044, D-168 repeats D-132, D-169 repeats D-014, D-170 repeats D-039, D-171 repeats D-164, D-172 repeats D-029, D-180 repeats D-086, D-181 repeats D-034, D-187 repeats D-185, D-188 repeats D-018, D-189 repeats D-181, D-196 repeats D-160, D-198 repeats D-187, D-201 repeats D-198, D-204 repeats D-201, D-217 repeats D-202, D-229 repeats D-028, D-242 repeats D-232, D-247 repeats D-242, D-255 repeats D-198, D-259 repeats D-027, D-263 repeats D-258, D-267 repeats D-255, D-274 repeats D-268, D-279 repeats D-271, D-281 repeats D-267, D-282 repeats D-264, D-312 repeats D-309, D-313 repeats D-259, D-315 repeats D-295, D-318 repeats D-308, D-321 repeats D-317, D-323 repeats D-022, D-324 repeats D-320, D-325 repeats D-319, D-326 repeats D-305, D-327 repeats D-301, D-334 repeats D-028, D-337 repeats D-107, D-339 repeats D-155, D-340 repeats D-163, D-386 repeats D-358, D-395 repeats D-358, D-397 repeats D-358, D-400 repeats D-398, D-422 repeats D-371, D-424 repeats D-144, D-427 repeats D-413, D-451 repeats D-442, D-452 repeats D-442, D-454 repeats D-442, D-458 repeats D-443, D-470 repeats D-458, D-471 repeats D-459, D-488 repeats D-432.
-- **70 are still open** (outstanding or contained), every one carrying a bead.
+- **103 soundness defects** — the system asserting something false about the mathematics. 79 of them pointed in the *flattering* direction, which is the dangerous one: the error looks like success.
+- **118 fixes left no regression check behind.** That list is the best predictor of what comes back; recorded recurrences are D-017 repeats D-010, D-029 repeats D-023, D-062 repeats D-042, D-065 repeats D-028, D-066 repeats D-042, D-072 repeats D-035, D-075 repeats D-059, D-076 repeats D-034, D-077 repeats D-028, D-078 repeats D-041, D-079 repeats D-063, D-082 repeats D-057, D-085 repeats D-058, D-094 repeats D-084, D-098 repeats D-083, D-104 repeats D-052, D-113 repeats D-100, D-115 repeats D-097, D-117 repeats D-104, D-138 repeats D-006, D-140 repeats D-093, D-148 repeats D-091, D-150 repeats D-086, D-155 repeats D-059, D-160 repeats D-145, D-162 repeats D-030, D-163 repeats D-004, D-164 repeats D-014, D-165 repeats D-132, D-166 repeats D-044, D-168 repeats D-132, D-169 repeats D-014, D-170 repeats D-039, D-171 repeats D-164, D-172 repeats D-029, D-180 repeats D-086, D-181 repeats D-034, D-187 repeats D-185, D-188 repeats D-018, D-189 repeats D-181, D-196 repeats D-160, D-198 repeats D-187, D-201 repeats D-198, D-204 repeats D-201, D-217 repeats D-202, D-229 repeats D-028, D-242 repeats D-232, D-247 repeats D-242, D-255 repeats D-198, D-259 repeats D-027, D-263 repeats D-258, D-267 repeats D-255, D-274 repeats D-268, D-279 repeats D-271, D-281 repeats D-267, D-282 repeats D-264, D-312 repeats D-309, D-313 repeats D-259, D-315 repeats D-295, D-318 repeats D-308, D-321 repeats D-317, D-323 repeats D-022, D-324 repeats D-320, D-325 repeats D-319, D-326 repeats D-305, D-327 repeats D-301, D-334 repeats D-028, D-337 repeats D-107, D-339 repeats D-155, D-340 repeats D-163, D-386 repeats D-358, D-395 repeats D-358, D-397 repeats D-358, D-400 repeats D-398, D-422 repeats D-371, D-424 repeats D-144, D-427 repeats D-413, D-451 repeats D-442, D-452 repeats D-442, D-454 repeats D-442, D-458 repeats D-443, D-470 repeats D-458, D-471 repeats D-459, D-488 repeats D-432, D-502 repeats D-488.
+- **71 are still open** (outstanding or contained), every one carrying a bead.
 
 ## What caught them
 
@@ -18,14 +18,14 @@ Source of truth is [`defects.yaml`](packing/defects.yaml).
 | --- | ---: | --- |
 | `pre_registered_rule` | 3 | a rule written down before the measurement, e.g. “beating the record means you have a bug” |
 | `control_cell` | 29 | a cell of the sweep whose answer is known in advance |
-| `review` | 288 | a human or agent reading the work against a checklist |
+| `review` | 300 | a human or agent reading the work against a checklist |
 | `anomaly` | 16 | a result that made no sense, chased down |
 | `inspection` | 62 | reading the code or the design with intent |
 | `drift_check` | 16 | a generated view disagreeing with its source |
 | `design` | 1 | caught while designing, before it reached data |
-| `gate` | 77 | the automated test suite |
+| `gate` | 80 | the automated test suite |
 
-The line worth reading twice: **the automated gate caught 77 of 492, and none of the 98 soundness defects.** Gates confirm what you already thought to check. The rest were found by a device built to be *surprised* — a control cell, a pre-registered rule, a generated view contradicting itself — or by someone reading carefully.
+The line worth reading twice: **the automated gate caught 80 of 507, and none of the 103 soundness defects.** Gates confirm what you already thought to check. The rest were found by a device built to be *surprised* — a control cell, a pre-registered rule, a generated view contradicting itself — or by someone reading carefully.
 
 ## Where they arise
 
@@ -33,20 +33,20 @@ The line worth reading twice: **the automated gate caught 77 of 492, and none of
 | --- | ---: |
 | engine | 11 |
 | quench | 23 |
-| verifier | 12 |
-| record | 152 |
-| tooling | 183 |
-| docs | 111 |
+| verifier | 13 |
+| record | 158 |
+| tooling | 188 |
+| docs | 114 |
 
 ## By kind
 
 | Class | Count |
 | --- | ---: |
-| soundness | 98 |
-| validity | 125 |
-| bookkeeping | 186 |
-| robustness | 65 |
-| performance | 18 |
+| soundness | 103 |
+| validity | 127 |
+| bookkeeping | 190 |
+| robustness | 68 |
+| performance | 19 |
 
 ## Fixed, but nothing stops it coming back
 
@@ -168,6 +168,11 @@ This is the actionable list.
 | D-478 | The BC-206 cutting floor has no retained family for independent replay | record |
 | D-479 | Case summaries replaced cited geometric helper proofs with generic pure dots counting | docs |
 | D-481 | The n26–27 source fields omitted Green's stronger reported lower bound | record |
+| D-495 | Unfinished covering and interval checks were treated as refutations | record |
+| D-503 | Artifact timeout test assumed a Python child could print within 200 milliseconds | tooling |
+| D-504 | Allowlist existence test generated a full declared-bound reference report | tooling |
+| D-505 | Bentz 2016 transcription moved the finishing line of Theorems 9 and 11 | docs |
+| D-506 | Bentz 2016 transcription inverted Lemma 7's bound and rewrote its lemma reference | docs |
 
 ## Still open
 
@@ -243,6 +248,7 @@ This is the actionable list.
 | D-478 | contained | medium | The BC-206 cutting floor has no retained family for independent replay | `think-aenh` |
 | D-489 | outstanding | high | The corner-dual salvage screen can only accept a family that already fails the mass threshold | `think-rm5c` |
 | D-490 | contained | medium | Two renders of the explainer disagreed by two bytes and the check could not say where | `think-ptit` |
+| D-502 | outstanding | high | Costly partial pre-push selections kept pytest serial until the command timed out | `think-1i1x` |
 
 ## Every defect
 
@@ -739,7 +745,22 @@ This is the actionable list.
 | [D-489](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-034/lane-x1-corner-conditioning-is-mass-neutral.md) | 2026-09-09 | tooling | validity | flattering | `review` | high | outstanding | The corner-dual salvage screen can only accept a family that already fails the mass threshold |
 | [D-490](packing/devtools/render_explainer_pdf.py) | 2026-09-10 | tooling | robustness |  | `gate` | medium | contained | Two renders of the explainer disagreed by two bytes and the check could not say where |
 | [D-491](packing/devtools/prepare_explainer_math.py) | 2026-09-11 | tooling | validity | conservative | `gate` | medium | fixed | The math geometry probe mixed observations and left a page watchdog uncontrolled |
-| [D-492](packages/workbench/src/animation/timeline.ts) | 2026-09-21 | tooling | bookkeeping | neutral | `gate` | medium | fixed | A range was quoted at a beat it never played |
+| [D-492](packing/devtools/produce_threshold_certificate.py) | 2026-09-19 | tooling | validity | conservative | `review` | high | fixed | Threshold producer called solver errors infeasible |
+| [D-493](packing/src/sqpack/fractional/integral_piercing.py) | 2026-09-19 | verifier | soundness | conservative | `review` | high | fixed | Event-cell geometry accepted directions outside its quadrant |
+| [D-494](packing/devtools/run_covering_queue.py) | 2026-09-19 | tooling | robustness |  | `review` | medium | fixed | Covering queue had no atomic writer ownership |
+| [D-495](docs/project/reviews/review-2026-09-19-pr199-201-correctness.md) | 2026-09-19 | record | validity | conservative | `review` | high | fixed | Unfinished covering and interval checks were treated as refutations |
+| [D-496](docs/project/reviews/review-2026-09-19-pr199-201-correctness.md) | 2026-09-19 | record | bookkeeping |  | `review` | medium | fixed | Floating solver subjects were labelled exact and verified |
+| [D-497](packing/frontier/results.yaml) | 2026-09-19 | record | bookkeeping |  | `review` | medium | fixed | T-027 provenance was swallowed by a YAML prose scalar |
+| [D-498](packing/campaign/explorations/X-038-n100-lower-bound-survey.md) | 2026-09-19 | record | bookkeeping |  | `review` | medium | fixed | Survey census omitted the three proved cases at 98 through 100 |
+| [D-499](docs/project/reviews/review-2026-09-19-pr199-201-correctness.md) | 2026-09-19 | record | bookkeeping |  | `review` | medium | fixed | Doubled certificate direction count was copied incorrectly |
+| [D-500](packing/src/sqpack/fractional/threshold_separation.py) | 2026-09-19 | tooling | soundness | flattering | `review` | medium | fixed | Threshold columns silently discarded site multiplicities |
+| [D-501](docs/project/reviews/review-2026-09-19-pr199-201-correctness.md) | 2026-09-19 | record | bookkeeping |  | `gate` | medium | fixed | Retained atlas graphics lagged behind the T-030 bound |
+| [D-502](docs/project/reviews/review-2026-09-19-pr199-201-correctness.md) | 2026-09-19 | tooling | robustness |  | `gate` | high | outstanding | Costly partial pre-push selections kept pytest serial until the command timed out |
+| [D-503](docs/project/reviews/review-2026-09-19-pr199-201-correctness.md) | 2026-09-19 | tooling | robustness |  | `gate` | medium | fixed | Artifact timeout test assumed a Python child could print within 200 milliseconds |
+| [D-504](docs/project/reviews/review-2026-09-19-pr199-201-correctness.md) | 2026-09-19 | tooling | performance |  | `gate` | medium | fixed | Allowlist existence test generated a full declared-bound reference report |
+| [D-505](packing/campaign/explorations/X-040-lower-bound-mechanisms-beyond-the-one-body-ceiling.md) | 2026-09-20 | docs | soundness | conservative | `review` | high | fixed | Bentz 2016 transcription moved the finishing line of Theorems 9 and 11 |
+| [D-506](packing/campaign/agent-sessions/session-143-lower-bound-math-review.md) | 2026-09-20 | docs | soundness | conservative | `review` | high | fixed | Bentz 2016 transcription inverted Lemma 7's bound and rewrote its lemma reference |
+| [D-507](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/bentz2016-one-spare-receipt.md) | 2026-09-20 | docs | soundness | conservative | `review` | high | fixed | Bentz 2016 transcription dropped the factor 2 from Theorem 9's budget line |
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

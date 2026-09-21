@@ -682,9 +682,28 @@ def test_every_case_page_binds_the_certificate_its_own_evidence_names() -> None:
     the `v3` schema names the variant and carries the six threshold conditions rather
     than five. Both are rechecked from the source bytes because the surd is a function of
     `B` and `D` alone whichever kind of atom carries the charge.
+
+    `external_reduction` is the one shape this contract cannot reach. T-032 adopts
+    Guzhou0806's R012, whose bound is not a container side at all: it covers parents of
+    side `A` inside `[0, L]^2` and rescales by `1/A`, so the proved side is `L/A` and no
+    certificate object anywhere carries it. The reduction is neither an endpoint
+    certificate nor the dilation surd these records model, and R012's measure ships as a
+    bare orbit table rather than in this repository's certificate schema, so there is no
+    `CertificateFigures` to bind either. What stands in for the binding is
+    `tests/test_n17_external_weighted_certificates.py`, which pins the archived bytes,
+    reruns the closed-form arithmetic and the ten negative controls, and asserts the two
+    replay receipts; an exemption is listed here, with its reason, rather than left to
+    look like an oversight.
     """
+    #: n -> why this case's bound cannot be bound to a certificate object at that side.
+    external_reduction = {
+        17: "T-032: external parent-rescaling reduction, bound L/A is no container side",
+    }
+
     evidence = _evidence_by_id()
     interval = _evidence("E-fractional-interval-decision")
+    # Its scope is what that decision decided, which still includes the n = 17
+    # certificate behind T-019; the exempt sizes are subtracted at the assertion.
     expected = {int(value) for value in interval["scope"]["n_values"]}
 
     bound: set[int] = set()
@@ -706,6 +725,10 @@ def test_every_case_page_binds_the_certificate_its_own_evidence_names() -> None:
             try:
                 record = json.loads(target.read_text(encoding="utf-8"))
             except OSError, json.JSONDecodeError:
+                continue
+            # An evidence certificate need not be a JSON object at all: R012's measure
+            # ships as a bare list of orbit rows (E-n017-guzhou-r012-source-replay).
+            if not isinstance(record, dict):
                 continue
             if record.get("schema") not in (
                 LIMIT_RECORD_SCHEMA,
@@ -750,13 +773,16 @@ def test_every_case_page_binds_the_certificate_its_own_evidence_names() -> None:
         n = int(packing["n"])
         side = str(lower["exact_form"])
         matching = [figures for bound_side, figures in cited.values() if bound_side == side]
+        if n in external_reduction:
+            assert not matching, f"n = {n} is exempt but now binds a certificate at {side}"
+            continue
         assert len(matching) == 1, f"n = {n}: {len(matching)} cited proof objects at {side}"
         assert matching[0].mass < n, f"n = {n}: {matching[0].path} has too much mass"
         bound.add(n)
 
     # Non-vacuity, itself derived: every case the interval decision declares in its own
     # scope must be bound this way, so the contract cannot quietly empty out.
-    assert bound == expected
+    assert bound == expected - set(external_reduction)
 
 
 def test_t017s_ladder_is_the_ladder_the_case_package_actually_retains() -> None:

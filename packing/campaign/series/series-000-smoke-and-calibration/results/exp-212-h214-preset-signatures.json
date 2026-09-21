@@ -1,0 +1,3009 @@
+{
+  "schema": "packing.squares.animate-preset-signatures/v1",
+  "experiment": "exp-212",
+  "provenance": {
+    "commit": "9cca493c17ab61d5efb3e1032f32c54a9b87320e",
+    "dirty": false,
+    "entryPoint": "packages/workbench/tools/measure-kinetics.ts",
+    "corpusBuilder": "packages/workbench/tools/workbench_tools/build_candidate.py --all",
+    "paths": [
+      "packages/workbench/src/motion-settings.ts",
+      "packages/workbench/src/animation/timeline.ts",
+      "packages/workbench/src/simulation/trajectory.ts",
+      "packages/workbench/tools/measure-kinetics.ts"
+    ],
+    "note": "Measured from the committed workbench tree. The retained compact rows contain every measured cell; full per-frame traces were intentionally omitted."
+  },
+  "regime": {
+    "sampleRateHz": 60,
+    "instances": [
+      17,
+      90
+    ],
+    "solvers": [
+      "physics",
+      "bodies"
+    ],
+    "laws": [
+      "balanced",
+      "rigid",
+      "soft",
+      "sticky"
+    ],
+    "seeds": [
+      0,
+      1,
+      2
+    ],
+    "mode": "snap",
+    "phase": "add-then-move",
+    "timingSeconds": {
+      "dwell": 0.6,
+      "move": 0.5,
+      "correct": 0.4,
+      "settle": 0.3
+    },
+    "containerDelayFraction": 0.2,
+    "anneal": 9,
+    "stepsPerSecond": 120,
+    "integrationSubsteps": "adaptive",
+    "speedLimit": 10,
+    "contactDamping": 20
+  },
+  "rows": [
+    {
+      "solver": "bodies",
+      "n": 17,
+      "law": "balanced",
+      "seed": 0,
+      "pairLaw": {
+        "rigidity": 0.35,
+        "repulsion": 950,
+        "attraction": 80,
+        "range": 0.15
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.01464890415044,
+        "maximumDisplacement": 0.09477205934136,
+        "reversalRatio": 0.04505813953488
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.2591592551789,
+        "wallPenetrationMaximum": 0.06663294288763,
+        "contactPairs": {
+          "maximum": 42,
+          "mean": 23.09734513274,
+          "final": 23
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.2591592551789,
+          "maximum": 0,
+          "mean": -0.08392082323764,
+          "p95": 0
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 4.440892098501e-16
+      },
+      "integrationSteps": 346,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 23.48175
+    },
+    {
+      "solver": "bodies",
+      "n": 17,
+      "law": "balanced",
+      "seed": 1,
+      "pairLaw": {
+        "rigidity": 0.35,
+        "repulsion": 950,
+        "attraction": 80,
+        "range": 0.15
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.01511715620509,
+        "maximumDisplacement": 0.0959890319342,
+        "reversalRatio": 0.04360465116279
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.2458051773413,
+        "wallPenetrationMaximum": 0.06120232986793,
+        "contactPairs": {
+          "maximum": 42,
+          "mean": 22.49557522124,
+          "final": 23
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.2458051773413,
+          "maximum": 0,
+          "mean": -0.08420105746398,
+          "p95": 0
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 4.440892098501e-16
+      },
+      "integrationSteps": 346,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 10.882291
+    },
+    {
+      "solver": "bodies",
+      "n": 17,
+      "law": "balanced",
+      "seed": 2,
+      "pairLaw": {
+        "rigidity": 0.35,
+        "repulsion": 950,
+        "attraction": 80,
+        "range": 0.15
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.01325197915287,
+        "maximumDisplacement": 0.07651986400575,
+        "reversalRatio": 0.03924418604651
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.313213897748,
+        "wallPenetrationMaximum": 0.0436452170785,
+        "contactPairs": {
+          "maximum": 42,
+          "mean": 22.70796460177,
+          "final": 23
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.313213897748,
+          "maximum": 0,
+          "mean": -0.08567536723171,
+          "p95": 0
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 4.440892098501e-16
+      },
+      "integrationSteps": 346,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 5.540875
+    },
+    {
+      "solver": "bodies",
+      "n": 17,
+      "law": "rigid",
+      "seed": 0,
+      "pairLaw": {
+        "rigidity": 0.01,
+        "repulsion": 4000,
+        "attraction": 0,
+        "range": 0
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.01627222572383,
+        "maximumDisplacement": 0.1352601582651,
+        "reversalRatio": 0.04360465116279
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.2432254524546,
+        "wallPenetrationMaximum": 0.3155904806562,
+        "contactPairs": {
+          "maximum": 42,
+          "mean": 22.29203539823,
+          "final": 23
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.2432254524546,
+          "maximum": 0,
+          "mean": -0.0351828462593,
+          "p95": 0
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 4.440892098501e-16
+      },
+      "integrationSteps": 865,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 13.436042
+    },
+    {
+      "solver": "bodies",
+      "n": 17,
+      "law": "rigid",
+      "seed": 1,
+      "pairLaw": {
+        "rigidity": 0.01,
+        "repulsion": 4000,
+        "attraction": 0,
+        "range": 0
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.01612553169004,
+        "maximumDisplacement": 0.1291661609881,
+        "reversalRatio": 0.05377906976744
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.2231926277172,
+        "wallPenetrationMaximum": 0.3379397463069,
+        "contactPairs": {
+          "maximum": 42,
+          "mean": 21.88495575221,
+          "final": 23
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.2231926277172,
+          "maximum": 0,
+          "mean": -0.03399440175868,
+          "p95": 0
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 4.440892098501e-16
+      },
+      "integrationSteps": 865,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 11.586459
+    },
+    {
+      "solver": "bodies",
+      "n": 17,
+      "law": "rigid",
+      "seed": 2,
+      "pairLaw": {
+        "rigidity": 0.01,
+        "repulsion": 4000,
+        "attraction": 0,
+        "range": 0
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.01570710951738,
+        "maximumDisplacement": 0.1294769858218,
+        "reversalRatio": 0.04941860465116
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.2514345313152,
+        "wallPenetrationMaximum": 0.3386119661467,
+        "contactPairs": {
+          "maximum": 42,
+          "mean": 22.37168141593,
+          "final": 23
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.2514345313152,
+          "maximum": 0,
+          "mean": -0.03662105061194,
+          "p95": 0
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 4.440892098501e-16
+      },
+      "integrationSteps": 865,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 8.217
+    },
+    {
+      "solver": "bodies",
+      "n": 17,
+      "law": "soft",
+      "seed": 0,
+      "pairLaw": {
+        "rigidity": 0.35,
+        "repulsion": 400,
+        "attraction": 0,
+        "range": 0
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.0170613653486,
+        "maximumDisplacement": 0.1430389301919,
+        "reversalRatio": 0.03561046511628
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.2423628095839,
+        "wallPenetrationMaximum": 0.3049896534561,
+        "contactPairs": {
+          "maximum": 42,
+          "mean": 21.56637168142,
+          "final": 23
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.2423628095839,
+          "maximum": 0,
+          "mean": -0.07398774407195,
+          "p95": 0
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 4.440892098501e-16
+      },
+      "integrationSteps": 346,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 4.012125
+    },
+    {
+      "solver": "bodies",
+      "n": 17,
+      "law": "soft",
+      "seed": 1,
+      "pairLaw": {
+        "rigidity": 0.35,
+        "repulsion": 400,
+        "attraction": 0,
+        "range": 0
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.01746328478053,
+        "maximumDisplacement": 0.1169227340542,
+        "reversalRatio": 0.03924418604651
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.2358603010726,
+        "wallPenetrationMaximum": 0.3067979040023,
+        "contactPairs": {
+          "maximum": 42,
+          "mean": 22.06194690265,
+          "final": 23
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.2358603010726,
+          "maximum": 0,
+          "mean": -0.07490302405478,
+          "p95": 0
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 4.440892098501e-16
+      },
+      "integrationSteps": 346,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 5.049917
+    },
+    {
+      "solver": "bodies",
+      "n": 17,
+      "law": "soft",
+      "seed": 2,
+      "pairLaw": {
+        "rigidity": 0.35,
+        "repulsion": 400,
+        "attraction": 0,
+        "range": 0
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.0170157453236,
+        "maximumDisplacement": 0.1243073272454,
+        "reversalRatio": 0.03997093023256
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.2148018137254,
+        "wallPenetrationMaximum": 0.2941291073996,
+        "contactPairs": {
+          "maximum": 42,
+          "mean": 22.10619469027,
+          "final": 23
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.2148018137254,
+          "maximum": 0,
+          "mean": -0.06846056848846,
+          "p95": 0
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 4.440892098501e-16
+      },
+      "integrationSteps": 346,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 3.241167
+    },
+    {
+      "solver": "bodies",
+      "n": 17,
+      "law": "sticky",
+      "seed": 0,
+      "pairLaw": {
+        "rigidity": 0.08,
+        "repulsion": 2500,
+        "attraction": 120,
+        "range": 0.25
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.01464798513168,
+        "maximumDisplacement": 0.1444739796192,
+        "reversalRatio": 0.04360465116279
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.3054998384846,
+        "wallPenetrationMaximum": 0.08325569137973,
+        "contactPairs": {
+          "maximum": 42,
+          "mean": 23.36283185841,
+          "final": 23
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.3054998384846,
+          "maximum": 0,
+          "mean": -0.0606452373249,
+          "p95": 0
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 4.440892098501e-16
+      },
+      "integrationSteps": 519,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 6.932
+    },
+    {
+      "solver": "bodies",
+      "n": 17,
+      "law": "sticky",
+      "seed": 1,
+      "pairLaw": {
+        "rigidity": 0.08,
+        "repulsion": 2500,
+        "attraction": 120,
+        "range": 0.25
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.01423918759513,
+        "maximumDisplacement": 0.1484866836633,
+        "reversalRatio": 0.05595930232558
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.2959201511407,
+        "wallPenetrationMaximum": 0.06736941012034,
+        "contactPairs": {
+          "maximum": 42,
+          "mean": 23.96460176991,
+          "final": 23
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.2959201511407,
+          "maximum": 0,
+          "mean": -0.06168463878478,
+          "p95": 0
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 4.440892098501e-16
+      },
+      "integrationSteps": 519,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 7.3125
+    },
+    {
+      "solver": "bodies",
+      "n": 17,
+      "law": "sticky",
+      "seed": 2,
+      "pairLaw": {
+        "rigidity": 0.08,
+        "repulsion": 2500,
+        "attraction": 120,
+        "range": 0.25
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.01352868279162,
+        "maximumDisplacement": 0.1400555437092,
+        "reversalRatio": 0.04651162790698
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.3072986127713,
+        "wallPenetrationMaximum": 0.05835237469473,
+        "contactPairs": {
+          "maximum": 42,
+          "mean": 23.75221238938,
+          "final": 23
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.3072986127713,
+          "maximum": 0,
+          "mean": -0.06123453989787,
+          "p95": 0
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 4.440892098501e-16
+      },
+      "integrationSteps": 519,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 6.71675
+    },
+    {
+      "solver": "bodies",
+      "n": 90,
+      "law": "balanced",
+      "seed": 0,
+      "pairLaw": {
+        "rigidity": 0.35,
+        "repulsion": 950,
+        "attraction": 80,
+        "range": 0.15
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.02143407464947,
+        "maximumDisplacement": 0.2309482332348,
+        "reversalRatio": 0.03997909589757
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.7879918446408,
+        "wallPenetrationMaximum": 0.3510487170947,
+        "contactPairs": {
+          "maximum": 297,
+          "mean": 206.4424778761,
+          "final": 297
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.7879918446408,
+          "maximum": 0,
+          "mean": -0.2910653724713,
+          "p95": -0.000001259489086136
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 0
+      },
+      "integrationSteps": 346,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 21.72075
+    },
+    {
+      "solver": "bodies",
+      "n": 90,
+      "law": "balanced",
+      "seed": 1,
+      "pairLaw": {
+        "rigidity": 0.35,
+        "repulsion": 950,
+        "attraction": 80,
+        "range": 0.15
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.02197007108175,
+        "maximumDisplacement": 0.2268169073376,
+        "reversalRatio": 0.0363208779723
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.6244626512341,
+        "wallPenetrationMaximum": 0.3788392714722,
+        "contactPairs": {
+          "maximum": 297,
+          "mean": 204.3805309735,
+          "final": 297
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.6244626512341,
+          "maximum": 0,
+          "mean": -0.2562504831306,
+          "p95": -0.000001259489086136
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 0
+      },
+      "integrationSteps": 346,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 22.311208
+    },
+    {
+      "solver": "bodies",
+      "n": 90,
+      "law": "balanced",
+      "seed": 2,
+      "pairLaw": {
+        "rigidity": 0.35,
+        "repulsion": 950,
+        "attraction": 80,
+        "range": 0.15
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.02215275016579,
+        "maximumDisplacement": 0.2401375577787,
+        "reversalRatio": 0.02835118892083
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.5758132511144,
+        "wallPenetrationMaximum": 0.3760308994392,
+        "contactPairs": {
+          "maximum": 297,
+          "mean": 208.3008849558,
+          "final": 297
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.5758132511144,
+          "maximum": 0,
+          "mean": -0.2397139225624,
+          "p95": -0.000001259489086136
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 0
+      },
+      "integrationSteps": 346,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 23.007833
+    },
+    {
+      "solver": "bodies",
+      "n": 90,
+      "law": "rigid",
+      "seed": 0,
+      "pairLaw": {
+        "rigidity": 0.01,
+        "repulsion": 4000,
+        "attraction": 0,
+        "range": 0
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.02246262364639,
+        "maximumDisplacement": 0.2132819782977,
+        "reversalRatio": 0.04834073686961
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.5015486930286,
+        "wallPenetrationMaximum": 0.4822470469849,
+        "contactPairs": {
+          "maximum": 297,
+          "mean": 183.9734513274,
+          "final": 297
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.5015486930286,
+          "maximum": 0,
+          "mean": -0.09383791995957,
+          "p95": -0.000001259489086136
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 0
+      },
+      "integrationSteps": 865,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 45.6265
+    },
+    {
+      "solver": "bodies",
+      "n": 90,
+      "law": "rigid",
+      "seed": 1,
+      "pairLaw": {
+        "rigidity": 0.01,
+        "repulsion": 4000,
+        "attraction": 0,
+        "range": 0
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.02275175026685,
+        "maximumDisplacement": 0.1989826216853,
+        "reversalRatio": 0.05147635223413
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.5075298419233,
+        "wallPenetrationMaximum": 0.5617737970168,
+        "contactPairs": {
+          "maximum": 297,
+          "mean": 181.6991150442,
+          "final": 297
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.5075298419233,
+          "maximum": 0,
+          "mean": -0.09184717186031,
+          "p95": -0.000001259489086136
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 0
+      },
+      "integrationSteps": 865,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 41.667583
+    },
+    {
+      "solver": "bodies",
+      "n": 90,
+      "law": "rigid",
+      "seed": 2,
+      "pairLaw": {
+        "rigidity": 0.01,
+        "repulsion": 4000,
+        "attraction": 0,
+        "range": 0
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.02098723535165,
+        "maximumDisplacement": 0.1937142636191,
+        "reversalRatio": 0.04442121766397
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.4915090062186,
+        "wallPenetrationMaximum": 0.6512808063118,
+        "contactPairs": {
+          "maximum": 297,
+          "mean": 184.6991150442,
+          "final": 297
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.4915090062186,
+          "maximum": 0,
+          "mean": -0.09470749500576,
+          "p95": -0.000001259489086136
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 0
+      },
+      "integrationSteps": 865,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 41.416667
+    },
+    {
+      "solver": "bodies",
+      "n": 90,
+      "law": "soft",
+      "seed": 0,
+      "pairLaw": {
+        "rigidity": 0.35,
+        "repulsion": 400,
+        "attraction": 0,
+        "range": 0
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.02170410043724,
+        "maximumDisplacement": 0.2804203176861,
+        "reversalRatio": 0.03162158630602
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.6239742138388,
+        "wallPenetrationMaximum": 0.3477245875413,
+        "contactPairs": {
+          "maximum": 297,
+          "mean": 205.8053097345,
+          "final": 297
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.6239742138388,
+          "maximum": 0,
+          "mean": -0.2985481145442,
+          "p95": -0.000001259489086136
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 0
+      },
+      "integrationSteps": 346,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 18.763292
+    },
+    {
+      "solver": "bodies",
+      "n": 90,
+      "law": "soft",
+      "seed": 1,
+      "pairLaw": {
+        "rigidity": 0.35,
+        "repulsion": 400,
+        "attraction": 0,
+        "range": 0
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.02225243735261,
+        "maximumDisplacement": 0.2421224284328,
+        "reversalRatio": 0.0297883459629
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.635788790155,
+        "wallPenetrationMaximum": 0.3300550091762,
+        "contactPairs": {
+          "maximum": 297,
+          "mean": 202.4159292035,
+          "final": 297
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.635788790155,
+          "maximum": 0,
+          "mean": -0.2838721131228,
+          "p95": -0.000001259489086136
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 0
+      },
+      "integrationSteps": 346,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 22.350625
+    },
+    {
+      "solver": "bodies",
+      "n": 90,
+      "law": "soft",
+      "seed": 2,
+      "pairLaw": {
+        "rigidity": 0.35,
+        "repulsion": 400,
+        "attraction": 0,
+        "range": 0
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.02254736940278,
+        "maximumDisplacement": 0.2992653175534,
+        "reversalRatio": 0.02665621324971
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.6395718275623,
+        "wallPenetrationMaximum": 0.3566204901192,
+        "contactPairs": {
+          "maximum": 297,
+          "mean": 203.592920354,
+          "final": 297
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.6395718275623,
+          "maximum": 0,
+          "mean": -0.2920034967616,
+          "p95": -0.000001259489086136
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 0
+      },
+      "integrationSteps": 346,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 23.0005
+    },
+    {
+      "solver": "bodies",
+      "n": 90,
+      "law": "sticky",
+      "seed": 0,
+      "pairLaw": {
+        "rigidity": 0.08,
+        "repulsion": 2500,
+        "attraction": 120,
+        "range": 0.25
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.02229801814478,
+        "maximumDisplacement": 0.2136189665784,
+        "reversalRatio": 0.04455186830415
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.5234173421438,
+        "wallPenetrationMaximum": 0.4340307590625,
+        "contactPairs": {
+          "maximum": 297,
+          "mean": 185.2477876106,
+          "final": 297
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.5234173421438,
+          "maximum": 0,
+          "mean": -0.1523860751571,
+          "p95": -0.000001259489086136
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 0
+      },
+      "integrationSteps": 519,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 36.661208
+    },
+    {
+      "solver": "bodies",
+      "n": 90,
+      "law": "sticky",
+      "seed": 1,
+      "pairLaw": {
+        "rigidity": 0.08,
+        "repulsion": 2500,
+        "attraction": 120,
+        "range": 0.25
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.02350073527981,
+        "maximumDisplacement": 0.1987777669895,
+        "reversalRatio": 0.03906454141625
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.5544771377046,
+        "wallPenetrationMaximum": 0.5262933322661,
+        "contactPairs": {
+          "maximum": 297,
+          "mean": 183.8495575221,
+          "final": 297
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.5544771377046,
+          "maximum": 0,
+          "mean": -0.1584097724801,
+          "p95": -0.000001259489086136
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 0
+      },
+      "integrationSteps": 519,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 34.60325
+    },
+    {
+      "solver": "bodies",
+      "n": 90,
+      "law": "sticky",
+      "seed": 2,
+      "pairLaw": {
+        "rigidity": 0.08,
+        "repulsion": 2500,
+        "attraction": 120,
+        "range": 0.25
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.0223579360914,
+        "maximumDisplacement": 0.219459932855,
+        "reversalRatio": 0.03984844525738
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.563092935628,
+        "wallPenetrationMaximum": 0.5370959690018,
+        "contactPairs": {
+          "maximum": 297,
+          "mean": 185.8318584071,
+          "final": 297
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.563092935628,
+          "maximum": 0,
+          "mean": -0.1583982743677,
+          "p95": -0.000001259489086136
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 0
+      },
+      "integrationSteps": 519,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 35.780708
+    },
+    {
+      "solver": "physics",
+      "n": 17,
+      "law": "balanced",
+      "seed": 0,
+      "pairLaw": {
+        "rigidity": 0.35,
+        "repulsion": 950,
+        "attraction": 80,
+        "range": 0.15
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.01118916656497,
+        "maximumDisplacement": 0.08797045764615,
+        "reversalRatio": 0.03779069767442
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.2497334600534,
+        "wallPenetrationMaximum": 0.0489486127181,
+        "contactPairs": {
+          "maximum": 42,
+          "mean": 18.3982300885,
+          "final": 23
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.2497334600534,
+          "maximum": 0,
+          "mean": -0.08669507708902,
+          "p95": 0
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 4.440892098501e-16
+      },
+      "integrationSteps": 346,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 78.297291
+    },
+    {
+      "solver": "physics",
+      "n": 17,
+      "law": "balanced",
+      "seed": 1,
+      "pairLaw": {
+        "rigidity": 0.35,
+        "repulsion": 950,
+        "attraction": 80,
+        "range": 0.15
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.01155549879134,
+        "maximumDisplacement": 0.1018394303582,
+        "reversalRatio": 0.04287790697674
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.2236416047565,
+        "wallPenetrationMaximum": 0.04133720151469,
+        "contactPairs": {
+          "maximum": 42,
+          "mean": 18.26548672566,
+          "final": 23
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.2236416047565,
+          "maximum": 0,
+          "mean": -0.08505620624275,
+          "p95": 0
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 4.440892098501e-16
+      },
+      "integrationSteps": 346,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 37.334333
+    },
+    {
+      "solver": "physics",
+      "n": 17,
+      "law": "balanced",
+      "seed": 2,
+      "pairLaw": {
+        "rigidity": 0.35,
+        "repulsion": 950,
+        "attraction": 80,
+        "range": 0.15
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.01102210828647,
+        "maximumDisplacement": 0.07551126076287,
+        "reversalRatio": 0.04433139534884
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.201549545326,
+        "wallPenetrationMaximum": 0.03935062584436,
+        "contactPairs": {
+          "maximum": 42,
+          "mean": 18.56637168142,
+          "final": 23
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.201549545326,
+          "maximum": 0,
+          "mean": -0.08342740111699,
+          "p95": 0
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 4.440892098501e-16
+      },
+      "integrationSteps": 346,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 125.792875
+    },
+    {
+      "solver": "physics",
+      "n": 17,
+      "law": "rigid",
+      "seed": 0,
+      "pairLaw": {
+        "rigidity": 0.01,
+        "repulsion": 4000,
+        "attraction": 0,
+        "range": 0
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.01362165083916,
+        "maximumDisplacement": 0.1342021105947,
+        "reversalRatio": 0.0625
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.1254403063285,
+        "wallPenetrationMaximum": 0.327112324773,
+        "contactPairs": {
+          "maximum": 42,
+          "mean": 18.94690265487,
+          "final": 23
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.1254403063285,
+          "maximum": 0,
+          "mean": -0.02567136680124,
+          "p95": 0
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 4.440892098501e-16
+      },
+      "integrationSteps": 865,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 134.292542
+    },
+    {
+      "solver": "physics",
+      "n": 17,
+      "law": "rigid",
+      "seed": 1,
+      "pairLaw": {
+        "rigidity": 0.01,
+        "repulsion": 4000,
+        "attraction": 0,
+        "range": 0
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.01380818126179,
+        "maximumDisplacement": 0.1374691153718,
+        "reversalRatio": 0.05886627906977
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.1014647718209,
+        "wallPenetrationMaximum": 0.3091425176882,
+        "contactPairs": {
+          "maximum": 42,
+          "mean": 18.66371681416,
+          "final": 23
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.1014647718209,
+          "maximum": 0,
+          "mean": -0.02262879946582,
+          "p95": 0
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 4.440892098501e-16
+      },
+      "integrationSteps": 865,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 40.509875
+    },
+    {
+      "solver": "physics",
+      "n": 17,
+      "law": "rigid",
+      "seed": 2,
+      "pairLaw": {
+        "rigidity": 0.01,
+        "repulsion": 4000,
+        "attraction": 0,
+        "range": 0
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.01368058363078,
+        "maximumDisplacement": 0.1385818883425,
+        "reversalRatio": 0.05014534883721
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.05111696611322,
+        "wallPenetrationMaximum": 0.3060209468658,
+        "contactPairs": {
+          "maximum": 42,
+          "mean": 19.30973451327,
+          "final": 23
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.05111696611322,
+          "maximum": 0,
+          "mean": -0.01801028769636,
+          "p95": 0
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 4.440892098501e-16
+      },
+      "integrationSteps": 865,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 20.692708
+    },
+    {
+      "solver": "physics",
+      "n": 17,
+      "law": "soft",
+      "seed": 0,
+      "pairLaw": {
+        "rigidity": 0.35,
+        "repulsion": 400,
+        "attraction": 0,
+        "range": 0
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.01419353432013,
+        "maximumDisplacement": 0.1042371543376,
+        "reversalRatio": 0.03790087463557
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.2065079112692,
+        "wallPenetrationMaximum": 0.3030373106183,
+        "contactPairs": {
+          "maximum": 42,
+          "mean": 15.19469026549,
+          "final": 23
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.2065079112692,
+          "maximum": 0,
+          "mean": -0.07212052996753,
+          "p95": 0
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 4.440892098501e-16
+      },
+      "integrationSteps": 346,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 9.60225
+    },
+    {
+      "solver": "physics",
+      "n": 17,
+      "law": "soft",
+      "seed": 1,
+      "pairLaw": {
+        "rigidity": 0.35,
+        "repulsion": 400,
+        "attraction": 0,
+        "range": 0
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.01463541715754,
+        "maximumDisplacement": 0.1090462441683,
+        "reversalRatio": 0.03706395348837
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.2452400407203,
+        "wallPenetrationMaximum": 0.2727860057694,
+        "contactPairs": {
+          "maximum": 42,
+          "mean": 15.46902654867,
+          "final": 23
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.2452400407203,
+          "maximum": 0,
+          "mean": -0.06567792824493,
+          "p95": 0
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 4.440892098501e-16
+      },
+      "integrationSteps": 346,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 43.493667
+    },
+    {
+      "solver": "physics",
+      "n": 17,
+      "law": "soft",
+      "seed": 2,
+      "pairLaw": {
+        "rigidity": 0.35,
+        "repulsion": 400,
+        "attraction": 0,
+        "range": 0
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.01471896880365,
+        "maximumDisplacement": 0.09964734590688,
+        "reversalRatio": 0.0421511627907
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.2348951868073,
+        "wallPenetrationMaximum": 0.2449156524413,
+        "contactPairs": {
+          "maximum": 42,
+          "mean": 15.15044247788,
+          "final": 23
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.2348951868073,
+          "maximum": 0,
+          "mean": -0.07249139100002,
+          "p95": 0
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 4.440892098501e-16
+      },
+      "integrationSteps": 346,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 48.445
+    },
+    {
+      "solver": "physics",
+      "n": 17,
+      "law": "sticky",
+      "seed": 0,
+      "pairLaw": {
+        "rigidity": 0.08,
+        "repulsion": 2500,
+        "attraction": 120,
+        "range": 0.25
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.01149963374052,
+        "maximumDisplacement": 0.1354468753844,
+        "reversalRatio": 0.04941860465116
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.3162604573909,
+        "wallPenetrationMaximum": 0.07651423461584,
+        "contactPairs": {
+          "maximum": 42,
+          "mean": 20.17699115044,
+          "final": 23
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.3162604573909,
+          "maximum": 0,
+          "mean": -0.05848405309152,
+          "p95": 0
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 4.440892098501e-16
+      },
+      "integrationSteps": 519,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 27.317
+    },
+    {
+      "solver": "physics",
+      "n": 17,
+      "law": "sticky",
+      "seed": 1,
+      "pairLaw": {
+        "rigidity": 0.08,
+        "repulsion": 2500,
+        "attraction": 120,
+        "range": 0.25
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.01201959211002,
+        "maximumDisplacement": 0.1496289489115,
+        "reversalRatio": 0.0530523255814
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.3238812210821,
+        "wallPenetrationMaximum": 0.06945528261904,
+        "contactPairs": {
+          "maximum": 42,
+          "mean": 19.19469026549,
+          "final": 23
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.3238812210821,
+          "maximum": 0,
+          "mean": -0.06148098782073,
+          "p95": 0
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 4.440892098501e-16
+      },
+      "integrationSteps": 519,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 12.895166
+    },
+    {
+      "solver": "physics",
+      "n": 17,
+      "law": "sticky",
+      "seed": 2,
+      "pairLaw": {
+        "rigidity": 0.08,
+        "repulsion": 2500,
+        "attraction": 120,
+        "range": 0.25
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.01036511588188,
+        "maximumDisplacement": 0.1395568771694,
+        "reversalRatio": 0.05886627906977
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.3100860021946,
+        "wallPenetrationMaximum": 0.07503811470902,
+        "contactPairs": {
+          "maximum": 42,
+          "mean": 19.75221238938,
+          "final": 23
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.3100860021946,
+          "maximum": 0,
+          "mean": -0.05857366014914,
+          "p95": 0
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 4.440892098501e-16
+      },
+      "integrationSteps": 519,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 10.289667
+    },
+    {
+      "solver": "physics",
+      "n": 90,
+      "law": "balanced",
+      "seed": 0,
+      "pairLaw": {
+        "rigidity": 0.35,
+        "repulsion": 950,
+        "attraction": 80,
+        "range": 0.15
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.01672182616411,
+        "maximumDisplacement": 0.2053412878053,
+        "reversalRatio": 0.0418082048602
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.5429504238944,
+        "wallPenetrationMaximum": 0.3285983723954,
+        "contactPairs": {
+          "maximum": 297,
+          "mean": 140.0619469027,
+          "final": 297
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.5429504238944,
+          "maximum": 0,
+          "mean": -0.1914474689618,
+          "p95": -0.000001259489086136
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 0
+      },
+      "integrationSteps": 346,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 57.034667
+    },
+    {
+      "solver": "physics",
+      "n": 90,
+      "law": "balanced",
+      "seed": 1,
+      "pairLaw": {
+        "rigidity": 0.35,
+        "repulsion": 950,
+        "attraction": 80,
+        "range": 0.15
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.01624678511103,
+        "maximumDisplacement": 0.2022366035187,
+        "reversalRatio": 0.04598902534622
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.5505654301474,
+        "wallPenetrationMaximum": 0.3615621759201,
+        "contactPairs": {
+          "maximum": 297,
+          "mean": 141.8230088496,
+          "final": 297
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.5505654301474,
+          "maximum": 0,
+          "mean": -0.1876466548955,
+          "p95": -0.000001259489086136
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 0
+      },
+      "integrationSteps": 346,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 104.991042
+    },
+    {
+      "solver": "physics",
+      "n": 90,
+      "law": "balanced",
+      "seed": 2,
+      "pairLaw": {
+        "rigidity": 0.35,
+        "repulsion": 950,
+        "attraction": 80,
+        "range": 0.15
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.01647322022603,
+        "maximumDisplacement": 0.2173965204125,
+        "reversalRatio": 0.03828063757512
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.5582645931653,
+        "wallPenetrationMaximum": 0.3197595864202,
+        "contactPairs": {
+          "maximum": 297,
+          "mean": 139.5840707965,
+          "final": 297
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.5582645931653,
+          "maximum": 0,
+          "mean": -0.1897118634133,
+          "p95": -0.000001259489086136
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 0
+      },
+      "integrationSteps": 346,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 184.632375
+    },
+    {
+      "solver": "physics",
+      "n": 90,
+      "law": "rigid",
+      "seed": 0,
+      "pairLaw": {
+        "rigidity": 0.01,
+        "repulsion": 4000,
+        "attraction": 0,
+        "range": 0
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.01728381565324,
+        "maximumDisplacement": 0.1358949471444,
+        "reversalRatio": 0.05356676247714
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.5318537707602,
+        "wallPenetrationMaximum": 0.5787819623747,
+        "contactPairs": {
+          "maximum": 297,
+          "mean": 119.9115044248,
+          "final": 297
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.5318537707602,
+          "maximum": 0,
+          "mean": -0.09799741196915,
+          "p95": -0.000001259489086136
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 0
+      },
+      "integrationSteps": 865,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 308.5675
+    },
+    {
+      "solver": "physics",
+      "n": 90,
+      "law": "rigid",
+      "seed": 1,
+      "pairLaw": {
+        "rigidity": 0.01,
+        "repulsion": 4000,
+        "attraction": 0,
+        "range": 0
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.01769554959474,
+        "maximumDisplacement": 0.1370532956784,
+        "reversalRatio": 0.04729553174811
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.5192758543867,
+        "wallPenetrationMaximum": 0.6109005194388,
+        "contactPairs": {
+          "maximum": 297,
+          "mean": 130.0353982301,
+          "final": 297
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.5192758543867,
+          "maximum": 0,
+          "mean": -0.09726250936416,
+          "p95": -0.000001259489086136
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 0
+      },
+      "integrationSteps": 865,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 124.992125
+    },
+    {
+      "solver": "physics",
+      "n": 90,
+      "law": "rigid",
+      "seed": 2,
+      "pairLaw": {
+        "rigidity": 0.01,
+        "repulsion": 4000,
+        "attraction": 0,
+        "range": 0
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.01734810844574,
+        "maximumDisplacement": 0.1639998070291,
+        "reversalRatio": 0.05905408936504
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.522849448064,
+        "wallPenetrationMaximum": 0.5282418413176,
+        "contactPairs": {
+          "maximum": 297,
+          "mean": 114.5663716814,
+          "final": 297
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.522849448064,
+          "maximum": 0,
+          "mean": -0.08632664884892,
+          "p95": -0.000001259489086136
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 0
+      },
+      "integrationSteps": 865,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 107.259792
+    },
+    {
+      "solver": "physics",
+      "n": 90,
+      "law": "soft",
+      "seed": 0,
+      "pairLaw": {
+        "rigidity": 0.35,
+        "repulsion": 400,
+        "attraction": 0,
+        "range": 0
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.0180729094402,
+        "maximumDisplacement": 0.1950315899439,
+        "reversalRatio": 0.03200940684609
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.5183270072477,
+        "wallPenetrationMaximum": 0.3157926058265,
+        "contactPairs": {
+          "maximum": 297,
+          "mean": 119.6548672566,
+          "final": 297
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.5183270072477,
+          "maximum": 0,
+          "mean": -0.199936758717,
+          "p95": -0.000001259489086136
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 0
+      },
+      "integrationSteps": 346,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 53.494458
+    },
+    {
+      "solver": "physics",
+      "n": 90,
+      "law": "soft",
+      "seed": 1,
+      "pairLaw": {
+        "rigidity": 0.35,
+        "repulsion": 400,
+        "attraction": 0,
+        "range": 0
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.01766465246794,
+        "maximumDisplacement": 0.2164730224143,
+        "reversalRatio": 0.03449627597021
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.4309043477473,
+        "wallPenetrationMaximum": 0.3219613450101,
+        "contactPairs": {
+          "maximum": 297,
+          "mean": 118.3716814159,
+          "final": 297
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.4309043477473,
+          "maximum": 0,
+          "mean": -0.2050185394355,
+          "p95": -0.000001259489086136
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 0
+      },
+      "integrationSteps": 346,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 98.798292
+    },
+    {
+      "solver": "physics",
+      "n": 90,
+      "law": "soft",
+      "seed": 2,
+      "pairLaw": {
+        "rigidity": 0.35,
+        "repulsion": 400,
+        "attraction": 0,
+        "range": 0
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.01806297722141,
+        "maximumDisplacement": 0.187173844685,
+        "reversalRatio": 0.03135615364515
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.4500495647706,
+        "wallPenetrationMaximum": 0.3273966217303,
+        "contactPairs": {
+          "maximum": 297,
+          "mean": 122.0265486726,
+          "final": 297
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.4500495647706,
+          "maximum": 0,
+          "mean": -0.2067127826165,
+          "p95": -0.000001259489086136
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 0
+      },
+      "integrationSteps": 346,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 46.345458
+    },
+    {
+      "solver": "physics",
+      "n": 90,
+      "law": "sticky",
+      "seed": 0,
+      "pairLaw": {
+        "rigidity": 0.08,
+        "repulsion": 2500,
+        "attraction": 120,
+        "range": 0.25
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.01736665597234,
+        "maximumDisplacement": 0.2234431860664,
+        "reversalRatio": 0.05604912464071
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.5623073759111,
+        "wallPenetrationMaximum": 0.4588599235509,
+        "contactPairs": {
+          "maximum": 297,
+          "mean": 132.5840707965,
+          "final": 297
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.5623073759111,
+          "maximum": 0,
+          "mean": -0.1377668916595,
+          "p95": -0.000001259489086136
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 0
+      },
+      "integrationSteps": 519,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 132.280542
+    },
+    {
+      "solver": "physics",
+      "n": 90,
+      "law": "sticky",
+      "seed": 1,
+      "pairLaw": {
+        "rigidity": 0.08,
+        "repulsion": 2500,
+        "attraction": 120,
+        "range": 0.25
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.0167081520044,
+        "maximumDisplacement": 0.1527958195458,
+        "reversalRatio": 0.05408936503789
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.5664571507261,
+        "wallPenetrationMaximum": 0.4387428721075,
+        "contactPairs": {
+          "maximum": 297,
+          "mean": 131.017699115,
+          "final": 297
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.5664571507261,
+          "maximum": 0,
+          "mean": -0.1394653967306,
+          "p95": -0.000001259489086136
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 0
+      },
+      "integrationSteps": 519,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 68.27466700001
+    },
+    {
+      "solver": "physics",
+      "n": 90,
+      "law": "sticky",
+      "seed": 2,
+      "pairLaw": {
+        "rigidity": 0.08,
+        "repulsion": 2500,
+        "attraction": 120,
+        "range": 0.25
+      },
+      "wallLaw": {
+        "rigidity": 0.25,
+        "repulsion": 2500,
+        "attraction": 0,
+        "range": 0
+      },
+      "presented": {
+        "mean": 0.01762152402092,
+        "maximumDisplacement": 0.1863844772485,
+        "reversalRatio": 0.05212960543507
+      },
+      "geometry": {
+        "pairPenetrationMaximum": 0.5698400674036,
+        "wallPenetrationMaximum": 0.4150250213937,
+        "contactPairs": {
+          "maximum": 297,
+          "mean": 132.8495575221,
+          "final": 297
+        },
+        "nearestNeighborGap": {
+          "minimum": -0.5698400674036,
+          "maximum": 0,
+          "mean": -0.1384596338831,
+          "p95": -0.000001259489086136
+        }
+      },
+      "endpoint": {
+        "maximumCenterError": 0,
+        "rootMeanSquareCenterError": 0,
+        "maximumAngleErrorRadians": 0
+      },
+      "integrationSteps": 519,
+      "deterministic": true,
+      "runtimeWallMilliseconds": 111.166875
+    }
+  ],
+  "groups": [
+    {
+      "solver": "bodies",
+      "n": 17,
+      "law": "balanced",
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "pairPenetrationMaximum": [
+        0.2591592551789,
+        0.2458051773413,
+        0.313213897748
+      ],
+      "contactMean": [
+        23.09734513274,
+        22.49557522124,
+        22.70796460177
+      ],
+      "contactFinal": [
+        23,
+        23,
+        23
+      ],
+      "nearestGapMean": [
+        -0.08392082323764,
+        -0.08420105746398,
+        -0.08567536723171
+      ],
+      "maximumDisplacement": [
+        0.09477205934136,
+        0.0959890319342,
+        0.07651986400575
+      ],
+      "meanDisplacement": [
+        0.01464890415044,
+        0.01511715620509,
+        0.01325197915287
+      ],
+      "reversalRatio": [
+        0.04505813953488,
+        0.04360465116279,
+        0.03924418604651
+      ],
+      "deterministic": true
+    },
+    {
+      "solver": "bodies",
+      "n": 17,
+      "law": "rigid",
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "pairPenetrationMaximum": [
+        0.2432254524546,
+        0.2231926277172,
+        0.2514345313152
+      ],
+      "contactMean": [
+        22.29203539823,
+        21.88495575221,
+        22.37168141593
+      ],
+      "contactFinal": [
+        23,
+        23,
+        23
+      ],
+      "nearestGapMean": [
+        -0.0351828462593,
+        -0.03399440175868,
+        -0.03662105061194
+      ],
+      "maximumDisplacement": [
+        0.1352601582651,
+        0.1291661609881,
+        0.1294769858218
+      ],
+      "meanDisplacement": [
+        0.01627222572383,
+        0.01612553169004,
+        0.01570710951738
+      ],
+      "reversalRatio": [
+        0.04360465116279,
+        0.05377906976744,
+        0.04941860465116
+      ],
+      "deterministic": true
+    },
+    {
+      "solver": "bodies",
+      "n": 17,
+      "law": "soft",
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "pairPenetrationMaximum": [
+        0.2423628095839,
+        0.2358603010726,
+        0.2148018137254
+      ],
+      "contactMean": [
+        21.56637168142,
+        22.06194690265,
+        22.10619469027
+      ],
+      "contactFinal": [
+        23,
+        23,
+        23
+      ],
+      "nearestGapMean": [
+        -0.07398774407195,
+        -0.07490302405478,
+        -0.06846056848846
+      ],
+      "maximumDisplacement": [
+        0.1430389301919,
+        0.1169227340542,
+        0.1243073272454
+      ],
+      "meanDisplacement": [
+        0.0170613653486,
+        0.01746328478053,
+        0.0170157453236
+      ],
+      "reversalRatio": [
+        0.03561046511628,
+        0.03924418604651,
+        0.03997093023256
+      ],
+      "deterministic": true
+    },
+    {
+      "solver": "bodies",
+      "n": 17,
+      "law": "sticky",
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "pairPenetrationMaximum": [
+        0.3054998384846,
+        0.2959201511407,
+        0.3072986127713
+      ],
+      "contactMean": [
+        23.36283185841,
+        23.96460176991,
+        23.75221238938
+      ],
+      "contactFinal": [
+        23,
+        23,
+        23
+      ],
+      "nearestGapMean": [
+        -0.0606452373249,
+        -0.06168463878478,
+        -0.06123453989787
+      ],
+      "maximumDisplacement": [
+        0.1444739796192,
+        0.1484866836633,
+        0.1400555437092
+      ],
+      "meanDisplacement": [
+        0.01464798513168,
+        0.01423918759513,
+        0.01352868279162
+      ],
+      "reversalRatio": [
+        0.04360465116279,
+        0.05595930232558,
+        0.04651162790698
+      ],
+      "deterministic": true
+    },
+    {
+      "solver": "bodies",
+      "n": 90,
+      "law": "balanced",
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "pairPenetrationMaximum": [
+        0.7879918446408,
+        0.6244626512341,
+        0.5758132511144
+      ],
+      "contactMean": [
+        206.4424778761,
+        204.3805309735,
+        208.3008849558
+      ],
+      "contactFinal": [
+        297,
+        297,
+        297
+      ],
+      "nearestGapMean": [
+        -0.2910653724713,
+        -0.2562504831306,
+        -0.2397139225624
+      ],
+      "maximumDisplacement": [
+        0.2309482332348,
+        0.2268169073376,
+        0.2401375577787
+      ],
+      "meanDisplacement": [
+        0.02143407464947,
+        0.02197007108175,
+        0.02215275016579
+      ],
+      "reversalRatio": [
+        0.03997909589757,
+        0.0363208779723,
+        0.02835118892083
+      ],
+      "deterministic": true
+    },
+    {
+      "solver": "bodies",
+      "n": 90,
+      "law": "rigid",
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "pairPenetrationMaximum": [
+        0.5015486930286,
+        0.5075298419233,
+        0.4915090062186
+      ],
+      "contactMean": [
+        183.9734513274,
+        181.6991150442,
+        184.6991150442
+      ],
+      "contactFinal": [
+        297,
+        297,
+        297
+      ],
+      "nearestGapMean": [
+        -0.09383791995957,
+        -0.09184717186031,
+        -0.09470749500576
+      ],
+      "maximumDisplacement": [
+        0.2132819782977,
+        0.1989826216853,
+        0.1937142636191
+      ],
+      "meanDisplacement": [
+        0.02246262364639,
+        0.02275175026685,
+        0.02098723535165
+      ],
+      "reversalRatio": [
+        0.04834073686961,
+        0.05147635223413,
+        0.04442121766397
+      ],
+      "deterministic": true
+    },
+    {
+      "solver": "bodies",
+      "n": 90,
+      "law": "soft",
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "pairPenetrationMaximum": [
+        0.6239742138388,
+        0.635788790155,
+        0.6395718275623
+      ],
+      "contactMean": [
+        205.8053097345,
+        202.4159292035,
+        203.592920354
+      ],
+      "contactFinal": [
+        297,
+        297,
+        297
+      ],
+      "nearestGapMean": [
+        -0.2985481145442,
+        -0.2838721131228,
+        -0.2920034967616
+      ],
+      "maximumDisplacement": [
+        0.2804203176861,
+        0.2421224284328,
+        0.2992653175534
+      ],
+      "meanDisplacement": [
+        0.02170410043724,
+        0.02225243735261,
+        0.02254736940278
+      ],
+      "reversalRatio": [
+        0.03162158630602,
+        0.0297883459629,
+        0.02665621324971
+      ],
+      "deterministic": true
+    },
+    {
+      "solver": "bodies",
+      "n": 90,
+      "law": "sticky",
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "pairPenetrationMaximum": [
+        0.5234173421438,
+        0.5544771377046,
+        0.563092935628
+      ],
+      "contactMean": [
+        185.2477876106,
+        183.8495575221,
+        185.8318584071
+      ],
+      "contactFinal": [
+        297,
+        297,
+        297
+      ],
+      "nearestGapMean": [
+        -0.1523860751571,
+        -0.1584097724801,
+        -0.1583982743677
+      ],
+      "maximumDisplacement": [
+        0.2136189665784,
+        0.1987777669895,
+        0.219459932855
+      ],
+      "meanDisplacement": [
+        0.02229801814478,
+        0.02350073527981,
+        0.0223579360914
+      ],
+      "reversalRatio": [
+        0.04455186830415,
+        0.03906454141625,
+        0.03984844525738
+      ],
+      "deterministic": true
+    },
+    {
+      "solver": "physics",
+      "n": 17,
+      "law": "balanced",
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "pairPenetrationMaximum": [
+        0.2497334600534,
+        0.2236416047565,
+        0.201549545326
+      ],
+      "contactMean": [
+        18.3982300885,
+        18.26548672566,
+        18.56637168142
+      ],
+      "contactFinal": [
+        23,
+        23,
+        23
+      ],
+      "nearestGapMean": [
+        -0.08669507708902,
+        -0.08505620624275,
+        -0.08342740111699
+      ],
+      "maximumDisplacement": [
+        0.08797045764615,
+        0.1018394303582,
+        0.07551126076287
+      ],
+      "meanDisplacement": [
+        0.01118916656497,
+        0.01155549879134,
+        0.01102210828647
+      ],
+      "reversalRatio": [
+        0.03779069767442,
+        0.04287790697674,
+        0.04433139534884
+      ],
+      "deterministic": true
+    },
+    {
+      "solver": "physics",
+      "n": 17,
+      "law": "rigid",
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "pairPenetrationMaximum": [
+        0.1254403063285,
+        0.1014647718209,
+        0.05111696611322
+      ],
+      "contactMean": [
+        18.94690265487,
+        18.66371681416,
+        19.30973451327
+      ],
+      "contactFinal": [
+        23,
+        23,
+        23
+      ],
+      "nearestGapMean": [
+        -0.02567136680124,
+        -0.02262879946582,
+        -0.01801028769636
+      ],
+      "maximumDisplacement": [
+        0.1342021105947,
+        0.1374691153718,
+        0.1385818883425
+      ],
+      "meanDisplacement": [
+        0.01362165083916,
+        0.01380818126179,
+        0.01368058363078
+      ],
+      "reversalRatio": [
+        0.0625,
+        0.05886627906977,
+        0.05014534883721
+      ],
+      "deterministic": true
+    },
+    {
+      "solver": "physics",
+      "n": 17,
+      "law": "soft",
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "pairPenetrationMaximum": [
+        0.2065079112692,
+        0.2452400407203,
+        0.2348951868073
+      ],
+      "contactMean": [
+        15.19469026549,
+        15.46902654867,
+        15.15044247788
+      ],
+      "contactFinal": [
+        23,
+        23,
+        23
+      ],
+      "nearestGapMean": [
+        -0.07212052996753,
+        -0.06567792824493,
+        -0.07249139100002
+      ],
+      "maximumDisplacement": [
+        0.1042371543376,
+        0.1090462441683,
+        0.09964734590688
+      ],
+      "meanDisplacement": [
+        0.01419353432013,
+        0.01463541715754,
+        0.01471896880365
+      ],
+      "reversalRatio": [
+        0.03790087463557,
+        0.03706395348837,
+        0.0421511627907
+      ],
+      "deterministic": true
+    },
+    {
+      "solver": "physics",
+      "n": 17,
+      "law": "sticky",
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "pairPenetrationMaximum": [
+        0.3162604573909,
+        0.3238812210821,
+        0.3100860021946
+      ],
+      "contactMean": [
+        20.17699115044,
+        19.19469026549,
+        19.75221238938
+      ],
+      "contactFinal": [
+        23,
+        23,
+        23
+      ],
+      "nearestGapMean": [
+        -0.05848405309152,
+        -0.06148098782073,
+        -0.05857366014914
+      ],
+      "maximumDisplacement": [
+        0.1354468753844,
+        0.1496289489115,
+        0.1395568771694
+      ],
+      "meanDisplacement": [
+        0.01149963374052,
+        0.01201959211002,
+        0.01036511588188
+      ],
+      "reversalRatio": [
+        0.04941860465116,
+        0.0530523255814,
+        0.05886627906977
+      ],
+      "deterministic": true
+    },
+    {
+      "solver": "physics",
+      "n": 90,
+      "law": "balanced",
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "pairPenetrationMaximum": [
+        0.5429504238944,
+        0.5505654301474,
+        0.5582645931653
+      ],
+      "contactMean": [
+        140.0619469027,
+        141.8230088496,
+        139.5840707965
+      ],
+      "contactFinal": [
+        297,
+        297,
+        297
+      ],
+      "nearestGapMean": [
+        -0.1914474689618,
+        -0.1876466548955,
+        -0.1897118634133
+      ],
+      "maximumDisplacement": [
+        0.2053412878053,
+        0.2022366035187,
+        0.2173965204125
+      ],
+      "meanDisplacement": [
+        0.01672182616411,
+        0.01624678511103,
+        0.01647322022603
+      ],
+      "reversalRatio": [
+        0.0418082048602,
+        0.04598902534622,
+        0.03828063757512
+      ],
+      "deterministic": true
+    },
+    {
+      "solver": "physics",
+      "n": 90,
+      "law": "rigid",
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "pairPenetrationMaximum": [
+        0.5318537707602,
+        0.5192758543867,
+        0.522849448064
+      ],
+      "contactMean": [
+        119.9115044248,
+        130.0353982301,
+        114.5663716814
+      ],
+      "contactFinal": [
+        297,
+        297,
+        297
+      ],
+      "nearestGapMean": [
+        -0.09799741196915,
+        -0.09726250936416,
+        -0.08632664884892
+      ],
+      "maximumDisplacement": [
+        0.1358949471444,
+        0.1370532956784,
+        0.1639998070291
+      ],
+      "meanDisplacement": [
+        0.01728381565324,
+        0.01769554959474,
+        0.01734810844574
+      ],
+      "reversalRatio": [
+        0.05356676247714,
+        0.04729553174811,
+        0.05905408936504
+      ],
+      "deterministic": true
+    },
+    {
+      "solver": "physics",
+      "n": 90,
+      "law": "soft",
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "pairPenetrationMaximum": [
+        0.5183270072477,
+        0.4309043477473,
+        0.4500495647706
+      ],
+      "contactMean": [
+        119.6548672566,
+        118.3716814159,
+        122.0265486726
+      ],
+      "contactFinal": [
+        297,
+        297,
+        297
+      ],
+      "nearestGapMean": [
+        -0.199936758717,
+        -0.2050185394355,
+        -0.2067127826165
+      ],
+      "maximumDisplacement": [
+        0.1950315899439,
+        0.2164730224143,
+        0.187173844685
+      ],
+      "meanDisplacement": [
+        0.0180729094402,
+        0.01766465246794,
+        0.01806297722141
+      ],
+      "reversalRatio": [
+        0.03200940684609,
+        0.03449627597021,
+        0.03135615364515
+      ],
+      "deterministic": true
+    },
+    {
+      "solver": "physics",
+      "n": 90,
+      "law": "sticky",
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "pairPenetrationMaximum": [
+        0.5623073759111,
+        0.5664571507261,
+        0.5698400674036
+      ],
+      "contactMean": [
+        132.5840707965,
+        131.017699115,
+        132.8495575221
+      ],
+      "contactFinal": [
+        297,
+        297,
+        297
+      ],
+      "nearestGapMean": [
+        -0.1377668916595,
+        -0.1394653967306,
+        -0.1384596338831
+      ],
+      "maximumDisplacement": [
+        0.2234431860664,
+        0.1527958195458,
+        0.1863844772485
+      ],
+      "meanDisplacement": [
+        0.01736665597234,
+        0.0167081520044,
+        0.01762152402092
+      ],
+      "reversalRatio": [
+        0.05604912464071,
+        0.05408936503789,
+        0.05212960543507
+      ],
+      "deterministic": true
+    }
+  ],
+  "finding": "Rejected: rigid-versus-soft penetration and sticky-versus-balanced contact ordering are not universal across both solvers and transitions, and continuity guards fail.",
+  "measurement": {
+    "rows": 48,
+    "wallSeconds": 86.689334042,
+    "physicsWallSeconds": 57.801654792,
+    "bodiesWallSeconds": 28.88767925,
+    "traceRuntimeWallMilliseconds": 2460.1191670000094
+  }
+}

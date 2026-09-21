@@ -1,5 +1,6 @@
 import type { AtlasPhase } from "../api/workbench-api.js";
 import type { CorpusBlock } from "../data/corpus.js";
+import { newSquareOpacity } from "../motion-settings.ts";
 import type { SceneFrame, SceneMark, SceneSquare } from "../view/scene-types.js";
 import { type PairSchedule, phaseProgress, ramp } from "./timeline.ts";
 
@@ -92,12 +93,13 @@ export function illustrationFrame(input: IllustrationInput): SceneFrame {
   const { schedule, seconds } = input;
   const progress = ramp(seconds, schedule.blocksStart, schedule.blocksEnd);
   const phased = phaseProgress(input.phase, progress);
-  const arrival = easeOut(ramp(seconds, schedule.arrive, schedule.arrived));
-  const growth =
-    input.phase === "add-then-move"
-      ? phaseProgress("simultaneous", ramp(seconds, schedule.arrive, schedule.arrived)).e
-      : phased.e;
-  const side = lerp(input.fromSide, input.toSide, growth);
+  // The new square fades in where it ends up and at its own size: opacity is all that changes.
+  const arrival = newSquareOpacity(ramp(seconds, schedule.arrive, schedule.arrived));
+  const containerGrowth = phaseProgress(
+    "simultaneous",
+    ramp(seconds, schedule.containerStart, schedule.containerEnd),
+  ).e;
+  const side = lerp(input.fromSide, input.toSide, containerGrowth);
   const view = side * (1 + 2 * input.padding);
   const squares: SceneSquare[] = input.tracks.map((track, index) => {
     const [x, y, angleDegrees] = interpolateBlockPose(track, phased);
@@ -110,7 +112,7 @@ export function illustrationFrame(input: IllustrationInput): SceneFrame {
     y: input.arriving.pose[1],
     angleDegrees: input.arriving.pose[2],
     opacity: arrival,
-    scale: arrival > 0 ? lerp(0.8, 1, arrival) : 1,
+    scale: 1,
   };
   const settled = easeOut(ramp(seconds, schedule.moveEnd, schedule.end));
   const mark: SceneMark | null =

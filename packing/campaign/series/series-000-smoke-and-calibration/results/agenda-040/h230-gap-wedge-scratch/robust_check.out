@@ -1,0 +1,53 @@
+all 64 admissible unit squares built (concentric, shifted into the container where needed); cores contained: OK
+wedge edges between non-overlapping cores (admissible squares): 0
+
+7.11-orbit pockets (g<0.5): non-overlapping cores b whose admissible unit square comes within 0.3 of the pocket T(Q_a)
+  (sep<0 is an exact lower bound on the separation along an edge normal of the pair; T = whole pocket, S = forced-empty part)
+  a=40 wall=right  g=0.09180  b=57 (  0.53 deg, w=1/16)  sep(Q_b,T)=-0.00294  sep(Q_b,S)=-0.12273  unit_overlap=False
+  a=40 wall=right  g=0.09180  b=24 (  0.00 deg, w=1/8)  sep(Q_b,T)=-0.01117  sep(Q_b,S)=-0.13096  unit_overlap=False
+  a=40 wall=top    g=0.01463  b=57 (  0.53 deg, w=1/16)  sep(Q_b,T)=-0.11209  sep(Q_b,S)=-0.99622  unit_overlap=False
+  a=40 wall=top    g=0.01463  b=24 (  0.00 deg, w=1/8)  sep(Q_b,T)=-0.12032  sep(Q_b,S)=-1.00348  unit_overlap=False
+  a=41 wall=left   g=0.01463  b=58 (  0.53 deg, w=1/16)  sep(Q_b,T)=-0.11209  sep(Q_b,S)=-0.99622  unit_overlap=False
+  a=41 wall=left   g=0.01463  b=25 (  0.00 deg, w=1/8)  sep(Q_b,T)=-0.12032  sep(Q_b,S)=-1.00348  unit_overlap=False
+  a=41 wall=top    g=0.09180  b=58 (  0.53 deg, w=1/16)  sep(Q_b,T)=-0.00294  sep(Q_b,S)=-0.12273  unit_overlap=False
+  a=41 wall=top    g=0.09180  b=25 (  0.00 deg, w=1/8)  sep(Q_b,T)=-0.01117  sep(Q_b,S)=-0.13096  unit_overlap=False
+  a=42 wall=bottom g=0.01463  b=59 (  0.53 deg, w=1/16)  sep(Q_b,T)=-0.11209  sep(Q_b,S)=-0.99622  unit_overlap=False
+  a=42 wall=bottom g=0.01463  b=26 (  0.00 deg, w=1/8)  sep(Q_b,T)=-0.12032  sep(Q_b,S)=-1.00348  unit_overlap=False
+  a=42 wall=left   g=0.09180  b=59 (  0.53 deg, w=1/16)  sep(Q_b,T)=-0.00294  sep(Q_b,S)=-0.12273  unit_overlap=False
+  a=42 wall=left   g=0.09180  b=26 (  0.00 deg, w=1/8)  sep(Q_b,T)=-0.01117  sep(Q_b,S)=-0.13096  unit_overlap=False
+  a=43 wall=bottom g=0.09180  b=56 (  0.53 deg, w=1/16)  sep(Q_b,T)=-0.00294  sep(Q_b,S)=-0.12273  unit_overlap=False
+  a=43 wall=bottom g=0.09180  b=27 (  0.00 deg, w=1/8)  sep(Q_b,T)=-0.01117  sep(Q_b,S)=-0.13096  unit_overlap=False
+  a=43 wall=right  g=0.01463  b=56 (  0.53 deg, w=1/16)  sep(Q_b,T)=-0.11209  sep(Q_b,S)=-0.99622  unit_overlap=False
+  a=43 wall=right  g=0.01463  b=27 (  0.00 deg, w=1/8)  sep(Q_b,T)=-0.12032  sep(Q_b,S)=-1.00348  unit_overlap=False
+  a=44 wall=left   g=0.09180  b=62 ( 89.47 deg, w=1/16)  sep(Q_b,T)=-0.00294  sep(Q_b,S)=-0.12273  unit_overlap=False
+  a=44 wall=left   g=0.09180  b=28 ( 90.00 deg, w=1/8)  sep(Q_b,T)=-0.01117  sep(Q_b,S)=-0.13096  unit_overlap=False
+  a=44 wall=top    g=0.01463  b=62 ( 89.47 deg, w=1/16)  sep(Q_b,T)=-0.11209  sep(Q_b,S)=-0.99622  unit_overlap=False
+  a=44 wall=top    g=0.01463  b=28 ( 90.00 deg, w=1/8)  sep(Q_b,T)=-0.12032  sep(Q_b,S)=-1.00348  unit_overlap=False
+  a=45 wall=bottom g=0.01463  b=63 ( 89.47 deg, w=1/16)  sep(Q_b,T)=-0.11209  sep(Q_b,S)=-0.99622  unit_overlap=False
+  a=45 wall=bottom g=0.01463  b=29 ( 90.00 deg, w=1/8)  sep(Q_b,T)=-0.12032  sep(Q_b,S)=-1.00348  unit_overlap=False
+  a=45 wall=right  g=0.09180  b=63 ( 89.47 deg, w=1/16)  sep(Q_b,T)=-0.00294  sep(Q_b,S)=-0.12273  unit_overlap=False
+  a=45 wall=right  g=0.09180  b=29 ( 90.00 deg, w=1/8)  sep(Q_b,T)=-0.01117  sep(Q_b,S)=-0.13096  unit_overlap=False
+  a=46 wall=right  g=0.01463  b=61 ( 89.47 deg, w=1/16)  sep(Q_b,T)=-0.11209  sep(Q_b,S)=-0.99622  unit_overlap=False
+  a=46 wall=right  g=0.01463  b=30 ( 90.00 deg, w=1/8)  sep(Q_b,T)=-0.12032  sep(Q_b,S)=-1.00348  unit_overlap=False
+  a=46 wall=top    g=0.09180  b=61 ( 89.47 deg, w=1/16)  sep(Q_b,T)=-0.00294  sep(Q_b,S)=-0.12273  unit_overlap=False
+  a=46 wall=top    g=0.09180  b=30 ( 90.00 deg, w=1/8)  sep(Q_b,T)=-0.01117  sep(Q_b,S)=-0.13096  unit_overlap=False
+  a=47 wall=bottom g=0.09180  b=60 ( 89.47 deg, w=1/16)  sep(Q_b,T)=-0.00294  sep(Q_b,S)=-0.12273  unit_overlap=False
+  a=47 wall=bottom g=0.09180  b=31 ( 90.00 deg, w=1/8)  sep(Q_b,T)=-0.01117  sep(Q_b,S)=-0.13096  unit_overlap=False
+  a=47 wall=left   g=0.01463  b=60 ( 89.47 deg, w=1/16)  sep(Q_b,T)=-0.11209  sep(Q_b,S)=-0.99622  unit_overlap=False
+  a=47 wall=left   g=0.01463  b=31 ( 90.00 deg, w=1/8)  sep(Q_b,T)=-0.12032  sep(Q_b,S)=-1.00348  unit_overlap=False
+
+Pairs with disjoint cores whose admissible unit squares overlap (near-overlap, not a wedge matter):
+  count: 88
+  unit overlap depth 0.00236  cores 55,56 (88.68,0.53 deg; w 1/8,1/16) core separation 0.00007
+  unit overlap depth 0.00236  cores 54,58 (88.68,0.53 deg; w 1/8,1/16) core separation 0.00007
+  unit overlap depth 0.00236  cores 53,57 (88.68,0.53 deg; w 1/8,1/16) core separation 0.00007
+  unit overlap depth 0.00236  cores 52,59 (88.68,0.53 deg; w 1/8,1/16) core separation 0.00007
+  unit overlap depth 0.00236  cores 51,60 (1.32,89.47 deg; w 1/8,1/16) core separation 0.00007
+  unit overlap depth 0.00236  cores 50,62 (1.32,89.47 deg; w 1/8,1/16) core separation 0.00007
+  unit overlap depth 0.00236  cores 49,61 (1.32,89.47 deg; w 1/8,1/16) core separation 0.00007
+  unit overlap depth 0.00236  cores 48,63 (1.32,89.47 deg; w 1/8,1/16) core separation 0.00007
+  unit overlap depth 0.00223  cores 13,15 (60.11,60.11 deg; w 1/4,1/4) core separation 0.00007
+  unit overlap depth 0.00223  cores 13,14 (60.11,60.11 deg; w 1/4,1/4) core separation 0.00007
+  unit overlap depth 0.00223  cores 12,15 (60.11,60.11 deg; w 1/4,1/4) core separation 0.00007
+  unit overlap depth 0.00223  cores 12,14 (60.11,60.11 deg; w 1/4,1/4) core separation 0.00007
+DONE

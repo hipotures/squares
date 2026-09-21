@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import re
 import shlex
+import shutil
+import subprocess
 from collections.abc import Mapping
 from fnmatch import fnmatchcase
 from pathlib import Path
 from typing import Any
 
-from devtools.pages_scope import BUILDER_INPUTS, pull_request_jobs
+from devtools.pages_scope import BUILDER_INPUTS, declared_inputs, pull_request_jobs
 from sqpack.yamlio import safe_load
 
 REPO = Path(__file__).resolve().parents[2]
@@ -18,6 +20,26 @@ REGISTER = REPO / "packing/devtools/gate-budgets.yaml"
 #: The jobs a pull request never runs: the deploy path, which only a push to `main`
 #: starts, and the dispatch-only timing experiment.
 DEPLOY_PATH = {"deploy", "verify-deployment"}
+
+# These jobs can provision Python and their browser without the rendered page. They
+# start beside `prepare`, then join its exact artifact before the first page consumer.
+OVERLAPPED_PREPARED_PAGE_JOBS = {
+    "pdf",
+    "print-layout",
+    "typography",
+    "screen",
+    "geometry",
+    "font-loading",
+    "browser-geometry",
+}
+
+#: The step right before every download by artifact id, reading the same id expression.
+#: With `merge-multiple`, an empty `artifact-ids` downloads every artifact in the run.
+ARTIFACT_ID_GUARD = "Require the prepared page's artifact id"
+ARTIFACT_ID_CHECK = (
+    '[[ "$ARTIFACT_ID" =~ ^[1-9][0-9]*$ ]] '
+    '|| { echo "::error::the prepared page has no artifact id to download"; exit 1; }'
+)
 
 
 def load() -> dict[str, Any]:
@@ -49,6 +71,42 @@ def browser_check_jobs(jobs: Mapping[str, Mapping[str, Any]]) -> list[str]:
         if name not in {"prepare", *DEPLOY_PATH}
         and any("playwright install" in step.get("run", "") for step in job.get("steps", []))
     ]
+
+
+def page_probe_inputs() -> dict[str, list[str]]:
+    """Probe inputs the page builders or their own workflow checks actually consume."""
+    sources: dict[str, list[str]] = {}
+    for inputs in declared_inputs().values():
+        for path in inputs:
+            relative = path.relative_to(REPO)
+            if "probes" not in relative.parts:
+                continue
+            files = (
+                [
+                    item.relative_to(REPO).as_posix()
+                    for item in path.rglob("*")
+                    if item.is_file()
+                ]
+                if path.is_dir()
+                else [relative.as_posix()]
+            )
+            sources[relative.as_posix()] = sorted(files)
+    return dict(sorted(sources.items()))
+
+
+def missing_page_probe_inputs(patterns: list[str]) -> dict[str, list[str]]:
+    """Declared probe inputs whose files no Pages push pattern covers."""
+    return {
+        root: missing
+        for root, files in page_probe_inputs().items()
+        if (
+            missing := [
+                path
+                for path in files
+                if not any(fnmatchcase(path, pattern) for pattern in patterns)
+            ]
+        )
+    }
 
 
 def test_the_push_filter_covers_the_developer_tools_its_jobs_run() -> None:
@@ -108,9 +166,12 @@ def test_every_pull_request_job_is_scoped_to_its_page_or_says_why() -> None:
         }
         for half in halves
     }
-    assert gated == {"explainer": {"prepare"}, "workbench": {"workbench"}}
-    for half, (root,) in ((h, tuple(g)) for h, g in gated.items()):
-        assert needs_of(jobs[root]) == ["scope"]
+    assert gated == {
+        "explainer": {"prepare", *OVERLAPPED_PREPARED_PAGE_JOBS},
+        "workbench": {"workbench"},
+    }
+    for half, roots in gated.items():
+        assert all(needs_of(jobs[root]) == ["scope"] for root in roots)
         notices = [
             name
             for name, job in jobs.items()
@@ -119,11 +180,11 @@ def test_every_pull_request_job_is_scoped_to_its_page_or_says_why() -> None:
         assert notices == [f"{half}-unchanged"], half
         notice = jobs[notices[0]]
         assert needs_of(notice) == ["scope"]
-        assert half in notice["name"]
-        assert "skipped" in notice["name"]
         (step,) = notice["steps"]
         assert step["env"]["REASON"] == f"${{{{ needs.scope.outputs.{half}_reason }}}}"
         assert step["run"].splitlines()[0] == 'test -n "$REASON"'
+        assert half in step["run"]
+        assert "not built" in step["run"]
 
     for name, job in jobs.items():
         commands = "\n".join(step.get("run", "") for step in job.get("steps", []))
@@ -131,10 +192,13 @@ def test_every_pull_request_job_is_scoped_to_its_page_or_says_why() -> None:
             r"python -m (devtools\.render_explainer|workbench_tools\.build_site)\b", commands
         )
         if works and name not in DEPLOY_PATH:
-            assert upstream(jobs, name) & {"prepare", "workbench"} or name in {
-                "prepare",
-                "workbench",
-            }, f"{name} does page work on a pull request without waiting for the scope"
+            directly_scoped = job.get("if") in {
+                "needs.scope.outputs.explainer == 'true'",
+                "needs.scope.outputs.workbench == 'true'",
+            }
+            assert upstream(jobs, name) & {"prepare", "workbench"} or directly_scoped, (
+                f"{name} does page work on a pull request without waiting for the scope"
+            )
 
 
 def test_the_required_aggregate_passes_a_justified_skip_and_nothing_else() -> None:
@@ -148,7 +212,11 @@ def test_the_required_aggregate_passes_a_justified_skip_and_nothing_else() -> No
     aggregate = jobs["pages-required"]
     assert aggregate["if"] == "always()"
     assert set(needs_of(aggregate)) == set(jobs) - {"pages-required", *DEPLOY_PATH}
-    (step,) = aggregate["steps"]
+    step = next(
+        item
+        for item in aggregate["steps"]
+        if item.get("name") == "Require every page this run builds to pass"
+    )
     assert step["env"]["NEEDS"] == "${{ toJSON(needs) }}"
     program = step["run"]
     assert '.scope.result == "success"' in program
@@ -159,6 +227,220 @@ def test_the_required_aggregate_passes_a_justified_skip_and_nothing_else() -> No
     assert set(needs_of(jobs["deploy"])) == {"publish", "pages-required"}
 
 
+def conjuncts(condition: str) -> list[str] | None:
+    """The whole clauses an `if:` joins with `&&`, or None if it is not only a conjunction.
+
+    Under `||` no clause is necessary, so finding one in the text proves nothing about
+    what the condition requires. The same holds inside a group: `!(a && b)` or
+    `(a && b) == false` splits into clauses that read as required and are not. So a clause
+    whose parentheses do not balance, or that negates a group, refuses the whole condition.
+    """
+    text = condition.strip()
+    if text.startswith("${{") and text.endswith("}}"):
+        text = text[3:-2]
+    if "||" in text:
+        return None
+    clauses = [" ".join(clause.split()) for clause in text.split("&&")]
+    for clause in clauses:
+        depth = 0
+        for character in clause:
+            depth += {"(": 1, ")": -1}.get(character, 0)
+            if depth < 0:
+                return None
+        if depth or clause.replace(" ", "").startswith("!("):
+            return None
+    return clauses
+
+
+def implicit_success_gaps(jobs: Mapping[str, Mapping[str, Any]], name: str) -> list[str]:
+    """The clauses `name`'s `if:` does not require when an ancestor can skip on a push.
+
+    Without a status function GitHub applies `success()` over every ancestor, so one
+    skipped ancestor skips the job however its direct `needs:` ended. Each clause must be
+    a whole conjunct of the condition, and a condition with `||` requires none of them.
+    """
+    if not any(jobs[ancestor].get("if") for ancestor in upstream(jobs, name)):
+        return []
+    clauses = conjuncts(str(jobs[name].get("if", "")))
+    required = [
+        "!cancelled()",
+        *(f"needs.{need}.result == 'success'" for need in needs_of(jobs[name])),
+    ]
+    return [clause for clause in required if clauses is None or clause not in clauses]
+
+
+def test_the_deploy_path_does_not_inherit_skips_from_its_ancestors() -> None:
+    """From #183 to this fix every push to `main` skipped `deploy`.
+
+    The dispatch-only timing job and one job of each `*-unchanged` pair skip on a push, and
+    `deploy` carried no status function, so its implicit `success()` saw those skips. The
+    conditions are pinned whole, so the fix cannot also drop the push-to-`main` gate.
+    """
+    jobs = load()["jobs"]
+    assert jobs["deploy"]["if"] == (
+        "${{ !cancelled() && github.ref == 'refs/heads/main' "
+        "&& github.event_name != 'pull_request' "
+        "&& needs.publish.result == 'success' && needs.pages-required.result == 'success' }}"
+    )
+    assert jobs["verify-deployment"]["if"] == (
+        "${{ !cancelled() && needs.deploy.result == 'success' }}"
+    )
+    for name in sorted(DEPLOY_PATH):
+        assert not implicit_success_gaps(jobs, name), (name, implicit_success_gaps(jobs, name))
+
+    def deploying_if(condition: str) -> dict[str, Any]:
+        return {**jobs, "deploy": {**jobs["deploy"], "if": condition}}
+
+    required = [
+        "!cancelled()",
+        "needs.publish.result == 'success'",
+        "needs.pages-required.result == 'success'",
+    ]
+    before = "github.ref == 'refs/heads/main' && github.event_name != 'pull_request'"
+    assert implicit_success_gaps(deploying_if(before), "deploy") == required
+    # Every clause is in the text of each of these, which a substring match accepted.
+    fixed = str(jobs["deploy"]["if"])
+    for weakened in (
+        fixed.replace("!cancelled()", "always() || !cancelled()"),
+        fixed.replace("&& needs.publish.result", "|| needs.publish.result"),
+    ):
+        assert all(clause in weakened for clause in required), weakened
+        assert implicit_success_gaps(deploying_if(weakened), "deploy") == required, weakened
+    # Each required clause is a whole `&&` split of these, which a plain split accepted, but
+    # inside a negated group none of them is required.
+    body = fixed.strip()[3:-2].strip()
+    ref = "github.ref == 'refs/heads/main'"
+    for negated in (
+        f"${{{{ !({ref} && {body} && {ref}) }}}}",
+        f"${{{{ ({ref} && {body} && {ref}) == false }}}}",
+    ):
+        split = {" ".join(clause.split()) for clause in negated[3:-2].split("&&")}
+        assert set(required) <= split, negated
+        assert conjuncts(negated) is None, negated
+        assert implicit_success_gaps(deploying_if(negated), "deploy") == required, negated
+    # A whole clause in harmless parentheses is still a conjunct.
+    grouped = f"${{{{ {body} && ({ref}) }}}}"
+    whole = conjuncts(fixed)
+    assert whole is not None
+    assert conjuncts(grouped) == [*whole, f"({ref})"]
+    assert implicit_success_gaps(deploying_if(grouped), "deploy") == []
+
+
+def test_every_download_by_artifact_id_extracts_into_its_path() -> None:
+    """`download-artifact` v4 puts an id download under `<path>/<artifact name>/`.
+
+    Only a download by `name` or with `merge-multiple` extracts into `path` itself. Run
+    35175474665 downloaded the prepared page to `packing/site/prepared-page/`, and every
+    browser check then failed to find `site/index.html`.
+    """
+    downloads = [
+        (name, step["with"])
+        for name, job in load()["jobs"].items()
+        for step in job.get("steps", [])
+        if step.get("uses", "").startswith("actions/download-artifact@")
+        and "artifact-ids" in step.get("with", {})
+    ]
+    assert len(downloads) >= 9
+    for name, arguments in downloads:
+        assert arguments.get("merge-multiple") is True, name
+
+
+def unguarded_downloads_by_id(jobs: Mapping[str, Mapping[str, Any]]) -> list[str]:
+    """Downloads by artifact id that an empty id would not stop.
+
+    Each must follow, immediately, the guard step reading its own id expression, and
+    neither step may be skippable or allowed to fail.
+    """
+    unguarded: list[str] = []
+    for name, job in jobs.items():
+        steps = job.get("steps", [])
+        for index, step in enumerate(steps):
+            if not (
+                step.get("uses", "").startswith("actions/download-artifact@")
+                and "artifact-ids" in step.get("with", {})
+            ):
+                continue
+            guard = {
+                "name": ARTIFACT_ID_GUARD,
+                "env": {"ARTIFACT_ID": step["with"]["artifact-ids"]},
+                "run": ARTIFACT_ID_CHECK,
+            }
+            preceding = steps[index - 1] if index else None
+            if preceding != guard or "if" in step or "continue-on-error" in step:
+                unguarded.append(f"{name}: step {index}")
+    return unguarded
+
+
+def test_every_download_by_artifact_id_is_refused_without_an_id() -> None:
+    """`artifact-ids: ''` with `merge-multiple` is not an error; it downloads everything.
+
+    Every artifact in the run would land in `packing/site`, the workbench's `index.html`
+    over the explainer's, and the checks after it would read the wrong page. Skipping the
+    download would leave them reading no page, so the step before it fails the job instead.
+    """
+    jobs = load()["jobs"]
+    assert not unguarded_downloads_by_id(jobs)
+    guarded = [
+        (name, index)
+        for name, job in jobs.items()
+        for index, step in enumerate(job.get("steps", []))
+        if step.get("name") == ARTIFACT_ID_GUARD
+    ]
+    downloads = [
+        name
+        for name, job in jobs.items()
+        for step in job.get("steps", [])
+        if "artifact-ids" in step.get("with", {})
+    ]
+    assert len(guarded) == len(downloads) >= 9
+    bash = shutil.which("bash")
+    assert bash
+    for value, status in (("", 1), (" ", 1), ("0", 1), ("12abc", 1), ("35175474665", 0)):
+        result = subprocess.run(
+            (bash, "-e", "-c", ARTIFACT_ID_CHECK),
+            env={"ARTIFACT_ID": value},
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        assert result.returncode == status, (value, result)
+
+    for name, index in guarded:
+        steps = jobs[name]["steps"]
+        guard, download = steps[index], steps[index + 1]
+        mutations = {
+            "no guard": [*steps[:index], *steps[index + 1 :]],
+            "another id": [
+                *steps[:index],
+                {**guard, "env": {"ARTIFACT_ID": "${{ steps.other.outputs.artifact_id }}"}},
+                *steps[index + 1 :],
+            ],
+            "skippable guard": [
+                *steps[:index],
+                {**guard, "if": "always()"},
+                *steps[index + 1 :],
+            ],
+            "skippable download": [
+                *steps[: index + 1],
+                {**download, "if": "steps.prepared.outputs.artifact_id != ''"},
+                *steps[index + 2 :],
+            ],
+            "guard allowed to fail": [
+                *steps[:index],
+                {**guard, "continue-on-error": True},
+                *steps[index + 1 :],
+            ],
+            "download allowed to fail": [
+                *steps[: index + 1],
+                {**download, "continue-on-error": True},
+                *steps[index + 2 :],
+            ],
+        }
+        for mutation, mutated in mutations.items():
+            changed = {**jobs, name: {**jobs[name], "steps": mutated}}
+            assert unguarded_downloads_by_id(changed), (name, mutation)
+
+
 def test_pages_filters_cover_the_probes_its_tools_and_controls_load() -> None:
     """The page's tools and its PDF controls hand the browser JavaScript from probe files, and
     the render inlines some of them; an edit to one is an edit to the tool that loads it.
@@ -167,16 +449,27 @@ def test_pages_filters_cover_the_probes_its_tools_and_controls_load() -> None:
     filter remains the one outer trigger that must be checked directly.
     """
     workflow = safe_load((REPO / ".github/workflows/pages.yml").read_text("utf-8"))
-    probes = sorted(
-        path.relative_to(REPO).as_posix()
-        for tree in ("packing/devtools/probes", "packing/tests/probes/pdf_math_browser")
-        for path in (REPO / tree).rglob("*")
-        if path.is_file()
-    )
-    assert probes
     patterns = workflow["on"]["push"]["paths"]
-    missing = [probe for probe in probes if not any(fnmatchcase(probe, p) for p in patterns)]
-    assert not missing, f"push: probes outside the workflow path filter: {missing}"
+    trees = page_probe_inputs()
+    assert trees
+    assert not missing_page_probe_inputs(patterns), (
+        "push: declared page probe inputs outside the workflow path filter: "
+        f"{missing_page_probe_inputs(patterns)}"
+    )
+
+
+def test_pages_filter_contract_rejects_each_omitted_declared_probe_input() -> None:
+    """The coverage check must fail when an actual page probe input loses its trigger."""
+    patterns = load()["on"]["push"]["paths"]
+    trees = page_probe_inputs()
+    for root, files in trees.items():
+        covering = {
+            pattern for pattern in patterns if any(fnmatchcase(path, pattern) for path in files)
+        }
+        assert covering, f"test setup: {root} has no covering push pattern"
+        without_tree = [pattern for pattern in patterns if pattern not in covering]
+        missing = missing_page_probe_inputs(without_tree)
+        assert root in missing, f"test setup: removing {covering} did not expose {root}"
 
 
 def test_deployment_waits_for_the_cross_browser_loading_checks() -> None:
@@ -188,6 +481,86 @@ def test_deployment_waits_for_the_cross_browser_loading_checks() -> None:
         "devtools.check_math_loading" in step.get("run", "")
         for step in jobs["font-loading"]["steps"]
     )
+
+
+def test_page_check_setup_overlaps_prepare_then_joins_its_exact_artifact() -> None:
+    """Independent provisioning starts early; no page consumer can outrun prepare."""
+    jobs = load()["jobs"]
+    for name in OVERLAPPED_PREPARED_PAGE_JOBS:
+        job = jobs[name]
+        assert needs_of(job) == ["scope"]
+        assert job["if"] == "needs.scope.outputs.explainer == 'true'"
+        assert job["permissions"] == {"contents": "read", "actions": "read"}
+        steps = job["steps"]
+        install_index = max(
+            index
+            for index, step in enumerate(steps)
+            if "playwright install" in step.get("run", "")
+        )
+        wait = next(step for step in steps if step.get("name") == "Wait for the prepared page")
+        guard = next(step for step in steps if step.get("name") == ARTIFACT_ID_GUARD)
+        download = next(step for step in steps if step.get("name") == "Use the prepared page")
+        assert (
+            install_index < steps.index(wait) < steps.index(guard) == steps.index(download) - 1
+        )
+        assert guard["env"] == {"ARTIFACT_ID": "${{ steps.prepared.outputs.artifact_id }}"}
+        assert wait["id"] == "prepared"
+        assert wait["env"]["GH_TOKEN"] == "${{ github.token }}"
+        command = wait["run"]
+        assert "python -m devtools.wait_for_run_artifact" in command
+        assert '--repository "$GITHUB_REPOSITORY"' in command
+        assert '--run-id "$GITHUB_RUN_ID"' in command
+        assert '--run-attempt "$GITHUB_RUN_ATTEMPT"' in command
+        assert "--name prepared-page" in command
+        assert "--producer prepare" in command
+        assert '--github-output "$GITHUB_OUTPUT"' in command
+        assert "--timeout 600" in command
+        assert download["with"] == {
+            "artifact-ids": "${{ steps.prepared.outputs.artifact_id }}",
+            "path": "packing/site",
+            "merge-multiple": True,
+        }
+
+
+def test_saved_font_geometry_runs_as_two_bounded_pairs() -> None:
+    """Remove the serial WebKit tail without launching four browsers at once."""
+    steps = load()["jobs"]["font-loading"]["steps"]
+    command = next(
+        step["run"]
+        for step in steps
+        if step.get("name") == "Check saved font settings retain geometry at 1280 px"
+    )
+    lines = command.splitlines()
+    launches = [line for line in lines if "devtools.prepare_explainer_math" in line]
+    waits = [line for line in lines if line.strip().startswith("wait ")]
+    assert len(launches) == 4
+    assert all(line.endswith(" &") for line in launches)
+    assert len(waits) == 4
+    assert lines.index(waits[1]) < lines.index(launches[2])
+
+
+def test_print_layout_runs_the_overflow_self_check_beside_the_page() -> None:
+    """Two Chromium launches, one page each; serializing them was 66 s of this job."""
+    steps = load()["jobs"]["print-layout"]["steps"]
+    command = next(
+        step["run"]
+        for step in steps
+        if step.get("name") == "Check the print layout and its overflow self-check"
+    )
+    lines = command.splitlines()
+    launches = [line for line in lines if "python -m devtools.check_print_layout" in line]
+    waits = [line for line in lines if line.strip().startswith("wait ")]
+    assert len(launches) == 2
+    assert all(line.rstrip().endswith(" &") for line in launches)
+    assert sum("--self-check" in line for line in launches) == 1
+    assert len(waits) == 2
+    assert 'wait "$layout_pid"' in command
+    assert 'wait "$self_pid"' in command
+    assert 'test "$layout_status" -eq 0' in command
+    assert 'test "$self_status" -eq 0' in command
+    last_launch = max(lines.index(line) for line in launches)
+    first_wait = min(lines.index(line) for line in waits)
+    assert last_launch < first_wait
 
 
 def test_every_browser_check_waits_for_deployment() -> None:
@@ -253,16 +626,32 @@ def test_publication_assembles_the_three_checked_products_and_only_main_uploads_
     publish = jobs["publish"]
     assert set(needs_of(publish)) == {"prepare", "pdf", "workbench"}
     steps = publish["steps"]
+    assert steps[0]["name"] == ARTIFACT_ID_GUARD
+    assert steps[0]["env"] == {
+        "ARTIFACT_ID": "${{ needs.prepare.outputs.prepared_artifact_id }}"
+    }
     downloads = [
         step["with"]
         for step in steps
         if step.get("uses", "").startswith("actions/download-artifact@")
     ]
     assert downloads == [
-        {"name": "prepared-page", "path": "packing/site"},
+        {
+            "artifact-ids": "${{ needs.prepare.outputs.prepared_artifact_id }}",
+            "path": "packing/site",
+            "merge-multiple": True,
+        },
         {"name": "explainer-pdf", "path": "packing/site"},
         {"name": "workbench-page", "path": "packing/site/workbench"},
     ]
+    prepare = jobs["prepare"]
+    assert prepare["outputs"] == {
+        "prepared_artifact_id": "${{ steps.prepared-page-upload.outputs.artifact-id }}"
+    }
+    prepared_upload = next(
+        step for step in prepare["steps"] if step.get("with", {}).get("name") == "prepared-page"
+    )
+    assert prepared_upload["id"] == "prepared-page-upload"
     produced = {
         step["with"]["name"]: (name, step["with"]["path"])
         for name, job in jobs.items()
@@ -324,14 +713,25 @@ def test_every_page_job_a_pull_request_runs_is_budgeted() -> None:
     assert {entry["id"] for entry in pages["jobs"]} == expected
     assert pages["reference"] == {"runner": "ubuntu-latest", "cpus": 4, "caches": "warm"}
     headroom = register["policy"]["max_headroom"]
-    for entry in [*pages["jobs"], pages["wall"]]:
-        where = entry.get("id", "wall")
+    for entry in pages["jobs"]:
+        where = entry["id"]
         assert entry["measured_seconds"] > 0, where
         assert entry["measured_on"], where
         assert re.search(r"run \d{8,}", entry["measured_where"]), where
         assert entry["ceiling_seconds"] >= entry["measured_seconds"], where
         assert entry["ceiling_seconds"] <= headroom * entry["measured_seconds"], where
         assert entry["argument"].strip(), where
+    wall = pages["wall"]
+    wall_budget = next(
+        workflow
+        for workflow in register["pull_request_walls"]["workflows"]
+        if workflow["id"] == "certificate-page"
+    )["budget_seconds"]
+    assert wall["measured_seconds"] > 0
+    assert wall["measured_on"]
+    assert re.search(r"run \d{8,}", wall["measured_where"])
+    assert wall["ceiling_seconds"] == wall_budget == 180.0
+    assert wall["argument"].strip()
     assert pages["wall"]["measured_seconds"] >= max(
         entry["measured_seconds"] for entry in pages["jobs"]
     ), "the wall is at least the longest job"
@@ -371,7 +771,7 @@ def test_pages_runs_real_math_failure_controls_on_the_pdf_it_draws() -> None:
         before
         for before, candidate in enumerate(steps)
         if candidate.get("uses", "").startswith("actions/download-artifact@")
-        and candidate["with"] == {"name": "prepared-page", "path": "packing/site"}
+        and candidate.get("name") == "Use the prepared page"
     ]
     installs = [
         before
@@ -607,13 +1007,27 @@ def test_every_browser_checks_the_same_prepared_publication() -> None:
         "startup-timing",
     } <= set(checks)
     for name in checks:
-        assert needs_of(jobs[name]) == ["prepare"], name
+        if name in OVERLAPPED_PREPARED_PAGE_JOBS:
+            assert needs_of(jobs[name]) == ["scope"], name
+            artifact_id = "${{ steps.prepared.outputs.artifact_id }}"
+        else:
+            assert needs_of(jobs[name]) == ["prepare"], name
+            artifact_id = "${{ needs.prepare.outputs.prepared_artifact_id }}"
         downloads = [
             step["with"]
             for step in jobs[name]["steps"]
             if step.get("uses", "").startswith("actions/download-artifact@")
         ]
-        assert downloads == [{"name": uploads[0]["name"], "path": "packing/site"}], name
+        assert downloads == [
+            {"artifact-ids": artifact_id, "path": "packing/site", "merge-multiple": True}
+        ], name
+
+    assert not any(
+        step.get("with", {}).get("name") == "prepared-page"
+        for job in jobs.values()
+        for step in job.get("steps", [])
+        if step.get("uses", "").startswith("actions/download-artifact@")
+    )
 
 
 def test_the_partial_checkouts_keep_the_directories_the_render_links() -> None:
@@ -636,6 +1050,14 @@ def test_the_partial_checkouts_keep_the_directories_the_render_links() -> None:
                 continue
             settings = step["with"]
             if "sparse-checkout" in settings:
+                if step.get("name") == "Check out the wall budget and its register":
+                    assert settings["sparse-checkout"] == (
+                        "packing/devtools/check_pr_wall.py\n"
+                        "packing/devtools/gate-budgets.yaml\n"
+                    )
+                    assert settings["sparse-checkout-cone-mode"] is False, name
+                    assert settings["filter"] == "blob:none", name
+                    continue
                 assert settings["sparse-checkout"] == patterns, name
                 assert settings["sparse-checkout-cone-mode"] is False, name
                 assert settings["filter"] == "blob:none", name
@@ -722,7 +1144,11 @@ def test_prepared_geometry_checks_cover_each_browser_and_their_controls() -> Non
                 f"/tmp/math-geometry/{expected_browser}-{option(command, '--width', '1280')}-"
                 f"{'-'.join(context(command))}-{medium}{suffix}.json"
             )
-            assert command[-2:] == ["||", "geometry_status=1"]
+            width = option(command, "--width", "1280")
+            if expected_browser == "matrix-browser" and width == "1280":
+                assert command[-1] == "&"
+            else:
+                assert command[-2:] == ["||", "geometry_status=1"]
         for name in names:
             geometry_steps = [
                 step

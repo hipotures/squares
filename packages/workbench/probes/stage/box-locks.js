@@ -8,7 +8,15 @@
   const api = window.atlasTransitions;
   const box = /** @type {Element} */ (document.getElementById("bound-box"));
   const pointer = /** @type {Element} */ (document.getElementById("gapbar-box"));
-  const met = getComputedStyle(document.documentElement).getPropertyValue("--met").trim();
+  const met = getComputedStyle(document.documentElement).getPropertyValue("--scene-best").trim();
+  // The box's colour is the stylesheet's, switched by `is-locked`, so it is read off the
+  // computed style and the token is converted to the `rgb(...)` that is reported in.
+  /** @param {string} value a `#rrggbb` token */
+  const rgb = (value) => {
+    const packed = Number.parseInt(value.slice(1), 16);
+    return `rgb(${(packed >> 16) & 255}, ${(packed >> 8) & 255}, ${packed & 255})`;
+  };
+  const green = rgb(met);
   api.pause();
   api.setStyle(o.style);
   const pairs = api.pairs();
@@ -38,7 +46,7 @@
         phase,
         t,
         side: Number(box.getAttribute("width")),
-        green: box.getAttribute("stroke") === met,
+        green: getComputedStyle(box).stroke === green,
         pointer: pointer.classList.contains("is-locked"),
         shownN: bar.n,
         record: bar.record,

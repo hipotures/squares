@@ -251,6 +251,11 @@ What this shows:
 
 ## 6. What Follows
 
+- **Animation kinetics now have their own measured surface.**
+  [X-035](X-035-animation-kinetics-without-pixels.md) separates stored-path smoothness,
+  penetration, contacts and integration work from rendered appearance.
+  Its CLI is also the mechanism instrument for any later test connecting these values to
+  Search outcomes; packing validity and best valid side remain the guards and outcome.
 - **Re-measure before reusing any number here.** From #160 on, the package benchmark
   keeps each trial’s raw and repaired poses and reports disjoint seed blocks, which is
   what these observations lack.
@@ -260,6 +265,12 @@ What this shows:
   [annealing plan](../../../docs/project/specs/active/plan-2026-09-11-annealing-as-a-search.md)
   lays out the levels in between, from the record’s connected components to its contact
   graph and rigid clusters.
+- **Continuation, 2026-09-16:** [X-036](X-036-graded-guidance-for-annealing.md) turns
+  those levels into a staged, fixed-work program.
+  It separates ordinary pair stickiness from structural guidance, adds controls that
+  change the supplied information (split-merge partitions, rewired graphs and
+  wrong-feature assignments), and requires a valid-side improvement before target
+  recovery can support a search claim.
 
 ## Evidence
 

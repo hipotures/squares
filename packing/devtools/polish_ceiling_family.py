@@ -82,6 +82,7 @@ from sqpack.fractional.ceiling import (
     loose_membership,
     verify_ceiling,
 )
+from sqpack.fractional.corner_clip import declared_class_clip
 from sqpack.fractional.cutting import float_vertices
 
 REPO = Path(__file__).resolve().parents[2]
@@ -122,25 +123,42 @@ def columns_of(matrix: sparse.csr_matrix) -> int:
     return int(matrix.get_shape()[1])
 
 
+def fold_half_tangent(half_tangent: Fraction) -> Fraction:
+    """``t = 1`` is the same axis-parallel square as ``t = 0``.
+
+    Reflection of an upright square produces half-tangent ``(1 - 0) / (1 + 0) = 1``.
+    Records store that geometry as ``t = 0``; looking up the raw ``t = 1`` image
+    then claims a D4 orbit is missing. The independent ceiling reader folds the
+    same way.
+    """
+
+    return Fraction(0) if half_tangent == 1 else half_tangent
+
+
 def placement_key(p: Placement) -> tuple[Fraction, Fraction, Fraction, Fraction]:
-    return (p.half_tangent, p.centre_x, p.centre_y, p.side)
+    return (fold_half_tangent(p.half_tangent), p.centre_x, p.centre_y, p.side)
 
 
 def d4_placement_images(
     p: Placement, side: Fraction
 ) -> tuple[tuple[Fraction, Fraction, Fraction, Fraction], ...]:
     """The eight D4 images of a placement's geometry, as `cutting.symmetric_placements`
-    spreads them: rotations keep the half-tangent, reflections mirror it."""
+    spreads them: rotations keep the half-tangent, reflections mirror it.
+
+    Axis-parallel squares fold ``t = 1`` to ``t = 0``, so a record that stores
+    every upright placement as ``t = 0`` still closes under reflection.
+    """
 
     x, y = p.centre_x, p.centre_y
     far_x, far_y = side - x, side - y
     t = p.half_tangent
     mirrored = (1 - t) / (1 + t)
     images = [
-        (t, px, py, p.side) for px, py in ((x, y), (far_y, x), (far_x, far_y), (y, far_x))
+        (fold_half_tangent(t), px, py, p.side)
+        for px, py in ((x, y), (far_y, x), (far_x, far_y), (y, far_x))
     ]
     images.extend(
-        (mirrored, px, py, p.side)
+        (fold_half_tangent(mirrored), px, py, p.side)
         for px, py in ((far_x, y), (x, far_y), (y, x), (far_y, far_x))
     )
     return tuple(images)
@@ -910,6 +928,17 @@ def polished_record(result: Polished, *, source: Path, symmetric: bool) -> dict[
 def load_family(path: Path, square_side: Fraction | None) -> CeilingCertificate:
     data = json.loads(path.read_text())
     record = data.get("best_family", data)
+    if declared_class_clip(record) is not None:
+        # This polisher has no clip: it re-solves and re-verifies on the full domain and
+        # writes a record carrying neither ``variant`` nor ``corner_clip``, so polishing
+        # a class family would hand back bytes that read as the unconditional ceiling
+        # (review defect D4). Refusing is the honest answer until the program takes a
+        # clip; nothing in the repository polishes a clipped family today.
+        raise ValueError(
+            f"{path} declares variant: class at corner clip "
+            f"d = {declared_class_clip(record)}; devtools.polish_ceiling_family decides "
+            "the unconditional program only and would drop the hypothesis"
+        )
     if square_side is not None:
         record = dict(record)
         record["square_side"] = str(square_side)

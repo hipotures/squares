@@ -2,8 +2,78 @@ softschema:
   contract: packing.squares:CoveringValues/v1
   schema: covering-values.schema.yaml
   status: enforced
-last_reviewed: '2026-09-06'
+last_reviewed: '2026-09-19'
 values:
+  - n: 6
+    side: '299/100'
+    side_decimal: '2.99'
+    objective: '6.08216'
+    site_set: auto-18-24-29
+    sites: 1785
+    rows: 2020
+    rounds: 8
+    converged: true
+    stop_reason: >-
+      The row loop converged: every placement covers mass 1. Column generation
+      stopped at round 7 with 248 orbits; covering freeze mass 76027/12500.
+    least_covered_mass: null
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/h216-n6-299-100-receipt.md
+      - packing/campaign/hypotheses/H-216-point-certificate-at-n6-299-100.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 H-216 calibration on BC-191 auto grids (18, 24, 29). Covering freeze
+      retained under agenda-037; mass 76027/12500 is not strictly below 6, so it cannot
+      confirm. Nothing was frozen into packing/cases/. Does not move s(6)=3 and is not
+      an n=11 result. Float LP objective 6.08188585608286; no cell sweep.
+  - n: 6
+    side: '299/100'
+    side_decimal: '2.99'
+    objective: '6.07724'
+    site_set: four-grid-18-24-29-34
+    sites: 2941
+    rows: 2797
+    rounds: 8
+    converged: true
+    stop_reason: >-
+      The row loop converged: every placement covers mass 1. Column generation
+      stopped at round 7 with 400 orbits; covering freeze mass 151931/25000.
+    least_covered_mass: null
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/h216-n6-299-100-sites2-receipt.md
+      - packing/campaign/hypotheses/H-216-point-certificate-at-n6-299-100.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 H-216 second named site set, `--grid-counts 18,24,29,34`. Covering
+      freeze retained under agenda-037; mass 151931/25000 is not strictly below 6.
+      Nothing was frozen into packing/cases/. Does not move s(6)=3 and is not an n=11
+      result. Float LP objective 6.076773566569485; no cell sweep.
+  - n: 11
+    side: '381/100'
+    side_decimal: '3.81'
+    objective: '11.000000'
+    site_set: t025-auto-25-33-41-60
+    sites: 7413
+    rows: 13008
+    rounds: 60
+    converged: false
+    stop_reason: >-
+      The 60-round limit stopped the row loop after 60 LP rounds with 120 placements
+      still violated. The objective sat at 11.000000 from round 7 onward and never
+      crossed above eleven. Wall 585.9 s on 7413 sites / 988 orbits, including 584
+      T-025 seed sites scaled from 191/50.
+    least_covered_mass: '0.992102'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-381-100-t025-auto60-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 T-025-seeded auto-plus-60 probe at 381/100, T-018's container side.
+      Unconverged mass 11.000000 refutes this site set only; remaining rows can only
+      raise it. Adding sites can still lower the covering value, so 381/100 is not
+      barred. No covering freeze was retained.
   - n: 11
     side: '191/50'
     side_decimal: '3.82'
@@ -80,6 +150,217 @@ values:
       prior six-decimal display 9.907906 rounded the exact lower bound upward; this
       record now preserves its approximate status.
   - n: 11
+    side: '191/50'
+    side_decimal: '3.82'
+    objective: '11.142857'
+    site_set: four-grid-26-35-43-48
+    sites: 6037
+    rows: 7677
+    rounds: 31
+    converged: true
+    stop_reason: >-
+      The row loop converged at LP round 31 (violated 0) at 11.142857 on 6037 sites
+      / 810 orbits. Rounds 4-7 sat at 11.000000; it crossed eleven at round 8
+      (11.010582). Column generation then added one orbit and stopped; wall 125.8 s.
+    least_covered_mass: '1'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-191-50-grid4-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 named set at 191/50. Counts 26,35,43,48 are not a superset of the
+      historical 6637-site grid that sat at exactly eleven, nor of BC-191 auto
+      (25,34,41). Restricted optimum 11.142857 therefore does not raise the historical
+      plateau. No covering freeze was retained.
+  - n: 11
+    side: '191/50'
+    side_decimal: '3.82'
+    objective: '11.106195'
+    site_set: auto-plus-60
+    sites: 6961
+    rows: 6041
+    rounds: 21
+    converged: true
+    stop_reason: >-
+      The row loop converged at LP round 21 (violated 0) at 11.106195 on 6961 sites
+      / 921 orbits. Rounds 3-7 sat at 11.000000; it crossed eleven at round 8
+      (11.035354). Column generation then added one orbit and stopped; wall 84.7 s.
+    least_covered_mass: '1'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-191-50-auto60-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 BC-191 auto (25,34,41) plus count 60. A superset of auto, 6961 sites,
+      more than the historical 6637-site exact-eleven grid, and a worse restricted
+      optimum. Site geometry matters more than count. No covering freeze was retained.
+  - n: 11
+    side: '191/50'
+    side_decimal: '3.82'
+    objective: '11.020212'
+    site_set: t025-seeded-auto-plus-60
+    sites: 7249
+    rows: 7956
+    rounds: 29
+    converged: true
+    stop_reason: >-
+      The row loop converged at LP round 29 (violated 0) at 11.020212 on 7249 sites
+      / 958 orbits, including 584 T-025 seed sites. Rounds 3-16 sat at 11.000000; it
+      crossed eleven at round 17 (11.004716). Column generation then added one orbit
+      and stopped; wall 132.3 s.
+    least_covered_mass: '1'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-191-50-t025-auto60-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 closest point-atom construction at 191/50 besides the historical
+      exact-eleven grid. Auto (25,34,41) plus 60, union T-025. Still above eleven on a
+      converged loop. No covering freeze was retained.
+  - n: 11
+    side: '191/50'
+    side_decimal: '3.82'
+    objective: '11.018646'
+    site_set: t025-seeded-auto-plus-60-windows5
+    sites: 7473
+    rows: 7832
+    rounds: 35
+    converged: true
+    stop_reason: >-
+      The row loop converged at LP round 35 (violated 0) at 11.018646 on 7473 sites
+      / 993 orbits, including 809 seed sites (584 T-025 plus 225 ceiling-window
+      lattice sites from --seed-windows 5). Rounds 6-16 sat at 11.000000; it crossed
+      eleven at round 17 (11.008586). Column generation then added one orbit and
+      stopped; wall 176.2 s.
+    least_covered_mass: '1'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-191-50-t025-windows5-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 T-025-seeded auto-plus-60 plus a 5-per-window ceiling lattice at
+      191/50. Dropped the no-windows 11.020212 by 0.0016. Closest session-139
+      point-atom construction, still above eleven on a converged loop. No covering
+      freeze was retained.
+  - n: 11
+    side: '191/50'
+    side_decimal: '3.82'
+    objective: '11.033743'
+    site_set: t026-seeded-auto-plus-60
+    sites: 8081
+    rows: 8324
+    rounds: 35
+    converged: true
+    stop_reason: >-
+      The row loop converged at LP round 35 (violated 0) at 11.033743 on 8081 sites
+      / 1069 orbits, including 1121 T-026 seed sites scaled from 381/100. Rounds
+      5-13 sat at 11.000000; it crossed eleven at round 14 (11.002509). Column
+      generation then added one orbit and stopped; wall 265.4 s.
+    least_covered_mass: '1'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-191-50-t026-auto60-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 T-026-fractional-seeded auto-plus-60 at 191/50. Worse than the
+      T-025 seed (11.020212) and the T-025 plus window lattice (11.018646). Still
+      above eleven on a converged loop. No covering freeze was retained.
+  - n: 11
+    side: '383/100'
+    side_decimal: '3.83'
+    objective: '11.192598'
+    site_set: auto-25-34-41
+    sites: 3365
+    rows: 5233
+    rounds: 24
+    converged: true
+    stop_reason: >-
+      The row loop converged at LP round 24 (violated 0) at 11.192598 on 3365 sites
+      / 457 orbits. Round 4 sat at 11.000000; it crossed eleven at round 6
+      (11.096552). Column generation then added one orbit and stopped; wall 82.2 s.
+    least_covered_mass: '1'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-383-100-grid-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 scout probe above T-025 at 191/50 and T-026's certified side
+      3.826447. Same auto grids (25, 34, 41) and scale 4,000,000 as BC-191 at this n.
+      Above eleven on a converged loop, so this site set carries no certificate at 3.83;
+      adding sites can only lower it, so the side is not barred. No covering freeze was
+      retained.
+  - n: 11
+    side: '383/100'
+    side_decimal: '3.83'
+    objective: '11.142857'
+    site_set: four-grid-25-34-41-48
+    sites: 5665
+    rows: 6317
+    rounds: 23
+    converged: true
+    stop_reason: >-
+      The row loop converged at LP round 23 (violated 0) at 11.142857 on 5665 sites
+      / 756 orbits. Rounds 3-5 sat at 11.000000; it crossed eleven at round 6
+      (11.020986). Column generation then added one orbit and stopped; wall 81.7 s.
+    least_covered_mass: '1'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-383-100-grid4-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 denser named site set at 383/100 after auto-25-34-41. About 2,300 extra
+      sites dropped the restricted optimum by 0.050. Still above eleven on a converged
+      loop, so this site set carries no certificate; the side is not barred. No covering
+      freeze was retained.
+  - n: 11
+    side: '383/100'
+    side_decimal: '3.83'
+    objective: '11.140351'
+    site_set: t025-seeded-four-grid
+    sites: 6249
+    rows: 6753
+    rounds: 28
+    converged: true
+    stop_reason: >-
+      The row loop converged at LP round 28 (violated 0) at 11.140351 on 6249 sites
+      / 835 orbits, including 584 T-025 seed sites scaled from 191/50. Rounds 3-5 sat
+      at 11.000000; it crossed eleven at round 6 (11.020202). Column generation then
+      added one orbit and stopped; wall 107.9 s.
+    least_covered_mass: '1'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-383-100-t025-seed-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 T-025-seeded union at 383/100 after four-grid-25-34-41-48. The seed
+      dropped the restricted optimum by 0.0025. Still above eleven on a converged loop,
+      so this site set carries no certificate; the side is not barred. No covering freeze
+      was retained.
+  - n: 11
+    side: '96/25'
+    side_decimal: '3.84'
+    objective: '11.371819'
+    site_set: t025-auto-25-34-42-60
+    sites: 7705
+    rows: 8793
+    rounds: 38
+    converged: true
+    stop_reason: >-
+      The row loop converged at LP round 38 (violated 0) at 11.371819 on 7705 sites
+      / 1014 orbits, including 584 T-025 seed sites scaled to 96/25. Rounds 2-3 sat
+      at 11.000000; it crossed eleven at round 4 (11.064417). Column generation then
+      added one orbit and stopped; wall 222.9 s.
+    least_covered_mass: '1'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-96-25-t025-auto60-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 T-025-seeded auto-plus-60 probe at 96/25, between the 383/100 and
+      77/20 probes. Same construction. Restricted opt 11.371819 sits between those
+      two. Above eleven on a converged loop, so this site set carries no certificate;
+      the side is not barred. No covering freeze was retained.
+  - n: 11
     side: '77/20'
     side_decimal: '3.85'
     objective: '11.227631'
@@ -104,6 +385,54 @@ values:
       only raise it. Retained as a measurement of where the loop stood. The prior
       six-decimal display 9.049861 rounded the exact lower bound upward; this record now
       preserves the exact rational and its approximate decimal.
+  - n: 11
+    side: '77/20'
+    side_decimal: '3.85'
+    objective: '11.456576'
+    site_set: t025-auto-25-34-42-60
+    sites: 7705
+    rows: 7194
+    rounds: 26
+    converged: true
+    stop_reason: >-
+      The row loop converged at LP round 26 (violated 0) at 11.456576 on 7705 sites
+      / 1014 orbits, including 584 T-025 seed sites scaled to 77/20. It crossed eleven
+      at round 2 (11.000000). Column generation then added one orbit and stopped; wall
+      196.0 s.
+    least_covered_mass: '1'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-77-20-t025-auto60-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 T-025-seeded auto-plus-60 probe at 77/20, a different site set from
+      BC-200's vertex-seeded unconverged 11.227631. Above eleven on a converged loop, so
+      this site set carries no certificate; the side is not barred. No covering freeze
+      was retained.
+  - n: 11
+    side: '31/8'
+    side_decimal: '3.875'
+    objective: '11.561186'
+    site_set: t025-auto-25-34-42-60
+    sites: 7705
+    rows: 8892
+    rounds: 38
+    converged: true
+    stop_reason: >-
+      The row loop converged at LP round 38 (violated 0) at 11.561186 on 7705 sites
+      / 1014 orbits, including 584 T-025 seed sites scaled to 31/8. It crossed eleven
+      at round 2 (11.000000). Column generation then added one orbit and stopped; wall
+      234.3 s.
+    least_covered_mass: '1'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-31-8-t025-auto60-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 T-025-seeded auto-plus-60 probe at 31/8, 0.002 below the known-best
+      packing. Same construction as the 77/20 probe. Above eleven on a converged loop, so
+      this site set carries no certificate; the side is not barred. No covering freeze
+      was retained.
   - n: 12
     side: '79/20'
     side_decimal: '3.95'
@@ -191,6 +520,308 @@ values:
       The reported objective has no raw run, and it is not the artifact's mass. X-013's
       list of six omits this side. The record names no site set and retains no site,
       row or round count.
+  - n: 17
+    side: '23/5'
+    side_decimal: '4.6'
+    objective: '17.331710'
+    site_set: auto-32-42-52
+    sites: 5484
+    rows: 10302
+    rounds: 39
+    converged: false
+    stop_reason: >-
+      The 300 s deadline stopped the row loop after 39 LP rounds with 72 placements
+      still violated. The objective had already crossed 17 at round 7 (17.000094).
+    least_covered_mass: '0.994279'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-grid-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 auto-grid probe at 23/5, between T-019 at 459/100 and the n=18 probe
+      at 117/25. Unconverged mass 17.331710 on 5484 sites / 716 orbits refutes this
+      site set only; remaining rows can only raise it. Adding sites can still lower
+      the covering value, so 23/5 is not barred. No covering freeze was retained.
+  - n: 17
+    side: '23/5'
+    side_decimal: '4.6'
+    objective: '17.049597'
+    site_set: t019-seed-auto-32-42-52
+    sites: 6668
+    rows: 11189
+    rounds: 40
+    converged: false
+    stop_reason: >-
+      The 600 s deadline stopped the row loop after 40 LP rounds with 183 placements
+      still violated. The objective crossed 17 at round 16 (17.002464) and finished at
+      17.049597 on 6668 sites / 873 orbits, including 1184 T-019 seed sites scaled
+      from 459/100.
+    least_covered_mass: '0.993656'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-t019-seed-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 T-019-seeded auto-grid at 23/5. The seed dropped the unseeded
+      17.331710 by 0.282. Unconverged mass 17.049597 still refutes this site set
+      only; remaining rows can only raise it. Adding sites can still lower the
+      covering value, so 23/5 is not barred. No covering freeze was retained.
+  - n: 17
+    side: '23/5'
+    side_decimal: '4.6'
+    objective: '17.042346'
+    site_set: t019-seed-auto-32-42-52-windows5
+    sites: 7068
+    rows: 10672
+    rounds: 42
+    converged: false
+    stop_reason: >-
+      The 900 s deadline stopped the row loop after 42 LP rounds with 9 placements
+      still violated. The objective crossed 17 at round 14 (17.010028) and finished at
+      17.042346 on 7068 sites / 928 orbits, including 1584 seed sites (1184 T-019 plus
+      400 ceiling-window lattice sites from --seed-windows 5).
+    least_covered_mass: '0.998191'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-t019-windows5-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 T-019-seeded auto-grid plus windows at 23/5. Windows dropped the
+      seeded 17.049597 by 0.007. Unconverged mass 17.042346 still refutes this site
+      set only; remaining rows can only raise it. Adding sites can still lower the
+      covering value, so 23/5 is not barred. No covering freeze was retained.
+  - n: 17
+    side: '23/5'
+    side_decimal: '4.6'
+    objective: '17.048472'
+    site_set: t019-seed-auto-32-42-52-windows6
+    sites: 7244
+    rows: 12899
+    rounds: 46
+    converged: false
+    stop_reason: >-
+      The 900 s deadline stopped the row loop after 46 LP rounds with 54 placements
+      still violated. The objective crossed 17 at round 12 (17.000000), sat there
+      through round 18, and finished at 17.048472 on 7244 sites / 951 orbits,
+      including 1760 seed sites (1184 T-019 plus 576 ceiling-window lattice sites
+      from --seed-windows 6).
+    least_covered_mass: '0.999569'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-t019-windows6-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 T-019-seeded auto-grid plus windows 6 at 23/5. Finished slightly
+      worse than windows 5 (17.042346). Unconverged mass 17.048472 still refutes
+      this site set only; remaining rows can only raise it. Adding sites can still
+      lower the covering value, so 23/5 is not barred. No covering freeze was
+      retained.
+  - n: 17
+    side: '23/5'
+    side_decimal: '4.6'
+    objective: '17.046923'
+    site_set: t019-seed-auto-32-42-52-windows7
+    sites: 7452
+    rows: 12379
+    rounds: 42
+    converged: false
+    stop_reason: >-
+      The 900 s deadline stopped the row loop after 42 LP rounds with 186 placements
+      still violated. The objective crossed 17 at round 19 (17.001965) and finished
+      at 17.046923 on 7452 sites / 978 orbits, including 1968 seed sites (1184 T-019
+      plus 784 ceiling-window lattice sites from --seed-windows 7).
+    least_covered_mass: '0.995294'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-t019-windows7-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 T-019-seeded auto-grid plus windows 7 at 23/5. Finished between
+      windows 5 (17.042346) and windows 6 (17.048472). Unconverged mass 17.046923
+      still refutes this site set only; remaining rows can only raise it. Adding
+      sites can still lower the covering value, so 23/5 is not barred. No covering
+      freeze was retained.
+  - n: 17
+    side: '23/5'
+    side_decimal: '4.6'
+    objective: '17.120106'
+    site_set: t019-seed-four-grid-34-45-56-64-windows8
+    sites: 12317
+    rows: 16278
+    rounds: 46
+    converged: false
+    stop_reason: >-
+      The 1200 s deadline stopped the row loop after 46 LP rounds with 237 placements
+      still violated. The objective crossed 17 at round 19 (17.036105) and finished
+      at 17.120106 on 12317 sites / 1611 orbits, including 2208 T-019 seed sites.
+    least_covered_mass: '0.986645'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n17-23-5-t019-grid4-windows8-receipt.md
+      - packing/campaign/agent-sessions/session-140-lb-survey.md
+    notes: >-
+      Session-140 X-038 rank 3. T-019 seed plus four-grid (34, 45, 56, 64) plus
+      windows 8. Unconverged mass still above seventeen refutes this site set
+      only; remaining rows can only raise it.       Worse than the session-139 windows 5
+      row at 17.042346. Adding sites can still lower the covering value, so 23/5
+      is not barred. No covering freeze was retained.
+  - n: 17
+    side: '461/100'
+    side_decimal: '4.61'
+    objective: '17.195968'
+    site_set: t019-seed-auto-32-43-53-windows5
+    sites: 7253
+    rows: 14077
+    rounds: 56
+    converged: false
+    stop_reason: >-
+      The 1200 s deadline stopped the row loop after 56 LP rounds with 18 placements
+      still violated. The objective crossed 17 at round 11 (17.030928) and finished at
+      17.195968 on 7253 sites / 975 orbits, including 1584 T-019 seed sites. It sat
+      on 17.195968 from round 45.
+    least_covered_mass: '0.997823'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n17-461-100-t019-auto-windows5-receipt.md
+      - packing/campaign/agent-sessions/session-140-lb-survey.md
+    notes: >-
+      Session-140 leftover rank 2. T-019 459/100 seed plus auto (32, 43, 53) plus
+      windows 5 at 461/100, one cent above 23/5. Unconverged mass still above
+      seventeen refutes this site set only; remaining rows can only raise it.
+      Adding sites can still lower the covering value, so 461/100 is not barred.
+      T-019 is unchanged. T-029 was not offered.
+  - n: 18
+    side: '467/100'
+    side_decimal: '4.67'
+    objective: '18.000000'
+    site_set: auto-32-43-53
+    sites: 5669
+    rows: 16426
+    rounds: 57
+    converged: false
+    stop_reason: >-
+      The 600 s deadline stopped the row loop after 57 LP rounds with 336 placements
+      still violated. The objective crossed 18 at round 15 (18.000000) and held that
+      value through the stop.
+    least_covered_mass: '0.973636'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-467-100-grid-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 auto-grid probe at 467/100, just below the historical n=18 probes at
+      117/25. Unconverged mass 18.000000 on 5669 sites / 763 orbits cannot confirm;
+      remaining rows can only raise it. Adding sites can still lower the covering
+      value, so 467/100 is not barred. No covering freeze was retained.
+  - n: 18
+    side: '467/100'
+    side_decimal: '4.67'
+    objective: '17.875567'
+    site_set: t019-seed-auto-32-43-53
+    sites: 6853
+    rows: 11528
+    rounds: 44
+    converged: true
+    stop_reason: >-
+      The row loop converged at LP round 44 (violated 0) at 17.875567 on 6853 sites
+      / 920 orbits, including 1184 T-019 seed sites scaled from 459/100. least_covered
+      1. Column generation then entered check_ceiling on the untruncated dual
+      (--support-cap 0) and was interrupted after 31 minutes; run.json was not written.
+      Wall of the row loop 420.5 s.
+    least_covered_mass: '1'
+    frozen_artifact: packing/cases/n18_fractional_certificate/certificate-467-100.json
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-467-100-t019-seed-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+      - packing/frontier/n-018.md
+    notes: >-
+      Session-139 T-019-seeded auto-grid at 467/100. The seed dropped the unseeded
+      locked 18.000000 to a converged 17.875567. Freeze-then-decide retained the
+      candidate: 769 atoms, total mass 8937839/500000 = 17.875678, least cell mass
+      2000007/2000000. Both decide_certificate routes accept. T-027. The covering
+      objective and the artifact mass are different numbers. The live pointer later
+      moved to T-028; these bytes stay at certificate-467-100.json.
+  - n: 18
+    side: '187/40'
+    side_decimal: '4.675'
+    objective: '17.879034'
+    site_set: t027-seed-auto-32-43-53-windows5
+    sites: 6837
+    rows: 9607
+    rounds: 38
+    converged: true
+    stop_reason: >-
+      The row loop converged at LP round 38 (violated 0) at 17.879034 on 6837 sites
+      / 921 orbits, including 1169 T-027 seed sites scaled from 467/100 plus
+      windows 5. least_covered 1. Never crossed 18. Wall 319.6 s.
+    least_covered_mass: '1'
+    frozen_artifact: packing/cases/n18_fractional_certificate/certificate-187-40.json
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n18-4675-1000-t027-auto-windows5-receipt.md
+      - packing/campaign/agent-sessions/session-140-lb-survey.md
+      - packing/frontier/n-018.md
+    notes: >-
+      Session-140 T-027-seeded auto-grid plus windows 5 at 187/40. Freeze-then-decide
+      retained the candidate: 725 atoms, total mass 35758287/2000000 = 17.8791435,
+      least cell mass 4000013/4000000. Both decide_certificate routes accept. T-028.
+      The covering objective and the artifact mass are different numbers. n=18 is
+      off the H-218 sweep, so this retain does not confirm that claim. The live
+      pointer later moved to T-029; these bytes stay at certificate-187-40.json.
+  - n: 18
+    side: '1871/400'
+    side_decimal: '4.6775'
+    objective: '17.889237'
+    site_set: t028-seed-auto-32-43-54-windows5
+    sites: 6905
+    rows: 12165
+    rounds: 56
+    converged: true
+    stop_reason: >-
+      The row loop converged at LP round 56 (violated 0) at 17.889237 on 6905 sites
+      / 921 orbits, including 1125 T-028 seed sites scaled from 187/40 plus
+      windows 5. least_covered 1. Never crossed 18. Wall 650.3 s. Auto resolved to
+      (32, 43, 54), not T-028's (32, 43, 53).
+    least_covered_mass: '1'
+    frozen_artifact: packing/cases/n18_fractional_certificate/certificate-1871-400.json
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n18-1871-400-t028-auto-windows5-receipt.md
+      - packing/campaign/agent-sessions/session-141-n100-research.md
+      - packing/frontier/n-018.md
+    notes: >-
+      Session-141 leftover T-028-seeded auto-grid plus windows 5 at 1871/400.
+      Freeze-then-decide retained the candidate: 804 atoms, total mass
+      17889361/1000000 = 17.889361, least cell mass 250001/250000. Both
+      decide_certificate routes accept. T-029. The covering objective and the
+      artifact mass are different numbers. Confirms H-219. n=18 is off the H-218
+      sweep, so this retain does not confirm that claim. The live pointer later
+      moved to T-030; these bytes stay at certificate-1871-400.json.
+  - n: 18
+    side: '4679/1000'
+    side_decimal: '4.679'
+    objective: '17.893285'
+    site_set: t029-seed-auto-32-43-54-windows5
+    sites: 6985
+    rows: 10098
+    rounds: 39
+    converged: true
+    stop_reason: >-
+      The row loop converged at LP round 39 (violated 0) at 17.893285 on 6985 sites
+      / 929 orbits, including 1204 T-029 seed sites scaled from 1871/400 plus
+      windows 5. least_covered 1. Never crossed 18. Wall 432.9 s. Auto resolved to
+      (32, 43, 54), the same triple T-029 used.
+    least_covered_mass: '1'
+    frozen_artifact: packing/cases/n18_fractional_certificate/certificate.json
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n18-4679-1000-t029-auto-windows5-receipt.md
+      - packing/campaign/agent-sessions/session-141-n100-research.md
+      - packing/frontier/n-018.md
+    notes: >-
+      Session-141 H-221 T-029-seeded auto-grid plus windows 5 at 4679/1000.
+      Freeze-then-decide retained the candidate: 957 atoms, total mass
+      71573611/4000000 = 17.89340275, least cell mass 200001/200000. Both
+      decide_certificate routes accept. T-030. The covering objective and the
+      artifact mass are different numbers. Confirms H-221. n=18 is off the H-218
+      sweep, so this retain does not confirm that claim.
   - n: 18
     side: '117/25'
     side_decimal: '4.68'
@@ -259,6 +890,248 @@ values:
       to 27516 over the run. Both readings stay open, a covering value at or above
       eighteen or an optimum on a degenerate vertex, which the collapse of pricing from
       90 s to 1--3 s suggests. No raw run was retained and nothing was frozen.
+  - n: 18
+    side: '117/25'
+    side_decimal: '4.68'
+    objective: '18.000000'
+    site_set: t019-seed-auto-32-43-54
+    sites: 6965
+    rows: 10990
+    rounds: 35
+    converged: true
+    stop_reason: >-
+      The row loop converged at LP round 35 (violated 0) at float 17.999999999552305
+      on 6965 sites / 922 orbits, including 1184 T-019 seed sites scaled from 459/100.
+      Exact total mass 18000043/1000000 = 18.000043. Crossed 18 at round 8. Wall 180.0 s.
+    least_covered_mass: '1'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-117-25-t019-seed-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 T-019-seeded auto-grid at 117/25, the same seed that certified
+      467/100 as T-027. Converged with exact mass 18.000043, so this site set cannot
+      carry a certificate. Adding sites can still lower a restricted optimum, so
+      117/25 is not barred. No covering freeze was retained.
+  - n: 18
+    side: '117/25'
+    side_decimal: '4.68'
+    objective: '18.000000'
+    site_set: t019-seed-auto-32-43-53-windows5
+    sites: 7253
+    rows: 18858
+    rounds: 57
+    converged: false
+    stop_reason: >-
+      The 900 s deadline stopped the row loop after 57 LP rounds with 495 placements
+      still violated. The objective crossed 18 at round 10 (18.000000) and held that
+      value through the stop on 7253 sites / 975 orbits, including 1584 seed sites
+      (1184 T-019 plus 400 ceiling-window lattice sites from --seed-windows 5).
+    least_covered_mass: '0.960216'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-117-25-t019-windows5-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 T-019-seeded auto-grid plus windows at 117/25, grids (32, 43, 53).
+      Unconverged mass 18.000000 cannot confirm; remaining rows can only raise it.
+      Adding sites can still lower a restricted optimum, so 117/25 is not barred. No
+      covering freeze was retained.
+  - n: 18
+    side: '117/25'
+    side_decimal: '4.68'
+    objective: '18.000000'
+    site_set: t027-seed-auto-32-43-54
+    sites: 6549
+    rows: 19241
+    rounds: 60
+    converged: false
+    stop_reason: >-
+      The 60-round limit stopped the row loop after 60 LP rounds with 465 placements
+      still violated. The objective crossed 18 at round 7 (18.000000) and held that
+      value through the stop on 6549 sites / 868 orbits, including 769 T-027 seed
+      sites scaled from 467/100. Wall 819.5 s.
+    least_covered_mass: '0.970596'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-117-25-t027-seed-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 T-027-seeded auto-grid at 117/25, the atoms that certified 467/100.
+      Unconverged mass 18.000000 cannot confirm; remaining rows can only raise it.
+      Adding sites can still lower a restricted optimum, so 117/25 is not barred. No
+      covering freeze was retained.
+  - n: 18
+    side: '469/100'
+    side_decimal: '4.69'
+    objective: '18.000000'
+    site_set: t019-seed-auto-32-43-53
+    sites: 6853
+    rows: 17282
+    rounds: 59
+    converged: false
+    stop_reason: >-
+      The 900 s deadline stopped the row loop after 59 LP rounds with 288 placements
+      still violated. The objective crossed 18 at round 8 (18.000000) and held that
+      value through the stop on 6853 sites / 920 orbits, including 1184 T-019 seed
+      sites scaled from 459/100.
+    least_covered_mass: '0.981532'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-469-100-t019-seed-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 T-019-seeded auto-grid at 469/100, between T-027 at 467/100 and the
+      117/25 lock. Unconverged mass 18.000000 cannot confirm; remaining rows can only
+      raise it. Adding sites can still lower a restricted optimum, so 469/100 is not
+      barred. No covering freeze was retained.
+  - n: 18
+    side: '47/10'
+    side_decimal: '4.7'
+    objective: '18.165413'
+    site_set: t019-seed-auto-33-44-54
+    sites: 7117
+    rows: 11265
+    rounds: 44
+    converged: true
+    stop_reason: >-
+      The row loop converged at LP round 44 (violated 0) at 18.165413 on 7117 sites
+      / 939 orbits, including 1184 T-019 seed sites scaled from 459/100. Exact total
+      mass 18165509/1000000 = 18.165509. Crossed 18 at round 7. Wall 390.4 s.
+    least_covered_mass: '1'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-47-10-t019-seed-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 T-019-seeded auto-grid at 47/10, above T-027 at 467/100. Converged
+      above 18, so this site set cannot carry a certificate. Adding sites can still
+      lower a restricted optimum, so 47/10 is not barred. No covering freeze was
+      retained.
+  - n: 19
+    side: '97/20'
+    side_decimal: '4.85'
+    objective: '19.808958'
+    site_set: t020-seed-auto-34-45-56-windows6
+    sites: 8865
+    rows: 11546
+    rounds: 34
+    converged: false
+    stop_reason: >-
+      The 900 s deadline stopped the row loop after 34 LP rounds with 321 placements
+      still violated. The objective crossed 19 at round 5 (19.114379) and finished at
+      19.808958 on 8865 sites / 1172 orbits, including 2836 seed sites (2260 T-020
+      plus 576 ceiling-window lattice sites from --seed-windows 6).
+    least_covered_mass: '0.974389'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n19-97-20-t020-windows6-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 T-020-seeded auto-grid plus windows 6 at 97/20 for n=19, seeded
+      from certificate-24-5.json. Unconverged mass 19.808958 still refutes this site
+      set only; remaining rows can only raise it. Adding sites can still lower the
+      covering value, so 97/20 is not barred for n=19. No covering freeze was
+      retained. T-020 at 24/5 is unchanged.
+  - n: 19
+    side: '481/100'
+    side_decimal: '4.81'
+    objective: '19.132115'
+    site_set: t020-seed-auto-34-45-56-windows6
+    sites: 8865
+    rows: 10697
+    rounds: 37
+    converged: false
+    stop_reason: >-
+      The 1200 s deadline stopped the row loop after 37 LP rounds with 333 placements
+      still violated. The objective crossed 19 at round 16 (19.000170) and finished at
+      19.132115 on 8865 sites / 1172 orbits, including 2836 T-020 seed sites.
+    least_covered_mass: '0.951466'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n19-481-100-t020-auto-windows6-receipt.md
+      - packing/campaign/agent-sessions/session-140-lb-survey.md
+    notes: >-
+      Session-140 X-038 rank 4. T-020 24/5 seed plus auto (34, 45, 56) plus windows
+      6 at 481/100, one hundredth above the verified floor. Unconverged mass still
+      above nineteen refutes this site set only; remaining rows can only raise it.
+      Closer than the same construction at 97/20 (19.808958). Adding sites can still
+      lower the covering value, so 481/100 is not barred. T-020 is unchanged.
+  - n: 19
+    side: '481/100'
+    side_decimal: '4.81'
+    objective: '19.111435'
+    site_set: t020-seed-four-grid-34-45-56-64-windows7
+    sites: 13153
+    rows: 11449
+    rounds: 34
+    converged: false
+    stop_reason: >-
+      The 1200 s deadline stopped the row loop after 34 LP rounds with 369 placements
+      still violated. The objective crossed 19 at round 15 (19.017579) and finished at
+      19.111435 on 13153 sites / 1724 orbits, including 3044 T-020 plus window-lattice
+      seed sites. Four-grid resolved to (34, 45, 56, 64).
+    least_covered_mass: '0.966385'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n19-481-100-t020-grid4-windows7-receipt.md
+      - packing/campaign/agent-sessions/session-141-n100-research.md
+    notes: >-
+      Session-141 exp-174. T-020 24/5 seed plus four-grid (34, 45, 56, 64) plus
+      windows 7 at 481/100. Unconverged mass still above nineteen refutes this site
+      set only; remaining rows can only raise it. Closer than leftover auto plus
+      windows 6 at this side (19.132115). T-020 is unchanged. T-030 was not
+      offered. H-218 stays unconfirmed. Do not more-wall this set.
+  - n: 19
+    side: '241/50'
+    side_decimal: '4.82'
+    objective: '19.247109'
+    site_set: t020-seed-auto-34-45-56-windows6
+    sites: 8865
+    rows: 11317
+    rounds: 38
+    converged: false
+    stop_reason: >-
+      The 1200 s deadline stopped the row loop after 38 LP rounds with 291 placements
+      still violated. The objective crossed 19 at round 12 (19.011201) and finished at
+      19.247109 on 8865 sites / 1172 orbits, including 2836 T-020 seed sites.
+    least_covered_mass: '0.976285'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n19-241-50-t020-auto-windows6-receipt.md
+      - packing/campaign/agent-sessions/session-140-lb-survey.md
+    notes: >-
+      Session-140 leftover rank 1. T-020 24/5 seed plus auto (34, 45, 56) plus windows
+      6 at 241/50, two hundredths above the verified floor. Unconverged mass still
+      above nineteen refutes this site set only; remaining rows can only raise it.
+      Farther than the same construction at 481/100 (19.132115), closer than 97/20
+      (19.808958). Adding sites can still lower the covering value, so 241/50 is not
+      barred. T-020 is unchanged. T-029 was not offered.
+  - n: 19
+    side: '241/50'
+    side_decimal: '4.82'
+    objective: '19.224565'
+    site_set: t020-seed-four-grid-34-45-56-64-windows7
+    sites: 13153
+    rows: 11500
+    rounds: 34
+    converged: false
+    stop_reason: >-
+      The 1200 s deadline stopped the row loop after 34 LP rounds with 387 placements
+      still violated. The objective crossed 19 at round 13 (19.006821) and finished at
+      19.224565 on 13153 sites / 1724 orbits, including 3044 T-020 plus window-lattice
+      seed sites. Four-grid resolved to (34, 45, 56, 64).
+    least_covered_mass: '0.963656'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n19-241-50-t020-grid4-windows7-receipt.md
+      - packing/campaign/agent-sessions/session-141-n100-research.md
+    notes: >-
+      Session-141 exp-177. T-020 24/5 seed plus four-grid (34, 45, 56, 64) plus
+      windows 7 at 241/50. Unconverged mass still above nineteen refutes this site
+      set only; remaining rows can only raise it. Closer than leftover auto plus
+      windows 6 at this side (19.247109). T-020 is unchanged. T-030 was not
+      offered. H-218 stays unconfirmed. Do not more-wall this set.
   - n: 21
     side: '997/200'
     side_decimal: '4.985'
@@ -284,6 +1157,29 @@ values:
       sites only, and no uniform inset-1/2 grid the lane could afford puts a site in
       every strip, so twenty-five unit weights are dual-feasible whatever the covering
       value is. A second construction, the 24/5 atoms scaled, reached 24.315238 unconverged.
+  - n: 21
+    side: '97/20'
+    side_decimal: '4.85'
+    objective: '19.814820'
+    site_set: t021-seed-auto-34-45-56-windows6
+    sites: 7197
+    rows: 11277
+    rounds: 45
+    converged: false
+    stop_reason: >-
+      The 1200 s deadline stopped the row loop after 45 LP rounds with 162 placements
+      still violated. The objective finished at 19.814820 on 7197 sites / 950 orbits,
+      including 2256 T-021 seed sites, and sat on that value from round 39. It did
+      not cross 21.
+    least_covered_mass: '0.984206'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n21-97-20-t021-auto-windows6-receipt.md
+      - packing/campaign/agent-sessions/session-140-lb-survey.md
+    notes: >-
+      Session-140 X-038 rank 6. T-021 seed plus auto (34, 45, 56) plus windows 6 at
+      the already-verified 97/20 side. Unconverged mass still below 21 is a covering
+      measurement, not a floor raise. T-021 is unchanged. T-029 was not offered.
   - n: 20
     side: '979/200'
     side_decimal: '4.895'
@@ -447,6 +1343,109 @@ values:
       site set is where any doubt about this rung would go, since adding sites lowers a
       restricted optimum.
   - n: 20
+    side: '973/200'
+    side_decimal: '4.865'
+    objective: '19.939212'
+    site_set: t021-seed-four-grid-34-46-56-64-windows7
+    sites: 12676
+    rows: 15731
+    rounds: 45
+    converged: false
+    stop_reason: >-
+      The 2400 s follow-up stopped the row loop after 45 LP rounds with 255 placements
+      still violated. The objective finished at 19.939212 on 12676 sites / 1646 orbits,
+      including 2464 T-021 seed sites, and did not cross 20. The 1200 s run of the same
+      site set stopped at 19.930198 after 34 rounds.
+    least_covered_mass: '0.989323'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n20-973-200-t021-grid4-windows7-receipt.md
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n20-973-200-t021-grid4-windows7-2400-receipt.md
+      - packing/campaign/agent-sessions/session-140-lb-survey.md
+    notes: >-
+      Session-140 X-038 rank 1 and its 2400 s follow-up. T-021 seed plus four-grid
+      (34, 46, 56, 64) plus windows 7. Unconverged mass still below twenty is not a
+      covering below 20; remaining rows can only raise it. More wall on this set
+      raised 19.930198 to 19.939212 and did not converge. H-062's two named site
+      sets at this side already crossed. No covering freeze was retained. H-218
+      stays unconfirmed.
+  - n: 20
+    side: '971/200'
+    side_decimal: '4.855'
+    objective: '19.910044'
+    site_set: t021-seed-auto-34-45-56-windows6
+    sites: 8285
+    rows: 11818
+    rounds: 48
+    converged: false
+    stop_reason: >-
+      The 1200 s deadline stopped the row loop after 48 LP rounds with 6 placements
+      still violated. The objective finished at 19.910044 on 8285 sites / 1093 orbits,
+      including 2256 T-021 seed sites, and sat on that value from round 40. It did
+      not cross 20.
+    least_covered_mass: '0.990063'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n20-971-200-t021-auto-windows6-receipt.md
+      - packing/campaign/agent-sessions/session-140-lb-survey.md
+    notes: >-
+      Session-140 leftover rank 3. T-021 seed plus auto (34, 45, 56) plus windows 6
+      at 971/200, between the T-021 floor and 973/200. Unconverged mass still below
+      twenty is not a covering below 20; remaining rows can only raise it. Adding
+      sites can still lower the covering value, so 971/200 is not barred. T-021 is
+      unchanged. T-029 was not offered. H-218 stays unconfirmed.
+  - n: 20
+    side: '971/200'
+    side_decimal: '4.855'
+    objective: '19.857588'
+    site_set: t021-seed-four-grid-34-46-56-64-windows7
+    sites: 12676
+    rows: 15378
+    rounds: 48
+    converged: false
+    stop_reason: >-
+      The 2400 s deadline stopped the row loop after 48 LP rounds with 225 placements
+      still violated. The objective finished at 19.857588 on 12676 sites / 1646 orbits,
+      including 2464 T-021 seed sites, and sat near that value from round 41. It did
+      not cross 20.
+    least_covered_mass: '0.991565'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n20-971-200-t021-grid4-windows7-receipt.md
+      - packing/campaign/agent-sessions/session-141-n100-research.md
+    notes: >-
+      Session-141 exp-164. T-021 seed plus four-grid (34, 46, 56, 64) plus windows 7
+      at 971/200. Unconverged mass still below twenty is not a covering below 20;
+      remaining rows can only raise it. The mass is below leftover auto plus
+      windows 6 at this side (19.910044) and below the same four-grid at 973/200
+      (19.939212). T-021 is unchanged. T-030 was not offered. H-218 stays
+      unconfirmed. The same four-grid at 243/50 finished 19.887914 unconverged.
+  - n: 20
+    side: '243/50'
+    side_decimal: '4.86'
+    objective: '19.887914'
+    site_set: t021-seed-four-grid-34-46-56-64-windows7
+    sites: 12676
+    rows: 13250
+    rounds: 36
+    converged: false
+    stop_reason: >-
+      The 1200 s deadline stopped the row loop after 36 LP rounds with 459 placements
+      still violated. The objective finished at 19.887914 on 12676 sites / 1646 orbits,
+      including 2464 T-021 seed sites. It did not cross 20.
+    least_covered_mass: '0.965974'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n20-243-50-t021-grid4-windows7-receipt.md
+      - packing/campaign/agent-sessions/session-141-n100-research.md
+    notes: >-
+      Session-141 exp-165. T-021 seed plus four-grid (34, 46, 56, 64) plus windows 7
+      at 243/50. Unconverged mass still below twenty is not a covering below 20;
+      remaining rows can only raise it. The mass is above the same four-grid at
+      971/200 (19.857588) and below leftover auto plus windows 6 at 971/200
+      (19.910044). T-021 is unchanged. T-030 was not offered. H-218 stays
+      unconfirmed. Do not more-wall this set.
+  - n: 20
     side: '24/5'
     side_decimal: '4.80'
     objective: '18.916941'
@@ -470,6 +1469,102 @@ values:
       what keeps n = 19 standing at 24/5 after T-021 raised n = 20 and n = 21 to 97/20.
       The artifact named here is the immutable 24/5 rung, not the package's moving
       certificate.json pointer, which now holds the heavier 97/20 rung.
+  - n: 12
+    side: '3969/1000'
+    side_decimal: '3.969'
+    objective: '12.363498'
+    site_set: grid
+    sites: 3737
+    rows: 5226
+    rounds: 25
+    converged: true
+    stop_reason: >-
+      The row loop converged at LP round 25 (violated 0) at 12.363498 on 3737 sites
+      / 511 orbits. It crossed twelve at round 4 (12.043810). A later column-generation
+      pricing round was killed after the 600 s deadline while adding one orbit and did
+      not change the reported optimum.
+    least_covered_mass: '1'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n12-3969-1000-grid-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 scout probe between T-017 at 99/25 and BC-206's 397/100 grid wall.
+      Same auto grids (26, 35, 43) and scale 4,000,000 as BC-206. Above twelve on a
+      converged loop, so this site set carries no certificate at 3.969; adding sites
+      can only lower it, so the side is not barred. No covering freeze was retained.
+  - n: 12
+    side: '3969/1000'
+    side_decimal: '3.969'
+    objective: '12.118036'
+    site_set: t017-seed-auto-26-35-43
+    sites: 5833
+    rows: 8148
+    rounds: 29
+    converged: false
+    stop_reason: >-
+      The 600 s deadline stopped the row loop after 29 LP rounds with 186 placements
+      still violated. The objective had already crossed 12 at round 8 (12.003410).
+    least_covered_mass: '0.993700'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n12-3969-1000-t017-seed-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 T-017-seeded auto-grid probe at 3969/1000. The seed dropped the
+      restricted optimum from the unseeded 12.363498 to 12.118036. Unconverged mass
+      still above twelve refutes this site set only; remaining rows can only raise it.
+      Adding sites can still lower the covering value, so 3969/1000 is not barred. No
+      covering freeze was retained.
+  - n: 12
+    side: '3969/1000'
+    side_decimal: '3.969'
+    objective: '12.116115'
+    site_set: t017-seed-four-grid-26-35-43-48
+    sites: 8133
+    rows: 9056
+    rounds: 29
+    converged: false
+    stop_reason: >-
+      The 600 s deadline stopped the row loop after 29 LP rounds with 330 placements
+      still violated. The objective crossed 12 at round 8 (12.005274) and finished at
+      12.116115 on 8133 sites / 1120 orbits, including 2097 T-017 seed sites.
+    least_covered_mass: '0.990495'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n12-3969-1000-t017-grid4-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 T-017-seeded four-grid at 3969/1000. Dropped the seeded auto
+      12.118036 by 0.002. Unconverged mass still above twelve refutes this site set
+      only; remaining rows can only raise it. Adding sites can still lower the
+      covering value, so 3969/1000 is not barred. No covering freeze was retained.
+  - n: 12
+    side: '3969/1000'
+    side_decimal: '3.969'
+    objective: '12.091168'
+    site_set: t017-seed-four-grid-26-35-43-48-windows7
+    sites: 8569
+    rows: 10040
+    rounds: 36
+    converged: false
+    stop_reason: >-
+      The 1200 s deadline stopped the row loop after 36 LP rounds with 54 placements
+      still violated. The objective crossed 12 at round 11 (12.000732) and finished at
+      12.091168 on 8569 sites / 1184 orbits, including 2533 T-017 seed sites. It sat
+      near 12.091 from round 32.
+    least_covered_mass: '0.997200'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n12-3969-1000-t017-grid4-windows7-receipt.md
+      - packing/campaign/agent-sessions/session-140-lb-survey.md
+    notes: >-
+      Session-140 leftover rank 4. T-017 seed plus four-grid (26, 35, 43, 48) plus
+      windows 7 at 3969/1000. Lower than the Session-139 four-grid without windows
+      (12.116115) at the same side. Unconverged mass still above twelve refutes this
+      site set only; remaining rows can only raise it. Adding sites can still lower
+      the covering value, so 3969/1000 is not barred. Side 3.969 already exists.
+      T-017 is unchanged. T-029 was not offered. H-218 stays unconfirmed.
   - n: 12
     side: '397/100'
     side_decimal: '3.97'
@@ -511,6 +1606,78 @@ values:
       BC-206 of agenda 022. The grids unioned with T-017's 2097 atoms scaled to the side.
       Rows only raise a restricted optimum, so this site set's converged optimum is at
       least 12.016263.
+  - n: 12
+    side: '397/100'
+    side_decimal: '3.97'
+    objective: '12.122748'
+    site_set: t017-seed-four-grid-26-35-43-48
+    sites: 8133
+    rows: 9290
+    rounds: 33
+    converged: false
+    stop_reason: >-
+      The 900 s deadline stopped the row loop after 33 LP rounds with 108 placements
+      still violated. The objective crossed 12 at round 8 (12.001574) and finished at
+      12.122748 on 8133 sites / 1120 orbits, including 2097 T-017 seed sites.
+    least_covered_mass: '0.987523'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n12-397-100-t017-grid4-receipt.md
+      - packing/campaign/agent-sessions/session-139-n11-overnight-research.md
+    notes: >-
+      Session-139 T-017-seeded four-grid at 397/100. Unconverged mass still above
+      twelve refutes this site set only; remaining rows can only raise it. Adding
+      sites can still lower the covering value, so 397/100 is not barred. No
+      covering freeze was retained.
+  - n: 12
+    side: '397/100'
+    side_decimal: '3.97'
+    objective: '12.133391'
+    site_set: t017-seed-four-grid-28-38-46-54-windows7
+    sites: 9685
+    rows: 9678
+    rounds: 36
+    converged: true
+    stop_reason: >-
+      The row loop converged: every placement covers mass 1. Objective 12.133391
+      on 9685 sites / 1307 orbits, including 2533 T-017 seed sites. Freeze mass
+      48534459/4000000.
+    least_covered_mass: '1'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n12-397-100-t017-grid4-windows7-receipt.md
+      - packing/campaign/agent-sessions/session-140-lb-survey.md
+    notes: >-
+      Session-140 X-038 rank 2. T-017 seed plus four-grid (28, 38, 46, 54) plus
+      windows 7. Converged above twelve refutes this site set. Adding sites can
+      still lower the covering value, so 397/100 is not barred. The freeze sits
+      under agenda-038 and is not a retained case. T-017 is unchanged.
+  - n: 12
+    side: '397/100'
+    side_decimal: '3.97'
+    objective: '12.097146'
+    site_set: t017-seed-auto-26-35-43-windows7
+    sites: 6269
+    rows: 8086
+    rounds: 34
+    converged: false
+    stop_reason: >-
+      The 1200 s deadline stopped the row loop after 34 LP rounds with 33 placements
+      still violated. The objective crossed 12 at round 8 (12.021858) and finished at
+      12.097146 on 6269 sites / 885 orbits, including 2533 T-017 plus window-lattice
+      seed sites. Auto resolved to (26, 35, 43). The objective sat at 12.097146 from
+      round 32.
+    least_covered_mass: '0.998924'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n12-397-100-t017-auto-windows7-receipt.md
+      - packing/campaign/agent-sessions/session-141-n100-research.md
+    notes: >-
+      Session-141 exp-176. T-017 seed plus auto (26, 35, 43) plus windows 7 at
+      397/100. Unconverged mass still above twelve refutes this site set only;
+      remaining rows can only raise it. Closer than four-grid plus windows 7 at
+      this side (12.133391). Side 3.97 already exists. T-017 is unchanged. T-030
+      was not offered. H-218 stays unconfirmed. Do not more-wall this set.
   - n: 12
     side: '398/100'
     side_decimal: '3.98'
@@ -665,3 +1832,254 @@ values:
       3.96004 and the claim that the gap to the fixed-B ceiling 4B = 3.9908 was exhausted
       are withdrawn. The recorded run log preserves that historical inference; the
       attainable part of the remaining 0.0308 below the ceiling is unresolved.
+  - n: 32
+    side: '29/5'
+    side_decimal: '5.8'
+    objective: '29.803318'
+    site_set: auto-42-56-70-windows5
+    sites: 10417
+    rows: 11974
+    rounds: 35
+    converged: false
+    stop_reason: >-
+      The 1200 s deadline stopped the row loop after 35 LP rounds with 546 placements
+      still violated. The objective finished at 29.803318 on 10417 sites / 1356 orbits,
+      including 625 window-lattice seed sites. Auto resolved to (42, 56, 70). It did
+      not cross 32.
+    least_covered_mass: '0.929890'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n32-29-5-auto-windows5-receipt.md
+      - packing/campaign/agent-sessions/session-141-n100-research.md
+    notes: >-
+      Session-141 exp-166. First first-party covering row at n=32. Seedless auto
+      plus windows 5 at 29/5, above the Nagamochi floor 1 + sqrt(23). Unconverged
+      mass still below 32 is not a covering below 32; remaining rows can only raise
+      it. T-030 was not offered. H-220 stays unconfirmed. Do not more-wall this set.
+  - n: 31
+    side: '57/10'
+    side_decimal: '5.7'
+    objective: '28.331329'
+    site_set: auto-41-55-68-windows5
+    sites: 9941
+    rows: 12536
+    rounds: 38
+    converged: false
+    stop_reason: >-
+      The 1200 s deadline stopped the row loop after 38 LP rounds with 462 placements
+      still violated. The objective finished at 28.331329 on 9941 sites / 1318 orbits,
+      including 625 window-lattice seed sites. Auto resolved to (41, 55, 68). It did
+      not cross 31.
+    least_covered_mass: '0.962225'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n31-57-10-auto-windows5-receipt.md
+      - packing/campaign/agent-sessions/session-141-n100-research.md
+    notes: >-
+      Session-141 exp-167. First first-party covering row at n=31. Seedless auto
+      plus windows 5 at 57/10, above the Nagamochi floor 1 + sqrt(22). Unconverged
+      mass still below 31 is not a covering below 31; remaining rows can only raise
+      it. T-030 was not offered. H-220 stays unconfirmed. Do not more-wall this set.
+  - n: 30
+    side: '559/100'
+    side_decimal: '5.59'
+    objective: '27.178193'
+    site_set: auto-40-54-67-windows5
+    sites: 9609
+    rows: 15704
+    rounds: 50
+    converged: false
+    stop_reason: >-
+      The 1200 s deadline stopped the row loop after 50 LP rounds with 93 placements
+      still violated. The objective finished at 27.178193 on 9609 sites / 1269 orbits,
+      including 625 window-lattice seed sites. Auto resolved to (40, 54, 67). It did
+      not cross 30.
+    least_covered_mass: '0.971793'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n30-559-100-auto-windows5-receipt.md
+      - packing/campaign/agent-sessions/session-141-n100-research.md
+    notes: >-
+      Session-141 exp-168. First first-party covering row at n=30. Seedless auto
+      plus windows 5 at 559/100, above the Nagamochi floor 1 + sqrt(21). Unconverged
+      mass still below 30 is not a covering below 30; remaining rows can only raise
+      it. T-030 was not offered. H-220 stays unconfirmed. Do not more-wall this set.
+  - n: 26
+    side: '513/100'
+    side_decimal: '5.13'
+    objective: '25.000000'
+    site_set: auto-36-49-60-windows5
+    sites: 7913
+    rows: 15312
+    rounds: 42
+    converged: false
+    stop_reason: >-
+      The 1200 s deadline stopped the row loop after 42 LP rounds with 546 placements
+      still violated. The objective sat at 25.000000 from round 11 and finished
+      there on 7913 sites / 1049 orbits, including 625 window-lattice seed sites.
+      Auto resolved to (36, 49, 60). It did not cross 26.
+    least_covered_mass: '0.879358'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n26-513-100-auto-windows5-receipt.md
+      - packing/campaign/agent-sessions/session-141-n100-research.md
+    notes: >-
+      Session-141 exp-169. First first-party covering row at n=26. Seedless auto
+      plus windows 5 at 513/100, above the Nagamochi floor 1 + sqrt(17). The
+      25.000000 plateau with 546 still violated is not a covering below 26;
+      remaining rows can only raise it. T-030 was not offered. H-220 stays
+      unconfirmed. Do not more-wall this set.
+  - n: 27
+    side: '525/100'
+    side_decimal: '5.25'
+    objective: '25.000000'
+    site_set: auto-37-50-62-windows5
+    sites: 8329
+    rows: 14004
+    rounds: 38
+    converged: false
+    stop_reason: >-
+      The 1200 s deadline stopped the row loop after 38 LP rounds with 546 placements
+      still violated. The objective sat at 25.000000 and finished there on 8329
+      sites / 1099 orbits, including 625 window-lattice seed sites. Auto resolved
+      to (37, 50, 62). It did not cross 27.
+    least_covered_mass: '0.888193'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n27-525-100-auto-windows5-receipt.md
+      - packing/campaign/agent-sessions/session-141-n100-research.md
+    notes: >-
+      Session-141 exp-170. First first-party covering row at n=27. Seedless auto
+      plus windows 5 at 525/100, above the Nagamochi floor 1 + sqrt(18). The
+      25.000000 plateau with 546 still violated is not a covering below 27;
+      remaining rows can only raise it. T-030 was not offered. H-220 stays
+      unconfirmed. Do not more-wall this set.
+  - n: 29
+    side: '548/100'
+    side_decimal: '5.48'
+    objective: '26.040745'
+    site_set: auto-39-53-65-windows5
+    sites: 9145
+    rows: 14722
+    rounds: 52
+    converged: true
+    stop_reason: >-
+      The row loop converged at LP round 52 (violated 0) at 26.040745 on 9145 sites
+      / 1230 orbits, including 625 window-lattice seed sites. least_covered 1.
+      Freeze mass 52081879/2000000 = 26.0409395. Never crossed 29. Wall 1068.7 s.
+      Auto resolved to (39, 53, 65). declare_least_cell_mass accepted least
+      4000013/4000000. decide_certificate refused the interval route: 272 stalled
+      boxes, Condition 5, enclosure (398409/400000, 4000013/4000000).
+    least_covered_mass: '1'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n29-548-100-auto-windows5-receipt.md
+      - packing/campaign/agent-sessions/session-141-n100-research.md
+    notes: >-
+      Session-141 exp-171. First first-party covering row at n=29. Seedless auto
+      plus windows 5 at 548/100, above the Nagamochi floor 1 + sqrt(20). The
+      first Nagamochi freeze with mass below n. Interval route refused; T-030
+      was not offered. H-220 stays unconfirmed. Do not more-wall this set.
+  - n: 45
+    side: '684/100'
+    side_decimal: '6.84'
+    objective: '42.137360'
+    site_set: auto-51-68-84-windows5
+    sites: 15173
+    rows: 9572
+    rounds: 26
+    converged: false
+    stop_reason: >-
+      The 1200 s deadline stopped the row loop after 26 LP rounds with 546 placements
+      still violated. The objective finished at 42.137360 on 15173 sites / 1967
+      orbits, including 900 window-lattice seed sites. Auto resolved to (51, 68,
+      84). It did not cross 45.
+    least_covered_mass: '0.879972'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n45-684-100-auto-windows5-receipt.md
+      - packing/campaign/agent-sessions/session-141-n100-research.md
+    notes: >-
+      Session-141 exp-172. First first-party covering row at n=45. Seedless auto
+      plus windows 5 at 684/100, above the Nagamochi floor 1 + sqrt(34).
+      Unconverged mass still below 45 is not a covering below 45; remaining rows
+      can only raise it. T-030 was not offered. H-220 stays unconfirmed. Do not
+      more-wall this set.
+  - n: 44
+    side: '675/100'
+    side_decimal: '6.75'
+    objective: '41.236782'
+    site_set: auto-50-67-83-windows5
+    sites: 14765
+    rows: 10055
+    rounds: 28
+    converged: false
+    stop_reason: >-
+      The 1200 s deadline stopped the row loop after 28 LP rounds with 546 placements
+      still violated. The objective finished at 41.236782 on 14765 sites / 1939
+      orbits, including 900 window-lattice seed sites. Auto resolved to (50, 67,
+      83). It did not cross 44.
+    least_covered_mass: '0.916075'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n44-675-100-auto-windows5-receipt.md
+      - packing/campaign/agent-sessions/session-141-n100-research.md
+    notes: >-
+      Session-141 exp-173. First first-party covering row at n=44. Seedless auto
+      plus windows 5 at 675/100, above the Nagamochi floor 1 + sqrt(33).
+      Unconverged mass still below 44 is not a covering below 44; remaining rows
+      can only raise it. T-030 was not offered. The eight queued Nagamochi sides
+      are measured. H-220 stays unconfirmed. Do not more-wall this set.
+  - n: 12
+    side: '793/200'
+    side_decimal: '3.965'
+    objective: '12.067502'
+    site_set: t017-seed-auto-26-35-43-windows7
+    sites: 6269
+    rows: 9171
+    rounds: 38
+    converged: false
+    stop_reason: >-
+      The 1200 s deadline stopped the row loop after 38 LP rounds with 102 placements
+      still violated. The objective crossed 12 at round 11 (12.005485) and finished at
+      12.067502 on 6269 sites / 885 orbits, including 2533 T-017 plus window-lattice
+      seed sites. Auto resolved to (26, 35, 43). The objective sat at 12.067502 from
+      round 32.
+    least_covered_mass: '0.989127'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n12-793-200-t017-auto-windows7-receipt.md
+      - packing/campaign/agent-sessions/session-141-n100-research.md
+    notes: >-
+      Session-141 exp-175. First first-party covering row at 793/200. T-017 seed plus
+      auto (26, 35, 43) plus windows 7, one two-hundredth above T-017. Unconverged
+      mass still above twelve refutes this site set only; remaining rows can only
+      raise it. Closer than four-grid plus windows 7 at 397/100 (12.133391) and
+      3969/1000 (12.091168). T-017 is unchanged. T-030 was not offered. H-218
+      stays unconfirmed. Do not more-wall this set.
+  - n: 12
+    side: '793/200'
+    side_decimal: '3.965'
+    objective: '12.066995'
+    site_set: t017-seed-four-grid-26-35-43-48-windows7
+    sites: 8569
+    rows: 9701
+    rounds: 35
+    converged: false
+    stop_reason: >-
+      The 1200 s deadline stopped the row loop after 35 LP rounds with 192 placements
+      still violated. The objective crossed 12 at round 13 (12.016486) and finished at
+      12.066995 on 8569 sites / 1184 orbits, including 2533 T-017 plus window-lattice
+      seed sites. Four-grid resolved to (26, 35, 43, 48). The objective sat at
+      12.06699 from round 32.
+    least_covered_mass: '0.988078'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n12-793-200-t017-grid4-windows7-receipt.md
+      - packing/campaign/agent-sessions/session-141-n100-research.md
+    notes: >-
+      Session-141 exp-178. T-017 seed plus four-grid (26, 35, 43, 48) plus windows 7
+      at 793/200. Unconverged mass still above twelve refutes this site set only;
+      remaining rows can only raise it. Closer than leftover auto plus windows 7 at
+      this side (12.067502). T-017 is unchanged. T-030 was not offered. H-218 stays
+      unconfirmed. Do not more-wall this set.

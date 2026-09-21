@@ -1,0 +1,167 @@
+# Retained Session 148 scratch (H-230 gap-wedge lane), not a maintained tool: run as written against packing/ at 19cdd4f8, kept as .py.txt so it stays off the import path and out of the Ruff/BasedPyright floor.
+"""Extended-capture regions E(p) = core ∪ S(walls) for the A6 64-family; S∩S conflicts between
+core-disjoint pairs; the closed extended-depth maximum; exact numbers for the 7.11-degree orbit."""
+import sys, math, json, time
+from fractions import Fraction as F
+sys.path.insert(0, "/home/user/squares-chunk5/packing/src")
+sys.path.insert(0, "/tmp/claude-0/-home-user-squares/5e071e1a-5ab8-5bae-a5c0-c3687815bf4a/scratchpad/chunk5-wedge")
+from wedge import d_R_upper, d_R_numeric, pocket_polygons, polys_intersect, convex_hull_ccw, sqrt_upper, sqrt_lower
+from family_test import square, WALLS, wall_frame, pocket_data, shift, fam, L, B, placements, cores, deg
+t0 = time.time()
+n = len(placements); W = [p.weight for p in placements]
+assert all(w > 0 for w in W) and sum(W) == 11
+# admissible unit squares (concentric, shifted into the container when the nominal one pokes out)
+units = []; shifts = []
+for i, p in enumerate(placements):
+    U = square(p, F(1))
+    dx = max(F(0), -min(x for x, y in U)) - max(F(0), max(x for x, y in U) - L)
+    dy = max(F(0), -min(y for x, y in U)) - max(F(0), max(y for x, y in U) - L)
+    units.append([(x + dx, y + dy) for x, y in U]); shifts.append((dx, dy))
+INV = {"bottom": lambda x, y: (x, y), "top": lambda x, y: (x, L - y), "left": lambda x, y: (y, x), "right": lambda x, y: (L - y, x)}
+def back(poly, w): return [INV[w](x, y) for x, y in poly]
+# per placement: S pieces (container frame), T pieces, per-wall data
+Sp = [[] for _ in range(n)]; Tp = [[] for _ in range(n)]; walldata = [[] for _ in range(n)]
+for a in range(n):
+    for w in WALLS:
+        Qa = wall_frame(units[a], w); c, s, g, V = pocket_data(Qa)
+        if g >= 1: continue
+        DR = d_R_upper(c, s, g); DL = d_R_upper(s, c, g)
+        S_R, S_L, T_R, T_L = pocket_polygons(c, s, g, DR, DL)
+        area = F(0)
+        for S in (S_R, S_L):
+            if S:
+                P = convex_hull_ccw(S); A = sum(P[i][0]*P[(i+1)%len(P)][1] - P[(i+1)%len(P)][0]*P[i][1] for i in range(len(P)))
+                area += abs(A) / 2
+                Sp[a].append((w, back(shift(S, V), w)))
+        for T in (T_R, T_L):
+            if T: Tp[a].append((w, back(shift(T, V), w)))
+        walldata[a].append(dict(wall=w, c=c, s=s, g=g, V=V, DR=DR, DL=DL, area=area))
+print(f"[{time.time()-t0:.0f}s] regions built; S pieces {sum(len(x) for x in Sp)}, T pieces {sum(len(x) for x in Tp)}")
+# --- (b) core-disjoint pairs: S∩S interior overlap, core_b in S_a
+ss = 0; cs = 0; near = []
+def sqdist(P, Q):
+    """Exact squared distance between convex polygons (0 if closed sets meet)."""
+    if polys_intersect(P, Q, strict=False): return F(0)
+    best = None
+    for A_, B_ in ((P, Q), (Q, P)):
+        for (px, py) in A_:
+            m = len(B_)
+            for i in range(m):
+                ax, ay = B_[i]; bx, by = B_[(i+1) % m]
+                vx, vy = bx - ax, by - ay; l2 = vx*vx + vy*vy
+                t = ((px - ax)*vx + (py - ay)*vy) / l2; t = max(F(0), min(F(1), t))
+                dx, dy = px - (ax + t*vx), py - (ay + t*vy); d2 = dx*dx + dy*dy
+                best = d2 if best is None else min(best, d2)
+    return best
+for a in range(n):
+    for b in range(a+1, n):
+        if polys_intersect(cores[a], cores[b], strict=True): continue
+        for (wa, Sa) in Sp[a]:
+            for (wb, Sb) in Sp[b]:
+                if polys_intersect(Sa, Sb, strict=True): ss += 1; print("  S∩S conflict", a, b, wa, wb)
+            if polys_intersect(cores[b], Sa, strict=True): cs += 1; print("  core_b in S_a", a, b, wa)
+        for (wb, Sb) in Sp[b]:
+            if polys_intersect(cores[a], Sb, strict=True): cs += 1; print("  core_a in S_b", a, b, wb)
+print(f"[{time.time()-t0:.0f}s] core-disjoint pairs: S-S interior overlaps = {ss}, core-in-S = {cs}")
+# --- (c) closed extended depth at all vertices and pairwise edge intersections involving an S edge
+pieces = []  # (owner, polygon)
+for a in range(n):
+    pieces.append((a, convex_hull_ccw(cores[a])))
+    for (w, S) in Sp[a]: pieces.append((a, convex_hull_ccw(S)))
+def edges(P): return [(P[i], P[(i+1) % len(P)]) for i in range(len(P))]
+def seg_inter(p, q):
+    (x1, y1), (x2, y2) = p; (x3, y3), (x4, y4) = q
+    d = (x1 - x2)*(y3 - y4) - (y1 - y2)*(x3 - x4)
+    if d == 0: return None
+    t = ((x1 - x3)*(y3 - y4) - (y1 - y3)*(x3 - x4)) / d
+    u = -((x1 - x2)*(y1 - y3) - (y1 - y2)*(x1 - x3)) / d
+    if 0 <= t <= 1 and 0 <= u <= 1: return (x1 + t*(x2 - x1), y1 + t*(y2 - y1))
+    return None
+cand = set()
+for (o, P) in pieces:
+    for v in P: cand.add(v)
+# S-edges vs all edges (float bbox prefilter, exact intersection)
+all_edges = [(o, e) for (o, P) in pieces for e in edges(P)]
+def bbox(e): (x1, y1), (x2, y2) = e; return (min(x1, x2), max(x1, x2), min(y1, y2), max(y1, y2))
+Sedges = []
+core_hulls = {a: convex_hull_ccw(cores[a]) for a in range(n)}
+for (o, P) in pieces:
+    if P != core_hulls[o]: Sedges += [(o, e) for e in edges(P)]
+bb_all = [(o, e, bbox(e)) for (o, e) in all_edges]
+for (o, e) in Sedges:
+    b1 = bbox(e)
+    for (o2, e2, b2) in bb_all:
+        if o2 == o: continue
+        if b1[1] < b2[0] or b2[1] < b1[0] or b1[3] < b2[2] or b2[3] < b1[2]: continue
+        z = seg_inter(e, e2)
+        if z is not None: cand.add(z)
+print(f"[{time.time()-t0:.0f}s] candidate points {len(cand)}")
+def inside_closed(z, P):
+    m = len(P)
+    for i in range(m):
+        ax, ay = P[i]; bx, by = P[(i+1) % m]
+        if (bx - ax)*(z[1] - ay) - (by - ay)*(z[0] - ax) < 0: return False
+    return True
+pb = [(o, P, (min(x for x, y in P), max(x for x, y in P), min(y for x, y in P), max(y for x, y in P))) for (o, P) in pieces]
+best = []
+for z in cand:
+    owners = set()
+    for (o, P, b) in pb:
+        if o in owners or z[0] < b[0] or z[0] > b[1] or z[1] < b[2] or z[1] > b[3]: continue
+        if inside_closed(z, P): owners.add(o)
+    d = sum(W[o] for o in owners)
+    best.append((d, z, tuple(sorted(owners))))
+best.sort(key=lambda r: -r[0])
+print(f"[{time.time()-t0:.0f}s] closed extended depth: max = {best[0][0]} = {float(best[0][0]):.5f}")
+seen = set()
+for d, z, ow in best[:400]:
+    if ow in seen: continue
+    seen.add(ow)
+    print(f"   depth {str(d):>6s} at ({float(z[0]):.4f},{float(z[1]):.4f}) owners {[(o, round(deg[o],2), str(W[o])) for o in ow]}")
+    if len(seen) >= 8: break
+# core-only closed depth at the same points, for comparison
+cd = max(sum(W[o] for o in set(o for (o, P, b) in pb if P == core_hulls[o] and inside_closed(z, P))) for z in list(cand)[:0] or [b[1] for b in best[:50]])
+print("   core-only closed depth at the top-50 points:", cd)
+# --- (d) the 7.11-degree orbit, exact
+orbit = [i for i in range(n) if abs(deg[i] - 7.111) < 0.01 or abs(deg[i] - 82.889) < 0.01]
+a = orbit[0]; p = placements[a]
+print("\n7.11-degree orbit:", orbit, "weights", [str(W[i]) for i in orbit], "half-tangent", p.half_tangent, "shift", shifts[a])
+t = p.half_tangent; c0 = (1 - t*t)/(1 + t*t); s0 = 2*t/(1 + t*t)
+print("  cos =", c0, "=", float(c0), " sin =", s0, "=", float(s0), " tilt deg =", math.degrees(2*math.atan(float(t))))
+core_gaps = [min(x for x, y in cores[a]), L - max(x for x, y in cores[a]), min(y for x, y in cores[a]), L - max(y for x, y in cores[a])]
+print("  core gaps (l, r, b, t):", [str(g_) for g_ in core_gaps], [float(g_) for g_ in core_gaps])
+for d_ in walldata[a]:
+    if d_['g'] < F(1, 2):
+        c, s, g = d_['c'], d_['s'], d_['g']
+        print(f"  wall {d_['wall']}: unit gap g = {g} = {float(g):.6f}; pocket edges c={float(c):.5f} s={float(s):.5f}; T areas R={float(c*g + c*s/2):.5f} L={float(s*g + s*c/2):.5f}")
+        print(f"     d_R <= {float(d_['DR']):.6f} (num {d_R_numeric(c, s, g):.6f}), d_L <= {float(d_['DL']):.6f} (num {d_R_numeric(s, c, g):.6f}); A(S) >= {d_['area']} = {float(d_['area']):.6f}")
+# nearest core-disjoint neighbours to this member's pockets: exact distances
+print("  nearest core-disjoint positive-weight neighbours (exact distance lower bounds via vertex-edge, exact):")
+rows = []
+for b in range(n):
+    if b == a or polys_intersect(cores[a], cores[b], strict=True): continue
+    for (w, T) in Tp[a]:
+        dT = sqdist(convex_hull_ccw(units[b]), convex_hull_ccw(T)); dTc = sqdist(convex_hull_ccw(cores[b]), convex_hull_ccw(T))
+        dS = min([sqdist(convex_hull_ccw(units[b]), convex_hull_ccw(S)) for (w2, S) in Sp[a] if w2 == w] or [None])
+        rows.append((float(dT) ** 0.5, b, w, float(dTc) ** 0.5, float(dS) ** 0.5 if dS is not None else None, dT, dS))
+rows.sort()
+for r in rows[:8]:
+    print(f"     b={r[1]:2d} ({deg[r[1]]:6.2f} deg, w={W[r[1]]}) wall={r[2]:6s} dist(U_b,T)={r[0]:.6f} dist(core_b,T)={r[3]:.6f} dist(U_b,S)={r[4]:.6f}   [exact squared: dist(U_b,T)^2 = {r[5]}]")
+# --- (e) g_max numeric curves
+print("\ng_max (numerical): largest g with A(theta,g) > 0, and A at a few g")
+def A_num(th, g):
+    c, s = math.cos(th), math.sin(th)
+    dR, dL = d_R_numeric(c, s, g, n=20000), d_R_numeric(s, c, g, n=20000)
+    def ar(cc, ss, dR_, dL_):
+        xl, xr = max(0.0, dL_ - ss), cc - dR_
+        return 0.0 if xr <= xl else (xr - xl) * (g + (xl + xr) / 2 * ss / cc)
+    return ar(c, s, dR, dL) + ar(s, c, dL, dR)
+for thd in [7.111, 20.0, 30.0, 40.18, 45.0]:
+    th = math.radians(thd)
+    lo, hi = 0.0, 0.999
+    for _ in range(40):
+        m = (lo + hi) / 2
+        if A_num(th, m) > 0: lo = m
+        else: hi = m
+    print(f"  theta={thd:6.2f}: g_max ~ {lo:.4f};  A(0)={A_num(th,0):.4f} A(0.0146)={A_num(th,0.0146):.4f} A(0.0918)={A_num(th,0.0918):.4f} A(0.2)={A_num(th,0.2):.4f} A(0.4)={A_num(th,0.4):.4f}")
+print(f"[{time.time()-t0:.0f}s] done")

@@ -43,11 +43,22 @@ S_FIRST_POSITIVE = 4_524_185
 ATOM_COUNT = 377
 TOTAL_INTEGER_MASS = 45_048_398
 DIRECTION_STEPS = 180
-SOURCE_REVISION = "39714308ce2081abbd76624387d134fee4be6deb"
+SOURCE_REVISION = "8f4eca7d23cdfc32091b9f783fdcadf7cb269615"
 SOURCE_PATH = (
     "packing/campaign/series/series-000-smoke-and-calibration/results/agenda-030/"
     "bc-293-measure-free-96-25.json"
 )
+# 2026-09-20 (Session 145, PR 206): ``SOURCE_REVISION`` moved from 39714308 to
+# 8f4eca7d. Nothing here pins a blob hash; the revision is what the files in
+# ``SOURCE_FILES`` are compared against byte for byte, and of those only ``sweep.py``
+# differs between the two revisions. Those entries are review bindings -- the source
+# bytes this determination was reviewed against -- and not inputs to it: this sweep
+# imports no ``sqpack`` module (the standard library plus the stdlib-only geometry
+# control), so its output cannot depend on ``sweep.py``, ``adaptive.py`` or ``model.py``,
+# and re-running it re-validates the bindings rather than the modules. Re-run at
+# 8f4eca7d: this sweep under ``tests/test_bc303_t2_charge_sweep.py``, unchanged. The
+# evidence that the unclipped code paths themselves are unchanged is the re-decision
+# cited in ``packing/devtools/replay_bc303_t1_witness.py``.
 SOURCE_FILES = (
     SOURCE_PATH,
     "packing/devtools/owner_footprints.py",

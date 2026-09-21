@@ -864,7 +864,7 @@ def test_the_poster_badges_every_perfect_square_and_counts_them_in_its_legend() 
         "only known numerically (37)",
         "rigid (established here) (20)",
         "annotated rigid by the catalogue (2)",
-        "lower bound first proved here (7)",
+        "lower bound first proved here (6)",
         "colors indicate distinct tilt angles",
         "shade indicates number of full-side contacts",
     ]
@@ -1095,6 +1095,51 @@ def test_only_the_bound_numeral_carries_the_new_result_accent() -> None:
 
     assert len(accented) == record["figure"]["totals"]["lower_bound_first_proved_here"]
     assert len(plain) > len(accented)
+
+
+def test_fast_composite_check_rejects_a_stale_bound_label(monkeypatch) -> None:
+    canvas = known_best_builder.CompositeCanvas(
+        CompositeSpec(first_n=18, last_n=18, columns=1, stem="synthetic")
+    )
+    expected_lower = "s(18) ≥ 4.679"
+    monkeypatch.setattr(
+        known_best_builder,
+        "_figure_entries",
+        lambda: {
+            18: {
+                "side": {"display": "s(18) ≤ 4.822876"},
+                "lower": {"display": expected_lower, "shown": True},
+            }
+        },
+    )
+    root = ET.fromstring(
+        """<svg xmlns="http://www.w3.org/2000/svg">
+        <g data-feature="packing-card" data-n="18">
+          <text data-feature="packing-label">18</text>
+          <text data-feature="side-bound">s(18) ≤ 4.822876</text>
+          <text data-feature="lower-bound">s(18) ≥ 4.67</text>
+        </g>
+        </svg>"""
+    )
+
+    expected = (
+        "atlas/known-best/synthetic.svg n=18 lower-bound is "
+        "('s(18) ≥ 4.67',); expected ('s(18) ≥ 4.679',)"
+    )
+    problems = known_best_builder._composite_label_problems(  # pyright: ignore[reportPrivateUsage]  # noqa: SLF001
+        canvas, root
+    )
+    assert problems == [expected]
+
+    lower = next(
+        node
+        for node in root.iter("{http://www.w3.org/2000/svg}text")
+        if node.attrib.get("data-feature") == "lower-bound"
+    )
+    lower.text = expected_lower
+    assert not known_best_builder._composite_label_problems(  # pyright: ignore[reportPrivateUsage]  # noqa: SLF001
+        canvas, root
+    )
 
 
 def _unitsquare_digests() -> dict[int, str]:

@@ -1,0 +1,105 @@
+first-party R012 check, certificate packing/resources/web/n17-weighted-certificates-2026-09-20/guzhou0806-n17-square-packing/certificates/R012
+upstream commit 931a0dfd64302e277057006e99388fe5c00b7f53
+python 3.14.7 on Darwin, numpy 2.5.2
+integrity: 10 files match MANIFEST.json (manifest sha256 9ad92ab5b80a9de54c1d84661c4753a5800e25ef90b02577ee405e51a1ad294d, pinned=True)
+closed form: expanded_atom_sha256 = ae469399ced8580ddddcef6edc234cf9becd7e94df7752aa8b4f9cefcbaf3643
+closed form: expanded_atom_sha256_matches_source = True
+closed form: orbits = 206
+closed form: atoms = 1616
+closed form: total_mass = 424969/25000
+closed form: gamma = 250023/250000
+closed form: mass_gap_17gamma_minus_M = 701/250000
+closed form: net_end_T = 207107/500000
+closed form: T_squared_plus_2T_minus_1 = 309449/250000000000
+closed form: entries = 2925
+closed form: off_net_entries = 48
+closed form: least_containment_margin = 9246825470492230950855738842503/4032079239528994151028755999277446450000
+closed form: least_containment_margin_entry = 1189
+closed form: target_lower_bound = 461300/99999
+closed form: target_squared_minus_pinned_endpoint_squared = 1338724704271950594905978540377600/8294131309963187985770427210937705041
+
+mira provenance: mira_file = packing/resources/web/n17-weighted-certificates-2026-09-20/mira-17squares/certificates/lower_bound_4p613/best-certificate.json
+mira provenance: mira_sha256 = 749f13335980a66a27a2304f212b5d8796390c81b962149647a4d9ff43a228ec
+mira provenance: mira_sha256_pinned = True
+mira provenance: mira_atoms = 1620
+mira provenance: mira_total_mass = 849899249/50000000
+mira provenance: grid = 100000
+mira provenance: half_step_ties = 0
+mira provenance: merged_sites = 1616
+mira provenance: r012_sites = 1616
+mira provenance: site_sets_identical = True
+mira provenance: sites_only_in_r012 = 0
+mira provenance: sites_only_in_snapped_mira = 0
+mira provenance: largest_coordinate_move = 70549/14121900000
+mira provenance: largest_coordinate_move_float = 4.995715873926313e-06
+mira provenance: r012_weight_dominates_mira_everywhere = True
+mira provenance: least_weight_excess = 1/1000000000
+mira provenance: greatest_weight_excess = 909/500000000
+mira provenance: sites_with_zero_excess = 0
+mira provenance: sites_with_negative_excess = 0
+mira provenance: passed = True
+mira provenance: checked = True
+mass scale 1000000; gamma 250023/250000 = 1000092 on that scale; interval threshold prune_at = 1000092 (exact)
+total scaled mass 16998760 = 424969/25000
+
+controls (seed entry 0, t=0, B=6249/6250):
+  control faithful-restriction: PASS {"entry": 0, "initial_box_encloses_exact_domain_corners": true, "restricted_enclosed_minimum": "987127/1000000", "restricted_initial_at_contained_core": [0.49991999999999964, 4.1130800000000045, 0.49991999999999964, 4.1130800000000045], "restricted_margin_at_contained_core": [0.49992, 0.49992000000000003], "restriction_is_inside_contained_core": true, "same_verdict_on_the_same_domain": true, "stock_enclosed_minimum": "987127/1000000", "stock_initial": [0.49991999999999925, 4.113080000000006, 0.49991999999999925, 4.113080000000006], "stock_margin": [0.4999199999999996, 0.4999200000000006]}
+  control raised-threshold: PASS {"baseline_least_point_mass": "31259/31250", "baseline_status": "certified", "entry": 0, "raised_status": "refuted", "raised_threshold": "1000289/1000000", "raised_threshold_scaled": 1000289}
+  control gamma-is-tight: PASS {"baseline_least_point_mass": "250023/250000", "baseline_status": "certified", "entry": 2240, "entry_attains_gamma": true, "raised_least_point_mass": "250023/250000", "raised_status": "refuted", "raised_threshold": "1000093/1000000"}
+  control lightened-measure: PASS {"baseline_status": "certified", "entry": 0, "lightened_status": "refuted", "mass_at_witness_after_lightening": "189027/250000", "orbits_emptied": [14], "witness_atom_count": 26, "witness_exact_mass": "31259/31250"}
+  control lightened-measure: PASS {"baseline_status": "certified", "entry": 2240, "lightened_status": "refuted", "mass_at_witness_after_lightening": "461721/500000", "orbits_emptied": [143], "witness_atom_count": 194, "witness_exact_mass": "250023/250000"}
+  control counterexample #0: PASS {"B": "6249/6250", "atom_count": 25, "atom_count_matches": true, "below_gamma": true, "below_one": true, "centre_is_a_legal_parent_centre": true, "contained_core_inset": "1441011775136989253199/2880000536166368112500", "core_strictly_inside_parent": true, "enlarged_domain_least_point_mass": "30897/31250", "enlarged_domain_status": "refuted", "exact_mass_at_stated_centre": "30897/31250", "inset": "809783473720114253889/1618419721430777800000", "mass_matches_stated": true, "parent_interval": ["207107/576000000", "1449749/2880000000"], "position": 0, "restricted_domain_least_point_mass": "30897/31250", "restricted_domain_status": "refuted", "stated_atom_count": 25, "stated_mass": "30897/31250", "t": "207107/480000000"}
+  control counterexample #1: PASS {"B": "6249/6250", "atom_count": 25, "atom_count_matches": true, "below_gamma": true, "below_one": true, "centre_is_a_legal_parent_centre": true, "contained_core_inset": "810801964342669253199/1620000536166368112500", "core_strictly_inside_parent": true, "enlarged_domain_least_point_mass": "30897/31250", "enlarged_domain_status": "refuted", "exact_mass_at_stated_centre": "30897/31250", "inset": "830266542498331232063001/1658880420354432600200000", "mass_matches_stated": true, "parent_interval": ["1449749/2880000000", "207107/320000000"], "position": 1, "restricted_domain_least_point_mass": "30897/31250", "restricted_domain_status": "refuted", "stated_atom_count": 25, "stated_mass": "30897/31250", "t": "207107/360000000"}
+  control counterexample #2: PASS {"B": "6249/6250", "atom_count": 25, "atom_count_matches": true, "below_gamma": true, "below_one": true, "centre_is_a_legal_parent_centre": true, "contained_core_inset": "202933248151189253199/405000536166368112500", "core_strictly_inside_parent": true, "enlarged_domain_least_point_mass": "30897/31250", "enlarged_domain_status": "refuted", "exact_mass_at_stated_centre": "30897/31250", "inset": "3694311675982860409449/7372808578661889800000", "mass_matches_stated": true, "parent_interval": ["207107/192000000", "3520819/2880000000"], "position": 2, "restricted_domain_least_point_mass": "30897/31250", "restricted_domain_status": "refuted", "stated_atom_count": 25, "stated_mass": "30897/31250", "t": "207107/180000000"}
+  control counterexample #3: PASS {"B": "12497179/12500000", "atom_count": 69, "atom_count_matches": true, "below_gamma": true, "below_one": true, "centre_is_a_legal_parent_centre": true, "contained_core_inset": "2881834228675740793455629/5760001072332736225000000", "core_strictly_inside_parent": true, "enlarged_domain_least_point_mass": "988089/1000000", "enlarged_domain_status": "refuted", "exact_mass_at_stated_centre": "998421/1000000", "inset": "830266542498331232063001/1658880420354432600200000", "mass_matches_stated": true, "parent_interval": ["1449749/2880000000", "207107/384000000"], "position": 3, "restricted_domain_least_point_mass": "998769/1000000", "restricted_domain_status": "refuted", "stated_atom_count": 69, "stated_mass": "998421/1000000", "t": "207107/480000000"}
+  control counterexample #4: PASS {"B": "6249/6250", "atom_count": 193, "atom_count_matches": true, "below_gamma": true, "below_one": true, "centre_is_a_legal_parent_centre": true, "contained_core_inset": "454079956463468244231/734245404234381012500", "core_strictly_inside_parent": true, "enlarged_domain_least_point_mass": "499819/500000", "enlarged_domain_status": "refuted", "exact_mass_at_stated_centre": "499819/500000", "inset": "41850186312164560972569/67666714408374513800000", "mass_matches_stated": true, "parent_interval": ["80978837/576000000", "405308399/2880000000"], "position": 4, "restricted_domain_least_point_mass": "499819/500000", "restricted_domain_status": "refuted", "stated_atom_count": 193, "stated_mass": "499819/500000", "t": "33758441/240000000"}
+
+obligation (iii): 2925 of 2925 entries (all), 4 workers
+  100/2925 entries, 5.6s elapsed
+  200/2925 entries, 12.8s elapsed
+  300/2925 entries, 19.3s elapsed
+  400/2925 entries, 22.8s elapsed
+  500/2925 entries, 26.0s elapsed
+  600/2925 entries, 28.7s elapsed
+  700/2925 entries, 31.3s elapsed
+  800/2925 entries, 34.0s elapsed
+  900/2925 entries, 37.0s elapsed
+  1000/2925 entries, 40.5s elapsed
+  1100/2925 entries, 45.0s elapsed
+  1200/2925 entries, 51.3s elapsed
+  1300/2925 entries, 56.8s elapsed
+  1400/2925 entries, 61.9s elapsed
+  1500/2925 entries, 67.7s elapsed
+  1600/2925 entries, 73.3s elapsed
+  1700/2925 entries, 78.9s elapsed
+  1800/2925 entries, 83.7s elapsed
+  1900/2925 entries, 89.1s elapsed
+  2000/2925 entries, 95.2s elapsed
+  2100/2925 entries, 102.2s elapsed
+  2200/2925 entries, 111.3s elapsed
+  2300/2925 entries, 120.5s elapsed
+  2400/2925 entries, 132.7s elapsed
+  2500/2925 entries, 144.7s elapsed
+  2600/2925 entries, 159.4s elapsed
+  2700/2925 entries, 180.1s elapsed
+  2800/2925 entries, 200.4s elapsed
+  2900/2925 entries, 221.8s elapsed
+coverage: selection = all
+coverage: selected = 2925
+coverage: of = 2925
+coverage: complete_catalogue = True
+coverage: certified = 2925
+coverage: not_certified = 0
+coverage: not_certified_indices = []
+coverage: least_certified_lower_bound = 250023/250000
+coverage: least_certified_lower_bound_entry = 504
+coverage: gamma = 250023/250000
+coverage: total_boxes = 34465227
+coverage: total_stalled = 0
+coverage: budget_exhausted_entries = []
+coverage: coverage_seconds = 226.46
+coverage: jsonl = guzhou-r012-first-party-001.jsonl
+coverage: jsonl_sha256 = 53ce1c86e6d63bcc9d148154ffaf74ff4ca13d58c49cd0bde90912ebd41d3f3e
+coverage: source_comparison = {'compared': 2925, 'brackets_containing_source_minimum': 2925, 'mismatched_indices': []}
+
+STATUS FULL FULL_CATALOGUE_CERTIFIED: all 2925 catalogue entries certified at or above gamma = 250023/250000 (least certified lower bound 250023/250000 at entry 504); 10 controls passed

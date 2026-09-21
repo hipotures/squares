@@ -1,0 +1,161 @@
+# Retained Session 148 scratch (H-232 ring-centre lane), not a maintained tool: run as written against packing/ at 19cdd4f8, kept as .py.txt so it stays off the import path and out of the Ruff/BasedPyright floor.
+"""Exact analysis of the transported 88-family at L=96/25 for the all-deep class."""
+import json, sys, itertools, time
+from fractions import Fraction as F
+from collections import Counter
+
+SP = sys.argv[1]
+rec = json.load(open(f"{SP}/family-96-25.json"))
+L = F(rec["outer_side"]); B = F(rec["square_side"]); n = rec["n"]
+assert L == F(96,25) and B == F(9977,10000)
+pl = rec["placements"]
+print("placements", len(pl), "total", sum(F(p[3]) for p in pl))
+
+def core(p):
+    t, cx, cy, w, s = (F(v) for v in p)
+    c = (1-t*t)/(1+t*t); sn = 2*t/(1+t*t)
+    h = s/2
+    e1 = (c*h, sn*h); e2 = (-sn*h, c*h)
+    V = [(cx+e1[0]+e2[0], cy+e1[1]+e2[1]), (cx-e1[0]+e2[0], cy-e1[1]+e2[1]),
+         (cx-e1[0]-e2[0], cy-e1[1]-e2[1]), (cx+e1[0]-e2[0], cy+e1[1]-e2[1])]
+    return dict(t=t, cx=cx, cy=cy, w=w, s=s, cos=c, sin=sn, V=V)
+
+C = [core(p) for p in pl]
+
+def clip_poly(poly, hp):  # hp: (a,b,c) keep a*x+b*y<=c
+    a,b,c = hp; out=[]
+    m=len(poly)
+    for i in range(m):
+        P=poly[i]; Q=poly[(i+1)%m]
+        fp=a*P[0]+b*P[1]-c; fq=a*Q[0]+b*Q[1]-c
+        if fp<=0: out.append(P)
+        if (fp<0<fq) or (fq<0<fp):
+            tt=fp/(fp-fq); out.append((P[0]+tt*(Q[0]-P[0]), P[1]+tt*(Q[1]-P[1])))
+    return out
+def area(poly):
+    if len(poly)<3: return F(0)
+    return abs(sum(poly[i][0]*poly[(i+1)%len(poly)][1]-poly[(i+1)%len(poly)][0]*poly[i][1] for i in range(len(poly))))/2
+def meets_open_box(V, x0,x1,y0,y1):
+    p=V
+    for hp in [(-1,0,-x0),(1,0,x1),(0,-1,-y0),(0,1,y1)]:
+        p=clip_poly(p,hp)
+        if not p: return False
+    return area(p)>0
+def contains_point(V, q):  # closed convex polygon (ccw or cw) contains q
+    sgn=0
+    for i in range(4):
+        P=V[i]; Q=V[(i+1)%4]
+        cr=(Q[0]-P[0])*(q[1]-P[1])-(Q[1]-P[1])*(q[0]-P[0])
+        if cr==0: continue
+        s=1 if cr>0 else -1
+        if sgn==0: sgn=s
+        elif s!=sgn: return False
+    return True
+
+half=F(1,2); one=F(1)
+corners=[(0,0),(L,0),(0,L),(L,L)]
+def box_at(j):
+    x,y=corners[j]
+    xs=(half,one) if x==0 else (L-one,L-half)
+    ys=(half,one) if y==0 else (L-one,L-half)
+    return xs[0],xs[1],ys[0],ys[1]
+def penetration(V,j):
+    x,y=corners[j]
+    return min((v[0] if x==0 else L-v[0])+(v[1] if y==0 else L-v[1]) for v in V)
+
+# classification
+corner_cores=[]; deep=[]
+for i,c in enumerate(C):
+    c["box"]=[j for j in range(4) if meets_open_box(c["V"],*box_at(j))]
+    c["pen"]=[penetration(c["V"],j) for j in range(4)]
+    c["deep"]=[j for j in range(4) if c["pen"][j]<half]
+    c["wall"]=min(min(v[0],v[1],L-v[0],L-v[1]) for v in c["V"])  # distance of core to nearest wall
+    c["angle_deg"]=None
+import math
+for c in C:
+    c["angle_deg"]=math.degrees(2*math.atan(float(c["t"])))
+    c["fold"]=min(c["angle_deg"]%90, 90-(c["angle_deg"]%90))
+
+box_mass=sum(c["w"] for c in C if c["box"])
+deep_mass=sum(c["w"] for c in C if c["deep"])
+print("cores meeting an open corner box:", sum(1 for c in C if c["box"]), "mass", box_mass)
+print("cores with penetration<1/2 at some corner:", sum(1 for c in C if c["deep"]), "mass", deep_mass)
+print("same set?", all(bool(c['box'])==bool(c['deep']) for c in C))
+per_corner=[sum(c["w"] for c in C if j in c["box"]) for j in range(4)]
+print("mass per corner box", per_corner)
+residual=[c for c in C if not c["box"]]
+print("residual cores", len(residual), "mass", sum(c["w"] for c in residual))
+# corner-core geometry
+for c in C:
+    if c["box"]:
+        pass
+cc=[c for c in C if c["box"]]
+print("corner cores: angles(deg) fold", sorted(set(round(c["fold"],4) for c in cc)))
+print("corner cores min penetration", min(min(c["pen"]) for c in cc), "max of their min-pen", max(min(c["pen"]) for c in cc))
+# does each corner core contain the inset box X' = [1-beta/2,(1+beta)/2]^2 with beta=B/(1+D)?
+D=F(207107,90000000); beta=B/(1+D)
+xlo=1-beta/2; xhi=(1+beta)/2
+print("beta=",beta, float(beta), "X'=[",xlo,",",xhi,"]^2 ~", float(xlo), float(xhi))
+def frame_pt(j,x,y):
+    X,Y=corners[j]
+    return ((x if X==0 else L-x),(y if Y==0 else L-y))
+ok=True
+for c in cc:
+    for j in c["box"]:
+        for (x,y) in [(xlo,xlo),(xlo,xhi),(xhi,xlo),(xhi,xhi)]:
+            if not contains_point(c["V"], frame_pt(j,x,y)): ok=False
+print("every corner core contains X' corners:", ok)
+# wall-class census on the residual: distance of core to nearest wall
+wall_res=[c for c in residual if c["wall"]<half]
+print("residual cores meeting open wall strip depth<1/2:", len(wall_res), "mass", sum(c["w"] for c in wall_res))
+central=[c for c in residual if c["wall"]>=half]
+print("central cores:", len(central), "mass", sum(c["w"] for c in central))
+print("central fold angles:", sorted(Counter(round(c["fold"],3) for c in central).items()))
+print("central min wall distance:", min(c["wall"] for c in central), float(min(c["wall"] for c in central)))
+print("wall_res fold angles:", sorted(Counter(round(c["fold"],3) for c in wall_res).items()))
+for c in wall_res[:8]:
+    pass
+# min x-coordinate of the mid-wall cores' inner edge (R1: 1.005)
+def core_extent(c):
+    xs=[v[0] for v in c["V"]]; ys=[v[1] for v in c["V"]]
+    return min(xs),max(xs),min(ys),max(ys)
+mw=[c for c in wall_res]
+print("mid-wall cores extents (first 4):")
+for c in mw[:4]:
+    print("  t=",c["t"],"centre",float(c["cx"]),float(c["cy"]),"w",c["w"],"ext",[float(v) for v in core_extent(c)])
+# check the central box [1, L-1]^2 : which residual cores are inside it?
+inside=[c for c in residual if all(1<=v[0]<=L-1 and 1<=v[1]<=L-1 for v in c["V"])]
+print("residual cores inside [1,L-1]^2:", len(inside), "mass", sum(c["w"] for c in inside))
+print("L-2 =", L-2, float(L-2))
+
+# ring-centre overlap relation
+def polys_overlap(V1,V2):
+    p=V1
+    for i in range(4):
+        P=V2[i]; Q=V2[(i+1)%4]
+        # half-plane of V2's edge containing V2 (V2 orientation)
+        # determine orientation
+        pass
+    # generic: intersect V1 with V2 via clipping by each edge of V2 with proper orientation
+    o = sum(V2[i][0]*V2[(i+1)%4][1]-V2[(i+1)%4][0]*V2[i][1] for i in range(4))
+    for i in range(4):
+        P=V2[i]; Q=V2[(i+1)%4]
+        a=-(Q[1]-P[1]); b=(Q[0]-P[0])  # normal
+        if o<0: a,b=-a,-b
+        # inside: a*(x-P0)+b*(y-P1) >= 0  -> -a x - b y <= -(a P0 + b P1)
+        p=clip_poly(p,(-a,-b,-(a*P[0]+b*P[1])))
+        if not p: return False
+    return area(p)>0
+ring=[c for c in C if c["box"] or c["wall"]<half]
+print("ring cores", len(ring), "mass", sum(c["w"] for c in ring))
+cnt=0
+for c in central:
+    if any(polys_overlap(c["V"],r["V"]) for r in ring): cnt+=1
+print("central cores overlapping (positive area) at least one ring core:", cnt, "/", len(central))
+cnt2=sum(1 for c in central if any(polys_overlap(c["V"],r["V"]) for r in residual if r is not c and r["wall"]<half))
+print("central cores overlapping a mid-wall (residual ring) core:", cnt2)
+
+json.dump({"residual_idx":[i for i,c in enumerate(C) if not c["box"]],
+           "central_idx":[i for i,c in enumerate(C) if not c["box"] and c["wall"]>=half]}, open(f"{SP}/classes.json","w"))
+# save core vertices for the arrangement step
+json.dump([{"w":str(c["w"]),"V":[[str(v[0]),str(v[1])] for v in c["V"]],"t":str(c["t"]),"box":c["box"],"wall":str(c["wall"])} for c in C], open(f"{SP}/cores.json","w"))

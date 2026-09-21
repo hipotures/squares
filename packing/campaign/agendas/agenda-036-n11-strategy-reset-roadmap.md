@@ -8,7 +8,7 @@ softschema:
 agenda:
   id: agenda-036
   title: N11 Strategy-Reset Roadmap
-  updated: '2026-09-15'
+  updated: '2026-09-16'
   status: active
   objective: >-
     Reconcile the merged research record, then choose among routes that can either
@@ -207,6 +207,62 @@ agenda:
       - packing/campaign/agent-sessions/session-131-n11-w5-validation-efficiency.md
       disposition: retire-success
       follow_up: think-d3h5
+    - scope: >-
+        Correction of 2026-09-15, by addition. The checks-tier measured baseline the
+        outcome above says is still owed, and who owns it.
+      classification: never-opened
+      result: >-
+        BC-340 misrouted the still-owed hosted baseline to scientific bead think-d3h5.
+        Measurement belonged to think-gsz0, which remained unresolved for eight days and
+        was later closed as superseded after think-z121 recorded the predecessor
+        topology. That seven-run baseline is historical evidence, not a measurement of
+        the current seven-part surface. think-97we owns the exact-head replacement
+        measurements and their retained history.
+      evidence:
+      - packing/devtools/gate-budgets.yaml
+      - packing/devtools/read_tier_walls.py
+      disposition: defer-dependency
+      follow_up: think-97we
+  - id: BC-355
+    purpose: tool_validation
+    owner_focus: efficiency
+    instances: [11]
+    state: in_progress
+    priority: 0
+    question: >-
+      Can the CI topology, gate-cost register, and validation-lane contract keep
+      ordinary research feedback within 180 seconds while reserving slow, exhaustive,
+      deferred, golden, and strict checks for explicit checkpoints?
+    budget: >-
+      One W7 pipeline-improvement block over the reconciled pull-request topology, with
+      measured W5 decisions and an independent W2 review. Preserve the complete
+      seven-part fast surface; move work off the critical path only when an equivalence
+      guard retains its coverage and failure behavior.
+    entry: >-
+      BC-340's correction assigns current-topology measurements to think-97we, while
+      PRs 183, 185, and 186 carry overlapping Pages, Packing, and wall-budget changes
+      that cannot be merged as independent final designs.
+    exit: >-
+      Exact-head hosted Packing and Pages aggregates pass within 180 seconds; every
+      fast partition remains represented; budget history, attribution, tree reuse, and
+      artifact synchronization fail closed; the edit, push, pull-request, and
+      checkpoint lanes are documented; and superseded pull requests and beads have an
+      explicit disposition.
+    bead: think-97we
+    depends_on: [BC-340]
+    next_evidence: >-
+      Complete exact-head hosted measurements and independent re-review, then resume
+      BC-343 under think-ufmk without changing H-163, allocating exp-161, or running a
+      scientific target.
+    workflows: [pipeline-improvement, efficiency-loop, factual-review]
+    program: gate-cost
+    artifacts:
+    - packing/campaign/agent-sessions/session-136-ci-topology-reconciliation.md
+    - packing/campaign/agent-sessions/session-137-ci-topology-continuation-recovery.md
+    - docs/project/specs/active/plan-2026-09-06-validation-efficiency-and-checkpoints.md
+    - development.md
+    - packing/devtools/gate-budgets.yaml
+    parallel_group: ci-topology-reconciliation
   - id: BC-353
     purpose: tool_validation
     owner_focus: process
@@ -353,7 +409,7 @@ agenda:
     purpose: research
     owner_focus: insight
     instances: [11]
-    state: in_progress
+    state: blocked
     priority: 0
     question: >-
       Does T-025's exact atom-support universe admit a certificate at side 3.82 with at
@@ -375,11 +431,15 @@ agenda:
       exact coverage routes agreeing; or exact infeasibility refutes it. Bounded search
       without a candidate may park only this family as unresolved.
     bead: think-ufmk
-    depends_on: [BC-354]
+    depends_on: [BC-354, BC-355]
     next_evidence: >-
-      Under think-ufmk, use a fresh branch to register exp-161, its exact source, target
-      budget, accept rule, stop rule, independent-review boundary, and retained evidence
-      paths before changing any weight or running coverage.
+      Session 139 registered exp-161 on 2026-09-18 and closed the admission-synthetic
+      accept hole: live `admit_threshold_compression --check`, `--authorize-target
+      exp-161`, forbidden control-manifest SHA-256 values, `generating_account`, and
+      timeout maps to unresolved. The named producer is in-tree and emits no candidate;
+      a coverage-encoding search is still required before any scientific target.
+      BC-355's pull-request walls remain advisory under think-g4n9; that does not
+      reopen the admitted instrument.
     workflows: [pipeline-improvement, factual-review, research-loop]
     program: n11-strategy-reset
     artifacts:
@@ -388,6 +448,7 @@ agenda:
     - packing/campaign/agent-sessions/session-134-n11-route-s-admission.md
     - packing/campaign/agent-sessions/session-135-n11-route-s-guard-discharge.md
     - packing/cases/n11_threshold_certificate/route-s-compression-admission-receipt.json
+    - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-161-h163-route-s-threshold-compression.md
     parallel_group: proof-simplification
   - id: BC-344
     purpose: research
@@ -567,10 +628,10 @@ BC-340 and BC-353 are complete.
 BC-354 stopped at Route A’s representation boundary: the complete physical root, matched
 exact baseline, conditional gate, and independent replay were not admitted.
 No target ran and no physical root closed.
-Route S / BC-343 is now in progress under `think-ufmk`. Its no-target PR merged as
-`1d9c49c4` from reviewed head `609d7d62`, freezing T-025’s exact 119-orbit support
-universe, the at-most-23 positive-orbit metric, deterministic decompression, and
-target-blind controls.
+Route S / BC-343 has an admitted no-target instrument and is blocked on BC-355’s
+closeout under `think-97we`. Its no-target PR merged as `1d9c49c4` from reviewed head
+`609d7d62`, freezing T-025’s exact 119-orbit support universe, the at-most-23
+positive-orbit metric, deterministic decompression, and target-blind controls.
 Session 135 discharged all four obligations retained by Session 134: complete T-025 and
 T-026 contents bound to a declared Git revision and repository-relative paths, both
 T-026 sentinels, a canonical source-bound manifest, and the complete X-032 mutation
@@ -586,11 +647,11 @@ gaps.
 The W10 review originally mapped six active hours into five sequential PR-bounded
 blocks. BC-340 and BC-353 completed, and BC-354 activated the selected-route admission’s
 guard-refusal branch.
-The remaining conditional path begins with a fresh planning branch under `think-ufmk`.
-That branch must register `exp-161`, its exact target, budget, accept rule, stop rule,
-and review boundary before any target access.
-Review and replanning follow the bounded run; no later branch starts before the prior PR
-merges.
+After BC-355’s topology merge, the remaining conditional path is the exp-161 target
+under `think-ufmk`. Session 139 registered that experiment; the producer it names must
+exist before any target access.
+Review and replanning follow the bounded run.
+BC-355’s pull-request walls stay advisory under `think-g4n9` until they hold 180 s.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

@@ -1,0 +1,55 @@
+certificate  packing/resources/web/n17-weighted-certificates-2026-09-20/mira-17squares/certificates/lower_bound_4p613/best-certificate.json
+sha256       749f13335980a66a27a2304f212b5d8796390c81b962149647a4d9ff43a228ec
+source       github.com/Mira-acc/17squares @ 0266c9936a303817ac7da0802364034a34fb2558
+id           Mira-17-squares-spatial-pricing-4613/1000
+claim field  'candidate only; exact replay required'
+shape        n = 17, L = 4613/1000, B = 19997/20000, 1620 atoms, 2881 net directions, symmetry D4
+bound        s(17) >= 4613/1000 if every condition holds
+grid         one direction's dense event grid is 80.2 MiB
+interpreter  3.14.7 (macOS-26.5.2-arm64-arm-64bit-Mach-O)
+worktree     /Users/levy/wrk/github/squares/.claude/worktrees/n17-4613-intake at 061e9ffbcf3508acb11fc968abd1e1dd762950cd
+
+Containment inequalities, evaluated exactly (Fractions, nothing rounded)
+  B = 19997/20000
+  D = 207107/1440000000  (largest half-gap tangent of the net)
+  [this repository, Condition 4]  B(1 + D) = 28799821518679/28800000000000 = 0.999993802731909  -> HOLDS
+      slack 1 - B(1 + D) = 178481321/28800000000000
+  [Mira's proof note / T-022 sharpened form]  B^2(1 + D)^2 < 1 + D^2  -> HOLDS
+      B^2(1 + D)^2 = 829429719507765981945905041/829440000000000000000000000
+      1 + D^2      = 2073600042893309449/2073600000000000000
+      slack        = 3432549852599218031653/276480000000000000000000000
+  Condition 4 as this repository states it is satisfied; the sharper
+  inequality is reported for comparison and carries no weight in the verdict.
+
+Stage 2: the interval verifier, sqpack.fractional.interval.verify_by_intervals
+  doubled net of 5761 directions (theta_k and pi/2 - theta_k), so the D4
+  reflection argument is never invoked and Condition 1 is not needed.
+  enclose=True: no pruning, so the least covered mass is pinned, not just decided.
+
+  [PASS] Condition 2 total mass below n
+         total 849899249/50000000 against n = 17, exact integers
+  [PASS] Condition 3 net reaches pi/4
+         t_K^2 + 2 t_K - 1 in [1.238e-06, 1.238e-06]
+  [PASS] Condition 4 containment B(1 + D) < 1
+         B(1 + D) in [0.999993802732, 0.999993802732]
+  [PASS] Condition 5 every admissible centre covers mass 1
+         5761 directions, 70019687 boxes, 0 stalled, 0 budget-exhausted; least point mass 1000002103/1000000000 at 2194
+
+  directions searched 5761: 5761 certified, 0 refuted, 0 undecided
+  boxes 70019687, stalled 0, budget-exhausted 0
+  least covered mass enclosed in [1000002103/1000000000, 1000002103/1000000000]
+                              = [1.000002103000000, 1.000002103000000]
+  enclosure width 0
+
+  Against the source's declared numbers:
+  total mass: 849899249/50000000 = 16.997984980000000
+    source declares 849899249/50000000 -> AGREES
+  least cell mass: source declares 1000002103/1000000000 = 1.000002103000000
+    inside the enclosure -> YES
+
+  5761 directions in 1702.2 s
+
+certificate bytes re-read after the replay: UNCHANGED
+
+receipt written to resources/web/n17-weighted-certificates-2026-09-20/receipts/mira-4613-first-party-interval.json
+REPLAYED: this repository's interval verifier accepts Mira's certificate, so s(17) >= 4613/1000 on its own terms.

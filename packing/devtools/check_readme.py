@@ -7,7 +7,7 @@ counts owned by `defects.yaml` and went stale behind them both times. The counts
 gone now, moved to the generated view that owns them. What is left is the part a
 checker can hold: the layout tree, the report index, the links, and the work model.
 
-Five checks:
+Six checks:
 
 1. **Every link resolves**, including anchors into other documents. README and SYNOPSIS
    cross-reference each other heavily and a dead link between them is invisible until
@@ -24,6 +24,21 @@ Five checks:
    workflow entry points, the agent-session schema must be able to record them, the
    synopsis must define the work units those workflows produce, and retired workflow
    identifiers must not survive elsewhere in repository-owned text.
+6. **New results are complete.** Every result classified as `apparently-novel` or
+   `confirmed-novel` appears in the New Results section, and every concrete result ID
+   named there exists in the register.
+
+Every one of those that asks what is in the directory asks git, not the filesystem. A
+README cannot be wrong about a file the repository does not hold, so such a file cannot
+fail this check. `.gitignore` excludes `.claude/worktrees/`, where the harness puts
+other agents' worktrees inside this checkout; the work-model text scan walked into one
+and failed on a symlink into a `tree-head` checkout that had been removed, and read the
+retired identifier out of that worktree's own sources on the way past.
+`repo_scope.tracked_files` is the answer `check_class_record_claims` moved to after a
+scratch JSON in `attic/` turned its step red (PR 207), and asking it here retires three
+private walks that held three different skip sets. A tracked file this check cannot
+read is a skip carrying its reason, printed but not failed, for the same reason: unread
+bytes are not evidence of drift.
 
 Usage: uv run --frozen python -m devtools.check_readme
 """
@@ -33,8 +48,10 @@ from __future__ import annotations
 import re
 import sys
 from pathlib import Path
+from typing import NamedTuple
 
 from devtools.check_synopsis import check_links
+from devtools.repo_scope import tracked_files, vendored_directories
 from sqpack.yamlio import safe_load
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -44,7 +61,10 @@ README = REPO / "README.md"
 SYNOPSIS = REPO / "SYNOPSIS.md"
 RESEARCH = REPO / "docs/project/research"
 DEFECTS = ROOT / "defects.yaml"
+RESULTS = ROOT / "frontier/results.yaml"
 SESSION_SCHEMA = ROOT / "campaign/schemas/agent-session.schema.yaml"
+
+NEW_RESULT_NOVELTY = frozenset({"apparently-novel", "confirmed-novel"})
 
 WORK_UNITS = (
     "Packing exploration",
@@ -62,29 +82,27 @@ WORK_UNITS = (
     "Ledger",
 )
 
-# Tooling that is not part of what the directory *is*: caches, lockfiles, build config.
-# LICENSE is legal boilerplate rather than orientation content: the layout tree
-# may draw it once the README grows its license summary, but its absence from a
+# Tooling rather than orientation content: lockfiles and build config, should either
+# ever sit at the root, and LICENSE, which is legal boilerplate. The layout tree may
+# draw LICENSE once the README grows its license summary, but its absence from a
 # reader's map of the directory is not a documentation defect.
-# `attic` is where the tbd checkout shortcut clones third-party repositories for
-# review; it is gitignored and never part of the layout.
-# `node_modules` is the browser floor's install directory. It is gitignored, and the
-# floor's own instruction is to create it (`npm ci` at the repository root), so without
-# this every contributor who follows that instruction -- and CI, which runs `npm ci`
-# before the validation steps -- fails a documentation check over an installed
-# dependency tree. `_exists_somewhere` below already skips it for the same reason;
-# these two answers about what counts as content were not the same.
+#
+# What this set no longer names is everything gitignored -- `attic`, where the tbd
+# checkout shortcut clones third-party repositories; `node_modules`, which the browser
+# floor's own instruction and CI both create; the caches and `.venv`. The index does not
+# list them, so nothing here has to remember to, and the two private skip sets that had
+# drifted apart over that same question are gone with them.
 NOT_CONTENT = {
     "uv.lock",
     "pyproject.toml",
-    "__pycache__",
-    ".venv",
     "LICENSE",
-    "attic",
-    "node_modules",
 }
-CACHE_PARTS = {"__pycache__", ".pytest_cache", ".ruff_cache", ".venv"}
-IGNORED_FILES = {".DS_Store"}
+
+#: What every check that reads the tree says when there is no index to ask. Unlike the
+#: class-record sweep, this check cannot fall back to a walk with a stated bound: a walk
+#: is the thing that was wrong, and the check is hardwired to this repository's own
+#: documents, so there is no caller for whom "no git here" is an ordinary case.
+NO_INDEX = "cannot ask git which files this repository tracks, so the directory is unknown"
 
 # This is the repository-owned text surface, not the retained literature archive. The
 # latter is source evidence and may use any ordinary phrase; a workflow migration does
@@ -118,16 +136,12 @@ WORK_MODEL_TEXT_NAMES = {
     ".python-version",
     "Makefile",
 }
-WORK_MODEL_SCAN_PRUNED_DIRS = {
-    ".git",
-    ".mypy_cache",
-    ".pytest_cache",
-    ".ruff_cache",
-    ".tbd",
-    ".venv",
-    "__pycache__",
-    "node_modules",
-    "target",
+#: The retained literature archive's extractions and captures. Tracked, so the index
+#: lists them, and excluded here for the reason the suffix list above gives: they are
+#: source evidence, and a workflow migration does not rewrite what was archived.
+ARCHIVE_PREFIXES = {
+    ("packing", "resources", "papers"),
+    ("packing", "resources", "web"),
 }
 
 #: The README spells its counts out, so the check has to know the word for each one it
@@ -182,40 +196,63 @@ def layout_tree(text: str) -> str | None:
     return None
 
 
-def meaningful_top_level_entries(root: Path) -> set[str]:
-    """Entries with durable content, excluding cache-only migration remnants."""
-    entries: set[str] = set()
-    for entry in root.iterdir():
-        if entry.name.startswith(".") or entry.name in NOT_CONTENT:
-            continue
-        if entry.is_file():
-            if entry.name not in IGNORED_FILES:
-                entries.add(entry.name)
-            continue
-        if any(
-            path.is_file()
-            and path.name not in IGNORED_FILES
-            and not CACHE_PARTS.intersection(path.relative_to(entry).parts)
-            for path in entry.rglob("*")
-        ):
-            entries.add(entry.name)
-    return entries
+def tracked_paths(root: Path) -> tuple[Path, ...] | None:
+    """Every file `root` tracks, relative to it, or `None` where there is no index.
+
+    Asked again per question rather than cached: `main` puts three of them to one tree,
+    and three `git ls-files` runs cost less than a stale answer would. A cache keyed on
+    the root would make the listing a function of when it was first asked, which is the
+    shape of the bug this module is fixing.
+    """
+    listed = tracked_files(root, ".")
+    if listed is None:
+        return None
+    return tuple(path.relative_to(root) for path in listed)
 
 
-def _exists_somewhere(name: str) -> bool:
-    """Whether a nested tree entry exists anywhere the project keeps content.
+def _submodule_parts(root: Path) -> set[tuple[str, ...]]:
+    """Each declared submodule path, split. Git reports a gitlink, not the files inside.
+
+    `tracked_files` therefore drops the submodule entirely, and without this `vendor`
+    would stop being a top-level entry the layout tree has to draw. A declared submodule
+    is content by declaration, which is the rule `repo_scope` already states.
+    """
+    return {Path(declared).parts for declared in vendored_directories(root)}
+
+
+def meaningful_top_level_entries(root: Path) -> set[str] | None:
+    """Top-level entries with durable content, or `None` where there is no index to ask.
+
+    Durable means tracked. The walk this replaced had to recognise a cache-only
+    directory by name to avoid counting a migration remnant as content; git does not
+    list one at all, so the question stopped being asked.
+    """
+    tracked = tracked_paths(root)
+    if tracked is None:
+        return None
+    held = {path.parts[0] for path in tracked}
+    held |= {parts[0] for parts in _submodule_parts(root)}
+    return {name for name in held if not name.startswith(".") and name not in NOT_CONTENT}
+
+
+def content_names(root: Path) -> frozenset[str] | None:
+    """Every bare name a nested tree entry may be drawn by, or `None` with no index.
 
     The tree draws nested entries by bare name, so `atlas` under `packing/` has no
-    repo-relative path of its own. Search for it, but only through project content:
-    walking .git and node_modules to answer a documentation question is pure cost.
+    repo-relative path of its own and has to be matched by segment. Dot-prefixed paths
+    are left out because the tree draws the visible directory: a name that exists only
+    under `.github/` is not a name the reader's map is about.
     """
-    skip = {"node_modules", "__pycache__", ".venv"}
-    if any((base / name).exists() for base in (REPO, REPO / "packing")):
-        return True
-    return any(
-        not any(part in skip or part.startswith(".") for part in path.relative_to(REPO).parts)
-        for path in REPO.rglob(name)
-    )
+    tracked = tracked_paths(root)
+    if tracked is None:
+        return None
+    names = {
+        part
+        for path in tracked
+        if not any(segment.startswith(".") for segment in path.parts)
+        for part in path.parts
+    }
+    return frozenset(names | {part for parts in _submodule_parts(root) for part in parts})
 
 
 def check_layout(text: str) -> list[str]:
@@ -234,6 +271,9 @@ def check_layout(text: str) -> list[str]:
     drawn_any = drawn_top | {name.strip("/") for name in top + nested}
 
     on_disk = meaningful_top_level_entries(REPO)
+    names = content_names(REPO)
+    if on_disk is None or names is None:
+        return [f"README.md: {NO_INDEX}"]
 
     problems = [
         f"README.md: {missing} exists but the layout tree does not show it"
@@ -242,7 +282,7 @@ def check_layout(text: str) -> list[str]:
     problems += [
         f"README.md: the layout tree shows {drawn}, which does not exist"
         for drawn in sorted(drawn_any)
-        if not (REPO / drawn).exists() and not _exists_somewhere(drawn.split("/")[-1])
+        if not (REPO / drawn).exists() and drawn.split("/")[-1] not in names
     ]
     return problems
 
@@ -299,50 +339,97 @@ def check_defect_summary(text: str) -> list[str]:
     return problems
 
 
+def result_coverage_problems(text: str, results: list[dict[str, object]]) -> list[str]:
+    """Reconcile a New Results section with registered novel results."""
+    section = re.search(
+        r"^## New Results\s*$\n(?P<body>.*?)(?=^##\s|\Z)",
+        text,
+        re.MULTILINE | re.DOTALL,
+    )
+    if section is None:
+        return ["README.md: has no New Results section"]
+
+    registered = {str(result["id"]) for result in results}
+    required = {
+        str(result["id"]) for result in results if result.get("novelty") in NEW_RESULT_NOVELTY
+    }
+    named = set(re.findall(r"\bT-\d{3}\b", section.group("body")))
+
+    problems = [
+        f"README.md: New Results does not name novel result {result_id}"
+        for result_id in sorted(required - named)
+    ]
+    problems.extend(
+        f"README.md: New Results names unregistered result {result_id}"
+        for result_id in sorted(named - registered)
+    )
+    return problems
+
+
+def check_result_coverage(text: str) -> list[str]:
+    """Load the results register and check the curated reader-facing section."""
+    register = safe_load(RESULTS.read_text(encoding="utf-8"))
+    return result_coverage_problems(text, register["results"])
+
+
 def workflow_rows(text: str) -> list[tuple[str, str]]:
     """Numbered workflow rows in a Markdown table."""
     return re.findall(r"^\| (W\d+) \| `([^`]+)` \|", text, re.MULTILINE)
 
 
-def check_retired_workflow_identifiers() -> list[str]:
-    """Reject old controlled names without rewriting retained source evidence."""
+def work_model_text(root: Path) -> list[Path] | None:
+    """Every repository-owned text file `root` tracks, or `None` with no index to ask."""
+    tracked = tracked_paths(root)
+    if tracked is None:
+        return None
+    return [
+        root / path
+        for path in tracked
+        if (
+            path.suffix.lower() in WORK_MODEL_TEXT_SUFFIXES
+            or path.name in WORK_MODEL_TEXT_NAMES
+        )
+        and path.parts[:3] not in ARCHIVE_PREFIXES
+    ]
+
+
+class TextScan(NamedTuple):
+    """What the work-model text sweep decided, and what it never got to read."""
+
+    problems: list[str]
+    skipped: list[str]
+
+
+def scan_retired_workflow_identifiers(root: Path = REPO) -> TextScan:
+    """Reject old controlled names without rewriting retained source evidence.
+
+    A file the sweep cannot read is a skip carrying its reason, not a problem. The
+    sweep is looking for a token, and not having read a file is not having found one;
+    reporting it as README drift says the document is wrong about the directory on the
+    strength of bytes nobody looked at. It is still reported, so a tracked file that
+    stops being readable is visible rather than silently dropped.
+    """
     # Assemble the previous W1 slug so the guard does not preserve the token it bans.
     retired = "-".join(("research", "pass"))  # noqa: FLY002 - the literal is what this bans
+    paths = work_model_text(root)
+    if paths is None:
+        return TextScan([f"README.md: {NO_INDEX}"], [])
+
     problems: list[str] = []
-
-    def record_walk_error(error: OSError) -> None:
-        problems.append(f"work-model text scan could not traverse the repository: {error}")
-
-    for directory, directory_names, filenames in REPO.walk(
-        top_down=True, on_error=record_walk_error
-    ):
-        directory_names[:] = sorted(
-            name
-            for name in directory_names
-            if name not in WORK_MODEL_SCAN_PRUNED_DIRS
-            and not (directory == REPO / "packing" / "resources" and name in {"papers", "web"})
+    skipped: list[str] = []
+    for path in paths:
+        relative = path.relative_to(root)
+        try:
+            lines = path.read_text(encoding="utf-8").splitlines()
+        except (OSError, UnicodeDecodeError) as error:
+            skipped.append(f"{relative}: not scanned for retired workflow identifiers: {error}")
+            continue
+        problems.extend(
+            f"{relative}:{line_number}: contains retired workflow identifier"
+            for line_number, line in enumerate(lines, start=1)
+            if retired in line
         )
-        for filename in sorted(filenames):
-            path = directory / filename
-            if (
-                path.suffix.lower() not in WORK_MODEL_TEXT_SUFFIXES
-                and path.name not in WORK_MODEL_TEXT_NAMES
-            ):
-                continue
-            relative = path.relative_to(REPO)
-            try:
-                lines = path.read_text(encoding="utf-8").splitlines()
-            except (OSError, UnicodeDecodeError) as error:
-                problems.append(
-                    f"{relative}: cannot scan for retired workflow identifiers: {error}"
-                )
-                continue
-            problems.extend(
-                f"{relative}:{line_number}: contains retired workflow identifier"
-                for line_number, line in enumerate(lines, start=1)
-                if retired in line
-            )
-    return problems
+    return TextScan(problems, skipped)
 
 
 def check_work_model(text: str) -> list[str]:
@@ -423,22 +510,26 @@ def check_work_model(text: str) -> list[str]:
 
 def main() -> int:
     text = README.read_text(encoding="utf-8")
+    scan = scan_retired_workflow_identifiers()
     problems = (
         check_links(text, README)
         + check_layout(text)
         + check_reports(text)
         + check_defect_summary(text)
+        + check_result_coverage(text)
         + check_work_model(text)
-        + check_retired_workflow_identifiers()
+        + scan.problems
     )
+    for skip in scan.skipped:
+        print(f"  skipped: {skip}")
     if problems:
         print("README.md has drifted from the directory:", file=sys.stderr)
         for problem in problems:
             print(f"  {problem}", file=sys.stderr)
         return 1
     print(
-        "  README.md agrees with the directory, reports, defect source, work model "
-        "and its own links"
+        "  README.md agrees with the directory, reports, defect and result sources, "
+        "work model and its own links"
     )
     return 0
 

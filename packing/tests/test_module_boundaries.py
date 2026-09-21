@@ -164,14 +164,29 @@ def test_no_bash_or_shell_entry_points_remain() -> None:
 
 
 def test_readme_inventory_ignores_cache_only_legacy_directories(tmp_path: Path) -> None:
+    """A migration remnant is not content, and the index is what says so.
+
+    The inventory used to recognise a cache-only directory by name. It now lists what
+    git tracks, so `tools/` holding nothing but bytecode is absent for the same reason
+    every other gitignored path is -- `.gitignore` carries `__pycache__/` already.
+    """
     repository = tmp_path / "repository"
     repository.mkdir()
+    subprocess.run(
+        ("git", "-C", str(repository), "init", "-q"), check=True, capture_output=True
+    )
+    (repository / ".gitignore").write_text("__pycache__/\n", encoding="utf-8")
     (repository / "README.md").write_text("# Example\n", encoding="utf-8")
     (repository / "current").mkdir()
     (repository / "current" / "module.py").write_text("", encoding="utf-8")
     cache = repository / "tools" / "__pycache__"
     cache.mkdir(parents=True)
     (cache / "removed.cpython-314.pyc").write_bytes(b"ignored")
+    subprocess.run(
+        ("git", "-C", str(repository), "add", "README.md", "current/module.py"),
+        check=True,
+        capture_output=True,
+    )
 
     assert meaningful_top_level_entries(repository) == {"README.md", "current"}
 
@@ -350,7 +365,7 @@ def test_ci_jobs_fetch_provenance_history_and_key_the_uv_cache_from_the_lock() -
 
     validate_steps = _mapping(jobs["validate"])["steps"]
     assert isinstance(validate_steps, list)
-    # The pull-request surface is six concurrent jobs after the workbench package took
+    # The pull-request surface is seven concurrent jobs after the workbench package took
     # its frontend contracts out of the checks queue and the suite became two shards:
     # `--checks` here, `--frontend` in the `frontend` job, `--geometry` in the `geometry`
     # job, `--suite-a` and `--suite-b` in their shard jobs, and `--sweeps` in the
@@ -393,6 +408,37 @@ def test_ci_jobs_fetch_provenance_history_and_key_the_uv_cache_from_the_lock() -
     )
     assert " ".join(str(frontend_step["run"]).split()) == (
         "uv run --frozen --all-extras --group dev packing-validate --frontend "
+        "--jobs 2 --inner-jobs 1"
+    )
+    install = next(
+        _mapping(step)
+        for step in frontend_steps
+        if _mapping(step).get("name")
+        == "Install the npm toolchain and the pinned Chromium shell"
+    )
+    assert install.get("working-directory") == "."
+    install_run = str(install["run"])
+    assert "npm ci --ignore-scripts &" in install_run
+    assert "python -m playwright install --with-deps --only-shell chromium" in install_run
+    assert 'wait "$npm_pid"' in install_run
+    assert 'wait "$playwright_pid"' in install_run
+    assert 'test "$npm_status" -eq 0' in install_run
+    assert 'test "$playwright_status" -eq 0' in install_run
+    assert install_run.index("npm ci --ignore-scripts &") < install_run.index('wait "$npm_pid"')
+    assert install_run.index("playwright install") < install_run.index('wait "$playwright_pid"')
+    frontend_names = [_mapping(step).get("name") for step in frontend_steps]
+    assert frontend_names.index(install["name"]) < frontend_names.index(frontend_step["name"])
+    typecheck_job = _mapping(jobs["typecheck"])
+    assert typecheck_job["if"] == "github.event_name == 'pull_request'"
+    typecheck_steps = typecheck_job["steps"]
+    assert isinstance(typecheck_steps, list)
+    typecheck_step = next(
+        _mapping(step)
+        for step in typecheck_steps
+        if _mapping(step).get("name") == "Run the required pull-request type floor"
+    )
+    assert " ".join(str(typecheck_step["run"]).split()) == (
+        "uv run --frozen --all-extras --group dev packing-validate --typecheck "
         "--jobs 1 --inner-jobs 1"
     )
     geometry_job = _mapping(jobs["geometry"])
@@ -438,6 +484,16 @@ def test_ci_jobs_fetch_provenance_history_and_key_the_uv_cache_from_the_lock() -
             if str(_mapping(step).get("uses", "")).startswith("actions/checkout@")
         )
         assert _mapping(suite_checkout["with"])["fetch-depth"] == 0
+        # Neither partial form. Both were run against the whole lane, and the suite-a
+        # checkout comment has the counts: a blobless clone makes 66 tests fetch history
+        # over the network, and a sparse checkout without `packing/resources/*/` and
+        # `packing/campaign/*/` fails 426 tests and quietly skips three more.
+        assert "filter" not in _mapping(suite_checkout["with"])
+        assert "sparse-checkout" not in _mapping(suite_checkout["with"])
+        assert not any(
+            "setup-node" in str(_mapping(step).get("uses", "")) for step in suite_steps
+        )
+        assert not any("npm ci" in str(_mapping(step).get("run", "")) for step in suite_steps)
     sweep_steps = _mapping(jobs["sweeps"])["steps"]
     assert isinstance(sweep_steps, list)
     sweep_step = next(
@@ -449,6 +505,27 @@ def test_ci_jobs_fetch_provenance_history_and_key_the_uv_cache_from_the_lock() -
         "uv run --frozen --all-extras --group dev packing-validate --sweeps "
         "--jobs 4 --inner-jobs 2"
     )
+    sweep_checkout = next(
+        _mapping(step)
+        for step in sweep_steps
+        if str(_mapping(step).get("uses", "")).startswith("actions/checkout@")
+    )
+    sweep_checkout_options = _mapping(sweep_checkout["with"])
+    assert sweep_checkout_options["filter"] == "blob:none"
+    assert sweep_checkout_options["sparse-checkout-cone-mode"] is False
+    assert sweep_checkout_options["persist-credentials"] is False
+    sparse = set(str(sweep_checkout_options["sparse-checkout"]).splitlines())
+    assert {
+        "!/packing/campaign/*/",
+        "!/packing/resources/",
+        "/packing/resources/web/kingbird-squares-in-squares.html",
+        "/packing/resources/web/known-best-packings/",
+        "/packing/resources/web/prospective-packings/",
+        "/packing/resources/web/unitsquare-release1-2026/",
+        "/packing/resources/papers/kingbird-square-29-provenance.svg",
+        "/packages/workbench/",
+        "/vendor/kpress/",
+    } <= sparse
     full_step = next(
         _mapping(step)
         for step in validate_steps
@@ -515,12 +592,13 @@ def test_ci_jobs_fetch_provenance_history_and_key_the_uv_cache_from_the_lock() -
     required_job = _mapping(jobs["packing-required"])
     # Every part of the pull-request surface, and this is the assertion that keeps them
     # mandatory. Splitting `--fast` across concurrent jobs buys wall time only if a pull
-    # request still cannot merge without all of them, so a `needs` naming five of the
-    # six would turn the sixth into an advisory check that nothing blocks on -- the
+    # request still cannot merge without all of them, so a `needs` naming six of the
+    # seven would turn the seventh into an advisory check that nothing blocks on -- the
     # failure mode the split is otherwise a clean win against.
     assert required_job["needs"] == [
         "validate",
         "frontend",
+        "typecheck",
         "geometry",
         "suite-a",
         "suite-b",
@@ -537,13 +615,14 @@ def test_ci_jobs_fetch_provenance_history_and_key_the_uv_cache_from_the_lock() -
     assert "continue-on-error" not in required_job
     required_job_steps = required_job["steps"]
     assert isinstance(required_job_steps, list)
-    # One `test` per prerequisite, and all six of them, because `needs` alone does not
+    # One `test` per prerequisite, and all seven of them, because `needs` alone does not
     # make a job's failure fatal here: this job runs under `!cancelled()`, so it is reached
     # even when a prerequisite failed, and it is the shell that decides. A missing line
     # would leave that part of the surface green whatever it reported.
     required_command = " ".join(str(_mapping(required_job_steps[0])["run"]).split())
     assert required_command == (
         'test "$VALIDATE_RESULT" = "success" test "$FRONTEND_RESULT" = "success" '
+        'test "$TYPECHECK_RESULT" = "success" '
         'test "$GEOMETRY_RESULT" = "success" test "$SUITE_A_RESULT" = "success" '
         'test "$SUITE_B_RESULT" = "success" '
         'test "$SWEEPS_RESULT" = "success"'
@@ -552,11 +631,25 @@ def test_ci_jobs_fetch_provenance_history_and_key_the_uv_cache_from_the_lock() -
     assert required_env == {
         "VALIDATE_RESULT": "${{ needs.validate.result }}",
         "FRONTEND_RESULT": "${{ needs.frontend.result }}",
+        "TYPECHECK_RESULT": "${{ needs.typecheck.result }}",
         "GEOMETRY_RESULT": "${{ needs.geometry.result }}",
         "SUITE_A_RESULT": "${{ needs.suite-a.result }}",
         "SUITE_B_RESULT": "${{ needs.suite-b.result }}",
         "SWEEPS_RESULT": "${{ needs.sweeps.result }}",
     }
+    wall_step = next(
+        _mapping(step)
+        for step in required_job_steps
+        if _mapping(step).get("name") == "Hold the pull request's wall to its budget"
+    )
+    assert wall_step["if"] == "always() && github.event_name == 'pull_request'"
+    assert _mapping(wall_step["env"])["EXPECTED_PREREQUISITES"] == "${{ toJSON(needs) }}"
+    wall_checkout = next(
+        _mapping(step)
+        for step in required_job_steps
+        if _mapping(step).get("name") == "Check out the wall budget and its register"
+    )
+    assert _mapping(wall_checkout["with"])["filter"] == "blob:none"
 
     # The macOS job is a second-architecture smoke check, not a second full gate.
     # It used to run the whole surface, which reached the composite-PDF step, whose
@@ -637,6 +730,7 @@ def test_exhaustive_exact_marker_is_declared_only_by_measured_slow_nodes() -> No
             "test_the_live_n12_certificate_is_accepted_on_the_full_doubled_net",
             "test_the_retained_n11_certificate_is_accepted_on_the_full_doubled_net",
             "test_the_retained_n17_certificate_is_accepted_on_the_full_doubled_net",
+            "test_the_retained_n18_certificate_is_accepted_on_the_full_doubled_net",
             "test_the_retained_n20_certificate_is_accepted_on_the_full_doubled_net",
             "test_massaccesi_n17_reproduces_the_published_bound_on_the_full_doubled_net",
         },
@@ -817,6 +911,24 @@ def test_the_slow_marker_is_declared_only_by_measured_nodes() -> None:
             "test_changed_minimal_polynomial_is_refused",  # 7.4s
             "test_n54_source_formula_closes_in_one_quartic_field",  # 3.2s
         },
+        # 74s of call time across 4, measured 2026-09-20 on a four-cpu box. Two are one
+        # whole run of the Theorem 11 replay table each, and 14s of the 15s is the
+        # unavoidability screen: 619 exact tilings of `[0, 5]^2`, one per configuration
+        # the proof's row moves reach. The third classifies all 167,915 structure pairs
+        # of the n=21 inventory, with the merge propagation on every non-forced one.
+        # The fourth classifies the 12,100 pairs of the n=32 inventory at 50 digits,
+        # which is what pins the counts exp-217's verdict is built on; it was added
+        # when a review found nothing pinning them, and it is the whole tool, so no
+        # shorter form of it exists. Not a shared build -- the two replays differ in
+        # the finishing-line constant, so neither can pay for the other, the two
+        # inventories are different configurations at different sides and share
+        # nothing with them, and the file's six unmarked tests cost 1.6s between them.
+        "test_bentz2016_tools.py": {
+            "test_the_whole_n21_inventory_reports_both_sides_of_the_propagation",  # 30.6s
+            "test_the_n32_inventory_reports_the_counts_exp217_scores_on",  # 21.7s
+            "test_the_replay_fails_at_the_line_the_transcription_printed_before_d505",  # 11.0s
+            "test_the_replay_table_holds_at_the_printed_constants",  # 10.9s
+        },
         # 4s of call time across 2.
         "test_bentz46.py": {
             "test_certificate_refuses_a_displaced_point",  # 2.2s
@@ -893,6 +1005,17 @@ def test_the_slow_marker_is_declared_only_by_measured_nodes() -> None:
             # 34139067270) before the surface copy was cut to the atlas sample's stride.
             "test_every_known_best_witness_agrees_with_its_manifest_entry",
         },
+        # 33s of call time across 1, measured 2026-09-20 on a four-cpu box: the T-031
+        # retention gate replayed on the case certificate, both routes over its 680
+        # atoms -- 1,743,736 interval boxes and the exact event-cell sweep of the
+        # clipped row domain. Not a shared build -- the file's three other tests read
+        # the frozen bytes and cost 0.01s between them, and the refusal without
+        # `--corner-clip` never reaches either route, so it stays on the pull-request
+        # surface -- so this pays only for itself. It is the control that makes the two
+        # T-031 evidence atoms' `replay_status: passed` a measurement.
+        "test_n11_corner_class_certificate.py": {
+            "test_the_gate_decides_the_case_certificate_under_the_corner_clip",  # 33.4s
+        },
         # 47s of call time across 1: the interval route over the whole doubled net of the
         # retained threshold certificate, 361 directions and 1,639,903 boxes at one
         # worker. Not a shared build -- the file's other seven tests sweep one direction
@@ -961,16 +1084,25 @@ def test_the_slow_marker_is_declared_only_by_measured_nodes() -> None:
         "test_n54_source_contract_independent.py": {
             "test_author_and_verifier_are_normal_optimized_byte_identical",  # 7.6s
         },
-        # 11s of call time across 2.
+        # 8s of call time across 1 when measured; 1.92s locally after the fixture cuts.
+        # `test_a_declared_count_disagreement_blocks_readiness` left at 0.67s on hosted
+        # run 35208147744, below the slow floor, and runs on the pull-request surface.
         "test_n5_local_rigidity.py": {
             "test_every_control_rejects",  # 8.0s
-            "test_a_declared_count_disagreement_blocks_readiness",  # 2.6s
         },
         # 8s of call time across 1; 8.15s on the hosted PR runner. This directly copies
         # the source tree into a worker and has no shared builder whose cost can move to
         # a neighbouring test, so the slow marker is the measured classification.
         "test_negative_controls.py": {
             "test_build_caches_leave_the_counted_surface_and_the_worker_trees",  # 8.15s on CI
+        },
+        # 3s of call time across 1, measured 2026-09-20: `git worktree add --detach` of
+        # Session 148's opening commit -- a whole checkout of the tree -- and then
+        # `git apply --check` of both retained partial diffs in it. The file's two other
+        # tests read the patches' header lines and cost nothing. It needs the base
+        # commit, so it belongs in the lane that checks out with `fetch-depth: 0`.
+        "test_retained_patches_apply.py": {
+            "test_every_retained_patch_applies_to_its_declared_base",  # 3.3s
         },
         # 16s of call time across 1.
         "test_promote_elimination.py": {

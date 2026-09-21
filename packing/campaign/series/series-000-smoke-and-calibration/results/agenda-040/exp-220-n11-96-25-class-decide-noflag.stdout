@@ -1,0 +1,2 @@
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-220-n11-96-25-class-covering.json: REFUSED: cannot load certificate: variant 'class' is declared, and this gate implements only the unconditional conditions; a class certificate cannot be decided here. The one exception is the corner class: pass --corner-clip d

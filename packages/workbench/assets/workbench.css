@@ -1,29 +1,177 @@
+/* The workbench's design tokens: every colour, space, type size, weight, line height, radius,
+   border width, shadow, layer and duration the page uses is declared here and nowhere else.
+   `tests/design-system.test.ts` refuses a raw value for any of those properties outside this
+   block, checks the text and component colour pairs below against WCAG AA, and
+   `workbench_tools.check_layout` measures the page structure they produce in Chromium.
+
+   Three families of token, kept apart because they answer to different owners:
+   - UI chrome (`--color-*`, `--space-*`, `--font-*`, `--radius-*`, `--control-*`, `--layout-*`):
+     the controls around the stage. A 4 px spacing scale and a five-step type scale.
+   - The stage (`--stage-*`): the 1920 x 1080 poster the video is captured from. Its sizes are
+     stage pixels, chosen and measured for video, and do not follow the UI scale.
+   - Scene and plot colours (`--scene-*`, `--plot-*`): what is drawn, not chrome. Square fills
+     come from `sqpack.render` through the corpus and are not tokens at all. */
 :root {
-  --ink: #17202a;
-  --muted: #5c6673;
-  --label: #47525f;
-  --quiet: #8a939e;
-  --quiet-rule: #c9cfd5;
-  --new: #a3123f;
-  /* Revision 8: the one green on the page, and it means one thing — the best known arrangement.
-     It marks the stage when the arrangement is the best known one, the best known upper bound
-     on the gap bar, and, since 2026-09-13, the stage's box and its pointer once the box locks at
-     that side. */
-  --met: #17794a;
-  --paper: #ffffff;
-  --panel: #f7f8fa;
-  --chrome: #e6e8eb;
-  --rule: #d5d9de;
-  --track: #dfe3e7;
-  /* "Atlas Symbols" is KaTeX_Main restricted to the relation code points (≤ ≥ √ ≈ …) that the
-     latin subsets do not carry; it follows PT Serif so those glyphs never fall back to Georgia. */
-  --serif: "PT Serif", "Atlas Symbols", Georgia, "Times New Roman", serif;
-  --sans: "Source Sans 3", "Atlas Symbols", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  /* metabrowser's accent and fast transition, which its resize handle is drawn in. */
-  --handle-accent: oklch(54.14% 0.1337 246.71);
-  --transition-fast: 150ms ease;
+  /* Colour: surfaces. */
+  --color-page: #e6e8eb;
+  --color-surface: #ffffff;
+  --color-surface-hover: #f3f5f7;
+  --color-surface-selected: #eef1f4;
+  /* Colour: text. `muted` is the quietest text the chrome sets: 4.75:1 on the page. */
+  --color-text: #17202a;
+  --color-text-label: #47525f;
+  --color-text-muted: #5c6673;
+  --color-text-inverse: var(--color-surface);
+  /* Colour: lines. A control's own border has to read against the page it can sit on (WCAG
+     1.4.11, 3:1); a panel's border and a divider only group, and are quieter. */
+  --color-border: #d5d9de;
+  --color-border-control: #7d8590;
+  --color-divider: #dfe3e7;
+  /* Colour: accent and selection. The chrome's one accent is ink: a primary action, a chosen
+     segment or chip, the tab that is showing. */
+  --color-accent: var(--color-text);
+  --color-accent-hover: #2b3947;
+  --color-selected: var(--color-accent);
+  --color-selected-text: var(--color-text-inverse);
+  /* Colour: status. Scarlet is a bound first proved here and the proved lower bound; green is
+     the best known arrangement, and nothing else on the page is green. */
+  --color-status-new: #a3123f;
+  --color-status-best: #17794a;
+  /* Colour: focus. Scarlet for every control and the stage; the separator keeps metabrowser's
+     accent, which its resize handle is drawn in. */
+  --color-focus: var(--color-status-new);
+  --color-focus-separator: oklch(54.14% 0.1337 246.71);
+
+  /* Scene: what the stage draws besides the squares. */
+  --scene-paper: var(--color-surface);
+  --scene-ink: var(--color-text);
+  --scene-black: #000000;
+  --scene-rule: #0c1116;
+  --scene-track: var(--color-divider);
+  --scene-open: #8a939e;
+  --scene-reference: #9aa3ad;
+  --scene-ghost: var(--color-text-muted);
+  --scene-proved: var(--color-status-new);
+  --scene-best: var(--color-status-best);
+  --scene-heading: #8a939e;
+  --scene-label: var(--color-text-label);
+  --scene-badge: var(--color-text-muted);
+  --scene-badge-query: #c9cfd5;
+  --scene-shadow: 0 8px 40px rgb(23 32 42 / 18%);
+  /* Scene: the frames around the packing, all one width (the owner, 2026-09-17). The catalogue's
+     box is green where it locks at the best known side and medium grey on its way; the container
+     Pack and the animation studio draw is that grey too; the trace of where the box just was is
+     the lightest grey the page draws a line in. */
+  --scene-frame-width: 4px;
+  --scene-frame: var(--color-border-control);
+  --scene-frame-locked: var(--scene-best);
+  --scene-trace: var(--color-divider);
+  /* Scene: the repository's address at the stage's bottom right, in the frames' grey. */
+  --scene-attribution: var(--scene-frame);
+  /* Plot: the force-law editor's drawing. */
+  --plot-field: #fbfcfd;
+  --plot-zero: var(--scene-reference);
+  --plot-axis: #c8ced4;
+  --plot-pull: #7a5aa8;
+  --plot-text: var(--color-text-muted);
+  --plot-font-size: 9px;
+
+  /* Type: families. The names and stacks are kpress's (`--font-sans`, `--font-serif`,
+     `--font-mono`). "Atlas Symbols" is KaTeX_Main restricted to the relation code points
+     (≤ ≥ √ ≈ …) that the latin subsets do not carry; it follows each text face so those glyphs
+     never fall back to Georgia. */
+  --font-sans:
+    "Source Sans 3", "Atlas Symbols", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  --font-serif: "PT Serif", "Atlas Symbols", Georgia, "Times New Roman", serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  /* Type: the chrome's scale. */
+  --font-size-caps: 11px;
+  --font-size-xs: 12px;
+  --font-size-sm: 13px;
+  --font-size-body: 14px;
+  --font-size-heading: 18px;
+  --font-weight-strong: 600;
+  --font-weight-bold: 700;
+  --line-height-body: normal;
+  --line-height-readout: 16px;
+  --letter-spacing-caps: 0.1em;
+
+  /* Space: a 4 px scale. */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-8: 32px;
+  --space-12: 48px;
+
+  /* Shape. */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --border-width: 1px;
+  --border-width-strong: 2px;
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+
+  /* Layout: one page structure for every mode. The controls sit inside `--layout-gutter`; every
+     block in them, and every panel in a row of panels, is `--layout-stack-gap` from the next. */
+  --layout-gutter: var(--space-4);
+  --layout-stack-gap: var(--space-2);
+  --panel-padding-block: var(--space-2);
+  --panel-padding-inline: var(--space-3);
+  --panel-gap: var(--space-2);
+  --field-gap: var(--space-1);
+  /* The published page's note is fixed over the bottom of the window; the controls end this far
+     above it when scrolled to the end. A narrow window sets it on two lines (see `#site-note`). */
+  --site-note-clearance: var(--space-8);
+
+  /* Controls: one height for every button, select, text field and segmented group. */
+  --control-height: 28px;
+  --control-padding-inline: var(--space-2);
+  --control-border: var(--border-width) solid var(--color-border-control);
+  --tab-height: 32px;
+
+  /* Elevation and layers. */
+  --z-separator: 2;
+  --z-note: 30;
+
+  /* Motion. */
+  --duration-fast: 150ms;
+  --easing-standard: ease;
+
+  /* The stage's type, in stage pixels, large enough to read on video: 26 the gap bar's numbers;
+     28 the PROVEN and OPEN heads, the badge labels and the open group; 38 the bound line; 64 the
+     headline, `n = 17`, set by KaTeX. */
+  --stage-text-number: 26px;
+  --stage-text-label: 28px;
+  --stage-text-bound: 38px;
+  --stage-text-headline: 64px;
+  --stage-badge-glyph: 15px;
+  /* KaTeX inherits the line it is set in, as kpress's `--kpress-katex-size-sans` does. */
+  --stage-katex-size: 1em;
+  --stage-weight-regular: 400;
+  --stage-weight-quiet: 450;
+  --stage-weight-label: 500;
+  --stage-weight-glyph: 650;
+  --stage-weight-bold: 700;
+  --stage-line-height-head: 34px;
+  --stage-line-height-bound: 1.2;
+  --stage-line-height-headline: 92px;
+  --stage-line-height-facts: 1.35;
+  --stage-tracking-head: 0.16em;
+  --stage-tracking-label: 0.01em;
+  --stage-tracking-numeral: -0.02em;
+  /* A badge row: the gap between items, and between an item's icon and its label. The open row
+     is the same shape a step quieter, with a smaller icon and proportionally smaller gaps. */
+  --stage-badge-gap: 34px;
+  --stage-badge-icon-gap: 11px;
+  --stage-open-gap: 28px;
+  --stage-open-icon-gap: 10px;
+  /* Where the headline's rolling numbers start; `layoutHeadline` measures and sets it. */
+  --stage-numeral-left: 152px;
 }
+
+/* ============================================================================ base */
 html,
 body {
   margin: 0;
@@ -31,15 +179,40 @@ body {
   height: 100%;
 }
 body {
-  background: var(--chrome);
-  color: var(--ink);
-  font-family: var(--sans);
-  font-size: 14px;
+  background: var(--color-page);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
   overflow: hidden;
 }
 body.capture {
-  background: var(--paper);
+  background: var(--scene-paper);
 }
+/* A rule later in the sheet that sets `display` wins over this at equal specificity, so a
+   component that is shown and hidden by the attribute sets its own display only while it is not
+   hidden (see `.workspace`). */
+[hidden] {
+  display: none;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto;
+    transition: none;
+  }
+}
+
+/* ============================================================================ the stage */
 #viewport {
   position: absolute;
   inset: 0;
@@ -47,10 +220,15 @@ body.capture {
   flex-direction: column;
   align-items: center;
 }
+/* The stage is a 1920 x 1080 poster drawn at `--stage-scale`, which `layout` sets on `#viewport`
+   from the window and the controls. Until it first does, the property is unset, the wrapper has
+   no size and the stage no transform. */
 #stage-wrap {
   position: relative;
   flex: none;
   overflow: hidden;
+  width: calc(1920px * var(--stage-scale));
+  height: calc(1080px * var(--stage-scale));
 }
 #stage {
   position: absolute;
@@ -58,9 +236,10 @@ body.capture {
   top: 0;
   width: 1920px;
   height: 1080px;
-  background: var(--paper);
+  background: var(--scene-paper);
+  transform: scale(var(--stage-scale));
   transform-origin: 0 0;
-  box-shadow: 0 8px 40px rgba(23, 32, 42, 0.18);
+  box-shadow: var(--scene-shadow);
 }
 body.capture #stage {
   box-shadow: none;
@@ -96,7 +275,7 @@ body.dragging #packing-svg #squares {
   cursor: grabbing;
 }
 #links line {
-  stroke: var(--paper);
+  stroke: var(--scene-paper);
   stroke-opacity: 0.85;
   stroke-width: 2;
 }
@@ -105,7 +284,7 @@ body.dragging #packing-svg #squares {
    adding a second one, and a general relationship (every pair attracts) draws nothing, there being
    no mask to show. */
 #mask-links line {
-  stroke: var(--paper);
+  stroke: var(--scene-paper);
   stroke-opacity: 0.9;
   stroke-width: 2.5;
   stroke-dasharray: 5 4;
@@ -115,20 +294,20 @@ body.dragging #packing-svg #squares {
    it lies across the pair it joins, so white reads against the fill. One that is only wanted is
    dashed and dark: it is usually long and crosses paper, where white would be invisible. */
 #mask-links line.met {
-  stroke: var(--paper);
+  stroke: var(--scene-paper);
   stroke-opacity: 1;
   stroke-width: 4.5;
   stroke-dasharray: none;
 }
 #mask-links line.unmet {
-  stroke: var(--ink);
+  stroke: var(--scene-ink);
   stroke-opacity: 0.62;
   stroke-width: 3;
   stroke-dasharray: 7 6;
 }
 /* The edge being drawn, following the cursor from the square it started on. */
 #draw-line {
-  stroke: var(--ink);
+  stroke: var(--scene-ink);
   stroke-opacity: 0.75;
   stroke-width: 3.5;
   stroke-dasharray: 2 7;
@@ -137,11 +316,40 @@ body.dragging #packing-svg #squares {
 body.drawing #packing-svg #squares {
   cursor: crosshair;
 }
+/* The frames around the packing, one width whatever draws them. The box's colour is its lock, which
+   `drawBounds` sets as `is-locked`; `#container` keeps its `stroke="none"` in the catalogue, which
+   draws the box and trace instead, and is stroked by the mode rules below where it is drawn. */
+#bound-box,
+#bound-trace,
+#container {
+  stroke-width: var(--scene-frame-width);
+}
+#bound-box {
+  stroke: var(--scene-frame);
+}
+#bound-box.is-locked {
+  stroke: var(--scene-frame-locked);
+}
+#bound-trace {
+  stroke: var(--scene-trace);
+}
 #ghost rect {
-  stroke: var(--muted);
+  stroke: var(--scene-ghost);
 }
 #mark rect {
   stroke: none;
+}
+#squares .sq[tabindex="0"]:focus-visible,
+#pack-squares .pack-sq:focus-visible {
+  outline: none;
+}
+#squares .sq[tabindex="0"]:focus-visible rect,
+#pack-squares .pack-sq:focus-visible rect {
+  stroke: var(--color-focus);
+  stroke-width: 3;
+}
+#pack-squares .pack-sq {
+  cursor: grab;
 }
 #facts {
   position: absolute;
@@ -158,14 +366,9 @@ body.drawing #packing-svg #squares {
   height: 100%;
   will-change: opacity;
 }
-/* The type scale on the stage, large enough to read on video: 26 px the gap bar's numbers; 28 the
-   PROVED and OPEN heads, the badge labels and the open group; 34 the note under a bound first
-   proved here; 38 the bound line; 64 the headline, `n = 17`, set by KaTeX.
-   The badge glyphs are drawn marks in the poster's boxes, not stage text. */
 /* Revision 8, feature 4: how close the arrangement on the stage is to the best known, drawn on a
    scale that runs from the proved lower bound to comfortably past the record. The panel's top 200 px
-   were empty, and this is what goes in them: the head row at 24, the bar at 66, the two tick numbers
-   below it, the whole thing ending at 166, clear of the `n =` line at 196.
+   were empty, and this is what goes in them.
    Revision 9 folds the two tabs into one view, so the bar is always drawn: the range is the spine and
    its `to` end is the n the bar measures.
    The two numbers are the ones the panel itself prints, s(n) <= and s(n) >=, read from the record. */
@@ -186,26 +389,20 @@ body.drawing #packing-svg #squares {
   display: block;
 }
 .gapbar-plot .track {
-  fill: var(--track);
+  fill: var(--scene-track);
 }
-/* The bar's two ends, named by the formulas they are rather than by their values: area forbids
-   anything below the left one and a grid achieves the right one, so the span is one unit side at
-   every n. Set in the text face, which is where the radical comes from. */
-/* The two ends are HTML rather than SVG text, because KaTeX sets HTML: a radical it draws is an
-   inline SVG inside a span, which cannot be nested in a `<text>`. They sit above the plot in the
-   band its viewBox opens for them. */
 /* The scale's two ends: the formula the end IS, and the value it takes at this n, on one line.
-   Quiet, because they are the bar rather than a claim about this packing. */
-/* Under the value it names, not at the column's edge: `sqrt(n)` is a mark inside the bar now,
-   so its formula reads as a label on that mark rather than as a name for the whole end. `left`
-   is set per n by `gapbarSetup`; the translate is what centres it on the mark. */
+   HTML rather than SVG text, because KaTeX sets HTML: a radical it draws is an inline SVG inside a
+   span, which cannot be nested in a `<text>`. Quiet, because they are the bar rather than a claim
+   about this packing. Under the value each names: `left` is set per n by `gapbarSetup`, and the
+   translate is what centres it on the mark. */
 .gapbar-end {
   position: absolute;
   top: 210px;
   transform: translateX(-50%);
-  font-family: var(--sans);
-  font-size: 26px;
-  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--stage-text-number);
+  color: var(--scene-ink);
   white-space: nowrap;
 }
 .gapbar-area {
@@ -214,14 +411,16 @@ body.drawing #packing-svg #squares {
 .gapbar-grid {
   left: 646px;
 }
+/* The end's formula is the one piece of mathematics on the bar, so it is set as mathematics --
+   at the size every other number here is set at, because it names one of them. */
 .gapbar-end .katex {
-  font-size: 1em;
+  font-size: var(--stage-text-number);
 }
-/* The open territory: everything between what is proved and what is known. */
-/* Named `gap-open`, not `open`: `height` is a CSS property on an SVG rect, so the panel's own
+/* The open territory: everything between what is proved and what is known.
+   Named `gap-open`, not `open`: `height` is a CSS property on an SVG rect, so the panel's own
    `.open` group (a 76 px slot) silently stretched this band to 76 px when it shared the name. */
 .gapbar-plot .gap-open {
-  fill: var(--quiet);
+  fill: var(--scene-open);
   opacity: 0.62;
 }
 /* The scale's reference marks -- its two ends, and any integer inside the span. A step
@@ -229,93 +428,66 @@ body.drawing #packing-svg #squares {
    than the bounds so the eye sorts them without being told. Not black: an earlier revision
    drew these in ink and the bar read as though every mark on it were a claim. */
 .gapbar-plot .ref-tick {
-  stroke: #9aa3ad;
+  stroke: var(--scene-reference);
   stroke-width: 2.5;
 }
 /* The two bounds. Bold and black, because these are the two values the panel below states
    and the only two a reader is asked to compare the arrangement against. */
 .gapbar-plot .bound-rule {
-  stroke: #0c1116;
+  stroke: var(--scene-rule);
   stroke-width: 4;
 }
 /* Where the arrangement on the stage actually is: a line through the track, not a third arrow.
    It is the only mark here that moves, so it does not need a shape to argue for it. */
 .gapbar-plot .hand-stem {
-  stroke: var(--ink);
+  stroke: var(--scene-ink);
   stroke-width: 3;
 }
 .gapbar.is-met .gapbar-plot .hand-stem {
-  stroke: var(--met);
+  stroke: var(--scene-best);
 }
 /* The stage's box, pointed at from above the rail: black while it moves, green once it locks at
-   the best known side, as the box itself does. */
+   the best known side, when the box itself turns green. On its way the box is drawn grey and the
+   pointer stays black, a mark on the bar beside the bold black bound rules. */
 .gapbar-plot .box-pointer {
-  fill: #000000;
+  fill: var(--scene-black);
 }
 .gapbar-plot .box-pointer.is-locked {
-  fill: var(--met);
-}
-/* Every number on the bar is set the same: one size, one weight, tabular figures. What differs
-   is the colour, and the colour is the only thing that says which bound it is -- scarlet for
-   the proved lower bound, green for the best known upper bound, ink for anything that is
-   neither. The same three in the panel below. */
-/* The modifiers are `is-lower` and `is-record`, not `lower` and `record`. The panel below has a
-   `.lower` row -- a 48 px serif line -- and a bare class selector reaches into the SVG as
-   readily as into a div: same specificity, later in the sheet, so it won, and the bar's lower
-   bound came out in a large serif while its upper bound stayed small and sans. The same trap
-   the `gap-open` rect is named around, and the same fix. */
-.gapbar-num {
-  font-family: var(--sans);
-  font-size: 26px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  fill: var(--ink);
-}
-.gapbar-num.is-lower {
-  fill: var(--new);
+  fill: var(--scene-best);
 }
 /* Every number on this bar is the same size, and what differs is the colour and the weight.
    Scarlet and green at 700 are the two bounds, the values the panel below states. Ink at 400
    is a reference mark -- the scale's ends, and the integers inside it -- which is a place on
-   the scale rather than a claim about this n. Size was carrying that distinction before and
-   doing it badly: a mark at 20 px beside a bound at 26 read as a lesser version of the same
-   thing rather than as a different kind of thing. */
-.gapbar-ref-num {
-  font-family: var(--sans);
-  font-size: 26px;
-  font-weight: 400;
+   the scale rather than a claim about this n.
+   The modifiers are `is-lower` and `is-record`, not `lower` and `record`: a bare class selector
+   reaches into the SVG as readily as into a div, and a `.lower` row once won by source order. */
+.gapbar-num {
+  font-family: var(--font-sans);
+  font-size: var(--stage-text-number);
+  font-weight: var(--stage-weight-bold);
   font-variant-numeric: tabular-nums;
-  fill: var(--ink);
+  fill: var(--scene-ink);
 }
-/* The end's formula is the one piece of mathematics on the bar, so it is set as mathematics --
-   at the size every other number here is set at, because it names one of them. */
-.gapbar-end .katex {
-  font-size: 26px;
+.gapbar-num.is-lower {
+  fill: var(--scene-proved);
 }
 .gapbar-num.is-record {
-  fill: var(--met);
-  font-weight: 700;
+  fill: var(--scene-best);
 }
-/* The headline, on one line: `n = 11`, the label and the value reading as one statement rather
-   than as a caption stacked over a number. It sits under the packing it names, centred on it:
-   it is the one thing on the stage that belongs to the picture rather than to the record.
-   `#headline` is the row, and it holds three copies of the same KaTeX expression at the same
-   place: a still one that draws only `n =` and never fades, and the two rolling layers' copies,
-   which draw only the number (see `.numeral .katex` below). The script centres the expression
-   on the widest number the corpus holds, so `n =` does not move as a digit is gained. */
-/* Below the packing, with air the container cannot eat into.
-   The container's DRAWN floor is a constant: the packing SVG fits the box into the same
-   rectangle whatever the box is, so it sits at 942.9 at every n, from every start, at every
-   growth size and under a doubled blind inflation -- all five measured (at 913.2, before the
-   drawing grew to 971 tall). What changes inside
-   it is how much of it the squares fill, not where its edge is. So the clearance here is a
-   number that can be chosen once rather than a worst case to guess at.
-   The numeral's own box opens above its ink by about a fifth of its size, so what matters is
-   where the INK starts, not where the box does. Measured with pixels: ink from 990 to 1035,
-   45 below the box's drawn edge and 45 above the stage's own.
-   Anchored to the stage's floor with `bottom` rather than to its ceiling with `top`. The stage
-   is a fixed 1080 tall so the two are the same number today; `bottom` is the one that stays
-   true, because what this row is measured from is the bottom of the diagram. */
+.gapbar-ref-num {
+  font-family: var(--font-sans);
+  font-size: var(--stage-text-number);
+  font-weight: var(--stage-weight-regular);
+  font-variant-numeric: tabular-nums;
+  fill: var(--scene-ink);
+}
+/* The headline, on one line: `n = 11`, under the packing it names. `#headline` holds three copies
+   of the same KaTeX expression at the same place: a still one that draws only `n =` and never
+   fades, and the two rolling layers' copies, which draw only the number. The script centres the
+   expression on the widest number the corpus holds, through `--stage-numeral-left`, so `n =` does
+   not move as a digit is gained.
+   Anchored to the stage's floor with `bottom`: the numeral's ink runs 990 to 1035, 45 below the
+   container's drawn edge and 45 above the stage's own. */
 #headline {
   position: absolute;
   left: 60px;
@@ -323,9 +495,6 @@ body.drawing #packing-svg #squares {
   width: 1000px;
   height: 96px;
 }
-/* One slot per fading layer, and one still slot for `n =`. The numeral used to live inside the
-   layer and take the layer's own opacity; out here it carries its own, which is the whole of
-   what moving it cost. */
 .numeral-slot {
   position: absolute;
   left: 0;
@@ -333,50 +502,29 @@ body.drawing #packing-svg #squares {
   width: 100%;
   height: 100%;
 }
-.nline {
-  position: absolute;
-  top: 0;
-  height: 104px;
-  font-family: var(--serif);
-  font-size: 96px;
-  line-height: 104px;
-  color: var(--muted);
-  white-space: nowrap;
-}
-.nline .n-var {
-  font-style: italic;
-  font-weight: 400;
-  margin-right: 0.22em;
-}
-.nline .n-eq {
-  font-weight: 400;
-}
 .numeral {
   position: absolute;
-  left: 0;
+  left: var(--stage-numeral-left);
   top: 0;
-  font-family: var(--serif);
-  color: var(--ink);
-  line-height: 92px;
+  font-family: var(--font-serif);
+  color: var(--scene-ink);
+  line-height: var(--stage-line-height-headline);
   white-space: nowrap;
 }
 .numeral .n-val {
-  font-weight: 700;
-  font-size: 64px;
-  letter-spacing: -0.02em;
+  font-weight: var(--stage-weight-bold);
+  font-size: var(--stage-text-headline);
+  letter-spacing: var(--stage-tracking-numeral);
   font-variant-numeric: tabular-nums;
 }
-/* The headline is an equation, so KaTeX sets it and this is the one place its size is chosen.
-   Large, because it names the picture above it; smaller than it was, because it is bold now --
-   the same `\boldsymbol` the panel's two bound lines are set in, so the three statements about
-   n on this page are one voice -- and bold at 76 was heavier than the picture it labels. */
+/* The headline is an equation, so KaTeX sets it and this is the one place its size is chosen,
+   in the same `\boldsymbol` the panel's bound line is set in. */
 .numeral .katex {
-  font-size: 64px;
+  font-size: var(--stage-text-headline);
 }
 /* `n =` never moves: the owner asked that a step change the number and nothing else. All three
    slots render the whole expression; the rolling two hide `n` and `=`, and the still one hides
-   the digits. `visibility` rather than `display`, so every copy keeps KaTeX's own spacing and
-   the number lands where the still copy leaves room for it. */
+   the digits. `visibility` rather than `display`, so every copy keeps KaTeX's own spacing. */
 #numeral-a .katex .boldsymbol,
 #numeral-a .katex .mrel,
 #numeral-b .katex .boldsymbol,
@@ -384,54 +532,88 @@ body.drawing #packing-svg #squares {
 #numeral-static .katex .mord.mathbf {
   visibility: hidden;
 }
-/* The panel says two things about n, and says them under headings: what is proved, then what
-   is open. The heads are the gap bar's head style, so the three headings in the column read as
-   one set. Every slot below is fixed, so nothing jumps between n; a slot with nothing to say
-   for this n stays empty at its height rather than closing up. */
+/* An empty inline block on the headline's line sits on its baseline, so its top is where the
+   headline's letters stand. `placeAttribution` reads it; it draws nothing. */
+.numeral .baseline {
+  display: inline-block;
+}
+/* The attribution, the owner's (2026-09-17): the repository's address in the stage's bottom right,
+   standing on the headline's baseline and ending where the gap bar ends. It is SVG text because
+   SVG text is placed by its baseline and its end, which are the two things said about it:
+   `placeAttribution` measures the headline's baseline and the rail's right end once the faces
+   land and writes them as the text's `y` and `x` in stage pixels. Hidden until then, rather than
+   drawn at a guess. It is on the stage in every mode, so a captured frame carries it; the overlay
+   takes no pointer events but the link's own. */
+#stage-attribution {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  overflow: visible;
+  pointer-events: none;
+}
+#stage-attribution:not(.is-placed) {
+  visibility: hidden;
+}
+#stage-attribution a {
+  cursor: pointer;
+  pointer-events: auto;
+}
+#stage-attribution text {
+  font-family: var(--font-sans);
+  font-size: var(--stage-text-number);
+  font-weight: var(--stage-weight-regular);
+  fill: var(--scene-attribution);
+}
+#stage-attribution a:hover text,
+#stage-attribution a:focus-visible text {
+  text-decoration: underline;
+}
+/* The panel says what is proved about n and, when anything is, what is open, under headings in
+   the gap bar's head style. Every slot is fixed, so nothing jumps between n: PROVEN's bound and
+   badges hold their places at every n, and OPEN, which is left out when nothing is open, starts
+   at the same place whenever it is drawn.
+   The rhythm, in stage pixels: a head is 6 above what it heads; a row of content is 28 above
+   the next head. The badges took the slot the separate "new lower bound" line used to hold,
+   since a bound first proved here is now a badge of its own. */
 .section-head {
   position: absolute;
   left: 6px;
-  height: 34px;
-  line-height: 34px;
-  font-family: var(--sans);
-  font-size: 28px;
-  font-weight: 500;
-  letter-spacing: 0.16em;
+  height: var(--stage-line-height-head);
+  line-height: var(--stage-line-height-head);
+  font-family: var(--font-sans);
+  font-size: var(--stage-text-label);
+  font-weight: var(--stage-weight-label);
+  letter-spacing: var(--stage-tracking-head);
   text-transform: uppercase;
-  color: var(--quiet);
+  color: var(--scene-heading);
   white-space: nowrap;
 }
 .head-proved {
   top: 320px;
 }
 .head-open {
-  top: 546px;
+  top: 494px;
 }
-/* The two bounds, one above the other at one size: a best known side and a proved lower bound
-   are the same kind of fact about the same quantity, and a reader is meant to compare them, so
-   showing one larger than the other would rank them. Both are proved -- a construction proves
-   its upper bound -- which is why both sit under PROVED and only the questions sit under OPEN. */
-/* One chained statement, so it is about twice as wide as the single bound it replaced.
-   Measured over the whole corpus at the old 48 px, the widest -- `10.055385 <= s(101) <=
-   10.535534` -- came to 812 against a 694 column and ran off the panel. 38 px brings that to
-   643, which leaves room for the ellipsis think-xp8b will add to every truncated value. */
+/* The two bounds as one chained statement, at one size: a best known side and a proved lower
+   bound are the same kind of fact about the same quantity. Measured over the whole corpus at the
+   old 48 px, the widest -- `10.055385 <= s(101) <= 10.535534` -- came to 812 against a 694 column;
+   38 px brings that to 643. */
 .side {
   position: absolute;
   left: 6px;
   top: 360px;
   height: 62px;
-  font-family: var(--serif);
-  font-size: 38px;
-  line-height: 1.2;
-  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: var(--stage-text-bound);
+  line-height: var(--stage-line-height-bound);
+  color: var(--scene-ink);
   white-space: nowrap;
 }
-/* The star hangs in the margin, to the LEFT of the column the facts are set in.
-   It was an inline slot in front of the inequality, always the star's width so the line would
-   not step sideways at the n that have one -- which held the line still but indented every
-   statement on the page by a space that is empty at most n. Out here it costs nothing: the
-   inequality starts at the margin like every other row, and the star is beside it rather than
-   inside it. There is room because the packing ends at 1060 and this column starts at 1160. */
+/* The star hangs in the margin, to the LEFT of the column the facts are set in, so the inequality
+   starts at the margin like every other row. There is room because the packing ends at 1060 and
+   this column starts at 1160. */
 .bound-star {
   position: absolute;
   left: -46px;
@@ -442,71 +624,42 @@ body.drawing #packing-svg #squares {
   width: 38px;
   height: 38px;
 }
-/* KaTeX owns the setting inside these lines; the stylesheet owns only where they sit and how
-   big they are. `.katex` inherits the line's size, so one number here scales the whole expression,
-   and the relation's own colour is left to KaTeX rather than being tinted by a class of ours. */
-.side .katex,
-.lower .katex {
-  font-size: 1em;
+/* KaTeX owns the setting inside the line; the stylesheet owns only where it sits and how big it
+   is. KaTeX's own stylesheet sets `white-space: normal` and breaks an expression into one `.base`
+   span per relation; this line is a fixed-height slot in a poster and must not wrap. */
+.side .katex {
+  font-size: var(--stage-katex-size);
 }
-/* KaTeX's own stylesheet sets `white-space: normal` on `.katex`, and KaTeX breaks an expression
-   into one `.base` span per relation so a long one can wrap. These lines are fixed-height slots in
-   a poster and must not: `s(11)` wrapped away from its own bound and landed on the line below. */
 .side .katex,
-.lower .katex,
-.side .katex-html,
-.lower .katex-html {
+.side .katex-html {
   white-space: nowrap;
 }
-/* A bound first proved here, in scarlet on the line directly under the bound it is about --
-   the digits themselves are never coloured, so this line is what says it. */
-.star-line {
-  position: absolute;
-  left: 6px;
-  top: 426px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  white-space: nowrap;
-}
-/* "new lower bound" names what the star beside the bound means, in the text face at the
-   annotation size. It is the star's own caption, so it takes the star's colour: the two are one
-   mark and reading them as one is the point. */
-.star-line .note {
-  font-family: var(--serif);
-  font-size: 34px;
-  color: var(--new);
-}
-/* The poster's badges, in a row with short labels: what this record establishes. Fixed height,
-   so the row never reflows. */
+/* The poster's badges, in a row with short labels: what this record establishes, and, first,
+   `new result` when the lower bound was first proved here. Fixed height, so the row never
+   reflows. */
 .badges {
   position: absolute;
   left: 6px;
-  top: 478px;
+  top: 426px;
   height: 40px;
   display: flex;
   align-items: center;
-  gap: 34px;
+  gap: var(--stage-badge-gap);
   white-space: nowrap;
-}
-/* Most n have no star, and the empty star line left a 56 px hole between the bound and the
-   badges -- a band of nothing under PROVEN that appeared and vanished as a sweep ran through
-   the n that were first proved here. Without a star the badges take the star line's own top,
-   so they sit under the bound directly and the space collects where space belongs, above the
-   next heading. `.head-open` does not move either way: the pair of headings is the panel's
-   shape, and a heading that shifted with its content would be a worse fault than the hole. */
-.badges.no-star {
-  top: 426px;
 }
 .badge-item {
   display: inline-flex;
   align-items: center;
-  gap: 11px;
-  font-family: var(--sans);
-  font-size: 28px;
-  font-weight: 500;
-  color: var(--label);
-  letter-spacing: 0.01em;
+  gap: var(--stage-badge-icon-gap);
+  font-family: var(--font-sans);
+  font-size: var(--stage-text-label);
+  font-weight: var(--stage-weight-label);
+  color: var(--scene-label);
+  letter-spacing: var(--stage-tracking-label);
+}
+/* `new result` is set in the badges' type, in the star's scarlet (the owner, 2026-09-17). */
+.badge-item.is-new-result {
+  color: var(--scene-proved);
 }
 .badge-item svg {
   width: 36px;
@@ -514,63 +667,59 @@ body.drawing #packing-svg #squares {
   display: block;
   flex: none;
 }
-.badge-item.is-star .label {
-  color: var(--new);
-  font-weight: 600;
-}
 .badge .box {
   fill: none;
-  stroke: var(--muted);
+  stroke: var(--scene-badge);
   stroke-width: 1.2;
 }
 .badge-solid .box {
-  fill: var(--muted);
+  fill: var(--scene-badge);
   stroke: none;
 }
 .badge-query .box {
-  stroke: var(--quiet-rule);
+  stroke: var(--scene-badge-query);
 }
 .badge .glyph {
-  font-family: var(--sans);
-  font-weight: 650;
-  font-size: 15px;
-  fill: var(--muted);
+  font-family: var(--font-sans);
+  font-weight: var(--stage-weight-glyph);
+  font-size: var(--stage-badge-glyph);
+  fill: var(--scene-badge);
 }
 .badge-solid .glyph {
-  fill: var(--paper);
+  fill: var(--scene-paper);
 }
 .badge-query .glyph {
-  fill: var(--quiet);
+  fill: var(--scene-heading);
 }
 /* The approximately-equal sign is KaTeX_Main's outline in font units, filled and thickened by a
    stroke in the same units (the stroke width scales with the path), as the slideshow draws it. */
 .badge .glyph-path {
-  fill: var(--muted);
-  stroke: var(--muted);
+  fill: var(--scene-badge);
+  stroke: var(--scene-badge);
   stroke-linejoin: round;
 }
 .badge .star {
-  fill: var(--new);
+  fill: var(--scene-proved);
 }
 /* OPEN: what the record leaves unsettled for this n, in the same badge row shape, a step quieter. */
 .open-items {
   position: absolute;
   left: 6px;
-  top: 586px;
+  top: 534px;
   height: 40px;
   display: flex;
   align-items: center;
-  gap: 28px;
+  gap: var(--stage-open-gap);
   white-space: nowrap;
 }
 .open-item {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  font-family: var(--sans);
-  font-size: 28px;
-  font-weight: 450;
-  color: var(--quiet);
+  gap: var(--stage-open-icon-gap);
+  font-family: var(--font-sans);
+  font-size: var(--stage-text-label);
+  font-weight: var(--stage-weight-quiet);
+  color: var(--scene-heading);
 }
 .open-item svg {
   width: 32px;
@@ -578,43 +727,19 @@ body.drawing #packing-svg #squares {
   display: block;
   flex: none;
 }
-.open-none {
-  font-family: var(--sans);
-  font-size: 28px;
-  font-weight: 450;
-  color: var(--quiet);
-}
-.sr-only {
+#pack-stage-facts {
   position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
+  left: 1480px;
+  top: 210px;
+  width: 370px;
+  font-family: var(--font-sans);
+  font-size: var(--stage-text-label);
+  line-height: var(--stage-line-height-facts);
+  font-variant-numeric: tabular-nums;
+  white-space: pre-line;
 }
 
-/* Revision 9: one view, no tabs. Stepping one n and running a range are the same operation over a
-   different span, so the range is the single spine: `from` and `to` are values of n stepped into,
-   and setting them equal is the old Single step tab. */
-/* Past the share `layout` allows it, the panel scrolls rather than pushing the stage out.
-   `max-height` here and `CONTROLS_SHARE` there are the same number, and if they ever
-   disagree the stage is either starved or overlapped. */
-#controls {
-  max-height: 58vh;
-  overflow-y: auto;
-  flex: none;
-  width: 100%;
-  box-sizing: border-box;
-  padding: 7px 14px 8px;
-  background: var(--chrome);
-  border-top: 1px solid var(--rule);
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-body.capture #controls {
-  display: none;
-}
+/* ============================================================================ page structure */
 /* The separator between the stage and the controls, after metabrowser's `.resize-handle`
    (src/metabrowser/static/styles.css), turned for a stacked layout: a 4 px strip that takes
    no layout space, a 12 px hit area, transparent at rest and metabrowser's accent while
@@ -622,32 +747,32 @@ body.capture #controls {
 .resize-handle {
   flex: none;
   align-self: stretch;
-  height: 4px;
-  margin-bottom: -4px;
+  height: var(--space-1);
+  margin-bottom: calc(var(--space-1) * -1);
   position: relative;
-  z-index: 2;
+  z-index: var(--z-separator);
   cursor: row-resize;
   background: transparent;
   touch-action: none;
-  transition: background var(--transition-fast);
+  transition: background var(--duration-fast) var(--easing-standard);
 }
 .resize-handle::after {
   content: "";
   position: absolute;
   left: 0;
   right: 0;
-  top: -4px;
-  bottom: -4px;
+  top: calc(var(--space-1) * -1);
+  bottom: calc(var(--space-1) * -1);
   cursor: row-resize;
 }
 .resize-handle:hover,
 .resize-handle:focus-visible,
 body.resizing .resize-handle {
-  background: var(--handle-accent);
+  background: var(--color-focus-separator);
 }
 .resize-handle:focus-visible {
-  outline: 2px solid var(--handle-accent);
-  outline-offset: 1px;
+  outline: var(--focus-ring-width) solid var(--color-focus-separator);
+  outline-offset: calc(var(--focus-ring-offset) / 2);
 }
 body.resizing {
   cursor: row-resize;
@@ -662,74 +787,337 @@ body.search-active .resize-handle {
     display: none;
   }
 }
+/* The controls are the page's one column: every block in them -- the mode's panel, a row of
+   panels, a workspace -- spans the same two edges inside `--layout-gutter`, and sits
+   `--layout-stack-gap` from the next. Past the share `layout` allows it, the column scrolls rather
+   than pushing the stage out: `max-height` here and `CONTROLS_SHARE` there are the same number. */
+#controls {
+  max-height: 58vh;
+  overflow-y: auto;
+  flex: none;
+  width: 100%;
+  box-sizing: border-box;
+  padding: var(--layout-stack-gap) var(--layout-gutter) var(--site-note-clearance);
+  background: var(--color-page);
+  border-top: var(--border-width) solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--layout-stack-gap);
+}
+body.capture #controls {
+  display: none;
+}
 #panel {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--layout-stack-gap);
 }
-[hidden] {
+/* The published page's one note, injected by `build_site`: fixed to the bottom right, quiet, and
+   clear of a drag everywhere but its link. */
+#site-note {
+  position: fixed;
+  right: var(--space-3);
+  bottom: var(--space-2);
+  z-index: var(--z-note);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-caps);
+  line-height: var(--line-height-body);
+  color: var(--color-text-muted);
+  text-align: right;
+  pointer-events: none;
+}
+#site-note a {
+  color: inherit;
+  text-decoration: underline;
+  pointer-events: auto;
+}
+body.capture #site-note {
   display: none;
 }
+@media (max-width: 720px) {
+  :root {
+    --site-note-clearance: var(--space-12);
+  }
+}
+
+/* ============================================================================ primitives */
+/* Panel: a white surface with a quiet border, grouping one thing's controls. A workspace is a
+   panel too, and a flush panel (the mode tabs) lets its own parts meet its edges. */
+.subpanel {
+  box-sizing: border-box;
+  min-width: 0;
+  padding: var(--panel-padding-block) var(--panel-padding-inline);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+.subpanel.is-flush {
+  padding: 0;
+}
+/* A row of panels fills the column: each panel grows to share the line, so the last one on every
+   line ends at the column's right edge, and the panels on a line share one height. */
+.panel-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: var(--layout-stack-gap);
+}
+.panel-row > .subpanel {
+  flex: 1 1 auto;
+}
+/* Section header: the name of a panel, in small capitals. */
+.box-title {
+  display: block;
+  margin-bottom: var(--space-1);
+  font-size: var(--font-size-caps);
+  font-weight: var(--font-weight-strong);
+  letter-spacing: var(--letter-spacing-caps);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+/* Control row: controls and their labels on one line that wraps, centred on the control height. */
 .row {
   display: flex;
-  align-items: flex-start;
-  gap: 10px;
+  align-items: center;
+  gap: var(--panel-gap);
   flex-wrap: wrap;
 }
-/* Revision 15: boxes in a row differ in height, and centring them made the panel read as
-   scattered rather than as rows. They hang from a common top instead. */
-.row label {
+/* Field: a label and the control it names. */
+.row label,
+.group-body label,
+.workspace label {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  color: var(--label);
+  gap: var(--field-gap);
+  color: var(--color-text-label);
   white-space: nowrap;
+}
+/* Controls: one height, one border, one radius. */
+button,
+select,
+input[type="number"],
+input[type="text"],
+textarea {
+  box-sizing: border-box;
+  font: inherit;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: var(--control-border);
+  border-radius: var(--radius-sm);
 }
 button,
 select,
-input[type="number"] {
-  font: inherit;
-  color: var(--ink);
-  background: var(--paper);
-  border: 1px solid #b9c0c8;
-  border-radius: 4px;
-  padding: 3px 9px;
+input[type="number"],
+input[type="text"] {
+  height: var(--control-height);
+  padding: 0 var(--control-padding-inline);
+}
+button {
   cursor: pointer;
 }
 button:hover {
-  background: #f3f5f7;
+  background: var(--color-surface-hover);
+}
+button:disabled {
+  cursor: not-allowed;
+}
+input[type="number"] {
+  width: 64px;
+}
+input[type="range"] {
+  accent-color: var(--color-accent);
+}
+textarea {
+  display: block;
+  width: 100%;
+  padding: var(--space-1) var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
 }
 button:focus-visible,
 select:focus-visible,
 input:focus-visible,
-#stage:focus-visible {
-  outline: 2px solid var(--new);
-  outline-offset: 2px;
-}
-#squares .sq[tabindex="0"]:focus-visible {
-  outline: none;
-}
-#squares .sq[tabindex="0"]:focus-visible rect {
-  stroke: var(--new);
-  stroke-width: 3;
+textarea:focus-visible,
+summary:focus-visible,
+#stage:focus-visible,
+#stage-attribution a:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: var(--focus-ring-offset);
 }
 button.primary {
-  background: var(--ink);
-  color: var(--paper);
-  border-color: var(--ink);
   min-width: 84px;
+  background: var(--color-accent);
+  color: var(--color-selected-text);
+  border-color: var(--color-accent);
 }
 button.primary:hover {
-  background: #2b3947;
+  background: var(--color-accent-hover);
+}
+/* Button group: segments share one border, and the chosen one is filled. At a narrow width the
+   group wraps rather than running out of the column. */
+.seg {
+  display: inline-flex;
+  flex-wrap: wrap;
+  box-sizing: border-box;
+  min-height: var(--control-height);
+  border: var(--control-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.seg button {
+  height: calc(var(--control-height) - var(--border-width) * 2);
+  border: 0;
+  border-radius: 0;
+}
+.seg button + button {
+  border-left: var(--control-border);
+}
+.seg button.on,
+.chips button.on {
+  background: var(--color-selected);
+  color: var(--color-selected-text);
+  border-color: var(--color-selected);
+}
+.chips {
+  display: inline-flex;
+  gap: var(--space-1);
+  flex-wrap: wrap;
+}
+.chips button {
+  min-width: 38px;
+  font-size: var(--font-size-sm);
+  text-align: center;
+}
+/* Readout: a live figure in a fixed slot. **A readout that changes at runtime never changes
+   size** (revision 12): every one takes a slot wide enough for the widest value it can hold, or
+   moves onto its own line *below* the control it belongs to. Figures are tabular, so a slot's
+   width is a character count, and anything that overruns is clipped rather than allowed to push.
+   `check_animate_view` compares every button's box across a step and a setting change. A slot is
+   never wider than the column, so a narrow window clips rather than scrolls sideways. */
+.readout {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-variant-numeric: tabular-nums;
+  vertical-align: middle;
+  box-sizing: border-box;
+}
+.readout-line {
+  display: block;
+  flex: 0 0 100%;
+  width: 100%;
+  height: var(--line-height-readout);
+  line-height: var(--line-height-readout);
+}
+.hint {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.hint.readout-line {
+  font-style: italic;
+}
+/* Details: a disclosure's summary reads as a control. */
+summary {
+  cursor: pointer;
+  font-weight: var(--font-weight-strong);
+  color: var(--color-text-label);
+}
+/* Workspace: a mode's own panel -- a heading, its rows, and what it reports -- stacked at one gap. */
+.workspace:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--panel-gap);
+}
+.workspace h2 {
+  margin: 0;
+  font-size: var(--font-size-heading);
+  font-weight: var(--font-weight-strong);
+}
+.workspace p {
+  margin: 0;
+}
+.workspace details[open] > * + * {
+  margin-top: var(--panel-gap);
+}
+.workspace output {
+  display: block;
+  font-variant-numeric: tabular-nums;
+}
+.workspace fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: var(--panel-gap);
+  margin: 0;
+  padding: var(--panel-padding-block) var(--panel-padding-inline);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+.workspace legend {
+  padding: 0 var(--space-1);
+  font-size: var(--font-size-caps);
+  font-weight: var(--font-weight-strong);
+  letter-spacing: var(--letter-spacing-caps);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+/* Table: tabular figures, a rule under each row. */
+#search-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-variant-numeric: tabular-nums;
+}
+#search-table th,
+#search-table td {
+  border-bottom: var(--border-width) solid var(--color-border);
+  padding: var(--space-1) var(--space-2);
+  text-align: left;
+}
+#search-table th {
+  font-weight: var(--font-weight-strong);
+}
+
+/* ============================================================================ the controls */
+/* Revision 10: a small tabbed sub-panel naming which aspect the page is showing. It is drawn as
+   tabs and exposed as `aria-pressed` buttons inside a group, not as ARIA tabs: revision 9's
+   property that no tab role survives anywhere on the page still holds. It spans the column on
+   every mode, so the tabs sit in the same place whatever is under them. */
+.mode-tabs {
+  display: flex;
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+.mode-tabs button {
+  height: var(--tab-height);
+  margin-bottom: calc(var(--border-width) * -1);
+  padding: 0 var(--space-4);
+  border: 0;
+  border-bottom: var(--border-width-strong) solid transparent;
+  border-radius: 0;
+  background: transparent;
+  font-weight: var(--font-weight-strong);
+  color: var(--color-text-label);
+}
+.mode-tabs button + button {
+  border-left: var(--border-width) solid var(--color-divider);
+}
+.mode-tabs button.on {
+  color: var(--color-text);
+  border-bottom-color: var(--color-accent);
+  background: var(--color-surface-selected);
+}
+.mode-body {
+  padding: var(--panel-padding-block) var(--panel-padding-inline);
+}
+.mode-body + .mode-body {
+  border-top: var(--border-width) solid var(--color-divider);
 }
 /* Revision 9: the transport is the tape convention — a right-pointing triangle to play, two bars to
    pause — drawn as inline SVG on one button that toggles. The glyphs are `fill: currentColor`, so
-   they take the button's ink in both states, and the accessible name is set from the script beside
-   the class that swaps them. Previous and next are `-` and `+`: they were solid triangles, which on
-   a transport row read as play. */
+   they take the button's ink in both states. Previous and next are `-` and `+`. */
 button.transport {
   min-width: 44px;
-  padding: 5px 14px;
+  padding: 0 var(--space-3);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -751,96 +1139,45 @@ button.transport.is-playing .glyph-pause {
 }
 button.step-nudge {
   min-width: 36px;
-  font-weight: 700;
-  font-size: 15px;
-  line-height: 1.1;
+  font-weight: var(--font-weight-bold);
   text-align: center;
 }
-input[type="number"] {
-  width: 64px;
-  padding: 4px 6px;
-}
-/* Revision 10: a small tabbed sub-panel naming which of the two aspects the page is showing — Pack,
-   one fixed n run open-endedly, or Animate, a range played end to end. It is drawn as tabs and
-   exposed as two `aria-pressed` buttons inside a group, not as ARIA tabs: revision 9's property
-   that no tab role survives anywhere on the page still holds, so a checker can keep asserting it
-   and nobody can mistake this for the two full-page tabs coming back. */
-.subpanel {
-  border: 1px solid #b9c0c8;
-  border-radius: 6px;
-  background: var(--paper);
-  align-self: flex-start;
-}
-.mode-tabs {
-  display: flex;
-  border-bottom: 1px solid #b9c0c8;
-}
-.mode-tabs button {
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  padding: 5px 18px;
-  font-weight: 600;
-  color: var(--label);
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
-}
-.mode-tabs button + button {
-  border-left: 1px solid #dfe3e8;
-}
-.mode-tabs button.on {
-  color: var(--ink);
-  border-bottom-color: var(--ink);
-  background: #eef1f4;
-}
-.mode-body {
-  padding: 5px 12px 6px;
-}
-/* Revision 9: how fast the virtual clock runs during playback, 0.05x to 2x on a logarithmic slider
-   so the slow end has as much travel as the fast one. It scales playback only — `seek(t)` is still a
-   pure function of its argument, so every instant renders identically and captures are untouched. */
-/* Revision 12: **a readout that changes at runtime never changes size.** The defect it closes is a
-   real one: the numbers sat inline with the buttons, so as a figure gained a digit the controls
-   after it slid sideways under the cursor while a run was playing. Every live readout now either
-   takes a fixed slot wide enough for the widest value it can hold, or — the owner's own suggestion,
-   and the better rule for anything that changes often — moves onto its own line *below* the control
-   it belongs to. Figures are tabular throughout, so a slot's width is a character count and not a
-   guess, and anything that overruns is clipped rather than allowed to push. `check_animate_view`
-   holds it down by comparing every button's bounding box across a step and a setting change. */
-.readout {
-  display: inline-block;
-  overflow: hidden;
+.step-label {
+  font-weight: var(--font-weight-strong);
+  color: var(--color-text);
   white-space: nowrap;
-  text-overflow: ellipsis;
+}
+#range-from,
+#range-to {
+  width: 72px;
+  font-weight: var(--font-weight-strong);
+}
+.range-sep,
+.range-figure {
+  color: var(--color-text-label);
+  white-space: nowrap;
+}
+.range-figure strong {
+  color: var(--color-text);
   font-variant-numeric: tabular-nums;
-  vertical-align: middle;
-  box-sizing: border-box;
 }
-/* The below-its-control form: a full-width line of its own inside a wrapping flex row. */
-.readout-line {
-  display: block;
-  flex: 0 0 100%;
-  width: 100%;
-  height: 16px;
-  line-height: 16px;
-}
+/* Revision 9: how fast the virtual clock runs during playback, 0.05x to 2x on a logarithmic slider.
+   It scales playback only — `seek(t)` is still a pure function of its argument. */
 #speed {
   width: 130px;
-  accent-color: var(--ink);
 }
 #speed-info {
-  color: var(--label);
+  color: var(--color-text-label);
   width: 54px;
 }
 #clock {
-  font-family: var(--mono);
-  font-size: 13px;
-  color: var(--label);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-label);
   width: 200px;
   text-align: right;
 }
-/* 'Optimize' becomes 'Restart optimize' the moment a run starts: one slot holds both, so the button
-   the owner just pressed does not change size under the cursor. */
+/* 'Optimize' becomes 'Restart optimize' the moment a run starts: one slot holds both. */
 #optimize {
   width: 152px;
 }
@@ -853,140 +1190,131 @@ input[type="number"] {
 #step-label {
   width: 216px;
 }
-/* The one-line note about the n on show. Its own line at a fixed height, so appearing and
+/* The one-line note about the n on show, on its own line at a fixed height, so appearing and
    disappearing cannot change how tall the controls are and therefore how big the stage is. */
 #step-note {
   flex: 0 0 100%;
   width: 100%;
-  height: 16px;
-  line-height: 16px;
+  height: var(--line-height-readout);
+  line-height: var(--line-height-readout);
 }
 #continuous-info {
-  color: var(--muted);
+  color: var(--color-text-muted);
 }
 /* A line of its own, but a fixed one: the annealing readout gains '(styles B and C only)'
-   under style A, and with no width of its own that text widened the box it sits in and slid
-   the whole view box — colour chooser and all — sideways on a style change. */
+   under style A, and with no width of its own that text widened the box it sits in. */
 #anneal-info {
-  color: var(--muted);
+  color: var(--color-text-muted);
   width: 396px;
 }
+#anneal {
+  width: 130px;
+}
 /* A flex row's intrinsic width is the sum of its items whether they wrap or not, so a line placed
-   *below* the controls still widens the box that holds it unless the box has a width of its own.
-   The shake box is given one, and the readout drops under the dial instead of beside it. */
-#shake-box {
-  width: 478px;
-  box-sizing: border-box;
+   *below* the controls still widens the box that holds it unless the box has a width of its own. */
+#shake-box,
+#motion-advanced-box {
+  flex-basis: 478px;
+  max-width: 100%;
+}
+#law-info,
+#rel-info,
+#grow-info,
+#solver-note {
+  height: var(--line-height-readout);
+  line-height: var(--line-height-readout);
 }
 #law-info,
 #rel-info,
 #grow-info {
   width: 300px;
-  height: 15px;
-  line-height: 15px;
 }
-/* Revision 14: **controls sit with the axis they belong to.** A mode is a choice on three
-   independent axes — scope (one n, or a range), strategy (the law, the graph, growth, annealing and
-   which solver runs) and presentation (colour, timing, phasing, desaturation) — and which solver
-   runs is strategy, not animation, so the select left the step-animation group for the row that
-   holds the law and the graph. It is given a width of its own because a `select` is as wide as its
-   widest *option*, and Pack offers one option fewer: without this, hiding `tween` would resize the
-   control. */
+/* Revision 14: **controls sit with the axis they belong to.** Which solver runs is strategy, not
+   animation. The select has a width of its own because a `select` is as wide as its widest
+   option, and Pack offers one option fewer. */
 #solver-box {
-  width: 232px;
-  box-sizing: border-box;
+  flex-basis: 264px;
 }
-/* Revision 15: the note under the select was clipping mid-word in a 152px box. A fixed
-   slot keeps the controls still; it has to be wide enough to hold what it is given. */
 #solver-note {
   white-space: normal;
 }
 #style-select {
   width: 118px;
 }
-#solver-note {
-  height: 15px;
-  line-height: 15px;
+#motion-scope-note {
+  height: calc(var(--line-height-readout) * 2);
+  line-height: var(--line-height-readout);
+  white-space: normal;
 }
-/* The step animation's own group — dwell, move, settle, the motion phasing and the full beat —
-   describes a step, and Pack has no steps, so it is hidden there. Hidden *in place*: `display: none`
-   would take its box out of this wrapping row, the boxes after it would rewrap onto fewer lines, the
-   controls would get shorter and the stage would grow — which is exactly the reflow revision 12
-   forbids and step 13 measures. `visibility: hidden` leaves the footprint, takes the group off the
-   hit test and out of the tab order, and moves nothing on the page. */
-/* Revision 15: `visibility: hidden` kept this box's 1145px in the flow, so the row wrapped
-   around a box nobody could see and the view fell to a line of its own. It is a whole group
-   in its own row, so removing it moves nothing beside it. */
-#step-anim-box.is-off {
+/* A strategy control that cannot affect the current step is visibly and mechanically off. The
+   fixed opacity and note slot keep switching solvers from reflowing the panel. */
+[data-motion-control="physics"].is-inert {
+  opacity: 0.56;
+}
+[data-motion-control="physics"].is-inert details {
+  pointer-events: none;
+}
+/* Revision 15: the step animation is a whole group in its own row, so removing it in Pack moves
+   nothing beside it. */
+#step-anim-box.is-off,
+#motion-advanced-box.is-off,
+.panel-row:has(> #step-anim-box.is-off) {
   display: none;
 }
-#pair-select {
-  max-width: 480px;
-}
-.hint {
-  color: var(--muted);
-  font-size: 12.5px;
-}
-.seg {
-  display: inline-flex;
-  border: 1px solid #b9c0c8;
-  border-radius: 4px;
-  overflow: hidden;
-}
-.seg button {
-  border: 0;
-  border-radius: 0;
-  padding: 4px 10px;
-}
-.seg button + button {
-  border-left: 1px solid #b9c0c8;
-}
-.seg button.on {
-  background: var(--ink);
-  color: var(--paper);
-}
-#pair-info {
-  color: var(--label);
-  font-size: 13px;
-}
-/* The chooser for n, and the sparse cases worth looking at as a row of chips. A chip sets both ends
-   of the range to the same value, which is one step. */
-.chips {
-  display: inline-flex;
-  gap: 4px;
+/* Panel bodies: a wrapping line of fields, or a stack of labelled rows. */
+.group-body {
+  display: flex;
+  align-items: center;
+  gap: var(--panel-gap);
   flex-wrap: wrap;
 }
-.chips button {
-  padding: 3px 9px;
-  font-size: 13px;
-  min-width: 38px;
-  text-align: center;
+.group-body.stack,
+.rel-body,
+.law-body {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-1);
 }
-.chips button.on {
-  background: var(--ink);
-  color: var(--paper);
-  border-color: var(--ink);
+.law-row {
+  display: flex;
+  align-items: center;
+  gap: var(--panel-gap);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-label);
 }
-.step-label {
-  font-weight: 600;
-  color: var(--ink);
-  white-space: nowrap;
+.law-row > span:first-child {
+  min-width: 42px;
 }
-.hint.readout-line {
-  font-style: italic;
+.law-body .law-row > span:first-child {
+  min-width: 88px;
+  text-align: right;
 }
-/* The range: two boxes of n, its length in wall-clock seconds, and where a run stands in it. */
+.group-body.stack .law-row > span:first-child {
+  width: 66px;
+  text-align: right;
+}
+.law-row input[type="range"] {
+  width: 118px;
+}
+.rel-body label {
+  font-size: var(--font-size-sm);
+}
+.law-val {
+  display: inline-block;
+  width: 56px;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+}
 /* Revision 11: the force law, drawn and edited. The plot is the law itself — force against the
-   signed gap, both sides of zero, the crossing marked — and its two handles are the four numbers:
-   the knee's position is the rigidity and its height the repulsion, the pull's position is the
-   range and its depth the attraction. The sliders and the handles are two views of one state. */
+   signed gap, both sides of zero, the crossing marked — and its two handles are the four numbers.
+   The sliders and the handles are two views of one state. */
+/* The plot and its sliders sit side by side, and stack in a narrow window. */
 .lawbox {
   display: flex;
-  align-items: stretch;
-}
-.law-plot-wrap {
-  padding: 3px 8px 4px 6px;
-  border-right: 1px solid #e2e6ea;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--panel-gap) var(--space-4);
 }
 #law-plot {
   display: block;
@@ -995,230 +1323,92 @@ input[type="number"] {
   touch-action: none;
   cursor: crosshair;
 }
+[data-motion-control="physics"].is-inert #law-plot {
+  pointer-events: none;
+  cursor: default;
+}
 #law-plot .lp-field {
-  fill: #fbfcfd;
+  fill: var(--plot-field);
 }
 #law-plot .lp-zero {
-  stroke: #9aa3ad;
+  stroke: var(--plot-zero);
   stroke-width: 1;
 }
 #law-plot .lp-axis {
-  stroke: #c8ced4;
+  stroke: var(--plot-axis);
   stroke-width: 1;
 }
 #law-plot .lp-curve {
   fill: none;
-  stroke: var(--ink);
+  stroke: var(--scene-ink);
   stroke-width: 2;
   stroke-linejoin: round;
 }
 #law-plot .lp-cross {
-  fill: var(--new);
+  fill: var(--scene-proved);
 }
 #law-plot .lp-handle {
-  fill: var(--paper);
-  stroke: var(--ink);
+  fill: var(--scene-paper);
+  stroke: var(--scene-ink);
   stroke-width: 2;
   cursor: grab;
 }
 #law-plot .lp-handle.is-pull {
-  stroke: #7a5aa8;
+  stroke: var(--plot-pull);
 }
 #law-plot text {
-  font-family: var(--sans);
-  font-size: 9px;
-  fill: var(--quiet);
+  font-family: var(--font-sans);
+  font-size: var(--plot-font-size);
+  fill: var(--plot-text);
 }
 #law-plot text.lp-side {
-  fill: var(--label);
-  font-weight: 600;
-}
-.law-body {
-  padding: 4px 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-.law-body .law-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12.5px;
-  color: var(--label);
-}
-.law-body .law-row > span:first-child {
-  min-width: 88px;
-  text-align: right;
-}
-.law-body input[type="range"] {
-  width: 118px;
-  accent-color: var(--ink);
-}
-.law-val {
-  font-variant-numeric: tabular-nums;
-  color: var(--ink);
-  display: inline-block;
-  width: 56px;
+  fill: var(--color-text-label);
+  font-weight: var(--font-weight-strong);
 }
 .law-presets {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-top: 3px;
+  gap: var(--panel-gap);
   flex-wrap: wrap;
 }
-.relbox {
-  display: flex;
-  flex-direction: column;
+.motion-advanced {
+  color: var(--color-text-label);
+  font-size: var(--font-size-sm);
 }
-/* Revision 11: the panel reads as one instrument rather than as a wall of labels. Every control is
-   in a named box — what the step animation does, how hard it shakes, what the view shows, the force
-   law, who attracts whom, and growth — and the boxes lay out in one row that wraps. */
-.groupbox {
-  display: flex;
-  flex-direction: column;
-  align-self: flex-start;
-}
-.group-body {
-  padding: 1px 10px 5px;
+.motion-advanced-body,
+.motion-response-controls {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: var(--panel-gap);
   flex-wrap: wrap;
 }
-.group-body.stack {
-  flex-direction: column;
-  align-items: stretch;
-  gap: 2px;
+.motion-advanced-body {
+  padding-top: var(--space-1);
 }
-.group-body.stack .law-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12.5px;
-  color: var(--label);
-}
-.group-body.stack .law-row > span:first-child {
-  width: 66px;
-  text-align: right;
-}
-.group-body.stack .law-row input[type="range"] {
-  width: 118px;
-}
-.group-body label {
+.motion-advanced-body label {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  color: var(--label);
+  gap: var(--field-gap);
   white-space: nowrap;
 }
-.rel-body {
-  padding: 1px 10px 5px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+.motion-advanced-body input[type="range"] {
+  width: 100px;
 }
-.rel-body .law-row > span:first-child {
-  min-width: 42px;
+#motion-response-info {
+  color: var(--color-text-muted);
 }
-.rel-body label {
-  font-size: 12.5px;
-}
-.law-presets .hint {
-  font-size: 12px;
-}
-.box-title {
-  font-size: 11.5px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--quiet);
-  padding: 3px 10px 1px;
-  display: block;
-}
-#range-from,
-#range-to {
-  width: 72px;
-  font-weight: 600;
-}
-.range-sep {
-  color: var(--label);
-}
-.range-figure {
-  color: var(--label);
-  white-space: nowrap;
-}
-.range-figure strong {
-  color: var(--ink);
-  font-variant-numeric: tabular-nums;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    scroll-behavior: auto;
-    transition: none;
-  }
-}
-
-#animation-editor {
-  background: var(--panel);
-  border: 1px solid var(--rule);
-  padding: 12px;
-  margin: 8px 0;
-}
-#pack-workspace {
-  background: var(--panel);
-  border: 1px solid var(--rule);
-  padding: 12px;
-  margin: 8px 0;
-}
-#pack-workspace h2 {
-  margin: 0 0 8px;
-  font-size: 18px;
-}
-#pack-workspace .row {
-  align-items: center;
-  margin: 8px 0;
-}
-#pack-workspace #pack-seed {
+#pack-seed {
   width: 112px;
 }
-#pack-workspace textarea {
-  display: block;
-  box-sizing: border-box;
-  width: 100%;
-  font: 12px var(--mono);
-  margin: 8px 0;
-}
-#pack-workspace output {
-  display: block;
-  margin-top: 6px;
-  font-variant-numeric: tabular-nums;
-}
-#pack-squares .pack-sq {
-  cursor: grab;
-}
-#pack-squares .pack-sq:focus-visible rect {
-  stroke: var(--new);
-  stroke-width: 3;
-}
-#pack-stage-facts {
-  position: absolute;
-  left: 1480px;
-  top: 210px;
-  width: 370px;
-  font: 28px / 1.35 var(--sans);
-  font-variant-numeric: tabular-nums;
-  white-space: pre-line;
-}
+
+/* ============================================================================ modes */
+/* Pack: its own workspace under the tabs, and its own facts on the stage. */
 body.pack-independent #facts,
 body.pack-independent #headline,
 body.pack-independent #mask-links,
 body.pack-independent #mode-panel,
-body.pack-independent #panel > .row,
-body.pack-independent #panel > .subpanel:not(:first-child) {
+body.pack-independent #transport-row,
+body.pack-independent #panel > .panel-row {
   display: none;
 }
 body.pack-independent #packing-svg {
@@ -1229,9 +1419,8 @@ body.pack-independent #pack-stage-facts {
 }
 /* The box and its trace are the catalogue's drawing of its container (`drawBounds`), and only the
    catalogue's scene updates them. Pack and the animation studio draw into the same stage and the
-   same `#container` and draw no box, so while either owns the stage the bounds, which would
-   otherwise stay at the last catalogue step's side, are hidden and the container is drawn, as it
-   was before the box. */
+   same `#container` and draw no box, so while either owns the stage the bounds are hidden and the
+   container is drawn. */
 body.pack-independent #bound-box,
 body.pack-independent #bound-trace,
 body.trace-active #bound-box,
@@ -1240,90 +1429,39 @@ body.trace-active #bound-trace {
 }
 body.pack-independent #container,
 body.trace-active #container {
-  stroke: #000000;
+  stroke: var(--scene-frame);
 }
+/* Search: no stage, and only its own workspace under the tabs. */
 body.search-active #stage-wrap,
 body.search-active #mode-panel,
-body.search-active #panel > .row,
-body.search-active #panel > .subpanel:not(:first-child),
-body.search-active #continuous-info {
+body.search-active #transport-row,
+body.search-active #panel > .panel-row,
+body.search-active #controls > .panel-row {
   display: none;
 }
 body.search-active #controls {
   max-height: 100vh;
 }
-#search-workspace {
-  align-self: center;
-  box-sizing: border-box;
-  width: min(100%, 1100px);
-  background: var(--panel);
-  border: 1px solid var(--rule);
-  padding: 16px;
-}
-#search-workspace h2 {
-  margin: 0 0 8px;
-}
-#search-workspace .row {
-  margin: 10px 0;
-  align-items: center;
-}
-#search-workspace textarea {
-  display: block;
-  box-sizing: border-box;
-  width: 100%;
-  font: 12px var(--mono);
-  margin: 8px 0;
-}
-#search-workspace output {
-  display: block;
-  margin: 8px 0;
-  font-variant-numeric: tabular-nums;
-}
-#search-table {
-  border-collapse: collapse;
-  width: 100%;
-  margin: 12px 0;
-  font-variant-numeric: tabular-nums;
-}
-#search-table th,
-#search-table td {
-  border-bottom: 1px solid var(--rule);
-  padding: 5px 9px;
-  text-align: left;
-}
+/* The animation studio: the trace on the stage and the studio's workspace under the tabs. */
 body.trace-active #controls {
   max-height: calc(100vh - min(56.25vw, 42vh));
-}
-#animation-editor[hidden] {
-  display: none;
-}
-#animation-editor h2 {
-  margin: 0;
-  font-size: 18px;
-}
-#animation-editor textarea {
-  display: block;
-  box-sizing: border-box;
-  width: 100%;
-  font: 12px var(--mono);
-  margin: 8px 0;
-}
-#animation-editor details {
-  margin: 8px 0;
-}
-#animation-editor output {
-  display: block;
-  margin-top: 8px;
 }
 body.trace-active #facts,
 body.trace-active #headline,
 body.trace-active #mask-links,
 body.trace-active #mode-panel,
-body.trace-active #panel > .row,
-body.trace-active #controls > .row {
+body.trace-active #transport-row,
+body.trace-active #panel > .panel-row,
+body.trace-active #controls > .panel-row {
   display: none;
 }
 body.trace-active #packing-svg {
   left: 50%;
   transform: translateX(-50%);
+}
+/* A share chosen with the separator fixes the column's height, whatever the mode's own cap. Last,
+   so it outranks the modes' `max-height` at equal specificity. */
+body #controls.is-sized {
+  height: var(--controls-height);
+  max-height: none;
 }

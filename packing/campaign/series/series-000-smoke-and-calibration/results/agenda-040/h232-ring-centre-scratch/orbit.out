@@ -1,0 +1,7 @@
+distinct D4 images of the atom: 8
+each image charges 5/4 on the family; orbit charge 10 vs orbit budget 8
+any site in an X' box: False
+any site in an open corner box: False
+depth at (Fraction(101, 100), Fraction(367, 200)) = 1
+depth at (Fraction(34, 25), Fraction(19, 10)) = 1
+depth at (Fraction(101, 100), Fraction(401, 200)) = 1

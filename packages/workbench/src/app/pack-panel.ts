@@ -147,7 +147,7 @@ export function mountPackPanel(options: PackPanelOptions): PackPanel {
   const catalogueSquares = element(document, "squares", SVGGElement);
   const packSquares = document.createElementNS(SVG_NS, "g");
   packSquares.id = "pack-squares";
-  packSquares.style.display = "none";
+  packSquares.toggleAttribute("hidden", true);
   world.append(packSquares);
   const squareNodes = new Map<number, { node: SVGGElement; shape: SVGRectElement }>();
   const targets: StageTargets = {
@@ -376,8 +376,8 @@ export function mountPackPanel(options: PackPanelOptions): PackPanel {
       active = visible;
       root.hidden = !visible;
       stageFacts.hidden = !visible;
-      catalogueSquares.style.display = visible ? "none" : "";
-      packSquares.style.display = visible ? "" : "none";
+      catalogueSquares.toggleAttribute("hidden", visible);
+      packSquares.toggleAttribute("hidden", !visible);
       document.body.classList.toggle("pack-independent", visible);
       if (visible) {
         redraw();

@@ -21,6 +21,10 @@ packing/campaign/series/.ids/
 # gate so a shared engine rebuild or validation CPU load cannot contaminate measurements.
 packing/.gate-running
 
+# Kernel-held queue ownership. The empty file persists so an unlink cannot split one
+# advisory lock into two inodes; its presence alone never means a queue is running.
+.*.covering-queue.lock
+
 # Sub-agent worktrees, created by the harness inside the repo.
 .claude/worktrees/
 

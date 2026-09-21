@@ -25,6 +25,7 @@
       "tsconfig.json",
       "!**/node_modules",
       "!vendor",
+      "!packing/resources",
       "!**/.venv",
       "!**/*.min.js"
     ]

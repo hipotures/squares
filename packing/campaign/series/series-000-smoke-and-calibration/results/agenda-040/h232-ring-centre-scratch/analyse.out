@@ -1,0 +1,25 @@
+placements 88 total 11
+cores meeting an open corner box: 32 mass 4
+cores with penetration<1/2 at some corner: 32 mass 4
+same set? True
+mass per corner box [Fraction(1, 1), Fraction(1, 1), Fraction(1, 1), Fraction(1, 1)]
+residual cores 56 mass 7
+corner cores: angles(deg) fold [0.0, 0.2637]
+corner cores min penetration 87531964572061/4374376347070000 max of their min-pen 1099/13750
+beta= 89793000/90207107 0.9954093750063395 X'=[ 45310607/90207107 , 180000107/180414214 ]^2 ~ 0.5022953124968302 0.9977046875031698
+every corner core contains X' corners: True
+residual cores meeting open wall strip depth<1/2: 32 mass 4
+central cores: 24 mass 3
+central fold angles: [(0.791, 8), (25.668, 8), (29.152, 8)]
+central min wall distance: 102831479376713457778697783/156723908291424938333580000 0.6561314128633163
+wall_res fold angles: [(0.0, 16), (1.318, 16)]
+mid-wall cores extents (first 4):
+  t= 0 centre 3.3236363636363637 2.2725 w 1/8 ext [2.8247863636363637, 3.8224863636363637, 1.77365, 2.77135]
+  t= 0 centre 1.5675 3.3236363636363637 w 1/8 ext [1.06865, 2.06635, 2.8247863636363637, 3.8224863636363637]
+  t= 0 centre 0.5163636363636364 1.5675 w 1/8 ext [0.017513636363636363, 1.0152136363636364, 1.06865, 2.06635]
+  t= 0 centre 2.2725 0.5163636363636364 w 1/8 ext [1.77365, 2.77135, 0.017513636363636363, 1.0152136363636364]
+residual cores inside [1,L-1]^2: 8 mass 1
+L-2 = 46/25 1.84
+ring cores 64 mass 8
+central cores overlapping (positive area) at least one ring core: 24 / 24
+central cores overlapping a mid-wall (residual ring) core: 24

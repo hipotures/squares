@@ -1,0 +1,78 @@
+{
+  "tool": "packing/resources/web/n17-weighted-certificates-2026-09-20/replay_mira_4613_first_party.py",
+  "generated_at": "2026-09-20T17:05:11.986749+00:00",
+  "certificate": "packing/resources/web/n17-weighted-certificates-2026-09-20/mira-17squares/certificates/lower_bound_4p613/best-certificate.json",
+  "certificate_sha256": "749f13335980a66a27a2304f212b5d8796390c81b962149647a4d9ff43a228ec",
+  "certificate_unchanged_after_replay": true,
+  "source_repository": "github.com/Mira-acc/17squares",
+  "source_commit": "0266c9936a303817ac7da0802364034a34fb2558",
+  "certificate_claim_field": "candidate only; exact replay required",
+  "declared_by_source": {
+    "total_mass": "849899249/50000000",
+    "minimum_mass": "1000002103/1000000000",
+    "slabs": 9116871,
+    "strict_decimal_bound": "4.613028635886"
+  },
+  "interpreter": "3.14.7",
+  "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+  "worktree_commit": "061e9ffbcf3508acb11fc968abd1e1dd762950cd",
+  "wall_seconds": 423.003,
+  "containment": {
+    "largest_half_gap_tangent": "207107/1440000000",
+    "square_side": "19997/20000",
+    "coarse_product": "28799821518679/28800000000000",
+    "coarse_slack": "178481321/28800000000000",
+    "coarse_holds": true,
+    "sharp_left": "829429719507765981945905041/829440000000000000000000000",
+    "sharp_right": "2073600042893309449/2073600000000000000",
+    "sharp_slack": "3432549852599218031653/276480000000000000000000000",
+    "sharp_holds": true
+  },
+  "result": {
+    "stage": "exact",
+    "sampled_directions": null,
+    "requested_workers": 8,
+    "wall_seconds": 422.95,
+    "conditions": [
+      {
+        "name": "Condition 1 atoms carry the declared symmetry",
+        "detail": "1620 atoms closed under D4 about the centre",
+        "holds": true
+      },
+      {
+        "name": "Condition 2 total mass below n",
+        "detail": "total 849899249/50000000 against n = 17",
+        "holds": true
+      },
+      {
+        "name": "Condition 3 net reaches pi/4",
+        "detail": "final half-tangent 207107/500000, t^2 + 2t - 1 = 309449/250000000000",
+        "holds": true
+      },
+      {
+        "name": "Condition 4 containment B(1 + D) < 1",
+        "detail": "B = 19997/20000, D = 207107/1440000000, B(1 + D) = 28799821518679/28800000000000",
+        "holds": true
+      },
+      {
+        "name": "Condition 5 every reachable cell carries mass 1",
+        "detail": "least cell mass 1000002103/1000000000 at direction 2194",
+        "holds": true
+      }
+    ],
+    "total_mass": {
+      "computed": "849899249/50000000",
+      "declared": "849899249/50000000",
+      "agrees": true
+    },
+    "least_cell_mass": {
+      "computed": "1000002103/1000000000",
+      "declared": "1000002103/1000000000",
+      "agrees": true,
+      "worst_direction": "2194"
+    },
+    "accepted": true
+  },
+  "smoke": false,
+  "refusals": []
+}

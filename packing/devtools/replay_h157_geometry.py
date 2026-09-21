@@ -47,6 +47,18 @@ RETAINED_FAMILY_PATH = RETAINED_ROOT / "ceiling-family-191-50.json"
 RETAINED_BIN16_PATH = RETAINED_ROOT / "lane-x4-nbins.py.txt"
 PUBLISHED_CHILDREN_PATH = RETAINED_ROOT / "lane-x4-survivors-16.json"
 
+# 2026-09-20 (Session 145, PR 206): one pin moved, ``ceiling.py``, from f026bd04 to
+# e74916c0 at 8f4eca7d; every other blob below is unchanged. Unlike the T1 witness
+# replay, this replay does depend on the module it re-pins -- it reads the retained
+# family through ``CeilingCertificate.from_record`` and its placement geometry -- so the
+# pin is both a review binding and a live dependency. What the corner-clip instrument
+# added to ``ceiling.py`` is an optional K4 condition and the clipped wording of the
+# verdict's statement, both reached only when a clip is passed to ``verify_ceiling``;
+# this replay calls neither, and re-running it re-executes the paths it does use.
+# Re-run at 8f4eca7d: this replay under ``tests/test_replay_h157_geometry.py``,
+# reproducing the published readings unchanged. That is evidence about this replay's own
+# code path, not about the clip-free behaviour of the covering engine at large; for that
+# see the unclipped re-decision cited in ``packing/devtools/replay_bc303_t1_witness.py``.
 SOURCE_BLOBS: tuple[tuple[str, Path, str], ...] = (
     (
         "retained ceiling family",
@@ -81,7 +93,7 @@ SOURCE_BLOBS: tuple[tuple[str, Path, str], ...] = (
     (
         "ceiling-family reader",
         Path("packing/src/sqpack/fractional/ceiling.py"),
-        "f026bd04186787096fb57128517e319e7ee1ae00",
+        "e74916c02303f368798b2bcee6b36f9442cb0375",
     ),
     (
         "exact direction model",

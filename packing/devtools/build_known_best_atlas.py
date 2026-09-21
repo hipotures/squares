@@ -2223,12 +2223,13 @@ def _retained_problems() -> tuple[list[str], list[dict] | None]:
 
 
 def _composite_receipt_problems() -> list[str]:
-    """Every composite export, against the retained drawing it declares it came from.
+    """Every retained composite claim and export, checked without rebuilding geometry.
 
-    The whole check compares each export's receipt against a freshly rendered SVG. Here
-    the SVG is the retained one, so what this catches is an export that has fallen behind
-    the drawing beside it -- and the drawing is held to the canvas its own specification
-    computes, so a composite silently resized cannot pass this either.
+    The whole check compares the entire SVG against a fresh rendering. Here the current
+    figure record is cheap enough to compare directly with the visible labels in the
+    retained SVG, so a changed bound cannot wait for that deferred rebuild to be found.
+    Exports are checked against the retained drawing they declare they came from, and
+    the drawing is held to the canvas its own specification computes.
     """
     problems: list[str] = []
     for canvas in COMPOSITES:
@@ -2241,12 +2242,64 @@ def _composite_receipt_problems() -> list[str]:
             problems.append(
                 f"{_relative(canvas.svg_path)} is not the canvas its specification computes"
             )
+        problems.extend(_composite_label_problems(canvas, root))
         problems.extend(
             f"missing or stale {export.name} {export.role} receipt"
             for export in canvas.rasters
             if not _png_matches_summary(export, svg_text)
         )
         problems.extend(_composite_pdf_problems(canvas, svg_text))
+    return problems
+
+
+def _composite_label_problems(canvas: CompositeCanvas, root: ET.Element) -> list[str]:
+    """Compare the claims printed on each card with the current figure record."""
+    path = _relative(canvas.svg_path)
+    entries = _figure_entries()
+    cards: dict[int, list[ET.Element]] = {}
+    problems: list[str] = []
+    for card in root.iter(svg_tag("g")):
+        if card.attrib.get("data-feature") != "packing-card":
+            continue
+        raw_n = card.attrib.get("data-n")
+        try:
+            n = int(raw_n) if raw_n is not None else None
+        except ValueError:
+            n = None
+        if n is None:
+            problems.append(f"{path} has a packing card without an integer data-n")
+            continue
+        cards.setdefault(n, []).append(card)
+
+    expected_numbers = set(canvas.spec.numbers)
+    problems.extend(
+        f"{path} has an unexpected packing card for n={n}"
+        for n in sorted(set(cards) - expected_numbers)
+    )
+    for n in canvas.spec.numbers:
+        matching = cards.get(n, [])
+        if len(matching) != 1:
+            problems.append(f"{path} has {len(matching)} packing cards for n={n}; expected 1")
+            continue
+        entry = entries[n]
+        expected = {
+            "packing-label": (str(n),),
+            "side-bound": (str(entry["side"]["display"]),),
+            "lower-bound": (
+                (str(entry["lower"]["display"]),) if entry["lower"]["shown"] else ()
+            ),
+        }
+        card = matching[0]
+        for feature, expected_text in expected.items():
+            actual_text = tuple(
+                "".join(node.itertext())
+                for node in card.iter(svg_tag("text"))
+                if node.attrib.get("data-feature") == feature
+            )
+            if actual_text != expected_text:
+                problems.append(
+                    f"{path} n={n} {feature} is {actual_text!r}; expected {expected_text!r}"
+                )
     return problems
 
 
@@ -2281,10 +2334,10 @@ def check_sample(stride: int = ATLAS_SAMPLE_STRIDE, workers: int = 1) -> None:
     introduced rather than after the merge.
 
     What it does not cover, stated so nobody has to infer it: the per-case geometry of
-    the cases the stride skips, and the composite SVGs' own bytes. Both are covered by
-    `known-best n=1..324 atlas rebuild` on the deferred surface, which is the exact
-    complement `test_the_deep_gate_runs_exactly_what_the_pull_request_surface_defers`
-    holds.
+    the cases the stride skips, and the composite SVGs' own bytes beyond their canvas,
+    visible claim labels, and export receipts. Both are covered by `known-best
+    n=1..324 atlas rebuild` on the deferred surface, which is the exact complement
+    `test_the_deep_gate_runs_exactly_what_the_pull_request_surface_defers` holds.
     """
     numbers = sampled_numbers(CORPUS, stride)
     problems, entries = _retained_problems()

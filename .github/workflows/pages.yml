@@ -70,6 +70,7 @@ name: Certificate page
       - packages/workbench/**
       - packing/devtools/check_published_site.py
       - packing/devtools/pages_scope.py
+      - packing/devtools/wait_for_run_artifact.py
       - packing/devtools/explainer/**
       - packing/devtools/probes/**
       - packing/atlas/known-best/manifest.json
@@ -95,14 +96,14 @@ concurrency:
 #   scope ─┬─ explainer-unchanged                  (only when the explainer is skipped)
 #          ├─ workbench-unchanged                  (only when the workbench is skipped)
 #          ├─ workbench ───────────────────────────────┐
-#          └─ prepare ─┬─ pdf ─────────────────────────┼─ publish ─┐
-#                      ├─ print-layout                 │           ├─ pages-required ─ (pr-wall)
-#                      ├─ typography                   │           │
-#                      ├─ screen                       │           │
-#                      ├─ geometry                     │           │
-#                      ├─ font-loading (ff, wk)        │           │
-#                      ├─ browser-geometry (ff, wk)    │           │
-#                      └─ startup-timing (dispatch)    │           │
+#          ├─ prepare ─┬─ pdf ─────────────────────────┼─ publish ─┐
+#          │           ├─ print-layout                 │           ├─ pages-required (gate + wall)
+#          │           ├─ typography                   │           │
+#          │           ├─ screen                       │           │
+#          │           ├─ geometry                     │           │
+#          │           └─ startup-timing (dispatch)    │           │
+#          ├─ font-loading (ff, wk) ── wait artifact ──┤           │
+#          └─ browser-geometry (ff, wk) ─ wait artifact┘           │
 #                                                      └───────────┴─ deploy ─ verify-deployment
 #
 # A pull request waits for its slowest job, so what sets its wall is the longest chain,
@@ -111,9 +112,11 @@ concurrency:
 # workbench stack's pull requests, 381 s on pull requests into `main`, and 471 s on the
 # push to `main` that merged the stack (run 35017781374). None of those checks reads
 # another's result -- each loads the one prepared page -- so they are split into jobs
-# balanced by their measured step times, and the long pole is now `scope`, `prepare` and
-# one check job. Every check that ran before still runs, on the same prepared artifact;
-# nothing moved off the pull request (`OR-13`).
+# balanced by their measured step times. Firefox and WebKit provisioning starts beside
+# `prepare`, then joins it through a bounded, fail-closed artifact wait immediately
+# before the page is read. The long pole therefore overlaps independent setup rather
+# than serializing it. Every check that ran before still runs, on the same prepared
+# artifact; nothing moved off the pull request (`OR-13`).
 jobs:
   # Which of the two pages this change can affect. A pull request that touches neither
   # page's inputs does no browser work at all, and a workbench-only change no longer
@@ -176,7 +179,6 @@ jobs:
   # has to interpret. These run only when their page is out of scope, and they fail if
   # the scope job gave no reason, so an empty output cannot pass for a decision.
   explainer-unchanged:
-    name: "explainer: no declared input changed, its build and browser checks are skipped"
     needs: scope
     if: needs.scope.outputs.explainer != 'true'
     runs-on: ubuntu-latest
@@ -190,7 +192,6 @@ jobs:
           echo "The explainer is not built or checked on this run: $REASON." >> "$GITHUB_STEP_SUMMARY"
 
   workbench-unchanged:
-    name: "workbench: no declared input changed, its build is skipped"
     needs: scope
     if: needs.scope.outputs.workbench != 'true'
     runs-on: ubuntu-latest
@@ -207,6 +208,8 @@ jobs:
     needs: scope
     if: needs.scope.outputs.explainer == 'true'
     runs-on: ubuntu-latest
+    outputs:
+      prepared_artifact_id: ${{ steps.prepared-page-upload.outputs.artifact-id }}
     defaults:
       run:
         working-directory: packing
@@ -286,6 +289,7 @@ jobs:
           echo "two renders agree; one file, $(du -h site/index.html | cut -f1)"
 
       - name: Share the prepared page with all browser checks
+        id: prepared-page-upload
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: prepared-page
@@ -374,12 +378,20 @@ jobs:
   # spread over three jobs, because balanced by cost is what keeps the longest job short.
   # Each job downloads the one prepared page, so all of them check the bytes that are
   # published, and a failure now names its job rather than a step in a 388 s queue.
+  # Their checkout, Python and browser provisioning do not consume the page, so those
+  # steps start beside `prepare`; each job joins the exact `prepared-page` artifact only
+  # after setup. Run 35127260004 showed that leaving this setup behind `prepare` made
+  # `typography` the new 194 s critical path after the cross-browser jobs were overlapped.
 
   # Everything the PDF is: drawn once, from the prepared page, then checked in place and
   # handed to `publish` unchanged.
   pdf:
-    needs: prepare
+    needs: scope
+    if: needs.scope.outputs.explainer == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
     defaults:
       run:
         working-directory: packing
@@ -405,12 +417,6 @@ jobs:
           enable-cache: true
           cache-dependency-glob: uv.lock
 
-      - name: Use the prepared page
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-        with:
-          name: prepared-page
-          path: packing/site
-
       - name: Cache the Playwright browser
         uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
         with:
@@ -419,6 +425,32 @@ jobs:
 
       - name: Install the pinned Chromium headless shell
         run: uv run --frozen --group dev python -m playwright install --only-shell chromium
+
+      - name: Wait for the prepared page
+        id: prepared
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          uv run --frozen --group dev python -m devtools.wait_for_run_artifact
+          --repository "$GITHUB_REPOSITORY" --run-id "$GITHUB_RUN_ID"
+          --run-attempt "$GITHUB_RUN_ATTEMPT" --name prepared-page
+          --producer prepare --github-output "$GITHUB_OUTPUT" --timeout 600
+
+      # With `merge-multiple`, an empty `artifact-ids` downloads every artifact in the
+      # run into `packing/site`, the workbench's `index.html` among them. Refuse it here.
+      - name: Require the prepared page's artifact id
+        env:
+          ARTIFACT_ID: ${{ steps.prepared.outputs.artifact_id }}
+        run: >-
+          [[ "$ARTIFACT_ID" =~ ^[1-9][0-9]*$ ]]
+          || { echo "::error::the prepared page has no artifact id to download"; exit 1; }
+
+      - name: Use the prepared page
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          artifact-ids: ${{ steps.prepared.outputs.artifact_id }}
+          path: packing/site
+          merge-multiple: true
 
       # After the page, not beside it: the exporter loads `site/index.html` from disk,
       # and Figure 2 references the composite that the render copies into `site/` on its
@@ -520,8 +552,12 @@ jobs:
           retention-days: 7
 
   print-layout:
-    needs: prepare
+    needs: scope
+    if: needs.scope.outputs.explainer == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
     defaults:
       run:
         working-directory: packing
@@ -547,12 +583,6 @@ jobs:
           enable-cache: true
           cache-dependency-glob: uv.lock
 
-      - name: Use the prepared page
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-        with:
-          name: prepared-page
-          path: packing/site
-
       - name: Cache the Playwright browser
         uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
         with:
@@ -561,6 +591,32 @@ jobs:
 
       - name: Install the pinned Chromium headless shell
         run: uv run --frozen --group dev python -m playwright install --only-shell chromium
+
+      - name: Wait for the prepared page
+        id: prepared
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          uv run --frozen --group dev python -m devtools.wait_for_run_artifact
+          --repository "$GITHUB_REPOSITORY" --run-id "$GITHUB_RUN_ID"
+          --run-attempt "$GITHUB_RUN_ATTEMPT" --name prepared-page
+          --producer prepare --github-output "$GITHUB_OUTPUT" --timeout 600
+
+      # With `merge-multiple`, an empty `artifact-ids` downloads every artifact in the
+      # run into `packing/site`, the workbench's `index.html` among them. Refuse it here.
+      - name: Require the prepared page's artifact id
+        env:
+          ARTIFACT_ID: ${{ steps.prepared.outputs.artifact_id }}
+        run: >-
+          [[ "$ARTIFACT_ID" =~ ^[1-9][0-9]*$ ]]
+          || { echo "::error::the prepared page has no artifact id to download"; exit 1; }
+
+      - name: Use the prepared page
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          artifact-ids: ${{ steps.prepared.outputs.artifact_id }}
+          path: packing/site
+          merge-multiple: true
 
       # Reproducibility is not correctness: the PDF artifact check would have passed on
       # all three print defects a reader found in the finished PDF, because two identical
@@ -568,16 +624,28 @@ jobs:
       # blocks the page declares centred, where the list markers sit, whether a footnote
       # reference opens a line -- at the column the PDF actually has, and the second
       # measures the same thing on a page mutated to overflow, so the probe is held to
-      # catching what it exists to catch.
-      - name: Check the print layout
-        run: uv run --frozen --group dev python -m devtools.check_print_layout
-
-      - name: Check the print-layout probe still catches a page-width overflow
-        run: uv run --frozen --group dev python -m devtools.check_print_layout --self-check
+      # catching what it exists to catch. The two Chromium launches do not share a page.
+      - name: Check the print layout and its overflow self-check
+        run: |
+          set -euo pipefail
+          uv run --frozen --group dev python -m devtools.check_print_layout &
+          layout_pid=$!
+          uv run --frozen --group dev python -m devtools.check_print_layout --self-check &
+          self_pid=$!
+          layout_status=0
+          self_status=0
+          wait "$layout_pid" || layout_status=$?
+          wait "$self_pid" || self_status=$?
+          test "$layout_status" -eq 0
+          test "$self_status" -eq 0
 
   typography:
-    needs: prepare
+    needs: scope
+    if: needs.scope.outputs.explainer == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
     defaults:
       run:
         working-directory: packing
@@ -603,12 +671,6 @@ jobs:
           enable-cache: true
           cache-dependency-glob: uv.lock
 
-      - name: Use the prepared page
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-        with:
-          name: prepared-page
-          path: packing/site
-
       - name: Cache the Playwright browser
         uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
         with:
@@ -617,6 +679,32 @@ jobs:
 
       - name: Install the pinned Chromium headless shell
         run: uv run --frozen --group dev python -m playwright install --only-shell chromium
+
+      - name: Wait for the prepared page
+        id: prepared
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          uv run --frozen --group dev python -m devtools.wait_for_run_artifact
+          --repository "$GITHUB_REPOSITORY" --run-id "$GITHUB_RUN_ID"
+          --run-attempt "$GITHUB_RUN_ATTEMPT" --name prepared-page
+          --producer prepare --github-output "$GITHUB_OUTPUT" --timeout 600
+
+      # With `merge-multiple`, an empty `artifact-ids` downloads every artifact in the
+      # run into `packing/site`, the workbench's `index.html` among them. Refuse it here.
+      - name: Require the prepared page's artifact id
+        env:
+          ARTIFACT_ID: ${{ steps.prepared.outputs.artifact_id }}
+        run: >-
+          [[ "$ARTIFACT_ID" =~ ^[1-9][0-9]*$ ]]
+          || { echo "::error::the prepared page has no artifact id to download"; exit 1; }
+
+      - name: Use the prepared page
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          artifact-ids: ${{ steps.prepared.outputs.artifact_id }}
+          path: packing/site
+          merge-multiple: true
 
       - name: Check every comparison variant measures the font it draws
         run: uv run --frozen --group dev python -m devtools.compare_math_fonts check
@@ -661,8 +749,12 @@ jobs:
 
   # Math faces, font loading and the reading position, all on the prepared page.
   screen:
-    needs: prepare
+    needs: scope
+    if: needs.scope.outputs.explainer == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
     defaults:
       run:
         working-directory: packing
@@ -688,12 +780,6 @@ jobs:
           enable-cache: true
           cache-dependency-glob: uv.lock
 
-      - name: Use the prepared page
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-        with:
-          name: prepared-page
-          path: packing/site
-
       - name: Cache the Playwright browser
         uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
         with:
@@ -702,6 +788,32 @@ jobs:
 
       - name: Install the pinned Chromium headless shell
         run: uv run --frozen --group dev python -m playwright install --only-shell chromium
+
+      - name: Wait for the prepared page
+        id: prepared
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          uv run --frozen --group dev python -m devtools.wait_for_run_artifact
+          --repository "$GITHUB_REPOSITORY" --run-id "$GITHUB_RUN_ID"
+          --run-attempt "$GITHUB_RUN_ATTEMPT" --name prepared-page
+          --producer prepare --github-output "$GITHUB_OUTPUT" --timeout 600
+
+      # With `merge-multiple`, an empty `artifact-ids` downloads every artifact in the
+      # run into `packing/site`, the workbench's `index.html` among them. Refuse it here.
+      - name: Require the prepared page's artifact id
+        env:
+          ARTIFACT_ID: ${{ steps.prepared.outputs.artifact_id }}
+        run: >-
+          [[ "$ARTIFACT_ID" =~ ^[1-9][0-9]*$ ]]
+          || { echo "::error::the prepared page has no artifact id to download"; exit 1; }
+
+      - name: Use the prepared page
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          artifact-ids: ${{ steps.prepared.outputs.artifact_id }}
+          path: packing/site
+          merge-multiple: true
 
       # Which composite draws each expression, which metric table laid it out, and
       # whether the faces were loaded before the first one was painted. None of the three
@@ -737,8 +849,12 @@ jobs:
   # carries the host check and the negative controls, about 41 s of this job's 61; the
   # mobile settings run in `typography` and the print settings in `pdf`.
   geometry:
-    needs: prepare
+    needs: scope
+    if: needs.scope.outputs.explainer == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
     defaults:
       run:
         working-directory: packing
@@ -764,12 +880,6 @@ jobs:
           enable-cache: true
           cache-dependency-glob: uv.lock
 
-      - name: Use the prepared page
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-        with:
-          name: prepared-page
-          path: packing/site
-
       - name: Cache the Playwright browser
         uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
         with:
@@ -778,6 +888,32 @@ jobs:
 
       - name: Install the pinned Chromium headless shell
         run: uv run --frozen --group dev python -m playwright install --only-shell chromium
+
+      - name: Wait for the prepared page
+        id: prepared
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          uv run --frozen --group dev python -m devtools.wait_for_run_artifact
+          --repository "$GITHUB_REPOSITORY" --run-id "$GITHUB_RUN_ID"
+          --run-attempt "$GITHUB_RUN_ATTEMPT" --name prepared-page
+          --producer prepare --github-output "$GITHUB_OUTPUT" --timeout 600
+
+      # With `merge-multiple`, an empty `artifact-ids` downloads every artifact in the
+      # run into `packing/site`, the workbench's `index.html` among them. Refuse it here.
+      - name: Require the prepared page's artifact id
+        env:
+          ARTIFACT_ID: ${{ steps.prepared.outputs.artifact_id }}
+        run: >-
+          [[ "$ARTIFACT_ID" =~ ^[1-9][0-9]*$ ]]
+          || { echo "::error::the prepared page has no artifact id to download"; exit 1; }
+
+      - name: Use the prepared page
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          artifact-ids: ${{ steps.prepared.outputs.artifact_id }}
+          path: packing/site
+          merge-multiple: true
 
       # The trap: see the print geometry step in `typography`.
       - name: Check reserved math geometry under every saved font setting
@@ -803,13 +939,17 @@ jobs:
 
   # The same prepared page in Firefox and WebKit: mobile font loading and the saved font
   # settings at 1280 px here, the 390 px settings and the reload position in
-  # `browser-geometry`. WebKit's page loads are about 7 s against Firefox's 5, and the
-  # eight settings in one job made WebKit the longest job of run 35039248281 at 120 s;
-  # split this way its two jobs are about 80 s each, on top of an install that the
-  # package cache below takes from 30 s to about 14 s.
+  # `browser-geometry`. WebKit's page loads are about 7 s against Firefox's 5. The four
+  # independent saved-font variants run in two pairs: exact-head run 35078515689 spent
+  # 39 s on them serially and missed OR-14's 180 s outer edge by 9 s. Two pairs preserve
+  # headroom on the four-CPU runner while removing roughly half that serial tail.
   font-loading:
-    needs: prepare
+    needs: scope
+    if: needs.scope.outputs.explainer == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
     strategy:
       fail-fast: false
       matrix:
@@ -877,11 +1017,33 @@ jobs:
           sudo rm -rf ~/apt-archives/partial ~/apt-archives/lock
           sudo chown -R "$(id -u):$(id -g)" ~/apt-archives
 
+      # Provisioning is independent of the page and starts beside `prepare`. Join only
+      # at the first consumer, with a bounded tool that also observes producer failure.
+      - name: Wait for the prepared page
+        id: prepared
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          uv run --frozen --group dev python -m devtools.wait_for_run_artifact
+          --repository "$GITHUB_REPOSITORY" --run-id "$GITHUB_RUN_ID"
+          --run-attempt "$GITHUB_RUN_ATTEMPT" --name prepared-page
+          --producer prepare --github-output "$GITHUB_OUTPUT" --timeout 600
+
+      # With `merge-multiple`, an empty `artifact-ids` downloads every artifact in the
+      # run into `packing/site`, the workbench's `index.html` among them. Refuse it here.
+      - name: Require the prepared page's artifact id
+        env:
+          ARTIFACT_ID: ${{ steps.prepared.outputs.artifact_id }}
+        run: >-
+          [[ "$ARTIFACT_ID" =~ ^[1-9][0-9]*$ ]]
+          || { echo "::error::the prepared page has no artifact id to download"; exit 1; }
+
       - name: Use the prepared page
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: prepared-page
+          artifact-ids: ${{ steps.prepared.outputs.artifact_id }}
           path: packing/site
+          merge-multiple: true
 
       - name: Check mobile font loading on the published artifact
         run: |
@@ -893,10 +1055,18 @@ jobs:
           trap 'exit 130' INT TERM
           mkdir -p /tmp/math-geometry
           geometry_status=0
-          uv run --frozen --group dev python -m devtools.prepare_explainer_math site/index.html --browser ${{ matrix.browser }} --width 1280 --host-check --output /tmp/math-geometry/${{ matrix.browser }}-1280-custom-serif-screen.json || geometry_status=1
-          uv run --frozen --group dev python -m devtools.prepare_explainer_math site/index.html --browser ${{ matrix.browser }} --prose-font sans --width 1280 --output /tmp/math-geometry/${{ matrix.browser }}-1280-custom-sans-screen.json || geometry_status=1
-          uv run --frozen --group dev python -m devtools.prepare_explainer_math site/index.html --browser ${{ matrix.browser }} --font-set system --width 1280 --output /tmp/math-geometry/${{ matrix.browser }}-1280-system-serif-screen.json || geometry_status=1
-          uv run --frozen --group dev python -m devtools.prepare_explainer_math site/index.html --browser ${{ matrix.browser }} --font-set system --prose-font sans --width 1280 --output /tmp/math-geometry/${{ matrix.browser }}-1280-system-sans-screen.json || geometry_status=1
+          uv run --frozen --group dev python -m devtools.prepare_explainer_math site/index.html --browser ${{ matrix.browser }} --width 1280 --host-check --output /tmp/math-geometry/${{ matrix.browser }}-1280-custom-serif-screen.json &
+          custom_serif_pid=$!
+          uv run --frozen --group dev python -m devtools.prepare_explainer_math site/index.html --browser ${{ matrix.browser }} --prose-font sans --width 1280 --output /tmp/math-geometry/${{ matrix.browser }}-1280-custom-sans-screen.json &
+          custom_sans_pid=$!
+          wait "$custom_serif_pid" || geometry_status=1
+          wait "$custom_sans_pid" || geometry_status=1
+          uv run --frozen --group dev python -m devtools.prepare_explainer_math site/index.html --browser ${{ matrix.browser }} --font-set system --width 1280 --output /tmp/math-geometry/${{ matrix.browser }}-1280-system-serif-screen.json &
+          system_serif_pid=$!
+          uv run --frozen --group dev python -m devtools.prepare_explainer_math site/index.html --browser ${{ matrix.browser }} --font-set system --prose-font sans --width 1280 --output /tmp/math-geometry/${{ matrix.browser }}-1280-system-sans-screen.json &
+          system_sans_pid=$!
+          wait "$system_serif_pid" || geometry_status=1
+          wait "$system_sans_pid" || geometry_status=1
           exit "$geometry_status"
 
       - name: Retain browser geometry observations
@@ -909,8 +1079,12 @@ jobs:
           retention-days: 7
 
   browser-geometry:
-    needs: prepare
+    needs: scope
+    if: needs.scope.outputs.explainer == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
     strategy:
       fail-fast: false
       matrix:
@@ -978,11 +1152,31 @@ jobs:
           sudo rm -rf ~/apt-archives/partial ~/apt-archives/lock
           sudo chown -R "$(id -u):$(id -g)" ~/apt-archives
 
+      - name: Wait for the prepared page
+        id: prepared
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          uv run --frozen --group dev python -m devtools.wait_for_run_artifact
+          --repository "$GITHUB_REPOSITORY" --run-id "$GITHUB_RUN_ID"
+          --run-attempt "$GITHUB_RUN_ATTEMPT" --name prepared-page
+          --producer prepare --github-output "$GITHUB_OUTPUT" --timeout 600
+
+      # With `merge-multiple`, an empty `artifact-ids` downloads every artifact in the
+      # run into `packing/site`, the workbench's `index.html` among them. Refuse it here.
+      - name: Require the prepared page's artifact id
+        env:
+          ARTIFACT_ID: ${{ steps.prepared.outputs.artifact_id }}
+        run: >-
+          [[ "$ARTIFACT_ID" =~ ^[1-9][0-9]*$ ]]
+          || { echo "::error::the prepared page has no artifact id to download"; exit 1; }
+
       - name: Use the prepared page
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: prepared-page
+          artifact-ids: ${{ steps.prepared.outputs.artifact_id }}
           path: packing/site
+          merge-multiple: true
 
       - name: Check reload preserves the reading position in both viewports
         run: |
@@ -1051,11 +1245,21 @@ jobs:
           enable-cache: true
           cache-dependency-glob: uv.lock
 
+      # With `merge-multiple`, an empty `artifact-ids` downloads every artifact in the
+      # run into `packing/site`, the workbench's `index.html` among them. Refuse it here.
+      - name: Require the prepared page's artifact id
+        env:
+          ARTIFACT_ID: ${{ needs.prepare.outputs.prepared_artifact_id }}
+        run: >-
+          [[ "$ARTIFACT_ID" =~ ^[1-9][0-9]*$ ]]
+          || { echo "::error::the prepared page has no artifact id to download"; exit 1; }
+
       - name: Use the prepared page
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: prepared-page
+          artifact-ids: ${{ needs.prepare.outputs.prepared_artifact_id }}
           path: packing/site
+          merge-multiple: true
 
       - name: Cache the Playwright browser
         uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
@@ -1109,11 +1313,21 @@ jobs:
     needs: [prepare, pdf, workbench]
     runs-on: ubuntu-latest
     steps:
+      # With `merge-multiple`, an empty `artifact-ids` downloads every artifact in the
+      # run into `packing/site`, the workbench's `index.html` among them. Refuse it here.
+      - name: Require the prepared page's artifact id
+        env:
+          ARTIFACT_ID: ${{ needs.prepare.outputs.prepared_artifact_id }}
+        run: >-
+          [[ "$ARTIFACT_ID" =~ ^[1-9][0-9]*$ ]]
+          || { echo "::error::the prepared page has no artifact id to download"; exit 1; }
+
       - name: Use the prepared page
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: prepared-page
+          artifact-ids: ${{ needs.prepare.outputs.prepared_artifact_id }}
           path: packing/site
+          merge-multiple: true
 
       - name: Use the checked PDF
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
@@ -1161,6 +1375,9 @@ jobs:
       - startup-timing
       - publish
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
     steps:
       - name: Require every page this run builds to pass
         env:
@@ -1173,15 +1390,47 @@ jobs:
             and ([.[].result] | all(. == "success" or . == "skipped"))
           ' <<< "$NEEDS" > /dev/null
 
-  # Lane 3 of think-xfqk (`claude/ci-wall-budget`) adds `pr-wall` here: a trailing job with
-  # `needs: pages-required` and `if: always() && github.event_name == 'pull_request'`
-  # that reads this run's job timings and holds the pull-request wall to its budget.
-  # `pages-required` needs every job a pull request runs, so a job that needs it is the
-  # last one in the graph; nothing below this comment runs on a pull request.
+      # The wall-check step's start is the stable end of the measured wall: every job
+      # above is settled, and this aggregator's checkout and setup are included while the
+      # check itself is not. The checkout is blobless and sparse so evidence collection
+      # does not become the wall's floor.
+      - name: Check out the wall budget and its register
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          sparse-checkout: |
+            packing/devtools/check_pr_wall.py
+            packing/devtools/gate-budgets.yaml
+          sparse-checkout-cone-mode: false
+          filter: blob:none
+          persist-credentials: false
 
+      - name: Install uv and Python 3.14
+        if: always() && github.event_name == 'pull_request'
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: "0.12.8"
+          python-version: "3.14.7"
+          enable-cache: false
+
+      - name: Hold the pull request's wall to its budget
+        if: always() && github.event_name == 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          EXPECTED_PREREQUISITES: ${{ toJSON(needs) }}
+        run: >-
+          uv run --no-project --python 3.14.7 --with PyYAML==6.0.3 python
+          packing/devtools/check_pr_wall.py --workflow certificate-page
+
+  # A job with no status function in its `if:` implicitly requires `success()`, which
+  # GitHub evaluates over every ancestor, not just `needs:`. The dispatch-only timing job
+  # and one job of each `*-unchanged` pair skip on every push, so without explicit result
+  # checks these two jobs skip too: from 2026-09-16 no push to `main` deployed.
   deploy:
     needs: [publish, pages-required]
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    if: >-
+      ${{ !cancelled() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+      && needs.publish.result == 'success' && needs.pages-required.result == 'success' }}
     runs-on: ubuntu-latest
     outputs:
       page-url: ${{ steps.deployment.outputs.page_url }}
@@ -1204,6 +1453,7 @@ jobs:
 
   verify-deployment:
     needs: deploy
+    if: ${{ !cancelled() && needs.deploy.result == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repository

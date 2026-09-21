@@ -26,6 +26,8 @@ from cases.n12_fractional_certificate.replay import load as load_n12
 from cases.n17_fractional_certificate.replay import BURNS_CONTROL_PATH
 from cases.n17_fractional_certificate.replay import declared as declared_n17
 from cases.n17_fractional_certificate.replay import load as load_n17
+from cases.n18_fractional_certificate.replay import declared as declared_n18
+from cases.n18_fractional_certificate.replay import load as load_n18
 from cases.n20_fractional_certificate.replay import declared as declared_n20
 from cases.n20_fractional_certificate.replay import load as load_n20
 from sqpack.fractional import interval as interval_module
@@ -386,6 +388,29 @@ def test_the_retained_n20_certificate_is_accepted_on_the_full_doubled_net() -> N
     assert enclosure is not None
     assert certificate.bounded_side == Fraction(97, 20)
     assert declared_n20()["least_cell_mass"] == str(enclosure[0])
+
+
+@pytest.mark.exhaustive_exact
+def test_the_retained_n18_certificate_is_accepted_on_the_full_doubled_net() -> None:
+    """The interval-certified decision of s(18) >= 4679/1000, every direction.
+
+    T-030 stands at C4 on the strength of this route. The decide_certificate
+    gate already accepted these bytes; this test is the named replay
+    E-fractional-interval-decision points at for the new rung.
+    """
+    certificate = load_n18()
+    verdict = verify_by_intervals(certificate, enclose=True)
+    assert verdict.accepted, verdict.failures
+    assert not any(o.budget_exhausted for o in verdict.directions)
+    # 181 steps inclusive of both ends is 182 half-tangents; the doubled net
+    # drops only the upright reflection, so 2 * 182 - 1 = 363.
+    assert len(verdict.directions) == 363
+    assert sum(outcome.stalled for outcome in verdict.directions) == 0
+    enclosure = verdict.enclosure
+    assert enclosure == (Fraction(200001, 200000), Fraction(200001, 200000))
+    assert enclosure is not None
+    assert certificate.bounded_side == Fraction(4679, 1000)
+    assert declared_n18()["least_cell_mass"] == str(enclosure[0])
 
 
 # --- the published-value control ----------------------------------------------
@@ -814,6 +839,20 @@ def test_perturbing_the_coincidence_away_lets_the_same_search_certify() -> None:
     # undecided, since a sample decides nothing about the other 360 directions.
     assert not verdict.accepted
     assert verdict.conditions[-1].status == "undecided"
+
+
+def test_collecting_stall_boxes_does_not_change_the_grid_verdict() -> None:
+    """The dump is diagnostic: the same boxes, the same refusal."""
+
+    certificate = _grid_certificate(Fraction(1, 2))
+    stalls: dict[str, list[list[float]]] = {}
+    with_log = verify_by_intervals(certificate, directions=("0",), stall_log=stalls)
+    without = verify_by_intervals(certificate, directions=("0",))
+    assert with_log.directions[0].stalled == without.directions[0].stalled
+    assert with_log.directions[0].status == without.directions[0].status
+    assert with_log.accepted == without.accepted
+    assert stalls["0"]
+    assert len(stalls["0"][0]) == 4
 
 
 # --- Burns's control: the seam the interval route cannot close --------------

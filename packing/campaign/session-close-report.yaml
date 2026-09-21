@@ -7,19 +7,19 @@ softschema:
   schema: schemas/session-close-report.schema.yaml
   envelope: null
   status: enforced
-count: 135
+count: 150
 generated_by: >-
   uv run --frozen --all-extras --group dev python -m devtools.close_session --render
 totals:
-  sessions_measured: 87
-  sessions_unmeasured: 48
+  sessions_measured: 96
+  sessions_unmeasured: 54
   attributed:
-    rollups: 129
-    turns: 40048
-    tool_calls: 21835
-    tool_errors: 440
-    one_off_code: 3461
-    wall_hours: 370.08
+    rollups: 176
+    turns: 48062
+    tool_calls: 26312
+    tool_errors: 522
+    one_off_code: 4032
+    wall_hours: 428.3
   unattributed:
     rollups: 60
     turns: 11110
@@ -28,16 +28,16 @@ totals:
     one_off_code: 946
     wall_hours: 51.75
   measured:
-    rollups: 189
-    turns: 51158
-    tool_calls: 28374
-    tool_errors: 596
-    one_off_code: 4407
-    wall_hours: 421.83
+    rollups: 236
+    turns: 59172
+    tool_calls: 32851
+    tool_errors: 678
+    one_off_code: 4978
+    wall_hours: 480.05
 codex_receipts:
-  attributed: 55
+  attributed: 56
   unattributed: 2
-  measured: 57
+  measured: 58
 # Per-session figures below are the logs each session DECLARES. They overlap when
 # sessions share a harness log, so they do not sum to `attributed` above.
 sessions:
@@ -2261,3 +2261,239 @@ sessions:
     active_union_hours: 0.48
     wall_hours: 0.48
     snapshot_incomplete: true
+- id: session-136
+  title: "CI Topology Reconciliation"
+  status: stopped
+  primary_bead: think-97we
+  phases: 1
+  measured: false
+  unmeasured_reason: >-
+    native harness data unavailable; The collaboration harness exposed delegated task status but no native task-tree resource receipt or log identifier from which a repository roll-up could be generated.
+  rollups: []
+  codex_receipts: []
+- id: session-137
+  title: "CI Topology Continuation and Crash Recovery"
+  status: stopped
+  primary_bead: think-97we
+  phases: 3
+  measured: false
+  unmeasured_reason: >-
+    native harness data unavailable; No receipt measures this interval as one attributable cost. In the same window the Codex workbench task 01a0a837 also merged PR 189 and drafted PR 190, work on other branches, so no delta from its log belongs to this branch alone. A delta from the Session 136 Codex task 01a0a0b5 would omit that thread's share, and the Claude recovery log was still live when this record stopped, so each available source yields only a partial lower bound.
+  rollups: []
+  codex_receipts: []
+- id: session-138
+  title: "N11 Overnight Review"
+  status: stopped
+  primary_bead: think-4woh
+  phases: 6
+  measured: false
+  unmeasured_reason: >-
+    native harness data unavailable; The coordinator's Claude session was still live when this record was written, and its single log also carries the parallel pull-request threads and a session-quota exhaustion from about 00:15 to 02:50 PT. No per-log receipt was generated before terminalization, and the native log does not separate this program's usage from the pull-request work that shares it.
+  rollups: []
+  codex_receipts: []
+- id: session-139
+  title: "N11 Overnight Research"
+  status: stopped
+  primary_bead: think-mcb6
+  phases: 4
+  measured: false
+  unmeasured_reason: >-
+    native harness data unavailable; This Cursor cloud-agent run has no ClaudeEfficiencyRollup or CodexTaskTreeDelta receipt. Session clocks and the encode and covering walls are not a substitute.
+  rollups: []
+  codex_receipts: []
+- id: session-140
+  title: "N<=100 Lower-Bound Survey"
+  status: stopped
+  primary_bead: think-8x4t
+  phases: 3
+  measured: false
+  unmeasured_reason: >-
+    native harness data unavailable; This Cursor cloud-agent run has no ClaudeEfficiencyRollup or CodexTaskTreeDelta receipt. Session clocks and covering walls are not a substitute.
+  rollups: []
+  codex_receipts: []
+- id: session-141
+  title: "N<100 Research Loop"
+  status: stopped
+  primary_bead: think-ul7y
+  phases: 3
+  measured: false
+  unmeasured_reason: >-
+    native harness data unavailable; This Cursor cloud-agent run has no ClaudeEfficiencyRollup or CodexTaskTreeDelta receipt. Session clocks and covering walls are not a substitute.
+  rollups: []
+  codex_receipts: []
+- id: session-142
+  title: "Correctness Review of PRs 199–201"
+  status: completed
+  primary_bead: think-gz4k
+  phases: 2
+  measured: true
+  rollups:
+  - packing/campaign/resource-usage/session-142-stack-correctness.yaml
+  turns: null
+  tool_calls: null
+  tool_errors: null
+  one_off_code: null
+  wall_hours: null
+  codex_receipts:
+  - path: packing/campaign/resource-usage/session-142-stack-correctness.yaml
+    model_responses: 1186
+    agent_hours: 5.01
+    active_union_hours: 2.29
+    wall_hours: 2.3
+    snapshot_incomplete: true
+- id: session-143
+  title: "Deeper Mathematical Review of Lower-Bound Routes"
+  status: completed
+  primary_bead: think-srln
+  phases: 2
+  measured: true
+  rollups:
+  - packing/campaign/resource-usage/5e071e1a-5ab8-5bae-a5c0-c3687815bf4a.yaml
+  - packing/campaign/resource-usage/ae3edbd2676fddaf2.yaml
+  - packing/campaign/resource-usage/afc8f6dcbe7aef07d.yaml
+  - packing/campaign/resource-usage/af860c4b4d0468ad0.yaml
+  - packing/campaign/resource-usage/a5a0fa0629343ea04.yaml
+  - packing/campaign/resource-usage/a593739458b58626a.yaml
+  - packing/campaign/resource-usage/a8b8b405efc053f16.yaml
+  - packing/campaign/resource-usage/a68c79e799a3fc678.yaml
+  - packing/campaign/resource-usage/a1730fd7bec467b88.yaml
+  turns: 1730
+  tool_calls: 1024
+  tool_errors: 13
+  one_off_code: 167
+  wall_hours: 13.36
+  codex_receipts: []
+- id: session-144
+  title: "Overnight Chunk 1 — Stock-Instrument Determinations at n=13, 17, 26"
+  status: completed
+  primary_bead: think-pogj
+  phases: 1
+  measured: true
+  rollups:
+  - packing/campaign/resource-usage/5e071e1a-5ab8-5bae-a5c0-c3687815bf4a.yaml
+  - packing/campaign/resource-usage/a40525ecaabdf057f.yaml
+  - packing/campaign/resource-usage/af3bb85bdced64a1f.yaml
+  - packing/campaign/resource-usage/a6b63770ad4f86dd8.yaml
+  - packing/campaign/resource-usage/adb95622cef697549.yaml
+  - packing/campaign/resource-usage/a5a0195a7e1b20013.yaml
+  - packing/campaign/resource-usage/acb53dcd42fbab01e.yaml
+  turns: 1633
+  tool_calls: 953
+  tool_errors: 11
+  one_off_code: 159
+  wall_hours: 14.96
+  codex_receipts: []
+- id: session-145
+  title: "Overnight Chunk 2 — The Corner-Clip Instrument and H-222"
+  status: completed
+  primary_bead: think-ni3v
+  phases: 1
+  measured: true
+  rollups:
+  - packing/campaign/resource-usage/5e071e1a-5ab8-5bae-a5c0-c3687815bf4a.yaml
+  - packing/campaign/resource-usage/afdde84bfe1625a5f.yaml
+  - packing/campaign/resource-usage/af9db849f9a1cc845.yaml
+  - packing/campaign/resource-usage/a9d7576dad97ca9ab.yaml
+  - packing/campaign/resource-usage/a957ff219905b86a7.yaml
+  turns: 1607
+  tool_calls: 952
+  tool_errors: 8
+  one_off_code: 144
+  wall_hours: 12.47
+  codex_receipts: []
+- id: session-146
+  title: "Overnight Chunk 3 — The exp-219 Registration Review and the Fold Tool"
+  status: completed
+  primary_bead: think-b7pr
+  phases: 1
+  measured: true
+  rollups:
+  - packing/campaign/resource-usage/5e071e1a-5ab8-5bae-a5c0-c3687815bf4a.yaml
+  - packing/campaign/resource-usage/a57beb19e2ae7ed7b.yaml
+  - packing/campaign/resource-usage/a556b81b10ff8b762.yaml
+  - packing/campaign/resource-usage/aac63642e9cd0a16e.yaml
+  turns: 1241
+  tool_calls: 735
+  tool_errors: 6
+  one_off_code: 105
+  wall_hours: 11.55
+  codex_receipts: []
+- id: session-147
+  title: "Overnight Chunk 4 — The BC-367 Registration Entry"
+  status: completed
+  primary_bead: think-b7pr
+  phases: 1
+  measured: true
+  rollups:
+  - packing/campaign/resource-usage/5e071e1a-5ab8-5bae-a5c0-c3687815bf4a.yaml
+  turns: 958
+  tool_calls: 561
+  tool_errors: 2
+  one_off_code: 90
+  wall_hours: 10.93
+  codex_receipts: []
+- id: session-148
+  title: "Chunk 5 — The Second Stage Inside the All-Deep Class, and the Gap-g Wedge"
+  status: stopped
+  primary_bead: think-b7pr
+  phases: 1
+  measured: true
+  rollups:
+  - packing/campaign/resource-usage/5e071e1a-5ab8-5bae-a5c0-c3687815bf4a.yaml
+  - packing/campaign/resource-usage/a559dad08e3059322.yaml
+  - packing/campaign/resource-usage/ab767eaa07325eb5f.yaml
+  - packing/campaign/resource-usage/af80e22bd291ac081.yaml
+  - packing/campaign/resource-usage/aa765fa0c2414bc33.yaml
+  - packing/campaign/resource-usage/a65f1dd01126278cb.yaml
+  - packing/campaign/resource-usage/a2dbeb566572f2219.yaml
+  - packing/campaign/resource-usage/a7d6f9f0f839a3ab3.yaml
+  - packing/campaign/resource-usage/ac77b62ac52bfd061.yaml
+  - packing/campaign/resource-usage/a7cda6271ca02151e.yaml
+  turns: 1482
+  tool_calls: 857
+  tool_errors: 13
+  one_off_code: 149
+  wall_hours: 13.28
+  codex_receipts: []
+- id: session-149
+  title: "Intake and Verification of Two External n = 17 Weighted Certificates"
+  status: completed
+  primary_bead: think-pcd0
+  phases: 3
+  measured: true
+  rollups:
+  - packing/campaign/resource-usage/7163c7b2-b4ac-4c82-afcc-ab827886ebd9.yaml
+  turns: 370
+  tool_calls: 185
+  tool_errors: 2
+  one_off_code: 23
+  wall_hours: 18.66
+  codex_receipts: []
+- id: session-150
+  title: "Correctness on the Agenda-040 Stack, the n = 17 Ladder, and the Record It Left"
+  status: completed
+  primary_bead: think-b7pr
+  phases: 4
+  measured: true
+  rollups:
+  - packing/campaign/resource-usage/agent-a03d9f91834d31398.yaml
+  - packing/campaign/resource-usage/agent-a0766254e1d7068d0.yaml
+  - packing/campaign/resource-usage/agent-a1a5bdfe66ee80e7e.yaml
+  - packing/campaign/resource-usage/agent-a5ada27ae702ebba4.yaml
+  - packing/campaign/resource-usage/agent-a670ff040f974d000.yaml
+  - packing/campaign/resource-usage/agent-a6bdd78cb6dd38a25.yaml
+  - packing/campaign/resource-usage/agent-aa5aad61a5058f512.yaml
+  - packing/campaign/resource-usage/agent-aadc3241b7be53c05.yaml
+  - packing/campaign/resource-usage/agent-aae9b5ce445a8c884.yaml
+  - packing/campaign/resource-usage/agent-ac18860fbbd613485.yaml
+  - packing/campaign/resource-usage/agent-ac407d8706d60cddc.yaml
+  - packing/campaign/resource-usage/agent-ac9c2597825d2ffd1.yaml
+  - packing/campaign/resource-usage/agent-acc596ced5294ca9c.yaml
+  - packing/campaign/resource-usage/agent-ae65c7226abcb1a98.yaml
+  - packing/campaign/resource-usage/d71b369b-163a-561c-a698-2900d1d8109e.yaml
+  turns: 3783
+  tool_calls: 2015
+  tool_errors: 37
+  one_off_code: 184
+  wall_hours: 17.66
+  codex_receipts: []

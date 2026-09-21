@@ -1281,10 +1281,20 @@ def force_law(session: Session) -> str:
         and segment == ["pair:0.123:3333:250:0.375"],
         f"the law does not clamp, round-trip and ignore junk: {moved}",
     )
+    nondefault_presets = [name for name in presets if laws[name] != laws["default"]]
+    session.require(
+        len(nondefault_presets) >= 2,
+        f"fewer than two presets differ from the balanced default: {presets}",
+    )
     keyed = session.look(
         "law/cache-key",
         n=17,
-        presets={"a": "default", "b": presets[0], "c": "default", "d": presets[1]},
+        presets={
+            "a": "default",
+            "b": nondefault_presets[0],
+            "c": "default",
+            "d": nondefault_presets[1],
+        },
     )
     session.require(
         len({keyed["a"], keyed["b"], keyed["d"]}) == 3 and keyed["a"] == keyed["c"],
@@ -1393,13 +1403,119 @@ def force_law(session: Session) -> str:
         )
     session.api(("setLawPreset", "default"))
     session.require(
-        session.look("dom/count", selector="#law-preset-seg button.on") == 0,
-        "a preset is still lit with the default law in use",
+        session.look("dom/count", selector="#law-preset-seg button.on") == 1,
+        "the default law did not light exactly its named balanced preset",
     )
     restore(session, found, "force_law")
     return (
         f"the law matches its formula under {len(laws)} laws and never pulls over {len(grid)}"
     )
+
+
+def motion_controls_and_arrival(session: Session) -> str:
+    """Physical controls tell the truth, restart paths, and preserve square-first continuity."""
+    scoped = session.look("controls/motion-scope")
+    for label in ("tween", "staticStep"):
+        state = scoped[label]
+        session.require(
+            state["arrivalDelayDisabled"] is False
+            and all(
+                group["inert"] and group["aria"] == "true" and group["disabled"]
+                for group in state["groups"]
+            ),
+            f"{label} does not disable exactly the physical controls: {state}",
+        )
+    physical = scoped["physics"]
+    session.require(
+        not physical["advancedHidden"]
+        and physical["arrivalDelayDisabled"] is False
+        and all(
+            not group["inert"] and group["aria"] == "false" and not group["disabled"]
+            for group in physical["groups"]
+        ),
+        f"physics does not enable its controls: {physical}",
+    )
+    for label, owner in (("pack", "own controller"), ("search", "own plan")):
+        state = scoped[label]
+        session.require(
+            state["advancedHidden"]
+            and all(
+                group["inert"] and group["aria"] == "true" and group["disabled"]
+                for group in state["groups"]
+            )
+            and owner in state["note"],
+            f"catalogue-only motion controls remain active in {label}: {state}",
+        )
+
+    restarted = session.look("controls/trajectory-setting-restart")
+    bad_restarts = {
+        name: states
+        for name, states in restarted.items()
+        if not (
+            states["before"]["playing"]
+            and states["before"]["t"] > 0
+            and not states["after"]["playing"]
+            and states["after"]["t"] == 0
+        )
+    }
+    session.require(
+        not bad_restarts,
+        f"trajectory settings spliced a live path: {bad_restarts}",
+    )
+
+    arrival = session.look("controls/arrival-continuity")
+    schedule = arrival["schedule"]
+    delay = arrival["delay"]["effectiveSeconds"]
+    session.require(
+        schedule["moveStart"] == schedule["containerStart"]
+        and schedule["containerStart"] < schedule["containerEnd"] < schedule["arrive"]
+        and abs(schedule["arrive"] - schedule["containerEnd"] - delay) < 1e-9
+        and schedule["arrive"] < schedule["arrived"] <= schedule["end"]
+        and arrival["jump"] <= 0.01,
+        f"the resize, arrival delay and continuous arrival are out of order: {arrival}",
+    )
+    # Drawn, not only scheduled: nothing of the square shows until the delay after the resize
+    # has passed, it is never scaled, and its opacity only rises.
+    samples = arrival["samples"]
+    opacities = [opacity for _, opacity, _ in samples]
+    session.require(
+        all(opacity == 0 for t, opacity, _ in samples if t <= schedule["arrive"])
+        and not any(scaled for _, _, scaled in samples)
+        and all(b >= a for a, b in pairwise(opacities))
+        and opacities[-1] > 0.99,
+        f"the new square does not fade in at full size after the delay: {samples}",
+    )
+    trip = session.look("controls/arrival-delay-round-trip")
+    initial, moved = trip["initial"], trip["moved"]
+
+    def gap(read: dict[str, Any]) -> float:
+        """The drawn delay: from the end of the resize to the square starting to fade in."""
+        return read["schedule"]["arrive"] - read["schedule"]["containerEnd"]
+
+    session.require(
+        initial["delay"]["fraction"] == initial["delay"]["dflt"] == 0.2
+        and initial["delay"]["bounds"] == [0, 0.6]
+        and initial["delay"]["direction"] == "resize first"
+        and initial["input"] == {"value": "0.2", "min": "0", "max": "0.6", "step": "0.05"}
+        and abs(gap(initial) - initial["delay"]["effectiveSeconds"]) < 1e-9,
+        f"the arrival delay does not open at its default: {initial}",
+    )
+    session.require(
+        moved["delay"]["fraction"] == 0.4
+        and moved["input"]["value"] == "0.4"
+        and abs(gap(moved) - moved["delay"]["effectiveSeconds"]) < 1e-9
+        and abs(moved["delay"]["effectiveSeconds"] - 2 * initial["delay"]["effectiveSeconds"])
+        < 1e-9
+        and abs(moved["duration"] - initial["duration"] - (gap(moved) - gap(initial))) < 1e-9
+        and moved["schedule"]["containerEnd"] == initial["schedule"]["containerEnd"]
+        and moved["readout"] == f"{moved['delay']['effectiveSeconds']:.2f} s · after resize",
+        f"moving the arrival-delay control did not move the square's arrival: {trip}",
+    )
+    session.require(
+        (trip["clamped"], trip["ignored"], trip["lowest"]) == (0.6, 0.6, 0),
+        f"the arrival delay is not clamped to its bounds: {trip}",
+    )
+    return "physical controls are scoped; changes restart; resize, delay, then a full-size fade"
 
 
 def _grid(axes: list[list[float]]) -> list[list[float]]:
@@ -1465,7 +1581,7 @@ def relationship_graph(session: Session) -> str:
     )
     drawn = {}
     for kind in kinds:
-        session.api(("setRelationship", kind))
+        session.look("page/seek-to-end", calls=[["setRelationship", kind]])
         drawn[kind] = session.look("mask/links")
     relationship = session.api(("relationship",))
     contact = drawn["contact"]
@@ -1697,6 +1813,7 @@ SECTIONS: tuple[Callable[[Session], str], ...] = (
     hand_and_keys,
     stage_layout,
     force_law,
+    motion_controls_and_arrival,
     relationship_graph,
     drawn_graph,
 )

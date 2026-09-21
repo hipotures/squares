@@ -54,6 +54,10 @@ policy:
   # Under this wall, the ratios are measuring scheduler noise rather than the tier. The
   # ceiling still applies; the drift and stale ratios do not.
   min_wall_seconds: 20.0
+  # A record may move this far above the lowest record since the last attributed rise.
+  # Larger rises name the steps or files that grew, their costs, and the cause.
+  max_unattributed_rise: 1.2
+  attribution_required_from: '2026-09-16'
 
 # One entry per tier `packing-validate` can select as a whole. A tier with no entry here
 # fails `devtools.check_gate_budgets`, so a new tier cannot arrive without a ceiling.
@@ -172,10 +176,10 @@ tiers:
   reference: {jobs: 3, inner_jobs: 1, cpus: 4}
   argument: >-
     Since 2026-09-06 no CI job runs this tier whole: a pull request now runs `checks`,
-    `frontend`, `geometry`, `suite_a`, `suite_b`, and `sweeps` concurrently, and this is
-    their union. The six parts are where the live bands now are. It is
+    `frontend`, `typecheck`, `geometry`, `suite_a`, `suite_b`, and `sweeps` concurrently,
+    and this is their union. The seven parts are where the live bands now are. It is
     still a real tier -- it is what a contributor runs before a block boundary, and it is
-    the thing the six parts have to add up to -- which is why it keeps a ceiling rather
+    the thing the seven parts have to add up to -- which is why it keeps a ceiling rather
     than being retired.
     The edit tier plus the behavioural tests under the per-test ceiling: every floor,
     every record check, and the quick lane. What it excludes is a rule rather than a list
@@ -302,9 +306,33 @@ tiers:
   # against 2.80s over 5.5). Exact verification rose 11% with no change to its inputs,
   # which is contention for the runner rather than new work. The step moved to
   # `frontend` and the ceiling stayed, because raising it would turn the check that
-  # caught this into slack. `measured_seconds` stays empty: those readings include a
-  # step this tier no longer runs.
-  ceiling_seconds: 195.0
+  # caught this into slack. At that point `measured_seconds` stayed empty: those
+  # readings included a step this tier no longer runs.
+  # 2026-09-16: the exact reconciliation topology removed the standalone type floor
+  # from this tier. Run 35127260063 measured the resulting 50-step selection at 94.65 s
+  # and tripped the stale-record rule against 158.82 s. The 189 s ceiling written that
+  # day was just under rule 2's 2x headroom against that record.
+  #
+  # 2026-09-17: 140 s, and the ceiling came down because the record did rather than
+  # because anything about this tier got worse. PR #185 (`think-5hfr`, merged as
+  # d7f9d94d) runs `exact verification`'s subprocesses concurrently, and the step read
+  # 67.51 s and 46.01 s in the two hosted runs of that code against 82.90 s and 96.29 s
+  # serial. Against the 75.67 s record below, 189 s would be 2.50x of headroom where
+  # rule 2 allows 2.0x, so the declaration check refuses it: a tightened ceiling is not
+  # optional here, it is what the register's own static rule demands.
+  #
+  # 140 s is 1.85x of the record, and the two edges it sits between are the usual ones.
+  # It is above the drift rule's 1.5x (113.5 s), so the record-relative rule -- which
+  # names the step that grew -- still speaks before the ceiling does, and the ceiling is
+  # not what a regression trips first. It is below the step time this tier costs if its
+  # pool stops parallelising: the eight steps the faster run's log names already sum to
+  # 148.23 s over 42 more it does not name, so serial degeneration fails here rather
+  # than passing quietly. Both properties are what the 189 s and the 195 s before it
+  # were argued from, so the argument is unchanged and only the numbers moved.
+  #
+  # It remains outside the 180 s required-workflow wall, which includes checkout, setup,
+  # queueing and the aggregator as well as this tier.
+  ceiling_seconds: 140.0
   # Cleared, on the same rule that cleared 1369.60s and 409.0s from the `fast` entry and
   # 107.05s from `sweeps`: the figure measures a tier that no longer exists. It measured
   # this one twice over -- the four readings predate the corpus widening, and the widened
@@ -314,22 +342,88 @@ tiers:
   # reading at the reference shape of the tier this change replaced, so recording it
   # would arm the stale rule against every honest run of the new one. The gate prints the
   # line to paste the first time a run at the reference shape measures the new tier.
-  measured_seconds: null
-  measured_on: null
-  measured_where: null
+  #
+  # 2026-09-17: the field has not been cleared again. What follows is a fall, not a
+  # re-scoping -- the tier selects the same 50 steps and the work inside it is the same
+  # work, run concurrently -- so the 94.65 s it supersedes moves into `history:`
+  # unchanged, and a fall owes the ratchet rule no attribution.
+  measured_seconds: 75.67
+  measured_on: '2026-09-17'
+  measured_where: >-
+    The geometric mean of two readings at the reference shape -- 90.19 s in run
+    35210073404 at head e8c79fe4 and 63.48 s in run 35213759889 at head 80a5976f, job
+    validate on PR 185, each selecting 50 of 80 steps, each green. Observed spread
+    1.42x. The fall is PR #185's concurrent `exact verification` (`think-5hfr`, merged
+    as d7f9d94d): that step read 67.51 s and 46.01 s in those two runs against 82.90 s
+    in run 35127260063 and 96.29 s in run 35182460400 on the serial code this tier ran
+    before, and nothing else in the selection changed. 90.19 s is 1.19x of this record
+    and 63.48 s is 0.84x, so both readings sit inside the drift and the stale rules the
+    record arms. Two readings is the minimum this convention accepts; the first hosted
+    run at the reference shape after this lands gives a third and can refine it.
+  history:
+  - measured_seconds: 99.39
+    measured_on: '2026-09-06'
+    measured_where: >-
+      The geometric mean of four readings at the reference shape -- 106.35, 106.02,
+      80.62 and 107.33 -- across runs 34023002068, 34032566385, 34037168378 and
+      34040196689. Cleared on 2026-09-07 when the corpus widened and the grid replay was
+      deferred.
+  - measured_seconds: 145.53
+    measured_on: '2026-09-15'
+    measured_where: >-
+      The geometric mean of seven readings at the reference shape -- 150.89, 152.60,
+      141.70, 147.87, 140.88, 144.10 and 141.17 -- across runs 34924677097,
+      34925616821, 34926777301, 34929890466, 34930296150, 35012847055 and 35013703659,
+      each selecting 49 of the gate's 76 steps. Observed spread 1.08x.
+    attribution:
+      cause: >-
+        Two steps. `exact verification` gained `devtools.dilation_corollary`: absent
+        from the four baseline runs' logs, 47.11 s in run 34064274054 on 2026-09-06 and
+        60.87 s in run 34997018168 on 2026-09-15. The type floor grew with the code it
+        checks, and on 2026-09-13 (f9099096) its include list gained
+        `../packages/workbench` and the retained video spikes. Neither is one regression,
+        and neither is runner noise: the tier's spread across the seven readings is
+        1.08x.
+      unit: step-seconds
+      source: >-
+        python -m devtools.read_tier_walls --tier checks --baseline-run-id 34023002068
+        34032566385 34037168378 34040196689 --run-id 34924677097 34925616821
+        34926777301 34929890466 34930296150 35012847055 35013703659; the logs list each
+        run's eight slowest steps, so a step outside them reads 0.
+      grew:
+      - {name: exact verification, before: 50.15, after: 119.21}
+      - {name: type floor (basedpyright), before: 51.31, after: 102.50}
+      - {name: bead tree, before: 5.69, after: 14.32}
+      - {name: soft-schema validation, before: 7.88, after: 14.23}
+      - {name: soundness perimeter, before: 65.15, after: 70.88}
+      - {name: synopsis agrees with the artifacts, before: 0.0, after: 5.40}
+  - measured_seconds: 158.82
+    measured_on: '2026-09-16'
+    measured_where: >-
+      Run 35078515837, job validate, on PR 180 exact head f4cfa5be: 158.82 s at
+      the reference shape, selecting 51 of 79 steps, before the type floor moved to its
+      own required partition.
+  - measured_seconds: 94.65
+    measured_on: '2026-09-16'
+    measured_where: >-
+      Run 35127260063, job validate, on PR 188 exact head 2f619303: 94.65 s at
+      the reference shape, selecting 50 of 80 steps. The tier's checks all passed; the job
+      failed only because this reading was below the stale-record boundary.
+      Superseded on 2026-09-17: it is a reading of the same 50 steps with `exact
+      verification` still serial, and PR #185 made that step concurrent.
   reference: {jobs: 3, inner_jobs: 1, cpus: 4}
   argument: >-
-    The part of the pull-request surface that is none of the other five: every floor,
+    The part of the pull-request surface that is none of the other six: every floor,
     every record check, and everything that needs the Rust engine. That last clause is a
     rule rather than an accident -- `_build_engine` puts a serial `cargo build --release`
     in front of every step of any job that selects an engine step, so keeping all three
     engine steps and the Rust lint floor here stops every other job paying for a toolchain
     it never uses. It is 50 steps of pure outer-parallel work at `--jobs 3`,
     which is three units on four cpus and one cpu of headroom, and its wall is step time
-    divided rather than any one step's own cost. `checks`, `frontend`, `geometry`,
-    `suite_a`, `suite_b`, and `sweeps` are a partition of `--fast` by construction in
+    divided rather than any one step's own cost. `checks`, `frontend`, `typecheck`,
+    `geometry`, `suite_a`, `suite_b`, and `sweeps` are a partition of `--fast` by construction in
     `_select_steps`, and `test_the_pull_request_jobs_partition_the_surface` checks that
-    the workflow invokes all six. What the geometry split bought is on its entry below.
+    the workflow invokes all seven. What the geometry split bought is on its entry below.
 
 - id: frontend
   command: packing-validate --frontend
@@ -344,16 +438,27 @@ tiers:
   # Keeping those two frontend units in `checks` made that lane's existing ceiling
   # impossible; appending them to the 160s behavioural suite would create the same queue.
   #
-  # 150s is an initial fail-safe, not a hosted baseline. It is four times the observed
-  # source floor and leaves a similar amount for the build/browser contract plus ordinary
-  # runner setup variance. `measured_seconds` remains empty until this exact partition
-  # runs on its reference runner; the first hosted result supplies the record and tests
-  # the estimate instead of being made to agree with it.
+  # 150s began as a fail-safe at four times the observed source floor. The hosted
+  # baseline below now replaces that estimate; the ceiling leaves room for the
+  # build/browser contract and ordinary runner variance without exceeding the
+  # pull-request wall.
   ceiling_seconds: 150.0
-  measured_seconds: null
-  measured_on: null
-  measured_where: null
-  reference: {jobs: 1, inner_jobs: 1, cpus: 4}
+  measured_seconds: 85.25
+  measured_on: '2026-09-16'
+  measured_where: >-
+    The geometric mean of two green readings at the reference shape: 84.90 s in run
+    35050021006 and 85.61 s in run 35052543153, job frontend, on PR 185. The latter
+    selected three of 77 steps, including browser-floor liveness. Refresh after the
+    reconciliation topology runs on its exact head.
+  history:
+  - measured_seconds: 76.66
+    measured_on: '2026-09-15'
+    measured_where: >-
+      The geometric mean of seven readings at the reference shape -- 65.85, 79.34,
+      49.75, 95.49, 94.50, 83.92 and 79.04 -- across runs 34924677097, 34925616821,
+      34926777301, 34929890466, 34930296150, 35012847055 and 35013703659, each selecting
+      2 of the gate's 76 steps. Observed spread 1.92x.
+  reference: {jobs: 2, inner_jobs: 1, cpus: 4}
   argument: >-
     The source and built-page contracts for the top-level workbench package: Biome,
     type-aware ESLint, every TypeScript program, Node tests, deterministic package build,
@@ -383,24 +488,29 @@ tiers:
   # 42.73s, well under the 81s the queue divides to, so this tier does not set its own
   # floor either.
   #
-  # 200s is a shade over twice that reading, on the same three edges the entry above
-  # uses: it clears a runner a third slower (124s), it is under the drift rule's reach,
-  # and it is below the 243.81s of step time this tier costs if its pool stops
-  # parallelising -- which is the regression a ceiling on an outer-parallel tier is
-  # actually for.
+  # 180s is 1.75x the current 102.73s hosted mean. It clears a runner a third slower
+  # (about 137s), stays inside the pull-request wall, and remains below the 243.81s of
+  # step time this tier costs if its pool stops parallelising -- the regression a
+  # ceiling on an outer-parallel tier is actually for.
   ceiling_seconds: 180.0
   # Hosted samples at the reference shape establish the baseline below.
-  measured_seconds: 91.55
-  measured_on: '2026-09-06'
+  measured_seconds: 102.73
+  measured_on: '2026-09-15'
   measured_where: >-
-    The geometric mean of four readings at the reference shape -- 104.12, 106.07, 76.76 and 82.86 --
-    across runs 34023002068, 34032566385, 34037168378 and 34040196689.
-    Observed spread 1.38x. The centre of the band, not an edge: recording the
-    maximum was tried first and left `geometry` 1.21x from failing the stale rule on a
-    fast runner, because a record at the top of the band starves that rule by as much
-    as it feeds the drift rule. At four samples every margin is at least 1.25x.
-    **Refresh this when samples accumulate** -- a mean moves as they arrive, which is
-    the argument for `think-be1s` rather than a property of these numbers.
+    The geometric mean of seven readings at the reference shape -- 111.17, 110.47,
+    105.79, 114.21, 113.94, 84.17 and 84.84 -- across runs 34924677097, 34925616821,
+    34926777301, 34929890466, 34930296150, 35012847055 and 35013703659, each selecting
+    9 of the gate's 76 steps. Observed spread 1.36x. Refresh from the exact
+    reconciliation topology.
+  history:
+  - measured_seconds: 91.55
+    measured_on: '2026-09-06'
+    measured_where: >-
+      The geometric mean of four readings at the reference shape -- 104.12, 106.07,
+      76.76 and 82.86 -- across runs 34023002068, 34032566385, 34037168378 and
+      34040196689. Observed spread 1.38x. The centre of the band, not an edge: recording
+      the maximum was tried first and left `geometry` 1.21x from failing the stale rule
+      on a fast runner.
   reference: {jobs: 3, inner_jobs: 1, cpus: 4}
   argument: >-
     The nine steps that re-derive geometry without the engine: the basin atlas and its
@@ -420,50 +530,211 @@ tiers:
 
 - id: suite_a
   command: packing-validate --suite-a
-  ceiling_seconds: 180.0
-  measured_seconds: 150.54
-  measured_on: '2026-09-15'
+  ceiling_seconds: 168.0
+  measured_seconds: 109.92
+  measured_on: '2026-09-17'
   measured_where: >-
-    The geometric mean of two green readings at the reference shape -- 151.11s and
-    149.97s -- from run 35044761025, attempts 1 and 3, on PR 175 exact head dee68bc8.
-    Each selected 3,056 tests: 3,050 passed and 6 skipped. Observed spread 1.01x.
+    The geometric mean of three readings at the reference shape -- 81.26s, 133.91s and
+    122.06s -- from run 35182460400, attempts 1, 2 and 3 (jobs 105077378155, 105078217244
+    and 105079133326), on PR 188 exact head be28ad5a, after the c4f0660d repartition. Each
+    ran 3,422 tests, all passing. Observed spread 1.65x, on identical code.
+  history:
+  - measured_seconds: 150.54
+    measured_on: '2026-09-15'
+    measured_where: >-
+      The geometric mean of two green readings at the reference shape -- 151.11s and
+      149.97s -- from run 35044761025, attempts 1 and 3, on PR 175 exact head dee68bc8.
+      Each selected 3,056 tests under the predecessor whole-module partition: 3,050
+      passed and 6 skipped. Observed spread 1.01x.
+  - measured_seconds: 84.0
+    measured_on: '2026-09-16'
+    measured_where: >-
+      Run 35128357992, job suite-a, on PR 188 exact head c5a33270: 84.00 s at
+      the reference shape, selecting 2,362 tests under the first recorded-cost partition.
+      All tests passed; the job failed only because this reading was below the stale-record
+      boundary. Refresh from the final exact-head hosted cohort after the record is rebuilt
+      from schema-v2 reports. 2026-09-17: one reading on a fast runner; attempt 2 of run
+      35182460400 read 133.91s against it and failed drift at 1.59x.
+  attribution:
+    cause: >-
+      Two causes, neither a slower test. The c4f0660d repartition, rebuilt from same-speed
+      cohort 35175474610, moved about 1,000 tests from shard B into this shard (2,362 to
+      3,422 tests; the cohort predicts 272.87 test-seconds for each shard). And the 84.00s
+      record was a single reading on a fast runner, while hosted runner speed varies 1.6 to
+      1.8x on identical code: per-test time ratios between attempts of run 35176748398
+      and runs 35175474610 and 35128357992 have medians of 1.59 to 1.81.
+    unit: job-seconds
+    source: >-
+      Job logs 105077378155, 105078217244 and 105079133326 of run 35182460400, and the
+      suite-a and suite-b test-file cost reports of runs 35128357992, 35175474610 and
+      35176748398.
+    grew:
+    - {name: suite-a tier, before: 84.0, after: 109.92}
   reference: {jobs: 1, inner_jobs: 1, cpus: 4}
   argument: >-
-    Whole-module shard A of the quick behavioural lane. Both shard jobs collect the same
-    selection and a deterministic largest-first assignment gives each module to exactly
-    one shard. Run 35014107573 retained 915.58 worker-seconds across 315 modules; replaying
-    this assignment over that exact collection allocates 419.69s here and 495.89s to
-    shard B, whose ideal four-worker floors are 104.92s and 123.97s. The unsplit job had
-    failed at 280.83s and 278.93s. Scheduler-only alternatives did not solve it:
-    loadscope took 318.54s and worksteal 323.69s against the 302.70s default. The 180s
-    ceiling remains the predeclared absolute bound; the hosted mean above now arms the
-    relative drift and stale-record checks. The reference matches CI's `--jobs 1
-    --inner-jobs 1` four-cpu invocation, and `packing-required` preserves coverage by
-    requiring both shard jobs.
+    Pre-collection shard A of the quick behavioural lane. `devtools.suite_files` packs
+    recorded per-file costs longest-first; a file absent from the record uses a stable
+    CRC32 path fallback. Pytest therefore imports only this shard's files, and the job
+    writes a fresh per-file cost report beside its timing artifact. It keeps full Git
+    history for history-reading tests but installs no Node toolchain; browser liveness
+    belongs to `frontend`. `packing-required` preserves coverage by requiring both shard
+    jobs, and the declared 168-second ceiling is the absolute bound.
 
 - id: suite_b
   command: packing-validate --suite-b
-  ceiling_seconds: 180.0
-  measured_seconds: 119.54
-  measured_on: '2026-09-15'
+  # 154s, and the first ceiling this entry has set for itself. The three before it were
+  # all 180: OR-14's pull-request wall, borrowed as an absolute bound because a shard
+  # job's wall is a share of that wall. That is the loosest a per-tier ceiling can be --
+  # it says only that this one job of seven may spend the whole surface's budget -- and
+  # `OR-17` is the rule that a routine gate carries a ceiling of its own rather than the
+  # surface's. 26s of the pull-request wall go back to the surface with it.
+  #
+  # 154s is 1.50x of the record below, which is where the drift rule already sits
+  # (154.37s). The two bounds coincide on purpose, the way the `fast` entry argues: an
+  # absolute ceiling looser than the record-relative rule never gets to speak, and one
+  # tighter than it fails a run the drift rule was willing to explain. Rule 2 would
+  # permit 205s; the tier has no use for it.
+  #
+  # It is a band and not a target, and the band is the runner pool's rather than the
+  # tier's. This tier has no known cost -- it has a distribution, and 2026-09-21 measured
+  # it directly. Three runs of one byte-identical shard that day, 3,140 passed and 6
+  # skipped each time, read 73.90s, 74.98s and 133.81s, on 240.2, 240.2 and 449.9
+  # test-seconds of accumulated test time. 1.81x, on work that did not change at all.
+  # So the record is placed at the centre of what five readings span and both edges are
+  # what is left: 1.15x of margin above the slowest wall this tier has read and 1.20x
+  # below the fastest. Those margins are thin, and they are the honest width of the
+  # pool -- `think-be1s` is the recorded band that would replace a recorded point, and
+  # `D-472` is why neither edge of this one may be bought by moving the record toward
+  # the other. What the absolute number still adds is the failure the ratios cannot see:
+  # 154s is well under the 240-450 test-seconds this shard accumulates, so the job still
+  # fails here if `-n 4 --dist=loadfile` stops dividing, which is the regression an
+  # absolute ceiling on a pre-collection shard is actually for.
+  ceiling_seconds: 154.0
+  measured_seconds: 102.91
+  measured_on: '2026-09-21'
   measured_where: >-
-    The geometric mean of two green readings at the reference shape -- 133.13s and
-    107.34s -- from run 35044761025, attempts 1 and 2, on PR 175 exact head dee68bc8.
-    Each ran all 3,055 selected tests. Observed spread 1.24x. A 145.68s predecessor-head
-    attempt is excluded: it failed the unchanged per-test backstop in a quick test that
-    still carried research-scale solver overrides, so it measured a superseded test
-    composition rather than this exact head.
+    The geometric mean of five green readings at the reference shape, spread 1.81x. Three
+    are PR 212's, on one test composition -- 3,140 passed and 6 skipped, 172 files, 3,146
+    collected -- and all three on 2026-09-21: 73.90s in run 35634463193, job 106448349232,
+    at head c4b493e1; 74.98s in run 35637674151, job 106459001378, at head cb821629; and
+    133.81s in run 35638434973, job 106461545452, at head e92e3187, which passed at 92 per
+    cent of the 145s ceiling the first two readings had set, and is why that ceiling is
+    154s now. Two are the readings the superseded record was built from:
+    125.16s and 124.40s in run 35182460400, attempts 2 and 3 (jobs 105078217114 and
+    105079133540), on PR 188 exact head be28ad5a, 3,008 passed and 6 skipped.
+
+    What moved between the two heads is the runner and not the shard, which is why the
+    2026-09-17 pair stays in the mean rather than being replaced by it. Shard B runs more
+    tests than it did (3,008 to 3,140 passing) in less wall, and the obvious reading of
+    that -- the recorded-cost partition rebalanced when the agenda-040 stack added test
+    files -- is wrong twice over. By mechanism: `suite-file-costs.json` has not changed
+    since c4f0660d, the greedy packing reads only that record, so no recorded file can
+    have changed shard, and each of the 10 files added since takes `crc32(path) mod 2`.
+    By measurement: 162 of this shard's 163 files are common to the two heads, the 10
+    added are 117 tests and 1.8 test-seconds between them, and across the 99 common files
+    whose test count did not change the median per-file ratio is 1.91x -- a repartition
+    moves files, it does not make a file that stayed put 1.91x cheaper. PR 212's own trio
+    then settles it without any cross-head comparison at all: one byte-identical shard
+    cost 240.2 and 449.9 test-seconds hours apart on 2026-09-21. So a record taken from
+    either edge of the pool starves one rule to feed the other. `D-472` is that lesson from the fast side, and the
+    typecheck entry below is the same repair from this one: its 38.15s stale-rule failure
+    went into the mean with the two readings before it rather than over them.
+  history:
+  - measured_seconds: 119.54
+    measured_on: '2026-09-15'
+    measured_where: >-
+      The geometric mean of two green readings at the reference shape -- 133.13s and
+      107.34s -- from run 35044761025, attempts 1 and 2, on PR 175 exact head dee68bc8.
+      Each ran 3,055 tests under the predecessor whole-module partition. Observed spread
+      1.24x. A 145.68s predecessor-head attempt is excluded: it failed the unchanged
+      per-test backstop in a quick test that still carried research-scale solver
+      overrides, so it measured a superseded test composition rather than this exact
+      head.
+  - measured_seconds: 143.98
+    measured_on: '2026-09-16'
+    measured_where: >-
+      Run 35128357992, job suite-b, on PR 188 exact head c5a33270: 143.98 s at
+      the reference shape, selecting 3,983 tests under the first recorded-cost partition;
+      3,977 passed and 6 skipped. Refresh from the final exact-head hosted cohort after the
+      record is rebuilt from schema-v2 reports. 2026-09-17: one reading on a slow runner;
+      attempt 1 of run 35176748398 read 82.64s on the same partition and failed the stale
+      rule.
+    attribution:
+      cause: >-
+        The first recorded-cost repartition moved 154 of 325 test files using one hosted
+        cohort. That cohort's accumulated per-file time was balanced in its old assignment,
+        but under the new assignment the next run split 257.91 versus 468.08 test-seconds.
+        The suite-wide work did not grow; its distribution did. 2026-09-17 correction: the
+        same assignment split 272.33 versus 273.42 test-seconds in run 35175474610, so the
+        468.08 was a slow runner rather than the partition; per-test time ratios between
+        runs have medians of 1.59 to 1.81 on identical code.
+      unit: job-seconds
+      source: >-
+        Test-file cost reports from jobs suite-a and suite-b in run 35128357992; both
+        reports carry run, attempt and merge-SHA provenance.
+      grew:
+      - {name: suite-b tier, before: 119.54, after: 143.98}
+  - measured_seconds: 124.78
+    measured_on: '2026-09-17'
+    measured_where: >-
+      The geometric mean of two green readings at the reference shape -- 125.16s and
+      124.40s -- from run 35182460400, attempts 2 and 3 (jobs 105078217114 and
+      105079133540), on PR 188 exact head be28ad5a, after the c4f0660d repartition; 3,008
+      passed and 6 skipped. Attempt 1 read 124.42s but is excluded: a gate-budget test
+      failed there because bead think-g4n9 had not yet reached the sync branch. Observed
+      spread 1.01x. 2026-09-21: superseded, and not because the tier changed. Both
+      readings behind it came from one cohort -- two attempts of a single run, agreeing
+      to 1.01x -- so the record sat at the top of a band 1.69x wide instead of in it, and
+      run 35634463193 read 73.90s against it and failed the stale rule at 0.59x. The
+      shard is not what moved: 162 of its 163 files are common to both heads, the 10
+      added are 117 tests and 1.8 test-seconds between them, and the one dropped is
+      `test_suite_shard.py`, renamed. Its accumulated test time fell 419.1 to 240.2
+      test-seconds while its test count rose 3,014 to 3,146, and across the 99 common
+      files whose test count did not change the median per-file ratio is 1.91x
+      (quartiles 1.68, 1.91, 2.11). A repartition moves files; it does not make a file
+      that stayed put 1.91x cheaper. This is runner speed, a little wider than the
+      1.59-1.81x the record above already prices, and it is per job rather than per run:
+      the same run 35634463193 read suite-a at 109.24s against its 109.92s record and
+      typecheck at 79.95s against its 55.67s record, 1.44x the other way. Settled the same
+      day without the cross-head comparison: run 35638434973 ran the byte-identical shard
+      at 449.9 test-seconds and 133.81s of wall, against 240.2 and 73.90s hours earlier.
   reference: {jobs: 1, inner_jobs: 1, cpus: 4}
   argument: >-
-    Whole-module shard B under the same complete and disjoint assignment as shard A.
-    Run 35014107573 retained 915.58 worker-seconds across 315 modules; the exact replay
-    assigns 495.89s to this shard and 419.69s to shard A, for ideal four-worker floors of
-    123.97s and 104.92s. `--dist=loadfile` preserves module-scoped fixture reuse, while
-    collection-derived membership places every new module in exactly one shard. The 180s
-    ceiling remains the predeclared absolute bound above the larger ideal floor; the
-    hosted mean above now arms the relative drift and stale-record checks. The reference
-    matches CI's `--jobs 1 --inner-jobs 1` four-cpu invocation, and `packing-required`
-    requires both shards so aggregation cannot hide lost coverage.
+    Pre-collection shard B under the same complete and disjoint assignment as shard A.
+    The recorded-cost packing and stable fallback place every file in exactly one shard
+    before import. This job also retains Git history, omits Node, and publishes its
+    per-file report. `packing-required` requires both shards so aggregation cannot hide
+    lost coverage. Its ceiling was OR-14's 180-second pull-request wall until 2026-09-21
+    and is now its own: a shard job runs beside six others, so a ceiling equal to the
+    whole surface's wall bounds the surface and not the tier.
+
+- id: typecheck
+  command: packing-validate --typecheck
+  # BasedPyright is one indivisible unit. Inside `checks` it occupied one of three slots
+  # on a four-cpu runner; moving it to a one-step job gives it the runner without changing
+  # the edit tier, which still contains the same type floor.
+  ceiling_seconds: 111.0
+  measured_seconds: 55.67
+  measured_on: '2026-09-18'
+  measured_where: >-
+    Geometric mean of three hosted packing-validate --typecheck walls at the reference
+    shape: 65.90 s in run 35050021006 and 68.64 s in run 35052543153, job typecheck, on
+    PR 185, and 38.15 s in run 35311746708, job typecheck, on PR 199, which failed the
+    stale rule against 67.26 s (0.57x). Ceiling is 2.0x of this mean.
+  history:
+  - measured_seconds: 67.26
+    measured_on: '2026-09-16'
+    measured_where: >-
+      The geometric mean of two green readings at the reference shape: 65.90 s in run
+      35050021006 and 68.64 s in run 35052543153, job typecheck, on PR 185. The latter
+      selected one of 77 steps. Refresh after the reconciliation topology runs on its exact
+      head.
+  reference: {jobs: 1, inner_jobs: 1, cpus: 4}
+  argument: >-
+    The type floor, isolated because it is one of the checks queue's largest units and no
+    outer-worker setting divides it. The standalone tier changes only CI ownership:
+    `Step.typecheck` remains part of `--edit`, and the pull-request partition test keeps
+    it inside `--fast` exactly once.
 
 - id: sweeps
   command: packing-validate --sweeps
@@ -501,7 +772,7 @@ tiers:
   # longest unit either way: the census is, and it is now both this job's floor and the
   # floor under the whole pull-request surface.
   #
-  # 240s stands through that. It is still below the roughly 258s of step time this tier
+  # 210s stands through that. It is still below the roughly 258s of step time this tier
   # costs if the pool stops parallelising, so serial degeneration still fails here, and
   # it still has to hold whatever the escape screen costs on a bad day -- which is why it
   # is not tightened to the new prediction.
@@ -569,15 +840,54 @@ tiers:
   # -- over 688.74s of cpu against the 691.19s the serial run spent, so the pool divided
   # the work rather than adding any, and `--check` still passed, which is what makes the
   # parallel build byte-identical rather than merely fast.
-  ceiling_seconds: 210.0
+  #
+  # 2026-09-18: 200 s, and the ceiling came down because the record did. Six hosted
+  # readings at the current 4-of-80 selection include two fast runners at 66.36 s and
+  # 68.66 s, which fail the stale rule against 119.72 s (0.55x and 0.57x). The work is
+  # the same four steps; the fall is runner spread, not a re-scope, so 119.72 s moves
+  # into `history:` and owes the ratchet no attribution. 210 s would be 2.07x of the new
+  # record where rule 2 allows 2.0x, so the declaration check refuses it.
+  #
+  # 200 s is 1.97x of the record. It sits above the drift rule's 1.5x (152.3 s), so the
+  # record-relative rule still speaks first, and below the ~400 s this tier costs if the
+  # two sampled steps lose their inner workers, so serial degeneration still fails here
+  # rather than passing quietly.
+  ceiling_seconds: 200.0
   # Cleared, and the reason is the one that cleared 1369.60s and 409.0s from the `fast`
   # entry: the figure measured a tier that no longer exists. Two of these four steps are
   # new names running different work, so 107.05s is not a record of this tier, and
   # leaving it here would fail the stale rule on every honest run of the new one. The
   # gate prints the line to paste the first time it runs at the reference shape.
-  measured_seconds: null
-  measured_on: null
-  measured_where: null
+  #
+  # 2026-09-18: the field has not been cleared again. What follows is a fall on the same
+  # four steps, not a re-scoping, so the 119.72 s it supersedes moves into `history:`
+  # unchanged.
+  measured_seconds: 101.51
+  measured_on: '2026-09-18'
+  measured_where: >-
+    The geometric mean of six readings at the reference shape -- 66.36, 68.66, 130.77,
+    129.82, 118.45 and 119.45 -- across runs 35295629265, 35294834934, 35294680332,
+    35275396658, 35273908145 and 35272781729, each selecting 4 of 80 steps. Observed
+    spread 1.97x. The two fast walls (66.36 s, 68.66 s) completed the four steps and
+    failed only the stale rule against 119.72 s; they are readings, not incomplete
+    runs. 66.36 s is 0.65x of this record and 130.77 s is 1.29x, so every counted
+    reading sits inside the drift and the stale rules the record arms.
+  history:
+  - measured_seconds: 107.05
+    measured_on: '2026-09-06'
+    measured_where: >-
+      The geometric mean of four readings -- 108.91, 108.62, 106.15 and 104.57 --
+      across runs 34023002068, 34032566385, 34037168378 and 34040196689, over the
+      n=1..100 workload. Cleared on 2026-09-07 when two of the four steps were split.
+  - measured_seconds: 119.72
+    measured_on: '2026-09-15'
+    measured_where: >-
+      The geometric mean of seven readings at the reference shape -- 111.63, 137.76,
+      127.28, 139.41, 131.41, 97.75 and 100.58 -- across runs 34924677097, 34925616821,
+      34926777301, 34929890466, 34930296150, 35012847055 and 35013703659, each selecting
+      4 of the gate's 76 steps. Observed spread 1.43x. Refresh from the exact
+      reconciliation topology; PR 180's 138.84-second predecessor reading is not the
+      current seven-part surface.
   reference: {jobs: 4, inner_jobs: 2, cpus: 4}
   argument: >-
     The pull request's record sweeps, on their own runner: the known-best atlas's record
@@ -593,14 +903,14 @@ tiers:
     surface's floor. And this tier is what removes the contention that failed five
     ordinary tests against the quick lane's 5s per-test ceiling -- those tests were never
     slow, they were sharing four cpus with 468s of atlas rendering.
-    210s stands through the 2026-09-07 re-scoping without being re-tightened, and that is
-    a decision rather than an oversight. The predicted wall is the census's, near 90s on
-    this runner, so a ceiling at 210s has real margin for a slow day; and it is still
-    below the step time this tier costs if its pool stops parallelising altogether --
-    about 400s once the two sampled steps lose their inner workers -- so serial
-    degeneration fails here rather than passing quietly, which is the regression a
-    ceiling on an outer-parallel tier is actually for. Tightening it against a prediction
-    rather than a reading is what `OR-14` calls advertising an aspiration.
+    210s stood through the 2026-09-07 re-scoping without being re-tightened. On
+    2026-09-18 the record fell to 101.51s on the same four steps (hosted spread 1.97x),
+    and 210s became 2.07x of headroom where rule 2 allows 2.0x, so the ceiling moved to
+    200s with the record. The predicted wall is still the census's on a slow runner;
+    200s keeps margin for a slow day and is still below the ~400s this tier costs if
+    its pool stops parallelising, so serial degeneration fails here rather than passing
+    quietly. Tightening it against a prediction rather than a reading is what `OR-14`
+    calls advertising an aspiration.
 
 - id: push
   command: packing-validate --push
@@ -627,10 +937,12 @@ tiers:
   argument: >-
     The complete gate. Never clocked end to end on the reference runner in one piece -- CI
     splits it across jobs -- so only the ceiling applies, and it is argued from the parts
-    rather than from another tier: the pull-request surface at 409s, the exhaustive tier
-    at 892s on the same runner (run 33932095609), the slow lane BC-214 moved here, and the
-    rest. 3600s is roughly twice that sum, which is the room a tier growing one
-    certificate at a time needs before anyone has clocked it whole.
+    rather than from another tier. The original argument used the historical
+    pull-request surface at 409s, the exhaustive tier at 892s on the same runner (run
+    33932095609), the slow lane BC-214 moved here, and the rest. The current 180s
+    pull-request wall is separate. The 3600s checkpoint ceiling is roughly twice that
+    historical component sum, which leaves room for a tier that has never been clocked
+    whole.
 
 # The certificate page's pull-request jobs. The tiers above budget `packing-validate`'s
 # steps; this workflow runs none of them, and until 2026-09-15 nothing budgeted it at all.
@@ -639,30 +951,34 @@ tiers:
 # contributor waits for. `test_every_page_job_a_pull_request_runs_is_budgeted` holds the
 # tiers' own rule over these entries -- every job a pull request runs has one, every entry
 # names a job that exists, every cost is measured on named runs, and every ceiling is
-# inside `policy.max_headroom` of it -- and `devtools.check_pr_wall` enforces the wall on
-# the live run.
+# inside `policy.max_headroom` of it -- and `devtools.check_pr_wall` judges the wall on
+# the live run, advisory under think-g4n9 since 2026-09-17 (see `pull_request_walls`).
 #
 # A matrix job is one entry per cell, because a cell is what a runner runs.
 pages:
   reference: {runner: ubuntu-latest, cpus: 4, caches: warm}
   wall:
-    measured_seconds: 186.0
-    measured_on: 2026-09-16
+    # 2026-09-17: replaced PR 180's single reading, 189.0 s measured 2026-09-16 on
+    # exact-head run 35078515689 to the legacy `pages-required` aggregator-start
+    # endpoint. This record keeps no history, so the superseded reading is kept here.
+    measured_seconds: 176.0
+    measured_on: 2026-09-17
     measured_where: >-
-      exact-head run 35056004552 after the workbench checkout became sparse, measured
-      from the run's creation to the `pages-required` aggregator's start; the preceding
-      exact-head run 35052785989 took 281 s before that cut
-    ceiling_seconds: 250.0
+      The median of PR 188's two exact-head readings, run 35182460356 at be28ad5a (182 s)
+      and run 35187007572 at 16d5e14d (170 s), each measured by `devtools.check_pr_wall`
+      from the workflow run's start to the start of the wall-check step in
+      `pages-required`: the figure `pull_request_walls` records below.
+    ceiling_seconds: 180.0
     argument: >-
       Before the split this workflow was `prepare` then a single `build` of about 300 s of
       serial Chromium checks: a 472 s median on the workbench stack's pull requests, 381 s
       on pull requests into main. The checks now run as thirteen jobs beside each other,
-      and the wall is `prepare` plus the longest of them. 250 s is 1.34x the final-shape
-      reading, which leaves modest room for hosted-runner variance without leaving room
-      for another doubling. Sparse checkout removed the 281 s run's anomalous workbench
-      fetch from the critical path, but 186 s remains above `OR-14`'s two to two and a
-      half minute target. The floor is back in the browser jobs: after `prepare`, the
-      slowest full browser cell took 97 s.
+      and the wall is `prepare` plus the longest of them. OR-14's 180-second outer edge is
+      the one authority for this wall, shared with `pull_request_walls` below. PR 180's
+      run 35078515689 missed it by nine seconds; that run spent 39 seconds on four serial
+      saved-font variants, which now run as two bounded pairs. Of PR 188's two readings
+      since, run 35182460356 still missed it by two seconds and run 35187007572 was ten
+      seconds inside it.
   jobs:
   - id: scope
     measured_seconds: 20.2
@@ -788,3 +1104,87 @@ pages:
       The required-check aggregator. It runs under `always()` even though it needs jobs
       that are intentionally dispatch-only, so it is part of the pull-request surface
       and must be budgeted with the jobs whose results it reduces.
+
+# The wall is the run start through the start of the wall-check step inside the job that
+# aggregates every required prerequisite. It therefore includes prerequisite queues,
+# checkout, setup, work and artifact transfer, plus the aggregator's queue, blobless
+# checkout and pinned Python setup, without including the check itself. The absolute
+# budget is OR-14's 180-second outer edge. The recorded medians below are PR 188's
+# exact-head readings at that wall-step-start endpoint, at be28ad5a and 16d5e14d.
+#
+# `enforcement` is `enforcing` when absent. `enforcement: advisory` keeps the wall
+# measured, diagnosed and reported on every pull request, but a wall over its budget or
+# regression ratio warns instead of failing the aggregator. It must name a
+# `tracking_bead` and an `advisory_reason`; `devtools.check_gate_budgets` refuses one
+# whose bead is closed or unknown, and an enforcing wall may name neither. Nothing
+# else is relaxed: an unmeasurable run, a missing prerequisite and a malformed entry
+# still fail, and the budget stays at OR-14's edge. On 2026-09-17 the owner made both
+# walls advisory under think-g4n9, after five hosted Packing walls on PR 188 read 194,
+# 189, 178, 166 and 216 s: runner speed varied 1.6-1.8x on identical code, and the
+# frontend job alone ran 158-180 s. think-g4n9 switches both back once five consecutive
+# exact-head hosted runs hold both walls at or under 180 s.
+pull_request_walls:
+  policy:
+    regression_ratio: 1.2
+    min_samples: 15
+    main_branch: main
+    setup_steps:
+    - '^(Set up job|Complete job)$'
+    - '^Post '
+    - '^Check out '
+    - '^Install '
+    - '^Synchroni[sz]e '
+    - '^Cache '
+    - '^(Use|Share) the prepared '
+    - '^Download '
+    - '^(Preserve|Retain|Upload) '
+  workflows:
+  - id: packing-validation
+    file: .github/workflows/packing-validation.yml
+    aggregator: packing-required
+    not_gating: [macos-portability]
+    budget_seconds: 180.0
+    enforcement: advisory
+    tracking_bead: think-g4n9
+    advisory_reason: >-
+      Owner decision 2026-09-17: five hosted runs read 194, 189, 178, 166 and 216 s on
+      1.6-1.8x runner variance, so the wall is reported rather than enforced until
+      think-g4n9 holds it at or under 180 s.
+    argument: >-
+      The required Linux pull-request surface. The two suite shards use the recorded
+      pre-collection partition, and the type floor has its own runner; packing-required
+      waits for every lane and judges this wall.
+    kinds:
+    # 2026-09-17: replaced PR 180's single reading, 208 s on run 35078515837, measured
+    # 2026-09-16 to the predecessor aggregator-start endpoint. A kind record keeps no
+    # history, so the superseded reading is kept here.
+    - kind: main
+      median_seconds: 175.5
+      measured_on: '2026-09-17'
+      samples:
+      - {run: 35182460400, seconds: 168}
+      - {run: 35187007544, seconds: 183}
+  - id: certificate-page
+    file: .github/workflows/pages.yml
+    aggregator: pages-required
+    not_gating: []
+    budget_seconds: 180.0
+    enforcement: advisory
+    tracking_bead: think-g4n9
+    advisory_reason: >-
+      Owner decision 2026-09-17 covers the pull-request wall generally, and this wall
+      has also read over 180 s on PR 188 itself (182 s, run 35182460356), so it is
+      reported rather than enforced until think-g4n9 re-enforces both walls.
+    argument: >-
+      The page build and browser checks through pages-required. Saved-font variants run
+      in two bounded pairs so the slow WebKit cell no longer carries four serial draws.
+    kinds:
+    # 2026-09-17: replaced PR 180's single reading, 189 s on run 35078515689, measured
+    # 2026-09-16 to the predecessor aggregator-start endpoint. A kind record keeps no
+    # history, so the superseded reading is kept here.
+    - kind: main
+      median_seconds: 176
+      measured_on: '2026-09-17'
+      samples:
+      - {run: 35182460356, seconds: 182}
+      - {run: 35187007572, seconds: 170}

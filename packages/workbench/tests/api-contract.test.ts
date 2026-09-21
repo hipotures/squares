@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { isAbsolute, join, relative, resolve, sep } from "node:path";
 import { test } from "node:test";
 import { runInNewContext } from "node:vm";
 import { bundleBrowser } from "../tools/bundle-browser.ts";
@@ -41,12 +41,22 @@ function compileContractFixture(path: string): string {
 }
 
 test("the public API rejects missing, extra, and incompatible members", async () => {
-  const scratch = await mkdtemp(join(PACKAGE_ROOT, ".api-contract-"));
-  const relativeApi = "../src/api/workbench-api.ts";
+  const scratch = await mkdtemp(join(tmpdir(), "squares-workbench-api-contract-"));
+  const scratchFromPackage = relative(PACKAGE_ROOT, scratch);
+  assert.equal(
+    isAbsolute(scratchFromPackage) ||
+      scratchFromPackage === ".." ||
+      scratchFromPackage.startsWith(`..${sep}`),
+    true,
+  );
+  const apiFromScratch = relative(scratch, resolve(PACKAGE_ROOT, "src/api/workbench-api.ts"));
+  const portableApi = apiFromScratch.split(sep).join("/");
+  const relativeApi =
+    isAbsolute(apiFromScratch) || portableApi.startsWith(".") ? portableApi : `./${portableApi}`;
   const fixtures = new Map([
     [
       "valid",
-      `import type { AtlasTransitions } from "${relativeApi}";\ndeclare const api: AtlasTransitions;\nconst checked: AtlasTransitions = api;\nvoid checked;\n`,
+      `import type { AtlasTransitions } from "${relativeApi}";\ndeclare const api: AtlasTransitions;\nconst checked: AtlasTransitions = api;\nconst integration = checked.physics(0).integration;\nconst requested: "adaptive" | number = integration.requested;\nconst warning: "below-adaptive-stability-bound" | null = integration.warning;\nvoid requested;\nvoid warning;\n`,
     ],
     [
       "missing",
@@ -115,4 +125,13 @@ test("the API module bundles into the named classic-browser seam", async () => {
   } finally {
     await rm(scratch, { recursive: true });
   }
+});
+
+test("the browser physics report preserves the trajectory integration receipt", async () => {
+  const application = await readFile(resolve(PACKAGE_ROOT, "src/application.js"), "utf8");
+  assert.match(
+    application,
+    /integration:\s*Object\.assign\(\{\}, tr\.receipt\.configuration\.integration\)/,
+  );
+  assert.match(application, /animationIntegration\(LAW, WALLLAW, response\.storedTimestep\)/);
 });

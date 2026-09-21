@@ -139,8 +139,12 @@ record checks was a judgement call, and at four there is no argument for skippin
 **Use `--edit` while editing.** `BC-079` split it out of `--fast`, which had stopped
 being fast at `499s` with one step 94% of it.
 `--edit` is 33 seconds and runs everything except that step.
-`--fast` is what a block boundary is for, and CI runs the full gate on every push
-regardless, so the split moves feedback latency and not coverage.
+`--fast` is what a block boundary is for, and each pull request runs its complete
+seven-part surface as concurrent checks, frontend, typecheck, geometry, suite A, suite
+B, and sweeps jobs. Slow, exhaustive, deferred, golden-rebuild, and strict evidence
+belongs at explicit research, final-review, merge, daily, or on-demand checkpoints
+rather than in every edit cycle.
+The split changes feedback latency without thinning the fast surface.
 
 **The waste this rule names is measured now, and it is the coordinator’s, not the
 gate’s.** The evidence is the retained rollup
@@ -216,6 +220,15 @@ footer, and de-slop pass, which is the one that never happens on its own.
 Once per block, not per file: per file it re-reads the same guidelines for every edit
 and churns text that was already conformant, and a block that only touched records or
 code has nothing for it to do.
+
+A newly retained result also completes the
+[publication sequence](packing/campaign/documentation-pass.md#new-result-publication) in
+the same change: the frontier, README, survey, and affected SVG/PDF/PNG exports must
+agree before landing.
+The
+[Session 142 corrections](docs/project/reviews/review-2026-09-19-pr199-201-correctness.md)
+repaired the atlas while the README still omitted T-027–T-030; checking generated views
+alone did not catch the missing narrative.
 
 ## OR-8: A self-declared budget is not a stop condition
 
@@ -315,6 +328,24 @@ groups concrete file and interface changes by purpose.
 Validation, documentation decisions, limitations, ranked follow-up candidates, and the
 one selected next entry follow.
 Agenda chronology may support that account; it may not stand in for it.
+
+**The description is the template.**
+[`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md) is the section
+order.
+`devtools.check_pr_description` refuses a body that drops those headings, replaces
+the disposition table with a session chronology, or opens Cost with every experiment
+wall. Session-141’s first [#201](https://github.com/jlevy/squares/pull/201) draft was a
+heading-less chronology; the first rewrite had the headings and still listed fifteen
+covering walls. [#196](https://github.com/jlevy/squares/pull/196) and
+[#197](https://github.com/jlevy/squares/pull/197) are the filled template: Cost is two
+to four sentences of what the slice is, what it cost, and what it does not do.
+Dispositions are one row per decision, not per probe.
+A contextual dump is an unfinished pull request, the same as a missing cost block.
+From `packing/`:
+
+```bash
+uv run --frozen --all-extras --group dev python -m devtools.check_pr_description --file BODY.md
+```
 
 ## OR-10: Treat matched agent and host handoffs as continuation, not a reset
 
@@ -522,6 +553,30 @@ than the tier’s own wall produces **no completed run at all** — three runs o
 were cancelled that way before the pattern was seen.
 On 2026-09-05 a single test fix cost twenty-three minutes to verify, four times over.
 
+The same failure recurred in a form the first timing register could not detect.
+The required pull-request wall had a 154-second median on 2026-09-06, crossed 180
+seconds on 2026-09-08, and reached 288 seconds by 2026-09-15. Over the same interval,
+the certificate-page pull-request wall rose from 37 seconds to a 464-second median.
+Every individual tier remained inside its own ceiling because those ceilings bound gate
+steps, while the contributor waits for the longest job together with its queue,
+checkout, toolchain setup, and artifact transfers.
+
+Three gaps allowed that growth.
+A pull-request tier could have no recorded cost, which disabled its drift, stale-record,
+and headroom checks.
+A new observation could simply replace the old baseline, turning the drift rule into a
+ratchet. Finally, the complete wall had no machine-read budget.
+The pull-request wall checker now measures that wait on every run and fails closed when
+the current run cannot be measured.
+It judges the 180-second wall; after 15 comparable samples establish a kind-specific
+median, it also judges a 1.2-fold regression.
+Since 2026-09-17 both walls are advisory under `think-g4n9`: a wall over its budget or
+its regression ratio warns rather than fails until that bead holds them at or under 180
+seconds, while unmeasurable evidence still fails.
+Missing median evidence is reported explicitly rather than represented as a passed
+relative check. [The validation guide](development.md#validation-tiers) defines the
+measurement and the register contracts.
+
 The target applies to ordinary PR feedback.
 A full final checkpoint may take longer, but its measured duration is still open to
 improvement. Twenty-seven minutes observed on one checkpoint is not a necessary minimum.
@@ -570,6 +625,18 @@ What this rule requires in practice:
   aspiration, and a gate that goes red for reasons unrelated to any regression is one
   people learn to ignore.
   The target belongs in the agenda; the ceiling belongs around the measurement.
+  This rule’s outer edge is the exception: a pull-request wall above three minutes is
+  already a defect, so its absolute budget is 180 seconds and its regression check is
+  relative to the recorded median beside it.
+- **Budget the wall, not only the steps.** Every component can remain in band while the
+  contributor’s wait doubles.
+  Measure queue, setup, execution, and transfer time on the run they describe, and give
+  the complete wait a machine-read budget.
+- **Raise a record only with attribution.** Replacing a baseline with every new reading
+  hides compounding growth.
+  A material rise names the steps or test files that grew, quantifies the increase, and
+  records its cause. Keep earlier readings in the register so the cumulative change
+  remains visible.
 
 ### OR-15: Outcome over ceremony, and process is revised on a cadence rather than on irritation
 
@@ -624,6 +691,59 @@ The owner requested this rule on 2026-09-06 after the PR #97 continuation added
 duplicate packet hashes and a checker-side manifest for files already tracked together
 in Git. `think-jyf4` tracks their removal.
 Include this rule when briefing subagents that create artifacts or validation checks.
+
+### OR-17: Every routine gate has a wall ceiling, and anything above it is selected on purpose
+
+`OR-13` decides *where* a check runs and `OR-14` bounds the pull-request wall at 180
+seconds.
+Neither bounds a gate once it has **left** the fast surface, and that gap is not
+theoretical: it is how a 45-minute gate came to sit on the merge path with nothing
+objecting.
+
+**The rule is a ceiling on wall time per routine gate, deferred surface included.** A
+gate above the ceiling is not forbidden; it is **selected**, per invocation, and the
+record says who selected it and what evidence was wanted.
+A label that silently costs forty-five minutes is not a selection, it is a checkbox, and
+a checkbox cannot state what it was for.
+
+The owner set this on 2026-09-21: routine delays beyond a few minutes that were not
+consciously selected as needed checks are not acceptable, because they delay all serious
+progress.
+
+The measurement that day, on two complete deep-gate runs of PR 208 over one tree:
+
+| Job | Wall |
+| --- | --- |
+| `exhaustive-tier` | 2674 s (44 m 34 s) |
+| `deferred-steps` | 2469 s (41 m 09 s) |
+| `deferred-slow-lane` | 999 s (16 m 39 s) |
+| `screen` | 909 s (15 m 09 s) |
+
+`deep-gate.yml` and `test_deep_gate_workflow.py` price the exhaustive tier at 1943.05 s
+— the figure that refused its promotion into `--fast`. The job costs 2674 s, **1.38x its
+own declared price**. That is under the 1.5x that fails a local tier, and it went
+unnoticed for the reason `OR-14` already names in another form: the CI jobs are clocked
+by no drift rule at all, so there was nothing for the number to fail against.
+
+Four obligations follow, and they are what a control has to hold:
+
+- **A wall ceiling per gate, not only a step-time budget.** The deferred surface is
+  inside it. A tier does not become unbounded by being deferred.
+- **Selection is per invocation and recorded.** Above the ceiling, the record names the
+  selector and the evidence sought, the way `OR-13` already makes a session name its
+  certifying gate.
+- **The CI jobs are clocked the way local tiers are**, so `gate-budgets.yaml`’s drift
+  and stale rules reach them.
+  A price nothing reads is not a budget.
+- **A gate never re-decides a tree it has already decided.** The second deep-gate run
+  that day spent forty-five minutes on a byte-identical tree the first had passed, and
+  that duplicate was the whole wall of the merge.
+
+`OR-14`’s argument carries over unchanged and is the reason this is not a comfort
+question: cycle time is a floor on iteration rate, and a gate people cannot afford to
+run is a gate that stops reporting.
+`think-zmos` is the efficiency block that measured this; `think-haam` tracks encoding
+the ceiling and its control.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

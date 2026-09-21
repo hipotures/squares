@@ -97,6 +97,11 @@ action for each are in [`frontier/RESULTS.md`](packing/frontier/RESULTS.md); the
 | [T-001](packing/frontier/RESULTS.md) | 17 | `V4` | `C4` | `S3` | `apparently-novel` | Sixteen points make [0, 4426213/1000000]^2 unavoidable for open squares of side above one, so s(17) >= 4426213/1000000 = 4.426213. |
 | [T-002](packing/frontier/RESULTS.md) | 18 | `V4` | `C4` | `S3` | `apparently-novel` | s(18) >= 4426213/1000000, by monotonicity from T-001 (a packing of 18 unit squares contains a packing of 17). |
 | [T-021](packing/frontier/RESULTS.md) | 20, 21 | `V4` | `C4` | `S3` | `apparently-novel` | s(20) >= 97/20 and s(21) >= 97/20, from a first-party weighted fractional unavoidable-set certificate at container side 97/20 = 4.85. |
+| [T-027](packing/frontier/RESULTS.md) | 18 | `V4` | `C4` | `S3` | `apparently-novel` | s(18) >= 467/100 = 4.67, from a first-party weighted fractional unavoidable-set certificate at container side 467/100. |
+| [T-028](packing/frontier/RESULTS.md) | 18 | `V4` | `C4` | `S3` | `apparently-novel` | s(18) >= 187/40 = 4.675, from a first-party weighted fractional unavoidable-set certificate at container side 187/40. |
+| [T-029](packing/frontier/RESULTS.md) | 18 | `V4` | `C4` | `S3` | `apparently-novel` | s(18) >= 1871/400 = 4.6775, from a first-party weighted fractional unavoidable-set certificate at container side 1871/400. |
+| [T-030](packing/frontier/RESULTS.md) | 18 | `V4` | `C4` | `S3` | `apparently-novel` | s(18) >= 4679/1000 = 4.679, from a first-party weighted fractional unavoidable-set certificate at container side 4679/1000. |
+| [T-032](packing/frontier/RESULTS.md) | 17 | `V4` | `C4` | `S3` | `previously-published` | s(17) >= 461300/99999 = 4.61304613 …, by Guzhou0806’s R012 parent-angle certificate of 20 September 2026, replayed here by the source’s exact checker and decided again by this repository’s interval branch and bound. |
 | [T-004](packing/frontier/RESULTS.md) | 46 | `V4` | `C3` | `S3` | `previously-published` | Bentz 2010, Theorem 8: the printed 45-point unavoidable-set argument for s(46) >= 7 is correct as printed, machine-audited in full. |
 | [T-008](packing/frontier/RESULTS.md) | 46 | `V4` | `C3` | `S3` | `previously-published` | s(46) = 7: the lower half by T-004’s audited unavoidable set, the upper half by the exact 7 x 7 grid packing of 46 squares. |
 | [T-009](packing/frontier/RESULTS.md) | 29 | `V4` | `C3` | `S3` | `apparently-novel` | s(29) <= 5.93383346267692918974379895098, by a Krawczyk interval certificate over the retained rational 29-square witness at a declared relaxation of 1e-20. |
@@ -110,6 +115,7 @@ action for each are in [`frontier/RESULTS.md`](packing/frontier/RESULTS.md); the
 | [T-003](packing/frontier/RESULTS.md) | 17, 18 | `V4` | `C3` | `S2` | `apparently-novel` | The sixteen-point set’s unavoidability ceiling lies in [4426213/1000000, 4427/1000): certification at the left endpoint, an exact escaping pose at the right, with the top strips’ a + 2b <= 2*sqrt(2) hypothesis identifying the closing mechanism at 753/250 + sqrt(2), inside the bracket. |
 | [T-005](packing/frontier/RESULTS.md) | 13 | `V4` | `C3` | `S2` | `apparently-novel` | Bentz 2010, Lemma 10 is false as printed -- the middle replacement point (1, 1.74) is refuted by an exact escape certificate, and the published page image carries the same transposed text -- and true under the corrected reading (1.74, 1), with all three corrected replacement covers certified exactly. |
 | [T-011](packing/frontier/RESULTS.md) | 11 | `V4` | `C3` | `S2` | `previously-published` | Trump’s 1979 packing is exactly valid: 11 unit squares in a square of side the published degree-8 algebraic number 3.877083590022814 …, with 14 of 55 pairs in exact zero-separation contact and 20 corner coordinates exactly on the boundary, so s(11) <= that side. |
+| [T-031](packing/frontier/RESULTS.md) | 11 | `V4` | `C3` | `S2` | `apparently-novel` | At L = 96/25 and B = 9977/10000 on the 181-direction net (half-tangents k*207107/90000000, k = 0..180), the D4-symmetric point measure of total mass 10868617/1000000 = 10.868617 in cases/n11_corner_class_certificate/certificate.json, the retained exp-220 covering (SHA-256 876820dde8d55c727dec73c85f245db27661556bb3c7aa06ffb15b01ec97a461) charges at least 2000013/2000000 to every closed B-square at a net direction whose minimum of x + y is at least 1/2 in each of the four corner frames, decided by the exact event-cell sweep and by the interval branch and bound, which agree at that value. |
 
 | Significance | What [`epistemics.md`](epistemics.md#significance-and-novelty) anchors it to |
 | --- | --- |
@@ -137,13 +143,13 @@ hypothesis status and summarizes experiment verdicts, and the
 
 | Record | Count | State at the cutoff |
 | --- | ---: | --- |
-| Agendas | 35 | 15 active; 14 completed; 5 paused; 1 superseded |
-| Commitments | 343 | 177 complete; 59 stopped; 64 blocked; 15 ready; 20 tentative; 8 in progress |
-| Sessions | 135 | 84 completed; 51 stopped; all terminal |
-| Explorations | 32 | 19 linked to proposed hypotheses; 13 uncodified |
-| Hypotheses | 150 | 26 confirmed; 27 refuted; 50 blocked; 12 unresolved; 5 open; 27 open questions; 2 result registered; 1 abandoned; 0 running |
-| Experiments | 126 | 39 accepted; 32 rejected; 30 unresolved; 12 baseline; 11 blocked; 2 abandoned; 0 in progress |
-| Frontier results | 26 | 26 registered |
+| Agendas | 37 | 17 active; 14 completed; 5 paused; 1 superseded |
+| Commitments | 356 | 181 complete; 61 stopped; 68 blocked; 16 ready; 21 tentative; 9 in progress |
+| Sessions | 150 | 92 completed; 58 stopped; all terminal |
+| Explorations | 39 | 24 linked to proposed hypotheses; 15 uncodified |
+| Hypotheses | 170 | 29 confirmed; 31 refuted; 55 blocked; 17 unresolved; 5 open; 29 open questions; 2 result registered; 2 abandoned; 0 running |
+| Experiments | 155 | 43 accepted; 36 rejected; 50 unresolved; 12 baseline; 11 blocked; 3 abandoned; 0 in progress |
+| Frontier results | 32 | 32 registered |
 
 <!-- END CURRENT-RESEARCH-STATUS -->
 
@@ -156,15 +162,43 @@ Agendas 024–028 built on the `3.81` result with adaptive and structural routes
 Agendas 029–033 and 035 developed conditional-owner geometry, T-025/T-026, and the
 now-paused incremental follow-ups.
 [Agenda 036](packing/campaign/agendas/agenda-036-n11-strategy-reset-roadmap.md) is the
-current strategy-reset queue.
+strategy-reset queue, and
+[Agenda 037](packing/campaign/agendas/agenda-037-n11-relational-certificate-program.md)
+is the relational-certificate queue opened by the overnight review, and
+[Agenda 040](packing/campaign/agendas/agenda-040-overnight-lower-bound-loop.md) is the
+current overnight lower-bound queue opened by Session 143’s review.
 The generated agenda map, not this narrative, summarizes commitment state.
 
-All recorded sessions are terminal; Session 135 is the latest handoff.
+[Session 143](packing/campaign/agent-sessions/session-143-lower-bound-math-review.md) is
+the latest terminal closeout: its four research lanes and three adversarial reviews
+produced
+[X-040](packing/campaign/explorations/X-040-lower-bound-mechanisms-beyond-the-one-body-ceiling.md),
+registered H-222 to H-231, opened agenda-040, corrected the Bentz 2016 transcription
+(D-505, D-506), and selected BC-361 under `think-pogj` as the next entry; no bound
+moved.
+[Session 142](packing/campaign/agent-sessions/session-142-stack-correctness.md) is
+the preceding terminal closeout: its correctness review replayed all four retained n=18
+certificates, repaired the stack in PR 202, and preserved `think-qqzs` as the next
+entry. The corrected code passed the full checkpoint; unchanged lower PR heads remain
+independently unready.
+[Session 141](packing/campaign/agent-sessions/session-141-n100-research.md) closed the
+preceding research pass: T-029 retained `s(18) >= 1871/400`, T-030 retained
+`s(18) >= 4679/1000`, H-218 and H-220 stay unconfirmed, and `think-qqzs` remained the
+next entry. [Session 140](packing/campaign/agent-sessions/session-140-lb-survey.md)
+closed the stacked-PR survey of `n <= 100` lower bounds; it retained T-028
+`s(18) >= 187/40` and does not confirm H-218.
+[Session 139](packing/campaign/agent-sessions/session-139-n11-overnight-research.md)
+retained T-027 `s(18) >= 467/100` after encode-only timed out unresolved.
+[Session 138](packing/campaign/agent-sessions/session-138-n11-overnight-review.md) is
+the preceding route-selection handoff: PR 193 merged its records as `4ad98e90`,
+`think-4woh` is closed, and certification debt now sits under `think-qqzs`. The five
+X-037 owner decisions are resolved under [`epistemics.md`](epistemics.md).
 `stopped` is not a scientific failure; it includes time limits, guarded refusals,
 administrative handoffs, and work deliberately ended after its next evidence was
 identified. The late-session arc moved from certificate production and exact dilation
 through owner geometry and bounded negative tests, then through the T-025/T-026
-publication stack and this reconciliation.
+publication stack, research-state reconciliation, the CI-efficiency block, and the
+overnight n=11 route review.
 Use the generated close report for individual session clocks and never add child-session
 resource totals to their parent roll-up.
 
@@ -174,7 +208,8 @@ Some explorations link forward through `proposes`, while others remain uncodifie
 observations or strategy notes.
 The most consequential recent synthesis is X-027’s ceiling for pure point/density
 certificates, followed by X-028’s strategy portfolio and the scoped BC303 drafts
-X-029–X-031, followed by X-032’s no-target Route S compression contract.
+X-029–X-031, followed by X-032’s no-target Route S compression contract and X-037’s
+ranked relational-certificate slate.
 A draft or proposed direction is not a registered hypothesis, and a registered
 hypothesis is not a frontier result.
 
@@ -184,10 +219,12 @@ Stromquist-to-Trump interval.
 The pure point/density ceiling `38200/9977 ≈ 3.8288` lies only about `0.00236` above
 T-026, so additional heavy work for microscopic gains in that language is paused.
 H-160/exp-158 and H-162/exp-160 are registered but blocked before target invocation.
-H-163 is registered and open but untested; its target-blind instrument merged in PR 182,
-and no `exp-161` exists.
-The `think-ufmk` planning block must register that experiment before any target is
-authorized. The retained source and control work carries no scientific verdict.
+H-163 is registered and unresolved via exp-161; its target-blind instrument merged in PR
+182\. Encode-only timed out with no JSON. `--search` did not run.
+`think-ufmk` registered that experiment; a scientific target still requires the live
+`--check`, `--authorize-target exp-161`, and a coverage-encoding search that is not an
+admission-control manifest.
+The retained source and control work carries no scientific verdict.
 
 BC-339’s W7 pipeline-improvement and W8 reconciliation are complete and certified.
 BC-347’s source-bound
@@ -203,17 +240,36 @@ Its three alternating local pairs reduced the rollup’s median from 47.72 to 2.
 seconds, and the first candidate hosted checks tier passed in 106.38 seconds against the
 unchanged 195-second ceiling.
 This is validation evidence, not new mathematics.
-The current order is:
+BC-355 / `think-97we` reconciled the later Pages, Packing, budgeting, and
+validation-lane work into one exact-head topology.
+[Session 136](packing/campaign/agent-sessions/session-136-ci-topology-reconciliation.md)
+stopped after the implementation handoff and
+[Session 137](packing/campaign/agent-sessions/session-137-ci-topology-continuation-recovery.md)
+recovered it; PR 188 merged as `042e791c` and PR 185 merged as `d7f9d94d`, and
+`think-97we` is closed.
+What that closure did not carry is the 180-second hosted wall: by owner decision the
+pull-request walls are advisory under the open `think-g4n9` until they hold on hosted
+runners, so BC-355’s agenda cell still records `in_progress`. The block ran no
+scientific target and changed no theorem, hypothesis verdict, n=11 bound, or frontier
+record. The current order is:
 
-1. BC-354 / `think-0t5y` stopped at Route A’s representation boundary.
+1. BC-361 / `think-pogj` is the active block, opened by Session 143’s review in
+   [agenda-040](packing/campaign/agendas/agenda-040-overnight-lower-bound-loop.md).
+   Session 144 decides H-223, H-224, and H-225 on the stock instruments under `exp-213`
+   to `exp-215`, with the BC-362 Bentz 2016 replay lane beside it.
+   BC-357 / `think-qqzs` stays the registered n=6 calibration entry in agenda-037: it
+   closes M7’s n=6 point bracket at 299/100 after the G5 site-merge fix and can fill an
+   idle slot.
+2. BC-354 / `think-0t5y` stopped at Route A’s representation boundary.
    Its source inventories found no complete 80-stratum negative-root producer, matched
    exact baseline, conditional gate, or method-distinct replay.
    No target ran and no physical root closed.
-2. BC-343 remains the active research commitment; `think-ufmk` is its sole operational
-   entry. [X-032](packing/campaign/explorations/X-032-route-s-threshold-compression.md)
-   and [H-163](packing/campaign/hypotheses/H-163-route-s-threshold-compression.md)
-   freeze T-025 as the sole matched control, its exact 119-orbit support universe, and
-   the at-most-23 positive-orbit criterion.
+3. BC-343 remains the standing Route S commitment; `think-ufmk` is its sole scientific
+   entry, on a fresh planning branch.
+   [X-032](packing/campaign/explorations/X-032-route-s-threshold-compression.md) and
+   [H-163](packing/campaign/hypotheses/H-163-route-s-threshold-compression.md) freeze
+   T-025 as the sole matched control, its exact 119-orbit support universe, and the
+   at-most-23 positive-orbit criterion.
    T-026 is only a support-and-rescaling sentinel.
    Session 134’s source-distinct review refused the first admission checkpoint.
    Session 135 then discharged all four retained guards: complete source contents bound
@@ -222,15 +278,17 @@ The current order is:
    Its source-distinct re-audit returned ADMIT after one symlink-alias boundary repair.
    PR 182 merged the instrument as `1d9c49c4` from reviewed head `609d7d62` after
    exact-head validation.
-   No optimizer, candidate, coverage target, or `exp-161` has run.
-3. Treat A, S, global angular resources, and B as the first advisory tier.
+   Session 139 registered exp-161 and landed the named producer, which emits no
+   candidate. Encode-only timed out unresolved.
+   `--search` did not run.
+4. Treat A, S, global angular resources, and B as the first advisory tier.
    A is the strongest route to a material `n = 11` lower bound; S is the best bounded
    deliverable; angular resources offer a cheap optimal-face screen; and B is the
    strongest alternative mechanism after its soundness controls.
-4. Retain stronger charge algebra, geometry-dependent budgets, an `n = 12` exact-value
+5. Retain stronger charge algebra, geometry-dependent budgets, an `n = 12` exact-value
    program, and orientation structure as second-tier candidates whose first blocks must
    pay for missing premises.
-5. Keep constructive search separately budgeted after an oblique proposer control, and
+6. Keep constructive search separately budgeted after an oblique proposer control, and
    treat geometric waste accounting as a speculative candidate requiring both a local
    lemma and a non-double-counting global rule.
 
@@ -239,10 +297,13 @@ The detailed
 originally allocated five sequential merge-bounded blocks.
 BC-354 activated that schedule’s guard-refusal branch, so the Route A discriminator no
 longer follows it. BC-343’s no-target Route S instrument is admitted and merged.
-The remaining path begins with the `think-ufmk` planning block, which may register
-`exp-161` and authorize one bounded target.
-Each block starts from the preceding merge on a fresh branch and gets its own session,
-bead disposition, validation receipt, and pull request.
+Its remaining Route S path is the `think-ufmk` planning block, which registered
+`exp-161`; the named producer exists and emits no candidate.
+Encode-only timed out unresolved.
+A later encode still needs a live `--check` and `--authorize-target
+exp-161` before `--search`; agenda-037’s relational-certificate queue now runs ahead of
+it. Each block starts from the preceding merge on a fresh branch and gets its own
+session, bead disposition, validation receipt, and pull request.
 
 The audit’s linear advisory order is A, S, angular resources, B, stronger charge
 algebra, geometry-dependent budgets, `n = 12`, C, D, then geometric waste.
@@ -337,6 +398,9 @@ case or experiment separately.
 
 | Document or collection | Role | Authority | Lifecycle | Current replacement |
 | --- | --- | --- | --- | --- |
+| [Senior Review of PRs 199–201](docs/project/reviews/review-2026-09-19-pr199-201-correctness.md) | dated review record | record | retained | — |
+| [Proof Review: R012 `s(17) >= 461300/99999` and Mira’s `4.613` Certificate](docs/project/reviews/review-2026-09-20-n17-r012-and-mira-4613-proof-review.md) | dated review record | record | retained | — |
+| [Review: Derived-Artifact Currency on `main` at `9fe9999d`](docs/project/reviews/review-2026-09-21-derived-artifact-currency.md) | dated review record | record | retained | — |
 | [Square-packing workbench](packages/workbench/README.md) | component scope and use | current | maintained | — |
 | [The checkers’ probes](packages/workbench/probes/README.md) | component scope and use | supporting | maintained | — |
 | [Foundation Benchmark Replay Fixture](packages/workbench/tests/fixtures/benchmark-foundation/README.md) | component scope and use | supporting | maintained | — |
@@ -365,7 +429,6 @@ case or experiment separately.
 | [BC329 Target-Free Three-Profile Run Sheet](docs/project/specs/active/plan-2026-09-13-n11-bc329-three-profile-run-sheet.md) | implementation plan | current | transient | — |
 | [PR157 Integrated Calibration Launch Supplement](docs/project/specs/active/plan-2026-09-13-pr157-integrated-calibration-launch-supplement.md) | implementation plan | current | transient | — |
 | [BC329 Run-Set Verifier Contract](docs/project/specs/active/plan-2026-09-13-n11-bc329-runset-verifier.md) | implementation plan | current | transient | — |
-| [Feature: Video delivery profiles](docs/project/specs/active/plan-2026-09-21-video-delivery-profiles.md) | implementation plan | current | transient | — |
 | [BC329 Calibration Reader: Source-Distinct Review](docs/project/reviews/review-2026-09-13-n11-bc329-source-distinct-reader.md) | dated review record | record | retained | — |
 | [BC329 Reader Repair: Exact-Commit Rereview](docs/project/reviews/review-2026-09-13-n11-bc329-reader-rereview.md) | dated review record | record | retained | — |
 | [BC329 Reader F6/F7: Exact-Commit Admission Review](docs/project/reviews/review-2026-09-13-n11-bc329-reader-f6f7-overflow.md) | dated review record | record | retained | — |
@@ -411,6 +474,88 @@ case or experiment separately.
 | [Exact Threshold-Atom Orbit Admission](packing/cases/n11_fractional_certificate/threshold-atom-orbit-admission.md) | research synthesis | record | retained | — |
 | [H157 and Conditional-Claim Review at ee98c4ba](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-034/h157-independent-review/review.md) | dated review record | record | retained | — |
 | [Bounded Review of the H157 Corrections](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-034/h157-independent-review/correction-review.md) | dated review record | record | retained | — |
+| [H-216 n=6 299/100 Freeze Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/h216-n6-299-100-receipt.md) | research synthesis | record | retained | — |
+| [H-216 n=6 299/100 Sites2 Freeze Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/h216-n6-299-100-sites2-receipt.md) | research synthesis | record | retained | — |
+| [n=12 3969/1000 Grid Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n12-3969-1000-grid-receipt.md) | research synthesis | record | retained | — |
+| [n=11 383/100 Grid Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-383-100-grid-receipt.md) | research synthesis | record | retained | — |
+| [n=11 383/100 Four-Grid Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-383-100-grid4-receipt.md) | research synthesis | record | retained | — |
+| [n=11 383/100 T-025-Seeded Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-383-100-t025-seed-receipt.md) | research synthesis | record | retained | — |
+| [n=11 191/50 Four-Grid Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-191-50-grid4-receipt.md) | research synthesis | record | retained | — |
+| [n=11 191/50 Auto-Plus-60 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-191-50-auto60-receipt.md) | research synthesis | record | retained | — |
+| [n=11 191/50 T-025-Seeded Auto-Plus-60 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-191-50-t025-auto60-receipt.md) | research synthesis | record | retained | — |
+| [n=11 191/50 T-025-Seeded Auto-Plus-60 Window-Lattice Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-191-50-t025-windows5-receipt.md) | research synthesis | record | retained | — |
+| [n=11 191/50 T-026-Seeded Auto-Plus-60 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-191-50-t026-auto60-receipt.md) | research synthesis | record | retained | — |
+| [n=11 381/100 T-025-Seeded Auto-Plus-60 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-381-100-t025-auto60-receipt.md) | research synthesis | record | retained | — |
+| [n=11 77/20 T-025-Seeded Auto-Plus-60 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-77-20-t025-auto60-receipt.md) | research synthesis | record | retained | — |
+| [n=11 31/8 T-025-Seeded Auto-Plus-60 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-31-8-t025-auto60-receipt.md) | research synthesis | record | retained | — |
+| [n=11 96/25 T-025-Seeded Auto-Plus-60 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-96-25-t025-auto60-receipt.md) | research synthesis | record | retained | — |
+| [G4 n=11 31/8 Nine-Direction Threshold-Atom Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/g4-n11-31-8-net9/g4-n11-31-8-net9-receipt.md) | research synthesis | record | retained | — |
+| [n=12 3969/1000 T-017-Seeded Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n12-3969-1000-t017-seed-receipt.md) | research synthesis | record | retained | — |
+| [n=12 3969/1000 T-017-Seeded Four-Grid Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n12-3969-1000-t017-grid4-receipt.md) | research synthesis | record | retained | — |
+| [n=12 397/100 T-017-Seeded Four-Grid Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n12-397-100-t017-grid4-receipt.md) | research synthesis | record | retained | — |
+| [n=18 467/100 Auto-Grid Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-467-100-grid-receipt.md) | research synthesis | record | retained | — |
+| [n=18 467/100 T-019-Seeded Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-467-100-t019-seed-receipt.md) | research synthesis | record | retained | — |
+| [n=18 117/25 T-019-Seeded Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-117-25-t019-seed-receipt.md) | research synthesis | record | retained | — |
+| [n=18 117/25 T-019-Seeded Window-Lattice Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-117-25-t019-windows5-receipt.md) | research synthesis | record | retained | — |
+| [n=18 117/25 T-027-Seeded Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-117-25-t027-seed-receipt.md) | research synthesis | record | retained | — |
+| [n=18 47/10 T-019-Seeded Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-47-10-t019-seed-receipt.md) | research synthesis | record | retained | — |
+| [n=18 469/100 T-019-Seeded Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n18-469-100-t019-seed-receipt.md) | research synthesis | record | retained | — |
+| [M3 T-018 Selftest Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/m3-t018-selftest/README.md) | research synthesis | record | retained | — |
+| [M3 T-018 9-Direction Search Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/m3-t018-net8/README.md) | research synthesis | record | retained | — |
+| [M3 T-018 Selftest After Span-Sweep Encoding](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/m3-t018-selftest-span/README.md) | research synthesis | record | retained | — |
+| [n=17 23/5 Grid Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-grid-receipt.md) | research synthesis | record | retained | — |
+| [n=17 23/5 T-019-Seeded Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-t019-seed-receipt.md) | research synthesis | record | retained | — |
+| [n=17 23/5 T-019-Seeded Window-Lattice Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-t019-windows5-receipt.md) | research synthesis | record | retained | — |
+| [n=17 23/5 T-019-Seeded Window-6 Lattice Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-t019-windows6-receipt.md) | research synthesis | record | retained | — |
+| [n=17 23/5 T-019-Seeded Window-7 Lattice Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-t019-windows7-receipt.md) | research synthesis | record | retained | — |
+| [n=19 97/20 T-020-Seeded Window-6 Lattice Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/n19-97-20-t020-windows6-receipt.md) | research synthesis | record | retained | — |
+| [G4 n=11 191/50 Nine-Direction Threshold-Atom Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/g4-n11-191-50-net9/g4-n11-191-50-net9-receipt.md) | research synthesis | record | retained | — |
+| [Exp-161 Blocks 5–7 Command](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/exp-161-block57-command.md) | research synthesis | record | retained | — |
+| [Second-Wave Nagamochi-Only Floors](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/second-wave-nagamochi-triage.md) | research synthesis | record | retained | — |
+| [Leftover First-Wave Sides](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/leftover-side-ranking.md) | research synthesis | record | retained | — |
+| [Session-141 Ranked Covering Queue](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/ranked-queue.md) | research synthesis | record | retained | — |
+| [n=18 1871/400 T-028-Seeded Auto Window-5 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n18-1871-400-t028-auto-windows5-receipt.md) | research synthesis | record | retained | — |
+| [n=18 4679/1000 T-029-Seeded Auto Window-5 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n18-4679-1000-t029-auto-windows5-receipt.md) | research synthesis | record | retained | — |
+| [n=20 971/200 T-021 Four-Grid Window-7 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n20-971-200-t021-grid4-windows7-receipt.md) | research synthesis | record | retained | — |
+| [n=20 243/50 T-021 Four-Grid Window-7 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n20-243-50-t021-grid4-windows7-receipt.md) | research synthesis | record | retained | — |
+| [n=32 29/5 Seedless Auto Window-5 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n32-29-5-auto-windows5-receipt.md) | research synthesis | record | retained | — |
+| [n=31 57/10 Seedless Auto Window-5 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n31-57-10-auto-windows5-receipt.md) | research synthesis | record | retained | — |
+| [n=30 559/100 Seedless Auto Window-5 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n30-559-100-auto-windows5-receipt.md) | research synthesis | record | retained | — |
+| [n=26 513/100 Seedless Auto Window-5 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n26-513-100-auto-windows5-receipt.md) | research synthesis | record | retained | — |
+| [Session-141 Block 4 W5: `think-g4n9` hosted walls](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/w5-think-g4n9-hosted-walls.md) | research synthesis | record | retained | — |
+| [n=27 525/100 Seedless Auto Window-5 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n27-525-100-auto-windows5-receipt.md) | research synthesis | record | retained | — |
+| [n=29 548/100 Seedless Auto Window-5 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n29-548-100-auto-windows5-receipt.md) | research synthesis | record | retained | — |
+| [n=45 684/100 Seedless Auto Window-5 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n45-684-100-auto-windows5-receipt.md) | research synthesis | record | retained | — |
+| [n=44 675/100 Seedless Auto Window-5 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n44-675-100-auto-windows5-receipt.md) | research synthesis | record | retained | — |
+| [n=19 481/100 T-020 Four-Grid Window-7 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n19-481-100-t020-grid4-windows7-receipt.md) | research synthesis | record | retained | — |
+| [n=12 793/200 T-017 Auto Window-7 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n12-793-200-t017-auto-windows7-receipt.md) | research synthesis | record | retained | — |
+| [n=12 397/100 T-017 Auto Window-7 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n12-397-100-t017-auto-windows7-receipt.md) | research synthesis | record | retained | — |
+| [n=19 241/50 T-020 Four-Grid Window-7 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n19-241-50-t020-grid4-windows7-receipt.md) | research synthesis | record | retained | — |
+| [n=12 793/200 T-017 Four-Grid Window-7 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-039/n12-793-200-t017-grid4-windows7-receipt.md) | research synthesis | record | retained | — |
+| [Bentz 2016 Replay and One-Spare Inventory Receipt (exp-216, exp-217)](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/bentz2016-one-spare-receipt.md) | research synthesis | record | retained | — |
+| [n=17 23/5 T-019-Seeded Ceiling-Family Receipt (exp-213)](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-213-n17-23-5-receipt.md) | research synthesis | record | retained | — |
+| [Exp-214 n=13 399/100 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-214-n13-399-100-receipt.md) | research synthesis | record | retained | — |
+| [Exp-215 n=26 53/10 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-215-n26-53-10-receipt.md) | research synthesis | record | retained | — |
+| [n=17 23/5 T-019-Seeded Ceiling-Family Receipt (exp-218)](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-218-n17-23-5-receipt.md) | research synthesis | record | retained | — |
+| [H-230 Gap-g Wedge Derivation (Session 148, chunk 5)](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/h230-gap-wedge-derivation.md) | research synthesis | record | retained | — |
+| [H-232 Ring-Centre Derivation (Session 148, chunk 5)](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/h232-ring-centre-derivation.md) | research synthesis | record | retained | — |
+| [H-232 Ring-Centre Review (Session 148, chunk 5)](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/h232-ring-centre-review.md) | research synthesis | record | retained | — |
+| [Exp-220 n=11 96/25 Class Re-Freeze Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-220-n11-96-25-class-receipt.md) | research synthesis | record | retained | — |
+| [H-222 Registration Review of exp-219 (Session 146, chunk 3)](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/h222-registration-review.md) | research synthesis | record | retained | — |
+| [n=11 96/25 Corner-Clipped Covering Receipt (exp-219)](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-219-n11-96-25-clip-receipt.md) | research synthesis | record | retained | — |
+| [n=20 973/200 T-021-Seeded Four-Grid Window-7 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n20-973-200-t021-grid4-windows7-receipt.md) | research synthesis | record | retained | — |
+| [n=20 973/200 T-021-Seeded Four-Grid Window-7 2400 s Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n20-973-200-t021-grid4-windows7-2400-receipt.md) | research synthesis | record | retained | — |
+| [n=21 97/20 T-021-Seeded Auto Window-6 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n21-97-20-t021-auto-windows6-receipt.md) | research synthesis | record | retained | — |
+| [n=12 397/100 T-017-Seeded Four-Grid Window-7 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n12-397-100-t017-grid4-windows7-receipt.md) | research synthesis | record | retained | — |
+| [n=17 23/5 T-019-Seeded Four-Grid Window-8 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n17-23-5-t019-grid4-windows8-receipt.md) | research synthesis | record | retained | — |
+| [n=19 481/100 T-020-Seeded Auto Window-6 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n19-481-100-t020-auto-windows6-receipt.md) | research synthesis | record | retained | — |
+| [n=19 241/50 T-020-Seeded Auto Window-6 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n19-241-50-t020-auto-windows6-receipt.md) | research synthesis | record | retained | — |
+| [n=17 461/100 T-019-Seeded Auto Window-5 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n17-461-100-t019-auto-windows5-receipt.md) | research synthesis | record | retained | — |
+| [n=20 971/200 T-021-Seeded Auto Window-6 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n20-971-200-t021-auto-windows6-receipt.md) | research synthesis | record | retained | — |
+| [n=12 3969/1000 T-017-Seeded Four-Grid Window-7 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n12-3969-1000-t017-grid4-windows7-receipt.md) | research synthesis | record | retained | — |
+| [n=18 187/40 T-027-Seeded Auto Window-5 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n18-4675-1000-t027-auto-windows5-receipt.md) | research synthesis | record | retained | — |
+| [M3 T-018 9-Direction Search After Span-Sweep Encoding](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/m3-t018-net8-span/README.md) | research synthesis | record | retained | — |
+| [G4 n=11 191/50 Seventeen-Direction Threshold-Atom Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/g4-n11-191-50-net17/g4-n11-191-50-net17-receipt.md) | research synthesis | record | retained | — |
 | [Unit-Parent Centre Restriction: Author-Lane Proof Check](docs/project/reviews/review-2026-09-10-n11-parent-centre-author-check.md) | dated review record | record | retained | — |
 | [N11 Research: Definitions, Findings, and the Inference Chain](docs/project/research/research-2026-09-09-n11-evidence-and-inference.md) | research synthesis | record | retained | — |
 | [Inference Audit: Owner Geometry and Fixed-D Continuation](docs/project/research/research-2026-09-09-n11-inference-audit.md) | research synthesis | record | retained | — |
@@ -691,9 +836,11 @@ case or experiment separately.
 | [Mathematical Audit of Routes to Significant Progress on Small Square Packings](docs/project/reviews/review-2026-09-14-small-n-significant-progress-mathematical-audit.md) | dated review record | record | retained | — |
 | [N11 W10 Route Selection](docs/project/reviews/review-2026-09-14-n11-w10-route-selection.md) | dated review record | record | retained | — |
 | [Post-W5 route selection for material small-n progress](docs/project/reviews/review-2026-09-14-n11-post-w5-route-selection.md) | dated review record | record | retained | — |
+| [Proof Review: Kleddamag’s `s(17) > 461300/99853`](docs/project/reviews/review-2026-09-21-n17-kleddamag-461300-99853.md) | dated review record | record | retained | — |
 | [The Three-Lane Research Method](docs/project/three-lane-research-method.md) | component scope and use | record | retained | — |
 | [Handoff — 2026-09-04, close of the fractional-certificate block](docs/project/handoff-2026-09-04-block-close.md) | dated handoff record | record | retained | — |
 | [Handoff: Post-3.81 Portfolio at T+2](docs/project/handoff-2026-09-06-post-381-t2-commissioning.md) | dated handoff record | record | retained | — |
+| [Handoff: the `n = 17` External Intake, 21 September 2026](docs/project/handoff-2026-09-21-n17-external-intake.md) | dated handoff record | record | retained | — |
 | [Continuation Addendum: Post-3.81 Portfolio, T+2 Through T+10](docs/project/handoff-2026-09-06-post-381-t2-t10-continuation.md) | dated handoff record | record | superseded | [Synopsis: The `s(n)` Program](SYNOPSIS.md) |
 | [Self-Contained Package for Third-Party Checking of s(11) ≥ 19/5](packing/cases/n11_fractional_certificate/thirdparty/README.md) | component scope and use | record | retained | — |
 | [Lean Feasibility Spike for the `s(11) ≥ 381/100` Certificate](packing/cases/n11_fractional_certificate/lean-spike/README.md) | component scope and use | supporting | maintained | — |
@@ -908,60 +1055,274 @@ controller, not permission to blur contracts.
 
 ### Current Handoff
 
+[Session 150](packing/campaign/agent-sessions/session-150-n17-consolidation-and-correctness.md)
+landed the agenda-040 overnight stack and the n = 17 intake on main, repairing four
+confirmed review findings at the integration point rather than after it, and left the
+session’s own analysis as records: `X-041`’s ranked slate and the 2026-09-21
+derived-artifact currency review.
+It also replayed and reviewed a fifth external n = 17 value, Kleddamag’s `461300/99853`,
+which reproduced byte-identically through both of its own checkers and drew no Blocker
+and no High from an adversarial proof review.
+That artifact is retained at V4/C3 with C4 blocked, and **no bound moved for it**: the
+registered n = 17 lower bound is `T-032` at `461300/99999`.
+
+Three process defects came out of the block and are tracked rather than worked around:
+`think-fqut`, where GitHub’s stacked-PR merge orphans declared gate commits;
+`think-qsn2`, where `check_session_gate`’s verdict depends on the clone’s fetch depth;
+and `think-3umt`, where a record authored terminal can never earn its first receipt.
+
+**Selected next entry:** `think-zmos`, the W5 efficiency block.
+`OR-12` asks for one in every four to eight blocks and seventeen have closed since
+Session 131 declared the last one, so this is nine past mandatory.
+Its measurements are already taken — the deep gate’s exhaustive-tier step at 1.38 times
+its own declared budget, the deferred-steps wall beside it, and one 45-minute run spent
+over a tree byte-identical to a tree already measured — and `OR-17` now gives every
+routine gate the ceiling those numbers argued for.
+The agenda-040 closeout under `OR-11` remains outstanding and is not this entry.
+
+[Session 149](packing/campaign/agent-sessions/session-149-n17-external-intake.md)
+adopted `s(17) >= 461300/99999` as `T-032` from Guzhou0806’s R012 certificate, with
+Mira’s `4613/1000` beneath it, after four passing replays and a proof review that found
+no error. It is the first verified bound at this size that came from outside, and both
+certificates descend from this repository’s own `T-019`. The identifier was contended:
+pull request 208 claimed `T-031` from the open overnight stack for the `n = 11` octagon
+corner class, the stack merged into `main` first and kept it, and this result took
+`T-032` when `main` was merged into the intake branch.
+
+**Selected next entry at that cutoff:** `think-pcd0`, the n = 17 intake: land the
+adoption of `s(17) >= 461300/99999` as `T-032`. The research entry behind it is BC-357,
+closing M7’s n=6 bracket at 299/100 under H-216.
+
+[Session 148](packing/campaign/agent-sessions/session-148-overnight-chunk-5.md), chunk 5
+on [PR 209](https://github.com/jlevy/squares/pull/209), stopped at the owner’s request
+at 17:02Z with its work captured.
+It registered H-232 after an adversarial review: the all-deep corner class at 96/25 is
+pinned (occupant cores contain X', at least three non-occupants at depth at least sqrt 2
+\- 1 from every wall, at most one in the central 1.84-box), the ring-centre 2-of-3 atom
+collects exactly 5/4 against a budget of 1 from the transported 88-family, the maximum,
+and the fixed-support screen is the full kill at value 7. The gap-g wedge lemma (BC-364,
+H-230) is derived and reaches the 7.11 degree orbit but cuts no weighted pair of the
+64-family (CANNOT REACH, unreviewed).
+Two partial ports (the corner clip on the threshold routes, the gap_wedge tool) are
+retained as patches under results/agenda-040. No bound moved.
+
+**Selected next entry at that cutoff:** `think-n1v2`: resume chunk 5 from the retained
+patches and the wedge derivation (its review, exp-221 for H-230 and BC-364’s
+disposition, the threshold clip and the gap_wedge port), then H-232’s fixed-support
+screen, in Session 149 on the next stacked branch.
+BC-357 / H-216 stays the registered n=6 calibration entry in agenda-037.
+
+[Session 147](packing/campaign/agent-sessions/session-147-overnight-chunk-4.md)
+completed overnight chunk 4 of agenda-040 in
+[PR 208](https://github.com/jlevy/squares/pull/208), stacked on PR 207: T-031 registers
+the `exp-220` exclusion of the octagon corner class at 96/25 at the scope Session 146’s
+review accepted, V4/C3 on the two gate routes — the exact sweep and the interval branch
+and bound are the two internal routes of one gate invocation, so the review counts them
+as one confirmation — significance 2, with a case package and a control test that
+replays the gate. The overnight loop closed on its clock after four chunks; no bound
+moved.
+
+The selected entry at that cutoff was `think-b7pr`, BC-367: the four mixed corner
+classes at 96/25 and a second n=26 site set.
+
+[Session 146](packing/campaign/agent-sessions/session-146-overnight-chunk-3.md)
+completed overnight chunk 3 of agenda-040 in
+[PR 207](https://github.com/jlevy/squares/pull/207), stacked on PR 206. A Fable
+registration review of the `exp-219` exclusion returned REGISTER WITH CORRECTIONS with
+no soundness defect: the gate replays byte-for-byte, the statement is a theorem about
+every packing of eleven unit squares in a square of side 96/25 (some square meets the
+open corner triangle x + y < 1/2), and the all-deep class is already outside the point
+language (BC-366), so the corner tree cannot close at 96/25 by clipping alone.
+The bytes’ unconditional claim string was fixed in the driver, the gate and the readers,
+and `exp-220` re-froze the same 680-atom covering under the class claim with both routes
+accepting. The ceiling-family fold is retained as `devtools.fold_ceiling_family`. No
+bound moved.
+
+The selected entry at that cutoff was `think-b7pr`, BC-367: write the registration entry
+at the reviewed scope, then the four mixed corner classes and a second n=26 site set.
+
+[Session 145](packing/campaign/agent-sessions/session-145-overnight-chunk-2.md)
+completed overnight chunk 2 of agenda-040 in
+[PR 206](https://github.com/jlevy/squares/pull/206), stacked on PR 205. The convex
+corner-clip instrument was admitted after an adversarial review, and `exp-219` confirmed
+H-222 at its scope: every packing of 11 unit squares in a square of side 96/25 has a
+square meeting the open corner triangle x + y < 1/2 at some corner, RETAINABLE under the
+corner class hypothesis from both routes at mass 10.868617. That excludes the octagon
+class at 3.84; it is not a bound, and the all-deep class is already outside the point
+language (BC-366), so the corner tree cannot close at 96/25 by clipping alone.
+The three retained replay readers are re-bound to the instrument’s revision with their
+determinations reproduced.
+The overnight loop closed on its clock after two of four chunks; BC-361, BC-362 and
+BC-363 are dispositioned on agenda-040.
+
+The selected entry at that cutoff was `think-b7pr`, BC-367: register the exp-219
+conditional exclusion after review, clip the remaining corner-bin classes at 96/25, and
+give n=26 a second site set.
+
+[Session 144](packing/campaign/agent-sessions/session-144-overnight-chunk-1.md)
+completed overnight chunk 1 of agenda-040 in
+[PR 205](https://github.com/jlevy/squares/pull/205), stacked on PR 204. None of the
+three stock-instrument determinations reached its target: H-223 and H-224 are unresolved
+with their site sets refuted at 15.566 and 17.042 (`exp-214`, `exp-218`), and H-225
+stopped on the clock at the 25.000000 plateau (`exp-215`). The BC-362 lane replayed
+Bentz 2016 Theorem 11 at the printed constants, retained the one-spare inventory under
+`devtools/bentz2016`, and rejected H-226 and H-227 as stated (`exp-216`, `exp-217`);
+D-507 corrects the Theorem 9 budget.
+No bound moved.
+
+The selected entry at that cutoff was `think-ni3v`, BC-363: the corner-clip instrument
+and H-222 at 96/25 in Session 145 under `exp-219`.
+
+[Session 143](packing/campaign/agent-sessions/session-143-lower-bound-math-review.md)
+completed the owner-directed deeper mathematical review of the lower-bound routes in
+[PR 204](https://github.com/jlevy/squares/pull/204).
+[X-040](packing/campaign/explorations/X-040-lower-bound-mechanisms-beyond-the-one-body-ceiling.md)
+reads the retained ceiling family as a fractional 8 + 3 packing, shows the corner deep
+branches neutral at the target sides, retires the theta screen and the four-wall stress
+theorem, identifies the one-spare integer cases 21 and 32, and corrects the Bentz 2016
+transcription (D-505, D-506). Ten hypotheses H-222 to H-231 are registered and
+[agenda-040](packing/campaign/agendas/agenda-040-overnight-lower-bound-loop.md) carries
+the overnight loop; no bound moved.
+
+The selected entry at that cutoff was `think-pogj`, BC-361: decide H-223, H-224, and
+H-225 on the stock instruments in Session 144 under `exp-213` to `exp-215`, with the
+BC-362 Bentz 2016 replay lane beside it.
+
+[Session 142](packing/campaign/agent-sessions/session-142-stack-correctness.md)
+completed the correctness review and bounded pipeline repairs in
+[PR 202](https://github.com/jlevy/squares/pull/202). All four retained n=18 certificates
+passed both routes, and the corrected code passed the matching fast and deferred
+checkpoints.
+The original PRs 199–201 remain unchanged and are not independently ready to
+merge; landing must retain the corrections at the cumulative tip.
+The n=29 candidate remains interval-unresolved and unpromoted.
+The owner’s follow-up on 2026-09-19 requires the PR-by-PR landing-readiness block
+`think-n3fl`, then the small W7 correctness and efficiency block `think-177v`, before
+resuming H-216. The pipeline block includes `think-1i1x` and the publication update
+sequence in the
+[documentation runbook](packing/campaign/documentation-pass.md#new-result-publication).
+The current publication audit is tracked by `think-kq00`.
+
+[Session 141](packing/campaign/agent-sessions/session-141-n100-research.md) closed the
+stacked n<100 research loop.
+It retained T-029 `s(18) >= 1871/400` and T-030 `s(18) >= 4679/1000`, confirmed H-219
+and H-221, and left H-218 and H-220 unconfirmed.
+`think-qqzs` was the selected scientific continuation behind those prerequisites until
+Session 143; H-216 stays the registered n=6 calibration entry, and the owner’s
+2026-09-20 direction runs the overnight lower-bound loop of agenda-040 beside the
+landing-readiness and pipeline blocks.
+[Session 140](packing/campaign/agent-sessions/session-140-lb-survey.md) closed the
+preceding stacked-PR n<=100 survey and retained T-028 `s(18) >= 187/40`.
+
+[Session 139](packing/campaign/agent-sessions/session-139-n11-overnight-research.md) is
+the preceding overnight scientific closeout.
+It retained T-027 `s(18) >= 467/100`, stopped after Route S encode-only timed out
+unresolved, and left H-216 open.
+[Session 138](packing/campaign/agent-sessions/session-138-n11-overnight-review.md) is
+the preceding route-selection handoff.
+It reviewed the n=11 record, ranked eight mechanisms that price relations between
+squares, subjected them to an independent adversarial review, and measured two.
+[X-037](packing/campaign/explorations/X-037-n11-overnight-review-and-route-slate.md)
+records the findings at their scope, and
+[agenda-037](packing/campaign/agendas/agenda-037-n11-relational-certificate-program.md)
+owns the resulting queue.
+No bound moved, no covering value was measured above 191/50, and no hypothesis was
+registered that night.
+The measurements come from scratch lanes and need guarded tools before any of them is
+retained.
+
+- **M1 (clique and majority atoms at 153/40).** All 44 heavy cliques of the A6 64-family
+  are budget-one threshold atoms.
+  Fixed supports fell below 11, but column generation rebuilt a mass-11 family after
+  every cut, and the decisive rows-complete LP was blocked by the unretained `sites-1`
+  checkpoint.
+- **M7 (helper-free point certificates).** n=10 at 37/10 is foreclosed exactly by an
+  integer ceiling family.
+  The n=6 covering value at 299/100 lies between 83/14 (exact) and 6.006571 (float).
+  The two-route gate accepts only crossings weaker than the proved values.
+
+Session 138’s records landed when PR 193 merged as `4ad98e90`; `think-4woh` is closed
+and certification debt now sits under `think-qqzs`. The five X-037 owner decisions are
+resolved under [`epistemics.md`](epistemics.md): weighted-majority, k-of-S, and floor
+atoms are an admitted language (`think-g3j7` still lands a new reader, and does not
+mutate T-025/T-026 `verify_claim.py`);
+[H-216](packing/campaign/hypotheses/H-216-point-certificate-at-n6-299-100.md) is the n=6
+existence determination;
+[H-217](packing/campaign/hypotheses/H-217-route-f1-majority-floor-at-153-40.md) is Route
+F1, blocked on tools; M6 stays retired with no Route D search hypothesis; SDP is not
+admitted and M2 stays retired.
+
+**Selected next entry at that cutoff:** `think-qqzs`, BC-357: close M7’s n=6 bracket at
+299/100 under H-216. G1, G2, G3, and G5 are on main.
+G4 remains on this bead and is not H-216’s instrument.
+[Session 139](packing/campaign/agent-sessions/session-139-n11-overnight-research.md)
+stopped after encode-only timed out unresolved and T-027 retained `s(18) >= 467/100`.
+H-216 stays open. `think-qqzs` was the next entry until Session 143 selected BC-361.
+
+BC-358, Route F1 / H-217, is blocked on the `think-g3j7` reader, `think-3xbr`, and
+`think-gyzw`. BC-359, the M3 kill test under `think-k4vb`, is tentative.
+BC-360 retires M2, M4, M5, M6, and M8 with reasons.
+`exp-161` remains Route S in agenda-036.
+
+[Session 137](packing/campaign/agent-sessions/session-137-ci-topology-continuation-recovery.md)
+is the preceding terminal handoff and the last pipeline one.
+It records the continuation of
+[Session 136](packing/campaign/agent-sessions/session-136-ci-topology-reconciliation.md)
+by two concurrent Codex threads, their interruption, and the recovery that restored the
+160 MiB snapshot cap and committed a repair for the Pages deploy that had not run since
+PR 183, pending the first main deploy.
+It then took PR 188 to green hosted CI at `be28ad5a`: the suite shards were rebalanced,
+and by owner decision the pull-request walls are advisory under `think-g4n9` until they
+hold 180 s on hosted runners.
+PR 188 merged as `042e791c` and the stacked PR 185 as `d7f9d94d`, and `think-97we` is
+closed; BC-355’s cell stays `in_progress` for those advisory walls alone.
+Neither stopped CI session changes a mathematical result.
+
 [Session 135](packing/campaign/agent-sessions/session-135-n11-route-s-guard-discharge.md)
-is the latest terminal handoff on the no-target Route S admission branch.
+remains the latest Route S handoff.
 It discharged the four guards retained by
 [Session 134](packing/campaign/agent-sessions/session-134-n11-route-s-admission.md):
 complete T-025/T-026 contents bound to a declared Git revision and repository-relative
 paths, both T-026 sentinels, a canonical source-bound nonempty selection manifest, and
 every declared mutation refusal.
 A fresh source-distinct audit found one path-alias hole; the repaired symlink refusal
-and its regression passed re-audit.
-The retained receipt therefore admits the instrument.
-No optimizer, candidate, coverage target, experiment, or scientific verdict was
-produced. [X-032](packing/campaign/explorations/X-032-route-s-threshold-compression.md)
-owns the source and verdict boundary, and
+and its regression passed re-audit, so the retained receipt admits the instrument, and
+PR 182 merged it as `1d9c49c4` from reviewed head `609d7d62`. No optimizer, candidate,
+coverage target, experiment, or scientific verdict was produced.
+[X-032](packing/campaign/explorations/X-032-route-s-threshold-compression.md) owns the
+source and verdict boundary,
 [H-163](packing/campaign/hypotheses/H-163-route-s-threshold-compression.md) owns the
-prospective scientific claim.
-T-026 is only a support-and-rescaling provenance sentinel.
-[Session 133](packing/campaign/agent-sessions/session-133-n11-route-a-admission.md) is
-the latest terminal predecessor.
-It began BC-354 from post-W5 planning merge `a9de8a705d785e5b7b6ac46f28c11b6f5a45d7c6`,
-after
-[Session 132](packing/campaign/agent-sessions/session-132-n11-post-w5-route-selection.md)
-selected Route A admission with Route S as the explicit fallback.
-Session 133 stopped BC-354 at the frozen Route A representation boundary.
-Three source inventories found no complete 80-stratum negative-root producer, seam-safe
-shared-parent domain, rows-complete matched baseline, conditional-domain gate, or
-independent exact replay.
-No target ran, zero of the 16 physical roots closed, and this is not evidence against a
-future complete Route A representation.
-The scientific evidence cutoff remains main revision
-`80bcdbb0819504354e1278c37f211dd8cc2158fb`, where the latest merged stack is green and
-the T-026 lower bound remains the frontier.
-
-**Selected next entry:** `think-ufmk`, the BC-343 planning block that must register
-`exp-161`, its exact target, budget, accept rule, stop rule, and review boundary before
-any bounded compression target runs.
+prospective scientific claim, and T-026 is only a support-and-rescaling provenance
+sentinel. BC-343 stays open in
+[agenda-036](packing/campaign/agendas/agenda-036-n11-strategy-reset-roadmap.md) under
+`think-ufmk`.
+[Session 139](packing/campaign/agent-sessions/session-139-n11-overnight-research.md)
+registered
+[exp-161](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-161-h163-route-s-threshold-compression.md)
+and ran encode-only; that process timed out unresolved.
+`--search` did not run.
 
 BC-340, BC-353, and BC-354 are terminal.
 BC-341 remains tentative behind a future W10 reselection and the named Route A
-representation gaps.
-BC-343’s no-target PR freezes Route S’s complexity metric, fixed support universe,
-controls, and verdict rules.
-It merged as `1d9c49c4` from reviewed head `609d7d62` after source-distinct review and
-exact-head validation.
-No scientific compression target has execution authority before the separate experiment
-registration under `think-ufmk`; no optimizer, candidate, coverage target, or `exp-161`
-has run.
+representation gaps, which
+[Session 133](packing/campaign/agent-sessions/session-133-n11-route-a-admission.md)
+found when it stopped BC-354 at the frozen Route A representation boundary: three source
+inventories turned up no complete 80-stratum negative-root producer, seam-safe
+shared-parent domain, rows-complete matched baseline, conditional-domain gate, or
+independent exact replay.
+No target ran, zero of the 16 physical roots closed, and that is not evidence against a
+future complete Route A representation.
+
+For the n = 11 Route A/Route S decision, the scientific evidence cutoff remains main
+revision `80bcdbb0819504354e1278c37f211dd8cc2158fb`. Later merged campaign, CI and
+workbench records are included in the repository-wide roll-up above; none promotes a
+frontier result at n = 11, so T-026 remains the n = 11 lower-bound frontier.
 
 The older BC329, weighted-atom stages 3–4, and BC303 H-160/H-162 target lanes are
 paused. Their admitted implementations, registrations, and controls remain evidence; no
 exp-158 or exp-160 target receipt exists, so none carries a scientific verdict.
 The current inventory and candidate roadmap are in
-[Research Program Status and Roadmap](#research-program-status-and-roadmap), and
-[agenda-036](packing/campaign/agendas/agenda-036-n11-strategy-reset-roadmap.md) owns the
-queue.
+[Research Program Status and Roadmap](#research-program-status-and-roadmap).
 
 ## Handoff Record
 
@@ -1506,9 +1867,9 @@ source-table audit is `think-4g6w`, and `think-z0fi` implements and controls the
 [specified contact-release family](docs/project/reviews/review-2026-09-07-stromquist-n26-directions.md).
 The [MacIver review](docs/project/reviews/review-2026-09-07-maciver-square-packing.md)
 adds three previously unindexed manuscripts.
-His reported lower bound at `4.450208382...` is below the verified `4.59` for both n17
-and n18. The missing computational artifacts remain a source gap; `think-sske` owns
-local replay of the center-area and capacity lemmas before adoption.
+His reported lower bound at `4.450208382...` is below the verified bound at both n17 and
+n18. The missing computational artifacts remain a source gap; `think-sske` owns local
+replay of the center-area and capacity lemmas before adoption.
 Exact design controls show potential local cuts, not a new global bound.
 This source review does not authorize further kernel research.
 
@@ -1611,9 +1972,9 @@ resume the completed efficiency block.
 
 PR 93 subsequently landed two operational guards on `main` without changing this
 research entry point.
-The on-demand [`deep-gate.yml`](.github/workflows/deep-gate.yml) runs the four deferred
-checks against a pull request before merge; because it is advisory, the post-merge full
-gate remains the backstop for a pull request that does not request it.
+The on-demand [`deep-gate.yml`](.github/workflows/deep-gate.yml) runs the 11 deferred
+steps in four jobs against a pull request before merge; because it is advisory, the
+post-merge full gate remains the backstop for a pull request that does not request it.
 The push-triggered
 [`branch-mergeability.yml`](.github/workflows/branch-mergeability.yml) now reports a
 branch that cannot be merge-built even when GitHub cannot create its pull-request merge
@@ -1623,8 +1984,12 @@ push. Session 087 retains the full-gate evidence from run `34010683180` at `c743
 The later upstream efficiency corrections preserve that historical accounting.
 Session 087 reduced the then-required CI surface from `1369.60 s` to about `221.70 s`
 without removing checks.
-The R1 tree-id cache remains a separate efficiency task: 20.2 percent of measured
-deep-run work repeated, and 92 percent of that repetition came from unchanged trees.
+Exact-tree reuse is now fail-closed.
+A matching successful `packing-required` proof lets the post-merge integration job omit
+only explicitly allowlisted tree-pure fast steps; deferred and unclassified steps still
+run, and any lookup or proof failure repeats the complete surface.
+The work was motivated by the earlier measurement that 20.2 percent of deep-run work
+repeated and 92 percent of that repetition came from unchanged trees.
 Per-test CPU readings are diagnostic because child costs cannot yet be attributed
 reliably; the `12 s` call-wall backstop remains enforced.
 [D-472](defects.md) records why one hosted timing sample cannot establish a speedup.
@@ -3856,7 +4221,7 @@ round that names the hypothesis, control roles included.
 | [H-160](packing/campaign/hypotheses/H-160-bc303-t2-charge-filters.md) | blocked | Every frozen BC303 C charge is at least 4524200 and every S first-owner strip charge is at least 4524185 | 1 | exp-158 paused before target invocation; no scientific verdict |
 | [H-161](packing/campaign/hypotheses/H-161-bc303-literal-parent-union.md) | refuted | The frozen literal closed Q0 has integer mass `N>=4262074`, excluding the named four-corner tuple under the imported BC303 floor | 1 | exp-159: `N=4000015`; neither the four-corner nor one-parent threshold rejects |
 | [H-162](packing/campaign/hypotheses/H-162-bc303-floor-normalized-t2-filter.md) | blocked | Frozen BC303 C and S first-owner strip minima are each at least 4524132 | 1 | exp-160 paused without an exp-158 receipt; no scientific verdict |
-| [H-163](packing/campaign/hypotheses/H-163-route-s-threshold-compression.md) | open | T-025’s exact support universe admits a certificate with at most 23 positive D4 orbit representatives | 0 | Target-blind instrument admitted; no exp-161, candidate, optimizer, coverage target, or scientific verdict |
+| [H-163](packing/campaign/hypotheses/H-163-route-s-threshold-compression.md) | unresolved | T-025’s exact support universe admits a certificate with at most 23 positive D4 orbit representatives | 1 | exp-161 encode-only timeout; 180.1m wall |
 | [H-201](packing/campaign/hypotheses/H-201-simultaneous-perturbation-move.md) | refuted | A collective move takes n = 17 from the trivial grid to within 0.002 of Bidwell cold, and is inert above n = 26 | 2 | 105.7m wall |
 | [H-202](packing/campaign/hypotheses/H-202-wall-pressure-dense-objective.md) | refuted | Isotropic wall pressure optimises a disc, returning exactly 2*sqrt(2) at n = 5, so pressure must be directional | 1 | 39.2m wall |
 | [H-203](packing/campaign/hypotheses/H-203-basin-hopping-over-the-lp-quench.md) | confirmed | Basin hopping beats multistart at an equal budget of refined local optima | 1 | 81.2m wall |
@@ -3868,6 +4233,26 @@ round that names the hypothesis, control roles included.
 | [H-210](packing/campaign/hypotheses/H-210-no-valid-packing.md) | open | the blind physics never settles to a valid packing; registered from exp-210’s runs, so untested | 0 | — |
 | [H-211](packing/campaign/hypotheses/H-211-the-shake-has-a-sweet-spot.md) | open | the shake has a sweet spot, and the shipped value is far below it; registered from exp-208’s table, so untested | 0 | — |
 | [H-212](packing/campaign/hypotheses/H-212-the-workbench-physics-as-a-search.md) | open question | what the workbench’s blind physics does, measured as a search; holds the exploratory rounds exp-208 to exp-210 | 3 | 3 rounds unrecorded |
+| [H-213](packing/campaign/hypotheses/H-213-adaptive-animate-integration.md) | refuted | Law-driven integration substeps remove Animate’s cap-to-cap contact ringing at the registered transitions while retaining mean motion | 1 | Shared frozen-commit matrix |
+| [H-214](packing/campaign/hypotheses/H-214-presets-have-distinct-kinetics.md) | refuted | Rigid has less penetration than soft and sticky gathers more contacts than balanced in every registered solver-transition cell | 1 | 86.689s frozen-commit matrix |
+| [H-215](packing/campaign/hypotheses/H-215-kinetics-predict-search-quality.md) | open question | Which headless kinetic measurements, if any, predict that a fixed-budget search setting will produce better valid packings? | 0 | — |
+| [H-216](packing/campaign/hypotheses/H-216-point-certificate-at-n6-299-100.md) | open | A helper-free point-atom certificate exists for n=6 at side 299/100 with B = 9977/10000 on the 181-direction net, on some named site set | 0 | — |
+| [H-217](packing/campaign/hypotheses/H-217-route-f1-majority-floor-at-153-40.md) | blocked | The rows-complete covering LP with weighted-majority, k-of-S, and floor atoms on arrangement-vertex sites is below 11 at 153/40 | 0 | — |
+| [H-218](packing/campaign/hypotheses/H-218-existing-colgen-raises-a-small-n-floor.md) | abandoned | A rows-complete covering of mass strictly below n exists at a container side strictly above the current verified floor for at least one n in {12, 17, 19, 20} | 8 | exp-162 abandoned; exp-164 unresolved at 19.857588; exp-165 unresolved at 19.887914; exp-174 unresolved at 19.111435; exp-175 unresolved at 12.067502; exp-176 unresolved at 12.097146; exp-177 unresolved at 19.224565; exp-178 unresolved at 12.066995 |
+| [H-219](packing/campaign/hypotheses/H-219-t028-seeded-colgen-raises-s18.md) | confirmed | A rows-complete covering of mass strictly below 18 exists at a container side in (187/40, 117/25) on a T-028-seeded stock-colgen site set | 1 | T-029 |
+| [H-220](packing/campaign/hypotheses/H-220-seedless-colgen-raises-nagamochi-floor.md) | unresolved | A rows-complete covering of mass strictly below n exists at a queued Nagamochi-only side on a seedless stock-colgen site set | 8 | exp-166 unresolved at 29.803318; exp-167 unresolved at 28.331329; exp-168 unresolved at 27.178193; exp-169 unresolved at 25.000000; exp-170 unresolved at 25.000000; exp-171 unresolved, freeze interval-refused; exp-172 unresolved at 42.137360; exp-173 unresolved at 41.236782 |
+| [H-221](packing/campaign/hypotheses/H-221-t029-seeded-colgen-raises-s18.md) | confirmed | A rows-complete covering of mass strictly below 18 exists at a container side in (1871/400, 117/25) on a T-029-seeded stock-colgen site set | 1 | T-030 |
+| [H-222](packing/campaign/hypotheses/H-222-n11-octagon-class-at-96-25.md) | confirmed | The all-free corner class at n=11, 96/25, d = 1/2 has restricted covering value below 11; blocked on a convex corner-clip domain predicate | 2 | exp-219 accepted |
+| [H-223](packing/campaign/hypotheses/H-223-n13-point-covering-at-399-100.md) | unresolved | A point-atom certificate exists at n=13, 399/100 on a window-seeded site set; calibration under s(13) = 4 | 1 | exp-214 unresolved at 15.565562 |
+| [H-224](packing/campaign/hypotheses/H-224-n17-ceiling-family-at-23-5.md) | unresolved | A depth-one ceiling family of total 17 exists at n=17, 23/5, closing the fixed-shrink point route there for every site set | 2 | exp-213 unresolved (lost mid-run); exp-218 unresolved at family total 13.999999984 |
+| [H-225](packing/campaign/hypotheses/H-225-n26-seeded-certificate-at-53-10.md) | unresolved | A seeded point certificate exists at n=26, 53/10, a first-party floor above Nagamochi’s 5 | 1 | exp-215 unresolved at 25.000000 |
+| [H-226](packing/campaign/hypotheses/H-226-n21-one-spare-wall-charge-lemma.md) | refuted | The one-spare wall-charge lemma closes n=21 after the Theorem 11 replay at the printed constant; blocked on the enumeration tool | 1 | exp-216 rejected: 3,461 kill orbits |
+| [H-227](packing/campaign/hypotheses/H-227-n32-one-spare-wall-charge-lemma.md) | refuted | The one-spare wall-charge lemma closes n=32; blocked on the same tool | 1 | exp-217 rejected: 11,699 raw kills |
+| [H-228](packing/campaign/hypotheses/H-228-n12-unshrunk-covering-at-side-4.md) | blocked | An unshrunk covering below 12 exists at n=12, side 4; blocked on an unshrunk verifier | 0 | — |
+| [H-229](packing/campaign/hypotheses/H-229-n11-tilted-anchor-case-at-96-25.md) | blocked | The tilted-anchor case containing the 29° slot has covering value below 10 at 96/25; blocked on the non-convex domain instrument | 0 | — |
+| [H-230](packing/campaign/hypotheses/H-230-a6-family-violates-a-gap-wedge-conflict.md) | blocked | A gap-g wall-wedge conflict edge cuts the A6 64-family; blocked on the gap extension and a conflict-edge atom class | 0 | — |
+| [H-231](packing/campaign/hypotheses/H-231-theta-on-pose-cells.md) | open question | Theta on a sound pose-cell graph at n=11; stays retired under X-037’s condition | 0 | — |
+| [H-232](packing/campaign/hypotheses/H-232-n11-all-deep-class-ring-centre-atom.md) | blocked | The all-deep corner class at n=11, 96/25 has covering value below 7 in the point-plus-2-of-3 language on the box-cut domain; blocked on the box cut, the refund and an exact 2-of-3 reader | 0 | — |
 
 ### Confirmed
 
@@ -4036,9 +4421,9 @@ in separate tables: their units differ, and the same work can appear in both.
 
 | Rollups | count | turns | tool calls | errors | one-off code | wall |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| claimed by a session | 129 | 40,048 | 21,835 | 440 | 3,461 | 370.08 h |
+| claimed by a session | 176 | 48,062 | 26,312 | 522 | 4,032 | 428.3 h |
 | claimed by none | 60 | 11,110 | 6,539 | 156 | 946 | 51.75 h |
-| **measured** | **189** | **51,158** | **28,374** | **596** | **4,407** | **421.83 h** |
+| **measured** | **236** | **59,172** | **32,851** | **678** | **4,978** | **480.05 h** |
 
 | Session | Phases | Rollups | Turns | Tool calls | Errors | Wall |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -4079,7 +4464,15 @@ in separate tables: their units differ, and the same work can appear in both.
 | [session-109](packing/campaign/agent-sessions/session-109-corner-class-at-q.md) | 1 | 1 | 156 | 67 | 0 | 0.53 h |
 | [session-125](packing/campaign/agent-sessions/session-125-past-the-point-atom-ceiling.md) | 4 | 1 | 1,721 | 695 | 16 | 17.59 h |
 | [session-127](packing/campaign/agent-sessions/session-127-weighted-five-site-atom-admission.md) | 2 | 5 | 434 | 269 | 5 | 0.54 h |
-| *shared by 37 sessions* | — | 6 | 22,990 | 12,497 | 280 | 293.24 h |
+| [session-143](packing/campaign/agent-sessions/session-143-lower-bound-math-review.md) | 2 | 8 | 772 | 463 | 11 | 2.43 h |
+| [session-144](packing/campaign/agent-sessions/session-144-overnight-chunk-1.md) | 1 | 6 | 675 | 392 | 9 | 4.03 h |
+| [session-145](packing/campaign/agent-sessions/session-145-overnight-chunk-2.md) | 1 | 4 | 649 | 391 | 6 | 1.54 h |
+| [session-146](packing/campaign/agent-sessions/session-146-overnight-chunk-3.md) | 1 | 3 | 283 | 174 | 4 | 0.62 h |
+| [session-147](packing/campaign/agent-sessions/session-147-overnight-chunk-4.md) | 1 | 0 | 0 | 0 | 0 | 0 h |
+| [session-148](packing/campaign/agent-sessions/session-148-overnight-chunk-5.md) | 1 | 9 | 524 | 296 | 11 | 2.35 h |
+| [session-149](packing/campaign/agent-sessions/session-149-n17-external-intake.md) | 3 | 1 | 370 | 185 | 2 | 18.66 h |
+| [session-150](packing/campaign/agent-sessions/session-150-n17-consolidation-and-correctness.md) | 4 | 15 | 3,783 | 2,015 | 37 | 17.66 h |
+| *shared by 45 sessions* | — | 7 | 23,948 | 13,058 | 282 | 304.17 h |
 
 | Codex interval receipt | declaring sessions | model responses | agent time | active union | wall window | live lower bound |
 | --- | --- | ---: | ---: | ---: | ---: | --- |
@@ -4138,14 +4531,15 @@ in separate tables: their units differ, and the same work can appear in both.
 | `codex-task-tree-session-133.yaml` | session-133 | 101 | 0.37 h | 0.2 h | 13.6 h | yes |
 | `codex-task-tree-session-134.yaml` | session-134 | 497 | 4.88 h | 1.21 h | 1.21 h | yes |
 | `codex-task-tree-session-135.yaml` | session-135 | 437 | 1.53 h | 0.48 h | 0.48 h | yes |
+| `session-142-stack-correctness.yaml` | session-142 | 1,186 | 5.01 h | 2.29 h | 2.3 h | yes |
 | `codex-task-tree-pr137-publication-tail.yaml` | unattributed | 610 | 4.39 h | 1.77 h | 1.82 h | yes |
 | `codex-task-tree-pr142-publication-tail.yaml` | unattributed | 136 | 0.87 h | 0.41 h | 0.58 h | yes |
 
 | Coverage | sessions |
 | --- | ---: |
-| measured | 87 |
-| unmeasured | 48 |
-| **total** | **135** |
+| measured | 96 |
+| unmeasured | 54 |
+| **total** | **150** |
 
 <!-- END GENERATED: session-close-report -->
 
@@ -4161,9 +4555,9 @@ The relevant generator writes the receipt, and the entry fills in on the next
 
 ## Experiments Conducted
 
-There are 126 rounds registered in `series-000`.
+There are 155 rounds registered in `series-000`.
 
-They record 2512.1 agent-minutes and 1798.3 wall-minutes.
+They record 2512.1 agent-minutes and 2696.2 wall-minutes.
 These totals exclude four historical annealing rounds with unrecorded timing; their wall
 and operator costs are unknown, not zero.
 Exp129 closed as blocked without invocation and contributes zero scientific elapsed
@@ -4321,6 +4715,25 @@ archive beside it.
 | [exp-158](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-158-bc303-t2-charge-filters.md) | 11 | target | H-160 | Prospective exact all-chart C and S first-owner charge filters after source and synthetic-control admission | Paused by strategy reset before target invocation; no scientific result | blocked |
 | [exp-159](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-159-bc303-literal-parent-union.md) | 11 | target | H-161 | Source-bound exact mass of closed `Q0=[0,1]^2` against frozen one-parent and four-corner budgets | `N=4000015`; both tests retain `1048233` units of slack | rejected |
 | [exp-160](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-160-bc303-floor-normalized-t2-filter-analysis.md) | 11 | target | H-162 | Prospective receipt-only comparison of admitted exp-158 C and S-strip minima with 4524132 | Paused without an exp-158 receipt; no comparison or scientific result | blocked |
+| [exp-161](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-161-h163-route-s-threshold-compression.md) | 11 | target | H-163 | T-025 U025 reweighting to at most 23 positive D4 orbits | Encode-only timed out with no JSON; no --search | unresolved |
+| [exp-162](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-162-h218-stock-colgen-small-n-floors.md) | 20 | target | H-218 | Restricted covering optima at n in {12, 17, 19, 20} on named stock-colgen site sets | Session-140 wall expired; no H-218 RETAINABLE freeze | abandoned |
+| [exp-163](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-163-h219-t028-next-rung.md) | 18 | target | H-219 | T-028-seeded covering at 1871/400 | T-029 retained at 1871/400; mass 17.889361 | accepted |
+| [exp-164](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-164-h218-n20-971-200-new-four-grid.md) | 20 | target | H-218 | T-021 four-grid plus windows 7 at 971/200 | 19.857588 unconverged below 20; no freeze | unresolved |
+| [exp-165](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-165-h218-n20-243-50-four-grid.md) | 20 | target | H-218 | T-021 four-grid plus windows 7 at 243/50 | 19.887914 unconverged below 20; no freeze | unresolved |
+| [exp-166](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-166-h220-n32-29-5-seedless-auto-windows5.md) | 32 | target | H-220 | Seedless auto plus windows 5 at 29/5 | 29.803318 unconverged below 32; no freeze | unresolved |
+| [exp-167](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-167-h220-n31-57-10-seedless-auto-windows5.md) | 31 | target | H-220 | Seedless auto plus windows 5 at 57/10 | 28.331329 unconverged below 31; no freeze | unresolved |
+| [exp-168](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-168-h220-n30-559-100-seedless-auto-windows5.md) | 30 | target | H-220 | Seedless auto plus windows 5 at 559/100 | 27.178193 unconverged below 30; no freeze | unresolved |
+| [exp-169](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-169-h220-n26-513-100-seedless-auto-windows5.md) | 26 | target | H-220 | Seedless auto plus windows 5 at 513/100 | 25.000000 unconverged below 26; no freeze | unresolved |
+| [exp-170](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-170-h220-n27-525-100-seedless-auto-windows5.md) | 27 | target | H-220 | Seedless auto plus windows 5 at 525/100 | 25.000000 unconverged below 27; no freeze | unresolved |
+| [exp-171](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-171-h220-n29-548-100-seedless-auto-windows5.md) | 29 | target | H-220 | Seedless auto plus windows 5 at 548/100 | Freeze mass 26.0409395; interval refused | unresolved |
+| [exp-172](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-172-h220-n45-684-100-seedless-auto-windows5.md) | 45 | target | H-220 | Seedless auto plus windows 5 at 684/100 | 42.137360 unconverged below 45; no freeze | unresolved |
+| [exp-173](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-173-h220-n44-675-100-seedless-auto-windows5.md) | 44 | target | H-220 | Seedless auto plus windows 5 at 675/100 | 41.236782 unconverged below 44; no freeze | unresolved |
+| [exp-174](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-174-h218-n19-481-100-four-grid.md) | 19 | target | H-218 | T-020 four-grid plus windows 7 at 481/100 | 19.111435 unconverged above 19; no freeze | unresolved |
+| [exp-175](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-175-h218-n12-793-200-t017-auto.md) | 12 | target | H-218 | T-017 auto plus windows 7 at 793/200 | 12.067502 unconverged above 12; no freeze | unresolved |
+| [exp-176](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-176-h218-n12-397-100-t017-auto.md) | 12 | target | H-218 | T-017 auto plus windows 7 at 397/100 | 12.097146 unconverged above 12; no freeze | unresolved |
+| [exp-177](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-177-h218-n19-241-50-four-grid.md) | 19 | target | H-218 | T-020 four-grid plus windows 7 at 241/50 | 19.224565 unconverged above 19; no freeze | unresolved |
+| [exp-178](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-178-h218-n12-793-200-t017-four-grid.md) | 12 | target | H-218 | T-017 four-grid plus windows 7 at 793/200 | 12.066995 unconverged above 12; no freeze | unresolved |
+| [exp-179](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-179-h221-n18-4679-1000-t029-auto.md) | 18 | target | H-221 | T-029 auto plus windows 5 at 4679/1000 | T-030 retained at 4679/1000; mass 17.893403 | accepted |
 | [exp-201](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-201-arm-calibration.md) | 18 | control | H-201 | Sparsity of the single-square move set at a trivial grid | At every scale tried no single-square proposal lowers the container side; the grid is a strict local minimum under the whole move set | baseline |
 | [exp-202](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-202-round-1-perturbation.md) | 11 | target | H-201 | Gensane’s simultaneous all-square perturbation on the ordinary move menu | Takes n = 17 from exactly 5.0 to within 0.002 of Bidwell cold, and is inert above n = 26 | rejected |
 | [exp-203](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-203-round-1-pressure.md) | 11 | target | H-202 | Aggregate wall-pressure term against the plain required-side objective | Isotropic pressure optimises a disc, returning exactly 2*sqrt(2) at n = 5, so pressure must be directional | rejected |
@@ -4331,6 +4744,16 @@ archive beside it.
 | [exp-208](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-208-h211-the-shake-dial.md) | 11 | target | H-212 | The shake dial from level 0 to 10, on repaired runs | At levels 0, 2 and 4 no repaired run in 3,000 beat the grid at n = 5, 10 or 11, and at levels 6, 8 and 10 the best run did in eight of nine cells, the ninth within 5,000 seeds, but each value is one prefix from one seed stream and the page’s own level 3 was not measured on repaired runs. | unresolved |
 | [exp-209](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-209-h211-an-unretained-compaction-pass.md) | 11 | target | H-212 | A compaction pass over repaired runs, run inline and not kept | The compaction program, its inputs and its outputs were not kept, so the observation cannot be reproduced and supports no conclusion about whether repaired arrangements are locally compact. | unresolved |
 | [exp-210](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-210-h210-blind-runs-are-not-packings.md) | 11 | target | H-212 | Blind runs of the workbench’s physics end with squares overlapping | Every blind run observed ended overlapping, but the snapped control was measured once with a probe variant that was not kept, and neither the trials nor their final poses are in the repository, so the observation cannot be re-checked from it. | unresolved |
+| [exp-211](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-211-h213-adaptive-animate-integration.md) | 17, 90 | target | H-213 | Headless raw and presented Animate kinetics across balanced and rigid laws | Every solver-transition group at the frozen commit misses at least one 60 Hz presentation budget; physical tuning remains open | rejected |
+| [exp-212](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-212-h214-preset-signatures.md) | 17, 90 | target | H-214 | Preset penetration and contact signatures across both physical solvers | Rigid-versus-soft penetration and sticky-versus-balanced contact order reverse by solver or transition at the frozen commit | rejected |
+| [exp-213](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-213-h224-n17-23-5-ceiling-family.md) | 17 | target | H-224 | T-019-seeded ceiling family at 23/5 | lost mid-run before any freeze; round-0 optimum 17.0423 | unresolved |
+| [exp-214](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-214-h223-n13-399-100-window-covering.md) | 13 | calibration | H-223 | Window-seeded point covering at 399/100 | restricted optimum 15.5656; accepted family total 85/8 | unresolved |
+| [exp-215](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-215-h225-n26-53-10-seeded-covering.md) | 26 | target | H-225 | Window-seeded point covering at 53/10 | deadline inside round 0 at the 25.000000 plateau | unresolved |
+| [exp-216](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-216-h226-n21-one-spare-inventory.md) | 21 | target | H-226 | Theorem 11 replay and the one-spare inventory at n=21 | 24 of 24 rows replay; 42,124 orbits, 3,461 kills after propagation | rejected |
+| [exp-217](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-217-h227-n32-one-spare-inventory.md) | 32 | target | H-227 | The one-spare inventory at n=32 | 11,699 of 12,100 raw pairs are kills; n=33 control forced | rejected |
+| [exp-218](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-218-h224-n17-23-5-ceiling-family-cap32.md) | 17 | target | H-224 | T-019-seeded ceiling family at 23/5, support cap 32 | restricted optimum 17.0423; accepted family total 13.999999984 < 17 | unresolved |
+| [exp-219](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-219-h222-n11-96-25-octagon-class.md) | 11 | target | H-222 | Corner-clipped covering at 96/25, d = 1/2 | RETAINABLE UNDER THE CORNER CLASS HYPOTHESIS; mass 10.868617 | accepted |
+| [exp-220](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-220-h222-n11-96-25-class-refreeze.md) | 11 | target | H-222 | Re-freeze of the exp-219 class certificate under the class claim strings | RETAINABLE UNDER THE CORNER CLASS HYPOTHESIS; the same 680 atoms; mass 10.868617 | accepted |
 
 ### Cost and provenance
 
@@ -4452,6 +4875,25 @@ archive beside it.
 | exp-158 | one all-chart invocation, at most 30 minutes after controls | — | — | not started | source and control admission pending; no target charge |
 | exp-159 | one source-bound literal target invocation; no pose sweep or retry | 0.16s | — | criterion | execution head `f27c8ec7`; independent 377-atom and D4 audit retained |
 | exp-160 | one admitted retained exp-158 receipt; zero new charge sweeps | — | — | not started | future receipt-only H-162 comparison; source admission remains separate |
+| exp-161 | one overnight target after this registration; 3h once the producer exists | — | 10806s | timebox | encode-only timeout 2026-09-18; no JSON; no --search |
+| exp-162 | Session-140 research wall to 06:42Z; one probe family per ranked n | — | 14280s | timebox | leftover n=20 19.910044; leftover n=12 12.091168; T-028 off-sweep |
+| exp-163 | Session-141 first leftover n=18 probe | 702s | — | criterion | T-029 RETAINABLE |
+| exp-164 | Session-141 n=20 971/200 four-grid plus windows 7 | 2516s | — | timebox | 19.857588 unconverged; no freeze |
+| exp-165 | Session-141 n=20 243/50 four-grid plus windows 7 | 1269s | — | timebox | 19.887914 unconverged; no freeze |
+| exp-166 | Session-141 n=32 29/5 seedless auto plus windows 5 | 1206s | — | timebox | 29.803318 unconverged; no freeze |
+| exp-167 | Session-141 n=31 57/10 seedless auto plus windows 5 | 1285s | — | timebox | 28.331329 unconverged; no freeze |
+| exp-168 | Session-141 n=30 559/100 seedless auto plus windows 5 | 1213s | — | timebox | 27.178193 unconverged; no freeze |
+| exp-169 | Session-141 n=26 513/100 seedless auto plus windows 5 | 1209s | — | timebox | 25.000000 unconverged; no freeze |
+| exp-170 | Session-141 n=27 525/100 seedless auto plus windows 5 | 1201s | — | timebox | 25.000000 unconverged; no freeze |
+| exp-171 | Session-141 n=29 548/100 seedless auto plus windows 5 | 1180s | — | criterion | freeze 26.0409395; interval refused |
+| exp-172 | Session-141 n=45 684/100 seedless auto plus windows 5 | 1254s | — | timebox | 42.137360 unconverged; no freeze |
+| exp-173 | Session-141 n=44 675/100 seedless auto plus windows 5 | 1300s | — | timebox | 41.236782 unconverged; no freeze |
+| exp-174 | Session-141 n=19 481/100 T-020 four-grid plus windows 7 | 1285s | — | timebox | 19.111435 unconverged; crossed 19 |
+| exp-175 | Session-141 n=12 793/200 T-017 auto plus windows 7 | 1222s | — | timebox | 12.067502 unconverged; crossed 12 |
+| exp-176 | Session-141 n=12 397/100 T-017 auto plus windows 7 | 1213s | — | timebox | 12.097146 unconverged; crossed 12 |
+| exp-177 | Session-141 n=19 241/50 T-020 four-grid plus windows 7 | 1257s | — | timebox | 19.224565 unconverged; crossed 19 |
+| exp-178 | Session-141 n=12 793/200 T-017 four-grid plus windows 7 | 1217s | — | timebox | 12.066995 unconverged; crossed 12 |
+| exp-179 | Session-141 n=18 4679/1000 T-029 auto plus windows 5 | 494s | — | criterion | T-030 RETAINABLE |
 | exp-201 | 1.25e9 pair tests per chain, 8 chains, 5 seeds | 2681.0 s | 95 m | criterion | `9ae7700` |
 | exp-202 | 1.25e9 pair tests per chain, 8 chains, 5 seeds, 11 cells | 3663.0 s | 60 m | criterion | `9ae7700` |
 | exp-203 | 400,000 steps per anneal, 5 seeds, 5 cells | 2349.0 s | 25 m | criterion | `9ae7700` |
@@ -4462,10 +4904,20 @@ archive beside it.
 | exp-208 | 900 s harness default per run, in the recorded command | unrecorded | unrecorded | dependency: timing receipt lost (D-067) | `88d452f1` (mapped source) |
 | exp-209 | not recorded | unrecorded | unrecorded | dependency: timing receipt lost (D-067) | `f91fc7d4` (mapped source) |
 | exp-210 | 900 s harness default, in the recorded command | unrecorded | unrecorded | dependency: timing receipt lost (D-067) | `d3c3a778` (mapped source) |
+| exp-211 | 24 deterministic trajectory cells shared with exp-212 | shared; no duplicate charge | — | criterion | `9cca493c17ab61d5efb3e1032f32c54a9b87320e` |
+| exp-212 | 48 deterministic trajectory cells | 86.689 s | — | criterion | `9cca493c17ab61d5efb3e1032f32c54a9b87320e` |
+| exp-213 | One run of at most 2400 s, polish, two readers | 1583 s | — | error | `8d8eed3c` |
+| exp-214 | One run of at most 2400 s and the gate or the readers | 80 s | — | criterion | `8d8eed3c` |
+| exp-215 | One run of at most 3600 s and the gate | 3754 s | — | timebox | `8d8eed3c` |
+| exp-216 | One Fable lane, one Opus port, one Fable review | 39 s | — | criterion | `8d8eed3c` |
+| exp-217 | Runs beside exp-216 on the same tool | 16 s | — | criterion | `8d8eed3c` |
+| exp-218 | One run of at most 2400 s plus polish and two readers | 1639 s | — | criterion | `8d8eed3c` |
+| exp-219 | One run of at most 2400 s, then the gate | 307 s | — | criterion | `8f4eca7d` |
+| exp-220 | One run of at most 2400 s, then the gate twice | 263 s | — | criterion | `ea7ea453` |
 
-### What the 126 rounds jointly establish
+### What the 155 rounds jointly establish
 
-The 126 rounds use 2512.1 agent-minutes and 1798.3 wall-minutes under the campaign’s
+The 155 rounds use 2512.1 agent-minutes and 2696.2 wall-minutes under the campaign’s
 retained effort accounting.
 The never-invoked exp129 adds no scientific result or execution time.
 Exp-114 contributes 2.46 seconds of target/replay effort; its readiness work is recorded
@@ -4671,16 +5123,16 @@ table above.
 
 Kept with the same discipline as the experiment record, because the aggregate says
 things no individual bug report can.
-The log contains 492 defects, [one line each](defects.md), generated from `defects.yaml`
+The log contains 507 defects, [one line each](defects.md), generated from `defects.yaml`
 and checked in the gate.
 
 | Class | Count | The system … |
 | --- | ---: | --- |
-| soundness | 98 | asserted something false about the mathematics |
-| validity | 125 | was correct, but the measurement did not bear on the question |
-| bookkeeping | 186 | recorded something its own evidence contradicts |
-| robustness | 65 | did not finish, or finished only by luck |
-| performance | 18 | worked, but cost far more than it should |
+| soundness | 103 | asserted something false about the mathematics |
+| validity | 127 | was correct, but the measurement did not bear on the question |
+| bookkeeping | 190 | recorded something its own evidence contradicts |
+| robustness | 68 | did not finish, or finished only by luck |
+| performance | 19 | worked, but cost far more than it should |
 
 One entry is filed under a class it only half fits, and the table reads accordingly.
 [D-484](defects.md) carries two defects with a single cause: an escape screen that
@@ -4691,16 +5143,23 @@ It is filed as `robustness`, for the half that took `main` red, so the `performa
 here reads one low. The entry names that call rather than leaving it implicit; the
 alternative was two ids sharing every other field.
 
+[D-502](defects.md) remains open: the implicit local pre-push allocation left a costly
+partial reachable-test selection serial until its 900-second command cap.
+A ten-worker retry completed below that cap under a different `PACK_JOBS` shape, so it
+is an observed workaround rather than a controlled speedup or validation of the proposed
+cost-aware allocation.
+That allocation remains unimplemented and needs measurement.
+
 Two observations the log exists to make.
 
-**Seventy-eight of the ninety-eight soundness defects pointed in the *flattering*
-direction**, where the error looks like a success.
+**79 of the 103 soundness defects pointed in the *flattering* direction**, where the
+error looks like a success.
 That is the dangerous class, and it is the majority of it.
 
-**The automated gate has caught seventy-seven defects in 492, and no soundness defect
-ever.** Every soundness failure was found by a control cell whose answer was known in
-advance, a rule written down before the measurement, a generated view contradicting its
-source, or someone reading carefully.
+**The automated gate has caught eighty defects in 507, and no soundness defect ever.**
+Every soundness failure was found by a control cell whose answer was known in advance, a
+rule written down before the measurement, a generated view contradicting its source, or
+someone reading carefully.
 Gates confirm what you already thought to check; these were found by devices built to be
 *surprised*. Gate-detected entries here are mechanical process, implementation, or
 test-validity failures, found by contiguity, integration, mutation-anchor,
@@ -5048,7 +5507,7 @@ It is contained rather than fixed — such delegations are recorded on completio
 `read_only` flag is better than permitting an empty list that would be ambiguous between
 “writes nothing” and “nobody filled this in”.
 
-113 fixes left no regression check behind.
+118 fixes left no regression check behind.
 [D-300](defects.md) remains open: the yielded session id, output, timeout/final poll,
 and exit survived, but invalid `gdate` precision left the start and end fields empty, so
 [D-202](defects.md), [D-217](defects.md), and `think-b3bm` remain open.
@@ -5313,20 +5772,93 @@ the best known packing runs near half a unit — eleven cases above `+0.49`, hea
 `n = 51` at `+0.5364`, then `68`, `84`, `39`, `86`, `66`, `38`, `83`, `37`, `53` and
 `26`. Two cautions travel with that ranking.
 The prize is what the *ceiling* allows; the real limit is the covering value at that
-side. 18 values have been reported for the restricted program, at sides `3.82`, `3.85`,
-`3.95`, `3.96`, `3.97`, `3.98`, `3.985`, `3.99`, `4.58`, `4.59`, `4.68`, `4.80`,
-`4.825`, `4.85`, `4.865`, `4.875`, `4.895` and `4.985` — the first eight reports, not
-measurements this repository can reproduce, since no covering-search run log or solver
-checkpoint was retained for any of them; the ten added on 2026-09-05 by Agenda 021’s
-`BC-200` and `BC-197` and Agenda 022’s `BC-213` and `BC-206` carry run logs; retained
-checkpoint and frozen-certificate availability differs by row.
-Several sides are reported more than once from site sets built differently, which is the
-point of reporting them that way: at `4.85` the difference is between a wall and the
-certificate `T-021` rests on, at `4.865` it is two independent walls, and at `3.97` it
-is a converged grid optimum of `12.364038` above a cutting-plane row LP of `12.248227`
-with a historical reported floor of `10.845594`. That floor cannot currently be replayed
-because its generating family and state are missing; [D-478](defects.md) records the
-evidence gap.
+side. 45 values have been reported for the restricted program, at sides `2.99`, `3.81`,
+`3.82`, `3.83`, `3.84`, `3.85`, `3.875`, `3.95`, `3.96`, `3.965`, `3.969`, `3.97`,
+`3.98`, `3.985`, `3.99`, `4.58`, `4.59`, `4.6`, `4.61`, `4.67`, `4.675`, `4.6775`,
+`4.679`, `4.68`, `4.69`, `4.7`, `4.80`, `4.81`, `4.82`, `4.825`, `4.85`, `4.855`,
+`4.86`, `4.865`, `4.875`, `4.895`, `4.985`, `5.13`, `5.25`, `5.48`, `5.59`, `5.7`,
+`5.8`, `6.75` and `6.84` — the first eight reports, not measurements this repository can
+reproduce, since no covering-search run log or solver checkpoint was retained for any of
+them; the ten added on 2026-09-05 by Agenda 021’s `BC-200` and `BC-197` and Agenda 022’s
+`BC-213` and `BC-206` carry run logs; the `2.99` pair added on 2026-09-18 by session-139
+is H-216 calibration at n=6 (covering `6.08216` and `6.07724` on two named site sets,
+both ≥ 6, not a bound); `3.81` is the session-139 T-025-seeded auto-plus-60 at 381/100,
+covering `11.000000` unconverged on the eleven plateau, site set refuted, side open;
+`3.82` also has the session-139 T-025-seeded auto-plus-60 plus `--seed-windows 5` at
+191/50, covering `11.018646` converged, closest session-139 point-atom construction,
+site set refuted; T-026-seeded auto-plus-60 at the same side converged `11.033743`,
+worse than the threshold seed; `3.83` is the session-139 n=11 probes at 383/100,
+covering `11.192598` (auto grids), `11.142857` (four-grid), and `11.140351`
+(T-025-seeded four-grid), all site sets refuted, side open; `3.84` is the same
+T-025-seeded auto-plus-60 construction at 96/25, covering `11.371819` converged, site
+set refuted; `3.85` also has the session-139 T-025-seeded auto-plus-60 at 77/20,
+covering `11.456576` converged, site set refuted; `3.875` is the same construction at
+31/8, covering `11.561186` converged, site set refuted, 0.002 below the packing; `3.965`
+is the session-141 n=12 T-017-seeded auto plus windows 7 at 793/200, covering
+`12.067502` unconverged, still above twelve, the first first-party covering row at that
+side; a session-141 T-017-seeded four-grid plus windows 7 finished at `12.066995`
+unconverged, still above twelve; `3.969` T-017-seeded auto-grid dropped to `12.118036`
+unconverged, still above twelve; T-017-seeded four-grid at the same side dropped to
+`12.116115` unconverged; a session-140 leftover T-017-seeded four-grid plus windows 7
+finished at `12.091168` unconverged, still above twelve; `4.6` is the session-139 n=17
+auto-grid probe at 23/5, covering `17.331710` unconverged, site set refuted, side open;
+the T-019-seeded auto grid at the same side dropped to `17.049597` unconverged, still
+above seventeen; T-019-seeded auto plus `--seed-windows 5` dropped to `17.042346`
+unconverged; a session-140 T-019-seeded four-grid plus windows 8 finished at `17.120106`
+unconverged, still above seventeen; `4.61` is the session-140 leftover n=17 T-019-seeded
+auto plus windows 5 at 461/100, covering `17.195968` unconverged, one cent above `23/5`;
+`4.67` is the session-139 n=18 auto-grid probe at 467/100, covering `18.000000`
+unconverged, cannot confirm; the T-019-seeded auto grid at the same side converged
+`17.875567` with least_covered 1, freeze-then-decide retained `T-027` at
+`s(18) >= 467/100`; `4.675` is the session-140 T-027-seeded auto plus windows 5 at
+187/40, freeze-then-decide retained `T-028` at `s(18) >= 187/40`; `4.6775` is the
+session-141 leftover T-028-seeded auto plus windows 5 at 1871/400, freeze-then-decide
+retained `T-029` at `s(18) >= 1871/400`; `4.679` is the session-141 T-029-seeded auto
+plus windows 5 at 4679/1000, freeze-then-decide retained `T-030` at
+`s(18) >= 4679/1000`; `4.68` T-019-seeded auto-grid locked at exact mass `18.000043`
+converged, cannot confirm; T-019-seeded auto plus `--seed-windows 5` at `4.68` locked
+`18.000000` unconverged; T-027-seeded auto at the same side locked `18.000000`
+unconverged; `4.69` T-019-seeded auto-grid locked `18.000000` unconverged; `4.7`
+T-019-seeded auto-grid converged `18.165413`, cannot confirm; retained checkpoint and
+frozen-certificate availability differs by row.
+`4.81` is the session-140 n=19 T-020-seeded auto plus windows 6 at 481/100, covering
+`19.132115` unconverged, closer than the same construction at `4.85` (`19.808958`); a
+session-141 T-020-seeded four-grid plus windows 7 finished at `19.111435` unconverged,
+still above nineteen.
+`4.82` is the session-140 leftover n=19 T-020-seeded auto plus windows 6 at 241/50,
+covering `19.247109` unconverged, farther than `4.81` on the same site set; a
+session-141 T-020-seeded four-grid plus windows 7 finished at `19.224565` unconverged,
+still above nineteen.
+`4.855` is the session-140 leftover n=20 T-021-seeded auto plus windows 6 at 971/200,
+covering `19.910044` unconverged, still below 20. `4.86` is the session-141 n=20
+T-021-seeded four-grid plus windows 7 at 243/50, covering `19.887914` unconverged, still
+below 20. `5.13` is the session-141 n=26 seedless auto plus windows 5 at 513/100,
+covering `25.000000` unconverged, still below 26, the first first-party covering row at
+that size. `5.25` is the session-141 n=27 seedless auto plus windows 5 at 525/100,
+covering `25.000000` unconverged, still below 27, the first first-party covering row at
+that size. `5.48` is the session-141 n=29 seedless auto plus windows 5 at 548/100,
+covering `26.040745` converged with freeze mass `26.0409395`; the interval route refused
+the freeze, the first first-party covering row at that size.
+`5.59` is the session-141 n=30 seedless auto plus windows 5 at 559/100, covering
+`27.178193` unconverged, still below 30, the first first-party covering row at that
+size. `5.7` is the session-141 n=31 seedless auto plus windows 5 at 57/10, covering
+`28.331329` unconverged, still below 31, the first first-party covering row at that
+size. `5.8` is the session-141 n=32 seedless auto plus windows 5 at 29/5, covering
+`29.803318` unconverged, still below 32, the first first-party covering row at that
+size. `6.75` is the session-141 n=44 seedless auto plus windows 5 at 675/100, covering
+`41.236782` unconverged, still below 44, the first first-party covering row at that
+size. `6.84` is the session-141 n=45 seedless auto plus windows 5 at 684/100, covering
+`42.137360` unconverged, still below 45, the first first-party covering row at that
+size. Several sides are reported more than once from site sets built differently, which
+is the point of reporting them that way: at `4.85` the difference is between a wall and
+the certificate `T-021` rests on, at `4.865` it is two independent walls plus a
+session-140 four-grid-plus-windows-7 construction that stopped at `19.930198`
+unconverged without crossing, and at `3.97` it is a converged grid optimum of
+`12.364038` above a cutting-plane row LP of `12.248227` and a session-140 T-017-seeded
+four-grid-plus-windows-7 freeze at `12.133391`, and a session-141 T-017-seeded
+auto-plus-windows-7 row at `12.097146` unconverged, with a historical reported floor of
+`10.845594`. That floor cannot currently be replayed because its generating family and
+state are missing; [D-478](defects.md) records the evidence gap.
 
 The middle tier is built and works within the explicit boundaries above.
 Two instruments now agree on the cell decomposition to `4.4e-16` and on the corner’s
