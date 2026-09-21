@@ -51,8 +51,9 @@ uv run --frozen --all-extras --group dev python -m devtools.bentz2016.replay_the
   --negative-control
 ```
 
-Wall times: replay 15.1 s, `--check` 0.7 s, `--n 21` 39.3 s, `--n 32` 15.8 s. The
-negative control is 15.0 s and exits 1. The `n = 21` run was 6.6 s before the merge
+Wall times: replay 15.1 s, `--check` 0.7 s, `--n 21` 39.3 s, `--n 32` 22.8 s (15.8 s
+before the guard-margin measurement the second review asked for was added to it).
+The negative control is 15.0 s and exits 1. The `n = 21` run was 6.6 s before the merge
 propagation, which runs on each of the 122,323 pairs the wall-line count leaves
 non-forced.
 
@@ -228,6 +229,50 @@ orbit-size distribution exactly, including the 4,146 orbits.
 against all 2,365 blue structures is 240 forced, 1,516 needs-geometry and 609 kill
 before the propagation and 405, 1,381 and 579 after, and a slow-marked test pins the
 whole inventory’s orbit counts on both sides.
+A second slow-marked test pins the whole `n = 32` inventory -- its four counts, its
+reason breakdown and its zero needs-geometry -- which the second review found nothing
+doing.
+
+## What the second review changed
+
+Four findings against the port, all addressed here; the counts above are unchanged by
+all of them.
+
+- **Side-6 distinctness decided from colour labels.** Two counted boxes were called
+  distinct when their known sets shared a colour *name*, which two boxes carrying each
+  other’s end point satisfy although one box holding one point of each colour explains
+  both. The predicate now carries witness *identity*: distinct when some colour has two
+  different known points between the two boxes.
+  Every `n = 32` count was re-derived under it and **nothing moved**; the two predicates
+  agree on all 72,698 counted-box pairs this case reaches, and the `n = 22` control and
+  the `n = 21` counts are untouched, as they must be -- the predicate is side-6 only.
+  The direction is worth stating: a loose distinctness test inflates `forced`, so it
+  pushed toward a false *confirm* of `H-227`, and `exp-217` recorded a rejection.
+- **The merge propagation was exercised only where it decided nothing.** At `n = 22` the
+  wall-line pass forces every pair before the propagation runs.
+  A test now defers the wall-line verdict and lets the propagation decide alone: it
+  refuses 8 of the 73, four by an uncovered blue point swept into a merged box and four
+  by a merged box holding a singly covered red end point together with its neighbour,
+  each pinned by its reason string.
+  At `n = 22` no packing exists, so every refusal it makes there is correct.
+- **The sampled orientation slack is now measured, not asserted.**
+  `_min_enclosing_square` samples 1,000 orientations in float and refuses a merged box
+  above `1.01 + 4e-3`; a sampling overshoot would manufacture a forcing.
+  The run reports the closest any decision came to that threshold.
+  At `n = 21` it is **0.0332**, 8.3 slacks away over 144 sampled decisions, and **none
+  of them refused**: every “does not fit a square of side 1.01” refusal in the run comes
+  from the exact rational diameter test instead.
+  The `n = 22` control never reaches the sampler at all, and with the wall lines
+  deferred it reaches it 8 times, no closer than 0.0518.
+- **The side-6 `EPS` guard is measured the same way.** Every comparison guarded by
+  `1e-30` reports how far it stood from its threshold.
+  Over the `n = 32` run the closest deciding margins are 0.0660 (a rectangle against a
+  trajectory’s height range), 0.1 (a trajectory’s `x` against a rectangle’s span),
+  0.0752 (feasibility of a system of row moves) and 0.9598 (the close-pair test) -- 28
+  orders of magnitude above the guard, and of the order `1e-2` the module docstring
+  claimed. The remaining comparisons are exact ties, where a point sits on a rectangle’s
+  edge; the guard decides those the same way with or without it, and they are counted
+  separately rather than folded into the minimum.
 
 ## `D-507` and the source slip
 

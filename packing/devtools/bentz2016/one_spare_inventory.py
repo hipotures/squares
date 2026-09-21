@@ -388,13 +388,43 @@ def _min_enclosing_square(points: tuple[tuple[Fraction, Fraction], ...]) -> floa
     return best
 
 
+#: Every sampled orientation decision made in this process, as
+#: `sampled side - (MAX_SIDE + ORIENTATION_SLACK)`: positive refuses the box, negative
+#: keeps it, and the distance from zero is how far that decision was from flipping.
+#: One entry per distinct point set, because the decision below is memoised.
+_ORIENTATION_MARGINS: dict[tuple[tuple[Fraction, Fraction], ...], float] = {}
+
+
+def orientation_margins() -> dict[str, object]:
+    """How close the sampled orientation decisions came to their threshold.
+
+    The sampled minimum is an *upper* bound on the true least enclosing square, and
+    exceeding the threshold refuses the box, which is a contradiction, which is a
+    forcing -- so a sampling overshoot wider than `ORIENTATION_SLACK` would manufacture
+    a forcing. This reports what the slack was previously only asserted to have: the
+    closest any decision came to flipping, measured on the run rather than argued in a
+    comment. It is cumulative over the process, because the decision is memoised, which
+    only makes the reported minimum more conservative.
+    """
+    margins = list(_ORIENTATION_MARGINS.values())
+    return {
+        "sampled_decisions": len(margins),
+        "orientation_samples": ORIENTATION_SAMPLES,
+        "slack": ORIENTATION_SLACK,
+        "min_abs_margin": min((abs(m) for m in margins), default=None),
+        "refusals": sum(1 for m in margins if m > 0),
+    }
+
+
 @cache
 def _too_big_for_one_box(points: tuple[tuple[Fraction, Fraction], ...]) -> bool:
     """Do these points need a square of side above 1.01, so no box holds them all?
 
     Cheap first: a diameter at or below the side fits, and a diameter at or above the
     diagonal cannot. Only the band between them reaches the sampled minimum, and the
-    same point sets recur across thousands of pairs, so the answer is memoised.
+    same point sets recur across thousands of pairs, so the answer is memoised. Every
+    sampled decision records its margin above or below the threshold, which
+    `orientation_margins` reports.
     """
     if len(points) < 2:
         return False
@@ -403,7 +433,9 @@ def _too_big_for_one_box(points: tuple[tuple[Fraction, Fraction], ...]) -> bool:
         return False
     if diameter2 >= 2 * MAX_SIDE**2:
         return True
-    return _min_enclosing_square(points) > float(MAX_SIDE) + ORIENTATION_SLACK
+    margin = _min_enclosing_square(points) - (float(MAX_SIDE) + ORIENTATION_SLACK)
+    _ORIENTATION_MARGINS[points] = margin
+    return margin > 0
 
 
 def merge_propagation(red: StructureFacts, blue: StructureFacts) -> str | None:
@@ -583,7 +615,7 @@ def _four_full_and_a_partial(
     return None
 
 
-def _classify_by_wall_lines(
+def classify_by_wall_lines(
     red: StructureFacts, blue: StructureFacts, finish_ok: dict[int, bool]
 ) -> Verdict:
     """The wall-line verdict alone, before the merge propagation: the lane's original."""
@@ -634,7 +666,7 @@ def classify(
     forced. `propagate=False` runs the first pass alone, for reporting the two side by
     side rather than for deciding anything.
     """
-    verdict = _classify_by_wall_lines(red, blue, finish_ok)
+    verdict = classify_by_wall_lines(red, blue, finish_ok)
     if not propagate or verdict.klass == "forced":
         return verdict
     merged = merge_propagation(red, blue)
@@ -771,6 +803,12 @@ def run(
         print("  non-forced patterns -> raw count:")
         for shape, count in sorted(patterns.items(), key=lambda kv: -kv[1]):
             print(f"    {count:7d}  {shape}")
+    margins = orientation_margins()
+    print(
+        f"  sampled orientation decisions: {margins['sampled_decisions']} "
+        f"({margins['refusals']} refused a merged box); closest any came to the "
+        f"1.01 + {ORIENTATION_SLACK} threshold: {margins['min_abs_margin']}"
+    )
     inventory: dict[str, object] = {
         "tool": "devtools.bentz2016.one_spare_inventory",
         "label": label,
@@ -790,6 +828,7 @@ def run(
         "reasons_raw": dict(reasons_raw),
         "non_forced_patterns_raw": dict(patterns),
         "invariance_ok": invariance_ok,
+        "orientation_margins": orientation_margins(),
         "orbits": list(orbits.values()),
     }
     if out_path:

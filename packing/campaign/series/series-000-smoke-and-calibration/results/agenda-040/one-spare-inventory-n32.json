@@ -37,6 +37,21 @@
   "kill (L: 0 distinct full, 0 with partial), (R: 0 distinct full, 0 with partial)": 441
  },
  "invariance_ok": true,
+ "guard_margins": {
+  "eps": "1.0e-30",
+  "closest_deciding": {
+   "close-pair": "0.9598",
+   "meets-x": "0.1",
+   "meets-y": "0.06602540378",
+   "reach": "0.07519655808"
+  },
+  "exact_ties_inside_the_guard": {
+   "meets-x": 194076,
+   "meets-y": 39160,
+   "reach": 6198
+  },
+  "min_deciding": "0.06602540378"
+ },
  "zero_spare_n33_control": {
   "class": "forced",
   "reason": "L: six distinct full boxes",
