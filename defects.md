@@ -759,7 +759,7 @@ This is the actionable list.
 | [D-503](docs/project/reviews/review-2026-09-19-pr199-201-correctness.md) | 2026-09-19 | tooling | robustness |  | `gate` | medium | fixed | Artifact timeout test assumed a Python child could print within 200 milliseconds |
 | [D-504](docs/project/reviews/review-2026-09-19-pr199-201-correctness.md) | 2026-09-19 | tooling | performance |  | `gate` | medium | fixed | Allowlist existence test generated a full declared-bound reference report |
 | [D-505](packing/campaign/explorations/X-040-lower-bound-mechanisms-beyond-the-one-body-ceiling.md) | 2026-09-20 | docs | soundness | conservative | `review` | high | fixed | Bentz 2016 transcription moved the finishing line of Theorems 9 and 11 |
-| [D-506](packing/campaign/explorations/X-040-lower-bound-mechanisms-beyond-the-one-body-ceiling.md) | 2026-09-20 | docs | soundness | conservative | `review` | high | fixed | Bentz 2016 transcription inverted Lemma 7's bound and rewrote its lemma reference |
+| [D-506](packing/campaign/agent-sessions/session-143-lower-bound-math-review.md) | 2026-09-20 | docs | soundness | conservative | `review` | high | fixed | Bentz 2016 transcription inverted Lemma 7's bound and rewrote its lemma reference |
 | [D-507](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/bentz2016-one-spare-receipt.md) | 2026-09-20 | docs | soundness | conservative | `review` | high | fixed | Bentz 2016 transcription dropped the factor 2 from Theorem 9's budget line |
 
 <!-- This document follows common-doc-guidelines.md.
