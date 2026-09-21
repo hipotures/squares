@@ -618,7 +618,8 @@ tiers:
     collected -- and all three on 2026-09-21: 73.90s in run 35634463193, job 106448349232,
     at head c4b493e1; 74.98s in run 35637674151, job 106459001378, at head cb821629; and
     133.81s in run 35638434973, job 106461545452, at head e92e3187, which passed at 92 per
-    cent of this ceiling. Two are the readings the superseded record was built from:
+    cent of the 145s ceiling the first two readings had set, and is why that ceiling is
+    154s now. Two are the readings the superseded record was built from:
     125.16s and 124.40s in run 35182460400, attempts 2 and 3 (jobs 105078217114 and
     105079133540), on PR 188 exact head be28ad5a, 3,008 passed and 6 skipped. The
     2026-09-17 pair stays in the mean rather than being replaced by it, because it is a
