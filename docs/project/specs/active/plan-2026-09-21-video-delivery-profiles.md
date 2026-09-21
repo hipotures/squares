@@ -4,7 +4,7 @@
 
 **Author:** Joshua Levy, with Claude Opus 5
 
-**Status:** Draft
+**Status:** In Review
 
 ## Overview
 
@@ -152,16 +152,16 @@ handles n = 300.
 
 ### Phase 1: profiles, conformance, and the capture wiring
 
-- [ ] `delivery.py`: `DeliveryProfile`, `PROFILES`, `encode_arguments`,
+- [x] `delivery.py`: `DeliveryProfile`, `PROFILES`, `encode_arguments`,
   `DeliveredVideo`, `measure`, `conformance`, `fidelity`, `main`.
-- [ ] `capture_video`: `--profile`, encode through the profile, check before the
+- [x] `capture_video`: `--profile`, encode through the profile, check before the
   receipt, record `profile` and `delivered` in the receipt.
-- [ ] Move the `encode_arguments` contract test to the profile-driven form.
-- [ ] `test_delivery.py`: conformance over plain data — a conforming measurement, each
+- [x] Move the `encode_arguments` contract test to the profile-driven form.
+- [x] `test_delivery.py`: conformance over plain data — a conforming measurement, each
   constraint violated one at a time, the ceilings under `social` and their absence under
   `archive`, and a duration that disagrees with the receipt by more than a frame.
-- [ ] Console script `squares-workbench-check-delivery`.
-- [ ] Ruff, BasedPyright and `pytest ../packages/workbench/tests` at zero findings.
+- [x] Console script `squares-workbench-check-delivery`.
+- [x] Ruff, BasedPyright and `pytest ../packages/workbench/tests` at zero findings.
 
 ### Phase 2: re-cut and validate the deliverables
 
