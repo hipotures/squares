@@ -21,10 +21,12 @@ import tseslint from "typescript-eslint";
 // should check it: one line, in that `tsconfig`, and nothing here. A new root program is found
 // without an edit; a new package program is one line in `PACKAGE_PROGRAMS`.
 //
-// The ignores are what is not ours (`vendor/`) and the git-ignored directories that hold
-// JavaScript nobody wrote here: dependencies, virtual environments, build output, scratch space
-// and agent worktrees. Biome reads `.gitignore` itself; ESLint cannot, so they are named, one a
-// line.
+// The ignores are what is not ours (`vendor/`, and `packing/resources/`, the literature archive
+// of other authors' retained bytes) and the git-ignored directories that hold JavaScript nobody
+// wrote here: dependencies, virtual environments, build output, scratch space and agent
+// worktrees. Biome reads `.gitignore` itself; ESLint cannot, so they are named, one a line.
+// Archived source is never edited to look tidy, and a retained file belongs to no type program,
+// so holding it to this floor would only ever report that it parses under someone else's rules.
 
 const REPOSITORY = resolve(import.meta.dirname, "../..");
 const PACKAGE_PROGRAMS = ["packages/workbench/tsconfig.json"];
@@ -41,6 +43,7 @@ const NOT_OURS = [
   "**/.venv/**",
   "packages/workbench/dist/**",
   "attic/**",
+  "packing/resources/**",
   ".claude/**",
 ];
 

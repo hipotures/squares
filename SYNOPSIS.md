@@ -833,6 +833,7 @@ case or experiment separately.
 | [Mathematical Audit of Routes to Significant Progress on Small Square Packings](docs/project/reviews/review-2026-09-14-small-n-significant-progress-mathematical-audit.md) | dated review record | record | retained | — |
 | [N11 W10 Route Selection](docs/project/reviews/review-2026-09-14-n11-w10-route-selection.md) | dated review record | record | retained | — |
 | [Post-W5 route selection for material small-n progress](docs/project/reviews/review-2026-09-14-n11-post-w5-route-selection.md) | dated review record | record | retained | — |
+| [Proof Review: Kleddamag’s `s(17) > 461300/99853`](docs/project/reviews/review-2026-09-21-n17-kleddamag-461300-99853.md) | dated review record | record | retained | — |
 | [The Three-Lane Research Method](docs/project/three-lane-research-method.md) | component scope and use | record | retained | — |
 | [Handoff — 2026-09-04, close of the fractional-certificate block](docs/project/handoff-2026-09-04-block-close.md) | dated handoff record | record | retained | — |
 | [Handoff: Post-3.81 Portfolio at T+2](docs/project/handoff-2026-09-06-post-381-t2-commissioning.md) | dated handoff record | record | retained | — |
