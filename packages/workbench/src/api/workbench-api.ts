@@ -206,6 +206,8 @@ export interface AtlasColour {
   greens: string[];
   greenStride: number;
   animateStandardize: boolean;
+  /** Whether an axis-aligned square keeps its colour across a step instead of draining. */
+  holdSquareColours: boolean;
   /** How many angle classes the frame's angles fell into. */
   classes: number;
   centres: number[];
@@ -610,6 +612,8 @@ export interface AtlasTransitions {
   identityFills(count?: number): string[];
   setAnimateStandardize(on: boolean): boolean;
   animateStandardize(): boolean;
+  holdSquareColours(): boolean;
+  setHoldSquareColours(on: boolean): boolean;
 
   setPhase(phase: AtlasPhase): void;
   setStyle(style: string): void;

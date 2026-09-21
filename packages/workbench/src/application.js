@@ -13,8 +13,6 @@ import {
   annealConfiguration,
   BLIND_SETTINGS,
   BODY_PHYSICS_SETTINGS,
-  BOUND_CLEAR,
-  BOUND_FADE,
   DEFAULT_ANIMATE_STYLE,
   DEFAULT_ARRIVAL_DELAY_FRACTION,
   DEFAULT_MOTION_RESPONSE,
@@ -384,7 +382,12 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   let stageChroma = 0.85;
   /** @type {AtlasScheme} */
   let colorScheme = "identity";
-  const ANIMATE = { standardize: true };
+  //: `standardize` repaints the resting frame in the standard angle colours. `holdSquare` is
+  //: the rule below it: whether a square that is axis-aligned at both ends of a step keeps its
+  //: colour while everything around it drains. On -- the shipped behaviour -- the grid a viewer
+  //: can already read stays put and the drain says which squares are still looking for a place.
+  //: Off, every square drains, so nothing is green while it is visibly tilted by the shake.
+  const ANIMATE = { standardize: true, holdSquare: true };
   function standardizing() {
     return colorScheme === "identity" && state.mode === "animate" && ANIMATE.standardize;
   }
@@ -1199,11 +1202,17 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     // colour and the drain is left to say which squares are still looking for their place. It is
     // the ORIENTATION that decides, not whether the square moves -- an axis-aligned square sliding
     // one cell along a row is still a square a viewer can follow.
+    //
+    // The rule is a setting (the owner, 2026-09-21). Held, a square keeps its colour through a
+    // shake that visibly turns it off its axis, so the colour says "square to the container"
+    // while the picture shows otherwise for as long as the annealing runs. Which of those two
+    // reads better is a judgement, so both are available.
     holdsColour = new Uint8Array(p.n + 1);
     for (let i = 0; i <= p.n; i++) {
       const here = i < p.n ? motion[i].a[2] : tgtA[i];
       const there = tgtA[i];
       holdsColour[i] =
+        ANIMATE.holdSquare &&
         angleGap(foldAngle(here), 0) <= HOLD_TURN_TOL &&
         angleGap(foldAngle(there), 0) <= HOLD_TURN_TOL
           ? 1
@@ -3613,6 +3622,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       scheme: colorScheme,
       mode: state.mode,
       animateStandardize: ANIMATE.standardize,
+      holdSquareColours: ANIMATE.holdSquare,
       stageChroma,
       desaturationFloor: desatFloor,
       scarlet: SCARLET,
@@ -3656,6 +3666,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       greens: GREENS.slice(),
       greenStride: GREEN_STRIDE,
       animateStandardize: ANIMATE.standardize,
+      holdSquareColours: ANIMATE.holdSquare,
       classes: paintOut.classes,
       centres: paintOut.centres.slice(),
       sizes: paintOut.sizes.slice(),
@@ -4022,22 +4033,24 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     updateChrome();
   }
 
-  // The box, as the owner asked on 2026-09-13: a bold square at the side the step is using, black
-  // while it is on its way and green once it locks at the best known side, and a thin black trace
-  // of where it just was, so every change of size is seen from both ends.
-  //   dwell   green rests at n's best known side; the trace the last step left outside it clears
-  //           over the dwell's last BOUND_CLEAR.
-  //   grow    as the move opens, over the schedule's resize (`containerStart` to `containerEnd`),
-  //           green opens up and to the right to the room
-  //           n + 1 can always use -- ceil(sqrt(n + 1)), the grid, or the best known side where that
-  //           is wider -- riding out further wherever the moving container breathes past it. The
-  //           trace stays inside at n's side, and the view widens with the box, which is the
-  //           picture shrinking.
-  //   clear   the inner trace fades over the next BOUND_FADE of the move, as the arrival delay
-  //           passes. The resize-to-square ordering is explicit in the schedule and does not
-  //           depend on which solver draws the squares.
-  //   settle  green contracts to n + 1's best known side and the trace stays outside it, where the
-  //           box was, until the next step clears it.
+  // The box, as the owner asked on 2026-09-13 and revised on 2026-09-21: a bold square at the
+  // side the step is using, black while it is on its way and green once it locks at the best
+  // known side, with a light grey outside it at the room the next n will need.
+  //
+  // **It never animates growing.** The container has to be larger at n + 1 than at n, and a line
+  // that opened outward to get there said the box was being enlarged -- which is the opposite of
+  // what the sequence is about. The size it needs is drawn ahead of it in the trace's light grey,
+  // and the box darkens into that grey in place, so the only motion the container ever shows is
+  // shrinking.
+  //   dwell   green rests at n's best known side, with the light grey already at the room n + 1
+  //           can always use: ceil(sqrt(n + 1)), the grid, or the best known side where that is
+  //           wider.
+  //   darken  over the schedule's resize (`containerStart` to `containerEnd`) the box takes that
+  //           side at once and its stroke comes up over the grey beneath it. No geometry moves.
+  //           The resize-to-square ordering is explicit in the schedule and does not depend on
+  //           which solver draws the squares.
+  //   settle  the dark line contracts to n + 1's best known side and turns green there, and the
+  //           grey stays outside it, where the box was, as the room the step began with.
   // Where the grid is the best known packing the box never changes size and stays green. An
   // open-ended run has walls rather than a step: its box is drawn on the walls, black, with no
   // trace.
@@ -4071,23 +4084,33 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     let box = sceneSide;
     let trace = sceneSide;
     let seen = 0;
+    //: How much of the box's own stroke is drawn: the darkening, run over the light grey trace
+    //: beneath it rather than as a change of colour, so it is an attribute and not an inline
+    //: style the design contract would have to allow.
+    let ink = 1;
     // The side the view holds through the whole step, so the picture does not zoom as the trace
     // comes and goes: n's open side through the dwell, n + 1's once the box has grown.
     let held = sceneSide;
     if (!optimizing && t <= sc.moveStart) {
       box = from;
-      trace = openSide(p.n);
-      seen = 1 - ramp(t, sc.moveStart * (1 - BOUND_CLEAR), sc.moveStart);
+      // The room n + 1 will need, drawn in the trace's light grey from the dwell onward. It is
+      // what the box darkens INTO at the step's start, so it has to already be there: a line
+      // that grew outward would say the container was being enlarged, and the container is only
+      // ever made smaller.
+      trace = open;
+      seen = 1;
       held = trace;
     } else if (!optimizing && t < Math.max(sc.moveEnd, sc.containerEnd)) {
-      const grown = sc.containerEnd;
-      const settleStart = Math.max(sc.moveEnd, grown);
-      const clearEnd = Math.min(settleStart, grown + (sc.moveEnd - sc.moveStart) * BOUND_FADE);
-      const opening = easeInOut(ramp(t, sc.containerStart, grown));
-      box = Math.max(sceneSide, lerp(from, open, opening));
-      trace = from;
-      seen = 1 - ramp(t, grown, clearEnd);
-      held = Math.max(box, lerp(openSide(p.n), open, opening));
+      // **The box never animates growing** (the owner, 2026-09-21). It takes the larger side at
+      // once and darkens into it, over the light grey already drawn there, so the only motion
+      // the container ever shows is shrinking. The story across a step: green at n's best side,
+      // the light grey outside it saying how much room n + 1 needs, that grey darkening in place
+      // when the step begins, and then the dark line shrinking back to green at n + 1's side.
+      box = Math.max(sceneSide, open);
+      ink = easeInOut(ramp(t, sc.containerStart, sc.containerEnd));
+      trace = open;
+      seen = 1;
+      held = Math.max(box, open);
     } else if (!optimizing) {
       const settleStart = Math.max(sc.moveEnd, sc.containerEnd);
       trace = Math.max(sceneSide, open);
@@ -4098,6 +4121,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     if (!optimizing) {
       holdInView(held);
     }
+    boxRect.setAttribute("stroke-opacity", String(ink));
     traceRect.setAttribute("opacity", String(seen));
     traceRect.setAttribute("width", String(trace));
     traceRect.setAttribute("height", String(trace));
@@ -4528,6 +4552,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     const animateBox = /** @type {HTMLInputElement} */ (inputNode("animate-standard-toggle"));
     animateBox.checked = ANIMATE.standardize;
     animateBox.disabled = state.mode !== "animate" || colorScheme !== "identity";
+    const holdBox = /** @type {HTMLInputElement} */ (inputNode("hold-square-toggle"));
+    holdBox.checked = ANIMATE.holdSquare;
+    holdBox.disabled = animateBox.disabled;
 
     // Under continuous play the sequence's own beat governs, so the three boxes are inert.
     // The four inputs drive whichever beat is in force: `state.timing` for a single step, and
@@ -5036,6 +5063,20 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     updateSegments();
     render();
     return ANIMATE.standardize;
+  }
+  // Whether an axis-aligned square keeps its colour across a step, or drains with the rest. The
+  // flags are worked out once per pair in `buildPair`, so the pair is rebuilt rather than redrawn.
+  function setHoldSquareColours(on) {
+    const next = !!on;
+    if (next === ANIMATE.holdSquare) {
+      return ANIMATE.holdSquare;
+    }
+    ANIMATE.holdSquare = next;
+    buildPair();
+    markGapBar();
+    updateSegments();
+    render();
+    return ANIMATE.holdSquare;
   }
   function setColorRule() {
     return colorScheme;
@@ -5884,6 +5925,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     identityFills,
     setAnimateStandardize,
     animateStandardize: () => ANIMATE.standardize,
+    holdSquareColours: () => ANIMATE.holdSquare,
+    setHoldSquareColours,
     setPhase,
     setStyle,
     setOverlay,
@@ -6196,6 +6239,11 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     .getElementById("animate-standard-toggle")
     .addEventListener("change", (ev) =>
       setAnimateStandardize(/** @type {HTMLInputElement} */ (ev.target).checked),
+    );
+  document
+    .getElementById("hold-square-toggle")
+    .addEventListener("change", (ev) =>
+      setHoldSquareColours(/** @type {HTMLInputElement} */ (ev.target).checked),
     );
   document
     .getElementById("links-toggle")

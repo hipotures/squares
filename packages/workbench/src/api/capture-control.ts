@@ -38,6 +38,7 @@ export type CaptureCommand =
   | ["setDrawing", boolean]
   | ["setEdges", AtlasEdgeInput]
   | ["setGrowth", Partial<Pick<AtlasGrowth, "on" | "size" | "rate" | "rule">>]
+  | ["setHoldSquareColours", boolean]
   | ["setInitial", AtlasInitial]
   | ["setLaw", AtlasLawInput]
   | ["setLawPreset", string]
@@ -188,6 +189,9 @@ function apply(api: AtlasTransitions, command: CaptureCommand): void {
       return;
     case "setGrowth":
       api.setGrowth(command[1]);
+      return;
+    case "setHoldSquareColours":
+      api.setHoldSquareColours(command[1]);
       return;
     case "setInitial":
       api.setInitial(command[1]);

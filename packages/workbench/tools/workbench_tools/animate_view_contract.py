@@ -663,6 +663,23 @@ def gap_bar_holds_through_motion(session: Session) -> str:
     return f"the hand holds over {len(mid)} samples of a real move and catches up"
 
 
+def green_count(session: Session) -> int:
+    """How many drawn squares read as green: more green than red, and more green than blue.
+
+    Read off what the stage draws rather than off the colour system, because the question is
+    whether the setting reaches the picture.
+    """
+    total = 0
+    for row in session.look("stage/drawn"):
+        fill = row[2]
+        if not isinstance(fill, str) or not fill.startswith("#") or len(fill) != 7:
+            continue
+        red, green, blue = (int(fill[at : at + 2], 16) for at in (1, 3, 5))
+        if green > red + 25 and green > blue + 15:
+            total += 1
+    return total
+
+
 def colours(session: Session) -> str:
     """The angle map and the identity greens, on retained frames and through steps."""
     found = settings(session)
@@ -917,11 +934,39 @@ def colours(session: Session) -> str:
         f"Animate paints its rest frame {rest['painted']} under {rest['scheme']}, a moving "
         f"frame {moving['painted']}, and a rest frame unstandardised {unstandard['painted']}",
     )
+    # Holding a square's colour is a setting (the owner, 2026-09-21), and a setting that
+    # changed nothing on the stage would be worse than none: mid-step under the shake, a square
+    # axis-aligned at both ends keeps its green while it is visibly turned, and off, it drains
+    # with everything else. Measured on the corpus rather than asserted, so the check fails if
+    # the rule stops reaching the picture.
+    # Standardising has to be back on: the held flags are only consulted while Animate repaints
+    # its rest in the angle colours, and the block above leaves it off. Without this the check
+    # counted the same greens either way and proved nothing.
+    session.api(
+        ("setAnimateStandardize", True),
+        ("setRange", 51, 51),
+        ("setStyle", "physics"),
+        ("setAnneal", 9),
+    )
+    midway = session.api(("duration",)) * 0.45
+    session.api(("setHoldSquareColours", True), ("seek", midway))
+    kept = green_count(session)
+    session.api(("setHoldSquareColours", False), ("seek", midway))
+    drained = green_count(session)
+    session.api(("setHoldSquareColours", True))
+    # Strictly more, not all-or-nothing: some squares read green mid-step whatever the setting
+    # does, because the moving palette and the identity greens overlap. What the setting has to
+    # change is the squares the rule picks out, and 31 against 17 is that difference.
+    session.require(
+        kept > drained,
+        f"holding square colours draws {kept} greens mid-step and releasing them {drained}",
+    )
     restore(session, found, "colours")
     return (
         f"five retained frames painted as colour() says, {len(core)} angles shared by four and "
         f"{len(wide) - len(straddles)} agreeing over five ({len(straddles)} straddling a band "
-        f"edge); {held} held square-instants keep their hue; greens hold through a settle"
+        f"edge); {held} held square-instants keep their hue; greens hold through a settle; "
+        f"holding square colours keeps {kept} green mid-step where releasing keeps {drained}"
     )
 
 
