@@ -207,9 +207,13 @@ erratum.
   found no error and supplies two steps R012’s note omits.
   The movement over `T-019` is `0.02305`, and the gap to Bidwell’s packing is now
   `0.0625`. It is the strongest value *verified here*, not the strongest claimed in
-  public: Guzhou0806’s later R038 certificate reports `461300000000/99974999999 =
-  4.614153538431…`, above it, and this repository has neither retained nor replayed that
-  one.
+  public. Two public claims stand above it, each with a different standing in this
+  repository. Guzhou0806’s later R038 certificate reports
+  `461300000000/99974999999 = 4.614153538431…`, which is neither retained nor replayed
+  here. Kleddamag’s `461300/99853 = 4.619791092907…` is retained here, replayed to a
+  byte-identical result, and reviewed with no blocking finding — and is deliberately not
+  registered, because both of its checkers are one method and a rung needs a first-party
+  decision that does not inherit the idiom they share.
 
 - **T-027 / T-028 / T-029 / T-030: `s(18) ≥ 4.67, 4.675, 4.6775, 4.679` (`S3`).** Four
   retained weighted fractional unavoidable-set certificates form the latest `n = 18`

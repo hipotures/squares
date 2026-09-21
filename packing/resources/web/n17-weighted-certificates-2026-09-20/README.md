@@ -57,6 +57,12 @@ repository records rests on it.
 It is named so that no document here implies `461300/99999` is the strongest value
 publicly claimed for `s(17)`; adjudicating R038 is separate work under its own lane.
 
+For the same reason, R038 is not the top of that sequence either. Kleddamag's `v1.0.0`
+release claims `461300/99853 = 4.619791092907…`, above both, and unlike R038 its bytes
+are retained and were replayed here; see
+[that packet](../n17-kleddamag-certified-bound-2026-09-21/README.md). It is not
+registered, for reasons its own review records.
+
 ## Mira-acc/17squares: `s(17) > 4.613028635886`
 
 Selected tree of <https://github.com/Mira-acc/17squares> at commit
