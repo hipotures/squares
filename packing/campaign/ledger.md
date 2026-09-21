@@ -164,6 +164,7 @@ Each entry summarizes one user-level research window. Cycle slots are wall-clock
 | [session-147](agent-sessions/session-147-overnight-chunk-4.md) | completed | contemporaneous | `research-loop` (insight) | `research-loop` (insight) | 1 | think-b7pr | Session 148 under think-b7pr takes BC-367's mixed classes and the n=26 second site set on the next stacked branch. |
 | [session-148](agent-sessions/session-148-overnight-chunk-5.md) | stopped | contemporaneous | `insight-iteration` (insight) | `insight-iteration` (insight) | 1 | think-b7pr | Session 149 under think-n1v2 resumes from the retained patches and the wedge derivation, then the H-232 fixed-support screen. |
 | [session-149](agent-sessions/session-149-n17-external-intake.md) | completed | contemporaneous | `research-survey` (correctness) | `documentation-pass` (process) | 3 | think-pcd0 | Land the adoption under think-pcd0. The T-031 identifier contest with pull request 208 is settled: the overnight stack merged into main first and kept T-031 for the n = 11 octagon corner class, and this result took T-032 when main was merged into this branch. |
+| [session-150](agent-sessions/session-150-n17-consolidation-and-correctness.md) | in_progress | contemporaneous | `remediation` (correctness) | `review-planning-oversight` (process) | 4 | think-b7pr | Certify this record on the hosted fast gate, then close it in a record-only commit that declares that gate with its real run ids. |
 
 ### Workflow summary
 
@@ -171,16 +172,16 @@ Declared counts are contemporaneous contracts; retrospective counts are reconstr
 
 | workflow | declared entries | retrospective entries | declared phases | retrospective phases |
 | --- | ---: | ---: | ---: | ---: |
-| `research-survey` | 3 | 2 | 14 | 2 |
-| `factual-review` | 7 | 0 | 54 | 2 |
+| `research-survey` | 3 | 2 | 15 | 2 |
+| `factual-review` | 7 | 0 | 55 | 2 |
 | `insight-iteration` | 26 | 1 | 82 | 4 |
 | `process-review` | 16 | 4 | 64 | 6 |
 | `efficiency-loop` | 10 | 1 | 36 | 1 |
 | `research-loop` | 30 | 4 | 104 | 8 |
 | `pipeline-improvement` | 35 | 2 | 153 | 5 |
 | `documentation-pass` | 1 | 0 | 25 | 1 |
-| `remediation` | 0 | 1 | 0 | 3 |
-| `review-planning-oversight` | 5 | 0 | 22 | 2 |
+| `remediation` | 1 | 1 | 1 | 3 |
+| `review-planning-oversight` | 5 | 0 | 23 | 2 |
 | `general-improvement` | 1 | 0 | 7 | 1 |
 
 ## Experiment agendas
@@ -1238,6 +1239,7 @@ These totals exclude 4 historical rounds with unrecorded timing; their cost is u
 - X-030 — Draft N11 Proof Obligations After the T1 Local Witness
 - X-031 — Floor-Normalized BC303 T2 Helper and H-161 Local Stability
 - X-036 — Graded Guidance for Annealing
+- X-041 — After the n = 17 Certified Bound, a Ranked Slate
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

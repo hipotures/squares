@@ -1,0 +1,577 @@
+softschema:
+  contract: packing.squares:ClaudeEfficiencyRollup/v1
+  schema: ../schemas/claude-efficiency-rollup.schema.yaml
+  envelope: rollup
+  status: enforced
+rollup:
+  source:
+    harness: claude-code
+    filename: agent-a6bdd78cb6dd38a25.jsonl
+    sha256: 37399e4d02a9a8fb099960534214dc6cce3ae58849097a1a244be017d35be5a2
+    bytes: 992600
+    records: 266
+    session_id: d71b369b-163a-561c-a698-2900d1d8109e
+    harness_versions:
+    - 2.1.278
+  span:
+    started_at: '2026-09-21T16:49:26.129Z'
+    ended_at: '2026-09-21T17:00:27.051Z'
+    wall_seconds: 660.922
+  turns:
+    assistant: 116
+    sidechain: 116
+    by_model:
+      claude-opus-5: 116
+    by_thinking_level:
+      xhigh: 116
+    by_model_and_thinking_level:
+      claude-opus-5 @ xhigh: 116
+    by_branch:
+      main: 116
+    latency:
+      count: 116
+      total_seconds: 556.081
+      median_seconds: 1.726
+      max_seconds: 126.105
+  tokens:
+    cache_creation_input_tokens: 398486
+    cache_read_input_tokens: 15891738
+    ephemeral_1h_input_tokens: 0
+    ephemeral_5m_input_tokens: 398486
+    input_tokens: 232
+    output_tokens: 43605
+    thinking_tokens: 18461
+  tokens_by_thinking_level:
+    xhigh:
+      cache_creation_input_tokens: 398486
+      cache_read_input_tokens: 15891738
+      ephemeral_1h_input_tokens: 0
+      ephemeral_5m_input_tokens: 398486
+      input_tokens: 232
+      output_tokens: 43605
+      thinking_tokens: 18461
+  tool_calls:
+    total: 72
+    total_seconds: 109.162
+    share_of_wall: 0.1652
+    errors: 2
+    denied: 0
+    unpaired_results: 0
+    outstanding_at_snapshot: 0
+    one_off_code:
+      count: 4
+      total_seconds: 9.99
+      median_seconds: 2.382
+      max_seconds: 3.523
+    by_tool:
+      Bash:
+        count: 67
+        total_seconds: 107.441
+        median_seconds: 0.125
+        max_seconds: 33.716
+      SubagentHandback:
+        count: 1
+        total_seconds: 1.478
+        median_seconds: 1.478
+        max_seconds: 1.478
+      Read:
+        count: 2
+        total_seconds: 0.166
+        median_seconds: 0.083
+        max_seconds: 0.13
+      Edit:
+        count: 2
+        total_seconds: 0.077
+        median_seconds: 0.038
+        max_seconds: 0.039
+    by_command:
+      timeout tbd show:
+        count: 5
+        total_seconds: 53.154
+        median_seconds: 5.278
+        max_seconds: 33.716
+      timeout tbd list:
+        count: 4
+        total_seconds: 14.081
+        median_seconds: 3.602
+        max_seconds: 3.692
+      tbd && tbd:
+        count: 1
+        total_seconds: 5.326
+        median_seconds: 5.326
+        max_seconds: 5.326
+      tbd && tbd && tbd:
+        count: 1
+        total_seconds: 5.213
+        median_seconds: 5.213
+        max_seconds: 5.213
+      grep:
+        count: 12
+        total_seconds: 4.883
+        median_seconds: 0.102
+        max_seconds: 2.126
+      python3:
+        count: 2
+        total_seconds: 4.523
+        median_seconds: 2.262
+        max_seconds: 2.82
+      head:
+        count: 6
+        total_seconds: 3.211
+        median_seconds: 0.13
+        max_seconds: 2.561
+      sed:
+        count: 10
+        total_seconds: 2.381
+        median_seconds: 0.106
+        max_seconds: 1.472
+      'workflow: efficiency-loop':
+        count: 1
+        total_seconds: 1.978
+        median_seconds: 1.978
+        max_seconds: 1.978
+      ? "Block && Block && Workflow && Why && Wall && 1. && 150 && 2. && `W1 && the && `think-xdoh`\
+        \ && 180 && 3. && `W10 && the && 90 && H-226s `regime` was\n  corrected from a 25-point\
+        \ red set to Bentzs && Mira && Guzhou0806 && Guzhou && Kleddamag && Source && Date\
+        \ && Exact && Decimal && Held && ojoshe && Sep && not && 4.59 && never && `T-019`\
+        \ && Sep && 100` && 4.59 && registered && Mira && Sep && as && 4.613029 && retained\
+        \ && Guzhou0806 && Sep && 99999` && 4.613046130461 && retained && PR && Guzhou &&\
+        \ Sep && 99974999999` && 4.614153538431 && not && Kleddamag && — && 99951` && 4.615261478124\
+        \ && not && Kleddamag && Sep && 99853` && 4.619791092907 && ` && Two && PRs && the\
+        \ && each && PR && Field && Value && Objective && Merge && Owns && kind-wright-whxxn6-chunk4`,\
+        \ && Bead && `think-fqut` && `think-b7pr` && Expected && Both && Validation && `cd\
+        \ && packing-validate && Kill && A && the && Fallback && Re-run && Budget && 30 &&\
+        \ ### && Field && Value && Objective && Make && Owns && check_session_gate.py`, &&\
+        \ Bead && `think-fqut`. && Expected && A && Validation && `cd && packing-validate\
+        \ && Kill && The && `OR-16` && Fallback && Document && file && Budget && 30 && ###\
+        \ && Field && Value && Objective && Owns && `transport_ceiling_family` && Bead &&\
+        \ Epic && Expected && Six && a && the && Validation && `cd && packing-validate &&\
+        \ Kill && A && it && Fallback && Disposition && Budget && 45 && ### && Field && Value\
+        \ && Objective && Resolve && Owns && PR && Bead && `think-pcd0`, && Expected && A\
+        \ && Validation && `cd && packing-validate && Kill && The && the && Fallback && Land\
+        \ && hold && Budget && 30 && ### && Field && Value && Objective && Exclude && Owns\
+        \ && check_readme.py` && Bead && `think-ztek`. && Expected && The && Validation &&\
+        \ `cd && packing-validate && Kill && The && the && Fallback && Move && Budget && 15\
+        \ && the && `think-xdoh` && the && a && an && the && and && a && Field && Value &&\
+        \ Objective && Run && Owns && Bead && `think-g0zn`. && Expected && Validation && Kill\
+        \ && A && the && Fallback && Record && Budget && 30 && ### && Field && Value && Objective\
+        \ && Review && Owns && review-2026-09-21-n17-kleddamag-461300-99853.md`. && Bead &&\
+        \ Expected && A && Validation && The && Kill && The && report && Fallback && Report\
+        \ && Budget && 45 && ### && Field && Value && Objective && Owns && The && Bead &&\
+        \ `think-vpyj`. && Expected && A && Validation && `cd && packing-validate && Kill\
+        \ && None. && Fallback && Record && Budget && 30 && 99853`. The lanes && Field &&\
+        \ Value && Objective && Copy && Owns && A && Bead && `think-9ll1`, && Expected &&\
+        \ The && Validation && `cd && packing-validate && Kill && The && retention && Fallback\
+        \ && Retain && Budget && 20 && Archived && Field && Value && Objective && Recommend,\
+        \ && Owns && The && Bead && `think-haqw`. && Expected && Validation && no && Kill\
+        \ && R1 && registration && Fallback && State && Budget && 20 && ## && generated &&\
+        \ live && and && Field && Value && Objective && Assess && Owns && An && the && Bead\
+        \ && **None. && Expected && Ranked && Validation && `cd && packing-validate && Kill\
+        \ && The && the && Fallback && Rank && Budget && 45 && ### && Field && Value && Objective\
+        \ && Owns && agenda-040-overnight-lower-bound-loop.md`, && Bead && `think-n1v2` &&\
+        \ the && Expected && Terminal && refreshed && five && Validation && `cd && packing-validate\
+        \ && Kill && A && it && Fallback && Disposition && Budget && 30 && ### && Field &&\
+        \ Value && Objective && Select && Owns && Bead && `think-g4n9` && Expected && One\
+        \ && Validation && `cd && packing-validate && Kill && Fallback && Publish && Budget\
+        \ && 15 && `OR-7` && the && Blocks && a && a && and && `OR-15` && it && Blocker &&\
+        \ Bead && Lane && `check_readme` && `think-ztek` && C5 && Stacked-PR && `think-fqut`\
+        \ && C1, && PR && `think-pcd0` && C4 && `think-mqaj` && C4 && ` && `think-7qto` &&\
+        \ R4 && No && `think-3kg7` && C3 && the && Lane && Beads && Gap && C1, && `think-fqut`,\
+        \ && — && C3 && `think-nalh` && — && C4 && `think-pcd0`, && — && C5 && `think-ztek`\
+        \ && — && R1 && `think-g0zn` && — && R2 && `think-kjvp` && — && R3 && `think-vpyj`\
+        \ && — && R4 && `think-9ll1`, && **licensing && R5 && `think-haqw` && — && S1 && —\
+        \ && **no && create && S2 && `think-n1v2`, && **the && S3 && `think-g4n9` && — &&\
+        \ ## && the"
+      : count: 1
+        total_seconds: 1.944
+        median_seconds: 1.944
+        max_seconds: 1.944
+      timeout gh pr:
+        count: 1
+        total_seconds: 1.785
+        median_seconds: 1.785
+        max_seconds: 1.785
+      timeout uvx flowmark:
+        count: 1
+        total_seconds: 1.769
+        median_seconds: 1.769
+        max_seconds: 1.769
+      '^  date: && ^  status: && ^  - workflow: && ^    commitment:':
+        count: 1
+        total_seconds: 1.762
+        median_seconds: 1.762
+        max_seconds: 1.762
+      awk:
+        count: 1
+        total_seconds: 1.754
+        median_seconds: 1.754
+        max_seconds: 1.754
+      flowmark && git:
+        count: 1
+        total_seconds: 1.604
+        median_seconds: 1.604
+        max_seconds: 1.604
+      cat:
+        count: 6
+        total_seconds: 0.579
+        median_seconds: 0.094
+        max_seconds: 0.138
+      ls:
+        count: 6
+        total_seconds: 0.577
+        median_seconds: 0.099
+        max_seconds: 0.111
+      ls && find:
+        count: 2
+        total_seconds: 0.223
+        median_seconds: 0.112
+        max_seconds: 0.125
+      ls && ls:
+        count: 2
+        total_seconds: 0.215
+        median_seconds: 0.107
+        max_seconds: 0.132
+      ls && find && ls:
+        count: 1
+        total_seconds: 0.166
+        median_seconds: 0.166
+        max_seconds: 0.166
+      find:
+        count: 1
+        total_seconds: 0.162
+        median_seconds: 0.162
+        max_seconds: 0.162
+      git && git && git:
+        count: 1
+        total_seconds: 0.151
+        median_seconds: 0.151
+        max_seconds: 0.151
+    by_command_family:
+      toolchain:
+        count: 15
+        total_seconds: 85.67
+        median_seconds: 3.68
+        max_seconds: 33.716
+      inspection:
+        count: 47
+        total_seconds: 14.151
+        median_seconds: 0.106
+        max_seconds: 2.561
+      other:
+        count: 3
+        total_seconds: 5.684
+        median_seconds: 1.944
+        max_seconds: 1.978
+      vcs:
+        count: 2
+        total_seconds: 1.936
+        median_seconds: 0.968
+        max_seconds: 1.785
+    invoked:
+      head: 43
+      echo: 30
+      grep: 28
+      cd: 21
+      sed: 20
+      the: 17
+      ls: 14
+      Bead: 14
+      Field: 13
+      Value: 13
+      Objective: 13
+      Owns: 13
+      Expected: 13
+      Validation: 13
+      Kill: 13
+      Fallback: 13
+      Budget: 13
+      —: 11
+      The: 11
+      '`cd': 10
+      A: 9
+      tail: 8
+      '###': 8
+      cat: 7
+      timeout tbd list: 7
+      timeout tbd show: 7
+      uv run packing-validate: 7
+      Sep: 6
+      '30': 6
+      a: 5
+      find: 4
+      PR: 4
+      Kleddamag: 3
+      not: 3
+      it: 3
+      '45': 3
+      and: 3
+      C4: 3
+      wc: 2
+      printf: 2
+      python3: 2
+      git status: 2
+      Block: 2
+      '`think-xdoh`': 2
+      Mira: 2
+      Guzhou0806: 2
+      Guzhou: 2
+      '4.59': 2
+      retained: 2
+      '`': 2
+      '`think-fqut`': 2
+      Disposition: 2
+      '`think-pcd0`,': 2
+      '15': 2
+      Record: 2
+      '`think-9ll1`,': 2
+      '20': 2
+      R1: 2
+      '##': 2
+      '`think-g4n9`': 2
+      Lane: 2
+      '`think-ztek`': 2
+      C5: 2
+      C1,: 2
+      R4: 2
+      C3: 2
+      timeout uvx flowmark: 2
+      'workflow: efficiency-loop': 1
+      '^  date:': 1
+      '^  status:': 1
+      '^  - workflow:': 1
+      '^    commitment:': 1
+      which: 1
+      tr: 1
+      git log: 1
+      git rev-parse: 1
+      timeout gh pr: 1
+      awk: 1
+      Workflow: 1
+      Why: 1
+      Wall: 1
+      '1.': 1
+      '150': 1
+      '2.': 1
+      '`W1': 1
+      '180': 1
+      '3.': 1
+      '`W10': 1
+      '90': 1
+      ? "H-226s `regime` was\n  corrected from a 25-point red set to Bentzs"
+      : 1
+      Source: 1
+      Date: 1
+      Exact: 1
+      Decimal: 1
+      Held: 1
+      ojoshe: 1
+      never: 1
+      '`T-019`': 1
+      100`: 1
+      registered: 1
+      as: 1
+      '4.613029': 1
+      99999`: 1
+      '4.613046130461': 1
+      99974999999`: 1
+      '4.614153538431': 1
+      99951`: 1
+      '4.615261478124': 1
+      99853`: 1
+      '4.619791092907': 1
+      Two: 1
+      PRs: 1
+      each: 1
+      Merge: 1
+      kind-wright-whxxn6-chunk4`,: 1
+      '`think-b7pr`': 1
+      Both: 1
+      Re-run: 1
+      Make: 1
+      check_session_gate.py`,: 1
+      '`think-fqut`.': 1
+      uv run packing-validate plus: 1
+      '`OR-16`': 1
+      Document: 1
+      file: 1
+      '`transport_ceiling_family`': 1
+      Epic: 1
+      Six: 1
+      uv run packing-validate and: 1
+      Resolve: 1
+      Land: 1
+      hold: 1
+      Exclude: 1
+      check_readme.py`: 1
+      '`think-ztek`.': 1
+      Move: 1
+      an: 1
+      Run: 1
+      '`think-g0zn`.': 1
+      Review: 1
+      review-2026-09-21-n17-kleddamag-461300-99853.md`.: 1
+      report: 1
+      Report: 1
+      '`think-vpyj`.': 1
+      None.: 1
+      99853`. The lanes: 1
+      Copy: 1
+      retention: 1
+      Retain: 1
+      Archived: 1
+      Recommend,: 1
+      '`think-haqw`.': 1
+      'no': 1
+      registration: 1
+      State: 1
+      generated: 1
+      live: 1
+      Assess: 1
+      An: 1
+      '**None.': 1
+      Ranked: 1
+      Rank: 1
+      agenda-040-overnight-lower-bound-loop.md`,: 1
+      '`think-n1v2`': 1
+      Terminal: 1
+      refreshed: 1
+      five: 1
+      uv run packing-validate the: 1
+      Select: 1
+      One: 1
+      Publish: 1
+      '`OR-7`': 1
+      Blocks: 1
+      '`OR-15`': 1
+      Blocker: 1
+      '`check_readme`': 1
+      Stacked-PR: 1
+      '`think-pcd0`': 1
+      '`think-mqaj`': 1
+      '`think-7qto`': 1
+      'No': 1
+      '`think-3kg7`': 1
+      Beads: 1
+      Gap: 1
+      '`think-fqut`,': 1
+      '`think-nalh`': 1
+      '`think-g0zn`': 1
+      R2: 1
+      '`think-kjvp`': 1
+      R3: 1
+      '`think-vpyj`': 1
+      '**licensing': 1
+      R5: 1
+      '`think-haqw`': 1
+      S1: 1
+      '**no': 1
+      create: 1
+      S2: 1
+      '`think-n1v2`,': 1
+      '**the': 1
+      S3: 1
+    invoked_families:
+      other: 409
+      inspection: 128
+      shell: 54
+      toolchain: 18
+      project: 10
+      vcs: 5
+    by_shell_shape:
+      compound:
+        count: 38
+        total_seconds: 73.381
+        median_seconds: 0.123
+        max_seconds: 33.716
+      pipeline:
+        count: 15
+        total_seconds: 23.1
+        median_seconds: 1.746
+        max_seconds: 3.84
+      python_inline:
+        count: 2
+        total_seconds: 6.343
+        median_seconds: 3.172
+        max_seconds: 3.523
+      python_heredoc:
+        count: 2
+        total_seconds: 3.647
+        median_seconds: 1.824
+        max_seconds: 1.944
+      simple:
+        count: 10
+        total_seconds: 0.97
+        median_seconds: 0.102
+        max_seconds: 0.138
+    by_thinking_level:
+      xhigh:
+        count: 72
+        total_seconds: 109.162
+        median_seconds: 0.125
+        max_seconds: 33.716
+    shell_traits:
+      pipes: 47
+      redirects_output: 4
+      substitutes: 2
+  session_events:
+    compact_boundaries: 0
+    stop_hook_summaries: 0
+    queue_operations: {}
+  semantics:
+    wall_seconds: First to last timestamped record. It is elapsed session time and includes
+      every interval in which nothing was running, so it is an upper bound on work and never
+      a measure of it.
+    tool_call_seconds: From the assistant record issuing a tool_use to the user record carrying
+      its tool_result. It therefore includes harness scheduling and any permission wait, not
+      only the tool's own execution.
+    model_seconds: UNAVAILABLE for this harness. Claude Code's transcript records no timed
+      model-stream items and no first-token latency, so model time cannot be separated from
+      the interval before a turn's record is written. It is absent rather than zero, and a
+      consumer that sums it with a harness that does report it must carry the gap forward.
+    turns.latency: 'From a turn''s parent record to the turn itself. It is the closest thing
+      here to model time and is NOT model time: it also carries queueing, the user''s own
+      thinking time before a reply, and any wait for a permission prompt. Read the median,
+      not the maximum.'
+    share_of_wall: tool_call_seconds over wall_seconds. Concurrent calls are summed independently,
+      so on a session that backgrounds work this can exceed one and is a load figure, not
+      an occupancy figure.
+    tokens: 'As the harness reported them per turn, summed. Cache creation and cache read
+      are distinct from input tokens and are not double-counted here, but no cost is derived:
+      pricing is not this record''s and a stored price goes stale silently.'
+    tokens_by_thinking_level: The same counters split by the effort the harness recorded for
+      each turn. This is what makes OR-2's 'matched to the task' claim answerable rather than
+      asserted.
+    by_shell_shape: Structural classification of shell commands in a fixed priority order,
+      so a Python heredoc that also pipes counts as a Python heredoc. `python_heredoc` and
+      `python_inline` are the shapes OR-1 calls one-off code; a session with many of them
+      was writing scripts where it should have been building a tool.
+    by_command: 'The tool a shell command actually runs. Every chain is split into components,
+      shell bookkeeping and text munging are dropped, and what is left names the command:
+      one component and it takes the full invoked form, so `uv run packing-validate` keeps
+      its runner and `grep -rn x . | head -5` is `grep`; several and the name is the chain
+      of bare tools, so `make format && git add -A && git push` is `make && git && git`. Peeling
+      matters more than it sounds: keyed on the leading word instead, `cd` led 524 of 882
+      commands here. Past 256 distinct names the tail folds into `(other)`, which is a long
+      tail of odd commands or a resolver bug rather than anything to act on.'
+    invoked: 'Every tool reached for, counted across all segments of every command, not just
+      the one a call''s time was attributed to. Counts and never elapsed: most commands here
+      run several tools and the transcript times the call rather than the pipeline, so how
+      often a CLI was used is knowable and its share of the clock is not. This is the table
+      that answers which instruments a session actually uses; `by_command` answers where its
+      measured time went.'
+    by_command_family: Our own instruments against everything else. `project` is this repository's
+      CLIs and modules, `toolchain` the language tooling, `inspection` the reading and searching
+      a session does to orient itself. Time in `packing-validate` and time in `grep` are both
+      real and are not the same kind of cost.
+    errors: tool_result blocks the harness marked is_error. A failed call still spends its
+      elapsed time, and the count is here so a rising failure rate is visible rather than
+      hidden inside the total.
+    unpaired_results: tool_result blocks whose tool_use was not seen, which is normal for
+      a log that begins mid-session after a compaction. A large count means the elapsed figures
+      cover less than the session does.
+    session_events.queue_operations: Messages queued and withdrawn while a turn was running.
+      An enqueue is an interjection, which is a signal about the session's pacing rather than
+      about any tool.
+    excluded: 'Every prose body: assistant text, thinking text, user messages, tool stdout
+      and stderr, file contents, and diffs. This record is not a transcript and cannot be
+      read as one.'
