@@ -11,13 +11,14 @@ detached read-only clone at `9fe9999d`, for the reason given under “How this w
 the working tree was mid-merge at the time and would have reported conflict markers as
 record drift.
 
-**This is a dated record, not a live status page.** `main` has since advanced to
-`6eb69761`, which carries PR 211 and `T-032`. Two things in this report therefore have a
-known successor state, and both are flagged where they appear: finding 1, the ⚠️ banner
-in the Bentz 2016 transcription, was still live on `main` at the moment of the audit and
-is tracked separately; and the section “Will go stale when the n = 17 work lands”
-describes a branch that has since merged, so read it as the diff it predicted rather
-than as pending work.
+**This is a dated record, not a live status page.** `main` has since advanced past
+`6eb69761`, which carried PR 211 and `T-032`, to `beee2e0f`, which carries `OR-17` from
+PR 212 and the retained Kleddamag artifact from PR 213. Two things in this report
+therefore have a known successor state, and both are flagged where they appear: finding
+1, the ⚠️ banner in the Bentz 2016 transcription, was still live on `main` at the moment
+of the audit and is tracked separately; and the section “Will go stale when the n = 17
+work lands” describes a branch that has since merged, so read it as the diff it
+predicted rather than as pending work.
 
 ## Headline
 

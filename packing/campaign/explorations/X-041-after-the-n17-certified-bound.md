@@ -32,6 +32,7 @@ exploration:
   - packing/frontier/n-017.md
   - packing/cases/n11_threshold_certificate/certificate.json
   - docs/project/reviews/review-2026-09-20-n17-r012-and-mira-4613-proof-review.md
+  - docs/project/reviews/review-2026-09-21-n17-kleddamag-461300-99853.md
   - epistemics.md
   proposes: []
 ---
@@ -91,10 +92,12 @@ records, the T-026 finer-net lane record, agenda-037’s BC-357/BC-358, the tbd 
 the `think-xdoh` epic, and the Kleddamag artifact (PROOF, README, RESULT, bounds,
 VERIFICATION, ATTRIBUTION, AUTHORS, LICENSING, NOTICES, `global-certificate.json`,
 `evidence/release-replay/python.json`, `exact_mixed.py`). The artifact was read from the
-gitignored `attic/` clone while this ran; the retention that puts those bytes under
-`packing/resources/web/n17-kleddamag-certified-bound-2026-09-21/` is pull request 213,
-open at the time of writing, so every path above names the clone rather than a tracked
-file.
+gitignored `attic/` clone while this ran, so every path above names that clone.
+Pull request 213 has since retained the same bytes under
+`packing/resources/web/n17-kleddamag-certified-bound-2026-09-21/`, with a manifest and
+the proof review at
+[review-2026-09-21-n17-kleddamag-461300-99853.md](../../../docs/project/reviews/review-2026-09-21-n17-kleddamag-461300-99853.md);
+a reader retracing this analysis should use the tracked copy.
 
 Measured here (scratch, project interpreter, on the artifact’s bytes and on
 `packing/cases/n11_threshold_certificate/certificate.json`): the artifact’s headline

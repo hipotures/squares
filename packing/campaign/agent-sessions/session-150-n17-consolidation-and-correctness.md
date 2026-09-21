@@ -133,15 +133,17 @@ session:
     outcome: >-
       The adversarial proof review found no Blocker and no High. The artifact is retained
       under `packing/resources/web/n17-kleddamag-certified-bound-2026-09-21/` with an
-      84-entry manifest, on open pull request 213, stated at V4/C3 with C4 blocked; no
-      bound moved and `461300/99853` is registered by nothing. On the correctness line,
+      84-entry manifest, stated at V4/C3 with C4 blocked; no bound moved and
+      `461300/99853` is registered by nothing. Pull request 213 carried it and merged
+      after this phase closed. On the correctness line,
       PR 211 merged as `T-032` for `s(17) >= 461300/99999` after a `T-031` collision
       renumber that physically moved the 82-line row to the end of the register, because
       contiguity is read positionally, a session renumber from 148 to 149, and a
       correction to a stale claim that R012 was the strongest public n = 17 value.
     evidence:
+    - docs/project/reviews/review-2026-09-21-n17-kleddamag-461300-99853.md
+    - packing/resources/web/n17-kleddamag-certified-bound-2026-09-21/retained-files.sha256
     - packing/campaign/agent-sessions/session-149-n17-external-intake.md
-    - docs/project/reviews/review-2026-09-20-n17-r012-and-mira-4613-proof-review.md
     - packing/frontier/results.yaml
     stop_reason: >-
       The external result is replayed, reviewed and retained at a stated rung, and the
@@ -241,14 +243,15 @@ session:
     write_scope: [packing/resources/web/n17-kleddamag-certified-bound-2026-09-21, docs/project/reviews]
     excluded_commands: [git push --force, packing-validate --records --jobs 1]
     outcome: >-
-      Pull request 213 is open with the artifact retained and an 84-entry manifest, V4/C3
-      stated and C4 blocked; no bound moved.
-    evidence: [packing/campaign/agent-sessions/session-150-n17-consolidation-and-correctness.md]
-    files: []
-    checks: ['The manifest has 84 entries; the pull request states V4/C3 with C4 blocked and moves no bound.']
+      Pull request 213 retained the artifact with an 84-entry manifest and a review
+      document, V4/C3 stated and C4 blocked; no bound moved. It merged into main while
+      this record was being written.
+    evidence: [docs/project/reviews/review-2026-09-21-n17-kleddamag-461300-99853.md]
+    files: [packing/resources/web/n17-kleddamag-certified-bound-2026-09-21/retained-files.sha256]
+    checks: ['The manifest has 84 entries; the review states V4/C3 with C4 blocked and moves no bound.']
     uncertainty: >-
-      The lane's files are on pull request 213 and are not on this branch, so this record
-      names them rather than carrying them.
+      The lane's files reached this branch through the merge of main rather than through
+      its own work, so this record declares them and does not author them.
     elapsed_seconds: null
     elapsed_quality: unavailable
     next_action: Land pull request 213 under its own review.
@@ -359,7 +362,7 @@ source’s own checkers; both completed and reproduced `RESULT.json` byte-identi
 An adversarial proof review of the written argument found no Blocker and no High.
 
 **None of that registered a bound.** The artifact is retained with an 84-entry manifest
-and stated at `V4/C3`, with `C4` blocked, on pull request 213. `C4` is withheld for a
+and stated at `V4/C3`, with `C4` blocked, by pull request 213. `C4` is withheld for a
 stated reason rather than an abundance of caution: both of the source’s checkers share
 one method, and two implementations of one method are `C3` under `epistemics.md`. The
 first-party, domain-parameterised verifier that would earn `C4` is the `B1` row of
@@ -403,8 +406,8 @@ gate’s `exhaustive-tier` step ran 2674 s against its own declared 1943.05 s, a
 1.38; `deferred-steps` ran 2469 s; and one 45-minute run was spent over a tree
 byte-identical to a tree already measured.
 `OR-17` — a wall ceiling on every routine gate, with anything above it selected on
-purpose — is the rule proposed out of those numbers and is open as PR 212 with a
-`suite_b` gate-budget re-measurement beside it.
+purpose — is the rule those numbers produced, and it merged as PR 212 with a `suite_b`
+gate-budget re-measurement beside it, bringing `operating-rules.md` to seventeen rules.
 
 Publishing the count is not discharging it.
 The W5 is the selected next entry.
