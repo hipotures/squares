@@ -61,6 +61,17 @@ from typing import Any
 
 from strif import atomic_output_file
 
+from workbench_tools.delivery import (
+    DEFAULT_PROFILE,
+    FRAME_PATTERN,
+    PROFILES,
+    DeliveredVideo,
+    DeliveryProfile,
+    conformance,
+    encode_arguments,
+    measure,
+    report,
+)
 from workbench_tools.probes import probe
 
 PACKAGE_ROOT = Path(__file__).resolve().parents[2]
@@ -77,10 +88,6 @@ STAGE_HEIGHT = 1080
 #: What `--height` may ask for. A device scale below one resamples the page down and blurs the
 #: 28 px type the panel is built around, which is the whole reason the type scale has a floor.
 HEIGHTS = {1080: 1, 2160: 2}
-
-#: The frames' file names, numbered from zero without gaps, which is what ffmpeg's image
-#: sequence reader requires.
-FRAME_PATTERN = "f%07d.png"
 
 #: Plan D9's statement of what a frame between two records is.
 INTERMEDIATE_FRAMES = "illustrative-tween"
@@ -359,58 +366,12 @@ def _capture_animation(
     )
 
 
-def metadata_comment(page_sha256: str) -> str:
-    """The MP4 comment: the receipt's statement and the page digest, for a video on its own."""
+def capture_comment() -> str:
+    """Plan D9's statement, which the MP4 carries for anyone holding the video alone."""
     return (
         f"intermediate_frames: {INTERMEDIATE_FRAMES}. Transitions are illustrative, not "
-        f"packings: frames between checked records are tweens. page sha256 {page_sha256}"
+        "packings: frames between checked records are tweens."
     )
-
-
-def encode_arguments(
-    ffmpeg: str,
-    frames_dir: Path,
-    fps: int,
-    out: Path,
-    *,
-    page_sha256: str,
-    title: str,
-) -> list[str]:
-    """The ffmpeg command that encodes the frames to an H.264 MP4 anything will play.
-
-    `yuv420p` and the even-dimension scale are not taste: without them QuickTime and most
-    browsers refuse the file outright, which would make an unplayable "uploadable" video.
-    `+faststart` puts the index first so a browser can start playing before the download
-    ends. `-n` rather than `-y`: the output is a fresh temporary beside the destination, and
-    ffmpeg overwriting anything would mean it was not.
-    """
-    return [
-        ffmpeg,
-        "-n",
-        "-framerate",
-        str(fps),
-        "-i",
-        str(frames_dir / FRAME_PATTERN),
-        "-c:v",
-        "libx264",
-        "-preset",
-        "slow",
-        "-crf",
-        "18",
-        "-pix_fmt",
-        "yuv420p",
-        "-vf",
-        "scale=trunc(iw/2)*2:trunc(ih/2)*2",
-        "-movflags",
-        "+faststart",
-        "-metadata",
-        f"title={title}",
-        "-metadata",
-        f"comment={metadata_comment(page_sha256)}",
-        "-f",
-        "mp4",
-        str(out),
-    ]
 
 
 def encode_into_place(
@@ -474,6 +435,8 @@ def capture_receipt(
     size: tuple[int, int],
     steps: list[dict[str, Any]],
     provenance: Provenance,
+    profile: DeliveryProfile,
+    delivered: DeliveredVideo,
     encoder: list[str],
     capture_seconds: float,
     animation: dict[str, Any] | None = None,
@@ -496,6 +459,10 @@ def capture_receipt(
         "seconds": round(frames / fps, 3),
         "steps_off_record": missed,
         "transitions_are_packings": False,
+        # What the file is, beside what it shows: the profile asked for and the stream that
+        # came out, so a reader can answer "will this upload" without re-probing the file.
+        "profile": profile.name,
+        "delivered": asdict(delivered),
         "intermediate_frames": INTERMEDIATE_FRAMES,
         "reason": ANIMATION_TRANSITIONS_REASON if animation else TRANSITIONS_REASON,
         **asdict(provenance),
@@ -533,12 +500,22 @@ def main() -> int:
         type=Path,
         help="capture this PackingAnimation/v1 document instead of the retained catalogue",
     )
+    ap.add_argument(
+        "--profile",
+        default=DEFAULT_PROFILE,
+        choices=sorted(PROFILES),
+        help=(
+            "the delivery profile the file is encoded to and then checked against; "
+            "`social` adds the ceilings an X post imposes"
+        ),
+    )
     ap.add_argument("--out", type=Path, default=PACKING / "site/workbench/ascent.mp4")
     ap.add_argument("--keep-frames", action="store_true", help="leave the PNGs for inspection")
     o = ap.parse_args()
 
     if not o.page.exists():
         raise SystemExit(f"{o.page} is not built: run `squares-workbench-build` first")
+    profile = PROFILES[o.profile]
     ffmpeg = _encoder()
     scale = HEIGHTS[o.height]
     started_all = time.monotonic()
@@ -586,7 +563,14 @@ def main() -> int:
             browser.close()
         encode_into_place(
             lambda partial: encode_arguments(
-                ffmpeg, frames_dir, o.fps, partial, page_sha256=page_sha256, title=title
+                profile,
+                ffmpeg,
+                frames_dir,
+                o.fps,
+                partial,
+                page_sha256=page_sha256,
+                title=title,
+                comment=capture_comment(),
             ),
             o.out,
         )
@@ -595,6 +579,23 @@ def main() -> int:
             print(f"  frames left in {frames_dir}")
         else:
             shutil.rmtree(holder, ignore_errors=True)
+
+    delivered = measure(o.out)
+    seconds = sum(int(step["frames"]) for step in receipt) / o.fps
+    failures = conformance(
+        profile,
+        delivered,
+        fps=o.fps,
+        width=STAGE_WIDTH * scale,
+        height=STAGE_HEIGHT * scale,
+        seconds=seconds,
+    )
+    print(report(profile, delivered, failures))
+    if failures:
+        raise SystemExit(
+            f"the encoded file does not meet the {profile.name} profile, so no receipt was "
+            "written. The frames are still on disk if --keep-frames was given."
+        )
 
     document = capture_receipt(
         page=str(o.page.relative_to(PACKING) if o.page.is_relative_to(PACKING) else o.page),
@@ -606,6 +607,8 @@ def main() -> int:
         fps=o.fps,
         size=(STAGE_WIDTH * scale, STAGE_HEIGHT * scale),
         steps=receipt,
+        profile=profile,
+        delivered=delivered,
         provenance=Provenance(
             commit=commit,
             dirty=dirty,
@@ -616,12 +619,14 @@ def main() -> int:
         # The arguments as they amount to: the frames directory and the final name, rather
         # than a temporary directory and a partial file that no longer exist.
         encoder=encode_arguments(
+            profile,
             Path(ffmpeg).name,
             Path("frames"),
             o.fps,
             Path(o.out.name),
             page_sha256=page_sha256,
             title=title,
+            comment=capture_comment(),
         ),
         capture_seconds=time.monotonic() - started_all,
         animation=(

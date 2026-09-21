@@ -11,6 +11,7 @@ build-backend = "hatchling.build"
 [project.scripts]
 squares-workbench-build = "workbench_tools.build_site:main"
 squares-workbench-capture = "workbench_tools.capture_video:main"
+squares-workbench-check-delivery = "workbench_tools.delivery:main"
 squares-workbench-benchmark = "workbench_tools.benchmark:main"
 squares-workbench-summarize-annealing = "workbench_tools.summarize_annealing:main"
 squares-workbench-ascent = "workbench_tools.ascent:main"

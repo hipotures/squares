@@ -13,14 +13,13 @@ import hashlib
 import json
 import subprocess
 from collections.abc import Callable
-from itertools import pairwise
 from pathlib import Path
 from typing import Any
 from xml.etree import ElementTree as ET
 
 import pytest
 
-from workbench_tools import animation_render, capture_video, export_animation_svg
+from workbench_tools import animation_render, capture_video, delivery, export_animation_svg
 from workbench_tools.animation_records import ANIMATION_CONTRACT, decode_animation
 from workbench_tools.animation_render import TRANSITIONS_STATEMENT
 
@@ -125,21 +124,10 @@ def test_ffmpeg_version_is_read_from_its_banner() -> None:
     assert capture_video.ffmpeg_version(banner) == "ffmpeg version 7.1.1"
 
 
-def test_the_encode_is_faststart_and_says_transitions_are_not_packings(tmp_path: Path) -> None:
-    out = tmp_path / "ascent.partial.mp4"
-    arguments = capture_video.encode_arguments(
-        "ffmpeg", tmp_path / "frames", 30, out, page_sha256="ab" * 32, title="n = 2 to 3"
-    )
-    assert arguments[-1] == str(out)
-    assert "-y" not in arguments
-    flags = list(pairwise(arguments))
-    assert ("-movflags", "+faststart") in flags
-    assert ("-i", str(tmp_path / "frames" / capture_video.FRAME_PATTERN)) in flags
-    comments = [v for flag, v in flags if flag == "-metadata" and v.startswith("comment=")]
-    assert len(comments) == 1
-    assert "illustrative-tween" in comments[0]
-    assert "not packings" in comments[0]
-    assert "ab" * 32 in comments[0]
+def test_the_capture_states_that_its_intermediate_frames_are_tweens() -> None:
+    comment = capture_video.capture_comment()
+    assert capture_video.INTERMEDIATE_FRAMES in comment
+    assert "not packings" in comment
 
 
 def _fake_ffmpeg(out: Path, returncode: int) -> tuple[list[bool], Runner]:
@@ -193,6 +181,18 @@ def test_the_receipt_carries_the_plan_d9_statement_and_provenance() -> None:
         browser_version="151.0.7922.34",
         ffmpeg_version="ffmpeg version 7.1.1",
     )
+    delivered = delivery.DeliveredVideo(
+        codec="h264",
+        h264_profile="High",
+        level=40,
+        pixel_format="yuv420p",
+        width=1920,
+        height=1080,
+        fps=30.0,
+        seconds=1.5,
+        bytes=123_456,
+        faststart=True,
+    )
     receipt = capture_video.capture_receipt(
         page="site/workbench/index.html",
         page_sha256="a" * 64,
@@ -204,6 +204,8 @@ def test_the_receipt_carries_the_plan_d9_statement_and_provenance() -> None:
         size=(1920, 1080),
         steps=steps,
         provenance=provenance,
+        profile=delivery.PROFILES["social"],
+        delivered=delivered,
         encoder=["ffmpeg", "-movflags", "+faststart"],
         capture_seconds=12.34,
     )
@@ -219,6 +221,11 @@ def test_the_receipt_carries_the_plan_d9_statement_and_provenance() -> None:
     assert receipt["seconds"] == 1.5
     assert receipt["steps_off_record"] == [4]
     assert receipt["ms_per_frame"] == {"mean": 45.0, "worst": 50.0, "worst_at_n": 4}
+    # The file is described beside what it shows, so a reader of the receipt alone can say
+    # which ceilings the capture was held to and what the stream turned out to be.
+    assert receipt["profile"] == "social"
+    assert receipt["delivered"]["level"] == 40
+    assert receipt["delivered"]["faststart"] is True
     assert json.loads(json.dumps(receipt)) == receipt
 
 
