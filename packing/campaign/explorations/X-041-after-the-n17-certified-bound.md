@@ -47,12 +47,16 @@ artifact’s own bytes; scratch numbers are `V0/C0` until a guarded tool reprodu
 (`OR-1`). Main tip read: `9fe9999d`, the tip immediately after the agenda-040 stack
 merged.
 
-The id was allocated as the next free number after `X-040`, which is the highest issued.
-`X-020` and `X-033` are absent by design and are not free: `X-020` was a temporary
-filename in commit `5e1263ff` that `X-017` superseded, and both gaps are recorded as
-gaps in [X-037](X-037-n11-overnight-review-and-route-slate.md).
-Exploration ids are stable and never reused, so the gaps stay open and this report is
-`X-041`.
+The id is the next number above `X-040`, the highest issued.
+The two gaps below it are not free numbers.
+`X-020` is a burned name: it was a temporary filename in commit `5e1263ff`, reverted
+with all its references when `X-017` was published as the final identity, and `X-025`
+already declined to reuse it on that ground.
+`X-033` is recorded as absent from `main` by
+[X-037](X-037-n11-overnight-review-and-route-slate.md), which lists both gaps under its
+finding on exploration-id hygiene and offers no history for this one.
+The schema is explicit that an exploration id is stable and never reused, so a gap stays
+a gap and this report is `X-041`.
 
 ## The Sharpest Claim Here Is Scratch
 
