@@ -19,7 +19,7 @@ extraction_note: >
 ---
 
 > ⚠️ **Contains reconstructed passages.**
-> This transcription contains **10** annotated passage(s) where the PDF extraction was
+> This transcription contains **9** annotated passage(s) where the PDF extraction was
 > damaged and text or mathematics was reconstructed or marked unrecoverable. Search this
 > file for `GARBLED` and `NOTE` to find them.
 > **Any formula near an annotation must be checked against `compound-perfect-squared-squares-1303.0599.raw.md`**, which is the
