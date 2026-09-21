@@ -1,0 +1,6 @@
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-219-n11-96-25-clip-covering.json: n = 11, L = 96/25 = 3.840000, 680 atoms, mass 10868617/1000000 = 10.868617, corner clip d = 1/2
+  ceiling 3.990800, certifies every n >= 11
+  interval accepted=True enclosure=(Fraction(2000013, 2000000), Fraction(2000013, 2000000)) boxes=1743736 stalled=0 (30s)
+  exact    accepted=True least=2000013/2000000 (11s)
+  RETAINABLE UNDER THE CORNER CLASS HYPOTHESIS (no square meets x + y <= 1/2 in any corner frame): both routes accept and agree at 2000013/2000000; sha256 5813d822d3f83eef98326de0c16e245466afbcb8c4988b039e81a4bcf3d7040d

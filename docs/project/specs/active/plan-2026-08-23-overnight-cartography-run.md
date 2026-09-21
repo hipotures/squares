@@ -341,10 +341,13 @@ on.
 It is not the next thing, because a reassessment of what to search is queued in front
 of it.
 
-For the next supervised exact-research goal, take BC-363 under `think-ni3v`: the
-corner-clip instrument and
-[H-222](../../../../packing/campaign/hypotheses/H-222-n11-octagon-class-at-96-25.md) at
-96/25 in Session 145 under `exp-219`, after Session 144 left
+For the next supervised exact-research goal, take BC-367 under `think-b7pr`: register
+the `exp-219` conditional exclusion of the octagon class after review, clip the
+remaining corner-bin classes at 96/25 under
+[H-222](../../../../packing/campaign/hypotheses/H-222-n11-octagon-class-at-96-25.md)
+with the admitted instrument, and give n=26 a second site set under
+[H-225](../../../../packing/campaign/hypotheses/H-225-n26-seeded-certificate-at-53-10.md),
+in Session 146; Session 145 confirmed H-222 at its scope, and Session 144 left
 [H-223](../../../../packing/campaign/hypotheses/H-223-n13-point-covering-at-399-100.md),
 [H-224](../../../../packing/campaign/hypotheses/H-224-n17-ceiling-family-at-23-5.md),
 and

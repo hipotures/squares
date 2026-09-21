@@ -90,6 +90,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from sqpack.fractional.certificate import Certificate
+from sqpack.fractional.corner_clip import CornerClip
 
 Floats = NDArray[np.float64]
 Ints = NDArray[np.int64]
@@ -428,6 +429,7 @@ class DirectionSearch:
         rotation: Rotation,
         outer_side: Interval,
         square_side: Interval,
+        clip: CornerClip | None = None,
     ) -> None:
         self.label = rotation.label
         self.mass = atoms.mass
@@ -464,6 +466,7 @@ class DirectionSearch:
         v_max = rotation.cosine * far - rotation.sine * h
         self.initial = np.array([[u_min.lo, u_max.hi, v_min.lo, v_max.hi]])
         _require_finite(self.initial)
+        self.clip_planes = _clip_planes(clip, rotation)
 
     def tighten(self, boxes: Floats) -> Floats:
         """Enclose the bounding box of each box's intersection with the domain.
@@ -493,16 +496,83 @@ class DirectionSearch:
         return np.stack([a, b, c, d], axis=1)
 
     def admissible(self, u: Floats, v: Floats) -> NDArray[np.bool_]:
-        """Points whose container coordinates provably lie in ``[h, L - h]^2``."""
+        """Points whose container coordinates provably lie in ``[h, L - h]^2``.
+
+        With a corner clip in force a point must also be *provably* outside all four
+        corner triangles before it may witness a refutation: the enclosure of
+        ``sigma . q`` has to clear ``d + reach - offset`` on its low side. A point that
+        rounding might have placed across the cut is not admissible, so a refutation
+        always exhibits a centre the class can really carry.
+        """
         cos, sin = self.cosine.arrays(), self.sine.arrays()
         xlo, xhi = _sub(*_mul(*cos, u, u), *_mul(*sin, v, v))
         ylo, yhi = _add(*_mul(*sin, u, u), *_mul(*cos, v, v))
-        return (
+        inside = (
             (xlo >= self.margin.hi)
             & (xhi <= self.far.lo)
             & (ylo >= self.margin.hi)
             & (yhi <= self.far.lo)
         )
+        for nu, nv, bound in self.clip_planes:
+            low = _down(_mul(*nu.arrays(), u, u)[0] + _mul(*nv.arrays(), v, v)[0])
+            _require_finite(low)
+            inside = inside & (low > bound.hi)
+        return inside
+
+    def clip_span(self, boxes: Floats) -> tuple[Floats, Floats] | None:
+        """Per box and per corner, an enclosure of the range of ``sigma . q`` over it.
+
+        Returns ``(low, high)`` with one column per clip plane: ``low`` is below the
+        true minimum over the box and ``high`` above the true maximum, both with
+        directed rounding, so every comparison made against them is conservative in the
+        direction the caller needs.
+        """
+        if not self.clip_planes:
+            return None
+        a, b, c, d = (boxes[:, i] for i in range(4))
+        lows: list[Floats] = []
+        highs: list[Floats] = []
+        for nu, nv, bound in self.clip_planes:
+            ulo, uhi = _mul(*nu.arrays(), a, b)
+            vlo, vhi = _mul(*nv.arrays(), c, d)
+            low, high = _add(ulo, uhi, vlo, vhi)
+            # One subtraction each, so stepping a single ulp outward keeps both sides
+            # rigorous: ``lows`` stays below the true slack and ``highs`` above it.
+            lows.append(_down(low - bound.hi))
+            highs.append(_up(high - bound.lo))
+        return np.stack(lows, axis=1), np.stack(highs, axis=1)
+
+    def clip_excluded(self, boxes: Floats) -> NDArray[np.bool_]:
+        """Boxes every point of which provably meets one corner triangle.
+
+        Soundness. A box is dropped only when, for one corner, an *upper* bound on
+        ``max_box (sigma . q)`` is at or below a *lower* bound on ``d + reach - offset``.
+        Then every centre in the box carries a core that meets that closed triangle, so
+        no packing of the free class realises any of them and the box holds no
+        placement the class has to cover. A box that merely *may* meet a triangle is
+        kept and searched in full: it is then certified against a stricter requirement
+        than the class imposes, which is sound and costs only boxes. The asymmetry is
+        deliberate -- dropping is the only operation here that can lose a constraint,
+        so it is the only one that demands certainty.
+        """
+        span = self.clip_span(boxes)
+        if span is None:
+            return np.zeros(len(boxes), dtype=bool)
+        _, high = span
+        return (high <= 0).any(axis=1)
+
+    def clip_crossing(self, boxes: Floats) -> NDArray[np.bool_]:
+        """Boxes a cut line may pass through, which are worth splitting on their own.
+
+        Without this a box straddling a cut with no atom-region edge inside it cannot
+        be split, stalls at the resolution floor and leaves the direction undecided.
+        Splitting it is free of soundness consequences: both children cover the parent.
+        """
+        span = self.clip_span(boxes)
+        if span is None:
+            return np.zeros(len(boxes), dtype=bool)
+        low, high = span
+        return ((low < 0) & (high > 0)).any(axis=1)
 
     def lower_bound(self, boxes: Floats) -> Ints:
         """Mass of the atoms whose inner region contains the whole box."""
@@ -540,8 +610,9 @@ class DirectionSearch:
         v_edges = (((c < vlo) & (vlo < d)) | ((c < vhi) & (vhi < d))).sum(axis=1)
         width_u = boxes[:, 1] - boxes[:, 0]
         width_v = boxes[:, 3] - boxes[:, 2]
-        can_u = (width_u > RESOLUTION_FLOOR) & (u_edges > 0)
-        can_v = (width_v > RESOLUTION_FLOOR) & (v_edges > 0)
+        crossed = self.clip_crossing(boxes)
+        can_u = (width_u > RESOLUTION_FLOOR) & ((u_edges > 0) | crossed)
+        can_v = (width_v > RESOLUTION_FLOOR) & ((v_edges > 0) | crossed)
         prefer_u = (u_edges > v_edges) | ((u_edges == v_edges) & (width_u >= width_v))
         along_u = can_u & (prefer_u | ~can_v)
         along_v = can_v & ~along_u
@@ -591,6 +662,8 @@ class DirectionSearch:
             tight = self.tighten(batch)
             _require_finite(tight)
             tight = tight[(tight[:, 0] <= tight[:, 1]) & (tight[:, 2] <= tight[:, 3])]
+            if self.clip_planes and len(tight):
+                tight = tight[~self.clip_excluded(tight)]
             boxes += len(tight)
             if not len(tight):
                 continue
@@ -750,12 +823,58 @@ def _condition_containment(certificate: Certificate) -> IntervalCondition:
     )
 
 
-def searches(certificate: Certificate, atoms: AtomData) -> Iterator[DirectionSearch]:
+def _clip_planes(
+    clip: CornerClip | None, rotation: Rotation
+) -> tuple[tuple[Interval, Interval, Interval], ...]:
+    """The four kept half-planes in the rotated frame, as interval enclosures.
+
+    ``reach`` is ``B max(|cos|, |sin|)``. This builds ``[max(lo), max(hi)]``, which
+    encloses ``max(cos, sin)`` -- the unsigned maximum, and the same number only while
+    both components are non-negative. They are: `doubled_net` yields the net's own arc
+    ``[0, pi/4]`` and its reflection in the diagonal, so every rotation here lies in
+    ``[0, pi/2]``. The guard below is what makes that true by construction rather than
+    by reading the caller, since a rotation with a negative component would otherwise
+    get an enclosure that is not one.
+    """
+    if clip is None:
+        return ()
+    cosine, sine = rotation.cosine, rotation.sine
+    if cosine.lo < 0 or sine.lo < 0:
+        raise ValueError(
+            "the corner clip's folded reach is enclosed as max(cos, sin), which is "
+            f"max(|cos|, |sin|) only on [0, pi/2]; rotation {rotation.label} encloses "
+            f"cos in [{cosine.lo}, {cosine.hi}] and sin in [{sine.lo}, {sine.hi}]"
+        )
+    reach = Interval.of(clip.square_side) * Interval(
+        max(cosine.lo, sine.lo), max(cosine.hi, sine.hi)
+    )
+    side = Interval.of(clip.outer_side)
+    depth = Interval.of(clip.depth)
+    planes: list[tuple[Interval, Interval, Interval]] = []
+    for sign_x, sign_y in ((1, 1), (-1, 1), (1, -1), (-1, -1)):
+        x_axis = cosine if sign_x > 0 else Interval(-cosine.hi, -cosine.lo)
+        y_axis = sine if sign_y > 0 else Interval(-sine.hi, -sine.lo)
+        nu = x_axis + y_axis
+        # ``sigma_y cos - sigma_x sin`` is the v-coefficient; build it by the same
+        # signing so no branch has to re-derive the sign of a difference.
+        v_cos = cosine if sign_y > 0 else Interval(-cosine.hi, -cosine.lo)
+        v_sin = sine if sign_x > 0 else Interval(-sine.hi, -sine.lo)
+        nv = v_cos - v_sin
+        bound = depth + reach
+        for _ in range((sign_x < 0) + (sign_y < 0)):
+            bound = bound - side
+        planes.append((nu, nv, bound))
+    return tuple(planes)
+
+
+def searches(
+    certificate: Certificate, atoms: AtomData, *, clip: CornerClip | None = None
+) -> Iterator[DirectionSearch]:
     outer = Interval.of(certificate.outer_side)
     square = Interval.of(certificate.square_side)
     for rotation in doubled_net(certificate.half_tangents):
         with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
-            search = DirectionSearch(atoms, rotation, outer, square)
+            search = DirectionSearch(atoms, rotation, outer, square, clip)
         yield search
 
 
@@ -765,11 +884,16 @@ def verify_by_intervals(
     enclose: bool = False,
     directions: tuple[str, ...] | None = None,
     stall_log: dict[str, list[list[float]]] | None = None,
+    clip: CornerClip | None = None,
 ) -> IntervalVerdict:
     """Decide the certificate; ``enclose`` also pins the least covered mass.
 
     ``directions`` restricts ``Condition 5`` to the named labels of the doubled net (a
     sub-net decides a weaker statement and is for controls, not for claims).
+    ``clip`` restricts the admissible centres to lane-a Theorem B's free-corner domain;
+    the verdict is then about that class of packings. See ``DirectionSearch.
+    clip_excluded`` for why the restriction is applied by exclusion rather than by
+    tightening, and why that is the sound direction.
     ``stall_log``, when given, is filled with the stalled boxes of each searched
     direction as ``[u_lo, u_hi, v_lo, v_hi]`` rows. Collecting them does not
     change the verdict.
@@ -785,7 +909,7 @@ def verify_by_intervals(
         _condition_containment(certificate),
     ]
     outcomes: list[DirectionOutcome] = []
-    for search in searches(certificate, atoms):
+    for search in searches(certificate, atoms, clip=clip):
         if directions is not None and search.label not in directions:
             continue
         with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
@@ -807,6 +931,11 @@ def verify_by_intervals(
     # thing in both modes. Without this an enclosed run accepted the retained
     # atoms with one lightened by 1/10000, reporting the true 99993/100000 as a
     # width-zero enclosure and calling it a pass (D-435).
+    #
+    # The ``o.lower is not None`` half is load-bearing a second time, for the corner
+    # clip: a direction whose clipped domain is empty leaves ``lower`` unset, and this
+    # is what turns that into a refusal rather than a vacuous pass on an empty class.
+    # Incidental to D-435 but relied on, so do not reduce it to a mass comparison.
     reaches_one = all(o.lower is not None and o.lower >= atoms.scale for o in outcomes)
     if "refuted" in statuses:
         status: Status = "fails"

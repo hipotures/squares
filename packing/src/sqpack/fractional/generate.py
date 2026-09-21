@@ -28,7 +28,9 @@ import numpy as np
 from scipy.optimize import linprog
 
 from sqpack.fractional.certificate import Certificate
+from sqpack.fractional.corner_clip import CornerClip
 from sqpack.fractional.model import Atom, Direction, rotation_from_half_tangent
+from sqpack.fractional.sweep import centre_domain
 
 
 @dataclass(frozen=True, slots=True)
@@ -115,6 +117,14 @@ class _CentreDomain:
     The net's arc is [0, pi/4], so ``cosine >= sine >= 0`` throughout and the
     corner of least ``v`` is the image of ``(high, low)``, that of greatest
     ``v`` the image of ``(low, high)``.
+
+    ``clip_lines`` carries lane-a Theorem B's free-corner cut, as kept half-planes
+    ``n_u u + n_v v >= offset``. Adding them keeps ``_floor`` a maximum of affine
+    functions and ``_ceiling`` a minimum of them, which is the only property
+    `v_range` relies on; the extremes it needs instead of a closed form come from the
+    *exact* clipped polygon, so a corner of the octagon is a vertex and not a solve.
+    This layer is the search, and an over- or under-included cell here costs a
+    redundant row or a missing one, never soundness -- the two gate routes decide.
     """
 
     cosine: float
@@ -127,16 +137,51 @@ class _CentreDomain:
     v_high: float
     u_bottom: float
     u_top: float
+    clip_lines: tuple[tuple[float, float, float], ...] = ()
 
     @classmethod
-    def at(cls, direction: Direction, outer_side: float, square_side: float) -> _CentreDomain:
+    def at(
+        cls,
+        direction: Direction,
+        outer_side: float,
+        square_side: float,
+        clip: CornerClip | None = None,
+    ) -> _CentreDomain:
         cosine, sine = float(direction.ux), float(direction.uy)
         extent = square_side * (cosine + sine) / 2
         low, high = extent, outer_side - extent
-        corner_x = np.array([low, high, high, low])
-        corner_y = np.array([low, low, high, high])
-        corner_u = corner_x * cosine + corner_y * sine
-        corner_v = -corner_x * sine + corner_y * cosine
+        if clip is None:
+            corner_x = np.array([low, high, high, low])
+            corner_y = np.array([low, low, high, high])
+            corner_u = corner_x * cosine + corner_y * sine
+            corner_v = -corner_x * sine + corner_y * cosine
+            return cls(
+                cosine,
+                sine,
+                low,
+                high,
+                float(corner_u.min()),
+                float(corner_u.max()),
+                float(corner_v.min()),
+                float(corner_v.max()),
+                float(corner_u[1]),
+                float(corner_u[3]),
+            )
+        # The polygon comes from the clip's own exact sides while ``low`` and ``high``
+        # -- which ``_floor``, ``_ceiling`` and ``u_chord`` read -- come from the float
+        # arguments. If the two disagreed, the domain's polygon and its affine bounds
+        # would describe different containers; every caller passes matching values, and
+        # this is what says so.
+        if float(clip.outer_side) != outer_side or float(clip.square_side) != square_side:
+            raise ValueError(
+                "the clip's sides must match the domain's: clip has "
+                f"({clip.outer_side}, {clip.square_side}) = "
+                f"({float(clip.outer_side)}, {float(clip.square_side)}), "
+                f"the domain was given ({outer_side}, {square_side})"
+            )
+        polygon = centre_domain(clip.outer_side, clip.square_side, direction, clip=clip)
+        corner_u = np.array([float(u) for u, _ in polygon])
+        corner_v = np.array([float(v) for _, v in polygon])
         return cls(
             cosine,
             sine,
@@ -146,8 +191,12 @@ class _CentreDomain:
             float(corner_u.max()),
             float(corner_v.min()),
             float(corner_v.max()),
-            float(corner_u[1]),
-            float(corner_u[3]),
+            float(corner_u[int(corner_v.argmin())]),
+            float(corner_u[int(corner_v.argmax())]),
+            tuple(
+                (float(nu), float(nv), float(offset))
+                for nu, nv, offset in clip.half_planes(direction.ux, direction.uy)
+            ),
         )
 
     def _floor(self, u: np.ndarray) -> np.ndarray:
@@ -156,12 +205,18 @@ class _CentreDomain:
         v = (self.low - u * self.sine) / self.cosine
         if self.sine > 0:
             v = np.maximum(v, (u * self.cosine - self.high) / self.sine)
+        for nu, nv, offset in self.clip_lines:
+            if nv > 0:
+                v = np.maximum(v, (offset - nu * u) / nv)
         return v
 
     def _ceiling(self, u: np.ndarray) -> np.ndarray:
         v = (self.high - u * self.sine) / self.cosine
         if self.sine > 0:
             v = np.minimum(v, (u * self.cosine - self.low) / self.sine)
+        for nu, nv, offset in self.clip_lines:
+            if nv < 0:
+                v = np.minimum(v, (offset - nu * u) / nv)
         return v
 
     def v_range(self, u0: np.ndarray, u1: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
@@ -188,6 +243,11 @@ class _CentreDomain:
         if self.sine > 0:
             lo = max(lo, (self.low - v * self.cosine) / self.sine)
             hi = min(hi, (self.high - v * self.cosine) / self.sine)
+        for nu, nv, offset in self.clip_lines:
+            if nu > 0:
+                lo = max(lo, (offset - nv * v) / nu)
+            elif nu < 0:
+                hi = min(hi, (offset - nv * v) / nu)
         return lo, hi
 
 
@@ -220,6 +280,8 @@ def event_grid(
     direction: Direction,
     outer_side: float,
     square_side: float,
+    *,
+    clip: CornerClip | None = None,
 ) -> EventGrid:
     """Project the sites, accumulate the cell masses, and mark the reachable cells.
 
@@ -240,7 +302,7 @@ def event_grid(
     half = square_side / 2
     u = points[:, 0] * cosine + points[:, 1] * sine
     v = -points[:, 0] * sine + points[:, 1] * cosine
-    domain = _CentreDomain.at(direction, outer_side, square_side)
+    domain = _CentreDomain.at(direction, outer_side, square_side, clip)
 
     live = weights > 0
     if not live.any():
@@ -294,6 +356,7 @@ def placement_cells(
     square_side: float,
     *,
     keep: int,
+    clip: CornerClip | None = None,
 ) -> list[tuple[float, float, float, np.ndarray]]:
     """Least-mass placements at one direction: ``(mass, u, v, covering mask)``.
 
@@ -306,7 +369,7 @@ def placement_cells(
     """
 
     half = square_side / 2
-    cells = event_grid(points, weights, direction, outer_side, square_side)
+    cells = event_grid(points, weights, direction, outer_side, square_side, clip=clip)
     u, v = cells.u, cells.v
     u_events, v_events = cells.u_events, cells.v_events
     lows, highs, domain = cells.lows, cells.highs, cells.domain

@@ -53,6 +53,7 @@ from itertools import pairwise
 from multiprocessing.context import BaseContext
 from pathlib import Path
 
+from sqpack.fractional.corner_clip import CornerClip, EmptyClippedDomainError
 from sqpack.fractional.model import (
     Atom,
     Direction,
@@ -357,12 +358,26 @@ def closed_form_conditions(certificate: Certificate) -> tuple[ConditionReport, .
 
 
 def sweep_direction_minimum(
-    certificate: Certificate, direction: Direction
+    certificate: Certificate,
+    direction: Direction,
+    *,
+    clip: CornerClip | None = None,
 ) -> tuple[Fraction, tuple[Fraction, Fraction]]:
-    """The least mass any reachable ``B``-square placement covers, exactly."""
+    """The least mass any reachable ``B``-square placement covers, exactly.
+
+    ``clip`` restricts the reachable placements to the free-corner domain of lane-a
+    Theorem B, which decides a statement about a *class* of packings rather than the
+    unconditional theorem. It is threaded, never stored on the certificate: the record
+    on disk declares the hypothesis and the caller passes it, so no object can carry a
+    clip a reader of the file cannot see.
+    """
 
     return minimum_covered_mass(
-        certificate.atoms, direction, certificate.outer_side, certificate.square_side
+        certificate.atoms,
+        direction,
+        certificate.outer_side,
+        certificate.square_side,
+        clip=clip,
     )
 
 
@@ -432,12 +447,17 @@ def _pool_context() -> BaseContext | None:
     return None
 
 
-def _direction_minimum(certificate: Certificate, direction: Direction) -> tuple[Fraction, str]:
-    return sweep_direction_minimum(certificate, direction)[0], direction.label
+def _direction_minimum(
+    certificate: Certificate, clip: CornerClip | None, direction: Direction
+) -> tuple[Fraction, str]:
+    return sweep_direction_minimum(certificate, direction, clip=clip)[0], direction.label
 
 
 def sweep_all_directions(
-    certificate: Certificate, *, workers: int | None = None
+    certificate: Certificate,
+    *,
+    workers: int | None = None,
+    clip: CornerClip | None = None,
 ) -> tuple[tuple[Fraction, str], ...]:
     """The least covered mass at every net direction, in net order.
 
@@ -459,21 +479,42 @@ def sweep_all_directions(
     small = workers is None and len(certificate.atoms) < _PARALLEL_ATOMS
     context = _pool_context() if count > 1 else None
     if count == 1 or len(directions) < 2 or small or context is None:
-        return tuple(_direction_minimum(certificate, d) for d in directions)
+        return tuple(_direction_minimum(certificate, clip, d) for d in directions)
     with ProcessPoolExecutor(max_workers=count, mp_context=context) as pool:
-        return tuple(pool.map(partial(_direction_minimum, certificate), directions))
+        return tuple(pool.map(partial(_direction_minimum, certificate, clip), directions))
 
 
-def verify(certificate: Certificate, *, workers: int | None = None) -> Verdict:
+def verify(
+    certificate: Certificate,
+    *,
+    workers: int | None = None,
+    clip: CornerClip | None = None,
+) -> Verdict:
     """Decide all four conditions.
 
     Exact, and never short-circuits Condition 2 to Condition 4.
+
+    With ``clip``, Condition 5 quantifies over the free-corner domain only, and the
+    verdict is about the corresponding class of packings rather than about every
+    packing. A clip that empties the domain at some direction is a *failure*, not a
+    vacuous pass: the class would be empty and the run would be deciding nothing.
     """
 
     conditions = list(closed_form_conditions(certificate))
     worst: Fraction | None = None
     worst_label: str | None = None
-    for minimum, label in sweep_all_directions(certificate, workers=workers):
+    try:
+        minima = sweep_all_directions(certificate, workers=workers, clip=clip)
+    except EmptyClippedDomainError as error:
+        conditions.append(
+            ConditionReport(
+                "Condition 5 every reachable cell carries mass 1",
+                f"the corner clip admits no placement: {error}",
+                holds=False,
+            )
+        )
+        return Verdict(tuple(conditions), certificate.total_mass, None, None)
+    for minimum, label in minima:
         if worst is None or minimum < worst:
             worst, worst_label = minimum, label
     conditions.append(

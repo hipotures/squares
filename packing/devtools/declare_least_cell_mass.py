@@ -24,7 +24,28 @@ from fractions import Fraction
 from pathlib import Path
 
 from sqpack.fractional.certificate import Certificate, verify
+from sqpack.fractional.corner_clip import CornerClip, clip_from_optional
 from sqpack.fractional.model import Atom
+
+
+def corner_clip_of(record: dict[str, object], certificate: Certificate) -> CornerClip | None:
+    """The clip the record declares, if any.
+
+    There is no flag for this. The record is the declaration: a candidate frozen under
+    lane-a Theorem B's free-corner hypothesis carries ``variant: class`` and
+    ``corner_clip``, and the number declared here has to be the one the gate will then
+    recompute from the same bytes under the same domain. A flag would let the two
+    disagree silently.
+    """
+
+    declared = record.get("corner_clip")
+    if declared is None:
+        return None
+    if record.get("variant") != "class":
+        raise ValueError("a record declaring corner_clip must declare variant: class")
+    return clip_from_optional(
+        Fraction(str(declared)), certificate.outer_side, certificate.square_side
+    )
 
 
 def load_candidate(path: Path) -> tuple[Certificate, dict[str, object]]:
@@ -57,10 +78,17 @@ def declare(path: Path, *, overwrite: bool = False) -> tuple[bool, str]:
     certificate, record = load_candidate(path)
     if record.get("least_cell_mass") is not None and not overwrite:
         return False, f"{path} already declares least_cell_mass {record['least_cell_mass']}"
-    verdict = verify(certificate, workers=1)
+    clip = corner_clip_of(record, certificate)
+    # A record without the declaration is swept by the call this tool always made.
+    verdict = (
+        verify(certificate, workers=1)
+        if clip is None
+        else verify(certificate, workers=1, clip=clip)
+    )
+    domain = "" if clip is None else f" under the corner clip d = {clip.depth}"
     detail = (
-        f"one-worker sweep: accepted={verdict.accepted} failures={verdict.failures} "
-        f"least cell mass {verdict.minimum_cell_mass}"
+        f"one-worker sweep{domain}: accepted={verdict.accepted} "
+        f"failures={verdict.failures} least cell mass {verdict.minimum_cell_mass}"
     )
     if not verdict.accepted or verdict.minimum_cell_mass is None:
         return False, detail
