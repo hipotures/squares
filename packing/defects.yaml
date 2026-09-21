@@ -11,7 +11,7 @@ softschema:
   schema: defects.schema.yaml
   envelope: null
   status: enforced
-count: 506
+count: 507
 defects:
 - id: D-001
   title: Fixed-side search never left the grid basin
@@ -16751,3 +16751,44 @@ defects:
     seven.
   regression: none
   recorded_in: packing/campaign/explorations/X-040-lower-bound-mechanisms-beyond-the-one-body-ceiling.md
+- id: D-507
+  title: Bentz 2016 transcription dropped the factor 2 from Theorem 9's budget line
+  date: '2026-09-20'
+  layer: docs
+  class: soundness
+  direction: conservative
+  detected_by: review
+  severity: high
+  status: fixed
+  bead: think-srln
+  what: >-
+    The cleaned transcription printed Theorem 9's vertical budget as sqrt(2) minus one
+    half, plus 2 times 0.8, plus 3 times one half sqrt(3), exceeding 6. Rendered PDF page
+    5 prints that same left side with a leading factor 2 on the first term, which is the
+    two wall gaps of a six-row configuration. The transcribed left side is about 5.1123;
+    the printed one is about 6.0265.
+  consequence: >-
+    Without the factor the inequality is false, since about 5.1123 does not exceed 6, so
+    the sentence it supports establishes nothing -- and that sentence is what bounds
+    every interior gap of the minimising configurations by 0.8. That bound is in turn
+    what allows a six-point row to shift 0.1 sideways, the move the rest of Theorem 9
+    runs on and the move the n=32 one-spare model inherits. A reader checking the line
+    finds an arithmetic error where the source has none, and cannot see how little slack
+    the argument leaves: about 0.0265 over the side 6.
+  fix: >-
+    Restored the leading factor 2, read off the archived PDF, and added an annotation
+    giving the transcribed and the printed value, the seven gaps the sum counts -- two to
+    the walls, two at 0.8 and three at one half sqrt(3) -- and the conclusion the
+    inequality feeds. A second annotation of the same date records a slip of the source
+    rather than of the transcription, at the end point of Theorem 11's case 2, where the
+    PDF prints 0.5 and sqrt(2) minus one half while Figure 3 has 0.5 and 0.9; that text
+    is left as printed, and the replay shows the step holds either way, the midpoint
+    region lying within 0.49733 of its target at 0.9 and within 0.48444 at the printed
+    point, both under one half. The archive annotation census for this file rises from
+    seven to nine.
+  regression: >-
+    None over the transcribed text itself. The constant is computed rather than quoted by
+    devtools.bentz2016.m6_model, which prints the printed budget and the transcribed left
+    side beside it on every n=32 run, and the case-2 point is row 24 of
+    devtools.bentz2016.replay_theorem11, evaluated at both values.
+  recorded_in: packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/bentz2016-one-spare-receipt.md

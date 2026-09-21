@@ -27,7 +27,7 @@ hypothesis:
       charges on every wall line with no forced partial-box point.
     threshold: 6
   instrument: The H-226 enumeration tool at m = 6; not yet built
-  instrument_ready: false
+  instrument_ready: true
   regime: >-
     Boxes of side above 1 in [0, 6]^2; Bentz 2016 Figure 2 configurations; wall lines
     at sqrt(2) - 1/2; exact arithmetic
@@ -40,7 +40,7 @@ hypothesis:
   notes: >-
     Review R3 classified 32 as the (1, 1) case, the same shape as the proved 22 in
     one colour, and dropped n=45 and n=44 because the m = 7 height budget 6.8925 < 7
-    blocks Bentz's 0.1 slide. The register lists n=32 as open.
+    blocks Bentz's 0.1 slide. The register lists n=32 as open. 2026-09-20 Session 144 exp-217: the m=6 vertical budget 0.0265 lets any frozen row above a six-point row kill its shift; 11,699 of 12,100 raw pairs are kills and the n=33 control is forced. Rejected as stated by the Fable review; s(32) = 6 untouched.
 ---
 # H-227: The One-Spare Wall-Charge Lemma at n=32
 

@@ -38,7 +38,7 @@ hypothesis:
     A new exact enumeration tool under packing/devtools with the Theorem 11 chord
     replay as its control; cases/bentz13 style exact escape checks for any structure
     that needs a geometric argument
-  instrument_ready: false
+  instrument_ready: true
   regime: >-
     Boxes of side above 1 in [0, 5]^2; red set {0.5..4.5 step 1} x {0.9, 1.7, 2.5,
     3.3, 4.1} and blue set on the interleaved half-integers per Bentz 2016 Figure 3;
@@ -58,7 +58,7 @@ hypothesis:
     count: doubly-covered boxes fix two points, so up to six stationary points and
     about 38 red by 1,200 blue exceptional structures modulo D2 must be handled, and
     a red double merges two of the five boxes. The register lists n=21 as open with
-    verified floor 97/20 (T-021).
+    verified floor 97/20 (T-021). 2026-09-20 Session 144 exp-216: Theorem 11 replays exactly at the printed constants (24 rows); the inventory tool devtools.bentz2016.one_spare_inventory enumerates 42,124 D2 orbits at n=21, and after the reviewer's merge propagation 3,461 are kills (at most four charges on every vertical wall line, no confined partial box) and 22,603 need the claim Q(i, j). Rejected as stated by the Fable review; s(21) = 5 untouched.
 ---
 # H-226: The One-Spare Wall-Charge Lemma at n=21
 

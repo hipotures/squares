@@ -158,6 +158,7 @@ Each entry summarizes one user-level research window. Cycle slots are wall-clock
 | [session-141](agent-sessions/session-141-n100-research.md) | stopped | contemporaneous | `review-planning-oversight` (process) | `review-planning-oversight` (process) | 3 | think-ul7y | Continue H-216 under think-qqzs. |
 | [session-142](agent-sessions/session-142-stack-correctness.md) | completed | contemporaneous | `pipeline-improvement` (correctness) | `factual-review` (correctness) | 2 | think-gz4k | Return to H-216 under think-qqzs. |
 | [session-143](agent-sessions/session-143-lower-bound-math-review.md) | completed | contemporaneous | `insight-iteration` (insight) | `review-planning-oversight` (insight) | 2 | think-srln | Session 144 under think-pogj decides exp-213 to exp-215 for BC-361, with the Bentz 2016 replay lane beside it. |
+| [session-144](agent-sessions/session-144-overnight-chunk-1.md) | completed | contemporaneous | `research-loop` (insight) | `research-loop` (insight) | 1 | think-pogj | Session 145 under think-ni3v runs BC-363 on the next stacked branch; the handoff names the remaining agenda-040 items. |
 
 ### Workflow summary
 
@@ -170,7 +171,7 @@ Declared counts are contemporaneous contracts; retrospective counts are reconstr
 | `insight-iteration` | 25 | 1 | 81 | 4 |
 | `process-review` | 16 | 4 | 64 | 6 |
 | `efficiency-loop` | 10 | 1 | 36 | 1 |
-| `research-loop` | 27 | 4 | 101 | 8 |
+| `research-loop` | 28 | 4 | 102 | 8 |
 | `pipeline-improvement` | 34 | 2 | 152 | 5 |
 | `documentation-pass` | 1 | 0 | 24 | 1 |
 | `remediation` | 0 | 1 | 0 | 3 |
@@ -797,7 +798,7 @@ Status: **active**. Run the hypotheses X-040 adapted from the Session 143 review
 
 | id | status | title | rounds | opened because |
 | --- | --- | --- | --- | --- |
-| series-000 | open | S0: smoke and calibration — prove the machinery, establish every baseline metric | 147 | First series. There is no prior instrument, so not |
+| series-000 | open | S0: smoke and calibration — prove the machinery, establish every baseline metric | 153 | First series. There is no prior instrument, so not |
 
 ## Registry
 
@@ -963,11 +964,11 @@ Status: **active**. Run the hypotheses X-040 adapted from the Session 143 review
 | H-220 | unresolved | proof | A rows-complete covering of mass strictly below n exists at a containe | n: 32* 31* 30* 26* 27* 29* 45* 44* | 8 |  | 164.1m wall |
 | H-221 | confirmed | proof | A rows-complete covering of mass strictly below 18 exists at a contain | n: 18* | 1 |  | 8.2m wall |
 | H-222 | blocked | proof | At n=11, side 96/25, B = 9977/10000 on the 181-direction net, the rest |  | 0 |  |  |
-| H-223 | open | proof | A point-atom certificate exists for n=13 at container side 399/100 wit |  | 0 |  |  |
-| H-224 | open | proof | At n=17, side 23/5, B = 9977/10000 on the 181-direction net, an exact  |  | 0 |  |  |
-| H-225 | open | proof | A point-atom certificate exists for n=26 at container side 53/10 with  | side: 53/10 107/20 27/5 | 0 |  |  |
-| H-226 | blocked | proof | In every packing of 21 boxes (open squares of side above 1) in [0, 5]^ |  | 0 |  |  |
-| H-227 | blocked | proof | In every packing of 32 boxes in [0, 6]^2, some wall-parallel line at d |  | 0 |  |  |
+| H-223 | unresolved | proof | A point-atom certificate exists for n=13 at container side 399/100 wit |  | 1 |  | 1.3m wall |
+| H-224 | unresolved | proof | At n=17, side 23/5, B = 9977/10000 on the 181-direction net, an exact  |  | 2 |  | 53.7m wall |
+| H-225 | unresolved | proof | A point-atom certificate exists for n=26 at container side 53/10 with  | side: 53/10 107/20 27/5 | 1 |  | 62.6m wall |
+| H-226 | refuted | proof | In every packing of 21 boxes (open squares of side above 1) in [0, 5]^ |  | 1 |  | 39s wall |
+| H-227 | refuted | proof | In every packing of 32 boxes in [0, 6]^2, some wall-parallel line at d |  | 1 |  | 16s wall |
 | H-228 | blocked | proof | A weighted measure on [0, 4]^2 of total mass strictly below 12 puts ma |  | 0 |  |  |
 | H-229 | blocked | proof | At n=11, side 96/25, B = 9977/10000, in the anchor case whose centre b |  | 0 |  |  |
 | H-230 | blocked | proof | There is a proved wall-wedge conflict lemma for a tilted unit square a |  | 0 |  |  |
@@ -981,7 +982,7 @@ Status: **active**. Run the hypotheses X-040 adapted from the Session 143 review
 
 ## Rounds
 
-### rejected (34)
+### rejected (36)
 
 | id | series | instance | operator | hypotheses | reason |
 | --- | --- | --- | --- | --- | --- |
@@ -1019,6 +1020,8 @@ Status: **active**. Run the hypotheses X-040 adapted from the Session 143 review
 | exp-205 | series-000 | 11 | claude-opus-5 | H-204 | The criterion was measured and missed -- three cells of eleven against the six declared -- but a parameter that costs nothing to carry recovers three quarters of what the new move family recovers, which contradicts the design input hard enough that the schedule axis has to be swept properly before any further move is built. |
 | exp-211 | series-000 | 17 | Codex with delegated measurement agents | H-213 | Every solver-transition group at the frozen commit misses at least one required 60 Hz budget; the instrument is ready, but physical tuning remains open. |
 | exp-212 | series-000 | 17 | Codex with delegated measurement agents | H-214 | Both predicted orders reverse in at least one transition: rigid exceeds soft penetration in Physics at n = 90, and sticky has fewer mean contacts than balanced at n = 90 in both solvers; continuity guards also fail at the frozen commit. |
+| exp-216 | series-000 | 21 | Claude session-144 (Fable lane, Opus port, Fable review) | H-226 | The registered proof strategy cannot close n=21: 3,461 D2-orbits of exceptional structures (for example red (1, 9/10) uncovered with blue (1/2, 9/10) and (9/2, 9/10) uncovered) leave at most four charging boxes on each vertical wall line with no confined partial box, and the paper's toolkit has no further move or contradiction to apply; s(21) = 5 itself is untouched, and the 22,603 needs-geometry orbits name the claim Q(i, j) a stronger lemma would need. |
+| exp-217 | series-000 | 32 | Claude session-144 (Fable lane, Opus port, Fable review) | H-227 | With the m=6 vertical budget 2(sqrt 2 - 1/2) + 1.6 + 3 sqrt 3 / 2 - 6 = 0.0265, any frozen row above a six-point row kills that row's shift and end-point move, so every structure whose red spare lies outside red row 1 or blue spare outside blue row 6 leaves at most five charges on every wall line and no shorter slide recovers a sixth; s(32) = 6 itself is untouched. |
 
 ### abandoned (3)
 
@@ -1028,7 +1031,7 @@ Status: **active**. Run the hypotheses X-040 adapted from the Session 143 review
 | exp-070 | series-000 | 11 | Codex /root/fractional_t2_manager at max reasoning, BC-232, think-gmdy | H-064 | The one authorized leg improved the exact lower endpoint but expired before reaching eleven; the bracket is still open and the frozen four-CPU-hour routing rule forbids a continuation decision from this 105-minute partial budget alone. |
 | exp-162 | series-000 | 20 | Cursor session-140 | H-218 | The Session-140 research wall expired with no RETAINABLE freeze on the H-218 sweep. Closest masses were leftover n=20 971/200 at 19.910044 unconverged and leftover n=12 3969/1000 at 12.091168 after crossing 12. T-028 at n=18 does not confirm H-218. The unfinished float LPs remain unresolved; their objectives do not refute their site sets. |
 
-### unresolved (46)
+### unresolved (50)
 
 | id | series | instance | operator | hypotheses | reason |
 | --- | --- | --- | --- | --- | --- |
@@ -1078,6 +1081,10 @@ Status: **active**. Run the hypotheses X-040 adapted from the Session 143 review
 | exp-208 | series-000 | 11 | claude-opus-5, unattended | H-212 | At levels 0, 2 and 4 no repaired run in 3,000 beat the grid at n = 5, 10 or 11, and at levels 6, 8 and 10 the best run did in eight of nine cells, the ninth within 5,000 seeds, but each value is one prefix from one seed stream and the page's own level 3 was not measured on repaired runs. |
 | exp-209 | series-000 | 11 | claude-opus-5, unattended | H-212 | The compaction program, its inputs and its outputs were not kept, so the observation cannot be reproduced and supports no conclusion about whether repaired arrangements are locally compact. |
 | exp-210 | series-000 | 11 | claude-opus-5, unattended | H-212 | Every blind run observed ended overlapping, but the snapped control was measured once with a probe variant that was not kept, and neither the trials nor their final poses are in the repository, so the observation cannot be re-checked from it. |
+| exp-213 | series-000 | 17 | Claude session-144 Opus runner | H-224 | The restricted optimum on this site set sat above 17 at round 0, which refutes point certificates on this site set only, and the priced dual was never frozen because the container restarted mid-run, so no ceiling family exists to read; H-224 is undecided in both directions. Resume needs a new experiment id with a support cap, since keeping every dual row spent 1583 s on round 0 alone. |
+| exp-214 | series-000 | 13 | Claude session-144 Opus runner | H-223 | The converged restricted optimum 15.5656 refutes this site set only, and the accepted depth-one family has total 85/8, below 13, so H-223 is neither confirmed nor killed at this scope. |
+| exp-215 | series-000 | 26 | Claude session-144 Opus runner | H-225 | The loop hit its deadline with rows still violated at the exact-integer plateau 25.000000 that Session 141 also saw at n=26; an unfinished loop decides nothing and this site set is not even refuted. |
+| exp-218 | series-000 | 17 | Claude session-144 Opus runner | H-224 | The converged restricted optimum 17.0423 refutes point certificates on this site set only, and the accepted depth-one family has total just below 14, not 17, so H-224 is neither confirmed nor killed at this scope; the fixed-shrink point route at n=17 is bounded below by 14 for every site set at 23/5 and above by this site set's 17.04. |
 
 ### blocked (11)
 
@@ -1198,10 +1205,11 @@ Status: **active**. Run the hypotheses X-040 adapted from the Session 143 review
 | exp-208 | H-212 | 1 round unrecorded | dependency |  |  |
 | exp-209 | H-212 | 1 round unrecorded | dependency |  |  |
 | exp-210 | H-212 | 1 round unrecorded | dependency |  |  |
+| exp-215 | H-225 | 62.6m wall | timebox | packing/campaign/series/series-000-smoke-and-calibration/res |  |
 
 ## Effort
 
-147 rounds, 2512.1 agent-minutes, 2568.2 wall-minutes.
+153 rounds, 2512.1 agent-minutes, 2686.7 wall-minutes.
 
 These totals exclude 4 historical rounds with unrecorded timing; their cost is unknown, not zero.
 
