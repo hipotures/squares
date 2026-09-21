@@ -39,7 +39,9 @@ documents.
 Usage, from `packing/`:
     uv run --frozen --all-extras --group dev python -m workbench_tools.capture_video --to 24
     uv run --frozen --all-extras --group dev python -m workbench_tools.capture_video \
-        --from 100 --to 110 --fps 60 --height 2160 --out site/workbench/ascent-4k.mp4
+        --from 2 --to 100 --profile social --out site/workbench/ascent-excerpt.mp4
+    uv run --frozen --all-extras --group dev python -m workbench_tools.capture_video \
+        --from 100 --to 110 --fps 30 --height 2160 --out site/workbench/ascent-4k.mp4
 """
 
 from __future__ import annotations
@@ -157,6 +159,25 @@ def _encoder() -> str:
     return found
 
 
+def animation_defaults(state: dict[str, Any]) -> list[list[Any]]:
+    """The commands that put the page's own animation character back after `prepare()`.
+
+    `prepare()` is the capture tools' shared baseline and it reduces two settings for a
+    checker's benefit: a fixed `tween` style and a shake of 3, so that a still or a contract
+    test is cheap and repeatable. A video is the other kind of product -- it is meant to show
+    what the page shows anyone who opens it -- and for these two the difference is the whole
+    character of the motion. `tween` is a pure block interpolation, and `annealSpan()` returns
+    1 under it whatever the level, so the shake does not merely soften: it disappears.
+
+    Taken from the page's own state rather than written down here, because a default written
+    in two places is a default that drifts.
+    """
+    return [
+        ["setStyle", state["style"]],
+        ["setAnneal", state["anneal"]],
+    ]
+
+
 def pricing_commands(first: int, last: int) -> list[list[Any]]:
     """The commands that put the page on the beat it plays a range at, with the clock stopped.
 
@@ -164,6 +185,10 @@ def pricing_commands(first: int, last: int) -> list[list[Any]]:
     continuous play on, which is what prices a static append at its short beat. Pausing in
     the same browser turn stops the clock before a frame of it runs, so the capture seeks
     through the range on that beat rather than watching it play.
+
+    The style and the shake are already set by the time this runs, and they have to be: the
+    annealed styles stretch a pair's move and correction by `annealSpan()`, so a range priced
+    before them is priced on a clock the page will not play.
     """
     return [["setMode", "animate"], ["setRange", first, last], ["playRange"], ["pause"]]
 
@@ -325,12 +350,13 @@ def _capture_animation(
     source: str,
     fps: int,
     frames_dir: Path,
+    defaults: list[list[Any]],
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     """Capture an imported v1 animation at the document's declared duration."""
     imported = _control(
         page,
         prepare=True,
-        commands=[["importAnimation", source]],
+        commands=[*defaults, ["importAnimation", source]],
         read=["animation", "exportAnimation"],
     )
     state = imported["animation"]
@@ -493,7 +519,11 @@ def main() -> int:
     ap.add_argument("--page", type=Path, default=PAGE, help="the built workbench page")
     ap.add_argument("--from", dest="first", type=int, default=2, help="the n to start at")
     ap.add_argument("--to", dest="last", type=int, default=24, help="the n to end on")
-    ap.add_argument("--fps", type=int, default=30)
+    # 60, not 30: the owner compared the two cuts of n = 1..100 and 60 reads better, for
+    # 14.9 MB against 11.7 over the same 111.4 s. Twice the frames cost 28 per cent more bytes
+    # because the tweens are smooth enough to encode cheaply. It does roughly double the
+    # capture, which is a screenshot per frame through a real browser.
+    ap.add_argument("--fps", type=int, default=60)
     ap.add_argument("--height", type=int, default=1080, choices=sorted(HEIGHTS))
     ap.add_argument(
         "--animation",
@@ -540,21 +570,32 @@ def main() -> int:
             )
             page.goto(o.page.resolve().as_uri(), wait_until="load")
             page.evaluate(probe("capture/fonts-ready"))
+            # The page's own defaults, read before `prepare` reduces them. `atlasTransitions`
+            # answers only while the catalogue owns the page, so Animate is entered first.
+            opened = _control(page, commands=[["setMode", "animate"]], read=["state"])["state"]
+            defaults = animation_defaults(opened)
             # Capture preview, applied by `prepare`, is what hides the chrome.
             if o.animation is None:
-                _control(page, prepare=True, commands=pricing_commands(o.first, o.last))
+                _control(
+                    page,
+                    prepare=True,
+                    commands=[*defaults, *pricing_commands(o.first, o.last)],
+                )
                 steps = _steps(page, o.first, o.last)
                 durations = _price(page, steps)
                 print(
                     f"{len(steps)} steps, n = {o.first} to {o.last}, "
-                    f"{math.fsum(durations):.2f} s, {o.fps} fps at {o.height}p"
+                    f"{math.fsum(durations):.2f} s, {o.fps} fps at {o.height}p, "
+                    f"{opened['style']} at shake {opened['anneal']}"
                 )
                 receipt = _capture(page, steps, durations, o.fps, frames_dir)
                 animation = None
                 title = f"Square packing ascent, n = {o.first} to {o.last}"
             else:
                 source = o.animation.read_text(encoding="utf-8")
-                receipt, animation = _capture_animation(page, source, o.fps, frames_dir)
+                receipt, animation = _capture_animation(
+                    page, source, o.fps, frames_dir, defaults
+                )
                 title = str(animation.get("name") or o.animation.stem)
                 print(
                     f"animation {o.animation.name}, {receipt[0]['seconds']} s, "

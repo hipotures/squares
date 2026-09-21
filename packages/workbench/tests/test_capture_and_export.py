@@ -124,6 +124,26 @@ def test_ffmpeg_version_is_read_from_its_banner() -> None:
     assert capture_video.ffmpeg_version(banner) == "ffmpeg version 7.1.1"
 
 
+def test_a_video_takes_the_page_s_own_style_and_shake_not_the_checkers_baseline() -> None:
+    # `prepare()` reduces both for a checker's benefit, and under `tween` the shake disappears
+    # entirely rather than softening, because `annealSpan()` returns 1 whatever the level. A
+    # video is meant to show what the page shows, so the defaults are read back from it.
+    commands = capture_video.animation_defaults({"style": "physics", "anneal": 9, "snap": True})
+    assert commands == [["setStyle", "physics"], ["setAnneal", 9]]
+
+
+def test_the_style_and_shake_are_set_before_the_range_is_priced() -> None:
+    # The annealed styles stretch a pair's move and correction, so a range priced before them
+    # is priced on a clock the page will not play -- and `price_steps` would refuse the run.
+    ordered = [
+        *capture_video.animation_defaults({"style": "physics", "anneal": 9}),
+        *capture_video.pricing_commands(2, 24),
+    ]
+    names = [command[0] for command in ordered]
+    assert names.index("setStyle") < names.index("playRange")
+    assert names.index("setAnneal") < names.index("playRange")
+
+
 def test_the_capture_states_that_its_intermediate_frames_are_tweens() -> None:
     comment = capture_video.capture_comment()
     assert capture_video.INTERMEDIATE_FRAMES in comment
