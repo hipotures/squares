@@ -291,7 +291,7 @@ agenda:
     question: >-
       Should the corner-penetration deep branches, the theta screen, the stressed
       contact-graph theorem, the uniform m^2 - 3 test at m = 5 and 6, or the n=45
-      one-spare case run as lanes?
+      case run as lanes?
     hypotheses: [H-231]
     budget: None. Retired or parked by the Session 143 adversarial reviews without a measurement.
     entry: The three reviews are complete.
@@ -349,7 +349,7 @@ agenda:
       - packing/campaign/explorations/X-040-lower-bound-mechanisms-beyond-the-one-body-ceiling.md
       disposition: retire-negative
       follow_up: null
-    - scope: The n=45 and n=44 one-spare cases.
+    - scope: The n=45 and n=44 cases, filed here as one-spare and corrected by R3.
       classification: bounded-negative
       result: >-
         n=45 is a (0, 1) case, not one-spare, and the m = 7 height budget 6.8925 < 7
