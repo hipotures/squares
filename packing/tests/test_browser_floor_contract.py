@@ -194,13 +194,21 @@ PROBE_GROUP_SAMPLES = REPOSITORY_ROOT / "packing/tests/fixtures/probe-typecheck"
 
 #: The only exclusions Biome's `files.includes` may write: what is not ours to hold to a floor,
 #: and minified output, of which none is tracked. Any other `!` pattern skips owned code.
-BIOME_EXCLUSIONS = frozenset({"!**/node_modules", "!vendor", "!**/.venv", "!**/*.min.js"})
+#: `packing/resources` is the literature archive. Its JavaScript is other authors' bytes,
+#: retained verbatim and hash-bound by each packet's own manifest, so the formatter must not
+#: reach it: the pre-commit hook writes Biome's fixes back to staged files, which would edit
+#: archived source to look tidy and void the retention. Ruff excludes the same tree for the
+#: same reason, and `.flowmarkignore` excludes it for the Markdown beside it.
+BIOME_EXCLUSIONS = frozenset(
+    {"!**/node_modules", "!vendor", "!packing/resources", "!**/.venv", "!**/*.min.js"}
+)
 
 TYPE_ERROR_DIAGNOSTIC = "sample.js(1,12): error TS2345:"
 
-#: Directories whose JavaScript is not ours to hold to a floor: third-party code, vendored
-#: or installed. Minified files are excluded from Biome too, and none is tracked.
-NOT_OURS = ("vendor/", "node_modules/")
+#: Directories whose JavaScript is not ours to hold to a floor: third-party code, vendored,
+#: installed, or archived as retained source. Minified files are excluded from Biome too, and
+#: none is tracked.
+NOT_OURS = ("vendor/", "node_modules/", "packing/resources/")
 SCRIPT_SUFFIXES = (".js", ".jsx", ".mjs", ".cjs", ".ts", ".tsx", ".mts", ".cts")
 STYLE_SUFFIXES = (".css",)
 #: The suffixes the ESLint promise overlay covers: checked JavaScript. Biome's own promise

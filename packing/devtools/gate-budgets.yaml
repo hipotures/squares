@@ -582,16 +582,63 @@ tiers:
 
 - id: suite_b
   command: packing-validate --suite-b
-  ceiling_seconds: 180.0
-  measured_seconds: 124.78
-  measured_on: '2026-09-17'
+  # 154s, and the first ceiling this entry has set for itself. The three before it were
+  # all 180: OR-14's pull-request wall, borrowed as an absolute bound because a shard
+  # job's wall is a share of that wall. That is the loosest a per-tier ceiling can be --
+  # it says only that this one job of seven may spend the whole surface's budget -- and
+  # `OR-17` is the rule that a routine gate carries a ceiling of its own rather than the
+  # surface's. 26s of the pull-request wall go back to the surface with it.
+  #
+  # 154s is 1.50x of the record below, which is where the drift rule already sits
+  # (154.37s). The two bounds coincide on purpose, the way the `fast` entry argues: an
+  # absolute ceiling looser than the record-relative rule never gets to speak, and one
+  # tighter than it fails a run the drift rule was willing to explain. Rule 2 would
+  # permit 205s; the tier has no use for it.
+  #
+  # It is a band and not a target, and the band is the runner pool's rather than the
+  # tier's. This tier has no known cost -- it has a distribution, and 2026-09-21 measured
+  # it directly. Three runs of one byte-identical shard that day, 3,140 passed and 6
+  # skipped each time, read 73.90s, 74.98s and 133.81s, on 240.2, 240.2 and 449.9
+  # test-seconds of accumulated test time. 1.81x, on work that did not change at all.
+  # So the record is placed at the centre of what five readings span and both edges are
+  # what is left: 1.15x of margin above the slowest wall this tier has read and 1.20x
+  # below the fastest. Those margins are thin, and they are the honest width of the
+  # pool -- `think-be1s` is the recorded band that would replace a recorded point, and
+  # `D-472` is why neither edge of this one may be bought by moving the record toward
+  # the other. What the absolute number still adds is the failure the ratios cannot see:
+  # 154s is well under the 240-450 test-seconds this shard accumulates, so the job still
+  # fails here if `-n 4 --dist=loadfile` stops dividing, which is the regression an
+  # absolute ceiling on a pre-collection shard is actually for.
+  ceiling_seconds: 154.0
+  measured_seconds: 102.91
+  measured_on: '2026-09-21'
   measured_where: >-
-    The geometric mean of two green readings at the reference shape -- 125.16s and
-    124.40s -- from run 35182460400, attempts 2 and 3 (jobs 105078217114 and
-    105079133540), on PR 188 exact head be28ad5a, after the c4f0660d repartition; 3,008
-    passed and 6 skipped. Attempt 1 read 124.42s but is excluded: a gate-budget test
-    failed there because bead think-g4n9 had not yet reached the sync branch. Observed
-    spread 1.01x.
+    The geometric mean of five green readings at the reference shape, spread 1.81x. Three
+    are PR 212's, on one test composition -- 3,140 passed and 6 skipped, 172 files, 3,146
+    collected -- and all three on 2026-09-21: 73.90s in run 35634463193, job 106448349232,
+    at head c4b493e1; 74.98s in run 35637674151, job 106459001378, at head cb821629; and
+    133.81s in run 35638434973, job 106461545452, at head e92e3187, which passed at 92 per
+    cent of the 145s ceiling the first two readings had set, and is why that ceiling is
+    154s now. Two are the readings the superseded record was built from:
+    125.16s and 124.40s in run 35182460400, attempts 2 and 3 (jobs 105078217114 and
+    105079133540), on PR 188 exact head be28ad5a, 3,008 passed and 6 skipped.
+
+    What moved between the two heads is the runner and not the shard, which is why the
+    2026-09-17 pair stays in the mean rather than being replaced by it. Shard B runs more
+    tests than it did (3,008 to 3,140 passing) in less wall, and the obvious reading of
+    that -- the recorded-cost partition rebalanced when the agenda-040 stack added test
+    files -- is wrong twice over. By mechanism: `suite-file-costs.json` has not changed
+    since c4f0660d, the greedy packing reads only that record, so no recorded file can
+    have changed shard, and each of the 10 files added since takes `crc32(path) mod 2`.
+    By measurement: 162 of this shard's 163 files are common to the two heads, the 10
+    added are 117 tests and 1.8 test-seconds between them, and across the 99 common files
+    whose test count did not change the median per-file ratio is 1.91x -- a repartition
+    moves files, it does not make a file that stayed put 1.91x cheaper. PR 212's own trio
+    then settles it without any cross-head comparison at all: one byte-identical shard
+    cost 240.2 and 449.9 test-seconds hours apart on 2026-09-21. So a record taken from
+    either edge of the pool starves one rule to feed the other. `D-472` is that lesson from the fast side, and the
+    typecheck entry below is the same repair from this one: its 38.15s stale-rule failure
+    went into the mean with the two readings before it rather than over them.
   history:
   - measured_seconds: 119.54
     measured_on: '2026-09-15'
@@ -627,13 +674,39 @@ tiers:
         reports carry run, attempt and merge-SHA provenance.
       grew:
       - {name: suite-b tier, before: 119.54, after: 143.98}
+  - measured_seconds: 124.78
+    measured_on: '2026-09-17'
+    measured_where: >-
+      The geometric mean of two green readings at the reference shape -- 125.16s and
+      124.40s -- from run 35182460400, attempts 2 and 3 (jobs 105078217114 and
+      105079133540), on PR 188 exact head be28ad5a, after the c4f0660d repartition; 3,008
+      passed and 6 skipped. Attempt 1 read 124.42s but is excluded: a gate-budget test
+      failed there because bead think-g4n9 had not yet reached the sync branch. Observed
+      spread 1.01x. 2026-09-21: superseded, and not because the tier changed. Both
+      readings behind it came from one cohort -- two attempts of a single run, agreeing
+      to 1.01x -- so the record sat at the top of a band 1.69x wide instead of in it, and
+      run 35634463193 read 73.90s against it and failed the stale rule at 0.59x. The
+      shard is not what moved: 162 of its 163 files are common to both heads, the 10
+      added are 117 tests and 1.8 test-seconds between them, and the one dropped is
+      `test_suite_shard.py`, renamed. Its accumulated test time fell 419.1 to 240.2
+      test-seconds while its test count rose 3,014 to 3,146, and across the 99 common
+      files whose test count did not change the median per-file ratio is 1.91x
+      (quartiles 1.68, 1.91, 2.11). A repartition moves files; it does not make a file
+      that stayed put 1.91x cheaper. This is runner speed, a little wider than the
+      1.59-1.81x the record above already prices, and it is per job rather than per run:
+      the same run 35634463193 read suite-a at 109.24s against its 109.92s record and
+      typecheck at 79.95s against its 55.67s record, 1.44x the other way. Settled the same
+      day without the cross-head comparison: run 35638434973 ran the byte-identical shard
+      at 449.9 test-seconds and 133.81s of wall, against 240.2 and 73.90s hours earlier.
   reference: {jobs: 1, inner_jobs: 1, cpus: 4}
   argument: >-
     Pre-collection shard B under the same complete and disjoint assignment as shard A.
     The recorded-cost packing and stable fallback place every file in exactly one shard
     before import. This job also retains Git history, omits Node, and publishes its
     per-file report. `packing-required` requires both shards so aggregation cannot hide
-    lost coverage, and the 180-second ceiling remains the absolute bound.
+    lost coverage. Its ceiling was OR-14's 180-second pull-request wall until 2026-09-21
+    and is now its own: a shard job runs beside six others, so a ceiling equal to the
+    whole surface's wall bounds the surface and not the tier.
 
 - id: typecheck
   command: packing-validate --typecheck

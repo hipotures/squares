@@ -46,6 +46,8 @@ for each rule. Edit there, not here.
   irritation.
 - **OR-16:** Use Git for repository integrity; reserve checksums for real trust
   boundaries.
+- **OR-17:** Every routine gate has a wall ceiling, and anything above it is selected on
+  purpose.
 <!-- END OPERATING RULES SUMMARY -->
 
 ## Build & Test
