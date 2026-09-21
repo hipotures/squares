@@ -612,17 +612,25 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   //: Centring was right while the headline sat under the packing, and it was there to stop `n =`
   //: sliding as a digit was gained. A fixed left does that outright: the expression starts in the
   //: same place at every n and only the numeral grows to its right.
-  const HEADLINE_LEFT = 0;
   function measureHeadline() {
-    // The guard, not the arithmetic, is what this still does: nothing can be placed until the
-    // faces have landed and the expression has a box, and the attribution is placed from here
-    // because it is measured off what the headline draws.
+    // Nothing can be placed until the faces have landed and the expression has a box, and the
+    // attribution is placed from here because it too is measured off what is drawn.
     /** @type {HTMLElement} */
     const shown = document.querySelector(".numeral");
     if (!shown || shown.offsetWidth === 0) {
       return;
     }
-    const numeralLeft = HEADLINE_LEFT;
+    // Centred in the facts column (the owner, 2026-09-21), and centred on the WIDEST expression
+    // the corpus holds rather than on the current one. `n = 324` is the longest, and centring
+    // each n on itself would slide `n =` sideways as a digit is gained -- twice in the film, and
+    // again mid-roll while the number crossfades.
+    const digits = String(DATA.n_max).length;
+    /** @type {HTMLElement} */
+    const current = document.querySelector(".numeral .n-val, .numeral .mord");
+    const shownDigits = current?.textContent ? current.textContent.length : digits;
+    const figure = current?.textContent ? current.offsetWidth / Math.max(1, shownDigits) : 0;
+    const widest = shown.offsetWidth + figure * Math.max(0, digits - shownDigits);
+    const numeralLeft = Math.max(0, (htmlNode("headline").offsetWidth - widest) / 2);
     // One property on the row, which every numeral in its three slots reads, rather than a `left`
     // written into each numeral: a numeral built later starts in the right place without being told.
     htmlNode("headline").style.setProperty("--stage-numeral-left", `${numeralLeft}px`);
@@ -647,8 +655,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   //: hidden rather than drawn at a guess.
   let attributionAt = null;
   let attributionSettled = false;
-  // The attribution stands on the base of the packing beside it (the owner, 2026-09-21) and ends
-  // where the gap bar's rail ends. Both anchors are measured off what is drawn -- the drawn
+  // The attribution stands on the base of the packing beside it and is centred on the column
+  // under it, with the headline above (the owner, 2026-09-21). The rail's own middle is what it
+  // is centred on: the bar is the column's full width, so its middle is the column's. Both anchors are measured off what is drawn -- the drawn
   // container's own rect, not the SVG element, whose box carries the view's padding -- and
   // written in stage pixels as the SVG text's `y` and `x`. It used to stand on the headline's
   // baseline, which was under the packing; the headline heads the facts column now, so that
@@ -667,8 +676,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     }
     const frame = stage.getBoundingClientRect();
     const scale = frame.width / stage.offsetWidth;
+    const railBox = rail.getBoundingClientRect();
     attributionAt = [
-      (rail.getBoundingClientRect().right - frame.left) / scale,
+      (railBox.left + railBox.width / 2 - frame.left) / scale,
       (box.getBoundingClientRect().bottom - frame.top) / scale,
     ];
     attributionSettled = !("fonts" in document) || document.fonts.status === "loaded";
