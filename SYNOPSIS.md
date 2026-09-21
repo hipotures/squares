@@ -1704,9 +1704,9 @@ source-table audit is `think-4g6w`, and `think-z0fi` implements and controls the
 [specified contact-release family](docs/project/reviews/review-2026-09-07-stromquist-n26-directions.md).
 The [MacIver review](docs/project/reviews/review-2026-09-07-maciver-square-packing.md)
 adds three previously unindexed manuscripts.
-His reported lower bound at `4.450208382...` is below the verified `4.59` for both n17
-and n18. The missing computational artifacts remain a source gap; `think-sske` owns
-local replay of the center-area and capacity lemmas before adoption.
+His reported lower bound at `4.450208382...` is below the verified bound at both n17 and
+n18. The missing computational artifacts remain a source gap; `think-sske` owns local
+replay of the center-area and capacity lemmas before adoption.
 Exact design controls show potential local cuts, not a new global bound.
 This source review does not authorize further kernel research.
 

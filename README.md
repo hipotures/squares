@@ -134,8 +134,8 @@ Results first established here, as far as the recorded source searches show:
   One certificate covers all three sizes without a monotonicity step: only `Condition 2`
   mentions `n`, so an atom set certifies its side for every integer above its own mass.
   `T-020` has since carried `n = 19` past it, and `T-030` has carried `n = 18` to
-  `4679/1000 = 4.679`. The `n = 17` bound remains this result’s alone, because the
-  heavier atom sets do not apply there.
+  `4679/1000 = 4.679`. At `n = 17` it held alone until `T-031`, and its own atoms are
+  what the two certificates in `T-031` were built from.
 - **T-020: `s(19), s(20), s(21) ≥ 24/5`, improving the verified register (`S4`).** The
   verified fields for twenty and twenty-one squares previously carried Nagamochi’s 2005
   general formula, `1 + √13 = 4.6055…` and `1 + √14 = 4.7416…`. The
@@ -190,6 +190,24 @@ erratum.
   It raises each bound by `0.05` above `T-020`; the heavier atom set does not apply to
   `n = 19`.
 
+- **T-031: `s(17) ≥ 461300/99999 = 4.61304613…`, the first verified bound here that came
+  from outside (`S3`).** Two certificates arrived together in September 2026, both built
+  on `T-019`’s atoms and both crediting it.
+  **Mira**’s of 7 September gives `4613/1000` on 1620 atoms, and is written in this
+  repository’s own certificate schema, so the stock exact and interval verifiers decide
+  it unchanged and both accept.
+  **Guzhou0806**’s R012 of 20 September restricts coverage to what a real parent square
+  needs — parents of side `99999/100000`, a catalogue of 2925 parent-angle intervals
+  each choosing its own core, and coverage only over legal parent centres — which lifts
+  the same measure to `461300/99999` after rescaling.
+  R012 is decided by its own exact checker and, in a method that fails differently, by
+  this repository’s interval branch and bound over all 2925 entries.
+  The
+  [proof review](docs/project/reviews/review-2026-09-20-n17-r012-and-mira-4613-proof-review.md)
+  found no error and supplies two steps R012’s note omits.
+  The movement over `T-019` is `0.02305`, and the gap to Bidwell’s packing is now
+  `0.0625`.
+
 - **T-027 / T-028 / T-029 / T-030: `s(18) ≥ 4.67, 4.675, 4.6775, 4.679` (`S3`).** Four
   retained weighted fractional unavoidable-set certificates form the latest `n = 18`
   ladder. Each passed both the exact weighted-sum replay and an independent interval
@@ -200,7 +218,7 @@ erratum.
   unavoidable set is certified by exact rational cover verification and an independent
   interval branch-and-bound over the full pose space.
   Both are superseded as the verified lower bound: first by the source-backed `4.5058`
-  adopted on 2026-09-03, and now by `T-019`, which proves more than either.
+  adopted on 2026-09-03, then by `T-019`, and now by `T-031`.
 
 - **T-003: the sixteen-point construction’s ceiling is bracketed (`S2`).** Exact
   certification at `4426213/1000000` and an exact escaping pose at `4427/1000` locate
@@ -261,7 +279,7 @@ fields. Its source is one schema-validated case file under
 [status table](packing/frontier/STATUS.md) is the reader view, and the atlas above
 renders every retained known-best packing.
 The current `n = 18` survey row records the independently verified lower bound
-`4679/1000 = 4.679` from `T-030`.
+`4679/1000 = 4.679` from `T-030`, and `n = 17` records `461300/99999` from `T-031`.
 
 The [literature archive](packing/resources/README.md) retains each primary source, a
 cleaned Markdown transcription, and the unedited extraction used to check it.
