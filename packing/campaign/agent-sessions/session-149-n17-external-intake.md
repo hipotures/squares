@@ -15,7 +15,7 @@ session:
   primary_bead: think-pcd0
   resource_rollups:
   - packing/campaign/resource-usage/7163c7b2-b4ac-4c82-afcc-ab827886ebd9.yaml
-  status: stopped
+  status: completed
   ended_at: '2026-09-20T18:00:00Z'
   goal: >-
     Decide whether Guzhou0806's R012 certificate for s(17) >= 461300/99999 is correct,
@@ -93,7 +93,7 @@ session:
     objective: >-
       Register the result and its evidence, move the n = 17 fields, and correct every
       document that still says nothing public exceeds 459/100.
-    status: stopped
+    status: completed
     entered_by: evidence_checkpoint
     switch_reason: The verdicts are in and the record contradicts them.
     budget_minutes: 120
@@ -190,15 +190,15 @@ session:
   - Five controls pass, including a forged measure three parts in a million lighter that both routes refuse.
   - 'full gate: fast at bf2821e2: failed (hosted run 35636483146; frontend, typecheck, geometry, suite-a, sweeps and macos-portability passed, and validate and suite-b failed on one step each -- this record had no full-gate declaration for that step to read)'
   - 'full gate: fast at 9ca74721: failed (hosted run 35636079542; the same single step, and nothing else, on the tree before the formatting pass)'
+  - 'full gate: fast at 4479f2f5: passed (hosted run 35637803410; pages run 35637803857)'
   stop_reason: >-
     Both certificates are decided, the register states what they support, and both
     authors are credited. No search for a stronger bound was started.
   next_action: >-
-    Land the adoption under think-pcd0, which also carries this record's certification.
-    The T-031 identifier contest with pull request 208 is settled: the overnight stack
-    merged into main first and kept T-031 for the n = 11 octagon corner class, and this
-    result took T-032 when main was merged into this branch.
-  certification_pending: think-pcd0
+    Land the adoption under think-pcd0. The T-031 identifier contest with pull request
+    208 is settled: the overnight stack merged into main first and kept T-031 for the
+    n = 11 octagon corner class, and this result took T-032 when main was merged into
+    this branch.
 ---
 # Session 149: Two External Certificates at `n = 17`
 

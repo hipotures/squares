@@ -145,7 +145,7 @@ hypothesis status and summarizes experiment verdicts, and the
 | --- | ---: | --- |
 | Agendas | 37 | 17 active; 14 completed; 5 paused; 1 superseded |
 | Commitments | 356 | 181 complete; 61 stopped; 68 blocked; 16 ready; 21 tentative; 9 in progress |
-| Sessions | 149 | 90 completed; 59 stopped; all terminal |
+| Sessions | 149 | 91 completed; 58 stopped; all terminal |
 | Explorations | 38 | 24 linked to proposed hypotheses; 14 uncodified |
 | Hypotheses | 170 | 29 confirmed; 31 refuted; 55 blocked; 17 unresolved; 5 open; 29 open questions; 2 result registered; 2 abandoned; 0 running |
 | Experiments | 155 | 43 accepted; 36 rejected; 50 unresolved; 12 baseline; 11 blocked; 3 abandoned; 0 in progress |
@@ -1062,14 +1062,9 @@ pull request 208 claimed `T-031` from the open overnight stack for the `n = 11` 
 corner class, the stack merged into `main` first and kept it, and this result took
 `T-032` when `main` was merged into the intake branch.
 
-The record is stopped rather than completed, and carries
-`certification_pending: think-pcd0`: its own validation has not yet succeeded, because
-the gate step that reads a session’s receipt is the one step this branch cannot pass
-until the record carries one.
-
-**Selected next entry:** `think-pcd0`, the n = 17 intake: certify and land the adoption
-of `s(17) >= 461300/99999` as `T-032`. The research entry behind it is BC-357, closing
-M7’s n=6 bracket at 299/100 under H-216.
+**Selected next entry:** `think-pcd0`, the n = 17 intake: land the adoption of
+`s(17) >= 461300/99999` as `T-032`. The research entry behind it is BC-357, closing M7’s
+n=6 bracket at 299/100 under H-216.
 
 [Session 148](packing/campaign/agent-sessions/session-148-overnight-chunk-5.md), chunk 5
 on [PR 209](https://github.com/jlevy/squares/pull/209), stopped at the owner’s request
