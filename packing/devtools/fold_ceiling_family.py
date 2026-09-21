@@ -25,10 +25,20 @@ Run from `packing/`, with `uv run --frozen --all-extras --group dev` in front::
     python -m devtools.fold_ceiling_family FAMILY.json FAMILY-merged.json
     python -m devtools.fold_ceiling_family FAMILY.json OUT.json --check RETAINED.json
 
-`--check` re-folds the source and compares the result against retained merged bytes --
-placements as exact rationals, the total weight, and the folded count the retained
-provenance claims -- printing every difference and exiting 1 if there is one. The
-destination is always written, and may be neither the source nor the `--check` file.
+`--check` re-folds the source and compares the result against retained merged bytes,
+printing every difference and exiting 1 if there is one: the container and net the
+family is a ceiling for (`n`, `outer_side`, `square_side`, `half_tangents`), the
+placements as exact rationals **in order**, the total weight, and the folded count the
+retained provenance claims. Row order is part of the contract rather than an
+incidental: the fold emits keys in order of first appearance, so the same source rows
+always fold to the same sequence, and an order difference means the bytes were not
+re-derived from these rows by this rule. Provenance is not compared, because a retained
+record may name the scratch script that wrote it. The destination is always written,
+and may be neither the source nor the `--check` file.
+
+A refusal is a printed line and a non-zero exit, as at the sibling devtools, not a
+traceback; every rational is read from a string, so a placement or a total written as a
+JSON float is refused rather than silently binarised.
 """
 
 from __future__ import annotations
@@ -39,7 +49,7 @@ import sys
 from collections.abc import Sequence
 from fractions import Fraction
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from devtools.polish_ceiling_family import fold_half_tangent
 from sqpack.cover import write_text_atomic
@@ -49,20 +59,78 @@ RULE = "fold half-tangent 1 to 0 at the same centre and side, summing weights"
 UPRIGHT_WRITINGS = [Fraction(0), Fraction(1)]
 REPORT_LIMIT = 10
 
+
+class FamilyFormatError(ValueError):
+    """The JSON cannot be read as an exact ceiling family.
+
+    A `ValueError` so that `main`'s refusal path and every caller that already treats a
+    malformed family as a refusal keep working unchanged, named so the refusals this
+    module raises about its input are distinguishable from the arithmetic ones.
+    """
+
+
 Row = tuple[Fraction, Fraction, Fraction, Fraction, Fraction]
 Key = tuple[Fraction, Fraction, Fraction, Fraction]
+
+
+def load(path: Path) -> dict[str, Any]:
+    """One family record, or a refusal naming the file rather than a traceback."""
+
+    try:
+        record = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as error:
+        raise ValueError(f"{path} is not JSON: {error}") from error
+    if not isinstance(record, dict):
+        raise FamilyFormatError(f"{path} is not a family record object")
+    return cast("dict[str, Any]", record)
+
+
+def exact(value: object, where: str) -> Fraction:
+    """One exact rational, read from its string spelling and nothing else.
+
+    A JSON float has already lost the value by the time this sees it, so it is refused
+    rather than binarised -- which is what every other exact-rational reader in this
+    area does, and what a tool that claims to preserve a total exactly has to do.
+    """
+
+    if not isinstance(value, str):
+        raise FamilyFormatError(
+            f"{where}: exact rationals are written as strings, got {type(value).__name__} "
+            f"{value!r}"
+        )
+    try:
+        return Fraction(value)
+    except (ValueError, ZeroDivisionError) as error:
+        message = f"{where}: {value!r} is not an exact rational ({error})"
+        raise FamilyFormatError(message) from error
 
 
 def placement_rows(record: dict[str, Any]) -> list[Row]:
     """Every placement as exact rationals: half-tangent, centre, weight, side."""
 
+    placements = record.get("placements")
+    if not isinstance(placements, list):
+        raise FamilyFormatError("the record has no 'placements' list")
     rows: list[Row] = []
-    for index, entry in enumerate(record["placements"]):
-        values = [Fraction(value) for value in entry]
-        if len(values) != 5:
-            raise ValueError(f"placement {index} has {len(values)} fields, not 5")
+    for index, entry in enumerate(placements):
+        if not isinstance(entry, list):
+            raise FamilyFormatError(f"placement {index} is not a list")
+        if len(entry) != 5:
+            raise ValueError(f"placement {index} has {len(entry)} fields, not 5")
+        values = [
+            exact(value, f"placement {index} field {field}")
+            for field, value in enumerate(entry)
+        ]
         rows.append((values[0], values[1], values[2], values[3], values[4]))
     return rows
+
+
+def declared_total(record: dict[str, Any], where: str) -> Fraction:
+    """The total the record's own header declares, as an exact rational."""
+
+    if "total_weight" not in record:
+        raise ValueError(f"{where}: the record declares no total_weight")
+    return exact(record["total_weight"], f"{where}: total_weight")
 
 
 def fold(record: dict[str, Any]) -> dict[str, Any]:
@@ -73,9 +141,25 @@ def fold(record: dict[str, Any]) -> dict[str, Any]:
     writings are `t = 0` and `t = 1`; every other repeat raises. Order of first
     appearance is preserved, the caller's record is not mutated, and the arithmetic
     is exact, so the total weight out equals the total weight in.
+
+    Two total checks, both with content. First the record is required to be internally
+    consistent: its declared `total_weight` must equal the sum of its own rows, so a
+    header that disagrees with its placements is refused rather than silently corrected
+    into a self-consistent record and then reported as preserved. Then the emitted
+    placement strings are summed back and required to equal that same declared total,
+    which exercises the serialisation the destination actually receives. The earlier
+    `before != after` guard compared a sum with itself and could not fire (review
+    finding M2).
     """
 
     rows = placement_rows(record)
+    declared = declared_total(record, "the source family")
+    summed = sum((row[3] for row in rows), Fraction(0))
+    if declared != summed:
+        raise ValueError(
+            f"the record's declared total_weight {declared} is not the sum of its own "
+            f"placements {summed}; the bytes are internally inconsistent"
+        )
     weights: dict[Key, Fraction] = {}
     writings: dict[Key, list[Fraction]] = {}
     order: list[Key] = []
@@ -97,15 +181,13 @@ def fold(record: dict[str, Any]) -> dict[str, Any]:
             order.append(key)
         seen.append(half_tangent)
 
-    before = sum((row[3] for row in rows), Fraction(0))
-    after = sum(weights.values(), Fraction(0))
-    if before != after:
-        raise ValueError(f"the fold changed the total weight: {before} became {after}")
-
     folded_record = dict(record)
     folded_record["placements"] = [
         [str(t), str(x), str(y), str(weights[(t, x, y, s)]), str(s)] for (t, x, y, s) in order
     ]
+    after = sum((row[3] for row in placement_rows(folded_record)), Fraction(0))
+    if after != declared:
+        raise ValueError(f"the fold changed the total weight: {declared} became {after}")
     folded_record["total_weight"] = str(after)
     folded_record["total_weight_float"] = float(after)
     provenance = dict(folded_record.get("provenance") or {})
@@ -130,14 +212,70 @@ def folded_count(record: dict[str, Any]) -> int | None:
     return count if isinstance(count, int) else None
 
 
-def differences(folded: dict[str, Any], expected: dict[str, Any]) -> list[str]:
-    """Every way the fold and the retained bytes disagree mathematically.
+def required(record: dict[str, Any], field: str, where: str) -> object:
+    """One field a ceiling family always carries, or a refusal naming it."""
 
-    Provenance is not compared: a retained record may name the scratch script that
-    wrote it, and what has to match is the geometry, the weights and the total.
+    if field not in record:
+        raise ValueError(f"{where}: the record declares no {field}")
+    return record[field]
+
+
+def net(record: dict[str, Any], where: str) -> list[Fraction]:
+    """The record's half-tangent net as exact rationals, in the order written."""
+
+    values = required(record, "half_tangents", where)
+    if not isinstance(values, list):
+        raise FamilyFormatError(f"{where}: half_tangents is not a list")
+    return [
+        exact(value, f"{where}: half_tangents[{index}]") for index, value in enumerate(values)
+    ]
+
+
+def container_differences(folded: dict[str, Any], expected: dict[str, Any]) -> list[str]:
+    """Every way the two records describe a different problem.
+
+    `n`, `outer_side`, `square_side` and `half_tangents` say which container and which
+    net the family is a ceiling for, and `fold` carries all four through from the source
+    untouched. Comparing only the rows made `--check` report `matches: true` for
+    retained bytes describing a different container (review finding M3), which is the
+    opposite of what the flag is for.
     """
 
     report: list[str] = []
+    if folded.get("n") != expected.get("n"):
+        report.append(f"n: fold {folded.get('n')!r} != expected {expected.get('n')!r}")
+    for field in ("outer_side", "square_side"):
+        ours = exact(required(folded, field, "fold"), f"fold: {field}")
+        theirs = exact(required(expected, field, "expected"), f"expected: {field}")
+        if ours != theirs:
+            report.append(f"{field}: fold {ours} != expected {theirs}")
+    ours_net = net(folded, "fold")
+    theirs_net = net(expected, "expected")
+    if ours_net != theirs_net:
+        report.append(
+            f"half_tangents: fold has {len(ours_net)}, expected has {len(theirs_net)}"
+            if len(ours_net) != len(theirs_net)
+            else "half_tangents: the same count in a different order or at other values"
+        )
+    return report
+
+
+def differences(folded: dict[str, Any], expected: dict[str, Any]) -> list[str]:
+    """Every way the fold and the retained bytes disagree mathematically.
+
+    The container and net come first (`container_differences`), then the placements in
+    order, the total and the folded count. Row order counts: the fold emits keys in
+    order of first appearance, so re-folding the same source always gives the same
+    sequence, and a permutation means the retained bytes were not produced from these
+    rows by this rule -- the docstrings now say so rather than calling order incidental
+    (review finding M3).
+
+    Provenance is not compared: a retained record may name the scratch script that
+    wrote it, and what has to match is the problem, the geometry, the weights and the
+    total.
+    """
+
+    report: list[str] = container_differences(folded, expected)
     ours = placement_rows(folded)
     theirs = placement_rows(expected)
     if len(ours) != len(theirs):
@@ -159,8 +297,8 @@ def differences(folded: dict[str, Any], expected: dict[str, Any]) -> list[str]:
         if len(mismatched) > REPORT_LIMIT:
             report.append(f"... and {len(mismatched) - REPORT_LIMIT} further placements differ")
 
-    ours_total = Fraction(folded["total_weight"])
-    theirs_total = Fraction(expected["total_weight"])
+    ours_total = declared_total(folded, "fold")
+    theirs_total = declared_total(expected, "expected")
     if ours_total != theirs_total:
         report.append(f"total weight: fold {ours_total} != expected {theirs_total}")
 
@@ -186,8 +324,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.check is not None and args.destination.resolve() == args.check.resolve():
         parser.error("--check compares against retained bytes; do not overwrite them")
 
-    record: dict[str, Any] = json.loads(args.source.read_text(encoding="utf-8"))
-    output = fold(record)
+    try:
+        record = load(args.source)
+        output = fold(record)
+    except (ValueError, OSError) as error:
+        # A refusal line and a non-zero exit, as at the sibling devtools, rather than a
+        # traceback on a malformed family (review finding L2).
+        print(json.dumps({"tool": TOOL, "source": str(args.source), "refused": str(error)}))
+        return 2
     write_text_atomic(args.destination, json.dumps(output, indent=1) + "\n")
     merge = output["provenance"]["merge"]
     print(
@@ -207,17 +351,22 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.check is None:
         return 0
 
-    expected: dict[str, Any] = json.loads(args.check.read_text(encoding="utf-8"))
-    report = differences(output, expected)
+    try:
+        expected = load(args.check)
+        report = differences(output, expected)
+        claimed = folded_count(expected)
+        placements = len(placement_rows(expected))
+    except (ValueError, OSError) as error:
+        print(json.dumps({"tool": TOOL, "check": str(args.check), "refused": str(error)}))
+        return 2
     for line in report:
         print(line, flush=True)
-    claimed = folded_count(expected)
     print(
         json.dumps(
             {
                 "check": str(args.check),
                 "matches": not report,
-                "placements": len(expected["placements"]),
+                "placements": placements,
                 "expected_folded": claimed,
                 "differences": len(report),
             }

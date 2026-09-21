@@ -828,13 +828,23 @@ def _clip_planes(
 ) -> tuple[tuple[Interval, Interval, Interval], ...]:
     """The four kept half-planes in the rotated frame, as interval enclosures.
 
-    ``reach`` is ``B max(|cos|, |sin|)``, and ``[max(lo), max(hi)]`` encloses the
-    maximum of two reals given enclosures of each, so the folded constant is rigorous
-    on the doubled net's reflected directions as well as on the net's own arc.
+    ``reach`` is ``B max(|cos|, |sin|)``. This builds ``[max(lo), max(hi)]``, which
+    encloses ``max(cos, sin)`` -- the unsigned maximum, and the same number only while
+    both components are non-negative. They are: `doubled_net` yields the net's own arc
+    ``[0, pi/4]`` and its reflection in the diagonal, so every rotation here lies in
+    ``[0, pi/2]``. The guard below is what makes that true by construction rather than
+    by reading the caller, since a rotation with a negative component would otherwise
+    get an enclosure that is not one.
     """
     if clip is None:
         return ()
     cosine, sine = rotation.cosine, rotation.sine
+    if cosine.lo < 0 or sine.lo < 0:
+        raise ValueError(
+            "the corner clip's folded reach is enclosed as max(cos, sin), which is "
+            f"max(|cos|, |sin|) only on [0, pi/2]; rotation {rotation.label} encloses "
+            f"cos in [{cosine.lo}, {cosine.hi}] and sin in [{sine.lo}, {sine.hi}]"
+        )
     reach = Interval.of(clip.square_side) * Interval(
         max(cosine.lo, sine.lo), max(cosine.hi, sine.hi)
     )
@@ -921,6 +931,11 @@ def verify_by_intervals(
     # thing in both modes. Without this an enclosed run accepted the retained
     # atoms with one lightened by 1/10000, reporting the true 99993/100000 as a
     # width-zero enclosure and calling it a pass (D-435).
+    #
+    # The ``o.lower is not None`` half is load-bearing a second time, for the corner
+    # clip: a direction whose clipped domain is empty leaves ``lower`` unset, and this
+    # is what turns that into a refusal rather than a vacuous pass on an empty class.
+    # Incidental to D-435 but relied on, so do not reduce it to a mass comparison.
     reaches_one = all(o.lower is not None and o.lower >= atoms.scale for o in outcomes)
     if "refuted" in statuses:
         status: Status = "fails"

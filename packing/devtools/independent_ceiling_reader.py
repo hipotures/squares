@@ -75,6 +75,18 @@ DEFAULT_RECORD = (
 )
 RETAINED_SHA256 = "95cf06473f185764076d21021b75cc65962ef6b68dc717c045c2c7d76ae12427"
 
+# What a record declares itself to be, restated rather than imported: this reader is
+# stdlib-only by contract and must not import ``sqpack``, whose
+# ``fractional.corner_clip`` holds the same two tuples for the tools that may. Neither
+# copy may grow a name the other lacks, and
+# ``tests/test_fractional_corner_clip.py`` fails if the two copies drift, in
+# ``test_the_reader_s_variant_vocabulary_matches_sqpack_s``.
+CERTIFICATE_VARIANTS = ("unconditional", "class", "conditional")
+# The variants this reader implements. Everything else is refused by name before any
+# clip is reconciled; reading a declared variant this reader does not implement as the
+# unconditional theorem is review finding H1.
+DECIDABLE_VARIANTS = ("unconditional", "class")
+
 type Point = tuple[Fraction, Fraction]
 # A x + B y = C over the integers, (A, B) != (0, 0), normalised by gcd and sign.
 type Line = tuple[int, int, int]
@@ -120,6 +132,33 @@ class Square:
         u = c * self.centre_x + s * self.centre_y
         v = -s * self.centre_x + c * self.centre_y
         return integer_slab(c, s, u - h, u + h), integer_slab(-s, c, v - h, v + h)
+
+    def corner_penetration(self, outer: Fraction) -> Fraction:
+        """The least ``x + y`` this square reaches in any of the four corner frames.
+
+        Written from the statement: for a closed square of side S centred at (x, y) at
+        angle theta the linear functional x + y is extreme at the four vertices, where
+        it takes x + y + S * {cos, sin, -sin, -cos}, so its minimum over the square is
+        x + y - S * max(|cos|, |sin|). The folded maximum, not the cosine: this record
+        stores mirrored placements whose stated angle is near a quarter turn while the
+        square itself is near axis-parallel, and reading cos there would put a flush
+        corner square deep in the container. The other three corners are the same
+        statement in the frames that put them at the origin, i.e. with x replaced by
+        ``outer - x``, y by ``outer - y``, or both.
+
+        One expression, read by K4 and by the clipped residual, so the condition and
+        the reading cannot drift apart. ``outer`` is the *container* side; the reach
+        uses this placement's own ``side``.
+        """
+        cosine, sine = self.frame()
+        reach = self.side * max(abs(cosine), abs(sine))
+        x, y = self.centre_x, self.centre_y
+        return min(
+            x + y - reach,
+            (outer - x) + y - reach,
+            x + (outer - y) - reach,
+            (outer - x) + (outer - y) - reach,
+        )
 
     @property
     def mirror_half_tangent(self) -> Fraction:
@@ -375,33 +414,20 @@ def check_k3(record: Record) -> dict[str, Any]:
 def check_k4(record: Record, depth: Fraction) -> dict[str, Any]:
     """K4: every placement avoids the four closed corner triangles ``x + y <= depth``.
 
-    Written from the statement, like the rest of this file. For a closed square of side
-    S centred at (x, y) at angle theta, the linear functional x + y is extreme at the
-    four vertices, where it takes the values x + y + S * {cos, sin, -sin, -cos}; so its
-    minimum over the square is x + y - S * max(|cos|, |sin|). The folded maximum, not
-    the cosine: this record stores mirrored placements whose stated angle is near a
-    quarter turn while the square itself is near axis-parallel, and reading cos there
-    would put a flush corner square deep in the container. The other three corners are
-    the same statement in the frames that put them at the origin, i.e. with x replaced
-    by L - x, y by L - y, or both.
+    The penetration itself is ``Square.corner_penetration``, written from the statement
+    like the rest of this file and shared with `clipped_residual` so the condition and
+    the reading cannot disagree.
 
     A family is a ceiling for the *clipped* covering program only if every placement is
     a constraint of that program, and a placement meeting a corner triangle is not: the
-    free class removed it from the row domain.
+    free class removed it from the row domain. The test is strict, ``> depth`` to hold:
+    a square touching a closed triangle meets it.
     """
 
     reached: list[dict[str, str]] = []
     worst: Fraction | None = None
     for index, sq in enumerate(record.squares):
-        c, s = sq.frame()
-        reach = sq.side * max(abs(c), abs(s))
-        x, y, side = sq.centre_x, sq.centre_y, record.outer_side
-        penetration = min(
-            x + y - reach,
-            (side - x) + y - reach,
-            x + (side - y) - reach,
-            (side - x) + (side - y) - reach,
-        )
+        penetration = sq.corner_penetration(record.outer_side)
         if worst is None or penetration < worst:
             worst = penetration
         if penetration <= depth:
@@ -426,16 +452,7 @@ def clipped_residual(record: Record, depth: Fraction) -> dict[str, Any]:
     kept = Fraction(0)
     removed = Fraction(0)
     for sq in record.squares:
-        c, s = sq.frame()
-        reach = sq.side * max(abs(c), abs(s))
-        x, y, side = sq.centre_x, sq.centre_y, record.outer_side
-        penetration = min(
-            x + y - reach,
-            (side - x) + y - reach,
-            x + (side - y) - reach,
-            (side - x) + (side - y) - reach,
-        )
-        if penetration <= depth:
+        if sq.corner_penetration(record.outer_side) <= depth:
             removed += sq.weight
         else:
             kept += sq.weight
@@ -579,6 +596,28 @@ def controls(record: Record) -> list[dict[str, Any]]:
 # ----------------------------------------------------------------------------- CLI
 
 
+def require_decidable_variant(variant: object) -> None:
+    """Refuse any declared variant this reader does not implement, naming it.
+
+    Absent means the unconditional theorem and ``class`` means the corner class; every
+    other name -- ``conditional``, which the gate's vocabulary knows, or a misspelling,
+    which nothing knows -- is refused here rather than falling through to the requested
+    clip and being decided as the unconditional program (review finding H1). The same
+    allowlist is stated at the gate in ``decide_certificate._require_declared_variant``
+    and for the importing tools in ``sqpack.fractional.corner_clip``.
+    """
+
+    if variant is None or variant in DECIDABLE_VARIANTS:
+        return
+    if isinstance(variant, str) and variant in CERTIFICATE_VARIANTS:
+        raise ValueError(
+            f"the record declares variant: {variant}, and this reader decides only the "
+            f"unconditional theorem and the corner class; a {variant} record cannot be "
+            "read here"
+        )
+    raise ValueError(f"field 'variant' must be one of {CERTIFICATE_VARIANTS}, got {variant!r}")
+
+
 def agreed_corner_clip(fields: dict[str, Any], requested: Fraction | None) -> Fraction | None:
     """Reconcile the clip the record declares with the one the command line asked for.
 
@@ -588,10 +627,12 @@ def agreed_corner_clip(fields: dict[str, Any], requested: Fraction | None) -> Fr
     declares ``variant: class`` without ``--corner-clip`` would print this reader's
     unconditional theorem sentence over bytes that claim only a class, which is review
     defect D4, so that combination is refused. Asking for a clip on a record that
-    declares none stays allowed: that is this reader deciding K4 itself.
+    declares none stays allowed: that is this reader deciding K4 itself. A variant this
+    reader does not implement is refused first, by name.
     """
 
     variant = fields.get("variant")
+    require_decidable_variant(variant)
     declared_field = fields.get("corner_clip")
     if declared_field is None:
         if variant == "class":

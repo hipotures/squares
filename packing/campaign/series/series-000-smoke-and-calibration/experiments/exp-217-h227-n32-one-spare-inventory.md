@@ -60,7 +60,11 @@ experiment:
       the record's decimal keys (3,089 at exact integer keys), 401 raw forced (352
       Theorem 8, 49 six distinct full), 11,699 raw kill, 0 needs-geometry; the
       zero-spare n=33 control is forced on both lines; the Fable review reproduced the
-      survival table and the 0.0265 budget (receipt bentz2016-one-spare-receipt.md)
+      survival table and the 0.0265 budget (receipt bentz2016-one-spare-receipt.md).
+      Every count here was re-derived after the second review found the side-6
+      distinctness predicate unsound (it decided from colour labels, not witness
+      identity); with the predicate corrected, nothing moved, and the counts are now
+      pinned by tests/test_bentz2016_tools.py.
   - shape: record
     role: outcome
     metric: raw kill pairs at n=32 (wall-line count alone; the merge propagation is not carried by the m=6 model)
@@ -84,6 +88,27 @@ experiment:
 The first round of [H-227](../../../hypotheses/H-227-n32-one-spare-wall-charge-lemma.md)
 under [agenda-040](../../../agendas/agenda-040-overnight-lower-bound-loop.md) BC-362, on
 the same tool as exp-216.
+
+## The counts were re-derived after the review
+
+A review of the port found the side-6 distinctness predicate unsound: it asked whether
+two counted boxes shared a colour *label*, which two boxes carrying each other’s end
+point satisfy without being different boxes.
+The predicate now carries witness identity -- two boxes are distinct when some colour
+has two different known points between them -- and every count above was re-derived
+under it. **Nothing moved:** 12,100 raw pairs, 4,146 orbits (3,089 on exact integer
+keys), 401 forced (352 Theorem 8, 49 six distinct full), 11,699 kill, 0 needs-geometry,
+and the `n = 33` zero-spare control still forced on both lines.
+The loose and the sound predicate agree on every one of the 72,698 counted-box pairs
+this case reaches.
+
+The direction matters for reading this record.
+A loose distinctness test over-counts distinct boxes, which inflates `forced` and pushes
+toward a false *confirm* of H-227; exp-217 recorded a rejection, so the rejection was
+never at risk from it, and the re-derivation confirms the score.
+The counts are now pinned by
+[`tests/test_bentz2016_tools.py`](../../../../tests/test_bentz2016_tools.py), which the
+second review found nothing doing.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

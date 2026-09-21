@@ -26,7 +26,7 @@ from typing import cast
 from strif import atomic_write_text
 
 SCHEMA = "bc303-literal-t1-witness/v1"
-SOURCE_REVISION = "8f4eca7d23cdfc32091b9f783fdcadf7cb269615"
+SOURCE_REVISION = "9a19d39319861c93d85d7213101cf3a8a443c415"
 READER_PATH = "packing/devtools/replay_bc303_t1_witness.py"
 MEASURE_PATH = (
     "packing/campaign/series/series-000-smoke-and-calibration/results/agenda-030/"
@@ -109,9 +109,28 @@ class Measure:
     weight_scale: int
 
 
-# 2026-09-20: re-bound to 8f4eca7d after the corner-clip instrument (Session 145,
-# PR 206) changed these modules on clip-free-identical code paths; the replay
-# reproduced the retained determination unchanged.
+# 2026-09-20 (Session 145, PR 206): re-bound twice. First from 39714308 to 8f4eca7d,
+# where the corner-clip instrument had changed three pinned blobs -- certificate.py,
+# sweep.py and generate.py -- and then to 9a19d393, which carries this review's own
+# change to generate.py (the clipped branch of ``_CentreDomain.at`` now refuses a clip
+# whose sides disagree with its affine bounds).
+#
+# Read these entries as what they are: *review bindings*, the source bytes the retained
+# determination was reviewed against. They are not inputs to it. This reader imports no
+# ``sqpack`` module -- the standard library plus ``strif`` -- and ``_literal_witness``
+# computes the witness from the measure document alone, so the determination never
+# depended on certificate.py, sweep.py or generate.py and re-running the replay
+# re-validates the bindings rather than the behaviour of the re-pinned modules. What was
+# re-run at each re-binding: this replay and its test module, which reproduce the
+# retained witness unchanged; that is a statement about this reader, not about them.
+#
+# The evidence that the clip-free code paths of those modules are themselves unchanged
+# is separate, and does exercise them: an unclipped re-decision of
+# packing/campaign/series/series-000-smoke-and-calibration/results/agenda-037/
+# n18-467-100-t019-seed-certificate.json, reproducing the pre-PR log
+# n18-467-100-t019-seed-decide.log in every field -- interval accepted, enclosure
+# 2000007/2000000 both ends, boxes 2543909, stalled 0; exact accepted, least
+# 2000007/2000000; sha256 3a11b6303e0663b502b6c1e3fc9d8da285104e199b17022937369bc781479059.
 SOURCES = (
     SourceSpec(
         "docs/project/research/research-2026-09-12-n11-selection-routing-first-principles.md",
@@ -199,8 +218,8 @@ SOURCES = (
     ),
     SourceSpec(
         "packing/src/sqpack/fractional/generate.py",
-        "179d1d11b58b4127b6475046fc988cf3bff60f10",
-        23_474,
+        "f95792ca57139d0991b6a92e1e971d9a0a7b35d3",
+        24_267,
     ),
 )
 
