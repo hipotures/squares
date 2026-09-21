@@ -99,9 +99,20 @@ NOT_CONTENT = {
 }
 
 #: What every check that reads the tree says when there is no index to ask. Unlike the
-#: class-record sweep, this check cannot fall back to a walk with a stated bound: a walk
-#: is the thing that was wrong, and the check is hardwired to this repository's own
-#: documents, so there is no caller for whom "no git here" is an ordinary case.
+#: class-record sweep, this check does not fall back to a walk with a stated bound: a
+#: walk is the thing that was wrong, and the check is hardwired to this repository's own
+#: documents.
+#:
+#: The first version of this comment justified that refusal by adding that there was no
+#: caller for whom "no git here" is an ordinary case. That was false as written, and it
+#: turned main red the same day. The negative-control worker is exactly such a caller --
+#: `check_class_record_claims` names it in its own docstring, which is why that sweep
+#: kept its walk -- and it ran every check against a source snapshot carrying no `.git`,
+#: so the README controls read this line where they rehearse drift and did not fire. The
+#: answer was not to reintroduce the walk but to give the snapshot the index it was
+#: missing: `run_negative_controls.clone_tree` now makes each worker tree a git checkout
+#: of itself, so that caller asks git like every other one and the control rehearses the
+#: code the gate runs rather than a fallback.
 NO_INDEX = "cannot ask git which files this repository tracks, so the directory is unknown"
 
 # This is the repository-owned text surface, not the retained literature archive. The
