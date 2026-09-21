@@ -1,17 +1,19 @@
 # n=19 241/50 T-020-Seeded Auto Window-6 Covering Receipt
 
-Status: **site set still open, unconverged**. The side stays open. No freeze.
+Status: **site set still open, unconverged**. The side stays open.
+No freeze.
 
-Session-140 leftover rank 1: BC-191 auto grids `(34, 45, 56)` unioned with T-020's
-atom sites from `certificate-24-5.json` scaled from `24/5` to `241/50`, plus
-`--seed-windows 6`, `(n, L, B, net) = (19, 241/50, 9977/10000, 181 directions)`.
-Seed sites 2836. The 1200 s deadline stopped the row loop after 38 LP rounds at
-`19.247109` (291 still violated). It crossed 19 at round 12 (`19.011201`).
-Farther than the same construction at `481/100` (`19.132115`), closer than
-`97/20` (`19.808958`). Remaining rows can only raise this value, so
-`19.247109` is not a covering below 19.
-Adding sites, or more wall, can still lower it. T-020 is unchanged. T-029 was
-not offered. H-218 stays unconfirmed.
+Session-140 leftover rank 1: BC-191 auto grids `(34, 45, 56)` unioned with T-020’s atom
+sites from `certificate-24-5.json` scaled from `24/5` to `241/50`, plus
+`--seed-windows 6`, `(n, L, B, net) = (19, 241/50, 9977/10000, 181 directions)`. Seed
+sites 2836. The 1200 s deadline stopped the row loop after 38 LP rounds at `19.247109`
+(291 still violated).
+It crossed 19 at round 12 (`19.011201`). Farther than the same construction at `481/100`
+(`19.132115`), closer than `97/20` (`19.808958`). Remaining rows can only raise this
+value, so `19.247109` is not a covering below 19. Adding sites, or more wall, can still
+lower it. T-020 is unchanged.
+T-029 was not offered.
+H-218 stays unconfirmed.
 
 ## Command
 

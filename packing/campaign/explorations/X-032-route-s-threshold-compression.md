@@ -161,9 +161,8 @@ Admission requires controls whose outcomes do not depend on a compression candid
   T-026 sentinels.
 
 These controls admit a producer and checker.
-They are not candidate certificates and cannot resolve H-163.
-Their retained SHA-256 values are therefore excluded from any later accept:
-the full T-025 control
+They are not candidate certificates and cannot resolve H-163. Their retained SHA-256
+values are therefore excluded from any later accept: the full T-025 control
 `53fbe28bd6dd022600515663ea1e3609ed2bd36a83e69e350b4bb3b45d7b7176`, the synthetic
 23-orbit decompressor control
 `007b394f48b0b11565ca87d09ad961258534c426bfd623a3e9bfc15aa6495e8a`, and the rejected

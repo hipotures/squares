@@ -1,17 +1,18 @@
 # n=12 793/200 T-017 Auto Window-7 Covering Receipt
 
-Status: **site set still open, unconverged**. The side stays open. No freeze.
+Status: **site set still open, unconverged**. The side stays open.
+No freeze.
 
 Session-141 exp-175: T-017 seed plus auto grids plus `--seed-windows 7`,
 `(n, L, B, net) = (12, 793/200, 9977/10000, 181 directions)`. Auto resolved to
-`(26, 35, 43)`. Seed sites 2533. The 1200 s deadline stopped the row loop after
-38 LP rounds at `12.067502` (102 still violated). It crossed 12 at round 11
-(`12.005485`). The objective sat at `12.067502` from round 32.
+`(26, 35, 43)`. Seed sites 2533. The 1200 s deadline stopped the row loop after 38 LP
+rounds at `12.067502` (102 still violated).
+It crossed 12 at round 11 (`12.005485`). The objective sat at `12.067502` from round 32.
 
-Remaining rows can only raise this value, so `12.067502` is not a covering
-below 12.
-Do not more-wall this set. T-017 stands. T-030 was not offered. H-218 stays
-unconfirmed.
+Remaining rows can only raise this value, so `12.067502` is not a covering below 12. Do
+not more-wall this set.
+T-017 stands. T-030 was not offered.
+H-218 stays unconfirmed.
 
 This is the first first-party covering row at `793/200`.
 
@@ -34,8 +35,8 @@ uv run --frozen --all-extras --group dev python -m devtools.run_fractional_colge
 ```
 
 No freeze file: the 1200 s deadline stopped the row loop after 38 rounds.
-Wall 1221.6 s. The walker then started n=12 `397/100` T-017 auto plus windows 7
-as exp-176.
+Wall 1221.6 s. The walker then started n=12 `397/100` T-017 auto plus windows 7 as
+exp-176.
 
 ## Covering
 

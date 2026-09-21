@@ -3,11 +3,11 @@
 Status: **site set refuted**. The side stays open.
 
 Session-139 probe on `--grid-counts 25,34,41,48` at
-`(n, L, B, net) = (11, 383/100, 9977/10000, 181 directions)`.
-This is the denser named site set after auto grids `(25, 34, 41)` returned
-`11.192598`. A restricted optimum at or above 11 on a converged row loop refutes
-this site set only. Adding sites can still lower the covering value, so
-`383/100` is not barred. T-025 and T-026 are unchanged.
+`(n, L, B, net) = (11, 383/100, 9977/10000, 181 directions)`. This is the denser named
+site set after auto grids `(25, 34, 41)` returned `11.192598`. A restricted optimum at
+or above 11 on a converged row loop refutes this site set only.
+Adding sites can still lower the covering value, so `383/100` is not barred.
+T-025 and T-026 are unchanged.
 
 ## Command
 
@@ -23,8 +23,8 @@ uv run --frozen --all-extras --group dev python -m devtools.run_fractional_colge
   --log campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-383-100-grid4.log
 ```
 
-`--freeze-family` was not requested. Column generation added one orbit after the
-row loop and stopped; wall 81.7 s.
+`--freeze-family` was not requested.
+Column generation added one orbit after the row loop and stopped; wall 81.7 s.
 
 ## Covering
 
@@ -39,8 +39,8 @@ row loop and stopped; wall 81.7 s.
 | `least_covered` | 1 |
 | Converged | yes (`violated == 0`) |
 
-About 2,300 extra sites dropped the restricted optimum by 0.050 from the auto-grid
-row. `devtools.decide_certificate` was not run: the mass is not below 11.
+About 2,300 extra sites dropped the restricted optimum by 0.050 from the auto-grid row.
+`devtools.decide_certificate` was not run: the mass is not below 11.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

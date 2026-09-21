@@ -1,16 +1,17 @@
 # n=17 23/5 T-019-Seeded Four-Grid Window-8 Covering Receipt
 
-Status: **site set still open, unconverged**. The side stays open. No freeze.
+Status: **site set still open, unconverged**. The side stays open.
+No freeze.
 
-Session-140 rank-3 probe: four-grid `(34, 45, 56, 64)` unioned with T-019's
-atom sites scaled from `459/100` to `23/5`, plus `--seed-windows 8`,
-`(n, L, B, net) = (17, 23/5, 9977/10000, 181 directions)`.
-Seed sites 2208. The 1200 s deadline stopped the row loop after 46 LP rounds at
-`17.120106` (237 still violated). It crossed 17 at round 19 (`17.036105`).
-Session-139's best at this side remains the T-019-seeded auto plus windows 5
-row at `17.042346`. Remaining rows can only raise this value, so `17.120106`
-is not a covering below 17. Adding sites, or more wall, can still lower it.
-T-019 is unchanged. T-028 was not offered.
+Session-140 rank-3 probe: four-grid `(34, 45, 56, 64)` unioned with T-019’s atom sites
+scaled from `459/100` to `23/5`, plus `--seed-windows 8`,
+`(n, L, B, net) = (17, 23/5, 9977/10000, 181 directions)`. Seed sites 2208. The 1200 s
+deadline stopped the row loop after 46 LP rounds at `17.120106` (237 still violated).
+It crossed 17 at round 19 (`17.036105`). Session-139’s best at this side remains the
+T-019-seeded auto plus windows 5 row at `17.042346`. Remaining rows can only raise this
+value, so `17.120106` is not a covering below 17. Adding sites, or more wall, can still
+lower it. T-019 is unchanged.
+T-028 was not offered.
 
 ## Command
 

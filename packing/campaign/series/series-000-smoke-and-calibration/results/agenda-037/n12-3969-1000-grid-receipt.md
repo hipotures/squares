@@ -3,9 +3,9 @@
 Status: **site set refuted**. The side stays open.
 
 Session-139 probe on BC-191 auto grids `(26, 35, 43)` at
-`(n, L, B, net) = (12, 3969/1000, 9977/10000, 181 directions)`.
-A restricted optimum at or above 12 on a converged row loop refutes this site set
-only. Adding sites can still lower the covering value, so `3969/1000` is not barred.
+`(n, L, B, net) = (12, 3969/1000, 9977/10000, 181 directions)`. A restricted optimum at
+or above 12 on a converged row loop refutes this site set only.
+Adding sites can still lower the covering value, so `3969/1000` is not barred.
 T-017 at `99/25` is unchanged.
 
 ## Command

@@ -642,7 +642,8 @@ M2, M4, M5, M6, and M8 stay retired in agenda-037 BC-360. `exp-161` remains Rout
 ## N<=100 lower-bound survey — X-038
 
 [X-038](explorations/X-038-n100-lower-bound-survey.md) ranks the open floors at
-`n <= 100` against the stock colgen. Session-140 runs the first wave.
+`n <= 100` against the stock colgen.
+Session-140 runs the first wave.
 
 | # | Idea | Status | H | Crux |
 | --- | --- | --- | --- | --- |
@@ -651,8 +652,10 @@ M2, M4, M5, M6, and M8 stay retired in agenda-037 BC-360. `exp-161` remains Rout
 ## N<100 re-rank after Session-140 — X-039
 
 [X-039](explorations/X-039-n100-re-rank-after-session-140.md) re-ranks the open floors
-from Session-140 masses. Leftover n=18 is a new claim. The Nagamochi-only sizes are a
-new claim. H-218 stays row 189; its reopen is a new site set at n=20, not a replay.
+from Session-140 masses.
+Leftover n=18 is a new claim.
+The Nagamochi-only sizes are a new claim.
+H-218 stays row 189; its reopen is a new site set at n=20, not a replay.
 
 | # | Idea | Status | H | Crux |
 | --- | --- | --- | --- | --- |

@@ -3,11 +3,11 @@
 Status: **site set refuted**. The side stays open.
 
 Session-139 probe on BC-191 auto grids `(25, 34, 41)` at
-`(n, L, B, net) = (11, 383/100, 9977/10000, 181 directions)`.
-A restricted optimum at or above 11 on a converged row loop refutes this site set
-only. Adding sites can still lower the covering value, so `383/100` is not barred.
-T-025 at `191/50` and T-026 at
-`955000*sqrt(518400042893309449)/179696714646249` are unchanged.
+`(n, L, B, net) = (11, 383/100, 9977/10000, 181 directions)`. A restricted optimum at or
+above 11 on a converged row loop refutes this site set only.
+Adding sites can still lower the covering value, so `383/100` is not barred.
+T-025 at `191/50` and T-026 at `955000*sqrt(518400042893309449)/179696714646249` are
+unchanged.
 
 ## Command
 
@@ -23,8 +23,8 @@ uv run --frozen --all-extras --group dev python -m devtools.run_fractional_colge
   --log campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-383-100-grid.log
 ```
 
-`--freeze-family` was not requested. Column generation added one orbit after the
-row loop and stopped; wall 82.2 s.
+`--freeze-family` was not requested.
+Column generation added one orbit after the row loop and stopped; wall 82.2 s.
 
 ## Covering
 

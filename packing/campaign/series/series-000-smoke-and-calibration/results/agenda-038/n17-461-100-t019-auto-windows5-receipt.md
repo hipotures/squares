@@ -1,17 +1,18 @@
 # n=17 461/100 T-019-Seeded Auto Window-5 Covering Receipt
 
-Status: **site set still open, unconverged**. The side stays open. No freeze.
+Status: **site set still open, unconverged**. The side stays open.
+No freeze.
 
-Session-140 leftover rank 2: BC-191 auto grids `(32, 43, 53)` unioned with T-019's
-atom sites from `certificate.json` scaled from `459/100` to `461/100`, plus
-`--seed-windows 5`, `(n, L, B, net) = (17, 461/100, 9977/10000, 181 directions)`.
-Seed sites 1584. The 1200 s deadline stopped the row loop after 56 LP rounds at
-`17.195968` (18 still violated). It crossed 17 at round 11 (`17.030928`) and sat
-on `17.195968` from round 45. This side is `4.61`, one cent above `23/5`.
-Remaining rows can only raise this value, so `17.195968` is not a covering below
-17.
-Adding sites, or more wall, can still lower it. T-019 is unchanged. T-029 was
-not offered. H-218 stays unconfirmed.
+Session-140 leftover rank 2: BC-191 auto grids `(32, 43, 53)` unioned with T-019’s atom
+sites from `certificate.json` scaled from `459/100` to `461/100`, plus
+`--seed-windows 5`, `(n, L, B, net) = (17, 461/100, 9977/10000, 181 directions)`. Seed
+sites 1584. The 1200 s deadline stopped the row loop after 56 LP rounds at `17.195968`
+(18 still violated).
+It crossed 17 at round 11 (`17.030928`) and sat on `17.195968` from round 45. This side
+is `4.61`, one cent above `23/5`. Remaining rows can only raise this value, so
+`17.195968` is not a covering below 17. Adding sites, or more wall, can still lower it.
+T-019 is unchanged. T-029 was not offered.
+H-218 stays unconfirmed.
 
 ## Command
 

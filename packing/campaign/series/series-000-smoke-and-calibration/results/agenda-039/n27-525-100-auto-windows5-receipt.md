@@ -1,17 +1,20 @@
 # n=27 525/100 Seedless Auto Window-5 Covering Receipt
 
-Status: **site set still open, unconverged**. The side stays open. No freeze.
+Status: **site set still open, unconverged**. The side stays open.
+No freeze.
 
 Session-141 exp-170: seedless auto grids plus `--seed-windows 5`,
 `(n, L, B, net) = (27, 525/100, 9977/10000, 181 directions)`. Auto resolved to
-`(37, 50, 62)`. Seed sites 625 (windows only). The 1200 s deadline stopped the
-row loop after 38 LP rounds at `25.000000` (546 still violated). It sat on
-`25.000000` from the early rounds. It did not cross 27.
+`(37, 50, 62)`. Seed sites 625 (windows only).
+The 1200 s deadline stopped the row loop after 38 LP rounds at `25.000000` (546 still
+violated). It sat on `25.000000` from the early rounds.
+It did not cross 27.
 
-Remaining rows can only raise this value, so `25.000000` is not a covering
-below 27.
-Do not more-wall this set. Nagamochi `1 + sqrt(18)` stands. T-030 was not
-offered. H-220 stays unconfirmed.
+Remaining rows can only raise this value, so `25.000000` is not a covering below 27. Do
+not more-wall this set.
+Nagamochi `1 + sqrt(18)` stands.
+T-030 was not offered.
+H-220 stays unconfirmed.
 
 This is the first first-party covering row at n=27.
 
@@ -33,8 +36,8 @@ uv run --frozen --all-extras --group dev python -m devtools.run_fractional_colge
 ```
 
 No freeze file: the 1200 s deadline stopped the row loop after 38 rounds.
-Wall 1201.0 s. The walker then stopped before n=29 (`remain=-1094s` past the
-10:26Z cut). Resume after 11:26Z.
+Wall 1201.0 s. The walker then stopped before n=29 (`remain=-1094s` past the 10:26Z
+cut). Resume after 11:26Z.
 
 ## Covering
 

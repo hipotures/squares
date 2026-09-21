@@ -1,11 +1,13 @@
 # M3 T-018 Selftest Receipt
 
-Status: **unresolved**. Not a kill. Not an eleven-candidate.
+Status: **unresolved**. Not a kill.
+Not an eleven-candidate.
 
-Session-139 ran `devtools.pierce_t018_sites --selftest` on T-018's 1121 unique
-sites at side `19/5` with closed unit squares (not the fractional shrink).
-The 5-direction net's event-cell encoding hit the 20 s time limit before HiGHS
-ran. Timeout is unresolved. A float LP was not used.
+Session-139 ran `devtools.pierce_t018_sites --selftest` on T-018’s 1121 unique sites at
+side `19/5` with closed unit squares (not the fractional shrink).
+The 5-direction net’s event-cell encoding hit the 20 s time limit before HiGHS ran.
+Timeout is unresolved.
+A float LP was not used.
 
 A 36-direction scientific search needs a larger encoding budget than 20 s.
 

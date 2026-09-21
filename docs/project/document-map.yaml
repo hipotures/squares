@@ -615,6 +615,10 @@ documents:
     role: handoff
     authority: record
     lifecycle: retained
+  - path: docs/project/handoff-2026-09-21-n17-external-intake.md
+    role: handoff
+    authority: record
+    lifecycle: retained
   - path: docs/project/handoff-2026-09-06-post-381-t2-t10-continuation.md
     role: handoff
     authority: record

@@ -87,9 +87,9 @@ The accept rule is the gate, not the float LP. A restricted optimum above 18 is 
 site-set negative and is recorded on `covering-values.yaml`. The next T-id is landed
 only on `RETAINABLE`. That retain does not confirm H-218.
 
-exp-161 is not this round. Do not `--search`. Do not mutate T-025 or T-026
-`verify_claim.py`. Do not close `think-qqzs`, `think-g3j7`, `think-gyzw`, or
-`think-jwb1`.
+exp-161 is not this round.
+Do not `--search`. Do not mutate T-025 or T-026 `verify_claim.py`. Do not close
+`think-qqzs`, `think-g3j7`, `think-gyzw`, or `think-jwb1`.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

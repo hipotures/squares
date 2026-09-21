@@ -3,19 +3,19 @@
 Status: **retained**. `s(18) >= 467/100` is T-027. Canonical bytes:
 `packing/cases/n18_fractional_certificate/certificate.json`.
 
-Session-139 probe: BC-191 auto `(32, 43, 53)` unioned with T-019's 1184 atom
-sites scaled from `459/100` to `467/100`,
-`(n, L, B, net) = (18, 467/100, 9977/10000, 181 directions)`.
-The unseeded auto grid locked at `18.000000` unconverged.
-The seed's row loop crossed below 18 and converged at `17.875567` with
-`least_covered = 1` (44 LP rounds, 6853 sites / 920 orbits). The first
-`--support-cap 0` invocation then hung in `check_ceiling` on the untruncated
+Session-139 probe: BC-191 auto `(32, 43, 53)` unioned with T-019’s 1184 atom sites
+scaled from `459/100` to `467/100`,
+`(n, L, B, net) = (18, 467/100, 9977/10000, 181 directions)`. The unseeded auto grid
+locked at `18.000000` unconverged.
+The seed’s row loop crossed below 18 and converged at `17.875567` with
+`least_covered = 1` (44 LP rounds, 6853 sites / 920 orbits).
+The first `--support-cap 0` invocation then hung in `check_ceiling` on the untruncated
 dual and was interrupted after 31 minutes, so `run.json` was not written.
-A freeze re-run with `--support-cap 32` wrote the candidate. `declare_least_cell_mass`
-then `decide_certificate` accepted both routes at least cell mass
-`2000007/2000000`. sha256
-`3a11b6303e0663b502b6c1e3fc9d8da285104e199b17022937369bc781479059`.
-T-019 at `459/100` is unchanged at n = 17.
+A freeze re-run with `--support-cap 32` wrote the candidate.
+`declare_least_cell_mass` then `decide_certificate` accepted both routes at least cell
+mass `2000007/2000000`. sha256
+`3a11b6303e0663b502b6c1e3fc9d8da285104e199b17022937369bc781479059`. T-019 at `459/100`
+is unchanged at n = 17.
 
 ## Command
 
@@ -57,8 +57,8 @@ uv run --frozen --all-extras --group dev python -m devtools.decide_certificate \
 ```
 
 The undeclared freeze bytes are kept beside the declared file as
-`n18-467-100-t019-seed-certificate-undeclared.json`. The case copy is the
-canonical artifact.
+`n18-467-100-t019-seed-certificate-undeclared.json`. The case copy is the canonical
+artifact.
 
 ## Covering
 

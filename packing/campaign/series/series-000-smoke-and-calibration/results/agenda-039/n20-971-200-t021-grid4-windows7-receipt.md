@@ -1,21 +1,21 @@
 # n=20 971/200 T-021 Four-Grid Window-7 Covering Receipt
 
-Status: **site set still open, unconverged**. The side stays open. No freeze.
+Status: **site set still open, unconverged**. The side stays open.
+No freeze.
 
-Session-141 exp-164: T-021 four-grid `(34, 46, 56, 64)` unioned with T-021's atom
-sites from `certificate.json` scaled from `97/20` to `971/200`, plus
-`--seed-windows 7`, `(n, L, B, net) = (20, 971/200, 9977/10000, 181 directions)`.
-Seed sites 2464. The 2400 s deadline stopped the row loop after 48 LP rounds at
-`19.857588` (225 still violated). The objective sat near `19.857` from round 41.
-It did not cross 20.
+Session-141 exp-164: T-021 four-grid `(34, 46, 56, 64)` unioned with T-021’s atom sites
+from `certificate.json` scaled from `97/20` to `971/200`, plus `--seed-windows 7`,
+`(n, L, B, net) = (20, 971/200, 9977/10000, 181 directions)`. Seed sites 2464. The 2400
+s deadline stopped the row loop after 48 LP rounds at `19.857588` (225 still violated).
+The objective sat near `19.857` from round 41. It did not cross 20.
 
-Remaining rows can only raise this value, so `19.857588` is not a covering below
-20.
-Adding sites, or a thinner side on this four-grid class, can still lower it. T-021
-is unchanged. T-030 was not offered. H-218 stays unconfirmed.
+Remaining rows can only raise this value, so `19.857588` is not a covering below 20.
+Adding sites, or a thinner side on this four-grid class, can still lower it.
+T-021 is unchanged. T-030 was not offered.
+H-218 stays unconfirmed.
 
-This mass is below the leftover auto plus windows 6 row at the same side
-(`19.910044`) and below the same four-grid at `973/200` (`19.939212`).
+This mass is below the leftover auto plus windows 6 row at the same side (`19.910044`)
+and below the same four-grid at `973/200` (`19.939212`).
 
 ## Command
 
