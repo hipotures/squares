@@ -341,11 +341,16 @@ on.
 It is not the next thing, because a reassessment of what to search is queued in front
 of it.
 
-For the next supervised exact-research goal, take the n = 17 intake under `think-pcd0`:
-land the adoption of `s(17) >= 461300/99999`. Its identifier contest with pull request
-208, which claimed the same `T-031` from the open overnight stack, is settled — the
-stack merged into `main` first and kept `T-031`, and this result took `T-032` when
-`main` was merged into the intake branch.
+For the next supervised exact-research goal, take the W5 efficiency block under
+`think-zmos`: measure every routine gate against the wall ceiling `OR-17` now gives it,
+starting from the deep gate’s exhaustive-tier step at 1.38 times its own declared budget
+and the forty-five minutes spent re-running a tree byte-identical to one already
+measured. `OR-12` puts this nine blocks past mandatory; Session 150 published the count
+rather than discharging it.
+The n = 17 intake that stood here is landed: `T-032` carries `s(17) >= 461300/99999`,
+and its identifier contest with pull request 208, which claimed the same `T-031` from
+the open overnight stack, is settled — the stack merged into `main` first and kept
+`T-031`, and this result took `T-032` when `main` was merged into the intake branch.
 The overnight stack’s own chunk-5 handoff is queued behind it: finish the threshold-clip
 and `gap_wedge` ports from the retained patches, review the gap-g wedge derivation and
 disposition H-230 and BC-364, run H-232’s fixed-support screen, then clip the four mixed

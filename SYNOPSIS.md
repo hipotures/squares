@@ -145,8 +145,8 @@ hypothesis status and summarizes experiment verdicts, and the
 | --- | ---: | --- |
 | Agendas | 37 | 17 active; 14 completed; 5 paused; 1 superseded |
 | Commitments | 356 | 181 complete; 61 stopped; 68 blocked; 16 ready; 21 tentative; 9 in progress |
-| Sessions | 149 | 91 completed; 58 stopped; all terminal |
-| Explorations | 38 | 24 linked to proposed hypotheses; 14 uncodified |
+| Sessions | 150 | 92 completed; 58 stopped; all terminal |
+| Explorations | 39 | 24 linked to proposed hypotheses; 15 uncodified |
 | Hypotheses | 170 | 29 confirmed; 31 refuted; 55 blocked; 17 unresolved; 5 open; 29 open questions; 2 result registered; 2 abandoned; 0 running |
 | Experiments | 155 | 43 accepted; 36 rejected; 50 unresolved; 12 baseline; 11 blocked; 3 abandoned; 0 in progress |
 | Frontier results | 32 | 32 registered |
@@ -400,6 +400,7 @@ case or experiment separately.
 | --- | --- | --- | --- | --- |
 | [Senior Review of PRs 199–201](docs/project/reviews/review-2026-09-19-pr199-201-correctness.md) | dated review record | record | retained | — |
 | [Proof Review: R012 `s(17) >= 461300/99999` and Mira’s `4.613` Certificate](docs/project/reviews/review-2026-09-20-n17-r012-and-mira-4613-proof-review.md) | dated review record | record | retained | — |
+| [Review: Derived-Artifact Currency on `main` at `9fe9999d`](docs/project/reviews/review-2026-09-21-derived-artifact-currency.md) | dated review record | record | retained | — |
 | [Square-packing workbench](packages/workbench/README.md) | component scope and use | current | maintained | — |
 | [The checkers’ probes](packages/workbench/probes/README.md) | component scope and use | supporting | maintained | — |
 | [Foundation Benchmark Replay Fixture](packages/workbench/tests/fixtures/benchmark-foundation/README.md) | component scope and use | supporting | maintained | — |
@@ -1054,6 +1055,31 @@ controller, not permission to blur contracts.
 
 ### Current Handoff
 
+[Session 150](packing/campaign/agent-sessions/session-150-n17-consolidation-and-correctness.md)
+landed the agenda-040 overnight stack and the n = 17 intake on main, repairing four
+confirmed review findings at the integration point rather than after it, and left the
+session’s own analysis as records: `X-041`’s ranked slate and the 2026-09-21
+derived-artifact currency review.
+It also replayed and reviewed a fifth external n = 17 value, Kleddamag’s `461300/99853`,
+which reproduced byte-identically through both of its own checkers and drew no Blocker
+and no High from an adversarial proof review.
+That artifact is retained at V4/C3 with C4 blocked, and **no bound moved for it**: the
+registered n = 17 lower bound is `T-032` at `461300/99999`.
+
+Three process defects came out of the block and are tracked rather than worked around:
+`think-fqut`, where GitHub’s stacked-PR merge orphans declared gate commits;
+`think-qsn2`, where `check_session_gate`’s verdict depends on the clone’s fetch depth;
+and `think-3umt`, where a record authored terminal can never earn its first receipt.
+
+**Selected next entry:** `think-zmos`, the W5 efficiency block.
+`OR-12` asks for one in every four to eight blocks and seventeen have closed since
+Session 131 declared the last one, so this is nine past mandatory.
+Its measurements are already taken — the deep gate’s exhaustive-tier step at 1.38 times
+its own declared budget, the deferred-steps wall beside it, and one 45-minute run spent
+over a tree byte-identical to a tree already measured — and `OR-17` now gives every
+routine gate the ceiling those numbers argued for.
+The agenda-040 closeout under `OR-11` remains outstanding and is not this entry.
+
 [Session 149](packing/campaign/agent-sessions/session-149-n17-external-intake.md)
 adopted `s(17) >= 461300/99999` as `T-032` from Guzhou0806’s R012 certificate, with
 Mira’s `4613/1000` beneath it, after four passing replays and a proof review that found
@@ -1063,9 +1089,9 @@ pull request 208 claimed `T-031` from the open overnight stack for the `n = 11` 
 corner class, the stack merged into `main` first and kept it, and this result took
 `T-032` when `main` was merged into the intake branch.
 
-**Selected next entry:** `think-pcd0`, the n = 17 intake: land the adoption of
-`s(17) >= 461300/99999` as `T-032`. The research entry behind it is BC-357, closing M7’s
-n=6 bracket at 299/100 under H-216.
+**Selected next entry at that cutoff:** `think-pcd0`, the n = 17 intake: land the
+adoption of `s(17) >= 461300/99999` as `T-032`. The research entry behind it is BC-357,
+closing M7’s n=6 bracket at 299/100 under H-216.
 
 [Session 148](packing/campaign/agent-sessions/session-148-overnight-chunk-5.md), chunk 5
 on [PR 209](https://github.com/jlevy/squares/pull/209), stopped at the owner’s request
@@ -4395,9 +4421,9 @@ in separate tables: their units differ, and the same work can appear in both.
 
 | Rollups | count | turns | tool calls | errors | one-off code | wall |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| claimed by a session | 161 | 44,279 | 24,297 | 485 | 3,848 | 410.64 h |
+| claimed by a session | 176 | 48,062 | 26,312 | 522 | 4,032 | 428.3 h |
 | claimed by none | 60 | 11,110 | 6,539 | 156 | 946 | 51.75 h |
-| **measured** | **221** | **55,389** | **30,836** | **641** | **4,794** | **462.39 h** |
+| **measured** | **236** | **59,172** | **32,851** | **678** | **4,978** | **480.05 h** |
 
 | Session | Phases | Rollups | Turns | Tool calls | Errors | Wall |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -4445,7 +4471,8 @@ in separate tables: their units differ, and the same work can appear in both.
 | [session-147](packing/campaign/agent-sessions/session-147-overnight-chunk-4.md) | 1 | 0 | 0 | 0 | 0 | 0 h |
 | [session-148](packing/campaign/agent-sessions/session-148-overnight-chunk-5.md) | 1 | 9 | 524 | 296 | 11 | 2.35 h |
 | [session-149](packing/campaign/agent-sessions/session-149-n17-external-intake.md) | 3 | 1 | 370 | 185 | 2 | 18.66 h |
-| *shared by 44 sessions* | — | 7 | 23,948 | 13,058 | 282 | 304.17 h |
+| [session-150](packing/campaign/agent-sessions/session-150-n17-consolidation-and-correctness.md) | 4 | 15 | 3,783 | 2,015 | 37 | 17.66 h |
+| *shared by 45 sessions* | — | 7 | 23,948 | 13,058 | 282 | 304.17 h |
 
 | Codex interval receipt | declaring sessions | model responses | agent time | active union | wall window | live lower bound |
 | --- | --- | ---: | ---: | ---: | ---: | --- |
@@ -4510,9 +4537,9 @@ in separate tables: their units differ, and the same work can appear in both.
 
 | Coverage | sessions |
 | --- | ---: |
-| measured | 95 |
+| measured | 96 |
 | unmeasured | 54 |
-| **total** | **149** |
+| **total** | **150** |
 
 <!-- END GENERATED: session-close-report -->
 

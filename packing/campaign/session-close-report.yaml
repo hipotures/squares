@@ -7,19 +7,19 @@ softschema:
   schema: schemas/session-close-report.schema.yaml
   envelope: null
   status: enforced
-count: 149
+count: 150
 generated_by: >-
   uv run --frozen --all-extras --group dev python -m devtools.close_session --render
 totals:
-  sessions_measured: 95
+  sessions_measured: 96
   sessions_unmeasured: 54
   attributed:
-    rollups: 161
-    turns: 44279
-    tool_calls: 24297
-    tool_errors: 485
-    one_off_code: 3848
-    wall_hours: 410.64
+    rollups: 176
+    turns: 48062
+    tool_calls: 26312
+    tool_errors: 522
+    one_off_code: 4032
+    wall_hours: 428.3
   unattributed:
     rollups: 60
     turns: 11110
@@ -28,12 +28,12 @@ totals:
     one_off_code: 946
     wall_hours: 51.75
   measured:
-    rollups: 221
-    turns: 55389
-    tool_calls: 30836
-    tool_errors: 641
-    one_off_code: 4794
-    wall_hours: 462.39
+    rollups: 236
+    turns: 59172
+    tool_calls: 32851
+    tool_errors: 678
+    one_off_code: 4978
+    wall_hours: 480.05
 codex_receipts:
   attributed: 56
   unattributed: 2
@@ -2468,4 +2468,32 @@ sessions:
   tool_errors: 2
   one_off_code: 23
   wall_hours: 18.66
+  codex_receipts: []
+- id: session-150
+  title: "Correctness on the Agenda-040 Stack, the n = 17 Ladder, and the Record It Left"
+  status: completed
+  primary_bead: think-b7pr
+  phases: 4
+  measured: true
+  rollups:
+  - packing/campaign/resource-usage/agent-a03d9f91834d31398.yaml
+  - packing/campaign/resource-usage/agent-a0766254e1d7068d0.yaml
+  - packing/campaign/resource-usage/agent-a1a5bdfe66ee80e7e.yaml
+  - packing/campaign/resource-usage/agent-a5ada27ae702ebba4.yaml
+  - packing/campaign/resource-usage/agent-a670ff040f974d000.yaml
+  - packing/campaign/resource-usage/agent-a6bdd78cb6dd38a25.yaml
+  - packing/campaign/resource-usage/agent-aa5aad61a5058f512.yaml
+  - packing/campaign/resource-usage/agent-aadc3241b7be53c05.yaml
+  - packing/campaign/resource-usage/agent-aae9b5ce445a8c884.yaml
+  - packing/campaign/resource-usage/agent-ac18860fbbd613485.yaml
+  - packing/campaign/resource-usage/agent-ac407d8706d60cddc.yaml
+  - packing/campaign/resource-usage/agent-ac9c2597825d2ffd1.yaml
+  - packing/campaign/resource-usage/agent-acc596ced5294ca9c.yaml
+  - packing/campaign/resource-usage/agent-ae65c7226abcb1a98.yaml
+  - packing/campaign/resource-usage/d71b369b-163a-561c-a698-2900d1d8109e.yaml
+  turns: 3783
+  tool_calls: 2015
+  tool_errors: 37
+  one_off_code: 184
+  wall_hours: 17.66
   codex_receipts: []
