@@ -645,7 +645,12 @@ def _index_tree(root: Path) -> None:
     with no index cannot answer that question, and a check that runs here then either
     refuses, which is how main went red on 2026-09-21 with the README controls reporting
     "no index" in place of the drift they rehearse, or takes its own fallback, which
-    makes the control rehearse the fallback instead of the code the gate runs.
+    would make the control rehearse the fallback instead of the code the gate runs.
+
+    Three checks ask `tracked_files` today -- `check_readme`, `check_class_record_claims`
+    and `check_archive_annotations` -- and only the first has a registered control, which
+    is why the refusal is what was seen and the fallback half was still latent. Adopting
+    that question in a fourth check should not have to come with reading this file.
 
     `git init` and `git add -A` over the finished tree, which is what
     `tests/test_check_archive_annotations.py` already does for the same reason. No

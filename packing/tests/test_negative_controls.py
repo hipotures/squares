@@ -453,7 +453,8 @@ def test_a_worker_snapshot_can_be_asked_what_this_repository_tracks(
     because a walk reads the reader's scratch and the other agents' worktrees too. Where
     a snapshot has no index those checks do not run the code the gate runs: they either
     refuse, which is how main went red on 2026-09-21, or they take a fallback, and a
-    control over a fallback rehearses the fallback.
+    control over a fallback would rehearse the fallback. Only `check_readme` of the three
+    callers has a registered control, so the first of those is what was seen.
 
     Both halves are asserted, because either one alone is satisfiable by the wrong tree.
     That the index answers at all is the regression; that it answers with exactly the
