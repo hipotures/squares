@@ -143,9 +143,15 @@
      28 the PROVEN and OPEN heads, the badge labels and the open group; 38 the bound line; 64 the
      headline, `n = 17`, set by KaTeX. */
   --stage-text-number: 26px;
+  /* The note under the facts: the composite's own legend, a step below the bar's numbers. */
+  --stage-text-note: 22px;
+  /* The legend's rhythm: between a swatch row and its sentence, between swatches, and the
+     hairline outline that keeps a pale shade reading as a square. */
+  --stage-note-gap: 10px;
+  --stage-note-swatch-border: 1px;
   --stage-text-label: 28px;
   --stage-text-bound: 38px;
-  --stage-text-headline: 64px;
+  --stage-text-headline: 58px;
   --stage-badge-glyph: 15px;
   /* KaTeX inherits the line it is set in, as kpress's `--kpress-katex-size-sans` does. */
   --stage-katex-size: 1em;
@@ -156,7 +162,7 @@
   --stage-weight-bold: 700;
   --stage-line-height-head: 34px;
   --stage-line-height-bound: 1.2;
-  --stage-line-height-headline: 92px;
+  --stage-line-height-headline: 84px;
   --stage-line-height-facts: 1.35;
   --stage-tracking-head: 0.16em;
   --stage-tracking-label: 0.01em;
@@ -248,9 +254,9 @@ body.capture #stage {
    browser's pan and zoom, and says so with the cursor. */
 #packing-svg {
   position: absolute;
-  left: 60px;
+  left: 30px;
   top: 12px;
-  width: 1000px;
+  width: 1056px;
   /* 971, not 940: the owner asked for the box to be bigger, with even space above and below
      the headline under it, and saw and accepted this size. The square view fits this height,
      so the settled box's path sits at 12 + 971 x 1.045 / 1.09 = 942.9 at every n, and its
@@ -264,7 +270,7 @@ body.capture #stage {
      ignore the clip and put that square 8 px into the headline's ink at this size; drawn,
      it never reaches it. The stage itself stays 1920 x 1080, which the 1080p capture
      depends on. */
-  height: 971px;
+  height: 1056px;
   display: block;
   touch-action: none;
 }
@@ -353,9 +359,9 @@ body.drawing #packing-svg #squares {
 }
 #facts {
   position: absolute;
-  left: 1160px;
+  left: 1110px;
   top: 0;
-  width: 700px;
+  width: 780px;
   height: 1080px;
 }
 .facts-layer {
@@ -375,8 +381,8 @@ body.drawing #packing-svg #squares {
 .gapbar {
   position: absolute;
   left: 6px;
-  top: 40px;
-  width: 694px;
+  top: 164px;
+  width: 768px;
   height: 268px;
 }
 /* The bar sits under the headline, so the first thing in the column is the n it is all about. */
@@ -384,7 +390,7 @@ body.drawing #packing-svg #squares {
   position: absolute;
   left: 0;
   top: 60px;
-  width: 680px;
+  width: 760px;
   height: 150px;
   display: block;
 }
@@ -490,9 +496,9 @@ body.drawing #packing-svg #squares {
    container's drawn edge and 45 above the stage's own. */
 #headline {
   position: absolute;
-  left: 60px;
-  bottom: 11px;
-  width: 1000px;
+  left: 1116px;
+  top: 10px;
+  width: 768px;
   height: 96px;
 }
 .numeral-slot {
@@ -536,6 +542,42 @@ body.drawing #packing-svg #squares {
    headline's letters stand. `placeAttribution` reads it; it draws nothing. */
 .numeral .baseline {
   display: inline-block;
+}
+/* The composite's legend, at the foot of the facts column and above the attribution. It is a
+   child of the STAGE rather than of `#facts`, like the attribution it sits above, so its `left` is
+   the stage's coordinate for the column's own inset (1110 + 6) rather than the inset itself --
+   written at 6 it drew across the packing. Aligned with every other row in the column, so the
+   column reads as one edge; the attribution keeps the right anchor on the rail's end it was given. */
+.stage-note {
+  position: absolute;
+  left: 1116px;
+  top: 906px;
+  width: 768px;
+  font-family: var(--font-sans);
+  font-size: var(--stage-text-note);
+  font-weight: var(--stage-weight-quiet);
+  line-height: var(--stage-line-height-facts);
+  color: var(--scene-heading);
+  white-space: nowrap;
+}
+.note-row {
+  display: flex;
+  align-items: center;
+  gap: var(--stage-note-gap);
+}
+.note-swatches {
+  display: block;
+  flex: none;
+}
+/* The swatch's own outline, as the composite figure draws it: a hairline so a pale shade still
+   reads as a square rather than as a smudge. Its `fill` is the corpus's palette, set as an
+   attribute per rect, so the stylesheet says nothing about it. */
+.note-swatch {
+  stroke: var(--scene-ink);
+  stroke-width: var(--stage-note-swatch-border);
+}
+.note-math {
+  font-family: var(--font-serif);
 }
 /* The attribution, the owner's (2026-09-17): the repository's address in the stage's bottom right,
    standing on the headline's baseline and ending where the gap bar ends. It is SVG text because
@@ -590,11 +632,17 @@ body.drawing #packing-svg #squares {
   color: var(--scene-heading);
   white-space: nowrap;
 }
+/* KNOWN BOUNDS heads the bar and every label on it, so the scale is introduced rather than
+   just appearing. It sits under the headline, which moved out from beneath the packing to the
+   head of this column, and takes PROVEN's own styling: they are the same kind of heading. */
+.head-bounds {
+  top: 124px;
+}
 .head-proved {
-  top: 320px;
+  top: 444px;
 }
 .head-open {
-  top: 494px;
+  top: 618px;
 }
 /* The two bounds as one chained statement, at one size: a best known side and a proved lower
    bound are the same kind of fact about the same quantity. Measured over the whole corpus at the
@@ -603,7 +651,7 @@ body.drawing #packing-svg #squares {
 .side {
   position: absolute;
   left: 6px;
-  top: 360px;
+  top: 484px;
   height: 62px;
   font-family: var(--font-serif);
   font-size: var(--stage-text-bound);
@@ -640,7 +688,7 @@ body.drawing #packing-svg #squares {
 .badges {
   position: absolute;
   left: 6px;
-  top: 426px;
+  top: 550px;
   height: 40px;
   display: flex;
   align-items: center;
@@ -705,7 +753,7 @@ body.drawing #packing-svg #squares {
 .open-items {
   position: absolute;
   left: 6px;
-  top: 534px;
+  top: 658px;
   height: 40px;
   display: flex;
   align-items: center;

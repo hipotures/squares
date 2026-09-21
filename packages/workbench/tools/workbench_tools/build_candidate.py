@@ -1260,7 +1260,14 @@ def type_metrics() -> dict:
         # The gap bar's two ends, set by the same KaTeX as the panel's lines. They are the same
         # expression at every n, so they are rendered once here rather than per pair.
         "bound_html": dict(
-            zip(("area", "grid"), katex_html([r"\sqrt{n}", r"\sqrt{n} + 1"]), strict=True)
+            zip(
+                ("area", "grid", "side_of"),
+                # `s(n)` for the stage's legend goes through the same KaTeX as everything else
+                # it sits under: a legend that explained the panel's notation in a different
+                # face would be explaining something the panel does not draw.
+                katex_html([r"\sqrt{n}", r"\sqrt{n} + 1", r"s(n)"]),
+                strict=True,
+            )
         ),
         "digit_bearing_px": round(digit_bearing_px, 2),
         "n_bearing_px": round(n_bearing_px, 2),

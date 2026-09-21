@@ -446,16 +446,22 @@ def headline_roll(session: Session) -> str:
     return "`n =` holds while the number crossfades in place"
 
 
-#: The elements whose text the stage may draw: the gap bar, the facts panel, the headline, and
-#: the repository's address in the stage's bottom right (the owner, 2026-09-17), which is on the
-#: stage in every mode so that a captured frame carries it.
+#: The elements whose text the stage may draw: the gap bar, the facts panel and its
+#: headings,
+#: the headline, the composite's legend at the column's foot (the owner, 2026-09-21), and the
+#: repository's address in the stage's bottom right (the owner, 2026-09-17). The last two are on
+#: the stage in every mode so that a captured frame carries them: both explain the
+#: PICTURE, which
+#: is why they survive capture preview while everything explaining the page does not.
 DRAWN_TEXT_OWNERS = (
     "gapbar",
+    "facts",
     "facts-a",
     "facts-b",
     "numeral-static",
     "numeral-a",
     "numeral-b",
+    "stage-note",
     "stage-attribution",
 )
 
@@ -500,13 +506,17 @@ def stage_says_only_facts(session: Session) -> str:
     return f"the stage draws only its facts in {states} states"
 
 
-def headline_ink(session: Session) -> tuple[float, float, float] | None:
-    """The settled box's drawn floor and the headline's first and last inked rows.
+def container_ink(session: Session) -> tuple[float, float] | None:
+    """The settled box's drawn top and floor, in stage units.
 
-    In stage units, read from a capture-mode screenshot of the frame on the stage rather than
-    from element boxes, because a box is not where the glyphs are: KaTeX's strut opens well
-    above the digits. The floor is the lowest row the box draws across, above the SVG's own
-    floor.
+    Read from a capture-mode screenshot of the frame on the stage rather than from element
+    boxes,
+    because a box is not where the ink is: the SVG's own box carries the view's padding and the
+    drawn container ends well above it.
+
+    It used to return the headline's inked rows as well, because the headline hung under the
+    packing and two checks measured against them. The headline heads the facts column now, so
+    what is left to say about the picture is where its own two edges are.
     """
     page = session.page
     session.look("animate/clear-selection")
@@ -516,74 +526,92 @@ def headline_ink(session: Session) -> tuple[float, float, float] | None:
     scale = width / 1920
     svg_floor = boxes["svg"][1] + boxes["svg"][3] - top
     image = np.asarray(Image.open(io.BytesIO(page.screenshot())).convert("RGB")).astype(int)
-    paper = image[int(top + 1076 * scale), int(left + 100 * scale)]
+    paper = image[int(top + 1076 * scale), int(left + 1900 * scale)]
     band = image[
         int(top) : int(top + 1080 * scale),
-        int(left + 60 * scale) : int(left + 1060 * scale),
+        int(left + PACKING_LEFT * scale) : int(left + PACKING_RIGHT * scale),
     ]
     inked = np.abs(band - paper).sum(axis=2) > 60
     wide = np.where(inked.mean(axis=1) > 0.5)[0]
     wide = wide[wide < svg_floor]
     if wide.size == 0:
         return None
-    floor = (wide.max() + 1) / scale
-    rows = np.where(inked.any(axis=1))[0] / scale
-    ink = rows[rows > floor + 4]
-    if ink.size == 0:
-        return None
-    return float(floor), float(ink.min()), float(ink.max() + 1 / scale)
+    return float(wide.min() / scale), float((wide.max() + 1) / scale)
 
 
 def headline_space(session: Session) -> str:
-    """The headline is centred in the space between the box's floor and the stage's foot."""
+    """The picture is centred in the height it has, at every n.
+
+    This used to measure the headline's ink against the box's floor, because the headline hung
+    under the packing. It heads the facts column now (the owner, 2026-09-21) and the box grew
+    into the room it left, so what is worth measuring is the room itself: the drawn container
+    should sit with the same space above it as below, or the picture is off-centre on the stage
+    and every captured frame carries it. `gapbar/clearance` checks where the headline went.
+    """
     session.api(("pause",), ("setCapture", True))
     for n in (2, 17, 100):
         session.api(("setStepN", n), ("seek", 0))
-        measured = headline_ink(session)
-        session.require(measured is not None, f"no headline ink under the container at n = {n}")
+        measured = container_ink(session)
+        session.require(measured is not None, f"no drawn container to measure at n = {n}")
         if measured is None:
             continue
-        floor, ink_top, ink_bottom = measured
-        above, under = ink_top - floor, 1080 - ink_bottom
+        ceiling, floor = measured
+        above, under = ceiling, 1080 - floor
         session.require(
-            abs(above - under) <= 2,
-            f"the headline at n = {n} is not centred in its space: {above:.1f} above, "
-            f"{under:.1f} below",
+            abs(above - under) <= CONTAINER_CENTRING,
+            f"the picture at n = {n} is not centred in its space: {above:.1f} above its "
+            f"drawn top, {under:.1f} below its floor",
         )
     session.api(("setCapture", False), ("seek", 0))
-    return "the headline is centred under the container"
+    return "the picture is centred in the height it has"
 
 
-#: How far above the headline's first inked row the lowest drawn point of a moving frame must
-#: stay, in stage px. The owner-approved 971 px stage clears it by 7; a 979 px stage would
-#: leave 3, and element boxes that ignore the SVG's clip read 7.8 px into the ink.
-HEADLINE_CLEARANCE = 5
+#: How far from centred the drawn container may sit on the stage, in stage px. Two: the box is
+#: drawn on a scale that does not land on whole pixels at every n, and a tolerance tighter than
+#: the rounding would fail on arithmetic rather than on layout.
+CONTAINER_CENTRING = 2
+
+#: The packing SVG's own left and right edges on the stage, in stage px: the band the
+#: container's
+#: floor is looked for in. Sampling the whole stage would find the facts column's ink instead.
+PACKING_LEFT = 30
+PACKING_RIGHT = 1086
+
+#: How far above the stage's own floor the lowest drawn point of a moving frame must stay,
+#: in
+#: stage px. It used to be measured against the headline's ink, which sat under the
+#: packing; with
+#: the headline moved to the facts column the floor is the stage's own, and the clearance
+#: is what
+#: keeps a swinging square from drawing to the very edge of the frame.
+STAGE_FLOOR_CLEARANCE = 5
 
 
 def stage_clearance(session: Session) -> str:
-    """What a moving drawing draws clears the headline, at the steps where it reaches deepest.
+    """What a moving drawing draws stays inside the stage, where it reaches deepest.
 
     The box grows toward the next record's side and squares tilt, so a moving drawing reaches
     below the settled floor. `stage/lowest-drawn` counts only what the SVG draws, cut at the
     SVG's floor where the SVG clips, because an element's box is not what is drawn: at the
     step into 293 under the bodies style a square's box reads 15 px below a floor that nothing
     is drawn under. The four steps are the corpus's deepest under each physical style.
+
+    The thing being cleared used to be the headline's ink. With the headline at the head of the
+    facts column the hazard is the frame's own edge, so that is what this measures.
     """
     style = session.api(("state",))["style"]
     session.api(("pause",), ("setCapture", True), ("setStepN", 17), ("seek", 0))
-    measured = headline_ink(session)
-    session.require(measured is not None, "no headline ink below the container to clear")
-    ink_top = math.inf if measured is None else measured[1]
+    limit = 1080 - STAGE_FLOOR_CLEARANCE
     for solver, n in (("physics", 6), ("physics", 5), ("bodies", 293), ("bodies", 302)):
         drawn = session.look("stage/lowest-drawn", n=n, style=solver)
         session.require(
-            drawn["deepest"] <= ink_top - HEADLINE_CLEARANCE,
+            drawn["deepest"] <= limit,
             f"the drawing reaches {drawn['deepest']:.1f} in the step into n = {n} under "
-            f"{solver}, within {HEADLINE_CLEARANCE} of the headline's ink at {ink_top:.1f} "
+            f"{solver}, within {STAGE_FLOOR_CLEARANCE} of the stage's floor at 1080 "
             f"(the SVG's floor is {drawn['floor']:.1f}, clipping: {drawn['clips']})",
         )
     session.api(("setCapture", False), ("setStyle", style), ("setStepN", 17), ("seek", 0))
-    return f"what a moving drawing draws clears the headline's ink at {ink_top:.0f}"
+    return f"what a moving drawing draws stays above {limit:.0f}"
 
 
 def capture_baseline(session: Session) -> str:

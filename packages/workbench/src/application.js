@@ -152,7 +152,6 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   const SIMPLE = PAIRS.map((p) => isSimpleTransition(FRAMES[p.n], FRAMES[p.n + 1]));
   const FACTS = DATA.facts;
   const METRICS = DATA.metrics;
-  const N_MAX = DATA.n_max; // 324: the progress bar always maps to 1..N_MAX
   const PHASES = DATA.motion_phases; // add-then-move (the default), move-then-add, simultaneous, rotate-first, slide-first
   const ARRIVAL_FRACTION = DATA.arrival_fraction; // the share of the move the new square takes to arrive in the two staged modes
   const PAD = 0.045; // container-side fraction of breathing room inside the 1000 px box
@@ -606,27 +605,24 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // startup and again on `document.fonts.ready`, as the figure width beside it is. Until then the
   // stylesheet's `--stage-numeral-left` is the fallback, close enough for the frame before the
   // faces land.
-  //: The row the headline is centred in: the packing's own box, so `n = 26` sits under the picture
-  //: it names rather than under the panel.
-  const HEADLINE_ROW = 1000;
+  //: Where the headline's expression starts inside its row. Zero: the headline now heads the
+  //: facts column, and every other row in that column -- KNOWN BOUNDS, PROVEN, the bound, OPEN --
+  //: begins at the column's own inset, so a centred headline would be the one row out of line.
+  //:
+  //: Centring was right while the headline sat under the packing, and it was there to stop `n =`
+  //: sliding as a digit was gained. A fixed left does that outright: the expression starts in the
+  //: same place at every n and only the numeral grows to its right.
+  const HEADLINE_LEFT = 0;
   function measureHeadline() {
-    // The headline is one rendered expression now, so centring it is centring one box. It is
-    // centred on the WIDEST the corpus holds rather than on the current one: `n = 324` is the
-    // longest, and centring each n on itself would slide the row as a digit is gained, twice in
-    // the film and again mid-roll.
+    // The guard, not the arithmetic, is what this still does: nothing can be placed until the
+    // faces have landed and the expression has a box, and the attribution is placed from here
+    // because it is measured off what the headline draws.
     /** @type {HTMLElement} */
     const shown = document.querySelector(".numeral");
     if (!shown || shown.offsetWidth === 0) {
       return;
     }
-    const digits = String(N_MAX).length;
-    /** @type {HTMLElement} */
-    const current = document.querySelector(".numeral .n-val, .numeral .mord");
-    const widest =
-      shown.offsetWidth +
-      (current?.textContent ? current.offsetWidth / Math.max(1, current.textContent.length) : 0) *
-        Math.max(0, digits - (current?.textContent ? current.textContent.length : digits));
-    const numeralLeft = Math.max(0, (HEADLINE_ROW - widest) / 2);
+    const numeralLeft = HEADLINE_LEFT;
     // One property on the row, which every numeral in its three slots reads, rather than a `left`
     // written into each numeral: a numeral built later starts in the right place without being told.
     htmlNode("headline").style.setProperty("--stage-numeral-left", `${numeralLeft}px`);
@@ -651,23 +647,22 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   //: hidden rather than drawn at a guess.
   let attributionAt = null;
   let attributionSettled = false;
+  //: The attribution's baseline, in stage pixels from the stage's top. It used to stand on the
+  //: headline's baseline, which was under the packing; with the headline moved to the head of the
+  //: facts column that anchor would put the repository's address across the top of the frame. The
+  //: stage is laid out at a fixed 1920 x 1080 and only scaled, so its own foot is a known quantity
+  //: and this is measured from it rather than from something that moved.
+  const ATTRIBUTION_BASELINE = 1046;
   function placeAttribution() {
-    const baseline = document.querySelector("#numeral-static .numeral .baseline");
     const rail = document.querySelector("#gapbar .track");
-    if (
-      baseline === null ||
-      rail === null ||
-      baseline.getClientRects().length === 0 ||
-      rail.getClientRects().length === 0 ||
-      stage.offsetWidth === 0
-    ) {
+    if (rail === null || rail.getClientRects().length === 0 || stage.offsetWidth === 0) {
       return;
     }
     const frame = stage.getBoundingClientRect();
     const scale = frame.width / stage.offsetWidth;
     attributionAt = [
       (rail.getBoundingClientRect().right - frame.left) / scale,
-      (baseline.getBoundingClientRect().top - frame.top) / scale,
+      ATTRIBUTION_BASELINE,
     ];
     attributionSettled = !("fonts" in document) || document.fonts.status === "loaded";
     drawAttribution();
@@ -2448,7 +2443,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     gapBarDirty = true;
   }
   const GAPBAR = {
-    width: 680,
+    width: 760,
     // How far in from each end of the rail the scale's own ends are marked. The rail is the full
     // width of the column; `sqrt(n)` sits at `inset` and `sqrt(n) + 1` at `width - inset`, so the
     // bar reads as a scale with two ticks on it rather than as a box with two hard ends -- and an
@@ -6549,12 +6544,98 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // The page opens on Animate, the aspect the owner uses most (2026-09-14), through the same
   // transition a click on its tab takes, so Pack still remembers the n it was set up on.
   setMode("animate");
+  //: How many tilt-angle swatches the legend shows, and how many shades of one family. Four and
+  //: four, as the composite figure's own legend does: enough to read as a range, few enough that
+  //: the row stays one line at the stage's width.
+  const NOTE_ANGLE_SWATCHES = 4;
+  //: A swatch's side and the space between two, in stage px, as the composite figure draws
+  //: them. They are the SVG's own coordinates, so they are numbers here rather than tokens.
+  const NOTE_SWATCH = 19;
+  const NOTE_SWATCH_GAP = 2;
+  const NOTE_SHADE_SWATCHES = 4;
+  /**
+   * The legend at the foot of the facts column: what `s(n)` means, and what colour and shade say.
+   *
+   * Built here rather than written into the template because the swatches must be the page's own
+   * palette. Copying the composite figure's hexes across would leave the legend describing a
+   * palette the picture had stopped using the moment `sqpack.render` changed one.
+   */
+  function buildStageNote() {
+    const note = htmlNode("stage-note");
+    note.replaceChildren();
+    // `document.createElement`, not `el`: `el` makes SVG-namespaced nodes, and an SVG `div` in
+    // an HTML flow lays out as nothing at all -- it is in the tree, it has no box, and nothing
+    // reports an error.
+    /** @param {string} tag @param {string} className */
+    const node = (tag, className) => {
+      const made = document.createElement(tag);
+      made.className = className;
+      return made;
+    };
+    /** @param {string[]} fills @param {string} text */
+    const row = (fills, text) => {
+      const line = node("div", "note-row");
+      if (fills.length > 0) {
+        // SVG, not styled spans: a swatch's colour is the corpus's palette, which is data rather
+        // than a design value, and `fill` is an attribute here instead of an inline style the
+        // design contract would have to be widened to allow. It is also how the composite
+        // figure's own legend draws them.
+        const span = fills.length * (NOTE_SWATCH + NOTE_SWATCH_GAP) - NOTE_SWATCH_GAP;
+        const swatches = el("svg", {
+          class: "note-swatches",
+          width: String(span),
+          height: String(NOTE_SWATCH),
+          viewBox: `0 0 ${span} ${NOTE_SWATCH}`,
+          "aria-hidden": "true",
+        });
+        fills.forEach((fill, index) => {
+          swatches.appendChild(
+            el("rect", {
+              class: "note-swatch",
+              x: String(index * (NOTE_SWATCH + NOTE_SWATCH_GAP)),
+              y: "0",
+              width: String(NOTE_SWATCH),
+              height: String(NOTE_SWATCH),
+              fill,
+            }),
+          );
+        });
+        line.appendChild(swatches);
+      }
+      line.appendChild(document.createTextNode(text));
+      return line;
+    };
+    const sideOf = node("div", "note-row");
+    const math = node("span", "note-math");
+    math.innerHTML = METRICS.bound_html.side_of;
+    sideOf.appendChild(math);
+    sideOf.appendChild(
+      document.createTextNode(" is the side of the smallest square holding n unit squares."),
+    );
+    note.appendChild(sideOf);
+    // One swatch per angle family at its base shade, and one family across its shades: the two
+    // things the picture varies, each shown varying. Read off the corpus's own shade table.
+    const families = COLOUR.shades;
+    const angles = Array.from(
+      { length: Math.min(NOTE_ANGLE_SWATCHES, families.length) },
+      (_unused, index) => families[index]?.[0] ?? "",
+    ).filter((fill) => fill !== "");
+    const first = families[0] ?? [];
+    const shades = Array.from(
+      { length: Math.min(NOTE_SHADE_SWATCHES, first.length) },
+      (_unused, index) => first[index] ?? "",
+    ).filter((fill) => fill !== "");
+    note.appendChild(row(angles, "Colors indicate distinct tilt angles."));
+    note.appendChild(row(shades, "Shade indicates number of full-side contacts."));
+  }
+
   layout();
   // The scale's figure width is measured from the drawn numerals, so it has to be taken again once
   // the faces are in; re-rendering afterwards is a no-op on everything but the suppression.
   // The bar's two ends, set once: they are the same expression at every n.
   htmlNode("gapbar-area").innerHTML = METRICS.bound_html.area;
   htmlNode("gapbar-grid").innerHTML = METRICS.bound_html.grid;
+  buildStageNote();
   measureDigit();
   measureHeadline();
   if ("fonts" in document) {

@@ -557,10 +557,19 @@ def gap_bar(session: Session) -> str:
         f"the bar's two numbers overlap: {low_label} and {rec_label}",
     )
     room = session.look("gapbar/clearance")
+    # The headline heads the facts column (the owner, 2026-09-21). What has to hold is
+    # that it is above the bar, inside the column on both edges, and clear of the picture
+    # beside it. It used
+    # to hang under the packing and the old check said so; measuring that now would pass only a
+    # layout the owner asked to be replaced.
     session.require(
         room["shown"]
-        and room["headTop"] >= room["packBottom"] - 0.5
-        and room["headBottom"] <= room["stageBottom"] + 0.5
+        and room["headBottom"] <= room["top"] + 0.5
+        and room["headTop"] >= -0.5
+        and room["headLeft"] >= room["panelLeft"] - 0.5
+        and room["headRight"] <= room["panelRight"] + 0.5
+        and room["headLeft"] >= room["packRight"] - 0.5
+        and room["bottom"] <= room["stageBottom"] + 0.5
         and room["right"] <= room["panelRight"] + 0.5,
         f"the bar or the headline is out of its room: {room}",
     )
