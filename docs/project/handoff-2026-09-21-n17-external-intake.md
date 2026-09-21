@@ -41,10 +41,11 @@ test covers the whole angle interval, and that the inset from the endpoint minim
 1. **The `T-031` identifier contest is settled.** Pull request 208, from the open
    overnight stack, claimed the same number.
    The register’s contiguity rule leaves no free number below it, so whichever landed
-   second had to renumber. The stack merged into `main` first and kept `T-031` for the
-   `n = 11` octagon corner class; this result took `T-032` when `main` was merged into
-   this branch, and its row moved to the end of the register, because
-   `devtools/check_results.py` reads contiguity positionally rather than by label.
+   second had to renumber.
+   The stack merged into `main` first and kept `T-031` for the `n = 11` octagon corner
+   class; this result took `T-032` when `main` was merged into this branch, and its row
+   moved to the end of the register, because `devtools/check_results.py` reads
+   contiguity positionally rather than by label.
 2. **Hosted CI is red on the first run** and was diagnosed, not guessed:
    - `frontend`: fixed in `48a3ad23`. The workbench layout check staged `n = 17` to
      assert the “new result” star, which reports that a bound was first proved here;

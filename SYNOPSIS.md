@@ -101,7 +101,7 @@ action for each are in [`frontier/RESULTS.md`](packing/frontier/RESULTS.md); the
 | [T-028](packing/frontier/RESULTS.md) | 18 | `V4` | `C4` | `S3` | `apparently-novel` | s(18) >= 187/40 = 4.675, from a first-party weighted fractional unavoidable-set certificate at container side 187/40. |
 | [T-029](packing/frontier/RESULTS.md) | 18 | `V4` | `C4` | `S3` | `apparently-novel` | s(18) >= 1871/400 = 4.6775, from a first-party weighted fractional unavoidable-set certificate at container side 1871/400. |
 | [T-030](packing/frontier/RESULTS.md) | 18 | `V4` | `C4` | `S3` | `apparently-novel` | s(18) >= 4679/1000 = 4.679, from a first-party weighted fractional unavoidable-set certificate at container side 4679/1000. |
-| [T-032](packing/frontier/RESULTS.md) | 17 | `V4` | `C4` | `S3` | `previously-published` | s(17) >= 461300/99999 = 4.61304613 …, by Guzhou0806's R012 parent-angle certificate of 20 September 2026, replayed here by the source's exact checker and decided again by this repository's interval branch and bound. |
+| [T-032](packing/frontier/RESULTS.md) | 17 | `V4` | `C4` | `S3` | `previously-published` | s(17) >= 461300/99999 = 4.61304613 …, by Guzhou0806’s R012 parent-angle certificate of 20 September 2026, replayed here by the source’s exact checker and decided again by this repository’s interval branch and bound. |
 | [T-004](packing/frontier/RESULTS.md) | 46 | `V4` | `C3` | `S3` | `previously-published` | Bentz 2010, Theorem 8: the printed 45-point unavoidable-set argument for s(46) >= 7 is correct as printed, machine-audited in full. |
 | [T-008](packing/frontier/RESULTS.md) | 46 | `V4` | `C3` | `S3` | `previously-published` | s(46) = 7: the lower half by T-004’s audited unavoidable set, the upper half by the exact 7 x 7 grid packing of 46 squares. |
 | [T-009](packing/frontier/RESULTS.md) | 29 | `V4` | `C3` | `S3` | `apparently-novel` | s(29) <= 5.93383346267692918974379895098, by a Krawczyk interval certificate over the retained rational 29-square witness at a declared relaxation of 1e-20. |
@@ -1063,8 +1063,8 @@ corner class, the stack merged into `main` first and kept it, and this result to
 `T-032` when `main` was merged into the intake branch.
 
 **Selected next entry:** `think-pcd0`, the n = 17 intake: land the adoption of
-`s(17) >= 461300/99999` as `T-032`.
-The research entry behind it is BC-357, closing M7’s n=6 bracket at 299/100 under H-216.
+`s(17) >= 461300/99999` as `T-032`. The research entry behind it is BC-357, closing M7’s
+n=6 bracket at 299/100 under H-216.
 
 [Session 148](packing/campaign/agent-sessions/session-148-overnight-chunk-5.md), chunk 5
 on [PR 209](https://github.com/jlevy/squares/pull/209), stopped at the owner’s request
@@ -1079,10 +1079,10 @@ H-230) is derived and reaches the 7.11 degree orbit but cuts no weighted pair of
 Two partial ports (the corner clip on the threshold routes, the gap_wedge tool) are
 retained as patches under results/agenda-040. No bound moved.
 
-**Selected next entry at that cutoff:** `think-n1v2`: resume chunk 5 from the retained patches and the
-wedge derivation (its review, exp-221 for H-230 and BC-364’s disposition, the threshold
-clip and the gap_wedge port), then H-232’s fixed-support screen, in Session 149 on the
-next stacked branch.
+**Selected next entry at that cutoff:** `think-n1v2`: resume chunk 5 from the retained
+patches and the wedge derivation (its review, exp-221 for H-230 and BC-364’s
+disposition, the threshold clip and the gap_wedge port), then H-232’s fixed-support
+screen, in Session 149 on the next stacked branch.
 BC-357 / H-216 stays the registered n=6 calibration entry in agenda-037.
 
 [Session 147](packing/campaign/agent-sessions/session-147-overnight-chunk-4.md)

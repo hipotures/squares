@@ -206,9 +206,8 @@ erratum.
   [proof review](docs/project/reviews/review-2026-09-20-n17-r012-and-mira-4613-proof-review.md)
   found no error and supplies two steps R012’s note omits.
   The movement over `T-019` is `0.02305`, and the gap to Bidwell’s packing is now
-  `0.0625`.
-  It is the strongest value *verified here*, not the strongest claimed in public:
-  Guzhou0806’s later R038 certificate reports `461300000000/99974999999 =
+  `0.0625`. It is the strongest value *verified here*, not the strongest claimed in
+  public: Guzhou0806’s later R038 certificate reports `461300000000/99974999999 =
   4.614153538431…`, above it, and this repository has neither retained nor replayed that
   one.
 

@@ -237,11 +237,10 @@ It costs nothing, because R012’s value is larger and is the one registered.
 The identifier was contended, and the contest is settled.
 Pull request 208, from the open overnight stack, also claimed `T-031`, and the
 register’s contiguity rule leaves no free number below it, so whichever landed second
-had to renumber.
-The stack merged into `main` first and kept `T-031` for the `n = 11` octagon corner
-class; this result took `T-032` when `main` was merged into this branch, and its row
-moved to the end of the register, because `devtools/check_results.py` reads contiguity
-positionally rather than by label.
+had to renumber. The stack merged into `main` first and kept `T-031` for the `n = 11`
+octagon corner class; this result took `T-032` when `main` was merged into this branch,
+and its row moved to the end of the register, because `devtools/check_results.py` reads
+contiguity positionally rather than by label.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
