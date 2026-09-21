@@ -95,6 +95,13 @@ Nothing else is stale.
 Items 2–4 are detector gaps, not drift; items 5–7 are cosmetic or pre-existing.
 **Only item 1 is drift introduced by the agenda-040 stack.**
 
+**Findings 1 and 2 are already closed.** Pull request 214 merged at 19:01Z on the day of
+this audit: it corrects the Bentz 2016 banner to nine and builds the archive-annotation
+census gate that finding 2 says should exist, which is the fix this report asks for in
+the order it asks for it.
+Findings 5 and 6 are inside that gate’s scope and should be read against it rather than
+against this page.
+
 Finding 4 has a postscript, found while landing this document rather than while auditing
 main. The first draft quoted the banner constant’s value verbatim, which made
 `check_generated_markdown` classify this review as a generated view and demand that it
