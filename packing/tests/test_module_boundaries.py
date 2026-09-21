@@ -164,14 +164,29 @@ def test_no_bash_or_shell_entry_points_remain() -> None:
 
 
 def test_readme_inventory_ignores_cache_only_legacy_directories(tmp_path: Path) -> None:
+    """A migration remnant is not content, and the index is what says so.
+
+    The inventory used to recognise a cache-only directory by name. It now lists what
+    git tracks, so `tools/` holding nothing but bytecode is absent for the same reason
+    every other gitignored path is -- `.gitignore` carries `__pycache__/` already.
+    """
     repository = tmp_path / "repository"
     repository.mkdir()
+    subprocess.run(
+        ("git", "-C", str(repository), "init", "-q"), check=True, capture_output=True
+    )
+    (repository / ".gitignore").write_text("__pycache__/\n", encoding="utf-8")
     (repository / "README.md").write_text("# Example\n", encoding="utf-8")
     (repository / "current").mkdir()
     (repository / "current" / "module.py").write_text("", encoding="utf-8")
     cache = repository / "tools" / "__pycache__"
     cache.mkdir(parents=True)
     (cache / "removed.cpython-314.pyc").write_bytes(b"ignored")
+    subprocess.run(
+        ("git", "-C", str(repository), "add", "README.md", "current/module.py"),
+        check=True,
+        capture_output=True,
+    )
 
     assert meaningful_top_level_entries(repository) == {"README.md", "current"}
 
