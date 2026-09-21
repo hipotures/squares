@@ -8,12 +8,29 @@ every exclusion to match a file and an unchecked-out submodule matches none (thi
 
 `devtools.repo_scope` is the one answer, and it comes from the declaration rather than
 from the working tree, so it is the same on a clone with submodules and one without.
+
+`tracked_files` is the same principle one level down: a sweep reads what the repository
+holds, which is its index, not what the working directory happens to contain.
 """
 
 from __future__ import annotations
 
-from devtools.repo_scope import REPO, is_vendored, vendored_directories
+import subprocess
+from pathlib import Path
+
+from devtools.repo_scope import REPO, is_vendored, tracked_files, vendored_directories
 from sqpack.yamlio import safe_load
+
+
+def _git(directory: Path, *arguments: str) -> None:
+    subprocess.run(("git", "-C", str(directory), *arguments), check=True, capture_output=True)
+
+
+def _repository(tmp_path: Path) -> Path:
+    repository = tmp_path / "repository"
+    repository.mkdir()
+    _git(repository, "init", "-q")
+    return repository
 
 
 def test_the_vendored_set_is_what_gitmodules_declares() -> None:
@@ -64,3 +81,61 @@ def test_every_map_pattern_matches_a_file_no_submodule_supplies() -> None:
             path for path in REPO.glob(pattern) if path.is_file() and not is_vendored(path)
         ]
         assert without_submodules, f"{pattern} matches only files a submodule supplies"
+
+
+def test_only_what_the_index_holds_is_listed(tmp_path: Path) -> None:
+    """Untracked and ignored files are not the repository's, whatever the disk says.
+
+    This is the regression: a sweep that walked the filesystem read one JSON dropped into
+    the gitignored `attic/` and failed on a record nobody had asked to keep (PR 207).
+    """
+    repository = _repository(tmp_path)
+    (repository / ".gitignore").write_text("attic/\n", encoding="utf-8")
+    (repository / "kept.json").write_text("{}\n", encoding="utf-8")
+    (repository / "untracked.json").write_text("{}\n", encoding="utf-8")
+    (repository / "attic").mkdir()
+    (repository / "attic" / "scratch.json").write_text("{}\n", encoding="utf-8")
+    _git(repository, "add", ".gitignore", "kept.json")
+    assert tracked_files(repository, "*.json") == [repository / "kept.json"]
+
+
+def test_a_pathspec_matches_at_any_depth_and_excludes_other_suffixes(tmp_path: Path) -> None:
+    repository = _repository(tmp_path)
+    (repository / "results").mkdir()
+    (repository / "results" / "deep.json").write_text("{}\n", encoding="utf-8")
+    (repository / "notes.md").write_text("read me\n", encoding="utf-8")
+    _git(repository, "add", "-A")
+    assert tracked_files(repository, "*.json") == [repository / "results" / "deep.json"]
+
+
+def test_a_tracked_file_the_working_tree_no_longer_holds_is_dropped(tmp_path: Path) -> None:
+    """The index still names it; a sweep that went on to read its bytes would raise."""
+    repository = _repository(tmp_path)
+    (repository / "gone.json").write_text("{}\n", encoding="utf-8")
+    _git(repository, "add", "gone.json")
+    (repository / "gone.json").unlink()
+    assert tracked_files(repository, "*.json") == []
+
+
+def test_a_directory_inside_a_checkout_is_not_a_repository_of_its_own(tmp_path: Path) -> None:
+    """Otherwise a snapshot nested in someone else's checkout would sweep that checkout."""
+    repository = _repository(tmp_path)
+    nested = repository / "nested"
+    nested.mkdir()
+    (nested / "inside.json").write_text("{}\n", encoding="utf-8")
+    _git(repository, "add", "-A")
+    assert tracked_files(nested, "*.json") is None
+
+
+def test_tracking_nothing_is_not_the_same_answer_as_having_no_index(tmp_path: Path) -> None:
+    """`[]` and `None` are different answers, and the caller's fallback turns on which."""
+    repository = _repository(tmp_path)
+    assert tracked_files(repository, "*.json") == []
+    assert tracked_files(tmp_path / "no-such-directory", "*.json") is None
+
+
+def test_the_repository_itself_tracks_this_file() -> None:
+    """The real checkout, not a fixture: the listing has to work where the sweeps run."""
+    listed = tracked_files(REPO, "*.py")
+    assert listed is not None
+    assert Path(__file__).resolve() in {path.resolve() for path in listed}

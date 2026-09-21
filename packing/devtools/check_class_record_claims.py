@@ -15,12 +15,16 @@ D1, and both receipts say so -- but only prose separates those bytes from a genu
 unconditional n = 11 certificate at 96/25, and nothing mechanical stopped the *next*
 record from landing in the same shape (review finding L3).
 
-This sweep is that mechanism. Every JSON record that declares `variant: class` or
-carries a `corner_clip` must state a class `claim` (the corner-class sentence, never
-`s(n) >= L`) and, when it carries an `id`, a class id (one with a `-clip-` segment).
-The one exemption is named below with its reason, and a stale exemption is a failure
-too: if `exp-219` is ever rewritten or removed, the entry goes with it rather than
-quietly covering some later record at the same path.
+This sweep is that mechanism. Every JSON record the repository *tracks* that declares
+`variant: class` or carries a `corner_clip` must state a class `claim` (the corner-class
+sentence, never `s(n) >= L`) and, when it carries an `id`, a class id (one with a
+`-clip-` segment). The one exemption is named below with its reason, and a stale
+exemption is a failure too: if `exp-219` is ever rewritten or removed, the entry goes
+with it rather than quietly covering some later record at the same path.
+
+Tracked, because what the repository retains is its index and not its working directory.
+A walk read the reader's scratch as well, and a JSON dropped into the gitignored `attic/`
+was enough to turn this step red (PR 207).
 
 Usage:
     uv run --frozen --all-extras --group dev python -m devtools.check_class_record_claims
@@ -32,9 +36,10 @@ import json
 import sys
 from pathlib import Path
 
-PACKING = Path(__file__).resolve().parent.parent
-REPO = PACKING.parent
-#: Directories that hold no retained record and are large enough to be worth skipping.
+from devtools.repo_scope import REPO, tracked_files
+
+#: Directories the fallback walk skips. Git never lists them -- they are environments,
+#: build products and scratch -- so they only arise where there is no index to ask.
 SKIP = {".venv", ".git", "node_modules", "__pycache__", ".mypy_cache", ".ruff_cache"}
 #: The unconditional claim sentence's opening, which a class record may never state.
 UNCONDITIONAL_CLAIM_PREFIX = "s("
@@ -54,12 +59,23 @@ EXEMPT: dict[str, str] = {
 
 
 def records(root: Path) -> list[Path]:
-    """Every JSON file under `root` that mentions either declaration field."""
+    """Every JSON file `root` tracks that mentions either declaration field.
 
+    Tracked, not walked. A walk reads whatever is on disk, so one scratch JSON in
+    `attic/` -- the directory `AGENTS.md` names for transient files, and `.gitignore`
+    excludes -- failed this step for a record nobody had asked the repository to keep
+    (PR 207). The step is also reused across runs over one tree, on the stated ground
+    that it is a function of the tracked JSON; a walk is not that function.
+
+    Where there is no index to ask -- a `tmp_path` fixture, a source snapshot with no
+    git of its own -- the walk is the only answer available, and `SKIP` bounds it.
+    """
+
+    candidates = tracked_files(root, "*.json")
+    if candidates is None:
+        candidates = sorted(path for path in root.rglob("*.json") if not SKIP & set(path.parts))
     found: list[Path] = []
-    for path in sorted(root.rglob("*.json")):
-        if SKIP & set(path.parts):
-            continue
+    for path in candidates:
         raw = path.read_bytes()
         if b'"variant"' in raw or b'"corner_clip"' in raw:
             found.append(path)

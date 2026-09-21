@@ -8,11 +8,16 @@ retained carrying the unconditional id (review finding L3).
 from __future__ import annotations
 
 import json
+import subprocess
 from pathlib import Path
 
-from devtools.check_class_record_claims import EXEMPT, check, problems
+from devtools.check_class_record_claims import EXEMPT, check, problems, records
 
 REPO = Path(__file__).resolve().parents[2]
+
+
+def _git(directory: Path, *arguments: str) -> None:
+    subprocess.run(("git", "-C", str(directory), *arguments), check=True, capture_output=True)
 
 
 def test_the_repository_as_it_stands_passes() -> None:
@@ -82,3 +87,44 @@ def test_an_unclipped_record_is_left_alone(tmp_path: Path) -> None:
         encoding="utf-8",
     )
     assert [line for line in check(tmp_path) if "no longer has" not in line] == []
+
+
+def test_the_sweep_reads_the_tracked_tree_and_not_the_working_directory(
+    tmp_path: Path,
+) -> None:
+    """A scratch record in `attic/` cannot fail this gate; a retained one still does.
+
+    The sweep walked the filesystem until PR 207, so one JSON dropped into the gitignored
+    directory `AGENTS.md` names for transient files turned the records tier red on bytes
+    the repository does not keep -- and the step is reused across runs over one tree on
+    the stated ground that it is a function of the tracked JSON.
+    """
+    repository = tmp_path / "repository"
+    repository.mkdir()
+    _git(repository, "init", "-q")
+    (repository / ".gitignore").write_text("attic/\n", encoding="utf-8")
+    (repository / "attic").mkdir()
+    unconditional = {
+        "id": "C-n011-fractional-96-25",
+        "claim": "s(11) >= 96/25",
+        "variant": "class",
+        "corner_clip": "1/2",
+    }
+    (repository / "attic" / "scratch.json").write_text(
+        json.dumps(unconditional), encoding="utf-8"
+    )
+    (repository / "untracked.json").write_text(json.dumps(unconditional), encoding="utf-8")
+    _git(repository, "add", ".gitignore")
+    assert records(repository) == []
+    assert [line for line in check(repository) if "no longer has" not in line] == []
+
+    (repository / "results").mkdir()
+    retained = repository / "results" / "kept.json"
+    retained.write_text(json.dumps(unconditional), encoding="utf-8")
+    _git(repository, "add", "results/kept.json")
+    assert records(repository) == [retained]
+    failures = check(repository)
+    assert any(
+        "results/kept.json" in line and "unconditional claim" in line for line in failures
+    )
+    assert any("results/kept.json" in line and "unconditional id" in line for line in failures)
