@@ -167,6 +167,18 @@ class _CentreDomain:
                 float(corner_u[1]),
                 float(corner_u[3]),
             )
+        # The polygon comes from the clip's own exact sides while ``low`` and ``high``
+        # -- which ``_floor``, ``_ceiling`` and ``u_chord`` read -- come from the float
+        # arguments. If the two disagreed, the domain's polygon and its affine bounds
+        # would describe different containers; every caller passes matching values, and
+        # this is what says so.
+        if float(clip.outer_side) != outer_side or float(clip.square_side) != square_side:
+            raise ValueError(
+                "the clip's sides must match the domain's: clip has "
+                f"({clip.outer_side}, {clip.square_side}) = "
+                f"({float(clip.outer_side)}, {float(clip.square_side)}), "
+                f"the domain was given ({outer_side}, {square_side})"
+            )
         polygon = centre_domain(clip.outer_side, clip.square_side, direction, clip=clip)
         corner_u = np.array([float(u) for u, _ in polygon])
         corner_v = np.array([float(v) for _, v in polygon])

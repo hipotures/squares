@@ -310,8 +310,11 @@ def _without_own_disc(
     """Drop the denied-point disc centred on the target.
 
     A target that is itself a denied point has its own disc among the constraints.
-    Keeping it would make the region empty, which is the contradiction being
-    established rather than a fact about the region, so it is dropped for that target.
+    Keeping it would not empty the region -- it would hold every point of the region at
+    distance at least 1/2 from the target, so the sup could never drop below 1/2 and
+    the finish could never close. The sup has to be taken over the larger region, which
+    is where the contradiction is derived, so the target's own disc is dropped for that
+    target.
     """
     return [
         con
