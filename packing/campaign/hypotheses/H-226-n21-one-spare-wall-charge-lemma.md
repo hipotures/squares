@@ -40,9 +40,17 @@ hypothesis:
     that needs a geometric argument
   instrument_ready: true
   regime: >-
-    Boxes of side above 1 in [0, 5]^2; red set {0.5..4.5 step 1} x {0.9, 1.7, 2.5,
-    3.3, 4.1} and blue set on the interleaved half-integers per Bentz 2016 Figure 3;
-    wall lines at sqrt(2) - 1/2 from each wall; exact arithmetic
+    Boxes of side above 1 in [0, 5]^2; the red and blue points of Bentz 2016 Figure 3
+    together are exactly {0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5} x {0.9, 1.7, 2.5, 3.3,
+    4.1}, 45 points in five rows at y_1..y_5 = 0.9, 1.7, 2.5, 3.3, 4.1, partitioned by
+    row: rows 2 and 4 (y = 1.7, 3.3) carry 5 red points on the half-integers {0.5, 1.5,
+    2.5, 3.5, 4.5} and 4 blue points on the integers {1, 2, 3, 4}, while rows 1, 3 and 5
+    (y = 0.9, 2.5, 4.1) carry 4 red points on the integers and 5 blue points on the
+    half-integers, so red is 4 + 5 + 4 + 5 + 4 = 22 and blue 5 + 4 + 5 + 4 + 5 = 23. The
+    5-point rows are the ones whose left-most point slides from (0.5, y_i) to (1, y_i) --
+    r_2 and r_4 in red, b_1, b_3 and b_5 in blue -- and the red stationary points are
+    (1, 0.9), (1, 2.5) and (1, 4.1). Wall lines at sqrt(2) - 1/2 from each wall; exact
+    arithmetic
   instance: {axis: n, point: 21}
   priority: 1
   cost_estimate: >-

@@ -1,0 +1,1363 @@
+Retained partial diff from Session 148, taken against base revision 19cdd4f8e21a28b058c21f04636dc6f6f82cb33c; apply with `git apply` from the repository root. Measured by tests/test_retained_patches_apply.py.
+
+diff --git a/packing/devtools/decide_threshold_certificate.py b/packing/devtools/decide_threshold_certificate.py
+index 63341cea..8d44cbaa 100644
+--- a/packing/devtools/decide_threshold_certificate.py
++++ b/packing/devtools/decide_threshold_certificate.py
+@@ -43,6 +43,20 @@ checked when present: ``total_budget``, ``claim`` (which must read ``s(n) >= L``
+ ``least_cell_charge`` (which both routes must reproduce), and ``variant``, which must be
+ ``threshold`` if it is declared at all -- a record declaring anything else is refused by
+ name, because this gate implements only these conditions.
++
++The one exception is the corner class, decided only when asked for it by name::
++
++    uv run --frozen python -m devtools.decide_threshold_certificate --corner-clip d <path>
++
++That restricts ``Condition 5'`` on *both* routes to lane-a Theorem B's free-corner
++domain: the cores avoiding every corner triangle ``x + y <= d`` and its three D4 images.
++The record must itself declare ``variant: class`` and the same ``corner_clip``, so the
++hypothesis lives in the bytes that are decided and the flag only says which hypothesis
++the operator meant; it must also carry the class's own ``claim`` and ``id``, so a
++clipped candidate can never be quoted as a bound on ``s(n)``. Without the flag a
++``class`` record is refused, with it an unconditional one is, and a positive verdict
++under the flag prints ``RETAINABLE UNDER THE CORNER CLASS HYPOTHESIS`` rather than the
++bare word. These are `devtools.decide_certificate`'s rules, on this gate's records.
+ """
+ 
+ from __future__ import annotations
+@@ -61,6 +75,14 @@ from functools import partial
+ from pathlib import Path
+ from typing import Literal, Never, cast
+ 
++from sqpack.fractional.corner_clip import (
++    CornerClip,
++    EmptyClippedDomainError,
++    agreed_class_clip,
++    class_certificate_id,
++    class_claim,
++    clip_from_optional,
++)
+ from sqpack.fractional.interval import IntervalInputError
+ from sqpack.fractional.model import Atom
+ from sqpack.fractional.threshold import (
+@@ -80,6 +102,9 @@ from sqpack.fractional.threshold_interval import (
+ RATIONAL = re.compile(r"^-?[0-9]+(/[1-9][0-9]*)?$")
+ MAX_BYTES = 32 * 1024 * 1024
+ VARIANT = "threshold"
++#: What a clipped candidate declares instead. The name is `corner_clip`'s, shared with
++#: the point gate, so one word means one thing in every record this repository decides.
++CLASS = "class"
+ 
+ Mode = Literal["both", "quick", "exact-only"]
+ 
+@@ -223,16 +248,40 @@ def _unchanged_sha256(path: Path, frozen: bytes) -> tuple[str | None, str | None
+ 
+ 
+ def _declarations(
+-    certificate: ThresholdCertificate, record: dict[str, object]
++    certificate: ThresholdCertificate,
++    record: dict[str, object],
++    corner_clip: Fraction | None = None,
+ ) -> tuple[list[str], Fraction | None]:
+-    """Every optional declaration the record makes, checked against the object."""
++    """Every optional declaration the record makes, checked against the object.
++
++    The variant policy is the point gate's, on this gate's names. Without
++    ``--corner-clip`` the record must declare ``threshold`` (or nothing) and a ``class``
++    record is refused by the name it declares, with the one exception named in the
++    refusal; with the flag the record must declare ``variant: class`` and the same
++    ``corner_clip``. The name is checked first, so an unclipped reader's refusal is the
++    sentence this gate has always printed and does not change wording because a second
++    field is also missing. What the two fields mean together --
++    ``variant: class`` with no threshold, a threshold with no ``variant`` -- is
++    `corner_clip.declared_class_clip`'s and `corner_clip.agreed_class_clip`'s, so that
++    rule lives in one place for every reader in the repository rather than being
++    retyped per gate.
++    """
+     problems: list[str] = []
++    expected_variant = VARIANT if corner_clip is None else CLASS
+     variant = record.get("variant", VARIANT)
+-    if variant != VARIANT:
+-        problems.append(
+-            f"variant {variant!r} is declared, and this gate decides only {VARIANT!r} "
+-            "certificates; nothing else can be printed RETAINABLE here"
+-        )
++    if variant != expected_variant:
++        return [
++            (
++                f"variant {variant!r} is declared, and this gate decides only "
++                f"{expected_variant!r} certificates; nothing else can be printed "
++                "RETAINABLE here. The one exception is the corner class: pass "
++                f"--corner-clip d over a record declaring variant: {CLASS} and that d"
++            )
++        ], None
++    try:
++        agreed_class_clip(record, corner_clip, reader="decide_threshold_certificate")
++    except ValueError as error:
++        return [str(error)], None
+     declared_budget = record.get("total_budget")
+     if declared_budget is not None:
+         try:
+@@ -243,10 +292,32 @@ def _declarations(
+                 )
+         except FormatError as error:
+             problems.append(str(error))
++    # What the bytes have to claim. Unclipped, that is the theorem's conclusion and the
++    # comparison this gate has always made. Under the clip it is the class's own claim,
++    # so a record cannot be decided as a class while carrying the theorem's sentence:
++    # ``variant`` was the only field saying so, and a reader scanning claim strings
++    # never saw it.
+     claim = record.get("claim")
+-    expected_claim = f"s({certificate.n}) >= {certificate.outer_side}"
++    theorem_claim = f"s({certificate.n}) >= {certificate.outer_side}"
++    expected_claim = (
++        theorem_claim
++        if corner_clip is None
++        else class_claim(certificate.n, certificate.outer_side, corner_clip)
++    )
+     if claim is not None and claim != expected_claim:
+-        problems.append(f"declared claim {claim!r} != theorem conclusion {expected_claim!r}")
++        problems.append(
++            f"declared claim {claim!r} != "
++            + (
++                f"theorem conclusion {expected_claim!r}"
++                if corner_clip is None
++                else f"class claim {expected_claim!r}"
++            )
++        )
++    if corner_clip is not None:
++        expected_id = _class_id(certificate, corner_clip)
++        declared_id = record.get("id")
++        if declared_id != expected_id:
++            problems.append(f"declared id {declared_id!r} != class id {expected_id!r}")
+     declared_least: Fraction | None = None
+     if "least_cell_charge" in record:
+         try:
+@@ -256,6 +327,23 @@ def _declarations(
+     return problems, declared_least
+ 
+ 
++def _class_id(certificate: ThresholdCertificate, depth: Fraction) -> str:
++    """The id a clipped threshold candidate must carry.
++
++    `corner_clip.class_certificate_id` is the point route's, whose family word is
++    ``fractional``; this gate's records say ``threshold``. The clip suffix is taken from
++    that function rather than retyped, so the two gates cannot drift on how a threshold
++    is spelled into an id, and a class record can never be mistaken for the
++    unconditional one by its id alone.
++    """
++
++    _, _, suffix = class_certificate_id(certificate.n, certificate.outer_side, depth).partition(
++        "-clip-"
++    )
++    side = certificate.outer_side
++    return f"C-n{certificate.n:03d}-{VARIANT}-{side.numerator}-{side.denominator}-clip-{suffix}"
++
++
+ def _placement_membership(
+     certificate: ThresholdCertificate, direction_index: int, witness: tuple[Fraction, Fraction]
+ ):
+@@ -278,13 +366,23 @@ def _print_refusals(path: Path, problems: list[str]) -> bool:
+ 
+ 
+ def _interval_route(
+-    certificate: ThresholdCertificate, *, workers: int
++    certificate: ThresholdCertificate, *, workers: int, clip: CornerClip | None = None
+ ) -> tuple[Fraction | None, list[str]]:
+-    """Run the interval route; return the pinned least charge and every objection."""
++    """Run the interval route; return the pinned least charge and every objection.
++
++    An unconditional decision calls the route exactly as it did before the clip existed,
++    with no extra argument: same call, same bytes, same verdict.
++    """
+     problems: list[str] = []
+     start = time.perf_counter()
+     try:
+-        verdict = verify_threshold_by_intervals(certificate, enclose=True, workers=workers)
++        verdict = (
++            verify_threshold_by_intervals(certificate, enclose=True, workers=workers)
++            if clip is None
++            else verify_threshold_by_intervals(
++                certificate, enclose=True, workers=workers, clip=clip
++            )
++        )
+     except IntervalInputError as error:
+         return None, [f"the interval route could not decide it: {error}"]
+     boxes = sum(o.boxes for o in verdict.directions)
+@@ -305,7 +403,7 @@ def _interval_route(
+         default=None,
+     )
+     if worst is not None and worst.witness is not None:
+-        witness = exact_charge_at_witness(certificate, worst.label, worst.witness)
++        witness = exact_charge_at_witness(certificate, worst.label, worst.witness, clip)
+         print(
+             f"    least point charge at direction {worst.label}, witness (rotated frame) "
+             f"{worst.witness}: exact charge by membership counting {witness.charge} = "
+@@ -335,7 +433,7 @@ def _interval_route(
+ 
+ 
+ def _exact_route(
+-    certificate: ThresholdCertificate, *, workers: int
++    certificate: ThresholdCertificate, *, workers: int, clip: CornerClip | None = None
+ ) -> tuple[Fraction | None, list[str]]:
+     """Run the exact sweep two ways; return the least charge and every objection."""
+     try:
+@@ -345,15 +443,28 @@ def _exact_route(
+     problems: list[str] = []
+     start = time.perf_counter()
+     directions = certificate.directions
+-    if workers > 1:
+-        with ProcessPoolExecutor(
+-            max_workers=workers, mp_context=mp.get_context("fork")
+-        ) as pool:
+-            results = list(
+-                pool.map(partial(_dense_and_slab, certificate), range(len(directions)))
+-            )
+-    else:
+-        results = [_dense_and_slab(certificate, k) for k in range(len(directions))]
++    # A clip that empties some direction's domain is a refusal and not a traceback: the
++    # class it names is empty, so Condition 5' has nothing to quantify over and a pass
++    # there would be vacuous. `threshold.verify_threshold` turns the same exception into
++    # the same refusal; this route reads the sweep directly and so must catch it itself.
++    # Unclipped, the task is the one this route has always built, with no extra
++    # argument bound: `devtools.fixed_core_packet` calls the same function with the
++    # same two arguments, and a clip must not change what that call means.
++    task = (
++        partial(_dense_and_slab, certificate)
++        if clip is None
++        else partial(_dense_and_slab, certificate, clip=clip)
++    )
++    try:
++        if workers > 1:
++            with ProcessPoolExecutor(
++                max_workers=workers, mp_context=mp.get_context("fork")
++            ) as pool:
++                results = list(pool.map(task, range(len(directions))))
++        else:
++            results = [task(k) for k in range(len(directions))]
++    except EmptyClippedDomainError as error:
++        return None, [f"the corner clip admits no placement: {error}"]
+     worst: Fraction | None = None
+     worst_at: tuple[int, tuple[Fraction, Fraction]] | None = None
+     disagreements = 0
+@@ -386,13 +497,16 @@ def _exact_route(
+     return worst, problems
+ 
+ 
+-def decide(path: Path, *, workers: int, mode: Mode = "both") -> bool:
++def decide(
++    path: Path, *, workers: int, mode: Mode = "both", corner_clip: Fraction | None = None
++) -> bool:
+     started = time.perf_counter()
+     try:
+         frozen = _read_bounded(path)
+         certificate, record = load(frozen)
+     except (FormatError, OSError) as error:
+         return _print_refusals(path, [str(error)])
++    clip = clip_from_optional(corner_clip, certificate.outer_side, certificate.square_side)
+     print(
+         f"{path}: n = {certificate.n}, L = {certificate.outer_side} = "
+         f"{float(certificate.outer_side):.6f}, B = {certificate.square_side}, "
+@@ -400,10 +514,11 @@ def decide(path: Path, *, workers: int, mode: Mode = "both") -> bool:
+         f"{float(certificate.point_mass):.9f}), {len(certificate.threshold_atoms)} threshold "
+         f"atoms (budget {certificate.threshold_budget} = "
+         f"{float(certificate.threshold_budget):.9f}), total budget "
+-        f"{certificate.total_budget} = {float(certificate.total_budget):.9f}",
++        f"{certificate.total_budget} = {float(certificate.total_budget):.9f}"
++        + ("" if clip is None else f", corner clip d = {clip.depth}"),
+         flush=True,
+     )
+-    problems, declared_least = _declarations(certificate, record)
++    problems, declared_least = _declarations(certificate, record, corner_clip)
+     if declared_least is None:
+         print(
+             "  no least_cell_charge is declared; the routes are compared to each other",
+@@ -421,7 +536,12 @@ def decide(path: Path, *, workers: int, mode: Mode = "both") -> bool:
+ 
+     interval_least: Fraction | None = None
+     if mode != "exact-only":
+-        interval_least, problems = _interval_route(certificate, workers=workers)
++        # Unclipped, this is the call the gate has always made, with no extra argument.
++        interval_least, problems = (
++            _interval_route(certificate, workers=workers)
++            if clip is None
++            else _interval_route(certificate, workers=workers, clip=clip)
++        )
+         if (
+             declared_least is not None
+             and interval_least is not None
+@@ -443,7 +563,11 @@ def decide(path: Path, *, workers: int, mode: Mode = "both") -> bool:
+             )
+             return True
+ 
+-    exact_least, problems = _exact_route(certificate, workers=workers)
++    exact_least, problems = (
++        _exact_route(certificate, workers=workers)
++        if clip is None
++        else _exact_route(certificate, workers=workers, clip=clip)
++    )
+     if exact_least is not None:
+         if interval_least is not None and interval_least != exact_least:
+             problems.append(
+@@ -458,18 +582,32 @@ def decide(path: Path, *, workers: int, mode: Mode = "both") -> bool:
+     if problems:
+         return _print_refusals(path, problems)
+     elapsed = time.perf_counter() - started
++    headline = (
++        "RETAINABLE"
++        if clip is None
++        else (
++            "RETAINABLE UNDER THE CORNER CLASS HYPOTHESIS "
++            f"(no square meets x + y <= {clip.depth} in any corner frame)"
++        )
++    )
+     verdict = (
+         f"ACCEPTED (one exact route; retention wants an independent verifier); "
+         f"least cell charge {exact_least}"
+         if mode == "exact-only"
+-        else f"RETAINABLE: both routes accept and agree at {exact_least}"
++        else f"{headline}: both routes accept and agree at {exact_least}"
+     )
+     print(f"{path}: {verdict}; sha256 {digest}; {elapsed:.1f}s", flush=True)
+     return True
+ 
+ 
+-def _dense_and_slab(certificate: ThresholdCertificate, k: int):
+-    """The exact sweep at one direction, read from the dense grid and from the slabs."""
++def _dense_and_slab(
++    certificate: ThresholdCertificate, k: int, clip: CornerClip | None = None
++):
++    """The exact sweep at one direction, read from the dense grid and from the slabs.
++
++    ``clip`` is last and optional because this function is `devtools.fixed_core_packet`'s
++    too, which reads the unconditional sweep and passes the two arguments it always has.
++    """
+     direction = certificate.directions[k]
+     dense = minimum_charge(
+         certificate.atoms,
+@@ -478,6 +616,7 @@ def _dense_and_slab(certificate: ThresholdCertificate, k: int):
+         certificate.outer_side,
+         certificate.square_side,
+         dense_cell_limit=DENSE_CELL_LIMIT,
++        clip=clip,
+     )
+     slab = minimum_charge(
+         certificate.atoms,
+@@ -486,6 +625,7 @@ def _dense_and_slab(certificate: ThresholdCertificate, k: int):
+         certificate.outer_side,
+         certificate.square_side,
+         dense_cell_limit=0,
++        clip=clip,
+     )
+     return dense, slab
+ 
+@@ -505,7 +645,20 @@ def main(argv: list[str] | None = None) -> int:
+         action="store_true",
+         help="the exact sweep only, as the spike tool ran it; cannot retain",
+     )
++    parser.add_argument(
++        "--corner-clip",
++        type=Fraction,
++        default=None,
++        metavar="d",
++        help=(
++            "decide the corner class of lane-a Theorem B instead of the unconditional "
++            "theorem: Condition 5' quantifies only over cores avoiding every corner "
++            "triangle x + y <= d. The record must declare variant: class and the same d"
++        ),
++    )
+     args = parser.parse_args(argv)
++    if args.corner_clip is not None and not 0 < args.corner_clip <= 1:
++        parser.error("--corner-clip must satisfy 0 < d <= 1")
+     mode: Mode = "quick" if args.quick else "exact-only" if args.exact_only else "both"
+     ok = True
+     seen: set[Path] = set()
+@@ -514,7 +667,18 @@ def main(argv: list[str] | None = None) -> int:
+             print(f"{path}: SKIPPED duplicate path", flush=True)
+             continue
+         seen.add(path)
+-        ok = decide(path, workers=max(1, args.workers), mode=mode) and ok
++        # Without the flag this is the call the command has always made.
++        decided = (
++            decide(path, workers=max(1, args.workers), mode=mode)
++            if args.corner_clip is None
++            else decide(
++                path,
++                workers=max(1, args.workers),
++                mode=mode,
++                corner_clip=args.corner_clip,
++            )
++        )
++        ok = decided and ok
+     return 0 if ok else 1
+ 
+ 
+diff --git a/packing/src/sqpack/fractional/threshold.py b/packing/src/sqpack/fractional/threshold.py
+index 51a2c76e..bf0f9c2e 100644
+--- a/packing/src/sqpack/fractional/threshold.py
++++ b/packing/src/sqpack/fractional/threshold.py
+@@ -83,6 +83,7 @@ from sqpack.fractional.certificate import (
+     closed_form_conditions,
+     d4_images,
+ )
++from sqpack.fractional.corner_clip import CornerClip, EmptyClippedDomainError
+ from sqpack.fractional.model import Atom, Direction
+ from sqpack.fractional.sweep import (
+     _INTEGER_MASS_LIMIT,
+@@ -516,8 +517,16 @@ def rectangle_terms(
+     square_side: Fraction,
+     *,
+     scale: int,
++    clip: CornerClip | None = None,
+ ) -> Terms:
+-    """Every signed rectangle term at one direction, with the event grid it indexes."""
++    """Every signed rectangle term at one direction, with the event grid it indexes.
++
++    ``clip`` reaches the terms only through the event grid: `reduce_to_spans` cuts the
++    centre domain by lane-a Theorem B's four corner half-planes, so the spans it marks
++    reachable are the clipped ones and every rectangle term is unchanged. The terms are
++    the charge, and the domain is where the charge is read -- keeping the two separate
++    is why a clip costs this module no arithmetic at all.
++    """
+ 
+     preflight_expansion(threshold_atoms)
+     _headroom(atoms, threshold_atoms, scale)
+@@ -526,7 +535,7 @@ def rectangle_terms(
+             if not (0 <= x <= outer_side and 0 <= y <= outer_side):
+                 raise ValueError(f"threshold point ({x}, {y}) lies outside the container")
+     everything = _event_atoms(atoms, threshold_atoms)
+-    reduction = reduce_to_spans(everything, direction, outer_side, square_side)
++    reduction = reduce_to_spans(everything, direction, outer_side, square_side, clip=clip)
+     u_index = {value: index for index, value in enumerate(reduction.u_events)}
+     v_index = {value: index for index, value in enumerate(reduction.v_events)}
+ 
+@@ -591,6 +600,7 @@ def charge_grid(
+     square_side: Fraction,
+     *,
+     scale: int,
++    clip: CornerClip | None = None,
+ ) -> MassGrid:
+     """The dense integer charge grid at one direction, by inclusion--exclusion.
+ 
+@@ -601,7 +611,7 @@ def charge_grid(
+     """
+ 
+     terms = rectangle_terms(
+-        atoms, threshold_atoms, direction, outer_side, square_side, scale=scale
++        atoms, threshold_atoms, direction, outer_side, square_side, scale=scale, clip=clip
+     )
+     reduction = terms.reduction
+     width, height = len(reduction.u_events), len(reduction.v_events)
+@@ -666,6 +676,7 @@ def charge_grid_direct(
+     square_side: Fraction,
+     *,
+     scale: int,
++    clip: CornerClip | None = None,
+ ) -> MassGrid:
+     """The reference: one integer count grid per threshold atom, thresholded.
+ 
+@@ -681,7 +692,7 @@ def charge_grid_direct(
+             raise ValueError("token count exceeds the direct grid's int64 capacity")
+     _headroom(atoms, threshold_atoms, scale)
+     everything = _event_atoms(atoms, threshold_atoms)
+-    reduction = reduce_to_spans(everything, direction, outer_side, square_side)
++    reduction = reduce_to_spans(everything, direction, outer_side, square_side, clip=clip)
+     u_index = {value: index for index, value in enumerate(reduction.u_events)}
+     v_index = {value: index for index, value in enumerate(reduction.v_events)}
+     width, height = len(reduction.u_events), len(reduction.v_events)
+@@ -722,10 +733,12 @@ def _witness(
+     outer_side: Fraction,
+     square_side: Fraction,
+     direction: Direction,
++    *,
++    clip: CornerClip | None = None,
+ ) -> Point:
+     i, j = cell
+     return _cell_witness(
+-        centre_domain(outer_side, square_side, direction),
++        centre_domain(outer_side, square_side, direction, clip=clip),
+         reduction.u_events[i],
+         reduction.u_events[i + 1],
+         reduction.v_events[j],
+@@ -733,6 +746,10 @@ def _witness(
+     )
+ 
+ 
++#: The sweep's Condition 5', named once so a clipped refusal and an ordinary verdict
++#: cannot drift apart in their wording.
++CONDITION_5_PRIME = "Condition 5' every reachable cell is charged at least 1"
++
+ #: Above this many cells the sweep runs slab by slab instead of filling the dense grid:
+ #: a dense int64 grid of this size is 800 MB.
+ DENSE_CELL_LIMIT = 100_000_000
+@@ -746,17 +763,24 @@ def minimum_charge(
+     square_side: Fraction,
+     *,
+     dense_cell_limit: int = DENSE_CELL_LIMIT,
++    clip: CornerClip | None = None,
+ ) -> tuple[Fraction, Point]:
+     """The least charge any reachable core carries at one direction, with a witness
+     centre in the rotated frame. Exact; first occurrence wins, in span order.
+ 
+     The dense grid is filled when it fits ``dense_cell_limit`` cells and the slab sweep
+     runs otherwise; the two agree cell for cell (the tests hold them to it).
++
++    ``clip`` restricts the reachable cells to lane-a Theorem B's free-corner domain, so
++    the value is the least charge over that class of placements and not over every one.
++    It is threaded, never stored on the certificate: the record on disk declares the
++    hypothesis and the caller passes it, so no object can carry a clip a reader of the
++    file cannot see.
+     """
+ 
+     scale = threshold_weight_scale(atoms, threshold_atoms)
+     terms = rectangle_terms(
+-        atoms, threshold_atoms, direction, outer_side, square_side, scale=scale
++        atoms, threshold_atoms, direction, outer_side, square_side, scale=scale, clip=clip
+     )
+     reduction = terms.reduction
+     if len(reduction.u_events) * len(reduction.v_events) <= dense_cell_limit:
+@@ -781,7 +805,9 @@ def minimum_charge(
+         best, cell = int(scores[k]), (int(cells[k, 0]), int(cells[k, 1]))
+     if best is None or cell is None:  # pragma: no cover - reduce_to_spans raises first
+         raise ValueError("the sweep produced no reachable cell")
+-    return Fraction(best, scale), _witness(reduction, cell, outer_side, square_side, direction)
++    return Fraction(best, scale), _witness(
++        reduction, cell, outer_side, square_side, direction, clip=clip
++    )
+ 
+ 
+ def least_charged_slabs(
+@@ -792,6 +818,7 @@ def least_charged_slabs(
+     *,
+     keep: int,
+     below: Fraction,
++    clip: CornerClip | None = None,
+ ) -> list[tuple[Fraction, Point]]:
+     """Up to ``keep`` slab minima charged below ``below``, least first, with witnesses.
+ 
+@@ -807,7 +834,9 @@ def least_charged_slabs(
+     for index in order:
+         cell = (int(cells[index, 0]), int(cells[index, 1]))
+         try:
+-            witness = _witness(terms.reduction, cell, outer_side, square_side, direction)
++            witness = _witness(
++                terms.reduction, cell, outer_side, square_side, direction, clip=clip
++            )
+         except ValueError:
+             continue
+         found.append((Fraction(int(scores[index]), terms.scale), witness))
+@@ -824,6 +853,7 @@ def least_charged_cells(
+     *,
+     keep: int,
+     below: Fraction,
++    clip: CornerClip | None = None,
+ ) -> list[tuple[Fraction, Point]]:
+     """Up to ``keep`` reachable cells charged below ``below``, least first, with witnesses.
+ 
+@@ -850,7 +880,9 @@ def least_charged_cells(
+     for index in order:
+         i, j = int(where[index, 0]), int(where[index, 1])
+         try:
+-            witness = _witness(grid.reduction, (i, j), outer_side, square_side, direction)
++            witness = _witness(
++                grid.reduction, (i, j), outer_side, square_side, direction, clip=clip
++            )
+         except ValueError:
+             continue
+         found.append((Fraction(int(flat[index]), grid.scale), witness))
+@@ -986,7 +1018,9 @@ def closed_form_threshold_conditions(
+ 
+ 
+ def _direction_minimum(
+-    certificate: ThresholdCertificate, direction: Direction
++    certificate: ThresholdCertificate,
++    direction: Direction,
++    clip: CornerClip | None = None,
+ ) -> tuple[Fraction, str]:
+     minimum, _ = minimum_charge(
+         certificate.atoms,
+@@ -994,6 +1028,7 @@ def _direction_minimum(
+         direction,
+         certificate.outer_side,
+         certificate.square_side,
++        clip=clip,
+     )
+     return minimum, direction.label
+ 
+@@ -1009,22 +1044,33 @@ class ThresholdSweepDeadlineError(TimeoutError):
+ @dataclass(slots=True)
+ class _ThresholdSweepWorker:
+     certificate: ThresholdCertificate | None = None
++    clip: CornerClip | None = None
+ 
+ 
+ _THRESHOLD_SWEEP_WORKER = _ThresholdSweepWorker()
+ 
+ 
+-def _install_threshold_sweep(certificate: ThresholdCertificate) -> None:
+-    """Install one fork-inherited certificate for index-only worker tasks."""
++def _install_threshold_sweep(
++    certificate: ThresholdCertificate, clip: CornerClip | None = None
++) -> None:
++    """Install one fork-inherited certificate for index-only worker tasks.
++
++    The clip travels with it rather than with the task, for the same reason the
++    certificate does: a worker decides directions of one object under one hypothesis,
++    and an index is the whole of a task.
++    """
+ 
+     _THRESHOLD_SWEEP_WORKER.certificate = certificate
++    _THRESHOLD_SWEEP_WORKER.clip = clip
+ 
+ 
+ def _shared_direction_minimum(index: int) -> tuple[int, Fraction, str]:
+     certificate = _THRESHOLD_SWEEP_WORKER.certificate
+     if certificate is None:
+         raise RuntimeError("threshold sweep worker has no installed certificate")
+-    minimum, label = _direction_minimum(certificate, certificate.directions[index])
++    minimum, label = _direction_minimum(
++        certificate, certificate.directions[index], _THRESHOLD_SWEEP_WORKER.clip
++    )
+     return index, minimum, label
+ 
+ 
+@@ -1044,6 +1090,7 @@ def sweep_all_threshold_directions(
+     progress: ThresholdSweepProgress | None = None,
+     deadline: float | None = None,
+     clock: ThresholdSweepClock = time.perf_counter,
++    clip: CornerClip | None = None,
+ ) -> tuple[tuple[Fraction, str], ...]:
+     """The least charge at every net direction, in deterministic net order.
+ 
+@@ -1051,6 +1098,9 @@ def sweep_all_threshold_directions(
+     only direction indices, with at most twice the worker count outstanding. ``progress``
+     observes completed directions without net-order blocking. Any non-complete exit
+     requests worker termination; the outer supervisor owns the hard process-tree guarantee.
++
++    ``clip`` cuts every direction's centre domain to lane-a Theorem B's free-corner
++    domain, and is installed into the workers beside the certificate.
+     """
+ 
+     # Refuse an unaffordable expansion once, before any direction runs or any worker forks;
+@@ -1061,7 +1111,7 @@ def sweep_all_threshold_directions(
+         serial_outcomes: list[tuple[Fraction, str]] = []
+         for index, direction in enumerate(directions):
+             _deadline_remaining(deadline, clock)
+-            minimum, label = _direction_minimum(certificate, direction)
++            minimum, label = _direction_minimum(certificate, direction, clip)
+             serial_outcomes.append((minimum, label))
+             if progress is not None:
+                 progress(index, minimum, label)
+@@ -1073,7 +1123,7 @@ def sweep_all_threshold_directions(
+         max_workers=max_workers,
+         mp_context=mp.get_context("fork"),
+         initializer=_install_threshold_sweep,
+-        initargs=(certificate,),
++        initargs=(certificate, clip),
+     )
+     in_flight_limit = 2 * max_workers
+     pending: dict[Future[tuple[int, Fraction, str]], int] = {}
+@@ -1140,24 +1190,43 @@ def verify_threshold(
+     progress: ThresholdSweepProgress | None = None,
+     deadline: float | None = None,
+     clock: ThresholdSweepClock = time.perf_counter,
++    clip: CornerClip | None = None,
+ ) -> Verdict:
+-    """Decide Conditions 1', 2', 3, 4 and 5'. Exact; never short-circuits."""
++    """Decide Conditions 1', 2', 3, 4 and 5'. Exact; never short-circuits.
++
++    With ``clip``, Condition 5' quantifies over the free-corner domain only, and the
++    verdict is about the corresponding class of packings rather than about every
++    packing. A clip that empties the domain at some direction is a *failure*, not a
++    vacuous pass: the class would be empty and the run would be deciding nothing.
++    """
+ 
+     conditions = list(closed_form_threshold_conditions(certificate))
+     worst: Fraction | None = None
+     worst_label: str | None = None
+-    for minimum, label in sweep_all_threshold_directions(
+-        certificate,
+-        workers=workers,
+-        progress=progress,
+-        deadline=deadline,
+-        clock=clock,
+-    ):
++    try:
++        minima = sweep_all_threshold_directions(
++            certificate,
++            workers=workers,
++            progress=progress,
++            deadline=deadline,
++            clock=clock,
++            clip=clip,
++        )
++    except EmptyClippedDomainError as error:
++        conditions.append(
++            ConditionReport(
++                CONDITION_5_PRIME,
++                f"the corner clip admits no placement: {error}",
++                holds=False,
++            )
++        )
++        return Verdict(tuple(conditions), certificate.total_budget, None, None)
++    for minimum, label in minima:
+         if worst is None or minimum < worst:
+             worst, worst_label = minimum, label
+     conditions.append(
+         ConditionReport(
+-            "Condition 5' every reachable cell is charged at least 1",
++            CONDITION_5_PRIME,
+             f"least cell charge {worst} at direction {worst_label}",
+             holds=worst is not None and worst >= 1,
+         )
+@@ -1166,6 +1235,7 @@ def verify_threshold(
+ 
+ 
+ __all__ = [
++    "CONDITION_5_PRIME",
+     "DENSE_CELL_LIMIT",
+     "MAX_EXPANSION_SUBSETS",
+     "MAX_EXPANSION_TOKENS_PER_ATOM",
+diff --git a/packing/src/sqpack/fractional/threshold_interval.py b/packing/src/sqpack/fractional/threshold_interval.py
+index e4e5f27a..9c7a01ed 100644
+--- a/packing/src/sqpack/fractional/threshold_interval.py
++++ b/packing/src/sqpack/fractional/threshold_interval.py
+@@ -100,6 +100,7 @@ from queue import Empty, SimpleQueue
+ import numpy as np
+ from numpy.typing import NDArray
+ 
++from sqpack.fractional.corner_clip import CornerClip
+ from sqpack.fractional.interval import (
+     INT64_MASS_LIMIT,
+     MAX_INTERVAL_ATOMS,
+@@ -279,6 +280,13 @@ class ThresholdDirectionSearch(DirectionSearch):
+     and reported, never accepted. The site enclosures the inherited machinery reads are
+     the distinct atom points; the bounds below turn a site mask into a charge through the
+     member table.
++
++    ``clip`` is the point route's too, and nothing here touches it: the inherited search
++    drops a box only when every centre in it *provably* meets a corner triangle, admits
++    a witness only when it *provably* clears all four, and splits a box a cut line may
++    pass through. Since the clip changes which centres are searched and never what a
++    centre is charged, the two bounds below are the same functions on the clipped domain
++    as on the full one.
+     """
+ 
+     def __init__(
+@@ -287,8 +295,9 @@ class ThresholdDirectionSearch(DirectionSearch):
+         rotation: Rotation,
+         outer_side: Interval,
+         square_side: Interval,
++        clip: CornerClip | None = None,
+     ) -> None:
+-        super().__init__(data.sites, rotation, outer_side, square_side)
++        super().__init__(data.sites, rotation, outer_side, square_side, clip)
+         self.members = data.members
+         self.thresholds = data.thresholds
+         # Mass per atom, replacing the inherited per-site array, which is all zeros here.
+@@ -348,7 +357,10 @@ class WitnessCharge:
+ 
+ 
+ def exact_charge_at_witness(
+-    certificate: ThresholdCertificate, label: str, witness: tuple[float, float]
++    certificate: ThresholdCertificate,
++    label: str,
++    witness: tuple[float, float],
++    clip: CornerClip | None = None,
+ ) -> WitnessCharge:
+     """Count, in rational arithmetic, what the core centred at a float witness contains.
+ 
+@@ -357,6 +369,12 @@ def exact_charge_at_witness(
+     closed core when both rotated coordinates are within ``B/2`` of the centre; a
+     threshold atom charges its weight when its count reaches its threshold. Nothing here
+     is shared with the search's arithmetic or with the sweep.
++
++    Under ``clip`` a centre is admissible only when its core also avoids all four corner
++    triangles, in the same rational arithmetic: a refutation is a placement the class can
++    really carry, or it is not a refutation of the class at all. The reach is folded
++    (``B max(|cos|, |sin|)``), so a reflected label gets the constant of the square it is
++    congruent to.
+     """
+     cosine, sine = exact_rotation(certificate, label)
+     u, v = Fraction(witness[0]), Fraction(witness[1])
+@@ -364,6 +382,8 @@ def exact_charge_at_witness(
+     side, square = certificate.outer_side, certificate.square_side
+     margin = square * (cosine + sine) / 2
+     admissible = margin <= x <= side - margin and margin <= y <= side - margin
++    if clip is not None and admissible:
++        admissible = not clip.excludes(x, y, cosine, sine)
+     half = square / 2
+ 
+     def inside(px: Fraction, py: Fraction) -> bool:
+@@ -433,13 +453,16 @@ def _condition_budget_below_n(
+ 
+ 
+ def threshold_searches(
+-    certificate: ThresholdCertificate, data: ThresholdAtomData
++    certificate: ThresholdCertificate,
++    data: ThresholdAtomData,
++    *,
++    clip: CornerClip | None = None,
+ ) -> Iterator[ThresholdDirectionSearch]:
+     outer = Interval.of(certificate.outer_side)
+     square = Interval.of(certificate.square_side)
+     for rotation in doubled_net(certificate.half_tangents):
+         with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
+-            search = ThresholdDirectionSearch(data, rotation, outer, square)
++            search = ThresholdDirectionSearch(data, rotation, outer, square, clip)
+         yield search
+ 
+ 
+@@ -449,9 +472,11 @@ def _search_direction(
+     square: Interval,
+     prune_at: int | None,
+     rotation: Rotation,
++    *,
++    clip: CornerClip | None = None,
+ ) -> DirectionOutcome:
+     with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
+-        search = ThresholdDirectionSearch(data, rotation, outer, square)
++        search = ThresholdDirectionSearch(data, rotation, outer, square, clip)
+         return search.search(prune_at=prune_at)
+ 
+ 
+@@ -463,6 +488,7 @@ def _search_directions(
+     prune_at: int | None,
+     workers: int,
+     progress: Callable[[DirectionOutcome], None] | None = None,
++    clip: CornerClip | None = None,
+ ) -> list[DirectionOutcome]:
+     """Every rotation's outcome in net order, stopping after the first refutation.
+ 
+@@ -477,7 +503,14 @@ def _search_directions(
+     """
+     outer = Interval.of(certificate.outer_side)
+     square = Interval.of(certificate.square_side)
+-    task = partial(_search_direction, data, outer, square, prune_at)
++    # An unclipped run builds the task exactly as it did before the clip existed, with
++    # no extra argument: the same call reaches the same function with the same bound
++    # arguments, whether it is dispatched here or in a worker.
++    task = (
++        partial(_search_direction, data, outer, square, prune_at)
++        if clip is None
++        else partial(_search_direction, data, outer, square, prune_at, clip=clip)
++    )
+     outcomes: list[DirectionOutcome] = []
+     if workers <= 1 or len(rotations) < 2 or not sys.platform.startswith("linux"):
+         for rotation in rotations:
+@@ -573,6 +606,7 @@ def verify_threshold_by_intervals(
+     directions: tuple[str, ...] | None = None,
+     workers: int = 1,
+     progress: Callable[[DirectionOutcome], None] | None = None,
++    clip: CornerClip | None = None,
+ ) -> ThresholdIntervalVerdict:
+     """Decide the certificate; ``enclose`` also pins the least charge.
+ 
+@@ -582,6 +616,13 @@ def verify_threshold_by_intervals(
+     not depend on it. In parallel, ``progress`` receives each outcome drained by the
+     coordinator in completion order. After an early refutation, the scheduler cancels
+     or discards work beyond the deterministic net prefix.
++
++    ``clip`` restricts the admissible centres to lane-a Theorem B's free-corner domain,
++    and the verdict is then about that class of packings. The restriction is applied by
++    exclusion and never by tightening -- `sqpack.fractional.interval.DirectionSearch.
++    clip_excluded` gives the argument for why that is the sound direction -- and the
++    exact re-evaluation of a refuting witness applies the same predicate in rationals,
++    so a refutation of the class exhibits a centre the class can carry.
+     """
+     if any(t >= 1 for t in certificate.half_tangents):
+         raise IntervalInputError(
+@@ -606,6 +647,7 @@ def verify_threshold_by_intervals(
+         prune_at=None if enclose else data.scale,
+         workers=workers,
+         progress=progress,
++        clip=clip,
+     )
+     # A refutation is a float upper bound below 1 at a provably admissible centre: a
+     # direction the pruned search refuted outright, or -- under ``enclose``, where the
+@@ -624,7 +666,7 @@ def verify_threshold_by_intervals(
+         if pinned_below_one:
+             refuting.append(min(pinned_below_one, key=lambda o: o.upper or 0))
+     refutations = tuple(
+-        exact_charge_at_witness(certificate, o.label, o.witness)
++        exact_charge_at_witness(certificate, o.label, o.witness, clip)
+         for o in refuting
+         if o.witness is not None
+     )
+diff --git a/packing/tests/test_threshold_corner_clip.py b/packing/tests/test_threshold_corner_clip.py
+new file mode 100644
+index 00000000..50c80109
+--- /dev/null
++++ b/packing/tests/test_threshold_corner_clip.py
+@@ -0,0 +1,471 @@
++"""Controls for the corner clip on the threshold routes.
++
++The clip is `sqpack.fractional.corner_clip`'s, admitted on the point routes in 167a4b05
++and threaded here without a line of new geometry: the sweep meets it through the centre
++domain its event grid is built on, and the interval search inherits the point route's
++exclusion, witness and split rules wholesale. What has to be controlled is therefore not
++the predicate -- `tests/test_fractional_corner_clip.py` holds that -- but the threading:
++
++* that an unclipped threshold decision is the one this repository has always made, held
++  to T-025's retained certificate, on the numbers *and* on the box counts;
++* that a clipped decision changes the least charge in the direction and by the amount a
++  hand computation says it must, on a fixture small enough to do that computation in;
++* that the two routes still agree on the number they produce under the clip;
++* that the gate's variant policy is `devtools.decide_certificate`'s, both ways round: a
++  class record is refused without the flag and an unconditional one with it.
++"""
++
++from __future__ import annotations
++
++import json
++from fractions import Fraction
++from pathlib import Path
++
++import pytest
++
++from devtools.decide_threshold_certificate import load as gate_load
++from devtools.decide_threshold_certificate import main as gate_main
++from sqpack.fractional.corner_clip import CornerClip, EmptyClippedDomainError
++from sqpack.fractional.threshold import (
++    CONDITION_5_PRIME,
++    ThresholdAtom,
++    ThresholdCertificate,
++    minimum_charge,
++    verify_threshold,
++)
++from sqpack.fractional.threshold_interval import (
++    CONDITION_5,
++    exact_charge_at_witness,
++    verify_threshold_by_intervals,
++)
++
++PACKING = Path(__file__).resolve().parents[1]
++RETAINED = PACKING / "cases" / "n11_threshold_certificate" / "certificate.json"
++
++
++# --- the unclipped route is byte-for-byte what it was -------------------------
++
++#: What the exact sweep read at three directions of T-025's retained certificate, and
++#: what the interval route read at two of the doubled net's, *measured on the code as it
++#: stood before the clip was threaded through this module*. They are the control on the
++#: default path: a clip argument that reached any arithmetic, or a domain built one event
++#: differently, would move one of these. The box counts are included deliberately --
++#: they are the search's own trace and move on far less than a verdict does.
++RETAINED_EXACT = {
++    0: Fraction(1000002031, 1000000000),
++    90: Fraction(100000203, 100000000),
++    180: Fraction(1000002031, 1000000000),
++}
++RETAINED_INTERVAL = {
++    "0": (1000002031, 1000002031, 3639, 0),
++    "90'": (1000002030, 1000002030, 4119, 0),
++}
++
++
++@pytest.fixture(scope="module")
++def retained() -> ThresholdCertificate:
++    certificate, _ = gate_load(RETAINED.read_bytes())
++    return certificate
++
++
++@pytest.mark.parametrize("index", sorted(RETAINED_EXACT))
++def test_the_unclipped_sweep_reads_the_retained_certificate_unchanged(
++    retained: ThresholdCertificate, index: int
++) -> None:
++    """The retained example decides to the same digit with the clip threaded through."""
++    charge, _ = minimum_charge(
++        retained.atoms,
++        retained.threshold_atoms,
++        retained.directions[index],
++        retained.outer_side,
++        retained.square_side,
++    )
++    assert charge == RETAINED_EXACT[index]
++    # The same call with an explicit ``clip=None`` is the same call: the default path is
++    # not a second path that happens to agree.
++    assert (
++        minimum_charge(
++            retained.atoms,
++            retained.threshold_atoms,
++            retained.directions[index],
++            retained.outer_side,
++            retained.square_side,
++            clip=None,
++        )[0]
++        == charge
++    )
++
++
++def test_the_unclipped_interval_route_searches_the_retained_certificate_unchanged(
++    retained: ThresholdCertificate,
++) -> None:
++    """Same bounds, same enclosure, same boxes, same stalls at the searched directions."""
++    verdict = verify_threshold_by_intervals(
++        retained, enclose=True, directions=tuple(RETAINED_INTERVAL)
++    )
++    assert verdict.enclosure == (RETAINED_EXACT[90], RETAINED_EXACT[90])
++    read = {
++        outcome.label: (outcome.lower, outcome.upper, outcome.boxes, outcome.stalled)
++        for outcome in verdict.directions
++    }
++    assert read == RETAINED_INTERVAL
++
++
++# --- the synthetic fixture the clip is load-bearing on ------------------------
++
++# A container, a shrink and a two-direction net small enough to decide in milliseconds by
++# both routes, carrying two ``2-of-3`` atoms and no point atom at all. The numbers are
++# chosen so the direction-0 charge can be read off by hand; the derivation is in
++# `test_the_clip_turns_the_uncharged_corner_placement_into_a_charged_one`. ``n = 5`` only
++# to clear Condition 2' with room to spare.
++TINY_SIDE = Fraction(19, 10)
++TINY_SHRINK = Fraction(7, 10)
++TINY_NET = (Fraction(0), Fraction(5, 12))
++#: The offset of each atom's outer tokens from the container centre.
++TINY_OFFSET = Fraction(1, 5)
++TINY_DEPTH = Fraction(1)
++
++
++def _tiny_certificate(side: Fraction = TINY_SIDE) -> ThresholdCertificate:
++    """Two ``2-of-3`` atoms of weight 1, collinear through the centre, one per axis.
++
++    The pair is the D4 orbit of either one of them, so Condition 1' holds and the fixture
++    can be put through the whole of `verify_threshold`, not only through one direction.
++    """
++    centre = side / 2
++    horizontal = ThresholdAtom(
++        (
++            (centre - TINY_OFFSET, centre),
++            (centre, centre),
++            (centre + TINY_OFFSET, centre),
++        ),
++        2,
++        Fraction(1),
++    )
++    vertical = ThresholdAtom(
++        (
++            (centre, centre - TINY_OFFSET),
++            (centre, centre),
++            (centre, centre + TINY_OFFSET),
++        ),
++        2,
++        Fraction(1),
++    )
++    return ThresholdCertificate(
++        n=5,
++        outer_side=side,
++        square_side=TINY_SHRINK,
++        atoms=(),
++        threshold_atoms=(horizontal, vertical),
++        half_tangents=TINY_NET,
++    )
++
++
++def _tiny_clip(side: Fraction = TINY_SIDE) -> CornerClip:
++    return CornerClip(side, TINY_SHRINK, TINY_DEPTH)
++
++
++def test_the_clip_turns_the_uncharged_corner_placement_into_a_charged_one() -> None:
++    """The one number in this file computed by hand, at the axis-aligned direction.
++
++    With ``L = 19/10``, ``B = 7/10`` and ``h = B/2 = 7/20`` the centres run over
++    ``[7/20, 39/20]^2`` and the container centre is ``c = 19/20``.
++
++    *Unclipped.* The core centred at ``(7/20, 7/20)`` is ``[0, 7/10]^2``, and every one
++    of the six token points has a coordinate equal to ``19/20 > 7/10``, so it holds no
++    token at all: neither atom reaches its threshold and the charge there is ``0``.
++
++    *Clipped at ``d = 1``.* At this direction ``reach = B max(|cos|, |sin|) = B``, so the
++    four kept half-planes are ``x + y >= d + B = 17/10``, ``x + y <= 2L - d - B = 21/10``
++    and ``|x - y| <= L - d - B = 1/5``: the diamond of half-diagonal ``1/5`` about ``c``,
++    on which ``|x - c| <= 1/5`` and ``|y - c| <= 1/5``.
++
++    Take a centre there and the horizontal atom, whose tokens sit at ``x`` in
++    ``c - 1/5, c, c + 1/5`` and ``y = c``. Every token is within ``1/5 < h`` of ``c`` in
++    ``y``, so ``y`` never drops one. The middle token is within ``1/5 < h`` in ``x`` as
++    well and is always held. The left token is held exactly when ``x <= c + 3/20`` and
++    the right one exactly when ``x >= c - 3/20``, and no ``x`` fails both, so at least
++    two of the three tokens are held and the atom charges its weight ``1``. The outer
++    tokens really are dropped at the diamond's extremes -- at ``x = c + 1/5`` the left
++    one is ``8/20`` away against ``h = 7/20`` -- which is what makes the ``2`` of the
++    ``2-of-3`` load-bearing rather than decorative. The same argument in ``y`` charges
++    the vertical atom, so every clipped centre carries charge ``1 + 1 = 2``.
++    """
++    certificate = _tiny_certificate()
++    direction = certificate.directions[0]
++    plain, _ = minimum_charge(
++        certificate.atoms,
++        certificate.threshold_atoms,
++        direction,
++        TINY_SIDE,
++        TINY_SHRINK,
++    )
++    assert plain == 0
++    clipped, witness = minimum_charge(
++        certificate.atoms,
++        certificate.threshold_atoms,
++        direction,
++        TINY_SIDE,
++        TINY_SHRINK,
++        clip=_tiny_clip(),
++    )
++    assert clipped == 2
++    # The witness is a centre of the clipped domain, which at this direction is the
++    # diamond of the docstring: the rotated frame is the container's own.
++    u, v = witness
++    assert abs(u - TINY_SIDE / 2) <= TINY_OFFSET
++    assert abs(v - TINY_SIDE / 2) <= TINY_OFFSET
++
++
++def test_the_clip_is_what_decides_the_tiny_threshold_certificate() -> None:
++    certificate = _tiny_certificate()
++    plain = verify_threshold(certificate, workers=1)
++    assert not plain.accepted
++    assert plain.failures == (CONDITION_5_PRIME,)
++    assert plain.minimum_cell_mass == 0
++    clipped = verify_threshold(certificate, workers=1, clip=_tiny_clip())
++    assert clipped.accepted
++    assert clipped.minimum_cell_mass == 1
++
++
++def test_the_clip_reaches_the_forked_workers_on_both_routes() -> None:
++    """The clip is installed beside the certificate, not carried by the task.
++
++    A worker that inherited the certificate and dropped the clip would sweep the full
++    domain and report ``0`` here, so this is the control on the threading and not a
++    second control on the geometry. Both parallel routes are covered: the sweep's
++    ``initargs`` and the interval route's ``partial``.
++    """
++    certificate = _tiny_certificate()
++    clip = _tiny_clip()
++    assert verify_threshold(certificate, workers=2, clip=clip).minimum_cell_mass == 1
++    assert verify_threshold(certificate, workers=2).minimum_cell_mass == 0
++    parallel = verify_threshold_by_intervals(certificate, enclose=True, workers=2, clip=clip)
++    assert parallel.accepted
++    assert parallel.enclosure == (Fraction(1), Fraction(1))
++
++
++def test_both_routes_agree_on_the_number_under_the_clip() -> None:
++    """The gate's own requirement, on a clipped domain: one value, enclosure width zero."""
++    certificate = _tiny_certificate()
++    clip = _tiny_clip()
++    exact = verify_threshold(certificate, workers=1, clip=clip)
++    interval = verify_threshold_by_intervals(certificate, enclose=True, clip=clip)
++    assert interval.accepted
++    enclosure = interval.enclosure
++    assert enclosure is not None
++    assert enclosure[0] == enclosure[1] == exact.minimum_cell_mass
++    assert all(outcome.stalled == 0 for outcome in interval.directions)
++    # And the interval route refuses the same certificate on the full domain, so the two
++    # are agreeing about the clip and not about a certificate that never needed one.
++    plain = verify_threshold_by_intervals(certificate, enclose=True)
++    assert not plain.accepted
++    assert plain.failures == (CONDITION_5,)
++
++
++def test_clipping_can_only_raise_the_least_charge() -> None:
++    """Cutting placements out of a covering program cannot lower its worst one."""
++    certificate = _tiny_certificate()
++    clip = _tiny_clip()
++    for direction in certificate.directions:
++        plain, _ = minimum_charge(
++            certificate.atoms, certificate.threshold_atoms, direction, TINY_SIDE, TINY_SHRINK
++        )
++        clipped, _ = minimum_charge(
++            certificate.atoms,
++            certificate.threshold_atoms,
++            direction,
++            TINY_SIDE,
++            TINY_SHRINK,
++            clip=clip,
++        )
++        assert clipped >= plain
++
++
++def test_a_witness_inside_a_corner_triangle_is_not_admissible_under_the_clip() -> None:
++    """A refutation of the class has to exhibit a centre the class can carry."""
++    certificate = _tiny_certificate()
++    # Inside the container domain with room to spare -- the float is read as an exact
++    # rational, so a centre on the margin itself would be decided by its last bit -- and
++    # deep inside the corner triangle, where ``x + y = 4/5`` against the cut at ``17/10``.
++    corner = (0.4, 0.4)
++    plain = exact_charge_at_witness(certificate, "0", corner)
++    assert plain.admissible
++    assert plain.charge == 0
++    clipped = exact_charge_at_witness(certificate, "0", corner, _tiny_clip())
++    assert not clipped.admissible
++    # The charge is a property of the placement and not of the domain, so it is the same
++    # number either way: only admissibility moves.
++    assert clipped.charge == plain.charge
++
++
++def test_a_clip_that_removes_everything_is_a_refusal_and_not_a_vacuous_pass() -> None:
++    """An empty class has nothing to quantify over, so Condition 5' must fail, not pass."""
++    small = Fraction(3, 2)
++    certificate = _tiny_certificate(small)
++    clip = _tiny_clip(small)
++    with pytest.raises(EmptyClippedDomainError):
++        minimum_charge(
++            certificate.atoms,
++            certificate.threshold_atoms,
++            certificate.directions[0],
++            small,
++            TINY_SHRINK,
++            clip=clip,
++        )
++    verdict = verify_threshold(certificate, workers=1, clip=clip)
++    assert not verdict.accepted
++    assert verdict.failures == (CONDITION_5_PRIME,)
++    assert verdict.minimum_cell_mass is None
++
++
++# --- the gate's variant policy ------------------------------------------------
++
++
++def _record(
++    clip: CornerClip | None, least: str, side: Fraction = TINY_SIDE
++) -> dict[str, object]:
++    """The frozen record of the tiny certificate, clipped or not.
++
++    The clipped form is what `sqpack.fractional.corner_clip` prescribes -- ``variant:
++    class``, the threshold in ``corner_clip``, the class's claim and the class's id --
++    and the unclipped form is what this gate has always read.
++    """
++    certificate = _tiny_certificate(side)
++    side = certificate.outer_side
++    record: dict[str, object] = {
++        "id": f"C-n{certificate.n:03d}-threshold-{side.numerator}-{side.denominator}",
++        "variant": "threshold",
++        "n": certificate.n,
++        "claim": f"s({certificate.n}) >= {side}",
++        "outer_side": str(side),
++        "square_side": str(certificate.square_side),
++        "angle_limit": str(TINY_NET[-1]),
++        "direction_steps": len(TINY_NET) - 1,
++        "symmetry": "D4",
++        "total_budget": str(certificate.total_budget),
++        "least_cell_charge": least,
++        "atoms": [],
++        "threshold_atoms": [t.to_record() for t in certificate.threshold_atoms],
++    }
++    if clip is not None:
++        depth = clip.depth
++        base = f"C-n{certificate.n:03d}-threshold-{side.numerator}-{side.denominator}"
++        record["id"] = f"{base}-clip-{depth.numerator}-{depth.denominator}"
++        record["variant"] = "class"
++        record["corner_clip"] = str(depth)
++        record["claim"] = f"corner class d = {depth} excluded at s({certificate.n}) >= {side}"
++    return record
++
++
++def _write(tmp_path: Path, record: dict[str, object]) -> Path:
++    path = tmp_path / "candidate.json"
++    path.write_text(json.dumps(record, indent=1) + "\n")
++    return path
++
++
++def test_the_gate_decides_a_clipped_record_only_when_asked_for_that_clip(
++    tmp_path: Path, capsys: pytest.CaptureFixture[str]
++) -> None:
++    path = _write(tmp_path, _record(_tiny_clip(), "1"))
++    # Without the flag the record is refused by name: reading it unclipped would print
++    # this gate's own sentence over bytes that never claimed it.
++    assert gate_main([str(path)]) == 1
++    assert "variant: class" in capsys.readouterr().out
++    # With a different threshold it is refused for disagreeing with its own bytes.
++    assert gate_main([str(path), "--corner-clip", "1/2"]) == 1
++    assert "declared corner_clip" in capsys.readouterr().out
++    # With the threshold it declares, both routes decide it and say what it is.
++    assert gate_main([str(path), "--corner-clip", "1"]) == 0
++    printed = capsys.readouterr().out
++    assert "RETAINABLE UNDER THE CORNER CLASS HYPOTHESIS" in printed
++    assert "corner clip d = 1" in printed
++    assert "RETAINABLE: " not in printed
++
++
++def test_an_unclipped_record_is_refused_under_the_flag(
++    tmp_path: Path, capsys: pytest.CaptureFixture[str]
++) -> None:
++    """The other half of the policy: the flag does not clip bytes that never asked.
++
++    The refusal names the variant the record declares, as the point gate's does, so the
++    operator is told which of the two -- the flag or the file -- is the one to change.
++    """
++    path = _write(tmp_path, _record(None, "0"))
++    assert gate_main([str(path), "--corner-clip", "1"]) == 1
++    printed = capsys.readouterr().out
++    assert "variant 'threshold' is declared" in printed
++    assert "decides only 'class' certificates" in printed
++
++
++def test_a_record_carrying_a_clip_without_the_class_variant_is_refused(
++    tmp_path: Path, capsys: pytest.CaptureFixture[str]
++) -> None:
++    record = _record(_tiny_clip(), "1")
++    record["variant"] = "threshold"
++    path = _write(tmp_path, record)
++    assert gate_main([str(path), "--corner-clip", "1"]) == 1
++    assert gate_main([str(path)]) == 1
++    assert "must declare variant: class" in capsys.readouterr().out
++
++
++def test_a_class_record_with_no_threshold_is_refused_rather_than_read_as_either(
++    tmp_path: Path, capsys: pytest.CaptureFixture[str]
++) -> None:
++    record = _record(_tiny_clip(), "1")
++    del record["corner_clip"]
++    path = _write(tmp_path, record)
++    assert gate_main([str(path), "--corner-clip", "1"]) == 1
++    assert "must declare corner_clip" in capsys.readouterr().out
++
++
++def test_the_gate_refuses_the_unconditional_claim_on_a_class_record(
++    tmp_path: Path, capsys: pytest.CaptureFixture[str]
++) -> None:
++    """A clipped candidate must never be quotable as a bound on ``s(n)``."""
++    record = _record(_tiny_clip(), "1")
++    record["claim"] = f"s(5) >= {TINY_SIDE}"
++    path = _write(tmp_path, record)
++    assert gate_main([str(path), "--corner-clip", "1"]) == 1
++    assert "class claim" in capsys.readouterr().out
++
++
++def test_the_gate_refuses_a_class_record_carrying_the_unconditional_id(
++    tmp_path: Path, capsys: pytest.CaptureFixture[str]
++) -> None:
++    record = _record(_tiny_clip(), "1")
++    record["id"] = "C-n005-threshold-19-10"
++    path = _write(tmp_path, record)
++    assert gate_main([str(path), "--corner-clip", "1"]) == 1
++    assert "!= class id" in capsys.readouterr().out
++
++
++def test_the_unclipped_gate_is_the_command_it_has_always_been(
++    tmp_path: Path, capsys: pytest.CaptureFixture[str]
++) -> None:
++    """The tiny certificate is refused without the clip, on Condition 5' and nothing else."""
++    path = _write(tmp_path, _record(None, "0"))
++    assert gate_main([str(path)]) == 1
++    printed = capsys.readouterr().out
++    assert "corner clip" not in printed
++    assert "Condition 5'" in printed
++
++
++def test_the_gate_refuses_an_empty_class_rather_than_raising(
++    tmp_path: Path, capsys: pytest.CaptureFixture[str]
++) -> None:
++    """The exact route's refusal, read through the gate: a message, not a traceback.
++
++    The interval route cannot see the emptiness itself: its exclusion rule drops a box
++    only when the box is *provably* inside a corner triangle, so an empty domain reaches
++    it as no surviving box and it accepts, having refuted nothing. Here it still refuses,
++    because a search that examined nothing pins no enclosure -- but that is a
++    consequence and not the reason, so the gate is also held to the exact route's own
++    sentence under ``--exact-only``, where nothing else can produce it.
++    """
++    small = Fraction(3, 2)
++    path = _write(tmp_path, _record(_tiny_clip(small), "1", small))
++    assert gate_main([str(path), "--corner-clip", "1"]) == 1
++    assert "no enclosure to compare" in capsys.readouterr().out
++    assert gate_main([str(path), "--corner-clip", "1", "--exact-only"]) == 1
++    assert "the corner clip admits no placement" in capsys.readouterr().out

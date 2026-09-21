@@ -1,0 +1,41 @@
+# Retained Session 148 scratch (H-232 ring-centre lane), not a maintained tool: run as written against packing/ at 19cdd4f8, kept as .py.txt so it stays off the import path and out of the Ruff/BasedPyright floor.
+import json,sys
+from fractions import Fraction as F
+SP=sys.argv[1]; L=F(96,25)
+cores=json.load(open(f"{SP}/cores.json"))
+for c in cores: c["V"]=[(F(a),F(b)) for a,b in c["V"]]; c["w"]=F(c["w"])
+def contains(V,q):
+    sgn=0
+    for i in range(4):
+        P=V[i];Q=V[(i+1)%4]
+        cr=(Q[0]-P[0])*(q[1]-P[1])-(Q[1]-P[1])*(q[0]-P[0])
+        if cr==0: continue
+        s=1 if cr>0 else -1
+        if sgn==0: sgn=s
+        elif s!=sgn: return False
+    return True
+S=[(F(a),F(b)) for a,b in json.load(open(f"{SP}/simple_sites.json"))]
+def d4(p):
+    x,y=p
+    return [(x,y),(L-x,y),(x,L-y),(L-x,L-y),(y,x),(L-y,x),(y,L-x),(L-y,L-x)]
+images=set()
+for k in range(8):
+    images.add(frozenset(d4(s)[k] for s in S))
+print("distinct D4 images of the atom:",len(images))
+tot=F(0)
+for im in images:
+    ch=sum(c["w"] for c in cores if sum(contains(c["V"],s) for s in im)>=2)
+    tot+=ch; assert ch==F(5,4), ch
+print("each image charges 5/4 on the family; orbit charge", tot, "vs orbit budget 8")
+# refund: sites in X'?
+beta=F(9977,10000)/(1+F(207107,90000000)); lo=1-beta/2; hi=(1+beta)/2
+def in_Xp(p):
+    for X,Y in [(0,0),(L,0),(0,L),(L,L)]:
+        x=p[0] if X==0 else L-p[0]; y=p[1] if Y==0 else L-p[1]
+        if lo<=x<=hi and lo<=y<=hi: return True
+    return False
+print("any site in an X' box:", any(in_Xp(s) for im in images for s in im))
+# sites in open corner boxes? (would be useless)
+print("any site in an open corner box:", any(any((F(1,2)<(s[0] if X==0 else L-s[0])<1) and (F(1,2)<(s[1] if Y==0 else L-s[1])<1) for X,Y in [(0,0),(L,0),(0,L),(L,L)]) for im in images for s in im))
+# depth of the family at each site
+for s in S: print("depth at",s,"=",sum(c["w"] for c in cores if contains(c["V"],s)))

@@ -1,0 +1,33 @@
+site 1 ~ (1.01482,1.84654)
+    #2 midwall fold=0.000 centre=(0.5164,1.5675) w=1/8
+    #4 midwall fold=0.000 centre=(0.5164,2.2725) w=1/8
+    #19 midwall fold=1.318 centre=(0.5261,2.3221) w=1/8
+    #22 midwall fold=1.318 centre=(0.5261,1.5179) w=1/8
+    #25 midwall fold=1.318 centre=(0.5262,1.5426) w=1/8
+    #31 midwall fold=1.318 centre=(0.5262,2.2974) w=1/8
+    #44 central fold=29.152 centre=(1.3348,1.3969) w=1/8
+    #76 central fold=25.668 centre=(1.3540,1.4007) w=1/8
+site 2 ~ (1.39487,1.93455)
+    #32 central fold=0.791 centre=(1.5243,1.5331) w=1/8
+    #35 central fold=0.791 centre=(1.5331,2.3157) w=1/8
+    #37 central fold=0.791 centre=(1.5243,2.3069) w=1/8
+    #38 central fold=0.791 centre=(1.5331,1.5243) w=1/8
+    #42 central fold=29.152 centre=(1.3348,2.4431) w=1/8
+    #44 central fold=29.152 centre=(1.3348,1.3969) w=1/8
+    #74 central fold=25.668 centre=(1.3540,2.4393) w=1/8
+    #76 central fold=25.668 centre=(1.3540,1.4007) w=1/8
+site 3 ~ (1.00891,2.00576)
+    #2 midwall fold=0.000 centre=(0.5164,1.5675) w=1/8
+    #4 midwall fold=0.000 centre=(0.5164,2.2725) w=1/8
+    #19 midwall fold=1.318 centre=(0.5261,2.3221) w=1/8
+    #22 midwall fold=1.318 centre=(0.5261,1.5179) w=1/8
+    #25 midwall fold=1.318 centre=(0.5262,1.5426) w=1/8
+    #31 midwall fold=1.318 centre=(0.5262,2.2974) w=1/8
+    #42 central fold=29.152 centre=(1.3348,2.4431) w=1/8
+    #74 central fold=25.668 centre=(1.3540,2.4393) w=1/8
+charged cores: 10 mass 5/4
+by class: {'corner': 0, 'midwall': 6, 'central': 4}
+site 1 simple rational with same trace: (Fraction(101, 100), Fraction(367, 200)) ~ (1.01,1.835)
+site 2 simple rational with same trace: (Fraction(34, 25), Fraction(19, 10)) ~ (1.36,1.9)
+site 3 simple rational with same trace: (Fraction(101, 100), Fraction(401, 200)) ~ (1.01,2.005)
+charge with simple sites: 5/4 same charged set: True

@@ -1,0 +1,460 @@
+Retained partial diff from Session 148, taken against base revision 19cdd4f8e21a28b058c21f04636dc6f6f82cb33c; apply with `git apply` from the repository root. Measured by tests/test_retained_patches_apply.py.
+
+diff --git a/packing/devtools/gap_wedge/__init__.py b/packing/devtools/gap_wedge/__init__.py
+new file mode 100644
+index 00000000..c84b4a1d
+--- /dev/null
++++ b/packing/devtools/gap_wedge/__init__.py
+@@ -0,0 +1 @@
++"""The gap-`g` wall-wedge lemma and its census over a retained ceiling family."""
+diff --git a/packing/devtools/gap_wedge/geometry.py b/packing/devtools/gap_wedge/geometry.py
+new file mode 100644
+index 00000000..6c6d6549
+--- /dev/null
++++ b/packing/devtools/gap_wedge/geometry.py
+@@ -0,0 +1,445 @@
++"""Exact geometry of the gap-`g` wall-wedge lemma (`BC-364`, `H-230`, X-040 row D6).
++
++**Frame.** The wall is `y = 0` and the container lies above it. `Q` is a closed unit
++square whose lowest vertex is `V = (0, g)` with `0 <= g < 1`; its lower-right edge
++leaves `V` at angle `theta` and its lower-left edge at `pi/2 - theta`, so with
++`c = cos theta` and `s = sin theta` the other vertices are `E_R = (c, g + s)`,
++`E_L = (-s, g + c)` and `E_T = (c - s, g + s + c)`. The two *pockets* between `Q` and
++the wall are
++
++    T_R = {0 <= x <= c, 0 <= y <= g + x s / c},    area  c g + s c / 2,
++    T_L = {-s <= x <= 0, 0 <= y <= g - x c / s},   area  s g + s c / 2.
++
++At `g = 0` the right pocket is the wall-vertex triangle of X-040 row D6, which is why
++this module reproduces that row's `0.3203` as its self-test.
++
++**Lemma A (unit square in a wedge; tight).** A unit square inside the wedge
++`{y >= 0, y <= (x - a) tan psi}` with `0 < psi <= pi/2` has every point at
++`x >= a + cos psi cot psi`, and the bound is attained -- by the square with an edge on
++the upper wedge line at distance `cot psi` from the apex, whose lower edge then touches
++the wall. `lemma_a_bound` is the bound and `lemma_a_extremal_square` that square, so a
++caller can check tightness against a constructed square rather than against a restated
++formula.
++
++**Lemma B (gap-`g` pocket protection).** Every other unit square of the packing is
++separated from `Q` by a supporting line of `Q`, and the only supporting lines that let
++it into `T_R` give a wedge Lemma A bounds: through `E_R` at line angle
++`psi in [theta, pi/2]`, through `V` at `psi in (0, theta]`, and -- for a square to the
++left of `V` -- the mirror of those two. Writing `u = cos psi`, the first two families
++give the *intrusion depth* measured from the pocket's open end `x = c`,
++
++    d_R(theta, g) = max( max_{u in [0, min(c, g + s)]} u (g + s - u) / sqrt(1 - u^2),
++                         max_{u in [c, 1)} [ c - u (u - g) / sqrt(1 - u^2) ] ),
++
++and `d_L` is the same with `c` and `s` exchanged. `intrusion_depth_upper` returns a
++rational **upper** bound of that maximum, so the *forced-empty regions*
++
++    S_R = T_R and {max(0, d_L - s) <= x <= c - d_R},
++    S_L = T_L and {-s + d_L <= x <= -max(0, d_R - c)}
++
++that `wedge_regions` builds are rigorous **subsets** of the region no other square of
++the packing can reach, and every area taken from them is a rigorous lower bound. The
++pockets `T_R`, `T_L` themselves are exact.
++
++Everything a claim rests on is a `Fraction`: the depth envelope brackets each
++`sqrt` with `isqrt` (`sqrt_lower`, `sqrt_upper`), and the polygon predicates are exact
++separating-axis tests. The `_float` functions are for reporting a number the exact
++route already bounds -- `intrusion_depth_float` and `forced_area_float` sample and
++refine in double precision and nothing claim-bearing may be built on them.
++
++Used by `devtools.gap_wedge.family_test`.
++"""
++
++from __future__ import annotations
++
++from dataclasses import dataclass
++from fractions import Fraction
++from math import cos, isqrt, sin, sqrt
++
++type Point = tuple[Fraction, Fraction]
++type Polygon = list[Point]
++
++#: Denominator of the rational square-root brackets: `1e-12` on every `sqrt` taken.
++SQRT_DENOMINATOR = 10**12
++#: Pieces in the intrusion-depth envelope. 400 is what the derivation used, and what
++#: brackets X-040's `0.3203` from below at `0.32014`.
++DEPTH_PIECES = 400
++
++
++def sqrt_lower(value: Fraction, denominator: int = SQRT_DENOMINATOR) -> Fraction:
++    """A rational lower bound of `sqrt(value)`, zero for a non-positive argument."""
++    value = Fraction(value)
++    if value <= 0:
++        return Fraction(0)
++    root = isqrt((value.numerator * denominator * denominator) // value.denominator)
++    return Fraction(root, denominator)
++
++
++def sqrt_upper(value: Fraction, denominator: int = SQRT_DENOMINATOR) -> Fraction:
++    """A rational upper bound of `sqrt(value)`, zero for a non-positive argument."""
++    value = Fraction(value)
++    if value <= 0:
++        return Fraction(0)
++    root = isqrt((value.numerator * denominator * denominator) // value.denominator) + 1
++    return Fraction(root, denominator)
++
++
++def lemma_a_bound(cos_psi: Fraction, sin_psi: Fraction, apex_x: Fraction) -> Fraction:
++    """Lemma A's bound `a + cos psi cot psi` on the least `x` of a square in the wedge."""
++    if sin_psi <= 0:
++        raise ValueError("the wedge angle must be positive")
++    return apex_x + cos_psi * cos_psi / sin_psi
++
++
++def lemma_a_extremal_square(cos_psi: Fraction, sin_psi: Fraction, apex_x: Fraction) -> Polygon:
++    """The unit square attaining Lemma A: an edge on the upper wedge line, one on the wall."""
++    if sin_psi <= 0:
++        raise ValueError("the wedge angle must be positive")
++    along = cos_psi / sin_psi
++    base = (apex_x + along * cos_psi, along * sin_psi)
++    step = (cos_psi, sin_psi)
++    drop = (sin_psi, -cos_psi)
++    corners = [(Fraction(0), Fraction(0)), step, (step[0] + drop[0], step[1] + drop[1]), drop]
++    return [(base[0] + dx, base[1] + dy) for dx, dy in corners]
++
++
++def intrusion_depth_upper(
++    cos_theta: Fraction,
++    sin_theta: Fraction,
++    gap: Fraction,
++    pieces: int = DEPTH_PIECES,
++) -> Fraction:
++    """A rigorous rational upper bound of `d_R(theta, g)`; swap the arguments for `d_L`.
++
++    The depth is measured from the pocket's open end `x = c`. Each piece of the
++    `E_R` family is bounded by the concave numerator's maximum over the piece against
++    `1 / sqrt(1 - u^2)` at the piece's right end; the `V` family is bounded from below
++    in `x` piecewise and by its monotone tail beyond `c + 1/4`.
++    """
++    c = Fraction(cos_theta)
++    s = Fraction(sin_theta)
++    g = Fraction(gap)
++    total = g + s
++    best = Fraction(0)
++    top = min(c, total)
++    if top > 0:
++        for piece in range(pieces):
++            left = top * piece / pieces
++            right = top * (piece + 1) / pieces
++            peak = min(max(total / 2, left), right)
++            floor = sqrt_lower(1 - right * right)
++            if floor <= 0:
++                raise ValueError("degenerate wedge: the depth envelope reaches u = 1")
++            best = max(best, peak * (total - peak) / floor)
++    if c < 1:
++        cut = min(Fraction(1), c + Fraction(1, 4))
++        for piece in range(pieces):
++            left = c + (cut - c) * piece / pieces
++            right = c + (cut - c) * (piece + 1) / pieces
++            if left >= g:
++                least_x = left * (left - g) / sqrt_upper(1 - left * left)
++            else:
++                floor = sqrt_lower(1 - right * right)
++                if floor <= 0:
++                    raise ValueError("degenerate wedge: the depth envelope reaches u = 1")
++                least_x = -(g * g / 4) / floor
++            best = max(best, c - least_x)
++        if cut < 1:
++            tail = c - max(cut * (cut - g), Fraction(0)) if cut >= g else c + g * g / 4
++            best = max(best, tail)
++    return best
++
++
++@dataclass(frozen=True)
++class WedgeRegions:
++    """The two pockets of one square at one wall and their forced-empty parts.
++
++    Coordinates are in the wall frame with the square's lowest vertex at `(0, g)`;
++    `shifted` puts them back where the square is. `forced_right` and `forced_left` are
++    `None` when the intrusion depths leave nothing.
++    """
++
++    cos_theta: Fraction
++    sin_theta: Fraction
++    gap: Fraction
++    depth_right: Fraction
++    depth_left: Fraction
++    pocket_right: Polygon | None
++    pocket_left: Polygon | None
++    forced_right: Polygon | None
++    forced_left: Polygon | None
++
++    @property
++    def forced_regions(self) -> list[Polygon]:
++        return [region for region in (self.forced_right, self.forced_left) if region]
++
++    @property
++    def pockets(self) -> list[Polygon]:
++        return [pocket for pocket in (self.pocket_right, self.pocket_left) if pocket]
++
++    @property
++    def forced_area(self) -> Fraction:
++        """A rigorous lower bound of the area this square forces empty at this wall."""
++        return sum((polygon_area(region) for region in self.forced_regions), start=Fraction(0))
++
++
++def wedge_regions(
++    cos_theta: Fraction,
++    sin_theta: Fraction,
++    gap: Fraction,
++    pieces: int = DEPTH_PIECES,
++) -> WedgeRegions:
++    """Lemma B's pockets and forced-empty regions at gap `g`, in the wall frame."""
++    c = Fraction(cos_theta)
++    s = Fraction(sin_theta)
++    g = Fraction(gap)
++    depth_right = intrusion_depth_upper(c, s, g, pieces)
++    depth_left = intrusion_depth_upper(s, c, g, pieces)
++    zero = Fraction(0)
++    pocket_right = [(zero, zero), (c, zero), (c, g + s), (zero, g)] if c > 0 else None
++    pocket_left = [(-s, zero), (zero, zero), (zero, g), (-s, g + c)] if s > 0 else None
++    forced_right: Polygon | None = None
++    forced_left: Polygon | None = None
++    if c > 0:
++        left, right = max(zero, depth_left - s), c - depth_right
++        if right > left:
++            forced_right = [
++                (left, zero),
++                (right, zero),
++                (right, g + right * s / c),
++                (left, g + left * s / c),
++            ]
++    if s > 0:
++        left, right = max(zero, depth_right - c), s - depth_left
++        if right > left:
++            forced_left = [
++                (-right, zero),
++                (-left, zero),
++                (-left, g + left * c / s),
++                (-right, g + right * c / s),
++            ]
++    return WedgeRegions(
++        c, s, g, depth_right, depth_left, pocket_right, pocket_left, forced_right, forced_left
++    )
++
++
++def shifted(polygon: Polygon, origin: Point) -> Polygon:
++    """`polygon` translated so that the wall frame's origin sits at `origin`."""
++    return [(x + origin[0], y + origin[1]) for x, y in polygon]
++
++
++def polygon_area(polygon: Polygon) -> Fraction:
++    """The exact area of a simple polygon, by the shoelace formula."""
++    total = Fraction(0)
++    count = len(polygon)
++    for index in range(count):
++        x1, y1 = polygon[index]
++        x2, y2 = polygon[(index + 1) % count]
++        total += x1 * y2 - x2 * y1
++    return abs(total) / 2
++
++
++def bounds(polygon: Polygon) -> tuple[float, float, float, float]:
++    """A float bounding box `(x_min, x_max, y_min, y_max)`, widened by `1e-9`.
++
++    A prefilter only: it is widened so that it never rejects a pair the exact tests
++    would accept, and every decision behind it is exact.
++    """
++    slack = 1e-9
++    xs = [float(x) for x, _ in polygon]
++    ys = [float(y) for _, y in polygon]
++    return min(xs) - slack, max(xs) + slack, min(ys) - slack, max(ys) + slack
++
++
++def boxes_disjoint(
++    first: tuple[float, float, float, float], second: tuple[float, float, float, float]
++) -> bool:
++    """Whether two widened bounding boxes are certainly apart."""
++    return (
++        first[1] < second[0]
++        or second[1] < first[0]
++        or first[3] < second[2]
++        or second[3] < first[2]
++    )
++
++
++def _cross(origin: Point, first: Point, second: Point) -> Fraction:
++    return (first[0] - origin[0]) * (second[1] - origin[1]) - (first[1] - origin[1]) * (
++        second[0] - origin[0]
++    )
++
++
++def convex_hull_ccw(points: list[Point]) -> Polygon:
++    """The counter-clockwise convex hull of `points`, collinear points dropped."""
++    ordered = sorted(set(points))
++    if len(ordered) <= 2:
++        return ordered
++    lower: Polygon = []
++    for point in ordered:
++        while len(lower) >= 2 and _cross(lower[-2], lower[-1], point) <= 0:
++            lower.pop()
++        lower.append(point)
++    upper: Polygon = []
++    for point in reversed(ordered):
++        while len(upper) >= 2 and _cross(upper[-2], upper[-1], point) <= 0:
++            upper.pop()
++        upper.append(point)
++    return lower[:-1] + upper[:-1]
++
++
++def _axes(polygon: Polygon) -> list[tuple[Fraction, Fraction]]:
++    count = len(polygon)
++    axes: list[tuple[Fraction, Fraction]] = []
++    for index in range(count):
++        ax, ay = polygon[index]
++        bx, by = polygon[(index + 1) % count]
++        axes.append((-(by - ay), bx - ax))
++    return axes
++
++
++def polygons_overlap(first: Polygon, second: Polygon, *, strict: bool = True) -> bool:
++    """Whether two convex polygons meet: `strict` asks for their interiors."""
++    left = convex_hull_ccw(first)
++    right = convex_hull_ccw(second)
++    for polygon, other in ((left, right), (right, left)):
++        for nx, ny in _axes(polygon):
++            own = [nx * x + ny * y for x, y in polygon]
++            theirs = [nx * x + ny * y for x, y in other]
++            if strict:
++                if max(own) <= min(theirs) or max(theirs) <= min(own):
++                    return False
++            elif max(own) < min(theirs) or max(theirs) < min(own):
++                return False
++    return True
++
++
++def penetration(first: Polygon, second: Polygon) -> Fraction:
++    """The least separating-axis overlap of two convex polygons.
++
++    Positive is an overlap depth; negative is a separation, and a lower bound on the
++    true distance (exact when the witness axis is an edge normal). The normals are not
++    unit, so each is scaled by a rational bracket of its length in the safe direction.
++    """
++    left = convex_hull_ccw(first)
++    right = convex_hull_ccw(second)
++    best: Fraction | None = None
++    for polygon, other in ((left, right), (right, left)):
++        for nx, ny in _axes(polygon):
++            own = [nx * x + ny * y for x, y in polygon]
++            theirs = [nx * x + ny * y for x, y in other]
++            overlap = min(max(own), max(theirs)) - max(min(own), min(theirs))
++            length2 = nx * nx + ny * ny
++            scaled = (
++                overlap / sqrt_upper(length2) if overlap >= 0 else overlap / sqrt_lower(length2)
++            )
++            best = scaled if best is None else min(best, scaled)
++    if best is None:
++        raise ValueError("penetration needs two non-degenerate polygons")
++    return best
++
++
++def squared_distance(first: Polygon, second: Polygon) -> Fraction:
++    """The exact squared distance between two convex polygons, zero when they meet."""
++    left = convex_hull_ccw(first)
++    right = convex_hull_ccw(second)
++    if polygons_overlap(left, right, strict=False):
++        return Fraction(0)
++    best: Fraction | None = None
++    for polygon, other in ((left, right), (right, left)):
++        for px, py in polygon:
++            count = len(other)
++            for index in range(count):
++                ax, ay = other[index]
++                bx, by = other[(index + 1) % count]
++                vx, vy = bx - ax, by - ay
++                length2 = vx * vx + vy * vy
++                along = ((px - ax) * vx + (py - ay) * vy) / length2
++                along = max(Fraction(0), min(Fraction(1), along))
++                dx, dy = px - (ax + along * vx), py - (ay + along * vy)
++                distance2 = dx * dx + dy * dy
++                best = distance2 if best is None else min(best, distance2)
++    if best is None:
++        raise ValueError("squared_distance needs two non-degenerate polygons")
++    return best
++
++
++def contains_closed(point: Point, polygon: Polygon) -> bool:
++    """Whether `point` lies in the closed convex polygon (counter-clockwise)."""
++    count = len(polygon)
++    for index in range(count):
++        ax, ay = polygon[index]
++        bx, by = polygon[(index + 1) % count]
++        if (bx - ax) * (point[1] - ay) - (by - ay) * (point[0] - ax) < 0:
++            return False
++    return True
++
++
++def segment_intersection(
++    first: tuple[Point, Point], second: tuple[Point, Point]
++) -> Point | None:
++    """The exact crossing point of two closed segments, or `None` when there is none."""
++    (x1, y1), (x2, y2) = first
++    (x3, y3), (x4, y4) = second
++    denominator = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
++    if denominator == 0:
++        return None
++    along = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / denominator
++    other = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / denominator
++    if 0 <= along <= 1 and 0 <= other <= 1:
++        return (x1 + along * (x2 - x1), y1 + along * (y2 - y1))
++    return None
++
++
++def edges(polygon: Polygon) -> list[tuple[Point, Point]]:
++    """The closed polygon's edges, in order."""
++    count = len(polygon)
++    return [(polygon[index], polygon[(index + 1) % count]) for index in range(count)]
++
++
++def intrusion_depth_float(
++    cos_theta: float, sin_theta: float, gap: float, samples: int = 20000
++) -> float:
++    """A float value of `d_R` by sampling and golden refinement: reporting only.
++
++    Nothing claim-bearing is built on this; `intrusion_depth_upper` is the bound.
++    """
++    total = gap + sin_theta
++
++    def value(u: float) -> float:
++        return u * (total - u) / sqrt(1 - u * u)
++
++    best = 0.0
++    argmax = 0.0
++    top = min(cos_theta, total)
++    for step in range(samples + 1):
++        u = top * step / samples
++        here = value(u)
++        if here > best:
++            best, argmax = here, u
++    low = max(0.0, argmax - top / samples)
++    high = min(top, argmax + top / samples)
++    for _ in range(200):
++        first = low + (high - low) * 0.381966
++        second = high - (high - low) * 0.381966
++        if value(first) < value(second):
++            low = first
++        else:
++            high = second
++    best = max(best, value((low + high) / 2))
++    for step in range(1, samples + 1):
++        u = cos_theta + (1 - cos_theta) * step / (samples + 1)
++        best = max(best, cos_theta - u * (u - gap) / sqrt(1 - u * u))
++    return best
++
++
++def forced_area_float(theta: float, gap: float, samples: int = 20000) -> float:
++    """A float value of `A(theta, g)` from the float depths: reporting only."""
++    c, s = cos(theta), sin(theta)
++    depth_right = intrusion_depth_float(c, s, gap, samples)
++    depth_left = intrusion_depth_float(s, c, gap, samples)
++
++    def area(near: float, far: float, own: float, other: float) -> float:
++        left, right = max(0.0, other - far), near - own
++        return 0.0 if right <= left else (right - left) * (gap + (left + right) / 2 * far / near)
++
++    return area(c, s, depth_right, depth_left) + area(s, c, depth_left, depth_right)

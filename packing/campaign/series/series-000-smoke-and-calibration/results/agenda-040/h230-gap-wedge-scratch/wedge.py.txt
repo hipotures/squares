@@ -1,0 +1,192 @@
+# Retained Session 148 scratch (H-230 gap-wedge lane), not a maintained tool: run as written against packing/ at 19cdd4f8, kept as .py.txt so it stays off the import path and out of the Ruff/BasedPyright floor.
+"""Gap-g wall-wedge lemma: exact tools.
+
+Wall frame: wall is y = 0, container above. Q is a unit square whose lowest vertex is
+V = (0, g); its lower-right edge leaves V at angle theta (cos = c, sin = s, rational
+via the half-tangent), its lower-left edge at angle pi/2 - theta.
+Right pocket T_R = {0 <= x <= c, 0 <= y <= g + x tan theta}.
+Lemma A: a unit square inside the wedge {y >= 0, y <= (x - a) tan psi} has every
+point at x >= a + cos psi cot psi.
+Every other square P (in the container, interior-disjoint from Q) is separated from Q
+by a supporting line of Q. The lines that can let P into T_R are: through V at angle
+psi in (0, theta] (apex -g cot psi), through E_R = (c, g+s) at psi in [theta, pi/2]
+(apex c - (g+s) cot psi), and through V at angle -beta, beta in (0, pi/2 - theta]
+(P to the left, max x <= cot beta (g - cos beta)).
+Hence P meets T_R only in {x >= c - d_R} and {x <= d_V}, with
+  d_R = max over psi of [c - apex(psi) - cos psi cot psi],
+  d_V = max over beta of cot beta (g - cos beta).
+In u = cos psi: for the E_R family (u in [0, c]) intrusion is (G - u) u / sqrt(1-u^2),
+G = g + s; for the V family (u in [c, 1)) x_min = (u^2 - g u)/sqrt(1-u^2); for the
+beta family (u in [s, 1)) x_max = (g u - u^2)/sqrt(1-u^2).
+The left pocket is the right pocket of the mirrored square (theta -> pi/2 - theta).
+"""
+from fractions import Fraction as F
+from math import isqrt, sqrt
+
+def sqrt_lower(r, N=10**12):
+    """Rational lower bound of sqrt(r) for rational r >= 0."""
+    r = F(r)
+    if r <= 0: return F(0)
+    return F(isqrt((r.numerator * N * N) // r.denominator), N)
+
+def sqrt_upper(r, N=10**12):
+    r = F(r)
+    if r <= 0: return F(0)
+    return F(isqrt((r.numerator * N * N) // r.denominator) + 1, N)
+
+def d_R_upper(c, s, g, pieces=400):
+    """Rigorous rational upper bound of d_R(theta, g) (right-pocket intrusion depth
+    measured from the pocket's open end x = c), including the V family (psi <= theta)."""
+    c, s, g = F(c), F(s), F(g)
+    G = g + s
+    best = F(0)
+    # E_R family: u in [0, c]; f(u) = u (G - u) / sqrt(1 - u^2).
+    # On a piece [u0, u1]: numerator <= max of the concave quadratic on the piece,
+    # 1/sqrt(1-u^2) <= 1/sqrt(1-u1^2).
+    top = min(c, G)  # for u > G the numerator is negative
+    if top > 0:
+        for i in range(pieces):
+            u0 = top * i / pieces; u1 = top * (i + 1) / pieces
+            # max of u(G-u) on [u0,u1]
+            vertex = G / 2
+            uu = u0 if vertex < u0 else (u1 if vertex > u1 else vertex)
+            num = uu * (G - uu)
+            den = sqrt_lower(1 - u1 * u1)
+            if den <= 0:  # u1 -> 1 only if c = 1 (theta = 0, then s = 0, G = g < 1 so top < 1)
+                raise ValueError("degenerate")
+            best = max(best, num / den)
+    # V family: u in [c, 1): x_min(u) = u(u - g)/sqrt(1-u^2); intrusion = c - x_min.
+    # For u >= g: numerator increasing, so on [u0,u1] x_min >= u0(u0-g)/sqrt(1-u0^2)
+    # (denominator largest at u0). For u < g numerator negative: x_min >= u(u-g)/sqrt(1-u1^2)
+    # >= -(g^2/4)/sqrt(1-u1^2).
+    # Tail: for u >= u_t >= g, x_min >= u_t (u_t - g) (since 1/sqrt >= 1).
+    if c < 1:
+        u_t = min(F(1), c + F(1, 4))
+        n2 = pieces
+        for i in range(n2):
+            u0 = c + (u_t - c) * i / n2; u1 = c + (u_t - c) * (i + 1) / n2
+            if u0 >= g:
+                xmin = u0 * (u0 - g) / sqrt_upper(1 - u0 * u0)
+            else:
+                xmin = -(g * g / 4) / sqrt_lower(1 - u1 * u1)
+            best = max(best, c - xmin)
+        if u_t < 1:
+            best = max(best, c - max(u_t * (u_t - g), F(0)) if u_t >= g else c + g*g/4)
+    return best
+
+def d_V_upper(c, s, g, pieces=400):
+    """Rigorous rational upper bound of d_V = max_{beta in (0, pi/2 - theta]} cot beta (g - cos beta):
+    intrusion into the right pocket from the left (P sliding under V). u = cos beta in [s, 1):
+    (g u - u^2)/sqrt(1-u^2). Nonpositive whenever g <= s."""
+    c, s, g = F(c), F(s), F(g)
+    if g <= s:
+        return F(0)
+    best = F(0)
+    top = min(g, F(1))
+    for i in range(pieces):
+        u0 = s + (top - s) * i / pieces; u1 = s + (top - s) * (i + 1) / pieces
+        vertex = g / 2
+        uu = u0 if vertex < u0 else (u1 if vertex > u1 else vertex)
+        num = uu * (g - uu)
+        den = sqrt_lower(1 - u1 * u1)
+        if den <= 0: return F(10)  # g >= 1: nothing
+        best = max(best, num / den)
+    return best
+
+def d_R_numeric(c, s, g, n=200000):
+    """Float value of d_R by dense sampling plus local refinement (numerical only)."""
+    c, s, g = float(c), float(s), float(g); G = g + s
+    def f(u):
+        return u * (G - u) / sqrt(1 - u * u)
+    best = 0.0; bu = 0.0
+    top = min(c, G)
+    for i in range(n + 1):
+        u = top * i / n
+        v = f(u)
+        if v > best: best, bu = v, u
+    # golden refine
+    lo, hi = max(0.0, bu - top / n), min(top, bu + top / n)
+    for _ in range(200):
+        m1 = lo + (hi - lo) * 0.381966; m2 = hi - (hi - lo) * 0.381966
+        if f(m1) < f(m2): lo = m1
+        else: hi = m2
+    best = max(best, f((lo + hi) / 2))
+    # V family
+    for i in range(1, n + 1):
+        u = c + (1 - c) * i / (n + 1)
+        xmin = u * (u - g) / sqrt(1 - u * u)
+        best = max(best, c - xmin)
+    return best
+
+def pocket_polygons(c, s, g, DR, DL):
+    """Vertices (rational, CCW) of S_R, S_L, T_R, T_L in the wall frame.
+    DR >= D_edge(c, s, g) and DL >= D_edge(s, c, g) are rigorous upper bounds.
+    S_R = T_R cap { max(0, DL - s) < x < c - DR },  S_L = T_L cap { -(s - DL) < x < -max(0, DR - c) }."""
+    c, s, g = F(c), F(s), F(g)
+    T_R = [(F(0), F(0)), (c, F(0)), (c, g + s), (F(0), g)] if c > 0 else None
+    T_L = [(-s, F(0)), (F(0), F(0)), (F(0), g), (-s, g + c)] if s > 0 else None
+    S_R = S_L = None
+    if c > 0:
+        xl, xr = max(F(0), DL - s), c - DR
+        if xr > xl:
+            S_R = [(xl, F(0)), (xr, F(0)), (xr, g + xr * s / c), (xl, g + xl * s / c)]
+    if s > 0:
+        xl2, xr2 = max(F(0), DR - c), s - DL   # mirrored coordinate x' = -x
+        if xr2 > xl2:
+            S_L = [(-xr2, F(0)), (-xl2, F(0)), (-xl2, g + xl2 * c / s), (-xr2, g + xr2 * c / s)]
+    return S_R, S_L, T_R, T_L
+
+# ---- exact convex polygon intersection (separating axis) ----
+def _cross(o, a, b):
+    return (a[0]-o[0])*(b[1]-o[1]) - (a[1]-o[1])*(b[0]-o[0])
+
+def convex_hull_ccw(pts):
+    pts = sorted(set(pts))
+    if len(pts) <= 2: return pts
+    lower = []
+    for p in pts:
+        while len(lower) >= 2 and _cross(lower[-2], lower[-1], p) <= 0: lower.pop()
+        lower.append(p)
+    upper = []
+    for p in reversed(pts):
+        while len(upper) >= 2 and _cross(upper[-2], upper[-1], p) <= 0: upper.pop()
+        upper.append(p)
+    return lower[:-1] + upper[:-1]
+
+def polys_intersect(P, Q, strict=True):
+    """Closed convex polygons P, Q (CCW). strict=True: True iff interiors meet
+    (touching does not count). strict=False: True iff closed sets meet."""
+    P = convex_hull_ccw(P); Q = convex_hull_ccw(Q)
+    for poly, other in ((P, Q), (Q, P)):
+        n = len(poly)
+        for i in range(n):
+            a, b = poly[i], poly[(i+1) % n]
+            nx, ny = -(b[1]-a[1]), (b[0]-a[0])  # inward normal for CCW
+            # project
+            pmin = min(nx*p[0]+ny*p[1] for p in poly); pmax = max(nx*p[0]+ny*p[1] for p in poly)
+            qmin = min(nx*p[0]+ny*p[1] for p in other); qmax = max(nx*p[0]+ny*p[1] for p in other)
+            if strict:
+                if pmax <= qmin or qmax <= pmin: return False
+            else:
+                if pmax < qmin or qmax < pmin: return False
+    return True
+
+def penetration(P, Q):
+    """Max over separating-axis candidates of the overlap depth (rational): positive when
+    the closed polygons overlap, negative = separation gap along the best axis (a lower
+    bound on the true distance, exact when the witness axis is an edge normal). Normals
+    are not unit, so scale each by a rational bound of its length."""
+    P = convex_hull_ccw(P); Q = convex_hull_ccw(Q)
+    best = None
+    for poly, other in ((P, Q), (Q, P)):
+        n = len(poly)
+        for i in range(n):
+            a, b = poly[i], poly[(i+1) % n]
+            nx, ny = -(b[1]-a[1]), (b[0]-a[0])
+            L2 = nx*nx + ny*ny
+            pmin = min(nx*p[0]+ny*p[1] for p in poly); pmax = max(nx*p[0]+ny*p[1] for p in poly)
+            qmin = min(nx*p[0]+ny*p[1] for p in other); qmax = max(nx*p[0]+ny*p[1] for p in other)
+            ov = min(pmax, qmax) - max(pmin, qmin)  # >0 overlap along axis
+            ovn = ov / sqrt_upper(L2) if ov >= 0 else ov / sqrt_lower(L2)
+            best = ovn if best is None else min(best, ovn)
+    return best

@@ -162,6 +162,7 @@ Each entry summarizes one user-level research window. Cycle slots are wall-clock
 | [session-145](agent-sessions/session-145-overnight-chunk-2.md) | completed | contemporaneous | `pipeline-improvement` (correctness) | `pipeline-improvement` (correctness) | 1 | think-ni3v | Session 146 under think-b7pr takes BC-367 on the next stacked branch. |
 | [session-146](agent-sessions/session-146-overnight-chunk-3.md) | completed | contemporaneous | `research-loop` (insight) | `research-loop` (insight) | 1 | think-b7pr | Session 147 under think-b7pr writes the BC-367 registration entry at the reviewed scope, then the mixed classes and n=26. |
 | [session-147](agent-sessions/session-147-overnight-chunk-4.md) | completed | contemporaneous | `research-loop` (insight) | `research-loop` (insight) | 1 | think-b7pr | Session 148 under think-b7pr takes BC-367's mixed classes and the n=26 second site set on the next stacked branch. |
+| [session-148](agent-sessions/session-148-overnight-chunk-5.md) | stopped | contemporaneous | `insight-iteration` (insight) | `insight-iteration` (insight) | 1 | think-b7pr | Session 149 under think-n1v2 resumes from the retained patches and the wedge derivation, then the H-232 fixed-support screen. |
 
 ### Workflow summary
 
@@ -171,7 +172,7 @@ Declared counts are contemporaneous contracts; retrospective counts are reconstr
 | --- | ---: | ---: | ---: | ---: |
 | `research-survey` | 2 | 2 | 13 | 2 |
 | `factual-review` | 7 | 0 | 53 | 2 |
-| `insight-iteration` | 25 | 1 | 81 | 4 |
+| `insight-iteration` | 26 | 1 | 82 | 4 |
 | `process-review` | 16 | 4 | 64 | 6 |
 | `efficiency-loop` | 10 | 1 | 36 | 1 |
 | `research-loop` | 30 | 4 | 104 | 8 |
@@ -977,6 +978,7 @@ Status: **active**. Run the hypotheses X-040 adapted from the Session 143 review
 | H-229 | blocked | proof | At n=11, side 96/25, B = 9977/10000, in the anchor case whose centre b |  | 0 |  |  |
 | H-230 | blocked | proof | There is a proved wall-wedge conflict lemma for a tilted unit square a |  | 0 |  |  |
 | H-231 | open question | proof | Whether a Lovász theta certificate on a sound, non-uniform pose-cell c |  | 0 |  |  |
+| H-232 | blocked | proof | At n=11, side 96/25, B = 9977/10000 on the 181-direction net, the rest |  | 0 |  |  |
 
 ## Needs review — held for a human, not decided
 

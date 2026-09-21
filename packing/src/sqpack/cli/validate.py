@@ -3720,6 +3720,9 @@ STEPS: tuple[Step, ...] = (
             *_RESULTS,
             *_CASES,
             "packing/devtools/check_class_record_claims.py",
+            # The sweep enumerates the tracked JSON through it, so which files it reads
+            # is this module's answer and not the check's own.
+            "packing/devtools/repo_scope.py",
             "packing/src/sqpack/fractional/corner_clip.py",
         ),
     ),

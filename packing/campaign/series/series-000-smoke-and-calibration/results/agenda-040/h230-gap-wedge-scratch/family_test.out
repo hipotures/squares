@@ -1,0 +1,206 @@
+64 placements; pocket records 96; pairs touching a pocket: 1344
+
+Per-orbit forced-empty area (nominal unit square), walls with g < 0.5:
+  tilt   0.000 w=13/32 wall=top    g=0.00002 c=1.0000 s=0.0000 DR<=0.00000 DL<=0.00000 wR=1.00000 wL=-0.00000 A>=0.00002
+  tilt  90.000 w=13/32 wall=top    g=0.00002 c=1.0000 s=0.0000 DR<=0.00000 DL<=0.00000 wR=1.00000 wL=-0.00000 A>=0.00002
+  tilt   0.791 w=1/4 wall=bottom g=-0.00010 c=0.9999 s=0.0138 DR<=0.00005 DL<=0.01361 wR=0.99986 wL=0.00019 A>=0.00690
+  tilt  89.209 w=1/4 wall=bottom g=-0.00010 c=0.0138 s=0.9999 DR<=0.01361 DL<=0.00005 wR=0.00019 wL=0.99986 A>=0.00690
+  tilt   0.000 w=1/8 wall=right  g=-0.00042 c=1.0000 s=0.0000 DR<=0.00000 DL<=0.00000 wR=1.00000 wL=0.00000 A>=0.00042
+  tilt  90.000 w=1/8 wall=left   g=-0.00042 c=1.0000 s=0.0000 DR<=0.00000 DL<=0.00000 wR=1.00000 wL=0.00000 A>=0.00042
+  tilt   0.264 w=1/16 wall=bottom g=0.00054 c=1.0000 s=0.0046 DR<=0.00001 DL<=0.00458 wR=0.99998 wL=0.00002 A>=0.00284
+  tilt  89.736 w=1/16 wall=bottom g=0.00054 c=0.0046 s=1.0000 DR<=0.00458 DL<=0.00001 wR=0.00002 wL=0.99998 A>=0.00284
+  tilt   7.111 w=3/32 wall=top    g=0.01463 c=0.1238 s=0.9923 DR<=0.11017 DL<=0.00480 wR=0.01362 wL=0.98751 A>=0.07622
+  tilt   7.111 w=3/32 wall=right  g=0.09180 c=0.9923 s=0.1238 DR<=0.01169 DL<=0.11980 wR=0.98062 wL=0.00399 A>=0.15043
+  tilt  82.889 w=3/32 wall=top    g=0.01463 c=0.9923 s=0.1238 DR<=0.00480 DL<=0.11017 wR=0.98751 wL=0.01362 A>=0.07622
+  tilt  82.889 w=3/32 wall=left   g=0.09180 c=0.9923 s=0.1238 DR<=0.01169 DL<=0.11980 wR=0.98062 wL=0.00399 A>=0.15043
+  tilt   0.527 w=1/16 wall=bottom g=-0.00009 c=1.0000 s=0.0092 DR<=0.00002 DL<=0.00912 wR=0.99994 wL=0.00009 A>=0.00460
+  tilt  89.473 w=1/16 wall=bottom g=-0.00009 c=0.0092 s=1.0000 DR<=0.00912 DL<=0.00002 wR=0.00009 wL=0.99994 A>=0.00460
+
+Pair categories (hitS_unit, hitS_core, core_overlap, unit_overlap): count
+   (False, False, False, False) 208
+   (False, False, False, True) 176
+   (False, False, True, True) 584
+   (True, False, True, True) 16
+   (True, True, True, True) 360
+
+Pairs with Q_b meeting S(Q_a) and cores NOT overlapping (candidate new edges):
+
+All pairs touching a pocket of a 7.11/82.89-degree member (a in that orbit), non-overlapping cores first:
+  a=40(  7.11deg) b= 3(  0.00deg,w=13/32) wall=right  hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.21249
+  a=40(  7.11deg) b= 4( 90.00deg,w=13/32) wall=right  hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.21249
+  a=40(  7.11deg) b=10( 29.89deg,w=1/4) wall=right  hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.67355
+  a=40(  7.11deg) b=15( 60.11deg,w=1/4) wall=right  hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.42452
+  a=40(  7.11deg) b=23( 89.21deg,w=1/4) wall=right  hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.00145
+  a=40(  7.11deg) b=39( 89.74deg,w=1/16) wall=right  hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.00484
+  a=40(  7.11deg) b=46( 82.89deg,w=3/32) wall=right  hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.21249
+  a=40(  7.11deg) b=49(  1.32deg,w=1/8) wall=right  hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.80737
+  a=40(  7.11deg) b=53( 88.68deg,w=1/8) wall=right  hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.78847
+  a=40(  7.11deg) b= 3(  0.00deg,w=13/32) wall=top    hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.12612
+  a=40(  7.11deg) b= 4( 90.00deg,w=13/32) wall=top    hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.12612
+  a=40(  7.11deg) b=18(  0.79deg,w=1/4) wall=top    hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.13676
+  a=40(  7.11deg) b=23( 89.21deg,w=1/4) wall=top    hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.86486
+  a=40(  7.11deg) b=30( 90.00deg,w=1/8) wall=top    hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.06120
+  a=40(  7.11deg) b=34(  0.26deg,w=1/16) wall=top    hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.13676
+  a=40(  7.11deg) b=39( 89.74deg,w=1/16) wall=top    hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.86359
+  a=40(  7.11deg) b=46( 82.89deg,w=3/32) wall=top    hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.03590
+  a=40(  7.11deg) b=61( 89.47deg,w=1/16) wall=top    hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.07013
+  a=41(  7.11deg) b= 0(  0.00deg,w=13/32) wall=left   hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.12612
+  a=41(  7.11deg) b= 7( 90.00deg,w=13/32) wall=left   hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.12612
+  a=41(  7.11deg) b=19(  0.79deg,w=1/4) wall=left   hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.13676
+  a=41(  7.11deg) b=21( 89.21deg,w=1/4) wall=left   hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.86486
+  a=41(  7.11deg) b=28( 90.00deg,w=1/8) wall=left   hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.06120
+  a=41(  7.11deg) b=35(  0.26deg,w=1/16) wall=left   hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.13676
+  a=41(  7.11deg) b=37( 89.74deg,w=1/16) wall=left   hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.86359
+  a=41(  7.11deg) b=44( 82.89deg,w=3/32) wall=left   hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.03590
+  a=41(  7.11deg) b=62( 89.47deg,w=1/16) wall=left   hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.07013
+  a=41(  7.11deg) b= 0(  0.00deg,w=13/32) wall=top    hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.21249
+  a=41(  7.11deg) b= 7( 90.00deg,w=13/32) wall=top    hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.21249
+  a=41(  7.11deg) b=11( 29.89deg,w=1/4) wall=top    hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.67355
+  a=41(  7.11deg) b=13( 60.11deg,w=1/4) wall=top    hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.42452
+  a=41(  7.11deg) b=21( 89.21deg,w=1/4) wall=top    hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.00145
+  a=41(  7.11deg) b=37( 89.74deg,w=1/16) wall=top    hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.00484
+  a=41(  7.11deg) b=44( 82.89deg,w=3/32) wall=top    hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.21249
+  a=41(  7.11deg) b=50(  1.32deg,w=1/8) wall=top    hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.80737
+  a=41(  7.11deg) b=54( 88.68deg,w=1/8) wall=top    hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.78847
+  a=42(  7.11deg) b= 1(  0.00deg,w=13/32) wall=bottom hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.12612
+  a=42(  7.11deg) b= 5( 90.00deg,w=13/32) wall=bottom hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.12612
+  a=42(  7.11deg) b=16(  0.79deg,w=1/4) wall=bottom hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.13676
+  a=42(  7.11deg) b=22( 89.21deg,w=1/4) wall=bottom hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.86486
+  a=42(  7.11deg) b=31( 90.00deg,w=1/8) wall=bottom hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.06120
+  a=42(  7.11deg) b=32(  0.26deg,w=1/16) wall=bottom hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.13676
+  a=42(  7.11deg) b=38( 89.74deg,w=1/16) wall=bottom hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.86359
+  a=42(  7.11deg) b=47( 82.89deg,w=3/32) wall=bottom hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.03590
+  a=42(  7.11deg) b=60( 89.47deg,w=1/16) wall=bottom hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.07013
+  a=42(  7.11deg) b= 1(  0.00deg,w=13/32) wall=left   hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.21249
+  a=42(  7.11deg) b= 5( 90.00deg,w=13/32) wall=left   hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.21249
+  a=42(  7.11deg) b= 8( 29.89deg,w=1/4) wall=left   hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.67355
+  a=42(  7.11deg) b=14( 60.11deg,w=1/4) wall=left   hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.42452
+  a=42(  7.11deg) b=22( 89.21deg,w=1/4) wall=left   hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.00145
+  a=42(  7.11deg) b=38( 89.74deg,w=1/16) wall=left   hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.00484
+  a=42(  7.11deg) b=47( 82.89deg,w=3/32) wall=left   hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.21249
+  a=42(  7.11deg) b=51(  1.32deg,w=1/8) wall=left   hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.80737
+  a=42(  7.11deg) b=52( 88.68deg,w=1/8) wall=left   hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.78847
+  a=43(  7.11deg) b= 2(  0.00deg,w=13/32) wall=bottom hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.21249
+  a=43(  7.11deg) b= 6( 90.00deg,w=13/32) wall=bottom hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.21249
+  a=43(  7.11deg) b= 9( 29.89deg,w=1/4) wall=bottom hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.67355
+  a=43(  7.11deg) b=12( 60.11deg,w=1/4) wall=bottom hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.42452
+  a=43(  7.11deg) b=20( 89.21deg,w=1/4) wall=bottom hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.00145
+  a=43(  7.11deg) b=36( 89.74deg,w=1/16) wall=bottom hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.00484
+  a=43(  7.11deg) b=45( 82.89deg,w=3/32) wall=bottom hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.21249
+  a=43(  7.11deg) b=48(  1.32deg,w=1/8) wall=bottom hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.80737
+  a=43(  7.11deg) b=55( 88.68deg,w=1/8) wall=bottom hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.78847
+  a=43(  7.11deg) b= 2(  0.00deg,w=13/32) wall=right  hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.12612
+  a=43(  7.11deg) b= 6( 90.00deg,w=13/32) wall=right  hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.12612
+  a=43(  7.11deg) b=17(  0.79deg,w=1/4) wall=right  hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.13676
+  a=43(  7.11deg) b=20( 89.21deg,w=1/4) wall=right  hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.86486
+  a=43(  7.11deg) b=29( 90.00deg,w=1/8) wall=right  hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.06120
+  a=43(  7.11deg) b=33(  0.26deg,w=1/16) wall=right  hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.13676
+  a=43(  7.11deg) b=36( 89.74deg,w=1/16) wall=right  hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.86359
+  a=43(  7.11deg) b=45( 82.89deg,w=3/32) wall=right  hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.03590
+  a=43(  7.11deg) b=63( 89.47deg,w=1/16) wall=right  hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.07013
+  a=44( 82.89deg) b= 0(  0.00deg,w=13/32) wall=left   hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.21249
+  a=44( 82.89deg) b= 7( 90.00deg,w=13/32) wall=left   hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.21249
+  a=44( 82.89deg) b=11( 29.89deg,w=1/4) wall=left   hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.42452
+  a=44( 82.89deg) b=13( 60.11deg,w=1/4) wall=left   hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.67355
+  a=44( 82.89deg) b=19(  0.79deg,w=1/4) wall=left   hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.00145
+  a=44( 82.89deg) b=35(  0.26deg,w=1/16) wall=left   hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.00484
+  a=44( 82.89deg) b=41(  7.11deg,w=3/32) wall=left   hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.21249
+  a=44( 82.89deg) b=50(  1.32deg,w=1/8) wall=left   hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.78847
+  a=44( 82.89deg) b=54( 88.68deg,w=1/8) wall=left   hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.80737
+  a=44( 82.89deg) b= 0(  0.00deg,w=13/32) wall=top    hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.12612
+  a=44( 82.89deg) b= 7( 90.00deg,w=13/32) wall=top    hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.12612
+  a=44( 82.89deg) b=19(  0.79deg,w=1/4) wall=top    hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.86486
+  a=44( 82.89deg) b=21( 89.21deg,w=1/4) wall=top    hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.13676
+  a=44( 82.89deg) b=25(  0.00deg,w=1/8) wall=top    hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.06120
+  a=44( 82.89deg) b=35(  0.26deg,w=1/16) wall=top    hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.86359
+  a=44( 82.89deg) b=37( 89.74deg,w=1/16) wall=top    hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.13676
+  a=44( 82.89deg) b=41(  7.11deg,w=3/32) wall=top    hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.03590
+  a=44( 82.89deg) b=58(  0.53deg,w=1/16) wall=top    hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.07013
+  a=45( 82.89deg) b= 2(  0.00deg,w=13/32) wall=bottom hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.12612
+  a=45( 82.89deg) b= 6( 90.00deg,w=13/32) wall=bottom hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.12612
+  a=45( 82.89deg) b=17(  0.79deg,w=1/4) wall=bottom hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.86486
+  a=45( 82.89deg) b=20( 89.21deg,w=1/4) wall=bottom hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.13676
+  a=45( 82.89deg) b=27(  0.00deg,w=1/8) wall=bottom hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.06120
+  a=45( 82.89deg) b=33(  0.26deg,w=1/16) wall=bottom hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.86359
+  a=45( 82.89deg) b=36( 89.74deg,w=1/16) wall=bottom hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.13676
+  a=45( 82.89deg) b=43(  7.11deg,w=3/32) wall=bottom hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.03590
+  a=45( 82.89deg) b=56(  0.53deg,w=1/16) wall=bottom hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.07013
+  a=45( 82.89deg) b= 2(  0.00deg,w=13/32) wall=right  hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.21249
+  a=45( 82.89deg) b= 6( 90.00deg,w=13/32) wall=right  hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.21249
+  a=45( 82.89deg) b= 9( 29.89deg,w=1/4) wall=right  hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.42452
+  a=45( 82.89deg) b=12( 60.11deg,w=1/4) wall=right  hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.67355
+  a=45( 82.89deg) b=17(  0.79deg,w=1/4) wall=right  hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.00145
+  a=45( 82.89deg) b=33(  0.26deg,w=1/16) wall=right  hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.00484
+  a=45( 82.89deg) b=43(  7.11deg,w=3/32) wall=right  hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.21249
+  a=45( 82.89deg) b=48(  1.32deg,w=1/8) wall=right  hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.78847
+  a=45( 82.89deg) b=55( 88.68deg,w=1/8) wall=right  hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.80737
+  a=46( 82.89deg) b= 3(  0.00deg,w=13/32) wall=right  hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.12612
+  a=46( 82.89deg) b= 4( 90.00deg,w=13/32) wall=right  hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.12612
+  a=46( 82.89deg) b=18(  0.79deg,w=1/4) wall=right  hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.86486
+  a=46( 82.89deg) b=23( 89.21deg,w=1/4) wall=right  hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.13676
+  a=46( 82.89deg) b=24(  0.00deg,w=1/8) wall=right  hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.06120
+  a=46( 82.89deg) b=34(  0.26deg,w=1/16) wall=right  hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.86359
+  a=46( 82.89deg) b=39( 89.74deg,w=1/16) wall=right  hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.13676
+  a=46( 82.89deg) b=40(  7.11deg,w=3/32) wall=right  hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.03590
+  a=46( 82.89deg) b=57(  0.53deg,w=1/16) wall=right  hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.07013
+  a=46( 82.89deg) b= 3(  0.00deg,w=13/32) wall=top    hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.21249
+  a=46( 82.89deg) b= 4( 90.00deg,w=13/32) wall=top    hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.21249
+  a=46( 82.89deg) b=10( 29.89deg,w=1/4) wall=top    hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.42452
+  a=46( 82.89deg) b=15( 60.11deg,w=1/4) wall=top    hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.67355
+  a=46( 82.89deg) b=18(  0.79deg,w=1/4) wall=top    hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.00145
+  a=46( 82.89deg) b=34(  0.26deg,w=1/16) wall=top    hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.00484
+  a=46( 82.89deg) b=40(  7.11deg,w=3/32) wall=top    hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.21249
+  a=46( 82.89deg) b=49(  1.32deg,w=1/8) wall=top    hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.78847
+  a=46( 82.89deg) b=53( 88.68deg,w=1/8) wall=top    hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.80737
+  a=47( 82.89deg) b= 1(  0.00deg,w=13/32) wall=bottom hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.21249
+  a=47( 82.89deg) b= 5( 90.00deg,w=13/32) wall=bottom hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.21249
+  a=47( 82.89deg) b= 8( 29.89deg,w=1/4) wall=bottom hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.42452
+  a=47( 82.89deg) b=14( 60.11deg,w=1/4) wall=bottom hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.67355
+  a=47( 82.89deg) b=16(  0.79deg,w=1/4) wall=bottom hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.00145
+  a=47( 82.89deg) b=32(  0.26deg,w=1/16) wall=bottom hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.00484
+  a=47( 82.89deg) b=42(  7.11deg,w=3/32) wall=bottom hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.21249
+  a=47( 82.89deg) b=51(  1.32deg,w=1/8) wall=bottom hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.78847
+  a=47( 82.89deg) b=52( 88.68deg,w=1/8) wall=bottom hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.80737
+  a=47( 82.89deg) b= 1(  0.00deg,w=13/32) wall=left   hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.12612
+  a=47( 82.89deg) b= 5( 90.00deg,w=13/32) wall=left   hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.12612
+  a=47( 82.89deg) b=16(  0.79deg,w=1/4) wall=left   hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.86486
+  a=47( 82.89deg) b=22( 89.21deg,w=1/4) wall=left   hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.13676
+  a=47( 82.89deg) b=26(  0.00deg,w=1/8) wall=left   hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.06120
+  a=47( 82.89deg) b=32(  0.26deg,w=1/16) wall=left   hitT=True hitS_unit=False core_overlap=True unit_overlap=True pen(Q_b,S)=-0.86359
+  a=47( 82.89deg) b=38( 89.74deg,w=1/16) wall=left   hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.13676
+  a=47( 82.89deg) b=42(  7.11deg,w=3/32) wall=left   hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.03590
+  a=47( 82.89deg) b=59(  0.53deg,w=1/16) wall=left   hitT=True hitS_unit=True core_overlap=True unit_overlap=True pen(Q_b,S)=0.07013
+
+Pairs where the 7.11-orbit member is b (its unit square entering another's pocket), non-overlapping:
+  a=16(  0.79deg,w=1/4) b=43(  7.11deg) wall=left   hitT=True hitS_unit=False unit_overlap=False pen=nan
+  a=16(  0.79deg,w=1/4) b=45( 82.89deg) wall=left   hitT=True hitS_unit=False unit_overlap=False pen=nan
+  a=17(  0.79deg,w=1/4) b=40(  7.11deg) wall=bottom hitT=True hitS_unit=False unit_overlap=False pen=nan
+  a=17(  0.79deg,w=1/4) b=46( 82.89deg) wall=bottom hitT=True hitS_unit=False unit_overlap=False pen=nan
+  a=18(  0.79deg,w=1/4) b=41(  7.11deg) wall=right  hitT=True hitS_unit=False unit_overlap=False pen=nan
+  a=18(  0.79deg,w=1/4) b=44( 82.89deg) wall=right  hitT=True hitS_unit=False unit_overlap=False pen=nan
+  a=19(  0.79deg,w=1/4) b=42(  7.11deg) wall=top    hitT=True hitS_unit=False unit_overlap=False pen=nan
+  a=19(  0.79deg,w=1/4) b=47( 82.89deg) wall=top    hitT=True hitS_unit=False unit_overlap=False pen=nan
+  a=20( 89.21deg,w=1/4) b=42(  7.11deg) wall=right  hitT=True hitS_unit=False unit_overlap=False pen=nan
+  a=20( 89.21deg,w=1/4) b=47( 82.89deg) wall=right  hitT=True hitS_unit=False unit_overlap=False pen=nan
+  a=21( 89.21deg,w=1/4) b=40(  7.11deg) wall=left   hitT=True hitS_unit=False unit_overlap=False pen=nan
+  a=21( 89.21deg,w=1/4) b=46( 82.89deg) wall=left   hitT=True hitS_unit=False unit_overlap=False pen=nan
+  a=22( 89.21deg,w=1/4) b=41(  7.11deg) wall=bottom hitT=True hitS_unit=False unit_overlap=False pen=nan
+  a=22( 89.21deg,w=1/4) b=44( 82.89deg) wall=bottom hitT=True hitS_unit=False unit_overlap=False pen=nan
+  a=23( 89.21deg,w=1/4) b=43(  7.11deg) wall=top    hitT=True hitS_unit=False unit_overlap=False pen=nan
+  a=23( 89.21deg,w=1/4) b=45( 82.89deg) wall=top    hitT=True hitS_unit=False unit_overlap=False pen=nan
+  a=32(  0.26deg,w=1/16) b=43(  7.11deg) wall=left   hitT=True hitS_unit=False unit_overlap=False pen=nan
+  a=32(  0.26deg,w=1/16) b=45( 82.89deg) wall=left   hitT=True hitS_unit=False unit_overlap=False pen=nan
+  a=33(  0.26deg,w=1/16) b=40(  7.11deg) wall=bottom hitT=True hitS_unit=False unit_overlap=False pen=nan
+  a=33(  0.26deg,w=1/16) b=46( 82.89deg) wall=bottom hitT=True hitS_unit=False unit_overlap=False pen=nan
+  a=34(  0.26deg,w=1/16) b=41(  7.11deg) wall=right  hitT=True hitS_unit=False unit_overlap=False pen=nan
+  a=34(  0.26deg,w=1/16) b=44( 82.89deg) wall=right  hitT=True hitS_unit=False unit_overlap=False pen=nan
+  a=35(  0.26deg,w=1/16) b=42(  7.11deg) wall=top    hitT=True hitS_unit=False unit_overlap=False pen=nan
+  a=35(  0.26deg,w=1/16) b=47( 82.89deg) wall=top    hitT=True hitS_unit=False unit_overlap=False pen=nan
+  a=36( 89.74deg,w=1/16) b=42(  7.11deg) wall=right  hitT=True hitS_unit=False unit_overlap=False pen=nan
+  a=36( 89.74deg,w=1/16) b=47( 82.89deg) wall=right  hitT=True hitS_unit=False unit_overlap=False pen=nan
+  a=37( 89.74deg,w=1/16) b=40(  7.11deg) wall=left   hitT=True hitS_unit=False unit_overlap=False pen=nan
+  a=37( 89.74deg,w=1/16) b=46( 82.89deg) wall=left   hitT=True hitS_unit=False unit_overlap=False pen=nan
+  a=38( 89.74deg,w=1/16) b=41(  7.11deg) wall=bottom hitT=True hitS_unit=False unit_overlap=False pen=nan
+  a=38( 89.74deg,w=1/16) b=44( 82.89deg) wall=bottom hitT=True hitS_unit=False unit_overlap=False pen=nan
+  a=39( 89.74deg,w=1/16) b=43(  7.11deg) wall=top    hitT=True hitS_unit=False unit_overlap=False pen=nan
+  a=39( 89.74deg,w=1/16) b=45( 82.89deg) wall=top    hitT=True hitS_unit=False unit_overlap=False pen=nan
