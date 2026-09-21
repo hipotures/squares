@@ -144,11 +144,11 @@ hypothesis status and summarizes experiment verdicts, and the
 | --- | ---: | --- |
 | Agendas | 36 | 16 active; 14 completed; 5 paused; 1 superseded |
 | Commitments | 349 | 178 complete; 60 stopped; 66 blocked; 15 ready; 21 tentative; 9 in progress |
-| Sessions | 142 | 85 completed; 57 stopped; all terminal |
+| Sessions | 143 | 86 completed; 57 stopped; all terminal |
 | Explorations | 37 | 23 linked to proposed hypotheses; 14 uncodified |
 | Hypotheses | 159 | 28 confirmed; 29 refuted; 51 blocked; 14 unresolved; 5 open; 28 open questions; 2 result registered; 2 abandoned; 0 running |
 | Experiments | 147 | 41 accepted; 34 rejected; 46 unresolved; 12 baseline; 11 blocked; 3 abandoned; 0 in progress |
-| Frontier results | 30 | 30 registered |
+| Frontier results | 31 | 31 registered |
 
 <!-- END CURRENT-RESEARCH-STATUS -->
 
@@ -1028,6 +1028,14 @@ controller, not permission to blur contracts.
 
 ### Current Handoff
 
+[Session 148](packing/campaign/agent-sessions/session-148-n17-external-intake.md)
+adopted `s(17) >= 461300/99999` as `T-031` from Guzhou0806’s R012 certificate, with
+Mira’s `4613/1000` beneath it, after four passing replays and a proof review that found
+no error. It is the first verified bound at this size that came from outside, and both
+certificates descend from this repository’s own `T-019`. The identifier is contended:
+pull request 208 claims `T-031` from the open overnight stack, and whichever lands
+second renumbers.
+
 [Session 142](packing/campaign/agent-sessions/session-142-stack-correctness.md)
 completed the correctness review and bounded pipeline repairs in
 [PR 202](https://github.com/jlevy/squares/pull/202). All four retained n=18 certificates
@@ -1089,8 +1097,10 @@ existence determination;
 F1, blocked on tools; M6 stays retired with no Route D search hypothesis; SDP is not
 admitted and M2 stays retired.
 
-**Selected next entry:** `think-qqzs`, BC-357: close M7’s n=6 bracket at 299/100 under
-H-216. G1, G2, G3, and G5 are on main.
+**Selected next entry:** `think-pcd0`, the n = 17 intake: reconcile the `T-031`
+identifier with pull request 208 and land the adoption.
+The research entry behind it is BC-357, closing M7’s n=6 bracket at 299/100 under H-216.
+G1, G2, G3, and G5 are on main.
 G4 remains on this bead and is not H-216’s instrument.
 [Session 139](packing/campaign/agent-sessions/session-139-n11-overnight-research.md)
 stopped after encode-only timed out unresolved and T-027 retained `s(18) >= 467/100`.

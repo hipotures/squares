@@ -341,11 +341,13 @@ on.
 It is not the next thing, because a reassessment of what to search is queued in front
 of it.
 
-For the next supervised exact-research goal, take BC-357 under `think-qqzs`: close the
-n=6 calibration bracket at 299/100 under
+For the next supervised exact-research goal, take the n = 17 intake under `think-pcd0`:
+reconcile the `T-031` identifier with pull request 208, which claims the same number
+from the open overnight stack, and land the adoption of `s(17) >= 461300/99999`. The
+research entry behind it is BC-357: close the n=6 calibration bracket at 299/100 under
 [H-216](../../../../packing/campaign/hypotheses/H-216-point-certificate-at-n6-299-100.md).
-G1, G2, G3, and G5 are on main; G4 remains on that bead and is not H-216’s instrument.
-The five X-037 owner decisions are resolved in
+G1, G2, G3, and G5 are on main; G4 remains on that research bead and is not H-216’s
+instrument. The five X-037 owner decisions are resolved in
 [X-037](../../../../packing/campaign/explorations/X-037-n11-overnight-review-and-route-slate.md).
 Session 138’s overnight review measured M1 and M7 at stated scope and moved no bound;
 [agenda-037](../../../../packing/campaign/agendas/agenda-037-n11-relational-certificate-program.md)

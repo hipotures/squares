@@ -683,7 +683,7 @@ def test_every_case_page_binds_the_certificate_its_own_evidence_names() -> None:
     than five. Both are rechecked from the source bytes because the surd is a function of
     `B` and `D` alone whichever kind of atom carries the charge.
 
-    `EXTERNAL_REDUCTION` is the one shape this contract cannot reach. T-031 adopts
+    `external_reduction` is the one shape this contract cannot reach. T-031 adopts
     Guzhou0806's R012, whose bound is not a container side at all: it covers parents of
     side `A` inside `[0, L]^2` and rescales by `1/A`, so the proved side is `L/A` and no
     certificate object anywhere carries it. The reduction is neither an endpoint
@@ -696,7 +696,7 @@ def test_every_case_page_binds_the_certificate_its_own_evidence_names() -> None:
     look like an oversight.
     """
     #: n -> why this case's bound cannot be bound to a certificate object at that side.
-    EXTERNAL_REDUCTION = {
+    external_reduction = {
         17: "T-031: external parent-rescaling reduction, bound L/A is no container side",
     }
 
@@ -773,7 +773,7 @@ def test_every_case_page_binds_the_certificate_its_own_evidence_names() -> None:
         n = int(packing["n"])
         side = str(lower["exact_form"])
         matching = [figures for bound_side, figures in cited.values() if bound_side == side]
-        if n in EXTERNAL_REDUCTION:
+        if n in external_reduction:
             assert not matching, f"n = {n} is exempt but now binds a certificate at {side}"
             continue
         assert len(matching) == 1, f"n = {n}: {len(matching)} cited proof objects at {side}"
@@ -782,7 +782,7 @@ def test_every_case_page_binds_the_certificate_its_own_evidence_names() -> None:
 
     # Non-vacuity, itself derived: every case the interval decision declares in its own
     # scope must be bound this way, so the contract cannot quietly empty out.
-    assert bound == expected - set(EXTERNAL_REDUCTION)
+    assert bound == expected - set(external_reduction)
 
 
 def test_t017s_ladder_is_the_ladder_the_case_package_actually_retains() -> None:
