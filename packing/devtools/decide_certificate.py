@@ -76,6 +76,9 @@ from sqpack.fractional.certificate import (
     verify,
 )
 from sqpack.fractional.corner_clip import (
+    CERTIFICATE_VARIANTS,
+    CLASS,
+    UNCONDITIONAL,
     class_certificate_id,
     class_claim,
     clip_from_optional,
@@ -97,10 +100,9 @@ MAX_CERTIFICATE_BYTES = 8 * 1024 * 1024
 # unless it is asked for the one class it implements by name (``--corner-clip``); the
 # other names are reserved so that a certificate declaring one is refused by name rather
 # than read as unconditional and printed RETAINABLE under conditions it never claimed.
-# Conditional checking is not implemented at all.
-UNCONDITIONAL = "unconditional"
-CLASS = "class"
-CERTIFICATE_VARIANTS = (UNCONDITIONAL, CLASS, "conditional")
+# Conditional checking is not implemented at all. The names come from ``corner_clip``
+# so the gate and the reader-side reconciliation share one vocabulary rather than two
+# that can drift (review finding H1).
 
 
 class CertificateFormatError(ValueError):

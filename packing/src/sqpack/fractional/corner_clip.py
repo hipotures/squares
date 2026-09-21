@@ -63,6 +63,34 @@ once the shift would have to serve four constraints with one vector, so the kept
 still be a superset there; that direction is the safe one for a covering program, and a
 ceiling family on the kept set bounds the program this repository actually runs.
 
+Two boundary conventions, on purpose
+------------------------------------
+
+The exact free class is the **open** set ``{penetration > d}``: the triangle ``T_d`` is
+closed, so a core whose penetration is exactly ``d`` touches it and no packing of the
+class produces that core. The module keeps the boundary on one side in one place and on
+the other side in the other, because the two consumers move in opposite directions and
+each gets the side that is safe for it:
+
+* ``excludes`` / ``excludes_square`` exclude on ``penetration <= d``, so the set they
+  *keep* is the open ``{penetration > d}`` -- the class exactly. Their consumers
+  (`colgen.dual_support`, `colgen.check_ceiling` through `colgen.square_excluded`,
+  `ceiling`'s K4 condition, and the independent reader's K4) **drop** what the predicate
+  excludes, and dropping a member of a ceiling family only weakens the ceiling it
+  proves, never invalidates it, so parting with the boundary band there costs at most
+  bound and never soundness.
+* ``thresholds`` / ``half_planes`` / ``clip_polygon`` keep the **closed**
+  ``{penetration >= d}``: the kept side of each half-plane is ``>=``, so the sweep's
+  domain is the class's closure, larger by one measure-zero band. Its consumer
+  **quantifies** Condition 5 over what is kept, so the extra band is extra rows the class
+  cannot realise and a strictly harder Condition 5.
+
+So the two kept sets differ on exactly the boundary band ``{penetration == d}``, and the
+direction of the difference is chosen per consumer. Do not "tidy" one into the other
+without re-deciding which way its consumer is conservative: making ``half_planes`` open
+would drop rows out of a covering program, which is the unsound direction.
+`test_the_two_kept_sets_differ_exactly_on_the_boundary_band` pins both.
+
 Every quantity here is a ``Fraction``. With the half-tangent ``t`` rational,
 ``cos = (1 - t^2) / (1 + t^2)`` and ``sin = 2t / (1 + t^2)`` are rational, so ``reach``
 is rational and no angle, tolerance or float takes part in the predicate.
@@ -81,6 +109,23 @@ type HalfPlane = tuple[Fraction, Fraction, Fraction]
 #: The four corner sign patterns, in the order (0,0), (L,0), (0,L), (L,L).
 _CORNERS: tuple[tuple[int, int], ...] = ((1, 1), (-1, 1), (1, -1), (-1, -1))
 
+#: What a record declares itself to be. A record with no ``variant`` is the
+#: unconditional theorem, which is what every reader here decided before the corner
+#: class existed; ``class`` is that one class, and ``conditional`` is reserved so a
+#: record declaring it is refused by name rather than read as the unconditional
+#: program. ``devtools.decide_certificate`` imports these so the gate's vocabulary and
+#: the readers' are one list, and ``devtools.independent_ceiling_reader`` restates them
+#: under its stdlib-only contract with a test pinning the two copies together.
+UNCONDITIONAL = "unconditional"
+CLASS = "class"
+CERTIFICATE_VARIANTS = (UNCONDITIONAL, CLASS, "conditional")
+#: The variants a reader-side clip reconciliation can decide. Everything else in
+#: ``CERTIFICATE_VARIANTS`` names a program no reader here implements, and anything
+#: outside it names nothing at all; both are refused before any clip is reconciled
+#: (review finding H1), because falling through to the requested clip would decide the
+#: unconditional program over bytes that declared something else.
+DECIDABLE_VARIANTS = (UNCONDITIONAL, CLASS)
+
 
 class EmptyClippedDomainError(ValueError):
     """The clip leaves no admissible centre at some direction.
@@ -98,6 +143,13 @@ class CornerClip:
     ``depth`` is the threshold ``d`` of the triangle ``T_d``. Theorem B states the bins
     for ``0 < d <= 1``; above 1 the uniqueness of the occupant fails and the clip is not
     the theorem's, so the value is refused here rather than silently reinterpreted.
+
+    The methods do not all keep the same side of the boundary ``penetration == d``:
+    ``excludes`` and ``excludes_square`` keep the open side, ``thresholds``,
+    ``half_planes`` and ``clip_polygon`` the closed one, each because that is the
+    conservative direction for its own consumer. "Two boundary conventions, on purpose"
+    in the module docstring says which is which and why, and every method below repeats
+    its own convention.
     """
 
     outer_side: Fraction
@@ -131,10 +183,13 @@ class CornerClip:
     def excludes(self, x: Fraction, y: Fraction, cosine: Fraction, sine: Fraction) -> bool:
         """Whether the core at this centre and direction meets some corner triangle.
 
-        Closed: a core touching ``T_d`` at one point meets it, so the test is ``<=``.
-        Keeping the boundary is the conservative choice for a row domain -- it retains a
-        measure-zero set of rows the class cannot realise -- and it is the one that
-        matches the closed triangle in the theorem.
+        Closed: a core touching ``T_d`` at one point meets it, so the test is ``<=``,
+        which is the closed triangle of the theorem. The set this predicate **keeps** is
+        therefore the open ``{penetration > d}`` -- the free class exactly, boundary
+        band excluded. That is the safe side for its consumers, which drop what it
+        excludes from a ceiling family (`colgen.dual_support`, `colgen.check_ceiling`,
+        `ceiling`'s K4); ``half_planes`` keeps the other side for its own
+        consumer. See "Two boundary conventions, on purpose" in the module docstring.
         """
 
         return self.penetration(x, y, cosine, sine) <= self.depth
@@ -172,12 +227,18 @@ class CornerClip:
         centre: tuple[Fraction, Fraction],
         half: Fraction,
     ) -> bool:
-        """Whether that closed square meets some corner triangle."""
+        """Whether that closed square meets some corner triangle.
+
+        The same closed ``<=`` test as `excludes`, hence the same open kept set.
+        """
 
         return self.square_penetration(axes, centre, half) <= self.depth
 
     def thresholds(self, cosine: Fraction, sine: Fraction) -> tuple[Fraction, ...]:
-        """``d + reach - offset`` per corner: the kept side's bound in container terms."""
+        """``d + reach - offset`` per corner: the kept side's bound in container terms.
+
+        The kept side is the **closed** one, ``>=``, as in `half_planes`.
+        """
 
         reach = self.reach(cosine, sine)
         return tuple(self.depth + reach - self._offset(sx, sy) for sx, sy in _CORNERS)
@@ -187,10 +248,13 @@ class CornerClip:
 
         With ``u = c x + s y`` and ``v = -s x + c y`` the inverse is ``x = c u - s v``
         and ``y = s u + c v``, so ``sigma_x x + sigma_y y`` is
-        ``(sigma_x c + sigma_y s) u + (sigma_y c - sigma_x s) v``. The kept side is the
-        complement of the closed triangle, i.e. ``>= d + reach - offset``; taking it
-        closed keeps a measure-zero boundary the class cannot realise, which is the safe
-        direction for a covering program.
+        ``(sigma_x c + sigma_y s) u + (sigma_y c - sigma_x s) v``. The kept side is
+        ``>= d + reach - offset``: the **closed** ``{penetration >= d}``, the class's
+        closure rather than the class. Keeping that measure-zero boundary band retains
+        rows the class cannot realise, which makes Condition 5 strictly harder and is
+        the safe direction for a covering program -- the opposite side from `excludes`,
+        deliberately. See "Two boundary conventions, on purpose" in the module
+        docstring.
         """
 
         reach = self.reach(cosine, sine)
@@ -209,7 +273,10 @@ class CornerClip:
         cosine: Fraction,
         sine: Fraction,
     ) -> tuple[tuple[Fraction, Fraction], ...]:
-        """Clip a convex rational polygon in ``(u, v)`` by the four half-planes."""
+        """Clip a convex rational polygon in ``(u, v)`` by the four half-planes.
+
+        Closed, as `half_planes` is: a vertex exactly on a cut is kept.
+        """
 
         clipped = polygon
         for half_plane in self.half_planes(cosine, sine):
@@ -297,21 +364,47 @@ def class_certificate_id(n: int, outer_side: Fraction, depth: Fraction) -> str:
     )
 
 
+def require_decidable_variant(variant: object) -> None:
+    """Refuse any declared variant these readers do not implement, naming it.
+
+    Absent means the unconditional theorem, and ``class`` is the one class implemented
+    here. Every other name is refused *before* the clip is reconciled: a reader that
+    asked only ``variant == "class"`` let ``conditional`` -- a name the gate's own
+    vocabulary already knows -- and every misspelling fall through to the requested clip
+    and be decided as the unconditional program (review finding H1). That mirrors
+    ``decide_certificate._require_declared_variant``, which has refused the same set at
+    the gate all along.
+    """
+
+    if variant is None or variant in DECIDABLE_VARIANTS:
+        return
+    if isinstance(variant, str) and variant in CERTIFICATE_VARIANTS:
+        raise ValueError(
+            f"the record declares variant: {variant}, and this reader decides only the "
+            f"unconditional program and the corner class; a {variant} record cannot be "
+            "read here"
+        )
+    raise ValueError(f"field 'variant' must be one of {CERTIFICATE_VARIANTS}, got {variant!r}")
+
+
 def declared_class_clip(record: Mapping[str, object]) -> Fraction | None:
     """The clip a record declares at its top level, or ``None`` for an unclipped one.
 
     The two fields go together: ``variant: class`` says the bytes decide a class, and
     ``corner_clip`` says which one. Half a declaration is refused rather than read as
-    either, so no record can lose its hypothesis by leaving a field out.
+    either, so no record can lose its hypothesis by leaving a field out. A variant this
+    reader does not implement is refused first, by name, so no unknown hypothesis is
+    read as the unconditional one either.
     """
 
     variant = record.get("variant")
+    require_decidable_variant(variant)
     declared = record.get("corner_clip")
     if declared is None:
-        if variant == "class":
+        if variant == CLASS:
             raise ValueError("a record declaring variant: class must declare corner_clip")
         return None
-    if variant != "class":
+    if variant != CLASS:
         raise ValueError("a record declaring corner_clip must declare variant: class")
     return Fraction(str(declared))
 
@@ -346,6 +439,10 @@ def agreed_class_clip(
 
 
 __all__ = [
+    "CERTIFICATE_VARIANTS",
+    "CLASS",
+    "DECIDABLE_VARIANTS",
+    "UNCONDITIONAL",
     "CornerClip",
     "EmptyClippedDomainError",
     "HalfPlane",
@@ -354,4 +451,5 @@ __all__ = [
     "class_claim",
     "clip_from_optional",
     "declared_class_clip",
+    "require_decidable_variant",
 ]

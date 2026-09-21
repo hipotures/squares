@@ -39,12 +39,16 @@ spare.
 
 ## Distinctness and the finish
 
-Two counted boxes are distinct when their known point sets share a colour: a singly
-covered point's box holds no second point of its own colour. The known points of a
-counted box are its own end point and every base point or vertical trajectory of the
-other colour meeting its rectangle. The maximum pairwise-distinct set is found by
-brute force over at most six candidates per line. The finish is the `m = 5` region
-computation ported to mpmath and cross-checked against the exact table to `1e-18`.
+Two counted boxes are distinct when, for some colour, the points they are known to
+hold between them are two different points: a box holds one point of each colour, so
+no single box explains both. The known points of a counted box are its own end point
+and every base point or vertical trajectory of the other colour meeting its rectangle,
+each carried by *identity* rather than by colour alone -- sharing a colour label is
+not enough, because two boxes can carry each other's end point as their only
+cross-colour witness, which one box holding one point of each colour explains. The
+maximum pairwise-distinct set is found by brute force over at most six candidates per
+line. The finish is the `m = 5` region computation ported to mpmath and cross-checked
+against the exact table to `1e-18`.
 
 ## The control
 
@@ -71,8 +75,12 @@ structures this toolkit cannot correlate with `(R, B)`, so a kill counted on the
 vertical lines is a kill on all four only for the structure paired with its own
 transposed twin.
 
-All arithmetic is mpmath at 50 digits. Margins here are of order `1e-2` and the strict
-inequalities carry an explicit `1e-30` guard, so the decisions are not close calls.
+All arithmetic is mpmath at 50 digits, and the strict inequalities carry an explicit
+`1e-30` guard. That the margins are of order `1e-2` is measured rather than asserted:
+every guarded comparison reports how far it stood from its threshold, and `run` prints
+the closest per site (`guard_margins`). Comparisons that land inside the guard are
+exact ties -- a point on a rectangle's edge -- which the guard decides the same way
+with or without it, and they are counted apart from the minimum.
 
 Records: `H-227` (and `H-226` for the shared machinery); defects `D-505`, `D-507`.
 """
@@ -142,6 +150,51 @@ type Trajectory = tuple[Scalar, Scalar, Scalar]
 type Rect = tuple[tuple[Scalar, Scalar], Scalar, Scalar]
 
 
+#: The closest any `EPS`-guarded comparison came to its threshold while still deciding
+#: it, per site, and how many landed inside the guard. See `_note_margin`.
+_GUARD_MARGINS: dict[str, Scalar] = {}
+_GUARD_TIES: Counter[str] = Counter()
+
+
+def _note_margin(site: str, margin: Scalar) -> None:
+    """Record how far one `EPS`-guarded comparison was from its threshold.
+
+    A margin at or inside the guard is an exact tie up to 50-digit round-off -- these
+    quantities are algebraic and coincide exactly, a point sitting on a rectangle's
+    edge being the common case -- and the guard decides none of them either way, since
+    both the guarded and the unguarded comparison give the same answer on a tie. Those
+    are counted. What is minimised is the closest approach of a comparison the guard
+    could have flipped, which is the measurement the module docstring's "margins here
+    are of order 1e-2" previously only asserted.
+    """
+    if margin <= EPS:
+        _GUARD_TIES[site] += 1
+        return
+    current = _GUARD_MARGINS.get(site)
+    if current is None or margin < current:
+        _GUARD_MARGINS[site] = margin
+
+
+def guard_margins() -> dict[str, object]:
+    """The measured `EPS` margins of this process, by decision site.
+
+    Cumulative over the process because the sites are on shared paths, which only makes
+    the reported minimum more conservative. The four sites are the ones a verdict turns
+    on: which point pairs are close enough to be a double (`close-pair`), whether a
+    system of row moves is feasible (`reach`), whether a counted box's rectangle meets
+    a trajectory (`meets-x`, `meets-y`), and whether the finish's sup drops below 1/2
+    (`finish-sup`).
+    """
+    return {
+        "eps": mp.nstr(EPS, 4),
+        "closest_deciding": {
+            site: mp.nstr(margin, 10) for site, margin in sorted(_GUARD_MARGINS.items())
+        },
+        "exact_ties_inside_the_guard": dict(sorted(_GUARD_TIES.items())),
+        "min_deciding": (mp.nstr(min(_GUARD_MARGINS.values()), 10) if _GUARD_MARGINS else None),
+    }
+
+
 def point_key(p: tuple[Scalar, Scalar], digits: int = KEY_DIGITS) -> PointKey:
     """Identify a point by its printed coordinates, so computed heights compare."""
     return (str(mp.nstr(p[0], digits)), str(mp.nstr(p[1], digits)))
@@ -172,7 +225,9 @@ def structures_one_spare(pts: list[tuple[Scalar, Scalar]]) -> list[Structure]:
     """Every one-spare structure: one uncovered point, or one double."""
     out: list[Structure] = [(frozenset([point_key(p)]), ()) for p in pts]
     for a, b in combinations(pts, 2):
-        if (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 < DIAG2 - EPS:
+        d2 = (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2
+        _note_margin("close-pair", abs(d2 - DIAG2))
+        if d2 < DIAG2 - EPS:
             out.append((frozenset(), (frozenset([point_key(a), point_key(b)]),)))
     return out
 
@@ -218,6 +273,7 @@ def reach(
             for j in range(n):
                 dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j])
     for i in range(n):
+        _note_margin("reach", abs(dist[i][i]))
         if dist[i][i] < -EPS:
             return None
     return [(-dist[k][6], dist[6][k]) for k in range(6)]
@@ -309,8 +365,10 @@ def meets(rect: Rect, traj: Trajectory) -> bool:
     """Does a counted box's rectangle meet a point's vertical trajectory?"""
     (x0, x1), lo, hi = rect
     x, tlo, thi = traj
+    _note_margin("meets-x", min(abs(x - x0), abs(x - x1)))
     if not x0 - EPS <= x <= x1 + EPS:
         return False
+    _note_margin("meets-y", min(abs(thi - lo), abs(tlo - hi)))
     return not (thi < lo - EPS or tlo > hi + EPS)
 
 
@@ -432,6 +490,8 @@ def finish_m6(
     out: dict[str, tuple[Scalar | None, bool]] = {}
     for name, target in targets.items():
         sup = sup_dist_region(y_e, denied, target, e_x=e_x)
+        if sup is not None:
+            _note_margin("finish-sup", abs(sup - HALF))
         out[name] = (sup, bool(sup is not None and sup < HALF - EPS))
     return out
 
@@ -544,15 +604,37 @@ class CountedBox:
     colour: str
     row: int
     status: str
-    known: frozenset[str]
+    #: The witnesses this box is known to hold, as `(colour, point key)` pairs: its own
+    #: end point, and every point of the other colour whose trajectory its rectangle
+    #: meets. The identity of the point is carried, not just its colour, because the
+    #: colour alone does not decide distinctness (see `boxes_are_distinct`).
+    known: frozenset[tuple[str, PointKey]]
     span: tuple[Scalar, Scalar]
+
+
+def _witnesses(box: CountedBox, colour: str) -> frozenset[PointKey]:
+    """The points of one colour this box is known to hold."""
+    return frozenset(key for c, key in box.known if c == colour)
+
+
+def boxes_are_distinct(a: CountedBox, b: CountedBox) -> bool:
+    """Are these two counted boxes provably different boxes?
+
+    A box of a packing of this configuration holds one point of each colour, so two
+    counted boxes are distinct as soon as some colour `c` has two *different* known
+    points between them: one box cannot hold both. Sharing a colour *label* is not
+    enough, and that was the bug this predicate replaced -- two boxes can each carry
+    the other's end point as their only cross-colour witness, in which case a single
+    box holding one point of each colour explains both and nothing is contradicted.
+    """
+    return any(len(_witnesses(a, colour) | _witnesses(b, colour)) >= 2 for colour in COLOURS)
 
 
 def _max_distinct(boxes: list[CountedBox]) -> list[CountedBox]:
     """The largest pairwise-distinct subset, by brute force over at most six boxes."""
     for r in range(len(boxes), 0, -1):
         for sub in combinations(boxes, r):
-            if all(a.known & b.known for a, b in combinations(sub, 2)):
+            if all(boxes_are_distinct(a, b) for a, b in combinations(sub, 2)):
                 return list(sub)
     return []
 
@@ -587,11 +669,11 @@ def _side_boxes(
             rect = charge.rect
             if rect is None:
                 continue
-            known = {colour}
+            known = {(colour, point_key(charge.end))}
             for key, traj in analyses[OTHER[colour]].trajectories.items():
                 if not meets(rect, traj):
                     continue
-                known.add(OTHER[colour])
+                known.add((OTHER[colour], key))
                 if key in structures[OTHER[colour]][0]:
                     immediate = (
                         f"{side}: rectangle of {colour} row {k + 1} meets the uncovered "
@@ -662,7 +744,7 @@ def _five_plus_partial(side: str, line: M6Line, lines: dict[str, M6Line]) -> M6V
     fulls = [b for b in line.boxes if b.status == "full"]
     for partial in [b for b in line.boxes if b.status == "partial"]:
         sub = [*fulls, partial]
-        if len(sub) < 6 or not all(a.known & b.known for a, b in combinations(sub, 2)):
+        if len(sub) < 6 or not all(boxes_are_distinct(a, b) for a, b in combinations(sub, 2)):
             continue
         lo, hi = partial.span
         # Rows never cross, so ordering the six boxes by base height gives the rank
@@ -788,8 +870,12 @@ def report_zero_spare_control() -> dict[str, object]:
     return {"class": verdict.klass, "reason": verdict.reason, "lines": lines}
 
 
-def main(out_path: str | None = None) -> int:
-    """Run the n = 32 inventory and, with a path, write it."""
+def run() -> dict[str, object]:
+    """Run the n = 32 inventory and return its payload, printing the report as it goes.
+
+    The payload is what `--json` writes and what the record's counts are read from, so
+    a test can pin those counts without going through the file.
+    """
     report_budget()
     cross_check_finish()
     control = report_zero_spare_control()
@@ -863,37 +949,42 @@ def main(out_path: str | None = None) -> int:
         print("  non-forced patterns -> raw count:")
         for shape, count in sorted(patterns.items(), key=lambda kv: -kv[1]):
             print(f"    {count:6d}  {shape}")
+    margins = guard_margins()
+    print(
+        f"  EPS-guarded decisions: closest deciding margin per site "
+        f"{margins['closest_deciding']}, exact ties inside the guard "
+        f"{margins['exact_ties_inside_the_guard']}, guard {margins['eps']}"
+    )
+    return {
+        "tool": "devtools.bentz2016.one_spare_inventory --n 32",
+        "label": "n=32 (red k=1, blue k=1) at side 6",
+        "counts": {
+            "red_structures": len(reds),
+            "blue_structures": len(blues),
+            "raw_pairs": len(reds) * len(blues),
+            "orbits": len(orbits),
+        },
+        "classes_raw": dict(classes),
+        "classes_orbits": dict(orbit_classes),
+        "key_digits": KEY_DIGITS,
+        "mirror_involutive_on_decimal_keys": mirror_is_involutive(),
+        "orbits_on_exact_integer_keys": exact_orbits,
+        "reasons_raw": dict(reasons),
+        "non_forced_patterns_raw": dict(patterns),
+        "invariance_ok": invariance_ok,
+        "guard_margins": guard_margins(),
+        "zero_spare_n33_control": control,
+        "orbits": list(orbits.values()),
+    }
+
+
+def main(out_path: str | None = None) -> int:
+    """Run the n = 32 inventory and, with a path, write it."""
+    inventory = run()
     if out_path:
         out = Path(out_path)
         out.parent.mkdir(parents=True, exist_ok=True)
-        out.write_text(
-            json.dumps(
-                {
-                    "tool": "devtools.bentz2016.one_spare_inventory --n 32",
-                    "label": "n=32 (red k=1, blue k=1) at side 6",
-                    "counts": {
-                        "red_structures": len(reds),
-                        "blue_structures": len(blues),
-                        "raw_pairs": len(reds) * len(blues),
-                        "orbits": len(orbits),
-                    },
-                    "classes_raw": dict(classes),
-                    "classes_orbits": dict(orbit_classes),
-                    "key_digits": KEY_DIGITS,
-                    "mirror_involutive_on_decimal_keys": mirror_is_involutive(),
-                    "orbits_on_exact_integer_keys": exact_orbits,
-                    "reasons_raw": dict(reasons),
-                    "non_forced_patterns_raw": dict(patterns),
-                    "invariance_ok": invariance_ok,
-                    "zero_spare_n33_control": control,
-                    "orbits": list(orbits.values()),
-                },
-                indent=1,
-                default=str,
-            )
-            + "\n",
-            encoding="utf-8",
-        )
+        out.write_text(json.dumps(inventory, indent=1, default=str) + "\n", encoding="utf-8")
         print(f"  inventory written to {out}")
     return 0
 
