@@ -692,6 +692,59 @@ duplicate packet hashes and a checker-side manifest for files already tracked to
 in Git. `think-jyf4` tracks their removal.
 Include this rule when briefing subagents that create artifacts or validation checks.
 
+### OR-17: Every routine gate has a wall ceiling, and anything above it is selected on purpose
+
+`OR-13` decides *where* a check runs and `OR-14` bounds the pull-request wall at 180
+seconds.
+Neither bounds a gate once it has **left** the fast surface, and that gap is not
+theoretical: it is how a 45-minute gate came to sit on the merge path with nothing
+objecting.
+
+**The rule is a ceiling on wall time per routine gate, deferred surface included.** A
+gate above the ceiling is not forbidden; it is **selected**, per invocation, and the
+record says who selected it and what evidence was wanted.
+A label that silently costs forty-five minutes is not a selection, it is a checkbox, and
+a checkbox cannot state what it was for.
+
+The owner set this on 2026-09-21: routine delays beyond a few minutes that were not
+consciously selected as needed checks are not acceptable, because they delay all serious
+progress.
+
+The measurement that day, on two complete deep-gate runs of PR 208 over one tree:
+
+| Job | Wall |
+| --- | --- |
+| `exhaustive-tier` | 2674 s (44 m 34 s) |
+| `deferred-steps` | 2469 s (41 m 09 s) |
+| `deferred-slow-lane` | 999 s (16 m 39 s) |
+| `screen` | 909 s (15 m 09 s) |
+
+`deep-gate.yml` and `test_deep_gate_workflow.py` price the exhaustive tier at 1943.05 s
+— the figure that refused its promotion into `--fast`. The job costs 2674 s, **1.38x its
+own declared price**. That is under the 1.5x that fails a local tier, and it went
+unnoticed for the reason `OR-14` already names in another form: the CI jobs are clocked
+by no drift rule at all, so there was nothing for the number to fail against.
+
+Four obligations follow, and they are what a control has to hold:
+
+- **A wall ceiling per gate, not only a step-time budget.** The deferred surface is
+  inside it. A tier does not become unbounded by being deferred.
+- **Selection is per invocation and recorded.** Above the ceiling, the record names the
+  selector and the evidence sought, the way `OR-13` already makes a session name its
+  certifying gate.
+- **The CI jobs are clocked the way local tiers are**, so `gate-budgets.yaml`’s drift
+  and stale rules reach them.
+  A price nothing reads is not a budget.
+- **A gate never re-decides a tree it has already decided.** The second deep-gate run
+  that day spent forty-five minutes on a byte-identical tree the first had passed, and
+  that duplicate was the whole wall of the merge.
+
+`OR-14`’s argument carries over unchanged and is the reason this is not a comfort
+question: cycle time is a floor on iteration rate, and a gate people cannot afford to
+run is a gate that stops reporting.
+`think-zmos` is the efficiency block that measured this; `think-haam` tracks encoding
+the ceiling and its control.
+
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
 -->
