@@ -39,13 +39,16 @@ _SUBMODULE_PATH = re.compile(r"^\s*path\s*=\s*(.+?)\s*$", re.MULTILINE)
 
 
 @cache
-def vendored_directories() -> frozenset[str]:
-    """Every submodule path `.gitmodules` declares, repository-relative and POSIX.
+def vendored_directories(root: Path = REPO) -> frozenset[str]:
+    """Every submodule path `root`'s `.gitmodules` declares, root-relative and POSIX.
 
-    Read once and cached: both sweeps call it per candidate path, and the file does not
-    change under a running check.
+    Read once per root and cached: the sweeps call it per candidate path, and the file
+    does not change under a running check. `root` is this repository unless a caller
+    asks the question of another checkout -- `check_readme` asks it of the `tmp_path`
+    repository its tests build, since a declared submodule is a top-level entry the
+    README must draw and `tracked_files` cannot report one.
     """
-    gitmodules = REPO / ".gitmodules"
+    gitmodules = root / ".gitmodules"
     if not gitmodules.is_file():
         return frozenset()
     declared = _SUBMODULE_PATH.findall(gitmodules.read_text(encoding="utf-8"))
