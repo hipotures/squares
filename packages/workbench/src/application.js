@@ -394,10 +394,14 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   let colorScheme = "identity";
   //: `standardize` repaints the resting frame in the standard angle colours. `holdSquare` is
   //: the rule below it: whether a square that is axis-aligned at both ends of a step keeps its
-  //: colour while everything around it drains. On -- the shipped behaviour -- the grid a viewer
-  //: can already read stays put and the drain says which squares are still looking for a place.
-  //: Off, every square drains, so nothing is green while it is visibly tilted by the shake.
-  const ANIMATE = { standardize: true, holdSquare: true };
+  //: colour while everything around it drains.
+  //:
+  //: Off by default (the owner, 2026-09-21, after watching both). Held, the grid a viewer can
+  //: already read stays put and the drain says which squares are still looking for a place --
+  //: but it also keeps a square green while the shake has visibly turned it off its axis, and it
+  //: leaves the axis-aligned majority at full colour, which is most of the packing and hides the
+  //: drain almost entirely. Released, every square drains and the motion reads.
+  const ANIMATE = { standardize: true, holdSquare: false };
   function standardizing() {
     return colorScheme === "identity" && state.mode === "animate" && ANIMATE.standardize;
   }
