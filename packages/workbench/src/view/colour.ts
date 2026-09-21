@@ -225,11 +225,17 @@ const NEUTRAL_CHROMA = 1e-4;
 /**
  * The widest hue arc a blend will travel around the wheel, in degrees.
  *
- * Inside it the two colours are near enough that the arc passes through hues between them, which
- * is what a reader expects of a small change. Past it the arc starts running through hues neither
- * end has -- green to scarlet crosses yellow -- so the blend goes through neutral instead.
+ * Inside it the two ends are the same colour moving a little -- two shades of one family, a
+ * moving shade settling into its neighbour -- and travelling between them shows nothing a
+ * viewer would call a third colour. Past it the arc starts running through hues neither end
+ * has, so the blend goes through neutral instead.
+ *
+ * Twenty-five, not sixty. At sixty a green at 158 degrees blending to the olive at 109 swept
+ * the forty-nine between them, and the middle of that sweep is a yellow-green -- a colour
+ * neither end has, which is the whole thing this rule exists to prevent. The angle families are
+ * far enough apart that only shades of one family fall inside twenty-five.
  */
-const HUE_ARC_LIMIT = 60;
+const HUE_ARC_LIMIT = 25;
 
 /**
  * The shortest way round from one hue to another, in degrees, signed.

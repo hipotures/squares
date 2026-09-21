@@ -4109,13 +4109,20 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     let held = sceneSide;
     if (!optimizing && t <= sc.moveStart) {
       box = Math.min(from, open);
-      // The room n + 1 will need, drawn in the trace's light grey from the dwell onward. It is
-      // what the box darkens INTO at the step's start, so it has to already be there: a line
-      // that grew outward would say the container was being enlarged, and the container is only
-      // ever made smaller.
+      // The room n + 1 will need, drawn in the trace's light grey. It is what the box darkens
+      // INTO at the step's start, so it has to be there before the step begins: a line that grew
+      // outward would say the container was being enlarged, and the container is only ever made
+      // smaller.
+      //
+      // It fades in over the dwell rather than appearing with it, and the view opens to meet it
+      // over the same span. Held at the new room from the dwell's first frame, the view stepped
+      // out the instant a step began -- on the step into 50 it went 7.63 to 8.72, a seventh of
+      // the frame, so every square on the stage jumped smaller and then filled the space again
+      // as the packing grew into it. Easing it over the dwell is the same room reached without
+      // the lurch.
       trace = open;
-      seen = 1;
-      held = trace;
+      seen = smootherstep(ramp(t, 0, sc.moveStart));
+      held = lerp(openSide(p.n), open, seen);
     } else if (!optimizing && t < Math.max(sc.moveEnd, sc.containerEnd)) {
       // **The box never animates growing** (the owner, 2026-09-21). It takes the larger side at
       // once and darkens into it, over the light grey already drawn there, so the only motion
