@@ -157,7 +157,7 @@ Each entry summarizes one user-level research window. Cycle slots are wall-clock
 | [session-140](agent-sessions/session-140-lb-survey.md) | stopped | contemporaneous | `review-planning-oversight` (process) | `review-planning-oversight` (process) | 3 | think-8x4t | Continue H-216 under think-qqzs. |
 | [session-141](agent-sessions/session-141-n100-research.md) | stopped | contemporaneous | `review-planning-oversight` (process) | `review-planning-oversight` (process) | 3 | think-ul7y | Continue H-216 under think-qqzs. |
 | [session-142](agent-sessions/session-142-stack-correctness.md) | completed | contemporaneous | `pipeline-improvement` (correctness) | `factual-review` (correctness) | 2 | think-gz4k | Return to H-216 under think-qqzs. |
-| [session-148](agent-sessions/session-148-n17-external-intake.md) | completed | contemporaneous | `research-survey` (correctness) | `documentation-pass` (process) | 3 | think-pcd0 | Open the pull request and reconcile the T-031 identifier with pull request 208, which claims the same number from the open overnight stack. |
+| [session-148](agent-sessions/session-148-n17-external-intake.md) | completed | contemporaneous | `research-survey` (correctness) | `documentation-pass` (process) | 3 | think-pcd0 | Reconcile the T-031 identifier with pull request 208, which claims the same number from the open overnight stack, under think-pcd0. |
 
 ### Workflow summary
 
