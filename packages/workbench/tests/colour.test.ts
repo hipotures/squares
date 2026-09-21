@@ -80,6 +80,62 @@ test("colour transformation endpoints are exact and invalid palette shapes fail 
   );
 });
 
+/** A hex colour's OKLab chroma, which is what a blend must not let sag. */
+function chromaOf(colours: ReturnType<typeof createColourSystem>, hex: string): number {
+  // `trim` scales chroma toward neutral, so the distance a full trim moves a colour is that
+  // colour's chroma, read through the system's own conversions rather than a second copy.
+  const neutral = colours.trim(hex, 0);
+  const channels = (value: string): number[] =>
+    [1, 3, 5].map((at) => Number.parseInt(value.slice(at, at + 2), 16));
+  const [r, g, b] = channels(hex);
+  const [nr, ng, nb] = channels(neutral);
+  return Math.hypot((r ?? 0) - (nr ?? 0), (g ?? 0) - (ng ?? 0), (b ?? 0) - (nb ?? 0));
+}
+
+test("a blend between distant hues keeps its chroma instead of sagging through grey", () => {
+  const colours = createColourSystem(fixtureColour());
+  // Green to scarlet is close to a half turn of hue, and it is the blend the page runs most:
+  // every newly placed square is tinted along it. Lerping OKLab's rectangular a and b walked a
+  // chord across the neutral axis, so the midpoint came out greyer than either end and the
+  // square flashed on its way in.
+  const green = "#3f8a63";
+  const scarlet = "#a43b47";
+  const ends = Math.min(chromaOf(colours, green), chromaOf(colours, scarlet));
+  for (const progress of [0.25, 0.5, 0.75]) {
+    const middle = colours.mix(green, scarlet, progress);
+    assert.ok(
+      chromaOf(colours, middle) > ends * 0.8,
+      `${middle} at ${progress} sags to ${chromaOf(colours, middle)} against ends ${ends}`,
+    );
+  }
+});
+
+test("a blend takes the short way round the hue wheel and neutrals borrow a hue", () => {
+  const colours = createColourSystem(fixtureColour());
+  // These two straddle the seam where hue wraps: `labToPolar` reports them at +175.6 and
+  // -178.2 degrees, so the short way between them is 6 degrees through teal and the long way
+  // is 354 degrees through green, yellow, red and blue. Both endpoints are teal, so red is
+  // their weakest channel; a midpoint where red has become the strongest is a blend that
+  // travelled the long way, which is the same defect as the chord, wearing a different shape.
+  const greenSide = "#2fa88f";
+  const blueSide = "#2fa494";
+  const channels = (value: string): number[] =>
+    [1, 3, 5].map((at) => Number.parseInt(value.slice(at, at + 2), 16));
+  for (const progress of [0.25, 0.5, 0.75]) {
+    const middle = colours.mix(greenSide, blueSide, progress);
+    const [red, green, blue] = channels(middle);
+    assert.ok(
+      (red ?? 0) < (green ?? 0) && (red ?? 0) < (blue ?? 0),
+      `${middle} at ${progress} left the short arc between ${greenSide} and ${blueSide}`,
+    );
+  }
+  // A neutral endpoint has no hue of its own; reading its noisy angle would swing the blend
+  // through hues neither colour has.
+  const fromGrey = colours.mix("#808080", "#3f8a63", 0.5);
+  assert.ok(chromaOf(colours, fromGrey) > 0, fromGrey);
+  assert.equal(colours.mix("#808080", "#3f8a63", 1), "#3f8a63");
+});
+
 test("one scene receipt carries fills, contacts, overlap, and touching evidence", () => {
   const colours = createColourSystem(fixtureColour());
   const scene: SceneFrame = {

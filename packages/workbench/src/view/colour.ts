@@ -204,6 +204,35 @@ function oklchHex(lightness: number, chromaValue: number, hueDegrees: number): s
   return labToHex(lightness, chroma * Math.cos(hue), chroma * Math.sin(hue));
 }
 
+/**
+ * OKLab's rectangular `a`/`b` as polar chroma and hue, hue in degrees.
+ *
+ * A near-neutral colour has no meaningful hue -- the angle of a point at the origin is noise --
+ * so `chroma` is what a caller checks before trusting `hue`.
+ */
+function labToPolar(lab: Lab): { lightness: number; chroma: number; hue: number } {
+  const chroma = Math.hypot(lab[1], lab[2]);
+  return {
+    lightness: lab[0],
+    chroma,
+    hue: (Math.atan2(lab[2], lab[1]) * 180) / Math.PI,
+  };
+}
+
+/** Below this OKLab chroma a colour is neutral and takes the other endpoint's hue. */
+const NEUTRAL_CHROMA = 1e-4;
+
+/**
+ * The shortest way round from one hue to another, in degrees, signed.
+ *
+ * Without the fold, a mix from 350 degrees to 10 travels 340 degrees the wrong way through
+ * every other hue on the wheel -- the same artifact a chord through the middle produces, just
+ * with a different shape.
+ */
+function hueDelta(from: number, to: number): number {
+  return ((((to - from) % 360) + 540) % 360) - 180;
+}
+
 function hexToLab(hexValue: string): Lab {
   const hex = checkedHex(hexValue);
   const red = srgbToLinear(Number.parseInt(hex.slice(1, 3), 16) / 255);
@@ -261,6 +290,18 @@ export function createColourSystem(config: CorpusColour): ColourSystem {
     labCache.set(normalized, converted);
     return converted;
   };
+  /**
+   * Blend two colours the way the palette was built: polar, in OKLCH.
+   *
+   * Lerping OKLab's rectangular `a` and `b` walks a CHORD across the a-b plane, and a chord
+   * passes nearer the neutral axis than either of its endpoints. The further apart the two
+   * hues, the deeper the chroma sags in the middle, and the sag reads as a grey flash. The
+   * worst case here is also the most visible one -- a green fill blended toward the new
+   * square's scarlet is close to a half turn of hue, so the chord ran almost through grey.
+   *
+   * Lerping lightness, chroma and hue instead keeps chroma up across the whole blend, and
+   * `oklchHex` gamut-maps whatever comes out. This is the same shape `rampFill` already used.
+   */
   const mix = (left: string, right: string, progressValue: number): string => {
     const progress = clamp01(progressValue);
     if (progress <= 0) {
@@ -269,12 +310,17 @@ export function createColourSystem(config: CorpusColour): ColourSystem {
     if (progress >= 1) {
       return checkedHex(right);
     }
-    const from = toLab(left);
-    const to = toLab(right);
-    return labToHex(
-      lerp(from[0], to[0], progress),
-      lerp(from[1], to[1], progress),
-      lerp(from[2], to[2], progress),
+    const from = labToPolar(toLab(left));
+    const to = labToPolar(toLab(right));
+    // A neutral endpoint has no hue to travel from or to, so it borrows the other's and moves
+    // in chroma alone. Reading its noisy angle instead would swing the blend through hues
+    // neither colour has.
+    const fromHue = from.chroma < NEUTRAL_CHROMA ? to.hue : from.hue;
+    const toHue = to.chroma < NEUTRAL_CHROMA ? from.hue : to.hue;
+    return oklchHex(
+      lerp(from.lightness, to.lightness, progress),
+      lerp(from.chroma, to.chroma, progress),
+      fromHue + hueDelta(fromHue, toHue) * progress,
     );
   };
   const desaturate = (hex: string, levelValue: number, floor: number): string => {
