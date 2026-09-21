@@ -29,7 +29,8 @@ session:
   - packing/campaign/resource-usage/agent-ae65c7226abcb1a98.yaml
   - packing/campaign/resource-usage/d71b369b-163a-561c-a698-2900d1d8109e.yaml
   primary_bead: think-b7pr
-  status: in_progress
+  status: completed
+  ended_at: '2026-09-21T19:09:44Z'
   goal: >-
     Land the agenda-040 overnight stack and the n = 17 intake on main with every
     confirmed review finding repaired at the integration point, decide what the record
@@ -157,7 +158,7 @@ session:
       Turn the session's three scratchpad analyses into retained records - a ranked slate,
       a dated currency review and this session record - and reconcile the generated views
       and censuses they move.
-    status: in_progress
+    status: completed
     entered_by: evidence_checkpoint
     switch_reason: >-
       The correctness and survey obligations are discharged; what remains is what the
@@ -173,12 +174,22 @@ session:
       cd packing && uv run --frozen --all-extras --group dev packing-validate --records --jobs 1
     kill_condition: A record would state a validation that was not run or name a run id that does not exist.
     fallback: Land the records the evidence supports and name what is missing in the pull request.
-    outcome: null
+    outcome: >-
+      Three records landed: this one, `X-041` with its ranked slate and its sharpest
+      claim flagged V0/C0, and the currency audit as a dated review mapped in the
+      document map. Every generated view was regenerated rather than hand-resolved, and
+      the synopsis censuses for sessions and explorations are reconciled. Main moved
+      twice underneath the branch while this ran - OR-17 merged as pull request 212 and
+      the Kleddamag retention as 213 - and all three records were corrected to say what
+      happened rather than what was open.
     evidence:
     - packing/campaign/explorations/X-041-after-the-n17-certified-bound.md
     - docs/project/reviews/review-2026-09-21-derived-artifact-currency.md
-    stop_reason: null
-    next_action: Certify this record on the hosted fast gate, then close it in a record-only commit.
+    - docs/project/document-map.yaml
+    stop_reason: >-
+      The three records are on the branch, every generated view agrees with its source,
+      and the hosted fast gate certifies the tree that is handed over.
+    next_action: Run the W5 efficiency block under `think-zmos`.
   budget:
     wall_minutes: 850
   stop_conditions:
@@ -191,7 +202,11 @@ session:
     before: >-
       PRs 204-209 and 211 open with four confirmed review findings unrepaired; main at
       9fe9999d carries none of them; nothing on record about Kleddamag's 461300/99853.
-    after: null
+    after: >-
+      PRs 204-209 and 211 merged, with all four confirmed findings repaired at the
+      integration point; main carries T-032 at 461300/99999; the Kleddamag artifact is
+      replayed, reviewed and retained at V4/C3 with C4 blocked and no bound moved; and
+      the session's three analyses are records rather than scratchpad files.
   delegations:
   - task: Replay Kleddamag's v1.0.0 certificate through both of its own checkers
     operator: replay lane; Opus xhigh
@@ -299,11 +314,17 @@ session:
   - packing/campaign/explorations/X-041-after-the-n17-certified-bound.md
   - docs/project/reviews/review-2026-09-21-derived-artifact-currency.md
   checks:
-  - 'packing-validate --records --jobs 1 on this branch: pending at the time this record was authored.'
-  stop_reason: null
+  - 'packing-validate --records --jobs 1, at ae77f600 and again over this closing change: one step failed on each, `terminal sessions name the gate that certified them`, for sessions 087-090 and 112-113. The same step fails identically on origin/main in the same clone, so it is think-qsn2 rather than a property of this branch.'
+  - 'full gate: fast at ae77f600: passed (hosted run 35642570383; pages run 35642570509)'
+  stop_reason: >-
+    The three records are landed and certified on the hosted fast gate. The agenda-040
+    closeout the plan forecast for the last block, and the W5 efficiency block OR-12
+    requires, are both named as outstanding rather than attempted here.
   next_action: >-
-    Certify this record on the hosted fast gate, then close it in a record-only commit
-    that declares that gate with its real run ids.
+    Run the W5 efficiency block under `think-zmos`: the deep gate's exhaustive-tier step
+    against its own declared budget, the deferred-steps wall, and the duplicate run over
+    a byte-identical tree, now that every routine gate has a wall ceiling to be measured
+    against.
 ---
 # Session 150: Correctness First, Then the `n = 17` Ladder
 

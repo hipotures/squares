@@ -7,84 +7,139 @@ rollup:
   source:
     harness: claude-code
     filename: agent-ac18860fbbd613485.jsonl
-    sha256: 7d02b7d18775e8f61a6a37da4dd1ff1439b2ba359957497826b74a869bb01a8a
-    bytes: 1025368
-    records: 312
+    sha256: 65fe1abee201d21b04ba2cfe83919025bd555ddfaa4bbb8bc25841ef594ac28d
+    bytes: 1696409
+    records: 636
     session_id: d71b369b-163a-561c-a698-2900d1d8109e
     harness_versions:
     - 2.1.278
   span:
     started_at: '2026-09-21T18:37:02.249Z'
-    ended_at: '2026-09-21T18:50:06.053Z'
-    wall_seconds: 783.804
+    ended_at: '2026-09-21T19:09:56.951Z'
+    wall_seconds: 1974.702
   turns:
-    assistant: 139
-    sidechain: 139
+    assistant: 280
+    sidechain: 280
     by_model:
-      claude-opus-5: 139
+      claude-opus-5: 280
     by_thinking_level:
-      xhigh: 139
+      xhigh: 280
     by_model_and_thinking_level:
-      claude-opus-5 @ xhigh: 139
+      claude-opus-5 @ xhigh: 280
     by_branch:
-      claude/n17-mira-guzhou-4613-intake: 139
+      claude/n17-mira-guzhou-4613-intake: 280
     latency:
-      count: 139
-      total_seconds: 673.945
-      median_seconds: 2.493
+      count: 280
+      total_seconds: 1384.169
+      median_seconds: 2.833
       max_seconds: 83.544
   tokens:
-    cache_creation_input_tokens: 374570
-    cache_read_input_tokens: 18087581
+    cache_creation_input_tokens: 553363
+    cache_read_input_tokens: 55435674
     ephemeral_1h_input_tokens: 0
-    ephemeral_5m_input_tokens: 374570
-    input_tokens: 278
-    output_tokens: 49663
-    thinking_tokens: 21868
+    ephemeral_5m_input_tokens: 553363
+    input_tokens: 560
+    output_tokens: 100803
+    thinking_tokens: 41583
   tokens_by_thinking_level:
     xhigh:
-      cache_creation_input_tokens: 374570
-      cache_read_input_tokens: 18087581
+      cache_creation_input_tokens: 553363
+      cache_read_input_tokens: 55435674
       ephemeral_1h_input_tokens: 0
-      ephemeral_5m_input_tokens: 374570
-      input_tokens: 278
-      output_tokens: 49663
-      thinking_tokens: 21868
+      ephemeral_5m_input_tokens: 553363
+      input_tokens: 560
+      output_tokens: 100803
+      thinking_tokens: 41583
   tool_calls:
-    total: 87
-    total_seconds: 123.11
-    share_of_wall: 0.1571
-    errors: 0
+    total: 175
+    total_seconds: 604.133
+    share_of_wall: 0.3059
+    errors: 3
     denied: 0
     unpaired_results: 0
     outstanding_at_snapshot: 1
     one_off_code:
-      count: 7
-      total_seconds: 19.833
-      median_seconds: 1.792
+      count: 23
+      total_seconds: 55.928
+      median_seconds: 2.045
       max_seconds: 8.093
     by_tool:
       Bash:
-        count: 87
-        total_seconds: 123.11
-        median_seconds: 0.198
-        max_seconds: 14.808
+        count: 172
+        total_seconds: 601.025
+        median_seconds: 1.42
+        max_seconds: 122.028
+      Monitor:
+        count: 2
+        total_seconds: 3.072
+        median_seconds: 1.536
+        max_seconds: 1.556
+      ToolSearch:
+        count: 1
+        total_seconds: 0.036
+        median_seconds: 0.036
+        max_seconds: 0.036
     by_command:
+      uv run packing-validate:
+        count: 2
+        total_seconds: 190.084
+        median_seconds: 95.042
+        max_seconds: 122.028
+      diff && packing-validate:
+        count: 1
+        total_seconds: 68.926
+        median_seconds: 68.926
+        max_seconds: 68.926
+      head:
+        count: 13
+        total_seconds: 33.664
+        median_seconds: 0.238
+        max_seconds: 22.548
+      devtools.$m && packing-ledger && devtools.close_session && rendered && git:
+        count: 1
+        total_seconds: 31.495
+        median_seconds: 31.495
+        max_seconds: 31.495
+      (uv && pgrep:
+        count: 1
+        total_seconds: 21.873
+        median_seconds: 21.873
+        max_seconds: 21.873
+      python3:
+        count: 9
+        total_seconds: 19.515
+        median_seconds: 1.864
+        max_seconds: 4.106
       git && devtools.close_session:
         count: 1
         total_seconds: 14.808
         median_seconds: 14.808
         max_seconds: 14.808
+      devtools.close_session && packing-ledger:
+        count: 1
+        total_seconds: 14.218
+        median_seconds: 14.218
+        max_seconds: 14.218
       packing-ledger && devtools.render_results && devtools.close_session:
         count: 1
         total_seconds: 12.874
         median_seconds: 12.874
         max_seconds: 12.874
-      head:
-        count: 10
-        total_seconds: 8.835
-        median_seconds: 0.135
-        max_seconds: 3.633
+      git && git && git:
+        count: 4
+        total_seconds: 12.075
+        median_seconds: 2.714
+        max_seconds: 4.792
+      sed:
+        count: 34
+        total_seconds: 9.619
+        median_seconds: 0.169
+        max_seconds: 1.746
+      ls:
+        count: 7
+        total_seconds: 9.598
+        median_seconds: 0.491
+        max_seconds: 5.155
       tbd show:
         count: 1
         total_seconds: 8.093
@@ -95,36 +150,56 @@ rollup:
         total_seconds: 8.053
         median_seconds: 8.053
         max_seconds: 8.053
-      sed:
-        count: 27
-        total_seconds: 6.755
-        median_seconds: 0.162
-        max_seconds: 1.561
+      git && devtools.check_synopsis && devtools.render_results && devtools.render_evidence_inventory:
+        count: 1
+        total_seconds: 7.091
+        median_seconds: 7.091
+        max_seconds: 7.091
+      grep:
+        count: 22
+        total_seconds: 6.96
+        median_seconds: 0.177
+        max_seconds: 1.665
       (tbd && ls:
         count: 1
         total_seconds: 6.062
         median_seconds: 6.062
         max_seconds: 6.062
+      git && git:
+        count: 3
+        total_seconds: 5.936
+        median_seconds: 1.784
+        max_seconds: 2.375
+      cd:
+        count: 5
+        total_seconds: 5.656
+        median_seconds: 1.517
+        max_seconds: 2.045
       cat:
-        count: 4
-        total_seconds: 5.329
-        median_seconds: 0.894
+        count: 5
+        total_seconds: 5.391
+        median_seconds: 0.084
         max_seconds: 3.461
       git && ls && uv:
         count: 1
         total_seconds: 5.091
         median_seconds: 5.091
         max_seconds: 5.091
-      python3:
+      (uv:
         count: 3
-        total_seconds: 5.002
-        median_seconds: 1.638
-        max_seconds: 1.792
+        total_seconds: 4.861
+        median_seconds: 1.59
+        max_seconds: 1.69
       timeout uv sync:
         count: 1
         total_seconds: 4.661
         median_seconds: 4.661
         max_seconds: 4.661
+      Opus && packing-ledger:
+        count: 1
+        total_seconds: 4.406
+        median_seconds: 4.406
+        max_seconds: 4.406
       ? "packing-validate && H-226s `regime`, where a 25-point red set was corrected\n   \
         \   to Bentzs && packing-validate && it && packing-validate && no && what && packing-validate\
         \ && the && main && nothing && that && no && two && Opus && packing-validate && the\
@@ -138,16 +213,37 @@ rollup:
         total_seconds: 4.03
         median_seconds: 4.03
         max_seconds: 4.03
-      grep:
-        count: 10
-        total_seconds: 3.796
-        median_seconds: 0.177
-        max_seconds: 1.665
-      cd:
+      git && git && git && they && none && git && git:
+        count: 1
+        total_seconds: 3.99
+        median_seconds: 3.99
+        max_seconds: 3.99
+      gh api:
+        count: 1
+        total_seconds: 3.929
+        median_seconds: 3.929
+        max_seconds: 3.929
+      git push:
+        count: 1
+        total_seconds: 3.653
+        median_seconds: 3.653
+        max_seconds: 3.653
+      ? 4 && check_generated_markdown.py` && Matches && Flowmark && Case-fold && 4 && check_generated_markdown.py`
+        && Matches && Flowmark && Case-fold && devtools.check_generated_markdown
+      : count: 2
+        total_seconds: 3.549
+        median_seconds: 1.775
+        max_seconds: 1.881
+      gh && gh:
+        count: 1
+        total_seconds: 3.452
+        median_seconds: 3.452
+        max_seconds: 3.452
+      tail:
         count: 4
-        total_seconds: 3.611
-        median_seconds: 0.842
-        max_seconds: 1.842
+        total_seconds: 3.395
+        median_seconds: 0.195
+        max_seconds: 2.981
       ? "Sessions && 149 && 91 && 58 && all && ,\n   && Sessions && 150 && 91 && 58 && 1 &&\
         \ ),\n ( && Explorations && 38 && 24 && 14 && ,\n   && Explorations && 39 && 24 &&\
         \ 15 && devtools.check_synopsis"
@@ -155,148 +251,149 @@ rollup:
         total_seconds: 3.314
         median_seconds: 3.314
         max_seconds: 3.314
+      pkill && pkill && pgrep:
+        count: 1
+        total_seconds: 3.249
+        median_seconds: 3.249
+        max_seconds: 3.249
+      pgrep:
+        count: 4
+        total_seconds: 2.91
+        median_seconds: 0.273
+        max_seconds: 2.173
+      select(.head_sha && startswith(ae77f600)):
+        count: 1
+        total_seconds: 2.695
+        median_seconds: 2.695
+        max_seconds: 2.695
       gh pr:
         count: 1
         total_seconds: 2.663
         median_seconds: 2.663
         max_seconds: 2.663
-      git && git:
+      no && no && no && the && the:
         count: 1
-        total_seconds: 2.375
-        median_seconds: 2.375
-        max_seconds: 2.375
-      devtools.render_document_map && devtools.check_synopsis:
+        total_seconds: 2.66
+        median_seconds: 2.66
+        max_seconds: 2.66
+      pkill && pgrep && rm:
         count: 1
-        total_seconds: 2.083
-        median_seconds: 2.083
-        max_seconds: 2.083
-      ls:
-        count: 3
-        total_seconds: 1.975
-        median_seconds: 0.234
-        max_seconds: 1.513
-      cp:
+        total_seconds: 2.419
+        median_seconds: 2.419
+        max_seconds: 2.419
+      +%Y-%m-%dT%H:%M:%SZ) && python3 && devtools.check_session_clocks:
         count: 1
-        total_seconds: 1.734
-        median_seconds: 1.734
-        max_seconds: 1.734
-      and:
-        count: 1
-        total_seconds: 1.698
-        median_seconds: 1.698
-        max_seconds: 1.698
-      nothing:
-        count: 1
-        total_seconds: 1.594
-        median_seconds: 1.594
-        max_seconds: 1.594
-      (uv:
-        count: 1
-        total_seconds: 1.581
-        median_seconds: 1.581
-        max_seconds: 1.581
-      ? "the && ,\n    Not"
-      : count: 1
-        total_seconds: 1.478
-        median_seconds: 1.478
-        max_seconds: 1.478
-      devtools.log_rollup && ls:
-        count: 1
-        total_seconds: 0.425
-        median_seconds: 0.425
-        max_seconds: 0.425
-      find:
-        count: 1
-        total_seconds: 0.347
-        median_seconds: 0.347
-        max_seconds: 0.347
-      ls && ls && ls:
-        count: 2
-        total_seconds: 0.251
-        median_seconds: 0.125
-        max_seconds: 0.159
-      ls && ls:
-        count: 2
-        total_seconds: 0.17
-        median_seconds: 0.085
-        max_seconds: 0.093
-      ls && ^sync:
-        count: 1
-        total_seconds: 0.073
-        median_seconds: 0.073
-        max_seconds: 0.073
-      ls && rollup && close:
-        count: 1
-        total_seconds: 0.065
-        median_seconds: 0.065
-        max_seconds: 0.065
+        total_seconds: 2.409
+        median_seconds: 2.409
+        max_seconds: 2.409
     by_command_family:
-      inspection:
-        count: 62
-        total_seconds: 35.649
-        median_seconds: 0.164
-        max_seconds: 8.053
-      vcs:
-        count: 5
-        total_seconds: 28.967
-        median_seconds: 4.03
-        max_seconds: 14.808
-      other:
-        count: 7
-        total_seconds: 20.388
-        median_seconds: 1.698
-        max_seconds: 6.062
       project:
-        count: 4
-        total_seconds: 19.666
-        median_seconds: 3.183
-        max_seconds: 12.874
+        count: 12
+        total_seconds: 261.155
+        median_seconds: 3.198
+        max_seconds: 122.028
+      inspection:
+        count: 94
+        total_seconds: 146.512
+        median_seconds: 0.177
+        max_seconds: 68.926
+      other:
+        count: 29
+        total_seconds: 81.066
+        median_seconds: 1.881
+        max_seconds: 21.873
+      vcs:
+        count: 19
+        total_seconds: 72.506
+        median_seconds: 3.452
+        max_seconds: 14.808
       toolchain:
-        count: 4
-        total_seconds: 13.095
-        median_seconds: 1.715
+        count: 10
+        total_seconds: 27.608
+        median_seconds: 2.035
         max_seconds: 8.093
-      shell:
-        count: 4
-        total_seconds: 3.611
-        median_seconds: 0.842
-        max_seconds: 1.842
       filesystem:
-        count: 1
-        total_seconds: 1.734
-        median_seconds: 1.734
-        max_seconds: 1.734
+        count: 4
+        total_seconds: 7.43
+        median_seconds: 1.832
+        max_seconds: 2.039
+      shell:
+        count: 5
+        total_seconds: 5.656
+        median_seconds: 1.517
+        max_seconds: 2.045
     invoked:
-      cd: 79
-      head: 35
-      echo: 32
-      sed: 31
-      grep: 26
-      tail: 19
-      ls: 19
-      cat: 5
-      uv run packing-validate: 5
-      the: 4
-      wc: 3
-      python3: 3
+      cd: 149
+      echo: 94
+      head: 60
+      tail: 59
+      grep: 49
+      sed: 40
+      ls: 24
+      sleep: 15
+      git status: 12
+      wc: 10
+      python3: 10
+      the: 8
+      uv run packing-validate: 8
+      cat: 7
+      pgrep: 7
+      true): 6
+      (uv: 5
+      'no': 5
+      Sessions: 5
+      '58': 5
+      The: 5
+      git log: 4
+      and: 4
+      '91': 4
+      '150': 4
+      uv run python -m devtools.close_session: 4
+      git diff: 4
+      '4': 4
+      check_generated_markdown.py`: 4
+      Matches: 4
+      Flowmark: 4
+      Case-fold: 4
+      git add: 4
+      sort: 3
+      uv run python -m devtools.check_synopsis: 3
+      '1': 3
+      uv run packing-ledger render: 3
+      uv run python -m devtools.log_rollup: 3
+      git push: 3
+      gh api: 3
+      pkill: 3
+      rm: 3
+      git fetch: 2
       find: 2
-      and: 2
+      printf: 2
+      date: 2
+      cp: 2
       nothing: 2
-      'no': 2
-      uv run python -m devtools.check_synopsis: 2
-      Sessions: 2
-      '91': 2
-      '58': 2
+      main: 2
+      Opus: 2
+      all: 2
       ? ",\n  "
       : 2
       Explorations: 2
       '24': 2
-      uv run python -m devtools.close_session: 2
-      uv run python -m devtools.log_rollup: 2
-      git fetch: 1
-      git log: 1
+      uv run python -m devtools.render_results: 2
+      diff: 2
+      uv run python -m devtools.check_generated_markdown: 2
+      uv run python -m devtools.render_pr_rollup: 2
+      Session: 2
+      session-150-n17-consolidation-and-correctness.md`: 2
+      '`X-041`,': 2
+      X-041-after-the-n17-certified-bound.md`: 2
+      review-2026-09-21-derived-artifact-currency.md`: 2
+      '##': 2
+      uv run packing-ledger check: 2
+      i: 2
+      'true': 2
+      select(.head_sha: 2
+      startswith(ae77f600)): 2
       git worktree: 1
-      sort: 1
       uniq: 1
       rollup: 1
       close: 1
@@ -305,89 +402,136 @@ rollup:
       which: 1
       uv: 1
       timeout uv sync: 1
-      (uv: 1
       gh pr: 1
       (tbd: 1
-      printf: 1
       tbd show: 1
-      date: 1
-      cp: 1
       ? ",\n    Not"
       : 1
       ? "H-226s `regime`, where a 25-point red set was corrected\n      to Bentzs"
       : 1
       it: 1
       what: 1
-      main: 1
       that: 1
       two: 1
-      Opus: 1
       every: 1
       both: 1
       '`deferred-steps`': 1
       uv run python -m devtools.render_document_map: 1
       '149': 1
-      all: 1
-      '150': 1
-      '1': 1
       ? "),\n ("
       : 1
       '38': 1
       '14': 1
       '39': 1
       '15': 1
-      uv run packing-ledger render: 1
-      uv run python -m devtools.render_results: 1
-      git diff: 1
+      uvx flowmark: 1
+      X-020: 1
+      xargs: 1
+      Work: 1
+      What: 1
+      Evidence: 1
+      Why: 1
+      Disposition: 1
+      Four: 1
+      Certification: 1
+      —: 1
+      Eleven: 1
+      retire-success: 1
+      '`A1': 1
+      Nothing: 1
+      guard-refused: 1
+      fix-and-rerun: 1
+      Main: 1
+      Read-only: 1
+      Nothing.: 1
+      agenda-040-overnight-lower-bound-loop.md`,: 1
+      never-opened: 1
+      Area: 1
+      Result: 1
+      Principal: 1
+      fifteen: 1
+      Campaign: 1
+      Review: 1
+      document-map.yaml`: 1
+      Regenerated: 1
+      'No': 1
+      '`SYNOPSIS.md`': 1
+      ledger.md`: 1
+      session-close-report.yaml`: 1
+      its: 1
+      '`B1`,': 1
+      uv run python -m devtools.check_pr_description: 1
+      jobs: 1
+      ps: 1
+      or: 1
+      startswith(9fe3bc5b))): 1
+      git merge-base: 1
+      git show: 1
+      git merge: 1
+      uv run python -m devtools.$m: 1
+      rendered: 1
+      uv run python -m devtools.render_evidence_inventory: 1
+      git commit: 1
+      they: 1
+      none: 1
+      git rev-parse: 1
+      pages: 1
+      '`think-qsn2`,': 1
+      ? ",\n                  "
+      : 1
+      '92': 1
+      python3 close150.py: 1
+      +%Y-%m-%dT%H:%M:%SZ): 1
+      uv run python -m devtools.check_session_clocks: 1
     invoked_families:
-      inspection: 142
-      shell: 114
-      other: 48
-      project: 14
-      vcs: 6
-      toolchain: 5
-      filesystem: 1
+      shell: 265
+      inspection: 258
+      other: 183
+      vcs: 40
+      project: 34
+      toolchain: 13
+      filesystem: 5
     by_shell_shape:
       compound:
-        count: 70
-        total_seconds: 79.86
-        median_seconds: 0.173
-        max_seconds: 14.808
+        count: 135
+        total_seconds: 508.314
+        median_seconds: 0.242
+        max_seconds: 122.028
+      python_heredoc:
+        count: 15
+        total_seconds: 31.988
+        median_seconds: 2.045
+        max_seconds: 4.406
       python_inline:
-        count: 4
-        total_seconds: 13.249
-        median_seconds: 1.792
+        count: 8
+        total_seconds: 23.94
+        median_seconds: 2.076
         max_seconds: 8.093
+      heredoc:
+        count: 7
+        total_seconds: 19.889
+        median_seconds: 1.827
+        max_seconds: 4.792
       pipeline:
-        count: 4
-        total_seconds: 12.562
+        count: 6
+        total_seconds: 18.213
         median_seconds: 3.062
         max_seconds: 4.03
-      heredoc:
-        count: 4
-        total_seconds: 9.28
-        median_seconds: 1.701
-        max_seconds: 4.284
-      python_heredoc:
-        count: 3
-        total_seconds: 6.584
-        median_seconds: 1.792
-        max_seconds: 3.314
       simple:
-        count: 2
-        total_seconds: 1.575
-        median_seconds: 0.788
+        count: 3
+        total_seconds: 1.753
+        median_seconds: 0.178
         max_seconds: 1.513
     by_thinking_level:
       xhigh:
-        count: 87
-        total_seconds: 123.11
-        median_seconds: 0.198
-        max_seconds: 14.808
+        count: 175
+        total_seconds: 604.133
+        median_seconds: 1.478
+        max_seconds: 122.028
     shell_traits:
-      pipes: 44
-      redirects_output: 5
-      substitutes: 2
+      pipes: 93
+      redirects_output: 26
+      substitutes: 8
   session_events:
     compact_boundaries: 0
     stop_hook_summaries: 0

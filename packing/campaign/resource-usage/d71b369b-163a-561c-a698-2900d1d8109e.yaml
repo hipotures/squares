@@ -7,57 +7,57 @@ rollup:
   source:
     harness: claude-code
     filename: d71b369b-163a-561c-a698-2900d1d8109e.jsonl
-    sha256: a5c347bd5078c680e27824858efd4e94c872657faca4076c2c1d9bce8d6f94ed
-    bytes: 4776509
-    records: 1946
+    sha256: 6a604420532e9ed2c812de4eeabe03bacb17ae3c28e439910c54ffe15f9d4b71
+    bytes: 5223470
+    records: 2226
     session_id: d71b369b-163a-561c-a698-2900d1d8109e
     harness_versions:
     - 2.1.278
   span:
     started_at: '2026-09-21T08:25:55.093Z'
-    ended_at: '2026-09-21T18:49:12.211Z'
-    wall_seconds: 37397.118
+    ended_at: '2026-09-21T19:09:04.951Z'
+    wall_seconds: 38589.858
   turns:
-    assistant: 658
+    assistant: 724
     sidechain: 0
     by_model:
-      claude-opus-5: 658
+      claude-opus-5: 724
     by_thinking_level:
-      xhigh: 658
+      xhigh: 724
     by_model_and_thinking_level:
-      claude-opus-5 @ xhigh: 658
+      claude-opus-5 @ xhigh: 724
     by_branch:
       fix/chunk5-review: 277
-      claude/n17-mira-guzhou-4613-intake: 209
+      claude/n17-mira-guzhou-4613-intake: 275
       main: 108
       claude/beautiful-brown-39orpo: 59
       claude/n17-kleddamag-intake: 5
     latency:
-      count: 658
-      total_seconds: 3413.646
-      median_seconds: 2.332
+      count: 724
+      total_seconds: 3687.383
+      median_seconds: 2.411
       max_seconds: 541.837
   tokens:
-    cache_creation_input_tokens: 1802206
-    cache_read_input_tokens: 195993701
-    ephemeral_1h_input_tokens: 1802206
+    cache_creation_input_tokens: 1897785
+    cache_read_input_tokens: 232086626
+    ephemeral_1h_input_tokens: 1897785
     ephemeral_5m_input_tokens: 0
-    input_tokens: 1316
-    output_tokens: 713093
-    thinking_tokens: 350840
+    input_tokens: 1448
+    output_tokens: 759453
+    thinking_tokens: 367283
   tokens_by_thinking_level:
     xhigh:
-      cache_creation_input_tokens: 1802206
-      cache_read_input_tokens: 195993701
-      ephemeral_1h_input_tokens: 1802206
+      cache_creation_input_tokens: 1897785
+      cache_read_input_tokens: 232086626
+      ephemeral_1h_input_tokens: 1897785
       ephemeral_5m_input_tokens: 0
-      input_tokens: 1316
-      output_tokens: 713093
-      thinking_tokens: 350840
+      input_tokens: 1448
+      output_tokens: 759453
+      thinking_tokens: 367283
   tool_calls:
-    total: 274
-    total_seconds: 31654.291
-    share_of_wall: 0.8464
+    total: 298
+    total_seconds: 32154.954
+    share_of_wall: 0.8332
     errors: 3
     denied: 2
     unpaired_results: 0
@@ -69,9 +69,9 @@ rollup:
       max_seconds: 9.975
     by_tool:
       Bash:
-        count: 232
-        total_seconds: 31565.32
-        median_seconds: 2.6
+        count: 254
+        total_seconds: 32061.97
+        median_seconds: 2.748
         max_seconds: 24676.775
       Agent:
         count: 14
@@ -79,9 +79,9 @@ rollup:
         median_seconds: 2.119
         max_seconds: 12.17
       SendMessage:
-        count: 7
-        total_seconds: 13.494
-        median_seconds: 1.892
+        count: 9
+        total_seconds: 17.507
+        median_seconds: 1.919
         max_seconds: 2.282
       AskUserQuestion:
         count: 1
@@ -130,9 +130,9 @@ rollup:
         median_seconds: 215.549
         max_seconds: 544.251
       gh && gh:
-        count: 8
-        total_seconds: 525.622
-        median_seconds: 6.623
+        count: 9
+        total_seconds: 630.965
+        median_seconds: 7.273
         max_seconds: 249.517
       head:
         count: 16
@@ -144,11 +144,21 @@ rollup:
         total_seconds: 338.465
         median_seconds: 30.017
         max_seconds: 277.045
+      gh && gh && git:
+        count: 1
+        total_seconds: 154.19
+        median_seconds: 154.19
+        max_seconds: 154.19
       uv run packing-validate:
         count: 1
         total_seconds: 120.702
         median_seconds: 120.702
         max_seconds: 120.702
+      git && git && gh && gh:
+        count: 1
+        total_seconds: 114.106
+        median_seconds: 114.106
+        max_seconds: 114.106
       flowmark && git && packing-validate:
         count: 2
         total_seconds: 78.473
@@ -175,14 +185,24 @@ rollup:
         median_seconds: 2.668
         max_seconds: 15.596
       git && git:
-        count: 11
-        total_seconds: 23.969
-        median_seconds: 1.827
+        count: 12
+        total_seconds: 27.794
+        median_seconds: 1.829
         max_seconds: 6.306
+      gh && pr && MERGED && git && git:
+        count: 3
+        total_seconds: 25.963
+        median_seconds: 8.664
+        max_seconds: 9.016
+      run && gh && gh:
+        count: 1
+        total_seconds: 25.473
+        median_seconds: 25.473
+        max_seconds: 25.473
       git && git && git:
-        count: 8
-        total_seconds: 21.299
-        median_seconds: 2.031
+        count: 9
+        total_seconds: 21.427
+        median_seconds: 1.548
         max_seconds: 6.16
       rev-parse && git:
         count: 1
@@ -194,6 +214,11 @@ rollup:
         total_seconds: 19.778
         median_seconds: 19.778
         max_seconds: 19.778
+      the:
+        count: 2
+        total_seconds: 19.26
+        median_seconds: 9.63
+        max_seconds: 13.028
       tail:
         count: 3
         total_seconds: 19.094
@@ -254,6 +279,11 @@ rollup:
         total_seconds: 11.623
         median_seconds: 11.623
         max_seconds: 11.623
+      git && gh && gh && gh && git:
+        count: 2
+        total_seconds: 11.145
+        median_seconds: 5.573
+        max_seconds: 6.113
       tbd list:
         count: 1
         total_seconds: 10.793
@@ -279,41 +309,11 @@ rollup:
         total_seconds: 9.975
         median_seconds: 9.975
         max_seconds: 9.975
-      i && git && git:
+      gh && pr && MERGED && gh && gh:
         count: 1
-        total_seconds: 9.501
-        median_seconds: 9.501
-        max_seconds: 9.501
-      gh && pr && MERGED && git && git:
-        count: 1
-        total_seconds: 8.283
-        median_seconds: 8.283
-        max_seconds: 8.283
-      tbd && git && git && kleddamag:
-        count: 1
-        total_seconds: 8.252
-        median_seconds: 8.252
-        max_seconds: 8.252
-      ls && find && ls && find:
-        count: 1
-        total_seconds: 7.48
-        median_seconds: 7.48
-        max_seconds: 7.48
-      V4 && C3 && credit && S && S && tbd:
-        count: 1
-        total_seconds: 7.432
-        median_seconds: 7.432
-        max_seconds: 7.432
-      gh && git:
-        count: 3
-        total_seconds: 7.038
-        median_seconds: 2.42
-        max_seconds: 2.89
-      npm && ls && tbd:
-        count: 1
-        total_seconds: 6.553
-        median_seconds: 6.553
-        max_seconds: 6.553
+        total_seconds: 9.652
+        median_seconds: 9.652
+        max_seconds: 9.652
     by_command_family:
       toolchain:
         count: 24
@@ -321,9 +321,9 @@ rollup:
         median_seconds: 5.346
         max_seconds: 24676.775
       vcs:
-        count: 107
-        total_seconds: 5365.513
-        median_seconds: 2.712
+        count: 125
+        total_seconds: 5816.053
+        median_seconds: 3.015
         max_seconds: 544.251
       inspection:
         count: 60
@@ -336,10 +336,10 @@ rollup:
         median_seconds: 30.017
         max_seconds: 277.045
       other:
-        count: 25
-        total_seconds: 189.805
-        median_seconds: 4.448
-        max_seconds: 22.502
+        count: 29
+        total_seconds: 235.915
+        median_seconds: 4.968
+        max_seconds: 25.473
       filesystem:
         count: 5
         total_seconds: 13.339
@@ -351,49 +351,52 @@ rollup:
         median_seconds: 2.44
         max_seconds: 2.589
     invoked:
-      echo: 204
-      head: 137
-      tail: 94
-      export: 76
-      gh pr: 48
-      grep: 44
+      echo: 251
+      head: 154
+      tail: 102
+      export: 91
+      gh pr: 72
+      grep: 47
+      sleep: 42
+      awk: 41
       cd: 35
-      sleep: 34
+      sort: 28
+      git fetch: 28
       sed: 24
       git status: 23
-      awk: 20
-      sort: 17
-      git fetch: 16
-      git show: 15
-      gh api: 14
+      uniq: 22
+      git show: 19
+      git log: 18
+      git diff: 18
+      gh api: 17
+      wc: 14
       ls: 13
-      git diff: 13
-      wc: 12
-      git log: 11
-      uniq: 11
-      git merge-base: 11
-      gh run: 11
+      tr: 13
+      git merge-base: 13
+      pr: 13
+      gh run: 13
       timeout uv run packing-validate: 9
       printf: 8
-      pr: 7
       rev-parse: 7
+      the: 7
       date: 6
       git config: 6
-      the: 6
+      MERGED: 6
       find: 5
       cat: 5
       git grep: 5
       git submodule: 5
       git push: 5
       mkdir: 4
+      '0': 4
       git rev-parse: 4
       curl: 4
       git add: 4
       tbd sync: 4
       PR: 4
+      git ls-remote: 4
       The: 4
       git for-each-ref: 3
-      '0': 3
       git cat-file: 3
       git worktree: 3
       timeout uvx flowmark: 3
@@ -401,13 +404,12 @@ rollup:
       tbd create: 3
       tbd show: 3
       python3: 3
-      MERGED: 3
       unzip: 3
       rm: 3
       which: 2
-      tr: 2
       git ls-tree: 2
       merge-tree: 2
+      cut: 2
       '*)': 2
       '1': 2
       uv run pytest: 2
@@ -415,7 +417,6 @@ rollup:
       S: 2
       '`d95db2c2`': 2
       '`24e049d5`': 2
-      git ls-remote: 2
       '`exhaustive-tier`': 2
       a: 2
       OR-17: 2
@@ -425,7 +426,9 @@ rollup:
       '##': 2
       git rev-list: 2
       Error: 2
+      measured_seconds: 2
       select(.name: 2
+      full: 2
       git branch: 1
       (tbd: 1
       timeout uvx tbd@latest: 1
@@ -439,7 +442,6 @@ rollup:
       gh label: 1
       'n17-mira-guzhou-4613-intake:': 1
       git: 1
-      cut: 1
       'true': 1
       df: 1
       git merge: 1
@@ -531,7 +533,6 @@ rollup:
       OR-1[0-9]: 1
       startswith(9fe9999d))): 1
       ceiling: 1
-      measured_seconds: 1
       reference: 1
       'checks:': 1
       finishing: 1
@@ -551,19 +552,25 @@ rollup:
       wall: 1
       verdict: 1
       error: 1
+      run: 1
+      ls-tree: 1
+      'deadline_at:': 1
+      certification_pending: 1
+      select(.headSha: 1
+      startswith(ae77f600)): 1
     invoked_families:
-      inspection: 385
-      shell: 367
-      vcs: 218
-      other: 161
+      inspection: 458
+      shell: 437
+      vcs: 279
+      other: 193
       toolchain: 32
       filesystem: 14
       project: 13
     by_shell_shape:
       compound:
-        count: 169
-        total_seconds: 31349.898
-        median_seconds: 3.382
+        count: 191
+        total_seconds: 31846.548
+        median_seconds: 3.623
         max_seconds: 24676.775
       pipeline:
         count: 33
@@ -592,21 +599,21 @@ rollup:
         max_seconds: 2.318
     by_thinking_level:
       xhigh:
-        count: 274
-        total_seconds: 31654.291
-        median_seconds: 2.271
+        count: 298
+        total_seconds: 32154.954
+        median_seconds: 2.43
         max_seconds: 24676.775
     shell_traits:
-      pipes: 195
-      redirects_output: 40
-      substitutes: 32
+      pipes: 217
+      redirects_output: 52
+      substitutes: 41
   session_events:
     compact_boundaries: 0
-    stop_hook_summaries: 10
+    stop_hook_summaries: 16
     queue_operations:
-      enqueue: 100
-      remove: 86
-      dequeue: 11
+      enqueue: 135
+      remove: 115
+      dequeue: 17
   semantics:
     wall_seconds: First to last timestamped record. It is elapsed session time and includes
       every interval in which nothing was running, so it is an upper bound on work and never

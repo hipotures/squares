@@ -15,11 +15,11 @@ totals:
   sessions_unmeasured: 54
   attributed:
     rollups: 176
-    turns: 47656
-    tool_calls: 26100
-    tool_errors: 518
-    one_off_code: 4004
-    wall_hours: 427.14
+    turns: 48062
+    tool_calls: 26312
+    tool_errors: 522
+    one_off_code: 4032
+    wall_hours: 428.3
   unattributed:
     rollups: 60
     turns: 11110
@@ -29,11 +29,11 @@ totals:
     wall_hours: 51.75
   measured:
     rollups: 236
-    turns: 58766
-    tool_calls: 32639
-    tool_errors: 674
-    one_off_code: 4950
-    wall_hours: 478.89
+    turns: 59172
+    tool_calls: 32851
+    tool_errors: 678
+    one_off_code: 4978
+    wall_hours: 480.05
 codex_receipts:
   attributed: 56
   unattributed: 2
@@ -2471,7 +2471,7 @@ sessions:
   codex_receipts: []
 - id: session-150
   title: "Correctness on the Agenda-040 Stack, the n = 17 Ladder, and the Record It Left"
-  status: in_progress
+  status: completed
   primary_bead: think-b7pr
   phases: 4
   measured: true
@@ -2491,9 +2491,9 @@ sessions:
   - packing/campaign/resource-usage/agent-acc596ced5294ca9c.yaml
   - packing/campaign/resource-usage/agent-ae65c7226abcb1a98.yaml
   - packing/campaign/resource-usage/d71b369b-163a-561c-a698-2900d1d8109e.yaml
-  turns: 3377
-  tool_calls: 1803
-  tool_errors: 33
-  one_off_code: 156
-  wall_hours: 16.5
+  turns: 3783
+  tool_calls: 2015
+  tool_errors: 37
+  one_off_code: 184
+  wall_hours: 17.66
   codex_receipts: []
