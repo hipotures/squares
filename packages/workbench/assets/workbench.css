@@ -489,6 +489,15 @@ body.drawing #packing-svg #squares {
   gap: 34px;
   white-space: nowrap;
 }
+/* Most n have no star, and the empty star line left a 56 px hole between the bound and the
+   badges -- a band of nothing under PROVEN that appeared and vanished as a sweep ran through
+   the n that were first proved here. Without a star the badges take the star line's own top,
+   so they sit under the bound directly and the space collects where space belongs, above the
+   next heading. `.head-open` does not move either way: the pair of headings is the panel's
+   shape, and a heading that shifted with its content would be a worse fault than the hole. */
+.badges.no-star {
+  top: 426px;
+}
 .badge-item {
   display: inline-flex;
   align-items: center;

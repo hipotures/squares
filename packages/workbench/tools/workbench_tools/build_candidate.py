@@ -1099,8 +1099,14 @@ def load_facts(manifest_entries: dict[int, dict]) -> dict[str, dict]:
             open_items.append("optimality")
         if entry["exactness"]["state"] not in ("closed-form", "minimal-polynomial"):
             open_items.append("exact value")
-        if entry["rigidity"]["state"] == "not-established":
-            open_items.append("rigidity")
+        # **Rigidity is not listed as open.** `not-established` holds for 304 of the 324 n, and
+        # it means the record carries no rigidity fact -- not that rigidity is an open question
+        # anyone has posed. Printing `? rigidity` against a packing a reader can see is rigid,
+        # which is most of the grid-filling ones, made the panel look wrong about the picture
+        # beside it. An absent fact and an open question are different things and the panel says
+        # only what it knows: rigidity appears as an `R` badge under PROVEN where it is
+        # established, and not at all where it is not. `think-769x` tracks what the record
+        # should actually say.
         facts[str(n)] = {
             "relation": relation,
             # The TeX the panel's lines are set from, rendered below, once, for every n.

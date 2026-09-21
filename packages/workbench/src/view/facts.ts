@@ -14,10 +14,12 @@ export function createFactsView(document: Document, DATA: Corpus, numeralLeft: (
     "R/muted": "rigid (catalogue)",
   };
   const STAR_LABEL = "new lower bound";
+  // Rigidity is deliberately absent: the builder stops listing it as open, because
+  // `not-established` means the record has no rigidity fact rather than that the question is
+  // open. See `build_candidate.py` and `think-769x`.
   const OPEN_LABELS: Record<string, string> = {
     optimality: "optimality",
     "exact value": "exact value",
-    rigidity: "rigidity",
   };
   function glyphBaseline(glyph: string) {
     const b = METRICS.badge_baseline;
@@ -164,7 +166,9 @@ export function createFactsView(document: Document, DATA: Corpus, numeralLeft: (
     // the value of -- 108 of the 110 n that had one show `lower <= s(n) <= upper` -- so the owner
     // asked for it to go. The data keeps `html_exact` and `degree` for a design that attaches a
     // form to the bound it belongs to.
-    const badges = text("div", "badges");
+    // Without a star line above them the badges take its place, so PROVEN has no hole in
+    // it. See `.badges.no-star`.
+    const badges = text("div", f.star ? "badges" : "badges no-star");
     for (const b of f.badges) {
       const label = BADGE_LABELS[`${b.glyph}/${b.style}`];
       if (label === undefined) {
