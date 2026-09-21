@@ -564,14 +564,20 @@ body.drawing #packing-svg #squares {
   color: var(--scene-heading);
   white-space: nowrap;
 }
+/* Baseline, not centre: the row holds KaTeX and text on one line, and centring their boxes
+   sits `s(n)` a little off the line the sentence is set on -- KaTeX's box is taller than the
+   text's and centring splits the difference. The swatches are not type and keep to the middle
+   of the line. */
 .note-row {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: var(--stage-note-gap);
 }
 .note-swatches {
   display: block;
   flex: none;
+  /* The row aligns type on its baseline; the swatches are not type and keep to its middle. */
+  align-self: center;
 }
 /* The swatch's own outline, as the composite figure draws it: a hairline so a pale shade still
    reads as a square rather than as a smudge. Its `fill` is the corpus's palette, set as an

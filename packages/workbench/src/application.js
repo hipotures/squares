@@ -6628,7 +6628,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     math.innerHTML = METRICS.bound_html.side_of;
     sideOf.appendChild(math);
     sideOf.appendChild(
-      document.createTextNode(" is the side of the smallest square holding n unit squares."),
+      document.createTextNode(" is the side of the smallest square holding n unit squares"),
     );
     note.appendChild(sideOf);
     // One swatch per angle family, and one family across its shades: the two things the picture
@@ -6643,13 +6643,18 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       { length: Math.min(NOTE_ANGLE_SWATCHES, families.length) },
       (_unused, index) => middle(families[index] ?? []),
     ).filter((fill) => fill !== "");
+    // The shade row runs light to dark (the owner, 2026-09-21). Shade index 0 is the darkest, so
+    // the table's own order would read the other way -- and the line under it counts contacts up
+    // from none, which is the lightest.
     const first = families[0] ?? [];
     const shades = Array.from(
       { length: Math.min(NOTE_SHADE_SWATCHES, first.length) },
       (_unused, index) => first[index] ?? "",
-    ).filter((fill) => fill !== "");
-    note.appendChild(row(angles, "Colors indicate distinct tilt angles."));
-    note.appendChild(row(shades, "Shade indicates number of full-side contacts."));
+    )
+      .filter((fill) => fill !== "")
+      .reverse();
+    note.appendChild(row(angles, "Colors indicate distinct tilt angles"));
+    note.appendChild(row(shades, "Shade indicates number of full-side contacts"));
   }
 
   layout();
