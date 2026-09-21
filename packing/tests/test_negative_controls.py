@@ -16,6 +16,8 @@ from pathlib import Path
 import pytest
 
 from devtools import run_negative_controls as controls
+from devtools.check_readme import NO_INDEX
+from devtools.repo_scope import tracked_files
 from devtools.run_negative_controls import (
     BUILD_CACHES,
     HERE,
@@ -440,6 +442,71 @@ def test_workflow_evidence_selection_keeps_only_existing_referenced_files(
     monkeypatch.setattr(controls, "ROOT_DOCUMENTS", (document,))
     monkeypatch.setattr(controls, "LINKED_PRUNE_ROOTS", (workflows,))
     assert controls.linked_pruned_targets() == [needed]
+
+
+def test_a_worker_snapshot_can_be_asked_what_this_repository_tracks(
+    control_snapshot: tuple[Path, set[Path]],
+) -> None:
+    """A snapshot is a git checkout of itself, holding the tracked files it carries.
+
+    Checks that read the directory ask `repo_scope.tracked_files` rather than walking,
+    because a walk reads the reader's scratch and the other agents' worktrees too. Where
+    a snapshot has no index those checks do not run the code the gate runs: they either
+    refuse, which is how main went red on 2026-09-21, or they take a fallback, and a
+    control over a fallback rehearses the fallback.
+
+    Both halves are asserted, because either one alone is satisfiable by the wrong tree.
+    That the index answers at all is the regression; that it answers with exactly the
+    repository's own tracked set restricted to what the snapshot carries is what keeps it
+    honest -- an index built by adding whatever happens to be on disk would also answer,
+    and would put a reader's `attic/` scratch in it (PR 207).
+    """
+    tree, _copied = control_snapshot
+    listed = tracked_files(tree, ".")
+    assert listed is not None, "the worker snapshot has no index to ask"
+    tracked = {path.relative_to(tree).as_posix() for path in listed}
+    assert "README.md" in tracked
+    assert "packing/devtools/check_readme.py" in tracked
+
+    names = subprocess.run(
+        ("git", "-C", str(controls.REPO), "ls-files", "-z", "--cached"),
+        check=True,
+        capture_output=True,
+    ).stdout.split(b"\0")
+    repository = {name.decode() for name in names if name and (tree / name.decode()).is_file()}
+    assert tracked == repository
+
+    # The linked-back environment and cargo target are the real checkout's, not this
+    # snapshot's content, which is why the index is built before they are symlinked in.
+    assert not any(
+        name.startswith(("packing/.venv", "packing/sqsearch/target")) for name in tracked
+    )
+
+
+def test_the_readme_check_reads_the_directory_inside_a_worker(
+    control_snapshot: tuple[Path, set[Path]],
+) -> None:
+    """The README controls rehearse drift, so the check must get past "no index" here.
+
+    `check_readme` is not green in a worker and is not expected to be: the snapshot
+    carries a bounded source surface, so the layout tree draws root-level tooling the
+    snapshot does not hold. What must not appear is the refusal, which is what the four
+    README controls got instead of the drift they mutate for.
+    """
+    tree, _copied = control_snapshot
+    work = tree / HERE
+    completed = subprocess.run(
+        [sys.executable, "-m", "devtools.check_readme"],
+        cwd=work,
+        env={
+            **os.environ,
+            "PYTHONPATH": os.pathsep.join((str(work / "src"), str(work))),
+        },
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert NO_INDEX not in completed.stdout + completed.stderr
 
 
 def test_unmutated_results_checker_is_green_inside_a_worker(
