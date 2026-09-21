@@ -25,8 +25,9 @@ and an encode does not:
 
 Level 4.0 is in both. x264 at `-preset slow` keeps five reference frames, whose
 decoded-picture-buffer size at 1920x1080 is past what level 4.0 admits, so left alone it
-tags the file 5.0 -- a compatibility cost bought with a compression gain measured at under
-one per cent on this content. 1080p30 needs level 4.0, and a master tagged for hardware that
+tags the file 5.0. It buys nothing here: the n = 1..100 cut is 11,659,220 bytes at level 4.0
+against 11,659,739 at 5.0 over the same 3,342 frames, which is the constrained file coming
+out 519 bytes *smaller*. 1080p30 needs level 4.0, and a master tagged for hardware that
 cannot play it is not a better master.
 
 Fidelity is measured but never made a threshold: `fidelity` reports PSNR and SSIM against

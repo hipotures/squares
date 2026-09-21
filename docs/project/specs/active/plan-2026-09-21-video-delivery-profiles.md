@@ -54,8 +54,9 @@ Three facts from the end-to-end run on 2026-09-21, which cut n = 1..100 and the 
 - **x264 tags the output level 5.0.** At `-preset slow` it keeps five reference frames,
   whose decoded-picture-buffer size at 1920x1080 exceeds what level 4.0 allows, so it
   raises the level rather than dropping a reference.
-  1080p30 needs level 4.0; the higher tag is a compatibility cost bought with a
-  compression gain small enough to measure rather than assume.
+  1080p30 needs level 4.0, and the higher tag buys nothing: cutting n = 1..100 both ways
+  gives 11,659,220 bytes at level 4.0 against 11,659,739 at 5.0 over the same 3,342
+  frames, the constrained file coming out 519 bytes smaller.
 
 - **Nothing checks the file.** The receipt names the encoder’s arguments but not the
   encoded stream, so the two could disagree — an ffmpeg that ignored a flag, a filter
@@ -115,8 +116,8 @@ read by a future consumer gains two keys rather than changing any.
 | Duration ceiling | none | 140 s |
 | Byte ceiling | none | 512 MB |
 
-Level 4.0 is in both because the measurement says its cost is negligible and it is the
-level 1080p30 requires; a master tagged for hardware that cannot play it is not a better
+Level 4.0 is in both because the measurement says it costs nothing and it is the level
+1080p30 requires; a master tagged for hardware that cannot play it is not a better
 master. What separates the profiles is only the ceilings, which is the honest split: a
 ceiling is a property of a destination, not of an encode.
 
