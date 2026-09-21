@@ -88,6 +88,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     pairTiming: timelinePairTiming,
     ramp: timelineRamp,
     rangeDuration: timelineRangeDuration,
+    SIMPLE_TRANSITION_SPEED,
     rangeProgress,
     seekSequence: timelineSeekSequence,
     sequenceDuration: timelineSequenceDuration,
@@ -4552,7 +4553,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       c.pairs +
       " pairs); " +
       c.simplePairs +
-      (c.fastSimple ? " simple grid fills at double speed" : " simple grid fills at full length") +
+      (c.fastSimple
+        ? ` simple grid fills at ${SIMPLE_TRANSITION_SPEED}x speed`
+        : " simple grid fills at full length") +
       "; this pair " +
       fmt(duration(), 2) +
       " s, " +

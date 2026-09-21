@@ -9,8 +9,15 @@ export interface ContinuousTiming {
   staticBeat: AtlasTiming;
 }
 
-/** How many times faster a simple transition plays while `fastSimple` is on. */
-export const SIMPLE_TRANSITION_SPEED = 2;
+/**
+ * How many times faster a simple transition plays while `fastSimple` is on.
+ *
+ * Three, raised from two by the owner on 2026-09-21: a grid fill where every square is
+ * axis-aligned has nothing to watch, and at 2x it still held the eye longer than it earned.
+ * `baseTiming` is deliberately free of this, so physics steps are counted from the unsped span
+ * and a faster clock simulates the same work rather than a third of it.
+ */
+export const SIMPLE_TRANSITION_SPEED = 3;
 
 export interface TimelineConfiguration {
   pairs: readonly Pick<CorpusPair, "n" | "kind">[];
@@ -143,7 +150,7 @@ function scaledTiming(timing: AtlasTiming, scale: number): AtlasTiming {
 /**
  * The timing a pair's work is priced from: the beat, and the annealed span of the move, with no
  * presentation speed-up. Physics steps are counted from this, so a simple transition played at
- * double speed simulates what it simulates at full length, and `physics()` and the benchmark do
+ * a faster clock simulates what it simulates at full length, and `physics()` and the benchmark do
  * the same work whatever the clock plays. A trajectory is sampled by move fraction, so a faster
  * clock still plays all of it.
  */
@@ -395,6 +402,7 @@ export function displayedCount(
 }
 
 export const timeline = Object.freeze({
+  SIMPLE_TRANSITION_SPEED,
   isStillPair,
   isSpedUpPair,
   annealSpan,

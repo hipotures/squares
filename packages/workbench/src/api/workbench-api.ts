@@ -408,7 +408,7 @@ export interface AtlasPhysics {
 export interface AtlasContinuous {
   on: boolean;
   fullBeat: boolean;
-  /** Whether simple transitions, axis-aligned grid fills, play at double speed. */
+  /** Whether simple transitions, axis-aligned grid fills, play at `SIMPLE_TRANSITION_SPEED`. */
   fastSimple: boolean;
   prefetch: boolean;
   dwell: number;

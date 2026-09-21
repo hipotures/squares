@@ -85,7 +85,7 @@ test("four-span timing preserves correction in single, continuous and annealed p
   assert.equal(annealSpan("tween", 10), 1);
 });
 
-test("simple transitions play every phase at double speed only while the setting is on", () => {
+test("simple transitions play every phase at the speed-up only while the setting is on", () => {
   const config = configuration();
   config.simple = [true, false, true, false];
   const full = [0, 1, 2, 3].map((index) => pairDuration(config, index, "tween"));
@@ -96,26 +96,35 @@ test("simple transitions play every phase at double speed only while the setting
     [0, 1, 2, 3].map((index) => isSpedUpPair(config, index)),
     [true, false, true, false],
   );
-  near(pairDuration(config, 0, "tween"), (full[0] ?? Number.NaN) / 2);
+  // Written against the constant rather than against its value: what is being tested is that a
+  // sped pair plays its own beat divided by the speed-up, and a test that spelled the number
+  // would have to be edited every time the owner changed it -- which is the moment it stops
+  // being a check and becomes a copy.
+  const saved = 1 - 1 / SIMPLE_TRANSITION_SPEED;
+  near(pairDuration(config, 0, "tween"), (full[0] ?? Number.NaN) / SIMPLE_TRANSITION_SPEED);
   near(pairDuration(config, 1, "tween"), full[1] ?? Number.NaN);
-  near(pairDuration(config, 2, "tween"), (full[2] ?? Number.NaN) / 2);
+  near(pairDuration(config, 2, "tween"), (full[2] ?? Number.NaN) / SIMPLE_TRANSITION_SPEED);
   near(
     sequenceDuration(config, "tween"),
-    fullSequence - ((full[0] ?? Number.NaN) + (full[2] ?? Number.NaN)) / 2,
+    fullSequence - ((full[0] ?? Number.NaN) + (full[2] ?? Number.NaN)) * saved,
   );
   near(
     rangeDuration(config, { from: 2, to: 18 }, "tween"),
-    fullRange - ((full[0] ?? Number.NaN) + (full[2] ?? Number.NaN)) / 2,
+    fullRange - ((full[0] ?? Number.NaN) + (full[2] ?? Number.NaN)) * saved,
   );
+  // A shared picture is a still pair, so its continuous beat is the static one; sped, every
+  // span of it is that beat over the speed-up, which is what "every phase" in the name means.
   const beat = pairTiming(config, 2, "tween");
-  near(beat.dwell, 0.2);
-  near(beat.move, 0.14);
-  near(beat.correct, 0.06);
-  near(beat.settle, 0.175);
+  const staticBeat = config.continuous.staticBeat;
+  near(beat.dwell, staticBeat.dwell / SIMPLE_TRANSITION_SPEED);
+  near(beat.move, staticBeat.move / SIMPLE_TRANSITION_SPEED);
+  near(beat.correct, staticBeat.correct / SIMPLE_TRANSITION_SPEED);
+  near(beat.settle, staticBeat.settle / SIMPLE_TRANSITION_SPEED);
+  // Off the continuous beat the speed-up still applies, to the single-step timing instead.
   config.continuous.on = false;
-  near(pairTiming(config, 0, "tween").settle, 0.4);
+  near(pairTiming(config, 0, "tween").settle, config.timing.settle / SIMPLE_TRANSITION_SPEED);
   config.fastSimple = false;
-  near(pairTiming(config, 0, "tween").settle, 0.8);
+  near(pairTiming(config, 0, "tween").settle, config.timing.settle);
   assert.throws(() => isSpedUpPair(config, 9), /no transition/);
 });
 
@@ -299,10 +308,11 @@ test("the arrival delay is a share of the moving span that scales with the beat"
   config.anneal = 8;
   near(gap(1, "physics"), 0.2 * 1.2);
   near(gap(1, "tween"), 0.2 * 0.8);
-  // A static step plays the static beat, and the speed-up halves it with every other phase.
-  near(gap(0, "tween"), 0.2 * 0.4);
+  // A static step plays the static beat, and the speed-up shortens it with every other phase.
+  const staticSpan = config.continuous.staticBeat.move + config.continuous.staticBeat.correct;
+  near(gap(0, "tween"), DEFAULT_ARRIVAL_DELAY_FRACTION * staticSpan);
   config.fastSimple = true;
-  near(gap(0, "tween"), 0.2 * 0.2);
+  near(gap(0, "tween"), (DEFAULT_ARRIVAL_DELAY_FRACTION * staticSpan) / SIMPLE_TRANSITION_SPEED);
   near(gap(1, "tween"), 0.2 * 0.8);
   const sped = pairSchedule(config, 0, "tween");
   config.fastSimple = false;
