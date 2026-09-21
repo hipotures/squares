@@ -1,0 +1,599 @@
+softschema:
+  contract: packing.squares:ClaudeEfficiencyRollup/v1
+  schema: ../schemas/claude-efficiency-rollup.schema.yaml
+  envelope: rollup
+  status: enforced
+rollup:
+  source:
+    harness: claude-code
+    filename: af860c4b4d0468ad0.output
+    sha256: 93969b841ed70ac3d00c47941fdb147547b5bb517e18a36fdc775ec98bebb006
+    bytes: 966431
+    records: 132
+    session_id: 5e071e1a-5ab8-5bae-a5c0-c3687815bf4a
+    harness_versions:
+    - 2.1.278
+  span:
+    started_at: '2026-09-20T06:12:07.093Z'
+    ended_at: '2026-09-20T06:26:04.413Z'
+    wall_seconds: 837.32
+  turns:
+    assistant: 54
+    sidechain: 54
+    by_model:
+      claude-fable-5-1: 54
+    by_thinking_level:
+      medium: 54
+    by_model_and_thinking_level:
+      claude-fable-5-1 @ medium: 54
+    by_branch:
+      claude/kind-wright-whxxn6: 54
+    latency:
+      count: 54
+      total_seconds: 824.544
+      median_seconds: 1.374
+      max_seconds: 365.18
+  tokens:
+    cache_creation_input_tokens: 1980251
+    cache_read_input_tokens: 6390083
+    ephemeral_1h_input_tokens: 0
+    ephemeral_5m_input_tokens: 1980251
+    input_tokens: 1518
+    output_tokens: 13579
+    thinking_tokens: 6252
+  tokens_by_thinking_level:
+    medium:
+      cache_creation_input_tokens: 1980251
+      cache_read_input_tokens: 6390083
+      ephemeral_1h_input_tokens: 0
+      ephemeral_5m_input_tokens: 1980251
+      input_tokens: 1518
+      output_tokens: 13579
+      thinking_tokens: 6252
+  tool_calls:
+    total: 40
+    total_seconds: 13.968
+    share_of_wall: 0.0167
+    errors: 2
+    denied: 0
+    unpaired_results: 0
+    outstanding_at_snapshot: 0
+    one_off_code:
+      count: 3
+      total_seconds: 3.111
+      median_seconds: 0.957
+      max_seconds: 1.243
+    by_tool:
+      Bash:
+        count: 39
+        total_seconds: 12.738
+        median_seconds: 0.073
+        max_seconds: 1.966
+      SubagentHandback:
+        count: 1
+        total_seconds: 1.23
+        median_seconds: 1.23
+        max_seconds: 1.23
+    by_command:
+      python3 bidwell.py:
+        count: 1
+        total_seconds: 1.966
+        median_seconds: 1.966
+        max_seconds: 1.966
+      grep:
+        count: 3
+        total_seconds: 1.56
+        median_seconds: 0.068
+        max_seconds: 1.431
+      'reported_upper_bound: && value: && exact_form: && found_by && verified_lower && reported_lower':
+        count: 1
+        total_seconds: 1.422
+        median_seconds: 1.422
+        max_seconds: 1.422
+      'reported_upper_bound: && value: && exact_form: && found_by && verified_lower':
+        count: 1
+        total_seconds: 1.31
+        median_seconds: 1.31
+        max_seconds: 1.31
+      find && sqpack:
+        count: 1
+        total_seconds: 1.307
+        median_seconds: 1.307
+        max_seconds: 1.307
+      '[(cx && off && a && x,y && x,y':
+        count: 1
+        total_seconds: 1.243
+        median_seconds: 1.243
+        max_seconds: 1.243
+      python3 && 2):) && pts && Green:
+        count: 1
+        total_seconds: 0.957
+        median_seconds: 0.957
+        max_seconds: 0.957
+      ? 'mkdir && nothing && neither && and && `render_certificate_reach.py:136-179`] && 4.6710
+        && 4.8216 && 5.9308 && the && m && rows && points && m^2 && what && 4 && yes && 14
+        && 2 && s(15) && 5 && yes && 22 && 3 && s(23) && Bentz && 6 && yes && 33 && 3 && s(34)
+        && Theorem && 7 && yes && 45 && 4 && s(46) && 8 && no && — && — && idiom && plus &&
+        every && gives && Burns, && n && verified && best && gap && method && transferable
+        && 11 && 3.8264 && 3.8771 && 0.0506 && 3.8690 && S10 && W && outside && 12 && 3.9600
+        && 4 && 0.0400 && 3.9908 && B13 && B22 && W && 17 && 4.5900 && 4.6755 && 0.0855 &&
+        4.6710 && none && W && 18 && 4.6790 && 4.8229 && 0.1439 && 4.8216 && W && the && 19
+        && 4.8000 && 4.8856 && 0.0856 && 4.9885 && W && Green && 20 && 4.8500 && 5 && 0.1500
+        && 4.9885 && B22 && W && 21 && 4.8500 && 5 && 0.1500 && 4.9885 && **B22 && 26 && 5.1231
+        && 5.6213 && 0.4982 && 5.9862 && Green && N-style && W && 27 && 5.2426 && 5.7071 &&
+        0.4645 && 5.9862 && inherits && W && 28 && 5.3589 && 5.8244 && 0.4655 && 5.9862 &&
+        Green && W && 29 && 5.4721 && 5.9338 && 0.4617 && 5.9308 && W && six && 30 && 5.5826
+        && 6 && 0.4174 && 5.9862 && N && hex && W && 31 && 5.6904 && 6 && 0.3096 && 5.9862
+        && W && hex && 32 && 5.7958 && 6 && 0.2042 && 5.9862 && **B33 && W && 37 && 6.0990
+        && 6.5986 && 0.4996 && 6.9839 && Green && W && 38–39 && 6.1962 && 6.7071 && 0.51 &&
+        6.9839 && monotone && W && 40–41 && 6.3852 && 6.8284 && 0.44 && 6.9839 && Green &&
+        W && 44 && 6.7446 && 7 && 0.2554 && 6.9839 && hex && **44 && 45 && 6.8310 && 7 &&
+        0.1690 && 6.9839 && **B46 && 50–55 && 7.08–7.48 && 7.57–7.95 && 0.44–0.50 && 7.9816
+        && Green && W && 56–61 && 7.56–7.93 && 8 && 0.07–0.42 && 7.9816 && hex && N && integer
+        && 65–71 && 8.07–8.48 && 8.54–8.94 && 0.46–0.52 && 8.9793 && Green && W && 82–89 &&
+        9.06–9.49 && 9.54–9.95 && 0.46–0.52 && 9.9770 && Green && W && Reading && nothing
+        && it && reference && 69: && numbers && `n-017.md` && containment && it && `X-039`).
+        && 1 && 6 && or && or && they && at && `2^4` && axis && n && n && side && 0.0506 &&
+        0.0855 && ratio && 0.9869 && 0.9817 && distinct && 2 && 3 && degree && 8 && 18 &&
+        unknowns && 2 && 3 && optimum && second-order && not && verified && exact && trivial
+        && Bidwell && certified && 6.58 && none && Two && and && B22 && the && the && `τ*_box(5)
+        && the && at && at && some && floor && reported && packing && the && it && three &&
+        separating && 19 && the && rank && target && signif. && feas. && route && 1 && **s(21)
+        && 5 && 3 && Bentz-2016 && parallel, && 2 && **s(45) && 4 && 4 && same && 3 && **first
+        && 4 && 3 && stock && the && 4 && **unshrunk && 3 && 3 && ladder && measure && 5 &&
+        **s(12) && 5 && 1 && one && the && Details: && the && `n && 12` && n && no && n &&
+        it && n && n && 45 && that && one && it && the && run && the && a && resolve && the'
+      : count: 1
+        total_seconds: 0.911
+        median_seconds: 0.911
+        max_seconds: 0.911
+      cat:
+        count: 10
+        total_seconds: 0.58
+        median_seconds: 0.056
+        max_seconds: 0.076
+      sed:
+        count: 7
+        total_seconds: 0.51
+        median_seconds: 0.073
+        max_seconds: 0.089
+      ls:
+        count: 2
+        total_seconds: 0.226
+        median_seconds: 0.113
+        max_seconds: 0.132
+      git status:
+        count: 1
+        total_seconds: 0.093
+        median_seconds: 0.093
+        max_seconds: 0.093
+      wc:
+        count: 1
+        total_seconds: 0.092
+        median_seconds: 0.092
+        max_seconds: 0.092
+      lemma && m^2 && m2 && square && unavoidable:
+        count: 1
+        total_seconds: 0.079
+        median_seconds: 0.079
+        max_seconds: 0.079
+      ls && s12 && n12 && n17 && n20 && n26:
+        count: 1
+        total_seconds: 0.077
+        median_seconds: 0.077
+        max_seconds: 0.077
+      ls && ls && ls && ls:
+        count: 1
+        total_seconds: 0.073
+        median_seconds: 0.073
+        max_seconds: 0.073
+      Theorem && Lemma && Theorem && Lemma:
+        count: 1
+        total_seconds: 0.073
+        median_seconds: 0.073
+        max_seconds: 0.073
+      Theorem && Green:
+        count: 1
+        total_seconds: 0.069
+        median_seconds: 0.069
+        max_seconds: 0.069
+      Lemma:
+        count: 1
+        total_seconds: 0.068
+        median_seconds: 0.068
+        max_seconds: 0.068
+      seventeen && degree && seems:
+        count: 1
+        total_seconds: 0.067
+        median_seconds: 0.067
+        max_seconds: 0.067
+      ls && kearney && stromquist && gensane && friedman && bentz && el-moumni && goebel && gobel:
+        count: 1
+        total_seconds: 0.055
+        median_seconds: 0.055
+        max_seconds: 0.055
+    by_command_family:
+      other:
+        count: 9
+        total_seconds: 6.297
+        median_seconds: 0.079
+        max_seconds: 1.966
+      inspection:
+        count: 27
+        total_seconds: 4.48
+        median_seconds: 0.068
+        max_seconds: 1.431
+      toolchain:
+        count: 1
+        total_seconds: 0.957
+        median_seconds: 0.957
+        max_seconds: 0.957
+      filesystem:
+        count: 1
+        total_seconds: 0.911
+        median_seconds: 0.911
+        max_seconds: 0.911
+      vcs:
+        count: 1
+        total_seconds: 0.093
+        median_seconds: 0.093
+        max_seconds: 0.093
+    invoked:
+      head: 26
+      W: 19
+      sed: 15
+      cat: 13
+      echo: 13
+      the: 13
+      Green: 10
+      cut: 9
+      '3': 9
+      grep: 8
+      ls: 8
+      '4': 7
+      n: 7
+      '5': 6
+      '5.9862': 6
+      '6': 5
+      '6.9839': 5
+      it: 5
+      Theorem: 4
+      'yes': 4
+      '2': 4
+      hex: 4
+      awk: 3
+      Lemma: 3
+      cd: 3
+      '7': 3
+      '45': 3
+      '8': 3
+      B22: 3
+      '4.9885': 3
+      '1': 3
+      at: 3
+      wc: 2
+      'reported_upper_bound:': 2
+      'value:': 2
+      'exact_form:': 2
+      found_by: 2
+      verified_lower: 2
+      m^2: 2
+      degree: 2
+      xargs: 2
+      a: 2
+      x,y: 2
+      nothing: 2
+      and: 2
+      '4.6710': 2
+      '4.8216': 2
+      '5.9308': 2
+      'no': 2
+      —: 2
+      verified: 2
+      '0.0506': 2
+      '0.0855': 2
+      none: 2
+      '18': 2
+      '19': 2
+      '4.8500': 2
+      '0.1500': 2
+      N: 2
+      '7.9816': 2
+      0.46–0.52: 2
+      or: 2
+      one: 2
+      reported_lower: 1
+      kearney: 1
+      stromquist: 1
+      gensane: 1
+      friedman: 1
+      bentz: 1
+      el-moumni: 1
+      goebel: 1
+      gobel: 1
+      lemma: 1
+      m2: 1
+      square: 1
+      unavoidable: 1
+      seventeen: 1
+      seems: 1
+      find: 1
+      sqpack: 1
+      s12: 1
+      n12: 1
+      n17: 1
+      n20: 1
+      n26: 1
+      '[(cx': 1
+      'off': 1
+      python3 bidwell.py: 1
+      python3: 1
+      2):): 1
+      pts: 1
+      mkdir: 1
+      neither: 1
+      '`render_certificate_reach.py:136-179`]': 1
+      m: 1
+      rows: 1
+      points: 1
+      what: 1
+      '14': 1
+      s(15): 1
+      '22': 1
+      s(23): 1
+      Bentz: 1
+      '33': 1
+      s(34): 1
+      s(46): 1
+      idiom: 1
+      plus: 1
+      every: 1
+      gives: 1
+      Burns,: 1
+      best: 1
+      gap: 1
+      method: 1
+      transferable: 1
+      '11': 1
+      '3.8264': 1
+      '3.8771': 1
+      '3.8690': 1
+      S10: 1
+      outside: 1
+      '12': 1
+      '3.9600': 1
+      '0.0400': 1
+      '3.9908': 1
+      B13: 1
+      '17': 1
+      '4.5900': 1
+      '4.6755': 1
+      '4.6790': 1
+      '4.8229': 1
+      '0.1439': 1
+      '4.8000': 1
+      '4.8856': 1
+      '0.0856': 1
+      '20': 1
+      '21': 1
+      '**B22': 1
+      '26': 1
+      '5.1231': 1
+      '5.6213': 1
+      '0.4982': 1
+      N-style: 1
+      '27': 1
+      '5.2426': 1
+      '5.7071': 1
+      '0.4645': 1
+      inherits: 1
+      '28': 1
+      '5.3589': 1
+      '5.8244': 1
+      '0.4655': 1
+      '29': 1
+      '5.4721': 1
+      '5.9338': 1
+      '0.4617': 1
+      six: 1
+      '30': 1
+      '5.5826': 1
+      '0.4174': 1
+      '31': 1
+      '5.6904': 1
+      '0.3096': 1
+      '32': 1
+      '5.7958': 1
+      '0.2042': 1
+      '**B33': 1
+      '37': 1
+      '6.0990': 1
+      '6.5986': 1
+      '0.4996': 1
+      38–39: 1
+      '6.1962': 1
+      '6.7071': 1
+      '0.51': 1
+      monotone: 1
+      40–41: 1
+      '6.3852': 1
+      '6.8284': 1
+      '0.44': 1
+      '44': 1
+      '6.7446': 1
+      '0.2554': 1
+      '**44': 1
+      '6.8310': 1
+      '0.1690': 1
+      '**B46': 1
+      50–55: 1
+      7.08–7.48: 1
+      7.57–7.95: 1
+      0.44–0.50: 1
+      56–61: 1
+      7.56–7.93: 1
+      0.07–0.42: 1
+      integer: 1
+      65–71: 1
+      8.07–8.48: 1
+      8.54–8.94: 1
+      '8.9793': 1
+      82–89: 1
+      9.06–9.49: 1
+      9.54–9.95: 1
+      '9.9770': 1
+      Reading: 1
+      reference: 1
+      '69:': 1
+      numbers: 1
+      '`n-017.md`': 1
+      containment: 1
+      '`X-039`).': 1
+      they: 1
+      '`2^4`': 1
+      axis: 1
+      side: 1
+      ratio: 1
+      '0.9869': 1
+      '0.9817': 1
+      distinct: 1
+      unknowns: 1
+      optimum: 1
+      second-order: 1
+      not: 1
+      exact: 1
+      trivial: 1
+      Bidwell: 1
+      certified: 1
+      '6.58': 1
+      Two: 1
+      '`τ*_box(5)': 1
+      some: 1
+      floor: 1
+      reported: 1
+      packing: 1
+      three: 1
+      separating: 1
+      rank: 1
+      target: 1
+      signif.: 1
+      feas.: 1
+      route: 1
+      '**s(21)': 1
+      Bentz-2016: 1
+      parallel,: 1
+      '**s(45)': 1
+      same: 1
+      '**first': 1
+      stock: 1
+      '**unshrunk': 1
+      ladder: 1
+      measure: 1
+      '**s(12)': 1
+      'Details:': 1
+      '`n': 1
+      12`: 1
+      that: 1
+      run: 1
+      (other): 2
+    invoked_families:
+      other: 391
+      inspection: 76
+      shell: 16
+      project: 1
+      toolchain: 1
+      filesystem: 1
+      vcs: 1
+    by_shell_shape:
+      compound:
+        count: 18
+        total_seconds: 8.473
+        median_seconds: 0.084
+        max_seconds: 1.966
+      python_heredoc:
+        count: 3
+        total_seconds: 3.111
+        median_seconds: 0.957
+        max_seconds: 1.243
+      simple:
+        count: 11
+        total_seconds: 0.69
+        median_seconds: 0.057
+        max_seconds: 0.092
+      pipeline:
+        count: 7
+        total_seconds: 0.464
+        median_seconds: 0.064
+        max_seconds: 0.076
+    by_thinking_level:
+      medium:
+        count: 40
+        total_seconds: 13.968
+        median_seconds: 0.073
+        max_seconds: 1.966
+    shell_traits:
+      pipes: 24
+      redirects_output: 4
+      substitutes: 1
+  session_events:
+    compact_boundaries: 0
+    stop_hook_summaries: 0
+    queue_operations: {}
+  semantics:
+    wall_seconds: First to last timestamped record. It is elapsed session time and includes
+      every interval in which nothing was running, so it is an upper bound on work and never
+      a measure of it.
+    tool_call_seconds: From the assistant record issuing a tool_use to the user record carrying
+      its tool_result. It therefore includes harness scheduling and any permission wait, not
+      only the tool's own execution.
+    model_seconds: UNAVAILABLE for this harness. Claude Code's transcript records no timed
+      model-stream items and no first-token latency, so model time cannot be separated from
+      the interval before a turn's record is written. It is absent rather than zero, and a
+      consumer that sums it with a harness that does report it must carry the gap forward.
+    turns.latency: 'From a turn''s parent record to the turn itself. It is the closest thing
+      here to model time and is NOT model time: it also carries queueing, the user''s own
+      thinking time before a reply, and any wait for a permission prompt. Read the median,
+      not the maximum.'
+    share_of_wall: tool_call_seconds over wall_seconds. Concurrent calls are summed independently,
+      so on a session that backgrounds work this can exceed one and is a load figure, not
+      an occupancy figure.
+    tokens: 'As the harness reported them per turn, summed. Cache creation and cache read
+      are distinct from input tokens and are not double-counted here, but no cost is derived:
+      pricing is not this record''s and a stored price goes stale silently.'
+    tokens_by_thinking_level: The same counters split by the effort the harness recorded for
+      each turn. This is what makes OR-2's 'matched to the task' claim answerable rather than
+      asserted.
+    by_shell_shape: Structural classification of shell commands in a fixed priority order,
+      so a Python heredoc that also pipes counts as a Python heredoc. `python_heredoc` and
+      `python_inline` are the shapes OR-1 calls one-off code; a session with many of them
+      was writing scripts where it should have been building a tool.
+    by_command: 'The tool a shell command actually runs. Every chain is split into components,
+      shell bookkeeping and text munging are dropped, and what is left names the command:
+      one component and it takes the full invoked form, so `uv run packing-validate` keeps
+      its runner and `grep -rn x . | head -5` is `grep`; several and the name is the chain
+      of bare tools, so `make format && git add -A && git push` is `make && git && git`. Peeling
+      matters more than it sounds: keyed on the leading word instead, `cd` led 524 of 882
+      commands here. Past 256 distinct names the tail folds into `(other)`, which is a long
+      tail of odd commands or a resolver bug rather than anything to act on.'
+    invoked: 'Every tool reached for, counted across all segments of every command, not just
+      the one a call''s time was attributed to. Counts and never elapsed: most commands here
+      run several tools and the transcript times the call rather than the pipeline, so how
+      often a CLI was used is knowable and its share of the clock is not. This is the table
+      that answers which instruments a session actually uses; `by_command` answers where its
+      measured time went.'
+    by_command_family: Our own instruments against everything else. `project` is this repository's
+      CLIs and modules, `toolchain` the language tooling, `inspection` the reading and searching
+      a session does to orient itself. Time in `packing-validate` and time in `grep` are both
+      real and are not the same kind of cost.
+    errors: tool_result blocks the harness marked is_error. A failed call still spends its
+      elapsed time, and the count is here so a rising failure rate is visible rather than
+      hidden inside the total.
+    unpaired_results: tool_result blocks whose tool_use was not seen, which is normal for
+      a log that begins mid-session after a compaction. A large count means the elapsed figures
+      cover less than the session does.
+    session_events.queue_operations: Messages queued and withdrawn while a turn was running.
+      An enqueue is an interjection, which is a signal about the session's pacing rather than
+      about any tool.
+    excluded: 'Every prose body: assistant text, thinking text, user messages, tool stdout
+      and stderr, file contents, and diffs. This record is not a transcript and cannot be
+      read as one.'

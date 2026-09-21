@@ -82,6 +82,7 @@ from sqpack.fractional.ceiling import (
     loose_membership,
     verify_ceiling,
 )
+from sqpack.fractional.corner_clip import declared_class_clip
 from sqpack.fractional.cutting import float_vertices
 
 REPO = Path(__file__).resolve().parents[2]
@@ -927,6 +928,17 @@ def polished_record(result: Polished, *, source: Path, symmetric: bool) -> dict[
 def load_family(path: Path, square_side: Fraction | None) -> CeilingCertificate:
     data = json.loads(path.read_text())
     record = data.get("best_family", data)
+    if declared_class_clip(record) is not None:
+        # This polisher has no clip: it re-solves and re-verifies on the full domain and
+        # writes a record carrying neither ``variant`` nor ``corner_clip``, so polishing
+        # a class family would hand back bytes that read as the unconditional ceiling
+        # (review defect D4). Refusing is the honest answer until the program takes a
+        # clip; nothing in the repository polishes a clipped family today.
+        raise ValueError(
+            f"{path} declares variant: class at corner clip "
+            f"d = {declared_class_clip(record)}; devtools.polish_ceiling_family decides "
+            "the unconditional program only and would drop the hypothesis"
+        )
     if square_side is not None:
         record = dict(record)
         record["square_side"] = str(square_side)

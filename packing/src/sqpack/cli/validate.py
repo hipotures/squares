@@ -2903,6 +2903,18 @@ def _certificate_citations(context: Context) -> str:
     return _module(context, "devtools.check_certificate_citations")
 
 
+def _class_record_claims(context: Context) -> str:
+    # 0.3s: a byte scan of every tracked JSON for the two declaration fields, then a parse
+    # of the sixteen that carry one. Records tier because it checks the retained bytes
+    # against themselves -- that a record declaring the corner-class hypothesis does not
+    # also state the unconditional claim or id. The gate refuses such a record when it is
+    # decided; nothing said anything about the ones that are kept, which is how
+    # `exp-219-n11-96-25-clip-covering.json` sits in the results directory carrying
+    # `C-n011-fractional-96-25` (review finding L3). That one is exempt by name with its
+    # reason, and the exemption fails if it ever stops applying.
+    return _module(context, "devtools.check_class_record_claims")
+
+
 def _rung_figures(context: Context) -> str:
     # Sub-second: it sums a few dozen certificate atoms in exact Fraction arithmetic and
     # regex-scans results.yaml, evidence.yaml, and defects.yaml. Records tier because it
@@ -3699,6 +3711,21 @@ STEPS: tuple[Step, ...] = (
         ),
     ),
     Step("soft-schema validation", _schemas, fast=True, records=True),
+    Step(
+        "class records do not claim the unconditional bound",
+        _class_record_claims,
+        fast=True,
+        records=True,
+        touches=(
+            *_RESULTS,
+            *_CASES,
+            "packing/devtools/check_class_record_claims.py",
+            # The sweep enumerates the tracked JSON through it, so which files it reads
+            # is this module's answer and not the check's own.
+            "packing/devtools/repo_scope.py",
+            "packing/src/sqpack/fractional/corner_clip.py",
+        ),
+    ),
     Step(
         "derivation (needs sympy)",
         _derivation,
@@ -4562,6 +4589,9 @@ TREE_REUSABLE_FAST_STEPS = frozenset(
         "golden basin maps (proved cases, checked against mathematics)",
         "basin identity",
         "soft-schema validation",
+        # A pure function of the tracked JSON: it reads the retained records and nothing
+        # else, so a pull-request run over this exact tree has already decided it.
+        "class records do not claim the unconditional bound",
         "derivation (needs sympy)",
         "search engine (sqsearch)",
         "lint floor (rust)",

@@ -153,7 +153,9 @@ def test_cross_checkout_and_dirty_executing_reader_are_refused(tmp_path: Path) -
         ("git", "-C", str(checkout), "checkout", "--quiet", replay.SOURCE_REVISION),
         check=True,
     )
-    assert not reader.exists()
+    # The re-bound source revision postdates this reader, so the checkout now holds a
+    # reader file; the refusal turns on its not being the executing one, not on absence.
+    assert reader.resolve() != Path(replay.__file__).resolve()
     with pytest.raises(replay.T1ReplayError, match=r"executing T1 reader.*path"):
         replay.replay(checkout)
 

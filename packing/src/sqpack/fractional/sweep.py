@@ -19,6 +19,7 @@ from math import lcm
 
 import numpy as np
 
+from sqpack.fractional.corner_clip import CornerClip, EmptyClippedDomainError
 from sqpack.fractional.model import Atom, Direction, require_nonnegative_atom_weights
 
 #: The dense integer grid holds signed partial sums of weights on the common scale.
@@ -101,19 +102,52 @@ def _clip(
 
 
 def centre_domain(
-    outer_side: Fraction, square_side: Fraction, direction: Direction
+    outer_side: Fraction,
+    square_side: Fraction,
+    direction: Direction,
+    *,
+    clip: CornerClip | None = None,
 ) -> tuple[tuple[Fraction, Fraction], ...]:
     """Centres at which the rotated square stays inside the container.
 
     In the rotated frame this is a rotated square, not its bounding box. The
     difference is not cosmetic: the box admits placements that hang outside the
     container, which cover no site and make a feasible program look infeasible.
+
+    ``clip`` additionally cuts the four corner triangles of lane-a Theorem B's free
+    bins. The cut is by four half-planes, so the domain stays a convex rational
+    polygon and every consumer below -- the per-slab min/max reduction and the cell
+    witness -- is unchanged in kind. A clip that empties the domain is refused rather
+    than returned: a Condition 5 with nothing to quantify over is vacuously true.
     """
     cosine, sine = direction.ux, direction.uy
     half_extent = square_side * (cosine + sine) / 2
     low, high = half_extent, outer_side - half_extent
     corners = ((low, low), (high, low), (high, high), (low, high))
-    return tuple((cosine * x + sine * y, -sine * x + cosine * y) for x, y in corners)
+    domain = tuple((cosine * x + sine * y, -sine * x + cosine * y) for x, y in corners)
+    if clip is None:
+        return domain
+    clipped = clip.clip_polygon(domain, cosine, sine)
+    # Zero area counts as empty. A sliver has no open event cell, and the reductions
+    # below would raise their generic "no event cell" instead, which reads as a bug in
+    # the sweep rather than as what it is: a clip the class cannot realise anything in.
+    if len(clipped) < 3 or _polygon_area_twice(clipped) == 0:
+        raise EmptyClippedDomainError(
+            f"the corner clip at depth {clip.depth} leaves no admissible centre at "
+            f"direction {direction.label}"
+        )
+    return clipped
+
+
+def _polygon_area_twice(polygon: tuple[tuple[Fraction, Fraction], ...]) -> Fraction:
+    """Twice the signed shoelace area, exactly; zero means the polygon is degenerate."""
+
+    total = Fraction(0)
+    previous = polygon[-1]
+    for current in polygon:
+        total += previous[0] * current[1] - current[0] * previous[1]
+        previous = current
+    return abs(total)
 
 
 def _cell_witness(
@@ -150,6 +184,8 @@ def reduce_to_cells(
     direction: Direction,
     outer_side: Fraction,
     square_side: Fraction,
+    *,
+    clip: CornerClip | None = None,
 ) -> Reduction:
     """Legacy event-cell reduction, retained independently as a reference.
 
@@ -160,7 +196,7 @@ def reduce_to_cells(
 
     require_nonnegative_atom_weights(atoms)
     half = square_side / 2
-    domain = centre_domain(outer_side, square_side, direction)
+    domain = centre_domain(outer_side, square_side, direction, clip=clip)
     u_low = min(u for u, _ in domain)
     u_high = max(u for u, _ in domain)
     v_low = min(v for _, v in domain)
@@ -202,12 +238,14 @@ def reduce_to_spans(
     direction: Direction,
     outer_side: Fraction,
     square_side: Fraction,
+    *,
+    clip: CornerClip | None = None,
 ) -> SpanReduction:
     """Event grid, per-site coverage rectangles, and the reachable cells as spans."""
 
     require_nonnegative_atom_weights(atoms)
     half = square_side / 2
-    domain = centre_domain(outer_side, square_side, direction)
+    domain = centre_domain(outer_side, square_side, direction, clip=clip)
     u_low = min(u for u, _ in domain)
     u_high = max(u for u, _ in domain)
     v_low = min(v for _, v in domain)
@@ -266,6 +304,8 @@ def minimum_covered_mass(
     direction: Direction,
     outer_side: Fraction,
     square_side: Fraction,
+    *,
+    clip: CornerClip | None = None,
 ) -> tuple[Fraction, tuple[Fraction, Fraction]]:
     """The least mass a reachable placement covers, with a witness centre.
 
@@ -278,8 +318,10 @@ def minimum_covered_mass(
     scale = weight_scale(atoms)
     total = sum(atom.weight for atom in atoms) * scale
     if total < _INTEGER_MASS_LIMIT:
-        return minimum_covered_mass_integer(atoms, direction, outer_side, square_side, scale)
-    return minimum_covered_mass_fraction(atoms, direction, outer_side, square_side)
+        return minimum_covered_mass_integer(
+            atoms, direction, outer_side, square_side, scale, clip=clip
+        )
+    return minimum_covered_mass_fraction(atoms, direction, outer_side, square_side, clip=clip)
 
 
 def scaled_mass_grid(
@@ -288,6 +330,8 @@ def scaled_mass_grid(
     outer_side: Fraction,
     square_side: Fraction,
     scale: int,
+    *,
+    clip: CornerClip | None = None,
 ) -> MassGrid:
     """Fill the dense integer mass grid one direction's sweep decides on.
 
@@ -310,7 +354,7 @@ def scaled_mass_grid(
     if sum(scaled_weights) >= _INTEGER_MASS_LIMIT:
         raise ValueError("scaled total mass exceeds the safe int64 limit")
 
-    reduction = reduce_to_spans(atoms, direction, outer_side, square_side)
+    reduction = reduce_to_spans(atoms, direction, outer_side, square_side, clip=clip)
     u_index = {value: index for index, value in enumerate(reduction.u_events)}
     v_index = {value: index for index, value in enumerate(reduction.v_events)}
     width, height = len(reduction.u_events), len(reduction.v_events)
@@ -342,6 +386,8 @@ def minimum_covered_mass_integer(
     outer_side: Fraction,
     square_side: Fraction,
     scale: int,
+    *,
+    clip: CornerClip | None = None,
 ) -> tuple[Fraction, tuple[Fraction, Fraction]]:
     """The optimized sweep in ``int64`` on the common weight scale. Exact.
 
@@ -356,7 +402,7 @@ def minimum_covered_mass_integer(
     mass.
     """
 
-    filled = scaled_mass_grid(atoms, direction, outer_side, square_side, scale)
+    filled = scaled_mass_grid(atoms, direction, outer_side, square_side, scale, clip=clip)
     reduction, grid = filled.reduction, filled.grid
 
     best: int | None = None
@@ -372,7 +418,7 @@ def minimum_covered_mass_integer(
         raise ValueError("the sweep produced no reachable cell")
     i, j = witness_cell
     witness = _cell_witness(
-        centre_domain(outer_side, square_side, direction),
+        centre_domain(outer_side, square_side, direction, clip=clip),
         reduction.u_events[i],
         reduction.u_events[i + 1],
         reduction.v_events[j],
@@ -386,6 +432,8 @@ def minimum_covered_mass_fraction(
     direction: Direction,
     outer_side: Fraction,
     square_side: Fraction,
+    *,
+    clip: CornerClip | None = None,
 ) -> tuple[Fraction, tuple[Fraction, Fraction]]:
     """The reference: the same sweep, one ``Fraction`` per cell.
 
@@ -395,7 +443,7 @@ def minimum_covered_mass_fraction(
     that strengthens the witness without changing the decision value.
     """
 
-    reduction = reduce_to_cells(atoms, direction, outer_side, square_side)
+    reduction = reduce_to_cells(atoms, direction, outer_side, square_side, clip=clip)
     u_index = {value: index for index, value in enumerate(reduction.u_events)}
     v_index = {value: index for index, value in enumerate(reduction.v_events)}
     width, height = len(reduction.u_events), len(reduction.v_events)
@@ -426,7 +474,7 @@ def minimum_covered_mass_fraction(
         raise ValueError("the sweep produced no reachable cell")
     i, j = best_cell
     witness = _cell_witness(
-        centre_domain(outer_side, square_side, direction),
+        centre_domain(outer_side, square_side, direction, clip=clip),
         reduction.u_events[i],
         reduction.u_events[i + 1],
         reduction.v_events[j],

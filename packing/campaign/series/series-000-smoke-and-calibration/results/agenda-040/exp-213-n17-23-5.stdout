@@ -1,0 +1,22 @@
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+{
+ "n": 17,
+ "outer_side": "23/5",
+ "square_side": "9977/10000",
+ "grid_counts": [
+  32,
+  42,
+  52
+ ],
+ "inset": "1/2",
+ "angle_limit": "207107/500000",
+ "direction_steps": 181,
+ "scale": 4000000,
+ "column_rounds": 1,
+ "max_rounds": 60,
+ "rows_per_direction": 3,
+ "seed_certificate": "cases/n17_fractional_certificate/certificate.json",
+ "seed_map": "scale",
+ "seed_windows": 5,
+ "support_cap": null
+}

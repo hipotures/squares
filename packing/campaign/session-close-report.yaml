@@ -7,19 +7,19 @@ softschema:
   schema: schemas/session-close-report.schema.yaml
   envelope: null
   status: enforced
-count: 143
+count: 148
 generated_by: >-
   uv run --frozen --all-extras --group dev python -m devtools.close_session --render
 totals:
-  sessions_measured: 89
+  sessions_measured: 94
   sessions_unmeasured: 54
   attributed:
-    rollups: 130
-    turns: 40418
-    tool_calls: 22020
-    tool_errors: 442
-    one_off_code: 3484
-    wall_hours: 388.74
+    rollups: 160
+    turns: 43909
+    tool_calls: 24112
+    tool_errors: 483
+    one_off_code: 3825
+    wall_hours: 391.98
   unattributed:
     rollups: 60
     turns: 11110
@@ -28,12 +28,12 @@ totals:
     one_off_code: 946
     wall_hours: 51.75
   measured:
-    rollups: 190
-    turns: 51528
-    tool_calls: 28559
-    tool_errors: 598
-    one_off_code: 4430
-    wall_hours: 440.49
+    rollups: 220
+    turns: 55019
+    tool_calls: 30651
+    tool_errors: 639
+    one_off_code: 4771
+    wall_hours: 443.73
 codex_receipts:
   attributed: 56
   unattributed: 2
@@ -2341,17 +2341,117 @@ sessions:
     active_union_hours: 2.29
     wall_hours: 2.3
     snapshot_incomplete: true
-- id: session-148
-  title: "Intake and Verification of Two External n = 17 Weighted Certificates"
+- id: session-143
+  title: "Deeper Mathematical Review of Lower-Bound Routes"
   status: completed
-  primary_bead: think-pcd0
-  phases: 3
+  primary_bead: think-srln
+  phases: 2
   measured: true
   rollups:
-  - packing/campaign/resource-usage/7163c7b2-b4ac-4c82-afcc-ab827886ebd9.yaml
-  turns: 370
-  tool_calls: 185
+  - packing/campaign/resource-usage/5e071e1a-5ab8-5bae-a5c0-c3687815bf4a.yaml
+  - packing/campaign/resource-usage/ae3edbd2676fddaf2.yaml
+  - packing/campaign/resource-usage/afc8f6dcbe7aef07d.yaml
+  - packing/campaign/resource-usage/af860c4b4d0468ad0.yaml
+  - packing/campaign/resource-usage/a5a0fa0629343ea04.yaml
+  - packing/campaign/resource-usage/a593739458b58626a.yaml
+  - packing/campaign/resource-usage/a8b8b405efc053f16.yaml
+  - packing/campaign/resource-usage/a68c79e799a3fc678.yaml
+  - packing/campaign/resource-usage/a1730fd7bec467b88.yaml
+  turns: 1730
+  tool_calls: 1024
+  tool_errors: 13
+  one_off_code: 167
+  wall_hours: 13.36
+  codex_receipts: []
+- id: session-144
+  title: "Overnight Chunk 1 — Stock-Instrument Determinations at n=13, 17, 26"
+  status: completed
+  primary_bead: think-pogj
+  phases: 1
+  measured: true
+  rollups:
+  - packing/campaign/resource-usage/5e071e1a-5ab8-5bae-a5c0-c3687815bf4a.yaml
+  - packing/campaign/resource-usage/a40525ecaabdf057f.yaml
+  - packing/campaign/resource-usage/af3bb85bdced64a1f.yaml
+  - packing/campaign/resource-usage/a6b63770ad4f86dd8.yaml
+  - packing/campaign/resource-usage/adb95622cef697549.yaml
+  - packing/campaign/resource-usage/a5a0195a7e1b20013.yaml
+  - packing/campaign/resource-usage/acb53dcd42fbab01e.yaml
+  turns: 1633
+  tool_calls: 953
+  tool_errors: 11
+  one_off_code: 159
+  wall_hours: 14.96
+  codex_receipts: []
+- id: session-145
+  title: "Overnight Chunk 2 — The Corner-Clip Instrument and H-222"
+  status: completed
+  primary_bead: think-ni3v
+  phases: 1
+  measured: true
+  rollups:
+  - packing/campaign/resource-usage/5e071e1a-5ab8-5bae-a5c0-c3687815bf4a.yaml
+  - packing/campaign/resource-usage/afdde84bfe1625a5f.yaml
+  - packing/campaign/resource-usage/af9db849f9a1cc845.yaml
+  - packing/campaign/resource-usage/a9d7576dad97ca9ab.yaml
+  - packing/campaign/resource-usage/a957ff219905b86a7.yaml
+  turns: 1607
+  tool_calls: 952
+  tool_errors: 8
+  one_off_code: 144
+  wall_hours: 12.47
+  codex_receipts: []
+- id: session-146
+  title: "Overnight Chunk 3 — The exp-219 Registration Review and the Fold Tool"
+  status: completed
+  primary_bead: think-b7pr
+  phases: 1
+  measured: true
+  rollups:
+  - packing/campaign/resource-usage/5e071e1a-5ab8-5bae-a5c0-c3687815bf4a.yaml
+  - packing/campaign/resource-usage/a57beb19e2ae7ed7b.yaml
+  - packing/campaign/resource-usage/a556b81b10ff8b762.yaml
+  - packing/campaign/resource-usage/aac63642e9cd0a16e.yaml
+  turns: 1241
+  tool_calls: 735
+  tool_errors: 6
+  one_off_code: 105
+  wall_hours: 11.55
+  codex_receipts: []
+- id: session-147
+  title: "Overnight Chunk 4 — The BC-367 Registration Entry"
+  status: completed
+  primary_bead: think-b7pr
+  phases: 1
+  measured: true
+  rollups:
+  - packing/campaign/resource-usage/5e071e1a-5ab8-5bae-a5c0-c3687815bf4a.yaml
+  turns: 958
+  tool_calls: 561
   tool_errors: 2
-  one_off_code: 23
-  wall_hours: 18.66
+  one_off_code: 90
+  wall_hours: 10.93
+  codex_receipts: []
+- id: session-148
+  title: "Chunk 5 — The Second Stage Inside the All-Deep Class, and the Gap-g Wedge"
+  status: stopped
+  primary_bead: think-b7pr
+  phases: 1
+  measured: true
+  rollups:
+  - packing/campaign/resource-usage/5e071e1a-5ab8-5bae-a5c0-c3687815bf4a.yaml
+  - packing/campaign/resource-usage/a559dad08e3059322.yaml
+  - packing/campaign/resource-usage/ab767eaa07325eb5f.yaml
+  - packing/campaign/resource-usage/af80e22bd291ac081.yaml
+  - packing/campaign/resource-usage/aa765fa0c2414bc33.yaml
+  - packing/campaign/resource-usage/a65f1dd01126278cb.yaml
+  - packing/campaign/resource-usage/a2dbeb566572f2219.yaml
+  - packing/campaign/resource-usage/a7d6f9f0f839a3ab3.yaml
+  - packing/campaign/resource-usage/ac77b62ac52bfd061.yaml
+  - packing/campaign/resource-usage/a7cda6271ca02151e.yaml
+  turns: 1482
+  tool_calls: 857
+  tool_errors: 13
+  one_off_code: 149
+  wall_hours: 13.28
   codex_receipts: []

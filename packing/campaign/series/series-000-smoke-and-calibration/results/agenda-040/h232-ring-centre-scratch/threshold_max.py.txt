@@ -1,0 +1,100 @@
+# Retained Session 148 scratch (H-232 ring-centre lane), not a maintained tool: run as written against packing/ at 19cdd4f8, kept as .py.txt so it stays off the import path and out of the Ruff/BasedPyright floor.
+"""Exact maximum charge of all-ones threshold atoms on the transported family (residual and full)."""
+import json, sys, itertools, time
+from fractions import Fraction as F
+SP=sys.argv[1]
+cores=json.load(open(f"{SP}/cores.json"))
+for c in cores:
+    c["V"]=[(F(a),F(b)) for a,b in c["V"]]; c["w"]=F(c["w"])
+def contains(V,q):
+    sgn=0
+    for i in range(4):
+        P=V[i];Q=V[(i+1)%4]
+        cr=(Q[0]-P[0])*(q[1]-P[1])-(Q[1]-P[1])*(q[0]-P[0])
+        if cr==0: continue
+        s=1 if cr>0 else -1
+        if sgn==0: sgn=s
+        elif s!=sgn: return False
+    return True
+def seg_int(P,Q,R,S):
+    d1=(Q[0]-P[0],Q[1]-P[1]); d2=(S[0]-R[0],S[1]-R[1])
+    den=d1[0]*d2[1]-d1[1]*d2[0]
+    if den==0: return None
+    rx=R[0]-P[0]; ry=R[1]-P[1]
+    t=(rx*d2[1]-ry*d2[0])/den; u=(rx*d1[1]-ry*d1[0])/den
+    if 0<=t<=1 and 0<=u<=1: return (P[0]+t*d1[0],P[1]+t*d1[1])
+    return None
+def run(idx,label):
+    t0=time.time()
+    sub=[cores[i] for i in idx]
+    segs=[(c["V"][i],c["V"][(i+1)%4],k) for k,c in enumerate(sub) for i in range(4)]
+    pts=set()
+    for c in sub:
+        for v in c["V"]: pts.add(v)
+    for a in range(len(segs)):
+        for b in range(a+1,len(segs)):
+            if segs[a][2]==segs[b][2]: continue
+            p=seg_int(segs[a][0],segs[a][1],segs[b][0],segs[b][1])
+            if p is not None: pts.add(p)
+    pts=list(pts)
+    traces={}
+    for p in pts:
+        m=0
+        for k,c in enumerate(sub):
+            if contains(c["V"],p): m|=1<<k
+        if m: traces.setdefault(m,p)
+    T=list(traces)
+    # maximal
+    T.sort(key=lambda m:-bin(m).count("1"))
+    maxi=[]
+    for m in T:
+        if not any((m & n)==m for n in maxi): maxi.append(m)
+    w=[c["w"] for c in sub]
+    uniform = len(set(w))==1
+    def mass(m):
+        if uniform: return bin(m).count("1")*w[0]
+        return sum(w[k] for k in range(len(sub)) if m>>k&1)
+    depth=max(mass(m) for m in maxi)
+    print(f"[{label}] cores={len(sub)} vertices={len(pts)} traces={len(traces)} maximal={len(maxi)} maxdepth={depth} time={time.time()-t0:.1f}s",flush=True)
+    # 2-of-3
+    best=(F(0),None); M=maxi
+    sizes=[mass(m) for m in M]
+    order=sorted(range(len(M)),key=lambda i:-sizes[i]); M=[M[i] for i in order]; sizes=[sizes[i] for i in order]
+    for i in range(len(M)):
+        for j in range(i+1,len(M)):
+            ab=M[i]&M[j]
+            if (sizes[i]+sizes[j]+sizes[j])/2<=best[0]: break
+            for k in range(j+1,len(M)):
+                if (sizes[i]+sizes[j]+sizes[k])/2<=best[0]: break
+                ch=mass(ab|(M[i]&M[k])|(M[j]&M[k]))
+                if ch>best[0]: best=(ch,(M[i],M[j],M[k]))
+    print(f"[{label}] max 2-of-3 charge = {best[0]} (budget 1)  time={time.time()-t0:.1f}s",flush=True)
+    if best[1]:
+        print("   sites:",[ (str(traces[m][0]),str(traces[m][1])) for m in best[1]])
+        print("   trace sizes:",[bin(m).count('1') for m in best[1]], "pair masses", [mass(best[1][a]&best[1][b]) for a,b in [(0,1),(0,2),(1,2)]], "triple", mass(best[1][0]&best[1][1]&best[1][2]))
+    # 3-of-4 (budget 1) and 2-of-5 (budget 2), 3-of-5 (budget 1): charge = mass of cores in >=k of the traces
+    def kofn(k,nn,budget,limit=None):
+        t1=time.time(); bestk=(F(0),None)
+        Ms=M if limit is None else M[:limit]
+        for combo in itertools.combinations(range(len(Ms)),nn):
+            if sum(sizes[i] for i in combo)/k<=bestk[0]: continue
+            cnt={}
+            union=0
+            for i in combo: union|=Ms[i]
+            m=0
+            x=union
+            while x:
+                b=x&-x; x^=b
+                if sum(1 for i in combo if Ms[i]&b)>=k: m|=b
+            ch=mass(m)
+            if ch>bestk[0]: bestk=(ch,combo)
+        print(f"[{label}] max {k}-of-{nn} charge = {bestk[0]} (budget {budget}) over {len(Ms)} maximal traces, time={time.time()-t1:.1f}s",flush=True)
+        return bestk
+    return M,sizes,kofn,traces
+cls=json.load(open(f"{SP}/classes.json"))
+M,sizes,kofn,traces=run(cls["residual_idx"],"residual-56")
+kofn(3,4,1)
+lim=min(len(M),60)
+kofn(3,5,1,limit=lim); kofn(2,5,2,limit=lim)
+M2,s2,kofn2,tr2=run(list(range(len(cores))),"full-88")
+kofn2(3,4,1)

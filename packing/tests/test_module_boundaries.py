@@ -896,6 +896,24 @@ def test_the_slow_marker_is_declared_only_by_measured_nodes() -> None:
             "test_changed_minimal_polynomial_is_refused",  # 7.4s
             "test_n54_source_formula_closes_in_one_quartic_field",  # 3.2s
         },
+        # 74s of call time across 4, measured 2026-09-20 on a four-cpu box. Two are one
+        # whole run of the Theorem 11 replay table each, and 14s of the 15s is the
+        # unavoidability screen: 619 exact tilings of `[0, 5]^2`, one per configuration
+        # the proof's row moves reach. The third classifies all 167,915 structure pairs
+        # of the n=21 inventory, with the merge propagation on every non-forced one.
+        # The fourth classifies the 12,100 pairs of the n=32 inventory at 50 digits,
+        # which is what pins the counts exp-217's verdict is built on; it was added
+        # when a review found nothing pinning them, and it is the whole tool, so no
+        # shorter form of it exists. Not a shared build -- the two replays differ in
+        # the finishing-line constant, so neither can pay for the other, the two
+        # inventories are different configurations at different sides and share
+        # nothing with them, and the file's six unmarked tests cost 1.6s between them.
+        "test_bentz2016_tools.py": {
+            "test_the_whole_n21_inventory_reports_both_sides_of_the_propagation",  # 30.6s
+            "test_the_n32_inventory_reports_the_counts_exp217_scores_on",  # 21.7s
+            "test_the_replay_fails_at_the_line_the_transcription_printed_before_d505",  # 11.0s
+            "test_the_replay_table_holds_at_the_printed_constants",  # 10.9s
+        },
         # 4s of call time across 2.
         "test_bentz46.py": {
             "test_certificate_refuses_a_displaced_point",  # 2.2s
@@ -971,6 +989,17 @@ def test_the_slow_marker_is_declared_only_by_measured_nodes() -> None:
             # locally at n = 1..324, and its parent read 18.00s on the hosted runner (run
             # 34139067270) before the surface copy was cut to the atlas sample's stride.
             "test_every_known_best_witness_agrees_with_its_manifest_entry",
+        },
+        # 33s of call time across 1, measured 2026-09-20 on a four-cpu box: the T-031
+        # retention gate replayed on the case certificate, both routes over its 680
+        # atoms -- 1,743,736 interval boxes and the exact event-cell sweep of the
+        # clipped row domain. Not a shared build -- the file's three other tests read
+        # the frozen bytes and cost 0.01s between them, and the refusal without
+        # `--corner-clip` never reaches either route, so it stays on the pull-request
+        # surface -- so this pays only for itself. It is the control that makes the two
+        # T-031 evidence atoms' `replay_status: passed` a measurement.
+        "test_n11_corner_class_certificate.py": {
+            "test_the_gate_decides_the_case_certificate_under_the_corner_clip",  # 33.4s
         },
         # 47s of call time across 1: the interval route over the whole doubled net of the
         # retained threshold certificate, 361 directions and 1,639,903 boxes at one
@@ -1051,6 +1080,14 @@ def test_the_slow_marker_is_declared_only_by_measured_nodes() -> None:
         # a neighbouring test, so the slow marker is the measured classification.
         "test_negative_controls.py": {
             "test_build_caches_leave_the_counted_surface_and_the_worker_trees",  # 8.15s on CI
+        },
+        # 3s of call time across 1, measured 2026-09-20: `git worktree add --detach` of
+        # Session 148's opening commit -- a whole checkout of the tree -- and then
+        # `git apply --check` of both retained partial diffs in it. The file's two other
+        # tests read the patches' header lines and cost nothing. It needs the base
+        # commit, so it belongs in the lane that checks out with `fetch-depth: 0`.
+        "test_retained_patches_apply.py": {
+            "test_every_retained_patch_applies_to_its_declared_base",  # 3.3s
         },
         # 16s of call time across 1.
         "test_promote_elimination.py": {

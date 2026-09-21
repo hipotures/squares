@@ -663,6 +663,27 @@ H-218 stays row 189; its reopen is a new site set at n=20, not a replay.
 | 191 | Seedless colgen raises a Nagamochi-only floor in {32, 31, 30, 26, 27, 29, 45, 44} | registered | [H-220](hypotheses/H-220-seedless-colgen-raises-nagamochi-floor.md) | Session-141 exp-166–173: all eight queued sides measured; n=32/31/30/45/44 unconverged, n=26/27 plateau, n=29 freeze interval-refused. No RETAINABLE. Confirm only on RETAINABLE. |
 | 192 | T-029-seeded colgen raises s(18) above 1871/400 | confirmed | [H-221](hypotheses/H-221-t029-seeded-colgen-raises-s18.md) | T-030 retained 4679/1000, auto plus windows 5. Off the H-218 sweep. |
 
+## Lower-bound mechanisms beyond the one-body ceiling — X-040
+
+Session 143’s owner-directed review ran four lanes and three adversarial reviews and
+handed an overnight loop ten registrations
+([X-040](explorations/X-040-lower-bound-mechanisms-beyond-the-one-body-ceiling.md),
+[agenda-040](agendas/agenda-040-overnight-lower-bound-loop.md)).
+
+| # | Idea | Status | Hypothesis | Notes |
+| --- | --- | --- | --- | --- |
+| 193 | The all-free corner class at n=11, 96/25, d = 1/2 has covering value below 11 | registered | [H-222](hypotheses/H-222-n11-octagon-class-at-96-25.md) | Blocked on a convex corner-clip domain predicate. Kill with a depth-one family of total 11 avoiding all four corner triangles; that closes every corner-conditioned point route at this B. |
+| 194 | A point certificate exists at n=13, 399/100 with window sites | registered | [H-223](hypotheses/H-223-n13-point-covering-at-399-100.md) | Calibration under Bentz’s s(13) = 4. Confirm only on RETAINABLE. |
+| 195 | A depth-one ceiling family of total 17 exists at n=17, 23/5 | registered | [H-224](hypotheses/H-224-n17-ceiling-family-at-23-5.md) | Confirm closes the fixed-shrink point route at n=17 from 4.60 for every site set; a covering below 17 would instead be a new rung. |
+| 196 | A seeded point certificate exists at n=26, 53/10 | registered | [H-225](hypotheses/H-225-n26-seeded-certificate-at-53-10.md) | First-party floor above Nagamochi’s 5; confirm only on RETAINABLE. Two converged seeded site sets at or above 26 park the side. |
+| 197 | The one-spare wall-charge lemma closes n=21 | registered | [H-226](hypotheses/H-226-n21-one-spare-wall-charge-lemma.md) | Replay Theorem 11 at the printed constant sqrt(2) − 1/2 first (D-505), then enumerate the exceptional structures. Kill is a structure with four charges on every wall line. |
+| 198 | The one-spare wall-charge lemma closes n=32 | registered | [H-227](hypotheses/H-227-n32-one-spare-wall-charge-lemma.md) | The (1, 1) sibling of row 197; runs on the same tool. |
+| 199 | An unshrunk covering below 12 exists at n=12, side 4 | registered | [H-228](hypotheses/H-228-n12-unshrunk-covering-at-side-4.md) | Blocked on an unshrunk verifier. Kill with a certified dual of value 12 below side 4. |
+| 200 | The tilted-anchor case containing the 29° slot has covering value below 10 at 96/25 | registered | [H-229](hypotheses/H-229-n11-tilted-anchor-case-at-96-25.md) | Gain at most 1.5 per case after review; bin edge 6.4537°; blocked on the non-convex domain instrument. |
+| 201 | A gap-g wall-wedge conflict edge cuts the A6 64-family | registered | [H-230](hypotheses/H-230-a6-family-violates-a-gap-wedge-conflict.md) | The family’s 7.11° orbit sits at gap 0.016; the zero-gap lemma is verified, the extension is the question. |
+| 202 | Theta on a sound pose-cell graph at n=11 | open question | [H-231](hypotheses/H-231-theta-on-pose-cells.md) | Stays retired: the screen cannot discriminate and the dual matrix is dense. No owner decision requested. |
+| 203 | The all-deep corner class at n=11, 96/25 under the ring-centre 2-of-3 atom | registered | [H-232](hypotheses/H-232-n11-all-deep-class-ring-centre-atom.md) | The transported 88-family pays 5/4 against a budget of 1 on the named atom, the exact maximum; the counting proof is reviewed; blocked on the box cut, the refund and an exact 2-of-3 reader, with the fixed-support screen decisive on the kill side. |
+
 ## Dead ends
 
 Killed without spending a round, with the reason.

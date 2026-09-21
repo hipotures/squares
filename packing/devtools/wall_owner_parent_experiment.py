@@ -82,6 +82,7 @@ IMPLEMENTATION_PATHS = (
     "packing/src/sqpack/field.py",
     "packing/src/sqpack/fractional/__init__.py",
     "packing/src/sqpack/fractional/certificate.py",
+    "packing/src/sqpack/fractional/corner_clip.py",
     "packing/src/sqpack/fractional/generate.py",
     "packing/src/sqpack/fractional/model.py",
     "packing/src/sqpack/fractional/sweep.py",

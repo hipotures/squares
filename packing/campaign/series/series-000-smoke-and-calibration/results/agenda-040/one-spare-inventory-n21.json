@@ -1,0 +1,84 @@
+{
+ "tool": "devtools.bentz2016.one_spare_inventory",
+ "label": "n=21 (red k=1, blue k=2)",
+ "k_red": 1,
+ "k_blue": 2,
+ "counts": {
+  "red_structures": 71,
+  "blue_structures": 2365,
+  "raw_pairs": 167915,
+  "orbits": 42124
+ },
+ "classes_raw": {
+  "forced": 63842,
+  "kill": 13764,
+  "needs-geometry": 90309
+ },
+ "classes_raw_before_propagation": {
+  "forced": 45592,
+  "kill": 14844,
+  "needs-geometry": 107479
+ },
+ "classes_orbits": {
+  "forced": 16060,
+  "kill": 3461,
+  "needs-geometry": 22603
+ },
+ "classes_orbits_before_propagation": {
+  "forced": 11483,
+  "kill": 3733,
+  "needs-geometry": 26908
+ },
+ "orbits_converted_by_propagation": {
+  "kill": 272,
+  "needs-geometry": 4305
+ },
+ "reasons_raw": {
+  "forced: four full + partial, paper finish (blue height 1/3/5)": 14367,
+  "kill: at most 4 counted boxes on either line": 13764,
+  "forced: Theorem 8 (trajectory through an uncovered point)": 28936,
+  "needs-geometry: 3 full at heights [2, 4, 5] + 2 partial at heights [1, 3]": 3575,
+  "needs-geometry: 3 full at heights [2, 3, 4] + 2 partial at heights [1, 5]": 2493,
+  "forced: Theorem 8 propagated through merged boxes": 18250,
+  "forced: five full boxes on one line": 495,
+  "needs-geometry: 3 full at heights [1, 2, 4] + 2 partial at heights [3, 5]": 3575,
+  "needs-geometry: 3 full at heights [3, 4, 5] + 2 partial at heights [1, 2]": 4298,
+  "needs-geometry: 2 full at heights [4, 5] + 3 partial at heights [1, 2, 3]": 8793,
+  "needs-geometry: 2 full at heights [3, 4] + 3 partial at heights [1, 2, 5]": 6175,
+  "forced: four full + partial, derived finish (red height 2/4)": 1794,
+  "needs-geometry: 3 full at heights [1, 4, 5] + 2 partial at heights [2, 3]": 7959,
+  "needs-geometry: 3 full at heights [1, 3, 4] + 2 partial at heights [2, 5]": 4315,
+  "needs-geometry: 2 full at heights [1, 4] + 3 partial at heights [2, 3, 5]": 8793,
+  "needs-geometry: 3 full at heights [2, 3, 5] + 2 partial at heights [1, 4]": 4315,
+  "needs-geometry: 2 full at heights [2, 5] + 3 partial at heights [1, 3, 4]": 8793,
+  "needs-geometry: 2 full at heights [2, 3] + 3 partial at heights [1, 4, 5]": 6175,
+  "needs-geometry: 3 full at heights [1, 2, 5] + 2 partial at heights [3, 4]": 7959,
+  "needs-geometry: 3 full at heights [1, 2, 3] + 2 partial at heights [4, 5]": 4298,
+  "needs-geometry: 2 full at heights [1, 2] + 3 partial at heights [3, 4, 5]": 8793
+ },
+ "non_forced_patterns_raw": {
+  "kill (L: 4 full, 0 partial), (R: 4 full, 0 partial)": 402,
+  "needs-geometry (L: 3 full, 0 partial), (R: 3 full, 2 partial)": 3572,
+  "needs-geometry (L: 3 full, 1 partial), (R: 3 full, 2 partial)": 15956,
+  "kill (L: 3 full, 1 partial), (R: 3 full, 1 partial)": 4990,
+  "needs-geometry (L: 3 full, 2 partial), (R: 3 full, 2 partial)": 15653,
+  "needs-geometry (L: 3 full, 2 partial), (R: 3 full, 1 partial)": 7420,
+  "needs-geometry (L: 3 full, 2 partial), (R: 3 full, 0 partial)": 186,
+  "kill (L: 3 full, 0 partial), (R: 3 full, 1 partial)": 544,
+  "needs-geometry (L: 2 full, 0 partial), (R: 2 full, 3 partial)": 496,
+  "needs-geometry (L: 2 full, 1 partial), (R: 2 full, 3 partial)": 5148,
+  "kill (L: 2 full, 1 partial), (R: 2 full, 2 partial)": 1056,
+  "needs-geometry (L: 2 full, 2 partial), (R: 2 full, 3 partial)": 16468,
+  "kill (L: 2 full, 2 partial), (R: 2 full, 2 partial)": 6276,
+  "kill (L: 2 full, 2 partial), (R: 2 full, 1 partial)": 496,
+  "needs-geometry (L: 2 full, 3 partial), (R: 2 full, 3 partial)": 16150,
+  "needs-geometry (L: 2 full, 3 partial), (R: 2 full, 2 partial)": 8268,
+  "needs-geometry (L: 2 full, 3 partial), (R: 2 full, 1 partial)": 992
+ },
+ "invariance_ok": true,
+ "orbit_records": {
+  "count": 42124,
+  "written_to": "one-spare-inventory-n21-orbits.json.gz",
+  "note": "The per-orbit records are gzipped beside this file: the uncompressed inventory is 21.6 MB, over the 5 MB this results directory keeps inline. Every count in this file is a total over those records, and each record carries both its class and its class_before_propagation."
+ }
+}

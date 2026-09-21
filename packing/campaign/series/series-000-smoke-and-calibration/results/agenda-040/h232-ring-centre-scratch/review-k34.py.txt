@@ -1,0 +1,22 @@
+# Retained Session 148 scratch (H-232 ring-centre lane), not a maintained tool: run as written against packing/ at 19cdd4f8, kept as .py.txt so it stays off the import path and out of the Ruff/BasedPyright floor.
+import itertools, time
+from fractions import Fraction as F
+exec(open("arr.py").read().split("# how many triples")[0].replace('print(','(lambda *a,**k:None)('))
+t0=time.time()
+# 3-of-4: charge = cores in >=3 of 4 traces = union over pairs... = (ab&(c|d)) | (cd&(a|b)) | (ac&d) | (bd&... ) ; simpler: count per core
+M=maxi; sz=[bin(m).count("1") for m in M]
+order=sorted(range(len(M)),key=lambda i:-sz[i]); M=[M[i] for i in order]; sz=[sz[i] for i in order]
+best=0
+for i in range(len(M)):
+    for j in range(i+1,len(M)):
+        if (sz[i]+sz[j]+sz[j]+sz[j])/3<=best: break
+        ab=M[i]&M[j]
+        for k in range(j+1,len(M)):
+            if (sz[i]+sz[j]+sz[k]+sz[k])/3<=best: break
+            ac=M[i]&M[k]; bc=M[j]&M[k]; abc=ab&M[k]
+            two=(ab|ac|bc)   # in >=2 of a,b,c
+            for l in range(k+1,len(M)):
+                if (sz[i]+sz[j]+sz[k]+sz[l])/3<=best: break
+                ch=bin(abc|(two&M[l])).count("1")
+                if ch>best: best=ch; arg=(i,j,k,l)
+print("max 3-of-4 charge (cores):",best,"=",F(best,8),"time",round(time.time()-t0,1))

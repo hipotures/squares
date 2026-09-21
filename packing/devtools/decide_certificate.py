@@ -31,11 +31,29 @@ remember.
 
 A certificate may say what it claims to be with ``variant``. ``unconditional`` -- the
 theorem as stated, Conditions 1--5 and nothing assumed -- is the default when the key
-is absent and the only value this gate decides. ``class`` (a bound restricted to a
-class of packings) and ``conditional`` (a bound under a named hypothesis) are reserved
-names: a certificate declaring either is refused before any route runs, by name,
-because this gate implements only the unconditional conditions and a verdict printed
-under the wrong ones would read as retainable. Any other string is refused as unknown.
+is absent and the only value this gate decides on its own. ``conditional`` (a bound
+under a named hypothesis) is a reserved name: a certificate declaring it is refused
+before any route runs, by name, because this gate implements none of its conditions and
+a verdict printed under the wrong ones would read as retainable. Any other string is
+refused as unknown.
+
+``class`` is decided only for the one class this gate implements, and only when asked
+for it by name::
+
+    uv run --frozen python -m devtools.decide_certificate --corner-clip 1/2 <path>
+
+That restricts Condition 5 on *both* routes to lane-a Theorem B's free-corner domain:
+the cores avoiding every corner triangle ``x + y <= d`` and its three D4 images. The
+record must itself declare ``variant: class`` and the same ``corner_clip``, so the
+hypothesis lives in the bytes that are decided and the flag only says which hypothesis
+the operator meant. It must also carry the class's own ``claim`` and ``id`` -- the
+claim names the class and never reads ``s(n) >= L``, the id carries the threshold --
+because ``variant`` alone is one field between a class record and a reader who takes a
+claim string for a bound (review defect D1). A record declaring ``variant: class``
+while claiming the unconditional conclusion is refused under the flag, by name.
+Without the flag a ``class`` record is refused exactly as before,
+and a positive verdict under the flag prints RETAINABLE UNDER THE CORNER CLASS
+HYPOTHESIS rather than the bare word.
 """
 
 from __future__ import annotations
@@ -57,6 +75,14 @@ from sqpack.fractional.certificate import (
     least_size_certified,
     verify,
 )
+from sqpack.fractional.corner_clip import (
+    CERTIFICATE_VARIANTS,
+    CLASS,
+    UNCONDITIONAL,
+    class_certificate_id,
+    class_claim,
+    clip_from_optional,
+)
 from sqpack.fractional.interval import (
     MAX_INTERVAL_ATOMS,
     IntervalInputError,
@@ -70,12 +96,13 @@ MAX_RATIONAL_TEXT = 512
 MAX_DIRECTION_STEPS = 10_000
 MAX_ATOMS = MAX_INTERVAL_ATOMS
 MAX_CERTIFICATE_BYTES = 8 * 1024 * 1024
-# What a certificate claims to be. Only the unconditional theorem is decided here; the
-# other two names are reserved so that a certificate declaring one is refused by name
-# rather than read as unconditional and printed RETAINABLE under conditions it never
-# claimed. Neither class nor conditional checking is implemented.
-UNCONDITIONAL = "unconditional"
-CERTIFICATE_VARIANTS = (UNCONDITIONAL, "class", "conditional")
+# What a certificate claims to be. The unconditional theorem is what this gate decides
+# unless it is asked for the one class it implements by name (``--corner-clip``); the
+# other names are reserved so that a certificate declaring one is refused by name rather
+# than read as unconditional and printed RETAINABLE under conditions it never claimed.
+# Conditional checking is not implemented at all. The names come from ``corner_clip``
+# so the gate and the reader-side reconciliation share one vocabulary rather than two
+# that can drift (review finding H1).
 
 
 class CertificateFormatError(ValueError):
@@ -143,21 +170,56 @@ def _exact_rational(record: dict[str, object], key: str) -> Fraction:
     return _rational(_required(record, key), field=key)
 
 
-def _require_unconditional(record: dict[str, object]) -> None:
-    """Refuse any declared variant this gate does not implement, naming it."""
+def _require_declared_variant(record: dict[str, object], corner_clip: Fraction | None) -> None:
+    """Refuse any declared variant this gate does not implement, naming it.
+
+    Without ``--corner-clip`` the gate decides the unconditional theorem and nothing
+    else, exactly as before. With it, the one class this gate implements -- lane-a
+    Theorem B's free-corner domain -- is admitted, and only when the record itself
+    declares the same threshold. That is the whole of the policy: the hypothesis lives
+    in the bytes, the flag only says which hypothesis the operator meant, and the two
+    must agree or nothing is decided. A record carrying ``corner_clip`` without
+    ``variant: class`` is refused too, so a clipped candidate can never be read as the
+    unconditional theorem by leaving a field out.
+    """
+
     variant = record.get("variant", UNCONDITIONAL)
     if not isinstance(variant, str) or variant not in CERTIFICATE_VARIANTS:
         raise CertificateFormatError(
             f"field 'variant' must be one of {CERTIFICATE_VARIANTS}, got {variant!r}"
         )
-    if variant != UNCONDITIONAL:
+    declared_clip = record.get("corner_clip")
+    if declared_clip is not None and variant != CLASS:
         raise CertificateFormatError(
-            f"variant {variant!r} is declared, and this gate implements only the "
-            f"unconditional conditions; a {variant} certificate cannot be decided here"
+            "field 'corner_clip' is declared without variant: class; a clipped "
+            "candidate must say so in its variant"
+        )
+    if corner_clip is None:
+        if variant != UNCONDITIONAL:
+            raise CertificateFormatError(
+                f"variant {variant!r} is declared, and this gate implements only the "
+                f"unconditional conditions; a {variant} certificate cannot be decided "
+                "here. The one exception is the corner class: pass --corner-clip d"
+            )
+        return
+    if variant != CLASS:
+        raise CertificateFormatError(
+            f"--corner-clip was given but the record declares variant {variant!r}; a "
+            "clipped decision needs a record that declares variant: class"
+        )
+    if declared_clip is None:
+        raise CertificateFormatError(
+            "--corner-clip was given but the record declares no 'corner_clip'"
+        )
+    if _rational(declared_clip, field="corner_clip") != corner_clip:
+        raise CertificateFormatError(
+            f"declared corner_clip {declared_clip!r} != the requested {corner_clip}"
         )
 
 
-def _load_bytes(data: bytes) -> tuple[Certificate, dict[str, object]]:
+def _load_bytes(
+    data: bytes, corner_clip: Fraction | None = None
+) -> tuple[Certificate, dict[str, object]]:
     """Rebuild a certificate from one frozen byte string."""
     try:
         decoded = cast(
@@ -192,7 +254,7 @@ def _load_bytes(data: bytes) -> tuple[Certificate, dict[str, object]]:
     _exact_string(record, "claim")
     _exact_rational(record, "total_mass")
     symmetry = _exact_string(record, "symmetry")
-    _require_unconditional(record)
+    _require_declared_variant(record, corner_clip)
     if "least_cell_mass" in record:
         _exact_rational(record, "least_cell_mass")
 
@@ -237,14 +299,16 @@ def _read_bounded(path: Path) -> bytes:
     return data
 
 
-def load_frozen_bytes(data: bytes) -> tuple[Certificate, dict[str, object]]:
+def load_frozen_bytes(
+    data: bytes, corner_clip: Fraction | None = None
+) -> tuple[Certificate, dict[str, object]]:
     """Parse one bounded byte snapshot with the certificate gate's strict decoder."""
 
     if len(data) > MAX_CERTIFICATE_BYTES:
         raise CertificateFormatError(
             f"data exceeds the {MAX_CERTIFICATE_BYTES}-byte certificate limit"
         )
-    return _load_bytes(data)
+    return _load_bytes(data, corner_clip)
 
 
 def read_bounded(path: Path) -> bytes:
@@ -253,10 +317,12 @@ def read_bounded(path: Path) -> bytes:
     return _read_bounded(path)
 
 
-def load(path: Path) -> tuple[Certificate, dict[str, object]]:
+def load(
+    path: Path, corner_clip: Fraction | None = None
+) -> tuple[Certificate, dict[str, object]]:
     """Rebuild a certificate from a record's own bytes, trusting none of its summary."""
 
-    return _load_bytes(_read_bounded(path))
+    return _load_bytes(_read_bounded(path), corner_clip)
 
 
 def _approx(value: Fraction) -> str:
@@ -287,11 +353,11 @@ def _print_refusals(path: Path, problems: list[str]) -> bool:
 
 
 def _prepare_candidate(
-    path: Path,
+    path: Path, corner_clip: Fraction | None = None
 ) -> tuple[bytes, Certificate, dict[str, object], Fraction]:
     try:
         frozen = _read_bounded(path)
-        certificate, record = _load_bytes(frozen)
+        certificate, record = _load_bytes(frozen, corner_clip)
     except (CertificateFormatError, OSError) as error:
         raise CandidateRefusalError(f"cannot load certificate: {error}") from None
     try:
@@ -304,26 +370,59 @@ def _prepare_candidate(
     return frozen, certificate, record, Fraction(total, scale)
 
 
-def decide(path: Path, *, quick: bool, dump_stalls: Path | None = None) -> bool:
+def decide(
+    path: Path,
+    *,
+    quick: bool,
+    dump_stalls: Path | None = None,
+    corner_clip: Fraction | None = None,
+) -> bool:
     try:
-        frozen, certificate, record, mass = _prepare_candidate(path)
+        frozen, certificate, record, mass = _prepare_candidate(path, corner_clip)
     except CandidateRefusalError as error:
         print(f"{path}: REFUSED: {error}", flush=True)
         return False
     side = certificate.outer_side
+    clip = clip_from_optional(corner_clip, side, certificate.square_side)
     print(
         f"{path}: n = {certificate.n}, L = {side} = {_approx(side)}, "
-        f"{len(certificate.atoms)} atoms, mass {mass} = {_approx(mass)}",
+        f"{len(certificate.atoms)} atoms, mass {mass} = {_approx(mass)}"
+        + ("" if clip is None else f", corner clip d = {clip.depth}"),
         flush=True,
     )
 
     problems: list[str] = []
-    expected_claim = f"s({certificate.n}) >= {side}"
+    # What the bytes have to claim. Unclipped, that is the theorem's conclusion and the
+    # comparison this gate has always made. Under the clip it is the class's own claim,
+    # so a record cannot be decided as a class while carrying the theorem's sentence:
+    # ``variant`` was the only field saying so, and a reader scanning claim strings
+    # never saw it (review defect D1).
+    theorem_claim = f"s({certificate.n}) >= {side}"
+    expected_claim = (
+        theorem_claim if clip is None else class_claim(certificate.n, side, clip.depth)
+    )
     declared_claim = _exact_string(record, "claim")
     if declared_claim != expected_claim:
-        problems.append(
-            f"declared claim {declared_claim!r} != theorem conclusion {expected_claim!r}"
-        )
+        if clip is not None and declared_claim == theorem_claim:
+            problems.append(
+                f"declared claim {declared_claim!r} is the unconditional theorem "
+                f"conclusion on a variant: class record; a candidate decided under the "
+                f"corner clip d = {clip.depth} must claim {expected_claim!r}"
+            )
+        else:
+            problems.append(
+                f"declared claim {declared_claim!r} != "
+                + (
+                    f"theorem conclusion {expected_claim!r}"
+                    if clip is None
+                    else f"class claim {expected_claim!r}"
+                )
+            )
+    if clip is not None:
+        expected_id = class_certificate_id(certificate.n, side, clip.depth)
+        declared_id = _exact_string(record, "id")
+        if declared_id != expected_id:
+            problems.append(f"declared id {declared_id!r} != class id {expected_id!r}")
     declared_mass = _exact_rational(record, "total_mass")
     if declared_mass != mass:
         problems.append(f"declared total_mass {declared_mass} != recomputed {mass}")
@@ -350,9 +449,14 @@ def decide(path: Path, *, quick: bool, dump_stalls: Path | None = None) -> bool:
     start = time.time()
     interval = None
     stall_log: dict[str, list[list[float]]] = {}
+    # An unconditional decision calls both routes exactly as it did before the clip
+    # existed, with no extra argument: same call, same bytes, same verdict.
+    log = stall_log if dump_stalls is not None else None
     try:
-        interval = verify_by_intervals(
-            certificate, enclose=True, stall_log=stall_log if dump_stalls is not None else None
+        interval = (
+            verify_by_intervals(certificate, enclose=True, stall_log=log)
+            if clip is None
+            else verify_by_intervals(certificate, enclose=True, stall_log=log, clip=clip)
         )
     except IntervalInputError as error:
         problems.append(f"the interval route could not decide it: {error}")
@@ -416,7 +520,7 @@ def decide(path: Path, *, quick: bool, dump_stalls: Path | None = None) -> bool:
         return True
 
     start = time.time()
-    exact = verify(certificate)
+    exact = verify(certificate) if clip is None else verify(certificate, clip=clip)
     print(
         f"  exact    accepted={exact.accepted} least={exact.minimum_cell_mass} "
         f"({time.time() - start:.0f}s)",
@@ -441,8 +545,16 @@ def decide(path: Path, *, quick: bool, dump_stalls: Path | None = None) -> bool:
     if problems:
         return _print_refusals(path, problems)
     assert digest is not None
+    headline = (
+        "RETAINABLE"
+        if clip is None
+        else (
+            "RETAINABLE UNDER THE CORNER CLASS HYPOTHESIS "
+            f"(no square meets x + y <= {clip.depth} in any corner frame)"
+        )
+    )
     print(
-        f"  RETAINABLE: both routes accept and agree at {exact.minimum_cell_mass}; "
+        f"  {headline}: both routes accept and agree at {exact.minimum_cell_mass}; "
         f"sha256 {digest}",
         flush=True,
     )
@@ -461,7 +573,20 @@ def main(argv: Sequence[str] | None = None) -> int:
         default=None,
         help="write stalled interval boxes as JSON; does not change the verdict",
     )
+    parser.add_argument(
+        "--corner-clip",
+        type=Fraction,
+        default=None,
+        metavar="d",
+        help=(
+            "decide the corner class of lane-a Theorem B instead of the unconditional "
+            "theorem: Condition 5 quantifies only over cores avoiding every corner "
+            "triangle x + y <= d. The record must declare variant: class and the same d"
+        ),
+    )
     args = parser.parse_args(argv)
+    if args.corner_clip is not None and not 0 < args.corner_clip <= 1:
+        parser.error("--corner-clip must satisfy 0 < d <= 1")
     ok = True
     seen: set[Path] = set()
     for path in args.paths:
@@ -469,7 +594,18 @@ def main(argv: Sequence[str] | None = None) -> int:
             print(f"{path}: SKIPPED duplicate path", flush=True)
             continue
         seen.add(path)
-        ok = decide(path, quick=args.quick, dump_stalls=args.dump_stalls) and ok
+        # Without the flag this is the call the command has always made.
+        decided = (
+            decide(path, quick=args.quick, dump_stalls=args.dump_stalls)
+            if args.corner_clip is None
+            else decide(
+                path,
+                quick=args.quick,
+                dump_stalls=args.dump_stalls,
+                corner_clip=args.corner_clip,
+            )
+        )
+        ok = decided and ok
     return 0 if ok else 1
 
 

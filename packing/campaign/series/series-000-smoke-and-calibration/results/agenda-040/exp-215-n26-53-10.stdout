@@ -1,0 +1,36 @@
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+{
+ "n": 26,
+ "outer_side": "53/10",
+ "square_side": "9977/10000",
+ "grid_counts": [
+  38,
+  51,
+  62
+ ],
+ "inset": "1/2",
+ "angle_limit": "207107/500000",
+ "direction_steps": 181,
+ "scale": 4000000,
+ "column_rounds": 1,
+ "max_rounds": 80,
+ "rows_per_direction": 3,
+ "seed_certificate": null,
+ "seed_map": "scale",
+ "seed_windows": 5,
+ "support_cap": 32
+}
+round    rows  orbits   sites lp_rounds     objective least_covered      depth   seconds  note
+----------------------------------------------------------------------------------------------
+    0   17162    1125    8505        48     25.000000      0.953075        nan    3753.8  deadline reached after 48 rounds
+stopped: deadline reached after 48 rounds
+objective: 25.000000000040338
+least covered mass: 0.9530750900989208
+total mass: None = None
+least cell mass: None
+atoms: 0
+seed sites: 625
+frozen: None
+family frozen: None
+priced support rows: None
+seconds: 3754.0

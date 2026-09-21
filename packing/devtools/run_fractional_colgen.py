@@ -32,6 +32,12 @@ from sqpack.fractional.colgen import (
     generate_adaptive,
     site_counts_for_side,
 )
+from sqpack.fractional.corner_clip import (
+    CornerClip,
+    class_certificate_id,
+    class_claim,
+    clip_from_optional,
+)
 from sqpack.fractional.cutting import SupportEntry, family_record, symmetric_placements
 from sqpack.fractional.generate import net_half_tangents
 from sqpack.fractional.site_merge import MergeReceipt, merge_near_atoms
@@ -69,9 +75,14 @@ class RunSettings:
     seed_windows: int = 0
     # Heaviest dual rows kept for pricing; ``None`` keeps every positive row.
     support_cap: int | None = 32
+    # Lane-a Theorem B's free-corner threshold ``d``. ``None`` is the unconditional
+    # program every run before BC-363 was; a value restricts the row domain to cores
+    # avoiding all four corner triangles and makes the run a statement about that
+    # class of packings, which the frozen candidate then declares.
+    corner_clip: Fraction | None = None
 
     def as_dict(self) -> dict[str, object]:
-        return {
+        settings: dict[str, object] = {
             "n": self.n,
             "outer_side": str(self.outer_side),
             "square_side": str(self.square_side),
@@ -90,6 +101,11 @@ class RunSettings:
             "seed_windows": self.seed_windows,
             "support_cap": self.support_cap,
         }
+        # Only a clipped run names its clip: an unclipped run's settings block and
+        # provenance stay byte-for-byte what they were before the clip existed.
+        if self.corner_clip is not None:
+            settings["corner_clip"] = str(self.corner_clip)
+        return settings
 
 
 def summary(
@@ -287,6 +303,7 @@ def run(
         settings.n, settings.outer_side, settings.square_side, settings.seed_windows
     )
     timings: RowLog | list[RoundTiming] = RowLog(row_log) if row_log is not None else []
+    clip = clip_from_optional(settings.corner_clip, settings.outer_side, settings.square_side)
     candidate, log = generate_adaptive(
         settings.n,
         settings.outer_side,
@@ -307,6 +324,7 @@ def run(
         seed_points=seed,
         timings=timings,
         deadline=deadline,
+        clip=clip,
     )
     seconds = time.perf_counter() - started
     if isinstance(timings, RowLog):
@@ -322,11 +340,16 @@ def run(
         if verify_serial:
             # One worker, never the pool: a lane holding one core must not
             # start a parallel sweep, and this only fills the declaration.
-            least_cell_mass = str(verify(candidate, workers=1).minimum_cell_mass)
+            verdict = (
+                verify(candidate, workers=1)
+                if clip is None
+                else verify(candidate, workers=1, clip=clip)
+            )
+            least_cell_mass = str(verdict.minimum_cell_mass)
         freeze.parent.mkdir(parents=True, exist_ok=True)
-        freeze.write_text(certificate_json(candidate, least_cell_mass))
+        freeze.write_text(certificate_json(candidate, least_cell_mass, clip=clip))
         frozen = freeze
-    family_frozen = _freeze_priced_family(settings, log, freeze_family)
+    family_frozen = freeze_priced_family(settings, log, freeze_family)
     result = summary(settings, log, candidate, seconds, frozen)
     result["least_cell_mass"] = least_cell_mass
     result["family_frozen"] = None if family_frozen is None else str(family_frozen)
@@ -361,7 +384,7 @@ def run(
     return result
 
 
-def _freeze_priced_family(
+def freeze_priced_family(
     settings: RunSettings, log: AdaptiveLog, path: Path | None
 ) -> Path | None:
     """Write the priced dual as a ceiling-family record, or skip if there is none."""
@@ -386,24 +409,59 @@ def _freeze_priced_family(
         "stopped": log.stopped,
         "support_rows": len(log.priced_support),
     }
+    record = family_record(family, provenance)
+    if settings.corner_clip is not None:
+        # The clip belongs at the top level, beside the placements it priced, and not
+        # only inside ``provenance.settings`` where a reader has to go looking for it
+        # (review defect D4). The covering record declares the hypothesis the same way,
+        # so a family and the candidate it priced read alike, and the ceiling readers
+        # refuse to print the unconditional sentence over these bytes.
+        record["variant"] = "class"
+        record["corner_clip"] = str(settings.corner_clip)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(family_record(family, provenance), indent=1) + "\n")
+    path.write_text(json.dumps(record, indent=1) + "\n")
     return path
 
 
-def certificate_json(certificate: Certificate, least_cell_mass: str | None) -> str:
+def certificate_json(
+    certificate: Certificate,
+    least_cell_mass: str | None,
+    *,
+    clip: CornerClip | None = None,
+) -> str:
     """The retained on-disk shape, which `cases/*/replay.py` reads back.
 
     ``least_cell_mass`` is a declaration and not a decision: it is left null
     when nothing has computed it, so a frozen candidate never carries a number
     no run produced. `devtools.decide_certificate` is what decides the bytes.
+
+    A run under a corner clip writes ``variant`` and ``corner_clip`` into the record,
+    so the hypothesis travels with the bytes. The gate refuses ``variant: class``
+    unless it is asked for the same clip on its own command line, which is what keeps
+    a class candidate from ever being read as the unconditional theorem.
+
+    It also writes the claim and the id of that class rather than the theorem's
+    (review defect D1). A clipped record used to carry ``s(n) >= L`` word for word, so
+    the only thing standing between those bytes and a reader who takes a claim string
+    at face value was ``variant``. The class strings say the class in the claim and
+    carry the threshold in the id, and the gate expects exactly them under the flag.
     """
 
+    identifier = (
+        f"C-n{certificate.n:03d}-fractional-"
+        f"{certificate.outer_side.numerator}-{certificate.outer_side.denominator}"
+        if clip is None
+        else class_certificate_id(certificate.n, certificate.outer_side, clip.depth)
+    )
+    claim = (
+        f"s({certificate.n}) >= {certificate.bounded_side}"
+        if clip is None
+        else class_claim(certificate.n, certificate.bounded_side, clip.depth)
+    )
     record: dict[str, object] = {
-        "id": f"C-n{certificate.n:03d}-fractional-"
-        f"{certificate.outer_side.numerator}-{certificate.outer_side.denominator}",
+        "id": identifier,
         "n": certificate.n,
-        "claim": f"s({certificate.n}) >= {certificate.bounded_side}",
+        "claim": claim,
         "outer_side": str(certificate.outer_side),
         "square_side": str(certificate.square_side),
         "angle_limit": str(certificate.half_tangents[-1]),
@@ -413,6 +471,9 @@ def certificate_json(certificate: Certificate, least_cell_mass: str | None) -> s
         "symmetry": certificate.symmetry,
         "atoms": [[str(atom.x), str(atom.y), str(atom.weight)] for atom in certificate.atoms],
     }
+    if clip is not None:
+        record["variant"] = "class"
+        record["corner_clip"] = str(clip.depth)
     return json.dumps(record, indent=1) + "\n"
 
 
@@ -441,6 +502,17 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--column-rounds", type=int, default=8)
     parser.add_argument("--max-rounds", type=int, default=60)
     parser.add_argument("--rows-per-direction", type=int, default=3)
+    parser.add_argument(
+        "--corner-clip",
+        type=Fraction,
+        default=None,
+        metavar="d",
+        help=(
+            "lane-a Theorem B free-corner threshold: restrict the row domain to cores "
+            "avoiding every corner triangle x + y <= d (0 < d <= 1). The run then "
+            "decides that class, and the frozen candidate declares variant: class"
+        ),
+    )
     parser.add_argument(
         "--support-cap",
         type=int,
@@ -500,6 +572,8 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     if args.support_cap < 0:
         parser.error("--support-cap must be non-negative")
+    if args.corner_clip is not None and not 0 < args.corner_clip <= 1:
+        parser.error("--corner-clip must satisfy 0 < d <= 1")
 
     settings = RunSettings(
         n=args.n,
@@ -517,6 +591,7 @@ def main(argv: list[str] | None = None) -> int:
         seed_map=args.seed_map,
         seed_windows=args.seed_windows,
         support_cap=None if args.support_cap == 0 else args.support_cap,
+        corner_clip=args.corner_clip,
     )
     print(json.dumps(settings.as_dict(), indent=1), flush=True)
     result = run(

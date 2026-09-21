@@ -2,7 +2,7 @@ softschema:
   contract: packing.squares:ResultsRegister/v1
   schema: results.schema.yaml
   status: enforced
-last_reviewed: '2026-09-18'
+last_reviewed: '2026-09-20'
 results:
   - id: T-001
     claim: >-
@@ -1777,6 +1777,110 @@ results:
       review-ready under epistemics.md -- a mapped, non-superseded review artifact
       -- and none has been written for this result.
   - id: T-031
+    claim: >-
+      At L = 96/25 and B = 9977/10000 on the 181-direction net (half-tangents
+      k*207107/90000000, k = 0..180), the D4-symmetric point measure of total mass
+      10868617/1000000 = 10.868617 in cases/n11_corner_class_certificate/certificate.json, the retained exp-220 covering (SHA-256
+      876820dde8d55c727dec73c85f245db27661556bb3c7aa06ffb15b01ec97a461) charges at
+      least 2000013/2000000 to every closed B-square at a net direction whose minimum
+      of x + y is at least 1/2 in each of the four corner frames, decided by the exact
+      event-cell sweep and by the interval branch and bound, which agree at that value.
+      Consequently every packing of eleven unit squares in [0, 96/25]^2 contains a
+      unit square whose minimum of x + y in some corner frame is strictly below 1/2,
+      that is, one that meets the open corner triangle x + y < 1/2 at that corner;
+      equivalently, the all-free (octagon) class of lane-a Theorem B at threshold 1/2
+      contains no eleven-square packing at side 96/25. This is a conditional exclusion
+      of one corner-bin class and changes no bound on s(11); the all-deep class is
+      separately known to be outside this language's reach (BC-366), so the corner
+      tree cannot close at 96/25 by clipping alone.
+    scope:
+      n_values:
+        - 11
+    verification: V4
+    confirmation: C3
+    significance:
+      score: 2
+      rationale: >-
+        The first decided item of the corner-conditioned point language at the central
+        open size: one D4 class of the corner tree is excluded at 3.84 by a certificate
+        on a clipped domain, with the structural consequence that every eleven-square
+        packing in a square of side 96/25 has a square meeting an open corner triangle
+        of depth 1/2. It moves no bound, and the registration review shows the tree it
+        belongs to cannot close at this side in the point language alone, since the
+        all-deep class is a Lemma-D theorem for every site set (BC-366); the mixed
+        classes are a bounded follow-up.
+      scored: '2026-09-20'
+      by: Session 146 adversarial registration review (REGISTER WITH CORRECTIONS) and coordinator review
+    novelty: apparently-novel
+    composition: >-
+      The certificate is a weighted fractional unavoidable-set certificate of the
+      retained form whose row domain is the D4-symmetric convex clip of the admissible
+      core domain by the four corner triangles at depth 1/2, admitted as a domain
+      predicate on the row generator and threaded through both gate routes and the
+      ceiling readers in Session 145 with a residual-7 control on the transported
+      88-family. The declared C3 is deliberately below the C4 the two cited atoms
+      derive, and the minimum over parts is what this note claims. The exact event-cell
+      sweep and the interval branch and bound are the two internal routes of one
+      decide_certificate --corner-clip 1/2 invocation, which refuses the file unless
+      both accept: they share the Certificate parser and the closed-form conditions,
+      carry a byte-identical replay string, and the exact leg records
+      relationship_to_generator: same-implementation, so the repository counts the pair
+      as one confirmation and not as two method-distinct derivations. The Session 146
+      registration review says exactly that and recommends V4/C3; a genuinely separate
+      derivation of this clipped decision would earn C4, and none exists. V4 still
+      rests on the two machine decisions of the frozen bytes, which fail differently:
+      the exact event-cell sweep with the clip as extra half-planes on the per-slab
+      centre range, and the interval branch and bound whose boxes are dropped only when
+      provably inside the excluded set; the two decide the same set only because the
+      clip is D4-invariant and folded, which the instrument's tests check. Conditions 1
+      to 4 are decided exactly before either route runs. The conclusion transfers from the
+      shrunken cores to the unit squares without loss in the direction that matters,
+      because the kept domain is closed and a core lies strictly inside its square by
+      Condition 4. The retained bytes declare variant class and the clip, and the gate
+      refuses them without the flag, so the file cannot be read as a bound.
+    produced_by:
+      hypothesis: H-222
+      agenda_cell: BC-367
+      session: session-146
+      experiment: exp-220
+    evidence:
+      - E-n011-corner-class-96-25-exact-decision
+      - E-n011-corner-class-96-25-interval-decision
+    artifacts:
+      - packing/cases/n11_corner_class_certificate/certificate.json
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-220-n11-96-25-class-covering.json
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-220-n11-96-25-class-decide.stdout
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-220-n11-96-25-class-decide-noflag.stdout
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-220-n11-96-25-class-receipt.md
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-219-n11-96-25-clip-receipt.md
+      - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/h222-registration-review.md
+      - packing/src/sqpack/fractional/corner_clip.py
+      - packing/devtools/decide_certificate.py
+    controls:
+      - packing/tests/test_n11_corner_class_certificate.py
+      - packing/tests/test_fractional_corner_clip.py
+      - packing/tests/test_decide_certificate.py
+    next_rung: >-
+      The complementary class, in which some core meets a corner triangle, is the hard
+      one: the all-deep class is a Lemma-D theorem for every site set (the transported
+      88-family keeps residual 7 against a requirement of 7, BC-366), so no point
+      covering excludes it and the corner tree cannot make 96/25 unconditional by
+      clipping. The four mixed D4 classes (fourteen bin vectors) are a bounded
+      follow-up under BC-367 and need a box cut on the row domain. The instrument that
+      could matter is a 2-of-3 threshold atom on ring-centre overlaps inside the
+      all-deep class, which needs the clip wired into the threshold routes. C5 needs
+      the registration review mapped under docs/project/reviews; the case directory and
+      the gate control test in the T-022 pattern are retained.
+    notes: >-
+      Registered at the close of the overnight loop from exp-220, the exp-219 covering
+      re-frozen under the class claim strings after the registration review found the
+      original bytes carried an unconditional claim string (review defect D1). Every
+      atom of exp-220 equals exp-219's as an exact Fraction in the same order; the
+      corrected gate refuses exp-219's bytes and accepts exp-220's. Apparent novelty
+      concerns this explicit clipped-domain certificate; no priority search was
+      performed. The statement itself is unconditional about every packing at 96/25;
+      the exclusion of the class is what is conditional.
+  - id: T-032
     claim: >-
       s(17) >= 461300/99999 = 4.61304613..., by Guzhou0806's R012 parent-angle
       certificate of 20 September 2026, replayed here by the source's exact checker and
