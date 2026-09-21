@@ -4108,7 +4108,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     // comes and goes: n's open side through the dwell, n + 1's once the box has grown.
     let held = sceneSide;
     if (!optimizing && t <= sc.moveStart) {
-      box = from;
+      box = Math.min(from, open);
       // The room n + 1 will need, drawn in the trace's light grey from the dwell onward. It is
       // what the box darkens INTO at the step's start, so it has to already be there: a line
       // that grew outward would say the container was being enlarged, and the container is only
@@ -4122,17 +4122,24 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       // the container ever shows is shrinking. The story across a step: green at n's best side,
       // the light grey outside it saying how much room n + 1 needs, that grey darkening in place
       // when the step begins, and then the dark line shrinking back to green at n + 1's side.
-      box = Math.max(sceneSide, open);
+      box = open;
       ink = easeInOut(ramp(t, sc.containerStart, sc.containerEnd));
       trace = open;
       seen = 1;
-      held = Math.max(box, open);
+      held = open;
     } else if (!optimizing) {
       const settleStart = Math.max(sc.moveEnd, sc.containerEnd);
-      trace = Math.max(sceneSide, open);
-      box = Math.max(sceneSide, lerp(trace, to, easeInOut(ramp(t, settleStart, sc.end))));
+      trace = open;
+      // **Not `max(sceneSide, ...)`.** Under a physical style the simulated container breathes,
+      // and a box that took its side whenever it was the larger followed it OUTWARD -- measured
+      // on the step into 51, the drawn line ran 991 px, out to 1018, and back to 1007. That is
+      // the growth this was meant to end, and because the view is held to the box it also
+      // widened and narrowed again, which is every square on the stage shrinking and swelling
+      // for no reason a viewer can see. The box is the side the STEP is using, which only ever
+      // falls: from the room n + 1 needs to the side n + 1 settles at.
+      box = lerp(open, to, easeInOut(ramp(t, settleStart, sc.end)));
       seen = 1;
-      held = trace;
+      held = open;
     }
     if (!optimizing) {
       holdInView(held);
