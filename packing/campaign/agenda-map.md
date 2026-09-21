@@ -65,7 +65,7 @@ Commitments a session may take now, in each agenda's declared order.
 | agenda-036 | `BC-351` | tentative | 3 | insight | research | Can an orientation-sensitive two- or three-parent gap lemma be summed without double counting to prove… | `think-gzjq` |
 | agenda-037 | `BC-357` | in_progress | 1 | correctness | measurement_validation | Does a helper-free point-atom certificate exist for n=6 at side 299/100 with B = 9977/10000 on the… | `think-qqzs` |
 | agenda-037 | `BC-359` | tentative | 2 | insight | research | Is the integral piercing number of the T-018 site set at side 3.80 on a 37-direction net at most 11, as a… | `think-k4vb` |
-| agenda-040 | `BC-367` | ready | 0 | insight | research | Does the corner-clip exclusion extend from the octagon class to the other corner-bin classes at 96/25, so… | `think-b7pr` |
+| agenda-040 | `BC-367` | ready | 0 | insight | research | Is the exp-219 exclusion registered at its reviewed scope, does the corner-clip exclusion extend from the… | `think-b7pr` |
 
 ## Blocked, and on what
 
@@ -394,7 +394,7 @@ Open frontier: `BC-221`, `BC-222`, `BC-223`, `BC-224`, `BC-225`.
 | agenda-040 | `BC-364` | blocked | Can the tilted-anchor case or a gap-g wedge conflict edge cut the retained n=11 families at 96/25… |
 | agenda-040 | `BC-365` | blocked | Does an unshrunk covering of mass below 12 exist at side exactly 4? |
 | agenda-040 | `BC-366` | stopped | Should the corner-penetration deep branches, the theta screen, the stressed contact-graph theorem,… |
-| agenda-040 | `BC-367` | ready | Does the corner-clip exclusion extend from the octagon class to the other corner-bin classes at… |
+| agenda-040 | `BC-367` | ready | Is the exp-219 exclusion registered at its reviewed scope, does the corner-clip exclusion extend… |
 
 Open frontier: `BC-342`, `BC-344`, `BC-345`, `BC-348`, `BC-349`, `BC-350`, `BC-351`, `BC-352`, `BC-341`, `BC-343`, `BC-357`, `BC-358`, `BC-359`, `BC-364`, `BC-365`, `BC-367`.
 

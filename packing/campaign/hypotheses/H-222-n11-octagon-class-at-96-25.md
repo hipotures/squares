@@ -59,13 +59,22 @@ hypothesis:
     class is obstructed for every site set; the all-free class is the only branch
     with headroom (the family's residual there is 7 against a requirement of 11).
     A kill here is a structural negative about corner conditioning in the point
-    language; a confirm is a conditional exclusion at 3.84 that still needs the
-    other fifteen bin classes before it is a bound. 2026-09-20 Session 145: the
+    language; a confirm is a conditional exclusion at 3.84 that would still need
+    the other bin classes before it is a bound. 2026-09-20 Session 145: the
     convex corner-clip instrument was admitted after a Fable review, and exp-219
     printed RETAINABLE UNDER THE CORNER CLASS HYPOTHESIS on both routes at 96/25 with
     frozen mass 10868617/1000000 and least charge 2000013/2000000. Confirmed at this
-    scope: every packing of eleven unit squares at side 96/25 has a square meeting a
-    corner triangle x + y <= 1/2. Not a bound on s(11).
+    scope: every packing of eleven unit squares in a square of side 96/25 has a
+    square meeting the open corner triangle x + y < 1/2 at some corner. Not a bound on
+    s(11). Session 146's registration review (REGISTER WITH CORRECTIONS,
+    results/agenda-040/h222-registration-review.md) confirmed the gate byte-for-byte
+    and the logical direction, found no soundness defect, and corrected the scope:
+    the all-deep class is already outside the point language for every site set
+    (BC-366), so fourteen bin vectors in four mixed D4 classes remain open and the
+    corner tree cannot close at 96/25 by clipping alone; exp-220 (accepted) re-froze
+    the same 680-atom covering under the class claim strings, sha256
+    876820dde8d55c727dec73c85f245db27661556bb3c7aa06ffb15b01ec97a461, and supersedes
+    exp-219's bytes as the record of the exclusion.
 ---
 # H-222: The All-Free Corner Class at n=11, 96/25
 

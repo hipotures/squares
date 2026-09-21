@@ -32,7 +32,12 @@ from sqpack.fractional.colgen import (
     generate_adaptive,
     site_counts_for_side,
 )
-from sqpack.fractional.corner_clip import CornerClip, clip_from_optional
+from sqpack.fractional.corner_clip import (
+    CornerClip,
+    class_certificate_id,
+    class_claim,
+    clip_from_optional,
+)
 from sqpack.fractional.cutting import SupportEntry, family_record, symmetric_placements
 from sqpack.fractional.generate import net_half_tangents
 from sqpack.fractional.site_merge import MergeReceipt, merge_near_atoms
@@ -344,7 +349,7 @@ def run(
         freeze.parent.mkdir(parents=True, exist_ok=True)
         freeze.write_text(certificate_json(candidate, least_cell_mass, clip=clip))
         frozen = freeze
-    family_frozen = _freeze_priced_family(settings, log, freeze_family)
+    family_frozen = freeze_priced_family(settings, log, freeze_family)
     result = summary(settings, log, candidate, seconds, frozen)
     result["least_cell_mass"] = least_cell_mass
     result["family_frozen"] = None if family_frozen is None else str(family_frozen)
@@ -379,7 +384,7 @@ def run(
     return result
 
 
-def _freeze_priced_family(
+def freeze_priced_family(
     settings: RunSettings, log: AdaptiveLog, path: Path | None
 ) -> Path | None:
     """Write the priced dual as a ceiling-family record, or skip if there is none."""
@@ -404,8 +409,17 @@ def _freeze_priced_family(
         "stopped": log.stopped,
         "support_rows": len(log.priced_support),
     }
+    record = family_record(family, provenance)
+    if settings.corner_clip is not None:
+        # The clip belongs at the top level, beside the placements it priced, and not
+        # only inside ``provenance.settings`` where a reader has to go looking for it
+        # (review defect D4). The covering record declares the hypothesis the same way,
+        # so a family and the candidate it priced read alike, and the ceiling readers
+        # refuse to print the unconditional sentence over these bytes.
+        record["variant"] = "class"
+        record["corner_clip"] = str(settings.corner_clip)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(family_record(family, provenance), indent=1) + "\n")
+    path.write_text(json.dumps(record, indent=1) + "\n")
     return path
 
 
@@ -425,13 +439,29 @@ def certificate_json(
     so the hypothesis travels with the bytes. The gate refuses ``variant: class``
     unless it is asked for the same clip on its own command line, which is what keeps
     a class candidate from ever being read as the unconditional theorem.
+
+    It also writes the claim and the id of that class rather than the theorem's
+    (review defect D1). A clipped record used to carry ``s(n) >= L`` word for word, so
+    the only thing standing between those bytes and a reader who takes a claim string
+    at face value was ``variant``. The class strings say the class in the claim and
+    carry the threshold in the id, and the gate expects exactly them under the flag.
     """
 
+    identifier = (
+        f"C-n{certificate.n:03d}-fractional-"
+        f"{certificate.outer_side.numerator}-{certificate.outer_side.denominator}"
+        if clip is None
+        else class_certificate_id(certificate.n, certificate.outer_side, clip.depth)
+    )
+    claim = (
+        f"s({certificate.n}) >= {certificate.bounded_side}"
+        if clip is None
+        else class_claim(certificate.n, certificate.bounded_side, clip.depth)
+    )
     record: dict[str, object] = {
-        "id": f"C-n{certificate.n:03d}-fractional-"
-        f"{certificate.outer_side.numerator}-{certificate.outer_side.denominator}",
+        "id": identifier,
         "n": certificate.n,
-        "claim": f"s({certificate.n}) >= {certificate.bounded_side}",
+        "claim": claim,
         "outer_side": str(certificate.outer_side),
         "square_side": str(certificate.square_side),
         "angle_limit": str(certificate.half_tangents[-1]),

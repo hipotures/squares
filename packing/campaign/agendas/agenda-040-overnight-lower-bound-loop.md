@@ -176,10 +176,11 @@ agenda:
         The instrument was admitted by an adversarial review (residual 7 reproduced
         three ways; K4 added to both ceiling readers); exp-219 printed RETAINABLE
         UNDER THE CORNER CLASS HYPOTHESIS from both routes with mass 10868617/1000000
-        and least charge 2000013/2000000. Every packing of 11 unit squares at side
-        96/25 therefore has a square meeting a corner triangle x + y <= 1/2: the
-        octagon class is excluded at 3.84. Conditional, not a bound; registration as
-        a frontier item after review is BC-367.
+        and least charge 2000013/2000000. Every packing of 11 unit squares in a square
+        of side 96/25 therefore has a square meeting the open corner triangle
+        x + y < 1/2 at some corner: the octagon class is excluded at 3.84. The
+        exclusion is conditional and not a bound; Session 146's review returned
+        REGISTER WITH CORRECTIONS and the registration is BC-367.
       evidence:
       - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-219-n11-96-25-clip-receipt.md
       disposition: retire-success
@@ -191,9 +192,11 @@ agenda:
     state: ready
     priority: 0
     question: >-
-      Does the corner-clip exclusion extend from the octagon class to the other
-      corner-bin classes at 96/25, so that the corner-conditioned point language
-      closes at 3.84, and does a second site set move the n=26 floor at 53/10?
+      Is the exp-219 exclusion registered at its reviewed scope, does the corner-clip
+      exclusion extend from the octagon class to the four mixed D4 classes (fourteen
+      bin vectors) at 96/25, given that the all-deep class is already outside the
+      point language (BC-366) so the tree cannot close by clipping alone, and does a
+      second site set move the n=26 floor at 53/10?
     hypotheses: [H-222, H-225]
     budget: >-
       Session 146, one to two hours: a W2 review-and-register step for the exp-219

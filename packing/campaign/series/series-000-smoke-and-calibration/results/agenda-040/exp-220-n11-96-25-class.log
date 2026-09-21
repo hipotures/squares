@@ -1,0 +1,3 @@
+round 0: rows=6133 orbits=506 sites=3749 lp_rounds=32 objective=10.868522956 depth=1.125738464 cost=-1.005907711 least_covered=1.000000000 seconds=249.1 | adding 1 orbits, deepest at (Fraction(112037, 108600), Fraction(180169, 188825))
+ceiling: proved=False total 8.944877 over 256 squares, max pointwise depth 1.144073 at 299376 vertices (4616 decided exactly), feasible total 7.818449
+rationalised total 10868617/1000000 = 10.868617000 against LP optimum 10.868522956 over 680 atoms

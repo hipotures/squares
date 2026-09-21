@@ -98,6 +98,7 @@ is rational and no angle, tolerance or float takes part in the predicate.
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
 from fractions import Fraction
 
@@ -107,6 +108,23 @@ type HalfPlane = tuple[Fraction, Fraction, Fraction]
 
 #: The four corner sign patterns, in the order (0,0), (L,0), (0,L), (L,L).
 _CORNERS: tuple[tuple[int, int], ...] = ((1, 1), (-1, 1), (1, -1), (-1, -1))
+
+#: What a record declares itself to be. A record with no ``variant`` is the
+#: unconditional theorem, which is what every reader here decided before the corner
+#: class existed; ``class`` is that one class, and ``conditional`` is reserved so a
+#: record declaring it is refused by name rather than read as the unconditional
+#: program. ``devtools.decide_certificate`` imports these so the gate's vocabulary and
+#: the readers' are one list, and ``devtools.independent_ceiling_reader`` restates them
+#: under its stdlib-only contract with a test pinning the two copies together.
+UNCONDITIONAL = "unconditional"
+CLASS = "class"
+CERTIFICATE_VARIANTS = (UNCONDITIONAL, CLASS, "conditional")
+#: The variants a reader-side clip reconciliation can decide. Everything else in
+#: ``CERTIFICATE_VARIANTS`` names a program no reader here implements, and anything
+#: outside it names nothing at all; both are refused before any clip is reconciled
+#: (review finding H1), because falling through to the requested clip would decide the
+#: unconditional program over bytes that declared something else.
+DECIDABLE_VARIANTS = (UNCONDITIONAL, CLASS)
 
 
 class EmptyClippedDomainError(ValueError):
@@ -317,9 +335,121 @@ def clip_from_optional(
     return CornerClip(outer_side, square_side, depth)
 
 
+def class_claim(n: int, bounded_side: Fraction, depth: Fraction) -> str:
+    """What a candidate frozen under the clip claims, in words no reader can misread.
+
+    A clipped run decides one class and not the theorem, so the string it freezes must
+    not be the theorem's. The unconditional claim is ``s(n) >= L``; this one names the
+    class first and never begins with ``s(``, so a reader scanning claim strings for a
+    bound cannot pick it up as one (review defect D1). ``excluded`` is the verdict on
+    the class: no packing of ``n`` unit squares into side ``bounded_side`` keeps all
+    four corner triangles ``x + y <= depth`` free.
+    """
+
+    return f"corner class d = {depth} excluded at s({n}) >= {bounded_side}"
+
+
+def class_certificate_id(n: int, outer_side: Fraction, depth: Fraction) -> str:
+    """The id of a clipped candidate: the unconditional id plus the threshold.
+
+    The unconditional id is ``C-n011-fractional-96-25``; a clip at ``1/2`` makes it
+    ``C-n011-fractional-96-25-clip-1-2``. Two candidates at the same side and different
+    thresholds are then different records, and neither can be mistaken for the
+    unconditional one by its id alone.
+    """
+
+    return (
+        f"C-n{n:03d}-fractional-{outer_side.numerator}-{outer_side.denominator}"
+        f"-clip-{depth.numerator}-{depth.denominator}"
+    )
+
+
+def require_decidable_variant(variant: object) -> None:
+    """Refuse any declared variant these readers do not implement, naming it.
+
+    Absent means the unconditional theorem, and ``class`` is the one class implemented
+    here. Every other name is refused *before* the clip is reconciled: a reader that
+    asked only ``variant == "class"`` let ``conditional`` -- a name the gate's own
+    vocabulary already knows -- and every misspelling fall through to the requested clip
+    and be decided as the unconditional program (review finding H1). That mirrors
+    ``decide_certificate._require_declared_variant``, which has refused the same set at
+    the gate all along.
+    """
+
+    if variant is None or variant in DECIDABLE_VARIANTS:
+        return
+    if isinstance(variant, str) and variant in CERTIFICATE_VARIANTS:
+        raise ValueError(
+            f"the record declares variant: {variant}, and this reader decides only the "
+            f"unconditional program and the corner class; a {variant} record cannot be "
+            "read here"
+        )
+    raise ValueError(f"field 'variant' must be one of {CERTIFICATE_VARIANTS}, got {variant!r}")
+
+
+def declared_class_clip(record: Mapping[str, object]) -> Fraction | None:
+    """The clip a record declares at its top level, or ``None`` for an unclipped one.
+
+    The two fields go together: ``variant: class`` says the bytes decide a class, and
+    ``corner_clip`` says which one. Half a declaration is refused rather than read as
+    either, so no record can lose its hypothesis by leaving a field out. A variant this
+    reader does not implement is refused first, by name, so no unknown hypothesis is
+    read as the unconditional one either.
+    """
+
+    variant = record.get("variant")
+    require_decidable_variant(variant)
+    declared = record.get("corner_clip")
+    if declared is None:
+        if variant == CLASS:
+            raise ValueError("a record declaring variant: class must declare corner_clip")
+        return None
+    if variant != CLASS:
+        raise ValueError("a record declaring corner_clip must declare variant: class")
+    return Fraction(str(declared))
+
+
+def agreed_class_clip(
+    record: Mapping[str, object], requested: Fraction | None, *, reader: str
+) -> Fraction | None:
+    """Reconcile what a record declares with the clip a command line asked for.
+
+    A reader handed a class record without ``--corner-clip`` would otherwise decide the
+    unconditional program over clipped bytes and print the unconditional sentence
+    (review defect D4), so that combination raises. Asking for a clip on a record that
+    declares none stays allowed: that is a reader deciding the class itself, on a family
+    that never claimed it. Asking for a different threshold than the bytes declare is a
+    disagreement about what is being decided, and raises.
+    """
+
+    declared = declared_class_clip(record)
+    if declared is None:
+        return requested
+    if requested is None:
+        raise ValueError(
+            f"{reader}: the record declares variant: class at corner clip d = {declared}, "
+            f"and reading it without --corner-clip {declared} would state the "
+            "unconditional conclusion over bytes that never claimed it"
+        )
+    if requested != declared:
+        raise ValueError(
+            f"{reader}: declared corner_clip {declared} != the requested {requested}"
+        )
+    return declared
+
+
 __all__ = [
+    "CERTIFICATE_VARIANTS",
+    "CLASS",
+    "DECIDABLE_VARIANTS",
+    "UNCONDITIONAL",
     "CornerClip",
     "EmptyClippedDomainError",
     "HalfPlane",
+    "agreed_class_clip",
+    "class_certificate_id",
+    "class_claim",
     "clip_from_optional",
+    "declared_class_clip",
+    "require_decidable_variant",
 ]

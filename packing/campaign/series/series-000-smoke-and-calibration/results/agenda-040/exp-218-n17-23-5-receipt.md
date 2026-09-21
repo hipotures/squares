@@ -30,9 +30,10 @@ total preserved exactly and polished in 45.2 s to a rounded family:
 | `independent_ceiling_reader` | `874999999/62500000` | `1` (K0, K1, K2 hold) | 287456 | fails: total weight at least 17 |
 | `replay_ceiling_family --check` | `874999999/62500000` | `1` | 287456 | fails |
 
-The fold used the same `t = 1` to `t = 0` rule as the h216 and exp-214 receipts (scratch
-script, not a retained tool; the fold changed no weight and preserved the total
-exactly); retaining that fold as a devtools command is open work.
+The fold used the same `t = 1` to `t = 0` rule as the h216 and exp-214 receipts and is
+now the retained tool `devtools.fold_ceiling_family`, whose
+`--check exp-218-n17-23-5-family-merged.json` re-folds the raw family to exactly these
+bytes (256 placements, 0 folded, the total preserved exactly, 0 differences).
 
 ## Determination
 

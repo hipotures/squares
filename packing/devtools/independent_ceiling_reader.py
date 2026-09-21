@@ -65,7 +65,7 @@ from fractions import Fraction
 from itertools import combinations, pairwise
 from math import gcd, lcm
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 PACKING = Path(__file__).resolve().parent.parent
 DEFAULT_RECORD = (
@@ -74,6 +74,18 @@ DEFAULT_RECORD = (
     / "ceiling-family-191-50.json"
 )
 RETAINED_SHA256 = "95cf06473f185764076d21021b75cc65962ef6b68dc717c045c2c7d76ae12427"
+
+# What a record declares itself to be, restated rather than imported: this reader is
+# stdlib-only by contract and must not import ``sqpack``, whose
+# ``fractional.corner_clip`` holds the same two tuples for the tools that may. Neither
+# copy may grow a name the other lacks, and
+# ``tests/test_fractional_corner_clip.py`` fails if the two copies drift, in
+# ``test_the_reader_s_variant_vocabulary_matches_sqpack_s``.
+CERTIFICATE_VARIANTS = ("unconditional", "class", "conditional")
+# The variants this reader implements. Everything else is refused by name before any
+# clip is reconciled; reading a declared variant this reader does not implement as the
+# unconditional theorem is review finding H1.
+DECIDABLE_VARIANTS = ("unconditional", "class")
 
 type Point = tuple[Fraction, Fraction]
 # A x + B y = C over the integers, (A, B) != (0, 0), normalised by gcd and sign.
@@ -584,8 +596,73 @@ def controls(record: Record) -> list[dict[str, Any]]:
 # ----------------------------------------------------------------------------- CLI
 
 
-def read_record(path: Path, expected_sha256: str | None = None) -> tuple[Record, str]:
-    """The parsed record and its SHA-256, refused when the digest is not the expected one."""
+def require_decidable_variant(variant: object) -> None:
+    """Refuse any declared variant this reader does not implement, naming it.
+
+    Absent means the unconditional theorem and ``class`` means the corner class; every
+    other name -- ``conditional``, which the gate's vocabulary knows, or a misspelling,
+    which nothing knows -- is refused here rather than falling through to the requested
+    clip and being decided as the unconditional program (review finding H1). The same
+    allowlist is stated at the gate in ``decide_certificate._require_declared_variant``
+    and for the importing tools in ``sqpack.fractional.corner_clip``.
+    """
+
+    if variant is None or variant in DECIDABLE_VARIANTS:
+        return
+    if isinstance(variant, str) and variant in CERTIFICATE_VARIANTS:
+        raise ValueError(
+            f"the record declares variant: {variant}, and this reader decides only the "
+            f"unconditional theorem and the corner class; a {variant} record cannot be "
+            "read here"
+        )
+    raise ValueError(f"field 'variant' must be one of {CERTIFICATE_VARIANTS}, got {variant!r}")
+
+
+def agreed_corner_clip(fields: dict[str, Any], requested: Fraction | None) -> Fraction | None:
+    """Reconcile the clip the record declares with the one the command line asked for.
+
+    Kept here in the standard library rather than imported from ``sqpack``, which this
+    reader does not use by design; ``sqpack.fractional.corner_clip.agreed_class_clip``
+    states the same policy for the tools that may import it. Reading a record that
+    declares ``variant: class`` without ``--corner-clip`` would print this reader's
+    unconditional theorem sentence over bytes that claim only a class, which is review
+    defect D4, so that combination is refused. Asking for a clip on a record that
+    declares none stays allowed: that is this reader deciding K4 itself. A variant this
+    reader does not implement is refused first, by name.
+    """
+
+    variant = fields.get("variant")
+    require_decidable_variant(variant)
+    declared_field = fields.get("corner_clip")
+    if declared_field is None:
+        if variant == "class":
+            raise ValueError("a record declaring variant: class must declare corner_clip")
+        return requested
+    if variant != "class":
+        raise ValueError("a record declaring corner_clip must declare variant: class")
+    declared = Fraction(str(declared_field))
+    if requested is None:
+        raise ValueError(
+            f"the record declares variant: class at corner clip d = {declared}, and "
+            f"reading it without --corner-clip {declared} would state the unconditional "
+            "theorem over bytes that never claimed it"
+        )
+    if requested != declared:
+        raise ValueError(f"declared corner_clip {declared} != the requested {requested}")
+    return declared
+
+
+def read_record(
+    path: Path, expected_sha256: str | None = None
+) -> tuple[Record, str, dict[str, Any]]:
+    """The parsed record, its SHA-256 and its raw fields.
+
+    The digest is refused when it is not the expected one. The raw fields come back
+    because the record's top-level ``variant`` and ``corner_clip`` say which program it
+    is a ceiling for: this reader prints a theorem sentence, and printing the
+    unconditional one over bytes that declare a class is the misreading review defect
+    D4 names, so the caller reconciles the two before deciding anything.
+    """
     raw = path.read_bytes()
     digest = hashlib.sha256(raw).hexdigest()
     if expected_sha256 is not None and digest != expected_sha256.lower():
@@ -593,7 +670,8 @@ def read_record(path: Path, expected_sha256: str | None = None) -> tuple[Record,
     data = json.loads(raw)
     if not isinstance(data, dict):
         raise TypeError("record is not a JSON object")
-    return parse_record(data), digest
+    fields = cast(dict[str, Any], data)
+    return parse_record(fields), digest, fields
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -628,8 +706,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.corner_clip is not None and not 0 < args.corner_clip <= 1:
         parser.error("--corner-clip must satisfy 0 < d <= 1")
     try:
-        record, digest = read_record(args.record, args.expect_sha256)
-        result = decide(record, args.corner_clip)
+        record, digest, fields = read_record(args.record, args.expect_sha256)
+        depth = agreed_corner_clip(fields, args.corner_clip)
+        result = decide(record, depth)
         result["record"] = str(args.record)
         result["sha256"] = digest
         result["retained_sha256_matches"] = digest == RETAINED_SHA256

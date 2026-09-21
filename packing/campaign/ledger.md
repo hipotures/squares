@@ -160,6 +160,7 @@ Each entry summarizes one user-level research window. Cycle slots are wall-clock
 | [session-143](agent-sessions/session-143-lower-bound-math-review.md) | completed | contemporaneous | `insight-iteration` (insight) | `review-planning-oversight` (insight) | 2 | think-srln | Session 144 under think-pogj decides exp-213 to exp-215 for BC-361, with the Bentz 2016 replay lane beside it. |
 | [session-144](agent-sessions/session-144-overnight-chunk-1.md) | completed | contemporaneous | `research-loop` (insight) | `research-loop` (insight) | 1 | think-pogj | Session 145 under think-ni3v runs BC-363 on the next stacked branch; the handoff names the remaining agenda-040 items. |
 | [session-145](agent-sessions/session-145-overnight-chunk-2.md) | completed | contemporaneous | `pipeline-improvement` (correctness) | `pipeline-improvement` (correctness) | 1 | think-ni3v | Session 146 under think-b7pr takes BC-367 on the next stacked branch. |
+| [session-146](agent-sessions/session-146-overnight-chunk-3.md) | completed | contemporaneous | `research-loop` (insight) | `research-loop` (insight) | 1 | think-b7pr | Session 147 under think-b7pr writes the BC-367 registration entry at the reviewed scope, then the mixed classes and n=26. |
 
 ### Workflow summary
 
@@ -172,7 +173,7 @@ Declared counts are contemporaneous contracts; retrospective counts are reconstr
 | `insight-iteration` | 25 | 1 | 81 | 4 |
 | `process-review` | 16 | 4 | 64 | 6 |
 | `efficiency-loop` | 10 | 1 | 36 | 1 |
-| `research-loop` | 28 | 4 | 102 | 8 |
+| `research-loop` | 29 | 4 | 103 | 8 |
 | `pipeline-improvement` | 35 | 2 | 153 | 5 |
 | `documentation-pass` | 1 | 0 | 24 | 1 |
 | `remediation` | 0 | 1 | 0 | 3 |
@@ -800,7 +801,7 @@ Status: **active**. Run the hypotheses X-040 adapted from the Session 143 review
 
 | id | status | title | rounds | opened because |
 | --- | --- | --- | --- | --- |
-| series-000 | open | S0: smoke and calibration — prove the machinery, establish every baseline metric | 154 | First series. There is no prior instrument, so not |
+| series-000 | open | S0: smoke and calibration — prove the machinery, establish every baseline metric | 155 | First series. There is no prior instrument, so not |
 
 ## Registry
 
@@ -965,7 +966,7 @@ Status: **active**. Run the hypotheses X-040 adapted from the Session 143 review
 | H-219 | confirmed | proof | A rows-complete covering of mass strictly below 18 exists at a contain | n: 18* | 1 |  | 11.7m wall |
 | H-220 | unresolved | proof | A rows-complete covering of mass strictly below n exists at a containe | n: 32* 31* 30* 26* 27* 29* 45* 44* | 8 |  | 164.1m wall |
 | H-221 | confirmed | proof | A rows-complete covering of mass strictly below 18 exists at a contain | n: 18* | 1 |  | 8.2m wall |
-| H-222 | confirmed | proof | At n=11, side 96/25, B = 9977/10000 on the 181-direction net, the rest |  | 1 |  | 5.1m wall |
+| H-222 | confirmed | proof | At n=11, side 96/25, B = 9977/10000 on the 181-direction net, the rest |  | 2 |  | 9.5m wall |
 | H-223 | unresolved | proof | A point-atom certificate exists for n=13 at container side 399/100 wit |  | 1 |  | 1.3m wall |
 | H-224 | unresolved | proof | At n=17, side 23/5, B = 9977/10000 on the 181-direction net, an exact  |  | 2 |  | 53.7m wall |
 | H-225 | unresolved | proof | A point-atom certificate exists for n=26 at container side 53/10 with  | side: 53/10 107/20 27/5 | 1 |  | 62.6m wall |
@@ -1104,7 +1105,7 @@ Status: **active**. Run the hypotheses X-040 adapted from the Session 143 review
 | exp-158 | series-000 | 11 | Codex BC303 T2 charge-sweep agent | H-160 | The September 14 strategy reset paused this route before the target charge ran; no target receipt or scientific verdict exists. |
 | exp-160 | series-000 | 11 | Codex BC303 H-162 retained-receipt analyst | H-162 | The September 14 strategy reset paused this route with no exp-158 target receipt; no H-162 comparison or scientific verdict exists. |
 
-### accepted (42)
+### accepted (43)
 
 | id | series | instance | operator | hypotheses | reason |
 | --- | --- | --- | --- | --- | --- |
@@ -1150,6 +1151,7 @@ Status: **active**. Run the hypotheses X-040 adapted from the Session 143 review
 | exp-179 | series-000 | 18 | Cursor session-141 | H-221 | T-029-seeded auto plus windows 5 at n=18 4679/1000 converged at 17.893285 and freeze-then-decide retained T-030. Confirms H-221. Does not confirm H-218. |
 | exp-204 | series-000 | 11 | claude-opus-5 | H-203 | The proposal structure is worth its complexity at this budget: H-203 declared three of five cells improving by 0.01 and four did, two of them with disjoint seed ranges, but the other two overlap and no run came within 1e-2 of any record, so this accepts a proposer and settles nothing about record-finding. |
 | exp-219 | series-000 | 11 | Claude session-145 coordinator | H-222 | Both gate routes accept the clipped covering of mass 10868617/1000000 < 11 with least charge 2000013/2000000 >= 1 on the corner-clipped domain at 96/25, so no packing of eleven unit squares in a square of side 96/25 has every square avoiding the four corner triangles x + y <= 1/2; this confirms H-222 at its registered scope and is a conditional exclusion, not a bound on s(11). |
+| exp-220 | series-000 | 11 | Claude session-146 Opus lane | H-222 | The same 680-atom covering as exp-219, now frozen with the claim "corner class d = 1/2 excluded at s(11) >= 96/25" and the id C-n011-fractional-96-25-clip-1-2; both gate routes accept it under the flag and the gate refuses it without the flag, so the retained bytes declare what they prove. The corrected gate now refuses exp-219's bytes on their unconditional claim string, and exp-220 supersedes exp-219 as the record of the exclusion; the registration of the reviewed statement remains BC-367. |
 
 ### baseline (12)
 
@@ -1212,7 +1214,7 @@ Status: **active**. Run the hypotheses X-040 adapted from the Session 143 review
 
 ## Effort
 
-154 rounds, 2512.1 agent-minutes, 2691.8 wall-minutes.
+155 rounds, 2512.1 agent-minutes, 2696.2 wall-minutes.
 
 These totals exclude 4 historical rounds with unrecorded timing; their cost is unknown, not zero.
 
