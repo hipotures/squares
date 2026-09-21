@@ -2457,7 +2457,7 @@ sessions:
   codex_receipts: []
 - id: session-149
   title: "Intake and Verification of Two External n = 17 Weighted Certificates"
-  status: completed
+  status: stopped
   primary_bead: think-pcd0
   phases: 3
   measured: true
