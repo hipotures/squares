@@ -70,7 +70,7 @@ SLACK = 0.6
 AT_CONTROL_HEIGHT = frozenset({"button", "select", "input-number", "input-text", "chip"})
 
 #: A bound first proved here (n = 18) and an n with nothing open (n = 16).
-#: It was n = 17 until T-031 adopted an external certificate there, which is exactly the
+#: It was n = 17 until T-032 adopted an external certificate there, which is exactly the
 #: fact the star reports; the six that still qualify are n = 11, 12, 18, 19, 20 and 21.
 STAR_N = 18
 OPEN_NONE_N = 16

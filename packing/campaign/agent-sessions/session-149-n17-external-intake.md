@@ -1,12 +1,12 @@
 ---
-title: Session 148 — intake and verification of two external n = 17 weighted certificates
+title: Session 149 — intake and verification of two external n = 17 weighted certificates
 softschema:
   contract: packing.squares:AgentSession/v2
   schema: ../schemas/agent-session.schema.yaml
   envelope: session
   status: enforced
 session:
-  id: session-148
+  id: session-149
   title: Intake and Verification of Two External n = 17 Weighted Certificates
   date: '2026-09-20'
   started_at: '2026-09-20T08:05:00Z'
@@ -85,7 +85,7 @@ session:
     - packing/resources/web/n17-weighted-certificates-2026-09-20/receipts/guzhou-r012-first-party-001.json
     - packing/tests/test_n17_external_weighted_certificates.py
     stop_reason: Both certificates are decided at V4/C4; what remains is what the register says.
-    next_action: Register T-031 and reconcile the reader-facing documents.
+    next_action: Register T-032 and reconcile the reader-facing documents.
   - workflow: documentation-pass
     focus: process
     recording: contemporaneous
@@ -100,14 +100,14 @@ session:
     started_at: '2026-09-20T16:00:00Z'
     deadline_at: '2026-09-20T18:00:00Z'
     expected_output: >-
-      T-031 and four evidence entries, the n = 17 case record, the regenerated views,
+      T-032 and four evidence entries, the n = 17 case record, the regenerated views,
       and the credits in the five places this repository credits external authors.
     validation_command: >-
       cd packing && uv run --frozen --all-extras --group dev packing-validate --records
     kill_condition: A record change would overstate what the replays decided.
     fallback: Record the weaker statement the replays support and say what is missing.
     outcome: >-
-      T-031 registered at V4/C4 with four evidence entries; the verified lower bound at
+      T-032 registered at V4/C4 with four evidence entries; the verified lower bound at
       n = 17 moves from 459/100 to 461300/99999.
     evidence:
     - packing/frontier/results.yaml
@@ -124,7 +124,7 @@ session:
   progress:
     metric: Verified lower bound at n = 17
     before: 459/100 = 4.59 (T-019, first-party, 2026-09-04).
-    after: 461300/99999 = 4.61304613... (T-031, external, replayed and decided here).
+    after: 461300/99999 = 4.61304613... (T-032, external, replayed and decided here).
   delegations:
   - task: Archive both sources and register them in the resource index
     operator: archive_packet; Opus high
@@ -159,7 +159,7 @@ session:
     uncertainty: Mira's Condition 5 was sampled at 16 directions in the review; the coordinator's replays decided it in full.
     elapsed_seconds: null
     elapsed_quality: unavailable
-    next_action: Coordinator records the findings as the review artifact for T-031.
+    next_action: Coordinator records the findings as the review artifact for T-032.
   - task: First-party replay instruments for both certificates
     operator: replay_tools; Opus xhigh
     status: completed
@@ -181,7 +181,7 @@ session:
   - packing/resources/web/n17-weighted-certificates-2026-09-20/README.md
   - docs/project/reviews/review-2026-09-20-n17-r012-and-mira-4613-proof-review.md
   - packing/tests/test_n17_external_weighted_certificates.py
-  - packing/campaign/agent-sessions/session-148-n17-external-intake.md
+  - packing/campaign/agent-sessions/session-149-n17-external-intake.md
   checks:
   - R012's own exact checker recomputed all 2925 parent-angle intervals under Python 3.14.7 and printed its complete marker; catalogue minimum exactly 250023/250000.
   - This repository's interval branch and bound certified all 2925 R012 entries over 34,465,227 boxes, none stalled, every bracket containing the source's exact minimum.
@@ -192,10 +192,12 @@ session:
     Both certificates are decided, the register states what they support, and both
     authors are credited. No search for a stronger bound was started.
   next_action: >-
-    Reconcile the T-031 identifier with pull request 208, which claims the same number
-    from the open overnight stack, under think-pcd0.
+    Land the adoption under think-pcd0. The T-031 identifier contest with pull request
+    208 is settled: the overnight stack merged into main first and kept T-031 for the
+    n = 11 octagon corner class, and this result took T-032 when main was merged into
+    this branch.
 ---
-# Session 148: Two External Certificates at `n = 17`
+# Session 149: Two External Certificates at `n = 17`
 
 The entry point was **W1 research survey**, because the owner supplied a link and the
 record had neither the result behind it nor the certificate that result descends from.
@@ -232,10 +234,14 @@ container side. That step needs a `T-022`-style proof note which this certificat
 not have, so the record carries the side and not the endpoint.
 It costs nothing, because R012’s value is larger and is the one registered.
 
-The identifier is contended.
-Pull request 208, from the open overnight stack, also uses `T-031`, and the register’s
-contiguity rule leaves no free number below it.
-Whichever lands second renumbers.
+The identifier was contended, and the contest is settled.
+Pull request 208, from the open overnight stack, also claimed `T-031`, and the
+register’s contiguity rule leaves no free number below it, so whichever landed second
+had to renumber.
+The stack merged into `main` first and kept `T-031` for the `n = 11` octagon corner
+class; this result took `T-032` when `main` was merged into this branch, and its row
+moved to the end of the register, because `devtools/check_results.py` reads contiguity
+positionally rather than by label.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

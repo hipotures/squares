@@ -1594,7 +1594,7 @@ evidence:
     external_review:
       state: informally-verified
       date: '2026-09-20'
-      reviewed_by: repository (session-148 proof review)
+      reviewed_by: repository (session-149 proof review)
       note: >-
         Mira's PROOF.md sections 3 and 6 were worked through in
         docs/project/reviews/review-2026-09-20-n17-r012-and-mira-4613-proof-review.md
@@ -1668,7 +1668,7 @@ evidence:
     external_review:
       state: informally-verified
       date: '2026-09-20'
-      reviewed_by: repository (session-148 proof review)
+      reviewed_by: repository (session-149 proof review)
       note: >-
         PROOF.md, verify.py and sweep.py were read line by line in
         docs/project/reviews/review-2026-09-20-n17-r012-and-mira-4613-proof-review.md.

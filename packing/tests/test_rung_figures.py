@@ -683,7 +683,7 @@ def test_every_case_page_binds_the_certificate_its_own_evidence_names() -> None:
     than five. Both are rechecked from the source bytes because the surd is a function of
     `B` and `D` alone whichever kind of atom carries the charge.
 
-    `external_reduction` is the one shape this contract cannot reach. T-031 adopts
+    `external_reduction` is the one shape this contract cannot reach. T-032 adopts
     Guzhou0806's R012, whose bound is not a container side at all: it covers parents of
     side `A` inside `[0, L]^2` and rescales by `1/A`, so the proved side is `L/A` and no
     certificate object anywhere carries it. The reduction is neither an endpoint
@@ -697,7 +697,7 @@ def test_every_case_page_binds_the_certificate_its_own_evidence_names() -> None:
     """
     #: n -> why this case's bound cannot be bound to a certificate object at that side.
     external_reduction = {
-        17: "T-031: external parent-rescaling reduction, bound L/A is no container side",
+        17: "T-032: external parent-rescaling reduction, bound L/A is no container side",
     }
 
     evidence = _evidence_by_id()

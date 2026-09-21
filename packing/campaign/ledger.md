@@ -163,6 +163,7 @@ Each entry summarizes one user-level research window. Cycle slots are wall-clock
 | [session-146](agent-sessions/session-146-overnight-chunk-3.md) | completed | contemporaneous | `research-loop` (insight) | `research-loop` (insight) | 1 | think-b7pr | Session 147 under think-b7pr writes the BC-367 registration entry at the reviewed scope, then the mixed classes and n=26. |
 | [session-147](agent-sessions/session-147-overnight-chunk-4.md) | completed | contemporaneous | `research-loop` (insight) | `research-loop` (insight) | 1 | think-b7pr | Session 148 under think-b7pr takes BC-367's mixed classes and the n=26 second site set on the next stacked branch. |
 | [session-148](agent-sessions/session-148-overnight-chunk-5.md) | stopped | contemporaneous | `insight-iteration` (insight) | `insight-iteration` (insight) | 1 | think-b7pr | Session 149 under think-n1v2 resumes from the retained patches and the wedge derivation, then the H-232 fixed-support screen. |
+| [session-149](agent-sessions/session-149-n17-external-intake.md) | completed | contemporaneous | `research-survey` (correctness) | `documentation-pass` (process) | 3 | think-pcd0 | Land the adoption under think-pcd0. The T-031 identifier contest with pull request 208 is settled: the overnight stack merged into main first and kept T-031 for the n = 11 octagon corner class, and this result took T-032 when main was merged into this branch. |
 
 ### Workflow summary
 
@@ -170,14 +171,14 @@ Declared counts are contemporaneous contracts; retrospective counts are reconstr
 
 | workflow | declared entries | retrospective entries | declared phases | retrospective phases |
 | --- | ---: | ---: | ---: | ---: |
-| `research-survey` | 2 | 2 | 13 | 2 |
-| `factual-review` | 7 | 0 | 53 | 2 |
+| `research-survey` | 3 | 2 | 14 | 2 |
+| `factual-review` | 7 | 0 | 54 | 2 |
 | `insight-iteration` | 26 | 1 | 82 | 4 |
 | `process-review` | 16 | 4 | 64 | 6 |
 | `efficiency-loop` | 10 | 1 | 36 | 1 |
 | `research-loop` | 30 | 4 | 104 | 8 |
 | `pipeline-improvement` | 35 | 2 | 153 | 5 |
-| `documentation-pass` | 1 | 0 | 24 | 1 |
+| `documentation-pass` | 1 | 0 | 25 | 1 |
 | `remediation` | 0 | 1 | 0 | 3 |
 | `review-planning-oversight` | 5 | 0 | 22 | 2 |
 | `general-improvement` | 1 | 0 | 7 | 1 |

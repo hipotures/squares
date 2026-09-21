@@ -1,6 +1,6 @@
 # Handoff: the `n = 17` External Intake, 21 September 2026
 
-Written at the end of session 148 for whoever picks this up.
+Written at the end of session 149 for whoever picks this up.
 Pull request [211](https://github.com/jlevy/squares/pull/211) carries the whole of it,
 on branch `claude/n17-mira-guzhou-4613-intake` from main `061e9ffb`, tracked by
 `think-pcd0`.
@@ -11,7 +11,7 @@ travel together.
 
 ## Part 1: validated, in the pull request, ready to land
 
-`s(17) >= 461300/99999 = 4.61304613…` is registered as `T-031` at `V4/C4`. The previous
+`s(17) >= 461300/99999 = 4.61304613…` is registered as `T-032` at `V4/C4`. The previous
 verified value was `459/100`, so the movement is `+0.02305` and the gap to Bidwell’s
 packing closes to `0.0625`. It is the first verified bound at this size that came from
 outside this project.
@@ -38,10 +38,13 @@ test covers the whole angle interval, and that the inset from the endpoint minim
 
 ### What is left to land it
 
-1. **The `T-031` identifier is contended.** Pull request 208, from the open overnight
-   stack, claims the same number.
-   The register’s contiguity rule leaves no free number below it, so whichever lands
-   second renumbers. This is the only substantive blocker and it is bookkeeping.
+1. **The `T-031` identifier contest is settled.** Pull request 208, from the open
+   overnight stack, claimed the same number.
+   The register’s contiguity rule leaves no free number below it, so whichever landed
+   second had to renumber. The stack merged into `main` first and kept `T-031` for the
+   `n = 11` octagon corner class; this result took `T-032` when `main` was merged into
+   this branch, and its row moved to the end of the register, because
+   `devtools/check_results.py` reads contiguity positionally rather than by label.
 2. **Hosted CI is red on the first run** and was diagnosed, not guessed:
    - `frontend`: fixed in `48a3ad23`. The workbench layout check staged `n = 17` to
      assert the “new result” star, which reports that a bound was first proved here;

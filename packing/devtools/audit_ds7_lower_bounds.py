@@ -88,7 +88,7 @@ EXTERNAL_REPORTS = {
             "this repository's interval decision accept all 2925 catalogue entries."
         ),
         scope=(
-            "The source's report. What the replays here decided is recorded in T-031 "
+            "The source's report. What the replays here decided is recorded in T-032 "
             "and in the verified field, not in this one."
         ),
         evidence=(EXTERNAL17_R012, EXTERNAL17_R012_INTERVAL),

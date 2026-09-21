@@ -89,7 +89,7 @@ def test_indexed_external17_report_never_exceeds_the_verified_lane(n: int) -> No
 
     It was anabologyco-maker's 9141/2000, below the verified lane at both sizes. Since
     2026-09-20 it is Guzhou0806's R012, which this repository replayed and decided, so
-    at n = 17 the reported and verified fields now hold the same value (T-031) and at
+    at n = 17 the reported and verified fields now hold the same value (T-032) and at
     n = 18 the report still sits below a stronger first-party rung. Either way the
     audit's own selector must be at a fixed point: the reported lane is raised only by
     a report that exceeds it, and never past what the verified lane already carries.

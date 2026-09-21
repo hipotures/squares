@@ -1919,7 +1919,7 @@ results:
         measure. What those two extensions are worth on a measure optimised against them
         is open and is not this result.
       scored: '2026-09-20'
-      by: session-148 (repository; no independent evaluator)
+      by: session-149 (repository; no independent evaluator)
     novelty: previously-published
     composition: >-
       Primary at n = 17 on the R012 certificate: the bound is L/A from one catalogue and
@@ -1936,7 +1936,7 @@ results:
       finite obligations is a read argument, closed in the review artifact, and is what
       a formal port would address.
     produced_by:
-      session: session-148
+      session: session-149
     review_artifact: docs/project/reviews/review-2026-09-20-n17-r012-and-mira-4613-proof-review.md
     evidence:
       - E-n017-guzhou-r012-source-replay

@@ -102,7 +102,7 @@ LIVE_CERTIFICATE = "certificate.json"
 
 #: Another author's archived bytes. A result that adopts an external certificate names
 #: it among its artifacts, but the `certificate.json` pointer convention is this
-#: repository's own and the archive is never renamed to satisfy it (T-031 adopts Mira's
+#: repository's own and the archive is never renamed to satisfy it (T-032 adopts Mira's
 #: `best-certificate.json`), so these are not read as rung pointers. The figures in such
 #: a result's prose are checked by that result's own controls and receipts instead.
 ARCHIVE_PREFIX = "packing/resources/"

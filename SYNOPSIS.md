@@ -101,7 +101,7 @@ action for each are in [`frontier/RESULTS.md`](packing/frontier/RESULTS.md); the
 | [T-028](packing/frontier/RESULTS.md) | 18 | `V4` | `C4` | `S3` | `apparently-novel` | s(18) >= 187/40 = 4.675, from a first-party weighted fractional unavoidable-set certificate at container side 187/40. |
 | [T-029](packing/frontier/RESULTS.md) | 18 | `V4` | `C4` | `S3` | `apparently-novel` | s(18) >= 1871/400 = 4.6775, from a first-party weighted fractional unavoidable-set certificate at container side 1871/400. |
 | [T-030](packing/frontier/RESULTS.md) | 18 | `V4` | `C4` | `S3` | `apparently-novel` | s(18) >= 4679/1000 = 4.679, from a first-party weighted fractional unavoidable-set certificate at container side 4679/1000. |
-| [T-031](packing/frontier/RESULTS.md) | 17 | `V4` | `C4` | `S3` | `previously-published` | s(17) >= 461300/99999 = 4.61304613 …, by Guzhou0806’s R012 parent-angle certificate of 20 September 2026, replayed here by the source’s exact checker and decided again by this repository’s interval branch and bound. |
+| [T-032](packing/frontier/RESULTS.md) | 17 | `V4` | `C4` | `S3` | `previously-published` | s(17) >= 461300/99999 = 4.61304613 …, by Guzhou0806's R012 parent-angle certificate of 20 September 2026, replayed here by the source's exact checker and decided again by this repository's interval branch and bound. |
 | [T-004](packing/frontier/RESULTS.md) | 46 | `V4` | `C3` | `S3` | `previously-published` | Bentz 2010, Theorem 8: the printed 45-point unavoidable-set argument for s(46) >= 7 is correct as printed, machine-audited in full. |
 | [T-008](packing/frontier/RESULTS.md) | 46 | `V4` | `C3` | `S3` | `previously-published` | s(46) = 7: the lower half by T-004’s audited unavoidable set, the upper half by the exact 7 x 7 grid packing of 46 squares. |
 | [T-009](packing/frontier/RESULTS.md) | 29 | `V4` | `C3` | `S3` | `apparently-novel` | s(29) <= 5.93383346267692918974379895098, by a Krawczyk interval certificate over the retained rational 29-square witness at a declared relaxation of 1e-20. |
@@ -145,11 +145,11 @@ hypothesis status and summarizes experiment verdicts, and the
 | --- | ---: | --- |
 | Agendas | 37 | 17 active; 14 completed; 5 paused; 1 superseded |
 | Commitments | 356 | 181 complete; 61 stopped; 68 blocked; 16 ready; 21 tentative; 9 in progress |
-| Sessions | 148 | 90 completed; 58 stopped; all terminal |
+| Sessions | 149 | 91 completed; 58 stopped; all terminal |
 | Explorations | 38 | 24 linked to proposed hypotheses; 14 uncodified |
 | Hypotheses | 170 | 29 confirmed; 31 refuted; 55 blocked; 17 unresolved; 5 open; 29 open questions; 2 result registered; 2 abandoned; 0 running |
 | Experiments | 155 | 43 accepted; 36 rejected; 50 unresolved; 12 baseline; 11 blocked; 3 abandoned; 0 in progress |
-| Frontier results | 31 | 31 registered |
+| Frontier results | 32 | 32 registered |
 
 <!-- END CURRENT-RESEARCH-STATUS -->
 
@@ -1053,7 +1053,7 @@ controller, not permission to blur contracts.
 
 ### Current Handoff
 
-[Session 148](packing/campaign/agent-sessions/session-148-n17-external-intake.md)
+[Session 149](packing/campaign/agent-sessions/session-149-n17-external-intake.md)
 adopted `s(17) >= 461300/99999` as `T-032` from Guzhou0806’s R012 certificate, with
 Mira’s `4613/1000` beneath it, after four passing replays and a proof review that found
 no error. It is the first verified bound at this size that came from outside, and both
@@ -4394,9 +4394,9 @@ in separate tables: their units differ, and the same work can appear in both.
 
 | Rollups | count | turns | tool calls | errors | one-off code | wall |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| claimed by a session | 160 | 43,909 | 24,112 | 483 | 3,825 | 391.98 h |
+| claimed by a session | 161 | 44,279 | 24,297 | 485 | 3,848 | 410.64 h |
 | claimed by none | 60 | 11,110 | 6,539 | 156 | 946 | 51.75 h |
-| **measured** | **220** | **55,019** | **30,651** | **639** | **4,771** | **443.73 h** |
+| **measured** | **221** | **55,389** | **30,836** | **641** | **4,794** | **462.39 h** |
 
 | Session | Phases | Rollups | Turns | Tool calls | Errors | Wall |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -4443,7 +4443,8 @@ in separate tables: their units differ, and the same work can appear in both.
 | [session-146](packing/campaign/agent-sessions/session-146-overnight-chunk-3.md) | 1 | 3 | 283 | 174 | 4 | 0.62 h |
 | [session-147](packing/campaign/agent-sessions/session-147-overnight-chunk-4.md) | 1 | 0 | 0 | 0 | 0 | 0 h |
 | [session-148](packing/campaign/agent-sessions/session-148-overnight-chunk-5.md) | 1 | 9 | 524 | 296 | 11 | 2.35 h |
-| *shared by 43 sessions* | — | 7 | 23,948 | 13,058 | 282 | 304.17 h |
+| [session-149](packing/campaign/agent-sessions/session-149-n17-external-intake.md) | 3 | 1 | 370 | 185 | 2 | 18.66 h |
+| *shared by 44 sessions* | — | 7 | 23,948 | 13,058 | 282 | 304.17 h |
 
 | Codex interval receipt | declaring sessions | model responses | agent time | active union | wall window | live lower bound |
 | --- | --- | ---: | ---: | ---: | ---: | --- |
@@ -4508,9 +4509,9 @@ in separate tables: their units differ, and the same work can appear in both.
 
 | Coverage | sessions |
 | --- | ---: |
-| measured | 94 |
+| measured | 95 |
 | unmeasured | 54 |
-| **total** | **148** |
+| **total** | **149** |
 
 <!-- END GENERATED: session-close-report -->
 
