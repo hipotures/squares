@@ -2747,6 +2747,26 @@ def _readme(context: Context) -> str:
     return _module(context, "devtools.check_readme")
 
 
+def _archive_annotations(context: Context) -> str:
+    """Every archive transcription's annotation count says the same thing three times.
+
+    Sub-second: a marker scan of the hundred-odd tracked Markdown files in the literature
+    archive and one parse of the census table. Records tier because it checks the record
+    against itself -- the annotations a transcription carries, the count in its own
+    banner, and the `Annotated` cell of `packing/resources/README.md`.
+
+    It exists because nothing gated that. The owner's review of PR 204 said so (finding
+    F4: the defect count is gated end to end and the archive annotation census is not),
+    and the census then drifted inside the same stack -- `2aef9421` added the eighth and
+    ninth annotations to `bentz-2016-optimal-packings-22-and-33.md` and updated the README
+    to 9 while the file's own banner stayed at 7. This is the one boundary the repository
+    keeps against an external source, so a silent miscount there is the expensive kind.
+    """
+    output = _module(context, "devtools.check_archive_annotations")
+    _require_text(output, "annotated transcriptions")
+    return output
+
+
 def _operating_rules(context: Context) -> str:
     return _module(context, "devtools.render_operating_rules", "--check")
 
@@ -3990,6 +4010,21 @@ STEPS: tuple[Step, ...] = (
     Step("synopsis agrees with the artifacts", _synopsis, fast=True, records=True),
     Step("README agrees with the directory", _readme, fast=True, records=True),
     Step(
+        "archive annotation census agrees with the archive",
+        _archive_annotations,
+        fast=True,
+        records=True,
+        touches=(
+            *_CORE,
+            "packing/devtools/check_archive_annotations.py",
+            "packing/devtools/repo_scope.py",
+            # `fnmatch` lets `*` cross separators, so this is the whole archive at every
+            # depth: the transcriptions, the census README, and the contributed packets
+            # the coverage guard sweeps.
+            "packing/resources/*",
+        ),
+    ),
+    Step(
         "AGENTS.md mirrors the operating rules",
         _operating_rules,
         fast=True,
@@ -4592,6 +4627,9 @@ TREE_REUSABLE_FAST_STEPS = frozenset(
         # A pure function of the tracked JSON: it reads the retained records and nothing
         # else, so a pull-request run over this exact tree has already decided it.
         "class records do not claim the unconditional bound",
+        # The same shape: it reads the tracked Markdown under `packing/resources/` and
+        # compares three numbers found in those bytes. No clock, no network, no history.
+        "archive annotation census agrees with the archive",
         "derivation (needs sympy)",
         "search engine (sqsearch)",
         "lint floor (rust)",
