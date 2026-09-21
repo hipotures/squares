@@ -11,7 +11,7 @@ softschema:
   schema: defects.schema.yaml
   envelope: null
   status: enforced
-count: 491
+count: 492
 defects:
 - id: D-001
   title: Fixed-side search never left the grid basin
@@ -16459,3 +16459,35 @@ defects:
     returned no finding. Firefox and WebKit run the same geometry oracle in hosted CI; the
     Chromium self-test also runs the independent queue-watchdog control.
   recorded_in: packing/devtools/prepare_explainer_math.py
+- id: D-492
+  title: A range was quoted at a beat it never played
+  date: '2026-09-21'
+  layer: tooling
+  class: bookkeeping
+  direction: neutral
+  detected_by: gate
+  latent_for: since the fast-simple speed-up landed; every range holding a simple grid fill
+  severity: medium
+  status: fixed
+  what: >-
+    `rangeDuration` priced a range by summing `continuousTiming` directly, while a pair
+    actually plays through `pairTiming`, which halves a simple grid fill when `fastSimple`
+    is on -- the default. So the Animate panel's range figure, and the number the capture
+    tool prices its frame clock against, were the unsped beat, and the page played the
+    range faster than it said it would. Over n = 1 to 6 it quoted 7.05 s for a range it
+    played in 5.90 s.
+  consequence: >-
+    No video could be captured at all: `capture_video.price_steps` refuses a run whose
+    steps do not add up to the page's own figure for the range, which is the check that
+    makes "the video is the page" a fact. Without that check the frame clock would have
+    been stretched over a shorter animation and every step boundary would have drifted off
+    its settled record.
+  fix: >-
+    `rangeDuration` now applies the same `SIMPLE_TRANSITION_SPEED` speed-up to a sped-up
+    pair that `pairTiming` does, so the quote is the clock `playRange` runs.
+  regression: >-
+    `a range is quoted at the clock it plays on, speed-up included` in
+    `packages/workbench/tests/timeline.test.ts` pins `rangeDuration` to the sum of
+    `pairDuration` over the range with `fastSimple` on, and to `sequenceDuration` over the
+    whole corpus.
+  recorded_in: packages/workbench/src/animation/timeline.ts

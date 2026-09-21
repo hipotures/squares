@@ -255,6 +255,15 @@ export function ramp(time: number, from: number, to: number): number {
   return to > from ? clampUnit((time - from) / (to - from)) : time >= from ? 1 : 0;
 }
 
+/**
+ * How long the range plays end to end, on the beat `playRange` puts the page on.
+ *
+ * `playRange` turns continuous play on, so the range is priced from `continuousTiming` whatever
+ * the clock is doing now -- and then through the same speed-up a pair actually plays at. Pricing
+ * the speed-up here is not a refinement: with `fastSimple` on, a simple grid fill plays at
+ * `SIMPLE_TRANSITION_SPEED`, so a range holding any of them was quoted longer than the page ever
+ * took to play it, and the figure the panel showed was not the figure the clock ran.
+ */
 export function rangeDuration(
   configuration: TimelineConfiguration,
   range: StepRange,
@@ -266,7 +275,10 @@ export function rangeDuration(
   );
   let duration = 0;
   for (let index = bounds.first; index <= bounds.last; index += 1) {
-    duration += timingDuration(continuousTiming(configuration, index, style));
+    const timing = continuousTiming(configuration, index, style);
+    duration += timingDuration(
+      isSpedUpPair(configuration, index) ? spedTiming(timing, SIMPLE_TRANSITION_SPEED) : timing,
+    );
   }
   return finiteNonnegative(duration, "range duration");
 }

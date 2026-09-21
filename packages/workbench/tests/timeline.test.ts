@@ -93,6 +93,24 @@ test("simple transitions play every phase at double speed only while the setting
   assert.throws(() => isSpedUpPair(config, 9), /no transition/);
 });
 
+test("a range is quoted at the clock it plays on, speed-up included", () => {
+  const config = configuration();
+  config.simple = [true, false, true, false];
+  config.fastSimple = true;
+  const whole = { from: 2, to: 18 };
+  const played = [0, 1, 2, 3].reduce(
+    (total, index) => total + pairDuration(config, index, "tween"),
+    0,
+  );
+  // The bug this pins: priced from `continuousTiming` alone, a range holding a simple fill was
+  // quoted at the unsped beat, so the panel's figure and the capture's step clock disagreed.
+  near(rangeDuration(config, whole, "tween"), played);
+  near(rangeDuration(config, whole, "tween"), sequenceDuration(config, "tween"));
+  const unsped = rangeDuration(config, whole, "tween");
+  config.fastSimple = false;
+  assert.ok(rangeDuration(config, whole, "tween") > unsped);
+});
+
 test("physics work is priced from the base timing, which the speed-up does not shorten", () => {
   const config = configuration();
   config.simple = [true, false, true, false];
