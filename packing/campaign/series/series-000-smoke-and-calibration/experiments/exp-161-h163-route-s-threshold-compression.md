@@ -118,9 +118,10 @@ Sessions [134](../../../agent-sessions/session-134-n11-route-s-admission.md) and
 [135](../../../agent-sessions/session-135-n11-route-s-guard-discharge.md) admitted the
 target-blind instrument; PR 182 merged it as `1d9c49c4` from reviewed head `609d7d62`.
 Until this artifact existed, no optimizer, candidate, or coverage target was allowed.
-Session 139 ran encode-only; `timeout` 10800 exited at 15:24:31Z with no JSON.
-That timeout is unresolved. `--search` did not run. The record-shape row scores
-source U025 `N+=119`, not a post-encode measurement.
+Session 139 ran encode-only; `timeout` 10800 exited at 15:24:31Z with no JSON. That
+timeout is unresolved.
+`--search` did not run.
+The record-shape row scores source U025 `N+=119`, not a post-encode measurement.
 
 ## Source
 
@@ -154,15 +155,15 @@ admission controls cannot resolve H-163.
   and the candidate manifest SHA-256 is none of
   `53fbe28bd6dd022600515663ea1e3609ed2bd36a83e69e350b4bb3b45d7b7176`,
   `007b394f48b0b11565ca87d09ad961258534c426bfd623a3e9bfc15aa6495e8a`, or
-  `194f1f9f47fc94e7f945920c38a4efdb43476719eba025ea446a1d7b91fde27e`.
-  Smaller files, simpler denominators, or fewer distinct weights do not meet `N+`.
-  Decompressing, coverage-checking, and scoring an admission-control manifest is not
-  confirmation.
+  `194f1f9f47fc94e7f945920c38a4efdb43476719eba025ea446a1d7b91fde27e`. Smaller files,
+  simpler denominators, or fewer distinct weights do not meet `N+`. Decompressing,
+  coverage-checking, and scoring an admission-control manifest is not confirmation.
 - **Refute H-163** (`rejected`) only with an exact infeasibility certificate that no
   family member with `N+ <= 23` meets the frozen budget and coverage constraints.
 - **Unresolved** if the three-hour scientific wall expires, the overnight lease expires
   first, the search saturates without a candidate, or a coverage route disagrees.
-  Park only this frozen family. Timeout is never `rejected`.
+  Park only this frozen family.
+  Timeout is never `rejected`.
 - **Blocked** (no scientific verdict) if the live `--check` fails, the source, catalog,
   mutation controls, or decompressor fail, `--authorize-target exp-161` is missing, a
   candidate is built by any path other than the admitted decompressor, or the candidate

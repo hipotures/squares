@@ -1,0 +1,52 @@
+certificate  packing/resources/web/n17-weighted-certificates-2026-09-20/mira-17squares/certificates/lower_bound_4p613/best-certificate.json
+sha256       749f13335980a66a27a2304f212b5d8796390c81b962149647a4d9ff43a228ec
+source       github.com/Mira-acc/17squares @ 0266c9936a303817ac7da0802364034a34fb2558
+id           Mira-17-squares-spatial-pricing-4613/1000
+claim field  'candidate only; exact replay required'
+shape        n = 17, L = 4613/1000, B = 19997/20000, 1620 atoms, 2881 net directions, symmetry D4
+bound        s(17) >= 4613/1000 if every condition holds
+grid         one direction's dense event grid is 80.2 MiB
+interpreter  3.14.7 (macOS-26.5.2-arm64-arm-64bit-Mach-O)
+worktree     /Users/levy/wrk/github/squares/.claude/worktrees/n17-4613-intake at 061e9ffbcf3508acb11fc968abd1e1dd762950cd
+
+Containment inequalities, evaluated exactly (Fractions, nothing rounded)
+  B = 19997/20000
+  D = 207107/1440000000  (largest half-gap tangent of the net)
+  [this repository, Condition 4]  B(1 + D) = 28799821518679/28800000000000 = 0.999993802731909  -> HOLDS
+      slack 1 - B(1 + D) = 178481321/28800000000000
+  [Mira's proof note / T-022 sharpened form]  B^2(1 + D)^2 < 1 + D^2  -> HOLDS
+      B^2(1 + D)^2 = 829429719507765981945905041/829440000000000000000000000
+      1 + D^2      = 2073600042893309449/2073600000000000000
+      slack        = 3432549852599218031653/276480000000000000000000000
+  Condition 4 as this repository states it is satisfied; the sharper
+  inequality is reported for comparison and carries no weight in the verdict.
+
+Stage 1: the exact verifier, sqpack.fractional.certificate.verify
+  requested 8 workers; sqpack applies its own caps (a four-worker
+  ceiling and a 512 MiB grid budget, certificate.py), so the effective pool
+  may be smaller. Directions are independent and the result is net-ordered.
+
+  [PASS] Condition 1 atoms carry the declared symmetry
+         1620 atoms closed under D4 about the centre
+  [PASS] Condition 2 total mass below n
+         total 849899249/50000000 against n = 17
+  [PASS] Condition 3 net reaches pi/4
+         final half-tangent 207107/500000, t^2 + 2t - 1 = 309449/250000000000
+  [PASS] Condition 4 containment B(1 + D) < 1
+         B = 19997/20000, D = 207107/1440000000, B(1 + D) = 28799821518679/28800000000000
+  [PASS] Condition 5 every reachable cell carries mass 1
+         least cell mass 1000002103/1000000000 at direction 2194
+
+  Against the source's declared numbers:
+  total mass: 849899249/50000000 = 16.997984980000000
+    source declares 849899249/50000000 -> AGREES
+  least cell mass: 1000002103/1000000000 = 1.000002103000000
+    source declares 1000002103/1000000000 -> AGREES
+    attained at net direction 2194 of 2880
+
+  2881 directions swept in 422.9 s
+
+certificate bytes re-read after the replay: UNCHANGED
+
+receipt written to resources/web/n17-weighted-certificates-2026-09-20/receipts/mira-4613-first-party-exact.json
+REPLAYED: this repository's exact verifier accepts Mira's certificate, so s(17) >= 4613/1000 on its own terms.

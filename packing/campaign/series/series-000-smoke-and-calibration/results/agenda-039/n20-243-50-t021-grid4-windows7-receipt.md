@@ -1,20 +1,21 @@
 # n=20 243/50 T-021 Four-Grid Window-7 Covering Receipt
 
-Status: **site set still open, unconverged**. The side stays open. No freeze.
+Status: **site set still open, unconverged**. The side stays open.
+No freeze.
 
-Session-141 exp-165: T-021 four-grid `(34, 46, 56, 64)` unioned with T-021's atom
-sites from `certificate.json` scaled from `97/20` to `243/50`, plus
-`--seed-windows 7`, `(n, L, B, net) = (20, 243/50, 9977/10000, 181 directions)`.
-Seed sites 2464. The 1200 s deadline stopped the row loop after 36 LP rounds at
-`19.887914` (459 still violated). It did not cross 20.
+Session-141 exp-165: T-021 four-grid `(34, 46, 56, 64)` unioned with T-021’s atom sites
+from `certificate.json` scaled from `97/20` to `243/50`, plus `--seed-windows 7`,
+`(n, L, B, net) = (20, 243/50, 9977/10000, 181 directions)`. Seed sites 2464. The 1200 s
+deadline stopped the row loop after 36 LP rounds at `19.887914` (459 still violated).
+It did not cross 20.
 
-Remaining rows can only raise this value, so `19.887914` is not a covering below
-20.
-Do not more-wall this set. T-021 is unchanged. T-030 was not offered. H-218 stays
-unconfirmed.
+Remaining rows can only raise this value, so `19.887914` is not a covering below 20. Do
+not more-wall this set.
+T-021 is unchanged. T-030 was not offered.
+H-218 stays unconfirmed.
 
-This mass is above the same four-grid at `971/200` (`19.857588`) and below leftover
-auto plus windows 6 at `971/200` (`19.910044`).
+This mass is above the same four-grid at `971/200` (`19.857588`) and below leftover auto
+plus windows 6 at `971/200` (`19.910044`).
 
 ## Command
 

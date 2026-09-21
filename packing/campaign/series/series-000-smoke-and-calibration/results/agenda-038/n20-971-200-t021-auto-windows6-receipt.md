@@ -1,18 +1,18 @@
 # n=20 971/200 T-021-Seeded Auto Window-6 Covering Receipt
 
-Status: **site set still open, unconverged**. The side stays open. No freeze.
+Status: **site set still open, unconverged**. The side stays open.
+No freeze.
 
-Session-140 leftover rank 3: BC-191 auto grids `(34, 45, 56)` unioned with T-021's
-atom sites from `certificate.json` scaled from `97/20` to `971/200`, plus
-`--seed-windows 6`, `(n, L, B, net) = (20, 971/200, 9977/10000, 181 directions)`.
-Seed sites 2256. The 1200 s deadline stopped the row loop after 48 LP rounds at
-`19.910044` (6 still violated). The objective sat on `19.910044` from round 40.
-It did not cross 20.
+Session-140 leftover rank 3: BC-191 auto grids `(34, 45, 56)` unioned with T-021’s atom
+sites from `certificate.json` scaled from `97/20` to `971/200`, plus `--seed-windows 6`,
+`(n, L, B, net) = (20, 971/200, 9977/10000, 181 directions)`. Seed sites 2256. The 1200
+s deadline stopped the row loop after 48 LP rounds at `19.910044` (6 still violated).
+The objective sat on `19.910044` from round 40. It did not cross 20.
 
-Remaining rows can only raise this value, so `19.910044` is not a covering below
-20.
-Adding sites, or more wall, can still lower it. T-021 is unchanged. T-029 was
-not offered. H-218 stays unconfirmed.
+Remaining rows can only raise this value, so `19.910044` is not a covering below 20.
+Adding sites, or more wall, can still lower it.
+T-021 is unchanged. T-029 was not offered.
+H-218 stays unconfirmed.
 
 ## Command
 

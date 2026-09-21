@@ -2,13 +2,13 @@
 
 Status: **site set refuted**. The side stays open.
 
-Session-139 probe: BC-191 auto `(25, 34, 41)` plus count 60, unioned with
-T-026's 1121 fractional-certificate atoms scaled from `381/100` to `191/50`,
-`(n, L, B, net) = (11, 191/50, 9977/10000, 181 directions)`.
-The T-025-seeded auto-plus-60 construction at this side converged at
-`11.020212`; windows dropped that to `11.018646`. Fractional seed converged
-at `11.033743` on 8081 sites. Worse than the threshold seed. T-025 and T-026
-are unchanged.
+Session-139 probe: BC-191 auto `(25, 34, 41)` plus count 60, unioned with T-026’s 1121
+fractional-certificate atoms scaled from `381/100` to `191/50`,
+`(n, L, B, net) = (11, 191/50, 9977/10000, 181 directions)`. The T-025-seeded
+auto-plus-60 construction at this side converged at `11.020212`; windows dropped that to
+`11.018646`. Fractional seed converged at `11.033743` on 8081 sites.
+Worse than the threshold seed.
+T-025 and T-026 are unchanged.
 
 ## Command
 
@@ -25,8 +25,8 @@ uv run --frozen --all-extras --group dev python -m devtools.run_fractional_colge
   --log campaign/series/series-000-smoke-and-calibration/results/agenda-037/n11-191-50-t026-auto60.log
 ```
 
-`--freeze-family` was not requested. Column generation added one orbit after the
-row loop and stopped; wall 265.4 s.
+`--freeze-family` was not requested.
+Column generation added one orbit after the row loop and stopped; wall 265.4 s.
 
 ## Covering
 

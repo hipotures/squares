@@ -43,7 +43,7 @@
     <text x="1415.8165" y="2731.75" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="650" fill="#5c6673">R</text>
     <text x="1433.3165" y="2732" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#47525f">annotated rigid by the catalogue (2)</text>
     <polygon data-feature="legend-star" points="1797.7645,2717.76 1799.819856666666666666666667,2723.671153333333333333333333 1806.07624,2723.79934 1801.09007,2727.580846666666666666666667 1802.902163333333333333333333,2733.57066 1797.7645,2729.996 1792.626836666666666666666667,2733.57066 1794.43893,2727.580846666666666666666667 1789.45276,2723.79934 1795.709143333333333333333333,2723.671153333333333333333333" fill="#a3123f" data-evidence="lower bound first proved here" />
-    <text x="1815.2645" y="2732" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#47525f">lower bound first proved here (7)</text>
+    <text x="1815.2645" y="2732" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#47525f">lower bound first proved here (6)</text>
     <rect data-feature="legend-swatch" x="737.905" y="2745" width="19" height="19" fill="#4b9582" stroke="#000000" stroke-width="0.8" />
     <rect data-feature="legend-swatch" x="756.905" y="2745" width="19" height="19" fill="#c1c13c" stroke="#000000" stroke-width="0.8" />
     <rect data-feature="legend-swatch" x="775.905" y="2745" width="19" height="19" fill="#cb5698" stroke="#000000" stroke-width="0.8" />
@@ -381,10 +381,9 @@
     <text data-feature="packing-label" x="1452" y="629" font-family="Helvetica, Arial, sans-serif" font-size="29" font-weight="700" letter-spacing="-0.5" fill="#17202a">17</text>
     <rect data-feature="evidence-badge" data-evidence="exact value known" x="1591" y="608.7" width="19" height="19" rx="4.5" fill="#5c6673" stroke="none" stroke-width="1.2" />
     <text x="1600.5" y="622.7" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="650" fill="#ffffff">=</text>
-    <polygon data-feature="legend-star" points="1577.5,609.46 1579.555356666666666666666667,615.3711533333333333333333333 1585.81174,615.49934 1580.82557,619.2808466666666666666666667 1582.637663333333333333333333,625.27066 1577.5,621.696 1572.362336666666666666666667,625.27066 1574.17443,619.2808466666666666666666667 1569.18826,615.49934 1575.444643333333333333333333,615.3711533333333333333333333" fill="#a3123f" data-evidence="lower bound first proved here" />
     <text data-feature="side-bound" x="1452" y="646" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(17) ≤ 4.67553</tspan></text>
     <text data-feature="algebraic-degree" x="1610" y="646" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f">deg 18</text>
-    <text data-feature="lower-bound" x="1452" y="663" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(17) ≥ </tspan><tspan fill="#a3123f">4.59</tspan></text>
+    <text data-feature="lower-bound" x="1452" y="663" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(17) ≥ 4.613046</tspan></text>
   </g>
   <g data-feature="packing-card" data-n="18" data-row="1" data-column="7" data-source-id="W-known-best-n018">
     <rect data-feature="container-outline" x="1680" y="438" width="158" height="158" fill="#ffffff" stroke="#000000" stroke-width="1.15" />

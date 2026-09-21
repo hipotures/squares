@@ -84,11 +84,23 @@ def test_table82_contradiction_is_excluded_without_rewriting_the_theorem() -> No
 
 
 @pytest.mark.parametrize("n", [17, 18])
-def test_indexed_external17_report_is_non_strict_and_below_verified(n: int) -> None:
+def test_indexed_external17_report_never_exceeds_the_verified_lane(n: int) -> None:
+    """The strongest indexed external n17 report, and what it may and may not move.
+
+    It was anabologyco-maker's 9141/2000, below the verified lane at both sizes. Since
+    2026-09-20 it is Guzhou0806's R012, which this repository replayed and decided, so
+    at n = 17 the reported and verified fields now hold the same value (T-032) and at
+    n = 18 the report still sits below a stronger first-party rung. Either way the
+    audit's own selector must be at a fixed point: the reported lane is raised only by
+    a report that exceeds it, and never past what the verified lane already carries.
+    """
     case = ds7.read_case(REPO, None, n)
-    assert case["reported_lower_bound"]["exact_form"] == "9141/2000"
-    assert "s(17) >= 9141/2000" in case["reported_lower_bound"]["note"]
-    assert case["verified_lower_bound"]["value"] == {17: "4.59", 18: "4.679"}[n]
+    assert case["reported_lower_bound"]["exact_form"] == "461300/99999"
+    assert "s(17) >= 461300/99999" in case["reported_lower_bound"]["note"]
+    assert case["verified_lower_bound"]["value"] == {17: "4.613046130461", 18: "4.679"}[n]
+    reported, _ = ds7.field_expression(case, "reported_lower_bound")
+    verified, _ = ds7.field_expression(case, "verified_lower_bound")
+    assert ds7.compare(reported, verified)["sign"] <= 0
     assert ds7.select_update(case) is None
 
 

@@ -1,17 +1,18 @@
 # n=20 973/200 T-021-Seeded Four-Grid Window-7 Covering Receipt
 
-Status: **site set still open, unconverged**. The side stays open. No freeze.
+Status: **site set still open, unconverged**. The side stays open.
+No freeze.
 
-Session-140 rank-1 probe: four-grid `(34, 46, 56, 64)` unioned with T-021's
-atom sites scaled from `97/20` to `973/200`, plus `--seed-windows 7`,
-`(n, L, B, net) = (20, 973/200, 9977/10000, 181 directions)`.
-Seed from the live `certificate.json` (T-021 at `97/20`). Seed sites 2464.
-The 1200 s deadline stopped the row loop after 34 LP rounds at `19.930198`
-(492 still violated). It did not cross twenty. H-062's certificate-seeded
-construction at this side crossed at `20.000223` on the same round count.
-Remaining rows can only raise this value, so `19.930198` is not a covering
-below 20. Adding sites, or more wall, can still lower it. T-021 is unchanged.
-T-028 was not offered.
+Session-140 rank-1 probe: four-grid `(34, 46, 56, 64)` unioned with T-021’s atom sites
+scaled from `97/20` to `973/200`, plus `--seed-windows 7`,
+`(n, L, B, net) = (20, 973/200, 9977/10000, 181 directions)`. Seed from the live
+`certificate.json` (T-021 at `97/20`). Seed sites 2464. The 1200 s deadline stopped the
+row loop after 34 LP rounds at `19.930198` (492 still violated).
+It did not cross twenty.
+H-062’s certificate-seeded construction at this side crossed at `20.000223` on the same
+round count. Remaining rows can only raise this value, so `19.930198` is not a covering
+below 20. Adding sites, or more wall, can still lower it.
+T-021 is unchanged. T-028 was not offered.
 
 ## Command
 

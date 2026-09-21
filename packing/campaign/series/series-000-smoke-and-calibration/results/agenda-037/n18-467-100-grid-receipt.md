@@ -3,13 +3,13 @@
 Status: **unconverged at 18**. The side stays open.
 
 Session-139 probe on BC-191 auto grids `(32, 43, 53)` at
-`(n, L, B, net) = (18, 467/100, 9977/10000, 181 directions)`.
-`467/100 = 4.67` sits just below the historical n=18 probes at `117/25 = 4.68`.
-The row loop crossed eighteen at LP round 15 (`18.000000`) and held that value
-through round 57, when the 600 s deadline stopped it with 336 placements still
-violated. Remaining rows can only raise the restricted optimum. This site set
-cannot confirm. Adding sites can still lower the covering value, so `467/100`
-is not barred.
+`(n, L, B, net) = (18, 467/100, 9977/10000, 181 directions)`. `467/100 = 4.67` sits just
+below the historical n=18 probes at `117/25 = 4.68`. The row loop crossed eighteen at LP
+round 15 (`18.000000`) and held that value through round 57, when the 600 s deadline
+stopped it with 336 placements still violated.
+Remaining rows can only raise the restricted optimum.
+This site set cannot confirm.
+Adding sites can still lower the covering value, so `467/100` is not barred.
 
 ## Command
 

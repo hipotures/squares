@@ -2,8 +2,8 @@
 
 Status: **CANNOT REACH** (lane verdict), unreviewed: the adversarial review and the
 `devtools.gap_wedge` port were stopped by the owner at 17:02Z and resume under
-`think-n1v2`; the lane's exact-check scripts are retained as text under
-`h230-gap-wedge-scratch/` and the port's partial diff as
+`think-n1v2`; the lane’s exact-check scripts are retained as text under
+`h230-gap-wedge-scratch/` and the port’s partial diff as
 `h230-gap-wedge-port-partial.patch`. The lane’s report follows as delivered.
 
 Working notes, written incrementally.

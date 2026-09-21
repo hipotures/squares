@@ -1,19 +1,21 @@
 # n=12 3969/1000 T-017-Seeded Four-Grid Window-7 Covering Receipt
 
-Status: **site set still open, unconverged**. The side stays open. No freeze.
+Status: **site set still open, unconverged**. The side stays open.
+No freeze.
 
-Session-140 leftover rank 4: four-grid `(26, 35, 43, 48)` unioned with T-017's
-atom sites from `certificate.json` scaled from `99/25` to `3969/1000`, plus
-`--seed-windows 7`, `(n, L, B, net) = (12, 3969/1000, 9977/10000, 181 directions)`.
-Seed sites 2533. The 1200 s deadline stopped the row loop after 36 LP rounds at
-`12.091168` (54 still violated). It crossed 12 at round 11 (`12.000732`) and
-sat near `12.091` from round 32. This is lower than the Session-139 four-grid
-without windows at the same side (`12.116115`).
+Session-140 leftover rank 4: four-grid `(26, 35, 43, 48)` unioned with T-017’s atom
+sites from `certificate.json` scaled from `99/25` to `3969/1000`, plus
+`--seed-windows 7`, `(n, L, B, net) = (12, 3969/1000, 9977/10000, 181 directions)`. Seed
+sites 2533. The 1200 s deadline stopped the row loop after 36 LP rounds at `12.091168`
+(54 still violated).
+It crossed 12 at round 11 (`12.000732`) and sat near `12.091` from round 32. This is
+lower than the Session-139 four-grid without windows at the same side (`12.116115`).
 
-Remaining rows can only raise this value, so `12.091168` is not a covering
-below 12.
-Adding sites, or more wall, can still lower it. T-017 is unchanged. T-029 was
-not offered. H-218 stays unconfirmed. Side `3.969` already exists.
+Remaining rows can only raise this value, so `12.091168` is not a covering below 12.
+Adding sites, or more wall, can still lower it.
+T-017 is unchanged. T-029 was not offered.
+H-218 stays unconfirmed.
+Side `3.969` already exists.
 
 ## Command
 

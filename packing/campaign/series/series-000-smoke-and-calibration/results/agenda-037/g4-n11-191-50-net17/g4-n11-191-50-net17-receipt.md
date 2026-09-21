@@ -5,8 +5,8 @@ Status: **unresolved**. This is not a scientific freeze.
 The 181-net was not run (`--direction-steps 16`).
 
 Session-139 G4 producer on `(n, L, B, net) = (11, 191/50, 9977/10000, 17
-directions)` at `--grid-counts 10,14,18` with six atom rounds and eight row
-rounds. Wall 32.4 s.
+directions)` at `--grid-counts 10,14,18` with six atom rounds and eight row rounds.
+Wall 32.4 s.
 
 ## Command
 
@@ -33,10 +33,10 @@ uv run --frozen --all-extras --group dev python -m devtools.produce_threshold_ce
 | Covering below 11 | no |
 | Seed stopped | round limit 8 reached |
 
-On the 203 seed rows the atom loop dropped below 11 from `atoms-1` (`10.874023`)
-through `atoms-5` (`9.636364`). Eight row rounds then restored mass, crossing 11
-at `rows-2` (`11.146979`) and finishing at `11.449457` on 459 rows. Same shape as
-the 9-direction 456-site run: threshold atoms overfit the seed rows; added
+On the 203 seed rows the atom loop dropped below 11 from `atoms-1` (`10.874023`) through
+`atoms-5` (`9.636364`). Eight row rounds then restored mass, crossing 11 at `rows-2`
+(`11.146979`) and finishing at `11.449457` on 459 rows.
+Same shape as the 9-direction 456-site run: threshold atoms overfit the seed rows; added
 placement rows bring the covering back above 11.
 
 Artifacts in this directory: `receipt.json`, `trajectory.json`, `atoms.json`,

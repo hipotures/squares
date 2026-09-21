@@ -2,13 +2,13 @@
 
 Status: **site set refuted, unconverged**. The side stays open.
 
-Session-139 probe: BC-191 auto `(32, 42, 52)` unioned with T-019's 1184 atom
-sites scaled from `459/100` to `23/5`,
-`(n, L, B, net) = (17, 23/5, 9977/10000, 181 directions)`.
-The unseeded auto grid stopped at `17.331710` after 300 s. The seed dropped
-that to `17.049597` at the 600 s deadline (40 LP rounds, 183 still violated).
-Crossed seventeen at round 16 (`17.002464`). Remaining rows can only raise
-this value. Adding sites can still lower it, so `23/5` is not barred.
+Session-139 probe: BC-191 auto `(32, 42, 52)` unioned with T-019’s 1184 atom sites
+scaled from `459/100` to `23/5`,
+`(n, L, B, net) = (17, 23/5, 9977/10000, 181 directions)`. The unseeded auto grid
+stopped at `17.331710` after 300 s. The seed dropped that to `17.049597` at the 600 s
+deadline (40 LP rounds, 183 still violated).
+Crossed seventeen at round 16 (`17.002464`). Remaining rows can only raise this value.
+Adding sites can still lower it, so `23/5` is not barred.
 T-019 at `459/100` is unchanged.
 
 ## Command
@@ -26,8 +26,9 @@ uv run --frozen --all-extras --group dev python -m devtools.run_fractional_colge
   --log campaign/series/series-000-smoke-and-calibration/results/agenda-037/n17-23-5-t019-seed.log
 ```
 
-`--freeze-family` was not requested. The 600 s deadline stopped the row loop
-after 40 rounds; no column-generation round ran. Wall 628.0 s.
+`--freeze-family` was not requested.
+The 600 s deadline stopped the row loop after 40 rounds; no column-generation round ran.
+Wall 628.0 s.
 
 ## Covering
 
