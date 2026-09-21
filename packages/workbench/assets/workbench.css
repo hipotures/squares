@@ -494,10 +494,14 @@ body.drawing #packing-svg #squares {
    not move as a digit is gained.
    Anchored to the stage's floor with `bottom`: the numeral's ink runs 990 to 1035, 45 below the
    container's drawn edge and 45 above the stage's own. */
+/* The headline's ink starts level with the packing's own top edge (the owner, 2026-09-21), so
+   the two columns begin on one line and neither crowds the frame's top. The drawn container's
+   top is at 55.6 and KaTeX's strut opens 15 px above the digits -- measured, not computed, since
+   the strut is the face's business -- so the box sits at 41. */
 #headline {
   position: absolute;
   left: 1116px;
-  top: 10px;
+  top: 41px;
   width: 768px;
   height: 96px;
 }
@@ -576,6 +580,11 @@ body.drawing #packing-svg #squares {
   stroke: var(--scene-ink);
   stroke-width: var(--stage-note-swatch-border);
 }
+/* KaTeX sets its own base at 1.21em, which made `s(n)` read a size larger than the sentence it
+   opens. Held to the line it is set in, so the notation and the words about it are one size. */
+.note-math .katex {
+  font-size: var(--stage-katex-size);
+}
 .note-math {
   font-family: var(--font-serif);
 }
@@ -631,12 +640,6 @@ body.drawing #packing-svg #squares {
   text-transform: uppercase;
   color: var(--scene-heading);
   white-space: nowrap;
-}
-/* KNOWN BOUNDS heads the bar and every label on it, so the scale is introduced rather than
-   just appearing. It sits under the headline, which moved out from beneath the packing to the
-   head of this column, and takes PROVEN's own styling: they are the same kind of heading. */
-.head-bounds {
-  top: 124px;
 }
 .head-proved {
   top: 444px;

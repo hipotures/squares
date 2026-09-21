@@ -223,6 +223,15 @@ function labToPolar(lab: Lab): { lightness: number; chroma: number; hue: number 
 const NEUTRAL_CHROMA = 1e-4;
 
 /**
+ * The widest hue arc a blend will travel around the wheel, in degrees.
+ *
+ * Inside it the two colours are near enough that the arc passes through hues between them, which
+ * is what a reader expects of a small change. Past it the arc starts running through hues neither
+ * end has -- green to scarlet crosses yellow -- so the blend goes through neutral instead.
+ */
+const HUE_ARC_LIMIT = 60;
+
+/**
  * The shortest way round from one hue to another, in degrees, signed.
  *
  * Without the fold, a mix from 350 degrees to 10 travels 340 degrees the wrong way through
@@ -317,11 +326,23 @@ export function createColourSystem(config: CorpusColour): ColourSystem {
     // neither colour has.
     const fromHue = from.chroma < NEUTRAL_CHROMA ? to.hue : from.hue;
     const toHue = to.chroma < NEUTRAL_CHROMA ? from.hue : to.hue;
-    return oklchHex(
-      lerp(from.lightness, to.lightness, progress),
-      lerp(from.chroma, to.chroma, progress),
-      fromHue + hueDelta(fromHue, toHue) * progress,
-    );
+    const lightness = lerp(from.lightness, to.lightness, progress);
+    const chroma = lerp(from.chroma, to.chroma, progress);
+    const arc = hueDelta(fromHue, toHue);
+    if (Math.abs(arc) <= HUE_ARC_LIMIT) {
+      // Near hues blend along the short arc at full chroma. Two shades of one family, or a
+      // moving shade settling into its neighbour, are the same colour moving a little; taking
+      // them through neutral would put a wash in the middle of a change nobody should notice.
+      return oklchHex(lightness, chroma, fromHue + arc * progress);
+    }
+    // Far hues cross through neutral instead of around the wheel. Green to scarlet is close to
+    // a half turn, and the short arc between them runs through yellow -- a colour neither end
+    // has and the picture never shows, appearing for the length of the blend and reading as a
+    // flash. Collapsing chroma to nothing at the crossing and bringing it back on the other
+    // side gives green, then something greyer, then scarlet, which is the change itself and
+    // nothing else. The hue switches where chroma is zero, so the switch cannot be seen.
+    const away = Math.abs(2 * progress - 1);
+    return oklchHex(lightness, chroma * away, progress < 0.5 ? fromHue : toHue);
   };
   const desaturate = (hex: string, levelValue: number, floor: number): string => {
     const level = clamp01(levelValue);

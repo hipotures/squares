@@ -647,22 +647,29 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   //: hidden rather than drawn at a guess.
   let attributionAt = null;
   let attributionSettled = false;
-  //: The attribution's baseline, in stage pixels from the stage's top. It used to stand on the
-  //: headline's baseline, which was under the packing; with the headline moved to the head of the
-  //: facts column that anchor would put the repository's address across the top of the frame. The
-  //: stage is laid out at a fixed 1920 x 1080 and only scaled, so its own foot is a known quantity
-  //: and this is measured from it rather than from something that moved.
-  const ATTRIBUTION_BASELINE = 1046;
+  // The attribution stands on the base of the packing beside it (the owner, 2026-09-21) and ends
+  // where the gap bar's rail ends. Both anchors are measured off what is drawn -- the drawn
+  // container's own rect, not the SVG element, whose box carries the view's padding -- and
+  // written in stage pixels as the SVG text's `y` and `x`. It used to stand on the headline's
+  // baseline, which was under the packing; the headline heads the facts column now, so that
+  // anchor would have put the repository's address across the top of the frame.
   function placeAttribution() {
     const rail = document.querySelector("#gapbar .track");
-    if (rail === null || rail.getClientRects().length === 0 || stage.offsetWidth === 0) {
+    const box = document.getElementById("container");
+    if (
+      rail === null ||
+      box === null ||
+      rail.getClientRects().length === 0 ||
+      box.getClientRects().length === 0 ||
+      stage.offsetWidth === 0
+    ) {
       return;
     }
     const frame = stage.getBoundingClientRect();
     const scale = frame.width / stage.offsetWidth;
     attributionAt = [
       (rail.getBoundingClientRect().right - frame.left) / scale,
-      ATTRIBUTION_BASELINE,
+      (box.getBoundingClientRect().bottom - frame.top) / scale,
     ];
     attributionSettled = !("fonts" in document) || document.fonts.status === "loaded";
     drawAttribution();
@@ -6548,10 +6555,11 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   //: four, as the composite figure's own legend does: enough to read as a range, few enough that
   //: the row stays one line at the stage's width.
   const NOTE_ANGLE_SWATCHES = 4;
-  //: A swatch's side and the space between two, in stage px, as the composite figure draws
-  //: them. They are the SVG's own coordinates, so they are numbers here rather than tokens.
+  //: A swatch's side, in stage px, as the composite figure draws them. They sit adjacent, so a
+  //: row reads as one strip of the palette rather than as four separate marks. The SVG's own
+  //: coordinates, so numbers here rather than tokens.
   const NOTE_SWATCH = 19;
-  const NOTE_SWATCH_GAP = 2;
+  const NOTE_SWATCH_GAP = 0;
   const NOTE_SHADE_SWATCHES = 4;
   /**
    * The legend at the foot of the facts column: what `s(n)` means, and what colour and shade say.
@@ -6613,12 +6621,17 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       document.createTextNode(" is the side of the smallest square holding n unit squares."),
     );
     note.appendChild(sideOf);
-    // One swatch per angle family at its base shade, and one family across its shades: the two
-    // things the picture varies, each shown varying. Read off the corpus's own shade table.
+    // One swatch per angle family, and one family across its shades: the two things the picture
+    // varies, each shown varying. Read off the corpus's own shade table.
+    //
+    // The angle row takes each family's MIDDLE shade, not its first. Shade index 0 is the
+    // darkest, and four darkest shades read as four near-blacks rather than as four hues, which
+    // is the opposite of what that line says.
     const families = COLOUR.shades;
+    const middle = (family) => family[Math.floor(family.length / 2)] ?? family[0] ?? "";
     const angles = Array.from(
       { length: Math.min(NOTE_ANGLE_SWATCHES, families.length) },
-      (_unused, index) => families[index]?.[0] ?? "",
+      (_unused, index) => middle(families[index] ?? []),
     ).filter((fill) => fill !== "");
     const first = families[0] ?? [];
     const shades = Array.from(

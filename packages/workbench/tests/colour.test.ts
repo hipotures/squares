@@ -92,21 +92,53 @@ function chromaOf(colours: ReturnType<typeof createColourSystem>, hex: string): 
   return Math.hypot((r ?? 0) - (nr ?? 0), (g ?? 0) - (ng ?? 0), (b ?? 0) - (nb ?? 0));
 }
 
-test("a blend between distant hues keeps its chroma instead of sagging through grey", () => {
+test("a blend between distant hues crosses through neutral, never a third hue", () => {
   const colours = createColourSystem(fixtureColour());
   // Green to scarlet is close to a half turn of hue, and it is the blend the page runs most:
-  // every newly placed square is tinted along it. Lerping OKLab's rectangular a and b walked a
-  // chord across the neutral axis, so the midpoint came out greyer than either end and the
-  // square flashed on its way in.
+  // every newly placed square is tinted along it. Neither a chord across the a-b plane nor an
+  // arc around the wheel is right for it -- the chord lands on a muddy olive and the arc runs
+  // through yellow, and yellow is a colour neither end has and the picture never shows. The
+  // blend collapses chroma to nothing at the crossing instead and brings it back on the far
+  // side, so the change reads as green, greyer, scarlet.
   const green = "#3f8a63";
   const scarlet = "#a43b47";
   const ends = Math.min(chromaOf(colours, green), chromaOf(colours, scarlet));
-  for (const progress of [0.25, 0.5, 0.75]) {
-    const middle = colours.mix(green, scarlet, progress);
-    assert.ok(
-      chromaOf(colours, middle) > ends * 0.8,
-      `${middle} at ${progress} sags to ${chromaOf(colours, middle)} against ends ${ends}`,
-    );
+  assert.ok(chromaOf(colours, colours.mix(green, scarlet, 0.5)) < ends * 0.05);
+  // Approaching the crossing from either side, chroma only falls.
+  const falling = [0.1, 0.25, 0.4].map((at) => chromaOf(colours, colours.mix(green, scarlet, at)));
+  const rising = [0.6, 0.75, 0.9].map((at) => chromaOf(colours, colours.mix(green, scarlet, at)));
+  assert.deepEqual(
+    falling,
+    [...falling].sort((a, b) => b - a),
+  );
+  assert.deepEqual(
+    rising,
+    [...rising].sort((a, b) => a - b),
+  );
+  // The green side stays green and the scarlet side stays scarlet: at no point does a third
+  // hue appear. Green has more green channel than red; scarlet has more red than green.
+  const channels = (value: string): number[] =>
+    [1, 3, 5].map((at) => Number.parseInt(value.slice(at, at + 2), 16));
+  for (const at of [0.1, 0.25, 0.4]) {
+    const [red, greenCh] = channels(colours.mix(green, scarlet, at));
+    assert.ok((greenCh ?? 0) >= (red ?? 0), `${colours.mix(green, scarlet, at)} at ${at}`);
+  }
+  for (const at of [0.6, 0.75, 0.9]) {
+    const [red, greenCh] = channels(colours.mix(green, scarlet, at));
+    assert.ok((red ?? 0) >= (greenCh ?? 0), `${colours.mix(green, scarlet, at)} at ${at}`);
+  }
+});
+
+test("two shades of one family blend directly, without a wash in the middle", () => {
+  const colours = createColourSystem(fixtureColour());
+  // The crossing is for hues far enough apart that the way between them runs through a colour
+  // neither has. Shades of one family are the same colour moving a little, and taking those
+  // through neutral would put a grey pulse in the middle of a change nobody should notice.
+  const before = "#2fa88f";
+  const after = "#2f9d7d";
+  const ends = Math.min(chromaOf(colours, before), chromaOf(colours, after));
+  for (const at of [0.25, 0.5, 0.75]) {
+    assert.ok(chromaOf(colours, colours.mix(before, after, at)) > ends * 0.9);
   }
 });
 
