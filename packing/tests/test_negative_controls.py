@@ -287,6 +287,7 @@ def test_generator_owned_prospective_outputs_stay_out_of_mutation_snapshots() ->
             "agenda-033",
             "agenda-034",
             "agenda-035",
+            "agenda-041",
             "exp-201-arm-calibration",
             "exp-202-round-1",
         )

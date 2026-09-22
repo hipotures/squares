@@ -187,6 +187,18 @@ PRUNE = frozenset(
         ROOT / "campaign/series/series-000-smoke-and-calibration/results/agenda-033",
         ROOT / "campaign/series/series-000-smoke-and-calibration/results/agenda-034",
         ROOT / "campaign/series/series-000-smoke-and-calibration/results/agenda-035",
+        # Agenda 041 joins them on 2026-09-22, on exactly their grounds and for the
+        # reason the note above predicts: registering T-033 copied a 674 KB certificate
+        # into `cases/`, and the snapshot went to 168,240,654 bytes against the
+        # 167,772,160 cap -- 468,494 over, on a `main` that had only 209,349 bytes of
+        # headroom. The breach is not the certificate. It is that a 10.8 MB directory of
+        # numerical receipts, gate stdout and copied measurements was being copied into
+        # every private worker, and `controls.yaml` names none of it. Pruning the
+        # directory recovers what the census says it should and leaves the cap with room
+        # for the next registration, which is the move this constant's own note prefers
+        # over raising it a second time. The receipt the register lists as an artifact
+        # returns through `linked_pruned_targets`, as agenda 034's did.
+        ROOT / "campaign/series/series-000-smoke-and-calibration/results/agenda-041",
         ROOT
         / "campaign/series/series-000-smoke-and-calibration/results/exp-201-arm-calibration",
         ROOT / "campaign/series/series-000-smoke-and-calibration/results/exp-202-round-1",
