@@ -282,7 +282,10 @@ def _row_geometry(
         for x, y in ((-domain, -domain), (domain, -domain), (domain, domain), (-domain, domain))
     ]
     live = {box: weight for box, weight in rectangles.items() if weight}
-    return frame, live, polygon, half, cosine, sine, norm * scale
+    # The frame map is ``(dx, dy) -> scale * (C dx + S dy, -S dx + C dy)`` and its inverse
+    # divides by ``scale * (C^2 + S^2) = scale * norm^2``, not by ``scale * norm``: the
+    # rotation enters unnormalised on both coordinates, so its determinant is ``norm^2``.
+    return frame, live, polygon, half, cosine, sine, norm * norm * scale
 
 
 def _polygon_window(
@@ -353,7 +356,7 @@ def minimising_cell(expansion: Expansion, support: Support, index: int) -> RowCe
     the artifact's own replay.
     """
     row = expansion.rows[index]
-    frame, rectangles, polygon, half, cosine, sine, scale = _row_geometry(expansion, row)
+    frame, rectangles, polygon, half, cosine, sine, unscale = _row_geometry(expansion, row)
     boxes = list(rectangles)
     weights = [rectangles[box] for box in boxes]
     us = sorted({point[0] for point in polygon} | {v for box in boxes for v in box[:2]})
@@ -421,8 +424,10 @@ def minimising_cell(expansion: Expansion, support: Support, index: int) -> RowCe
         legal if legal is not None else (Fraction(twice_u, 2), Fraction(twice_v, 2))
     )
     middle = expansion.outer_side / 2
-    centre_x = middle + (cosine * frame_u - sine * frame_v) / scale
-    centre_y = middle + (sine * frame_u + cosine * frame_v) / scale
+    centre_x = middle + (cosine * frame_u - sine * frame_v) / unscale
+    centre_y = middle + (sine * frame_u + cosine * frame_v) / unscale
+    if not (0 <= centre_x <= expansion.outer_side and 0 <= centre_y <= expansion.outer_side):
+        raise RepricingError(f"row {index} produced a centre outside the container")
     return RowCell(
         row=index,
         units=least,
