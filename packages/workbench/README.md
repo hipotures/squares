@@ -79,6 +79,22 @@ receipt records that it was on, the file’s sha256 and the version.
 The stage’s bottom right carries that version, `sqpack.release.PUBLICATION_EDITION`, so
 every captured frame names the data it was drawn from.
 
+**The panel trades its text rather than dissolving it.** A word both n draw holds at
+full ink and swaps at the midpoint; a word that changes leaves before its replacement
+arrives, over `TEXT_HANDOVER`, which is seven frames at 60 fps.
+Cross-fading the two put the old sentence and the new one in the same place at half ink
+each, and neither could be read (`think-0few`). `check_animate_view` holds both halves
+of that: two different strings drawn in one place are never both legible, and a slot
+with nothing holding it up may be under half ink for `BLANK_DIP_SECONDS` and no longer.
+
+**A grid fill plays faster, by a factor you set.** `speed up simple transitions` is the
+toggle and `grid fill speed` the factor, 1 to 8 in halves and 4 by default: a step where
+every square is already square to the container has nothing to watch.
+`setSimpleSpeed` is the browser API, `squares-workbench-capture --simple-speed` the
+cut’s, and the receipt’s `simple_speed` names the clock its step lengths were measured
+on — so a length means nothing without it, and a cut that asks for a factor the page
+declines is refused.
+
 The page has one structure in every mode.
 The controls are a single column inside `--layout-gutter`. Every block in it (the mode
 panel, a `.panel-row` of `.subpanel`s, a `.workspace`) spans the same two edges and sits

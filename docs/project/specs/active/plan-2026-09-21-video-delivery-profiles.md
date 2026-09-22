@@ -181,7 +181,15 @@ handles n = 300.
 | n = 1..100 | `social` | 9,579 | 159.65 s | 43.8 MB | 49.6 to 51.3 dB, 0.999 |
 | n = 1..324 | `archive` | 33,626 | 560.43 s | 239.2 MB | 47.9 to 51.4 dB, 0.998 to 0.999 |
 
-Both conform. Fidelity is measured over three windows of each cut, early, middle and
+**Both rows were cut at a grid-fill speed-up of 3, which is no longer the default.** The
+factor is a setting now (`think-gr3j`, default 4), so a length means nothing without it:
+the receipt’s `simple_speed` names the clock its step lengths were measured on, and a
+cut that asks for a factor the page declines is refused rather than cut at whatever the
+page settled for. Priced at 4, the same ranges are 153.39 s and 542.02 s, all of the
+difference in the 55 and 160 grid fills each contains.
+
+Both rows conform.
+Fidelity is measured over three windows of each cut, early, middle and
 late, against the capture’s own PNGs.
 
 Smoothness is measured by `squares-workbench-check-cadence`, which this phase added:
