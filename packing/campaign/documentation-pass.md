@@ -63,6 +63,10 @@ reverse: a pass that starts from the prose inherits the prose’s mistakes.
 Publish a newly retained result in the same change as its registration.
 Start from the accepted evidence and its scope; an unfinished search or a certificate
 awaiting a required verification route stays unresolved.
+Use
+[Registering a First-Party Result](../frontier/README.md#registering-a-first-party-result)
+for id allocation, evidence fields, and the review obligations behind the declared
+rungs.
 For each result, complete this sequence before declaring the change ready to land:
 
 1. Update the owning case under `packing/frontier/`, `evidence.yaml`, and
