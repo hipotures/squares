@@ -235,11 +235,16 @@ session:
   - 'edit tier after the bootstrap repair: passed, 124.4 s of a 240 s ceiling, 50 of 82 steps'
   - 'campaign record: OK, 40 reports, 38 agendas'
   - 'synopsis agrees with the artifacts: passed after the census rows were reconciled'
+  - 'fast tier: 637.3 s of a 600 s ceiling, reported not failed (4 cpus against a 4-cpu/--jobs-3 reference); four steps failed and each is classified below'
+  - 'known-best atlas records and sample: failed as mine and is fixed - the n-011.md rigidity edit propagates into the generated composite-figure.json, regenerated with --update and the step now passes'
+  - 'workbench browser behavior in Chromium: environment, not code. SQUARES_BROWSER_EXECUTABLE is unset in this container; with it pointed at /opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell the check passes in full'
+  - 'test_timeout_kills_and_reaps_a_termination_resistant_process_group and test_nonzero_leader_exit_reaps_a_sigterm_ignoring_grandchild: container process semantics. Both fail in isolation as well as under load, so they are not the contention flakes the session-149 handoff expected; the error is "worker process group remained alive after SIGKILL" and pid 1 here is process_api rather than an init that reaps'
+  - 'test_the_revision_is_the_length_this_repository_abbreviates_to: pre-existing and not caused by this branch. It asserts PUBLICATION_REVISION (8 characters) has the length git currently abbreviates to, and a complete clone of this repository abbreviates to 9 - origin/main is 97efd26f5. The shallow clone masked it'
   stop_reason: null
   next_action: >-
-    Close the two running lanes, run the fast gate on the settled tree, and decide
-    whether the n = 27 and n = 28 candidate's enclosure-agreement refusal is worth a W7
-    question to the gate's owner.
+    Register the n = 11 rung, which is accepted by both routes and has no T-id, following
+    the handoff's three steps; then decide whether the n = 27 and n = 28 candidate's
+    enclosure-agreement refusal is worth a W7 question to the gate's owner.
 ---
 # Session 151: What Is Left at Low `n`, and a Loop That Could Not Run
 
