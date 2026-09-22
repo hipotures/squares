@@ -1,9 +1,10 @@
 # Exp-224 n=19 at Four Times the Budget
 
-Status: **in flight.** The sweep is running; this receipt carries the three parts that
-are complete — the deviation from `H-U2`’s declared budget and why, the polished `1x`
-baseline the sweep is judged against, and the adjunct one-sided tilt slopes — and will
-carry the sweep’s per-seed table when it lands.
+Status: **`H-U2` undecided; neither branch of its rule fired.** No record moved and
+nothing was registered.
+This receipt carries the parts — the deviation from `H-U2`’s declared budget and why,
+the polished `1x` baseline the sweep is judged against, and the adjunct one-sided tilt
+slopes — and will carry the sweep’s per-seed table when it lands.
 Nothing here is registered and no bound moved.
 
 This is `X-042`’s
@@ -111,6 +112,82 @@ And the second quench round never improved on the first on any seed: the loop re
 from the repaired pose and lands in the same cell fixed point, so the `--rounds 6`
 budget was not the binding constraint — the solver’s own cell conditions were, on four
 of five seeds.
+
+## The result
+
+```bash
+uv run --frozen --all-extras --group dev python -m devtools.run_arm_sweep \
+  campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-224-n19-10x/exp-224-plan.yaml \
+  --out campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-224-n19-10x
+
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 uv run --frozen \
+  --all-extras --group dev python -m devtools.polish_sweep_archive \
+  campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-224-n19-10x/B-perturb.jsonl \
+  --quench-seconds 60 --rounds 6 --pose-seconds 240 \
+  --json campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-224-n19-10x/exp-224-polish.json
+```
+
+| seed | engine stop | polished | least pair gap | least wall gap | quench | wall |
+| ---: | ---: | ---: | ---: | ---: | --- | ---: |
+| 1 | `4.927619575320` | `4.908695543942` | `0.0` | `0.0` | **converged**, 2 rounds | `251.6 s` |
+| 2 | `4.958905655093` | `4.920529395970` | `0.0` | `0.0` | `cell cycle`, 2 rounds | `272.3 s` |
+| 3 | `4.919385737412` | `4.898251845392` | `0.0` | `0.0` | **converged**, 2 rounds | `339.6 s` |
+| 4 | `4.904834135968` | **`4.888118685629`** | `0.0` | `0.0` | **converged**, 3 rounds | `343.4 s` |
+| 5 | `4.925742468241` | `4.908792432131` | `0.0` | `0.0` | `cell cycle`, 2 rounds | `281.4 s` |
+
+Sweep wall `1488.2 s` for the five seeds, `202,464,513,000` pair tests delivered against
+`2.0e11` declared (`1.012x`; the budget is enforced at restart granularity).
+Engine gate `SELFTEST PASSED` in `2.622 s`; 45 poses re-checked by `sqpack.verify` in a
+separate process, 0 failures, tolerance `1e-9`, archive `sha256 fd477d83…14e744`; 0 runs
+below the standing best.
+
+### Against the discriminator
+
+|  | `1x` (exp-202), polished | `4x` (this run), polished |
+| --- | ---: | ---: |
+| median | `4.944934863883` | `4.908695543942` |
+| best | `4.915912971524` | **`4.888118685629`** |
+| best gap to `3 + (4/3)sqrt(2)` | `+3.029e-02` | **`+2.501e-03`** |
+| seeds below the grid | 4 of 5 | **5 of 5** |
+
+**Neither branch of `H-U2`’s rule fires.**
+
+- *Confirm* asks for a seed within `1e-4` of `4.885618083164`. The best is
+  `4.888118685629`, which is `+2.501e-03` away — twenty-five times the threshold.
+  Not confirmed.
+- *Kill* asks for all five seeds at or above `4.8956`. Seed 4 is `4.888119`, four times
+  closer to the record than that threshold allows.
+  Not killed.
+
+So `4x` does not reach Wainwright and does not fail in the way the kill rule anticipated
+either. What it does do is move the number a great deal: the best polished seed is
+`12.1x` closer to the record than the `1x` run’s best polished seed (`3.029e-02` to
+`2.501e-03`), and the `4x` engine’s raw stopping point `4.904834` already beats the `1x`
+run’s *polished* best `4.915913`. Four times the budget plus a quench is worth `0.0708`
+of side at this cell.
+
+### The `4.888109` question the lane was asked to watch
+
+The lane brief names a distinct oblique basin at `4.888109` (Stromquist 1984, `23.944°`)
+as the nearest competitor to Wainwright’s construction, and asks whether any seed lands
+in it. The honest answer has two halves and they disagree.
+
+**By value, seed 4 is `9.69e-06` above `4.888109`.** That is a striking coincidence at
+five decimal places.
+
+**By structure, it is not that packing.** Folded into `[0, 90°)`, seed 4’s angle classes
+are `0°` (10 squares), `≈50.12°` (4), `≈51.80°` (3), `≈88.21°` (1) and `≈89.36°` (1).
+That is five classes, not one common tilt, and reflecting the configuration sends
+`50.12°` to `39.88°`, not to `23.944°`.
+
+**And this repository holds no Stromquist `n = 19` record to compare against.** A search
+of `frontier/`, `resources/` and the campaign for `4.888109`, `23.944` or a Stromquist
+`n = 19` entry returns nothing; the only Stromquist source retained here is the 2003
+`n = 10` and `n = 11` paper.
+So `4.888109` is a number carried into this lane from outside, and nothing in this
+receipt verifies it.
+The value coincidence is recorded because the lane was asked to record it.
+It is not evidence that the basin was found, and the pose says it was not.
 
 ## The control cells: is the `n = 19` polish gain real, or is the tool flattering itself?
 
