@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import subprocess
 from collections.abc import Callable
 from pathlib import Path
@@ -19,7 +20,13 @@ from xml.etree import ElementTree as ET
 
 import pytest
 
-from workbench_tools import animation_render, capture_video, delivery, export_animation_svg
+from workbench_tools import (
+    animation_render,
+    build_candidate,
+    capture_video,
+    delivery,
+    export_animation_svg,
+)
 from workbench_tools.animation_records import ANIMATION_CONTRACT, decode_animation
 from workbench_tools.animation_render import TRANSITIONS_STATEMENT
 
@@ -421,3 +428,29 @@ def test_the_export_receipt_is_written_after_the_svg(
     with pytest.raises(OSError, match="disk full"):
         export_animation_svg.main([str(source), str(tmp_path / "late.svg")])
     assert sorted(p.name for p in tmp_path.iterdir()) == ["animation.json"]
+
+
+def _ts_beat(name: str) -> dict[str, float]:
+    """One `as const` timing object read out of `src/motion-settings.ts`."""
+    source = (Path(__file__).resolve().parents[1] / "src/motion-settings.ts").read_text(
+        encoding="utf-8"
+    )
+    body = re.search(rf"export const {name} = {{(.*?)}} as const;", source, re.DOTALL)
+    assert body is not None, f"{name} is not declared in motion-settings.ts"
+    return {
+        key: float(value) for key, value in re.findall(r"(\w+):\s*([0-9.]+),", body.group(1))
+    }
+
+
+def test_the_page_data_and_the_browser_default_carry_one_beat() -> None:
+    """The beat is written twice, in two languages, and must be written the same twice.
+
+    `build_candidate.TIMING` is what the page's editor opens on and what its data carries;
+    `DEFAULT_STEP_TIMING` is what the browser module defaults to and what the capture prices a
+    range against. On 2026-09-22 the move beat was changed from 0.5 s to 0.4 s in the module
+    alone, and the built page still opened on 0.5: every check of the drawing passed, and only
+    `check_animation_editor`'s reading of the input caught it. A cut priced on one beat and
+    played on another is a film whose length nobody asked for.
+    """
+    assert _ts_beat("DEFAULT_STEP_TIMING") == build_candidate.TIMING
+    assert _ts_beat("DEFAULT_STATIC_STEP_TIMING") == build_candidate.STATIC_TIMING

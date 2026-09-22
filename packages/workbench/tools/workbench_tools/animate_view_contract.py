@@ -926,8 +926,15 @@ def colours(session: Session) -> str:
 
     session.api(("setAnimateStandardize", True), ("setRange", 29, 29))
     span = session.api(("duration",))
+    # Mid-way through the block motion, taken from the step's own schedule rather than as a
+    # fraction of the span. It was `span * 0.55`, which landed inside the blocks while the move
+    # beat was 0.5 s and landed before they started when it became 0.4 s on 2026-09-22: a rule
+    # about what the page paints WHILE SQUARES MOVE has to ask the page when they move.
+    schedule = session.api(("pause",), ("setStepN", 29), ("schedule",))
     rest = session.api(("seek", span), ("colour",))
-    moving = session.api(("seek", span * 0.55), ("colour",))
+    moving = session.api(
+        ("seek", (schedule["blocksStart"] + schedule["blocksEnd"]) / 2), ("colour",)
+    )
     unstandard = session.api(("setAnimateStandardize", False), ("seek", span), ("colour",))
     session.require(
         (rest["painted"], rest["scheme"], moving["painted"], unstandard["painted"])

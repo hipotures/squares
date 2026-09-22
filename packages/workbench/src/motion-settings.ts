@@ -141,7 +141,9 @@ export function annealConfiguration(level: number): AnnealConfiguration {
 
 export const DEFAULT_STEP_TIMING = {
   dwell: 0.6,
-  move: 0.5,
+  // 0.4 since 2026-09-22 (the owner), 0.5 before it: the moving span a step's squares take to
+  // reach their new places, before the correction and the settle.
+  move: 0.4,
   correct: 0.2,
   settle: 0.3,
 } as const;

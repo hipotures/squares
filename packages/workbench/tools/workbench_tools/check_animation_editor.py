@@ -68,16 +68,16 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
         require(call("desatFloor") == 0, "the desaturation floor is not 0")
         beat = call("continuous")
         require(
-            (beat["dwell"], beat["move"], beat["settle"]) == (0.6, 0.5, 0.3),
-            f"the continuous beat is not 0.6 + 0.5 + 0.3: {beat}",
+            (beat["dwell"], beat["move"], beat["settle"]) == (0.6, 0.4, 0.3),
+            f"the continuous beat is not 0.6 + 0.4 + 0.3: {beat}",
         )
+        shown = [
+            page.locator(f"#t-{key}").input_value()
+            for key in ("dwell", "move", "correct", "settle")
+        ]
         require(
-            [
-                page.locator(f"#t-{key}").input_value()
-                for key in ("dwell", "move", "correct", "settle")
-            ]
-            == ["0.6", "0.5", "0.2", "0.3"],
-            "the timing inputs do not show the 0.6 / 0.5 / 0.2 / 0.3 beat",
+            shown == ["0.6", "0.4", "0.2", "0.3"],
+            f"the timing inputs do not show the 0.6 / 0.4 / 0.2 / 0.3 beat: {shown}",
         )
 
         # 6 -> 7 fills the last row of a 3 x 3 grid; 4 -> 5 tilts its squares.

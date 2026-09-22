@@ -343,12 +343,12 @@ test("the arrival delay is a share of the moving span that scales with the beat"
   assert.equal(TWEEN_ILLUSTRATION_SETTINGS.arrivalDelay, DEFAULT_ARRIVAL_DELAY_FRACTION);
   assert.equal(TWEEN_ILLUSTRATION_SETTINGS.newFraction, NEW_FRACTION);
   assert.equal(NEW_FRACTION, 0.4);
-  // At the owner's beat (0.5 s move, 0.2 s correct since 2026-09-17; it was 0.4 s) the default is
-  // 0.2 of a 0.7 s span, 0.14 s, longer than the 0.084 s box-first staging left between the box
-  // growing and the square arriving.
+  // At the owner's beat (0.4 s move since 2026-09-22, 0.2 s correct since 2026-09-17) the default
+  // is 0.2 of a 0.6 s span, 0.12 s, still longer than the 0.084 s box-first staging left between
+  // the box growing and the square arriving.
   const beat = DEFAULT_STEP_TIMING;
   near(beat.correct, 0.2);
-  near(DEFAULT_ARRIVAL_DELAY_FRACTION * (beat.move + beat.correct), 0.14);
+  near(DEFAULT_ARRIVAL_DELAY_FRACTION * (beat.move + beat.correct), 0.12);
 
   const config = configuration();
   config.simple = [true, false, true, false];
