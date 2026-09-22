@@ -1,0 +1,4 @@
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+solving the covering LP on the extracted cells
+  all orbits: exact bracket [16.776137468, 16.776137532] (solver 16.776137505), support 93, 3.4s -> headroom-in-the-relaxation
+  positive orbits: exact bracket [16.811458499, 16.811458570] (solver 16.811458512), support 102, 2.2s -> headroom-in-the-relaxation
