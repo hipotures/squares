@@ -1,0 +1,44 @@
+{
+ "tool": "devtools.measure_interval_stalls",
+ "source": "campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-225-n27-548-100-bump103-certificate.json",
+ "mode": "condition5",
+ "enclose": false,
+ "n": 27,
+ "outer_side": "137/25",
+ "atoms": 1329,
+ "accepted": true,
+ "failures": [],
+ "conditions": [
+  {
+   "name": "Condition 2 total mass below n",
+   "status": "holds",
+   "detail": "total 107289303/4000000 against n = 27, exact integers"
+  },
+  {
+   "name": "Condition 3 net reaches pi/4",
+   "status": "holds",
+   "detail": "t_K^2 + 2 t_K - 1 in [1.238e-06, 1.238e-06]"
+  },
+  {
+   "name": "Condition 4 containment B(1 + D) < 1",
+   "status": "holds",
+   "detail": "B(1 + D) in [0.999983211645, 0.999983211645]"
+  },
+  {
+   "name": "Condition 5 every admissible centre covers mass 1",
+   "status": "holds",
+   "detail": "363 directions, 2707989 boxes, 0 stalled, 0 budget-exhausted; least point mass 4120021/4000000 at 0"
+  }
+ ],
+ "directions_searched": 363,
+ "boxes": 2707989,
+ "stalled": 0,
+ "budget_exhausted": 0,
+ "enclosure": [
+  "1",
+  "4120021/4000000"
+ ],
+ "enclosure_has_width": true,
+ "unsettled_directions": [],
+ "wall_seconds": 116.2
+}
