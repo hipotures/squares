@@ -31,8 +31,12 @@ accepted and the corollary value is computed and printed by
 and no evidence entries exist.
 A session that wants the rung registered needs to:
 
-1. decide the identifier, remembering that `X-041` records the contiguity rule reading
-   positionally rather than by label, which is what forced `T-032`’s row to move;
+1. take the next id and put its row **last**. `devtools/check_results.py:186-189` builds
+   the expected ids as `T-001..T-N` and compares them to the ids *in file order*, so an
+   id is its row’s position and an insertion anywhere else fails.
+   The rule that ids are never renumbered except on merge collision is
+   `conventions.md:88-90`; the `T-032` move is commit `611804c2d`. An earlier revision
+   of this handoff attributed the rule to `X-041`, which does not contain it;
 2. write the claim in the shape `T-026`’s uses, as a **supremum** — the theorem supplies
    no individual certificate at that side and does not establish a strict inequality
    there, and the tool says so in its own output;
