@@ -90,9 +90,18 @@ DATA_PATHS: tuple[str, ...] = ("packing/frontier", "packing/atlas/known-best")
 #: and are drawn from the data rather than being it; counting them would make the commit
 #: that re-stamps them a data commit (rule 4 above). The video spikes are the players'
 #: code, and the videos themselves are release assets, never committed.
+#:
+#: The registers' own READMEs join them on 2026-09-22, on the same grounds: they document
+#: how a record is written, and nothing is drawn from them. `e560571f2` edited
+#: `frontier/README.md` alone -- the prose on registration evidence, no packing record and
+#: no bound -- and under the old list that moved the version every artifact prints, which
+#: would have restamped the atlas and dated a cut whose every frame was identical. A
+#: version that changes when the instructions change is not naming the evidence.
 DATA_EXCLUDED: tuple[str, ...] = (
     "packing/atlas/known-best/known-best-1-*",
     "packing/atlas/known-best/video",
+    "packing/frontier/README.md",
+    "packing/atlas/known-best/README.md",
 )
 
 #: How many characters of that commit the version carries (the owner, 2026-09-22).
