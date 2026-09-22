@@ -37,7 +37,9 @@ uv run --frozen --all-extras --group dev python -m devtools.measure_threshold_ne
 
 The 1440 row is a control and it reproduces the registered record exactly: its dilation
 supremum is `955000*sqrt(518400042893309449)/179696714646249 = 3.826447410572939744`,
-which is `T-026`’s registered surd to twenty-two digits.
+which is `T-026`’s registered surd **exactly** — the stronger statement, and the one to
+make; the retained `decimal_20` carries 21 significant digits, so an earlier draft’s
+“twenty-two digits” was both weaker and wrong.
 
 **`B*` does not rise.** The 1,440 directions the finer net adds do not break the frozen
 atoms, so `H-G` is confirmed and its kill did not fire.

@@ -102,11 +102,12 @@ is exactly how it was run.
 
 Two things make it trustworthy rather than merely arithmetic.
 The same run’s 1440 leg is a control and reproduces `T-026`’s registered surd to
-twenty-two digits. And the retention gate accepts the frozen bytes by **both** routes:
-the interval route returns a zero-width enclosure `(1, 1)` over 5,761 directions and
-23,785,079 boxes with no stalls, the exact route independently finds least cell charge 1
-at direction 1828 and re-evaluates it at its witness by membership counting, and the two
-agree — `RETAINABLE`, `sha256 fefcf8ac…`.
+exactly.
+And the retention gate accepts the frozen bytes by **both** routes: the interval
+route returns a zero-width enclosure `(1, 1)` over 5,761 directions and 23,785,079 boxes
+with no stalls, the exact route independently finds least cell charge 1 at direction
+1828 and re-evaluates it at its witness by membership counting, and the two agree —
+`RETAINABLE`, `sha256 fefcf8ac…`.
 
 The value sits below `L/B* = 3.827547924507` and below the universal one-body ceiling
 `L* = 3.828806254385`, as the theory requires; a value above either would have been

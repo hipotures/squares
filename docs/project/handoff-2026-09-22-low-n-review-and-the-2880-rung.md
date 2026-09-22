@@ -18,7 +18,7 @@ with no new mathematics.
 Both retention routes accept the frozen bytes and agree at exactly 1 — interval
 enclosure `(1, 1)` over 5,761 directions and 23,785,079 boxes with no stalls, exact
 route independently at direction 1828 — and the run’s own 1440 leg reproduces `T-026`’s
-surd to twenty-two digits as a control.
+surd exactly as a control.
 
 `RETAINABLE`, `sha256 fefcf8ac23456442f855b5bb9188fc16db3b2bf5380e0e0bd1f472ba17665219`.
 The receipt is `results/agenda-041/exp-226-n11-net2880-receipt.md`.
@@ -38,11 +38,11 @@ A session that wants the rung registered needs to:
    there, and the tool says so in its own output;
 3. carry the limit record, which **is written and complete**:
    `results/agenda-041/exp-226-n11-dilation-limit-corollary-net2880.json`, 32 m 50 s to
-   replay all five source conditions.
-   It binds to the certificate by `sha256 fefcf8ac…`, carries the sharpened-containment
-   identity with its monotonicity step, the strict dilation family over its rational
-   factor domain, and the density, embedding and order steps that take the family to the
-   supremum. It records `endpoint_certificate: False`.
+   replay all six source conditions (1, 1', 2', 3, 4 and 5'). It binds to the
+   certificate by `sha256 fefcf8ac…`, carries the sharpened-containment identity with
+   its monotonicity step, the strict dilation family over its rational factor domain,
+   and the density, embedding and order steps that take the family to the supremum.
+   It records `endpoint_certificate: False`.
 
 The certificate bytes are under `results/agenda-041/`, not under `cases/`. Moving them
 to `cases/n11_threshold_certificate/` is the convention `T-026` follows and is part of
