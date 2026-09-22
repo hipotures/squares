@@ -91,6 +91,17 @@ session:
   - packing-validate --records passed every selected record check with two workers; the bead-tree check was omitted because the parallel native lane was already measuring the known worktree fallback.
   - pytest -n 2 tests/test_results_register.py tests/test_rung_figures.py tests/test_negative_controls.py passed 78 tests.
   - >-
+    The first full atlas update reached raster export and failed because Cairo was not
+    discoverable under DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib. The retry first
+    imported cairocffi and cairosvg successfully with the installed
+    /opt/homebrew/opt/cairo/lib path, then updated all 324 witnesses, 324 house
+    renderings, two composites, four PNG rasters, and two PDFs with two workers.
+  - >-
+    The pre-commit focused release/citation/atlas/register test set passed 203 of 204
+    tests. The sole refusal was the intended byte-for-byte publication snapshot test,
+    which compares the working SVG to HEAD and therefore cannot accept regenerated
+    bytes before their pin commit. Its exact test is rerun after the commit.
+  - >-
     Interim lane-only cost receipt through 2026-09-22T23:27:00Z: 146 model responses,
     0.69 agent-hours, a 0.67-hour active-union and wall envelope, 81.6 seconds of
     parallel overlap, and 51,169 output tokens. The snapshot is incomplete while this
