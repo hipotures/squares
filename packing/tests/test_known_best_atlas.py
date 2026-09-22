@@ -1178,13 +1178,16 @@ def test_fast_composite_check_rejects_a_stale_version_stamp() -> None:
     )
 
 
-def test_the_version_leaves_out_exactly_the_stamped_composites_and_the_video_code() -> None:
+def test_the_version_leaves_out_exactly_the_stamped_composites_the_video_code_and_the_readmes() -> None:
     """What `sqpack.release` does not count as data is what the stamp would chase.
 
     Each composite and every export drawn from it carries the version, so each must be
     outside the data or re-stamping it would be a data commit; anything else left out
-    is data the version stops seeing. The video spikes are the one other exclusion, and
-    they are code.
+    is data the version stops seeing. Two other kinds are left out, and neither is data:
+    the video spikes, which are code, and the registers' own READMEs, which are the prose
+    on how a record is written. `e560571f2` edited `frontier/README.md` alone and moved
+    the version every artifact prints (2026-09-22), which would have re-stamped the atlas
+    over a documentation change.
     """
 
     def tracked(*pathspec: str) -> set[str]:
@@ -1207,8 +1210,13 @@ def test_the_version_leaves_out_exactly_the_stamped_composites_and_the_video_cod
         family.add(render_composite_pdf.composite_pdf(stem))
     stamped = {path.resolve().relative_to(REPOSITORY).as_posix() for path in family}
     video = "packing/atlas/known-best/video/"
-    assert {path for path in left_out if not path.startswith(video)} == stamped
+    readmes = {"packing/frontier/README.md", "packing/atlas/known-best/README.md"}
+    assert {
+        path for path in left_out if not path.startswith(video) and path not in readmes
+    } == stamped
     assert any(path.startswith(video) for path in left_out)
+    # Both READMEs are tracked, so leaving them out is a rule about them and not a typo.
+    assert readmes <= left_out
 
 
 def _unitsquare_digests() -> dict[int, str]:
