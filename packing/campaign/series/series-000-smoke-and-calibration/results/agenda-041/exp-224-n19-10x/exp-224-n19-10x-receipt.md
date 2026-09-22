@@ -62,9 +62,10 @@ that have been in the tree since 2026-09-08 — gives `4.915912971524`.
 | **Gap after polish** | **`+3.029e-02`** |
 
 The `0.073` is `2.4` times the real figure.
-It does not change the qualitative claim — no search here has reached `4.885618`, and
-`n = 19` remains the worst-served low non-grid cell — but a lane that is priced against
-`0.073` is pricing against an artefact of not polishing.
+It does not change the qualitative claim — no search here has reached `4.885618` — but a
+lane priced against `0.073` is pricing against an artefact of not polishing.
+The *comparative* claim does not survive at all: the control cells below put `n = 26`
+and `n = 27` further from their records than `n = 19`, both absolutely and relatively.
 
 ## The baseline: exp-202 at `1x`, polished
 
@@ -110,6 +111,48 @@ And the second quench round never improved on the first on any seed: the loop re
 from the repaired pose and lands in the same cell fixed point, so the `--rounds 6`
 budget was not the binding constraint — the solver’s own cell conditions were, on four
 of five seeds.
+
+## The control cells: is the `n = 19` polish gain real, or is the tool flattering itself?
+
+A polish worth `0.069` of side is an order of magnitude more than anything else in this
+repository’s search record, so the same tool was run over every other cell exp-202
+archived, on the same five arms, the same five seeds and the same settings.
+Output in [`exp-224-polish-control-cells.json`](exp-224-polish-control-cells.json).
+
+| n | record | best engine stop | best polished | polish gain | gap after polish | relative |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 5 | `2.707107` | `2.707106783686` | `2.707106781187` | `2.50e-09` | `+7.55e-15` | `2.8e-15` |
+| 10 | `3.707107` | `3.707106795025` | `3.707106781187` | `1.38e-08` | `+8.88e-15` | `2.4e-15` |
+| 11 | `3.877084` | `3.886755281796` | `3.886746028799` | `9.25e-06` | `+9.66e-03` | `2.5e-03` |
+| 17 | `4.675530` | `4.677676115437` | `4.677648295264` | `2.78e-05` | `+2.12e-03` | `4.5e-04` |
+| **19** | `4.885618` | `4.958947728075` | `4.915912971524` | **`4.30e-02`** | `+3.03e-02` | `6.2e-03` |
+| 26 | `5.621320` | `5.707120382476` | `5.707118064318` | `2.32e-06` | `+8.58e-02` | `1.5e-02` |
+| **27** | `5.707107` | `5.829814425821` | `5.776135112860` | **`5.37e-02`** | `+6.90e-02` | `1.2e-02` |
+
+Four things this settles.
+
+**The tool has two positive controls and passes both exactly.** At `n = 5` and `n = 10`
+the polish reaches the proved values `2 + 1/sqrt(2)` and `3 + 1/sqrt(2)` on 5 seeds of
+5, to `7.55e-15` and `8.88e-15`. exp-001 read `n = 10` as a polish failure; this is what
+fixing it looks like from the other side.
+
+**No cell produced a side below its record.** Seven cells, 35 seeds, zero refusals from
+the below-record guard.
+
+**The `n = 19` gain is not unique and not an artefact — it is a signature.** `n = 27`
+shows the same thing at `5.37e-02`, and the two cells have something in common that the
+others do not: they are the two where exp-202’s arm barely left the grid.
+At `5`, `10`, `11`, `17` and `26` the annealer found the right basin and stopped near
+its floor, so the polish is worth `1e-9` to `3e-5`. At `19` and `27` it stopped wherever
+the cooling schedule ran out, and the LP then had `0.04` to `0.05` of side lying on the
+table. **Where the annealer only just escapes, its reported side is not a local optimum
+and should not be quoted as the search’s result.**
+
+**And `n = 19` is not the worst-served low non-grid cell.** After polishing, `n = 26` is
+`+8.58e-02` from its record and `n = 27` is `+6.90e-02`, against `n = 19`’s `+3.03e-02`;
+relative to the record the order is the same.
+`n = 19` is the cell no search has *reached*, which is a different and weaker statement
+than the one this lane was dispatched with.
 
 ## Provenance of the engine
 
@@ -193,6 +236,17 @@ left to improve on it.
   They say nothing about a packing with two tilts, and nothing about global optimality.
 - The `n = 26` slope of `1/2` is a numerical reading at five `delta` values, not a
   derivation.
+- **`H-U2` is not decided.** The budget run is `4x`, not the declared `10x`, so nothing
+  here rules out that ten times exp-202’s budget behaves differently from four.
+  The kill rule was applied to what ran.
+- The control-cell table is exp-202’s archive re-read, so it inherits exp-202’s arms,
+  seeds and `1e10` budget.
+  “The annealer’s reported side is not a local optimum where it only just escapes” is a
+  claim about two cells of seven, not a law.
+- No claim here is novel against the external literature.
+  The external record catalogue was not consulted for `n = 19`; “no computer search on
+  record has reached it” is `X-042`’s statement, carried forward and not re-checked by
+  this receipt.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
