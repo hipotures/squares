@@ -165,6 +165,7 @@ Each entry summarizes one user-level research window. Cycle slots are wall-clock
 | [session-148](agent-sessions/session-148-overnight-chunk-5.md) | stopped | contemporaneous | `insight-iteration` (insight) | `insight-iteration` (insight) | 1 | think-b7pr | Session 149 under think-n1v2 resumes from the retained patches and the wedge derivation, then the H-232 fixed-support screen. |
 | [session-149](agent-sessions/session-149-n17-external-intake.md) | completed | contemporaneous | `research-survey` (correctness) | `documentation-pass` (process) | 3 | think-pcd0 | Land the adoption under think-pcd0. The T-031 identifier contest with pull request 208 is settled: the overnight stack merged into main first and kept T-031 for the n = 11 octagon corner class, and this result took T-032 when main was merged into this branch. |
 | [session-150](agent-sessions/session-150-n17-consolidation-and-correctness.md) | completed | contemporaneous | `remediation` (correctness) | `review-planning-oversight` (process) | 4 | think-b7pr | Run the W5 efficiency block under `think-zmos`: the deep gate's exhaustive-tier step against its own declared budget, the deferred-steps wall, and the duplicate run over a byte-identical tree, now that every routine gate has a wall ceiling to be measured against. |
+| [session-151](agent-sessions/session-151-low-n-review-and-first-party-n17.md) | in_progress | contemporaneous | `efficiency-loop` (efficiency) | `research-loop` (insight) | 4 | think-gvlg | Close the two running lanes, run the fast gate on the settled tree, and decide whether the n = 27 and n = 28 candidate's enclosure-agreement refusal is worth a W7 question to the gate's owner. |
 
 ### Workflow summary
 
@@ -173,11 +174,11 @@ Declared counts are contemporaneous contracts; retrospective counts are reconstr
 | workflow | declared entries | retrospective entries | declared phases | retrospective phases |
 | --- | ---: | ---: | ---: | ---: |
 | `research-survey` | 3 | 2 | 15 | 2 |
-| `factual-review` | 7 | 0 | 55 | 2 |
-| `insight-iteration` | 26 | 1 | 82 | 4 |
+| `factual-review` | 7 | 0 | 56 | 2 |
+| `insight-iteration` | 26 | 1 | 83 | 4 |
 | `process-review` | 16 | 4 | 64 | 6 |
-| `efficiency-loop` | 10 | 1 | 36 | 1 |
-| `research-loop` | 30 | 4 | 104 | 8 |
+| `efficiency-loop` | 11 | 1 | 37 | 1 |
+| `research-loop` | 30 | 4 | 105 | 8 |
 | `pipeline-improvement` | 35 | 2 | 153 | 5 |
 | `documentation-pass` | 1 | 0 | 25 | 1 |
 | `remediation` | 1 | 1 | 1 | 3 |

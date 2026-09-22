@@ -84,17 +84,22 @@ OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 uv run --frozen \
   --json campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-224-n19-10x/exp-224-baseline-exp202-1x-polish.json
 ```
 
-| seed | engine stop | polished | kept | quench |
-| ---: | ---: | ---: | ---: | --- |
-| 1 | `4.971854791865` | `4.944934863883` | `4.944934863883` | 2 rounds, 21.3 s, `re-read cell worse` |
-| 2 | `4.958947728075` | `4.925390647054` | `4.925390647054` | 2 rounds, 5.9 s, `cell cycle` |
-| 3 | `4.984416587363` | `4.915912971524` | `4.915912971524` | 2 rounds, 63.2 s, **converged** |
-| 4 | `5.000000000000` | `5.000000000000` | `5.000000000000` | 2 rounds, 2.8 s, `cell cycle` |
-| 5 | `4.991997643233` | `4.955058032143` | `4.955058032143` | 2 rounds, 46.0 s, `cell cycle` |
+| seed | engine stop | polished | kept | least pair gap | least wall gap | quench |
+| ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| 1 | `4.971854791865` | `4.944934863883` | `4.944934863883` | `0.0` | `0.0` | 2 rounds, 14.7 s, `re-read cell worse` |
+| 2 | `4.958947728075` | `4.925390647054` | `4.925390647054` | `0.0` | `0.0` | 2 rounds, 4.7 s, `cell cycle` |
+| 3 | `4.984416587363` | `4.915912971524` | `4.915912971524` | `0.0` | `0.0` | 2 rounds, 51.8 s, **converged** |
+| 4 | `5.000000000000` | `5.000000000000` | `5.000000000000` | `0.0` | `0.0` | 2 rounds, 2.3 s, `cell cycle` |
+| 5 | `4.991997643233` | `4.955058032143` | `4.955058032143` | `0.0` | `0.0` | 2 rounds, 28.7 s, `cell cycle` |
 
 Median `4.944934863883`, best `4.915912971524`, best gap `+3.029e-02`. Every kept pose
 was repaired by scaling centres apart about their centroid — which can only raise the
-side — and accepted by `sqpack.verify` at tolerance `1e-9` in the same process.
+side — and accepted by `sqpack.verify` at tolerance `1e-9`. The two margin columns are
+what makes that tolerance beside the point: the tightest pair separation and the
+tightest corner-to-wall distance are both exactly `0.0`, not a small negative cleared by
+a tolerance, so each pose satisfies those two predicates at tolerance `0`. The wall
+margin is `0` by construction — the reported side *is* the bounding-box extent — so the
+load-bearing column is the pair separation.
 No pose is below any standing best.
 
 Two things the table says that the single best number does not.

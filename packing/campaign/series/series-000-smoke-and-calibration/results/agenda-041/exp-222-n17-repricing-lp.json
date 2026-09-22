@@ -1,48 +1,3 @@
-warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
-sweeping 7853 rows on 2 workers
-  row 1/7853 10.0s
-  row 201/7853 67.3s
-  row 401/7853 125.2s
-  row 601/7853 189.4s
-  row 801/7853 266.0s
-  row 1001/7853 323.5s
-  row 1201/7853 380.9s
-  row 1401/7853 432.0s
-  row 1601/7853 512.9s
-  row 1801/7853 585.3s
-  row 2001/7853 721.7s
-  row 2201/7853 831.4s
-  row 2401/7853 894.6s
-  row 2601/7853 942.2s
-  row 2801/7853 1001.6s
-  row 3001/7853 1074.2s
-  row 3201/7853 1160.7s
-  row 3401/7853 1246.1s
-  row 3601/7853 1329.6s
-  row 3801/7853 1392.0s
-  row 4001/7853 1455.4s
-  row 4201/7853 1529.2s
-  row 4401/7853 1587.2s
-  row 4601/7853 1619.2s
-  row 4801/7853 1644.5s
-  row 5001/7853 1667.3s
-  row 5201/7853 1699.9s
-  row 5401/7853 1739.7s
-  row 5601/7853 1785.6s
-  row 5801/7853 1811.0s
-  row 6001/7853 1847.4s
-  row 6201/7853 1879.3s
-  row 6401/7853 1909.6s
-  row 6601/7853 1933.7s
-  row 6801/7853 1958.6s
-  row 7001/7853 1982.1s
-  row 7201/7853 2007.2s
-  row 7401/7853 2030.0s
-  row 7601/7853 2055.5s
-  row 7801/7853 2079.3s
-solving the covering LP on the extracted cells
-  all orbits: exact mass 16.776137532 (solver 16.776137505), support 93, 3.4s -> headroom
-  positive orbits: exact mass 16.811458570 (solver 16.811458512), support 102, 2.3s -> headroom
 {
   "source": "/home/user/squares/packing/resources/web/n17-kleddamag-certified-bound-2026-09-21/kleddamag-17-squares-certified-bound/global-certificate.json",
   "source_sha256": "0288aaac680131aa675adb63ea6a67e3d363fcca6061d4c788301da7c5d69cec",
@@ -86,6 +41,34 @@ solving the covering LP on the extracted cells
   "captured_sites": {
     "least": 267,
     "greatest": 998
+  },
+  "lp_full": {
+    "variables": 1387,
+    "constraints": 7853,
+    "nonzeros": 3248096,
+    "solver_objective_float": 16.776137504522023,
+    "exact_mass": "4194034383/250000000",
+    "exact_mass_float": 16.776137532,
+    "rationalised_objective_units": 16776137532,
+    "rationalised_least_charge_units": 1000000000,
+    "weight_denominator": 1000000000,
+    "support": 93,
+    "seconds": 3.4,
+    "verdict": "headroom"
+  },
+  "lp_positive_orbits_only": {
+    "variables": 1105,
+    "constraints": 7853,
+    "nonzeros": 2594123,
+    "solver_objective_float": 16.811458512277703,
+    "exact_mass": "8405729268/499999999",
+    "exact_mass_float": 16.811458569622918,
+    "rationalised_objective_units": 16811458536,
+    "rationalised_least_charge_units": 999999998,
+    "weight_denominator": 1000000000,
+    "support": 102,
+    "seconds": 2.3,
+    "verdict": "headroom"
   },
   "H239_dual": {
     "window_degrees": 0.5,
