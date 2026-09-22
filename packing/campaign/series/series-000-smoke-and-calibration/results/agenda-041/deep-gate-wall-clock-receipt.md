@@ -206,6 +206,27 @@ unacceptable whatever a band says.
 the agenda, so the ceiling is 3,430 s — 1.35x of the record, a blow-up detector — and
 the 42 minutes is a candidate for `think-haam`, not a red check.
 
+## Validation
+
+`uv run --frozen --all-extras --group dev packing-validate --edit` from `packing/`:
+**exit 0**, 358 s of wall, 50 of 82 steps selected and passed, on the settled tree.
+
+That wall is itself worth recording, because it is 1.49x the `edit` tier’s 240 s ceiling
+and the gate says so rather than failing: this box was sharing four CPUs with three
+concurrent research runs, and the run’s shape (4 cpus, `--jobs 4`) is not the tier’s
+declared reference (2 cpus, `--jobs 2`), so the band was reported and not enforced.
+The gate’s own attribution names `type floor (basedpyright)` at 356.7 s and
+`browser floor` at 267.8 s, which are the two that soak up a contended box.
+It is the same rule this session extended to the CI jobs, doing on a local tier exactly
+what it is now able to do on a hosted one.
+
+Also run, all clean: `devtools.check_gate_budgets` (12 tiers, every declaration
+passing), `devtools.check_documentation` (0 problems),
+`pytest tests/test_deep_gate_workflow.py` (11 passed),
+`pytest tests/test_gate_budgets.py tests/test_validation_cli.py` (168 passed), and
+`ruff`, `ruff format` and `basedpyright` at zero findings over the three changed Python
+files.
+
 ## On the merge-path question
 
 A recommendation, not an implementation, as asked.
