@@ -81,6 +81,16 @@ def _box_moving(n: int) -> Callable[[Page], None]:
     return drive
 
 
+def _cited(n: int) -> Callable[[Page], None]:
+    """Animate at `n` with the citations shown, which is off by default."""
+
+    def drive(page: Page) -> None:
+        duration = _api(page, ["pause"], ["setCitations", True], ["setStepN", n], ["duration"])
+        _api(page, ["seek", duration], ["pause"])
+
+    return drive
+
+
 def _pack(page: Page) -> None:
     page.locator("#mode-pack").click()
 
@@ -133,6 +143,8 @@ VIEWS: tuple[View, ...] = (
     # The stage both ways (the owner, 2026-09-21): n = 17 again, with its citations on.
     View("animate-citations", "Animate at n = 17 with citations", _with_citations(17)),
     View("animate-11", "Animate at n = 11", _show_n(11)),
+    View("animate-cited-17", "Animate at n = 17, citations shown", _cited(17)),
+    View("animate-cited-29", "Animate at n = 29, a reported upper bound cited", _cited(29)),
     View("animate-moving", "Animate into n = 11, the box on its way", _box_moving(11)),
     View("animate-advanced", "Animate with Advanced motion open", _advanced),
     View("studio", "Animate with an illustration in the studio", _studio),
