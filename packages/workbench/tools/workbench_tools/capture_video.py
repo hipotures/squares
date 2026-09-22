@@ -193,6 +193,37 @@ def pricing_commands(first: int, last: int) -> list[list[Any]]:
     return [["setMode", "animate"], ["setRange", first, last], ["playRange"], ["pause"]]
 
 
+def price_report(
+    steps: list[dict[str, Any]], durations: list[float], earlier: list[dict[str, Any]]
+) -> list[str]:
+    """How this page prices each kind of step against an earlier capture's receipt.
+
+    A range that got longer between two cuts is a property of some kind of step, and this says
+    which: per kind, how many steps, their total then and now, and the largest change in one.
+    """
+    before = {int(step["n"]): float(step["seconds"]) for step in earlier}
+    kinds: dict[str, list[tuple[float, float]]] = {}
+    for step, seconds in zip(steps, durations, strict=True):
+        n = int(step["n"]) + 1
+        if n in before:
+            kinds.setdefault(str(step["kind"]), []).append((before[n], seconds))
+    lines = []
+    for kind, pairs in sorted(kinds.items()):
+        then = math.fsum(p[0] for p in pairs)
+        now = math.fsum(p[1] for p in pairs)
+        widest = max(pairs, key=lambda p: abs(p[1] - p[0]))
+        lines.append(
+            f"  {kind}: {len(pairs)} steps, {then:.2f} s then, {now:.2f} s now "
+            f"({now - then:+.2f}); one step went {widest[0]:.3f} -> {widest[1]:.3f} s"
+        )
+    total_then = math.fsum(p[0] for pairs in kinds.values() for p in pairs)
+    total_now = math.fsum(p[1] for pairs in kinds.values() for p in pairs)
+    lines.append(
+        f"  all: {total_then:.2f} s then, {total_now:.2f} s now ({total_now - total_then:+.2f})"
+    )
+    return lines
+
+
 def price_steps(
     steps: Sequence[dict[str, Any]], durations: Sequence[float], beat: dict[str, Any]
 ) -> list[float]:
@@ -294,6 +325,73 @@ def _price(page: Any, steps: list[dict[str, Any]]) -> list[float]:
         for step in steps
     ]
     return price_steps(steps, durations, page.evaluate(probe("capture/beat")))
+
+
+def priced_range(page_path: Path, first: int, last: int, fps: int) -> list[dict[str, Any]]:
+    """The steps a capture of `first..last` makes and the frames each gets, without capturing.
+
+    Priced from the page exactly as `main` prices a capture, through the same defaults, the
+    same commands and the same frame schedule, so a check can place any frame of a cut that has
+    no receipt -- one the profile refused -- in its step.
+    """
+    from playwright.sync_api import sync_playwright  # noqa: PLC0415  (optional dev dependency)
+
+    with sync_playwright() as pw:
+        browser = pw.chromium.launch()
+        page = browser.new_page(viewport={"width": STAGE_WIDTH, "height": STAGE_HEIGHT})
+        page.goto(page_path.resolve().as_uri(), wait_until="load")
+        page.evaluate(probe("capture/fonts-ready"))
+        opened = _control(page, commands=[["setMode", "animate"]], read=["state"])["state"]
+        _control(
+            page,
+            prepare=True,
+            commands=[*animation_defaults(opened), *pricing_commands(first, last)],
+        )
+        steps = _steps(page, first, last)
+        durations = _price(page, steps)
+        browser.close()
+    counts = [0] * len(steps)
+    for sample in frame_schedule(durations, fps):
+        counts[sample.step] += 1
+    return [
+        {"n": int(step["n"]) + 1, "kind": str(step["kind"]), "frames": count}
+        for step, count in zip(steps, counts, strict=True)
+    ]
+
+
+def render_frames(
+    page_path: Path, first: int, last: int, fps: int, indices: Sequence[int]
+) -> dict[int, bytes]:
+    """Draw the named frames of a capture of `first..last` again, as PNG bytes, from the page.
+
+    Each is drawn exactly as `_capture` draws it -- the same defaults and preparation, the step
+    selected, the page seeked to the frame's own instant from `frame_schedule` -- so a kept
+    frame that differs from its re-render was not the page's frame at that instant.
+    """
+    from playwright.sync_api import sync_playwright  # noqa: PLC0415  (optional dev dependency)
+
+    wanted = set(indices)
+    drawn: dict[int, bytes] = {}
+    with sync_playwright() as pw:
+        browser = pw.chromium.launch()
+        page = browser.new_page(viewport={"width": STAGE_WIDTH, "height": STAGE_HEIGHT})
+        page.goto(page_path.resolve().as_uri(), wait_until="load")
+        page.evaluate(probe("capture/fonts-ready"))
+        opened = _control(page, commands=[["setMode", "animate"]], read=["state"])["state"]
+        _control(
+            page,
+            prepare=True,
+            commands=[*animation_defaults(opened), *pricing_commands(first, last)],
+        )
+        steps = _steps(page, first, last)
+        for sample in frame_schedule(_price(page, steps), fps):
+            if sample.index not in wanted:
+                continue
+            _control(page, commands=[["select", steps[sample.step]["index"]]])
+            _control(page, commands=[["seek", sample.at]])
+            drawn[sample.index] = page.screenshot(type="png")
+        browser.close()
+    return drawn
 
 
 def _capture(
@@ -541,6 +639,12 @@ def main() -> int:
     )
     ap.add_argument("--out", type=Path, default=PACKING / "site/workbench/ascent.mp4")
     ap.add_argument("--keep-frames", action="store_true", help="leave the PNGs for inspection")
+    ap.add_argument(
+        "--price-against",
+        type=Path,
+        metavar="RECEIPT",
+        help="price the range, compare each kind of step with an earlier receipt, and stop",
+    )
     o = ap.parse_args()
 
     if not o.page.exists():
@@ -588,6 +692,10 @@ def main() -> int:
                     f"{math.fsum(durations):.2f} s, {o.fps} fps at {o.height}p, "
                     f"{opened['style']} at shake {opened['anneal']}"
                 )
+                if o.price_against is not None:
+                    earlier = json.loads(o.price_against.read_text(encoding="utf-8"))["steps"]
+                    print("\n".join(price_report(steps, durations, earlier)))
+                    return 0
                 receipt = _capture(page, steps, durations, o.fps, frames_dir)
                 animation = None
                 title = f"Square packing ascent, n = {o.first} to {o.last}"

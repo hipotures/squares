@@ -200,13 +200,13 @@ def test_a_duration_more_than_one_frame_from_the_receipt_is_a_failure() -> None:
     assert "frames apart" in off[0]
 
 
-def test_the_ceilings_bind_under_social_and_are_absent_under_archive() -> None:
-    # The whole ascent: an archive master at any length, and past what an X post takes.
-    long_run = {"seconds": 382.733}
-    assert _failures("archive", **long_run) == []
-    over = _failures("social", **long_run)
-    assert len(over) == 1
-    assert over[0].startswith("social duration ceiling: declared 140.0")
+def test_the_byte_ceiling_binds_under_social_and_no_duration_ceiling_does() -> None:
+    # The 1..100 excerpt at its full length (the owner, 2026-09-22) and the whole ascent: no
+    # profile holds a file to a length any more.
+    for seconds in (159.65, 560.433):
+        long_run = {"seconds": seconds}
+        assert _failures("archive", **long_run) == []
+        assert _failures("social", **long_run) == []
 
     heavy = {"bytes": 600 * 1000 * 1000}
     assert _failures("archive", **heavy) == []

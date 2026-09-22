@@ -20,8 +20,9 @@ Two profiles, differing only in their ceilings, because a ceiling belongs to a d
 and an encode does not:
 
 - `archive` is the master. Nothing is traded for anyone's upload rules.
-- `social` carries the tightest ceiling we actually face, which is an X post: 140 seconds
-  and 512 MB.
+- `social` carries X's byte ceiling on a post, 512 MB. It carried X's standard 140 s duration
+  ceiling too, until the owner kept the n = 1..100 excerpt at its full 160 s (2026-09-22), for
+  X Premium, which takes longer posts, and for other destinations.
 
 Level 4.0 is in both. x264 at `-preset slow` keeps five reference frames, whose
 decoded-picture-buffer size at 1920x1080 is past what level 4.0 admits, so left alone it
@@ -96,11 +97,10 @@ class DeliveryProfile:
         return int(major) * 10 + int(minor)
 
 
-#: X accepts a video up to 140 s and 512 MB on a standard post. Both are the platform's
-#: published limits rather than observed behaviour, so a file that clears them may still be
-#: refused for a reason we do not model -- what the check buys is that it will not be
-#: refused for one we do.
-_X_MAX_SECONDS = 140.0
+#: X accepts a video up to 512 MB on a post. That is the platform's published limit rather than
+#: observed behaviour, so a file that clears it may still be refused for a reason we do not
+#: model -- what the check buys is that it will not be refused for one we do. Its 140 s limit on
+#: a standard post is not held: the owner chose the full-length excerpt over it (2026-09-22).
 _X_MAX_BYTES = 512 * 1000 * 1000
 
 PROFILES: dict[str, DeliveryProfile] = {
@@ -121,7 +121,7 @@ PROFILES: dict[str, DeliveryProfile] = {
         h264_profile="high",
         level="4.0",
         pixel_format="yuv420p",
-        max_seconds=_X_MAX_SECONDS,
+        max_seconds=None,
         max_bytes=_X_MAX_BYTES,
     ),
 }

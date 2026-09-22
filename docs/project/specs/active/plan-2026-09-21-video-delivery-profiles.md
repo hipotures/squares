@@ -113,7 +113,7 @@ read by a future consumer gains two keys rather than changing any.
 | H.264 profile / level | high / 4.0 | high / 4.0 |
 | Pixel format | `yuv420p` | `yuv420p` |
 | CRF / preset | 18 / `slow` | 18 / `slow` |
-| Duration ceiling | none | 140 s |
+| Duration ceiling | none | none (140 s until 2026-09-22) |
 | Byte ceiling | none | 512 MB |
 
 Level 4.0 is in both because the measurement says it costs nothing and it is the level
@@ -167,11 +167,39 @@ handles n = 300.
 
 - [x] Cut n = 1..100 at both 30 and 60 fps under `social` for comparison.
   The owner chose 60 fps (2026-09-21), and `capture_video` now defaults to it.
-- [ ] Re-capture n = 1..324 under `archive` and n = 1..100 under `social`, at 60 fps.
-  The earlier cuts, 468.05 s and 135.2 s, predate the transition fixes that
-  `check_transitions` drove, so both are re-cut only after the owner has reviewed the
-  page.
-- [ ] Record the measured fidelity and the conformance result for each.
+- [x] Re-capture n = 1..324 under `archive` and n = 1..100 under `social`, at 60 fps,
+  from the reviewed page at `17dcb3f92`, frames and files on the external drive.
+  The n = 1..100 cut runs 159.65 s, past X’s standard 140 s. The earlier 135.2 s cut
+  predated the arrival delay merged from main (`4c2f2da27`), which adds 0.69 s to every
+  moving step; `capture_video --price-against` measures that per kind of step.
+  The owner kept the full excerpt (2026-09-22), and the `social` duration ceiling was
+  dropped.
+- [x] Record the measured fidelity and the conformance result for each.
+
+| Cut | Profile | Frames | Length | Size | Fidelity (PSNR, SSIM) |
+| --- | --- | ---: | ---: | ---: | --- |
+| n = 1..100 | `social` | 9,579 | 159.65 s | 43.8 MB | 49.6 to 51.3 dB, 0.999 |
+| n = 1..324 | `archive` | 33,626 | 560.43 s | 239.2 MB | 47.9 to 51.4 dB, 0.998 to 0.999 |
+
+Both conform. Fidelity is measured over three windows of each cut, early, middle and
+late, against the capture’s own PNGs.
+
+Smoothness is measured by `squares-workbench-check-cadence`, which this phase added:
+
+- **The clock is exact.** Every presentation-time gap in both files is within 0.7 µs of
+  one sixtieth of a second.
+- **The capture is faithful.** Every flagged frame is drawn again from the page, and no
+  kept frame is the page one frame early.
+- **Playback holds for one frame in a few places.** At a moving step’s last frame, and
+  where the physics move joins its tightening, playback holds still where a fresh draw
+  of the same instants moves.
+  That is 41 of 33,626 frames in the full ascent and 16 of 9,579 in n = 1..100. The
+  other flagged holds are the page’s own, eased phases meeting at a boundary.
+  Tracked as `think-dh9j`.
+- A slow color fade steps 8-bit fills one level at a time, so the mean change between
+  frames alternates while nothing moves.
+  The check therefore judges motion on pixels that change by more than 12 grey levels,
+  not on the mean.
 
 ## Testing Strategy
 
