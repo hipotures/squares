@@ -700,7 +700,10 @@ def test_every_case_page_binds_the_certificate_its_own_evidence_names() -> None:
         17: "T-032: external parent-rescaling reduction, bound L/A is no container side",
     }
     superseded_current_bound = {
-        11: "T-026 remains replayable historical evidence after the external bound superseded it",
+        11: (
+            "T-026 remains replayable historical evidence after the external bound "
+            "superseded it"
+        ),
     }
 
     evidence = _evidence_by_id()

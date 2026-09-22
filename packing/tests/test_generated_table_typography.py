@@ -28,7 +28,7 @@ from devtools.render_research_tables import (
     tables,
 )
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+REPO = Path(__file__).resolve().parents[2]
 
 APOSTROPHE = "\u2019"
 OPEN_QUOTE = "\u201c"
@@ -132,5 +132,5 @@ def test_rendering_over_an_unchanged_tree_is_a_no_op() -> None:
         rendered = splice(rendered, name, rows)
 
     assert rendered == text, (
-        f"re-rendering rewrote {MAIN.relative_to(PROJECT_ROOT)} with no upstream change"
+        f"re-rendering rewrote {MAIN.relative_to(REPO)} with no upstream change"
     )

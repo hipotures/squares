@@ -181,8 +181,13 @@ precedes it. `n-053.md` and `n-087.md` are hand-written and are left as written.
   still diffs to nothing, and compares everything but the `rigidity` block for a related
   reason: the promotion path writes that block after this tool has run, and a check that
   insisted on `null` there would report every promoted record as drift and so find none.
-- Case-specific evidence is editorial. `priority_notes` is written only for the second
-  lineage above, and is otherwise empty.
+- Case-specific lower-bound promotions are editorial. A fresh draft, including a forced
+  overwrite, does not infer them. During `--check`, or through an explicit API argument,
+  `LowerBoundPromotion` preserves the reviewed lower-bound fields and only the evidence
+  and resources added around them. The promotion is bound to its source `n`; upper-bound
+  and source fields remain regenerated and checked.
+- Other case-specific evidence is editorial. `priority_notes` is written only for the
+  second lineage above, and is otherwise empty.
 
 The record it writes is a draft. It is complete and it validates, and it is not a
 substitute for the review that follows it.
@@ -327,18 +332,12 @@ COMMON_DOC_FOOTER = (
 
 NAGAMOCHI_DISPLAY = "s(N) ≥ min{ ⌈√N⌉,  √(N − 2⌊√N⌋ + 1) + 1 }"
 
-#: The closing sentence of "The lower bound", in the two forms the corpus uses.
-#:
-#: The first quotes a corpus-wide count, and `devtools/check_nagamochi_bounds.py` owns
-#: that count: it re-derives "N of the M open cases" from the case records and fails if
-#: any body disagrees. Writing it into 200 new records would put a figure about the first
-#: hundred into files that are not part of what it counts, and would move the count on
-#: the day the new cases land. So generated records past the hand-authored range say the
-#: same thing without the arithmetic, and the counted form is emitted only where the
-#: corpus that owns it already carries it.
+#: The closing sentence of "The lower bound", in the two forms the corpus uses. The
+#: hand-authored cases link to the generated summary so promotions cannot stale a count
+#: copied into every case. Drafts past that range state only the evidence distinction.
 NAGAMOCHI_DEFAULT_COUNTED = (
-    "At `n ≤ 100`, this theorem supplies the independently verified lower bound in "
-    "58 of the 65 open cases. Source-reported bounds are recorded separately."
+    "See the [Frontier corpus summary](README.md#what-the-corpus-shows) for the current "
+    "aggregate count; source-reported bounds are recorded separately."
 )
 NAGAMOCHI_DEFAULT_UNCOUNTED = (
     "Source-reported bounds are recorded separately from this independently verified theorem."
@@ -532,6 +531,30 @@ FIRST_PARTY_DISPLAY_PLACES = 19
 
 class GenerationError(Exception):
     """A case cannot be drafted from the inputs given."""
+
+
+@dataclass(frozen=True, slots=True)
+class PreservedListItem:
+    """One editorial list addition and its position in the reviewed record."""
+
+    index: int
+    value: Any
+
+
+@dataclass(frozen=True, slots=True)
+class LowerBoundPromotion:
+    """Reviewed lower-bound enrichment preserved across generator round trips.
+
+    These values are copied from an existing reviewed case; this object does not derive
+    or validate the mathematical claim. `source_n` prevents a promotion from being
+    silently transferred to another case.
+    """
+
+    source_n: int
+    reported_lower_bound: Mapping[str, Any] | None
+    verified_lower_bound: Mapping[str, Any] | None
+    evidence_additions: tuple[PreservedListItem, ...]
+    resource_additions: tuple[PreservedListItem, ...]
 
 
 # --------------------------------------------------------------------------------------
@@ -1806,6 +1829,86 @@ def render_record(
     return f"---\n{front}---\n{body}"
 
 
+def _list_additions(
+    reviewed: Sequence[Any], generated: Sequence[Any]
+) -> tuple[PreservedListItem, ...]:
+    """Return reviewed additions without preserving removals or reordered base entries."""
+    additions: list[PreservedListItem] = []
+    unmatched_generated = list(generated)
+    for index, value in enumerate(reviewed):
+        try:
+            unmatched_generated.remove(value)
+        except ValueError:
+            additions.append(PreservedListItem(index=index, value=value))
+    return tuple(additions)
+
+
+def lower_bound_promotion_from_records(
+    reviewed: Mapping[str, Any], generated: Mapping[str, Any]
+) -> LowerBoundPromotion | None:
+    """Copy the manual lower-bound enrichment relative to a fresh generated payload."""
+    source_n = int(reviewed["n"])
+    if source_n != int(generated["n"]):
+        raise GenerationError(
+            f"cannot compare lower-bound promotion for n={source_n} with n={generated['n']}"
+        )
+    reported = (
+        dict(reviewed["reported_lower_bound"])
+        if reviewed["reported_lower_bound"] != generated["reported_lower_bound"]
+        else None
+    )
+    verified = (
+        dict(reviewed["verified_lower_bound"])
+        if reviewed["verified_lower_bound"] != generated["verified_lower_bound"]
+        else None
+    )
+    if reported is None and verified is None:
+        return None
+    generated_lower_evidence = {
+        *generated["reported_lower_bound"]["evidence"],
+        *generated["verified_lower_bound"]["evidence"],
+    }
+    reviewed_lower_evidence = {
+        *reviewed["reported_lower_bound"]["evidence"],
+        *reviewed["verified_lower_bound"]["evidence"],
+    }
+    if not reviewed_lower_evidence - generated_lower_evidence:
+        return None
+    return LowerBoundPromotion(
+        source_n=source_n,
+        reported_lower_bound=reported,
+        verified_lower_bound=verified,
+        evidence_additions=_list_additions(reviewed["evidence"], generated["evidence"]),
+        resource_additions=_list_additions(reviewed["resources"], generated["resources"]),
+    )
+
+
+def _insert_additions(
+    generated: Sequence[Any], additions: Sequence[PreservedListItem]
+) -> list[Any]:
+    values = list(generated)
+    for addition in additions:
+        values.insert(addition.index, addition.value)
+    return values
+
+
+def apply_lower_bound_promotion(
+    payload: dict[str, Any], promotion: LowerBoundPromotion
+) -> None:
+    """Apply copied enrichment only to the case from which it was preserved."""
+    n = int(payload["n"])
+    if promotion.source_n != n:
+        raise GenerationError(
+            f"lower-bound promotion for n={promotion.source_n} cannot be applied to n={n}"
+        )
+    if promotion.reported_lower_bound is not None:
+        payload["reported_lower_bound"] = dict(promotion.reported_lower_bound)
+    if promotion.verified_lower_bound is not None:
+        payload["verified_lower_bound"] = dict(promotion.verified_lower_bound)
+    payload["evidence"] = _insert_additions(payload["evidence"], promotion.evidence_additions)
+    payload["resources"] = _insert_additions(payload["resources"], promotion.resource_additions)
+
+
 def generate_record(
     n: int,
     *,
@@ -1814,6 +1917,7 @@ def generate_record(
     review_date: str,
     retrieved_date: str,
     release: Mapping[int, UnitSquareRecord] | None = None,
+    lower_bound_promotion: LowerBoundPromotion | None = None,
 ) -> str:
     """Draft the complete record text for one `n`."""
     source = availability.get(n)
@@ -1852,6 +1956,8 @@ def generate_record(
         release=release,
         pictured_grid=pictured_grid,
     )
+    if lower_bound_promotion is not None:
+        apply_lower_bound_promotion(payload, lower_bound_promotion)
     packing_lines: list[str] | None = None
     if source.is_unitsquare:
         names = credited_surnames(None if facts is None else facts.credit_line)
@@ -2047,7 +2153,7 @@ def selected(args: argparse.Namespace) -> list[int]:
     return list(range(first, last + 1))
 
 
-def _check(
+def check_records(
     cases: Iterable[int],
     args: argparse.Namespace,
     availability: Mapping[int, SourceAvailability],
@@ -2075,6 +2181,18 @@ def _check(
                 review_date=review,
                 retrieved_date=retrieved,
             )
+            reviewed_payload = safe_load(existing.split("---\n", 2)[1])["packing"]
+            generated_payload = safe_load(generated.split("---\n", 2)[1])["packing"]
+            promotion = lower_bound_promotion_from_records(reviewed_payload, generated_payload)
+            if promotion is not None:
+                generated = generate_record(
+                    n,
+                    availability=availability,
+                    catalogue=catalogue,
+                    review_date=review,
+                    retrieved_date=retrieved,
+                    lower_bound_promotion=promotion,
+                )
             write_record(generated, record_path(scratch_dir, n))
             checked += 1
             comparable = without_rigidity(existing)
@@ -2095,7 +2213,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         catalogue = load_catalogue(args.catalogue) if needs_catalogue else None
 
         if args.check:
-            return _check(cases, args, availability, catalogue)
+            return check_records(cases, args, availability, catalogue)
 
         for line in method_summary(cases, availability, catalogue):
             print(line)
