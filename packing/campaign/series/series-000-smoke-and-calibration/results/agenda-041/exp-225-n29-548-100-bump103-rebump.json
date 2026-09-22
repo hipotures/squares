@@ -1,0 +1,19 @@
+{
+ "tool": "devtools.rebump_certificate",
+ "source": "campaign/series/series-000-smoke-and-calibration/results/agenda-039/n29-548-100-auto-windows5-certificate.json",
+ "output": "campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-225-n29-548-100-bump103-certificate.json",
+ "bump": "103/100",
+ "scale": 4000000,
+ "n": 29,
+ "outer_side": "137/25",
+ "square_side": "9977/10000",
+ "atoms": 1329,
+ "source_total_mass": "52081879/2000000",
+ "total_mass": "107289303/4000000",
+ "total_mass_decimal": "26.822325750",
+ "mass_headroom_to_n": "8710697/4000000",
+ "source_least_cell_mass": "4000013/4000000",
+ "least_cell_mass_lower_bound": "412001339/400000000",
+ "certifies_every_n_at_least": 27,
+ "ceiling": "29931/5000"
+}

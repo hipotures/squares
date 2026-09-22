@@ -803,21 +803,15 @@ def separation_probe(
     it takes every row to pass, and this takes a few hundred.
     """
     started = time.perf_counter()
-    active = cast(np.ndarray, solution["active"])
-    units = cast(np.ndarray, solution["weights"])
-    whole = np.zeros(support.variables, np.int64)
-    whole[active] = units
-    offset = len(support.orbit_size)
-    repriced = replace(
-        expansion,
-        weights=tuple(int(whole[o]) for o in support.site_orbit),
-        triple_weights=tuple(int(whole[offset + t]) for t in support.triple_orbit),
-    )
+    repriced, whole = _reprice(expansion, support, solution)
     total = int(budget @ whole)
-    if sum(repriced.weights) + 5 * sum(repriced.triple_weights) >= 2**50:
-        raise RepricingError("the re-priced measure leaves the artifact's int64 headroom")
     cells = sweep(repriced, support, sample, workers=workers, quiet=quiet)
     worst = min(cells, key=lambda cell: cell.units)
+    if worst.units <= 0:
+        raise RepricingError(
+            f"the re-priced measure charges {worst.units} units at row {worst.row}; "
+            "no rescaling turns it into a certificate"
+        )
     mass = Fraction(total, worst.units)
     return {
         "rows_swept": len(cells),
@@ -830,6 +824,115 @@ def separation_probe(
         "mass_lower_bound": str(mass),
         "mass_lower_bound_float": float(mass),
         "survives_as_certificate_on_sample": bool(mass < 17),
+        "seconds": round(time.perf_counter() - started, 1),
+    }
+
+
+def _reprice(
+    expansion: Expansion, support: Support, solution: dict[str, Any]
+) -> tuple[Expansion, np.ndarray]:
+    """The expansion with the program's own weights on its sites and triples."""
+    whole = np.zeros(support.variables, np.int64)
+    whole[cast(np.ndarray, solution["active"])] = cast(np.ndarray, solution["weights"])
+    offset = len(support.orbit_size)
+    repriced = replace(
+        expansion,
+        weights=tuple(int(whole[o]) for o in support.site_orbit),
+        triple_weights=tuple(int(whole[offset + t]) for t in support.triple_orbit),
+    )
+    if sum(repriced.weights) + 5 * sum(repriced.triple_weights) >= 2**50:
+        raise RepricingError("the re-priced measure leaves the artifact's int64 headroom")
+    return repriced, whole
+
+
+def row_generate(
+    expansion: Expansion,
+    support: Support,
+    budget: np.ndarray,
+    sample: list[int],
+    *,
+    rounds: int,
+    deadline: float,
+    workers: int,
+    quiet: bool,
+) -> dict[str, Any]:
+    """Re-price and re-separate a sub-catalogue until the sweep stops finding a cell.
+
+    The one-cell-per-row program is a weak relaxation, and its weakness is measurable
+    rather than arguable: the separation probe says how far the answer falls when the
+    dropped cells come back. This closes the loop on a *stratified sub-catalogue*, which
+    is the same relaxation applied to fewer rows and a far tighter one, because each row
+    that is kept is kept whole.
+
+    Two numbers come out and they say different things. The final program's exact dual
+    floor is a lower bound on the optimum over the cells held, hence over the
+    sub-catalogue, hence over the whole catalogue: a rigorous floor under any re-priced
+    measure on this support at this ``A``. The final sweep's mass is what the loop's own
+    measure achieves on those rows, an upper bound on the sub-catalogue's optimum and a
+    lower bound on nothing. Convergence is when a round adds no cell, at which point the
+    two meet and the sub-catalogue is solved exactly.
+    """
+    started = time.perf_counter()
+    held = sweep(expansion, support, sample, workers=workers, quiet=quiet)
+    seen = {(cell.row, cell.columns.tobytes(), cell.counts.tobytes()) for cell in held}
+    log: list[dict[str, Any]] = []
+    solution: dict[str, Any] | None = None
+    stopped = "rounds exhausted"
+    for index in range(rounds):
+        matrix, _ = build_matrix(held, support)
+        solution = solve(matrix, budget, expansion.weight_denominator)
+        repriced, whole = _reprice(expansion, support, solution)
+        fresh = sweep(repriced, support, sample, workers=workers, quiet=quiet)
+        worst = min(fresh, key=lambda cell: cell.units)
+        mass = Fraction(int(budget @ whole), worst.units) if worst.units > 0 else None
+        added = 0
+        for cell in fresh:
+            key = (cell.row, cell.columns.tobytes(), cell.counts.tobytes())
+            if key not in seen:
+                seen.add(key)
+                held.append(cell)
+                added += 1
+        log.append(
+            {
+                "round": index,
+                "cells_held": len(held),
+                "cells_added": added,
+                "lp_floor_float": cast(float, solution["exact_floor_float"]),
+                "lp_mass_float": cast(float, solution["exact_mass_float"]),
+                "swept_mass": str(mass) if mass is not None else None,
+                "swept_mass_float": float(mass) if mass is not None else None,
+                "least_charge_units": worst.units,
+                "least_charge_row": worst.row,
+                "seconds": round(time.perf_counter() - started, 1),
+            }
+        )
+        if not quiet:
+            swept = f"{float(mass):.6f}" if mass is not None else "none"
+            print(
+                f"  round {index}: held {len(held)} (+{added}) "
+                f"floor {solution['exact_floor_float']:.6f} swept {swept} "
+                f"({time.perf_counter() - started:.1f}s)",
+                flush=True,
+            )
+        if added == 0:
+            stopped = "converged: the sweep found no cell the program had not priced"
+            break
+        if time.perf_counter() - started > deadline:
+            stopped = "deadline reached"
+            break
+    if solution is None:
+        raise RepricingError("row generation ran no round")
+    return {
+        "rows": len(sample),
+        "rows_available": len(expansion.rows),
+        "rounds": len(log),
+        "stopped": stopped,
+        "cells_held": len(held),
+        "exact_floor": cast(str, solution["exact_floor"]),
+        "exact_floor_float": cast(float, solution["exact_floor_float"]),
+        "final_swept_mass": log[-1]["swept_mass"],
+        "final_swept_mass_float": log[-1]["swept_mass_float"],
+        "log": log,
         "seconds": round(time.perf_counter() - started, 1),
     }
 
@@ -1036,6 +1139,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--report", type=Path, default=None)
     parser.add_argument("--skip-lp", action="store_true")
     parser.add_argument(
+        "--rowgen-rows",
+        type=int,
+        default=0,
+        help="row-generate on this many stratified rows after the one-cell program",
+    )
+    parser.add_argument("--rowgen-rounds", type=int, default=40)
+    parser.add_argument("--rowgen-deadline", type=float, default=900.0)
+    parser.add_argument(
         "--separation-rows",
         type=int,
         default=0,
@@ -1124,7 +1235,7 @@ def main(argv: list[str] | None = None) -> int:
         report["H239_dual"] = dual_histogram(cells, full["duals"])
         if args.separation_rows > 0:
             stride = max(len(expansion.rows) // args.separation_rows, 1)
-            probe = _sample(len(expansion.rows), stride, args.separation_rows)
+            probe = _sample(len(expansion.rows), stride, None)
             report["separation"] = separation_probe(
                 expansion,
                 support,
@@ -1151,6 +1262,19 @@ def main(argv: list[str] | None = None) -> int:
                 Fraction(cast(str, full["exact_mass"])),
             ),
         }
+
+        if args.rowgen_rows > 0:
+            stride = max(len(expansion.rows) // args.rowgen_rows, 1)
+            report["rowgen"] = row_generate(
+                expansion,
+                support,
+                budget,
+                _sample(len(expansion.rows), stride, None),
+                rounds=args.rowgen_rounds,
+                deadline=args.rowgen_deadline,
+                workers=args.workers,
+                quiet=args.quiet,
+            )
 
     report["seconds"] = round(time.perf_counter() - started, 1)
     if args.report is not None:

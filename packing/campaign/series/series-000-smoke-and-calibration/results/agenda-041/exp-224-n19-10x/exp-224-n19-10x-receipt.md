@@ -122,11 +122,19 @@ keeping:
 | 18 | smooth quadratic minimum | same `delta^2` law, branches differing by `0.76%` at `delta = 1e-2` | `0`, with curvature `0.753` to `0.756` |
 | 26 | **kink** | `s - s0` falls `10x` per `10x` in `delta`: `5.11e-3`, `1.51e-3`, `5.01e-4`, `5.00e-5`, `5.00e-6` | `+1/2` on **both** branches |
 
-`n = 26` is the `H-019` shape — the genuine corner measured at `n = 11`, where the two
-one-sided slopes were `0.175` and `0.384`. Here the corner is symmetric and the slope is
-`1/2` to five digits on each side.
-A smooth local model is misspecified at that point, which is why this was run
-branchwise; a central difference would have reported `0` there and said nothing.
+`n = 26` is the `H-019` shape — the corner
+[exp-010](../../experiments/exp-010-angle-kink-n11.md) measured at `n = 11`, by the same
+method and over the same decades of `delta`, where the one-sided slopes were `0.1747`
+and `0.3841`, a ratio of `2.198`. Here the corner is symmetric: `1/2` to five digits on
+each side, ratio `1`. A smooth local model is misspecified at a corner, which is why
+this was run branchwise; a central difference at `n = 26` returns `0` and reports a
+smooth stationary point that is not there.
+
+One more contrast with `n = 11` is worth keeping.
+exp-010 records an excess of `1.742e-10` at Trump’s own exact tilt — the LP does not
+quite reproduce the published side from the published pose.
+At `n = 19` and `n = 26` that excess is `0` to the last bit and at `n = 18` it is
+`8.882e-16`, so these three witnesses sit exactly at their family’s LP optimum.
 
 At `n = 19` and `n = 18` the opposite holds: the tilt is an interior stationary point of
 its own family, so the record is *not* defended by a large first-order penalty there —

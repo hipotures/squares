@@ -68,7 +68,7 @@ from sqpack.fractional.model import Atom
 MAX_SCALE = 10**12
 
 
-class RebumpRefusal(ValueError):
+class RebumpRefusalError(ValueError):
     """The requested restatement is not one the source bytes support."""
 
 
@@ -79,7 +79,7 @@ def weight_scale(certificate: Certificate) -> int:
     for atom in certificate.atoms:
         scale = math.lcm(scale, atom.weight.denominator)
         if scale > MAX_SCALE:
-            raise RebumpRefusal(
+            raise RebumpRefusalError(
                 f"the atom weights need a denominator above the {MAX_SCALE} scale limit; "
                 "pass --scale to round onto a coarser grid"
             )
@@ -126,7 +126,9 @@ def declared_least_cell_mass(record: dict[str, object]) -> Fraction | None:
     if value is None:
         return None
     if not isinstance(value, str):
-        raise RebumpRefusal(f"source least_cell_mass {value!r} is not an exact rational string")
+        raise RebumpRefusalError(
+            f"source least_cell_mass {value!r} is not an exact rational string"
+        )
     return Fraction(value)
 
 
@@ -171,21 +173,21 @@ def rebump(
     """
 
     if bump < 1:
-        raise RebumpRefusal(
+        raise RebumpRefusalError(
             f"bump {bump} is below 1; shaving a weight drops a tight cell below 1 (D-433)"
         )
     certificate, record = load(source)
     source_least = declared_least_cell_mass(record)
     grid = weight_scale(certificate) if scale is None else scale
     if grid < 1:
-        raise RebumpRefusal(f"scale {grid} must be a positive integer")
+        raise RebumpRefusalError(f"scale {grid} must be a positive integer")
     heavier = rebumped_atoms(certificate, bump=bump, scale=grid)
     total = sum((atom.weight for atom in heavier), start=Fraction(0))
     target = least_size_certified(total) if n is None else n
     restatement = restated(certificate, n=target, bump=bump, scale=grid)
     problems = refusals(restatement, bump=bump, source_least=source_least)
     if problems:
-        raise RebumpRefusal("; ".join(problems))
+        raise RebumpRefusalError("; ".join(problems))
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(certificate_json(restatement, None))
     return {
@@ -236,10 +238,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--report", type=Path, default=None, help="write the measurement here")
     args = parser.parse_args(argv)
     try:
-        report = rebump(
-            args.source, args.output, n=args.n, bump=args.bump, scale=args.scale
-        )
-    except RebumpRefusal as error:
+        report = rebump(args.source, args.output, n=args.n, bump=args.bump, scale=args.scale)
+    except RebumpRefusalError as error:
         print(f"{args.source}: REFUSED: {error}", flush=True)
         return 1
     if args.report is not None:
