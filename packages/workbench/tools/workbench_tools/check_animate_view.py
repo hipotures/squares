@@ -222,6 +222,26 @@ def transport_loop(session: Session) -> str:
     return "one playback loop"
 
 
+def plays_across_steps(session: Session) -> str:
+    """Play carries on from one step into the next, in real time, through the range.
+
+    Every other section seeks, and a seek draws one instant: none of them could see play stop
+    at the end of a step, which is how a regression that halted playback after the first step
+    reached the owner (2026-09-21). This plays from the grid fill into 6 for 3.5 s and requires
+    the stage to have shown at least three n in turn: 5, 6 and 7 on the page as it stands.
+    """
+    played = session.look("animate/plays-on", **{"from": 6, "to": 10, "seconds": 3.5})
+    session.require(not played["errors"], f"a frame threw while playing: {played['errors']}")
+    # Stopped after its first step, the stage shows that step's n and n + 1 and nothing more.
+    # Carrying on, it shows at least one n past that, each in turn.
+    seen = played["seen"]
+    session.require(
+        len(seen) >= 3 and seen == list(range(seen[0], seen[0] + len(seen))),
+        f"play did not carry on from step to step: the stage showed n = {seen}",
+    )
+    return f"play carried the stage through n = {played['seen'][0]} to {played['seen'][-1]}"
+
+
 def drag_ends(session: Session) -> str:
     """A key that ends the run mid-drag does not leave the page marked as dragging."""
     page = session.page
@@ -752,6 +772,7 @@ SECTIONS: tuple[Callable[[Session], str], ...] = (
     seeds,
     scope,
     transport_loop,
+    plays_across_steps,
     drag_ends,
     drag_past_walls,
     facts_handover,
