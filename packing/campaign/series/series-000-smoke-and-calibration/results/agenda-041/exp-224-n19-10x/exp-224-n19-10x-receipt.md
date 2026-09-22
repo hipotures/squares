@@ -1,11 +1,10 @@
 # Exp-224 n=19 at Four Times the Budget
 
-Status: **`H-U2` undecided; neither branch of its rule fired.** No record moved and
+Status: **`H-U2` undecided — neither branch of its rule fired.** No record moved and
 nothing was registered.
-This receipt carries the parts — the deviation from `H-U2`’s declared budget and why,
-the polished `1x` baseline the sweep is judged against, and the adjunct one-sided tilt
-slopes — and will carry the sweep’s per-seed table when it lands.
-Nothing here is registered and no bound moved.
+The best polished seed is `4.888118685629`, `+2.501e-03` from Wainwright’s
+`3 + (4/3) sqrt(2)`, which is twenty-five times the confirm threshold and four times
+closer than the kill threshold allows.
 
 This is `X-042`’s
 [slate row A5](../../../../../explorations/X-042-what-is-left-at-low-n.md) (`H-U2`), the
@@ -67,6 +66,11 @@ It does not change the qualitative claim — no search here has reached `4.88561
 lane priced against `0.073` is pricing against an artefact of not polishing.
 The *comparative* claim does not survive at all: the control cells below put `n = 26`
 and `n = 27` further from their records than `n = 19`, both absolutely and relatively.
+
+The sweep in the next section then takes the figure to `4.888118685629`, `+2.501e-03`.
+So over this one lane the repository’s best at `n = 19` went `4.958948` → `4.915913`
+(polish alone, no new search) → `4.888119` (four times the budget, then polish), and the
+`0.073` gap `X-042` prices against is now `0.0025`.
 
 ## The baseline: exp-202 at `1x`, polished
 
