@@ -175,17 +175,34 @@ uv run --frozen --all-extras --group dev python -m devtools.measure_interval_sta
   --dump-stalls campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-225-n27-interval-condition5-stalls.json
 ```
 
+Run again with `--mode enclosure` for the gate’s own threshold, and with
+`--source ../agenda-039/n29-548-100-auto-windows5-certificate.json` for the control.
+
 | Bytes | Mode | Directions | Boxes | Stalled | Condition 5 | Wall |
 | --- | --- | ---: | ---: | ---: | --- | ---: |
 | agenda-039 original | `condition5` | 363 | 4,890,517 | 272 | `undecided` | 186 s |
 | exp-225 bumped | `condition5` | 363 | 2,707,989 | **0** | **`holds`** | 116 s |
-| agenda-039 original | `enclosure` (the gate) | 362 | 4,960,181 | 272 | `undecided` | 162 s |
-| exp-225 bumped | `enclosure` (the gate) | 362 | 4,955,893 | 272 | `undecided` | 205–291 s |
+| agenda-039 original | `enclosure` (the gate) | 363 | 4,960,181 | 272 | `undecided` | 162 s |
+| exp-225 bumped | `enclosure` (the gate) | 363 | 4,955,893 | 272 | `undecided` | 152 s |
 
 The control is the first row against the second.
 At the theorem’s own threshold the bump clears the stall completely, over the full
 doubled net, and the stall dump is empty.
 The margin was the obstruction to Condition 5; it is not the obstruction to the gate.
+
+The last row is `--mode enclosure`, which reproduces the gate’s own interval numbers to
+the box — 4,955,893 and 272, the same as the `decide_certificate` runs above — and adds
+what the gate does not print: **every one of the 272 stalled boxes is in direction
+`0`**, the axis-parallel one, and that direction is also where the least point mass
+`4120021/4000000` is attained.
+The other 362 directions certify.
+The stall dump records two further unsplittable boxes at each of directions `142` and
+`142'`; neither counts as a stall, because their bounds already reach the threshold.
+
+Direction `0` is where a seam is most likely by construction: the atom sites lie on
+rational grids, and at zero rotation a coverage region’s leave-edge at `x + B/2` can
+land exactly on another’s enter-edge at `x' - B/2`. That is a fact about the
+coordinates, and no reweighting touches it.
 
 ## What is established, and what is not
 
@@ -232,11 +249,12 @@ The candidate is one gate mode away from a decision, and the question is now abo
 gate rather than about the certificate.
 Two routes a coordinator could take:
 
-1. **Close the seam.** The 272 stalled boxes are a coordinate phenomenon at
-   `RESOLUTION_FLOOR`; identifying which directions and which atom pairs produce them
-   would say whether a small, D4-symmetric site adjustment removes them.
-   That needs the covering re-run, so it is a `more-wall` decision the register
-   currently forbids.
+1. **Close the seam.** All 272 stalled boxes sit in direction `0` and their coordinates
+   are dumped in `exp-225-n27-interval-enclosure-stalls.json`, so the atom pairs whose
+   axis-parallel edges coincide can be read off without another search.
+   Whether a small D4-symmetric site adjustment removes them is answerable from that
+   file; acting on the answer needs the covering re-run, which is a `more-wall` decision
+   the register currently forbids.
 2. **Decide the policy.** Ask whether a certificate whose Condition 5 is certified by
    the exact sweep and by the interval route at the mass-1 threshold, but whose
    enclosure cannot be pinned, should be retainable — and if so, under what recorded
