@@ -34,6 +34,7 @@ from __future__ import annotations
 
 import io
 import json
+import re
 import shlex
 from contextlib import redirect_stdout
 from itertools import combinations
@@ -41,6 +42,7 @@ from pathlib import Path
 from typing import Any
 
 from sqpack.cli import validate
+from sqpack.gate_budgets import BUDGETS, ci_declaration_problems, load
 from sqpack.yamlio import safe_load
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -392,3 +394,100 @@ def test_the_deep_gate_runs_the_locked_project_interpreter() -> None:
         ]
         assert environment, job_name
         assert all("--all-extras" in command for command in environment), job_name
+
+
+def test_every_deep_gate_job_is_clocked_against_a_declared_wall() -> None:
+    """`OR-17`: a hosted job with no ceiling is a job that can double unremarked.
+
+    Not hypothetical here, and the numbers are the ones this file already carries.
+    `deep-gate.yml` prices the exhaustive tier at 1943.05s of step time, and the job that
+    runs it cost 2674s on two complete runs on 2026-09-21 -- 1.38x, under the 1.5x that
+    fails a local tier, and read by no rule at all, because `gate-budgets.yaml` clocked
+    `packing-validate`'s own wall and nothing clocked a workflow job's.
+
+    So the tiers' own rule, asked of these four jobs: every job the gate runs has an
+    entry, every entry names a job that exists, every entry carries a wall measured on
+    named runs, and every ceiling is inside `policy.max_headroom` of it. The same shape
+    `test_every_page_job_a_pull_request_runs_is_budgeted` holds over `pages`.
+
+    Enforcement against a live run belongs to `devtools.check_ci_gate_walls`; this is the
+    declaration check, and like `check_gate_budgets` it needs no clock.
+    """
+    register = load(BUDGETS)
+    gate = register.ci_gate("deep-gate")
+    assert gate is not None, "the deep gate has no entry in gate-budgets.yaml"
+    jobs = _workflow(DEEP_GATE)["jobs"]
+
+    assert gate.file == str(DEEP_GATE.relative_to(REPOSITORY_ROOT))
+    assert gate.aggregate == AGGREGATE_JOB
+    # Driven from the workflow, so a fifth deep job fails here the day it arrives rather
+    # than running unclocked -- which is the property the 1943.05s figure never had.
+    assert set(gate.ids) == set(jobs) - {AGGREGATE_JOB}
+    assert ci_declaration_problems(register) == []
+
+    headroom = register.policy.max_headroom
+    for budget in (*gate.jobs, gate.wall):
+        where = budget.id
+        assert budget.measured_seconds is not None, where
+        assert budget.measured_on, where
+        assert budget.measured_where is not None, where
+        assert re.search(r"run \d{8,}", budget.measured_where), where
+        assert budget.ceiling_seconds >= budget.measured_seconds, where
+        assert budget.ceiling_seconds <= headroom * budget.measured_seconds, where
+        assert budget.argument.strip(), where
+        # A hosted band has to be argued against the runner's own variance, so the
+        # spread the readings showed is recorded beside the mean of them.
+        assert budget.spread is not None, where
+        assert budget.spread >= 1.0, where
+
+    # The gate declares its own band rather than inheriting the policy's, because the
+    # policy's 1.5x was measured against local tiers. It may be tighter, never looser.
+    assert 1.0 < gate.drift_ratio <= register.policy.drift_ratio
+    # A relaxation with no bead behind it is a permanent one.
+    assert gate.reports_only
+    assert gate.tracking_bead
+    longest = max(budget.measured_seconds or 0.0 for budget in gate.jobs)
+    wall = gate.wall.measured_seconds or 0.0
+    assert wall >= longest, "the wall is at least the longest job"
+
+
+def test_the_deep_gate_aggregate_reads_the_walls_it_is_budgeted_against() -> None:
+    """A price nothing reads is not a budget, which is `OR-17`'s third obligation.
+
+    The register above is only a declaration until something compares a finished run
+    against it. `packing-required` runs `check_pr_wall` for exactly this reason and
+    `check_gate_budgets` refuses a pull-request wall whose aggregator never runs it; this
+    is that rule for the deep surface.
+
+    The step is `continue-on-error` and the gate is declared `enforcement: reporting`,
+    which are two different relaxations and both are deliberate. The gate reports because
+    a band built on one hosted reading cannot separate a 1.5x regression from a slow
+    runner draw. The step continues on error because a 45-minute pre-merge gate must not
+    go red for a measurement tool, and an unreachable API is not a regression. Both are
+    `think-haam`'s to remove.
+    """
+    aggregate = _workflow(DEEP_GATE)["jobs"][AGGREGATE_JOB]
+    all_steps = list(aggregate["steps"])
+    steps = [step for step in all_steps if isinstance(step.get("run"), str)]
+    reporting = [step for step in steps if "devtools.check_ci_gate_walls" in str(step["run"])]
+
+    assert len(reporting) == 1, "the aggregate must read its own walls exactly once"
+    # Nothing added to this job may decide its verdict except the prerequisite script,
+    # so every other step -- the checkout and the toolchain included -- continues on
+    # error. A measurement tool that can redden a 45-minute pre-merge gate is worse than
+    # no measurement tool.
+    verdict = all_steps[0]
+    assert "needs." in str(verdict.get("env", {}).get("EXHAUSTIVE_RESULT", ""))
+    for step in all_steps[1:]:
+        assert step.get("continue-on-error") is True, step.get("name")
+    (step,) = reporting
+    command = " ".join(str(step["run"]).split())
+    assert "--gate deep-gate" in command
+    # No `--enforce`: the register's `enforcement` field is the one authority for that,
+    # and a flag in the workflow would be a second one that could disagree with it.
+    assert "--enforce" not in command
+    assert step.get("continue-on-error") is True
+    # It must run when a prerequisite failed too: a deep job that died slowly is exactly
+    # the run whose walls are worth reading.
+    assert str(step.get("if", "")).startswith("always()")
+    assert aggregate["permissions"] == {"contents": "read", "actions": "read"}

@@ -143,10 +143,10 @@ hypothesis status and summarizes experiment verdicts, and the
 
 | Record | Count | State at the cutoff |
 | --- | ---: | --- |
-| Agendas | 37 | 17 active; 14 completed; 5 paused; 1 superseded |
-| Commitments | 356 | 181 complete; 61 stopped; 68 blocked; 16 ready; 21 tentative; 9 in progress |
+| Agendas | 38 | 18 active; 14 completed; 5 paused; 1 superseded |
+| Commitments | 362 | 182 complete; 61 stopped; 68 blocked; 16 ready; 21 tentative; 14 in progress |
 | Sessions | 150 | 92 completed; 58 stopped; all terminal |
-| Explorations | 39 | 24 linked to proposed hypotheses; 15 uncodified |
+| Explorations | 40 | 24 linked to proposed hypotheses; 16 uncodified |
 | Hypotheses | 170 | 29 confirmed; 31 refuted; 55 blocked; 17 unresolved; 5 open; 29 open questions; 2 result registered; 2 abandoned; 0 running |
 | Experiments | 155 | 43 accepted; 36 rejected; 50 unresolved; 12 baseline; 11 blocked; 3 abandoned; 0 in progress |
 | Frontier results | 32 | 32 registered |
@@ -543,6 +543,9 @@ case or experiment separately.
 | [Exp-220 n=11 96/25 Class Re-Freeze Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-220-n11-96-25-class-receipt.md) | research synthesis | record | retained | — |
 | [H-222 Registration Review of exp-219 (Session 146, chunk 3)](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/h222-registration-review.md) | research synthesis | record | retained | — |
 | [n=11 96/25 Corner-Clipped Covering Receipt (exp-219)](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-219-n11-96-25-clip-receipt.md) | research synthesis | record | retained | — |
+| [Bootstrap Receipt: a Fresh Clone Cannot Run the Research Loop (BC-368)](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-041/bootstrap-receipt.md) | research synthesis | record | retained | — |
+| [Deep-Gate Wall Clock Receipt (W5 efficiency block, `think-zmos`)](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-041/deep-gate-wall-clock-receipt.md) | research synthesis | record | retained | — |
+| [Exp-221 n=17 Kleddamag Measure, Read Unrestricted](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-221-n17-kleddamag-unrestricted-receipt.md) | research synthesis | record | retained | — |
 | [n=20 973/200 T-021-Seeded Four-Grid Window-7 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n20-973-200-t021-grid4-windows7-receipt.md) | research synthesis | record | retained | — |
 | [n=20 973/200 T-021-Seeded Four-Grid Window-7 2400 s Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n20-973-200-t021-grid4-windows7-2400-receipt.md) | research synthesis | record | retained | — |
 | [n=21 97/20 T-021-Seeded Auto Window-6 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n21-97-20-t021-auto-windows6-receipt.md) | research synthesis | record | retained | — |

@@ -49,13 +49,16 @@ agenda:
       The bootstrap receipt under results/agenda-041 and the new devtools check.
     workflows: [efficiency-loop]
     program: n11-strategy-reset
+    artifacts:
+    - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-041/bootstrap-receipt.md
+    - packing/devtools/check_bootstrap.py
     parallel_group: efficiency
     note: >-
       Unplanned. It was found by running the loop rather than by reasoning about it, which
       is the whole argument for opening a block by measuring it.
     outcomes:
     - scope: Five preconditions no document named, found by running the edit tier on a fresh clone.
-      classification: confirmed
+      classification: achieved
       result: >-
         The image ships uv 0.8.17, whose interpreter index ends at cpython-3.14.0rc2, so
         the pinned 3.14.7 cannot install and uv sync fails; uv self update does not fix it
@@ -65,7 +68,7 @@ agenda:
         After all five, the edit tier passes at 124.4 s of wall against its 240 s ceiling.
       evidence:
       - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-041/bootstrap-receipt.md
-      disposition: fix-forward
+      disposition: retire-success
       follow_up: null
   - id: BC-369
     purpose: tool_validation

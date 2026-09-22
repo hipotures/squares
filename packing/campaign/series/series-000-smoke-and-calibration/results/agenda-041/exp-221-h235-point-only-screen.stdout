@@ -1,0 +1,47 @@
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+  H-235 1/415 row 0: least so far 793735377 (0.3s)
+  H-235 201/415 row 3800: least so far 768584952 (90.7s)
+  H-235 401/415 row 7600: least so far 741584526 (159.9s)
+{
+  "source": "/home/user/squares/packing/resources/web/n17-kleddamag-certified-bound-2026-09-21/kleddamag-17-squares-certified-bound/global-certificate.json",
+  "source_sha256": "0288aaac680131aa675adb63ea6a67e3d363fcca6061d4c788301da7c5d69cec",
+  "structure": {
+    "available_point_orbits": 1134,
+    "positive_point_orbits": 852,
+    "physical_sites": 8988,
+    "positive_sites": 6744,
+    "threshold_orbits": 253,
+    "physical_triples": 2008,
+    "point_budget_units": 14640116080,
+    "threshold_budget_units": 2358311276,
+    "total_budget_units": 16998427356
+  },
+  "core_side_band": [
+    "17222913506866278366600017442224375944783077159199/17251090982558979015112715291272840801000000000000",
+    "392274404235301509353271379462242479024485262216379657/392853403757170308517924585309722853620343000000000000"
+  ],
+  "catalogue_rows": 7853,
+  "direction_steps": 1440,
+  "square_side": "17222913506866278366600017442224375944783077159199/17251090982558979015112715291272840801000000000000",
+  "total_budget": "4249606839/250000000",
+  "containment_product": "12404064710891386978265683988213957444072611743384490227293/12420785507442464890881155009716445376720000000000000000000",
+  "emitted_atoms": 6744,
+  "emitted_threshold_atoms": 2008,
+  "restricted_replay_control": "skipped",
+  "point_only_screen": {
+    "rows_swept": 415,
+    "rows_available": 7853,
+    "least_point_charge_units": 741584526,
+    "least_point_charge": "370792263/500000000",
+    "least_point_charge_float": 0.741584526,
+    "attained_at_row": 5130,
+    "point_budget_over_n": "183001451/212500000",
+    "point_budget_over_n_float": 0.8611832988235294,
+    "margin": "-1016589569/8500000000",
+    "triples_load_bearing": true,
+    "seconds": 165.0
+  },
+  "unrestricted_witness_control": "skipped"
+}
+WARNING: C8 did not run; the translation is unconfirmed and no verdict taken from these bytes means anything. Pass --control-rows.
+wrote campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-221-h235-point-only-screen.json

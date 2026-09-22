@@ -801,6 +801,19 @@ Status: **active**. Run the hypotheses X-040 adapted from the Session 143 review
 | BC-365 | research | 12 | blocked | 3 | think-mmd5 | A verifier admission receipt, or a certified dual of value at least 12 below side 4 from the existing ceiling readers. |
 | BC-366 | research | 11, 45 | stopped | 4 | think-srln | None; reopen an item only when its stated reopening condition holds. |
 
+### [agenda-041](agendas/agenda-041-low-n-review-and-first-party-n17.md) — A Deep Low-n Review, an Efficiency Block, and the First-Party n = 17 Question
+
+Status: **active**. Spend one four-hour run on three blocks in sequence, overlapped so that no gate is waited on idle. A deep mathematical review on Fable asks whether anything significant is left at n = 11, n = 17 or another low n now that the five-value n = 17 ladder and the T-031 and T-032 registrations have merged; it runs as four disjoint lanes and lands as X-042. An efficiency block runs beside it, because OR-12 is seventeen terminal blocks overdue and because a fresh clone of this repository turned out not to run the research loop at all. The remaining time is an Opus research block on what the review ranks, with Fable taking the mathematics. The flagship is X-041's A2 cell: whether the external n = 17 measure also verifies unrestricted, in this repository's own language and its own gate, which is the one available move that would turn a retained external artifact into a first-party bound.
+
+| item | purpose | n | state | priority | bead | next evidence |
+| --- | --- | --- | --- | ---: | --- | --- |
+| BC-368 | tool_validation | 11, 17 | complete | 0 | think-zmos | The bootstrap receipt under results/agenda-041 and the new devtools check. |
+| BC-369 | tool_validation | 11, 17 | in_progress | 1 | think-zmos | The CI-budget receipt under results/agenda-041. |
+| BC-370 | research | 11, 17, 18 | in_progress | 0 | think-gvlg | packing/campaign/explorations/X-042 and the hypotheses it registers. |
+| BC-371 | research | 17 | in_progress | 0 | think-xdoh | exp-221 under results/agenda-041 and the translator under devtools. |
+| BC-372 | research | 17 | in_progress | 2 | think-xdoh | The sweep receipt under results/agenda-041. |
+| BC-373 | research | 11 | in_progress | 2 | think-gvlg | The refinement work file and its receipt under results/agenda-041. |
+
 ## Series
 
 | id | status | title | rounds | opened because |
@@ -1240,6 +1253,7 @@ These totals exclude 4 historical rounds with unrecorded timing; their cost is u
 - X-031 — Floor-Normalized BC303 T2 Helper and H-161 Local Stability
 - X-036 — Graded Guidance for Annealing
 - X-041 — After the n = 17 Certified Bound, a Ranked Slate
+- X-042 — What Is Left at Low n, After the n = 17 Ladder Merged
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

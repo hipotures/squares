@@ -1,0 +1,8 @@
+campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-221-n17-kleddamag-unrestricted-net1440.json: n = 17, L = 4613/1000 = 4.613000, B = 17222913506866278366600017442224375944783077159199/17251090982558979015112715291272840801000000000000, 6744 point atoms (mass 183001451/12500000 = 14.640116080), 2008 threshold atoms (budget 589577819/250000000 = 2.358311276), total budget 4249606839/250000000 = 16.998427356
+  no least_cell_charge is declared; the routes are compared to each other
+  holds: Condition 1 atoms carry the declared symmetry: 6744 atoms closed under D4 about the centre
+  holds: Condition 1' threshold atoms carry the declared symmetry: 2008 threshold atoms closed under D4 about the centre
+  holds: Condition 2' total budget below n: point mass 183001451/12500000 + threshold budget 589577819/250000000 = 4249606839/250000000 against n = 17
+  holds: Condition 3 net reaches pi/4: final half-tangent 207107/500000, t^2 + 2t - 1 = 309449/250000000000
+  holds: Condition 4 containment B(1 + D) < 1: B = 17222913506866278366600017442224375944783077159199/17251090982558979015112715291272840801000000000000, D = 207107/720000000, B(1 + D) = 12404064710891386978265683988213957444072611743384490227293/12420785507442464890881155009716445376720000000000000000000
+campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-221-n17-kleddamag-unrestricted-net1440.json: REFUSED: the interval route could not decide it: the interval verifier supports at most 4096 atoms

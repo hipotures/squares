@@ -38,8 +38,11 @@ does not contain the commit is not evidence the commit was orphaned. Concretely 
 * no Git history reachable at all (the negative-control sandbox is a source snapshot with
   no `.git`, and so is a source tarball): every declaration is reported as unresolved and
   nothing fails on ancestry;
-* a **shallow** repository that lacks the commit: reported by name with the remedy, and
-  nothing fails, because that is the case `conventions.md` names;
+* a **shallow** repository, whether it lacks the commit or holds it and cannot reach it:
+  reported by name with the remedy, and nothing fails. The first is the case
+  `conventions.md` names. The second is the one that looks like evidence and is not --
+  `merge-base --is-ancestor` stops at the graft point, so a real ancestor fetched as some
+  other ref's tip reads as orphaned until `git fetch --unshallow` (`think-qsn2`);
 * a **complete** repository that lacks the commit: that is a failure. Shallowness is the
   only innocent explanation for a missing object, and it has been ruled out.
 
@@ -426,6 +429,22 @@ def ancestry_problems(
         state = commit_state(repository, run.commit)
         if state == "reachable":
             reachable += 1
+        elif history == "shallow":
+            # A truncated graph answers neither question. `absent` is the case
+            # `conventions.md` §6 names; `orphaned` is the same fact one step further
+            # on, and it is the reading that looks like evidence and is not.
+            # `merge-base --is-ancestor` stops at the graft point, so a commit that is
+            # a real ancestor of HEAD -- fetched as the tip of some other ref, with the
+            # path back to it cut -- is reported as not being one. Measured on a
+            # `--depth 1 --no-single-branch` clone, where the tip of a merged branch is
+            # present and reads `orphaned`; `git fetch --unshallow` makes it
+            # `reachable` with no commit having moved (`think-qsn2`).
+            detail = (
+                "shallow checkout"
+                if state == "absent"
+                else "shallow checkout: present, and HEAD's history is cut before it"
+            )
+            unresolved.append(f"{name} -> {run.commit} ({detail})")
         elif state == "orphaned" and not run.certifies:
             unresolved.append(
                 f"{name} -> {run.commit} (a retained {run.tier} run that {run.verdict}, "
@@ -437,8 +456,6 @@ def ancestry_problems(
                 "history and is not an ancestor of HEAD; a gate run off the handover's "
                 "own history certifies nothing about what was handed over"
             )
-        elif history == "shallow":
-            unresolved.append(f"{name} -> {run.commit} (shallow checkout)")
         else:
             problems.append(
                 f"{name}: declares a {run.tier} gate at {run.commit}, which is in no "
