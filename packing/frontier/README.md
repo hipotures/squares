@@ -246,6 +246,16 @@ row satisfies it, not what it means.
    package is what readers are pointed at: the root README’s New Results entries link
    into it, and the self-contained verifiable-claim documents live there.
 
+   A **verifiable-claim document is a separate deliverable, not a registration step.**
+   `T-025` and `T-026` each carry one, and
+   [`render_verifiable_claim`](../devtools/render_verifiable_claim.py) writes both from
+   one template — but as two hard-coded branches of one function, keyed to those two
+   files, with the witness direction, the title, the surd and the proof note written in.
+   A third claim document needs that branch parameterized and its own proof note, which
+   is work to schedule rather than a box to tick.
+   Registering without one is what `T-033` did; the row then cites the argument’s
+   existing proof note rather than inventing an artifact.
+
 4. **Update the case.** Its `verified_lower_bound` or `verified_upper_bound` cites the
    same evidence entries, with `value` and `exact_form`, and its body must restate the
    new bound: `devtools.check_case_prose` reads the prose against the front matter,

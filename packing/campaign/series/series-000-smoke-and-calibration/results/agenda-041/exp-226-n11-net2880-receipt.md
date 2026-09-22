@@ -87,10 +87,15 @@ the dilation-limit theorem establishes s(11) >= 955000*sqrt(2073600042893309449)
 | **this certificate** | `955000*sqrt(2073600042893309449)/359341754646249` | **`3.826997548829543624`** |
 | movement | — | **`+0.000550138257`** |
 
-It sits below `L/B* = 3.827547924507` and below the universal one-body ceiling
-`L* = 38200/9977 = 3.828806254385`, which is what the theory requires.
-A value above either would have been a reason to distrust the run rather than a better
-result.
+It sits below `L/B* = 3.827547924507` and below the point-certificate ceiling
+`L* = 38200/9977 = 3.828806254385`, and neither comparison is an independent check of
+the run. `S < L/B*` is an algebraic identity, since `sqrt(1 + D^2) < 1 + D` for `D > 0`,
+so a value above it would have meant an arithmetic defect.
+`L*` is the ceiling on *point* certificates, and `T-025`’s own rationale is that
+threshold atoms carry budget the point method cannot have, so `L*` is exactly the bound
+that does not bind this language: `S < L*` holds here because `B* > 9977/10000`, which
+the refinement measurement forces, not because of a theorem about threshold
+certificates.
 
 ## What this does not establish
 
