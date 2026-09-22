@@ -341,15 +341,16 @@ on.
 It is not the next thing, because a reassessment of what to search is queued in front
 of it.
 
-For the next supervised exact-research goal, take `think-gvlg`: register the `n = 11`
-rung Session 151 left accepted and unregistered.
-Its threshold certificate at the 2880-step net is `RETAINABLE` by both retention routes,
-which agree at exactly 1, and its dilation-limit record is replayed and written; the
-bound it carries is
-`955000*sqrt(2073600042893309449)/359341754646249 = 3.826997548829544`, `+0.00055` over
-`T-026`. What it needs is a `T-id`, a claim written as a supremum because the theorem
-supplies no individual certificate at that side, and a qualifying gate pass on a host
-where Session 151’s three environment failures do not apply.
+For the next supervised exact-research goal, after PR 222 is green and mergeable, start
+two separate branches from its head in parallel.
+The selected `think-d010` branch decides the complete n11 adaptive parent-core catalogue
+by an independent coverage method while preserving its admissible centre domain and
+addressing the native site and feature-slot limits.
+The other branch reconciles PR 221 while retaining every historical result and the
+strongest justified current bounds.
+Existing identifiers from PR 221 take precedence; any later conflicting identifiers are
+renumbered after PR 221’s sequence with every reference.
+PR 222 introduces no T-ID.
 
 The W5 efficiency block that stood here is discharged.
 Its headline turned out to be a correction rather than a confirmation: the exhaustive

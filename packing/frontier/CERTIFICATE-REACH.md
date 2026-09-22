@@ -3,7 +3,9 @@
 # Where the fractional certificate can still go
 
 The most a weighted fractional unavoidable-set certificate could add to each
-case's lower bound, at the 181-direction net every retained certificate uses.
+case's lower bound under this fixed 181-direction baseline instrument.
+Retained certificates may use finer or adaptive direction sets; their own nets
+are outside this comparison.
 `ceiling` is `ceil(sqrt(n)) / (1 + D)`, proved in
 `sqpack.fractional.certificate.ceiling_side`.
 

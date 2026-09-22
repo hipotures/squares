@@ -153,7 +153,7 @@ hypothesis status and summarizes experiment verdicts, and the
 | --- | ---: | --- |
 | Agendas | 38 | 18 active; 14 completed; 5 paused; 1 superseded |
 | Commitments | 362 | 182 complete; 61 stopped; 68 blocked; 16 ready; 21 tentative; 14 in progress |
-| Sessions | 152 | 92 completed; 59 stopped; 1 nonterminal |
+| Sessions | 152 | 93 completed; 59 stopped; all terminal |
 | Explorations | 40 | 24 linked to proposed hypotheses; 16 uncodified |
 | Hypotheses | 170 | 29 confirmed; 31 refuted; 55 blocked; 17 unresolved; 5 open; 29 open questions; 2 result registered; 2 abandoned; 0 running |
 | Experiments | 155 | 43 accepted; 36 rejected; 50 unresolved; 12 baseline; 11 blocked; 3 abandoned; 0 in progress |
@@ -410,6 +410,7 @@ case or experiment separately.
 
 | Document or collection | Role | Authority | Lifecycle | Current replacement |
 | --- | --- | --- | --- | --- |
+| [D-490 PDF Incident: Run 35784981711](packing/campaign/agent-sessions/session-152-validation/pdf-d490-run-35784981711.md) | failure analysis and lessons | record | retained | — |
 | [Senior Review of PRs 199–201](docs/project/reviews/review-2026-09-19-pr199-201-correctness.md) | dated review record | record | retained | — |
 | [Proof Review: R012 `s(17) >= 461300/99999` and Mira’s `4.613` Certificate](docs/project/reviews/review-2026-09-20-n17-r012-and-mira-4613-proof-review.md) | dated review record | record | retained | — |
 | [Review: Derived-Artifact Currency on `main` at `9fe9999d`](docs/project/reviews/review-2026-09-21-derived-artifact-currency.md) | dated review record | record | retained | — |
@@ -1111,20 +1112,36 @@ Three process defects came out of the block and are tracked rather than worked a
 `think-qsn2`, where `check_session_gate`’s verdict depends on the clone’s fetch depth;
 and `think-3umt`, where a record authored terminal can never earn its first receipt.
 
-**Owner-directed entry, Session 152:** review and integrate the new external n11 and
-rectangle-density certificates.
-The resulting next technical priority is `think-d010`: decide the complete n11 adaptive
-parent-core catalogue by an independent coverage method, preserving its admissible
-centre domain and addressing the native site and feature-slot limits.
-`think-c0xc` tracks the reproduced density import bug; `think-ck07` tracks an additional
-complete density-verification method.
-Session 152 also corrects the n17 case to the already replayed and reviewed Kleddamag
-value `461300/99853`: the lack of C4 does not bar adoption under the
-strongest-certifiable-bound contract.
-The preceding Session 150 paragraph records its disposition at that earlier cutoff.
+**[Session 152](packing/campaign/agent-sessions/session-152-external-density-and-n11-review.md)**
+retained and reviewed the complete external n11 threshold, rectangle-density and point
+certificate packet. Complete source replays and mathematical audits support 19 newly
+audited verified-field improvements, and the session corrects n17 to the stronger
+Kleddamag bound already replayed and reviewed in Session 150, for 20 promotions in all.
+The n11 and n17 paired source checkers each share one event-cell method, and the density
+global decision remains the source C++ method, so the adopted evidence is stated at C3
+rather than C4. The density continuation driver’s wrong-count and stale-side imports are
+a High defect in that admission path; the separately checked fixed certificate files
+remain valid. The scoped pre-push at clean commit `819ade7` timed out in reachable
+behavioral tests with no emitted assertion failure; its retained receipt is diagnostic,
+not certification. The closure is certified at reachable branch commit
+`819ade7ca8afbe634a6ee54f215f0878f5674031` solely by the
+[hosted five-job full gate](https://github.com/jlevy/squares/actions/runs/35784995867).
 
-**Selected next entry:** `think-gvlg`, registering the `n = 11` rung Session 151 left
-accepted and unregistered.
+**Selected next entry:** `think-d010`. After PR 222 is green and mergeable, two separate
+branches start from PR 222’s head in parallel.
+The `think-d010` branch decides the complete n11 adaptive parent-core catalogue by an
+independent coverage method while preserving its admissible centre domain and addressing
+the native site and feature-slot limits.
+The other branch reconciles PR 221 while retaining every historical result and the
+strongest justified current bounds.
+Existing identifiers from PR 221 take precedence; any later conflicting identifiers are
+renumbered after PR 221’s sequence with every reference.
+PR 222 introduces no T-ID. `think-ck07` separately owns a second complete
+density-verification method, and `think-c0xc` owns the continuation-driver admission
+guard.
+
+**Selected next entry at the Session 151 cutoff:** `think-gvlg`, registering the
+`n = 11` rung Session 151 left accepted and unregistered.
 Its threshold certificate at the 2880-step net is `RETAINABLE` by both retention routes,
 which agree at exactly 1, and its dilation-limit record is replayed and written; what is
 missing is a `T-id`, a claim written as a supremum, and a qualifying gate pass on a host
@@ -4586,7 +4603,7 @@ in separate tables: their units differ, and the same work can appear in both.
 | `codex-task-tree-session-133.yaml` | session-133 | 101 | 0.37 h | 0.2 h | 13.6 h | yes |
 | `codex-task-tree-session-134.yaml` | session-134 | 497 | 4.88 h | 1.21 h | 1.21 h | yes |
 | `codex-task-tree-session-135.yaml` | session-135 | 437 | 1.53 h | 0.48 h | 0.48 h | yes |
-| `codex-task-tree-session-152.yaml` | session-152 | 1,060 | 6.36 h | 2.26 h | 2.26 h | yes |
+| `codex-task-tree-session-152.yaml` | session-152 | 2,141 | 12.27 h | 4.31 h | 4.31 h | yes |
 | `session-142-stack-correctness.yaml` | session-142 | 1,186 | 5.01 h | 2.29 h | 2.3 h | yes |
 | `codex-task-tree-pr137-publication-tail.yaml` | unattributed | 610 | 4.39 h | 1.77 h | 1.82 h | yes |
 | `codex-task-tree-pr142-publication-tail.yaml` | unattributed | 136 | 0.87 h | 0.41 h | 0.58 h | yes |

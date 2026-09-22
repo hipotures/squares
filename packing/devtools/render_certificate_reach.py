@@ -81,9 +81,10 @@ BANNER = (
     "hand. -->"
 )
 
-# Massaccesi's net, which every retained certificate uses: 181 half-tangents from 0 to
-# a rational just above tan(pi/8). D is about T / K, so refining the net raises the
-# ceiling only as fast as K grows.
+# This reach instrument intentionally uses Massaccesi's fixed 181-direction baseline
+# net: 181 half-tangents from 0 to a rational just above tan(pi/8). Retained
+# certificates may use finer or adaptive direction sets. D is about T / K, so refining
+# a net raises the ceiling only as fast as K grows.
 ANGLE_LIMIT = Fraction(207107, 500000)
 DIRECTION_STEPS = 180
 NET = tuple(ANGLE_LIMIT * k / DIRECTION_STEPS for k in range(DIRECTION_STEPS + 1))
@@ -491,7 +492,9 @@ def render(rows: list[dict]) -> str:
     out = [BANNER, "", "# Where the fractional certificate can still go", ""]
     out += [
         "The most a weighted fractional unavoidable-set certificate could add to each",
-        "case's lower bound, at the 181-direction net every retained certificate uses.",
+        "case's lower bound under this fixed 181-direction baseline instrument.",
+        "Retained certificates may use finer or adaptive direction sets; their own nets",
+        "are outside this comparison.",
         "`ceiling` is `ceil(sqrt(n)) / (1 + D)`, proved in",
         "`sqpack.fractional.certificate.ceiling_side`.",
         "",

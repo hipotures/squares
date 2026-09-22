@@ -2524,7 +2524,7 @@ sessions:
   codex_receipts: []
 - id: session-152
   title: "External rectangle-density and n11 certificate review"
-  status: in_progress
+  status: completed
   primary_bead: think-6xoc
   phases: 1
   measured: true
@@ -2537,8 +2537,8 @@ sessions:
   wall_hours: null
   codex_receipts:
   - path: packing/campaign/resource-usage/codex-task-tree-session-152.yaml
-    model_responses: 1060
-    agent_hours: 6.36
-    active_union_hours: 2.26
-    wall_hours: 2.26
+    model_responses: 2141
+    agent_hours: 12.27
+    active_union_hours: 4.31
+    wall_hours: 4.31
     snapshot_incomplete: true

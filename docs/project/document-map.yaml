@@ -3,12 +3,13 @@ softschema:
   schema: document-map.schema.yaml
   status: enforced
 
-last_reviewed: '2026-09-14'
+last_reviewed: '2026-09-22'
 scope: >
   Durable Markdown owned by packing. Source-faithful archive content is
   excluded because its role and lifecycle come from resources/README.md rather than
   current project documentation rules.
 documents:
+  - {path: packing/campaign/agent-sessions/session-152-validation/pdf-d490-run-35784981711.md, role: postmortem, authority: record, lifecycle: retained}
   - {path: docs/project/reviews/review-2026-09-19-pr199-201-correctness.md, role: review, authority: record, lifecycle: retained}
   - {path: docs/project/reviews/review-2026-09-20-n17-r012-and-mira-4613-proof-review.md, role: review, authority: record, lifecycle: retained}
   - {path: docs/project/reviews/review-2026-09-21-derived-artifact-currency.md, role: review, authority: record, lifecycle: retained}

@@ -232,11 +232,11 @@ unchanged; the atlas displays the updated current bounds.
 3. Use the external n11 certificate as the comparison target for future research.
    Any first-party rung below 3.875 remains useful as controlled evidence or a simpler
    certificate, but is not a public lower-bound advance.
-   The current strict bound above 3.875 also exceeds the retained 181-direction
-   fixed-core point model’s packing-side cap of about 3.869, recorded by
+   The strict 3.875 bound also exceeds the retained 181-direction fixed-core point
+   model’s packing-side cap of about 3.869, recorded by
    [X-014 in the certificate-reach analysis](../../../packing/frontier/CERTIFICATE-REACH.md).
-   Search within that unchanged model is therefore foreclosed; an improvement requires
-   finer angles or a different core-domain contract.
+   Search within that unchanged model is therefore foreclosed; an improvement requires a
+   changed model, for example finer angles or a different core-domain contract.
 4. Treat the older n26 point-basis plateau as evidence about the tested representation,
    not a barrier refuted by a distinct packing method.
    Evaluate rectangle pricing against its measured cost and slack with the retained
