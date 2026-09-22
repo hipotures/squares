@@ -247,6 +247,54 @@ be decided by this repository’s own two routes.
 That is worth stating plainly next to every claim about what the intake programme can
 verify.
 
+## Two Findings That Change the Slate Itself
+
+**`fold_ceiling_family` is one-sided, and the record’s own calibration proves it.** At
+the one side where the truth is known — `n = 11` at `191/50`, where the true covering
+value is exactly 11 and the 88-family verifies it — every fold ever produced from a
+column-generation dual sits two to six units low: the session-139 cap-32 folds read
+6.82, 6.50, 7.12, 6.84 and 5.21; `BC-200`’s at `1152/175` read 6.58 and 9.91 after eight
+cutting iterations; a cap-64 rerun this session folded 6.94 raw and polished to exactly
+9\. The 88-family did not come from folding a colgen dual at all — it came from a
+threshold-enriched 13,721-site LP and a separate extraction.
+
+So a fold at or above `n` proves a ceiling, and **a fold below `n` proves nothing**.
+`X-041`’s `A6` row sets its kill as “total below 18 after polish — the lock is an
+artefact”, and that inference is invalid.
+Only the positive branch is a kill.
+The two-sided instrument is the cutting-plane loop, which ends either with a restricted
+optimum below `n` on an enlarged support (an artefact) or a folded total at or above `n`
+(a ceiling), and which can stay undecided for a long time.
+
+**The `25.000000` plateau at `n = 26` and `n = 27` is a real floor, not the unexplained
+artefact the record calls it.** If `(m-1)B < L` then the `(m-1)^2` axis-parallel
+`B`-squares on a lattice of pitch `B + g` are pairwise disjoint closed sets, so every
+covering measure on every site set has mass at least `(m-1)^2`. At `L >= 5B = 4.9885`
+that is 25, and the loop is not stuck on an artefact: it is sitting on a degenerate
+primal face above a tight trivial dual.
+`exp-215`’s metric text and `X-041`’s `A5` row both mislabel it.
+The genuinely artefactual integer locks are a different mechanism — when `L < kB` the
+`k` squares across `[0, L]` force total overlap into fixed windows, and an auto grid
+with no site coordinate in those windows makes the `k^2` placements pairwise
+site-disjoint. That was measured exactly here at `n = 12` (`L = 3.98`, `3.985`, `3.99`)
+and at `n = 21` (`997/200`), and it is cheap to test: `L < kB` and an empty window per
+axis.
+
+## An Available Bound Movement Nobody Has Taken
+
+The retained `n = 29` candidate at `548/100` is, by Condition 2 alone, **also a
+certificate for `n = 27` and `n = 28` at `5.48`**: only Condition 2 mentions `n`, and
+the candidate’s converged mass is `26.0409395`. That would be `+0.237` over
+`1 + sqrt(18)` and `+0.121` over `1 + sqrt(19)`. The exact route already accepts it.
+What blocks it is not mathematics but a margin: the interval route stalled on 272 boxes
+at `3.25e-6`. A re-rationalisation with a larger bump, or a raised box budget, is the
+whole of the work.
+
+Nothing in the record states this, and `X-041` says of this region only “one more site
+set, then stop”.
+
+## Ranked Slate
+
 ## Ranked Slate
 
 Ranked by expected information per hour against instruments that exist.
@@ -277,11 +325,27 @@ generalised off its hard-coded `n = 11` tables.
 
 ### Tier C: retired or corrected
 
-`H-228` is **refuted as stated**, not blocked: its claim is at side exactly 4, where the
-sixteen open grid squares are disjoint and force `mu >= 16` under the interior
-convention the unshrunk language must use.
-Its confirm condition can never be met, and the hypothesis needs restating as a limit
-family below 4 before it is anything.
+`H-228` **stays blocked, and an earlier draft of this report was wrong about it.** That
+draft called it refuted as stated, on the ground that at side exactly 4 the sixteen grid
+squares are disjoint and force `mu >= 16`. That argument uses the **interior**
+convention; `H-228` is stated for **closed** unit squares, and sixteen closed grid
+squares share their edges and vertices, so `sum mu(Q_ij) >= 16` is perfectly compatible
+with `mu(K) < 12` once mass sits on the grid lines — an interior-line point is counted
+twice and an interior vertex four times.
+The refutation does not touch the hypothesis as written, and the adversarial validation
+lane caught it before it travelled.
+
+The closed convention is moreover sound for what `H-228` claims, by a scaling argument
+that needs no shrink: if twelve unit squares pack at side `L' < 4`, scale by `4/L' > 1`
+to get twelve parents of side above 1 in `[0, 4]^2` with disjoint interiors, take the
+closed concentric unit core strictly inside each, and those cores are pairwise disjoint
+closed unit squares, so `12 <= sum mu(core_i) <= mu(K) < 12`.
+
+What the episode leaves is a **specification constraint rather than a verdict**: the
+`BC-365` verifier must decide **closed** cores, because an open-core verifier is dead at
+every integer side. The record nowhere fixes the convention, which is how the confusion
+arose, and that is the thing to fix.
+
 Angle-dependent measure families are killed outright by the pointwise-maximum argument.
 “A larger `L`” at `n = 17` is not a mechanism, by scale invariance.
 
