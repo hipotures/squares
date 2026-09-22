@@ -101,6 +101,7 @@ session:
     tests. The sole refusal was the intended byte-for-byte publication snapshot test,
     which compares the working SVG to HEAD and therefore cannot accept regenerated
     bytes before their pin commit. Its exact test is rerun after the commit.
+  - The refused byte-for-byte poster snapshot test passed after commit 385a3f03e made the regenerated SVG the committed publication.
   - >-
     Interim lane-only cost receipt through 2026-09-22T23:27:00Z: 146 model responses,
     0.69 agent-hours, a 0.67-hour active-union and wall envelope, 81.6 seconds of
