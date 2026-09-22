@@ -137,11 +137,27 @@ def test_the_style_and_shake_are_set_before_the_range_is_priced() -> None:
     # is priced on a clock the page will not play -- and `price_steps` would refuse the run.
     ordered = [
         *capture_video.animation_defaults({"style": "physics", "anneal": 9}),
+        *capture_video.simple_speed_commands(None, {"simpleSpeed": 4}),
         *capture_video.pricing_commands(2, 24),
     ]
     names = [command[0] for command in ordered]
     assert names.index("setStyle") < names.index("playRange")
     assert names.index("setAnneal") < names.index("playRange")
+    # The grid-fill speed-up shortens every step holding one, so it belongs in front of the
+    # pricing for the same reason the shake does.
+    assert names.index("setSimpleSpeed") < names.index("playRange")
+
+
+def test_a_cut_states_the_grid_fill_speed_up_it_played_at() -> None:
+    # Without `--simple-speed` the factor is the page's own, read from the page so the default
+    # keeps one spelling; the command goes in either way, so the receipt names a clock the cut
+    # asked for rather than one it happened to inherit.
+    assert capture_video.simple_speed_commands(None, {"simpleSpeed": 4}) == [
+        ["setSimpleSpeed", 4.0]
+    ]
+    assert capture_video.simple_speed_commands(3, {"simpleSpeed": 4}) == [
+        ["setSimpleSpeed", 3.0]
+    ]
 
 
 def test_the_capture_states_that_its_intermediate_frames_are_tweens() -> None:

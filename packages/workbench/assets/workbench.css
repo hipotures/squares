@@ -164,7 +164,12 @@
   --stage-line-height-bound: 1.2;
   --stage-line-height-headline: 84px;
   --stage-line-height-facts: 1.35;
-  --stage-tracking-head: 0.16em;
+  /* The tracking on the uppercase section heads -- PROVEN, KNOWN BOUNDS, CITATION, OPEN. Uppercase
+     needs a little to stop the letters closing up, and 0.16em was enough to read as spacing rather
+     than as a word; the owner asked for less on 2026-09-22, once CITATION put three of them in the
+     column at once. 0.06em, a little under the chrome's own 0.1em, because the stage's heads are
+     set larger than any chrome label and tracking is felt at the size it is set. */
+  --stage-tracking-head: 0.06em;
   --stage-tracking-label: 0.01em;
   --stage-tracking-numeral: -0.02em;
   /* A badge row: the gap between items, and between an item's icon and its label. The open row

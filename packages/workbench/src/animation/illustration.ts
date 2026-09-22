@@ -24,7 +24,7 @@ export interface MotionTrack {
  *
  * The rest is the hold, where the square sits opaque and fully scarlet. Half: a step has to
  * show the square arriving AND show it taking its place, and on the shortest steps -- a grid
- * fill at `SIMPLE_TRANSITION_SPEED` -- there are only a few frames for each.
+ * fill at the page's simple-transition speed-up -- there are only a few frames for each.
  */
 const TINT_CROSS_SHARE = 0.5;
 

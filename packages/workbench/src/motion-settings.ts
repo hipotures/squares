@@ -153,6 +153,41 @@ export const DEFAULT_STATIC_STEP_TIMING = {
   settle: 0.35,
 } as const;
 
+/**
+ * The factor a simple transition -- an axis-aligned grid fill -- plays at while `fastSimple` is
+ * on: the setting's default and the range its control offers. This is where the default is
+ * declared; the page's state starts from it and everything else reads the page.
+ *
+ * Four (the owner, 2026-09-22; three since 2026-09-21, two before that): a step where every
+ * square is already square to the container has nothing to watch, and the eye is ahead of it.
+ *
+ * The range is where a step's clock still says something. One is the floor and means no speed-up
+ * at all, which is the honest bottom of a control named for a speed-up. Eight is the ceiling, and
+ * the arriving square sets it rather than the step: the shortest step in the catalogue is a still
+ * grid fill on the static beat, 1.39 s unsped, so at 8x it is 0.174 s -- ten frames at the 60 fps
+ * the cuts are captured at -- and the square's opaque scarlet hold is 2.4 of them, only just clear
+ * of the two frames `check_transitions` refuses a step under. Halves, so a factor can be bracketed
+ * rather than jumped over.
+ */
+export const SIMPLE_SPEED_SETTINGS = {
+  min: 1,
+  max: 8,
+  step: 0.5,
+  default: 4,
+} as const;
+
+/** The factor behind a requested one: clamped to the dial and snapped to its step. */
+export function simpleSpeedSetting(
+  value: number,
+  fallback: number = SIMPLE_SPEED_SETTINGS.default,
+): number {
+  if (!Number.isFinite(value)) {
+    return fallback;
+  }
+  const clamped = Math.max(SIMPLE_SPEED_SETTINGS.min, Math.min(SIMPLE_SPEED_SETTINGS.max, value));
+  return Math.round(clamped / SIMPLE_SPEED_SETTINGS.step) * SIMPLE_SPEED_SETTINGS.step;
+}
+
 export const PHYSICS_SETTINGS = {
   stepsPerSecond: 120,
   omega: 10,
@@ -239,6 +274,34 @@ export const BLIND_TRAJECTORY_SETTINGS = BLIND_SETTINGS;
  */
 export const NEW_FRACTION = 0.4;
 export const ROLL_MAX = 0.4;
+
+/**
+ * When changed text leaves and when its replacement arrives, as shares of the roll.
+ *
+ * Text that changes used to cross-fade through its replacement over the middle half of the
+ * roll, which put the old and the new at half ink in the same place: the panel drew
+ * `Guzhou0806 & Mira 2026, GitHub (confirmed,` and `This project 2026, result T-030` on top of
+ * each other for 0.2 s at every step, and neither could be read. That is what the owner saw as
+ * a flicker (2026-09-22, `think-0few`).
+ *
+ * So the old text goes before the new comes, and the whole handover is FAST: at the default roll
+ * of 0.4 s the outgoing text takes 0.064 s to go, the incoming 0.064 s to come, and the 0.016 s
+ * they share has both under a fifth of full ink -- one frame at 60, against 12 at half ink each
+ * before. Unchanged text is untouched by this: it holds at full ink and swaps at the midpoint.
+ *
+ * Fast is not a matter of taste here. A slot where EVERY part changes -- the badge row, a
+ * citation line -- has nothing holding it up while its parts trade, so it passes under half ink
+ * for about half the handover's length. At this speed that is 0.055 s, three frames; over the
+ * middle half of the roll it would have been 0.2 s, which is a blink. `check_animate_view`
+ * measures that dip and holds it under `BLANK_DIP_SECONDS`.
+ */
+export const TEXT_HANDOVER = {
+  outStart: 0.36,
+  outEnd: 0.52,
+  inStart: 0.48,
+  inEnd: 0.64,
+} as const;
+
 export const BOUND_CLEAR = 0.3;
 export const BOUND_GROW = 0.2;
 export const BOUND_FADE = 0.12;

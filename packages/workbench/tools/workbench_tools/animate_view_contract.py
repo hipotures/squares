@@ -422,6 +422,7 @@ def single_view(session: Session) -> str:
         "phase-seg",
         "fullbeat-toggle",
         "fastsimple-toggle",
+        "simple-speed",
     ]
     outside = session.look("dom/contains", parent="step-anim-box", ids=timing)
     session.require(outside == [], f"the timing group does not hold {outside}")

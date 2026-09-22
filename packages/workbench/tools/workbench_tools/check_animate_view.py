@@ -306,6 +306,24 @@ OPACITY_TOLERANCE = 1e-6
 #: number that changes.
 HANDOVER_STEPS = (18, 26, 100, 111)
 
+#: How much of each other two parts' boxes must cover for them to be drawn in the same place.
+SAME_PLACE = 0.5
+
+#: What two DIFFERENT strings drawn in the same place may both be seen at, at once.
+#:
+#: Measured on 2026-09-22 with the citations on: at the midpoint of the step into 18 the panel
+#: drew `Guzhou0806 & Mira 2026, GitHub (confirmed,` and `This project 2026, result T-030` at
+#: the same x, each at 0.5, and the same for the upper line. Every opacity rule above held --
+#: the two sum to one, nothing is blank, the words `lower` and `upper` hold -- because they are
+#: about one part at a time, and none of them can see that the two parts are different sentences
+#: on top of each other. That is what the owner saw as a flicker (`think-0few`): for the middle
+#: of every roll, two citations are legible as neither.
+#:
+#: So a changed part leaves before its replacement arrives, rather than dissolving through it.
+#: Where they are drawn in the same place, the fainter of the two stays under this, which is low
+#: enough that a reader sees one sentence and the ghost of another, not two sentences.
+SUPERIMPOSED_LIMIT = 0.2
+
 
 def handover_instants(session: Session, n: int) -> tuple[dict[str, Any], list[float]]:
     """The step's schedule, and instants every 10 ms across its handover, ends included."""
@@ -317,33 +335,67 @@ def handover_instants(session: Session, n: int) -> tuple[dict[str, Any], list[fl
     return schedule, at
 
 
-def require_crossfade(
-    session: Session, label: str, schedule: dict[str, Any], at: list[float], enter: list[float]
+#: The shares of the roll over which changed text leaves and arrives, as the page declares them
+#: in `TEXT_HANDOVER`. Written here too rather than read from the bundle, so the check states
+#: the contract it holds the page to and a change to either side has to be made on purpose.
+TEXT_HANDOVER = {"outStart": 0.36, "outEnd": 0.52, "inStart": 0.48, "inEnd": 0.64}
+
+#: How long a slot may be under half ink while its parts trade, in seconds.
+#:
+#: A slot where every part changes -- the badge row, a citation line -- has nothing holding it
+#: up through the handover, so it dips. The rule here used to be that no slot is ever under half
+#: ink, which a crossfade satisfies by drawing both the old and the new at once; that is exactly
+#: what `SUPERIMPOSED_LIMIT` refuses. Both cannot hold, so this one asks the honest question
+#: instead: not whether the panel dips, but for how long. Three frames at 60 is a trade; a fifth
+#: of a second is the blink the owner asked us to stop.
+BLANK_DIP_SECONDS = 0.07
+
+
+def require_handover_curves(
+    session: Session,
+    label: str,
+    schedule: dict[str, Any],
+    at: list[float],
+    *,
+    enter: list[float],
+    leave: list[float],
 ) -> None:
-    """The arriving layer is 0 before the middle half of the roll, 1 after, partial within."""
+    """Changed text leaves over its window and arrives over its own, each whole within the roll.
+
+    The two are no longer one curve and its complement: what leaves goes before what arrives
+    comes, so that two different strings in the same place are never both legible
+    (`SUPERIMPOSED_LIMIT`). Each is checked on its own window -- settled outside it, partial
+    somewhere within -- and the windows are the page's, which is what makes this a contract
+    rather than a description.
+    """
     arrive, roll = schedule["arrive"], schedule["roll"]
-    lo, hi = arrive + 0.25 * roll, arrive + 0.75 * roll
-    session.require(len(enter) == len(at), f"{label}: {len(enter)} of {len(at)} samples")
-    partial = [t for t, e in zip(at, enter, strict=True) if 1e-9 < e < 1 - 1e-9]
     session.require(
-        bool(partial)
-        and lo - 0.011 <= min(partial) <= lo + 0.021
-        and hi - 0.021 <= max(partial) <= hi + 0.011,
-        f"{label}: the crossfade runs over {partial[:1]}..{partial[-1:]}, not the middle half "
-        f"of the roll [{lo:.3f}, {hi:.3f}]",
+        len(enter) == len(at) and len(leave) == len(at),
+        f"{label}: {len(enter)} arriving and {len(leave)} leaving samples of {len(at)}",
     )
-    for t, e in zip(at, enter, strict=True):
-        q = (t - arrive) / roll if roll > 0 else float(t >= arrive)
-        if q < 0.25 or q > 0.75:
-            want = 0.0 if q < 0.25 else 1.0
-            session.require(
-                abs(e - want) <= OPACITY_TOLERANCE,
-                f"{label} at t = {t:.3f}: the arriving layer is at {e}, not {want}",
-            )
+    for name, seen, first, last, settled in (
+        ("arriving", enter, TEXT_HANDOVER["inStart"], TEXT_HANDOVER["inEnd"], (0.0, 1.0)),
+        ("leaving", leave, TEXT_HANDOVER["outStart"], TEXT_HANDOVER["outEnd"], (1.0, 0.0)),
+    ):
+        lo, hi = arrive + first * roll, arrive + last * roll
+        partial = [t for t, v in zip(at, seen, strict=True) if 1e-9 < v < 1 - 1e-9]
+        session.require(
+            bool(partial) and lo - 0.011 <= min(partial) and max(partial) <= hi + 0.011,
+            f"{label}: the {name} text moves over {partial[:1]}..{partial[-1:]}, outside its "
+            f"window [{lo:.3f}, {hi:.3f}]",
+        )
+        for t, v in zip(at, seen, strict=True):
+            q = (t - arrive) / roll if roll > 0 else float(t >= arrive)
+            if q < first or q > last:
+                want = settled[0] if q < first else settled[1]
+                session.require(
+                    abs(v - want) <= OPACITY_TOLERANCE,
+                    f"{label} at t = {t:.3f}: the {name} text is at {v}, not {want}",
+                )
 
 
 def facts_handover(session: Session) -> str:
-    """Unchanged text never fades; changed text crossfades in the middle 0.2 s, never blank."""
+    """Unchanged text never fades; changed text leaves before its replacement arrives."""
     held_digits = handover(session, HANDOVER_STEPS)
     session.require(
         held_digits > 0,
@@ -352,19 +404,59 @@ def facts_handover(session: Session) -> str:
     return f"the facts hand over part by part, {held_digits} kept digits held"
 
 
+def _placed(key: str) -> tuple[str, tuple[float, float, float, float]]:
+    """A probe key split into what is drawn and the box it is drawn in.
+
+    The probe writes `<what>@<left>,<top>,<width>,<height>`, the box in half pixels, and `what`
+    is `tag:text` for text and the bare markup for an SVG. Split at the LAST `@`, since markup
+    may carry one of its own.
+    """
+    what, _, box = key.rpartition("@")
+    left, top, width, height = (float(value) for value in box.split(","))
+    return what, (left, top, width, height)
+
+
+def _same_place(
+    one: tuple[float, float, float, float], two: tuple[float, float, float, float]
+) -> bool:
+    """Whether two boxes cover enough of each other to be read as one place on the panel."""
+    (left, top, width, height), (l2, t2, w2, h2) = one, two
+    across = min(left + width, l2 + w2) - max(left, l2)
+    down = min(top + height, t2 + h2) - max(top, t2)
+    if across <= 0 or down <= 0:
+        return False
+    smaller = min(width * height, w2 * h2)
+    return smaller > 0 and (across * down) / smaller >= SAME_PLACE
+
+
+def _longest_run(instants: list[float], apart: float = 0.011) -> float:
+    """The longest stretch of consecutive sampled instants, counting each sample's own 10 ms."""
+    longest = 0.0
+    start = previous = instants[0]
+    for moment in instants[1:]:
+        if moment - previous > apart:
+            longest = max(longest, previous - start)
+            start = moment
+        previous = moment
+    return max(longest, previous - start) + 0.01
+
+
 def handover(session: Session, steps: tuple[int, ...], note: str = "") -> int:
     """The facts panel's handover over each step into n, part by part; returns the digits held.
 
     Every part a slot draws in both layers is held at full ink and swapped at the midpoint;
-    every other part crossfades with the headline over the middle half of the roll, and a slot
-    is never blank. `note` names the setting the steps were run under.
+    every other part leaves over its window and its replacement arrives over its own, and a slot
+    is never blank. Two DIFFERENT strings drawn in the same place are never both legible at
+    once (`SUPERIMPOSED_LIMIT`). `note` names the setting the steps were run under.
     """
     held_digits = 0
     for n in steps:
         schedule, at = handover_instants(session, n)
         read = session.look("facts/crossfade", n=n, at=at)
-        enter = read["enter"]
-        require_crossfade(session, f"facts, step into {n}", schedule, at, enter)
+        enter, leaving = read["enter"], read["leave"]
+        require_handover_curves(
+            session, f"facts, step into {n}", schedule, at, enter=enter, leave=leaving
+        )
         changed = 0
         for slot in read["slots"]:
             keys_a, keys_b = slot["keys"]
@@ -385,6 +477,18 @@ def handover(session: Session, steps: tuple[int, ...], note: str = "") -> int:
             coming = [j for j in range(len(keys_b)) if j not in held_b]
             changed += bool(going or coming)
             label = f"step into {n}{note}, slot {slot['name']!r}"
+            # The changed parts that a reader would see on top of each other: drawn in the same
+            # place and saying different things. Paired here, off the boxes, rather than per
+            # instant, since neither what nor where changes across the handover.
+            over = [
+                (i, j, what_a)
+                for i in going
+                for j in coming
+                for what_a, box_a in [_placed(keys_a[i])]
+                for what_b, box_b in [_placed(keys_b[j])]
+                if what_a != what_b and _same_place(box_a, box_b)
+            ]
+            dim: list[float] = []
             for k, (seen_a, seen_b) in enumerate(slot["seen"]):
                 t = at[k]
                 for i, j in pairs:
@@ -397,9 +501,9 @@ def handover(session: Session, steps: tuple[int, ...], note: str = "") -> int:
                     )
                 for i in going:
                     session.require(
-                        abs(seen_a[i] - (1 - enter[k])) <= OPACITY_TOLERANCE,
+                        abs(seen_a[i] - leaving[k]) <= OPACITY_TOLERANCE,
                         f"{label} at t = {t:.3f}: leaving {keys_a[i]!r} at {seen_a[i]:.3f}, "
-                        f"not {1 - enter[k]:.3f}",
+                        f"not {leaving[k]:.3f}",
                     )
                 for j in coming:
                     session.require(
@@ -407,12 +511,25 @@ def handover(session: Session, steps: tuple[int, ...], note: str = "") -> int:
                         f"{label} at t = {t:.3f}: arriving {keys_b[j]!r} at {seen_b[j]:.3f}, "
                         f"not {enter[k]:.3f}",
                     )
-                if keys_a and keys_b:
-                    top = max([*seen_a, *seen_b])
+                for i, j, what in over:
                     session.require(
-                        top >= 0.5 - OPACITY_TOLERANCE,
-                        f"{label} at t = {t:.3f} is blank: nothing drawn above {top:.3f}",
+                        min(seen_a[i], seen_b[j]) <= SUPERIMPOSED_LIMIT + OPACITY_TOLERANCE,
+                        f"{label} at t = {t:.3f}: {what!r} and what replaces it are drawn in "
+                        f"the same place and seen at {seen_a[i]:.3f} and {seen_b[j]:.3f}, so "
+                        f"both are legible at once",
                     )
+                if keys_a and keys_b and max([*seen_a, *seen_b]) < 0.5 - OPACITY_TOLERANCE:
+                    dim.append(t)
+            # How long the slot was under half ink, as the longest unbroken run of instants that
+            # were: a slot that dips twice is two dips, not one long one. The instants are 10 ms
+            # apart, so a run of one covers 10 ms.
+            if dim:
+                longest = _longest_run(dim)
+                session.require(
+                    longest <= BLANK_DIP_SECONDS + 1e-9,
+                    f"{label}: the slot is under half ink for {longest:.3f} s, longer than "
+                    f"the {BLANK_DIP_SECONDS:.3f} s a trade may take",
+                )
         session.require(
             changed > 0, f"step into {n}{note} changed no slot, so it tested nothing"
         )
@@ -554,26 +671,30 @@ def _near(a: list[float] | None, b: list[float] | None, within: float = 0.5) -> 
 
 
 def headline_roll(session: Session) -> str:
-    """`n =` holds still at full ink while only the number crossfades, in place."""
+    """`n =` holds still at full ink while only the number hands over, in place."""
     equals_at: list[float] | None = None
     for n in (10, 100, 101):
         schedule, at = handover_instants(session, n)
         samples = session.look("headline/roll", n=n, at=at)
-        require_crossfade(
+        require_handover_curves(
             session,
             f"headline, step into {n}",
             schedule,
             at,
-            [s["arriving"]["seen"] for s in samples],
+            enter=[s["arriving"]["seen"] for s in samples],
+            leave=[s["leaving"]["seen"] for s in samples],
         )
         first = samples[0]
         for sample in samples:
             label = f"headline, step into {n} at t = {sample['t']:.3f}"
             still, leaving, arriving = sample["still"], sample["leaving"], sample["arriving"]
+            # The two numbers stand in the same place, so one goes before the other comes
+            # (`TEXT_HANDOVER`): they used to sum to one, which drew both at once.
             session.require(
-                abs(leaving["seen"] + arriving["seen"] - 1) <= OPACITY_TOLERANCE,
-                f"{label}: the numbers are seen at "
-                f"{leaving['seen']:.3f} + {arriving['seen']:.3f}",
+                min(leaving["seen"], arriving["seen"])
+                <= SUPERIMPOSED_LIMIT + OPACITY_TOLERANCE,
+                f"{label}: the numbers are both legible, at "
+                f"{leaving['seen']:.3f} and {arriving['seen']:.3f}",
             )
             session.require(
                 abs(still["seen"] - 1) <= OPACITY_TOLERANCE

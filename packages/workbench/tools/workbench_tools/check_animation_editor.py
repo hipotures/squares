@@ -106,8 +106,31 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
             f"{call('continuous')['simplePairs']}, sped up {len(sped)}, outside the range "
             f"{sorted(sped - in_range)}, missing {sorted(in_range - full_length - sped)}",
         )
-        speed = call("continuous")["simpleSpeed"]
+        # The speed-up is a setting, not a constant (the owner, 2026-09-22). Four by default,
+        # over a control the page also declares the ends of, so the input and the API cannot
+        # drift apart about what may be asked for.
+        speeds = call("continuous")
+        speed = speeds["simpleSpeed"]
         require(speed > 1, f"the simple-transition speed-up is not a speed-up: {speed}")
+        require(
+            (
+                speed,
+                speeds["simpleSpeedDefault"],
+                speeds["simpleSpeedMin"],
+                speeds["simpleSpeedMax"],
+            )
+            == (4, 4, 1, 8),
+            f"the grid-fill speed-up does not start at 4 of 1..8: {speeds}",
+        )
+        speed_input = page.locator("#simple-speed")
+        shown = [
+            speed_input.input_value(),
+            *(speed_input.get_attribute(name) for name in ("min", "max", "step")),
+        ]
+        require(
+            shown == ["4", "1", "8", "0.5"],
+            f"the grid-fill speed control does not show 4 over 1..8 in halves: {shown}",
+        )
         fast = [call("duration", simple_index), call("duration", moving_index)]
         toggle.click()
         playback = call("continuous")
@@ -145,6 +168,64 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
                 for index in (simple_index, moving_index)
             ),
             f"the simple-transition speed-up changed the physics work: {work}",
+        )
+
+        # The factor round-trips through the setter, and the control follows it: what the census
+        # above measures is whatever the page is set to, not a number written here. Two is far
+        # enough from four that a page ignoring the setter cannot pass by accident.
+        moved = call("setSimpleSpeed", 2)
+        require(
+            moved["simpleSpeed"] == 2 and speed_input.input_value() == "2",
+            f"setting the grid-fill speed-up to 2 gave {moved['simpleSpeed']} "
+            f"with the control on {speed_input.input_value()}",
+        )
+        at_two = call("duration", simple_index)
+        require(
+            abs(full[0] - 2 * at_two) < 1e-9,
+            f"the grid fill does not play at 2x once asked: {at_two} s against {full[0]} s",
+        )
+        # The census measures something different now -- every grid fill is twice the length it
+        # was -- and still finds the same 159 steps, because it reads the page's factor rather
+        # than assuming one. A census that assumed four would find none of them here.
+        recensus = page.evaluate(probe("animate/sped-pairs"))
+        require(
+            {row["n"] for row in recensus if row["sped"]} == sped,
+            "the census does not follow the page's factor: at 2x it reads "
+            f"{len({row['n'] for row in recensus if row['sped']})} sped steps, not {len(sped)}",
+        )
+        # Out of range the page takes the nearest factor it can play rather than the one asked
+        # for, so nothing is ever drawn on a clock the control cannot show.
+        require(
+            [call("setSimpleSpeed", value)["simpleSpeed"] for value in (0.25, 50, 3.7)]
+            == [1, 8, 3.5],
+            "the grid-fill speed-up is not clamped to 1..8 and snapped to halves",
+        )
+        restored = call("setSimpleSpeed", speeds["simpleSpeedDefault"])
+        require(
+            restored["simpleSpeed"] == speed,
+            f"the grid-fill speed-up did not go back to {speed}: {restored['simpleSpeed']}",
+        )
+
+        # The CITATION section is optional and its checkbox says so (think-nzs4): off on
+        # arrival, like the correspondence overlay, and driven from the box rather than only
+        # from `setCitations`, so the stage can be seen both ways without a console.
+        cites = page.locator("#citations-toggle")
+        facts = page.locator("#facts")
+        require(
+            not cites.is_checked() and call("citations") is False,
+            "the citation section is not off when the page opens",
+        )
+        cites.click()
+        require(
+            call("citations") is True
+            and "shows-citations" in (facts.get_attribute("class") or ""),
+            "checking the citations box did not turn the CITATION section on",
+        )
+        cites.click()
+        require(
+            call("citations") is False
+            and "shows-citations" not in (facts.get_attribute("class") or ""),
+            "unchecking the citations box did not turn the CITATION section off",
         )
 
         # The box on the stage: the frames' grey on its way, green once locked at the best known
@@ -398,7 +479,9 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
         "arrival on Animate, first of Animate, Pack and Search; the owner's law, dial, beat "
         "and desaturation defaults, the box, its trace, its lock "
         "and its gap-bar pointer through a step, sped-up simple "
-        "transitions and their checkbox, animation import drawn in its own container with no "
+        "transitions with their checkbox and their settable factor, "
+        "the citation section off on arrival and driven from its box, "
+        "animation import drawn in its own container with no "
         "catalogue box, geometry/guidance, frame edits, replay, "
         "SVG/JSON/frame capture, Pack return, and the box back in Animate"
     )

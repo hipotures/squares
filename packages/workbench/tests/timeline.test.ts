@@ -15,9 +15,9 @@ import {
   ramp,
   rangeDuration,
   rangeProgress,
-  SIMPLE_TRANSITION_SPEED,
   seekSequence,
   sequenceDuration,
+  simpleSpeedOf,
   type TimelineConfiguration,
 } from "../src/animation/timeline.ts";
 import {
@@ -25,8 +25,18 @@ import {
   DEFAULT_ARRIVAL_DELAY_FRACTION,
   DEFAULT_STEP_TIMING,
   NEW_FRACTION,
+  SIMPLE_SPEED_SETTINGS,
+  simpleSpeedSetting,
   TWEEN_ILLUSTRATION_SETTINGS,
 } from "../src/motion-settings.ts";
+
+/**
+ * The factor a configuration that says nothing plays a simple transition at. The tests below use
+ * it rather than its value: what they check is that a sped pair plays its own beat divided by the
+ * page's factor, and a test that spelled the number would have to be edited every time the owner
+ * moved the setting -- which is the moment it stops being a check and becomes a copy.
+ */
+const SPEED = SIMPLE_SPEED_SETTINGS.default;
 
 function configuration(): TimelineConfiguration {
   const timing = { dwell: 0.8, move: 0.55, correct: 0.25, settle: 0.8 };
@@ -96,14 +106,10 @@ test("simple transitions play every phase at the speed-up only while the setting
     [0, 1, 2, 3].map((index) => isSpedUpPair(config, index)),
     [true, false, true, false],
   );
-  // Written against the constant rather than against its value: what is being tested is that a
-  // sped pair plays its own beat divided by the speed-up, and a test that spelled the number
-  // would have to be edited every time the owner changed it -- which is the moment it stops
-  // being a check and becomes a copy.
-  const saved = 1 - 1 / SIMPLE_TRANSITION_SPEED;
-  near(pairDuration(config, 0, "tween"), (full[0] ?? Number.NaN) / SIMPLE_TRANSITION_SPEED);
+  const saved = 1 - 1 / SPEED;
+  near(pairDuration(config, 0, "tween"), (full[0] ?? Number.NaN) / SPEED);
   near(pairDuration(config, 1, "tween"), full[1] ?? Number.NaN);
-  near(pairDuration(config, 2, "tween"), (full[2] ?? Number.NaN) / SIMPLE_TRANSITION_SPEED);
+  near(pairDuration(config, 2, "tween"), (full[2] ?? Number.NaN) / SPEED);
   near(
     sequenceDuration(config, "tween"),
     fullSequence - ((full[0] ?? Number.NaN) + (full[2] ?? Number.NaN)) * saved,
@@ -116,13 +122,13 @@ test("simple transitions play every phase at the speed-up only while the setting
   // span of it is that beat over the speed-up, which is what "every phase" in the name means.
   const beat = pairTiming(config, 2, "tween");
   const staticBeat = config.continuous.staticBeat;
-  near(beat.dwell, staticBeat.dwell / SIMPLE_TRANSITION_SPEED);
-  near(beat.move, staticBeat.move / SIMPLE_TRANSITION_SPEED);
-  near(beat.correct, staticBeat.correct / SIMPLE_TRANSITION_SPEED);
-  near(beat.settle, staticBeat.settle / SIMPLE_TRANSITION_SPEED);
+  near(beat.dwell, staticBeat.dwell / SPEED);
+  near(beat.move, staticBeat.move / SPEED);
+  near(beat.correct, staticBeat.correct / SPEED);
+  near(beat.settle, staticBeat.settle / SPEED);
   // Off the continuous beat the speed-up still applies, to the single-step timing instead.
   config.continuous.on = false;
-  near(pairTiming(config, 0, "tween").settle, config.timing.settle / SIMPLE_TRANSITION_SPEED);
+  near(pairTiming(config, 0, "tween").settle, config.timing.settle / SPEED);
   config.fastSimple = false;
   near(pairTiming(config, 0, "tween").settle, config.timing.settle);
   assert.throws(() => isSpedUpPair(config, 9), /no transition/);
@@ -146,6 +152,54 @@ test("a range is quoted at the clock it plays on, speed-up included", () => {
   assert.ok(rangeDuration(config, whole, "tween") > unsped);
 });
 
+test("the speed-up is the page's setting, and the clock it prices refuses one out of range", () => {
+  // Four by default, and the default is declared once: the configuration that says nothing plays
+  // at the same factor as the one that asks for it.
+  assert.equal(SIMPLE_SPEED_SETTINGS.default, 4);
+  assert.deepEqual(
+    [SIMPLE_SPEED_SETTINGS.min, SIMPLE_SPEED_SETTINGS.max, SIMPLE_SPEED_SETTINGS.step],
+    [1, 8, 0.5],
+  );
+  const config = configuration();
+  assert.equal(simpleSpeedOf(config), SIMPLE_SPEED_SETTINGS.default);
+  config.simple = [true, false, true, false];
+  config.fastSimple = true;
+  config.simpleSpeed = SIMPLE_SPEED_SETTINGS.min;
+  const full = [0, 1, 2, 3].map((index) => pairDuration(config, index, "tween"));
+  const whole = { from: 2, to: 18 };
+  // Every factor the dial offers, priced two ways: a sped pair is its unsped self over the
+  // factor, and the range is the sum of what its pairs play, which is what the capture reprices.
+  for (let speed = SIMPLE_SPEED_SETTINGS.min; speed <= SIMPLE_SPEED_SETTINGS.max; speed += 0.5) {
+    config.simpleSpeed = speed;
+    assert.equal(simpleSpeedOf(config), speed);
+    near(pairDuration(config, 0, "tween"), (full[0] ?? Number.NaN) / speed);
+    near(pairDuration(config, 1, "tween"), full[1] ?? Number.NaN);
+    near(
+      rangeDuration(config, whole, "tween"),
+      [0, 1, 2, 3].reduce((total, index) => total + pairDuration(config, index, "tween"), 0),
+    );
+  }
+  // One is the floor, so the dial's bottom is a factor the timeline takes rather than a refusal.
+  config.simpleSpeed = SIMPLE_SPEED_SETTINGS.min;
+  near(pairDuration(config, 0, "tween"), full[0] ?? Number.NaN);
+  // Outside it, nothing is drawn on a clock nobody can play.
+  for (const bad of [0, 0.5, -1, 8.5, 20, Number.NaN, Number.POSITIVE_INFINITY]) {
+    config.simpleSpeed = bad;
+    assert.throws(() => simpleSpeedOf(config), /simple-transition speed must be between 1 and 8/);
+    assert.throws(() => pairDuration(config, 0, "tween"), /simple-transition speed/);
+    assert.throws(() => rangeDuration(config, whole, "tween"), /simple-transition speed/);
+    // A pair that is not sped up never asks, so the refusal is about the clock it would play on.
+    assert.doesNotThrow(() => pairDuration(config, 1, "tween"));
+  }
+  // The control clamps to the same range and snaps to its step, so what the page takes is always
+  // something the timeline will price.
+  assert.deepEqual(
+    [0, 1, 3.7, 4, 8, 20, Number.NaN].map((value) => simpleSpeedSetting(value)),
+    [1, 1, 3.5, 4, 8, 8, SIMPLE_SPEED_SETTINGS.default],
+  );
+  assert.equal(simpleSpeedSetting(Number.NaN, 2.5), 2.5);
+});
+
 test("physics work is priced from the base timing, which the speed-up does not shorten", () => {
   const config = configuration();
   config.simple = [true, false, true, false];
@@ -157,7 +211,7 @@ test("physics work is priced from the base timing, which the speed-up does not s
     for (const index of [0, 1, 2, 3]) {
       const played = pairTiming(config, index, "physics");
       const base = baseTiming(config, index, "physics");
-      const speed = isSpedUpPair(config, index) ? SIMPLE_TRANSITION_SPEED : 1;
+      const speed = isSpedUpPair(config, index) ? SPEED : 1;
       for (const span of spans) {
         near(played[span] * speed, base[span]);
       }
@@ -312,14 +366,14 @@ test("the arrival delay is a share of the moving span that scales with the beat"
   const staticSpan = config.continuous.staticBeat.move + config.continuous.staticBeat.correct;
   near(gap(0, "tween"), DEFAULT_ARRIVAL_DELAY_FRACTION * staticSpan);
   config.fastSimple = true;
-  near(gap(0, "tween"), (DEFAULT_ARRIVAL_DELAY_FRACTION * staticSpan) / SIMPLE_TRANSITION_SPEED);
+  near(gap(0, "tween"), (DEFAULT_ARRIVAL_DELAY_FRACTION * staticSpan) / SPEED);
   near(gap(1, "tween"), 0.2 * 0.8);
   const sped = pairSchedule(config, 0, "tween");
   config.fastSimple = false;
   const full = pairSchedule(config, 0, "tween");
   for (const key of Object.keys(full) as (keyof PairSchedule)[]) {
     if (key !== "roll") {
-      near(sped[key] * SIMPLE_TRANSITION_SPEED, full[key]);
+      near(sped[key] * SPEED, full[key]);
     }
   }
 });

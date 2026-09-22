@@ -1,6 +1,7 @@
 import type { AtlasPhase, AtlasStyle, AtlasTiming } from "../api/workbench-api.js";
 import { rangeIndexBounds, type StepRange } from "../core/navigation.ts";
 import type { CorpusPair } from "../data/corpus.js";
+import { SIMPLE_SPEED_SETTINGS } from "../motion-settings.ts";
 
 export interface ContinuousTiming {
   on: boolean;
@@ -9,22 +10,19 @@ export interface ContinuousTiming {
   staticBeat: AtlasTiming;
 }
 
-/**
- * How many times faster a simple transition plays while `fastSimple` is on.
- *
- * Three, raised from two by the owner on 2026-09-21: a grid fill where every square is
- * axis-aligned has nothing to watch, and at 2x it still held the eye longer than it earned.
- * `baseTiming` is deliberately free of this, so physics steps are counted from the unsped span
- * and a faster clock simulates the same work rather than a third of it.
- */
-export const SIMPLE_TRANSITION_SPEED = 3;
-
 export interface TimelineConfiguration {
   pairs: readonly Pick<CorpusPair, "n" | "kind">[];
   /** Per pair, whether the step only fills an axis-aligned grid; see `isSimpleTransition`. */
   simple?: readonly boolean[];
-  /** Play simple transitions, every phase, at `SIMPLE_TRANSITION_SPEED`. */
+  /** Play simple transitions, every phase, at `simpleSpeed`. */
   fastSimple?: boolean;
+  /**
+   * How many times faster a simple transition plays while `fastSimple` is on: the page's own
+   * setting, and `SIMPLE_SPEED_SETTINGS.default` where a caller does not say. `baseTiming` is
+   * deliberately free of it, so physics steps are counted from the unsped span and a faster
+   * clock simulates the same work rather than a quarter of it.
+   */
+  simpleSpeed?: number;
   /**
    * Fraction of the moving span between the container finishing its resize and the new square
    * starting to fade in. The resize is always first; the default zero fades the square in as soon
@@ -132,6 +130,31 @@ export function isSpedUpPair(configuration: TimelineConfiguration, index: number
   return configuration.fastSimple === true && configuration.simple?.[index] === true;
 }
 
+/**
+ * The factor this configuration plays a simple transition at, refused outside the setting's range.
+ *
+ * The control clamps, so a factor that arrives out of range came from a caller that went around
+ * it, and neither end of what it could ask for is a clock: under one the "speed-up" is a
+ * slow-down, and over the ceiling a grid fill is finished before the arriving square can be read.
+ * Either way a range would be quoted at a length nothing plays, which is the disagreement between
+ * the panel's figure and the capture's step clock that `rangeDuration` exists to prevent. So this
+ * throws rather than returning a number.
+ */
+export function simpleSpeedOf(configuration: TimelineConfiguration): number {
+  const speed = configuration.simpleSpeed ?? SIMPLE_SPEED_SETTINGS.default;
+  if (
+    !Number.isFinite(speed) ||
+    speed < SIMPLE_SPEED_SETTINGS.min ||
+    speed > SIMPLE_SPEED_SETTINGS.max
+  ) {
+    throw new RangeError(
+      `simple-transition speed must be between ${SIMPLE_SPEED_SETTINGS.min} and ` +
+        `${SIMPLE_SPEED_SETTINGS.max}, got ${speed}`,
+    );
+  }
+  return speed;
+}
+
 function spedTiming(timing: AtlasTiming, speed: number): AtlasTiming {
   const valid = checkedTiming(timing);
   return {
@@ -172,7 +195,9 @@ export function pairTiming(
   style: AtlasStyle,
 ): AtlasTiming {
   const timing = baseTiming(configuration, index, style);
-  return isSpedUpPair(configuration, index) ? spedTiming(timing, SIMPLE_TRANSITION_SPEED) : timing;
+  return isSpedUpPair(configuration, index)
+    ? spedTiming(timing, simpleSpeedOf(configuration))
+    : timing;
 }
 
 export function timingDuration(timing: AtlasTiming): number {
@@ -319,8 +344,8 @@ export function ramp(time: number, from: number, to: number): number {
  * `playRange` turns continuous play on, so the range is priced from `continuousTiming` whatever
  * the clock is doing now -- and then through the same speed-up a pair actually plays at. Pricing
  * the speed-up here is not a refinement: with `fastSimple` on, a simple grid fill plays at
- * `SIMPLE_TRANSITION_SPEED`, so a range holding any of them is quoted longer than the page ever
- * takes to play it, and the figure the panel shows is not the figure the clock runs.
+ * `simpleSpeed`, so a range holding any of them is quoted longer than the page ever takes to play
+ * it, and the figure the panel shows is not the figure the clock runs.
  *
  * The schedule's own `end` is what a pair costs, rather than the four spans added up, so a
  * staging that reserves part of the move is priced at what it plays.
@@ -338,7 +363,7 @@ export function rangeDuration(
   for (let index = bounds.first; index <= bounds.last; index += 1) {
     const continuous = continuousTiming(configuration, index, style);
     const timing = isSpedUpPair(configuration, index)
-      ? spedTiming(continuous, SIMPLE_TRANSITION_SPEED)
+      ? spedTiming(continuous, simpleSpeedOf(configuration))
       : continuous;
     duration += scheduleForTiming(configuration, index, style, timing).end;
   }
@@ -402,9 +427,9 @@ export function displayedCount(
 }
 
 export const timeline = Object.freeze({
-  SIMPLE_TRANSITION_SPEED,
   isStillPair,
   isSpedUpPair,
+  simpleSpeedOf,
   annealSpan,
   continuousTiming,
   baseTiming,

@@ -32,6 +32,9 @@ import {
   physicalPresentationNeedsTrajectory,
   physicalPresentationState,
   ROLL_MAX,
+  SIMPLE_SPEED_SETTINGS,
+  simpleSpeedSetting,
+  TEXT_HANDOVER,
   trajectoryPhysicsConfiguration,
   WALL_LAW_BOUNDS,
 } from "./motion-settings.js";
@@ -86,7 +89,6 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     pairTiming: timelinePairTiming,
     ramp: timelineRamp,
     rangeDuration: timelineRangeDuration,
-    SIMPLE_TRANSITION_SPEED,
     rangeProgress,
     seekSequence: timelineSeekSequence,
     sequenceDuration: timelineSequenceDuration,
@@ -145,8 +147,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   const FRAMES = DATA.frames;
   const PAIRS = DATA.pairs;
   // The owner's request of 2026-09-13: a step that only fills the last row of an axis-aligned
-  // grid has no phase worth watching, so it can play at double speed. Decided once, from the
-  // records themselves rather than from n.
+  // grid has no phase worth watching, so it can play sped up. How much faster is the setting
+  // below; which steps qualify is decided once, from the records themselves rather than from n.
   const SIMPLE = PAIRS.map((p) => isSimpleTransition(FRAMES[p.n], FRAMES[p.n + 1]));
   const FACTS = DATA.facts;
   const METRICS = DATA.metrics;
@@ -196,9 +198,10 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // it has further to go and because it is the change that must not be seen happening.
   //: How long a square's colour takes to leave and to come back, in SECONDS rather than as a
   //: fraction of the step (the owner, 2026-09-21). A fraction inherits the step's clock, so
-  //: speeding simple transitions up to 3x squeezed the whole change into about two frames at 30
-  //: fps -- which is a cut, not a transition, and on a blend through neutral it landed as a grey
-  //: flash. Declared in seconds, the colour crosses over at the same rate whatever the step does.
+  //: speeding simple transitions up -- 3x at the time, a setting since -- squeezed the whole
+  //: change into about two frames at 30 fps, which is a cut, not a transition, and on a blend
+  //: through neutral it landed as a grey flash. Declared in seconds, the colour crosses over at
+  //: the same rate whatever the step does, and whatever factor the owner sets.
   //:
   //: The fade OUT is the slower of the two: the picture is being taken apart, and a viewer needs
   //: longer to accept a colour leaving than to accept one arriving. The drain finishes before the
@@ -208,7 +211,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   //: the chroma has gone and returns before it comes back, so a viewer never watches one colour
   //: turn into another. They were fractions of the move and of the settle, which is why the
   //: owner could lengthen the step and still see a colour change faster than anything asked for:
-  //: a fraction rides the step's own clock, and a simple transition's clock runs at 3x.
+  //: a fraction rides the step's own clock, and a simple transition's clock runs at the speed-up.
   const COLOR_FADE = { out: 0.45, in: 0.3, hueOut: 0.35, hueIn: 0.35 };
   // Continuous play (revision 6, feature 4): the beat the whole sequence runs at, back to back.
   // A static append (a grid prefix or a shared picture, where nothing moves) gets a dwell and no
@@ -324,9 +327,16 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     // And the n Pack was last left on, for the same reason in the other direction. Null until Pack
     // has been left once, which cannot happen before the page has an n on the stage.
     packN: null,
-    // Continuous play across the whole sequence: on, whether static appends take the full beat, and
-    // whether the next pair is simulated during this one's dwell.
-    continuous: { on: false, fullBeat: false, fastSimple: true, prefetch: true },
+    // Continuous play across the whole sequence: on, whether static appends take the full beat, how
+    // much faster a simple grid fill plays while the speed-up is on, and whether the next pair is
+    // simulated during this one's dwell.
+    continuous: {
+      on: false,
+      fullBeat: false,
+      fastSimple: true,
+      simpleSpeed: SIMPLE_SPEED_SETTINGS.default,
+      prefetch: true,
+    },
     // Revision 9: the range, stated as the values of n stepped *into*, which is the unit the chooser
     // and the chips have always used. 17 to 17 is the one step 16 -> 17 (the page's default), 2 to
     // 324 is the whole corpus. Clamped to what the page carries by `setRange`.
@@ -1343,6 +1353,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       pairs: PAIRS,
       simple: SIMPLE,
       fastSimple: state.continuous.fastSimple,
+      simpleSpeed: state.continuous.simpleSpeed,
       arrivalDelay: arrivalDelayFraction,
       timing: state.timing,
       continuous: {
@@ -2248,6 +2259,10 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     Object.assign(WALLLAW, WALL_DEFAULT);
     Object.assign(MOTION_RESPONSE, DEFAULT_MOTION_RESPONSE);
     arrivalDelayFraction = DEFAULT_ARRIVAL_DELAY_FRACTION;
+    // A timing setting, and reset has restored the arrival delay beside it since that one landed.
+    // It matters to the capture tools: their baseline calls reset, so a cut that does not ask for
+    // a factor is cut at the page's default rather than at whatever the session was left on.
+    state.continuous.simpleSpeed = SIMPLE_SPEED_SETTINGS.default;
     relKind = "general";
     targetEdges = null;
     // The target goes back to the record's graph and the drawing mode comes off, but
@@ -2281,6 +2296,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       relationship: relationshipState(),
       growth: growthState(),
       anneal: state.anneal,
+      simpleSpeed: state.continuous.simpleSpeed,
       snap: state.snap,
       blind: state.blind,
       blindInflate: BLIND.inflate,
@@ -4105,11 +4121,18 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     // -- the n layer out, a blank beat, then the n + 1 layer in -- so "Proven", the badges and
     // every line that reads the same for both n blinked away and came back. The owner asked for
     // that to stop. A slot drawn identically in both layers now swaps at the midpoint, which
-    // cannot be seen. A slot that differs crossfades over the middle half of the handover, 0.2 s
-    // at the most: the two opacities always sum to one, so the text never dims through a blank
-    // beat, and the eased curve keeps the moment both are half-visible short.
-    // The number under the packing is always a changing slot, and it crossfades in place: it used
-    // to drift as it faded, which stacked the two numbers into a ghost for the length of the fade.
+    // cannot be seen. Only what changes moves at all.
+    //
+    // What changes LEAVES BEFORE ITS REPLACEMENT ARRIVES (`TEXT_HANDOVER`). It used to cross-fade
+    // through it, the two opacities summing to one, which is right for one line of drifting
+    // numbers and wrong for a panel of sentences: the old and the new stood in the same place at
+    // half ink each, so at the step into 11 `Stromquist 2003, Electron. J. Combin. 10, #R8` and
+    // what replaced it were both on the screen and neither could be read, for 0.2 s at every
+    // step. That is the flicker the owner reported on 2026-09-22 (`think-0few`), and
+    // `check_animate_view`'s `SUPERIMPOSED_LIMIT` is what now refuses it: two different strings
+    // drawn in the same place are never both legible.
+    // The number under the packing hands over the same way, in place: it used to drift as it
+    // faded, which stacked the two numbers into a ghost for the length of the fade.
     const q = optimizing
       ? 1
       : sc.roll > 0
@@ -4117,8 +4140,10 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
         : t >= sc.arrive
           ? 1
           : 0;
-    const enter = easeInOut(clamp01((q - 0.25) / 0.5));
-    const leave = 1 - enter;
+    const share = (/** @type {number} */ from, /** @type {number} */ to) =>
+      clamp01((q - from) / (to - from));
+    const enter = easeInOut(share(TEXT_HANDOVER.inStart, TEXT_HANDOVER.inEnd));
+    const leave = 1 - easeInOut(share(TEXT_HANDOVER.outStart, TEXT_HANDOVER.outEnd));
     const heldA = q < 0.5 ? "1" : "0";
     const heldB = q < 0.5 ? "0" : "1";
     const slotsA = factsA.children;
@@ -4727,6 +4752,11 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       state.continuous.fullBeat;
     /** @type {HTMLInputElement} */ (inputNode("fastsimple-toggle")).checked =
       state.continuous.fastSimple;
+    const speedInput = /** @type {HTMLInputElement} */ (inputNode("simple-speed"));
+    // The factor is meaningless while nothing is sped up, so the box says so rather than
+    // inviting a value that changes nothing.
+    speedInput.disabled = !state.continuous.fastSimple;
+    speedInput.value = String(state.continuous.simpleSpeed);
     updateStepChooser();
     updateRangeControls();
     const c = continuousState();
@@ -4746,7 +4776,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       " pairs); " +
       c.simplePairs +
       (c.fastSimple
-        ? ` simple grid fills at ${SIMPLE_TRANSITION_SPEED}x speed`
+        ? ` simple grid fills at ${c.simpleSpeed}x speed`
         : " simple grid fills at full length") +
       "; this pair " +
       fmt(duration(), 2) +
@@ -5641,6 +5671,25 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     render();
     return continuousState();
   }
+  // The speed-up is a factor the owner sets, not a constant (2026-09-22). Out of range it is
+  // clamped to the control rather than obeyed, and snapped to the control's step, so the page
+  // never plays a clock the dial cannot show; the timeline refuses one outright, which is what
+  // catches a caller that went around this. What comes back says which factor was taken, and the
+  // capture compares that with what it asked for before it cuts.
+  function setSimpleSpeed(speed) {
+    const next = simpleSpeedSetting(Number(speed), state.continuous.simpleSpeed);
+    if (next === state.continuous.simpleSpeed) {
+      return continuousState();
+    }
+    // As with the toggle beside it, a change of the factor keeps the playhead at the same point
+    // of the pair rather than of the clock.
+    const frac = duration() > 0 ? state.t / duration() : 0;
+    state.continuous.simpleSpeed = next;
+    state.t = frac * duration();
+    updateSegments();
+    render();
+    return continuousState();
+  }
   function continuousState() {
     let remaining = 0;
     for (let i = state.pair; i < PAIRS.length; i++) {
@@ -5656,7 +5705,10 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       on: state.continuous.on,
       fullBeat: state.continuous.fullBeat,
       fastSimple: state.continuous.fastSimple,
-      simpleSpeed: SIMPLE_TRANSITION_SPEED,
+      simpleSpeed: state.continuous.simpleSpeed,
+      simpleSpeedMin: SIMPLE_SPEED_SETTINGS.min,
+      simpleSpeedMax: SIMPLE_SPEED_SETTINGS.max,
+      simpleSpeedDefault: SIMPLE_SPEED_SETTINGS.default,
       prefetch: state.continuous.prefetch,
       dwell: CONTINUOUS.dwell,
       move: CONTINUOUS.move,
@@ -6224,6 +6276,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     playAll,
     stopAll,
     setContinuous,
+    setSimpleSpeed,
     goTo,
     continuous: continuousState,
     styles: () => STYLES.slice(),
@@ -6276,6 +6329,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       blindInflate: BLIND.inflate,
       mode: simMode(),
       anneal: state.anneal,
+      simpleSpeed: state.continuous.simpleSpeed,
       motionResponse: {
         speedLimit: MOTION_RESPONSE.speedLimit,
         contactDamping: MOTION_RESPONSE.contactDamping,
@@ -6491,6 +6545,11 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     .getElementById("fastsimple-toggle")
     .addEventListener("change", (ev) =>
       setContinuous({ fastSimple: /** @type {HTMLInputElement} */ (ev.target).checked }),
+    );
+  document
+    .getElementById("simple-speed")
+    .addEventListener("change", (ev) =>
+      setSimpleSpeed(/** @type {HTMLInputElement} */ (ev.target).value),
     );
   // Typing in `from` alone drags `to` with it while the two are equal, so a one-step range stays one
   // step rather than silently widening.

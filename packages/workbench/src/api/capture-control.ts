@@ -50,6 +50,7 @@ export type CaptureCommand =
   | ["setPhase", AtlasPhase]
   | ["setRange", number, number]
   | ["setRelationship", AtlasRelationshipKind]
+  | ["setSimpleSpeed", number]
   | ["setSnap", boolean]
   | ["setSpeed", number]
   | ["setStepN", number]
@@ -229,6 +230,9 @@ function apply(api: AtlasTransitions, command: CaptureCommand): void {
       return;
     case "setRelationship":
       api.setRelationship(command[1]);
+      return;
+    case "setSimpleSpeed":
+      api.setSimpleSpeed(command[1]);
       return;
     case "setSnap":
       api.setSnap(command[1]);

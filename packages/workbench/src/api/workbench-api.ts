@@ -410,10 +410,14 @@ export interface AtlasPhysics {
 export interface AtlasContinuous {
   on: boolean;
   fullBeat: boolean;
-  /** Whether simple transitions, axis-aligned grid fills, play at `SIMPLE_TRANSITION_SPEED`. */
+  /** Whether simple transitions, axis-aligned grid fills, play at `simpleSpeed`. */
   fastSimple: boolean;
   /** How many times faster a simple transition plays while `fastSimple` is on. */
   simpleSpeed: number;
+  /** The range the setting accepts, and the default it starts at. */
+  simpleSpeedMin: number;
+  simpleSpeedMax: number;
+  simpleSpeedDefault: number;
   prefetch: boolean;
   dwell: number;
   move: number;
@@ -509,6 +513,8 @@ export interface AtlasReset {
   relationship: AtlasRelationship;
   growth: AtlasGrowth;
   anneal: number;
+  /** Back to `SIMPLE_SPEED_SETTINGS.default`, as the arrival delay goes back to its own. */
+  simpleSpeed: number;
   snap: boolean;
   blind: boolean;
   blindInflate: number;
@@ -544,6 +550,8 @@ export interface AtlasState {
   blindInflate: number;
   mode: AtlasSimMode;
   anneal: number;
+  /** The factor a simple transition plays at, so a capture can record the clock it cut on. */
+  simpleSpeed: number;
   speed: number;
   initial: AtlasInitial;
   optimizing: boolean;
@@ -733,6 +741,14 @@ export interface AtlasTransitions {
   setContinuous(
     options?: Partial<Pick<AtlasContinuous, "on" | "fullBeat" | "fastSimple" | "prefetch">> | null,
   ): AtlasContinuous;
+  /**
+   * How many times faster a simple transition plays while `fastSimple` is on.
+   *
+   * Clamped to `simpleSpeedMin`..`simpleSpeedMax` and snapped to the control's step, so what
+   * comes back is what the page will play rather than what was asked for. A caller that must
+   * know its factor was taken compares the returned `simpleSpeed` with what it sent.
+   */
+  setSimpleSpeed(speed: number): AtlasContinuous;
   /** The n actually reached, which is the nearest one the page carries. */
   goTo(n: number): number;
   continuous(): AtlasContinuous;
