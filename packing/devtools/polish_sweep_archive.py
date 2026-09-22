@@ -111,20 +111,69 @@ def checked(
     return side, x, y
 
 
-def polish(pose: dict[str, Any], *, budget: float) -> dict[str, Any]:
-    """One (cell, seed): re-check the engine pose, quench it, re-check the result."""
+#: A round has to buy at least this much side to justify another one. HiGHS is asked
+#: for 1e-10 feasibility, so anything smaller is the solver repeating itself.
+ROUND_GAIN = 1e-12
+
+
+def polish(
+    pose: dict[str, Any], *, budget: float, rounds: int, deadline: float
+) -> dict[str, Any]:
+    """One (cell, seed): re-check the engine pose, quench it repeatedly, re-check.
+
+    Repeatedly, because `quench_bracket` stops on its own cell conditions far more often
+    than on its clock -- "re-read cell worse" and "cell cycle" are its two commonest
+    exits on annealer output, and both leave an incumbent that is a perfectly good start
+    for another bracket. Measured at `n = 19` on exp-202's archive, a single call used 4
+    to 20 seconds of a 90-second budget and then stopped. Restarting from the *repaired*
+    pose each time is what makes the next round a different problem.
+
+    The loop ends when a round buys less than `ROUND_GAIN`, when the oracle refuses the
+    round's pose, when `rounds` are used, or when the per-pose `deadline` passes.
+    """
     started = time.time()
     x0, y0, t0 = pose["x"], pose["y"], pose["t"]
     engine = checked(x0, y0, t0)
-    result = quench_bracket(list(x0), list(y0), list(t0), time_budget=budget)
-    t = [float(v) for v in result.theta]
-    polished = checked([float(v) for v in result.x], [float(v) for v in result.y], t)
+
+    current = (list(x0), list(y0), list(t0))
+    polished: tuple[float, list[float], list[float]] | None = None
+    theta = list(t0)
+    trace: list[dict[str, Any]] = []
+    lp_solves = 0
+    for index in range(rounds):
+        remaining = deadline - (time.time() - started)
+        if remaining <= 0.0:
+            break
+        result = quench_bracket(
+            list(current[0]), list(current[1]), list(current[2]),
+            time_budget=min(budget, remaining),
+        )  # fmt: skip
+        lp_solves += result.lp_solves
+        moved = [float(v) for v in result.theta]
+        candidate = checked([float(v) for v in result.x], [float(v) for v in result.y], moved)
+        trace.append(
+            {
+                "round": index,
+                "side": None if candidate is None else candidate[0],
+                "converged": result.converged,
+                "reason": result.reason,
+                "seconds": round(time.time() - started, 3),
+            }
+        )
+        if candidate is None:
+            break
+        improved = polished is None or candidate[0] < polished[0] - ROUND_GAIN
+        if not improved:
+            break
+        polished = candidate
+        theta = moved
+        current = (list(candidate[1]), list(candidate[2]), list(moved))
 
     candidates: list[tuple[float, str, list[float], list[float], list[float]]] = []
     if engine is not None:
         candidates.append((engine[0], "engine", engine[1], engine[2], t0))
     if polished is not None:
-        candidates.append((polished[0], "polished", polished[1], polished[2], t))
+        candidates.append((polished[0], "polished", polished[1], polished[2], theta))
     kept = min(candidates, key=lambda c: c[0]) if candidates else None
 
     return {
@@ -133,10 +182,12 @@ def polish(pose: dict[str, Any], *, budget: float) -> dict[str, Any]:
         "polished_side": None if polished is None else polished[0],
         "best_verified_side": None if kept is None else kept[0],
         "best_verified_from": None if kept is None else kept[1],
-        "quench_converged": result.converged,
-        "quench_reason": result.reason,
-        "quench_lp_solves": result.lp_solves,
+        "quench_rounds": len(trace),
+        "quench_converged": bool(trace and trace[-1]["converged"]),
+        "quench_reason": trace[-1]["reason"] if trace else "no round ran",
+        "quench_lp_solves": lp_solves,
         "quench_seconds": round(time.time() - started, 3),
+        "quench_trace": trace,
         "pose": None if kept is None else {"x": kept[2], "y": kept[3], "t": kept[4]},
     }
 
@@ -199,7 +250,7 @@ def render(payload: dict[str, Any]) -> str:
         f"| {num(row['polished_side'])} | {num(row['best_verified_side'])} "
         f"| {row['best_verified_from'] or '--'} "
         f"| {'converged' if row['quench_converged'] else row['quench_reason']} "
-        f"({row['quench_seconds']:.1f}s) |"
+        f"({row['quench_rounds']} rounds, {row['quench_seconds']:.1f}s) |"
         for row in payload["rows"]
     )
     return "\n".join(lines)
@@ -229,7 +280,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("archives", type=Path, nargs="+", help="arm-sweep JSONL archives")
     parser.add_argument("--json", type=Path, required=True, help="where the payload goes")
     parser.add_argument(
-        "--quench-seconds", type=float, default=60.0, help="per-pose wall bound"
+        "--quench-seconds", type=float, default=60.0, help="wall bound per quench call"
+    )
+    parser.add_argument(
+        "--rounds", type=int, default=1, help="quench calls per pose, restarted each time"
+    )
+    parser.add_argument(
+        "--pose-seconds", type=float, default=600.0, help="wall bound over all rounds"
     )
     parser.add_argument(
         "--cells", default="", help="comma-separated n to keep; empty keeps every cell"
@@ -250,7 +307,14 @@ def main(argv: list[str] | None = None) -> int:
         if wanted and n not in wanted:
             continue
         row = {"n": n, "seed": seed, "archive": poses[(n, seed)]["archive"]}
-        row.update(polish(poses[(n, seed)], budget=options.quench_seconds))
+        row.update(
+            polish(
+                poses[(n, seed)],
+                budget=options.quench_seconds,
+                rounds=options.rounds,
+                deadline=options.pose_seconds,
+            )
+        )
         rows.append(row)
         best = row["best_verified_side"]
         print(
@@ -264,6 +328,8 @@ def main(argv: list[str] | None = None) -> int:
     payload: dict[str, Any] = {
         "archives": [shown(p) for p in paths],
         "quench_seconds": options.quench_seconds,
+        "quench_rounds_max": options.rounds,
+        "pose_seconds": options.pose_seconds,
         "pose_tolerance": POSE_TOLERANCE,
         "host": {
             "platform": platform.platform(),

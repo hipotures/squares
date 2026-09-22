@@ -1,0 +1,18 @@
+### scale 0.01
+source                          n         side | single chg    lower   admiss |  coll chg    lower   admiss
+trivial-grid                   12     4.000000 |     0.3311   0.0000   0.0000 |    1.0000   0.0010   0.0000
+trivial-grid                   20     5.000000 |     0.2670   0.0000   0.0000 |    1.0000   0.0000   0.0000
+trivial-grid                   21     5.000000 |     0.4116   0.0000   0.0000 |    1.0000   0.0000   0.0000
+[{"base_overlap": 0.0, "base_side": 4.0, "collective": {"admissible": 0.0, "changed": 1.0, "lowered": 0.001}, "n": 12, "samples": 8000, "scale": 0.01, "single": {"admissible": 0.0, "changed": 0.331125, "lowered": 0.0}, "source": "trivial-grid"}, {"base_overlap": 0.0, "base_side": 5.0, "collective": {"admissible": 0.0, "changed": 1.0, "lowered": 0.0}, "n": 20, "samples": 8000, "scale": 0.01, "single": {"admissible": 0.0, "changed": 0.267, "lowered": 0.0}, "source": "trivial-grid"}, {"base_overlap": 0.0, "base_side": 5.0, "collective": {"admissible": 0.0, "changed": 1.0, "lowered": 0.0}, "n": 21, "samples": 8000, "scale": 0.01, "single": {"admissible": 0.0, "changed": 0.411625, "lowered": 0.0}, "source": "trivial-grid"}]
+### scale 0.05
+source                          n         side | single chg    lower   admiss |  coll chg    lower   admiss
+trivial-grid                   12     4.000000 |     0.3311   0.0000   0.0000 |    1.0000   0.0014   0.0000
+trivial-grid                   20     5.000000 |     0.2670   0.0000   0.0000 |    1.0000   0.0000   0.0000
+trivial-grid                   21     5.000000 |     0.4116   0.0000   0.0000 |    1.0000   0.0000   0.0000
+[{"base_overlap": 0.0, "base_side": 4.0, "collective": {"admissible": 0.0, "changed": 1.0, "lowered": 0.001375}, "n": 12, "samples": 8000, "scale": 0.05, "single": {"admissible": 0.0, "changed": 0.331125, "lowered": 0.0}, "source": "trivial-grid"}, {"base_overlap": 0.0, "base_side": 5.0, "collective": {"admissible": 0.0, "changed": 1.0, "lowered": 0.0}, "n": 20, "samples": 8000, "scale": 0.05, "single": {"admissible": 0.0, "changed": 0.267, "lowered": 0.0}, "source": "trivial-grid"}, {"base_overlap": 0.0, "base_side": 5.0, "collective": {"admissible": 0.0, "changed": 1.0, "lowered": 0.0}, "n": 21, "samples": 8000, "scale": 0.05, "single": {"admissible": 0.0, "changed": 0.411625, "lowered": 0.0}, "source": "trivial-grid"}]
+### scale 0.2
+source                          n         side | single chg    lower   admiss |  coll chg    lower   admiss
+trivial-grid                   12     4.000000 |     0.3311   0.0000   0.0000 |    1.0000   0.0022   0.0000
+trivial-grid                   20     5.000000 |     0.2670   0.0000   0.0000 |    1.0000   0.0001   0.0000
+trivial-grid                   21     5.000000 |     0.4116   0.0000   0.0000 |    1.0000   0.0000   0.0000
+[{"base_overlap": 0.0, "base_side": 4.0, "collective": {"admissible": 0.0, "changed": 1.0, "lowered": 0.00225}, "n": 12, "samples": 8000, "scale": 0.2, "single": {"admissible": 0.0, "changed": 0.331125, "lowered": 0.0}, "source": "trivial-grid"}, {"base_overlap": 0.0, "base_side": 5.0, "collective": {"admissible": 0.0, "changed": 1.0, "lowered": 0.000125}, "n": 20, "samples": 8000, "scale": 0.2, "single": {"admissible": 0.0, "changed": 0.267, "lowered": 0.0}, "source": "trivial-grid"}, {"base_overlap": 0.0, "base_side": 5.0, "collective": {"admissible": 0.0, "changed": 1.0, "lowered": 0.0}, "n": 21, "samples": 8000, "scale": 0.2, "single": {"admissible": 0.0, "changed": 0.411625, "lowered": 0.0}, "source": "trivial-grid"}]

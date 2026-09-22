@@ -83,7 +83,6 @@ from bisect import bisect_left, bisect_right
 from concurrent.futures import ProcessPoolExecutor
 from dataclasses import dataclass
 from fractions import Fraction
-from itertools import pairwise
 from math import atan, degrees, lcm
 from multiprocessing import get_context
 from pathlib import Path
@@ -309,8 +308,8 @@ def _polygon_window(
         values = [slope * us[i] + offset for i in range(i0, i1 + 1)]
         for slab in range(i0, i1):
             left, right = values[slab - i0], values[slab - i0 + 1]
-            bottom = left if left < right else right
-            top = right if left < right else left
+            bottom = min(right, left)
+            top = max(left, right)
             if hits[slab] == 0:
                 low_num[slab], low_den[slab] = bottom, length
                 high_num[slab], high_den[slab] = top, length
@@ -406,9 +405,18 @@ def minimising_cell(expansion: Expansion, support: Support, index: int) -> RowCe
             tally[key] = tally.get(key, 0) + 1
     columns = sorted(tally)
 
+    inside = _inside(polygon, Fraction(twice_u, 2), Fraction(twice_v, 2))
+    legal = _legal_centre(
+        polygon, (us[best_slab], us[best_slab + 1], vs[best_cell], vs[best_cell + 1])
+    )
+    if legal is not None and not _inside(polygon, legal[0], legal[1]):
+        raise RepricingError(f"K5 row {index} produced a centre outside its own polygon")
+    frame_u, frame_v = (
+        legal if legal is not None else (Fraction(twice_u, 2), Fraction(twice_v, 2))
+    )
     middle = expansion.outer_side / 2
-    centre_x = middle + Fraction(cosine * twice_u - sine * twice_v, 2 * scale)
-    centre_y = middle + Fraction(sine * twice_u + cosine * twice_v, 2 * scale)
+    centre_x = middle + (cosine * frame_u - sine * frame_v) / scale
+    centre_y = middle + (sine * frame_u + cosine * frame_v) / scale
     return RowCell(
         row=index,
         units=least,
@@ -419,22 +427,87 @@ def minimising_cell(expansion: Expansion, support: Support, index: int) -> RowCe
         centre_x=centre_x,
         centre_y=centre_y,
         captured=len(captured),
-        inside=_inside(polygon, twice_u, twice_v),
+        inside=inside,
+        meets=legal is not None,
         columns=np.array(columns, np.int32),
         counts=np.array([tally[c] for c in columns], np.int32),
     )
 
 
-def _inside(polygon: list[tuple[int, int]], twice_u: int, twice_v: int) -> bool:
-    """``K5``: is the doubled point inside the convex legal-centre polygon, exactly?"""
-    signs = set()
+def _inside(polygon: list[tuple[int, int]], u: Fraction, v: Fraction) -> bool:
+    """Is the point inside the convex, counter-clockwise legal-centre polygon, exactly?"""
+    signs: set[bool] = set()
     for corner, start in enumerate(polygon):
         end = polygon[(corner + 1) % 4]
         du, dv = end[0] - start[0], end[1] - start[1]
-        cross = du * (twice_v - 2 * start[1]) - dv * (twice_u - 2 * start[0])
+        cross = du * (v - start[1]) - dv * (u - start[0])
         if cross:
             signs.add(cross > 0)
     return len(signs) <= 1
+
+
+def _legal_centre(
+    polygon: list[tuple[int, int]], box: tuple[int, int, int, int]
+) -> tuple[Fraction, Fraction] | None:
+    """``K5``: a legal centre inside the minimising cell, or ``None`` if there is none.
+
+    The sweep minimises over every cell the legal-centre polygon *reaches*, and it reaches
+    a cell by a corner as readily as by its middle -- the window's ends are taken at the
+    floor and ceiling of the polygon's own crossings, so a boundary cell counts whole. The
+    cell's midpoint can therefore sit outside the parent-centre envelope even though the
+    cell is one the artifact's own checker scores, and on this catalogue that is the
+    common case rather than the exception, because a row's charge is least where its core
+    is pushed hardest against a wall.
+
+    The charge is constant on the open cell, so any interior point of the cell carries the
+    swept minimum and captures the same sites. This clips the cell to the polygon and
+    returns the intersection's centroid, which is interior to both whenever the
+    intersection has positive area: the constraint is then at a centre a legal side-``A``
+    parent could actually put its core at. ``None`` means the cell only touches the
+    envelope on a set of measure zero, so no legal centre attains this row's swept
+    minimum and the constraint is the artifact's window rather than its envelope.
+    """
+    u0, u1, v0, v1 = box
+    subject: list[tuple[Fraction, Fraction]] = [
+        (Fraction(u0), Fraction(v0)),
+        (Fraction(u1), Fraction(v0)),
+        (Fraction(u1), Fraction(v1)),
+        (Fraction(u0), Fraction(v1)),
+    ]
+    for corner, start in enumerate(polygon):
+        end = polygon[(corner + 1) % 4]
+        du, dv = end[0] - start[0], end[1] - start[1]
+        sides = [du * (v - start[1]) - dv * (u - start[0]) for u, v in subject]
+        clipped: list[tuple[Fraction, Fraction]] = []
+        for position, current in enumerate(subject):
+            previous = subject[position - 1]
+            here, before = sides[position], sides[position - 1]
+            if (before < 0) != (here < 0):
+                span = before - here
+                if span:
+                    ratio = before / span
+                    clipped.append(
+                        (
+                            previous[0] + ratio * (current[0] - previous[0]),
+                            previous[1] + ratio * (current[1] - previous[1]),
+                        )
+                    )
+            if here >= 0:
+                clipped.append(current)
+        subject = clipped
+        if len(subject) < 3:
+            return None
+    twice_area = Fraction(0)
+    sum_u = Fraction(0)
+    sum_v = Fraction(0)
+    for current, following in zip(subject, [*subject[1:], subject[0]], strict=True):
+        cross = current[0] * following[1] - following[0] * current[1]
+        twice_area += cross
+        sum_u += (current[0] + following[0]) * cross
+        sum_v += (current[1] + following[1]) * cross
+    if twice_area <= 0:
+        return None
+    return sum_u / (3 * twice_area), sum_v / (3 * twice_area)
 
 
 def _initialise(expansion: Expansion, support: Support) -> None:
@@ -479,8 +552,7 @@ def sweep(
             results.append(cell)
             if not quiet and position % 200 == 0:
                 print(
-                    f"  row {position + 1}/{len(sample)} "
-                    f"{time.perf_counter() - started:.1f}s",
+                    f"  row {position + 1}/{len(sample)} {time.perf_counter() - started:.1f}s",
                     flush=True,
                 )
     return results
@@ -540,8 +612,9 @@ def build_matrix(cells: list[RowCell], support: Support) -> tuple[csr_array, np.
     indptr = np.zeros(len(cells) + 1, np.int64)
     for position, cell in enumerate(cells):
         indptr[position + 1] = indptr[position] + len(cell.columns)
-    indices = np.concatenate([cell.columns for cell in cells]) if cells else np.empty(0, np.int32)
-    data = np.concatenate([cell.counts for cell in cells]) if cells else np.empty(0, np.int32)
+    empty = np.empty(0, np.int32)
+    indices = np.concatenate([cell.columns for cell in cells]) if cells else empty
+    data = np.concatenate([cell.counts for cell in cells]) if cells else empty
     matrix = csr_array(
         (data.astype(np.int64), indices.astype(np.int64), indptr),
         shape=(len(cells), support.variables),
@@ -623,7 +696,8 @@ def solve(
     rescaling, so it is an exact *upper* bound on the relaxation's optimum, while the
     solver's own value is the corresponding estimate from below.
     """
-    active = np.arange(matrix.shape[1], dtype=np.int64) if columns is None else columns
+    shape = cast(tuple[int, int], matrix.shape)
+    active = np.arange(shape[1], dtype=np.int64) if columns is None else columns
     reduced = matrix[:, active]
     costs = budget[active].astype(float)
     started = time.perf_counter()
@@ -648,7 +722,7 @@ def solve(
     mass = Fraction(total, least)
     duals = np.maximum(-np.asarray(result.ineqlin.marginals, dtype=float), 0.0)
     return {
-        "variables": int(len(active)),
+        "variables": len(active),
         "constraints": int(reduced.shape[0]),
         "nonzeros": int(reduced.nnz),
         "solver_objective_float": float(result.fun),
@@ -714,8 +788,9 @@ def write_cells(path: Path, cells: list[RowCell]) -> None:
                         "centre_x": str(cell.centre_x),
                         "centre_y": str(cell.centre_y),
                         "captured_sites": cell.captured,
-                        "inside_envelope": cell.inside,
-                        "columns": int(len(cell.columns)),
+                        "midpoint_inside_envelope": cell.inside,
+                        "cell_meets_envelope": cell.meets,
+                        "columns": len(cell.columns),
                         "core_degrees_float": cell.degrees,
                     }
                 )
@@ -723,7 +798,9 @@ def write_cells(path: Path, cells: list[RowCell]) -> None:
             )
 
 
-def save_matrix(path: Path, matrix: csr_array, budget: np.ndarray, cells: list[RowCell]) -> None:
+def save_matrix(
+    path: Path, matrix: csr_array, budget: np.ndarray, cells: list[RowCell]
+) -> None:
     """The program's integer bytes, so a later solve need not re-sweep."""
     np.savez_compressed(
         path,
@@ -737,6 +814,7 @@ def save_matrix(path: Path, matrix: csr_array, budget: np.ndarray, cells: list[R
         half_tangent_p=np.array([cell.half_tangent.numerator for cell in cells], object),
         half_tangent_q=np.array([cell.half_tangent.denominator for cell in cells], object),
         inside=np.array([cell.inside for cell in cells], bool),
+        meets=np.array([cell.meets for cell in cells], bool),
     )
 
 
@@ -753,6 +831,7 @@ def load_matrix(path: Path) -> tuple[csr_array, np.ndarray, list[RowCell]]:
         ps = list(bundle["half_tangent_p"])
         qs = list(bundle["half_tangent_q"])
         inside = [bool(v) for v in bundle["inside"]]
+        meets = [bool(v) for v in bundle["meets"]]
     empty = np.empty(0, np.int32)
     cells = [
         RowCell(
@@ -766,6 +845,7 @@ def load_matrix(path: Path) -> tuple[csr_array, np.ndarray, list[RowCell]]:
             centre_y=Fraction(0),
             captured=0,
             inside=inside[i],
+            meets=meets[i],
             columns=empty,
             counts=empty,
         )
@@ -837,10 +917,12 @@ def main(argv: list[str] | None = None) -> int:
         cells = sweep(expansion, support, sample, workers=args.workers, quiet=args.quiet)
         report["sweep_seconds"] = round(time.perf_counter() - started, 1)
         report["rows_swept"] = len(cells)
-        replay = cast(dict[str, Any], json.loads(args.replay.read_text(encoding="utf-8")))
-        report["K2_replay"] = replay_control(cells, replay)
-        control = [cell.row for cell in cells[:: max(len(cells) // max(args.control_rows, 1), 1)]]
-        report["K3_translator"] = translator_control(expansion, cells, control[: args.control_rows])
+        text = args.replay.read_text(encoding="utf-8")
+        report["K2_replay"] = replay_control(cells, cast(dict[str, Any], json.loads(text)))
+        wanted = max(args.control_rows, 1)
+        stride = max(len(cells) // wanted, 1)
+        control = [cell.row for cell in cells[::stride]][:wanted]
+        report["K3_translator"] = translator_control(expansion, cells, control)
         matrix, budget = build_matrix(cells, support)
         if args.cells is not None:
             write_cells(args.cells, cells)
@@ -849,10 +931,18 @@ def main(argv: list[str] | None = None) -> int:
 
     report["K4_artifact"] = artifact_control(matrix, budget, support, expansion, cells)
     outside = [cell.row for cell in cells if not cell.inside]
+    detached = [cell.row for cell in cells if not cell.meets]
     report["K5_envelope"] = {
         "rows": len(cells),
-        "outside": len(outside),
-        "examples": outside[:8],
+        "midpoint_outside": len(outside),
+        "cell_detached_from_envelope": len(detached),
+        "detached_examples": detached[:8],
+        "note": (
+            "the sweep window is the artifact's own and takes a boundary cell whole, so a "
+            "cell's midpoint can lie outside the parent-centre envelope; a detached row is "
+            "one whose minimising cell meets the envelope in measure zero, and only there "
+            "is the constraint the artifact's window rather than its envelope"
+        ),
     }
     report["captured_sites"] = {
         "least": min((cell.captured for cell in cells), default=0),
@@ -874,6 +964,10 @@ def main(argv: list[str] | None = None) -> int:
         )
         restricted = solve(matrix, budget, expansion.weight_denominator, columns=live)
         report["lp_positive_orbits_only"] = _report_solution("positive orbits", restricted)
+        if detached:
+            keep = np.array([i for i, cell in enumerate(cells) if cell.meets], np.int64)
+            legal = solve(matrix[keep, :], budget, expansion.weight_denominator)
+            report["lp_envelope_cells_only"] = _report_solution("envelope cells", legal)
         report["H239_dual"] = dual_histogram(cells, full["duals"])
         report["headroom"] = {
             "artifact_normalised_mass": report["K4_artifact"]["normalised_mass"],
@@ -894,7 +988,7 @@ def main(argv: list[str] | None = None) -> int:
         args.report.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     print(
         json.dumps(
-            {k: v for k, v in report.items() if k not in {"lp_full", "lp_positive_orbits_only"}},
+            {k: v for k, v in report.items() if not k.startswith("lp_")},
             indent=2,
         )
     )

@@ -1,0 +1,33 @@
+# exp-224 (H-U2): n = 19 at ten times the exp-202 budget.
+#
+# Written before the sweep ran. It is exp-202's round-1 part-1 plan with one arm, one
+# cell, and budget_pair_tests multiplied by ten. Nothing else changed.
+#
+# Why this arm and not the long-schedule one. exp-202 ran a 2x2 factorial in (schedule
+# length) x (collective move) at n = 19. The stock-schedule collective arm B-perturb was
+# the only one that left the grid on any seed (median 4.984417, best 4.958948); the
+# long-schedule collective arm B-perturb-slow returned 5.000000 on all five. Depth per
+# anneal is therefore measured to be the WRONG lever at this cell, and restarts are the
+# right one, so the tenfold budget is spent at the stock schedule where it buys ten
+# times as many restarts rather than ten times longer anneals.
+#
+# Budget: 1.25e10 pair tests per chain, 8 chains, so 1e11 per seed -- ten times
+# exp-202's 1e10. The budget is enforced at restart granularity, so the delivered figure
+# overshoots by up to one anneal and is recorded per run in the archive.
+#
+# threads is 2 rather than exp-202's 3 because this lane is capped at about two of four
+# shared cores. sqsearch keys its RNG on (seed, chain) alone -- Rng::keyed(seed, chain)
+# in sqsearch/src/search.rs -- so the thread count changes the wall clock and nothing
+# about the numbers. That was checked rather than assumed: a fresh single run at
+# n = 19, seed 1, 1.25e9 per chain, threads 2, at engine commit c6a7ea190 returned
+# 4.971854791864539, and exp-202's archived seed-1 pose at commit 9ae7700 with threads 3
+# reads 4.971854791865.
+label: exp-224-n19-10x
+engine: sqsearch/target/release/sqsearch
+budget_pair_tests: 12500000000
+chains: 8
+threads: 2
+cells: [19]
+seeds: [1, 2, 3, 4, 5]
+arms:
+  B-perturb: ["--p-perturb", "1.0", "--perturb-scale", "2"]
