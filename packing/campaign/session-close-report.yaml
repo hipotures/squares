@@ -2499,7 +2499,7 @@ sessions:
   codex_receipts: []
 - id: session-151
   title: "A Deep Low-n Review, the Efficiency Block OR-12 Was Overdue, and What the Research Block Decided"
-  status: in_progress
+  status: stopped
   primary_bead: think-gvlg
   phases: 4
   measured: true
