@@ -1,0 +1,33 @@
+{
+  "source": "/home/user/squares/packing/resources/web/n17-kleddamag-certified-bound-2026-09-21/kleddamag-17-squares-certified-bound/global-certificate.json",
+  "source_sha256": "0288aaac680131aa675adb63ea6a67e3d363fcca6061d4c788301da7c5d69cec",
+  "structure": {
+    "available_point_orbits": 1134,
+    "positive_point_orbits": 852,
+    "physical_sites": 8988,
+    "positive_sites": 6744,
+    "threshold_orbits": 253,
+    "physical_triples": 2008,
+    "point_budget_units": 14640116080,
+    "threshold_budget_units": 2358311276,
+    "total_budget_units": 16998427356
+  },
+  "core_side_band": [
+    "17222913506866278366600017442224375944783077159199/17251090982558979015112715291272840801000000000000",
+    "392274404235301509353271379462242479024485262216379657/392853403757170308517924585309722853620343000000000000"
+  ],
+  "catalogue_rows": 7853,
+  "direction_steps": 288,
+  "square_side": "17222913506866278366600017442224375944783077159199/17251090982558979015112715291272840801000000000000",
+  "total_budget": "4249606839/250000000",
+  "containment_product": "2483666530936410639104073941492716899877559299685866227293/2484157101488492978176231001943289075344000000000000000000",
+  "emitted_atoms": 6744,
+  "emitted_threshold_atoms": 2008,
+  "restricted_replay_control": {
+    "rows_recomputed": 24,
+    "rows_available": 7853,
+    "sampled_minimum_units": 1000020517,
+    "declared_minimum_units": 1000020517,
+    "seconds": 7.7
+  }
+}

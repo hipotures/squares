@@ -1,0 +1,56 @@
+{
+ "tool": "devtools.measure_interval_stalls",
+ "source": "campaign/series/series-000-smoke-and-calibration/results/agenda-039/n29-548-100-auto-windows5-certificate.json",
+ "mode": "condition5",
+ "enclose": false,
+ "n": 29,
+ "outer_side": "137/25",
+ "atoms": 1329,
+ "accepted": false,
+ "failures": [
+  "Condition 5 every admissible centre covers mass 1"
+ ],
+ "conditions": [
+  {
+   "name": "Condition 2 total mass below n",
+   "status": "holds",
+   "detail": "total 52081879/2000000 against n = 29, exact integers"
+  },
+  {
+   "name": "Condition 3 net reaches pi/4",
+   "status": "holds",
+   "detail": "t_K^2 + 2 t_K - 1 in [1.238e-06, 1.238e-06]"
+  },
+  {
+   "name": "Condition 4 containment B(1 + D) < 1",
+   "status": "holds",
+   "detail": "B(1 + D) in [0.999983211645, 0.999983211645]"
+  },
+  {
+   "name": "Condition 5 every admissible centre covers mass 1",
+   "status": "undecided",
+   "detail": "363 directions, 4890517 boxes, 272 stalled, 0 budget-exhausted; least point mass 4000013/4000000 at 0"
+  }
+ ],
+ "directions_searched": 363,
+ "boxes": 4890517,
+ "stalled": 272,
+ "budget_exhausted": 0,
+ "enclosure": [
+  "398409/400000",
+  "4000013/4000000"
+ ],
+ "enclosure_has_width": true,
+ "unsettled_directions": [
+  {
+   "direction": "0",
+   "status": "undecided",
+   "boxes": 18183,
+   "stalled": 272,
+   "budget_exhausted": false,
+   "lower": "398409/400000",
+   "upper": "4000013/4000000"
+  }
+ ],
+ "wall_seconds": 186.3
+}

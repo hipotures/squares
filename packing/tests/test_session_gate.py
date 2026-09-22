@@ -296,6 +296,52 @@ def test_an_absent_commit_in_a_shallow_checkout_is_uncheckable_not_false(
     assert _run(monkeypatch, tmp_path / "sessions", shallow) == 0
 
 
+def test_a_severed_ancestor_in_a_shallow_checkout_is_uncheckable_not_false(
+    monkeypatch, tmp_path
+) -> None:
+    """The reading that looks like evidence: present, a real ancestor, and unreachable.
+
+    A shallow clone grafts HEAD's parents away, so `merge-base --is-ancestor` stops at the
+    boundary and reports a commit it can see -- fetched here as the tip of a merged branch
+    -- as not being behind HEAD. Git says `orphaned` and the truth is `reachable`, which
+    `--unshallow` then confirms. Eleven declarations failed this way on a remote-session
+    clone with nothing wrong with any of them (`think-qsn2`).
+    """
+    origin = _repository(tmp_path / "origin")
+    _git(origin, "checkout", "--quiet", "-b", "merged")
+    (origin / "merged.txt").write_text("merged", encoding="utf-8")
+    _git(origin, "add", "-A")
+    _git(origin, "commit", "--quiet", "-m", "merged work")
+    ancestor = _git(origin, "rev-parse", "HEAD")
+    _git(origin, "checkout", "--quiet", "main")
+    _git(origin, "merge", "--quiet", "--no-ff", "-m", "merge", "merged")
+    shallow = tmp_path / "shallow"
+    _git(
+        tmp_path,
+        "clone",
+        "--quiet",
+        "--depth",
+        "1",
+        "--no-single-branch",
+        f"file://{origin}",
+        str(shallow),
+    )
+    _record(
+        tmp_path / "sessions",
+        "session-999",
+        status="completed",
+        checks=_checks(f"full gate: fast at {ancestor}: passed"),
+    )
+
+    assert history_state(shallow) == "shallow"
+    assert commit_state(shallow, ancestor) == "orphaned"
+    assert _run(monkeypatch, tmp_path / "sessions", shallow) == 0
+
+    _git(shallow, "fetch", "--quiet", "--unshallow")
+    assert history_state(shallow) == "complete"
+    assert commit_state(shallow, ancestor) == "reachable"
+
+
 def test_a_tree_with_no_git_history_leaves_ancestry_unresolved(monkeypatch, tmp_path) -> None:
     """The negative-control sandbox is a source snapshot with no `.git`, and so is a tarball.
 

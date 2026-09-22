@@ -64,6 +64,44 @@ syntax errors by anything older.
 correct. A report that they do not parse is a report that the wrong interpreter was used
 — see [`D-397`](defects.md), and `OR-2` for the three occurrences before it.
 
+### A fresh clone
+
+Five things have to be true before any gate can run, and the gate checks none of them.
+A remote-session clone on 2026-09-22 had all five false, and the edit tier came back
+three steps red with every message pointing somewhere other than the cause.
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR="$HOME/.local/bin" sh
+uv python install 3.14.7                  # what packing/.python-version pins
+git fetch --unshallow                     # remote-session clones arrive shallow
+git submodule update --init --recursive
+make hooks-install                        # npm ci, then the git hooks
+```
+
+Run `python3 -m devtools.check_bootstrap` from `packing/` to see which of the five are
+already true; it prints the remedy for each one that is not, repairs nothing, and runs
+under whatever `python3` the machine has, because a missing project interpreter is one
+of the five things it reports.
+
+Why each, since the failure it prevents never appears where it is caused:
+
+- **uv before the interpreter.** uv’s download index is compiled in, so an old uv cannot
+  install a new CPython at all.
+  0.8.17 stops at `cpython-3.14.0rc2` and answers `uv python install 3.14.7` with “No
+  download found for request”; `uv sync` then reports “No interpreter found for Python
+  3.14.7”, which reads as a complaint about this repository.
+  `uv self update` is not the way out — it asks the GitHub releases API and is
+  rate-limited from a session proxy.
+- **History before provenance.** A shallow clone makes `check_provenance` refuse
+  recorded engine commits and leaves `check_session_gate` unable to decide the ancestry
+  of a declared gate commit.
+  Neither is a fact about the record.
+- **The submodule before `uv sync`.** `vendor/kpress` is a declared workspace member, so
+  an unchecked-out submodule makes uv report that it “does not appear to be a Python
+  project”.
+- **`npm ci` before the browser floor**, which asks for pinned binaries under
+  `node_modules/.bin` rather than for anything on `PATH`.
+
 The repository is mostly prose.
 The only repo-wide tooling is Markdown formatting and the browser floor.
 

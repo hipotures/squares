@@ -36,6 +36,7 @@ from __future__ import annotations
 
 import itertools
 import math
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Literal
@@ -171,9 +172,15 @@ class Register:
     policy: Policy
     tiers: tuple[TierBudget, ...]
     path: Path | None = None
+    #: The CI gates whose hosted jobs are clocked by the same rules (`OR-17`). Empty in a
+    #: register that predates them, which is why it has a default.
+    ci_gates: tuple[CiGate, ...] = ()
 
     def tier(self, tier_id: str) -> TierBudget | None:
         return next((tier for tier in self.tiers if tier.id == tier_id), None)
+
+    def ci_gate(self, gate_id: str) -> CiGate | None:
+        return next((gate for gate in self.ci_gates if gate.id == gate_id), None)
 
     @property
     def ids(self) -> tuple[str, ...]:
@@ -378,7 +385,15 @@ def load(path: Path | None = None) -> Register:
     duplicates = sorted({tier.id for tier in tiers if [t.id for t in tiers].count(tier.id) > 1})
     if duplicates:
         raise BudgetError(f"tiers declared more than once: {', '.join(duplicates)}")
-    return Register(policy=policy, tiers=tiers, path=source)
+    raw_gates = document.get("ci_gates")
+    if raw_gates is not None and not isinstance(raw_gates, list):
+        raise BudgetError("ci_gates must be a list of gates, or absent")
+    gates = tuple(_ci_gate_from(raw, index) for index, raw in enumerate(raw_gates or []))
+    gate_ids = [gate.id for gate in gates]
+    repeated = sorted({gate.id for gate in gates if gate_ids.count(gate.id) > 1})
+    if repeated:
+        raise BudgetError(f"ci gates declared more than once: {', '.join(repeated)}")
+    return Register(policy=policy, tiers=tiers, path=source, ci_gates=gates)
 
 
 def declaration_problems(register: Register) -> list[str]:
@@ -495,6 +510,332 @@ def ratchet_problems(register: Register) -> tuple[list[str], list[str]]:
     return problems, grandfathered
 
 
+# ---------------------------------------------------------------------------
+# CI gates. The same register, the same four rules, a hosted job's wall instead
+# of a local tier's. `OR-17` is why this exists: a tier that leaves the fast
+# surface stops being clocked by anything, and the deep gate reached 2674s
+# against its own declared 1943.05s with no rule reading either number.
+# ---------------------------------------------------------------------------
+
+#: What a CI gate's size verdict does to the run. Absent means `enforcing`.
+CI_ENFORCEMENT = ("enforcing", "reporting")
+#: A bead alias, the only thing a reporting-only gate may name as its tracker. The same
+#: shape `check_pr_wall` requires of an advisory pull-request wall, for the same reason:
+#: a relaxation with no bead behind it is a permanent one.
+CI_TRACKING_BEAD = r"think-[a-z0-9]{4}"
+
+
+@dataclass(frozen=True)
+class CiReference:
+    """The runner a CI job's recorded wall was measured on.
+
+    `Reference` pins a local tier to `--jobs`, `--inner-jobs` and a core count. A hosted
+    job has none of those to vary: the workflow fixes its flags, so what is left to
+    disagree about is the runner label the job asked for. `cpus` is recorded for the
+    argument rather than matched, because the jobs API reports the label and not the
+    machine behind it.
+    """
+
+    runner: str
+    cpus: int
+
+    def matches(self, *, runner: str) -> bool:
+        return self.runner == runner
+
+    def describe(self) -> str:
+        return f"{self.runner}, {self.cpus} cpus"
+
+
+@dataclass(frozen=True)
+class CiJobBudget:
+    """One hosted job's declared ceiling and the wall that justifies it.
+
+    Deliberately the same five fields a `pages:` job entry carries, plus the history and
+    attribution a `tiers:` entry carries, so the ratchet rule reaches these too.
+    """
+
+    id: str
+    ceiling_seconds: float
+    argument: str
+    measured_seconds: float | None = None
+    measured_on: str | None = None
+    measured_where: str | None = None
+    #: Observed max/min across the readings behind `measured_seconds`. Recorded because a
+    #: hosted band has to be argued against the runner's own spread, not against a local
+    #: tier's; `None` when one reading is all there is, which is itself worth seeing.
+    spread: float | None = None
+    history: tuple[Record, ...] = ()
+    attribution: Attribution | None = None
+
+    @property
+    def records(self) -> tuple[Record, ...]:
+        """Every record this job has held, oldest first, ending with the current one."""
+        if self.measured_seconds is None or self.measured_on is None:
+            return self.history
+        current = Record(
+            self.measured_seconds, self.measured_on, self.measured_where, self.attribution
+        )
+        return (*self.history, current)
+
+    @property
+    def headroom(self) -> float | None:
+        if self.measured_seconds is None:
+            return None
+        return self.ceiling_seconds / self.measured_seconds
+
+
+@dataclass(frozen=True)
+class CiGate:
+    """One workflow's jobs and its whole wall, under one declared band."""
+
+    id: str
+    file: str
+    aggregate: str
+    selected_by: str
+    reference: CiReference
+    #: The band this gate's walls are held to, in place of `policy.drift_ratio`. A hosted
+    #: runner is noisier than the box a local tier is measured on, and the entry says in
+    #: the register what spread it was chosen against.
+    drift_ratio: float
+    enforcement: str
+    argument: str
+    #: The gate's complete wall, same shape as a job so the same rules apply to it.
+    wall: CiJobBudget
+    jobs: tuple[CiJobBudget, ...]
+    tracking_bead: str | None = None
+    reporting_reason: str | None = None
+
+    def job(self, job_id: str) -> CiJobBudget | None:
+        return next((job for job in self.jobs if job.id == job_id), None)
+
+    @property
+    def ids(self) -> tuple[str, ...]:
+        return tuple(job.id for job in self.jobs)
+
+    @property
+    def reports_only(self) -> bool:
+        return self.enforcement == "reporting"
+
+
+def _ci_job_from(raw: object, where: str) -> CiJobBudget:
+    entry = _require_mapping(raw, where)
+    job_id = _text(entry.get("id"), f"{where}.id")
+    at = f"{where}[{job_id!r}]"
+    measured = _optional_positive(entry.get("measured_seconds"), f"{at}.measured_seconds")
+    measured_on = _optional_text(entry.get("measured_on"), f"{at}.measured_on")
+    if (measured is None) != (measured_on is None):
+        raise BudgetError(
+            f"{at} records a wall without a date or a date without a wall; a measurement "
+            "nobody can place is not a measurement"
+        )
+    return CiJobBudget(
+        id=job_id,
+        ceiling_seconds=_positive(entry.get("ceiling_seconds"), f"{at}.ceiling_seconds"),
+        argument=_text(entry.get("argument"), f"{at}.argument"),
+        measured_seconds=measured,
+        measured_on=measured_on,
+        measured_where=_optional_text(entry.get("measured_where"), f"{at}.measured_where"),
+        spread=_optional_positive(entry.get("spread"), f"{at}.spread"),
+        history=_history_from(entry.get("history"), at),
+        attribution=_attribution_from(entry.get("attribution"), f"{at}.attribution"),
+    )
+
+
+def _ci_gate_from(raw: object, index: int) -> CiGate:
+    entry = _require_mapping(raw, f"ci_gates[{index}]")
+    gate_id = _text(entry.get("id"), f"ci_gates[{index}].id")
+    where = f"ci gate {gate_id!r}"
+    reference = _require_mapping(entry.get("reference"), f"{where}.reference")
+    enforcement = _text(entry.get("enforcement"), f"{where}.enforcement")
+    if enforcement not in CI_ENFORCEMENT:
+        raise BudgetError(f"{where}.enforcement is {enforcement!r}; expected {CI_ENFORCEMENT}")
+    bead = _optional_text(entry.get("tracking_bead"), f"{where}.tracking_bead")
+    reason = _optional_text(entry.get("reporting_reason"), f"{where}.reporting_reason")
+    if enforcement == "reporting" and (bead is None or reason is None):
+        raise BudgetError(
+            f"{where} reports rather than enforces without naming both a `tracking_bead` "
+            "and a `reporting_reason`; a relaxation with no bead behind it is permanent"
+        )
+    if enforcement == "enforcing" and (bead is not None or reason is not None):
+        raise BudgetError(
+            f"{where} enforces and still names a reporting tracker; remove it with the "
+            "relaxation it tracked"
+        )
+    if bead is not None and re.fullmatch(CI_TRACKING_BEAD, bead) is None:
+        raise BudgetError(f"{where}.tracking_bead is {bead!r}; expected a `think-xxxx` alias")
+    raw_jobs = entry.get("jobs")
+    if not isinstance(raw_jobs, list) or not raw_jobs:
+        raise BudgetError(f"{where}.jobs must be a non-empty list")
+    jobs = tuple(_ci_job_from(item, f"{where}.jobs") for item in raw_jobs)
+    seen = [job.id for job in jobs]
+    duplicates = sorted({job.id for job in jobs if seen.count(job.id) > 1})
+    if duplicates:
+        raise BudgetError(f"{where} declares jobs more than once: {', '.join(duplicates)}")
+    wall = _require_mapping(entry.get("wall"), f"{where}.wall")
+    return CiGate(
+        id=gate_id,
+        file=_text(entry.get("file"), f"{where}.file"),
+        aggregate=_text(entry.get("aggregate"), f"{where}.aggregate"),
+        selected_by=_text(entry.get("selected_by"), f"{where}.selected_by"),
+        reference=CiReference(
+            runner=_text(reference.get("runner"), f"{where}.reference.runner"),
+            cpus=_positive_integer(reference.get("cpus"), f"{where}.reference.cpus"),
+        ),
+        drift_ratio=_positive(entry.get("drift_ratio"), f"{where}.drift_ratio"),
+        enforcement=enforcement,
+        argument=_text(entry.get("argument"), f"{where}.argument"),
+        wall=_ci_job_from({**wall, "id": "wall"}, f"{where}.wall"),
+        jobs=jobs,
+        tracking_bead=bead,
+        reporting_reason=reason,
+    )
+
+
+def ci_declaration_problems(register: Register) -> list[str]:
+    """Rule 2 and the ratchet over the CI gates, with no clock involved.
+
+    The static half of `OR-17`'s third obligation. A hosted job with no recorded wall, or
+    a ceiling with more headroom than `policy.max_headroom`, is a job that can double
+    without anything objecting -- which is exactly what `exhaustive-tier` did.
+    """
+    policy = register.policy
+    problems: list[str] = []
+    for gate in register.ci_gates:
+        label = f"ci gate {gate.id!r}"
+        if gate.drift_ratio <= 1.0:
+            problems.append(
+                f"{label}: drift_ratio is {gate.drift_ratio:g}; a band at or below the "
+                "recorded wall fails every honest run"
+            )
+        if gate.drift_ratio > policy.max_headroom:
+            problems.append(
+                f"{label}: drift_ratio is {gate.drift_ratio:g}, above "
+                f"policy.max_headroom ({policy.max_headroom:g}); a band looser than the "
+                "ceiling's own slack cannot be the thing that speaks first"
+            )
+        for job in (*gate.jobs, gate.wall):
+            at = f"{label} job {job.id!r}"
+            measured = job.measured_seconds
+            if measured is None:
+                problems.append(
+                    f"{at}: no wall is recorded, so its drift, stale and headroom rules "
+                    "are all switched off. Run `devtools.check_ci_gate_walls --sample`."
+                )
+                continue
+            if job.ceiling_seconds < measured:
+                problems.append(
+                    f"{at}: the ceiling is {job.ceiling_seconds:g}s and the recorded wall "
+                    f"is {measured:g}s, so the job is declared to fail every time it runs"
+                )
+            headroom = job.headroom
+            if headroom is not None and headroom > policy.max_headroom:
+                problems.append(
+                    f"{at}: the ceiling is {job.ceiling_seconds:g}s against a recorded "
+                    f"{measured:g}s, which is {headroom:.2f}x of headroom where "
+                    f"policy.max_headroom allows {policy.max_headroom:g}x"
+                )
+            if headroom is not None and headroom < gate.drift_ratio:
+                problems.append(
+                    f"{at}: the ceiling is {headroom:.2f}x of the record, inside the "
+                    f"gate's own {gate.drift_ratio:g}x drift band, so the ceiling would "
+                    "fail before the drift rule could name what moved"
+                )
+            found, _ = rise_findings(at, job.records, policy)
+            problems.extend(found)
+        walls = [job.measured_seconds for job in gate.jobs if job.measured_seconds is not None]
+        recorded_wall = gate.wall.measured_seconds
+        if walls and recorded_wall is not None and recorded_wall < max(walls):
+            problems.append(
+                f"{label}: the gate's wall is recorded at {recorded_wall:g}s, under its "
+                f"longest job at {max(walls):g}s; the wall is at least the longest job"
+            )
+    return problems
+
+
+def judge_ci_job(
+    register: Register,
+    gate_id: str,
+    job_id: str,
+    *,
+    wall_seconds: float,
+    steps: tuple[tuple[str, float], ...] = (),
+    runner: str,
+    force: bool = False,
+    enforce: bool = False,
+) -> Verdict:
+    """Compare one finished hosted job against the register.
+
+    `Verdict.tier` carries the job id here. The four rules are `band_findings`, the same
+    function `judge` uses, so a CI job cannot end up under a second set of bands that
+    drifts from the tiers'.
+
+    `force` overrides the runner match and `enforce` overrides a gate's declared
+    `enforcement: reporting`. Both are for a caller asking the question deliberately; the
+    register is the authority on what CI itself does with the answer.
+    """
+    top = _named_steps(steps, wall_seconds)
+    gate = register.ci_gate(gate_id)
+    if gate is None:
+        return Verdict(
+            tier=job_id,
+            wall_seconds=wall_seconds,
+            status="unknown",
+            notes=(f"no ci gate {gate_id!r} is declared in {register.path}",),
+            top_steps=top,
+        )
+    job = gate.wall if job_id == "wall" else gate.job(job_id)
+    if job is None:
+        return Verdict(
+            tier=job_id,
+            wall_seconds=wall_seconds,
+            status="unknown",
+            notes=(
+                (
+                    f"the {gate.id} gate declares no ceiling for its {job_id!r} job in "
+                    f"{register.path}; every job a gate runs needs one"
+                ),
+            ),
+            top_steps=top,
+        )
+    enforced = force or gate.reference.matches(runner=runner)
+    failures, notes = band_findings(
+        subject=f"the {gate.id} gate's {job.id!r} job",
+        wall_seconds=wall_seconds,
+        ceiling_seconds=job.ceiling_seconds,
+        measured_seconds=job.measured_seconds,
+        shape=gate.reference.describe(),
+        policy=register.policy,
+        attribution=_attribution(steps, wall_seconds),
+        register_path=register.path,
+        drift_ratio=gate.drift_ratio,
+    )
+    if failures and not enforced:
+        notes.extend(failures)
+        notes.append(
+            f"this job ran on {runner!r}; the {gate.id} gate's band is declared for "
+            f"{gate.reference.describe()}, so the run above is reported and not failed"
+        )
+        failures = []
+    if failures and gate.reports_only and not enforce:
+        notes.extend(failures)
+        notes.append(
+            f"the {gate.id} gate reports rather than enforces under {gate.tracking_bead}: "
+            f"{gate.reporting_reason}"
+        )
+        failures = []
+    return Verdict(
+        tier=job.id,
+        wall_seconds=wall_seconds,
+        status="failed" if failures else ("passed" if enforced else "reported"),
+        enforced=enforced and (enforce or not gate.reports_only),
+        ceiling_seconds=job.ceiling_seconds,
+        measured_seconds=job.measured_seconds,
+        failures=tuple(failures),
+        notes=tuple(notes),
+        top_steps=top,
+    )
+
+
 def _named_steps(
     steps: tuple[tuple[str, float], ...], wall: float
 ) -> tuple[tuple[str, float], ...]:
@@ -518,6 +859,66 @@ def _attribution(steps: tuple[tuple[str, float], ...], wall: float) -> str:
         for name, seconds in named
     ]
     return "; ".join(parts)
+
+
+def band_findings(
+    *,
+    subject: str,
+    wall_seconds: float,
+    ceiling_seconds: float,
+    measured_seconds: float | None,
+    shape: str,
+    policy: Policy,
+    attribution: str,
+    register_path: Path | None,
+    drift_ratio: float | None = None,
+) -> tuple[list[str], list[str]]:
+    """Rules 1, 3 and 4 over one wall, as `(failures, notes)`.
+
+    The one place the four rules are written, so a surface that clocks something other
+    than a local tier -- `judge_ci_job` clocks a hosted job -- is held to the same bands
+    rather than to a second copy of them that drifts from this one. `drift_ratio`
+    overrides `policy.drift_ratio` for a surface whose noise the policy figure was not
+    measured on; nothing else is overridable, because a per-entry stale ratio or headroom
+    is a tier declaring its own policy, which is what `policy` exists to prevent.
+    """
+    failures: list[str] = []
+    notes: list[str] = []
+    drift = policy.drift_ratio if drift_ratio is None else drift_ratio
+    if wall_seconds > ceiling_seconds:
+        failures.append(
+            f"{subject} ran {wall_seconds:.1f}s against a "
+            f"{ceiling_seconds:g}s ceiling: {attribution}"
+        )
+    if measured_seconds is None:
+        notes.append(
+            f"no cost is recorded for {subject} at {shape}; "
+            f"write `measured_seconds: {wall_seconds:.1f}` into {register_path} to arm the "
+            "drift rule"
+        )
+    elif wall_seconds < policy.min_wall_seconds:
+        notes.append(
+            f"{wall_seconds:.1f}s is under the {policy.min_wall_seconds:g}s noise floor, so "
+            "the drift and stale rules were not applied"
+        )
+    else:
+        if wall_seconds > drift * measured_seconds:
+            failures.append(
+                f"{subject} ran {wall_seconds:.1f}s against a recorded "
+                f"{measured_seconds:g}s ({wall_seconds / measured_seconds:.2f}x, where "
+                f"{drift:g}x fails): {attribution}"
+            )
+        if wall_seconds < policy.stale_ratio * measured_seconds:
+            tightened = min(ceiling_seconds, wall_seconds * policy.max_headroom)
+            failures.append(
+                f"{subject} ran {wall_seconds:.1f}s against a recorded "
+                f"{measured_seconds:g}s, which is "
+                f"{wall_seconds / measured_seconds:.2f}x. The record is "
+                f"stale in the flattering direction, which is how a ceiling stops "
+                f"detecting anything. Write `measured_seconds: {wall_seconds:.1f}` and "
+                f"`ceiling_seconds: {tightened:.0f}` into {register_path}."
+            )
+    return failures, notes
 
 
 def judge(
@@ -563,43 +964,18 @@ def judge(
 
     enforced = force or tier.reference.matches(jobs=jobs, inner_jobs=inner_jobs, cpus=cpus)
     policy = register.policy
-    failures: list[str] = []
-    notes: list[str] = []
     attribution = _attribution(steps, wall_seconds)
-
-    if wall_seconds > tier.ceiling_seconds:
-        failures.append(
-            f"the {tier.id} tier ran {wall_seconds:.1f}s against a "
-            f"{tier.ceiling_seconds:g}s ceiling: {attribution}"
-        )
     measured = tier.measured_seconds
-    if measured is None:
-        notes.append(
-            f"no cost is recorded for the {tier.id} tier at {tier.reference.describe()}; "
-            f"write `measured_seconds: {wall_seconds:.1f}` into {register.path} to arm the "
-            "drift rule"
-        )
-    elif wall_seconds < policy.min_wall_seconds:
-        notes.append(
-            f"{wall_seconds:.1f}s is under the {policy.min_wall_seconds:g}s noise floor, so "
-            "the drift and stale rules were not applied"
-        )
-    else:
-        if wall_seconds > policy.drift_ratio * measured:
-            failures.append(
-                f"the {tier.id} tier ran {wall_seconds:.1f}s against a recorded "
-                f"{measured:g}s ({wall_seconds / measured:.2f}x, where "
-                f"{policy.drift_ratio:g}x fails): {attribution}"
-            )
-        if wall_seconds < policy.stale_ratio * measured:
-            tightened = min(tier.ceiling_seconds, wall_seconds * policy.max_headroom)
-            failures.append(
-                f"the {tier.id} tier ran {wall_seconds:.1f}s against a recorded "
-                f"{measured:g}s, which is {wall_seconds / measured:.2f}x. The record is "
-                f"stale in the flattering direction, which is how a ceiling stops "
-                f"detecting anything. Write `measured_seconds: {wall_seconds:.1f}` and "
-                f"`ceiling_seconds: {tightened:.0f}` into {register.path}."
-            )
+    failures, notes = band_findings(
+        subject=f"the {tier.id} tier",
+        wall_seconds=wall_seconds,
+        ceiling_seconds=tier.ceiling_seconds,
+        measured_seconds=measured,
+        shape=tier.reference.describe(),
+        policy=policy,
+        attribution=attribution,
+        register_path=register.path,
+    )
 
     if failures and not enforced:
         notes.extend(failures)

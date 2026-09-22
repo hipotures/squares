@@ -1,0 +1,8 @@
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-225-n27-548-100-bump103-certificate.json: mode condition5, 363 directions, 2707989 boxes, 0 stalled, accepted=True enclosure=['1', '4120021/4000000'] (116.2s)
+  holds     Condition 2 total mass below n
+  holds     Condition 3 net reaches pi/4
+  holds     Condition 4 containment B(1 + D) < 1
+  holds     Condition 5 every admissible centre covers mass 1
+  NOT A RETENTION GATE: devtools.decide_certificate decides these bytes.
+EXIT:0 wall_s:117

@@ -1,0 +1,64 @@
+{
+  "conclusion": {
+    "bounded_side": "955000*sqrt(2073600042893309449)/359341754646249",
+    "bounded_side_defining_polynomial": "129126496632245014779129770001*x^2 - 1891175079119770550224225000000",
+    "bounded_side_squared": "1891175079119770550224225000000/129126496632245014779129770001",
+    "decimal": "3.826997548829544",
+    "endpoint_certificate": false,
+    "relation": ">="
+  },
+  "proof": {
+    "density_step": "for every real x below bounded_side, rational density supplies q with x / outer_side < q < factor_supremum",
+    "embedding_step": "a packing at side x embeds in the larger side q * outer_side, contradicting that strict-subfactor no-fit proof",
+    "endpoint_status": "the dilation-limit theorem establishes s(11) >= 955000*sqrt(2073600042893309449)/359341754646249; at the factor supremum the sharpened containment inequality is equality, so endpoint_certificate is false because the proof supplies no individual certificate at that side; the method does not establish s(11) > 955000*sqrt(2073600042893309449)/359341754646249",
+    "order_step": "equivalently, s(n) is at least every strict rational subbound and therefore at least their real supremum",
+    "requires_compactness": false,
+    "strict_family": "for every rational q > 0 with q^2 below factor_supremum_squared, the sharpened containment theorem and the scaled source data rule out a packing at side q * outer_side"
+  },
+  "schema": "packing.squares:FractionalDilationLimitCorollary/v3",
+  "sharpened_containment": {
+    "gap_domain": "0 <= t <= D = 207107/1440000000 < 1",
+    "identity": "cos(d) + sin(d) = (1 + t) / sqrt(1 + t^2), where t = tan(d)",
+    "monotonicity_identity": "(1 + D)^2(1 + t^2) - (1 + t)^2(1 + D^2) = 2(D - t)(1 - Dt) >= 0",
+    "source_gap_below_one": true,
+    "strict_factor_test": "q^2 * 1594154279410432281223824321/1600000000000000000000000000 < 2073600042893309449/2073600000000000000",
+    "strict_factor_test_left_multiplier": "1594154279410432281223824321/1600000000000000000000000000",
+    "strict_factor_test_right": "2073600042893309449/2073600000000000000"
+  },
+  "source": {
+    "accepted_conditions": [
+      "Condition 1 atoms carry the declared symmetry",
+      "Condition 1' threshold atoms carry the declared symmetry",
+      "Condition 2' total budget below n",
+      "Condition 3 net reaches pi/4",
+      "Condition 4 containment B(1 + D) < 1",
+      "Condition 5' every reachable cell is charged at least 1"
+    ],
+    "certificate": "exp-226-n11-threshold-191-50-net2880",
+    "coarse_containment": "39926861627361/40000000000000",
+    "half_gap_tangent": "207107/1440000000",
+    "minimum_cell_charge": "1",
+    "n": 11,
+    "outer_side": "191/50",
+    "point_atoms": 584,
+    "sha256": "fefcf8ac23456442f855b5bb9188fc16db3b2bf5380e0e0bd1f472ba17665219",
+    "square_side": "249507/250000",
+    "threshold_atoms": 320,
+    "total_budget": "5483661432/498684619",
+    "variant": "threshold"
+  },
+  "strict_dilation_family": {
+    "factor_domain": "q in Q with q > 0 and q^2 < 129600002680831840562500000000/129126496632245014779129770001",
+    "factor_supremum": "250000*sqrt(2073600042893309449)/359341754646249",
+    "factor_supremum_decimal": "1.001831819065326",
+    "factor_supremum_defining_polynomial": "129126496632245014779129770001*x^2 - 129600002680831840562500000000",
+    "factor_supremum_irrational": true,
+    "factor_supremum_squared": "129600002680831840562500000000/129126496632245014779129770001",
+    "invariants": [
+      "Conditions 1 and 1' D4 symmetry of the point and threshold atoms is equivariant under common scaling",
+      "Conditions 2' and 3 (total budget and direction net) are unchanged",
+      "Condition 5' charge is preserved by inverse dilation of placements: a core's trace on each threshold atom's scaled points is unchanged"
+    ],
+    "scaled_containment_test": "q^2 B^2 (1 + D)^2 < 1 + D^2; this rational inequality is equivalent to strict geometric containment"
+  }
+}

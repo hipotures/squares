@@ -1,0 +1,85 @@
+{
+  "source": "/home/user/squares/packing/resources/web/n17-kleddamag-certified-bound-2026-09-21/kleddamag-17-squares-certified-bound/global-certificate.json",
+  "source_sha256": "0288aaac680131aa675adb63ea6a67e3d363fcca6061d4c788301da7c5d69cec",
+  "structure": {
+    "available_point_orbits": 1134,
+    "positive_point_orbits": 852,
+    "physical_sites": 8988,
+    "positive_sites": 6744,
+    "threshold_orbits": 253,
+    "physical_triples": 2008,
+    "point_budget_units": 14640116080,
+    "threshold_budget_units": 2358311276,
+    "total_budget_units": 16998427356
+  },
+  "core_side_band": [
+    "17222913506866278366600017442224375944783077159199/17251090982558979015112715291272840801000000000000",
+    "392274404235301509353271379462242479024485262216379657/392853403757170308517924585309722853620343000000000000"
+  ],
+  "catalogue_rows": 7853,
+  "direction_steps": 1440,
+  "square_side": "17222913506866278366600017442224375944783077159199/17251090982558979015112715291272840801000000000000",
+  "total_budget": "4249606839/250000000",
+  "containment_product": "12404064710891386978265683988213957444072611743384490227293/12420785507442464890881155009716445376720000000000000000000",
+  "emitted_atoms": 6744,
+  "emitted_threshold_atoms": 2008,
+  "restricted_replay_control": {
+    "rows_recomputed": 24,
+    "rows_available": 7853,
+    "sampled_minimum_units": 1000020517,
+    "declared_minimum_units": 1000020517,
+    "seconds": 20.6
+  },
+  "unrestricted_witness_control": [
+    {
+      "row": 6512,
+      "half_tangent": "706027763/1920000000",
+      "core_side": "39345026614694153242696023911474166186555695292511/39406234221306835264272925561214707489000000000000",
+      "centre": [
+        "55461420073805525484422518176651040033976784707489/78812468442613670528545851122429414978000000000000",
+        "109373/50000"
+      ],
+      "centre_float": [
+        0.7037137799355832,
+        2.18746
+      ],
+      "core_admissible_in_container": true,
+      "parent_centre_envelope": "1325302289930959948369307/1883149976114144856200000",
+      "outside_envelope_by": 5.5068398899381675e-05,
+      "captured_sites": 561,
+      "point_units": 822915871,
+      "triple_units": 176221844,
+      "charge": "199827543/200000000",
+      "charge_float": 0.999137715,
+      "budget_over_n": "4249606839/4250000000",
+      "budget_over_n_float": 0.9999074915294117,
+      "shortfall_against_budget_over_n": "13086201/17000000000",
+      "no_rescaling_saves_it": true
+    },
+    {
+      "row": 6237,
+      "half_tangent": "110388031/320000000",
+      "core_side": "66367836564543952399541539388782645762773089111/66475414792353877248581673576910889000000000000",
+      "centre": [
+        "93171613247125411030020556949079524273066910889/132950829584707754497163347153821778000000000000",
+        "109373/50000"
+      ],
+      "centre_float": [
+        0.7007975319760034,
+        2.18746
+      ],
+      "core_admissible_in_container": true,
+      "parent_centre_envelope": "6254785754943729407831/8924053300879874600000",
+      "outside_envelope_by": 9.314449799676427e-05,
+      "captured_sites": 580,
+      "point_units": 841246542,
+      "triple_units": 184192062,
+      "charge": "256359651/250000000",
+      "charge_float": 1.025438604,
+      "budget_over_n": "4249606839/4250000000",
+      "budget_over_n_float": 0.9999074915294117,
+      "shortfall_against_budget_over_n": "-27126807/1062500000",
+      "no_rescaling_saves_it": false
+    }
+  ]
+}

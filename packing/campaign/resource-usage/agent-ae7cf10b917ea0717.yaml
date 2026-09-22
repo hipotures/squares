@@ -1,0 +1,713 @@
+softschema:
+  contract: packing.squares:ClaudeEfficiencyRollup/v1
+  schema: ../schemas/claude-efficiency-rollup.schema.yaml
+  envelope: rollup
+  status: enforced
+rollup:
+  source:
+    harness: claude-code
+    filename: agent-ae7cf10b917ea0717.jsonl
+    sha256: 27a79d8c04d68114d352697bcce515c82319406924b0ac1a49c718e57ec1bcbe
+    bytes: 1823356
+    records: 400
+    session_id: 216fe0a3-88ed-5da5-baf4-c4d6171928f3
+    harness_versions:
+    - 2.1.278
+  span:
+    started_at: '2026-09-22T06:20:09.907Z'
+    ended_at: '2026-09-22T07:43:21.603Z'
+    wall_seconds: 4991.696
+  turns:
+    assistant: 167
+    sidechain: 167
+    by_model:
+      claude-fable-5-1: 167
+    by_thinking_level:
+      xhigh: 167
+    by_model_and_thinking_level:
+      claude-fable-5-1 @ xhigh: 167
+    by_branch:
+      claude/happy-johnson-i2ridl: 167
+    latency:
+      count: 167
+      total_seconds: 2685.121
+      median_seconds: 4.762
+      max_seconds: 480.18
+  tokens:
+    cache_creation_input_tokens: 3517818
+    cache_read_input_tokens: 44223240
+    ephemeral_1h_input_tokens: 0
+    ephemeral_5m_input_tokens: 3517818
+    input_tokens: 4960
+    output_tokens: 169105
+    thinking_tokens: 112102
+  tokens_by_thinking_level:
+    xhigh:
+      cache_creation_input_tokens: 3517818
+      cache_read_input_tokens: 44223240
+      ephemeral_1h_input_tokens: 0
+      ephemeral_5m_input_tokens: 3517818
+      input_tokens: 4960
+      output_tokens: 169105
+      thinking_tokens: 112102
+  tool_calls:
+    total: 71
+    total_seconds: 73.86
+    share_of_wall: 0.0148
+    errors: 3
+    denied: 0
+    unpaired_results: 0
+    outstanding_at_snapshot: 0
+    one_off_code:
+      count: 16
+      total_seconds: 27.101
+      median_seconds: 1.456
+      max_seconds: 3.679
+    by_tool:
+      Bash:
+        count: 69
+        total_seconds: 72.744
+        median_seconds: 1.232
+        max_seconds: 3.679
+      SubagentHandback:
+        count: 1
+        total_seconds: 1.09
+        median_seconds: 1.09
+        max_seconds: 1.09
+      ToolSearch:
+        count: 1
+        total_seconds: 0.026
+        median_seconds: 0.026
+        max_seconds: 0.026
+    by_command:
+      ls:
+        count: 5
+        total_seconds: 6.051
+        median_seconds: 1.288
+        max_seconds: 1.915
+      ls && polish && reader:
+        count: 3
+        total_seconds: 4.671
+        median_seconds: 1.51
+        max_seconds: 1.719
+      sed:
+        count: 13
+        total_seconds: 4.048
+        median_seconds: 0.116
+        max_seconds: 1.134
+      python3 && x,y && y && windows_check(L, && windows_check(L, && 25:,counts) && ls && polish && reader:
+        count: 1
+        total_seconds: 3.679
+        median_seconds: 3.679
+        max_seconds: 3.679
+      ^ && inset && python3 && x,y && y && windows_check(L, && windows_check(L,:
+        count: 1
+        total_seconds: 2.924
+        median_seconds: 2.924
+        max_seconds: 2.924
+      pipeline.sh:
+        count: 2
+        total_seconds: 2.402
+        median_seconds: 1.201
+        max_seconds: 1.213
+      python3 && x,y && y && print(auto failed,e) && windows_check(L,:
+        count: 1
+        total_seconds: 2.351
+        median_seconds: 2.351
+        max_seconds: 2.351
+      cat:
+        count: 6
+        total_seconds: 2.139
+        median_seconds: 0.082
+        max_seconds: 1.59
+      ? 'run.json && 18.00000000000006 && 17.999999999552305 && # && n && L && B && value
+        && site && converged && yaml && class && 1 && 11 && 100 && 3.8188 && 11.000000 &&
+        t025-auto-25-33-41-60 && no, && 53 && (iv) && 2 && 11 && 50 && 3.8288 && 11.000000
+        && grid, && yes && 77 && (iii) && 3 && 11 && 50 && 3.8288 && 11.000000 && certificate-seeded,
+        && no && 100 && (iii) && 4 && 12 && 100 && 3.9892 && 16.000000 && grid && no && 1681
+        && (ii) && 5 && 12 && 1000 && 3.9942 && 16.000000 && grid && no && 1702 && (ii) &&
+        6 && 12 && 100 && 3.9992 && 16.000000 && grid && no && 1723 && (ii) && 7 && 17 &&
+        5 && 4.6106 && 17.000000 && t019-seed && no && 593 && (vi) && 8 && 18 && 100 && 4.6808
+        && 18.000000 && auto-32-43-53 && no, && 693 && (iv) && same && 9 && 18 && 25 && 4.6908
+        && 18.000000 && 538 && not && 825 && (v) && 10 && 18 && 25 && 4.6908 && 18.000000
+        && 578 && not && 847 && (v) && 11 && 18 && 25 && 4.6908 && 18.000000 && 618 && no
+        && 869 && (v) && 12 && 18 && 25 && 4.6908 && 17.999999999552305, && t019-seed-auto-32-43-54,
+        && yes && 893 && (v) && run.json && 13 && 18 && 25 && 4.6908 && 18.000000 && t019-seed
+        && no, && 916 && (v) && 14 && 18 && 25 && 4.6908 && 18.000000 && t027-seed-auto-32-43-54
+        && no, && 940 && (v) && 15 && 18 && 100 && 4.7008 && 18.000000 && t019-seed-auto-32-43-53
+        && no, && 964 && (v) && 16 && 21 && 200 && 4.9965 && 25.000000 && grid && no && 1135
+        && (ii) && 17 && 26 && 100 && 5.1418 && 25.000000 && auto-36-49-60-windows5 && no,
+        && 1907 && (i) && 18 && 27 && 100 && 5.2621 && 25.000000 && auto-37-50-62-windows5
+        && no, && 1932 && (i) && 19 && 26 && 10 && 5.3122 && 25.000000 && exp-215 && no &&
+        exp-215 && (i) && 20 && 20 && 20, && 4.8612, && 20.000439, && grid && certificate-seeded
+        && no && 1205, && near-integer && X-041:267 && the && both && the && stated && at
+        && both && the && its && ceiling-reader-191-50.md:22-33). && ceiling-reader-191-50.md:30
+        && the && it && T-027 && by && n && n && n && n && n && n && n && verified && artefact
+        && a && fold && my && polished && it && provenance && only && anything && the && the
+        && identical && exact && cap-64 && orbit && a && polished && a && ls'
+      : count: 1
+        total_seconds: 2.136
+        median_seconds: 2.136
+        max_seconds: 2.136
+      ceiling-family-191-50.json && n18-467-100-t019-seed-family.json && ls && exp-218-n17-23-5-family.json && ls && polish:
+        count: 1
+        total_seconds: 2.066
+        median_seconds: 2.066
+        max_seconds: 2.066
+      ls && ls && friedman && stromquist:
+        count: 1
+        total_seconds: 2.001
+        median_seconds: 2.001
+        max_seconds: 2.001
+      python3 && print() && cp):
+        count: 1
+        total_seconds: 1.691
+        median_seconds: 1.691
+        max_seconds: 1.691
+      cd:
+        count: 1
+        total_seconds: 1.687
+        median_seconds: 1.687
+        max_seconds: 1.687
+      print(list(c.keys())) && ls && polish && reader && ps:
+        count: 1
+        total_seconds: 1.655
+        median_seconds: 1.655
+        max_seconds: 1.655
+      ps:
+        count: 1
+        total_seconds: 1.585
+        median_seconds: 1.585
+        max_seconds: 1.585
+      ls && polish && reader && python3 && or:
+        count: 1
+        total_seconds: 1.529
+        median_seconds: 1.529
+        max_seconds: 1.529
+      ? python3 && print(rounds field:, && print(d[lp_log][0]) && )[1],\n   obj,r.get(objective),conv,r.get(converged),\n   ceil,r.get(ceiling_proved),r.get(ceiling_detail))
+      : count: 1
+        total_seconds: 1.513
+        median_seconds: 1.513
+        max_seconds: 1.513
+      ? 'S && k) && V0.) && V0. && n && at && BC-365 && restricted && see && X-040 && the
+        && it && the && the && n && verified && best && gap && lower && m && shrunk && cap
+        && prize && window && reach && 10 && 3.707107 && 3.707107 && 0 && 0 && 4 && 3.9908
+        && cap && foreclosed && 1 && 11 && 3.826447 && 3.877084 && 0.050636 && 0.01323 &&
+        4 && 3.9908 && 3.8690 && +0.0426 && point && 2 && 0 && 12 && 3.96 && 4 && 0.04 &&
+        0.01010 && 4 && 3.9908 && 3.9908 && +0.0308 && 3 && 0 && 13-16 && 4 && 4 && 0 && 0
+        && 4 && 3.9908 && foreclosed && 4-7 && 17 && 4.613046 && external && 4.675530 && 0.062484
+        && 0.01355 && 5 && 4.9885 && 4.6710 && +0.0580 && 1 && 0 && 18 && 4.679 && 4.822876
+        && 0.143876 && 0.03075 && 5 && 4.9885 && 4.8216 && +0.1426 && 2 && +0.0387 && 19 &&
+        4.80 && 4.885618 && 0.085618 && 0.01784 && 5 && 4.9885 && packing && +0.0856 && 3
+        && 0 && 20 && 4.85 && 5 && 0.15 && 0.03093 && 5 && 4.9885 && 4.9885 && +0.1385 &&
+        4 && +0.0410 && 21 && 4.85 && 5 && 0.15 && 0.03093 && 5 && 4.9885 && 4.9885 && +0.1385
+        && 5 && +0.0410 && 26 && 5.123106 && 5.621320 && 0.498215 && 0.09725 && 6 && 5.9862
+        && packing && +0.4982 && 1 && +0.3756 && 27 && 5.242641 && 5.707107 && 0.464466 &&
+        0.0886 && 6 && 5.9862 && packing && +0.4645 && 2 && +0.3400 && 28 && 5.358899 && 5.824400
+        && 0.465501 && 0.0869 && 6 && 5.9862 && packing && +0.4655 && 3 && +0.3385 && Sources:
+        && n && n && n && n && n && n && what && receipt && RESULTS.md:22), && a && X-041:271
+        && window && the && window && no && the && expect && the && the && first-party &&
+        the && yield && (b) && (d) && the && nothing && P && P && boxes && enumerate && the
+        && ls'
+      : count: 1
+        total_seconds: 1.484
+        median_seconds: 1.484
+        max_seconds: 1.484
+      ls && polish && reader && run.json && ps:
+        count: 1
+        total_seconds: 1.474
+        median_seconds: 1.474
+        max_seconds: 1.474
+      print(d[placements][:3]):
+        count: 1
+        total_seconds: 1.398
+        median_seconds: 1.398
+        max_seconds: 1.398
+      python3 && show(v,ind+2) && show(v,ind+2):
+        count: 1
+        total_seconds: 1.393
+        median_seconds: 1.393
+        max_seconds: 1.393
+      depth && total && verdict && result && objective && converged && plateau && 8 && ceiling && family && refut:
+        count: 1
+        total_seconds: 1.372
+        median_seconds: 1.372
+        max_seconds: 1.372
+      ceiling-reader-191-50.md:22-33 && n-011.md:190-198). && 25 && the && polished && row:
+        count: 1
+        total_seconds: 1.369
+        median_seconds: 1.369
+        max_seconds: 1.369
+      mass && mass && m-1 && ls && polished && reader:
+        count: 1
+        total_seconds: 1.365
+        median_seconds: 1.365
+        max_seconds: 1.365
+      ls && ls && polish && reader:
+        count: 1
+        total_seconds: 1.362
+        median_seconds: 1.362
+        max_seconds: 1.362
+      C0..C3 && ls:
+        count: 1
+        total_seconds: 1.357
+        median_seconds: 1.357
+        max_seconds: 1.357
+      awk:
+        count: 1
+        total_seconds: 1.337
+        median_seconds: 1.337
+        max_seconds: 1.337
+      python3 && A6 && A5 && B4:
+        count: 1
+        total_seconds: 1.337
+        median_seconds: 1.337
+        max_seconds: 1.337
+      (grep && ls:
+        count: 1
+        total_seconds: 1.326
+        median_seconds: 1.326
+        max_seconds: 1.326
+      python3:
+        count: 1
+        total_seconds: 1.3
+        median_seconds: 1.3
+        max_seconds: 1.3
+      ls && <<EOF:
+        count: 1
+        total_seconds: 1.295
+        median_seconds: 1.295
+        max_seconds: 1.295
+      verify_ceiling:
+        count: 1
+        total_seconds: 1.252
+        median_seconds: 1.252
+        max_seconds: 1.252
+      status && claim && kill && verdict && falsifier && prediction && instrument) && ^ && ^status && blocked:
+        count: 1
+        total_seconds: 1.232
+        median_seconds: 1.232
+        max_seconds: 1.232
+      python3 && line && except:
+        count: 1
+        total_seconds: 1.212
+        median_seconds: 1.212
+        max_seconds: 1.212
+      ls && ls && fold && colgen && cutting && covering && freeze && nproc && python3:
+        count: 1
+        total_seconds: 1.183
+        median_seconds: 1.183
+        max_seconds: 1.183
+      mkdir && exit && exit:
+        count: 1
+        total_seconds: 1.107
+        median_seconds: 1.107
+        max_seconds: 1.107
+      cut:
+        count: 2
+        total_seconds: 1.079
+        median_seconds: 0.539
+        max_seconds: 0.756
+      python3 && print(\n##,p):
+        count: 1
+        total_seconds: 1.03
+        median_seconds: 1.03
+        max_seconds: 1.03
+      Theorem && Lemma && Proposition && Case:
+        count: 1
+        total_seconds: 0.477
+        median_seconds: 0.477
+        max_seconds: 0.477
+      wall && minute:
+        count: 1
+        total_seconds: 0.456
+        median_seconds: 0.456
+        max_seconds: 0.456
+    by_command_family:
+      inspection:
+        count: 36
+        total_seconds: 28.842
+        median_seconds: 0.761
+        max_seconds: 2.001
+      other:
+        count: 22
+        total_seconds: 25.602
+        median_seconds: 1.289
+        max_seconds: 2.924
+      toolchain:
+        count: 9
+        total_seconds: 15.506
+        median_seconds: 1.393
+        max_seconds: 3.679
+      shell:
+        count: 1
+        total_seconds: 1.687
+        median_seconds: 1.687
+        max_seconds: 1.687
+      filesystem:
+        count: 1
+        total_seconds: 1.107
+        median_seconds: 1.107
+        max_seconds: 1.107
+    invoked:
+      echo: 161
+      cut: 73
+      cd: 50
+      sed: 37
+      head: 37
+      grep: 30
+      tail: 30
+      ls: 28
+      cat: 19
+      the: 17
+      n: 16
+      python3: 12
+      '18': 11
+      date: 10
+      'no': 10
+      '5': 10
+      reader: 9
+      polish: 9
+      '4': 9
+      '25': 8
+      '100': 8
+      '0': 8
+      no,: 7
+      '18.000000': 7
+      (v): 7
+      '4.9885': 7
+      '4.6908': 6
+      windows_check(L,: 5
+      '11': 5
+      '12': 5
+      grid: 5
+      '3.9908': 5
+      '20': 4
+      '26': 4
+      polished: 4
+      '1': 4
+      '2': 4
+      '3': 4
+      (ii): 4
+      '6': 4
+      '25.000000': 4
+      a: 4
+      packing: 4
+      wc: 3
+      ^: 3
+      '19': 3
+      '21': 3
+      '27': 3
+      x,y: 3
+      y: 3
+      ps: 3
+      run.json: 3
+      '11.000000': 3
+      '16.000000': 3
+      '17': 3
+      '10': 3
+      (i): 3
+      it: 3
+      window: 3
+      '5.9862': 3
+      awk: 2
+      (1[0-9]: 2
+      '28': 2
+      fold: 2
+      show(v,ind+2): 2
+      verdict: 2
+      converged: 2
+      '8': 2
+      exit: 2
+      pipeline.sh: 2
+      mass: 2
+      sleep: 2
+      (iv): 2
+      '50': 2
+      '3.8288': 2
+      'yes': 2
+      (iii): 2
+      t019-seed: 2
+      not: 2
+      exp-215: 2
+      both: 2
+      at: 2
+      verified: 2
+      cap: 2
+      '3.707107': 2
+      foreclosed: 2
+      '4.85': 2
+      '0.15': 2
+      '0.03093': 2
+      '+0.1385': 2
+      '+0.0410': 2
+      P: 2
+      sort: 1
+      T-0(17: 1
+      '29': 1
+      '30': 1
+      '31': 1
+      colgen: 1
+      cutting: 1
+      covering: 1
+      freeze: 1
+      nproc: 1
+      find: 1
+      68p: 1
+      print(\n##,p): 1
+      depth: 1
+      total: 1
+      result: 1
+      objective: 1
+      plateau: 1
+      ceiling: 1
+      family: 1
+      refut: 1
+      status: 1
+      claim: 1
+      kill: 1
+      falsifier: 1
+      prediction: 1
+      instrument): 1
+      ^status: 1
+      blocked: 1
+      print(rounds field:,: 1
+      print(d[lp_log][0]): 1
+      )[1],\n   obj,r.get(objective),conv,r.get(converged),\n   ceil,r.get(ceiling_proved),r.get(ceiling_detail)): 1
+      wall: 1
+      minute: 1
+      mkdir: 1
+      print(): 1
+      cp): 1
+      A6: 1
+      A5: 1
+      B4: 1
+      friedman: 1
+      stromquist: 1
+      Theorem: 1
+      Lemma: 1
+      Proposition: 1
+      Case: 1
+      line: 1
+      except: 1
+      print(d[placements][:3]): 1
+      m-1: 1
+      ceiling-family-191-50.json: 1
+      n18-467-100-t019-seed-family.json: 1
+      exp-218-n17-23-5-family.json: 1
+      print(auto failed,e): 1
+      inset: 1
+      25:,counts): 1
+      or: 1
+      print(list(c.keys())): 1
+      (grep: 1
+      C0..C3: 1
+      ceiling-reader-191-50.md:22-33: 1
+      n-011.md:190-198).: 1
+      row: 1
+      '18.00000000000006': 1
+      '17.999999999552305': 1
+      '#': 1
+      L: 1
+      B: 1
+      value: 1
+      site: 1
+      yaml: 1
+      class: 1
+      '3.8188': 1
+      t025-auto-25-33-41-60: 1
+      '53': 1
+      grid,: 1
+      '77': 1
+      certificate-seeded,: 1
+      '3.9892': 1
+      '1681': 1
+      '1000': 1
+      '3.9942': 1
+      '1702': 1
+      '3.9992': 1
+      '1723': 1
+      '7': 1
+      '4.6106': 1
+      '17.000000': 1
+      '593': 1
+      (vi): 1
+      '4.6808': 1
+      auto-32-43-53: 1
+      '693': 1
+      same: 1
+      '9': 1
+      '538': 1
+      '825': 1
+      '578': 1
+      '847': 1
+      '618': 1
+      '869': 1
+      17.999999999552305,: 1
+      t019-seed-auto-32-43-54,: 1
+      '893': 1
+      '13': 1
+      '916': 1
+      '14': 1
+      t027-seed-auto-32-43-54: 1
+      '940': 1
+      '15': 1
+      '4.7008': 1
+      t019-seed-auto-32-43-53: 1
+      '964': 1
+      '16': 1
+      '200': 1
+      '4.9965': 1
+      '1135': 1
+      '5.1418': 1
+      auto-36-49-60-windows5: 1
+      '1907': 1
+      '5.2621': 1
+      auto-37-50-62-windows5: 1
+      '1932': 1
+      '5.3122': 1
+      20,: 1
+      4.8612,: 1
+      20.000439,: 1
+      certificate-seeded: 1
+      1205,: 1
+      near-integer: 1
+      X-041:267: 1
+      stated: 1
+      its: 1
+      ceiling-reader-191-50.md:22-33).: 1
+      ceiling-reader-191-50.md:30: 1
+      T-027: 1
+      by: 1
+      artefact: 1
+      my: 1
+      provenance: 1
+      only: 1
+      anything: 1
+      command identical: 1
+      exact: 1
+      cap-64: 1
+      orbit: 1
+      S: 1
+      k): 1
+      V0.): 1
+      V0.: 1
+      BC-365: 1
+      restricted: 1
+      see: 1
+      X-040: 1
+      best: 1
+      gap: 1
+      lower: 1
+      m: 1
+      shrunk: 1
+      prize: 1
+      reach: 1
+      '3.826447': 1
+      '3.877084': 1
+      '0.050636': 1
+      (other): 62
+    invoked_families:
+      other: 619
+      shell: 223
+      inspection: 191
+      toolchain: 12
+      filesystem: 1
+    by_shell_shape:
+      compound:
+        count: 46
+        total_seconds: 35.53
+        median_seconds: 0.478
+        max_seconds: 2.066
+      python_heredoc:
+        count: 14
+        total_seconds: 24.048
+        median_seconds: 1.453
+        max_seconds: 3.679
+      heredoc:
+        count: 5
+        total_seconds: 7.711
+        median_seconds: 1.369
+        max_seconds: 2.136
+      python_inline:
+        count: 2
+        total_seconds: 3.053
+        median_seconds: 1.526
+        max_seconds: 1.655
+      simple:
+        count: 2
+        total_seconds: 2.402
+        median_seconds: 1.201
+        max_seconds: 1.213
+    by_thinking_level:
+      xhigh:
+        count: 71
+        total_seconds: 73.86
+        median_seconds: 1.213
+        max_seconds: 3.679
+    shell_traits:
+      pipes: 46
+      redirects_output: 13
+      substitutes: 3
+  session_events:
+    compact_boundaries: 0
+    stop_hook_summaries: 0
+    queue_operations: {}
+  semantics:
+    wall_seconds: First to last timestamped record. It is elapsed session time and includes
+      every interval in which nothing was running, so it is an upper bound on work and never
+      a measure of it.
+    tool_call_seconds: From the assistant record issuing a tool_use to the user record carrying
+      its tool_result. It therefore includes harness scheduling and any permission wait, not
+      only the tool's own execution.
+    model_seconds: UNAVAILABLE for this harness. Claude Code's transcript records no timed
+      model-stream items and no first-token latency, so model time cannot be separated from
+      the interval before a turn's record is written. It is absent rather than zero, and a
+      consumer that sums it with a harness that does report it must carry the gap forward.
+    turns.latency: 'From a turn''s parent record to the turn itself. It is the closest thing
+      here to model time and is NOT model time: it also carries queueing, the user''s own
+      thinking time before a reply, and any wait for a permission prompt. Read the median,
+      not the maximum.'
+    share_of_wall: tool_call_seconds over wall_seconds. Concurrent calls are summed independently,
+      so on a session that backgrounds work this can exceed one and is a load figure, not
+      an occupancy figure.
+    tokens: 'As the harness reported them per turn, summed. Cache creation and cache read
+      are distinct from input tokens and are not double-counted here, but no cost is derived:
+      pricing is not this record''s and a stored price goes stale silently.'
+    tokens_by_thinking_level: The same counters split by the effort the harness recorded for
+      each turn. This is what makes OR-2's 'matched to the task' claim answerable rather than
+      asserted.
+    by_shell_shape: Structural classification of shell commands in a fixed priority order,
+      so a Python heredoc that also pipes counts as a Python heredoc. `python_heredoc` and
+      `python_inline` are the shapes OR-1 calls one-off code; a session with many of them
+      was writing scripts where it should have been building a tool.
+    by_command: 'The tool a shell command actually runs. Every chain is split into components,
+      shell bookkeeping and text munging are dropped, and what is left names the command:
+      one component and it takes the full invoked form, so `uv run packing-validate` keeps
+      its runner and `grep -rn x . | head -5` is `grep`; several and the name is the chain
+      of bare tools, so `make format && git add -A && git push` is `make && git && git`. Peeling
+      matters more than it sounds: keyed on the leading word instead, `cd` led 524 of 882
+      commands here. Past 256 distinct names the tail folds into `(other)`, which is a long
+      tail of odd commands or a resolver bug rather than anything to act on.'
+    invoked: 'Every tool reached for, counted across all segments of every command, not just
+      the one a call''s time was attributed to. Counts and never elapsed: most commands here
+      run several tools and the transcript times the call rather than the pipeline, so how
+      often a CLI was used is knowable and its share of the clock is not. This is the table
+      that answers which instruments a session actually uses; `by_command` answers where its
+      measured time went.'
+    by_command_family: Our own instruments against everything else. `project` is this repository's
+      CLIs and modules, `toolchain` the language tooling, `inspection` the reading and searching
+      a session does to orient itself. Time in `packing-validate` and time in `grep` are both
+      real and are not the same kind of cost.
+    errors: tool_result blocks the harness marked is_error. A failed call still spends its
+      elapsed time, and the count is here so a rising failure rate is visible rather than
+      hidden inside the total.
+    unpaired_results: tool_result blocks whose tool_use was not seen, which is normal for
+      a log that begins mid-session after a compaction. A large count means the elapsed figures
+      cover less than the session does.
+    session_events.queue_operations: Messages queued and withdrawn while a turn was running.
+      An enqueue is an interjection, which is a signal about the session's pacing rather than
+      about any tool.
+    excluded: 'Every prose body: assistant text, thinking text, user messages, tool stdout
+      and stderr, file contents, and diffs. This record is not a transcript and cannot be
+      read as one.'

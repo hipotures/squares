@@ -7,19 +7,19 @@ softschema:
   schema: schemas/session-close-report.schema.yaml
   envelope: null
   status: enforced
-count: 150
+count: 151
 generated_by: >-
   uv run --frozen --all-extras --group dev python -m devtools.close_session --render
 totals:
-  sessions_measured: 96
+  sessions_measured: 97
   sessions_unmeasured: 54
   attributed:
-    rollups: 176
-    turns: 48062
-    tool_calls: 26312
-    tool_errors: 522
-    one_off_code: 4032
-    wall_hours: 428.3
+    rollups: 188
+    turns: 50776
+    tool_calls: 27914
+    tool_errors: 549
+    one_off_code: 4234
+    wall_hours: 436.81
   unattributed:
     rollups: 60
     turns: 11110
@@ -28,12 +28,12 @@ totals:
     one_off_code: 946
     wall_hours: 51.75
   measured:
-    rollups: 236
-    turns: 59172
-    tool_calls: 32851
-    tool_errors: 678
-    one_off_code: 4978
-    wall_hours: 480.05
+    rollups: 248
+    turns: 61886
+    tool_calls: 34453
+    tool_errors: 705
+    one_off_code: 5180
+    wall_hours: 488.56
 codex_receipts:
   attributed: 56
   unattributed: 2
@@ -2496,4 +2496,29 @@ sessions:
   tool_errors: 37
   one_off_code: 184
   wall_hours: 17.66
+  codex_receipts: []
+- id: session-151
+  title: "A Deep Low-n Review, the Efficiency Block OR-12 Was Overdue, and What the Research Block Decided"
+  status: stopped
+  primary_bead: think-gvlg
+  phases: 4
+  measured: true
+  rollups:
+  - packing/campaign/resource-usage/216fe0a3-88ed-5da5-baf4-c4d6171928f3.yaml
+  - packing/campaign/resource-usage/agent-a028ee98e0f75eb66.yaml
+  - packing/campaign/resource-usage/agent-a41a6a4a1e33f736a.yaml
+  - packing/campaign/resource-usage/agent-a64397e5f83d328e1.yaml
+  - packing/campaign/resource-usage/agent-a8cd7f48de8eed7e1.yaml
+  - packing/campaign/resource-usage/agent-a945578bf0da690f6.yaml
+  - packing/campaign/resource-usage/agent-ab0c0b35e2bfe4085.yaml
+  - packing/campaign/resource-usage/agent-acf9f81f0e2efd9e2.yaml
+  - packing/campaign/resource-usage/agent-addd36018d6e6b82a.yaml
+  - packing/campaign/resource-usage/agent-ae7cf10b917ea0717.yaml
+  - packing/campaign/resource-usage/agent-afc70c9271ea1d01b.yaml
+  - packing/campaign/resource-usage/agent-afcacea2c4bddfe4a.yaml
+  turns: 2714
+  tool_calls: 1602
+  tool_errors: 27
+  one_off_code: 202
+  wall_hours: 8.51
   codex_receipts: []
