@@ -1,7 +1,7 @@
 // The stage's box and trace and the gap bar's pointer as drawn now: the trace's and the box's
-// sides, the trace's opacity, the box's stroke and whether it is the page's green or the frames'
-// grey, whether the pointer is locked, the pointer's and the record rule's x on the bar, and
-// whether the box is drawn over its trace.
+// sides, the trace's opacity, how much of the box's stroke is inked, the box's stroke and
+// whether it is the page's green or the frames' grey, whether the pointer is locked, the
+// pointer's and the record rule's x on the bar, and whether the box is drawn over its trace.
 //
 // The box's colour is the stylesheet's, switched by `is-locked` (`--scene-frame-*`), so the
 // stroke is read off the computed style rather than an attribute, and the tokens it is compared
@@ -32,6 +32,7 @@
     trace: Number(trace.getAttribute("width")),
     box: Number(box.getAttribute("width")),
     traceOpacity: Number(trace.getAttribute("opacity")),
+    boxInk: Number(box.getAttribute("stroke-opacity") ?? "1"),
     boxStroke: stroke,
     green: stroke === rgb(met),
     grey: stroke === rgb(grey),

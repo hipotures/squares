@@ -23,6 +23,7 @@ class Call(NamedTuple):
     out: Path
     revision: str | None
     dirty: bool | None
+    citations: Path | None = None
 
 
 class FakeBuild:
@@ -41,9 +42,14 @@ class FakeBuild:
         self.barrier = threading.Barrier(2, timeout=10)
 
     def __call__(
-        self, out: Path, *, revision: str | None = None, dirty: bool | None = None
+        self,
+        out: Path,
+        *,
+        revision: str | None = None,
+        dirty: bool | None = None,
+        citations: Path | None = None,
     ) -> str:
-        self.calls.append(Call(out, revision, dirty))
+        self.calls.append(Call(out, revision, dirty, citations))
         self.barrier.wait()
         page = self.published if out == self.published_dir else self.twin
         out.mkdir(parents=True, exist_ok=True)
@@ -72,7 +78,22 @@ def test_check_runs_two_builds_at_once_into_distinct_directories(
     assert out in directories
     # One identity, looked up once, so a stamp cannot be what differs between the twins.
     assert {(call.revision, call.dirty) for call in fake.calls} == {(REVISION, False)}
+    # The builder's own default for both, so the twins read one citation file.
+    assert {call.citations for call in fake.calls} == {None}
     assert "deterministic, self-contained" in capsys.readouterr().out
+
+
+def test_check_gives_both_builds_the_same_citations(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    out = tmp_path / "site"
+    fake = FakeBuild(out, published="<html></html>", twin="<html></html>")
+    monkeypatch.setattr(build_site, "build", fake)
+    monkeypatch.setattr(build_site, "source_dirty", lambda: False)
+    cited = tmp_path / "bound-citations.json"
+    argv = ["--check", "--out", str(out), "--revision", REVISION, "--citations", str(cited)]
+    assert build_site.main(argv) == 0
+    assert {call.citations for call in fake.calls} == {cited}
 
 
 def test_check_fails_when_the_two_pages_differ(

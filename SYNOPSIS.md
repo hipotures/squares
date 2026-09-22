@@ -442,6 +442,8 @@ case or experiment separately.
 | [BC329 Target-Free Three-Profile Run Sheet](docs/project/specs/active/plan-2026-09-13-n11-bc329-three-profile-run-sheet.md) | implementation plan | current | transient | — |
 | [PR157 Integrated Calibration Launch Supplement](docs/project/specs/active/plan-2026-09-13-pr157-integrated-calibration-launch-supplement.md) | implementation plan | current | transient | — |
 | [BC329 Run-Set Verifier Contract](docs/project/specs/active/plan-2026-09-13-n11-bc329-runset-verifier.md) | implementation plan | current | transient | — |
+| [Feature: Video delivery profiles](docs/project/specs/active/plan-2026-09-21-video-delivery-profiles.md) | implementation plan | current | transient | — |
+| [Plan: Certify the Reported Upper Bounds, One Validation Block at a Time](docs/project/specs/active/plan-2026-09-22-upper-bound-certification-blocks.md) | implementation plan | current | transient | — |
 | [BC329 Calibration Reader: Source-Distinct Review](docs/project/reviews/review-2026-09-13-n11-bc329-source-distinct-reader.md) | dated review record | record | retained | — |
 | [BC329 Reader Repair: Exact-Commit Rereview](docs/project/reviews/review-2026-09-13-n11-bc329-reader-rereview.md) | dated review record | record | retained | — |
 | [BC329 Reader F6/F7: Exact-Commit Admission Review](docs/project/reviews/review-2026-09-13-n11-bc329-reader-f6f7-overflow.md) | dated review record | record | retained | — |
@@ -4494,8 +4496,8 @@ in separate tables: their units differ, and the same work can appear in both.
 | Rollups | count | turns | tool calls | errors | one-off code | wall |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | claimed by a session | 188 | 50,776 | 27,914 | 549 | 4,234 | 436.81 h |
-| claimed by none | 60 | 11,110 | 6,539 | 156 | 946 | 51.75 h |
-| **measured** | **248** | **61,886** | **34,453** | **705** | **5,180** | **488.56 h** |
+| claimed by none | 61 | 13,190 | 7,606 | 177 | 1,122 | 60.64 h |
+| **measured** | **249** | **63,966** | **35,520** | **726** | **5,356** | **497.45 h** |
 
 | Session | Phases | Rollups | Turns | Tool calls | Errors | Wall |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |

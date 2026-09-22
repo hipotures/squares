@@ -242,6 +242,21 @@ unchanged; the atlas displays the updated current bounds.
    Evaluate rectangle pricing against its measured cost and slack with the retained
    source verifier and an explicitly scoped comparison protocol.
 
+## Subsequent main-branch reconciliation
+
+After Session 152 closed and PR 222 passed its final checks at `7d4a755`, PR 218 merged
+into main as `d5b1c2e1b`. Its workbench citation renderer and shared data-version stamp
+conflicted with the updated atlas exports on this branch.
+`think-ujyr` tracks the follow-up merge and renewed validation; it is outside the
+completed Session 152 measurement cutoff.
+
+The reconciliation keeps the new renderer and version contract, adds bibliography
+entries for the four external sources now supplying verified case bounds, and rebuilds
+the citation and figure records from the combined data.
+The external certificate bytes and adopted bounds remain unchanged.
+The two subsequent work branches hold publication until this base is again green and
+mergeable.
+
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
 -->

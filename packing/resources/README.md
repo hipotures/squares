@@ -9,10 +9,24 @@ paywalls and bot blocks.
 
 ```
 packing/resources/
+├── bibliography.yaml       Citation fields for the keys something cites; see below
 ├── papers/                 Academic papers: original .pdf, cleaned .md, and faithful .raw.md
 ├── private-correspondence/ Unpublished letters and email, transcribed verbatim
 └── web/                    Web sources: original .html and maintained .md capture
 ```
+
+**The tables in this file are the index of citation keys; `bibliography.yaml` is the
+same keys as data.** It carries only what a line of citation text is built from — each
+cited source’s authors as a citation prints them, its year, a short venue, and, where a
+line would otherwise run past the width the stage sets, a shorter venue still — and the
+surname each credited finder is cited under.
+[`devtools.build_bound_citations`](../devtools/build_bound_citations.py) reads it to
+write the stage’s citation lines, and
+[`tests/test_bound_citations.py`](../tests/test_bound_citations.py) checks that every
+key in it is defined in bold here, that a paper’s year and authors agree with the Papers
+table below, and that every source key the frontier register uses is defined here.
+It is not an archived source and is edited like any other record; a key it needs that
+this file does not define fails that test rather than being added silently.
 
 The archive’s normal form stores a paper three ways; the documented exceptions follow:
 
@@ -446,6 +460,7 @@ distinguishes literal reported bounds, verified replays and proposed native exte
 | Key | What | Source | File stem (in `web/`) |
 | --- | --- | --- | --- |
 | **[Friedman Center]** | Packing Center record tables and diagrams | erich-friedman.github.io | `friedman-packing-center-squares` |
+| **[Guzhou R038 2026]** | The pinned R038 parent-angle certificate and verifier used in the external n17 comparison | github.com/Guzhou0806/N17 | `external-square-certificates-2026-09-22/dependencies/guzhou-n17-full/certificates/R038/` |
 | **[Friedman DS7 html]** | 2009 HTML edition of the DS7 survey | combinatorics.org | `friedman-ds7-survey-2009-html` |
 | **[Kingbird]** | Squares-in-Squares catalogue: exact minimal polynomials, rigidity flags | kingbird.myphotos.cc | `kingbird-squares-in-squares` |
 | **[Kingbird-compared]** | Supersession history: which record fell to which method, when | kingbird.myphotos.cc | `kingbird-squares-in-squares-compared` |
@@ -464,7 +479,7 @@ distinguishes literal reported bounds, verified replays and proposed native exte
 | **[MacIver 2026 papers]** | Three author-hosted manuscripts: a reported `s(17), s(18) > 4.450208382…`, the center-area lemma, and center-count bounds; original PDFs, faithful extractions, source revision, upstream CI receipt, and a reading aid with verification limits | github.com/DRMacIver; drmaciver.github.io | `maciver-square-packing-2026-09-07/` |
 | **[n26 current-source audit 2026]** | Current n26 catalogues, recent solver and proof projects, and an exact comparison of MinMax Arena’s reciprocal score; no smaller public upper bound found in the scoped search | primary catalogues; GitHub; minmaxarena.com | `n26-best-known-2026-09-07/` |
 | **[De Winter 2026]** | Mutable author report of proposed construction improvements at `n = 68, 126, 206`; coordinates unavailable and values unreplayed | researchgate.net | `de-winter-improved-packings-2026/` |
-| **[Schadt n29 2025]** | Thomas Schadt’s `n = 29` record repository: the packing, its Python verifier, the rendered SVG, and his four-sentence methodology note | github.com/BalthasarStrauss | `schadt-s29-2025/` |
+| **[Schadt n=29 repository]** | Thomas Schadt’s `n = 29` record repository: the packing, its Python verifier, the rendered SVG, and his four-sentence methodology note | github.com/BalthasarStrauss | `schadt-s29-2025/` |
 | **[Squarl n17 2026]** | Sam Burns’s open `n = 17` pipeline documentation at a pinned commit: the formulation and move set, the deep-polish architecture and its tolerances, the final nine-hour production search’s own accounting, and the earlier topology drain | github.com/sam-bee/squarl | `squarl-n17-2026/` |
 | **[Literature refresh 2026-09-05]** | Frozen arXiv, Crossref, OpenAlex, and Zenodo receipts; additions, currentness checks, and nearby-problem exclusions | primary sources and scholarly indexes | `literature-refresh-2026-09-05/` |
 | **[Annealing methods audit 2026-09-08]** | Frozen arXiv, Crossref and OpenAlex receipts for the search-method corpus; the fifteen-paper acquisition manifest, three readings checked against the retained bytes, the screened-out adjacent problems, and the open-access verdict on every source that could not be retrieved | primary sources and scholarly indexes | `annealing-methods-audit-2026-09-08/` |
@@ -495,19 +510,26 @@ No journal venue or DOI for them was identified in the inspected source.
 ## Special Kingbird SVG Witnesses
 
 These are not papers, but they carry the source geometry rather than a rendered picture.
+Each is named by the key the frontier records cite it under.
 
-- `papers/kingbird-square-11-provenance.svg` is the single most information-dense source
-  found on `n = 11`. Its XML comments carry David Ellsworth’s provenance notes, the two
-  contact equations, the derived placement constants, and the full exact-solution
-  history (Gensane–Ryckelynck 2004 → Ellsworth 2023 → Alexeev’s independent
-  confirmation). It is preserved verbatim.
-- `papers/kingbird-square-29-provenance.svg` carries Thomas Schadt and David Ellsworth’s
-  `n = 29` construction, 100-digit placement constants, the six defining equations, and
-  the full SVG transform tree.
+- **[Ellsworth SVG]** `papers/kingbird-square-11-provenance.svg` is the single most
+  information-dense source found on `n = 11`. Its XML comments carry David Ellsworth’s
+  provenance notes, the two contact equations, the derived placement constants, and the
+  full exact-solution history (Gensane–Ryckelynck 2004 → Ellsworth 2023 → Alexeev’s
+  independent confirmation).
+  It is preserved verbatim.
+- **[Kingbird n=29 SVG]** `papers/kingbird-square-29-provenance.svg` carries Thomas
+  Schadt and David Ellsworth’s `n = 29` construction, 100-digit placement constants, the
+  six defining equations, and the full SVG transform tree.
   The upstream response was retrieved on 2026-08-24. The retained text differs only by
   CRLF-to-LF normalization and a terminal newline.
   The H-024 experiment records the URL, retrieval date, normalization, and retained
   path; Git retains the source bytes.
+- **[Kingbird n=5 SVG]** is the catalogue’s `square-5.svg`
+  (<https://kingbird.myphotos.cc/packing/square-5.svg>), the source
+  `cases/gobel5/packing.py` names for Göbel’s five-square construction.
+  Its bytes are **not** retained here; `web/known-best-packings/sources.json` records
+  its retrieval, and the construction is replayed exactly from the case module.
 
 ## Not Retrievable
 

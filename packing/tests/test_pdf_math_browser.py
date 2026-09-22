@@ -3,7 +3,8 @@
 These tests consume the prepared publication page, the PDF Pages drew from it, and
 pinned Chromium. Python-only jobs skip them; the dedicated Pages invocation requires
 all three and fails if any is absent. Faults change one rendered FontFace, leaving the
-actual KPress runtime, host fallback, export waits, and final DOM guard in use.
+actual KPress runtime, host fallback, export waits, repeated draw, and final DOM guard
+in use.
 """
 
 from __future__ import annotations
@@ -21,6 +22,7 @@ from devtools import render_explainer_pdf as pdf
 from devtools.check_math_loading import MATH_LIBRARY
 from devtools.render_explainer_pdf import (
     _MATH_RENDERED,  # pyright: ignore[reportPrivateUsage]
+    _PRINT_DRAWS,  # pyright: ignore[reportPrivateUsage]
     SETTLED,
 )
 from sqpack.probes import applied, probe
@@ -135,7 +137,9 @@ def test_production_pdf_preserves_readable_native_mathml_fallback(
     observed = observe_export(monkeypatch, wrapper="native", mode=mode)
     document = pdf.render_pdf_bytes()
     assert document.startswith(b"%PDF-")
-    assert observed.draws == 1
+    # Two prints at least, and never fewer: since D-490 the export keeps only bytes that
+    # two consecutive prints of one loaded page agreed on.
+    assert 2 <= observed.draws <= _PRINT_DRAWS
     state = observed.state
     assert state["target_found"] is True
     assert state["math_ready"] is True

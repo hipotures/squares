@@ -70,7 +70,7 @@ session:
     outcome: null
     evidence: []
     stop_reason: null
-    next_action: Integrate the coordinator's repaired PR 222 base, publish the draft stacked PR and run all 12028 rows on its frozen implementation commit.
+    next_action: After the repaired PR 222 base passes hosted CI, publish the draft stacked PR and run all 12028 rows on its frozen implementation commit.
   budget:
     wall_minutes: 240
     slice_minutes: 30
@@ -109,10 +109,11 @@ session:
   - Combined interval regression selection passed 98 tests, with two existing Linux-only pool tests skipped on macOS and ten slow or exhaustive tests deselected.
   - Scoped push gate took 781.81 seconds within its 1800-second ceiling; 2115 selected tests passed, four failed, two skipped and twelve deselected. Failures were generated session views, test formatting, sandbox-blocked process inspection and a snapshot race caused by moving the new cost receipt during the gate. Freeze the tree and rerun those affected checks after correction.
   - After correction and staging, all four affected snapshot and process-lifecycle tests passed in 23.36 seconds. The four selected lint, synopsis and campaign steps passed in 9.75 seconds; close_session --check agreed with all 153 sessions. The final native file passed 39 tests, Ruff check and format-check, and BasedPyright.
+  - The repaired base ab1b92bb3 merged without conflicts and changed none of the native verifier, shared interval modules, CLI or native tests. On the merged tree, all 39 native tests passed in 5.72 seconds and the three synopsis, session-cost and campaign checks passed in 12.95 seconds.
   resource_rollups:
   - packing/campaign/resource-usage/codex-task-tree-session-153-native-draft.yaml
   stop_reason: null
-  next_action: Integrate the repaired PR 222 base, publish the reviewed draft and complete the native 12028-row catalogue.
+  next_action: After repaired-base CI passes, publish the reviewed draft and complete the native 12028-row catalogue.
 ---
 # Session 153: Native n11 Adaptive Parent-Core Verification
 
@@ -126,9 +127,9 @@ No confirmation-level promotion follows from the current partial pilots.
 The complete run must cover every interval, preserve strict containment at the final
 parent side, and finish with no unresolved boxes.
 
-The coordinator is repairing PR 222 after new upstream changes made that base conflict.
-Publication and full execution wait for the repaired base; local validation and
-preparation continue during that repair.
+New upstream changes required the coordinator to repair PR 222. This branch now includes
+the repaired base `ab1b92bb3`, with the native numerical implementation unchanged.
+Publication and full execution wait for that base’s hosted CI to pass.
 
 The
 [initial task-tree cost receipt](../resource-usage/codex-task-tree-session-153-native-draft.yaml)

@@ -49,6 +49,7 @@ name: Certificate page
       - packing/src/sqpack/**
       - packing/frontier/results.yaml
       - packing/atlas/known-best/composite-figure.json
+      - packing/atlas/known-best/bound-citations.json
       - packing/atlas/known-best/rendering/**
       - packing/witnesses/known-best/**
       - packing/devtools/templates/explainer-shell.html
