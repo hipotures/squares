@@ -1,0 +1,7 @@
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-226-n11-threshold-191-50-net2880-certificate.json: n = 11, L = 191/50 = 3.820000, B = 249507/250000, 584 point atoms (mass 4336840816/498684619 = 8.696560212), 320 threshold atoms (budget 1146820616/498684619 = 2.299691172), total budget 5483661432/498684619 = 10.996251384
+  holds: Condition 1 atoms carry the declared symmetry: 584 atoms closed under D4 about the centre
+  holds: Condition 1' threshold atoms carry the declared symmetry: 320 threshold atoms closed under D4 about the centre
+  holds: Condition 2' total budget below n: point mass 4336840816/498684619 + threshold budget 1146820616/498684619 = 5483661432/498684619 against n = 11
+  holds: Condition 3 net reaches pi/4: final half-tangent 207107/500000, t^2 + 2t - 1 = 309449/250000000000
+  holds: Condition 4 containment B(1 + D) < 1: B = 249507/250000, D = 207107/1440000000, B(1 + D) = 39926861627361/40000000000000
