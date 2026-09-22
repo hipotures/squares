@@ -628,6 +628,18 @@ documents:
     role: review
     authority: record
     lifecycle: retained
+  - path: docs/project/reviews/review-2026-09-22-external-square-certificates-integration.md
+    role: review
+    authority: record
+    lifecycle: retained
+  - path: docs/project/reviews/review-2026-09-22-tokoharu-density-mathematics.md
+    role: review
+    authority: record
+    lifecycle: retained
+  - path: docs/project/reviews/review-2026-09-22-kleddamag-n11-mathematics.md
+    role: review
+    authority: record
+    lifecycle: retained
   - path: docs/project/three-lane-research-method.md
     role: component-guide
     authority: record

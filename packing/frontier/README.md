@@ -369,16 +369,17 @@ lower-bound side has underused methods.
 
 Counts below are computed from the artifacts, not asserted.
 
-Of the 265 open cases, **258** have Nagamochi’s formula as their independently verified
-lower bound. The other seven use weighted fractional unavoidable-set certificates held
-here: `n = 11` at the exact dilation limit approximately `3.826447410573` of a threshold
-certificate and `n = 12` at `99/25` (`T-026`, `T-017`); `n = 17` at `459/100` (`T-019`);
-`n = 18` at `4679/1000` (`T-030`); `n = 19` at `24/5` (`T-020`); and `n = 20` and
-`n = 21` at `97/20` (`T-021`). Within the original `n ≤ 100` corpus, the corresponding
-Nagamochi count fell from sixty-three before 2026-09-03 to fifty-eight after those
-adoptions. The count is checked against the case records by
-`devtools.check_nagamochi_bounds` (`D-430`), because the earlier figure of sixty-three
-outlived the first adoption by a day.
+Of the 265 open cases, **240** have Nagamochi’s formula as their verified lower bound.
+Seven others use certificates already integrated into the register: current external
+certificate bounds at `n = 11` (`31/8`) and `n = 17` (`461300/99853`), plus the earlier
+first-party bounds at `n = 12` (`99/25`), `n = 18` (`4679/1000`), `n = 19` (`24/5`), and
+`n = 20,21` (`97/20`). Complete interval and exact replays add 18 more
+external-certificate cases: `n = 26,27,28` at `1377/250`; `n = 29,30,31` at `571/100`;
+`n = 39,40,41` at `13/2`; `n = 52,53` at `369/50`; `n = 55` at `377/50`; `n = 56` at
+`381/50`; `n = 68,69` at `841/100`; `n = 70,71` at `171/20`; and `n = 72` at `861/100`.
+Within the original `n ≤ 100` corpus, the corresponding Nagamochi count is 40. The count
+is checked against the case records by `devtools.check_nagamochi_bounds` (`D-430`),
+because earlier hand-maintained counts outlived their case promotions.
 
 Of the 265 open cases, 120 are still held by the trivial grid.
 The other 145 carry non-grid constructions.

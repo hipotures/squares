@@ -1,0 +1,28 @@
+{
+  "status": "PASS",
+  "scope": "Deterministic adversarial samples; not independent global coverage",
+  "area_probes": 1080,
+  "positive_area_lower_bounds": 540,
+  "positive_partial_area_lower_bounds": 360,
+  "slice_boxes": 144,
+  "exact_slice_samples": 1296,
+  "angles": [
+    0,
+    1,
+    25,
+    100,
+    200
+  ],
+  "compile_command": [
+    "g++",
+    "-O2",
+    "-std=c++17",
+    "-fno-fast-math",
+    "-ffp-contract=off",
+    "-I",
+    "/Users/levy/.codex/worktrees/116b/squares/packing/resources/web/external-square-certificates-2026-09-22/tokoharu-density/src",
+    "/Users/levy/.codex/worktrees/116b/squares/packing/devtools/tokoharu_density_probe.cpp",
+    "-o",
+    "/var/folders/ms/fjn8hgyd24d3jv6w65dw37hh0000gp/T/tokoharu-probe-8qbo7iaf/probe"
+  ]
+}

@@ -1832,7 +1832,7 @@ def number_line_marks(facts: list[Facts], headline: Facts, current: CurrentBound
     if ordered[0] is not headline:
         raise SystemExit("the headline bound is not the largest; the marks would stack wrong")
     entries = [
-        (current.bounded_side, "T-026: current lower bound", True),
+        (current.bounded_side, "T-026: bound explained here", True),
         (current.endpoint, f"191/50 = {decimal(current.endpoint)}, direct certificate", False),
         *[
             (
@@ -2102,7 +2102,7 @@ def card_substitutions(headline: Facts, current: CurrentBoundFacts) -> dict[str,
     the page it opens cannot say different things. The bound in the title and in the
     sentence is the headline certificate's own, like every other number on the page.
 
-    The card names the current bound while the interactive figures retain the point
+    The card names T-026's historical bound while the interactive figures retain the point
     certificates. It uses the cropped composite rather than the full canvas, and the reason is
     what the croppers do with a portrait. X and Facebook show a landscape card and take
     a band from the middle of whatever they are given: from the 150:181 canvas that is
@@ -2115,8 +2115,8 @@ def card_substitutions(headline: Facts, current: CurrentBoundFacts) -> dict[str,
     width, height = png_size(COMPOSITE_CARD)
     title = f"{TITLE}: s({headline.n}) ≥ {current.bounded_side_decimal}"
     description = (
-        f"How weighted point and threshold certificates prove the current lower bound "
-        f"for s({headline.n}), from a visual point-only proof to the current exact lower bound."
+        "How weighted point and threshold certificates prove T-026's historical bound "
+        f"s({headline.n}) ≥ {current.bounded_side_decimal}, with visual point-only proofs."
     )
     return {
         "PAGE_TITLE": title,
@@ -2132,11 +2132,11 @@ def card_substitutions(headline: Facts, current: CurrentBoundFacts) -> dict[str,
 
 
 def shared_substitutions(facts: list[Facts], headline: Facts, default: Facts) -> dict[str, str]:
-    """Values the whole page states: current result, point lesson, deck, and shared axis.
+    """Values the whole page states: T-026, point lesson, deck, and shared axis.
 
     The axis positions are here rather than in `certificate_substitutions`
     because the bounds figure states every rung at once and stands outside the stamped
-    article; the band it shades runs from the current lower bound to the best packing.
+    article; the band it shades runs from T-026's lower bound to the best packing.
     """
     headline_frac = f"{headline.outer_side.numerator}/{headline.outer_side.denominator}"
     current = current_bound_facts()
@@ -2167,6 +2167,10 @@ def shared_substitutions(facts: list[Facts], headline: Facts, default: Facts) ->
         "N_RESULTS": str(registered_results()),
         "N_NOVEL": str(novel_results()),
         "RESULTS_URL": repo_file(PACKING / "frontier/RESULTS.md"),
+        "FRONTIER_N11_URL": repo_file(PACKING / "frontier/n-011.md"),
+        "FRONTIER_N11_REVIEW_URL": repo_file(
+            REPO / "docs/project/reviews/review-2026-09-22-kleddamag-n11-mathematics.md"
+        ),
         "N_STARRED": str(starred_lower_bounds()),
         "SOURCE_URL": MARKDOWN_OUTPUT.name,
         "REPO_URL": REPO_URL,

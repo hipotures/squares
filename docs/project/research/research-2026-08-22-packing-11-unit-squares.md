@@ -877,25 +877,25 @@ Use the structured form to query or plot; use these tables to read.
 
 | `n` | best reported `s(n)` | how | deg | reported lower bound | from | gap |
 | --- | --- | --- | --- | --- | --- | --- |
-| 11 | 3.87708359 | hand | 8 | 3.788854 | unavoidable points | 0.0882 |
+| 11 | 3.87708359 | hand | 8 | 3.875 | elementary | 0.0021 |
 | 12 | 4 | grid | — | 3.788854 | monotone from `s(11)` | 0.2111 |
-| 17 | 4.67553009 | hand | 18 | 4.613046 | unavoidable points | 0.0625 |
+| 17 | 4.67553009 | hand | 18 | 4.619791 | unavoidable points | 0.0557 |
 | 18 | `(7/2) + (1/2)√7` = 4.82287566 | hand | — | 4.613046 | monotone from `s(17)` | 0.2098 |
 | 19 | `3 + (4/3)√2` = 4.88561808 | hand | — | 4.617282 | unavoidable points | 0.2683 |
 | 20 | 5 | grid | — | 4.617282 | monotone | 0.3827 |
 | 21 | 5 | grid | — | 4.7438 | unavoidable points | 0.2562 |
-| 26 | `(7/2) + (3/2)√2` = 5.62132034 | extension | — | 5.3918 | unavoidable points | 0.2295 |
-| 27 | `5 + (1/2)√2` = 5.70710678 | strip | — | 5.3918 | unavoidable points | 0.3153 |
+| 26 | `(7/2) + (3/2)√2` = 5.62132034 | extension | — | 5.508 | elementary | 0.1133 |
+| 27 | `5 + (1/2)√2` = 5.70710678 | strip | — | 5.508 | monotone | 0.1991 |
 | 28 | 5.82444462 | annealing | 6 | 5.511709 | unavoidable points | 0.3127 |
-| 29 | 5.93383346 | annealing | — | 5.511709 | monotone | 0.4221 |
-| 30 | 6 | grid | — | 5.582576 | Nagamochi | 0.4174 |
-| 31 | 6 | grid | — | 5.690416 | Nagamochi | 0.3096 |
+| 29 | 5.93383346 | annealing | — | 5.71 | elementary | 0.2238 |
+| 30 | 6 | grid | — | 5.71 | monotone | 0.29 |
+| 31 | 6 | grid | — | 5.71 | monotone | 0.29 |
 | 32 | 6 | grid | — | 5.795832 | Nagamochi | 0.2042 |
 | 37 | 6.59861961 | hand | 8 | 6.350603 | unavoidable points | 0.248 |
 | 38 | `6 + (1/2)√2` = 6.70710678 | strip | — | 6.350603 | monotone | 0.3565 |
-| 39 | 6.81072208 | annealing | 5 | 6.350603 | monotone | 0.4601 |
-| 40 | `4 + 2 √2` = 6.82842712 | hand | — | 6.406136 | unavoidable points | 0.4223 |
-| 41 | 6.92669309 | annealing | 42 | 6.477226 | Nagamochi | 0.4495 |
+| 39 | 6.81072208 | annealing | 5 | 6.5 | elementary | 0.3107 |
+| 40 | `4 + 2 √2` = 6.82842712 | hand | — | 6.5 | elementary | 0.3284 |
+| 41 | 6.92669309 | annealing | 42 | 6.5 | monotone | 0.4267 |
 | 42 | 7 | grid | — | 6.567764 | Nagamochi | 0.4322 |
 | 43 | 7 | grid | — | 6.656854 | Nagamochi | 0.3431 |
 | 44 | 7 | grid | — | 6.744563 | Nagamochi | 0.2554 |
@@ -903,10 +903,10 @@ Use the structured form to query or plot; use these tables to read.
 | 50 | `7 + (4/7)` = 7.57142857 | annealing | — | 7.317426 | unavoidable points | 0.254 |
 | 51 | 7.70079924 | annealing | 12 | 7.317426 | monotone | 0.3834 |
 | 52 | `7 + (1/2)√2` = 7.70710678 | strip | — | 7.317426 | monotone | 0.3897 |
-| 53 | `(13/2) + (1/2)√7` = 7.82287566 | annealing | — | 7.324555 | Nagamochi | 0.4983 |
+| 53 | `(13/2) + (1/2)√7` = 7.82287566 | annealing | — | 7.38 | elementary | 0.4429 |
 | 54 | `7 - (1/2)√2 + sqrt(1 + √2)` = 7.84666719 | hand | — | 7.403124 | Nagamochi | 0.4435 |
-| 55 | 7.94577101 | annealing | — | 7.480741 | Nagamochi | 0.465 |
-| 56 | 8 | grid | — | 7.557439 | Nagamochi | 0.4426 |
+| 55 | 7.94577101 | annealing | — | 7.54 | elementary | 0.4058 |
+| 56 | 8 | grid | — | 7.62 | elementary | 0.38 |
 | 57 | 8 | grid | — | 7.63325 | Nagamochi | 0.3668 |
 | 58 | 8 | grid | — | 7.708204 | Nagamochi | 0.2918 |
 | 59 | 8 | grid | — | 7.78233 | Nagamochi | 0.2177 |
@@ -916,10 +916,10 @@ Use the structured form to query or plot; use these tables to read.
 | 66 | `3 + 4 √2` = 8.65685425 | hand | — | 8.289966 | monotone | 0.3669 |
 | 67 | `8 + (1/2)√2` = 8.70710678 | strip | — | 8.289966 | monotone | 0.4171 |
 | 68 | 8.80338307 | — | — | 8.289966 | monotone | 0.5134 |
-| 69 | 8.82720551 | — | — | 8.348469 | Nagamochi | 0.4787 |
-| 70 | 8.88166676 | hand | 4 | 8.416198 | Nagamochi | 0.4655 |
-| 71 | 8.94407156 | annealing | — | 8.483315 | Nagamochi | 0.4608 |
-| 72 | 9 | grid | — | 8.549834 | Nagamochi | 0.4502 |
+| 69 | 8.82720551 | — | — | 8.41 | elementary | 0.4172 |
+| 70 | 8.88166676 | hand | 4 | 8.55 | elementary | 0.3317 |
+| 71 | 8.94407156 | annealing | — | 8.55 | monotone | 0.3941 |
+| 72 | 9 | grid | — | 8.61 | elementary | 0.39 |
 | 73 | 9 | grid | — | 8.615773 | Nagamochi | 0.3842 |
 | 74 | 9 | grid | — | 8.681146 | Nagamochi | 0.3189 |
 | 75 | 9 | grid | — | 8.745967 | Nagamochi | 0.254 |

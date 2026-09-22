@@ -1,0 +1,3 @@
+{"step": "start", "source": "certificate", "L": 100.0, "t": 0.0}
+{"step": "done", "status": "TARGET_REACHED", "best_L": 100.0, "t": 0.0}
+{"step": "final", "n": 29, "best_L": 100.0, "certificate": "/private/var/folders/ms/fjn8hgyd24d3jv6w65dw37hh0000gp/T/tokoharu-driver-i59c3imo/stale", "t": 0.0}

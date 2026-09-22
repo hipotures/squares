@@ -187,6 +187,12 @@ PRUNE = frozenset(
         ROOT / "campaign/series/series-000-smoke-and-calibration/results/agenda-033",
         ROOT / "campaign/series/series-000-smoke-and-calibration/results/agenda-034",
         ROOT / "campaign/series/series-000-smoke-and-calibration/results/agenda-035",
+        # Agenda 041 is the same retained-output class. The dependency audit recorded
+        # in think-t1lk for PR 218 found no control or external code reader of its bulk
+        # numerical output. Inline-linked receipts and registered artifacts still return
+        # through snapshot_pruned_targets. Reuse that prune here instead of raising the
+        # portable ceiling for this intake's 8,847-byte source-growth breach.
+        ROOT / "campaign/series/series-000-smoke-and-calibration/results/agenda-041",
         ROOT
         / "campaign/series/series-000-smoke-and-calibration/results/exp-201-arm-calibration",
         ROOT / "campaign/series/series-000-smoke-and-calibration/results/exp-202-round-1",

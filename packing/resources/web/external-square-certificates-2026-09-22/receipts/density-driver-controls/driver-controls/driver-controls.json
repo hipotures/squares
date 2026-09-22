@@ -1,0 +1,41 @@
+{
+  "status": "OBSERVED",
+  "controls": [
+    {
+      "control": "wrong-target-n",
+      "command": [
+        "/Users/levy/.codex/worktrees/116b/squares/packing/.venv/bin/python3",
+        "/private/tmp/squares-frontier-20260922/tokoharu-density/src/push.py",
+        "--n",
+        "1",
+        "--from",
+        "/private/tmp/squares-frontier-20260922/tokoharu-density/certificates/cert_n29_L571",
+        "--target",
+        "5.71",
+        "--out",
+        "/var/folders/ms/fjn8hgyd24d3jv6w65dw37hh0000gp/T/tokoharu-driver-i59c3imo/wrong-target-n"
+      ],
+      "returncode": 0,
+      "invalid_initial_bound_accepted": true,
+      "finite_grid_upper_bound": 1
+    },
+    {
+      "control": "stale-side-metadata",
+      "command": [
+        "/Users/levy/.codex/worktrees/116b/squares/packing/.venv/bin/python3",
+        "/private/tmp/squares-frontier-20260922/tokoharu-density/src/push.py",
+        "--n",
+        "29",
+        "--from",
+        "/var/folders/ms/fjn8hgyd24d3jv6w65dw37hh0000gp/T/tokoharu-driver-i59c3imo/stale",
+        "--target",
+        "100",
+        "--out",
+        "/var/folders/ms/fjn8hgyd24d3jv6w65dw37hh0000gp/T/tokoharu-driver-i59c3imo/stale-side-metadata"
+      ],
+      "returncode": 0,
+      "invalid_initial_bound_accepted": true,
+      "finite_grid_upper_bound": 6
+    }
+  ]
+}

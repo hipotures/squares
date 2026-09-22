@@ -2,8 +2,314 @@ softschema:
   contract: packing.squares:FrontierEvidenceSet/v1
   schema: frontier-evidence.schema.yaml
   status: enforced
-last_reviewed: '2026-09-20'
+last_reviewed: '2026-09-22'
 evidence:
+  - id: E-wand125-point-source-replay
+    claim: lower-bound
+    scope: {n_values: [26, 29, 39, 40, 41, 53, 55, 56, 69, 70, 71, 72]}
+    assurance: verified
+    method: exact-algebraic
+    performed_by: repository
+    relationship_to_generator: independent-implementation
+    origin: replayed-here
+    novelty: previously-published
+    source_key: '[wand125 point bounds 2026]'
+    certificate: resources/web/external-square-certificates-2026-09-22/wand125-points/certificates
+    replay: >-
+      cd .. && packing/.venv/bin/python3
+      packing/resources/web/external-square-certificates-2026-09-22/wand125-points/src/check_with_sqpack.py
+      packing/resources/web/external-square-certificates-2026-09-22/wand125-points/certificates/cert_n26_L545.json
+      packing/resources/web/external-square-certificates-2026-09-22/wand125-points/certificates/cert_n29_L557.json
+      packing/resources/web/external-square-certificates-2026-09-22/wand125-points/certificates/cert_n39_L650.json
+      packing/resources/web/external-square-certificates-2026-09-22/wand125-points/certificates/cert_n40_L650.json
+      packing/resources/web/external-square-certificates-2026-09-22/wand125-points/certificates/cert_n53_L738.json
+      packing/resources/web/external-square-certificates-2026-09-22/wand125-points/certificates/cert_n55_L754.json
+      packing/resources/web/external-square-certificates-2026-09-22/wand125-points/certificates/cert_n56_L762.json
+      packing/resources/web/external-square-certificates-2026-09-22/wand125-points/certificates/cert_n69_L841.json
+      packing/resources/web/external-square-certificates-2026-09-22/wand125-points/certificates/cert_n70_L855.json
+      packing/resources/web/external-square-certificates-2026-09-22/wand125-points/certificates/cert_n72_L861.json
+    replay_status: passed
+    proof:
+      source: packing/src/sqpack/fractional/certificate.py
+      theorem: Exact weighted covering obstruction over the complete rational direction net
+      scope: Unrestricted independent rotations and disjoint interiors; n41 follows from n39 and n71 from n70 by monotonicity.
+      pinpoints: All five Certificate verification conditions; complete successful entries for the ten named files in receipts/wand125-points/sqpack-exact-replay.log.
+      assumptions:
+        - Exact nonnegative point weights have total mass strictly below the target count.
+        - The complete D4 symmetry and 201-direction net are verified.
+        - The shrink condition places each closed tested core strictly inside its parent square.
+        - Every reachable translation cell has exact weight at least one.
+      audit_record: docs/project/reviews/review-2026-09-22-tokoharu-density-mathematics.md
+    external_review:
+      state: informally-verified
+      date: '2026-09-22'
+      reviewed_by: GPT-6 Astra at max reasoning, with coordinator review.
+      note: The adapter, all ten exact rational headers, the native theorem contract and count/monotonicity consequences were reviewed; no gap found for the fixed inputs.
+    limitations: >-
+      The ten completed files prove, in the listed direct
+      target order, 109/20, 557/100, 13/2, 13/2, 369/50, 377/50, 381/50, 841/100, 171/20 and 861/100.
+      The n39 value transfers to n41 and n70 to n71. This is a
+      complete exact coverage method at V4/C3, not independent interval coverage
+      or C4. Tokoharu's separate density certificates supersede the n26/n29
+      values. The adapter hardcodes the reviewed net; all retained headers agree.
+    source_reviewed: '2026-09-22'
+
+  - id: E-wand125-n052-derived-lower
+    claim: lower-bound
+    scope: {n_values: [52]}
+    assurance: verified
+    method: exact-algebraic
+    performed_by: repository
+    relationship_to_generator: independent-implementation
+    origin: audited-here
+    source_key: '[wand125 point bounds 2026]'
+    certificate: resources/web/external-square-certificates-2026-09-22/wand125-points/certificates/cert_n53_L738.json
+    replay: >-
+      cd .. && packing/.venv/bin/python3
+      packing/resources/web/external-square-certificates-2026-09-22/wand125-points/src/check_with_sqpack.py
+      packing/resources/web/external-square-certificates-2026-09-22/wand125-points/certificates/cert_n53_L738.json
+    replay_status: passed
+    proof:
+      source: packing/src/sqpack/fractional/certificate.py
+      theorem: Weighted covering obstruction with the least integer above the exact mass
+      scope: s(52) >= 369/50 for unrestricted square packing.
+      pinpoints: least_size_certified and all five verification conditions; the complete n53 source-file replay in receipts/wand125-points/sqpack-exact-replay.log.
+      assumptions:
+        - The complete 201-direction exact coverage replay passes for the retained atoms, side and shrink.
+        - The target square count appears only in the strict mass-budget inequality.
+        - The exact mass is 1287080441/25000000, leaving 12919559/25000000 below 52.
+      audit_record: docs/project/reviews/review-2026-09-22-tokoharu-density-mathematics.md
+    external_review:
+      state: informally-verified
+      date: '2026-09-22'
+      reviewed_by: Coordinator and GPT-6 Astra at max reasoning.
+      note: The native theorem and adapter were reviewed; replacing the conservative filename count 53 by 52 changes no geometric premise.
+    limitations: >-
+      This is a local deduction from the external certificate, not a numerical
+      statement attributed to the upstream README. The complete native exact
+      replay passed at the source count; the exact mass inequality gives n52
+      without another coverage run. No priority claim is made. This supplies
+      V4/C3 exact evidence; no independent interval coverage run is claimed.
+    source_reviewed: '2026-09-22'
+
+  - id: E-n011-kleddamag-3875-source-replay
+    claim: lower-bound
+    scope: {n_values: [11]}
+    assurance: verified
+    method: exact-algebraic
+    performed_by: repository
+    relationship_to_generator: same-implementation
+    origin: replayed-here
+    novelty: previously-published
+    source_key: '[Kleddamag n11 2026]'
+    certificate: resources/web/external-square-certificates-2026-09-22/kleddamag-11/global-certificate.json
+    replay: >-
+      "$N11_UPSTREAM_PYTHON" "$N11_SOURCE_TREE/verify.py"
+      --output-dir "$N11_REPLAY_OUTPUT"
+    replay_status: passed
+    proof:
+      source: packing/resources/web/external-square-certificates-2026-09-22/kleddamag-11/PROOF.md
+      theorem: Eleven independently rotated unit squares cannot fit in a square of side 31/8; compactness gives s(11) > 31/8.
+      scope: Unrestricted square packing with disjoint interiors and boundary contact allowed.
+      pinpoints: >-
+        PROOF.md lines 7-85; exact_mixed.py lines 16-102; integer_sweep.py
+        lines 8-38; hash-pinned R038 JavaScript reconstruction and the complete
+        Python, JavaScript and boundary-control receipts.
+      assumptions:
+        - Exact nonnegative point and threshold charges form the validated D4-invariant system; a k-of-m feature costs floor(m/k) times its weight.
+        - The 12028 contiguous parent-angle intervals cover the folded angular range, and each assigned closed core lies strictly inside every parent in its interval.
+        - Every legal parent centre lies in its row's verified centre envelope, and the exact sweeps cover every generic centre cell there.
+        - Upper semicontinuity of the original nonnegative closed-set charges extends the generic-cell bound to all boundary centres.
+        - Distinct closed cores lie in disjoint parent interiors, and 11 times 999962528 exceeds the budget 10999479944 by 107864 integer weight units.
+        - The reviewed arithmetic bounds keep fixed-width accumulators exact; compactness makes the minimum packing side attained.
+      audit_record: docs/project/reviews/review-2026-09-22-kleddamag-n11-mathematics.md
+    external_review:
+      state: informally-verified
+      date: '2026-09-22'
+      reviewed_by: GPT-6 Astra at max reasoning, with an independent Astra cross-review and coordinator integration review.
+      note: >-
+        Complete proof and checker correspondence reviewed; no mathematical
+        blocker found. Source-distinct exact premise checks, selected dense
+        accumulation and polygon-clipping controls, malformed-input refusals,
+        source-byte binding and complete receipt reconciliation all passed.
+    limitations: >-
+      Pinned v1.0.2 source commit 6a733f339395c3514f2ab63d8c4aa64cf63c0b5a;
+      certificate SHA-256 57e9927da5c13f42dd8bcbf8f08c84363635fece626657ee63a810c61cd44458.
+      Full Python and JavaScript replays passed all 12028 intervals with matching
+      per-range and global charge histograms. The complete launcher receipt is
+      packing/resources/web/external-square-certificates-2026-09-22/receipts/n11/full-replay/RESULT.json;
+      the first-party reconciliation and adverse controls are in
+      packing/resources/web/external-square-certificates-2026-09-22/receipts/n11/independent-audit.json.
+      The two complete scanners share the event-cell method, so replay supports
+      V4/C3 and does not establish C4. Selected boundary and dense-array controls
+      are not a second complete coverage decision. The exact optimum remains
+      open, and the older T-026 certificate remains valid historical evidence.
+      Portable variable definitions, the isolated pinned runtime, writable
+      source-copy preparation and actual historical command are recorded in
+      packing/resources/web/external-square-certificates-2026-09-22/receipts/n11/README.md.
+      The immutable source archive is not an execution cache or output directory.
+    source_reviewed: '2026-09-22'
+
+  - id: E-n011-kleddamag-3875-report
+    claim: lower-bound
+    scope: {n_values: [11]}
+    assurance: reported
+    reported_method: exact-algebraic
+    performed_by: source-author
+    relationship_to_generator: same-implementation
+    origin: external
+    novelty: previously-published
+    source_key: '[Kleddamag n11 2026]'
+    certificate: resources/web/external-square-certificates-2026-09-22/kleddamag-11/global-certificate.json
+    replay_status: not-attempted
+    limitations: >-
+      Source release v1.0.2 at 6a733f339395c3514f2ab63d8c4aa64cf63c0b5a claims
+      the strict global bound s(11) > 31/8 = 3.875, with independent square
+      rotations and boundary contact allowed. The two source exact scans share
+      the event-cell reduction; their agreement is not method-distinct
+      confirmation. This entry preserves the source claim, independently of
+      the local replay and mathematical review recorded separately.
+    source_reviewed: '2026-09-22'
+
+  - id: E-tokoharu-density-report
+    claim: lower-bound
+    scope: {n_values: [11, 26, 29]}
+    assurance: reported
+    reported_method: interval-certified
+    performed_by: source-author
+    relationship_to_generator: same-implementation
+    origin: external
+    novelty: previously-published
+    source_key: '[Tokoharu density 2026]'
+    certificate: resources/web/external-square-certificates-2026-09-22/tokoharu-density/certificates
+    replay_status: not-attempted
+    limitations: >-
+      Source b543990f7794b8c511cb46cf3854b7e8166c3674 reports s(11) >= 381/100,
+      s(26) >= 1377/250 and s(29) >= 571/100 using nonnegative rectangle
+      densities and a 201-direction interval checker. This is the public-claim
+      entry, not a local verification receipt. A runner's VERIFIED status
+      addresses coverage; exact total-mass, input-binding and theorem premises
+      also have to be checked. The supplied post's unspecified later improvement
+      by wand125 is not a new numerical bound without a recovered certificate.
+    source_reviewed: '2026-09-22'
+
+  - id: E-wand125-point-bounds-report
+    claim: lower-bound
+    scope: {n_values: [26, 29, 39, 40, 53, 55, 56, 69, 70, 72]}
+    assurance: reported
+    reported_method: exact-algebraic
+    performed_by: source-author
+    relationship_to_generator: same-implementation
+    origin: external
+    novelty: previously-published
+    source_key: '[wand125 point bounds 2026]'
+    certificate: resources/web/external-square-certificates-2026-09-22/wand125-points/certificates
+    replay_status: not-attempted
+    limitations: >-
+      The complete source tree at 1398e42f17f23fe3744bc54425a589fab1f3542c
+      reports lower bounds 5.45, 5.57, 6.5, 6.5, 7.38, 7.54, 7.62, 8.41,
+      8.55 and 8.61 in the listed n order. Its own float64 checker uses
+      tolerances; its stronger claimed exact check imports this repository's
+      sqpack checker. Public claims are preserved here separately from local
+      replay. Tokoharu supersedes its n26 and n29 values. The source's rounded
+      historical Green baselines do not replace the exact DS7 source audit.
+    source_reviewed: '2026-09-22'
+
+  - id: E-tokoharu-density-monotone-report
+    claim: lower-bound
+    scope: {n_values: [27, 30, 31]}
+    assurance: reported
+    reported_method: interval-certified
+    performed_by: repository
+    relationship_to_generator: not-applicable
+    origin: audited-here
+    novelty: previously-published
+    source_key: '[Tokoharu density 2026]'
+    replay_status: not-attempted
+    limitations: >-
+      Reported-lane transfer: s(27) >= 1377/250 follows from the n26 source
+      certificate; s(30), s(31) >= 571/100 follow from n29. Deleting squares
+      proves monotonicity. This derivation does not strengthen the assurance
+      of its source premise or substitute for its complete replay. The current
+      Nagamochi/Green records dominate further transfers at n28 and n32.
+    source_reviewed: '2026-09-22'
+
+  - id: E-wand125-point-monotone-report
+    claim: lower-bound
+    scope: {n_values: [41, 71]}
+    assurance: reported
+    reported_method: exact-algebraic
+    performed_by: repository
+    relationship_to_generator: not-applicable
+    origin: audited-here
+    novelty: previously-published
+    source_key: '[wand125 point bounds 2026]'
+    replay_status: not-attempted
+    limitations: >-
+      Reported-lane transfer: s(41) >= 13/2 follows from n39 (also directly
+      reported at n40); s(71) >= 171/20 follows from n70. Deleting squares
+      proves monotonicity, conditional on the cited source premise. The
+      source's comparison against DS7 through n44 does not improve this
+      repository's stronger Nagamochi lower bounds at n42 through n44.
+    source_reviewed: '2026-09-22'
+
+  - id: E-tokoharu-density-source-replay
+    claim: lower-bound
+    scope: {n_values: [11, 26, 27, 28, 29, 30, 31]}
+    assurance: verified
+    method: interval-certified
+    performed_by: repository
+    relationship_to_generator: same-implementation
+    origin: replayed-here
+    novelty: previously-published
+    source_key: '[Tokoharu density 2026]'
+    certificate: resources/web/external-square-certificates-2026-09-22/tokoharu-density/certificates
+    replay: >-
+      density_replay_output="$(mktemp -d "${TMPDIR:-/tmp}/tokoharu-density-replay.XXXXXX")" &&
+      .venv/bin/python3 -m devtools.audit_tokoharu_density --out "$density_replay_output"
+      --n 26 --n 29 --n 11 --replay --workers 4 --timeout 900
+    replay_status: passed
+    proof:
+      source: packing/resources/web/external-square-certificates-2026-09-22/tokoharu-density/docs/continuous-density-certificate.ja.md
+      theorem: Rectangle-density covering obstruction at n11, n26 and n29
+      scope: Unrestricted square packing with disjoint interiors and arbitrary rotations; monotonic transfer to n27, n28, n30 and n31.
+      pinpoints: Complete source theorem and interval-verifier correspondence, audited in the linked review.
+      assumptions:
+        - Nonnegative exact rational rectangle densities have total mass strictly below the target square count.
+        - All angles and legal centres are covered by the certified core net and interval subdivision.
+        - Binary64 arithmetic has the reviewed IEEE-754 semantics, without fast math or FMA contraction.
+      audit_record: docs/project/reviews/review-2026-09-22-tokoharu-density-mathematics.md
+    limitations: >-
+      Full 201-direction replays passed separately for n11, n26 and n29.
+      The independent exact preflight checks candidate-to-input enclosures,
+      orbit normalization, total mass, net/shrink premises and the complete
+      axis-event partition. Exact rational polygon and derivative probes
+      exercise the interval kernel but do not independently decide global
+      rotated coverage. The full coverage decision remains the source C++
+      implementation, so this is machine replay evidence at V4/C3, not C4.
+      Receipts are resources/web/external-square-certificates-2026-09-22/receipts/density/audit.json
+      and the per-certificate logs. Source continuation-driver import defects
+      are retained separately and do not invalidate these bound input files.
+      All theorem assumptions are discharged for case adoption. A later
+      archive-binding preflight verifies all 62 retained source files before
+      execution; its receipt is receipts/density-archive-binding/audit.json
+      within the same source packet. Run the replay from packing/ with the
+      project CPython 3.14 environment and a C++17-capable g++ on PATH. Each
+      per-certificate output directory must be absent; the recorded mktemp
+      command creates an empty parent that satisfies this precondition. Full
+      instructions are in
+      resources/web/external-square-certificates-2026-09-22/receipts/density/README.md.
+    external_review:
+      state: informally-verified
+      date: '2026-09-22'
+      reviewed_by: GPT-6 Astra at max reasoning, with a separate Astra mathematical cross-review.
+      note: >-
+        Complete covering reduction, orbit normalization, angle net, continuous
+        translation partition, derivative bounds and outward arithmetic reviewed.
+        No proof blocker found. DENS-1 concerns the separate continuation driver;
+        DENS-2 identifies why raw coverage status needs the exact premise wrapper.
+    source_reviewed: '2026-09-22'
+
   - id: E-green-ds7-theorem9-reported-lower
     claim: lower-bound
     scope: {n_min: 2, n_max: 324}
@@ -298,11 +604,11 @@ evidence:
         lambda = 1 to estimate the minimum". That last is geometrically evident and is the
         only place the argument leans on something unargued. This promotes nothing: the
         method stays `published-proof`, and `proof-assistant-checked` is a different thing.
-        Separately `devtools/check_nagamochi_bounds.py` re-derives the 83 operative
+        Separately `devtools/check_nagamochi_bounds.py` re-derives the 65 operative
         verified-field values from Theorem 2 in the gate, so a transcription slip in a
         current bound is caught even though the proof behind them is not machine-checked.
         95 of the hundred case records cite this record and it supplies the operative
-        verified lower bound in 83 of them; the other 12 citations are historical or
+        verified lower bound in 65 of them; the other 30 citations are historical or
         reported context, and a citation count is not a count of current bounds.
     limitations: External published proof; its arithmetic is not independently replayed here.
     source_reviewed: '2026-08-24'
@@ -1652,6 +1958,95 @@ evidence:
       As with the exact entry, the statement decided is the container side 4613/1000 and
       not Mira's dilation endpoint.
     source_reviewed: '2026-09-20'
+  - id: E-n017-kleddamag-461300-99853-report
+    claim: lower-bound
+    scope: {n_values: [17]}
+    assurance: reported
+    reported_method: exact-algebraic
+    performed_by: source-author
+    relationship_to_generator: same-implementation
+    origin: external
+    novelty: previously-published
+    source_key: '[Kleddamag n17 certified bound]'
+    certificate: resources/web/n17-kleddamag-certified-bound-2026-09-21/kleddamag-17-squares-certified-bound/global-certificate.json
+    replay_status: not-attempted
+    limitations: >-
+      Source v1.0.0 at a499e2c739ce7853fa04c8bcdc85caf1c2b01b37 claims the
+      strict lower bound s(17) > 461300/99853 for independently rotated unit
+      squares with disjoint interiors. This entry records that source claim;
+      the local complete replay of 2026-09-21 is recorded separately. The
+      release's comparison with its unpublished 461300/99951 baseline does
+      not establish priority; the public predecessors are Guzhou R012 and R038.
+    source_reviewed: '2026-09-22'
+
+  - id: E-n017-kleddamag-461300-99853-source-replay
+    claim: lower-bound
+    scope: {n_values: [17]}
+    assurance: verified
+    method: exact-algebraic
+    performed_by: repository
+    relationship_to_generator: same-implementation
+    origin: replayed-here
+    novelty: previously-published
+    source_key: '[Kleddamag n17 certified bound]'
+    certificate: resources/web/n17-kleddamag-certified-bound-2026-09-21/kleddamag-17-squares-certified-bound/global-certificate.json
+    replay: >-
+      From a writable copy of the pinned release, prepare_secondary.py --source
+      with the retained secondary-checker-inputs/exact_parent_side_scan.js,
+      then run the release environment's Python on verify.py --jobs 2 --output
+      a fresh output directory. The full recipe is in
+      packing/resources/web/n17-kleddamag-certified-bound-2026-09-21/README.md.
+    replay_status: passed
+    proof:
+      source: packing/resources/web/n17-kleddamag-certified-bound-2026-09-21/kleddamag-17-squares-certified-bound/PROOF.md
+      theorem: Seventeen independently rotated unit squares cannot fit at side 461300/99853; compactness gives s(17) > 461300/99853.
+      scope: Unrestricted square packing with disjoint interiors and boundary contact allowed.
+      pinpoints: >-
+        The thirteen-step proof trace in sections 3-4 of the retained
+        2026-09-21 mathematical review; its F4 closes the endpoint-containment
+        and parent-centre-domain arguments using independent_controls.py.
+      assumptions:
+        - The exact nonnegative D4-invariant point and two-of-three charges have total budget 16998427356 integer units.
+        - The 7853 contiguous rational parent-angle intervals cover every folded orientation, with a strictly contained closed core in each interval.
+        - Each row's centre envelope contains every legal parent centre, and the exact sweep decides every generic centre cell in it.
+        - Upper semicontinuity of the original nonnegative closed-set charges extends the generic bound to boundary and event centres.
+        - Disjoint parent interiors contain disjoint strict cores; a two-of-three feature can charge at most one core.
+        - Exact arithmetic establishes minimum charge 1000020517, so 17 times that charge exceeds the budget by 1921433; compactness makes the packing minimum attained.
+      audit_record: docs/project/reviews/review-2026-09-21-n17-kleddamag-461300-99853.md
+    external_review:
+      state: informally-verified
+      date: '2026-09-21'
+      reviewed_by: Session 150 adversarial proof-review lane; integration scope rechecked by GPT-6 Astra on 2026-09-22.
+      note: >-
+        The prior review finds no blocking or high-severity defect and discharges
+        all continuous-to-finite premises. Its exact controls pass 31412 core
+        containment inequalities, 7853 centre-envelope inequalities and 3403
+        selected boundary/event centres. The selected controls are not a second
+        complete coverage method.
+    limitations: >-
+      The actual complete local replay was performed on 2026-09-21, recorded in
+      packing/campaign/agent-sessions/session-150-n17-consolidation-and-correctness.md
+      and section 4 of the proof review: both checkers passed all 7853 intervals
+      in about 1001 seconds, agreeing on all 509 histogram bins and producing
+      PASS_TWO_COMPLETE_EXACT_REPLAYS. Certificate SHA-256 is
+      0288aaac680131aa675adb63ea6a67e3d363fcca6061d4c788301da7c5d69cec;
+      RESULT.json SHA-256 is
+      1410a3c19cf5d3e3c86c04d49b99db23f688f0d17b34d58d37b662ba52991910.
+      The retained RESULT.json and evidence/release-replay/ beneath the source
+      tree are manifest-bound source outputs, attested by the prior session
+      and review to have been reproduced locally; a separate local raw replay
+      directory was not retained. The packet README gives a Python 3.12 release
+      environment recipe while the session describes the project interpreter;
+      an exact historical runtime receipt is unavailable. Those limitations
+      are preserved rather than labelling source outputs as fresh local receipts.
+      Both complete checkers share the event-cell method, supporting V4/C3
+      rather than C4. Method-distinct confirmation remains additional work,
+      not a prerequisite for this verified lower-bound field. This entry was
+      registered on 2026-09-22 without a new full replay, correcting the prior
+      admission-policy hold. T-032 retains its historical R012 statement and
+      its separate method-distinct evidence; no new theorem identifier is created.
+    source_reviewed: '2026-09-22'
+
   - id: E-n017-guzhou-r012-source-replay
     claim: lower-bound
     scope: {n_values: [17, 18, 19]}
@@ -3610,3 +4005,43 @@ evidence:
         As for the exact decision; no separate search.
       gaps: >-
         As for the exact decision.
+
+  - id: E-wand125-n068-derived-lower
+    claim: lower-bound
+    scope: {n_values: [68]}
+    assurance: verified
+    method: exact-algebraic
+    performed_by: repository
+    relationship_to_generator: independent-implementation
+    origin: audited-here
+    source_key: '[wand125 point bounds 2026]'
+    certificate: resources/web/external-square-certificates-2026-09-22/wand125-points/certificates/cert_n69_L841.json
+    replay: >-
+      cd .. && packing/.venv/bin/python3
+      packing/resources/web/external-square-certificates-2026-09-22/wand125-points/src/check_with_sqpack.py
+      packing/resources/web/external-square-certificates-2026-09-22/wand125-points/certificates/cert_n69_L841.json
+    replay_status: passed
+    proof:
+      source: packing/src/sqpack/fractional/certificate.py
+      theorem: Weighted covering obstruction with the least integer above the exact mass
+      scope: s(68) >= 841/100 for unrestricted square packing.
+      pinpoints: The module function least_size_certified and all five verification conditions; the complete n69 source-file replay in receipts/wand125-points/sqpack-exact-replay.log.
+      assumptions:
+        - The complete 201-direction exact coverage replay passes for the retained atoms, side and shrink.
+        - The target square count appears only in the strict mass-budget inequality.
+        - The exact mass is 846701027/12500000, leaving 3298973/12500000 below 68.
+      audit_record: docs/project/reviews/review-2026-09-22-tokoharu-density-mathematics.md
+    external_review:
+      state: informally-verified
+      date: '2026-09-22'
+      reviewed_by: Coordinator and GPT-6 Astra at max reasoning.
+      note: The native theorem and adapter were reviewed; replacing the conservative filename count 69 by 68 changes no geometric premise.
+    limitations: >-
+      This is a local deduction from the external certificate, not a numerical
+      statement attributed to the upstream README. The complete native exact
+      replay passed at the source count; the exact mass inequality gives n68
+      without another coverage run. No priority claim is made. This supplies
+      V4/C3 exact evidence; no independent interval coverage run is claimed.
+      The replay command runs from the repository root. The source is pinned at
+      1398e42f17f23fe3744bc54425a589fab1f3542c in the acquisition manifest.
+    source_reviewed: '2026-09-22'

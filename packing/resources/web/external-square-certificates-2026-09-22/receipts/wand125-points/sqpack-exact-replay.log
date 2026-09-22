@@ -1,0 +1,110 @@
+=== /private/tmp/squares-frontier-20260922/wand125-square-packing-bounds/certificates/cert_n26_L545.json
+    n = 26   L = 109/20 = 5.45
+    atoms = 1376   total mass = 646393601/25000000 = 25.855744   budget = 26
+    accepted = True   (111.8s)
+      [ok  ] Condition 1 atoms carry the declared symmetry: 1376 atoms closed under D4 about the centre
+      [ok  ] Condition 2 total mass below n: total 646393601/25000000 against n = 26
+      [ok  ] Condition 3 net reaches pi/4: final half-tangent 83/200, t^2 + 2t - 1 = 89/40000
+      [ok  ] Condition 4 containment B(1 + D) < 1: B = 9977/10000, D = 83/40000, B(1 + D) = 399908091/400000000
+      [ok  ] Condition 5 every reachable cell carries mass 1: least cell mass 6250063/6250000 at direction 0
+    => s(26) >= 109/20 = 5.45
+
+=== /private/tmp/squares-frontier-20260922/wand125-square-packing-bounds/certificates/cert_n29_L557.json
+    n = 29   L = 557/100 = 5.57
+    atoms = 748   total mass = 453011/15625 = 28.992704   budget = 29
+    accepted = True   (36.1s)
+      [ok  ] Condition 1 atoms carry the declared symmetry: 748 atoms closed under D4 about the centre
+      [ok  ] Condition 2 total mass below n: total 453011/15625 against n = 29
+      [ok  ] Condition 3 net reaches pi/4: final half-tangent 83/200, t^2 + 2t - 1 = 89/40000
+      [ok  ] Condition 4 containment B(1 + D) < 1: B = 9977/10000, D = 83/40000, B(1 + D) = 399908091/400000000
+      [ok  ] Condition 5 every reachable cell carries mass 1: least cell mass 1000003/1000000 at direction 0
+    => s(29) >= 557/100 = 5.57
+
+=== /private/tmp/squares-frontier-20260922/wand125-square-packing-bounds/certificates/cert_n39_L650.json
+    n = 39   L = 13/2 = 6.5
+    atoms = 2724   total mass = 481487971/12500000 = 38.519038   budget = 39
+    accepted = True   (213.8s)
+      [ok  ] Condition 1 atoms carry the declared symmetry: 2724 atoms closed under D4 about the centre
+      [ok  ] Condition 2 total mass below n: total 481487971/12500000 against n = 39
+      [ok  ] Condition 3 net reaches pi/4: final half-tangent 83/200, t^2 + 2t - 1 = 89/40000
+      [ok  ] Condition 4 containment B(1 + D) < 1: B = 9977/10000, D = 83/40000, B(1 + D) = 399908091/400000000
+      [ok  ] Condition 5 every reachable cell carries mass 1: least cell mass 100000111/100000000 at direction 93
+    => s(39) >= 13/2 = 6.5
+
+=== /private/tmp/squares-frontier-20260922/wand125-square-packing-bounds/certificates/cert_n40_L650.json
+    n = 40   L = 13/2 = 6.5
+    atoms = 1892   total mass = 975019903/25000000 = 39.000796   budget = 40
+    accepted = True   (205.3s)
+      [ok  ] Condition 1 atoms carry the declared symmetry: 1892 atoms closed under D4 about the centre
+      [ok  ] Condition 2 total mass below n: total 975019903/25000000 against n = 40
+      [ok  ] Condition 3 net reaches pi/4: final half-tangent 83/200, t^2 + 2t - 1 = 89/40000
+      [ok  ] Condition 4 containment B(1 + D) < 1: B = 9977/10000, D = 83/40000, B(1 + D) = 399908091/400000000
+      [ok  ] Condition 5 every reachable cell carries mass 1: least cell mass 20000203/20000000 at direction 171
+    => s(40) >= 13/2 = 6.5
+
+=== /private/tmp/squares-frontier-20260922/wand125-square-packing-bounds/certificates/cert_n53_L738.json
+    n = 53   L = 369/50 = 7.38
+    atoms = 3196   total mass = 1287080441/25000000 = 51.483218   budget = 53
+    accepted = True   (312.2s)
+      [ok  ] Condition 1 atoms carry the declared symmetry: 3196 atoms closed under D4 about the centre
+      [ok  ] Condition 2 total mass below n: total 1287080441/25000000 against n = 53
+      [ok  ] Condition 3 net reaches pi/4: final half-tangent 83/200, t^2 + 2t - 1 = 89/40000
+      [ok  ] Condition 4 containment B(1 + D) < 1: B = 9977/10000, D = 83/40000, B(1 + D) = 399908091/400000000
+      [ok  ] Condition 5 every reachable cell carries mass 1: least cell mass 100001017/100000000 at direction 0
+    => s(53) >= 369/50 = 7.38
+
+=== /private/tmp/squares-frontier-20260922/wand125-square-packing-bounds/certificates/cert_n55_L754.json
+    n = 55   L = 377/50 = 7.54
+    atoms = 3196   total mass = 1362984297/25000000 = 54.519372   budget = 55
+    accepted = True   (335.7s)
+      [ok  ] Condition 1 atoms carry the declared symmetry: 3196 atoms closed under D4 about the centre
+      [ok  ] Condition 2 total mass below n: total 1362984297/25000000 against n = 55
+      [ok  ] Condition 3 net reaches pi/4: final half-tangent 83/200, t^2 + 2t - 1 = 89/40000
+      [ok  ] Condition 4 containment B(1 + D) < 1: B = 9977/10000, D = 83/40000, B(1 + D) = 399908091/400000000
+      [ok  ] Condition 5 every reachable cell carries mass 1: least cell mass 100001011/100000000 at direction 177
+    => s(55) >= 377/50 = 7.54
+
+=== /private/tmp/squares-frontier-20260922/wand125-square-packing-bounds/certificates/cert_n56_L762.json
+    n = 56   L = 381/50 = 7.62
+    atoms = 3856   total mass = 1379852479/25000000 = 55.194099   budget = 56
+    accepted = True   (725.2s)
+      [ok  ] Condition 1 atoms carry the declared symmetry: 3856 atoms closed under D4 about the centre
+      [ok  ] Condition 2 total mass below n: total 1379852479/25000000 against n = 56
+      [ok  ] Condition 3 net reaches pi/4: final half-tangent 83/200, t^2 + 2t - 1 = 89/40000
+      [ok  ] Condition 4 containment B(1 + D) < 1: B = 9977/10000, D = 83/40000, B(1 + D) = 399908091/400000000
+      [ok  ] Condition 5 every reachable cell carries mass 1: least cell mass 10000019/10000000 at direction 129
+    => s(56) >= 381/50 = 7.62
+
+=== /private/tmp/squares-frontier-20260922/wand125-square-packing-bounds/certificates/cert_n69_L841.json
+    n = 69   L = 841/100 = 8.41
+    atoms = 5684   total mass = 846701027/12500000 = 67.736082   budget = 69
+    accepted = True   (1359.3s)
+      [ok  ] Condition 1 atoms carry the declared symmetry: 5684 atoms closed under D4 about the centre
+      [ok  ] Condition 2 total mass below n: total 846701027/12500000 against n = 69
+      [ok  ] Condition 3 net reaches pi/4: final half-tangent 83/200, t^2 + 2t - 1 = 89/40000
+      [ok  ] Condition 4 containment B(1 + D) < 1: B = 9977/10000, D = 83/40000, B(1 + D) = 399908091/400000000
+      [ok  ] Condition 5 every reachable cell carries mass 1: least cell mass 100001017/100000000 at direction 118
+    => s(69) >= 841/100 = 8.41
+
+=== /private/tmp/squares-frontier-20260922/wand125-square-packing-bounds/certificates/cert_n70_L855.json
+    n = 70   L = 171/20 = 8.55
+    atoms = 8060   total mass = 108946291/1562500 = 69.725626   budget = 70
+    accepted = True   (1491.7s)
+      [ok  ] Condition 1 atoms carry the declared symmetry: 8060 atoms closed under D4 about the centre
+      [ok  ] Condition 2 total mass below n: total 108946291/1562500 against n = 70
+      [ok  ] Condition 3 net reaches pi/4: final half-tangent 83/200, t^2 + 2t - 1 = 89/40000
+      [ok  ] Condition 4 containment B(1 + D) < 1: B = 9977/10000, D = 83/40000, B(1 + D) = 399908091/400000000
+      [ok  ] Condition 5 every reachable cell carries mass 1: least cell mass 50000509/50000000 at direction 0
+    => s(70) >= 171/20 = 8.55
+
+=== /private/tmp/squares-frontier-20260922/wand125-square-packing-bounds/certificates/cert_n72_L861.json
+    n = 72   L = 861/100 = 8.61
+    atoms = 6384   total mass = 1789465839/25000000 = 71.578634   budget = 72
+    accepted = True   (936.7s)
+      [ok  ] Condition 1 atoms carry the declared symmetry: 6384 atoms closed under D4 about the centre
+      [ok  ] Condition 2 total mass below n: total 1789465839/25000000 against n = 72
+      [ok  ] Condition 3 net reaches pi/4: final half-tangent 83/200, t^2 + 2t - 1 = 89/40000
+      [ok  ] Condition 4 containment B(1 + D) < 1: B = 9977/10000, D = 83/40000, B(1 + D) = 399908091/400000000
+      [ok  ] Condition 5 every reachable cell carries mass 1: least cell mass 50000507/50000000 at direction 0
+    => s(72) >= 861/100 = 8.61
+

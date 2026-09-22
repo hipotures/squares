@@ -77,19 +77,22 @@ def test_the_revision_names_a_commit_this_repository_has() -> None:
     assert found.stdout.strip() == "commit", found.stdout.strip()
 
 
-def test_the_revision_is_the_length_this_repository_abbreviates_to() -> None:
-    """So the footer's hash and `git rev-parse --short` agree, character for character.
+def test_the_pinned_revision_is_an_unambiguous_object_prefix() -> None:
+    """Repository growth must not force a historical edition's stamp to change.
 
-    A shorter hash still resolves, which is why this is its own check rather than a
-    clause of the shape above: what would go unnoticed is the stamp drifting to a
-    different abbreviation than the one every other tool here prints.
+    Git's automatic abbreviation length grows with the object database and can differ
+    between clones. The pinned prefix must still identify exactly one object, rather
+    than have the same length as today's unrelated HEAD abbreviation.
     """
-    short = subprocess.run(
-        ("git", "rev-parse", "--short", "HEAD"),
+    found = subprocess.run(
+        ("git", "rev-parse", f"--disambiguate={PUBLICATION_REVISION}"),
         capture_output=True,
         text=True,
         check=False,
     )
-    if short.returncode != 0:
+    if found.returncode != 0 and "not a git repository" in found.stderr.lower():
         return
-    assert len(PUBLICATION_REVISION) == len(short.stdout.strip())
+    assert found.returncode == 0, found.stderr.strip()
+    matches = found.stdout.splitlines()
+    assert len(matches) == 1, matches
+    assert matches[0].startswith(PUBLICATION_REVISION)

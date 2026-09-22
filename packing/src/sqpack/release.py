@@ -27,7 +27,7 @@ PUBLICATION_HISTORY = (
         version="v0.4.0",
         first_labeled="September 10, 2026",
         result_scope=(
-            "The current lower-bound edition: T-025 proves "
+            "The T-025/T-026 proof edition: T-025 proves "
             "$s(11) ≥ 191/50 = 3.82$, and T-026 proves "
             "$s(11) ≥ 3.8264474…$."
         ),
@@ -50,10 +50,10 @@ PUBLICATION_VERSION = PUBLICATION_HISTORY[0].version
 #: join below then drops it and the stray space with it, so going final is one edit.
 PUBLICATION_STATUS = ""
 
-#: The commit the committed artifacts are stamped with, at this repository's own short
-#: length -- the eight characters `git rev-parse --short` prints here -- so the hash a
-#: reader sees in the atlas footer is one they can paste into `git show` and have
-#: resolve.
+#: The commit the committed artifacts are stamped with, using the unambiguous prefix
+#: chosen when the edition was cut. Git's automatic abbreviation length may grow with
+#: the repository; that does not change the historical stamp a reader can resolve with
+#: `git show`.
 #:
 #: Pinned rather than read from git at build time, because the artifacts that carry it
 #: are checked in: the atlas SVG is compared byte for byte against a fresh render, and

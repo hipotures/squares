@@ -287,6 +287,7 @@ def test_generator_owned_prospective_outputs_stay_out_of_mutation_snapshots() ->
             "agenda-033",
             "agenda-034",
             "agenda-035",
+            "agenda-041",
             "exp-201-arm-calibration",
             "exp-202-round-1",
         )
@@ -330,6 +331,39 @@ def test_dual_salvage_receipt_is_not_a_mutation_worker_input(
     assert all(packing_relative not in control["run"] for control in specification["controls"])
     assert relative not in copied_targets
     assert not (tree / relative).exists()
+
+
+def test_agenda_041_bulk_output_is_pruned_but_linked_receipts_survive(
+    control_snapshot: tuple[Path, set[Path]],
+) -> None:
+    """Prune unused bulk output while retaining every declared linked dependency."""
+    tree, copied_targets = control_snapshot
+    directory = ROOT / "campaign/series/series-000-smoke-and-calibration/results/agenda-041"
+    packing_relative = directory.relative_to(ROOT).as_posix()
+    specification = safe_load((ROOT / "devtools/controls.yaml").read_text())
+
+    assert directory in PRUNE
+    assert all(
+        not (ROOT / control["file"]).resolve().is_relative_to(directory)
+        for control in specification["controls"]
+    )
+    assert all(packing_relative not in control["run"] for control in specification["controls"])
+
+    sources = [path for path in directory.rglob("*") if path.is_file()]
+    assert sources
+    for source in sources:
+        relative = source.relative_to(controls.REPO)
+        copied = tree / relative
+        if relative in copied_targets:
+            assert copied.read_bytes() == source.read_bytes()
+        else:
+            assert not copied.exists()
+
+    # Named rather than left to the loop: this one journal is 7,127,269 of the prune,
+    # and a future link to it would quietly return two thirds of the saving.
+    journal = directory / "exp-222-n17-repricing-cells.jsonl"
+    assert journal.is_file()
+    assert not (tree / journal.relative_to(controls.REPO)).exists()
 
 
 def test_math_startup_reports_are_pruned_but_record_sources_survive(

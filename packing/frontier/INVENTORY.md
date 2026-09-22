@@ -8,9 +8,9 @@ ours, which rest on someone else's argument, and how far each has been checked.
 
 ## The short version
 
-- **89** evidence records. **73** are formal; **67** of those were established here.
-- **11** rest on an argument made elsewhere, of which **8** have been read by nobody here.
-- **32** claim to be first established here. **8** make no novelty statement at all - not assessed, which is not the same as not novel.
+- **101** evidence records. **79** are formal; **73** of those were established here.
+- **15** rest on an argument made elsewhere, of which **8** have been read by nobody here.
+- **32** claim to be first established here. **10** make no novelty statement at all - not assessed, which is not the same as not novel.
 
 A formal claim on an unread external proof is still formal: the proof proves its
 claim whether or not we read it. The count above is not a doubt about those
@@ -20,17 +20,26 @@ results, it is a statement about what this repository has itself examined.
 
 | evidence | cases | claim | assurance | method decides | whose work | read here | novelty |
 | --- | ---: | --- | --- | --- | --- | --- | --- |
-| `E-green-ds7-theorem9-reported-lower` | 48 | lower-bound | reported | - | elsewhere | not-reviewed | previously-published |
-| `E-green-ds7-theorem10-reported-lower` | 5 | lower-bound | reported | - | elsewhere | not-reviewed | previously-published |
+| `E-wand125-point-source-replay` | 10 | lower-bound | verified | equalities and inequalities, no tolerance | here | informally-verified | previously-published |
+| `E-wand125-n052-derived-lower` | 1 | lower-bound | verified | equalities and inequalities, no tolerance | here | informally-verified | *not assessed* |
+| `E-n011-kleddamag-3875-source-replay` | 1 | lower-bound | verified | equalities and inequalities, no tolerance | here | informally-verified | previously-published |
+| `E-n011-kleddamag-3875-report` | 1 | lower-bound | reported | - | elsewhere | - | previously-published |
+| `E-tokoharu-density-report` | 2 | lower-bound | reported | - | elsewhere | - | previously-published |
+| `E-wand125-point-bounds-report` | 8 | lower-bound | reported | - | elsewhere | - | previously-published |
+| `E-tokoharu-density-monotone-report` | 3 | lower-bound | reported | - | here | - | previously-published |
+| `E-wand125-point-monotone-report` | 2 | lower-bound | reported | - | here | - | previously-published |
+| `E-tokoharu-density-source-replay` | 6 | lower-bound | verified | strict inequalities only | here | informally-verified | previously-published |
+| `E-green-ds7-theorem9-reported-lower` | 47 | lower-bound | reported | - | elsewhere | not-reviewed | previously-published |
+| `E-green-ds7-theorem10-reported-lower` | 3 | lower-bound | reported | - | elsewhere | not-reviewed | previously-published |
 | `E-friedman-ds7-table2-opaque-lower` | 1 | lower-bound | reported | - | elsewhere | - | previously-published |
 | `E-n017-maciver-reported-lower` | 0 | lower-bound | reported | - | elsewhere | not-reviewed | previously-published |
-| `E-green26-reported-lower` | 2 | lower-bound | reported | - | - | - | previously-published |
+| `E-green26-reported-lower` | 0 | lower-bound | reported | - | - | - | previously-published |
 | `E-kingbird-upper-register` | 221 | upper-bound | reported | - | - | - | previously-published |
 | `E-kingbird-grid-completeness` | 97 | upper-bound | reported | - | - | - | previously-published |
 | `E-unitsquare-release1-report` | 6 | upper-bound | reported | - | - | - | previously-published |
 | `E-basic-grid-upper` | 305 | upper-bound | verified | equalities and inequalities, no tolerance | here | - | common-knowledge |
 | `E-basic-area-lower` | 18 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | common-knowledge |
-| `E-nagamochi-lower` | 307 | lower-bound | verified | whatever its theorem states | elsewhere | informally-verified | previously-published |
+| `E-nagamochi-lower` | 289 | lower-bound | verified | whatever its theorem states | elsewhere | informally-verified | previously-published |
 | `E-migrated-lower-report` | 6 | lower-bound | reported | - | - | - | *not assessed* |
 | `E-side2-center-lower` | 2 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | common-knowledge |
 | `E-n005-gobel-upper` | 1 | upper-bound | verified | equalities and inequalities, no tolerance | here | - | previously-published |
@@ -52,7 +61,7 @@ results, it is a statement about what this repository has itself examined.
 | `E-n005-fixed-side-local-rigidity` | 1 | derived-structure | verified | whatever its theorem states | here | - | apparently-novel |
 | `E-n040-first-order-flexibility` | 1 | derived-structure | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
 | `E-n011-trump-local-rigidity` | 1 | derived-structure | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
-| `E-n011-repaired-lower` | 1 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
+| `E-n011-repaired-lower` | 0 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
 | `E-n012-monotonicity-lower` | 1 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | previously-published |
 | `E-n029-kingbird-report` | 1 | upper-bound | reported | - | - | - | previously-published |
 | `E-n029-kingbird-numerical` | 0 | witness-feasibility | numerically-checked | nothing formally; a measurement at a tolerance | here | - | *not assessed* |
@@ -73,10 +82,12 @@ results, it is a statement about what this repository has itself examined.
 | `E-n017-mira-point-certificate-replay` | 0 | lower-bound | verified | equalities and inequalities, no tolerance | here | not-reviewed | previously-published |
 | `E-n017-fort-point-certificate-replay` | 0 | lower-bound | verified | equalities and inequalities, no tolerance | here | not-reviewed | previously-published |
 | `E-n017-anabologyco-weighted-certificate` | 0 | lower-bound | reported | - | elsewhere | not-reviewed | previously-published |
-| `E-n017-mira-4613-exact-replay` | 1 | lower-bound | verified | equalities and inequalities, no tolerance | here | informally-verified | previously-published |
-| `E-n017-mira-4613-interval-decision` | 1 | lower-bound | verified | strict inequalities only | here | - | previously-published |
-| `E-n017-guzhou-r012-source-replay` | 2 | lower-bound | verified | equalities and inequalities, no tolerance | here | informally-verified | previously-published |
-| `E-n017-guzhou-r012-interval-decision` | 2 | lower-bound | verified | strict inequalities only | here | - | previously-published |
+| `E-n017-mira-4613-exact-replay` | 0 | lower-bound | verified | equalities and inequalities, no tolerance | here | informally-verified | previously-published |
+| `E-n017-mira-4613-interval-decision` | 0 | lower-bound | verified | strict inequalities only | here | - | previously-published |
+| `E-n017-kleddamag-461300-99853-report` | 1 | lower-bound | reported | - | elsewhere | - | previously-published |
+| `E-n017-kleddamag-461300-99853-source-replay` | 1 | lower-bound | verified | equalities and inequalities, no tolerance | here | informally-verified | previously-published |
+| `E-n017-guzhou-r012-source-replay` | 1 | lower-bound | verified | equalities and inequalities, no tolerance | here | informally-verified | previously-published |
+| `E-n017-guzhou-r012-interval-decision` | 1 | lower-bound | verified | strict inequalities only | here | - | previously-published |
 | `E-n017-massaccesi-h052-agreement` | 0 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | previously-published |
 | `E-n012-fractional-certificate` | 1 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
 | `E-n012-independent-verifier` | 0 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
@@ -89,9 +100,9 @@ results, it is a statement about what this repository has itself examined.
 | `E-n011-fractional-net720-dilation-limit` | 0 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
 | `E-n011-threshold-certificate` | 0 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
 | `E-n011-threshold-interval-decision` | 0 | lower-bound | verified | strict inequalities only | here | - | previously-published |
-| `E-n011-threshold-net1440-certificate` | 1 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
-| `E-n011-threshold-net1440-interval-decision` | 1 | lower-bound | verified | strict inequalities only | here | - | previously-published |
-| `E-n011-threshold-net1440-dilation-limit` | 1 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
+| `E-n011-threshold-net1440-certificate` | 0 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
+| `E-n011-threshold-net1440-interval-decision` | 0 | lower-bound | verified | strict inequalities only | here | - | previously-published |
+| `E-n011-threshold-net1440-dilation-limit` | 0 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
 | `E-n011-threshold-net720-certificate` | 0 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
 | `E-n011-threshold-net720-dilation-limit` | 0 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
 | `E-n017-fractional-certificate` | 0 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
@@ -109,12 +120,13 @@ results, it is a statement about what this repository has itself examined.
 | `E-n011-five-dot-physical-transfer` | 0 | derived-structure | verified | whatever its theorem states | here | - | apparently-novel |
 | `E-n011-corner-class-96-25-exact-decision` | 0 | derived-structure | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
 | `E-n011-corner-class-96-25-interval-decision` | 0 | derived-structure | verified | strict inequalities only | here | - | apparently-novel |
+| `E-wand125-n068-derived-lower` | 1 | lower-bound | verified | equalities and inequalities, no tolerance | here | informally-verified | *not assessed* |
 
 ## What the register rests on
 
-- **assurance**: numerically-checked 4, reported 12, verified 73
-- **method**: exact-algebraic 56, interval-certified 9, numerical-multiprecision 4, proof-audited 2, published-proof 6, reported 12
-- **novelty**: apparently-novel 32, common-knowledge 4, not assessed 8, previously-published 45
+- **assurance**: numerically-checked 4, reported 18, verified 79
+- **method**: exact-algebraic 61, interval-certified 10, numerical-multiprecision 4, proof-audited 2, published-proof 6, reported 18
+- **novelty**: apparently-novel 32, common-knowledge 4, not assessed 10, previously-published 55
 
 The `cases` column is how many frontier records cite each piece of evidence, and it is the reason to read this table rather than count records. Ranked below are the *formal* records only: a `reported` record cited across the frontier may be a shared catalogue and is labelled as such, which is the register working rather than risk. The risk is a verified claim resting on an argument nobody has examined.
 
@@ -128,9 +140,6 @@ Claims marked `apparently-novel`: first established here as far as the archived 
 | `E-n020-fractional-certificate-97-20` | 20, 21 | The certificate and the side. The method is Burns's, the parametrisation Massaccesi's, and the previous rung this project's own; what is new is a certificate at 97/20, found by seeding the generator's site set with the 24/5 certificate's own atoms scaled to the new side after the uniform grid walled there. | 2 | verified |
 | `E-n005-fixed-side-local-rigidity` | 5 | The first exact PROOF that Goebel's n = 5 optimum is locally rigid at fixed side -- a property ASSERTED WITHOUT PROOF by Kingbird (archived main page, line 44, "Rigid." with a link and no argument), not stated by Goebel 1979 (zero occurrences of "rigid" or "uniqu" in the extraction) and not annotated by Friedman DS7, whose Theorem 2 is a lower bound only and analyses no equality case | 1 | verified |
 | `E-n005-second-order-rigidity` | 5 | That n = 5 is not infinitesimally rigid but is second-order rigid, proved exactly; the catalogue asserts 'Rigid.' without defining or arguing it | 1 | verified |
-| `E-n011-repaired-lower` | 11 | A correct proof of a bound stated in 1979 and cited as proved since, whose printed argument does not close | 1 | verified |
-| `E-n011-threshold-net1440-certificate` | 11 | The re-certification of the retained T-025 threshold atoms on the 1440-step net at shrink 249507/250000. The atoms, the threshold theorem, the two decision routes and the net-refinement measurement are not new objects; this certificate and the lower bound derived from it under E-n011-threshold-net1440-dilation-limit are. | 1 | verified |
-| `E-n011-threshold-net1440-dilation-limit` | 11 | The exact lower-bound value obtained by combining the 1440-step re-certification of T-025's threshold atoms with T-022's sharpened containment lemma, every strict rational uniform dilation it admits, rational density, and upward embedding. The lemma and the dilation argument are T-022's and T-024's; carrying them over threshold atoms needs no new theorem, and the bound is new. | 1 | verified |
 | `E-n011-trump-local-rigidity` | 11 | Local rigidity proved by exhausting all 128 branchwise cones; sources assert rigidity, and zero algebraic freedom does not exclude a branching motion | 1 | verified |
 | `E-n012-fractional-certificate` | 12 | The certificate and the bound it carries, not the method. The weighted fractional unavoidable-set technique is Burns's, with Massaccesi's parameters; what is new here is a first-party certificate ladder at n = 12, reaching 99/25, and the generator that produced it. The first instance was retained at 19/5. Anyone holding Burns's note could have run this search. | 1 | verified |
 | `E-n018-t030-fractional-certificate` | 18 | The certificate and the side. The method is Burns's, the parametrisation Massaccesi's, and the seed T-029's own atoms scaled to 4679/1000 plus a windows-5 lattice; what is new is a certificate at 4679/1000, found after T-029 retained 1871/400 and 117/25 locked at 18.000000. | 1 | verified |
@@ -147,7 +156,10 @@ Claims marked `apparently-novel`: first established here as far as the archived 
 | `E-n011-fractional-net1440-dilation-limit` | 11 | The exact lower-bound value obtained by combining the 1440-step re-certification of the retained atoms with T-022's sharpened containment lemma, every strict rational uniform dilation it admits, rational density, and upward embedding. The lemma and the dilation argument are T-022's; the bound is new. | 0 | verified |
 | `E-n011-fractional-net720-certificate` | 11 | The re-certification of the retained T-018 atoms on the 720-step net at shrink 9979243/10000000, the rung below the registered one and the one the standalone reader decides. | 0 | verified |
 | `E-n011-fractional-net720-dilation-limit` | 11 | The exact lower-bound value from the 720-step re-certification under T-022's dilation-limit argument. It is weaker than the registered bound and is retained because its source rung is the one the standalone reader decides. | 0 | verified |
+| `E-n011-repaired-lower` | 11 | A correct proof of a bound stated in 1979 and cited as proved since, whose printed argument does not close | 0 | verified |
 | `E-n011-threshold-certificate` | 11 | The threshold atoms themselves: rank-1 Chvatal-Gomory cuts on the certificate side, charging w to every core holding at least k points of S and costing w floor(|S| / k) of the budget. The unavoidable-set counting argument, the event-cell sweep and the interval route are not new objects; a certificate whose budget rests on the floor rule, and the side it reaches, are. | 0 | verified |
+| `E-n011-threshold-net1440-certificate` | 11 | The re-certification of the retained T-025 threshold atoms on the 1440-step net at shrink 249507/250000. The atoms, the threshold theorem, the two decision routes and the net-refinement measurement are not new objects; this certificate and the lower bound derived from it under E-n011-threshold-net1440-dilation-limit are. | 0 | verified |
+| `E-n011-threshold-net1440-dilation-limit` | 11 | The exact lower-bound value obtained by combining the 1440-step re-certification of T-025's threshold atoms with T-022's sharpened containment lemma, every strict rational uniform dilation it admits, rational density, and upward embedding. The lemma and the dilation argument are T-022's and T-024's; carrying them over threshold atoms needs no new theorem, and the bound is new. | 0 | verified |
 | `E-n011-threshold-net720-certificate` | 11 | The re-certification of the retained T-025 threshold atoms on the 720-step net, which crosses at the same shrink as the 1440-step net and is the control that isolates what halving the half-gap tangent is worth. | 0 | verified |
 | `E-n011-threshold-net720-dilation-limit` | 11 | The exact lower-bound value from the 720-step threshold re-certification under T-022's dilation-limit argument. It is weaker than the registered bound and is retained because its source rung is the control that isolates the effect of the net alone. | 0 | verified |
 | `E-n012-independent-verifier` | 12 | Nothing new in this entry -- it is a second, independent decision of the historical 77/20 rung and its 19/5 calibration certificate. | 0 | verified |
@@ -161,13 +173,13 @@ The `n` column is what each covers and `cases` is how many frontier records cite
 
 | evidence | cases | whose work | read here |
 | --- | ---: | --- | --- |
-| `E-nagamochi-lower` | 307 | elsewhere | informally-verified |
 | `E-basic-grid-upper` | 305 | here | - |
+| `E-nagamochi-lower` | 289 | elsewhere | informally-verified |
 | `E-basic-area-lower` | 18 | here | - |
 | `E-perfect-square-tiling-rigid` | 18 | here | - |
-| `E-gobel-strip-upper` | 5 | here | - |
+| `E-wand125-point-source-replay` | 10 | here | informally-verified |
 
-The most-cited argument this repository did not produce is `E-nagamochi-lower`, carrying 307 frontier cases. It is an external proof, and it has been read here: its record carries the review, what was re-derived, and the four things that were not. The arithmetic is what picked it out for reading -- being cited this heavily is the reason to open an argument, not a reason to trust it.
+The most-cited argument this repository did not produce is `E-nagamochi-lower`, carrying 289 frontier cases. It is an external proof, and it has been read here: its record carries the review, what was re-derived, and the four things that were not. The arithmetic is what picked it out for reading -- being cited this heavily is the reason to open an argument, not a reason to trust it.
 
 `[Stromquist 2003]` is why that matters rather than being a formality: its `n = 11` argument needed a source-distinct repair, which `E-n011-repaired-lower` supplies.
 

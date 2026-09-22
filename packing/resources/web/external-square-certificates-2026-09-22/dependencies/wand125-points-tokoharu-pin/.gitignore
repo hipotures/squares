@@ -1,0 +1,7 @@
+__pycache__/
+*.py[cod]
+.venv/
+# search checkpoints and intermediate state: large and not needed to check a result
+*.pkl
+*.npy
+*.log

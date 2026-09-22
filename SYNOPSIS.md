@@ -68,12 +68,20 @@ Read it before citing any capability here.
 
 The core exposition begins with T-018’s visual proof of `s(11) >= 3.81`, then explains
 the threshold charges and dilation argument that strengthen it.
-T-026 proves the project’s strongest current lower bound,
+T-026 established the historical lower bound,
 `s(11) >= 955000*sqrt(518400042893309449)/179696714646249 =
 3.8264474...`, at `V4/C5`. Future research follows the
 [payoff policy](docs/project/handoff-2026-09-06-post-381-t2-t10-continuation.md#research-payoff-and-exposition):
 prioritize substantial bound improvements and methods or theorems that make them
 possible.
+
+The
+[September 22 external intake](docs/project/reviews/review-2026-09-22-external-square-certificates-integration.md)
+verifies Kleddamag’s stronger `s(11) > 3.875` bound and Tokoharu’s rectangle-density
+certificates at `s(26) >= 5.508` and `s(29) >= 5.71`, with pinned sources, mathematical
+reviews and complete replays.
+These now supply the verified Frontier bounds; the records retain literal source reports
+and state the verification methods separately.
 
 Every result this project has registered, in the reading order its significance scores
 set. The full claims, the rationale behind each score, and the next evidence-improving
@@ -145,7 +153,7 @@ hypothesis status and summarizes experiment verdicts, and the
 | --- | ---: | --- |
 | Agendas | 38 | 18 active; 14 completed; 5 paused; 1 superseded |
 | Commitments | 362 | 182 complete; 61 stopped; 68 blocked; 16 ready; 21 tentative; 14 in progress |
-| Sessions | 151 | 92 completed; 59 stopped; all terminal |
+| Sessions | 152 | 92 completed; 59 stopped; 1 nonterminal |
 | Explorations | 40 | 24 linked to proposed hypotheses; 16 uncodified |
 | Hypotheses | 170 | 29 confirmed; 31 refuted; 55 blocked; 17 unresolved; 5 open; 29 open questions; 2 result registered; 2 abandoned; 0 running |
 | Experiments | 155 | 43 accepted; 36 rejected; 50 unresolved; 12 baseline; 11 blocked; 3 abandoned; 0 in progress |
@@ -213,9 +221,13 @@ ranked relational-certificate slate.
 A draft or proposed direction is not a registered hypothesis, and a registered
 hypothesis is not a frontier result.
 
-Scientifically, the current bracket is unchanged:
-`3.826447410572939… <= s(11) <= 3.877083590022814…`. T-026 closes about 43% of the older
-Stromquist-to-Trump interval.
+The current verified bracket is `3.875 < s(11) <= 3.877083590022814…`. Session 152 fully
+replayed and mathematically reviewed Kleddamag’s external certificate.
+It closes 95.89% of the gap from T-026 to the retained upper bound; the exact optimum
+remains open. The event-sweep replay is C3; an independent complete coverage method
+remains additional confirmation.
+Research below 3.875 must now justify its value as a simpler certificate or method
+development, rather than a public bound advance.
 The pure point/density ceiling `38200/9977 ≈ 3.8288` lies only about `0.00236` above
 T-026, so additional heavy work for microscopic gains in that language is paused.
 H-160/exp-158 and H-162/exp-160 are registered but blocked before target invocation.
@@ -846,6 +858,9 @@ case or experiment separately.
 | [N11 W10 Route Selection](docs/project/reviews/review-2026-09-14-n11-w10-route-selection.md) | dated review record | record | retained | — |
 | [Post-W5 route selection for material small-n progress](docs/project/reviews/review-2026-09-14-n11-post-w5-route-selection.md) | dated review record | record | retained | — |
 | [Proof Review: Kleddamag’s `s(17) > 461300/99853`](docs/project/reviews/review-2026-09-21-n17-kleddamag-461300-99853.md) | dated review record | record | retained | — |
+| [External Square Certificates: Mathematical and Integration Review](docs/project/reviews/review-2026-09-22-external-square-certificates-integration.md) | dated review record | record | retained | — |
+| [Tokoharu Rectangle Densities: Mathematical and Integration Review](docs/project/reviews/review-2026-09-22-tokoharu-density-mathematics.md) | dated review record | record | retained | — |
+| [Mathematical Review: Kleddamag’s `s(11) > 31/8`](docs/project/reviews/review-2026-09-22-kleddamag-n11-mathematics.md) | dated review record | record | retained | — |
 | [The Three-Lane Research Method](docs/project/three-lane-research-method.md) | component scope and use | record | retained | — |
 | [Handoff — 2026-09-04, close of the fractional-certificate block](docs/project/handoff-2026-09-04-block-close.md) | dated handoff record | record | retained | — |
 | [Handoff: Post-3.81 Portfolio at T+2](docs/project/handoff-2026-09-06-post-381-t2-commissioning.md) | dated handoff record | record | retained | — |
@@ -1095,6 +1110,18 @@ Three process defects came out of the block and are tracked rather than worked a
 `think-fqut`, where GitHub’s stacked-PR merge orphans declared gate commits;
 `think-qsn2`, where `check_session_gate`’s verdict depends on the clone’s fetch depth;
 and `think-3umt`, where a record authored terminal can never earn its first receipt.
+
+**Owner-directed entry, Session 152:** review and integrate the new external n11 and
+rectangle-density certificates.
+The resulting next technical priority is `think-d010`: decide the complete n11 adaptive
+parent-core catalogue by an independent coverage method, preserving its admissible
+centre domain and addressing the native site and feature-slot limits.
+`think-c0xc` tracks the reproduced density import bug; `think-ck07` tracks an additional
+complete density-verification method.
+Session 152 also corrects the n17 case to the already replayed and reviewed Kleddamag
+value `461300/99853`: the lack of C4 does not bar adoption under the
+strongest-certifiable-bound contract.
+The preceding Session 150 paragraph records its disposition at that earlier cutoff.
 
 **Selected next entry:** `think-gvlg`, registering the `n = 11` rung Session 151 left
 accepted and unregistered.
@@ -3431,8 +3458,8 @@ no intervening improvement:
 |  | value | source |
 | --- | --- | --- |
 | Best known packing (upper bound) | `3.8770835…` | Walter Trump, 1979 |
-| Best certified lower bound | `955000*sqrt(518400042893309449)/179696714646249 = 3.8264474…` | [T-026](packing/frontier/RESULTS.md), proved at V4/C5 by an exact dilation-limit argument from T-025’s threshold certificate re-certified on a 1440-step direction net |
-| Bound gap | `0.0506362` | the second-smallest open gap at `n ≤ 100` in this corpus |
+| Best certified lower bound | `31/8 = 3.875` (strict) | [Kleddamag n11 review](docs/project/reviews/review-2026-09-22-kleddamag-n11-mathematics.md), complete exact replay and mapped mathematical audit; C3 coverage method |
+| Bound gap | `0.0020836` | difference between the two bounds; the exact optimum remains open |
 
 ![Walter Trump’s exact eleven-square packing.](packing/atlas/rendering/trump11-overview.svg)
 
@@ -3510,7 +3537,7 @@ Where the program has spent effort, and what came of it.
 | 16 | proved, `4` | `4` | proved not-below control | The valid replacement for the old `n=12` guard: any reported side below `4` is known to be invalid |
 | 17 | open | `4.67553009…` (Bidwell 1998) | mechanism-matched calibration | The nearest case whose record uses genuinely oblique structure—tilts of `0°`, `+39.80496°`, and `−36.62379°`. One round: [exp-011](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-011-h-020-n17.md) reports `5.0`, the trivial `5×5` grid, on all five binary64 screening seeds |
 | 61, 78, 97 | open, `m² − 3` | `8`, `9`, `10` (grids) | opportunistic slot | The narrowest gaps in the table. An analytic Cleemann-style attempt at `arctan(3/4)` is registered and **not yet made** |
-| 1–100 | 35 proved, 65 open | — | the corpus | One schema-validated artifact per case in [`frontier/`](packing/frontier/README.md); 58 of the 65 open cases are bounded below by Nagamochi’s general theorem |
+| 1–100 | 35 proved, 65 open | — | the corpus | One schema-validated artifact per case in [`frontier/`](packing/frontier/README.md); see the [Frontier corpus summary](packing/frontier/README.md#what-the-corpus-shows) for the current aggregate lower-bound counts |
 
 Three facts about this table drive the strategy.
 
@@ -4559,15 +4586,16 @@ in separate tables: their units differ, and the same work can appear in both.
 | `codex-task-tree-session-133.yaml` | session-133 | 101 | 0.37 h | 0.2 h | 13.6 h | yes |
 | `codex-task-tree-session-134.yaml` | session-134 | 497 | 4.88 h | 1.21 h | 1.21 h | yes |
 | `codex-task-tree-session-135.yaml` | session-135 | 437 | 1.53 h | 0.48 h | 0.48 h | yes |
+| `codex-task-tree-session-152.yaml` | session-152 | 1,060 | 6.36 h | 2.26 h | 2.26 h | yes |
 | `session-142-stack-correctness.yaml` | session-142 | 1,186 | 5.01 h | 2.29 h | 2.3 h | yes |
 | `codex-task-tree-pr137-publication-tail.yaml` | unattributed | 610 | 4.39 h | 1.77 h | 1.82 h | yes |
 | `codex-task-tree-pr142-publication-tail.yaml` | unattributed | 136 | 0.87 h | 0.41 h | 0.58 h | yes |
 
 | Coverage | sessions |
 | --- | ---: |
-| measured | 97 |
+| measured | 98 |
 | unmeasured | 54 |
-| **total** | **151** |
+| **total** | **152** |
 
 <!-- END GENERATED: session-close-report -->
 
@@ -6096,8 +6124,8 @@ Each entry names what this project relies on it for.
   Electronic Journal of Combinatorics, DS7. The survey the corpus is checked against.
 - Erdős, P. and Graham, R. L. (1975). *On packing squares with equal squares.* The
   asymptotic waste line of work.
-- Nagamochi, H. (2005). *Packing unit squares in a rectangle.* The general lower bound
-  covering 58 of the 65 open cases in the corpus.
+- Nagamochi, H. (2005). *Packing unit squares in a rectangle.* The general closed-form
+  lower bound used where the register has no stronger formal evidence.
 - Montanher, T. et al.
   (2018). *Rigorous packing of unit squares into a circle.* The only rigorous
   computer-assisted optimality proof for rotatable unit squares in any container, and

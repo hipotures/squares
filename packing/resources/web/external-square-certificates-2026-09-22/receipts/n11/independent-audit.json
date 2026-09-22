@@ -1,0 +1,220 @@
+{
+  "status": "PASS_SOURCE_DISTINCT_PREMISE_AND_ADVERSARIAL_CONTROLS",
+  "certificate_sha256": "57e9927da5c13f42dd8bcbf8f08c84363635fece626657ee63a810c61cd44458",
+  "reviewed_certificate_source_commit": "6a733f339395c3514f2ab63d8c4aa64cf63c0b5a",
+  "scope": "Complete premises and selected scanner controls; complete upstream replay remains required.",
+  "structure": {
+    "physical_sites": 5284,
+    "active_physical_sites": 5284,
+    "site_orbits": 679,
+    "positive_orbits_by_family": {
+      "points": 66,
+      "2-of-5": 10,
+      "2-of-3": 132,
+      "3-of-5": 142
+    },
+    "physical_features_by_family": {
+      "points": 496,
+      "2-of-5": 76,
+      "2-of-3": 1020,
+      "3-of-5": 1124
+    },
+    "budget_units_by_family": {
+      "points": 2247714156,
+      "2-of-5": 989672288,
+      "2-of-3": 3188007592,
+      "3-of-5": 4574085908
+    },
+    "budget_units": 10999479944,
+    "minimum_units": 999962528,
+    "surplus_units": 107864,
+    "absolute_expanded_weight_units": 184231386320,
+    "headroom_limit": 1125899906842624,
+    "native_padded_member_slots": 13580
+  },
+  "containment": {
+    "intervals": 12028,
+    "strict_quadratic_inequalities": 48112,
+    "centre_envelope_inequalities": 12028,
+    "minimum_positive_quadratic_numerator": "1/1000000000000",
+    "last_half_angle": "207107/500000",
+    "angle_coverage_surplus": "309449/250000000000"
+  },
+  "gap_arithmetic": {
+    "prior_T026_approximation": "3.82644741057293974417136861547183468306846904947131772112791",
+    "reported_upper_approximation": "3.87708359002281417730789706010096",
+    "new_lower": "3.875",
+    "remaining_gap_approximation": "0.00208359002281417730789706010096",
+    "percent_of_T026_gap_closed_approximation": "95.8851752927434888371711173554987557753645362586813037493840",
+    "scope": "Decimal arithmetic on the T-026 expression and retained upper approximation; not an optimum proof."
+  },
+  "source_verification": {
+    "reviewed_source_commit": "6a733f339395c3514f2ab63d8c4aa64cf63c0b5a",
+    "manifest_sha256": "17b9ca8fc7020bebffb0f10cbc2206d631265538a89fe1ada5fd76acf31a1b7a",
+    "verified_files": 54,
+    "source_tree": "/private/tmp/squares-frontier-20260922/kleddamag-11"
+  },
+  "source_probes": {
+    "source_verification": {
+      "reviewed_source_commit": "6a733f339395c3514f2ab63d8c4aa64cf63c0b5a",
+      "manifest_sha256": "17b9ca8fc7020bebffb0f10cbc2206d631265538a89fe1ada5fd76acf31a1b7a",
+      "verified_files": 54,
+      "source_tree": "/private/tmp/squares-frontier-20260922/kleddamag-11"
+    },
+    "mutations": [
+      {
+        "mutation": "negative_point_weight",
+        "result": "REFUSED",
+        "reason": "invalid point orbit"
+      },
+      {
+        "mutation": "negative_charge_weight",
+        "result": "REFUSED",
+        "reason": "invalid charge weight"
+      },
+      {
+        "mutation": "duplicate_point_orbit",
+        "result": "REFUSED",
+        "reason": "duplicate sites"
+      },
+      {
+        "mutation": "missing_charge_image",
+        "result": "REFUSED",
+        "reason": "incomplete charge orbit"
+      },
+      {
+        "mutation": "duplicate_charge_site",
+        "result": "REFUSED",
+        "reason": "invalid charge sites"
+      },
+      {
+        "mutation": "out_of_range_charge_site",
+        "result": "REFUSED",
+        "reason": "invalid charge sites"
+      },
+      {
+        "mutation": "understated_budget",
+        "result": "REFUSED",
+        "reason": "budget/overflow"
+      },
+      {
+        "mutation": "angle_partition_gap",
+        "result": "REFUSED",
+        "reason": "catalogue coverage"
+      },
+      {
+        "mutation": "truncated_angle_coverage",
+        "result": "REFUSED",
+        "reason": "angle gap"
+      },
+      {
+        "mutation": "nonstrict_core",
+        "result": "REFUSED",
+        "reason": "catalogue coverage"
+      },
+      {
+        "mutation": "wrong_container",
+        "result": "REFUSED",
+        "reason": "wrong container/parent"
+      },
+      {
+        "mutation": "insufficient_counting_margin",
+        "result": "REFUSED",
+        "reason": "counting budget"
+      },
+      {
+        "mutation": "core_touches_parent",
+        "result": "REFUSED",
+        "reason": "core not strict"
+      },
+      {
+        "mutation": "ambiguous_charge_schema",
+        "result": "REFUSED",
+        "reason": "ambiguous charge schema"
+      },
+      {
+        "mutation": "expanded_weight_overflow",
+        "result": "REFUSED",
+        "reason": "budget/overflow"
+      },
+      {
+        "mutation": "doubled_required_charge",
+        "result": "REFUSED_BY_COVERAGE",
+        "reason": "row 0 gives 1000047518 < 1999925056"
+      }
+    ],
+    "sampled_geometry": {
+      "rows": [
+        {
+          "row": 0,
+          "minimum_units": 1000047518,
+          "clipped_slabs": 6385,
+          "cells": 40523881,
+          "dense_matches_segment_tree": true
+        },
+        {
+          "row": 1,
+          "minimum_units": 1000047518,
+          "clipped_slabs": 6415,
+          "cells": 40703661,
+          "dense_matches_segment_tree": true
+        },
+        {
+          "row": 6014,
+          "minimum_units": 1000047518,
+          "clipped_slabs": 7267,
+          "cells": 43298341,
+          "dense_matches_segment_tree": true
+        },
+        {
+          "row": 11962,
+          "minimum_units": 999962528,
+          "clipped_slabs": 7421,
+          "cells": 42875093,
+          "dense_matches_segment_tree": true
+        },
+        {
+          "row": 12027,
+          "minimum_units": 1000047518,
+          "clipped_slabs": 7421,
+          "cells": 42871173,
+          "dense_matches_segment_tree": true
+        }
+      ],
+      "scope": "Selected rows only; all slabs per selected row."
+    },
+    "runtime": {
+      "python": "3.14.7 (main, Aug 25 2026, 13:50:14) [Clang 22.1.3 ]",
+      "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+      "packages": {
+        "numpy": "2.3.5",
+        "numba": "0.67.0",
+        "llvmlite": "0.49.0"
+      }
+    }
+  },
+  "source_probe_stderr": "",
+  "optimized_launcher_control": {
+    "returncode": 1,
+    "stderr": "Verification requires Python assertions; remove -O/-OO and unset PYTHONOPTIMIZE."
+  },
+  "full_replay": {
+    "status": "PASS_FRESH_PORTABLE_FULL_VERIFICATION",
+    "certificate_sha256": "57e9927da5c13f42dd8bcbf8f08c84363635fece626657ee63a810c61cd44458",
+    "bound": "31/8",
+    "parent_side": "764/775",
+    "scope": "Receipt consistency and complete recorded coverage; not a signed execution attestation.",
+    "intervals": 12028,
+    "minimum_units": 999962528,
+    "histogram_bins": 11,
+    "python_slabs": 86299918,
+    "python_cells": 511649694680,
+    "javascript_slabs": 86275862,
+    "python_seconds": 1501.1203584999894,
+    "javascript_seconds": 1790.0111118750065,
+    "controls_seconds": 277.9722431249684,
+    "boundary_centres": 5586,
+    "minimum_sampled_charge": 1000047518
+  },
+  "seconds": 27.626048417005222
+}

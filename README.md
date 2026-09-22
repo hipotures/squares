@@ -19,15 +19,15 @@ This repository contains:
 
 The [**v0.4.0 explainer page**](https://jlevy.github.io/squares/) starts with an
 interactive point-certificate proof, then shows how threshold atoms and a dilation limit
-reach the current `s(11)` lower bound.
+reach T-026’s historical `s(11) >= 3.8264474…` bound.
 Its figures remain drawn from the point certificates they explain.
 
-[![One hundred known-best square packings arranged from n equals one through one hundred, each labeled with its best-known upper bound and, where the value is still open, the strongest lower bound independently verified here.](packing/atlas/known-best/known-best-1-100.png)](https://jlevy.github.io/squares/known-best-1-100.pdf)
+[![One hundred known-best square packings arranged from n equals one through one hundred, each labeled with its best-known upper bound and, where the value is still open, the strongest verified lower bound.](packing/atlas/known-best/known-best-1-100.png)](https://jlevy.github.io/squares/known-best-1-100.pdf)
 
 *The retained `n = 1…100` atlas, with each packing normalized to its own container and
 labeled by its best-known side upper bound.
-For open cases, the strongest lower bound independently verified here appears beneath
-it. A crimson star marks a lower bound proved here.
+For open cases, the strongest verified lower bound appears beneath it.
+A crimson star marks a lower bound proved here.
 The image is available in [**SVG**](packing/atlas/known-best/known-best-1-100.svg),
 [**PDF**](https://jlevy.github.io/squares/known-best-1-100.pdf), and
 [**high-resolution PNG**](packing/atlas/known-best/known-best-1-100@2x.png).*
@@ -102,7 +102,7 @@ Results first established here, as far as the recorded source searches show:
   [T-025](packing/cases/n11_threshold_certificate/t-025-verifiable-claim-191-50.md)
   introduces point atoms plus *threshold atoms*, whose stronger budget rule carries the
   side past the point method’s proved ceiling, and directly proves
-  `s(11) ≥ 191/50 = 3.82`. The strongest proved lower bound now stands at
+  `s(11) ≥ 191/50 = 3.82`. The later T-026 result is
   `s(11) ≥ 955000*sqrt(518400042893309449)/179696714646249 =
   3.8264474…`, proved from those same threshold atoms re-certified on a 1440-step
   direction net and an exact dilation-limit argument
@@ -111,7 +111,14 @@ Results first established here, as far as the recorded source searches show:
   with passing replay, confirmed by distinct exact event-cell and interval coverage
   methods and a mapped source-distinct review of the complete claim.
   The explainer uses the `3.81` certificate as its visual worked example, then proves
-  the threshold-counting and dilation steps that establish the headline bound directly.
+  the threshold-counting and dilation steps that establish T-026 directly.
+  The
+  [September 22 external review](docs/project/reviews/review-2026-09-22-external-square-certificates-integration.md)
+  verifies Kleddamag’s stronger `s(11) > 31/8 = 3.875` certificate and Tokoharu’s
+  rectangle-density bounds `s(26) >= 5.508` and `s(29) >= 5.71`. Complete replays and
+  mathematical reviews support the new verified Frontier bounds.
+  The records state each checker’s scope; a second complete method remains additional
+  confirmation.
 - **T-019: `s(17), s(18), s(19) ≥ 459/100`, improving the register (`S4`).** The adopted
   bound for [these](packing/frontier/n-017.md) three cases was Massaccesi’s `4.5058`,
   taken from a source rather than proved here.
@@ -286,14 +293,18 @@ accordingly.
 
 ## Survey
 
-The survey records the best-known packing and strongest lower bound independently
-verified here for every `n ≤ 324`, with provenance and separate reported and verified
-fields. Its source is one schema-validated case file under
+The survey records the best-known packing and strongest verified lower bound for every
+`n ≤ 324`, with provenance and separate reported and verified fields.
+Complete external certificate replays qualify when their mathematical assumptions are
+discharged; each record states who performed the checks and their independence limits.
+Its source is one schema-validated case file under
 [`packing/frontier/`](packing/frontier/README.md); the generated
 [status table](packing/frontier/STATUS.md) is the reader view, and the atlas above
 renders every retained known-best packing.
 The current `n = 18` survey row records the independently verified lower bound
-`4679/1000 = 4.679` from `T-030`, and `n = 17` records `461300/99999` from `T-032`.
+`4679/1000 = 4.679` from `T-030`. At `n = 17`, the retained Kleddamag replay and proof
+review support the stronger `461300/99853 = 4.619791…`; T-032 remains in the result
+history.
 
 The [literature archive](packing/resources/README.md) retains each primary source, a
 cleaned Markdown transcription, and the unedited extraction used to check it.

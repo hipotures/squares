@@ -1,0 +1,36 @@
+Source URL: https://x.com/kleddamag/status/2102358756591907112?s=20
+Author profile: https://x.com/kleddamag
+Retrieved: 2026-09-22T18:09:13Z
+Method: unauthenticated first-party X page in the Codex in-app browser
+Web fallback: web.open returned "Cache miss"; exact-ID web searches returned no results
+
+The browser accessibility tree and page Open Graph metadata exposed this two-post thread.
+
+Post 1 of 2
+URL: https://x.com/kleddamag/status/2102358756591907112
+Published: 2026-09-22T11:26:02.000Z
+
+Me + Codex (@ChatGPT) pushed the lower bound for packing 11 unit squares into a square from 3.826447… to 3.875.
+
+That closes 95.89% of the gap to the best known packing (3.87708359…).
+
+Rotations allowed. Exact minimum still open.
+
+Attached media Open Graph URL:
+https://pbs.twimg.com/media/HS0T7__W0AAZ0kZ?format=webp&name=large
+
+Retained media: x-kleddamag-media.webp
+Retained media SHA-256: 539f08b572586a67f65f087b894f98d48775c33a703d21d43dfcedae8e10bb4b
+Retained media dimensions: 2048 x 1280
+
+Post 2 of 2
+URL: https://x.com/kleddamag/status/2102358760471564308
+Published: 2026-09-22T11:26:03.000Z
+
+Built on @ojoshe’s work, with checker code adapted from @guzhou0806.
+
+Proof + code:
+https://github.com/Kleddamag/11-squares-certified-bound
+Download it, run the checks, and improve it further if you can. Tag me if you do.
+
+The first-party page displayed the shortened link https://t.co/t7sSvmZ8fI and resolved it to the GitHub URL above.

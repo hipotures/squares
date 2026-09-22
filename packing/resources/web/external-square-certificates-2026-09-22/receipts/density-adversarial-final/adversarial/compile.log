@@ -1,0 +1,5 @@
+In file included from /Users/levy/.codex/worktrees/116b/squares/packing/devtools/tokoharu_density_probe.cpp:4:
+/Users/levy/.codex/worktrees/116b/squares/packing/resources/web/external-square-certificates-2026-09-22/tokoharu-density/src/verify.cpp:126:1: warning: non-void function does not return a value in all control paths [-Wreturn-type]
+  126 | }
+      | ^
+1 warning generated.

@@ -1,0 +1,42 @@
+Source URL: https://x.com/tokoharu_procon/status/2102433505158590533?s=20
+Author profile: https://x.com/tokoharu_procon
+Retrieved: 2026-09-22T18:09:13Z
+Method: unauthenticated first-party X page in the Codex in-app browser
+Web fallback: web.open returned "Cache miss"; exact-ID web searches returned no results
+
+The browser accessibility tree and page Open Graph metadata exposed this three-post thread.
+
+Post 1 of 3
+URL: https://x.com/tokoharu_procon/status/2102433505158590533
+Published: 2026-09-22T16:23:03.000Z
+
+I’ve published new certified lower bounds for packing unit squares in a square, developed with AI assistance under human direction:
+
+n = 26: 5.45 → 5.508 (+0.058)
+n = 29: 5.57 → 5.71 (+0.14)
+These results have since been improved further by @wand125.
+
+https://github.com/tokoharu/square-packing-density-bounds
+
+Attached media Open Graph URL:
+https://pbs.twimg.com/media/HS1WEcEa0AEnLtD?format=webp&name=large
+
+Retained media: x-tokoharu-media.webp
+Retained media SHA-256: 57f992ea575960a379f009198f3d9d0a58bb8942ffaa4bd46a15e5ceea213275
+Retained media dimensions: 2048 x 704
+
+Post 2 of 3
+URL: https://x.com/tokoharu_procon/status/2102433509084459453
+Published: 2026-09-22T16:23:04.000Z
+
+I was inspired to explore square-packing problems by @ojoshe and @wand125.
+
+At n = 26 and 29, I found it increasingly difficult to obtain substantially better bounds using point-mass constructions. This led me to step back and rethink the representation itself.
+
+Post 3 of 3
+URL: https://x.com/tokoharu_procon/status/2102433511894642832
+Published: 2026-09-22T16:23:05.000Z
+
+The main idea is to extend the point-mass basis to rectangle densities, adding flexibility while retaining rigorous certification.
+
+What struck me most was starting from ideas, then working with AI to carry them through to the technical details needed for a proof!

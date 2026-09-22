@@ -434,6 +434,15 @@ could not be retrieved are in
 
 ## Web Sources
 
+The
+[September 22 external certificate packet](web/external-square-certificates-2026-09-22/README.md)
+retains complete pinned Tokoharu, Kleddamag, wand125 and Guzhou source trees, the
+supplied social threads, executable replay receipts and independent audit controls.
+Its Frontier keys are **[Tokoharu density 2026]**, **[Kleddamag n11 2026]** and
+**[wand125 point bounds 2026]**. The
+[integration review](../../docs/project/reviews/review-2026-09-22-external-square-certificates-integration.md)
+distinguishes literal reported bounds, verified replays and proposed native extensions.
+
 | Key | What | Source | File stem (in `web/`) |
 | --- | --- | --- | --- |
 | **[Friedman Center]** | Packing Center record tables and diagrams | erich-friedman.github.io | `friedman-packing-center-squares` |

@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+title: "R038: A strict parent-side lower-bound certificate for seventeen unit squares / 十七单位正方形的严格父边长下界证书"
+message: "Please cite a fixed commit and retain the upstream credit listed in NOTICE.md. / 请引用固定提交并保留 NOTICE.md 中列出的上游署名。"
+type: software
+version: "r038-public-1"
+authors:
+  - name: "Guzhou0806"
+repository-code: "https://github.com/Guzhou0806/n17-square-packing"
+abstract: >-
+  An exact computer-assisted certificate proving s(17) > 461300000000/99974999999,
+  using a SHA-pinned upstream measure and complete expanded-domain event-cell replay.
+  / 一份精确的计算机辅助证书，证明 s(17) > 461300000000/99974999999，
+  使用 SHA 锁定的上游测度与完整扩域事件胞元复演。
+keywords:
+  - square packing
+  - computer-assisted proof
+  - lower bound
+  - exact arithmetic
