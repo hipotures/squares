@@ -925,6 +925,19 @@ clone stamps correctly.
 The claim documents still link to the pinned `PUBLICATION_REVISION` (`edition_file()`),
 which moves only when an edition is cut.
 
+**A release tag carries the version alone, without the data revision.** `v0.4.1` is
+`PUBLICATION_VERSION`; the stamp in a frame’s corner is `PUBLICATION_EDITION`, which
+appends the data revision.
+A tag names a release; a stamp names the evidence one artifact was drawn from, and a
+release may carry assets drawn from different revisions.
+
+**Videos are published as release assets, never committed.** The whole route -- why not
+Actions artifacts, Git LFS or a committed file; the tag; the upload’s content type; the
+receipt that travels with each video; and the `<video>` embed with its codec string --
+is
+[Publication](docs/project/specs/active/plan-2026-09-21-video-delivery-profiles.md#publication)
+in the delivery-profiles plan.
+
 **After any commit that changes the data, re-pin.** A commit cannot contain its own
 hash, so a data change is followed by a second commit that sets `DATA_REVISION` to the
 data commit and rebuilds the atlas family

@@ -241,8 +241,99 @@ It alters a developer tool and adds a checker.
 
 The captures live outside the repository: `packing/site/` is gitignored and built by CI,
 and a multi-megabyte MP4 is not committed.
-Where the finished files are hosted is a separate decision, tracked on the video epic
-`think-hsdj`, Phase 4.
+How a finished cut reaches a reader is **Publication** below.
+
+## Publication
+
+A cut is published as a **GitHub Release asset**, and linked or embedded from the pages
+this repository already serves.
+The route was chosen against three alternatives on 2026-09-22; what follows is the
+reasoning, then the procedure.
+
+### Why not commit the file
+
+`sqpack.release` says it in the code that pins the data revision: the videos are release
+assets, never committed.
+Two measurements stand behind that.
+GitHub refuses a file over 100 MB outright, and the n = 1..324 archive cut is about 230
+MB, so the long cut could not be committed even if the policy allowed it.
+And a committed binary is permanent: the repository is already 502 MB, and every re-cut
+would add its predecessor to history forever.
+
+### Why not Actions artifacts, Git LFS, or Pages alone
+
+| Mechanism | Cost on this public repository | Lifetime | Can a page link it? |
+| --- | --- | --- | --- |
+| Actions artifact | free | 90 days at most | **No** — no anonymous URL; a download needs a signed-in session or a token |
+| Git LFS | billed past its free quota | permanent | **No** — Pages serves the pointer file, not the video |
+| Committed and served by Pages | free | permanent, unfortunately | yes, under a 100 MB per-file wall |
+| **Release asset** | **free** | until deleted | **yes**, 2 GB per file |
+
+The one that matters for video is the last column *and* range requests: a `<video>`
+element seeks by asking for byte ranges, and a host that answers 200 with the whole file
+makes seeking a full download.
+Measured on 2026-09-22: a release asset URL 302-redirects to
+`release-assets.githubusercontent.com`, which answers a `Range: bytes=0-99` request with
+`HTTP 206` and `accept-ranges: bytes`. That is what makes this route work.
+
+### The tag
+
+The tag is the **publication version alone** — `v0.4.1`, which is
+`sqpack.release.PUBLICATION_VERSION` — and carries no data revision.
+The frames carry the full edition, `PUBLICATION_EDITION`, which appends the first six
+characters of the pinned data revision: `v0.4.1-b7690c`. The two are deliberately
+different. The tag names a release, which is a thing a reader cites and a maintainer
+moves forward; the stamp names the evidence a particular frame was drawn from, which is
+finer-grained and changes whenever the records do.
+A release may carry assets stamped with different revisions, and the stamp in the corner
+is what says which.
+
+### The procedure
+
+1. **Cut and verify.** `capture_video --citations` writes the file and its receipt,
+   refuses a file that does not conform to its profile, and prices the range against the
+   page. Run `squares-workbench-check-cadence` on the result and record where its
+   smoothness stands.
+2. **Tag and create the release** from the commit the page was built at.
+3. **Upload the mp4 with an explicit content type.** `gh release upload` has no
+   content-type flag and infers one, and a release asset uploaded without a type is
+   served as `application/octet-stream` with `Content-Disposition: attachment`
+   (observed). A `<video>` element ignores the disposition and browsers sniff the bytes,
+   so it generally plays either way, but the honest fix is to set
+   `Content-Type: video/mp4` through the API rather than rely on sniffing.
+4. **Upload each receipt beside its video.** The receipt is the provenance — frames,
+   duration, the file’s digest, the page’s digest, the citation file’s digest, the beat
+   and the grid-fill factor.
+   A published video whose receipt is not published is a claim without its evidence.
+5. **Verify what is served**, rather than assuming: the status, the content type, and
+   that a range request returns 206.
+6. **Link or embed** from `templates/explainer-article.md`, which is the explainer’s
+   prose source.
+
+### The embed
+
+Read off the delivered file rather than assumed — H.264 High profile, level 4.0,
+yuv420p, 1920 x 1080, 60 fps, and no audio track:
+
+```html
+<video controls width="960" playsinline>
+  <source src="https://github.com/jlevy/squares/releases/download/v0.4.1/ascent-n1-100-1080p60-citations.mp4"
+          type='video/mp4; codecs="avc1.640028"'>
+</video>
+```
+
+`64` is the High profile, `00` the constraint flags, `28` hexadecimal for level 40.
+There is no `mp4a` in the codecs string because the cut is silent.
+
+### The alternative, if the asset host’s headers ever become a problem
+
+Pages here deploys from a **workflow artifact** rather than from a branch, so the site
+is assembled in CI. A build step could fetch the release asset and place it under
+`packing/site/`, which would serve it from the Pages origin with a content type derived
+from the extension and a URL under `jlevy.github.io/squares/`. The cost is the file’s
+bytes on every deploy, against Pages’ 1 GB site limit and its 100 GB monthly soft
+bandwidth limit. Not taken while the release asset serves correctly, because it couples
+every page deploy to a large binary.
 
 ## Open Questions
 
