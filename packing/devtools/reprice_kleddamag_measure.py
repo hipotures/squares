@@ -85,7 +85,7 @@ import json
 import time
 from bisect import bisect_left, bisect_right
 from concurrent.futures import ProcessPoolExecutor
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from fractions import Fraction
 from math import atan, degrees, lcm
 from multiprocessing import get_context
@@ -777,6 +777,63 @@ def _dual_bound(
     return scale * Fraction(int(units.sum()), denominator), int(np.count_nonzero(units))
 
 
+def separation_probe(
+    expansion: Expansion,
+    support: Support,
+    solution: dict[str, Any],
+    budget: np.ndarray,
+    sample: list[int],
+    *,
+    workers: int,
+    quiet: bool,
+) -> dict[str, Any]:
+    """One round of separation: what the re-priced measure actually charges.
+
+    The linear program is a relaxation, and a relaxation's value is worth exactly as much
+    as the question of whether its answer survives the constraints it dropped. This puts
+    the LP's own weights back into the artifact's sweep and re-minimises over the *whole*
+    continuum of a sample of rows, not over the one cell the program was given.
+
+    By the same homogeneity the ``H-235`` screen uses, a measure of integer budget ``B``
+    whose least charge over every row is ``G`` rescales to one charging at least 1
+    everywhere with mass ``B / G``. The sample's least charge is an upper bound on the
+    true ``G``, so ``B / G`` over the sample is a *lower* bound on the re-priced measure's
+    real mass -- and a sample that already pushes it to 17 or past refutes the LP's answer
+    as a certificate without sweeping the other rows. A sample that does not is silent:
+    it takes every row to pass, and this takes a few hundred.
+    """
+    started = time.perf_counter()
+    active = cast(np.ndarray, solution["active"])
+    units = cast(np.ndarray, solution["weights"])
+    whole = np.zeros(support.variables, np.int64)
+    whole[active] = units
+    offset = len(support.orbit_size)
+    repriced = replace(
+        expansion,
+        weights=tuple(int(whole[o]) for o in support.site_orbit),
+        triple_weights=tuple(int(whole[offset + t]) for t in support.triple_orbit),
+    )
+    total = int(budget @ whole)
+    if sum(repriced.weights) + 5 * sum(repriced.triple_weights) >= 2**50:
+        raise RepricingError("the re-priced measure leaves the artifact's int64 headroom")
+    cells = sweep(repriced, support, sample, workers=workers, quiet=quiet)
+    worst = min(cells, key=lambda cell: cell.units)
+    mass = Fraction(total, worst.units)
+    return {
+        "rows_swept": len(cells),
+        "rows_available": len(expansion.rows),
+        "budget_units": total,
+        "least_charge_units": worst.units,
+        "least_charge_row": worst.row,
+        "least_charge": str(Fraction(worst.units, expansion.weight_denominator)),
+        "least_charge_float": float(Fraction(worst.units, expansion.weight_denominator)),
+        "mass_lower_bound": str(mass),
+        "mass_lower_bound_float": float(mass),
+        "survives_as_certificate_on_sample": bool(mass < 17),
+        "seconds": round(time.perf_counter() - started, 1),
+    }
+
+
 def dual_histogram(cells: list[RowCell], duals: np.ndarray) -> dict[str, Any]:
     """``H-239``: what share of the dual mass sits at a folded Bidwell tilt class."""
     total = float(duals.sum())
@@ -978,6 +1035,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--from-matrix", type=Path, default=None)
     parser.add_argument("--report", type=Path, default=None)
     parser.add_argument("--skip-lp", action="store_true")
+    parser.add_argument(
+        "--separation-rows",
+        type=int,
+        default=0,
+        help="re-sweep this many rows with the LP's own weights, one round of separation",
+    )
     parser.add_argument("--quiet", action="store_true")
     args = parser.parse_args(argv)
 
@@ -1059,6 +1122,18 @@ def main(argv: list[str] | None = None) -> int:
             legal = solve(matrix[keep, :], budget, expansion.weight_denominator)
             report["lp_envelope_cells_only"] = _report_solution("envelope cells", legal)
         report["H239_dual"] = dual_histogram(cells, full["duals"])
+        if args.separation_rows > 0:
+            stride = max(len(expansion.rows) // args.separation_rows, 1)
+            probe = _sample(len(expansion.rows), stride, args.separation_rows)
+            report["separation"] = separation_probe(
+                expansion,
+                support,
+                full,
+                budget,
+                probe,
+                workers=args.workers,
+                quiet=args.quiet,
+            )
         report["headroom"] = {
             "artifact_normalised_mass": report["K4_artifact"]["normalised_mass"],
             "lp_exact_floor": full["exact_floor"],
