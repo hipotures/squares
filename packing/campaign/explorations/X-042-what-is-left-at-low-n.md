@@ -184,6 +184,40 @@ unbuilt. After repair the edit tier passes at `124.4 s` against its `240 s` ceil
 This is recorded because a review block that cannot run its own instruments is not a
 review block, and because the next session should not rediscover it.
 
+## The Gate Cannot Reach These Artifacts, and That Is Structural
+
+Found by running the `A2` cell rather than by reasoning about it, and it bounds the
+whole external-intake programme rather than one experiment.
+
+`decide_threshold_certificate` retains a record only when **both** routes accept it.
+The interval route refuses any input above `MAX_INTERVAL_ATOMS = 4096`
+(`src/sqpack/fractional/interval.py:145`), a deliberate memory guard whose own comment
+sizes it against the repository’s experience: “the largest retained certificate has
+2,260 atoms”. The external `n = 17` measure expands to **6,744 point atoms and 2,008
+threshold atoms**, so the interval route refuses it outright and prints
+`REFUSED: the interval verifier supports at most 4096 atoms`.
+
+The consequence is not about this artifact.
+**No external measure above 4,096 atoms can be retained by this repository’s gate as it
+is built**, whatever its mathematics, because one of the two required routes will not
+look at it. The `C4` rung is structurally out of reach for artifacts at the scale they
+now arrive at, and the five-value ladder shows that scale is rising — 1,620 atoms, then
+1,616, then 3,280, then 8,988 sites.
+
+The guard is conservative rather than fundamental.
+It exists to refuse an input-driven allocation in the hundreds of megabytes, and it does
+that by capping the atom count because the boxes-by-atoms mask is materialised whole.
+Batching over atoms as well as over boxes would keep the same memory ceiling at any atom
+count: at `BATCH = 4096` and 6,744 atoms the full mask is about 27 MiB, which is the
+size the cap was chosen to avoid and not a size the method requires.
+Raising the cap without chunking would not be the fix; chunking is.
+
+Until that is done, an external measure of this size can be replayed, reviewed and
+retained as bytes — which is what `T-032` and the Kleddamag retention did — and cannot
+be decided by this repository’s own two routes.
+That is worth stating plainly next to every claim about what the intake programme can
+verify.
+
 ## Ranked Slate
 
 Ranked by expected information per hour against instruments that exist.
