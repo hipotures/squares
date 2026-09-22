@@ -143,10 +143,10 @@ hypothesis status and summarizes experiment verdicts, and the
 
 | Record | Count | State at the cutoff |
 | --- | ---: | --- |
-| Agendas | 37 | 17 active; 14 completed; 5 paused; 1 superseded |
-| Commitments | 356 | 181 complete; 61 stopped; 68 blocked; 16 ready; 21 tentative; 9 in progress |
-| Sessions | 150 | 92 completed; 58 stopped; all terminal |
-| Explorations | 39 | 24 linked to proposed hypotheses; 15 uncodified |
+| Agendas | 38 | 18 active; 14 completed; 5 paused; 1 superseded |
+| Commitments | 362 | 182 complete; 61 stopped; 68 blocked; 16 ready; 21 tentative; 14 in progress |
+| Sessions | 151 | 92 completed; 59 stopped; all terminal |
+| Explorations | 40 | 24 linked to proposed hypotheses; 16 uncodified |
 | Hypotheses | 170 | 29 confirmed; 31 refuted; 55 blocked; 17 unresolved; 5 open; 29 open questions; 2 result registered; 2 abandoned; 0 running |
 | Experiments | 155 | 43 accepted; 36 rejected; 50 unresolved; 12 baseline; 11 blocked; 3 abandoned; 0 in progress |
 | Frontier results | 32 | 32 registered |
@@ -545,6 +545,15 @@ case or experiment separately.
 | [Exp-220 n=11 96/25 Class Re-Freeze Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-220-n11-96-25-class-receipt.md) | research synthesis | record | retained | — |
 | [H-222 Registration Review of exp-219 (Session 146, chunk 3)](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/h222-registration-review.md) | research synthesis | record | retained | — |
 | [n=11 96/25 Corner-Clipped Covering Receipt (exp-219)](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-040/exp-219-n11-96-25-clip-receipt.md) | research synthesis | record | retained | — |
+| [Bootstrap Receipt: a Fresh Clone Cannot Run the Research Loop (BC-368)](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-041/bootstrap-receipt.md) | research synthesis | record | retained | — |
+| [Deep-Gate Wall Clock Receipt (W5 efficiency block, `think-zmos`)](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-041/deep-gate-wall-clock-receipt.md) | research synthesis | record | retained | — |
+| [Exp-221 n=17 Kleddamag Measure, Read Unrestricted](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-221-n17-kleddamag-unrestricted-receipt.md) | research synthesis | record | retained | — |
+| [Exp-222 Re-pricing the n=17 Kleddamag Measure on Its Own Catalogue](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-222-n17-repricing-receipt.md) | research synthesis | record | retained | — |
+| [Exp-223 The Grid Escape at n = 12, 20, 21](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-223-grid-escape/exp-223-grid-escape-receipt.md) | research synthesis | record | retained | — |
+| [Exp-224 n=19 at Four Times the Budget](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-224-n19-10x/exp-224-n19-10x-receipt.md) | research synthesis | record | retained | — |
+| [Exp-225 n=27, n=28 and n=29 at 548/100 by Re-Bumping the n=29 Atoms](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-225-n27-n28-548-100-rebump-receipt.md) | research synthesis | record | retained | — |
+| [Exp-226 The `n = 11` Threshold Atoms at the 2880-Step Net](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-226-n11-net2880-receipt.md) | research synthesis | record | retained | — |
+| [Handoff: the Low-`n` Review, the Efficiency Block, and the 2880 Rung, 22 September 2026](docs/project/handoff-2026-09-22-low-n-review-and-the-2880-rung.md) | dated handoff record | record | retained | — |
 | [n=20 973/200 T-021-Seeded Four-Grid Window-7 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n20-973-200-t021-grid4-windows7-receipt.md) | research synthesis | record | retained | — |
 | [n=20 973/200 T-021-Seeded Four-Grid Window-7 2400 s Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n20-973-200-t021-grid4-windows7-2400-receipt.md) | research synthesis | record | retained | — |
 | [n=21 97/20 T-021-Seeded Auto Window-6 Covering Receipt](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-038/n21-97-20-t021-auto-windows6-receipt.md) | research synthesis | record | retained | — |
@@ -1057,6 +1066,22 @@ controller, not permission to blur contracts.
 
 ### Current Handoff
 
+[Session 151](packing/campaign/agent-sessions/session-151-low-n-review-and-first-party-n17.md)
+asked again what improvement is left at low `n` and moved one bound.
+The frozen `T-025` threshold atoms re-certify at the 2880-step net, where the crossing
+shrink does not rise, so the dilation-limit supremum rises to
+`955000*sqrt(2073600042893309449)/359341754646249 = 3.826997548829544`, `+0.00055` over
+`T-026`. Both retention routes accept the frozen bytes and agree at exactly 1, and the
+limit record is replayed and written; **the register entry is deliberately unwritten**,
+which is why the session is stopped with certification debt rather than completed.
+Four cells returned measured negatives with witnesses — the `n = 17` triples and the
+parent-centre restriction are both load-bearing, re-pricing that support is capped at
+about `+0.0034`, and the first grid-capable search at `n = 12`, `20` and `21` returned
+the grid exactly on every run.
+Its `X-042` contradicts `X-041` in nine places, and the block corrected itself three
+times, including reverting an `H-228` refutation that an adversarial lane caught after
+it had been pushed.
+
 [Session 150](packing/campaign/agent-sessions/session-150-n17-consolidation-and-correctness.md)
 landed the agenda-040 overnight stack and the n = 17 intake on main, repairing four
 confirmed review findings at the integration point rather than after it, and left the
@@ -1073,13 +1098,15 @@ Three process defects came out of the block and are tracked rather than worked a
 `think-qsn2`, where `check_session_gate`’s verdict depends on the clone’s fetch depth;
 and `think-3umt`, where a record authored terminal can never earn its first receipt.
 
-**Selected next entry:** `think-zmos`, the W5 efficiency block.
-`OR-12` asks for one in every four to eight blocks and seventeen have closed since
-Session 131 declared the last one, so this is nine past mandatory.
-Its measurements are already taken — the deep gate’s exhaustive-tier step at 1.38 times
-its own declared budget, the deferred-steps wall beside it, and one 45-minute run spent
-over a tree byte-identical to a tree already measured — and `OR-17` now gives every
-routine gate the ceiling those numbers argued for.
+**Selected next entry:** `think-gvlg`, registering the `n = 11` rung Session 151 left
+accepted and unregistered.
+Its threshold certificate at the 2880-step net is `RETAINABLE` by both retention routes,
+which agree at exactly 1, and its dilation-limit record is replayed and written; what is
+missing is a `T-id`, a claim written as a supremum, and a qualifying gate pass on a host
+where that session’s three environment failures do not apply.
+`think-zmos`, the W5 efficiency block that was the previous entry, is discharged:
+`OR-17`’s `1.38x` turned out to be the hosted runner pool rather than drift, the four CI
+jobs are clocked, and the rule’s text is corrected.
 The agenda-040 closeout under `OR-11` remains outstanding and is not this entry.
 
 [Session 149](packing/campaign/agent-sessions/session-149-n17-external-intake.md)
@@ -4423,9 +4450,9 @@ in separate tables: their units differ, and the same work can appear in both.
 
 | Rollups | count | turns | tool calls | errors | one-off code | wall |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| claimed by a session | 176 | 48,062 | 26,312 | 522 | 4,032 | 428.3 h |
+| claimed by a session | 188 | 50,776 | 27,914 | 549 | 4,234 | 436.81 h |
 | claimed by none | 61 | 13,190 | 7,606 | 177 | 1,122 | 60.64 h |
-| **measured** | **237** | **61,252** | **33,918** | **699** | **5,154** | **488.94 h** |
+| **measured** | **249** | **63,966** | **35,520** | **726** | **5,356** | **497.45 h** |
 
 | Session | Phases | Rollups | Turns | Tool calls | Errors | Wall |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -4474,7 +4501,8 @@ in separate tables: their units differ, and the same work can appear in both.
 | [session-148](packing/campaign/agent-sessions/session-148-overnight-chunk-5.md) | 1 | 9 | 524 | 296 | 11 | 2.35 h |
 | [session-149](packing/campaign/agent-sessions/session-149-n17-external-intake.md) | 3 | 1 | 370 | 185 | 2 | 18.66 h |
 | [session-150](packing/campaign/agent-sessions/session-150-n17-consolidation-and-correctness.md) | 4 | 15 | 3,783 | 2,015 | 37 | 17.66 h |
-| *shared by 45 sessions* | — | 7 | 23,948 | 13,058 | 282 | 304.17 h |
+| [session-151](packing/campaign/agent-sessions/session-151-low-n-review-and-first-party-n17.md) | 4 | 12 | 2,714 | 1,602 | 27 | 8.51 h |
+| *shared by 46 sessions* | — | 7 | 23,948 | 13,058 | 282 | 304.17 h |
 
 | Codex interval receipt | declaring sessions | model responses | agent time | active union | wall window | live lower bound |
 | --- | --- | ---: | ---: | ---: | ---: | --- |
@@ -4539,9 +4567,9 @@ in separate tables: their units differ, and the same work can appear in both.
 
 | Coverage | sessions |
 | --- | ---: |
-| measured | 96 |
+| measured | 97 |
 | unmeasured | 54 |
-| **total** | **150** |
+| **total** | **151** |
 
 <!-- END GENERATED: session-close-report -->
 

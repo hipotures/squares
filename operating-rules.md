@@ -721,9 +721,23 @@ The measurement that day, on two complete deep-gate runs of PR 208 over one tree
 
 `deep-gate.yml` and `test_deep_gate_workflow.py` price the exhaustive tier at 1943.05 s
 — the figure that refused its promotion into `--fast`. The job costs 2674 s, **1.38x its
-own declared price**. That is under the 1.5x that fails a local tier, and it went
-unnoticed for the reason `OR-14` already names in another form: the CI jobs are clocked
-by no drift rule at all, so there was nothing for the number to fail against.
+own declared price**, and it went unnoticed for the reason `OR-14` already names in
+another form: the CI jobs are clocked by no drift rule at all, so there was nothing for
+the number to fail against.
+
+**The clocking gap was real; the 1.38x was not a regression.** Measured on 2026-09-22,
+after this rule was written: runs 35480905141 and 35579234418 ran the same 58 tests,
+none added and none removed, compared by name from the two JUnit records, at 1836.1 s
+against 2621.4 s — a uniform 1.428x, every test between 1.15x and 1.60x. Two runs of the
+byte-identical commit `030d109a` read 2608 s and 2771 s, 1.06x apart, so within one
+class the job is stable.
+1943.05 s is what the tier costs on the faster class of `ubuntu-latest` and about 2650 s
+on the slower one; the declared price was one reading of a two-class pool written down
+as the job’s cost. That the pool is two machine generations is inference — the jobs API
+reports the label, not the machine — but the two-class shape of the readings is
+measurement.
+The obligation below stands unchanged: a number nothing clocks cannot tell a
+regression from a slow draw, which is exactly why it has to be clocked.
 
 Four obligations follow, and they are what a control has to hold:
 

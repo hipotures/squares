@@ -341,20 +341,31 @@ on.
 It is not the next thing, because a reassessment of what to search is queued in front
 of it.
 
-For the next supervised exact-research goal, take the W5 efficiency block under
-`think-zmos`: measure every routine gate against the wall ceiling `OR-17` now gives it,
-starting from the deep gate’s exhaustive-tier step at 1.38 times its own declared budget
-and the forty-five minutes spent re-running a tree byte-identical to one already
-measured. `OR-12` puts this nine blocks past mandatory; Session 150 published the count
-rather than discharging it.
-The n = 17 intake that stood here is landed: `T-032` carries `s(17) >= 461300/99999`,
-and its identifier contest with pull request 208, which claimed the same `T-031` from
-the open overnight stack, is settled — the stack merged into `main` first and kept
-`T-031`, and this result took `T-032` when `main` was merged into the intake branch.
-The overnight stack’s own chunk-5 handoff is queued behind it: finish the threshold-clip
-and `gap_wedge` ports from the retained patches, review the gap-g wedge derivation and
-disposition H-230 and BC-364, run H-232’s fixed-support screen, then clip the four mixed
-corner classes at 96/25 under
+For the next supervised exact-research goal, take `think-gvlg`: register the `n = 11`
+rung Session 151 left accepted and unregistered.
+Its threshold certificate at the 2880-step net is `RETAINABLE` by both retention routes,
+which agree at exactly 1, and its dilation-limit record is replayed and written; the
+bound it carries is
+`955000*sqrt(2073600042893309449)/359341754646249 = 3.826997548829544`, `+0.00055` over
+`T-026`. What it needs is a `T-id`, a claim written as a supremum because the theorem
+supplies no individual certificate at that side, and a qualifying gate pass on a host
+where Session 151’s three environment failures do not apply.
+
+The W5 efficiency block that stood here is discharged.
+Its headline turned out to be a correction rather than a confirmation: the exhaustive
+tier’s `1.38x` over its declared price is the hosted runner pool and not drift — the
+same 58 tests, compared by name, cost `1836.1 s` and `2621.4 s` on two runs, while two
+runs of one byte-identical commit differ by `1.06x` — and `OR-17`’s text now says so.
+The four CI jobs are clocked in a new `ci_gates` register at reporting strength, and the
+cheapest remaining win there is running the gate once per tree rather than once per
+pull-request event. The n = 17 intake that stood here is landed: `T-032` carries
+`s(17) >= 461300/99999`, and its identifier contest with pull request 208, which claimed
+the same `T-031` from the open overnight stack, is settled — the stack merged into
+`main` first and kept `T-031`, and this result took `T-032` when `main` was merged into
+the intake branch. The overnight stack’s own chunk-5 handoff is queued behind it: finish
+the threshold-clip and `gap_wedge` ports from the retained patches, review the gap-g
+wedge derivation and disposition H-230 and BC-364, run H-232’s fixed-support screen,
+then clip the four mixed corner classes at 96/25 under
 [H-222](../../../../packing/campaign/hypotheses/H-222-n11-octagon-class-at-96-25.md)
 with the admitted instrument and give n=26 a second site set under
 [H-225](../../../../packing/campaign/hypotheses/H-225-n26-seeded-certificate-at-53-10.md);

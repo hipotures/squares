@@ -1188,3 +1188,175 @@ pull_request_walls:
       samples:
       - {run: 35182460356, seconds: 182}
       - {run: 35187007572, seconds: 170}
+
+# The deep gate's hosted jobs, clocked the way the tiers above are clocked (`OR-17`).
+#
+# Why this section exists, in one measurement. `deep-gate.yml` and
+# `test_deep_gate_workflow.py` price the exhaustive tier at 1943.05s -- the figure that
+# refused its promotion into `--fast`. On 2026-09-21 the job that runs it cost 2674s on
+# two complete deep-gate runs of PR 208, 1.38x its own declared price. That is under the
+# 1.5x that fails a local tier, and it was read by nothing at all: the rules above judge
+# `packing-validate`'s own wall, and a hosted job's wall was judged by no rule in this
+# file. A tier does not become unbounded by being deferred.
+#
+# Read it:    ... python -m devtools.check_ci_gate_walls --gate deep-gate --run-id N
+# Record it:  ... python -m devtools.check_ci_gate_walls --gate deep-gate --sample --recent 8
+#
+# Same four rules and the same `policy` block, with one substitution: `drift_ratio` is
+# per gate, because the policy's 1.5x was measured against local tiers and these walls
+# are not local tiers.
+#
+# WHAT THE BAND IS CHOSEN AGAINST, which is the one thing this section would get wrong if
+# it were copied from the tiers. A hosted wall carries the queue, the checkout and the
+# toolchain, and it is drawn from a pool of machines that are not the same speed. Both
+# halves were measured on 2026-09-22 from the retained `validation-timings-*` artifacts
+# rather than assumed:
+#
+#   * setup is negligible here. On run 35579234418 `exhaustive-tier` spent 23s of its
+#     2674s on `Set up job`, checkout, uv and `uv sync`, 67s queueing before the job
+#     started at all, and 2648s inside the gate step. A 45-minute job does not have a
+#     setup problem, and the split is printed on every run so that stays checkable.
+#   * the runner is not negligible. Run 35480905141's `exhaustive-tier` ran the SAME 58
+#     tests as run 35579234418's -- none added, none removed, compared by name across the
+#     two JUnit records -- and every one of them was slower on the second: 1836.1s of
+#     test time against 2621.4s, a uniform 1.43x. `deferred-steps` tells the same story
+#     over its eight steps between runs 35012089923 and 35579234418: the same eight
+#     names, 1543.5s against 2435.7s, 1.58x, each step between 1.49x and 1.76x.
+#
+# So the 1.38x is not drift. About 1940s is what this job costs on the faster class of
+# hosted runner and about 2650s is what it costs on the slower one, and the declared
+# 1943.05s was one reading of a two-class pool written down as the job's cost. The
+# same-tree control says it from the other side: runs 35632055808 and 35627075872 are the
+# identical commit 030d109a and read 2608s and 2771s, 1.06x apart.
+#
+# `measured_seconds` is therefore the geometric mean over the runner mix rather than one
+# reading, with the observed `spread` and the readings themselves beside it. The cost of
+# that honesty is stated rather than hidden: a single hosted reading cannot separate a
+# 1.5x regression from a slow draw. `drift_ratio: 1.25` sits above the largest reading
+# any job has shown against its own record (1.12x, `deferred-steps`) with margin, and
+# below the 1.5x that fails a tier, so a real 1.5x regression fails on a typical draw and
+# is missed on a fast one. That is the limit of a one-run rule, not a claim about this
+# gate; what removes it is a recorded median over samples, which `pull_request_walls`
+# already has and `think-haam` owns for these.
+#
+# `enforcement: reporting` for the reason `pull_request_walls` went advisory on
+# 2026-09-17. A false red on a 45-minute pre-merge gate costs another 45 minutes to
+# clear, and a gate people cannot afford to re-run is a gate that stops reporting
+# (`OR-14`). Every band is measured, diagnosed and printed; none of them fails the run.
+#
+# And the number this section deliberately does not make red: 2540.6s of gate wall is 42
+# minutes on the merge path, which `OR-17` says is unacceptable whatever a band says. The
+# ceiling belongs around the measurement and the target belongs in the agenda (`OR-14`),
+# so those 42 minutes are `think-haam`'s to remove and not this file's to fail.
+ci_gates:
+- id: deep-gate
+  file: .github/workflows/deep-gate.yml
+  aggregate: deep-gate-required
+  selected_by: >-
+    The `deep-gate` label on a pull request, or a `workflow_dispatch`. `OR-17` requires
+    the selection to be per invocation and recorded; a label is recorded but it is not
+    yet a statement of the evidence wanted, which is the gap `think-haam` closes.
+  reference: {runner: ubuntu-latest, cpus: 4}
+  drift_ratio: 1.25
+  enforcement: reporting
+  tracking_bead: think-haam
+  reporting_reason: >-
+    First landing of a hosted-wall band on the pre-merge path, on a gate whose own
+    runner spread is 1.47x. Reporting until think-haam has a median over samples to
+    judge against; an enforcing band built on one reading would fail runs for the
+    machine rather than for the change.
+  argument: >-
+    The deferred surface, run against a pull request before it merges. Its four jobs are
+    disjoint by construction and their union is every step no pull-request job selects,
+    which `test_the_deep_gate_runs_exactly_what_the_pull_request_surface_defers` holds.
+    The aggregate has no entry: it is four seconds of `test` commands, and putting a
+    four-second script under the same band as a 44-minute tier measures nothing.
+  wall:
+    measured_seconds: 2540.6
+    measured_on: '2026-09-22'
+    measured_where: >-
+      In order, run 35632055808, 35627075872, 35579234418, 35480905141, 35213757305,
+      35078581840, 35012089923 and 34997041426, read by `devtools.check_ci_gate_walls`
+      on 2026-09-22 and reduced to their geometric mean.
+      Each reading is the run starting to its last gating job completing: 2611, 2773,
+      2762, 1882, 2590, 2635, 2581 and 2618 s.
+    spread: 1.47
+    ceiling_seconds: 3430.0
+    argument: >-
+      What a reviewer waits for once the label is applied, queue included, which no job
+      entry measures on its own. It is `exhaustive-tier` plus its queue on every one of
+      the eight runs. 3430s is 1.35x of the record: above the largest reading observed
+      (2773s, 1.09x) and above the 1.25x drift band, so the drift rule speaks first, and
+      well inside `policy.max_headroom`. It is a blow-up detector, not the ceiling
+      `OR-17` wants on the merge path -- 42 minutes is already past that, and no band
+      around a measurement can say so.
+  jobs:
+  - id: exhaustive-tier
+    measured_seconds: 2518.8
+    measured_on: '2026-09-22'
+    measured_where: >-
+      In order, run 35632055808, 35627075872, 35579234418, 35480905141, 35213757305,
+      35078581840, 35012089923 and 34997041426, read by `devtools.check_ci_gate_walls`
+      on 2026-09-22 and reduced to their geometric mean.
+      Job wall: 2608, 2771, 2674, 1879, 2588, 2606, 2576 and 2568 s. The 1879 s is run
+      35480905141, and it is a faster runner rather than a smaller tier: its JUnit
+      record has the same 58 tests, each one faster by a near-uniform 1.43x.
+    spread: 1.47
+    ceiling_seconds: 3400.0
+    argument: >-
+      The exhaustive exact tier alone, at `--inner-jobs 4` on its own runner. It sets
+      the gate's wall on all eight runs. 3400s is 1.35x of the record and deliberately
+      under `EXHAUSTIVE_SUITE_BUDGET_SECONDS` (3600s): the job ceiling should report
+      before the step's own subprocess timeout kills it, because `D-456` is what the
+      timeout firing looks like -- the tier killed with its output in an unflushed pipe
+      and three merges red saying nothing about the sixty other steps.
+  - id: deferred-steps
+    measured_seconds: 2226.9
+    measured_on: '2026-09-22'
+    measured_where: >-
+      In order, run 35632055808, 35627075872, 35579234418, 35480905141, 35213757305,
+      35078581840, 35012089923 and 34997041426, read by `devtools.check_ci_gate_walls`
+      on 2026-09-22 and reduced to their geometric mean.
+      Job wall: 2465, 2492, 2469, 1713, 2467, 2462, 1578 and 2429 s. Both low readings
+      are runner speed rather than a smaller selection: run 35012089923 ran the same
+      eight steps as run 35579234418 for 1543.5s of step time against 2435.7s.
+    spread: 1.58
+    ceiling_seconds: 3000.0
+    argument: >-
+      The eight deferrals outside the slow lane, the exhaustive tier and the screen, run
+      serially at `--jobs 1 --inner-jobs 2`. Second-longest job and within 12 per cent of
+      the longest, which is why the gate's wall barely falls if only one of them is
+      fixed. Its own steps are the attribution a verdict prints: on run 35579234418 the
+      1440-step threshold dilation-limit record was 695.8s of it, the atlas rebuild
+      482.9s and the negative controls 420.0s.
+  - id: deferred-slow-lane
+    measured_seconds: 921.7
+    measured_on: '2026-09-22'
+    measured_where: >-
+      In order, run 35632055808, 35627075872, 35579234418, 35480905141, 35213757305,
+      35078581840, 35012089923 and 34997041426, read by `devtools.check_ci_gate_walls`
+      on 2026-09-22 and reduced to their geometric mean.
+      Job wall: 990, 993, 999, 879, 953, 713, 913 and 973 s.
+    spread: 1.40
+    ceiling_seconds: 1250.0
+    argument: >-
+      The slow behavioural lane, isolated after run 34177317419 timed it out at 1800s
+      while the escape screen shared its runner. It finishes inside the gate's first
+      seventeen minutes and has never been the wall, so its band is a regression check
+      rather than a cost to attack.
+  - id: screen
+    measured_seconds: 914.0
+    measured_on: '2026-09-22'
+    measured_where: >-
+      In order, run 35632055808, 35627075872, 35579234418, 35480905141, 35213757305,
+      35078581840, 35012089923 and 34997041426, read by `devtools.check_ci_gate_walls`
+      on 2026-09-22 and reduced to their geometric mean.
+      Job wall: 973, 902, 909, 893, 806, 980, 965 and 897 s. The tightest spread of the
+      four, 1.22x, which is what a pooled step at `--inner-jobs 4` does to runner
+      variance.
+    spread: 1.22
+    ceiling_seconds: 1240.0
+    argument: >-
+      The single-square translation escape screen alone, split out under `D-484` because
+      it is a process pool sized by `PACK_JOBS` and two workers were not enough. 1240s is
+      1.36x of the record and well under `SCREEN_BUDGET_SECONDS` (1800s).

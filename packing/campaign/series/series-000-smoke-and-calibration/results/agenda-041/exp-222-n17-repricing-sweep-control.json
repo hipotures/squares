@@ -1,0 +1,76 @@
+{
+  "source": "/home/user/squares/packing/resources/web/n17-kleddamag-certified-bound-2026-09-21/kleddamag-17-squares-certified-bound/global-certificate.json",
+  "source_sha256": "0288aaac680131aa675adb63ea6a67e3d363fcca6061d4c788301da7c5d69cec",
+  "outer_side": "4613/1000",
+  "parent_side": "99853/100000",
+  "point_orbits": 1134,
+  "threshold_orbits": 253,
+  "variables": 1387,
+  "catalogue_rows": 7853,
+  "sweep_seconds": 7.2,
+  "rows_swept": 17,
+  "K2_replay": {
+    "rows_checked": 17,
+    "fields": [
+      "minimum_units",
+      "slabs",
+      "cells"
+    ],
+    "mismatched": 0
+  },
+  "K3_translator": {
+    "rows_checked": 4,
+    "against": "restricted_row_minimum"
+  },
+  "K4_artifact": {
+    "objective_units": 16998427356,
+    "least_charge_units": 1000682644,
+    "complete_catalogue": false,
+    "constraints_matching_sweep": 17,
+    "normalised_mass": "16998427356/1000020517",
+    "normalised_mass_float": 16.99807860642123,
+    "normalised_mass_on_sample": "4249606839/250170661"
+  },
+  "K5_envelope": {
+    "rows": 17,
+    "midpoint_outside": 13,
+    "cell_detached_from_envelope": 0,
+    "detached_examples": [],
+    "note": "the sweep window is the artifact's own and takes a boundary cell whole, so a cell's midpoint can lie outside the parent-centre envelope; a detached row is one whose minimising cell meets the envelope in measure zero, and only there is the constraint the artifact's window rather than its envelope"
+  },
+  "slack": {
+    "rows": 17,
+    "least_units": 1000682644,
+    "least_rows": [
+      6500
+    ],
+    "plateau": [
+      {
+        "units": 1002070341,
+        "rows": 5
+      },
+      {
+        "units": 1002070393,
+        "rows": 2
+      },
+      {
+        "units": 1000682644,
+        "rows": 1
+      }
+    ],
+    "plateau_share": 0.4706,
+    "rows_at_or_above_slack_2040e-6": 10,
+    "windows_above_least": {
+      "within_10_units": 1,
+      "within_10000_units": 1,
+      "within_100000_units": 1,
+      "within_500000_units": 2,
+      "within_1000000_units": 3
+    }
+  },
+  "captured_sites": {
+    "least": 267,
+    "greatest": 985
+  },
+  "seconds": 9.3
+}

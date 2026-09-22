@@ -1,0 +1,8 @@
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+campaign/series/series-000-smoke-and-calibration/results/agenda-039/n29-548-100-auto-windows5-certificate.json: n = 29, L = 137/25 = 5.480000, 1329 atoms, mass 52081879/2000000 = 26.040940
+  ceiling 5.986200, certifies every n >= 27
+  interval accepted=False enclosure=(Fraction(398409, 400000), Fraction(4000013, 4000000)) boxes=4960181 stalled=272 (162s)
+campaign/series/series-000-smoke-and-calibration/results/agenda-039/n29-548-100-auto-windows5-certificate.json: REFUSED: the interval route refused it: ('Condition 5 every admissible centre covers mass 1',)
+campaign/series/series-000-smoke-and-calibration/results/agenda-039/n29-548-100-auto-windows5-certificate.json: REFUSED: 272 boxes stalled; the interval route decided nothing there
+campaign/series/series-000-smoke-and-calibration/results/agenda-039/n29-548-100-auto-windows5-certificate.json: REFUSED: the enclosure has width: (Fraction(398409, 400000), Fraction(4000013, 4000000))
+EXIT:1

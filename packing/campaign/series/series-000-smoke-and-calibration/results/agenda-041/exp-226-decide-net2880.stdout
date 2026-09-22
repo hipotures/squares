@@ -1,0 +1,19 @@
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-226-n11-threshold-191-50-net2880-certificate.json: n = 11, L = 191/50 = 3.820000, B = 249507/250000, 584 point atoms (mass 4336840816/498684619 = 8.696560212), 320 threshold atoms (budget 1146820616/498684619 = 2.299691172), total budget 5483661432/498684619 = 10.996251384
+  holds: Condition 1 atoms carry the declared symmetry: 584 atoms closed under D4 about the centre
+  holds: Condition 1' threshold atoms carry the declared symmetry: 320 threshold atoms closed under D4 about the centre
+  holds: Condition 2' total budget below n: point mass 4336840816/498684619 + threshold budget 1146820616/498684619 = 5483661432/498684619 against n = 11
+  holds: Condition 3 net reaches pi/4: final half-tangent 207107/500000, t^2 + 2t - 1 = 309449/250000000000
+  holds: Condition 4 containment B(1 + D) < 1: B = 249507/250000, D = 207107/1440000000, B(1 + D) = 39926861627361/40000000000000
+  interval accepted=True enclosure=(Fraction(1, 1), Fraction(1, 1)) directions=5761 boxes=23785079 stalled=0 budget-exhausted=0 (588.1s)
+    holds: Condition 2' total budget below n: budget 5483661432/498684619 against n = 11, exact integers
+    holds: Condition 3 net reaches pi/4: t_K^2 + 2 t_K - 1 in [1.238e-06, 1.238e-06]
+    holds: Condition 4 containment B(1 + D) < 1: B(1 + D) in [0.998171540684, 0.998171540684]
+    holds: Condition 5' every admissible centre is charged at least 1: 5761 directions, 23785079 boxes, 0 stalled, 0 budget-exhausted; least point charge 1 at 1828
+    least point charge at direction 1828, witness (rotated frame) (1.8583992664183653, 0.4665738637756622): exact charge by membership counting 1 = 1.000000000, admissible True
+  exact    least cell charge 1 = 1.000000000 at direction 1828; charge re-evaluated at the witness by membership counting 1 (agrees); dense/slab disagreements 0 (1826.7s)
+campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-226-n11-threshold-191-50-net2880-certificate.json: RETAINABLE: both routes accept and agree at 1; sha256 fefcf8ac23456442f855b5bb9188fc16db3b2bf5380e0e0bd1f472ba17665219; 2415.0s
+
+real	40m15.319s
+user	70m23.091s
+sys	4m34.308s

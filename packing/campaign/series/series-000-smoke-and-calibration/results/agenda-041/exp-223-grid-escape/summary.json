@@ -1,0 +1,249 @@
+{
+  "arms": {
+    "B-perturb": {
+      "archive": "packing/campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-223-grid-escape/B-perturb.jsonl",
+      "cells": {
+        "12": {
+          "basin_runs": 5,
+          "beat_grid_runs": 0,
+          "below_record_runs": 0,
+          "best_gap": 0.0,
+          "best_side": 4.0,
+          "grid": 4.0,
+          "hit_runs": 5,
+          "median_gap": 0.0,
+          "median_side": 4.0,
+          "moves": 768000000,
+          "n": 12,
+          "pair_tests": 50688129360,
+          "record": 4.0,
+          "record_source": "frontier/n-012.md (unknown None)",
+          "rejected_poses": 0,
+          "seconds": 585.2486340999603,
+          "seeds": 5,
+          "unadmitted_seeds": 0,
+          "worst_side": 4.0
+        },
+        "20": {
+          "basin_runs": 5,
+          "beat_grid_runs": 0,
+          "below_record_runs": 0,
+          "best_gap": 0.0,
+          "best_side": 5.0,
+          "grid": 5.0,
+          "hit_runs": 5,
+          "median_gap": 0.0,
+          "median_side": 5.0,
+          "moves": 272000000,
+          "n": 20,
+          "pair_tests": 51680136800,
+          "record": 5.0,
+          "record_source": "frontier/n-020.md (unknown None)",
+          "rejected_poses": 0,
+          "seconds": 729.7576651573181,
+          "seeds": 5,
+          "unadmitted_seeds": 0,
+          "worst_side": 5.0
+        },
+        "21": {
+          "basin_runs": 5,
+          "beat_grid_runs": 0,
+          "below_record_runs": 0,
+          "best_gap": 0.0,
+          "best_side": 5.0,
+          "grid": 5.0,
+          "hit_runs": 5,
+          "median_gap": 0.0,
+          "median_side": 5.0,
+          "moves": 240000000,
+          "n": 21,
+          "pair_tests": 50400134400,
+          "record": 5.0,
+          "record_source": "frontier/n-021.md (unknown None)",
+          "rejected_poses": 0,
+          "seconds": 652.0929729938507,
+          "seeds": 5,
+          "unadmitted_seeds": 0,
+          "worst_side": 5.0
+        }
+      },
+      "flags": [
+        "--p-perturb",
+        "1.0",
+        "--perturb-scale",
+        "2"
+      ],
+      "runs": [
+        {
+          "moves": 153600000,
+          "n": 12,
+          "pair_tests": 10137625872,
+          "seconds": 125.12298703193665,
+          "seed": 1,
+          "seed_best": 4.0
+        },
+        {
+          "moves": 153600000,
+          "n": 12,
+          "pair_tests": 10137625872,
+          "seconds": 79.17969298362732,
+          "seed": 2,
+          "seed_best": 4.0
+        },
+        {
+          "moves": 153600000,
+          "n": 12,
+          "pair_tests": 10137625872,
+          "seconds": 91.89566087722778,
+          "seed": 3,
+          "seed_best": 4.0
+        },
+        {
+          "moves": 153600000,
+          "n": 12,
+          "pair_tests": 10137625872,
+          "seconds": 129.11201333999634,
+          "seed": 4,
+          "seed_best": 4.0
+        },
+        {
+          "moves": 153600000,
+          "n": 12,
+          "pair_tests": 10137625872,
+          "seconds": 159.93827986717224,
+          "seed": 5,
+          "seed_best": 4.0
+        },
+        {
+          "moves": 54400000,
+          "n": 20,
+          "pair_tests": 10336027360,
+          "seconds": 124.40429615974426,
+          "seed": 1,
+          "seed_best": 5.0
+        },
+        {
+          "moves": 54400000,
+          "n": 20,
+          "pair_tests": 10336027360,
+          "seconds": 113.8118257522583,
+          "seed": 2,
+          "seed_best": 5.0
+        },
+        {
+          "moves": 54400000,
+          "n": 20,
+          "pair_tests": 10336027360,
+          "seconds": 177.93961906433105,
+          "seed": 3,
+          "seed_best": 5.0
+        },
+        {
+          "moves": 54400000,
+          "n": 20,
+          "pair_tests": 10336027360,
+          "seconds": 212.08262014389038,
+          "seed": 4,
+          "seed_best": 5.0
+        },
+        {
+          "moves": 54400000,
+          "n": 20,
+          "pair_tests": 10336027360,
+          "seconds": 101.51930403709412,
+          "seed": 5,
+          "seed_best": 5.0
+        },
+        {
+          "moves": 48000000,
+          "n": 21,
+          "pair_tests": 10080026880,
+          "seconds": 134.50396585464478,
+          "seed": 1,
+          "seed_best": 5.0
+        },
+        {
+          "moves": 48000000,
+          "n": 21,
+          "pair_tests": 10080026880,
+          "seconds": 161.89350843429565,
+          "seed": 2,
+          "seed_best": 5.0
+        },
+        {
+          "moves": 48000000,
+          "n": 21,
+          "pair_tests": 10080026880,
+          "seconds": 133.72044157981873,
+          "seed": 3,
+          "seed_best": 5.0
+        },
+        {
+          "moves": 48000000,
+          "n": 21,
+          "pair_tests": 10080026880,
+          "seconds": 130.72844219207764,
+          "seed": 4,
+          "seed_best": 5.0
+        },
+        {
+          "moves": 48000000,
+          "n": 21,
+          "pair_tests": 10080026880,
+          "seconds": 91.24661493301392,
+          "seed": 5,
+          "seed_best": 5.0
+        }
+      ],
+      "verification": {
+        "archive_sha256": "fc9c3d1d8e86b0042cbb46641cf2c140162affd1a2e718ace427ad230c8711e4",
+        "assurance": "numerically-checked",
+        "failures": [],
+        "poses_checked": 135,
+        "tolerance": 1e-09,
+        "verified": true,
+        "verifier": "sqpack.verify.verify_packing"
+      }
+    }
+  },
+  "budget_pair_tests_per_chain": 1250000000,
+  "cells": [
+    12,
+    20,
+    21
+  ],
+  "chains": 8,
+  "engine": "packing/sqsearch/target/release/sqsearch",
+  "gate": {
+    "command": "/home/user/squares/packing/sqsearch/target/release/sqsearch --selftest",
+    "passed": true,
+    "seconds": 3.305,
+    "tail": [
+      "SELFTEST PASSED"
+    ]
+  },
+  "host": {
+    "cpu_count": 4,
+    "loadavg_after": [
+      7.32373046875,
+      9.0283203125,
+      10.14501953125
+    ],
+    "loadavg_before": [
+      10.36962890625,
+      14.4970703125,
+      12.92236328125
+    ],
+    "platform": "Linux-6.18.44-fc-v37-x86_64-with-glibc2.39"
+  },
+  "label": "exp-223-grid-escape-n12-20-21",
+  "plan": "campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-223-grid-escape/exp-223-plan.yaml",
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "threads": 2
+}

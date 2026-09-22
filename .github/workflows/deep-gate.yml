@@ -4,6 +4,16 @@ name: Deferred checkpoint
 # merges rather than after it. Not on every build, and that is the point: the selection
 # here is 1943.05s in one step.
 #
+# **1943.05s is step time on one class of runner, and this file used to read as though it
+# were the job's cost.** The job costs about 42 minutes of wall, and `ci_gates` in
+# `devtools/gate-budgets.yaml` is where that is now recorded, argued and judged, one
+# entry per job below plus the gate's whole wall. `deep-gate-required` reads a finished
+# run against those numbers on every invocation, so the figure is no longer one nothing
+# looks at -- which is what `OR-17` means by clocking the CI jobs the way local tiers are
+# clocked. The 1.38x that started that rule turned out to be the hosted pool rather than
+# drift: the same 58 tests run 1.43x slower on the slower class of runner, measured from
+# the JUnit records of runs 35480905141 and 35579234418.
+#
 # **The hole this closes, and it is measured rather than feared.** The header of
 # `packing-validation.yml` already concedes it in one sentence -- "a pull request can be
 # green while a deferred test is broken" -- and on 2026-09-05 that sentence came true.
@@ -243,8 +253,10 @@ jobs:
 
   exhaustive-tier:
     # The exhaustive exact tier alone, on its own runner, for the reason think-tr2z split
-    # it out of the post-merge gate: at 1943.05s it is the one step that decides whether
-    # the *other* steps get reported at all. `D-456` is what that looked like -- the tier
+    # it out of the post-merge gate: at 1943.05s of step time it is the one step that
+    # decides whether the *other* steps get reported at all. As a hosted job it is
+    # recorded at 2518.8s of wall over eight runs, spread 1.47x, in `ci_gates` in
+    # `devtools/gate-budgets.yaml`; it sets the gate's wall on every one of them. `D-456` is what that looked like -- the tier
     # outgrew its budget, the gate killed it with its output in an unflushed pipe, and
     # three consecutive merges went red saying nothing about the sixty other steps. Run
     # beside `deferred-steps` in one job it would do that here too, and the deep gate's
@@ -403,6 +415,10 @@ jobs:
       || contains(github.event.pull_request.labels.*.name, 'deep-gate'))
     needs: [deferred-steps, deferred-slow-lane, exhaustive-tier, screen]
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # The jobs endpoint, which is where this run's own walls are read from.
+      actions: read
     steps:
       - name: Require every deep-gate prerequisite
         env:
@@ -415,3 +431,55 @@ jobs:
           test "$SLOW_RESULT" = "success"
           test "$EXHAUSTIVE_RESULT" = "success"
           test "$SCREEN_RESULT" = "success"
+
+      # **The walls, read against the ceilings that declare them** (`OR-17`: a price
+      # nothing reads is not a budget). `ci_gates` in `devtools/gate-budgets.yaml` carries
+      # one entry per job above plus the gate's own wall, and this is what compares a
+      # finished run against them -- the same four rules `packing-validate` is judged by,
+      # through `gate_budgets.band_findings`.
+      #
+      # It costs about 21s: checkout, uv and `uv sync` on a warm cache, measured on the
+      # deep jobs' own step timings. That is 0.8 per cent of a gate whose wall is 42
+      # minutes, and it does not move the recorded wall, which is measured to the last
+      # *gating* job and deliberately excludes this one.
+      #
+      # `always()` because a run whose deep job died slowly is exactly the one whose
+      # walls are worth reading, and the verdict above has already been decided by then.
+      #
+      # **Every step below is `continue-on-error`, including its checkout and its
+      # toolchain**, and that is the whole of what keeps this addition safe. A 45-minute
+      # pre-merge gate must never go red for the measurement tool: an unreachable API, a
+      # cache miss or a checkout failure is not a regression, and a false red here costs
+      # another 45 minutes to clear. The verdict this job reports is decided entirely by
+      # the step above. The register's own `enforcement: reporting` is a separate and
+      # separately argued relaxation, of the *bands* rather than of the step;
+      # `think-haam` owns removing both.
+      - name: Check out the wall register and the tool that reads it
+        if: always()
+        continue-on-error: true
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.inputs.pull_request && format('refs/pull/{0}/merge', github.event.inputs.pull_request) || '' }}
+          # kpress is installed from the vendored submodule, so `uv sync` needs it.
+          submodules: true
+
+      - name: Install uv and Python 3.14
+        if: always()
+        continue-on-error: true
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: "0.12.8"
+          python-version: "3.14.7"
+          working-directory: packing
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+
+      - name: Report every deep-gate wall against its declared ceiling
+        if: always()
+        continue-on-error: true
+        working-directory: packing
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: >-
+          uv run --frozen --all-extras --group dev
+          python -m devtools.check_ci_gate_walls --gate deep-gate

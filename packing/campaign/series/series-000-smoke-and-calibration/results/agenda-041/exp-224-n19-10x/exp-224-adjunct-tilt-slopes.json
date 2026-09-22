@@ -1,0 +1,502 @@
+{
+  "cells": [
+    {
+      "at_zero": {
+        "cell_changes": 3,
+        "delta": 0.0,
+        "lp_solves": 20,
+        "reason": "adjacent cell closure (16 cells)",
+        "seconds": 0.079,
+        "settled": true,
+        "side": 4.885618083164127
+      },
+      "axis_squares": 11,
+      "branches": [
+        {
+          "delta_deg": 0.5729577951308232,
+          "delta_rad": 0.01,
+          "minus": {
+            "cell_changes": 3,
+            "delta": -0.01,
+            "difference": 3.14256584914574e-05,
+            "lp_solves": 36,
+            "reason": "adjacent cell closure (32 cells)",
+            "seconds": 0.147,
+            "settled": true,
+            "side": 4.885649508822619,
+            "slope": 0.0031425658491457398,
+            "verdict": "positive"
+          },
+          "plus": {
+            "cell_changes": 3,
+            "delta": 0.01,
+            "difference": 3.1425658492345576e-05,
+            "lp_solves": 20,
+            "reason": "adjacent cell closure (16 cells)",
+            "seconds": 0.076,
+            "settled": true,
+            "side": 4.8856495088226195,
+            "slope": 0.0031425658492345576,
+            "verdict": "positive"
+          }
+        },
+        {
+          "delta_deg": 0.17188733853924698,
+          "delta_rad": 0.003,
+          "minus": {
+            "cell_changes": 3,
+            "delta": -0.003,
+            "difference": 2.828416517886012e-06,
+            "lp_solves": 36,
+            "reason": "adjacent cell closure (32 cells)",
+            "seconds": 0.138,
+            "settled": true,
+            "side": 4.885620911580645,
+            "slope": 0.000942805505962004,
+            "verdict": "positive"
+          },
+          "plus": {
+            "cell_changes": 3,
+            "delta": 0.003,
+            "difference": 2.8284165187741905e-06,
+            "lp_solves": 20,
+            "reason": "adjacent cell closure (16 cells)",
+            "seconds": 0.077,
+            "settled": true,
+            "side": 4.885620911580646,
+            "slope": 0.0009428055062580635,
+            "verdict": "positive"
+          }
+        },
+        {
+          "delta_deg": 0.057295779513082325,
+          "delta_rad": 0.001,
+          "minus": {
+            "cell_changes": 3,
+            "delta": -0.001,
+            "difference": 3.14269549051005e-07,
+            "lp_solves": 36,
+            "reason": "adjacent cell closure (32 cells)",
+            "seconds": 0.147,
+            "settled": true,
+            "side": 4.885618397433676,
+            "slope": 0.000314269549051005,
+            "verdict": "positive"
+          },
+          "plus": {
+            "cell_changes": 3,
+            "delta": 0.001,
+            "difference": 3.14269549051005e-07,
+            "lp_solves": 20,
+            "reason": "adjacent cell closure (16 cells)",
+            "seconds": 0.075,
+            "settled": true,
+            "side": 4.885618397433676,
+            "slope": 0.000314269549051005,
+            "verdict": "positive"
+          }
+        },
+        {
+          "delta_deg": 0.005729577951308232,
+          "delta_rad": 0.0001,
+          "minus": {
+            "cell_changes": 3,
+            "delta": -0.0001,
+            "difference": 3.142695881308555e-09,
+            "lp_solves": 36,
+            "reason": "adjacent cell closure (32 cells)",
+            "seconds": 0.136,
+            "settled": true,
+            "side": 4.885618086306823,
+            "slope": 3.142695881308555e-05,
+            "verdict": "flat-within-solver-noise"
+          },
+          "plus": {
+            "cell_changes": 3,
+            "delta": 0.0001,
+            "difference": 3.1426967694869745e-09,
+            "lp_solves": 20,
+            "reason": "adjacent cell closure (16 cells)",
+            "seconds": 0.076,
+            "settled": true,
+            "side": 4.885618086306824,
+            "slope": 3.1426967694869745e-05,
+            "verdict": "flat-within-solver-noise"
+          }
+        },
+        {
+          "delta_deg": 0.0005729577951308233,
+          "delta_rad": 1e-05,
+          "minus": {
+            "cell_changes": 3,
+            "delta": -1e-05,
+            "difference": 3.142730520266923e-11,
+            "lp_solves": 36,
+            "reason": "adjacent cell closure (32 cells)",
+            "seconds": 0.136,
+            "settled": true,
+            "side": 4.8856180831955545,
+            "slope": 3.1427305202669227e-06,
+            "verdict": "flat-within-solver-noise"
+          },
+          "plus": {
+            "cell_changes": 3,
+            "delta": 1e-05,
+            "difference": 3.142641702424953e-11,
+            "lp_solves": 20,
+            "reason": "adjacent cell closure (16 cells)",
+            "seconds": 0.077,
+            "settled": true,
+            "side": 4.885618083195554,
+            "slope": 3.1426417024249527e-06,
+            "verdict": "flat-within-solver-noise"
+          }
+        }
+      ],
+      "lp_minus_published": 0.0,
+      "n": 19,
+      "published_side": 4.885618083164127,
+      "tilt_deg": 45.0,
+      "tilted_squares": 8,
+      "witness": "packing/witnesses/known-best/n-019.yaml"
+    },
+    {
+      "at_zero": {
+        "cell_changes": 2,
+        "delta": 0.0,
+        "lp_solves": 3,
+        "reason": "cell fixed point",
+        "seconds": 0.016,
+        "settled": true,
+        "side": 5.621320343559643
+      },
+      "axis_squares": 17,
+      "branches": [
+        {
+          "delta_deg": 0.5729577951308232,
+          "delta_rad": 0.01,
+          "minus": {
+            "cell_changes": 2,
+            "delta": -0.01,
+            "difference": 0.005106237110108047,
+            "lp_solves": 3,
+            "reason": "cell fixed point",
+            "seconds": 0.016,
+            "settled": true,
+            "side": 5.626426580669751,
+            "slope": 0.5106237110108047,
+            "verdict": "positive"
+          },
+          "plus": {
+            "cell_changes": 2,
+            "delta": 0.01,
+            "difference": 0.005106237110108047,
+            "lp_solves": 3,
+            "reason": "cell fixed point",
+            "seconds": 0.015,
+            "settled": true,
+            "side": 5.626426580669751,
+            "slope": 0.5106237110108047,
+            "verdict": "positive"
+          }
+        },
+        {
+          "delta_deg": 0.17188733853924698,
+          "delta_rad": 0.003,
+          "minus": {
+            "cell_changes": 2,
+            "delta": -0.003,
+            "difference": 0.0015095504773592339,
+            "lp_solves": 3,
+            "reason": "cell fixed point",
+            "seconds": 0.016,
+            "settled": true,
+            "side": 5.622829894037002,
+            "slope": 0.5031834924530779,
+            "verdict": "positive"
+          },
+          "plus": {
+            "cell_changes": 2,
+            "delta": 0.003,
+            "difference": 0.0015095504773592339,
+            "lp_solves": 3,
+            "reason": "cell fixed point",
+            "seconds": 0.015,
+            "settled": true,
+            "side": 5.622829894037002,
+            "slope": 0.5031834924530779,
+            "verdict": "positive"
+          }
+        },
+        {
+          "delta_deg": 0.057295779513082325,
+          "delta_rad": 0.001,
+          "minus": {
+            "cell_changes": 2,
+            "delta": -0.001,
+            "difference": 0.0005010608272817407,
+            "lp_solves": 3,
+            "reason": "cell fixed point",
+            "seconds": 0.016,
+            "settled": true,
+            "side": 5.621821404386925,
+            "slope": 0.5010608272817407,
+            "verdict": "positive"
+          },
+          "plus": {
+            "cell_changes": 2,
+            "delta": 0.001,
+            "difference": 0.0005010608272799644,
+            "lp_solves": 3,
+            "reason": "cell fixed point",
+            "seconds": 0.015,
+            "settled": true,
+            "side": 5.621821404386923,
+            "slope": 0.5010608272799644,
+            "verdict": "positive"
+          }
+        },
+        {
+          "delta_deg": 0.005729577951308232,
+          "delta_rad": 0.0001,
+          "minus": {
+            "cell_changes": 2,
+            "delta": -0.0001,
+            "difference": 5.00106067677919e-05,
+            "lp_solves": 3,
+            "reason": "cell fixed point",
+            "seconds": 0.016,
+            "settled": true,
+            "side": 5.621370354166411,
+            "slope": 0.500106067677919,
+            "verdict": "positive"
+          },
+          "plus": {
+            "cell_changes": 2,
+            "delta": 0.0001,
+            "difference": 5.001060676868008e-05,
+            "lp_solves": 3,
+            "reason": "cell fixed point",
+            "seconds": 0.015,
+            "settled": true,
+            "side": 5.6213703541664115,
+            "slope": 0.5001060676868008,
+            "verdict": "positive"
+          }
+        },
+        {
+          "delta_deg": 0.0005729577951308233,
+          "delta_rad": 1e-05,
+          "minus": {
+            "cell_changes": 2,
+            "delta": -1e-05,
+            "difference": 5.000106065189414e-06,
+            "lp_solves": 3,
+            "reason": "cell fixed point",
+            "seconds": 0.016,
+            "settled": true,
+            "side": 5.621325343665708,
+            "slope": 0.5000106065189414,
+            "verdict": "positive"
+          },
+          "plus": {
+            "cell_changes": 2,
+            "delta": 1e-05,
+            "difference": 5.000106065189414e-06,
+            "lp_solves": 3,
+            "reason": "cell fixed point",
+            "seconds": 0.015,
+            "settled": true,
+            "side": 5.621325343665708,
+            "slope": 0.5000106065189414,
+            "verdict": "positive"
+          }
+        }
+      ],
+      "lp_minus_published": 0.0,
+      "n": 26,
+      "published_side": 5.621320343559643,
+      "tilt_deg": 45.0,
+      "tilted_squares": 9,
+      "witness": "packing/witnesses/known-best/n-026.yaml"
+    },
+    {
+      "at_zero": {
+        "cell_changes": 0,
+        "delta": 0.0,
+        "lp_solves": 1,
+        "reason": "cell fixed point",
+        "seconds": 0.004,
+        "settled": true,
+        "side": 4.822875655532296
+      },
+      "axis_squares": 10,
+      "branches": [
+        {
+          "delta_deg": 0.5729577951308232,
+          "delta_rad": 0.01,
+          "minus": {
+            "cell_changes": 0,
+            "delta": -0.01,
+            "difference": 7.588286426329915e-05,
+            "lp_solves": 1,
+            "reason": "cell fixed point",
+            "seconds": 0.004,
+            "settled": true,
+            "side": 4.822951538396559,
+            "slope": 0.0075882864263299155,
+            "verdict": "positive"
+          },
+          "plus": {
+            "cell_changes": 1,
+            "delta": 0.01,
+            "difference": 7.531138466543297e-05,
+            "lp_solves": 2,
+            "reason": "cell fixed point",
+            "seconds": 0.007,
+            "settled": true,
+            "side": 4.822950966916961,
+            "slope": 0.007531138466543297,
+            "verdict": "positive"
+          }
+        },
+        {
+          "delta_deg": 0.17188733853924698,
+          "delta_rad": 0.003,
+          "minus": {
+            "cell_changes": 0,
+            "delta": -0.003,
+            "difference": 6.811109122040193e-06,
+            "lp_solves": 1,
+            "reason": "cell fixed point",
+            "seconds": 0.004,
+            "settled": true,
+            "side": 4.822882466641418,
+            "slope": 0.002270369707346731,
+            "verdict": "positive"
+          },
+          "plus": {
+            "cell_changes": 0,
+            "delta": 0.003,
+            "difference": 6.795680425497608e-06,
+            "lp_solves": 1,
+            "reason": "cell fixed point",
+            "seconds": 0.004,
+            "settled": true,
+            "side": 4.822882451212721,
+            "slope": 0.0022652268084992024,
+            "verdict": "positive"
+          }
+        },
+        {
+          "delta_deg": 0.057295779513082325,
+          "delta_rad": 0.001,
+          "minus": {
+            "cell_changes": 0,
+            "delta": -0.001,
+            "difference": 7.562150834417025e-07,
+            "lp_solves": 1,
+            "reason": "cell fixed point",
+            "seconds": 0.005,
+            "settled": true,
+            "side": 4.822876411747379,
+            "slope": 0.0007562150834417025,
+            "verdict": "positive"
+          },
+          "plus": {
+            "cell_changes": 0,
+            "delta": 0.001,
+            "difference": 7.556436543154632e-07,
+            "lp_solves": 1,
+            "reason": "cell fixed point",
+            "seconds": 0.004,
+            "settled": true,
+            "side": 4.82287641117595,
+            "slope": 0.0007556436543154632,
+            "verdict": "positive"
+          }
+        },
+        {
+          "delta_deg": 0.005729577951308232,
+          "delta_rad": 0.0001,
+          "minus": {
+            "cell_changes": 0,
+            "delta": -0.0001,
+            "difference": 7.559574299875749e-09,
+            "lp_solves": 1,
+            "reason": "cell fixed point",
+            "seconds": 0.004,
+            "settled": true,
+            "side": 4.82287566309187,
+            "slope": 7.559574299875749e-05,
+            "verdict": "flat-within-solver-noise"
+          },
+          "plus": {
+            "cell_changes": 0,
+            "delta": 0.0001,
+            "difference": 7.559001424795042e-09,
+            "lp_solves": 1,
+            "reason": "cell fixed point",
+            "seconds": 0.004,
+            "settled": true,
+            "side": 4.822875663091297,
+            "slope": 7.559001424795042e-05,
+            "verdict": "flat-within-solver-noise"
+          }
+        },
+        {
+          "delta_deg": 0.0005729577951308233,
+          "delta_rad": 1e-05,
+          "minus": {
+            "cell_changes": 0,
+            "delta": -1e-05,
+            "difference": 7.559197712225796e-11,
+            "lp_solves": 1,
+            "reason": "cell fixed point",
+            "seconds": 0.004,
+            "settled": true,
+            "side": 4.822875655607888,
+            "slope": 7.559197712225795e-06,
+            "verdict": "flat-within-solver-noise"
+          },
+          "plus": {
+            "cell_changes": 0,
+            "delta": 1e-05,
+            "difference": 7.559020076541856e-11,
+            "lp_solves": 1,
+            "reason": "cell fixed point",
+            "seconds": 0.004,
+            "settled": true,
+            "side": 4.822875655607886,
+            "slope": 7.559020076541855e-06,
+            "verdict": "flat-within-solver-noise"
+          }
+        }
+      ],
+      "lp_minus_published": 8.881784197001252e-16,
+      "n": 18,
+      "published_side": 4.822875655532295,
+      "tilt_deg": 24.295188945,
+      "tilted_squares": 8,
+      "witness": "packing/witnesses/known-best/n-018.yaml"
+    }
+  ],
+  "deltas_rad": [
+    0.01,
+    0.003,
+    0.001,
+    0.0001,
+    1e-05
+  ],
+  "host": {
+    "cpu_count": 4,
+    "loadavg": [
+      5.6337890625,
+      9.78564453125,
+      11.359375
+    ],
+    "platform": "Linux-6.18.44-fc-v37-x86_64-with-glibc2.39"
+  },
+  "seconds": 1.389,
+  "slope_noise_floor": 1e-07
+}

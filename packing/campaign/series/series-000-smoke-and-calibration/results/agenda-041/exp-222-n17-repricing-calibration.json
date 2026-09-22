@@ -1,0 +1,99 @@
+{
+  "source": "/home/user/squares/packing/resources/web/n17-kleddamag-certified-bound-2026-09-21/kleddamag-17-squares-certified-bound/global-certificate.json",
+  "source_sha256": "0288aaac680131aa675adb63ea6a67e3d363fcca6061d4c788301da7c5d69cec",
+  "outer_side": "4613/1000",
+  "parent_side": "99853/100000",
+  "point_orbits": 1134,
+  "threshold_orbits": 253,
+  "variables": 1387,
+  "catalogue_rows": 7853,
+  "sweep_seconds": 19.6,
+  "rows_swept": 80,
+  "K2_replay": {
+    "rows_checked": 80,
+    "fields": [
+      "minimum_units",
+      "slabs",
+      "cells"
+    ],
+    "mismatched": 0
+  },
+  "K3_translator": {
+    "rows_checked": 6,
+    "against": "restricted_row_minimum"
+  },
+  "K4_artifact": {
+    "objective_units": 16998427356,
+    "least_charge_units": 1000657994,
+    "complete_catalogue": false,
+    "constraints_matching_sweep": 80,
+    "normalised_mass": "16998427356/1000020517",
+    "normalised_mass_float": 16.99807860642123,
+    "normalised_mass_on_sample": "8499213678/500328997"
+  },
+  "K5_envelope": {
+    "rows": 80,
+    "midpoint_outside": 49,
+    "cell_detached_from_envelope": 0,
+    "detached_examples": [],
+    "note": "the sweep window is the artifact's own and takes a boundary cell whole, so a cell's midpoint can lie outside the parent-centre envelope; a detached row is one whose minimising cell meets the envelope in measure zero, and only there is the constraint the artifact's window rather than its envelope"
+  },
+  "captured_sites": {
+    "least": 267,
+    "greatest": 985
+  },
+  "lp_full": {
+    "variables": 1387,
+    "constraints": 80,
+    "nonzeros": 34017,
+    "solver_objective_float": 16.15384615384615,
+    "exact_mass": "8076923072/499999999",
+    "exact_mass_float": 16.15384617630769,
+    "rationalised_objective_units": 16153846144,
+    "rationalised_least_charge_units": 999999998,
+    "weight_denominator": 1000000000,
+    "support": 13,
+    "seconds": 0.0,
+    "verdict": "headroom"
+  },
+  "lp_positive_orbits_only": {
+    "variables": 1105,
+    "constraints": 80,
+    "nonzeros": 27093,
+    "solver_objective_float": 16.153846153846153,
+    "exact_mass": "8076923072/499999999",
+    "exact_mass_float": 16.15384617630769,
+    "rationalised_objective_units": 16153846144,
+    "rationalised_least_charge_units": 999999998,
+    "weight_denominator": 1000000000,
+    "support": 15,
+    "seconds": 0.0,
+    "verdict": "headroom"
+  },
+  "H239_dual": {
+    "window_degrees": 0.5,
+    "classes": [
+      0.0,
+      36.62,
+      39.8
+    ],
+    "total_dual_mass": 16.153846153846153,
+    "near_class_mass": 4.461538461538463,
+    "near_class_fraction": 0.27619047619047626,
+    "per_class_mass": [
+      3.5384615384615374,
+      0.0,
+      0.9230769230769247
+    ],
+    "support_rows": 19,
+    "signature_present": false
+  },
+  "headroom": {
+    "artifact_normalised_mass": "16998427356/1000020517",
+    "lp_exact_mass": "8076923072/499999999",
+    "difference": "422124874770904420/500010257499979483",
+    "difference_float": 0.8442324301135397,
+    "verdict": "headroom"
+  },
+  "seconds": 21.6
+}

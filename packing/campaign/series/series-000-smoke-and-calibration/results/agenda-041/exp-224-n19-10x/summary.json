@@ -1,0 +1,125 @@
+{
+  "arms": {
+    "B-perturb": {
+      "archive": "packing/campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-224-n19-10x/B-perturb.jsonl",
+      "cells": {
+        "19": {
+          "basin_runs": 0,
+          "beat_grid_runs": 5,
+          "below_record_runs": 0,
+          "best_gap": 0.019216052803987083,
+          "best_side": 4.904834135968107,
+          "grid": 5.0,
+          "hit_runs": 0,
+          "median_gap": 0.04012438507681271,
+          "median_side": 4.925742468240933,
+          "moves": 1184000000,
+          "n": 19,
+          "pair_tests": 202464513000,
+          "record": 4.88561808316412,
+          "record_source": "frontier/n-019.md (Robert Wainwright 1979)",
+          "rejected_poses": 0,
+          "seconds": 1488.2193248271942,
+          "seeds": 5,
+          "unadmitted_seeds": 0,
+          "worst_side": 4.958905655092532
+        }
+      },
+      "flags": [
+        "--p-perturb",
+        "1.0",
+        "--perturb-scale",
+        "2"
+      ],
+      "runs": [
+        {
+          "moves": 236800000,
+          "n": 19,
+          "pair_tests": 40492902600,
+          "seconds": 251.57372212409973,
+          "seed": 1,
+          "seed_best": 4.927619575320046
+        },
+        {
+          "moves": 236800000,
+          "n": 19,
+          "pair_tests": 40492902600,
+          "seconds": 272.310174703598,
+          "seed": 2,
+          "seed_best": 4.958905655092532
+        },
+        {
+          "moves": 236800000,
+          "n": 19,
+          "pair_tests": 40492902600,
+          "seconds": 339.5991930961609,
+          "seed": 3,
+          "seed_best": 4.919385737412185
+        },
+        {
+          "moves": 236800000,
+          "n": 19,
+          "pair_tests": 40492902600,
+          "seconds": 343.3635573387146,
+          "seed": 4,
+          "seed_best": 4.904834135968107
+        },
+        {
+          "moves": 236800000,
+          "n": 19,
+          "pair_tests": 40492902600,
+          "seconds": 281.372677564621,
+          "seed": 5,
+          "seed_best": 4.925742468240933
+        }
+      ],
+      "verification": {
+        "archive_sha256": "fd477d83394dd2ec995eef045b0e0b6bdda2a4194dbbeb1d03a9f72ea614e744",
+        "assurance": "numerically-checked",
+        "failures": [],
+        "poses_checked": 45,
+        "tolerance": 1e-09,
+        "verified": true,
+        "verifier": "sqpack.verify.verify_packing"
+      }
+    }
+  },
+  "budget_pair_tests_per_chain": 5000000000,
+  "cells": [
+    19
+  ],
+  "chains": 8,
+  "engine": "packing/sqsearch/target/release/sqsearch",
+  "gate": {
+    "command": "/home/user/squares/packing/sqsearch/target/release/sqsearch --selftest",
+    "passed": true,
+    "seconds": 2.622,
+    "tail": [
+      "SELFTEST PASSED"
+    ]
+  },
+  "host": {
+    "cpu_count": 4,
+    "loadavg_after": [
+      7.2216796875,
+      7.6484375,
+      7.68798828125
+    ],
+    "loadavg_before": [
+      4.18115234375,
+      4.65869140625,
+      6.9873046875
+    ],
+    "platform": "Linux-6.18.44-fc-v37-x86_64-with-glibc2.39"
+  },
+  "label": "exp-224-n19-4x",
+  "plan": "campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-224-n19-10x/exp-224-plan.yaml",
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "threads": 2
+}
