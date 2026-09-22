@@ -1,7 +1,3 @@
-warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
-solving the covering LP on the extracted cells
-  all orbits: exact bracket [16.776137468, 16.776137532] (solver 16.776137505), support 93, 3.4s -> headroom-in-the-relaxation
-  positive orbits: exact bracket [16.811458499, 16.811458570] (solver 16.811458512), support 102, 2.2s -> headroom-in-the-relaxation
 {
   "source": "/home/user/squares/packing/resources/web/n17-kleddamag-certified-bound-2026-09-21/kleddamag-17-squares-certified-bound/global-certificate.json",
   "source_sha256": "0288aaac680131aa675adb63ea6a67e3d363fcca6061d4c788301da7c5d69cec",
@@ -61,6 +57,40 @@ solving the covering LP on the extracted cells
   "captured_sites": {
     "least": 0,
     "greatest": 0
+  },
+  "lp_full": {
+    "variables": 1387,
+    "constraints": 7853,
+    "nonzeros": 3248096,
+    "solver_objective_float": 16.776137504522023,
+    "exact_mass": "4194034383/250000000",
+    "exact_mass_float": 16.776137532,
+    "exact_floor": "6710455004/400000001",
+    "exact_floor_float": 16.776137468059655,
+    "dual_support": 99,
+    "rationalised_objective_units": 16776137532,
+    "rationalised_least_charge_units": 1000000000,
+    "weight_denominator": 1000000000,
+    "support": 93,
+    "seconds": 3.4,
+    "verdict": "headroom-in-the-relaxation"
+  },
+  "lp_positive_orbits_only": {
+    "variables": 1105,
+    "constraints": 7853,
+    "nonzeros": 2594123,
+    "solver_objective_float": 16.811458512277703,
+    "exact_mass": "8405729268/499999999",
+    "exact_mass_float": 16.811458569622918,
+    "exact_floor": "134491668112/8000000007",
+    "exact_floor_float": 16.811458499289973,
+    "dual_support": 102,
+    "rationalised_objective_units": 16811458536,
+    "rationalised_least_charge_units": 999999998,
+    "weight_denominator": 1000000000,
+    "support": 102,
+    "seconds": 2.2,
+    "verdict": "headroom-in-the-relaxation"
   },
   "H239_dual": {
     "window_degrees": 0.5,
