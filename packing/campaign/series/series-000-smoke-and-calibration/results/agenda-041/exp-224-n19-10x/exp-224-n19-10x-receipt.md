@@ -131,16 +131,17 @@ OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 uv run --frozen \
   --json campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-224-n19-10x/exp-224-polish.json
 ```
 
-| seed | engine stop | polished | least pair gap | least wall gap | quench | wall |
-| ---: | ---: | ---: | ---: | ---: | --- | ---: |
-| 1 | `4.927619575320` | `4.908695543942` | `0.0` | `0.0` | **converged**, 2 rounds | `251.6 s` |
-| 2 | `4.958905655093` | `4.920529395970` | `0.0` | `0.0` | `cell cycle`, 2 rounds | `272.3 s` |
-| 3 | `4.919385737412` | `4.898251845392` | `0.0` | `0.0` | **converged**, 2 rounds | `339.6 s` |
-| 4 | `4.904834135968` | **`4.888118685629`** | `0.0` | `0.0` | **converged**, 3 rounds | `343.4 s` |
-| 5 | `4.925742468241` | `4.908792432131` | `0.0` | `0.0` | `cell cycle`, 2 rounds | `281.4 s` |
+| seed | engine stop | polished | least pair gap | least wall gap | quench | engine wall | quench wall |
+| ---: | ---: | ---: | ---: | ---: | --- | ---: | ---: |
+| 1 | `4.927619575320` | `4.908695543942` | `0.0` | `0.0` | **converged**, 2 rounds | `251.6 s` | `42.7 s` |
+| 2 | `4.958905655093` | `4.920529395970` | `0.0` | `0.0` | `cell cycle`, 2 rounds | `272.3 s` | `7.1 s` |
+| 3 | `4.919385737412` | `4.898251845392` | `0.0` | `0.0` | **converged**, 2 rounds | `339.6 s` | `36.5 s` |
+| 4 | `4.904834135968` | **`4.888118685629`** | `0.0` | `0.0` | **converged**, 3 rounds | `343.4 s` | `40.9 s` |
+| 5 | `4.925742468241` | `4.908792432131` | `0.0` | `0.0` | `cell cycle`, 2 rounds | `281.4 s` | `4.8 s` |
 
-Sweep wall `1488.2 s` for the five seeds, `202,464,513,000` pair tests delivered against
-`2.0e11` declared (`1.012x`; the budget is enforced at restart granularity).
+Sweep wall `1488.2 s` for the five seeds and `132.0 s` for the polish, `202,464,513,000`
+pair tests delivered against `2.0e11` declared (`1.012x`; the budget is enforced at
+restart granularity).
 Engine gate `SELFTEST PASSED` in `2.622 s`; 45 poses re-checked by `sqpack.verify` in a
 separate process, 0 failures, tolerance `1e-9`, archive `sha256 fd477d83…14e744`; 0 runs
 below the standing best.

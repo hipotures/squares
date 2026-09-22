@@ -7,7 +7,7 @@
   "threshold_orbits": 253,
   "variables": 1387,
   "catalogue_rows": 7853,
-  "sweep_seconds": 2084.3,
+  "sweep_seconds": 1363.7,
   "rows_swept": 7853,
   "K2_replay": {
     "rows_checked": 7853,
@@ -38,6 +38,36 @@
     "detached_examples": [],
     "note": "the sweep window is the artifact's own and takes a boundary cell whole, so a cell's midpoint can lie outside the parent-centre envelope; a detached row is one whose minimising cell meets the envelope in measure zero, and only there is the constraint the artifact's window rather than its envelope"
   },
+  "slack": {
+    "rows": 7853,
+    "least_units": 1000020517,
+    "least_rows": [
+      6237
+    ],
+    "plateau": [
+      {
+        "units": 1002070341,
+        "rows": 2140
+      },
+      {
+        "units": 1002070393,
+        "rows": 1361
+      },
+      {
+        "units": 1002070388,
+        "rows": 309
+      }
+    ],
+    "plateau_share": 0.4852,
+    "rows_at_or_above_slack_2040e-6": 5026,
+    "windows_above_least": {
+      "within_10_units": 1,
+      "within_10000_units": 13,
+      "within_100000_units": 26,
+      "within_500000_units": 255,
+      "within_1000000_units": 729
+    }
+  },
   "captured_sites": {
     "least": 267,
     "greatest": 998
@@ -49,12 +79,15 @@
     "solver_objective_float": 16.776137504522023,
     "exact_mass": "4194034383/250000000",
     "exact_mass_float": 16.776137532,
+    "exact_floor": "6710455004/400000001",
+    "exact_floor_float": 16.776137468059655,
+    "dual_support": 99,
     "rationalised_objective_units": 16776137532,
     "rationalised_least_charge_units": 1000000000,
     "weight_denominator": 1000000000,
     "support": 93,
-    "seconds": 3.4,
-    "verdict": "headroom"
+    "seconds": 3.7,
+    "verdict": "headroom-in-the-relaxation"
   },
   "lp_positive_orbits_only": {
     "variables": 1105,
@@ -63,12 +96,15 @@
     "solver_objective_float": 16.811458512277703,
     "exact_mass": "8405729268/499999999",
     "exact_mass_float": 16.811458569622918,
+    "exact_floor": "134491668112/8000000007",
+    "exact_floor_float": 16.811458499289973,
+    "dual_support": 102,
     "rationalised_objective_units": 16811458536,
     "rationalised_least_charge_units": 999999998,
     "weight_denominator": 1000000000,
     "support": 102,
-    "seconds": 2.3,
-    "verdict": "headroom"
+    "seconds": 2.2,
+    "verdict": "headroom-in-the-relaxation"
   },
   "H239_dual": {
     "window_degrees": 0.5,
@@ -90,10 +126,11 @@
   },
   "headroom": {
     "artifact_normalised_mass": "16998427356/1000020517",
+    "lp_exact_floor": "6710455004/400000001",
     "lp_exact_mass": "4194034383/250000000",
     "difference": "55486406996563989/250005129250000000",
     "difference_float": 0.22194107442123207,
-    "verdict": "headroom"
+    "verdict": "headroom-in-the-relaxation"
   },
-  "seconds": 2097.3
+  "seconds": 1376.5
 }

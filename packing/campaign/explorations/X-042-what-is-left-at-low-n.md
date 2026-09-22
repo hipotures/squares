@@ -63,12 +63,22 @@ differently.
 > The surplus the measure was priced to carry is `0.0368`; what survived is `1.13e-4`.
 > Row generation is not converged.
 
-> **3. At `n = 19` and `n = 26` the target itself is the least defended number in the
-> low range.** No computer search on record, first-party or external, has ever reached
-> Wainwright’s 1979 `n = 19` packing; the repository’s best is `0.073` short.
+> **3. At `n = 19` and `n = 26` the target itself is less defended than elsewhere in the
+> low range** — but this claim was overstated in the draft that opened the block, and
+> the block’s own measurements corrected it.
 > `n = 26` has the largest gap below `n = 27` at `0.4982` and has been improved twice
-> historically. Every lower-bound lane aims at a number that at these two sizes nobody
-> has defended.
+> historically. `n = 19` is the low non-grid cell no search has ever *reached*, which is
+> weaker than “worst served”: after the same polish, `n = 26` sits `8.58e-2` and
+> `n = 27` `6.90e-2` from their records against `n = 19`’s `3.03e-2`.
+
+The `0.073` figure the draft quoted for `n = 19` was **the annealer’s stopping point,
+not the repository’s best**, and it is now superseded twice over.
+Polishing `exp-202`’s own archived poses — no new search, the same bytes — reaches
+`4.915912971524`, a gap of `3.029e-2`; a four-times-budget sweep then reaches
+`4.888118685629`, a gap of **`2.501e-03`**. The lesson generalises and is worth more
+than the number: where the annealer only just escapes the grid, its reported side is not
+a local optimum and should not be quoted as the search’s result.
+`n = 27` shows the same `5.37e-2` polish gain.
 
 All three are `V0/C0`: each is a reading taken once, in one-off code, on retained bytes.
 `OR-1` is explicit that a measurement left in one-off code is a missing tool, and the
@@ -321,7 +331,50 @@ Whether a recorded escape from the agreement requirement is sound policy is a qu
 for the gate’s owner, and `D-435` is exactly why acceptance is asked the same question
 in both modes.
 
-## Ranked Slate
+## What the Upper-Bound Lane Measured, and Three Things It Corrected
+
+**The grid escape is the null, and the null is total.** At `n = 12`, `20` and `21`, all
+fifteen runs and all 120 individual chains behind them returned the grid exactly —
+`4.000000000000`, `5.000000000000`, `5.000000000000`. The seed-to-seed spread is not
+small, it is zero, and polishing all fifteen best poses returns the integer again, so
+the grid is a fixed point of the LP-in-cell quench too and not merely where the annealer
+stops. That is the first grid-capable search ever run at these three sizes.
+
+**`n = 19` was not decided.** A four-times-budget sweep — not the ten declared, because
+the host runs this arm at about an eighth of `exp-202`’s rate and five seeds at `5e9`
+was chosen over two at `1.25e10`, the kill rule being written over five seeds — reached
+`4.888118685629` on seed 4, `2.501e-03` from Wainwright.
+Neither branch of `H-U2` fires: no seed is within `1e-4`, and not all five sit at or
+above `4.8956`. Every kept pose has least pair separation and least wall margin exactly
+`0.0`, rather than a small negative cleared by a tolerance.
+
+**All six one-sided tilt slopes are positive**, so no sub-record packing exists in the
+axis-plus-one-angle family at `n = 18`, `19` or `26`. The shapes differ in a way that
+matters: `n = 19` and `n = 18` are smooth quadratic minima, while **`n = 26` is a
+genuine kink**, its one-sided slopes tending to `+1/2` on both branches.
+A central difference there returns 0 and reports a smooth stationary point that does not
+exist, so taking the slopes branchwise was load-bearing rather than pedantic.
+
+Three corrections follow, and the third is to this block’s own briefs.
+
+1. The `n = 19` figure, above.
+2. **`exp-202`’s escape-mechanism story does not survive more points.** Measured over
+   six cells rather than three, single-square proposals lower `required_side` in 0 of
+   144,000 draws at every cell and scale, *including the cells that do escape*, so the
+   statistic is a fact about trivial grids and not a discriminator.
+   The collective-lowered rate does not predict escape either: `n = 26` has rate
+   `0.0000` and escapes by `0.253`, while `n = 12` has `0.0006`-`0.0011`, higher than
+   both `n = 17` and `n = 26`, and does not escape.
+   **Why `n = 12`, `20` and `21` keep the grid is therefore unexplained**, and the
+   three-point reading should not be quoted as though it had survived.
+3. **The `4.888109` Stromquist `n = 19` figure carried in this block’s briefs is not in
+   the record at all.** A search of the frontier, the resources and the campaign finds
+   no Stromquist `n = 19` entry; the only retained Stromquist source is the 2003
+   `n = 10` and `n = 11` paper.
+   Seed 4 lands `9.69e-06` above that value, striking at five decimals, but its angle
+   classes are five rather than one common tilt and reflection does not send them to
+   `23.944°`. The coincidence is recorded, the basin is not claimed, and the number
+   should not be repeated as though this repository held it.
 
 ## Ranked Slate
 
