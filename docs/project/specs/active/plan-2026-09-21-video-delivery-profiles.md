@@ -181,12 +181,22 @@ handles n = 300.
 | n = 1..100 | `social` | 9,579 | 159.65 s | 43.8 MB | 49.6 to 51.3 dB, 0.999 |
 | n = 1..324 | `archive` | 33,626 | 560.43 s | 239.2 MB | 47.9 to 51.4 dB, 0.998 to 0.999 |
 
-**Both rows were cut at a grid-fill speed-up of 3, which is no longer the default.** The
-factor is a setting now (`think-gr3j`, default 4), so a length means nothing without it:
-the receipt’s `simple_speed` names the clock its step lengths were measured on, and a
-cut that asks for a factor the page declines is refused rather than cut at whatever the
-page settled for. Priced at 4, the same ranges are 153.39 s and 542.02 s, all of the
-difference in the 55 and 160 grid fills each contains.
+The n = 1..100 cut was replaced on 2026-09-22 (`v0.4.1-b7690c`, citations on, grid fills
+at 4x): 9,203 frames, 153.383 s, 44.0 MB, conforming, captured in 564 s. Its repeated
+frames inside motion fell from 73 to 15 over that day — 44 of them the container box’s
+one-frame blink (`think-dh9j`), 8 of them frames the 480 × 270 measurement called
+repeats and a full-size reading did not, and the rest a mixture.
+Ten of the 15 that remain are the one- to two-frame beat on a grid fill between the
+arriving square settling and the facts column starting its handover, which is a timing
+choice rather than a defect and is the owner’s to disposition.
+
+**The two rows below were cut at a grid-fill speed-up of 3, which is no longer the
+default.** The factor is a setting now (`think-gr3j`, default 4), so a length means
+nothing without it: the receipt’s `simple_speed` names the clock its step lengths were
+measured on, and a cut that asks for a factor the page declines is refused rather than
+cut at whatever the page settled for.
+Priced at 4, the same ranges are 153.39 s and 542.02 s, all of the difference in the 55
+and 160 grid fills each contains.
 
 Both rows conform.
 Fidelity is measured over three windows of each cut, early, middle and
