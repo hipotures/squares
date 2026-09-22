@@ -2,3 +2,7 @@ warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be remo
 sweeping 7853 rows on 2 workers
   row 1/7853 10.0s
   row 201/7853 67.3s
+  row 401/7853 125.2s
+  row 601/7853 189.4s
+  row 801/7853 266.0s
+  row 1001/7853 323.5s

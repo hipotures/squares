@@ -1,0 +1,3 @@
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+campaign/series/series-000-smoke-and-calibration/results/agenda-039/n29-548-100-auto-windows5-certificate.json: n = 29, L = 137/25 = 5.480000, 1329 atoms, mass 52081879/2000000 = 26.040940
+  ceiling 5.986200, certifies every n >= 27

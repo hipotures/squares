@@ -64,6 +64,10 @@ overstatement, which is the direction that matters for a negative verdict.
 ``K6`` the LP solution rationalised on the artifact's own weight denominator and
 re-verified exactly: the reported mass is ``objective / least charge`` in integers, so it
 is the exact mass of an exactly feasible rational measure and never a solver's float.
+``K7`` the solver's dual rationalised the same way and scaled down until ``A^T y <= c``
+holds in integers, which by weak duality is an exact floor under the relaxation's
+optimum -- and therefore under the unrelaxed problem's optimum as well. The two together
+bracket the answer in rationals with no float between them.
 
 Usage, from `packing/`:
 
@@ -721,6 +725,7 @@ def solve(
     total = int(budget[active] @ units)
     mass = Fraction(total, least)
     duals = np.maximum(-np.asarray(result.ineqlin.marginals, dtype=float), 0.0)
+    floor, dual_support = _dual_bound(reduced, budget[active], duals, denominator)
     return {
         "variables": len(active),
         "constraints": int(reduced.shape[0]),
@@ -728,6 +733,9 @@ def solve(
         "solver_objective_float": float(result.fun),
         "exact_mass": str(mass),
         "exact_mass_float": float(mass),
+        "exact_floor": str(floor),
+        "exact_floor_float": float(floor),
+        "dual_support": dual_support,
         "rationalised_objective_units": total,
         "rationalised_least_charge_units": least,
         "weight_denominator": denominator,
@@ -737,6 +745,36 @@ def solve(
         "weights": units,
         "active": active,
     }
+
+
+def _dual_bound(
+    reduced: csr_array, costs: np.ndarray, duals: np.ndarray, denominator: int
+) -> tuple[Fraction, int]:
+    """An exact floor under the relaxation's optimum, from the solver's own dual.
+
+    Weak duality: any ``y >= 0`` with ``A^T y <= c`` has ``sum(y) <= OPT``. The solver's
+    dual is a float and satisfies neither inequality exactly, so it is rounded onto the
+    same ``1e-9`` grid, clipped non-negative, and then scaled down by the largest factor
+    that makes ``A^T y <= c`` hold in integers. What comes back is the exact mass of an
+    exactly dual-feasible ``y``, and therefore a rational number no re-priced measure on
+    this constraint set can go below.
+
+    This is the half of the measurement that can settle the negative. The primal side
+    returns an exact mass *above* the relaxation's optimum, which can only ever say that
+    the relaxation has room; a floor at or above the artifact's own normalised mass would
+    say the opposite, and say it about every measure on this support at this ``A``.
+    """
+    units = np.rint(duals * denominator).astype(np.int64)
+    loads = np.asarray(reduced.T @ units, dtype=np.int64)
+    room = costs.astype(np.int64) * denominator
+    scale = None
+    for position in np.flatnonzero(loads > 0):
+        ratio = Fraction(int(room[position]), int(loads[position]))
+        if scale is None or ratio < scale:
+            scale = ratio
+    if scale is None:
+        return Fraction(0), 0
+    return scale * Fraction(int(units.sum()), denominator), int(np.count_nonzero(units))
 
 
 def dual_histogram(cells: list[RowCell], duals: np.ndarray) -> dict[str, Any]:
@@ -763,12 +801,59 @@ def dual_histogram(cells: list[RowCell], duals: np.ndarray) -> dict[str, Any]:
     }
 
 
-def verdict_of(mass: Fraction) -> str:
-    """The pre-declared discriminator, read off the exact mass."""
-    if mass < Fraction(1699, 100):
-        return "headroom"
-    if mass >= Fraction(16998, 1000):
+def slack_summary(cells: list[RowCell], expansion: Expansion) -> dict[str, Any]:
+    """The slack distribution the re-pricing question rests on, recomputed here.
+
+    X-042 reports it from one-off code and calls the reading ``V0/C0``; it is the whole
+    argument for this lane, so it is re-measured from the swept minima -- which ``K2`` has
+    already matched, row by row, to the artifact's own retained replay. A measure whose
+    row minima pile onto one plateau far above the global minimum is one that was priced
+    against a catalogue it no longer has.
+    """
+    units = [cell.units for cell in cells]
+    tally: dict[int, int] = {}
+    for value in units:
+        tally[value] = tally.get(value, 0) + 1
+    plateau = sorted(tally.items(), key=lambda item: (-item[1], item[0]))[:3]
+    least = min(units)
+    denominator = expansion.weight_denominator
+    windows = {
+        f"within_{gap}_units": sum(1 for value in units if value - least <= gap)
+        for gap in (10, 10**4, 10**5, 5 * 10**5, 10**6)
+    }
+    above = sum(1 for value in units if value >= denominator + 2040000)
+    return {
+        "rows": len(units),
+        "least_units": least,
+        "least_rows": [cell.row for cell in cells if cell.units == least],
+        "plateau": [{"units": value, "rows": count} for value, count in plateau],
+        "plateau_share": round(sum(count for _, count in plateau) / max(len(units), 1), 4),
+        "rows_at_or_above_slack_2040e-6": above,
+        "windows_above_least": windows,
+    }
+
+
+#: The two pre-declared thresholds. Below ``16.99`` there is real room on this support at
+#: this ``A``; at or above ``16.998`` -- the artifact's own normalised mass to three places
+#: -- there is none, and the next rung is a sites problem rather than a pricing one.
+HEADROOM_AT = Fraction(1699, 100)
+NO_HEADROOM_AT = Fraction(16998, 1000)
+
+
+def verdict_of(floor: Fraction, mass: Fraction) -> str:
+    """The pre-declared discriminator, read off the exact bracket.
+
+    The two sides are not symmetric and the asymmetry is the point. ``mass`` is an exact
+    *upper* bound on the relaxation's optimum, so ``mass`` under ``16.99`` says the
+    relaxation has room -- and the relaxation is not the problem a certificate has to
+    solve, so that is a signal and not a result. ``floor`` is an exact *lower* bound on
+    the same optimum and therefore on the unrelaxed problem's optimum too, so ``floor`` at
+    or above ``16.998`` settles the negative outright.
+    """
+    if floor >= NO_HEADROOM_AT:
         return "no-headroom"
+    if mass < HEADROOM_AT:
+        return "headroom-in-the-relaxation"
     return "inconclusive"
 
 
@@ -865,9 +950,13 @@ def _sample(total: int, stride: int, limit: int | None) -> list[int]:
 
 def _report_solution(name: str, solution: dict[str, Any]) -> dict[str, Any]:
     trimmed = {k: v for k, v in solution.items() if k not in {"duals", "weights", "active"}}
-    trimmed["verdict"] = verdict_of(Fraction(cast(str, solution["exact_mass"])))
+    trimmed["verdict"] = verdict_of(
+        Fraction(cast(str, solution["exact_floor"])),
+        Fraction(cast(str, solution["exact_mass"])),
+    )
     print(
-        f"  {name}: exact mass {solution['exact_mass_float']:.9f} "
+        f"  {name}: exact bracket [{solution['exact_floor_float']:.9f}, "
+        f"{solution['exact_mass_float']:.9f}] "
         f"(solver {solution['solver_objective_float']:.9f}), "
         f"support {solution['support']}, {solution['seconds']}s "
         f"-> {trimmed['verdict']}",
@@ -944,6 +1033,7 @@ def main(argv: list[str] | None = None) -> int:
             "is the constraint the artifact's window rather than its envelope"
         ),
     }
+    report["slack"] = slack_summary(cells, expansion)
     report["captured_sites"] = {
         "least": min((cell.captured for cell in cells), default=0),
         "greatest": max((cell.captured for cell in cells), default=0),
@@ -971,6 +1061,7 @@ def main(argv: list[str] | None = None) -> int:
         report["H239_dual"] = dual_histogram(cells, full["duals"])
         report["headroom"] = {
             "artifact_normalised_mass": report["K4_artifact"]["normalised_mass"],
+            "lp_exact_floor": full["exact_floor"],
             "lp_exact_mass": full["exact_mass"],
             "difference": str(
                 Fraction(cast(str, report["K4_artifact"]["normalised_mass"]))
@@ -980,7 +1071,10 @@ def main(argv: list[str] | None = None) -> int:
                 Fraction(cast(str, report["K4_artifact"]["normalised_mass"]))
                 - Fraction(cast(str, full["exact_mass"]))
             ),
-            "verdict": verdict_of(Fraction(cast(str, full["exact_mass"]))),
+            "verdict": verdict_of(
+                Fraction(cast(str, full["exact_floor"])),
+                Fraction(cast(str, full["exact_mass"])),
+            ),
         }
 
     report["seconds"] = round(time.perf_counter() - started, 1)

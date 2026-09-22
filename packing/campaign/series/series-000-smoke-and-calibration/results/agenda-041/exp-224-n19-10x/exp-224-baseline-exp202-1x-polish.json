@@ -3,7 +3,8 @@
     "packing/campaign/series/series-000-smoke-and-calibration/results/exp-202-round-1/part-1/B-perturb.jsonl",
     "packing/campaign/series/series-000-smoke-and-calibration/results/exp-202-round-1/part-2/B-perturb-slow.jsonl",
     "packing/campaign/series/series-000-smoke-and-calibration/results/exp-202-round-1/part-1/A-control.jsonl",
-    "packing/campaign/series/series-000-smoke-and-calibration/results/exp-202-round-1/part-2/A-slow.jsonl"
+    "packing/campaign/series/series-000-smoke-and-calibration/results/exp-202-round-1/part-2/A-slow.jsonl",
+    "packing/campaign/series/series-000-smoke-and-calibration/results/exp-202-round-1/part-3/C-pressure.jsonl"
   ],
   "cells": [
     {
@@ -26,14 +27,16 @@
   "host": {
     "cpu_count": 4,
     "loadavg": [
-      7.42626953125,
-      8.57568359375,
-      10.5810546875
+      10.07373046875,
+      9.03173828125,
+      10.40576171875
     ],
     "platform": "Linux-6.18.44-fc-v37-x86_64-with-glibc2.39"
   },
+  "pose_seconds": 150.0,
   "pose_tolerance": 1e-09,
-  "quench_seconds": 90.0,
+  "quench_rounds_max": 6,
+  "quench_seconds": 40.0,
   "rows": [
     {
       "archive": "packing/campaign/series/series-000-smoke-and-calibration/results/exp-202-round-1/part-1/B-perturb.jsonl",
@@ -109,9 +112,26 @@
         ]
       },
       "quench_converged": false,
-      "quench_lp_solves": 3449,
+      "quench_lp_solves": 3594,
       "quench_reason": "fixed cell unsettled during bracket: re-read cell worse",
-      "quench_seconds": 15.994,
+      "quench_rounds": 2,
+      "quench_seconds": 21.338,
+      "quench_trace": [
+        {
+          "converged": false,
+          "reason": "fixed cell unsettled during bracket: re-read cell worse",
+          "round": 0,
+          "seconds": 20.634,
+          "side": 4.944934863883148
+        },
+        {
+          "converged": false,
+          "reason": "fixed cell unsettled during bracket: re-read cell worse",
+          "round": 1,
+          "seconds": 21.338,
+          "side": 4.944934863883148
+        }
+      ],
       "seed": 1
     },
     {
@@ -188,9 +208,26 @@
         ]
       },
       "quench_converged": false,
-      "quench_lp_solves": 949,
+      "quench_lp_solves": 1105,
       "quench_reason": "fixed cell unsettled during bracket: cell cycle (closure exceeded 64-cell cap)",
-      "quench_seconds": 4.445,
+      "quench_rounds": 2,
+      "quench_seconds": 5.929,
+      "quench_trace": [
+        {
+          "converged": false,
+          "reason": "fixed cell unsettled during bracket: cell cycle (closure exceeded 64-cell cap)",
+          "round": 0,
+          "seconds": 4.873,
+          "side": 4.925390647054185
+        },
+        {
+          "converged": false,
+          "reason": "fixed cell unsettled during bracket: cell cycle (closure exceeded 64-cell cap)",
+          "round": 1,
+          "seconds": 5.929,
+          "side": 4.925390647054185
+        }
+      ],
       "seed": 2
     },
     {
@@ -267,9 +304,26 @@
         ]
       },
       "quench_converged": true,
-      "quench_lp_solves": 8149,
+      "quench_lp_solves": 10403,
       "quench_reason": "converged, 4 classes, free pass clean",
-      "quench_seconds": 44.36,
+      "quench_rounds": 2,
+      "quench_seconds": 63.196,
+      "quench_trace": [
+        {
+          "converged": false,
+          "reason": "time budget during free sweep",
+          "round": 0,
+          "seconds": 40.03,
+          "side": 4.915912971524187
+        },
+        {
+          "converged": true,
+          "reason": "converged, 4 classes, free pass clean",
+          "round": 1,
+          "seconds": 63.196,
+          "side": 4.915912971524187
+        }
+      ],
       "seed": 3
     },
     {
@@ -346,9 +400,26 @@
         ]
       },
       "quench_converged": false,
-      "quench_lp_solves": 283,
+      "quench_lp_solves": 566,
       "quench_reason": "fixed cell unsettled during bracket: cell cycle (closure exceeded 64-cell cap)",
-      "quench_seconds": 1.569,
+      "quench_rounds": 2,
+      "quench_seconds": 2.825,
+      "quench_trace": [
+        {
+          "converged": false,
+          "reason": "fixed cell unsettled during bracket: cell cycle (closure exceeded 64-cell cap)",
+          "round": 0,
+          "seconds": 1.365,
+          "side": 5.0
+        },
+        {
+          "converged": false,
+          "reason": "fixed cell unsettled during bracket: cell cycle (closure exceeded 64-cell cap)",
+          "round": 1,
+          "seconds": 2.825,
+          "side": 5.0
+        }
+      ],
       "seed": 4
     },
     {
@@ -424,12 +495,29 @@
           4.453920680248723
         ]
       },
-      "quench_converged": true,
-      "quench_lp_solves": 6197,
-      "quench_reason": "converged, 5 classes, free pass clean",
-      "quench_seconds": 34.433,
+      "quench_converged": false,
+      "quench_lp_solves": 5486,
+      "quench_reason": "fixed cell unsettled during bracket: cell cycle (closure exceeded 64-cell cap)",
+      "quench_rounds": 2,
+      "quench_seconds": 46.045,
+      "quench_trace": [
+        {
+          "converged": false,
+          "reason": "time budget during free sweep",
+          "round": 0,
+          "seconds": 40.029,
+          "side": 4.9550580321426025
+        },
+        {
+          "converged": false,
+          "reason": "fixed cell unsettled during bracket: cell cycle (closure exceeded 64-cell cap)",
+          "round": 1,
+          "seconds": 46.045,
+          "side": 4.95505803214259
+        }
+      ],
       "seed": 5
     }
   ],
-  "seconds": 100.847
+  "seconds": 139.419
 }
