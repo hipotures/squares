@@ -807,12 +807,7 @@ def separation_probe(
     total = int(budget @ whole)
     cells = sweep(repriced, support, sample, workers=workers, quiet=quiet)
     worst = min(cells, key=lambda cell: cell.units)
-    if worst.units <= 0:
-        raise RepricingError(
-            f"the re-priced measure charges {worst.units} units at row {worst.row}; "
-            "no rescaling turns it into a certificate"
-        )
-    mass = Fraction(total, worst.units)
+    mass = Fraction(total, worst.units) if worst.units > 0 else None
     return {
         "rows_swept": len(cells),
         "rows_available": len(expansion.rows),
@@ -821,9 +816,9 @@ def separation_probe(
         "least_charge_row": worst.row,
         "least_charge": str(Fraction(worst.units, expansion.weight_denominator)),
         "least_charge_float": float(Fraction(worst.units, expansion.weight_denominator)),
-        "mass_lower_bound": str(mass),
-        "mass_lower_bound_float": float(mass),
-        "survives_as_certificate_on_sample": bool(mass < 17),
+        "mass_lower_bound": str(mass) if mass is not None else None,
+        "mass_lower_bound_float": float(mass) if mass is not None else None,
+        "survives_as_certificate_on_sample": bool(mass is not None and mass < 17),
         "seconds": round(time.perf_counter() - started, 1),
     }
 
