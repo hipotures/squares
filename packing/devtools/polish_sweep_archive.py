@@ -31,6 +31,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import platform
 import statistics
@@ -93,10 +94,41 @@ def best_poses(paths: list[Path]) -> dict[tuple[int, int], dict[str, Any]]:
     return best
 
 
-def checked(
-    x: list[float], y: list[float], t: list[float]
-) -> tuple[float, list[float], list[float]] | None:
-    """Repair, measure, and hand to the independent oracle. `None` if it refuses."""
+def separation(x: list[float], y: list[float], t: list[float]) -> float:
+    """The least separating-axis gap over all pairs. Negative means a penetration.
+
+    `run_basin_hopping.total_depth` answers only "is any pair overlapping"; a claimed
+    improvement needs the *margin*, because a packing that clears the oracle's `1e-9`
+    by `2e-9` and one that clears it by `1e-3` are not the same evidence.
+    """
+    least = math.inf
+    for i in range(len(x)):
+        ci, si = math.cos(t[i]), math.sin(t[i])
+        for j in range(i + 1, len(x)):
+            cj, sj = math.cos(t[j]), math.sin(t[j])
+            dx, dy = x[i] - x[j], y[i] - y[j]
+            half = 0.5 + 0.5 * (abs(ci * cj + si * sj) + abs(si * cj - ci * sj))
+            least = min(
+                least,
+                max(
+                    abs(dx * ci + dy * si) - half,
+                    abs(dy * ci - dx * si) - half,
+                    abs(dx * cj + dy * sj) - half,
+                    abs(dy * cj - dx * sj) - half,
+                ),
+            )
+    return least
+
+
+def checked(x: list[float], y: list[float], t: list[float]) -> dict[str, Any] | None:
+    """Repair, measure, and hand to the independent oracle. `None` if it refuses.
+
+    The returned margins are what makes a reported side checkable rather than merely
+    asserted: `separation` is how far the tightest pair is from touching, and
+    `containment` how far the extreme corner is from the wall of the reported side.
+    Both are zero-ish by construction at a tight packing; what would be alarming is a
+    *negative* one, which the oracle also refuses.
+    """
     x, y = repair(list(x), list(y), t)
     if total_depth(x, y, t) != 0.0:
         return None
@@ -108,7 +140,15 @@ def checked(
     report = verify_packing(shifted, side, sign=float_sign(POSE_TOLERANCE))
     if not report.valid:
         return None
-    return side, x, y
+    corners = [value for square in shifted for value in square]
+    containment = min(min(px, py, side - px, side - py) for px, py in corners)
+    return {
+        "side": side,
+        "x": x,
+        "y": y,
+        "separation": separation(x, y, t),
+        "containment": containment,
+    }
 
 
 #: A round has to buy at least this much side to justify another one. HiGHS is asked
@@ -136,7 +176,7 @@ def polish(
     engine = checked(x0, y0, t0)
 
     current = (list(x0), list(y0), list(t0))
-    polished: tuple[float, list[float], list[float]] | None = None
+    polished: dict[str, Any] | None = None
     theta = list(t0)
     trace: list[dict[str, Any]] = []
     lp_solves = 0
@@ -154,7 +194,7 @@ def polish(
         trace.append(
             {
                 "round": index,
-                "side": None if candidate is None else candidate[0],
+                "side": None if candidate is None else candidate["side"],
                 "converged": result.converged,
                 "reason": result.reason,
                 "seconds": round(time.time() - started, 3),
@@ -162,33 +202,35 @@ def polish(
         )
         if candidate is None:
             break
-        improved = polished is None or candidate[0] < polished[0] - ROUND_GAIN
+        improved = polished is None or candidate["side"] < polished["side"] - ROUND_GAIN
         if not improved:
             break
         polished = candidate
         theta = moved
-        current = (list(candidate[1]), list(candidate[2]), list(moved))
+        current = (list(candidate["x"]), list(candidate["y"]), list(moved))
 
-    candidates: list[tuple[float, str, list[float], list[float], list[float]]] = []
+    candidates: list[tuple[dict[str, Any], str, list[float]]] = []
     if engine is not None:
-        candidates.append((engine[0], "engine", engine[1], engine[2], t0))
+        candidates.append((engine, "engine", list(t0)))
     if polished is not None:
-        candidates.append((polished[0], "polished", polished[1], polished[2], theta))
-    kept = min(candidates, key=lambda c: c[0]) if candidates else None
+        candidates.append((polished, "polished", theta))
+    kept = min(candidates, key=lambda c: c[0]["side"]) if candidates else None
 
     return {
         "engine_side_reported": pose["best_side"],
-        "engine_side_rechecked": None if engine is None else engine[0],
-        "polished_side": None if polished is None else polished[0],
-        "best_verified_side": None if kept is None else kept[0],
+        "engine_side_rechecked": None if engine is None else engine["side"],
+        "polished_side": None if polished is None else polished["side"],
+        "best_verified_side": None if kept is None else kept[0]["side"],
         "best_verified_from": None if kept is None else kept[1],
+        "least_pair_separation": None if kept is None else kept[0]["separation"],
+        "least_containment_margin": None if kept is None else kept[0]["containment"],
         "quench_rounds": len(trace),
         "quench_converged": bool(trace and trace[-1]["converged"]),
         "quench_reason": trace[-1]["reason"] if trace else "no round ran",
         "quench_lp_solves": lp_solves,
         "quench_seconds": round(time.time() - started, 3),
         "quench_trace": trace,
-        "pose": None if kept is None else {"x": kept[2], "y": kept[3], "t": kept[4]},
+        "pose": None if kept is None else {"x": kept[0]["x"], "y": kept[0]["y"], "t": kept[2]},
     }
 
 
@@ -222,6 +264,11 @@ def num(value: float | None) -> str:
     return "--" if value is None else f"`{value:.12f}`"
 
 
+def margin(value: float | None) -> str:
+    """A separation or containment margin, or a dash where there is none."""
+    return "--" if value is None else f"`{value:+.2e}`"
+
+
 def render(payload: dict[str, Any]) -> str:
     """The per-cell table, lifted from the payload and never retyped into prose."""
     lines = [
@@ -243,12 +290,17 @@ def render(payload: dict[str, Any]) -> str:
             f"| `{cell['best_gap_to_grid']:+.3e}` |"
         )
     lines.append("")
-    lines.append("| n | seed | engine | polished | kept | from | quench |")
-    lines.append("| ---: | ---: | ---: | ---: | ---: | --- | --- |")
+    lines.append(
+        "| n | seed | engine | polished | kept | from | least pair gap "
+        "| least wall gap | quench |"
+    )
+    lines.append("| ---: | ---: | ---: | ---: | ---: | --- | ---: | ---: | --- |")
     lines.extend(
         f"| {row['n']} | {row['seed']} | {num(row['engine_side_rechecked'])} "
         f"| {num(row['polished_side'])} | {num(row['best_verified_side'])} "
         f"| {row['best_verified_from'] or '--'} "
+        f"| {margin(row['least_pair_separation'])} "
+        f"| {margin(row['least_containment_margin'])} "
         f"| {'converged' if row['quench_converged'] else row['quench_reason']} "
         f"({row['quench_rounds']} rounds, {row['quench_seconds']:.1f}s) |"
         for row in payload["rows"]
