@@ -7,12 +7,12 @@ softschema:
   schema: schemas/session-close-report.schema.yaml
   envelope: null
   status: enforced
-count: 152
+count: 153
 generated_by: >-
   uv run --frozen --all-extras --group dev python -m devtools.close_session --render
 totals:
   sessions_measured: 98
-  sessions_unmeasured: 54
+  sessions_unmeasured: 55
   attributed:
     rollups: 188
     turns: 50776
@@ -2542,3 +2542,13 @@ sessions:
     active_union_hours: 4.31
     wall_hours: 4.31
     snapshot_incomplete: true
+- id: session-154
+  title: "PR 221 and PR 222 frontier reconciliation"
+  status: in_progress
+  primary_bead: think-t30b
+  phases: 1
+  measured: false
+  unmeasured_reason: >-
+    declares no resource measurement
+  rollups: []
+  codex_receipts: []

@@ -4,6 +4,13 @@ Status: **`RETAINABLE`, and the dilation-limit theorem moves the bound.** Both r
 the retention gate accept the frozen bytes and agree at exactly 1. Nothing is registered
 by this receipt; the register entry is a separate decision.
 
+**Reconciliation note, 2026-09-22.** This receipt records the first-party move from
+T-026 to T-033. Session 152 subsequently verified Kleddamag’s stronger
+`s(11) > 31/8 = 3.875` certificate, which is the current Frontier lower bound.
+The unchanged fixed-core family’s refinement ceiling `955000/249507 ≈ 3.82755` is below
+`3.875`; this run remains auditable method and calibration evidence and does not support
+a current public-bound advance.
+
 This is `X-042`’s slate row A6 and the `H-G` of the `n = 11` review lane, which `X-041`
 called a rung to be run in an idle CPU slot and never as a block.
 It was run that way, beside the review lanes, and it is the one bound movement of the
@@ -87,10 +94,15 @@ the dilation-limit theorem establishes s(11) >= 955000*sqrt(2073600042893309449)
 | **this certificate** | `955000*sqrt(2073600042893309449)/359341754646249` | **`3.826997548829543624`** |
 | movement | — | **`+0.000550138257`** |
 
-It sits below `L/B* = 3.827547924507` and below the universal one-body ceiling
-`L* = 38200/9977 = 3.828806254385`, which is what the theory requires.
-A value above either would have been a reason to distrust the run rather than a better
-result.
+It sits below `L/B* = 3.827547924507` and below the point-certificate ceiling
+`L* = 38200/9977 = 3.828806254385`, and neither comparison is an independent check of
+the run. `S < L/B*` is an algebraic identity, since `sqrt(1 + D^2) < 1 + D` for `D > 0`,
+so a value above it would have meant an arithmetic defect.
+`L*` is the ceiling on *point* certificates, and `T-025`’s own rationale is that
+threshold atoms carry budget the point method cannot have, so `L*` is exactly the bound
+that does not bind this language: `S < L*` holds here because `B* > 9977/10000`, which
+the refinement measurement forces, not because of a theorem about threshold
+certificates.
 
 ## What this does not establish
 
@@ -98,13 +110,32 @@ The theorem gives `s(11) >=` the supremum and **supplies no individual certifica
 that side**; it does not establish a strict inequality there.
 The tool says so in its own output and the claim must not be quoted without it.
 
-Nothing here touches the gap to Trump’s `3.877084`, which remains open by `0.050086`
-after this movement.
-Nothing here bears on global optimality, and nothing here is a new mechanism: this is
-the same frozen measure on a finer net, which is why `X-041` called it a rung.
+At the time of this first-party run, it left a `0.050086` gap to Trump’s `3.877084`. The
+later external certificate narrows the current gap to about `0.0020836`. Nothing here
+bears on global optimality, and nothing here is a new mechanism: this is the same frozen
+measure on a finer net, which is why `X-041` called it a rung.
 The remaining series headroom, `L/B* - 3.826998 = 0.000550`, is now half what it was.
 
 The register entry is not written by this receipt.
+
+## The limit record was re-derived once, and only its label moved
+
+The record this run first wrote named its source by the bare experiment label
+`exp-226-n11-threshold-191-50-net2880`. That is not a path, and
+`tests/test_rung_figures.py` reads a limit record’s `source.certificate` as
+repository-relative and opens it, so registering `T-033` failed on a `FileNotFoundError`
+that named the label.
+`T-022`’s, `T-024`’s and `T-026`’s records all name the case copy’s path there.
+
+Re-derived with
+`--source-name packing/cases/n11_threshold_certificate/certificate-191-50-net2880.json`,
+31 m 51 s of wall on a contended four-core box.
+**Exactly one field differs between the two records**, `source.certificate`; the surd,
+the factor supremum and its squared form, the sharpened-containment identity, the six
+accepted conditions and the source digest are identical, which is what says the
+re-derivation reproduced the same mathematics rather than a new measurement.
+The copy under `cases/` and the copy here are byte-identical again, at `sha256
+e891b3b1e47cb328a8a53e16ed3b72985633ff04034343467038383dcd948fa2`.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

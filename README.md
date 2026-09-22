@@ -102,23 +102,31 @@ Results first established here, as far as the recorded source searches show:
   [T-025](packing/cases/n11_threshold_certificate/t-025-verifiable-claim-191-50.md)
   introduces point atoms plus *threshold atoms*, whose stronger budget rule carries the
   side past the point method’s proved ceiling, and directly proves
-  `s(11) ≥ 191/50 = 3.82`. The later T-026 result is
-  `s(11) ≥ 955000*sqrt(518400042893309449)/179696714646249 =
-  3.8264474…`, proved from those same threshold atoms re-certified on a 1440-step
-  direction net and an exact dilation-limit argument
-  ([T-026](packing/cases/n11_threshold_certificate/t-026-verifiable-claim-dilation-limit.md)).
-  It is registered as `V4/C5`: machine-verified exact or interval-certified evidence
-  with passing replay, confirmed by distinct exact event-cell and interval coverage
-  methods and a mapped source-distinct review of the complete claim.
-  The explainer uses the `3.81` certificate as its visual worked example, then proves
-  the threshold-counting and dilation steps that establish T-026 directly.
+  `s(11) ≥ 191/50 = 3.82`.
+  [T-026](packing/cases/n11_threshold_certificate/t-026-verifiable-claim-dilation-limit.md)
+  re-certifies those same threshold atoms on a 1440-step direction net and takes
+  `s(11) ≥ 955000*sqrt(518400042893309449)/179696714646249 = 3.8264474…` from an exact
+  dilation-limit argument, at `V4/C5`: machine-verified exact or interval-certified
+  evidence with passing replay, confirmed by distinct exact event-cell and interval
+  coverage methods and a mapped source-distinct review of the complete claim.
+  T-033 records the same retained atoms on a 2880-step net and gives the stronger
+  first-party result
+  `s(11) ≥ 955000*sqrt(2073600042893309449)/359341754646249 = 3.8269975…`
+  ([T-033](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-226-n11-net2880-receipt.md)),
+  which halves the net’s largest half-gap tangent and moves the bound by
+  `+0.00055013825660`. `T-033` is registered as `V4/C3`: the certificate carries the
+  same two distinct machine decisions, but the bound is derived from it by a single
+  exact-algebraic step, and a derived claim takes the minimum over its parts.
   The
   [September 22 external review](docs/project/reviews/review-2026-09-22-external-square-certificates-integration.md)
-  verifies Kleddamag’s stronger `s(11) > 31/8 = 3.875` certificate and Tokoharu’s
-  rectangle-density bounds `s(26) >= 5.508` and `s(29) >= 5.71`. Complete replays and
-  mathematical reviews support the new verified Frontier bounds.
-  The records state each checker’s scope; a second complete method remains additional
-  confirmation.
+  establishes the stronger current bound `s(11) > 31/8 = 3.875` from Kleddamag’s
+  certificate and verifies Tokoharu’s rectangle-density bounds `s(26) >= 5.508` and
+  `s(29) >= 5.71`. Complete replays and mathematical reviews support those Frontier
+  bounds. The records state each checker’s scope; a second complete method remains
+  additional confirmation.
+  The explainer uses the `3.81` certificate as its visual worked example, then proves
+  the threshold-counting and dilation steps that establish `T-026`’s `3.8264474…`
+  directly; it is generated against that rung and has not been rebuilt on `T-033`’s net.
 - **T-019: `s(17), s(18), s(19) ≥ 459/100`, improving the register (`S4`).** The adopted
   bound for [these](packing/frontier/n-017.md) three cases was Massaccesi’s `4.5058`,
   taken from a source rather than proved here.

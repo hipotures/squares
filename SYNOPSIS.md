@@ -68,9 +68,12 @@ Read it before citing any capability here.
 
 The core exposition begins with T-018’s visual proof of `s(11) >= 3.81`, then explains
 the threshold charges and dilation argument that strengthen it.
-T-026 established the historical lower bound,
-`s(11) >= 955000*sqrt(518400042893309449)/179696714646249 =
-3.8264474...`, at `V4/C5`. Future research follows the
+T-026 established the earlier first-party bound
+`s(11) >= 955000*sqrt(518400042893309449)/179696714646249 = 3.8264474...` at `V4/C5`.
+T-033 tightens the same retained family to
+`s(11) >= 955000*sqrt(2073600042893309449)/359341754646249 = 3.8269975...` at `V4/C3`.
+The current verified lower bound is the stronger external result `s(11) > 31/8 = 3.875`.
+Future research follows the
 [payoff policy](docs/project/handoff-2026-09-06-post-381-t2-t10-continuation.md#research-payoff-and-exposition):
 prioritize substantial bound improvements and methods or theorems that make them
 possible.
@@ -96,7 +99,7 @@ action for each are in [`frontier/RESULTS.md`](packing/frontier/RESULTS.md); the
 | [T-022](packing/frontier/RESULTS.md) | 11 | `V4` | `C5` | `S5` | `apparently-novel` | s(11) >= 38100*sqrt(8100042893309449)/899996306539 = 3.810025723614703, proved by an exact dilation-limit corollary of T-018’s retained certificate. |
 | [T-025](packing/frontier/RESULTS.md) | 11 | `V4` | `C5` | `S5` | `apparently-novel` | s(11) >= 191/50 = 3.82, by a threshold certificate: 584 point atoms of mass 271052551/31250000 and 320 threshold atoms, every one 2-of-3, of budget 143352577/62500000, on the D4-symmetric site set at shrunken side 9977/10000 and the 181-direction net. |
 | [T-026](packing/frontier/RESULTS.md) | 11 | `V4` | `C5` | `S5` | `apparently-novel` | s(11) >= 955000*sqrt(518400042893309449)/179696714646249 = 3.826447410572939, proved by an exact dilation-limit corollary of T-025’s threshold certificate re-certified on a finer direction net. |
-| [T-024](packing/frontier/RESULTS.md) | 11 | `V4` | `C4` | `S5` | `apparently-novel` | s(11) >= 3175000*sqrt(518400042893309449)/598960960743657 = 3.816609502788862, proved by an exact dilation-limit corollary of T-018’s retained atoms re-certified on a finer direction net. |
+| [T-024](packing/frontier/RESULTS.md) | 11 | `V4` | `C3` | `S5` | `apparently-novel` | s(11) >= 3175000*sqrt(518400042893309449)/598960960743657 = 3.816609502788862, proved by an exact dilation-limit corollary of T-018’s retained atoms re-certified on a finer direction net. |
 | [T-017](packing/frontier/RESULTS.md) | 12 | `V4` | `C4` | `S4` | `apparently-novel` | s(12) >= 99/25, by a first-party weighted fractional unavoidable-set certificate at container side 99/25 = 3.96. |
 | [T-019](packing/frontier/RESULTS.md) | 17, 18, 19 | `V4` | `C4` | `S4` | `apparently-novel` | s(17) >= 459/100, and s(18) >= 459/100 and s(19) >= 459/100, from a first-party weighted fractional unavoidable-set certificate at container side 459/100 = 4.59. |
 | [T-020](packing/frontier/RESULTS.md) | 19, 20, 21 | `V4` | `C4` | `S4` | `apparently-novel` | s(19) >= 24/5, s(20) >= 24/5 and s(21) >= 24/5, from a first-party weighted fractional unavoidable-set certificate at container side 24/5 = 4.80. |
@@ -118,6 +121,7 @@ action for each are in [`frontier/RESULTS.md`](packing/frontier/RESULTS.md); the
 | [T-015](packing/frontier/RESULTS.md) | 17 | `V4` | `C3` | `S3` | `previously-published` | s(17) >= 22529/5000 = 4.5058, by Massaccesi’s 168-atom fractional unavoidable-set certificate (2026) on Burns’s architecture: total mass 203/12 < 17 and mass at least 1 in every closed unit square of [0, 22529/5000]^2, reduced exactly to 181 rational directions and finitely many event cells, replayed here by the source verifier and by an accumulation-independent repository instrument. |
 | [T-016](packing/frontier/RESULTS.md) | 18, 19 | `V4` | `C3` | `S3` | `previously-published` | s(18) >= 22529/5000 and s(19) >= 22529/5000, by monotonicity from T-015 (a packing of n >= 17 unit squares contains a packing of 17). |
 | [T-023](packing/frontier/RESULTS.md) | 11 | `V3` | `C3` | `S3` | `apparently-novel` | At q = 96/25, if four distinct unit squares have selected strict cores of side B = 9977/10000 containing, respectively, the four closed rational patches in arms.endpoint.footprint_union of the retained exp143 receipt, at most five further unit squares fit. |
+| [T-033](packing/frontier/RESULTS.md) | 11 | `V4` | `C3` | `S3` | `apparently-novel` | s(11) >= 955000*sqrt(2073600042893309449)/359341754646249 = 3.826997548829543624, proved by an exact dilation-limit corollary of T-025’s threshold certificate re-certified on the 2880-step direction net. |
 | [T-006](packing/frontier/RESULTS.md) | 13 | `V3` | `C1` | `S3` | `previously-published` | s(13) = 4 (Bentz 2010, Theorem 9). |
 | [T-007](packing/frontier/RESULTS.md) | 4-100 | `V3` | `C1` | `S3` | `previously-published` | For every integer 4 <= N <= 100, Nagamochi 2005, Theorem 2 gives s(N) >= min(ceil(sqrt(N)), sqrt(N - 2*floor(sqrt(N)) + 1) + 1). |
 | [T-003](packing/frontier/RESULTS.md) | 17, 18 | `V4` | `C3` | `S2` | `apparently-novel` | The sixteen-point set’s unavoidability ceiling lies in [4426213/1000000, 4427/1000): certification at the left endpoint, an exact escaping pose at the right, with the top strips’ a + 2b <= 2*sqrt(2) hypothesis identifying the closing mechanism at 753/250 + sqrt(2), inside the bracket. |
@@ -153,11 +157,11 @@ hypothesis status and summarizes experiment verdicts, and the
 | --- | ---: | --- |
 | Agendas | 38 | 18 active; 14 completed; 5 paused; 1 superseded |
 | Commitments | 362 | 182 complete; 61 stopped; 68 blocked; 16 ready; 21 tentative; 14 in progress |
-| Sessions | 152 | 93 completed; 59 stopped; all terminal |
+| Sessions | 153 | 93 completed; 59 stopped; 1 nonterminal |
 | Explorations | 40 | 24 linked to proposed hypotheses; 16 uncodified |
 | Hypotheses | 170 | 29 confirmed; 31 refuted; 55 blocked; 17 unresolved; 5 open; 29 open questions; 2 result registered; 2 abandoned; 0 running |
 | Experiments | 155 | 43 accepted; 36 rejected; 50 unresolved; 12 baseline; 11 blocked; 3 abandoned; 0 in progress |
-| Frontier results | 32 | 32 registered |
+| Frontier results | 33 | 33 registered |
 
 <!-- END CURRENT-RESEARCH-STATUS -->
 
@@ -230,6 +234,10 @@ Research below 3.875 must now justify its value as a simpler certificate or meth
 development, rather than a public bound advance.
 The pure point/density ceiling `38200/9977 ≈ 3.8288` lies only about `0.00236` above
 T-026, so additional heavy work for microscopic gains in that language is paused.
+T-033 remains the controlled first-party net-refinement result: it moved T-026 by
+`0.00055013825660`, but the unchanged family’s ceiling `955000/249507 ≈ 3.82755` is
+already below `3.875` and cannot improve the current global bound.
+Changed weights, sites, parent domains, or charge atoms remain separate hypotheses.
 H-160/exp-158 and H-162/exp-160 are registered but blocked before target invocation.
 H-163 is registered and unresolved via exp-161; its target-blind instrument merged in PR
 182\. Encode-only timed out with no JSON. `--search` did not run.
@@ -1086,8 +1094,11 @@ The frozen `T-025` threshold atoms re-certify at the 2880-step net, where the cr
 shrink does not rise, so the dilation-limit supremum rises to
 `955000*sqrt(2073600042893309449)/359341754646249 = 3.826997548829544`, `+0.00055` over
 `T-026`. Both retention routes accept the frozen bytes and agree at exactly 1, and the
-limit record is replayed and written; **the register entry is deliberately unwritten**,
-which is why the session is stopped with certification debt rather than completed.
+limit record is replayed and written.
+Session 151 deliberately left the register entry unwritten, which is why that session
+remains stopped with certification debt rather than being rewritten after the fact.
+Session 154 later registers the result as T-033 and reconciles it with the stronger
+external `s(11) > 31/8` bound.
 Four cells returned measured negatives with witnesses — the `n = 17` triples and the
 parent-centre restriction are both load-bearing, re-pricing that support is capped at
 about `+0.0034`, and the first grid-capable search at `n = 12`, `20` and `21` returned
@@ -1143,9 +1154,9 @@ guard.
 **Selected next entry at the Session 151 cutoff:** `think-gvlg`, registering the
 `n = 11` rung Session 151 left accepted and unregistered.
 Its threshold certificate at the 2880-step net is `RETAINABLE` by both retention routes,
-which agree at exactly 1, and its dilation-limit record is replayed and written; what is
-missing is a `T-id`, a claim written as a supremum, and a qualifying gate pass on a host
-where that session’s three environment failures do not apply.
+which agree at exactly 1, and its dilation-limit record is replayed and written.
+That cutoff debt is now discharged by T-033 and Session 154; this paragraph preserves
+the selection Session 151 actually made.
 `think-zmos`, the W5 efficiency block that was the previous entry, is discharged:
 `OR-17`’s `1.38x` turned out to be the hosted runner pool rather than drift, the four CI
 jobs are clocked, and the rule’s text is corrected.
@@ -1459,9 +1470,9 @@ records the implemented controls and the remaining admission requirements.
 with definitions, proof results, scoped negatives and open comparisons in one place.
 PR137, PR142, PR145 and PR147 landed together at `1c1db463` on September 10, 2026. PR139
 then merged as `3a18a05a`, incorporating that owner strand and contributing T-024–T-026.
-The global lower bound is `3.8264474...`; the upper construction is unchanged at
-`3.8770835...`. The review corrections preserve the fixed-family scope of conditional
-obstructions and the existential owner-selection requirement.
+At that cutoff the global lower bound was `3.8264474...`; the upper construction is
+unchanged at `3.8770835...`. The review corrections preserve the fixed-family scope of
+conditional obstructions and the existential owner-selection requirement.
 Finite support, net and grid results do not close entire research directions.
 The
 [review addendum](docs/project/reviews/review-2026-09-09-n11-evidence-interpretation.md#combined-series-review-addendum--september-10-2026)
@@ -4611,8 +4622,8 @@ in separate tables: their units differ, and the same work can appear in both.
 | Coverage | sessions |
 | --- | ---: |
 | measured | 98 |
-| unmeasured | 54 |
-| **total** | **152** |
+| unmeasured | 55 |
+| **total** | **153** |
 
 <!-- END GENERATED: session-close-report -->
 
@@ -5751,15 +5762,16 @@ agrees, and new components inheriting the perimeter—that apply to code not yet
 
 ## Where This Stands
 
-**As of 2026-09-14 the current state and execution order are the checked
-[Research Program Status and Roadmap](#research-program-status-and-roadmap) above.**
-T-026 remains the strongest lower bound; the point/density ceiling leaves too little
-room for further incremental work in that language, and the owner has selected material
-bound improvement or proof simplification as the governing payoff.
-The historical synthesis below explains how the program reached that boundary.
-Its weighted-resource lineage runs through Göbel, Kearney–Shiu, Nagamochi and Bentz; the
-recent pure-atomic rational direction-net architecture follows Burns, and the LP
-instance and parameter line follows Massaccesi.
+**As of 2026-09-22 the current state and execution order are the checked
+[Research Program Status and Roadmap](#research-program-status-and-roadmap) above.** The
+verified external bound is `s(11) > 31/8 = 3.875`; the first-party point and threshold
+families below remain historical method evidence, and their ceilings leave no route to
+that current bound by net refinement alone.
+The owner has selected material bound improvement or proof simplification as the
+governing payoff. The historical synthesis below explains how the program reached that
+boundary. Its weighted-resource lineage runs through Göbel, Kearney–Shiu, Nagamochi and
+Bentz; the recent pure-atomic rational direction-net architecture follows Burns, and the
+LP instance and parameter line follows Massaccesi.
 This project’s instances and generator moved seven registered cases in one day.
 `s(11) >= 381/100` is [T-018](packing/frontier/RESULTS.md), improving Stromquist’s
 `2 + 4/sqrt(5)`, stated in 1984 and published in 2003; the recorded search found no
@@ -5773,12 +5785,14 @@ threshold atoms, which charge a core holding at least `k` of a set’s points an
 only `floor(|S| / k)` of the budget, carry the side past the exact ceiling that the
 point-atom method provably cannot pass.
 [T-026](packing/frontier/RESULTS.md) then re-certifies those atoms on a 1440-step net
-and proves `s(11) >= 3.826447410572939…` by an exact dilation-limit argument.
-This is the verified lower bound of the case; “dilation-limit” describes the proof
-construction, not a weaker theorem or assurance level.
-The shared S5 rubric category does not make these contributions comparable in size.
-`s(12) >= 99/25` is [T-017](packing/frontier/RESULTS.md), the first bound located that
-was proved about twelve squares rather than inherited from eleven.
+and proves `s(11) >= 3.826447410572939…` by an exact dilation-limit argument, and
+[T-033](packing/frontier/RESULTS.md) repeats that on a 2880-step net for
+`s(11) >= 3.826997548829543…`. T-033 is the strongest retained first-party rung in this
+family, while the current verified case bound is the stronger external strict result
+`s(11) > 31/8`. “Dilation-limit” describes T-033’s proof construction, not a weaker
+theorem or assurance level; its current significance is S3 as method and calibration
+evidence. `s(12) >= 99/25` is [T-017](packing/frontier/RESULTS.md), the first bound
+located that was proved about twelve squares rather than inherited from eleven.
 `s(17) >= 459/100`, and `n = 18` and `n = 19` at the same side without a monotonicity
 step, is [T-019](packing/frontier/RESULTS.md) and displaces Massaccesi’s published
 `4.5058` by `0.0842`. `s(19)`, `s(20)` and `s(21) >= 24/5` is
