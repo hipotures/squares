@@ -2,7 +2,7 @@
 
 # Agenda map
 
-356 agenda commitments across 37 agendas, as declared in each agenda's own frontmatter.
+362 agenda commitments across 38 agendas, as declared in each agenda's own frontmatter.
 Source of truth is [`agendas/`](agendas/); this view is regenerated, never edited.
 
 An agenda's queue owns priority ordering, so this map preserves each agenda's
@@ -10,7 +10,7 @@ order rather than imposing one across them.
 
 ## The short version
 
-- **9** in_progress, **16** ready, **21** tentative, **68** blocked, **61** stopped, **181** complete.
+- **14** in_progress, **16** ready, **21** tentative, **68** blocked, **61** stopped, **182** complete.
 
 - **26 blocked commitments carry a manual condition** (`BC-016`, `BC-025`, `BC-033`, `BC-050`, `BC-115`, `BC-170`, `BC-204`, `BC-205`, `BC-212`, `BC-207`, `BC-208`, `BC-209`, `BC-215`, `BC-217`, `BC-221`, `BC-238`, `BC-248`, `BC-270`, `BC-306`, `BC-337`, `BC-327`, `BC-329`, `BC-330`, `BC-358`, `BC-364`, `BC-365`). Dependency edges alone cannot make these ready; each condition is named in the table below and must be explicitly cleared.
 
@@ -66,6 +66,11 @@ Commitments a session may take now, in each agenda's declared order.
 | agenda-037 | `BC-357` | in_progress | 1 | correctness | measurement_validation | Does a helper-free point-atom certificate exist for n=6 at side 299/100 with B = 9977/10000 on the… | `think-qqzs` |
 | agenda-037 | `BC-359` | tentative | 2 | insight | research | Is the integral piercing number of the T-018 site set at side 3.80 on a 37-direction net at most 11, as a… | `think-k4vb` |
 | agenda-040 | `BC-367` | ready | 0 | insight | research | Is the exp-219 exclusion registered at its reviewed scope, does the corner-clip exclusion extend from the… | `think-b7pr` |
+| agenda-041 | `BC-370` | in_progress | 0 | insight | research | With the n = 17 ladder merged and T-031 and T-032 registered, is there a significant improvement still… | `think-gvlg` |
+| agenda-041 | `BC-371` | in_progress | 0 | insight | research | Does the external n = 17 measure, which is stated in a restricted parent-centre language this repository does… | `think-xdoh` |
+| agenda-041 | `BC-369` | in_progress | 1 | efficiency | tool_validation | The deep gate costs about 45 minutes of wall and its exhaustive tier runs at 1.376x its own declared price,… | `think-zmos` |
+| agenda-041 | `BC-372` | in_progress | 2 | insight | research | Can this repository's own site sets cover at the external side L = 4613/1000 at all, and at which shrink do… | `think-xdoh` |
+| agenda-041 | `BC-373` | in_progress | 2 | insight | research | Does T-026's threshold family still decide at the 2880-step net, and what does the finer net buy over the… | `think-gvlg` |
 
 ## Blocked, and on what
 
@@ -201,6 +206,7 @@ A commitment whose exit another agenda's commitment satisfied. Recorded as an ed
 | agenda-036 | active | 1 |  | 9 | 1 |  | 6 | 17 |
 | agenda-037 | active | 1 |  | 1 | 1 | 1 | 1 | 5 |
 | agenda-040 | active |  | 1 |  | 2 | 1 | 3 | 7 |
+| agenda-041 | active | 5 |  |  |  |  | 1 | 6 |
 
 ## By program
 
@@ -395,8 +401,14 @@ Open frontier: `BC-221`, `BC-222`, `BC-223`, `BC-224`, `BC-225`.
 | agenda-040 | `BC-365` | blocked | Does an unshrunk covering of mass below 12 exist at side exactly 4? |
 | agenda-040 | `BC-366` | stopped | Should the corner-penetration deep branches, the theta screen, the stressed contact-graph theorem,… |
 | agenda-040 | `BC-367` | ready | Is the exp-219 exclusion registered at its reviewed scope, does the corner-clip exclusion extend… |
+| agenda-041 | `BC-368` | complete | Does the research loop actually run in a fresh remote-session clone, and if not, what is missing… |
+| agenda-041 | `BC-369` | in_progress | The deep gate costs about 45 minutes of wall and its exhaustive tier runs at 1.376x its own… |
+| agenda-041 | `BC-370` | in_progress | With the n = 17 ladder merged and T-031 and T-032 registered, is there a significant improvement… |
+| agenda-041 | `BC-371` | in_progress | Does the external n = 17 measure, which is stated in a restricted parent-centre language this… |
+| agenda-041 | `BC-372` | in_progress | Can this repository's own site sets cover at the external side L = 4613/1000 at all, and at which… |
+| agenda-041 | `BC-373` | in_progress | Does T-026's threshold family still decide at the 2880-step net, and what does the finer net buy… |
 
-Open frontier: `BC-342`, `BC-344`, `BC-345`, `BC-348`, `BC-349`, `BC-350`, `BC-351`, `BC-352`, `BC-341`, `BC-343`, `BC-357`, `BC-358`, `BC-359`, `BC-364`, `BC-365`, `BC-367`.
+Open frontier: `BC-342`, `BC-344`, `BC-345`, `BC-348`, `BC-349`, `BC-350`, `BC-351`, `BC-352`, `BC-341`, `BC-343`, `BC-357`, `BC-358`, `BC-359`, `BC-364`, `BC-365`, `BC-367`, `BC-369`, `BC-370`, `BC-371`, `BC-372`, `BC-373`.
 
 ### `n11-structure-and-conditional-dots`
 
