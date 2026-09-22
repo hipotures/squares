@@ -34,7 +34,7 @@
       "Condition 4 containment B(1 + D) < 1",
       "Condition 5' every reachable cell is charged at least 1"
     ],
-    "certificate": "exp-226-n11-threshold-191-50-net2880",
+    "certificate": "packing/cases/n11_threshold_certificate/certificate-191-50-net2880.json",
     "coarse_containment": "39926861627361/40000000000000",
     "half_gap_tangent": "207107/1440000000",
     "minimum_cell_charge": "1",

@@ -111,6 +111,25 @@ The remaining series headroom, `L/B* - 3.826998 = 0.000550`, is now half what it
 
 The register entry is not written by this receipt.
 
+## The limit record was re-derived once, and only its label moved
+
+The record this run first wrote named its source by the bare experiment label
+`exp-226-n11-threshold-191-50-net2880`. That is not a path, and
+`tests/test_rung_figures.py` reads a limit record’s `source.certificate` as
+repository-relative and opens it, so registering `T-033` failed on a `FileNotFoundError`
+that named the label.
+`T-022`’s, `T-024`’s and `T-026`’s records all name the case copy’s path there.
+
+Re-derived with
+`--source-name packing/cases/n11_threshold_certificate/certificate-191-50-net2880.json`,
+31 m 51 s of wall on a contended four-core box.
+**Exactly one field differs between the two records**, `source.certificate`; the surd,
+the factor supremum and its squared form, the sharpened-containment identity, the six
+accepted conditions and the source digest are identical, which is what says the
+re-derivation reproduced the same mathematics rather than a new measurement.
+The copy under `cases/` and the copy here are byte-identical again, at `sha256
+e891b3b1e47cb328a8a53e16ed3b72985633ff04034343467038383dcd948fa2`.
+
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
 -->
