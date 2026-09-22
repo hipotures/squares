@@ -12,8 +12,10 @@ from __future__ import annotations
 
 import re
 import subprocess
+from pathlib import Path
 
 from sqpack.release import (
+    DATA_PATHS,
     PUBLICATION_DATE,
     PUBLICATION_EDITION,
     PUBLICATION_HISTORY,
@@ -21,6 +23,8 @@ from sqpack.release import (
     PUBLICATION_STAMP,
     PUBLICATION_STATUS,
     PUBLICATION_VERSION,
+    data_revision,
+    data_version,
 )
 
 #: `v0.1.0-3bd273e6`: a semver core, a hyphen, and this repository's short hash.
@@ -93,3 +97,20 @@ def test_the_revision_is_the_length_this_repository_abbreviates_to() -> None:
     if short.returncode != 0:
         return
     assert len(PUBLICATION_REVISION) == len(short.stdout.strip())
+
+
+def test_the_shared_version_names_the_last_data_commit_in_six_characters() -> None:
+    """`data_version` is the edition's core and the last commit that touched the data."""
+    repo = Path(__file__).resolve().parents[2]
+    last = subprocess.run(
+        ("git", "-C", str(repo), "log", "-1", "--format=%H", "--", *DATA_PATHS),
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if last.returncode != 0 or not last.stdout.strip():
+        return  # no history to ask, as in a shallow clone; `data_revision` raises there
+    assert data_revision(repo) == last.stdout.strip()
+    version = data_version(repo)
+    assert re.fullmatch(r"v\d+\.\d+\.\d+-[0-9a-f]{6}", version), version
+    assert version == f"{PUBLICATION_VERSION}-{last.stdout.strip()[:6]}"

@@ -8,6 +8,8 @@ reasons.
 
 from __future__ import annotations
 
+import subprocess
+from pathlib import Path
 from typing import NamedTuple
 
 
@@ -82,3 +84,43 @@ PUBLICATION_EDITION = " ".join(part for part in (PUBLICATION_STATUS, PUBLICATION
 
 #: The date that edition carries, written the way a reader reads it.
 PUBLICATION_DATE = PUBLICATION_HISTORY[0].first_labeled
+
+
+#: What the shared version's hash names (the owner, 2026-09-22): the last commit that changed
+#: the evidence and data every artifact is drawn from. The explainer, the atlas SVGs, the
+#: workbench page and the videos built from the same data then carry one version, whatever
+#: code commit built them. Repository-relative, as every declared path here is.
+DATA_PATHS: tuple[str, ...] = ("packing/frontier", "packing/atlas/known-best")
+
+#: How many characters of that commit the version carries (the owner, 2026-09-22).
+DATA_REVISION_LENGTH = 6
+
+
+def data_revision(repo: Path) -> str:
+    """The full hash of the last commit in `repo` that changed any of `DATA_PATHS`.
+
+    Raises where git cannot say, which includes a shallow clone whose one commit did not
+    touch the data: a version stamped from a guess would name the wrong data.
+    """
+    found = subprocess.run(
+        ["git", "-C", str(repo), "log", "-1", "--format=%H", "--", *DATA_PATHS],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    revision = found.stdout.strip()
+    if found.returncode != 0 or not revision:
+        raise RuntimeError(
+            f"git cannot name the last data commit in {repo} (a shallow clone?): "
+            f"{found.stderr.strip() or 'no commit touches ' + ', '.join(DATA_PATHS)}"
+        )
+    return revision
+
+
+def data_version(repo: Path) -> str:
+    """The shared version, written the one way it is ever written: `v0.4.1-f5e113`.
+
+    The edition's semver core, then the first `DATA_REVISION_LENGTH` characters of the last
+    data commit.
+    """
+    return f"{PUBLICATION_VERSION}-{data_revision(repo)[:DATA_REVISION_LENGTH]}"
