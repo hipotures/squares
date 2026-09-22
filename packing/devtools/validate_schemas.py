@@ -44,6 +44,9 @@ RESOURCE_USAGE = FRONTIER.parent / "campaign" / "resource-usage"
 SESSION_CLOSE_REPORT = RESOURCE_USAGE.parent / "session-close-report.yaml"
 DOCUMENT_MAP = FRONTIER.parent.parent / "docs" / "project" / "document-map.yaml"
 COMPOSITE_FIGURE = FRONTIER.parent / "atlas" / "known-best" / "composite-figure.json"
+BOUND_CITATIONS = FRONTIER.parent / "atlas" / "known-best" / "bound-citations.json"
+#: The citation fields behind `BOUND_CITATIONS`, kept beside the archive index they mirror.
+BIBLIOGRAPHY = FRONTIER.parent / "resources" / "bibliography.yaml"
 TRANSLATION_ESCAPE_SCREEN = (
     FRONTIER.parent / "atlas" / "known-best" / "translation-escape-screen.json"
 )
@@ -290,6 +293,8 @@ def corpus_paths() -> tuple[list[pathlib.Path], list[pathlib.Path]]:
     datasets.append(DOCUMENT_MAP)
     datasets.append(KNOWN_BEST_MANIFEST)
     datasets.append(COMPOSITE_FIGURE)
+    datasets.append(BOUND_CITATIONS)
+    datasets.append(BIBLIOGRAPHY)
     datasets.append(TRANSLATION_ESCAPE_SCREEN)
     datasets.append(CHUNK_PARTITION_ATLAS)
     datasets.append(CONTACT_ASSEMBLY_GRAMMAR)

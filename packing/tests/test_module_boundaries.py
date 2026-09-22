@@ -518,6 +518,12 @@ def test_ci_jobs_fetch_provenance_history_and_key_the_uv_cache_from_the_lock() -
     assert {
         "!/packing/campaign/*/",
         "!/packing/resources/",
+        # The citation data is derived from the bibliography and checked in this tier, so
+        # the slice must carry it: without it `build_bound_citations --check` fails on a
+        # missing file rather than on a disagreement, which is how it failed in CI on
+        # 2026-09-22 while passing everywhere a whole checkout runs it.
+        "/packing/resources/bibliography.yaml",
+        "/packing/resources/bibliography.schema.yaml",
         "/packing/resources/web/kingbird-squares-in-squares.html",
         "/packing/resources/web/known-best-packings/",
         "/packing/resources/web/prospective-packings/",

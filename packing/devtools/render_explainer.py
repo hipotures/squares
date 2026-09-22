@@ -68,10 +68,9 @@ from sqpack.fractional.sweep import minimum_covered_mass, weight_scale
 from sqpack.probes import applied, probe
 from sqpack.release import (
     PUBLICATION_DATE,
+    PUBLICATION_EDITION,
     PUBLICATION_HISTORY,
     PUBLICATION_REVISION,
-    PUBLICATION_STATUS,
-    PUBLICATION_VERSION,
 )
 from sqpack.render.style import SQUARE_HUE_PALETTE
 from sqpack.yamlio import safe_load
@@ -363,10 +362,9 @@ def link_revision() -> str:
     merge would then owe the page a republish before its links told the truth. `HEAD`
     of the checkout the deploy renders from is the commit whose files the page
     describes, so the links name it, in full, as GitHub's own permalinks do. The page's
-    credits use this build revision too. The atlas keeps the edition revision pinned
-    in `sqpack.release`, because it is committed and compared byte for byte against a
-    fresh render. Where git cannot answer (a source tarball) the edition's revision
-    stands in.
+    credits do not: they print the shared version, `sqpack.release.PUBLICATION_EDITION`,
+    which names the last data commit and is the string the atlas footer carries. Where
+    git cannot answer (a source tarball) the edition's revision stands in.
     """
     found = subprocess.run(
         ("git", "rev-parse", "HEAD"), cwd=REPO, capture_output=True, text=True, check=False
@@ -375,20 +373,6 @@ def link_revision() -> str:
     if found.returncode != 0 or not re.fullmatch(r"[0-9a-f]{40}", revision):
         return PUBLICATION_REVISION
     return revision
-
-
-def page_edition() -> str:
-    """The edition the page stamps: the status and version, then the commit it is built from.
-
-    The version is editorial and pinned in `sqpack.release`; the hash after it is the
-    build's, so it moves on every push, and the credits say exactly which commit the
-    reader is looking at. The atlas footer and the claim documents are committed and
-    compared byte for byte, so they carry `PUBLICATION_EDITION`, whose hash is pinned;
-    the two spellings agree on the status and the version and differ only in which
-    commit they name.
-    """
-    stamp = f"{PUBLICATION_VERSION}-{link_revision()[:8]}"
-    return " ".join(part for part in (PUBLICATION_STATUS, stamp) if part)
 
 
 def publication_history_markdown() -> str:
@@ -2171,7 +2155,9 @@ def shared_substitutions(facts: list[Facts], headline: Facts, default: Facts) ->
         "SOURCE_URL": MARKDOWN_OUTPUT.name,
         "REPO_URL": REPO_URL,
         "PUBLISHED": PUBLICATION_DATE,
-        "EDITION": page_edition(),
+        # The shared version, taken whole: the atlas footer and the videos print the same
+        # string, so the credits name the data rather than the commit that built the page.
+        "EDITION": PUBLICATION_EDITION,
         "VERSION_HISTORY": publication_history_markdown(),
         "PRIOR_YEAR": str(PRIOR_YEAR),
         "YEARS_SINCE_PRIOR": str(RESULT_YEAR - PRIOR_YEAR),

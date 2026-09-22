@@ -1942,6 +1942,9 @@ def _known_best_atlas(context: Context) -> str:
                     "devtools.build_composite_figure_data",
                     "--check",
                 ),
+                # The stage's citation lines, drawn from the same register as the record
+                # above, so a register change that leaves them stale fails here with it.
+                (sys.executable, "-m", "devtools.build_bound_citations", "--check"),
                 (sys.executable, "-m", "devtools.render_composite_pdf", "--check"),
                 (
                     sys.executable,
@@ -1989,6 +1992,7 @@ def _known_best_atlas(context: Context) -> str:
         # inspected hundred rather than counts of it.
         "known-best contact overlay check passed: 5 house-rendered calibration strata",
         "known-best chunk evidence profile check passed: 36 non-grid calibration cases",
+        "bound citations check passed",
         "contact enumeration pricing check passed",
         "contact full-cell control check passed",
         "contact structures check passed",
@@ -3159,6 +3163,8 @@ _RESULTS = ("packing/campaign/series/*",)
 _WORKBENCH_INPUTS = (
     "packages/workbench/*",
     "packing/src/sqpack/render/*",
+    # The stage prints the shared version, pinned in `release.py`, so a re-pin changes the page.
+    "packing/src/sqpack/release.py",
     "packing/devtools/render_explainer.py",
     "packing/witnesses/known-best/*",
     "packing/atlas/known-best/*",

@@ -52,7 +52,7 @@ from devtools.render_explainer import (
 from devtools.render_explainer_pdf import EXPECTED_PAGE_COUNT
 from devtools.render_explainer_pdf import OUTPUT as PDF_OUTPUT
 from sqpack.probes import probe
-from sqpack.release import PUBLICATION_STATUS, PUBLICATION_VERSION
+from sqpack.release import PUBLICATION_EDITION
 
 #: The JavaScript this runs in the deployed workbench, as files (`sqpack.probes`).
 PROBES = Path(__file__).resolve().parent / "probes"
@@ -200,9 +200,10 @@ def check(
     results.append(
         (status == 200, f"page {site}{OUTPUT.name}: HTTP {status}, {len(page)} bytes")
     )
-    edition = " ".join(
-        part for part in (PUBLICATION_STATUS, f"{PUBLICATION_VERSION}-{commit[:8]}") if part
-    )
+    # The shared version (think-qsuu), pinned in release.py: the page names the data it was
+    # drawn from, as the atlas and the videos do, whatever commit built it. The commit is
+    # still what the page's links and the workbench's source revision must name.
+    edition = PUBLICATION_EDITION
     stamped = edition in text
     results.append(
         (

@@ -11,16 +11,22 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import subprocess
 from collections.abc import Callable
-from itertools import pairwise
 from pathlib import Path
 from typing import Any
 from xml.etree import ElementTree as ET
 
 import pytest
 
-from workbench_tools import animation_render, capture_video, export_animation_svg
+from workbench_tools import (
+    animation_render,
+    build_candidate,
+    capture_video,
+    delivery,
+    export_animation_svg,
+)
 from workbench_tools.animation_records import ANIMATION_CONTRACT, decode_animation
 from workbench_tools.animation_render import TRANSITIONS_STATEMENT
 
@@ -125,21 +131,46 @@ def test_ffmpeg_version_is_read_from_its_banner() -> None:
     assert capture_video.ffmpeg_version(banner) == "ffmpeg version 7.1.1"
 
 
-def test_the_encode_is_faststart_and_says_transitions_are_not_packings(tmp_path: Path) -> None:
-    out = tmp_path / "ascent.partial.mp4"
-    arguments = capture_video.encode_arguments(
-        "ffmpeg", tmp_path / "frames", 30, out, page_sha256="ab" * 32, title="n = 2 to 3"
-    )
-    assert arguments[-1] == str(out)
-    assert "-y" not in arguments
-    flags = list(pairwise(arguments))
-    assert ("-movflags", "+faststart") in flags
-    assert ("-i", str(tmp_path / "frames" / capture_video.FRAME_PATTERN)) in flags
-    comments = [v for flag, v in flags if flag == "-metadata" and v.startswith("comment=")]
-    assert len(comments) == 1
-    assert "illustrative-tween" in comments[0]
-    assert "not packings" in comments[0]
-    assert "ab" * 32 in comments[0]
+def test_a_video_takes_the_page_s_own_style_and_shake_not_the_checkers_baseline() -> None:
+    # `prepare()` reduces both for a checker's benefit, and under `tween` the shake disappears
+    # entirely rather than softening, because `annealSpan()` returns 1 whatever the level. A
+    # video is meant to show what the page shows, so the defaults are read back from it.
+    commands = capture_video.animation_defaults({"style": "physics", "anneal": 9, "snap": True})
+    assert commands == [["setStyle", "physics"], ["setAnneal", 9]]
+
+
+def test_the_style_and_shake_are_set_before_the_range_is_priced() -> None:
+    # The annealed styles stretch a pair's move and correction, so a range priced before them
+    # is priced on a clock the page will not play -- and `price_steps` would refuse the run.
+    ordered = [
+        *capture_video.animation_defaults({"style": "physics", "anneal": 9}),
+        *capture_video.simple_speed_commands(None, {"simpleSpeed": 4}),
+        *capture_video.pricing_commands(2, 24),
+    ]
+    names = [command[0] for command in ordered]
+    assert names.index("setStyle") < names.index("playRange")
+    assert names.index("setAnneal") < names.index("playRange")
+    # The grid-fill speed-up shortens every step holding one, so it belongs in front of the
+    # pricing for the same reason the shake does.
+    assert names.index("setSimpleSpeed") < names.index("playRange")
+
+
+def test_a_cut_states_the_grid_fill_speed_up_it_played_at() -> None:
+    # Without `--simple-speed` the factor is the page's own, read from the page so the default
+    # keeps one spelling; the command goes in either way, so the receipt names a clock the cut
+    # asked for rather than one it happened to inherit.
+    assert capture_video.simple_speed_commands(None, {"simpleSpeed": 4}) == [
+        ["setSimpleSpeed", 4.0]
+    ]
+    assert capture_video.simple_speed_commands(3, {"simpleSpeed": 4}) == [
+        ["setSimpleSpeed", 3.0]
+    ]
+
+
+def test_the_capture_states_that_its_intermediate_frames_are_tweens() -> None:
+    comment = capture_video.capture_comment()
+    assert capture_video.INTERMEDIATE_FRAMES in comment
+    assert "not packings" in comment
 
 
 def _fake_ffmpeg(out: Path, returncode: int) -> tuple[list[bool], Runner]:
@@ -193,6 +224,18 @@ def test_the_receipt_carries_the_plan_d9_statement_and_provenance() -> None:
         browser_version="151.0.7922.34",
         ffmpeg_version="ffmpeg version 7.1.1",
     )
+    delivered = delivery.DeliveredVideo(
+        codec="h264",
+        h264_profile="High",
+        level=40,
+        pixel_format="yuv420p",
+        width=1920,
+        height=1080,
+        fps=30.0,
+        seconds=1.5,
+        bytes=123_456,
+        faststart=True,
+    )
     receipt = capture_video.capture_receipt(
         page="site/workbench/index.html",
         page_sha256="a" * 64,
@@ -204,9 +247,18 @@ def test_the_receipt_carries_the_plan_d9_statement_and_provenance() -> None:
         size=(1920, 1080),
         steps=steps,
         provenance=provenance,
+        profile=delivery.PROFILES["social"],
+        delivered=delivered,
         encoder=["ffmpeg", "-movflags", "+faststart"],
         capture_seconds=12.34,
+        edition=capture_video.PageEdition(version="v0.4.1-f5e113", citations_sha256="c" * 64),
+        citations=True,
     )
+    # What the frames draw from, as the page states it (think-jwly): the shared version, whether
+    # the CITATION section was on, and the citation file it was built from.
+    assert receipt["version"] == "v0.4.1-f5e113"
+    assert receipt["citations"] is True
+    assert receipt["citations_sha256"] == "c" * 64
     assert receipt["transitions_are_packings"] is False
     assert "not packings" in receipt["reason"]
     assert receipt["intermediate_frames"] == "illustrative-tween"
@@ -219,6 +271,11 @@ def test_the_receipt_carries_the_plan_d9_statement_and_provenance() -> None:
     assert receipt["seconds"] == 1.5
     assert receipt["steps_off_record"] == [4]
     assert receipt["ms_per_frame"] == {"mean": 45.0, "worst": 50.0, "worst_at_n": 4}
+    # The file is described beside what it shows, so a reader of the receipt alone can say
+    # which ceilings the capture was held to and what the stream turned out to be.
+    assert receipt["profile"] == "social"
+    assert receipt["delivered"]["level"] == 40
+    assert receipt["delivered"]["faststart"] is True
     assert json.loads(json.dumps(receipt)) == receipt
 
 
@@ -371,3 +428,29 @@ def test_the_export_receipt_is_written_after_the_svg(
     with pytest.raises(OSError, match="disk full"):
         export_animation_svg.main([str(source), str(tmp_path / "late.svg")])
     assert sorted(p.name for p in tmp_path.iterdir()) == ["animation.json"]
+
+
+def _ts_beat(name: str) -> dict[str, float]:
+    """One `as const` timing object read out of `src/motion-settings.ts`."""
+    source = (Path(__file__).resolve().parents[1] / "src/motion-settings.ts").read_text(
+        encoding="utf-8"
+    )
+    body = re.search(rf"export const {name} = {{(.*?)}} as const;", source, re.DOTALL)
+    assert body is not None, f"{name} is not declared in motion-settings.ts"
+    return {
+        key: float(value) for key, value in re.findall(r"(\w+):\s*([0-9.]+),", body.group(1))
+    }
+
+
+def test_the_page_data_and_the_browser_default_carry_one_beat() -> None:
+    """The beat is written twice, in two languages, and must be written the same twice.
+
+    `build_candidate.TIMING` is what the page's editor opens on and what its data carries;
+    `DEFAULT_STEP_TIMING` is what the browser module defaults to and what the capture prices a
+    range against. On 2026-09-22 the move beat was changed from 0.5 s to 0.4 s in the module
+    alone, and the built page still opened on 0.5: every check of the drawing passed, and only
+    `check_animation_editor`'s reading of the input caught it. A cut priced on one beat and
+    played on another is a film whose length nobody asked for.
+    """
+    assert _ts_beat("DEFAULT_STEP_TIMING") == build_candidate.TIMING
+    assert _ts_beat("DEFAULT_STATIC_STEP_TIMING") == build_candidate.STATIC_TIMING

@@ -1,5 +1,6 @@
 import type {
   AtlasAspect,
+  AtlasColorFade,
   AtlasEdgeInput,
   AtlasGrowth,
   AtlasInitial,
@@ -33,11 +34,14 @@ export type CaptureCommand =
   | ["setAnneal", number]
   | ["setBlind", boolean]
   | ["setCapture", boolean]
+  | ["setCitations", boolean]
   | ["setColorScheme", AtlasScheme]
   | ["setDesaturate", boolean]
   | ["setDrawing", boolean]
   | ["setEdges", AtlasEdgeInput]
   | ["setGrowth", Partial<Pick<AtlasGrowth, "on" | "size" | "rate" | "rule">>]
+  | ["setHoldSquareColors", boolean]
+  | ["setColorFade", Partial<AtlasColorFade>]
   | ["setInitial", AtlasInitial]
   | ["setLaw", AtlasLawInput]
   | ["setLawPreset", string]
@@ -46,6 +50,7 @@ export type CaptureCommand =
   | ["setPhase", AtlasPhase]
   | ["setRange", number, number]
   | ["setRelationship", AtlasRelationshipKind]
+  | ["setSimpleSpeed", number]
   | ["setSnap", boolean]
   | ["setSpeed", number]
   | ["setStepN", number]
@@ -88,6 +93,9 @@ export interface CaptureControlResult {
  * and the page opens on the independent Pack panel, so a baseline that set its other settings
  * before entering Animate -- or that entered Pack, the catalogue's old home -- was refused at
  * its first call and no capture could start.
+ *
+ * Citations are off in the baseline, as the correspondence overlay is: a cut that draws them asks
+ * for them with a command after it, so what a capture shows is what it asked for.
  */
 function prepare(api: AtlasTransitions, capture: boolean): void {
   api.setMode("animate");
@@ -102,6 +110,7 @@ function prepare(api: AtlasTransitions, capture: boolean): void {
   api.setInitial("previous");
   api.reset();
   api.setOverlay(false);
+  api.setCitations(false);
   api.setDrawing(false);
   api.clearEdges();
   api.setColorScheme("identity");
@@ -174,6 +183,9 @@ function apply(api: AtlasTransitions, command: CaptureCommand): void {
     case "setCapture":
       api.setCapture(command[1]);
       return;
+    case "setCitations":
+      api.setCitations(command[1]);
+      return;
     case "setColorScheme":
       api.setColorScheme(command[1]);
       return;
@@ -188,6 +200,12 @@ function apply(api: AtlasTransitions, command: CaptureCommand): void {
       return;
     case "setGrowth":
       api.setGrowth(command[1]);
+      return;
+    case "setHoldSquareColors":
+      api.setHoldSquareColors(command[1]);
+      return;
+    case "setColorFade":
+      api.setColorFade(command[1]);
       return;
     case "setInitial":
       api.setInitial(command[1]);
@@ -212,6 +230,9 @@ function apply(api: AtlasTransitions, command: CaptureCommand): void {
       return;
     case "setRelationship":
       api.setRelationship(command[1]);
+      return;
+    case "setSimpleSpeed":
+      api.setSimpleSpeed(command[1]);
       return;
     case "setSnap":
       api.setSnap(command[1]);

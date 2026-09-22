@@ -16374,12 +16374,55 @@ defects:
     transition survived a reader asking for no motion, and was a transition the export could
     in principle catch in flight. The two selectors are now named in the guard.
 
-    The cause remains open. A Flate stream that compressed two bytes smaller and a
-    variable-length decimal that changed by two characters are two plausible hypotheses,
-    but the length-only evidence neither selects them nor excludes a change outside an
-    object body. The historical document had 79 Link `/Rect` arrays whose payloads ran 31 to
-    43 bytes and 36 bare `/ca` graphics states in objects 3 to 143. Another occurrence must
-    preserve the new location report before any hypothesis can be selected.
+    The second occurrence named the cause, on 2026-09-22 (`think-a5qp`). PR 218's run
+    35764316182 failed the `pdf` job at head e1d7bd42 with `843296 then 843299 bytes,
+    normalised; length delta 3` and, this time, a location: object 163, a FlateDecode page
+    content stream. Both renders were retained. Decompressed, the whole document differs in
+    two objects: object 1, which is the two clock fields, and three `Tm` lines in object 163
+    that move one inline math box's baseline from y=14905.2188 to y=14906, 0.78125 CSS px,
+    with every glyph, advance, font and page identical. The box is the KaTeX render of
+    `500000000/498684619`, the common rational factor in the T-026 paragraph. The 1298
+    objects of the two files are otherwise equal.
+
+    It reproduced locally from that run's own `prepared-page` artifact, on the pinned
+    headless shell, at one render in thirty: twenty-nine agreed and one moved a different
+    box, the `sin` run of a formula, by 0.609375 px. Both are sub-pixel vertical moves of a
+    single math box, which is the signature of a box measured while it was re-rendering.
+
+    A watch across `page.pdf()` found what was moving. A settled page left alone for 1500 ms
+    after the full wait chain records no mutation at all. Every print of it records 366
+    attribute writes -- `style`, `data-kpress-math-face`, `data-kpress-math-pending`,
+    `data-squares-math-ready` on `span.squares-math-variant` -- in two bursts of 183, one at
+    `beforeprint` and one at `afterprint`, and starts a font load as it goes. Four
+    consecutive prints of one page each recorded the same 366, so it is not warm-up that a
+    longer wait could absorb. `devtools/explainer/certificate.js` is the source: its last
+    two statements are `window.addEventListener("beforeprint", repaint)` and the same for
+    `afterprint`; `repaint` re-runs `boot()`; `boot()` calls `refresh(false)` and
+    `shrinkDraw()`, and those reach eleven `tex(...)` calls, which is `squaresMath.render`,
+    asynchronous. The elements the watch names are exactly their targets: the mass readout,
+    the direction values, the six shrink readouts under `dl.kv dd`, the verdict's `hidden`
+    and the slider's `aria-valuetext`. `page.emulate_media(media=print)`
+    answers `@media print` and `matchMedia("print").matches` but fires neither event, so
+    this work cannot start until the draw starts, and no wait before the draw can reach it.
+    A prepared formula holds its reserved box while it re-renders, and that box's inline
+    `style` carries KaTeX's `width`, `height` and `vertical-align` in em; a page laid out
+    while one is in flight is drawn from the geometry of that moment.
+
+    What is fixed is the export, not the page. `render_pdf_bytes` now prints until two
+    consecutive prints of one loaded page agree once the clock fields are normalised, and
+    returns only bytes that were drawn twice (`_draw_reproduced`, up to `_PRINT_DRAWS` = 4).
+    The repeat is one `page.pdf()` on a page already loaded and settled: three prints there
+    measured 0.50, 0.49 and 0.50 s, with 0.04 s to settle after each, against 2.54 s for the
+    load and wait chain before them. Each repeat is logged with the object it disagreed in,
+    so the runner's own rate becomes readable in the job log. An export where no two prints
+    agree refuses and quotes both the difference and what the watch saw moving. The
+    published bytes do not change: the draw the pair agrees on is the same document the
+    unmodified renderer produced in twenty-nine renders of thirty.
+
+    The page defect is untouched and still open. Making `repaint` redraw the canvases
+    without handing the readouts back to `squaresMath.render`, or making that render a no-op
+    when the TeX is unchanged, would remove the race rather than work around it;
+    `devtools/explainer/certificate.js` is where that belongs, and `think-a5qp` carries it.
   regression: >-
     `tests/test_render_explainer_pdf.py` covers synthetic documents in the
     shapes the writer emits and the exact image-wait JavaScript under Node. They pin that a
@@ -16390,9 +16433,20 @@ defects:
     that changed object-number headers identify their own object, that shortened and
     appended exact-prefix renders receive no causal diagnosis, that equal renders are
     reported as equal, that the CLI count reaches `check` and is refused in other modes,
-    and that capture refuses an image with no drawable current request. Nothing here
-    prevents the race, which is what contained means: the guard is that the next occurrence
-    arrives diagnosable.
+    and that capture refuses an image with no drawable current request.
+
+    Five more cover the repeated draw, against a page that prints a scripted sequence: an
+    export keeps bytes two consecutive prints agreed on rather than the first draw; a draw
+    carrying D-490's own shape, one `Tm` coordinate off in one object, is drawn again and
+    the repeat is reported with that object; two draws differing only in the clock are an
+    agreement; a page where no two of four prints agree refuses with the difference and with
+    what the watch saw moving; and the trace records the watch for every draw, the kept one
+    included. The fake page asserts the print options, because a repeat taken at a different
+    paper size would disagree for a reason that is not the page moving.
+
+    None of this stops the page from re-rendering math while it is drawn, which is what
+    contained still means here: the export refuses to hand out bytes it could not draw
+    twice, and a draw it did have to repeat says so in the log.
   recorded_in: packing/devtools/render_explainer_pdf.py
 - id: D-491
   title: The math geometry probe mixed observations and left a page watchdog uncontrolled

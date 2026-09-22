@@ -1,0 +1,6836 @@
+{
+  "citations": {
+    "entries": [
+      {
+        "lower": null,
+        "n": 1,
+        "record": "n-001",
+        "upper": null
+      },
+      {
+        "lower": null,
+        "n": 2,
+        "record": "n-002",
+        "upper": null
+      },
+      {
+        "lower": null,
+        "n": 3,
+        "record": "n-003",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "2"
+        },
+        "n": 4,
+        "record": "n-004",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Göbel 1979]",
+          "text": "Göbel 1979, Math. Centre Tracts 106",
+          "value": "2.70710678118654752440084436210485"
+        },
+        "n": 5,
+        "record": "n-005",
+        "upper": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Göbel 1979, Squares in Squares",
+          "value": "2.70710678118654"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Kearney–Shiu 2002]",
+          "text": "Kearney & Shiu 2002, Electron. J. Combin. 9, #R14",
+          "value": "3"
+        },
+        "n": 6,
+        "record": "n-006",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "3"
+        },
+        "n": 7,
+        "record": "n-007",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "3"
+        },
+        "n": 8,
+        "record": "n-008",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "3"
+        },
+        "n": 9,
+        "record": "n-009",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Stromquist 2003]",
+          "text": "Stromquist 2003, Electron. J. Combin. 10, #R8",
+          "value": "3.70710678118654752440084436210485"
+        },
+        "n": 10,
+        "record": "n-010",
+        "upper": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Göbel 1979, Squares in Squares",
+          "value": "3.70710678118654"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "project",
+          "confirmed_by": [],
+          "note": null,
+          "result": "T-026",
+          "results": [
+            "T-026"
+          ],
+          "source_key": null,
+          "text": "This project 2026, result T-026",
+          "value": "3.826447410572939"
+        },
+        "n": 11,
+        "record": "n-011",
+        "upper": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [
+            "T-011"
+          ],
+          "note": "(confirmed T-011)",
+          "result": null,
+          "results": [
+            "T-011"
+          ],
+          "source_key": "[Kingbird]",
+          "text": "Trump 1979, Squares in Squares",
+          "value": "3.87708359002281"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "project",
+          "confirmed_by": [],
+          "note": null,
+          "result": "T-017",
+          "results": [
+            "T-017"
+          ],
+          "source_key": null,
+          "text": "This project 2026, result T-017",
+          "value": "3.96"
+        },
+        "n": 12,
+        "record": "n-012",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-005",
+            "T-006"
+          ],
+          "source_key": "[Bentz 2010]",
+          "text": "Bentz 2010, Electron. J. Combin. 17, #R126",
+          "value": "4"
+        },
+        "n": 13,
+        "record": "n-013",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "4"
+        },
+        "n": 14,
+        "record": "n-014",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "4"
+        },
+        "n": 15,
+        "record": "n-015",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "4"
+        },
+        "n": 16,
+        "record": "n-016",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [
+            "T-032"
+          ],
+          "note": "(confirmed T-032)",
+          "result": null,
+          "results": [
+            "T-032"
+          ],
+          "source_key": "[n17 weighted certificates 2026-09-20]",
+          "text": "Guzhou0806 & Mira 2026, GitHub",
+          "value": "4.613046130461"
+        },
+        "n": 17,
+        "record": "n-017",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Bidwell 1998, Squares in Squares",
+          "value": "4.67553009360455"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "project",
+          "confirmed_by": [],
+          "note": null,
+          "result": "T-030",
+          "results": [
+            "T-030"
+          ],
+          "source_key": null,
+          "text": "This project 2026, result T-030",
+          "value": "4.679"
+        },
+        "n": 18,
+        "record": "n-018",
+        "upper": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Hämäläinen 1980, Squares in Squares",
+          "value": "4.82287565553229"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "project",
+          "confirmed_by": [],
+          "note": null,
+          "result": "T-020",
+          "results": [
+            "T-020"
+          ],
+          "source_key": null,
+          "text": "This project 2026, result T-020",
+          "value": "4.8"
+        },
+        "n": 19,
+        "record": "n-019",
+        "upper": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Wainwright 1979, Squares in Squares",
+          "value": "4.88561808316412"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "project",
+          "confirmed_by": [],
+          "note": null,
+          "result": "T-021",
+          "results": [
+            "T-021"
+          ],
+          "source_key": null,
+          "text": "This project 2026, result T-021",
+          "value": "4.85"
+        },
+        "n": 20,
+        "record": "n-020",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "project",
+          "confirmed_by": [],
+          "note": null,
+          "result": "T-021",
+          "results": [
+            "T-021"
+          ],
+          "source_key": null,
+          "text": "This project 2026, result T-021",
+          "value": "4.85"
+        },
+        "n": 21,
+        "record": "n-021",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Bentz 2016]",
+          "text": "Bentz 2016, arXiv:1606.03746",
+          "value": "5"
+        },
+        "n": 22,
+        "record": "n-022",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "5"
+        },
+        "n": 23,
+        "record": "n-023",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "5"
+        },
+        "n": 24,
+        "record": "n-024",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "5"
+        },
+        "n": 25,
+        "record": "n-025",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "5.12310562562"
+        },
+        "n": 26,
+        "record": "n-026",
+        "upper": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman 1997, Squares in Squares",
+          "value": "5.62132034355964"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "5.24264068712"
+        },
+        "n": 27,
+        "record": "n-027",
+        "upper": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Göbel 1979, Squares in Squares",
+          "value": "5.70710678118654"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "5.35889894354"
+        },
+        "n": 28,
+        "record": "n-028",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth 2025, Squares in Squares",
+          "value": "5.82444461667405"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "5.472135955"
+        },
+        "n": 29,
+        "record": "n-029",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [
+            "T-009"
+          ],
+          "note": "(reported; confirmed T-009)",
+          "result": null,
+          "results": [
+            "T-009"
+          ],
+          "source_key": "[Kingbird]",
+          "text": "Schadt & Ellsworth, Squares in Squares",
+          "value": "5.93383346267692"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "5.58257569496"
+        },
+        "n": 30,
+        "record": "n-030",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "5.69041575982"
+        },
+        "n": 31,
+        "record": "n-031",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "5.79583152331"
+        },
+        "n": 32,
+        "record": "n-032",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Bentz 2016]",
+          "text": "Bentz 2016, arXiv:1606.03746",
+          "value": "6"
+        },
+        "n": 33,
+        "record": "n-033",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "6"
+        },
+        "n": 34,
+        "record": "n-034",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "6"
+        },
+        "n": 35,
+        "record": "n-035",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "6"
+        },
+        "n": 36,
+        "record": "n-036",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "6.09901951359"
+        },
+        "n": 37,
+        "record": "n-037",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Cantrell 2002, Squares in Squares",
+          "value": "6.59861960924436"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "6.19615242271"
+        },
+        "n": 38,
+        "record": "n-038",
+        "upper": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Göbel 1979, Squares in Squares",
+          "value": "6.70710678118654"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "6.29150262213"
+        },
+        "n": 39,
+        "record": "n-039",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Schadt 2026, Squares in Squares",
+          "value": "6.81072208306864"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "6.38516480713"
+        },
+        "n": 40,
+        "record": "n-040",
+        "upper": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Göbel 1979, Squares in Squares",
+          "value": "6.82842712474619"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "6.47722557505"
+        },
+        "n": 41,
+        "record": "n-041",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Schadt 2025, Squares in Squares",
+          "value": "6.92669309446880"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "6.56776436283"
+        },
+        "n": 42,
+        "record": "n-042",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "6.65685424949"
+        },
+        "n": 43,
+        "record": "n-043",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "6.74456264654"
+        },
+        "n": 44,
+        "record": "n-044",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "6.83095189485"
+        },
+        "n": 45,
+        "record": "n-045",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [
+            "T-004",
+            "T-008"
+          ],
+          "note": "(confirmed T-004, T-008)",
+          "result": null,
+          "results": [
+            "T-004",
+            "T-008"
+          ],
+          "source_key": "[Bentz 2010]",
+          "text": "Bentz 2010, Electron. J. Combin. 17",
+          "value": "7"
+        },
+        "n": 46,
+        "record": "n-046",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "7"
+        },
+        "n": 47,
+        "record": "n-047",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "7"
+        },
+        "n": 48,
+        "record": "n-048",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "7"
+        },
+        "n": 49,
+        "record": "n-049",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "7.0827625303"
+        },
+        "n": 50,
+        "record": "n-050",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Schadt 2025, Squares in Squares",
+          "value": "7.57142857142857"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "7.16441400297"
+        },
+        "n": 51,
+        "record": "n-051",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Schadt 2026, Squares in Squares",
+          "value": "7.70079923541701"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "7.2449979984"
+        },
+        "n": 52,
+        "record": "n-052",
+        "upper": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Göbel 1979, Squares in Squares",
+          "value": "7.70710678118654"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "7.32455532034"
+        },
+        "n": 53,
+        "record": "n-053",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Cantrell & Ellsworth, Squares in Squares",
+          "value": "7.82287565553229"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "7.40312423743"
+        },
+        "n": 54,
+        "record": "n-054",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Cantrell & DeVincentis, Squares in Squares",
+          "value": "7.84666719284348"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "7.48074069841"
+        },
+        "n": 55,
+        "record": "n-055",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Schadt & Ellsworth, Squares in Squares",
+          "value": "7.94577100750391"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "7.5574385243"
+        },
+        "n": 56,
+        "record": "n-056",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "7.63324958071"
+        },
+        "n": 57,
+        "record": "n-057",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "7.7082039325"
+        },
+        "n": 58,
+        "record": "n-058",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "7.78232998313"
+        },
+        "n": 59,
+        "record": "n-059",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "7.8556546004"
+        },
+        "n": 60,
+        "record": "n-060",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "7.92820323028"
+        },
+        "n": 61,
+        "record": "n-061",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "8"
+        },
+        "n": 62,
+        "record": "n-062",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "8"
+        },
+        "n": 63,
+        "record": "n-063",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "8"
+        },
+        "n": 64,
+        "record": "n-064",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "8.07106781187"
+        },
+        "n": 65,
+        "record": "n-065",
+        "upper": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Göbel 1979, Squares in Squares",
+          "value": "8.53553390593273"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "8.14142842854"
+        },
+        "n": 66,
+        "record": "n-066",
+        "upper": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Stenlund 1980, Squares in Squares",
+          "value": "8.65685424949238"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "8.21110255093"
+        },
+        "n": 67,
+        "record": "n-067",
+        "upper": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Stenlund 1980, Squares in Squares",
+          "value": "8.70710678118654"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "8.28010988928"
+        },
+        "n": 68,
+        "record": "n-068",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[UnitSquare 2026]",
+          "text": "UnitSquare Project 2026, Results Release 1",
+          "value": "8.803383074716108386903836683375989697670063329"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "8.34846922835"
+        },
+        "n": 69,
+        "record": "n-069",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[UnitSquare 2026]",
+          "text": "UnitSquare Project 2026, Results Release 1",
+          "value": "8.827205507815920656880680735618736931225314831"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "8.4161984871"
+        },
+        "n": 70,
+        "record": "n-070",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "DeVincentis 2014, Squares in Squares",
+          "value": "8.88166675700900"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "8.48331477355"
+        },
+        "n": 71,
+        "record": "n-071",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Schadt 2025, Squares in Squares",
+          "value": "8.94407155757031"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "8.54983443527"
+        },
+        "n": 72,
+        "record": "n-072",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "8.61577310586"
+        },
+        "n": 73,
+        "record": "n-073",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "8.68114574787"
+        },
+        "n": 74,
+        "record": "n-074",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "8.74596669241"
+        },
+        "n": 75,
+        "record": "n-075",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "8.81024967591"
+        },
+        "n": 76,
+        "record": "n-076",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "8.87400787401"
+        },
+        "n": 77,
+        "record": "n-077",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "8.93725393319"
+        },
+        "n": 78,
+        "record": "n-078",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "9"
+        },
+        "n": 79,
+        "record": "n-079",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "9"
+        },
+        "n": 80,
+        "record": "n-080",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "9"
+        },
+        "n": 81,
+        "record": "n-081",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "9.0622577483"
+        },
+        "n": 82,
+        "record": "n-082",
+        "upper": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Göbel 1979, Squares in Squares",
+          "value": "9.53553390593273"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "9.12403840464"
+        },
+        "n": 83,
+        "record": "n-083",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Hajba & Cantrell, Squares in Squares",
+          "value": "9.63482562092335"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "9.18535277187"
+        },
+        "n": 84,
+        "record": "n-084",
+        "upper": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Stenlund 1980, Squares in Squares",
+          "value": "9.70710678118654"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "9.24621125124"
+        },
+        "n": 85,
+        "record": "n-085",
+        "upper": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman 1997, Squares in Squares",
+          "value": "9.74264068711928"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "9.30662386292"
+        },
+        "n": 86,
+        "record": "n-086",
+        "upper": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman 1997, Squares in Squares",
+          "value": "9.82287565553229"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "9.36660026534"
+        },
+        "n": 87,
+        "record": "n-087",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth & Cantrell, Squares in Squares",
+          "value": "9.83881743996618"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "9.42614977318"
+        },
+        "n": 88,
+        "record": "n-088",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth 2024, Squares in Squares",
+          "value": "9.88815305375857"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "9.48528137424"
+        },
+        "n": 89,
+        "record": "n-089",
+        "upper": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Stenlund 1980, Squares in Squares",
+          "value": "9.94974746830583"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "9.54400374532"
+        },
+        "n": 90,
+        "record": "n-090",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "9.60232526704"
+        },
+        "n": 91,
+        "record": "n-091",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "9.66025403784"
+        },
+        "n": 92,
+        "record": "n-092",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "9.71779788708"
+        },
+        "n": 93,
+        "record": "n-093",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "9.77496438739"
+        },
+        "n": 94,
+        "record": "n-094",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "9.83176086633"
+        },
+        "n": 95,
+        "record": "n-095",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "9.88819441732"
+        },
+        "n": 96,
+        "record": "n-096",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "9.94427191"
+        },
+        "n": 97,
+        "record": "n-097",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "10"
+        },
+        "n": 98,
+        "record": "n-098",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "10"
+        },
+        "n": 99,
+        "record": "n-099",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [
+            "T-007"
+          ],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "10"
+        },
+        "n": 100,
+        "record": "n-100",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "10.0553851381"
+        },
+        "n": 101,
+        "record": "n-101",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "10.53553390593273"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "10.1104335791"
+        },
+        "n": 102,
+        "record": "n-102",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Hajba et al., Squares in Squares",
+          "value": "10.61138823373863"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "10.1651513899"
+        },
+        "n": 103,
+        "record": "n-103",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[UnitSquare 2026]",
+          "text": "UnitSquare Project 2026, Results Release 1",
+          "value": "10.703790283762427"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "10.2195444573"
+        },
+        "n": 104,
+        "record": "n-104",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "10.70710678118654"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "10.2736184955"
+        },
+        "n": 105,
+        "record": "n-105",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[UnitSquare 2026]",
+          "text": "UnitSquare Project 2026, Results Release 1",
+          "value": "10.807847913867976"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "10.3273790531"
+        },
+        "n": 106,
+        "record": "n-106",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth & Cantrell, Squares in Squares",
+          "value": "10.82297973416944"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "10.3808315196"
+        },
+        "n": 107,
+        "record": "n-107",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Hajba 2024, Squares in Squares",
+          "value": "10.84666719284348"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "10.4339811321"
+        },
+        "n": 108,
+        "record": "n-108",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Hajba & Ellsworth, Squares in Squares",
+          "value": "10.92591939016138"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "10.4868329805"
+        },
+        "n": 109,
+        "record": "n-109",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "10.94974746830583"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "10.5393920142"
+        },
+        "n": 110,
+        "record": "n-110",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[UnitSquare 2026]",
+          "text": "UnitSquare Project 2026, Results Release 1",
+          "value": "10.996797773597706"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "10.5916630466"
+        },
+        "n": 111,
+        "record": "n-111",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "10.643650761"
+        },
+        "n": 112,
+        "record": "n-112",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "10.6953597148"
+        },
+        "n": 113,
+        "record": "n-113",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "10.7467943448"
+        },
+        "n": 114,
+        "record": "n-114",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "10.7979589711"
+        },
+        "n": 115,
+        "record": "n-115",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "10.8488578018"
+        },
+        "n": 116,
+        "record": "n-116",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "10.8994949366"
+        },
+        "n": 117,
+        "record": "n-117",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "10.9498743711"
+        },
+        "n": 118,
+        "record": "n-118",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "11"
+        },
+        "n": 119,
+        "record": "n-119",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "11"
+        },
+        "n": 120,
+        "record": "n-120",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "11"
+        },
+        "n": 121,
+        "record": "n-121",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "11.0498756211"
+        },
+        "n": 122,
+        "record": "n-122",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "11.53553390593273"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "11.0995049384"
+        },
+        "n": 123,
+        "record": "n-123",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth & Cantrell, Squares in Squares",
+          "value": "11.60139979378801"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "11.1488915651"
+        },
+        "n": 124,
+        "record": "n-124",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "11.65685424949238"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "11.1980390272"
+        },
+        "n": 125,
+        "record": "n-125",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "11.70710678118654"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "11.246950766"
+        },
+        "n": 126,
+        "record": "n-126",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth et al., Squares in Squares",
+          "value": "11.77617894651987"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "11.295630141"
+        },
+        "n": 127,
+        "record": "n-127",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "11.82287565553229"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "11.3440804328"
+        },
+        "n": 128,
+        "record": "n-128",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth & Cantrell, Squares in Squares",
+          "value": "11.82509196821368"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "11.3923048454"
+        },
+        "n": 129,
+        "record": "n-129",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth, Squares in Squares",
+          "value": "11.88130621809000"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "11.4403065089"
+        },
+        "n": 130,
+        "record": "n-130",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth & Cantrell, Squares in Squares",
+          "value": "11.91119052015898"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "11.4880884817"
+        },
+        "n": 131,
+        "record": "n-131",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[UnitSquare 2026]",
+          "text": "UnitSquare Project 2026, Results Release 1",
+          "value": "11.956543108124773261501115489978287643498579738"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "11.5356537529"
+        },
+        "n": 132,
+        "record": "n-132",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Arslanov et al., Squares in Squares",
+          "value": "11.99143643966336"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "11.5830052443"
+        },
+        "n": 133,
+        "record": "n-133",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "11.6301458127"
+        },
+        "n": 134,
+        "record": "n-134",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "11.677078252"
+        },
+        "n": 135,
+        "record": "n-135",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "11.7238052948"
+        },
+        "n": 136,
+        "record": "n-136",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "11.7703296143"
+        },
+        "n": 137,
+        "record": "n-137",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "11.8166538264"
+        },
+        "n": 138,
+        "record": "n-138",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "11.8627804912"
+        },
+        "n": 139,
+        "record": "n-139",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "11.9087121146"
+        },
+        "n": 140,
+        "record": "n-140",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "11.9544511501"
+        },
+        "n": 141,
+        "record": "n-141",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "12"
+        },
+        "n": 142,
+        "record": "n-142",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "12"
+        },
+        "n": 143,
+        "record": "n-143",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "12"
+        },
+        "n": 144,
+        "record": "n-144",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "12.0453610172"
+        },
+        "n": 145,
+        "record": "n-145",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "12.53553390593273"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "12.0905365064"
+        },
+        "n": 146,
+        "record": "n-146",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Cantrell 2025, Squares in Squares",
+          "value": "12.60090777851301"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "12.1355287257"
+        },
+        "n": 147,
+        "record": "n-147",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "12.65685424949238"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "12.1803398875"
+        },
+        "n": 148,
+        "record": "n-148",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "12.65685424949238"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "12.2249721603"
+        },
+        "n": 149,
+        "record": "n-149",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "12.70710678118654"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "12.2694276696"
+        },
+        "n": 150,
+        "record": "n-150",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth 2025, Squares in Squares",
+          "value": "12.77817459305202"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "12.313708499"
+        },
+        "n": 151,
+        "record": "n-151",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth & Cantrell, Squares in Squares",
+          "value": "12.82287565553229"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "12.3578166916"
+        },
+        "n": 152,
+        "record": "n-152",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth & Cantrell 2025, Squares in Squares",
+          "value": "12.83100282216725"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "12.401754251"
+        },
+        "n": 153,
+        "record": "n-153",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth 2024, Squares in Squares",
+          "value": "12.88166675700900"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "12.4455231423"
+        },
+        "n": 154,
+        "record": "n-154",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth & Cantrell, Squares in Squares",
+          "value": "12.93171183926903"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "12.4891252931"
+        },
+        "n": 155,
+        "record": "n-155",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth 2026, Squares in Squares",
+          "value": "12.95851388606690"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "12.5325625947"
+        },
+        "n": 156,
+        "record": "n-156",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Arslanov et al., Squares in Squares",
+          "value": "12.98219172354800"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "12.5758369028"
+        },
+        "n": 157,
+        "record": "n-157",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "12.6189500386"
+        },
+        "n": 158,
+        "record": "n-158",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "12.6619037897"
+        },
+        "n": 159,
+        "record": "n-159",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "12.7046999107"
+        },
+        "n": 160,
+        "record": "n-160",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "12.7473401245"
+        },
+        "n": 161,
+        "record": "n-161",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "12.7898261226"
+        },
+        "n": 162,
+        "record": "n-162",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "12.8321595662"
+        },
+        "n": 163,
+        "record": "n-163",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "12.874342087"
+        },
+        "n": 164,
+        "record": "n-164",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "12.9163752878"
+        },
+        "n": 165,
+        "record": "n-165",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "12.9582607431"
+        },
+        "n": 166,
+        "record": "n-166",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "13"
+        },
+        "n": 167,
+        "record": "n-167",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "13"
+        },
+        "n": 168,
+        "record": "n-168",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "13"
+        },
+        "n": 169,
+        "record": "n-169",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "13.0415945788"
+        },
+        "n": 170,
+        "record": "n-170",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Hajba 2024, Squares in Squares",
+          "value": "13.53553390593273"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "13.0830459736"
+        },
+        "n": 171,
+        "record": "n-171",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth 2025, Squares in Squares",
+          "value": "13.57142857142857"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "13.124355653"
+        },
+        "n": 172,
+        "record": "n-172",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Hajba & Ellsworth, Squares in Squares",
+          "value": "13.61898898660160"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "13.1655250606"
+        },
+        "n": 173,
+        "record": "n-173",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "13.65685424949238"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "13.2065556157"
+        },
+        "n": 174,
+        "record": "n-174",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "13.70710678118654"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "13.2474487139"
+        },
+        "n": 175,
+        "record": "n-175",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth 2024, Squares in Squares",
+          "value": "13.77817459305202"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "13.2882057274"
+        },
+        "n": 176,
+        "record": "n-176",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "13.82287565553229"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "13.3288280059"
+        },
+        "n": 177,
+        "record": "n-177",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth 2024, Squares in Squares",
+          "value": "13.82302875075647"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "13.3693168769"
+        },
+        "n": 178,
+        "record": "n-178",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "13.84666719284348"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "13.409673646"
+        },
+        "n": 179,
+        "record": "n-179",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth, Squares in Squares",
+          "value": "13.89540982243640"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "13.449899598"
+        },
+        "n": 180,
+        "record": "n-180",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth 2026, Squares in Squares",
+          "value": "13.93513929847193"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "13.4899959968"
+        },
+        "n": 181,
+        "record": "n-181",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth 2026, Squares in Squares",
+          "value": "13.95698416446504"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "13.5299640861"
+        },
+        "n": 182,
+        "record": "n-182",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Arslanov et al., Squares in Squares",
+          "value": "13.97442960739443"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "13.56980509"
+        },
+        "n": 183,
+        "record": "n-183",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "13.6095202129"
+        },
+        "n": 184,
+        "record": "n-184",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "13.6491106407"
+        },
+        "n": 185,
+        "record": "n-185",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "13.6885775404"
+        },
+        "n": 186,
+        "record": "n-186",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "13.7279220614"
+        },
+        "n": 187,
+        "record": "n-187",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "13.7671453348"
+        },
+        "n": 188,
+        "record": "n-188",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "13.8062484749"
+        },
+        "n": 189,
+        "record": "n-189",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "13.8452325787"
+        },
+        "n": 190,
+        "record": "n-190",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "13.8840987267"
+        },
+        "n": 191,
+        "record": "n-191",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "13.9228479833"
+        },
+        "n": 192,
+        "record": "n-192",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "13.9614813968"
+        },
+        "n": 193,
+        "record": "n-193",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "14"
+        },
+        "n": 194,
+        "record": "n-194",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "14"
+        },
+        "n": 195,
+        "record": "n-195",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "14"
+        },
+        "n": 196,
+        "record": "n-196",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "14.0384048104"
+        },
+        "n": 197,
+        "record": "n-197",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "14.53553390593273"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "14.0766968306"
+        },
+        "n": 198,
+        "record": "n-198",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "14.57142857142857"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "14.1148770486"
+        },
+        "n": 199,
+        "record": "n-199",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "14.61898898660160"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "14.152946438"
+        },
+        "n": 200,
+        "record": "n-200",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "14.65685424949238"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "14.1909059583"
+        },
+        "n": 201,
+        "record": "n-201",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "14.70710678118654"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "14.2287565553"
+        },
+        "n": 202,
+        "record": "n-202",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "14.72792206135785"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "14.2664991614"
+        },
+        "n": 203,
+        "record": "n-203",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth 2024, Squares in Squares",
+          "value": "14.77817459305202"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "14.3041346957"
+        },
+        "n": 204,
+        "record": "n-204",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "14.82287565553229"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "14.3416640641"
+        },
+        "n": 205,
+        "record": "n-205",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth, Squares in Squares",
+          "value": "14.82445114612408"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "14.3790881603"
+        },
+        "n": 206,
+        "record": "n-206",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth, Squares in Squares",
+          "value": "14.87253189075152"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "14.416407865"
+        },
+        "n": 207,
+        "record": "n-207",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth, Squares in Squares",
+          "value": "14.89397859563780"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "14.4536240471"
+        },
+        "n": 208,
+        "record": "n-208",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth 2026, Squares in Squares",
+          "value": "14.93783044811097"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "14.4907375632"
+        },
+        "n": 209,
+        "record": "n-209",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth 2026, Squares in Squares",
+          "value": "14.95868244078260"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "14.5277492585"
+        },
+        "n": 210,
+        "record": "n-210",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Arslanov et al., Squares in Squares",
+          "value": "14.97421396826961"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "14.5646599663"
+        },
+        "n": 211,
+        "record": "n-211",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "14.6014705087"
+        },
+        "n": 212,
+        "record": "n-212",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "14.638181697"
+        },
+        "n": 213,
+        "record": "n-213",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "14.6747943312"
+        },
+        "n": 214,
+        "record": "n-214",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "14.7113092008"
+        },
+        "n": 215,
+        "record": "n-215",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "14.7477270849"
+        },
+        "n": 216,
+        "record": "n-216",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "14.7840487521"
+        },
+        "n": 217,
+        "record": "n-217",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "14.8202749611"
+        },
+        "n": 218,
+        "record": "n-218",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "14.8564064606"
+        },
+        "n": 219,
+        "record": "n-219",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "14.8924439894"
+        },
+        "n": 220,
+        "record": "n-220",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "14.9283882772"
+        },
+        "n": 221,
+        "record": "n-221",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "14.9642400438"
+        },
+        "n": 222,
+        "record": "n-222",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "15"
+        },
+        "n": 223,
+        "record": "n-223",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "15"
+        },
+        "n": 224,
+        "record": "n-224",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "15"
+        },
+        "n": 225,
+        "record": "n-225",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "15.0356688476"
+        },
+        "n": 226,
+        "record": "n-226",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "15.53553390593273"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "15.0712472795"
+        },
+        "n": 227,
+        "record": "n-227",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth 2025, Squares in Squares",
+          "value": "15.57106781186547"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "15.1067359797"
+        },
+        "n": 228,
+        "record": "n-228",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth, Squares in Squares",
+          "value": "15.60902282132495"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "15.1421356237"
+        },
+        "n": 229,
+        "record": "n-229",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "15.65685424949238"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "15.1774468788"
+        },
+        "n": 230,
+        "record": "n-230",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth 2025, Squares in Squares",
+          "value": "15.68292682926829"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "15.2126704036"
+        },
+        "n": 231,
+        "record": "n-231",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "15.70710678118654"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "15.2478068488"
+        },
+        "n": 232,
+        "record": "n-232",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "15.77817459305202"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "15.2828568571"
+        },
+        "n": 233,
+        "record": "n-233",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "15.77817459305202"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "15.3178210633"
+        },
+        "n": 234,
+        "record": "n-234",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth, Squares in Squares",
+          "value": "15.82287565553229"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "15.3527000944"
+        },
+        "n": 235,
+        "record": "n-235",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth & Cantrell 2025, Squares in Squares",
+          "value": "15.82660563342856"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "15.3874945699"
+        },
+        "n": 236,
+        "record": "n-236",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth, Squares in Squares",
+          "value": "15.87607676541001"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "15.4222051019"
+        },
+        "n": 237,
+        "record": "n-237",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth 2024, Squares in Squares",
+          "value": "15.91421356237309"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "15.4568322948"
+        },
+        "n": 238,
+        "record": "n-238",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth 2026, Squares in Squares",
+          "value": "15.93984676308969"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "15.4913767462"
+        },
+        "n": 239,
+        "record": "n-239",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth 2026, Squares in Squares",
+          "value": "15.95643304058435"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "15.5258390463"
+        },
+        "n": 240,
+        "record": "n-240",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth, Squares in Squares",
+          "value": "15.97559404379946"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "15.5602197786"
+        },
+        "n": 241,
+        "record": "n-241",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Arslanov et al., Squares in Squares",
+          "value": "15.99091684780193"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "15.5945195193"
+        },
+        "n": 242,
+        "record": "n-242",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "15.6287388383"
+        },
+        "n": 243,
+        "record": "n-243",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "15.6628782986"
+        },
+        "n": 244,
+        "record": "n-244",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "15.6969384567"
+        },
+        "n": 245,
+        "record": "n-245",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "15.7309198627"
+        },
+        "n": 246,
+        "record": "n-246",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "15.7648230602"
+        },
+        "n": 247,
+        "record": "n-247",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "15.7986485869"
+        },
+        "n": 248,
+        "record": "n-248",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "15.8323969742"
+        },
+        "n": 249,
+        "record": "n-249",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "15.8660687473"
+        },
+        "n": 250,
+        "record": "n-250",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "15.8996644258"
+        },
+        "n": 251,
+        "record": "n-251",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "15.9331845231"
+        },
+        "n": 252,
+        "record": "n-252",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "15.9666295471"
+        },
+        "n": 253,
+        "record": "n-253",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "16"
+        },
+        "n": 254,
+        "record": "n-254",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "16"
+        },
+        "n": 255,
+        "record": "n-255",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "16"
+        },
+        "n": 256,
+        "record": "n-256",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "16.0332963784"
+        },
+        "n": 257,
+        "record": "n-257",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth 2025, Squares in Squares",
+          "value": "16.53553390593273"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "16.0665191733"
+        },
+        "n": 258,
+        "record": "n-258",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "16.57106781186547"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "16.0996688705"
+        },
+        "n": 259,
+        "record": "n-259",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth, Squares in Squares",
+          "value": "16.60257141234448"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "16.1327459504"
+        },
+        "n": 260,
+        "record": "n-260",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth 2024, Squares in Squares",
+          "value": "16.65685424949238"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "16.1657508881"
+        },
+        "n": 261,
+        "record": "n-261",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "16.68292682926829"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "16.1986841536"
+        },
+        "n": 262,
+        "record": "n-262",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "16.70710678118654"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "16.2315462117"
+        },
+        "n": 263,
+        "record": "n-263",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth 2025, Squares in Squares",
+          "value": "16.74264068711928"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "16.2643375225"
+        },
+        "n": 264,
+        "record": "n-264",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "16.77817459305202"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "16.2970585408"
+        },
+        "n": 265,
+        "record": "n-265",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "16.77817459305202"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "16.3297097168"
+        },
+        "n": 266,
+        "record": "n-266",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth 2024, Squares in Squares",
+          "value": "16.82306208283780"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "16.3622914957"
+        },
+        "n": 267,
+        "record": "n-267",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "16.84666719284348"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "16.3948043183"
+        },
+        "n": 268,
+        "record": "n-268",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth & Cantrell, Squares in Squares",
+          "value": "16.87933209237563"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "16.4272486205"
+        },
+        "n": 269,
+        "record": "n-269",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth, Squares in Squares",
+          "value": "16.90596764828402"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "16.4596248337"
+        },
+        "n": 270,
+        "record": "n-270",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth 2026, Squares in Squares",
+          "value": "16.94073593015457"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "16.4919333848"
+        },
+        "n": 271,
+        "record": "n-271",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth 2026, Squares in Squares",
+          "value": "16.95509447506437"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "16.5241746963"
+        },
+        "n": 272,
+        "record": "n-272",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth, Squares in Squares",
+          "value": "16.96980702828259"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "16.5563491861"
+        },
+        "n": 273,
+        "record": "n-273",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Arslanov et al., Squares in Squares",
+          "value": "16.98832058897683"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "16.5884572681"
+        },
+        "n": 274,
+        "record": "n-274",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "16.6204993518"
+        },
+        "n": 275,
+        "record": "n-275",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "16.6524758425"
+        },
+        "n": 276,
+        "record": "n-276",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "16.6843871414"
+        },
+        "n": 277,
+        "record": "n-277",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "16.7162336455"
+        },
+        "n": 278,
+        "record": "n-278",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "16.748015748"
+        },
+        "n": 279,
+        "record": "n-279",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "16.7797338381"
+        },
+        "n": 280,
+        "record": "n-280",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "16.8113883008"
+        },
+        "n": 281,
+        "record": "n-281",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "16.8429795178"
+        },
+        "n": 282,
+        "record": "n-282",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "16.8745078664"
+        },
+        "n": 283,
+        "record": "n-283",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "16.9059737206"
+        },
+        "n": 284,
+        "record": "n-284",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "16.9373774505"
+        },
+        "n": 285,
+        "record": "n-285",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "16.9687194227"
+        },
+        "n": 286,
+        "record": "n-286",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "17"
+        },
+        "n": 287,
+        "record": "n-287",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "17"
+        },
+        "n": 288,
+        "record": "n-288",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "17"
+        },
+        "n": 289,
+        "record": "n-289",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "17.0312195419"
+        },
+        "n": 290,
+        "record": "n-290",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "17.53553390593273"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "17.0623784042"
+        },
+        "n": 291,
+        "record": "n-291",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "17.53553390593273"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "17.0934769394"
+        },
+        "n": 292,
+        "record": "n-292",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "17.60257141234448"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "17.1245154966"
+        },
+        "n": 293,
+        "record": "n-293",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth & Cantrell, Squares in Squares",
+          "value": "17.63414634146341"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "17.1554944214"
+        },
+        "n": 294,
+        "record": "n-294",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "17.65685424949238"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "17.1864140562"
+        },
+        "n": 295,
+        "record": "n-295",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "17.70710678118654"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "17.2172747402"
+        },
+        "n": 296,
+        "record": "n-296",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "17.70710678118654"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "17.2480768093"
+        },
+        "n": 297,
+        "record": "n-297",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth, Squares in Squares",
+          "value": "17.74116992948972"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "17.2788205961"
+        },
+        "n": 298,
+        "record": "n-298",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "17.77817459305202"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "17.3095064303"
+        },
+        "n": 299,
+        "record": "n-299",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Friedman & Ellsworth, Squares in Squares",
+          "value": "17.82287565553229"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "17.3401346384"
+        },
+        "n": 300,
+        "record": "n-300",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth, Squares in Squares",
+          "value": "17.82412338847854"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "17.3707055437"
+        },
+        "n": 301,
+        "record": "n-301",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth 2025, Squares in Squares",
+          "value": "17.86899185179999"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "17.4012194669"
+        },
+        "n": 302,
+        "record": "n-302",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth 2024, Squares in Squares",
+          "value": "17.88674602860566"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "17.4316767252"
+        },
+        "n": 303,
+        "record": "n-303",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth 2026, Squares in Squares",
+          "value": "17.93127894394689"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "17.4620776332"
+        },
+        "n": 304,
+        "record": "n-304",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth 2026, Squares in Squares",
+          "value": "17.94917201919110"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "17.4924225025"
+        },
+        "n": 305,
+        "record": "n-305",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth 2026, Squares in Squares",
+          "value": "17.96075558628675"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "17.5227116419"
+        },
+        "n": 306,
+        "record": "n-306",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Ellsworth 2026, Squares in Squares",
+          "value": "17.96926975248972"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "17.5529453572"
+        },
+        "n": 307,
+        "record": "n-307",
+        "upper": {
+          "assurance": "reported",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": "(reported)",
+          "result": null,
+          "results": [],
+          "source_key": "[Kingbird]",
+          "text": "Arslanov et al., Squares in Squares",
+          "value": "17.98281564631754"
+        }
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "17.5831239518"
+        },
+        "n": 308,
+        "record": "n-308",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "17.6132477258"
+        },
+        "n": 309,
+        "record": "n-309",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "17.6433169771"
+        },
+        "n": 310,
+        "record": "n-310",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "17.6733320005"
+        },
+        "n": 311,
+        "record": "n-311",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "17.7032930885"
+        },
+        "n": 312,
+        "record": "n-312",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "17.7332005307"
+        },
+        "n": 313,
+        "record": "n-313",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "17.7630546142"
+        },
+        "n": 314,
+        "record": "n-314",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "17.7928556237"
+        },
+        "n": 315,
+        "record": "n-315",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "17.8226038413"
+        },
+        "n": 316,
+        "record": "n-316",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "17.8522995464"
+        },
+        "n": 317,
+        "record": "n-317",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "17.8819430161"
+        },
+        "n": 318,
+        "record": "n-318",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "17.9115345253"
+        },
+        "n": 319,
+        "record": "n-319",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "17.9410743461"
+        },
+        "n": 320,
+        "record": "n-320",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "17.9705627485"
+        },
+        "n": 321,
+        "record": "n-321",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "18"
+        },
+        "n": 322,
+        "record": "n-322",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "18"
+        },
+        "n": 323,
+        "record": "n-323",
+        "upper": null
+      },
+      {
+        "lower": {
+          "assurance": "verified",
+          "basis": "external",
+          "confirmed_by": [],
+          "note": null,
+          "result": null,
+          "results": [],
+          "source_key": "[Nagamochi 2005]",
+          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
+          "value": "18"
+        },
+        "n": 324,
+        "record": "n-324",
+        "upper": null
+      }
+    ],
+    "generated_by": "devtools.build_bound_citations"
+  },
+  "softschema": {
+    "contract": "packing.squares:BoundCitations/v1",
+    "envelope": "citations",
+    "schema": "bound-citations.schema.yaml",
+    "status": "enforced"
+  }
+}

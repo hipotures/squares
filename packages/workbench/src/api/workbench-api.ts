@@ -206,6 +206,8 @@ export interface AtlasColour {
   greens: string[];
   greenStride: number;
   animateStandardize: boolean;
+  /** Whether an axis-aligned square keeps its colour across a step instead of draining. */
+  holdSquareColors: boolean;
   /** How many angle classes the frame's angles fell into. */
   classes: number;
   centres: number[];
@@ -408,8 +410,14 @@ export interface AtlasPhysics {
 export interface AtlasContinuous {
   on: boolean;
   fullBeat: boolean;
-  /** Whether simple transitions, axis-aligned grid fills, play at double speed. */
+  /** Whether simple transitions, axis-aligned grid fills, play at `simpleSpeed`. */
   fastSimple: boolean;
+  /** How many times faster a simple transition plays while `fastSimple` is on. */
+  simpleSpeed: number;
+  /** The range the setting accepts, and the default it starts at. */
+  simpleSpeedMin: number;
+  simpleSpeedMax: number;
+  simpleSpeedDefault: number;
   prefetch: boolean;
   dwell: number;
   move: number;
@@ -505,6 +513,8 @@ export interface AtlasReset {
   relationship: AtlasRelationship;
   growth: AtlasGrowth;
   anneal: number;
+  /** Back to `SIMPLE_SPEED_SETTINGS.default`, as the arrival delay goes back to its own. */
+  simpleSpeed: number;
   snap: boolean;
   blind: boolean;
   blindInflate: number;
@@ -530,6 +540,8 @@ export interface AtlasState {
   motionResponse: AtlasMotionResponseValues;
   arrivalDelay: number;
   links: boolean;
+  /** Whether the CITATION section is drawn under PROVEN. */
+  citations: boolean;
   capture: boolean;
   timing: AtlasTiming;
   desaturate: boolean;
@@ -538,6 +550,8 @@ export interface AtlasState {
   blindInflate: number;
   mode: AtlasSimMode;
   anneal: number;
+  /** The factor a simple transition plays at, so a capture can record the clock it cut on. */
+  simpleSpeed: number;
   speed: number;
   initial: AtlasInitial;
   optimizing: boolean;
@@ -610,10 +624,17 @@ export interface AtlasTransitions {
   identityFills(count?: number): string[];
   setAnimateStandardize(on: boolean): boolean;
   animateStandardize(): boolean;
+  holdSquareColors(): boolean;
+  setHoldSquareColors(on: boolean): boolean;
+  colorFade(): AtlasColorFade;
+  setColorFade(fade: Partial<AtlasColorFade>): AtlasColorFade;
 
   setPhase(phase: AtlasPhase): void;
   setStyle(style: string): void;
   setOverlay(on: boolean): void;
+  /** Draw the CITATION section under PROVEN, or not; returns what is now drawn. */
+  setCitations(on: boolean): boolean;
+  citations(): boolean;
   setCapture(on: boolean): void;
   setAutoAdvance(on: boolean): void;
   setDesaturate(on: boolean): void;
@@ -720,6 +741,14 @@ export interface AtlasTransitions {
   setContinuous(
     options?: Partial<Pick<AtlasContinuous, "on" | "fullBeat" | "fastSimple" | "prefetch">> | null,
   ): AtlasContinuous;
+  /**
+   * How many times faster a simple transition plays while `fastSimple` is on.
+   *
+   * Clamped to `simpleSpeedMin`..`simpleSpeedMax` and snapped to the control's step, so what
+   * comes back is what the page will play rather than what was asked for. A caller that must
+   * know its factor was taken compares the returned `simpleSpeed` with what it sent.
+   */
+  setSimpleSpeed(speed: number): AtlasContinuous;
   /** The n actually reached, which is the nearest one the page carries. */
   goTo(n: number): number;
   continuous(): AtlasContinuous;
@@ -744,6 +773,12 @@ export interface AtlasTransitions {
   exportAnimationSvg(): string;
   leaveAnimation(): void;
   state(): AtlasState;
+}
+
+/** How long a square's colour takes to leave and to come back, in seconds. */
+export interface AtlasColorFade {
+  out: number;
+  in: number;
 }
 
 /** A browser-like host that can expose the workbench API. */
