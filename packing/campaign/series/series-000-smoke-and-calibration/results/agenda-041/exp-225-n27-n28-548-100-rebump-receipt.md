@@ -1,4 +1,4 @@
-# Exp-225 n=27 and n=28 at 548/100 by Re-Bumping the n=29 Atoms
+# Exp-225 n=27, n=28 and n=29 at 548/100 by Re-Bumping the n=29 Atoms
 
 Status: **not retainable, nothing registrable**. The re-bump did what it was meant to do
 — it moved Condition 5 from `undecided` to `holds` on the interval route, 272 stalled
@@ -127,16 +127,18 @@ uv run --frozen --all-extras --group dev python -m devtools.decide_certificate \
 | --- | --- | --- | ---: | ---: | ---: | --- |
 | 27 | `accepted=False` | `(1025913/1000000, 4120021/4000000)` | 4,955,893 | 272 | 291 s | `REFUSED`, `EXIT:1` |
 | 28 | `accepted=False` | `(1025913/1000000, 4120021/4000000)` | 4,955,893 | 272 | 205 s | `REFUSED`, `EXIT:1` |
+| 29 | `accepted=False` | `(1025913/1000000, 4120021/4000000)` | 4,955,893 | 272 | 115 s | `REFUSED`, `EXIT:1` |
 
 Three refusals each, identical apart from the path: Condition 5, 272 stalled boxes, and
 an enclosure with width.
-Identical because Condition 5 does not depend on `n` — which is the premise, showing
-through in the failure as well as in the claim.
+The three runs agree to the box and to the fraction, at three different declared `n` —
+which is the premise showing through in the failure as well as in the claim.
+The walls differ only with what else the shared four-core host was running.
 
-The exact route again never ran, so neither file carries a gate-printed digest.
-`decide_certificate` prints a SHA-256 only on a positive full verdict, and by `OR-16`
-these artifacts are identified by repository-relative path and Git revision rather than
-by a digest written beside them.
+The exact route again never ran, so none of the three files carries a gate-printed
+digest. `decide_certificate` prints a SHA-256 only on a positive full verdict, and by
+`OR-16` these artifacts are identified by repository-relative path and Git revision
+rather than by a digest written beside them.
 
 ## Why the gate still refuses, exactly
 

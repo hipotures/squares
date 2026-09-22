@@ -280,18 +280,46 @@ site-disjoint. That was measured exactly here at `n = 12` (`L = 3.98`, `3.985`, 
 and at `n = 21` (`997/200`), and it is cheap to test: `L < kB` and an empty window per
 axis.
 
-## An Available Bound Movement Nobody Has Taken
+## The `n = 27` and `n = 28` Candidate: Run, and Refused for a Reason Worth Recording
 
-The retained `n = 29` candidate at `548/100` is, by Condition 2 alone, **also a
-certificate for `n = 27` and `n = 28` at `5.48`**: only Condition 2 mentions `n`, and
-the candidate’s converged mass is `26.0409395`. That would be `+0.237` over
-`1 + sqrt(18)` and `+0.121` over `1 + sqrt(19)`. The exact route already accepts it.
-What blocks it is not mathematics but a margin: the interval route stalled on 272 boxes
-at `3.25e-6`. A re-rationalisation with a larger bump, or a raised box budget, is the
-whole of the work.
+The retained `n = 29` candidate at `548/100` was taken up in this block as `exp-225`,
+and the outcome is a clean negative with a precisely located cause.
+**No bound moved.**
 
-Nothing in the record states this, and `X-041` says of this region only “one more site
-set, then stop”.
+The premise holds exactly.
+Across the whole decision path `n` is read only by Condition 2
+(`certificate.py:253-259`), by an `int64` guard that is monotone and strictly safer at
+lower `n`, and by string fields; `sweep.py`, which is Condition 5’s engine, never sees
+`n` at all. `decide_certificate` prints `certifies every n >= 27` on the bytes itself.
+And `n = 29` at this side is not registered either — it is a covering row with
+`frozen_artifact: null` — so `5.48` would move that too.
+
+Re-rationalising at bump `103/100` raises the mass to `107289303/4000000 = 26.822326`,
+keeping `0.1777` of headroom below 27, and lifts the declared least cell mass to
+`4120021/4000000 = 1.030005`. **At the theorem’s own threshold that clears the
+obstruction completely**: run with `enclose = False`, Condition 5 *holds* over the full
+363-direction doubled net, 2,707,989 boxes, **zero stalled**, against the un-bumped
+baseline’s 272 stalled and `undecided`.
+
+**The gate nevertheless refuses, and not for the same reason.** It runs the interval
+route with `enclose = True`, where a box settles against the *exact minimum* rather than
+against mass 1. That shortfall is **relative**, so reweighting moves both ends of the
+enclosure together and buys essentially nothing: `0.3980737%` before the bump,
+`0.3973038%` after. All 272 stalled boxes sit in **direction 0**, the axis-parallel one,
+at the seam where one coverage region’s leave-edge at `x + B/2` lands exactly on
+another’s enter-edge at `x' - B/2` — unsplittable below the `1e-12` resolution floor.
+The other 362 directions certify.
+
+Raising `BOX_BUDGET` would not help and was not tried: `budget_exhausted` is 0
+everywhere, the budget being per direction.
+
+So what exists is a candidate whose five conditions are established by the exact
+event-cell sweep **and** by the interval route at the mass-1 threshold, refused by the
+retention gate on its enclosure-agreement requirement.
+**That is a finding about the gate, not a bound**, and nothing is registered on it.
+Whether a recorded escape from the agreement requirement is sound policy is a question
+for the gate’s owner, and `D-435` is exactly why acceptance is asked the same question
+in both modes.
 
 ## Ranked Slate
 
