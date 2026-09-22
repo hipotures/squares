@@ -63,7 +63,7 @@
   </g>
   <text data-feature="explainer" x="709.572" y="2804" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="1.045">(</tspan><tspan font-style="italic">n</tspan><tspan dx="1.045">) is the side of the smallest square holding </tspan><tspan font-style="italic">n</tspan><tspan dx="1.045"> unit squares; deg is the algebraic degree of that side length</tspan></text>
   <text data-feature="credit" x="1200" y="2834" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#47525f">Diagram by Joshua Levy with assistance from Claude and Codex</text>
-  <text data-feature="release-stamp" x="1200" y="2864" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#47525f">v0.4.1-f5e113</text>
+  <text data-feature="release-stamp" x="1200" y="2864" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#47525f">v0.4.1-a4bdfa</text>
   <g data-feature="packing-card" data-n="1" data-row="0" data-column="0" data-source-id="W-known-best-n001">
     <rect data-feature="container-outline" x="84" y="186" width="158" height="158" fill="#ffffff" stroke="#000000" stroke-width="1.15" />
     <polygon data-feature="square-fill" data-square="n-001-square-001" data-hue-index="0" data-shade-index="0" data-contact-sides="4" data-orientation-radians="0.0" points="84,344 242,344 242,186 84,186" fill="#257260" stroke="#000000" stroke-width="0.42" stroke-linejoin="round" data-angle-class="0" />
@@ -381,7 +381,7 @@
     <text data-feature="packing-label" x="1452" y="629" font-family="Helvetica, Arial, sans-serif" font-size="29" font-weight="700" letter-spacing="-0.5" fill="#17202a">17</text>
     <rect data-feature="evidence-badge" data-evidence="exact value known" x="1591" y="608.7" width="19" height="19" rx="4.5" fill="#5c6673" stroke="none" stroke-width="1.2" />
     <text x="1600.5" y="622.7" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="650" fill="#ffffff">=</text>
-    <text data-feature="side-bound" x="1452" y="646" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(17) ≤ 4.67553</tspan></text>
+    <text data-feature="side-bound" x="1452" y="646" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(17) ≤ 4.675531</tspan></text>
     <text data-feature="algebraic-degree" x="1610" y="646" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f">deg 18</text>
     <text data-feature="lower-bound" x="1452" y="663" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(17) ≥ 4.613046</tspan></text>
   </g>
@@ -438,7 +438,7 @@
     <rect data-feature="evidence-badge" data-evidence="exact value known" x="2047" y="608.7" width="19" height="19" rx="4.5" fill="#5c6673" stroke="none" stroke-width="1.2" />
     <text x="2056.5" y="622.7" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="650" fill="#ffffff">=</text>
     <polygon data-feature="legend-star" points="2033.5,609.46 2035.555356666666666666666667,615.3711533333333333333333333 2041.81174,615.49934 2036.82557,619.2808466666666666666666667 2038.637663333333333333333333,625.27066 2033.5,621.696 2028.362336666666666666666667,625.27066 2030.17443,619.2808466666666666666666667 2025.18826,615.49934 2031.444643333333333333333333,615.3711533333333333333333333" fill="#a3123f" data-evidence="lower bound first proved here" />
-    <text data-feature="side-bound" x="1908" y="646" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(19) ≤ 4.885618</tspan></text>
+    <text data-feature="side-bound" x="1908" y="646" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(19) ≤ 4.885619</tspan></text>
     <text data-feature="algebraic-degree" x="2066" y="646" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f">deg 2</text>
     <text data-feature="lower-bound" x="1908" y="663" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(19) ≥ </tspan><tspan fill="#a3123f">4.8</tspan></text>
   </g>
@@ -664,7 +664,7 @@
     <text data-feature="packing-label" x="1224" y="881" font-family="Helvetica, Arial, sans-serif" font-size="29" font-weight="700" letter-spacing="-0.5" fill="#17202a">26</text>
     <rect data-feature="evidence-badge" data-evidence="exact value known" x="1363" y="860.7" width="19" height="19" rx="4.5" fill="#5c6673" stroke="none" stroke-width="1.2" />
     <text x="1372.5" y="874.7" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="650" fill="#ffffff">=</text>
-    <text data-feature="side-bound" x="1224" y="898" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(26) ≤ 5.62132</tspan></text>
+    <text data-feature="side-bound" x="1224" y="898" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(26) ≤ 5.621321</tspan></text>
     <text data-feature="algebraic-degree" x="1382" y="898" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f">deg 2</text>
     <text data-feature="lower-bound" x="1224" y="915" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(26) ≥ 5.123105</tspan></text>
   </g>
@@ -777,7 +777,7 @@
     <text data-feature="packing-label" x="1908" y="881" font-family="Helvetica, Arial, sans-serif" font-size="29" font-weight="700" letter-spacing="-0.5" fill="#17202a">29</text>
     <rect data-feature="evidence-badge" data-evidence="only known numerically" x="2047" y="860.7" width="19" height="19" rx="4.5" fill="none" stroke="#5c6673" stroke-width="1.2" />
     <text x="2056.5" y="874.7" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="650" fill="#5c6673">≈</text>
-    <text data-feature="side-bound" x="1908" y="898" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(29) ≤ 5.933833</tspan></text>
+    <text data-feature="side-bound" x="1908" y="898" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(29) ≤ 5.933834</tspan></text>
     <text data-feature="lower-bound" x="1908" y="915" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(29) ≥ 5.472135</tspan></text>
   </g>
   <g data-feature="packing-card" data-n="30" data-row="2" data-column="9" data-source-id="W-known-best-n030">
@@ -1210,7 +1210,7 @@
     <text data-feature="packing-label" x="1908" y="1133" font-family="Helvetica, Arial, sans-serif" font-size="29" font-weight="700" letter-spacing="-0.5" fill="#17202a">39</text>
     <rect data-feature="evidence-badge" data-evidence="exact value known" x="2047" y="1112.7" width="19" height="19" rx="4.5" fill="#5c6673" stroke="none" stroke-width="1.2" />
     <text x="2056.5" y="1126.7" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="650" fill="#ffffff">=</text>
-    <text data-feature="side-bound" x="1908" y="1150" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(39) ≤ 6.810722</tspan></text>
+    <text data-feature="side-bound" x="1908" y="1150" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(39) ≤ 6.810723</tspan></text>
     <text data-feature="algebraic-degree" x="2066" y="1150" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f">deg 5</text>
     <text data-feature="lower-bound" x="1908" y="1167" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(39) ≥ 6.291502</tspan></text>
   </g>
@@ -1261,7 +1261,7 @@
     <text x="2284.5" y="1127.45" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="650" fill="#5c6673">R</text>
     <rect data-feature="evidence-badge" data-evidence="exact value known" x="2252" y="1112.7" width="19" height="19" rx="4.5" fill="#5c6673" stroke="none" stroke-width="1.2" />
     <text x="2261.5" y="1126.7" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="650" fill="#ffffff">=</text>
-    <text data-feature="side-bound" x="2136" y="1150" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(40) ≤ 6.828427</tspan></text>
+    <text data-feature="side-bound" x="2136" y="1150" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(40) ≤ 6.828428</tspan></text>
     <text data-feature="algebraic-degree" x="2294" y="1150" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f">deg 2</text>
     <text data-feature="lower-bound" x="2136" y="1167" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(40) ≥ 6.385164</tspan></text>
   </g>
@@ -1311,7 +1311,7 @@
     <text data-feature="packing-label" x="84" y="1385" font-family="Helvetica, Arial, sans-serif" font-size="29" font-weight="700" letter-spacing="-0.5" fill="#17202a">41</text>
     <rect data-feature="evidence-badge" data-evidence="exact value known" x="223" y="1364.7" width="19" height="19" rx="4.5" fill="#5c6673" stroke="none" stroke-width="1.2" />
     <text x="232.5" y="1378.7" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="650" fill="#ffffff">=</text>
-    <text data-feature="side-bound" x="84" y="1402" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(41) ≤ 6.926693</tspan></text>
+    <text data-feature="side-bound" x="84" y="1402" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(41) ≤ 6.926694</tspan></text>
     <text data-feature="algebraic-degree" x="242" y="1402" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f">deg 42</text>
     <text data-feature="lower-bound" x="84" y="1419" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(41) ≥ 6.477225</tspan></text>
   </g>
@@ -1863,7 +1863,7 @@
     <text data-feature="packing-label" x="84" y="1637" font-family="Helvetica, Arial, sans-serif" font-size="29" font-weight="700" letter-spacing="-0.5" fill="#17202a">51</text>
     <rect data-feature="evidence-badge" data-evidence="exact value known" x="223" y="1616.7" width="19" height="19" rx="4.5" fill="#5c6673" stroke="none" stroke-width="1.2" />
     <text x="232.5" y="1630.7" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="650" fill="#ffffff">=</text>
-    <text data-feature="side-bound" x="84" y="1654" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(51) ≤ 7.700799</tspan></text>
+    <text data-feature="side-bound" x="84" y="1654" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(51) ≤ 7.7008</tspan></text>
     <text data-feature="algebraic-degree" x="242" y="1654" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f">deg 12</text>
     <text data-feature="lower-bound" x="84" y="1671" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(51) ≥ 7.164414</tspan></text>
   </g>
@@ -2049,7 +2049,7 @@
     <text data-feature="packing-label" x="768" y="1637" font-family="Helvetica, Arial, sans-serif" font-size="29" font-weight="700" letter-spacing="-0.5" fill="#17202a">54</text>
     <rect data-feature="evidence-badge" data-evidence="exact value known" x="907" y="1616.7" width="19" height="19" rx="4.5" fill="#5c6673" stroke="none" stroke-width="1.2" />
     <text x="916.5" y="1630.7" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="650" fill="#ffffff">=</text>
-    <text data-feature="side-bound" x="768" y="1654" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(54) ≤ 7.846667</tspan></text>
+    <text data-feature="side-bound" x="768" y="1654" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(54) ≤ 7.846668</tspan></text>
     <text data-feature="algebraic-degree" x="926" y="1654" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f">deg 4</text>
     <text data-feature="lower-bound" x="768" y="1671" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(54) ≥ 7.403124</tspan></text>
   </g>
@@ -2113,7 +2113,7 @@
     <text data-feature="packing-label" x="996" y="1637" font-family="Helvetica, Arial, sans-serif" font-size="29" font-weight="700" letter-spacing="-0.5" fill="#17202a">55</text>
     <rect data-feature="evidence-badge" data-evidence="only known numerically" x="1135" y="1616.7" width="19" height="19" rx="4.5" fill="none" stroke="#5c6673" stroke-width="1.2" />
     <text x="1144.5" y="1630.7" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="650" fill="#5c6673">≈</text>
-    <text data-feature="side-bound" x="996" y="1654" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(55) ≤ 7.945771</tspan></text>
+    <text data-feature="side-bound" x="996" y="1654" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(55) ≤ 7.945772</tspan></text>
     <text data-feature="lower-bound" x="996" y="1671" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(55) ≥ 7.48074</tspan></text>
   </g>
   <g data-feature="packing-card" data-n="56" data-row="5" data-column="5" data-source-id="W-known-best-n056">
@@ -2878,7 +2878,7 @@
     <text data-feature="packing-label" x="1224" y="1889" font-family="Helvetica, Arial, sans-serif" font-size="29" font-weight="700" letter-spacing="-0.5" fill="#17202a">66</text>
     <rect data-feature="evidence-badge" data-evidence="exact value known" x="1363" y="1868.7" width="19" height="19" rx="4.5" fill="#5c6673" stroke="none" stroke-width="1.2" />
     <text x="1372.5" y="1882.7" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="650" fill="#ffffff">=</text>
-    <text data-feature="side-bound" x="1224" y="1906" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(66) ≤ 8.656854</tspan></text>
+    <text data-feature="side-bound" x="1224" y="1906" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(66) ≤ 8.656855</tspan></text>
     <text data-feature="algebraic-degree" x="1382" y="1906" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f">deg 2</text>
     <text data-feature="lower-bound" x="1224" y="1923" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(66) ≥ 8.141428</tspan></text>
   </g>
@@ -3031,7 +3031,7 @@
     <text data-feature="packing-label" x="1680" y="1889" font-family="Helvetica, Arial, sans-serif" font-size="29" font-weight="700" letter-spacing="-0.5" fill="#17202a">68</text>
     <rect data-feature="evidence-badge" data-evidence="only known numerically" x="1819" y="1868.7" width="19" height="19" rx="4.5" fill="none" stroke="#5c6673" stroke-width="1.2" />
     <text x="1828.5" y="1882.7" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="650" fill="#5c6673">≈</text>
-    <text data-feature="side-bound" x="1680" y="1906" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(68) ≤ 8.803383</tspan></text>
+    <text data-feature="side-bound" x="1680" y="1906" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(68) ≤ 8.803384</tspan></text>
     <text data-feature="lower-bound" x="1680" y="1923" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(68) ≥ 8.280109</tspan></text>
   </g>
   <g data-feature="packing-card" data-n="69" data-row="6" data-column="8" data-source-id="W-known-best-n069">
@@ -4676,7 +4676,7 @@
     <text data-feature="packing-label" x="1452" y="2393" font-family="Helvetica, Arial, sans-serif" font-size="29" font-weight="700" letter-spacing="-0.5" fill="#17202a">87</text>
     <rect data-feature="evidence-badge" data-evidence="exact value known" x="1591" y="2372.7" width="19" height="19" rx="4.5" fill="#5c6673" stroke="none" stroke-width="1.2" />
     <text x="1600.5" y="2386.7" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="650" fill="#ffffff">=</text>
-    <text data-feature="side-bound" x="1452" y="2410" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(87) ≤ 9.838817</tspan></text>
+    <text data-feature="side-bound" x="1452" y="2410" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(87) ≤ 9.838818</tspan></text>
     <text data-feature="algebraic-degree" x="1610" y="2410" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f">deg 44</text>
     <text data-feature="lower-bound" x="1452" y="2427" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(87) ≥ 9.3666</tspan></text>
   </g>
@@ -4773,7 +4773,7 @@
     <text data-feature="packing-label" x="1680" y="2393" font-family="Helvetica, Arial, sans-serif" font-size="29" font-weight="700" letter-spacing="-0.5" fill="#17202a">88</text>
     <rect data-feature="evidence-badge" data-evidence="exact value known" x="1819" y="2372.7" width="19" height="19" rx="4.5" fill="#5c6673" stroke="none" stroke-width="1.2" />
     <text x="1828.5" y="2386.7" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="650" fill="#ffffff">=</text>
-    <text data-feature="side-bound" x="1680" y="2410" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(88) ≤ 9.888153</tspan></text>
+    <text data-feature="side-bound" x="1680" y="2410" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(88) ≤ 9.888154</tspan></text>
     <text data-feature="algebraic-degree" x="1838" y="2410" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f">deg 20</text>
     <text data-feature="lower-bound" x="1680" y="2427" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(88) ≥ 9.426149</tspan></text>
   </g>
@@ -4871,7 +4871,7 @@
     <text data-feature="packing-label" x="1908" y="2393" font-family="Helvetica, Arial, sans-serif" font-size="29" font-weight="700" letter-spacing="-0.5" fill="#17202a">89</text>
     <rect data-feature="evidence-badge" data-evidence="exact value known" x="2047" y="2372.7" width="19" height="19" rx="4.5" fill="#5c6673" stroke="none" stroke-width="1.2" />
     <text x="2056.5" y="2386.7" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="650" fill="#ffffff">=</text>
-    <text data-feature="side-bound" x="1908" y="2410" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(89) ≤ 9.949747</tspan></text>
+    <text data-feature="side-bound" x="1908" y="2410" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(89) ≤ 9.949748</tspan></text>
     <text data-feature="algebraic-degree" x="2066" y="2410" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f">deg 2</text>
     <text data-feature="lower-bound" x="1908" y="2427" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(89) ≥ 9.485281</tspan></text>
   </g>
