@@ -12,6 +12,8 @@ session:
   started_at: '2026-09-22T22:46:28.122Z'
   deadline_at: '2026-09-23T02:46:28.122Z'
   branch: codex/reconcile-pr-221-frontier
+  resource_rollups:
+  - packing/campaign/resource-usage/codex-task-tree-session-154.yaml
   primary_bead: think-t30b
   status: in_progress
   goal: >-
@@ -88,6 +90,12 @@ session:
   - The 1440- and 2880-step frozen certificates differ only in id, direction_steps, and provenance; all atoms, weights, shrink, and declared charge fields agree.
   - packing-validate --records passed every selected record check with two workers; the bead-tree check was omitted because the parallel native lane was already measuring the known worktree fallback.
   - pytest -n 2 tests/test_results_register.py tests/test_rung_figures.py tests/test_negative_controls.py passed 78 tests.
+  - >-
+    Interim lane-only cost receipt through 2026-09-22T23:27:00Z: 146 model responses,
+    0.69 agent-hours, a 0.67-hour active-union and wall envelope, 81.6 seconds of
+    parallel overlap, and 51,169 output tokens. The snapshot is incomplete while this
+    session remains live, so these are lower bounds; shared root review and coordination
+    are excluded from this branch declaration.
   stop_reason: null
   next_action: >-
     Complete local validation and review, publish the stacked pull request, record the
