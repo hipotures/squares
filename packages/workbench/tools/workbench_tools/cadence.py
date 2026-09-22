@@ -22,6 +22,14 @@ counted.
 The measurement and the judgement are separate, and the judgement is pure, so the rules are
 tested on recorded change series without a video.
 
+**A count is not a diagnosis.** `--detail` places each finding at the instant the capture
+seeked to, on the beat the cut was priced at rather than the beat the page happens to open
+on, and, with `--frames`, says what changed either side of it: how many pixels, how hard, and
+where on the stage. That is what a cause is read from. On the n = 2..24 cut of 2026-09-22 it
+named one: a few thousand pixels at a peak over a hundred, spread over the packing's own
+frame, is the container box's stroke, and the box was blinking out for a frame at the start
+of every step that does not resize it.
+
 Usage, from `packing/`:
     uv run --frozen --all-extras --group dev squares-workbench-check-cadence VIDEO [VIDEO ...]
 """
@@ -37,12 +45,23 @@ import subprocess
 from collections.abc import Iterator, Sequence
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 from PIL import Image
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import Page, sync_playwright
 
-from workbench_tools.capture_video import PAGE, priced_range, render_frames
+from workbench_tools.capture_video import (
+    PAGE,
+    FrameSample,
+    animation_defaults,
+    frame_schedule,
+    frames_per_step,
+    price_steps,
+    pricing_commands,
+    render_frames,
+    simple_speed_commands,
+)
 from workbench_tools.delivery import FRAME_PATTERN
 from workbench_tools.probes import probe
 
@@ -225,6 +244,55 @@ def frame_changes(frames_dir: Path, first: int, last: int) -> list[float]:
 RENDER_NOISE_PIXELS = 20
 
 
+@dataclass(frozen=True, slots=True)
+class Change:
+    """What changed between two full-size frames: how much, how hard, and where on the stage.
+
+    `moved` and `peak` together say which kind of change it was. A fade of something already
+    drawn moves a modest number of pixels at a large peak -- an outline's stroke going out and
+    coming back is a few thousand pixels at over a hundred grey levels -- where a square
+    arriving changes a whole region. Neither is visible in a mean, and `moved` alone cannot
+    tell a fading stroke from a moving one; the box says which part of the picture it was.
+    """
+
+    moved: int
+    peak: int
+    box: tuple[int, int, int, int]
+    regions: tuple[str, ...]
+
+    def says(self) -> str:
+        if self.moved == 0:
+            return "0 px"
+        where = ", ".join(self.regions) or "neither"
+        return f"{self.moved} px peak {self.peak} in {list(self.box)} ({where})"
+
+
+def change_between(before: np.ndarray, after: np.ndarray) -> Change:
+    """The change from one full-size grey frame to the next, in stage coordinates."""
+    difference = np.abs(after.astype(np.int16) - before.astype(np.int16))
+    moved = int(np.count_nonzero(difference > MOVED_EDGE))
+    if moved == 0:
+        return Change(moved=0, peak=int(difference.max()), box=(0, 0, 0, 0), regions=())
+    rows, cols = np.nonzero(difference > MOVED_EDGE)
+    scale = 1920 / before.shape[1]
+    box = (
+        round(int(cols.min()) * scale),
+        round(int(rows.min()) * scale),
+        round(int(cols.max()) * scale),
+        round(int(rows.max()) * scale),
+    )
+    return Change(
+        moved=moved,
+        peak=int(difference.max()),
+        box=box,
+        regions=tuple(
+            name
+            for name, (x0, y0, x1, y1) in REGIONS.items()
+            if box[0] < x1 and box[2] > x0 and box[1] < y1 and box[3] > y0
+        ),
+    )
+
+
 def unfaithful(frames_dir: Path, rendered: dict[int, bytes]) -> dict[int, str]:
     """Each re-rendered frame that differs from the kept PNG of the same index by more than
     `RENDER_NOISE_PIXELS` moved pixels, with the count and the stage box they fall in: an empty
@@ -233,19 +301,9 @@ def unfaithful(frames_dir: Path, rendered: dict[int, bytes]) -> dict[int, str]:
     for index, png in sorted(rendered.items()):
         kept = np.asarray(Image.open(frames_dir / (FRAME_PATTERN % index)).convert("L"))
         fresh = np.asarray(Image.open(io.BytesIO(png)).convert("L"))
-        moved = moved_pixels(kept, fresh)
-        if moved > RENDER_NOISE_PIXELS:
-            rows, cols = np.nonzero(
-                np.abs(kept.astype(np.int16) - fresh.astype(np.int16)) > MOVED_EDGE
-            )
-            scale = 1920 / kept.shape[1]
-            box = [round(v * scale) for v in (cols.min(), rows.min(), cols.max(), rows.max())]
-            where = [
-                name
-                for name, (x0, y0, x1, y1) in REGIONS.items()
-                if box[0] < x1 and box[2] > x0 and box[1] < y1 and box[3] > y0
-            ]
-            found[index] = f"{moved} px in {box} ({', '.join(where) or 'neither'})"
+        change = change_between(kept, fresh)
+        if change.moved > RENDER_NOISE_PIXELS:
+            found[index] = change.says()
     return found
 
 
@@ -384,27 +442,133 @@ def nearest_instant(t: float, schedule: dict[str, float], fps: float) -> str:
     return f"{round((t - at) * fps):+d} frames from {name}"
 
 
-def schedules(page_path: Path, ns: Sequence[int]) -> dict[int, dict[str, float]]:
-    """Each step's schedule as the page that was captured reports it."""
-    found: dict[int, dict[str, float]] = {}
+@dataclass(frozen=True, slots=True)
+class Beat:
+    """The clock a cut was made on: its steps, which instant each frame shows, and the
+    schedules those instants are read against.
+
+    `samples` and `timetable` are absent where the page the cut came from is not the page on
+    disk, and then a frame is placed by the receipt's frame counts alone, which is a frame
+    coarser.
+    """
+
+    steps: tuple[dict[str, object], ...]
+    samples: tuple[FrameSample, ...] | None = None
+    timetable: dict[int, dict[str, float]] | None = None
+
+    def place(self, frame: int, fps: float) -> tuple[int, str, float]:
+        """The n and kind of the step `frame` is in, and the instant of it the frame shows."""
+        if self.samples is None:
+            return locate(frame, self.steps, fps)
+        if frame >= len(self.samples):
+            raise ValueError(f"frame {frame} is past the {len(self.samples)} the beat prices")
+        sample = self.samples[frame]
+        step = self.steps[sample.step]
+        return int(str(step["n"])), str(step["kind"]), sample.at
+
+    def says(self, frame: int, fps: float) -> str:
+        n, kind, at = self.place(frame, fps)
+        where = f", step into {n} ({kind}) at t {at:.3f} s"
+        schedule = (self.timetable or {}).get(n)
+        return where if schedule is None else f"{where}, {nearest_instant(at, schedule, fps)}"
+
+
+def apply(page: Page, calls: Sequence[Sequence[object]]) -> Any:
+    """Several calls on the page's own animation API in one turn; the last answer comes back."""
+    return page.evaluate(probe("api/apply"), {"calls": [list(call) for call in calls]})
+
+
+def beat_of_cut(
+    page_path: Path,
+    first: int,
+    last: int,
+    fps: int,
+    *,
+    citations: bool,
+    simple_speed: float | None = None,
+) -> Beat:
+    """The page put on the beat the cut played, priced the way the cut priced it.
+
+    **A cut is not the page as it opens.** `capture_video` sets the range and calls `playRange`
+    before it asks how long a step lasts, and continuous play prices a static append at its
+    own short beat; the page as it opens prices the same step at the full one. Reading the
+    schedule without that preparation is what this used to do, and on the n = 2..24 cut of
+    2026-09-22 it reported the step into 2 lasting 2.692 s where the cut plays it in 1.383 s.
+    Every instant a stutter was named against was then wrong by the difference -- findings
+    that sit between the container resize and the arriving square were reported as one frame
+    before the move had even started.
+
+    So the preparation is the capture's own, through the capture's own helpers, and the frame
+    schedule is `capture_video.frame_schedule` over the prices it reads: a frame's instant is
+    the instant the capture seeked to, not `(frame - step start) / fps`, which is up to a
+    frame early because a step does not begin on the frame grid.
+    """
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(headless=True)
         page = browser.new_page(viewport={"width": 1920, "height": 1080})
         page.goto(page_path.resolve().as_uri())
         page.wait_for_function(probe("benchmark/page-api-ready"))
-        for n in sorted(set(ns)):
-            calls = [["pause"], ["setStepN", n], ["schedule"]]
-            found[n] = page.evaluate(probe("api/apply"), {"calls": calls})
+        opened = apply(page, [["setMode", "animate"], ["state"]])
+        apply(
+            page,
+            [
+                *animation_defaults(opened),
+                ["setCitations", citations],
+                *simple_speed_commands(simple_speed, opened),
+                *pricing_commands(first, last),
+            ],
+        )
+        chosen = [p for p in apply(page, [["pairs"]]) if first <= int(p["n"]) + 1 <= last]
+        if not chosen:
+            raise SystemExit(f"{page_path} carries no steps in {first}..{last}")
+        durations = [
+            float(apply(page, [["select", int(pair["index"])], ["duration"]]))
+            for pair in chosen
+        ]
+        timetable = {
+            int(pair["n"]) + 1: apply(page, [["select", int(pair["index"])], ["schedule"]])
+            for pair in chosen
+        }
+        beat = page.evaluate(probe("capture/beat"))
         browser.close()
-    return found
+    samples = frame_schedule(price_steps(chosen, durations, beat), fps)
+    counts = frames_per_step(samples, len(chosen))
+    return Beat(
+        steps=tuple(
+            {"n": int(pair["n"]) + 1, "kind": str(pair["kind"]), "frames": count}
+            for pair, count in zip(chosen, counts, strict=True)
+        ),
+        samples=samples,
+        timetable=timetable,
+    )
+
+
+def kept_grey(frames_dir: Path, index: int) -> np.ndarray:
+    """One kept frame, full size, in grey."""
+    return np.asarray(Image.open(frames_dir / (FRAME_PATTERN % index)).convert("L"))
+
+
+def changed_around(frames_dir: Path, frame: int, last: int, *, around: int = 2) -> str:
+    """What changed into and out of a stutter, from the capture's own full-size frames.
+
+    The series above says how much; this says WHAT. A mean, and a moved-pixel count at the
+    measuring size, cannot tell an outline's stroke fading out and back from a square moving:
+    both are thousands of pixels. The box and the peak can -- a stroke at a high peak inside
+    the packing's own frame is the container box, a whole region at a low peak is something
+    arriving -- and it is how the box blink of 2026-09-22 was named.
+    """
+    pairs = [(i, i + 1) for i in range(max(0, frame - 1 - around), min(frame + around, last))]
+    return "; ".join(
+        f"{a}->{b} {change_between(kept_grey(frames_dir, a), kept_grey(frames_dir, b)).says()}"
+        for a, b in pairs
+    )
 
 
 def detail(
     changes: Sequence[float],
     cadence: Cadence,
     *,
-    steps: Sequence[dict[str, object]] = (),
-    timetable: dict[int, dict[str, float]] | None = None,
+    beat: Beat | None = None,
     regions: dict[str, list[float]] | None = None,
     frames_dir: Path | None = None,
     around: int = 4,
@@ -416,12 +580,7 @@ def detail(
     for frame in cadence.stutters:
         start = max(0, frame - 1 - around)
         window = " ".join(f"{c:.3f}" for c in changes[start : frame + around])
-        where = ""
-        if steps:
-            n, kind, t = locate(frame, steps, cadence.fps)
-            where = f", step into {n} ({kind}) at t {t:.3f} s"
-            if timetable is not None and n in timetable:
-                where += f", {nearest_instant(t, timetable[n], cadence.fps)}"
+        where = "" if beat is None else beat.says(frame, cadence.fps)
         lines.append(f"    frame {frame} ({frame / cadence.fps:.3f} s{where}): {window}")
         for name, series in (regions or {}).items():
             if name != "all":
@@ -430,6 +589,9 @@ def detail(
         if frames_dir is not None:
             png = frame_changes(frames_dir, start, min(frame + around, len(changes)))
             lines.append(f"      {'pngs':>8}: " + " ".join(f"{c:.3f}" for c in png))
+            lines.append(
+                f"      {'changed':>8}: " + changed_around(frames_dir, frame, len(changes))
+            )
     return lines
 
 
@@ -452,8 +614,6 @@ def explain(
     if not receipt_path.is_file():
         if priced is None:
             return detail(changes, cadence, regions=regions, frames_dir=frames_dir)
-        steps = priced_range(PAGE, priced[0], priced[1], round(cadence.fps))
-        ns = [locate(frame, steps, cadence.fps)[0] for frame in cadence.stutters]
         note = [
             f"    (no receipt: placed by pricing n = {priced[0]} to {priced[1]} from {PAGE})"
         ]
@@ -462,32 +622,37 @@ def explain(
             *detail(
                 changes,
                 cadence,
-                steps=steps,
-                timetable=schedules(PAGE, ns),
+                beat=beat_of_cut(
+                    PAGE, priced[0], priced[1], round(cadence.fps), citations=False
+                ),
                 regions=regions,
                 frames_dir=frames_dir,
             ),
         ]
     receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
-    steps = receipt["steps"]
-    page = Path(receipt["page"])
-    timetable = None
+    page = cut_page(video)
+    beat = Beat(steps=tuple(receipt["steps"]))
     note = []
-    if (
-        page.is_file()
-        and hashlib.sha256(page.read_bytes()).hexdigest() == receipt["page_sha256"]
-    ):
-        ns = [locate(frame, steps, cadence.fps)[0] for frame in cadence.stutters]
-        timetable = schedules(page, ns) if ns else {}
+    if page is not None:
+        first, last = (int(v) for v in receipt["range"])
+        beat = beat_of_cut(
+            page,
+            first,
+            last,
+            int(receipt["fps"]),
+            citations=receipt.get("citations") is True,
+            simple_speed=receipt.get("simple_speed"),
+        )
     else:
-        note = [f"    ({page} is not the page this was cut from, so no schedule is read)"]
+        note = [
+            f"    ({receipt['page']} is not the page this was cut from, so no schedule is read)"
+        ]
     return [
         *note,
         *detail(
             changes,
             cadence,
-            steps=steps,
-            timetable=timetable,
+            beat=beat,
             regions=regions,
             frames_dir=frames_dir,
         ),
@@ -501,6 +666,27 @@ def cut_cited(video: Path) -> bool:
     if not receipt.is_file():
         return False
     return json.loads(receipt.read_text(encoding="utf-8")).get("citations") is True
+
+
+def cut_page(video: Path) -> Path | None:
+    """The page a cut came from, when its receipt names one that is still on disk unchanged.
+
+    `--verify` re-draws a finding from a page and asks whether the fresh draw holds, so it has
+    to be THIS cut's page: drawing from the built page a cut of some other page reports every
+    difference between the two as a stutter the page never had. `None` says the cut cannot be
+    placed against a page at all, and the caller decides what that is worth.
+    """
+    receipt_path = video.with_suffix(".receipt.json")
+    if not receipt_path.is_file():
+        return None
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    page = Path(receipt["page"])
+    if (
+        page.is_file()
+        and hashlib.sha256(page.read_bytes()).hexdigest() == receipt["page_sha256"]
+    ):
+        return page
+    return None
 
 
 def report(video: Path, cadence: Cadence) -> str:
@@ -571,7 +757,12 @@ def main() -> int:
         if o.verify and o.frames is not None and o.range is not None and cadence.stutters:
             indices = sorted({i for s in cadence.stutters for i in (s - 1, s)})
             rendered = render_frames(
-                PAGE, o.range[0], o.range[1], round(fps), indices, citations=cut_cited(video)
+                cut_page(video) or PAGE,
+                o.range[0],
+                o.range[1],
+                round(fps),
+                indices,
+                citations=cut_cited(video),
             )
             if o.dump is not None:
                 o.dump.mkdir(parents=True, exist_ok=True)

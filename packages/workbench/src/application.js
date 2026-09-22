@@ -4271,7 +4271,15 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       // the light grey outside it saying how much room n + 1 needs, that grey darkening in place
       // when the step begins, and then the dark line shrinking back to green at n + 1's side.
       box = open;
-      ink = easeInOut(ramp(t, sc.containerStart, sc.containerEnd));
+      // Darkening into the grey only makes sense where there was grey to darken into. The dwell
+      // draws the box at `Math.min(from, open)`; where n's best side is already n + 1's room --
+      // every grid fill -- that IS `open`, drawn at full ink, so easing the ink from zero here
+      // blinks the outline out instead of darkening it. At the 4x speed-up the whole ease is
+      // under two frames, which is a stroke that vanishes for one frame and returns: 44 of the
+      // 73 repeated frames the cadence check found in the n = 1..100 cut (`think-dh9j`,
+      // 2026-09-22), measured at a peak of 121 grey levels over the box's own frame.
+      ink =
+        Math.min(from, open) === open ? 1 : easeInOut(ramp(t, sc.containerStart, sc.containerEnd));
       trace = open;
       seen = 1;
       held = open;

@@ -11,7 +11,7 @@ from __future__ import annotations
 import numpy as np
 
 from workbench_tools import cadence
-from workbench_tools.cadence import MOTION, MOVED_EDGE, REPEAT
+from workbench_tools.cadence import MOTION, MOVED_EDGE, REPEAT, change_between
 
 FPS = 60.0
 #: A step's moved pixels frame to frame: a dwell that holds, a move, and a settle that holds.
@@ -80,3 +80,46 @@ def test_a_finding_is_placed_in_its_step_and_against_its_schedule() -> None:
     assert cadence.locate(60, steps, FPS) == (10, "matched", 0.1)
     schedule = {"moveStart": 0.6, "moveEnd": 2.728, "end": 3.028}
     assert cadence.nearest_instant(0.617, schedule, FPS) == "+1 frames from moveStart"
+
+
+def test_a_frame_is_placed_at_the_instant_the_capture_seeked_to() -> None:
+    """A step does not begin on the frame grid, so the frame counts alone place a frame early.
+
+    The receipt says the step into 9 owns 54 frames, which is all counting them can say; the
+    step's own length is not 54 sixtieths, so the instant the capture seeked frame 55 to is
+    not `(55 - 54) / 60`. `Beat` carries the capture's own frame schedule where it has one and
+    falls back to the counts where it does not. Naming an instant a frame out is what sent the
+    2026-09-22 findings to `moveStart` when they sit at `arrive`.
+    """
+    steps = [
+        {"n": 9, "kind": "prefix", "frames": 54},
+        {"n": 10, "kind": "matched", "frames": 182},
+    ]
+    counted = cadence.Beat(steps=tuple(steps))
+    assert counted.place(55, FPS) == (10, "matched", 1 / FPS)
+    seeked = cadence.Beat(
+        steps=tuple(steps),
+        samples=(
+            *(cadence.FrameSample(index=k, step=0, at=0.0) for k in range(55)),
+            cadence.FrameSample(index=55, step=1, at=0.033),
+        ),
+    )
+    assert seeked.place(55, FPS) == (10, "matched", 0.033)
+
+
+def test_a_change_says_where_it_fell_and_how_hard() -> None:
+    """A stroke fading and a square arriving both move thousands of pixels; the box and the
+    peak are what tell them apart, and how the container box's one-frame blink was named."""
+    paper = np.full((1080, 1920), 250, dtype=np.uint8)
+    stroke = paper.copy()
+    stroke[100:900, 200:203] = 20  # an outline drawn down the packing's own frame
+    fading = change_between(stroke, paper)
+    assert fading.peak > 200
+    assert fading.regions == ("packing",)
+    assert fading.box[2] - fading.box[0] < 20  # a line, not a region
+    arriving = paper.copy()
+    arriving[100:900, 200:900] = 120  # a square filling a region of the same height
+    filled = change_between(paper, arriving)
+    assert filled.moved > 10 * fading.moved
+    assert filled.box[2] - filled.box[0] > 600
+    assert change_between(paper, paper).moved == 0
