@@ -1,0 +1,810 @@
+softschema:
+  contract: packing.squares:ClaudeEfficiencyRollup/v1
+  schema: ../schemas/claude-efficiency-rollup.schema.yaml
+  envelope: rollup
+  status: enforced
+rollup:
+  source:
+    harness: claude-code
+    filename: b5cf94b1-01cb-4a19-bb70-9051d5eecc8d.jsonl
+    sha256: aa4d298f944e2894bfeada70ef13496f72714f35c4264e5d3949a4b93469b061
+    bytes: 21070202
+    records: 6496
+    session_id: b5cf94b1-01cb-4a19-bb70-9051d5eecc8d
+    harness_versions:
+    - 2.1.275
+  span:
+    started_at: '2026-09-21T17:02:42.731Z'
+    ended_at: '2026-09-22T01:56:00.514Z'
+    wall_seconds: 31997.783
+  turns:
+    assistant: 2080
+    sidechain: 0
+    by_model:
+      claude-opus-5: 2078
+      <synthetic>: 2
+    by_thinking_level:
+      xhigh: 1839
+      max: 239
+      None: 2
+    by_model_and_thinking_level:
+      claude-opus-5 @ xhigh: 1839
+      claude-opus-5 @ max: 239
+      <synthetic> @ None: 2
+    by_branch:
+      claude/workbench-full-ascent-video: 2063
+      HEAD: 17
+    latency:
+      count: 2080
+      total_seconds: 11566.415
+      median_seconds: 3.127
+      max_seconds: 152.04
+  tokens:
+    cache_creation_input_tokens: 6495321
+    cache_read_input_tokens: 913754660
+    ephemeral_1h_input_tokens: 6495321
+    ephemeral_5m_input_tokens: 0
+    input_tokens: 4160
+    output_tokens: 1793262
+    thinking_tokens: 857030
+  tokens_by_thinking_level:
+    None:
+      cache_creation_input_tokens: 0
+      cache_read_input_tokens: 0
+      ephemeral_1h_input_tokens: 0
+      ephemeral_5m_input_tokens: 0
+      input_tokens: 0
+      output_tokens: 0
+    max:
+      cache_creation_input_tokens: 1334574
+      cache_read_input_tokens: 107061149
+      ephemeral_1h_input_tokens: 1334574
+      ephemeral_5m_input_tokens: 0
+      input_tokens: 478
+      output_tokens: 217582
+      thinking_tokens: 125231
+    xhigh:
+      cache_creation_input_tokens: 5160747
+      cache_read_input_tokens: 806693511
+      ephemeral_1h_input_tokens: 5160747
+      ephemeral_5m_input_tokens: 0
+      input_tokens: 3682
+      output_tokens: 1575680
+      thinking_tokens: 731799
+  tool_calls:
+    total: 1067
+    total_seconds: 7241.479
+    share_of_wall: 0.2263
+    errors: 21
+    denied: 0
+    unpaired_results: 0
+    outstanding_at_snapshot: 1
+    one_off_code:
+      count: 176
+      total_seconds: 2039.789
+      median_seconds: 3.963
+      max_seconds: 61.597
+    by_tool:
+      Bash:
+        count: 923
+        total_seconds: 5685.301
+        median_seconds: 1.347
+        max_seconds: 119.5
+      AskUserQuestion:
+        count: 3
+        total_seconds: 1432.732
+        median_seconds: 336.075
+        max_seconds: 1043.014
+      mcp__Claude_Browser__browser_batch:
+        count: 27
+        total_seconds: 54.79
+        median_seconds: 1.67
+        max_seconds: 8.774
+      mcp__Claude_Browser__javascript_tool:
+        count: 30
+        total_seconds: 53.231
+        median_seconds: 1.67
+        max_seconds: 3.853
+      SendUserFile:
+        count: 5
+        total_seconds: 4.494
+        median_seconds: 1.293
+        max_seconds: 1.826
+      mcp__Claude_Browser__preview_start:
+        count: 2
+        total_seconds: 4.223
+        median_seconds: 2.112
+        max_seconds: 2.218
+      Read:
+        count: 35
+        total_seconds: 1.626
+        median_seconds: 0.039
+        max_seconds: 0.214
+      mcp__Claude_Browser__navigate:
+        count: 1
+        total_seconds: 1.536
+        median_seconds: 1.536
+        max_seconds: 1.536
+      Monitor:
+        count: 2
+        total_seconds: 1.45
+        median_seconds: 0.725
+        max_seconds: 1.398
+      Edit:
+        count: 15
+        total_seconds: 0.634
+        median_seconds: 0.041
+        max_seconds: 0.071
+      Write:
+        count: 8
+        total_seconds: 0.382
+        median_seconds: 0.042
+        max_seconds: 0.091
+      mcp__Claude_Browser__computer:
+        count: 4
+        total_seconds: 0.362
+        median_seconds: 0.069
+        max_seconds: 0.167
+      mcp__ccd_session__mark_chapter:
+        count: 3
+        total_seconds: 0.214
+        median_seconds: 0.04
+        max_seconds: 0.142
+      ToolSearch:
+        count: 3
+        total_seconds: 0.132
+        median_seconds: 0.037
+        max_seconds: 0.061
+      mcp__ccd_session__spawn_task:
+        count: 1
+        total_seconds: 0.116
+        median_seconds: 0.116
+        max_seconds: 0.116
+      mcp__Claude_Browser__find:
+        count: 1
+        total_seconds: 0.108
+        median_seconds: 0.108
+        max_seconds: 0.108
+      mcp__Claude_Browser__resize_window:
+        count: 1
+        total_seconds: 0.043
+        median_seconds: 0.043
+        max_seconds: 0.043
+      mcp__Claude_Browser__read_console_messages:
+        count: 1
+        total_seconds: 0.038
+        median_seconds: 0.038
+        max_seconds: 0.038
+      mcp__Claude_Browser__tabs_context:
+        count: 1
+        total_seconds: 0.034
+        median_seconds: 0.034
+        max_seconds: 0.034
+      TaskStop:
+        count: 1
+        total_seconds: 0.033
+        median_seconds: 0.033
+        max_seconds: 0.033
+    by_command:
+      npm && pass && pytest && workbench_tools.check_animate_view:
+        count: 6
+        total_seconds: 386.703
+        median_seconds: 64.469
+        max_seconds: 68.674
+      npm && fail) && workbench_tools.build_site && workbench_tools.check_frontend:
+        count: 2
+        total_seconds: 200.924
+        median_seconds: 100.462
+        max_seconds: 119.5
+      uv run packing-validate:
+        count: 6
+        total_seconds: 138.2
+        median_seconds: 15.24
+        max_seconds: 71.494
+      pytest && workbench_tools.check_animate_view:
+        count: 2
+        total_seconds: 89.919
+        median_seconds: 44.959
+        max_seconds: 45.756
+      npm && packing-validate:
+        count: 1
+        total_seconds: 82.99
+        median_seconds: 82.99
+        max_seconds: 82.99
+      packing-validate && SUCCEED:
+        count: 1
+        total_seconds: 69.557
+        median_seconds: 69.557
+        max_seconds: 69.557
+      uv run python -m workbench_tools.check_frontend:
+        count: 1
+        total_seconds: 68.678
+        median_seconds: 68.678
+        max_seconds: 68.678
+      ruff && workbench_tools.check_animate_view:
+        count: 2
+        total_seconds: 67.807
+        median_seconds: 33.904
+        max_seconds: 34.065
+      uv run python -m workbench_tools.check_animate_view:
+        count: 2
+        total_seconds: 67.742
+        median_seconds: 33.871
+        max_seconds: 34.693
+      python3 && ruff && workbench_tools.check_animate_view:
+        count: 2
+        total_seconds: 67.437
+        median_seconds: 33.719
+        max_seconds: 33.732
+      uv run python -m workbench_tools.capture_video:
+        count: 5
+        total_seconds: 65.46
+        median_seconds: 13.326
+        max_seconds: 34.525
+      workbench_tools.build_site && rm && workbench_tools.capture_video && cp:
+        count: 2
+        total_seconds: 64.153
+        median_seconds: 32.077
+        max_seconds: 32.383
+      const && const && // && const && const && npx && npx && workbench_tools.build_site && workbench_tools.check_animate_view:
+        count: 1
+        total_seconds: 61.597
+        median_seconds: 61.597
+        max_seconds: 61.597
+      rm && npm && pass && ✖ && workbench_tools.build_site:
+        count: 1
+        total_seconds: 59.028
+        median_seconds: 59.028
+        max_seconds: 59.028
+      workbench_tools.build_site && pytest && workbench_tools.check_animate_view:
+        count: 1
+        total_seconds: 56.043
+        median_seconds: 56.043
+        max_seconds: 56.043
+      uv run python -m workbench_tools.build_site:
+        count: 3
+        total_seconds: 55.661
+        median_seconds: 18.719
+        max_seconds: 19.037
+      npx && npm && fail) && ruff && basedpyright && pytest && workbench_tools.build_site && packing-validate:
+        count: 1
+        total_seconds: 55.221
+        median_seconds: 55.221
+        max_seconds: 55.221
+      workbench_tools.build_site && rm && workbench_tools.capture_video:
+        count: 2
+        total_seconds: 54.101
+        median_seconds: 27.051
+        max_seconds: 31.671
+      rm && workbench_tools.capture_video && python && pytest && workbench_tools.check_animate_view:
+        count: 1
+        total_seconds: 53.039
+        median_seconds: 53.039
+        max_seconds: 53.039
+      npm && pass && pytest:
+        count: 2
+        total_seconds: 52.98
+        median_seconds: 26.49
+        max_seconds: 39.929
+      pytest && workbench_tools.check_animate_view && python:
+        count: 1
+        total_seconds: 52.588
+        median_seconds: 52.588
+        max_seconds: 52.588
+      perl && ruff && ruff && workbench_tools.check_frontend:
+        count: 1
+        total_seconds: 51.543
+        median_seconds: 51.543
+        max_seconds: 51.543
+      workbench_tools.build_site && workbench_tools.check_animate_view:
+        count: 1
+        total_seconds: 51.514
+        median_seconds: 51.514
+        max_seconds: 51.514
+      workbench_tools.check_frontend && the && pack && search) && ValueError:
+        count: 1
+        total_seconds: 51.024
+        median_seconds: 51.024
+        max_seconds: 51.024
+      uv run python -m pytest:
+        count: 8
+        total_seconds: 50.254
+        median_seconds: 6.247
+        max_seconds: 11.733
+      python3 && encode_sweep.py:
+        count: 1
+        total_seconds: 49.76
+        median_seconds: 49.76
+        max_seconds: 49.76
+      workbench_tools.build_site && workbench_tools.check_transitions:
+        count: 2
+        total_seconds: 48.771
+        median_seconds: 24.385
+        max_seconds: 25.179
+      npm && pass && pytest && workbench_tools.build_site:
+        count: 1
+        total_seconds: 48.306
+        median_seconds: 48.306
+        max_seconds: 48.306
+      npx && ruff && ruff && packing-validate && workbench_tools.check_frontend:
+        count: 1
+        total_seconds: 45.571
+        median_seconds: 45.571
+        max_seconds: 45.571
+      python3 && npx && npm && pass && workbench_tools.build_site:
+        count: 1
+        total_seconds: 45.48
+        median_seconds: 45.48
+        max_seconds: 45.48
+      npm run:
+        count: 4
+        total_seconds: 45.374
+        median_seconds: 6.239
+        max_seconds: 27.056
+      workbench_tools.check_animate_view && pytest:
+        count: 1
+        total_seconds: 44.009
+        median_seconds: 44.009
+        max_seconds: 44.009
+      npm && pass && error && workbench_tools.build_site:
+        count: 1
+        total_seconds: 43.335
+        median_seconds: 43.335
+        max_seconds: 43.335
+      npx && npm && fail) && ✖ && error && ruff && ruff && workbench_tools.build_site && no:
+        count: 1
+        total_seconds: 38.983
+        median_seconds: 38.983
+        max_seconds: 38.983
+      npm && eslint && tsc && error && warn && ✖:
+        count: 1
+        total_seconds: 38.564
+        median_seconds: 38.564
+        max_seconds: 38.564
+      npm && pass && fail):
+        count: 2
+        total_seconds: 38.186
+        median_seconds: 19.093
+        max_seconds: 19.535
+      ? "align-items: && gap: && Baseline, && align-items: && gap: && .note-row && ,\n   \
+        \ note.appendChild(row(angles, && Shade indicates number of full-side contacts.))\
+        \ && ,\n    note.appendChild(row(shades, && npx && workbench_tools.build_site && rm\
+        \ && workbench_tools.capture_video && capture-video-*)"
+      : count: 1
+        total_seconds: 37.539
+        median_seconds: 37.539
+        max_seconds: 37.539
+      time uv run python -m workbench_tools.check_transitions:
+        count: 1
+        total_seconds: 37.318
+        median_seconds: 37.318
+        max_seconds: 37.318
+      ruff && basedpyright && (cd && npx && workbench_tools.check_frontend:
+        count: 1
+        total_seconds: 36.424
+        median_seconds: 36.424
+        max_seconds: 36.424
+      workbench_tools.build_site && rm && workbench_tools.capture_video && capture-video-*) && python:
+        count: 1
+        total_seconds: 35.813
+        median_seconds: 35.813
+        max_seconds: 35.813
+    by_command_family:
+      other:
+        count: 249
+        total_seconds: 2621.752
+        median_seconds: 2.267
+        max_seconds: 68.678
+      toolchain:
+        count: 163
+        total_seconds: 1986.564
+        median_seconds: 2.376
+        max_seconds: 119.5
+      filesystem:
+        count: 37
+        total_seconds: 404.096
+        median_seconds: 4.79
+        max_seconds: 59.028
+      project:
+        count: 22
+        total_seconds: 289.075
+        median_seconds: 4.664
+        max_seconds: 71.494
+      inspection:
+        count: 365
+        total_seconds: 205.325
+        median_seconds: 0.102
+        max_seconds: 18.761
+      vcs:
+        count: 67
+        total_seconds: 164.967
+        median_seconds: 1.641
+        max_seconds: 21.053
+      shell:
+        count: 5
+        total_seconds: 2.685
+        median_seconds: 0.157
+        max_seconds: 1.189
+    invoked:
+      head: 549
+      tail: 391
+      cd: 380
+      grep: 279
+      sed: 234
+      echo: 233
+      const: 202
+      ls: 110
+      cat: 92
+      npx: 83
+      n: 69
+      npm run: 65
+      cut: 58
+      uv run ruff check: 54
+      rm: 52
+      uv run python -m workbench_tools.build_site: 50
+      python3: 50
+      uv run python -m workbench_tools.capture_video: 45
+      pass: 42
+      //: 41
+      wc: 36
+      uv run python -m pytest: 33
+      perl: 32
+      git add: 28
+      git log: 26
+      uv run ruff format: 25
+      uv run python -m workbench_tools.check_animate_view: 25
+      uv run python: 24
+      '})': 24
+      sleep: 20
+      uv run basedpyright: 20
+      the: 20
+      git push: 19
+      uv run packing-validate: 19
+      cp: 19
+      git diff: 18
+      /: 18
+      git status: 17
+      ✖: 17
+      tbd create: 17
+      df: 16
+      open: 16
+      ? ",\n    "
+      : 16
+      git commit: 15
+      'left:': 15
+      'top:': 15
+      uv run python -m workbench_tools.check_transitions: 15
+      '*': 14
+      s: 14
+      git show: 13
+      'height:': 13
+      curl: 12
+      ? "n\n    "
+      : 12
+      shasum: 12
+      'width:': 11
+      held: 11
+      capture-video-*): 10
+      seen: 10
+      let: 9
+      uv run python -m workbench_tools.delivery: 9
+      a: 9
+      'display:': 9
+      'gap:': 9
+      attributionAt: 9
+      ps: 9
+      config.fastSimple: 8
+      tbd list: 8
+      '**': 8
+      fail: 8
+      The: 8
+      t: 8
+      time uv run python -m workbench_tools.check_frontend: 8
+      index: 7
+      assert.ok(chromaOf(colours,: 7
+      'position:': 7
+      stage.offsetWidth: 7
+      trace: 7
+      fail): 7
+      mv: 7
+      Implementation,: 7
+      error: 6
+      'align-items:': 6
+      diskutil: 6
+      near(pairDuration(config,: 6
+      rail.getClientRects().length: 6
+      0): 6
+      mkdir: 5
+      slow: 5
+      tbd update: 5
+      None: 5
+      JS: 5
+      out: 5
+      tbd show: 5
+      placeAttribution(): 5
+      line.appendChild(swatches): 5
+      box: 5
+      (!optimizing: 5
+      o[key]: 5
+      '[dwell,': 5
+      uv run pytest: 5
+      ffmpeg: 4
+      git checkout: 4
+      du: 4
+      duration: 4
+      tbd guidelines: 4
+      tbd shortcut: 4
+      ', ': 4
+      'null': 4
+      (python3: 4
+      (progress: 4
+      reading: 4
+      assert.equal(colours.mix(#808080,: 4
+      left: 4
+      'white-space:': 4
+      near(: 4
+      near(pairTiming(config,: 4
+      'no': 4
+      measureHeadline(): 4
+      (!shown: 4
+      shown.offsetWidth: 4
+      ? ",\n              "
+      : 4
+      read: 4
+      'grid:': 4
+      (!optimizing): 4
+      setColorRule(): 4
+      updateSegments(): 4
+      render(): 4
+      ANIMATE.holdSquare: 4
+      '1': 4
+      fill: 4
+      'n:': 4
+      EOF: 4
+      uv run python -m devtools.render_pr_rollup: 4
+      uv run python -m workbench_tools.check_layout: 4
+      uv run python -m workbench_tools.layout_gallery: 4
+      git branch: 3
+      git submodule: 3
+      config.simple: 3
+      tbd search: 3
+      tbd sync: 3
+      tbd template: 3
+      ? '
+
+        echo'
+      : 3
+      oklchHex(: 3
+      assert.ok(: 3
+      short: 3
+      tbd close: 3
+      git fetch: 3
+      gh pr: 3
+      and: 3
+      find: 3
+      at: 3
+      near(gap(0,: 3
+      headline: 3
+      rail: 3
+      'font-size:': 3
+      'font-weight:': 3
+      (fills.length: 3
+      line.appendChild(document.createTextNode(text)): 3
+      line: 3
+      .note-row: 3
+      'border:': 3
+      'side_of:': 3
+      'flex:': 3
+      ink: 3
+      markGapBar(): 3
+      document: 3
+      (next.in: 3
+      setColourFade(o): 3
+      input.disabled: 3
+      input.value: 3
+      pkill: 3
+      scene.presentation.newTint: 3
+      (cd: 3
+      api.setContinuous({: 3
+      uv run python -m workbench_tools.check_frontend: 3
+      modes.contains(trace-active): 3
+      Error: 3
+      Complete: 3
+      Retire-success: 3
+      ([^: 3
+      which: 2
+      node: 2
+      time uv run python -m workbench_tools.build_site: 2
+      traceback: 2
+      failed: 2
+      finiteNonnegative(duration,: 2
+      sysctl: 2
+      git: 2
+      STEP: 2
+      defects.md): 2
+      uv run python -m devtools.render_document_map: 2
+      SUCCEED: 2
+      uv run python -m devtools.check_synopsis: 2
+      bookkeeping: 2
+      git worktree: 2
+      ascent-n1-100-1080p60.receipt.json: 2
+      labToHex(: 2
+      hueOf(hex): 2
+      (const: 2
+      (): 2
+      (red: 2
+      to: 2
+      .*: 2
+      Checked: 2
+      conforms: 2
+      ascent-n1-324-1080p60.receipt.json: 2
+      log: 2
+      git merge-base: 2
+      git rev-parse: 2
+      git merge: 2
+      gh auth: 2
+      assert.deepEqual(: 2
+      near(beat.dwell,: 2
+      near(beat.move,: 2
+      near(beat.correct,: 2
+      near(beat.settle,: 2
+      near(gap(1,: 2
+      it: 2
+      'touch-action:': 2
+      '{{n': 2
+      Where: 2
+      (rail: 2
+      shades: 2
+      htmlNode(gapbar-grid).innerHTML: 2
+      .note-math: 2
+      FAIL: 2
+      swatch.style.background: 2
+      swatches.appendChild(swatch): 2
+      n}n.note-swatches: 2
+      swatch.style.setProperty(--swatch-fill,: 2
+      A: 2
+      console.log(`: 2
+      colour.ts: 2
+      box.getClientRects().length: 2
+      'fill:': 2
+      text: 2
+      (legend: 2
+      legend.getClientRects().length: 2
+      traceRect.setAttribute(opacity,: 2
+      '`standardize`': 2
+      i: 2
+      i++): 2
+      holdsColour[i]: 2
+      angleGap(foldAngle(there),: 2
+      rebuildPair(): 2
+      'animateStandardize:': 2
+      animateBox.checked: 2
+      animateBox.disabled: 2
+      colorScheme: 2
+      '[setGrowth,': 2
+      size: 2
+      rate: 2
+      '{held}': 2
+      i,v: 2
+      'out:': 2
+      '[out,': 2
+      (other): 411
+    invoked_families:
+      other: 1896
+      inspection: 1727
+      shell: 636
+      toolchain: 346
+      vcs: 170
+      filesystem: 84
+      project: 36
+    by_shell_shape:
+      compound:
+        count: 533
+        total_seconds: 2939.31
+        median_seconds: 1.296
+        max_seconds: 119.5
+      python_heredoc:
+        count: 123
+        total_seconds: 1642.063
+        median_seconds: 8.345
+        max_seconds: 61.597
+      pipeline:
+        count: 115
+        total_seconds: 575.907
+        median_seconds: 0.316
+        max_seconds: 71.494
+      python_inline:
+        count: 53
+        total_seconds: 397.726
+        median_seconds: 2.267
+        max_seconds: 53.039
+      heredoc:
+        count: 38
+        total_seconds: 121.128
+        median_seconds: 1.912
+        max_seconds: 22.138
+      simple:
+        count: 63
+        total_seconds: 10.617
+        median_seconds: 0.081
+        max_seconds: 1.814
+    by_thinking_level:
+      xhigh:
+        count: 971
+        total_seconds: 6943.242
+        median_seconds: 1.315
+        max_seconds: 1043.014
+      max:
+        count: 96
+        total_seconds: 298.237
+        median_seconds: 1.291
+        max_seconds: 55.221
+    shell_traits:
+      pipes: 713
+      redirects_output: 201
+      substitutes: 48
+  session_events:
+    compact_boundaries: 1
+    stop_hook_summaries: 32
+    queue_operations:
+      enqueue: 102
+      remove: 67
+      dequeue: 35
+  semantics:
+    wall_seconds: First to last timestamped record. It is elapsed session time and includes
+      every interval in which nothing was running, so it is an upper bound on work and never
+      a measure of it.
+    tool_call_seconds: From the assistant record issuing a tool_use to the user record carrying
+      its tool_result. It therefore includes harness scheduling and any permission wait, not
+      only the tool's own execution.
+    model_seconds: UNAVAILABLE for this harness. Claude Code's transcript records no timed
+      model-stream items and no first-token latency, so model time cannot be separated from
+      the interval before a turn's record is written. It is absent rather than zero, and a
+      consumer that sums it with a harness that does report it must carry the gap forward.
+    turns.latency: 'From a turn''s parent record to the turn itself. It is the closest thing
+      here to model time and is NOT model time: it also carries queueing, the user''s own
+      thinking time before a reply, and any wait for a permission prompt. Read the median,
+      not the maximum.'
+    share_of_wall: tool_call_seconds over wall_seconds. Concurrent calls are summed independently,
+      so on a session that backgrounds work this can exceed one and is a load figure, not
+      an occupancy figure.
+    tokens: 'As the harness reported them per turn, summed. Cache creation and cache read
+      are distinct from input tokens and are not double-counted here, but no cost is derived:
+      pricing is not this record''s and a stored price goes stale silently.'
+    tokens_by_thinking_level: The same counters split by the effort the harness recorded for
+      each turn. This is what makes OR-2's 'matched to the task' claim answerable rather than
+      asserted.
+    by_shell_shape: Structural classification of shell commands in a fixed priority order,
+      so a Python heredoc that also pipes counts as a Python heredoc. `python_heredoc` and
+      `python_inline` are the shapes OR-1 calls one-off code; a session with many of them
+      was writing scripts where it should have been building a tool.
+    by_command: 'The tool a shell command actually runs. Every chain is split into components,
+      shell bookkeeping and text munging are dropped, and what is left names the command:
+      one component and it takes the full invoked form, so `uv run packing-validate` keeps
+      its runner and `grep -rn x . | head -5` is `grep`; several and the name is the chain
+      of bare tools, so `make format && git add -A && git push` is `make && git && git`. Peeling
+      matters more than it sounds: keyed on the leading word instead, `cd` led 524 of 882
+      commands here. Past 256 distinct names the tail folds into `(other)`, which is a long
+      tail of odd commands or a resolver bug rather than anything to act on.'
+    invoked: 'Every tool reached for, counted across all segments of every command, not just
+      the one a call''s time was attributed to. Counts and never elapsed: most commands here
+      run several tools and the transcript times the call rather than the pipeline, so how
+      often a CLI was used is knowable and its share of the clock is not. This is the table
+      that answers which instruments a session actually uses; `by_command` answers where its
+      measured time went.'
+    by_command_family: Our own instruments against everything else. `project` is this repository's
+      CLIs and modules, `toolchain` the language tooling, `inspection` the reading and searching
+      a session does to orient itself. Time in `packing-validate` and time in `grep` are both
+      real and are not the same kind of cost.
+    errors: tool_result blocks the harness marked is_error. A failed call still spends its
+      elapsed time, and the count is here so a rising failure rate is visible rather than
+      hidden inside the total.
+    unpaired_results: tool_result blocks whose tool_use was not seen, which is normal for
+      a log that begins mid-session after a compaction. A large count means the elapsed figures
+      cover less than the session does.
+    session_events.queue_operations: Messages queued and withdrawn while a turn was running.
+      An enqueue is an interjection, which is a signal about the session's pacing rather than
+      about any tool.
+    excluded: 'Every prose body: assistant text, thinking text, user messages, tool stdout
+      and stderr, file contents, and diffs. This record is not a transcript and cannot be
+      read as one.'
