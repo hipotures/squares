@@ -1,0 +1,6 @@
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+limit record agrees with the source certificate: campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-226-n11-dilation-limit-corollary-net2880.json
+
+real	32m6.953s
+user	29m11.859s
+sys	2m25.725s
