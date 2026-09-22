@@ -1,0 +1,32 @@
+# exp-223 (H-U5): the grid escape at n = 12, 20, 21.
+#
+# Written before the sweep ran. It is exp-202's round-1 part-1 plan with one arm and
+# three cells substituted, and nothing else changed: same engine, same
+# budget_pair_tests per chain, same chain count, same seeds, same flags.
+#
+# Why these three cells. exp-202 chose eleven cells every one of which beats the
+# trivial grid, so no arm could score by returning the incumbent. n = 12, 20 and 21 are
+# the opposite case: their best known packings ARE the grid (4, 5, 5), and no
+# grid-capable arm has ever been run at any of them. exp-202's own mechanism
+# measurement (devtools/measure_objective_sparsity.py) found that at the trivial grid
+# NO single-square proposal lowers required_side at any tested n, so the control arm
+# provably cannot leave the grid here and is not run; the only informative arm is the
+# collective one.
+#
+# The budget is exp-202's: 1.25e9 pair tests per chain, 8 chains, so 1e10 per
+# (cell, seed). Pair tests rather than moves or seconds, because this host carries
+# three other research lanes and a wall-clock budget would measure them.
+#
+# threads is 2 rather than exp-202's 3 because this lane is capped at about two of four
+# shared cores. sqsearch keys its RNG on (seed, chain) alone -- Rng::keyed(seed, chain)
+# in sqsearch/src/search.rs -- so the thread count changes the wall clock and nothing
+# about the numbers.
+label: exp-223-grid-escape-n12-20-21
+engine: sqsearch/target/release/sqsearch
+budget_pair_tests: 1250000000
+chains: 8
+threads: 2
+cells: [12, 20, 21]
+seeds: [1, 2, 3, 4, 5]
+arms:
+  B-perturb: ["--p-perturb", "1.0", "--perturb-scale", "2"]

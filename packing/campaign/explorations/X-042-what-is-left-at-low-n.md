@@ -184,6 +184,29 @@ unbuilt. After repair the edit tier passes at `124.4 s` against its `240 s` ceil
 This is recorded because a review block that cannot run its own instruments is not a
 review block, and because the next session should not rediscover it.
 
+## What the Unrestricted Test Actually Returned
+
+The `A2` cell is decided, and the number is not marginal.
+Read through the gate’s own exact route at a stratified sample of the 1440 net, the
+measure’s **least charge is `305414321/1000000000 = 0.305414321`, at direction 0**, the
+axis-aligned one, with the witness core pushed into the container corner `1.4e-5` off
+flush against both walls.
+Nine of the seventeen sampled directions charge below 1. Direction 0 belongs to every
+net this repository builds, so the refutation holds at 288, at 1440 and at every finer
+net.
+
+That is not a near miss, and it is the expected shape once the restricted domain is
+understood: the parent-centre envelope is exactly what excludes corner-flush cores, and
+a measure optimised against it has no reason to charge them at all.
+The whole-net figure varies domain, selector and net together, so `0.305414321` is an
+**upper bound on what the restriction alone costs and never a measurement of it**. The
+measurement is the single-row witness above, which moves only the centre.
+
+A `Condition 5'` decision is a conjunction over directions, so a sample can refuse and
+can never accept.
+Seventeen directions of 1,441 refute; they are not a complete decision,
+and none was run.
+
 ## The Gate Cannot Reach These Artifacts, and That Is Structural
 
 Found by running the `A2` cell rather than by reasoning about it, and it bounds the
@@ -203,6 +226,12 @@ is built**, whatever its mathematics, because one of the two required routes wil
 look at it. The `C4` rung is structurally out of reach for artifacts at the scale they
 now arrive at, and the five-value ladder shows that scale is rising — 1,620 atoms, then
 1,616, then 3,280, then 8,988 sites.
+
+The cap is not confined to the interval route either.
+`AtomData.of` is the point route’s loader as well, so an `A1` certificate that keeps
+more than 4,096 atoms from this support meets the same wall: the ceiling binds the
+first-party colgen route at this scale too, not only the intake of someone else’s
+measure.
 
 The guard is conservative rather than fundamental.
 It exists to refuse an input-driven allocation in the hundreds of megabytes, and it does

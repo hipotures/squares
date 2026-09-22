@@ -51,10 +51,30 @@ integer polygon crossings, reading the artifact’s `sum(w) + 5 sum(w_t) < 2^50`
 Agreeing on the *cell counts* as well as the minima is the sharp part — a differently
 partitioned sweep would not.
 
+`epistemics.md` is explicit that a control path proves only that a control is retained,
+not that it bites, so the guards were shown three tampered sources (scratch copies, not
+retained):
+
+| Tamper | What it mimics | Refused by |
+| --- | --- | --- |
+| two point orbits of equal size swapped | the expansion order that gives the triple indices their meaning | `C8` at row 0, on the *cell count*: 190,194,929 against 190,415,641 |
+| one site moved by `1e-3` | a coordinate-scale or rotation slip | `C8` at row 1,570, on the cell count, by 8 cells |
+| one threshold orbit dropped | a truncated read of the triples | `C4`, expanded budget 16,990,626,852 against 16,998,427,356 |
+
+What the guards do *not* catch, stated because it is the honest boundary: a single site
+nudged by `1e-8` — one unit on the source’s coordinate scale — left all eight sampled
+rows’ minima, slabs and cells unchanged and was emitted.
+`C8` bites on errors that move the event grid or the minimising cell, which is the shape
+every translation bug takes; it is not a digest of the site list.
+
 ## C9: the un-confounded measurement
 
 The sharpest number in this lane, and the one that is free of the confound in the next
-section. It holds catalogue row 6512’s own core fixed — its own half-tangent
+section. The row and the centre were derived by the block’s parallel mathematical review
+lane and handed to this one; what is recorded here is that this lane’s translation, run
+through `--charge-at`, reproduces that lane’s rational to its last digit — two
+derivations, one number, and neither reading the other’s code.
+It holds catalogue row 6512’s own core fixed — its own half-tangent
 `t = 706027763/1920000000` (parent band `40.3756°`–`40.3829°`, beside Bidwell’s `39.80°`
 tilt), its own side `B`, the artifact’s own sites and triples — and moves only the
 centre, to the placement whose rotated core touches the wall,
@@ -103,8 +123,10 @@ REFUSED: the interval route could not decide it: the interval verifier supports 
 
 `MAX_INTERVAL_ATOMS` is 4,096 and the translation carries 6,744 point atoms, so the
 two-route gate cannot reach `RETAINABLE`, or a two-route refusal, on an object this
-size. That is a tool limit and not a verdict, and cell `A1` will meet it on the same
-support.
+size. That is a tool limit and not a verdict.
+`MAX_INTERVAL_ATOMS` lives in `sqpack.fractional.interval` and `AtomData.of` is the
+point route’s loader too, so any `A1` certificate that keeps more than 4,096 atoms from
+this 8,988-site support meets the same wall.
 
 `Condition 5'` was therefore decided by the gate’s *exact* route, read through the
 gate’s own loader at a stratified sample of the 1440 net’s directions
@@ -247,6 +269,10 @@ Emitted bytes beside this receipt:
   the translation carries 6,744 point atoms, so the two-route gate cannot reach
   `RETAINABLE` or a two-route refusal on any object of this size.
   That is a tool limit and not a verdict.
+- **`C9` is one row and one centre.** It establishes that the restriction is
+  load-bearing by at least `7.6978e-4` at row 6512; it does not measure the worst such
+  shortfall over the catalogue, and says nothing about what the restriction is worth at
+  any other row.
 - **Nothing about a re-priced measure.** Whether an LP priced unrestricted on this
   support reaches `4.6198` is cell `A1`, untouched here.
 - **`C8` is a 204-row sample, not a replay.** All 7,853 rows would be about an hour in
@@ -256,10 +282,9 @@ Emitted bytes beside this receipt:
 - **`H-235` is a 415-row sample** of the same catalogue, and one-sided: it establishes
   that the triples are load-bearing and not the exact least point-only charge over all
   7,853 rows.
-- **The receipt is not in the document map.** `docs/project/document-map.yaml` is
-  outside this lane’s write scope; the entry
-  (`role: research-report, authority: record, lifecycle: retained`) is the
-  coordinator’s.
+- **No unit test.** A new file under `packing/tests/` was outside this lane’s write
+  scope; the tool’s guards were exercised by the three tampered sources above and by the
+  runs in the table, and a regression test for the translator is a follow-up.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

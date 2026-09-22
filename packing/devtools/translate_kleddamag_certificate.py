@@ -18,9 +18,17 @@ the parent survives the translation, so ``Condition 5'`` then quantifies over *e
 closed ``B``-square at a net direction inside the container -- a strict superset of the
 artifact's centres, since ``B <= A`` and each row's own check
 ``B (c(t) + s(t)) / 2 <= r`` puts the core's envelope inside the parent's. A pass would
-therefore hand the repository the external bound in its own gate; a fail measures, by its
-least charge, what the parent-centre restriction carries. Neither reading is worth
-anything if the translation moved the object, which is what the controls below are for.
+therefore hand the repository the external bound in its own gate, and that implication is
+one-sided in the useful direction.
+
+A *fail* is weaker than it looks, and the difference matters enough to state here. The
+whole-net decision replaces the artifact's adaptive per-row selector -- a core angle within
+``0.006`` degrees of its parent band, a per-row ``B`` anywhere in the measured band -- with
+fixed net directions and one ``B``, so it varies the selector and the net alongside the
+domain. Its least charge is an *upper bound* on what the parent-centre restriction costs
+and never a measurement of it. The measurement is ``--charge-at`` below, which moves the
+centre and nothing else. Neither reading is worth anything if the translation moved the
+object, which is what the controls below are for.
 
 Three choices in the translation, each of which could be made differently and none of
 which is free:
@@ -66,6 +74,25 @@ segment-free slab sweep over the same signed rectangle expansion
 ``sum(w) + 5 sum(w_triple) < 2^50`` headroom, with the polygon crossings taken in exact
 integer arithmetic. It agrees with the retained replay on the cell counts as well as the
 minima, which a differently-partitioned sweep would not.
+
+Three measurements ride on the same expansion, each behind its own flag because each
+costs something:
+
+``--charge-at`` (``C9``) charges one catalogue row's *own* core -- its own ``t``, its own
+``B``, the artifact's own sites -- at one named centre, by membership counting in exact
+rationals. It is the un-confounded reading of what the parent-centre restriction carries,
+because it moves the centre and nothing else; the whole-net decision below moves the
+domain, the selector and the net together and can only bound it.
+
+``--point-only-rows`` is the ``H-235`` screen: the same restricted rows with every
+two-of-three atom dropped, deciding whether the triples are load-bearing at these weights.
+
+``--sweep-certificate`` with ``--sweep-directions`` decides ``Condition 5'`` at a sample of
+an emitted record's own net directions, reading the bytes through
+`devtools.decide_threshold_certificate`'s loader and running that gate's own exact sweep.
+``Condition 5'`` is a conjunction over directions, so a sample refuses and never accepts;
+it exists because the whole net is hours of gate at this support size and a lane that only
+needs to refuse should not pay for them.
 
 Usage, from `packing/`:
 
