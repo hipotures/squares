@@ -87,7 +87,65 @@ of particular rows near `40°`, not of every wall-touching placement.
 on the emitted bytes at both nets.
 `Condition 5'` is where it ends.
 
-VERDICT_PLACEHOLDER
+**Refuted, at the first direction of the net.**
+
+`decide_threshold_certificate --quick` on the 1440-net record printed every closed-form
+condition as holding and then stopped short of `Condition 5'`:
+
+```text
+holds: Condition 1 atoms carry the declared symmetry: 6744 atoms closed under D4 about the centre
+holds: Condition 1' threshold atoms carry the declared symmetry: 2008 threshold atoms closed under D4 about the centre
+holds: Condition 2' total budget below n: point mass 183001451/12500000 + threshold budget 589577819/250000000 = 4249606839/250000000 against n = 17
+holds: Condition 3 net reaches pi/4: final half-tangent 207107/500000, t^2 + 2t - 1 = 309449/250000000000
+holds: Condition 4 containment B(1 + D) < 1: B = 1722291350…159199/1725109098…000000, D = 207107/720000000
+REFUSED: the interval route could not decide it: the interval verifier supports at most 4096 atoms
+```
+
+`MAX_INTERVAL_ATOMS` is 4,096 and the translation carries 6,744 point atoms, so the
+two-route gate cannot reach `RETAINABLE`, or a two-route refusal, on an object this
+size. That is a tool limit and not a verdict, and cell `A1` will meet it on the same
+support.
+
+`Condition 5'` was therefore decided by the gate’s *exact* route, read through the
+gate’s own loader at a stratified sample of the 1440 net’s directions
+(`--sweep-certificate … --sweep-directions 16`). `Condition 5'` is a conjunction over
+directions, so a sample can refuse and can never accept; each least charge was
+re-evaluated at its own witness by membership counting and every one agreed.
+
+| Direction | least charge |  | Direction | least charge |
+| --- | --- | --- | --- | --- |
+| **0** | **0.305414321** |  | 810 | 1.002070398 |
+| 90 | 0.991934973 |  | 900 | 1.002009541 |
+| 180 | 1.001080902 |  | 990 | 1.001816536 |
+| 270 | 0.998609646 |  | 1080 | 1.001898228 |
+| 360 | 0.992023896 |  | 1170 | 1.000378319 |
+| 450 | 0.994774912 |  | 1260 | 0.996103915 |
+| 540 | 0.994654619 |  | 1350 | 0.991233779 |
+| 630 | 1.001359213 |  | 1440 | 0.987138141 |
+| 720 | 1.001743655 |  |  |  |
+
+Nine of the seventeen are below 1. The binding direction is index 0, half-tangent `0` —
+the axis-aligned one — at least charge
+
+```
+305414321/1000000000 = 0.305414321,
+```
+
+with the witness centre `(19967893/40000000, 19967893/40000000)` in the rotated frame,
+which at this direction is the container frame: the core pushed into the corner,
+`1.4e-5` off flush against both walls.
+Direction 0 belongs to every net this repository builds, so this refutation stands at
+288, 1440 and every finer net, and the emitted 288-net record is refused by it too.
+
+The complete 288-direction `--exact-only` gate run was launched
+(`PACK_JOBS=2 … --workers 2`, 90-minute deadline) and **stopped at 18 minutes,
+incomplete**. At the contention this block ran under — load average 10 to 20 on four
+cores, two other research lanes — each worker held about a quarter of a core and the 289
+directions projected to about 2.1 hours against a 90-minute ceiling (`OR-17`). It was
+stopped rather than left to time out, because its only output would have been a least
+charge already known to be at most `0.305414321` at a direction already named.
+Its partial output is retained as `exp-221-decide-net288-exact.stdout`, which carries
+the closed-form conditions and nothing of `Condition 5'`.
 
 ## The confound, named
 
@@ -129,7 +187,20 @@ By homogeneity the point part rescales to a point certificate at the same
 `(L, B, catalogue)` exactly when its least charge exceeds
 `M_p / 17 = 183001451/212500000 = 0.861183299`.
 
-H235_PLACEHOLDER
+**The triples are load-bearing, and not marginally.** Over a 415-row stratified sample —
+every nineteenth row of the catalogue, plus the last — the least point-only charge is
+
+```
+370792263/500000000 = 0.741584526   at row 5130,
+```
+
+a margin of `-1016589569/8500000000 = -0.119598773` below `M_p / 17`. The point part
+reaches 86.1% of what it would need.
+Row 0 alone already refutes, at `0.793735377`, and the screen is one-sided: one row
+below `M_p / 17` settles it, so the sample costs nothing in what can be concluded.
+Stripped of its triples and rescaled, this measure is not a point certificate at
+`L = 4613/1000` on its own catalogue; the `2.358311276` of two-of-three budget is doing
+real work, not decorating.
 
 The screen is one-sided and about *these* weights only: a point-only linear program with
 the triples’ budget returned to the sites is a different question and this says nothing
@@ -145,11 +216,16 @@ All from `packing/`, all `uv run --frozen --all-extras --group dev`.
 | 87.9 s | `python -m devtools.translate_kleddamag_certificate --direction-steps 1440 --control-rows 200 --quiet --output …-net1440.json --report …-report-net1440.json` |
 | 23.0 s | `python -m devtools.translate_kleddamag_certificate --direction-steps 1440 --control-rows 24 --quiet --charge-at 6512 wall 218746/100000 --charge-at 6237 wall 218746/100000 --report …-witness-control.json` |
 | 1.3 s | `python -m devtools.decide_threshold_certificate --quick --workers 1 …-net1440.json` |
-| DECIDE_WALL | `PACK_JOBS=2 python -m devtools.decide_threshold_certificate --exact-only --workers 2 …-net288.json` |
-| H235_WALL | `python -m devtools.translate_kleddamag_certificate --point-only-rows 400 --control-rows 0 --report …-h235-point-only-screen.json` |
+| 18 m 14 s, stopped incomplete | `PACK_JOBS=2 timeout 5400 python -m devtools.decide_threshold_certificate --exact-only --workers 2 …-net288.json` |
+| 2 m 45 s | `python -m devtools.translate_kleddamag_certificate --control-rows 0 --direction-steps 1440 --sweep-certificate …-net1440.json --sweep-directions 16 --report …-unrestricted-direction-sweep.json` |
+| 2 m 52 s | `python -m devtools.translate_kleddamag_certificate --point-only-rows 400 --control-rows 0 --report …-h235-point-only-screen.json` |
 
-The machine carried a load average of 15 to 20 on four cores throughout, from other
-lanes; every wall above is a contended wall and none of them is a cost measurement.
+The machine carried a load average of 10 to 20 on four cores throughout, from other
+lanes, and the two workers of the gate run each held about 25% of a core.
+Every wall above is a contended wall and none of them is a cost measurement.
+The `H-235` and direction-sweep commands pass `--control-rows 0`, so `C8` does not
+re-run inside them; they read the same source digest `0288aaac…d69cec` through the same
+expander that `C8` confirmed in the two emission commands above.
 
 Emitted bytes beside this receipt:
 
@@ -160,10 +236,11 @@ Emitted bytes beside this receipt:
 
 ## What this did not establish
 
-- **No complete 1440-net decision.** `Condition 5'` over all 1,441 directions is about
-  2.6 hours of gate on two uncontended workers and was not run; what ran is the nested
-  288-net decision, whose directions are every fifth direction of the 1440 net, so its
-  refutation is a refutation there too.
+- **No complete-net decision at either net.** `Condition 5'` over all 1,441 directions
+  is about 2.6 hours of gate on two uncontended workers; the nested 288-direction run is
+  about an hour, and neither finished here.
+  What is decided is a 17-direction sample, which is enough to refuse and never enough
+  to accept. The net’s own least charge is at most `0.305414321` and may be lower.
 - **No `C4` or `C5` rung for anything.** Nothing here is registered, and the emitted
   records are candidates, not certificates.
 - **The interval route never decided this object.** `MAX_INTERVAL_ATOMS` is 4,096 and
@@ -172,6 +249,13 @@ Emitted bytes beside this receipt:
   That is a tool limit and not a verdict.
 - **Nothing about a re-priced measure.** Whether an LP priced unrestricted on this
   support reaches `4.6198` is cell `A1`, untouched here.
+- **`C8` is a 204-row sample, not a replay.** All 7,853 rows would be about an hour in
+  this tool; the sample is stratified and contains the row attaining the global minimum,
+  and it matched the retained replay on every row it touched, but it is not a complete
+  reproduction of the artifact’s sweep.
+- **`H-235` is a 415-row sample** of the same catalogue, and one-sided: it establishes
+  that the triples are load-bearing and not the exact least point-only charge over all
+  7,853 rows.
 - **The receipt is not in the document map.** `docs/project/document-map.yaml` is
   outside this lane’s write scope; the entry
   (`role: research-report, authority: record, lifecycle: retained`) is the

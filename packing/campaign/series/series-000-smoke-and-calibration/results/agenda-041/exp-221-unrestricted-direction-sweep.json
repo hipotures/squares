@@ -1,0 +1,131 @@
+{
+  "source": "/home/user/squares/packing/resources/web/n17-kleddamag-certified-bound-2026-09-21/kleddamag-17-squares-certified-bound/global-certificate.json",
+  "source_sha256": "0288aaac680131aa675adb63ea6a67e3d363fcca6061d4c788301da7c5d69cec",
+  "structure": {
+    "available_point_orbits": 1134,
+    "positive_point_orbits": 852,
+    "physical_sites": 8988,
+    "positive_sites": 6744,
+    "threshold_orbits": 253,
+    "physical_triples": 2008,
+    "point_budget_units": 14640116080,
+    "threshold_budget_units": 2358311276,
+    "total_budget_units": 16998427356
+  },
+  "core_side_band": [
+    "17222913506866278366600017442224375944783077159199/17251090982558979015112715291272840801000000000000",
+    "392274404235301509353271379462242479024485262216379657/392853403757170308517924585309722853620343000000000000"
+  ],
+  "catalogue_rows": 7853,
+  "direction_steps": 1440,
+  "square_side": "17222913506866278366600017442224375944783077159199/17251090982558979015112715291272840801000000000000",
+  "total_budget": "4249606839/250000000",
+  "containment_product": "12404064710891386978265683988213957444072611743384490227293/12420785507442464890881155009716445376720000000000000000000",
+  "emitted_atoms": 6744,
+  "emitted_threshold_atoms": 2008,
+  "restricted_replay_control": "skipped",
+  "point_only_screen": "skipped",
+  "unrestricted_witness_control": "skipped",
+  "unrestricted_direction_sweep": {
+    "certificate": "campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-221-n17-kleddamag-unrestricted-net1440.json",
+    "directions_swept": 17,
+    "directions_in_net": 1441,
+    "least_charge": "305414321/1000000000",
+    "least_charge_float": 0.305414321,
+    "binding_direction": 0,
+    "binding_half_tangent": "0",
+    "binding_witness_rotated_frame": [
+      "19967893/40000000",
+      "19967893/40000000"
+    ],
+    "refuted": true,
+    "per_direction": [
+      {
+        "direction": 0,
+        "least_charge": "305414321/1000000000",
+        "least_charge_float": 0.305414321
+      },
+      {
+        "direction": 90,
+        "least_charge": "991934973/1000000000",
+        "least_charge_float": 0.991934973
+      },
+      {
+        "direction": 180,
+        "least_charge": "500540451/500000000",
+        "least_charge_float": 1.001080902
+      },
+      {
+        "direction": 270,
+        "least_charge": "499304823/500000000",
+        "least_charge_float": 0.998609646
+      },
+      {
+        "direction": 360,
+        "least_charge": "124002987/125000000",
+        "least_charge_float": 0.992023896
+      },
+      {
+        "direction": 450,
+        "least_charge": "7771679/7812500",
+        "least_charge_float": 0.994774912
+      },
+      {
+        "direction": 540,
+        "least_charge": "994654619/1000000000",
+        "least_charge_float": 0.994654619
+      },
+      {
+        "direction": 630,
+        "least_charge": "1001359213/1000000000",
+        "least_charge_float": 1.001359213
+      },
+      {
+        "direction": 720,
+        "least_charge": "200348731/200000000",
+        "least_charge_float": 1.001743655
+      },
+      {
+        "direction": 810,
+        "least_charge": "501035199/500000000",
+        "least_charge_float": 1.002070398
+      },
+      {
+        "direction": 900,
+        "least_charge": "1002009541/1000000000",
+        "least_charge_float": 1.002009541
+      },
+      {
+        "direction": 990,
+        "least_charge": "125227067/125000000",
+        "least_charge_float": 1.001816536
+      },
+      {
+        "direction": 1080,
+        "least_charge": "250474557/250000000",
+        "least_charge_float": 1.001898228
+      },
+      {
+        "direction": 1170,
+        "least_charge": "1000378319/1000000000",
+        "least_charge_float": 1.000378319
+      },
+      {
+        "direction": 1260,
+        "least_charge": "199220783/200000000",
+        "least_charge_float": 0.996103915
+      },
+      {
+        "direction": 1350,
+        "least_charge": "991233779/1000000000",
+        "least_charge_float": 0.991233779
+      },
+      {
+        "direction": 1440,
+        "least_charge": "987138141/1000000000",
+        "least_charge_float": 0.987138141
+      }
+    ],
+    "seconds": 159.7
+  }
+}

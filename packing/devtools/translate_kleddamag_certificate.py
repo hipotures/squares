@@ -84,6 +84,7 @@ import json
 import sys
 import time
 from bisect import bisect_left, bisect_right
+from collections.abc import Callable
 from concurrent.futures import ProcessPoolExecutor
 from dataclasses import dataclass
 from fractions import Fraction
@@ -95,7 +96,9 @@ from typing import Any, cast
 
 import numpy as np
 
+from devtools.decide_threshold_certificate import load
 from sqpack.fractional.certificate import d4_images
+from sqpack.fractional.threshold import ThresholdCertificate, exact_charge, minimum_charge
 
 PACKING = Path(__file__).resolve().parent.parent
 ARTIFACT = (
@@ -601,6 +604,113 @@ def _sweep_rows(
     return pairs
 
 
+def direction_sweep(path: Path, count: int, *, workers: int, verbose: bool) -> dict[str, Any]:
+    """The emitted certificate's least charge at a sample of its own net directions.
+
+    `devtools.decide_threshold_certificate` decides ``Condition 5'`` at every direction of
+    the net and prints one number; at this size that is hours of sweep, and a lane that
+    only needs to *refuse* does not need all of them. ``Condition 5'`` is a conjunction
+    over directions, so one direction whose least charge falls below 1 refuses the
+    certificate, and refuses every finer net containing that direction as well. This reads
+    the bytes through the gate's own loader, so the object swept is the gate's object, and
+    then runs the gate's own exact sweep at a stratified sample of directions -- index 0
+    always among them -- re-evaluating each least charge at its witness by membership
+    counting, which is the sweep's own independent check.
+
+    A sample decides a weaker statement than the net does. It can refuse and it can never
+    accept, and the report says so in ``refuted``; the least charge it reports is an upper
+    bound on the net's own least charge, never a measurement of it.
+    """
+    certificate, _ = load(path.read_bytes())
+    total = len(certificate.half_tangents)
+    stride = max(1, total // max(1, count))
+    sample = sorted({*range(0, total, stride), total - 1})
+    started = time.perf_counter()
+    results = _sweep_directions(
+        certificate, sample, workers=workers, verbose=verbose, started=started
+    )
+    least, at, witness = min(results, key=lambda row: row[0])
+    return {
+        "certificate": str(path),
+        "directions_swept": len(sample),
+        "directions_in_net": total,
+        "least_charge": str(least),
+        "least_charge_float": float(least),
+        "binding_direction": at,
+        "binding_half_tangent": str(certificate.half_tangents[at]),
+        "binding_witness_rotated_frame": [str(value) for value in witness],
+        "refuted": least < 1,
+        "per_direction": [
+            {"direction": index, "least_charge": str(value), "least_charge_float": float(value)}
+            for value, index, _ in sorted(results, key=lambda row: row[1])
+        ],
+        "seconds": round(time.perf_counter() - started, 1),
+    }
+
+
+def _one_direction(
+    argument: tuple[ThresholdCertificate, int],
+) -> tuple[Fraction, int, tuple[Fraction, Fraction]]:
+    certificate, index = argument
+    least, witness = minimum_charge(
+        certificate.atoms,
+        certificate.threshold_atoms,
+        certificate.directions[index],
+        certificate.outer_side,
+        certificate.square_side,
+        dense_cell_limit=0,
+    )
+    membership = _membership(certificate, index, witness)
+    recount = exact_charge(certificate.atoms, certificate.threshold_atoms, membership)
+    if recount != least:
+        raise TranslationError(
+            f"direction {index}: the sweep says {least} and membership counting {recount}"
+        )
+    return least, index, witness
+
+
+def _membership(
+    certificate: ThresholdCertificate, index: int, witness: tuple[Fraction, Fraction]
+) -> Callable[[Fraction, Fraction], bool]:
+    """Is a point inside the core the sweep's witness centre names? Exactly, by counting."""
+    direction = certificate.directions[index]
+    half = certificate.square_side / 2
+    centre_u, centre_v = witness
+
+    def contains(x: Fraction, y: Fraction) -> bool:
+        return (
+            abs(direction.ux * x + direction.uy * y - centre_u) <= half
+            and abs(direction.vx * x + direction.vy * y - centre_v) <= half
+        )
+
+    return contains
+
+
+def _sweep_directions(
+    certificate: ThresholdCertificate,
+    sample: list[int],
+    *,
+    workers: int,
+    verbose: bool,
+    started: float,
+) -> list[tuple[Fraction, int, tuple[Fraction, Fraction]]]:
+    arguments = [(certificate, index) for index in sample]
+    if workers > 1:
+        with ProcessPoolExecutor(max_workers=workers, mp_context=get_context("fork")) as pool:
+            return list(pool.map(_one_direction, arguments))
+    results: list[tuple[Fraction, int, tuple[Fraction, Fraction]]] = []
+    for argument in arguments:
+        results.append(_one_direction(argument))
+        if verbose:
+            value, index, _ = results[-1]
+            print(
+                f"  direction {index}: least charge {float(value):.9f} "
+                f"({time.perf_counter() - started:.1f}s)",
+                flush=True,
+            )
+    return results
+
+
 def control_rows(expansion: Expansion, replay: dict[str, Any], count: int) -> list[int]:
     """A deterministic sample: the two ends, the tight row, and an even stride between."""
     rows = cast(list[dict[str, int]], replay["rows"])
@@ -894,7 +1004,21 @@ def main(argv: list[str] | None = None) -> int:
             "pass 7853 or more for the whole catalogue, 0 to skip"
         ),
     )
-    parser.add_argument("--workers", type=int, default=1, help="forked processes for H-235")
+    parser.add_argument(
+        "--workers", type=int, default=1, help="forked processes for the sweeps"
+    )
+    parser.add_argument(
+        "--sweep-certificate", type=Path, help="an emitted record to sweep unrestricted"
+    )
+    parser.add_argument(
+        "--sweep-directions",
+        type=int,
+        default=0,
+        help=(
+            "net directions of --sweep-certificate to decide Condition 5' at; a sample can "
+            "refuse and can never accept"
+        ),
+    )
     parser.add_argument("--quiet", action="store_true", help="no per-row C8 progress")
     args = parser.parse_args(argv)
     try:
@@ -912,6 +1036,17 @@ def main(argv: list[str] | None = None) -> int:
     except (TranslationError, OSError, KeyError, ValueError) as error:
         print(f"REFUSED: {error}", flush=True)
         return 1
+    if args.sweep_certificate is not None and args.sweep_directions:
+        try:
+            report["unrestricted_direction_sweep"] = direction_sweep(
+                args.sweep_certificate,
+                args.sweep_directions,
+                workers=max(1, args.workers),
+                verbose=not args.quiet,
+            )
+        except (TranslationError, OSError, ValueError) as error:
+            print(f"REFUSED: {error}", flush=True)
+            return 1
     print(json.dumps(report, indent=2), flush=True)
     if args.control_rows == 0:
         print(

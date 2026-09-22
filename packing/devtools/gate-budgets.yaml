@@ -1275,12 +1275,11 @@ ci_gates:
     measured_seconds: 2540.6
     measured_on: '2026-09-22'
     measured_where: >-
-      The geometric mean of eight complete runs read by `devtools.check_ci_gate_walls`
-      on 2026-09-22, from run 35632055808 to run 34997041426 -- 35627075872,
-      35579234418, 35480905141, 35213757305, 35078581840 and 35012089923 between them --
-      reading 2611, 2773, 2762,
-      1882, 2590, 2635, 2581 and 2618 s from the run starting to its last gating job
-      completing.
+      In order, run 35632055808, 35627075872, 35579234418, 35480905141, 35213757305,
+      35078581840, 35012089923 and 34997041426, read by `devtools.check_ci_gate_walls`
+      on 2026-09-22 and reduced to their geometric mean.
+      Each reading is the run starting to its last gating job completing: 2611, 2773,
+      2762, 1882, 2590, 2635, 2581 and 2618 s.
     spread: 1.47
     ceiling_seconds: 3430.0
     argument: >-
@@ -1296,11 +1295,12 @@ ci_gates:
     measured_seconds: 2518.8
     measured_on: '2026-09-22'
     measured_where: >-
-      The geometric mean of the same eight runs, from run 35632055808 to run
-      34997041426 -- 35579234418, 35480905141, 35213757305, 35078581840, 35012089923 and
-      35627075872 between them -- reading 2608, 2771, 2674, 1879, 2588, 2606, 2576 and 2568 s of job wall. The 1879 s is run 35480905141 and it is a
-      faster runner rather than a smaller tier: its JUnit record has the same 58 tests,
-      each one faster by a near-uniform 1.43x.
+      In order, run 35632055808, 35627075872, 35579234418, 35480905141, 35213757305,
+      35078581840, 35012089923 and 34997041426, read by `devtools.check_ci_gate_walls`
+      on 2026-09-22 and reduced to their geometric mean.
+      Job wall: 2608, 2771, 2674, 1879, 2588, 2606, 2576 and 2568 s. The 1879 s is run
+      35480905141, and it is a faster runner rather than a smaller tier: its JUnit
+      record has the same 58 tests, each one faster by a near-uniform 1.43x.
     spread: 1.47
     ceiling_seconds: 3400.0
     argument: >-
@@ -1314,11 +1314,12 @@ ci_gates:
     measured_seconds: 2226.9
     measured_on: '2026-09-22'
     measured_where: >-
-      The geometric mean of the same eight runs, from run 35632055808 to run
-      34997041426 -- 35579234418, 35480905141, 35213757305, 35078581840, 35012089923 and
-      35627075872 between them -- reading 2465, 2492, 2469, 1713, 2467, 2462, 1578 and 2429 s of job wall. Both low readings are runner speed, not a smaller
-      selection: run 35012089923 ran the same eight steps as run 35579234418 for 1543.5s
-      of step time against 2435.7s.
+      In order, run 35632055808, 35627075872, 35579234418, 35480905141, 35213757305,
+      35078581840, 35012089923 and 34997041426, read by `devtools.check_ci_gate_walls`
+      on 2026-09-22 and reduced to their geometric mean.
+      Job wall: 2465, 2492, 2469, 1713, 2467, 2462, 1578 and 2429 s. Both low readings
+      are runner speed rather than a smaller selection: run 35012089923 ran the same
+      eight steps as run 35579234418 for 1543.5s of step time against 2435.7s.
     spread: 1.58
     ceiling_seconds: 3000.0
     argument: >-
@@ -1332,9 +1333,10 @@ ci_gates:
     measured_seconds: 921.7
     measured_on: '2026-09-22'
     measured_where: >-
-      The geometric mean of the same eight runs, from run 35632055808 to run
-      34997041426 -- 35579234418, 35480905141, 35213757305, 35078581840, 35012089923 and
-      35627075872 between them -- reading 990, 993, 999, 879, 953, 713, 913 and 973 s of job wall.
+      In order, run 35632055808, 35627075872, 35579234418, 35480905141, 35213757305,
+      35078581840, 35012089923 and 34997041426, read by `devtools.check_ci_gate_walls`
+      on 2026-09-22 and reduced to their geometric mean.
+      Job wall: 990, 993, 999, 879, 953, 713, 913 and 973 s.
     spread: 1.40
     ceiling_seconds: 1250.0
     argument: >-
@@ -1346,11 +1348,12 @@ ci_gates:
     measured_seconds: 914.0
     measured_on: '2026-09-22'
     measured_where: >-
-      The geometric mean of the same eight runs, from run 35632055808 to run
-      34997041426 -- 35579234418, 35480905141, 35213757305, 35078581840, 35012089923 and
-      35627075872 between them -- reading 973, 902, 909, 893, 806, 980, 965 and 897 s of job wall. The tightest
-      spread of the four, 1.22x, which is what a pooled step at `--inner-jobs 4` does to
-      runner variance.
+      In order, run 35632055808, 35627075872, 35579234418, 35480905141, 35213757305,
+      35078581840, 35012089923 and 34997041426, read by `devtools.check_ci_gate_walls`
+      on 2026-09-22 and reduced to their geometric mean.
+      Job wall: 973, 902, 909, 893, 806, 980, 965 and 897 s. The tightest spread of the
+      four, 1.22x, which is what a pooled step at `--inner-jobs 4` does to runner
+      variance.
     spread: 1.22
     ceiling_seconds: 1240.0
     argument: >-

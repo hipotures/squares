@@ -253,6 +253,10 @@ obligation `think-haam` carries that this session did not discharge.
 - **The split arithmetic is arithmetic.** No shard was built or measured; the floors are
   the largest single test and the largest single step, which is a lower bound on what a
   split can reach, not a measurement of one.
+- **`packing-validate --budgets` still prints only the tiers.** The CI entries are read
+  by `check_ci_gate_walls` and by the contract test, not by that view, and
+  `sqpack/cli/validate.py` was outside this lane’s file set.
+  One rendering call would close it.
 - **`think-haam` is not discharged.** This session built the third of its four
   obligations, the clocking.
   The wall ceiling as a policy rather than a band, the per-invocation selection record,
