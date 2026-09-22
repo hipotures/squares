@@ -17,6 +17,8 @@
 // - `attribution`: the repository's address under the stage's legend, where its first character
 //   starts and its baseline beside the legend's left edge and foot it is set from, its type, and
 //   the boxes it must not be drawn over. Null where no stage is shown.
+// - `legend`: the baseline the legend's sentence stands on and the baseline each of its formulas
+//   stands on. Null where the legend is not shown.
 //
 // The stage is a 1920 x 1080 poster drawn at `--stage-scale`, so `frames` and `attribution` are
 // measured in stage pixels: a rule in them holds at every window size rather than at one.
@@ -189,6 +191,34 @@
   // The obstacles are what it must not be drawn over -- the numeral, the packing, everything the
   // facts panels actually draw, and the page's own fixed note, which is outside the stage and so
   // maps to stage pixels outside it.
+  // The legend's sentence: the baseline its text stands on and the baseline each formula's
+  // glyphs stand on, in stage pixels. A zero-size inline-block sits exactly on the baseline of
+  // the line it is laid in, so one is appended to the sentence and one inside each formula's
+  // `.base`, where KaTeX sets its glyphs; both are read and taken away again before anything
+  // paints. Null where the legend is not shown.
+  const legend = () => {
+    const sentence = document.querySelector("#stage-note .note-sentence");
+    if (sentence === null || !shown(sentence)) {
+      return null;
+    }
+    const baselineOf = (/** @type {Element} */ line) => {
+      const marker = document.createElement("span");
+      marker.style.display = "inline-block";
+      marker.style.width = "0";
+      marker.style.height = "0";
+      line.appendChild(marker);
+      const at = staged(marker.getBoundingClientRect()).bottom;
+      marker.remove();
+      return at;
+    };
+    return {
+      text: baselineOf(sentence),
+      math: [...sentence.querySelectorAll(".note-math .base")].map((base) => ({
+        source: base.textContent ?? "",
+        baseline: baselineOf(base),
+      })),
+    };
+  };
   const attribution = () => {
     const holder = document.getElementById("stage-attribution");
     const text = /** @type {SVGTextElement | null} */ (
@@ -281,5 +311,6 @@
         : { "facts-a": layer("facts-a"), "facts-b": layer("facts-b") },
     frames: poster === null ? null : frames(),
     attribution: poster === null ? null : attribution(),
+    legend: poster === null ? null : legend(),
   };
 };

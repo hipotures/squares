@@ -6817,12 +6817,23 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       line.appendChild(document.createTextNode(text));
       return line;
     };
-    const sideOf = node("div", "note-row");
-    const math = node("span", "note-math");
-    math.innerHTML = METRICS.bound_html.side_of;
-    sideOf.appendChild(math);
-    sideOf.appendChild(
-      document.createTextNode(" is the side of the smallest square holding n unit squares"),
+    // **A sentence, not a flex row.** Its math is inline in the text the way KaTeX is made to
+    // be set, so each formula stands on the line's own baseline, and the `n` in the sentence --
+    // the same variable, so the same math (the owner, 2026-09-21) -- sits in the words rather
+    // than being a flex item with the row's gap on both sides of it. `check_layout` holds both
+    // formulas to the sentence's baseline and its letters' ink.
+    /** @param {string} html */
+    const math = (html) => {
+      const span = node("span", "note-math");
+      span.innerHTML = html;
+      return span;
+    };
+    const sideOf = node("div", "note-sentence");
+    sideOf.append(
+      math(METRICS.bound_html.side_of),
+      " is the side of the smallest square holding ",
+      math(METRICS.bound_html.n),
+      " unit squares",
     );
     note.appendChild(sideOf);
     // One swatch per angle family, and one family across its shades: the two things the picture

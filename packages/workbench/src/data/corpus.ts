@@ -52,7 +52,7 @@ export interface CorpusMetrics {
   numeral_weight: number;
   n_line_px: number;
   headline_gap_px: number;
-  bound_html: { area: string; grid: string; side_of: string };
+  bound_html: { area: string; grid: string; side_of: string; n: string };
   digit_bearing_px: number;
   n_bearing_px: number;
   badge_baseline: { letter: number; math: number; query: number };
@@ -265,6 +265,7 @@ function metrics(value: unknown): CorpusMetrics {
       area: string(bound.area),
       grid: string(bound.grid),
       side_of: string(bound.side_of),
+      n: string(bound.n),
     },
     digit_bearing_px: numeric(row.digit_bearing_px),
     n_bearing_px: numeric(row.n_bearing_px),

@@ -638,6 +638,43 @@ def capture_baseline(session: Session) -> str:
     return "the capture baseline reaches Animate from Pack"
 
 
+#: What on the stage is text a pointer could select: the legend's sentence, the headline and
+#: the facts column's first rows. A selection in any of them was painted through the animation.
+SELECTABLE_LOOKING = ("#stage-note .note-sentence", "#headline", "#gapbar")
+
+
+def stage_takes_no_selection(session: Session) -> str:
+    """A double-click or a drag across the stage's text selects nothing.
+
+    The owner saw the facts' text painted with a grey background through the animation
+    (2026-09-21): a click, drag or double-click on the stage left a browser selection, which is
+    repainted on every frame after it and is grey while the window is unfocused. The stage is a
+    poster and refuses selection, and this makes the gestures that caused it.
+    """
+    page = session.page
+    session.api(("pause",), ("setStepN", 11), ("seek", 0))
+    gestures = 0
+    for selector in SELECTABLE_LOOKING:
+        box = page.locator(selector).first.bounding_box()
+        session.require(box is not None, f"{selector} is not drawn to try selecting")
+        if box is None:
+            continue
+        x, y = box["x"] + box["width"] / 3, box["y"] + box["height"] / 2
+        page.mouse.dblclick(x, y)
+        page.mouse.move(x, y)
+        page.mouse.down()
+        page.mouse.move(box["x"] + box["width"] * 0.9, y, steps=6)
+        page.mouse.up()
+        gestures += 2
+        selected = session.look("stage/selection", clear=True)
+        session.require(
+            selected == "",
+            f"a double-click and a drag on {selector} selected {selected!r}",
+        )
+    session.api(("pause",), ("seek", 0))
+    return f"{gestures} double-clicks and drags across the stage's text select nothing"
+
+
 def readouts_claim_only_packings(session: Session) -> str:
     """No readout calls a non-packing valid, on the record, or gives it an excess or a side."""
 
@@ -722,6 +759,7 @@ SECTIONS: tuple[Callable[[Session], str], ...] = (
     headline_space,
     stage_clearance,
     stage_says_only_facts,
+    stage_takes_no_selection,
     readouts_claim_only_packings,
     *animate_view_contract.SECTIONS,
     capture_baseline,

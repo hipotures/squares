@@ -246,6 +246,12 @@ body.capture {
   transform: scale(var(--stage-scale));
   transform-origin: 0 0;
   box-shadow: var(--scene-shadow);
+  /* A poster, not a text surface. A click, drag or double-click on it selected the facts' text,
+     and the browser went on painting that selection -- grey while the window is unfocused --
+     over every frame of the animation after it (the owner, 2026-09-21). The link in the
+     attribution still takes its click; only selection is refused. */
+  -webkit-user-select: none;
+  user-select: none;
 }
 body.capture #stage {
   box-shadow: none;
@@ -494,14 +500,15 @@ body.drawing #packing-svg #squares {
    not move as a digit is gained.
    Anchored to the stage's floor with `bottom`: the numeral's ink runs 990 to 1035, 45 below the
    container's drawn edge and 45 above the stage's own. */
-/* The headline's ink starts level with the packing's own top edge (the owner, 2026-09-21), so
-   the two columns begin on one line and neither crowds the frame's top. The drawn container's
-   top is at 55.6 and KaTeX's strut opens 15 px above the digits -- measured, not computed, since
-   the strut is the face's business -- so the box sits at 41. */
+/* The headline sits a little below the packing's top edge (the owner, 2026-09-21: lower, with
+   more room above it). Level with that edge, at 41, its ink started at 55.6 -- KaTeX's strut
+   opens 15 px above the digits, measured rather than computed, since the strut is the face's
+   business -- and read as crowding the frame's top. 24 px lower its ink starts near 80, and it
+   still clears the gap bar under it, which `gapbar/clearance` holds. */
 #headline {
   position: absolute;
   left: 1116px;
-  top: 41px;
+  top: 65px;
   width: 768px;
   height: 96px;
 }
@@ -567,14 +574,18 @@ body.drawing #packing-svg #squares {
   color: var(--scene-heading);
   white-space: nowrap;
 }
-/* Baseline, not centre: the row holds KaTeX and text on one line, and centring their boxes
-   sits `s(n)` a little off the line the sentence is set on -- KaTeX's box is taller than the
-   text's and centring splits the difference. The swatches are not type and keep to the middle
-   of the line. */
+/* A swatch row: the swatches beside the line of text they explain. */
 .note-row {
   display: flex;
   align-items: baseline;
   gap: var(--stage-note-gap);
+}
+/* The legend's sentence is ordinary inline text with its math in the flow, which is how KaTeX
+   is made to be set, so each formula stands on the line's own baseline. It was a flex row, and
+   the sentence's `n` could not be math there without the row's gap on both sides of it.
+   `check_layout` measures the baselines and the letters' ink; neither rests on this comment. */
+.note-sentence {
+  display: block;
 }
 .note-swatches {
   display: block;

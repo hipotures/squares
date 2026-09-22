@@ -135,10 +135,14 @@ def _slug(size: tuple[int, int]) -> str:
     return f"{size[0]}x{size[1]}"
 
 
-def _open(browser: Browser, page_path: Path, size: tuple[int, int], view: View) -> Page:
-    """A fresh reduced-motion page at `size`, driven to `view`."""
+def _open(
+    browser: Browser, page_path: Path, size: tuple[int, int], view: View, scale: float = 1
+) -> Page:
+    """A fresh reduced-motion page at `size` and device `scale`, driven to `view`."""
     context = browser.new_context(
-        reduced_motion="reduce", viewport={"width": size[0], "height": size[1]}
+        reduced_motion="reduce",
+        viewport={"width": size[0], "height": size[1]},
+        device_scale_factor=scale,
     )
     page = context.new_page()
     page.goto(page_path.resolve().as_uri())
@@ -163,6 +167,48 @@ def _stage_still(browser: Browser, page_path: Path, view: View, path: Path) -> N
                 _api(page, ["setCapture", True])
             page.evaluate(probe("design/frames"))
             page.locator("#stage").screenshot(path=path)
+    finally:
+        page.context.close()
+
+
+#: The device scale the legend close-up is photographed at. Its type is 22 stage px, so at 1x a
+#: baseline a pixel off is one pixel of a small word, which is the size of offset the owner kept
+#: seeing and a stage still cannot show; at 3x it is three.
+LEGEND_SCALE = 3
+
+#: How much of the sentence either side of a formula its close-up keeps, in stage px.
+LEGEND_CONTEXT_PX = 90
+
+
+def _legend_still(browser: Browser, page_path: Path, view: View, path: Path) -> None:
+    """Photograph the stage's legend alone, close up, where it is shown."""
+    page = _open(browser, page_path, STAGE, view, scale=LEGEND_SCALE)
+    try:
+        legend = page.locator("#stage-note")
+        if legend.is_visible():
+            # In capture the stage is drawn at its own size; with the controls showing it is
+            # scaled to fit beside them, and the close-up would be of a legend half as big.
+            if _api(page, ["mode"]) == "animate":
+                _api(page, ["setCapture", True])
+            page.evaluate(probe("design/frames"))
+            legend.screenshot(path=path)
+            # Each formula with the words either side of it, small enough to be seen at full
+            # size: a baseline is judged against the letters beside it, not across the column.
+            line = page.locator("#stage-note .note-sentence").bounding_box()
+            for index, formula in enumerate(page.locator("#stage-note .note-math").all()):
+                box = formula.bounding_box()
+                if box is None or line is None:
+                    continue
+                left = max(0.0, box["x"] - LEGEND_CONTEXT_PX)
+                page.screenshot(
+                    path=path.with_name(f"{path.stem}-math-{index + 1}.png"),
+                    clip={
+                        "x": left,
+                        "y": line["y"],
+                        "width": box["x"] + box["width"] + LEGEND_CONTEXT_PX - left,
+                        "height": line["height"],
+                    },
+                )
     finally:
         page.context.close()
 
@@ -201,6 +247,7 @@ def capture(page_path: Path, out: Path, views: tuple[View, ...] = VIEWS) -> dict
                         )
                 page.context.close()
                 _stage_still(browser, page_path, view, folder / "stage.png")
+                _legend_still(browser, page_path, view, folder / "legend.png")
         finally:
             browser.close()
     out.mkdir(parents=True, exist_ok=True)

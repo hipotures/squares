@@ -1261,11 +1261,12 @@ def type_metrics() -> dict:
         # expression at every n, so they are rendered once here rather than per pair.
         "bound_html": dict(
             zip(
-                ("area", "grid", "side_of"),
+                ("area", "grid", "side_of", "n"),
                 # `s(n)` for the stage's legend goes through the same KaTeX as everything else
                 # it sits under: a legend that explained the panel's notation in a different
-                # face would be explaining something the panel does not draw.
-                katex_html([r"\sqrt{n}", r"\sqrt{n} + 1", r"s(n)"]),
+                # face would be explaining something the panel does not draw. So does the `n`
+                # in its sentence, which is the same variable (the owner, 2026-09-21).
+                katex_html([r"\sqrt{n}", r"\sqrt{n} + 1", r"s(n)", r"n"]),
                 strict=True,
             )
         ),

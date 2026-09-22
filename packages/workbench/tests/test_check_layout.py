@@ -11,13 +11,18 @@ import copy
 from collections.abc import Callable
 from typing import Any
 
+import numpy as np
 import pytest
 
 from workbench_tools.check_layout import (
+    LEGEND_INK_SLACK,
     attribution_findings,
     facts_findings,
     findings,
     frames_findings,
+    ink_bottoms,
+    legend_findings,
+    legend_ink_findings,
 )
 
 TYPE = {"family": '"Source Sans 3", sans-serif', "size": "28px", "weight": "500"}
@@ -352,3 +357,56 @@ def test_the_attribution_is_drawn_and_clears_what_the_stage_draws() -> None:
         "drawn over #packing-svg" in item
         for item in attribution_findings(across, aligned=False)
     )
+
+
+# -------------------------------------------------------------------------------- the legend
+
+
+def test_the_legends_math_must_stand_on_its_sentences_baseline() -> None:
+    # Measured on the page: the sentence and both formulas at 929.5.
+    aligned = {"text": 929.5, "math": [{"source": "s(n)", "baseline": 929.5}]}
+    assert legend_findings(aligned) == []
+    low = {"text": 929.5, "math": [{"source": "s(n)", "baseline": 930.5}]}
+    [finding] = legend_findings(low)
+    assert "s(n) stands +1.00 stage px" in finding
+    assert legend_findings({"text": 929.5, "math": []}) == [
+        "the legend's sentence sets no math to measure"
+    ]
+
+
+def _letters(bottoms: dict[int, int], height: int = 40, width: int = 60) -> np.ndarray:
+    """White paper with a black block per letter, each ten columns wide, ending at its row."""
+    image = np.full((height, width, 3), 255, dtype=np.uint8)
+    for start, bottom in bottoms.items():
+        image[bottom - 12 : bottom, start : start + 10] = 0
+    return image
+
+
+def test_ink_is_read_where_each_letter_ends_and_nowhere_else() -> None:
+    image = _letters({0: 30, 20: 30, 40: 34})
+    glyphs = [
+        {"char": "i", "math": False, "left": 0, "right": 10},
+        {"char": "s", "math": False, "left": 20, "right": 30},
+        {"char": "n", "math": True, "left": 40, "right": 50},
+    ]
+    assert ink_bottoms(image, glyphs, origin=0, scale=1) == [30.0, 30.0, 34.0]
+    # An empty advance box drew nothing, which is its own finding rather than a zero.
+    blank = [{"char": "x", "math": True, "left": 52, "right": 60}]
+    assert ink_bottoms(image, blank, origin=0, scale=1) == [None]
+
+
+def test_a_formula_whose_ink_ends_off_the_sentences_line_is_a_finding() -> None:
+    glyphs = [
+        {"char": "i", "math": False},
+        {"char": "s", "math": False},
+        {"char": "e", "math": False},
+        {"char": "n", "math": True},
+    ]
+    # The line is the median of the text letters, so one letter's overshoot does not move it.
+    on_line = [929.25, 929.5, 929.5, 929.5 + LEGEND_INK_SLACK / 2]
+    assert legend_ink_findings(glyphs, on_line) == []
+    [finding] = legend_ink_findings(glyphs, [929.25, 929.5, 929.5, 930.5])
+    assert "'n' ends +1.00 stage px" in finding
+    assert legend_ink_findings(glyphs, [929.5, 929.5, 929.5, None]) == [
+        "the legend's math 'n' drew no ink to read"
+    ]

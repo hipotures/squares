@@ -30,6 +30,10 @@ first proved here, Animate with nothing open, the animation studio, Pack and Sea
   `ATTRIBUTION_SLACK` stage pixels, and stands just under it, its ink within
   `ATTRIBUTION_LEAD` of the legend's foot (the owner, 2026-09-21); and it is drawn over nothing,
   including in Pack and the studio, which do not show the legend and center their drawing.
+- on the stage, **the legend's math on its sentence's line**: each formula stands on the
+  sentence's baseline within `LEGEND_BASELINE_SLACK`, and its letters' ink ends where the
+  sentence's does within `LEGEND_INK_SLACK`, read at `LEGEND_INK_SCALE` (the owner asked for
+  this four times, and each fix was judged by eye).
 
 `findings`, `facts_findings`, `frames_findings` and `attribution_findings` are pure functions of
 the probe's output, so `tests/test_check_layout.py` proves each rule refuses a page that breaks
@@ -89,6 +93,11 @@ ATTRIBUTION_SLACK = 1.0
 #: How far below the legend's foot the attribution's ink may start and still stand just under
 #: it, in stage pixels: one line of the legend's own 22 px type.
 ATTRIBUTION_LEAD = 22.0
+
+#: How far a formula in the legend's sentence may stand from the sentence's own baseline, in
+#: stage pixels: half a pixel of the poster, which is less than any offset the eye can see and
+#: more than a marker's sub-pixel placement.
+LEGEND_BASELINE_SLACK = 0.5
 
 Metrics = Mapping[str, Any]
 
@@ -378,6 +387,134 @@ def attribution_findings(attribution: Metrics, *, aligned: bool) -> list[str]:
     return found
 
 
+def legend_findings(legend: Metrics) -> list[str]:
+    """Every formula in the legend's sentence that does not stand on the sentence's baseline.
+
+    The owner asked four times for `s(n)` to sit on the line its sentence is set on, and each
+    fix was judged by eye. This is the measurement instead: the probe reads both baselines off
+    the page, and a formula more than `LEGEND_BASELINE_SLACK` off is a finding.
+    """
+    found = []
+    if not legend["math"]:
+        found.append("the legend's sentence sets no math to measure")
+    for formula in legend["math"]:
+        off = formula["baseline"] - legend["text"]
+        if abs(off) > LEGEND_BASELINE_SLACK:
+            found.append(
+                f"the legend's {formula['source']} stands {off:+.2f} stage px from its "
+                f"sentence's baseline at {legend['text']:.2f}"
+            )
+    return found
+
+
+#: The device scale the legend's ink is read at. Its type is 22 stage px, so at 4x a letter's
+#: lowest inked row is placed to a quarter of a poster pixel.
+LEGEND_INK_SCALE = 4
+
+#: How far a formula's letters may end from the sentence's, in stage px. Round letters dip
+#: below the baseline by design, by about one and a half per cent of their size, which is a
+#: third of a poster pixel here; a formula off by more than this is off by something else.
+LEGEND_INK_SLACK = 0.6
+
+
+def ink_bottoms(
+    image: np.ndarray, glyphs: Sequence[Metrics], origin: float, scale: float
+) -> list[float | None]:
+    """The lowest inked row under each glyph, in image rows, or None where it drew nothing.
+
+    A pixel is ink where it is darker than halfway from the paper to the darkest pixel in the
+    picture, so the row found is where a letter's edge is half covered: the same point for a
+    grey face and a black one. Only the middle of each advance box is read, because italic
+    letters lean into their neighbours' columns.
+    """
+    darkness = image.astype(int).sum(axis=2)
+    paper = int(darkness.max())
+    ink = darkness < (paper + int(darkness.min())) / 2
+    found: list[float | None] = []
+    for glyph in glyphs:
+        left = (float(glyph["left"]) - origin) * scale
+        right = (float(glyph["right"]) - origin) * scale
+        inset = (right - left) * 0.2
+        columns = ink[:, max(0, round(left + inset)) : max(0, round(right - inset))]
+        rows = np.flatnonzero(columns.any(axis=1))
+        found.append(float(rows[-1] + 1) if rows.size else None)
+    return found
+
+
+def legend_ink_findings(
+    glyphs: Sequence[Metrics], bottoms: Sequence[float | None]
+) -> list[str]:
+    """Every formula letter whose ink ends off the line the sentence's letters end on.
+
+    The line is the median of the text letters' bottoms, which no single letter's overshoot
+    moves. `bottoms` are in stage px.
+    """
+    text = [b for g, b in zip(glyphs, bottoms, strict=True) if not g["math"] and b is not None]
+    if not text:
+        return ["the legend's sentence has no letters to read its line from"]
+    line = float(np.median(text))
+    found = []
+    for glyph, bottom in zip(glyphs, bottoms, strict=True):
+        if not glyph["math"]:
+            continue
+        if bottom is None:
+            found.append(f"the legend's math {glyph['char']!r} drew no ink to read")
+        elif abs(bottom - line) > LEGEND_INK_SLACK:
+            found.append(
+                f"the legend's math {glyph['char']!r} ends {bottom - line:+.2f} stage px from "
+                f"the line its sentence's letters end on"
+            )
+    return found
+
+
+def legend_ink(page: Page) -> tuple[list[str], float]:
+    """Read the legend's ink in a capture of the stage at its own size, `LEGEND_INK_SCALE` up.
+
+    Returns the findings and the furthest a formula letter ended from the sentence's line.
+    A page of its own: with the controls showing, the stage is scaled to fit beside them and
+    the legend's letters are a few device pixels tall.
+    """
+    browser = page.context.browser
+    if browser is None:
+        return ["no browser to read the legend's ink in"], float("nan")
+    context = browser.new_context(
+        reduced_motion="reduce",
+        viewport={"width": 1920, "height": 1080},
+        device_scale_factor=LEGEND_INK_SCALE,
+    )
+    try:
+        still = context.new_page()
+        still.goto(page.url)
+        still.wait_for_function(probe("benchmark/page-api-ready"))
+        still.evaluate(probe("capture/fonts-ready"))
+        still.evaluate(probe("api/apply"), {"calls": [["setCapture", True]]})
+        still.evaluate(probe("design/frames"))
+        read = still.evaluate(probe("design/legend-glyphs"))
+        if read is None:
+            return ["the legend is not drawn to read its ink"], float("nan")
+        line = read["line"]
+        clip: FloatRect = {
+            "x": float(line["left"]),
+            "y": float(line["top"]),
+            "width": float(line["right"]) - float(line["left"]),
+            "height": float(line["bottom"]) - float(line["top"]),
+        }
+        image = np.asarray(Image.open(io.BytesIO(still.screenshot(clip=clip))).convert("RGB"))
+        rows = ink_bottoms(image, read["glyphs"], float(line["left"]), LEGEND_INK_SCALE)
+        bottoms = [None if r is None else r / LEGEND_INK_SCALE for r in rows]
+        found = legend_ink_findings(read["glyphs"], bottoms)
+        text = [b for g, b in zip(read["glyphs"], bottoms, strict=True) if not g["math"] and b]
+        math = [b for g, b in zip(read["glyphs"], bottoms, strict=True) if g["math"] and b]
+        furthest = (
+            max(abs(b - float(np.median(text))) for b in math)
+            if text and math
+            else float("nan")
+        )
+        return found, furthest
+    finally:
+        context.close()
+
+
 #: The sum of an RGB pixel's channels under which it counts as ink rather than paper. White is
 #: 765 and the attribution is set in the scene's ink, far darker, so a region of paper alone
 #: never reaches it.
@@ -486,6 +623,9 @@ def check_open(page: Page, viewports: Sequence[tuple[int, int]] = VIEWPORTS) -> 
     #: Whether the box was seen locked and seen on its way. Its two colours are one rule, and a
     #: sweep that only ever saw it at rest would pass without the frames' grey being drawn once.
     locks: set[bool] = set()
+    #: Every formula offset the legend rule measured, so the summary says what it saw and not
+    #: only that nothing failed: a rule that read nothing would also report nothing.
+    offsets: list[float] = []
     for label, enter, leave, star, aligned in VIEWS:
         enter(page)
         for width, height in viewports:
@@ -505,9 +645,19 @@ def check_open(page: Page, viewports: Sequence[tuple[int, int]] = VIEWPORTS) -> 
                     locks.add(bool(metrics["frames"]["box"]["locked"]))
             if metrics["attribution"] is not None:
                 found.extend(attribution_findings(metrics["attribution"], aligned=aligned))
+            if metrics["legend"] is not None:
+                found.extend(legend_findings(metrics["legend"]))
+                offsets.extend(
+                    abs(formula["baseline"] - metrics["legend"]["text"])
+                    for formula in metrics["legend"]["math"]
+                )
             failures.extend(f"{label} at {width} x {height}: {item}" for item in found)
         if leave is not None:
             leave(page)
+    if not offsets:
+        failures.append(
+            "the sweep never measured the legend's math, so its baseline went unchecked"
+        )
     if locks != {True, False}:
         failures.append(
             f"the sweep never saw the box both locked and on its way, so only one of its two "
@@ -527,6 +677,10 @@ def check_open(page: Page, viewports: Sequence[tuple[int, int]] = VIEWPORTS) -> 
             f"animate at {narrowest[0]} x {narrowest[1]}: {item}"
             for item in _painted(page, smallest)
         )
+    ink_found, ink_furthest = legend_ink(page)
+    failures.extend(
+        f"the legend at 1920 x 1080, {LEGEND_INK_SCALE}x: {item}" for item in ink_found
+    )
     if original is not None:
         page.set_viewport_size(original)
     if failures:
@@ -536,7 +690,10 @@ def check_open(page: Page, viewports: Sequence[tuple[int, int]] = VIEWPORTS) -> 
         f"{len(viewports)} viewports ({measured} measurements, "
         f"{time.perf_counter() - started:.1f}s), OPEN only when open, one badge type with "
         f"`{NEW_RESULT}` alone in the star's scarlet, one frame width in its three colours, "
-        f"and the attribution just under the legend at its left edge"
+        f"the attribution just under the legend at its left edge, and the legend's math on its "
+        f"sentence's baseline ({len(offsets)} formulas measured, the furthest "
+        f"{max(offsets, default=float('nan')):.2f} stage px off; its letters' ink "
+        f"{ink_furthest:.2f} stage px from the sentence's)"
     )
 
 
