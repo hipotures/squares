@@ -84,6 +84,37 @@ All three are `V0/C0`: each is a reading taken once, in one-off code, on retaine
 `OR-1` is explicit that a measurement left in one-off code is a missing tool, and the
 three tools these readings show are worth building are named in the slate.
 
+## The One Bound That Moved
+
+Stated before the rest, because it is the only movement in the block and because it came
+from the slate’s lowest-ranked row rather than its highest.
+
+> **`s(11) >= 955000*sqrt(2073600042893309449)/359341754646249 = 3.826997548829543624`**,
+> against `T-026`’s registered `3.826447410572939744`. A movement of
+> **`+0.000550138257`**.
+
+The frozen `T-025` threshold atoms were re-certified at the **2880-step net**. The
+crossing shrink does not rise under refinement — the 1,440 directions the finer net adds
+do not break them, least charge exactly 1 — so halving the net gap `D` moves the
+dilation-limit supremum with no new mathematics.
+`X-041` called this a rung to be run in an idle CPU slot and never as a block, and that
+is exactly how it was run.
+
+Two things make it trustworthy rather than merely arithmetic.
+The same run’s 1440 leg is a control and reproduces `T-026`’s registered surd to
+twenty-two digits. And the retention gate accepts the frozen bytes by **both** routes:
+the interval route returns a zero-width enclosure `(1, 1)` over 5,761 directions and
+23,785,079 boxes with no stalls, the exact route independently finds least cell charge 1
+at direction 1828 and re-evaluates it at its witness by membership counting, and the two
+agree — `RETAINABLE`, `sha256 fefcf8ac…`.
+
+The value sits below `L/B* = 3.827547924507` and below the universal one-body ceiling
+`L* = 3.828806254385`, as the theory requires; a value above either would have been
+reason to distrust the run.
+The dilation-limit theorem establishes the bound as a supremum and **supplies no
+individual certificate at that side**, so the strict inequality there is not claimed.
+The register entry is a separate decision and is not written by this report.
+
 ## Evidence Boundary
 
 Read in full by the lanes: `AGENTS.md`, `operating-rules.md`, `epistemics.md`, `X-040`,
