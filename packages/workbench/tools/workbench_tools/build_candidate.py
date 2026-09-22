@@ -1175,9 +1175,15 @@ def load_facts(manifest_entries: dict[int, dict]) -> dict[str, dict]:
 #: and a module named here would read as one this build runs (`test_build_site_inputs`).
 CITATIONS_CONTRACT = "packing.squares:BoundCitations/v1"
 CITATIONS_GENERATOR = re.compile(r"devtools\.\w+")
-#: The longest reference line the facts column takes at the stage's small type. The contract's
-#: own limit, repeated here because this is where a longer one would reach the page.
+#: The longest line the facts column takes at the stage's small type, the reference and its
+#: note together. The contract's own limit, repeated here because this is where a longer one
+#: would reach the page.
 CITATION_TEXT_MAX = 66
+#: One aside after a reference: what the register and this project have to say about the
+#: bound, as `build_bound_citations.note` composes it.
+CITATION_NOTE = re.compile(
+    r"\((reported|confirmed T-\d{3}(, T-\d{3})*|reported; confirmed T-\d{3}(, T-\d{3})*)\)"
+)
 CITATION_BASES = frozenset({"external", "project"})
 CITATION_ASSURANCES = frozenset({"verified", "reported"})
 RESULT_ID = re.compile(r"T-\d{3,}")
@@ -1210,7 +1216,7 @@ def same_decimal(cited: str, drawn: str) -> bool:
     return abs(Fraction(cited) - Fraction(drawn)) <= Fraction(1, 10**places)
 
 
-def _citation(value: Any, n: int, bound: str) -> dict[str, str] | None:
+def _citation(value: Any, n: int, bound: str) -> dict[str, str | None] | None:
     """One bound's citation, checked against the contract, as the page carries it."""
     if value is None:
         return None
@@ -1220,13 +1226,19 @@ def _citation(value: Any, n: int, bound: str) -> dict[str, str] | None:
     text, basis, assurance = value.get("text"), value.get("basis"), value.get("assurance")
     if not isinstance(text, str) or not text or text != text.strip() or "\n" in text:
         raise ValueError(f"{where}: the reference must be one trimmed line, not {text!r}")
-    if len(text) > CITATION_TEXT_MAX:
+    # Everything this project has to say about the bound is one parenthesis after the
+    # reference, and the two share the column's one line, so they are measured together.
+    note = value.get("note")
+    if note is not None and not (isinstance(note, str) and CITATION_NOTE.fullmatch(note)):
+        raise ValueError(f"{where}: the note {note!r} is not one parenthesis of text")
+    line = " ".join(part for part in (text, note) if part)
+    if len(line) > CITATION_TEXT_MAX:
         raise ValueError(
-            f"{where}: {text!r} is {len(text)} characters, over the {CITATION_TEXT_MAX} the "
+            f"{where}: {line!r} is {len(line)} characters, over the {CITATION_TEXT_MAX} the "
             f"facts column takes"
         )
-    if not latin_face_covers(text):
-        raise ValueError(f"{where}: {text!r} has characters the page's faces do not draw")
+    if not latin_face_covers(line):
+        raise ValueError(f"{where}: {line!r} has characters the page's faces do not draw")
     if basis not in CITATION_BASES or assurance not in CITATION_ASSURANCES:
         raise ValueError(
             f"{where}: basis {basis!r} and assurance {assurance!r} are not the contract's"
@@ -1238,7 +1250,7 @@ def _citation(value: Any, n: int, bound: str) -> dict[str, str] | None:
         raise TypeError(f"{where}: source_key {key!r} is not a string")
     if not isinstance(value.get("value"), str):
         raise TypeError(f"{where}: the value it cites is not a string: {value.get('value')!r}")
-    return {"text": text, "basis": basis, "assurance": assurance}
+    return {"text": text, "note": note, "basis": basis, "assurance": assurance}
 
 
 def load_citations(

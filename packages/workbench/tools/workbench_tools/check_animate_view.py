@@ -546,12 +546,12 @@ def citation_file(session: Session) -> tuple[dict[str, Any] | None, str | None]:
     return {str(entry["n"]): entry for entry in entries}, hashlib.sha256(raw).hexdigest()
 
 
-def cited_lines(entry: dict[str, Any] | None) -> dict[str, tuple[str, bool]]:
-    """What the file says an n's section draws: per bound, its reference and if reported."""
+def cited_lines(entry: dict[str, Any] | None) -> dict[str, tuple[str, str | None]]:
+    """What the file says an n's section draws: per bound, its reference and its note."""
     if entry is None:
         return {}
     return {
-        bound: (cited["text"], cited["assurance"] == "reported")
+        bound: (cited["text"], cited["note"])
         for bound in ("lower", "upper")
         if (cited := entry.get(bound)) is not None
     }
@@ -582,16 +582,13 @@ def citations_drawn(session: Session) -> str:
     on = session.look("facts/citation-sweep", on=True)
     column = on["column"]
     wrong: list[str] = []
-    drawn_lines = reported = 0
+    drawn_lines = noted = 0
     for row in on["drawn"]:
         n = row["n"]
         want = cited_lines(None if entries is None else entries.get(str(n)))
-        got = {
-            line["slot"]: (line["text"], line["reported"] == "reported")
-            for line in row["lines"]
-        }
+        got = {line["slot"]: (line["text"], line["note"]) for line in row["lines"]}
         drawn_lines += len(got)
-        reported += sum(1 for _, marked in got.values() if marked)
+        noted += sum(1 for _, aside in got.values() if aside)
         if got != want:
             wrong.append(f"n = {n} draws {got}, and the file has {want}")
         if row["built"] != 3:
@@ -606,7 +603,7 @@ def citations_drawn(session: Session) -> str:
                 f"n = {n}: the record ends at {row['recordRight']:.1f}, past the column"
             )
         for line in row["lines"]:
-            if line["bound"] != line["slot"] or line["reported"] not in (None, "reported"):
+            if line["bound"] != line["slot"]:
                 wrong.append(f"n = {n}: the {line['slot']} line is labeled {line}")
             if line["left"] < column["left"] - 1 or line["right"] > column["right"] + 1:
                 wrong.append(
@@ -622,13 +619,13 @@ def citations_drawn(session: Session) -> str:
     session.require(drawn_lines > 0, "the citation file cites nothing the page drew")
     return (
         f"the citations are drawn at exactly the file's {drawn_lines} lines over "
-        f"{len(on['drawn'])} n, {reported} of them reported, inside the column, and nowhere "
-        f"with the setting off"
+        f"{len(on['drawn'])} n, {noted} of them carrying this project's aside, inside the "
+        f"column, and nowhere with the setting off"
     )
 
 
 def citation_steps(entries: dict[str, Any], last: int) -> tuple[int, ...]:
-    """Steps into n where the section changes in each way it can: a reference, `reported`, a
+    """Steps into n where the section changes in each way it can: a reference, a note, a
     bound gaining or losing its line, and the section appearing or going. The first of each."""
     kinds: dict[str, int] = {}
     for n in range(2, last + 1):
@@ -640,7 +637,7 @@ def citation_steps(entries: dict[str, Any], last: int) -> tuple[int, ...]:
             elif a is not None and b is not None and a[0] != b[0]:
                 kinds.setdefault(f"{bound} reference", n)
             elif a is not None and b is not None and a[1] != b[1]:
-                kinds.setdefault("reported", n)
+                kinds.setdefault("note", n)
         if bool(before) != bool(after):
             kinds.setdefault("section", n)
     return tuple(sorted(set(kinds.values())))

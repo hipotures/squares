@@ -504,7 +504,7 @@ UPPER_INK = LOCKED
 
 
 def _section(
-    *, lower: bool = True, upper: bool = True, reported: bool = True
+    *, lower: bool = True, upper: bool = True, noted: bool = True
 ) -> dict[str, Any]:
     """A CITATION section as the page draws it at n = 17, with OPEN moved below it."""
 
@@ -515,7 +515,7 @@ def _section(
             "slot": slot,
             "bound": slot if drawn else None,
             "text": f"the {slot} bound's source" if drawn else None,
-            "reported": "reported" if drawn and marked else None,
+            "note": "(reported)" if drawn and marked else None,
             "color": (LOWER_INK if slot == "lower" else UPPER_INK) if drawn else None,
             "left": 1116.0,
             "top": top,
@@ -546,7 +546,7 @@ def _section(
         ),
         "lines": [
             line("lower", 658.0, 1461.06, drawn=lower, marked=False),
-            line("upper", 688.0, 1814.38, drawn=upper, marked=reported),
+            line("upper", 688.0, 1814.38, drawn=upper, marked=noted),
         ],
         "below": [
             {
@@ -565,7 +565,7 @@ def _section(
 
 def test_a_citation_section_that_keeps_every_rule_passes() -> None:
     assert citation_findings(_section(), shown=True) == []
-    assert citation_findings(_section(reported=False), shown=True) == []
+    assert citation_findings(_section(noted=False), shown=True) == []
     # One bound cited: the other line is an empty slot, and the section is still headed.
     assert citation_findings(_section(lower=False), shown=True) == []
     assert citation_findings(_section(upper=False), shown=True) == []
@@ -578,7 +578,7 @@ def test_a_citation_section_that_keeps_every_rule_passes() -> None:
     ("change", "expected"),
     [
         # Too long for the column at the stage's small type: the fixture's 65-character
-        # reported line measured 1912 against the column's 1884.
+        # noted line measured 1912 against the column's 1884.
         (
             _set("lines.1.right", 1912.4),
             "spans 1116.0..1912.4, outside the column's 1116.0..1884.0",
@@ -598,7 +598,11 @@ def test_a_citation_section_that_keeps_every_rule_passes() -> None:
             f"is labeled in {LOWER_INK}, not its bound's {UPPER_INK}",
         ),
         (_set("lines.0.bound", "upper"), "source\" is labeled 'upper'"),
-        (_set("lines.1.reported", "unverified"), "is marked 'unverified', not 'reported'"),
+        # An aside the record would never compose: the check reads the words, not a flag.
+        (
+            _set("lines.1.note", "(unverified)"),
+            "carries the note '(unverified)', which is not one aside",
+        ),
         (_set("lines.1.top", 670.0), "the lower and upper citations overlap by 18.0"),
         (_set("lines.0.top", 640.0), "starts at 640.0, inside its head"),
         (
@@ -664,16 +668,16 @@ def test_the_citation_head_is_set_in_the_heads_type() -> None:
 
 
 def test_the_sweep_measures_the_citation_section_where_it_is_hardest_to_fit() -> None:
-    def cite(text: str, assurance: str = "verified") -> dict[str, str]:
-        return {"text": text, "basis": "external", "assurance": assurance}
+    def cite(text: str, note: str | None = None) -> dict[str, str | None]:
+        return {"text": text, "note": note, "basis": "external", "assurance": "verified"}
 
     entries = {
         "5": {"lower": cite("x" * 60), "upper": None},
-        "17": {"lower": cite("short"), "upper": cite("y" * 50, "reported")},
+        "17": {"lower": cite("short"), "upper": cite("y" * 50, "(reported)")},
         "18": {"lower": cite("short"), "upper": cite("z" * 55)},
-        "324": {"lower": cite("w" * 66), "upper": cite("v" * 66, "reported")},
+        "324": {"lower": cite("w" * 66), "upper": cite("v" * 66, "(reported)")},
     }
-    # Both bounds cited beats one; a reported line beats none; 324 has no step into it drawn.
+    # Both bounds cited beats one; a noted line beats none; 324 has no step into it drawn.
     assert widest_cited(entries, last=323) == 17
     assert widest_cited(entries, last=324) == 324
     assert widest_cited({}, last=323) is None

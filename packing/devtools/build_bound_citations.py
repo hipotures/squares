@@ -33,11 +33,17 @@ states is how `D-385` happened, and the same four questions recur for each bound
 4. *What has this project recorded about it?* Every result for this `n` that carries one
    of the bound's own evidence entries is listed in `results`. Those that carry one this
    project performed -- a replay, an audit, an interval certificate -- confirm the
-   external bound, are listed in `confirmed_by`, and are named on the line as
-   "(confirmed, T-NNN)". A result that only cites the source's own proof is relevant and
-   listed, and confirms nothing. The shared checker behind several first-party
-   certificates is not the bound's own evidence, so a project line lists only the results
-   that carry its novel entries, not every earlier rung that used the same checker.
+   external bound and are listed in `confirmed_by`. A result that only cites the source's
+   own proof is relevant and listed, and confirms nothing. The shared checker behind
+   several first-party certificates is not the bound's own evidence, so a project line
+   lists only the results that carry its novel entries, not every earlier rung that used
+   the same checker.
+
+The reference says where the bound comes from and nothing else. **Everything this project
+has to say about it is one parenthesis at the end of the line, `note`**: `(reported)`
+where the register has not certified the bound, `(confirmed T-009)` where a result of ours
+checks it, `(reported; confirmed T-009)` where both are true. `note` is composed here
+rather than at the stage, so one place spells these words and the width below counts them.
 
 **Nothing is read from prose.** Where the structured record lacks a year or an author it is
 left out, not recovered from a body sentence or a credit line: an improved construction's
@@ -45,10 +51,10 @@ line carries no year, because `found_year` dates the find and the schema has no 
 the improvement's date. `--review` lists every such case, and every omitted line with the
 reason, so a gap is reported rather than filled.
 
-A line must fit in `TEXT_LIMIT` characters, the width the stage sets it in. Where the
-confirmation would push it past that, the source's `short_venue` is used if the
-bibliography gives one; a line that still does not fit fails the build rather than being
-cut, and `--review` names every line that was shortened.
+A line must fit in `TEXT_LIMIT` characters, the width the stage sets it in, the reference
+and its note together. Where the note leaves too little room, the source's `short_venue`
+is used if the bibliography gives one; a line that still does not fit fails the build
+rather than being cut, and `--review` names every line that was shortened.
 
 Usage, from `packing/`:
 
@@ -88,8 +94,16 @@ SCHEMA = "bound-citations.schema.yaml"
 #: records cover the same `n` by construction.
 CORPUS = KNOWN_BEST_CORPUS
 
-#: The widest line the stage sets, in characters.
+#: The widest line the stage sets, in characters: the reference and its note together,
+#: which is what a reader sees on one line. The note used to sit outside this count, drawn
+#: as a bare word after the reference, so a line could be checked as fitting and drawn as
+#: not (`think-qzmf`).
 TEXT_LIMIT = 66
+
+#: The register's two words for a bound's standing. `VERIFIED` is one it certifies at the
+#: printed precision; `REPORTED` is one it carries from a source without certifying.
+VERIFIED = "verified"
+REPORTED = "reported"
 
 PROJECT_NAME = "This project"
 
@@ -177,18 +191,40 @@ def cite(authors: str | None, year: int | None, venue: str) -> str:
     return f"{head}, {venue}" if head else venue
 
 
-def compose(
-    authors: str | None, year: int | None, source: Source, confirmed_by: Sequence[str]
-) -> str:
-    """The line, with this project's confirmation in parentheses where there is one.
+def note(assurance: str, confirmed_by: Sequence[str]) -> str | None:
+    """What this project has to say about the bound, or None where it is nothing.
 
-    In the source's full venue where that fits, and its short venue where it does not; the
-    caller fails a line that fits neither.
+    One parenthesis at the end of the line, in one vocabulary, holding both of the things
+    that were said in two shapes before: the register's standing on the bound, and this
+    project's own confirming results. The stage drew `reported` as a bare word after the
+    reference and baked `(confirmed, T-009)` into the reference itself, so at `n = 29`,
+    the one case that is both, the line read "Squares in Squares (confirmed, T-009)
+    reported" -- two annotations of one bound, formatted two ways, saying what looks like
+    two contradictory things (the owner, 2026-09-22).
+
+    They do not contradict. `reported` is the register's: it carries this construction's
+    value from the catalogue and has not certified it at the printed precision. The
+    confirmation is ours: a result of this project's that checks the same bound. At
+    `n = 29` both are true, and the line now says so once: "(reported; confirmed T-009)".
+    The semicolon separates the two statements, so the comma is left to separate results.
     """
-    note = f" (confirmed, {', '.join(confirmed_by)})" if confirmed_by else ""
-    text = cite(authors, year, source.venue) + note
-    if len(text) > TEXT_LIMIT and source.short_venue is not None:
-        text = cite(authors, year, source.short_venue) + note
+    said = []
+    if assurance == REPORTED:
+        said.append(REPORTED)
+    if confirmed_by:
+        said.append(f"confirmed {', '.join(confirmed_by)}")
+    return f"({'; '.join(said)})" if said else None
+
+
+def compose(authors: str | None, year: int | None, source: Source, room: int) -> str:
+    """The reference alone: authors, year and venue, with nothing of this project's in it.
+
+    In the source's full venue where that fits the `room` the note leaves, and its short
+    venue where it does not; the caller fails a line that fits neither.
+    """
+    text = cite(authors, year, source.venue)
+    if len(text) > room and source.short_venue is not None:
+        text = cite(authors, year, source.short_venue)
     return text
 
 
@@ -278,11 +314,16 @@ def own_evidence(ids: Iterable[str], register: Register) -> list[str]:
     ]
 
 
+def drawn(citation: Mapping[str, Any]) -> str:
+    """The line as the stage sets it: the reference, then its note where there is one."""
+    return " ".join(part for part in (citation["text"], citation["note"]) if part)
+
+
 def _checked(n: int, label: str, citation: dict[str, Any]) -> dict[str, Any]:
-    text = citation["text"]
-    if len(text) > TEXT_LIMIT:
+    line = drawn(citation)
+    if len(line) > TEXT_LIMIT:
         raise ValueError(
-            f"n={n} {label}: {text!r} is {len(text)} characters, over {TEXT_LIMIT}"
+            f"n={n} {label}: {line!r} is {len(line)} characters, over {TEXT_LIMIT}"
         )
     return citation
 
@@ -297,6 +338,7 @@ def _project(
         label,
         {
             "text": f"{PROJECT_NAME} {year}, result {result['id']}",
+            "note": note(assurance, []),
             "basis": "project",
             "assurance": assurance,
             "source_key": None,
@@ -333,11 +375,13 @@ def _external(
     ]
     confirmed_by = results_carrying(n, performed, register.results)
     authors, year = credited
+    said = note(assurance, confirmed_by)
     return _checked(
         n,
         label,
         {
-            "text": compose(authors, year, source, confirmed_by),
+            "text": compose(authors, year, source, TEXT_LIMIT - len(said or "") - bool(said)),
+            "note": said,
             "basis": "external",
             "assurance": assurance,
             "source_key": source.key,
@@ -392,7 +436,7 @@ def upper_citation(
     if certified and not certificate:
         return None
     value = str(reported["value"])
-    assurance = "verified" if certified else "reported"
+    assurance = VERIFIED if certified else REPORTED
     construction = own_evidence(reported["evidence"], register)
     novel = [
         item
@@ -503,7 +547,7 @@ def omissions(
         "upper reported and not certified": [
             e["n"]
             for e in entries
-            if e["upper"] is not None and e["upper"]["assurance"] == "reported"
+            if e["upper"] is not None and e["upper"]["assurance"] == REPORTED
         ],
         "lower omitted: common-knowledge evidence alone": [
             e["n"] for e in entries if e["lower"] is None

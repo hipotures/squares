@@ -49,10 +49,19 @@ $defs:
   citation:
     type: object
     additionalProperties: false
-    required: [text, basis, assurance, source_key, result, results, confirmed_by, value]
+    required: [text, note, basis, assurance, source_key, result, results, confirmed_by, value]
     properties:
-      # The one line the stage draws; the stage sets it at this width.
+      # The reference the stage draws: where the bound comes from, and nothing else.
       text: {type: string, minLength: 1, maxLength: 66}
+      # Everything this project has to say about the bound, as the one parenthesis drawn
+      # after the reference, or null where there is nothing: "(reported)" where the
+      # register has not certified it, "(confirmed T-009)" where a result of ours checks
+      # it, "(reported; confirmed T-009)" where both. The reference and the note together
+      # are what must fit the stage's line, which the builder checks.
+      note:
+        oneOf:
+          - {type: string, pattern: '^\((reported|confirmed T-[0-9]{3}(, T-[0-9]{3})*|reported; confirmed T-[0-9]{3}(, T-[0-9]{3})*)\)$'}
+          - {type: 'null'}
       basis: {enum: [external, project]}
       # `verified` only where the register certifies the value shown; an upper bound it
       # reports but has not certified is `reported`.
@@ -70,7 +79,7 @@ $defs:
       # order: the one that established it, or those that confirm, replay or cite it.
       results: {$ref: '#/$defs/result_ids'}
       # The results among those that confirm an external bound -- they carry an entry this
-      # project performed -- and so appear on the line as "(confirmed, T-NNN, ...)".
+      # project performed -- and so are named in the line's note.
       confirmed_by: {$ref: '#/$defs/result_ids'}
       # The bound's stored value, as the frontier record and composite-figure.json print it.
       value: {type: string, minLength: 1}

@@ -78,9 +78,10 @@ def _entry(n: int) -> dict[str, Any]:
 
 
 def _line(citation: Mapping[str, Any] | None) -> tuple[str, str, str] | None:
+    """A line as the stage sets it -- the reference and its note -- with where it stands."""
     if citation is None:
         return None
-    return (citation["text"], citation["basis"], citation["assurance"])
+    return (citations.drawn(citation), citation["basis"], citation["assurance"])
 
 
 # --------------------------------------------------------------------------- the rules
@@ -228,7 +229,8 @@ def test_a_published_bound_and_its_replay_cite_the_one_source_and_name_the_repla
     register = _synthetic_register()
     line = citations.lower_citation(7, _synthetic_case(["E-paper", "E-replay"]), register)
     assert line == {
-        "text": "Author 2001, J. Test 1 (confirmed, T-901)",
+        "text": "Author 2001, J. Test 1",
+        "note": "(confirmed T-901)",
         "basis": "external",
         "assurance": "verified",
         "source_key": "[Paper 2001]",
@@ -287,9 +289,9 @@ def test_a_reported_construction_above_a_certified_grid_is_cited_as_reported() -
     credited = citations.upper_citation(
         7, _synthetic_case(["E-area"], found_by=["A. Finder"]), register
     )
-    assert _line(credited) == ("Finder 1999, The Catalogue", "external", "reported")
+    assert _line(credited) == ("Finder 1999, The Catalogue (reported)", "external", "reported")
     uncredited = citations.upper_citation(7, _synthetic_case(["E-area"]), register)
-    assert _line(uncredited) == ("Compiler, The Catalogue", "external", "reported")
+    assert _line(uncredited) == ("Compiler, The Catalogue (reported)", "external", "reported")
 
 
 def test_our_certificate_of_someone_else_s_packing_confirms_it_and_does_not_own_it() -> None:
@@ -299,8 +301,9 @@ def test_our_certificate_of_someone_else_s_packing_confirms_it_and_does_not_own_
         7, _synthetic_case(["E-area"], found_by=["A. Finder"], certificate=True), register
     )
     assert line is not None
-    assert (line["text"], line["basis"], line["assurance"]) == (
-        "Finder 1999, The Catalogue (confirmed, T-910)",
+    assert (line["text"], line["note"], line["basis"], line["assurance"]) == (
+        "Finder 1999, The Catalogue",
+        "(confirmed T-910)",
         "external",
         "verified",
     )
@@ -322,7 +325,10 @@ def test_a_confirmation_that_would_not_fit_falls_back_to_the_short_venue() -> No
     narrow = citations.Register(register.evidence, register.results, sources, register.names)
     confirmed = citations.lower_citation(7, _synthetic_case(["E-paper", "E-replay"]), narrow)
     assert confirmed is not None
-    assert confirmed["text"] == "Author 2001, Short J. (confirmed, T-901)"
+    assert (confirmed["text"], confirmed["note"]) == (
+        "Author 2001, Short J.",
+        "(confirmed T-901)",
+    )
     # Without the confirmation the full venue still fits, so it is what the line prints.
     plain = citations.lower_citation(7, _synthetic_case(["E-paper"]), narrow)
     assert plain is not None
@@ -342,10 +348,37 @@ def test_a_line_wider_than_the_stage_fails_rather_than_being_cut() -> None:
 
 def test_several_confirmations_are_named_in_id_order() -> None:
     source = citations.Source("[K]", ("Author",), 2001, "J. Test 1")
-    assert citations.compose("Author", 2001, source, ["T-009", "T-011"]) == (
-        "Author 2001, J. Test 1 (confirmed, T-009, T-011)"
+    assert citations.compose("Author", 2001, source, citations.TEXT_LIMIT) == (
+        "Author 2001, J. Test 1"
     )
+    assert citations.note("verified", ["T-009", "T-011"]) == "(confirmed T-009, T-011)"
     assert citations.result_order("T-032") == 32
+
+
+def test_the_one_aside_says_both_things_where_both_are_true() -> None:
+    """`n = 29`'s shape again, and the reason the note exists: the register reports the bound
+    and a result of ours confirms it, which used to be drawn as two marks in two styles."""
+    assert citations.note("reported", []) == "(reported)"
+    assert citations.note("verified", ["T-009"]) == "(confirmed T-009)"
+    assert citations.note("reported", ["T-009"]) == "(reported; confirmed T-009)"
+    assert citations.note("verified", []) is None
+
+
+def test_the_width_a_line_is_checked_against_counts_its_note() -> None:
+    """The note used to be drawn outside the count, so a line could pass and overflow."""
+    register = _synthetic_register()
+    sources = {
+        **register.sources,
+        "[Paper 2001]": citations.Source("[Paper 2001]", ("Author",), 2001, "V" * 53),
+    }
+    wide = citations.Register(register.evidence, register.results, sources, register.names)
+    # `Author 2001, ` and 53 of venue is exactly the limit with no note.
+    plain = citations.lower_citation(7, _synthetic_case(["E-paper"]), wide)
+    assert plain is not None
+    assert len(citations.drawn(plain)) == citations.TEXT_LIMIT
+    # The same line with a confirmation does not fit, and there is no short venue to fall to.
+    with pytest.raises(ValueError, match="over 66"):
+        citations.lower_citation(7, _synthetic_case(["E-paper", "E-replay"]), wide)
 
 
 # ------------------------------------------------------------ over the recorded register
@@ -376,23 +409,23 @@ RECORDED: dict[int, tuple[tuple[str, str, str] | None, tuple[str, str, str] | No
     46: (
         None,
         (
-            "Bentz 2010, Electron. J. Combin. 17 (confirmed, T-004, T-008)",
+            "Bentz 2010, Electron. J. Combin. 17 (confirmed T-004, T-008)",
             "external",
             "verified",
         ),
     ),
     68: (
-        ("UnitSquare Project 2026, Results Release 1", "external", "reported"),
+        ("UnitSquare Project 2026, Results Release 1 (reported)", "external", "reported"),
         ("Nagamochi 2005, Electron. J. Combin. 12, #R37", "external", "verified"),
     ),
     # The catalogue credits nobody, so the line cites the catalogue by its compilers.
     101: (
-        ("Friedman & Ellsworth, Squares in Squares", "external", "reported"),
+        ("Friedman & Ellsworth, Squares in Squares (reported)", "external", "reported"),
         ("Nagamochi 2005, Electron. J. Combin. 12, #R37", "external", "verified"),
     ),
     # Three finders and two improvers: the first and et al., and no year.
     132: (
-        ("Arslanov et al., Squares in Squares", "external", "reported"),
+        ("Arslanov et al., Squares in Squares (reported)", "external", "reported"),
         ("Nagamochi 2005, Electron. J. Combin. 12, #R37", "external", "verified"),
     ),
 }
@@ -414,7 +447,9 @@ def test_n29_credits_finder_and_optimizer_and_takes_the_registers_verdict() -> N
     """
     case = citations.load_case(29)
     upper = _entry(29)["upper"]
-    assert upper["text"] == "Schadt & Ellsworth, Squares in Squares (confirmed, T-009)"
+    # The one bound that is both reported and confirmed, and so the one line that says both.
+    assert upper["text"] == "Schadt & Ellsworth, Squares in Squares"
+    assert upper["note"] == "(reported; confirmed T-009)"
     assert (upper["basis"], upper["confirmed_by"]) == ("external", ["T-009"])
     agrees = bounds_agree_at_declared_precision(
         case["reported_upper_bound"], case["verified_upper_bound"]
@@ -535,10 +570,13 @@ def test_the_line_names_exactly_the_results_that_confirm_it() -> None:
             if line is None:
                 continue
             if line["confirmed_by"]:
-                note = f" (confirmed, {', '.join(line['confirmed_by'])})"
-                assert line["text"].endswith(note), (entry["n"], label)
+                named = f"confirmed {', '.join(line['confirmed_by'])}"
+                assert (line["note"] or "").endswith(f"{named})"), (entry["n"], label)
             else:
-                assert "confirmed" not in line["text"], (entry["n"], label)
+                assert "confirmed" not in (line["note"] or ""), (entry["n"], label)
+            # The reference says where the bound comes from and never what we did with it.
+            assert "confirmed" not in line["text"], (entry["n"], label)
+            assert "reported" not in line["text"], (entry["n"], label)
 
 
 def test_every_value_is_the_one_the_composite_draws() -> None:

@@ -179,11 +179,13 @@
         "record": "n-002",
         "lower": {
           "text": "Folklore, the area bound",
+          "note": null,
           "basis": "external",
           "assurance": "verified"
         },
         "upper": {
           "text": "The 2 x 2 grid",
+          "note": "(reported)",
           "basis": "external",
           "assurance": "reported"
         }

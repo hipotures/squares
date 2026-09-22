@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { type CorpusBoundCitations, decodeCorpus } from "../src/data/corpus.ts";
-import { planCitations, RECORD, REPORTED } from "../src/view/facts.ts";
+import { planCitations, RECORD } from "../src/view/facts.ts";
 
 /**
  * The stage's citation data and version, held at the corpus boundary, and the plan the facts
@@ -15,6 +15,7 @@ function fixture(): Record<string, unknown> {
 
 const verified = {
   text: "Nagamochi 2005, Discrete Optim. 2",
+  note: null,
   basis: "external",
   assurance: "verified",
 };
@@ -75,30 +76,37 @@ test("citations that break the contract are refused at the boundary", () => {
   assert.throws(() => decodeCorpus({ ...fixture(), citations: undefined }), /object/);
 });
 
-test("the plan keeps each bound on its own line and says reported where the register does", () => {
+test("the plan keeps each bound on its own line and carries the record's own note", () => {
   const cited = (lower: unknown, upper: unknown) =>
     ({ lower, upper, record: "n-017" }) as unknown as CorpusBoundCitations;
-  const reported = { ...verified, text: "in Friedman & Ellsworth", assurance: "reported" };
+  const reported = {
+    ...verified,
+    text: "in Friedman & Ellsworth",
+    note: "(reported)",
+    assurance: "reported",
+  };
   assert.equal(planCitations(undefined), null);
   assert.equal(planCitations(cited(null, null)), null);
   assert.deepEqual(planCitations(cited(verified, reported)), {
     record: "n-017",
     lines: [
-      { bound: "lower", text: verified.text, reported: false },
-      { bound: "upper", text: reported.text, reported: true },
+      { bound: "lower", text: verified.text, note: null },
+      { bound: "upper", text: reported.text, note: "(reported)" },
     ],
   });
   // A lone upper bound stays on the second line, so it does not move up between two n.
   assert.deepEqual(planCitations(cited(null, verified))?.lines, [
     null,
-    { bound: "upper", text: verified.text, reported: false },
+    { bound: "upper", text: verified.text, note: null },
   ]);
   assert.deepEqual(planCitations(cited(verified, null))?.lines, [
-    { bound: "lower", text: verified.text, reported: false },
+    { bound: "lower", text: verified.text, note: null },
     null,
   ]);
-  // A reported lower bound is marked too: the word follows the register, not the bound.
-  assert.equal(planCitations(cited(reported, null))?.lines[0]?.reported, true);
-  assert.equal(REPORTED, "reported");
+  // A reported lower bound carries the note too: it follows the register, not the bound.
+  assert.equal(planCitations(cited(reported, null))?.lines[0]?.note, "(reported)");
+  // The words are the record's. The plan passes them through and spells none of them.
+  const both = { ...verified, note: "(reported; confirmed T-009)", assurance: "reported" };
+  assert.equal(planCitations(cited(null, both))?.lines[1]?.note, "(reported; confirmed T-009)");
   assert.equal(RECORD, "record");
 });

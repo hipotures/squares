@@ -881,9 +881,11 @@ body.drawing #packing-svg #squares {
 .cite-bound.is-upper {
   color: var(--scene-best);
 }
-/* A bound the register reports but has not certified: said after its source, in OPEN's quieter
-   grey, since an uncertified bound is a question the register has not closed (think-n56i). */
-.cite-reported {
+/* Everything this project has to say about a bound -- that the register reports it without
+   certifying, that a result of ours confirms it, or both -- is one parenthesis after the
+   reference, in OPEN's quieter grey: an aside about the bound rather than part of its source
+   (the owner, 2026-09-22, think-qzmf). The words come from the record, not from here. */
+.cite-note {
   color: var(--scene-heading);
   font-weight: var(--stage-weight-label);
 }

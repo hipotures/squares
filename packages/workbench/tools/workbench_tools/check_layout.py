@@ -104,7 +104,16 @@ ATTRIBUTION_SLACK = 1.0
 CITATION_SLACK = 1.0
 
 #: The word a citation line ends with where the register reports a bound without certifying it.
-REPORTED = "reported"
+#: One aside after a reference, as `build_bound_citations.note` composes it.
+NOTE = re.compile(
+    r"\((reported|confirmed T-\d{3}(, T-\d{3})*|reported; confirmed T-\d{3}(, T-\d{3})*)\)"
+)
+
+
+def drawn_line(citation: Mapping[str, Any]) -> str:
+    """A citation as the stage sets it: the reference, then its note where there is one."""
+    return " ".join(part for part in (citation["text"], citation["note"]) if part)
+
 
 #: What a section head's type is: all of it, since the three heads are one style.
 HEAD_TYPE = ("family", "size", "weight", "spacing", "transform", "color")
@@ -365,8 +374,8 @@ def citation_findings(citations: Metrics | None, *, shown: bool) -> list[str]:
         wanted = citations["colours"][line["slot"]]
         if line["color"] != wanted:
             found.append(f"{label} is labeled in {line['color']}, not its bound's {wanted}")
-        if line["reported"] not in (None, REPORTED):
-            found.append(f"{label} is marked {line['reported']!r}, not {REPORTED!r}")
+        if line["note"] is not None and not NOTE.fullmatch(line["note"]):
+            found.append(f"{label} carries the note {line['note']!r}, which is not one aside")
         if column is None:
             found.append(f"{label} has no column to be measured against")
         elif (
@@ -777,15 +786,13 @@ VIEWS: tuple[View, ...] = (
 
 def widest_cited(entries: Mapping[str, Any], last: int) -> int | None:
     """The n up to `last` whose CITATION section is hardest to fit: both bounds cited, then a
-    reported one, then the longest line, counting `reported` as its own ten characters."""
+    noted one, then the longest line, the reference and its note together as they are drawn."""
 
     def cost(n: str) -> tuple[int, int, int]:
         lines = [entries[n][bound] for bound in ("lower", "upper") if entries[n][bound]]
-        reported = any(line["assurance"] == REPORTED for line in lines)
-        longest = max(
-            len(line["text"]) + 10 * (line["assurance"] == REPORTED) for line in lines
-        )
-        return (len(lines), reported, longest)
+        noted = any(line["note"] for line in lines)
+        longest = max(len(drawn_line(line)) for line in lines)
+        return (len(lines), noted, longest)
 
     candidates = [n for n in entries if int(n) <= last]
     return int(max(candidates, key=lambda n: (*cost(n), -int(n)))) if candidates else None

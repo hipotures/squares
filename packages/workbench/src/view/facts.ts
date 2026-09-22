@@ -57,16 +57,23 @@ export function planFacts(facts: CorpusFacts, n: number): FactsPlan {
 /** The section's head. The owner's word for it (2026-09-21), and one word at every n: a head that
  * turned plural where an n cites both bounds would change, and so crossfade, between most n. */
 export const CITATION_HEAD = "Citation";
-/** The word that marks a bound the register reports but has not certified (the owner, 2026-09-22). */
-export const REPORTED = "reported";
+/**
+ * What the register and this project have to say about a bound is ONE parenthesis after its
+ * reference, in the panel's quiet grey, and the words are the record's rather than this file's:
+ * `(reported)`, `(confirmed T-009)`, `(reported; confirmed T-009)`. Two annotations of one bound,
+ * set two ways -- `reported` as a bare word here and the confirmation baked into the reference --
+ * is what the owner read as inconsistent at `n = 29`, the one bound that is both (2026-09-22,
+ * `think-qzmf`). `build_bound_citations.note` composes them, and its width check counts them.
+ */
 /** The word ahead of the frontier record's name on the head's line. */
 export const RECORD = "record";
 
-/** One line of the citation section: which bound, where it comes from, and whether it is certified. */
+/** One line of the citation section: which bound, where it comes from, and what we say about it. */
 export interface CitationLine {
   bound: CitationBound;
   text: string;
-  reported: boolean;
+  /** The record's own parenthesis, or null where this project has nothing to add. */
+  note: string | null;
 }
 
 /** What the CITATION section draws for one n. */
@@ -90,9 +97,7 @@ export function planCitations(cited: CorpusBoundCitations | undefined): Citation
   }
   const line = (bound: CitationBound): CitationLine | null => {
     const source = cited[bound];
-    return source === null
-      ? null
-      : { bound, text: source.text, reported: source.assurance === "reported" };
+    return source === null ? null : { bound, text: source.text, note: source.note };
   };
   return { record: cited.record, lines: [line("lower"), line("upper")] };
 }
@@ -233,8 +238,8 @@ export function createFactsView(document: Document, DATA: Corpus) {
       if (line !== null) {
         slot.appendChild(text("span", `cite-bound is-${line.bound}`, line.bound));
         slot.appendChild(text("span", "cite-text", line.text));
-        if (line.reported) {
-          slot.appendChild(text("span", "cite-reported", REPORTED));
+        if (line.note !== null) {
+          slot.appendChild(text("span", "cite-note", line.note));
         }
       }
       return slot;

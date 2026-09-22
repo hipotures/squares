@@ -77,11 +77,14 @@ export interface CorpusColour {
 export type CitationBound = "lower" | "upper";
 /**
  * Where one bound comes from, as `packing/atlas/known-best/bound-citations.json` states it. Only
- * what the stage draws is carried: the reference line, and whether the register has certified
- * the bound (`verified`) or only reports it (`reported`).
+ * what the stage draws is carried: the reference line, the one parenthesis of everything this
+ * project has to say about the bound, and whether the register has certified it (`verified`) or
+ * only reports it (`reported`).
  */
 export interface CorpusCitation {
   text: string;
+  /** `(reported)`, `(confirmed T-009)`, `(reported; confirmed T-009)`, or null for nothing. */
+  note: string | null;
   basis: "external" | "project";
   assurance: "verified" | "reported";
 }
@@ -341,7 +344,8 @@ function version(value: unknown): string {
   }
   return text;
 }
-/** A citation line is drawn on one line of the facts column, so it is one short line of text. */
+/** A citation line is drawn on one line of the facts column, so it is one short line of text.
+ * The reference and its note share that line, and the builder checks them against it together. */
 const CITATION_TEXT_MAX = 66;
 function citation(value: unknown): CorpusCitation {
   const row = object(value, "citation");
@@ -352,6 +356,13 @@ function citation(value: unknown): CorpusCitation {
   if (text.length > CITATION_TEXT_MAX) {
     throw new RangeError(`citation text must be at most ${CITATION_TEXT_MAX} characters`);
   }
+  const note = nullable(row.note, string);
+  if (note !== null && !/^\([^()\n\r\t]+\)$/.test(note)) {
+    throw new RangeError("a citation note must be one parenthesis of text");
+  }
+  if (note !== null && text.length + 1 + note.length > CITATION_TEXT_MAX) {
+    throw new RangeError(`a citation and its note must be at most ${CITATION_TEXT_MAX} characters`);
+  }
   const basis = row.basis;
   const assurance = row.assurance;
   if (basis !== "external" && basis !== "project") {
@@ -360,7 +371,7 @@ function citation(value: unknown): CorpusCitation {
   if (assurance !== "verified" && assurance !== "reported") {
     throw new RangeError("citation assurance must be verified or reported");
   }
-  return { text, basis, assurance };
+  return { text, note, basis, assurance };
 }
 function citations(value: unknown): CorpusCitations {
   const row = object(value, "citations");
