@@ -109,11 +109,26 @@ def _first_party_lower_bounds() -> frozenset[str]:
     )
 
 
+def _six(text: str) -> str:
+    """Six decimals as written, unless the value is whole.
+
+    Stripping trailing zeros made the figure's own numbers disagree about their
+    precision: on 2026-09-22 the 324 displays carried 137 bounds at six decimals, 8 at
+    five and 2 at four, so `s(17) <= 4.675531` and `s(23) <= 5.43689` stood next to each
+    other with no reason a reader could see. Six is what the figure prints (`think-4nxe`),
+    and the record behind it keeps its full precision either way.
+
+    A whole number has nothing to say after the point, so the grid packings stay as the
+    integers they are: `s(100) = 10`, never `10.000000`.
+    """
+    whole, _, fraction = text.partition(".")
+    return whole if set(fraction) <= {"0"} else text
+
+
 def _side_text(value: str) -> str:
-    """Six significant decimals, trailing zeros and point removed."""
+    """The nearest six decimals of an exactly known side."""
     number = sp.Float(value, 20)
-    text = f"{float(number):.6f}".rstrip("0").rstrip(".")
-    return text or "0"
+    return _six(f"{float(number):.6f}") or "0"
 
 
 def _upper_text(value: str) -> str:
@@ -128,8 +143,7 @@ def _upper_text(value: str) -> str:
     """
     exact = Decimal(str(sp.Float(value, 30)))
     number = exact.quantize(Decimal("1.000000"), rounding=ROUND_UP)
-    text = format(number, "f").rstrip("0").rstrip(".")
-    return text or "0"
+    return _six(format(number, "f")) or "0"
 
 
 def _lower_text(value: str) -> str:
@@ -143,8 +157,7 @@ def _lower_text(value: str) -> str:
     """
     exact = Decimal(str(sp.Float(value, 30)))
     number = exact.quantize(Decimal("1.000000"), rounding=ROUND_DOWN)
-    text = format(number, "f").rstrip("0").rstrip(".")
-    return text or "0"
+    return _six(format(number, "f")) or "0"
 
 
 def _rigidity(n: int, packing: dict) -> dict:

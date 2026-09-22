@@ -12,6 +12,11 @@ than anything on record (`think-1z70`). Nothing read the displays, so nothing sa
 
 These tests read them: the two helpers on their own, and every display in the retained
 record against the value it was made from.
+
+They also hold the width. The displays used to strip trailing zeros, so the record
+carried three precisions at once -- 137 bounds at six decimals, 8 at five, 2 at four --
+and a reader had no way to tell which was a rounding and which was the whole number
+(`think-4nxe`, 2026-09-22).
 """
 
 from __future__ import annotations
@@ -74,6 +79,36 @@ def test_an_equality_keeps_the_nearest_six_decimals() -> None:
     # An equality claims neither direction, so it is the closest six decimals to the value.
     assert _side_text("3.8284271247") == "3.828427"
     assert abs(Decimal(_side_text("5.9338334626769")) - Decimal("5.9338334626769")) <= STEP
+
+
+@pytest.mark.parametrize(
+    ("helper", "value", "shown"),
+    [
+        (_lower_text, "4.8", "4.800000"),
+        (_upper_text, "7.7008", "7.700800"),
+        (_side_text, "3.96", "3.960000"),
+        # A whole number has nothing to say after the point and keeps none of it.
+        (_side_text, "10", "10"),
+        (_upper_text, "6", "6"),
+        (_lower_text, "1", "1"),
+    ],
+)
+def test_a_display_keeps_six_decimals_unless_the_value_is_whole(
+    helper: Any, value: str, shown: str
+) -> None:
+    assert helper(value) == shown
+
+
+def test_every_display_in_the_record_is_whole_or_six_decimals() -> None:
+    ragged: list[str] = []
+    for packing in _entries():
+        for part in ("side", "lower"):
+            display = str(packing[part]["display"])
+            number = display.rsplit(maxsplit=1)[-1]
+            _, point, fraction = number.partition(".")
+            if point and len(fraction) != 6:
+                ragged.append(f"n = {packing['n']}: {display} carries {len(fraction)}")
+    assert ragged == [], ragged
 
 
 def test_every_displayed_bound_in_the_record_stays_true_as_written() -> None:

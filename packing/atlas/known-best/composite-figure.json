@@ -627,7 +627,7 @@
           "state": "closed-form"
         },
         "lower": {
-          "display": "s(12) ≥ 3.96",
+          "display": "s(12) ≥ 3.960000",
           "evidence": [
             "E-fractional-interval-decision",
             "E-n012-fractional-certificate"
@@ -920,7 +920,7 @@
           "state": "closed-form"
         },
         "lower": {
-          "display": "s(18) ≥ 4.679",
+          "display": "s(18) ≥ 4.679000",
           "evidence": [
             "E-fractional-interval-decision",
             "E-n018-t030-fractional-certificate"
@@ -965,7 +965,7 @@
           "state": "closed-form"
         },
         "lower": {
-          "display": "s(19) ≥ 4.8",
+          "display": "s(19) ≥ 4.800000",
           "evidence": [
             "E-fractional-interval-decision",
             "E-n020-fractional-certificate"
@@ -1010,7 +1010,7 @@
           "state": "closed-form"
         },
         "lower": {
-          "display": "s(20) ≥ 4.85",
+          "display": "s(20) ≥ 4.850000",
           "evidence": [
             "E-fractional-interval-decision",
             "E-n020-fractional-certificate-97-20"
@@ -1055,7 +1055,7 @@
           "state": "closed-form"
         },
         "lower": {
-          "display": "s(21) ≥ 4.85",
+          "display": "s(21) ≥ 4.850000",
           "evidence": [
             "E-fractional-interval-decision",
             "E-n020-fractional-certificate-97-20"
@@ -1345,7 +1345,7 @@
           "state": "closed-form"
         },
         "lower": {
-          "display": "s(27) ≥ 5.24264",
+          "display": "s(27) ≥ 5.242640",
           "evidence": [
             "E-nagamochi-lower"
           ],
@@ -1836,7 +1836,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(37) ≤ 6.59862",
+          "display": "s(37) ≤ 6.598620",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "6.59861960924436"
@@ -2483,7 +2483,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(51) ≤ 7.7008",
+          "display": "s(51) ≤ 7.700800",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "7.70079923541701"
@@ -2638,7 +2638,7 @@
           "state": "numeric-only"
         },
         "lower": {
-          "display": "s(55) ≥ 7.48074",
+          "display": "s(55) ≥ 7.480740",
           "evidence": [
             "E-nagamochi-lower"
           ],
@@ -4086,7 +4086,7 @@
           "state": "minimal-polynomial"
         },
         "lower": {
-          "display": "s(87) ≥ 9.3666",
+          "display": "s(87) ≥ 9.366600",
           "evidence": [
             "E-nagamochi-lower"
           ],
@@ -4438,7 +4438,7 @@
           "state": "closed-form"
         },
         "lower": {
-          "display": "s(95) ≥ 9.83176",
+          "display": "s(95) ≥ 9.831760",
           "evidence": [
             "E-nagamochi-lower"
           ],
@@ -4963,7 +4963,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(106) ≤ 10.82298",
+          "display": "s(106) ≤ 10.822980",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "10.82297973416944"
@@ -5051,7 +5051,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(108) ≤ 10.92592",
+          "display": "s(108) ≤ 10.925920",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "10.92591939016138"
@@ -5206,7 +5206,7 @@
           "state": "closed-form"
         },
         "lower": {
-          "display": "s(112) ≥ 10.64365",
+          "display": "s(112) ≥ 10.643650",
           "evidence": [
             "E-nagamochi-lower"
           ],
@@ -5731,7 +5731,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(123) ≤ 11.6014",
+          "display": "s(123) ≤ 11.601400",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "11.60139979378801"
@@ -5842,7 +5842,7 @@
           "state": "minimal-polynomial"
         },
         "lower": {
-          "display": "s(126) ≥ 11.24695",
+          "display": "s(126) ≥ 11.246950",
           "evidence": [
             "E-nagamochi-lower"
           ],
@@ -5886,7 +5886,7 @@
           "state": "closed-form"
         },
         "lower": {
-          "display": "s(127) ≥ 11.29563",
+          "display": "s(127) ≥ 11.295630",
           "evidence": [
             "E-nagamochi-lower"
           ],
@@ -5930,7 +5930,7 @@
           "state": "minimal-polynomial"
         },
         "lower": {
-          "display": "s(128) ≥ 11.34408",
+          "display": "s(128) ≥ 11.344080",
           "evidence": [
             "E-nagamochi-lower"
           ],
@@ -6414,7 +6414,7 @@
           "state": "closed-form"
         },
         "lower": {
-          "display": "s(139) ≥ 11.86278",
+          "display": "s(139) ≥ 11.862780",
           "evidence": [
             "E-nagamochi-lower"
           ],
@@ -7270,7 +7270,7 @@
           "state": "closed-form"
         },
         "lower": {
-          "display": "s(158) ≥ 12.61895",
+          "display": "s(158) ≥ 12.618950",
           "evidence": [
             "E-nagamochi-lower"
           ],
@@ -7402,7 +7402,7 @@
           "state": "closed-form"
         },
         "lower": {
-          "display": "s(161) ≥ 12.74734",
+          "display": "s(161) ≥ 12.747340",
           "evidence": [
             "E-nagamochi-lower"
           ],
@@ -7622,7 +7622,7 @@
           "state": "closed-form"
         },
         "lower": {
-          "display": "s(166) ≥ 12.95826",
+          "display": "s(166) ≥ 12.958260",
           "evidence": [
             "E-nagamochi-lower"
           ],
@@ -8235,7 +8235,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(179) ≤ 13.89541",
+          "display": "s(179) ≤ 13.895410",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "13.89540982243640"
@@ -8279,7 +8279,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(180) ≤ 13.93514",
+          "display": "s(180) ≤ 13.935140",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "13.93513929847193"
@@ -8367,7 +8367,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(182) ≤ 13.97443",
+          "display": "s(182) ≤ 13.974430",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "13.97442960739443"
@@ -8434,7 +8434,7 @@
           "state": "closed-form"
         },
         "lower": {
-          "display": "s(184) ≥ 13.60952",
+          "display": "s(184) ≥ 13.609520",
           "evidence": [
             "E-nagamochi-lower"
           ],
@@ -8478,7 +8478,7 @@
           "state": "closed-form"
         },
         "lower": {
-          "display": "s(185) ≥ 13.64911",
+          "display": "s(185) ≥ 13.649110",
           "evidence": [
             "E-nagamochi-lower"
           ],
@@ -9686,7 +9686,7 @@
           "state": "closed-form"
         },
         "lower": {
-          "display": "s(212) ≥ 14.60147",
+          "display": "s(212) ≥ 14.601470",
           "evidence": [
             "E-nagamochi-lower"
           ],
@@ -10126,7 +10126,7 @@
           "state": "closed-form"
         },
         "lower": {
-          "display": "s(222) ≥ 14.96424",
+          "display": "s(222) ≥ 14.964240",
           "evidence": [
             "E-nagamochi-lower"
           ],
@@ -10542,7 +10542,7 @@
           "state": "closed-form"
         },
         "lower": {
-          "display": "s(231) ≥ 15.21267",
+          "display": "s(231) ≥ 15.212670",
           "evidence": [
             "E-nagamochi-lower"
           ],
@@ -10718,7 +10718,7 @@
           "state": "minimal-polynomial"
         },
         "lower": {
-          "display": "s(235) ≥ 15.3527",
+          "display": "s(235) ≥ 15.352700",
           "evidence": [
             "E-nagamochi-lower"
           ],
@@ -11882,7 +11882,7 @@
           "state": "closed-form"
         },
         "lower": {
-          "display": "s(261) ≥ 16.16575",
+          "display": "s(261) ≥ 16.165750",
           "evidence": [
             "E-nagamochi-lower"
           ],
@@ -13507,7 +13507,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(297) ≤ 17.74117",
+          "display": "s(297) ≤ 17.741170",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "17.74116992948972"
@@ -13530,7 +13530,7 @@
           "state": "closed-form"
         },
         "lower": {
-          "display": "s(298) ≥ 17.27882",
+          "display": "s(298) ≥ 17.278820",
           "evidence": [
             "E-nagamochi-lower"
           ],
@@ -13903,7 +13903,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(306) ≤ 17.96927",
+          "display": "s(306) ≤ 17.969270",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "17.96926975248972"
@@ -14190,7 +14190,7 @@
           "state": "closed-form"
         },
         "lower": {
-          "display": "s(313) ≥ 17.7332",
+          "display": "s(313) ≥ 17.733200",
           "evidence": [
             "E-nagamochi-lower"
           ],
