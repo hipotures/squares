@@ -1178,7 +1178,7 @@ def test_fast_composite_check_rejects_a_stale_version_stamp() -> None:
     )
 
 
-def test_the_version_leaves_out_exactly_the_stamped_composites_the_video_code_and_the_readmes() -> None:
+def test_the_version_leaves_out_the_stamped_composites_the_video_code_and_readmes() -> None:
     """What `sqpack.release` does not count as data is what the stamp would chase.
 
     Each composite and every export drawn from it carries the version, so each must be
