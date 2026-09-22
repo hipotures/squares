@@ -36,11 +36,13 @@ A session that wants the rung registered needs to:
 2. write the claim in the shape `T-026`’s uses, as a **supremum** — the theorem supplies
    no individual certificate at that side and does not establish a strict inequality
    there, and the tool says so in its own output;
-3. carry the limit record.
-   `--update-limit-record` was started and replays all five source conditions, which
-   means re-running the 40-minute Condition 5'; check whether
-   `results/agenda-041/exp-226-n11-dilation-limit-corollary-net2880.json` exists and is
-   complete before trusting it.
+3. carry the limit record, which **is written and complete**:
+   `results/agenda-041/exp-226-n11-dilation-limit-corollary-net2880.json`, 32 m 50 s to
+   replay all five source conditions.
+   It binds to the certificate by `sha256 fefcf8ac…`, carries the sharpened-containment
+   identity with its monotonicity step, the strict dilation family over its rational
+   factor domain, and the density, embedding and order steps that take the family to the
+   supremum. It records `endpoint_certificate: False`.
 
 The certificate bytes are under `results/agenda-041/`, not under `cases/`. Moving them
 to `cases/n11_threshold_certificate/` is the convention `T-026` follows and is part of
@@ -106,7 +108,18 @@ None of these moved a bound, and each is worth more than an absence.
 - **A fresh clone cannot run the loop.** Five preconditions, now checked by
   `devtools.check_bootstrap` and documented in `AGENTS.md`. A sixth is not in the check:
   the Rust engine is unbuilt, which blocks every upper-bound experiment —
-  `cargo build --release --manifest-path sqsearch/Cargo.toml`, 19 s.
+  `cargo build --release --manifest-path sqsearch/Cargo.toml`, 19 s. A seventh is not in
+  it either: `SQUARES_BROWSER_EXECUTABLE` is unset, which fails the Chromium workbench
+  check; pointed at
+  `/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell` that check
+  passes in full. Both belong in `check_bootstrap`.
+- **Two container facts that look like code failures and are not.** The subprocess
+  signal tests fail here in isolation as well as under load — “worker process group
+  remained alive after SIGKILL”, with pid 1 being `process_api` rather than an init that
+  reaps — and the release test asserting `PUBLICATION_REVISION`’s length fails on any
+  complete clone of this repository, which now abbreviates to nine characters
+  (`origin/main` is `97efd26f5`). The second is pre-existing and the shallow clone was
+  hiding it.
 - **The `1.38x` on the deep gate is the hosted runner pool, not drift.** `OR-17`’s text
   is corrected. The cheapest remaining win there is running the gate **once per tree
   rather than once per pull-request event**; two runs spent 45 minutes each on
