@@ -334,7 +334,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       on: false,
       fullBeat: false,
       fastSimple: true,
-      simpleSpeed: SIMPLE_SPEED_SETTINGS.default,
+      // The declaration's type is the literal 4, and this is a setting: annotated so the page
+      // can be set to another factor without the root type program reading it as a constant.
+      simpleSpeed: /** @type {number} */ (SIMPLE_SPEED_SETTINGS.default),
       prefetch: true,
     },
     // Revision 9: the range, stated as the values of n stepped *into*, which is the unit the chooser
