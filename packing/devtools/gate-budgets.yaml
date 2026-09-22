@@ -714,13 +714,22 @@ tiers:
   # on a four-cpu runner; moving it to a one-step job gives it the runner without changing
   # the edit tier, which still contains the same type floor.
   ceiling_seconds: 111.0
-  measured_seconds: 55.67
-  measured_on: '2026-09-18'
+  measured_seconds: 82.58
+  measured_on: '2026-09-22'
   measured_where: >-
-    Geometric mean of three hosted packing-validate --typecheck walls at the reference
-    shape: 65.90 s in run 35050021006 and 68.64 s in run 35052543153, job typecheck, on
-    PR 185, and 38.15 s in run 35311746708, job typecheck, on PR 199, which failed the
-    stale rule against 67.26 s (0.57x). Ceiling is 2.0x of this mean.
+    Geometric mean of six hosted packing-validate --typecheck walls on PR 218, all within
+    78.83 s to 85.41 s: runs 35786452418, 35786229930, 35781126061, 35780496520,
+    35780291711 and 35775289155, job typecheck. The previous record, 55.67 s on
+    2026-09-18, was itself a mean of 65.90 s, 68.64 s and one 38.15 s outlier its own note
+    called stale at 0.57x, so the band it armed was under two of the three walls that set
+    it. What moved the level is the merge from main at 5cd610a1a: this branch measured
+    65.33 s in run 35764316225 before it and 78.83 s or more in every run after, and the
+    merge brought about 4,400 lines of deep-gate devtools into the floor's corpus.
+    NOTE: the ceiling is left at 111.0 rather than raised to the 2.0x this entry's
+    convention would give (165 s). At 82.58 s the ceiling binds at 1.34x, before the 1.5x
+    drift rule fires at 123.9 s, so the two rules have swapped roles here. Raising a wall
+    ceiling is a decision to take on purpose (`OR-17`), not one to slip in while clearing
+    a red check.
   history:
   - measured_seconds: 67.26
     measured_on: '2026-09-16'
