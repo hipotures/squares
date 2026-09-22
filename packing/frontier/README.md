@@ -203,18 +203,27 @@ This is an audit of those named sources, not every publication.
 
 ## Registering a First-Party Result
 
-The procedure above is source intake: its first two steps retain a public claim and put
-it in the reported lane.
-A result this repository produced has no source to retain and nothing to report; it has
-a certificate, a replay, and a rung to earn.
-`T-026` is the worked example, and every step below is what its record does.
-[`epistemics.md`](../../epistemics.md) owns the rung vocabulary; this section says how a
-row satisfies it, not what it means.
+For a result produced here, register the claim supported by the retained evidence.
+Use [`epistemics.md`](../../epistemics.md) for its classification and
+[New Result Publication](../campaign/documentation-pass.md#new-result-publication) for
+publishing it. `T-026` is a worked example of a machine-certified lower bound; proofs,
+numerical findings, and structural results use the fields and rungs appropriate to their
+evidence.
+
+Before registering a machine-confirmed result, run every required verification route on
+the retained certificate bytes and keep the commands, outcomes, and scope in the
+receipts. Record `replay_status: passed` only after that replay succeeds.
+Schema and register checks inspect the recorded support; they do not execute the
+certificate’s replay command.
 
 1. **Take the next id and put the row last.**
    [`devtools.check_results`](../devtools/check_results.py) compares the register’s ids
    to `T-001..T-N` in file order, so an id is its row’s position and nothing else.
-   A new result is the last row, numbered one past the current last.
+   Check the integrated register and known parallel assignments, agendas, transports,
+   and open PRs before allocating an id, as
+   [`conventions.md`](../../conventions.md#1-identity) requires.
+   Coordinate any pending rows so the integrated register remains contiguous; a new
+   result is appended one past the current last row.
    Two branches that each add a row collide on merge, and the one landing second is
    renumbered—the only renumbering [`conventions.md`](../../conventions.md) allows,
    recorded as an annotation on the affected artifacts rather than made silently.
@@ -222,22 +231,29 @@ row satisfies it, not what it means.
 
 2. **Write the evidence entries first**, one per decision, in
    [`evidence.yaml`](evidence.yaml).
-   The rung is derived from them, so what each carries decides what the row may declare:
-   a machine entry has `method` `exact-algebraic` or `interval-certified`, `origin`
-   `audited-here` or `replayed-here`, `certificate`, `replay`, and
+   The [evidence schema](frontier-evidence.schema.yaml) requires `id`, `claim`, `scope`,
+   `assurance`, `performed_by`, `relationship_to_generator`, `replay_status`,
+   `limitations`, and `source_reviewed`, plus the fields conditional on the method and
+   assurance. The rung is derived from them, so what each carries decides what the row
+   may declare: a machine entry has `method` `exact-algebraic` or `interval-certified`,
+   `origin` `audited-here` or `replayed-here`, `certificate`, `replay`, and
    `replay_status: passed`, and counts toward `C3` only with all five.
    `assurance: verified` needs a formal method and may not carry `precision` or
-   `tolerance`. A first-party result is normally `apparently-novel`, which requires
-   `novelty_basis`—corpus, search, the narrow `novel_object`, and known gaps—and a dated
-   `source_reviewed`. `certificate` and `replay` are written relative to `packing/`,
-   where the replay runs and where `devtools.check_rung_figures` resolves the
-   certificate; every path in `results.yaml` is repository-relative.
+   `tolerance`. Choose novelty from the retained source search, independently of who
+   produced the result.
+   For `apparently-novel`, record `novelty_basis`: the corpus, search, narrow
+   `novel_object`, and known gaps, dated by `source_reviewed`. Write local `certificate`
+   paths relative to `packing/` and `replay` as a command runnable from `packing/`;
+   every path in `results.yaml` is repository-relative.
+   Verify that the certificate resolves and the command actually runs: the evidence
+   schema accepts nonempty strings, and `check_rung_figures` can skip unrecognized or
+   unresolved certificates.
    `T-026` cites five entries: the exact decision and the interval decision of the
    1440-step certificate, the dilation-limit record that turns its shrink into the
    registered bound, and the 720-step pair retained as its control.
 
-3. **Keep the certificate bytes under `cases/`.** `T-026`’s certificates, limit records,
-   proof note, and verifier are all in
+3. **Keep first-party certificate packages under `cases/`.** `T-026`’s certificates,
+   limit records, proof note, and verifier are all in
    [`../cases/n11_threshold_certificate/`](../cases/n11_threshold_certificate/), one
    package per certificate family, named by the evidence entries’ `certificate` and the
    row’s `artifacts` alike.
@@ -246,17 +262,25 @@ row satisfies it, not what it means.
    package is what readers are pointed at: the root README’s New Results entries link
    into it, and the self-contained verifiable-claim documents live there.
 
-4. **Update the case.** Its `verified_lower_bound` or `verified_upper_bound` cites the
-   same evidence entries, with `value` and `exact_form`, and its body must restate the
-   new bound: `devtools.check_case_prose` reads the prose against the front matter,
-   because three case bodies once sat six hours on a rung the front matter had left.
+4. **Update affected cases.** When the result improves a formal bound, the case’s
+   `verified_lower_bound` or `verified_upper_bound` cites the evidence that directly
+   establishes that bound, with `value` and `exact_form`, and its body must restate the
+   new bound: `devtools.check_case_prose` reads the prose against the front matter.
+   Controls may remain result-only: `T-026` cites five entries, while the case bound
+   cites the three that establish its 1440-step result.
+   A numerical finding or a result about a restricted family does not by itself change
+   an unconditional verified bound.
+   Preserve earlier evidence and decisions.
 
 5. **Write the row** with what [`results.schema.yaml`](results.schema.yaml) requires:
    `id`, `claim`, `scope`, `verification`, `confirmation`, `significance`, `novelty`,
    `evidence`, `artifacts`, and `next_rung`, plus `controls` at `C3` or above.
-   `claim` is the one statement the rungs attach to, in full and with the exact value;
-   `devtools.check_rung_figures` recomputes every `a/b = d.ddd` in it and every mass,
-   atom count, and margin it quotes from a named certificate.
+   `claim` is the one statement the rungs attach to, in full and with exact values where
+   established; `devtools.check_rung_figures` checks recognized `a/b = d.ddd`
+   expressions and supported mass, atom-count, and margin phrases against the local
+   fractional certificates it resolves.
+   It is a targeted consistency check, not a proof of every numerical statement or
+   certificate format; review the remaining figures explicitly.
    `significance` is a `score` from 1 to 5 against the rubric, a `rationale`, the date
    `scored`, and `by`; it never gates.
    `artifacts` and `controls` are repository-relative paths that must exist, and
@@ -270,21 +294,26 @@ row satisfies it, not what it means.
 6. **Derive the rung; do not choose it.** `verification` and `confirmation` are declared
    in the row and re-derived from the cited entries by the checker, which refuses a
    declaration above what they support and a declaration below it that has no
-   `composition` note. Three predicates are literal and are the ones read wrong:
+   `composition` note. `V0` and `V2` are declared-only and require explanatory `notes`.
+   Review evidence relevance, scope, and coverage of every premise before accepting the
+   derived rung; the checker does not establish those relationships.
+   Result-level novelty is also declared and reviewed, not derived from the entries.
 
    - `C4` is two machine-shaped repository-origin entries with *different* `method`
      values. `T-026` earns it from the exact event-cell sweep (`exact-algebraic`) and the
      interval branch and bound (`interval-certified`) of one certificate: one harness
      runs both, and they share the loader and the closed-form conditions but nothing of
      how the least-charge condition is decided, so the two fail differently.
-     Two implementations of one method—two exact sweeps, however independently
-     written—derive `C3`.
+     Review establishes that method distinction; the checker compares the recorded
+     method values. Two implementations of one method—two exact sweeps, however
+     independently written—derive `C3`.
    - `C5` is `C3` or `C4` plus a `review_artifact` that exists and is mapped in
      [`document-map.yaml`](../../docs/project/document-map.yaml) as a `review` that is
      not superseded. That is a document predicate.
-     A mapped review of some other object passes the checker and fails the relevance
-     obligation `epistemics.md` leaves with the reviewer; what blocks `C5` is a missing
-     document, never missing mathematics.
+     The reviewer must establish that the review covers the complete stated claim and
+     its premises, including any composition or derivation.
+     A mapped review of another object satisfies the document predicate but cannot
+     justify `C5` for this claim.
    - A compound or derived claim takes the **minimum** rung over its parts, which can
      sit below what the checker derives from the strongest entry: a derivation step
      decided by one entry of one method holds a `C4` source at `C3`. The `composition`
@@ -298,10 +327,17 @@ row satisfies it, not what it means.
    gives: `validate_schemas` and `check_results` on the records, then
    `render_results --update`, `render_evidence_inventory --update`,
    `render_research_tables`, and `render_results_headline`. `packing-validate --records`
-   runs every `--check` form of those.
-   An `apparently-novel` result must also be named in the root README’s New Results
-   section, which `check_readme` requires, and a `T-id` may not appear there or in the
-   synopsis before its row exists, since the checker rejects unknown ids in that tier.
+   runs those checks and the related record checks; it does not replace certificate
+   replay or the full checkpoint.
+   Complete the remaining publication steps too: regenerate affected atlas exports,
+   reconcile the README, synopsis, and affected prose, and run the applicable
+   [validation tiers](../../development.md#validation-tiers), including the full
+   checkpoint before final review.
+   Retain the checked source/base and state which publication surfaces were updated or
+   checked current. Each `apparently-novel` or `confirmed-novel` result must be named in
+   the root README’s New Results section, which `check_readme` requires.
+   A `T-id` may not appear there or in the synopsis before its row exists, since the
+   checker rejects unknown ids in that tier.
 
 ## The Strategy Catalogues
 
