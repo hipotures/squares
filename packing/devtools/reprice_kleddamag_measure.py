@@ -42,25 +42,27 @@ rectangles, the same event grid and the same restricted legal-centre polygon.
 
 The controls, all exact:
 
-``K1`` every extracted cell's charge under the artifact's own weights, recomputed from
-the extracted capture set, against the artifact's retained per-row replay
-(`evidence/average4-adaptive-r1.python-replay.json`) -- the minimum, row by row, over
-every row swept. A capture set that is off by one site fails this.
-``K2`` the slab and cell counts of this sweep against the same replay, row by row.
+``K1`` this sweep's per-row minimum against the artifact's own retained replay
+(`evidence/average4-adaptive-r1.python-replay.json`), row by row over every row swept.
+``K2`` this sweep's per-row slab and cell counts against the same replay, row by row.
 Agreeing on the cell counts is the sharp half: a differently partitioned sweep would not.
+``K1`` and ``K2`` are decided together and the tool refuses to emit if either fails.
 ``K3`` this sweep's ``(units, slabs, cells)`` against
 `translate_kleddamag_certificate.restricted_row_minimum`, the translator's own
 implementation, on a sample of rows -- a third implementation of the same number.
-``K4`` the artifact's own weights evaluated through the emitted constraint matrix: the
-objective must return ``budget_units`` and the least constraint value must return
-``minimum_units``, so the LP's own arithmetic reproduces the artifact before it is asked
-to improve on it. This makes the artifact a *feasible point* of the relaxation, which is
-what makes ``budget_units / minimum_units`` the number the LP value is read against.
-``K5`` every extracted centre tested against its own row's legal-centre polygon, exactly.
-The sweep's slab window is a superset of the polygon -- it admits any cell the polygon
-*meets* -- so a cell on the boundary can have a midpoint outside it. Those rows are
-counted and reported; a constraint at an illegal centre would make the LP value an
-overstatement, which is the direction that matters for a negative verdict.
+``K4`` the artifact's own weights evaluated through the emitted constraint matrix. The
+objective must return ``budget_units``; *each* constraint must return that row's own
+swept minimum, which is what says the capture set read off the minimising cell is the
+charge the sweep found; and on a complete catalogue the least of them must return
+``minimum_units``. The artifact is then an exactly feasible point of the relaxation, and
+``budget_units / minimum_units`` is the number the program's value is read against.
+``K5`` every minimising cell clipped against its own row's parent-centre envelope, and
+the reported centre taken as the centroid of the intersection. The sweep's window is the
+artifact's own and takes a boundary cell whole, so a cell's midpoint can lie outside the
+envelope; the charge is constant on the open cell, so the clip moves the reported centre
+without moving the constraint. A row whose cell meets the envelope only in measure zero
+is counted and named, because there the constraint is the artifact's window rather than
+its envelope.
 ``K6`` the LP solution rationalised on the artifact's own weight denominator and
 re-verified exactly: the reported mass is ``objective / least charge`` in integers, so it
 is the exact mass of an exactly feasible rational measure and never a solver's float.
@@ -1269,6 +1271,15 @@ def main(argv: list[str] | None = None) -> int:
                 deadline=args.rowgen_deadline,
                 workers=args.workers,
                 quiet=args.quiet,
+            )
+            floor = max(
+                Fraction(cast(str, full["exact_floor"])),
+                Fraction(cast(str, report["rowgen"]["exact_floor"])),
+            )
+            report["headroom"]["best_exact_floor"] = str(floor)
+            report["headroom"]["best_exact_floor_float"] = float(floor)
+            report["headroom"]["verdict"] = verdict_of(
+                floor, Fraction(cast(str, full["exact_mass"]))
             )
 
     report["seconds"] = round(time.perf_counter() - started, 1)

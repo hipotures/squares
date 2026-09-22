@@ -1,3 +1,8 @@
 warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
 campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-225-n27-548-100-bump103-certificate.json: n = 27, L = 137/25 = 5.480000, 1329 atoms, mass 107289303/4000000 = 26.822326
   ceiling 5.986200, certifies every n >= 27
+  interval accepted=False enclosure=(Fraction(1025913, 1000000), Fraction(4120021, 4000000)) boxes=4955893 stalled=272 (290s)
+campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-225-n27-548-100-bump103-certificate.json: REFUSED: the interval route refused it: ('Condition 5 every admissible centre covers mass 1',)
+campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-225-n27-548-100-bump103-certificate.json: REFUSED: 272 boxes stalled; the interval route decided nothing there
+campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-225-n27-548-100-bump103-certificate.json: REFUSED: the enclosure has width: (Fraction(1025913, 1000000), Fraction(4120021, 4000000))
+EXIT:1 wall_s:291

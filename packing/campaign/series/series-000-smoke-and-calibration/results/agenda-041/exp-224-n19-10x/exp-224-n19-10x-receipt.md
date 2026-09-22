@@ -1,14 +1,47 @@
-# Exp-224 n=19 at Ten Times the Budget
+# Exp-224 n=19 at Four Times the Budget
 
-Status: **in flight.** The `10x` sweep is running; this receipt carries the two parts
-that are complete — the polished `1x` baseline the sweep is judged against, and the
-adjunct one-sided tilt slopes — and will carry the sweep’s per-seed table when it lands.
+Status: **in flight.** The sweep is running; this receipt carries the three parts that
+are complete — the deviation from `H-U2`’s declared budget and why, the polished `1x`
+baseline the sweep is judged against, and the adjunct one-sided tilt slopes — and will
+carry the sweep’s per-seed table when it lands.
 Nothing here is registered and no bound moved.
 
 This is `X-042`’s
-[slate row A5](../../../../explorations/X-042-what-is-left-at-low-n.md) (`H-U2`), the
+[slate row A5](../../../../../explorations/X-042-what-is-left-at-low-n.md) (`H-U2`), the
 upper-bound side of agenda 041: `n = 19` is the low-`n` record that no computer search
 on record has ever reached.
+The directory and file are named `...-10x-...` because that is what the lane was
+dispatched as and the path is already referenced elsewhere; the budget actually run is
+`4x`, for the reason below.
+
+## The deviation, stated before anything else
+
+`H-U2` asks for `1.25e10` pair tests per chain — ten times exp-202’s budget — over five
+seeds. **That is not what ran.
+Five seeds ran at `5e9` per chain, four times exp-202.**
+
+The reason is a host-rate measurement, not a judgement.
+exp-202 ran `n = 19` over five seeds in `134.1 s` of wall at `1e10` pair tests per seed,
+which is about `3.7e8` pair tests per second on that machine.
+This host does `4.8e7` to `1.3e8`, measured on this lane’s own runs: a calibration at
+`n = 19`, seed 1, `1.25e9` per chain, `--threads 2` delivered `1.0397e10` pair tests in
+`240.4 s` at load 16, and exp-223 delivered `1.0137e10` per seed in `79.2 s` to
+`212.1 s` at `n = 12`. At that rate the declared `1.25e10` per chain costs 77 to 141
+minutes for five seeds, against a 45-minute lane budget on four cores shared with three
+other lanes.
+
+Five seeds at `4x` was preferred over two or three seeds at `10x` for two reasons.
+`H-U2`’s own kill rule is written over five seeds — “all five at or above `4.8956`” — so
+a two-seed run cannot discharge it.
+And chain depth is *measured* to be the wrong lever at this cell: exp-202’s 2×2
+factorial found the stock-schedule collective arm `B-perturb` left the grid on four of
+five seeds at `n = 19`, while the long-schedule collective arm `B-perturb-slow` returned
+`5.000000` on all five.
+Restarts are the lever, and at the stock schedule a larger pair-test budget buys
+restarts.
+
+**So `H-U2` as written is not decided by this receipt at any budget above `4x`,** and
+the measured rate above is what a future run should be priced against.
 
 ## The correction this receipt leads with
 
@@ -123,12 +156,12 @@ keeping:
 | 26 | **kink** | `s - s0` falls `10x` per `10x` in `delta`: `5.11e-3`, `1.51e-3`, `5.01e-4`, `5.00e-5`, `5.00e-6` | `+1/2` on **both** branches |
 
 `n = 26` is the `H-019` shape — the corner
-[exp-010](../../experiments/exp-010-angle-kink-n11.md) measured at `n = 11`, by the same
-method and over the same decades of `delta`, where the one-sided slopes were `0.1747`
-and `0.3841`, a ratio of `2.198`. Here the corner is symmetric: `1/2` to five digits on
-each side, ratio `1`. A smooth local model is misspecified at a corner, which is why
-this was run branchwise; a central difference at `n = 26` returns `0` and reports a
-smooth stationary point that is not there.
+[exp-010](../../../experiments/exp-010-angle-kink-n11.md) measured at `n = 11`, by the
+same method and over the same decades of `delta`, where the one-sided slopes were
+`0.1747` and `0.3841`, a ratio of `2.198`. Here the corner is symmetric: `1/2` to five
+digits on each side, ratio `1`. A smooth local model is misspecified at a corner, which
+is why this was run branchwise; a central difference at `n = 26` returns `0` and reports
+a smooth stationary point that is not there.
 
 One more contrast with `n = 11` is worth keeping.
 exp-010 records an excess of `1.742e-10` at Trump’s own exact tilt — the LP does not

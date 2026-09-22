@@ -1,19 +1,31 @@
-# exp-224 (H-U2): n = 19 at ten times the exp-202 budget.
+# exp-224 (H-U2): n = 19 at four times the exp-202 budget.
 #
 # Written before the sweep ran. It is exp-202's round-1 part-1 plan with one arm, one
-# cell, and budget_pair_tests multiplied by ten. Nothing else changed.
+# cell, and budget_pair_tests multiplied by four. Nothing else changed.
 #
-# Why this arm and not the long-schedule one. exp-202 ran a 2x2 factorial in (schedule
-# length) x (collective move) at n = 19. The stock-schedule collective arm B-perturb was
-# the only one that left the grid on any seed (median 4.984417, best 4.958948); the
-# long-schedule collective arm B-perturb-slow returned 5.000000 on all five. Depth per
-# anneal is therefore measured to be the WRONG lever at this cell, and restarts are the
-# right one, so the tenfold budget is spent at the stock schedule where it buys ten
-# times as many restarts rather than ten times longer anneals.
+# WHY FOUR AND NOT TEN, stated here because the hypothesis asks for ten. H-U2 is written
+# for a host that does about 3.7e8 pair tests per second on this arm -- exp-202 ran
+# n = 19 over five seeds in 134.1 s of wall at 1e10 per seed. This host does 4.8e7 to
+# 1.3e8, measured on this lane's own runs: exp-223 delivered 1.0137e10 pair tests per
+# seed in 79.2 s to 212.1 s at n = 12 with --threads 2, and a calibration run at n = 19,
+# seed 1, 1.25e9 per chain returned 1.0397e10 pair tests in 240.4 s at load 16. At that
+# rate the declared 1.25e10 per chain costs 77 to 141 minutes for five seeds, against a
+# 45-minute lane budget on four cores shared with three other lanes.
 #
-# Budget: 1.25e10 pair tests per chain, 8 chains, so 1e11 per seed -- ten times
-# exp-202's 1e10. The budget is enforced at restart granularity, so the delivered figure
-# overshoots by up to one anneal and is recorded per run in the archive.
+# The choice is therefore five seeds at 5e9 per chain rather than two or three seeds at
+# 1.25e10. Five seeds is what H-U2's own kill rule needs -- "all five at or above
+# 4.8956" -- and the depth of a single chain is measured to be the wrong lever at this
+# cell in any case: exp-202's 2x2 factorial found the stock-schedule collective arm
+# B-perturb left the grid on four of five seeds while the long-schedule collective arm
+# B-perturb-slow returned 5.000000 on all five. Restarts are the lever, and a larger
+# pair-test budget at the stock schedule buys restarts.
+#
+# The deviation is a deviation and is reported as one in the receipt: this is a 4x test,
+# not the 10x H-U2 asks for.
+#
+# Budget: 5e9 pair tests per chain, 8 chains, so 4e10 per seed -- four times exp-202's
+# 1e10. The budget is enforced at restart granularity, so the delivered figure overshoots
+# by up to one anneal and is recorded per run in the archive.
 #
 # threads is 2 rather than exp-202's 3 because this lane is capped at about two of four
 # shared cores. sqsearch keys its RNG on (seed, chain) alone -- Rng::keyed(seed, chain)
@@ -22,9 +34,9 @@
 # n = 19, seed 1, 1.25e9 per chain, threads 2, at engine commit c6a7ea190 returned
 # 4.971854791864539, and exp-202's archived seed-1 pose at commit 9ae7700 with threads 3
 # reads 4.971854791865.
-label: exp-224-n19-10x
+label: exp-224-n19-4x
 engine: sqsearch/target/release/sqsearch
-budget_pair_tests: 12500000000
+budget_pair_tests: 5000000000
 chains: 8
 threads: 2
 cells: [19]
