@@ -68,8 +68,13 @@ side and `--scene-frame` on its way, the trace is `--scene-trace`, and the conta
 `--scene-frame`.
 
 **The stage names its sources on request.** Under PROVEN, the CITATION section gives
-each bound’s reference, the frontier case record they are held in, and `reported`
-against a bound the register reports without certifying.
+each bound’s reference and the frontier case record they are held in.
+Everything this project has to say about a bound is one grey parenthesis after the
+reference, in one vocabulary: `(reported)` where the register carries the bound without
+certifying it, `(confirmed T-009)` where a result of ours checks it, and
+`(reported; confirmed T-009)` where both are true, which in the whole corpus is n = 29
+alone. The words are composed with the data, not at the stage, and the width a line is
+checked against counts them.
 It is a setting — `show citations`, off until it is asked for, `setCitations` on the
 browser API — and its data is
 [`bound-citations.json`](../../packing/atlas/known-best/bound-citations.json), read at
