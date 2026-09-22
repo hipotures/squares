@@ -27,9 +27,9 @@
   "host": {
     "cpu_count": 4,
     "loadavg": [
-      10.07373046875,
-      9.03173828125,
-      10.40576171875
+      5.54833984375,
+      6.791015625,
+      8.87109375
     ],
     "platform": "Linux-6.18.44-fc-v37-x86_64-with-glibc2.39"
   },
@@ -44,6 +44,8 @@
       "best_verified_side": 4.944934863883148,
       "engine_side_rechecked": 4.97185479186454,
       "engine_side_reported": 4.971854791864539,
+      "least_containment_margin": 0.0,
+      "least_pair_separation": 0.0,
       "n": 19,
       "polished_side": 4.944934863883148,
       "pose": {
@@ -115,20 +117,20 @@
       "quench_lp_solves": 3594,
       "quench_reason": "fixed cell unsettled during bracket: re-read cell worse",
       "quench_rounds": 2,
-      "quench_seconds": 21.338,
+      "quench_seconds": 14.711,
       "quench_trace": [
         {
           "converged": false,
           "reason": "fixed cell unsettled during bracket: re-read cell worse",
           "round": 0,
-          "seconds": 20.634,
+          "seconds": 14.095,
           "side": 4.944934863883148
         },
         {
           "converged": false,
           "reason": "fixed cell unsettled during bracket: re-read cell worse",
           "round": 1,
-          "seconds": 21.338,
+          "seconds": 14.71,
           "side": 4.944934863883148
         }
       ],
@@ -140,6 +142,8 @@
       "best_verified_side": 4.925390647054185,
       "engine_side_rechecked": 4.958947728075096,
       "engine_side_reported": 4.958947728075096,
+      "least_containment_margin": 0.0,
+      "least_pair_separation": 0.0,
       "n": 19,
       "polished_side": 4.925390647054185,
       "pose": {
@@ -211,20 +215,20 @@
       "quench_lp_solves": 1105,
       "quench_reason": "fixed cell unsettled during bracket: cell cycle (closure exceeded 64-cell cap)",
       "quench_rounds": 2,
-      "quench_seconds": 5.929,
+      "quench_seconds": 4.727,
       "quench_trace": [
         {
           "converged": false,
           "reason": "fixed cell unsettled during bracket: cell cycle (closure exceeded 64-cell cap)",
           "round": 0,
-          "seconds": 4.873,
+          "seconds": 4.058,
           "side": 4.925390647054185
         },
         {
           "converged": false,
           "reason": "fixed cell unsettled during bracket: cell cycle (closure exceeded 64-cell cap)",
           "round": 1,
-          "seconds": 5.929,
+          "seconds": 4.727,
           "side": 4.925390647054185
         }
       ],
@@ -236,6 +240,8 @@
       "best_verified_side": 4.915912971524187,
       "engine_side_rechecked": 4.984416587363404,
       "engine_side_reported": 4.984416587363404,
+      "least_containment_margin": 0.0,
+      "least_pair_separation": 0.0,
       "n": 19,
       "polished_side": 4.915912971524187,
       "pose": {
@@ -304,23 +310,23 @@
         ]
       },
       "quench_converged": true,
-      "quench_lp_solves": 10403,
+      "quench_lp_solves": 11910,
       "quench_reason": "converged, 4 classes, free pass clean",
       "quench_rounds": 2,
-      "quench_seconds": 63.196,
+      "quench_seconds": 51.772,
       "quench_trace": [
         {
-          "converged": false,
-          "reason": "time budget during free sweep",
+          "converged": true,
+          "reason": "converged, 4 classes, free pass clean",
           "round": 0,
-          "seconds": 40.03,
+          "seconds": 34.982,
           "side": 4.915912971524187
         },
         {
           "converged": true,
           "reason": "converged, 4 classes, free pass clean",
           "round": 1,
-          "seconds": 63.196,
+          "seconds": 51.772,
           "side": 4.915912971524187
         }
       ],
@@ -332,6 +338,8 @@
       "best_verified_side": 5.0,
       "engine_side_rechecked": 5.0,
       "engine_side_reported": 5.0,
+      "least_containment_margin": 0.0,
+      "least_pair_separation": 0.0,
       "n": 19,
       "polished_side": 5.0,
       "pose": {
@@ -403,20 +411,20 @@
       "quench_lp_solves": 566,
       "quench_reason": "fixed cell unsettled during bracket: cell cycle (closure exceeded 64-cell cap)",
       "quench_rounds": 2,
-      "quench_seconds": 2.825,
+      "quench_seconds": 2.322,
       "quench_trace": [
         {
           "converged": false,
           "reason": "fixed cell unsettled during bracket: cell cycle (closure exceeded 64-cell cap)",
           "round": 0,
-          "seconds": 1.365,
+          "seconds": 1.156,
           "side": 5.0
         },
         {
           "converged": false,
           "reason": "fixed cell unsettled during bracket: cell cycle (closure exceeded 64-cell cap)",
           "round": 1,
-          "seconds": 2.825,
+          "seconds": 2.322,
           "side": 5.0
         }
       ],
@@ -428,6 +436,8 @@
       "best_verified_side": 4.9550580321426025,
       "engine_side_rechecked": 4.991997643232614,
       "engine_side_reported": 4.991997643232614,
+      "least_containment_margin": 0.0,
+      "least_pair_separation": 0.0,
       "n": 19,
       "polished_side": 4.9550580321426025,
       "pose": {
@@ -496,28 +506,28 @@
         ]
       },
       "quench_converged": false,
-      "quench_lp_solves": 5486,
+      "quench_lp_solves": 7054,
       "quench_reason": "fixed cell unsettled during bracket: cell cycle (closure exceeded 64-cell cap)",
       "quench_rounds": 2,
-      "quench_seconds": 46.045,
+      "quench_seconds": 28.687,
       "quench_trace": [
         {
-          "converged": false,
-          "reason": "time budget during free sweep",
+          "converged": true,
+          "reason": "converged, 5 classes, free pass clean",
           "round": 0,
-          "seconds": 40.029,
+          "seconds": 25.074,
           "side": 4.9550580321426025
         },
         {
           "converged": false,
           "reason": "fixed cell unsettled during bracket: cell cycle (closure exceeded 64-cell cap)",
           "round": 1,
-          "seconds": 46.045,
+          "seconds": 28.687,
           "side": 4.95505803214259
         }
       ],
       "seed": 5
     }
   ],
-  "seconds": 139.419
+  "seconds": 102.277
 }
