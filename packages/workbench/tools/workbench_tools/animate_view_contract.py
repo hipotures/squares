@@ -422,6 +422,7 @@ def single_view(session: Session) -> str:
         "phase-seg",
         "fullbeat-toggle",
         "fastsimple-toggle",
+        "simple-speed",
     ]
     outside = session.look("dom/contains", parent="step-anim-box", ids=timing)
     session.require(outside == [], f"the timing group does not hold {outside}")
@@ -557,10 +558,19 @@ def gap_bar(session: Session) -> str:
         f"the bar's two numbers overlap: {low_label} and {rec_label}",
     )
     room = session.look("gapbar/clearance")
+    # The headline heads the facts column (the owner, 2026-09-21). What has to hold is
+    # that it is above the bar, inside the column on both edges, and clear of the picture
+    # beside it. It used
+    # to hang under the packing and the old check said so; measuring that now would pass only a
+    # layout the owner asked to be replaced.
     session.require(
         room["shown"]
-        and room["headTop"] >= room["packBottom"] - 0.5
-        and room["headBottom"] <= room["stageBottom"] + 0.5
+        and room["headBottom"] <= room["top"] + 0.5
+        and room["headTop"] >= -0.5
+        and room["headLeft"] >= room["panelLeft"] - 0.5
+        and room["headRight"] <= room["panelRight"] + 0.5
+        and room["headLeft"] >= room["packRight"] - 0.5
+        and room["bottom"] <= room["stageBottom"] + 0.5
         and room["right"] <= room["panelRight"] + 0.5,
         f"the bar or the headline is out of its room: {room}",
     )
@@ -652,6 +662,23 @@ def gap_bar_holds_through_motion(session: Session) -> str:
     )
     restore(session, found, "gap_bar_holds_through_motion")
     return f"the hand holds over {len(mid)} samples of a real move and catches up"
+
+
+def green_count(session: Session) -> int:
+    """How many drawn squares read as green: more green than red, and more green than blue.
+
+    Read off what the stage draws rather than off the colour system, because the question is
+    whether the setting reaches the picture.
+    """
+    total = 0
+    for row in session.look("stage/drawn"):
+        fill = row[2]
+        if not isinstance(fill, str) or not fill.startswith("#") or len(fill) != 7:
+            continue
+        red, green, blue = (int(fill[at : at + 2], 16) for at in (1, 3, 5))
+        if green > red + 25 and green > blue + 15:
+            total += 1
+    return total
 
 
 def colours(session: Session) -> str:
@@ -899,8 +926,15 @@ def colours(session: Session) -> str:
 
     session.api(("setAnimateStandardize", True), ("setRange", 29, 29))
     span = session.api(("duration",))
+    # Mid-way through the block motion, taken from the step's own schedule rather than as a
+    # fraction of the span. It was `span * 0.55`, which landed inside the blocks while the move
+    # beat was 0.5 s and landed before they started when it became 0.4 s on 2026-09-22: a rule
+    # about what the page paints WHILE SQUARES MOVE has to ask the page when they move.
+    schedule = session.api(("pause",), ("setStepN", 29), ("schedule",))
     rest = session.api(("seek", span), ("colour",))
-    moving = session.api(("seek", span * 0.55), ("colour",))
+    moving = session.api(
+        ("seek", (schedule["blocksStart"] + schedule["blocksEnd"]) / 2), ("colour",)
+    )
     unstandard = session.api(("setAnimateStandardize", False), ("seek", span), ("colour",))
     session.require(
         (rest["painted"], rest["scheme"], moving["painted"], unstandard["painted"])
@@ -908,11 +942,42 @@ def colours(session: Session) -> str:
         f"Animate paints its rest frame {rest['painted']} under {rest['scheme']}, a moving "
         f"frame {moving['painted']}, and a rest frame unstandardised {unstandard['painted']}",
     )
+    # Holding a square's color is a setting (the owner, 2026-09-21), and a setting that
+    # changed nothing on the stage would be worse than none: mid-step under the shake, a square
+    # axis-aligned at both ends keeps its green while it is visibly turned, and off, it drains
+    # with everything else. Measured on the corpus rather than asserted, so the check fails if
+    # the rule stops reaching the picture.
+    # Standardising has to be back on: the held flags are only consulted while Animate repaints
+    # its rest in the angle colors, and the block above leaves it off. Without this the check
+    # counted the same greens either way and proved nothing.
+    session.api(
+        ("setAnimateStandardize", True),
+        ("setRange", 51, 51),
+        ("setStyle", "physics"),
+        ("setAnneal", 9),
+    )
+    midway = session.api(("duration",)) * 0.45
+    # Put back as found: the default is released (the owner, 2026-09-21), and a hard-coded
+    # restore left every later section holding colors the page does not hold.
+    holding = session.api(("holdSquareColors",))
+    session.api(("setHoldSquareColors", True), ("seek", midway))
+    kept = green_count(session)
+    session.api(("setHoldSquareColors", False), ("seek", midway))
+    drained = green_count(session)
+    session.api(("setHoldSquareColors", holding))
+    # Strictly more, not all-or-nothing: some squares read green mid-step whatever the setting
+    # does, because the moving palette and the identity greens overlap. What the setting has to
+    # change is the squares the rule picks out, and 31 against 17 is that difference.
+    session.require(
+        kept > drained,
+        f"holding square colors draws {kept} greens mid-step and releasing them {drained}",
+    )
     restore(session, found, "colours")
     return (
         f"five retained frames painted as colour() says, {len(core)} angles shared by four and "
         f"{len(wide) - len(straddles)} agreeing over five ({len(straddles)} straddling a band "
-        f"edge); {held} held square-instants keep their hue; greens hold through a settle"
+        f"edge); {held} held square-instants keep their hue; greens hold through a settle; "
+        f"holding square colors keeps {kept} green mid-step where releasing keeps {drained}"
     )
 
 

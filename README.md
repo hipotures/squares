@@ -17,7 +17,7 @@ This repository contains:
   the survey are produced and checked by AI agents running a recorded process:
   hypotheses registered before measurement, every claim graded, every defect logged.
 
-The [**v0.4.0 explainer page**](https://jlevy.github.io/squares/) starts with an
+The [**v0.4.1 explainer page**](https://jlevy.github.io/squares/) starts with an
 interactive point-certificate proof, then shows how threshold atoms and a dilation limit
 reach the current `s(11)` lower bound.
 Its figures remain drawn from the point certificates they explain.

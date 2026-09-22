@@ -25,3 +25,21 @@ type SquaresMathSnapshotter = (
   phase: string,
   selected?: SquaresSelectedText[] | null,
 ) => SquaresMathSnapshot;
+
+/** One change `render_explainer_pdf/print_activity` saw while a print was in flight. */
+interface SquaresPrintActivityRecord {
+  at_ms: number;
+  kind: string;
+  where: string;
+  detail: string;
+}
+
+/** The watch `print_activity.js` installs, closed and read by `print_activity_report.js`. */
+interface SquaresPrintActivity {
+  records: SquaresPrintActivityRecord[];
+  limit: number;
+  truncated: boolean;
+  status: FontFaceSetLoadStatus;
+  note: (mutation: MutationRecord) => void;
+  stop: () => void;
+}

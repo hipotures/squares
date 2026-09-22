@@ -11,13 +11,20 @@ import copy
 from collections.abc import Callable
 from typing import Any
 
+import numpy as np
 import pytest
 
 from workbench_tools.check_layout import (
+    LEGEND_INK_SLACK,
     attribution_findings,
+    citation_findings,
     facts_findings,
     findings,
     frames_findings,
+    ink_bottoms,
+    legend_findings,
+    legend_ink_findings,
+    widest_cited,
 )
 
 TYPE = {"family": '"Source Sans 3", sans-serif', "size": "28px", "weight": "500"}
@@ -31,6 +38,15 @@ STARRED = {**TYPE, "color": SCARLET}
 FRAME = "rgb(125, 133, 144)"
 LOCKED = "rgb(23, 121, 74)"
 TRACE = "rgb(223, 227, 231)"
+#: A section head's type, as PROVEN, CITATION and OPEN are all set (measured on the page).
+HEAD = {
+    "family": '"Source Sans 3", sans-serif',
+    "size": "28px",
+    "weight": "500",
+    "spacing": "4.48px",
+    "transform": "uppercase",
+    "color": "rgb(138, 147, 158)",
+}
 
 
 def _panel(name: str, left: float, right: float, top: float, bottom: float) -> dict[str, Any]:
@@ -88,8 +104,11 @@ def _layer(*, star: bool, open_items: int) -> dict[str, Any]:
     badges = [{"icon": "badge badge-solid", "text": "exact", **LABEL}]
     if star:
         badges.insert(0, {"icon": "badge badge-star", "text": "new result", **STARRED})
+    heads = ["Proven", "Open"] if open_items else ["Proven"]
     return {
-        "heads": ["Proven", "Open"] if open_items else ["Proven"],
+        "heads": heads,
+        "headTypes": [{"text": head, **HEAD} for head in heads],
+        "citations": None,
         "openItems": open_items,
         "colours": {"starred": SCARLET, "label": GREY},
         "badges": badges,
@@ -117,19 +136,34 @@ def _frames(*, locked: bool = True, catalogue: bool = True) -> dict[str, Any]:
 
 
 def _attribution() -> dict[str, Any]:
-    """The address on the headline's baseline, ending at the rail, over nothing."""
+    """The address one legend line under the legend at its left edge, and the version on its
+    baseline at the column's right edge, over nothing. The numbers are the page's, measured."""
+    legend = {"left": 1116.0, "right": 1884.0, "top": 906.0, "bottom": 997.52}
     return {
         "placed": True,
         "shown": True,
-        "right": 1846.0,
-        "baseline": 1033.0,
-        "headlineBaseline": 1033.0,
-        "railRight": 1846.0,
-        "ink": {"left": 1568.4, "right": 1846.0, "top": 1007.3, "bottom": 1044.4},
+        "left": 1116.0,
+        "baseline": 1018.52,
+        "legend": legend,
+        "rows": [929.0, 959.14, 988.83],
+        "column": dict(legend),
+        "version": {
+            "text": "v0.4.1-f5e113",
+            "right": 1884.0,
+            "baseline": 1018.52,
+            "ink": {"left": 1762.04, "top": 995.66, "right": 1884.0, "bottom": 1027.09},
+            "screen": {"x": 1300.0, "y": 352.5, "width": 50.0, "height": 13.0},
+            "family": '"Source Sans 3", sans-serif',
+            "size": "22px",
+            "weight": "400",
+            "fill": FRAME,
+            "shown": True,
+        },
+        "ink": {"left": 1116.0, "right": 1351.13, "top": 995.66, "bottom": 1027.09},
         "frame": {"left": 0.0, "top": 0.0, "right": 1920.0, "bottom": 1080.0},
         "screen": {"x": 932.9, "y": 352.5, "width": 97.2, "height": 13.0},
         "family": '"Source Sans 3", sans-serif',
-        "size": "26px",
+        "size": "22px",
         "weight": "400",
         "fill": FRAME,
         "obstacles": [
@@ -299,16 +333,51 @@ def test_the_box_is_grey_on_its_way_and_green_only_where_it_locks() -> None:
 @pytest.mark.parametrize(
     ("change", "expected"),
     [
-        (_set("baseline", 1029.0), "baseline is at 1029.00, 4.00 stage px"),
-        (_set("right", 1840.0), "right edge is at 1840.00, 6.00 stage px"),
-        (_set("headlineBaseline", None), "baseline cannot be measured against the headline"),
-        (_set("railRight", None), "right edge cannot be measured against the gap bar's rail"),
+        (_set("left", 1110.0), "starts at 1110.00, 6.00 stage px from the legend's left edge"),
+        # Where it stood before the owner asked for the legend's own spacing: 30 under the
+        # legend's box is 38 under its last row, against the rows' 30. And closer than a line.
+        (_set("baseline", 1027.52), "is 38.69 stage px under the legend's last row, not one"),
+        (_set("baseline", 1008.0), "is 19.17 stage px under the legend's last row, not one"),
+        (_set("rows", [929.0]), "cannot be measured against the legend's rows"),
+        (_set("legend", None), "cannot be measured against the legend"),
+        (_set("left", None), "cannot be measured against the legend"),
         # The overlay's units are stage pixels only because its box is the stage's; a box that
         # is not makes the two numbers above mean something else.
         (_set("frame.right", 1024.0), "overlay is not the stage's own box"),
     ],
 )
 def test_each_attribution_anchor_refuses_the_stage_that_breaks_it(
+    change: Callable[[dict[str, Any]], None], expected: str
+) -> None:
+    attribution = copy.deepcopy(_attribution())
+    change(attribution)
+    found = attribution_findings(attribution, aligned=True)
+    assert any(expected in item for item in found), found
+
+
+@pytest.mark.parametrize(
+    ("change", "expected"),
+    [
+        (_set("version", None), "the shared version is not drawn"),
+        (_set("version.text", ""), "the shared version is not drawn"),
+        (lambda a: a["version"].update(shown=False), "the shared version is not drawn"),
+        # On its own line rather than the attribution's, and short of the column's edge.
+        (_set("version.baseline", 1022.0), "stands on 1022.00, not the attribution's baseline"),
+        (_set("version.right", 1876.0), "ends at 1876.00, not the column's right edge at 1884"),
+        (_set("column", None), "not the column's right edge at None"),
+        # Styled to match it (the owner, 2026-09-22): one family, size, weight and colour.
+        (
+            _set("version.size", "18px"),
+            "the version's size is 18px, not the attribution's 22px",
+        ),
+        (_set("version.weight", "600"), "the version's weight is 600"),
+        (_set("version.fill", GREY), f"the version's fill is {GREY}"),
+        (_set("version.family", "serif"), "the version's family is serif"),
+        # A mode that set both texts on the right would put the one over the other.
+        (_set("ink.right", 1800.0), "the version is drawn over the attribution"),
+    ],
+)
+def test_each_version_rule_refuses_the_stage_that_breaks_it(
     change: Callable[[dict[str, Any]], None], expected: str
 ) -> None:
     attribution = copy.deepcopy(_attribution())
@@ -331,9 +400,282 @@ def test_the_attribution_is_drawn_and_clears_what_the_stage_draws() -> None:
         "drawn over #packing-svg" in item
         for item in attribution_findings(over_the_packing, aligned=True)
     )
-    # A misalignment is not checked where the headline and the rail are not drawn, but what it
-    # is drawn over still is: Pack keeps the placement the catalogue measured.
-    drifted = copy.deepcopy(_attribution())
-    drifted["baseline"] = 900.0
-    drifted["headlineBaseline"] = None
-    assert attribution_findings(drifted, aligned=False) == []
+    # The legend is not shown in Pack and the studio, so where the address starts is not checked
+    # there, but what it is drawn over still is: those modes center the packing, and at the
+    # legend's left edge the address sat across it.
+    clear = copy.deepcopy(_attribution())
+    clear["legend"] = None
+    # Where Pack and the studio set the address: mirroring the version, at the stage's bottom
+    # left, 36 stage px in from its edge as the version is from the right one.
+    clear["ink"] = {"left": 36.0, "right": 271.13, "top": 995.66, "bottom": 1027.09}
+    clear["obstacles"][0] = {
+        "name": "#packing-svg",
+        "left": 460,
+        "right": 1516,
+        "top": 12,
+        "bottom": 1068,
+    }
+    assert attribution_findings(clear, aligned=False) == []
+    across = copy.deepcopy(clear)
+    across["ink"] = _attribution()["ink"]
+    assert any(
+        "drawn over #packing-svg" in item
+        for item in attribution_findings(across, aligned=False)
+    )
+    # The version and the address both at the right, as the address stood there before the
+    # version: 379 stage px of text in the 368 right of Pack's drawing.
+    both_right = copy.deepcopy(clear)
+    both_right["ink"] = {"left": 1505.0, "right": 1740.0, "top": 995.66, "bottom": 1027.09}
+    assert any(
+        "the attribution is drawn over #packing-svg by 11.0" in item
+        for item in attribution_findings(both_right, aligned=False)
+    )
+    version_over = copy.deepcopy(clear)
+    version_over["version"]["ink"] = {
+        "left": 1400.0,
+        "right": 1522.0,
+        "top": 995.66,
+        "bottom": 1027.09,
+    }
+    assert any(
+        "the version is drawn over #packing-svg" in item
+        for item in attribution_findings(version_over, aligned=False)
+    )
+
+
+# -------------------------------------------------------------------------------- the legend
+
+
+def test_the_legends_math_must_stand_on_its_sentences_baseline() -> None:
+    # Measured on the page: the sentence and both formulas at 929.5.
+    aligned = {"text": 929.5, "math": [{"source": "s(n)", "baseline": 929.5}]}
+    assert legend_findings(aligned) == []
+    low = {"text": 929.5, "math": [{"source": "s(n)", "baseline": 930.5}]}
+    [finding] = legend_findings(low)
+    assert "s(n) stands +1.00 stage px" in finding
+    assert legend_findings({"text": 929.5, "math": []}) == [
+        "the legend's sentence sets no math to measure"
+    ]
+
+
+def _letters(bottoms: dict[int, int], height: int = 40, width: int = 60) -> np.ndarray:
+    """White paper with a black block per letter, each ten columns wide, ending at its row."""
+    image = np.full((height, width, 3), 255, dtype=np.uint8)
+    for start, bottom in bottoms.items():
+        image[bottom - 12 : bottom, start : start + 10] = 0
+    return image
+
+
+def test_ink_is_read_where_each_letter_ends_and_nowhere_else() -> None:
+    image = _letters({0: 30, 20: 30, 40: 34})
+    glyphs = [
+        {"char": "i", "math": False, "left": 0, "right": 10},
+        {"char": "s", "math": False, "left": 20, "right": 30},
+        {"char": "n", "math": True, "left": 40, "right": 50},
+    ]
+    assert ink_bottoms(image, glyphs, origin=0, scale=1) == [30.0, 30.0, 34.0]
+    # An empty advance box drew nothing, which is its own finding rather than a zero.
+    blank = [{"char": "x", "math": True, "left": 52, "right": 60}]
+    assert ink_bottoms(image, blank, origin=0, scale=1) == [None]
+
+
+def test_a_formula_whose_ink_ends_off_the_sentences_line_is_a_finding() -> None:
+    glyphs = [
+        {"char": "i", "math": False},
+        {"char": "s", "math": False},
+        {"char": "e", "math": False},
+        {"char": "n", "math": True},
+    ]
+    # The line is the median of the text letters, so one letter's overshoot does not move it.
+    on_line = [929.25, 929.5, 929.5, 929.5 + LEGEND_INK_SLACK / 2]
+    assert legend_ink_findings(glyphs, on_line) == []
+    [finding] = legend_ink_findings(glyphs, [929.25, 929.5, 929.5, 930.5])
+    assert "'n' ends +1.00 stage px" in finding
+    assert legend_ink_findings(glyphs, [929.5, 929.5, 929.5, None]) == [
+        "the legend's math 'n' drew no ink to read"
+    ]
+
+
+# ------------------------------------------------------------------------------ the citations
+
+#: The bound line's two colours, which a citation line's label takes.
+LOWER_INK = SCARLET
+UPPER_INK = LOCKED
+
+
+def _section(*, lower: bool = True, upper: bool = True, noted: bool = True) -> dict[str, Any]:
+    """A CITATION section as the page draws it at n = 17, with OPEN moved below it."""
+
+    def line(
+        slot: str, top: float, right: float, *, drawn: bool, marked: bool
+    ) -> dict[str, Any]:
+        return {
+            "slot": slot,
+            "bound": slot if drawn else None,
+            "text": f"the {slot} bound's source" if drawn else None,
+            "note": "(reported)" if drawn and marked else None,
+            "color": (LOWER_INK if slot == "lower" else UPPER_INK) if drawn else None,
+            "left": 1116.0,
+            "top": top,
+            "right": right if drawn else 1116.0,
+            "bottom": top + 30,
+        }
+
+    drawn = lower or upper
+    return {
+        "head": {
+            "text": "Citation" if drawn else "",
+            "drawn": drawn,
+            "left": 1116.0,
+            "top": 618.0,
+            "right": 1263.09 if drawn else 1116.0,
+            "bottom": 652.0,
+        },
+        "record": (
+            {
+                "text": "recordn-017",
+                "left": 1278.6,
+                "top": 624.5,
+                "right": 1395.2,
+                "bottom": 654.2,
+            }
+            if drawn
+            else None
+        ),
+        "lines": [
+            line("lower", 658.0, 1461.06, drawn=lower, marked=False),
+            line("upper", 688.0, 1814.38, drawn=upper, marked=noted),
+        ],
+        "below": [
+            {
+                "name": "div.section-head.head-open",
+                "left": 1116,
+                "top": 746,
+                "right": 1202,
+                "bottom": 780,
+            },
+            {"name": "div.open-items", "left": 1116, "top": 786, "right": 1280, "bottom": 826},
+        ],
+        "column": {"left": 1116.0, "top": 906.0, "right": 1884.0, "bottom": 997.52},
+        "colours": {"lower": LOWER_INK, "upper": UPPER_INK},
+    }
+
+
+def test_a_citation_section_that_keeps_every_rule_passes() -> None:
+    assert citation_findings(_section(), shown=True) == []
+    assert citation_findings(_section(noted=False), shown=True) == []
+    # One bound cited: the other line is an empty slot, and the section is still headed.
+    assert citation_findings(_section(lower=False), shown=True) == []
+    assert citation_findings(_section(upper=False), shown=True) == []
+    # Nothing cited: the slots are built and empty, and the head is not drawn.
+    assert citation_findings(_section(lower=False, upper=False), shown=True) == []
+    assert citation_findings(None, shown=False) == []
+
+
+@pytest.mark.parametrize(
+    ("change", "expected"),
+    [
+        # Too long for the column at the stage's small type: the fixture's 65-character
+        # noted line measured 1912 against the column's 1884.
+        (
+            _set("lines.1.right", 1912.4),
+            "spans 1116.0..1912.4, outside the column's 1116.0..1884.0",
+        ),
+        (_set("lines.0.left", 1100.0), "spans 1100.0..1461.1, outside the column's"),
+        (_set("column", None), "has no column to be measured against"),
+        # OPEN left where it stands with the setting off, across the section.
+        (
+            _set("below.0.top", 618.0),
+            "ends at 718.0, 100.0 stage px into div.section-head.head-open",
+        ),
+        (_set("column.top", 700.0), "18.0 stage px into #stage-note below it"),
+        (lambda c: c["head"].update(drawn=False), "CITATION is not headed over 2 drawn lines"),
+        (_set("lines.0.color", GREY), f"is labeled in {GREY}, not its bound's {LOWER_INK}"),
+        (
+            _set("lines.1.color", LOWER_INK),
+            f"is labeled in {LOWER_INK}, not its bound's {UPPER_INK}",
+        ),
+        (_set("lines.0.bound", "upper"), "source\" is labeled 'upper'"),
+        # An aside the record would never compose: the check reads the words, not a flag.
+        (
+            _set("lines.1.note", "(unverified)"),
+            "carries the note '(unverified)', which is not one aside",
+        ),
+        (_set("lines.1.top", 670.0), "the lower and upper citations overlap by 18.0"),
+        (_set("lines.0.top", 640.0), "starts at 640.0, inside its head"),
+        (
+            _set("lines", []),
+            "the section's lines are [], not the lower bound's then the upper's",
+        ),
+        # The frontier record, once per n on the head's line (the owner, 2026-09-22).
+        (
+            _set("record", None),
+            "the head's line names the record None where it is headed: True",
+        ),
+        (_set("record.text", "recordN-017"), "names the record"),
+        (_set("record.text", "n-017"), "names the record"),
+        (
+            _set("record.right", 1900.0),
+            "the record 'recordn-017' ends past the column at 1900.0",
+        ),
+    ],
+)
+def test_each_citation_rule_refuses_the_section_that_breaks_it(
+    change: Callable[[dict[str, Any]], None], expected: str
+) -> None:
+    section = copy.deepcopy(_section())
+    change(section)
+    found = citation_findings(section, shown=True)
+    assert any(expected in item for item in found), found
+
+
+def test_the_citation_section_is_built_exactly_while_its_setting_is_on() -> None:
+    assert citation_findings(_section(), shown=False) == [
+        "a CITATION section is built with the setting off"
+    ]
+    assert citation_findings(None, shown=True) == [
+        "the citation setting is on and no CITATION section is built"
+    ]
+    headed_over_nothing = _section(lower=False, upper=False)
+    headed_over_nothing["head"]["drawn"] = True
+    assert citation_findings(headed_over_nothing, shown=True) == [
+        "CITATION is headed over 0 drawn lines",
+        "the head's line names the record None where it is headed: True",
+    ]
+    # A record named over nothing: the empty head's slot names no record either.
+    unheaded_record = _section(lower=False, upper=False)
+    unheaded_record["record"] = _section()["record"]
+    assert any(
+        "names the record" in item for item in citation_findings(unheaded_record, shown=True)
+    )
+
+
+def test_the_citation_head_is_set_in_the_heads_type() -> None:
+    layer = _layer(star=False, open_items=2)
+    layer["headTypes"].insert(1, {"text": "Citation", **HEAD})
+    assert facts_findings(layer) == []
+    for key, value in (
+        ("size", "22px"),
+        ("spacing", "0px"),
+        ("transform", "none"),
+        ("color", GREY),
+    ):
+        off = copy.deepcopy(layer)
+        off["headTypes"][1][key] = value
+        assert any("heads are set in 2 different types" in item for item in facts_findings(off))
+
+
+def test_the_sweep_measures_the_citation_section_where_it_is_hardest_to_fit() -> None:
+    def cite(text: str, note: str | None = None) -> dict[str, str | None]:
+        return {"text": text, "note": note, "basis": "external", "assurance": "verified"}
+
+    entries = {
+        "5": {"lower": cite("x" * 60), "upper": None},
+        "17": {"lower": cite("short"), "upper": cite("y" * 50, "(reported)")},
+        "18": {"lower": cite("short"), "upper": cite("z" * 55)},
+        "324": {"lower": cite("w" * 66), "upper": cite("v" * 66, "(reported)")},
+    }
+    # Both bounds cited beats one; a noted line beats none; 324 has no step into it drawn.
+    assert widest_cited(entries, last=323) == 17
+    assert widest_cited(entries, last=324) == 324
+    assert widest_cited({}, last=323) is None

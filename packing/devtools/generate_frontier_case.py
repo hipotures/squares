@@ -64,7 +64,7 @@ catalogue states neither as a field; both live in the prose under the picture, w
 the page means -- it is measured against the sixty catalogue-sourced pictured entries at
 `n <= 100` that a person transcribed by hand. A rule fires on 22 of them and agrees with
 the transcription on every one; on the other 38 no rule fires, and the transcription
-called those `hand-construction` (22), `trivial-grid` (14) or `unknown` (2), never one of
+called those `hand-construction` (21), `trivial-grid` (14) or `unknown` (3), never one of
 the four methods a rule is for. The counts are the number of entries each rule reaches:
 
 | The credit line contains | `construction_method` | at `n <= 100` | in `101..324` |
