@@ -24,7 +24,17 @@ change. A historical pull-request run drew that revision at 786125 bytes over 17
 where the container drew 18. These host-qualified controls describe known outcomes; they
 do not identify the cause of the two-byte CI disagreement or rule out another readiness
 failure. `--check` now names the PDF object or outside-object section containing the
-first difference. D-490 records the incident, and `think-ptit` tracks its unknown cause.
+first difference, and that report is what identified the cause on 2026-09-22.
+
+The last wait is the one no wait can reach, and it is D-490's. The page's print handlers
+do not run until a print runs, so they run inside `page.pdf()`, and the certificate
+figure answers `beforeprint` and `afterprint` by re-rendering every readout beside it --
+366 attribute writes on math boxes whose inline `style` carries KaTeX geometry in em,
+while Chromium is laying the printed pages out. A draw that samples one of them
+mid-render is a draw whose bytes nothing else will reproduce. `_draw_reproduced` is the
+answer available here: print until two consecutive prints of one page agree, and hand
+out only bytes that were drawn twice. The cause-level fix belongs in
+`devtools/explainer/certificate.js`, which is not this module's to make.
 
 That same-host agreement is stronger than the composite PDF beside it manages: cairo assigns
 font-subset tags per process, so two runs of `render_composite_pdf` differ. It is still
@@ -57,11 +67,14 @@ from functools import cache
 from importlib.metadata import version
 from pathlib import Path
 from tempfile import mkdtemp
-from typing import Never
+from typing import TYPE_CHECKING, Never
 
 from strif import atomic_output_file
 
 from sqpack.probes import applied, probe
+
+if TYPE_CHECKING:
+    from playwright.sync_api import Page
 
 ROOT = Path(__file__).resolve().parent.parent
 PAGE = ROOT / "site" / "index.html"
@@ -203,6 +216,45 @@ _IMAGES_DECODED = probe(PROBES, "render_explainer_pdf/images_decoded")
 #: face here is already a data URI in a document loaded from `file://`, and Playwright's
 #: own evaluate timeout is the backstop.
 _FACES_APPLIED = probe(PROBES, "render_explainer_pdf/faces_applied")
+
+#: The document, watched across one `page.pdf()` call, and the report that closes the watch.
+#:
+#: This is what the wait chain above cannot reach. Settling the page under emulated print
+#: media is not the same thing as a page that has printed: `emulate_media` changes what
+#: `@media print` and `matchMedia("print").matches` say, and it does not fire `beforeprint`
+#: or `afterprint`. The certificate figure's script takes both
+#: (`devtools/explainer/certificate.js`, the two `window.addEventListener` calls at the end
+#: of the module) and answers each with `repaint`, which re-runs `boot()`: the canvases are
+#: redrawn for print colour, and every readout beside them is handed back to
+#: `squaresMath.render`, which re-renders asynchronously.
+#:
+#: So the page starts re-rendering math *inside* `page.pdf()`, while Chromium is laying the
+#: printed pages out. Measured on the run-35764316182 page, on the pinned headless shell: a
+#: settled page left alone for 1500 ms records no mutation at all, while each print records
+#: 366 attribute writes -- `style`, `data-kpress-math-face`, `data-kpress-math-pending` and
+#: `data-squares-math-ready` on `span.squares-math-variant` -- in two bursts of 183, one at
+#: `beforeprint` and one at `afterprint`, and starts a font load as it does. Four consecutive
+#: prints of one page each recorded the same 366: the work is not warm-up, it is what every
+#: print of this page does, so an export cannot wait it out.
+#:
+#: A `span.squares-math-variant` carries KaTeX's `width`, `height` and `vertical-align` in
+#: em on its `style` attribute, and a prepared formula holds its reserved box while it
+#: re-renders. A page laid out while that is in flight is drawn from the geometry of that
+#: moment. That is D-490: one math box's baseline a fraction of a pixel off, identical
+#: glyphs, every other object in the file equal.
+#:
+#: The watch is a diagnosis, not a verdict. It reports on every print of this page, so it
+#: cannot decide whether a draw is good; `_draw_reproduced` decides that by drawing again,
+#: and this is what tells the reader of a refusal what was moving.
+_PRINT_ACTIVITY = probe(PROBES, "render_explainer_pdf/print_activity")
+_PRINT_ACTIVITY_REPORT = probe(PROBES, "render_explainer_pdf/print_activity_report")
+
+#: How many prints one export may spend on getting two in a row to agree. The measured cost
+#: of a disagreement is one extra print, and the measured rate is low -- one draw in thirty
+#: on this host -- so four leaves room for two independent incidents in one export before it
+#: refuses. A print measured 0.50, 0.49 and 0.50 s here, with 0.04 s to settle after each,
+#: against 2.54 s for the page load and wait chain before them.
+_PRINT_DRAWS = 4
 
 
 def _normalised(pdf: bytes) -> bytes:
@@ -440,17 +492,121 @@ def render_pdf_bytes(
             page.evaluate(_MATH_RENDERED, {"math": page.evaluate_handle(_MATH_LIBRARY)})
             if math_trace is not None:
                 snapshots.append(page.evaluate(_MATH_SNAPSHOT, "before-pdf"))
-            drawn = page.pdf(
-                print_background=True,
-                prefer_css_page_size=True,
-                tagged=True,
-                outline=True,
-            )
+            drawn = _draw_reproduced(page, math_trace=math_trace)
             if math_trace is not None:
                 snapshots.append(page.evaluate(_MATH_SNAPSHOT, "after-pdf"))
             return drawn
         finally:
             browser.close()
+
+
+def _print(page: Page) -> bytes:
+    """One print, with the options every draw of this page uses.
+
+    One function rather than one dictionary because the options are keyword parameters with
+    their own types, and a draw taken at a different paper size or with the structure tree
+    off would not be comparable with the draw beside it.
+    """
+    return page.pdf(
+        print_background=True,
+        prefer_css_page_size=True,
+        tagged=True,
+        outline=True,
+    )
+
+
+#: How many of a watch's records the refusal quotes. The rest stay in the math trace: a
+#: CI log wants the shape of what moved, not twenty-four lines of it.
+_MOVED = 4
+
+
+def _moved(record: object) -> str:
+    """One line for what a watch saw, for a message a CI log has to carry."""
+    if not isinstance(record, dict):
+        return repr(record)
+    seen = record.get("records")
+    seen = seen if isinstance(seen, list) else []
+    quoted = "; ".join(
+        f"{one.get('where')} {one.get('detail')} at {float(one.get('at_ms', 0)):.0f} ms"
+        if isinstance(one, dict)
+        else repr(one)
+        for one in seen[:_MOVED]
+    )
+    more = f", and {len(seen) - _MOVED} more" if len(seen) > _MOVED else ""
+    tail = " (the watch stopped counting)" if record.get("truncated") else ""
+    return f"{record.get('changes')} changes{tail}: {quoted}{more}"
+
+
+def _draw_reproduced(page: Page, *, math_trace: dict[str, object] | None = None) -> bytes:
+    """Return bytes this page drew twice in a row, rather than bytes it drew once.
+
+    The wait chain before this settles the page under emulated print media, and stops there
+    because a page that has not printed has not yet done its print work. `_PRINT_ACTIVITY`
+    has the measurement: every print of this page re-renders the certificate figure's
+    readouts from its `beforeprint` and `afterprint` handlers, 366 attribute writes' worth,
+    while Chromium lays the printed pages out. No wait reaches that, because it does not
+    start until the draw does, and it happens on the fourth print exactly as on the first.
+
+    What is left is to notice it. A draw that caught the page mid-render disagrees with the
+    draw beside it, so this prints until two consecutive prints match once the two clock
+    fields are normalised, and returns the second of that pair. The second print is the
+    whole cost: half a second on this host, on a page already loaded and settled, against
+    the 2.54 s its load and wait chain took. The page is settled again between prints, which
+    measured 0.04 s, so each draw starts where the last one did.
+
+    Agreement is taken to mean the settled geometry, and that is an assumption rather than a
+    measurement: two draws could in principle catch the same transient. What supports it is
+    that the three occurrences seen so far each moved one box, and not the same box -- the
+    CI one and the local one were different formulas -- and that the shipped document is the
+    one ninety local renders agreed on.
+
+    The rate this is up against, measured on this host over thirty renders of the retained
+    page from run 35764316182: one render disagreed with the other twenty-nine, a single
+    inline math box 0.609375 px off its baseline. The CI occurrence was the same shape,
+    0.78125 px on one box in object 163.
+
+    This does not make Chromium's print layout deterministic, and it does not fix the page:
+    `devtools/explainer/certificate.js` still re-renders math from its print handlers, and
+    the cause-level fix belongs there. What it does is refuse to hand out bytes that could
+    not be drawn twice, and name what was moving when it could not.
+    """
+    draws: list[object] = []
+    if math_trace is not None:
+        math_trace["print_draws"] = draws
+    previous: bytes | None = None
+    difference = "no draw was taken"
+    for attempt in range(_PRINT_DRAWS):
+        watch = page.evaluate_handle(_PRINT_ACTIVITY)
+        drawn = _print(page)
+        record: dict[str, object] = {"draw": attempt}
+        record.update(page.evaluate(_PRINT_ACTIVITY_REPORT, {"watch": watch}))
+        if previous is not None:
+            first, again = _normalised(previous), _normalised(drawn)
+            record["agreed_with_the_draw_before_it"] = first == again
+            draws.append(record)
+            if first == again:
+                return drawn
+            difference = (
+                f"draws {attempt - 1} and {attempt} disagree: {len(first)} then "
+                f"{len(again)} bytes, normalised. " + _difference(first, again)
+            )
+            record["difference"] = difference
+            # Say so in the log every time, whether or not the export goes on to succeed.
+            # This is the only place the D-490 race is counted, and how often it fires on a
+            # runner is exactly what the defect does not yet know.
+            print(f"explainer PDF: drawing again, because {difference}", flush=True)
+        else:
+            draws.append(record)
+        previous = drawn
+        # A print's own work outlives the call that provoked it -- the `afterprint` burst
+        # lands after `page.pdf()` returns -- so settle again before spending another draw.
+        page.evaluate(FONTS_READY)
+        page.evaluate(SETTLED)
+    raise RuntimeError(
+        f"no two of {_PRINT_DRAWS} consecutive prints of this page agreed, so there are no "
+        "reproducible bytes to export. The page mutates while it is drawn; D-490 records "
+        f"the mechanism. {difference}\nwhat moved under the last draw: " + _moved(draws[-1])
+    )
 
 
 #: Font dictionaries, read out of the file with a byte scan rather than a PDF parser.
@@ -1007,8 +1163,9 @@ def _check_renders(
             length_delta = abs(len(first) - len(again))
             _failed_check(
                 f"explainer PDF does not reproduce itself: {len(first)} then {len(again)} "
-                f"bytes, normalised; length delta {length_delta}. The cause is unknown; "
-                "D-490 records the host-qualified readiness controls. "
+                f"bytes, normalised; length delta {length_delta}. Each of these was drawn "
+                "until two consecutive prints of its page agreed, so this is a difference "
+                "between renders and not the print-time re-render D-490 records. "
                 + _difference(first, again),
                 reference,
                 replay,

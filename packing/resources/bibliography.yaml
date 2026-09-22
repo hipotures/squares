@@ -1,0 +1,123 @@
+softschema:
+  contract: packing.squares:Bibliography/v1
+  schema: bibliography.schema.yaml
+  status: enforced
+last_reviewed: '2026-09-22'
+# The citation fields a generator needs, keyed by the source keys the frontier records
+# use. The Markdown tables in README.md stay the human index; this file holds only what
+# a line of citation text is built from, for the keys something cites.
+# `devtools.build_bound_citations` reads it, and `tests/test_bound_citations.py` checks
+# that every key here is defined in README.md and that a paper's year and authors agree
+# with the Papers table there.
+#
+# `authors` are surnames as a citation prints them, in the source's own order; `year` is
+# null where the source carries none (a maintained web page); `venue` is the short form
+# printed after them, and `short_venue`, where given, the shorter one a line falls back to
+# when this project's "(confirmed, T-NNN)" would not otherwise fit. A web source's authors
+# are not in the README's Web Sources table, so its `note` says which retained bytes they
+# were read from.
+sources:
+  - key: '[Bentz 2010]'
+    authors: [Bentz]
+    year: 2010
+    venue: 'Electron. J. Combin. 17, #R126'
+    # n = 46 names two confirming results, T-004 and T-008, and the full venue then runs
+    # to 68 characters; the article number is what gives way.
+    short_venue: Electron. J. Combin. 17
+  - key: '[Bentz 2016]'
+    authors: [Bentz]
+    year: 2016
+    venue: arXiv:1606.03746
+  - key: '[Göbel 1979]'
+    authors: [Göbel]
+    year: 1979
+    venue: Math. Centre Tracts 106
+  - key: '[Kearney–Shiu 2002]'
+    authors: [Kearney, Shiu]
+    year: 2002
+    venue: 'Electron. J. Combin. 9, #R14'
+  - key: '[Kingbird]'
+    authors: [Friedman, Ellsworth]
+    year: null
+    venue: Squares in Squares
+    note: >-
+      The page's own header: "SVG, high-precision, and other updates by David
+      Ellsworth, based on original compiled by Erich Friedman"
+      (web/kingbird-squares-in-squares.md, lines 10-11). A maintained page, so no year.
+  - key: '[Nagamochi 2005]'
+    authors: [Nagamochi]
+    year: 2005
+    venue: 'Electron. J. Combin. 12, #R37'
+  - key: '[Stromquist 2003]'
+    authors: [Stromquist]
+    year: 2003
+    venue: 'Electron. J. Combin. 10, #R8'
+  - key: '[UnitSquare 2026]'
+    authors: [UnitSquare Project]
+    year: 2026
+    venue: Results Release 1
+    note: >-
+      The release's own `creator` and `published` fields
+      (web/unitsquare-release1-2026/results.json): "UnitSquare Project", 2026-07-29.
+  - key: '[n17 weighted certificates 2026-09-20]'
+    authors: [Guzhou0806, Mira]
+    year: 2026
+    venue: GitHub
+    note: >-
+      The two repositories the packet retains, by their authors' GitHub names
+      (web/n17-weighted-certificates-2026-09-20/README.md): Guzhou0806's R012
+      parent-angle catalogue, 2026-09-20, over Mira's 1620-atom measure of 2026-09-07.
+      The bound the register verifies from them, 461300/99999, is R012's.
+  - key: '[Kleddamag n17 certified bound]'
+    authors: [Kleddamag]
+    year: 2026
+    venue: GitHub
+    note: >-
+      The retained v1.0.0 release and AUTHORS.md identify Kleddamag as the human
+      project director and credit OpenAI Codex for research, implementation and
+      verification (web/n17-kleddamag-certified-bound-2026-09-21/README.md).
+  - key: '[Kleddamag n11 2026]'
+    authors: [Kleddamag]
+    year: 2026
+    venue: GitHub
+    note: >-
+      The v1.0.2 release of Kleddamag/11-squares-certified-bound, pinned in
+      web/external-square-certificates-2026-09-22/acquisition/sources.json,
+      and the author's September 22 announcement retained in acquisition/x-kleddamag.txt.
+  - key: '[Tokoharu density 2026]'
+    authors: [Tokoharu]
+    year: 2026
+    venue: GitHub
+    note: >-
+      The tokoharu/square-packing-density-bounds repository, pinned in
+      web/external-square-certificates-2026-09-22/acquisition/sources.json,
+      and the author's September 22 announcement retained in acquisition/x-tokoharu.txt.
+  - key: '[wand125 point bounds 2026]'
+    authors: [wand125]
+    year: 2026
+    venue: GitHub
+    note: >-
+      The wand125/square-packing-bounds repository and its 2026 certificate claims,
+      retained under web/external-square-certificates-2026-09-22/wand125-points/;
+      acquisition/sources.json pins the complete source tree.
+# The surname each credited name is cited under, for the names `found_by` and
+# `improved_by` carry. Listed rather than derived from the last word of the name, because
+# a credit can be an organization; a name missing here fails the build instead of being
+# guessed at.
+credited_names:
+  David Ellsworth: Ellsworth
+  David W. Cantrell: Cantrell
+  Erich Friedman: Friedman
+  Evert Stenlund: Stenlund
+  Frits Göbel: Göbel
+  Joe DeVincentis: DeVincentis
+  John Bidwell: Bidwell
+  Károly Hajba: Hajba
+  M.Z. Arslanov: Arslanov
+  Pertti Hämäläinen: Hämäläinen
+  Robert Wainwright: Wainwright
+  S.A. Mustafin: Mustafin
+  Thomas Schadt: Schadt
+  UnitSquare Project: UnitSquare Project
+  Walter Trump: Trump
+  Z.K. Shangitbayev: Shangitbayev

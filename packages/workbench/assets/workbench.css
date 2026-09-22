@@ -66,8 +66,6 @@
   --scene-frame: var(--color-border-control);
   --scene-frame-locked: var(--scene-best);
   --scene-trace: var(--color-divider);
-  /* Scene: the repository's address at the stage's bottom right, in the frames' grey. */
-  --scene-attribution: var(--scene-frame);
   /* Plot: the force-law editor's drawing. */
   --plot-field: #fbfcfd;
   --plot-zero: var(--scene-reference);
@@ -143,12 +141,20 @@
      28 the PROVEN and OPEN heads, the badge labels and the open group; 38 the bound line; 64 the
      headline, `n = 17`, set by KaTeX. */
   --stage-text-number: 26px;
+  /* The note under the facts: the composite's own legend, a step below the bar's numbers. */
+  --stage-text-note: 22px;
+  /* The legend's rhythm: between a swatch row and its sentence, between swatches, and the
+     hairline outline that keeps a pale shade reading as a square. */
+  --stage-note-gap: 10px;
+  --stage-note-swatch-border: 1px;
   --stage-text-label: 28px;
   --stage-text-bound: 38px;
-  --stage-text-headline: 64px;
+  --stage-text-headline: 58px;
   --stage-badge-glyph: 15px;
   /* KaTeX inherits the line it is set in, as kpress's `--kpress-katex-size-sans` does. */
   --stage-katex-size: 1em;
+  /* The legend's mathematics, sized so its x-height matches the sentence beside it. */
+  --stage-katex-note: 1.18em;
   --stage-weight-regular: 400;
   --stage-weight-quiet: 450;
   --stage-weight-label: 500;
@@ -156,9 +162,14 @@
   --stage-weight-bold: 700;
   --stage-line-height-head: 34px;
   --stage-line-height-bound: 1.2;
-  --stage-line-height-headline: 92px;
+  --stage-line-height-headline: 84px;
   --stage-line-height-facts: 1.35;
-  --stage-tracking-head: 0.16em;
+  /* The tracking on the uppercase section heads -- PROVEN, KNOWN BOUNDS, CITATION, OPEN. Uppercase
+     needs a little to stop the letters closing up, and 0.16em was enough to read as spacing rather
+     than as a word; the owner asked for less on 2026-09-22, once CITATION put three of them in the
+     column at once. 0.06em, a little under the chrome's own 0.1em, because the stage's heads are
+     set larger than any chrome label and tracking is felt at the size it is set. */
+  --stage-tracking-head: 0.06em;
   --stage-tracking-label: 0.01em;
   --stage-tracking-numeral: -0.02em;
   /* A badge row: the gap between items, and between an item's icon and its label. The open row
@@ -167,6 +178,14 @@
   --stage-badge-icon-gap: 11px;
   --stage-open-gap: 28px;
   --stage-open-icon-gap: 10px;
+  /* A citation line: the gap between which bound it is, its reference, and `reported`. The line is
+     set in the legend's type, a step below the badges, because it annotates the bound line rather
+     than stating a fact of its own. */
+  --stage-cite-gap: 12px;
+  /* The head's line: CITATION, then the frontier record the n's bounds are held in, set apart by
+     the badges' gap and read as one quiet phrase with a word space inside it. */
+  --stage-cite-record-gap: var(--stage-badge-icon-gap);
+  --stage-cite-word-gap: 5px;
   /* Where the headline's rolling numbers start; `layoutHeadline` measures and sets it. */
   --stage-numeral-left: 152px;
 }
@@ -240,6 +259,12 @@ body.capture {
   transform: scale(var(--stage-scale));
   transform-origin: 0 0;
   box-shadow: var(--scene-shadow);
+  /* A poster, not a text surface. A click, drag or double-click on it selected the facts' text,
+     and the browser went on painting that selection -- grey while the window is unfocused --
+     over every frame of the animation after it (the owner, 2026-09-21). The link in the
+     attribution still takes its click; only selection is refused. */
+  -webkit-user-select: none;
+  user-select: none;
 }
 body.capture #stage {
   box-shadow: none;
@@ -248,9 +273,9 @@ body.capture #stage {
    browser's pan and zoom, and says so with the cursor. */
 #packing-svg {
   position: absolute;
-  left: 60px;
+  left: 30px;
   top: 12px;
-  width: 1000px;
+  width: 1056px;
   /* 971, not 940: the owner asked for the box to be bigger, with even space above and below
      the headline under it, and saw and accepted this size. The square view fits this height,
      so the settled box's path sits at 12 + 971 x 1.045 / 1.09 = 942.9 at every n, and its
@@ -264,7 +289,7 @@ body.capture #stage {
      ignore the clip and put that square 8 px into the headline's ink at this size; drawn,
      it never reaches it. The stage itself stays 1920 x 1080, which the 1080p capture
      depends on. */
-  height: 971px;
+  height: 1056px;
   display: block;
   touch-action: none;
 }
@@ -353,9 +378,9 @@ body.drawing #packing-svg #squares {
 }
 #facts {
   position: absolute;
-  left: 1160px;
+  left: 1110px;
   top: 0;
-  width: 700px;
+  width: 780px;
   height: 1080px;
 }
 .facts-layer {
@@ -375,8 +400,8 @@ body.drawing #packing-svg #squares {
 .gapbar {
   position: absolute;
   left: 6px;
-  top: 40px;
-  width: 694px;
+  top: 164px;
+  width: 768px;
   height: 268px;
 }
 /* The bar sits under the headline, so the first thing in the column is the n it is all about. */
@@ -384,7 +409,7 @@ body.drawing #packing-svg #squares {
   position: absolute;
   left: 0;
   top: 60px;
-  width: 680px;
+  width: 760px;
   height: 150px;
   display: block;
 }
@@ -488,11 +513,16 @@ body.drawing #packing-svg #squares {
    not move as a digit is gained.
    Anchored to the stage's floor with `bottom`: the numeral's ink runs 990 to 1035, 45 below the
    container's drawn edge and 45 above the stage's own. */
+/* The headline sits a little below the packing's top edge (the owner, 2026-09-21: lower, with
+   more room above it). Level with that edge, at 41, its ink started at 55.6 -- KaTeX's strut
+   opens 15 px above the digits, measured rather than computed, since the strut is the face's
+   business -- and read as crowding the frame's top. 24 px lower its ink starts near 80, and it
+   still clears the gap bar under it, which `gapbar/clearance` holds. */
 #headline {
   position: absolute;
-  left: 60px;
-  bottom: 11px;
-  width: 1000px;
+  left: 1116px;
+  top: 65px;
+  width: 768px;
   height: 96px;
 }
 .numeral-slot {
@@ -537,13 +567,75 @@ body.drawing #packing-svg #squares {
 .numeral .baseline {
   display: inline-block;
 }
-/* The attribution, the owner's (2026-09-17): the repository's address in the stage's bottom right,
-   standing on the headline's baseline and ending where the gap bar ends. It is SVG text because
-   SVG text is placed by its baseline and its end, which are the two things said about it:
-   `placeAttribution` measures the headline's baseline and the rail's right end once the faces
-   land and writes them as the text's `y` and `x` in stage pixels. Hidden until then, rather than
-   drawn at a guess. It is on the stage in every mode, so a captured frame carries it; the overlay
-   takes no pointer events but the link's own. */
+/* The composite's legend, at the foot of the facts column and above the attribution. It is a
+   child of the STAGE rather than of `#facts`, like the attribution it sits above, so its `left` is
+   the stage's coordinate for the column's own inset (1110 + 6) rather than the inset itself --
+   written at 6 it drew across the packing. Aligned with every other row in the column, so the
+   column reads as one edge, and the attribution below it keeps the same left edge.
+   It is text and takes no pointer: in Pack, where the packing is drawn further right, it sat over
+   the drawing's lower right and swallowed the press that picks a square up. */
+.stage-note {
+  position: absolute;
+  pointer-events: none;
+  left: 1116px;
+  top: 906px;
+  width: 768px;
+  font-family: var(--font-sans);
+  font-size: var(--stage-text-note);
+  font-weight: var(--stage-weight-quiet);
+  line-height: var(--stage-line-height-facts);
+  color: var(--scene-heading);
+  white-space: nowrap;
+}
+/* A swatch row: the swatches beside the line of text they explain. */
+.note-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--stage-note-gap);
+}
+/* The legend's sentence is ordinary inline text with its math in the flow, which is how KaTeX
+   is made to be set, so each formula stands on the line's own baseline. It was a flex row, and
+   the sentence's `n` could not be math there without the row's gap on both sides of it.
+   `check_layout` measures the baselines and the letters' ink; neither rests on this comment. */
+.note-sentence {
+  display: block;
+}
+/* An empty inline block at the end of each row's words stands on the row's baseline, so its top is
+   where the row's letters stand. `placeAttribution` reads the last two to set the attribution one
+   legend line below the last row; it draws nothing. */
+.note-baseline {
+  display: inline-block;
+}
+.note-swatches {
+  display: block;
+  flex: none;
+  /* The row aligns type on its baseline; the swatches are not type and keep to its middle. */
+  align-self: center;
+}
+/* The swatch's own outline, as the composite figure draws it: a hairline so a pale shade still
+   reads as a square rather than as a smudge. Its `fill` is the corpus's palette, set as an
+   attribute per rect, so the stylesheet says nothing about it. */
+.note-swatch {
+  stroke: var(--scene-ink);
+  stroke-width: var(--stage-note-swatch-border);
+}
+/* Matched by x-height, not by em. At the line's own size KaTeX_Math's `s` inks 11 px against
+   the text's 13 -- measured on a captured frame -- so the letters look small and float even
+   though their baselines agree exactly. 13/11 is 1.18, which is why KaTeX's own default is
+   1.21em: its faces carry a smaller x-height per em than a text face does. */
+.note-math .katex {
+  font-size: var(--stage-katex-note);
+}
+.note-math {
+  font-family: var(--font-serif);
+}
+/* The attribution, the owner's (2026-09-17): the repository's address, just under the legend at
+   its left edge (the owner, 2026-09-21), or on the same line at the column's right edge where
+   Pack and the studio center their drawing. It is SVG text because SVG text is placed by its
+   baseline and one end, which are the two things said about it: `placeAttribution` measures the
+   legend once the faces land and writes them as the text's `y` and `x` in stage pixels. Hidden
+   until then, rather than drawn at a guess. It is on the stage in every mode, so a captured frame
+   carries it; the overlay takes no pointer events but the link's own. */
 #stage-attribution {
   position: absolute;
   left: 0;
@@ -562,9 +654,9 @@ body.drawing #packing-svg #squares {
 }
 #stage-attribution text {
   font-family: var(--font-sans);
-  font-size: var(--stage-text-number);
+  font-size: var(--stage-text-note);
   font-weight: var(--stage-weight-regular);
-  fill: var(--scene-attribution);
+  fill: var(--scene-ink);
 }
 #stage-attribution a:hover text,
 #stage-attribution a:focus-visible text {
@@ -591,10 +683,10 @@ body.drawing #packing-svg #squares {
   white-space: nowrap;
 }
 .head-proved {
-  top: 320px;
+  top: 444px;
 }
 .head-open {
-  top: 494px;
+  top: 618px;
 }
 /* The two bounds as one chained statement, at one size: a best known side and a proved lower
    bound are the same kind of fact about the same quantity. Measured over the whole corpus at the
@@ -603,7 +695,7 @@ body.drawing #packing-svg #squares {
 .side {
   position: absolute;
   left: 6px;
-  top: 360px;
+  top: 484px;
   height: 62px;
   font-family: var(--font-serif);
   font-size: var(--stage-text-bound);
@@ -640,7 +732,7 @@ body.drawing #packing-svg #squares {
 .badges {
   position: absolute;
   left: 6px;
-  top: 426px;
+  top: 550px;
   height: 40px;
   display: flex;
   align-items: center;
@@ -705,7 +797,7 @@ body.drawing #packing-svg #squares {
 .open-items {
   position: absolute;
   left: 6px;
-  top: 534px;
+  top: 658px;
   height: 40px;
   display: flex;
   align-items: center;
@@ -726,6 +818,82 @@ body.drawing #packing-svg #squares {
   height: 32px;
   display: block;
   flex: none;
+}
+/* CITATION, under PROVEN while the setting is on (the owner, 2026-09-21): where each bound on the
+   bound line comes from, one line per cited bound. Its head takes the place OPEN has with the
+   setting off, and its two lines are fixed slots -- the lower bound's source on the first, the
+   upper bound's on the second, at every n -- so nothing moves between n; a line with nothing to
+   cite is an empty slot. OPEN moves below them for as long as the setting is on, to the same
+   place at every n, in the same rhythm: a head 6 above what it heads, the last row 28 above the
+   next head. The legend's 30 px pitch sets the lines, so the section reads at the legend's size.
+   With the setting off none of this is built and OPEN is where it always was. */
+.head-cite {
+  position: absolute;
+  left: 6px;
+  top: 618px;
+}
+/* The head's own word keeps the heads' type, the record beside it the legend's: it names where the
+   lines under it are kept rather than heading them, so it is not set in capitals or tracked. */
+.head-cite.section-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--stage-cite-record-gap);
+}
+.cite-record {
+  display: flex;
+  gap: var(--stage-cite-word-gap);
+  font-size: var(--stage-text-note);
+  font-weight: var(--stage-weight-quiet);
+  letter-spacing: var(--stage-tracking-label);
+  text-transform: none;
+  font-variant-numeric: tabular-nums;
+}
+.cite-line {
+  position: absolute;
+  left: 6px;
+  height: 30px;
+  display: flex;
+  align-items: baseline;
+  gap: var(--stage-cite-gap);
+  font-family: var(--font-sans);
+  font-size: var(--stage-text-note);
+  font-weight: var(--stage-weight-quiet);
+  line-height: var(--stage-line-height-facts);
+  color: var(--scene-label);
+  white-space: nowrap;
+}
+.cite-lower {
+  top: 658px;
+}
+.cite-upper {
+  top: 688px;
+}
+/* Which bound, in that bound's colour on the bound line: scarlet for the proved lower bound, green
+   for the best known upper one. One width for both words, so the two references start together. */
+.cite-bound {
+  flex: none;
+  width: 58px;
+  font-weight: var(--stage-weight-label);
+}
+.cite-bound.is-lower {
+  color: var(--scene-proved);
+}
+.cite-bound.is-upper {
+  color: var(--scene-best);
+}
+/* Everything this project has to say about a bound -- that the register reports it without
+   certifying, that a result of ours confirms it, or both -- is one parenthesis after the
+   reference, in OPEN's quieter grey: an aside about the bound rather than part of its source
+   (the owner, 2026-09-22, think-qzmf). The words come from the record, not from here. */
+.cite-note {
+  color: var(--scene-heading);
+  font-weight: var(--stage-weight-label);
+}
+#facts.shows-citations .head-open {
+  top: 746px;
+}
+#facts.shows-citations .open-items {
+  top: 786px;
 }
 #pack-stage-facts {
   position: absolute;
@@ -1413,6 +1581,13 @@ body.pack-independent #panel > .panel-row {
 }
 body.pack-independent #packing-svg {
   left: 460px;
+}
+/* The legend explains the catalogue's picture, and Pack and the studio draw their own, centered,
+   under where it would sit. Hidden rather than removed, so `placeAttribution` still has its box
+   to set the attribution's line by. */
+body.pack-independent #stage-note,
+body.trace-active #stage-note {
+  visibility: hidden;
 }
 body.pack-independent #pack-stage-facts {
   display: block;

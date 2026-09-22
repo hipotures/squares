@@ -73,6 +73,9 @@ RENDER_INPUTS = (
     ROOT / "atlas/known-best/rendering",
     ROOT / "atlas/known-best/manifest.json",
     ROOT / "atlas/known-best/composite-figure.json",
+    ROOT / "atlas/known-best/bound-citations.json",
+    # The stage prints the shared version, which is pinned here, so a re-pin redraws the page.
+    ROOT / "src/sqpack/release.py",
     REPO / "vendor/kpress",
     REPO / "package.json",
     REPO / "package-lock.json",
@@ -195,8 +198,13 @@ def build(
     *,
     revision: str | None = None,
     dirty: bool | None = None,
+    citations: Path | None = None,
 ) -> str:
-    """Generate the page and return its text, refusing anything that reaches outside itself."""
+    """Generate the page and return its text, refusing anything that reaches outside itself.
+
+    `citations` stands in for the register's citation file, for a page built from a fixture.
+    """
+    extra = ["--citations", str(citations)] if citations is not None else []
     with tempfile.TemporaryDirectory() as scratch:
         # Captured so a working build stays quiet, but reported on failure: `check=True`
         # alone raises a CalledProcessError whose message is the exit status and the
@@ -211,6 +219,7 @@ def build(
                 "--out",
                 scratch,
                 "--all",
+                *extra,
             ],
             check=False,
             capture_output=True,
@@ -268,7 +277,13 @@ def build(
     return marked
 
 
-def check_builds(out: Path, *, revision: str, dirty: bool) -> tuple[str, str]:
+def check_builds(
+    out: Path,
+    *,
+    revision: str,
+    dirty: bool,
+    citations: Path | None = None,
+) -> tuple[str, str]:
     """Build the page twice at once and return both texts, the published one first.
 
     Each build has its own directory -- `out` for the published page, a temporary directory
@@ -285,8 +300,12 @@ def check_builds(out: Path, *, revision: str, dirty: bool) -> tuple[str, str]:
         tempfile.TemporaryDirectory(prefix="squares-workbench-twin-") as scratch,
         ThreadPoolExecutor(max_workers=2) as pool,
     ):
-        published = pool.submit(build, out, revision=revision, dirty=dirty)
-        twin = pool.submit(build, Path(scratch), revision=revision, dirty=dirty)
+
+        def one(into: Path) -> str:
+            return build(into, revision=revision, dirty=dirty, citations=citations)
+
+        published = pool.submit(one, out)
+        twin = pool.submit(one, Path(scratch))
         return published.result(), twin.result()
 
 
@@ -297,12 +316,17 @@ def main(argv: Sequence[str] | None = None) -> int:
         "--check", action="store_true", help="build twice at once and require byte equality"
     )
     ap.add_argument("--revision", help="full source commit to stamp (default: checkout HEAD)")
+    ap.add_argument(
+        "--citations", type=Path, help="bound citations to draw (default: the register's)"
+    )
     o = ap.parse_args(argv)
 
     revision = o.revision or source_revision()
     dirty = source_dirty()
     if o.check:
-        first, again = check_builds(o.out, revision=revision, dirty=dirty)
+        first, again = check_builds(
+            o.out, revision=revision, dirty=dirty, citations=o.citations
+        )
         if again != first:
             msg = (
                 "the workbench did not reproduce itself; a published page must be deterministic"
@@ -311,7 +335,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"deterministic, self-contained, {len(first) / 1024 / 1024:.1f} MB")
         return 0
 
-    first = build(o.out, revision=revision, dirty=dirty)
+    first = build(o.out, revision=revision, dirty=dirty, citations=o.citations)
     print(f"{o.out / 'index.html'}: {len(first) / 1024 / 1024:.1f} MB, no external references")
     return 0
 

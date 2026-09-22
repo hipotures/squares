@@ -9,12 +9,16 @@ HTML receipt take part in the comparison, and an image that cannot become drawab
 refuses capture. A failed comparison retains its raw pair when diagnosis is requested.
 
 On 2026-09-10 this check failed on main for the first time, said `786119 then 786117
-bytes` and nothing else, and the renders were gone. Its cause remains unknown. The
-publication job also checked a later pair of draws while shipping an earlier file;
-agreement between the later pair could not validate that artifact. The CLI-to-function
-join is the one D-488 was made of: a count that argparse accepts and nothing forwards
-looks exactly like a count that works. The image wait initially discarded every decode
-rejection, which could let two PDFs agree on the same absent figure.
+bytes` and nothing else, and the renders were gone. The second occurrence, on PR 218's
+run 35764316182, arrived with its object named and its pair retained, and that is what
+identified the cause: the page re-renders math from its own print handlers, inside the
+`page.pdf()` call that is drawing it. `_draw_reproduced` and the cases for it below are
+what that bought. The publication job also checked a later pair of draws while shipping
+an earlier file; agreement between the later pair could not validate that artifact. The
+CLI-to-function join is the one D-488 was made of: a count that argparse accepts and
+nothing forwards looks exactly like a count that works. The image wait initially
+discarded every decode rejection, which could let two PDFs agree on the same absent
+figure.
 
 Nothing here launches a browser. `render_pdf_bytes` is replaced with synthetic
 documents in the shapes Chromium writes, and the exact image-wait, settlement and math
@@ -29,11 +33,17 @@ import json
 from contextlib import nullcontext
 from pathlib import Path
 from types import SimpleNamespace
+from typing import TYPE_CHECKING, cast
 
 import pytest
 from nodejs_wheel import node
 
 from devtools import render_explainer_pdf as pdf
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from playwright.sync_api import Page
 
 NODE = Path(__file__).resolve().parent / "node" / "render_explainer_pdf"
 
@@ -198,6 +208,119 @@ def test_two_renders_that_agree_are_not_given_an_invented_difference() -> None:
     assert "cut short" not in report
 
 
+class _Printer:
+    """A page that prints a scripted sequence and answers the two watch probes.
+
+    It also pins the option set, because `_draw_reproduced` compares draws against each
+    other: a repeat taken at a different paper size would disagree with the draw before it
+    for a reason that has nothing to do with the page moving.
+    """
+
+    def __init__(self, documents: Sequence[bytes]) -> None:
+        self.documents = list(documents)
+        self.drawn: list[bytes] = []
+        self.settlements = 0
+
+    def evaluate_handle(self, script: str) -> object:
+        assert script == pdf._PRINT_ACTIVITY
+        return object()
+
+    def pdf(self, **options: object) -> bytes:
+        assert options == {
+            "print_background": True,
+            "prefer_css_page_size": True,
+            "tagged": True,
+            "outline": True,
+        }
+        drawn = self.documents[min(len(self.drawn), len(self.documents) - 1)]
+        self.drawn.append(drawn)
+        return drawn
+
+    def evaluate(self, script: str, argument: object = None) -> dict[str, object] | None:
+        if script == pdf._PRINT_ACTIVITY_REPORT:
+            assert isinstance(argument, dict)
+            assert "watch" in argument
+            return {
+                "quiet": False,
+                "font_status_when_installed": "loaded",
+                "changes": 24,
+                "truncated": True,
+                "records": [
+                    {
+                        "at_ms": 27.0,
+                        "kind": "attributes",
+                        "where": "dl.kv>dd>span.squares-math-variant",
+                        "detail": "style",
+                    }
+                ],
+            }
+        assert script in (pdf.FONTS_READY, pdf.SETTLED)
+        self.settlements += 1
+        return None
+
+
+def _drawn(printer: _Printer, math_trace: dict[str, object] | None = None) -> bytes:
+    return pdf._draw_reproduced(cast("Page", printer), math_trace=math_trace)
+
+
+def test_an_export_keeps_bytes_that_two_consecutive_prints_agreed_on() -> None:
+    """Not one draw: every print of this page re-renders math while it is laid out."""
+    printer = _Printer([_document(b"0.5 rg")] * 2)
+    assert _drawn(printer) == _document(b"0.5 rg")
+    assert len(printer.drawn) == 2
+    assert printer.settlements == 2
+
+
+def test_a_draw_that_did_not_reproduce_is_drawn_again_and_the_repeat_is_reported(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """D-490's shape: one coordinate off, in one object, between two draws of one page."""
+    settled = _document(b"1 0 0 -1 49.0625 14905.2188 Tm")
+    caught = _document(b"1 0 0 -1 49.0625 14906.0000 Tm")
+    printer = _Printer([caught, settled, settled])
+    assert _drawn(printer) == settled
+    assert len(printer.drawn) == 3
+    reported = capsys.readouterr().out
+    assert "drawing again" in reported
+    assert "object 1, Page" in reported
+
+
+def test_two_draws_that_differ_only_in_the_clock_are_an_agreement() -> None:
+    """The two fields Chromium stamps move between any two draws and mean nothing here."""
+    stamped = b"%s1 0 obj\n<< /Type /Page /CreationDate (D:%s) >>\nendobj\n"
+    printer = _Printer(
+        [stamped % (_HEADER, b"20260922180000"), stamped % (_HEADER, b"20260922180007")]
+    )
+    assert _drawn(printer) == stamped % (_HEADER, b"20260922180007")
+    assert len(printer.drawn) == 2
+
+
+def test_an_export_refuses_when_no_two_prints_of_the_page_agree() -> None:
+    """A page that never settles produces no publishable bytes, and says what moved."""
+    printer = _Printer([_document(b"%d rg" % number) for number in range(pdf._PRINT_DRAWS)])
+    with pytest.raises(RuntimeError) as refused:
+        _drawn(printer)
+    message = str(refused.value)
+    assert f"no two of {pdf._PRINT_DRAWS} consecutive prints" in message
+    assert "D-490" in message
+    assert "object 1, Page" in message
+    assert "squares-math-variant" in message
+    assert len(printer.drawn) == pdf._PRINT_DRAWS
+
+
+def test_the_trace_records_what_moved_under_every_draw() -> None:
+    """The watch is diagnosis, not a verdict: it reports on a draw that was kept too."""
+    printer = _Printer([_document(b"0.5 rg")] * 2)
+    trace: dict[str, object] = {}
+    _drawn(printer, trace)
+    draws = trace["print_draws"]
+    assert isinstance(draws, list)
+    assert [draw["draw"] for draw in draws] == [0, 1]
+    assert all(draw["changes"] == 24 and draw["quiet"] is False for draw in draws)
+    assert "agreed_with_the_draw_before_it" not in draws[0]
+    assert draws[1]["agreed_with_the_draw_before_it"] is True
+
+
 def test_a_disagreement_reaches_the_failure_the_job_reads(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -210,7 +333,7 @@ def test_a_disagreement_reaches_the_failure_the_job_reads(
     assert "explainer PDF does not reproduce itself" in message
     assert "object 1, Page" in message
     assert "length delta 1" in message
-    assert "cause is unknown" in message
+    assert "difference between renders" in message
 
 
 def test_the_check_draws_every_render_it_is_asked_for(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -361,7 +484,7 @@ def test_failed_comparisons_retain_the_raw_pair_and_report_without_overwriting_p
         draws = iter([raw, fresh] if mode == "fresh" else [fresh])
         monkeypatch.setattr(pdf, "render_pdf_bytes", draws.__next__)
         check = pdf.check_artifact if mode == "artifact" else pdf.check
-        with pytest.raises(SystemExit, match="cause is unknown") as refused:
+        with pytest.raises(SystemExit, match="difference between renders") as refused:
             check(diagnostics_dir=diagnostics)
         assert str(diagnostics) in str(refused.value)
     runs = list(diagnostics.glob("pdf-check-*"))
@@ -370,7 +493,7 @@ def test_failed_comparisons_retain_the_raw_pair_and_report_without_overwriting_p
         assert (run / "reference.pdf").read_bytes() == expected[0]
         assert (run / "replay.pdf").read_bytes() == expected[1]
         report = (run / "report.txt").read_text(encoding="utf-8")
-        assert "cause is unknown" in report
+        assert "difference between renders" in report
         assert "first difference at byte" in report
         assert "object 1, Page" in report
     assert pdf.OUTPUT.read_bytes() == stored

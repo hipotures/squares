@@ -493,6 +493,7 @@ function tweenFrames(
       padding: 0,
       drain: 0,
       resting: 0,
+      homeward: 0,
       links: false,
       tint: 0,
       mark: { wide: 0, thin: 0, fade: 0 },
