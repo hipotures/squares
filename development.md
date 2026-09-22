@@ -629,6 +629,10 @@ smaller `timeout_seconds` in `devtools/controls.yaml`. A timeout terminates and 
 the whole process group, including a child that ignores the first termination signal.
 Each command also gets an empty bytecode-cache root, so rapid same-size source mutations
 cannot execute a stale control from the preceding snapshot use.
+Each snapshot is itself a git checkout of the tracked files it carries, so a check that
+asks git what this repository holds — rather than walking the working directory — is
+answered inside the worker, and its control rehearses the code the gate runs rather than
+a refusal or a fallback.
 
 The validation deadline bounds subprocess commands on supported POSIX hosts.
 It does not bound pure-Python worker code, the total duration of a step that runs

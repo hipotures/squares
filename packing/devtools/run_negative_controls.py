@@ -31,7 +31,9 @@ afterwards. That worked, and it cost more than it looked like it did:
 
 On APFS a snapshot uses copy-on-write cloning. Elsewhere it falls back to a plain copy
 of a bounded source surface: the packing tree without the literature archive or build
-products, plus the root formatter ignore file. One snapshot per worker is reused across
+products, plus the root formatter and git ignore files. The finished tree is then a git
+checkout of itself, so a check that asks git what this repository tracks is answered
+here instead of refusing; see `_index_tree`. One snapshot per worker is reused across
 controls; `.venv` and the cargo target are symlinked back so nothing is rebuilt.
 
 The gate can now run this step concurrently with every other step, and a control can no
@@ -302,7 +304,15 @@ BUILD_CACHES = frozenset(
     {"__pycache__", ".pytest_cache", ".ruff_cache", "dist", "node_modules"}
 )
 LINK_BACK = (Path(".venv"), Path("sqsearch/target"))
-COPY_SEPARATELY = (ROOT / "resources/README.md", REPO / ".flowmarkignore")
+# `.gitignore` is here for the index `clone_tree` builds rather than for a checker:
+# `git add -A` inside a snapshot must skip what the real index skips, or a reader's
+# scratch in `attic/` would be tracked in the worker though the repository does not
+# track it -- which is PR 207's bug, rebuilt one directory over.
+COPY_SEPARATELY = (
+    ROOT / "resources/README.md",
+    REPO / ".flowmarkignore",
+    REPO / ".gitignore",
+)
 # The reader-facing documents live at the repository root now, and the controls reach
 # them: three mutate README.md and ten mutate SYNOPSIS.md, while the schema and
 # generated-view checkers read defects.md and docs/project/. Cloning only packing/ would
@@ -625,6 +635,51 @@ def snapshot_source_bytes() -> int:
     return total
 
 
+def _index_tree(root: Path) -> None:
+    """Make the finished snapshot a git checkout of itself, so it has an index to ask.
+
+    Several checks answer "what does this repository hold?" with
+    `repo_scope.tracked_files` rather than with a walk, because a walk also reads the
+    reader's scratch -- one JSON in `attic/` was enough to turn a step red (PR 207) --
+    and the other agents' worktrees the harness puts inside the checkout. A snapshot
+    with no index cannot answer that question, and a check that runs here then either
+    refuses, which is how main went red on 2026-09-21 with the README controls reporting
+    "no index" in place of the drift they rehearse, or takes its own fallback, which
+    would make the control rehearse the fallback instead of the code the gate runs.
+
+    Three checks ask `tracked_files` today -- `check_readme`, `check_class_record_claims`
+    and `check_archive_annotations` -- and only the first has a registered control, which
+    is why the refusal is what was seen and the fallback half was still latent. Adopting
+    that question in a fourth check should not have to come with reading this file.
+
+    `git init` and `git add -A` over the finished tree, which is what
+    `tests/test_check_archive_annotations.py` already does for the same reason. No
+    commit: `git ls-files --cached` reads the index, and writing a tree object would
+    cost time and buy nothing. Called after the build-cache sweep and before the
+    symlinks, so neither a cache nor the linked-back `.venv` is indexed as this
+    snapshot's content, and the repository's `.gitignore` is copied in beside
+    `.flowmarkignore` so this index holds what that one holds.
+
+    Measured on the 147.2 MiB snapshot of 2026-09-21: 2.8 s and 44 MiB of loose objects
+    per worker tree, against 4.4 s to copy it. The objects are generated, so they are
+    not source and `snapshot_source_bytes` does not count them.
+    """
+    # `-C` chooses the directory, not the repository. A `GIT_DIR` or `GIT_INDEX_FILE` in
+    # the environment -- a gate run from inside a git hook -- would send both commands to
+    # another repository, and `git add -A` there is not a mistake anyone should be able
+    # to make from here.
+    environment = {
+        name: value for name, value in os.environ.items() if not name.startswith("GIT_")
+    }
+    for arguments in (("init", "-q"), ("add", "-A")):
+        subprocess.run(
+            ("git", "-C", str(root), *arguments),
+            check=True,
+            capture_output=True,
+            env=environment,
+        )
+
+
 def clone_tree(dest: Path) -> None:
     """A private, writable source snapshot for one worker to corrupt."""
     work = dest / HERE
@@ -638,6 +693,7 @@ def clone_tree(dest: Path) -> None:
         landing.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(target, landing)
     shutil.copy2(REPO / ".flowmarkignore", dest / ".flowmarkignore")
+    shutil.copy2(REPO / ".gitignore", dest / ".gitignore")
 
     for document in ROOT_DOCUMENTS:
         if document.is_dir():
@@ -654,6 +710,7 @@ def clone_tree(dest: Path) -> None:
     # none of the real checkout: `.venv` alone holds 147 `__pycache__` directories that
     # are not this clone's to delete.
     _strip_build_caches(dest)
+    _index_tree(dest)
 
     for rel in LINK_BACK:
         source = ROOT / rel
@@ -696,9 +753,14 @@ def run_one(c: dict, tree: Path) -> tuple[bool, str]:
         # check=False deliberately: a non-zero exit is the EXPECTED outcome here, and
         # inspecting it is this function's whole job.
         env = os.environ.copy()
-        # The parent owns the control journal. Mutation snapshots have no Git
-        # metadata, and nested gates must not start a second artifact capture there.
+        # The parent owns the control journal, and a nested gate must not start a
+        # second artifact capture inside a snapshot.
         env.pop("PACKING_VALIDATION_ARTIFACT_DIR", None)
+        # A snapshot owns its own index, which is how a check here answers what the
+        # repository holds. An inherited `GIT_DIR` or `GIT_INDEX_FILE` would point every
+        # one of those questions at another repository, and the mutation is not in it.
+        for inherited in [name for name in env if name.startswith("GIT_")]:
+            del env[inherited]
         # Every worker links the already-synced environment to avoid reinstalling the
         # scientific stack. Letting `uv run` sync that shared environment installs the
         # editable project from a temporary snapshot, which disappears after this run
