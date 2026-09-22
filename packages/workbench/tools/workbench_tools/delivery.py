@@ -155,9 +155,11 @@ class Fidelity:
     frames: int
 
 
-def metadata_comment(page_sha256: str, statement: str) -> str:
-    """The MP4 comment: the receipt's statement and the page digest, for a video on its own."""
-    return f"{statement} page sha256 {page_sha256}"
+def metadata_comment(page_sha256: str, statement: str, version: str | None = None) -> str:
+    """The MP4 comment: the receipt's statement, the shared version the frames draw, and the
+    page digest, for a video on its own."""
+    edition = f" version {version}," if version is not None else ""
+    return f"{statement}{edition} page sha256 {page_sha256}"
 
 
 def encode_arguments(
@@ -170,8 +172,12 @@ def encode_arguments(
     page_sha256: str,
     title: str,
     comment: str,
+    version: str | None = None,
 ) -> list[str]:
     """The ffmpeg command that encodes the frames to an H.264 MP4 the profile describes.
+
+    `version` is the shared version the page draws on every frame; the comment carries it, as it
+    carries the page's digest, because MP4 keeps no field of its own for it that ffmpeg writes.
 
     The pixel format and the even-dimension scale are not taste: without them QuickTime and
     most browsers refuse the file outright, which would make an unplayable "uploadable"
@@ -205,7 +211,7 @@ def encode_arguments(
         "-metadata",
         f"title={title}",
         "-metadata",
-        f"comment={metadata_comment(page_sha256, comment)}",
+        f"comment={metadata_comment(page_sha256, comment, version)}",
         "-f",
         "mp4",
         str(out),

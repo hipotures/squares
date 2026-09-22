@@ -173,6 +173,14 @@
   --stage-badge-icon-gap: 11px;
   --stage-open-gap: 28px;
   --stage-open-icon-gap: 10px;
+  /* A citation line: the gap between which bound it is, its reference, and `reported`. The line is
+     set in the legend's type, a step below the badges, because it annotates the bound line rather
+     than stating a fact of its own. */
+  --stage-cite-gap: 12px;
+  /* The head's line: CITATION, then the frontier record the n's bounds are held in, set apart by
+     the badges' gap and read as one quiet phrase with a word space inside it. */
+  --stage-cite-record-gap: var(--stage-badge-icon-gap);
+  --stage-cite-word-gap: 5px;
   /* Where the headline's rolling numbers start; `layoutHeadline` measures and sets it. */
   --stage-numeral-left: 152px;
 }
@@ -587,6 +595,12 @@ body.drawing #packing-svg #squares {
 .note-sentence {
   display: block;
 }
+/* An empty inline block at the end of each row's words stands on the row's baseline, so its top is
+   where the row's letters stand. `placeAttribution` reads the last two to set the attribution one
+   legend line below the last row; it draws nothing. */
+.note-baseline {
+  display: inline-block;
+}
 .note-swatches {
   display: block;
   flex: none;
@@ -799,6 +813,80 @@ body.drawing #packing-svg #squares {
   height: 32px;
   display: block;
   flex: none;
+}
+/* CITATION, under PROVEN while the setting is on (the owner, 2026-09-21): where each bound on the
+   bound line comes from, one line per cited bound. Its head takes the place OPEN has with the
+   setting off, and its two lines are fixed slots -- the lower bound's source on the first, the
+   upper bound's on the second, at every n -- so nothing moves between n; a line with nothing to
+   cite is an empty slot. OPEN moves below them for as long as the setting is on, to the same
+   place at every n, in the same rhythm: a head 6 above what it heads, the last row 28 above the
+   next head. The legend's 30 px pitch sets the lines, so the section reads at the legend's size.
+   With the setting off none of this is built and OPEN is where it always was. */
+.head-cite {
+  position: absolute;
+  left: 6px;
+  top: 618px;
+}
+/* The head's own word keeps the heads' type, the record beside it the legend's: it names where the
+   lines under it are kept rather than heading them, so it is not set in capitals or tracked. */
+.head-cite.section-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--stage-cite-record-gap);
+}
+.cite-record {
+  display: flex;
+  gap: var(--stage-cite-word-gap);
+  font-size: var(--stage-text-note);
+  font-weight: var(--stage-weight-quiet);
+  letter-spacing: var(--stage-tracking-label);
+  text-transform: none;
+  font-variant-numeric: tabular-nums;
+}
+.cite-line {
+  position: absolute;
+  left: 6px;
+  height: 30px;
+  display: flex;
+  align-items: baseline;
+  gap: var(--stage-cite-gap);
+  font-family: var(--font-sans);
+  font-size: var(--stage-text-note);
+  font-weight: var(--stage-weight-quiet);
+  line-height: var(--stage-line-height-facts);
+  color: var(--scene-label);
+  white-space: nowrap;
+}
+.cite-lower {
+  top: 658px;
+}
+.cite-upper {
+  top: 688px;
+}
+/* Which bound, in that bound's colour on the bound line: scarlet for the proved lower bound, green
+   for the best known upper one. One width for both words, so the two references start together. */
+.cite-bound {
+  flex: none;
+  width: 58px;
+  font-weight: var(--stage-weight-label);
+}
+.cite-bound.is-lower {
+  color: var(--scene-proved);
+}
+.cite-bound.is-upper {
+  color: var(--scene-best);
+}
+/* A bound the register reports but has not certified: said after its source, in OPEN's quieter
+   grey, since an uncertified bound is a question the register has not closed (think-n56i). */
+.cite-reported {
+  color: var(--scene-heading);
+  font-weight: var(--stage-weight-label);
+}
+#facts.shows-citations .head-open {
+  top: 746px;
+}
+#facts.shows-citations .open-items {
+  top: 786px;
 }
 #pack-stage-facts {
   position: absolute;

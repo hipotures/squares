@@ -81,12 +81,15 @@ __WORKBENCH_CSS__
            poster met these three facts. They explain the PICTURE, not the page, so unlike the
            controls they survive capture preview and appear in every captured frame. -->
       <div class="stage-note" id="stage-note"></div>
-      <!-- The attribution: placed just under the legend by `placeAttribution`, and hidden until it
-           has been. -->
+      <!-- The attribution: placed one legend line under the legend by `placeAttribution`, and
+           hidden until it has been. The shared version stands on its baseline at the column's
+           right edge, so every captured frame names the data it was drawn from; the page's data
+           supplies the text. -->
       <svg id="stage-attribution" viewBox="0 0 1920 1080" role="none">
         <a id="stage-attribution-link" href="https://github.com/jlevy/squares" aria-label="github.com/jlevy/squares, the project's repository on GitHub">
           <text id="stage-attribution-text" text-anchor="start">github.com/jlevy/squares</text>
         </a>
+        <text id="stage-version" text-anchor="end"></text>
       </svg>
       <div id="pack-stage-facts" hidden></div>
       <p class="sr-only" id="pack-announcement" aria-live="polite" aria-atomic="true"></p>
@@ -371,6 +374,7 @@ __WORKBENCH_CSS__
           </label>
           <label title="In Animate only: repaint the frame the step comes to rest on in the standard angle colours, leaving the motion itself identity-coloured"><input type="checkbox" id="animate-standard-toggle" checked> animate rests in angle colours</label>
           <label title="Faint lines on what the physics is relating: the step's correspondence, or the relationship graph's own attracting pairs"><input type="checkbox" id="links-toggle"> show correspondence</label>
+          <label title="Under PROVEN, where each bound comes from: a paper or project by its authors and year, or this project's own result, and `reported` where the register has not certified the bound"><input type="checkbox" id="citations-toggle"> show citations</label>
           <label title="Press on one square and release on another to add an edge to the contact graph, or to take it away again. While this is on no square can be picked up and moved."><input type="checkbox" id="draw-toggle"> draw links</label>
           <label><input type="checkbox" id="capture-toggle"> capture preview</label>
         </div>

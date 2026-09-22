@@ -3163,6 +3163,8 @@ _RESULTS = ("packing/campaign/series/*",)
 _WORKBENCH_INPUTS = (
     "packages/workbench/*",
     "packing/src/sqpack/render/*",
+    # The stage prints the shared version, pinned in `release.py`, so a re-pin changes the page.
+    "packing/src/sqpack/release.py",
     "packing/devtools/render_explainer.py",
     "packing/witnesses/known-best/*",
     "packing/atlas/known-best/*",

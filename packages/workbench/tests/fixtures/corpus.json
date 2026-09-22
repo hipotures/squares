@@ -170,5 +170,24 @@
       ["#ff0000", "#ee0000", "#dd0000", "#cc0000", "#bb0000"]
     ],
     "angleToleranceDegrees": 0.5
+  },
+  "version": "v0.4.0-f5e113",
+  "citations": {
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000001",
+    "entries": {
+      "2": {
+        "record": "n-002",
+        "lower": {
+          "text": "Folklore, the area bound",
+          "basis": "external",
+          "assurance": "verified"
+        },
+        "upper": {
+          "text": "The 2 x 2 grid",
+          "basis": "external",
+          "assurance": "reported"
+        }
+      }
+    }
   }
 }

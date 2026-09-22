@@ -494,6 +494,15 @@ def explain(
     ]
 
 
+def cut_cited(video: Path) -> bool:
+    """Whether a cut drew its CITATION section, as its receipt says. A cut without a receipt --
+    one its profile refused -- is taken as plain, which is right only if it was cut plain."""
+    receipt = video.with_suffix(".receipt.json")
+    if not receipt.is_file():
+        return False
+    return json.loads(receipt.read_text(encoding="utf-8")).get("citations") is True
+
+
 def report(video: Path, cadence: Cadence) -> str:
     """One paragraph a person reads: what was measured and whether it is smooth."""
     lines = [
@@ -561,7 +570,9 @@ def main() -> int:
         verified = False
         if o.verify and o.frames is not None and o.range is not None and cadence.stutters:
             indices = sorted({i for s in cadence.stutters for i in (s - 1, s)})
-            rendered = render_frames(PAGE, o.range[0], o.range[1], round(fps), indices)
+            rendered = render_frames(
+                PAGE, o.range[0], o.range[1], round(fps), indices, citations=cut_cited(video)
+            )
             if o.dump is not None:
                 o.dump.mkdir(parents=True, exist_ok=True)
                 for index, png in rendered.items():

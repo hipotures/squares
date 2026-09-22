@@ -28,7 +28,13 @@ encoder's arguments, the range and the frame rate, and, per step, the record the
 aiming at and whether it actually landed on it. It states `transitions_are_packings: false`
 and `intermediate_frames: illustrative-tween`, with the reason: the frames between checked
 records are tweens, not packings. The MP4's own `comment` metadata says the same, with the
-page digest, for anyone who has the video without the receipt.
+shared version and the page digest, for anyone who has the video without the receipt.
+
+**Citations are a setting of the cut** (think-jwly). `--citations` turns on the stage's CITATION
+section, which names where each bound comes from; the receipt says whether it was on, the
+sha256 of the citation file the page was built from, and the shared version the stage draws,
+all read from the page itself. A page built without a citation file has nothing to cite, so a
+cut that asks for citations from one is refused rather than cut plain under a cited name.
 
 What this does NOT yet do is play a PackingStrategy document: the workbench animates the
 retained corpus, and the strategy documents `workbench_tools.ascent`
@@ -51,6 +57,7 @@ import hashlib
 import importlib.metadata
 import json
 import math
+import re
 import shutil
 import subprocess
 import tempfile
@@ -108,6 +115,49 @@ ANIMATION_TRANSITIONS_REASON = (
 )
 
 Runner = Callable[..., subprocess.CompletedProcess[str]]
+
+#: The page's data block, as `tools/check-candidate-corpus.ts` finds it.
+DATA_BLOCK = re.compile(
+    r'<script\s+id="atlas-data"\s+type="application/json">(.*?)</script>', re.DOTALL
+)
+
+
+@dataclass(frozen=True, slots=True)
+class PageEdition:
+    """What a built page says about the data it draws: the shared version on its stage, and the
+    sha256 of the citation file its CITATION section was built from, or None without one."""
+
+    version: str
+    citations_sha256: str | None
+
+
+def page_edition(page: str) -> PageEdition:
+    """The edition a page's own data states, read from its text rather than asked of a browser,
+    so the receipt names what the bytes it digested carry."""
+    blocks = DATA_BLOCK.findall(page)
+    if len(blocks) != 1:
+        raise SystemExit(f"the page has {len(blocks)} data blocks, not one")
+    # The builder writes `</` as `<\/`, which JSON reads as the same two characters.
+    data = json.loads(blocks[0])
+    citations = data.get("citations") or {}
+    version = data.get("version")
+    if not isinstance(version, str):
+        raise SystemExit("the page carries no shared version: rebuild it")
+    return PageEdition(version=version, citations_sha256=citations.get("sha256"))
+
+
+def citation_commands(*, citations: bool, edition: PageEdition) -> list[list[Any]]:
+    """The command that sets the CITATION section for the cut, after the baseline turned it off.
+
+    Refused where the cut asks for citations the page does not carry: its frames would be the
+    plain cut's, with a receipt saying they were cited.
+    """
+    if citations and edition.citations_sha256 is None:
+        raise SystemExit(
+            "--citations asks for the CITATION section, and this page was built without a "
+            "citation file: build it with packing/atlas/known-best/bound-citations.json present"
+        )
+    return [["setCitations", citations]]
 
 
 @dataclass(frozen=True, slots=True)
@@ -327,12 +377,15 @@ def _price(page: Any, steps: list[dict[str, Any]]) -> list[float]:
     return price_steps(steps, durations, page.evaluate(probe("capture/beat")))
 
 
-def priced_range(page_path: Path, first: int, last: int, fps: int) -> list[dict[str, Any]]:
+def priced_range(
+    page_path: Path, first: int, last: int, fps: int, *, citations: bool = False
+) -> list[dict[str, Any]]:
     """The steps a capture of `first..last` makes and the frames each gets, without capturing.
 
     Priced from the page exactly as `main` prices a capture, through the same defaults, the
     same commands and the same frame schedule, so a check can place any frame of a cut that has
-    no receipt -- one the profile refused -- in its step.
+    no receipt -- one the profile refused -- in its step. `citations` is the cut's setting,
+    which changes what a frame draws and not when.
     """
     from playwright.sync_api import sync_playwright  # noqa: PLC0415  (optional dev dependency)
 
@@ -345,7 +398,11 @@ def priced_range(page_path: Path, first: int, last: int, fps: int) -> list[dict[
         _control(
             page,
             prepare=True,
-            commands=[*animation_defaults(opened), *pricing_commands(first, last)],
+            commands=[
+                *animation_defaults(opened),
+                ["setCitations", citations],
+                *pricing_commands(first, last),
+            ],
         )
         steps = _steps(page, first, last)
         durations = _price(page, steps)
@@ -360,13 +417,20 @@ def priced_range(page_path: Path, first: int, last: int, fps: int) -> list[dict[
 
 
 def render_frames(
-    page_path: Path, first: int, last: int, fps: int, indices: Sequence[int]
+    page_path: Path,
+    first: int,
+    last: int,
+    fps: int,
+    indices: Sequence[int],
+    *,
+    citations: bool = False,
 ) -> dict[int, bytes]:
     """Draw the named frames of a capture of `first..last` again, as PNG bytes, from the page.
 
-    Each is drawn exactly as `_capture` draws it -- the same defaults and preparation, the step
-    selected, the page seeked to the frame's own instant from `frame_schedule` -- so a kept
-    frame that differs from its re-render was not the page's frame at that instant.
+    Each is drawn exactly as `_capture` draws it -- the same defaults and preparation, citations
+    as the cut had them, the step selected, the page seeked to the frame's own instant from
+    `frame_schedule` -- so a kept frame that differs from its re-render was not the page's frame
+    at that instant.
     """
     from playwright.sync_api import sync_playwright  # noqa: PLC0415  (optional dev dependency)
 
@@ -381,7 +445,11 @@ def render_frames(
         _control(
             page,
             prepare=True,
-            commands=[*animation_defaults(opened), *pricing_commands(first, last)],
+            commands=[
+                *animation_defaults(opened),
+                ["setCitations", citations],
+                *pricing_commands(first, last),
+            ],
         )
         steps = _steps(page, first, last)
         for sample in frame_schedule(_price(page, steps), fps):
@@ -563,9 +631,15 @@ def capture_receipt(
     delivered: DeliveredVideo,
     encoder: list[str],
     capture_seconds: float,
+    edition: PageEdition,
+    citations: bool,
     animation: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """The receipt written beside a video: what it shows, what made it, and what it is not."""
+    """The receipt written beside a video: what it shows, what made it, and what it is not.
+
+    `edition` is what the page says it draws -- the shared version every frame carries and the
+    citation file's digest -- and `citations` whether the cut drew its CITATION section.
+    """
     frames = sum(int(step["frames"]) for step in steps)
     missed = [step["n"] for step in steps if step.get("landed_on_record") is False]
     drawn = [float(step["ms_per_frame"]) for step in steps]
@@ -573,6 +647,10 @@ def capture_receipt(
     return {
         "page": page,
         "page_sha256": page_sha256,
+        # The data the frames are drawn from, as the page states it, beside the page itself.
+        "version": edition.version,
+        "citations": citations,
+        "citations_sha256": edition.citations_sha256,
         "video": video,
         "video_sha256": video_sha256,
         "range": [first, last],
@@ -637,6 +715,11 @@ def main() -> int:
             "`social` adds the ceilings an X post imposes"
         ),
     )
+    ap.add_argument(
+        "--citations",
+        action="store_true",
+        help="draw the CITATION section under PROVEN, which names each bound's source",
+    )
     ap.add_argument("--out", type=Path, default=PACKING / "site/workbench/ascent.mp4")
     ap.add_argument("--keep-frames", action="store_true", help="leave the PNGs for inspection")
     ap.add_argument(
@@ -656,6 +739,12 @@ def main() -> int:
     # Digested before it is loaded, so the receipt names the page the frames came from rather
     # than whatever sits at that path once the capture is over.
     page_sha256 = _digest(o.page)
+    edition = page_edition(o.page.read_text(encoding="utf-8"))
+    if o.citations and o.animation is not None:
+        raise SystemExit(
+            "--citations draws the catalogue's CITATION section, not an animation's"
+        )
+    cited = citation_commands(citations=o.citations, edition=edition)
     commit, dirty = repository_state(REPO)
     banner = subprocess.run([ffmpeg, "-version"], capture_output=True, text=True, check=False)
 
@@ -680,11 +769,18 @@ def main() -> int:
             defaults = animation_defaults(opened)
             # Capture preview, applied by `prepare`, is what hides the chrome.
             if o.animation is None:
-                _control(
+                prepared = _control(
                     page,
                     prepare=True,
-                    commands=[*defaults, *pricing_commands(o.first, o.last)],
+                    commands=[*defaults, *cited, *pricing_commands(o.first, o.last)],
+                    read=["state"],
                 )
+                # What the receipt says is what the page reports, not what was asked of it.
+                if prepared["state"]["citations"] is not o.citations:
+                    raise SystemExit(
+                        f"asked for citations {o.citations}, and the page shows "
+                        f"{prepared['state']['citations']}"
+                    )
                 steps = _steps(page, o.first, o.last)
                 durations = _price(page, steps)
                 print(
@@ -720,6 +816,7 @@ def main() -> int:
                 page_sha256=page_sha256,
                 title=title,
                 comment=capture_comment(),
+                version=edition.version,
             ),
             o.out,
         )
@@ -776,8 +873,11 @@ def main() -> int:
             page_sha256=page_sha256,
             title=title,
             comment=capture_comment(),
+            version=edition.version,
         ),
         capture_seconds=time.monotonic() - started_all,
+        edition=edition,
+        citations=o.citations,
         animation=(
             {
                 "animation": str(o.animation),

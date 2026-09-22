@@ -73,11 +73,38 @@ export interface CorpusColour {
   /** Workbench angle clustering, separate from exact rendering's angle tolerance. */
   angleToleranceDegrees: number;
 }
+/** Which of an n's two bounds a citation names, as the bound line distinguishes them. */
+export type CitationBound = "lower" | "upper";
+/**
+ * Where one bound comes from, as `packing/atlas/known-best/bound-citations.json` states it. Only
+ * what the stage draws is carried: the reference line, and whether the register has certified
+ * the bound (`verified`) or only reports it (`reported`).
+ */
+export interface CorpusCitation {
+  text: string;
+  basis: "external" | "project";
+  assurance: "verified" | "reported";
+}
+export interface CorpusBoundCitations {
+  lower: CorpusCitation | null;
+  upper: CorpusCitation | null;
+  /** The n's frontier case record, `n-017` for `packing/frontier/n-017.md`. */
+  record: string;
+}
+export interface CorpusCitations {
+  /** The citation file's sha256 the page was built from, or null when there was none. */
+  sha256: string | null;
+  /** Per n, and only where at least one of its bounds is cited. */
+  entries: Record<string, CorpusBoundCitations>;
+}
 export interface Corpus {
   schema: typeof CORPUS_SCHEMA;
+  /** The shared version the page's data belongs to, `v0.4.1-f5e113`: drawn on the stage. */
+  version: string;
   frames: Record<string, CorpusFrame>;
   pairs: CorpusPair[];
   facts: Record<string, CorpusFacts>;
+  citations: CorpusCitations;
   timing: AtlasTiming;
   arrival_fraction: number;
   motion_phases: AtlasPhase[];
@@ -302,6 +329,69 @@ function colour(value: unknown): CorpusColour {
   }
   return { palette, shades, angleToleranceDegrees: positive(row.angleToleranceDegrees) };
 }
+/**
+ * The edition's semver core and the last data commit, as `sqpack.release.data_version` writes
+ * it. A version drawn on every captured frame that is not one would be worse than none.
+ */
+const VERSION = /^v\d+\.\d+\.\d+(?:-[0-9A-Za-z.]+)?-[0-9a-f]{4,40}$/;
+function version(value: unknown): string {
+  const text = string(value);
+  if (!VERSION.test(text)) {
+    throw new RangeError("corpus version must read vMAJOR.MINOR.PATCH-<data commit>");
+  }
+  return text;
+}
+/** A citation line is drawn on one line of the facts column, so it is one short line of text. */
+const CITATION_TEXT_MAX = 66;
+function citation(value: unknown): CorpusCitation {
+  const row = object(value, "citation");
+  const text = string(row.text);
+  if (text.trim() !== text || text === "" || /[\n\r\t]/.test(text)) {
+    throw new RangeError("citation text must be one trimmed, non-empty line");
+  }
+  if (text.length > CITATION_TEXT_MAX) {
+    throw new RangeError(`citation text must be at most ${CITATION_TEXT_MAX} characters`);
+  }
+  const basis = row.basis;
+  const assurance = row.assurance;
+  if (basis !== "external" && basis !== "project") {
+    throw new RangeError("citation basis must be external or project");
+  }
+  if (assurance !== "verified" && assurance !== "reported") {
+    throw new RangeError("citation assurance must be verified or reported");
+  }
+  return { text, basis, assurance };
+}
+function citations(value: unknown): CorpusCitations {
+  const row = object(value, "citations");
+  const sha256 = nullable(row.sha256, string);
+  if (sha256 !== null && !/^[0-9a-f]{64}$/.test(sha256)) {
+    throw new RangeError("citation file digest must be a sha256");
+  }
+  const entries = record(row.entries, (value, key) => {
+    const n = integer(Number(key), 1);
+    const entry = object(value, "bound citations");
+    const cited = {
+      lower: nullable(entry.lower, citation),
+      upper: nullable(entry.upper, citation),
+      record: string(entry.record),
+    };
+    // The record is the n's own, named as the frontier names its files.
+    if (cited.record !== `n-${String(n).padStart(3, "0")}`) {
+      throw new RangeError(`citations for n = ${key} name the record ${cited.record}`);
+    }
+    // The builder leaves out an n with nothing to cite, so an entry that cites nothing is a
+    // payload that disagrees with its builder rather than a quiet n.
+    if (cited.lower === null && cited.upper === null) {
+      throw new RangeError(`citations for n = ${key} cite neither bound`);
+    }
+    return cited;
+  });
+  if (sha256 === null && Object.keys(entries).length > 0) {
+    throw new RangeError("citations without the digest of the file they came from");
+  }
+  return { sha256, entries };
+}
 
 /** Decode the build payload once. Geometry/evidence validation remains a separate contract. */
 export function decodeCorpus(value: unknown): Corpus {
@@ -312,9 +402,11 @@ export function decodeCorpus(value: unknown): Corpus {
   const timing = object(row.timing, "timing");
   const corpus: Corpus = {
     schema: CORPUS_SCHEMA,
+    version: version(row.version),
     frames: record(row.frames, frame),
     pairs: array(row.pairs, pair),
     facts: record(row.facts, facts),
+    citations: citations(row.citations),
     timing: {
       dwell: numeric(timing.dwell),
       move: numeric(timing.move),
@@ -396,6 +488,11 @@ export function decodeCorpus(value: unknown): Corpus {
   }
   if (corpus.pairs.length === 0) {
     throw new RangeError("corpus requires at least one transition");
+  }
+  for (const n of Object.keys(corpus.citations.entries)) {
+    if (corpus.facts[n] === undefined) {
+      throw new RangeError(`citations for n = ${n}, which the corpus has no facts for`);
+    }
   }
   return corpus;
 }

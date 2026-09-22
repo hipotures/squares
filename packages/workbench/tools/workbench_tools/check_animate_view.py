@@ -20,7 +20,9 @@ Usage, from ``packing/``::
 from __future__ import annotations
 
 import argparse
+import hashlib
 import io
+import json
 import math
 import os
 import tempfile
@@ -35,16 +37,18 @@ from PIL import Image
 from playwright.sync_api import Page, sync_playwright
 
 from workbench_tools import animate_view_contract
+from workbench_tools.build_candidate import CITATIONS
 from workbench_tools.build_site import build
 from workbench_tools.probes import probe
 
 
 @dataclass
 class Session:
-    """One page, and the failures collected against it."""
+    """One page, the citation file it was built from, and the failures collected against it."""
 
     page: Page
     failures: list[str] = field(default_factory=list)
+    citations: Path = CITATIONS
 
     def look(self, name: str, /, **argument: Any) -> Any:
         """Evaluate one probe, with its argument."""
@@ -340,8 +344,23 @@ def require_crossfade(
 
 def facts_handover(session: Session) -> str:
     """Unchanged text never fades; changed text crossfades in the middle 0.2 s, never blank."""
+    held_digits = handover(session, HANDOVER_STEPS)
+    session.require(
+        held_digits > 0,
+        "no step held a digit of a number it kept (a KaTeX number is one span unless split)",
+    )
+    return f"the facts hand over part by part, {held_digits} kept digits held"
+
+
+def handover(session: Session, steps: tuple[int, ...], note: str = "") -> int:
+    """The facts panel's handover over each step into n, part by part; returns the digits held.
+
+    Every part a slot draws in both layers is held at full ink and swapped at the midpoint;
+    every other part crossfades with the headline over the middle half of the roll, and a slot
+    is never blank. `note` names the setting the steps were run under.
+    """
     held_digits = 0
-    for n in HANDOVER_STEPS:
+    for n in steps:
         schedule, at = handover_instants(session, n)
         read = session.look("facts/crossfade", n=n, at=at)
         enter = read["enter"]
@@ -365,7 +384,7 @@ def facts_handover(session: Session) -> str:
             going = [i for i in range(len(keys_a)) if i not in held_a]
             coming = [j for j in range(len(keys_b)) if j not in held_b]
             changed += bool(going or coming)
-            label = f"step into {n}, slot {slot['name']!r}"
+            label = f"step into {n}{note}, slot {slot['name']!r}"
             for k, (seen_a, seen_b) in enumerate(slot["seen"]):
                 t = at[k]
                 for i, j in pairs:
@@ -394,12 +413,136 @@ def facts_handover(session: Session) -> str:
                         top >= 0.5 - OPACITY_TOLERANCE,
                         f"{label} at t = {t:.3f} is blank: nothing drawn above {top:.3f}",
                     )
-        session.require(changed > 0, f"step into {n} changed no slot, so it tested nothing")
+        session.require(
+            changed > 0, f"step into {n}{note} changed no slot, so it tested nothing"
+        )
+    return held_digits
+
+
+def citation_file(session: Session) -> tuple[dict[str, Any] | None, str | None]:
+    """The citation file's entries by n and its digest, or None and None where it is absent."""
+    path = session.citations
+    if not path.is_file():
+        return None, None
+    raw = path.read_bytes()
+    entries = json.loads(raw)["citations"]["entries"]
+    return {str(entry["n"]): entry for entry in entries}, hashlib.sha256(raw).hexdigest()
+
+
+def cited_lines(entry: dict[str, Any] | None) -> dict[str, tuple[str, bool]]:
+    """What the file says an n's section draws: per bound, its reference and if reported."""
+    if entry is None:
+        return {}
+    return {
+        bound: (cited["text"], cited["assurance"] == "reported")
+        for bound in ("lower", "upper")
+        if (cited := entry.get(bound)) is not None
+    }
+
+
+def citations_drawn(session: Session) -> str:
+    """The CITATION section is drawn exactly where the citation file has a line, at every n.
+
+    With the setting off no n builds any of it. With it on, each n draws its lower bound's
+    reference on the first line and its upper bound's on the second, labeled with the bound,
+    `reported` exactly where the file says the register has not certified the bound, headed
+    only where it draws a line, with the file's frontier record for the n on the head's line,
+    and every line inside the column. The file is the one the page
+    was built from, by digest; a page built without one draws nothing at any n.
+    """
+    entries, digest = citation_file(session)
+    carried = session.look("page/citations")
     session.require(
-        held_digits > 0,
-        "no step held a digit of a number it kept (a KaTeX number is one span unless split)",
+        carried["sha256"] == digest,
+        f"the page was built from citations {carried['sha256']}, not {session.citations} "
+        f"({digest})",
     )
-    return f"the facts hand over part by part, {held_digits} kept digits held"
+    off = session.look("facts/citation-sweep", on=False)
+    built_off = [row["n"] for row in off["drawn"] if row["built"]]
+    session.require(
+        not built_off, f"with the setting off, n = {built_off[:12]} build citations"
+    )
+    on = session.look("facts/citation-sweep", on=True)
+    column = on["column"]
+    wrong: list[str] = []
+    drawn_lines = reported = 0
+    for row in on["drawn"]:
+        n = row["n"]
+        want = cited_lines(None if entries is None else entries.get(str(n)))
+        got = {
+            line["slot"]: (line["text"], line["reported"] == "reported")
+            for line in row["lines"]
+        }
+        drawn_lines += len(got)
+        reported += sum(1 for _, marked in got.values() if marked)
+        if got != want:
+            wrong.append(f"n = {n} draws {got}, and the file has {want}")
+        if row["built"] != 3:
+            wrong.append(f"n = {n} builds {row['built']} citation slots, not the fixed 3")
+        if (row["head"] is not None) != bool(want):
+            wrong.append(f"n = {n} is {'headed' if row['head'] else 'not headed'} over {want}")
+        record = entries[str(n)]["record"] if want and entries is not None else None
+        if row["record"] != record:
+            wrong.append(f"n = {n} names the record {row['record']}, and the file {record}")
+        if row["recordRight"] is not None and row["recordRight"] > column["right"] + 1:
+            wrong.append(
+                f"n = {n}: the record ends at {row['recordRight']:.1f}, past the column"
+            )
+        for line in row["lines"]:
+            if line["bound"] != line["slot"] or line["reported"] not in (None, "reported"):
+                wrong.append(f"n = {n}: the {line['slot']} line is labeled {line}")
+            if line["left"] < column["left"] - 1 or line["right"] > column["right"] + 1:
+                wrong.append(
+                    f"n = {n}: the {line['slot']} line {line['text']!r} spans "
+                    f"{line['left']:.1f}..{line['right']:.1f}, past the column's "
+                    f"{column['left']:.1f}..{column['right']:.1f} by "
+                    f"{line['right'] - column['right']:.1f}"
+                )
+    session.failures.extend(wrong[:12])
+    session.require(len(wrong) <= 12, f"and {len(wrong) - 12} more citation findings")
+    if entries is None:
+        return f"no citation file, and no n of {len(on['drawn'])} draws a citation"
+    session.require(drawn_lines > 0, "the citation file cites nothing the page drew")
+    return (
+        f"the citations are drawn at exactly the file's {drawn_lines} lines over "
+        f"{len(on['drawn'])} n, {reported} of them reported, inside the column, and nowhere "
+        f"with the setting off"
+    )
+
+
+def citation_steps(entries: dict[str, Any], last: int) -> tuple[int, ...]:
+    """Steps into n where the section changes in each way it can: a reference, `reported`, a
+    bound gaining or losing its line, and the section appearing or going. The first of each."""
+    kinds: dict[str, int] = {}
+    for n in range(2, last + 1):
+        before, after = cited_lines(entries.get(str(n - 1))), cited_lines(entries.get(str(n)))
+        for bound in ("lower", "upper"):
+            a, b = before.get(bound), after.get(bound)
+            if (a is None) != (b is None):
+                kinds.setdefault(f"{bound} line", n)
+            elif a is not None and b is not None and a[0] != b[0]:
+                kinds.setdefault(f"{bound} reference", n)
+            elif a is not None and b is not None and a[1] != b[1]:
+                kinds.setdefault("reported", n)
+        if bool(before) != bool(after):
+            kinds.setdefault("section", n)
+    return tuple(sorted(set(kinds.values())))
+
+
+def citations_handover(session: Session) -> str:
+    """With the citations on, the section hands over between n as the rest of the panel does."""
+    entries, _ = citation_file(session)
+    if entries is None:
+        return "no citation file, so no citation handover to sample"
+    last = max(int(pair["n"]) for pair in session.api(("pairs",))) + 1
+    steps = citation_steps(entries, last)
+    session.require(bool(steps), "the citation file changes the section at no step")
+    session.api(("setCitations", True))
+    try:
+        handover(session, steps, " with citations")
+    finally:
+        session.api(("setCitations", False), ("pause",), ("seek", 0))
+    return f"the citations hand over part by part at the steps into {list(steps)}"
 
 
 def _near(a: list[float] | None, b: list[float] | None, within: float = 0.5) -> bool:
@@ -483,6 +626,9 @@ DRAWN_TEXT_OWNERS = (
     "numeral-b",
     "stage-note",
     "stage-attribution",
+    # The shared version on the attribution's line (the owner, 2026-09-22), so every captured
+    # frame names the data it was drawn from.
+    "stage-version",
 )
 
 
@@ -776,6 +922,8 @@ SECTIONS: tuple[Callable[[Session], str], ...] = (
     drag_ends,
     drag_past_walls,
     facts_handover,
+    citations_drawn,
+    citations_handover,
     headline_roll,
     headline_space,
     stage_clearance,
@@ -787,14 +935,18 @@ SECTIONS: tuple[Callable[[Session], str], ...] = (
 )
 
 
-def check(page_path: Path) -> str:
-    """Run every section against one page; raise with every failure if any section failed."""
+def check(page_path: Path, citations: Path = CITATIONS) -> str:
+    """Run every section against one page; raise with every failure if any section failed.
+
+    `citations` is the file the page was built from, which the citation sections hold what it
+    draws to.
+    """
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(
             headless=True, executable_path=os.environ.get("SQUARES_BROWSER_EXECUTABLE")
         )
         page = browser.new_page(viewport={"width": 1920, "height": 1080})
-        session = Session(page)
+        session = Session(page, citations=citations)
         page.on("pageerror", lambda error: session.failures.append(f"pageerror: {error}"))
         page.on(
             "console",
@@ -823,14 +975,20 @@ def check(page_path: Path) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--page", type=Path)
+    parser.add_argument(
+        "--citations",
+        type=Path,
+        default=CITATIONS,
+        help="the citation file the page is built from",
+    )
     options = parser.parse_args()
     if options.page is None:
         with tempfile.TemporaryDirectory(prefix="squares-animate-view-") as directory:
             page = Path(directory) / "index.html"
-            build(page.parent)
-            result = check(page)
+            build(page.parent, citations=options.citations)
+            result = check(page, options.citations)
     else:
-        result = check(options.page)
+        result = check(options.page, options.citations)
     print(f"OK: {result}")
     return 0
 

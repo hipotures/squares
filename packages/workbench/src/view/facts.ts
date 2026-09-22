@@ -1,4 +1,4 @@
-import type { Corpus, CorpusFacts } from "../data/corpus.js";
+import type { CitationBound, Corpus, CorpusBoundCitations, CorpusFacts } from "../data/corpus.js";
 import { createDom, requireHtml } from "./dom.ts";
 
 /** The label under each badge the panel draws, keyed `glyph/style`. */
@@ -52,6 +52,49 @@ export function planFacts(facts: CorpusFacts, n: number): FactsPlan {
       ? null
       : facts.open.map((key) => ({ glyph: "?", style: "query", label: OPEN_LABELS[key] ?? key }));
   return { badges, open };
+}
+
+/** The section's head. The owner's word for it (2026-09-21), and one word at every n: a head that
+ * turned plural where an n cites both bounds would change, and so crossfade, between most n. */
+export const CITATION_HEAD = "Citation";
+/** The word that marks a bound the register reports but has not certified (the owner, 2026-09-22). */
+export const REPORTED = "reported";
+/** The word ahead of the frontier record's name on the head's line. */
+export const RECORD = "record";
+
+/** One line of the citation section: which bound, where it comes from, and whether it is certified. */
+export interface CitationLine {
+  bound: CitationBound;
+  text: string;
+  reported: boolean;
+}
+
+/** What the CITATION section draws for one n. */
+export interface CitationPlan {
+  /** The frontier case record the n's bounds are held in, drawn on the head's line. */
+  record: string;
+  /** The lower line, then the upper line, each null where that bound has nothing to cite. */
+  lines: [CitationLine | null, CitationLine | null];
+}
+
+/**
+ * The citation section for one n, or null when neither bound is cited and there is no section.
+ *
+ * Each bound keeps its own line whether or not the other is cited, so the upper bound's source is
+ * always on the second line: an n that cites only its upper bound leaves the first line empty
+ * rather than moving the second up, which between two n would be a line that jumps.
+ */
+export function planCitations(cited: CorpusBoundCitations | undefined): CitationPlan | null {
+  if (cited === undefined || (cited.lower === null && cited.upper === null)) {
+    return null;
+  }
+  const line = (bound: CitationBound): CitationLine | null => {
+    const source = cited[bound];
+    return source === null
+      ? null
+      : { bound, text: source.text, reported: source.assurance === "reported" };
+  };
+  return { record: cited.record, lines: [line("lower"), line("upper")] };
 }
 
 /** A badge item's classes: `new result` is set in the star's colour, every other in the label's. */
@@ -143,10 +186,12 @@ export function createFactsView(document: Document, DATA: Corpus) {
   // itself and lightened mid-roll, against the owner's request that unchanged text never fade
   // out and back. Split, each character is a part of its own. The spans carry no class and no
   // style, so the line is drawn as before; only KaTeX's visible HTML is split, not its MathML.
+  // A one-digit number is split too: left whole, the `2` of `s(4) = 2` was a different part from
+  // the `2` of `2.707107` in the same place, and crossfaded with itself at the step into 5.
   function splitNumerals(root: HTMLElement) {
     for (const leaf of root.querySelectorAll(".katex-html .mord")) {
       const digits = leaf.textContent ?? "";
-      if (leaf.children.length > 0 || digits.length < 2 || !/[0-9]/.test(digits)) {
+      if (leaf.children.length > 0 || !/[0-9]/.test(digits)) {
         continue;
       }
       leaf.textContent = "";
@@ -158,7 +203,46 @@ export function createFactsView(document: Document, DATA: Corpus) {
     }
   }
 
-  function buildFacts(layer: HTMLElement, n: number) {
+  // The citation section's three slots, which are built whenever the setting is on, drawn or not:
+  // the layers are compared slot by slot, so a fixed count keeps OPEN's slots after them lined up
+  // between an n that cites something and one that does not. An undrawn slot is an empty box, and
+  // the head carries `section-head` only where it is drawn, so it is a head only when it says one.
+  // Every drawn word is an element of its own, which is what lets the handover hold `lower` in
+  // place while the reference beside it crossfades.
+  //
+  // The head's line also names the frontier record the n's bounds are held in (the owner,
+  // 2026-09-22): once per n, since both lines come from it, and on the head's line rather than a
+  // third one, so OPEN keeps its place. Its name is split a character to a span, as the bound
+  // line's numbers are, so between `n-017` and `n-018` only the last digit crossfades.
+  function citationSlots(n: number): HTMLElement[] {
+    const plan = planCitations(DATA.citations.entries[String(n)]);
+    const head = text("div", plan === null ? "head-cite" : "section-head head-cite");
+    if (plan !== null) {
+      head.appendChild(text("span", undefined, CITATION_HEAD));
+      const record = text("span", "cite-record");
+      record.appendChild(text("span", "cite-record-word", RECORD));
+      const name = text("span", "cite-record-name");
+      for (const character of plan.record) {
+        name.appendChild(text("span", undefined, character));
+      }
+      record.appendChild(name);
+      head.appendChild(record);
+    }
+    const lines = (plan?.lines ?? [null, null]).map((line, index) => {
+      const slot = text("div", index === 0 ? "cite-line cite-lower" : "cite-line cite-upper");
+      if (line !== null) {
+        slot.appendChild(text("span", `cite-bound is-${line.bound}`, line.bound));
+        slot.appendChild(text("span", "cite-text", line.text));
+        if (line.reported) {
+          slot.appendChild(text("span", "cite-reported", REPORTED));
+        }
+      }
+      return slot;
+    });
+    return [head, ...lines];
+  }
+
+  function buildFacts(layer: HTMLElement, n: number, withCitations = false) {
     const f = FACTS[String(n)];
     if (f === undefined) {
       throw new RangeError(`no catalogue facts for n = ${n}`);
@@ -198,9 +282,10 @@ export function createFactsView(document: Document, DATA: Corpus) {
       return line;
     }
     // PROVED, in the order a reader wants it: the chained bound on the side, then the badges, led by
-    // `new result` when its lower bound was first proved here. Both bounds are proved facts -- a
-    // construction proves its upper bound -- so both belong here, and OPEN below carries the
-    // questions.
+    // `new result` when its lower bound was first proved here, and OPEN below carries the questions.
+    // The upper bound is here because a construction shows it, but the register has certified only
+    // some constructions: where it reports one it has not checked, the bound stays on this line and
+    // the citation section says `reported` against it (the owner, 2026-09-22, think-n56i).
     const plan = planFacts(f, n);
     layer.appendChild(text("div", "section-head head-proved", "Proven"));
     // The bound is one chained statement now, so it is one row. The star sits to the LEFT of
@@ -223,6 +308,11 @@ export function createFactsView(document: Document, DATA: Corpus) {
       badges.appendChild(badgeItem(badgeClass(b), b.glyph, b.style, b.label));
     }
     layer.appendChild(badges);
+    // CITATION, under PROVEN, while the setting is on: where each bound on the line above comes
+    // from. Its slots are fixed, and the stylesheet moves OPEN below them while it is on.
+    if (withCitations) {
+      layer.append(...citationSlots(n));
+    }
     // OPEN, only when something is open. The two layers are compared slot by slot, and OPEN's
     // slots come last, so a layer without them lines up with one that has them: those two slots
     // fade in or out whole while every slot before them hands over as before.

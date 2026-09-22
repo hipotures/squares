@@ -30,6 +30,7 @@ from __future__ import annotations
 
 import argparse
 import base64
+import hashlib
 import json
 import math
 import re
@@ -48,6 +49,7 @@ from scipy.optimize import linear_sum_assignment
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import connected_components
 
+from sqpack.release import PUBLICATION_EDITION
 from workbench_tools.self_contained import assert_self_contained_html
 
 PACKAGE_ROOT = Path(__file__).resolve().parents[2]
@@ -59,6 +61,10 @@ WITNESSES = PACKING / "witnesses" / "known-best"
 RENDERINGS = PACKING / "atlas" / "known-best" / "rendering"
 MANIFEST = PACKING / "atlas" / "known-best" / "manifest.json"
 COMPOSITE = PACKING / "atlas" / "known-best" / "composite-figure.json"
+#: Where each bound on the stage comes from, generated from the frontier register by
+#: `devtools.build_bound_citations` (think-zb78). The page is built without it where it is
+#: absent: the CITATION section then has nothing to draw.
+CITATIONS = PACKING / "atlas" / "known-best" / "bound-citations.json"
 FONTS = REPO / "vendor" / "kpress" / "src" / "kpress" / "format" / "static" / "fonts"
 KATEX_FONTS = (
     REPO / "vendor" / "kpress" / "src" / "kpress" / "format" / "static" / "katex" / "fonts"
@@ -1161,6 +1167,160 @@ def load_facts(manifest_entries: dict[int, dict]) -> dict[str, dict]:
     return facts
 
 
+# --------------------------------------------------------------------------- citations
+
+
+#: The contract `CITATIONS` is written under, and the shape of the tool that writes it. The
+#: generator is matched rather than named: the page is built from the file, not from the tool,
+#: and a module named here would read as one this build runs (`test_build_site_inputs`).
+CITATIONS_CONTRACT = "packing.squares:BoundCitations/v1"
+CITATIONS_GENERATOR = re.compile(r"devtools\.\w+")
+#: The longest reference line the facts column takes at the stage's small type. The contract's
+#: own limit, repeated here because this is where a longer one would reach the page.
+CITATION_TEXT_MAX = 66
+CITATION_BASES = frozenset({"external", "project"})
+CITATION_ASSURANCES = frozenset({"verified", "reported"})
+RESULT_ID = re.compile(r"T-\d{3,}")
+DECIMAL = re.compile(r"\d+(?:\.(\d+))?")
+
+
+def latin_face_covers(text: str) -> bool:
+    """Whether every character of `text` is drawn by the embedded latin faces.
+
+    A reference line outside `LATIN_RANGE` would be set in whatever system face the browser
+    falls back to, a different face on every machine a capture is cut on.
+    """
+    spans = []
+    for part in LATIN_RANGE.split(","):
+        low, _, high = part.strip().removeprefix("U+").partition("-")
+        spans.append((int(low, 16), int(high or low, 16)))
+    return all(any(low <= ord(ch) <= high for low, high in spans) for ch in text)
+
+
+def same_decimal(cited: str, drawn: str) -> bool:
+    """Whether a citation's value names the number the stage draws, where both are decimals.
+
+    Compared to one unit in the last place of the shorter, since the stage rounds the register's
+    value to its own precision; a value that is not a plain decimal is not compared.
+    """
+    a, b = DECIMAL.fullmatch(cited), DECIMAL.fullmatch(drawn)
+    if a is None or b is None:
+        return True
+    places = min(len(a.group(1) or ""), len(b.group(1) or ""))
+    return abs(Fraction(cited) - Fraction(drawn)) <= Fraction(1, 10**places)
+
+
+def _citation(value: Any, n: int, bound: str) -> dict[str, str] | None:
+    """One bound's citation, checked against the contract, as the page carries it."""
+    if value is None:
+        return None
+    where = f"bound citations, n = {n}, {bound}"
+    if not isinstance(value, dict):
+        raise TypeError(f"{where}: a citation is an object or null, not {value!r}")
+    text, basis, assurance = value.get("text"), value.get("basis"), value.get("assurance")
+    if not isinstance(text, str) or not text or text != text.strip() or "\n" in text:
+        raise ValueError(f"{where}: the reference must be one trimmed line, not {text!r}")
+    if len(text) > CITATION_TEXT_MAX:
+        raise ValueError(
+            f"{where}: {text!r} is {len(text)} characters, over the {CITATION_TEXT_MAX} the "
+            f"facts column takes"
+        )
+    if not latin_face_covers(text):
+        raise ValueError(f"{where}: {text!r} has characters the page's faces do not draw")
+    if basis not in CITATION_BASES or assurance not in CITATION_ASSURANCES:
+        raise ValueError(
+            f"{where}: basis {basis!r} and assurance {assurance!r} are not the contract's"
+        )
+    result, key = value.get("result"), value.get("source_key")
+    if result is not None and not (isinstance(result, str) and RESULT_ID.fullmatch(result)):
+        raise ValueError(f"{where}: result {result!r} is not a T-NNN identifier")
+    if key is not None and not isinstance(key, str):
+        raise TypeError(f"{where}: source_key {key!r} is not a string")
+    if not isinstance(value.get("value"), str):
+        raise TypeError(f"{where}: the value it cites is not a string: {value.get('value')!r}")
+    return {"text": text, "basis": basis, "assurance": assurance}
+
+
+def load_citations(
+    path: Path = CITATIONS, facts: dict[str, dict] | None = None
+) -> dict[str, Any]:
+    """The stage's citations: the file's digest, and per n its lower and upper bound's source
+    and the frontier case record that holds them.
+
+    Absent, the page has nothing to cite and says so with a null digest; present, the file is
+    admitted whole or the build stops, because a line the stage draws is a claim about who
+    established a bound. Every n from 1 to `N_MAX` has one entry, in order, naming its own
+    record, `n-017` for `packing/frontier/n-017.md`. An n that cites neither
+    bound is left out of what the page carries. Where `facts` is given, each cited value must be
+    the number the stage's bound line draws for that bound, so the section never cites a bound
+    the line above it does not state.
+    """
+    if not path.is_file():
+        return {"sha256": None, "entries": {}}
+    raw = path.read_bytes()
+    document = json.loads(raw)
+    contract = (document.get("softschema") or {}).get("contract")
+    body = document.get("citations") or {}
+    generator = body.get("generated_by")
+    if contract != CITATIONS_CONTRACT or not (
+        isinstance(generator, str) and CITATIONS_GENERATOR.fullmatch(generator)
+    ):
+        raise ValueError(
+            f"{path}: not a {CITATIONS_CONTRACT} file from a project tool "
+            f"(contract {contract!r}, generated by {generator!r})"
+        )
+    entries = body.get("entries")
+    if not isinstance(entries, list) or [
+        entry.get("n") if isinstance(entry, dict) else None for entry in entries
+    ] != list(range(1, N_MAX + 1)):
+        raise ValueError(f"{path}: the entries are not one per n = 1..{N_MAX}, in order")
+    cited: dict[str, dict[str, Any]] = {}
+    for entry in entries:
+        n = entry["n"]
+        record = entry.get("record")
+        if record != f"n-{n:03d}":
+            raise ValueError(
+                f"{path}: n = {n} names the record {record!r}, not its own frontier case "
+                f"record n-{n:03d}"
+            )
+        pair = {bound: _citation(entry.get(bound), n, bound) for bound in ("lower", "upper")}
+        if facts is not None:
+            fact = facts[str(n)]
+            drawn = {"lower": fact["lower"] or fact["side"], "upper": fact["side"]}
+            for bound in ("lower", "upper"):
+                value = (entry.get(bound) or {}).get("value")
+                if value is not None and not same_decimal(value, drawn[bound]):
+                    raise ValueError(
+                        f"{path}: n = {n} cites {value} for its {bound} bound, and the stage "
+                        f"draws {drawn[bound]}"
+                    )
+        if pair["lower"] is not None or pair["upper"] is not None:
+            cited[str(n)] = {**pair, "record": record}
+    return {"sha256": hashlib.sha256(raw).hexdigest(), "entries": cited}
+
+
+#: What the page may call its version: the edition's status word while it has one, then its
+#: semver core and the data commit it is pinned to, as `sqpack.release` writes the edition.
+VERSION = re.compile(
+    r"(?:[A-Za-z][A-Za-z-]* )?v\d+\.\d+\.\d+(?:-[0-9A-Za-z.]+)?-[0-9a-f]{4,40}"
+)
+
+
+def checked_version(version: str) -> str:
+    """A version held to the shape the page's decoder admits, which is refused rather than
+    drawn on every frame of a video when it is not one."""
+    if VERSION.fullmatch(version) is None:
+        raise ValueError(f"{version!r} is not a version: vMAJOR.MINOR.PATCH-<data commit>")
+    return version
+
+
+def page_version() -> str:
+    """The shared version the stage draws: `sqpack.release.PUBLICATION_EDITION`, which the
+    explainer and the atlas print too. It is pinned there, so the page never asks git and builds
+    alike from a shallow checkout, where git would name the checkout's commit as the data's."""
+    return checked_version(PUBLICATION_EDITION)
+
+
 # --------------------------------------------------------------------------- type metrics
 
 
@@ -1793,6 +1953,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--all", action="store_true", help="also write index-all.html with every pair embedded"
     )
+    parser.add_argument(
+        "--citations",
+        type=Path,
+        default=CITATIONS,
+        help="the bound citations the stage draws (default: the frontier register's)",
+    )
     args = parser.parse_args(argv)
     out: Path = args.out
     out.mkdir(parents=True, exist_ok=True)
@@ -1805,6 +1971,8 @@ def main(argv: list[str] | None = None) -> int:
         renderings = {n: load_rendering(n) for n in range(1, N_MAX + 1)}
     with clock.stage("read the facts"):
         facts = load_facts(manifest_by_n)
+        citations = load_citations(args.citations, facts)
+    version = page_version()
 
     stats = []
     matches = {}
@@ -1880,6 +2048,7 @@ def main(argv: list[str] | None = None) -> int:
         frame_ns = sorted({n for p in pair_ns for n in (p, p + 1)})
         return {
             "schema": "squares.workbench.corpus/v1",
+            "version": version,
             "colour": colour_contract(),
             "frames": {
                 str(n): compact_frame(witnesses[n], renderings[n], identities[n])
@@ -1927,6 +2096,14 @@ def main(argv: list[str] | None = None) -> int:
                 for n in pair_ns
             ],
             "facts": {str(n): facts[str(n)] for n in frame_ns},
+            "citations": {
+                "sha256": citations["sha256"],
+                "entries": {
+                    str(n): citations["entries"][str(n)]
+                    for n in frame_ns
+                    if str(n) in citations["entries"]
+                },
+            },
             "timing": TIMING,
             "arrival_fraction": ARRIVAL_FRACTION,
             "motion_phases": MOTION_PHASES,
@@ -1936,6 +2113,15 @@ def main(argv: list[str] | None = None) -> int:
             "sequence_kinds": {str(s["n"]): s["kind"] for s in stats},
         }
 
+    print(
+        f"\nversion {version}; citations: "
+        + (
+            f"{len(citations['entries'])} n cited, from {args.citations} "
+            f"(sha256 {citations['sha256'][:12]})"
+            if citations["sha256"] is not None
+            else f"none, {args.citations} is absent"
+        )
+    )
     html = build_html(template, payload_for(demo))
     (out / "index.html").write_text(html)
     print(

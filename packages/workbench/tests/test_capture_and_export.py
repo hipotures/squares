@@ -228,7 +228,14 @@ def test_the_receipt_carries_the_plan_d9_statement_and_provenance() -> None:
         delivered=delivered,
         encoder=["ffmpeg", "-movflags", "+faststart"],
         capture_seconds=12.34,
+        edition=capture_video.PageEdition(version="v0.4.1-f5e113", citations_sha256="c" * 64),
+        citations=True,
     )
+    # What the frames draw from, as the page states it (think-jwly): the shared version, whether
+    # the CITATION section was on, and the citation file it was built from.
+    assert receipt["version"] == "v0.4.1-f5e113"
+    assert receipt["citations"] is True
+    assert receipt["citations_sha256"] == "c" * 64
     assert receipt["transitions_are_packings"] is False
     assert "not packings" in receipt["reason"]
     assert receipt["intermediate_frames"] == "illustrative-tween"

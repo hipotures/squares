@@ -304,6 +304,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     blind: false, // run the physics with no knowledge of the target poses at all
     anneal: /** @type {number} */ (ANNEAL.dflt), // how hard and how long the physical styles shake: 0 none, 20 the loudest
     links: false,
+    // The CITATION section under PROVEN (think-ac22). Off, like the correspondence overlay beside
+    // it: the stage's other information is off until asked for, and the plain cut is plain.
+    citations: false,
     // Revision 12: the stage takes two different press-drag-release gestures, and a toggle is what
     // keeps them apart. Off — the shipped behaviour — a press picks a square up and moves it. On, a
     // press starts an edge and the release lands it on whatever square is under the cursor.
@@ -616,6 +619,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   const ghost = svgNode("ghost");
   const mark = svgNode("mark");
   const markRect = mark.firstElementChild;
+  const factsNode = htmlNode("facts");
   const factsA = htmlNode("facts-a");
   const factsB = htmlNode("facts-b");
   const live = htmlNode("live");
@@ -663,16 +667,28 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     htmlNode("headline").style.setProperty("--stage-numeral-left", `${numeralLeft}px`);
     placeAttribution();
   }
-  // The attribution: the repository's address, just under the stage's legend and starting where
-  // it starts (the owner, 2026-09-21), so the foot of the facts column reads as one block. It used
-  // to stand on the headline's baseline at the gap bar's right end, and the headline now heads the
-  // column, so that anchor would put the address across the top of the frame.
+  // The attribution: the repository's address, one legend line under the stage's legend and
+  // starting where it starts (the owner, 2026-09-21), so the foot of the facts column reads as one
+  // block. It used to stand on the headline's baseline at the gap bar's right end, and the headline
+  // now heads the column, so that anchor would put the address across the top of the frame.
+  //
+  // One legend line under means at the legend's own pitch (the owner, 2026-09-22: no extra space
+  // under the lines above it): its baseline is as far below the legend's last row's baseline as
+  // that is below the row before, both read off the markers the legend's rows carry on their
+  // baselines. It used to sit a fixed 30 px under the legend's box, which put it 38 px under the
+  // last row's baseline against the rows' own 30.
+  //
+  // The shared version (`sqpack.release.PUBLICATION_EDITION`) stands on the same baseline, set
+  // the same way, and ends at the column's right edge (the owner, 2026-09-22), so every captured
+  // frame names the data it was drawn from. The page's data carries it; nothing here asks git.
   //
   // Pack and the animation studio center their own drawing and do not show the legend, and at the
   // legend's left edge the address sat across their packing (`check_layout`: 235 x 33 stage px
-  // over `#packing-svg`). There it keeps the same line and ends where the column ends instead,
-  // right of anything those modes draw. The legend is hidden in those modes rather than removed,
-  // so there is a box to measure either way.
+  // over `#packing-svg`). It used to end at the column's right edge there, where the version now
+  // ends, and the two together are 379 stage px against the 368 Pack's drawing leaves beside it.
+  // So in those modes the address mirrors the version instead: at the stage's bottom left, as far
+  // in from its left edge as the version is from the right one, on the same baseline. The legend is
+  // hidden in those modes rather than removed, so there is a box to measure either way.
   //
   // Measured off what is drawn and written in stage pixels as the SVG text's `x` and `y`. Nothing
   // it is measured from moves with n, the window or the separator, because the stage is laid out
@@ -683,26 +699,36 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // what keeps the overlay painted.
   const attribution = svgNode("stage-attribution");
   const attributionText = svgNode("stage-attribution-text");
+  const versionText = svgNode("stage-version");
+  versionText.textContent = DATA.version;
   //: Where the attribution stands, in stage pixels: `beside` the legend's left edge for the
-  //: catalogue, `clear` at the column's right edge for a mode that centers its drawing, and the
-  //: baseline both share. Null until measured, which is why the text is hidden rather than drawn
+  //: catalogue; `clear`, the column's right edge, where the version ends; `inset`, how far that
+  //: is from the stage's right edge, which is where a centered mode starts the address; and the
+  //: baseline they share. Null until measured, which is why the text is hidden rather than drawn
   //: at a guess.
   let attributionAt = null;
   let attributionSettled = false;
-  //: How far below the legend's last line the attribution's baseline sits, in stage px.
-  const ATTRIBUTION_GAP = 30;
   function placeAttribution() {
     const legend = document.getElementById("stage-note");
     if (legend === null || legend.getClientRects().length === 0 || stage.offsetWidth === 0) {
       return;
     }
+    const marks = legend.querySelectorAll(".note-baseline");
+    const last = marks[marks.length - 1];
+    const before = marks[marks.length - 2];
+    if (last === undefined || before === undefined) {
+      return;
+    }
     const frame = stage.getBoundingClientRect();
     const scale = frame.width / stage.offsetWidth;
     const legendBox = legend.getBoundingClientRect();
+    const lastBaseline = (last.getBoundingClientRect().top - frame.top) / scale;
+    const pitch = lastBaseline - (before.getBoundingClientRect().top - frame.top) / scale;
     attributionAt = {
       beside: (legendBox.left - frame.left) / scale,
       clear: (legendBox.right - frame.left) / scale,
-      baseline: (legendBox.bottom - frame.top) / scale + ATTRIBUTION_GAP,
+      inset: (frame.right - legendBox.right) / scale,
+      baseline: lastBaseline + pitch,
     };
     attributionSettled = !("fonts" in document) || document.fonts.status === "loaded";
     drawAttribution();
@@ -721,10 +747,12 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     const centered = modes.contains("pack-independent") || modes.contains("trace-active");
     attributionText.setAttribute(
       "x",
-      fmt(centered ? attributionAt.clear : attributionAt.beside, 2),
+      fmt(centered ? attributionAt.inset : attributionAt.beside, 2),
     );
     attributionText.setAttribute("y", fmt(attributionAt.baseline, 2));
-    attributionText.setAttribute("text-anchor", centered ? "end" : "start");
+    attributionText.setAttribute("text-anchor", "start");
+    versionText.setAttribute("x", fmt(attributionAt.clear, 2));
+    versionText.setAttribute("y", fmt(attributionAt.baseline, 2));
     attribution.classList.add("is-placed");
   }
   // The modes are body classes set by the panels that own them (`pack-panel`, `animation-panel`),
@@ -1127,6 +1155,39 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   let currentTrajectory = null; // the trajectory the physical scene last drew from, or null
   let lastMoveU = 0; // where in that trajectory the last frame sampled, 0..1
 
+  // The facts panel's two layers for a pair, n's and n + 1's, and what the handover needs to know
+  // about them: which slots draw the same in both, and within a changing slot which parts do.
+  // Rebuilt with the pair, and on its own when the citation setting changes what the layers hold.
+  function buildFactsLayers(p) {
+    numeralA = buildFacts(factsA, p.n, state.citations);
+    buildFacts(factsB, p.n + 1, state.citations);
+    // `n =` is drawn once, in its own slot, and never fades or drifts: only the number changes
+    // between n. The still copy is the same rendered expression as the rolling ones with its
+    // digits hidden, so KaTeX's spacing after the `=` is identical in all three and the rolling
+    // number lands exactly where the still one would have been.
+    numeralStatic.textContent = "";
+    numeralStatic.appendChild(numeralA.cloneNode(true));
+    // Which slots read the same for both n. Compared as markup: the two layers are built by the
+    // same function into the same absolute slots, so equal markup is an equal picture.
+    const slotsA = factsA.children;
+    const slotsB = factsB.children;
+    factsSame = [];
+    for (let i = 0; i < Math.max(slotsA.length, slotsB.length); i++) {
+      factsSame.push(
+        slotsA[i] !== undefined &&
+          slotsB[i] !== undefined &&
+          slotsA[i].outerHTML === slotsB[i].outerHTML,
+      );
+    }
+    factsParts = factsSame.map((same, i) =>
+      same || slotsA[i] === undefined || slotsB[i] === undefined
+        ? null
+        : pairParts(slotsA[i], slotsB[i]),
+    );
+    factsA.style.opacity = "1";
+    factsB.style.opacity = "1";
+  }
+
   function buildPair() {
     const p = PAIRS[state.pair];
     const A = FRAMES[String(p.n)];
@@ -1268,33 +1329,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     // The square that arrived in the pair before is identity n; it keeps its outline through the dwell.
     prevIndex = p.n > 1 ? A.ident.indexOf(p.n) : -1;
     ghost.setAttribute("transform", `translate(${newPose[0]} ${newPose[1]}) rotate(${newPose[2]})`);
-    numeralA = buildFacts(factsA, p.n);
-    buildFacts(factsB, p.n + 1);
-    // `n =` is drawn once, in its own slot, and never fades or drifts: only the number changes
-    // between n. The still copy is the same rendered expression as the rolling ones with its
-    // digits hidden, so KaTeX's spacing after the `=` is identical in all three and the rolling
-    // number lands exactly where the still one would have been.
-    numeralStatic.textContent = "";
-    numeralStatic.appendChild(numeralA.cloneNode(true));
-    // Which slots read the same for both n. Compared as markup: the two layers are built by the
-    // same function into the same absolute slots, so equal markup is an equal picture.
-    const slotsA = factsA.children;
-    const slotsB = factsB.children;
-    factsSame = [];
-    for (let i = 0; i < Math.max(slotsA.length, slotsB.length); i++) {
-      factsSame.push(
-        slotsA[i] !== undefined &&
-          slotsB[i] !== undefined &&
-          slotsA[i].outerHTML === slotsB[i].outerHTML,
-      );
-    }
-    factsParts = factsSame.map((same, i) =>
-      same || slotsA[i] === undefined || slotsB[i] === undefined
-        ? null
-        : pairParts(slotsA[i], slotsB[i]),
-    );
-    factsA.style.opacity = "1";
-    factsB.style.opacity = "1";
+    buildFactsLayers(p);
     // The step header (`16 → 17 · matched · max move 1.31 · …`) is gone from the stage: the
     // owner asked for it to go, and the transition's kind and motion statistics stay in
     // `transition-stats.json` for anyone who needs them.
@@ -4647,6 +4682,11 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     /** @type {HTMLInputElement} */ (inputNode("speed")).value = String(speedToSlider(state.speed));
     htmlNode("speed-info").textContent = `\u00d7${state.speed.toFixed(2)}`;
     /** @type {HTMLInputElement} */ (inputNode("links-toggle")).checked = state.links;
+    // The citations sit in the catalogue's facts column, which Pack does not draw, so there the
+    // box is disabled rather than hidden, as the standardising box below is.
+    const citationsBox = /** @type {HTMLInputElement} */ (inputNode("citations-toggle"));
+    citationsBox.checked = state.citations;
+    citationsBox.disabled = state.mode !== "animate";
     /** @type {HTMLInputElement} */ (inputNode("capture-toggle")).checked = state.capture;
     // Revision 12: the colour scheme, and Animate's own standardising. The standardising box is
     // disabled rather than hidden outside Animate, and disabled under either angle scheme, where it
@@ -5506,6 +5546,17 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     updateSegments();
     render();
   }
+  // The citation section is built into the facts layers, so turning it on or off rebuilds them;
+  // the class tells the stylesheet to move OPEN below the section's slots while it is on. The
+  // layers are rebuilt after the class moves, because the handover compares their laid-out boxes.
+  function setCitations(on) {
+    state.citations = !!on;
+    factsNode.classList.toggle("shows-citations", state.citations);
+    buildFactsLayers(PAIRS[state.pair]);
+    updateSegments();
+    render();
+    return state.citations;
+  }
   function setCapture(on) {
     state.capture = !!on;
     document.body.classList.toggle("capture", state.capture);
@@ -6073,6 +6124,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     setPhase,
     setStyle,
     setOverlay,
+    setCitations,
+    citations: () => state.citations,
     setCapture,
     setAutoAdvance,
     setDesaturate,
@@ -6214,6 +6267,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       phase: state.phase,
       style: state.style,
       links: state.links,
+      citations: state.citations,
       capture: state.capture,
       timing: Object.assign({}, state.timing),
       desaturate: state.desaturate,
@@ -6392,6 +6446,11 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     .getElementById("links-toggle")
     .addEventListener("change", (ev) =>
       setOverlay(/** @type {HTMLInputElement} */ (ev.target).checked),
+    );
+  document
+    .getElementById("citations-toggle")
+    .addEventListener("change", (ev) =>
+      setCitations(/** @type {HTMLInputElement} */ (ev.target).checked),
     );
   document
     .getElementById("draw-toggle")
@@ -6814,7 +6873,11 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
         });
         line.appendChild(swatches);
       }
-      line.appendChild(document.createTextNode(text));
+      // The words in a span of their own, with an empty marker standing on their baseline, so the
+      // attribution can be set one legend line below the last row (`placeAttribution`).
+      const words = node("span", "note-text");
+      words.append(text, node("span", "note-baseline"));
+      line.appendChild(words);
       return line;
     };
     // **A sentence, not a flex row.** Its math is inline in the text the way KaTeX is made to
@@ -6834,6 +6897,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       " is the side of the smallest square holding ",
       math(METRICS.bound_html.n),
       " unit squares",
+      node("span", "note-baseline"),
     );
     note.appendChild(sideOf);
     // One swatch per angle family, and one family across its shades: the two things the picture

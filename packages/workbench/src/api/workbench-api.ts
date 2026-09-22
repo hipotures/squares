@@ -534,6 +534,8 @@ export interface AtlasState {
   motionResponse: AtlasMotionResponseValues;
   arrivalDelay: number;
   links: boolean;
+  /** Whether the CITATION section is drawn under PROVEN. */
+  citations: boolean;
   capture: boolean;
   timing: AtlasTiming;
   desaturate: boolean;
@@ -622,6 +624,9 @@ export interface AtlasTransitions {
   setPhase(phase: AtlasPhase): void;
   setStyle(style: string): void;
   setOverlay(on: boolean): void;
+  /** Draw the CITATION section under PROVEN, or not; returns what is now drawn. */
+  setCitations(on: boolean): boolean;
+  citations(): boolean;
   setCapture(on: boolean): void;
   setAutoAdvance(on: boolean): void;
   setDesaturate(on: boolean): void;

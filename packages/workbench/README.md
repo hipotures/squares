@@ -67,6 +67,18 @@ thing that changes: the box is `--scene-frame-locked` where it rests at the best
 side and `--scene-frame` on its way, the trace is `--scene-trace`, and the container is
 `--scene-frame`.
 
+**The stage names its sources on request.** Under PROVEN, the CITATION section gives
+each bound’s reference, the frontier case record they are held in, and `reported`
+against a bound the register reports without certifying.
+It is a setting — `show citations`, off until it is asked for, `setCitations` on the
+browser API — and its data is
+[`bound-citations.json`](../../packing/atlas/known-best/bound-citations.json), read at
+build time; a page built without that file has nothing to cite and says so.
+`squares-workbench-capture --citations` draws the section for a cut, and the cut’s
+receipt records that it was on, the file’s sha256 and the version.
+The stage’s bottom right carries that version, `sqpack.release.PUBLICATION_EDITION`, so
+every captured frame names the data it was drawn from.
+
 The page has one structure in every mode.
 The controls are a single column inside `--layout-gutter`. Every block in it (the mode
 panel, a `.panel-row` of `.subpanel`s, a `.workspace`) spans the same two edges and sits
@@ -86,9 +98,12 @@ Three contracts hold it:
   studio, Pack and Search in Chromium at 1440 × 900, 1024 × 768 and 390 × 844. It checks
   the shared edges, gutters and gaps, one height per control kind, horizontal overflow,
   panel overlap, the stage panel’s OPEN and badge rules (one type, with `new result`
-  alone in the star’s scarlet), the one frame width in its three colours, and that the
-  attribution stands just under the legend at its left edge, clear of what each mode
-  draws. It runs inside `check_stage_resize`’s browser session in `check_frontend`, and
+  alone in the star’s scarlet), one type for the PROVEN, CITATION and OPEN heads, the
+  CITATION section inside its column and above what it is set over, the one frame width
+  in its three colours, and that the attribution stands one legend line under the legend
+  at its left edge, with the shared version on its baseline at the column’s right edge,
+  both clear of what each mode draws.
+  It runs inside `check_stage_resize`’s browser session in `check_frontend`, and
   `tests/test_check_layout.py` proves each rule refuses a page that breaks it.
 - `workbench_tools.layout_gallery` photographs every view at every review viewport and
   writes a side-by-side comparison page for design review.
