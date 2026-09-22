@@ -750,6 +750,8 @@ jobs:
             /packing/resources/
             !/packing/resources/*
             /packing/resources/README.md
+            /packing/resources/bibliography.yaml
+            /packing/resources/bibliography.schema.yaml
             /packing/resources/web/
             !/packing/resources/web/*
             /packing/resources/web/kingbird-squares-in-squares.html

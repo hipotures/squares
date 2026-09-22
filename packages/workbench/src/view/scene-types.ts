@@ -29,7 +29,8 @@ export interface SceneFrame {
     drain: number;
     newTint: number;
     resting: number;
-    homeward: boolean;
+    /** How far the rest colour has turned from the step's first packing to its last, 0 to 1. */
+    homeward: number;
     mark: SceneMark | null;
     linksOpacity: number;
     ghostOpacity: number;

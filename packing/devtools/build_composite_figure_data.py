@@ -19,7 +19,7 @@ import json
 import math
 import sys
 from collections.abc import Sequence
-from decimal import ROUND_DOWN, Decimal
+from decimal import ROUND_DOWN, ROUND_UP, Decimal
 from functools import cache
 from pathlib import Path
 
@@ -109,11 +109,41 @@ def _first_party_lower_bounds() -> frozenset[str]:
     )
 
 
+def _six(text: str) -> str:
+    """Six decimals as written, unless the value is whole.
+
+    Stripping trailing zeros made the figure's own numbers disagree about their
+    precision: on 2026-09-22 the 324 displays carried 137 bounds at six decimals, 8 at
+    five and 2 at four, so `s(17) <= 4.675531` and `s(23) <= 5.43689` stood next to each
+    other with no reason a reader could see. Six is what the figure prints (`think-4nxe`),
+    and the record behind it keeps its full precision either way.
+
+    A whole number has nothing to say after the point, so the grid packings stay as the
+    integers they are: `s(100) = 10`, never `10.000000`.
+    """
+    whole, _, fraction = text.partition(".")
+    return whole if set(fraction) <= {"0"} else text
+
+
 def _side_text(value: str) -> str:
-    """Six significant decimals, trailing zeros and point removed."""
+    """The nearest six decimals of an exactly known side."""
     number = sp.Float(value, 20)
-    text = f"{float(number):.6f}".rstrip("0").rstrip(".")
-    return text or "0"
+    return _six(f"{float(number):.6f}") or "0"
+
+
+def _upper_text(value: str) -> str:
+    """Six decimals of an upper bound, rounded away from zero rather than to nearest.
+
+    A displayed upper bound must stay true as written, and rounded to nearest it can print
+    BELOW the bound it stands for, which claims what the record does not prove: the
+    certified 5.93383346... at n = 29 printed as 5.933833, a stronger bound than anything
+    on record, and 51 of the 265 open cases did the same (think-1z70, 2026-09-22).
+    Rounding away from zero cannot. This is `_lower_text`'s rule in the other direction; an
+    equality is neither, and keeps the nearest six decimals.
+    """
+    exact = Decimal(str(sp.Float(value, 30)))
+    number = exact.quantize(Decimal("1.000000"), rounding=ROUND_UP)
+    return _six(format(number, "f")) or "0"
 
 
 def _lower_text(value: str) -> str:
@@ -127,8 +157,7 @@ def _lower_text(value: str) -> str:
     """
     exact = Decimal(str(sp.Float(value, 30)))
     number = exact.quantize(Decimal("1.000000"), rounding=ROUND_DOWN)
-    text = format(number, "f").rstrip("0").rstrip(".")
-    return text or "0"
+    return _six(format(number, "f")) or "0"
 
 
 def _rigidity(n: int, packing: dict) -> dict:
@@ -256,7 +285,11 @@ def _entry(n: int) -> dict:
         "side": {
             "value": value,
             "relation": relation,
-            "display": (f"s({n}) {'=' if relation == 'equality' else '≤'} {_side_text(value)}"),
+            "display": (
+                f"s({n}) = {_side_text(value)}"
+                if relation == "equality"
+                else f"s({n}) ≤ {_upper_text(value)}"
+            ),
             "provenance": "frontier",
         },
         "optimality": {"status": status, "provenance": "frontier"},

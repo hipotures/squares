@@ -24,12 +24,14 @@ __WORKBENCH_CSS__
                there the stylesheet hides the bounds and draws this, in the frames' grey. Every
                frame's width and colour is the stylesheet's (`--scene-frame-*`). -->
           <rect id="container" x="0" y="0" width="1" height="1" fill="none" stroke="none" vector-effect="non-scaling-stroke" />
-          <g id="squares"></g>
-          <!-- The box, over the squares: grey where it is, turning the page's green when it locks at
-               the best known side, and a light grey trace of where it just was, under it, at the
-               same width. -->
+          <!-- The box, UNDER the squares (the owner, 2026-09-21): grey where it is, turning the
+               page's green when it locks at the best known side, and a light grey trace of where it
+               just was, under it, at the same width. Drawn over the squares, the green edge painted
+               across the black border of every square that reaches the wall -- which at a grid fill
+               is most of one side -- and the square's own edge is the one that should win. -->
           <rect id="bound-trace" x="0" y="0" width="1" height="1" fill="none" vector-effect="non-scaling-stroke" pointer-events="none" />
           <rect id="bound-box" x="0" y="0" width="1" height="1" fill="none" vector-effect="non-scaling-stroke" pointer-events="none" />
+          <g id="squares"></g>
           <g id="links"></g>
           <g id="mask-links"></g>
           <line id="draw-line" x1="0" y1="0" x2="0" y2="0" vector-effect="non-scaling-stroke" stroke-linecap="round" style="display: none" />
@@ -39,10 +41,10 @@ __WORKBENCH_CSS__
       </svg>
       <div id="facts">
         <div class="gapbar" id="gapbar">
-          <svg class="gapbar-plot" viewBox="0 -40 680 150" aria-hidden="true">
+          <svg class="gapbar-plot" viewBox="0 -40 760 150" aria-hidden="true">
             <!-- Square corners, always. This is a number line: a rounded end reads as the end of a
                  THING, and the scale does not end there -- its ends are the ticks on it. -->
-            <rect class="track" x="0" y="0" width="680" height="26" />
+            <rect class="track" x="0" y="0" width="760" height="26" />
             <rect class="gap-open" id="gapbar-open" x="0" y="0" width="0" height="26" />
             <!-- Two weights of vertical rule, and the weight is what says which kind of value
                  it is. The reference marks -- the scale's two ends and any integer inside the
@@ -74,12 +76,20 @@ __WORKBENCH_CSS__
         <div class="numeral-slot" id="numeral-a"></div>
         <div class="numeral-slot" id="numeral-b"></div>
       </div>
-      <!-- The attribution: placed on the headline's baseline and at the gap bar's right end by
-           `placeAttribution`, and hidden until it has been. -->
+      <!-- What the picture means, carried over from the composite figure
+           (`packing/atlas/known-best/known-best-1-324.svg`), which is where a reader of the
+           poster met these three facts. They explain the PICTURE, not the page, so unlike the
+           controls they survive capture preview and appear in every captured frame. -->
+      <div class="stage-note" id="stage-note"></div>
+      <!-- The attribution: placed one legend line under the legend by `placeAttribution`, and
+           hidden until it has been. The shared version stands on its baseline at the column's
+           right edge, so every captured frame names the data it was drawn from; the page's data
+           supplies the text. -->
       <svg id="stage-attribution" viewBox="0 0 1920 1080" role="none">
         <a id="stage-attribution-link" href="https://github.com/jlevy/squares" aria-label="github.com/jlevy/squares, the project's repository on GitHub">
-          <text id="stage-attribution-text" text-anchor="end">github.com/jlevy/squares</text>
+          <text id="stage-attribution-text" text-anchor="start">github.com/jlevy/squares</text>
         </a>
+        <text id="stage-version" text-anchor="end"></text>
       </svg>
       <div id="pack-stage-facts" hidden></div>
       <p class="sr-only" id="pack-announcement" aria-live="polite" aria-atomic="true"></p>
@@ -311,7 +321,8 @@ __WORKBENCH_CSS__
           <label title="The landing: the window where the spring stiffens and the poses ease onto their exact targets. It used to be a fixed fraction of the move.">correct <input type="number" id="t-correct" min="0.1" max="10" step="0.1"> s</label>
           <label>settle <input type="number" id="t-settle" min="0" max="5" step="0.1"> s</label>
           <label><input type="checkbox" id="fullbeat-toggle"> full beat for static appends</label>
-          <label title="A step that only fills the last row of an axis-aligned grid, where every square is already square to the container, plays every phase at double speed"><input type="checkbox" id="fastsimple-toggle" checked> speed up simple transitions</label>
+          <label title="A step that only fills the last row of an axis-aligned grid, where every square is already square to the container, plays every phase of itself sped up"><input type="checkbox" id="fastsimple-toggle" checked> speed up simple transitions</label>
+          <label title="How many times faster those grid fills play: 1 is no speed-up at all, 4 the default, and 8 the most, where the shortest step is ten frames at 60 fps and the arriving square is red for barely two of them">grid fill speed <input type="number" id="simple-speed" min="1" max="8" step="0.5"> x</label>
         </div>
       </div>
       </div>
@@ -363,14 +374,27 @@ __WORKBENCH_CSS__
             </span>
           </label>
           <label title="In Animate only: repaint the frame the step comes to rest on in the standard angle colours, leaving the motion itself identity-coloured"><input type="checkbox" id="animate-standard-toggle" checked> animate rests in angle colours</label>
+          <label title="Faint lines on what the physics is relating: the step's correspondence, or the relationship graph's own attracting pairs"><input type="checkbox" id="links-toggle"> show correspondence</label>
+          <label title="Under PROVEN, where each bound comes from: a paper or project by its authors and year, or this project's own result, and `reported` where the register has not certified the bound"><input type="checkbox" id="citations-toggle"> show citations</label>
+          <label title="Press on one square and release on another to add an edge to the contact graph, or to take it away again. While this is on no square can be picked up and moved."><input type="checkbox" id="draw-toggle"> draw links</label>
+          <label><input type="checkbox" id="capture-toggle"> capture preview</label>
+        </div>
+      </div>
+      <!-- Color is its own group (the owner, 2026-09-21): it is scheduled on its own clock, in
+           seconds, and reading it beside the step's dwell and move suggested it rode them. -->
+      <div class="subpanel groupbox">
+        <span class="box-title">the colors</span>
+        <div class="group-body">
+          <label title="How long a square's color takes to drain toward grey at the start of a step, in seconds. Independent of the step's own clock, so a sped-up grid fill still crosses over at the same rate">drain out <input type="number" id="t-color-out" min="0" max="5" step="0.05"> s</label>
+          <label title="How long a square's color takes to come back at the end of a step, in seconds">drain in <input type="number" id="t-color-in" min="0" max="5" step="0.05"> s</label>
+          <label title="How long the hue takes to rotate away, once the chroma has gone, in seconds. It happens inside the grey, so no color is seen turning into another">hue out <input type="number" id="t-color-hueOut" min="0" max="5" step="0.05"> s</label>
+          <label title="How long the hue takes to rotate back, before the chroma returns, in seconds">hue in <input type="number" id="t-color-hueIn" min="0" max="5" step="0.05"> s</label>
           <label title="Drain the fills while a square is unsettled, so the squares that have found their place carry the picture"><input type="checkbox" id="desat-toggle" checked> desaturate while moving</label>
-          <label title="How much chroma a moving square keeps, as a fraction of its own: 1 leaves the colour alone, 0 takes it to grey">drained to
+          <label title="How much chroma a moving square keeps, as a fraction of its own: 1 leaves the color alone, 0 takes it to grey">drained to
             <input type="range" id="desat-floor" min="0" max="1" step="0.01" aria-label="the chroma a moving square keeps">
             <span class="law-val" id="desat-floor-val"></span>
           </label>
-          <label title="Faint lines on what the physics is relating: the step's correspondence, or the relationship graph's own attracting pairs"><input type="checkbox" id="links-toggle"> show correspondence</label>
-          <label title="Press on one square and release on another to add an edge to the contact graph, or to take it away again. While this is on no square can be picked up and moved."><input type="checkbox" id="draw-toggle"> draw links</label>
-          <label><input type="checkbox" id="capture-toggle"> capture preview</label>
+          <label title="In Animate only: a square that is axis-aligned at both ends of a step keeps its color while the rest of the packing drains. Off, every square drains, so nothing stays green while the shake turns it off its axis"><input type="checkbox" id="hold-square-toggle"> hold square colors</label>
         </div>
       </div>
       <span class="hint readout readout-line" id="continuous-info"></span>

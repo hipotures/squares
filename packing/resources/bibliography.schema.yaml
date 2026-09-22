@@ -1,0 +1,43 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: packing.squares:Bibliography/v1
+title: Bibliography
+description: >-
+  The fields a citation line is built from, keyed by the source keys the frontier
+  records use, and the surname each credited name is cited under. README.md in this
+  directory stays the human index of the same keys; the agreement between the two is
+  checked by tests/test_bound_citations.py rather than by this schema.
+type: object
+additionalProperties: false
+required: [last_reviewed, sources, credited_names]
+properties:
+  last_reviewed: {type: string, pattern: '^\d{4}-\d{2}-\d{2}$'}
+  sources:
+    type: array
+    minItems: 1
+    items:
+      type: object
+      additionalProperties: false
+      required: [key, authors, year, venue]
+      properties:
+        # Spelled exactly as README.md defines it, brackets included.
+        key: {type: string, pattern: '^\[.+\]$'}
+        # Surnames as printed, in the source's order. A citation needs at least one.
+        authors:
+          type: array
+          minItems: 1
+          items: {type: string, minLength: 1}
+        # Null where the source carries no year, such as a maintained web page.
+        year:
+          oneOf:
+            - {type: integer, minimum: 1900, maximum: 2100}
+            - {type: 'null'}
+        venue: {type: string, minLength: 1}
+        # The venue a line falls back to when this project's confirmation would not fit.
+        short_venue: {type: string, minLength: 1}
+        # Where a web source's authors or year were read, since the README's Web Sources
+        # table carries neither.
+        note: {type: string, minLength: 1}
+  credited_names:
+    type: object
+    minProperties: 1
+    additionalProperties: {type: string, minLength: 1}

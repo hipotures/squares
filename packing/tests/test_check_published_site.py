@@ -19,7 +19,7 @@ from devtools.check_published_site import (
 from devtools.render_explainer import COMPOSITE_ASSETS, MARKDOWN_OUTPUT, REPO_URL
 from devtools.render_explainer_pdf import EXPECTED_PAGE_COUNT
 from devtools.render_explainer_pdf import OUTPUT as PDF_OUTPUT
-from sqpack.release import PUBLICATION_STATUS, PUBLICATION_VERSION
+from sqpack.release import PUBLICATION_EDITION
 
 #: A page's text linking into the repository four ways: from markup, from Markdown, from plain
 #: text, and from inside a script, which the check must not read. `{{REPO_URL}}` and `{{SHA}}`
@@ -87,9 +87,7 @@ def test_check_accepts_the_requested_build_and_rejects_a_stale_stamp(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     commit = "0123456789abcdef0123456789abcdef01234567"
-    stamp = " ".join(
-        part for part in (PUBLICATION_STATUS, f"{PUBLICATION_VERSION}-{commit[:8]}") if part
-    )
+    stamp = PUBLICATION_EDITION
     link = f'<a href="{REPO_URL}/blob/{commit}/README.md">Repository</a>'
     page = f"<p>({stamp})</p>{link}".encode()
 
@@ -108,7 +106,7 @@ def test_check_accepts_the_requested_build_and_rejects_a_stale_stamp(
     )
     assert all(passed for passed, _ in results), results
 
-    page = f"<p>({stamp.replace(commit[:8], 'deadbeef')})</p>{link}".encode()
+    page = f"<p>({stamp.replace(PUBLICATION_EDITION, 'v0.0.0-deadbe')})</p>{link}".encode()
     failures = [
         line
         for passed, line in check_published_site.check(
@@ -124,9 +122,7 @@ def test_check_rejects_a_deployed_pdf_that_crossed_a_page_boundary(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     commit = "0123456789abcdef0123456789abcdef01234567"
-    stamp = " ".join(
-        part for part in (PUBLICATION_STATUS, f"{PUBLICATION_VERSION}-{commit[:8]}") if part
-    )
+    stamp = PUBLICATION_EDITION
     page = (
         f'<p>({stamp})</p><a href="{REPO_URL}/blob/{commit}/README.md">Repository</a>'
     ).encode()
@@ -167,9 +163,7 @@ def test_check_rejects_a_stale_workbench_or_account_root_navigation(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     commit = "0123456789abcdef0123456789abcdef01234567"
-    stamp = " ".join(
-        part for part in (PUBLICATION_STATUS, f"{PUBLICATION_VERSION}-{commit[:8]}") if part
-    )
+    stamp = PUBLICATION_EDITION
     page = (
         f'<p>({stamp})</p><a href="{REPO_URL}/blob/{commit}/README.md">Repository</a>'
     ).encode()
@@ -200,9 +194,7 @@ def test_check_requires_the_workbench_browser_api_to_start(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     commit = "0123456789abcdef0123456789abcdef01234567"
-    stamp = " ".join(
-        part for part in (PUBLICATION_STATUS, f"{PUBLICATION_VERSION}-{commit[:8]}") if part
-    )
+    stamp = PUBLICATION_EDITION
     page = (
         f'<p>({stamp})</p><a href="{REPO_URL}/blob/{commit}/README.md">Repository</a>'
     ).encode()
@@ -238,9 +230,7 @@ def test_check_rejects_a_pdf_without_the_deployed_html_source_receipt(
     monkeypatch: pytest.MonkeyPatch, receipt_kind: str
 ) -> None:
     commit = "0123456789abcdef0123456789abcdef01234567"
-    stamp = " ".join(
-        part for part in (PUBLICATION_STATUS, f"{PUBLICATION_VERSION}-{commit[:8]}") if part
-    )
+    stamp = PUBLICATION_EDITION
     page = (
         f'<p>({stamp})</p><a href="{REPO_URL}/blob/{commit}/README.md">Repository</a>'
     ).encode()
@@ -279,9 +269,7 @@ def test_check_compares_the_exact_fetched_html_bytes(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     commit = "0123456789abcdef0123456789abcdef01234567"
-    stamp = " ".join(
-        part for part in (PUBLICATION_STATUS, f"{PUBLICATION_VERSION}-{commit[:8]}") if part
-    )
+    stamp = PUBLICATION_EDITION
     page = (
         f'<p>({stamp})</p><a href="{REPO_URL}/blob/{commit}/README.md">Repository</a>'
     ).encode() + b"<!-- byte-exact source: \xff -->"

@@ -62,6 +62,7 @@ const input: IllustrationInput = {
   padding: 0.045,
   drain: 0,
   resting: 1,
+  homeward: 0,
   links: true,
   tint: 1,
   mark: { wide: 4, thin: 2, fade: 0.15 },
@@ -158,13 +159,16 @@ function instants(schedule: PairSchedule): number[] {
 }
 
 //: The largest opacity change the default fade may make between two 60 Hz frames. The ease's
-//: steepest slope is 1.5 per fade, and the default fade is 0.4 of the 0.7 s moving span, 0.28 s
-//: since the correct beat went from 0.4 s to 0.2 s on 2026-09-17 (it was 0.36 s), so 0.0893 is
-//: what it takes; the cubic ease-out it replaced jumped 0.17 on its first frame.
-const LARGEST_OPACITY_STEP = 0.09;
-//: The most the first visible 60 Hz frame may show: it lands at most 1/60 s into the 0.28 s fade,
-//: 0.0595 of it, where the smoothstep is 0.0102. At the 0.36 s fade this bound was 0.01.
-const FIRST_VISIBLE_OPACITY = 0.011;
+//: steepest slope is 1.5 per fade, and the default fade is 0.4 of the moving span -- 0.24 s since
+//: the move beat went from 0.5 s to 0.4 s on 2026-09-22 (it was 0.28 s, and 0.36 s before the
+//: correct beat halved on 2026-09-17) -- so 1.5 / 0.24 / 60 = 0.1042 is what it takes; the cubic
+//: ease-out it replaced jumped 0.17 on its first frame. Both bounds here are the arithmetic of
+//: the beat, not a tolerance: shorten the span and they rise, which is why they are derived in
+//: this comment rather than nudged until the test passes.
+const LARGEST_OPACITY_STEP = 0.105;
+//: The most the first visible 60 Hz frame may show: it lands at most 1/60 s into the 0.24 s fade,
+//: 0.0694 of it, where the smoothstep is 0.0138. At the 0.28 s fade this bound was 0.011.
+const FIRST_VISIBLE_OPACITY = 0.014;
 
 test("in every phase the new square fades in smoothly, at full size and in place", () => {
   const configuration = defaultConfiguration();
@@ -240,7 +244,11 @@ test("the arrival delay moves the fade and never the resize, which stays smooth 
     assert.ok(seen !== undefined && seen > schedule.arrive);
     arrivals.push(seen);
     const steps = drawn.slice(1).map((side, index) => side - (drawn[index] ?? side));
-    assert.ok(Math.min(...steps) >= 0 && Math.max(...steps) < 0.22);
+    // The resize takes `CONTAINER_RESIZE_FRACTION` of the moving span, so its per-frame step is
+    // inversely proportional to that span: 0.22 held while the span was 0.7 s, and the same
+    // motion over the 0.6 s span of the 2026-09-22 beat measures 0.2519. The bound is the
+    // arithmetic of the beat, not a tolerance.
+    assert.ok(Math.min(...steps) >= 0 && Math.max(...steps) < 0.26, `max ${Math.max(...steps)}`);
     assert.equal(drawn.at(-1), input.toSide);
   }
   assert.deepEqual(sides[1], sides[0]);

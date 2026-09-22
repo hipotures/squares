@@ -20,6 +20,7 @@ from devtools.check_readme import NO_INDEX
 from devtools.repo_scope import tracked_files
 from devtools.run_negative_controls import (
     BUILD_CACHES,
+    COPY_SEPARATELY,
     HERE,
     PRUNE,
     ROOT,
@@ -333,10 +334,37 @@ def test_dual_salvage_receipt_is_not_a_mutation_worker_input(
     assert not (tree / relative).exists()
 
 
+def test_individually_rescued_paths_reach_the_worker(
+    control_snapshot: tuple[Path, set[Path]],
+) -> None:
+    """Every path `COPY_SEPARATELY` names arrives, byte for byte, at the same place.
+
+    These are the files a check reads by exact path out of a directory the snapshot
+    otherwise prunes, so a missing one is not a smaller worker but a checker that raises
+    before any mutation is applied -- which is how `resources/bibliography.yaml` blinded
+    all ten `validate_schemas` controls on 2026-09-22. The tuple is now what `clone_tree`
+    copies and what `snapshot_source_bytes` counts; this asserts the copy actually lands.
+    """
+    tree, _copied = control_snapshot
+    assert ROOT / "resources/bibliography.yaml" in COPY_SEPARATELY
+    for source in COPY_SEPARATELY:
+        landed = tree / source.relative_to(controls.REPO)
+        assert landed.is_file(), f"rescued path missing from the worker: {source}"
+        assert landed.read_bytes() == source.read_bytes()
+
+
 def test_agenda_041_bulk_output_is_pruned_but_linked_receipts_survive(
     control_snapshot: tuple[Path, set[Path]],
 ) -> None:
-    """Prune unused bulk output while retaining every declared linked dependency."""
+    """The 2026-09-22 breach's answer, asserted from both sides rather than described.
+
+    Agenda 041 is the largest single entry in `PRUNE` at 10,827,488 bytes, and the claim
+    that earned it has two halves. No control reaches it, as a mutation target or by
+    naming it in a command. And the receipts a checked document links inline still
+    arrive in the worker byte for byte, which is what keeps the link scan answering
+    about the record rather than about the prune -- the failure mode
+    `linked_pruned_targets` exists to prevent.
+    """
     tree, copied_targets = control_snapshot
     directory = ROOT / "campaign/series/series-000-smoke-and-calibration/results/agenda-041"
     packing_relative = directory.relative_to(ROOT).as_posix()

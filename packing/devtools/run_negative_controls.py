@@ -131,6 +131,34 @@ PRUNE = frozenset(
         # composite vectors are what `build_known_best_atlas --check` compares in full,
         # and whether 6 MB of one of them belongs in every private worker's snapshot is a
         # measurement against the cap, not a line to add while adding the poster.
+        #
+        # That measurement was taken on 2026-09-22, and the answer is that pruning either
+        # composite vector saves exactly nothing. `README.md` links both inline -- the
+        # n=1..100 vector on line 31, the poster on line 39 -- and the root README is one
+        # of the documents `linked_pruned_targets` scans, so a pruned composite is copied
+        # straight back. `snapshot_source_bytes` returns the identical 168,251,525 with
+        # the 6,197,909-byte poster pruned, with the 2,332,836-byte n=1..100 vector
+        # pruned, and with both.
+        #
+        # The copy-back is load-bearing rather than an accident of the accounting. Four
+        # controls run `devtools.check_readme`, which calls `check_synopsis.check_links`
+        # over `README.md`, and that function refuses every relative link whose target
+        # does not exist. Prune a composite without copying it back and all four report
+        # `README.md: dead link -> packing/atlas/known-best/known-best-1-100.svg` in place
+        # of the refusal they rehearse -- the 2026-08-31 failure again, one directory
+        # over. No control reads either vector for its content: none drives
+        # `build_known_best_atlas --check`, `render_composite_pdf --check` or any atlas
+        # step, the only two controls naming `atlas/known-best/` reach the two small
+        # contact JSONs at its top level, and the single full-suite control refuses at
+        # collection before a test runs.
+        #
+        # Four exports already on this list are inert for the same reason, which is the
+        # part worth knowing before adding a fifth: `known-best-1-324.png`,
+        # `known-best-1-100@2x.png`, `known-best-1-100.png` and `known-best-1-324.pdf` are
+        # all linked from `README.md` and all copied back, 4,646,026 bytes that never
+        # leave any snapshot. They stay so the list reads as one class. What the
+        # composites actually want is a link scan that tolerates a pruned target, which is
+        # `think-t1lk`'s problem and not a line to add here.
         ROOT / "atlas/known-best/contact-overlays",
         ROOT / "atlas/known-best/known-best-1-100-card.png",
         ROOT / "atlas/known-best/known-best-1-100.pdf",
@@ -183,6 +211,34 @@ PRUNE = frozenset(
         # recover 23.2 MB more. That leaves meaningful margin below the fixed 160 MiB cap
         # and makes every private-worker copy smaller without removing research evidence
         # from the repository or a declared dependency from the worker.
+        #
+        # Agenda 041 joins the same class on 2026-09-22, and it is the whole of this
+        # branch's answer to the 479,365-byte breach logged at `SNAPSHOT_MAX_BYTES`. It
+        # arrived with the merge at 5cd610a1a and is 10,827,488 bytes in 62 files, of
+        # which four are 9,943,654 on their own: exp-222's repricing-cell journal
+        # (7,127,269), exp-221's two unrestricted nets (1,071,250 and 1,071,246) and the
+        # 2880 rung's certificate (673,889).
+        #
+        # Nothing outside the directory names any of it. Not a `file:` target or a `run:`
+        # command in `controls.yaml`, not a test, not a devtool, not the frontier, and not
+        # a root document: every path reference found anywhere in the repository is one of
+        # agenda 041's own receipts citing a sibling. Eleven files come back through
+        # `linked_pruned_targets` -- 202,755 bytes, all eight of its `.md` receipts among
+        # them, plus a plan, a table and one JSON -- so a worker still reads every
+        # document the link scan follows and loses only bulk numerical output. Net
+        # 10,624,188 bytes: 168,251,525 before, 157,627,337 after, 9.7 MiB under an
+        # unchanged cap rather than 0.5 MiB over it.
+        #
+        # Agendas 036--040 are deliberately not joining it, and the audit is recorded here
+        # so it is not repeated. 037, 038 and 040 are read from outside the record:
+        # `tests/test_covering_queue.py` reaches agenda 038;
+        # `tests/test_fold_ceiling_family.py`, `tests/test_retained_patches_apply.py` and
+        # `tests/test_n11_corner_class_certificate.py` reach agenda 040; and
+        # `devtools/check_class_record_claims.py` names agenda 040's directory outright.
+        # No control drives any of those steps today, which makes pruning them safe now
+        # and a trap for whoever registers one of those checks as a control later. That
+        # leaves 036 and 039, worth 421,136 bytes between them, which does not pay for the
+        # two list entries.
         ROOT / "campaign/series/series-000-smoke-and-calibration/results/agenda-031",
         ROOT / "campaign/series/series-000-smoke-and-calibration/results/agenda-033",
         ROOT / "campaign/series/series-000-smoke-and-calibration/results/agenda-034",
@@ -310,12 +366,30 @@ BUILD_CACHES = frozenset(
     {"__pycache__", ".pytest_cache", ".ruff_cache", "dist", "node_modules"}
 )
 LINK_BACK = (Path(".venv"), Path("sqsearch/target"))
+# Individual files rescued from `PRUNE` because a check that runs inside a worker reads
+# that exact path. `clone_tree` copies precisely this tuple and `snapshot_source_bytes`
+# counts precisely this tuple, so the two cannot drift; adding a rescue is one line.
+#
+# `resources/README.md` is here for the README link checker. `resources/bibliography.yaml`
+# joined it on 2026-09-22, and the cost of its absence is worth recording because it is
+# the failure mode every prune in this file is written to avoid. Commit `a4bdfae4c`
+# registered the bibliography as a validated dataset at `validate_schemas.py:297` while
+# `resources` stayed pruned, so `python3 -m devtools.validate_schemas` raised
+# `FileNotFoundError` in every worker before any mutation was applied. All ten controls
+# that drive that command -- four on the defect log, three on the frontier, the full-cell
+# geometry channel and two more -- then exited non-zero with a traceback instead of their
+# registered refusal, and were scored as failing. A control cannot prove anything over a
+# checker that was already red, and scoring on "exited non-zero" is what makes that
+# silent in the other direction: had the message check been looser, ten controls would
+# have gone on passing over a checker that never ran. 3,686 bytes.
+#
 # `.gitignore` is here for the index `clone_tree` builds rather than for a checker:
 # `git add -A` inside a snapshot must skip what the real index skips, or a reader's
 # scratch in `attic/` would be tracked in the worker though the repository does not
 # track it -- which is PR 207's bug, rebuilt one directory over.
 COPY_SEPARATELY = (
     ROOT / "resources/README.md",
+    ROOT / "resources/bibliography.yaml",
     REPO / ".flowmarkignore",
     REPO / ".gitignore",
 )
@@ -413,6 +487,23 @@ ROOT_DOCUMENTS = (
 # under 160 MiB. The raise answered a breach this branch removes by pruning, so it is
 # undone rather than kept as slack that would hide the next one. Three portable workers
 # return to 480 MiB.
+#
+# 2026-09-22, on PR 218's branch: 168,251,525 bytes against 167,772,160, over by 479,365.
+# Hosted `suite-b` read 168,221,736 for the same breach, on a tree without this session's
+# untracked probe sources. It arrives with the merge at 5cd610a1a -- 12,475,060 bytes in
+# 96 files from `origin/main`, whose own CI passes because main sits just under the cap --
+# and this branch's own additions, chiefly the 176,032-byte
+# `atlas/known-best/bound-citations.json`, are what tip it over.
+#
+# Answered by pruning, not by raising. Agenda 041's output root joins `PRUNE` above for a
+# net 10,624,188 bytes, leaving 157,627,337 and 9.7 MiB of headroom under an unchanged
+# 160 MiB cap. The poster SVG this log nominated three breaches ago was measured first
+# and cannot pay: `README.md` links both composite vectors inline, so pruning either
+# saves exactly zero bytes and four `check_readme` controls depend on the copy-back that
+# makes it zero. That measurement is now written out beside the vectors themselves, so
+# the next breach does not spend its first hour taking it a third time. `think-t1lk`
+# survives this branch narrowed rather than discharged: its nominated starting point is
+# disproved, and what remains is a link scan that can tolerate a pruned target.
 SNAPSHOT_MAX_BYTES = 160 * 1024 * 1024
 DEFAULT_CONTROL_TIMEOUT_SECONDS = 120.0
 TERMINATION_GRACE_SECONDS = 1.0
@@ -691,15 +782,10 @@ def clone_tree(dest: Path) -> None:
     work = dest / HERE
     _clone_into(ROOT, work)
 
-    resource_readme = work / "resources/README.md"
-    resource_readme.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(ROOT / "resources/README.md", resource_readme)
-    for target in snapshot_pruned_targets():
+    for target in (*COPY_SEPARATELY, *snapshot_pruned_targets()):
         landing = dest / target.relative_to(REPO)
         landing.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(target, landing)
-    shutil.copy2(REPO / ".flowmarkignore", dest / ".flowmarkignore")
-    shutil.copy2(REPO / ".gitignore", dest / ".gitignore")
 
     for document in ROOT_DOCUMENTS:
         if document.is_dir():
