@@ -4423,8 +4423,8 @@ in separate tables: their units differ, and the same work can appear in both.
 | Rollups | count | turns | tool calls | errors | one-off code | wall |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | claimed by a session | 176 | 48,062 | 26,312 | 522 | 4,032 | 428.3 h |
-| claimed by none | 60 | 11,110 | 6,539 | 156 | 946 | 51.75 h |
-| **measured** | **236** | **59,172** | **32,851** | **678** | **4,978** | **480.05 h** |
+| claimed by none | 61 | 13,190 | 7,606 | 177 | 1,122 | 60.64 h |
+| **measured** | **237** | **61,252** | **33,918** | **699** | **5,154** | **488.94 h** |
 
 | Session | Phases | Rollups | Turns | Tool calls | Errors | Wall |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
