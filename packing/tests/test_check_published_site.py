@@ -106,7 +106,7 @@ def test_check_accepts_the_requested_build_and_rejects_a_stale_stamp(
     )
     assert all(passed for passed, _ in results), results
 
-    page = f"<p>({stamp.replace(PUBLICATION_EDITION, "v0.0.0-deadbe")})</p>{link}".encode()
+    page = f"<p>({stamp.replace(PUBLICATION_EDITION, 'v0.0.0-deadbe')})</p>{link}".encode()
     failures = [
         line
         for passed, line in check_published_site.check(

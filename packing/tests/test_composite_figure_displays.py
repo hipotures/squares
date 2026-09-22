@@ -19,6 +19,7 @@ and a reader had no way to tell which was a rounding and which was the whole num
 (`think-4nxe`, 2026-09-22).
 """
 
+# pyright: reportPrivateUsage=false
 from __future__ import annotations
 
 import json
