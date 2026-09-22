@@ -117,15 +117,14 @@ def _frames(*, locked: bool = True, catalogue: bool = True) -> dict[str, Any]:
 
 
 def _attribution() -> dict[str, Any]:
-    """The address on the headline's baseline, ending at the rail, over nothing."""
+    """The address just under the legend, starting at its left edge, over nothing."""
     return {
         "placed": True,
         "shown": True,
-        "right": 1846.0,
-        "baseline": 1033.0,
-        "headlineBaseline": 1033.0,
-        "railRight": 1846.0,
-        "ink": {"left": 1568.4, "right": 1846.0, "top": 1007.3, "bottom": 1044.4},
+        "left": 1116.0,
+        "baseline": 1027.5,
+        "legend": {"left": 1116.0, "right": 1884.0, "top": 906.0, "bottom": 997.5},
+        "ink": {"left": 1116.0, "right": 1351.0, "top": 1005.0, "bottom": 1033.0},
         "frame": {"left": 0.0, "top": 0.0, "right": 1920.0, "bottom": 1080.0},
         "screen": {"x": 932.9, "y": 352.5, "width": 97.2, "height": 13.0},
         "family": '"Source Sans 3", sans-serif',
@@ -299,10 +298,12 @@ def test_the_box_is_grey_on_its_way_and_green_only_where_it_locks() -> None:
 @pytest.mark.parametrize(
     ("change", "expected"),
     [
-        (_set("baseline", 1029.0), "baseline is at 1029.00, 4.00 stage px"),
-        (_set("right", 1840.0), "right edge is at 1840.00, 6.00 stage px"),
-        (_set("headlineBaseline", None), "baseline cannot be measured against the headline"),
-        (_set("railRight", None), "right edge cannot be measured against the gap bar's rail"),
+        (_set("left", 1110.0), "starts at 1110.00, 6.00 stage px from the legend's left edge"),
+        # Drawn over the legend's last line, and left far below it.
+        (_set("ink.top", 990.0), "ink starts -7.50 stage px below the legend's foot"),
+        (_set("ink.top", 1040.0), "ink starts 42.50 stage px below the legend's foot"),
+        (_set("legend", None), "cannot be measured against the legend"),
+        (_set("left", None), "cannot be measured against the legend"),
         # The overlay's units are stage pixels only because its box is the stage's; a box that
         # is not makes the two numbers above mean something else.
         (_set("frame.right", 1024.0), "overlay is not the stage's own box"),
@@ -331,9 +332,23 @@ def test_the_attribution_is_drawn_and_clears_what_the_stage_draws() -> None:
         "drawn over #packing-svg" in item
         for item in attribution_findings(over_the_packing, aligned=True)
     )
-    # A misalignment is not checked where the headline and the rail are not drawn, but what it
-    # is drawn over still is: Pack keeps the placement the catalogue measured.
-    drifted = copy.deepcopy(_attribution())
-    drifted["baseline"] = 900.0
-    drifted["headlineBaseline"] = None
-    assert attribution_findings(drifted, aligned=False) == []
+    # The legend is not shown in Pack and the studio, so where the address starts is not checked
+    # there, but what it is drawn over still is: those modes center the packing, and at the
+    # legend's left edge the address sat across it.
+    clear = copy.deepcopy(_attribution())
+    clear["legend"] = None
+    clear["ink"] = {"left": 1649.0, "right": 1884.0, "top": 1005.0, "bottom": 1033.0}
+    clear["obstacles"][0] = {
+        "name": "#packing-svg",
+        "left": 460,
+        "right": 1516,
+        "top": 12,
+        "bottom": 1068,
+    }
+    assert attribution_findings(clear, aligned=False) == []
+    across = copy.deepcopy(clear)
+    across["ink"] = _attribution()["ink"]
+    assert any(
+        "drawn over #packing-svg" in item
+        for item in attribution_findings(across, aligned=False)
+    )

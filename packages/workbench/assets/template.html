@@ -81,8 +81,8 @@ __WORKBENCH_CSS__
            poster met these three facts. They explain the PICTURE, not the page, so unlike the
            controls they survive capture preview and appear in every captured frame. -->
       <div class="stage-note" id="stage-note"></div>
-      <!-- The attribution: placed on the headline's baseline and at the gap bar's right end by
-           `placeAttribution`, and hidden until it has been. -->
+      <!-- The attribution: placed just under the legend by `placeAttribution`, and hidden until it
+           has been. -->
       <svg id="stage-attribution" viewBox="0 0 1920 1080" role="none">
         <a id="stage-attribution-link" href="https://github.com/jlevy/squares" aria-label="github.com/jlevy/squares, the project's repository on GitHub">
           <text id="stage-attribution-text" text-anchor="start">github.com/jlevy/squares</text>
@@ -314,8 +314,6 @@ __WORKBENCH_CSS__
             </span>
           </label>
           <label>dwell <input type="number" id="t-dwell" min="0" max="10" step="0.1"> s</label>
-          <label title="How long a square's colour takes to drain to grey at the start of a step, in seconds. Independent of the step's own clock, so a sped-up grid fill still crosses over at the same rate">colour out <input type="number" id="t-colour-out" min="0" max="5" step="0.05"> s</label>
-          <label title="How long a square's colour takes to come back at the end of a step, in seconds">colour in <input type="number" id="t-colour-in" min="0" max="5" step="0.05"> s</label>
           <label>move <input type="number" id="t-move" min="0.1" max="10" step="0.1"> s</label>
           <label title="The landing: the window where the spring stiffens and the poses ease onto their exact targets. It used to be a fixed fraction of the move.">correct <input type="number" id="t-correct" min="0.1" max="10" step="0.1"> s</label>
           <label>settle <input type="number" id="t-settle" min="0" max="5" step="0.1"> s</label>
@@ -372,15 +370,26 @@ __WORKBENCH_CSS__
             </span>
           </label>
           <label title="In Animate only: repaint the frame the step comes to rest on in the standard angle colours, leaving the motion itself identity-coloured"><input type="checkbox" id="animate-standard-toggle" checked> animate rests in angle colours</label>
-          <label title="In Animate only: a square that is axis-aligned at both ends of a step keeps its colour while the rest of the packing drains. Off, every square drains, so nothing stays green while the shake turns it off its axis"><input type="checkbox" id="hold-square-toggle"> hold square colours</label>
-          <label title="Drain the fills while a square is unsettled, so the squares that have found their place carry the picture"><input type="checkbox" id="desat-toggle" checked> desaturate while moving</label>
-          <label title="How much chroma a moving square keeps, as a fraction of its own: 1 leaves the colour alone, 0 takes it to grey">drained to
-            <input type="range" id="desat-floor" min="0" max="1" step="0.01" aria-label="the chroma a moving square keeps">
-            <span class="law-val" id="desat-floor-val"></span>
-          </label>
           <label title="Faint lines on what the physics is relating: the step's correspondence, or the relationship graph's own attracting pairs"><input type="checkbox" id="links-toggle"> show correspondence</label>
           <label title="Press on one square and release on another to add an edge to the contact graph, or to take it away again. While this is on no square can be picked up and moved."><input type="checkbox" id="draw-toggle"> draw links</label>
           <label><input type="checkbox" id="capture-toggle"> capture preview</label>
+        </div>
+      </div>
+      <!-- Color is its own group (the owner, 2026-09-21): it is scheduled on its own clock, in
+           seconds, and reading it beside the step's dwell and move suggested it rode them. -->
+      <div class="subpanel groupbox">
+        <span class="box-title">the colors</span>
+        <div class="group-body">
+          <label title="How long a square's color takes to drain toward grey at the start of a step, in seconds. Independent of the step's own clock, so a sped-up grid fill still crosses over at the same rate">drain out <input type="number" id="t-color-out" min="0" max="5" step="0.05"> s</label>
+          <label title="How long a square's color takes to come back at the end of a step, in seconds">drain in <input type="number" id="t-color-in" min="0" max="5" step="0.05"> s</label>
+          <label title="How long the hue takes to rotate away, once the chroma has gone, in seconds. It happens inside the grey, so no color is seen turning into another">hue out <input type="number" id="t-color-hueOut" min="0" max="5" step="0.05"> s</label>
+          <label title="How long the hue takes to rotate back, before the chroma returns, in seconds">hue in <input type="number" id="t-color-hueIn" min="0" max="5" step="0.05"> s</label>
+          <label title="Drain the fills while a square is unsettled, so the squares that have found their place carry the picture"><input type="checkbox" id="desat-toggle" checked> desaturate while moving</label>
+          <label title="How much chroma a moving square keeps, as a fraction of its own: 1 leaves the color alone, 0 takes it to grey">drained to
+            <input type="range" id="desat-floor" min="0" max="1" step="0.01" aria-label="the chroma a moving square keeps">
+            <span class="law-val" id="desat-floor-val"></span>
+          </label>
+          <label title="In Animate only: a square that is axis-aligned at both ends of a step keeps its color while the rest of the packing drains. Off, every square drains, so nothing stays green while the shake turns it off its axis"><input type="checkbox" id="hold-square-toggle"> hold square colors</label>
         </div>
       </div>
       <span class="hint readout readout-line" id="continuous-info"></span>

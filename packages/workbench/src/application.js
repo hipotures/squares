@@ -105,7 +105,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     updatePackRun,
   } = workbenchBundle.pack;
   const { createAppendPackStart } = workbenchBundle.startProposals;
-  const { illustrationFrame } = workbenchBundle.illustration;
+  const { illustrationFrame, tintProgress } = workbenchBundle.illustration;
   const { renderStage } = workbenchBundle.stageView;
   /** @type {import("./app/animation-panel.js").AnimationPanel | null} */
   let animationPanel = null;
@@ -170,7 +170,10 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   //: the constant it was. At a third the moving squares still competed with the locked ones for
   //: attention, and at an eighth the locked ones carry the picture, which is the point of locking
   //: them one at a time. The owner lowered the default from 0.15 to 0.08 on 2026-09-13.
-  let desatFloor = 0.08;
+  //: How much chroma a moving square keeps when the drain is full. Zero (the owner,
+  //: 2026-09-21): the drain is what makes the grey the arriving square's colour crosses inside
+  //: of, and a floor left the packing tinted enough for that crossing to read against it.
+  let desatFloor = 0;
   // **Chroma and hue move one at a time, and the hue always moves in the grey.** A square's
   // colour changes twice a beat -- it drains and comes back, and it swaps between the scheme a
   // viewer chose and the atlas's own answer for a finished picture. Doing both at once is what
@@ -200,10 +203,13 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   //: The fade OUT is the slower of the two: the picture is being taken apart, and a viewer needs
   //: longer to accept a colour leaving than to accept one arriving. The drain finishes before the
   //: new square arrives, so the scarlet lands on a settled grey rather than into a change.
-  const COLOUR_FADE = { out: 0.45, in: 0.3 };
-  const DESAT_IN = 0.14; // fraction of the move the chroma takes to drain
-  const HUE_OUT = 0.4; // fraction of the move the hue takes to leave, once drained
-  const HUE_IN = 0.7; // fraction of the settle the hue takes, before the chroma returns
+  //:
+  //: `hueOut` and `hueIn` are the rotation that happens INSIDE the grey: the hue leaves after
+  //: the chroma has gone and returns before it comes back, so a viewer never watches one colour
+  //: turn into another. They were fractions of the move and of the settle, which is why the
+  //: owner could lengthen the step and still see a colour change faster than anything asked for:
+  //: a fraction rides the step's own clock, and a simple transition's clock runs at 3x.
+  const COLOR_FADE = { out: 0.45, in: 0.3, hueOut: 0.35, hueIn: 0.35 };
   // Continuous play (revision 6, feature 4): the beat the whole sequence runs at, back to back.
   // A static append (a grid prefix or a shared picture, where nothing moves) gets a dwell and no
   // move at all, unless the full beat is asked for.
@@ -657,35 +663,34 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     htmlNode("headline").style.setProperty("--stage-numeral-left", `${numeralLeft}px`);
     placeAttribution();
   }
-  // The attribution (the owner, 2026-09-17): the repository's address, standing on the headline's
-  // baseline and ending where the gap bar's rail ends. Both anchors are read off what is drawn --
-  // the empty inline block `buildFacts` puts on the headline's line, and the rail's own box -- and
-  // written in stage pixels as the SVG text's `y` (its baseline) and `x` (its end). Neither moves
-  // with n, the window or the separator, because the stage is laid out at 1920 x 1080 and only
-  // scaled; they move only when the faces land. So this runs with the headline's measurement, at
-  // startup and on `document.fonts.ready`, and `layout` repeats it until a placement has been made
-  // with the faces in, which covers a page that is in Pack or Search when they arrive, where the
-  // headline and the rail are not drawn to measure. Until the first placement the text is hidden.
-  // A resize measures nothing again: it redraws what was measured (`drawAttribution`), which is
-  // also what keeps the overlay painted, and works in Pack and Search where nothing is drawn to
-  // measure from.
+  // The attribution: the repository's address, just under the stage's legend and starting where
+  // it starts (the owner, 2026-09-21), so the foot of the facts column reads as one block. It used
+  // to stand on the headline's baseline at the gap bar's right end, and the headline now heads the
+  // column, so that anchor would put the address across the top of the frame.
+  //
+  // Pack and the animation studio center their own drawing and do not show the legend, and at the
+  // legend's left edge the address sat across their packing (`check_layout`: 235 x 33 stage px
+  // over `#packing-svg`). There it keeps the same line and ends where the column ends instead,
+  // right of anything those modes draw. The legend is hidden in those modes rather than removed,
+  // so there is a box to measure either way.
+  //
+  // Measured off what is drawn and written in stage pixels as the SVG text's `x` and `y`. Nothing
+  // it is measured from moves with n, the window or the separator, because the stage is laid out
+  // at 1920 x 1080 and only scaled; only the faces landing moves it. So this runs with the
+  // headline's measurement, at startup and on `document.fonts.ready`, and `layout` repeats it until
+  // a placement has been made with the faces in. Until the first placement the text is hidden. A
+  // resize measures nothing again: it redraws what was measured (`drawAttribution`), which is also
+  // what keeps the overlay painted.
   const attribution = svgNode("stage-attribution");
   const attributionText = svgNode("stage-attribution-text");
-  //: Where the attribution stands, in stage pixels: the rail's right end and the headline's
-  //: baseline, once both have been drawn to measure. Null until then, which is why the text is
-  //: hidden rather than drawn at a guess.
+  //: Where the attribution stands, in stage pixels: `beside` the legend's left edge for the
+  //: catalogue, `clear` at the column's right edge for a mode that centers its drawing, and the
+  //: baseline both share. Null until measured, which is why the text is hidden rather than drawn
+  //: at a guess.
   let attributionAt = null;
   let attributionSettled = false;
   //: How far below the legend's last line the attribution's baseline sits, in stage px.
   const ATTRIBUTION_GAP = 30;
-  // The attribution sits just under the legend and starts where it starts (the owner,
-  // 2026-09-21), so the foot of the column reads as one block left to right. Both anchors are
-  // measured off the legend's own box rather than written down, because the legend's height is
-  // its content's. Both anchors are measured off what is drawn -- the drawn
-  // container's own rect, not the SVG element, whose box carries the view's padding -- and
-  // written in stage pixels as the SVG text's `y` and `x`. It used to stand on the headline's
-  // baseline, which was under the packing; the headline heads the facts column now, so that
-  // anchor would have put the repository's address across the top of the frame.
   function placeAttribution() {
     const legend = document.getElementById("stage-note");
     if (legend === null || legend.getClientRects().length === 0 || stage.offsetWidth === 0) {
@@ -694,27 +699,38 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     const frame = stage.getBoundingClientRect();
     const scale = frame.width / stage.offsetWidth;
     const legendBox = legend.getBoundingClientRect();
-    attributionAt = [
-      (legendBox.left - frame.left) / scale,
-      (legendBox.bottom - frame.top) / scale + ATTRIBUTION_GAP,
-    ];
+    attributionAt = {
+      beside: (legendBox.left - frame.left) / scale,
+      clear: (legendBox.right - frame.left) / scale,
+      baseline: (legendBox.bottom - frame.top) / scale + ATTRIBUTION_GAP,
+    };
     attributionSettled = !("fonts" in document) || document.fonts.status === "loaded";
     drawAttribution();
   }
   // Writing the measured place back, which is also what makes the overlay repaint. Chromium does
   // not repaint this nested SVG when the transform above it changes: narrowed through the review
   // viewports to 390 px the text was simply left unpainted, while its own boxes read right
-  // (measured 2026-09-17, `attic/borders`). Writing the two attributes it is placed by is the
-  // change that invalidates it, and writing the same numbers back is enough, so `setStageScale`
-  // calls this whenever the stage's scale moves. It costs two attribute writes per resize.
+  // (measured 2026-09-17, `attic/borders`). Writing the attributes it is placed by is the change
+  // that invalidates it, and writing the same numbers back is enough, so `setStageScale` calls
+  // this whenever the stage's scale moves, and so does a change of mode, which picks the place.
   function drawAttribution() {
     if (attributionAt === null) {
       return;
     }
-    attributionText.setAttribute("x", fmt(attributionAt[0], 2));
-    attributionText.setAttribute("y", fmt(attributionAt[1], 2));
+    const modes = document.body.classList;
+    const centered = modes.contains("pack-independent") || modes.contains("trace-active");
+    attributionText.setAttribute(
+      "x",
+      fmt(centered ? attributionAt.clear : attributionAt.beside, 2),
+    );
+    attributionText.setAttribute("y", fmt(attributionAt.baseline, 2));
+    attributionText.setAttribute("text-anchor", centered ? "end" : "start");
     attribution.classList.add("is-placed");
   }
+  // The modes are body classes set by the panels that own them (`pack-panel`, `animation-panel`),
+  // so the attribution follows the classes rather than asking each panel to remember it.
+  const modeWatch = new MutationObserver(drawAttribution);
+  modeWatch.observe(document.body, { attributes: true, attributeFilter: ["class"] });
   //: The width of one figure in the face the gap bar sets its two numbers in, used to decide
   //: whether the record's label would sit on top of the lower bound's. The fallback is Source Sans
   //: 3's figure at 28 px; the real value is measured once the faces land.
@@ -1003,9 +1019,10 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     // colours and its contacts say nothing about runs, so no checkpoint is read there -- in
     // particular not the dwell's own arrangement, where a record's touching squares would all
     // merge before anything had moved.
-    const move = sc.moveEnd - sc.moveStart;
-    const from = sc.moveStart + move * DESAT_IN;
-    const span = sc.moveEnd + (sc.end - sc.moveEnd) * HUE_IN - from;
+    // On the same clock as the drain and the rotation it is bracketed by, in seconds: the window
+    // opens where the chroma has finished leaving and closes where the hue starts coming back.
+    const from = sc.moveStart + COLOR_FADE.out;
+    const span = sc.end - COLOR_FADE.in - COLOR_FADE.hueIn - from;
     const due =
       span <= 0 || t <= from
         ? 0
@@ -1374,8 +1391,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   }
   const ramp = timelineRamp;
   // How much chroma the fills carry at t: all of it through the dwell, drained over
-  // `COLOUR_FADE.out` seconds from the move's start, held through the motion, and back over the
-  // last `COLOUR_FADE.in` seconds of the step.
+  // `COLOR_FADE.out` seconds from the move's start, held through the motion, and back over the
+  // last `COLOR_FADE.in` seconds of the step.
   //
   // **A still pair never drains** (the owner, 2026-09-21). On a prefix or a shared picture
   // nothing rearranges -- the only thing that happens is the new square arriving -- so there is
@@ -1386,8 +1403,8 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     if (isStillPair()) {
       return 1;
     }
-    const out = smootherstep(ramp(t, sc.moveStart, sc.moveStart + COLOUR_FADE.out));
-    const back = smootherstep(ramp(t, sc.end - COLOUR_FADE.in, sc.end));
+    const out = smootherstep(ramp(t, sc.moveStart, sc.moveStart + COLOR_FADE.out));
+    const back = smootherstep(ramp(t, sc.end - COLOR_FADE.in, sc.end));
     return 1 - out * (1 - back);
   }
   // Which hues the fills carry at t: 1 is the atlas's answer, the convention for a finished
@@ -1395,13 +1412,48 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   // moves. It leaves only AFTER the chroma is gone and returns BEFORE the chroma comes back, so
   // both rotations happen in the grey and a viewer never watches a colour turn into another colour.
   function hueLevel(sc, t) {
-    const move = sc.moveEnd - sc.moveStart;
-    const settle = sc.end - sc.moveEnd;
+    if (isStillPair()) {
+      return 1;
+    }
+    // The hue leaves once the chroma is gone and is back before the chroma returns, so both
+    // rotations happen where nothing can be seen turning. Seconds, like the chroma's own.
     const leave = smootherstep(
-      ramp(t, sc.moveStart + move * DESAT_IN, sc.moveStart + move * (DESAT_IN + HUE_OUT)),
+      ramp(t, sc.moveStart + COLOR_FADE.out, sc.moveStart + COLOR_FADE.out + COLOR_FADE.hueOut),
     );
-    const back = smootherstep(ramp(t, sc.moveEnd, sc.moveEnd + settle * HUE_IN));
+    const backFrom = sc.end - COLOR_FADE.in - COLOR_FADE.hueIn;
+    const back = smootherstep(ramp(t, backFrom, backFrom + COLOR_FADE.hueIn));
     return 1 - leave * (1 - back);
+  }
+  // Which packing the rest color belongs to at t: 0 is n's, 1 is n + 1's.
+  //
+  // **It turns while the hue is gone, not when the move ends.** It used to be a switch at
+  // `moveEnd`, and the hue comes back before that: the returning color was n's, and it jumped to
+  // n + 1's a frame after the settle began. `check_transitions --trace 11 --square 5` read a
+  // square going yellow, grey, back toward yellow, then pink -- the old hue on the way back that
+  // the owner saw, and, with the chroma already gone, a grey that climbed to the old shade and
+  // then dropped one shade in a single frame.
+  //
+  // Between the hue leaving and the hue returning the mix gives the rest color no weight at all,
+  // so turning it there is invisible. A step too short for the hue to leave completely turns it
+  // over the overlap instead, which is a blend rather than a jump.
+  //
+  // A still pair has no hue rotation to hide the turn in, so it turns as the new square fades in:
+  // the squares it touches take their darker shade as it appears. Switched at `moveEnd`, they
+  // dropped a whole shade in one frame, 0.551 to 0.500 beside the square arriving into 8, 9, 49
+  // and 96..100.
+  function homeLevel(sc, t) {
+    if (isStillPair()) {
+      return smootherstep(ramp(t, sc.arrive, sc.arrived));
+    }
+    const gone = sc.moveStart + COLOR_FADE.out + COLOR_FADE.hueOut;
+    const backFrom = sc.end - COLOR_FADE.in - COLOR_FADE.hueIn;
+    return smootherstep(ramp(t, Math.min(gone, backFrom), Math.max(gone, backFrom)));
+  }
+  // When the arriving square's crossing from scarlet must be done: where the packing's chroma
+  // starts back, so red turns to the square's own color among grey squares (the owner's choice,
+  // 2026-09-21), or the step's end on a step that never drains and has no grey to cross in.
+  function tintUntil(sc) {
+    return state.desaturate && !isStillPair() ? sc.end - COLOR_FADE.in : sc.end;
   }
   function desatLevel(sc, t) {
     if (!state.desaturate) {
@@ -3646,7 +3698,6 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       scheme: colorScheme,
       mode: state.mode,
       animateStandardize: ANIMATE.standardize,
-      holdSquareColours: ANIMATE.holdSquare,
       stageChroma,
       desaturationFloor: desatFloor,
       scarlet: SCARLET,
@@ -3691,7 +3742,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       greens: GREENS.slice(),
       greenStride: GREEN_STRIDE,
       animateStandardize: ANIMATE.standardize,
-      holdSquareColours: ANIMATE.holdSquare,
+      holdSquareColors: ANIMATE.holdSquare,
       classes: paintOut.classes,
       centres: paintOut.centres.slice(),
       sizes: paintOut.sizes.slice(),
@@ -3766,7 +3817,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     newNode.setAttribute("transform", `translate(${o.X[p.n]} ${o.Y[p.n]}) rotate(${ang})${grow}`);
     // An open-ended run is at rest exactly when it is not playing; Animate's standardising does not
     // reach it anyway, an optimisation being Pack's own playback.
-    paintSquares(p, side, drain, 0, o.size, state.playing ? 0 : 1, true);
+    paintSquares(p, side, drain, 0, o.size, state.playing ? 0 : 1, 1);
     mark.setAttribute("opacity", "0");
     linksGroup.setAttribute("opacity", "0");
     ghost.setAttribute("opacity", "0");
@@ -3895,16 +3946,35 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       poseY,
       poseA,
     );
-    const settled = easeOut(ramp(t, sc.moveEnd, sc.end));
+    // The same crossing schedule the tween path draws, from the one place it is written.
+    const settled = tintProgress(sc, t, COLOR_FADE.in, tintUntil(sc));
     const e = easeInOut(u);
     // The held view has to cover the widest the container ever gets, which for a blind run is its
     // inflated start; that is a pure function of the record, so the view never jumps when the
     // trajectory arrives.
-    const widest = blind ? B.side * BLIND.inflate : side;
+    // The step's own sides, not the simulated container's. Under a physical style that container
+    // breathes, and a view held to it zoomed out and back in with every breath -- measured with
+    // `check_transitions --trace 11`, the view ran 4.3600, 4.4047, 4.4072, 4.3600 while the box
+    // darkened, which is the whole diagram shrinking and growing on the step into 11 and not on
+    // the grid fills either side of it, whose tween path does not breathe. Blind mode inflates
+    // the container on purpose and keeps its own width.
+    //
+    // n's side, not n + 1's: taken from n + 1 the view stepped out between the last frame of one
+    // step and the first of the next (3.270 to 3.796 into 10). The room n + 1 needs is
+    // `drawBounds`'s to reach, and it eases there over the dwell.
+    const widest = blind ? B.side * BLIND.inflate : A.side;
     const held = Math.max(A.side * (1 + 2 * PAD), widest * (1 + 2 * PAD_MIN));
     const refit = easeInOut(ramp(t, sc.moveEnd, sc.end));
     const view = u < 1 ? held : lerp(held, fit * (1 + 2 * PAD), refit);
-    svg.setAttribute("viewBox", `${side / 2 - view / 2} ${-side / 2 - view / 2} ${view} ${view}`);
+    // **Anchored where `holdInView` anchors, not centred on the simulated side.** Every view box
+    // here is the canonical one for some side k: from -k * PAD to k + k * PAD, which puts the
+    // container's corner at the origin. Two such boxes union to exactly the larger, so the view
+    // `drawBounds` widens to is monotone as long as each box is. Centred on the breathing `side`
+    // instead, this box sat off that anchor, and its union with the room's box grew and shrank
+    // with every breath even at a constant size -- the reversal the transition contract found at
+    // the move's start on the steps into 10 and 50.
+    const k = view / (1 + 2 * PAD);
+    svg.setAttribute("viewBox", `${k / 2 - view / 2} ${-k / 2 - view / 2} ${view} ${view}`);
     containerRect.setAttribute("width", String(side));
     containerRect.setAttribute("height", String(side));
     sceneSide = side;
@@ -3931,7 +4001,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       appear > 0 ? TINT * (1 - settled) : 0,
       undefined,
       hueLevel(sc, t),
-      t >= sc.moveEnd,
+      homeLevel(sc, t),
     );
     mark.setAttribute("opacity", "0");
     if (state.links) {
@@ -4202,9 +4272,11 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       padding: PAD,
       drain: clamp01(desatLevel(sc, t)),
       resting: clamp01(hueLevel(sc, t)),
+      homeward: homeLevel(sc, t),
       links: state.links,
       tint: TINT,
-      tintSeconds: COLOUR_FADE.in,
+      tintSeconds: COLOR_FADE.in,
+      tintUntil: tintUntil(sc),
       mark: { wide: MARK_WIDE, thin: MARK_THIN, fade: MARK_FADE },
     });
   }
@@ -4607,9 +4679,9 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       input.value = state.continuous.on ? CONTINUOUS[key] : state.timing[key];
     });
     ["out", "in"].forEach((key) => {
-      const input = /** @type {HTMLInputElement} */ (document.getElementById(`t-colour-${key}`));
+      const input = /** @type {HTMLInputElement} */ (document.getElementById(`t-color-${key}`));
       input.disabled = false;
-      input.value = String(COLOUR_FADE[key]);
+      input.value = String(COLOR_FADE[key]);
     });
     /** @type {HTMLInputElement} */ (inputNode("fullbeat-toggle")).checked =
       state.continuous.fullBeat;
@@ -5111,7 +5183,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   }
   // Whether an axis-aligned square keeps its colour across a step, or drains with the rest. The
   // flags are worked out once per pair in `buildPair`, so the pair is rebuilt rather than redrawn.
-  function setHoldSquareColours(on) {
+  function setHoldSquareColors(on) {
     const next = !!on;
     if (next === ANIMATE.holdSquare) {
       return ANIMATE.holdSquare;
@@ -5125,20 +5197,26 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   }
   // The two colour durations, in seconds. They change what is drawn at t and nothing that is
   // simulated, so the pair does not have to be rebuilt.
-  function setColourFade(fade) {
+  function setColorFade(fade) {
     const next = fade || {};
     if (next.out !== undefined) {
-      COLOUR_FADE.out = Math.max(0, Number(next.out) || 0);
+      COLOR_FADE.out = Math.max(0, Number(next.out) || 0);
     }
     if (next.in !== undefined) {
-      COLOUR_FADE.in = Math.max(0, Number(next.in) || 0);
+      COLOR_FADE.in = Math.max(0, Number(next.in) || 0);
+    }
+    if (next.hueOut !== undefined) {
+      COLOR_FADE.hueOut = Math.max(0, Number(next.hueOut) || 0);
+    }
+    if (next.hueIn !== undefined) {
+      COLOR_FADE.hueIn = Math.max(0, Number(next.hueIn) || 0);
     }
     updateSegments();
     render();
-    return { out: COLOUR_FADE.out, in: COLOUR_FADE.in };
+    return colorFade();
   }
-  function colourFade() {
-    return { out: COLOUR_FADE.out, in: COLOUR_FADE.in };
+  function colorFade() {
+    return { ...COLOR_FADE };
   }
   function setColorRule() {
     return colorScheme;
@@ -5527,6 +5605,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       on: state.continuous.on,
       fullBeat: state.continuous.fullBeat,
       fastSimple: state.continuous.fastSimple,
+      simpleSpeed: SIMPLE_TRANSITION_SPEED,
       prefetch: state.continuous.prefetch,
       dwell: CONTINUOUS.dwell,
       move: CONTINUOUS.move,
@@ -5987,10 +6066,10 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
     identityFills,
     setAnimateStandardize,
     animateStandardize: () => ANIMATE.standardize,
-    colourFade,
-    setColourFade,
-    holdSquareColours: () => ANIMATE.holdSquare,
-    setHoldSquareColours,
+    colorFade,
+    setColorFade,
+    holdSquareColors: () => ANIMATE.holdSquare,
+    setHoldSquareColors,
     setPhase,
     setStyle,
     setOverlay,
@@ -6307,7 +6386,7 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
   document
     .getElementById("hold-square-toggle")
     .addEventListener("change", (ev) =>
-      setHoldSquareColours(/** @type {HTMLInputElement} */ (ev.target).checked),
+      setHoldSquareColors(/** @type {HTMLInputElement} */ (ev.target).checked),
     );
   document
     .getElementById("links-toggle")
@@ -6337,11 +6416,11 @@ const SQUARES_WORKBENCH_CORE = workbenchBundle.core;
       setTiming(o);
     });
   });
-  ["out", "in"].forEach((key) => {
-    document.getElementById(`t-colour-${key}`).addEventListener("change", (ev) => {
+  ["out", "in", "hueOut", "hueIn"].forEach((key) => {
+    document.getElementById(`t-color-${key}`).addEventListener("change", (ev) => {
       const o = {};
       o[key] = /** @type {HTMLInputElement} */ (ev.target).value;
-      setColourFade(o);
+      setColorFade(o);
     });
   });
   document

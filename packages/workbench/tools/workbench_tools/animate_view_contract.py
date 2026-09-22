@@ -934,13 +934,13 @@ def colours(session: Session) -> str:
         f"Animate paints its rest frame {rest['painted']} under {rest['scheme']}, a moving "
         f"frame {moving['painted']}, and a rest frame unstandardised {unstandard['painted']}",
     )
-    # Holding a square's colour is a setting (the owner, 2026-09-21), and a setting that
+    # Holding a square's color is a setting (the owner, 2026-09-21), and a setting that
     # changed nothing on the stage would be worse than none: mid-step under the shake, a square
     # axis-aligned at both ends keeps its green while it is visibly turned, and off, it drains
     # with everything else. Measured on the corpus rather than asserted, so the check fails if
     # the rule stops reaching the picture.
     # Standardising has to be back on: the held flags are only consulted while Animate repaints
-    # its rest in the angle colours, and the block above leaves it off. Without this the check
+    # its rest in the angle colors, and the block above leaves it off. Without this the check
     # counted the same greens either way and proved nothing.
     session.api(
         ("setAnimateStandardize", True),
@@ -949,24 +949,27 @@ def colours(session: Session) -> str:
         ("setAnneal", 9),
     )
     midway = session.api(("duration",)) * 0.45
-    session.api(("setHoldSquareColours", True), ("seek", midway))
+    # Put back as found: the default is released (the owner, 2026-09-21), and a hard-coded
+    # restore left every later section holding colors the page does not hold.
+    holding = session.api(("holdSquareColors",))
+    session.api(("setHoldSquareColors", True), ("seek", midway))
     kept = green_count(session)
-    session.api(("setHoldSquareColours", False), ("seek", midway))
+    session.api(("setHoldSquareColors", False), ("seek", midway))
     drained = green_count(session)
-    session.api(("setHoldSquareColours", True))
+    session.api(("setHoldSquareColors", holding))
     # Strictly more, not all-or-nothing: some squares read green mid-step whatever the setting
     # does, because the moving palette and the identity greens overlap. What the setting has to
     # change is the squares the rule picks out, and 31 against 17 is that difference.
     session.require(
         kept > drained,
-        f"holding square colours draws {kept} greens mid-step and releasing them {drained}",
+        f"holding square colors draws {kept} greens mid-step and releasing them {drained}",
     )
     restore(session, found, "colours")
     return (
         f"five retained frames painted as colour() says, {len(core)} angles shared by four and "
         f"{len(wide) - len(straddles)} agreeing over five ({len(straddles)} straddling a band "
         f"edge); {held} held square-instants keep their hue; greens hold through a settle; "
-        f"holding square colours keeps {kept} green mid-step where releasing keeps {drained}"
+        f"holding square colors keeps {kept} green mid-step where releasing keeps {drained}"
     )
 
 

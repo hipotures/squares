@@ -551,9 +551,12 @@ body.drawing #packing-svg #squares {
    child of the STAGE rather than of `#facts`, like the attribution it sits above, so its `left` is
    the stage's coordinate for the column's own inset (1110 + 6) rather than the inset itself --
    written at 6 it drew across the packing. Aligned with every other row in the column, so the
-   column reads as one edge; the attribution keeps the right anchor on the rail's end it was given. */
+   column reads as one edge, and the attribution below it keeps the same left edge.
+   It is text and takes no pointer: in Pack, where the packing is drawn further right, it sat over
+   the drawing's lower right and swallowed the press that picks a square up. */
 .stage-note {
   position: absolute;
+  pointer-events: none;
   left: 1116px;
   top: 906px;
   width: 768px;
@@ -596,13 +599,13 @@ body.drawing #packing-svg #squares {
 .note-math {
   font-family: var(--font-serif);
 }
-/* The attribution, the owner's (2026-09-17): the repository's address in the stage's bottom right,
-   standing on the headline's baseline and ending where the gap bar ends. It is SVG text because
-   SVG text is placed by its baseline and its end, which are the two things said about it:
-   `placeAttribution` measures the headline's baseline and the rail's right end once the faces
-   land and writes them as the text's `y` and `x` in stage pixels. Hidden until then, rather than
-   drawn at a guess. It is on the stage in every mode, so a captured frame carries it; the overlay
-   takes no pointer events but the link's own. */
+/* The attribution, the owner's (2026-09-17): the repository's address, just under the legend at
+   its left edge (the owner, 2026-09-21), or on the same line at the column's right edge where
+   Pack and the studio center their drawing. It is SVG text because SVG text is placed by its
+   baseline and one end, which are the two things said about it: `placeAttribution` measures the
+   legend once the faces land and writes them as the text's `y` and `x` in stage pixels. Hidden
+   until then, rather than drawn at a guess. It is on the stage in every mode, so a captured frame
+   carries it; the overlay takes no pointer events but the link's own. */
 #stage-attribution {
   position: absolute;
   left: 0;
@@ -1472,6 +1475,13 @@ body.pack-independent #panel > .panel-row {
 }
 body.pack-independent #packing-svg {
   left: 460px;
+}
+/* The legend explains the catalogue's picture, and Pack and the studio draw their own, centered,
+   under where it would sit. Hidden rather than removed, so `placeAttribution` still has its box
+   to set the attribution's line by. */
+body.pack-independent #stage-note,
+body.trace-active #stage-note {
+  visibility: hidden;
 }
 body.pack-independent #pack-stage-facts {
   display: block;

@@ -574,6 +574,7 @@ export function createColourSystem(config: CorpusColour): ColourSystem {
     fraction(scene.presentation.drain, "scene drain");
     fraction(scene.presentation.newTint, "scene tint");
     fraction(scene.presentation.resting, "scene rest progress");
+    fraction(scene.presentation.homeward, "scene homeward progress");
     fraction(state.stageChroma, "stage chroma");
     fraction(state.desaturationFloor, "desaturation floor");
     fraction(state.tintChroma, "tint chroma");
@@ -608,16 +609,19 @@ export function createColourSystem(config: CorpusColour): ColourSystem {
       } else {
         const source = state.restSource;
         const target = state.restTarget;
+        // The square a step adds has no place in n's packing: the source reference parks it
+        // far off at angle 0 so its neighbors keep n's contacts, which as a color is a pale
+        // right-angle green. Turned from that, it crossed from scarlet to the pale green and
+        // then dropped a shade when the rest color turned. It takes n + 1's throughout.
+        const homeward = index === scene.squares.length - 1 ? 1 : scene.presentation.homeward;
         const settled =
           source === null || target === null || sourceMap === null || targetMap === null
             ? fillFor((currentAtlasMap ?? liveMap).slotOf(square.angleDegrees), contacts)
-            : scene.presentation.homeward
-              ? mix(
-                  referenceFill(source, sourceMap, index),
-                  referenceFill(target, targetMap, index),
-                  standard,
-                )
-              : referenceFill(source, sourceMap, index);
+            : mix(
+                referenceFill(source, sourceMap, index),
+                referenceFill(target, targetMap, index),
+                homeward,
+              );
         const holds =
           state.holdsColour !== null && index < state.holdsColour.length
             ? Boolean(itemAt(state.holdsColour, index, "held-colour flags"))

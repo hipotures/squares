@@ -165,8 +165,12 @@ handles n = 300.
 
 ### Phase 2: re-cut and validate the deliverables
 
-- [ ] Re-capture n = 1..324 under `archive` and n = 1..100 under `social`, at 30 fps.
-- [ ] Capture n = 1..100 at 60 fps under `social` for comparison against the 30 fps cut.
+- [x] Cut n = 1..100 at both 30 and 60 fps under `social` for comparison.
+  The owner chose 60 fps (2026-09-21), and `capture_video` now defaults to it.
+- [ ] Re-capture n = 1..324 under `archive` and n = 1..100 under `social`, at 60 fps.
+  The earlier cuts, 468.05 s and 135.2 s, predate the transition fixes that
+  `check_transitions` drove, so both are re-cut only after the owner has reviewed the
+  page.
 - [ ] Record the measured fidelity and the conformance result for each.
 
 ## Testing Strategy

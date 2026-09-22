@@ -14,9 +14,9 @@
 // - `frames`: the three outer container borders the stage draws -- the catalogue's box and the
 //   trace under it, and the container Pack and the animation studio draw -- as drawn, beside the
 //   tokens they are held to. Null where no stage is shown.
-// - `attribution`: the repository's address in the stage's bottom right, its baseline and right
-//   end beside the two things they are set from (the headline's baseline and the gap bar's rail),
-//   its type, and the boxes it must not be drawn over. Null where no stage is shown.
+// - `attribution`: the repository's address under the stage's legend, where its first character
+//   starts and its baseline beside the legend's left edge and foot it is set from, its type, and
+//   the boxes it must not be drawn over. Null where no stage is shown.
 //
 // The stage is a 1920 x 1080 poster drawn at `--stage-scale`, so `frames` and `attribution` are
 // measured in stage pixels: a rule in them holds at every window size rather than at one.
@@ -176,11 +176,11 @@
       trace: rgb(root.getPropertyValue("--scene-trace").trim()),
     },
   });
-  // Where the attribution's baseline and right end land, taken from the laid-out text rather than
-  // from the `x` and `y` that were written into it, beside the two things those are set from: the
-  // empty inline block standing on the headline's baseline, and the gap bar's rail.
+  // Where the attribution's first character starts and its baseline lands, taken from the laid-out
+  // text rather than from the `x` and `y` written into it, beside the legend's left edge and foot
+  // they are set from. The legend is null where it is not shown, as in Pack and the studio.
   //
-  // The end of the last character is read in the text's own user units, which are stage pixels:
+  // The start of the first character is read in the text's own user units, which are stage pixels:
   // the overlay is a 1920 x 1080 box over a 1920 x 1080 viewBox, and `frame` reports that box in
   // stage pixels so a caller can hold the mapping to 1:1 rather than assume it. Not through
   // `getScreenCTM`, which Chromium leaves stale for a frame after the stage's scale changes
@@ -198,23 +198,23 @@
       throw new Error("layout-metrics requires #stage-attribution and its text");
     }
     const characters = text.getNumberOfChars();
-    let end = null;
+    let start = null;
     if (characters > 0) {
-      const p = text.getEndPositionOfChar(characters - 1);
-      end = { right: Math.round(p.x * 100) / 100, baseline: Math.round(p.y * 100) / 100 };
+      const p = text.getStartPositionOfChar(0);
+      start = { left: Math.round(p.x * 100) / 100, baseline: Math.round(p.y * 100) / 100 };
     }
-    const marker = document.querySelector("#numeral-static .numeral .baseline");
+    const legend = document.getElementById("stage-note");
     const numeral = document.querySelector("#numeral-static .numeral");
-    const rail = document.querySelector("#gapbar .track");
     const type = getComputedStyle(text);
     /** @type {Element[]} */
     const near = [];
-    for (const id of ["packing-svg", "facts-a", "facts-b", "pack-stage-facts"]) {
+    for (const id of ["packing-svg", "facts-a", "facts-b", "stage-note", "pack-stage-facts"]) {
       const held = document.getElementById(id);
       if (held === null || !shown(held)) {
         continue;
       }
-      // A facts layer is an empty full-stage box; what it draws is its leaves.
+      // A facts layer is an empty full-stage box, and the legend a wide one; what each draws is
+      // its leaves.
       const leaves = [...held.querySelectorAll("*")].filter((e) => e.children.length === 0);
       near.push(...(id === "packing-svg" ? [held] : leaves));
     }
@@ -228,15 +228,8 @@
     return {
       placed: holder.classList.contains("is-placed"),
       shown: shown(holder),
-      ...(end ?? { right: null, baseline: null }),
-      headlineBaseline:
-        marker === null || marker.getClientRects().length === 0
-          ? null
-          : staged(marker.getBoundingClientRect()).top,
-      railRight:
-        rail === null || rail.getClientRects().length === 0
-          ? null
-          : staged(rail.getBoundingClientRect()).right,
+      ...(start ?? { left: null, baseline: null }),
+      legend: legend === null || !shown(legend) ? null : staged(legend.getBoundingClientRect()),
       ink: staged(text.getBoundingClientRect()),
       frame: staged(holder.getBoundingClientRect()),
       // The same ink box in the page's own pixels, which is what a screenshot is clipped to.

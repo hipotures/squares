@@ -87,11 +87,30 @@ Three contracts hold it:
   the shared edges, gutters and gaps, one height per control kind, horizontal overflow,
   panel overlap, the stage panel’s OPEN and badge rules (one type, with `new result`
   alone in the star’s scarlet), the one frame width in its three colours, and that the
-  attribution stands on the headline’s baseline and ends at the gap bar’s rail.
-  It runs inside `check_stage_resize`’s browser session in `check_frontend`, and
+  attribution stands just under the legend at its left edge, clear of what each mode
+  draws. It runs inside `check_stage_resize`’s browser session in `check_frontend`, and
   `tests/test_check_layout.py` proves each rule refuses a page that breaks it.
 - `workbench_tools.layout_gallery` photographs every view at every review viewport and
   writes a side-by-side comparison page for design review.
+
+## The transition contract
+
+`workbench_tools.check_transitions` samples every frame of a step at 60 fps and holds it
+to the rules in `transition_contract`. A blend shows no hue that neither of its ends
+has, and a hue turns only through grey.
+A shade blends rather than snapping.
+The view moves one way, the box only shrinks once the move starts, and the new square
+arrives saturated scarlet.
+`check_frontend` runs it on every pull request over the steps that have broken; `--all`
+runs every step in the corpus.
+
+When a transition looks wrong, trace it before changing anything.
+This prints one square through one step, frame by frame, in OKLCH, with the schedule it
+ran on:
+
+```bash
+uv run --frozen --all-extras --group dev squares-workbench-check-transitions --trace 11 --square 5
+```
 
 ## Contracts and ownership
 

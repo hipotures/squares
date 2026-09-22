@@ -64,7 +64,8 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
             page.locator("#anneal").get_attribute("max") == "20",
             "the dial's slider stops short",
         )
-        require(call("desatFloor") == 0.08, "the desaturation floor is not 0.08")
+        # Drained all the way to grey by default (the owner, 2026-09-21).
+        require(call("desatFloor") == 0, "the desaturation floor is not 0")
         beat = call("continuous")
         require(
             (beat["dwell"], beat["move"], beat["settle"]) == (0.6, 0.5, 0.3),
@@ -85,10 +86,11 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
         toggle = page.locator("#fastsimple-toggle")
         require(toggle.is_checked(), "simple transitions are not sped up by default")
 
-        # The census, observed as the steps whose duration halves. A simple step lies inside
-        # k^2 - k .. k^2 - 1 for k = ceil(sqrt(n + 1)), and that range holds 170 steps of the
-        # corpus; eleven of them change the container, because their best packing is tilted, and
-        # play at full length. So 159 play sped up, and the page's own count agrees.
+        # The census, observed as the steps whose duration shrinks by the page's speed-up. A
+        # simple step lies inside k^2 - k .. k^2 - 1 for k = ceil(sqrt(n + 1)), and that range
+        # holds 170 steps of the corpus; eleven of them change the container, because their best
+        # packing is tilted, and play at full length. So 159 play sped up, and the page's own
+        # count agrees.
         def grid_fill_range(n: int) -> bool:
             k = math.isqrt(n) + 1  # ceil(sqrt(n + 1))
             return k * k - k <= n <= k * k - 1
@@ -104,14 +106,16 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
             f"{call('continuous')['simplePairs']}, sped up {len(sped)}, outside the range "
             f"{sorted(sped - in_range)}, missing {sorted(in_range - full_length - sped)}",
         )
+        speed = call("continuous")["simpleSpeed"]
+        require(speed > 1, f"the simple-transition speed-up is not a speed-up: {speed}")
         fast = [call("duration", simple_index), call("duration", moving_index)]
         toggle.click()
         playback = call("continuous")
         require(not playback["fastSimple"], "unchecking did not turn the speed-up off")
         full = [call("duration", simple_index), call("duration", moving_index)]
         require(
-            abs(full[0] - 2 * fast[0]) < 1e-9,
-            f"the grid fill does not play at double speed: {fast[0]} s against {full[0]} s",
+            abs(full[0] - speed * fast[0]) < 1e-9,
+            f"the grid fill does not play at {speed}x: {fast[0]} s against {full[0]} s",
         )
         require(
             abs(full[1] - fast[1]) < 1e-9,
@@ -120,7 +124,7 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
         toggle.click()
         require(call("continuous")["fastSimple"], "checking did not turn the speed-up back on")
         # The speed-up is presentation only: a simple transition simulates as many physics steps
-        # at double speed as at full length, so `physics()`, and the annealing benchmark that
+        # sped up as at full length, so `physics()`, and the annealing benchmark that
         # calls it, do the same work whatever the clock plays.
         work = page.evaluate(
             probe("physics/steps-by-speed"),
@@ -129,7 +133,7 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
         by_speed = {(row["index"], row["fastSimple"]): row for row in work}
         require(
             abs(
-                2 * by_speed[simple_index, True]["duration"]
+                speed * by_speed[simple_index, True]["duration"]
                 - by_speed[simple_index, False]["duration"]
             )
             < 1e-9,
@@ -144,19 +148,22 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
         )
 
         # The box on the stage: the frames' grey on its way, green once locked at the best known
-        # side, with the lightest grey trace where it just was and a triangle over the gap bar
-        # at its side (the owner, 2026-09-17: every frame one width, and only the lock is a
+        # side, with the room n + 1 needs drawn in the lightest grey and a triangle over the gap
+        # bar at its side (the owner, 2026-09-17: every frame one width, and only the lock is a
         # colour change). Both colours are the stylesheet's `--scene-frame-*`, which the probe
-        # compares the drawn stroke with, so this asks for the token rather than for a hex. On
-        # 10 -> 11 the box rests at 3.707 with 9 -> 10's trace outside it at 4. As the move
-        # opens the box grows to 4, leaving and then clearing a trace at 3.707; the new square
-        # shows only once the arrival delay after that has passed, and the step settles at
-        # 3.877 with a trace outside at 4. 6 -> 7 is a grid fill, where the box never changes
-        # size.
-        def at(seconds: float) -> tuple[float, float, float]:
+        # compares the drawn stroke with, so this asks for the token rather than for a hex.
+        #
+        # **The box never animates growing** (the owner, 2026-09-21). On 10 -> 11 it rests green
+        # at 3.707 while the room 11 needs, 4, fades in around it in light grey over the dwell.
+        # When the move opens the box takes that room at once with no ink and darkens into it in
+        # place, so the only motion the container ever shows is shrinking: the new square shows
+        # once the arrival delay has passed, and the box shrinks to settle at 3.877 inside the
+        # room. 6 -> 7 is a grid fill, where the box never changes size. That the box only ever
+        # shrinks, frame by frame, is the transition contract's to hold (`check_transitions`).
+        def at(seconds: float) -> tuple[float, float, float, float]:
             call("seek", seconds)
             drawn = page.evaluate(probe("stage/box-state"))
-            return drawn["trace"], drawn["box"], drawn["traceOpacity"]
+            return drawn["trace"], drawn["box"], drawn["traceOpacity"], drawn["boxInk"]
 
         def locked() -> tuple[bool, bool]:
             drawn = page.evaluate(probe("stage/box-state"))
@@ -168,13 +175,17 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
         )
         call("select", into[11])
         step = call("schedule")
-        span = step["moveEnd"] - step["moveStart"]
         rest = at(0)
         require(
-            abs(rest[0] - 4) < 1e-9 and abs(rest[1] - 3.707106781) < 1e-6 and rest[2] == 1,
-            f"n = 10 does not rest at 3.707 inside the last step's trace at 4: {rest}",
+            abs(rest[0] - 4) < 1e-9 and abs(rest[1] - 3.707106781) < 1e-6 and rest[2] == 0,
+            f"n = 10 does not rest at 3.707 with the room 11 needs not yet shown: {rest}",
         )
         require(locked() == (True, True), f"n = 10 at rest is not locked green: {locked()}")
+        shown = at(step["moveStart"])
+        require(
+            abs(shown[1] - 3.707106781) < 1e-6 and shown[2] == 1,
+            f"the room 11 needs has not faded in by the end of the dwell: {shown}",
+        )
 
         def arriving() -> float:
             return float(
@@ -186,23 +197,22 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
             and step["containerEnd"] < step["arrive"],
             f"the box resize does not open the move ahead of the new square: {step}",
         )
-        # Half way through the resize the box is on its way out (a physical container can
-        # breathe past 4 before it settles there) and nothing has arrived.
+        # Half way through the resize the box already has the room, part inked, and nothing has
+        # arrived: it darkens into 4, it does not grow to it.
         opening = at((step["containerStart"] + step["containerEnd"]) / 2)
         require(
-            opening[1] > 3.707106781 + 1e-6 and arriving() == 0,
-            f"the box is not growing, alone, half way through its resize: "
+            abs(opening[1] - 4) < 1e-9 and 0 < opening[3] < 1 and arriving() == 0,
+            f"the box is not darkening in place, alone, half way through its resize: "
             f"{opening}, new square at {arriving()}, {step}",
         )
         grown = at(step["containerEnd"])
-        moving = float(page.locator("#container").get_attribute("width") or "nan")
         require(
-            abs(grown[0] - 3.707106781) < 1e-6
-            and abs(grown[1] - max(4, moving)) < 1e-9
-            and grown[2] == 1
+            abs(grown[0] - 4) < 1e-9
+            and abs(grown[1] - 4) < 1e-9
+            and grown[3] == 1
             and arriving() == 0,
-            f"the box did not grow to 4 over a trace of where it was before the new square "
-            f"showed: {grown}, new square at {arriving()}",
+            f"the box did not darken into the room before the new square showed: {grown}, "
+            f"new square at {arriving()}",
         )
         waiting = at((step["containerEnd"] + step["arrive"]) / 2)
         require(
@@ -214,21 +224,11 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
             0 < arriving() < 1,
             f"the new square is not fading in after the delay: {arriving()}, {step}",
         )
-        growing = page.evaluate(probe("stage/box-state"))
+        moving = page.evaluate(probe("stage/box-state"))
         require(
-            locked() == (False, False) and growing["grey"],
-            f"the growing box or its pointer is not the frames' grey: {locked()}, "
-            f"{growing['boxStroke']}",
-        )
-        clear_end = min(
-            max(step["moveEnd"], step["containerEnd"]),
-            step["containerEnd"] + 0.12 * span,
-        )
-        cleared = at(clear_end)
-        require(
-            cleared[2] == 0
-            and step["containerEnd"] < clear_end <= max(step["moveEnd"], step["containerEnd"]),
-            f"the inner trace did not clear after the delayed resize: {cleared}, {step}",
+            locked() == (False, False) and moving["grey"],
+            f"the moving box or its pointer is not the frames' grey: {locked()}, "
+            f"{moving['boxStroke']}",
         )
         settled = at(call("duration", into[11]))
         require(
@@ -397,7 +397,7 @@ def check(page_path: Path, screenshots: Path | None = None) -> str:
     return (
         "arrival on Animate, first of Animate, Pack and Search; the owner's law, dial, beat "
         "and desaturation defaults, the box, its trace, its lock "
-        "and its gap-bar pointer through a step, double-speed simple "
+        "and its gap-bar pointer through a step, sped-up simple "
         "transitions and their checkbox, animation import drawn in its own container with no "
         "catalogue box, geometry/guidance, frame edits, replay, "
         "SVG/JSON/frame capture, Pack return, and the box back in Animate"

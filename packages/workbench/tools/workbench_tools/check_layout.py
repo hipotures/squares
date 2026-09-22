@@ -26,8 +26,10 @@ first proved here, Animate with nothing open, the animation studio, Pack and Sea
   drawn in the colour its state calls for -- the best known side's green where the box locks
   there, the frames' grey where it does not and for the container, the lightest grey for the
   trace (the owner, 2026-09-17);
-- on the stage, **the attribution** stands on the headline's baseline and ends where the gap
-  bar's rail ends, both within `ATTRIBUTION_SLACK` stage pixels, and is drawn over nothing.
+- on the stage, **the attribution** starts at the legend's left edge, within
+  `ATTRIBUTION_SLACK` stage pixels, and stands just under it, its ink within
+  `ATTRIBUTION_LEAD` of the legend's foot (the owner, 2026-09-21); and it is drawn over nothing,
+  including in Pack and the studio, which do not show the legend and center their drawing.
 
 `findings`, `facts_findings`, `frames_findings` and `attribution_findings` are pure functions of
 the probe's output, so `tests/test_check_layout.py` proves each rule refuses a page that breaks
@@ -83,6 +85,10 @@ NEW_RESULT = "new result"
 #: 1920 x 1080 poster drawn at `--stage-scale`, so this is one pixel of the poster at every
 #: window size rather than one device pixel at some.
 ATTRIBUTION_SLACK = 1.0
+
+#: How far below the legend's foot the attribution's ink may start and still stand just under
+#: it, in stage pixels: one line of the legend's own 22 px type.
+ATTRIBUTION_LEAD = 22.0
 
 Metrics = Mapping[str, Any]
 
@@ -324,15 +330,15 @@ def frames_findings(frames: Metrics) -> list[str]:
 def attribution_findings(attribution: Metrics, *, aligned: bool) -> list[str]:
     """Every way the stage's attribution sits wrong; `aligned` says what it is set against.
 
-    The repository's address stands on the headline's baseline and ends where the gap bar's
-    rail ends, both read off what is drawn. Pack and the animation studio draw neither, so
-    there `aligned` is false and only the placement it kept and what it clears are checked.
+    The repository's address starts at the legend's left edge and stands just under it, both
+    read off what is drawn. Pack and the animation studio do not show the legend, so there
+    `aligned` is false and only that it is drawn and what it clears are checked.
     """
     found = []
     if not (attribution["placed"] and attribution["shown"]):
         return ["the stage's attribution is not drawn"]
-    # The two numbers above are read in the overlay's own units, which are stage pixels only
-    # because it is a 1920 x 1080 box over a 1920 x 1080 viewBox. That is measured, not assumed.
+    # The start above is read in the overlay's own units, which are stage pixels only because
+    # it is a 1920 x 1080 box over a 1920 x 1080 viewBox. That is measured, not assumed.
     poster = attribution["frame"]
     if not (
         _near(poster["left"], 0)
@@ -341,22 +347,27 @@ def attribution_findings(attribution: Metrics, *, aligned: bool) -> list[str]:
         and _near(poster["bottom"], 1080)
     ):
         found.append(f"the attribution's overlay is not the stage's own box: {poster}")
-    if aligned:
-        for label, at, against, of in (
-            ("baseline", attribution["baseline"], attribution["headlineBaseline"], "headline"),
-            ("right edge", attribution["right"], attribution["railRight"], "gap bar's rail"),
-        ):
-            if at is None or against is None:
-                found.append(
-                    f"the attribution's {label} cannot be measured against the {of}: "
-                    f"{at} and {against}"
-                )
-            elif abs(at - against) > ATTRIBUTION_SLACK:
-                found.append(
-                    f"the attribution's {label} is at {at:.2f}, {abs(at - against):.2f} stage "
-                    f"px from the {of}'s {against:.2f}"
-                )
+    legend = attribution["legend"]
     ink = attribution["ink"]
+    if aligned:
+        start = attribution["left"]
+        if legend is None or start is None:
+            found.append(
+                f"the attribution cannot be measured against the legend: starts at {start}, "
+                f"legend {legend}"
+            )
+        else:
+            if abs(start - legend["left"]) > ATTRIBUTION_SLACK:
+                found.append(
+                    f"the attribution starts at {start:.2f}, {abs(start - legend['left']):.2f} "
+                    f"stage px from the legend's left edge at {legend['left']:.2f}"
+                )
+            lead = ink["top"] - legend["bottom"]
+            if not 0 < lead <= ATTRIBUTION_LEAD:
+                found.append(
+                    f"the attribution's ink starts {lead:.2f} stage px below the legend's "
+                    f"foot, not just under it (0 to {ATTRIBUTION_LEAD:.0f})"
+                )
     for other in attribution["obstacles"]:
         width = min(ink["right"], other["right"]) - max(ink["left"], other["left"])
         height = min(ink["bottom"], other["bottom"]) - max(ink["top"], other["top"])
@@ -368,7 +379,8 @@ def attribution_findings(attribution: Metrics, *, aligned: bool) -> list[str]:
 
 
 #: The sum of an RGB pixel's channels under which it counts as ink rather than paper. White is
-#: 765 and the attribution's grey is 402, so a region of paper alone never reaches it.
+#: 765 and the attribution is set in the scene's ink, far darker, so a region of paper alone
+#: never reaches it.
 INK = 720
 
 
@@ -449,7 +461,7 @@ def _leave_studio(page: Page) -> None:
 
 
 #: The views, each with how to reach it and how to leave it, the facts it must show, and whether
-#: it draws the headline and the gap bar the attribution is set against.
+#: it shows the legend the attribution is set against.
 VIEWS: tuple[
     tuple[str, Callable[[Page], None], Callable[[Page], None] | None, bool | None, bool], ...
 ] = (
@@ -524,7 +536,7 @@ def check_open(page: Page, viewports: Sequence[tuple[int, int]] = VIEWPORTS) -> 
         f"{len(viewports)} viewports ({measured} measurements, "
         f"{time.perf_counter() - started:.1f}s), OPEN only when open, one badge type with "
         f"`{NEW_RESULT}` alone in the star's scarlet, one frame width in its three colours, "
-        f"and the attribution on the headline's baseline at the rail's end"
+        f"and the attribution just under the legend at its left edge"
     )
 
 

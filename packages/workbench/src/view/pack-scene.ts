@@ -27,7 +27,7 @@ export function paintPack(snapshot: GeometrySnapshot, colours: ColourSystem): Pa
         drain: 0,
         newTint: 0,
         resting: 1,
-        homeward: false,
+        homeward: 0,
         mark: null,
         linksOpacity: 0,
         ghostOpacity: 0,

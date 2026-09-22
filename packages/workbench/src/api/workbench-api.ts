@@ -207,7 +207,7 @@ export interface AtlasColour {
   greenStride: number;
   animateStandardize: boolean;
   /** Whether an axis-aligned square keeps its colour across a step instead of draining. */
-  holdSquareColours: boolean;
+  holdSquareColors: boolean;
   /** How many angle classes the frame's angles fell into. */
   classes: number;
   centres: number[];
@@ -412,6 +412,8 @@ export interface AtlasContinuous {
   fullBeat: boolean;
   /** Whether simple transitions, axis-aligned grid fills, play at `SIMPLE_TRANSITION_SPEED`. */
   fastSimple: boolean;
+  /** How many times faster a simple transition plays while `fastSimple` is on. */
+  simpleSpeed: number;
   prefetch: boolean;
   dwell: number;
   move: number;
@@ -612,10 +614,10 @@ export interface AtlasTransitions {
   identityFills(count?: number): string[];
   setAnimateStandardize(on: boolean): boolean;
   animateStandardize(): boolean;
-  holdSquareColours(): boolean;
-  setHoldSquareColours(on: boolean): boolean;
-  colourFade(): AtlasColourFade;
-  setColourFade(fade: Partial<AtlasColourFade>): AtlasColourFade;
+  holdSquareColors(): boolean;
+  setHoldSquareColors(on: boolean): boolean;
+  colorFade(): AtlasColorFade;
+  setColorFade(fade: Partial<AtlasColorFade>): AtlasColorFade;
 
   setPhase(phase: AtlasPhase): void;
   setStyle(style: string): void;
@@ -753,7 +755,7 @@ export interface AtlasTransitions {
 }
 
 /** How long a square's colour takes to leave and to come back, in seconds. */
-export interface AtlasColourFade {
+export interface AtlasColorFade {
   out: number;
   in: number;
 }

@@ -62,6 +62,7 @@ const input: IllustrationInput = {
   padding: 0.045,
   drain: 0,
   resting: 1,
+  homeward: 0,
   links: true,
   tint: 1,
   mark: { wide: 4, thin: 2, fade: 0.15 },

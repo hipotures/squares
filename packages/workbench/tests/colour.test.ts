@@ -183,7 +183,7 @@ test("one scene receipt carries fills, contacts, overlap, and touching evidence"
       drain: 0,
       newTint: 0,
       resting: 1,
-      homeward: true,
+      homeward: 1,
       mark: null,
       linksOpacity: 0,
       ghostOpacity: 0,
