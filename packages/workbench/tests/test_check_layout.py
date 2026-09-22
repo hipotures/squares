@@ -503,9 +503,7 @@ LOWER_INK = SCARLET
 UPPER_INK = LOCKED
 
 
-def _section(
-    *, lower: bool = True, upper: bool = True, noted: bool = True
-) -> dict[str, Any]:
+def _section(*, lower: bool = True, upper: bool = True, noted: bool = True) -> dict[str, Any]:
     """A CITATION section as the page draws it at n = 17, with OPEN moved below it."""
 
     def line(
