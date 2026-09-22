@@ -123,3 +123,27 @@ def test_a_change_says_where_it_fell_and_how_hard() -> None:
     assert filled.moved > 10 * fading.moved
     assert filled.box[2] - filled.box[0] > 600
     assert change_between(paper, paper).moved == 0
+
+
+def test_a_flagged_frame_is_read_again_at_full_size_before_it_is_called_a_stutter() -> None:
+    """The series is measured at a sixteenth of the area, where a real change can average
+    away. On the n = 1..100 cut 8 of 29 flagged frames moved 2,184 to 4,460 full-size pixels
+    (2026-09-22): the film was smooth there and the measurement was not fine enough to say
+    so. The judgement is unchanged -- it is asked at a finer resolution, not a looser one.
+    """
+    # A frame the reduced series calls a repeat, between two that moved.
+    moving = [MOTION * 5, REPEAT // 2, MOTION * 5]
+    times = [k / FPS for k in range(4)]
+    assert cadence.stutters(moving) == [2]
+    # Left to itself the rule keeps it, which is what it said before this pass existed.
+    assert cadence.judge(moving, times, FPS).stutters == (2,)
+    # A finer reading that finds real movement drops it; one that agrees keeps it.
+    assert cadence.judge(moving, times, FPS, confirm=lambda _: []).stutters == ()
+    assert cadence.judge(moving, times, FPS, confirm=list).stutters == (2,)
+
+
+def test_the_full_size_threshold_is_the_reduced_one_at_the_same_scale() -> None:
+    """Not a looser rule: `REPEAT` pixels of the measured frame are `FULL_REPEAT` of the real
+    one, so both ask the same question of the same picture at two resolutions."""
+    area = (1920 * 1080) / (cadence.MEASURE_WIDTH * cadence.MEASURE_HEIGHT)
+    assert int(REPEAT * area) == cadence.FULL_REPEAT

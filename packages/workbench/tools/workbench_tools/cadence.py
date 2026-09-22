@@ -37,12 +37,13 @@ Usage, from `packing/`:
 from __future__ import annotations
 
 import argparse
+import functools
 import hashlib
 import io
 import json
 import shutil
 import subprocess
-from collections.abc import Iterator, Sequence
+from collections.abc import Callable, Iterator, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -86,6 +87,17 @@ REPEAT = 20
 #: How many pixels must move in the frame before a repeat and in the frame after it for the
 #: repeat to be inside motion rather than a still stretch.
 MOTION = 100
+
+#: What a repeat may move when its two frames are read at FULL size, before it is not a repeat.
+#:
+#: The series above is measured at `MEASURE_WIDTH`, where each pixel is the average of the 16
+#: behind it, so a real change spread thinly over the stage can average below `REPEAT` and read
+#: as a held frame. Measured on the n = 1..100 cut (2026-09-22): of the 29 frames flagged after
+#: the container's blink was fixed, 8 moved 2,184 to 4,460 pixels at full size. The film was
+#: right and the measurement was not, so a flagged frame is now read again at full size before
+#: it is called a stutter. This is `REPEAT` scaled by that area ratio, not a looser rule: the
+#: threshold on what "the same frame" means is unchanged, only the resolution it is asked at.
+FULL_REPEAT = REPEAT * (1920 * 1080) // (MEASURE_WIDTH * MEASURE_HEIGHT)
 
 #: How far a presentation-time gap may stray from 1 / fps, in seconds, before the clock is
 #: uneven. The container's timescale rounds times to about a microsecond at 60 fps.
@@ -135,12 +147,23 @@ def worst_gap_error(times: Sequence[float], fps: float) -> float:
     return float(np.max(np.abs(gaps - 1.0 / fps)))
 
 
-def judge(moving: Sequence[float], times: Sequence[float], fps: float) -> Cadence:
-    """The cadence the measurements describe; `moving` is the moved-pixel series."""
+def judge(
+    moving: Sequence[float],
+    times: Sequence[float],
+    fps: float,
+    confirm: Callable[[Sequence[int]], Sequence[int]] | None = None,
+) -> Cadence:
+    """The cadence the measurements describe; `moving` is the moved-pixel series.
+
+    `confirm` is given the frames the series flags and returns those that are really repeats;
+    it is how a finer measurement reaches this judgement without changing it. The default
+    keeps them all, which is what the rules on their own say.
+    """
+    flagged = stutters(moving)
     return Cadence(
         frames=len(moving) + 1,
         fps=fps,
-        stutters=tuple(stutters(moving)),
+        stutters=tuple(flagged if confirm is None else confirm(flagged)),
         worst_gap_error=worst_gap_error(times, fps),
         still_frames=sum(1 for count in moving if count <= REPEAT),
     )
@@ -359,6 +382,59 @@ def verification(
         )
     lines.append("  smooth: every hold is the page's own" if not made else "  not smooth")
     return lines, not made
+
+
+def confirm_at_full_size(video: Path, flagged: Sequence[int]) -> list[int]:
+    """Of the frames the reduced series flagged, those that repeat at full size too.
+
+    One decode, reading only the frames a flag needs. A frame that moves more than
+    `FULL_REPEAT` full-size pixels from the one before it was never a repeat, and the
+    reduced measurement simply could not see it.
+    """
+    if not flagged:
+        return []
+    wanted = sorted({index for frame in flagged for index in (frame - 1, frame)})
+    read = _frames_at_full_size(video, wanted)
+    kept: list[int] = []
+    for frame in flagged:
+        before, after = read.get(frame - 1), read.get(frame)
+        if before is None or after is None:
+            kept.append(frame)
+            continue
+        if moved_pixels(before, after) <= FULL_REPEAT:
+            kept.append(frame)
+    return kept
+
+
+def _frames_at_full_size(video: Path, wanted: Sequence[int]) -> dict[int, np.ndarray]:
+    """The named frames of `video`, in grey at its own size, by frame index."""
+    chosen = "+".join(f"eq(n\\,{index})" for index in wanted)
+    command = [
+        _tool("ffmpeg"),
+        "-v",
+        "error",
+        "-i",
+        str(video),
+        "-vf",
+        f"select='{chosen}',format=gray",
+        "-vsync",
+        "0",
+        "-f",
+        "rawvideo",
+        "-",
+    ]
+    size = 1920 * 1080
+    read: dict[int, np.ndarray] = {}
+    with subprocess.Popen(command, stdout=subprocess.PIPE) as decoder:
+        if decoder.stdout is None:
+            raise SystemExit(f"ffmpeg gave no output for {video}")
+        for index in wanted:
+            chunk = decoder.stdout.read(size)
+            if len(chunk) < size:
+                break
+            grey = np.frombuffer(chunk, dtype=np.uint8).astype(np.int16)
+            read[index] = grey.reshape(1080, 1920)
+    return read
 
 
 def measure_changes(video: Path) -> list[float]:
@@ -738,7 +814,12 @@ def main() -> int:
         times, fps = measure_clock(video)
         regions = measure_regions(video)
         changes = regions["all"]
-        cadence = judge(regions["moving"], times, fps)
+        cadence = judge(
+            regions["moving"],
+            times,
+            fps,
+            confirm=functools.partial(confirm_at_full_size, video),
+        )
         print(report(video, cadence))
         if o.detail:
             print(
