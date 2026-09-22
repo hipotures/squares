@@ -26,7 +26,9 @@ session:
   - packing/campaign/resource-usage/agent-afc70c9271ea1d01b.yaml
   - packing/campaign/resource-usage/agent-afcacea2c4bddfe4a.yaml
   primary_bead: think-gvlg
-  status: in_progress
+  status: stopped
+  ended_at: '2026-09-22T09:20:00Z'
+  certification_pending: think-gvlg
   goal: >-
     Ask again what significant improvement is available at n = 11, n = 17 or another low
     n now that the five-value n = 17 ladder, T-031 and T-032 have merged; run the
@@ -165,7 +167,7 @@ session:
     objective: >-
       Run what the review ranks and the validation cleared, on the instruments that
       exist, and report the numbers rather than the verdicts alone.
-    status: in_progress
+    status: stopped
     entered_by: evidence_checkpoint
     switch_reason: >-
       The slate is reviewed and the unsound rows are named, so the remaining time is
@@ -200,8 +202,11 @@ session:
     - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-221-n17-kleddamag-unrestricted-receipt.md
     - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-223-grid-escape/exp-223-grid-escape-receipt.md
     - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-225-n27-n28-548-100-rebump-receipt.md
-    stop_reason: null
-    next_action: Close the remaining lanes, then decide what the register may say.
+    stop_reason: >-
+      Every dispatched cell is decided, the n = 11 rung is accepted by both routes with
+      its limit record written, and what remains is a register entry this session
+      deliberately did not write.
+    next_action: Register the n = 11 rung, following the handoff's three steps.
   budget:
     wall_minutes: 241
   stop_conditions:
@@ -240,11 +245,19 @@ session:
   - 'workbench browser behavior in Chromium: environment, not code. SQUARES_BROWSER_EXECUTABLE is unset in this container; with it pointed at /opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell the check passes in full'
   - 'test_timeout_kills_and_reaps_a_termination_resistant_process_group and test_nonzero_leader_exit_reaps_a_sigterm_ignoring_grandchild: container process semantics. Both fail in isolation as well as under load, so they are not the contention flakes the session-149 handoff expected; the error is "worker process group remained alive after SIGKILL" and pid 1 here is process_api rather than an init that reaps'
   - 'test_the_revision_is_the_length_this_repository_abbreviates_to: pre-existing and not caused by this branch. It asserts PUBLICATION_REVISION (8 characters) has the length git currently abbreviates to, and a complete clone of this repository abbreviates to 9 - origin/main is 97efd26f5. The shallow clone masked it'
-  stop_reason: null
+  stop_reason: >-
+    Stopped rather than completed, and the debt is named rather than papered over. Every
+    dispatched cell is decided, one bound moved and is accepted by both retention routes
+    with its dilation-limit record replayed, and the records are landed. What is missing
+    is a qualifying gate pass: the fast tier failed four steps here, one of which was
+    this branch's and is fixed, while three are the container and a pre-existing
+    complete-clone fragility that no change on this branch caused and none can repair
+    from inside it. Declaring a pass would be declaring a gate that did not pass, so the
+    record carries certification debt instead.
   next_action: >-
-    Register the n = 11 rung, which is accepted by both routes and has no T-id, following
-    the handoff's three steps; then decide whether the n = 27 and n = 28 candidate's
-    enclosure-agreement refusal is worth a W7 question to the gate's owner.
+    Under think-gvlg: obtain a qualifying fast-gate pass on a host where the three
+    environment failures above do not apply, then register the n = 11 rung, which is
+    accepted by both routes and has no T-id, following the handoff's three steps.
 ---
 # Session 151: What Is Left at Low `n`, and a Loop That Could Not Run
 

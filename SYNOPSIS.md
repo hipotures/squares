@@ -145,7 +145,7 @@ hypothesis status and summarizes experiment verdicts, and the
 | --- | ---: | --- |
 | Agendas | 38 | 18 active; 14 completed; 5 paused; 1 superseded |
 | Commitments | 362 | 182 complete; 61 stopped; 68 blocked; 16 ready; 21 tentative; 14 in progress |
-| Sessions | 151 | 92 completed; 58 stopped; 1 nonterminal |
+| Sessions | 151 | 92 completed; 59 stopped; all terminal |
 | Explorations | 40 | 24 linked to proposed hypotheses; 16 uncodified |
 | Hypotheses | 170 | 29 confirmed; 31 refuted; 55 blocked; 17 unresolved; 5 open; 29 open questions; 2 result registered; 2 abandoned; 0 running |
 | Experiments | 155 | 43 accepted; 36 rejected; 50 unresolved; 12 baseline; 11 blocked; 3 abandoned; 0 in progress |
@@ -1064,6 +1064,22 @@ controller, not permission to blur contracts.
 
 ### Current Handoff
 
+[Session 151](packing/campaign/agent-sessions/session-151-low-n-review-and-first-party-n17.md)
+asked again what improvement is left at low `n` and moved one bound.
+The frozen `T-025` threshold atoms re-certify at the 2880-step net, where the crossing
+shrink does not rise, so the dilation-limit supremum rises to
+`955000*sqrt(2073600042893309449)/359341754646249 = 3.826997548829544`, `+0.00055` over
+`T-026`. Both retention routes accept the frozen bytes and agree at exactly 1, and the
+limit record is replayed and written; **the register entry is deliberately unwritten**,
+which is why the session is stopped with certification debt rather than completed.
+Four cells returned measured negatives with witnesses — the `n = 17` triples and the
+parent-centre restriction are both load-bearing, re-pricing that support is capped at
+about `+0.0034`, and the first grid-capable search at `n = 12`, `20` and `21` returned
+the grid exactly on every run.
+Its `X-042` contradicts `X-041` in nine places, and the block corrected itself three
+times, including reverting an `H-228` refutation that an adversarial lane caught after
+it had been pushed.
+
 [Session 150](packing/campaign/agent-sessions/session-150-n17-consolidation-and-correctness.md)
 landed the agenda-040 overnight stack and the n = 17 intake on main, repairing four
 confirmed review findings at the integration point rather than after it, and left the
@@ -1080,13 +1096,15 @@ Three process defects came out of the block and are tracked rather than worked a
 `think-qsn2`, where `check_session_gate`’s verdict depends on the clone’s fetch depth;
 and `think-3umt`, where a record authored terminal can never earn its first receipt.
 
-**Selected next entry:** `think-zmos`, the W5 efficiency block.
-`OR-12` asks for one in every four to eight blocks and seventeen have closed since
-Session 131 declared the last one, so this is nine past mandatory.
-Its measurements are already taken — the deep gate’s exhaustive-tier step at 1.38 times
-its own declared budget, the deferred-steps wall beside it, and one 45-minute run spent
-over a tree byte-identical to a tree already measured — and `OR-17` now gives every
-routine gate the ceiling those numbers argued for.
+**Selected next entry:** `think-gvlg`, registering the `n = 11` rung Session 151 left
+accepted and unregistered.
+Its threshold certificate at the 2880-step net is `RETAINABLE` by both retention routes,
+which agree at exactly 1, and its dilation-limit record is replayed and written; what is
+missing is a `T-id`, a claim written as a supremum, and a qualifying gate pass on a host
+where that session’s three environment failures do not apply.
+`think-zmos`, the W5 efficiency block that was the previous entry, is discharged:
+`OR-17`’s `1.38x` turned out to be the hosted runner pool rather than drift, the four CI
+jobs are clocked, and the rule’s text is corrected.
 The agenda-040 closeout under `OR-11` remains outstanding and is not this entry.
 
 [Session 149](packing/campaign/agent-sessions/session-149-n17-external-intake.md)
