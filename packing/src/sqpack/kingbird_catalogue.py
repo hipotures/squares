@@ -151,9 +151,11 @@ class CatalogueEntry:
     The catalogue writes six openers in the same slot -- "Found by", "Found first by",
     "Found and improved by", "Originally found by", "Drafted by" and "Proved by" -- and
     does not separate who built a packing from who proved a bound about it, so this
-    field does not either. The frontier does -- `n = 6` credits Erich Friedman with the
-    packing and Kearney and Shiu with the proof, where the catalogue prints only the
-    latter -- which is why it is not a field the transcription check gates on.
+    field does not either. At `n = 6` it prints only Kearney and Shiu, who proved the bound,
+    and the frontier now records them the same way (think-dlof, 2026-09-22), as it does
+    the catalogue's "Proved by" credits at n = 13, 22, 23, 24, 33, 34, 35 and 46. So the
+    field says whom the catalogue credits, not who built the packing, which is why it is
+    not a field the transcription check gates on.
     """
 
     found_year: int | None

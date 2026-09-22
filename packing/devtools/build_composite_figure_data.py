@@ -19,7 +19,7 @@ import json
 import math
 import sys
 from collections.abc import Sequence
-from decimal import ROUND_DOWN, Decimal
+from decimal import ROUND_DOWN, ROUND_UP, Decimal
 from functools import cache
 from pathlib import Path
 
@@ -113,6 +113,22 @@ def _side_text(value: str) -> str:
     """Six significant decimals, trailing zeros and point removed."""
     number = sp.Float(value, 20)
     text = f"{float(number):.6f}".rstrip("0").rstrip(".")
+    return text or "0"
+
+
+def _upper_text(value: str) -> str:
+    """Six decimals of an upper bound, rounded away from zero rather than to nearest.
+
+    A displayed upper bound must stay true as written, and rounded to nearest it can print
+    BELOW the bound it stands for, which claims what the record does not prove: the
+    certified 5.93383346... at n = 29 printed as 5.933833, a stronger bound than anything
+    on record, and 51 of the 265 open cases did the same (think-1z70, 2026-09-22).
+    Rounding away from zero cannot. This is `_lower_text`'s rule in the other direction; an
+    equality is neither, and keeps the nearest six decimals.
+    """
+    exact = Decimal(str(sp.Float(value, 30)))
+    number = exact.quantize(Decimal("1.000000"), rounding=ROUND_UP)
+    text = format(number, "f").rstrip("0").rstrip(".")
     return text or "0"
 
 
@@ -256,7 +272,11 @@ def _entry(n: int) -> dict:
         "side": {
             "value": value,
             "relation": relation,
-            "display": (f"s({n}) {'=' if relation == 'equality' else '≤'} {_side_text(value)}"),
+            "display": (
+                f"s({n}) = {_side_text(value)}"
+                if relation == "equality"
+                else f"s({n}) ≤ {_upper_text(value)}"
+            ),
             "provenance": "frontier",
         },
         "optimality": {"status": status, "provenance": "frontier"},

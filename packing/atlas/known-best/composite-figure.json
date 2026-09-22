@@ -897,7 +897,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(17) ≤ 4.67553",
+          "display": "s(17) ≤ 4.675531",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "4.67553009360455"
@@ -987,7 +987,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(19) ≤ 4.885618",
+          "display": "s(19) ≤ 4.885619",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "4.88561808316412"
@@ -1322,7 +1322,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(26) ≤ 5.62132",
+          "display": "s(26) ≤ 5.621321",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "5.62132034355964"
@@ -1459,7 +1459,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(29) ≤ 5.933833",
+          "display": "s(29) ≤ 5.933834",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "5.93383346267692"
@@ -1924,7 +1924,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(39) ≤ 6.810722",
+          "display": "s(39) ≤ 6.810723",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "6.81072208306864"
@@ -1973,7 +1973,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(40) ≤ 6.828427",
+          "display": "s(40) ≤ 6.828428",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "6.82842712474619"
@@ -2017,7 +2017,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(41) ≤ 6.926693",
+          "display": "s(41) ≤ 6.926694",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "6.92669309446880"
@@ -2483,7 +2483,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(51) ≤ 7.700799",
+          "display": "s(51) ≤ 7.7008",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "7.70079923541701"
@@ -2615,7 +2615,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(54) ≤ 7.846667",
+          "display": "s(54) ≤ 7.846668",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "7.84666719284348"
@@ -2659,7 +2659,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(55) ≤ 7.945771",
+          "display": "s(55) ≤ 7.945772",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "7.94577100750391"
@@ -3163,7 +3163,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(66) ≤ 8.656854",
+          "display": "s(66) ≤ 8.656855",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "8.65685424949238"
@@ -3251,7 +3251,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(68) ≤ 8.803383",
+          "display": "s(68) ≤ 8.803384",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "8.803383074716108386903836683375989697670063329"
@@ -4107,7 +4107,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(87) ≤ 9.838817",
+          "display": "s(87) ≤ 9.838818",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "9.83881743996618"
@@ -4151,7 +4151,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(88) ≤ 9.888153",
+          "display": "s(88) ≤ 9.888154",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "9.88815305375857"
@@ -4195,7 +4195,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(89) ≤ 9.949747",
+          "display": "s(89) ≤ 9.949748",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "9.94974746830583"
@@ -4787,7 +4787,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(102) ≤ 10.611388",
+          "display": "s(102) ≤ 10.611389",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "10.61138823373863"
@@ -4831,7 +4831,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(103) ≤ 10.70379",
+          "display": "s(103) ≤ 10.703791",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "10.703790283762427"
@@ -5007,7 +5007,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(107) ≤ 10.846667",
+          "display": "s(107) ≤ 10.846668",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "10.84666719284348"
@@ -5051,7 +5051,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(108) ≤ 10.925919",
+          "display": "s(108) ≤ 10.92592",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "10.92591939016138"
@@ -5095,7 +5095,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(109) ≤ 10.949747",
+          "display": "s(109) ≤ 10.949748",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "10.94974746830583"
@@ -5775,7 +5775,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(124) ≤ 11.656854",
+          "display": "s(124) ≤ 11.656855",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "11.65685424949238"
@@ -5995,7 +5995,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(129) ≤ 11.881306",
+          "display": "s(129) ≤ 11.881307",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "11.88130621809000"
@@ -6083,7 +6083,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(131) ≤ 11.956543",
+          "display": "s(131) ≤ 11.956544",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "11.956543108124773261501115489978287643498579738"
@@ -6127,7 +6127,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(132) ≤ 11.991436",
+          "display": "s(132) ≤ 11.991437",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "11.99143643966336"
@@ -6807,7 +6807,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(147) ≤ 12.656854",
+          "display": "s(147) ≤ 12.656855",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "12.65685424949238"
@@ -6851,7 +6851,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(148) ≤ 12.656854",
+          "display": "s(148) ≤ 12.656855",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "12.65685424949238"
@@ -7971,7 +7971,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(173) ≤ 13.656854",
+          "display": "s(173) ≤ 13.656855",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "13.65685424949238"
@@ -8191,7 +8191,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(178) ≤ 13.846667",
+          "display": "s(178) ≤ 13.846668",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "13.84666719284348"
@@ -8279,7 +8279,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(180) ≤ 13.935139",
+          "display": "s(180) ≤ 13.93514",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "13.93513929847193"
@@ -8323,7 +8323,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(181) ≤ 13.956984",
+          "display": "s(181) ≤ 13.956985",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "13.95698416446504"
@@ -9179,7 +9179,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(200) ≤ 14.656854",
+          "display": "s(200) ≤ 14.656855",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "14.65685424949238"
@@ -9267,7 +9267,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(202) ≤ 14.727922",
+          "display": "s(202) ≤ 14.727923",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "14.72792206135785"
@@ -9399,7 +9399,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(205) ≤ 14.824451",
+          "display": "s(205) ≤ 14.824452",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "14.82445114612408"
@@ -9531,7 +9531,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(208) ≤ 14.93783",
+          "display": "s(208) ≤ 14.937831",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "14.93783044811097"
@@ -9575,7 +9575,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(209) ≤ 14.958682",
+          "display": "s(209) ≤ 14.958683",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "14.95868244078260"
@@ -10475,7 +10475,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(229) ≤ 15.656854",
+          "display": "s(229) ≤ 15.656855",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "15.65685424949238"
@@ -10915,7 +10915,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(239) ≤ 15.956433",
+          "display": "s(239) ≤ 15.956434",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "15.95643304058435"
@@ -10959,7 +10959,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(240) ≤ 15.975594",
+          "display": "s(240) ≤ 15.975595",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "15.97559404379946"
@@ -11815,7 +11815,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(259) ≤ 16.602571",
+          "display": "s(259) ≤ 16.602572",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "16.60257141234448"
@@ -11859,7 +11859,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(260) ≤ 16.656854",
+          "display": "s(260) ≤ 16.656855",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "16.65685424949238"
@@ -12123,7 +12123,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(266) ≤ 16.823062",
+          "display": "s(266) ≤ 16.823063",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "16.82306208283780"
@@ -12167,7 +12167,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(267) ≤ 16.846667",
+          "display": "s(267) ≤ 16.846668",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "16.84666719284348"
@@ -12211,7 +12211,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(268) ≤ 16.879332",
+          "display": "s(268) ≤ 16.879333",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "16.87933209237563"
@@ -12343,7 +12343,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(271) ≤ 16.955094",
+          "display": "s(271) ≤ 16.955095",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "16.95509447506437"
@@ -12387,7 +12387,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(272) ≤ 16.969807",
+          "display": "s(272) ≤ 16.969808",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "16.96980702828259"
@@ -13287,7 +13287,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(292) ≤ 17.602571",
+          "display": "s(292) ≤ 17.602572",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "17.60257141234448"
@@ -13331,7 +13331,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(293) ≤ 17.634146",
+          "display": "s(293) ≤ 17.634147",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "17.63414634146341"
@@ -13375,7 +13375,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(294) ≤ 17.656854",
+          "display": "s(294) ≤ 17.656855",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "17.65685424949238"
@@ -13639,7 +13639,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(300) ≤ 17.824123",
+          "display": "s(300) ≤ 17.824124",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "17.82412338847854"
@@ -13727,7 +13727,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(302) ≤ 17.886746",
+          "display": "s(302) ≤ 17.886747",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "17.88674602860566"
@@ -13815,7 +13815,7 @@
           "state": "not-established"
         },
         "side": {
-          "display": "s(304) ≤ 17.949172",
+          "display": "s(304) ≤ 17.949173",
           "provenance": "frontier",
           "relation": "upper-bound",
           "value": "17.94917201919110"

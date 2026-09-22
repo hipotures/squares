@@ -75,6 +75,20 @@ DECLARED_CONSUMERS = {
         "deliberately does not draw; it names this field to say the figure omits it "
         "because it is a ceiling rather than s(n), which is the contract's own reading"
     ),
+    "packing/devtools/build_bound_citations.py": (
+        "compares the ceiling with reported_upper_bound through "
+        "bounds_agree_at_declared_precision to mark a shown upper bound verified or reported, "
+        "and omits a line only where the ceiling's own evidence is common-knowledge; it never "
+        "reads the field as s(n)"
+    ),
+    "packing/tests/test_bound_citations.py": (
+        "builds synthetic cases carrying the field and restates the same agreement rule; it "
+        "asserts nothing about s(n)"
+    ),
+    "docs/project/specs/active/plan-2026-09-22-upper-bound-certification-blocks.md": (
+        "plans the blocks that certify reported upper bounds; it names the field to explain "
+        "the certification rule and the queue, reading it as a ceiling, never as s(n)"
+    ),
     "packing/devtools/audit_ds7_lower_bounds.py": (
         "preserves the certified ceiling unchanged while auditing source-reported lower "
         "bounds; it neither promotes that ceiling to s(n) nor derives a new upper bound"
@@ -228,6 +242,9 @@ DECLARED_CONSUMERS = {
 # is 44 MB of them, and nothing hand-written in this project comes close to the cap.
 SEARCHED_SUFFIXES = (".py", ".md", ".yaml", ".yml", ".rs")
 SKIPPED_PARTS = {
+    # A worktree's gitignored scratch, never part of the record: a consumer found there does
+    # not exist in any checkout but the one it was written in.
+    "attic",
     ".venv",
     "__pycache__",
     "resources",

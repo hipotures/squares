@@ -27,6 +27,7 @@ from sqpack.known_best import (
     parse_unitsquare_svg,
     sampled_sequence,
 )
+from sqpack.release import DATA_PATHS, data_pathspec
 from sqpack.render.color import ANGLE_CLASS_CONTRACT
 from sqpack.render.model import RenderSpec
 from sqpack.render.style import FIRST_PARTY_ACCENT_COLOR
@@ -55,6 +56,7 @@ GOLDEN_SOURCE_KINDS: dict[str, dict[str, int]] = {
 POSTER_SVG_BUDGET_BYTES = 8 * 1024 * 1024
 
 ROOT = Path(__file__).resolve().parent.parent
+REPOSITORY = ROOT.parent
 ATLAS = ROOT / "atlas/known-best"
 SOURCES = ROOT / "resources/web/known-best-packings"
 WITNESSES = ROOT / "witnesses/known-best"
@@ -1140,6 +1142,73 @@ def test_fast_composite_check_rejects_a_stale_bound_label(monkeypatch) -> None:
     assert not known_best_builder._composite_label_problems(  # pyright: ignore[reportPrivateUsage]  # noqa: SLF001
         canvas, root
     )
+
+
+def test_fast_composite_check_rejects_a_stale_version_stamp() -> None:
+    """Re-pinning the data revision moves the stamp and no card, so it is checked alone."""
+    canvas = known_best_builder.CompositeCanvas(
+        CompositeSpec(first_n=18, last_n=18, columns=1, stem="synthetic")
+    )
+    release = known_best_builder.SUMMARY_RELEASE_TEXT
+    stamp = known_best_builder.SUMMARY_RELEASE_STAMP
+    root = ET.fromstring(
+        f"""<svg xmlns="http://www.w3.org/2000/svg">
+        <text data-feature="release">{release}</text>
+        <text data-feature="release-stamp">v0.0.0-000000</text>
+        </svg>"""
+    )
+
+    problems = known_best_builder._composite_edition_problems(  # pyright: ignore[reportPrivateUsage]  # noqa: SLF001
+        canvas, root
+    )
+    expected = (
+        "atlas/known-best/synthetic.svg release-stamp is ('v0.0.0-000000',); "
+        f"expected ({stamp!r},)"
+    )
+    assert problems == [expected]
+
+    footer = next(
+        node
+        for node in root.iter("{http://www.w3.org/2000/svg}text")
+        if node.attrib.get("data-feature") == "release-stamp"
+    )
+    footer.text = stamp
+    assert not known_best_builder._composite_edition_problems(  # pyright: ignore[reportPrivateUsage]  # noqa: SLF001
+        canvas, root
+    )
+
+
+def test_the_version_leaves_out_exactly_the_stamped_composites_and_the_video_code() -> None:
+    """What `sqpack.release` does not count as data is what the stamp would chase.
+
+    Each composite and every export drawn from it carries the version, so each must be
+    outside the data or re-stamping it would be a data commit; anything else left out
+    is data the version stops seeing. The video spikes are the one other exclusion, and
+    they are code.
+    """
+
+    def tracked(*pathspec: str) -> set[str]:
+        listed = subprocess.run(
+            ("git", "-C", str(REPOSITORY), "ls-files", "--", *pathspec),
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if listed.returncode != 0:
+            pytest.skip(listed.stderr.strip() or "git cannot list tracked files here")
+        return set(listed.stdout.split())
+
+    left_out = tracked(*DATA_PATHS) - tracked(*data_pathspec())
+    family = set()
+    for canvas in known_best_builder.COMPOSITES:
+        stem = canvas.spec.stem
+        family.add(canvas.svg_path)
+        family.update(export.path for export in canvas.rasters)
+        family.add(render_composite_pdf.composite_pdf(stem))
+    stamped = {path.resolve().relative_to(REPOSITORY).as_posix() for path in family}
+    video = "packing/atlas/known-best/video/"
+    assert {path for path in left_out if not path.startswith(video)} == stamped
+    assert any(path.startswith(video) for path in left_out)
 
 
 def _unitsquare_digests() -> dict[int, str]:

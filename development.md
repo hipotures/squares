@@ -912,18 +912,26 @@ bytes and its page count to match the publication.
 It also requires the workbench’s exact source revision, starts its public API in pinned
 Chromium, and follows its project-relative link to the explainer.
 
-**The stamp in the credits has two parts, and they move on different clocks.** The
-current version and publication date come from the first entry in `PUBLICATION_HISTORY`
-in `src/sqpack/release.py`; the page renders the two retained history entries from that
-same source. Each history date records when that label first appeared in Git as an
-edition of this publication.
-The hash after the version is the commit the page is built from, read at render time
-(`page_edition()`), so it changes on every push, and a reader of the deployed page sees
-exactly which commit they are looking at.
-The atlas footer and the generated claim documents are checked in and drift-checked byte
-for byte, so they carry the pinned `PUBLICATION_REVISION` instead (`PUBLICATION_EDITION`
-and `edition_file()`); the two spellings agree on the status and the version and differ
-only in which commit they name.
+**One version, shared by every artifact** (the owner, 2026-09-22): the explainer’s
+credits, the atlas footer, the workbench stage and the videos all print
+`PUBLICATION_EDITION` from `src/sqpack/release.py`, written `v0.4.1-f5e113`. The version
+and publication date come from the first entry in `PUBLICATION_HISTORY`; the page
+renders the two retained history entries from that same source.
+The six characters after the version name the data, not the build: they are the pinned
+`DATA_REVISION`, the last commit that changed `DATA_PATHS` (the frontier records and the
+atlas data), so artifacts built from the same data carry the same version whatever code
+commit built them. Nothing reads git for it at build time, which is why a shallow deploy
+clone stamps correctly.
+The claim documents still link to the pinned `PUBLICATION_REVISION` (`edition_file()`),
+which moves only when an edition is cut.
+
+**After any commit that changes the data, re-pin.** A commit cannot contain its own
+hash, so a data change is followed by a second commit that sets `DATA_REVISION` to the
+data commit and rebuilds the atlas family
+(`uv run --frozen --all-extras --group dev python -m devtools.build_known_best_atlas --update`).
+`tests/test_release.py` fails until it does, and says which hash to pin.
+Only a branch’s head has to agree; a merge keeps the branch’s data commit unless main’s
+data moved too.
 
 **Cutting an edition** is the one manual step, and it is editorial: it changes the
 version, and with it the revision the committed artifacts are stamped with.
@@ -933,9 +941,10 @@ content revision, not the patch number.
 To cut one:
 
 1. Add the edition to the front of `PUBLICATION_HISTORY` with the date its label will
-   first appear in Git, and set `PUBLICATION_REVISION` to the short hash of the commit
-   whose content the edition describes.
+   first appear in Git, and set `PUBLICATION_REVISION`, the commit the claim documents
+   link to, to the short hash of the commit whose content the edition describes.
    That revision is by construction older than the commit that carries the bump.
+   `DATA_REVISION` follows the data, not the edition, as the paragraph above says.
 2. Rebuild the atlas family:
    `uv run --frozen --all-extras --group dev python -m devtools.build_known_best_atlas --update`
    (see the cairo note under Supported Environment), and regenerate the claim documents:

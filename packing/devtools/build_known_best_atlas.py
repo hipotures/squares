@@ -298,10 +298,11 @@ SUMMARY_MATH_GLYPH_BASELINE = Decimal(14)
 #: row beside the lettered badges.
 SUMMARY_BADGE_STAR_SPAN = Decimal("0.92")
 SUMMARY_CREDIT = "Diagram by Joshua Levy with assistance from Claude and Codex"
-#: The edition stamp, last of the footer lines and in the same voice as the rest of it.
-#: Taken whole from `sqpack.release` rather than assembled here: this line and the
-#: explainer's credits are the two places an edition is stamped, and they used to build
-#: the same string from the same parts in two files.
+#: The shared version, last of the footer lines and in the same voice as the rest of it.
+#: Taken whole from `sqpack.release` rather than assembled here, so this line, the
+#: explainer's credits and the videos print one string. Its hash is the pinned data
+#: revision, not one read from git, because this drawing is committed and compared byte
+#: for byte; `sqpack.release` says how the pin is kept true.
 SUMMARY_RELEASE_STAMP = PUBLICATION_EDITION
 SUMMARY_REPOSITORY = "github.com/jlevy/squares"
 # Set a step above the other small labels so the URL reads as part of the
@@ -2227,7 +2228,8 @@ def _composite_receipt_problems() -> list[str]:
 
     The whole check compares the entire SVG against a fresh rendering. Here the current
     figure record is cheap enough to compare directly with the visible labels in the
-    retained SVG, so a changed bound cannot wait for that deferred rebuild to be found.
+    retained SVG, so a changed bound cannot wait for that deferred rebuild to be found,
+    and the same holds for the footer's version against `sqpack.release`.
     Exports are checked against the retained drawing they declare they came from, and
     the drawing is held to the canvas its own specification computes.
     """
@@ -2243,6 +2245,7 @@ def _composite_receipt_problems() -> list[str]:
                 f"{_relative(canvas.svg_path)} is not the canvas its specification computes"
             )
         problems.extend(_composite_label_problems(canvas, root))
+        problems.extend(_composite_edition_problems(canvas, root))
         problems.extend(
             f"missing or stale {export.name} {export.role} receipt"
             for export in canvas.rasters
@@ -2303,6 +2306,29 @@ def _composite_label_problems(canvas: CompositeCanvas, root: ET.Element) -> list
     return problems
 
 
+def _composite_edition_problems(canvas: CompositeCanvas, root: ET.Element) -> list[str]:
+    """Compare the release line and the version stamp with `sqpack.release`.
+
+    Both say which data the drawing shows, and re-pinning the data revision changes the
+    stamp without touching a card, so a stale stamp would otherwise wait for the
+    deferred rebuild to be found.
+    """
+    path = _relative(canvas.svg_path)
+    problems: list[str] = []
+    for feature, expected in (
+        ("release", SUMMARY_RELEASE_TEXT),
+        ("release-stamp", SUMMARY_RELEASE_STAMP),
+    ):
+        actual = tuple(
+            "".join(node.itertext())
+            for node in root.iter(svg_tag("text"))
+            if node.attrib.get("data-feature") == feature
+        )
+        if actual != (expected,):
+            problems.append(f"{path} {feature} is {actual!r}; expected {(expected,)!r}")
+    return problems
+
+
 def _sample_problems(numbers: Sequence[int], retained: list[dict], workers: int) -> list[str]:
     """Where the retained bytes for the sampled cases differ from a fresh build."""
     entries = {int(entry["n"]): entry for entry in retained}
@@ -2335,8 +2361,9 @@ def check_sample(stride: int = ATLAS_SAMPLE_STRIDE, workers: int = 1) -> None:
 
     What it does not cover, stated so nobody has to infer it: the per-case geometry of
     the cases the stride skips, and the composite SVGs' own bytes beyond their canvas,
-    visible claim labels, and export receipts. Both are covered by `known-best
-    n=1..324 atlas rebuild` on the deferred surface, which is the exact complement
+    visible claim labels, release line and version stamp, and export receipts. Both are
+    covered by `known-best n=1..324 atlas rebuild` on the deferred surface, which is the
+    exact complement
     `test_the_deep_gate_runs_exactly_what_the_pull_request_surface_defers` holds.
     """
     numbers = sampled_numbers(CORPUS, stride)
