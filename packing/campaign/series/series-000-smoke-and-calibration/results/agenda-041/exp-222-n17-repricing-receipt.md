@@ -83,9 +83,12 @@ A capture set off by one site fails `K4`.
 
 ## What was extracted
 
-7,853 minimising cells, one per catalogue row, in 2,084.3 s on two contended workers.
-Each carries the row’s `(t, B)`, its minimum in units, the centre, the captured-site
-count and the folded orbit counts.
+7,853 minimising cells, one per catalogue row, in 1,363.7 s of sweep on two contended
+workers.
+The catalogue was swept twice, before and after the centre defect below, and the
+second pass reproduced `K1`–`K5` and both linear-program brackets to every printed
+digit. Each carries the row’s `(t, B)`, its minimum in units, the centre, the
+captured-site count and the folded orbit counts.
 
 | Quantity | Value |
 | --- | --- |
@@ -270,6 +273,11 @@ row 6237’s centre came out at `-1.04e17` against a container of side `4.613`.
 Nothing else was affected — the constraint matrix, every control and every LP value are
 computed in the frame and never through that inverse — but the extraction was re-run
 rather than patched in place, and the tool now refuses any centre outside the container.
+The re-run is its own evidence for that claim: both passes give `K1` and `K2` on all
+7,853 rows with zero mismatches, the same `4,761` midpoints outside the envelope, the
+same `0` detached, and the identical bracket `[16.776137468, 16.776137532]`. All 7,853
+retained centres now lie inside the container, `x` in `[0.499265, 2.306202]` and `y` in
+`[0.499265, 3.095368]` against `L = 4.613`.
 
 ## Commands and wall times
 
@@ -283,7 +291,7 @@ wall and none is a cost measurement.
 | 9.3 s | `devtools.reprice_kleddamag_measure --stride 500 --workers 1 --control-rows 4 --skip-lp --report …-sweep-control.json` |
 | 2,097.3 s | `devtools.reprice_kleddamag_measure --stride 1 --workers 2 --control-rows 24 --quiet --cells …-cells.jsonl --matrix …/exp-222-matrix.npz --report …-lp.json` |
 | 810.4 s | `devtools.reprice_kleddamag_measure --from-matrix …/exp-222-matrix.npz --separation-rows 413 --rowgen-rows 413 --rowgen-rounds 40 --rowgen-deadline 780 --workers 2 --quiet --report …-solve.json` |
-| RESWEEP_WALL | the third command again, after the centre fix |
+| 1,376.5 s | the third command again, after the centre fix; this is the retained run |
 
 Of the 810.4 s, the LP took 3.4 s, the second LP 2.2 s, the separation probe 4.4 s and
 row generation 799.9 s.

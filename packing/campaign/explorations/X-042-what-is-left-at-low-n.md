@@ -331,6 +331,50 @@ Whether a recorded escape from the agreement requirement is sound policy is a qu
 for the gate’s owner, and `D-435` is exactly why acceptance is asked the same question
 in both modes.
 
+## The Re-Pricing Prize, Measured and Bounded
+
+Claim 2 above says the external measure has not been re-priced against its own final
+catalogue and that this is where its headroom is.
+The block ran that as `exp-222`, and the result bounds the prize rather than collecting
+it.
+
+**The A2 discriminator fires “confirm” on its face, and that reading is wrong.** The LP
+over 1,387 orbit variables on the 7,853 extracted cells optimises to `16.776137532`,
+well under the `16.99` the slate set.
+But that optimum is supported on **93 orbits of 1,387**, and put back into the sweep
+over the whole continuum it charges `0.608365` at row 6042 and would need mass **27.58**
+to be a certificate.
+One cell per row is far too weak a relaxation for its value to say anything about a
+certificate. The slate’s own discriminator was badly chosen, and the lane’s separation
+probe is what caught it.
+
+What the lane does produce is a **floor**, and a floor is the useful direction here:
+
+| Quantity | Exact | Float |
+| --- | --- | --- |
+| The artifact’s own normalised mass | `16998427356/1000020517` | `16.998078606` |
+| **Floor under any re-priced measure on this support at this `(L, A)`** | `33945829752/2000000005` | **`16.972914834`** |
+
+Because a subset of constraints can only lower an optimum, that floor is valid
+catalogue-wide. So **re-pricing at fixed `(L, A)` on this support is worth at most
+`0.025163774` of mass**, and the floor had not converged when its deadline hit — it was
+still climbing at `4e-4` a round — so the true figure is smaller.
+Under a stated sensitivity heuristic that is at most about **`+0.0034`** in the bound,
+no more than roughly `4.6232` against the artifact’s `4.619791`.
+
+`H-233` is therefore neither killed nor confirmed; what replaces it is a quantified
+ceiling on the prize.
+**The consequence for the slate is direct: `A2`’s weight should move to the sites
+side**, because the weights alone cannot carry more than that.
+
+Two further readings from the same lane.
+Every slack figure this report quotes reproduces from the lane’s own sweep of all 7,853
+rows. And on `H-239`, the `X-014` cap signature is **not** present at `4.6198`: only
+`24.6%` of dual mass sits within `0.5°` of a folded Bidwell class, against the `50%` the
+signature would need, and almost all of that is at `0°` rather than at either tilt.
+That last is the weakest measurement of the block — it is the dual of a primal the
+separation probe has just refuted — and is recorded as a first look, not a decision.
+
 ## What the Upper-Bound Lane Measured, and Three Things It Corrected
 
 **The grid escape is the null, and the null is total.** At `n = 12`, `20` and `21`, all
