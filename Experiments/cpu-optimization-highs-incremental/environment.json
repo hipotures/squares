@@ -1,0 +1,21 @@
+{
+  "base_sha": "1f58b0f0abca55d4ea2cf0e1cd73d70ebd625659",
+  "machine": {
+    "system": "Linux",
+    "node": "gpu",
+    "release": "7.0.0-31-generic",
+    "version": "#31-Ubuntu SMP PREEMPT_DYNAMIC Sat Aug  1 04:26:38 UTC 2026",
+    "machine": "x86_64",
+    "processor": ""
+  },
+  "python": "3.14.7",
+  "numpy": "2.5.2",
+  "scipy": "1.17.1",
+  "highspy": "1.15.1",
+  "thread_env": {
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1"
+  },
+  "dependency_changes": false
+}
