@@ -1,0 +1,172 @@
+{
+  "vectorized-w1": {
+    "reference": {
+      "wall_per_solve_seconds": {
+        "min": 21.734192791001988,
+        "median": 21.82233685099345,
+        "max": 21.869379591000325,
+        "cv": 0.003146773906443306
+      },
+      "separation_per_solve_seconds": {
+        "min": 20.641,
+        "median": 20.729,
+        "max": 20.774,
+        "cv": 0.003265734512966774
+      },
+      "lp_per_solve_seconds": {
+        "min": 1.063,
+        "median": 1.064,
+        "max": 1.065,
+        "cv": 0.0009398496240601512
+      },
+      "batch_wall_seconds": {
+        "min": 21.734192791001988,
+        "median": 21.82233685099345,
+        "max": 21.869379591000325,
+        "cv": 0.003146773906443306
+      },
+      "repeats": [
+        1,
+        1,
+        1
+      ],
+      "raw": [
+        "raw/vectorized-reference-w1-s1.json",
+        "raw/vectorized-reference-w1-s2.json",
+        "raw/vectorized-reference-w1-s3.json"
+      ]
+    },
+    "candidate": {
+      "wall_per_solve_seconds": {
+        "min": 16.379292235502362,
+        "median": 16.396549508499447,
+        "max": 16.432614048502728,
+        "cv": 0.0016587446641179412
+      },
+      "separation_per_solve_seconds": {
+        "min": 15.256,
+        "median": 15.272,
+        "max": 15.3165,
+        "cv": 0.0020514245119153287
+      },
+      "lp_per_solve_seconds": {
+        "min": 1.0845,
+        "median": 1.0885,
+        "max": 1.093,
+        "cv": 0.0039061086412042253
+      },
+      "batch_wall_seconds": {
+        "min": 32.758584471004724,
+        "median": 32.793099016998895,
+        "max": 32.865228097005456,
+        "cv": 0.0016587446641179412
+      },
+      "repeats": [
+        2,
+        2,
+        2
+      ],
+      "raw": [
+        "raw/vectorized-candidate-w1-s1.json",
+        "raw/vectorized-candidate-w1-s2.json",
+        "raw/vectorized-candidate-w1-s3.json"
+      ]
+    },
+    "paired_saved_seconds": {
+      "min": 5.33764328250254,
+      "median": 5.3897228024907236,
+      "max": 5.490087355497963,
+      "cv": 0.014333823181970861
+    },
+    "paired_saved_samples_seconds": [
+      5.33764328250254,
+      5.490087355497963,
+      5.3897228024907236
+    ]
+  },
+  "vectorized-w16": {
+    "reference": {
+      "wall_per_solve_seconds": {
+        "min": 3.9568029353334473,
+        "median": 4.0596773979996215,
+        "max": 4.1877269931659,
+        "cv": 0.028438680349280227
+      },
+      "separation_per_solve_seconds": {
+        "min": 2.7411666666666665,
+        "median": 2.827666666666667,
+        "max": 2.970166666666667,
+        "cv": 0.040626149167562936
+      },
+      "lp_per_solve_seconds": {
+        "min": 1.1704999999999999,
+        "median": 1.1706666666666667,
+        "max": 1.1861666666666666,
+        "cv": 0.007652319839659011
+      },
+      "batch_wall_seconds": {
+        "min": 23.740817612000683,
+        "median": 24.35806438799773,
+        "max": 25.126361958995403,
+        "cv": 0.02843868034928029
+      },
+      "repeats": [
+        6,
+        6,
+        6
+      ],
+      "raw": [
+        "raw/vectorized-reference-w16-s1.json",
+        "raw/vectorized-reference-w16-s2.json",
+        "raw/vectorized-reference-w16-s3.json"
+      ]
+    },
+    "candidate": {
+      "wall_per_solve_seconds": {
+        "min": 3.6431161318573038,
+        "median": 3.688796050999372,
+        "max": 3.7287745587143166,
+        "cv": 0.011625180203792993
+      },
+      "separation_per_solve_seconds": {
+        "min": 2.4238571428571425,
+        "median": 2.480714285714286,
+        "max": 2.524714285714286,
+        "cv": 0.020418505876790276
+      },
+      "lp_per_solve_seconds": {
+        "min": 1.1592857142857143,
+        "median": 1.1611428571428573,
+        "max": 1.1717142857142857,
+        "cv": 0.005759340285139699
+      },
+      "batch_wall_seconds": {
+        "min": 25.501812923001125,
+        "median": 25.821572356995603,
+        "max": 26.101421911000216,
+        "cv": 0.011625180203793002
+      },
+      "repeats": [
+        7,
+        7,
+        7
+      ],
+      "raw": [
+        "raw/vectorized-candidate-w16-s1.json",
+        "raw/vectorized-candidate-w16-s2.json",
+        "raw/vectorized-candidate-w16-s3.json"
+      ]
+    },
+    "paired_saved_seconds": {
+      "min": 0.22802837661913067,
+      "median": 0.4165612661423177,
+      "max": 0.49893094216652845,
+      "cv": 0.3643354058595324
+    },
+    "paired_saved_samples_seconds": [
+      0.4165612661423177,
+      0.49893094216652845,
+      0.22802837661913067
+    ]
+  }
+}

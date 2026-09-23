@@ -9,6 +9,7 @@ import os
 import resource
 import time
 from fractions import Fraction
+from pathlib import Path
 
 from baseline import ROOT, machine_load
 from candidate_vectorized import CandidatePool, reachable_values_vectorized
@@ -56,7 +57,9 @@ def main() -> None:
     parser.add_argument("--workers", type=int, required=True)
     parser.add_argument("--variant", choices=("vectorized", "prefix"), required=True)
     parser.add_argument("--target-seconds", type=float, default=20)
+    parser.add_argument("--output-dir", type=Path, default=ROOT / "raw")
     args = parser.parse_args()
+    args.output_dir.mkdir(parents=True, exist_ok=True)
     assert args.workers in (1, 16)
     os.environ["PACK_JOBS"] = str(args.workers)
     case = bench_colgen.Case(n=12, outer_side=Fraction(99, 25))
@@ -94,7 +97,7 @@ def main() -> None:
                 "child_cpu_seconds": after[1] - before[1],
                 "solves": runs,
             }
-            (ROOT / "raw" / f"{args.variant}-{mode}-w{args.workers}-s{sample}.json").write_text(
+            (args.output_dir / f"{args.variant}-{mode}-w{args.workers}-s{sample}.json").write_text(
                 json.dumps(result, indent=2) + "\n"
             )
             print(json.dumps({

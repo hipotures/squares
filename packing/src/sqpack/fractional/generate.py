@@ -359,35 +359,31 @@ def _reachable_values(
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Compact reachable cells by slab intervals, without a full mask or score."""
     ve = cells.v_events
-    band_first = int(np.searchsorted(ve[1:], cells.domain.v_low, side="right"))
-    band_last = int(np.searchsorted(ve[:-1], cells.domain.v_high, side="left"))
-    intervals = []
-    for i, (u0, u1) in enumerate(zip(cells.u_events[:-1], cells.u_events[1:], strict=True)):
-        if not (u1 > cells.domain.u_low and u0 < cells.domain.u_high):
-            continue
-        first = max(
-            band_first,
-            int(np.searchsorted(ve[1:], cells.lows[i] - _REACH_SLACK, side="right")),
-        )
-        last = min(
-            band_last,
-            int(np.searchsorted(ve[:-1], cells.highs[i] + _REACH_SLACK, side="left")),
-        )
-        if first < last:
-            intervals.append((i, first, last))
-    count = sum(last - first for _, first, last in intervals)
-    values = np.empty(count, dtype=np.float64)
-    row_ids = np.empty(len(intervals), dtype=np.intp)
-    firsts = np.empty(len(intervals), dtype=np.intp)
-    offsets = np.empty(len(intervals), dtype=np.intp)
-    pos = 0
-    for slot, (i, first, last) in enumerate(intervals):
-        width = last - first
-        values[pos:pos + width] = cells.mass[i, first:last]
-        row_ids[slot] = i
-        firsts[slot] = first
-        offsets[slot] = pos
-        pos += width
+    band_first = np.searchsorted(ve[1:], cells.domain.v_low, side="right")
+    band_last = np.searchsorted(ve[:-1], cells.domain.v_high, side="left")
+    slabs = (
+        (cells.u_events[1:] > cells.domain.u_low)
+        & (cells.u_events[:-1] < cells.domain.u_high)
+    )
+    first_all = np.maximum(
+        band_first,
+        np.searchsorted(ve[1:], cells.lows - _REACH_SLACK, side="right"),
+    )
+    last_all = np.minimum(
+        band_last,
+        np.searchsorted(ve[:-1], cells.highs + _REACH_SLACK, side="left"),
+    )
+    valid = slabs & (first_all < last_all)
+    row_ids = np.flatnonzero(valid)
+    firsts = first_all[valid]
+    widths = last_all[valid] - firsts
+    offsets = np.empty(row_ids.size, dtype=np.intp)
+    if offsets.size:
+        offsets[0] = 0
+        np.cumsum(widths[:-1], out=offsets[1:])
+    values = np.empty(int(widths.sum()), dtype=np.float64)
+    for row, first, width, offset in zip(row_ids, firsts, widths, offsets, strict=True):
+        values[offset:offset + width] = cells.mass[row, first:first + width]
     return values, row_ids, firsts, offsets
 
 
