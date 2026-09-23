@@ -156,6 +156,7 @@ session:
   - Closeout records preflight passed 35 selected steps in 220.04 seconds, dominated by 220.04 seconds reading the linked-worktree bead tree. After the evidence edit, all 8 applicable schema, inventory, rung, exact-figure, case-prose, generated-table and front-door checks passed in 11.79 seconds.
   resource_rollups:
   - packing/campaign/resource-usage/codex-task-tree-session-153-native-draft.yaml
+  - packing/campaign/resource-usage/codex-task-tree-session-153-native-closeout.yaml
   stop_reason: null
   next_action: Integrate the final green PR 222 base and publish the independently reviewed PR 223 closeout; keep the proof receipt pinned to c183cc9ab and distinguish final-head checks from its historical full gate.
 ---
@@ -187,8 +188,15 @@ The
 covers this primary Astra implementation lane from its start through 23:18 UTC:
 1,922.174 elapsed seconds and 1,984.469 agent-active seconds, including automatic
 approval review. It is a live lower bound and excludes the separate Sol test lane and
-shared coordinator. Subsequent receipts must start at this cutoff to avoid counting the
-same interval twice.
+shared coordinator. The
+[closeout interval](../resource-usage/codex-task-tree-session-153-native-closeout.yaml)
+starts at that cutoff and ends at `2026-09-23T02:12:41Z`. It adds 3,751.135 agent-active
+seconds, for a measured total of 5,735.604 seconds (95.5934 minutes) in this primary
+lane.
+Both intervals retain their live-snapshot lower-bound flags; subsequent publication
+work and the separate Sol and coordinator lanes are outside this stated total.
+The complete proof’s 6,197.381 host seconds are reported separately and are not added to
+agent-active time.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

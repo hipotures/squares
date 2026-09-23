@@ -4613,6 +4613,7 @@ in separate tables: their units differ, and the same work can appear in both.
 | `codex-task-tree-session-134.yaml` | session-134 | 497 | 4.88 h | 1.21 h | 1.21 h | yes |
 | `codex-task-tree-session-135.yaml` | session-135 | 437 | 1.53 h | 0.48 h | 0.48 h | yes |
 | `codex-task-tree-session-152.yaml` | session-152 | 2,141 | 12.27 h | 4.31 h | 4.31 h | yes |
+| `codex-task-tree-session-153-native-closeout.yaml` | session-153 | 191 | 1.04 h | 1.0 h | 2.91 h | yes |
 | `codex-task-tree-session-153-native-draft.yaml` | session-153 | 103 | 0.55 h | 0.53 h | 0.53 h | yes |
 | `session-142-stack-correctness.yaml` | session-142 | 1,186 | 5.01 h | 2.29 h | 2.3 h | yes |
 | `codex-task-tree-pr137-publication-tail.yaml` | unattributed | 610 | 4.39 h | 1.77 h | 1.82 h | yes |
