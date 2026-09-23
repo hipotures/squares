@@ -341,16 +341,9 @@ on.
 It is not the next thing, because a reassessment of what to search is queued in front
 of it.
 
-For the next supervised exact-research goal, after PR 222 is green and mergeable, start
-two separate branches from its head in parallel.
-The selected `think-d010` branch decides the complete n11 adaptive parent-core catalogue
-by an independent coverage method while preserving its admissible centre domain and
-addressing the native site and feature-slot limits.
-The other branch reconciles PR 221 while retaining every historical result and the
-strongest justified current bounds.
-Existing identifiers from PR 221 take precedence; any later conflicting identifiers are
-renumbered after PR 221’s sequence with every reference.
-PR 222 introduces no T-ID.
+For the next supervised exact-research goal, `think-vx26` renders T-033’s missing
+standalone claim document from the retained result and evidence records.
+The reconciliation is complete; the claim surface remains the bounded publication gap.
 
 The W5 efficiency block that stood here is discharged.
 Its headline turned out to be a correction rather than a confirmation: the exhaustive

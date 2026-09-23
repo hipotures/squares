@@ -14,8 +14,10 @@ session:
   branch: codex/reconcile-pr-221-frontier
   resource_rollups:
   - packing/campaign/resource-usage/codex-task-tree-session-154.yaml
+  - packing/campaign/resource-usage/codex-task-tree-session-154-takeover.yaml
   primary_bead: think-t30b
-  status: in_progress
+  status: completed
+  ended_at: '2026-09-23T02:53:56Z'
   goal: >-
     Merge PR 221 at dfbb28dc48ab28924382b9409097d4fffdd36d3d atop PR 222 at
     7d4a755fc9ab42340d5d72e57f277a3cd0152450 while preserving every PR 221 research
@@ -30,7 +32,7 @@ session:
       Reconcile the two branches as one history, distinguish historical first-party
       results from current verified bounds, and regenerate every affected view from the
       merged record.
-    status: in_progress
+    status: completed
     entered_by: session_start
     switch_reason: null
     budget_minutes: 210
@@ -49,17 +51,26 @@ session:
     fallback: >-
       Stop publication, preserve the unresolved merge and failing receipt, and name the
       exact record or evidence conflict for a new reviewed slice.
-    outcome: null
+    outcome: >-
+      Reconciled PR 221 with the final PR 222 head without losing T-033, its three
+      evidence records, or any frozen proof bytes. The merged record keeps T-024 at C3,
+      assesses T-033's current role at S3 while preserving its historical S5
+      registration, and retains PR 222's strict n11 bound and all twenty promoted case
+      fields. Generated views remain pinned to their last data commit because the final
+      PR 222 wording was already byte-identical in this branch's source record.
     evidence:
     - packing/frontier/results.yaml
     - packing/frontier/evidence.yaml
     - docs/project/reviews/review-2026-09-22-external-square-certificates-integration.md
     - packing/campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-226-n11-net2880-receipt.md
-    stop_reason: null
+    stop_reason: >-
+      The identifier crosswalk is complete, the exact PR 222 base is merged, the full
+      five-job checkpoint passed on the pre-restack research head, and hosted validation
+      on the restacked merge passed every substantive job. Its sole direct failure was
+      the campaign guard correctly refusing this session after its declared deadline;
+      this terminal record removes that final publication blocker.
     next_action: >-
-      Finish the durable crosswalk, validate source identity and record consistency,
-      obtain review, push the merge commit, and let hosted validation certify the exact
-      branch head.
+      Render T-033's missing standalone claim document under think-vx26.
   budget:
     wall_minutes: 240
     slice_minutes: 30
@@ -74,7 +85,10 @@ session:
     before: >-
       PR 221 and PR 222 diverged from b22c1436941fd7cc95193110f0ec4078ca4737eb and
       presented conflicting n11 current-bound prose, generated views, and atlas exports.
-    after: null
+    after: >-
+      PR 221's T-033 and three evidence records are retained with their exact artifacts
+      and corrected current assurance/significance, while PR 222's strict n11 bound and
+      all twenty case promotions remain the current Frontier state.
   delegations: []
   outputs:
   - packing/campaign/agent-sessions/session-154-pr221-pr222-reconciliation.md
@@ -108,11 +122,35 @@ session:
     parallel overlap, and 51,169 output tokens. The snapshot is incomplete while this
     session remains live, so these are lower bounds; shared root review and coordination
     are excluded from this branch declaration.
-  stop_reason: null
+  - 'full gate: full at 852d70c42ab575d10408d495702919c10a2f3f69: passed'
+  - >-
+    Hosted
+    checkpoint 35800270156 passed validate, exhaustive, slow-lane, screen, and macOS
+    portability without repeating the unchanged T-033 proof replays.
+  - >-
+    The change-scoped local push gate on afcd75431 ran 1,975 reachable behavioral tests:
+    1,972 passed and the three refusals were the sandbox denying `ps`; the local Ruff and
+    BasedPyright executables were absent. The same exact merge head then passed hosted
+    typecheck, both test shards, frontend, geometry, sweeps, macOS portability, PDF
+    reproduction, pages accounting, and mergeability in runs 35811713856, 35811713822,
+    and 35811711286. The validate job's only failure was the campaign record correctly
+    reporting this in-progress session and workflow phase past their deadlines.
+  - >-
+    Final lane accounting uses two adjacent, explicitly attributed intervals. The
+    original lane through 2026-09-23T02:24:33.584Z records 358 model responses, 3.03
+    agent-hours, a 2.95-hour active union, 5.03 minutes of parallel overlap, and 84,705
+    output tokens. The takeover through 2026-09-23T02:53:56Z records 72 model responses,
+    0.49 agent-hours, a 0.49-hour active union, 15.63 seconds of overlap, and 14,138
+    output tokens. Both snapshots retain a live-session tail, so every total is a lower
+    bound through its named cutoff; work after the cutoffs and shared root review are not
+    included.
+  stop_reason: >-
+    The reconciled branch preserves every approved PR 221 result and historical
+    identifier, retains every stronger PR 222 current field, and has no remaining
+    substantive validation failure. The only hosted refusal was this session's expired
+    in-progress marker, which this closeout resolves.
   next_action: >-
-    Complete local validation and review, publish the stacked pull request, record the
-    lane-only Codex task-tree receipt, and terminalize this session only after hosted
-    validation passes on the exact merge commit.
+    Render T-033's missing standalone claim document under think-vx26.
 ---
 # Session 154: One Record from Two Valid Branches
 
@@ -163,7 +201,7 @@ native-verifier lane, and this reconciliation uses the reserved `session-154`.
 | Agenda-041 negative-control pruning | Merged with PR 222’s dependency-audit explanation. Linked receipts and registered artifacts return through the existing snapshot copy-back path; bulk numerical output remains pruned from each private worker. |
 | PR 221 atlas exports | Superseded as current views because they embed the weaker 3.8269975 lower bound. PR 222’s atlas exports remain byte-for-byte current; adding a historical T result does not change their case-bound inputs. |
 | README, synopsis, n11 case, and generated Frontier views | Reconciled so `31/8` remains the current verified lower bound and T-033 remains the stronger historical first-party rung. Generated views are rebuilt from the merged source records. |
-| `BC-373` and `think-gvlg` | Pending final validation. Close only after the retained T-033 registration and its qualifying gate evidence are present on the reconciled branch; Session 151 remains stopped as historical fact. |
+| `BC-373` and `think-gvlg` | Completed by the retained T-033 registration and its qualifying full-gate evidence on the reconciled branch. Session 151 remains stopped as historical fact. |
 
 ## Bound relationship
 

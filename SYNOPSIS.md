@@ -156,8 +156,8 @@ hypothesis status and summarizes experiment verdicts, and the
 | Record | Count | State at the cutoff |
 | --- | ---: | --- |
 | Agendas | 38 | 18 active; 14 completed; 5 paused; 1 superseded |
-| Commitments | 362 | 182 complete; 61 stopped; 68 blocked; 16 ready; 21 tentative; 14 in progress |
-| Sessions | 153 | 93 completed; 59 stopped; 1 nonterminal |
+| Commitments | 362 | 183 complete; 61 stopped; 68 blocked; 16 ready; 21 tentative; 13 in progress |
+| Sessions | 153 | 94 completed; 59 stopped; all terminal |
 | Explorations | 40 | 24 linked to proposed hypotheses; 16 uncodified |
 | Hypotheses | 170 | 29 confirmed; 31 refuted; 55 blocked; 17 unresolved; 5 open; 29 open questions; 2 result registered; 2 abandoned; 0 running |
 | Experiments | 155 | 43 accepted; 36 rejected; 50 unresolved; 12 baseline; 11 blocked; 3 abandoned; 0 in progress |
@@ -1140,18 +1140,18 @@ not certification. The closure is certified at reachable branch commit
 `819ade7ca8afbe634a6ee54f215f0878f5674031` solely by the
 [hosted five-job full gate](https://github.com/jlevy/squares/actions/runs/35784995867).
 
-**Selected next entry:** `think-d010`. After PR 222 is green and mergeable, two separate
-branches start from PR 222’s head in parallel.
-The `think-d010` branch decides the complete n11 adaptive parent-core catalogue by an
-independent coverage method while preserving its admissible centre domain and addressing
-the native site and feature-slot limits.
-The other branch reconciles PR 221 while retaining every historical result and the
-strongest justified current bounds.
-Existing identifiers from PR 221 take precedence; any later conflicting identifiers are
-renumbered after PR 221’s sequence with every reference.
-PR 222 introduces no T-ID. `think-ck07` separately owns a second complete
-density-verification method, and `think-c0xc` owns the continuation-driver admission
-guard.
+**[Session 154](packing/campaign/agent-sessions/session-154-pr221-pr222-reconciliation.md)**
+reconciled PR 221 with the final PR 222 head.
+T-033 and its three evidence records remain the retained first-party 2880-step rung,
+while the external strict `s(11) > 31/8` result remains the current case bound and all
+twenty promoted fields remain current.
+BC-373 is complete on the retained T-033 receipt and full-gate evidence; Session 151
+stays stopped as the historical record of its cutoff.
+
+**Selected next entry:** `think-vx26`. Render T-033’s missing standalone claim document
+from the retained result and evidence records.
+`think-tzg7` separately owns the frozen producer-provenance limitation, and `think-380b`
+owns the broader significance rubric.
 
 **Selected next entry at the Session 151 cutoff:** `think-gvlg`, registering the
 `n = 11` rung Session 151 left accepted and unregistered.
@@ -4617,7 +4617,8 @@ in separate tables: their units differ, and the same work can appear in both.
 | `codex-task-tree-session-134.yaml` | session-134 | 497 | 4.88 h | 1.21 h | 1.21 h | yes |
 | `codex-task-tree-session-135.yaml` | session-135 | 437 | 1.53 h | 0.48 h | 0.48 h | yes |
 | `codex-task-tree-session-152.yaml` | session-152 | 2,141 | 12.27 h | 4.31 h | 4.31 h | yes |
-| `codex-task-tree-session-154.yaml` | session-154 | 146 | 0.69 h | 0.67 h | 0.68 h | yes |
+| `codex-task-tree-session-154-takeover.yaml` | session-154 | 72 | 0.49 h | 0.49 h | 0.49 h | yes |
+| `codex-task-tree-session-154.yaml` | session-154 | 358 | 3.03 h | 2.95 h | 3.63 h | yes |
 | `session-142-stack-correctness.yaml` | session-142 | 1,186 | 5.01 h | 2.29 h | 2.3 h | yes |
 | `codex-task-tree-pr137-publication-tail.yaml` | unattributed | 610 | 4.39 h | 1.77 h | 1.82 h | yes |
 | `codex-task-tree-pr142-publication-tail.yaml` | unattributed | 136 | 0.87 h | 0.41 h | 0.58 h | yes |
