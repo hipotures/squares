@@ -28,7 +28,7 @@ per certificate; the prose is filled once, with the headline certificate's value
   <span>Human oversight: <a href="https://x.com/ojoshe"><strong>Joshua Levy</strong></a></span>
   <span>Agents: <strong>Opus 5</strong>, <strong>Fable 5.1</strong>, <strong>GPT 5.6 Sol</strong>, and <strong>GPT-6 Astra</strong></span>
   <span><a href="https://github.com/jlevy/squares"><strong>github.com/jlevy/squares</strong></a></span>
-  <span class="publication-date">{{PUBLISHED}} (<a href="#version-history">{{EDITION}}</a>)</span>
+  <span class="publication-date">First published {{FIRST_PUBLISHED}} · {{EDITION}} (<a href="#version-history">version history</a>)</span>
 </div>
 
 </div>

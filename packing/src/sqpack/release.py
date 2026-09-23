@@ -41,20 +41,42 @@ from typing import NamedTuple
 
 
 class PublicationHistoryEntry(NamedTuple):
-    """One retained public edition and its headline result scope."""
+    """One public edition, when it was first published, and its headline result."""
 
     version: str
-    first_labeled: str
+    first_published: str
     result_scope: str
 
 
-#: The two editions retained in the explainer's short public history, newest first.
-#: Dates say when each label first appeared in Git as an edition of this publication,
-#: rather than when a theorem was proved or when the page was deployed.
+#: Every edition this publication has had, newest first, and NONE is ever removed.
+#:
+#: It used to be "the two editions retained in the explainer's short public history", and
+#: under that rule adding v0.4.1 on 2026-09-22 dropped v0.3.0 -- the first edition, and the
+#: proof of s(11) >= 381/100 the whole publication began with. A history that keeps the
+#: last two is a changelog of the last two; a reader who wants to know when the result was
+#: first put in front of anyone needs the first one most. `test_release` holds the list to
+#: its oldest entry being that edition.
+#:
+#: Dates are when each edition's content was **first published** -- first live on the
+#: public page -- read from the repository's GitHub Pages deployments, in UTC. They used to
+#: be when each version *label* first appeared in Git, which is a different date whenever
+#: an edition went live before it was named or was named before it went live, and both
+#: happened (the owner, 2026-09-22: "accurately record the date of when that was first
+#: published"). The deployment and commit behind each date, so it can be re-read:
+#:
+#:   v0.4.1  2026-09-22T23:12:36Z  d5b1c2e1b  the merge of PR 218, label and content together
+#:   v0.4.0  2026-09-13T22:12:47Z  f2e24e07b  T-025's 191/50 and the v0.4.0 label first live;
+#:                                            the label was cut on a branch on September 10
+#:   v0.3.0  2026-09-05T08:06:30Z  f060b1d78  the first Pages deployment of all, headlining
+#:                                            s(11) >= 381/100; "v0.3.0" was only put on it
+#:                                            on September 8 (`ce3b1ab56`)
+#:
+#: Reproduce with `gh api "repos/jlevy/squares/deployments?environment=github-pages"` and,
+#: for each deployment's commit, what the page it built stated.
 PUBLICATION_HISTORY = (
     PublicationHistoryEntry(
         version="v0.4.1",
-        first_labeled="September 22, 2026",
+        first_published="September 22, 2026",
         result_scope=(
             "The shared-version edition: the page and the atlas carry one version, "
             "named for the last commit that changed the data, and the atlas adds "
@@ -63,11 +85,18 @@ PUBLICATION_HISTORY = (
     ),
     PublicationHistoryEntry(
         version="v0.4.0",
-        first_labeled="September 10, 2026",
+        first_published="September 13, 2026",
         result_scope=(
             "The T-025/T-026 proof edition: T-025 proves "
             "$s(11) ≥ 191/50 = 3.82$, and T-026 proves "
             "$s(11) ≥ 3.8264474…$."
+        ),
+    ),
+    PublicationHistoryEntry(
+        version="v0.3.0",
+        first_published="September 5, 2026",
+        result_scope=(
+            "The first edition: T-018's point certificate proves $s(11) ≥ 381/100 = 3.81$."
         ),
     ),
 )
@@ -127,8 +156,13 @@ PUBLICATION_STAMP = f"{PUBLICATION_VERSION}-{DATA_REVISION[:DATA_REVISION_LENGTH
 #: holding a draft, nor about how the version is spelled.
 PUBLICATION_EDITION = " ".join(part for part in (PUBLICATION_STATUS, PUBLICATION_STAMP) if part)
 
-#: The date that edition carries, written the way a reader reads it.
-PUBLICATION_DATE = PUBLICATION_HISTORY[0].first_labeled
+#: When the current edition was first published, written the way a reader reads it.
+PUBLICATION_DATE = PUBLICATION_HISTORY[0].first_published
+
+#: When the publication itself was first published: its oldest edition's date, which the
+#: page puts at the top beside the current version, so a reader sees both how old the
+#: result is and how recently it was revised.
+FIRST_PUBLISHED = PUBLICATION_HISTORY[-1].first_published
 
 #: The commit the committed claim documents link to (`render_explainer.edition_file`), at
 #: this repository's short length. It is pinned for the reason `DATA_REVISION` is: those

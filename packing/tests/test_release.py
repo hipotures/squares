@@ -4,8 +4,11 @@ The atlas footer and the explainer's credits each used to compose the stamp from
 parts, in two files and two languages, and the page named its build commit where the
 atlas named a pinned one. Hand-assembled spellings of one fact are how they come to
 disagree. What is pinned here is the shape, the single source, and the drift check that
-holds the pinned data revision to git. The short public history is the exception: its
-focused regression changes when an edition enters or leaves that two-entry record.
+holds the pinned data revision to git.
+
+The version history is held to two rules of its own: it only grows, back to the first
+edition, and each edition is dated by when it was first published rather than when its
+label was first written down.
 """
 
 from __future__ import annotations
@@ -19,6 +22,7 @@ import pytest
 from sqpack.release import (
     DATA_REVISION,
     DATA_REVISION_LENGTH,
+    FIRST_PUBLISHED,
     PUBLICATION_DATE,
     PUBLICATION_EDITION,
     PUBLICATION_HISTORY,
@@ -26,6 +30,7 @@ from sqpack.release import (
     PUBLICATION_STAMP,
     PUBLICATION_STATUS,
     PUBLICATION_VERSION,
+    PublicationHistoryEntry,
     data_pathspec,
     data_revision,
     data_version,
@@ -89,18 +94,46 @@ def history(tmp_path: Path) -> tuple[Path, str]:
     return repo, data
 
 
-def test_publication_history_is_the_two_retained_editions() -> None:
-    """The public history stays short, dated, and tied to the current edition."""
-    assert [entry.version for entry in PUBLICATION_HISTORY] == ["v0.4.1", "v0.4.0"]
-    assert [entry.first_labeled for entry in PUBLICATION_HISTORY] == [
-        "September 22, 2026",
-        "September 10, 2026",
-    ]
-    assert "4679/1000" in PUBLICATION_HISTORY[0].result_scope
-    assert "3.8264474…" in PUBLICATION_HISTORY[1].result_scope
+def _version(entry: PublicationHistoryEntry) -> tuple[int, ...]:
+    return tuple(int(part) for part in entry.version.removeprefix("v").split("."))
+
+
+def test_the_history_keeps_every_edition_back_to_the_first() -> None:
+    """An edition that was published stays in the history, and the first one most of all.
+
+    This test used to say the history was "the two retained editions", which is the rule
+    that let adding v0.4.1 drop v0.3.0 -- the proof of s(11) >= 381/100 the publication
+    began with -- and pass. The history now only grows: every edition ever published is
+    listed, newest first, and the oldest is the 381/100 edition. A new edition goes on the
+    front; nothing comes off the back.
+    """
+    versions = [entry.version for entry in PUBLICATION_HISTORY]
+    assert {"v0.4.1", "v0.4.0", "v0.3.0"} <= set(versions)
+    assert len(set(versions)) == len(versions)
+    assert [_version(e) for e in PUBLICATION_HISTORY] == sorted(
+        (_version(e) for e in PUBLICATION_HISTORY), reverse=True
+    )
+    first = PUBLICATION_HISTORY[-1]
+    assert first.version == "v0.3.0"
+    assert "381/100" in first.result_scope
     assert all("weak" not in entry.result_scope.lower() for entry in PUBLICATION_HISTORY)
     assert PUBLICATION_HISTORY[0].version == PUBLICATION_VERSION
-    assert PUBLICATION_HISTORY[0].first_labeled == PUBLICATION_DATE
+
+
+def test_each_edition_is_dated_by_when_it_was_first_published() -> None:
+    """The dates are first publication, read from the Pages deployments, not labelling.
+
+    Two of the three differ from the old label dates, in opposite directions: v0.3.0 went
+    live on September 5 and was named on September 8; v0.4.0 was named on a branch on
+    September 10 and went live on September 13. The deployments behind each are in the
+    comment on `PUBLICATION_HISTORY`.
+    """
+    dated = {entry.version: entry.first_published for entry in PUBLICATION_HISTORY}
+    assert dated["v0.3.0"] == "September 5, 2026"
+    assert dated["v0.4.0"] == "September 13, 2026"
+    assert dated["v0.4.1"] == "September 22, 2026"
+    assert PUBLICATION_HISTORY[0].first_published == PUBLICATION_DATE
+    assert PUBLICATION_HISTORY[-1].first_published == FIRST_PUBLISHED
 
 
 def test_the_stamp_is_a_version_and_a_data_revision_and_nothing_else() -> None:
