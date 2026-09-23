@@ -44,6 +44,7 @@ none, and deliberately does not read the "Optimized by" sentence the hand pass r
 
 from __future__ import annotations
 
+import argparse
 import math
 import re
 import shutil
@@ -68,9 +69,12 @@ from devtools.generate_frontier_case import (
     UNITSQUARE_SOURCE_KEY,
     CatalogueFacts,
     GenerationError,
+    LowerBoundPromotion,
+    PreservedListItem,
     SourceAvailability,
     analytically_optimized_from_credit,
     build_payload,
+    check_records,
     construction_method_from_credit,
     credited_surnames,
     facts_from_catalogue_entry,
@@ -78,10 +82,12 @@ from devtools.generate_frontier_case import (
     grid_ceiling,
     load_availability,
     load_unitsquare_release,
+    lower_bound_promotion_from_records,
     main,
     method_summary,
     record_path,
     refuse_reason,
+    render_record,
     without_rigidity,
     write_record,
 )
@@ -207,13 +213,167 @@ def _regenerate(n: int, *, facts: CatalogueFacts | None = None) -> str:
         # parent the release improved on, and the catalogue's credit chain is where
         # those authors are written down. So this one comes from the real parser.
         facts = _parsed_facts(n)
-    return generate_record(
-        n,
-        availability={n: _availability(n, kind)},
-        catalogue=None if facts is None else {n: facts},
-        review_date=str(payload["source_reviewed"]),
-        retrieved_date=str(payload["reported_upper_bound"]["retrieved_date"]),
+    arguments = {
+        "availability": {n: _availability(n, kind)},
+        "catalogue": None if facts is None else {n: facts},
+        "review_date": str(payload["source_reviewed"]),
+        "retrieved_date": str(payload["reported_upper_bound"]["retrieved_date"]),
+    }
+    generated = generate_record(n, **arguments)
+    generated_payload = safe_load(generated.split("---\n", 2)[1])["packing"]
+    promotion = lower_bound_promotion_from_records(payload, generated_payload)
+    return generate_record(n, **arguments, lower_bound_promotion=promotion)
+
+
+PROMOTED_LOWER_CASES = (
+    11,
+    17,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    39,
+    40,
+    41,
+    52,
+    53,
+    55,
+    56,
+    68,
+    69,
+    70,
+    71,
+    72,
+)
+
+
+@pytest.mark.parametrize("n", PROMOTED_LOWER_CASES)
+def test_preserves_reviewed_lower_bound_promotions_as_case_bound_deltas(n: int) -> None:
+    """Reviewed enrichment survives without treating copied fields as a derivation."""
+    document, _ = _committed(n)
+    reviewed = document["packing"]
+    kind = _source_kind(reviewed)
+    facts = None if kind == GRID else _injected_facts(n)
+    arguments = {
+        "availability": {n: _availability(n, kind)},
+        "catalogue": None if facts is None else {n: facts},
+        "review_date": str(reviewed["source_reviewed"]),
+        "retrieved_date": str(reviewed["reported_upper_bound"]["retrieved_date"]),
+    }
+    baseline = safe_load(generate_record(n, **arguments).split("---\n", 2)[1])["packing"]
+    promotion = lower_bound_promotion_from_records(reviewed, baseline)
+    assert promotion is not None
+    assert promotion.source_n == n
+
+    preserved = safe_load(
+        generate_record(n, **arguments, lower_bound_promotion=promotion).split("---\n", 2)[1]
+    )["packing"]
+    assert preserved["reported_lower_bound"] == reviewed["reported_lower_bound"]
+    assert preserved["verified_lower_bound"] == reviewed["verified_lower_bound"]
+    for addition in promotion.evidence_additions:
+        assert preserved["evidence"][addition.index] == addition.value
+    for addition in promotion.resource_additions:
+        assert preserved["resources"][addition.index] == addition.value
+
+
+def test_a_lower_bound_promotion_cannot_move_to_another_case() -> None:
+    promotion = LowerBoundPromotion(
+        source_n=68,
+        reported_lower_bound=None,
+        verified_lower_bound={
+            "value": "8.41",
+            "exact_form": "841/100",
+            "evidence": ["E-wand125-n068-derived-lower"],
+        },
+        evidence_additions=(),
+        resource_additions=(),
     )
+    with pytest.raises(GenerationError, match="for n=68 cannot be applied to n=69"):
+        generate_record(
+            69,
+            availability={69: _availability(69, UNITSQUARE)},
+            catalogue={69: _injected_facts(69)},
+            review_date="2026-09-22",
+            retrieved_date="2026-09-22",
+            lower_bound_promotion=promotion,
+        )
+
+
+def test_a_changed_value_without_new_lower_evidence_is_drift() -> None:
+    """A Nagamochi typo is not converted into a preserved editorial promotion."""
+    n = 111
+    text = generate_record(
+        n,
+        availability=load_availability(),
+        catalogue=None,
+        review_date="2026-09-07",
+        retrieved_date="2026-09-07",
+    )
+    generated = safe_load(text.split("---\n", 2)[1])["packing"]
+    reviewed = dict(generated)
+    reviewed["verified_lower_bound"] = {
+        **generated["verified_lower_bound"],
+        "value": "10.5",
+    }
+    assert lower_bound_promotion_from_records(reviewed, generated) is None
+
+
+def test_check_preserves_a_promotion_but_catches_generator_owned_drift(tmp_path: Path) -> None:
+    """Editorial lower-bound evidence survives; a changed upper bound still fails check."""
+    n = 111
+    availability = load_availability()
+    arguments = {
+        "availability": availability,
+        "catalogue": None,
+        "review_date": "2026-09-07",
+        "retrieved_date": "2026-09-07",
+    }
+    baseline = safe_load(generate_record(n, **arguments).split("---\n", 2)[1])["packing"]
+    verified = dict(baseline["verified_lower_bound"])
+    verified["evidence"] = ["E-reviewed-lower-promotion"]
+    promotion = LowerBoundPromotion(
+        source_n=n,
+        reported_lower_bound=None,
+        verified_lower_bound=verified,
+        evidence_additions=(PreservedListItem(index=0, value="E-reviewed-lower-promotion"),),
+        resource_additions=(
+            PreservedListItem(
+                index=0,
+                value={
+                    "key": "[reviewed lower promotion]",
+                    "role": "lower-bound-proof",
+                    "local": "web/reviewed-lower-promotion",
+                    "url": "https://example.com/reviewed-lower-promotion",
+                    "retrieved": True,
+                },
+            ),
+        ),
+    )
+    path = record_path(tmp_path, n)
+    write_record(generate_record(n, **arguments, lower_bound_promotion=promotion), path)
+    check_args = argparse.Namespace(
+        out=tmp_path,
+        review_date="2026-09-22",
+        retrieved_date="2026-09-22",
+    )
+    assert check_records([n], check_args, availability, None) == 0
+
+    path.write_text(
+        path.read_text(encoding="utf-8").replace("value: '11.0'", "value: '11.1'", 1),
+        encoding="utf-8",
+    )
+    assert check_records([n], check_args, availability, None) == 1
+
+    baseline_payload = safe_load(generate_record(n, **arguments).split("---\n", 2)[1])[
+        "packing"
+    ]
+    write_record(render_record(baseline_payload), path)
+    assert check_records([n], check_args, availability, None) == 0
+    baseline_payload["verified_lower_bound"]["value"] = "10.5"
+    write_record(render_record(baseline_payload), path)
+    assert check_records([n], check_args, availability, None) == 1
 
 
 def _flatten(value: object, prefix: str = "") -> dict[str, object]:

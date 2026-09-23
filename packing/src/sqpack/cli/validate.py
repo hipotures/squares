@@ -62,11 +62,12 @@ from sqpack.yamlio import safe_load
 #: re-argued when the corpus grows (think-93on): the open-case counts, the records the
 #: screen excludes by shape residual, and the screen's four findings.
 FRONTIER_COUNTS: dict[str, tuple[int, int, int]] = {
-    # (formal-open, reported-open, Nagamochi-bounded). 58 since 2026-09-04: T-020's
-    # certificate at 24/5 took n = 20 and n = 21 off the closed form.
-    "n=1..100": (65, 65, 58),
-    "n=1..200": (153, 153, 146),
-    "n=1..324": (265, 265, 258),
+    # (formal-open, reported-open, Nagamochi-bounded). 40 since 2026-09-22: exact and
+    # interval replays promoted 18 external-certificate cases beyond the seven earlier
+    # first-party replacements.
+    "n=1..100": (65, 65, 40),
+    "n=1..200": (153, 153, 128),
+    "n=1..324": (265, 265, 240),
 }
 SCREEN_EXCLUDED: dict[str, tuple[str, ...]] = {
     "n=1..100": ("n=68", "n=69"),
@@ -2614,7 +2615,8 @@ def _frontier_corpus(context: Context) -> str:
     # 60 since 2026-09-03: the adopted Massaccesi certificate took over the verified
     # lower bound at n = 19 by monotonicity (T-016), so a third case stopped citing it.
     # 58 since 2026-09-04: T-020's certificate at 24/5 took n = 20 and n = 21 off the
-    # closed form, the first bounds specific to either size. This constant is a
+    # closed form, the first bounds specific to either size. 40 since 2026-09-22: exact
+    # and interval replays promoted 18 external-certificate cases. This constant is a
     # tripwire, not a derivation -- check_nagamochi_bounds reads the count from the
     # record; this line exists so the record cannot move without someone saying so.
     # Deliberately NOT derived from KNOWN_BEST_CORPUS: widening the corpus adds open

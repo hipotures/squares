@@ -185,12 +185,13 @@ def test_axis_parallel_grid_packings_cap_exactly_at_the_ceiling() -> None:
         assert row["verdict"] != "cap"
 
 
-def test_n11_cap_reproduces_x014_at_the_retained_shrink() -> None:
+def test_n11_cap_reproduces_x014_and_the_current_bound_forecloses_it() -> None:
     """X-014's arithmetic: `U * B * (cos d + sin d)` is 3.868983 at `B = 9977/10000`.
 
     The shrink is read from the retained certificate rather than typed here, and the
     net-level cap must sit at or above the shrink-level one -- `1 / (1 + D)` exceeds
-    the retained `B` -- and strictly below the packing.
+    the retained `B` -- and strictly below the packing. The later external lower bound
+    exceeds that cap, so the fixed-net method is now foreclosed for the current case.
     """
     row = next(row for row in cases() if row["n"] == 11)
     record, _ = load_certificate(CASES / "n11_fractional_certificate" / "certificate.json")
@@ -199,8 +200,10 @@ def test_n11_cap_reproduces_x014_at_the_retained_shrink() -> None:
     at_shrink = packing_side_cap(row["upper"], row["tilts"], NET, shrink)
     assert f"{at_shrink:.6f}" == "3.868983"
     assert at_shrink <= row["cap"] < row["upper"]
+    assert row["cap"] < row["lower"] < row["upper"]
     assert row["bound"] == "cap"
-    assert row["verdict"] == "cap"
+    assert row["verdict"] == "foreclosed"
+    assert row["prize"] == 0.0
 
 
 def test_every_symmetric_image_of_a_tilt_folds_to_the_same_cap() -> None:
@@ -243,21 +246,25 @@ def test_the_limit_never_exceeds_the_ceiling() -> None:
             assert row["verdict"] != "packing"
 
 
-def test_the_cap_forecloses_the_solved_tilted_cases() -> None:
+def test_the_cap_forecloses_solved_tilted_cases_and_the_new_n11_bound() -> None:
     """n = 5 and n = 10 are solved and their packings carry a 45-degree tilt.
 
     The cap sits strictly below the proved value, so nothing was ever on offer there,
-    and the table now says so instead of listing a `+0.0000` prize.
+    and the table now says so instead of listing a `+0.0000` prize. The current n = 11
+    lower bound also exceeds its first-party fixed-net cap while remaining below its
+    packing bound.
     """
     rows = cases()
     by_cap = {
         row["n"] for row in rows if row["verdict"] == "foreclosed" and row["bound"] == "cap"
     }
-    assert by_cap == {5, 10}
+    assert by_cap == {5, 10, 11}
     for row in rows:
-        if row["n"] in by_cap:
+        if row["n"] in {5, 10}:
             assert row["lower"] == pytest.approx(row["upper"])
             assert row["cap"] < row["lower"]
+    n11 = next(row for row in rows if row["n"] == 11)
+    assert n11["cap"] < n11["lower"] < n11["upper"]
 
 
 def test_an_empty_tilt_inventory_is_refused() -> None:

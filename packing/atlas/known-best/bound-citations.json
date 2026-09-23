@@ -162,16 +162,14 @@
       {
         "lower": {
           "assurance": "verified",
-          "basis": "project",
+          "basis": "external",
           "confirmed_by": [],
           "note": null,
-          "result": "T-033",
-          "results": [
-            "T-033"
-          ],
-          "source_key": null,
-          "text": "This project 2026, result T-033",
-          "value": "3.826997548829543"
+          "result": null,
+          "results": [],
+          "source_key": "[Kleddamag n11 2026]",
+          "text": "Kleddamag 2026, GitHub",
+          "value": "3.875"
         },
         "n": 11,
         "record": "n-011",
@@ -286,17 +284,13 @@
         "lower": {
           "assurance": "verified",
           "basis": "external",
-          "confirmed_by": [
-            "T-032"
-          ],
-          "note": "(confirmed T-032)",
+          "confirmed_by": [],
+          "note": null,
           "result": null,
-          "results": [
-            "T-032"
-          ],
-          "source_key": "[n17 weighted certificates 2026-09-20]",
-          "text": "Guzhou0806 & Mira 2026, GitHub",
-          "value": "4.613046130461"
+          "results": [],
+          "source_key": "[Kleddamag n17 certified bound]",
+          "text": "Kleddamag 2026, GitHub",
+          "value": "4.619791092906572"
         },
         "n": 17,
         "record": "n-017",
@@ -481,12 +475,10 @@
           "confirmed_by": [],
           "note": null,
           "result": null,
-          "results": [
-            "T-007"
-          ],
-          "source_key": "[Nagamochi 2005]",
-          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
-          "value": "5.12310562562"
+          "results": [],
+          "source_key": "[Tokoharu density 2026]",
+          "text": "Tokoharu 2026, GitHub",
+          "value": "5.508"
         },
         "n": 26,
         "record": "n-026",
@@ -509,12 +501,10 @@
           "confirmed_by": [],
           "note": null,
           "result": null,
-          "results": [
-            "T-007"
-          ],
-          "source_key": "[Nagamochi 2005]",
-          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
-          "value": "5.24264068712"
+          "results": [],
+          "source_key": "[Tokoharu density 2026]",
+          "text": "Tokoharu 2026, GitHub",
+          "value": "5.508"
         },
         "n": 27,
         "record": "n-027",
@@ -537,12 +527,10 @@
           "confirmed_by": [],
           "note": null,
           "result": null,
-          "results": [
-            "T-007"
-          ],
-          "source_key": "[Nagamochi 2005]",
-          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
-          "value": "5.35889894354"
+          "results": [],
+          "source_key": "[Tokoharu density 2026]",
+          "text": "Tokoharu 2026, GitHub",
+          "value": "5.508"
         },
         "n": 28,
         "record": "n-028",
@@ -565,12 +553,10 @@
           "confirmed_by": [],
           "note": null,
           "result": null,
-          "results": [
-            "T-007"
-          ],
-          "source_key": "[Nagamochi 2005]",
-          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
-          "value": "5.472135955"
+          "results": [],
+          "source_key": "[Tokoharu density 2026]",
+          "text": "Tokoharu 2026, GitHub",
+          "value": "5.71"
         },
         "n": 29,
         "record": "n-029",
@@ -597,12 +583,10 @@
           "confirmed_by": [],
           "note": null,
           "result": null,
-          "results": [
-            "T-007"
-          ],
-          "source_key": "[Nagamochi 2005]",
-          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
-          "value": "5.58257569496"
+          "results": [],
+          "source_key": "[Tokoharu density 2026]",
+          "text": "Tokoharu 2026, GitHub",
+          "value": "5.71"
         },
         "n": 30,
         "record": "n-030",
@@ -615,12 +599,10 @@
           "confirmed_by": [],
           "note": null,
           "result": null,
-          "results": [
-            "T-007"
-          ],
-          "source_key": "[Nagamochi 2005]",
-          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
-          "value": "5.69041575982"
+          "results": [],
+          "source_key": "[Tokoharu density 2026]",
+          "text": "Tokoharu 2026, GitHub",
+          "value": "5.71"
         },
         "n": 31,
         "record": "n-031",
@@ -777,12 +759,10 @@
           "confirmed_by": [],
           "note": null,
           "result": null,
-          "results": [
-            "T-007"
-          ],
-          "source_key": "[Nagamochi 2005]",
-          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
-          "value": "6.29150262213"
+          "results": [],
+          "source_key": "[wand125 point bounds 2026]",
+          "text": "wand125 2026, GitHub",
+          "value": "6.5"
         },
         "n": 39,
         "record": "n-039",
@@ -805,12 +785,10 @@
           "confirmed_by": [],
           "note": null,
           "result": null,
-          "results": [
-            "T-007"
-          ],
-          "source_key": "[Nagamochi 2005]",
-          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
-          "value": "6.38516480713"
+          "results": [],
+          "source_key": "[wand125 point bounds 2026]",
+          "text": "wand125 2026, GitHub",
+          "value": "6.5"
         },
         "n": 40,
         "record": "n-040",
@@ -833,12 +811,10 @@
           "confirmed_by": [],
           "note": null,
           "result": null,
-          "results": [
-            "T-007"
-          ],
-          "source_key": "[Nagamochi 2005]",
-          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
-          "value": "6.47722557505"
+          "results": [],
+          "source_key": "[wand125 point bounds 2026]",
+          "text": "wand125 2026, GitHub",
+          "value": "6.5"
         },
         "n": 41,
         "record": "n-041",
@@ -1065,12 +1041,10 @@
           "confirmed_by": [],
           "note": null,
           "result": null,
-          "results": [
-            "T-007"
-          ],
-          "source_key": "[Nagamochi 2005]",
-          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
-          "value": "7.2449979984"
+          "results": [],
+          "source_key": "[wand125 point bounds 2026]",
+          "text": "wand125 2026, GitHub",
+          "value": "7.38"
         },
         "n": 52,
         "record": "n-052",
@@ -1093,12 +1067,10 @@
           "confirmed_by": [],
           "note": null,
           "result": null,
-          "results": [
-            "T-007"
-          ],
-          "source_key": "[Nagamochi 2005]",
-          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
-          "value": "7.32455532034"
+          "results": [],
+          "source_key": "[wand125 point bounds 2026]",
+          "text": "wand125 2026, GitHub",
+          "value": "7.38"
         },
         "n": 53,
         "record": "n-053",
@@ -1149,12 +1121,10 @@
           "confirmed_by": [],
           "note": null,
           "result": null,
-          "results": [
-            "T-007"
-          ],
-          "source_key": "[Nagamochi 2005]",
-          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
-          "value": "7.48074069841"
+          "results": [],
+          "source_key": "[wand125 point bounds 2026]",
+          "text": "wand125 2026, GitHub",
+          "value": "7.54"
         },
         "n": 55,
         "record": "n-055",
@@ -1177,12 +1147,10 @@
           "confirmed_by": [],
           "note": null,
           "result": null,
-          "results": [
-            "T-007"
-          ],
-          "source_key": "[Nagamochi 2005]",
-          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
-          "value": "7.5574385243"
+          "results": [],
+          "source_key": "[wand125 point bounds 2026]",
+          "text": "wand125 2026, GitHub",
+          "value": "7.62"
         },
         "n": 56,
         "record": "n-056",
@@ -1423,12 +1391,10 @@
           "confirmed_by": [],
           "note": null,
           "result": null,
-          "results": [
-            "T-007"
-          ],
-          "source_key": "[Nagamochi 2005]",
-          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
-          "value": "8.28010988928"
+          "results": [],
+          "source_key": "[wand125 point bounds 2026]",
+          "text": "wand125 2026, GitHub",
+          "value": "8.41"
         },
         "n": 68,
         "record": "n-068",
@@ -1451,12 +1417,10 @@
           "confirmed_by": [],
           "note": null,
           "result": null,
-          "results": [
-            "T-007"
-          ],
-          "source_key": "[Nagamochi 2005]",
-          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
-          "value": "8.34846922835"
+          "results": [],
+          "source_key": "[wand125 point bounds 2026]",
+          "text": "wand125 2026, GitHub",
+          "value": "8.41"
         },
         "n": 69,
         "record": "n-069",
@@ -1479,12 +1443,10 @@
           "confirmed_by": [],
           "note": null,
           "result": null,
-          "results": [
-            "T-007"
-          ],
-          "source_key": "[Nagamochi 2005]",
-          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
-          "value": "8.4161984871"
+          "results": [],
+          "source_key": "[wand125 point bounds 2026]",
+          "text": "wand125 2026, GitHub",
+          "value": "8.55"
         },
         "n": 70,
         "record": "n-070",
@@ -1507,12 +1469,10 @@
           "confirmed_by": [],
           "note": null,
           "result": null,
-          "results": [
-            "T-007"
-          ],
-          "source_key": "[Nagamochi 2005]",
-          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
-          "value": "8.48331477355"
+          "results": [],
+          "source_key": "[wand125 point bounds 2026]",
+          "text": "wand125 2026, GitHub",
+          "value": "8.55"
         },
         "n": 71,
         "record": "n-071",
@@ -1535,12 +1495,10 @@
           "confirmed_by": [],
           "note": null,
           "result": null,
-          "results": [
-            "T-007"
-          ],
-          "source_key": "[Nagamochi 2005]",
-          "text": "Nagamochi 2005, Electron. J. Combin. 12, #R37",
-          "value": "8.54983443527"
+          "results": [],
+          "source_key": "[wand125 point bounds 2026]",
+          "text": "wand125 2026, GitHub",
+          "value": "8.61"
         },
         "n": 72,
         "record": "n-072",

@@ -1,0 +1,52 @@
+{
+  "status": "PASS_SOURCE_DISTINCT_PREMISE_CONTROLS",
+  "certificate_sha256": "57e9927da5c13f42dd8bcbf8f08c84363635fece626657ee63a810c61cd44458",
+  "source_commit": "6a733f339395c3514f2ab63d8c4aa64cf63c0b5a",
+  "scope": "Complete premises and selected scanner controls; complete upstream replay remains required.",
+  "structure": {
+    "physical_sites": 5284,
+    "active_physical_sites": 5284,
+    "site_orbits": 679,
+    "positive_orbits_by_family": {
+      "points": 66,
+      "2-of-5": 10,
+      "2-of-3": 132,
+      "3-of-5": 142
+    },
+    "physical_features_by_family": {
+      "points": 496,
+      "2-of-5": 76,
+      "2-of-3": 1020,
+      "3-of-5": 1124
+    },
+    "budget_units_by_family": {
+      "points": 2247714156,
+      "2-of-5": 989672288,
+      "2-of-3": 3188007592,
+      "3-of-5": 4574085908
+    },
+    "budget_units": 10999479944,
+    "minimum_units": 999962528,
+    "surplus_units": 107864,
+    "absolute_expanded_weight_units": 184231386320,
+    "headroom_limit": 1125899906842624,
+    "native_padded_member_slots": 13580
+  },
+  "containment": {
+    "intervals": 12028,
+    "strict_quadratic_inequalities": 48112,
+    "centre_envelope_inequalities": 12028,
+    "minimum_positive_quadratic_numerator": "1/1000000000000",
+    "last_half_angle": "207107/500000",
+    "angle_coverage_surplus": "309449/250000000000"
+  },
+  "gap_arithmetic": {
+    "prior_T026_approximation": "3.82644741057293974417136861547183468306846904947131772112791",
+    "reported_upper_approximation": "3.87708359002281417730789706010096",
+    "new_lower": "3.875",
+    "remaining_gap_approximation": "0.00208359002281417730789706010096",
+    "percent_of_T026_gap_closed_approximation": "95.8851752927434888371711173554987557753645362586813037493840",
+    "scope": "Decimal arithmetic on the T-026 expression and retained upper approximation; not an optimum proof."
+  },
+  "seconds": 6.265645167033654
+}

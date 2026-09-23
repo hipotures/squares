@@ -68,6 +68,38 @@ sources:
       (web/n17-weighted-certificates-2026-09-20/README.md): Guzhou0806's R012
       parent-angle catalogue, 2026-09-20, over Mira's 1620-atom measure of 2026-09-07.
       The bound the register verifies from them, 461300/99999, is R012's.
+  - key: '[Kleddamag n17 certified bound]'
+    authors: [Kleddamag]
+    year: 2026
+    venue: GitHub
+    note: >-
+      The retained v1.0.0 release and AUTHORS.md identify Kleddamag as the human
+      project director and credit OpenAI Codex for research, implementation and
+      verification (web/n17-kleddamag-certified-bound-2026-09-21/README.md).
+  - key: '[Kleddamag n11 2026]'
+    authors: [Kleddamag]
+    year: 2026
+    venue: GitHub
+    note: >-
+      The v1.0.2 release of Kleddamag/11-squares-certified-bound, pinned in
+      web/external-square-certificates-2026-09-22/acquisition/sources.json,
+      and the author's September 22 announcement retained in acquisition/x-kleddamag.txt.
+  - key: '[Tokoharu density 2026]'
+    authors: [Tokoharu]
+    year: 2026
+    venue: GitHub
+    note: >-
+      The tokoharu/square-packing-density-bounds repository, pinned in
+      web/external-square-certificates-2026-09-22/acquisition/sources.json,
+      and the author's September 22 announcement retained in acquisition/x-tokoharu.txt.
+  - key: '[wand125 point bounds 2026]'
+    authors: [wand125]
+    year: 2026
+    venue: GitHub
+    note: >-
+      The wand125/square-packing-bounds repository and its 2026 certificate claims,
+      retained under web/external-square-certificates-2026-09-22/wand125-points/;
+      acquisition/sources.json pins the complete source tree.
 # The surname each credited name is cited under, for the names `found_by` and
 # `improved_by` carry. Listed rather than derived from the last word of the name, because
 # a credit can be an organization; a name missing here fails the build instead of being

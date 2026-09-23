@@ -1,0 +1,41 @@
+{
+  "status": "OBSERVED",
+  "controls": [
+    {
+      "control": "wrong-target-n",
+      "command": [
+        "/Users/levy/.codex/worktrees/116b/squares/packing/.venv/bin/python3",
+        "/Users/levy/.codex/worktrees/116b/squares/packing/resources/web/external-square-certificates-2026-09-22/tokoharu-density/src/push.py",
+        "--n",
+        "1",
+        "--from",
+        "/Users/levy/.codex/worktrees/116b/squares/packing/resources/web/external-square-certificates-2026-09-22/tokoharu-density/certificates/cert_n29_L571",
+        "--target",
+        "5.71",
+        "--out",
+        "/var/folders/ms/fjn8hgyd24d3jv6w65dw37hh0000gp/T/tokoharu-driver-x0c_dajo/wrong-target-n"
+      ],
+      "returncode": 0,
+      "invalid_initial_bound_accepted": true,
+      "finite_grid_upper_bound": 1
+    },
+    {
+      "control": "stale-side-metadata",
+      "command": [
+        "/Users/levy/.codex/worktrees/116b/squares/packing/.venv/bin/python3",
+        "/Users/levy/.codex/worktrees/116b/squares/packing/resources/web/external-square-certificates-2026-09-22/tokoharu-density/src/push.py",
+        "--n",
+        "29",
+        "--from",
+        "/var/folders/ms/fjn8hgyd24d3jv6w65dw37hh0000gp/T/tokoharu-driver-x0c_dajo/stale",
+        "--target",
+        "100",
+        "--out",
+        "/var/folders/ms/fjn8hgyd24d3jv6w65dw37hh0000gp/T/tokoharu-driver-x0c_dajo/stale-side-metadata"
+      ],
+      "returncode": 0,
+      "invalid_initial_bound_accepted": true,
+      "finite_grid_upper_bound": 6
+    }
+  ]
+}

@@ -1,0 +1,129 @@
+{
+  "kind": "tokoharu-density-audit/v1",
+  "source_revision": "b543990f7794b8c511cb46cf3854b7e8166c3674",
+  "source": "/private/tmp/squares-frontier-20260922/tokoharu-density",
+  "python": "3.14.7 (main, Aug 25 2026, 13:50:14) [Clang 22.1.3 ]",
+  "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+  "scope": "Independent exact preconditions; optional upstream global interval replay",
+  "cases": [
+    {
+      "status": "PASS",
+      "n": 26,
+      "L": "1377/250",
+      "B": "9977/10000",
+      "mass_exact": "6481789525574810517/250000000000000000",
+      "mass_below_n_exact": "18210474425189483/250000000000000000",
+      "net_safety_exact": "399908091/400000000",
+      "smoothing_safety_exact": "399968091/400000000",
+      "net_endpoint_polynomial_exact": "89/40000",
+      "positive_basis_rectangles": 83,
+      "expanded_rectangles": 664,
+      "axis_event_count": 600,
+      "axis_vertex_count": 360000,
+      "replay": {
+        "status": "PASS",
+        "command": [
+          "/Users/levy/.codex/worktrees/116b/squares/packing/.venv/bin/python3",
+          "run_verify.py",
+          "--workers",
+          "4"
+        ],
+        "working_directory": "temporary copy of retained certificate directory",
+        "elapsed_seconds_including_compile": 180.55545479099965,
+        "timeout_seconds": 900,
+        "summary": {
+          "status": "VERIFIED",
+          "angle_cases": 201,
+          "target_lower_bound_exact": "10001/10000",
+          "nodes": 4533720,
+          "leaves": 2446960,
+          "minimum_printed_leaf_lower_bound": "10001000055431877/10000000000000000",
+          "wall_seconds": "3489232910797/19531250000",
+          "input_sha256": "227a681d9e47118161f93f1d8979990a77534a2d96fd29ef8a0c8e9cd9dfa589",
+          "verifier_source_sha256": "a75140df1b484ad104a214d2e8de87afda9fca5929341ec40121afde0c1af602",
+          "method": "Outward-rounded binary64 intervals; certified inscribed polygon area; derivative bounds over center boxes; rational angular net."
+        }
+      }
+    },
+    {
+      "status": "PASS",
+      "n": 29,
+      "L": "571/100",
+      "B": "9977/10000",
+      "mass_exact": "71719849258137554097/2500000000000000000",
+      "mass_below_n_exact": "780150741862445903/2500000000000000000",
+      "net_safety_exact": "399908091/400000000",
+      "smoothing_safety_exact": "399968091/400000000",
+      "net_endpoint_polynomial_exact": "89/40000",
+      "positive_basis_rectangles": 69,
+      "expanded_rectangles": 552,
+      "axis_event_count": 460,
+      "axis_vertex_count": 211600,
+      "replay": {
+        "status": "PASS",
+        "command": [
+          "/Users/levy/.codex/worktrees/116b/squares/packing/.venv/bin/python3",
+          "run_verify.py",
+          "--workers",
+          "4"
+        ],
+        "working_directory": "temporary copy of retained certificate directory",
+        "elapsed_seconds_including_compile": 97.76763145800214,
+        "timeout_seconds": 900,
+        "summary": {
+          "status": "VERIFIED",
+          "angle_cases": 201,
+          "target_lower_bound_exact": "10001/10000",
+          "nodes": 3860166,
+          "leaves": 2035983,
+          "minimum_printed_leaf_lower_bound": "125012501560051/125000000000000",
+          "wall_seconds": "9274298119544983/100000000000000",
+          "input_sha256": "f5716e3a0baaf292414dce34c3cd66101994ae30e87e1eb06c400e2604988d48",
+          "verifier_source_sha256": "a75140df1b484ad104a214d2e8de87afda9fca5929341ec40121afde0c1af602",
+          "method": "Outward-rounded binary64 intervals; certified inscribed polygon area; derivative bounds over center boxes; rational angular net."
+        }
+      }
+    },
+    {
+      "status": "PASS",
+      "n": 11,
+      "L": "381/100",
+      "B": "9977/10000",
+      "mass_exact": "68302371743812406989/6250000000000000000",
+      "mass_below_n_exact": "447628256187593011/6250000000000000000",
+      "net_safety_exact": "399908091/400000000",
+      "smoothing_safety_exact": "399968091/400000000",
+      "net_endpoint_polynomial_exact": "89/40000",
+      "positive_basis_rectangles": 24,
+      "expanded_rectangles": 192,
+      "axis_event_count": 146,
+      "axis_vertex_count": 21316,
+      "replay": {
+        "status": "PASS",
+        "command": [
+          "/Users/levy/.codex/worktrees/116b/squares/packing/.venv/bin/python3",
+          "run_verify.py",
+          "--workers",
+          "4"
+        ],
+        "working_directory": "temporary copy of retained certificate directory",
+        "elapsed_seconds_including_compile": 74.70078533299966,
+        "timeout_seconds": 900,
+        "summary": {
+          "status": "VERIFIED",
+          "angle_cases": 201,
+          "target_lower_bound_exact": "10001/10000",
+          "nodes": 5575714,
+          "leaves": 2798615,
+          "minimum_printed_leaf_lower_bound": "5000500021995813/5000000000000000",
+          "wall_seconds": "459532929956913/6250000000000",
+          "input_sha256": "d9e760dd4e5a68bb8a287e2dbe61999a213650451f82e6a7f097339f70e0ecef",
+          "verifier_source_sha256": "a75140df1b484ad104a214d2e8de87afda9fca5929341ec40121afde0c1af602",
+          "method": "Outward-rounded binary64 intervals; certified inscribed polygon area; derivative bounds over center boxes; rational angular net."
+        }
+      }
+    }
+  ],
+  "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)\nTarget: arm64-apple-darwin25.5.0\nThread model: posix\nInstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin\n",
+  "status": "PASS"
+}

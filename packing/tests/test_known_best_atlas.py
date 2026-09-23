@@ -866,7 +866,7 @@ def test_the_poster_badges_every_perfect_square_and_counts_them_in_its_legend() 
         "only known numerically (37)",
         "rigid (established here) (20)",
         "annotated rigid by the catalogue (2)",
-        "lower bound first proved here (6)",
+        "lower bound first proved here (5)",
         "colors indicate distinct tilt angles",
         "shade indicates number of full-side contacts",
     ]

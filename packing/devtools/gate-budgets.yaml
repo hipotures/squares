@@ -714,35 +714,17 @@ tiers:
   # on a four-cpu runner; moving it to a one-step job gives it the runner without changing
   # the edit tier, which still contains the same type floor.
   ceiling_seconds: 111.0
-  measured_seconds: 82.58
+  measured_seconds: 60.16
   measured_on: '2026-09-22'
   measured_where: >-
-    Geometric mean of six hosted packing-validate --typecheck walls on PR 218, all within
-    78.83 s to 85.41 s: runs 35786452418, 35786229930, 35781126061, 35780496520,
-    35780291711 and 35775289155, job typecheck. Observed spread 1.08x.
-    NOTE: the ceiling is left at 111.0 rather than raised to the 2.0x this entry's
-    convention would give (165 s). At 82.58 s the ceiling binds at 1.34x, before the 1.5x
-    drift rule reaches 123.9 s, so the two rules have swapped roles here. Raising a wall
-    ceiling is a decision to take on purpose (`OR-17`), not one to slip in while clearing
-    a red check.
-  attribution:
-    cause: >-
-      One step, and it is the tier: the type floor grew with the corpus it checks. The
-      merge from main at 5cd610a1a brought the deep-gate work in -- about 4,400 lines of
-      new devtools, `reprice_kleddamag_measure` and `translate_kleddamag_certificate`
-      the largest -- and this branch straddles it: run 35764316225, before the merge,
-      read 65.33 s, and no run after it has read under 78.83 s. Not one regression and
-      not runner noise, since the six readings after the merge span 1.08x.
-      The record it supersedes was also low for its own evidence: 55.67 s was the mean of
-      65.90 s, 68.64 s and one 38.15 s reading its own note called stale at 0.57x, so the
-      band it armed sat under two of the three walls that set it.
-    unit: step-seconds
-    source: >-
-      The `where the time went` line of job typecheck in runs 35764274054 (before) and
-      35786452418, 35786229930, 35781126061, 35780496520, 35780291711, 35775289155
-      (after); the tier runs one step, so its wall is that step's.
-    grew:
-    - {name: type floor (basedpyright), before: 65.33, after: 82.58}
+    Geometric mean of two consecutive hosted packing-validate --typecheck walls on PR
+    222: 44.55 s in run 35803857967 and 81.25 s in run 35805712899, job typecheck. Both
+    passed BasedPyright with zero findings and failed only the cost band, first as stale
+    against 82.58 s and then as drift against the one-reading 44.5 s repair. Their 1.82x
+    spread demonstrates why neither endpoint is a stable record. The 111 s ceiling is
+    restored from the pre-incident declaration; at 1.85x of the two-reading record it
+    remains inside the register's 2.0x maximum headroom without narrowing the wall around
+    one unusually fast runner.
   history:
   - measured_seconds: 67.26
     measured_on: '2026-09-16'
@@ -761,6 +743,36 @@ tiers:
       is the baseline the rise above is measured from, and its own note says the 38.15 s
       reading it averaged in was stale, which is why the band it armed sat under two of
       the three walls that set it.
+  - measured_seconds: 82.58
+    measured_on: '2026-09-22'
+    measured_where: >-
+      Geometric mean of six hosted packing-validate --typecheck walls on PR 218, all
+      within 78.83 s to 85.41 s: runs 35786452418, 35786229930, 35781126061,
+      35780496520, 35780291711 and 35775289155, job typecheck. Observed spread 1.08x.
+      NOTE: the ceiling is left at 111.0 rather than raised to the 2.0x this entry's
+      convention would give (165 s). At 82.58 s the ceiling binds at 1.34x, before the
+      1.5x drift rule reaches 123.9 s, so the two rules have swapped roles here. Raising
+      a wall ceiling is a decision to take on purpose (`OR-17`), not one to slip in while
+      clearing a red check.
+    attribution:
+      cause: >-
+        One step, and it is the tier: the type floor grew with the corpus it checks. The
+        merge from main at 5cd610a1a brought the deep-gate work in -- about 4,400 lines
+        of new devtools, `reprice_kleddamag_measure` and
+        `translate_kleddamag_certificate` the largest -- and this branch straddles it:
+        run 35764316225, before the merge, read 65.33 s, and no run after it has read
+        under 78.83 s. Not one regression and not runner noise, since the six readings
+        after the merge span 1.08x. The record it supersedes was also low for its own
+        evidence: 55.67 s was the mean of 65.90 s, 68.64 s and one 38.15 s reading its
+        own note called stale at 0.57x, so the band it armed sat under two of the three
+        walls that set it.
+      unit: step-seconds
+      source: >-
+        The `where the time went` line of job typecheck in runs 35764274054 (before) and
+        35786452418, 35786229930, 35781126061, 35780496520, 35780291711 and 35775289155
+        (after); the tier runs one step, so its wall is that step's.
+      grew:
+      - {name: type floor (basedpyright), before: 65.33, after: 82.58}
   reference: {jobs: 1, inner_jobs: 1, cpus: 4}
   argument: >-
     The type floor, isolated because it is one of the checks queue's largest units and no

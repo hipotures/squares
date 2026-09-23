@@ -699,6 +699,12 @@ def test_every_case_page_binds_the_certificate_its_own_evidence_names() -> None:
     external_reduction = {
         17: "T-032: external parent-rescaling reduction, bound L/A is no container side",
     }
+    superseded_current_bound = {
+        11: (
+            "T-026 remains replayable historical evidence after the external bound "
+            "superseded it"
+        ),
+    }
 
     evidence = _evidence_by_id()
     interval = _evidence("E-fractional-interval-decision")
@@ -782,7 +788,25 @@ def test_every_case_page_binds_the_certificate_its_own_evidence_names() -> None:
 
     # Non-vacuity, itself derived: every case the interval decision declares in its own
     # scope must be bound this way, so the contract cannot quietly empty out.
-    assert bound == expected - set(external_reduction)
+    assert bound == expected - set(external_reduction) - set(superseded_current_bound)
+
+
+def test_t026_historical_limit_still_binds_its_frozen_threshold_artifact() -> None:
+    """The superseded n = 11 rung remains bound to its own historical proof object."""
+    result = _result("T-026")
+    evidence = _evidence("E-n011-threshold-net1440-dilation-limit")
+    target = PACKING / evidence["certificate"]
+    record = json.loads(target.read_text(encoding="utf-8"))
+    assert record["schema"] == THRESHOLD_LIMIT_RECORD_SCHEMA
+    assert record["conclusion"]["relation"] == ">="
+    exact = record["conclusion"]["bounded_side"]
+    assert exact in result["claim"]
+    source = record["source"]
+    source_path = REPO / source["certificate"]
+    assert hashlib.sha256(source_path.read_bytes()).hexdigest() == source["sha256"]
+    figures = load_certificate(source_path)
+    assert figures is not None
+    assert figures.mass < 11
 
 
 def test_t017s_ladder_is_the_ladder_the_case_package_actually_retains() -> None:

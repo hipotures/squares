@@ -1,0 +1,98 @@
+{
+  "kind": "tokoharu-density-audit/v1",
+  "source_revision": "b543990f7794b8c511cb46cf3854b7e8166c3674",
+  "source": "/private/tmp/squares-frontier-20260922/tokoharu-density",
+  "python": "3.14.7 (main, Aug 25 2026, 13:50:14) [Clang 22.1.3 ]",
+  "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+  "scope": "Independent exact preconditions; optional upstream global interval replay",
+  "cases": [
+    {
+      "status": "PASS",
+      "n": 11,
+      "L": "381/100",
+      "B": "9977/10000",
+      "mass_exact": "68302371743812406989/6250000000000000000",
+      "mass_below_n_exact": "447628256187593011/6250000000000000000",
+      "net_safety_exact": "399908091/400000000",
+      "smoothing_safety_exact": "399968091/400000000",
+      "net_endpoint_polynomial_exact": "89/40000",
+      "positive_basis_rectangles": 24,
+      "expanded_rectangles": 192,
+      "axis_event_count": 146,
+      "axis_vertex_count": 21316
+    },
+    {
+      "status": "PASS",
+      "n": 26,
+      "L": "1377/250",
+      "B": "9977/10000",
+      "mass_exact": "6481789525574810517/250000000000000000",
+      "mass_below_n_exact": "18210474425189483/250000000000000000",
+      "net_safety_exact": "399908091/400000000",
+      "smoothing_safety_exact": "399968091/400000000",
+      "net_endpoint_polynomial_exact": "89/40000",
+      "positive_basis_rectangles": 83,
+      "expanded_rectangles": 664,
+      "axis_event_count": 600,
+      "axis_vertex_count": 360000
+    },
+    {
+      "status": "PASS",
+      "n": 29,
+      "L": "571/100",
+      "B": "9977/10000",
+      "mass_exact": "71719849258137554097/2500000000000000000",
+      "mass_below_n_exact": "780150741862445903/2500000000000000000",
+      "net_safety_exact": "399908091/400000000",
+      "smoothing_safety_exact": "399968091/400000000",
+      "net_endpoint_polynomial_exact": "89/40000",
+      "positive_basis_rectangles": 69,
+      "expanded_rectangles": 552,
+      "axis_event_count": 460,
+      "axis_vertex_count": 211600
+    }
+  ],
+  "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)\nTarget: arm64-apple-darwin25.5.0\nThread model: posix\nInstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin\n",
+  "driver_controls": {
+    "status": "OBSERVED",
+    "controls": [
+      {
+        "control": "wrong-target-n",
+        "command": [
+          "/Users/levy/.codex/worktrees/116b/squares/packing/.venv/bin/python3",
+          "/private/tmp/squares-frontier-20260922/tokoharu-density/src/push.py",
+          "--n",
+          "1",
+          "--from",
+          "/private/tmp/squares-frontier-20260922/tokoharu-density/certificates/cert_n29_L571",
+          "--target",
+          "5.71",
+          "--out",
+          "/var/folders/ms/fjn8hgyd24d3jv6w65dw37hh0000gp/T/tokoharu-driver-i59c3imo/wrong-target-n"
+        ],
+        "returncode": 0,
+        "invalid_initial_bound_accepted": true,
+        "finite_grid_upper_bound": 1
+      },
+      {
+        "control": "stale-side-metadata",
+        "command": [
+          "/Users/levy/.codex/worktrees/116b/squares/packing/.venv/bin/python3",
+          "/private/tmp/squares-frontier-20260922/tokoharu-density/src/push.py",
+          "--n",
+          "29",
+          "--from",
+          "/var/folders/ms/fjn8hgyd24d3jv6w65dw37hh0000gp/T/tokoharu-driver-i59c3imo/stale",
+          "--target",
+          "100",
+          "--out",
+          "/var/folders/ms/fjn8hgyd24d3jv6w65dw37hh0000gp/T/tokoharu-driver-i59c3imo/stale-side-metadata"
+        ],
+        "returncode": 0,
+        "invalid_initial_bound_accepted": true,
+        "finite_grid_upper_bound": 6
+      }
+    ]
+  },
+  "status": "PASS"
+}

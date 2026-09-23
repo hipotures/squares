@@ -43,16 +43,20 @@ We prove
 <p class="centred"><span class="tex-d">s(11) \;\ge\; L = {{CURRENT_BOUND_TEX}} = {{CURRENT_BOUND_DEC}}.</span></p>
 
 Thus eleven unit squares cannot fit in any square whose side is smaller than $L$. This
-is the strongest lower bound proved in this project, and our recorded literature search
-found no stronger published bound.[^novelty] The best known packing gives the other side
-of the current bracket, ${{CURRENT_BOUND_DEC}} \le s(11) \le {{BEST_PACKING_TEX}}$.
+is T-026’s historical lower bound, explained in this v0.4 proof edition.
 
-This appears to be the first improvement in {{YEARS_SINCE_PRIOR}} years on the smallest
-open case of the square packing problem.
-Stromquist published the previous bound of {{PRIOR_LOWER_DEC}} in
+The project’s initial improvement appears to have been the first in
+{{YEARS_SINCE_PRIOR}} years on the smallest open case of the square packing
+problem.[^novelty] Stromquist published the previous bound of {{PRIOR_LOWER_DEC}} in
 {{PRIOR_YEAR}}.[^stromquist-history][^repair] The tightest known packing, due to Trump
 in 1979 (Figure 1), shows
 <span class="math-reference">$s(11) \le {{BEST_PACKING_TEX}}$.[^trump]</span>
+
+**Frontier update, September 22, 2026:** We have verified Kleddamag’s stronger lower
+bound, so the [current bracket]({{FRONTIER_N11_URL}}) is
+$3.875 < s(11) \le {{BEST_PACKING_TEX}}$. The
+[mathematical review]({{FRONTIER_N11_REVIEW_URL}}) records the replays and proof.
+This article retains the T-018, T-025, and T-026 proofs below.
 
 <figure>
   <div class="stage trump"><a href="{{BEST_RENDER_URL}}" aria-label="The rendering in the repository">{{TRUMP_SVG}}</a></div>
@@ -97,7 +101,7 @@ The separate [T-025]({{T025_CLAIM_URL}}) and [T-026]({{T026_CLAIM_URL}}) claim d
 each embed the shared standard-library threshold verifier and their exact input
 bytes.<!--END:CLAIM-->
 
-The new lower bound is registered as [**V4/C5**]({{EPISTEMICS_URL}}): the certificate
+The T-026 lower bound is registered as [**V4/C5**]({{EPISTEMICS_URL}}): the certificate
 and dilation calculations used in the proof are machine-verified with exact or
 interval-certified evidence and passing replay commands (`V4`), while the certificate’s
 coverage condition is confirmed by an exact event-cell sweep and a distinct interval
@@ -187,7 +191,7 @@ the film</a>. </video>
   </div>
 
   <figcaption><strong>Figure 2.</strong> The best known packings of 1 through 100 unit squares, with upper bounds
-  and, for unsettled cases, lower bounds verified here. A crimson star marks a lower bound this project
+  and, for unsettled cases, the current lower bounds verified here. A crimson star marks a lower bound this project
   proved: {{N_STARRED}} of the hundred. The <a href="{{ATLAS_URL}}">repository</a> records every witness and its
   provenance. PDFs are available for <a href="known-best-1-100.pdf">this figure</a> and the
   <a href="known-best-1-324.pdf">full 324-case poster</a>. The film below the atlas draws the same hundred
@@ -196,11 +200,10 @@ the film</a>. </video>
   <span class="tex">n = 1 \ldots 324</span> ascent</a> runs 8m 14s.</figcaption>
 </figure>
 
-For eleven squares, the current result is $s(11) \ge {{CURRENT_BOUND_DEC}}$. We first
-prove the point-only rung $s(11) \ge {{HEADLINE_L_FRAC}} =
+For eleven squares, T-026 proves $s(11) \ge {{CURRENT_BOUND_DEC}}$. We first prove the
+point-only rung $s(11) \ge {{HEADLINE_L_FRAC}} =
 {{HEADLINE_L_DEC}}$ because its geometry can be drawn and checked directly.
-The advanced section then explains how threshold atoms and dilation reach the current
-bound.
+The advanced section then explains how threshold atoms and dilation reach T-026’s bound.
 
 <!--BEGIN:COMPARISON-->
 
@@ -242,7 +245,7 @@ The figures below illustrate this certificate.
     {{NUMBER_LINE_MARKS}}
   </svg>
   </div>
-  <figcaption><strong>Figure 3.</strong> Bounds on <span class="tex">s(11)</span>. The shaded band is the gap left by the certificates explained here. At the current lower bound the gap is
+  <figcaption><strong>Figure 3.</strong> Bounds on <span class="tex">s(11)</span>. The shaded band is the gap left by the certificates explained here. At T-026’s bound the gap is
   <span class="tex">{{CURRENT_GAP}}</span> wide, down from <span class="tex">{{GAP_BEFORE}}</span> at Stromquist’s bound.</figcaption>
 </figure>
 

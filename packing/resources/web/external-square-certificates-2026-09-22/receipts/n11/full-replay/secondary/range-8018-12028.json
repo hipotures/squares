@@ -1,0 +1,28 @@
+{
+  "status": "PASS_EXACT_MOVABLE_SUPPORT_SCAN",
+  "certificate_sha256": "57e9927da5c13f42dd8bcbf8f08c84363635fece626657ee63a810c61cd44458",
+  "parent_side": "764/775",
+  "measure": "base",
+  "range": [
+    8018,
+    12028
+  ],
+  "atoms": 5284,
+  "thresholds": 2220,
+  "budget_units": 10999479944,
+  "minimum_units": 999962528,
+  "histogram": {
+    "999962528": 1,
+    "999970079": 2,
+    "1000010082": 7,
+    "1000024117": 10,
+    "1000030708": 2,
+    "1000030718": 4,
+    "1000031217": 5,
+    "1000039145": 2,
+    "1000041055": 5,
+    "1000047518": 3972
+  },
+  "center_slabs": 29636200,
+  "escape_rows": []
+}

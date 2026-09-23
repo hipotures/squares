@@ -65,7 +65,7 @@ PUBLICATION_HISTORY = (
         version="v0.4.0",
         first_labeled="September 10, 2026",
         result_scope=(
-            "The current lower-bound edition: T-025 proves "
+            "The T-025/T-026 proof edition: T-025 proves "
             "$s(11) ≥ 191/50 = 3.82$, and T-026 proves "
             "$s(11) ≥ 3.8264474…$."
         ),
@@ -110,7 +110,7 @@ DATA_REVISION_LENGTH = 6
 #: The last data commit, pinned in full: what `data_revision` returned when it was last
 #: re-pinned. Full rather than six characters so the drift check compares a commit, not
 #: a prefix.
-DATA_REVISION = "1959611f51edfcd7a97514539e7e054cea338107"
+DATA_REVISION = "3b50e2e21735f1d2e2ba6fbd7341d4743b465d2d"
 
 #: The version, written the one way it is ever written: `v0.4.1-f5e113`. Semver core,
 #: then the data revision, in the shape a build identifier takes everywhere else.

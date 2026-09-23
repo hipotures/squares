@@ -1,0 +1,214 @@
+{
+  "format": "external-source-acquisition-v1",
+  "retrieved_at_utc": "2026-09-22T18:09:13Z",
+  "git_scope": "All remote branches and tags were fetched before inventory. Archived full trees are exact git archive exports; .git directories and runtime detritus are excluded.",
+  "sources": [
+    {
+      "id": "tokoharu-density",
+      "source_url": "https://github.com/tokoharu/square-packing-density-bounds",
+      "source_ref": "refs/heads/main",
+      "source_commit": "b543990f7794b8c511cb46cf3854b7e8166c3674",
+      "git_tree": "54914020e3846489bb561ea8ed1f44f89274d7d5",
+      "archived_path": "packing/resources/web/external-square-certificates-2026-09-22/tokoharu-density",
+      "file_manifest": "packing/resources/web/external-square-certificates-2026-09-22/acquisition/tokoharu-density.sha256",
+      "file_count": 62,
+      "total_bytes": 1461796,
+      "license": "MIT",
+      "branches": {
+        "main": "b543990f7794b8c511cb46cf3854b7e8166c3674"
+      },
+      "tags": [],
+      "releases": [],
+      "submodules": [],
+      "lfs": "No Git LFS pointer files detected; git-lfs was not installed on the acquisition host.",
+      "claims": [
+        "s(11) >= 381/100",
+        "s(26) >= 1377/250",
+        "s(29) >= 571/100"
+      ],
+      "retention_notes": "Complete tracked main tree, byte for byte. The two untracked runtime categories possible during replay are excluded by git archive."
+    },
+    {
+      "id": "kleddamag-11",
+      "source_url": "https://github.com/Kleddamag/11-squares-certified-bound",
+      "source_ref": "refs/tags/v1.0.2",
+      "source_commit": "6a733f339395c3514f2ab63d8c4aa64cf63c0b5a",
+      "git_tree": "46122beb0aa5782bb7ee0caa1526fa1faa630c7d",
+      "archived_path": "packing/resources/web/external-square-certificates-2026-09-22/kleddamag-11",
+      "file_manifest": "packing/resources/web/external-square-certificates-2026-09-22/acquisition/kleddamag-11.sha256",
+      "file_count": 55,
+      "total_bytes": 6142946,
+      "license": "MIT, with the separate inherited-source boundaries in LICENSING.md and NOTICES/",
+      "branches": {
+        "main": "6a733f339395c3514f2ab63d8c4aa64cf63c0b5a"
+      },
+      "tags": [
+        {
+          "name": "v1.0.2",
+          "commit": "6a733f339395c3514f2ab63d8c4aa64cf63c0b5a"
+        }
+      ],
+      "releases": [
+        {
+          "tag": "v1.0.2",
+          "published_at": "2026-09-22T10:24:27Z",
+          "assets": [
+            {
+              "name": "11-squares-certified-bound-v1.0.2.zip",
+              "bytes": 1181929,
+              "sha256": "d134294bf377f4218619a12b19e1baadb01703c51f475a7309869d6785cab8ee"
+            },
+            {
+              "name": "11-squares-certified-bound-v1.0.2.zip.sha256",
+              "bytes": 104,
+              "sha256": "496aacf7e0267bf5390a4d8c607632bc3b7cc503a2e05c4fd2d2b80172120f62"
+            }
+          ],
+          "retention": "Assets were downloaded and verified. The expanded ZIP is byte-identical to the complete tracked Git tree, so the duplicate ZIP and checksum sidecar are inventoried here but not retained."
+        }
+      ],
+      "submodules": [],
+      "lfs": "No Git LFS pointer files detected; git-lfs was not installed on the acquisition host.",
+      "claims": [
+        "s(11) > 31/8"
+      ],
+      "retention_notes": "Complete tracked v1.0.2 tree, byte for byte. Clone-side .cache and __pycache__ directories created by replay are excluded by git archive."
+    },
+    {
+      "id": "wand125-density",
+      "source_url": "https://github.com/wand125/square-packing-density-bounds",
+      "source_ref": "refs/heads/main",
+      "source_commit": "096294aeb5f8b604df5890beda6cd601d05f4561",
+      "git_tree": "f3ea5151c3c484f42ec83fb71be1aac5b828e815",
+      "archived_path": "packing/resources/web/external-square-certificates-2026-09-22/wand125-density",
+      "file_manifest": "packing/resources/web/external-square-certificates-2026-09-22/acquisition/wand125-density.sha256",
+      "file_count": 60,
+      "total_bytes": 1446954,
+      "license": "MIT",
+      "branches": {
+        "main": "096294aeb5f8b604df5890beda6cd601d05f4561",
+        "add-push-driver": "93c0edde5745718b8490c37ee28543abea477b40"
+      },
+      "tags": [],
+      "releases": [],
+      "submodules": [],
+      "lfs": "No Git LFS pointer files detected; git-lfs was not installed on the acquisition host.",
+      "claims": [
+        "s(11) >= 381/100",
+        "s(26) >= 1377/250",
+        "s(29) >= 571/100"
+      ],
+      "retention_notes": "Complete tracked default-branch tree. It is Tokoharu history through 096294ae and contains no numerical improvement beyond Tokoharu. The feature branch changes only src/push.py and tests/test_push.py; those branch-only bytes are retained separately."
+    },
+    {
+      "id": "wand125-density-add-push-driver",
+      "source_url": "https://github.com/wand125/square-packing-density-bounds",
+      "source_ref": "refs/heads/add-push-driver",
+      "source_commit": "93c0edde5745718b8490c37ee28543abea477b40",
+      "git_tree": "36579a3b778afe0835de47ce2ae3e034ee325d89",
+      "archived_path": "packing/resources/web/external-square-certificates-2026-09-22/dependencies/wand125-density-add-push-driver",
+      "file_manifest": "packing/resources/web/external-square-certificates-2026-09-22/acquisition/wand125-density-add-push-driver.sha256",
+      "file_count": 2,
+      "total_bytes": 13331,
+      "license": "MIT, inherited from the repository",
+      "retention_notes": "Selected branch-only delta against main: src/push.py and tests/test_push.py. The full branch tree has 62 files and 1,460,285 bytes and is reconstructable from the archived main tree plus these files at the named commit. It changes no certificate or claimed bound."
+    },
+    {
+      "id": "wand125-points",
+      "source_url": "https://github.com/wand125/square-packing-bounds",
+      "source_ref": "refs/heads/main",
+      "source_commit": "1398e42f17f23fe3744bc54425a589fab1f3542c",
+      "git_tree": "7a2d81619d83701e250b24f104f7e63843a1c802",
+      "archived_path": "packing/resources/web/external-square-certificates-2026-09-22/wand125-points",
+      "file_manifest": "packing/resources/web/external-square-certificates-2026-09-22/acquisition/wand125-points.sha256",
+      "file_count": 23,
+      "total_bytes": 1611618,
+      "license": "MIT",
+      "branches": {
+        "main": "1398e42f17f23fe3744bc54425a589fab1f3542c"
+      },
+      "tags": [],
+      "releases": [],
+      "submodules": [],
+      "lfs": "No Git LFS pointer files detected; git-lfs was not installed on the acquisition host.",
+      "claims": [
+        "s(26) >= 109/20",
+        "s(29) >= 557/100",
+        "s(39) >= 13/2",
+        "s(40) >= 13/2",
+        "s(53) >= 369/50",
+        "s(55) >= 377/50",
+        "s(56) >= 381/50",
+        "s(69) >= 841/100",
+        "s(70) >= 171/20",
+        "s(72) >= 861/100"
+      ],
+      "retention_notes": "Complete tracked current main tree. The n=40 file is a cross-check; the same bound follows from n=39 by monotonicity. The source itself marks n=26 and n=29 as superseded by Tokoharu."
+    },
+    {
+      "id": "wand125-points-tokoharu-pin",
+      "source_url": "https://github.com/wand125/square-packing-bounds",
+      "source_ref": "8ec3d79167ac422f21cc38d96e0dd7a8f5c22ed4",
+      "source_commit": "8ec3d79167ac422f21cc38d96e0dd7a8f5c22ed4",
+      "git_tree": "e1e04dbab4782c7ca5683189b99b69038c7bebc6",
+      "archived_path": "packing/resources/web/external-square-certificates-2026-09-22/dependencies/wand125-points-tokoharu-pin",
+      "file_manifest": "packing/resources/web/external-square-certificates-2026-09-22/acquisition/wand125-points-tokoharu-pin.sha256",
+      "file_count": 21,
+      "total_bytes": 1233812,
+      "license": "MIT",
+      "retention_notes": "Complete tracked tree at the exact commit Tokoharu cites. The verifier, sqpack adapter and license are byte-identical to current main; current main adds n=53 and n=69 certificates and updates search/provenance prose and src/certify.py."
+    },
+    {
+      "id": "guzhou-n17-full",
+      "source_url": "https://github.com/Guzhou0806/n17-square-packing",
+      "source_ref": "refs/heads/main",
+      "source_commit": "32edfd3da78bf80a309398f552b3b602b9c45d6c",
+      "git_tree": "ef0c967992bbe913aeeb771c36e854ce4ae606ac",
+      "archived_path": "packing/resources/web/external-square-certificates-2026-09-22/dependencies/guzhou-n17-full",
+      "file_manifest": "packing/resources/web/external-square-certificates-2026-09-22/acquisition/guzhou-n17-full.sha256",
+      "file_count": 216,
+      "total_bytes": 3080514,
+      "license": "No repository-wide SPDX license detected. NOTICE.md and per-certificate attribution and license-scope files govern the retained material and preserve third-party boundaries.",
+      "branches": {
+        "main": "32edfd3da78bf80a309398f552b3b602b9c45d6c",
+        "r038-publication": "32edfd3da78bf80a309398f552b3b602b9c45d6c"
+      },
+      "tags": [],
+      "releases": [],
+      "submodules": [],
+      "lfs": "No Git LFS pointer files detected; git-lfs was not installed on the acquisition host.",
+      "retention_notes": "Complete tracked tree. Kleddamag reconstructs its second checker from certificates/R038/src/exact_parent_side_scan.js; the retained source has the required SHA-256 63e858e28c4dee40f5763a832e1cfdf1f1fce3a1e5c632d087525bf1ee20ed14."
+    },
+    {
+      "id": "guzhou-r038-convenience-selection",
+      "source_url": "https://github.com/Guzhou0806/n17-square-packing",
+      "source_ref": "32edfd3da78bf80a309398f552b3b602b9c45d6c",
+      "source_commit": "32edfd3da78bf80a309398f552b3b602b9c45d6c",
+      "git_tree": "ef0c967992bbe913aeeb771c36e854ce4ae606ac",
+      "archived_path": "packing/resources/web/external-square-certificates-2026-09-22/dependencies/guzhou-r038",
+      "file_manifest": "packing/resources/web/external-square-certificates-2026-09-22/acquisition/guzhou-r038.sha256",
+      "file_count": 5,
+      "total_bytes": 20113,
+      "license": "Same scope as the full Guzhou tree; retained NOTICE.md and R038 LICENSE_SCOPE.md state the boundaries.",
+      "retention_notes": "Convenience selection of the exact upstream checker plus R038 proof, attribution, license scope and top-level notice. All five files are also present byte for byte in guzhou-n17-full."
+    }
+  ],
+  "social_sources": [
+    {
+      "path": "packing/resources/web/external-square-certificates-2026-09-22/acquisition/x-kleddamag.txt",
+      "bytes": 1443,
+      "sha256": "aa2ae2ddd126029e77be0b027e6b9eca7304277f5229b162afc3eda8b1c4dd0c",
+      "media_path": "packing/resources/web/external-square-certificates-2026-09-22/acquisition/x-kleddamag-media.webp",
+      "media_bytes": 74540,
+      "media_sha256": "539f08b572586a67f65f087b894f98d48775c33a703d21d43dfcedae8e10bb4b"
+    },
+    {
+      "path": "packing/resources/web/external-square-certificates-2026-09-22/acquisition/x-tokoharu.txt",
+      "bytes": 1848,
+      "sha256": "5b0102bab4c63083e1415bfd9eeef89bc7b4c24a75d75fdb6b59eaff9533946c",
+      "media_path": "packing/resources/web/external-square-certificates-2026-09-22/acquisition/x-tokoharu-media.webp",
+      "media_bytes": 68780,
+      "media_sha256": "57f992ea575960a379f009198f3d9d0a58bb8942ffaa4bd46a15e5ceea213275"
+    }
+  ]
+}

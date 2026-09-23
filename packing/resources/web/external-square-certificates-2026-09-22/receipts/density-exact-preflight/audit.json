@@ -1,0 +1,63 @@
+{
+  "kind": "tokoharu-density-audit/v1",
+  "source_revision": "b543990f7794b8c511cb46cf3854b7e8166c3674",
+  "source": "/Users/levy/.codex/worktrees/116b/squares/packing/resources/web/external-square-certificates-2026-09-22/tokoharu-density",
+  "python": "3.14.7 (main, Aug 25 2026, 13:50:14) [Clang 22.1.3 ]",
+  "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+  "scope": "Independent exact preconditions; optional upstream global interval replay",
+  "cases": [
+    {
+      "status": "PASS",
+      "n": 11,
+      "L": "381/100",
+      "B": "9977/10000",
+      "mass_exact": "68302371743812406989/6250000000000000000",
+      "mass_below_n_exact": "447628256187593011/6250000000000000000",
+      "net_safety_exact": "399908091/400000000",
+      "smoothing_safety_exact": "399968091/400000000",
+      "net_endpoint_polynomial_exact": "89/40000",
+      "positive_basis_rectangles": 24,
+      "expanded_rectangles": 192,
+      "axis_event_count": 146,
+      "axis_vertex_count": 21316
+    },
+    {
+      "status": "PASS",
+      "n": 26,
+      "L": "1377/250",
+      "B": "9977/10000",
+      "mass_exact": "6481789525574810517/250000000000000000",
+      "mass_below_n_exact": "18210474425189483/250000000000000000",
+      "net_safety_exact": "399908091/400000000",
+      "smoothing_safety_exact": "399968091/400000000",
+      "net_endpoint_polynomial_exact": "89/40000",
+      "positive_basis_rectangles": 83,
+      "expanded_rectangles": 664,
+      "axis_event_count": 600,
+      "axis_vertex_count": 360000
+    },
+    {
+      "status": "PASS",
+      "n": 29,
+      "L": "571/100",
+      "B": "9977/10000",
+      "mass_exact": "71719849258137554097/2500000000000000000",
+      "mass_below_n_exact": "780150741862445903/2500000000000000000",
+      "net_safety_exact": "399908091/400000000",
+      "smoothing_safety_exact": "399968091/400000000",
+      "net_endpoint_polynomial_exact": "89/40000",
+      "positive_basis_rectangles": 69,
+      "expanded_rectangles": 552,
+      "axis_event_count": 460,
+      "axis_vertex_count": 211600
+    }
+  ],
+  "provenance": {
+    "kind": "archived-tree-with-external-acquisition-provenance",
+    "expected_revision": "b543990f7794b8c511cb46cf3854b7e8166c3674",
+    "manifest": "packing/resources/web/external-square-certificates-2026-09-22/acquisition/sources.json",
+    "note": "Archive identity is established by acquisition, separately from this audit."
+  },
+  "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)\nTarget: arm64-apple-darwin25.5.0\nThread model: posix\nInstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin\n",
+  "status": "PASS"
+}

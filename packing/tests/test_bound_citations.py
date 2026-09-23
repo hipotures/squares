@@ -416,7 +416,7 @@ RECORDED: dict[int, tuple[tuple[str, str, str] | None, tuple[str, str, str] | No
     ),
     68: (
         ("UnitSquare Project 2026, Results Release 1 (reported)", "external", "reported"),
-        ("Nagamochi 2005, Electron. J. Combin. 12, #R37", "external", "verified"),
+        ("wand125 2026, GitHub", "external", "verified"),
     ),
     # The catalogue credits nobody, so the line cites the catalogue by its compilers.
     101: (
@@ -435,6 +435,17 @@ RECORDED: dict[int, tuple[tuple[str, str, str] | None, tuple[str, str, str] | No
 def test_the_recorded_register_gives_these_lines(n: int) -> None:
     entry = _entry(n)
     assert (_line(entry["upper"]), _line(entry["lower"])) == RECORDED[n]
+
+
+@pytest.mark.parametrize(
+    ("n", "author"),
+    [(11, "Kleddamag"), (17, "Kleddamag"), (26, "Tokoharu"), (29, "Tokoharu")],
+)
+def test_promoted_external_bounds_keep_the_sources_credit(n: int, author: str) -> None:
+    lower = _entry(n)["lower"]
+    assert _line(lower) == (f"{author} 2026, GitHub", "external", "verified")
+    assert lower["result"] is None
+    assert lower["confirmed_by"] == []
 
 
 def test_n29_credits_finder_and_optimizer_and_takes_the_registers_verdict() -> None:

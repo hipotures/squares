@@ -68,13 +68,27 @@ Read it before citing any capability here.
 
 The core exposition begins with T-018’s visual proof of `s(11) >= 3.81`, then explains
 the threshold charges and dilation argument that strengthen it.
-T-033 proves the project’s strongest current lower bound,
-`s(11) >= 955000*sqrt(2073600042893309449)/359341754646249 =
-3.8269975...`, at `V4/C3`; T-026 holds the same argument one net coarser, at `V4/C5`.
+T-026 established the earlier first-party bound
+`s(11) >= 955000*sqrt(518400042893309449)/179696714646249 = 3.8264474...` at `V4/C5`.
+T-033 tightens the same retained family to
+`s(11) >= 955000*sqrt(2073600042893309449)/359341754646249 = 3.8269975...` at `V4/C3`.
+The current verified lower bound is the stronger external result `s(11) > 31/8 = 3.875`.
 Future research follows the
 [payoff policy](docs/project/handoff-2026-09-06-post-381-t2-t10-continuation.md#research-payoff-and-exposition):
 prioritize substantial bound improvements and methods or theorems that make them
 possible.
+
+The
+[September 22 external intake](docs/project/reviews/review-2026-09-22-external-square-certificates-integration.md)
+verifies Kleddamag’s stronger `s(11) > 3.875` bound and Tokoharu’s rectangle-density
+certificates at `s(26) >= 5.508` and `s(29) >= 5.71`, with pinned sources, mathematical
+reviews and complete replays.
+These now supply the verified Frontier bounds; the records retain literal source reports
+and state the verification methods separately.
+The
+[complete native n11 decision](docs/project/reviews/review-2026-09-22-native-n11-parent-core.md)
+adds a distinct interval coverage method and supports `V4/C4` for Kleddamag’s strict
+`3.875` bound, with no new bound or C5 claim.
 
 Every result this project has registered, in the reading order its significance scores
 set. The full claims, the rationale behind each score, and the next evidence-improving
@@ -147,7 +161,7 @@ hypothesis status and summarizes experiment verdicts, and the
 | --- | ---: | --- |
 | Agendas | 38 | 18 active; 14 completed; 5 paused; 1 superseded |
 | Commitments | 362 | 182 complete; 61 stopped; 68 blocked; 16 ready; 21 tentative; 14 in progress |
-| Sessions | 151 | 92 completed; 59 stopped; all terminal |
+| Sessions | 153 | 94 completed; 59 stopped; all terminal |
 | Explorations | 40 | 24 linked to proposed hypotheses; 16 uncodified |
 | Hypotheses | 170 | 29 confirmed; 31 refuted; 55 blocked; 17 unresolved; 5 open; 29 open questions; 2 result registered; 2 abandoned; 0 running |
 | Experiments | 155 | 43 accepted; 36 rejected; 50 unresolved; 12 baseline; 11 blocked; 3 abandoned; 0 in progress |
@@ -215,11 +229,21 @@ ranked relational-certificate slate.
 A draft or proposed direction is not a registered hypothesis, and a registered
 hypothesis is not a frontier result.
 
-Scientifically, the bracket has moved once since, by one net refinement:
-`3.826997548829543… <= s(11) <= 3.877083590022814…`. T-033 closes about 43% of the older
-Stromquist-to-Trump interval, T-026 having closed about 43% of it before that.
-The pure point/density ceiling `38200/9977 ≈ 3.8288` lies only about `0.00181` above
-T-033, so additional heavy work for microscopic gains in that language is paused.
+The current verified bracket is `3.875 < s(11) <= 3.877083590022814…`. Session 152 fully
+replayed and mathematically reviewed Kleddamag’s external certificate.
+It closes 95.89% of the gap from T-026 to the retained upper bound; the exact optimum
+remains open. Session 153 independently certifies every one of the 12,028 parent-angle
+intervals by directed-rounding box coverage, with no stalled or exhausted boxes.
+The event-sweep replay remains C3 by itself; the complete native decision and reviewed
+transfer theorem provide method-distinct C4 confirmation of the strict bound.
+Research below 3.875 must now justify its value as a simpler certificate or method
+development, rather than a public bound advance.
+The pure point/density ceiling `38200/9977 ≈ 3.8288` lies only about `0.00236` above
+T-026, so additional heavy work for microscopic gains in that language is paused.
+T-033 remains the controlled first-party net-refinement result: it moved T-026 by
+`0.00055013825660`, but the unchanged family’s ceiling `955000/249507 ≈ 3.82755` is
+already below `3.875` and cannot improve the current global bound.
+Changed weights, sites, parent domains, or charge atoms remain separate hypotheses.
 H-160/exp-158 and H-162/exp-160 are registered but blocked before target invocation.
 H-163 is registered and unresolved via exp-161; its target-blind instrument merged in PR
 182\. Encode-only timed out with no JSON. `--search` did not run.
@@ -400,6 +424,7 @@ case or experiment separately.
 
 | Document or collection | Role | Authority | Lifecycle | Current replacement |
 | --- | --- | --- | --- | --- |
+| [D-490 PDF Incident: Run 35784981711](packing/campaign/agent-sessions/session-152-validation/pdf-d490-run-35784981711.md) | failure analysis and lessons | record | retained | — |
 | [Senior Review of PRs 199–201](docs/project/reviews/review-2026-09-19-pr199-201-correctness.md) | dated review record | record | retained | — |
 | [Proof Review: R012 `s(17) >= 461300/99999` and Mira’s `4.613` Certificate](docs/project/reviews/review-2026-09-20-n17-r012-and-mira-4613-proof-review.md) | dated review record | record | retained | — |
 | [Review: Derived-Artifact Currency on `main` at `9fe9999d`](docs/project/reviews/review-2026-09-21-derived-artifact-currency.md) | dated review record | record | retained | — |
@@ -850,6 +875,10 @@ case or experiment separately.
 | [N11 W10 Route Selection](docs/project/reviews/review-2026-09-14-n11-w10-route-selection.md) | dated review record | record | retained | — |
 | [Post-W5 route selection for material small-n progress](docs/project/reviews/review-2026-09-14-n11-post-w5-route-selection.md) | dated review record | record | retained | — |
 | [Proof Review: Kleddamag’s `s(17) > 461300/99853`](docs/project/reviews/review-2026-09-21-n17-kleddamag-461300-99853.md) | dated review record | record | retained | — |
+| [External Square Certificates: Mathematical and Integration Review](docs/project/reviews/review-2026-09-22-external-square-certificates-integration.md) | dated review record | record | retained | — |
+| [Tokoharu Rectangle Densities: Mathematical and Integration Review](docs/project/reviews/review-2026-09-22-tokoharu-density-mathematics.md) | dated review record | record | retained | — |
+| [Mathematical Review: Kleddamag’s `s(11) > 31/8`](docs/project/reviews/review-2026-09-22-kleddamag-n11-mathematics.md) | dated review record | record | retained | — |
+| [Native Adaptive Parent-Core Verification](docs/project/reviews/review-2026-09-22-native-n11-parent-core.md) | dated review record | record | retained | — |
 | [The Three-Lane Research Method](docs/project/three-lane-research-method.md) | component scope and use | record | retained | — |
 | [Handoff — 2026-09-04, close of the fractional-certificate block](docs/project/handoff-2026-09-04-block-close.md) | dated handoff record | record | retained | — |
 | [Handoff: Post-3.81 Portfolio at T+2](docs/project/handoff-2026-09-06-post-381-t2-commissioning.md) | dated handoff record | record | retained | — |
@@ -1074,8 +1103,11 @@ The frozen `T-025` threshold atoms re-certify at the 2880-step net, where the cr
 shrink does not rise, so the dilation-limit supremum rises to
 `955000*sqrt(2073600042893309449)/359341754646249 = 3.826997548829544`, `+0.00055` over
 `T-026`. Both retention routes accept the frozen bytes and agree at exactly 1, and the
-limit record is replayed and written; **the register entry is deliberately unwritten**,
-which is why the session is stopped with certification debt rather than completed.
+limit record is replayed and written.
+Session 151 deliberately left the register entry unwritten, which is why that session
+remains stopped with certification debt rather than being rewritten after the fact.
+PR 221 later registered the result as T-033; this branch reconciles it with the stronger
+external `s(11) > 31/8` bound.
 Four cells returned measured negatives with witnesses — the `n = 17` triples and the
 parent-centre restriction are both load-bearing, re-pricing that support is capped at
 about `+0.0034`, and the first grid-capable search at `n = 12`, `20` and `21` returned
@@ -1100,12 +1132,45 @@ Three process defects came out of the block and are tracked rather than worked a
 `think-qsn2`, where `check_session_gate`’s verdict depends on the clone’s fetch depth;
 and `think-3umt`, where a record authored terminal can never earn its first receipt.
 
-**Selected next entry:** `think-gvlg`, registering the `n = 11` rung Session 151 left
-accepted and unregistered.
+**[Session 152](packing/campaign/agent-sessions/session-152-external-density-and-n11-review.md)**
+retained and reviewed the complete external n11 threshold, rectangle-density and point
+certificate packet. Complete source replays and mathematical audits support 19 newly
+audited verified-field improvements, and the session corrects n17 to the stronger
+Kleddamag bound already replayed and reviewed in Session 150, for 20 promotions in all.
+The n11 and n17 paired source checkers each share one event-cell method, and the density
+global decision remains the source C++ method, so the adopted evidence is stated at C3
+rather than C4. The density continuation driver’s wrong-count and stale-side imports are
+a High defect in that admission path; the separately checked fixed certificate files
+remain valid. The scoped pre-push at clean commit `819ade7` timed out in reachable
+behavioral tests with no emitted assertion failure; its retained receipt is diagnostic,
+not certification. The closure is certified at reachable branch commit
+`819ade7ca8afbe634a6ee54f215f0878f5674031` solely by the
+[hosted five-job full gate](https://github.com/jlevy/squares/actions/runs/35784995867).
+
+**Selected next entry:** `think-d010`.
+[Session 153](packing/campaign/agent-sessions/session-153-native-n11-parent-core.md)
+completes its mathematical and implementation scope: all 12,028 adaptive parent-core
+rows certify with the admissible parent-centre domain, strict core containment and
+bounded site and feature tables.
+The full proof and hosted checkpoint remain pinned to clean `c183cc9ab`; the final green
+PR 222 base at `be736b0ef` changes none of the 19 frozen proof inputs.
+The remaining W10 entry is publication of the independently reviewed closeout and its
+final-head checks on PR 223. The owner’s separately requested W3 frontier review uses
+this completed C4 evidence and owns the next research ordering.
+The parallel branch reconciles PR 221 while retaining every historical result and the
+strongest justified current bounds.
+Existing identifiers from PR 221 take precedence; any later conflicting identifiers are
+renumbered after PR 221’s sequence with every reference.
+PR 222 introduces no T-ID. `think-ck07` separately owns a second complete
+density-verification method, and `think-c0xc` owns the continuation-driver admission
+guard.
+
+**Selected next entry at the Session 151 cutoff:** `think-gvlg`, registering the
+`n = 11` rung Session 151 left accepted and unregistered.
 Its threshold certificate at the 2880-step net is `RETAINABLE` by both retention routes,
-which agree at exactly 1, and its dilation-limit record is replayed and written; what is
-missing is a `T-id`, a claim written as a supremum, and a qualifying gate pass on a host
-where that session’s three environment failures do not apply.
+which agree at exactly 1, and its dilation-limit record is replayed and written.
+That cutoff debt is now discharged by T-033 in PR 221; this paragraph preserves the
+selection Session 151 actually made.
 `think-zmos`, the W5 efficiency block that was the previous entry, is discharged:
 `OR-17`’s `1.38x` turned out to be the hosted runner pool rather than drift, the four CI
 jobs are clocked, and the rule’s text is corrected.
@@ -3435,8 +3500,8 @@ no intervening improvement:
 |  | value | source |
 | --- | --- | --- |
 | Best known packing (upper bound) | `3.8770835…` | Walter Trump, 1979 |
-| Best certified lower bound | `955000*sqrt(2073600042893309449)/359341754646249 = 3.8269975…` | [T-033](packing/frontier/RESULTS.md), proved at V4/C3 by an exact dilation-limit argument from T-025’s threshold certificate re-certified on a 2880-step direction net |
-| Bound gap | `0.0500860` | the second-smallest open gap at `n ≤ 100` in this corpus |
+| Best certified lower bound | `31/8 = 3.875` (strict) | [Native n11 review](docs/project/reviews/review-2026-09-22-native-n11-parent-core.md), complete exact and interval coverage with the reviewed transfer theorem; C4 |
+| Bound gap | `0.0020836` | difference between the two bounds; the exact optimum remains open |
 
 ![Walter Trump’s exact eleven-square packing.](packing/atlas/rendering/trump11-overview.svg)
 
@@ -3514,7 +3579,7 @@ Where the program has spent effort, and what came of it.
 | 16 | proved, `4` | `4` | proved not-below control | The valid replacement for the old `n=12` guard: any reported side below `4` is known to be invalid |
 | 17 | open | `4.67553009…` (Bidwell 1998) | mechanism-matched calibration | The nearest case whose record uses genuinely oblique structure—tilts of `0°`, `+39.80496°`, and `−36.62379°`. One round: [exp-011](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-011-h-020-n17.md) reports `5.0`, the trivial `5×5` grid, on all five binary64 screening seeds |
 | 61, 78, 97 | open, `m² − 3` | `8`, `9`, `10` (grids) | opportunistic slot | The narrowest gaps in the table. An analytic Cleemann-style attempt at `arctan(3/4)` is registered and **not yet made** |
-| 1–100 | 35 proved, 65 open | — | the corpus | One schema-validated artifact per case in [`frontier/`](packing/frontier/README.md); 58 of the 65 open cases are bounded below by Nagamochi’s general theorem |
+| 1–100 | 35 proved, 65 open | — | the corpus | One schema-validated artifact per case in [`frontier/`](packing/frontier/README.md); see the [Frontier corpus summary](packing/frontier/README.md#what-the-corpus-shows) for the current aggregate lower-bound counts |
 
 Three facts about this table drive the strategy.
 
@@ -4563,15 +4628,19 @@ in separate tables: their units differ, and the same work can appear in both.
 | `codex-task-tree-session-133.yaml` | session-133 | 101 | 0.37 h | 0.2 h | 13.6 h | yes |
 | `codex-task-tree-session-134.yaml` | session-134 | 497 | 4.88 h | 1.21 h | 1.21 h | yes |
 | `codex-task-tree-session-135.yaml` | session-135 | 437 | 1.53 h | 0.48 h | 0.48 h | yes |
+| `codex-task-tree-session-152.yaml` | session-152 | 2,141 | 12.27 h | 4.31 h | 4.31 h | yes |
+| `codex-task-tree-session-153-native-closeout.yaml` | session-153 | 191 | 1.04 h | 1.0 h | 2.91 h | yes |
+| `codex-task-tree-session-153-native-draft.yaml` | session-153 | 103 | 0.55 h | 0.53 h | 0.53 h | yes |
+| `codex-task-tree-session-153-native-finalization.yaml` | session-153 | 150 | 0.87 h | 0.84 h | 0.84 h | yes |
 | `session-142-stack-correctness.yaml` | session-142 | 1,186 | 5.01 h | 2.29 h | 2.3 h | yes |
 | `codex-task-tree-pr137-publication-tail.yaml` | unattributed | 610 | 4.39 h | 1.77 h | 1.82 h | yes |
 | `codex-task-tree-pr142-publication-tail.yaml` | unattributed | 136 | 0.87 h | 0.41 h | 0.58 h | yes |
 
 | Coverage | sessions |
 | --- | ---: |
-| measured | 97 |
+| measured | 99 |
 | unmeasured | 54 |
-| **total** | **151** |
+| **total** | **153** |
 
 <!-- END GENERATED: session-close-report -->
 
@@ -5710,15 +5779,16 @@ agrees, and new components inheriting the perimeter—that apply to code not yet
 
 ## Where This Stands
 
-**As of 2026-09-14 the current state and execution order are the checked
-[Research Program Status and Roadmap](#research-program-status-and-roadmap) above.**
-T-026 remains the strongest lower bound; the point/density ceiling leaves too little
-room for further incremental work in that language, and the owner has selected material
-bound improvement or proof simplification as the governing payoff.
-The historical synthesis below explains how the program reached that boundary.
-Its weighted-resource lineage runs through Göbel, Kearney–Shiu, Nagamochi and Bentz; the
-recent pure-atomic rational direction-net architecture follows Burns, and the LP
-instance and parameter line follows Massaccesi.
+**As of 2026-09-22 the current state and execution order are the checked
+[Research Program Status and Roadmap](#research-program-status-and-roadmap) above.** The
+verified external bound is `s(11) > 31/8 = 3.875`; the first-party point and threshold
+families below remain historical method evidence, and their ceilings leave no route to
+that current bound by net refinement alone.
+The owner has selected material bound improvement or proof simplification as the
+governing payoff. The historical synthesis below explains how the program reached that
+boundary. Its weighted-resource lineage runs through Göbel, Kearney–Shiu, Nagamochi and
+Bentz; the recent pure-atomic rational direction-net architecture follows Burns, and the
+LP instance and parameter line follows Massaccesi.
 This project’s instances and generator moved seven registered cases in one day.
 `s(11) >= 381/100` is [T-018](packing/frontier/RESULTS.md), improving Stromquist’s
 `2 + 4/sqrt(5)`, stated in 1984 and published in 2003; the recorded search found no
@@ -5734,11 +5804,14 @@ point-atom method provably cannot pass.
 [T-026](packing/frontier/RESULTS.md) then re-certifies those atoms on a 1440-step net
 and proves `s(11) >= 3.826447410572939…` by an exact dilation-limit argument, and
 [T-033](packing/frontier/RESULTS.md) repeats that on a 2880-step net for
-`s(11) >= 3.826997548829543…`. The second is the verified lower bound of the case;
-“dilation-limit” describes the proof construction, not a weaker theorem or assurance
-level. The shared S5 rubric category does not make these contributions comparable in
-size. `s(12) >= 99/25` is [T-017](packing/frontier/RESULTS.md), the first bound located
-that was proved about twelve squares rather than inherited from eleven.
+`s(11) >= 3.826997548829543…`. T-033 is the strongest retained first-party rung in this
+family, while the current verified case bound is the stronger external strict result
+`s(11) > 31/8`. “Dilation-limit” describes T-033’s proof construction, not a weaker
+theorem or assurance level.
+The result retains its historical S5 registration, while the external certificate
+supplies the current case bound.
+`s(12) >= 99/25` is [T-017](packing/frontier/RESULTS.md), the first bound located that
+was proved about twelve squares rather than inherited from eleven.
 `s(17) >= 459/100`, and `n = 18` and `n = 19` at the same side without a monotonicity
 step, is [T-019](packing/frontier/RESULTS.md) and displaces Massaccesi’s published
 `4.5058` by `0.0842`. `s(19)`, `s(20)` and `s(21) >= 24/5` is
@@ -6101,8 +6174,8 @@ Each entry names what this project relies on it for.
   Electronic Journal of Combinatorics, DS7. The survey the corpus is checked against.
 - Erdős, P. and Graham, R. L. (1975). *On packing squares with equal squares.* The
   asymptotic waste line of work.
-- Nagamochi, H. (2005). *Packing unit squares in a rectangle.* The general lower bound
-  covering 58 of the 65 open cases in the corpus.
+- Nagamochi, H. (2005). *Packing unit squares in a rectangle.* The general closed-form
+  lower bound used where the register has no stronger formal evidence.
 - Montanher, T. et al.
   (2018). *Rigorous packing of unit squares into a circle.* The only rigorous
   computer-assisted optimality proof for rotatable unit squares in any container, and

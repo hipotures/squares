@@ -19,15 +19,15 @@ This repository contains:
 
 The [**v0.4.1 explainer page**](https://jlevy.github.io/squares/) starts with an
 interactive point-certificate proof, then shows how threshold atoms and a dilation limit
-reach the current `s(11)` lower bound.
+reach T-026’s historical `s(11) >= 3.8264474…` bound.
 Its figures remain drawn from the point certificates they explain.
 
-[![One hundred known-best square packings arranged from n equals one through one hundred, each labeled with its best-known upper bound and, where the value is still open, the strongest lower bound independently verified here.](packing/atlas/known-best/known-best-1-100.png)](https://jlevy.github.io/squares/known-best-1-100.pdf)
+[![One hundred known-best square packings arranged from n equals one through one hundred, each labeled with its best-known upper bound and, where the value is still open, the strongest verified lower bound.](packing/atlas/known-best/known-best-1-100.png)](https://jlevy.github.io/squares/known-best-1-100.pdf)
 
 *The retained `n = 1…100` atlas, with each packing normalized to its own container and
 labeled by its best-known side upper bound.
-For open cases, the strongest lower bound independently verified here appears beneath
-it. A crimson star marks a lower bound proved here.
+For open cases, the strongest verified lower bound appears beneath it.
+A crimson star marks a lower bound proved here.
 The image is available in [**SVG**](packing/atlas/known-best/known-best-1-100.svg),
 [**PDF**](https://jlevy.github.io/squares/known-best-1-100.pdf), and
 [**high-resolution PNG**](packing/atlas/known-best/known-best-1-100@2x.png).*
@@ -121,17 +121,27 @@ Results first established here, as far as the recorded source searches show:
   dilation-limit argument, at `V4/C5`: machine-verified exact or interval-certified
   evidence with passing replay, confirmed by distinct exact event-cell and interval
   coverage methods and a mapped source-distinct review of the complete claim.
-  The strongest proved lower bound now stands at
-  `s(11) ≥ 955000*sqrt(2073600042893309449)/359341754646249 = 3.8269975…`, the same
-  measure re-certified once more on a 2880-step net
+  T-033 records the same retained atoms on a 2880-step net and gives the stronger
+  first-party result
+  `s(11) ≥ 955000*sqrt(2073600042893309449)/359341754646249 = 3.8269975…`
   ([T-033](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-226-n11-net2880-receipt.md)),
   which halves the net’s largest half-gap tangent and moves the bound by
   `+0.00055013825660`. `T-033` is registered as `V4/C3`: the certificate carries the
   same two distinct machine decisions, but the bound is derived from it by a single
   exact-algebraic step, and a derived claim takes the minimum over its parts.
-  The explainer uses the `3.81` certificate as its visual worked example, then proves
-  the threshold-counting and dilation steps that establish `T-026`’s `3.8264474…`
-  directly; it is generated against that rung and has not been rebuilt on `T-033`’s net.
+  The
+  [September 22 external review](docs/project/reviews/review-2026-09-22-external-square-certificates-integration.md)
+  establishes the stronger current bound `s(11) > 31/8 = 3.875` from Kleddamag’s
+  certificate and verifies Tokoharu’s rectangle-density bounds `s(26) >= 5.508` and
+  `s(29) >= 5.71`. Complete replays and mathematical reviews support those Frontier
+  bounds. The
+  [native n11 decision](docs/project/reviews/review-2026-09-22-native-n11-parent-core.md)
+  independently covers all 12,028 parent-angle intervals by interval branch and bound.
+  Together with the exact source replay and reviewed transfer theorem, it confirms the
+  strict `3.875` bound at `V4/C4`. The explainer uses the `3.81` certificate as its
+  visual worked example, then proves the threshold-counting and dilation steps that
+  establish `T-026`’s `3.8264474…` directly; it is generated against that rung and has
+  not been rebuilt on `T-033`’s net.
 - **T-019: `s(17), s(18), s(19) ≥ 459/100`, improving the register (`S4`).** The adopted
   bound for [these](packing/frontier/n-017.md) three cases was Massaccesi’s `4.5058`,
   taken from a source rather than proved here.
@@ -306,14 +316,18 @@ accordingly.
 
 ## Survey
 
-The survey records the best-known packing and strongest lower bound independently
-verified here for every `n ≤ 324`, with provenance and separate reported and verified
-fields. Its source is one schema-validated case file under
+The survey records the best-known packing and strongest verified lower bound for every
+`n ≤ 324`, with provenance and separate reported and verified fields.
+Complete external certificate replays qualify when their mathematical assumptions are
+discharged; each record states who performed the checks and their independence limits.
+Its source is one schema-validated case file under
 [`packing/frontier/`](packing/frontier/README.md); the generated
 [status table](packing/frontier/STATUS.md) is the reader view, and the atlas above
 renders every retained known-best packing.
 The current `n = 18` survey row records the independently verified lower bound
-`4679/1000 = 4.679` from `T-030`, and `n = 17` records `461300/99999` from `T-032`.
+`4679/1000 = 4.679` from `T-030`. At `n = 17`, the retained Kleddamag replay and proof
+review support the stronger `461300/99853 = 4.619791…`; T-032 remains in the result
+history.
 
 The [literature archive](packing/resources/README.md) retains each primary source, a
 cleaned Markdown transcription, and the unedited extraction used to check it.

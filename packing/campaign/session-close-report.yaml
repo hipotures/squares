@@ -7,11 +7,11 @@ softschema:
   schema: schemas/session-close-report.schema.yaml
   envelope: null
   status: enforced
-count: 151
+count: 153
 generated_by: >-
   uv run --frozen --all-extras --group dev python -m devtools.close_session --render
 totals:
-  sessions_measured: 97
+  sessions_measured: 99
   sessions_unmeasured: 54
   attributed:
     rollups: 188
@@ -35,9 +35,9 @@ totals:
     one_off_code: 5356
     wall_hours: 497.45
 codex_receipts:
-  attributed: 56
+  attributed: 60
   unattributed: 2
-  measured: 58
+  measured: 62
 # Per-session figures below are the logs each session DECLARES. They overlap when
 # sessions share a harness log, so they do not sum to `attributed` above.
 sessions:
@@ -2522,3 +2522,57 @@ sessions:
   one_off_code: 202
   wall_hours: 8.51
   codex_receipts: []
+- id: session-152
+  title: "External rectangle-density and n11 certificate review"
+  status: completed
+  primary_bead: think-6xoc
+  phases: 1
+  measured: true
+  rollups:
+  - packing/campaign/resource-usage/codex-task-tree-session-152.yaml
+  turns: null
+  tool_calls: null
+  tool_errors: null
+  one_off_code: null
+  wall_hours: null
+  codex_receipts:
+  - path: packing/campaign/resource-usage/codex-task-tree-session-152.yaml
+    model_responses: 2141
+    agent_hours: 12.27
+    active_union_hours: 4.31
+    wall_hours: 4.31
+    snapshot_incomplete: true
+- id: session-153
+  title: "Native n11 adaptive parent-core verification"
+  status: completed
+  primary_bead: think-d010
+  phases: 4
+  measured: true
+  rollups:
+  - packing/campaign/resource-usage/codex-task-tree-session-153-native-draft.yaml
+  - packing/campaign/resource-usage/codex-task-tree-session-153-native-closeout.yaml
+  - packing/campaign/resource-usage/codex-task-tree-session-153-native-finalization.yaml
+  turns: null
+  tool_calls: null
+  tool_errors: null
+  one_off_code: null
+  wall_hours: null
+  codex_receipts:
+  - path: packing/campaign/resource-usage/codex-task-tree-session-153-native-draft.yaml
+    model_responses: 103
+    agent_hours: 0.55
+    active_union_hours: 0.53
+    wall_hours: 0.53
+    snapshot_incomplete: true
+  - path: packing/campaign/resource-usage/codex-task-tree-session-153-native-closeout.yaml
+    model_responses: 191
+    agent_hours: 1.04
+    active_union_hours: 1.0
+    wall_hours: 2.91
+    snapshot_incomplete: true
+  - path: packing/campaign/resource-usage/codex-task-tree-session-153-native-finalization.yaml
+    model_responses: 150
+    agent_hours: 0.87
+    active_union_hours: 0.84
+    wall_hours: 0.84
+    snapshot_incomplete: true

@@ -448,9 +448,19 @@ could not be retrieved are in
 
 ## Web Sources
 
+The
+[September 22 external certificate packet](web/external-square-certificates-2026-09-22/README.md)
+retains complete pinned Tokoharu, Kleddamag, wand125 and Guzhou source trees, the
+supplied social threads, executable replay receipts and independent audit controls.
+Its Frontier keys are **[Tokoharu density 2026]**, **[Kleddamag n11 2026]** and
+**[wand125 point bounds 2026]**. The
+[integration review](../../docs/project/reviews/review-2026-09-22-external-square-certificates-integration.md)
+distinguishes literal reported bounds, verified replays and proposed native extensions.
+
 | Key | What | Source | File stem (in `web/`) |
 | --- | --- | --- | --- |
 | **[Friedman Center]** | Packing Center record tables and diagrams | erich-friedman.github.io | `friedman-packing-center-squares` |
+| **[Guzhou R038 2026]** | The pinned R038 parent-angle certificate and verifier used in the external n17 comparison | github.com/Guzhou0806/N17 | `external-square-certificates-2026-09-22/dependencies/guzhou-n17-full/certificates/R038/` |
 | **[Friedman DS7 html]** | 2009 HTML edition of the DS7 survey | combinatorics.org | `friedman-ds7-survey-2009-html` |
 | **[Kingbird]** | Squares-in-Squares catalogue: exact minimal polynomials, rigidity flags | kingbird.myphotos.cc | `kingbird-squares-in-squares` |
 | **[Kingbird-compared]** | Supersession history: which record fell to which method, when | kingbird.myphotos.cc | `kingbird-squares-in-squares-compared` |

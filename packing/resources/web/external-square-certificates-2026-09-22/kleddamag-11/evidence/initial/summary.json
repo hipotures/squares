@@ -1,0 +1,23 @@
+{
+  "status": "VERIFIED_GLOBAL_BOUND_TWO_FULL_EXACT_REPLAYS_AND_CONTROLS",
+  "n": 11,
+  "relation": ">",
+  "bound": "31/8",
+  "decimal": "3.875",
+  "certificate_sha256": "57e9927da5c13f42dd8bcbf8f08c84363635fece626657ee63a810c61cd44458",
+  "proposal_sha256": "3360eed10edd7c3a49629c02c1f4857bf32311bbc69d6e54e70a834ea57eeb7e",
+  "intervals": 12028,
+  "minimum_units": 999962528,
+  "budget_units": 10999479944,
+  "surplus_units": 107864,
+  "histograms_identical": true,
+  "strict_core_margin": "1/1000000000000",
+  "boundary_control_centres": 5586,
+  "improvement_over_pass1": "47/1000",
+  "seconds": 1018.1757426249969,
+  "limitations": [
+    "Exact minimum unresolved.",
+    "No improved packing found.",
+    "Not a proof-assistant formalization or an external independent review."
+  ]
+}

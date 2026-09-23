@@ -17,7 +17,7 @@
           "degree_known": 95,
           "degree_recorded_upstream": 11,
           "exact_value_known": 95,
-          "lower_bound_first_proved_here": 6,
+          "lower_bound_first_proved_here": 5,
           "only_known_numerically": 5,
           "proved_optimal": 35,
           "rigidity_catalogue_annotated": 2,
@@ -40,7 +40,7 @@
           "degree_known": 287,
           "degree_recorded_upstream": 36,
           "exact_value_known": 287,
-          "lower_bound_first_proved_here": 6,
+          "lower_bound_first_proved_here": 5,
           "only_known_numerically": 37,
           "proved_optimal": 59,
           "rigidity_catalogue_annotated": 2,
@@ -581,16 +581,15 @@
           "state": "minimal-polynomial"
         },
         "lower": {
-          "display": "s(11) ≥ 3.826997",
+          "display": "s(11) ≥ 3.875000",
           "evidence": [
-            "E-n011-threshold-net2880-certificate",
-            "E-n011-threshold-net2880-dilation-limit",
-            "E-n011-threshold-net2880-interval-decision"
+            "E-n011-kleddamag-3875-native-parent-core",
+            "E-n011-kleddamag-3875-source-replay"
           ],
-          "first_proved_here": true,
+          "first_proved_here": false,
           "provenance": "frontier",
           "shown": true,
-          "value": "3.826997548829543"
+          "value": "3.875"
         },
         "n": 11,
         "optimality": {
@@ -873,17 +872,14 @@
           "state": "minimal-polynomial"
         },
         "lower": {
-          "display": "s(17) ≥ 4.613046",
+          "display": "s(17) ≥ 4.619791",
           "evidence": [
-            "E-n017-guzhou-r012-interval-decision",
-            "E-n017-guzhou-r012-source-replay",
-            "E-n017-mira-4613-exact-replay",
-            "E-n017-mira-4613-interval-decision"
+            "E-n017-kleddamag-461300-99853-source-replay"
           ],
           "first_proved_here": false,
           "provenance": "frontier",
           "shown": true,
-          "value": "4.613046130461"
+          "value": "4.619791092906572"
         },
         "n": 17,
         "optimality": {
@@ -1301,14 +1297,14 @@
           "state": "closed-form"
         },
         "lower": {
-          "display": "s(26) ≥ 5.123105",
+          "display": "s(26) ≥ 5.508000",
           "evidence": [
-            "E-nagamochi-lower"
+            "E-tokoharu-density-source-replay"
           ],
           "first_proved_here": false,
           "provenance": "frontier",
           "shown": true,
-          "value": "5.12310562562"
+          "value": "5.508"
         },
         "n": 26,
         "optimality": {
@@ -1345,14 +1341,14 @@
           "state": "closed-form"
         },
         "lower": {
-          "display": "s(27) ≥ 5.242640",
+          "display": "s(27) ≥ 5.508000",
           "evidence": [
-            "E-nagamochi-lower"
+            "E-tokoharu-density-source-replay"
           ],
           "first_proved_here": false,
           "provenance": "frontier",
           "shown": true,
-          "value": "5.24264068712"
+          "value": "5.508"
         },
         "n": 27,
         "optimality": {
@@ -1394,14 +1390,14 @@
           "state": "minimal-polynomial"
         },
         "lower": {
-          "display": "s(28) ≥ 5.358898",
+          "display": "s(28) ≥ 5.508000",
           "evidence": [
-            "E-nagamochi-lower"
+            "E-tokoharu-density-source-replay"
           ],
           "first_proved_here": false,
           "provenance": "frontier",
           "shown": true,
-          "value": "5.35889894354"
+          "value": "5.508"
         },
         "n": 28,
         "optimality": {
@@ -1438,14 +1434,14 @@
           "state": "numeric-only"
         },
         "lower": {
-          "display": "s(29) ≥ 5.472135",
+          "display": "s(29) ≥ 5.710000",
           "evidence": [
-            "E-nagamochi-lower"
+            "E-tokoharu-density-source-replay"
           ],
           "first_proved_here": false,
           "provenance": "frontier",
           "shown": true,
-          "value": "5.472135955"
+          "value": "5.71"
         },
         "n": 29,
         "optimality": {
@@ -1482,14 +1478,14 @@
           "state": "closed-form"
         },
         "lower": {
-          "display": "s(30) ≥ 5.582575",
+          "display": "s(30) ≥ 5.710000",
           "evidence": [
-            "E-nagamochi-lower"
+            "E-tokoharu-density-source-replay"
           ],
           "first_proved_here": false,
           "provenance": "frontier",
           "shown": true,
-          "value": "5.58257569496"
+          "value": "5.71"
         },
         "n": 30,
         "optimality": {
@@ -1526,14 +1522,14 @@
           "state": "closed-form"
         },
         "lower": {
-          "display": "s(31) ≥ 5.690415",
+          "display": "s(31) ≥ 5.710000",
           "evidence": [
-            "E-nagamochi-lower"
+            "E-tokoharu-density-source-replay"
           ],
           "first_proved_here": false,
           "provenance": "frontier",
           "shown": true,
-          "value": "5.69041575982"
+          "value": "5.71"
         },
         "n": 31,
         "optimality": {
@@ -1903,14 +1899,14 @@
           "state": "minimal-polynomial"
         },
         "lower": {
-          "display": "s(39) ≥ 6.291502",
+          "display": "s(39) ≥ 6.500000",
           "evidence": [
-            "E-nagamochi-lower"
+            "E-wand125-point-source-replay"
           ],
           "first_proved_here": false,
           "provenance": "frontier",
           "shown": true,
-          "value": "6.29150262213"
+          "value": "6.5"
         },
         "n": 39,
         "optimality": {
@@ -1952,14 +1948,14 @@
           "state": "closed-form"
         },
         "lower": {
-          "display": "s(40) ≥ 6.385164",
+          "display": "s(40) ≥ 6.500000",
           "evidence": [
-            "E-nagamochi-lower"
+            "E-wand125-point-source-replay"
           ],
           "first_proved_here": false,
           "provenance": "frontier",
           "shown": true,
-          "value": "6.38516480713"
+          "value": "6.5"
         },
         "n": 40,
         "optimality": {
@@ -1996,14 +1992,14 @@
           "state": "minimal-polynomial"
         },
         "lower": {
-          "display": "s(41) ≥ 6.477225",
+          "display": "s(41) ≥ 6.500000",
           "evidence": [
-            "E-nagamochi-lower"
+            "E-wand125-point-source-replay"
           ],
           "first_proved_here": false,
           "provenance": "frontier",
           "shown": true,
-          "value": "6.47722557505"
+          "value": "6.5"
         },
         "n": 41,
         "optimality": {
@@ -2506,14 +2502,14 @@
           "state": "closed-form"
         },
         "lower": {
-          "display": "s(52) ≥ 7.244997",
+          "display": "s(52) ≥ 7.380000",
           "evidence": [
-            "E-nagamochi-lower"
+            "E-wand125-n052-derived-lower"
           ],
           "first_proved_here": false,
           "provenance": "frontier",
           "shown": true,
-          "value": "7.2449979984"
+          "value": "7.38"
         },
         "n": 52,
         "optimality": {
@@ -2550,14 +2546,14 @@
           "state": "closed-form"
         },
         "lower": {
-          "display": "s(53) ≥ 7.324555",
+          "display": "s(53) ≥ 7.380000",
           "evidence": [
-            "E-nagamochi-lower"
+            "E-wand125-point-source-replay"
           ],
           "first_proved_here": false,
           "provenance": "frontier",
           "shown": true,
-          "value": "7.32455532034"
+          "value": "7.38"
         },
         "n": 53,
         "optimality": {
@@ -2638,14 +2634,14 @@
           "state": "numeric-only"
         },
         "lower": {
-          "display": "s(55) ≥ 7.480740",
+          "display": "s(55) ≥ 7.540000",
           "evidence": [
-            "E-nagamochi-lower"
+            "E-wand125-point-source-replay"
           ],
           "first_proved_here": false,
           "provenance": "frontier",
           "shown": true,
-          "value": "7.48074069841"
+          "value": "7.54"
         },
         "n": 55,
         "optimality": {
@@ -2682,14 +2678,14 @@
           "state": "closed-form"
         },
         "lower": {
-          "display": "s(56) ≥ 7.557438",
+          "display": "s(56) ≥ 7.620000",
           "evidence": [
-            "E-nagamochi-lower"
+            "E-wand125-point-source-replay"
           ],
           "first_proved_here": false,
           "provenance": "frontier",
           "shown": true,
-          "value": "7.5574385243"
+          "value": "7.62"
         },
         "n": 56,
         "optimality": {
@@ -3230,14 +3226,14 @@
           "state": "numeric-only"
         },
         "lower": {
-          "display": "s(68) ≥ 8.280109",
+          "display": "s(68) ≥ 8.410000",
           "evidence": [
-            "E-nagamochi-lower"
+            "E-wand125-n068-derived-lower"
           ],
           "first_proved_here": false,
           "provenance": "frontier",
           "shown": true,
-          "value": "8.28010988928"
+          "value": "8.41"
         },
         "n": 68,
         "optimality": {
@@ -3274,14 +3270,14 @@
           "state": "numeric-only"
         },
         "lower": {
-          "display": "s(69) ≥ 8.348469",
+          "display": "s(69) ≥ 8.410000",
           "evidence": [
-            "E-nagamochi-lower"
+            "E-wand125-point-source-replay"
           ],
           "first_proved_here": false,
           "provenance": "frontier",
           "shown": true,
-          "value": "8.34846922835"
+          "value": "8.41"
         },
         "n": 69,
         "optimality": {
@@ -3318,14 +3314,14 @@
           "state": "minimal-polynomial"
         },
         "lower": {
-          "display": "s(70) ≥ 8.416198",
+          "display": "s(70) ≥ 8.550000",
           "evidence": [
-            "E-nagamochi-lower"
+            "E-wand125-point-source-replay"
           ],
           "first_proved_here": false,
           "provenance": "frontier",
           "shown": true,
-          "value": "8.4161984871"
+          "value": "8.55"
         },
         "n": 70,
         "optimality": {
@@ -3362,14 +3358,14 @@
           "state": "numeric-only"
         },
         "lower": {
-          "display": "s(71) ≥ 8.483314",
+          "display": "s(71) ≥ 8.550000",
           "evidence": [
-            "E-nagamochi-lower"
+            "E-wand125-point-source-replay"
           ],
           "first_proved_here": false,
           "provenance": "frontier",
           "shown": true,
-          "value": "8.48331477355"
+          "value": "8.55"
         },
         "n": 71,
         "optimality": {
@@ -3406,14 +3402,14 @@
           "state": "closed-form"
         },
         "lower": {
-          "display": "s(72) ≥ 8.549834",
+          "display": "s(72) ≥ 8.610000",
           "evidence": [
-            "E-nagamochi-lower"
+            "E-wand125-point-source-replay"
           ],
           "first_proved_here": false,
           "provenance": "frontier",
           "shown": true,
-          "value": "8.54983443527"
+          "value": "8.61"
         },
         "n": 72,
         "optimality": {
@@ -14739,7 +14735,7 @@
       "degree_known": 287,
       "degree_recorded_upstream": 36,
       "exact_value_known": 287,
-      "lower_bound_first_proved_here": 6,
+      "lower_bound_first_proved_here": 5,
       "only_known_numerically": 37,
       "proved_optimal": 59,
       "rigidity_catalogue_annotated": 2,

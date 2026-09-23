@@ -3,18 +3,97 @@ softschema:
   schema: source-coverage.schema.yaml
   status: enforced
 
-last_reviewed: '2026-09-07'
+last_reviewed: '2026-09-22'
 coverage_scope: >
   Current public upper-bound catalogues and first-party result releases known to this
-  project, plus the Schadt n=29 repository used as the witness-contract regression case.
-  Primary proof literature is tracked by evidence.yaml and source-availability.yaml
-  rather than duplicated here. This is a dated named-source claim, not a claim that a
+  project, the Schadt n=29 witness-contract regression source, and the September 2026
+  external executable lower-bound certificate releases. Their proof obligations and
+  assurance are tracked by evidence.yaml; paper availability remains in
+  source-availability.yaml. This is a dated named-source claim, not a claim that a
   web search has exhausted every possible source.
 case_corpus:
   n_min: 1
   n_max: 324
   reader_view: frontier/STATUS.md
 sources:
+  - id: kleddamag-n17-2026
+    title: Seventeen unit squares — a certified lower bound
+    role: source-repository
+    url: https://github.com/Kleddamag/17-squares-certified-bound
+    local: resources/web/n17-kleddamag-certified-bound-2026-09-21/kleddamag-17-squares-certified-bound/
+    source_key: '[Kleddamag n17 certified bound]'
+    scope: {n_values: [17]}
+    reviewed: '2026-09-22'
+    source_date: null
+    disposition: current-report
+    replay_disposition: case-specific
+    represented_by: [frontier/n-017.md]
+    evidence: [E-n017-kleddamag-461300-99853-report, E-n017-kleddamag-461300-99853-source-replay]
+    notes: >-
+      Complete v1.0.0 release at a499e2c739ce7853fa04c8bcdc85caf1c2b01b37
+      retained on 2026-09-21 with an offline R038 checker input. The prior
+      session and proof review attest a complete two-checker replay producing
+      the manifest-bound source RESULT.json byte-identically. Registered on
+      2026-09-22 at V4/C3; no fresh replay or method-distinct C4 is claimed.
+      Source outputs and the repository's execution attestation retain their
+      distinct provenance.
+  - id: kleddamag-n11-2026
+    title: Eleven unit squares — a certified lower bound
+    role: source-repository
+    url: https://github.com/Kleddamag/11-squares-certified-bound
+    local: resources/web/external-square-certificates-2026-09-22/kleddamag-11/
+    source_key: '[Kleddamag n11 2026]'
+    scope: {n_values: [11]}
+    reviewed: '2026-09-22'
+    source_date: null
+    disposition: current-report
+    replay_disposition: case-specific
+    represented_by: [frontier/n-011.md]
+    evidence: [E-n011-kleddamag-3875-report, E-n011-kleddamag-3875-source-replay]
+    notes: >-
+      Complete v1.0.2 tree pinned at 6a733f339395c3514f2ab63d8c4aa64cf63c0b5a,
+      with offline R038 checker dependency, supplied and fetched social text,
+      and separate mathematical review and replay receipts in the source packet.
+  - id: tokoharu-density-2026
+    title: Rectangle-density lower-bound certificates
+    role: source-repository
+    url: https://github.com/tokoharu/square-packing-density-bounds
+    local: resources/web/external-square-certificates-2026-09-22/tokoharu-density/
+    source_key: '[Tokoharu density 2026]'
+    scope: {n_values: [11, 26, 27, 28, 29, 30, 31]}
+    reviewed: '2026-09-22'
+    source_date: null
+    disposition: current-report
+    replay_disposition: case-specific
+    represented_by: [frontier/n-011.md, frontier/n-026.md, frontier/n-027.md, frontier/n-028.md, frontier/n-029.md, frontier/n-030.md, frontier/n-031.md]
+    evidence: [E-tokoharu-density-report, E-tokoharu-density-monotone-report, E-tokoharu-density-source-replay]
+    notes: >-
+      Complete tree at b543990f7794b8c511cb46cf3854b7e8166c3674, including
+      Japanese proof, search code, interval verifier and all three certificates.
+      The separately retained wand125 density fork's main and add-push-driver
+      branch contain the same certificates; neither supplies the unspecified
+      stronger numerical results mentioned by the social post.
+  - id: wand125-points-2026
+    title: Weighted point certificates for ten square counts
+    role: source-repository
+    url: https://github.com/wand125/square-packing-bounds
+    local: resources/web/external-square-certificates-2026-09-22/wand125-points/
+    source_key: '[wand125 point bounds 2026]'
+    scope: {n_values: [26, 29, 39, 40, 41, 52, 53, 55, 56, 68, 69, 70, 71, 72]}
+    reviewed: '2026-09-22'
+    source_date: null
+    disposition: current-report
+    replay_disposition: case-specific
+    represented_by: [frontier/evidence.yaml]
+    evidence: [E-wand125-point-bounds-report, E-wand125-point-monotone-report, E-wand125-point-source-replay, E-wand125-n052-derived-lower, E-wand125-n068-derived-lower]
+    notes: >-
+      Complete current tree at 1398e42f17f23fe3744bc54425a589fab1f3542c and
+      Tokoharu's pinned predecessor 8ec3d79167ac422f21cc38d96e0dd7a8f5c22ed4
+      retained. The n26 and n29 values are superseded by the density source.
+      The scope includes the explicitly reported n41/n71 monotonic consequences
+      and local n52/n68 deductions from the exact masses, credited as local deductions
+      rather than literal upstream claims. All ten complete exact replays passed; their verified evidence is recorded
+      separately from the literal source reports.
   - id: kingbird-current
     title: Squares in Squares
     role: current-catalogue

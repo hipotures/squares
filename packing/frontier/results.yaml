@@ -201,8 +201,9 @@ results:
       score: 3
       rationale: >-
         The workhorse lower bound: 95 of the hundred case records cite this result,
-        and it supplies the operative verified lower bound in 83 of them. The count was
-        88 until 2026-08-31, when first-party certificates began displacing it.
+        and it supplies the operative verified lower bound in 65 of them. The count was
+        88 until 2026-08-31, when first-party certificates began displacing it; replayed
+        external certificates displaced 18 more case values on 2026-09-22.
       scored: '2026-08-31'
       by: session-061 review (repository)
     novelty: previously-published
@@ -213,8 +214,8 @@ results:
       - packing/devtools/check_nagamochi_bounds.py
     next_rung: >-
       The proof itself is C1 with four named unverified items in the read;
-      the 83 operative verified-field values are separately re-derived in the gate (a C2
-      fact about the transcriptions), while the other 12 citations carry historical or
+      the 65 operative verified-field values are separately re-derived in the gate (a C2
+      fact about the transcriptions), while the other 30 citations carry historical or
       reported context and are not current bounds. C3 means machine-checking Theorem 1's
       unavoidable-set capacity argument.
   - id: T-008
