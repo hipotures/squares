@@ -1,0 +1,23 @@
+{
+  "checks": {
+    "rows": true,
+    "direction_order": true,
+    "centre_order": true,
+    "coefficient_matrix": true,
+    "weights": true,
+    "duals": true,
+    "objective": true,
+    "least_covered": true,
+    "stop_reason": true,
+    "round_decisions": true
+  },
+  "serial_matrix_sha256": "b98884b7058e010d9550ec7f7c3953fbf62c043e526f41f4ca7836b2b611f39b",
+  "parallel_matrix_sha256": "b98884b7058e010d9550ec7f7c3953fbf62c043e526f41f4ca7836b2b611f39b",
+  "serial_rounds": 22,
+  "parallel_rounds": 22,
+  "serial_rows": 5643,
+  "parallel_rows": 5643,
+  "objective": 12.21767636660579,
+  "least_covered": 0.9999999999995074,
+  "stopped": "converged: every placement covers mass 1"
+}

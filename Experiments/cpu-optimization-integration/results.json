@@ -1,0 +1,148 @@
+{
+  "case": {
+    "n": 12,
+    "outer_side": "99/25",
+    "square_side": "9977/10000",
+    "thread_limits": {
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1"
+    }
+  },
+  "environment_file": "environment.json",
+  "stages": [
+    {
+      "stage": 0,
+      "checkpoint": "M0",
+      "commit": "1f58b0f0abca55d4ea2cf0e1cd73d70ebd625659",
+      "workers_1": {
+        "files": [
+          "raw/m0-w1-r1.json",
+          "raw/m0-w1-r2.json",
+          "raw/m0-w1-r3.json"
+        ],
+        "runs": 3,
+        "wall_seconds": {
+          "min": 44.162,
+          "median": 44.253,
+          "max": 44.444
+        },
+        "separation_seconds": {
+          "min": 33.962,
+          "median": 34.153,
+          "max": 34.42
+        },
+        "lp_seconds": {
+          "min": 10.02,
+          "median": 10.097,
+          "max": 10.196
+        },
+        "round0_seconds": {
+          "min": 3.026163879996602,
+          "median": 3.1175883889991383,
+          "max": 3.247528402000171
+        },
+        "rounds": 22,
+        "rows": 5643,
+        "objective": 12.21767636660579,
+        "least_covered": 0.9999999999995074,
+        "stop_reason": "converged: every placement covers mass 1",
+        "peak_parent_rss_kib": null
+      },
+      "workers_16": null,
+      "workers_16_note": "current main had no production worker setting"
+    },
+    {
+      "stage": 1,
+      "checkpoint": "M1",
+      "optimization": "production parallel directions",
+      "input_baseline_commit": "1f58b0f0abca55d4ea2cf0e1cd73d70ebd625659",
+      "source_branch": "exp/cpu-parallel-directions",
+      "source_commit": "9fca9e8c66a5d05a71803e3e0796531568c7c850",
+      "integration_commit": "accd54aad5a003540d59adbeb3f84facb058b561",
+      "workers_1": {
+        "files": [
+          "raw/m1-w1-r1.json",
+          "raw/m1-w1-r2.json",
+          "raw/m1-w1-r3.json"
+        ],
+        "runs": 3,
+        "wall_seconds": {
+          "min": 44.052,
+          "median": 44.217,
+          "max": 44.642
+        },
+        "separation_seconds": {
+          "min": 33.844,
+          "median": 34.175,
+          "max": 34.524
+        },
+        "lp_seconds": {
+          "min": 10.038,
+          "median": 10.115,
+          "max": 10.204
+        },
+        "round0_seconds": {
+          "min": 3.072174349999841,
+          "median": 3.141475383999932,
+          "max": 3.2106941519959946
+        },
+        "rounds": 22,
+        "rows": 5643,
+        "objective": 12.21767636660579,
+        "least_covered": 0.9999999999995074,
+        "stop_reason": "converged: every placement covers mass 1",
+        "peak_parent_rss_kib": {
+          "min": 350936,
+          "median": 351984,
+          "max": 359076
+        }
+      },
+      "workers_16": {
+        "files": [
+          "raw/m1-w16-r1.json",
+          "raw/m1-w16-r2.json",
+          "raw/m1-w16-r3.json"
+        ],
+        "runs": 3,
+        "wall_seconds": {
+          "min": 17.431,
+          "median": 17.641,
+          "max": 17.718
+        },
+        "separation_seconds": {
+          "min": 7.298,
+          "median": 7.34,
+          "max": 7.349
+        },
+        "lp_seconds": {
+          "min": 10.071,
+          "median": 10.289,
+          "max": 10.407
+        },
+        "round0_seconds": {
+          "min": 1.0206188589982048,
+          "median": 1.023288409000088,
+          "max": 1.0264658980013337
+        },
+        "rounds": 22,
+        "rows": 5643,
+        "objective": 12.21767636660579,
+        "least_covered": 0.9999999999995074,
+        "stop_reason": "converged: every placement covers mass 1",
+        "peak_parent_rss_kib": {
+          "min": 356260,
+          "median": 356864,
+          "max": 358136
+        }
+      },
+      "correctness": "TRAJECTORY IDENTICAL",
+      "verdict": "ACCEPT",
+      "complete_row_comparison": "raw/m1-full-row-equivalence.json",
+      "exact_retained_rows": "raw/m1-exact-rows.json",
+      "seconds_saved_vs_m0_serial": 26.612,
+      "wall_reduction_percent_vs_m0_serial": 60.14,
+      "dependency_changes": []
+    }
+  ]
+}
