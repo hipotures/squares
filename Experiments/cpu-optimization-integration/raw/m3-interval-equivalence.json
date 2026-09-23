@@ -1,0 +1,12 @@
+{
+  "direction_weight_clip_cases": 96,
+  "directions_per_weight_clip": 16,
+  "reachable_cells_examined": 57897422,
+  "reachable_cell_sets_equal": true,
+  "masses_bitwise_equal": true,
+  "ordered_candidates_equal": true,
+  "clip_depths": [
+    null,
+    "1/4"
+  ]
+}

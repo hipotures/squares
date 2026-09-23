@@ -1,0 +1,20 @@
+{
+  "shape": [
+    1111,
+    1111
+  ],
+  "reachable_cells": 802055,
+  "selected_equal": true,
+  "baseline": {
+    "median_ms": 10.085804,
+    "min_ms": 9.934434,
+    "max_ms": 10.292604,
+    "peak_extra_bytes": 20984809
+  },
+  "compact": {
+    "median_ms": 7.667453,
+    "min_ms": 7.200186,
+    "max_ms": 8.24683,
+    "peak_extra_bytes": 13662623
+  }
+}

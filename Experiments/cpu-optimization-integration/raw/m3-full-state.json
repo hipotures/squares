@@ -1,0 +1,202 @@
+{
+  "label": "M3",
+  "workers": 1,
+  "colgen_module": "/home/user/DEV/squares/packing/src/sqpack/fractional/colgen.py",
+  "generate_module": "/home/user/DEV/squares/packing/src/sqpack/fractional/generate.py",
+  "rounds": 23,
+  "rows": 5842,
+  "objective": 12.217676366606236,
+  "least_covered": 0.9999999999998309,
+  "stopped": "converged: every placement covers mass 1",
+  "directions_sha256": "52769b9e64ee0b827b616e4af01204d2fb34a52fff6628204234801afc3961e4",
+  "centres_sha256": "fd9d18e922c4fe7700e31934c0cf697a977986dea5a87a14d2aab0dd9227ab9b",
+  "matrix_sha256": "f7fc2882f5f80bafa94c8d386cc03f4fe4f9e38748d12f2d5840c10aac455e38",
+  "weights_sha256": "2b03a480e92fee3651ea25fb566db420db2f680846911b35894f69606c8f851f",
+  "duals_sha256": "41f73f5d27cc523112ce6de8b31e2d146f98d924203bc76918ab90c5d5edd106",
+  "round_decisions": [
+    {
+      "index": 0,
+      "rows_held": 483,
+      "rows_added": 483,
+      "violated": 543,
+      "support": 0,
+      "objective": 10.212766
+    },
+    {
+      "index": 1,
+      "rows_held": 956,
+      "rows_added": 473,
+      "violated": 543,
+      "support": 168,
+      "objective": 10.586992
+    },
+    {
+      "index": 2,
+      "rows_held": 1349,
+      "rows_added": 393,
+      "violated": 543,
+      "support": 188,
+      "objective": 11.333333
+    },
+    {
+      "index": 3,
+      "rows_held": 1701,
+      "rows_added": 352,
+      "violated": 543,
+      "support": 204,
+      "objective": 11.508772
+    },
+    {
+      "index": 4,
+      "rows_held": 2051,
+      "rows_added": 350,
+      "violated": 543,
+      "support": 212,
+      "objective": 11.658762
+    },
+    {
+      "index": 5,
+      "rows_held": 2444,
+      "rows_added": 393,
+      "violated": 543,
+      "support": 221,
+      "objective": 11.78934
+    },
+    {
+      "index": 6,
+      "rows_held": 2760,
+      "rows_added": 316,
+      "violated": 543,
+      "support": 245,
+      "objective": 11.917411
+    },
+    {
+      "index": 7,
+      "rows_held": 3029,
+      "rows_added": 269,
+      "violated": 543,
+      "support": 261,
+      "objective": 11.98875
+    },
+    {
+      "index": 8,
+      "rows_held": 3323,
+      "rows_added": 294,
+      "violated": 501,
+      "support": 301,
+      "objective": 12.071622
+    },
+    {
+      "index": 9,
+      "rows_held": 3616,
+      "rows_added": 293,
+      "violated": 543,
+      "support": 357,
+      "objective": 12.11942
+    },
+    {
+      "index": 10,
+      "rows_held": 3957,
+      "rows_added": 341,
+      "violated": 543,
+      "support": 405,
+      "objective": 12.147306
+    },
+    {
+      "index": 11,
+      "rows_held": 4228,
+      "rows_added": 271,
+      "violated": 501,
+      "support": 397,
+      "objective": 12.15977
+    },
+    {
+      "index": 12,
+      "rows_held": 4488,
+      "rows_added": 260,
+      "violated": 543,
+      "support": 461,
+      "objective": 12.183424
+    },
+    {
+      "index": 13,
+      "rows_held": 4768,
+      "rows_added": 280,
+      "violated": 495,
+      "support": 509,
+      "objective": 12.199832
+    },
+    {
+      "index": 14,
+      "rows_held": 5120,
+      "rows_added": 352,
+      "violated": 522,
+      "support": 385,
+      "objective": 12.208519
+    },
+    {
+      "index": 15,
+      "rows_held": 5278,
+      "rows_added": 158,
+      "violated": 339,
+      "support": 477,
+      "objective": 12.2116
+    },
+    {
+      "index": 16,
+      "rows_held": 5454,
+      "rows_added": 176,
+      "violated": 393,
+      "support": 537,
+      "objective": 12.212581
+    },
+    {
+      "index": 17,
+      "rows_held": 5620,
+      "rows_added": 166,
+      "violated": 324,
+      "support": 557,
+      "objective": 12.215431
+    },
+    {
+      "index": 18,
+      "rows_held": 5785,
+      "rows_added": 165,
+      "violated": 297,
+      "support": 493,
+      "objective": 12.216686
+    },
+    {
+      "index": 19,
+      "rows_held": 5810,
+      "rows_added": 25,
+      "violated": 69,
+      "support": 573,
+      "objective": 12.216961
+    },
+    {
+      "index": 20,
+      "rows_held": 5828,
+      "rows_added": 18,
+      "violated": 54,
+      "support": 477,
+      "objective": 12.217648
+    },
+    {
+      "index": 21,
+      "rows_held": 5842,
+      "rows_added": 14,
+      "violated": 33,
+      "support": 525,
+      "objective": 12.217676
+    },
+    {
+      "index": 22,
+      "rows_held": 5842,
+      "rows_added": 0,
+      "violated": 0,
+      "support": 497,
+      "objective": 12.217676
+    }
+  ]
+}

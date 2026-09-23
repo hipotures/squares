@@ -243,7 +243,113 @@
       "exact_retained_rows": "raw/m2-exact-rows.json",
       "dependency_changes": [
         "highspy==1.15.1"
-      ]
+      ],
+      "accepted_checkpoint_commit": "164cf7521c060355e87857bb392116b74ed2ea82"
+    },
+    {
+      "stage": 3,
+      "checkpoint": "M3",
+      "optimization": "maskless slab interval selection",
+      "input_baseline_commit": "164cf7521c060355e87857bb392116b74ed2ea82",
+      "source_branch": "exp/cpu-maskless-selection",
+      "source_commit": "6d077b05ec6838d9f53fa9920ac440e36129c5fd",
+      "integration_commit": "039b6bba2c34614361589ad87d7d2370ba0ece17",
+      "workers_1": {
+        "files": [
+          "raw/m3-w1-r1.json",
+          "raw/m3-w1-r2.json",
+          "raw/m3-w1-r3.json"
+        ],
+        "runs": 3,
+        "wall_seconds": {
+          "min": 33.854,
+          "median": 34.193,
+          "max": 34.297
+        },
+        "separation_seconds": {
+          "min": 32.638,
+          "median": 32.995,
+          "max": 33.068
+        },
+        "lp_seconds": {
+          "min": 1.193,
+          "median": 1.213,
+          "max": 1.225
+        },
+        "round0_seconds": {
+          "min": 3.0990752710022207,
+          "median": 3.1267224829971383,
+          "max": 3.343981262001762
+        },
+        "rounds": 23,
+        "rows": 5842,
+        "objective": 12.217676366606236,
+        "least_covered": 0.9999999999998309,
+        "stop_reason": "converged: every placement covers mass 1",
+        "peak_parent_rss_kib": {
+          "min": 501760,
+          "median": 529340,
+          "max": 534040
+        }
+      },
+      "workers_16": {
+        "files": [
+          "raw/m3-w16-r1.json",
+          "raw/m3-w16-r2.json",
+          "raw/m3-w16-r3.json",
+          "raw/m3-w16-r4.json",
+          "raw/m3-w16-r5.json"
+        ],
+        "runs": 5,
+        "wall_seconds": {
+          "min": 6.155,
+          "median": 6.409,
+          "max": 6.57
+        },
+        "separation_seconds": {
+          "min": 4.891,
+          "median": 5.029,
+          "max": 5.249
+        },
+        "lp_seconds": {
+          "min": 1.242,
+          "median": 1.258,
+          "max": 1.363
+        },
+        "round0_seconds": {
+          "min": 0.8613484779998544,
+          "median": 0.8713165810004284,
+          "max": 0.8800138510014222
+        },
+        "rounds": 23,
+        "rows": 5842,
+        "objective": 12.217676366606236,
+        "least_covered": 0.9999999999998309,
+        "stop_reason": "converged: every placement covers mass 1",
+        "peak_parent_rss_kib": {
+          "min": 518892,
+          "median": 531312,
+          "max": 595512
+        }
+      },
+      "correctness": "TRAJECTORY IDENTICAL",
+      "verdict": "ACCEPT",
+      "gain_vs_m2_workers_1": {
+        "seconds_saved": 0.255,
+        "wall_reduction_percent": 0.74
+      },
+      "gain_vs_m2_workers_16": {
+        "seconds_saved": 1.516,
+        "wall_reduction_percent": 19.13
+      },
+      "interval_equivalence_file": "raw/m3-interval-equivalence.json",
+      "full_state_files": [
+        "raw/m2-full-state.json",
+        "raw/m3-full-state.json"
+      ],
+      "operation_file": "raw/m3-operation.json",
+      "dependency_changes": [],
+      "performance_variation_note": "Five 16-worker runs; CV 2.99%, variation localized to separation; candidate maximum 6.570 s below M2 minimum 7.762 s."
     }
   ]
 }

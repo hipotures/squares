@@ -9,6 +9,7 @@ The primary case is `n=12`, outer side `99/25`, square side `9977/10000`, with `
 | M0 | Current main | — | 44.162 / **44.253** / 44.444 s | unavailable in production | 34.153 / — s | 10.097 / — s | 3.118 / — s | control |
 | M1 | Parallel directions | M0 | 44.052 / **44.217** / 44.642 s | 17.431 / **17.641** / 17.718 s | 34.175 / 7.340 s | 10.115 / 10.289 s | 3.141 / 1.023 s | **ACCEPT** |
 | M2 | Persistent HiGHS LP | M1 | 34.076 / **34.448** / 34.987 s | 7.762 / **7.925** / 7.929 s | 33.265 / 6.666 s | 1.179 / 1.238 s | 3.072 / 1.026 s | **ACCEPT** |
+| M3 | Maskless slab selection | M2 | 33.854 / **34.193** / 34.297 s | 6.155 / **6.409** / 6.570 s | 32.995 / 5.029 s | 1.213 / 1.258 s | 3.127 / 0.871 s | **ACCEPT** |
 
 ## M0: current main control
 
@@ -59,4 +60,28 @@ OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 PACK_JOBS=1 PYTHONPAT
 uv lock --check
 ```
 
-The current accepted production checkpoint is **M2**. Maskless selection is the next independent candidate; it will be measured against M2 with the same HiGHS path.
+M2 was recorded by checkpoint commit `164cf7521c060355e87857bb392116b74ed2ea82`.
+
+## M3: maskless slab interval selection
+
+Source: `exp/cpu-maskless-selection` at `6d077b05ec6838d9f53fa9920ac440e36129c5fd`. Input baseline: M2 at `164cf7521c060355e87857bb392116b74ed2ea82`. Production integration commit: `039b6bba2c34614361589ad87d7d2370ba0ece17`. The only production file changed was `packing/src/sqpack/fractional/generate.py`; no dependency changed. The LP remained the same production HiGHS implementation for both M2 and M3.
+
+**Correctness: TRAJECTORY IDENTICAL.** The [interval check](raw/m3-interval-equivalence.json) compared 96 real-geometry direction/weight/clip cases covering 57,897,422 reachable cells. Reachable cell sets, their masses bitwise, and ordered 13-candidate selections all matched the full-mask implementation. Sixty focused generate, selector and corner-clip tests passed. The [M2](raw/m2-full-state.json) and [M3](raw/m3-full-state.json) full solver state captures have identical SHA-256 values for complete row directions, centres, coefficient matrix, final weights and duals, along with identical per-round decisions, objective, least-covered value and stop reason. The M2 exact witness check therefore applies to the identical M3 retained rows.
+
+Against M2, the five-run worker-16 median saves **1.516 s (19.1%)**: separation moves from 6.666 to 5.029 s, while LP is 1.238 versus 1.258 s. Worker-1 medians differ by 0.255 s, which is inside their run ranges; no serial gain is claimed. The worker-16 candidate had 2.99% CV, with variation concentrated in separation. Two extra runs were added: all five candidate runs fell between 6.155 and 6.570 s, still below M2's entire 7.762–7.929 s range, so the 16-worker gain remains material despite the scheduling variation.
+
+The [isolated operation probe](raw/m3-operation.json) on a `1111×1111` real site geometry with 802,055 reachable cells measured 10.086 ms for full-mask score/selection and 7.667 ms for compaction. Tracked peak extra allocation fell from 20,984,809 to 13,662,623 bytes, saving 7,322,186 bytes per call. Full parent RSS did not shift consistently: serial medians were 538,804 KiB at M2 and 529,340 KiB at M3; worker-16 medians were 530,672 and 531,312 KiB. Aggregate child RSS was not measured.
+
+M3 commands, from `packing/` (worker 1 repeated three times; worker 16 repeated five times after its initial spread):
+
+```bash
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. uv run --frozen --no-dev python ../Experiments/cpu-optimization-integration/verify_maskless.py --out ../Experiments/cpu-optimization-integration/raw/m3-interval-equivalence.json
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. uv run --frozen --no-dev --with pytest python -m pytest tests/test_fractional_generate.py tests/test_fractional_selector.py tests/test_fractional_corner_clip.py -q
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. uv run --frozen --no-dev python ../Experiments/cpu-optimization-integration/bench.py --workers "$jobs" --out "../Experiments/cpu-optimization-integration/raw/m3-w${jobs}-r${run}.json"
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. uv run --frozen --no-dev python ../Experiments/cpu-optimization-integration/measure_maskless_ops.py --out ../Experiments/cpu-optimization-integration/raw/m3-operation.json
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=.:src uv run --frozen --no-dev python ../Experiments/cpu-optimization-integration/capture_state.py --workers 1 --label M3 --out ../Experiments/cpu-optimization-integration/raw/m3-full-state.json
+```
+
+For the M2 cross-check, a detached worktree at the M2 checkpoint was created with `git worktree add --detach /home/user/DEV/squares-worktrees/cpu-integration-m2-control 164cf7521c060355e87857bb392116b74ed2ea82`. The same `capture_state.py` was run with `PYTHONPATH` set to that worktree's `packing` and `packing/src` paths, using the main project's `.venv/bin/python`; the captured module paths in the JSON prove it loaded M2 code. This is a correctness diagnostic, not a timed candidate run.
+
+The current accepted production checkpoint is **M3**. In-place cumsum reuse is next and will be measured against M3.
