@@ -168,6 +168,7 @@ Each entry summarizes one user-level research window. Cycle slots are wall-clock
 | [session-151](agent-sessions/session-151-low-n-review-and-first-party-n17.md) | stopped | contemporaneous | `efficiency-loop` (efficiency) | `research-loop` (insight) | 4 | think-gvlg | Under think-gvlg: obtain a qualifying fast-gate pass on a host where the three environment failures above do not apply, then register the n = 11 rung, which is accepted by both routes and has no T-id, following the handoff's three steps. |
 | [session-152](agent-sessions/session-152-external-density-and-n11-review.md) | completed | contemporaneous | `factual-review` (correctness) | `factual-review` (correctness) | 1 | think-6xoc | After PR 222 is green and mergeable, start two separate branches from its head in parallel: decide the complete n11 adaptive parent-core catalogue under think-d010, and reconcile PR 221 while retaining every historical result and the strongest justified current bounds. Existing identifiers from PR 221 take precedence; renumber any later conflicting identifiers after PR 221's sequence and update every reference. PR 222 introduces no T-ID. The density-method and continuation-driver work remain separately assigned as recorded above. |
 | [session-153](agent-sessions/session-153-native-n11-parent-core.md) | completed | contemporaneous | `pipeline-improvement` (correctness) | `review-planning-oversight` (correctness) | 4 | think-d010 | Publish the coordinator-approved PR 223 closure for completed think-d010 and require its final hosted checks before ready; the separately requested W3 review owns the next research ordering. Preserve the c183cc9ab proof scope and do not merge either stacked PR. |
+| [session-154](agent-sessions/session-154-pr221-pr222-reconciliation.md) | completed | contemporaneous | `remediation` (correctness) | `remediation` (correctness) | 1 | think-t30b | Render T-033's missing standalone claim document under think-vx26. |
 
 ### Workflow summary
 
@@ -183,7 +184,7 @@ Declared counts are contemporaneous contracts; retrospective counts are reconstr
 | `research-loop` | 30 | 4 | 105 | 8 |
 | `pipeline-improvement` | 36 | 2 | 154 | 5 |
 | `documentation-pass` | 1 | 0 | 25 | 1 |
-| `remediation` | 1 | 1 | 1 | 3 |
+| `remediation` | 2 | 1 | 2 | 3 |
 | `review-planning-oversight` | 5 | 0 | 25 | 2 |
 | `general-improvement` | 1 | 0 | 7 | 1 |
 
@@ -815,7 +816,7 @@ Status: **active**. Spend one four-hour run on three blocks in sequence, overlap
 | BC-370 | research | 11, 17, 18 | in_progress | 0 | think-gvlg | packing/campaign/explorations/X-042 and the hypotheses it registers. |
 | BC-371 | research | 17 | in_progress | 0 | think-xdoh | exp-221 under results/agenda-041 and the translator under devtools. |
 | BC-372 | research | 17 | in_progress | 2 | think-xdoh | The sweep receipt under results/agenda-041. |
-| BC-373 | research | 11 | in_progress | 2 | think-gvlg | The refinement work file and its receipt under results/agenda-041. |
+| BC-373 | research | 11 | complete | 2 | think-gvlg | The refinement work file and its receipt under results/agenda-041. |
 
 ## Series
 

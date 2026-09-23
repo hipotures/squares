@@ -3253,7 +3253,9 @@ evidence:
         project the search surfaced, wand125/square-packing-bounds, states bounds for
         n = 26, 29 and 39 and none for n = 11. The side 191/50 is this project's own
         rung and this re-certification is derived from the frozen T-025 bytes, so
-        neither was searched separately.
+        neither was searched separately. Later on 2026-09-22, Session 152 acquired and
+        verified Kleddamag's stronger s(11) > 31/8 certificate. That later source
+        supersedes any reading of this search as a current public-bound claim.
       novel_object: >-
         The re-certification of the retained T-025 threshold atoms on the 2880-step net
         at shrink 249507/250000. The atoms, the threshold theorem, the two decision
@@ -3267,7 +3269,9 @@ evidence:
         2026-09-22, and not an exhaustive review of subscription-only indexes, theses,
         proceedings,
         non-English or unindexed sources, code-hosting sites, private correspondence, or
-        unpublished work. Apparent novelty is not a priority claim.
+        unpublished work. The subsequently archived Kleddamag certificate is stronger.
+        Apparent novelty here is confined to the project-specific frozen rung and is not
+        a priority claim.
     certificate: cases/n11_threshold_certificate/certificate-191-50-net2880.json
     replay: uv run --frozen --all-extras --group dev python -m devtools.decide_threshold_certificate cases/n11_threshold_certificate/certificate-191-50-net2880.json
     replay_status: passed
@@ -3368,15 +3372,16 @@ evidence:
     novelty: apparently-novel
     novelty_basis:
       corpus: >-
-        The corpus of E-n011-threshold-net2880-certificate, which carries the 2026-09-09
-        bounded search for an s(11) lower bound above Stromquist's.
+        The corpus of E-n011-threshold-net2880-certificate, plus the external certificate
+        packet reviewed in Session 152, including Kleddamag's stronger s(11) > 31/8
+        result.
       searched: >-
         The 2026-09-09 search under E-n011-fractional-net1440-certificate, which returned
         no source stating any lower bound on s(11) above Stromquist's outside this
         repository, and its 2026-09-22 repetition under
-        E-n011-threshold-net2880-certificate, which returned the same. This bound's own
-        decimal 3.826998 and its radicand 2073600042893309449 were not searched
-        separately.
+        E-n011-threshold-net2880-certificate, which returned the same. Session 152 later
+        acquired and verified the stronger Kleddamag certificate. This rung's own decimal
+        3.826998 and radicand 2073600042893309449 were not searched separately.
       novel_object: >-
         The exact value obtained for this repository's retained T-025 atoms by combining
         their 2880-step re-certification with T-022's sharpened containment lemma, every
@@ -3386,7 +3391,8 @@ evidence:
         new; the stronger current public lower bound is not this result.
       gaps: >-
         A bounded search of one general index, dated 2026-09-09 and repeated on
-        2026-09-22. Apparent novelty is not a priority claim.
+        2026-09-22. Apparent novelty is confined to the retained fixed-core rung and is
+        not a priority claim.
     certificate: cases/n11_threshold_certificate/t-033-dilation-limit-corollary.json
     replay: uv run --frozen --all-extras --group dev python -m devtools.dilation_corollary cases/n11_threshold_certificate/certificate-191-50-net2880.json --source-name packing/cases/n11_threshold_certificate/certificate-191-50-net2880.json --check-limit-record cases/n11_threshold_certificate/t-033-dilation-limit-corollary.json
     replay_status: passed
