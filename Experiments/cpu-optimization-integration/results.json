@@ -454,7 +454,114 @@
         "raw/m4-full-state.json"
       ],
       "dependency_changes": [],
-      "performance_variation_note": "Five 16-worker runs; CV 2.41%, variation in separation; candidate maximum 5.755 s below M3 minimum 6.155 s."
+      "performance_variation_note": "Five 16-worker runs; CV 2.41%, variation in separation; candidate maximum 5.755 s below M3 minimum 6.155 s.",
+      "accepted_checkpoint_commit": "6b51d9bd07bf61b96abfee55036fc021551462af"
+    },
+    {
+      "stage": 5,
+      "checkpoint": "M5",
+      "optimization": "packaged stable native top-13 selector",
+      "input_baseline_commit": "6b51d9bd07bf61b96abfee55036fc021551462af",
+      "source_branch": "exp/cpu-top13-selector",
+      "source_commit": "4172e760220849097b184ab1c2d0e6aacf968f5f",
+      "integration_commit": "4188d59c2240f75b85e81bbaa7eb50ba6bec8d14",
+      "workers_1": {
+        "files": [
+          "raw/m5-w1-r1.json",
+          "raw/m5-w1-r2.json",
+          "raw/m5-w1-r3.json"
+        ],
+        "runs": 3,
+        "wall_seconds": {
+          "min": 21.927,
+          "median": 22.31,
+          "max": 22.578
+        },
+        "separation_seconds": {
+          "min": 20.763,
+          "median": 21.159,
+          "max": 21.4
+        },
+        "lp_seconds": {
+          "min": 1.146,
+          "median": 1.159,
+          "max": 1.173
+        },
+        "round0_seconds": {
+          "min": 2.13534965999861,
+          "median": 2.6024437899977784,
+          "max": 2.7464516629988793
+        },
+        "rounds": 23,
+        "rows": 5842,
+        "objective": 12.217676366606236,
+        "least_covered": 0.9999999999998309,
+        "stop_reason": "converged: every placement covers mass 1",
+        "peak_parent_rss_kib": {
+          "min": 508840,
+          "median": 542012,
+          "max": 571712
+        }
+      },
+      "workers_16": {
+        "files": [
+          "raw/m5-w16-r1.json",
+          "raw/m5-w16-r2.json",
+          "raw/m5-w16-r3.json"
+        ],
+        "runs": 3,
+        "wall_seconds": {
+          "min": 4.177,
+          "median": 4.211,
+          "max": 4.217
+        },
+        "separation_seconds": {
+          "min": 2.882,
+          "median": 2.892,
+          "max": 2.97
+        },
+        "lp_seconds": {
+          "min": 1.229,
+          "median": 1.269,
+          "max": 1.311
+        },
+        "round0_seconds": {
+          "min": 0.624958124004479,
+          "median": 0.6434984580009768,
+          "max": 0.6738816590004717
+        },
+        "rounds": 23,
+        "rows": 5842,
+        "objective": 12.217676366606236,
+        "least_covered": 0.9999999999998309,
+        "stop_reason": "converged: every placement covers mass 1",
+        "peak_parent_rss_kib": {
+          "min": 505064,
+          "median": 525104,
+          "max": 529700
+        }
+      },
+      "correctness": "TRAJECTORY IDENTICAL",
+      "verdict": "ACCEPT",
+      "gain_vs_m4_workers_1": {
+        "seconds_saved": 9.094,
+        "wall_reduction_percent": 28.96
+      },
+      "gain_vs_m4_workers_16": {
+        "seconds_saved": 1.269,
+        "wall_reduction_percent": 23.16
+      },
+      "captured_compact_workload": "raw/m4-round18-direction26.npz",
+      "isolated_methods_file": "raw/m4-selector-methods.json",
+      "production_selector_file": "raw/m5-production-selector.json",
+      "packaging_file": "raw/m5-packaging.json",
+      "exact_retained_rows": "raw/m5-exact-rows.json",
+      "full_state_files": [
+        "raw/m4-full-state.json",
+        "raw/m5-full-state.json"
+      ],
+      "dependency_changes": [],
+      "optional_native_build_tool": "C compiler on Linux/macOS; NumPy fallback otherwise"
     }
   ]
 }

@@ -11,6 +11,7 @@ The primary case is `n=12`, outer side `99/25`, square side `9977/10000`, with `
 | M2 | Persistent HiGHS LP | M1 | 34.076 / **34.448** / 34.987 s | 7.762 / **7.925** / 7.929 s | 33.265 / 6.666 s | 1.179 / 1.238 s | 3.072 / 1.026 s | **ACCEPT** |
 | M3 | Maskless slab selection | M2 | 33.854 / **34.193** / 34.297 s | 6.155 / **6.409** / 6.570 s | 32.995 / 5.029 s | 1.213 / 1.258 s | 3.127 / 0.871 s | **ACCEPT** |
 | M4 | In-place cumsum reuse | M3 | 31.132 / **31.404** / 31.738 s | 5.430 / **5.480** / 5.755 s | 30.225 / 4.220 s | 1.167 / 1.242 s | 2.104 / 0.646 s | **ACCEPT** |
+| M5 | Packaged native top-13 | M4 | 21.927 / **22.310** / 22.578 s | 4.177 / **4.211** / 4.217 s | 21.159 / 2.892 s | 1.159 / 1.269 s | 2.602 / 0.643 s | **ACCEPT** |
 
 ## M0: current main control
 
@@ -106,4 +107,34 @@ OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. uv run -
 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=.:src uv run --frozen --no-dev python ../Experiments/cpu-optimization-integration/capture_state.py --workers 1 --label M4 --out ../Experiments/cpu-optimization-integration/raw/m4-full-state.json
 ```
 
-The current accepted production checkpoint is **M4**. The fixed-size top-13 selector is next; it must first beat this composed maskless selection path before native packaging is considered.
+M4 was recorded by checkpoint commit `6b51d9bd07bf61b96abfee55036fc021551462af`.
+
+## M5: packaged native top-13 selector
+
+Source research: `exp/cpu-top13-selector` at `4172e760220849097b184ab1c2d0e6aacf968f5f`. Input baseline: M4 at `6b51d9bd07bf61b96abfee55036fc021551462af`. Production integration commit: `4188d59c2240f75b85e81bbaa7eb50ba6bec8d14`. The production C source lives at `packing/src/sqpack/fractional/_top13.c`; `hatch_build.py` compiles it during editable or wheel creation, and `_top13_selector.py` loads the packaged library. The existing stable NumPy selection remains the reference fallback if the native library is unavailable or the request exceeds 64 indices. Round zero retains its existing spatial tie rule. There is no runtime compilation and no new Python dependency. Linux and macOS builds with a C compiler get native acceleration; Windows or compiler-free builds use the reference path. macOS was not tested on this Linux machine.
+
+The [actual M4 compact late-round workload](raw/m4-round18-direction26.npz) contains 737,165 finite float64 scores from round 18, direction 26. It is 824,638 bytes compressed, 5,897,320 array bytes, SHA-256 `41ba304a7463e0c93500924deae9b7bd36618a78f97fa9f8ec0ca931fc471cac`; its capture metadata is [here](raw/m4-round18-direction26.json). The [method comparison](raw/m4-selector-methods.json) measured the compiled heap at 0.415 ms against the M4 NumPy selector at 4.793 ms. The [packaged production selector probe](raw/m5-production-selector.json) independently measured 0.418 versus 4.790 ms, with tracked peak extra allocation 1,776 versus 6,635,605 bytes. Both ordered outputs equal the stable reference. Randomized cases, ties, repeated values, NaN, both infinities, noncontiguous arrays, requests above the native limit, the retained real fixture, and the zero-weight rule were covered by the focused tests.
+
+Before production packaging, the research-only [prototype hook](prototype_top13.py) injected the source experiment's C selector into the M4 production solver without changing solver code. Its [serial](raw/m5-prototype-w1-r1.json) and [16-worker](raw/m5-prototype-w16-r1.json) runs finished in 21.881 and 4.138 s, respectively, with the same 23-round/5,842-row trajectory. This was the gate for undertaking native packaging. The preliminary source comparison used `python /home/user/DEV/squares-worktrees/cpu-top13-selector/Experiments/cpu-optimization-top13/bench_select.py --input ../Experiments/cpu-optimization-integration/raw/m4-round18-direction26.npz --out ../Experiments/cpu-optimization-integration/raw/m4-selector-methods.json` from `packing/`. The prototype library was built separately with `cc -O3 -fPIC -shared -o /tmp/libsqpack_top13_m4.so /home/user/DEV/squares-worktrees/cpu-top13-selector/Experiments/cpu-optimization-top13/heap_select.c`, then passed to `prototype_top13.py --workers 1` and `--workers 16` through its `--library` option. The production path does not use this hook.
+
+**Correctness: TRAJECTORY IDENTICAL.** M4 and [M5](raw/m5-full-state.json) full state captures have identical row direction order, centres, coefficient matrix, weights, duals and per-round decisions. Both converge in 23 rounds and 5,842 rows at objective `12.217676366606236`, least covered `0.9999999999998309` and the same coverage stop reason. The [fresh M5 exact retained-row check](raw/m5-exact-rows.json) checked all 5,842 rows: no centre outside the exact domain and all 92 boundary coefficient discrepancies have nearby exact witnesses. Ninety-five focused tests passed, including native loading in process workers, persistent LP, parallel directions and checkpoint behavior.
+
+Against M4, M5 saves **9.094 s (29.0%) serial** and **1.269 s (23.2%) at 16 workers**. Separation medians fall from 30.225 to 21.159 s serial and from 4.220 to 2.892 s at 16 workers; LP medians remain near 1.2 s. Worker-16 wall had 0.51% CV across its three unprofiled runs. Parent RSS medians rose from 518,116 to 542,012 KiB serial and from 512,096 to 525,104 KiB at 16, but run ranges overlap; no full-process memory win is claimed. The isolated selector's allocation reduction is clear.
+
+The [packaging record](raw/m5-packaging.json) preserves native/fallback wheel names, hashes, contents and clean-environment checks. A wheel built directly and a wheel rebuilt from its source distribution contained the native library and were platform-tagged. A simulated missing compiler produced a `py3-none-any` wheel without the library; installing it in a clean environment selected the NumPy fallback. The source archive excludes generated native binaries and includes the C source and Hatch build hook. The large source archive was **not committed**: `/tmp/squares-top13-sdist2/sqpack-0.2.0.tar.gz`, purpose native/fallback packaging verification, uncompressed payload 3,828,549,038 bytes, compressed 613,539,562 bytes, SHA-256 `242e5ff85e50c7b572ec93947cffd6012f7143823288e84858f709ca9db7a20f`. The commands below regenerate it. The hook uses [Hatch's documented custom build hook and wheel build data](https://hatch.pypa.io/dev/plugins/build-hook/custom/).
+
+M5 commands, from `packing/` unless specified (each timed endpoint repeated with `run=1,2,3`):
+
+```bash
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. uv run --frozen --no-dev python ../Experiments/cpu-optimization-integration/capture_top13.py --out ../Experiments/cpu-optimization-integration/raw/m4-round18-direction26.npz --metadata ../Experiments/cpu-optimization-integration/raw/m4-round18-direction26.json
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. uv run --frozen --no-dev python ../Experiments/cpu-optimization-integration/measure_production_top13.py --input ../Experiments/cpu-optimization-integration/raw/m4-round18-direction26.npz --out ../Experiments/cpu-optimization-integration/raw/m5-production-selector.json
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. uv run --frozen --no-dev python ../Experiments/cpu-optimization-integration/bench.py --workers "$jobs" --out "../Experiments/cpu-optimization-integration/raw/m5-w${jobs}-r${run}.json"
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=.:src uv run --frozen --no-dev python ../Experiments/cpu-optimization-integration/capture_state.py --workers 1 --label M5 --out ../Experiments/cpu-optimization-integration/raw/m5-full-state.json
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 PACK_JOBS=1 PYTHONPATH=. uv run --frozen --no-dev python benchmarks/round0_selector/exact_row_check.py --out ../Experiments/cpu-optimization-integration/raw/m5-exact-rows.json
+uv build --sdist --out-dir /tmp/squares-top13-sdist2
+uv build --wheel /tmp/squares-top13-sdist2/sqpack-0.2.0.tar.gz --out-dir /tmp/squares-top13-sdist2-native
+CC=/nonexistent uv build --wheel /tmp/squares-top13-sdist2/sqpack-0.2.0.tar.gz --out-dir /tmp/squares-top13-sdist2-fallback
+uv lock --check
+```
+
+The current accepted production checkpoint is **M5**. Fused separation remains research only: its independent 16-worker gain came with a 35% serial regression and it overlaps the safer separation changes already accepted.

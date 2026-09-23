@@ -1,0 +1,19 @@
+{
+  "input": "../Experiments/cpu-optimization-integration/raw/m4-round18-direction26.npz",
+  "size": 737165,
+  "finite": 737165,
+  "native_exact": true,
+  "fallback_exact": true,
+  "native": {
+    "median_ms": 0.4178485,
+    "min_ms": 0.400599,
+    "max_ms": 0.435119,
+    "peak_extra_bytes": 1776
+  },
+  "fallback": {
+    "median_ms": 4.789880500000001,
+    "min_ms": 4.757692,
+    "max_ms": 6.073926,
+    "peak_extra_bytes": 6635605
+  }
+}

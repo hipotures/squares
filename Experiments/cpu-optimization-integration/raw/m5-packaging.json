@@ -1,0 +1,45 @@
+{
+  "platform": "Linux x86_64, CPython 3.14.7",
+  "compiler": "cc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+  "native_source": "packing/src/sqpack/fractional/_top13.c",
+  "build_hook": "packing/hatch_build.py",
+  "build_backend": "hatchling 1.32.4",
+  "source_archive": {
+    "path": "/tmp/squares-top13-sdist2/sqpack-0.2.0.tar.gz",
+    "purpose": "Validate native and fallback wheels built from a source distribution",
+    "payload_uncompressed_bytes": 3828549038,
+    "compressed_bytes": 613539562,
+    "sha256": "242e5ff85e50c7b572ec93947cffd6012f7143823288e84858f709ca9db7a20f",
+    "committed": false
+  },
+  "native_wheel": {
+    "path": "/tmp/squares-top13-sdist2-native/sqpack-0.2.0-cp314-cp314-linux_x86_64.whl",
+    "bytes": 655727,
+    "sha256": "c914506dd266480a3dca38619273d52646cf815d5ffabc1254d3e730a49dfa90",
+    "contains_native_library": true,
+    "root_is_purelib": false
+  },
+  "fallback_wheel": {
+    "path": "/tmp/squares-top13-sdist2-fallback/sqpack-0.2.0-py3-none-any.whl",
+    "bytes": 652910,
+    "sha256": "177267c3c06ea21f84bce0f9b34bbc0cd12f234c21e10012b70f7faedd956141",
+    "contains_native_library": false,
+    "root_is_purelib": true
+  },
+  "validation": {
+    "source_archive_contains_c_source": true,
+    "source_archive_contains_build_hook": true,
+    "source_archive_contains_no_native_binary": true,
+    "native_wheel_loaded_in_isolated_environment": true,
+    "fallback_wheel_loaded_in_isolated_environment": true,
+    "native_selector_loaded_in_editable_install": true,
+    "compiler_free_build_command": "CC=/nonexistent uv build --wheel /tmp/squares-top13-sdist2/sqpack-0.2.0.tar.gz --out-dir /tmp/squares-top13-sdist2-fallback"
+  },
+  "fixture": {
+    "path": "raw/m4-round18-direction26.npz",
+    "purpose": "Actual M4 compact score input at round 18, direction 26",
+    "array_bytes": 5897320,
+    "compressed_bytes": 824638,
+    "sha256": "41ba304a7463e0c93500924deae9b7bd36618a78f97fa9f8ec0ca931fc471cac"
+  }
+}

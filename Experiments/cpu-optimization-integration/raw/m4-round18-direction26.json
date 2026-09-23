@@ -1,0 +1,15 @@
+{
+  "selection_call": 3284,
+  "total_selection_calls": 4163,
+  "round": 18,
+  "direction": 26,
+  "direction_count": 181,
+  "flat_size": 737165,
+  "finite_count": 737165,
+  "dtype": "float64",
+  "rounds": 23,
+  "rows": 5842,
+  "objective": 12.217676366606236,
+  "least_covered": 0.9999999999998309,
+  "stopped": "converged: every placement covers mass 1"
+}
