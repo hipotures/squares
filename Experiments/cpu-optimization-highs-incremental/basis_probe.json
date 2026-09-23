@@ -1,0 +1,29 @@
+{
+  "highspy_version": "1.15.1",
+  "records": [
+    {
+      "index": 0,
+      "valid_before_append": false,
+      "valid_after_append": false,
+      "valid_after_solve": true,
+      "row_status_count_after_append": 1,
+      "objective": 1.0
+    },
+    {
+      "index": 1,
+      "valid_before_append": true,
+      "valid_after_append": true,
+      "valid_after_solve": true,
+      "row_status_count_after_append": 2,
+      "objective": 1.0
+    },
+    {
+      "index": 2,
+      "valid_before_append": true,
+      "valid_after_append": true,
+      "valid_after_solve": true,
+      "row_status_count_after_append": 3,
+      "objective": 1.0
+    }
+  ]
+}

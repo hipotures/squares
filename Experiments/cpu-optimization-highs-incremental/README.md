@@ -17,7 +17,7 @@ The solver converged in 23 rounds and 5,842 rows at objective 12.217676366606236
 | Persistent interior point | 41.482 | 0.051 | 41.431 | Slower |
 | Persistent simplex, presolve off | 0.981 | 0.049 | 0.932 | Slightly slower |
 
-The basis is retained by `highspy` after `addRows`: a direct API probe showed `getBasis().valid` remains true as rows are appended. Explicitly resetting this retained basis would reproduce the same state; no separate warm-start transfer is needed. SciPy's public `linprog` call used here has no append-row model lifecycle. Its bundled HiGHS wrapper is private, so production integration would introduce a direct `highspy` dependency and a new model-owner lifecycle. This branch leaves that decision for the operator.
+The basis is retained by `highspy` after `addRows`: `basis_probe.json` shows `getBasis().valid` remains true as rows are appended. Explicitly resetting this retained basis would reproduce the same state; no separate warm-start transfer is needed. SciPy's public `linprog` call used here has no append-row model lifecycle. Its bundled HiGHS wrapper is private, so production integration would introduce a direct `highspy` dependency and a new model-owner lifecycle. This branch leaves that decision for the operator.
 
 Peak parent RSS across the prototype runs was 504,836–587,260 KiB serial and 543,552–579,832 KiB at 16 processes. The controlled base did not record comparable RSS, so the memory delta is unmeasured. The 16-process result uses the existing research direction pool and does not imply this branch productionizes that pool.
 
@@ -27,6 +27,7 @@ From `packing/`, set `OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
 
 ```bash
 uv run --frozen --no-dev --with highspy==1.15.1 python ../Experiments/cpu-optimization-highs-incremental/bench_lp.py --out /tmp/highs-comparison.json
+uv run --frozen --no-dev --with highspy==1.15.1 python ../Experiments/cpu-optimization-highs-incremental/basis_probe.py
 uv run --frozen --no-dev --with highspy==1.15.1 python ../Experiments/cpu-optimization-highs-incremental/run_highs.py --out /tmp/highs-serial.json
 uv run --frozen --no-dev --with highspy==1.15.1 python ../Experiments/cpu-optimization-highs-incremental/run_highs.py --workers 16 --out /tmp/highs-parallel.json
 uv run --frozen --no-dev --with highspy==1.15.1 python ../Experiments/cpu-optimization-highs-incremental/verify_rows.py --out /tmp/highs-exact-rows.json
