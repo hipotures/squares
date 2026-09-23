@@ -1099,7 +1099,7 @@ shrink does not rise, so the dilation-limit supremum rises to
 limit record is replayed and written.
 Session 151 deliberately left the register entry unwritten, which is why that session
 remains stopped with certification debt rather than being rewritten after the fact.
-Session 154 later registers the result as T-033 and reconciles it with the stronger
+PR 221 later registered the result as T-033; Session 154 reconciles it with the stronger
 external `s(11) > 31/8` bound.
 Four cells returned measured negatives with witnesses — the `n = 17` triples and the
 parent-centre restriction are both load-bearing, re-pricing that support is capped at
@@ -1157,8 +1157,8 @@ guard.
 `n = 11` rung Session 151 left accepted and unregistered.
 Its threshold certificate at the 2880-step net is `RETAINABLE` by both retention routes,
 which agree at exactly 1, and its dilation-limit record is replayed and written.
-That cutoff debt is now discharged by T-033 and Session 154; this paragraph preserves
-the selection Session 151 actually made.
+That cutoff debt is now discharged by T-033 in PR 221; this paragraph preserves the
+selection Session 151 actually made.
 `think-zmos`, the W5 efficiency block that was the previous entry, is discharged:
 `OR-17`’s `1.38x` turned out to be the hosted runner pool rather than drift, the four CI
 jobs are clocked, and the rule’s text is corrected.
@@ -5793,8 +5793,10 @@ and proves `s(11) >= 3.826447410572939…` by an exact dilation-limit argument, 
 `s(11) >= 3.826997548829543…`. T-033 is the strongest retained first-party rung in this
 family, while the current verified case bound is the stronger external strict result
 `s(11) > 31/8`. “Dilation-limit” describes T-033’s proof construction, not a weaker
-theorem or assurance level; its current significance is S3 as method and calibration
-evidence. `s(12) >= 99/25` is [T-017](packing/frontier/RESULTS.md), the first bound
+theorem or assurance level.
+The result retains its historical S5 registration; its current significance is S3 as
+method and calibration evidence, while the external certificate supplies the current
+case bound. `s(12) >= 99/25` is [T-017](packing/frontier/RESULTS.md), the first bound
 located that was proved about twelve squares rather than inherited from eleven.
 `s(17) >= 459/100`, and `n = 18` and `n = 19` at the same side without a monotonicity
 step, is [T-019](packing/frontier/RESULTS.md) and displaces Massaccesi’s published

@@ -278,10 +278,11 @@ certificate’s replay command.
    new bound: `devtools.check_case_prose` reads the prose against the front matter.
    Controls may remain result-only: `T-026` cites five entries, while the case bound at
    that rung cited the three that established it.
-   `n-011.md` retains `T-033`’s three entries in the case-wide evidence history, while
-   its current verified lower-bound field cites only the stronger external certificate
-   that establishes `31/8`. A numerical finding or a result about a restricted family
-   does not by itself change an unconditional verified bound.
+   At the historical `T-033` rung, `n-011.md` cited its three establishing entries
+   rather than its control leg; the current case bound cites Kleddamag’s replay evidence
+   and retains the earlier entries as history.
+   A numerical finding or a result about a restricted family does not by itself change
+   an unconditional verified bound.
    Preserve earlier evidence and decisions.
 
 5. **Write the row** with what [`results.schema.yaml`](results.schema.yaml) requires:
