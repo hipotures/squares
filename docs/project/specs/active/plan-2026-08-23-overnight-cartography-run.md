@@ -451,9 +451,8 @@ Do not repeat a completed experiment or create another candidate without a regis
 result; a float optimum is never a result.
 For the next supervised exact-research goal, treat standalone bead `think-d010` as
 fulfilled by PR 223’s merge.
-This checker-bounded paragraph preserves Session 153’s latest observed terminal handoff;
-the owner’s newer W3 request is the actual next work and will supply a new session
-handoff when published.
+This preserves Session 153’s latest observed terminal handoff; the owner’s newer W3
+request is the actual next work and will supply a new session handoff when published.
 See [Current Handoff](../../../../SYNOPSIS.md#current-handoff) for the current evidence
 and allocation boundaries.
 
