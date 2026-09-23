@@ -28,7 +28,8 @@ per certificate; the prose is filled once, with the headline certificate's value
   <span>Human oversight: <a href="https://x.com/ojoshe"><strong>Joshua Levy</strong></a></span>
   <span>Agents: <strong>Opus 5</strong>, <strong>Fable 5.1</strong>, <strong>GPT 5.6 Sol</strong>, and <strong>GPT-6 Astra</strong></span>
   <span><a href="https://github.com/jlevy/squares"><strong>github.com/jlevy/squares</strong></a></span>
-  <span class="publication-date">{{PUBLISHED}} (<a href="#version-history">{{EDITION}}</a>)</span>
+  <span class="publication-date">First published {{FIRST_PUBLISHED}} · Last revised {{LAST_REVISED}}</span>
+  <span class="edition">{{EDITION}} (<a href="#version-history">version history</a>)</span>
 </div>
 
 </div>
@@ -53,8 +54,8 @@ in 1979 (Figure 1), shows
 <span class="math-reference">$s(11) \le {{BEST_PACKING_TEX}}$.[^trump]</span>
 
 **Frontier update, September 22, 2026:** We have verified Kleddamag’s stronger lower
-bound, so the [current bracket]({{FRONTIER_N11_URL}}) is
-$3.875 < s(11) \le {{BEST_PACKING_TEX}}$. The
+bound, developed from the T-026 certificate below, so the
+[current bracket]({{FRONTIER_N11_URL}}) is $3.875 < s(11) \le {{BEST_PACKING_TEX}}$. The
 [mathematical review]({{FRONTIER_N11_REVIEW_URL}}) records the replays and proof.
 This article retains the T-018, T-025, and T-026 proofs below.
 

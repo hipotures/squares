@@ -914,9 +914,25 @@ Chromium, and follows its project-relative link to the explainer.
 
 **One version, shared by every artifact** (the owner, 2026-09-22): the explainer’s
 credits, the atlas footer, the workbench stage and the videos all print
-`PUBLICATION_EDITION` from `src/sqpack/release.py`, written `v0.4.1-f5e113`. The version
-and publication date come from the first entry in `PUBLICATION_HISTORY`; the page
-renders the two retained history entries from that same source.
+`PUBLICATION_EDITION` from `src/sqpack/release.py`, written like `v0.4.1-3b50e2`. The
+version comes from the first entry in `PUBLICATION_HISTORY`.
+
+**The version history keeps every edition, and dates each by first publication.** The
+top of the page reads, on two lines, like “First published September 5, 2026 · Last
+revised September 22, 2026” and “v0.4.1-3b50e2 (version history)”: when the result first
+reached a reader, when it was last revised, which edition is being read, and a link to
+the full list at the foot of the page.
+The first date is the oldest edition’s, so it does not move; the second date and the
+edition are the current one’s, so they do.
+`PUBLICATION_HISTORY` lists every edition ever published, newest first, and an edition
+never comes off it — a new one goes on the front.
+It used to keep “the two retained editions”, and adding v0.4.1 under that rule dropped
+v0.3.0, the proof of s(11) ≥ 381/100 the publication began with.
+Each date is when that edition was first *live on the public page*, read from the
+repository’s GitHub Pages deployments, not when its version label first appeared in Git.
+The two differ in both directions — v0.3.0 went live on September 5 and was named on
+September 8; v0.4.0 was named on September 10 and went live on September 13 — and the
+deployment behind each date is recorded beside the list.
 The six characters after the version name the data, not the build: they are the pinned
 `DATA_REVISION`, the last commit that changed `DATA_PATHS` (the frontier records and the
 atlas data), so artifacts built from the same data carry the same version whatever code

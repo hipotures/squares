@@ -1,17 +1,30 @@
-# Square Packing
+# The Squares Project
+
+The Squares Project studies `s(n)`, the side of the smallest square that holds `n`
+non-overlapping unit squares.
+The problem is elementary to state and remains open even at small `n`. Its central case
+is eleven squares, where the verified bracket is `3.875 < s(11) ≤ 3.8770835…`, a gap of
+about `0.0021`.
 
 This repository contains:
 
-- **[New results](#new-results).** The lower bound on `s(11)` has moved.
-  It improves Stromquist’s `3.7888543…` bound, stated in
+- **[New results](#new-results).** First-party lower bounds on `s(11)` that improve
+  Stromquist’s `3.7888543…` bound, stated in
   [1984, Memo III, p. 10](packing/resources/papers/stromquist-1984-packing-unit-squares-inside-squares-iii-cases-through-65-and-gardner-conjecture.pdf)
   and published in 2003; no intervening improvement was found by the recorded search.
-  With it come the first bounds located in the public record for twelve, twenty and
-  twenty-one squares, and values from `n = 17` through `n = 21` that displace what was
-  in print.
+  The strongest first-party bound is `s(11) ≥ 3.8269975…`. With them come the first
+  bounds located in the public record for twelve, twenty and twenty-one squares, and
+  values from `n = 17` through `n = 21` that displaced what was in print.
+- **[Third-party results that build on this work](#third-party-results).** Outside
+  authors have built on these certificates and credited them.
+  Kleddamag’s `s(11) > 31/8 = 3.875`, developed from T-026’s certificate, is the
+  strongest verified lower bound for eleven squares.
+  At seventeen squares, three certificates trace their support back to T-019’s atoms,
+  and the strongest, also Kleddamag’s, is the verified lower bound.
+  Each is replayed and reviewed here before it is registered.
 - **[A survey of the whole problem](#survey).** Every case `n = 1…100`, the primary
   literature retained and transcribed, and the bound a source *reports* kept apart from
-  the bound this repository has *verified*. Seven of the lower bounds it shows were
+  the bound this repository has *verified*. Five of the lower bounds it shows were
   proved here.
 - **[An automated research workflow](#autonomous-research-process).** The results and
   the survey are produced and checked by AI agents running a recorded process:
@@ -19,8 +32,8 @@ This repository contains:
 
 The [**v0.4.1 explainer page**](https://jlevy.github.io/squares/) starts with an
 interactive point-certificate proof, then shows how threshold atoms and a dilation limit
-reach T-026’s historical `s(11) >= 3.8264474…` bound.
-Its figures remain drawn from the point certificates they explain.
+reach T-026’s `s(11) ≥ 3.8264474…` bound, the certificate Kleddamag’s `31/8` was
+developed from. Its figures are drawn from the point certificates they explain.
 
 [![One hundred known-best square packings arranged from n equals one through one hundred, each labeled with its best-known upper bound and, where the value is still open, the strongest verified lower bound.](packing/atlas/known-best/known-best-1-100.png)](https://jlevy.github.io/squares/known-best-1-100.pdf)
 
@@ -53,10 +66,7 @@ grid with the same cards, badges and legend, available as
 The first figure is unchanged; the [atlas README](packing/atlas/known-best/README.md)
 describes both.
 
-`s(n)` is the side of the smallest square that holds `n` non-overlapping unit squares.
-The problem is elementary to state and remains open even at small `n`.
-
-[New Results](#new-results) ·
+[New Results](#new-results) · [Third-Party Results](#third-party-results) ·
 [Research Status](SYNOPSIS.md#research-program-status-and-roadmap) · [Survey](#survey) ·
 [Repository Guide](#repository-guide) · [Getting Started](#getting-started) ·
 [Reports](#reports) · [Autonomous Research Process](#autonomous-research-process) ·
@@ -129,19 +139,11 @@ Results first established here, as far as the recorded source searches show:
   `+0.00055013825660`. `T-033` is registered as `V4/C3`: the certificate carries the
   same two distinct machine decisions, but the bound is derived from it by a single
   exact-algebraic step, and a derived claim takes the minimum over its parts.
-  The
-  [September 22 external review](docs/project/reviews/review-2026-09-22-external-square-certificates-integration.md)
-  establishes the stronger current bound `s(11) > 31/8 = 3.875` from Kleddamag’s
-  certificate and verifies Tokoharu’s rectangle-density bounds `s(26) >= 5.508` and
-  `s(29) >= 5.71`. Complete replays and mathematical reviews support those Frontier
-  bounds. The
-  [native n11 decision](docs/project/reviews/review-2026-09-22-native-n11-parent-core.md)
-  independently covers all 12,028 parent-angle intervals by interval branch and bound.
-  Together with the exact source replay and reviewed transfer theorem, it confirms the
-  strict `3.875` bound at `V4/C4`. The explainer uses the `3.81` certificate as its
-  visual worked example, then proves the threshold-counting and dilation steps that
-  establish `T-026`’s `3.8264474…` directly; it is generated against that rung and has
-  not been rebuilt on `T-033`’s net.
+  Kleddamag’s stronger `s(11) > 31/8`, developed from T-026’s certificate, is listed
+  under [Third-Party Results](#third-party-results).
+  The explainer uses the `3.81` certificate as its visual worked example, then proves
+  the threshold-counting and dilation steps that establish `T-026`’s `3.8264474…`
+  directly; it is generated against that rung and has not been rebuilt on `T-033`’s net.
 - **T-019: `s(17), s(18), s(19) ≥ 459/100`, improving the register (`S4`).** The adopted
   bound for [these](packing/frontier/n-017.md) three cases was Massaccesi’s `4.5058`,
   taken from a source rather than proved here.
@@ -220,31 +222,6 @@ erratum.
   It raises each bound by `0.05` above `T-020`; the heavier atom set does not apply to
   `n = 19`.
 
-- **T-032: `s(17) ≥ 461300/99999 = 4.61304613…`, the first verified bound here that came
-  from outside (`S3`).** Two certificates arrived together in September 2026, both built
-  on `T-019`’s atoms and both crediting it.
-  **Mira**’s of 7 September gives `4613/1000` on 1620 atoms, and is written in this
-  repository’s own certificate schema, so the stock exact and interval verifiers decide
-  it unchanged and both accept.
-  **Guzhou0806**’s R012 of 20 September restricts coverage to what a real parent square
-  needs — parents of side `99999/100000`, a catalogue of 2925 parent-angle intervals
-  each choosing its own core, and coverage only over legal parent centres — which lifts
-  the same measure to `461300/99999` after rescaling.
-  R012 is decided by its own exact checker and, in a method that fails differently, by
-  this repository’s interval branch and bound over all 2925 entries.
-  The
-  [proof review](docs/project/reviews/review-2026-09-20-n17-r012-and-mira-4613-proof-review.md)
-  found no error and supplies two steps R012’s note omits.
-  The movement over `T-019` is `0.02305`, and the gap to Bidwell’s packing is now
-  `0.0625`. It is the strongest value *verified here*, not the strongest claimed in
-  public. Two public claims stand above it, each with a different standing in this
-  repository. Guzhou0806’s later R038 certificate reports
-  `461300000000/99974999999 = 4.614153538431…`, which is neither retained nor replayed
-  here. Kleddamag’s `461300/99853 = 4.619791092907…` is retained here, replayed to a
-  byte-identical result, and reviewed with no blocking finding — and is deliberately not
-  registered, because both of its checkers are one method and a rung needs a first-party
-  decision that does not inherit the idiom they share.
-
 - **T-027 / T-028 / T-029 / T-030: `s(18) ≥ 4.67, 4.675, 4.6775, 4.679` (`S3`).** Four
   retained weighted fractional unavoidable-set certificates form the latest `n = 18`
   ladder. Each passed both the exact weighted-sum replay and an independent interval
@@ -255,7 +232,7 @@ erratum.
   unavoidable set is certified by exact rational cover verification and an independent
   interval branch-and-bound over the full pose space.
   Both are superseded as the verified lower bound: first by the source-backed `4.5058`
-  adopted on 2026-09-03, then by `T-019`, and now by `T-032`.
+  adopted on 2026-09-03, then by `T-019`; the current values are in the survey.
 
 - **T-003: the sixteen-point construction’s ceiling is bracketed (`S2`).** Exact
   certification at `4426213/1000000` and an exact escaping pose at `4427/1000` locate
@@ -314,6 +291,59 @@ actions live in the register.
 Results that still rest on a source read rather than a machine check are labeled there
 accordingly.
 
+## Third-Party Results
+
+Outside authors have built on this repository’s certificates, credited them, and taken
+the bounds further. The theorems and the credit belong to those authors.
+This repository replays each certificate completely, reviews its mathematics, and only
+then registers the bound.
+
+- **Kleddamag: `s(11) > 31/8 = 3.875`.** The
+  [certificate](packing/resources/web/external-square-certificates-2026-09-22/kleddamag-11/README.md)
+  of September 2026 was developed from T-026’s threshold certificate, and its second
+  checker adapts Guzhou0806’s R038. It works at T-025’s container side `191/50` with
+  parent squares of side `764/775`, whose ratio is `31/8`, and checks 12,028
+  parent-angle intervals.
+  Both of the source’s complete exact sweeps pass here, and the
+  [mathematical review](docs/project/reviews/review-2026-09-22-kleddamag-n11-mathematics.md)
+  found no blocking defect.
+  The
+  [native n11 decision](docs/project/reviews/review-2026-09-22-native-n11-parent-core.md)
+  covers all 12,028 intervals again by a different method, interval branch and bound,
+  which confirms the bound at `V4/C4`. It is the verified lower bound for
+  [eleven squares](packing/frontier/n-011.md), about `0.0021` below Trump’s packing and
+  `0.048` above T-033.
+- **Kleddamag: `s(17) > 461300/99853 = 4.6197910…`.** The
+  [certificate](packing/resources/web/n17-kleddamag-certified-bound-2026-09-21/README.md)
+  of September 2026 takes its spatial support from Mira’s `4613/1000` certificate below,
+  and its attribution credits this repository’s parent-centre contract and T-025
+  threshold certificate.
+  The complete local replay and the
+  [proof review](docs/project/reviews/review-2026-09-21-n17-kleddamag-461300-99853.md)
+  support `V4/C3`; both of its checkers implement one event-cell method, so `C4` would
+  need a second one. It is the verified lower bound for
+  [seventeen squares](packing/frontier/n-017.md), `0.0067` above T-032 and `0.0557`
+  below Bidwell’s packing.
+- **T-032: `s(17) ≥ 461300/99999 = 4.61304613…`, from Guzhou0806 and Mira (`S3`).** Two
+  certificates arrived together in September 2026, both built on `T-019`’s atoms and
+  both crediting it. **Mira**’s of 7 September gives `4613/1000` on 1620 atoms, and is
+  written in this repository’s own certificate schema, so the stock exact and interval
+  verifiers decide it unchanged and both accept.
+  **Guzhou0806**’s R012 of 20 September restricts coverage to what a real parent square
+  needs — parents of side `99999/100000`, a catalogue of 2925 parent-angle intervals
+  each choosing its own core, and coverage only over legal parent centres — which lifts
+  the same measure to `461300/99999` after rescaling.
+  R012 is decided by its own exact checker and, in a method that fails differently, by
+  this repository’s interval branch and bound over all 2925 entries.
+  The
+  [proof review](docs/project/reviews/review-2026-09-20-n17-r012-and-mira-4613-proof-review.md)
+  found no error and supplies two steps R012’s note omits.
+  It moved the `n = 17` bound `0.02305` above `T-019`. It was the first external bound
+  registered here and is the only one with a `T-NNN` identifier; the two Kleddamag
+  bounds are recorded in their case files.
+  Guzhou0806’s later R038 reports `461300000000/99974999999 = 4.6141535…`, between T-032
+  and Kleddamag’s bound; it is neither retained nor replayed here.
+
 ## Survey
 
 The survey records the best-known packing and strongest verified lower bound for every
@@ -325,9 +355,12 @@ Its source is one schema-validated case file under
 [status table](packing/frontier/STATUS.md) is the reader view, and the atlas above
 renders every retained known-best packing.
 The current `n = 18` survey row records the independently verified lower bound
-`4679/1000 = 4.679` from `T-030`. At `n = 17`, the retained Kleddamag replay and proof
-review support the stronger `461300/99853 = 4.619791…`; T-032 remains in the result
-history.
+`4679/1000 = 4.679` from `T-030`, and the `n = 11` and `n = 17` rows record the two
+Kleddamag bounds under [Third-Party Results](#third-party-results).
+The
+[September 22 external review](docs/project/reviews/review-2026-09-22-external-square-certificates-integration.md)
+also verifies Tokoharu’s rectangle-density bounds `s(26) ≥ 5.508` and `s(29) ≥ 5.71`,
+which the survey carries as verified lower bounds.
 
 The [literature archive](packing/resources/README.md) retains each primary source, a
 cleaned Markdown transcription, and the unedited extraction used to check it.

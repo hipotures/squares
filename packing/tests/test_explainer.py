@@ -47,7 +47,13 @@ from devtools.render_explainer import (
 )
 from devtools.render_explainer import load_certificate as load
 from devtools.render_explainer_pdf import OUTPUT as PDF_OUTPUT
-from sqpack.release import PUBLICATION_EDITION, PUBLICATION_HISTORY, PUBLICATION_VERSION
+from sqpack.release import (
+    FIRST_PUBLISHED,
+    PUBLICATION_DATE,
+    PUBLICATION_EDITION,
+    PUBLICATION_HISTORY,
+    PUBLICATION_VERSION,
+)
 from sqpack.yamlio import safe_load
 from workbench_tools.build_site import NOTE as WORKBENCH_NOTE
 from workbench_tools.build_site import RENDER_INPUTS as WORKBENCH_INPUTS
@@ -927,16 +933,24 @@ def test_the_page_stamps_the_shared_version_the_atlas_carries(page: str, documen
         )
         assert footer is not None, composite.name
         assert footer.group(1) == PUBLICATION_EDITION, composite.name
-    linked_edition = f'(<a href="#version-history">{PUBLICATION_EDITION}</a>)'
-    assert linked_edition in page
-    assert f"([{PUBLICATION_EDITION}](#version-history))" in document
+    # The top names when the result was first published and when it was last revised,
+    # then which edition is being read, linking the full list rather than repeating it
+    # (the owner, 2026-09-22). Two lines, and the dates are two different editions'.
+    dates = f"First published {FIRST_PUBLISHED} · Last revised {PUBLICATION_DATE}"
+    edition = f'{PUBLICATION_EDITION} (<a href="#version-history">version history</a>)'
+    assert f'<span class="publication-date">{dates}</span>' in page
+    assert f'<span class="edition">{edition}</span>' in page
+    assert FIRST_PUBLISHED != PUBLICATION_DATE
+    compact = " ".join(document.split())
+    assert dates in compact
+    assert f"{PUBLICATION_EDITION} ([version history](#version-history))" in compact
     assert 'id="version-history"' in page
 
 
-def test_version_history_is_source_derived_and_has_two_entries(
+def test_version_history_is_source_derived_and_lists_every_edition(
     page: str, document: str
 ) -> None:
-    """The page history comes from release metadata rather than copied prose."""
+    """The page history comes from release metadata and carries every edition."""
     match = re.search(
         r"^## Version History\n\n(?P<history>.*?)(?=\n\[\^|\Z)",
         document,
@@ -945,13 +959,13 @@ def test_version_history_is_source_derived_and_has_two_entries(
     assert match is not None
     assert document.index("## Version History") > document.index("## Further Reading")
     history = match.group("history")
-    assert len(re.findall(r"^- \*\*v", history, re.MULTILINE)) == 2
+    assert len(re.findall(r"^- \*\*v", history, re.MULTILINE)) == len(PUBLICATION_HISTORY)
     compact_history = " ".join(history.split())
     for entry in PUBLICATION_HISTORY:
-        expected = f"- **{entry.version} — {entry.first_labeled}.** {entry.result_scope}"
+        expected = f"- **{entry.version} — {entry.first_published}.** {entry.result_scope}"
         assert " ".join(expected.split()) in compact_history
         assert entry.version in page
-        assert entry.first_labeled in page
+        assert entry.first_published in page
 
 
 def test_reader_facing_version_references_follow_release_metadata() -> None:
