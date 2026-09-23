@@ -1,0 +1,25 @@
+{
+  "input_sha": "e102e35f729eb52be10eabe5ba83428e2a10e1bc",
+  "p1_sha": "cc83964b",
+  "kernel": "7.0.0-31-generic",
+  "machine": "x86_64",
+  "cpu_model": "AMD Ryzen 9 7950X3D 16-Core Processor",
+  "visible_cpus": 16,
+  "compiler": "cc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+  "wheel_check": {
+    "filename": "sqpack-0.2.0-cp314-cp314-linux_x86_64.whl",
+    "bytes": 659202,
+    "sha256": "24fcb27056f7140567e38c979bd60e19aa9f24658a20275e596a26ac3bc72870",
+    "native_files": [
+      "sqpack/fractional/_prefix_rows.py",
+      "sqpack/fractional/_prefix_rows_native.so",
+      "sqpack/fractional/_top13.so"
+    ],
+    "build_command": "cd packing && uv build --wheel --out-dir ../Experiments/cpu-followup-integration/raw/wheel-check"
+  },
+  "thread_limits": {
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1"
+  }
+}

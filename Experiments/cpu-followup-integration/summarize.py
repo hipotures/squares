@@ -20,10 +20,15 @@ def describe(values: list[float]) -> dict[str, float]:
 
 def main() -> None:
     output: dict[str, object] = {}
-    for variant in ("vectorized", "prefix"):
-        for workers in (1, 16):
+    for variant, counts, subdir in (
+        ("vectorized", (1, 16), Path("raw")),
+        ("prefix", (1, 16), Path("raw")),
+        ("prefix-long", (16,), Path("raw/prefix-long")),
+    ):
+        for workers in counts:
+            filename_variant = "prefix" if variant == "prefix-long" else variant
             paths = {
-                mode: [ROOT / "raw" / f"{variant}-{mode}-w{workers}-s{i}.json"
+                mode: [ROOT / subdir / f"{filename_variant}-{mode}-w{workers}-s{i}.json"
                        for i in (1, 2, 3)]
                 for mode in ("reference", "candidate")
             }
@@ -54,6 +59,27 @@ def main() -> None:
             metric["paired_saved_seconds"] = describe(saved)
             metric["paired_saved_samples_seconds"] = saved
             output[f"{variant}-w{workers}"] = metric
+    for workers in (1, 16):
+        paths = [ROOT / "raw/p2-baseline" / f"baseline-w{workers}-s{i}.json"
+                 for i in (1, 2, 3)]
+        if not all(path.exists() for path in paths):
+            continue
+        records = [json.loads(path.read_text()) for path in paths]
+        output[f"p2-baseline-w{workers}"] = {
+            "wall_per_solve_seconds": describe(
+                [x["normalized_batch_wall_seconds"] for x in records]
+            ),
+            "separation_per_solve_seconds": describe([
+                sum(run["separation_seconds"] for run in x["solves"]) / x["repeats"]
+                for x in records
+            ]),
+            "lp_per_solve_seconds": describe([
+                sum(run["lp_seconds"] for run in x["solves"]) / x["repeats"]
+                for x in records
+            ]),
+            "batch_wall_seconds": describe([x["batch_wall_seconds"] for x in records]),
+            "raw": [str(path.relative_to(ROOT)) for path in paths],
+        }
     (ROOT / "results.json").write_text(json.dumps(output, indent=2) + "\n")
     print(json.dumps(output, indent=2))
 

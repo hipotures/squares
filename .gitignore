@@ -11,6 +11,8 @@ __pycache__/
 packing/.venv/
 /packing/src/sqpack/fractional/_top13.so
 /packing/src/sqpack/fractional/_top13.dylib
+/packing/src/sqpack/fractional/_prefix_rows_native.so
+/packing/src/sqpack/fractional/_prefix_rows_native.dylib
 
 # The unattended runner's id reservations (`packing-campaign`): one empty marker
 # directory per allocated exp id, created with an atomic mkdir. Local coordination

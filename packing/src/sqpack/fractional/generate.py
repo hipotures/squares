@@ -27,6 +27,7 @@ from fractions import Fraction
 import numpy as np
 from scipy.optimize import linprog
 
+from sqpack.fractional._prefix_rows import accumulate_axis0
 from sqpack.fractional._top13_selector import select_lowest_finite
 from sqpack.fractional.certificate import Certificate
 from sqpack.fractional.corner_clip import CornerClip
@@ -334,7 +335,7 @@ def event_grid(
     # No caller uses the difference grid after its prefix sums. Both passes
     # support exact in-place accumulation and avoid two grid-sized temporaries.
     np.add.accumulate(grid, axis=1, out=grid)
-    np.add.accumulate(grid, axis=0, out=grid)
+    accumulate_axis0(grid)
     mass = grid[:-1, :-1]
 
     # The domain's extremes are events themselves, so against those the tests

@@ -53,7 +53,9 @@ def main() -> None:
     parser.add_argument("--workers", type=int, required=True)
     parser.add_argument("--samples", type=int, default=3)
     parser.add_argument("--target-seconds", type=float, default=20)
+    parser.add_argument("--output-dir", type=Path, default=ROOT / "raw")
     args = parser.parse_args()
+    args.output_dir.mkdir(parents=True, exist_ok=True)
     assert args.workers > 0
     os.environ["PACK_JOBS"] = str(args.workers)
     case = bench_colgen.Case(n=12, outer_side=Fraction(99, 25))
@@ -93,7 +95,7 @@ def main() -> None:
                 for key in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS")
             },
         }
-        path = ROOT / "raw" / f"baseline-w{args.workers}-s{sample}.json"
+        path = args.output_dir / f"baseline-w{args.workers}-s{sample}.json"
         path.write_text(json.dumps(result, indent=2) + "\n")
         print(
             json.dumps({

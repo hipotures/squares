@@ -150,6 +150,8 @@ packages = ["src/sqpack"]
 exclude = [
     "/src/sqpack/fractional/_top13.so",
     "/src/sqpack/fractional/_top13.dylib",
+    "/src/sqpack/fractional/_prefix_rows_native.so",
+    "/src/sqpack/fractional/_prefix_rows_native.dylib",
 ]
 
 [tool.hatch.build.targets.sdist]
@@ -157,6 +159,8 @@ exclude = [
 exclude = [
     "/src/sqpack/fractional/_top13.so",
     "/src/sqpack/fractional/_top13.dylib",
+    "/src/sqpack/fractional/_prefix_rows_native.so",
+    "/src/sqpack/fractional/_prefix_rows_native.dylib",
 ]
 
 # Lint
