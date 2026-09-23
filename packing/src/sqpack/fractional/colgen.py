@@ -40,8 +40,10 @@ from __future__ import annotations
 
 import logging
 import math
+import os
 import time
 from collections.abc import Iterable
+from concurrent.futures import ProcessPoolExecutor
 from dataclasses import dataclass, field
 from fractions import Fraction
 from itertools import combinations
@@ -61,6 +63,7 @@ from sqpack.fractional.generate import (
     placement_cells,
 )
 from sqpack.fractional.model import Atom, Direction
+from sqpack.workers import worker_count
 
 # The eight orthogonal maps of the container's D4 group, as matrices acting on
 # coordinates measured from the container centre. Written out rather than
@@ -484,7 +487,14 @@ def _record(
     )
 
 
-def solve_rows(
+def _direction_task(
+    args: tuple[np.ndarray, np.ndarray, Direction, float, float, int, CornerClip | None],
+) -> list[tuple[float, float, float, np.ndarray]]:
+    points, weights, direction, outer, side, keep, clip = args
+    return placement_cells(points, weights, direction, outer, side, keep=keep, clip=clip)
+
+
+def _solve_rows_serial_or_pool(
     sites: SiteSet,
     square_side: Fraction,
     half_tangents: tuple[Fraction, ...],
@@ -496,6 +506,7 @@ def solve_rows(
     timings: list[RoundTiming] | None = None,
     deadline: float | None = None,
     clip: CornerClip | None = None,
+    _direction_pool: ProcessPoolExecutor | None = None,
 ) -> LpSolution:
     """Row-generate on a fixed site set until no placement is short of mass 1.
 
@@ -574,16 +585,20 @@ def solve_rows(
         added = 0
         least = float("inf")
         least_covered = float("inf")
-        for index, direction in enumerate(directions):
-            for mass, cu, cv, covers in placement_cells(
-                points,
-                site_weights,
-                direction,
-                outer,
-                side,
-                keep=rows_per_direction,
-                clip=clip,
-            ):
+        if _direction_pool is None:
+            found_by_direction = (
+                placement_cells(points, site_weights, direction, outer, side,
+                                keep=rows_per_direction, clip=clip)
+                for direction in directions
+            )
+        else:
+            tasks = (
+                (points, site_weights, direction, outer, side, rows_per_direction, clip)
+                for direction in directions
+            )
+            found_by_direction = _direction_pool.map(_direction_task, tasks)
+        for index, found in enumerate(found_by_direction):
+            for mass, cu, cv, covers in found:
                 # Cells arrive in ascending mass, so the first at a direction is
                 # that direction's least covered placement whether or not it is
                 # violated. Reading it before the break is the only way the
@@ -673,6 +688,47 @@ def solve_rows(
         )
     solution.stopped = f"round limit {max_rounds} reached"
     return solution
+
+
+def solve_rows(
+    sites: SiteSet,
+    square_side: Fraction,
+    half_tangents: tuple[Fraction, ...],
+    rows: Rows,
+    *,
+    max_rounds: int = 60,
+    rows_per_direction: int = 3,
+    tolerance: float = 1e-9,
+    timings: list[RoundTiming] | None = None,
+    deadline: float | None = None,
+    clip: CornerClip | None = None,
+    workers: int | None = None,
+) -> LpSolution:
+    """Row generation with an optional persistent direction process pool.
+
+    The default stays serial unless PACK_JOBS is set. Explicit counts are
+    capped by PACK_JOBS through the repository's worker_count convention.
+    Pool.map yields results in direction order, preserving row decisions.
+    """
+    if workers is not None and workers < 1:
+        raise ValueError("workers must be positive")
+    requested = workers if workers is not None else (
+        worker_count(len(half_tangents) + 1) if os.environ.get("PACK_JOBS") else 1
+    )
+    count = worker_count(min(requested, len(half_tangents) + 1))
+    args = (sites, square_side, half_tangents, rows)
+    options = {
+        "max_rounds": max_rounds,
+        "rows_per_direction": rows_per_direction,
+        "tolerance": tolerance,
+        "timings": timings,
+        "deadline": deadline,
+        "clip": clip,
+    }
+    if count == 1:
+        return _solve_rows_serial_or_pool(*args, **options)
+    with ProcessPoolExecutor(max_workers=count) as pool:
+        return _solve_rows_serial_or_pool(*args, _direction_pool=pool, **options)
 
 
 #: One dual row after snapping: net direction index, absolute centre, weight.
