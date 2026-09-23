@@ -255,7 +255,11 @@ PRUNE = frozenset(
         # in think-t1lk for PR 218 found no control or external code reader of its bulk
         # numerical output. Inline-linked receipts and registered artifacts still return
         # through snapshot_pruned_targets. Reuse that prune here instead of raising the
-        # portable ceiling for this intake's 8,847-byte source-growth breach.
+        # portable ceiling. Registering T-033 copied a 674 KB certificate into `cases/`,
+        # while the pruned directory itself holds about 10.8 MB of numerical receipts,
+        # gate stdout, and copied measurements that `controls.yaml` does not name.
+        # The receipt the register lists as an artifact returns through
+        # linked_pruned_targets, as agenda 034's did.
         ROOT / "campaign/series/series-000-smoke-and-calibration/results/agenda-041",
         ROOT
         / "campaign/series/series-000-smoke-and-calibration/results/exp-201-arm-calibration",
