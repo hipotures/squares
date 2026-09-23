@@ -330,7 +330,11 @@ def event_grid(
     np.add.at(grid, (right, bottom), -live_w)
     np.add.at(grid, (left, top), -live_w)
     np.add.at(grid, (right, top), live_w)
-    mass = np.cumsum(np.cumsum(grid, axis=1), axis=0)[:-1, :-1]
+    # No caller uses the difference grid after its prefix sums. Both passes
+    # support exact in-place accumulation and avoid two grid-sized temporaries.
+    np.add.accumulate(grid, axis=1, out=grid)
+    np.add.accumulate(grid, axis=0, out=grid)
+    mass = grid[:-1, :-1]
 
     # The domain's extremes are events themselves, so against those the tests
     # are exact; only the per-slab v-extent, which is computed, needs the slack.
