@@ -277,8 +277,10 @@ certificate’s replay command.
    establishes that bound, with `value` and `exact_form`, and its body must restate the
    new bound: `devtools.check_case_prose` reads the prose against the front matter.
    Controls may remain result-only: `T-026` cites five entries, while the case bound at
-   that rung cited the three that established it — as `n-011.md` now cites `T-033`’s
-   three and not its control leg.
+   that rung cited the three that established it.
+   At the historical `T-033` rung, `n-011.md` cited its three establishing entries
+   rather than its control leg; the current case bound cites Kleddamag’s replay evidence
+   and retains the earlier entries as history.
    A numerical finding or a result about a restricted family does not by itself change
    an unconditional verified bound.
    Preserve earlier evidence and decisions.

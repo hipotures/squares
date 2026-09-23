@@ -5792,9 +5792,11 @@ and proves `s(11) >= 3.826447410572939…` by an exact dilation-limit argument, 
 `s(11) >= 3.826997548829543…`. T-033 is the strongest retained first-party rung in this
 family, while the current verified case bound is the stronger external strict result
 `s(11) > 31/8`. “Dilation-limit” describes T-033’s proof construction, not a weaker
-theorem or assurance level; its current significance is S3 as method and calibration
-evidence. `s(12) >= 99/25` is [T-017](packing/frontier/RESULTS.md), the first bound
-located that was proved about twelve squares rather than inherited from eleven.
+theorem or assurance level.
+The result retains its historical S5 registration, while the external certificate
+supplies the current case bound.
+`s(12) >= 99/25` is [T-017](packing/frontier/RESULTS.md), the first bound located that
+was proved about twelve squares rather than inherited from eleven.
 `s(17) >= 459/100`, and `n = 18` and `n = 19` at the same side without a monotonicity
 step, is [T-019](packing/frontier/RESULTS.md) and displaces Massaccesi’s published
 `4.5058` by `0.0842`. `s(19)`, `s(20)` and `s(21) >= 24/5` is
