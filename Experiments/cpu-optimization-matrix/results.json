@@ -1,0 +1,474 @@
+{
+  "base_sha": "1f58b0f0abca55d4ea2cf0e1cd73d70ebd625659",
+  "controlled_baseline": {
+    "1": {
+      "seconds": 43.679,
+      "separation_seconds": 33.664,
+      "lp_seconds": 10.089,
+      "rounds": 22,
+      "rows": 5643,
+      "objective": 12.21767636660579,
+      "round0_separation_seconds": 3.0396258869986923,
+      "least_covered": 0.9999999999995074,
+      "pricing_seconds": 0.446
+    },
+    "16": {
+      "seconds": 17.568,
+      "separation_seconds": 7.266,
+      "lp_seconds": 10.249,
+      "rounds": 22,
+      "rows": 5643,
+      "objective": 12.21767636660579,
+      "round0_separation_seconds": 0.9551771389997157,
+      "least_covered": 0.9999999999995074,
+      "pricing_seconds": 0.466
+    }
+  },
+  "comparison_policy": "Other 16-worker rows use the controlled 16-process baseline; parallel directions uses measured production workers=1 versus workers=16. Independent gains are not additive.",
+  "experiments": [
+    {
+      "experiment": "parallel-directions",
+      "branch": "exp/cpu-parallel-directions",
+      "branch_url": "https://github.com/hipotures/squares/tree/exp/cpu-parallel-directions",
+      "commit": "9fca9e8c66a5d05a71803e3e0796531568c7c850",
+      "base_sha": "1f58b0f0abca55d4ea2cf0e1cd73d70ebd625659",
+      "correctness": "TRAJECTORY IDENTICAL",
+      "verdict": "READY TO CONSIDER FOR MERGE",
+      "modes": {
+        "1": {
+          "wall_runs_s": [
+            44.268,
+            43.798,
+            44.093
+          ],
+          "wall_median_s": 44.093,
+          "wall_min_s": 43.798,
+          "wall_max_s": 44.268,
+          "separation_median_s": 34.07,
+          "lp_median_s": 10.025,
+          "round0_median_s": 3.209539979998226,
+          "rounds": 22,
+          "rows": 5643,
+          "objective": 12.21767636660579,
+          "least_covered": 0.9999999999995074,
+          "controlled_base_wall_s": 43.679,
+          "controlled_seconds_saved": -0.414,
+          "controlled_wall_reduction_percent": -0.95
+        },
+        "16": {
+          "wall_runs_s": [
+            17.669,
+            17.648,
+            17.591
+          ],
+          "wall_median_s": 17.648,
+          "wall_min_s": 17.591,
+          "wall_max_s": 17.669,
+          "separation_median_s": 7.336,
+          "lp_median_s": 10.241,
+          "round0_median_s": 0.9536827279989666,
+          "rounds": 22,
+          "rows": 5643,
+          "objective": 12.21767636660579,
+          "least_covered": 0.9999999999995074,
+          "controlled_base_wall_s": 17.568,
+          "controlled_seconds_saved": -0.08,
+          "controlled_wall_reduction_percent": -0.46
+        }
+      },
+      "memory_effect": "parent 350,336\u2013352,404 KiB (1) vs 357,280\u2013358,680 KiB (16); child RSS unmeasured",
+      "complexity": "low to moderate",
+      "dependency_impact": "none",
+      "major_risk": "PACK_JOBS is a per-step cap, not a cross-process semaphore",
+      "files_changed": [
+        "Experiments/cpu-optimization-parallel-directions/README.md",
+        "Experiments/cpu-optimization-parallel-directions/environment.json",
+        "Experiments/cpu-optimization-parallel-directions/full-w1-1.json",
+        "Experiments/cpu-optimization-parallel-directions/full-w1-2.json",
+        "Experiments/cpu-optimization-parallel-directions/full-w1-3.json",
+        "Experiments/cpu-optimization-parallel-directions/full-w16-1.json",
+        "Experiments/cpu-optimization-parallel-directions/full-w16-2.json",
+        "Experiments/cpu-optimization-parallel-directions/full-w16-3.json",
+        "Experiments/cpu-optimization-parallel-directions/full-w4-1.json",
+        "Experiments/cpu-optimization-parallel-directions/full-w8-1.json",
+        "Experiments/cpu-optimization-parallel-directions/run_production.py",
+        "packing/src/sqpack/fractional/colgen.py",
+        "packing/tests/test_colgen_parallel_directions.py"
+      ],
+      "source_report": "Experiments/cpu-optimization-parallel-directions/README.md",
+      "production_1_to_16": {
+        "baseline_wall_s": 44.093,
+        "candidate_wall_s": 17.648,
+        "seconds_saved": 26.445,
+        "wall_reduction_percent": 59.98,
+        "speedup_factor": 2.498
+      }
+    },
+    {
+      "experiment": "highs-incremental",
+      "branch": "exp/cpu-highs-incremental",
+      "branch_url": "https://github.com/hipotures/squares/tree/exp/cpu-highs-incremental",
+      "commit": "114c9949ee4f5b12c1f830cde3f03d4127ea112d",
+      "base_sha": "1f58b0f0abca55d4ea2cf0e1cd73d70ebd625659",
+      "correctness": "SEMANTICALLY EQUIVALENT, DIFFERENT TRAJECTORY",
+      "verdict": "PROMISING BUT NEEDS MORE WORK",
+      "modes": {
+        "1": {
+          "wall_runs_s": [
+            34.293,
+            34.609,
+            34.461
+          ],
+          "wall_median_s": 34.461,
+          "wall_min_s": 34.293,
+          "wall_max_s": 34.609,
+          "separation_median_s": 33.244,
+          "lp_median_s": 1.16,
+          "round0_median_s": 3.0922445159994822,
+          "rounds": 23,
+          "rows": 5842,
+          "objective": 12.217676366606236,
+          "least_covered": 0.9999999999998309,
+          "controlled_base_wall_s": 43.679,
+          "controlled_seconds_saved": 9.218,
+          "controlled_wall_reduction_percent": 21.1
+        },
+        "16": {
+          "wall_runs_s": [
+            7.84,
+            7.712,
+            7.786
+          ],
+          "wall_median_s": 7.786,
+          "wall_min_s": 7.712,
+          "wall_max_s": 7.84,
+          "separation_median_s": 6.52,
+          "lp_median_s": 1.25,
+          "round0_median_s": 0.9739230769991991,
+          "rounds": 23,
+          "rows": 5842,
+          "objective": 12.217676366606236,
+          "least_covered": 0.9999999999998309,
+          "controlled_base_wall_s": 17.568,
+          "controlled_seconds_saved": 9.782,
+          "controlled_wall_reduction_percent": 55.68
+        }
+      },
+      "memory_effect": "parent 504,836\u2013587,260 KiB serial and 543,552\u2013579,832 KiB at 16; base RSS unmeasured",
+      "complexity": "moderate",
+      "dependency_impact": "highspy 1.15.1 for production",
+      "major_risk": "different optimal bases alter weights and row generation",
+      "files_changed": [
+        "Experiments/cpu-optimization-highs-incremental/README.md",
+        "Experiments/cpu-optimization-highs-incremental/bench_lp.py",
+        "Experiments/cpu-optimization-highs-incremental/comparison.json",
+        "Experiments/cpu-optimization-highs-incremental/environment.json",
+        "Experiments/cpu-optimization-highs-incremental/exact-rows.json",
+        "Experiments/cpu-optimization-highs-incremental/integrated-1.json",
+        "Experiments/cpu-optimization-highs-incremental/integrated-2.json",
+        "Experiments/cpu-optimization-highs-incremental/integrated-3.json",
+        "Experiments/cpu-optimization-highs-incremental/integrated-w16-1.json",
+        "Experiments/cpu-optimization-highs-incremental/integrated-w16-2.json",
+        "Experiments/cpu-optimization-highs-incremental/integrated-w16-3.json",
+        "Experiments/cpu-optimization-highs-incremental/run_highs.py",
+        "Experiments/cpu-optimization-highs-incremental/verify_rows.py"
+      ],
+      "source_report": "Experiments/cpu-optimization-highs-incremental/README.md"
+    },
+    {
+      "experiment": "top13-selector",
+      "branch": "exp/cpu-top13-selector",
+      "branch_url": "https://github.com/hipotures/squares/tree/exp/cpu-top13-selector",
+      "commit": "4172e760220849097b184ab1c2d0e6aacf968f5f",
+      "base_sha": "1f58b0f0abca55d4ea2cf0e1cd73d70ebd625659",
+      "correctness": "TRAJECTORY IDENTICAL",
+      "verdict": "PROMISING BUT NEEDS MORE WORK",
+      "modes": {
+        "1": {
+          "wall_runs_s": [
+            30.011,
+            30.007,
+            30.142
+          ],
+          "wall_median_s": 30.011,
+          "wall_min_s": 30.007,
+          "wall_max_s": 30.142,
+          "separation_median_s": 19.918,
+          "lp_median_s": 10.135,
+          "round0_median_s": 3.20033956199768,
+          "rounds": 22,
+          "rows": 5643,
+          "objective": 12.21767636660579,
+          "least_covered": 0.9999999999995074,
+          "controlled_base_wall_s": 43.679,
+          "controlled_seconds_saved": 13.668,
+          "controlled_wall_reduction_percent": 31.29
+        },
+        "16": {
+          "wall_runs_s": [
+            15.616,
+            15.532,
+            15.623
+          ],
+          "wall_median_s": 15.616,
+          "wall_min_s": 15.532,
+          "wall_max_s": 15.623,
+          "separation_median_s": 5.193,
+          "lp_median_s": 10.418,
+          "round0_median_s": 0.9483886979978706,
+          "rounds": 22,
+          "rows": 5643,
+          "objective": 12.21767636660579,
+          "least_covered": 0.9999999999995074,
+          "controlled_base_wall_s": 17.568,
+          "controlled_seconds_saved": 1.952,
+          "controlled_wall_reduction_percent": 11.11
+        }
+      },
+      "memory_effect": "per-call allocation 9,942,722 -> 1,664 bytes; full RSS unmeasured",
+      "complexity": "moderate to high",
+      "dependency_impact": "C compiler/native extension packaging",
+      "major_risk": "portable native packaging unfinished",
+      "files_changed": [
+        "Experiments/cpu-optimization-top13/README.md",
+        "Experiments/cpu-optimization-top13/bench_parallel.py",
+        "Experiments/cpu-optimization-top13/bench_select.py",
+        "Experiments/cpu-optimization-top13/current-round18-direction26.npz",
+        "Experiments/cpu-optimization-top13/current-round18-selector.json",
+        "Experiments/cpu-optimization-top13/environment.json",
+        "Experiments/cpu-optimization-top13/full-w1-1.json",
+        "Experiments/cpu-optimization-top13/full-w1-2.json",
+        "Experiments/cpu-optimization-top13/full-w1-3.json",
+        "Experiments/cpu-optimization-top13/full-w16-1.json",
+        "Experiments/cpu-optimization-top13/full-w16-2.json",
+        "Experiments/cpu-optimization-top13/full-w16-3.json",
+        "Experiments/cpu-optimization-top13/heap_select.c",
+        "Experiments/cpu-optimization-top13/parallel-selector.json",
+        "Experiments/cpu-optimization-top13/results.json",
+        "Experiments/cpu-optimization-top13/run_heap.py",
+        "Experiments/cpu-optimization-top13/trajectory-check.json"
+      ],
+      "source_report": "Experiments/cpu-optimization-top13/README.md"
+    },
+    {
+      "experiment": "maskless-selection",
+      "branch": "exp/cpu-maskless-selection",
+      "branch_url": "https://github.com/hipotures/squares/tree/exp/cpu-maskless-selection",
+      "commit": "6d077b05ec6838d9f53fa9920ac440e36129c5fd",
+      "base_sha": "1f58b0f0abca55d4ea2cf0e1cd73d70ebd625659",
+      "correctness": "TRAJECTORY IDENTICAL",
+      "verdict": "READY TO CONSIDER FOR MERGE",
+      "modes": {
+        "1": {
+          "wall_runs_s": [
+            42.442,
+            43.524,
+            43.583
+          ],
+          "wall_median_s": 43.524,
+          "wall_min_s": 42.442,
+          "wall_max_s": 43.583,
+          "separation_median_s": 33.315,
+          "lp_median_s": 10.098,
+          "round0_median_s": 3.2648297870000533,
+          "rounds": 22,
+          "rows": 5643,
+          "objective": 12.21767636660579,
+          "least_covered": 0.9999999999995074,
+          "controlled_base_wall_s": 43.679,
+          "controlled_seconds_saved": 0.155,
+          "controlled_wall_reduction_percent": 0.35
+        },
+        "16": {
+          "wall_runs_s": [
+            15.588,
+            15.457,
+            15.411
+          ],
+          "wall_median_s": 15.457,
+          "wall_min_s": 15.411,
+          "wall_max_s": 15.588,
+          "separation_median_s": 5.255,
+          "lp_median_s": 10.199,
+          "round0_median_s": 0.8065112399999634,
+          "rounds": 22,
+          "rows": 5643,
+          "objective": 12.21767636660579,
+          "least_covered": 0.9999999999995074,
+          "controlled_base_wall_s": 17.568,
+          "controlled_seconds_saved": 2.111,
+          "controlled_wall_reduction_percent": 12.02
+        }
+      },
+      "memory_effect": "per-call allocation 20,984,809 -> 13,662,623 bytes; full RSS unmeasured",
+      "complexity": "moderate",
+      "dependency_impact": "none",
+      "major_risk": "interval endpoint semantics",
+      "files_changed": [
+        "Experiments/cpu-optimization-maskless-selection/README.md",
+        "Experiments/cpu-optimization-maskless-selection/bench_maskless.py",
+        "Experiments/cpu-optimization-maskless-selection/check_intervals.py",
+        "Experiments/cpu-optimization-maskless-selection/environment.json",
+        "Experiments/cpu-optimization-maskless-selection/full-w1-1.json",
+        "Experiments/cpu-optimization-maskless-selection/full-w1-2.json",
+        "Experiments/cpu-optimization-maskless-selection/full-w1-3.json",
+        "Experiments/cpu-optimization-maskless-selection/full-w16-1.json",
+        "Experiments/cpu-optimization-maskless-selection/full-w16-2.json",
+        "Experiments/cpu-optimization-maskless-selection/full-w16-3.json",
+        "Experiments/cpu-optimization-maskless-selection/interval_check.json",
+        "Experiments/cpu-optimization-maskless-selection/operation.json",
+        "Experiments/cpu-optimization-maskless-selection/trajectory-check.json",
+        "packing/src/sqpack/fractional/generate.py"
+      ],
+      "source_report": "Experiments/cpu-optimization-maskless-selection/README.md"
+    },
+    {
+      "experiment": "fused-separation",
+      "branch": "exp/cpu-fused-separation",
+      "branch_url": "https://github.com/hipotures/squares/tree/exp/cpu-fused-separation",
+      "commit": "7ef9fd750b5a6dbf88ac14ef9718d40036d9355e",
+      "base_sha": "1f58b0f0abca55d4ea2cf0e1cd73d70ebd625659",
+      "correctness": "TRAJECTORY IDENTICAL",
+      "verdict": "RESEARCH RESULT ONLY",
+      "modes": {
+        "1": {
+          "wall_runs_s": [
+            58.705,
+            59.122,
+            58.904
+          ],
+          "wall_median_s": 58.904,
+          "wall_min_s": 58.705,
+          "wall_max_s": 59.122,
+          "separation_median_s": 48.742,
+          "lp_median_s": 10.159,
+          "round0_median_s": 1.3539823069986596,
+          "rounds": 22,
+          "rows": 5643,
+          "objective": 12.21767636660579,
+          "least_covered": 0.9999999999995074,
+          "controlled_base_wall_s": 43.679,
+          "controlled_seconds_saved": -15.225,
+          "controlled_wall_reduction_percent": -34.86
+        },
+        "16": {
+          "wall_runs_s": [
+            14.881,
+            14.853,
+            14.928
+          ],
+          "wall_median_s": 14.881,
+          "wall_min_s": 14.853,
+          "wall_max_s": 14.928,
+          "separation_median_s": 4.646,
+          "lp_median_s": 10.211,
+          "round0_median_s": 0.383784857000137,
+          "rounds": 22,
+          "rows": 5643,
+          "objective": 12.21767636660579,
+          "least_covered": 0.9999999999995074,
+          "controlled_base_wall_s": 17.568,
+          "controlled_seconds_saved": 2.687,
+          "controlled_wall_reduction_percent": 15.29
+        }
+      },
+      "memory_effect": "late-grid peak worker RSS 92,396 -> 76,504 KiB; full RSS unmeasured",
+      "complexity": "high",
+      "dependency_impact": "none",
+      "major_risk": "34.9% serial wall regression",
+      "files_changed": [
+        "Experiments/cpu-optimization-fused-separation/README.md",
+        "Experiments/cpu-optimization-fused-separation/check_stream.py",
+        "Experiments/cpu-optimization-fused-separation/environment.json",
+        "Experiments/cpu-optimization-fused-separation/full-w1-1.json",
+        "Experiments/cpu-optimization-fused-separation/full-w1-2.json",
+        "Experiments/cpu-optimization-fused-separation/full-w1-3.json",
+        "Experiments/cpu-optimization-fused-separation/full-w16-1.json",
+        "Experiments/cpu-optimization-fused-separation/full-w16-2.json",
+        "Experiments/cpu-optimization-fused-separation/full-w16-3.json",
+        "Experiments/cpu-optimization-fused-separation/parallel.json",
+        "Experiments/cpu-optimization-fused-separation/parallel_probe.py",
+        "Experiments/cpu-optimization-fused-separation/probe.json",
+        "Experiments/cpu-optimization-fused-separation/stream_check.json",
+        "Experiments/cpu-optimization-fused-separation/streaming_probe.py",
+        "Experiments/cpu-optimization-fused-separation/trajectory-check.json",
+        "packing/src/sqpack/fractional/generate.py"
+      ],
+      "source_report": "Experiments/cpu-optimization-fused-separation/README.md"
+    },
+    {
+      "experiment": "cumsum-reuse",
+      "branch": "exp/cpu-cumsum-reuse",
+      "branch_url": "https://github.com/hipotures/squares/tree/exp/cpu-cumsum-reuse",
+      "commit": "10dcd18ef65eef51de5bee8532260a3f2e635241",
+      "base_sha": "1f58b0f0abca55d4ea2cf0e1cd73d70ebd625659",
+      "correctness": "TRAJECTORY IDENTICAL",
+      "verdict": "READY TO CONSIDER FOR MERGE",
+      "modes": {
+        "1": {
+          "wall_runs_s": [
+            43.389,
+            43.412,
+            43.338
+          ],
+          "wall_median_s": 43.389,
+          "wall_min_s": 43.338,
+          "wall_max_s": 43.412,
+          "separation_median_s": 33.33,
+          "lp_median_s": 10.056,
+          "round0_median_s": 3.154007695000473,
+          "rounds": 22,
+          "rows": 5643,
+          "objective": 12.21767636660579,
+          "least_covered": 0.9999999999995074,
+          "controlled_base_wall_s": 43.679,
+          "controlled_seconds_saved": 0.29,
+          "controlled_wall_reduction_percent": 0.66
+        },
+        "16": {
+          "wall_runs_s": [
+            16.257,
+            16.093,
+            16.248
+          ],
+          "wall_median_s": 16.248,
+          "wall_min_s": 16.093,
+          "wall_max_s": 16.257,
+          "separation_median_s": 5.897,
+          "lp_median_s": 10.19,
+          "round0_median_s": 0.742416876997595,
+          "rounds": 22,
+          "rows": 5643,
+          "objective": 12.21767636660579,
+          "least_covered": 0.9999999999995074,
+          "controlled_base_wall_s": 17.568,
+          "controlled_seconds_saved": 1.32,
+          "controlled_wall_reduction_percent": 7.51
+        }
+      },
+      "memory_effect": "captured-grid allocation 15,367,262 -> 7,683,624 bytes; full RSS unmeasured",
+      "complexity": "low",
+      "dependency_impact": "none",
+      "major_risk": "serial gain only 0.7%",
+      "files_changed": [
+        "Experiments/cpu-optimization-cumsum-reuse/README.md",
+        "Experiments/cpu-optimization-cumsum-reuse/bench_cumsum.py",
+        "Experiments/cpu-optimization-cumsum-reuse/environment.json",
+        "Experiments/cpu-optimization-cumsum-reuse/full-w1-1.json",
+        "Experiments/cpu-optimization-cumsum-reuse/full-w1-2.json",
+        "Experiments/cpu-optimization-cumsum-reuse/full-w1-3.json",
+        "Experiments/cpu-optimization-cumsum-reuse/full-w16-1.json",
+        "Experiments/cpu-optimization-cumsum-reuse/full-w16-2.json",
+        "Experiments/cpu-optimization-cumsum-reuse/full-w16-3.json",
+        "Experiments/cpu-optimization-cumsum-reuse/operation.json",
+        "packing/src/sqpack/fractional/generate.py"
+      ],
+      "source_report": "Experiments/cpu-optimization-cumsum-reuse/README.md"
+    }
+  ],
+  "branch_isolation": {
+    "all_merge_bases_equal_base": true,
+    "matrix_branch_from_base": true
+  },
+  "gpu_work": false
+}
