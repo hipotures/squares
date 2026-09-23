@@ -175,12 +175,14 @@ The proof presented here is of this kind.
 <figure>
   <div class="stage"><a href="known-best-1-100.pdf"><img src="known-best-1-100.svg" alt="{{COMPOSITE_ALT}}" width="2400" height="2896"></a></div>
 
-  <div class="screen-only">
+  <div class="stage screen-only">
 
-  <video controls preload="none" playsinline width="100%" aria-label="The atlas built one unit square at a time, from n = 1 to n = 100, at 1080p60.">
-    <source src="https://github.com/jlevy/squares/releases/download/v0.4.1/ascent-n1-100-1080p60-citations.mp4" type="video/mp4; codecs=&quot;avc1.640028&quot;">
-    <a href="https://github.com/jlevy/squares/releases/download/v0.4.1/ascent-n1-100-1080p60-citations.mp4">Download the film</a>.
-  </video>
+<video class="film" controls preload="none" playsinline width="1920" height="1080"
+    poster="ascent-n1-100-poster.png"
+    aria-label="The atlas built one unit square at a time, from n = 1 to n = 100, at 1080p60.">
+<source src="https://github.com/jlevy/squares/releases/download/v0.4.1/ascent-n1-100-1080p60-citations.mp4" type="video/mp4; codecs=&quot;avc1.640028&quot;">
+<a href="https://github.com/jlevy/squares/releases/download/v0.4.1/ascent-n1-100-1080p60-citations.mp4">Download
+the film</a>. </video>
 
   </div>
 
