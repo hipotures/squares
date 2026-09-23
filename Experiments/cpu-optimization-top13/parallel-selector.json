@@ -1,0 +1,22 @@
+{
+  "1_current": {
+    "per_call_cpu_ms": 6.00261296,
+    "max_worker_wall_s": 0.1500819370012323,
+    "aggregate_cpu_s": 0.150065324
+  },
+  "1_heap": {
+    "per_call_cpu_ms": 0.5669755999999999,
+    "max_worker_wall_s": 0.014175280997733353,
+    "aggregate_cpu_s": 0.014174389999999999
+  },
+  "16_current": {
+    "per_call_cpu_ms": 10.661914880000001,
+    "max_worker_wall_s": 0.3575109520024853,
+    "aggregate_cpu_s": 4.264765952
+  },
+  "16_heap": {
+    "per_call_cpu_ms": 0.6657605225000001,
+    "max_worker_wall_s": 0.022815279000496957,
+    "aggregate_cpu_s": 0.266304209
+  }
+}
