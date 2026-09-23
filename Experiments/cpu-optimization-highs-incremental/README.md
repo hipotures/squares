@@ -19,7 +19,7 @@ The solver converged in 23 rounds and 5,842 rows at objective 12.217676366606236
 
 The basis is retained by `highspy` after `addRows`: a direct API probe showed `getBasis().valid` remains true as rows are appended. Explicitly resetting this retained basis would reproduce the same state; no separate warm-start transfer is needed. SciPy's public `linprog` call used here has no append-row model lifecycle. Its bundled HiGHS wrapper is private, so production integration would introduce a direct `highspy` dependency and a new model-owner lifecycle. This branch leaves that decision for the operator.
 
-Peak parent RSS across the prototype runs was 505–587 MiB serial and 544–580 MiB at 16 processes. The controlled base did not record comparable RSS, so the memory delta is unmeasured. The 16-process result uses the existing research direction pool and does not imply this branch productionizes that pool.
+Peak parent RSS across the prototype runs was 504,836–587,260 KiB serial and 543,552–579,832 KiB at 16 processes. The controlled base did not record comparable RSS, so the memory delta is unmeasured. The 16-process result uses the existing research direction pool and does not imply this branch productionizes that pool.
 
 ## Reproduce
 
