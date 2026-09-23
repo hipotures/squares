@@ -1,0 +1,26 @@
+{
+  "1_baseline": {
+    "per_call_cpu_ms": 13.061167800000002,
+    "max_worker_wall_s": 0.2612520239999867,
+    "aggregate_cpu_s": 0.261223356,
+    "peak_worker_rss_kib": 92448
+  },
+  "1_streaming": {
+    "per_call_cpu_ms": 15.978071999999997,
+    "max_worker_wall_s": 0.31957641700137174,
+    "aggregate_cpu_s": 0.31956144,
+    "peak_worker_rss_kib": 76504
+  },
+  "16_baseline": {
+    "per_call_cpu_ms": 31.118925187500004,
+    "max_worker_wall_s": 0.7411198749978212,
+    "aggregate_cpu_s": 9.95805606,
+    "peak_worker_rss_kib": 92396
+  },
+  "16_streaming": {
+    "per_call_cpu_ms": 18.983424825,
+    "max_worker_wall_s": 0.4098559009980818,
+    "aggregate_cpu_s": 6.074695944,
+    "peak_worker_rss_kib": 76504
+  }
+}

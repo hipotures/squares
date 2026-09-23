@@ -268,10 +268,76 @@ class EventGrid:
     u_events: np.ndarray
     v_events: np.ndarray
     mass: np.ndarray
-    reachable: np.ndarray
+    reachable: np.ndarray | None
     lows: np.ndarray
     highs: np.ndarray
     domain: _CentreDomain
+    candidate_order: np.ndarray | None = None
+
+
+def _stream_prefix_candidates(  # noqa: PLR0917 - keep geometry inputs explicit
+    grid: np.ndarray,
+    u_events: np.ndarray,
+    v_events: np.ndarray,
+    lows: np.ndarray,
+    highs: np.ndarray,
+    domain: _CentreDomain,
+    count: int,
+    *,
+    zero_weight_grid: bool,
+) -> np.ndarray:
+    """Prefix in place and keep only per-slab candidates during the scan.
+
+    Research prototype: each slab has a contiguous reachable v interval. A
+    global top-k cell must be in its slab's top-k, so the final merge is exact.
+    """
+    columns = v_events.size - 1
+    band_first = int(np.searchsorted(v_events[1:], domain.v_low, side="right"))
+    band_last = int(np.searchsorted(v_events[:-1], domain.v_high, side="left"))
+    running = np.zeros(grid.shape[1], dtype=grid.dtype)
+    candidates: list[np.ndarray] = []
+    intervals: list[tuple[int, int, int]] = []
+    for i, row in enumerate(grid):
+        np.add.accumulate(row, out=row)
+        row += running  # noqa: PLW2901 - mutate the grid row view in place
+        running[:] = row
+        if i >= grid.shape[0] - 1:
+            continue
+        if not (u_events[i + 1] > domain.u_low and u_events[i] < domain.u_high):
+            continue
+        first = max(
+            band_first,
+            int(np.searchsorted(v_events[1:], lows[i] - _REACH_SLACK, side="right")),
+        )
+        last = min(
+            band_last,
+            int(np.searchsorted(v_events[:-1], highs[i] + _REACH_SLACK, side="left")),
+        )
+        if first >= last:
+            continue
+        intervals.append((i, first, last))
+        if not zero_weight_grid:
+            local = _least_finite_indices(row[first:last], min(count, last - first))
+            candidates.append(i * columns + first + local)
+    if zero_weight_grid:
+        sizes = np.array([last - first for _, first, last in intervals], dtype=np.intp)
+        total = int(sizes.sum())
+        take = min(count, total)
+        if take == 0:
+            return np.empty(0, dtype=np.intp)
+        rank = np.linspace(0, total - 1, take, dtype=np.intp)
+        offsets = np.cumsum(sizes) - sizes
+        slots = np.searchsorted(offsets, rank, side="right") - 1
+        return np.array([
+            intervals[int(slot)][0] * columns + intervals[int(slot)][1]
+            + int(position) - int(offsets[int(slot)])
+            for slot, position in zip(slots, rank, strict=True)
+        ], dtype=np.intp)
+    if not candidates:
+        return np.empty(0, dtype=np.intp)
+    selected = np.concatenate(candidates)
+    selected_mass = grid[selected // columns, selected % columns]
+    return selected[np.lexsort((selected, selected_mass))[:count]]
 
 
 def event_grid(
@@ -282,6 +348,7 @@ def event_grid(
     square_side: float,
     *,
     clip: CornerClip | None = None,
+    stream_keep: int | None = None,
 ) -> EventGrid:
     """Project the sites, accumulate the cell masses, and mark the reachable cells.
 
@@ -329,6 +396,17 @@ def event_grid(
     np.add.at(grid, (right, bottom), -live_w)
     np.add.at(grid, (left, top), -live_w)
     np.add.at(grid, (right, top), live_w)
+    if stream_keep is not None:
+        u0, u1 = u_events[:-1], u_events[1:]
+        lows, highs = domain.v_range(u0, u1)
+        order = _stream_prefix_candidates(
+            grid, u_events, v_events, lows, highs, domain, stream_keep,
+            zero_weight_grid=not np.any(weights),
+        )
+        return EventGrid(
+            u, v, u_events, v_events, grid[:-1, :-1], None,
+            lows, highs, domain, order,
+        )
     mass = np.cumsum(np.cumsum(grid, axis=1), axis=0)[:-1, :-1]
 
     # The domain's extremes are events themselves, so against those the tests
@@ -418,15 +496,17 @@ def placement_cells(
     """
 
     half = square_side / 2
-    cells = event_grid(points, weights, direction, outer_side, square_side, clip=clip)
+    cells = event_grid(
+        points, weights, direction, outer_side, square_side,
+        clip=clip, stream_keep=4 * keep + 1,
+    )
     u, v = cells.u, cells.v
     u_events, v_events = cells.u_events, cells.v_events
     lows, highs, domain = cells.lows, cells.highs, cells.domain
     u0, u1 = u_events[:-1], u_events[1:]
 
-    scored = np.where(cells.reachable, cells.mass, np.inf)
-    flat = scored.ravel()
-    if flat.size == 0:
+    order = cells.candidate_order
+    if order is None or order.size == 0:
         return []
     # Survey more cells than are kept. A cell let in by the slack, or thinner
     # than a float can place a point in, re-scores at a neighbouring
@@ -437,7 +517,6 @@ def placement_cells(
     # Zero site weights imply the difference array and both prefix sums are
     # exactly zero. Passing this fact avoids a full-grid pattern scan on every
     # later round while the helper checks its own special-case precondition.
-    order = _least_finite_indices(flat, 4 * keep + 1, zero_weight_grid=not np.any(weights))
 
     found: list[tuple[float, float, float, np.ndarray]] = []
     exact = 0
@@ -458,7 +537,7 @@ def placement_cells(
         covers = (np.abs(u - cu) <= half) & (np.abs(v - cv) <= half)
         cell_mass = float(weights[covers].sum())
         found.append((cell_mass, cu, cv, covers))
-        exact += abs(cell_mass - float(flat[index])) <= 1e-9
+        exact += abs(cell_mass - float(cells.mass[i, j])) <= 1e-9
         if exact >= keep:
             break
     found.sort(key=lambda entry: entry[0])

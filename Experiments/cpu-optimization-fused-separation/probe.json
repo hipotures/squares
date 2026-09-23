@@ -1,0 +1,50 @@
+[
+  {
+    "direction": 0,
+    "shape": [
+      156,
+      156
+    ],
+    "baseline_median_s": 0.00034494899955461733,
+    "streaming_median_s": 0.0017305129986198153,
+    "peak_extra_bytes": {
+      "baseline": 604879,
+      "streaming": 290241
+    },
+    "mass_bitwise_equal": true,
+    "selected_equal": true,
+    "archived_selected_equal": true
+  },
+  {
+    "direction": 8,
+    "shape": [
+      980,
+      980
+    ],
+    "baseline_median_s": 0.013152859999536304,
+    "streaming_median_s": 0.01688943599947379,
+    "peak_extra_bytes": {
+      "baseline": 23980256,
+      "streaming": 8280731
+    },
+    "mass_bitwise_equal": true,
+    "selected_equal": true,
+    "archived_selected_equal": true
+  },
+  {
+    "direction": 17,
+    "shape": [
+      980,
+      980
+    ],
+    "baseline_median_s": 0.014160577000438934,
+    "streaming_median_s": 0.016827378000016324,
+    "peak_extra_bytes": {
+      "baseline": 23978413,
+      "streaming": 8289197
+    },
+    "mass_bitwise_equal": true,
+    "selected_equal": true,
+    "archived_selected_equal": true
+  }
+]
