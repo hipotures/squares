@@ -918,12 +918,14 @@ credits, the atlas footer, the workbench stage and the videos all print
 version comes from the first entry in `PUBLICATION_HISTORY`.
 
 **The version history keeps every edition, and dates each by first publication.** The
-page’s top line reads like “First published September 5, 2026 · v0.4.1-3b50e2 (version
-history)”: when the result first reached a reader, which edition is being read, and a
-link to the full list at the foot of the page.
-The date is the oldest edition’s, so it does not move; the edition is the current one,
-so it does. `PUBLICATION_HISTORY` lists every edition ever published, newest first, and
-an edition never comes off it — a new one goes on the front.
+top of the page reads, on two lines, like “First published September 5, 2026 · Last
+revised September 22, 2026” and “v0.4.1-3b50e2 (version history)”: when the result first
+reached a reader, when it was last revised, which edition is being read, and a link to
+the full list at the foot of the page.
+The first date is the oldest edition’s, so it does not move; the second date and the
+edition are the current one’s, so they do.
+`PUBLICATION_HISTORY` lists every edition ever published, newest first, and an edition
+never comes off it — a new one goes on the front.
 It used to keep “the two retained editions”, and adding v0.4.1 under that rule dropped
 v0.3.0, the proof of s(11) ≥ 381/100 the publication began with.
 Each date is when that edition was first *live on the public page*, read from the

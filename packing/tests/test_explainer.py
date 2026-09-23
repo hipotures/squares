@@ -49,6 +49,7 @@ from devtools.render_explainer import load_certificate as load
 from devtools.render_explainer_pdf import OUTPUT as PDF_OUTPUT
 from sqpack.release import (
     FIRST_PUBLISHED,
+    PUBLICATION_DATE,
     PUBLICATION_EDITION,
     PUBLICATION_HISTORY,
     PUBLICATION_VERSION,
@@ -932,16 +933,17 @@ def test_the_page_stamps_the_shared_version_the_atlas_carries(page: str, documen
         )
         assert footer is not None, composite.name
         assert footer.group(1) == PUBLICATION_EDITION, composite.name
-    # The top names when the result was first published and which edition is being read,
-    # and links the full list rather than repeating it (the owner, 2026-09-22).
-    top = (
-        f"First published {FIRST_PUBLISHED} · {PUBLICATION_EDITION} "
-        f'(<a href="#version-history">version history</a>)'
-    )
-    assert top in page
+    # The top names when the result was first published and when it was last revised,
+    # then which edition is being read, linking the full list rather than repeating it
+    # (the owner, 2026-09-22). Two lines, and the dates are two different editions'.
+    dates = f"First published {FIRST_PUBLISHED} · Last revised {PUBLICATION_DATE}"
+    edition = f'{PUBLICATION_EDITION} (<a href="#version-history">version history</a>)'
+    assert f'<span class="publication-date">{dates}</span>' in page
+    assert f'<span class="edition">{edition}</span>' in page
+    assert FIRST_PUBLISHED != PUBLICATION_DATE
     compact = " ".join(document.split())
-    assert f"First published {FIRST_PUBLISHED} · {PUBLICATION_EDITION}" in compact
-    assert "([version history](#version-history))" in compact
+    assert dates in compact
+    assert f"{PUBLICATION_EDITION} ([version history](#version-history))" in compact
     assert 'id="version-history"' in page
 
 
