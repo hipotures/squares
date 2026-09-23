@@ -3198,8 +3198,10 @@ evidence:
         The re-certification of the retained T-025 threshold atoms on the 2880-step net
         at shrink 249507/250000. The atoms, the threshold theorem, the two decision
         routes and the net-refinement measurement are not new objects, and T-026 already
-        certified the same atoms one net coarser; this certificate and the lower bound
-        derived from it under E-n011-threshold-net2880-dilation-limit are.
+        certified the same atoms one net coarser. The narrow novel object is this frozen
+        family's 2880-step re-certification and its exact dilation value, retained as
+        first-party method and calibration evidence rather than a current public-bound
+        advance.
       gaps: >-
         A bounded search of one general index, dated 2026-09-09 and repeated on
         2026-09-22, and not an exhaustive review of subscription-only indexes, theses,
@@ -3316,11 +3318,12 @@ evidence:
         decimal 3.826998 and its radicand 2073600042893309449 were not searched
         separately.
       novel_object: >-
-        The exact lower-bound value obtained by combining the 2880-step re-certification
-        of T-025's threshold atoms with T-022's sharpened containment lemma, every strict
-        rational uniform dilation it admits, rational density, and upward embedding. The
-        lemma and the dilation argument are T-022's and T-024's, and T-026 already
-        carried them over threshold atoms; the value is what is new.
+        The exact value obtained for this repository's retained T-025 atoms by combining
+        their 2880-step re-certification with T-022's sharpened containment lemma, every
+        strict rational uniform dilation it admits, rational density, and upward
+        embedding. The lemma and dilation argument are T-022's and T-024's, and T-026
+        already carried them over threshold atoms. The project-specific frozen rung is
+        new; the stronger current public lower bound is not this result.
       gaps: >-
         A bounded search of one general index, dated 2026-09-09 and repeated on
         2026-09-22. Apparent novelty is not a priority claim.
