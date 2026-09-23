@@ -117,8 +117,11 @@ Results first established here, as far as the recorded source searches show:
   verifies Kleddamag’s stronger `s(11) > 31/8 = 3.875` certificate and Tokoharu’s
   rectangle-density bounds `s(26) >= 5.508` and `s(29) >= 5.71`. Complete replays and
   mathematical reviews support the new verified Frontier bounds.
-  The records state each checker’s scope; a second complete method remains additional
-  confirmation.
+  The
+  [native n11 decision](docs/project/reviews/review-2026-09-22-native-n11-parent-core.md)
+  independently covers all 12,028 parent-angle intervals by interval branch and bound.
+  Together with the exact source replay and reviewed transfer theorem, it confirms the
+  strict `3.875` bound at `V4/C4`.
 - **T-019: `s(17), s(18), s(19) ≥ 459/100`, improving the register (`S4`).** The adopted
   bound for [these](packing/frontier/n-017.md) three cases was Massaccesi’s `4.5058`,
   taken from a source rather than proved here.

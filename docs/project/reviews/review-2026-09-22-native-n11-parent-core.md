@@ -1,8 +1,12 @@
 # Native Adaptive Parent-Core Verification
 
-`think-d010` implements a candidate complete-coverage method for the retained Kleddamag
-`n=11` certificate. The workflow entry is W7, pipeline improvement, followed by W2,
-factual verification.
+`think-d010` supplies a complete native coverage decision for Kleddamag’s retained
+`n=11` certificate. All 12,028 rows pass the preregistered rule below.
+Together with the source’s complete exact event sweeps and the reviewed transfer
+theorem, this supports `V4/C4` for the strict bound `s(11) > 31/8 = 3.875`. Kleddamag
+remains the source of the bound; no new result identifier or C5 claim follows.
+
+The workflow entry is W7, pipeline improvement, followed by W2, factual verification.
 This is Session 153, stacked on PR 222; PR 221’s earlier result identifiers remain
 reserved to that work.
 
@@ -71,8 +75,8 @@ weight. If every parent has a core of charge at least `Gamma` and the total budg
 less than `11 Gamma`, eleven parents cannot fit.
 Uniform scaling gives the same exclusion for eleven unit squares at `L/A=31/8`;
 compactness and attainment make the lower bound strict.
-Complete native coverage and the premise proof together are the claim to review for C4.
-Pilot success alone changes no confirmation level.
+Complete native coverage and the premise proof together are the claim reviewed for C4.
+The pilot alone did not change the confirmation level.
 
 Attainment follows from bounded translations, compact orientations and closed
 containment and non-overlap constraints: a convergent sequence of feasible packings has
@@ -111,7 +115,7 @@ need not equal the source event sweep’s exact minima.
 
 These are search times for each row, excluding import and exact-premise validation.
 The three batch sizes produce the same lower and upper bounds and box counts.
-The complete run will use 2,048 and two workers.
+The complete run used 2,048 and two workers.
 The parallel pilot’s largest individual child-process RSS was 384,925,696 bytes; that
 measurement is not a combined-process peak.
 At this batch size the source’s site mask uses 10,821,632 bytes, the gathered member
@@ -125,8 +129,92 @@ import, malformed interval partitions, parent-domain refutation checks, D4 token
 multiplicity, exact-seam refusal, Gamma-aware budget exhaustion and serial/parallel
 agreement. The combined interval regression selection passes 98 tests, with two existing
 Linux-only pool tests skipped on macOS and ten slow or exhaustive tests deselected.
-No pilot receipt has `accepted=true`, and no confirmation-level promotion has been
-recorded.
+No pilot receipt has `accepted=true`; the complete evidence below is what supports
+promotion.
+
+## Complete Native Decision
+
+The
+[complete receipt](../../../packing/campaign/agent-sessions/session-153-native-full.json)
+and
+[row journal](../../../packing/campaign/agent-sessions/session-153-native-full.rows.jsonl)
+come from clean commit `c183cc9abe93eedcb268a5390cdd1cdc6e7bbb39`. Execution began at
+`2026-09-22T23:43:50Z` and took 6,197.381 seconds with two workers.
+Every row index and label from 0 through 12027 appears exactly once, in order, with
+status `certified`. All 136,081,500 processed boxes resolved: there were zero stalled
+boxes, no exhausted row budgets and no refutations.
+The smallest recorded lower bound is exactly `999962528` integer weight units, the
+required `Gamma`; `complete=true` and `accepted=true`.
+
+The exact native premise check imports 679 source point orbits into 5,284 sites and
+2,716 weighted features, including 2,220 threshold features.
+It checks every parent interval and obtains a minimum containment-quadratic numerator of
+`1/1000000000000`, strictly positive.
+The final half-tangent `207107/500000` covers the folded endpoint.
+The distinct scales remain `L=191/50`, `A=764/775` and the row-dependent `B`, giving
+`L/A=31/8`. The exact budget gap is
+
+$$
+11\Gamma-\mathrm{budget}
+=\frac{107864}{1000000000}
+=\frac{13483}{125000000}>0.
+$$
+
+The coordinator independently reconciled the complete receipt and reviewed the domain,
+quadratic containment and transfer argument.
+The source and native decisions share the external certificate and the counting theorem.
+Their coverage computations are distinct: the source scanners enumerate generic event
+cells and extend to boundaries using upper semicontinuity; the native search directly
+bounds closed centre boxes, counts nonnegative threshold charges and refuses unresolved
+seams.
+Both decisions cover the complete parent domain and all orientations needed by the
+strict transfer theorem above.
+This supports C4 for the bound itself, rather than promoting only a core-coverage
+subclaim. The source replay remains C3 by itself.
+No proof-assistant check or additional C5 confirmation is claimed.
+
+Allocation tracing was disabled for the complete run after the measured pilots.
+The parent-process peak RSS was 88,064,000 bytes; the largest individual child-process
+peak was 869,367,808 bytes.
+Neither number is a combined-process peak.
+The attempted `nice -n 10` launch was refused by the host; the actual nice value was 0.
+The explicit two-worker cap remained in force.
+
+## Receipt Reconciliation and Reuse
+
+The permanent
+[receipt reconciliation tool](../../../packing/devtools/audit_kleddamag_n11_native.py)
+recomputes the exact premises, checks all row identities and outcomes, and compares the
+journal with the final receipt.
+It checks the current proof implementation against 19 Git blobs from `c183cc9ab`,
+including transitive local imports, package initializers, the Python pin and lockfile.
+The external certificate is separately bound to SHA-256
+`57e9927da5c13f42dd8bcbf8f08c84363635fece626657ee63a810c61cd44458`. The
+[retained reconciliation](../../../packing/campaign/agent-sessions/session-153-native-reconciliation.json)
+records those identities and the exact premises.
+
+```shell
+uv run --frozen --all-extras --group dev \
+  python -m devtools.audit_kleddamag_n11_native
+```
+
+This is receipt and provenance reconciliation, not another coverage run or an additional
+confirmation method.
+The receipt and journal are related outputs of one historical execution; matching them
+cannot authenticate coordinated invented data.
+The ordinary quick CI lane runs this reconciliation and adverse mutations, including
+changed row inventories, Gamma, parent side, stalls, budgets, provenance and proof
+dependencies. It also tests the stated authentication limitation explicitly.
+
+The [full hosted checkpoint](https://github.com/jlevy/squares/actions/runs/35799179943)
+passed all five jobs on the frozen `c183cc9ab` implementation; its
+[job metadata](../../../packing/campaign/agent-sessions/session-153-hosted-full.json) is
+retained beside the native receipt.
+Later documentation, evidence and base-integration changes do not change that run’s
+provenance. Reuse requires the same proof-input Git blobs and exact source bytes;
+final-head checks cover the reconciliation tool and updated records separately.
+The complete native computation and the historical full checkpoint are not represented
+as runs on a later commit.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.

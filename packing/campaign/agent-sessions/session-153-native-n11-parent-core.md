@@ -57,7 +57,7 @@ session:
     objective: >-
       Run the complete native interval coverage decision, reconcile every source row,
       and review the resulting full theorem before any confirmation-level promotion.
-    status: in_progress
+    status: completed
     entered_by: evidence_checkpoint
     switch_reason: The bounded pilots and adverse tests establish readiness for the full catalogue.
     budget_minutes: 180
@@ -67,10 +67,43 @@ session:
     validation_command: cd packing && .venv/bin/python3 -m devtools.verify_kleddamag_n11_native --all --workers 2 --output campaign/agent-sessions/session-153-native-full.json
     kill_condition: A refuted or unresolved row prevents acceptance of the complete certificate.
     fallback: Retain the row journal, diagnose the exact obstruction and continue the native-verifier bead.
+    outcome: >-
+      The clean c183cc9ab run certifies all 12028 rows in 6197.381 seconds with
+      136081500 boxes, zero stalls, no exhausted budgets and no refutations. Exact
+      premises and the complete transfer theorem support strict s(11)>31/8. The
+      coordinator independently reconciled the receipt and reviewed the mathematics.
+      A permanent fast audit reconciles the row journal, exact premises and 19 frozen
+      Git inputs; its 28 adverse and positive tests pass. The paired complete source
+      and native methods support C4 only, with attribution and the numerical bound
+      unchanged.
+    evidence:
+    - packing/campaign/agent-sessions/session-153-native-full.json
+    - packing/campaign/agent-sessions/session-153-native-full.rows.jsonl
+    - packing/campaign/agent-sessions/session-153-native-reconciliation.json
+    - docs/project/reviews/review-2026-09-22-native-n11-parent-core.md
+    stop_reason: Every preregistered row and exact premise passes, and independent mathematical review found no remaining blocker.
+    next_action: Complete the reviewed evidence registration, integrate the green base, and close the publication record with separate final-head checks.
+  - workflow: review-planning-oversight
+    focus: correctness
+    recording: contemporaneous
+    clock_role: work
+    objective: >-
+      Preserve the complete proof provenance, finish C4 evidence registration and
+      session accounting, and publish the reviewed closeout on the green stacked base.
+    status: in_progress
+    entered_by: evidence_checkpoint
+    switch_reason: Complete coverage and proof review are accepted; only integration, records and final publication checks remain.
+    budget_minutes: 10
+    started_at: '2026-09-23T02:05:18Z'
+    deadline_at: '2026-09-23T02:15:18Z'
+    expected_output: Reviewed PR 223 closeout with immutable proof receipts, C4 evidence and scoped cost and validation records.
+    validation_command: cd packing && .venv/bin/python3 -m devtools.audit_kleddamag_n11_native
+    kill_condition: A changed numerical proof input or new mathematical blocker invalidates reuse of the complete receipt.
+    fallback: Retain the original run, diagnose the affected premise, and withhold publication of the disputed claim until corrected.
     outcome: null
     evidence: []
     stop_reason: null
-    next_action: After the repaired PR 222 base passes hosted CI, publish the draft stacked PR and run all 12028 rows on its frozen implementation commit.
+    next_action: Merge only the final green PR 222 head, re-pin generated data, and finish final checks and root review before push.
   budget:
     wall_minutes: 240
     slice_minutes: 30
@@ -81,7 +114,7 @@ session:
   progress:
     metric: Source intervals completely decided by native box branch and bound.
     before: No native adaptive parent-core certificate decision; source event sweeps already support the strict 31/8 bound.
-    after: Three pilot intervals certify; the complete 12028-row native decision is pending.
+    after: All 12028 intervals certify with exact premises and no unresolved boxes; the distinct native method supports C4 for the strict 31/8 bound.
   delegations:
   - task: Adverse tests and independent review of native domain and batching boundaries
     operator: GPT-5.6 Sol, high
@@ -100,8 +133,14 @@ session:
   - packing/src/sqpack/fractional/parent_core.py
   - packing/src/sqpack/fractional/parent_core_interval.py
   - packing/devtools/verify_kleddamag_n11_native.py
+  - packing/devtools/audit_kleddamag_n11_native.py
   - packing/tests/test_fractional_parent_core.py
+  - packing/tests/test_native_parent_core_receipt.py
   - docs/project/reviews/review-2026-09-22-native-n11-parent-core.md
+  - packing/campaign/agent-sessions/session-153-native-full.json
+  - packing/campaign/agent-sessions/session-153-native-full.rows.jsonl
+  - packing/campaign/agent-sessions/session-153-native-reconciliation.json
+  - packing/campaign/agent-sessions/session-153-hosted-full.json
   checks:
   - Native pilot rows 0, 11962 and 12027 certify at batch sizes 256, 512 and 2048.
   - The two-worker source pilot matches the serial outcomes.
@@ -110,10 +149,15 @@ session:
   - Scoped push gate took 781.81 seconds within its 1800-second ceiling; 2115 selected tests passed, four failed, two skipped and twelve deselected. Failures were generated session views, test formatting, sandbox-blocked process inspection and a snapshot race caused by moving the new cost receipt during the gate. Freeze the tree and rerun those affected checks after correction.
   - After correction and staging, all four affected snapshot and process-lifecycle tests passed in 23.36 seconds. The four selected lint, synopsis and campaign steps passed in 9.75 seconds; close_session --check agreed with all 153 sessions. The final native file passed 39 tests, Ruff check and format-check, and BasedPyright.
   - The repaired base ab1b92bb3 merged without conflicts and changed none of the native verifier, shared interval modules, CLI or native tests. On the merged tree, all 39 native tests passed in 5.72 seconds and the three synopsis, session-cost and campaign checks passed in 12.95 seconds.
+  - 'full gate: full at c183cc9abe93eedcb268a5390cdd1cdc6e7bbb39: passed'
+  - 'The hosted five-job full checkpoint passed on frozen c183cc9ab: https://github.com/jlevy/squares/actions/runs/35799179943'
+  - The complete native run used two workers and batch size 2048 on clean c183cc9ab. All 12028 rows certified in 6197.381 seconds, with 136081500 boxes, zero stalls and no exhausted budgets or refutations. The attempted nice priority 10 was refused; the actual nice value was 0, with the worker cap unchanged.
+  - Receipt reconciliation recomputes exact premises and verifies all row identities, outcomes and journal agreement against 19 unchanged Git inputs and the exact external source SHA. Its 28 tests passed in 6.17 seconds, then 12.37 seconds including the retained-report comparison; Ruff and BasedPyright reported zero findings. This reconciliation is not a coverage replay or another confirmation method.
+  - Closeout records preflight passed 35 selected steps in 220.04 seconds, dominated by 220.04 seconds reading the linked-worktree bead tree. After the evidence edit, all 8 applicable schema, inventory, rung, exact-figure, case-prose, generated-table and front-door checks passed in 11.79 seconds.
   resource_rollups:
   - packing/campaign/resource-usage/codex-task-tree-session-153-native-draft.yaml
   stop_reason: null
-  next_action: After repaired-base CI passes, publish the reviewed draft and complete the native 12028-row catalogue.
+  next_action: Integrate the final green PR 222 base and publish the independently reviewed PR 223 closeout; keep the proof receipt pinned to c183cc9ab and distinguish final-head checks from its historical full gate.
 ---
 # Session 153: Native n11 Adaptive Parent-Core Verification
 
@@ -121,15 +165,22 @@ The
 [proof contract and run plan](../../../docs/project/reviews/review-2026-09-22-native-n11-parent-core.md)
 declare the original acceptance rule and explain the domain and threshold semantics.
 The external certificate remains the credited source of the bound.
-This session adds a candidate native method of complete coverage verification.
+This session adds a complete native method of coverage verification.
 
-No confirmation-level promotion follows from the current partial pilots.
-The complete run must cover every interval, preserve strict containment at the final
-parent side, and finish with no unresolved boxes.
+The complete run certifies every interval, preserves strict containment at the final
+parent side, and finishes with no unresolved boxes.
+Its exact budget margin is `13483/125000000`. Together with the source event-cell
+replay, the complete native interval method and reviewed transfer theorem support C4 for
+the strict bound `s(11)>31/8`; no C5 promotion or new result identifier is claimed.
 
-New upstream changes required the coordinator to repair PR 222. This branch now includes
-the repaired base `ab1b92bb3`, with the native numerical implementation unchanged.
-Publication and full execution wait for that base’s hosted CI to pass.
+The immutable proof receipt belongs to clean `c183cc9ab`, which includes the repaired
+base `ab1b92bb3`. Later base integration and record changes preserve that provenance.
+The permanent reconciliation compares transitive numerical inputs with their frozen Git
+blobs, and binds the external certificate to its reviewed SHA-256. It checks the
+recorded outcomes and exact premises without rerunning interval coverage; it cannot
+authenticate coordinated invented receipt and journal data.
+Final publication checks are recorded separately from the full checkpoint on
+`c183cc9ab`.
 
 The
 [initial task-tree cost receipt](../resource-usage/codex-task-tree-session-153-native-draft.yaml)

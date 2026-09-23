@@ -2546,7 +2546,7 @@ sessions:
   title: "Native n11 adaptive parent-core verification"
   status: in_progress
   primary_bead: think-d010
-  phases: 2
+  phases: 3
   measured: true
   rollups:
   - packing/campaign/resource-usage/codex-task-tree-session-153-native-draft.yaml

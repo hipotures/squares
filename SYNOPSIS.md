@@ -82,6 +82,10 @@ certificates at `s(26) >= 5.508` and `s(29) >= 5.71`, with pinned sources, mathe
 reviews and complete replays.
 These now supply the verified Frontier bounds; the records retain literal source reports
 and state the verification methods separately.
+The
+[complete native n11 decision](docs/project/reviews/review-2026-09-22-native-n11-parent-core.md)
+adds a distinct interval coverage method and supports `V4/C4` for Kleddamag’s strict
+`3.875` bound, with no new bound or C5 claim.
 
 Every result this project has registered, in the reading order its significance scores
 set. The full claims, the rationale behind each score, and the next evidence-improving
@@ -224,8 +228,10 @@ hypothesis is not a frontier result.
 The current verified bracket is `3.875 < s(11) <= 3.877083590022814…`. Session 152 fully
 replayed and mathematically reviewed Kleddamag’s external certificate.
 It closes 95.89% of the gap from T-026 to the retained upper bound; the exact optimum
-remains open. The event-sweep replay is C3; an independent complete coverage method
-remains additional confirmation.
+remains open. Session 153 independently certifies every one of the 12,028 parent-angle
+intervals by directed-rounding box coverage, with no stalled or exhausted boxes.
+The event-sweep replay remains C3 by itself; the complete native decision and reviewed
+transfer theorem provide method-distinct C4 confirmation of the strict bound.
 Research below 3.875 must now justify its value as a simpler certificate or method
 development, rather than a public bound advance.
 The pure point/density ceiling `38200/9977 ≈ 3.8288` lies only about `0.00236` above
@@ -3478,7 +3484,7 @@ no intervening improvement:
 |  | value | source |
 | --- | --- | --- |
 | Best known packing (upper bound) | `3.8770835…` | Walter Trump, 1979 |
-| Best certified lower bound | `31/8 = 3.875` (strict) | [Kleddamag n11 review](docs/project/reviews/review-2026-09-22-kleddamag-n11-mathematics.md), complete exact replay and mapped mathematical audit; C3 coverage method |
+| Best certified lower bound | `31/8 = 3.875` (strict) | [Native n11 review](docs/project/reviews/review-2026-09-22-native-n11-parent-core.md), complete exact and interval coverage with the reviewed transfer theorem; C4 |
 | Bound gap | `0.0020836` | difference between the two bounds; the exact optimum remains open |
 
 ![Walter Trump’s exact eleven-square packing.](packing/atlas/rendering/trump11-overview.svg)
