@@ -554,6 +554,50 @@ def _direction_task(
     return placement_cells(points, weights, direction, outer, side, keep=keep, clip=clip)
 
 
+_DIRECTIONS_PER_TASK = 4
+
+
+def _direction_chunk_task(
+    args: tuple[
+        np.ndarray, np.ndarray, tuple[Direction, ...], float, float, int, CornerClip | None
+    ],
+) -> list[list[tuple[float, float, float, np.ndarray]]]:
+    """Evaluate consecutive directions in one worker, retaining their order."""
+    points, weights, directions, outer, side, keep, clip = args
+    return [
+        placement_cells(points, weights, direction, outer, side, keep=keep, clip=clip)
+        for direction in directions
+    ]
+
+
+def _ordered_direction_chunks(
+    pool: ProcessPoolExecutor,
+    points: np.ndarray,
+    weights: np.ndarray,
+    directions: tuple[Direction, ...],
+    *,
+    outer: float,
+    side: float,
+    keep: int,
+    clip: CornerClip | None,
+):
+    """Flatten ordered pool results, including a final partial chunk."""
+    tasks = (
+        (
+            points,
+            weights,
+            directions[start : start + _DIRECTIONS_PER_TASK],
+            outer,
+            side,
+            keep,
+            clip,
+        )
+        for start in range(0, len(directions), _DIRECTIONS_PER_TASK)
+    )
+    for found_chunk in pool.map(_direction_chunk_task, tasks):
+        yield from found_chunk
+
+
 def _solve_rows_serial_or_pool(
     sites: SiteSet,
     square_side: Fraction,
@@ -648,16 +692,28 @@ def _solve_rows_serial_or_pool(
         least_covered = float("inf")
         if _direction_pool is None:
             found_by_direction = (
-                placement_cells(points, site_weights, direction, outer, side,
-                                keep=rows_per_direction, clip=clip)
+                placement_cells(
+                    points,
+                    site_weights,
+                    direction,
+                    outer,
+                    side,
+                    keep=rows_per_direction,
+                    clip=clip,
+                )
                 for direction in directions
             )
         else:
-            tasks = (
-                (points, site_weights, direction, outer, side, rows_per_direction, clip)
-                for direction in directions
+            found_by_direction = _ordered_direction_chunks(
+                _direction_pool,
+                points,
+                site_weights,
+                directions,
+                outer=outer,
+                side=side,
+                keep=rows_per_direction,
+                clip=clip,
             )
-            found_by_direction = _direction_pool.map(_direction_task, tasks)
         for index, found in enumerate(found_by_direction):
             for mass, cu, cv, covers in found:
                 # Cells arrive in ascending mass, so the first at a direction is
@@ -769,12 +825,14 @@ def solve_rows(
 
     The default stays serial unless PACK_JOBS is set. Explicit counts are
     capped by PACK_JOBS through the repository's worker_count convention.
-    Pool.map yields results in direction order, preserving row decisions.
+    Pool.map yields four-direction tasks in order, preserving row decisions.
     """
     if workers is not None and workers < 1:
         raise ValueError("workers must be positive")
-    requested = workers if workers is not None else (
-        worker_count(len(half_tangents) + 1) if os.environ.get("PACK_JOBS") else 1
+    requested = (
+        workers
+        if workers is not None
+        else (worker_count(len(half_tangents) + 1) if os.environ.get("PACK_JOBS") else 1)
     )
     count = worker_count(min(requested, len(half_tangents) + 1))
     args = (sites, square_side, half_tangents, rows)
