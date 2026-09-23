@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "direction_calls": 543,
+  "mass_cells_compared_bitwise": 619414779,
+  "rounds": [
+    0,
+    18,
+    22
+  ]
+}
