@@ -50,8 +50,10 @@ from itertools import combinations
 from pathlib import Path
 from typing import TextIO
 
+import highspy
 import numpy as np
 from scipy.optimize import linprog
+from scipy.sparse import csr_matrix
 
 from sqpack.fractional.certificate import Certificate, d4_images, verify
 from sqpack.fractional.corner_clip import CornerClip
@@ -457,6 +459,64 @@ def solve_lp(sites: SiteSet, rows: Rows) -> tuple[np.ndarray, np.ndarray, float]
     return np.asarray(result.x, dtype=float), duals, float(result.fun)
 
 
+class _PersistentLp:
+    """Own one HiGHS model for one fixed site set and append its held rows.
+
+    A new ``solve_rows`` call creates a new owner, because column generation can
+    change the site set between calls. HiGHS retains its simplex basis when rows
+    are appended; the next ``run`` therefore reoptimizes the existing model.
+    """
+
+    def __init__(self, costs: np.ndarray) -> None:
+        self.highs = highspy.Highs()
+        for name, value in (("output_flag", False), ("solver", "simplex")):
+            if self.highs.setOptionValue(name, value) != highspy.HighsStatus.kOk:
+                raise RuntimeError(f"HiGHS refused {name}={value!r}")
+        columns = len(costs)
+        status = self.highs.addCols(
+            columns,
+            np.asarray(costs, dtype=float),
+            np.zeros(columns),
+            np.full(columns, highspy.kHighsInf),
+            0,
+            np.zeros(columns + 1, dtype=np.int32),
+            np.empty(0, dtype=np.int32),
+            np.empty(0),
+        )
+        if status != highspy.HighsStatus.kOk:
+            raise RuntimeError("HiGHS refused the site columns")
+        self.columns = columns
+        self.held = 0
+
+    def solve(self, rows: Rows) -> tuple[np.ndarray, np.ndarray, float] | None:
+        matrix = rows.stacked()
+        if matrix.shape[1] != self.columns or len(rows) < self.held:
+            raise ValueError("the held rows no longer match this HiGHS model")
+        count = len(rows) - self.held
+        if count:
+            new = csr_matrix(-matrix[self.held :])
+            status = self.highs.addRows(
+                count,
+                np.full(count, -highspy.kHighsInf),
+                -np.ones(count),
+                new.nnz,
+                new.indptr.astype(np.int32),
+                new.indices.astype(np.int32),
+                new.data,
+            )
+            if status != highspy.HighsStatus.kOk:
+                raise RuntimeError("HiGHS refused the new placement rows")
+            self.held += count
+        if self.highs.run() != highspy.HighsStatus.kOk:
+            return None
+        if self.highs.getModelStatus() != highspy.HighsModelStatus.kOptimal:
+            return None
+        solution = self.highs.getSolution()
+        weights = np.asarray(solution.col_value, dtype=float)
+        duals = np.maximum(-np.asarray(solution.row_dual, dtype=float), 0.0)
+        return weights, duals, float(self.highs.getObjectiveValue())
+
+
 def _record(
     timings: list[RoundTiming] | None,
     index: int,
@@ -532,6 +592,7 @@ def _solve_rows_serial_or_pool(
     side = float(square_side)
     if rows.matrix.shape[0] == 0:
         rows.matrix = np.zeros((0, columns))
+    lp_model = _PersistentLp(sizes)
 
     # Seed at zero, not at one. Unit weights already cover every placement, so
     # the first separation would find nothing and report a convergence that
@@ -544,7 +605,7 @@ def _solve_rows_serial_or_pool(
     # separation pass on placements the previous site set never violated.
     if len(rows) > 0:
         started = time.perf_counter()
-        warm = solve_lp(sites, rows)
+        warm = lp_model.solve(rows)
         elapsed = time.perf_counter() - started
         if warm is not None:
             weights, duals, objective = warm
@@ -655,7 +716,7 @@ def _solve_rows_serial_or_pool(
             return solution
 
         lp_started = time.perf_counter()
-        solved = solve_lp(sites, rows)
+        solved = lp_model.solve(rows)
         lp_seconds = time.perf_counter() - lp_started
         if solved is None:
             solution.stopped = "linear program refused the generated rows"
