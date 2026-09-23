@@ -1,0 +1,113 @@
+[
+  {
+    "grids": [
+      26,
+      35,
+      43
+    ],
+    "densities": [
+      8.427,
+      11.46,
+      14.157
+    ],
+    "orbits": 511,
+    "sites": 3737,
+    "rows_per_direction": 3,
+    "max_rounds": 1,
+    "rounds": 1,
+    "rows": 483,
+    "objective": 10.212765957446807,
+    "stopped": "round limit 1 reached",
+    "seconds": 3.053,
+    "separation_seconds": 2.99,
+    "lp_seconds": 0.059,
+    "separation_share": 0.9805,
+    "peak_support": 0,
+    "timings": [
+      {
+        "index": 0,
+        "separation_s": 2.99,
+        "lp_s": 0.059,
+        "rows_held": 483,
+        "rows_added": 483,
+        "violated": 543,
+        "support": 0,
+        "objective": 10.212766
+      }
+    ]
+  },
+  {
+    "grids": [
+      26,
+      35,
+      43
+    ],
+    "densities": [
+      8.427,
+      11.46,
+      14.157
+    ],
+    "orbits": 511,
+    "sites": 3737,
+    "rows_per_direction": 3,
+    "max_rounds": 1,
+    "rounds": 1,
+    "rows": 483,
+    "objective": 10.212765957446807,
+    "stopped": "round limit 1 reached",
+    "seconds": 3.346,
+    "separation_seconds": 3.292,
+    "lp_seconds": 0.051,
+    "separation_share": 0.9847,
+    "peak_support": 0,
+    "timings": [
+      {
+        "index": 0,
+        "separation_s": 3.292,
+        "lp_s": 0.051,
+        "rows_held": 483,
+        "rows_added": 483,
+        "violated": 543,
+        "support": 0,
+        "objective": 10.212766
+      }
+    ]
+  },
+  {
+    "grids": [
+      26,
+      35,
+      43
+    ],
+    "densities": [
+      8.427,
+      11.46,
+      14.157
+    ],
+    "orbits": 511,
+    "sites": 3737,
+    "rows_per_direction": 3,
+    "max_rounds": 1,
+    "rounds": 1,
+    "rows": 483,
+    "objective": 10.212765957446807,
+    "stopped": "round limit 1 reached",
+    "seconds": 3.083,
+    "separation_seconds": 3.029,
+    "lp_seconds": 0.051,
+    "separation_share": 0.9835,
+    "peak_support": 0,
+    "timings": [
+      {
+        "index": 0,
+        "separation_s": 3.029,
+        "lp_s": 0.051,
+        "rows_held": 483,
+        "rows_added": 483,
+        "violated": 543,
+        "support": 0,
+        "objective": 10.212766
+      }
+    ]
+  }
+]

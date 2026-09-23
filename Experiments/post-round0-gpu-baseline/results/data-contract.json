@@ -1,0 +1,53 @@
+{
+  "round": 18,
+  "support_sites": 617,
+  "directions": 181,
+  "points_shape": [
+    3737,
+    2
+  ],
+  "points_dtype": "float64",
+  "weights_shape": [
+    3737
+  ],
+  "weights_dtype": "float64",
+  "direction_input": "two float64 projection coefficients per direction; outer and square side are two shared float64 scalars",
+  "grid_shapes": [
+    {
+      "shape": [
+        1052,
+        1052
+      ],
+      "directions": 180
+    },
+    {
+      "shape": [
+        164,
+        164
+      ],
+      "directions": 1
+    }
+  ],
+  "grid_dtype": "float64",
+  "mass_dtype": "float64",
+  "reachable_dtype": "bool (1 byte per cell)",
+  "points_bytes_once": 59792,
+  "weights_bytes_once": 29896,
+  "points_weights_bytes_repeated_per_direction": 16233528,
+  "direction_coefficients_bytes": 2896,
+  "shared_outer_side_bytes": 16,
+  "grid_input_bytes": 1593868928,
+  "reachable_input_bytes": 198854749,
+  "event_axis_input_bytes": 3032384,
+  "domain_range_input_bytes": 3029488,
+  "cumsum_mass_output_bytes": 1590837992,
+  "selector_scored_input_bytes": 1590837992,
+  "top13_indices_output_bytes": 18824,
+  "three_candidates_coordinates_mass_bytes": 13032,
+  "three_candidates_bool_masks_bytes": 2029191,
+  "event_grid_full_return_bytes": 1806576965,
+  "naive_separate_cumsum_and_selector_transfer_bytes": 4775563736,
+  "resident_grid_reachable_axes_input_bytes": 1599930800,
+  "resident_grid_reachable_axes_top13_output_bytes": 18824,
+  "resident_grid_plus_reachable_mask_input_bytes": 1792723677
+}
