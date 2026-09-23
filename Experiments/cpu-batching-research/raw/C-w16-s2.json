@@ -1,0 +1,50 @@
+{
+  "variant": "C",
+  "workers": 16,
+  "chunk_size": 4,
+  "sample": 2,
+  "repeats": 11,
+  "load_before": {
+    "utc": "2026-09-23T21:20:26Z",
+    "loadavg": [
+      11.71044921875,
+      6.50341796875,
+      5.00634765625
+    ],
+    "cpu_pressure": "some avg10=4.76 avg60=4.45 avg300=2.27 total=161644302\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+  },
+  "warmup_wall_seconds": 1.980022736999672,
+  "batch_wall_seconds": 19.90337765000004,
+  "separation_wall_seconds_per_replay": 1.8093979681818217,
+  "worker_cpu_seconds_per_replay": 23.954545454545453,
+  "effective_cores": 13.238958966344061,
+  "worker_minor_faults_per_replay": 210.0909090909091,
+  "worker_major_faults_per_replay": 0.0,
+  "worker_rss_pages": {
+    "143446": 23879,
+    "143449": 23516,
+    "143450": 23861,
+    "143451": 23618,
+    "143452": 23519,
+    "143453": 23764,
+    "143454": 24017,
+    "143455": 23713,
+    "143456": 23671,
+    "143457": 23928,
+    "143458": 23670,
+    "143459": 23617,
+    "143460": 23604,
+    "143461": 23768,
+    "143462": 23623,
+    "143463": 23639
+  },
+  "scratch_allocated_bytes_per_replay": 0.0,
+  "logical_grid_bytes_per_replay": 20877462528.0,
+  "logical_compact_bytes_per_replay": 15126159952.0,
+  "correctness": "warmup matrix and every replay row order/centres identical",
+  "thread_limits": {
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1"
+  }
+}

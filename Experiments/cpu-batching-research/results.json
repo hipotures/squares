@@ -1,0 +1,1430 @@
+{
+  "cpu_accepted_sha": "2a2efa39edb179128184f19d6a4235a6bbcaebcc",
+  "profiles": {
+    "A-w1": {
+      "batch_wall_seconds": {
+        "min": 20.110059734004608,
+        "median": 20.1131243810014,
+        "max": 20.164399146000505,
+        "cv": 0.0015165370656978119
+      },
+      "separation_wall_seconds_per_replay": {
+        "min": 10.055029867002304,
+        "median": 10.0565621905007,
+        "max": 10.082199573000253,
+        "cv": 0.0015165370656978119
+      },
+      "worker_cpu_seconds_per_replay": {
+        "min": 10.049999999999999,
+        "median": 10.060000000000002,
+        "max": 10.080000000000002,
+        "cv": 0.0015179117903134174
+      },
+      "effective_cores": {
+        "min": 0.9994997660803762,
+        "median": 0.9997818359987496,
+        "max": 1.000341847386232,
+        "cv": 0.0004286711792332566
+      },
+      "worker_minor_faults_per_replay": {
+        "min": 3.5,
+        "median": 12.5,
+        "max": 488.5,
+        "cv": 1.6498709576233879
+      },
+      "worker_major_faults_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "scratch_allocated_bytes_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "logical_grid_bytes_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "logical_compact_bytes_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "raw": [
+        "raw/A-w1-s1.json",
+        "raw/A-w1-s2.json",
+        "raw/A-w1-s3.json"
+      ],
+      "repeats": [
+        2,
+        2,
+        2
+      ],
+      "speedup_vs_one": 1.0,
+      "parallel_efficiency": 1.0,
+      "cpu_inflation": 1.0
+    },
+    "A-w2": {
+      "batch_wall_seconds": {
+        "min": 19.30805590000091,
+        "median": 19.567470601999958,
+        "max": 19.574867926996376,
+        "cv": 0.007799105244371899
+      },
+      "separation_wall_seconds_per_replay": {
+        "min": 6.436018633333636,
+        "median": 6.5224902006666525,
+        "max": 6.524955975665459,
+        "cv": 0.00779910524437194
+      },
+      "worker_cpu_seconds_per_replay": {
+        "min": 12.633333333333333,
+        "median": 12.799999999999999,
+        "max": 12.813333333333333,
+        "cv": 0.007867027433429829
+      },
+      "effective_cores": {
+        "min": 1.9624406639494427,
+        "median": 1.9629112426589885,
+        "max": 1.963742495906502,
+        "cv": 0.0003358023116136192
+      },
+      "worker_minor_faults_per_replay": {
+        "min": 523902.0,
+        "median": 525473.3333333334,
+        "max": 525484.3333333334,
+        "cv": 0.0017342531193716
+      },
+      "worker_major_faults_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "scratch_allocated_bytes_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "logical_grid_bytes_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "logical_compact_bytes_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "raw": [
+        "raw/A-w2-s1.json",
+        "raw/A-w2-s2.json",
+        "raw/A-w2-s3.json"
+      ],
+      "repeats": [
+        3,
+        3,
+        3
+      ],
+      "speedup_vs_one": 1.541828639232426,
+      "parallel_efficiency": 0.770914319616213,
+      "cpu_inflation": 1.2723658051689857
+    },
+    "A-w4": {
+      "batch_wall_seconds": {
+        "min": 19.99018136599625,
+        "median": 20.05109664700285,
+        "max": 20.09998571000324,
+        "cv": 0.002744130524554719
+      },
+      "separation_wall_seconds_per_replay": {
+        "min": 3.99803627319925,
+        "median": 4.01021932940057,
+        "max": 4.019997142000648,
+        "cv": 0.0027441305245547425
+      },
+      "worker_cpu_seconds_per_replay": {
+        "min": 15.486,
+        "median": 15.539999999999997,
+        "max": 15.574000000000002,
+        "cv": 0.0028568994404536813
+      },
+      "effective_cores": {
+        "min": 3.873401575621029,
+        "median": 3.874132107529118,
+        "max": 3.875099769748217,
+        "cv": 0.00021987751919859855
+      },
+      "worker_minor_faults_per_replay": {
+        "min": 581459.2,
+        "median": 581488.6,
+        "max": 581949.6,
+        "cv": 0.0004728736022696606
+      },
+      "worker_major_faults_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "scratch_allocated_bytes_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "logical_grid_bytes_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "logical_compact_bytes_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "raw": [
+        "raw/A-w4-s1.json",
+        "raw/A-w4-s2.json",
+        "raw/A-w4-s3.json"
+      ],
+      "repeats": [
+        5,
+        5,
+        5
+      ],
+      "speedup_vs_one": 2.507733708421357,
+      "parallel_efficiency": 0.6269334271053393,
+      "cpu_inflation": 1.5447316103379716
+    },
+    "A-w8": {
+      "batch_wall_seconds": {
+        "min": 15.377117481002642,
+        "median": 16.46056084599695,
+        "max": 17.356363988998055,
+        "cv": 0.060440523907554305
+      },
+      "separation_wall_seconds_per_replay": {
+        "min": 2.5628529135004405,
+        "median": 2.7434268076661588,
+        "max": 2.892727331499676,
+        "cv": 0.0604405239075543
+      },
+      "worker_cpu_seconds_per_replay": {
+        "min": 19.343333333333334,
+        "median": 20.713333333333335,
+        "max": 21.89,
+        "cv": 0.06172515374355502
+      },
+      "effective_cores": {
+        "min": 7.5475784160057335,
+        "median": 7.550168014489232,
+        "max": 7.567253146065299,
+        "cv": 0.0014150046205574297
+      },
+      "worker_minor_faults_per_replay": {
+        "min": 703771.8333333334,
+        "median": 704109.3333333334,
+        "max": 704617.8333333334,
+        "cv": 0.0006047869072583863
+      },
+      "worker_major_faults_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "scratch_allocated_bytes_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "logical_grid_bytes_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "logical_compact_bytes_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "raw": [
+        "raw/A-w8-s1.json",
+        "raw/A-w8-s2.json",
+        "raw/A-w8-s3.json"
+      ],
+      "repeats": [
+        6,
+        6,
+        6
+      ],
+      "speedup_vs_one": 3.6656936362941814,
+      "parallel_efficiency": 0.4582117045367727,
+      "cpu_inflation": 2.0589794565937702
+    },
+    "A-w16": {
+      "batch_wall_seconds": {
+        "min": 17.881711294001434,
+        "median": 17.916408047000004,
+        "max": 18.768097535998095,
+        "cv": 0.027601642973283068
+      },
+      "separation_wall_seconds_per_replay": {
+        "min": 2.2352139117501792,
+        "median": 2.2395510058750006,
+        "max": 2.346012191999762,
+        "cv": 0.027601642973283068
+      },
+      "worker_cpu_seconds_per_replay": {
+        "min": 27.43125,
+        "median": 27.46625,
+        "max": 28.89,
+        "cv": 0.029800032563400948
+      },
+      "effective_cores": {
+        "min": 12.248548895756233,
+        "median": 12.287973806718947,
+        "max": 12.314514007437406,
+        "cv": 0.0027020911432193645
+      },
+      "worker_minor_faults_per_replay": {
+        "min": 525975.25,
+        "median": 527050.625,
+        "max": 528543.25,
+        "cv": 0.0024462488329546938
+      },
+      "worker_major_faults_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "scratch_allocated_bytes_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "logical_grid_bytes_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "logical_compact_bytes_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "raw": [
+        "raw/A-w16-s1.json",
+        "raw/A-w16-s2.json",
+        "raw/A-w16-s3.json"
+      ],
+      "repeats": [
+        8,
+        8,
+        8
+      ],
+      "speedup_vs_one": 4.4904367724241965,
+      "parallel_efficiency": 0.2806522982765123,
+      "cpu_inflation": 2.730243538767395
+    },
+    "B-w1": {
+      "batch_wall_seconds": {
+        "min": 29.82136597799399,
+        "median": 29.882432557002176,
+        "max": 29.97663806300261,
+        "cv": 0.002616731620835665
+      },
+      "separation_wall_seconds_per_replay": {
+        "min": 9.940455325997997,
+        "median": 9.960810852334058,
+        "max": 9.992212687667537,
+        "cv": 0.002616731620835728
+      },
+      "worker_cpu_seconds_per_replay": {
+        "min": 9.939999999999998,
+        "median": 9.96,
+        "max": 9.993333333333334,
+        "cv": 0.002703915176847179
+      },
+      "effective_cores": {
+        "min": 0.999918595750278,
+        "median": 0.9999541946537591,
+        "max": 1.0001121519027691,
+        "cv": 0.00010302297307137709
+      },
+      "worker_minor_faults_per_replay": {
+        "min": 1.3333333333333333,
+        "median": 4.666666666666667,
+        "max": 185.33333333333334,
+        "cv": 1.6507848891242196
+      },
+      "worker_major_faults_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "scratch_allocated_bytes_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "logical_grid_bytes_per_replay": {
+        "min": 20877462528.0,
+        "median": 20877462528.0,
+        "max": 20877462528.0,
+        "cv": 0.0
+      },
+      "logical_compact_bytes_per_replay": {
+        "min": 15126159952.0,
+        "median": 15126159952.0,
+        "max": 15126159952.0,
+        "cv": 0.0
+      },
+      "raw": [
+        "raw/B-w1-s1.json",
+        "raw/B-w1-s2.json",
+        "raw/B-w1-s3.json"
+      ],
+      "repeats": [
+        3,
+        3,
+        3
+      ],
+      "speedup_vs_one": 1.0,
+      "parallel_efficiency": 1.0,
+      "cpu_inflation": 1.0
+    },
+    "B-w2": {
+      "batch_wall_seconds": {
+        "min": 17.76279211200017,
+        "median": 17.78067578899936,
+        "max": 17.938054550002562,
+        "cv": 0.005409756697821504
+      },
+      "separation_wall_seconds_per_replay": {
+        "min": 5.920930704000057,
+        "median": 5.9268919296664535,
+        "max": 5.979351516667521,
+        "cv": 0.005409756697821503
+      },
+      "worker_cpu_seconds_per_replay": {
+        "min": 11.590000000000002,
+        "median": 11.623333333333335,
+        "max": 11.713333333333333,
+        "cv": 0.005480006573756572
+      },
+      "effective_cores": {
+        "min": 1.957462530708228,
+        "median": 1.9589638275458907,
+        "max": 1.9611178120447792,
+        "cv": 0.0009378034167316393
+      },
+      "worker_minor_faults_per_replay": {
+        "min": 0.0,
+        "median": 4.666666666666667,
+        "max": 15.333333333333334,
+        "cv": 1.1789826122551597
+      },
+      "worker_major_faults_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "scratch_allocated_bytes_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "logical_grid_bytes_per_replay": {
+        "min": 20877462528.0,
+        "median": 20877462528.0,
+        "max": 20877462528.0,
+        "cv": 0.0
+      },
+      "logical_compact_bytes_per_replay": {
+        "min": 15126159952.0,
+        "median": 15126159952.0,
+        "max": 15126159952.0,
+        "cv": 0.0
+      },
+      "raw": [
+        "raw/B-w2-s1.json",
+        "raw/B-w2-s2.json",
+        "raw/B-w2-s3.json"
+      ],
+      "repeats": [
+        3,
+        3,
+        3
+      ],
+      "speedup_vs_one": 1.6806128693651785,
+      "parallel_efficiency": 0.8403064346825893,
+      "cpu_inflation": 1.1670013386880858
+    },
+    "B-w4": {
+      "batch_wall_seconds": {
+        "min": 18.439026630003355,
+        "median": 18.624039711001387,
+        "max": 18.65176000100473,
+        "cv": 0.006227410482680828
+      },
+      "separation_wall_seconds_per_replay": {
+        "min": 3.687805326000671,
+        "median": 3.7248079422002776,
+        "max": 3.7303520002009463,
+        "cv": 0.006227410482680825
+      },
+      "worker_cpu_seconds_per_replay": {
+        "min": 14.266,
+        "median": 14.404,
+        "max": 14.419999999999998,
+        "cv": 0.005895004584435703
+      },
+      "effective_cores": {
+        "min": 3.8655869470825337,
+        "median": 3.867045019102764,
+        "max": 3.8684254560343363,
+        "cv": 0.0003670608706028284
+      },
+      "worker_minor_faults_per_replay": {
+        "min": 0.0,
+        "median": 3.0,
+        "max": 149.6,
+        "cv": 1.681233241646206
+      },
+      "worker_major_faults_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "scratch_allocated_bytes_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 10004400.0,
+        "cv": 1.7320508075688774
+      },
+      "logical_grid_bytes_per_replay": {
+        "min": 20877462528.0,
+        "median": 20877462528.0,
+        "max": 20877462528.0,
+        "cv": 0.0
+      },
+      "logical_compact_bytes_per_replay": {
+        "min": 15126159952.0,
+        "median": 15126159952.0,
+        "max": 15126159952.0,
+        "cv": 0.0
+      },
+      "raw": [
+        "raw/B-w4-s1.json",
+        "raw/B-w4-s2.json",
+        "raw/B-w4-s3.json"
+      ],
+      "repeats": [
+        5,
+        5,
+        5
+      ],
+      "speedup_vs_one": 2.674181060312634,
+      "parallel_efficiency": 0.6685452650781585,
+      "cpu_inflation": 1.4461847389558231
+    },
+    "B-w8": {
+      "batch_wall_seconds": {
+        "min": 18.89512590999948,
+        "median": 18.90473697699781,
+        "max": 19.552531200002704,
+        "cv": 0.01971021238220043
+      },
+      "separation_wall_seconds_per_replay": {
+        "min": 2.699303701428497,
+        "median": 2.700676710999687,
+        "max": 2.7932187428575292,
+        "cv": 0.019710212382200432
+      },
+      "worker_cpu_seconds_per_replay": {
+        "min": 20.354285714285712,
+        "median": 20.367142857142856,
+        "max": 21.027142857142856,
+        "cv": 0.018695966872320856
+      },
+      "effective_cores": {
+        "min": 7.527925591545898,
+        "median": 7.536735378723407,
+        "max": 7.545332096704929,
+        "cv": 0.0011548172388349055
+      },
+      "worker_minor_faults_per_replay": {
+        "min": 3.2857142857142856,
+        "median": 8.285714285714286,
+        "max": 514.5714285714286,
+        "cv": 1.6749721295724542
+      },
+      "worker_major_faults_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "scratch_allocated_bytes_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 16638009.142857144,
+        "cv": 1.7320508075688776
+      },
+      "logical_grid_bytes_per_replay": {
+        "min": 20877462528.0,
+        "median": 20877462528.0,
+        "max": 20877462528.0,
+        "cv": 0.0
+      },
+      "logical_compact_bytes_per_replay": {
+        "min": 15126159952.0,
+        "median": 15126159952.0,
+        "max": 15126159952.0,
+        "cv": 0.0
+      },
+      "raw": [
+        "raw/B-w8-s1.json",
+        "raw/B-w8-s2.json",
+        "raw/B-w8-s3.json"
+      ],
+      "repeats": [
+        7,
+        7,
+        7
+      ],
+      "speedup_vs_one": 3.688264801101257,
+      "parallel_efficiency": 0.46103310013765714,
+      "cpu_inflation": 2.044893861158921
+    },
+    "B-w16": {
+      "batch_wall_seconds": {
+        "min": 14.932416848001594,
+        "median": 15.377387018001173,
+        "max": 17.467605279001873,
+        "cv": 0.08499721133278287
+      },
+      "separation_wall_seconds_per_replay": {
+        "min": 2.1332024068573707,
+        "median": 2.1967695740001676,
+        "max": 2.4953721827145534,
+        "cv": 0.08499721133278287
+      },
+      "worker_cpu_seconds_per_replay": {
+        "min": 25.785714285714285,
+        "median": 26.551428571428573,
+        "max": 30.642857142857142,
+        "cv": 0.0944124124086198
+      },
+      "effective_cores": {
+        "min": 12.086578804476172,
+        "median": 12.087795421017617,
+        "max": 12.279874463264541,
+        "cv": 0.009155291424583972
+      },
+      "worker_minor_faults_per_replay": {
+        "min": 10.714285714285714,
+        "median": 146.57142857142858,
+        "max": 2245.4285714285716,
+        "cv": 1.5642773859068764
+      },
+      "worker_major_faults_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "scratch_allocated_bytes_per_replay": {
+        "min": 0.0,
+        "median": 4764939.428571428,
+        "max": 30328827.42857143,
+        "cv": 1.3942464295749426
+      },
+      "logical_grid_bytes_per_replay": {
+        "min": 20877462528.0,
+        "median": 20877462528.0,
+        "max": 20877462528.0,
+        "cv": 0.0
+      },
+      "logical_compact_bytes_per_replay": {
+        "min": 15126159952.0,
+        "median": 15126159952.0,
+        "max": 15126159952.0,
+        "cv": 0.0
+      },
+      "raw": [
+        "raw/B-w16-s1.json",
+        "raw/B-w16-s2.json",
+        "raw/B-w16-s3.json"
+      ],
+      "repeats": [
+        7,
+        7,
+        7
+      ],
+      "speedup_vs_one": 4.534299350384802,
+      "parallel_efficiency": 0.2833937093990501,
+      "cpu_inflation": 2.665806081468732
+    },
+    "C-w1": {
+      "batch_wall_seconds": {
+        "min": 29.69264457699319,
+        "median": 29.699014421996253,
+        "max": 29.76946676600346,
+        "cv": 0.001434491512759938
+      },
+      "separation_wall_seconds_per_replay": {
+        "min": 9.897548192331064,
+        "median": 9.899671473998751,
+        "max": 9.92315558866782,
+        "cv": 0.0014344915127598842
+      },
+      "worker_cpu_seconds_per_replay": {
+        "min": 9.896666666666667,
+        "median": 9.9,
+        "max": 9.923333333333332,
+        "cv": 0.001466655095403916
+      },
+      "effective_cores": {
+        "min": 0.9999109349459818,
+        "median": 1.0000179121111146,
+        "max": 1.0000331855458147,
+        "cv": 6.661240462585365e-05
+      },
+      "worker_minor_faults_per_replay": {
+        "min": 0.0,
+        "median": 1.6666666666666667,
+        "max": 187.66666666666666,
+        "cv": 1.7092314220596114
+      },
+      "worker_major_faults_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "scratch_allocated_bytes_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "logical_grid_bytes_per_replay": {
+        "min": 20877462528.0,
+        "median": 20877462528.0,
+        "max": 20877462528.0,
+        "cv": 0.0
+      },
+      "logical_compact_bytes_per_replay": {
+        "min": 15126159952.0,
+        "median": 15126159952.0,
+        "max": 15126159952.0,
+        "cv": 0.0
+      },
+      "raw": [
+        "raw/C-w1-s1.json",
+        "raw/C-w1-s2.json",
+        "raw/C-w1-s3.json"
+      ],
+      "repeats": [
+        3,
+        3,
+        3
+      ],
+      "speedup_vs_one": 1.0,
+      "parallel_efficiency": 1.0,
+      "cpu_inflation": 1.0
+    },
+    "C-w2": {
+      "batch_wall_seconds": {
+        "min": 22.703054775003693,
+        "median": 22.82715277800162,
+        "max": 22.837778020002588,
+        "cv": 0.00328679702344801
+      },
+      "separation_wall_seconds_per_replay": {
+        "min": 5.675763693750923,
+        "median": 5.706788194500405,
+        "max": 5.709444505000647,
+        "cv": 0.00328679702344801
+      },
+      "worker_cpu_seconds_per_replay": {
+        "min": 11.15,
+        "median": 11.21,
+        "max": 11.2125,
+        "cv": 0.0031619441128248153
+      },
+      "effective_cores": {
+        "min": 1.963851297648917,
+        "median": 1.964327327024859,
+        "max": 1.9644933442659478,
+        "cv": 0.00016966702810224473
+      },
+      "worker_minor_faults_per_replay": {
+        "min": 0.25,
+        "median": 1.0,
+        "max": 26.25,
+        "cv": 1.6144748141794703
+      },
+      "worker_major_faults_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "scratch_allocated_bytes_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 4166856.0,
+        "cv": 1.7320508075688774
+      },
+      "logical_grid_bytes_per_replay": {
+        "min": 20877462528.0,
+        "median": 20877462528.0,
+        "max": 20877462528.0,
+        "cv": 0.0
+      },
+      "logical_compact_bytes_per_replay": {
+        "min": 15126159952.0,
+        "median": 15126159952.0,
+        "max": 15126159952.0,
+        "cv": 0.0
+      },
+      "raw": [
+        "raw/C-w2-s1.json",
+        "raw/C-w2-s2.json",
+        "raw/C-w2-s3.json"
+      ],
+      "repeats": [
+        4,
+        4,
+        4
+      ],
+      "speedup_vs_one": 1.7347185731439974,
+      "parallel_efficiency": 0.8673592865719987,
+      "cpu_inflation": 1.1323232323232324
+    },
+    "C-w4": {
+      "batch_wall_seconds": {
+        "min": 17.768109533004463,
+        "median": 17.864185546000954,
+        "max": 17.904988249996677,
+        "cv": 0.003937896005200808
+      },
+      "separation_wall_seconds_per_replay": {
+        "min": 3.5536219066008927,
+        "median": 3.572837109200191,
+        "max": 3.5809976499993352,
+        "cv": 0.003937896005200767
+      },
+      "worker_cpu_seconds_per_replay": {
+        "min": 13.62,
+        "median": 13.690000000000001,
+        "max": 13.704000000000002,
+        "cv": 0.003291829878917104
+      },
+      "effective_cores": {
+        "min": 3.8229569907711447,
+        "median": 3.832709375947029,
+        "max": 3.83560727263823,
+        "cv": 0.001730205990375986
+      },
+      "worker_minor_faults_per_replay": {
+        "min": 3.0,
+        "median": 5.6,
+        "max": 506.6,
+        "cv": 1.688699266082308
+      },
+      "worker_major_faults_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "scratch_allocated_bytes_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 9944352.0,
+        "cv": 1.7320508075688774
+      },
+      "logical_grid_bytes_per_replay": {
+        "min": 20877462528.0,
+        "median": 20877462528.0,
+        "max": 20877462528.0,
+        "cv": 0.0
+      },
+      "logical_compact_bytes_per_replay": {
+        "min": 15126159952.0,
+        "median": 15126159952.0,
+        "max": 15126159952.0,
+        "cv": 0.0
+      },
+      "raw": [
+        "raw/C-w4-s1.json",
+        "raw/C-w4-s2.json",
+        "raw/C-w4-s3.json"
+      ],
+      "repeats": [
+        5,
+        5,
+        5
+      ],
+      "speedup_vs_one": 2.770815229305227,
+      "parallel_efficiency": 0.6927038073263068,
+      "cpu_inflation": 1.382828282828283
+    },
+    "C-w8": {
+      "batch_wall_seconds": {
+        "min": 17.72217148499476,
+        "median": 17.90900892100035,
+        "max": 18.388123311000527,
+        "cv": 0.019076475679714832
+      },
+      "separation_wall_seconds_per_replay": {
+        "min": 2.53173878357068,
+        "median": 2.558429845857193,
+        "max": 2.626874758714361,
+        "cv": 0.019076475679714818
+      },
+      "worker_cpu_seconds_per_replay": {
+        "min": 18.768571428571427,
+        "median": 19.009999999999998,
+        "max": 19.527142857142856,
+        "cv": 0.02028838475236211
+      },
+      "effective_cores": {
+        "min": 7.413312759739321,
+        "median": 7.430338584730967,
+        "max": 7.433602531816091,
+        "cv": 0.0014671924020646565
+      },
+      "worker_minor_faults_per_replay": {
+        "min": 1.1428571428571428,
+        "median": 89.57142857142857,
+        "max": 1019.7142857142857,
+        "cv": 1.5244931089862632
+      },
+      "worker_major_faults_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "scratch_allocated_bytes_per_replay": {
+        "min": 0.0,
+        "median": 2381060.5714285714,
+        "max": 14030573.714285715,
+        "cv": 1.3724759527910586
+      },
+      "logical_grid_bytes_per_replay": {
+        "min": 20877462528.0,
+        "median": 20877462528.0,
+        "max": 20877462528.0,
+        "cv": 0.0
+      },
+      "logical_compact_bytes_per_replay": {
+        "min": 15126159952.0,
+        "median": 15126159952.0,
+        "max": 15126159952.0,
+        "cv": 0.0
+      },
+      "raw": [
+        "raw/C-w8-s1.json",
+        "raw/C-w8-s2.json",
+        "raw/C-w8-s3.json"
+      ],
+      "repeats": [
+        7,
+        7,
+        7
+      ],
+      "speedup_vs_one": 3.869432452888659,
+      "parallel_efficiency": 0.48367905661108235,
+      "cpu_inflation": 1.92020202020202
+    },
+    "C-w16": {
+      "batch_wall_seconds": {
+        "min": 19.72241584299627,
+        "median": 19.90337765000004,
+        "max": 20.363099219001015,
+        "cv": 0.01651777704905577
+      },
+      "separation_wall_seconds_per_replay": {
+        "min": 1.7929468948178426,
+        "median": 1.8093979681818217,
+        "max": 1.8511908380910014,
+        "cv": 0.016517777049055795
+      },
+      "worker_cpu_seconds_per_replay": {
+        "min": 23.60727272727273,
+        "median": 23.954545454545453,
+        "max": 24.413636363636364,
+        "cv": 0.016858743274932468
+      },
+      "effective_cores": {
+        "min": 13.166743976358065,
+        "median": 13.188071084455222,
+        "max": 13.238958966344061,
+        "cv": 0.0028112125618054667
+      },
+      "worker_minor_faults_per_replay": {
+        "min": 56.0,
+        "median": 210.0909090909091,
+        "max": 1557.2727272727273,
+        "cv": 1.3588286747772933
+      },
+      "worker_major_faults_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "scratch_allocated_bytes_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 20531248.0,
+        "cv": 1.7320508075688774
+      },
+      "logical_grid_bytes_per_replay": {
+        "min": 20877462528.0,
+        "median": 20877462528.0,
+        "max": 20877462528.0,
+        "cv": 0.0
+      },
+      "logical_compact_bytes_per_replay": {
+        "min": 15126159952.0,
+        "median": 15126159952.0,
+        "max": 15126159952.0,
+        "cv": 0.0
+      },
+      "raw": [
+        "raw/C-w16-s1.json",
+        "raw/C-w16-s2.json",
+        "raw/C-w16-s3.json"
+      ],
+      "repeats": [
+        11,
+        11,
+        11
+      ],
+      "speedup_vs_one": 5.471251569905576,
+      "parallel_efficiency": 0.3419532231190985,
+      "cpu_inflation": 2.419651056014692
+    },
+    "D-w16": {
+      "batch_wall_seconds": {
+        "min": 19.46480357400287,
+        "median": 19.787264499995217,
+        "max": 20.307804008996754,
+        "cv": 0.02142521668276453
+      },
+      "separation_wall_seconds_per_replay": {
+        "min": 1.7695275976366247,
+        "median": 1.7988422272722924,
+        "max": 1.8461640008178868,
+        "cv": 0.021425216682764543
+      },
+      "worker_cpu_seconds_per_replay": {
+        "min": 23.20909090909091,
+        "median": 23.652727272727272,
+        "max": 24.325454545454548,
+        "cv": 0.023687626551450527
+      },
+      "effective_cores": {
+        "min": 13.115981316193597,
+        "median": 13.148861481083598,
+        "max": 13.176215403765807,
+        "cv": 0.002294000198841763
+      },
+      "worker_minor_faults_per_replay": {
+        "min": 452586.54545454547,
+        "median": 452832.0909090909,
+        "max": 518141.7272727273,
+        "cv": 0.07961225839002432
+      },
+      "worker_major_faults_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "scratch_allocated_bytes_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "logical_grid_bytes_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "logical_compact_bytes_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "raw": [
+        "raw/D-w16-s1.json",
+        "raw/D-w16-s2.json",
+        "raw/D-w16-s3.json"
+      ],
+      "repeats": [
+        11,
+        11,
+        11
+      ]
+    },
+    "B-long-w16": {
+      "batch_wall_seconds": {
+        "min": 35.48223169200355,
+        "median": 35.94962000400119,
+        "max": 39.506888643998536,
+        "cv": 0.05952350105265747
+      },
+      "separation_wall_seconds_per_replay": {
+        "min": 2.217639480750222,
+        "median": 2.2468512502500744,
+        "max": 2.4691805402499085,
+        "cv": 0.05952350105265747
+      },
+      "worker_cpu_seconds_per_replay": {
+        "min": 26.603749999999998,
+        "median": 27.10625,
+        "max": 30.153125,
+        "cv": 0.06870758783965773
+      },
+      "effective_cores": {
+        "min": 11.996426935454817,
+        "median": 12.064105265973026,
+        "max": 12.211794361925502,
+        "cv": 0.00910883796176073
+      },
+      "worker_minor_faults_per_replay": {
+        "min": 3.1875,
+        "median": 140.75,
+        "max": 1056.75,
+        "cv": 1.4309526072750314
+      },
+      "worker_major_faults_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "raw": [
+        "raw/B-w16-long-s1.json",
+        "raw/B-w16-long-s2.json",
+        "raw/B-w16-long-s3.json"
+      ]
+    },
+    "A-long-w8": {
+      "batch_wall_seconds": {
+        "min": 28.16640336599812,
+        "median": 28.351494679001917,
+        "max": 28.579674515996885,
+        "cv": 0.007297844296665068
+      },
+      "separation_wall_seconds_per_replay": {
+        "min": 2.5605821241816473,
+        "median": 2.5774086071819924,
+        "max": 2.5981522287269896,
+        "cv": 0.007297844296665092
+      },
+      "worker_cpu_seconds_per_replay": {
+        "min": 19.299999999999997,
+        "median": 19.44818181818182,
+        "max": 19.592727272727274,
+        "cv": 0.007526488853923061
+      },
+      "effective_cores": {
+        "min": 7.537348565286969,
+        "median": 7.541023599809267,
+        "max": 7.5456339223781335,
+        "cv": 0.0005504950135770264
+      },
+      "worker_minor_faults_per_replay": {
+        "min": 592224.3636363636,
+        "median": 595328.2727272727,
+        "max": 610398.1818181818,
+        "cv": 0.016220661925419662
+      },
+      "worker_major_faults_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "raw": [
+        "raw/A-w8-long-s1.json",
+        "raw/A-w8-long-s2.json",
+        "raw/A-w8-long-s3.json"
+      ]
+    },
+    "B-long-w8": {
+      "batch_wall_seconds": {
+        "min": 32.056995327999175,
+        "median": 32.388703286000236,
+        "max": 34.99065782500111,
+        "cv": 0.04847056615110729
+      },
+      "separation_wall_seconds_per_replay": {
+        "min": 2.465922717538398,
+        "median": 2.4914387143077104,
+        "max": 2.6915890634616235,
+        "cv": 0.048470566151107286
+      },
+      "worker_cpu_seconds_per_replay": {
+        "min": 18.56692307692308,
+        "median": 18.75923076923077,
+        "max": 20.31692307692308,
+        "cv": 0.049945860175141334
+      },
+      "effective_cores": {
+        "min": 7.529401852243556,
+        "median": 7.529477109551678,
+        "max": 7.54830050126363,
+        "cv": 0.00144504716519358
+      },
+      "worker_minor_faults_per_replay": {
+        "min": 0.6153846153846154,
+        "median": 4.384615384615385,
+        "max": 519.6923076923077,
+        "cv": 1.707326718856286
+      },
+      "worker_major_faults_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "raw": [
+        "raw/B-w8-long-s1.json",
+        "raw/B-w8-long-s2.json",
+        "raw/B-w8-long-s3.json"
+      ]
+    },
+    "C-long-w8": {
+      "batch_wall_seconds": {
+        "min": 29.466043878994242,
+        "median": 29.54088966600102,
+        "max": 29.821439440995164,
+        "cv": 0.006327609626827026
+      },
+      "separation_wall_seconds_per_replay": {
+        "min": 2.678731261726749,
+        "median": 2.685535424181911,
+        "max": 2.7110399491813784,
+        "cv": 0.006327609626827002
+      },
+      "worker_cpu_seconds_per_replay": {
+        "min": 19.985454545454544,
+        "median": 19.986363636363635,
+        "max": 20.226363636363637,
+        "cv": 0.0069185099858646085
+      },
+      "effective_cores": {
+        "min": 7.442226773996861,
+        "median": 7.460739795616497,
+        "max": 7.460791170433286,
+        "cv": 0.0014358087218157025
+      },
+      "worker_minor_faults_per_replay": {
+        "min": 1.6363636363636365,
+        "median": 50.09090909090909,
+        "max": 628.8181818181819,
+        "cv": 1.53828668702541
+      },
+      "worker_major_faults_per_replay": {
+        "min": 0.0,
+        "median": 0.0,
+        "max": 0.0,
+        "cv": 0.0
+      },
+      "raw": [
+        "raw/C-w8-long-s1.json",
+        "raw/C-w8-long-s2.json",
+        "raw/C-w8-long-s3.json"
+      ]
+    }
+  },
+  "full_solver_chunk_only": {
+    "initial": {
+      "reference": {
+        "batch_wall_seconds": {
+          "min": 20.148145815001044,
+          "median": 20.560385785996914,
+          "max": 21.833230718999403,
+          "cv": 0.04213535397815025
+        },
+        "wall_per_solve_seconds": {
+          "min": 3.358024302500174,
+          "median": 3.426730964332819,
+          "max": 3.6388717864999003,
+          "cv": 0.042135353978150214
+        },
+        "separation_per_solve_seconds": {
+          "min": 2.1205,
+          "median": 2.190166666666667,
+          "max": 2.4010000000000002,
+          "cv": 0.06528204490139675
+        },
+        "lp_per_solve_seconds": {
+          "min": 1.1831666666666667,
+          "median": 1.1858333333333333,
+          "max": 1.1895,
+          "cv": 0.0026807340211239057
+        },
+        "raw": [
+          "raw/full-solver/reference-s1.json",
+          "raw/full-solver/reference-s2.json",
+          "raw/full-solver/reference-s3.json"
+        ]
+      },
+      "candidate": {
+        "batch_wall_seconds": {
+          "min": 21.933474555997236,
+          "median": 22.11329988700163,
+          "max": 22.401316465999116,
+          "cv": 0.010654786222619008
+        },
+        "wall_per_solve_seconds": {
+          "min": 3.133353507999605,
+          "median": 3.159042841000233,
+          "max": 3.2001880665713025,
+          "cv": 0.01065478622261905
+        },
+        "separation_per_solve_seconds": {
+          "min": 1.8827142857142858,
+          "median": 1.8925714285714286,
+          "max": 1.937,
+          "cv": 0.015188015664203254
+        },
+        "lp_per_solve_seconds": {
+          "min": 1.201142857142857,
+          "median": 1.2098571428571427,
+          "max": 1.211142857142857,
+          "cv": 0.0045060038050363455
+        },
+        "raw": [
+          "raw/full-solver/candidate-s1.json",
+          "raw/full-solver/candidate-s2.json",
+          "raw/full-solver/candidate-s3.json"
+        ]
+      },
+      "paired_saved_seconds": {
+        "min": 0.19898146149994123,
+        "median": 0.22654289776151648,
+        "max": 0.5055182785002952,
+        "cv": 0.5464314666951837
+      },
+      "paired_saved_samples_seconds": [
+        0.19898146149994123,
+        0.22654289776151648,
+        0.5055182785002952
+      ]
+    },
+    "long": {
+      "reference": {
+        "batch_wall_seconds": {
+          "min": 41.49289385199518,
+          "median": 43.29238357899885,
+          "max": 44.73786038099934,
+          "cv": 0.037654242079460325
+        },
+        "wall_per_solve_seconds": {
+          "min": 3.4577411543329313,
+          "median": 3.607698631583238,
+          "max": 3.7281550317499446,
+          "cv": 0.03765424207946032
+        },
+        "separation_per_solve_seconds": {
+          "min": 2.2216666666666667,
+          "median": 2.3984166666666664,
+          "max": 2.5140833333333332,
+          "cv": 0.061927825732964695
+        },
+        "lp_per_solve_seconds": {
+          "min": 1.16025,
+          "median": 1.1638333333333333,
+          "max": 1.18425,
+          "cv": 0.01107069296987343
+        },
+        "raw": [
+          "raw/full-solver/reference-long-s1.json",
+          "raw/full-solver/reference-long-s2.json",
+          "raw/full-solver/reference-long-s3.json"
+        ]
+      },
+      "candidate": {
+        "batch_wall_seconds": {
+          "min": 40.120865281998704,
+          "median": 41.38355064899952,
+          "max": 43.23646182300581,
+          "cv": 0.037688248049227775
+        },
+        "wall_per_solve_seconds": {
+          "min": 3.0862204063075924,
+          "median": 3.18335004992304,
+          "max": 3.3258816786927548,
+          "cv": 0.0376882480492278
+        },
+        "separation_per_solve_seconds": {
+          "min": 1.8766153846153846,
+          "median": 1.942,
+          "max": 2.1036923076923078,
+          "cv": 0.059213104972047195
+        },
+        "lp_per_solve_seconds": {
+          "min": 1.16,
+          "median": 1.1725384615384615,
+          "max": 1.1903846153846154,
+          "cv": 0.013002874961337379
+        },
+        "raw": [
+          "raw/full-solver/candidate-long-s1.json",
+          "raw/full-solver/candidate-long-s2.json",
+          "raw/full-solver/candidate-long-s3.json"
+        ]
+      },
+      "paired_saved_seconds": {
+        "min": 0.27439110440989145,
+        "median": 0.4022733530571898,
+        "max": 0.5214782252756454,
+        "cv": 0.30940126191698036
+      },
+      "paired_saved_samples_seconds": [
+        0.27439110440989145,
+        0.4022733530571898,
+        0.5214782252756454
+      ]
+    }
+  }
+}

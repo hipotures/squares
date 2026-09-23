@@ -81,3 +81,84 @@ Final **unprofiled production** baseline on P2, three independent batches:
 P2 is accepted because the measured incremental gain is positive in all long
 parallel pairs, substantial serially, bitwise correct on real grids, and
 packaged with a NumPy fallback. No Part 3 prototype is included in P2.
+
+P2 was committed as **`2a2efa39edb179128184f19d6a4235a6bbcaebcc`**.
+This exact SHA is `CPU_ACCEPTED_SHA` for both independent follow-up studies.
+
+## Memory observation at CPU_ACCEPTED_SHA
+
+The separate Luna observer worked in a detached worktree at the accepted SHA,
+without changing production. Its full [report](../cpu-memory-observation/report.md),
+scripts, and raw records are preserved. The strongest supported finding is
+that memory-system effects are plausible, while **physical DRAM bandwidth
+saturation is not proven**. The guest-visible STREAM-like triad median was
+40.81 GB/s at 8 workers and 40.11 GB/s at 16; read-only throughput reached
+76.83 GB/s at 16. These are sustained guest benchmark rates, not host DDR
+peak values. All 60 corrected samples lasted strictly more than 10 seconds;
+an erroneous calibration pass was excluded before analysis and its error is
+documented in the observer report.
+
+The accepted separation workload has 2.610 billion grid cells and 1.891
+billion compact values across 4,163 direction calls. Explicit element-pass
+accounting gives about **149.93 GB of lower-bound logical traffic** per
+replay: prefix 83.51 GB, compaction 30.25 GB, grid zeroing 20.88 GB, native
+selection input 15.13 GB, with smaller scatter/metadata. This is not measured
+DRAM traffic; cache reuse and omitted small arrays prevent converting it into
+a hardware bandwidth claim. Warmed 16-worker replays incurred roughly
+0.41–0.46 million minor faults per replay and no major faults. Hardware
+performance counters were blocked by `perf_event_paranoid=4`; settings were
+left untouched. Physical DRAM bytes, cache misses, and frequency effects
+remain unresolved.
+
+## A/B/C memory and batching study at CPU_ACCEPTED_SHA
+
+The independent [batching report](../cpu-batching-research/report.md) and
+[results](../cpu-batching-research/results.json) retain 72 audited primary
+timed samples, each 14.93–44.74 seconds. All variants replay the same accepted
+23-round/181-direction workload in order. Every warmup matched the full row
+matrix, direction order, and centres; every timed replay matched order and
+centres. No batching prototype was merged.
+
+| Variant | 1-worker separation / CPU | 16-worker separation / CPU | 16-worker CPU inflation | 16-worker minor faults/replay | Verdict |
+| --- | ---: | ---: | ---: | ---: | --- |
+| A current | 10.057 / 10.060 s | 2.240 / 27.466 s | 2.73× | 527,051 | Reference |
+| B reusable buffers | 9.961 / 9.960 s | 2.197 / 26.551 s | 2.67× | 147 | No stable 16-worker win |
+| C chunks + buffers | 9.900 / 9.900 s | 1.809 / 23.955 s | 2.42× | 210 | Strong replay gain |
+| D chunks only | — | **1.799 / 23.653 s** | — | 452,832 | Isolates chunk gain |
+
+B's longer 16-worker batch median was 2.247 s (2.218–2.469,
+6.0% CV), essentially tied with A's 2.240 s median despite eliminating
+almost all its minor faults. D retained 452,832 faults but matched C's
+low wall time. This makes **task granularity**, including fewer dispatches and
+less repeated argument transport, the main measured 16-worker factor among
+these variants. Reuse helps at 2 and 4 workers; the 8-worker ranking remains
+uncertain after a longer rerun because sets shifted under VM variation.
+The chunks-only diagnostic does not isolate dispatch versus serialization or
+cache state within a chunk.
+
+An ordered four-direction **research-only full-solver** prototype reproduced
+the accepted complete row state and objective. Two sets of three adjacent
+long control/candidate pairs all favored chunking. Savings ranged
+**0.199–0.521 s per solve**; the initial paired median was 0.227 s and the
+longer set median 0.402 s. Both sets had variable control wall (4.2% and
+3.8% CV), so **about 0.20 s / 6% is the conservative observed end-to-end
+opportunity**, with a larger VM-dependent upside. The steady-state replay
+gap is not substituted for the full-solver gain. The prototype remains in
+the research directory and is not part of P2.
+
+## Final CPU decision
+
+**MODERATE remaining opportunity.** P1 and P2 are accepted and committed as
+separate sequential production changes. Their final controlled P2 baseline is
+11.137 s wall / 10.029 s separation / 1.078 s LP at one worker, and
+3.390 s wall / 2.106 s separation / 1.219 s LP at 16 workers, with wall CV
+0.34% and 1.64% respectively. No tested memory result proves a DRAM ceiling,
+and reusable buffers alone are not a supported 16-worker integration.
+
+**Next CPU action:** implement an ordered four-direction chunked worker path
+in production as a separate integration task, preserving one pool per solve,
+and retest full solver correctness and three long adjacent 16-worker batches.
+The conservative measured opportunity is roughly 0.20 s per solve; the
+actual gain after production integration must be measured. Test worker counts
+and chunk sizes on the new path before choosing a default. No Part 3 prototype
+was merged here, and no push was performed.

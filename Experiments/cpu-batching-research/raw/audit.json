@@ -1,0 +1,9 @@
+{
+  "cpu_accepted_sha": "2a2efa39edb179128184f19d6a4235a6bbcaebcc",
+  "timed_samples": 72,
+  "min_batch_seconds": 14.932416848001594,
+  "max_batch_seconds": 44.73786038099934,
+  "all_primary_batches_10_to_60_seconds": true,
+  "all_fixed_replays_identical_order_centres_matrix_warmup": true,
+  "full_solver_trajectory_valid": true
+}

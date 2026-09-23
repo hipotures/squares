@@ -21,5 +21,11 @@
     "OMP_NUM_THREADS": "1",
     "OPENBLAS_NUM_THREADS": "1",
     "MKL_NUM_THREADS": "1"
-  }
+  },
+  "p2_sha": "2a2efa39edb179128184f19d6a4235a6bbcaebcc",
+  "cpu_accepted_sha": "2a2efa39edb179128184f19d6a4235a6bbcaebcc",
+  "python": "3.14.7",
+  "numpy": "2.5.2",
+  "scipy": "1.17.1",
+  "highspy": "1.15.1"
 }

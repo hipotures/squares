@@ -1,0 +1,31 @@
+{
+  "commit": "2a2efa39edb179128184f19d6a4235a6bbcaebcc",
+  "workers": 16,
+  "wall_s": 2.5422623159975046,
+  "worker_metrics": {
+    "grid_cells": 2609682816.0,
+    "compact_cells": 1890769994.0,
+    "compact_metadata_rows": 2930505.0,
+    "scatter_support_sites": 1542301.0,
+    "selector_input_cells": 1890769994.0,
+    "selector_k": 54119.0,
+    "minor_faults": 612545.0,
+    "major_faults": 0.0,
+    "worker_cpu_seconds": 25.478813000000045,
+    "task_wall_seconds": 25.68997914587817,
+    "total_wall": 25.68997914587817,
+    "total_cpu": 25.478813000000045
+  },
+  "rounds": 23,
+  "directions_per_round": 181,
+  "logical_traffic_model": {
+    "prefix_read_write_bytes": 83509850112,
+    "difference_grid_zero_write_bytes": 20877462528,
+    "difference_scatter_update_read_write_bytes": 98707264,
+    "compaction_read_bytes": 15126159952,
+    "compaction_write_bytes": 15126159952,
+    "top13_input_read_bytes": 15126159952,
+    "compact_metadata_write_bytes": 70332120,
+    "notes": "Explicit logical element traffic only; not DRAM counters. Excludes projections, event/index arrays, small selector/placement intermediates, cache-line write allocation, and allocator metadata."
+  }
+}

@@ -63,3 +63,10 @@ The original wheel binary and temporary build outputs are intentionally not
 committed; `environment.json` records its digest and contents. Rebuilding the
 wheel exercises the build hook. `raw/p2-equivalence.json` and
 `raw/p2-production-correctness.json` retain the correctness checks.
+
+The accepted P2 SHA is `2a2efa39edb179128184f19d6a4235a6bbcaebcc`.
+The pinned memory and A/B/C studies are preserved under the sibling
+`Experiments/cpu-memory-observation/` and
+`Experiments/cpu-batching-research/` directories, with their own reports,
+scripts, raw samples and JSON summaries. Their research worktrees were kept
+isolated from the operator's main working tree.

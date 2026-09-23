@@ -1,0 +1,38 @@
+{
+  "variant": "C",
+  "workers": 4,
+  "chunk_size": 4,
+  "sample": 1,
+  "repeats": 5,
+  "load_before": {
+    "utc": "2026-09-23T21:33:34Z",
+    "loadavg": [
+      3.77783203125,
+      4.85888671875,
+      5.48388671875
+    ],
+    "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.98 total=179924967\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+  },
+  "warmup_wall_seconds": 3.7850617869989946,
+  "batch_wall_seconds": 17.904988249996677,
+  "separation_wall_seconds_per_replay": 3.5809976499993352,
+  "worker_cpu_seconds_per_replay": 13.690000000000001,
+  "effective_cores": 3.8229569907711447,
+  "worker_minor_faults_per_replay": 506.6,
+  "worker_major_faults_per_replay": 0.0,
+  "worker_rss_pages": {
+    "149608": 24088,
+    "149611": 23780,
+    "149612": 23708,
+    "149613": 23731
+  },
+  "scratch_allocated_bytes_per_replay": 9944352.0,
+  "logical_grid_bytes_per_replay": 20877462528.0,
+  "logical_compact_bytes_per_replay": 15126159952.0,
+  "correctness": "warmup matrix and every replay row order/centres identical",
+  "thread_limits": {
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1"
+  }
+}

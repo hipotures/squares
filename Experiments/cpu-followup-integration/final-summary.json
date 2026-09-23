@@ -1,0 +1,38 @@
+{
+  "issue": "hipotures/squares#2",
+  "input_sha": "e102e35f729eb52be10eabe5ba83428e2a10e1bc",
+  "p1": {
+    "sha": "cc83964b",
+    "decision": "ACCEPT",
+    "optimization": "vectorized slab interval construction",
+    "paired_saved_seconds_median": {"workers_1": 5.3897228024907236, "workers_16": 0.4165612661423177}
+  },
+  "p2": {
+    "sha": "2a2efa39edb179128184f19d6a4235a6bbcaebcc",
+    "decision": "ACCEPT",
+    "optimization": "packaged row-major native prefix pass with NumPy fallback",
+    "paired_saved_seconds_median": {"workers_1": 5.348917370996787, "workers_16_long": 0.2816764491746997},
+    "production_baseline_median_seconds": {
+      "workers_1": {"wall": 11.136717890502041, "separation": 10.0295, "lp": 1.0775, "wall_cv": 0.003380114295750888},
+      "workers_16": {"wall": 3.390204129832758, "separation": 2.106, "lp": 1.219, "wall_cv": 0.016436330479810763}
+    }
+  },
+  "cpu_accepted_sha": "2a2efa39edb179128184f19d6a4235a6bbcaebcc",
+  "memory_observation": {
+    "logical_traffic_gb_per_replay": 149.93,
+    "guest_triad_gb_s_median": {"workers_8": 40.81, "workers_16": 40.11},
+    "dram_saturation": "not proven",
+    "detail": "../cpu-memory-observation/raw/stream-summary.json"
+  },
+  "batching": {
+    "production_replay_16_wall_seconds": 2.240,
+    "reuse_replay_16_wall_seconds": 2.197,
+    "chunk_reuse_replay_16_wall_seconds": 1.809,
+    "chunk_only_replay_16_wall_seconds": 1.799,
+    "full_solver_paired_saved_seconds_range": [0.19898146149994123, 0.5214782252756454],
+    "decision": "research only; chunking is next integration candidate",
+    "detail": "../cpu-batching-research/results.json"
+  },
+  "remaining_opportunity": "MODERATE",
+  "pushed": false
+}
