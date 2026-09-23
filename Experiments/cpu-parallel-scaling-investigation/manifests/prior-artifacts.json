@@ -1,0 +1,1224 @@
+{
+  "copied": [
+    {
+      "source": "/tmp/squares-boundary-1.json",
+      "bytes": 566035,
+      "sha256": "c1b41985935963ba130799b79ed57477493325d49ffc994b1a70c2f3b9523365",
+      "destination": "results/prior/squares-boundary-1.json"
+    },
+    {
+      "source": "/tmp/squares-boundary-1.stdout",
+      "bytes": 566035,
+      "sha256": "c1b41985935963ba130799b79ed57477493325d49ffc994b1a70c2f3b9523365",
+      "destination": "profiles/prior/squares-boundary-1.stdout"
+    },
+    {
+      "source": "/tmp/squares-boundary-1.time",
+      "bytes": 24,
+      "sha256": "89d41ad469f3a758a2cc5cc789c9c6c8f5bfef172d09c64e51d3d9578472bad5",
+      "destination": "profiles/prior/squares-boundary-1.time"
+    },
+    {
+      "source": "/tmp/squares-boundary-2.json",
+      "bytes": 566459,
+      "sha256": "4add82edfb1a689edfb503504a0c5ce97d3e27c883d97261763a8ec1ffa3436d",
+      "destination": "results/prior/squares-boundary-2.json"
+    },
+    {
+      "source": "/tmp/squares-boundary-2.stdout",
+      "bytes": 566459,
+      "sha256": "4add82edfb1a689edfb503504a0c5ce97d3e27c883d97261763a8ec1ffa3436d",
+      "destination": "profiles/prior/squares-boundary-2.stdout"
+    },
+    {
+      "source": "/tmp/squares-boundary-2.time",
+      "bytes": 24,
+      "sha256": "f370ff991f37434306c6de696dca9e852622c141403b85799d00cbb45cbddfa2",
+      "destination": "profiles/prior/squares-boundary-2.time"
+    },
+    {
+      "source": "/tmp/squares-boundary-4.json",
+      "bytes": 567223,
+      "sha256": "9b6e7c3373ea8120749184bf407f55829e1edc6b66c064cc6b3f0bdd8f084800",
+      "destination": "results/prior/squares-boundary-4.json"
+    },
+    {
+      "source": "/tmp/squares-boundary-4.stdout",
+      "bytes": 567223,
+      "sha256": "9b6e7c3373ea8120749184bf407f55829e1edc6b66c064cc6b3f0bdd8f084800",
+      "destination": "profiles/prior/squares-boundary-4.stdout"
+    },
+    {
+      "source": "/tmp/squares-boundary-4.time",
+      "bytes": 24,
+      "sha256": "c7b6aedac726232775189e956d7744081d7ffc63eda371763c1cdf4c9e79938e",
+      "destination": "profiles/prior/squares-boundary-4.time"
+    },
+    {
+      "source": "/tmp/squares-boundary-8.json",
+      "bytes": 568454,
+      "sha256": "e8d160ad06699a87f289cf85b88a227ac0d587a2ba0f781f8f060768b99c7750",
+      "destination": "results/prior/squares-boundary-8.json"
+    },
+    {
+      "source": "/tmp/squares-boundary-8.stdout",
+      "bytes": 568454,
+      "sha256": "e8d160ad06699a87f289cf85b88a227ac0d587a2ba0f781f8f060768b99c7750",
+      "destination": "profiles/prior/squares-boundary-8.stdout"
+    },
+    {
+      "source": "/tmp/squares-boundary-8.time",
+      "bytes": 24,
+      "sha256": "25c10350672331c7e7dadbba701e0967c655dbd204cda67b3311ae9b5d162811",
+      "destination": "profiles/prior/squares-boundary-8.time"
+    },
+    {
+      "source": "/tmp/squares-boundary-validity.json",
+      "bytes": 8741,
+      "sha256": "98832fed1c126a8614040cd28c9d00bb74bbb52d791a418990b7ac6f4afe63c6",
+      "destination": "results/prior/squares-boundary-validity.json"
+    },
+    {
+      "source": "/tmp/squares-boundary16.json",
+      "bytes": 571591,
+      "sha256": "1639224d84bb4d9f68728ae629413df2e431683c5c53ad6ea3e7469e5e3ceb9f",
+      "destination": "results/prior/squares-boundary16.json"
+    },
+    {
+      "source": "/tmp/squares-boundary16.stdout",
+      "bytes": 571591,
+      "sha256": "1639224d84bb4d9f68728ae629413df2e431683c5c53ad6ea3e7469e5e3ceb9f",
+      "destination": "profiles/prior/squares-boundary16.stdout"
+    },
+    {
+      "source": "/tmp/squares-boundary16.time",
+      "bytes": 24,
+      "sha256": "9dcbc03c1e645eb158cf6169540b436c68f07d4166167ed687c9abc8412f72f5",
+      "destination": "profiles/prior/squares-boundary16.time"
+    },
+    {
+      "source": "/tmp/squares-compare-selfcheck.json",
+      "bytes": 3726,
+      "sha256": "2d206cbd728b726c630f5d2009b6f365ee7774367d69da68f279453c403b295d",
+      "destination": "results/prior/squares-compare-selfcheck.json"
+    },
+    {
+      "source": "/tmp/squares-n12-controlled-1.stdout",
+      "bytes": 5989,
+      "sha256": "819d63452082a875e0b75df2d7ba97a8f8c0824afa9375493004daea9bac535d",
+      "destination": "profiles/prior/squares-n12-controlled-1.stdout"
+    },
+    {
+      "source": "/tmp/squares-n12-controlled-1.time",
+      "bytes": 17,
+      "sha256": "d71188439d11bdf96ce409aa15382afbdcb52f5f315ce122885e9b15814a90f3",
+      "destination": "profiles/prior/squares-n12-controlled-1.time"
+    },
+    {
+      "source": "/tmp/squares-n12-controlled-2.stdout",
+      "bytes": 5992,
+      "sha256": "552d2b8d69734942334f3be8c28471ced1894aa43ff0f0d208c048a93dafa7d6",
+      "destination": "profiles/prior/squares-n12-controlled-2.stdout"
+    },
+    {
+      "source": "/tmp/squares-n12-controlled-2.time",
+      "bytes": 17,
+      "sha256": "861a0e72498798fc7fc28200b6a8a2d0051bcf160927e082b45d71f33e23f79c",
+      "destination": "profiles/prior/squares-n12-controlled-2.time"
+    },
+    {
+      "source": "/tmp/squares-n12-controlled-3.stdout",
+      "bytes": 5986,
+      "sha256": "f4808fc3ac69b2e699f519dda34486cdb74e044d2d4484d5dcfe672c86406176",
+      "destination": "profiles/prior/squares-n12-controlled-3.stdout"
+    },
+    {
+      "source": "/tmp/squares-n12-controlled-3.time",
+      "bytes": 17,
+      "sha256": "fd759c23b1c63073530f232e01a93bf97d85a5092396e189ae0660e62b4a5a70",
+      "destination": "profiles/prior/squares-n12-controlled-3.time"
+    },
+    {
+      "source": "/tmp/squares-n12-default-utilization.txt",
+      "bytes": 1475,
+      "sha256": "366f9f026f2e888e8a9b244bbc7dddf3b2f4dd8efc56c29ae0fdbb24a1f0bc4e",
+      "destination": "profiles/prior/squares-n12-default-utilization.txt"
+    },
+    {
+      "source": "/tmp/squares-n12-default.stdout",
+      "bytes": 5985,
+      "sha256": "8e0ed51cdc41c78a2f4661fd3a40bf59c3b8f4dafa47bfdf3b2bd2d556a239ef",
+      "destination": "profiles/prior/squares-n12-default.stdout"
+    },
+    {
+      "source": "/tmp/squares-n12-default.time",
+      "bytes": 17,
+      "sha256": "b0b5355bade99b92a44df59ae9a93d5ef60baec18a52b6344a33e3d3ba04f7b4",
+      "destination": "profiles/prior/squares-n12-default.time"
+    },
+    {
+      "source": "/tmp/squares-n12-direction.time",
+      "bytes": 17,
+      "sha256": "664d4b1804b8e0d5f1fe1829c067208206f944f175d5e7a404591dd5b924e917",
+      "destination": "profiles/prior/squares-n12-direction.time"
+    },
+    {
+      "source": "/tmp/squares-n12-direction_profile.stdout",
+      "bytes": 5989,
+      "sha256": "26b1ffbec7c2a6e944e8741e060e0b74a913a50e8b93a52ac56422dae296e92f",
+      "destination": "profiles/prior/squares-n12-direction_profile.stdout"
+    },
+    {
+      "source": "/tmp/squares-n12-numpy-ops.time",
+      "bytes": 17,
+      "sha256": "3acd47861bde5be6b75664b2b87711bb4e3372d3c2d62f28294996f091aa55ed",
+      "destination": "profiles/prior/squares-n12-numpy-ops.time"
+    },
+    {
+      "source": "/tmp/squares-n12-profile-summary.txt",
+      "bytes": 11788,
+      "sha256": "43c684179f0dce56ae97536d75ce20ea6e0e5f27ad3bacfd2420d9514547068f",
+      "destination": "profiles/prior/squares-n12-profile-summary.txt"
+    },
+    {
+      "source": "/tmp/squares-n12-profile.pstats",
+      "bytes": 446276,
+      "sha256": "e2250033a81071040f1101975a4e60ea94f7df397c485033579df6ff91fc835b",
+      "destination": "profiles/prior/squares-n12-profile.pstats"
+    },
+    {
+      "source": "/tmp/squares-n12-profile.stdout",
+      "bytes": 5990,
+      "sha256": "6818a2d79d166fdc258ce1845bce2d66a51852119b8455e0651dbca0f5e5bf60",
+      "destination": "profiles/prior/squares-n12-profile.stdout"
+    },
+    {
+      "source": "/tmp/squares-n12-profile.time",
+      "bytes": 17,
+      "sha256": "8bbf6cd81a10f927a3544cfb43f993becc9b14b67280e20d8d4a06a6d6060da6",
+      "destination": "profiles/prior/squares-n12-profile.time"
+    },
+    {
+      "source": "/tmp/squares-numpy-analysis-20260923.json",
+      "bytes": 69967,
+      "sha256": "0ff340e88fbc47dab0304d2dec1c58e1bc73d534221b22856a6e1bc6b5c33e4b",
+      "destination": "results/prior/squares-numpy-analysis-20260923.json"
+    },
+    {
+      "source": "/tmp/squares-numpy-capture-20260923.stdout",
+      "bytes": 239,
+      "sha256": "12db3b1492c4c3989a5f556b5297df9bc470a685660cc1c61048507b73bd5702",
+      "destination": "profiles/prior/squares-numpy-capture-20260923.stdout"
+    },
+    {
+      "source": "/tmp/squares-numpy-capture-20260923.time",
+      "bytes": 138,
+      "sha256": "91978168d0d566ddd1abab1523e23dea34694acee370eab6176a0f10063d66da",
+      "destination": "profiles/prior/squares-numpy-capture-20260923.time"
+    },
+    {
+      "source": "/tmp/squares-numpy-process-20260923.stdout",
+      "bytes": 86,
+      "sha256": "b2e78be2654dac611430459c6c91523f5ab91c38b7834d8b1a93257e170488fd",
+      "destination": "profiles/prior/squares-numpy-process-20260923.stdout"
+    },
+    {
+      "source": "/tmp/squares-numpy-process-20260923.time",
+      "bytes": 132,
+      "sha256": "905becd891e069a51f6e7b284613142dd9f9ad4e14b2cef249b6a88e0cfef514",
+      "destination": "profiles/prior/squares-numpy-process-20260923.time"
+    },
+    {
+      "source": "/tmp/squares-numpy-process-double-faults-20260923.stdout",
+      "bytes": 99,
+      "sha256": "cd510aa677c69dd7376e39d6eacbb9d5f51ef4d83e3a13c3db9ed4eb0d683b1d",
+      "destination": "profiles/prior/squares-numpy-process-double-faults-20260923.stdout"
+    },
+    {
+      "source": "/tmp/squares-numpy-samples-20260923.stdout",
+      "bytes": 86,
+      "sha256": "b1f849ae6bb61ad245a6c70967b2c662d88b9a8e95462061cb1fa479ce49f598",
+      "destination": "profiles/prior/squares-numpy-samples-20260923.stdout"
+    },
+    {
+      "source": "/tmp/squares-numpy-thread-20260923.stdout",
+      "bytes": 84,
+      "sha256": "06bfa9b61d3d7642e2490d600ca70ca21d0ccc78cf7425643c56705309987ec1",
+      "destination": "profiles/prior/squares-numpy-thread-20260923.stdout"
+    },
+    {
+      "source": "/tmp/squares-numpy-thread-20260923.time",
+      "bytes": 142,
+      "sha256": "911bf2c8cf062f4764c1b6af31924d41a38a24fbed85f828fd9256b611bc7386",
+      "destination": "profiles/prior/squares-numpy-thread-20260923.time"
+    },
+    {
+      "source": "/tmp/squares-numpy-thread-double-faults-20260923.json",
+      "bytes": 18166,
+      "sha256": "996155bc6101c52b89ddf785025fbc100d87c5c0761c48b59f6fabd1d4437731",
+      "destination": "results/prior/squares-numpy-thread-double-faults-20260923.json"
+    },
+    {
+      "source": "/tmp/squares-numpy-thread-double-faults-20260923.stdout",
+      "bytes": 97,
+      "sha256": "3116def3b9a23d6d4ec38dba7a404e32c4df330734548093359bdd37f9541ec6",
+      "destination": "profiles/prior/squares-numpy-thread-double-faults-20260923.stdout"
+    },
+    {
+      "source": "/tmp/squares-parallel-analysis.json",
+      "bytes": 34597,
+      "sha256": "9b2dd1a0d6438bfd40893fd83e7a8ea718e4f5651e80e2dad4cb6aa8489e5225",
+      "destination": "results/prior/squares-parallel-analysis.json"
+    },
+    {
+      "source": "/tmp/squares-process-16-1-util.json",
+      "bytes": 6930,
+      "sha256": "af7fe77e5ab3a5683a23a438c46a55550ee2cf4d3f418d68312ed5978e95236f",
+      "destination": "results/prior/squares-process-16-1-util.json"
+    },
+    {
+      "source": "/tmp/squares-process-16-1.json",
+      "bytes": 11931,
+      "sha256": "eff8f19e3639a422b09f17f883f100a2cc290335860ae981814fc5a2e9100332",
+      "destination": "results/prior/squares-process-16-1.json"
+    },
+    {
+      "source": "/tmp/squares-process-16-1.stdout",
+      "bytes": 11931,
+      "sha256": "eff8f19e3639a422b09f17f883f100a2cc290335860ae981814fc5a2e9100332",
+      "destination": "profiles/prior/squares-process-16-1.stdout"
+    },
+    {
+      "source": "/tmp/squares-process-16-1.time",
+      "bytes": 24,
+      "sha256": "8fc206234d88579a2a7ae92c86cc44dcf45ebca652cf2b87ee7e2b629b741caf",
+      "destination": "profiles/prior/squares-process-16-1.time"
+    },
+    {
+      "source": "/tmp/squares-process-16-2.json",
+      "bytes": 11932,
+      "sha256": "33017cd01e0e8a873eef89fdc36ab2d8af704b6678a4237e9721a95ae78f7bed",
+      "destination": "results/prior/squares-process-16-2.json"
+    },
+    {
+      "source": "/tmp/squares-process-16-2.stdout",
+      "bytes": 11932,
+      "sha256": "33017cd01e0e8a873eef89fdc36ab2d8af704b6678a4237e9721a95ae78f7bed",
+      "destination": "profiles/prior/squares-process-16-2.stdout"
+    },
+    {
+      "source": "/tmp/squares-process-16-2.time",
+      "bytes": 24,
+      "sha256": "52da605989767bbbc9f3d325b01707d8b03c87d8f5fdaba87100c639e51ed107",
+      "destination": "profiles/prior/squares-process-16-2.time"
+    },
+    {
+      "source": "/tmp/squares-process-16-3.json",
+      "bytes": 11934,
+      "sha256": "3e40e96c0bbfd31ac7a5ecc74d06d8b89563b6df7f35375b11faa780f09a7719",
+      "destination": "results/prior/squares-process-16-3.json"
+    },
+    {
+      "source": "/tmp/squares-process-16-3.stdout",
+      "bytes": 11934,
+      "sha256": "3e40e96c0bbfd31ac7a5ecc74d06d8b89563b6df7f35375b11faa780f09a7719",
+      "destination": "profiles/prior/squares-process-16-3.stdout"
+    },
+    {
+      "source": "/tmp/squares-process-16-3.time",
+      "bytes": 24,
+      "sha256": "125fa29f34f2b06d892cdfd54a7da73782154ef4a38e6cb6520e75df50d47897",
+      "destination": "profiles/prior/squares-process-16-3.time"
+    },
+    {
+      "source": "/tmp/squares-process-16-observe-util.json",
+      "bytes": 6415,
+      "sha256": "ca6b9b904e388c52bb665617402b3fa9d767266c3cf24f297c1d092071244cc9",
+      "destination": "results/prior/squares-process-16-observe-util.json"
+    },
+    {
+      "source": "/tmp/squares-process-16-observe.json",
+      "bytes": 11934,
+      "sha256": "684fcc6136e366f320a029ab52b711593c1238e03b6a669b61102934ec0451d6",
+      "destination": "results/prior/squares-process-16-observe.json"
+    },
+    {
+      "source": "/tmp/squares-process-16-observe.stdout",
+      "bytes": 11934,
+      "sha256": "684fcc6136e366f320a029ab52b711593c1238e03b6a669b61102934ec0451d6",
+      "destination": "profiles/prior/squares-process-16-observe.stdout"
+    },
+    {
+      "source": "/tmp/squares-process-16-observe.time",
+      "bytes": 24,
+      "sha256": "28432772bad26b660c34820d512df23601ca1a1fbb33c483464f1c41fca5f7c2",
+      "destination": "profiles/prior/squares-process-16-observe.time"
+    },
+    {
+      "source": "/tmp/squares-process-16-observe2-util.json",
+      "bytes": 9060,
+      "sha256": "83c7b297382eee78cc41c1a677a76eda2c1774536882518750901f58575c317b",
+      "destination": "results/prior/squares-process-16-observe2-util.json"
+    },
+    {
+      "source": "/tmp/squares-process-16-observe2.json",
+      "bytes": 11940,
+      "sha256": "9775c43034e640116909bb0b5fcf39831c8139279c1875d2741039c53bb3ba41",
+      "destination": "results/prior/squares-process-16-observe2.json"
+    },
+    {
+      "source": "/tmp/squares-process-16-observe2.stdout",
+      "bytes": 11940,
+      "sha256": "9775c43034e640116909bb0b5fcf39831c8139279c1875d2741039c53bb3ba41",
+      "destination": "profiles/prior/squares-process-16-observe2.stdout"
+    },
+    {
+      "source": "/tmp/squares-process-16-observe2.time",
+      "bytes": 24,
+      "sha256": "c72ba355079d5414e8b489cb2ace4c00a694a10f58891fc1116c331339101366",
+      "destination": "profiles/prior/squares-process-16-observe2.time"
+    },
+    {
+      "source": "/tmp/squares-process-16-observe3-util.json",
+      "bytes": 15811,
+      "sha256": "f01b9113a832f09e8d9ede0ced7f6a32be2f5b5a59fca36321ff4f388657b418",
+      "destination": "results/prior/squares-process-16-observe3-util.json"
+    },
+    {
+      "source": "/tmp/squares-process-16-observe3.json",
+      "bytes": 11930,
+      "sha256": "68e5145cfed6e424dff7f0d41fd1717935c2b4f3e25b0d28d09bf0c9fdd1d441",
+      "destination": "results/prior/squares-process-16-observe3.json"
+    },
+    {
+      "source": "/tmp/squares-process-16-observe3.stdout",
+      "bytes": 11930,
+      "sha256": "68e5145cfed6e424dff7f0d41fd1717935c2b4f3e25b0d28d09bf0c9fdd1d441",
+      "destination": "profiles/prior/squares-process-16-observe3.stdout"
+    },
+    {
+      "source": "/tmp/squares-process-16-observe3.time",
+      "bytes": 24,
+      "sha256": "14180057c5be588729b7c5d27e6ef024dc2781650758a17f75389ae3d698d802",
+      "destination": "profiles/prior/squares-process-16-observe3.time"
+    },
+    {
+      "source": "/tmp/squares-process-2-1.json",
+      "bytes": 11923,
+      "sha256": "3c22fa88d073b03c251496f3e76c8344a99804d92b2026c67a4c47a7d937600b",
+      "destination": "results/prior/squares-process-2-1.json"
+    },
+    {
+      "source": "/tmp/squares-process-2-1.stdout",
+      "bytes": 11923,
+      "sha256": "3c22fa88d073b03c251496f3e76c8344a99804d92b2026c67a4c47a7d937600b",
+      "destination": "profiles/prior/squares-process-2-1.stdout"
+    },
+    {
+      "source": "/tmp/squares-process-2-1.time",
+      "bytes": 24,
+      "sha256": "bb94c7188f4a6656934663dfb50ed7b76ef3d9bfec702c122945a8a232c8c7c9",
+      "destination": "profiles/prior/squares-process-2-1.time"
+    },
+    {
+      "source": "/tmp/squares-process-2-2.json",
+      "bytes": 11913,
+      "sha256": "771140994a143d7b4c91a152f8262fbf4b0eaadead3eb08fad94f9ac7c273e8b",
+      "destination": "results/prior/squares-process-2-2.json"
+    },
+    {
+      "source": "/tmp/squares-process-2-2.stdout",
+      "bytes": 11913,
+      "sha256": "771140994a143d7b4c91a152f8262fbf4b0eaadead3eb08fad94f9ac7c273e8b",
+      "destination": "profiles/prior/squares-process-2-2.stdout"
+    },
+    {
+      "source": "/tmp/squares-process-2-2.time",
+      "bytes": 24,
+      "sha256": "87d7f299fe2a5d8ebd769af5bf61d058246a481bc0085af7e9f74d00c1dcd16a",
+      "destination": "profiles/prior/squares-process-2-2.time"
+    },
+    {
+      "source": "/tmp/squares-process-2-3.json",
+      "bytes": 11917,
+      "sha256": "cc84319f0e62c6c21e495c00c39c12717c0727f0b0c37274d592c111fe03c327",
+      "destination": "results/prior/squares-process-2-3.json"
+    },
+    {
+      "source": "/tmp/squares-process-2-3.stdout",
+      "bytes": 11917,
+      "sha256": "cc84319f0e62c6c21e495c00c39c12717c0727f0b0c37274d592c111fe03c327",
+      "destination": "profiles/prior/squares-process-2-3.stdout"
+    },
+    {
+      "source": "/tmp/squares-process-2-3.time",
+      "bytes": 24,
+      "sha256": "302cac0ed74cd69e0660e689f2a24cbb1a00d90e169ca3fd3066d5fc8bbc1ea2",
+      "destination": "profiles/prior/squares-process-2-3.time"
+    },
+    {
+      "source": "/tmp/squares-process-4-1-util.json",
+      "bytes": 11957,
+      "sha256": "4f5a273d70452017cd469899d60ee3311e67619802b17fde852bf5859e9ead70",
+      "destination": "results/prior/squares-process-4-1-util.json"
+    },
+    {
+      "source": "/tmp/squares-process-4-1.json",
+      "bytes": 11917,
+      "sha256": "5337ac10da24ffee64afee038b817331fec06e69144c93a931a774a5c8003bf3",
+      "destination": "results/prior/squares-process-4-1.json"
+    },
+    {
+      "source": "/tmp/squares-process-4-1.stdout",
+      "bytes": 11917,
+      "sha256": "5337ac10da24ffee64afee038b817331fec06e69144c93a931a774a5c8003bf3",
+      "destination": "profiles/prior/squares-process-4-1.stdout"
+    },
+    {
+      "source": "/tmp/squares-process-4-1.time",
+      "bytes": 24,
+      "sha256": "40c21b9739a71c2677f80a47e4318857706cd85b00c1116789ce62277391e7b3",
+      "destination": "profiles/prior/squares-process-4-1.time"
+    },
+    {
+      "source": "/tmp/squares-process-4-2.json",
+      "bytes": 11917,
+      "sha256": "0b70349e83c2b22bcaf229fa81f0baf6041919ea36331af309e6c5a5bf35a89a",
+      "destination": "results/prior/squares-process-4-2.json"
+    },
+    {
+      "source": "/tmp/squares-process-4-2.stdout",
+      "bytes": 11917,
+      "sha256": "0b70349e83c2b22bcaf229fa81f0baf6041919ea36331af309e6c5a5bf35a89a",
+      "destination": "profiles/prior/squares-process-4-2.stdout"
+    },
+    {
+      "source": "/tmp/squares-process-4-2.time",
+      "bytes": 24,
+      "sha256": "c4bfdbb32417c58dafa43afc11263d2335ed386adb6ee3f536c79cb63bfb44b0",
+      "destination": "profiles/prior/squares-process-4-2.time"
+    },
+    {
+      "source": "/tmp/squares-process-4-3.json",
+      "bytes": 11922,
+      "sha256": "02495968a7ea0ba318fe103427a015091466fb3e6fdb41578d95284a16e442b8",
+      "destination": "results/prior/squares-process-4-3.json"
+    },
+    {
+      "source": "/tmp/squares-process-4-3.stdout",
+      "bytes": 11922,
+      "sha256": "02495968a7ea0ba318fe103427a015091466fb3e6fdb41578d95284a16e442b8",
+      "destination": "profiles/prior/squares-process-4-3.stdout"
+    },
+    {
+      "source": "/tmp/squares-process-4-3.time",
+      "bytes": 24,
+      "sha256": "3def1dc81d70e4ce8214a12dc66068fb638de7d0e31ac6ac44c9188510d78c3d",
+      "destination": "profiles/prior/squares-process-4-3.time"
+    },
+    {
+      "source": "/tmp/squares-process-8-1-util.json",
+      "bytes": 8179,
+      "sha256": "8224653d38daf27524c7691372d997d806e97cc760f36474b947887ed7d832b4",
+      "destination": "results/prior/squares-process-8-1-util.json"
+    },
+    {
+      "source": "/tmp/squares-process-8-1.json",
+      "bytes": 11928,
+      "sha256": "922045e41f56fa29bcc4f23028a2c7b710d314e60c712ec986ad46f3ca0322c7",
+      "destination": "results/prior/squares-process-8-1.json"
+    },
+    {
+      "source": "/tmp/squares-process-8-1.stdout",
+      "bytes": 11928,
+      "sha256": "922045e41f56fa29bcc4f23028a2c7b710d314e60c712ec986ad46f3ca0322c7",
+      "destination": "profiles/prior/squares-process-8-1.stdout"
+    },
+    {
+      "source": "/tmp/squares-process-8-1.time",
+      "bytes": 24,
+      "sha256": "cb9b3d2a1258ebf01c4b0d2d073011340f5a526c017d6ae44ea60244cc93008b",
+      "destination": "profiles/prior/squares-process-8-1.time"
+    },
+    {
+      "source": "/tmp/squares-process-8-2.json",
+      "bytes": 11933,
+      "sha256": "1cd76e03cbff46e710e25b475281e2d4de460bdd0b1b21201eb5587efe1d19a1",
+      "destination": "results/prior/squares-process-8-2.json"
+    },
+    {
+      "source": "/tmp/squares-process-8-2.stdout",
+      "bytes": 11933,
+      "sha256": "1cd76e03cbff46e710e25b475281e2d4de460bdd0b1b21201eb5587efe1d19a1",
+      "destination": "profiles/prior/squares-process-8-2.stdout"
+    },
+    {
+      "source": "/tmp/squares-process-8-2.time",
+      "bytes": 24,
+      "sha256": "57cc5f53e1ae1c358c7feaa208cfe0f15f63a59d2fae683732d0d535ebcd8b57",
+      "destination": "profiles/prior/squares-process-8-2.time"
+    },
+    {
+      "source": "/tmp/squares-process-8-3.json",
+      "bytes": 11926,
+      "sha256": "fbc81219b551bfa4e6bbbf39d69c10e4a5a53da3c20c7776690a5ec946bfd180",
+      "destination": "results/prior/squares-process-8-3.json"
+    },
+    {
+      "source": "/tmp/squares-process-8-3.stdout",
+      "bytes": 11926,
+      "sha256": "fbc81219b551bfa4e6bbbf39d69c10e4a5a53da3c20c7776690a5ec946bfd180",
+      "destination": "profiles/prior/squares-process-8-3.stdout"
+    },
+    {
+      "source": "/tmp/squares-process-8-3.time",
+      "bytes": 24,
+      "sha256": "b4fe167451d9781e165081467bfcf6f10db5e42f4def901587c8c8df6694dbc7",
+      "destination": "profiles/prior/squares-process-8-3.time"
+    },
+    {
+      "source": "/tmp/squares-profile-baseline16.json",
+      "bytes": 11927,
+      "sha256": "9c285ba03fd7974964c3d780a4f4a2f22462c5ce1ee54b3a72dd3b9d5ed8d213",
+      "destination": "results/prior/squares-profile-baseline16.json"
+    },
+    {
+      "source": "/tmp/squares-profile-baseline16.stdout",
+      "bytes": 11927,
+      "sha256": "9c285ba03fd7974964c3d780a4f4a2f22462c5ce1ee54b3a72dd3b9d5ed8d213",
+      "destination": "profiles/prior/squares-profile-baseline16.stdout"
+    },
+    {
+      "source": "/tmp/squares-profile-baseline16.time",
+      "bytes": 24,
+      "sha256": "f01cf145bd75a4f4bc7efd356be9d0f583bd7b4570510fc0432b6976b2cfc56b",
+      "destination": "profiles/prior/squares-profile-baseline16.time"
+    },
+    {
+      "source": "/tmp/squares-profile-perf16.stderr",
+      "bytes": 888,
+      "sha256": "773a7759463996cdcb44efa7e6dcd8d824cf59bcf551a50fefcf04ae946a90d6",
+      "destination": "profiles/prior/squares-profile-perf16.stderr"
+    },
+    {
+      "source": "/tmp/squares-sampled16-v1-util.json",
+      "bytes": 1934024,
+      "sha256": "d24fdb59a93071ce631ab8f5736da7a2375aef6673f064c645b2a91713c01370",
+      "destination": "results/prior/squares-sampled16-v1-util.json"
+    },
+    {
+      "source": "/tmp/squares-sampled16-v1-util.summary",
+      "bytes": 30754,
+      "sha256": "d43823f264dea8c14896078738f8c6dd66b678f1886471d2620cb825350a0727",
+      "destination": "profiles/prior/squares-sampled16-v1-util.summary"
+    },
+    {
+      "source": "/tmp/squares-sampled16-v1.json",
+      "bytes": 11923,
+      "sha256": "c0eb808d45c99c0e80e18e7f434eed125b73b9f8391e374f87e676b0fdd13cd5",
+      "destination": "results/prior/squares-sampled16-v1.json"
+    },
+    {
+      "source": "/tmp/squares-sampled16-v1.markers",
+      "bytes": 2873,
+      "sha256": "0d30bd07b3f4e1938b0821c50c00f5143cd3b311dbe0ecde24debe9e0b56b51d",
+      "destination": "profiles/prior/squares-sampled16-v1.markers"
+    },
+    {
+      "source": "/tmp/squares-sampled16-v1.stdout",
+      "bytes": 11923,
+      "sha256": "c0eb808d45c99c0e80e18e7f434eed125b73b9f8391e374f87e676b0fdd13cd5",
+      "destination": "profiles/prior/squares-sampled16-v1.stdout"
+    },
+    {
+      "source": "/tmp/squares-sampled16-v1.time",
+      "bytes": 24,
+      "sha256": "423d523439243d3d9d017c9fa7dd71c6f87600971e6e5f77794cce9ed29b15a6",
+      "destination": "profiles/prior/squares-sampled16-v1.time"
+    },
+    {
+      "source": "/tmp/squares-thread-1-1.stdout",
+      "bytes": 6030,
+      "sha256": "3dbe805a90758b46a58779f3253ecc6ef143bad9f206fb83cc2019a4680d2cd8",
+      "destination": "profiles/prior/squares-thread-1-1.stdout"
+    },
+    {
+      "source": "/tmp/squares-thread-1-1.time",
+      "bytes": 24,
+      "sha256": "eb3659c6907306f08cf4737505da35f002c4cc880814148dc0bb8f52112b8bb4",
+      "destination": "profiles/prior/squares-thread-1-1.time"
+    },
+    {
+      "source": "/tmp/squares-thread-1-2.stdout",
+      "bytes": 6028,
+      "sha256": "ebf6b4f8ec542b4fddf871cf33712cc7415fca8d3ea9fa1bb5c8ddbd4896b939",
+      "destination": "profiles/prior/squares-thread-1-2.stdout"
+    },
+    {
+      "source": "/tmp/squares-thread-1-2.time",
+      "bytes": 24,
+      "sha256": "532553469cd5befcdb77370da2ac0be81619d8de3bb21cb2db39a8e7784d540e",
+      "destination": "profiles/prior/squares-thread-1-2.time"
+    },
+    {
+      "source": "/tmp/squares-thread-1-3.stdout",
+      "bytes": 6024,
+      "sha256": "a5154a3263bf5abca96aac4441daba31049280e0d5c213c069d3cff3065dd57a",
+      "destination": "profiles/prior/squares-thread-1-3.stdout"
+    },
+    {
+      "source": "/tmp/squares-thread-1-3.time",
+      "bytes": 24,
+      "sha256": "1ceaa38328ecef829d36edd9065aac1fdb8953740bb1af3ed7893b4edbec0edb",
+      "destination": "profiles/prior/squares-thread-1-3.time"
+    },
+    {
+      "source": "/tmp/squares-thread-16-1-util.json",
+      "bytes": 8818,
+      "sha256": "a964aa8cf4cace8562820e02202ba2d278b642ba1336765ea518faef99654ea2",
+      "destination": "results/prior/squares-thread-16-1-util.json"
+    },
+    {
+      "source": "/tmp/squares-thread-16-1.stdout",
+      "bytes": 6026,
+      "sha256": "f4b85754284e22da116e2432e089e26b7fd6fe39a75f5e04ba28d24970be9dad",
+      "destination": "profiles/prior/squares-thread-16-1.stdout"
+    },
+    {
+      "source": "/tmp/squares-thread-16-1.time",
+      "bytes": 25,
+      "sha256": "1dd1aa63d28d1b3f7003d16e51b942214dc826dcc67de7b2bb575d8841d04e14",
+      "destination": "profiles/prior/squares-thread-16-1.time"
+    },
+    {
+      "source": "/tmp/squares-thread-16-2.stdout",
+      "bytes": 6026,
+      "sha256": "533cf3e4e110001f304070a3f9f7872bff583c85fed384560cc1abab811fda69",
+      "destination": "profiles/prior/squares-thread-16-2.stdout"
+    },
+    {
+      "source": "/tmp/squares-thread-16-2.time",
+      "bytes": 25,
+      "sha256": "b283272473f88de3c61fa74fc662d22757014d24fe875ce30654795236e42f47",
+      "destination": "profiles/prior/squares-thread-16-2.time"
+    },
+    {
+      "source": "/tmp/squares-thread-16-3.stdout",
+      "bytes": 6027,
+      "sha256": "678c5abbf91dd0a652cc433540139016722ef077c359fe5e86911b811e991354",
+      "destination": "profiles/prior/squares-thread-16-3.stdout"
+    },
+    {
+      "source": "/tmp/squares-thread-16-3.time",
+      "bytes": 25,
+      "sha256": "ec121511cf576d20f2f5d9ceffec15506ff4703d816c063e1f6fbf8f13f963c0",
+      "destination": "profiles/prior/squares-thread-16-3.time"
+    },
+    {
+      "source": "/tmp/squares-thread-2-1.stdout",
+      "bytes": 6029,
+      "sha256": "f8d1b707406d5d948b9c2497b8297e74d20ae645c388181244d922bc72105926",
+      "destination": "profiles/prior/squares-thread-2-1.stdout"
+    },
+    {
+      "source": "/tmp/squares-thread-2-1.time",
+      "bytes": 24,
+      "sha256": "b07df7620b06d3ba93cd620198ee535322d76b13ecbfffa0db658c084314365c",
+      "destination": "profiles/prior/squares-thread-2-1.time"
+    },
+    {
+      "source": "/tmp/squares-thread-2-2.stdout",
+      "bytes": 6029,
+      "sha256": "ea29e20214122190c2fa8864a568ee25b0ceb458dd581fb89b8085daa44771bc",
+      "destination": "profiles/prior/squares-thread-2-2.stdout"
+    },
+    {
+      "source": "/tmp/squares-thread-2-2.time",
+      "bytes": 24,
+      "sha256": "5598143eb774af1cf2962b4c7838692dc9015d0924ad1122251f9ca857164cf1",
+      "destination": "profiles/prior/squares-thread-2-2.time"
+    },
+    {
+      "source": "/tmp/squares-thread-2-3.stdout",
+      "bytes": 6032,
+      "sha256": "52a52d95a95da073be2f7ae2a0c23afb0da18a8b2772e76edaffedda0e502bbb",
+      "destination": "profiles/prior/squares-thread-2-3.stdout"
+    },
+    {
+      "source": "/tmp/squares-thread-2-3.time",
+      "bytes": 24,
+      "sha256": "18eb9f099acbe8c1089ef1405e0820832d57e37ea1bc2eea249fb0b49798118d",
+      "destination": "profiles/prior/squares-thread-2-3.time"
+    },
+    {
+      "source": "/tmp/squares-thread-4-1.stdout",
+      "bytes": 6028,
+      "sha256": "05b4900beebf13853b5e3c2fb6b53239793682e309aa90caa4c8fb27523a9d38",
+      "destination": "profiles/prior/squares-thread-4-1.stdout"
+    },
+    {
+      "source": "/tmp/squares-thread-4-1.time",
+      "bytes": 24,
+      "sha256": "d590ec397b95136d22b38e2ba1d7a4ba255a0fa36a346ca30e86a788e86c447e",
+      "destination": "profiles/prior/squares-thread-4-1.time"
+    },
+    {
+      "source": "/tmp/squares-thread-4-2.stdout",
+      "bytes": 6029,
+      "sha256": "75b79f8bea1fec96ed122a945e5baf155df5f87a16e116a46ddd3c15013d5845",
+      "destination": "profiles/prior/squares-thread-4-2.stdout"
+    },
+    {
+      "source": "/tmp/squares-thread-4-2.time",
+      "bytes": 24,
+      "sha256": "da0b6d2f7358a610561f7149011da1edc5233cc636551bca050b80c32ced1b66",
+      "destination": "profiles/prior/squares-thread-4-2.time"
+    },
+    {
+      "source": "/tmp/squares-thread-4-3.stdout",
+      "bytes": 6030,
+      "sha256": "f23f99a5241c5df72f76509a8f2d23c03a641b1b546ac021293c7b8e11dcc044",
+      "destination": "profiles/prior/squares-thread-4-3.stdout"
+    },
+    {
+      "source": "/tmp/squares-thread-4-3.time",
+      "bytes": 24,
+      "sha256": "e2a22807a869c43711093f9c4711d7c129b974a4179b791f66387c84241ec085",
+      "destination": "profiles/prior/squares-thread-4-3.time"
+    },
+    {
+      "source": "/tmp/squares-thread-8-1-util.json",
+      "bytes": 8942,
+      "sha256": "4477dc6b2331a22f7d188cdcb6b519bd6cc2881e38b1531976a747dea54e3c75",
+      "destination": "results/prior/squares-thread-8-1-util.json"
+    },
+    {
+      "source": "/tmp/squares-thread-8-1.stdout",
+      "bytes": 6027,
+      "sha256": "5e0d3eeca19111cc340d5986930fdabe6871e10447abbb4ae5429bf79f58764e",
+      "destination": "profiles/prior/squares-thread-8-1.stdout"
+    },
+    {
+      "source": "/tmp/squares-thread-8-1.time",
+      "bytes": 25,
+      "sha256": "4641a360decd2f1d9c247360fa106d6fef86cc13259f01c7f26c04d08c69e8f8",
+      "destination": "profiles/prior/squares-thread-8-1.time"
+    },
+    {
+      "source": "/tmp/squares-thread-8-2.stdout",
+      "bytes": 6024,
+      "sha256": "6ec7f32ef2ea582ed5899356a700a15ee10e57d0546f700ee7001afa375ca19a",
+      "destination": "profiles/prior/squares-thread-8-2.stdout"
+    },
+    {
+      "source": "/tmp/squares-thread-8-2.time",
+      "bytes": 25,
+      "sha256": "f6e776a35f2c09caa3ae6318b7ef35211c8200a0cdb4ac491f70f66e4f12e217",
+      "destination": "profiles/prior/squares-thread-8-2.time"
+    },
+    {
+      "source": "/tmp/squares-thread-8-3.stdout",
+      "bytes": 6029,
+      "sha256": "412395b0918ba6fe822098ad97b55c6c7e553ab5e4004350308b497c5f3fb545",
+      "destination": "profiles/prior/squares-thread-8-3.stdout"
+    },
+    {
+      "source": "/tmp/squares-thread-8-3.time",
+      "bytes": 24,
+      "sha256": "47ee034354af68e9fad16bc84d015b887d5412f7924c51937713920b5d1b0d48",
+      "destination": "profiles/prior/squares-thread-8-3.time"
+    },
+    {
+      "source": "/tmp/squares-thread-analysis.json",
+      "bytes": 19204,
+      "sha256": "ea0f5fa7292bca986696ffe4fdac5571d82b6466168a2b8c51d340542c6e7a17",
+      "destination": "results/prior/squares-thread-analysis.json"
+    },
+    {
+      "source": "/tmp/squares-worker-cprofile16-summary.txt",
+      "bytes": 15114,
+      "sha256": "1d1dae787c45b9bfbfe1c6f0291346330855d4a26ce649e1b64c9f18d147b44e",
+      "destination": "profiles/prior/squares-worker-cprofile16-summary.txt"
+    },
+    {
+      "source": "/tmp/squares-worker-cprofile16.json",
+      "bytes": 11996,
+      "sha256": "11dc9ddb9954edd7e9c25f2ead4eb8756611c8fedccdd819a33dda5896bcf71a",
+      "destination": "results/prior/squares-worker-cprofile16.json"
+    },
+    {
+      "source": "/tmp/squares-worker-cprofile16.stdout",
+      "bytes": 11996,
+      "sha256": "11dc9ddb9954edd7e9c25f2ead4eb8756611c8fedccdd819a33dda5896bcf71a",
+      "destination": "profiles/prior/squares-worker-cprofile16.stdout"
+    },
+    {
+      "source": "/tmp/squares-worker-cprofile16.time",
+      "bytes": 24,
+      "sha256": "fd2725722515a11b96d5881c39f3c64c1b7cded5fa9e4690a9a6b07baf8a052c",
+      "destination": "profiles/prior/squares-worker-cprofile16.time"
+    },
+    {
+      "source": "/tmp/squares_compare_parallel.py",
+      "bytes": 6257,
+      "sha256": "09cb3b95afb1580e1f6457ea2056abc48bc5c69026f7466c6bd702ccdc996174",
+      "destination": "scripts/prior/squares_compare_parallel.py"
+    },
+    {
+      "source": "/tmp/squares_cpu_monitor.py",
+      "bytes": 2103,
+      "sha256": "c488d31687426c59aa2789f10ef28785113d3af099cad853ba1b33d5525caf31",
+      "destination": "scripts/prior/squares_cpu_monitor.py"
+    },
+    {
+      "source": "/tmp/squares_cpu_monitor2.py",
+      "bytes": 2274,
+      "sha256": "196c8ac44fe90afcb3eeeb4bd47ea48fb41aebb0bbfe9a02cd864c31142d4344",
+      "destination": "scripts/prior/squares_cpu_monitor2.py"
+    },
+    {
+      "source": "/tmp/squares_cpu_monitor3.py",
+      "bytes": 2371,
+      "sha256": "730de263141eb083dc6f81150ef235f2239aa666f5eadc22d25d859fc78fa2ed",
+      "destination": "scripts/prior/squares_cpu_monitor3.py"
+    },
+    {
+      "source": "/tmp/squares_n12_analyze.py",
+      "bytes": 5029,
+      "sha256": "5bcc84289e13a94c61e1570e5589ebfc8b049aa6a978e3e7d79898d6877401b1",
+      "destination": "scripts/prior/squares_n12_analyze.py"
+    },
+    {
+      "source": "/tmp/squares_n12_direction_profile.py",
+      "bytes": 2302,
+      "sha256": "d33280f27e8f0481d323402b64cf38da76d81a32636f8de88c0c752b58dce059",
+      "destination": "scripts/prior/squares_n12_direction_profile.py"
+    },
+    {
+      "source": "/tmp/squares_n12_direction_timings.json",
+      "bytes": 784830,
+      "sha256": "bbc4ea2cfb131995172db40dfa913df46a633dcfa3cfa777b40ac129f8d87f17",
+      "destination": "results/prior/squares_n12_direction_timings.json"
+    },
+    {
+      "source": "/tmp/squares_n12_numpy_ops_profile.py",
+      "bytes": 3500,
+      "sha256": "2109f6673f7f6c15bd5cb191f37ac3f1732dcd89f28f1cc8110a774439775f92",
+      "destination": "scripts/prior/squares_n12_numpy_ops_profile.py"
+    },
+    {
+      "source": "/tmp/squares_n12_numpy_ops_profile.stdout",
+      "bytes": 5990,
+      "sha256": "cf86b542101d7aad05b8d6923071d39c31f4ec892aae0248fed79133feb65dae",
+      "destination": "profiles/prior/squares_n12_numpy_ops_profile.stdout"
+    },
+    {
+      "source": "/tmp/squares_n12_numpy_ops_timings.json",
+      "bytes": 1080304,
+      "sha256": "af57525ea2365eb54fcd128067b2b2d1a96319dbd9fe26e8b424f887d7ebd44b",
+      "destination": "results/prior/squares_n12_numpy_ops_timings.json"
+    },
+    {
+      "source": "/tmp/squares_n12_process_boundary_profile.py",
+      "bytes": 7195,
+      "sha256": "38c8dd6adb232c08326be4afe21cf7daca953ae911f2ab33e7ddb33374105d60",
+      "destination": "scripts/prior/squares_n12_process_boundary_profile.py"
+    },
+    {
+      "source": "/tmp/squares_n12_process_cprofile.py",
+      "bytes": 4950,
+      "sha256": "628d0ced53be603e11340c8cc5fcde47483e033fc24c212439504fafd761ac20",
+      "destination": "scripts/prior/squares_n12_process_cprofile.py"
+    },
+    {
+      "source": "/tmp/squares_n12_process_parallel.py",
+      "bytes": 4201,
+      "sha256": "be0bdcd1f7c687cfbfbf2c7ae932504a2c2e24b9827d693de790bf2a01322920",
+      "destination": "scripts/prior/squares_n12_process_parallel.py"
+    },
+    {
+      "source": "/tmp/squares_n12_process_sampled.py",
+      "bytes": 5425,
+      "sha256": "e0dd03d82f8d8f458afed271ad33ba39288c20250071aa4bb188182ff762685c",
+      "destination": "scripts/prior/squares_n12_process_sampled.py"
+    },
+    {
+      "source": "/tmp/squares_numpy_capture.py",
+      "bytes": 4711,
+      "sha256": "a401cf1ad4d546f8d2e89b93248624b423e5cf8b04dcce62b5bc7d91640c92b5",
+      "destination": "scripts/prior/squares_numpy_capture.py"
+    },
+    {
+      "source": "/tmp/squares_numpy_replay.py",
+      "bytes": 9808,
+      "sha256": "30da075c6f3bd59ad093c0f17ed52bb2cc1080697bb706278ff0a2491da0c8da",
+      "destination": "scripts/prior/squares_numpy_replay.py"
+    },
+    {
+      "source": "/tmp/squares_profile_smoke.py",
+      "bytes": 581,
+      "sha256": "7a5dd3fd66ede59409ca78304271ef7fd0e23e88a9cc8d1ffc5a40d24402c1ed",
+      "destination": "scripts/prior/squares_profile_smoke.py"
+    },
+    {
+      "source": "/tmp/squares_thread_bench.py",
+      "bytes": 3476,
+      "sha256": "fed5f7f8214ba6ebefe4bb4ce92d513f98cc6a16e3bc54a1493fe1aa360de87b",
+      "destination": "scripts/prior/squares_thread_bench.py"
+    },
+    {
+      "source": "/tmp/squares_worker_sampler.py",
+      "bytes": 7131,
+      "sha256": "d02d7e6ca5180547fb4a33b8b17724fa09bc9ad41ca1a97d7f45897d9d1393c9",
+      "destination": "scripts/prior/squares_worker_sampler.py"
+    }
+  ],
+  "byte_identical_duplicates": [
+    {
+      "source": "/tmp/squares-numpy-process-20260923.json",
+      "bytes": 138805,
+      "sha256": "b64114e4758c915c18050e095e01564cc7f95f7719310d3c598ed106efdf9fde",
+      "duplicate_of": "raw/squares-numpy-process-20260923.json"
+    },
+    {
+      "source": "/tmp/squares-numpy-process-double-faults-20260923.json",
+      "bytes": 18042,
+      "sha256": "ac6cb2ff71e44dbb35300ef60dd181e1fac25a0b89a67df889cb2054bc182f95",
+      "duplicate_of": "raw/squares-numpy-process-double-faults-20260923.json"
+    },
+    {
+      "source": "/tmp/squares-numpy-samples-20260923.json",
+      "bytes": 41203,
+      "sha256": "a3f6bb6233d2ebfbb4d2ce9fb5474279019fb8266ae99efdccc665ec0c3bda9f",
+      "duplicate_of": "raw/squares-numpy-samples-20260923.json"
+    },
+    {
+      "source": "/tmp/squares-numpy-thread-20260923.json",
+      "bytes": 139942,
+      "sha256": "2b7d877d6a6c6ff29e9f019256dff6a736951a0e39d6953327ebc8ae475eff0b",
+      "duplicate_of": "raw/squares-numpy-thread-20260923.json"
+    }
+  ],
+  "transient_omissions": [
+    {
+      "source": "/tmp/squares-boundary-1.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-boundary-2.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-boundary-4.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-boundary-8.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-boundary16.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-n12-controlled-1.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-n12-controlled-2.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-n12-controlled-3.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-n12-default.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-n12-direction_profile.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-n12-profile.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-numpy-capture-20260923.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-numpy-process-20260923.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-numpy-process-double-faults-20260923.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-numpy-samples-20260923.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-numpy-thread-20260923.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-numpy-thread-double-faults-20260923.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-process-16-1.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-process-16-2.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-process-16-3.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-process-16-observe.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-process-16-observe2.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-process-16-observe3.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-process-2-1.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-process-2-2.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-process-2-3.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-process-4-1.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-process-4-2.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-process-4-3.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-process-8-1.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-process-8-2.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-process-8-3.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-profile-baseline16.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-profile-perf16.stdout",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-sampled16-v1.pid",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-sampled16-v1.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-thread-1-1.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-thread-1-2.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-thread-1-3.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-thread-16-1.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-thread-16-2.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-thread-16-3.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-thread-2-1.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-thread-2-2.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-thread-2-3.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-thread-4-1.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-thread-4-2.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-thread-4-3.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-thread-8-1.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-thread-8-2.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-thread-8-3.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares-worker-cprofile16.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares_n12_numpy_ops_profile.stderr",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares_n12_process_pid",
+      "reason": "empty or transient PID/bytecode"
+    },
+    {
+      "source": "/tmp/squares_n12_thread_pid",
+      "reason": "empty or transient PID/bytecode"
+    }
+  ]
+}

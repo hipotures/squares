@@ -1,0 +1,1250 @@
+[
+  {
+    "background": "idle",
+    "background_count": 0,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.793858711,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.7952543350002088
+    },
+    "bg_alive": 0
+  },
+  {
+    "background": "idle",
+    "background_count": 0,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.0809277270000166,
+      "cpu": 1.2000168999999998,
+      "minor_faults": 307,
+      "rss_kb": 54076,
+      "checksum": 145147040.0,
+      "start": 11691.917162208
+    },
+    "bg_alive": 0
+  },
+  {
+    "background": "idle",
+    "background_count": 0,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.5264456360000622,
+      "cpu": 0.721489465,
+      "minor_faults": 93120,
+      "rss_kb": 61660,
+      "checksum": 0.0,
+      "start": 11693.07924808
+    },
+    "bg_alive": 0
+  },
+  {
+    "background": "idle",
+    "background_count": 1,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.797506686,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.7989406030010286
+    },
+    "bg_alive": 1
+  },
+  {
+    "background": "idle",
+    "background_count": 1,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.0687566380001954,
+      "cpu": 1.2714998290000001,
+      "minor_faults": 818,
+      "rss_kb": 54168,
+      "checksum": 145147040.0,
+      "start": 11694.487536047
+    },
+    "bg_alive": 1
+  },
+  {
+    "background": "idle",
+    "background_count": 1,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.5309741599994595,
+      "cpu": 0.638971815,
+      "minor_faults": 93120,
+      "rss_kb": 61672,
+      "checksum": 0.0,
+      "start": 11695.645433615
+    },
+    "bg_alive": 1
+  },
+  {
+    "background": "idle",
+    "background_count": 2,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.81463635,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.815879675999895
+    },
+    "bg_alive": 2
+  },
+  {
+    "background": "idle",
+    "background_count": 2,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.0754163950005022,
+      "cpu": 1.1095456489999997,
+      "minor_faults": 307,
+      "rss_kb": 54024,
+      "checksum": 145147040.0,
+      "start": 11697.088450365
+    },
+    "bg_alive": 2
+  },
+  {
+    "background": "idle",
+    "background_count": 2,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.5116072159999021,
+      "cpu": 0.511583991,
+      "minor_faults": 93200,
+      "rss_kb": 61624,
+      "checksum": 0.0,
+      "start": 11698.275872451
+    },
+    "bg_alive": 2
+  },
+  {
+    "background": "idle",
+    "background_count": 4,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.801867063,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.8031135579985857
+    },
+    "bg_alive": 4
+  },
+  {
+    "background": "idle",
+    "background_count": 4,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.0647411410009227,
+      "cpu": 1.0839393960000003,
+      "minor_faults": 818,
+      "rss_kb": 53864,
+      "checksum": 145147040.0,
+      "start": 11699.688026216
+    },
+    "bg_alive": 4
+  },
+  {
+    "background": "idle",
+    "background_count": 4,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.5352423069998622,
+      "cpu": 0.6360048329999999,
+      "minor_faults": 93120,
+      "rss_kb": 61652,
+      "checksum": 0.0,
+      "start": 11700.84327043
+    },
+    "bg_alive": 4
+  },
+  {
+    "background": "idle",
+    "background_count": 8,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.794575018,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.7958622939986526
+    },
+    "bg_alive": 8
+  },
+  {
+    "background": "idle",
+    "background_count": 8,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.0681191310013674,
+      "cpu": 1.112690893,
+      "minor_faults": 307,
+      "rss_kb": 54032,
+      "checksum": 145147040.0,
+      "start": 11702.272030469
+    },
+    "bg_alive": 8
+  },
+  {
+    "background": "idle",
+    "background_count": 8,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.5181216029995994,
+      "cpu": 0.5363759929999999,
+      "minor_faults": 93120,
+      "rss_kb": 61572,
+      "checksum": 0.0,
+      "start": 11703.437123472
+    },
+    "bg_alive": 8
+  },
+  {
+    "background": "idle",
+    "background_count": 14,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.804903653,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.8061751280001772
+    },
+    "bg_alive": 14
+  },
+  {
+    "background": "idle",
+    "background_count": 14,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.071567729999515,
+      "cpu": 1.1240824209999998,
+      "minor_faults": 818,
+      "rss_kb": 53964,
+      "checksum": 145147040.0,
+      "start": 11704.877212492
+    },
+    "bg_alive": 14
+  },
+  {
+    "background": "idle",
+    "background_count": 14,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.4728941359990131,
+      "cpu": 0.601835104,
+      "minor_faults": 52240,
+      "rss_kb": 61644,
+      "checksum": 0.0,
+      "start": 11706.040888206
+    },
+    "bg_alive": 14
+  },
+  {
+    "background": "compute",
+    "background_count": 1,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.82147511,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.8232564530007949
+    },
+    "bg_alive": 1
+  },
+  {
+    "background": "compute",
+    "background_count": 1,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.081446115998915,
+      "cpu": 1.0787187880000002,
+      "minor_faults": 307,
+      "rss_kb": 53952,
+      "checksum": 145147040.0,
+      "start": 11707.45221001
+    },
+    "bg_alive": 1
+  },
+  {
+    "background": "compute",
+    "background_count": 1,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.5095156910010701,
+      "cpu": 0.5094926690000001,
+      "minor_faults": 93120,
+      "rss_kb": 61648,
+      "checksum": 0.0,
+      "start": 11708.647648674
+    },
+    "bg_alive": 1
+  },
+  {
+    "background": "compute",
+    "background_count": 2,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.827781857,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.8290348040009121
+    },
+    "bg_alive": 2
+  },
+  {
+    "background": "compute",
+    "background_count": 2,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.0908245650007302,
+      "cpu": 1.088125973,
+      "minor_faults": 307,
+      "rss_kb": 54016,
+      "checksum": 145147040.0,
+      "start": 11710.123310027
+    },
+    "bg_alive": 2
+  },
+  {
+    "background": "compute",
+    "background_count": 2,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.5099684090000665,
+      "cpu": 0.509972438,
+      "minor_faults": 93120,
+      "rss_kb": 61516,
+      "checksum": 0.0,
+      "start": 11711.346985156
+    },
+    "bg_alive": 2
+  },
+  {
+    "background": "compute",
+    "background_count": 4,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.828375426,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.8295819819995813
+    },
+    "bg_alive": 4
+  },
+  {
+    "background": "compute",
+    "background_count": 4,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.0969455539998307,
+      "cpu": 1.094235642,
+      "minor_faults": 818,
+      "rss_kb": 54060,
+      "checksum": 145147040.0,
+      "start": 11712.808265418
+    },
+    "bg_alive": 4
+  },
+  {
+    "background": "compute",
+    "background_count": 4,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.50877198300077,
+      "cpu": 0.5085142140000001,
+      "minor_faults": 93120,
+      "rss_kb": 61536,
+      "checksum": 0.0,
+      "start": 11714.023963483
+    },
+    "bg_alive": 4
+  },
+  {
+    "background": "compute",
+    "background_count": 8,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.86807747,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.8692575850000139
+    },
+    "bg_alive": 8
+  },
+  {
+    "background": "compute",
+    "background_count": 8,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.152117065001221,
+      "cpu": 1.152058114,
+      "minor_faults": 307,
+      "rss_kb": 54028,
+      "checksum": 145147040.0,
+      "start": 11715.539849877
+    },
+    "bg_alive": 8
+  },
+  {
+    "background": "compute",
+    "background_count": 8,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.5370998160015006,
+      "cpu": 0.537080401,
+      "minor_faults": 93120,
+      "rss_kb": 61548,
+      "checksum": 0.0,
+      "start": 11716.818616706
+    },
+    "bg_alive": 8
+  },
+  {
+    "background": "compute",
+    "background_count": 14,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.874246049,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.8756154220009194
+    },
+    "bg_alive": 14
+  },
+  {
+    "background": "compute",
+    "background_count": 14,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.1569664270009525,
+      "cpu": 1.151745788,
+      "minor_faults": 307,
+      "rss_kb": 54036,
+      "checksum": 145147040.0,
+      "start": 11718.358690398
+    },
+    "bg_alive": 14
+  },
+  {
+    "background": "compute",
+    "background_count": 14,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.5344979550009157,
+      "cpu": 0.534389082,
+      "minor_faults": 93200,
+      "rss_kb": 61672,
+      "checksum": 0.0,
+      "start": 11719.646416216
+    },
+    "bg_alive": 14
+  },
+  {
+    "background": "stream",
+    "background_count": 1,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.813448917,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.8159726970006886
+    },
+    "bg_alive": 1
+  },
+  {
+    "background": "stream",
+    "background_count": 1,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.1903573639992828,
+      "cpu": 1.190269759,
+      "minor_faults": 307,
+      "rss_kb": 53996,
+      "checksum": 145147040.0,
+      "start": 11721.747824689
+    },
+    "bg_alive": 1
+  },
+  {
+    "background": "stream",
+    "background_count": 1,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.6190586030006671,
+      "cpu": 0.619066369,
+      "minor_faults": 52240,
+      "rss_kb": 61540,
+      "checksum": 0.0,
+      "start": 11723.394307247
+    },
+    "bg_alive": 1
+  },
+  {
+    "background": "stream",
+    "background_count": 2,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.820171464,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.8240060219995939
+    },
+    "bg_alive": 2
+  },
+  {
+    "background": "stream",
+    "background_count": 2,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.3627299320014572,
+      "cpu": 1.3626404449999998,
+      "minor_faults": 818,
+      "rss_kb": 54152,
+      "checksum": 145147040.0,
+      "start": 11725.659446417
+    },
+    "bg_alive": 2
+  },
+  {
+    "background": "stream",
+    "background_count": 2,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.868039528000736,
+      "cpu": 0.868035629,
+      "minor_faults": 93120,
+      "rss_kb": 61544,
+      "checksum": 0.0,
+      "start": 11727.565069925
+    },
+    "bg_alive": 2
+  },
+  {
+    "background": "stream",
+    "background_count": 4,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.834619634,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.8380641029998515
+    },
+    "bg_alive": 4
+  },
+  {
+    "background": "stream",
+    "background_count": 4,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 2.866762335999738,
+      "cpu": 2.8666915719999997,
+      "minor_faults": 818,
+      "rss_kb": 54060,
+      "checksum": 145147040.0,
+      "start": 11730.12892415
+    },
+    "bg_alive": 4
+  },
+  {
+    "background": "stream",
+    "background_count": 4,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.8964406930008408,
+      "cpu": 0.8964294879999999,
+      "minor_faults": 52240,
+      "rss_kb": 61540,
+      "checksum": 0.0,
+      "start": 11733.552928792
+    },
+    "bg_alive": 4
+  },
+  {
+    "background": "stream",
+    "background_count": 8,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.896322022,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.9019952130001911
+    },
+    "bg_alive": 8
+  },
+  {
+    "background": "stream",
+    "background_count": 8,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.8562291060006828,
+      "cpu": 1.856015051,
+      "minor_faults": 307,
+      "rss_kb": 54060,
+      "checksum": 145147040.0,
+      "start": 11736.305145212
+    },
+    "bg_alive": 8
+  },
+  {
+    "background": "stream",
+    "background_count": 8,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.4826730630011298,
+      "cpu": 0.48265802699999993,
+      "minor_faults": 52240,
+      "rss_kb": 61600,
+      "checksum": 0.0,
+      "start": 11738.662692306
+    },
+    "bg_alive": 8
+  },
+  {
+    "background": "stream",
+    "background_count": 14,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.932601638,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.9471633470002416
+    },
+    "bg_alive": 14
+  },
+  {
+    "background": "stream",
+    "background_count": 14,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 2.317243042998598,
+      "cpu": 2.31259127,
+      "minor_faults": 307,
+      "rss_kb": 54172,
+      "checksum": 145147040.0,
+      "start": 11741.178599786
+    },
+    "bg_alive": 14
+  },
+  {
+    "background": "stream",
+    "background_count": 14,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.8419937990001927,
+      "cpu": 0.8414046649999999,
+      "minor_faults": 93120,
+      "rss_kb": 61708,
+      "checksum": 0.0,
+      "start": 11744.345576272
+    },
+    "bg_alive": 14
+  },
+  {
+    "background": "argpartition",
+    "background_count": 1,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.827902527,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.830415708000146
+    },
+    "bg_alive": 1
+  },
+  {
+    "background": "argpartition",
+    "background_count": 1,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.1035178800011636,
+      "cpu": 1.1035110590000001,
+      "minor_faults": 307,
+      "rss_kb": 54204,
+      "checksum": 145147040.0,
+      "start": 11746.561294423
+    },
+    "bg_alive": 1
+  },
+  {
+    "background": "argpartition",
+    "background_count": 1,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.5608826540010341,
+      "cpu": 0.560878657,
+      "minor_faults": 93120,
+      "rss_kb": 61664,
+      "checksum": 0.0,
+      "start": 11747.857082244
+    },
+    "bg_alive": 1
+  },
+  {
+    "background": "argpartition",
+    "background_count": 2,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.833111248,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.8353392709996115
+    },
+    "bg_alive": 2
+  },
+  {
+    "background": "argpartition",
+    "background_count": 2,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.185077050999098,
+      "cpu": 1.185072549,
+      "minor_faults": 818,
+      "rss_kb": 53860,
+      "checksum": 145147040.0,
+      "start": 11749.625805239
+    },
+    "bg_alive": 2
+  },
+  {
+    "background": "argpartition",
+    "background_count": 2,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.6203012500009208,
+      "cpu": 0.6202980639999999,
+      "minor_faults": 93120,
+      "rss_kb": 61788,
+      "checksum": 0.0,
+      "start": 11751.057751453
+    },
+    "bg_alive": 2
+  },
+  {
+    "background": "argpartition",
+    "background_count": 4,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.835731,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.8375573140001507
+    },
+    "bg_alive": 4
+  },
+  {
+    "background": "argpartition",
+    "background_count": 4,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.5055281699987972,
+      "cpu": 1.5022089049999998,
+      "minor_faults": 818,
+      "rss_kb": 54240,
+      "checksum": 145147040.0,
+      "start": 11752.894081177
+    },
+    "bg_alive": 4
+  },
+  {
+    "background": "argpartition",
+    "background_count": 4,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.6731539990014426,
+      "cpu": 0.673144056,
+      "minor_faults": 93120,
+      "rss_kb": 61640,
+      "checksum": 0.0,
+      "start": 11754.668993102
+    },
+    "bg_alive": 4
+  },
+  {
+    "background": "argpartition",
+    "background_count": 8,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.875868312,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.8780172929982655
+    },
+    "bg_alive": 8
+  },
+  {
+    "background": "argpartition",
+    "background_count": 8,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.388954850999653,
+      "cpu": 1.388903308,
+      "minor_faults": 307,
+      "rss_kb": 53884,
+      "checksum": 145147040.0,
+      "start": 11756.679397409
+    },
+    "bg_alive": 8
+  },
+  {
+    "background": "argpartition",
+    "background_count": 8,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.7055726880007569,
+      "cpu": 0.8234142299999999,
+      "minor_faults": 52240,
+      "rss_kb": 61780,
+      "checksum": 0.0,
+      "start": 11758.344485601
+    },
+    "bg_alive": 8
+  },
+  {
+    "background": "argpartition",
+    "background_count": 14,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.918377297,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.9218832449987531
+    },
+    "bg_alive": 14
+  },
+  {
+    "background": "argpartition",
+    "background_count": 14,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.305283187999521,
+      "cpu": 1.30504642,
+      "minor_faults": 818,
+      "rss_kb": 54056,
+      "checksum": 145147040.0,
+      "start": 11760.550765735
+    },
+    "bg_alive": 14
+  },
+  {
+    "background": "argpartition",
+    "background_count": 14,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.7241292329999851,
+      "cpu": 0.719762326,
+      "minor_faults": 93120,
+      "rss_kb": 61636,
+      "checksum": 0.0,
+      "start": 11762.24996338
+    },
+    "bg_alive": 14
+  },
+  {
+    "background": "double",
+    "background_count": 1,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.835276803,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.8374821439992957
+    },
+    "bg_alive": 1
+  },
+  {
+    "background": "double",
+    "background_count": 1,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.120412922999094,
+      "cpu": 1.120423079,
+      "minor_faults": 818,
+      "rss_kb": 54188,
+      "checksum": 145147040.0,
+      "start": 11764.114010888
+    },
+    "bg_alive": 1
+  },
+  {
+    "background": "double",
+    "background_count": 1,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.5699645019994932,
+      "cpu": 0.6557701160000001,
+      "minor_faults": 93120,
+      "rss_kb": 61672,
+      "checksum": 0.0,
+      "start": 11765.411372634
+    },
+    "bg_alive": 1
+  },
+  {
+    "background": "double",
+    "background_count": 2,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.853948677,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.8554560130014579
+    },
+    "bg_alive": 2
+  },
+  {
+    "background": "double",
+    "background_count": 2,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.1447460500003217,
+      "cpu": 1.144735422,
+      "minor_faults": 307,
+      "rss_kb": 53852,
+      "checksum": 145147040.0,
+      "start": 11767.218194699
+    },
+    "bg_alive": 2
+  },
+  {
+    "background": "double",
+    "background_count": 2,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.614933499999097,
+      "cpu": 0.614929714,
+      "minor_faults": 93120,
+      "rss_kb": 61264,
+      "checksum": 0.0,
+      "start": 11768.607140579
+    },
+    "bg_alive": 2
+  },
+  {
+    "background": "double",
+    "background_count": 4,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.842498437,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.8447938589997648
+    },
+    "bg_alive": 4
+  },
+  {
+    "background": "double",
+    "background_count": 4,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.1660426750004262,
+      "cpu": 1.1660373059999998,
+      "minor_faults": 307,
+      "rss_kb": 53928,
+      "checksum": 145147040.0,
+      "start": 11770.486192818
+    },
+    "bg_alive": 4
+  },
+  {
+    "background": "double",
+    "background_count": 4,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.6143663700004254,
+      "cpu": 0.614285866,
+      "minor_faults": 52240,
+      "rss_kb": 61644,
+      "checksum": 0.0,
+      "start": 11771.921940397
+    },
+    "bg_alive": 4
+  },
+  {
+    "background": "double",
+    "background_count": 8,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.89105947,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.893489063000743
+    },
+    "bg_alive": 8
+  },
+  {
+    "background": "double",
+    "background_count": 8,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.2614860180001415,
+      "cpu": 1.2614547750000003,
+      "minor_faults": 307,
+      "rss_kb": 54044,
+      "checksum": 145147040.0,
+      "start": 11773.882686504
+    },
+    "bg_alive": 8
+  },
+  {
+    "background": "double",
+    "background_count": 8,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.8514012859996001,
+      "cpu": 0.8513583600000001,
+      "minor_faults": 93120,
+      "rss_kb": 61872,
+      "checksum": 0.0,
+      "start": 11775.466364096
+    },
+    "bg_alive": 8
+  },
+  {
+    "background": "double",
+    "background_count": 14,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.913972541,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.91676389299937
+    },
+    "bg_alive": 14
+  },
+  {
+    "background": "double",
+    "background_count": 14,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.2834083630004898,
+      "cpu": 1.282614139,
+      "minor_faults": 307,
+      "rss_kb": 54096,
+      "checksum": 145147040.0,
+      "start": 11777.830494847
+    },
+    "bg_alive": 14
+  },
+  {
+    "background": "double",
+    "background_count": 14,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.8009196490002068,
+      "cpu": 0.8009159709999999,
+      "minor_faults": 93120,
+      "rss_kb": 61612,
+      "checksum": 0.0,
+      "start": 11779.476131067
+    },
+    "bg_alive": 14
+  }
+]

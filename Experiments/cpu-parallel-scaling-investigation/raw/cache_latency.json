@@ -1,0 +1,402 @@
+[
+  {
+    "mib": 1.0,
+    "nodes": 16384,
+    "steps": 15000000,
+    "elapsed_s": 0.092195681,
+    "ns_per_access": 6.1464,
+    "checksum": 11957,
+    "cpu": 0,
+    "trial": 0
+  },
+  {
+    "mib": 4.0,
+    "nodes": 65536,
+    "steps": 15000000,
+    "elapsed_s": 0.147910185,
+    "ns_per_access": 9.8607,
+    "checksum": 37158,
+    "cpu": 0,
+    "trial": 0
+  },
+  {
+    "mib": 8.0,
+    "nodes": 131072,
+    "steps": 15000000,
+    "elapsed_s": 0.155063061,
+    "ns_per_access": 10.3375,
+    "checksum": 65790,
+    "cpu": 0,
+    "trial": 0
+  },
+  {
+    "mib": 16.0,
+    "nodes": 262144,
+    "steps": 15000000,
+    "elapsed_s": 0.255132466,
+    "ns_per_access": 17.0088,
+    "checksum": 122036,
+    "cpu": 0,
+    "trial": 0
+  },
+  {
+    "mib": 24.0,
+    "nodes": 393216,
+    "steps": 15000000,
+    "elapsed_s": 0.42447948,
+    "ns_per_access": 28.2986,
+    "checksum": 218405,
+    "cpu": 0,
+    "trial": 0
+  },
+  {
+    "mib": 32.0,
+    "nodes": 524288,
+    "steps": 15000000,
+    "elapsed_s": 0.694420016,
+    "ns_per_access": 46.2947,
+    "checksum": 53144,
+    "cpu": 0,
+    "trial": 0
+  },
+  {
+    "mib": 48.0,
+    "nodes": 786432,
+    "steps": 15000000,
+    "elapsed_s": 1.190945765,
+    "ns_per_access": 79.3964,
+    "checksum": 322685,
+    "cpu": 0,
+    "trial": 0
+  },
+  {
+    "mib": 64.0,
+    "nodes": 1048576,
+    "steps": 15000000,
+    "elapsed_s": 1.45223419,
+    "ns_per_access": 96.8156,
+    "checksum": 231734,
+    "cpu": 0,
+    "trial": 0
+  },
+  {
+    "mib": 96.0,
+    "nodes": 1572864,
+    "steps": 15000000,
+    "elapsed_s": 1.620796996,
+    "ns_per_access": 108.0531,
+    "checksum": 1233243,
+    "cpu": 0,
+    "trial": 0
+  },
+  {
+    "mib": 128.0,
+    "nodes": 2097152,
+    "steps": 15000000,
+    "elapsed_s": 1.690779332,
+    "ns_per_access": 112.7186,
+    "checksum": 1880425,
+    "cpu": 0,
+    "trial": 0
+  },
+  {
+    "mib": 1.0,
+    "nodes": 16384,
+    "steps": 15000000,
+    "elapsed_s": 0.095005712,
+    "ns_per_access": 6.3337,
+    "checksum": 11957,
+    "cpu": 8,
+    "trial": 0
+  },
+  {
+    "mib": 4.0,
+    "nodes": 65536,
+    "steps": 15000000,
+    "elapsed_s": 0.147755915,
+    "ns_per_access": 9.8504,
+    "checksum": 37158,
+    "cpu": 8,
+    "trial": 0
+  },
+  {
+    "mib": 8.0,
+    "nodes": 131072,
+    "steps": 15000000,
+    "elapsed_s": 0.15562857,
+    "ns_per_access": 10.3752,
+    "checksum": 65790,
+    "cpu": 8,
+    "trial": 0
+  },
+  {
+    "mib": 16.0,
+    "nodes": 262144,
+    "steps": 15000000,
+    "elapsed_s": 0.284183658,
+    "ns_per_access": 18.9456,
+    "checksum": 122036,
+    "cpu": 8,
+    "trial": 0
+  },
+  {
+    "mib": 24.0,
+    "nodes": 393216,
+    "steps": 15000000,
+    "elapsed_s": 0.433227581,
+    "ns_per_access": 28.8818,
+    "checksum": 218405,
+    "cpu": 8,
+    "trial": 0
+  },
+  {
+    "mib": 32.0,
+    "nodes": 524288,
+    "steps": 15000000,
+    "elapsed_s": 0.748978904,
+    "ns_per_access": 49.9319,
+    "checksum": 53144,
+    "cpu": 8,
+    "trial": 0
+  },
+  {
+    "mib": 48.0,
+    "nodes": 786432,
+    "steps": 15000000,
+    "elapsed_s": 1.262986115,
+    "ns_per_access": 84.1991,
+    "checksum": 322685,
+    "cpu": 8,
+    "trial": 0
+  },
+  {
+    "mib": 64.0,
+    "nodes": 1048576,
+    "steps": 15000000,
+    "elapsed_s": 1.44310958,
+    "ns_per_access": 96.2073,
+    "checksum": 231734,
+    "cpu": 8,
+    "trial": 0
+  },
+  {
+    "mib": 96.0,
+    "nodes": 1572864,
+    "steps": 15000000,
+    "elapsed_s": 1.639084305,
+    "ns_per_access": 109.2723,
+    "checksum": 1233243,
+    "cpu": 8,
+    "trial": 0
+  },
+  {
+    "mib": 128.0,
+    "nodes": 2097152,
+    "steps": 15000000,
+    "elapsed_s": 1.735326193,
+    "ns_per_access": 115.6884,
+    "checksum": 1880425,
+    "cpu": 8,
+    "trial": 0
+  },
+  {
+    "mib": 1.0,
+    "nodes": 16384,
+    "steps": 15000000,
+    "elapsed_s": 0.102862907,
+    "ns_per_access": 6.8575,
+    "checksum": 11957,
+    "cpu": 0,
+    "trial": 1
+  },
+  {
+    "mib": 4.0,
+    "nodes": 65536,
+    "steps": 15000000,
+    "elapsed_s": 0.150165016,
+    "ns_per_access": 10.011,
+    "checksum": 37158,
+    "cpu": 0,
+    "trial": 1
+  },
+  {
+    "mib": 8.0,
+    "nodes": 131072,
+    "steps": 15000000,
+    "elapsed_s": 0.158109912,
+    "ns_per_access": 10.5407,
+    "checksum": 65790,
+    "cpu": 0,
+    "trial": 1
+  },
+  {
+    "mib": 16.0,
+    "nodes": 262144,
+    "steps": 15000000,
+    "elapsed_s": 0.278624379,
+    "ns_per_access": 18.575,
+    "checksum": 122036,
+    "cpu": 0,
+    "trial": 1
+  },
+  {
+    "mib": 24.0,
+    "nodes": 393216,
+    "steps": 15000000,
+    "elapsed_s": 0.46334121,
+    "ns_per_access": 30.8894,
+    "checksum": 218405,
+    "cpu": 0,
+    "trial": 1
+  },
+  {
+    "mib": 32.0,
+    "nodes": 524288,
+    "steps": 15000000,
+    "elapsed_s": 0.741638478,
+    "ns_per_access": 49.4426,
+    "checksum": 53144,
+    "cpu": 0,
+    "trial": 1
+  },
+  {
+    "mib": 48.0,
+    "nodes": 786432,
+    "steps": 15000000,
+    "elapsed_s": 1.263346652,
+    "ns_per_access": 84.2231,
+    "checksum": 322685,
+    "cpu": 0,
+    "trial": 1
+  },
+  {
+    "mib": 64.0,
+    "nodes": 1048576,
+    "steps": 15000000,
+    "elapsed_s": 1.451600633,
+    "ns_per_access": 96.7734,
+    "checksum": 231734,
+    "cpu": 0,
+    "trial": 1
+  },
+  {
+    "mib": 96.0,
+    "nodes": 1572864,
+    "steps": 15000000,
+    "elapsed_s": 1.682089882,
+    "ns_per_access": 112.1393,
+    "checksum": 1233243,
+    "cpu": 0,
+    "trial": 1
+  },
+  {
+    "mib": 128.0,
+    "nodes": 2097152,
+    "steps": 15000000,
+    "elapsed_s": 1.713480827,
+    "ns_per_access": 114.2321,
+    "checksum": 1880425,
+    "cpu": 0,
+    "trial": 1
+  },
+  {
+    "mib": 1.0,
+    "nodes": 16384,
+    "steps": 15000000,
+    "elapsed_s": 0.096797717,
+    "ns_per_access": 6.4532,
+    "checksum": 11957,
+    "cpu": 8,
+    "trial": 1
+  },
+  {
+    "mib": 4.0,
+    "nodes": 65536,
+    "steps": 15000000,
+    "elapsed_s": 0.146210451,
+    "ns_per_access": 9.7474,
+    "checksum": 37158,
+    "cpu": 8,
+    "trial": 1
+  },
+  {
+    "mib": 8.0,
+    "nodes": 131072,
+    "steps": 15000000,
+    "elapsed_s": 0.154519874,
+    "ns_per_access": 10.3013,
+    "checksum": 65790,
+    "cpu": 8,
+    "trial": 1
+  },
+  {
+    "mib": 16.0,
+    "nodes": 262144,
+    "steps": 15000000,
+    "elapsed_s": 0.278621737,
+    "ns_per_access": 18.5748,
+    "checksum": 122036,
+    "cpu": 8,
+    "trial": 1
+  },
+  {
+    "mib": 24.0,
+    "nodes": 393216,
+    "steps": 15000000,
+    "elapsed_s": 0.445882558,
+    "ns_per_access": 29.7255,
+    "checksum": 218405,
+    "cpu": 8,
+    "trial": 1
+  },
+  {
+    "mib": 32.0,
+    "nodes": 524288,
+    "steps": 15000000,
+    "elapsed_s": 0.736901445,
+    "ns_per_access": 49.1268,
+    "checksum": 53144,
+    "cpu": 8,
+    "trial": 1
+  },
+  {
+    "mib": 48.0,
+    "nodes": 786432,
+    "steps": 15000000,
+    "elapsed_s": 1.198477099,
+    "ns_per_access": 79.8985,
+    "checksum": 322685,
+    "cpu": 8,
+    "trial": 1
+  },
+  {
+    "mib": 64.0,
+    "nodes": 1048576,
+    "steps": 15000000,
+    "elapsed_s": 1.46154271,
+    "ns_per_access": 97.4362,
+    "checksum": 231734,
+    "cpu": 8,
+    "trial": 1
+  },
+  {
+    "mib": 96.0,
+    "nodes": 1572864,
+    "steps": 15000000,
+    "elapsed_s": 1.644953746,
+    "ns_per_access": 109.6636,
+    "checksum": 1233243,
+    "cpu": 8,
+    "trial": 1
+  },
+  {
+    "mib": 128.0,
+    "nodes": 2097152,
+    "steps": 15000000,
+    "elapsed_s": 1.684617973,
+    "ns_per_access": 112.3079,
+    "checksum": 1880425,
+    "cpu": 8,
+    "trial": 1
+  }
+]

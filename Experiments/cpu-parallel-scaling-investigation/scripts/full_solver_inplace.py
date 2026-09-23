@@ -1,0 +1,193 @@
+#!/usr/bin/env python3
+"""Temporary n=12 direction-process benchmark; changes no repository files."""
+
+from __future__ import annotations
+
+import argparse
+import inspect
+import json
+import multiprocessing as mp
+import os
+import sys
+from concurrent.futures import ProcessPoolExecutor
+from fractions import Fraction
+from pathlib import Path
+
+PACKING_ROOT = Path(__file__).resolve().parents[3] / "packing"
+sys.path.insert(0, str(PACKING_ROOT))
+
+from devtools import bench_colgen  # noqa: E402
+from sqpack.fractional import colgen  # noqa: E402
+from sqpack.fractional.generate import placement_cells  # noqa: E402
+import numpy as np
+_ORIGINAL_ARGPARTITION = np.argpartition
+
+def _selection_patch(array, kth, *args, **kwargs):
+    # Research-only: exact low-value selection with different tie choices.
+    if (isinstance(array, np.ndarray) and array.ndim == 1
+            and array.dtype == np.float64 and array.size > 1_000_000
+            and kth == 12 and not args and not kwargs
+            and np.all((array == 0) | np.isposinf(array))):
+        finite = np.flatnonzero(np.isfinite(array))
+        if finite.size >= 13:
+            return finite[_ORIGINAL_ARGPARTITION(array[finite], 12)[:13]]
+    return _ORIGINAL_ARGPARTITION(array, kth, *args, **kwargs)
+
+if os.environ.get('SQUARES_SELECTION') == 'finite':
+    np.argpartition = _selection_patch
+
+if os.environ.get('SQUARES_CUMSUM_BUFFER') == '1':
+    from collections import OrderedDict
+    from sqpack.fractional import generate as _generate
+    _cache = OrderedDict()
+    def _get_cumsum_buffers(shape):
+        if shape in _cache:
+            _cache.move_to_end(shape)
+            return _cache[shape]
+        buffers = (np.empty(shape, dtype=np.float64), np.empty(shape, dtype=np.float64))
+        _cache[shape] = buffers
+        if len(_cache) > 2:
+            _cache.popitem(last=False)
+        return buffers
+    _generate.__dict__['_get_cumsum_buffers'] = _get_cumsum_buffers
+    _old = '    mass = np.cumsum(np.cumsum(grid, axis=1), axis=0)[:-1, :-1]'
+    _new = ('    _one, _two = _get_cumsum_buffers(grid.shape)\n'
+            '    np.cumsum(grid, axis=1, out=_one)\n'
+            '    np.cumsum(_one, axis=0, out=_two)\n'
+            '    mass = _two[:-1, :-1]')
+    import inspect
+    _source = inspect.getsource(_generate.event_grid)
+    assert _source.count(_old) == 1
+    _scope = {}
+    exec(_source.replace(_old, _new), _generate.__dict__, _scope)
+    _generate.event_grid = _scope['event_grid']
+
+
+if os.environ.get('SQUARES_CUMSUM_INPLACE') == '1':
+    from collections import OrderedDict
+    from sqpack.fractional import generate as _generate
+    _one_cache = OrderedDict()
+    def _get_one_buffer(shape):
+        if shape in _one_cache:
+            _one_cache.move_to_end(shape)
+            return _one_cache[shape]
+        output = np.empty(shape, dtype=np.float64)
+        _one_cache[shape] = output
+        if len(_one_cache) > 2:
+            _one_cache.popitem(last=False)
+        return output
+    _generate.__dict__['_get_one_buffer'] = _get_one_buffer
+    _old = '    mass = np.cumsum(np.cumsum(grid, axis=1), axis=0)[:-1, :-1]'
+    _new = ('    _scratch = _get_one_buffer(grid.shape)\n'
+            '    np.copyto(_scratch, grid)\n'
+            '    np.add.accumulate(_scratch, axis=1, out=_scratch)\n'
+            '    np.add.accumulate(_scratch, axis=0, out=_scratch)\n'
+            '    mass = _scratch[:-1, :-1]')
+    import inspect
+    _source = inspect.getsource(_generate.event_grid)
+    assert _source.count(_old) == 1
+    _scope = {}
+    exec(_source.replace(_old, _new), _generate.__dict__, _scope)
+    _generate.event_grid = _scope['event_grid']
+
+
+def _direction_task(args):
+    points, site_weights, direction, outer, side, keep, clip = args
+    return placement_cells(
+        points, site_weights, direction, outer, side, keep=keep, clip=clip
+    )
+
+
+def _parallel_solve_rows():
+    source = inspect.getsource(colgen.solve_rows)
+    old = """        for index, direction in enumerate(directions):
+            for mass, cu, cv, covers in placement_cells(
+                points,
+                site_weights,
+                direction,
+                outer,
+                side,
+                keep=rows_per_direction,
+                clip=clip,
+            ):
+"""
+    new = """        tasks = (
+            (points, site_weights, direction, outer, side, rows_per_direction, clip)
+            for direction in directions
+        )
+        for index, found in enumerate(_DIRECTION_POOL.map(_direction_task, tasks)):
+            for mass, cu, cv, covers in found:
+"""
+    if source.count(old) != 1:
+        raise RuntimeError("solve_rows direction loop no longer matches this benchmark")
+    namespace = {}
+    exec(source.replace(old, new), colgen.__dict__, namespace)
+    return namespace["solve_rows"]
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--workers", type=int, required=True)
+    parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--pid-file", type=Path)
+    args = parser.parse_args()
+    if args.workers < 1:
+        parser.error("--workers must be positive")
+    if args.pid_file:
+        args.pid_file.write_text(f"{os.getpid()}\n")
+
+    original = bench_colgen.solve_rows
+    parallel = _parallel_solve_rows()
+    captured = {}
+
+    def timed_parallel_solve(*positional, **keywords):
+        # The benchmark's _row_run timer surrounds this whole function. The
+        # pool is created once, reused across rounds, and joined before return.
+        with ProcessPoolExecutor(max_workers=args.workers) as pool:
+            colgen.__dict__["_DIRECTION_POOL"] = pool
+            colgen.__dict__["_direction_task"] = _direction_task
+            try:
+                solution = parallel(*positional, **keywords)
+            finally:
+                del colgen.__dict__["_DIRECTION_POOL"]
+                del colgen.__dict__["_direction_task"]
+        captured["least_covered"] = solution.least_covered
+        captured["round_timings_exact"] = [
+            {
+                "index": t.index,
+                "separation_seconds": t.separation_seconds,
+                "lp_seconds": t.lp_seconds,
+                "rows_held": t.rows_held,
+                "rows_added": t.rows_added,
+                "violated": t.violated,
+                "support": t.support,
+                "objective": t.objective,
+            }
+            for t in keywords["timings"]
+        ]
+        return solution
+
+    bench_colgen.solve_rows = timed_parallel_solve
+    try:
+        case = bench_colgen.Case(n=12, outer_side=Fraction(99, 25))
+        grids = bench_colgen.site_counts_for_side(
+            case.outer_side, case.square_side, inset=case.inset
+        )
+        report = bench_colgen.bench_rounds(case, grids)
+    finally:
+        bench_colgen.solve_rows = original
+    report.update(captured)
+    report["selection"] = os.environ.get("SQUARES_SELECTION", "original")
+    report["cumsum_buffer"] = os.environ.get("SQUARES_CUMSUM_BUFFER", "0")
+    report["cumsum_inplace"] = os.environ.get("SQUARES_CUMSUM_INPLACE", "0")
+    report["workers"] = args.workers
+    report["worker_model"] = "ProcessPoolExecutor over directions"
+    report["start_method"] = mp.get_start_method()
+    report["parent_pid"] = os.getpid()
+    args.out.write_text(json.dumps(report, indent=2) + "\n")
+    print(json.dumps(report, indent=2), flush=True)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

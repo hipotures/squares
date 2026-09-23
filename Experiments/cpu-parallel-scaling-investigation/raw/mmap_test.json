@@ -1,0 +1,218 @@
+[
+  {
+    "op": "argpartition",
+    "mmap": false,
+    "workers": 1,
+    "trial": 0,
+    "cpu_per_call": 0.008473241716666666,
+    "wall_per_call_max": 0.008471608666665513,
+    "faults_mean": 308.0
+  },
+  {
+    "op": "argpartition",
+    "mmap": false,
+    "workers": 1,
+    "trial": 1,
+    "cpu_per_call": 0.008569360066666667,
+    "wall_per_call_max": 0.008567647366665673,
+    "faults_mean": 819.0
+  },
+  {
+    "op": "argpartition",
+    "mmap": false,
+    "workers": 8,
+    "trial": 0,
+    "cpu_per_call": 0.011390803775000001,
+    "wall_per_call_max": 0.01342351741668608,
+    "faults_mean": 435.75
+  },
+  {
+    "op": "argpartition",
+    "mmap": false,
+    "workers": 8,
+    "trial": 1,
+    "cpu_per_call": 0.011285251868750002,
+    "wall_per_call_max": 0.014111928866683835,
+    "faults_mean": 499.625
+  },
+  {
+    "op": "argpartition",
+    "mmap": false,
+    "workers": 16,
+    "trial": 0,
+    "cpu_per_call": 0.010550721483333332,
+    "wall_per_call_max": 0.015594630966673625,
+    "faults_mean": 403.8125
+  },
+  {
+    "op": "argpartition",
+    "mmap": false,
+    "workers": 16,
+    "trial": 1,
+    "cpu_per_call": 0.010420602740625,
+    "wall_per_call_max": 0.016574894299992593,
+    "faults_mean": 499.625
+  },
+  {
+    "op": "argpartition",
+    "mmap": true,
+    "workers": 1,
+    "trial": 0,
+    "cpu_per_call": 0.008248096000000002,
+    "wall_per_call_max": 0.008246957800020027,
+    "faults_mean": 276.0
+  },
+  {
+    "op": "argpartition",
+    "mmap": true,
+    "workers": 1,
+    "trial": 1,
+    "cpu_per_call": 0.008891514250000001,
+    "wall_per_call_max": 0.008890607400007865,
+    "faults_mean": 276.0
+  },
+  {
+    "op": "argpartition",
+    "mmap": true,
+    "workers": 8,
+    "trial": 0,
+    "cpu_per_call": 0.008112161125,
+    "wall_per_call_max": 0.01051242021667349,
+    "faults_mean": 531.5
+  },
+  {
+    "op": "argpartition",
+    "mmap": true,
+    "workers": 8,
+    "trial": 1,
+    "cpu_per_call": 0.008247147129166667,
+    "wall_per_call_max": 0.010952464849985214,
+    "faults_mean": 403.75
+  },
+  {
+    "op": "argpartition",
+    "mmap": true,
+    "workers": 16,
+    "trial": 0,
+    "cpu_per_call": 0.008240339379166666,
+    "wall_per_call_max": 0.013679579516671462,
+    "faults_mean": 499.5625
+  },
+  {
+    "op": "argpartition",
+    "mmap": true,
+    "workers": 16,
+    "trial": 1,
+    "cpu_per_call": 0.008055428644791666,
+    "wall_per_call_max": 0.014123278683352206,
+    "faults_mean": 403.75
+  },
+  {
+    "op": "double",
+    "mmap": false,
+    "workers": 1,
+    "trial": 0,
+    "cpu_per_call": 0.008850443250000001,
+    "wall_per_call_max": 0.00886083718332884,
+    "faults_mean": 69902.0
+  },
+  {
+    "op": "double",
+    "mmap": false,
+    "workers": 1,
+    "trial": 1,
+    "cpu_per_call": 0.008595743116666665,
+    "wall_per_call_max": 0.008648304733317977,
+    "faults_mean": 69901.0
+  },
+  {
+    "op": "double",
+    "mmap": false,
+    "workers": 8,
+    "trial": 0,
+    "cpu_per_call": 0.010679977979166666,
+    "wall_per_call_max": 0.014221464833341694,
+    "faults_mean": 66068.5
+  },
+  {
+    "op": "double",
+    "mmap": false,
+    "workers": 8,
+    "trial": 1,
+    "cpu_per_call": 0.010641225935416667,
+    "wall_per_call_max": 0.012943585216665573,
+    "faults_mean": 66068.5
+  },
+  {
+    "op": "double",
+    "mmap": false,
+    "workers": 16,
+    "trial": 0,
+    "cpu_per_call": 0.0118672812875,
+    "wall_per_call_max": 0.01697412924998692,
+    "faults_mean": 62236.0625
+  },
+  {
+    "op": "double",
+    "mmap": false,
+    "workers": 16,
+    "trial": 1,
+    "cpu_per_call": 0.012228635963541668,
+    "wall_per_call_max": 0.019985064616685123,
+    "faults_mean": 64152.25
+  },
+  {
+    "op": "double",
+    "mmap": true,
+    "workers": 1,
+    "trial": 0,
+    "cpu_per_call": 0.00778518885,
+    "wall_per_call_max": 0.007783771699996578,
+    "faults_mean": 39209.0
+  },
+  {
+    "op": "double",
+    "mmap": true,
+    "workers": 1,
+    "trial": 1,
+    "cpu_per_call": 0.008313204450000002,
+    "wall_per_call_max": 0.008312407566669814,
+    "faults_mean": 69869.0
+  },
+  {
+    "op": "double",
+    "mmap": true,
+    "workers": 8,
+    "trial": 0,
+    "cpu_per_call": 0.009498332377083333,
+    "wall_per_call_max": 0.011341939866664081,
+    "faults_mean": 54539.125
+  },
+  {
+    "op": "double",
+    "mmap": true,
+    "workers": 8,
+    "trial": 1,
+    "cpu_per_call": 0.009875815331250001,
+    "wall_per_call_max": 0.012241228783326126,
+    "faults_mean": 54539.25
+  },
+  {
+    "op": "double",
+    "mmap": true,
+    "workers": 16,
+    "trial": 0,
+    "cpu_per_call": 0.011276009173958332,
+    "wall_per_call_max": 0.016063802883339424,
+    "faults_mean": 62204.0
+  },
+  {
+    "op": "double",
+    "mmap": true,
+    "workers": 16,
+    "trial": 1,
+    "cpu_per_call": 0.011302954567708332,
+    "wall_per_call_max": 0.01694560418330487,
+    "faults_mean": 62202.0625
+  }
+]

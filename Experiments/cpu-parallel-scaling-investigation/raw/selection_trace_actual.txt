@@ -1,0 +1,20 @@
+iter=0 low=0 high=1555008 pivot=inf hh=1185314 new_low=0 new_high=1185313 scans=1555008 swaps=369693
+iter=1 low=0 high=1185313 pivot=0 hh=583510 new_low=0 new_high=583509 scans=1185314 swaps=953203
+iter=2 low=0 high=583509 pivot=0 hh=291754 new_low=0 new_high=291753 scans=583510 swaps=1244957
+iter=3 low=0 high=291753 pivot=0 hh=145876 new_low=0 new_high=145875 scans=291754 swaps=1390833
+iter=4 low=0 high=145875 pivot=0 hh=72937 new_low=0 new_high=72936 scans=145876 swaps=1463770
+iter=5 low=0 high=72936 pivot=0 hh=36468 new_low=0 new_high=36467 scans=72936 swaps=1500237
+iter=6 low=0 high=36467 pivot=0 hh=18233 new_low=0 new_high=18232 scans=36468 swaps=1518470
+iter=7 low=0 high=18232 pivot=0 hh=9116 new_low=0 new_high=9115 scans=18232 swaps=1527585
+iter=8 low=0 high=9115 pivot=0 hh=4557 new_low=0 new_high=4556 scans=9116 swaps=1532142
+iter=9 low=0 high=4556 pivot=0 hh=2278 new_low=0 new_high=2277 scans=4556 swaps=1534419
+iter=10 low=0 high=2277 pivot=0 hh=1138 new_low=0 new_high=1137 scans=2278 swaps=1535557
+iter=11 low=0 high=1137 pivot=0 hh=568 new_low=0 new_high=567 scans=1138 swaps=1536125
+iter=12 low=0 high=567 pivot=0 hh=283 new_low=0 new_high=282 scans=568 swaps=1536408
+iter=13 low=0 high=282 pivot=0 hh=141 new_low=0 new_high=140 scans=282 swaps=1536548
+iter=14 low=0 high=140 pivot=0 hh=70 new_low=0 new_high=69 scans=140 swaps=1536617
+iter=15 low=0 high=69 pivot=0 hh=34 new_low=0 new_high=33 scans=70 swaps=1536651
+iter=16 low=0 high=33 pivot=0 hh=16 new_low=0 new_high=15 scans=34 swaps=1536667
+iter=17 low=0 high=15 pivot=0 hh=7 new_low=9 new_high=15 scans=16 swaps=1536674
+iter=18 low=9 high=15 pivot=0 hh=12 new_low=13 new_high=11 scans=6 swaps=1536676
+final low=13 high=11 iterations=19 swaps=1536676 kth=12

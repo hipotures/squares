@@ -1,0 +1,130 @@
+[
+  {
+    "op": "argpartition",
+    "workers": 8,
+    "pinned": true,
+    "trial": 0,
+    "cpu_per_call": 0.010514944968749999,
+    "wall_per_call_max": 0.010855825250018825
+  },
+  {
+    "op": "argpartition",
+    "workers": 8,
+    "pinned": false,
+    "trial": 1,
+    "cpu_per_call": 0.010601663054166667,
+    "wall_per_call_max": 0.01081060530001802
+  },
+  {
+    "op": "argpartition",
+    "workers": 8,
+    "pinned": false,
+    "trial": 2,
+    "cpu_per_call": 0.010697301035416665,
+    "wall_per_call_max": 0.010964432783324204
+  },
+  {
+    "op": "argpartition",
+    "workers": 8,
+    "pinned": true,
+    "trial": 3,
+    "cpu_per_call": 0.010766786966666667,
+    "wall_per_call_max": 0.010845706633335794
+  },
+  {
+    "op": "argpartition",
+    "workers": 16,
+    "pinned": true,
+    "trial": 0,
+    "cpu_per_call": 0.010529213078124999,
+    "wall_per_call_max": 0.012696768483328924
+  },
+  {
+    "op": "argpartition",
+    "workers": 16,
+    "pinned": false,
+    "trial": 1,
+    "cpu_per_call": 0.010314047974999999,
+    "wall_per_call_max": 0.012377772533333579
+  },
+  {
+    "op": "argpartition",
+    "workers": 16,
+    "pinned": false,
+    "trial": 2,
+    "cpu_per_call": 0.010289846086458334,
+    "wall_per_call_max": 0.012219869049992364
+  },
+  {
+    "op": "argpartition",
+    "workers": 16,
+    "pinned": true,
+    "trial": 3,
+    "cpu_per_call": 0.010405808555208333,
+    "wall_per_call_max": 0.012444533583341884
+  },
+  {
+    "op": "double",
+    "workers": 8,
+    "pinned": true,
+    "trial": 0,
+    "cpu_per_call": 0.010307233666666667,
+    "wall_per_call_max": 0.010721933999987717
+  },
+  {
+    "op": "double",
+    "workers": 8,
+    "pinned": false,
+    "trial": 1,
+    "cpu_per_call": 0.010470009479166665,
+    "wall_per_call_max": 0.0108110621000075
+  },
+  {
+    "op": "double",
+    "workers": 8,
+    "pinned": false,
+    "trial": 2,
+    "cpu_per_call": 0.010347879733333334,
+    "wall_per_call_max": 0.01070152291664878
+  },
+  {
+    "op": "double",
+    "workers": 8,
+    "pinned": true,
+    "trial": 3,
+    "cpu_per_call": 0.010519068797916666,
+    "wall_per_call_max": 0.01069407746666305
+  },
+  {
+    "op": "double",
+    "workers": 16,
+    "pinned": true,
+    "trial": 0,
+    "cpu_per_call": 0.012302880476041667,
+    "wall_per_call_max": 0.01444496845000079
+  },
+  {
+    "op": "double",
+    "workers": 16,
+    "pinned": false,
+    "trial": 1,
+    "cpu_per_call": 0.012534804210416667,
+    "wall_per_call_max": 0.014715764949990747
+  },
+  {
+    "op": "double",
+    "workers": 16,
+    "pinned": false,
+    "trial": 2,
+    "cpu_per_call": 0.012508883002083334,
+    "wall_per_call_max": 0.014968601716676251
+  },
+  {
+    "op": "double",
+    "workers": 16,
+    "pinned": true,
+    "trial": 3,
+    "cpu_per_call": 0.012435369061458333,
+    "wall_per_call_max": 0.014998083233331272
+  }
+]

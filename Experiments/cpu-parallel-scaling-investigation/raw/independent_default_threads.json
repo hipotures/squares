@@ -1,0 +1,1586 @@
+[
+  {
+    "op": "argpartition",
+    "workers": 1,
+    "trial": 0,
+    "makespan": 1.0551544840000133,
+    "cpu_sum": 1.055125163,
+    "calls": 160,
+    "minor_faults": 307,
+    "workers_detail": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 160,
+        "wall": 1.0551544840000133,
+        "cpu": 1.055125163,
+        "minor_faults": 307,
+        "rss_kb": 53892,
+        "checksum": 145147040.0,
+        "start": 11649.398793543
+      }
+    ]
+  },
+  {
+    "op": "argpartition",
+    "workers": 1,
+    "trial": 1,
+    "makespan": 1.0549132859996462,
+    "cpu_sum": 1.0522071830000002,
+    "calls": 160,
+    "minor_faults": 307,
+    "workers_detail": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 160,
+        "wall": 1.0549132859996462,
+        "cpu": 1.0522071830000002,
+        "minor_faults": 307,
+        "rss_kb": 54124,
+        "checksum": 145147040.0,
+        "start": 11650.78650054
+      }
+    ]
+  },
+  {
+    "op": "argpartition",
+    "workers": 2,
+    "trial": 0,
+    "makespan": 0.5462149789982504,
+    "cpu_sum": 1.087821515,
+    "calls": 160,
+    "minor_faults": 1636,
+    "workers_detail": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 80,
+        "wall": 0.5461831489992619,
+        "cpu": 0.5461396599999999,
+        "minor_faults": 818,
+        "rss_kb": 54164,
+        "checksum": 72573520.0,
+        "start": 11652.265835417
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 1,
+        "calls": 80,
+        "wall": 0.5416759939998883,
+        "cpu": 0.5416818550000001,
+        "minor_faults": 818,
+        "rss_kb": 54116,
+        "checksum": 72573520.0,
+        "start": 11652.265803587
+      }
+    ]
+  },
+  {
+    "op": "argpartition",
+    "workers": 2,
+    "trial": 1,
+    "makespan": 0.5535061529990344,
+    "cpu_sum": 1.10307421,
+    "calls": 160,
+    "minor_faults": 1636,
+    "workers_detail": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 80,
+        "wall": 0.5535061529990344,
+        "cpu": 0.553495702,
+        "minor_faults": 818,
+        "rss_kb": 53864,
+        "checksum": 72573520.0,
+        "start": 11653.245264159
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 1,
+        "calls": 80,
+        "wall": 0.5495969870007684,
+        "cpu": 0.549578508,
+        "minor_faults": 818,
+        "rss_kb": 53732,
+        "checksum": 72573520.0,
+        "start": 11653.245264209
+      }
+    ]
+  },
+  {
+    "op": "argpartition",
+    "workers": 4,
+    "trial": 0,
+    "makespan": 0.32914943499963556,
+    "cpu_sum": 1.2729932430000002,
+    "calls": 160,
+    "minor_faults": 1739,
+    "workers_detail": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 40,
+        "wall": 0.316315197998847,
+        "cpu": 0.31630887900000004,
+        "minor_faults": 307,
+        "rss_kb": 53816,
+        "checksum": 36286760.0,
+        "start": 11654.244611521
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 1,
+        "calls": 40,
+        "wall": 0.3260175160012295,
+        "cpu": 0.326022596,
+        "minor_faults": 818,
+        "rss_kb": 53876,
+        "checksum": 36286760.0,
+        "start": 11654.244611601
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 2,
+        "calls": 40,
+        "wall": 0.3291491660002066,
+        "cpu": 0.329153455,
+        "minor_faults": 307,
+        "rss_kb": 53964,
+        "checksum": 36286760.0,
+        "start": 11654.24461179
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 3,
+        "calls": 40,
+        "wall": 0.3015003890013759,
+        "cpu": 0.30150831300000003,
+        "minor_faults": 307,
+        "rss_kb": 53784,
+        "checksum": 36286760.0,
+        "start": 11654.244625201
+      }
+    ]
+  },
+  {
+    "op": "argpartition",
+    "workers": 4,
+    "trial": 1,
+    "makespan": 0.32730194100076915,
+    "cpu_sum": 1.252875185,
+    "calls": 160,
+    "minor_faults": 1228,
+    "workers_detail": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 40,
+        "wall": 0.3007082709991664,
+        "cpu": 0.300687376,
+        "minor_faults": 307,
+        "rss_kb": 53768,
+        "checksum": 36286760.0,
+        "start": 11654.982647991
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 1,
+        "calls": 40,
+        "wall": 0.32011999400128843,
+        "cpu": 0.320116377,
+        "minor_faults": 307,
+        "rss_kb": 54068,
+        "checksum": 36286760.0,
+        "start": 11654.982638991
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 2,
+        "calls": 40,
+        "wall": 0.3047936970015144,
+        "cpu": 0.304785081,
+        "minor_faults": 307,
+        "rss_kb": 54072,
+        "checksum": 36286760.0,
+        "start": 11654.982648041
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 3,
+        "calls": 40,
+        "wall": 0.3272928709993721,
+        "cpu": 0.327286351,
+        "minor_faults": 307,
+        "rss_kb": 54000,
+        "checksum": 36286760.0,
+        "start": 11654.982648061
+      }
+    ]
+  },
+  {
+    "op": "argpartition",
+    "workers": 8,
+    "trial": 0,
+    "makespan": 0.19857725700057927,
+    "cpu_sum": 1.457344897,
+    "calls": 160,
+    "minor_faults": 5011,
+    "workers_detail": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 20,
+        "wall": 0.1751728359995468,
+        "cpu": 0.175180144,
+        "minor_faults": 307,
+        "rss_kb": 53980,
+        "checksum": 18143380.0,
+        "start": 11655.757014437
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 1,
+        "calls": 20,
+        "wall": 0.15500144500038004,
+        "cpu": 0.155009257,
+        "minor_faults": 818,
+        "rss_kb": 53828,
+        "checksum": 18143380.0,
+        "start": 11655.757014367
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 2,
+        "calls": 20,
+        "wall": 0.19509399800153915,
+        "cpu": 0.195052514,
+        "minor_faults": 307,
+        "rss_kb": 53732,
+        "checksum": 18143380.0,
+        "start": 11655.757022867
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 3,
+        "calls": 20,
+        "wall": 0.1606018660004338,
+        "cpu": 0.16061317599999997,
+        "minor_faults": 818,
+        "rss_kb": 54060,
+        "checksum": 18143380.0,
+        "start": 11655.757013687
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 4,
+        "calls": 20,
+        "wall": 0.18211167299887165,
+        "cpu": 0.18212308,
+        "minor_faults": 818,
+        "rss_kb": 53960,
+        "checksum": 18143380.0,
+        "start": 11655.757024357
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 5,
+        "calls": 20,
+        "wall": 0.19224842799849284,
+        "cpu": 0.19225545399999996,
+        "minor_faults": 818,
+        "rss_kb": 54008,
+        "checksum": 18143380.0,
+        "start": 11655.757022367
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 6,
+        "calls": 20,
+        "wall": 0.1985440770004061,
+        "cpu": 0.198549981,
+        "minor_faults": 307,
+        "rss_kb": 54028,
+        "checksum": 18143380.0,
+        "start": 11655.757028827
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 7,
+        "calls": 20,
+        "wall": 0.19855617699977302,
+        "cpu": 0.19856129099999997,
+        "minor_faults": 818,
+        "rss_kb": 53804,
+        "checksum": 18143380.0,
+        "start": 11655.757034767
+      }
+    ]
+  },
+  {
+    "op": "argpartition",
+    "workers": 8,
+    "trial": 1,
+    "makespan": 0.20793314599904988,
+    "cpu_sum": 1.521057448,
+    "calls": 160,
+    "minor_faults": 3989,
+    "workers_detail": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 20,
+        "wall": 0.18559292200006894,
+        "cpu": 0.185579128,
+        "minor_faults": 307,
+        "rss_kb": 53984,
+        "checksum": 18143380.0,
+        "start": 11656.382784106
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 1,
+        "calls": 20,
+        "wall": 0.2079246149987739,
+        "cpu": 0.20782462799999998,
+        "minor_faults": 307,
+        "rss_kb": 53992,
+        "checksum": 18143380.0,
+        "start": 11656.382792357
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 2,
+        "calls": 20,
+        "wall": 0.15861602299992228,
+        "cpu": 0.158623174,
+        "minor_faults": 307,
+        "rss_kb": 53952,
+        "checksum": 18143380.0,
+        "start": 11656.382802676
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 3,
+        "calls": 20,
+        "wall": 0.1890162589988904,
+        "cpu": 0.18893984399999997,
+        "minor_faults": 818,
+        "rss_kb": 53824,
+        "checksum": 18143380.0,
+        "start": 11656.382792397
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 4,
+        "calls": 20,
+        "wall": 0.18316342899925075,
+        "cpu": 0.183177095,
+        "minor_faults": 307,
+        "rss_kb": 53876,
+        "checksum": 18143380.0,
+        "start": 11656.382783826
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 5,
+        "calls": 20,
+        "wall": 0.20537908299957053,
+        "cpu": 0.205386346,
+        "minor_faults": 818,
+        "rss_kb": 54020,
+        "checksum": 18143380.0,
+        "start": 11656.382792377
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 6,
+        "calls": 20,
+        "wall": 0.19037879499956034,
+        "cpu": 0.19029331100000002,
+        "minor_faults": 307,
+        "rss_kb": 53724,
+        "checksum": 18143380.0,
+        "start": 11656.382783857
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 7,
+        "calls": 20,
+        "wall": 0.20129259799978172,
+        "cpu": 0.20123392199999998,
+        "minor_faults": 818,
+        "rss_kb": 53976,
+        "checksum": 18143380.0,
+        "start": 11656.382793117
+      }
+    ]
+  },
+  {
+    "op": "argpartition",
+    "workers": 16,
+    "trial": 0,
+    "makespan": 0.14472631999888108,
+    "cpu_sum": 1.806775741,
+    "calls": 160,
+    "minor_faults": 9000,
+    "workers_detail": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 10,
+        "wall": 0.11916494599972793,
+        "cpu": 0.11908276500000001,
+        "minor_faults": 818,
+        "rss_kb": 54124,
+        "checksum": 9071690.0,
+        "start": 11657.095985039
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 1,
+        "calls": 10,
+        "wall": 0.13217209299909882,
+        "cpu": 0.131781298,
+        "minor_faults": 307,
+        "rss_kb": 54056,
+        "checksum": 9071690.0,
+        "start": 11657.095981909
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 2,
+        "calls": 10,
+        "wall": 0.13861535099931643,
+        "cpu": 0.13852062499999998,
+        "minor_faults": 307,
+        "rss_kb": 53860,
+        "checksum": 9071690.0,
+        "start": 11657.095975729
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 3,
+        "calls": 10,
+        "wall": 0.12675405200025125,
+        "cpu": 0.126621426,
+        "minor_faults": 307,
+        "rss_kb": 54008,
+        "checksum": 9071690.0,
+        "start": 11657.095974579
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 4,
+        "calls": 10,
+        "wall": 0.08149689399942872,
+        "cpu": 0.08148842899999997,
+        "minor_faults": 307,
+        "rss_kb": 53744,
+        "checksum": 9071690.0,
+        "start": 11657.095980309
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 5,
+        "calls": 10,
+        "wall": 0.13211549399966316,
+        "cpu": 0.13201274699999999,
+        "minor_faults": 307,
+        "rss_kb": 53888,
+        "checksum": 9071690.0,
+        "start": 11657.095957399
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 6,
+        "calls": 10,
+        "wall": 0.12774613800138468,
+        "cpu": 0.12759869299999999,
+        "minor_faults": 818,
+        "rss_kb": 54024,
+        "checksum": 9071690.0,
+        "start": 11657.095974019
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 7,
+        "calls": 10,
+        "wall": 0.12215947699951357,
+        "cpu": 0.122058794,
+        "minor_faults": 307,
+        "rss_kb": 53832,
+        "checksum": 9071690.0,
+        "start": 11657.095995919
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 8,
+        "calls": 10,
+        "wall": 0.12556552500063844,
+        "cpu": 0.12493971400000004,
+        "minor_faults": 307,
+        "rss_kb": 54060,
+        "checksum": 9071690.0,
+        "start": 11657.095972309
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 9,
+        "calls": 10,
+        "wall": 0.13032893800118472,
+        "cpu": 0.12954030699999997,
+        "minor_faults": 818,
+        "rss_kb": 53944,
+        "checksum": 9071690.0,
+        "start": 11657.095984409
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 10,
+        "calls": 10,
+        "wall": 0.10535125400019751,
+        "cpu": 0.10517100400000001,
+        "minor_faults": 818,
+        "rss_kb": 53964,
+        "checksum": 9071690.0,
+        "start": 11657.095957419
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 11,
+        "calls": 10,
+        "wall": 0.08325503900050535,
+        "cpu": 0.08325095399999999,
+        "minor_faults": 818,
+        "rss_kb": 53888,
+        "checksum": 9071690.0,
+        "start": 11657.095957429
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 12,
+        "calls": 10,
+        "wall": 0.08127468500060786,
+        "cpu": 0.08051546099999995,
+        "minor_faults": 818,
+        "rss_kb": 53768,
+        "checksum": 9071690.0,
+        "start": 11657.095986989
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 13,
+        "calls": 10,
+        "wall": 0.08040817799883371,
+        "cpu": 0.08040253300000003,
+        "minor_faults": 818,
+        "rss_kb": 54072,
+        "checksum": 9071690.0,
+        "start": 11657.095984289
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 14,
+        "calls": 10,
+        "wall": 0.1446974999998929,
+        "cpu": 0.144310185,
+        "minor_faults": 818,
+        "rss_kb": 54036,
+        "checksum": 9071690.0,
+        "start": 11657.095986219
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 15,
+        "calls": 10,
+        "wall": 0.07956418100002338,
+        "cpu": 0.07948080600000001,
+        "minor_faults": 307,
+        "rss_kb": 54024,
+        "checksum": 9071690.0,
+        "start": 11657.095987279
+      }
+    ]
+  },
+  {
+    "op": "argpartition",
+    "workers": 16,
+    "trial": 1,
+    "makespan": 0.1487714369995956,
+    "cpu_sum": 1.846241271,
+    "calls": 160,
+    "minor_faults": 7467,
+    "workers_detail": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 10,
+        "wall": 0.08307212799991248,
+        "cpu": 0.08208901799999999,
+        "minor_faults": 818,
+        "rss_kb": 54080,
+        "checksum": 9071690.0,
+        "start": 11657.688884251
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 1,
+        "calls": 10,
+        "wall": 0.1296580409998569,
+        "cpu": 0.12857900200000003,
+        "minor_faults": 818,
+        "rss_kb": 53932,
+        "checksum": 9071690.0,
+        "start": 11657.68888388
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 2,
+        "calls": 10,
+        "wall": 0.12191086699931475,
+        "cpu": 0.12172513400000001,
+        "minor_faults": 307,
+        "rss_kb": 53984,
+        "checksum": 9071690.0,
+        "start": 11657.688877531
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 3,
+        "calls": 10,
+        "wall": 0.0808851149995462,
+        "cpu": 0.08088942000000002,
+        "minor_faults": 307,
+        "rss_kb": 53928,
+        "checksum": 9071690.0,
+        "start": 11657.688912771
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 4,
+        "calls": 10,
+        "wall": 0.08136200400076632,
+        "cpu": 0.08136817999999998,
+        "minor_faults": 307,
+        "rss_kb": 53988,
+        "checksum": 9071690.0,
+        "start": 11657.688917491
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 5,
+        "calls": 10,
+        "wall": 0.14227819799998542,
+        "cpu": 0.14198397399999999,
+        "minor_faults": 818,
+        "rss_kb": 54000,
+        "checksum": 9071690.0,
+        "start": 11657.68891886
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 6,
+        "calls": 10,
+        "wall": 0.12763727699893934,
+        "cpu": 0.126005459,
+        "minor_faults": 307,
+        "rss_kb": 54048,
+        "checksum": 9071690.0,
+        "start": 11657.688921991
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 7,
+        "calls": 10,
+        "wall": 0.14871959700030857,
+        "cpu": 0.14404802699999997,
+        "minor_faults": 818,
+        "rss_kb": 53892,
+        "checksum": 9071690.0,
+        "start": 11657.688929371
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 8,
+        "calls": 10,
+        "wall": 0.12419948999922781,
+        "cpu": 0.12399189800000002,
+        "minor_faults": 307,
+        "rss_kb": 54052,
+        "checksum": 9071690.0,
+        "start": 11657.6889183
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 9,
+        "calls": 10,
+        "wall": 0.13742749400080356,
+        "cpu": 0.137201111,
+        "minor_faults": 307,
+        "rss_kb": 54020,
+        "checksum": 9071690.0,
+        "start": 11657.68892906
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 10,
+        "calls": 10,
+        "wall": 0.13698160700005246,
+        "cpu": 0.13672263999999998,
+        "minor_faults": 818,
+        "rss_kb": 54024,
+        "checksum": 9071690.0,
+        "start": 11657.68890524
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 11,
+        "calls": 10,
+        "wall": 0.08057460700001684,
+        "cpu": 0.08057953200000001,
+        "minor_faults": 307,
+        "rss_kb": 53892,
+        "checksum": 9071690.0,
+        "start": 11657.688915771
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 12,
+        "calls": 10,
+        "wall": 0.12716638100027922,
+        "cpu": 0.12622311,
+        "minor_faults": 307,
+        "rss_kb": 54072,
+        "checksum": 9071690.0,
+        "start": 11657.68891966
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 13,
+        "calls": 10,
+        "wall": 0.13119850499970198,
+        "cpu": 0.13109971,
+        "minor_faults": 307,
+        "rss_kb": 54016,
+        "checksum": 9071690.0,
+        "start": 11657.688899191
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 14,
+        "calls": 10,
+        "wall": 0.12293311500070558,
+        "cpu": 0.12272222400000002,
+        "minor_faults": 307,
+        "rss_kb": 53880,
+        "checksum": 9071690.0,
+        "start": 11657.68887756
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 15,
+        "calls": 10,
+        "wall": 0.08106255600068835,
+        "cpu": 0.081012832,
+        "minor_faults": 307,
+        "rss_kb": 53800,
+        "checksum": 9071690.0,
+        "start": 11657.688913
+      }
+    ]
+  },
+  {
+    "op": "double",
+    "workers": 1,
+    "trial": 0,
+    "makespan": 1.0057985210005427,
+    "cpu_sum": 1.0030772900000002,
+    "calls": 160,
+    "minor_faults": 186240,
+    "workers_detail": [
+      {
+        "op": "double",
+        "cpu_pin": 0,
+        "calls": 160,
+        "wall": 1.0057985210005427,
+        "cpu": 1.0030772900000002,
+        "minor_faults": 186240,
+        "rss_kb": 61580,
+        "checksum": 0.0,
+        "start": 11658.192483445
+      }
+    ]
+  },
+  {
+    "op": "double",
+    "workers": 1,
+    "trial": 1,
+    "makespan": 0.9964724540004681,
+    "cpu_sum": 0.996448641,
+    "calls": 160,
+    "minor_faults": 186240,
+    "workers_detail": [
+      {
+        "op": "double",
+        "cpu_pin": 0,
+        "calls": 160,
+        "wall": 0.9964724540004681,
+        "cpu": 0.996448641,
+        "minor_faults": 186240,
+        "rss_kb": 61580,
+        "checksum": 0.0,
+        "start": 11659.581619047
+      }
+    ]
+  },
+  {
+    "op": "double",
+    "workers": 2,
+    "trial": 0,
+    "makespan": 0.5678830160013604,
+    "cpu_sum": 1.070161997,
+    "calls": 160,
+    "minor_faults": 145360,
+    "workers_detail": [
+      {
+        "op": "double",
+        "cpu_pin": 0,
+        "calls": 80,
+        "wall": 0.5023204580011225,
+        "cpu": 0.502286926,
+        "minor_faults": 52240,
+        "rss_kb": 61460,
+        "checksum": 0.0,
+        "start": 11660.96193464
+      },
+      {
+        "op": "double",
+        "cpu_pin": 1,
+        "calls": 80,
+        "wall": 0.5678815260016563,
+        "cpu": 0.5678750709999999,
+        "minor_faults": 93120,
+        "rss_kb": 61352,
+        "checksum": 0.0,
+        "start": 11660.96193613
+      }
+    ]
+  },
+  {
+    "op": "double",
+    "workers": 2,
+    "trial": 1,
+    "makespan": 0.5552641470003437,
+    "cpu_sum": 1.0367642189999997,
+    "calls": 160,
+    "minor_faults": 145360,
+    "workers_detail": [
+      {
+        "op": "double",
+        "cpu_pin": 0,
+        "calls": 80,
+        "wall": 0.5552641470003437,
+        "cpu": 0.5552257679999999,
+        "minor_faults": 93120,
+        "rss_kb": 61592,
+        "checksum": 0.0,
+        "start": 11661.95386416
+      },
+      {
+        "op": "double",
+        "cpu_pin": 1,
+        "calls": 80,
+        "wall": 0.481538977001037,
+        "cpu": 0.4815384509999999,
+        "minor_faults": 52240,
+        "rss_kb": 61472,
+        "checksum": 0.0,
+        "start": 11661.95386448
+      }
+    ]
+  },
+  {
+    "op": "double",
+    "workers": 4,
+    "trial": 0,
+    "makespan": 0.3228145659995789,
+    "cpu_sum": 1.277255703,
+    "calls": 160,
+    "minor_faults": 186240,
+    "workers_detail": [
+      {
+        "op": "double",
+        "cpu_pin": 0,
+        "calls": 40,
+        "wall": 0.319422068001586,
+        "cpu": 0.319405831,
+        "minor_faults": 46560,
+        "rss_kb": 61364,
+        "checksum": 0.0,
+        "start": 11662.951573198
+      },
+      {
+        "op": "double",
+        "cpu_pin": 1,
+        "calls": 40,
+        "wall": 0.3167570469995553,
+        "cpu": 0.31675488,
+        "minor_faults": 46560,
+        "rss_kb": 61260,
+        "checksum": 0.0,
+        "start": 11662.951572518
+      },
+      {
+        "op": "double",
+        "cpu_pin": 2,
+        "calls": 40,
+        "wall": 0.3228145659995789,
+        "cpu": 0.32280979800000004,
+        "minor_faults": 46560,
+        "rss_kb": 61600,
+        "checksum": 0.0,
+        "start": 11662.951572398
+      },
+      {
+        "op": "double",
+        "cpu_pin": 3,
+        "calls": 40,
+        "wall": 0.3182861519999278,
+        "cpu": 0.31828519400000005,
+        "minor_faults": 46560,
+        "rss_kb": 61180,
+        "checksum": 0.0,
+        "start": 11662.951572828
+      }
+    ]
+  },
+  {
+    "op": "double",
+    "workers": 4,
+    "trial": 1,
+    "makespan": 0.32165261000045575,
+    "cpu_sum": 1.266112628,
+    "calls": 160,
+    "minor_faults": 186240,
+    "workers_detail": [
+      {
+        "op": "double",
+        "cpu_pin": 0,
+        "calls": 40,
+        "wall": 0.3142477849996794,
+        "cpu": 0.314254028,
+        "minor_faults": 46560,
+        "rss_kb": 61528,
+        "checksum": 0.0,
+        "start": 11663.693609134
+      },
+      {
+        "op": "double",
+        "cpu_pin": 1,
+        "calls": 40,
+        "wall": 0.314639903999705,
+        "cpu": 0.31464406599999994,
+        "minor_faults": 46560,
+        "rss_kb": 61496,
+        "checksum": 0.0,
+        "start": 11663.693608914
+      },
+      {
+        "op": "double",
+        "cpu_pin": 2,
+        "calls": 40,
+        "wall": 0.321651579999525,
+        "cpu": 0.321656521,
+        "minor_faults": 46560,
+        "rss_kb": 61608,
+        "checksum": 0.0,
+        "start": 11663.693609664
+      },
+      {
+        "op": "double",
+        "cpu_pin": 3,
+        "calls": 40,
+        "wall": 0.31556541100144386,
+        "cpu": 0.31555801299999997,
+        "minor_faults": 46560,
+        "rss_kb": 61616,
+        "checksum": 0.0,
+        "start": 11663.693608634
+      }
+    ]
+  },
+  {
+    "op": "double",
+    "workers": 8,
+    "trial": 0,
+    "makespan": 0.21903027799999109,
+    "cpu_sum": 1.689962833,
+    "calls": 160,
+    "minor_faults": 176020,
+    "workers_detail": [
+      {
+        "op": "double",
+        "cpu_pin": 0,
+        "calls": 20,
+        "wall": 0.21671316599895363,
+        "cpu": 0.21670522600000003,
+        "minor_faults": 23280,
+        "rss_kb": 61652,
+        "checksum": 0.0,
+        "start": 11664.45905216
+      },
+      {
+        "op": "double",
+        "cpu_pin": 1,
+        "calls": 20,
+        "wall": 0.21069176600030914,
+        "cpu": 0.21069652700000002,
+        "minor_faults": 23280,
+        "rss_kb": 61552,
+        "checksum": 0.0,
+        "start": 11664.4590901
+      },
+      {
+        "op": "double",
+        "cpu_pin": 2,
+        "calls": 20,
+        "wall": 0.2110036760004732,
+        "cpu": 0.211009516,
+        "minor_faults": 23280,
+        "rss_kb": 61564,
+        "checksum": 0.0,
+        "start": 11664.45905318
+      },
+      {
+        "op": "double",
+        "cpu_pin": 3,
+        "calls": 20,
+        "wall": 0.21145357400018838,
+        "cpu": 0.211458615,
+        "minor_faults": 23280,
+        "rss_kb": 61512,
+        "checksum": 0.0,
+        "start": 11664.45905829
+      },
+      {
+        "op": "double",
+        "cpu_pin": 4,
+        "calls": 20,
+        "wall": 0.21902673800104822,
+        "cpu": 0.21901406700000003,
+        "minor_faults": 23280,
+        "rss_kb": 61420,
+        "checksum": 0.0,
+        "start": 11664.4590557
+      },
+      {
+        "op": "double",
+        "cpu_pin": 5,
+        "calls": 20,
+        "wall": 0.1992221939999581,
+        "cpu": 0.19923201799999998,
+        "minor_faults": 13060,
+        "rss_kb": 61672,
+        "checksum": 0.0,
+        "start": 11664.45905451
+      },
+      {
+        "op": "double",
+        "cpu_pin": 6,
+        "calls": 20,
+        "wall": 0.21048684699962905,
+        "cpu": 0.210493689,
+        "minor_faults": 23280,
+        "rss_kb": 61196,
+        "checksum": 0.0,
+        "start": 11664.45905221
+      },
+      {
+        "op": "double",
+        "cpu_pin": 7,
+        "calls": 20,
+        "wall": 0.21134886399886454,
+        "cpu": 0.211353175,
+        "minor_faults": 23280,
+        "rss_kb": 61632,
+        "checksum": 0.0,
+        "start": 11664.45906128
+      }
+    ]
+  },
+  {
+    "op": "double",
+    "workers": 8,
+    "trial": 1,
+    "makespan": 0.2142686639999738,
+    "cpu_sum": 1.648764239,
+    "calls": 160,
+    "minor_faults": 165800,
+    "workers_detail": [
+      {
+        "op": "double",
+        "cpu_pin": 0,
+        "calls": 20,
+        "wall": 0.21245816000009654,
+        "cpu": 0.21238179000000001,
+        "minor_faults": 23280,
+        "rss_kb": 61716,
+        "checksum": 0.0,
+        "start": 11665.140986809
+      },
+      {
+        "op": "double",
+        "cpu_pin": 1,
+        "calls": 20,
+        "wall": 0.17973955100023886,
+        "cpu": 0.17972880800000002,
+        "minor_faults": 13060,
+        "rss_kb": 61532,
+        "checksum": 0.0,
+        "start": 11665.140986759
+      },
+      {
+        "op": "double",
+        "cpu_pin": 2,
+        "calls": 20,
+        "wall": 0.2142686240003968,
+        "cpu": 0.21427422499999998,
+        "minor_faults": 23280,
+        "rss_kb": 61628,
+        "checksum": 0.0,
+        "start": 11665.140986739
+      },
+      {
+        "op": "double",
+        "cpu_pin": 3,
+        "calls": 20,
+        "wall": 0.2121787010000844,
+        "cpu": 0.212185902,
+        "minor_faults": 23280,
+        "rss_kb": 61452,
+        "checksum": 0.0,
+        "start": 11665.140986769
+      },
+      {
+        "op": "double",
+        "cpu_pin": 4,
+        "calls": 20,
+        "wall": 0.2126294190002227,
+        "cpu": 0.212634171,
+        "minor_faults": 23280,
+        "rss_kb": 61496,
+        "checksum": 0.0,
+        "start": 11665.141054659
+      },
+      {
+        "op": "double",
+        "cpu_pin": 5,
+        "calls": 20,
+        "wall": 0.21260983999854943,
+        "cpu": 0.21260799,
+        "minor_faults": 23280,
+        "rss_kb": 61476,
+        "checksum": 0.0,
+        "start": 11665.140986779
+      },
+      {
+        "op": "double",
+        "cpu_pin": 6,
+        "calls": 20,
+        "wall": 0.21222463100093591,
+        "cpu": 0.212183712,
+        "minor_faults": 23280,
+        "rss_kb": 61628,
+        "checksum": 0.0,
+        "start": 11665.140986699
+      },
+      {
+        "op": "double",
+        "cpu_pin": 7,
+        "calls": 20,
+        "wall": 0.19278307700005826,
+        "cpu": 0.19276764099999993,
+        "minor_faults": 13060,
+        "rss_kb": 61504,
+        "checksum": 0.0,
+        "start": 11665.140986719
+      }
+    ]
+  },
+  {
+    "op": "double",
+    "workers": 16,
+    "trial": 0,
+    "makespan": 0.158223813999939,
+    "cpu_sum": 1.95923469,
+    "calls": 160,
+    "minor_faults": 160700,
+    "workers_detail": [
+      {
+        "op": "double",
+        "cpu_pin": 0,
+        "calls": 10,
+        "wall": 0.14988679100133595,
+        "cpu": 0.145483103,
+        "minor_faults": 11640,
+        "rss_kb": 61408,
+        "checksum": 0.0,
+        "start": 11665.868671424
+      },
+      {
+        "op": "double",
+        "cpu_pin": 1,
+        "calls": 10,
+        "wall": 0.14185627899860265,
+        "cpu": 0.14152769499999998,
+        "minor_faults": 11640,
+        "rss_kb": 61344,
+        "checksum": 0.0,
+        "start": 11665.868667954
+      },
+      {
+        "op": "double",
+        "cpu_pin": 2,
+        "calls": 10,
+        "wall": 0.1319345930005511,
+        "cpu": 0.13126713,
+        "minor_faults": 6530,
+        "rss_kb": 61352,
+        "checksum": 0.0,
+        "start": 11665.868667974
+      },
+      {
+        "op": "double",
+        "cpu_pin": 3,
+        "calls": 10,
+        "wall": 0.1410300030001963,
+        "cpu": 0.14050181699999997,
+        "minor_faults": 11640,
+        "rss_kb": 61488,
+        "checksum": 0.0,
+        "start": 11665.868717743
+      },
+      {
+        "op": "double",
+        "cpu_pin": 4,
+        "calls": 10,
+        "wall": 0.13220910099880712,
+        "cpu": 0.131910936,
+        "minor_faults": 6530,
+        "rss_kb": 61624,
+        "checksum": 0.0,
+        "start": 11665.868688754
+      },
+      {
+        "op": "double",
+        "cpu_pin": 5,
+        "calls": 10,
+        "wall": 0.08867013899907761,
+        "cpu": 0.08868041400000001,
+        "minor_faults": 6530,
+        "rss_kb": 61612,
+        "checksum": 0.0,
+        "start": 11665.868708194
+      },
+      {
+        "op": "double",
+        "cpu_pin": 6,
+        "calls": 10,
+        "wall": 0.1356134910001856,
+        "cpu": 0.13537103799999997,
+        "minor_faults": 6530,
+        "rss_kb": 61600,
+        "checksum": 0.0,
+        "start": 11665.868688744
+      },
+      {
+        "op": "double",
+        "cpu_pin": 7,
+        "calls": 10,
+        "wall": 0.11550061799971445,
+        "cpu": 0.11550729800000001,
+        "minor_faults": 11640,
+        "rss_kb": 61444,
+        "checksum": 0.0,
+        "start": 11665.868673094
+      },
+      {
+        "op": "double",
+        "cpu_pin": 8,
+        "calls": 10,
+        "wall": 0.10240379300012137,
+        "cpu": 0.10234505399999999,
+        "minor_faults": 11640,
+        "rss_kb": 61520,
+        "checksum": 0.0,
+        "start": 11665.868704563
+      },
+      {
+        "op": "double",
+        "cpu_pin": 9,
+        "calls": 10,
+        "wall": 0.10239622300105111,
+        "cpu": 0.10238285499999997,
+        "minor_faults": 11640,
+        "rss_kb": 61564,
+        "checksum": 0.0,
+        "start": 11665.868705763
+      },
+      {
+        "op": "double",
+        "cpu_pin": 10,
+        "calls": 10,
+        "wall": 0.15820370400069805,
+        "cpu": 0.15663821200000003,
+        "minor_faults": 11640,
+        "rss_kb": 61428,
+        "checksum": 0.0,
+        "start": 11665.868688064
+      },
+      {
+        "op": "double",
+        "cpu_pin": 11,
+        "calls": 10,
+        "wall": 0.13722747400061053,
+        "cpu": 0.13382413499999998,
+        "minor_faults": 11640,
+        "rss_kb": 61520,
+        "checksum": 0.0,
+        "start": 11665.868688924
+      },
+      {
+        "op": "double",
+        "cpu_pin": 12,
+        "calls": 10,
+        "wall": 0.08935719699911715,
+        "cpu": 0.08935388099999997,
+        "minor_faults": 6530,
+        "rss_kb": 61756,
+        "checksum": 0.0,
+        "start": 11665.868688114
+      },
+      {
+        "op": "double",
+        "cpu_pin": 13,
+        "calls": 10,
+        "wall": 0.14084856299996318,
+        "cpu": 0.14033413100000003,
+        "minor_faults": 11650,
+        "rss_kb": 61524,
+        "checksum": 0.0,
+        "start": 11665.868708743
+      },
+      {
+        "op": "double",
+        "cpu_pin": 14,
+        "calls": 10,
+        "wall": 0.10270911299994623,
+        "cpu": 0.102573104,
+        "minor_faults": 11640,
+        "rss_kb": 61528,
+        "checksum": 0.0,
+        "start": 11665.868705963
+      },
+      {
+        "op": "double",
+        "cpu_pin": 15,
+        "calls": 10,
+        "wall": 0.10152544499942451,
+        "cpu": 0.10153388699999999,
+        "minor_faults": 11640,
+        "rss_kb": 61584,
+        "checksum": 0.0,
+        "start": 11665.868688074
+      }
+    ]
+  },
+  {
+    "op": "double",
+    "workers": 16,
+    "trial": 1,
+    "makespan": 0.1536869999999908,
+    "cpu_sum": 1.9893031900000002,
+    "calls": 160,
+    "minor_faults": 155580,
+    "workers_detail": [
+      {
+        "op": "double",
+        "cpu_pin": 0,
+        "calls": 10,
+        "wall": 0.1454854180010443,
+        "cpu": 0.13965074100000002,
+        "minor_faults": 11640,
+        "rss_kb": 61156,
+        "checksum": 0.0,
+        "start": 11666.535114104
+      },
+      {
+        "op": "double",
+        "cpu_pin": 1,
+        "calls": 10,
+        "wall": 0.14820183900155826,
+        "cpu": 0.14635339900000002,
+        "minor_faults": 11640,
+        "rss_kb": 61312,
+        "checksum": 0.0,
+        "start": 11666.535115824
+      },
+      {
+        "op": "double",
+        "cpu_pin": 2,
+        "calls": 10,
+        "wall": 0.14603220499884628,
+        "cpu": 0.145812668,
+        "minor_faults": 11640,
+        "rss_kb": 61724,
+        "checksum": 0.0,
+        "start": 11666.535116475
+      },
+      {
+        "op": "double",
+        "cpu_pin": 3,
+        "calls": 10,
+        "wall": 0.1449575790011295,
+        "cpu": 0.144708072,
+        "minor_faults": 11640,
+        "rss_kb": 61280,
+        "checksum": 0.0,
+        "start": 11666.535091155
+      },
+      {
+        "op": "double",
+        "cpu_pin": 4,
+        "calls": 10,
+        "wall": 0.15364119999867398,
+        "cpu": 0.152368842,
+        "minor_faults": 11640,
+        "rss_kb": 61588,
+        "checksum": 0.0,
+        "start": 11666.535135915
+      },
+      {
+        "op": "double",
+        "cpu_pin": 5,
+        "calls": 10,
+        "wall": 0.0961532460005401,
+        "cpu": 0.09616052600000002,
+        "minor_faults": 6530,
+        "rss_kb": 61724,
+        "checksum": 0.0,
+        "start": 11666.535107204
+      },
+      {
+        "op": "double",
+        "cpu_pin": 6,
+        "calls": 10,
+        "wall": 0.1402772150013334,
+        "cpu": 0.14021620799999998,
+        "minor_faults": 6530,
+        "rss_kb": 61688,
+        "checksum": 0.0,
+        "start": 11666.535090115
+      },
+      {
+        "op": "double",
+        "cpu_pin": 7,
+        "calls": 10,
+        "wall": 0.13522844199906103,
+        "cpu": 0.135113188,
+        "minor_faults": 6530,
+        "rss_kb": 61276,
+        "checksum": 0.0,
+        "start": 11666.535110855
+      },
+      {
+        "op": "double",
+        "cpu_pin": 8,
+        "calls": 10,
+        "wall": 0.09529955799916934,
+        "cpu": 0.095187189,
+        "minor_faults": 6530,
+        "rss_kb": 61612,
+        "checksum": 0.0,
+        "start": 11666.535090175
+      },
+      {
+        "op": "double",
+        "cpu_pin": 9,
+        "calls": 10,
+        "wall": 0.1124107699997694,
+        "cpu": 0.11241678799999999,
+        "minor_faults": 11640,
+        "rss_kb": 61616,
+        "checksum": 0.0,
+        "start": 11666.535122624
+      },
+      {
+        "op": "double",
+        "cpu_pin": 10,
+        "calls": 10,
+        "wall": 0.14597678599966457,
+        "cpu": 0.14572479900000002,
+        "minor_faults": 11640,
+        "rss_kb": 61644,
+        "checksum": 0.0,
+        "start": 11666.535096444
+      },
+      {
+        "op": "double",
+        "cpu_pin": 11,
+        "calls": 10,
+        "wall": 0.09919459299999289,
+        "cpu": 0.09764046200000001,
+        "minor_faults": 6530,
+        "rss_kb": 61696,
+        "checksum": 0.0,
+        "start": 11666.535334635
+      },
+      {
+        "op": "double",
+        "cpu_pin": 12,
+        "calls": 10,
+        "wall": 0.10775763500168978,
+        "cpu": 0.10776505600000003,
+        "minor_faults": 11640,
+        "rss_kb": 61388,
+        "checksum": 0.0,
+        "start": 11666.535107175
+      },
+      {
+        "op": "double",
+        "cpu_pin": 13,
+        "calls": 10,
+        "wall": 0.10916764099965803,
+        "cpu": 0.10914085100000001,
+        "minor_faults": 11640,
+        "rss_kb": 61568,
+        "checksum": 0.0,
+        "start": 11666.535114355
+      },
+      {
+        "op": "double",
+        "cpu_pin": 14,
+        "calls": 10,
+        "wall": 0.13151797499995155,
+        "cpu": 0.13136826100000001,
+        "minor_faults": 11640,
+        "rss_kb": 61676,
+        "checksum": 0.0,
+        "start": 11666.535113855
+      },
+      {
+        "op": "double",
+        "cpu_pin": 15,
+        "calls": 10,
+        "wall": 0.08966536700063443,
+        "cpu": 0.08967613999999999,
+        "minor_faults": 6530,
+        "rss_kb": 61688,
+        "checksum": 0.0,
+        "start": 11666.535090305
+      }
+    ]
+  }
+]

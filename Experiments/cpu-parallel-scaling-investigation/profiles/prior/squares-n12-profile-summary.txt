@@ -1,0 +1,160 @@
+Wed Sep 23 10:59:21 2026    /tmp/squares-n12-profile.pstats
+
+         2579260 function calls (2554910 primitive calls) in 72.183 seconds
+
+   Ordered by: cumulative time
+   List reduced from 2725 to 70 due to restriction <70>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+    553/1    0.009    0.000   72.201   72.201 {built-in method builtins.exec}
+        1    0.000    0.000   72.201   72.201 <string>:1(<module>)
+        1    0.000    0.000   72.201   72.201 <frozen runpy>:206(run_module)
+        1    0.000    0.000   72.201   72.201 <frozen runpy>:65(_run_code)
+        1    0.000    0.000   72.201   72.201 bench_colgen.py:1(<module>)
+        1    0.004    0.004   71.893   71.893 bench_colgen.py:578(main)
+        1    0.006    0.006   71.887   71.887 bench_colgen.py:177(bench_rounds)
+        1    0.000    0.000   71.385   71.385 bench_colgen.py:111(_row_run)
+        1    0.147    0.147   71.286   71.286 colgen.py:487(solve_rows)
+     4163    1.646    0.000   59.403    0.014 generate.py:351(placement_cells)
+    33308    0.017    0.000   55.238    0.002 fromnumeric.py:48(_wrapfunc)
+     4163    0.004    0.000   43.917    0.011 fromnumeric.py:848(argpartition)
+     4163   43.909    0.011   43.909    0.011 {method 'argpartition' of 'numpy.ndarray' objects}
+     4163    1.813    0.000   13.780    0.003 generate.py:277(event_grid)
+       22    0.023    0.001   11.677    0.531 colgen.py:435(solve_lp)
+       22    0.001    0.000   11.621    0.528 _linprog.py:178(linprog)
+       22    0.105    0.005   11.565    0.526 _linprog_highs.py:89(_linprog_highs)
+       22    0.961    0.044   11.137    0.506 _highs_wrapper.py:9(_highs_wrapper)
+     8326    0.004    0.000   11.057    0.001 fromnumeric.py:2876(cumsum)
+     8326   11.046    0.001   11.046    0.001 {method 'cumsum' of 'numpy.ndarray' objects}
+       22    9.853    0.448    9.853    0.448 {built-in method scipy.optimize._highspy._core.run}
+       72    0.001    0.000    0.734    0.010 __init__.py:1(<module>)
+        1    0.003    0.003    0.485    0.485 colgen.py:878(rank_candidates)
+        1    0.372    0.372    0.372    0.372 colgen.py:780(_depths)
+       22    0.316    0.014    0.316    0.014 {built-in method scipy.optimize._highspy._core.passModel}
+    637/9    0.001    0.000    0.307    0.034 <frozen importlib._bootstrap>:1360(_find_and_load)
+    628/9    0.002    0.000    0.307    0.034 <frozen importlib._bootstrap>:1308(_find_and_load_unlocked)
+   601/11    0.001    0.000    0.306    0.028 <frozen importlib._bootstrap>:914(_load_unlocked)
+   504/11    0.001    0.000    0.306    0.028 <frozen importlib._bootstrap_external>:753(exec_module)
+  1906/20    0.003    0.000    0.305    0.015 <frozen importlib._bootstrap>:483(_call_with_frames_removed)
+       22    0.000    0.000    0.259    0.012 _compressed.py:30(__init__)
+    16652    0.006    0.000    0.246    0.000 fromnumeric.py:1459(searchsorted)
+        1    0.000    0.000    0.239    0.239 colgen.py:1(<module>)
+    16652    0.232    0.000    0.232    0.000 {method 'searchsorted' of 'numpy.ndarray' objects}
+       22    0.054    0.002    0.222    0.010 _coo.py:32(__init__)
+    25910    0.175    0.000    0.175    0.000 {method 'at' of 'numpy.ufunc' objects}
+    13673    0.164    0.000    0.164    0.000 {built-in method numpy.zeros}
+  977/242    0.001    0.000    0.155    0.001 {built-in method builtins.__import__}
+  486/225    0.001    0.000    0.147    0.001 <frozen importlib._bootstrap>:1409(_handle_fromlist)
+       23    0.145    0.006    0.145    0.006 {method 'nonzero' of 'numpy.ndarray' objects}
+     8326    0.010    0.000    0.139    0.000 _arraysetops_impl.py:145(unique)
+    64/41    0.000    0.000    0.134    0.003 <frozen importlib._bootstrap_external>:1059(exec_module)
+    64/41    0.009    0.000    0.133    0.003 {built-in method _imp.exec_dynamic}
+     8326    0.053    0.000    0.126    0.000 _arraysetops_impl.py:350(_unique1d)
+     4163    0.049    0.000    0.123    0.000 generate.py:222(v_range)
+        1    0.000    0.000    0.116    0.116 _optimize.py:1(<module>)
+        1    0.000    0.000    0.098    0.098 colgen.py:136(site_set_from_grids)
+        1    0.001    0.001    0.094    0.094 colgen.py:120(site_set_from_points)
+       44    0.087    0.002    0.088    0.002 shape_base.py:218(vstack)
+     1041    0.010    0.000    0.087    0.000 {built-in method builtins.sorted}
+      281    0.000    0.000    0.087    0.000 _docscrape.py:579(__init__)
+5438/4685    0.001    0.000    0.076    0.000 {built-in method builtins.hasattr}
+      281    0.001    0.000    0.075    0.000 _docscrape.py:140(__init__)
+        1    0.051    0.051    0.071    0.071 colgen.py:835(_vertices)
+      199    0.001    0.000    0.067    0.000 _array_api.py:840(decorator)
+        1    0.000    0.000    0.066    0.066 _linprog.py:1(<module>)
+     8727    0.065    0.000    0.065    0.000 {built-in method numpy.array}
+        1    0.000    0.000    0.061    0.061 _linprog_ip.py:1(<module>)
+        1    0.000    0.000    0.061    0.061 _linprog_util.py:1(<module>)
+        1    0.000    0.000    0.061    0.061 _remove_redundancy.py:1(<module>)
+        1    0.000    0.000    0.061    0.061 interpolative.py:1(<module>)
+        1    0.000    0.000    0.060    0.060 _util.py:1(<module>)
+        1    0.000    0.000    0.059    0.059 _array_api.py:1(<module>)
+     4163    0.024    0.000    0.059    0.000 generate.py:142(at)
+      281    0.002    0.000    0.059    0.000 _docscrape.py:388(_parse)
+     8326    0.055    0.000    0.055    0.000 {method 'sort' of 'numpy.ndarray' objects}
+       22    0.000    0.000    0.052    0.002 _linprog_util.py:919(_parse_linprog)
+       22    0.012    0.001    0.051    0.002 _linprog_util.py:213(_clean_inputs)
+    47639    0.007    0.000    0.047    0.000 fractions.py:1043(__lt__)
+        3    0.000    0.000    0.045    0.015 _internal.py:56(clone_module)
+
+
+Wed Sep 23 10:59:21 2026    /tmp/squares-n12-profile.pstats
+
+         2579260 function calls (2554910 primitive calls) in 72.183 seconds
+
+   Ordered by: internal time
+   List reduced from 2725 to 70 due to restriction <70>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+     4163   43.909    0.011   43.909    0.011 {method 'argpartition' of 'numpy.ndarray' objects}
+     8326   11.046    0.001   11.046    0.001 {method 'cumsum' of 'numpy.ndarray' objects}
+       22    9.853    0.448    9.853    0.448 {built-in method scipy.optimize._highspy._core.run}
+     4163    1.813    0.000   13.780    0.003 generate.py:277(event_grid)
+     4163    1.646    0.000   59.403    0.014 generate.py:351(placement_cells)
+       22    0.961    0.044   11.137    0.506 _highs_wrapper.py:9(_highs_wrapper)
+        1    0.372    0.372    0.372    0.372 colgen.py:780(_depths)
+       22    0.316    0.014    0.316    0.014 {built-in method scipy.optimize._highspy._core.passModel}
+    16652    0.232    0.000    0.232    0.000 {method 'searchsorted' of 'numpy.ndarray' objects}
+    25910    0.175    0.000    0.175    0.000 {method 'at' of 'numpy.ufunc' objects}
+    13673    0.164    0.000    0.164    0.000 {built-in method numpy.zeros}
+        1    0.147    0.147   71.286   71.286 colgen.py:487(solve_rows)
+       23    0.145    0.006    0.145    0.006 {method 'nonzero' of 'numpy.ndarray' objects}
+       22    0.105    0.005   11.565    0.526 _linprog_highs.py:89(_linprog_highs)
+       44    0.087    0.002    0.088    0.002 shape_base.py:218(vstack)
+     8727    0.065    0.000    0.065    0.000 {built-in method numpy.array}
+     8326    0.055    0.000    0.055    0.000 {method 'sort' of 'numpy.ndarray' objects}
+       22    0.054    0.002    0.222    0.010 _coo.py:32(__init__)
+     8326    0.053    0.000    0.126    0.000 _arraysetops_impl.py:350(_unique1d)
+        1    0.051    0.051    0.071    0.071 colgen.py:835(_vertices)
+     4163    0.049    0.000    0.123    0.000 generate.py:222(v_range)
+     8326    0.042    0.000    0.042    0.000 generate.py:202(_floor)
+       22    0.035    0.002    0.035    0.002 {built-in method scipy.sparse._sparsetools.coo_tocsr}
+    43046    0.035    0.000    0.035    0.000 {method 'reduce' of 'numpy.ufunc' objects}
+     8326    0.031    0.000    0.031    0.000 generate.py:213(_ceiling)
+     4165    0.030    0.000    0.030    0.000 {method 'argsort' of 'numpy.ndarray' objects}
+     4163    0.024    0.000    0.059    0.000 generate.py:142(at)
+       22    0.023    0.001   11.677    0.531 colgen.py:435(solve_lp)
+      505    0.021    0.000    0.021    0.000 {built-in method marshal.loads}
+    48929    0.019    0.000    0.041    0.000 fractions.py:1021(_richcmp)
+   150972    0.017    0.000    0.037    0.000 {built-in method builtins.isinstance}
+    33308    0.017    0.000   55.238    0.002 fromnumeric.py:48(_wrapfunc)
+      110    0.014    0.000    0.014    0.000 {method 'astype' of 'numpy.ndarray' objects}
+    54233    0.014    0.000    0.033    0.000 fractions.py:1000(__eq__)
+       64    0.013    0.000    0.013    0.000 {built-in method _imp.create_dynamic}
+       22    0.012    0.001    0.051    0.002 _linprog_util.py:213(_clean_inputs)
+     9258    0.012    0.000    0.018    0.000 colgen.py:357(add)
+    29076    0.011    0.000    0.015    0.000 numbers.py:317(__float__)
+   107466    0.011    0.000    0.020    0.000 <frozen abc>:117(__instancecheck__)
+     1041    0.010    0.000    0.087    0.000 {built-in method builtins.sorted}
+     8326    0.010    0.000    0.139    0.000 _arraysetops_impl.py:145(unique)
+165102/163606    0.010    0.000    0.010    0.000 {built-in method builtins.len}
+      689    0.009    0.000    0.017    0.000 inspect.py:795(cleandoc)
+    553/1    0.009    0.000   72.201   72.201 {built-in method builtins.exec}
+    64/41    0.009    0.000    0.133    0.003 {built-in method _imp.exec_dynamic}
+   107466    0.008    0.000    0.009    0.000 {built-in method _abc._abc_instancecheck}
+    12489    0.008    0.000    0.010    0.000 generate.py:238(u_chord)
+     2542    0.008    0.000    0.014    0.000 textwrap.py:416(dedent)
+    89456    0.008    0.000    0.008    0.000 {built-in method builtins.min}
+54943/54930    0.008    0.000    0.008    0.000 {built-in method builtins.getattr}
+    47639    0.007    0.000    0.047    0.000 fractions.py:1043(__lt__)
+    21747    0.007    0.000    0.026    0.000 {method 'sum' of 'numpy.ndarray' objects}
+   130121    0.007    0.000    0.007    0.000 fractions.py:441(numerator)
+     3941    0.007    0.000    0.014    0.000 _docscrape.py:168(_is_at_section)
+    16652    0.006    0.000    0.246    0.000 fromnumeric.py:1459(searchsorted)
+    68225    0.006    0.000    0.006    0.000 {method 'append' of 'list' objects}
+    41522    0.006    0.000    0.007    0.000 {built-in method builtins.max}
+     4946    0.006    0.000    0.015    0.000 _docscrape.py:67(read_to_condition)
+     2196    0.006    0.000    0.006    0.000 {built-in method posix.stat}
+        1    0.006    0.006   71.887   71.887 bench_colgen.py:177(bench_rounds)
+    16453    0.005    0.000    0.006    0.000 fractions.py:361(_from_coprime_ints)
+  810/803    0.005    0.000    0.032    0.000 {built-in method builtins.__build_class__}
+      505    0.005    0.000    0.005    0.000 {method 'read' of '_io.BufferedReader' objects}
+  749/115    0.004    0.000    0.012    0.000 _parser.py:512(_parse)
+    21747    0.004    0.000    0.020    0.000 _methods.py:47(_sum)
+     8326    0.004    0.000   11.057    0.001 fromnumeric.py:2876(cumsum)
+    82003    0.004    0.000    0.004    0.000 fractions.py:445(denominator)
+     8326    0.004    0.000    0.004    0.000 {method 'flatten' of 'numpy.ndarray' objects}
+     4163    0.004    0.000   43.917    0.011 fromnumeric.py:848(argpartition)
+        1    0.004    0.004   71.893   71.893 bench_colgen.py:578(main)
+
+

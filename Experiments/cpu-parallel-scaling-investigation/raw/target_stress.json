@@ -1,0 +1,1406 @@
+[
+  {
+    "background": "idle",
+    "background_count": 0,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.817392493,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.8190181680001842
+    },
+    "bg_alive": 0
+  },
+  {
+    "background": "idle",
+    "background_count": 0,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.0881824030002463,
+      "cpu": 1.0882176239999999,
+      "thread_cpu": 1.088218725,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 818,
+      "rss_kb": 54020,
+      "checksum": 145147040.0,
+      "start": 12165.500242902
+    },
+    "bg_alive": 0
+  },
+  {
+    "background": "idle",
+    "background_count": 0,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.48953454900038196,
+      "cpu": 0.489566059,
+      "thread_cpu": 0.48956627,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61648,
+      "checksum": 0.0,
+      "start": 12166.657170519
+    },
+    "bg_alive": 0
+  },
+  {
+    "background": "idle",
+    "background_count": 1,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.80970321,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.8111741050015553
+    },
+    "bg_alive": 1
+  },
+  {
+    "background": "idle",
+    "background_count": 1,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.0652241120005783,
+      "cpu": 1.065200236,
+      "thread_cpu": 1.065201077,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 307,
+      "rss_kb": 54060,
+      "checksum": 145147040.0,
+      "start": 12168.034659039
+    },
+    "bg_alive": 1
+  },
+  {
+    "background": "idle",
+    "background_count": 1,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.5049710669991327,
+      "cpu": 0.502290556,
+      "thread_cpu": 0.502290225,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61620,
+      "checksum": 0.0,
+      "start": 12169.172567711
+    },
+    "bg_alive": 1
+  },
+  {
+    "background": "idle",
+    "background_count": 2,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.804075658,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.8055754030010576
+    },
+    "bg_alive": 2
+  },
+  {
+    "background": "idle",
+    "background_count": 2,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.0560467329996754,
+      "cpu": 1.056043949,
+      "thread_cpu": 1.056044599,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 818,
+      "rss_kb": 54028,
+      "checksum": 145147040.0,
+      "start": 12170.557326307
+    },
+    "bg_alive": 2
+  },
+  {
+    "background": "idle",
+    "background_count": 2,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.5184035990005214,
+      "cpu": 0.515705539,
+      "thread_cpu": 0.5157061789999999,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61668,
+      "checksum": 0.0,
+      "start": 12171.697785831
+    },
+    "bg_alive": 2
+  },
+  {
+    "background": "idle",
+    "background_count": 4,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.808693713,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.8102175580006588
+    },
+    "bg_alive": 4
+  },
+  {
+    "background": "idle",
+    "background_count": 4,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.065388602000894,
+      "cpu": 1.062583127,
+      "thread_cpu": 1.062583786,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 307,
+      "rss_kb": 53872,
+      "checksum": 145147040.0,
+      "start": 12173.099547146
+    },
+    "bg_alive": 4
+  },
+  {
+    "background": "idle",
+    "background_count": 4,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.5021563449990936,
+      "cpu": 0.502209287,
+      "thread_cpu": 0.502209525,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61692,
+      "checksum": 0.0,
+      "start": 12174.236084374
+    },
+    "bg_alive": 4
+  },
+  {
+    "background": "idle",
+    "background_count": 8,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.802177136,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.8035426209989964
+    },
+    "bg_alive": 8
+  },
+  {
+    "background": "idle",
+    "background_count": 8,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.0730878740014305,
+      "cpu": 1.070338247,
+      "thread_cpu": 1.070339487,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 307,
+      "rss_kb": 54000,
+      "checksum": 145147040.0,
+      "start": 12175.61779223
+    },
+    "bg_alive": 8
+  },
+  {
+    "background": "idle",
+    "background_count": 8,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.5123704720008391,
+      "cpu": 0.5123926000000001,
+      "thread_cpu": 0.5123925389999999,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61660,
+      "checksum": 0.0,
+      "start": 12176.783918174
+    },
+    "bg_alive": 8
+  },
+  {
+    "background": "idle",
+    "background_count": 14,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.8180896,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.8194334460004029
+    },
+    "bg_alive": 14
+  },
+  {
+    "background": "idle",
+    "background_count": 14,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.0596154809991276,
+      "cpu": 1.056895254,
+      "thread_cpu": 1.056895704,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 818,
+      "rss_kb": 54080,
+      "checksum": 145147040.0,
+      "start": 12178.197882319
+    },
+    "bg_alive": 14
+  },
+  {
+    "background": "idle",
+    "background_count": 14,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.44716867500028457,
+      "cpu": 0.447240452,
+      "thread_cpu": 0.447240853,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 52241,
+      "rss_kb": 61696,
+      "checksum": 0.0,
+      "start": 12179.33326872
+    },
+    "bg_alive": 14
+  },
+  {
+    "background": "compute",
+    "background_count": 1,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.816643266,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.8178604010008712
+    },
+    "bg_alive": 1
+  },
+  {
+    "background": "compute",
+    "background_count": 1,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.0791130739999062,
+      "cpu": 1.0764176460000001,
+      "thread_cpu": 1.076419056,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 818,
+      "rss_kb": 53832,
+      "checksum": 145147040.0,
+      "start": 12180.676978997
+    },
+    "bg_alive": 1
+  },
+  {
+    "background": "compute",
+    "background_count": 1,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.49984105399926193,
+      "cpu": 0.499889636,
+      "thread_cpu": 0.499889686,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61600,
+      "checksum": 0.0,
+      "start": 12181.844512877
+    },
+    "bg_alive": 1
+  },
+  {
+    "background": "compute",
+    "background_count": 2,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.812679429,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.8138619250003103
+    },
+    "bg_alive": 2
+  },
+  {
+    "background": "compute",
+    "background_count": 2,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.0661866199989163,
+      "cpu": 1.0635419000000002,
+      "thread_cpu": 1.063542561,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 307,
+      "rss_kb": 53860,
+      "checksum": 145147040.0,
+      "start": 12183.23268742
+    },
+    "bg_alive": 2
+  },
+  {
+    "background": "compute",
+    "background_count": 2,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.4948790310008917,
+      "cpu": 0.49493329900000005,
+      "thread_cpu": 0.49493340099999994,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61676,
+      "checksum": 0.0,
+      "start": 12184.374818818
+    },
+    "bg_alive": 2
+  },
+  {
+    "background": "compute",
+    "background_count": 4,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.82116474,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.822408304999044
+    },
+    "bg_alive": 4
+  },
+  {
+    "background": "compute",
+    "background_count": 4,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.100429461001113,
+      "cpu": 1.097699398,
+      "thread_cpu": 1.097700207,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 307,
+      "rss_kb": 53856,
+      "checksum": 145147040.0,
+      "start": 12185.771349853
+    },
+    "bg_alive": 4
+  },
+  {
+    "background": "compute",
+    "background_count": 4,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.5136570550002943,
+      "cpu": 0.513729565,
+      "thread_cpu": 0.513729496,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61612,
+      "checksum": 0.0,
+      "start": 12186.956446884
+    },
+    "bg_alive": 4
+  },
+  {
+    "background": "compute",
+    "background_count": 8,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.890198532,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.8915752980010438
+    },
+    "bg_alive": 8
+  },
+  {
+    "background": "compute",
+    "background_count": 8,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.189158156999838,
+      "cpu": 1.1865030429999999,
+      "thread_cpu": 1.186503613,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 818,
+      "rss_kb": 53916,
+      "checksum": 145147040.0,
+      "start": 12188.444034995
+    },
+    "bg_alive": 8
+  },
+  {
+    "background": "compute",
+    "background_count": 8,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.5404410940009257,
+      "cpu": 0.54050208,
+      "thread_cpu": 0.540502539,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61628,
+      "checksum": 0.0,
+      "start": 12189.709823239
+    },
+    "bg_alive": 8
+  },
+  {
+    "background": "compute",
+    "background_count": 14,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.872427064,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.8742905670005712
+    },
+    "bg_alive": 14
+  },
+  {
+    "background": "compute",
+    "background_count": 14,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.1525146219992166,
+      "cpu": 1.151544738,
+      "thread_cpu": 1.151545128,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 818,
+      "rss_kb": 54084,
+      "checksum": 145147040.0,
+      "start": 12191.212535139
+    },
+    "bg_alive": 14
+  },
+  {
+    "background": "compute",
+    "background_count": 14,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.5392832880006608,
+      "cpu": 0.539194881,
+      "thread_cpu": 0.539194751,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61556,
+      "checksum": 0.0,
+      "start": 12192.449163112
+    },
+    "bg_alive": 14
+  },
+  {
+    "background": "stream",
+    "background_count": 1,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.810599276,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.8130823580013384
+    },
+    "bg_alive": 1
+  },
+  {
+    "background": "stream",
+    "background_count": 1,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.1825368789995991,
+      "cpu": 1.182624506,
+      "thread_cpu": 1.182625556,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 818,
+      "rss_kb": 53984,
+      "checksum": 145147040.0,
+      "start": 12194.497728558
+    },
+    "bg_alive": 1
+  },
+  {
+    "background": "stream",
+    "background_count": 1,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.698550120998334,
+      "cpu": 0.698656484,
+      "thread_cpu": 0.698657664,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61632,
+      "checksum": 0.0,
+      "start": 12196.076535366
+    },
+    "bg_alive": 1
+  },
+  {
+    "background": "stream",
+    "background_count": 2,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.835373202,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.8386402500000258
+    },
+    "bg_alive": 2
+  },
+  {
+    "background": "stream",
+    "background_count": 2,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.5740622640005313,
+      "cpu": 1.574284748,
+      "thread_cpu": 1.5742878169999999,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 818,
+      "rss_kb": 54040,
+      "checksum": 145147040.0,
+      "start": 12198.364988278
+    },
+    "bg_alive": 2
+  },
+  {
+    "background": "stream",
+    "background_count": 2,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.7678504830000747,
+      "cpu": 0.768044466,
+      "thread_cpu": 0.768045377,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 52241,
+      "rss_kb": 61804,
+      "checksum": 0.0,
+      "start": 12200.406379508
+    },
+    "bg_alive": 2
+  },
+  {
+    "background": "stream",
+    "background_count": 4,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.836920446,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.8439065310012666
+    },
+    "bg_alive": 4
+  },
+  {
+    "background": "stream",
+    "background_count": 4,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 2.51485058399885,
+      "cpu": 2.5151403489999997,
+      "thread_cpu": 2.5151431779999998,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 307,
+      "rss_kb": 53976,
+      "checksum": 145147040.0,
+      "start": 12202.844567885
+    },
+    "bg_alive": 4
+  },
+  {
+    "background": "stream",
+    "background_count": 4,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.9527121790015372,
+      "cpu": 0.952913426,
+      "thread_cpu": 0.9529248459999999,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 52241,
+      "rss_kb": 61796,
+      "checksum": 0.0,
+      "start": 12205.852274537
+    },
+    "bg_alive": 4
+  },
+  {
+    "background": "stream",
+    "background_count": 8,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.901815252,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.9104933030012035
+    },
+    "bg_alive": 8
+  },
+  {
+    "background": "stream",
+    "background_count": 8,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.5199588209998183,
+      "cpu": 1.520076331,
+      "thread_cpu": 1.5200763019999999,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 307,
+      "rss_kb": 53984,
+      "checksum": 145147040.0,
+      "start": 12208.606078931
+    },
+    "bg_alive": 8
+  },
+  {
+    "background": "stream",
+    "background_count": 8,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.5245137990004878,
+      "cpu": 0.5245778759999999,
+      "thread_cpu": 0.5245854860000001,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 52241,
+      "rss_kb": 61640,
+      "checksum": 0.0,
+      "start": 12210.55158772
+    },
+    "bg_alive": 8
+  },
+  {
+    "background": "stream",
+    "background_count": 14,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.948391703,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.9671485480012052
+    },
+    "bg_alive": 14
+  },
+  {
+    "background": "stream",
+    "background_count": 14,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 2.175461090000681,
+      "cpu": 2.166014737,
+      "thread_cpu": 2.166021777,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 307,
+      "rss_kb": 54056,
+      "checksum": 145147040.0,
+      "start": 12213.208972945
+    },
+    "bg_alive": 14
+  },
+  {
+    "background": "stream",
+    "background_count": 14,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 1.0152005449999706,
+      "cpu": 1.004597612,
+      "thread_cpu": 1.0046063099999998,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61524,
+      "checksum": 0.0,
+      "start": 12216.359909094
+    },
+    "bg_alive": 14
+  },
+  {
+    "background": "argpartition",
+    "background_count": 1,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.846602803,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.8482767870009411
+    },
+    "bg_alive": 1
+  },
+  {
+    "background": "argpartition",
+    "background_count": 1,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.095714308999959,
+      "cpu": 1.095803137,
+      "thread_cpu": 1.095803497,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 818,
+      "rss_kb": 54140,
+      "checksum": 145147040.0,
+      "start": 12218.705710339
+    },
+    "bg_alive": 1
+  },
+  {
+    "background": "argpartition",
+    "background_count": 1,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.555834312001025,
+      "cpu": 0.555942654,
+      "thread_cpu": 0.5559427149999999,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61656,
+      "checksum": 0.0,
+      "start": 12219.936842942
+    },
+    "bg_alive": 1
+  },
+  {
+    "background": "argpartition",
+    "background_count": 2,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.814452663,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.8167421960006322
+    },
+    "bg_alive": 2
+  },
+  {
+    "background": "argpartition",
+    "background_count": 2,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.1432900429990696,
+      "cpu": 1.143427396,
+      "thread_cpu": 1.143426936,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 307,
+      "rss_kb": 54116,
+      "checksum": 145147040.0,
+      "start": 12221.516394279
+    },
+    "bg_alive": 2
+  },
+  {
+    "background": "argpartition",
+    "background_count": 2,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.5442748100012977,
+      "cpu": 0.544392585,
+      "thread_cpu": 0.544392496,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 52241,
+      "rss_kb": 61700,
+      "checksum": 0.0,
+      "start": 12222.802484032
+    },
+    "bg_alive": 2
+  },
+  {
+    "background": "argpartition",
+    "background_count": 4,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.835014412,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.836894994999966
+    },
+    "bg_alive": 4
+  },
+  {
+    "background": "argpartition",
+    "background_count": 4,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.338561454000228,
+      "cpu": 1.3386485590000001,
+      "thread_cpu": 1.338648589,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 818,
+      "rss_kb": 53980,
+      "checksum": 145147040.0,
+      "start": 12224.418540942
+    },
+    "bg_alive": 4
+  },
+  {
+    "background": "argpartition",
+    "background_count": 4,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.6160017550009798,
+      "cpu": 0.616113799,
+      "thread_cpu": 0.6161139899999999,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 52241,
+      "rss_kb": 61844,
+      "checksum": 0.0,
+      "start": 12225.932662123
+    },
+    "bg_alive": 4
+  },
+  {
+    "background": "argpartition",
+    "background_count": 8,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.874911755,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.8790248209988931
+    },
+    "bg_alive": 8
+  },
+  {
+    "background": "argpartition",
+    "background_count": 8,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.779183180000473,
+      "cpu": 1.779273123,
+      "thread_cpu": 1.779273574,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 307,
+      "rss_kb": 54140,
+      "checksum": 145147040.0,
+      "start": 12227.725239348
+    },
+    "bg_alive": 8
+  },
+  {
+    "background": "argpartition",
+    "background_count": 8,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.8046683970005688,
+      "cpu": 0.804969266,
+      "thread_cpu": 0.804968126,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61756,
+      "checksum": 0.0,
+      "start": 12229.697809094
+    },
+    "bg_alive": 8
+  },
+  {
+    "background": "argpartition",
+    "background_count": 14,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.880799005,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.8857761880008184
+    },
+    "bg_alive": 14
+  },
+  {
+    "background": "argpartition",
+    "background_count": 14,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.873573707000105,
+      "cpu": 1.870109531,
+      "thread_cpu": 1.8701095310000002,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 307,
+      "rss_kb": 53956,
+      "checksum": 145147040.0,
+      "start": 12231.79252412
+    },
+    "bg_alive": 14
+  },
+  {
+    "background": "argpartition",
+    "background_count": 14,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.866445735000525,
+      "cpu": 0.866808401,
+      "thread_cpu": 0.866808351,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61852,
+      "checksum": 0.0,
+      "start": 12233.937353955
+    },
+    "bg_alive": 14
+  },
+  {
+    "background": "double",
+    "background_count": 1,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.828085426,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.8301594889999251
+    },
+    "bg_alive": 1
+  },
+  {
+    "background": "double",
+    "background_count": 1,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.1088512429996626,
+      "cpu": 1.108943419,
+      "thread_cpu": 1.108943829,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 818,
+      "rss_kb": 53984,
+      "checksum": 145147040.0,
+      "start": 12235.854783131
+    },
+    "bg_alive": 1
+  },
+  {
+    "background": "double",
+    "background_count": 1,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.5453491570006008,
+      "cpu": 0.545450521,
+      "thread_cpu": 0.545450903,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61648,
+      "checksum": 0.0,
+      "start": 12237.09861299
+    },
+    "bg_alive": 1
+  },
+  {
+    "background": "double",
+    "background_count": 2,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.818061702,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.820253463998597
+    },
+    "bg_alive": 2
+  },
+  {
+    "background": "double",
+    "background_count": 2,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.1121255720008776,
+      "cpu": 1.112239178,
+      "thread_cpu": 1.1122402279999999,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 307,
+      "rss_kb": 54012,
+      "checksum": 145147040.0,
+      "start": 12238.672884954
+    },
+    "bg_alive": 2
+  },
+  {
+    "background": "double",
+    "background_count": 2,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.5988217029989755,
+      "cpu": 0.598930192,
+      "thread_cpu": 0.598931311,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61632,
+      "checksum": 0.0,
+      "start": 12239.923286011
+    },
+    "bg_alive": 2
+  },
+  {
+    "background": "double",
+    "background_count": 4,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.842294597,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.8443741900009627
+    },
+    "bg_alive": 4
+  },
+  {
+    "background": "double",
+    "background_count": 4,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.22046256899921,
+      "cpu": 1.22060597,
+      "thread_cpu": 1.22060703,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 307,
+      "rss_kb": 53944,
+      "checksum": 145147040.0,
+      "start": 12241.617021975
+    },
+    "bg_alive": 4
+  },
+  {
+    "background": "double",
+    "background_count": 4,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.6836825609989319,
+      "cpu": 0.683862418,
+      "thread_cpu": 0.683863068,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61776,
+      "checksum": 0.0,
+      "start": 12243.007894259
+    },
+    "bg_alive": 4
+  },
+  {
+    "background": "double",
+    "background_count": 8,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.899019033,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.9013515650003683
+    },
+    "bg_alive": 8
+  },
+  {
+    "background": "double",
+    "background_count": 8,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.217118570999446,
+      "cpu": 1.217150572,
+      "thread_cpu": 1.217150792,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 307,
+      "rss_kb": 54020,
+      "checksum": 145147040.0,
+      "start": 12244.851327978
+    },
+    "bg_alive": 8
+  },
+  {
+    "background": "double",
+    "background_count": 8,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.5538975569998001,
+      "cpu": 0.553946751,
+      "thread_cpu": 0.553946252,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61680,
+      "checksum": 0.0,
+      "start": 12246.232516296
+    },
+    "bg_alive": 8
+  },
+  {
+    "background": "double",
+    "background_count": 14,
+    "target": "fixed",
+    "target_result": {
+      "kind": "fixed",
+      "elapsed": 0.914694888,
+      "count": 500000000,
+      "checksum": 7897714613650562884,
+      "minor_faults": 0,
+      "wall": 0.9178871780004556
+    },
+    "bg_alive": 14
+  },
+  {
+    "background": "double",
+    "background_count": 14,
+    "target": "argpartition",
+    "target_result": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.2819489180001256,
+      "cpu": 1.282097253,
+      "thread_cpu": 1.282097824,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 818,
+      "rss_kb": 54176,
+      "checksum": 145147040.0,
+      "start": 12248.038151505
+    },
+    "bg_alive": 14
+  },
+  {
+    "background": "double",
+    "background_count": 14,
+    "target": "double",
+    "target_result": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.6887201949994051,
+      "cpu": 0.6882606019999999,
+      "thread_cpu": 0.688263673,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 52241,
+      "rss_kb": 61744,
+      "checksum": 0.0,
+      "start": 12249.542897088
+    },
+    "bg_alive": 14
+  }
+]

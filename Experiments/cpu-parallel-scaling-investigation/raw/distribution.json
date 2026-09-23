@@ -1,0 +1,2358 @@
+[
+  {
+    "distribution": "actual",
+    "workers": 1,
+    "finite": 1013715,
+    "latency_per_call_wall": 0.1736291714996696,
+    "cpu_per_call_mean": 0.17361550275000004,
+    "worker_results": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 4,
+        "wall": 0.6945166859986784,
+        "cpu": 0.6944620110000002,
+        "minor_faults": 450,
+        "rss_kb": 129328,
+        "checksum": 5031668.0,
+        "start": 11866.65766233
+      }
+    ]
+  },
+  {
+    "distribution": "actual",
+    "workers": 2,
+    "finite": 1013715,
+    "latency_per_call_wall": 0.18538983575035672,
+    "cpu_per_call_mean": 0.18164579124999997,
+    "worker_results": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 4,
+        "wall": 0.7415593430014269,
+        "cpu": 0.741500141,
+        "minor_faults": 450,
+        "rss_kb": 129328,
+        "checksum": 5031668.0,
+        "start": 11867.652705264
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 1,
+        "calls": 4,
+        "wall": 0.7116674770004465,
+        "cpu": 0.7116661889999999,
+        "minor_faults": 450,
+        "rss_kb": 129328,
+        "checksum": 5031668.0,
+        "start": 11867.654878645
+      }
+    ]
+  },
+  {
+    "distribution": "actual",
+    "workers": 4,
+    "finite": 1013715,
+    "latency_per_call_wall": 0.18704179525002473,
+    "cpu_per_call_mean": 0.18478893006249997,
+    "worker_results": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 4,
+        "wall": 0.7352329039986216,
+        "cpu": 0.7320704869999999,
+        "minor_faults": 450,
+        "rss_kb": 129328,
+        "checksum": 5031668.0,
+        "start": 11868.700979224
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 1,
+        "calls": 4,
+        "wall": 0.7481671810000989,
+        "cpu": 0.7481584579999999,
+        "minor_faults": 450,
+        "rss_kb": 129328,
+        "checksum": 5031668.0,
+        "start": 11868.707481241
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 2,
+        "calls": 4,
+        "wall": 0.74752361299943,
+        "cpu": 0.74750108,
+        "minor_faults": 450,
+        "rss_kb": 129328,
+        "checksum": 5031668.0,
+        "start": 11868.714418718
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 3,
+        "calls": 4,
+        "wall": 0.7289010869990307,
+        "cpu": 0.7288928559999999,
+        "minor_faults": 450,
+        "rss_kb": 129328,
+        "checksum": 5031668.0,
+        "start": 11868.706310875
+      }
+    ]
+  },
+  {
+    "distribution": "actual",
+    "workers": 8,
+    "finite": 1013715,
+    "latency_per_call_wall": 0.2408425907497076,
+    "cpu_per_call_mean": 0.23425044209375,
+    "worker_results": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 4,
+        "wall": 0.9339055439995718,
+        "cpu": 0.9336438039999999,
+        "minor_faults": 450,
+        "rss_kb": 129328,
+        "checksum": 5031668.0,
+        "start": 11869.859270355
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 1,
+        "calls": 4,
+        "wall": 0.921582966000642,
+        "cpu": 0.921572378,
+        "minor_faults": 450,
+        "rss_kb": 129328,
+        "checksum": 5031668.0,
+        "start": 11869.84940291
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 2,
+        "calls": 4,
+        "wall": 0.9348427299992181,
+        "cpu": 0.9348338210000001,
+        "minor_faults": 450,
+        "rss_kb": 129328,
+        "checksum": 5031668.0,
+        "start": 11869.836520154
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 3,
+        "calls": 4,
+        "wall": 0.9339902339997934,
+        "cpu": 0.9339895659999999,
+        "minor_faults": 451,
+        "rss_kb": 129328,
+        "checksum": 5031668.0,
+        "start": 11869.84332735
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 4,
+        "calls": 4,
+        "wall": 0.9330413560001034,
+        "cpu": 0.9329858069999999,
+        "minor_faults": 450,
+        "rss_kb": 129328,
+        "checksum": 5031668.0,
+        "start": 11869.847454807
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 5,
+        "calls": 4,
+        "wall": 0.9417322970002715,
+        "cpu": 0.9417226770000001,
+        "minor_faults": 450,
+        "rss_kb": 129328,
+        "checksum": 5031668.0,
+        "start": 11869.851783781
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 6,
+        "calls": 4,
+        "wall": 0.9339962840003864,
+        "cpu": 0.933898595,
+        "minor_faults": 450,
+        "rss_kb": 129328,
+        "checksum": 5031668.0,
+        "start": 11869.836744773
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 7,
+        "calls": 4,
+        "wall": 0.9633703629988304,
+        "cpu": 0.963367499,
+        "minor_faults": 961,
+        "rss_kb": 129456,
+        "checksum": 5031668.0,
+        "start": 11869.871516494
+      }
+    ]
+  },
+  {
+    "distribution": "actual",
+    "workers": 16,
+    "finite": 1013715,
+    "latency_per_call_wall": 0.3646134752502803,
+    "cpu_per_call_mean": 0.32113963865625,
+    "worker_results": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 4,
+        "wall": 1.1450022789995273,
+        "cpu": 1.14228762,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 5031668.0,
+        "start": 11871.319571431
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 1,
+        "calls": 4,
+        "wall": 1.4504884889993264,
+        "cpu": 1.4365730989999999,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 5031668.0,
+        "start": 11871.490829853
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 2,
+        "calls": 4,
+        "wall": 1.4119298009991326,
+        "cpu": 1.406258319,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 5031668.0,
+        "start": 11871.551259726
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 3,
+        "calls": 4,
+        "wall": 1.42446678899978,
+        "cpu": 1.424322204,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 5031668.0,
+        "start": 11871.517909491
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 4,
+        "calls": 4,
+        "wall": 1.412894220000453,
+        "cpu": 1.412497238,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 5031668.0,
+        "start": 11871.530893255
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 5,
+        "calls": 4,
+        "wall": 1.147789778000515,
+        "cpu": 1.147744141,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 5031668.0,
+        "start": 11871.322618422
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 6,
+        "calls": 4,
+        "wall": 1.4511761569992814,
+        "cpu": 1.4505678299999998,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 5031668.0,
+        "start": 11871.487260076
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 7,
+        "calls": 4,
+        "wall": 1.1856677380001202,
+        "cpu": 1.1854985560000002,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 5031668.0,
+        "start": 11871.398208282
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 8,
+        "calls": 4,
+        "wall": 1.152019454000765,
+        "cpu": 1.1485083779999998,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 5031668.0,
+        "start": 11871.316712171
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 9,
+        "calls": 4,
+        "wall": 1.4584539010011213,
+        "cpu": 1.4408994659999999,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 5031668.0,
+        "start": 11871.485027944
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 10,
+        "calls": 4,
+        "wall": 1.1481906570006686,
+        "cpu": 1.1446683370000001,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 5031668.0,
+        "start": 11871.32317962
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 11,
+        "calls": 4,
+        "wall": 1.4235443310008122,
+        "cpu": 1.3649624590000002,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 5031668.0,
+        "start": 11871.590182163
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 12,
+        "calls": 4,
+        "wall": 1.1249638970002707,
+        "cpu": 1.111591315,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 5031668.0,
+        "start": 11871.350414246
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 13,
+        "calls": 4,
+        "wall": 1.4420129989994166,
+        "cpu": 1.433194431,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 5031668.0,
+        "start": 11871.507166767
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 14,
+        "calls": 4,
+        "wall": 1.150979197000197,
+        "cpu": 1.1446417800000002,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 5031668.0,
+        "start": 11871.316717342
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 15,
+        "calls": 4,
+        "wall": 1.16018505700049,
+        "cpu": 1.158721701,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 5031668.0,
+        "start": 11871.36348371
+      }
+    ]
+  },
+  {
+    "distribution": "random_all",
+    "workers": 1,
+    "finite": 1013715,
+    "latency_per_call_wall": 0.014688204750200384,
+    "cpu_per_call_mean": 0.014689262750000043,
+    "worker_results": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 4,
+        "wall": 0.05875281900080154,
+        "cpu": 0.05875705100000017,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 75336.0,
+        "start": 11873.112563284
+      }
+    ]
+  },
+  {
+    "distribution": "random_all",
+    "workers": 2,
+    "finite": 1013715,
+    "latency_per_call_wall": 0.015480909250072727,
+    "cpu_per_call_mean": 0.015269125375000012,
+    "worker_results": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 4,
+        "wall": 0.06021989299915731,
+        "cpu": 0.060225734000000086,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 75336.0,
+        "start": 11873.299420163
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 1,
+        "calls": 4,
+        "wall": 0.06192363700029091,
+        "cpu": 0.06192726900000001,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 75336.0,
+        "start": 11873.300045031
+      }
+    ]
+  },
+  {
+    "distribution": "random_all",
+    "workers": 4,
+    "finite": 1013715,
+    "latency_per_call_wall": 0.01851067149982555,
+    "cpu_per_call_mean": 0.017178215000000004,
+    "worker_results": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 4,
+        "wall": 0.06195810600002005,
+        "cpu": 0.06196160900000003,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 75336.0,
+        "start": 11873.516916987
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 1,
+        "calls": 4,
+        "wall": 0.0740426859993022,
+        "cpu": 0.07404693600000001,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 75336.0,
+        "start": 11873.504403839
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 2,
+        "calls": 4,
+        "wall": 0.06490745699920808,
+        "cpu": 0.06491043899999999,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 75336.0,
+        "start": 11873.514104325
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 3,
+        "calls": 4,
+        "wall": 0.07393612600026245,
+        "cpu": 0.07393245600000004,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 75336.0,
+        "start": 11873.499399736
+      }
+    ]
+  },
+  {
+    "distribution": "random_all",
+    "workers": 8,
+    "finite": 1013715,
+    "latency_per_call_wall": 0.024863647249731002,
+    "cpu_per_call_mean": 0.0225067934375,
+    "worker_results": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 4,
+        "wall": 0.09387080800115655,
+        "cpu": 0.09387567500000002,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 75336.0,
+        "start": 11873.753353564
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 1,
+        "calls": 4,
+        "wall": 0.09662745899913716,
+        "cpu": 0.09663248599999999,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 75336.0,
+        "start": 11873.742057583
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 2,
+        "calls": 4,
+        "wall": 0.09945458899892401,
+        "cpu": 0.09946054500000001,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 75336.0,
+        "start": 11873.731753878
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 3,
+        "calls": 4,
+        "wall": 0.09314425000047777,
+        "cpu": 0.09314873699999998,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 75336.0,
+        "start": 11873.747249615
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 4,
+        "calls": 4,
+        "wall": 0.0964958900003694,
+        "cpu": 0.096501105,
+        "minor_faults": 962,
+        "rss_kb": 129456,
+        "checksum": 75336.0,
+        "start": 11873.747753173
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 5,
+        "calls": 4,
+        "wall": 0.07387095600097382,
+        "cpu": 0.07387838599999999,
+        "minor_faults": 962,
+        "rss_kb": 129456,
+        "checksum": 75336.0,
+        "start": 11873.732652665
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 6,
+        "calls": 4,
+        "wall": 0.07296203900114051,
+        "cpu": 0.07296737999999997,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 75336.0,
+        "start": 11873.738611305
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 7,
+        "calls": 4,
+        "wall": 0.0937473370013322,
+        "cpu": 0.09375307600000002,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 75336.0,
+        "start": 11873.741534796
+      }
+    ]
+  },
+  {
+    "distribution": "random_all",
+    "workers": 16,
+    "finite": 1013715,
+    "latency_per_call_wall": 0.03771884549996685,
+    "cpu_per_call_mean": 0.029529431781249997,
+    "worker_results": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 4,
+        "wall": 0.14336387699950137,
+        "cpu": 0.143240558,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 75336.0,
+        "start": 11874.078243219
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 1,
+        "calls": 4,
+        "wall": 0.13991309899938642,
+        "cpu": 0.13980151000000002,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 75336.0,
+        "start": 11874.0779525
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 2,
+        "calls": 4,
+        "wall": 0.1464467469995725,
+        "cpu": 0.146251268,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 75336.0,
+        "start": 11874.07795717
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 3,
+        "calls": 4,
+        "wall": 0.10991461300000083,
+        "cpu": 0.10968694599999998,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 75336.0,
+        "start": 11874.061886865
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 4,
+        "calls": 4,
+        "wall": 0.07634848899942881,
+        "cpu": 0.07635364699999997,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 75336.0,
+        "start": 11874.11830613
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 5,
+        "calls": 4,
+        "wall": 0.11785724599940295,
+        "cpu": 0.11766957899999997,
+        "minor_faults": 962,
+        "rss_kb": 129456,
+        "checksum": 75336.0,
+        "start": 11874.112072332
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 6,
+        "calls": 4,
+        "wall": 0.10818032899987884,
+        "cpu": 0.10817505599999996,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 75336.0,
+        "start": 11874.074348021
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 7,
+        "calls": 4,
+        "wall": 0.144291405000331,
+        "cpu": 0.144010407,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 75336.0,
+        "start": 11874.069852937
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 8,
+        "calls": 4,
+        "wall": 0.10340880500007188,
+        "cpu": 0.10337861200000001,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 75336.0,
+        "start": 11874.082896463
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 9,
+        "calls": 4,
+        "wall": 0.1508753819998674,
+        "cpu": 0.15087492100000002,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 75336.0,
+        "start": 11874.024293484
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 10,
+        "calls": 4,
+        "wall": 0.14638097699935315,
+        "cpu": 0.14598749900000002,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 75336.0,
+        "start": 11874.062019135
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 11,
+        "calls": 4,
+        "wall": 0.12074234600004274,
+        "cpu": 0.11776946399999996,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 75336.0,
+        "start": 11874.050037345
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 12,
+        "calls": 4,
+        "wall": 0.1273028539999359,
+        "cpu": 0.126980316,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 75336.0,
+        "start": 11874.10373366
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 13,
+        "calls": 4,
+        "wall": 0.08188153899936879,
+        "cpu": 0.08172005800000004,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 75336.0,
+        "start": 11874.135471632
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 14,
+        "calls": 4,
+        "wall": 0.08406977099912183,
+        "cpu": 0.08357295099999995,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 75336.0,
+        "start": 11874.101477549
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 15,
+        "calls": 4,
+        "wall": 0.09440298600020469,
+        "cpu": 0.094410842,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 75336.0,
+        "start": 11874.06912396
+      }
+    ]
+  },
+  {
+    "distribution": "random_finite_inf",
+    "workers": 1,
+    "finite": 1013715,
+    "latency_per_call_wall": 0.010539686250012892,
+    "cpu_per_call_mean": 0.022211164250000026,
+    "worker_results": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 4,
+        "wall": 0.04215874500005157,
+        "cpu": 0.0888446570000001,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 3933372.0,
+        "start": 11874.328678839
+      }
+    ]
+  },
+  {
+    "distribution": "random_finite_inf",
+    "workers": 2,
+    "finite": 1013715,
+    "latency_per_call_wall": 0.012149345499892661,
+    "cpu_per_call_mean": 0.011607227374999987,
+    "worker_results": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 4,
+        "wall": 0.044251658000575844,
+        "cpu": 0.04425762199999994,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 3933372.0,
+        "start": 11874.498979494
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 1,
+        "calls": 4,
+        "wall": 0.048597381999570644,
+        "cpu": 0.048600196999999956,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 3933372.0,
+        "start": 11874.494727169
+      }
+    ]
+  },
+  {
+    "distribution": "random_finite_inf",
+    "workers": 4,
+    "finite": 1013715,
+    "latency_per_call_wall": 0.014086099250107509,
+    "cpu_per_call_mean": 0.013655140062500005,
+    "worker_results": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 4,
+        "wall": 0.052797357999224914,
+        "cpu": 0.052802510999999996,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 3933372.0,
+        "start": 11874.679957663
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 1,
+        "calls": 4,
+        "wall": 0.056344397000430035,
+        "cpu": 0.05633453900000002,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 3933372.0,
+        "start": 11874.682950172
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 2,
+        "calls": 4,
+        "wall": 0.05527546099983738,
+        "cpu": 0.05528039300000004,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 3933372.0,
+        "start": 11874.683026112
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 3,
+        "calls": 4,
+        "wall": 0.05406116599988309,
+        "cpu": 0.054064798000000025,
+        "minor_faults": 962,
+        "rss_kb": 129456,
+        "checksum": 3933372.0,
+        "start": 11874.679415883
+      }
+    ]
+  },
+  {
+    "distribution": "random_finite_inf",
+    "workers": 8,
+    "finite": 1013715,
+    "latency_per_call_wall": 0.018539571250130393,
+    "cpu_per_call_mean": 0.017133536249999998,
+    "worker_results": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 4,
+        "wall": 0.06905308299974422,
+        "cpu": 0.069057013,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 3933372.0,
+        "start": 11874.888679725
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 1,
+        "calls": 4,
+        "wall": 0.07415828500052157,
+        "cpu": 0.07416392499999999,
+        "minor_faults": 962,
+        "rss_kb": 129456,
+        "checksum": 3933372.0,
+        "start": 11874.895563752
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 2,
+        "calls": 4,
+        "wall": 0.07157022400133428,
+        "cpu": 0.07157608499999998,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 3933372.0,
+        "start": 11874.895563732
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 3,
+        "calls": 4,
+        "wall": 0.06683734999933222,
+        "cpu": 0.066842501,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 3933372.0,
+        "start": 11874.909542444
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 4,
+        "calls": 4,
+        "wall": 0.05985997400057386,
+        "cpu": 0.05986393499999998,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 3933372.0,
+        "start": 11874.893677188
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 5,
+        "calls": 4,
+        "wall": 0.07083964600133186,
+        "cpu": 0.07084370699999998,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 3933372.0,
+        "start": 11874.89038127
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 6,
+        "calls": 4,
+        "wall": 0.06634455199855438,
+        "cpu": 0.06635740300000001,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 3933372.0,
+        "start": 11874.886032255
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 7,
+        "calls": 4,
+        "wall": 0.0695644009992975,
+        "cpu": 0.06956859099999999,
+        "minor_faults": 962,
+        "rss_kb": 129456,
+        "checksum": 3933372.0,
+        "start": 11874.912604014
+      }
+    ]
+  },
+  {
+    "distribution": "random_finite_inf",
+    "workers": 16,
+    "finite": 1013715,
+    "latency_per_call_wall": 0.02567424925018713,
+    "cpu_per_call_mean": 0.018339252984375,
+    "worker_results": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 4,
+        "wall": 0.10269699700074852,
+        "cpu": 0.10221693500000001,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 3933372.0,
+        "start": 11875.198567112
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 1,
+        "calls": 4,
+        "wall": 0.0973018749991752,
+        "cpu": 0.097250534,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 3933372.0,
+        "start": 11875.206132006
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 2,
+        "calls": 4,
+        "wall": 0.06495966800139286,
+        "cpu": 0.06418411100000002,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 3933372.0,
+        "start": 11875.267215425
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 3,
+        "calls": 4,
+        "wall": 0.06352306200096791,
+        "cpu": 0.06352831299999998,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 3933372.0,
+        "start": 11875.207876829
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 4,
+        "calls": 4,
+        "wall": 0.09061440900040907,
+        "cpu": 0.09062018700000002,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 3933372.0,
+        "start": 11875.173720306
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 5,
+        "calls": 4,
+        "wall": 0.055359748999762814,
+        "cpu": 0.055367481999999996,
+        "minor_faults": 962,
+        "rss_kb": 129456,
+        "checksum": 3933372.0,
+        "start": 11875.204207962
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 6,
+        "calls": 4,
+        "wall": 0.08587572499891394,
+        "cpu": 0.085887504,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 3933372.0,
+        "start": 11875.162557125
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 7,
+        "calls": 4,
+        "wall": 0.06152712799848814,
+        "cpu": 0.06137409200000002,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 3933372.0,
+        "start": 11875.227241283
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 8,
+        "calls": 4,
+        "wall": 0.05337854599929415,
+        "cpu": 0.053384210000000015,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 3933372.0,
+        "start": 11875.219019062
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 9,
+        "calls": 4,
+        "wall": 0.06383739999910176,
+        "cpu": 0.06373003200000002,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 3933372.0,
+        "start": 11875.240224859
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 10,
+        "calls": 4,
+        "wall": 0.051323982999747386,
+        "cpu": 0.05121542700000001,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 3933372.0,
+        "start": 11875.249116448
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 11,
+        "calls": 4,
+        "wall": 0.07668869600092876,
+        "cpu": 0.07635167699999998,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 3933372.0,
+        "start": 11875.248904269
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 12,
+        "calls": 4,
+        "wall": 0.0777309229997627,
+        "cpu": 0.07761600299999999,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 3933372.0,
+        "start": 11875.249903435
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 13,
+        "calls": 4,
+        "wall": 0.06381764000070689,
+        "cpu": 0.06382417199999998,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 3933372.0,
+        "start": 11875.174547215
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 14,
+        "calls": 4,
+        "wall": 0.08959969300121884,
+        "cpu": 0.08938792999999998,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 3933372.0,
+        "start": 11875.208515137
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 15,
+        "calls": 4,
+        "wall": 0.07795377300135442,
+        "cpu": 0.07777358200000001,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 3933372.0,
+        "start": 11875.245057281
+      }
+    ]
+  },
+  {
+    "distribution": "all_zero",
+    "workers": 1,
+    "finite": 1013715,
+    "latency_per_call_wall": 0.00499021800033006,
+    "cpu_per_call_mean": 0.052684821249999986,
+    "worker_results": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 4,
+        "wall": 0.01996087200132024,
+        "cpu": 0.21073928499999994,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 6220000.0,
+        "start": 11875.417484949
+      }
+    ]
+  },
+  {
+    "distribution": "all_zero",
+    "workers": 2,
+    "finite": 1013715,
+    "latency_per_call_wall": 0.00545088900025803,
+    "cpu_per_call_mean": 0.005341038500000006,
+    "worker_results": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 4,
+        "wall": 0.020915186998536228,
+        "cpu": 0.02092000599999999,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 6220000.0,
+        "start": 11875.559595422
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 1,
+        "calls": 4,
+        "wall": 0.02180355600103212,
+        "cpu": 0.021808302000000057,
+        "minor_faults": 961,
+        "rss_kb": 129456,
+        "checksum": 6220000.0,
+        "start": 11875.546047708
+      }
+    ]
+  },
+  {
+    "distribution": "all_zero",
+    "workers": 4,
+    "finite": 1013715,
+    "latency_per_call_wall": 0.006529067500196106,
+    "cpu_per_call_mean": 0.005951902500000002,
+    "worker_results": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 4,
+        "wall": 0.022469712001111475,
+        "cpu": 0.022478290000000012,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 6220000.0,
+        "start": 11875.707948143
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 1,
+        "calls": 4,
+        "wall": 0.022882453000420355,
+        "cpu": 0.022885937999999995,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 6220000.0,
+        "start": 11875.711507659
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 2,
+        "calls": 4,
+        "wall": 0.02374062000126287,
+        "cpu": 0.023744335999999977,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 6220000.0,
+        "start": 11875.71123306
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 3,
+        "calls": 4,
+        "wall": 0.026116270000784425,
+        "cpu": 0.026121876000000044,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 6220000.0,
+        "start": 11875.703324928
+      }
+    ]
+  },
+  {
+    "distribution": "all_zero",
+    "workers": 8,
+    "finite": 1013715,
+    "latency_per_call_wall": 0.007924930500394112,
+    "cpu_per_call_mean": 0.007052167593750002,
+    "worker_results": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 4,
+        "wall": 0.03169972200157645,
+        "cpu": 0.031703597,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 6220000.0,
+        "start": 11875.885286173
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 1,
+        "calls": 4,
+        "wall": 0.03118579299916746,
+        "cpu": 0.031189169000000017,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 6220000.0,
+        "start": 11875.886682409
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 2,
+        "calls": 4,
+        "wall": 0.021251418000247213,
+        "cpu": 0.021254033000000006,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 6220000.0,
+        "start": 11875.883728228
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 3,
+        "calls": 4,
+        "wall": 0.030839555000056862,
+        "cpu": 0.03082535,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 6220000.0,
+        "start": 11875.885775051
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 4,
+        "calls": 4,
+        "wall": 0.029685088999030995,
+        "cpu": 0.029697593999999994,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 6220000.0,
+        "start": 11875.881731375
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 5,
+        "calls": 4,
+        "wall": 0.021837476000655442,
+        "cpu": 0.021840722000000007,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 6220000.0,
+        "start": 11875.884055927
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 6,
+        "calls": 4,
+        "wall": 0.02807215499888116,
+        "cpu": 0.02809224000000002,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 6220000.0,
+        "start": 11875.87726425
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 7,
+        "calls": 4,
+        "wall": 0.03106324200052768,
+        "cpu": 0.031066658000000025,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 6220000.0,
+        "start": 11875.886790929
+      }
+    ]
+  },
+  {
+    "distribution": "all_zero",
+    "workers": 16,
+    "finite": 1013715,
+    "latency_per_call_wall": 0.011846464500194998,
+    "cpu_per_call_mean": 0.007917692921874999,
+    "worker_results": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 4,
+        "wall": 0.04105370799879893,
+        "cpu": 0.040972804,
+        "minor_faults": 961,
+        "rss_kb": 129456,
+        "checksum": 6220000.0,
+        "start": 11876.148260001
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 1,
+        "calls": 4,
+        "wall": 0.04029754100156424,
+        "cpu": 0.040327576000000004,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 6220000.0,
+        "start": 11876.119280971
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 2,
+        "calls": 4,
+        "wall": 0.03661639500023739,
+        "cpu": 0.036622078999999974,
+        "minor_faults": 961,
+        "rss_kb": 129456,
+        "checksum": 6220000.0,
+        "start": 11876.125339338
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 3,
+        "calls": 4,
+        "wall": 0.02287941200120258,
+        "cpu": 0.02284963000000001,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 6220000.0,
+        "start": 11876.115153894
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 4,
+        "calls": 4,
+        "wall": 0.036811095000302885,
+        "cpu": 0.036534398999999995,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 6220000.0,
+        "start": 11876.155160586
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 5,
+        "calls": 4,
+        "wall": 0.026712868999311468,
+        "cpu": 0.02187072200000001,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 6220000.0,
+        "start": 11876.089046233
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 6,
+        "calls": 4,
+        "wall": 0.028378522998536937,
+        "cpu": 0.027929379000000004,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 6220000.0,
+        "start": 11876.175335317
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 7,
+        "calls": 4,
+        "wall": 0.022604702000535326,
+        "cpu": 0.02249570099999998,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 6220000.0,
+        "start": 11876.160405649
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 8,
+        "calls": 4,
+        "wall": 0.03492304000064905,
+        "cpu": 0.03475916600000001,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 6220000.0,
+        "start": 11876.160117499
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 9,
+        "calls": 4,
+        "wall": 0.04013808200033964,
+        "cpu": 0.04015443599999999,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 6220000.0,
+        "start": 11876.121791931
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 10,
+        "calls": 4,
+        "wall": 0.023754730000291602,
+        "cpu": 0.023762104000000006,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 6220000.0,
+        "start": 11876.132969792
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 11,
+        "calls": 4,
+        "wall": 0.0395291749991884,
+        "cpu": 0.03885933,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 6220000.0,
+        "start": 11876.147631432
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 12,
+        "calls": 4,
+        "wall": 0.02607791999980691,
+        "cpu": 0.025881176999999977,
+        "minor_faults": 961,
+        "rss_kb": 129456,
+        "checksum": 6220000.0,
+        "start": 11876.134732787
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 13,
+        "calls": 4,
+        "wall": 0.04738585800077999,
+        "cpu": 0.046241156000000005,
+        "minor_faults": 961,
+        "rss_kb": 129456,
+        "checksum": 6220000.0,
+        "start": 11876.137864646
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 14,
+        "calls": 4,
+        "wall": 0.025280213998485124,
+        "cpu": 0.024676629000000005,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 6220000.0,
+        "start": 11876.12481452
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 15,
+        "calls": 4,
+        "wall": 0.022798321999289328,
+        "cpu": 0.02279605899999998,
+        "minor_faults": 450,
+        "rss_kb": 129456,
+        "checksum": 6220000.0,
+        "start": 11876.188301833
+      }
+    ]
+  },
+  {
+    "distribution": "few_ties_inf",
+    "workers": 1,
+    "finite": 1013715,
+    "latency_per_call_wall": 0.008216212000206724,
+    "cpu_per_call_mean": 0.08895870224999997,
+    "worker_results": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 4,
+        "wall": 0.032864848000826896,
+        "cpu": 0.35583480899999986,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 1014204.0,
+        "start": 11876.284617922
+      }
+    ]
+  },
+  {
+    "distribution": "few_ties_inf",
+    "workers": 2,
+    "finite": 1013715,
+    "latency_per_call_wall": 0.008413296250182611,
+    "cpu_per_call_mean": 0.008051337500000005,
+    "worker_results": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 4,
+        "wall": 0.030750065001484472,
+        "cpu": 0.03075458100000006,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 1014204.0,
+        "start": 11876.444083714
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 1,
+        "calls": 4,
+        "wall": 0.033653185000730446,
+        "cpu": 0.033656118999999984,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 1014204.0,
+        "start": 11876.442065562
+      }
+    ]
+  },
+  {
+    "distribution": "few_ties_inf",
+    "workers": 4,
+    "finite": 1013715,
+    "latency_per_call_wall": 0.00979536900013045,
+    "cpu_per_call_mean": 0.009200382687500001,
+    "worker_results": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 4,
+        "wall": 0.03721172400037176,
+        "cpu": 0.03721574700000002,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 1014204.0,
+        "start": 11876.60532771
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 1,
+        "calls": 4,
+        "wall": 0.035786106000159634,
+        "cpu": 0.03579289200000002,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 1014204.0,
+        "start": 11876.598477555
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 2,
+        "calls": 4,
+        "wall": 0.0391814760005218,
+        "cpu": 0.039187519999999976,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 1014204.0,
+        "start": 11876.597022369
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 3,
+        "calls": 4,
+        "wall": 0.03500606899979175,
+        "cpu": 0.035009964000000005,
+        "minor_faults": 451,
+        "rss_kb": 129456,
+        "checksum": 1014204.0,
+        "start": 11876.601646534
+      }
+    ]
+  },
+  {
+    "distribution": "few_ties_inf",
+    "workers": 8,
+    "finite": 1013715,
+    "latency_per_call_wall": 0.010514336499909405,
+    "cpu_per_call_mean": 0.009200655281249998,
+    "worker_results": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 4,
+        "wall": 0.04205734599963762,
+        "cpu": 0.04206227999999998,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 1014204.0,
+        "start": 11876.792969906
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 1,
+        "calls": 4,
+        "wall": 0.034706591000940534,
+        "cpu": 0.034709976000000003,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 1014204.0,
+        "start": 11876.805398624
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 2,
+        "calls": 4,
+        "wall": 0.03581314700022631,
+        "cpu": 0.035816702000000006,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 1014204.0,
+        "start": 11876.797324742
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 3,
+        "calls": 4,
+        "wall": 0.03606736599977012,
+        "cpu": 0.036023261,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 1014204.0,
+        "start": 11876.811251354
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 4,
+        "calls": 4,
+        "wall": 0.03654446399923472,
+        "cpu": 0.03654948999999999,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 1014204.0,
+        "start": 11876.793346515
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 5,
+        "calls": 4,
+        "wall": 0.03467286100021738,
+        "cpu": 0.03467630599999996,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 1014204.0,
+        "start": 11876.800353141
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 6,
+        "calls": 4,
+        "wall": 0.037930349999442114,
+        "cpu": 0.03793583499999997,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 1014204.0,
+        "start": 11876.783328579
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 7,
+        "calls": 4,
+        "wall": 0.03669859399997222,
+        "cpu": 0.036647119000000006,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 1014204.0,
+        "start": 11876.803899979
+      }
+    ]
+  },
+  {
+    "distribution": "few_ties_inf",
+    "workers": 16,
+    "finite": 1013715,
+    "latency_per_call_wall": 0.02177736300018296,
+    "cpu_per_call_mean": 0.014424633125000001,
+    "worker_results": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 4,
+        "wall": 0.044595476998438244,
+        "cpu": 0.038358432,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 1014204.0,
+        "start": 11877.053392002
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 1,
+        "calls": 4,
+        "wall": 0.03475362099925405,
+        "cpu": 0.034687995,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 1014204.0,
+        "start": 11877.063316488
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 2,
+        "calls": 4,
+        "wall": 0.07895570899927407,
+        "cpu": 0.07882999899999998,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 1014204.0,
+        "start": 11877.063708787
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 3,
+        "calls": 4,
+        "wall": 0.08710945200073184,
+        "cpu": 0.071711533,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 1014204.0,
+        "start": 11877.047120033
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 4,
+        "calls": 4,
+        "wall": 0.07982825699946261,
+        "cpu": 0.07956417500000001,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 1014204.0,
+        "start": 11877.066681406
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 5,
+        "calls": 4,
+        "wall": 0.0347899709995545,
+        "cpu": 0.03479500599999999,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 1014204.0,
+        "start": 11877.031858766
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 6,
+        "calls": 4,
+        "wall": 0.07761647400002403,
+        "cpu": 0.077455614,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 1014204.0,
+        "start": 11877.082560902
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 7,
+        "calls": 4,
+        "wall": 0.048005914000896155,
+        "cpu": 0.048010229000000015,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 1014204.0,
+        "start": 11877.116541406
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 8,
+        "calls": 4,
+        "wall": 0.036153615999864996,
+        "cpu": 0.036158020999999985,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 1014204.0,
+        "start": 11877.035264745
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 9,
+        "calls": 4,
+        "wall": 0.07160308299899043,
+        "cpu": 0.069535971,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 1014204.0,
+        "start": 11877.053348063
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 10,
+        "calls": 4,
+        "wall": 0.0357844970003498,
+        "cpu": 0.03572286100000002,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 1014204.0,
+        "start": 11877.058076387
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 11,
+        "calls": 4,
+        "wall": 0.047986155999751645,
+        "cpu": 0.04787090899999999,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 1014204.0,
+        "start": 11877.121087719
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 12,
+        "calls": 4,
+        "wall": 0.06401831000039238,
+        "cpu": 0.06392366199999999,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 1014204.0,
+        "start": 11877.066084529
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 13,
+        "calls": 4,
+        "wall": 0.07330922800065309,
+        "cpu": 0.06987065,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 1014204.0,
+        "start": 11877.073476054
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 14,
+        "calls": 4,
+        "wall": 0.08211540699994657,
+        "cpu": 0.08192483800000003,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 1014204.0,
+        "start": 11877.044844932
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 15,
+        "calls": 4,
+        "wall": 0.05479837200073234,
+        "cpu": 0.054756625,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 1014204.0,
+        "start": 11877.118899227
+      }
+    ]
+  },
+  {
+    "distribution": "zero_inf_shuffled",
+    "workers": 1,
+    "finite": 1013715,
+    "latency_per_call_wall": 0.008891211999980442,
+    "cpu_per_call_mean": 0.014339071500000022,
+    "worker_results": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 4,
+        "wall": 0.03556484799992177,
+        "cpu": 0.05735628600000009,
+        "minor_faults": 962,
+        "rss_kb": 129840,
+        "checksum": 64.0,
+        "start": 11877.269018522
+      }
+    ]
+  },
+  {
+    "distribution": "zero_inf_shuffled",
+    "workers": 2,
+    "finite": 1013715,
+    "latency_per_call_wall": 0.008742852749946906,
+    "cpu_per_call_mean": 0.008728016374999994,
+    "worker_results": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 4,
+        "wall": 0.03497141099978762,
+        "cpu": 0.03496576600000001,
+        "minor_faults": 962,
+        "rss_kb": 129840,
+        "checksum": 64.0,
+        "start": 11877.417592861
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 1,
+        "calls": 4,
+        "wall": 0.0348564300002181,
+        "cpu": 0.03485836499999995,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 64.0,
+        "start": 11877.424302129
+      }
+    ]
+  },
+  {
+    "distribution": "zero_inf_shuffled",
+    "workers": 4,
+    "finite": 1013715,
+    "latency_per_call_wall": 0.009038063749812864,
+    "cpu_per_call_mean": 0.008857735937499996,
+    "worker_results": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 4,
+        "wall": 0.036152254999251454,
+        "cpu": 0.036157671,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 64.0,
+        "start": 11877.584349709
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 1,
+        "calls": 4,
+        "wall": 0.0352502480000112,
+        "cpu": 0.035253124999999996,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 64.0,
+        "start": 11877.587316709
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 2,
+        "calls": 4,
+        "wall": 0.035606557999926736,
+        "cpu": 0.03560957299999995,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 64.0,
+        "start": 11877.585962283
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 3,
+        "calls": 4,
+        "wall": 0.034698370000114664,
+        "cpu": 0.03470340599999999,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 64.0,
+        "start": 11877.580734212
+      }
+    ]
+  },
+  {
+    "distribution": "zero_inf_shuffled",
+    "workers": 8,
+    "finite": 1013715,
+    "latency_per_call_wall": 0.01271251875004964,
+    "cpu_per_call_mean": 0.011291125562500002,
+    "worker_results": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 4,
+        "wall": 0.04650946100082365,
+        "cpu": 0.04651329400000004,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 64.0,
+        "start": 11877.774461096
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 1,
+        "calls": 4,
+        "wall": 0.05085007500019856,
+        "cpu": 0.050869618000000005,
+        "minor_faults": 962,
+        "rss_kb": 129840,
+        "checksum": 64.0,
+        "start": 11877.783143056
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 2,
+        "calls": 4,
+        "wall": 0.04587287200047285,
+        "cpu": 0.04587936599999998,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 64.0,
+        "start": 11877.779711828
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 3,
+        "calls": 4,
+        "wall": 0.04283999299877905,
+        "cpu": 0.042850257,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 64.0,
+        "start": 11877.7705081
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 4,
+        "calls": 4,
+        "wall": 0.04299591200106079,
+        "cpu": 0.043002766,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 64.0,
+        "start": 11877.7880414
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 5,
+        "calls": 4,
+        "wall": 0.04507120600101189,
+        "cpu": 0.04507726900000003,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 64.0,
+        "start": 11877.774675915
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 6,
+        "calls": 4,
+        "wall": 0.043608429999949294,
+        "cpu": 0.04361232400000001,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 64.0,
+        "start": 11877.788006989
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 7,
+        "calls": 4,
+        "wall": 0.04350571999930253,
+        "cpu": 0.04351112400000001,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 64.0,
+        "start": 11877.783143576
+      }
+    ]
+  },
+  {
+    "distribution": "zero_inf_shuffled",
+    "workers": 16,
+    "finite": 1013715,
+    "latency_per_call_wall": 0.022291248249985074,
+    "cpu_per_call_mean": 0.013965130390624999,
+    "worker_results": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 4,
+        "wall": 0.03998021199913637,
+        "cpu": 0.03998647799999999,
+        "minor_faults": 962,
+        "rss_kb": 129840,
+        "checksum": 64.0,
+        "start": 11878.056326738
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 1,
+        "calls": 4,
+        "wall": 0.07879198000046017,
+        "cpu": 0.07820886699999999,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 64.0,
+        "start": 11878.071286237
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 2,
+        "calls": 4,
+        "wall": 0.037919090000286815,
+        "cpu": 0.037918855,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 64.0,
+        "start": 11878.052191862
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 3,
+        "calls": 4,
+        "wall": 0.06386601099984546,
+        "cpu": 0.06370183299999999,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 64.0,
+        "start": 11878.0644069
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 4,
+        "calls": 4,
+        "wall": 0.07749690499986173,
+        "cpu": 0.076149887,
+        "minor_faults": 962,
+        "rss_kb": 129840,
+        "checksum": 64.0,
+        "start": 11878.077843074
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 5,
+        "calls": 4,
+        "wall": 0.03773057000034896,
+        "cpu": 0.03764653599999998,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 64.0,
+        "start": 11878.069667033
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 6,
+        "calls": 4,
+        "wall": 0.05958228500094265,
+        "cpu": 0.05945783800000001,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 64.0,
+        "start": 11878.060361855
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 7,
+        "calls": 4,
+        "wall": 0.08386814200093795,
+        "cpu": 0.08331898199999999,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 64.0,
+        "start": 11878.051647494
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 8,
+        "calls": 4,
+        "wall": 0.03999918299996352,
+        "cpu": 0.03907314099999998,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 64.0,
+        "start": 11878.050228979
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 9,
+        "calls": 4,
+        "wall": 0.03892011599964462,
+        "cpu": 0.03891657200000001,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 64.0,
+        "start": 11878.056327188
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 10,
+        "calls": 4,
+        "wall": 0.03956269400077872,
+        "cpu": 0.03957079799999999,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 64.0,
+        "start": 11878.024456758
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 11,
+        "calls": 4,
+        "wall": 0.05903859699901659,
+        "cpu": 0.05882759000000001,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 64.0,
+        "start": 11878.077716985
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 12,
+        "calls": 4,
+        "wall": 0.04951170999993337,
+        "cpu": 0.049442403000000024,
+        "minor_faults": 962,
+        "rss_kb": 129840,
+        "checksum": 64.0,
+        "start": 11878.102194481
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 13,
+        "calls": 4,
+        "wall": 0.06732282899974962,
+        "cpu": 0.06693411099999996,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 64.0,
+        "start": 11878.077307736
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 14,
+        "calls": 4,
+        "wall": 0.0891649929999403,
+        "cpu": 0.08903903100000002,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 64.0,
+        "start": 11878.040133604
+      },
+      {
+        "op": "argpartition",
+        "cpu_pin": 15,
+        "calls": 4,
+        "wall": 0.03562164699906134,
+        "cpu": 0.035575422999999995,
+        "minor_faults": 451,
+        "rss_kb": 129840,
+        "checksum": 64.0,
+        "start": 11878.13152056
+      }
+    ]
+  },
+  {
+    "distribution": "zero_inf_sorted",
+    "workers": 1,
+    "finite": 1013715,
+    "latency_per_call_wall": 0.17158617350014538,
+    "cpu_per_call_mean": 0.17089391975,
+    "worker_results": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 4,
+        "wall": 0.6863446940005815,
+        "cpu": 0.683575679,
+        "minor_faults": 450,
+        "rss_kb": 129840,
+        "checksum": 2703272.0,
+        "start": 11878.45174819
+      }
+    ]
+  },
+  {
+    "distribution": "zero_inf_reversed",
+    "workers": 1,
+    "finite": 1013715,
+    "latency_per_call_wall": 0.17565897674967346,
+    "cpu_per_call_mean": 0.17565446525,
+    "worker_results": [
+      {
+        "op": "argpartition",
+        "cpu_pin": 0,
+        "calls": 4,
+        "wall": 0.7026359069986938,
+        "cpu": 0.702617861,
+        "minor_faults": 962,
+        "rss_kb": 129840,
+        "checksum": 4146588.0,
+        "start": 11879.412452062
+      }
+    ]
+  }
+]

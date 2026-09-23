@@ -1,0 +1,130 @@
+[
+  {
+    "op": "axis1",
+    "layout": "C",
+    "workers": 1,
+    "cpu_per_call": 0.002098287875,
+    "wall_per_call_max": 0.002097513099988646,
+    "faults_per_call": 3.9
+  },
+  {
+    "op": "axis1",
+    "layout": "C",
+    "workers": 16,
+    "cpu_per_call": 0.00303582620859375,
+    "wall_per_call_max": 0.003829302637495857,
+    "faults_per_call": 6.69453125
+  },
+  {
+    "op": "axis1",
+    "layout": "F",
+    "workers": 1,
+    "cpu_per_call": 0.0021741718625,
+    "wall_per_call_max": 0.0021733367625074605,
+    "faults_per_call": 0.0125
+  },
+  {
+    "op": "axis1",
+    "layout": "F",
+    "workers": 16,
+    "cpu_per_call": 0.0036617704210937497,
+    "wall_per_call_max": 0.0043161206750028215,
+    "faults_per_call": 0.0125
+  },
+  {
+    "op": "axis0",
+    "layout": "C",
+    "workers": 1,
+    "cpu_per_call": 0.0022491457125,
+    "wall_per_call_max": 0.0022484674249881207,
+    "faults_per_call": 3.9
+  },
+  {
+    "op": "axis0",
+    "layout": "C",
+    "workers": 16,
+    "cpu_per_call": 0.00364245485859375,
+    "wall_per_call_max": 0.004294744762501068,
+    "faults_per_call": 8.2921875
+  },
+  {
+    "op": "axis0",
+    "layout": "F",
+    "workers": 1,
+    "cpu_per_call": 0.0021143474374999997,
+    "wall_per_call_max": 0.0021137535250090878,
+    "faults_per_call": 0.0125
+  },
+  {
+    "op": "axis0",
+    "layout": "F",
+    "workers": 16,
+    "cpu_per_call": 0.00286711054375,
+    "wall_per_call_max": 0.003497765062502367,
+    "faults_per_call": 0.01328125
+  },
+  {
+    "op": "double",
+    "layout": "C",
+    "workers": 1,
+    "cpu_per_call": 0.006365170375,
+    "wall_per_call_max": 0.006364275600003566,
+    "faults_per_call": 1164.0125
+  },
+  {
+    "op": "double",
+    "layout": "C",
+    "workers": 16,
+    "cpu_per_call": 0.012299127391406251,
+    "wall_per_call_max": 0.014451193875015634,
+    "faults_per_call": 1004.325
+  },
+  {
+    "op": "double",
+    "layout": "F",
+    "workers": 1,
+    "cpu_per_call": 0.006452329475,
+    "wall_per_call_max": 0.006452167225006633,
+    "faults_per_call": 1165.0125
+  },
+  {
+    "op": "double",
+    "layout": "F",
+    "workers": 16,
+    "cpu_per_call": 0.011757216566406251,
+    "wall_per_call_max": 0.013755514012518687,
+    "faults_per_call": 973.3875
+  },
+  {
+    "op": "double_out",
+    "layout": "C",
+    "workers": 1,
+    "cpu_per_call": 0.004351366587500001,
+    "wall_per_call_max": 0.004350593399999525,
+    "faults_per_call": 0.0125
+  },
+  {
+    "op": "double_out",
+    "layout": "C",
+    "workers": 16,
+    "cpu_per_call": 0.007727668373437501,
+    "wall_per_call_max": 0.009158450699987952,
+    "faults_per_call": 0.01328125
+  },
+  {
+    "op": "double_out",
+    "layout": "F",
+    "workers": 1,
+    "cpu_per_call": 0.0043804531,
+    "wall_per_call_max": 0.004379801387494808,
+    "faults_per_call": 0.0125
+  },
+  {
+    "op": "double_out",
+    "layout": "F",
+    "workers": 16,
+    "cpu_per_call": 0.0077981991578125,
+    "wall_per_call_max": 0.00923302673750186,
+    "faults_per_call": 0.01328125
+  }
+]

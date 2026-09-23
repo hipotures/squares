@@ -1,0 +1,145 @@
+{
+  "serial:1": {
+    "model": "serial",
+    "workers": 1,
+    "runs": [
+      {
+        "path": "/tmp/squares-n12-controlled-1.stdout",
+        "equivalent": true,
+        "differences": [],
+        "wall_s": 71.673,
+        "separation_s": 59.825,
+        "lp_s": 11.845,
+        "separation_share": 0.8347,
+        "rounds": 23,
+        "rows": 5481,
+        "objective": 12.217676366606284,
+        "stopped": "converged: every placement covers mass 1",
+        "least_covered": null,
+        "peak_support": 529,
+        "pricing_s": 0.492,
+        "slices": {
+          "round_0": {
+            "separation_s": 33.993,
+            "lp_s": 0.063,
+            "share": 0.9982
+          },
+          "rounds_1_final": {
+            "separation_s": 25.83,
+            "lp_s": 11.783,
+            "share": 0.6867
+          },
+          "last_5_completed": {
+            "separation_s": 9.42,
+            "lp_s": 3.602,
+            "share": 0.7234
+          },
+          "last_5_with_lp": {
+            "separation_s": 10.183,
+            "lp_s": 4.577,
+            "share": 0.6899
+          }
+        }
+      },
+      {
+        "path": "/tmp/squares-n12-controlled-2.stdout",
+        "equivalent": true,
+        "differences": [],
+        "wall_s": 71.082,
+        "separation_s": 59.318,
+        "lp_s": 11.761,
+        "separation_share": 0.8345,
+        "rounds": 23,
+        "rows": 5481,
+        "objective": 12.217676366606284,
+        "stopped": "converged: every placement covers mass 1",
+        "least_covered": null,
+        "peak_support": 529,
+        "pricing_s": 0.502,
+        "slices": {
+          "round_0": {
+            "separation_s": 33.564,
+            "lp_s": 0.062,
+            "share": 0.9982
+          },
+          "rounds_1_final": {
+            "separation_s": 25.752,
+            "lp_s": 11.702,
+            "share": 0.6876
+          },
+          "last_5_completed": {
+            "separation_s": 9.408,
+            "lp_s": 3.621,
+            "share": 0.7221
+          },
+          "last_5_with_lp": {
+            "separation_s": 10.289,
+            "lp_s": 4.584,
+            "share": 0.6918
+          }
+        }
+      },
+      {
+        "path": "/tmp/squares-n12-controlled-3.stdout",
+        "equivalent": true,
+        "differences": [],
+        "wall_s": 71.19,
+        "separation_s": 59.407,
+        "lp_s": 11.78,
+        "separation_share": 0.8345,
+        "rounds": 23,
+        "rows": 5481,
+        "objective": 12.217676366606284,
+        "stopped": "converged: every placement covers mass 1",
+        "least_covered": null,
+        "peak_support": 529,
+        "pricing_s": 0.49,
+        "slices": {
+          "round_0": {
+            "separation_s": 33.586,
+            "lp_s": 0.061,
+            "share": 0.9982
+          },
+          "rounds_1_final": {
+            "separation_s": 25.819,
+            "lp_s": 11.719,
+            "share": 0.6878
+          },
+          "last_5_completed": {
+            "separation_s": 9.518,
+            "lp_s": 3.621,
+            "share": 0.7244
+          },
+          "last_5_with_lp": {
+            "separation_s": 10.314,
+            "lp_s": 4.593,
+            "share": 0.6919
+          }
+        }
+      }
+    ],
+    "all_equivalent": true,
+    "wall_s": {
+      "min": 71.082,
+      "median": 71.19,
+      "max": 71.673
+    },
+    "separation_s": {
+      "min": 59.318,
+      "median": 59.407,
+      "max": 59.825
+    },
+    "lp_s": {
+      "min": 11.761,
+      "median": 11.78,
+      "max": 11.845
+    },
+    "total_speedup": 1.0,
+    "separation_speedup": 1.0,
+    "total_efficiency": 1.0,
+    "separation_efficiency": 1.0,
+    "ideal_amdahl_speedup": 1.0,
+    "fraction_of_ideal_speedup": 1.0,
+    "fraction_of_ideal_gain": null
+  }
+}

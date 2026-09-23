@@ -1,0 +1,274 @@
+[
+  {
+    "op": "argpartition",
+    "group": "low8",
+    "trial": 0,
+    "cpus": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "cpu_per_call": 0.010354767159375,
+    "wall_per_call_max": 0.010778623324995351
+  },
+  {
+    "op": "argpartition",
+    "group": "high8",
+    "trial": 0,
+    "cpus": [
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "cpu_per_call": 0.01020434425,
+    "wall_per_call_max": 0.010973801862496657
+  },
+  {
+    "op": "argpartition",
+    "group": "even8",
+    "trial": 0,
+    "cpus": [
+      0,
+      2,
+      4,
+      6,
+      8,
+      10,
+      12,
+      14
+    ],
+    "cpu_per_call": 0.01043953189375,
+    "wall_per_call_max": 0.010807416574994021
+  },
+  {
+    "op": "argpartition",
+    "group": "odd8",
+    "trial": 0,
+    "cpus": [
+      1,
+      3,
+      5,
+      7,
+      9,
+      11,
+      13,
+      15
+    ],
+    "cpu_per_call": 0.009508860131250001,
+    "wall_per_call_max": 0.010617857024999466
+  },
+  {
+    "op": "argpartition",
+    "group": "low8",
+    "trial": 1,
+    "cpus": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "cpu_per_call": 0.0099042058265625,
+    "wall_per_call_max": 0.010791320775001622
+  },
+  {
+    "op": "argpartition",
+    "group": "high8",
+    "trial": 1,
+    "cpus": [
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "cpu_per_call": 0.0102283832671875,
+    "wall_per_call_max": 0.01094986722498561
+  },
+  {
+    "op": "argpartition",
+    "group": "even8",
+    "trial": 1,
+    "cpus": [
+      0,
+      2,
+      4,
+      6,
+      8,
+      10,
+      12,
+      14
+    ],
+    "cpu_per_call": 0.0102136668140625,
+    "wall_per_call_max": 0.010855270749993906
+  },
+  {
+    "op": "argpartition",
+    "group": "odd8",
+    "trial": 1,
+    "cpus": [
+      1,
+      3,
+      5,
+      7,
+      9,
+      11,
+      13,
+      15
+    ],
+    "cpu_per_call": 0.010462589803125,
+    "wall_per_call_max": 0.010876051912509866
+  },
+  {
+    "op": "double",
+    "group": "low8",
+    "trial": 0,
+    "cpus": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "cpu_per_call": 0.01023636248125,
+    "wall_per_call_max": 0.010889640087498265
+  },
+  {
+    "op": "double",
+    "group": "high8",
+    "trial": 0,
+    "cpus": [
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "cpu_per_call": 0.0105873734859375,
+    "wall_per_call_max": 0.010959428562500761
+  },
+  {
+    "op": "double",
+    "group": "even8",
+    "trial": 0,
+    "cpus": [
+      0,
+      2,
+      4,
+      6,
+      8,
+      10,
+      12,
+      14
+    ],
+    "cpu_per_call": 0.010203775493750001,
+    "wall_per_call_max": 0.010732735162491736
+  },
+  {
+    "op": "double",
+    "group": "odd8",
+    "trial": 0,
+    "cpus": [
+      1,
+      3,
+      5,
+      7,
+      9,
+      11,
+      13,
+      15
+    ],
+    "cpu_per_call": 0.010361896698437501,
+    "wall_per_call_max": 0.010701739025012102
+  },
+  {
+    "op": "double",
+    "group": "low8",
+    "trial": 1,
+    "cpus": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "cpu_per_call": 0.010629891721875,
+    "wall_per_call_max": 0.01071862371250063
+  },
+  {
+    "op": "double",
+    "group": "high8",
+    "trial": 1,
+    "cpus": [
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "cpu_per_call": 0.0099553875609375,
+    "wall_per_call_max": 0.010526015675009149
+  },
+  {
+    "op": "double",
+    "group": "even8",
+    "trial": 1,
+    "cpus": [
+      0,
+      2,
+      4,
+      6,
+      8,
+      10,
+      12,
+      14
+    ],
+    "cpu_per_call": 0.0102520405890625,
+    "wall_per_call_max": 0.010776568699998278
+  },
+  {
+    "op": "double",
+    "group": "odd8",
+    "trial": 1,
+    "cpus": [
+      1,
+      3,
+      5,
+      7,
+      9,
+      11,
+      13,
+      15
+    ],
+    "cpu_per_call": 0.010856697581250001,
+    "wall_per_call_max": 0.011013229687500825
+  }
+]

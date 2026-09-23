@@ -1,0 +1,337 @@
+{
+  "process:1": {
+    "model": "process",
+    "workers": 1,
+    "runs": [
+      {
+        "path": "/tmp/squares-boundary-1.stdout",
+        "equivalent": true,
+        "differences": [],
+        "wall_s": 73.722,
+        "separation_s": 61.924,
+        "lp_s": 11.789,
+        "separation_share": 0.8401,
+        "rounds": 23,
+        "rows": 5481,
+        "objective": 12.217676366606284,
+        "stopped": "converged: every placement covers mass 1",
+        "least_covered": 0.9999999999999977,
+        "peak_support": 529,
+        "pricing_s": 0.466,
+        "slices": {
+          "round_0": {
+            "separation_s": 33.986,
+            "lp_s": 0.07,
+            "share": 0.9979
+          },
+          "rounds_1_final": {
+            "separation_s": 27.939,
+            "lp_s": 11.717,
+            "share": 0.7045
+          },
+          "last_5_completed": {
+            "separation_s": 9.889,
+            "lp_s": 3.63,
+            "share": 0.7315
+          },
+          "last_5_with_lp": {
+            "separation_s": 11.471,
+            "lp_s": 4.6,
+            "share": 0.7138
+          }
+        }
+      }
+    ],
+    "all_equivalent": true,
+    "wall_s": {
+      "min": 73.722,
+      "median": 73.722,
+      "max": 73.722
+    },
+    "separation_s": {
+      "min": 61.924,
+      "median": 61.924,
+      "max": 61.924
+    },
+    "lp_s": {
+      "min": 11.789,
+      "median": 11.789,
+      "max": 11.789
+    },
+    "total_speedup": 0.9656547570603077,
+    "separation_speedup": 0.9593534009430915,
+    "total_efficiency": 0.9656547570603077,
+    "separation_efficiency": 0.9593534009430915,
+    "ideal_amdahl_speedup": 1.0,
+    "fraction_of_ideal_speedup": 0.9656547570603077,
+    "fraction_of_ideal_gain": null
+  },
+  "process:2": {
+    "model": "process",
+    "workers": 2,
+    "runs": [
+      {
+        "path": "/tmp/squares-boundary-2.stdout",
+        "equivalent": true,
+        "differences": [],
+        "wall_s": 46.091,
+        "separation_s": 34.229,
+        "lp_s": 11.852,
+        "separation_share": 0.7428,
+        "rounds": 23,
+        "rows": 5481,
+        "objective": 12.217676366606284,
+        "stopped": "converged: every placement covers mass 1",
+        "least_covered": 0.9999999999999977,
+        "peak_support": 529,
+        "pricing_s": 0.487,
+        "slices": {
+          "round_0": {
+            "separation_s": 18.478,
+            "lp_s": 0.069,
+            "share": 0.9963
+          },
+          "rounds_1_final": {
+            "separation_s": 15.753,
+            "lp_s": 11.783,
+            "share": 0.5721
+          },
+          "last_5_completed": {
+            "separation_s": 5.708,
+            "lp_s": 3.651,
+            "share": 0.6099
+          },
+          "last_5_with_lp": {
+            "separation_s": 6.599,
+            "lp_s": 4.602,
+            "share": 0.5891
+          }
+        }
+      }
+    ],
+    "all_equivalent": true,
+    "wall_s": {
+      "min": 46.091,
+      "median": 46.091,
+      "max": 46.091
+    },
+    "separation_s": {
+      "min": 34.229,
+      "median": 34.229,
+      "max": 34.229
+    },
+    "lp_s": {
+      "min": 11.852,
+      "median": 11.852,
+      "max": 11.852
+    },
+    "total_speedup": 1.5445531665618015,
+    "separation_speedup": 1.735575097139852,
+    "total_efficiency": 0.7722765832809008,
+    "separation_efficiency": 0.867787548569926,
+    "ideal_amdahl_speedup": 1.715979897074952,
+    "fraction_of_ideal_speedup": 0.900099802564492,
+    "fraction_of_ideal_gain": 0.7605704696270198
+  },
+  "process:4": {
+    "model": "process",
+    "workers": 4,
+    "runs": [
+      {
+        "path": "/tmp/squares-boundary-4.stdout",
+        "equivalent": true,
+        "differences": [],
+        "wall_s": 30.588,
+        "separation_s": 18.736,
+        "lp_s": 11.843,
+        "separation_share": 0.6127,
+        "rounds": 23,
+        "rows": 5481,
+        "objective": 12.217676366606284,
+        "stopped": "converged: every placement covers mass 1",
+        "least_covered": 0.9999999999999977,
+        "peak_support": 529,
+        "pricing_s": 0.491,
+        "slices": {
+          "round_0": {
+            "separation_s": 9.515,
+            "lp_s": 0.069,
+            "share": 0.9928
+          },
+          "rounds_1_final": {
+            "separation_s": 9.219,
+            "lp_s": 11.775,
+            "share": 0.4391
+          },
+          "last_5_completed": {
+            "separation_s": 3.41,
+            "lp_s": 3.597,
+            "share": 0.4867
+          },
+          "last_5_with_lp": {
+            "separation_s": 3.848,
+            "lp_s": 4.567,
+            "share": 0.4573
+          }
+        }
+      }
+    ],
+    "all_equivalent": true,
+    "wall_s": {
+      "min": 30.588,
+      "median": 30.588,
+      "max": 30.588
+    },
+    "separation_s": {
+      "min": 18.736,
+      "median": 18.736,
+      "max": 18.736
+    },
+    "lp_s": {
+      "min": 11.843,
+      "median": 11.843,
+      "max": 11.843
+    },
+    "total_speedup": 2.3273832875637503,
+    "separation_speedup": 3.170740819812126,
+    "total_efficiency": 0.5818458218909376,
+    "separation_efficiency": 0.7926852049530315,
+    "ideal_amdahl_speedup": 2.6728240362684086,
+    "fraction_of_ideal_speedup": 0.8707581404472342,
+    "fraction_of_ideal_gain": 0.7934984545802931
+  },
+  "process:8": {
+    "model": "process",
+    "workers": 8,
+    "runs": [
+      {
+        "path": "/tmp/squares-boundary-8.stdout",
+        "equivalent": true,
+        "differences": [],
+        "wall_s": 24.451,
+        "separation_s": 12.424,
+        "lp_s": 12.016,
+        "separation_share": 0.5083,
+        "rounds": 23,
+        "rows": 5481,
+        "objective": 12.217676366606284,
+        "stopped": "converged: every placement covers mass 1",
+        "least_covered": 0.9999999999999977,
+        "peak_support": 529,
+        "pricing_s": 0.5,
+        "slices": {
+          "round_0": {
+            "separation_s": 6.3,
+            "lp_s": 0.069,
+            "share": 0.9892
+          },
+          "rounds_1_final": {
+            "separation_s": 6.123,
+            "lp_s": 11.948,
+            "share": 0.3388
+          },
+          "last_5_completed": {
+            "separation_s": 2.172,
+            "lp_s": 3.695,
+            "share": 0.3702
+          },
+          "last_5_with_lp": {
+            "separation_s": 2.505,
+            "lp_s": 4.668,
+            "share": 0.3492
+          }
+        }
+      }
+    ],
+    "all_equivalent": true,
+    "wall_s": {
+      "min": 24.451,
+      "median": 24.451,
+      "max": 24.451
+    },
+    "separation_s": {
+      "min": 12.424,
+      "median": 12.424,
+      "max": 12.424
+    },
+    "lp_s": {
+      "min": 12.016,
+      "median": 12.016,
+      "max": 12.016
+    },
+    "total_speedup": 2.911537360435156,
+    "separation_speedup": 4.781632324533161,
+    "total_efficiency": 0.3639421700543945,
+    "separation_efficiency": 0.5977040405666452,
+    "ideal_amdahl_speedup": 3.7060993941602516,
+    "fraction_of_ideal_speedup": 0.7856069281419983,
+    "fraction_of_ideal_gain": 0.7063810607105725
+  },
+  "process:16": {
+    "model": "process",
+    "workers": 16,
+    "runs": [
+      {
+        "path": "/tmp/squares-boundary16.stdout",
+        "equivalent": true,
+        "differences": [],
+        "wall_s": 21.656,
+        "separation_s": 9.755,
+        "lp_s": 11.886,
+        "separation_share": 0.4508,
+        "rounds": 23,
+        "rows": 5481,
+        "objective": 12.217676366606284,
+        "stopped": "converged: every placement covers mass 1",
+        "least_covered": 0.9999999999999977,
+        "peak_support": 529,
+        "pricing_s": 0.484,
+        "slices": {
+          "round_0": {
+            "separation_s": 5.032,
+            "lp_s": 0.071,
+            "share": 0.9861
+          },
+          "rounds_1_final": {
+            "separation_s": 4.723,
+            "lp_s": 11.812,
+            "share": 0.2856
+          },
+          "last_5_completed": {
+            "separation_s": 1.682,
+            "lp_s": 3.608,
+            "share": 0.318
+          },
+          "last_5_with_lp": {
+            "separation_s": 1.944,
+            "lp_s": 4.564,
+            "share": 0.2987
+          }
+        }
+      }
+    ],
+    "all_equivalent": true,
+    "wall_s": {
+      "min": 21.656,
+      "median": 21.656,
+      "max": 21.656
+    },
+    "separation_s": {
+      "min": 9.755,
+      "median": 9.755,
+      "max": 9.755
+    },
+    "lp_s": {
+      "min": 11.886,
+      "median": 11.886,
+      "max": 11.886
+    },
+    "total_speedup": 3.28731067602512,
+    "separation_speedup": 6.089902614044079,
+    "total_efficiency": 0.20545691725157,
+    "separation_efficiency": 0.38061891337775494,
+    "ideal_amdahl_speedup": 4.5941073265170305,
+    "fraction_of_ideal_speedup": 0.7155493858514962,
+    "fraction_of_ideal_gain": 0.6364057798579159
+  }
+}

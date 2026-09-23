@@ -1,0 +1,50 @@
+[
+  {
+    "method": "cumsum_out_reuse",
+    "peak_extra_bytes": 1630,
+    "output_bytes": 7683200,
+    "array_size": 960400
+  },
+  {
+    "method": "cumsum_inplace_reuse",
+    "peak_extra_bytes": 576,
+    "output_bytes": 7683200,
+    "array_size": 960400
+  },
+  {
+    "method": "argpartition",
+    "peak_extra_bytes": 12446368,
+    "output_bytes": 104,
+    "array_size": 1555009
+  },
+  {
+    "method": "finite_then_select",
+    "peak_extra_bytes": 24335936,
+    "output_bytes": 104,
+    "array_size": 1555009
+  },
+  {
+    "method": "first_finite",
+    "peak_extra_bytes": 9665545,
+    "output_bytes": 104,
+    "array_size": 1555009
+  },
+  {
+    "method": "partition_threshold",
+    "peak_extra_bytes": 12443128,
+    "output_bytes": 104,
+    "array_size": 1555009
+  },
+  {
+    "method": "shuffle_then_select",
+    "peak_extra_bytes": 38200749,
+    "output_bytes": 104,
+    "array_size": 1555009
+  },
+  {
+    "method": "cumsum_nested",
+    "peak_extra_bytes": 15367894,
+    "output_bytes": 7683200,
+    "array_size": 960400
+  }
+]

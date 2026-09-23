@@ -1,0 +1,1594 @@
+[
+  {
+    "size_mb_per_array": 0.25,
+    "scenario": "near4",
+    "target_cpu": 0,
+    "background_cpus": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "op": "argpartition",
+    "target": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.1123660810008005,
+      "cpu": 1.1123986879999999,
+      "thread_cpu": 1.112399488,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 818,
+      "rss_kb": 54064,
+      "checksum": 145147040.0,
+      "start": 12317.151985874
+    },
+    "bg_alive": 4
+  },
+  {
+    "size_mb_per_array": 0.25,
+    "scenario": "near4",
+    "target_cpu": 0,
+    "background_cpus": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "op": "double",
+    "target": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.468189232999066,
+      "cpu": 0.46826879799999993,
+      "thread_cpu": 0.468269348,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 52241,
+      "rss_kb": 61640,
+      "checksum": 0.0,
+      "start": 12318.586914457
+    },
+    "bg_alive": 4
+  },
+  {
+    "size_mb_per_array": 0.25,
+    "scenario": "far4",
+    "target_cpu": 0,
+    "background_cpus": [
+      8,
+      9,
+      10,
+      11
+    ],
+    "op": "argpartition",
+    "target": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.1206407720001152,
+      "cpu": 1.120668008,
+      "thread_cpu": 1.1206685680000001,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 818,
+      "rss_kb": 54032,
+      "checksum": 145147040.0,
+      "start": 12319.378839447
+    },
+    "bg_alive": 4
+  },
+  {
+    "size_mb_per_array": 0.25,
+    "scenario": "far4",
+    "target_cpu": 0,
+    "background_cpus": [
+      8,
+      9,
+      10,
+      11
+    ],
+    "op": "double",
+    "target": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.5241290300000401,
+      "cpu": 0.524171948,
+      "thread_cpu": 0.5241725380000001,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61684,
+      "checksum": 0.0,
+      "start": 12320.830523103
+    },
+    "bg_alive": 4
+  },
+  {
+    "size_mb_per_array": 0.25,
+    "scenario": "cross8",
+    "target_cpu": 0,
+    "background_cpus": [
+      1,
+      2,
+      3,
+      4,
+      8,
+      9,
+      10,
+      11
+    ],
+    "op": "argpartition",
+    "target": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.2201736590013752,
+      "cpu": 1.217435364,
+      "thread_cpu": 1.2174358619999999,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 307,
+      "rss_kb": 53968,
+      "checksum": 145147040.0,
+      "start": 12321.714900816
+    },
+    "bg_alive": 8
+  },
+  {
+    "size_mb_per_array": 0.25,
+    "scenario": "cross8",
+    "target_cpu": 0,
+    "background_cpus": [
+      1,
+      2,
+      3,
+      4,
+      8,
+      9,
+      10,
+      11
+    ],
+    "op": "double",
+    "target": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.507718846998614,
+      "cpu": 0.507812327,
+      "thread_cpu": 0.507812896,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 52241,
+      "rss_kb": 61656,
+      "checksum": 0.0,
+      "start": 12323.307020218
+    },
+    "bg_alive": 8
+  },
+  {
+    "size_mb_per_array": 0.25,
+    "scenario": "near7",
+    "target_cpu": 0,
+    "background_cpus": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "op": "argpartition",
+    "target": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.1508864980005455,
+      "cpu": 1.148134669,
+      "thread_cpu": 1.148135309,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 307,
+      "rss_kb": 53996,
+      "checksum": 145147040.0,
+      "start": 12324.145067131
+    },
+    "bg_alive": 7
+  },
+  {
+    "size_mb_per_array": 0.25,
+    "scenario": "near7",
+    "target_cpu": 0,
+    "background_cpus": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "op": "double",
+    "target": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.5370503659996757,
+      "cpu": 0.537092271,
+      "thread_cpu": 0.53709303,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61796,
+      "checksum": 0.0,
+      "start": 12325.620639014
+    },
+    "bg_alive": 7
+  },
+  {
+    "size_mb_per_array": 0.25,
+    "scenario": "far7",
+    "target_cpu": 0,
+    "background_cpus": [
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "op": "argpartition",
+    "target": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.1679279899999528,
+      "cpu": 1.1651353180000001,
+      "thread_cpu": 1.1651355879999998,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 307,
+      "rss_kb": 54036,
+      "checksum": 145147040.0,
+      "start": 12326.49551688
+    },
+    "bg_alive": 7
+  },
+  {
+    "size_mb_per_array": 0.25,
+    "scenario": "far7",
+    "target_cpu": 0,
+    "background_cpus": [
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "op": "double",
+    "target": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.5536045580010978,
+      "cpu": 0.553670942,
+      "thread_cpu": 0.553679513,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61704,
+      "checksum": 0.0,
+      "start": 12327.990389457
+    },
+    "bg_alive": 7
+  },
+  {
+    "size_mb_per_array": 0.25,
+    "scenario": "far4_swap",
+    "target_cpu": 8,
+    "background_cpus": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "op": "argpartition",
+    "target": {
+      "op": "argpartition",
+      "cpu_pin": 8,
+      "calls": 160,
+      "wall": 1.1128288180007075,
+      "cpu": 1.112870156,
+      "thread_cpu": 1.112871236,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 818,
+      "rss_kb": 53996,
+      "checksum": 145147040.0,
+      "start": 12328.867152816
+    },
+    "bg_alive": 4
+  },
+  {
+    "size_mb_per_array": 0.25,
+    "scenario": "far4_swap",
+    "target_cpu": 8,
+    "background_cpus": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "op": "double",
+    "target": {
+      "op": "double",
+      "cpu_pin": 8,
+      "calls": 80,
+      "wall": 0.5274991879996378,
+      "cpu": 0.527561286,
+      "thread_cpu": 0.527562286,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61688,
+      "checksum": 0.0,
+      "start": 12330.303981642
+    },
+    "bg_alive": 4
+  },
+  {
+    "size_mb_per_array": 0.25,
+    "scenario": "near4_swap",
+    "target_cpu": 8,
+    "background_cpus": [
+      9,
+      10,
+      11,
+      12
+    ],
+    "op": "argpartition",
+    "target": {
+      "op": "argpartition",
+      "cpu_pin": 8,
+      "calls": 160,
+      "wall": 1.1146005129994592,
+      "cpu": 1.111923159,
+      "thread_cpu": 1.111923869,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 818,
+      "rss_kb": 54008,
+      "checksum": 145147040.0,
+      "start": 12331.15770559
+    },
+    "bg_alive": 4
+  },
+  {
+    "size_mb_per_array": 0.25,
+    "scenario": "near4_swap",
+    "target_cpu": 8,
+    "background_cpus": [
+      9,
+      10,
+      11,
+      12
+    ],
+    "op": "double",
+    "target": {
+      "op": "double",
+      "cpu_pin": 8,
+      "calls": 80,
+      "wall": 0.5330258290014172,
+      "cpu": 0.533133246,
+      "thread_cpu": 0.533132726,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61756,
+      "checksum": 0.0,
+      "start": 12332.59944171
+    },
+    "bg_alive": 4
+  },
+  {
+    "size_mb_per_array": 2.0,
+    "scenario": "near4",
+    "target_cpu": 0,
+    "background_cpus": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "op": "argpartition",
+    "target": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.210726192999573,
+      "cpu": 1.210827156,
+      "thread_cpu": 1.210828785,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 307,
+      "rss_kb": 53988,
+      "checksum": 145147040.0,
+      "start": 12333.474419495
+    },
+    "bg_alive": 4
+  },
+  {
+    "size_mb_per_array": 2.0,
+    "scenario": "near4",
+    "target_cpu": 0,
+    "background_cpus": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "op": "double",
+    "target": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.6099926549995871,
+      "cpu": 0.610094732,
+      "thread_cpu": 0.610094922,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61636,
+      "checksum": 0.0,
+      "start": 12335.017223097
+    },
+    "bg_alive": 4
+  },
+  {
+    "size_mb_per_array": 2.0,
+    "scenario": "far4",
+    "target_cpu": 0,
+    "background_cpus": [
+      8,
+      9,
+      10,
+      11
+    ],
+    "op": "argpartition",
+    "target": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.1922533859997202,
+      "cpu": 1.192276273,
+      "thread_cpu": 1.192277384,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 307,
+      "rss_kb": 54180,
+      "checksum": 145147040.0,
+      "start": 12335.954591438
+    },
+    "bg_alive": 4
+  },
+  {
+    "size_mb_per_array": 2.0,
+    "scenario": "far4",
+    "target_cpu": 0,
+    "background_cpus": [
+      8,
+      9,
+      10,
+      11
+    ],
+    "op": "double",
+    "target": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.6095188480012439,
+      "cpu": 0.6096356919999999,
+      "thread_cpu": 0.609635353,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61764,
+      "checksum": 0.0,
+      "start": 12337.482492611
+    },
+    "bg_alive": 4
+  },
+  {
+    "size_mb_per_array": 2.0,
+    "scenario": "cross8",
+    "target_cpu": 0,
+    "background_cpus": [
+      1,
+      2,
+      3,
+      4,
+      8,
+      9,
+      10,
+      11
+    ],
+    "op": "argpartition",
+    "target": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.5452862019992608,
+      "cpu": 1.54543779,
+      "thread_cpu": 1.545438001,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 818,
+      "rss_kb": 53980,
+      "checksum": 145147040.0,
+      "start": 12338.481174843
+    },
+    "bg_alive": 8
+  },
+  {
+    "size_mb_per_array": 2.0,
+    "scenario": "cross8",
+    "target_cpu": 0,
+    "background_cpus": [
+      1,
+      2,
+      3,
+      4,
+      8,
+      9,
+      10,
+      11
+    ],
+    "op": "double",
+    "target": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.7614756959992519,
+      "cpu": 0.761536748,
+      "thread_cpu": 0.761537677,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61708,
+      "checksum": 0.0,
+      "start": 12340.403988209
+    },
+    "bg_alive": 8
+  },
+  {
+    "size_mb_per_array": 2.0,
+    "scenario": "near7",
+    "target_cpu": 0,
+    "background_cpus": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "op": "argpartition",
+    "target": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.6289956260006875,
+      "cpu": 1.625361556,
+      "thread_cpu": 1.625364025,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 307,
+      "rss_kb": 54028,
+      "checksum": 145147040.0,
+      "start": 12341.538734163
+    },
+    "bg_alive": 7
+  },
+  {
+    "size_mb_per_array": 2.0,
+    "scenario": "near7",
+    "target_cpu": 0,
+    "background_cpus": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "op": "double",
+    "target": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.7521033379998698,
+      "cpu": 0.7522478640000001,
+      "thread_cpu": 0.752248193,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61808,
+      "checksum": 0.0,
+      "start": 12343.538139917
+    },
+    "bg_alive": 7
+  },
+  {
+    "size_mb_per_array": 2.0,
+    "scenario": "far7",
+    "target_cpu": 0,
+    "background_cpus": [
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "op": "argpartition",
+    "target": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.6626416199997038,
+      "cpu": 1.658979593,
+      "thread_cpu": 1.658981113,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 307,
+      "rss_kb": 53820,
+      "checksum": 145147040.0,
+      "start": 12344.678312702
+    },
+    "bg_alive": 7
+  },
+  {
+    "size_mb_per_array": 2.0,
+    "scenario": "far7",
+    "target_cpu": 0,
+    "background_cpus": [
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "op": "double",
+    "target": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.7637140180013375,
+      "cpu": 0.7637441509999999,
+      "thread_cpu": 0.76374514,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61668,
+      "checksum": 0.0,
+      "start": 12346.690742771
+    },
+    "bg_alive": 7
+  },
+  {
+    "size_mb_per_array": 2.0,
+    "scenario": "far4_swap",
+    "target_cpu": 8,
+    "background_cpus": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "op": "argpartition",
+    "target": {
+      "op": "argpartition",
+      "cpu_pin": 8,
+      "calls": 160,
+      "wall": 1.196613651000007,
+      "cpu": 1.196689814,
+      "thread_cpu": 1.196689793,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 818,
+      "rss_kb": 53996,
+      "checksum": 145147040.0,
+      "start": 12347.796692294
+    },
+    "bg_alive": 4
+  },
+  {
+    "size_mb_per_array": 2.0,
+    "scenario": "far4_swap",
+    "target_cpu": 8,
+    "background_cpus": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "op": "double",
+    "target": {
+      "op": "double",
+      "cpu_pin": 8,
+      "calls": 80,
+      "wall": 0.6120118779999757,
+      "cpu": 0.612109153,
+      "thread_cpu": 0.6121095630000001,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61588,
+      "checksum": 0.0,
+      "start": 12349.324186658
+    },
+    "bg_alive": 4
+  },
+  {
+    "size_mb_per_array": 2.0,
+    "scenario": "near4_swap",
+    "target_cpu": 8,
+    "background_cpus": [
+      9,
+      10,
+      11,
+      12
+    ],
+    "op": "argpartition",
+    "target": {
+      "op": "argpartition",
+      "cpu_pin": 8,
+      "calls": 160,
+      "wall": 1.199132241999905,
+      "cpu": 1.196280427,
+      "thread_cpu": 1.1962757780000002,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 818,
+      "rss_kb": 53888,
+      "checksum": 145147040.0,
+      "start": 12350.269206533
+    },
+    "bg_alive": 4
+  },
+  {
+    "size_mb_per_array": 2.0,
+    "scenario": "near4_swap",
+    "target_cpu": 8,
+    "background_cpus": [
+      9,
+      10,
+      11,
+      12
+    ],
+    "op": "double",
+    "target": {
+      "op": "double",
+      "cpu_pin": 8,
+      "calls": 80,
+      "wall": 0.6113355210000009,
+      "cpu": 0.611447186,
+      "thread_cpu": 0.6114474560000001,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61656,
+      "checksum": 0.0,
+      "start": 12351.800880933
+    },
+    "bg_alive": 4
+  },
+  {
+    "size_mb_per_array": 8.0,
+    "scenario": "near4",
+    "target_cpu": 0,
+    "background_cpus": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "op": "argpartition",
+    "target": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 2.204673950000142,
+      "cpu": 2.204818176,
+      "thread_cpu": 2.204819726,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 818,
+      "rss_kb": 54084,
+      "checksum": 145147040.0,
+      "start": 12352.829551761
+    },
+    "bg_alive": 4
+  },
+  {
+    "size_mb_per_array": 8.0,
+    "scenario": "near4",
+    "target_cpu": 0,
+    "background_cpus": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "op": "double",
+    "target": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.8987537539996993,
+      "cpu": 0.8989835899999999,
+      "thread_cpu": 0.8989845599999999,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61560,
+      "checksum": 0.0,
+      "start": 12355.474916047
+    },
+    "bg_alive": 4
+  },
+  {
+    "size_mb_per_array": 8.0,
+    "scenario": "far4",
+    "target_cpu": 0,
+    "background_cpus": [
+      8,
+      9,
+      10,
+      11
+    ],
+    "op": "argpartition",
+    "target": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 2.1016149139995832,
+      "cpu": 2.101614183,
+      "thread_cpu": 2.101615504,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 818,
+      "rss_kb": 54092,
+      "checksum": 145147040.0,
+      "start": 12356.824676662
+    },
+    "bg_alive": 4
+  },
+  {
+    "size_mb_per_array": 8.0,
+    "scenario": "far4",
+    "target_cpu": 0,
+    "background_cpus": [
+      8,
+      9,
+      10,
+      11
+    ],
+    "op": "double",
+    "target": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.8739158680000401,
+      "cpu": 0.874031149,
+      "thread_cpu": 0.8740308179999999,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61692,
+      "checksum": 0.0,
+      "start": 12359.331427865
+    },
+    "bg_alive": 4
+  },
+  {
+    "size_mb_per_array": 8.0,
+    "scenario": "cross8",
+    "target_cpu": 0,
+    "background_cpus": [
+      1,
+      2,
+      3,
+      4,
+      8,
+      9,
+      10,
+      11
+    ],
+    "op": "argpartition",
+    "target": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 2.3872571920001064,
+      "cpu": 2.375228396,
+      "thread_cpu": 2.3752374069999997,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 307,
+      "rss_kb": 54004,
+      "checksum": 145147040.0,
+      "start": 12360.542421386
+    },
+    "bg_alive": 8
+  },
+  {
+    "size_mb_per_array": 8.0,
+    "scenario": "cross8",
+    "target_cpu": 0,
+    "background_cpus": [
+      1,
+      2,
+      3,
+      4,
+      8,
+      9,
+      10,
+      11
+    ],
+    "op": "double",
+    "target": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 1.1220476960006636,
+      "cpu": 1.122310221,
+      "thread_cpu": 1.122307821,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61584,
+      "checksum": 0.0,
+      "start": 12363.388250154
+    },
+    "bg_alive": 8
+  },
+  {
+    "size_mb_per_array": 8.0,
+    "scenario": "near7",
+    "target_cpu": 0,
+    "background_cpus": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "op": "argpartition",
+    "target": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 2.680888643999424,
+      "cpu": 2.671550794,
+      "thread_cpu": 2.6715549039999997,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 307,
+      "rss_kb": 54052,
+      "checksum": 145147040.0,
+      "start": 12364.90075094
+    },
+    "bg_alive": 7
+  },
+  {
+    "size_mb_per_array": 8.0,
+    "scenario": "near7",
+    "target_cpu": 0,
+    "background_cpus": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "op": "double",
+    "target": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 1.0787738149992947,
+      "cpu": 1.078958425,
+      "thread_cpu": 1.0789598850000002,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61684,
+      "checksum": 0.0,
+      "start": 12368.01111056
+    },
+    "bg_alive": 7
+  },
+  {
+    "size_mb_per_array": 8.0,
+    "scenario": "far7",
+    "target_cpu": 0,
+    "background_cpus": [
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "op": "argpartition",
+    "target": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 2.5404937969997263,
+      "cpu": 2.529549739,
+      "thread_cpu": 2.5295564280000002,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 818,
+      "rss_kb": 54012,
+      "checksum": 145147040.0,
+      "start": 12369.643836572
+    },
+    "bg_alive": 7
+  },
+  {
+    "size_mb_per_array": 8.0,
+    "scenario": "far7",
+    "target_cpu": 0,
+    "background_cpus": [
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "op": "double",
+    "target": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.996889727000962,
+      "cpu": 0.996867269,
+      "thread_cpu": 0.9968701289999999,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 52241,
+      "rss_kb": 61712,
+      "checksum": 0.0,
+      "start": 12372.66170678
+    },
+    "bg_alive": 7
+  },
+  {
+    "size_mb_per_array": 8.0,
+    "scenario": "far4_swap",
+    "target_cpu": 8,
+    "background_cpus": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "op": "argpartition",
+    "target": {
+      "op": "argpartition",
+      "cpu_pin": 8,
+      "calls": 160,
+      "wall": 2.3413010299991583,
+      "cpu": 2.341295057,
+      "thread_cpu": 2.341295577,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 307,
+      "rss_kb": 54036,
+      "checksum": 145147040.0,
+      "start": 12374.134494682
+    },
+    "bg_alive": 4
+  },
+  {
+    "size_mb_per_array": 8.0,
+    "scenario": "far4_swap",
+    "target_cpu": 8,
+    "background_cpus": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "op": "double",
+    "target": {
+      "op": "double",
+      "cpu_pin": 8,
+      "calls": 80,
+      "wall": 0.8752916749999713,
+      "cpu": 0.875416705,
+      "thread_cpu": 0.875418124,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61836,
+      "checksum": 0.0,
+      "start": 12376.913488489
+    },
+    "bg_alive": 4
+  },
+  {
+    "size_mb_per_array": 8.0,
+    "scenario": "near4_swap",
+    "target_cpu": 8,
+    "background_cpus": [
+      9,
+      10,
+      11,
+      12
+    ],
+    "op": "argpartition",
+    "target": {
+      "op": "argpartition",
+      "cpu_pin": 8,
+      "calls": 160,
+      "wall": 2.4508239639999374,
+      "cpu": 2.4444072,
+      "thread_cpu": 2.44441032,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 307,
+      "rss_kb": 53984,
+      "checksum": 145147040.0,
+      "start": 12378.234775192
+    },
+    "bg_alive": 4
+  },
+  {
+    "size_mb_per_array": 8.0,
+    "scenario": "near4_swap",
+    "target_cpu": 8,
+    "background_cpus": [
+      9,
+      10,
+      11,
+      12
+    ],
+    "op": "double",
+    "target": {
+      "op": "double",
+      "cpu_pin": 8,
+      "calls": 80,
+      "wall": 0.8969308300002012,
+      "cpu": 0.897137006,
+      "thread_cpu": 0.897138166,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61592,
+      "checksum": 0.0,
+      "start": 12381.125123237
+    },
+    "bg_alive": 4
+  },
+  {
+    "size_mb_per_array": 64.0,
+    "scenario": "near4",
+    "target_cpu": 0,
+    "background_cpus": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "op": "argpartition",
+    "target": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 2.844290003000424,
+      "cpu": 2.84455425,
+      "thread_cpu": 2.8445559009999997,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 307,
+      "rss_kb": 54204,
+      "checksum": 145147040.0,
+      "start": 12382.471147275
+    },
+    "bg_alive": 4
+  },
+  {
+    "size_mb_per_array": 64.0,
+    "scenario": "near4",
+    "target_cpu": 0,
+    "background_cpus": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "op": "double",
+    "target": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 1.0157524229998671,
+      "cpu": 1.0159358619999999,
+      "thread_cpu": 1.015939573,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61816,
+      "checksum": 0.0,
+      "start": 12385.766590878
+    },
+    "bg_alive": 4
+  },
+  {
+    "size_mb_per_array": 64.0,
+    "scenario": "far4",
+    "target_cpu": 0,
+    "background_cpus": [
+      8,
+      9,
+      10,
+      11
+    ],
+    "op": "argpartition",
+    "target": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 3.0957219889987755,
+      "cpu": 3.095617195,
+      "thread_cpu": 3.095620774,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 307,
+      "rss_kb": 54148,
+      "checksum": 145147040.0,
+      "start": 12387.307037229
+    },
+    "bg_alive": 4
+  },
+  {
+    "size_mb_per_array": 64.0,
+    "scenario": "far4",
+    "target_cpu": 0,
+    "background_cpus": [
+      8,
+      9,
+      10,
+      11
+    ],
+    "op": "double",
+    "target": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 0.9657762539991381,
+      "cpu": 0.9660093280000001,
+      "thread_cpu": 0.966013608,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 52241,
+      "rss_kb": 61532,
+      "checksum": 0.0,
+      "start": 12390.940491972
+    },
+    "bg_alive": 4
+  },
+  {
+    "size_mb_per_array": 64.0,
+    "scenario": "cross8",
+    "target_cpu": 0,
+    "background_cpus": [
+      1,
+      2,
+      3,
+      4,
+      8,
+      9,
+      10,
+      11
+    ],
+    "op": "argpartition",
+    "target": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 1.8991686990011658,
+      "cpu": 1.884539529,
+      "thread_cpu": 1.884551219,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 308,
+      "rss_kb": 54288,
+      "checksum": 145147040.0,
+      "start": 12392.377709927
+    },
+    "bg_alive": 8
+  },
+  {
+    "size_mb_per_array": 64.0,
+    "scenario": "cross8",
+    "target_cpu": 0,
+    "background_cpus": [
+      1,
+      2,
+      3,
+      4,
+      8,
+      9,
+      10,
+      11
+    ],
+    "op": "double",
+    "target": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 1.273822676999771,
+      "cpu": 1.2737637499999999,
+      "thread_cpu": 1.2737697700000001,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61680,
+      "checksum": 0.0,
+      "start": 12394.741839458
+    },
+    "bg_alive": 8
+  },
+  {
+    "size_mb_per_array": 64.0,
+    "scenario": "near7",
+    "target_cpu": 0,
+    "background_cpus": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "op": "argpartition",
+    "target": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 2.3614188709998416,
+      "cpu": 2.361268506,
+      "thread_cpu": 2.361273797,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 818,
+      "rss_kb": 54004,
+      "checksum": 145147040.0,
+      "start": 12396.540646972
+    },
+    "bg_alive": 7
+  },
+  {
+    "size_mb_per_array": 64.0,
+    "scenario": "near7",
+    "target_cpu": 0,
+    "background_cpus": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "op": "double",
+    "target": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 1.0376242870006536,
+      "cpu": 1.037695874,
+      "thread_cpu": 1.037701934,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 52241,
+      "rss_kb": 61616,
+      "checksum": 0.0,
+      "start": 12399.373982362
+    },
+    "bg_alive": 7
+  },
+  {
+    "size_mb_per_array": 64.0,
+    "scenario": "far7",
+    "target_cpu": 0,
+    "background_cpus": [
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "op": "argpartition",
+    "target": {
+      "op": "argpartition",
+      "cpu_pin": 0,
+      "calls": 160,
+      "wall": 3.109282384000835,
+      "cpu": 3.1091681199999996,
+      "thread_cpu": 3.1091653000000004,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 307,
+      "rss_kb": 54016,
+      "checksum": 145147040.0,
+      "start": 12401.037782729
+    },
+    "bg_alive": 7
+  },
+  {
+    "size_mb_per_array": 64.0,
+    "scenario": "far7",
+    "target_cpu": 0,
+    "background_cpus": [
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "op": "double",
+    "target": {
+      "op": "double",
+      "cpu_pin": 0,
+      "calls": 80,
+      "wall": 1.1369085359983728,
+      "cpu": 1.137028448,
+      "thread_cpu": 1.137032479,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 52241,
+      "rss_kb": 61700,
+      "checksum": 0.0,
+      "start": 12404.548812602
+    },
+    "bg_alive": 7
+  },
+  {
+    "size_mb_per_array": 64.0,
+    "scenario": "far4_swap",
+    "target_cpu": 8,
+    "background_cpus": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "op": "argpartition",
+    "target": {
+      "op": "argpartition",
+      "cpu_pin": 8,
+      "calls": 160,
+      "wall": 1.712506999998368,
+      "cpu": 1.712019505,
+      "thread_cpu": 1.712020425,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 307,
+      "rss_kb": 53936,
+      "checksum": 145147040.0,
+      "start": 12406.186478138
+    },
+    "bg_alive": 4
+  },
+  {
+    "size_mb_per_array": 64.0,
+    "scenario": "far4_swap",
+    "target_cpu": 8,
+    "background_cpus": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "op": "double",
+    "target": {
+      "op": "double",
+      "cpu_pin": 8,
+      "calls": 80,
+      "wall": 0.84765668,
+      "cpu": 0.847850001,
+      "thread_cpu": 0.8478520119999999,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 52241,
+      "rss_kb": 61628,
+      "checksum": 0.0,
+      "start": 12408.377090856
+    },
+    "bg_alive": 4
+  },
+  {
+    "size_mb_per_array": 64.0,
+    "scenario": "near4_swap",
+    "target_cpu": 8,
+    "background_cpus": [
+      9,
+      10,
+      11,
+      12
+    ],
+    "op": "argpartition",
+    "target": {
+      "op": "argpartition",
+      "cpu_pin": 8,
+      "calls": 160,
+      "wall": 1.4648895290010842,
+      "cpu": 1.457792495,
+      "thread_cpu": 1.457794295,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 307,
+      "rss_kb": 54092,
+      "checksum": 145147040.0,
+      "start": 12409.710233449
+    },
+    "bg_alive": 4
+  },
+  {
+    "size_mb_per_array": 64.0,
+    "scenario": "near4_swap",
+    "target_cpu": 8,
+    "background_cpus": [
+      9,
+      10,
+      11,
+      12
+    ],
+    "op": "double",
+    "target": {
+      "op": "double",
+      "cpu_pin": 8,
+      "calls": 80,
+      "wall": 0.8463241329991433,
+      "cpu": 0.846500986,
+      "thread_cpu": 0.846501676,
+      "threads_before": 1,
+      "threads_after": 1,
+      "minor_faults": 93121,
+      "rss_kb": 61820,
+      "checksum": 0.0,
+      "start": 12411.650443607
+    },
+    "bg_alive": 4
+  }
+]

@@ -1,0 +1,271 @@
+case n=12 L=99/25=3.9600 rule grids (26, 35, 43)
+{
+  "case": "n=12 L=99/25=3.9600",
+  "row_run": {
+    "grids": [
+      26,
+      35,
+      43
+    ],
+    "densities": [
+      8.427,
+      11.46,
+      14.157
+    ],
+    "orbits": 511,
+    "sites": 3737,
+    "rows_per_direction": 3,
+    "max_rounds": 60,
+    "rounds": 23,
+    "rows": 5481,
+    "objective": 12.217676366606284,
+    "stopped": "converged: every placement covers mass 1",
+    "seconds": 25.784,
+    "separation_seconds": 13.853,
+    "lp_seconds": 11.928,
+    "separation_share": 0.5373,
+    "peak_support": 529,
+    "timings": [
+      {
+        "index": 0,
+        "separation_s": 5.961,
+        "lp_s": 0.068,
+        "rows_held": 504,
+        "rows_added": 504,
+        "violated": 543,
+        "support": 0,
+        "objective": 9.575277
+      },
+      {
+        "index": 1,
+        "separation_s": 0.217,
+        "lp_s": 0.077,
+        "rows_held": 823,
+        "rows_added": 319,
+        "violated": 543,
+        "support": 173,
+        "objective": 10.142857
+      },
+      {
+        "index": 2,
+        "separation_s": 0.197,
+        "lp_s": 0.129,
+        "rows_held": 1118,
+        "rows_added": 295,
+        "violated": 543,
+        "support": 152,
+        "objective": 11.303226
+      },
+      {
+        "index": 3,
+        "separation_s": 0.189,
+        "lp_s": 0.16,
+        "rows_held": 1457,
+        "rows_added": 339,
+        "violated": 543,
+        "support": 132,
+        "objective": 11.736945
+      },
+      {
+        "index": 4,
+        "separation_s": 0.297,
+        "lp_s": 0.196,
+        "rows_held": 1805,
+        "rows_added": 348,
+        "violated": 543,
+        "support": 213,
+        "objective": 11.9463
+      },
+      {
+        "index": 5,
+        "separation_s": 0.24,
+        "lp_s": 0.243,
+        "rows_held": 2103,
+        "rows_added": 298,
+        "violated": 543,
+        "support": 189,
+        "objective": 12.012735
+      },
+      {
+        "index": 6,
+        "separation_s": 0.349,
+        "lp_s": 0.352,
+        "rows_held": 2438,
+        "rows_added": 335,
+        "violated": 543,
+        "support": 241,
+        "objective": 12.052455
+      },
+      {
+        "index": 7,
+        "separation_s": 0.366,
+        "lp_s": 0.36,
+        "rows_held": 2742,
+        "rows_added": 304,
+        "violated": 543,
+        "support": 249,
+        "objective": 12.077217
+      },
+      {
+        "index": 8,
+        "separation_s": 0.309,
+        "lp_s": 0.404,
+        "rows_held": 3085,
+        "rows_added": 343,
+        "violated": 543,
+        "support": 229,
+        "objective": 12.107097
+      },
+      {
+        "index": 9,
+        "separation_s": 0.16,
+        "lp_s": 0.485,
+        "rows_held": 3379,
+        "rows_added": 294,
+        "violated": 510,
+        "support": 257,
+        "objective": 12.145254
+      },
+      {
+        "index": 10,
+        "separation_s": 0.21,
+        "lp_s": 0.467,
+        "rows_held": 3716,
+        "rows_added": 337,
+        "violated": 543,
+        "support": 305,
+        "objective": 12.159747
+      },
+      {
+        "index": 11,
+        "separation_s": 0.338,
+        "lp_s": 0.712,
+        "rows_held": 4001,
+        "rows_added": 285,
+        "violated": 519,
+        "support": 393,
+        "objective": 12.175585
+      },
+      {
+        "index": 12,
+        "separation_s": 0.228,
+        "lp_s": 0.668,
+        "rows_held": 4367,
+        "rows_added": 366,
+        "violated": 528,
+        "support": 333,
+        "objective": 12.190293
+      },
+      {
+        "index": 13,
+        "separation_s": 0.361,
+        "lp_s": 0.655,
+        "rows_held": 4606,
+        "rows_added": 239,
+        "violated": 468,
+        "support": 405,
+        "objective": 12.202589
+      },
+      {
+        "index": 14,
+        "separation_s": 0.435,
+        "lp_s": 0.725,
+        "rows_held": 4746,
+        "rows_added": 140,
+        "violated": 309,
+        "support": 437,
+        "objective": 12.206004
+      },
+      {
+        "index": 15,
+        "separation_s": 0.466,
+        "lp_s": 0.794,
+        "rows_held": 4912,
+        "rows_added": 166,
+        "violated": 306,
+        "support": 445,
+        "objective": 12.208986
+      },
+      {
+        "index": 16,
+        "separation_s": 0.492,
+        "lp_s": 0.802,
+        "rows_held": 5037,
+        "rows_added": 125,
+        "violated": 270,
+        "support": 465,
+        "objective": 12.214631
+      },
+      {
+        "index": 17,
+        "separation_s": 0.626,
+        "lp_s": 0.991,
+        "rows_held": 5199,
+        "rows_added": 162,
+        "violated": 360,
+        "support": 529,
+        "objective": 12.215821
+      },
+      {
+        "index": 18,
+        "separation_s": 0.551,
+        "lp_s": 0.907,
+        "rows_held": 5329,
+        "rows_added": 130,
+        "violated": 246,
+        "support": 489,
+        "objective": 12.216974
+      },
+      {
+        "index": 19,
+        "separation_s": 0.446,
+        "lp_s": 0.946,
+        "rows_held": 5401,
+        "rows_added": 72,
+        "violated": 159,
+        "support": 449,
+        "objective": 12.217539
+      },
+      {
+        "index": 20,
+        "separation_s": 0.524,
+        "lp_s": 0.949,
+        "rows_held": 5456,
+        "rows_added": 55,
+        "violated": 108,
+        "support": 477,
+        "objective": 12.217676
+      },
+      {
+        "index": 21,
+        "separation_s": 0.42,
+        "lp_s": 0.837,
+        "rows_held": 5481,
+        "rows_added": 25,
+        "violated": 45,
+        "support": 433,
+        "objective": 12.217676
+      },
+      {
+        "index": 22,
+        "separation_s": 0.469,
+        "lp_s": 0.0,
+        "rows_held": 5481,
+        "rows_added": 0,
+        "violated": 0,
+        "support": 453,
+        "objective": 12.217676
+      }
+    ]
+  },
+  "pricing": {
+    "dual_squares_s": 0.004,
+    "rank_candidates_s": 0.509,
+    "total_s": 0.513,
+    "support": 32,
+    "candidates": 1,
+    "best_averaged_depth": 1.3370154387016004,
+    "share_of_round": 0.0199
+  },
+  "least_covered": 0.9999999999999977
+}

@@ -1,0 +1,717 @@
+{
+  "thread:1": {
+    "model": "thread",
+    "workers": 1,
+    "runs": [
+      {
+        "path": "/tmp/squares-thread-1-1.stdout",
+        "equivalent": true,
+        "differences": [],
+        "wall_s": 71.357,
+        "separation_s": 59.618,
+        "lp_s": 11.736,
+        "separation_share": 0.8355,
+        "rounds": 23,
+        "rows": 5481,
+        "objective": 12.217676366606284,
+        "stopped": "converged: every placement covers mass 1",
+        "least_covered": 0.9999999999999977,
+        "peak_support": 529,
+        "pricing_s": 0.485,
+        "slices": {
+          "round_0": {
+            "separation_s": 33.529,
+            "lp_s": 0.067,
+            "share": 0.998
+          },
+          "rounds_1_final": {
+            "separation_s": 26.088,
+            "lp_s": 11.669,
+            "share": 0.6909
+          },
+          "last_5_completed": {
+            "separation_s": 9.495,
+            "lp_s": 3.606,
+            "share": 0.7248
+          },
+          "last_5_with_lp": {
+            "separation_s": 10.322,
+            "lp_s": 4.555,
+            "share": 0.6938
+          }
+        }
+      },
+      {
+        "path": "/tmp/squares-thread-1-2.stdout",
+        "equivalent": true,
+        "differences": [],
+        "wall_s": 71.275,
+        "separation_s": 59.523,
+        "lp_s": 11.749,
+        "separation_share": 0.8351,
+        "rounds": 23,
+        "rows": 5481,
+        "objective": 12.217676366606284,
+        "stopped": "converged: every placement covers mass 1",
+        "least_covered": 0.9999999999999977,
+        "peak_support": 529,
+        "pricing_s": 0.498,
+        "slices": {
+          "round_0": {
+            "separation_s": 33.437,
+            "lp_s": 0.066,
+            "share": 0.998
+          },
+          "rounds_1_final": {
+            "separation_s": 26.084,
+            "lp_s": 11.685,
+            "share": 0.6906
+          },
+          "last_5_completed": {
+            "separation_s": 9.543,
+            "lp_s": 3.604,
+            "share": 0.7259
+          },
+          "last_5_with_lp": {
+            "separation_s": 10.325,
+            "lp_s": 4.561,
+            "share": 0.6936
+          }
+        }
+      },
+      {
+        "path": "/tmp/squares-thread-1-3.stdout",
+        "equivalent": true,
+        "differences": [],
+        "wall_s": 71.188,
+        "separation_s": 59.511,
+        "lp_s": 11.674,
+        "separation_share": 0.836,
+        "rounds": 23,
+        "rows": 5481,
+        "objective": 12.217676366606284,
+        "stopped": "converged: every placement covers mass 1",
+        "least_covered": 0.9999999999999977,
+        "peak_support": 529,
+        "pricing_s": 0.483,
+        "slices": {
+          "round_0": {
+            "separation_s": 33.515,
+            "lp_s": 0.067,
+            "share": 0.998
+          },
+          "rounds_1_final": {
+            "separation_s": 25.995,
+            "lp_s": 11.609,
+            "share": 0.6913
+          },
+          "last_5_completed": {
+            "separation_s": 9.545,
+            "lp_s": 3.566,
+            "share": 0.728
+          },
+          "last_5_with_lp": {
+            "separation_s": 10.325,
+            "lp_s": 4.506,
+            "share": 0.6962
+          }
+        }
+      }
+    ],
+    "all_equivalent": true,
+    "wall_s": {
+      "min": 71.188,
+      "median": 71.275,
+      "max": 71.357
+    },
+    "separation_s": {
+      "min": 59.511,
+      "median": 59.523,
+      "max": 59.618
+    },
+    "lp_s": {
+      "min": 11.674,
+      "median": 11.736,
+      "max": 11.749
+    },
+    "total_speedup": 0.9988074359873728,
+    "separation_speedup": 0.9980511734959594,
+    "total_efficiency": 0.9988074359873728,
+    "separation_efficiency": 0.9980511734959594,
+    "ideal_amdahl_speedup": 1.0,
+    "fraction_of_ideal_speedup": 0.9988074359873728,
+    "fraction_of_ideal_gain": null
+  },
+  "thread:2": {
+    "model": "thread",
+    "workers": 2,
+    "runs": [
+      {
+        "path": "/tmp/squares-thread-2-1.stdout",
+        "equivalent": true,
+        "differences": [],
+        "wall_s": 44.733,
+        "separation_s": 33.041,
+        "lp_s": 11.688,
+        "separation_share": 0.7387,
+        "rounds": 23,
+        "rows": 5481,
+        "objective": 12.217676366606284,
+        "stopped": "converged: every placement covers mass 1",
+        "least_covered": 0.9999999999999977,
+        "peak_support": 529,
+        "pricing_s": 0.489,
+        "slices": {
+          "round_0": {
+            "separation_s": 18.022,
+            "lp_s": 0.07,
+            "share": 0.9961
+          },
+          "rounds_1_final": {
+            "separation_s": 15.019,
+            "lp_s": 11.62,
+            "share": 0.5638
+          },
+          "last_5_completed": {
+            "separation_s": 5.468,
+            "lp_s": 3.576,
+            "share": 0.6046
+          },
+          "last_5_with_lp": {
+            "separation_s": 5.906,
+            "lp_s": 4.519,
+            "share": 0.5665
+          }
+        }
+      },
+      {
+        "path": "/tmp/squares-thread-2-2.stdout",
+        "equivalent": true,
+        "differences": [],
+        "wall_s": 44.776,
+        "separation_s": 32.974,
+        "lp_s": 11.799,
+        "separation_share": 0.7365,
+        "rounds": 23,
+        "rows": 5481,
+        "objective": 12.217676366606284,
+        "stopped": "converged: every placement covers mass 1",
+        "least_covered": 0.9999999999999977,
+        "peak_support": 529,
+        "pricing_s": 0.479,
+        "slices": {
+          "round_0": {
+            "separation_s": 17.862,
+            "lp_s": 0.068,
+            "share": 0.9962
+          },
+          "rounds_1_final": {
+            "separation_s": 15.112,
+            "lp_s": 11.729,
+            "share": 0.563
+          },
+          "last_5_completed": {
+            "separation_s": 5.484,
+            "lp_s": 3.594,
+            "share": 0.6041
+          },
+          "last_5_with_lp": {
+            "separation_s": 5.935,
+            "lp_s": 4.554,
+            "share": 0.5658
+          }
+        }
+      },
+      {
+        "path": "/tmp/squares-thread-2-3.stdout",
+        "equivalent": true,
+        "differences": [],
+        "wall_s": 44.819,
+        "separation_s": 33.111,
+        "lp_s": 11.704,
+        "separation_share": 0.7388,
+        "rounds": 23,
+        "rows": 5481,
+        "objective": 12.217676366606284,
+        "stopped": "converged: every placement covers mass 1",
+        "least_covered": 0.9999999999999977,
+        "peak_support": 529,
+        "pricing_s": 0.477,
+        "slices": {
+          "round_0": {
+            "separation_s": 17.983,
+            "lp_s": 0.066,
+            "share": 0.9963
+          },
+          "rounds_1_final": {
+            "separation_s": 15.127,
+            "lp_s": 11.637,
+            "share": 0.5652
+          },
+          "last_5_completed": {
+            "separation_s": 5.466,
+            "lp_s": 3.543,
+            "share": 0.6067
+          },
+          "last_5_with_lp": {
+            "separation_s": 5.917,
+            "lp_s": 4.503,
+            "share": 0.5679
+          }
+        }
+      }
+    ],
+    "all_equivalent": true,
+    "wall_s": {
+      "min": 44.733,
+      "median": 44.776,
+      "max": 44.819
+    },
+    "separation_s": {
+      "min": 32.974,
+      "median": 33.041,
+      "max": 33.111
+    },
+    "lp_s": {
+      "min": 11.688,
+      "median": 11.704,
+      "max": 11.799
+    },
+    "total_speedup": 1.589914239771306,
+    "separation_speedup": 1.7979782694228383,
+    "total_efficiency": 0.794957119885653,
+    "separation_efficiency": 0.8989891347114192,
+    "ideal_amdahl_speedup": 1.715979897074952,
+    "fraction_of_ideal_speedup": 0.9265343040914775,
+    "fraction_of_ideal_gain": 0.8239257026368033
+  },
+  "thread:4": {
+    "model": "thread",
+    "workers": 4,
+    "runs": [
+      {
+        "path": "/tmp/squares-thread-4-1.stdout",
+        "equivalent": true,
+        "differences": [],
+        "wall_s": 30.569,
+        "separation_s": 18.823,
+        "lp_s": 11.743,
+        "separation_share": 0.6158,
+        "rounds": 23,
+        "rows": 5481,
+        "objective": 12.217676366606284,
+        "stopped": "converged: every placement covers mass 1",
+        "least_covered": 0.9999999999999977,
+        "peak_support": 529,
+        "pricing_s": 0.474,
+        "slices": {
+          "round_0": {
+            "separation_s": 9.14,
+            "lp_s": 0.068,
+            "share": 0.9926
+          },
+          "rounds_1_final": {
+            "separation_s": 9.683,
+            "lp_s": 11.676,
+            "share": 0.4533
+          },
+          "last_5_completed": {
+            "separation_s": 3.307,
+            "lp_s": 3.521,
+            "share": 0.4843
+          },
+          "last_5_with_lp": {
+            "separation_s": 3.588,
+            "lp_s": 4.469,
+            "share": 0.4453
+          }
+        }
+      },
+      {
+        "path": "/tmp/squares-thread-4-2.stdout",
+        "equivalent": true,
+        "differences": [],
+        "wall_s": 30.954,
+        "separation_s": 18.984,
+        "lp_s": 11.966,
+        "separation_share": 0.6134,
+        "rounds": 23,
+        "rows": 5481,
+        "objective": 12.217676366606284,
+        "stopped": "converged: every placement covers mass 1",
+        "least_covered": 0.9999999999999977,
+        "peak_support": 529,
+        "pricing_s": 0.513,
+        "slices": {
+          "round_0": {
+            "separation_s": 9.294,
+            "lp_s": 0.071,
+            "share": 0.9924
+          },
+          "rounds_1_final": {
+            "separation_s": 9.692,
+            "lp_s": 11.894,
+            "share": 0.449
+          },
+          "last_5_completed": {
+            "separation_s": 3.308,
+            "lp_s": 3.653,
+            "share": 0.4752
+          },
+          "last_5_with_lp": {
+            "separation_s": 3.582,
+            "lp_s": 4.618,
+            "share": 0.4368
+          }
+        }
+      },
+      {
+        "path": "/tmp/squares-thread-4-3.stdout",
+        "equivalent": true,
+        "differences": [],
+        "wall_s": 30.667,
+        "separation_s": 18.99,
+        "lp_s": 11.673,
+        "separation_share": 0.6193,
+        "rounds": 23,
+        "rows": 5481,
+        "objective": 12.217676366606284,
+        "stopped": "converged: every placement covers mass 1",
+        "least_covered": 0.9999999999999977,
+        "peak_support": 529,
+        "pricing_s": 0.538,
+        "slices": {
+          "round_0": {
+            "separation_s": 9.298,
+            "lp_s": 0.069,
+            "share": 0.9926
+          },
+          "rounds_1_final": {
+            "separation_s": 9.692,
+            "lp_s": 11.602,
+            "share": 0.4552
+          },
+          "last_5_completed": {
+            "separation_s": 3.318,
+            "lp_s": 3.511,
+            "share": 0.4859
+          },
+          "last_5_with_lp": {
+            "separation_s": 3.6,
+            "lp_s": 4.469,
+            "share": 0.4462
+          }
+        }
+      }
+    ],
+    "all_equivalent": true,
+    "wall_s": {
+      "min": 30.569,
+      "median": 30.667,
+      "max": 30.954
+    },
+    "separation_s": {
+      "min": 18.823,
+      "median": 18.984,
+      "max": 18.99
+    },
+    "lp_s": {
+      "min": 11.673,
+      "median": 11.743,
+      "max": 11.966
+    },
+    "total_speedup": 2.321387811002054,
+    "separation_speedup": 3.129319426885798,
+    "total_efficiency": 0.5803469527505135,
+    "separation_efficiency": 0.7823298567214495,
+    "ideal_amdahl_speedup": 2.6728240362684086,
+    "fraction_of_ideal_speedup": 0.8685150161411288,
+    "fraction_of_ideal_gain": 0.7899144096169803
+  },
+  "thread:8": {
+    "model": "thread",
+    "workers": 8,
+    "runs": [
+      {
+        "path": "/tmp/squares-thread-8-1.stdout",
+        "equivalent": true,
+        "differences": [],
+        "wall_s": 25.784,
+        "separation_s": 13.853,
+        "lp_s": 11.928,
+        "separation_share": 0.5373,
+        "rounds": 23,
+        "rows": 5481,
+        "objective": 12.217676366606284,
+        "stopped": "converged: every placement covers mass 1",
+        "least_covered": 0.9999999999999977,
+        "peak_support": 529,
+        "pricing_s": 0.513,
+        "slices": {
+          "round_0": {
+            "separation_s": 5.961,
+            "lp_s": 0.068,
+            "share": 0.9887
+          },
+          "rounds_1_final": {
+            "separation_s": 7.89,
+            "lp_s": 11.859,
+            "share": 0.3995
+          },
+          "last_5_completed": {
+            "separation_s": 2.41,
+            "lp_s": 3.639,
+            "share": 0.3984
+          },
+          "last_5_with_lp": {
+            "separation_s": 2.567,
+            "lp_s": 4.63,
+            "share": 0.3567
+          }
+        }
+      },
+      {
+        "path": "/tmp/squares-thread-8-2.stdout",
+        "equivalent": true,
+        "differences": [],
+        "wall_s": 25.666,
+        "separation_s": 13.728,
+        "lp_s": 11.934,
+        "separation_share": 0.535,
+        "rounds": 23,
+        "rows": 5481,
+        "objective": 12.217676366606284,
+        "stopped": "converged: every placement covers mass 1",
+        "least_covered": 0.9999999999999977,
+        "peak_support": 529,
+        "pricing_s": 0.513,
+        "slices": {
+          "round_0": {
+            "separation_s": 6.145,
+            "lp_s": 0.07,
+            "share": 0.9887
+          },
+          "rounds_1_final": {
+            "separation_s": 7.583,
+            "lp_s": 11.865,
+            "share": 0.3899
+          },
+          "last_5_completed": {
+            "separation_s": 2.342,
+            "lp_s": 3.637,
+            "share": 0.3917
+          },
+          "last_5_with_lp": {
+            "separation_s": 2.455,
+            "lp_s": 4.609,
+            "share": 0.3475
+          }
+        }
+      },
+      {
+        "path": "/tmp/squares-thread-8-3.stdout",
+        "equivalent": true,
+        "differences": [],
+        "wall_s": 25.359,
+        "separation_s": 13.437,
+        "lp_s": 11.919,
+        "separation_share": 0.5299,
+        "rounds": 23,
+        "rows": 5481,
+        "objective": 12.217676366606284,
+        "stopped": "converged: every placement covers mass 1",
+        "least_covered": 0.9999999999999977,
+        "peak_support": 529,
+        "pricing_s": 0.483,
+        "slices": {
+          "round_0": {
+            "separation_s": 5.985,
+            "lp_s": 0.068,
+            "share": 0.9888
+          },
+          "rounds_1_final": {
+            "separation_s": 7.454,
+            "lp_s": 11.847,
+            "share": 0.3862
+          },
+          "last_5_completed": {
+            "separation_s": 2.206,
+            "lp_s": 3.643,
+            "share": 0.3772
+          },
+          "last_5_with_lp": {
+            "separation_s": 2.434,
+            "lp_s": 4.595,
+            "share": 0.3463
+          }
+        }
+      }
+    ],
+    "all_equivalent": true,
+    "wall_s": {
+      "min": 25.359,
+      "median": 25.666,
+      "max": 25.784
+    },
+    "separation_s": {
+      "min": 13.437,
+      "median": 13.728,
+      "max": 13.853
+    },
+    "lp_s": {
+      "min": 11.919,
+      "median": 11.928,
+      "max": 11.934
+    },
+    "total_speedup": 2.7737084080105974,
+    "separation_speedup": 4.327432983682984,
+    "total_efficiency": 0.34671355100132467,
+    "separation_efficiency": 0.540929122960373,
+    "ideal_amdahl_speedup": 3.7060993941602516,
+    "fraction_of_ideal_speedup": 0.7484171666796539,
+    "fraction_of_ideal_gain": 0.6554483593020459
+  },
+  "thread:16": {
+    "model": "thread",
+    "workers": 16,
+    "runs": [
+      {
+        "path": "/tmp/squares-thread-16-1.stdout",
+        "equivalent": true,
+        "differences": [],
+        "wall_s": 24.441,
+        "separation_s": 12.452,
+        "lp_s": 11.985,
+        "separation_share": 0.5096,
+        "rounds": 23,
+        "rows": 5481,
+        "objective": 12.217676366606284,
+        "stopped": "converged: every placement covers mass 1",
+        "least_covered": 0.9999999999999977,
+        "peak_support": 529,
+        "pricing_s": 0.494,
+        "slices": {
+          "round_0": {
+            "separation_s": 4.806,
+            "lp_s": 0.071,
+            "share": 0.9854
+          },
+          "rounds_1_final": {
+            "separation_s": 7.647,
+            "lp_s": 11.916,
+            "share": 0.3909
+          },
+          "last_5_completed": {
+            "separation_s": 2.357,
+            "lp_s": 3.672,
+            "share": 0.3909
+          },
+          "last_5_with_lp": {
+            "separation_s": 2.504,
+            "lp_s": 4.661,
+            "share": 0.3495
+          }
+        }
+      },
+      {
+        "path": "/tmp/squares-thread-16-2.stdout",
+        "equivalent": true,
+        "differences": [],
+        "wall_s": 24.303,
+        "separation_s": 12.349,
+        "lp_s": 11.949,
+        "separation_share": 0.5082,
+        "rounds": 23,
+        "rows": 5481,
+        "objective": 12.217676366606284,
+        "stopped": "converged: every placement covers mass 1",
+        "least_covered": 0.9999999999999977,
+        "peak_support": 529,
+        "pricing_s": 0.497,
+        "slices": {
+          "round_0": {
+            "separation_s": 4.724,
+            "lp_s": 0.075,
+            "share": 0.9844
+          },
+          "rounds_1_final": {
+            "separation_s": 7.624,
+            "lp_s": 11.874,
+            "share": 0.391
+          },
+          "last_5_completed": {
+            "separation_s": 2.299,
+            "lp_s": 3.641,
+            "share": 0.387
+          },
+          "last_5_with_lp": {
+            "separation_s": 2.376,
+            "lp_s": 4.62,
+            "share": 0.3396
+          }
+        }
+      },
+      {
+        "path": "/tmp/squares-thread-16-3.stdout",
+        "equivalent": true,
+        "differences": [],
+        "wall_s": 23.984,
+        "separation_s": 12.085,
+        "lp_s": 11.894,
+        "separation_share": 0.504,
+        "rounds": 23,
+        "rows": 5481,
+        "objective": 12.217676366606284,
+        "stopped": "converged: every placement covers mass 1",
+        "least_covered": 0.9999999999999977,
+        "peak_support": 529,
+        "pricing_s": 0.5,
+        "slices": {
+          "round_0": {
+            "separation_s": 4.714,
+            "lp_s": 0.071,
+            "share": 0.9852
+          },
+          "rounds_1_final": {
+            "separation_s": 7.371,
+            "lp_s": 11.823,
+            "share": 0.384
+          },
+          "last_5_completed": {
+            "separation_s": 2.06,
+            "lp_s": 3.601,
+            "share": 0.3639
+          },
+          "last_5_with_lp": {
+            "separation_s": 2.181,
+            "lp_s": 4.62,
+            "share": 0.3207
+          }
+        }
+      }
+    ],
+    "all_equivalent": true,
+    "wall_s": {
+      "min": 23.984,
+      "median": 24.303,
+      "max": 24.441
+    },
+    "separation_s": {
+      "min": 12.085,
+      "median": 12.349,
+      "max": 12.452
+    },
+    "lp_s": {
+      "min": 11.894,
+      "median": 11.949,
+      "max": 11.985
+    },
+    "total_speedup": 2.9292679916059745,
+    "separation_speedup": 4.810672928982103,
+    "total_efficiency": 0.1830792494753734,
+    "separation_efficiency": 0.30066705806138144,
+    "ideal_amdahl_speedup": 4.5941073265170305,
+    "fraction_of_ideal_speedup": 0.637614183434144,
+    "fraction_of_ideal_gain": 0.5367864163020377
+  }
+}

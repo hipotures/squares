@@ -1,0 +1,1030 @@
+[
+  {
+    "size_mb_per_array": 0.25,
+    "workers": 1,
+    "wall": 3.00241811900014,
+    "nominal_gib_per_s": 207.1723663236463,
+    "details": [
+      {
+        "kind": "stream",
+        "elapsed": 3.00007252,
+        "count": 849262,
+        "checksum": 5748430956587445525,
+        "minor_faults": 130
+      }
+    ]
+  },
+  {
+    "size_mb_per_array": 0.25,
+    "workers": 2,
+    "wall": 3.0019099119999737,
+    "nominal_gib_per_s": 423.17029125985516,
+    "details": [
+      {
+        "kind": "stream",
+        "elapsed": 3.00010283,
+        "count": 825522,
+        "checksum": 4414651126598315285,
+        "minor_faults": 130
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.00005185,
+        "count": 908887,
+        "checksum": 9265077022884789525,
+        "minor_faults": 130
+      }
+    ]
+  },
+  {
+    "size_mb_per_array": 0.25,
+    "workers": 4,
+    "wall": 3.001830843000789,
+    "nominal_gib_per_s": 822.7169056445149,
+    "details": [
+      {
+        "kind": "stream",
+        "elapsed": 3.00005756,
+        "count": 765720,
+        "checksum": 1222403222985788693,
+        "minor_faults": 130
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000083819,
+        "count": 838855,
+        "checksum": 5159081727838616853,
+        "minor_faults": 130
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000049889,
+        "count": 877830,
+        "checksum": 7403590695778610453,
+        "minor_faults": 130
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000050821,
+        "count": 889500,
+        "checksum": 8095474385158737173,
+        "minor_faults": 130
+      }
+    ]
+  },
+  {
+    "size_mb_per_array": 0.25,
+    "workers": 8,
+    "wall": 3.0016478630004713,
+    "nominal_gib_per_s": 1639.2926719873378,
+    "details": [
+      {
+        "kind": "stream",
+        "elapsed": 3.00008176,
+        "count": 706702,
+        "checksum": 16753993175161826581,
+        "minor_faults": 130
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000084799,
+        "count": 845430,
+        "checksum": 5530579284177612053,
+        "minor_faults": 130
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000053929,
+        "count": 870622,
+        "checksum": 6980812007394372885,
+        "minor_faults": 130
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000049261,
+        "count": 859108,
+        "checksum": 6312700201740176661,
+        "minor_faults": 130
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.00004978,
+        "count": 845049,
+        "checksum": 5508973035203845397,
+        "minor_faults": 130
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.00005334,
+        "count": 859022,
+        "checksum": 6307743428170411285,
+        "minor_faults": 130
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.00004766,
+        "count": 863051,
+        "checksum": 6540495433432907029,
+        "minor_faults": 130
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.00005494,
+        "count": 869247,
+        "checksum": 6900558532326980885,
+        "minor_faults": 130
+      }
+    ]
+  },
+  {
+    "size_mb_per_array": 0.25,
+    "workers": 16,
+    "wall": 3.0022324100009428,
+    "nominal_gib_per_s": 3131.6781483824807,
+    "details": [
+      {
+        "kind": "stream",
+        "elapsed": 3.000056649,
+        "count": 682308,
+        "checksum": 15617326363591347477,
+        "minor_faults": 130
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000051959,
+        "count": 830855,
+        "checksum": 4710980983572888853,
+        "minor_faults": 130
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.00004627,
+        "count": 842693,
+        "checksum": 5375582207953542421,
+        "minor_faults": 130
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000048639,
+        "count": 838714,
+        "checksum": 5151146778995010837,
+        "minor_faults": 130
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000047529,
+        "count": 833317,
+        "checksum": 4848426599532797205,
+        "minor_faults": 130
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.00004667,
+        "count": 823424,
+        "checksum": 4298598076973829397,
+        "minor_faults": 130
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000050219,
+        "count": 839956,
+        "checksum": 5221087732835781909,
+        "minor_faults": 130
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000052289,
+        "count": 843507,
+        "checksum": 5421626745165626645,
+        "minor_faults": 130
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000067371,
+        "count": 805683,
+        "checksum": 3329043289462979861,
+        "minor_faults": 130
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.00004894,
+        "count": 825121,
+        "checksum": 4392446566881385749,
+        "minor_faults": 130
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000044229,
+        "count": 839813,
+        "checksum": 5213029677879205141,
+        "minor_faults": 130
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.00004578,
+        "count": 822991,
+        "checksum": 4274682996223573269,
+        "minor_faults": 131
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.00005865,
+        "count": 820351,
+        "checksum": 4129144955372567829,
+        "minor_faults": 131
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.00004803,
+        "count": 764375,
+        "checksum": 1153365671266385173,
+        "minor_faults": 130
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.00004772,
+        "count": 800879,
+        "checksum": 3070135480268160277,
+        "minor_faults": 130
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000041641,
+        "count": 622912,
+        "checksum": 13016653258359819541,
+        "minor_faults": 130
+      }
+    ]
+  },
+  {
+    "size_mb_per_array": 2,
+    "workers": 1,
+    "wall": 3.0034067550004693,
+    "nominal_gib_per_s": 186.68448827035832,
+    "details": [
+      {
+        "kind": "stream",
+        "elapsed": 3.000327719,
+        "count": 95691,
+        "checksum": 1217280731381189909,
+        "minor_faults": 1026
+      }
+    ]
+  },
+  {
+    "size_mb_per_array": 2,
+    "workers": 2,
+    "wall": 3.0030572269988625,
+    "nominal_gib_per_s": 382.0637731058578,
+    "details": [
+      {
+        "kind": "stream",
+        "elapsed": 3.000401347,
+        "count": 97211,
+        "checksum": 1846937221591944469,
+        "minor_faults": 1026
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000331338,
+        "count": 98605,
+        "checksum": 2433121564217199893,
+        "minor_faults": 1026
+      }
+    ]
+  },
+  {
+    "size_mb_per_array": 2,
+    "workers": 4,
+    "wall": 3.0034132349992433,
+    "nominal_gib_per_s": 748.162453784208,
+    "details": [
+      {
+        "kind": "stream",
+        "elapsed": 3.000506158,
+        "count": 97048,
+        "checksum": 1778939858411048213,
+        "minor_faults": 1026
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000345339,
+        "count": 96277,
+        "checksum": 1458854544794340629,
+        "minor_faults": 1026
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000390329,
+        "count": 95435,
+        "checksum": 1112209659032718613,
+        "minor_faults": 1026
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000330309,
+        "count": 94735,
+        "checksum": 826342997780417813,
+        "minor_faults": 1026
+      }
+    ]
+  },
+  {
+    "size_mb_per_array": 2,
+    "workers": 8,
+    "wall": 3.003216185999918,
+    "nominal_gib_per_s": 760.1382097106421,
+    "details": [
+      {
+        "kind": "stream",
+        "elapsed": 3.000729057,
+        "count": 34494,
+        "checksum": 2555297674391506197,
+        "minor_faults": 1026
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000511987,
+        "count": 38561,
+        "checksum": 3193353331083332885,
+        "minor_faults": 1026
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000370599,
+        "count": 33677,
+        "checksum": 2435690441070497045,
+        "minor_faults": 1026
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000246859,
+        "count": 59896,
+        "checksum": 7704314518988377365,
+        "minor_faults": 1026
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000303218,
+        "count": 51113,
+        "checksum": 5610542355596987669,
+        "minor_faults": 1026
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000393258,
+        "count": 33221,
+        "checksum": 2370179465940978965,
+        "minor_faults": 1026
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.00033223,
+        "count": 65551,
+        "checksum": 9227735339334192405,
+        "minor_faults": 1026
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000282479,
+        "count": 73095,
+        "checksum": 11473866087609224469,
+        "minor_faults": 1026
+      }
+    ]
+  },
+  {
+    "size_mb_per_array": 2,
+    "workers": 16,
+    "wall": 3.0054787159988336,
+    "nominal_gib_per_s": 1695.536358442133,
+    "details": [
+      {
+        "kind": "stream",
+        "elapsed": 3.000602447,
+        "count": 33455,
+        "checksum": 2403685385944517909,
+        "minor_faults": 1026
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000515397,
+        "count": 50398,
+        "checksum": 5454677358985137429,
+        "minor_faults": 1026
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000408969,
+        "count": 42304,
+        "checksum": 3843353008905374997,
+        "minor_faults": 1026
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000291669,
+        "count": 59974,
+        "checksum": 7724393080195435797,
+        "minor_faults": 1026
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000315589,
+        "count": 48652,
+        "checksum": 5083288830819028245,
+        "minor_faults": 1026
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000427239,
+        "count": 39079,
+        "checksum": 3279720499055774997,
+        "minor_faults": 1026
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000378768,
+        "count": 60747,
+        "checksum": 7924789391131102485,
+        "minor_faults": 1026
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000364779,
+        "count": 59920,
+        "checksum": 7710489754767445269,
+        "minor_faults": 1026
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000300229,
+        "count": 66992,
+        "checksum": 9637889591807823125,
+        "minor_faults": 1026
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000303029,
+        "count": 60680,
+        "checksum": 7907318405379116309,
+        "minor_faults": 1026
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000440398,
+        "count": 44541,
+        "checksum": 4260551200821890325,
+        "minor_faults": 1026
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000297608,
+        "count": 60576,
+        "checksum": 7880237453000035605,
+        "minor_faults": 1026
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000393678,
+        "count": 60794,
+        "checksum": 7937056663121874197,
+        "minor_faults": 1026
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000347668,
+        "count": 61369,
+        "checksum": 8087903014756306197,
+        "minor_faults": 1026
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000361468,
+        "count": 59739,
+        "checksum": 7663979208114130197,
+        "minor_faults": 1026
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.000274508,
+        "count": 60480,
+        "checksum": 7855280881231711509,
+        "minor_faults": 1026
+      }
+    ]
+  },
+  {
+    "size_mb_per_array": 8,
+    "workers": 1,
+    "wall": 3.0100985070002935,
+    "nominal_gib_per_s": 158.45878843856505,
+    "details": [
+      {
+        "kind": "stream",
+        "elapsed": 3.001465523,
+        "count": 20351,
+        "checksum": 14232528409508039957,
+        "minor_faults": 4098
+      }
+    ]
+  },
+  {
+    "size_mb_per_array": 8,
+    "workers": 2,
+    "wall": 3.0098386369991204,
+    "nominal_gib_per_s": 159.6093662944564,
+    "details": [
+      {
+        "kind": "stream",
+        "elapsed": 3.002034842,
+        "count": 10442,
+        "checksum": 3747474343377489173,
+        "minor_faults": 4098
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.001930501,
+        "count": 10055,
+        "checksum": 3474883438703660309,
+        "minor_faults": 4098
+      }
+    ]
+  },
+  {
+    "size_mb_per_array": 8,
+    "workers": 4,
+    "wall": 3.0102403559994855,
+    "nominal_gib_per_s": 107.8506071294114,
+    "details": [
+      {
+        "kind": "stream",
+        "elapsed": 3.003310186,
+        "count": 2113,
+        "checksum": 153624929421348117,
+        "minor_faults": 4098
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.002564318,
+        "count": 3947,
+        "checksum": 535686568632503573,
+        "minor_faults": 4098
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.002256401,
+        "count": 2314,
+        "checksum": 184219637861829909,
+        "minor_faults": 4098
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.001958972,
+        "count": 5478,
+        "checksum": 1031640456990018837,
+        "minor_faults": 4098
+      }
+    ]
+  },
+  {
+    "size_mb_per_array": 8,
+    "workers": 8,
+    "wall": 3.0122800479985017,
+    "nominal_gib_per_s": 101.39744483682611,
+    "details": [
+      {
+        "kind": "stream",
+        "elapsed": 3.005919815,
+        "count": 915,
+        "checksum": 28860929487260949,
+        "minor_faults": 4098
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.005834624,
+        "count": 885,
+        "checksum": 27002425414372629,
+        "minor_faults": 4098
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.005039608,
+        "count": 1342,
+        "checksum": 62018511288913173,
+        "minor_faults": 4098
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.004238641,
+        "count": 1017,
+        "checksum": 35642459322961173,
+        "minor_faults": 4098
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.002927897,
+        "count": 1561,
+        "checksum": 83885363019238677,
+        "minor_faults": 4098
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.002576759,
+        "count": 4147,
+        "checksum": 591328304455863573,
+        "minor_faults": 4098
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.002471429,
+        "count": 1774,
+        "checksum": 108314744485563669,
+        "minor_faults": 4098
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.002168331,
+        "count": 1391,
+        "checksum": 66624880115830037,
+        "minor_faults": 4098
+      }
+    ]
+  },
+  {
+    "size_mb_per_array": 8,
+    "workers": 16,
+    "wall": 3.0177026749988727,
+    "nominal_gib_per_s": 155.03826101760498,
+    "details": [
+      {
+        "kind": "stream",
+        "elapsed": 3.009548789,
+        "count": 419,
+        "checksum": 6075374045351189,
+        "minor_faults": 4098
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.009930677,
+        "count": 434,
+        "checksum": 6516549722033429,
+        "minor_faults": 4098
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.009921928,
+        "count": 381,
+        "checksum": 5026928982871317,
+        "minor_faults": 4098
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.009337469,
+        "count": 413,
+        "checksum": 5903233068682517,
+        "minor_faults": 4098
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.007121769,
+        "count": 1040,
+        "checksum": 37270411309468949,
+        "minor_faults": 4098
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.00939553,
+        "count": 1386,
+        "checksum": 66147283395661077,
+        "minor_faults": 4098
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.007503368,
+        "count": 484,
+        "checksum": 8098803608702229,
+        "minor_faults": 4098
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.006321112,
+        "count": 457,
+        "checksum": 7223049275165973,
+        "minor_faults": 4098
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.009380939,
+        "count": 2772,
+        "checksum": 264303399444663573,
+        "minor_faults": 4098
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.006334852,
+        "count": 1972,
+        "checksum": 133819852431543573,
+        "minor_faults": 4098
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.007644706,
+        "count": 2647,
+        "checksum": 241016264417463573,
+        "minor_faults": 4098
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.004825088,
+        "count": 1469,
+        "checksum": 74297832199539989,
+        "minor_faults": 4098
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.006052874,
+        "count": 978,
+        "checksum": 32965100211522837,
+        "minor_faults": 4098
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.00686249,
+        "count": 874,
+        "checksum": 26336470044757269,
+        "minor_faults": 4098
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.005556416,
+        "count": 2770,
+        "checksum": 263922352853077269,
+        "minor_faults": 4098
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.001086236,
+        "count": 1466,
+        "checksum": 73994987775708437,
+        "minor_faults": 4098
+      }
+    ]
+  },
+  {
+    "size_mb_per_array": 64,
+    "workers": 1,
+    "wall": 3.0642618630008656,
+    "nominal_gib_per_s": 40.56849758860341,
+    "details": [
+      {
+        "kind": "stream",
+        "elapsed": 3.010299525,
+        "count": 663,
+        "checksum": 970995385479449877,
+        "minor_faults": 32770
+      }
+    ]
+  },
+  {
+    "size_mb_per_array": 64,
+    "workers": 2,
+    "wall": 3.064883610000834,
+    "nominal_gib_per_s": 51.14386709123919,
+    "details": [
+      {
+        "kind": "stream",
+        "elapsed": 3.013212544,
+        "count": 410,
+        "checksum": 372360253305244949,
+        "minor_faults": 32770
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.010733573,
+        "count": 426,
+        "checksum": 401879913352383765,
+        "minor_faults": 32770
+      }
+    ]
+  },
+  {
+    "size_mb_per_array": 64,
+    "workers": 4,
+    "wall": 3.071204334999493,
+    "nominal_gib_per_s": 53.908005440487024,
+    "details": [
+      {
+        "kind": "stream",
+        "elapsed": 3.021066089,
+        "count": 213,
+        "checksum": 101172565802470677,
+        "minor_faults": 32770
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.019888185,
+        "count": 220,
+        "checksum": 107883978385247509,
+        "minor_faults": 32770
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.015549763,
+        "count": 241,
+        "checksum": 129311240574717205,
+        "minor_faults": 32770
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.017061807,
+        "count": 209,
+        "checksum": 97434229828996373,
+        "minor_faults": 32770
+      }
+    ]
+  },
+  {
+    "size_mb_per_array": 64,
+    "workers": 8,
+    "wall": 3.0876150820004113,
+    "nominal_gib_per_s": 53.01421830533026,
+    "details": [
+      {
+        "kind": "stream",
+        "elapsed": 3.034253443,
+        "count": 96,
+        "checksum": 20899497313553685,
+        "minor_faults": 32770
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.033869675,
+        "count": 96,
+        "checksum": 20899497313553685,
+        "minor_faults": 32770
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.030699478,
+        "count": 114,
+        "checksum": 29330544453733653,
+        "minor_faults": 32770
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.033025458,
+        "count": 114,
+        "checksum": 29330544453733653,
+        "minor_faults": 32770
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.027618392,
+        "count": 102,
+        "checksum": 23551516836875541,
+        "minor_faults": 32770
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.029650041,
+        "count": 106,
+        "checksum": 25407490698759445,
+        "minor_faults": 32770
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.029066405,
+        "count": 119,
+        "checksum": 31925389425888533,
+        "minor_faults": 32770
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.026472046,
+        "count": 126,
+        "checksum": 35742890164210965,
+        "minor_faults": 32770
+      }
+    ]
+  },
+  {
+    "size_mb_per_array": 64,
+    "workers": 16,
+    "wall": 3.152245753000898,
+    "nominal_gib_per_s": 49.072157477804346,
+    "details": [
+      {
+        "kind": "stream",
+        "elapsed": 3.077446127,
+        "count": 48,
+        "checksum": 5383203969551637,
+        "minor_faults": 32770
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.080686762,
+        "count": 47,
+        "checksum": 5167699894979861,
+        "minor_faults": 32770
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.077309108,
+        "count": 49,
+        "checksum": 5603106086440213,
+        "minor_faults": 32770
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.07428773,
+        "count": 49,
+        "checksum": 5603106086440213,
+        "minor_faults": 32770
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.071365682,
+        "count": 48,
+        "checksum": 5383203969551637,
+        "minor_faults": 32770
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.073502444,
+        "count": 53,
+        "checksum": 6526694977162517,
+        "minor_faults": 32770
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.066437994,
+        "count": 47,
+        "checksum": 5167699894979861,
+        "minor_faults": 32770
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.073951381,
+        "count": 53,
+        "checksum": 6526694977162517,
+        "minor_faults": 32770
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.075853073,
+        "count": 52,
+        "checksum": 6289200691006741,
+        "minor_faults": 32770
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.069847269,
+        "count": 56,
+        "checksum": 7265566089530645,
+        "minor_faults": 32770
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.065622787,
+        "count": 51,
+        "checksum": 6056104447167765,
+        "minor_faults": 32770
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.070750116,
+        "count": 54,
+        "checksum": 6768587305635093,
+        "minor_faults": 32770
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.079260359,
+        "count": 60,
+        "checksum": 8312300165123349,
+        "minor_faults": 32770
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.068825544,
+        "count": 49,
+        "checksum": 5603106086440213,
+        "minor_faults": 32770
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.057404523,
+        "count": 56,
+        "checksum": 7265566089530645,
+        "minor_faults": 32770
+      },
+      {
+        "kind": "stream",
+        "elapsed": 3.05550471,
+        "count": 53,
+        "checksum": 6526694977162517,
+        "minor_faults": 32770
+      }
+    ]
+  }
+]

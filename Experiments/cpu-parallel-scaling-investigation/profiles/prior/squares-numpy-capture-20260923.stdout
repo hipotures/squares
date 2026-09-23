@@ -1,0 +1,1 @@
+{"out": "/tmp/squares-numpy-capture-20260923", "captured_arrays": 376, "rounds": 23, "rows": 5481, "objective": 12.217676366606284, "stopped": "converged: every placement covers mass 1", "wall": 72.299, "separation": 60.564, "lp": 11.732}

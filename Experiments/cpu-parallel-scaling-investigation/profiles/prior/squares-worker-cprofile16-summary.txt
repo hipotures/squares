@@ -1,0 +1,200 @@
+Wed Sep 23 12:08:06 2026    /tmp/squares-worker-cprofile16-pstats/worker-19835.pstats
+Wed Sep 23 12:08:06 2026    /tmp/squares-worker-cprofile16-pstats/worker-19834.pstats
+Wed Sep 23 12:08:06 2026    /tmp/squares-worker-cprofile16-pstats/worker-19830.pstats
+Wed Sep 23 12:08:06 2026    /tmp/squares-worker-cprofile16-pstats/worker-19842.pstats
+Wed Sep 23 12:08:06 2026    /tmp/squares-worker-cprofile16-pstats/worker-19843.pstats
+Wed Sep 23 12:08:06 2026    /tmp/squares-worker-cprofile16-pstats/worker-19846.pstats
+Wed Sep 23 12:08:06 2026    /tmp/squares-worker-cprofile16-pstats/worker-19838.pstats
+Wed Sep 23 12:08:06 2026    /tmp/squares-worker-cprofile16-pstats/worker-19837.pstats
+Wed Sep 23 12:08:06 2026    /tmp/squares-worker-cprofile16-pstats/worker-19833.pstats
+Wed Sep 23 12:08:06 2026    /tmp/squares-worker-cprofile16-pstats/worker-19847.pstats
+Wed Sep 23 12:08:06 2026    /tmp/squares-worker-cprofile16-pstats/worker-19840.pstats
+Wed Sep 23 12:08:06 2026    /tmp/squares-worker-cprofile16-pstats/worker-19839.pstats
+Wed Sep 23 12:08:06 2026    /tmp/squares-worker-cprofile16-pstats/worker-19836.pstats
+Wed Sep 23 12:08:06 2026    /tmp/squares-worker-cprofile16-pstats/worker-19841.pstats
+Wed Sep 23 12:08:06 2026    /tmp/squares-worker-cprofile16-pstats/worker-19844.pstats
+Wed Sep 23 12:08:06 2026    /tmp/squares-worker-cprofile16-pstats/worker-19845.pstats
+
+         1008906 function calls in 337.935 seconds
+
+   Ordered by: cumulative time
+   List reduced from 124 to 75 due to restriction <75>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+     4179    0.053    0.000  200.076    0.048 queues.py:96(get)
+     8358    0.014    0.000  185.133    0.022 synchronize.py:96(__enter__)
+     8358  185.119    0.022  185.119    0.022 {method '__enter__' of '_multiprocessing.SemLock' objects}
+     4163    0.019    0.000  136.741    0.033 process.py:194(_process_chunk)
+     4163    0.553    0.000  136.722    0.033 squares_n12_process_cprofile.py:39(_direction_task)
+     4163    8.872    0.002  136.169    0.033 generate.py:351(placement_cells)
+    33304    0.086    0.000  117.346    0.004 fromnumeric.py:48(_wrapfunc)
+     4163    0.031    0.000   88.977    0.021 fromnumeric.py:848(argpartition)
+     4163   88.911    0.021   88.911    0.021 {method 'argpartition' of 'numpy.ndarray' objects}
+     4163    5.202    0.001   38.156    0.009 generate.py:277(event_grid)
+     8326    0.030    0.000   28.061    0.003 fromnumeric.py:2876(cumsum)
+     8326   27.993    0.003   27.993    0.003 {method 'cumsum' of 'numpy.ndarray' objects}
+     4179    0.023    0.000   14.459    0.003 connection.py:218(recv_bytes)
+     4179    0.025    0.000   14.433    0.003 connection.py:450(_recv_bytes)
+     8358    0.043    0.000   14.399    0.002 connection.py:410(_recv)
+    12566   14.281    0.001   14.281    0.001 {built-in method posix.read}
+    16652    1.960    0.000    1.960    0.000 {method 'at' of 'numpy.ufunc' objects}
+     4344    1.575    0.000    1.575    0.000 {built-in method numpy.zeros}
+     4163    0.036    0.000    1.161    0.000 process.py:206(_sendback_result)
+     4179    0.062    0.000    1.124    0.000 queues.py:389(put)
+     4179    0.346    0.000    0.552    0.000 {built-in method _pickle.loads}
+     4179    0.058    0.000    0.503    0.000 reduction.py:48(dumps)
+     4179    0.033    0.000    0.380    0.000 connection.py:192(send_bytes)
+     8326    0.033    0.000    0.356    0.000 _arraysetops_impl.py:145(unique)
+    16652    0.020    0.000    0.353    0.000 fromnumeric.py:1459(searchsorted)
+     4179    0.031    0.000    0.343    0.000 connection.py:427(_send_bytes)
+     4163    0.164    0.000    0.340    0.000 generate.py:222(v_range)
+     4179    0.333    0.000    0.340    0.000 {method 'dump' of '_pickle.Pickler' objects}
+     8326    0.173    0.000    0.317    0.000 _arraysetops_impl.py:350(_unique1d)
+    16652    0.313    0.000    0.313    0.000 {method 'searchsorted' of 'numpy.ndarray' objects}
+     4179    0.007    0.000    0.299    0.000 connection.py:401(_send)
+     4179    0.291    0.000    0.291    0.000 {built-in method posix.write}
+     4163    0.079    0.000    0.206    0.000 generate.py:142(at)
+     8326    0.125    0.000    0.125    0.000 generate.py:202(_floor)
+     4179    0.073    0.000    0.097    0.000 reduction.py:38(__init__)
+     8326    0.088    0.000    0.088    0.000 {method 'sort' of 'numpy.ndarray' objects}
+     4163    0.038    0.000    0.085    0.000 dataclasses.py:1255(_dataclass_setstate)
+    33304    0.072    0.000    0.072    0.000 {method 'reduce' of 'numpy.ufunc' objects}
+    12566    0.068    0.000    0.068    0.000 {method 'write' of '_io.BytesIO' objects}
+     8326    0.016    0.000    0.055    0.000 numeric.py:1904(_frombuffer)
+     8358    0.012    0.000    0.054    0.000 synchronize.py:99(__exit__)
+    12489    0.039    0.000    0.049    0.000 fractions.py:206(__new__)
+     4163    0.013    0.000    0.049    0.000 fromnumeric.py:1115(argsort)
+     8326    0.049    0.000    0.049    0.000 generate.py:213(_ceiling)
+     4163    0.029    0.000    0.047    0.000 dataclasses.py:1454(fields)
+    12489    0.013    0.000    0.044    0.000 {method 'sum' of 'numpy.ndarray' objects}
+     8326    0.014    0.000    0.043    0.000 {method 'min' of 'numpy.ndarray' objects}
+     8358    0.042    0.000    0.042    0.000 {method '__exit__' of '_multiprocessing.SemLock' objects}
+     4163    0.036    0.000    0.036    0.000 <string>:2(__init__)
+     4163    0.011    0.000    0.033    0.000 {method 'any' of 'numpy.ndarray' objects}
+    12489    0.009    0.000    0.031    0.000 _methods.py:47(_sum)
+     8326    0.008    0.000    0.029    0.000 _methods.py:43(_amin)
+    45793    0.029    0.000    0.029    0.000 {built-in method builtins.getattr}
+    16652    0.020    0.000    0.024    0.000 numbers.py:317(__float__)
+     8326    0.015    0.000    0.023    0.000 core.py:6878(is_masked)
+     8326    0.007    0.000    0.022    0.000 {method 'max' of 'numpy.ndarray' objects}
+     4163    0.005    0.000    0.022    0.000 _methods.py:55(_any)
+    12489    0.019    0.000    0.022    0.000 generate.py:238(u_chord)
+     4163    0.021    0.000    0.021    0.000 {method 'argsort' of 'numpy.ndarray' objects}
+     8326    0.021    0.000    0.021    0.000 {built-in method numpy.array}
+     8326    0.021    0.000    0.021    0.000 {built-in method numpy.frombuffer}
+     8326    0.018    0.000    0.018    0.000 {method 'reshape' of 'numpy.ndarray' objects}
+     4163    0.017    0.000    0.017    0.000 reduction.py:225(_rebuild_partial)
+     8326    0.004    0.000    0.015    0.000 _methods.py:39(_amax)
+     8326    0.014    0.000    0.014    0.000 {built-in method numpy.empty}
+    24978    0.013    0.000    0.013    0.000 dataclasses.py:1469(<genexpr>)
+     4195    0.012    0.000    0.012    0.000 {method 'copy' of 'dict' objects}
+    54127    0.012    0.000    0.012    0.000 {built-in method builtins.min}
+     4179    0.012    0.000    0.012    0.000 {method 'update' of 'dict' objects}
+     4179    0.011    0.000    0.011    0.000 {built-in method _struct.pack}
+     4163    0.009    0.000    0.010    0.000 {method 'sort' of 'list' objects}
+    37579    0.010    0.000    0.010    0.000 {built-in method builtins.max}
+     8326    0.009    0.000    0.009    0.000 {method 'flatten' of 'numpy.ndarray' objects}
+     4163    0.009    0.000    0.009    0.000 {method 'ravel' of 'numpy.ndarray' objects}
+    37576    0.008    0.000    0.008    0.000 {built-in method builtins.len}
+
+
+Wed Sep 23 12:08:06 2026    /tmp/squares-worker-cprofile16-pstats/worker-19835.pstats
+Wed Sep 23 12:08:06 2026    /tmp/squares-worker-cprofile16-pstats/worker-19834.pstats
+Wed Sep 23 12:08:06 2026    /tmp/squares-worker-cprofile16-pstats/worker-19830.pstats
+Wed Sep 23 12:08:06 2026    /tmp/squares-worker-cprofile16-pstats/worker-19842.pstats
+Wed Sep 23 12:08:06 2026    /tmp/squares-worker-cprofile16-pstats/worker-19843.pstats
+Wed Sep 23 12:08:06 2026    /tmp/squares-worker-cprofile16-pstats/worker-19846.pstats
+Wed Sep 23 12:08:06 2026    /tmp/squares-worker-cprofile16-pstats/worker-19838.pstats
+Wed Sep 23 12:08:06 2026    /tmp/squares-worker-cprofile16-pstats/worker-19837.pstats
+Wed Sep 23 12:08:06 2026    /tmp/squares-worker-cprofile16-pstats/worker-19833.pstats
+Wed Sep 23 12:08:06 2026    /tmp/squares-worker-cprofile16-pstats/worker-19847.pstats
+Wed Sep 23 12:08:06 2026    /tmp/squares-worker-cprofile16-pstats/worker-19840.pstats
+Wed Sep 23 12:08:06 2026    /tmp/squares-worker-cprofile16-pstats/worker-19839.pstats
+Wed Sep 23 12:08:06 2026    /tmp/squares-worker-cprofile16-pstats/worker-19836.pstats
+Wed Sep 23 12:08:06 2026    /tmp/squares-worker-cprofile16-pstats/worker-19841.pstats
+Wed Sep 23 12:08:06 2026    /tmp/squares-worker-cprofile16-pstats/worker-19844.pstats
+Wed Sep 23 12:08:06 2026    /tmp/squares-worker-cprofile16-pstats/worker-19845.pstats
+
+         1008906 function calls in 337.935 seconds
+
+   Ordered by: internal time
+   List reduced from 124 to 75 due to restriction <75>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+     8358  185.119    0.022  185.119    0.022 {method '__enter__' of '_multiprocessing.SemLock' objects}
+     4163   88.911    0.021   88.911    0.021 {method 'argpartition' of 'numpy.ndarray' objects}
+     8326   27.993    0.003   27.993    0.003 {method 'cumsum' of 'numpy.ndarray' objects}
+    12566   14.281    0.001   14.281    0.001 {built-in method posix.read}
+     4163    8.872    0.002  136.169    0.033 generate.py:351(placement_cells)
+     4163    5.202    0.001   38.156    0.009 generate.py:277(event_grid)
+    16652    1.960    0.000    1.960    0.000 {method 'at' of 'numpy.ufunc' objects}
+     4344    1.575    0.000    1.575    0.000 {built-in method numpy.zeros}
+     4163    0.553    0.000  136.722    0.033 squares_n12_process_cprofile.py:39(_direction_task)
+     4179    0.346    0.000    0.552    0.000 {built-in method _pickle.loads}
+     4179    0.333    0.000    0.340    0.000 {method 'dump' of '_pickle.Pickler' objects}
+    16652    0.313    0.000    0.313    0.000 {method 'searchsorted' of 'numpy.ndarray' objects}
+     4179    0.291    0.000    0.291    0.000 {built-in method posix.write}
+     8326    0.173    0.000    0.317    0.000 _arraysetops_impl.py:350(_unique1d)
+     4163    0.164    0.000    0.340    0.000 generate.py:222(v_range)
+     8326    0.125    0.000    0.125    0.000 generate.py:202(_floor)
+     8326    0.088    0.000    0.088    0.000 {method 'sort' of 'numpy.ndarray' objects}
+    33304    0.086    0.000  117.346    0.004 fromnumeric.py:48(_wrapfunc)
+     4163    0.079    0.000    0.206    0.000 generate.py:142(at)
+     4179    0.073    0.000    0.097    0.000 reduction.py:38(__init__)
+    33304    0.072    0.000    0.072    0.000 {method 'reduce' of 'numpy.ufunc' objects}
+    12566    0.068    0.000    0.068    0.000 {method 'write' of '_io.BytesIO' objects}
+     4179    0.062    0.000    1.124    0.000 queues.py:389(put)
+     4179    0.058    0.000    0.503    0.000 reduction.py:48(dumps)
+     4179    0.053    0.000  200.076    0.048 queues.py:96(get)
+     8326    0.049    0.000    0.049    0.000 generate.py:213(_ceiling)
+     8358    0.043    0.000   14.399    0.002 connection.py:410(_recv)
+     8358    0.042    0.000    0.042    0.000 {method '__exit__' of '_multiprocessing.SemLock' objects}
+    12489    0.039    0.000    0.049    0.000 fractions.py:206(__new__)
+     4163    0.038    0.000    0.085    0.000 dataclasses.py:1255(_dataclass_setstate)
+     4163    0.036    0.000    1.161    0.000 process.py:206(_sendback_result)
+     4163    0.036    0.000    0.036    0.000 <string>:2(__init__)
+     8326    0.033    0.000    0.356    0.000 _arraysetops_impl.py:145(unique)
+     4179    0.033    0.000    0.380    0.000 connection.py:192(send_bytes)
+     4179    0.031    0.000    0.343    0.000 connection.py:427(_send_bytes)
+     4163    0.031    0.000   88.977    0.021 fromnumeric.py:848(argpartition)
+     8326    0.030    0.000   28.061    0.003 fromnumeric.py:2876(cumsum)
+     4163    0.029    0.000    0.047    0.000 dataclasses.py:1454(fields)
+    45793    0.029    0.000    0.029    0.000 {built-in method builtins.getattr}
+     4179    0.025    0.000   14.433    0.003 connection.py:450(_recv_bytes)
+     4179    0.023    0.000   14.459    0.003 connection.py:218(recv_bytes)
+     4163    0.021    0.000    0.021    0.000 {method 'argsort' of 'numpy.ndarray' objects}
+     8326    0.021    0.000    0.021    0.000 {built-in method numpy.array}
+     8326    0.021    0.000    0.021    0.000 {built-in method numpy.frombuffer}
+    16652    0.020    0.000    0.024    0.000 numbers.py:317(__float__)
+    16652    0.020    0.000    0.353    0.000 fromnumeric.py:1459(searchsorted)
+     4163    0.019    0.000  136.741    0.033 process.py:194(_process_chunk)
+    12489    0.019    0.000    0.022    0.000 generate.py:238(u_chord)
+     8326    0.018    0.000    0.018    0.000 {method 'reshape' of 'numpy.ndarray' objects}
+     4163    0.017    0.000    0.017    0.000 reduction.py:225(_rebuild_partial)
+     8326    0.016    0.000    0.055    0.000 numeric.py:1904(_frombuffer)
+     8326    0.015    0.000    0.023    0.000 core.py:6878(is_masked)
+     8358    0.014    0.000  185.133    0.022 synchronize.py:96(__enter__)
+     8326    0.014    0.000    0.014    0.000 {built-in method numpy.empty}
+     8326    0.014    0.000    0.043    0.000 {method 'min' of 'numpy.ndarray' objects}
+     4163    0.013    0.000    0.049    0.000 fromnumeric.py:1115(argsort)
+    12489    0.013    0.000    0.044    0.000 {method 'sum' of 'numpy.ndarray' objects}
+    24978    0.013    0.000    0.013    0.000 dataclasses.py:1469(<genexpr>)
+     4195    0.012    0.000    0.012    0.000 {method 'copy' of 'dict' objects}
+    54127    0.012    0.000    0.012    0.000 {built-in method builtins.min}
+     8358    0.012    0.000    0.054    0.000 synchronize.py:99(__exit__)
+     4179    0.012    0.000    0.012    0.000 {method 'update' of 'dict' objects}
+     4179    0.011    0.000    0.011    0.000 {built-in method _struct.pack}
+     4163    0.011    0.000    0.033    0.000 {method 'any' of 'numpy.ndarray' objects}
+    37579    0.010    0.000    0.010    0.000 {built-in method builtins.max}
+     8326    0.009    0.000    0.009    0.000 {method 'flatten' of 'numpy.ndarray' objects}
+     4163    0.009    0.000    0.009    0.000 {method 'ravel' of 'numpy.ndarray' objects}
+    12489    0.009    0.000    0.031    0.000 _methods.py:47(_sum)
+     4163    0.009    0.000    0.010    0.000 {method 'sort' of 'list' objects}
+    37576    0.008    0.000    0.008    0.000 {built-in method builtins.len}
+     4179    0.008    0.000    0.008    0.000 {method 'getbuffer' of '_io.BytesIO' objects}
+     8326    0.008    0.000    0.029    0.000 _methods.py:43(_amin)
+     8326    0.007    0.000    0.022    0.000 {method 'max' of 'numpy.ndarray' objects}
+     4179    0.007    0.000    0.299    0.000 connection.py:401(_send)
+     8326    0.007    0.000    0.007    0.000 {built-in method numpy._core._multiarray_umath._unique_hash}
+
+
