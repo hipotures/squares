@@ -27,6 +27,7 @@ from fractions import Fraction
 import numpy as np
 from scipy.optimize import linprog
 
+from sqpack.fractional._top13_selector import select_lowest_finite
 from sqpack.fractional.certificate import Certificate
 from sqpack.fractional.corner_clip import CornerClip
 from sqpack.fractional.model import Atom, Direction, rotation_from_half_tangent
@@ -417,9 +418,11 @@ def _least_finite_indices(
             raise ValueError("a zero-weight grid must contain only zero and +inf scores")
         zeros = np.flatnonzero(flat == 0)
         count = min(count, zeros.size)
-        if count == 0:
-            return zeros
         return zeros[np.linspace(0, zeros.size - 1, count, dtype=np.intp)]
+
+    native = select_lowest_finite(flat, count)
+    if native is not None:
+        return native
 
     partition = np.argpartition(flat, count - 1)[:count]
     if np.isneginf(flat[partition]).any():

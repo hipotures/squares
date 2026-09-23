@@ -140,8 +140,24 @@ squares-workbench-tools = { path = "../packages/workbench", editable = true }
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+[tool.hatch.build.hooks.custom]
+path = "hatch_build.py"
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/sqpack"]
+# Editable builds leave a local binary beside the source. Standard wheels only
+# include the binary explicitly compiled for that wheel by the build hook.
+exclude = [
+    "/src/sqpack/fractional/_top13.so",
+    "/src/sqpack/fractional/_top13.dylib",
+]
+
+[tool.hatch.build.targets.sdist]
+# A source archive must never carry a binary built on the checkout machine.
+exclude = [
+    "/src/sqpack/fractional/_top13.so",
+    "/src/sqpack/fractional/_top13.dylib",
+]
 
 # Lint
 #

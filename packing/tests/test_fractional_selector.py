@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+from concurrent.futures import ProcessPoolExecutor
 from fractions import Fraction
 from pathlib import Path
 
 import numpy as np
 import pytest
 
+from sqpack.fractional import _top13_selector
 from sqpack.fractional.generate import _least_finite_indices, placement_cells
 from sqpack.fractional.model import rotation_from_half_tangent
 
@@ -15,6 +17,10 @@ from sqpack.fractional.model import rotation_from_half_tangent
 def _reference(flat: np.ndarray, count: int) -> np.ndarray:
     finite = np.flatnonzero(np.isfinite(flat))
     return finite[np.lexsort((finite, flat[finite]))][:count]
+
+
+def _worker_has_native_selector(_index: int) -> bool:
+    return _top13_selector.native_available()
 
 
 def _policy_reference(
@@ -65,6 +71,30 @@ def test_captured_late_round_floating_masses() -> None:
     assert np.count_nonzero(np.isfinite(flat)) == 723_917
     expected = _reference(flat, 13)
     assert np.array_equal(_least_finite_indices(flat, 13), expected)
+
+
+def test_native_selector_and_reference_fallback_agree(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    fixture = Path(__file__).with_name("fixtures") / "late_selector_flat.npz"
+    with np.load(fixture) as archive:
+        late = archive["flat"]
+    special = np.array([np.nan, np.inf, -np.inf, -0.0, 0.0, 2.0, 2.0, -1.0])
+    noncontiguous = np.arange(80.0)[::-2]
+    cases = ((late, 13), (special, 6), (noncontiguous, 13), (noncontiguous, 65))
+    accelerated = [_least_finite_indices(values, count) for values, count in cases]
+    monkeypatch.setattr(_top13_selector, "_NATIVE", None)
+    for (values, count), chosen in zip(cases, accelerated, strict=True):
+        expected = _reference(values, count)
+        assert np.array_equal(chosen, expected)
+        assert np.array_equal(_least_finite_indices(values, count), expected)
+
+
+def test_native_selector_loads_in_process_workers() -> None:
+    if not _top13_selector.native_available():
+        pytest.skip("the platform or source checkout uses the NumPy fallback")
+    with ProcessPoolExecutor(max_workers=2) as pool:
+        assert all(pool.map(_worker_has_native_selector, range(2)))
 
 
 def test_zero_weight_placements_do_not_call_argpartition(
