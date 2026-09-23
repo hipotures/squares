@@ -89,18 +89,22 @@ its search strategy.
 |  | value | status |
 | --- | --- | --- |
 | best-known packing (upper bound) | `3.8770835…` | Trump 1979, a construction |
-| strongest proved lower bound | `3.8264474…` | [T-026](packing/cases/n11_threshold_certificate/t-026-verifiable-claim-dilation-limit.md), proved by an exact dilation-limit argument; the point-only T-018 proof is explained [below](#how-a-weighted-atomic-lower-bound-proof-works) |
-| gap between these bounds | about `0.050636` | still open |
+| strongest verified lower bound | `31/8 = 3.875`, strict | Kleddamag 2026, [developed from T-026’s certificate](README.md#third-party-results) and confirmed here by two complete coverage methods |
+| strongest first-party lower bound | `3.8269975…` | T-033, T-026’s atoms on a finer net; the point-only T-018 proof is explained [below](#how-a-weighted-atomic-lower-bound-proof-works) |
+| gap between the verified bounds | about `0.002084` | still open |
 
 [T-022](packing/cases/n11_fractional_certificate/t-022-dilation-limit-proof.md) refines
 the point-certificate bound to `3.8100257…`.
 [T-024](packing/cases/n11_fractional_certificate/t-024-dilation-limit-proof.md) rechecks
 the point atoms on a finer direction net and proves `s(11) ≥ 3.8166095…`.
 [T-025](packing/cases/n11_threshold_certificate/t-025-verifiable-claim-191-50.md)
-introduces threshold atoms and directly proves `s(11) ≥ 191/50 = 3.82`. The strongest
-proved bound is `s(11) ≥ 955000*sqrt(518400042893309449)/179696714646249 = 3.8264474…`,
-those same atoms re-certified on a finer direction net and dilated
-([T-026](packing/cases/n11_threshold_certificate/t-026-verifiable-claim-dilation-limit.md)).
+introduces threshold atoms and directly proves `s(11) ≥ 191/50 = 3.82`.
+[T-026](packing/cases/n11_threshold_certificate/t-026-verifiable-claim-dilation-limit.md)
+proves `s(11) ≥ 955000*sqrt(518400042893309449)/179696714646249 = 3.8264474…`, those
+same atoms re-certified on a finer direction net and dilated; T-033 repeats it on a net
+twice as fine for `3.8269975…`. Kleddamag’s `s(11) > 31/8` starts from T-026’s
+certificate and restricts coverage to what a real parent square needs; it lies `0.048`
+above T-033 and about `0.0021` below Trump’s packing.
 T-026 checks a finite certificate on the finer net, proves that common scaling preserves
 its coverage and budget whenever the strict containment inequality holds, and uses
 rational density to establish the displayed `≥` bound.
@@ -1309,7 +1313,7 @@ throughput.
 `4.6755`. What is unknown is whether the named alternatives, none of which is built,
 would do better.
 
-**4. What `s(11)` actually is.** The bounds above leave a gap of about `0.050636`, and
+**4. What `s(11)` actually is.** The bounds above leave a gap of about `0.002084`, and
 neither end is known to be tight.
 The upper end is a construction nobody has beaten since 1979; the lower bound excludes
 smaller containers without establishing the optimum.
