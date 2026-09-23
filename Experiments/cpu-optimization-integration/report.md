@@ -8,6 +8,7 @@ The primary case is `n=12`, outer side `99/25`, square side `9977/10000`, with `
 |---|---|---|---:|---:|---:|---:|---:|---|
 | M0 | Current main | — | 44.162 / **44.253** / 44.444 s | unavailable in production | 34.153 / — s | 10.097 / — s | 3.118 / — s | control |
 | M1 | Parallel directions | M0 | 44.052 / **44.217** / 44.642 s | 17.431 / **17.641** / 17.718 s | 34.175 / 7.340 s | 10.115 / 10.289 s | 3.141 / 1.023 s | **ACCEPT** |
+| M2 | Persistent HiGHS LP | M1 | 34.076 / **34.448** / 34.987 s | 7.762 / **7.925** / 7.929 s | 33.265 / 6.666 s | 1.179 / 1.238 s | 3.072 / 1.026 s | **ACCEPT** |
 
 ## M0: current main control
 
@@ -36,4 +37,26 @@ OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. uv run -
 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 PACK_JOBS=1 PYTHONPATH=. uv run --frozen --no-dev python benchmarks/round0_selector/exact_row_check.py --out ../Experiments/cpu-optimization-integration/raw/m1-exact-rows.json
 ```
 
-The checkpoint is **M1**. Subsequent candidates must be compared with M1 or later accepted checkpoints under the same production worker path.
+M1 was recorded by checkpoint commit `4d8620adacb9d392471fdc401124df53e16a7569`.
+
+## M2: persistent HiGHS LP
+
+Source research: `exp/cpu-highs-incremental` at `d37e1c13d5566aea24794072784f94ad89d29054`. Input baseline: M1 at `4d8620adacb9d392471fdc401124df53e16a7569`. Production integration commit: `ee137447725930323858965cd36b463b6f177b26`. The production owner in `colgen.py` keeps one HiGHS model for each `solve_rows()` invocation, appends only new rows, and retains the valid simplex basis on reoptimization. The public standalone `solve_lp()` remains available to callers outside that lifecycle. `highspy==1.15.1` is an explicit runtime dependency in `pyproject.toml` and `uv.lock`; `uv lock --check` passed. The lock update removed obsolete `uv` option metadata while leaving all pre-existing package versions unchanged.
+
+**Correctness: SEMANTICALLY EQUIVALENT, DIFFERENT TRAJECTORY.** M2 converges in 23 rounds and 5,842 rows, compared with M1's 22 and 5,643. Its objective `12.217676366606236` differs from M1 by `4.46e-13`, comfortably below a `1e-9` floating comparison tolerance. Its least-covered value is `0.9999999999998309`, and the normal stop reason is coverage convergence. All six timed runs had the same M2 per-round search decisions. The [LP audit](raw/m2-lp-feasibility.json) checked all 22 returned LP points: minimum held-row coverage `0.9999999999861181`, valid retained basis at every solve, matching dual length, and maximum objective recomputation residual `3.55e-15`. The [exact retained-row diagnostic](raw/m2-exact-rows.json) checked all 5,842 rows: no centre outside the exact domain, all 92 boundary coefficient discrepancies had exact nearby witnesses, and none remained unresolved. Thirty-three focused tests passed, including warm-start checkpoint behavior and the production direction pool.
+
+The checkpoint test previously demanded bitwise equality of weights after rebuilding an LP model at a chunk boundary. The row matrix and direction ordering still match exactly; two weights differed by only `5.55e-17`, while the objective differed by `4.44e-16`. That test now uses `1e-12` absolute tolerance for the floating LP point and keeps exact row/checkpoint comparisons. This change records the solver-basis behavior rather than suppressing a row-generation difference.
+
+Against M1, M2 saves **9.769 s (22.1%) serial** and **9.716 s (55.1%) at 16 workers**. The worker-16 LP median falls from 10.289 to 1.238 s; separation also moves from 7.340 to 6.666 s because the valid LP basis selects a different row path. This is an integrated end-to-end gain, not the old research branch estimate. Parent peak RSS median rises from 351,984 to 538,804 KiB serial and from 356,864 to 530,672 KiB at 16 workers; aggregate child RSS is unmeasured. The extra model memory is a material tradeoff. Independent speedups are not added together.
+
+M2 commands, from `packing/` (each timed endpoint repeated with `run=1,2,3`, alternating 1 and 16):
+
+```bash
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. uv run --frozen --no-dev python ../Experiments/cpu-optimization-integration/bench.py --workers "$jobs" --out "../Experiments/cpu-optimization-integration/raw/m2-w${jobs}-r${run}.json"
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 PACK_JOBS=1 PYTHONPATH=. uv run --frozen --no-dev python ../Experiments/cpu-optimization-integration/verify_persistent_lp.py --out ../Experiments/cpu-optimization-integration/raw/m2-lp-feasibility.json
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 PACK_JOBS=1 PYTHONPATH=. uv run --frozen --no-dev python benchmarks/round0_selector/exact_row_check.py --out ../Experiments/cpu-optimization-integration/raw/m2-exact-rows.json
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 PACK_JOBS=1 PYTHONPATH=. uv run --frozen --no-dev --with pytest python -m pytest tests/test_colgen_persistent_lp.py tests/test_colgen_parallel_directions.py tests/test_colgen_checkpoint.py tests/test_fractional_cutting.py -q
+uv lock --check
+```
+
+The current accepted production checkpoint is **M2**. Maskless selection is the next independent candidate; it will be measured against M2 with the same HiGHS path.

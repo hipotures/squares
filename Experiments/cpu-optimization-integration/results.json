@@ -142,7 +142,108 @@
       "exact_retained_rows": "raw/m1-exact-rows.json",
       "seconds_saved_vs_m0_serial": 26.612,
       "wall_reduction_percent_vs_m0_serial": 60.14,
-      "dependency_changes": []
+      "dependency_changes": [],
+      "accepted_checkpoint_commit": "4d8620adacb9d392471fdc401124df53e16a7569"
+    },
+    {
+      "stage": 2,
+      "checkpoint": "M2",
+      "optimization": "persistent HiGHS LP",
+      "input_baseline_commit": "4d8620adacb9d392471fdc401124df53e16a7569",
+      "source_branch": "exp/cpu-highs-incremental",
+      "source_commit": "d37e1c13d5566aea24794072784f94ad89d29054",
+      "integration_commit": "ee137447725930323858965cd36b463b6f177b26",
+      "workers_1": {
+        "files": [
+          "raw/m2-w1-r1.json",
+          "raw/m2-w1-r2.json",
+          "raw/m2-w1-r3.json"
+        ],
+        "runs": 3,
+        "wall_seconds": {
+          "min": 34.076,
+          "median": 34.448,
+          "max": 34.987
+        },
+        "separation_seconds": {
+          "min": 32.9,
+          "median": 33.265,
+          "max": 33.795
+        },
+        "lp_seconds": {
+          "min": 1.173,
+          "median": 1.179,
+          "max": 1.187
+        },
+        "round0_seconds": {
+          "min": 3.0513386210041062,
+          "median": 3.071621249004238,
+          "max": 3.3961262160009937
+        },
+        "rounds": 23,
+        "rows": 5842,
+        "objective": 12.217676366606236,
+        "least_covered": 0.9999999999998309,
+        "stop_reason": "converged: every placement covers mass 1",
+        "peak_parent_rss_kib": {
+          "min": 536860,
+          "median": 538804,
+          "max": 548848
+        }
+      },
+      "workers_16": {
+        "files": [
+          "raw/m2-w16-r1.json",
+          "raw/m2-w16-r2.json",
+          "raw/m2-w16-r3.json"
+        ],
+        "runs": 3,
+        "wall_seconds": {
+          "min": 7.762,
+          "median": 7.925,
+          "max": 7.929
+        },
+        "separation_seconds": {
+          "min": 6.495,
+          "median": 6.666,
+          "max": 6.685
+        },
+        "lp_seconds": {
+          "min": 1.225,
+          "median": 1.238,
+          "max": 1.25
+        },
+        "round0_seconds": {
+          "min": 1.0251146070004324,
+          "median": 1.0261445110008935,
+          "max": 1.0833421089992044
+        },
+        "rounds": 23,
+        "rows": 5842,
+        "objective": 12.217676366606236,
+        "least_covered": 0.9999999999998309,
+        "stop_reason": "converged: every placement covers mass 1",
+        "peak_parent_rss_kib": {
+          "min": 529104,
+          "median": 530672,
+          "max": 570364
+        }
+      },
+      "correctness": "SEMANTICALLY EQUIVALENT, DIFFERENT TRAJECTORY",
+      "verdict": "ACCEPT",
+      "gain_vs_m1_workers_1": {
+        "seconds_saved": 9.769,
+        "wall_reduction_percent": 22.09
+      },
+      "gain_vs_m1_workers_16": {
+        "seconds_saved": 9.716,
+        "wall_reduction_percent": 55.08
+      },
+      "lp_feasibility_file": "raw/m2-lp-feasibility.json",
+      "exact_retained_rows": "raw/m2-exact-rows.json",
+      "dependency_changes": [
+        "highspy==1.15.1"
+      ]
     }
   ]
 }

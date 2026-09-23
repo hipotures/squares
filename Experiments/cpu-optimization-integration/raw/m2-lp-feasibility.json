@@ -1,0 +1,189 @@
+{
+  "lp_rounds": [
+    {
+      "rows": 483,
+      "minimum_held_row_coverage": 0.9999999999999967,
+      "objective": 10.212765957446807,
+      "objective_from_weights": 10.212765957446805,
+      "dual_count": 483,
+      "basis_valid": true
+    },
+    {
+      "rows": 956,
+      "minimum_held_row_coverage": 0.9999999999999822,
+      "objective": 10.586991869918696,
+      "objective_from_weights": 10.586991869918696,
+      "dual_count": 956,
+      "basis_valid": true
+    },
+    {
+      "rows": 1349,
+      "minimum_held_row_coverage": 0.9999999999989105,
+      "objective": 11.33333333333229,
+      "objective_from_weights": 11.33333333333229,
+      "dual_count": 1349,
+      "basis_valid": true
+    },
+    {
+      "rows": 1701,
+      "minimum_held_row_coverage": 0.9999999999994476,
+      "objective": 11.508771929824286,
+      "objective_from_weights": 11.508771929824286,
+      "dual_count": 1701,
+      "basis_valid": true
+    },
+    {
+      "rows": 2051,
+      "minimum_held_row_coverage": 0.9999999999954416,
+      "objective": 11.658761528319435,
+      "objective_from_weights": 11.658761528319438,
+      "dual_count": 2051,
+      "basis_valid": true
+    },
+    {
+      "rows": 2444,
+      "minimum_held_row_coverage": 0.9999999999861181,
+      "objective": 11.789340101489763,
+      "objective_from_weights": 11.789340101489762,
+      "dual_count": 2444,
+      "basis_valid": true
+    },
+    {
+      "rows": 2760,
+      "minimum_held_row_coverage": 0.9999999999998533,
+      "objective": 11.91741071428562,
+      "objective_from_weights": 11.917410714285623,
+      "dual_count": 2760,
+      "basis_valid": true
+    },
+    {
+      "rows": 3029,
+      "minimum_held_row_coverage": 0.999999999999203,
+      "objective": 11.98874985650355,
+      "objective_from_weights": 11.98874985650355,
+      "dual_count": 3029,
+      "basis_valid": true
+    },
+    {
+      "rows": 3323,
+      "minimum_held_row_coverage": 0.9999999999997637,
+      "objective": 12.07162238263457,
+      "objective_from_weights": 12.071622382634569,
+      "dual_count": 3323,
+      "basis_valid": true
+    },
+    {
+      "rows": 3616,
+      "minimum_held_row_coverage": 0.9999999999998304,
+      "objective": 12.119419907626384,
+      "objective_from_weights": 12.119419907626385,
+      "dual_count": 3616,
+      "basis_valid": true
+    },
+    {
+      "rows": 3957,
+      "minimum_held_row_coverage": 0.9999999999875105,
+      "objective": 12.147305608833365,
+      "objective_from_weights": 12.147305608833365,
+      "dual_count": 3957,
+      "basis_valid": true
+    },
+    {
+      "rows": 4228,
+      "minimum_held_row_coverage": 0.9999999999989249,
+      "objective": 12.159770343076014,
+      "objective_from_weights": 12.159770343076016,
+      "dual_count": 4228,
+      "basis_valid": true
+    },
+    {
+      "rows": 4488,
+      "minimum_held_row_coverage": 0.9999999999935583,
+      "objective": 12.18342414532605,
+      "objective_from_weights": 12.183424145326052,
+      "dual_count": 4488,
+      "basis_valid": true
+    },
+    {
+      "rows": 4768,
+      "minimum_held_row_coverage": 0.9999999999999991,
+      "objective": 12.199832002394597,
+      "objective_from_weights": 12.199832002394597,
+      "dual_count": 4768,
+      "basis_valid": true
+    },
+    {
+      "rows": 5120,
+      "minimum_held_row_coverage": 0.9999999999986809,
+      "objective": 12.208518889630524,
+      "objective_from_weights": 12.208518889630525,
+      "dual_count": 5120,
+      "basis_valid": true
+    },
+    {
+      "rows": 5278,
+      "minimum_held_row_coverage": 0.9999999999952824,
+      "objective": 12.211599712087368,
+      "objective_from_weights": 12.211599712087368,
+      "dual_count": 5278,
+      "basis_valid": true
+    },
+    {
+      "rows": 5454,
+      "minimum_held_row_coverage": 0.9999999999966991,
+      "objective": 12.212581255090592,
+      "objective_from_weights": 12.212581255090596,
+      "dual_count": 5454,
+      "basis_valid": true
+    },
+    {
+      "rows": 5620,
+      "minimum_held_row_coverage": 0.999999999999987,
+      "objective": 12.215431259125285,
+      "objective_from_weights": 12.215431259125287,
+      "dual_count": 5620,
+      "basis_valid": true
+    },
+    {
+      "rows": 5785,
+      "minimum_held_row_coverage": 0.9999999999950503,
+      "objective": 12.216685639963297,
+      "objective_from_weights": 12.216685639963297,
+      "dual_count": 5785,
+      "basis_valid": true
+    },
+    {
+      "rows": 5810,
+      "minimum_held_row_coverage": 0.9999999999998741,
+      "objective": 12.21696122315474,
+      "objective_from_weights": 12.216961223154744,
+      "dual_count": 5810,
+      "basis_valid": true
+    },
+    {
+      "rows": 5828,
+      "minimum_held_row_coverage": 0.9999999999948257,
+      "objective": 12.217648445118094,
+      "objective_from_weights": 12.217648445118092,
+      "dual_count": 5828,
+      "basis_valid": true
+    },
+    {
+      "rows": 5842,
+      "minimum_held_row_coverage": 0.999999999999831,
+      "objective": 12.217676366606234,
+      "objective_from_weights": 12.217676366606236,
+      "dual_count": 5842,
+      "basis_valid": true
+    }
+  ],
+  "minimum_held_row_coverage": 0.9999999999861181,
+  "all_bases_valid": true,
+  "all_dual_lengths_match": true,
+  "maximum_objective_residual": 3.552713678800501e-15,
+  "rounds": 23,
+  "rows": 5842,
+  "objective": 12.217676366606236,
+  "least_covered": 0.9999999999998309,
+  "stopped": "converged: every placement covers mass 1"
+}
