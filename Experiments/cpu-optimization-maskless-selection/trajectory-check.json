@@ -1,0 +1,12 @@
+{
+  "1": {
+    "trajectory_identical": true,
+    "objective_equal": true,
+    "least_covered_equal": true
+  },
+  "16": {
+    "trajectory_identical": true,
+    "objective_equal": true,
+    "least_covered_equal": true
+  }
+}
