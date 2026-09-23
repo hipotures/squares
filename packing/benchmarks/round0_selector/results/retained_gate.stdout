@@ -1,0 +1,18 @@
+claim: s(12) >= 19/5
+  n = 12, L = 19/5, B = 9973/10000
+  68 atoms, total mass 58/5
+  PASS  Condition 1 atoms carry the declared symmetry | 68 atoms closed under D4 about the centre
+  PASS  Condition 2 total mass below n | total 58/5 against n = 12
+  PASS  Condition 3 net reaches pi/4 | final half-tangent 207107/500000, t^2 + 2t - 1 = 309449/250000000000
+  PASS  Condition 4 containment B(1 + D) < 1 | B = 9973/10000, D = 207107/90000000, B(1 + D) = 899635478111/900000000000
+  PASS  Condition 5 every reachable cell carries mass 1 | least cell mass 1 at direction 0
+VERIFIED: s(12) >= 19/5
+claim: s(12) >= 99/25
+  n = 12, L = 99/25, B = 9977/10000
+  2097 atoms, total mass 149987/12500
+  PASS  Condition 1 atoms carry the declared symmetry | 2097 atoms closed under D4 about the centre
+  PASS  Condition 2 total mass below n | total 149987/12500 against n = 12
+  PASS  Condition 3 net reaches pi/4 | final half-tangent 207107/500000, t^2 + 2t - 1 = 309449/250000000000
+  PASS  Condition 4 containment B(1 + D) < 1 | B = 9977/10000, D = 207107/90000000, B(1 + D) = 899996306539/900000000000
+  PASS  Condition 5 every reachable cell carries mass 1 | least cell mass 12501/12500 at direction 0
+VERIFIED: s(12) >= 99/25

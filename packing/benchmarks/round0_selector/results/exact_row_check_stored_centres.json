@@ -1,0 +1,112 @@
+{
+  "rounds": 22,
+  "rows": 5643,
+  "objective": 12.21767636660579,
+  "stopped": "converged: every placement covers mass 1",
+  "rows_checked": 5643,
+  "centres_outside_exact_domain": 0,
+  "rows_different_from_exact_coverage": 79,
+  "outside_samples": [],
+  "mismatch_samples": [
+    {
+      "row": 957,
+      "direction": 1,
+      "different_columns": 1
+    },
+    {
+      "row": 4937,
+      "direction": 4,
+      "different_columns": 1
+    },
+    {
+      "row": 4938,
+      "direction": 4,
+      "different_columns": 1
+    },
+    {
+      "row": 966,
+      "direction": 10,
+      "different_columns": 1
+    },
+    {
+      "row": 554,
+      "direction": 26,
+      "different_columns": 1
+    },
+    {
+      "row": 3323,
+      "direction": 28,
+      "different_columns": 1
+    },
+    {
+      "row": 2714,
+      "direction": 29,
+      "different_columns": 1
+    },
+    {
+      "row": 5463,
+      "direction": 31,
+      "different_columns": 1
+    },
+    {
+      "row": 578,
+      "direction": 34,
+      "different_columns": 1
+    },
+    {
+      "row": 579,
+      "direction": 34,
+      "different_columns": 1
+    },
+    {
+      "row": 581,
+      "direction": 35,
+      "different_columns": 1
+    },
+    {
+      "row": 582,
+      "direction": 35,
+      "different_columns": 1
+    },
+    {
+      "row": 583,
+      "direction": 35,
+      "different_columns": 1
+    },
+    {
+      "row": 5625,
+      "direction": 54,
+      "different_columns": 1
+    },
+    {
+      "row": 5629,
+      "direction": 55,
+      "different_columns": 1
+    },
+    {
+      "row": 1459,
+      "direction": 57,
+      "different_columns": 1
+    },
+    {
+      "row": 1462,
+      "direction": 58,
+      "different_columns": 1
+    },
+    {
+      "row": 3905,
+      "direction": 61,
+      "different_columns": 1
+    },
+    {
+      "row": 3906,
+      "direction": 61,
+      "different_columns": 1
+    },
+    {
+      "row": 4538,
+      "direction": 71,
+      "different_columns": 1
+    }
+  ]
+}

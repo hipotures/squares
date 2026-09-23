@@ -1,0 +1,40 @@
+{
+  "policy": "spread",
+  "row_run": {
+    "grids": [
+      26,
+      35,
+      43
+    ],
+    "densities": [
+      8.427,
+      11.46,
+      14.157
+    ],
+    "orbits": 511,
+    "sites": 3737,
+    "rows_per_direction": 3,
+    "max_rounds": 1,
+    "rounds": 1,
+    "rows": 483,
+    "objective": 10.212765957446807,
+    "stopped": "round limit 1 reached",
+    "seconds": 3.13,
+    "separation_seconds": 3.069,
+    "lp_seconds": 0.059,
+    "separation_share": 0.9812,
+    "peak_support": 0,
+    "timings": [
+      {
+        "index": 0,
+        "separation_s": 3.069,
+        "lp_s": 0.059,
+        "rows_held": 483,
+        "rows_added": 483,
+        "violated": 543,
+        "support": 0,
+        "objective": 10.212766
+      }
+    ]
+  }
+}

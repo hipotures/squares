@@ -1,0 +1,11 @@
+==========================================================================
+certificate: C-n012-fractional-77-20 certificate-77-20.json
+  n=12  L=77/20  B=9973/10000  t_K=207107/500000  steps=180  atoms=113
+  Condition 1 (D4 invariance)      : PASS
+  Condition 2 (total mass < n)     : PASS  sum w = 191/16 = 11.9375  (n = 12)
+  Condition 3 (net reaches pi/4)   : PASS  t_K^2+2t_K-1 = 309449/250000000000
+  Condition 4 (B(1+D) < 1)         : PASS  D = 207107/90000000 = 0.00230118888889 ; B(1+D) = 899635478111/900000000000 = 0.999594975679
+  Condition 5 (min covered mass>=1): PASS  min = 1 = 1.0  (cell-lower = 1, exact=True)
+       attained at k=0, t=0, centre (x,y)=(115047/220000, 115047/220000) ~ (0.522940909, 0.522940909)
+  Condition 5 time: 7.3s
+  ==> CERTIFICATE VALID : s(12) >= 77/20
