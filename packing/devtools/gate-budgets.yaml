@@ -713,14 +713,18 @@ tiers:
   # BasedPyright is one indivisible unit. Inside `checks` it occupied one of three slots
   # on a four-cpu runner; moving it to a one-step job gives it the runner without changing
   # the edit tier, which still contains the same type floor.
-  ceiling_seconds: 89.0
-  measured_seconds: 44.5
+  ceiling_seconds: 111.0
+  measured_seconds: 60.16
   measured_on: '2026-09-22'
   measured_where: >-
-    Run 35803857967, job typecheck, on PR 222: the one-step tier passed BasedPyright with
-    zero findings in 44.55 s and failed only the stale-record rule against 82.58 s. The
-    measured value follows the gate's one-decimal repair instruction. Its 89 s ceiling
-    is the register's 2.0x maximum headroom rounded down to a whole second.
+    Geometric mean of two consecutive hosted packing-validate --typecheck walls on PR
+    222: 44.55 s in run 35803857967 and 81.25 s in run 35805712899, job typecheck. Both
+    passed BasedPyright with zero findings and failed only the cost band, first as stale
+    against 82.58 s and then as drift against the one-reading 44.5 s repair. Their 1.82x
+    spread demonstrates why neither endpoint is a stable record. The 111 s ceiling is
+    restored from the pre-incident declaration; at 1.85x of the two-reading record it
+    remains inside the register's 2.0x maximum headroom without narrowing the wall around
+    one unusually fast runner.
   history:
   - measured_seconds: 67.26
     measured_on: '2026-09-16'
