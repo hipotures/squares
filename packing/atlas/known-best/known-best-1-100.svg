@@ -63,7 +63,7 @@
   </g>
   <text data-feature="explainer" x="709.572" y="2804" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="1.045">(</tspan><tspan font-style="italic">n</tspan><tspan dx="1.045">) is the side of the smallest square holding </tspan><tspan font-style="italic">n</tspan><tspan dx="1.045"> unit squares; deg is the algebraic degree of that side length</tspan></text>
   <text data-feature="credit" x="1200" y="2834" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#47525f">Diagram by Joshua Levy with assistance from Claude and Codex</text>
-  <text data-feature="release-stamp" x="1200" y="2864" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#47525f">v0.4.1-b7690c</text>
+  <text data-feature="release-stamp" x="1200" y="2864" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="700" fill="#47525f">v0.4.1-195961</text>
   <g data-feature="packing-card" data-n="1" data-row="0" data-column="0" data-source-id="W-known-best-n001">
     <rect data-feature="container-outline" x="84" y="186" width="158" height="158" fill="#ffffff" stroke="#000000" stroke-width="1.15" />
     <polygon data-feature="square-fill" data-square="n-001-square-001" data-hue-index="0" data-shade-index="0" data-contact-sides="4" data-orientation-radians="0.0" points="84,344 242,344 242,186 84,186" fill="#257260" stroke="#000000" stroke-width="0.42" stroke-linejoin="round" data-angle-class="0" />
@@ -240,7 +240,7 @@
     <polygon data-feature="legend-star" points="186.5,609.46 188.5553566666666666666666667,615.3711533333333333333333333 194.81174,615.49934 189.82557,619.2808466666666666666666667 191.6376633333333333333333333,625.27066 186.5,621.696 181.3623366666666666666666667,625.27066 183.17443,619.2808466666666666666666667 178.18826,615.49934 184.4446433333333333333333333,615.3711533333333333333333333" fill="#a3123f" data-evidence="lower bound first proved here" />
     <text data-feature="side-bound" x="84" y="646" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(11) ≤ 3.877084</tspan></text>
     <text data-feature="algebraic-degree" x="242" y="646" text-anchor="end" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f">deg 8</text>
-    <text data-feature="lower-bound" x="84" y="663" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(11) ≥ </tspan><tspan fill="#a3123f">3.826447</tspan></text>
+    <text data-feature="lower-bound" x="84" y="663" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#47525f"><tspan font-style="italic">s</tspan><tspan dx="0.77">(11) ≥ </tspan><tspan fill="#a3123f">3.826997</tspan></text>
   </g>
   <g data-feature="packing-card" data-n="12" data-row="1" data-column="1" data-source-id="W-known-best-n012">
     <rect data-feature="container-outline" x="312" y="438" width="158" height="158" fill="#ffffff" stroke="#000000" stroke-width="1.15" />

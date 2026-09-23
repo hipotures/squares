@@ -101,17 +101,20 @@ dilation-limit supremum with no new mathematics.
 is exactly how it was run.
 
 Two things make it trustworthy rather than merely arithmetic.
-The same run’s 1440 leg is a control and reproduces `T-026`’s registered surd to
-exactly.
-And the retention gate accepts the frozen bytes by **both** routes: the interval
-route returns a zero-width enclosure `(1, 1)` over 5,761 directions and 23,785,079 boxes
-with no stalls, the exact route independently finds least cell charge 1 at direction
-1828 and re-evaluates it at its witness by membership counting, and the two agree —
-`RETAINABLE`, `sha256 fefcf8ac…`.
+The same run’s 1440 leg is a control and reproduces `T-026`’s registered surd exactly.
+And the retention gate accepts the frozen bytes by **both** routes: the interval route
+returns a zero-width enclosure `(1, 1)` over 5,761 directions and 23,785,079 boxes with
+no stalls, the exact route independently finds least cell charge 1 at direction 1828 and
+re-evaluates it at its witness by membership counting, and the two agree — `RETAINABLE`,
+`sha256 fefcf8ac…`.
 
-The value sits below `L/B* = 3.827547924507` and below the universal one-body ceiling
-`L* = 3.828806254385`, as the theory requires; a value above either would have been
-reason to distrust the run.
+The value sits below `L/B* = 3.827547924507` and below the point-certificate ceiling
+`L* = 3.828806254385`, and neither comparison is an independent check of the run.
+`S < L/B*` is an algebraic identity, since `sqrt(1 + D^2) < 1 + D` for `D > 0`, so a
+value above it would have meant an arithmetic defect rather than a better result.
+And `L*` is the ceiling on *point* certificates, which is precisely the bound threshold
+atoms are built to pass: `S < L*` holds here because `B* > 9977/10000`, which the
+refinement measured, not because a theorem forbids a threshold certificate above it.
 The dilation-limit theorem establishes the bound as a supremum and **supplies no
 individual certificate at that side**, so the strict inequality there is not claimed.
 The register entry is a separate decision and is not written by this report.

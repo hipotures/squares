@@ -68,9 +68,10 @@ Read it before citing any capability here.
 
 The core exposition begins with T-018’s visual proof of `s(11) >= 3.81`, then explains
 the threshold charges and dilation argument that strengthen it.
-T-026 proves the project’s strongest current lower bound,
-`s(11) >= 955000*sqrt(518400042893309449)/179696714646249 =
-3.8264474...`, at `V4/C5`. Future research follows the
+T-033 proves the project’s strongest current lower bound,
+`s(11) >= 955000*sqrt(2073600042893309449)/359341754646249 =
+3.8269975...`, at `V4/C3`; T-026 holds the same argument one net coarser, at `V4/C5`.
+Future research follows the
 [payoff policy](docs/project/handoff-2026-09-06-post-381-t2-t10-continuation.md#research-payoff-and-exposition):
 prioritize substantial bound improvements and methods or theorems that make them
 possible.
@@ -89,6 +90,7 @@ action for each are in [`frontier/RESULTS.md`](packing/frontier/RESULTS.md); the
 | [T-025](packing/frontier/RESULTS.md) | 11 | `V4` | `C5` | `S5` | `apparently-novel` | s(11) >= 191/50 = 3.82, by a threshold certificate: 584 point atoms of mass 271052551/31250000 and 320 threshold atoms, every one 2-of-3, of budget 143352577/62500000, on the D4-symmetric site set at shrunken side 9977/10000 and the 181-direction net. |
 | [T-026](packing/frontier/RESULTS.md) | 11 | `V4` | `C5` | `S5` | `apparently-novel` | s(11) >= 955000*sqrt(518400042893309449)/179696714646249 = 3.826447410572939, proved by an exact dilation-limit corollary of T-025’s threshold certificate re-certified on a finer direction net. |
 | [T-024](packing/frontier/RESULTS.md) | 11 | `V4` | `C4` | `S5` | `apparently-novel` | s(11) >= 3175000*sqrt(518400042893309449)/598960960743657 = 3.816609502788862, proved by an exact dilation-limit corollary of T-018’s retained atoms re-certified on a finer direction net. |
+| [T-033](packing/frontier/RESULTS.md) | 11 | `V4` | `C3` | `S5` | `apparently-novel` | s(11) >= 955000*sqrt(2073600042893309449)/359341754646249 = 3.826997548829543624, proved by an exact dilation-limit corollary of T-025’s threshold certificate re-certified on the 2880-step direction net. |
 | [T-017](packing/frontier/RESULTS.md) | 12 | `V4` | `C4` | `S4` | `apparently-novel` | s(12) >= 99/25, by a first-party weighted fractional unavoidable-set certificate at container side 99/25 = 3.96. |
 | [T-019](packing/frontier/RESULTS.md) | 17, 18, 19 | `V4` | `C4` | `S4` | `apparently-novel` | s(17) >= 459/100, and s(18) >= 459/100 and s(19) >= 459/100, from a first-party weighted fractional unavoidable-set certificate at container side 459/100 = 4.59. |
 | [T-020](packing/frontier/RESULTS.md) | 19, 20, 21 | `V4` | `C4` | `S4` | `apparently-novel` | s(19) >= 24/5, s(20) >= 24/5 and s(21) >= 24/5, from a first-party weighted fractional unavoidable-set certificate at container side 24/5 = 4.80. |
@@ -149,7 +151,7 @@ hypothesis status and summarizes experiment verdicts, and the
 | Explorations | 40 | 24 linked to proposed hypotheses; 16 uncodified |
 | Hypotheses | 170 | 29 confirmed; 31 refuted; 55 blocked; 17 unresolved; 5 open; 29 open questions; 2 result registered; 2 abandoned; 0 running |
 | Experiments | 155 | 43 accepted; 36 rejected; 50 unresolved; 12 baseline; 11 blocked; 3 abandoned; 0 in progress |
-| Frontier results | 32 | 32 registered |
+| Frontier results | 33 | 33 registered |
 
 <!-- END CURRENT-RESEARCH-STATUS -->
 
@@ -213,11 +215,11 @@ ranked relational-certificate slate.
 A draft or proposed direction is not a registered hypothesis, and a registered
 hypothesis is not a frontier result.
 
-Scientifically, the current bracket is unchanged:
-`3.826447410572939… <= s(11) <= 3.877083590022814…`. T-026 closes about 43% of the older
-Stromquist-to-Trump interval.
-The pure point/density ceiling `38200/9977 ≈ 3.8288` lies only about `0.00236` above
-T-026, so additional heavy work for microscopic gains in that language is paused.
+Scientifically, the bracket has moved once since, by one net refinement:
+`3.826997548829543… <= s(11) <= 3.877083590022814…`. T-033 closes about 43% of the older
+Stromquist-to-Trump interval, T-026 having closed about 43% of it before that.
+The pure point/density ceiling `38200/9977 ≈ 3.8288` lies only about `0.00181` above
+T-033, so additional heavy work for microscopic gains in that language is paused.
 H-160/exp-158 and H-162/exp-160 are registered but blocked before target invocation.
 H-163 is registered and unresolved via exp-161; its target-blind instrument merged in PR
 182\. Encode-only timed out with no JSON. `--search` did not run.
@@ -1417,9 +1419,9 @@ records the implemented controls and the remaining admission requirements.
 with definitions, proof results, scoped negatives and open comparisons in one place.
 PR137, PR142, PR145 and PR147 landed together at `1c1db463` on September 10, 2026. PR139
 then merged as `3a18a05a`, incorporating that owner strand and contributing T-024–T-026.
-The global lower bound is `3.8264474...`; the upper construction is unchanged at
-`3.8770835...`. The review corrections preserve the fixed-family scope of conditional
-obstructions and the existential owner-selection requirement.
+At that cutoff the global lower bound was `3.8264474...`; the upper construction is
+unchanged at `3.8770835...`. The review corrections preserve the fixed-family scope of
+conditional obstructions and the existential owner-selection requirement.
 Finite support, net and grid results do not close entire research directions.
 The
 [review addendum](docs/project/reviews/review-2026-09-09-n11-evidence-interpretation.md#combined-series-review-addendum--september-10-2026)
@@ -3433,8 +3435,8 @@ no intervening improvement:
 |  | value | source |
 | --- | --- | --- |
 | Best known packing (upper bound) | `3.8770835…` | Walter Trump, 1979 |
-| Best certified lower bound | `955000*sqrt(518400042893309449)/179696714646249 = 3.8264474…` | [T-026](packing/frontier/RESULTS.md), proved at V4/C5 by an exact dilation-limit argument from T-025’s threshold certificate re-certified on a 1440-step direction net |
-| Bound gap | `0.0506362` | the second-smallest open gap at `n ≤ 100` in this corpus |
+| Best certified lower bound | `955000*sqrt(2073600042893309449)/359341754646249 = 3.8269975…` | [T-033](packing/frontier/RESULTS.md), proved at V4/C3 by an exact dilation-limit argument from T-025’s threshold certificate re-certified on a 2880-step direction net |
+| Bound gap | `0.0500860` | the second-smallest open gap at `n ≤ 100` in this corpus |
 
 ![Walter Trump’s exact eleven-square packing.](packing/atlas/rendering/trump11-overview.svg)
 
@@ -5730,12 +5732,13 @@ threshold atoms, which charge a core holding at least `k` of a set’s points an
 only `floor(|S| / k)` of the budget, carry the side past the exact ceiling that the
 point-atom method provably cannot pass.
 [T-026](packing/frontier/RESULTS.md) then re-certifies those atoms on a 1440-step net
-and proves `s(11) >= 3.826447410572939…` by an exact dilation-limit argument.
-This is the verified lower bound of the case; “dilation-limit” describes the proof
-construction, not a weaker theorem or assurance level.
-The shared S5 rubric category does not make these contributions comparable in size.
-`s(12) >= 99/25` is [T-017](packing/frontier/RESULTS.md), the first bound located that
-was proved about twelve squares rather than inherited from eleven.
+and proves `s(11) >= 3.826447410572939…` by an exact dilation-limit argument, and
+[T-033](packing/frontier/RESULTS.md) repeats that on a 2880-step net for
+`s(11) >= 3.826997548829543…`. The second is the verified lower bound of the case;
+“dilation-limit” describes the proof construction, not a weaker theorem or assurance
+level. The shared S5 rubric category does not make these contributions comparable in
+size. `s(12) >= 99/25` is [T-017](packing/frontier/RESULTS.md), the first bound located
+that was proved about twelve squares rather than inherited from eleven.
 `s(17) >= 459/100`, and `n = 18` and `n = 19` at the same side without a monotonicity
 step, is [T-019](packing/frontier/RESULTS.md) and displaces Massaccesi’s published
 `4.5058` by `0.0842`. `s(19)`, `s(20)` and `s(21) >= 24/5` is

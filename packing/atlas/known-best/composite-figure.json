@@ -581,16 +581,16 @@
           "state": "minimal-polynomial"
         },
         "lower": {
-          "display": "s(11) ≥ 3.826447",
+          "display": "s(11) ≥ 3.826997",
           "evidence": [
-            "E-n011-threshold-net1440-certificate",
-            "E-n011-threshold-net1440-dilation-limit",
-            "E-n011-threshold-net1440-interval-decision"
+            "E-n011-threshold-net2880-certificate",
+            "E-n011-threshold-net2880-dilation-limit",
+            "E-n011-threshold-net2880-interval-decision"
           ],
           "first_proved_here": true,
           "provenance": "frontier",
           "shown": true,
-          "value": "3.826447410572939"
+          "value": "3.826997548829543"
         },
         "n": 11,
         "optimality": {

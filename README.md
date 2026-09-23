@@ -102,16 +102,24 @@ Results first established here, as far as the recorded source searches show:
   [T-025](packing/cases/n11_threshold_certificate/t-025-verifiable-claim-191-50.md)
   introduces point atoms plus *threshold atoms*, whose stronger budget rule carries the
   side past the point method’s proved ceiling, and directly proves
-  `s(11) ≥ 191/50 = 3.82`. The strongest proved lower bound now stands at
-  `s(11) ≥ 955000*sqrt(518400042893309449)/179696714646249 =
-  3.8264474…`, proved from those same threshold atoms re-certified on a 1440-step
-  direction net and an exact dilation-limit argument
-  ([T-026](packing/cases/n11_threshold_certificate/t-026-verifiable-claim-dilation-limit.md)).
-  It is registered as `V4/C5`: machine-verified exact or interval-certified evidence
-  with passing replay, confirmed by distinct exact event-cell and interval coverage
-  methods and a mapped source-distinct review of the complete claim.
+  `s(11) ≥ 191/50 = 3.82`.
+  [T-026](packing/cases/n11_threshold_certificate/t-026-verifiable-claim-dilation-limit.md)
+  re-certifies those same threshold atoms on a 1440-step direction net and takes
+  `s(11) ≥ 955000*sqrt(518400042893309449)/179696714646249 = 3.8264474…` from an exact
+  dilation-limit argument, at `V4/C5`: machine-verified exact or interval-certified
+  evidence with passing replay, confirmed by distinct exact event-cell and interval
+  coverage methods and a mapped source-distinct review of the complete claim.
+  The strongest proved lower bound now stands at
+  `s(11) ≥ 955000*sqrt(2073600042893309449)/359341754646249 = 3.8269975…`, the same
+  measure re-certified once more on a 2880-step net
+  ([T-033](packing/campaign/series/series-000-smoke-and-calibration/results/agenda-041/exp-226-n11-net2880-receipt.md)),
+  which halves the net’s largest half-gap tangent and moves the bound by
+  `+0.00055013825660`. `T-033` is registered as `V4/C3`: the certificate carries the
+  same two distinct machine decisions, but the bound is derived from it by a single
+  exact-algebraic step, and a derived claim takes the minimum over its parts.
   The explainer uses the `3.81` certificate as its visual worked example, then proves
-  the threshold-counting and dilation steps that establish the headline bound directly.
+  the threshold-counting and dilation steps that establish `T-026`’s `3.8264474…`
+  directly; it is generated against that rung and has not been rebuilt on `T-033`’s net.
 - **T-019: `s(17), s(18), s(19) ≥ 459/100`, improving the register (`S4`).** The adopted
   bound for [these](packing/frontier/n-017.md) three cases was Massaccesi’s `4.5058`,
   taken from a source rather than proved here.

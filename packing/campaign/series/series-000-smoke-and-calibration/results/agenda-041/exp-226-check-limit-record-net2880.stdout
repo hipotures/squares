@@ -1,0 +1,7 @@
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+limit record agrees with the source certificate: cases/n11_threshold_certificate/t-033-dilation-limit-corollary.json
+
+real	31m34.643s
+user	29m12.419s
+sys	2m21.517s
+EXIT=0

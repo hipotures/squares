@@ -87,10 +87,15 @@ the dilation-limit theorem establishes s(11) >= 955000*sqrt(2073600042893309449)
 | **this certificate** | `955000*sqrt(2073600042893309449)/359341754646249` | **`3.826997548829543624`** |
 | movement | — | **`+0.000550138257`** |
 
-It sits below `L/B* = 3.827547924507` and below the universal one-body ceiling
-`L* = 38200/9977 = 3.828806254385`, which is what the theory requires.
-A value above either would have been a reason to distrust the run rather than a better
-result.
+It sits below `L/B* = 3.827547924507` and below the point-certificate ceiling
+`L* = 38200/9977 = 3.828806254385`, and neither comparison is an independent check of
+the run. `S < L/B*` is an algebraic identity, since `sqrt(1 + D^2) < 1 + D` for `D > 0`,
+so a value above it would have meant an arithmetic defect.
+`L*` is the ceiling on *point* certificates, and `T-025`’s own rationale is that
+threshold atoms carry budget the point method cannot have, so `L*` is exactly the bound
+that does not bind this language: `S < L*` holds here because `B* > 9977/10000`, which
+the refinement measurement forces, not because of a theorem about threshold
+certificates.
 
 ## What this does not establish
 
@@ -105,6 +110,25 @@ the same frozen measure on a finer net, which is why `X-041` called it a rung.
 The remaining series headroom, `L/B* - 3.826998 = 0.000550`, is now half what it was.
 
 The register entry is not written by this receipt.
+
+## The limit record was re-derived once, and only its label moved
+
+The record this run first wrote named its source by the bare experiment label
+`exp-226-n11-threshold-191-50-net2880`. That is not a path, and
+`tests/test_rung_figures.py` reads a limit record’s `source.certificate` as
+repository-relative and opens it, so registering `T-033` failed on a `FileNotFoundError`
+that named the label.
+`T-022`’s, `T-024`’s and `T-026`’s records all name the case copy’s path there.
+
+Re-derived with
+`--source-name packing/cases/n11_threshold_certificate/certificate-191-50-net2880.json`,
+31 m 51 s of wall on a contended four-core box.
+**Exactly one field differs between the two records**, `source.certificate`; the surd,
+the factor supremum and its squared form, the sharpened-containment identity, the six
+accepted conditions and the source digest are identical, which is what says the
+re-derivation reproduced the same mathematics rather than a new measurement.
+The copy under `cases/` and the copy here are byte-identical again, at `sha256
+e891b3b1e47cb328a8a53e16ed3b72985633ff04034343467038383dcd948fa2`.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
