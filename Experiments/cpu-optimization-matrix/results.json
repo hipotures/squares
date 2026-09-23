@@ -108,7 +108,7 @@
       "experiment": "highs-incremental",
       "branch": "exp/cpu-highs-incremental",
       "branch_url": "https://github.com/hipotures/squares/tree/exp/cpu-highs-incremental",
-      "commit": "114c9949ee4f5b12c1f830cde3f03d4127ea112d",
+      "commit": "d37e1c13d5566aea24794072784f94ad89d29054",
       "base_sha": "1f58b0f0abca55d4ea2cf0e1cd73d70ebd625659",
       "correctness": "SEMANTICALLY EQUIVALENT, DIFFERENT TRAJECTORY",
       "verdict": "PROMISING BUT NEEDS MORE WORK",
@@ -160,6 +160,8 @@
       "major_risk": "different optimal bases alter weights and row generation",
       "files_changed": [
         "Experiments/cpu-optimization-highs-incremental/README.md",
+        "Experiments/cpu-optimization-highs-incremental/basis_probe.json",
+        "Experiments/cpu-optimization-highs-incremental/basis_probe.py",
         "Experiments/cpu-optimization-highs-incremental/bench_lp.py",
         "Experiments/cpu-optimization-highs-incremental/comparison.json",
         "Experiments/cpu-optimization-highs-incremental/environment.json",
