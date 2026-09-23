@@ -341,12 +341,15 @@ on.
 It is not the next thing, because a reassessment of what to search is queued in front
 of it.
 
-For the next supervised exact-research goal, after PR 222 is green and mergeable, start
-two separate branches from its head in parallel.
-The selected `think-d010` branch decides the complete n11 adaptive parent-core catalogue
-by an independent coverage method while preserving its admissible centre domain and
-addressing the native site and feature-slot limits.
-The other branch reconciles PR 221 while retaining every historical result and the
+For the next supervised exact-research goal, the selected `think-d010` branch has
+completed the native n11 adaptive parent-core decision: every one of the 12,028 rows
+certifies while preserving the admissible parent-centre domain, strict containment and
+bounded site and feature tables.
+Its W10 publication closeout integrates the final green PR 222 base, preserves the clean
+`c183cc9ab` proof provenance and checks the final records separately.
+The owner’s separately requested W3 frontier review uses this completed C4 evidence to
+set the next research ordering.
+The parallel branch reconciles PR 221 while retaining every historical result and the
 strongest justified current bounds.
 Existing identifiers from PR 221 take precedence; any later conflicting identifiers are
 renumbered after PR 221’s sequence with every reference.

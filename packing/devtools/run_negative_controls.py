@@ -167,6 +167,14 @@ PRUNE = frozenset(
         ROOT / "atlas/known-best/known-best-1-324.pdf",
         ROOT / "atlas/known-best/known-best-1-324.png",
         ROOT / "atlas/known-best/rendering",
+        # The pre-migration transition statistics are frozen historical output;
+        # v2-transitions/NOTES.md records that the live builder now generates its
+        # own statistics elsewhere. No registered control reads this old JSON,
+        # and no checked document links it inline. Its 1,371,919 bytes are omitted
+        # when Session153's complete proof artifacts take the snapshot to
+        # 168,630,664 bytes, 858,504 above the unchanged 160 MiB cap. Those proof
+        # artifacts stay: their live audit and inline links need the retained files.
+        ROOT / "atlas/known-best/video/spikes/v2-transitions/transition-stats.json",
         ROOT / "atlas/prospective/rendering",
         # The Motion Lab's deterministic report is generated output, replayed by the
         # browser-golden check, and no registered mutation control names it. The report

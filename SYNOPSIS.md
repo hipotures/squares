@@ -1147,12 +1147,15 @@ not certification. The closure is certified at reachable branch commit
 `819ade7ca8afbe634a6ee54f215f0878f5674031` solely by the
 [hosted five-job full gate](https://github.com/jlevy/squares/actions/runs/35784995867).
 
-**Selected next entry:** `think-d010`. After PR 222 is green and mergeable, two separate
-branches start from PR 222’s head in parallel.
-The `think-d010` branch decides the complete n11 adaptive parent-core catalogue by an
-independent coverage method while preserving its admissible centre domain and addressing
-the native site and feature-slot limits.
-The other branch reconciles PR 221 while retaining every historical result and the
+**Selected next entry:** `think-d010`. Session 153 completes its mathematical and
+implementation scope: all 12,028 adaptive parent-core rows certify with the admissible
+parent-centre domain, strict core containment and bounded site and feature tables.
+The full proof and hosted checkpoint remain pinned to clean `c183cc9ab`; the final green
+PR 222 base at `be736b0ef` changes none of the 19 frozen proof inputs.
+The remaining W10 entry is publication of the independently reviewed closeout and its
+final-head checks on PR 223. The owner’s separately requested W3 frontier review uses
+this completed C4 evidence and owns the next research ordering.
+The parallel branch reconciles PR 221 while retaining every historical result and the
 strongest justified current bounds.
 Existing identifiers from PR 221 take precedence; any later conflicting identifiers are
 renumbered after PR 221’s sequence with every reference.

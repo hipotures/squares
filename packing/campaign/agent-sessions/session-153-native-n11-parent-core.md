@@ -10,7 +10,7 @@ session:
   title: Native n11 adaptive parent-core verification
   date: '2026-09-22'
   started_at: '2026-09-22T22:45:57.644Z'
-  deadline_at: '2026-09-23T02:45:57.644Z'
+  deadline_at: '2026-09-23T03:15:57.644Z'
   branch: codex/n11-parent-core-verifier
   primary_bead: think-d010
   status: in_progress
@@ -90,7 +90,7 @@ session:
     objective: >-
       Preserve the complete proof provenance, finish C4 evidence registration and
       session accounting, and publish the reviewed closeout on the green stacked base.
-    status: in_progress
+    status: completed
     entered_by: evidence_checkpoint
     switch_reason: Complete coverage and proof review are accepted; only integration, records and final publication checks remain.
     budget_minutes: 10
@@ -100,14 +100,44 @@ session:
     validation_command: cd packing && .venv/bin/python3 -m devtools.audit_kleddamag_n11_native
     kill_condition: A changed numerical proof input or new mathematical blocker invalidates reuse of the complete receipt.
     fallback: Retain the original run, diagnose the affected premise, and withhold publication of the disputed claim until corrected.
+    outcome: >-
+      The coordinator approved the C4 registration, permanent reconciliation tool and
+      adverse tests. Final green PR 222 merged without a numerical proof-input change;
+      the generated composite record adds the native evidence ID and its data commit
+      owns the final publication stamp. The snapshot-cap repair is narrowly reviewed.
+      Publication and its final validation move to the explicit finalization phase.
+    evidence:
+    - packing/devtools/audit_kleddamag_n11_native.py
+    - packing/tests/test_native_parent_core_receipt.py
+    - packing/atlas/known-best/composite-figure.json
+    - packing/devtools/run_negative_controls.py
+    stop_reason: Evidence registration and base integration are reviewed; publication checks are the remaining finalization work.
+    next_action: Finish the generated exports, measure the final snapshot, run the scoped push gate and publish the reviewed closeout.
+  - workflow: review-planning-oversight
+    focus: correctness
+    recording: contemporaneous
+    clock_role: finalization
+    objective: >-
+      Validate the integrated exports, mutation-worker dependency closure and final
+      records, then publish the reviewed PR 223 closeout and reconcile final CI.
+    status: in_progress
+    entered_by: evidence_checkpoint
+    switch_reason: The exact proof and evidence registration are accepted; remaining checks and publication have a separate finalization clock.
+    budget_minutes: 30
+    started_at: '2026-09-23T02:35:32Z'
+    deadline_at: '2026-09-23T03:05:32Z'
+    expected_output: Closed Session 153 and bead, scoped validation and cost receipts, and a reviewed PR 223 with final checks.
+    validation_command: cd packing && .venv/bin/packing-validate --push --since 3c81199f31db082feebc29de88c75cbf7f08ea7c --jobs 1 --inner-jobs 2
+    kill_condition: A relevant check or review finds an unresolved error in the integrated result.
+    fallback: Preserve the complete proof, diagnose the affected integration, and keep the PR draft until corrected.
     outcome: null
     evidence: []
     stop_reason: null
-    next_action: Merge only the final green PR 222 head, re-pin generated data, and finish final checks and root review before push.
+    next_action: Finish exports, worker baselines, exact snapshot measurement, scoped validation and coordinator review.
   budget:
-    wall_minutes: 240
+    wall_minutes: 270
     slice_minutes: 30
-    finalization_minutes: 30
+    finalization_minutes: 60
   stop_conditions:
   - Complete native coverage and its proof review, or retain an explicit external blocker without claiming C4.
   - Planning estimates are checkpoints and do not authorize truncating the user's task.
@@ -141,6 +171,10 @@ session:
   - packing/campaign/agent-sessions/session-153-native-full.rows.jsonl
   - packing/campaign/agent-sessions/session-153-native-reconciliation.json
   - packing/campaign/agent-sessions/session-153-hosted-full.json
+  - packing/campaign/agent-sessions/session-153-snapshot-readme-controls.jsonl
+  - packing/campaign/agent-sessions/session-153-snapshot-synopsis-control.jsonl
+  - packing/campaign/agent-sessions/session-153-integrated-push.json
+  - packing/campaign/agent-sessions/session-153-integrated-push.log
   checks:
   - Native pilot rows 0, 11962 and 12027 certify at batch sizes 256, 512 and 2048.
   - The two-worker source pilot matches the serial outcomes.
@@ -154,6 +188,13 @@ session:
   - The complete native run used two workers and batch size 2048 on clean c183cc9ab. All 12028 rows certified in 6197.381 seconds, with 136081500 boxes, zero stalls and no exhausted budgets or refutations. The attempted nice priority 10 was refused; the actual nice value was 0, with the worker cap unchanged.
   - Receipt reconciliation recomputes exact premises and verifies all row identities, outcomes and journal agreement against 19 unchanged Git inputs and the exact external source SHA. Its 28 tests passed in 6.17 seconds, then 12.37 seconds including the retained-report comparison; Ruff and BasedPyright reported zero findings. This reconciliation is not a coverage replay or another confirmation method.
   - Closeout records preflight passed 35 selected steps in 220.04 seconds, dominated by 220.04 seconds reading the linked-worktree bead tree. After the evidence edit, all 8 applicable schema, inventory, rung, exact-figure, case-prose, generated-table and front-door checks passed in 11.79 seconds.
+  - Final green PR 222 head be736b0ef05ac2f256691bc3ded21873ad1f2ab1 merged as 3c81199f31db082feebc29de88c75cbf7f08ea7c. The integrated tree passes exact receipt reconciliation against all 19 frozen proof inputs; the original native receipt and journal are unchanged.
+  - Retaining the complete proof artifacts raised the mutation snapshot to 168630664 bytes, 858504 above the unchanged 160 MiB cap. A narrowly scoped exclusion removes only the 1371919-byte historical v2-transitions/transition-stats.json; no registered control consumes it. Three real snapshot and copy-back checks passed in 16.58 seconds, preserving both proof artifacts and the historical notes byte for byte. All 167 control anchors still match exactly once.
+  - The generated composite record adds only the native n11 evidence ID and is committed as 3b50e2e21735f1d2e2ba6fbd7341d4743b465d2d. DATA_REVISION is pinned to that data commit; all 12 release tests passed in 5.45 seconds. The initial atlas regeneration was stopped after this data dependency was identified and restarted from the correct final pin before publication.
+  - The live ledger refused the expired phase-3 planning clock during regeneration. The completed integration phase was closed and an explicit finalization phase began at 02:35:32Z. The overall estimate was extended by 30 minutes while preserving the original 02:15:57.644Z finalization-reserve boundary; no proof acceptance rule or resource cap changed.
+  - The final atlas regeneration completed all 324 witnesses and renderings, two SVG/PDF composites and four PNG exports from the correct data pin. The permanent mutation journal measured the integrated snapshot at 167264782 bytes, leaving 507378 bytes (about 0.484 MiB) under the unchanged 167772160-byte cap before retaining the small control journals. This is modest remaining headroom, not a general capacity fix.
+  - Four README controls passed; the fifth encountered the sandbox's default uv-cache permission refusal before its check. Its focused rerun with a temporary uv cache passed in 3.188 seconds (23.048 seconds including snapshot setup). Both journals are retained. All 25 focused negative-control tests passed in 61.36 seconds, including clean result and synopsis worker baselines, mutation/restoration, real dependency copy-back, process lifecycle and exact byte preservation of the native proof artifacts.
+  - The integrated scoped push ran against 3c81199f3 with one outer and two inner workers and took 1054.46 seconds, inside its 1800-second ceiling. All 50 non-behavioral steps passed. The 85-file reachable suite passed 2248 tests with six skips and two repository-state refusals in 603.36 seconds. The atlas guard rejected the intentionally uncommitted stamp change against HEAD; the worker-index guard found the two newly retained journals before they were staged. Commit the reviewed integration, then rerun those two affected checks without changing either guard or any numerical code.
   resource_rollups:
   - packing/campaign/resource-usage/codex-task-tree-session-153-native-draft.yaml
   - packing/campaign/resource-usage/codex-task-tree-session-153-native-closeout.yaml
@@ -182,6 +223,14 @@ recorded outcomes and exact premises without rerunning interval coverage; it can
 authenticate coordinated invented receipt and journal data.
 Final publication checks are recorded separately from the full checkpoint on
 `c183cc9ab`.
+
+The final base integration changes no numerical proof input.
+Its generated composite record adds the native confirmation to the existing n11 evidence
+list; the reported bound and source attribution stay the same.
+The mutation workers retain the complete proof receipt, row journal and their linked
+documents. Only the frozen transition-statistics JSON left behind by the earlier
+workbench migration is omitted from temporary snapshots; the historical file remains in
+Git, and the 160 MiB cap stays fixed.
 
 The
 [initial task-tree cost receipt](../resource-usage/codex-task-tree-session-153-native-draft.yaml)
