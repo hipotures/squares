@@ -561,7 +561,118 @@
         "raw/m5-full-state.json"
       ],
       "dependency_changes": [],
-      "optional_native_build_tool": "C compiler on Linux/macOS; NumPy fallback otherwise"
+      "optional_native_build_tool": "C compiler on Linux/macOS; NumPy fallback otherwise",
+      "accepted_checkpoint_commit": "1c4b1e18d97faa985eb2e4bfbef245c8ec903105"
+    }
+  ],
+  "final_validation": {
+    "input_commit": "1c4b1e18d97faa985eb2e4bfbef245c8ec903105",
+    "workers_1": {
+      "files": [
+        "raw/final-w1-r1.json",
+        "raw/final-w1-r2.json",
+        "raw/final-w1-r3.json"
+      ],
+      "runs": 3,
+      "wall_seconds": {
+        "min": 21.812,
+        "median": 22.048,
+        "max": 22.593
+      },
+      "separation_seconds": {
+        "min": 20.68,
+        "median": 20.883,
+        "max": 21.424
+      },
+      "lp_seconds": {
+        "min": 1.128,
+        "median": 1.159,
+        "max": 1.163
+      },
+      "round0_seconds": {
+        "min": 2.0861334949986485,
+        "median": 2.1082100790008553,
+        "max": 2.7406008329999167
+      },
+      "rounds": 23,
+      "rows": 5842,
+      "objective": 12.217676366606236,
+      "least_covered": 0.9999999999998309,
+      "stop_reason": "converged: every placement covers mass 1",
+      "peak_parent_rss_kib": {
+        "min": 532924,
+        "median": 542036,
+        "max": 542336
+      }
+    },
+    "workers_16": {
+      "files": [
+        "raw/final-w16-r1.json",
+        "raw/final-w16-r2.json",
+        "raw/final-w16-r3.json"
+      ],
+      "runs": 3,
+      "wall_seconds": {
+        "min": 4.134,
+        "median": 4.172,
+        "max": 4.186
+      },
+      "separation_seconds": {
+        "min": 2.878,
+        "median": 2.923,
+        "max": 2.934
+      },
+      "lp_seconds": {
+        "min": 1.22,
+        "median": 1.239,
+        "max": 1.246
+      },
+      "round0_seconds": {
+        "min": 0.6263100700016366,
+        "median": 0.6269301970023662,
+        "max": 0.644772837000346
+      },
+      "rounds": 23,
+      "rows": 5842,
+      "objective": 12.217676366606236,
+      "least_covered": 0.9999999999998309,
+      "stop_reason": "converged: every placement covers mass 1",
+      "peak_parent_rss_kib": {
+        "min": 486716,
+        "median": 512104,
+        "max": 537516
+      }
+    },
+    "versus_m0_serial_workers_1": {
+      "baseline_serial_seconds": 44.253,
+      "final_seconds": 22.048,
+      "seconds_saved": 22.205,
+      "wall_reduction_percent": 50.18,
+      "throughput_factor": 2.007
+    },
+    "versus_m0_serial_workers_16": {
+      "baseline_serial_seconds": 44.253,
+      "final_seconds": 4.172,
+      "seconds_saved": 40.081,
+      "wall_reduction_percent": 90.57,
+      "throughput_factor": 10.607
+    },
+    "focused_tests": {
+      "passed": 95,
+      "output": "raw/final-focused-tests.txt",
+      "command": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 PACK_JOBS=1 PYTHONPATH=. uv run --frozen --no-dev --with pytest python -m pytest tests/test_fractional_selector.py tests/test_fractional_generate.py tests/test_fractional_corner_clip.py tests/test_colgen_persistent_lp.py tests/test_colgen_parallel_directions.py tests/test_colgen_checkpoint.py tests/test_fractional_cutting.py -q"
+    },
+    "audit": "raw/final-audit.json",
+    "exact_retained_row_verification": "raw/m5-exact-rows.json",
+    "native_selector_loaded": true,
+    "main_pushed": false
+  },
+  "not_integrated": [
+    {
+      "branch": "exp/cpu-fused-separation",
+      "source_commit": "7ef9fd750b5a6dbf88ac14ef9718d40036d9355e",
+      "verdict": "RESEARCH ONLY",
+      "reason": "Independent experiment regressed serial wall from 43.679 to 58.904 s and overlaps accepted separation changes; never integrated."
     }
   ]
 }

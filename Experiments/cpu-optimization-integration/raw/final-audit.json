@@ -1,0 +1,81 @@
+{
+  "checks": {
+    "M1_parallel_decisions": true,
+    "M2_parallel_decisions": true,
+    "M3_parallel_decisions": true,
+    "M4_parallel_decisions": true,
+    "M5_parallel_decisions": true,
+    "M1_incremental_trajectory": true,
+    "M3_incremental_trajectory": true,
+    "M4_incremental_trajectory": true,
+    "M5_incremental_trajectory": true,
+    "M3_complete_state": true,
+    "M4_complete_state": true,
+    "M5_complete_state": true,
+    "M1_complete_row_comparison": true,
+    "M1_exact_rows": true,
+    "M2_exact_rows": true,
+    "M5_exact_rows": true,
+    "M3_intervals": true,
+    "M4_cumsum_bitwise": true,
+    "M5_stable_selector": true,
+    "M5_packaging": true,
+    "final_w1_decisions": true,
+    "final_w16_decisions": true
+  },
+  "endpoints": {
+    "M0-w1": {
+      "runs": 3,
+      "wall_median": 44.253
+    },
+    "M1-w1": {
+      "runs": 3,
+      "wall_median": 44.217
+    },
+    "M1-w16": {
+      "runs": 3,
+      "wall_median": 17.641
+    },
+    "M2-w1": {
+      "runs": 3,
+      "wall_median": 34.448
+    },
+    "M2-w16": {
+      "runs": 3,
+      "wall_median": 7.925
+    },
+    "M3-w1": {
+      "runs": 3,
+      "wall_median": 34.193
+    },
+    "M3-w16": {
+      "runs": 5,
+      "wall_median": 6.409
+    },
+    "M4-w1": {
+      "runs": 3,
+      "wall_median": 31.404
+    },
+    "M4-w16": {
+      "runs": 5,
+      "wall_median": 5.48
+    },
+    "M5-w1": {
+      "runs": 3,
+      "wall_median": 22.31
+    },
+    "M5-w16": {
+      "runs": 3,
+      "wall_median": 4.211
+    },
+    "final-w1": {
+      "runs": 3,
+      "wall_median": 22.048
+    },
+    "final-w16": {
+      "runs": 3,
+      "wall_median": 4.172
+    }
+  },
+  "passed": true
+}
