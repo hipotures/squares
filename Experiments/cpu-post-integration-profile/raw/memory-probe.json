@@ -1,0 +1,245 @@
+{
+  "note": "tracemalloc captures NumPy allocations but changes call timing; no latency inferred",
+  "records": [
+    {
+      "round": 0,
+      "direction": 0,
+      "live_sites": 0,
+      "grid_shape": [
+        199,
+        115
+      ],
+      "grid_cells": 22885,
+      "grid_bytes": 183080,
+      "projected_u_v_bytes": 59792,
+      "event_bytes": 2528,
+      "compact_cells": 15675,
+      "compact_bytes": 125400,
+      "interval_metadata_bytes": 3960,
+      "placements": 3,
+      "peak_traced_bytes": 523891,
+      "retained_traced_bytes": 11859,
+      "minor_faults_one_call": 1
+    },
+    {
+      "round": 0,
+      "direction": 26,
+      "live_sites": 0,
+      "grid_shape": [
+        1247,
+        1247
+      ],
+      "grid_cells": 1555009,
+      "grid_bytes": 12440072,
+      "projected_u_v_bytes": 59792,
+      "event_bytes": 19968,
+      "compact_cells": 1013715,
+      "compact_bytes": 8109720,
+      "interval_metadata_bytes": 25704,
+      "placements": 3,
+      "peak_traced_bytes": 29824155,
+      "retained_traced_bytes": 15059,
+      "minor_faults_one_call": 3657
+    },
+    {
+      "round": 0,
+      "direction": 90,
+      "live_sites": 0,
+      "grid_shape": [
+        1247,
+        1247
+      ],
+      "grid_cells": 1555009,
+      "grid_bytes": 12440072,
+      "projected_u_v_bytes": 59792,
+      "event_bytes": 19968,
+      "compact_cells": 965531,
+      "compact_bytes": 7724248,
+      "interval_metadata_bytes": 27336,
+      "placements": 3,
+      "peak_traced_bytes": 29006659,
+      "retained_traced_bytes": 15059,
+      "minor_faults_one_call": 0
+    },
+    {
+      "round": 0,
+      "direction": 180,
+      "live_sites": 0,
+      "grid_shape": [
+        1247,
+        1247
+      ],
+      "grid_cells": 1555009,
+      "grid_bytes": 12440072,
+      "projected_u_v_bytes": 59792,
+      "event_bytes": 19968,
+      "compact_cells": 943755,
+      "compact_bytes": 7550040,
+      "interval_metadata_bytes": 27624,
+      "placements": 3,
+      "peak_traced_bytes": 28636755,
+      "retained_traced_bytes": 15059,
+      "minor_faults_one_call": 0
+    },
+    {
+      "round": 18,
+      "direction": 0,
+      "live_sites": 493,
+      "grid_shape": [
+        143,
+        143
+      ],
+      "grid_cells": 20449,
+      "grid_bytes": 163592,
+      "projected_u_v_bytes": 59792,
+      "event_bytes": 2304,
+      "compact_cells": 16129,
+      "compact_bytes": 129032,
+      "interval_metadata_bytes": 3048,
+      "placements": 3,
+      "peak_traced_bytes": 437923,
+      "retained_traced_bytes": 13115,
+      "minor_faults_one_call": 1
+    },
+    {
+      "round": 18,
+      "direction": 26,
+      "live_sites": 493,
+      "grid_shape": [
+        979,
+        979
+      ],
+      "grid_cells": 958441,
+      "grid_bytes": 7667528,
+      "projected_u_v_bytes": 59792,
+      "event_bytes": 15680,
+      "compact_cells": 737165,
+      "compact_bytes": 5897320,
+      "interval_metadata_bytes": 22344,
+      "placements": 3,
+      "peak_traced_bytes": 13772691,
+      "retained_traced_bytes": 16235,
+      "minor_faults_one_call": 0
+    },
+    {
+      "round": 18,
+      "direction": 90,
+      "live_sites": 493,
+      "grid_shape": [
+        979,
+        979
+      ],
+      "grid_cells": 958441,
+      "grid_bytes": 7667528,
+      "projected_u_v_bytes": 59792,
+      "event_bytes": 15680,
+      "compact_cells": 722405,
+      "compact_bytes": 5779240,
+      "interval_metadata_bytes": 22920,
+      "placements": 3,
+      "peak_traced_bytes": 13655123,
+      "retained_traced_bytes": 16171,
+      "minor_faults_one_call": 1
+    },
+    {
+      "round": 18,
+      "direction": 180,
+      "live_sites": 493,
+      "grid_shape": [
+        979,
+        979
+      ],
+      "grid_cells": 958441,
+      "grid_bytes": 7667528,
+      "projected_u_v_bytes": 59792,
+      "event_bytes": 15680,
+      "compact_cells": 706661,
+      "compact_bytes": 5653288,
+      "interval_metadata_bytes": 22920,
+      "placements": 3,
+      "peak_traced_bytes": 13529091,
+      "retained_traced_bytes": 16091,
+      "minor_faults_one_call": 1
+    },
+    {
+      "round": 22,
+      "direction": 0,
+      "live_sites": 497,
+      "grid_shape": [
+        155,
+        155
+      ],
+      "grid_cells": 24025,
+      "grid_bytes": 192200,
+      "projected_u_v_bytes": 59792,
+      "event_bytes": 2496,
+      "compact_cells": 18769,
+      "compact_bytes": 150152,
+      "interval_metadata_bytes": 3288,
+      "placements": 3,
+      "peak_traced_bytes": 488179,
+      "retained_traced_bytes": 12827,
+      "minor_faults_one_call": 0
+    },
+    {
+      "round": 22,
+      "direction": 26,
+      "live_sites": 497,
+      "grid_shape": [
+        963,
+        963
+      ],
+      "grid_cells": 927369,
+      "grid_bytes": 7418952,
+      "projected_u_v_bytes": 59792,
+      "event_bytes": 15424,
+      "compact_cells": 699885,
+      "compact_bytes": 5599080,
+      "interval_metadata_bytes": 21912,
+      "placements": 3,
+      "peak_traced_bytes": 13224363,
+      "retained_traced_bytes": 15947,
+      "minor_faults_one_call": 0
+    },
+    {
+      "round": 22,
+      "direction": 90,
+      "live_sites": 497,
+      "grid_shape": [
+        963,
+        963
+      ],
+      "grid_cells": 927369,
+      "grid_bytes": 7418952,
+      "projected_u_v_bytes": 59792,
+      "event_bytes": 15424,
+      "compact_cells": 691977,
+      "compact_bytes": 5535816,
+      "interval_metadata_bytes": 22488,
+      "placements": 3,
+      "peak_traced_bytes": 13161611,
+      "retained_traced_bytes": 15883,
+      "minor_faults_one_call": 0
+    },
+    {
+      "round": 22,
+      "direction": 180,
+      "live_sites": 497,
+      "grid_shape": [
+        963,
+        963
+      ],
+      "grid_cells": 927369,
+      "grid_bytes": 7418952,
+      "projected_u_v_bytes": 59792,
+      "event_bytes": 15424,
+      "compact_cells": 675837,
+      "compact_bytes": 5406696,
+      "interval_metadata_bytes": 22440,
+      "placements": 3,
+      "peak_traced_bytes": 13032427,
+      "retained_traced_bytes": 15843,
+      "minor_faults_one_call": 0
+    }
+  ]
+}

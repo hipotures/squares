@@ -1,0 +1,183 @@
+{
+  "case": "n=12 L=99/25=3.9600",
+  "grids": [
+    26,
+    35,
+    43
+  ],
+  "rounds": 23,
+  "rows": 5842,
+  "objective": 12.217676366606236,
+  "least_covered": 0.9999999999998309,
+  "stop_reason": "converged: every placement covers mass 1",
+  "site_count": 3737,
+  "orbits": 511,
+  "matrix_shape": [
+    5842,
+    511
+  ],
+  "matrix_nnz": 1239530,
+  "rounds_trace": [
+    {
+      "round": 0,
+      "rows_held": 483,
+      "support": 0,
+      "separation_seconds": 2.0632725699979346,
+      "lp_seconds": 0.0472724430001108
+    },
+    {
+      "round": 1,
+      "rows_held": 956,
+      "support": 168,
+      "separation_seconds": 0.2619582180013822,
+      "lp_seconds": 0.008388398000533925
+    },
+    {
+      "round": 2,
+      "rows_held": 1349,
+      "support": 188,
+      "separation_seconds": 0.277582998998696,
+      "lp_seconds": 0.02776564599844278
+    },
+    {
+      "round": 3,
+      "rows_held": 1701,
+      "support": 204,
+      "separation_seconds": 0.23117939499934437,
+      "lp_seconds": 0.024142819002008764
+    },
+    {
+      "round": 4,
+      "rows_held": 2051,
+      "support": 212,
+      "separation_seconds": 0.29564344300160883,
+      "lp_seconds": 0.025416885000595357
+    },
+    {
+      "round": 5,
+      "rows_held": 2444,
+      "support": 221,
+      "separation_seconds": 0.2668104999975185,
+      "lp_seconds": 0.03363037400049507
+    },
+    {
+      "round": 6,
+      "rows_held": 2760,
+      "support": 245,
+      "separation_seconds": 0.3194210830006341,
+      "lp_seconds": 0.03104088399777538
+    },
+    {
+      "round": 7,
+      "rows_held": 3029,
+      "support": 261,
+      "separation_seconds": 0.44322328999987803,
+      "lp_seconds": 0.03342860499833478
+    },
+    {
+      "round": 8,
+      "rows_held": 3323,
+      "support": 301,
+      "separation_seconds": 0.5262913389997266,
+      "lp_seconds": 0.05874921000213362
+    },
+    {
+      "round": 9,
+      "rows_held": 3616,
+      "support": 357,
+      "separation_seconds": 0.7444589309998264,
+      "lp_seconds": 0.05062245999943116
+    },
+    {
+      "round": 10,
+      "rows_held": 3957,
+      "support": 405,
+      "separation_seconds": 0.8972189600026468,
+      "lp_seconds": 0.06320135200076038
+    },
+    {
+      "round": 11,
+      "rows_held": 4228,
+      "support": 397,
+      "separation_seconds": 0.814231069998641,
+      "lp_seconds": 0.05187807599941152
+    },
+    {
+      "round": 12,
+      "rows_held": 4488,
+      "support": 461,
+      "separation_seconds": 1.0722677030025807,
+      "lp_seconds": 0.07301186699987738
+    },
+    {
+      "round": 13,
+      "rows_held": 4768,
+      "support": 509,
+      "separation_seconds": 1.175280245999602,
+      "lp_seconds": 0.07996047100095893
+    },
+    {
+      "round": 14,
+      "rows_held": 5120,
+      "support": 385,
+      "separation_seconds": 0.8762926570016134,
+      "lp_seconds": 0.07318102600038401
+    },
+    {
+      "round": 15,
+      "rows_held": 5278,
+      "support": 477,
+      "separation_seconds": 1.0557318059982208,
+      "lp_seconds": 0.06964892900214181
+    },
+    {
+      "round": 16,
+      "rows_held": 5454,
+      "support": 537,
+      "separation_seconds": 1.3562626990024,
+      "lp_seconds": 0.08321390800119843
+    },
+    {
+      "round": 17,
+      "rows_held": 5620,
+      "support": 557,
+      "separation_seconds": 1.4500280680003925,
+      "lp_seconds": 0.09553605199835147
+    },
+    {
+      "round": 18,
+      "rows_held": 5785,
+      "support": 493,
+      "separation_seconds": 1.2922615989991755,
+      "lp_seconds": 0.06954065900208661
+    },
+    {
+      "round": 19,
+      "rows_held": 5810,
+      "support": 573,
+      "separation_seconds": 1.6037469409966434,
+      "lp_seconds": 0.06284092399801011
+    },
+    {
+      "round": 20,
+      "rows_held": 5828,
+      "support": 477,
+      "separation_seconds": 1.2025707849970786,
+      "lp_seconds": 0.0629883349974989
+    },
+    {
+      "round": 21,
+      "rows_held": 5842,
+      "support": 525,
+      "separation_seconds": 1.2503543950006133,
+      "lp_seconds": 0.05746684499899857
+    },
+    {
+      "round": 22,
+      "rows_held": 5842,
+      "support": 497,
+      "separation_seconds": 1.2602487190015381,
+      "lp_seconds": 0.0
+    }
+  ]
+}

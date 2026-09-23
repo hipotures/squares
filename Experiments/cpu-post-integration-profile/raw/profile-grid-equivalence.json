@@ -1,0 +1,13 @@
+{
+  "rounds": [
+    0,
+    1,
+    8,
+    18,
+    22
+  ],
+  "directions_per_round": 181,
+  "cases": 905,
+  "mass_cells_compared_bitwise": 695327309,
+  "passed": true
+}

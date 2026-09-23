@@ -1,0 +1,18 @@
+{
+  "sample": 2,
+  "repeats": 18,
+  "load_before": {
+    "utc": "2026-09-23T19:52:55Z",
+    "loadavg": [
+      0.63427734375,
+      1.95068359375,
+      3.81201171875
+    ],
+    "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.46 total=112119213\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+  },
+  "batch_wall_seconds": 21.179164759996638,
+  "batch_parent_cpu_seconds": 21.152686461000002,
+  "wall_per_sequence_seconds": 1.1766202644442576,
+  "parent_cpu_per_sequence_seconds": 1.1751492478333334,
+  "last_objective": 12.217676366606234
+}

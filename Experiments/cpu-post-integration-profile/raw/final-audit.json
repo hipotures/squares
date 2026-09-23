@@ -1,0 +1,55 @@
+{
+  "passed": true,
+  "checks": {
+    "baseline_sample_count": true,
+    "baseline_durations_10_to_60_seconds": true,
+    "scaling_sample_count": true,
+    "scaling_durations_10_to_60_seconds": true,
+    "profile_separation_sample_count": true,
+    "profile_separation_durations_10_to_60_seconds": true,
+    "profile_lp_sample_count": true,
+    "profile_lp_durations_10_to_60_seconds": true,
+    "lp_cpu_sample_count": true,
+    "lp_cpu_durations_10_to_60_seconds": true,
+    "prototypes_sample_count": true,
+    "prototypes_durations_10_to_60_seconds": true,
+    "baseline_correctness": true,
+    "accepted_state_identity": true,
+    "timed_grid_bitwise": true,
+    "vectorized_equivalence": true,
+    "prefix_equivalence": true,
+    "input_commit": true
+  },
+  "timed_sample_groups": {
+    "baseline": {
+      "files": 12,
+      "min_seconds": 19.780073678997724,
+      "max_seconds": 23.550077766001777
+    },
+    "scaling": {
+      "files": 18,
+      "min_seconds": 19.100150643000234,
+      "max_seconds": 41.143372249000095
+    },
+    "profile_separation": {
+      "files": 6,
+      "min_seconds": 18.724870613001258,
+      "max_seconds": 21.418570898000326
+    },
+    "profile_lp": {
+      "files": 6,
+      "min_seconds": 19.935397542998544,
+      "max_seconds": 20.90092785700108
+    },
+    "lp_cpu": {
+      "files": 3,
+      "min_seconds": 21.11878997200256,
+      "max_seconds": 21.259746980998898
+    },
+    "prototypes": {
+      "files": 24,
+      "min_seconds": 21.83415873299964,
+      "max_seconds": 49.2057327759976
+    }
+  }
+}

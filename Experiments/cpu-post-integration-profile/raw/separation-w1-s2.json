@@ -1,0 +1,199 @@
+{
+  "workers": 1,
+  "sample": 2,
+  "repeats": 1,
+  "load_before": {
+    "utc": "2026-09-23T19:13:56Z",
+    "loadavg": [
+      2.44921875,
+      3.24267578125,
+      1.80517578125
+    ],
+    "cpu_pressure": "some avg10=0.00 avg60=0.54 avg300=0.59 total=69141473\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+  },
+  "warmup_seconds": 21.083801015000063,
+  "batch_wall_seconds": 21.129457874001673,
+  "normalized_wall_seconds": 21.129457874001673,
+  "parent_cpu_seconds": 21.119999999999997,
+  "worker_cpu_seconds": 21.119999999999997,
+  "aggregate_cpu_seconds": 21.119999999999997,
+  "worker_cpu_by_pid_seconds": {},
+  "worker_minor_faults": 0,
+  "worker_rss_pages": {},
+  "peak_parent_rss_kib": 175784,
+  "replays": [
+    {
+      "wall_seconds": 21.12641787499888,
+      "worker_wait_seconds": 21.071526390809595,
+      "parent_process_seconds": 0.0522001470271789,
+      "dispatch_seconds": 0.0,
+      "site_weights_seconds": 7.469899355783127e-05,
+      "other_seconds": 0.0026166381685470697,
+      "worker_metrics": {},
+      "worker_tasks": {},
+      "rounds": [
+        {
+          "round": 0,
+          "wall_seconds": 2.523115236999729,
+          "rows_held": 483,
+          "added": 483,
+          "violated": 543
+        },
+        {
+          "round": 1,
+          "wall_seconds": 0.2561736200004816,
+          "rows_held": 956,
+          "added": 473,
+          "violated": 543
+        },
+        {
+          "round": 2,
+          "wall_seconds": 0.27992211099990527,
+          "rows_held": 1349,
+          "added": 393,
+          "violated": 543
+        },
+        {
+          "round": 3,
+          "wall_seconds": 0.23705982200044673,
+          "rows_held": 1701,
+          "added": 352,
+          "violated": 543
+        },
+        {
+          "round": 4,
+          "wall_seconds": 0.29571955199935474,
+          "rows_held": 2051,
+          "added": 350,
+          "violated": 543
+        },
+        {
+          "round": 5,
+          "wall_seconds": 0.2666376819979632,
+          "rows_held": 2444,
+          "added": 393,
+          "violated": 543
+        },
+        {
+          "round": 6,
+          "wall_seconds": 0.3292061259999173,
+          "rows_held": 2760,
+          "added": 316,
+          "violated": 543
+        },
+        {
+          "round": 7,
+          "wall_seconds": 0.4413619070001005,
+          "rows_held": 3029,
+          "added": 269,
+          "violated": 543
+        },
+        {
+          "round": 8,
+          "wall_seconds": 0.5226532119995682,
+          "rows_held": 3323,
+          "added": 294,
+          "violated": 501
+        },
+        {
+          "round": 9,
+          "wall_seconds": 0.7527347200011718,
+          "rows_held": 3616,
+          "added": 293,
+          "violated": 543
+        },
+        {
+          "round": 10,
+          "wall_seconds": 0.8874957949992677,
+          "rows_held": 3957,
+          "added": 341,
+          "violated": 543
+        },
+        {
+          "round": 11,
+          "wall_seconds": 0.8254121179998037,
+          "rows_held": 4228,
+          "added": 271,
+          "violated": 501
+        },
+        {
+          "round": 12,
+          "wall_seconds": 1.064977068999724,
+          "rows_held": 4488,
+          "added": 260,
+          "violated": 543
+        },
+        {
+          "round": 13,
+          "wall_seconds": 1.1750771779989009,
+          "rows_held": 4768,
+          "added": 280,
+          "violated": 495
+        },
+        {
+          "round": 14,
+          "wall_seconds": 0.8631799159993534,
+          "rows_held": 5120,
+          "added": 352,
+          "violated": 522
+        },
+        {
+          "round": 15,
+          "wall_seconds": 1.0526466260016605,
+          "rows_held": 5278,
+          "added": 158,
+          "violated": 339
+        },
+        {
+          "round": 16,
+          "wall_seconds": 1.3078760320022411,
+          "rows_held": 5454,
+          "added": 176,
+          "violated": 393
+        },
+        {
+          "round": 17,
+          "wall_seconds": 1.4532396649992734,
+          "rows_held": 5620,
+          "added": 166,
+          "violated": 324
+        },
+        {
+          "round": 18,
+          "wall_seconds": 1.2880622239972581,
+          "rows_held": 5785,
+          "added": 165,
+          "violated": 297
+        },
+        {
+          "round": 19,
+          "wall_seconds": 1.6150889890013786,
+          "rows_held": 5810,
+          "added": 25,
+          "violated": 69
+        },
+        {
+          "round": 20,
+          "wall_seconds": 1.206232821001322,
+          "rows_held": 5828,
+          "added": 18,
+          "violated": 54
+        },
+        {
+          "round": 21,
+          "wall_seconds": 1.2335858490005194,
+          "rows_held": 5842,
+          "added": 14,
+          "violated": 33
+        },
+        {
+          "round": 22,
+          "wall_seconds": 1.2489123419982207,
+          "rows_held": 5842,
+          "added": 0,
+          "violated": 0
+        }
+      ]
+    }
+  ]
+}
