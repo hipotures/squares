@@ -268,7 +268,7 @@ class EventGrid:
     u_events: np.ndarray
     v_events: np.ndarray
     mass: np.ndarray
-    reachable: np.ndarray
+    reachable: np.ndarray | None
     lows: np.ndarray
     highs: np.ndarray
     domain: _CentreDomain
@@ -282,6 +282,7 @@ def event_grid(
     square_side: float,
     *,
     clip: CornerClip | None = None,
+    build_reachable: bool = True,
 ) -> EventGrid:
     """Project the sites, accumulate the cell masses, and mark the reachable cells.
 
@@ -344,8 +345,45 @@ def event_grid(
         & bands[None, :]
         & (v_events[None, :-1] < highs[:, None] + _REACH_SLACK)
         & (v_events[None, 1:] > lows[:, None] - _REACH_SLACK)
-    )
+    ) if build_reachable else None
     return EventGrid(u, v, u_events, v_events, mass, reachable, lows, highs, domain)
+
+
+def _reachable_values(
+    cells: EventGrid,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """Compact reachable cells by slab intervals, without a full mask or score."""
+    ve = cells.v_events
+    band_first = int(np.searchsorted(ve[1:], cells.domain.v_low, side="right"))
+    band_last = int(np.searchsorted(ve[:-1], cells.domain.v_high, side="left"))
+    intervals = []
+    for i, (u0, u1) in enumerate(zip(cells.u_events[:-1], cells.u_events[1:], strict=True)):
+        if not (u1 > cells.domain.u_low and u0 < cells.domain.u_high):
+            continue
+        first = max(
+            band_first,
+            int(np.searchsorted(ve[1:], cells.lows[i] - _REACH_SLACK, side="right")),
+        )
+        last = min(
+            band_last,
+            int(np.searchsorted(ve[:-1], cells.highs[i] + _REACH_SLACK, side="left")),
+        )
+        if first < last:
+            intervals.append((i, first, last))
+    count = sum(last - first for _, first, last in intervals)
+    values = np.empty(count, dtype=np.float64)
+    row_ids = np.empty(len(intervals), dtype=np.intp)
+    firsts = np.empty(len(intervals), dtype=np.intp)
+    offsets = np.empty(len(intervals), dtype=np.intp)
+    pos = 0
+    for slot, (i, first, last) in enumerate(intervals):
+        width = last - first
+        values[pos:pos + width] = cells.mass[i, first:last]
+        row_ids[slot] = i
+        firsts[slot] = first
+        offsets[slot] = pos
+        pos += width
+    return values, row_ids, firsts, offsets
 
 
 def _least_finite_indices(
@@ -418,14 +456,14 @@ def placement_cells(
     """
 
     half = square_side / 2
-    cells = event_grid(points, weights, direction, outer_side, square_side, clip=clip)
+    cells = event_grid(points, weights, direction, outer_side, square_side,
+                       clip=clip, build_reachable=False)
     u, v = cells.u, cells.v
     u_events, v_events = cells.u_events, cells.v_events
     lows, highs, domain = cells.lows, cells.highs, cells.domain
     u0, u1 = u_events[:-1], u_events[1:]
 
-    scored = np.where(cells.reachable, cells.mass, np.inf)
-    flat = scored.ravel()
+    flat, row_ids, firsts, offsets = _reachable_values(cells)
     if flat.size == 0:
         return []
     # Survey more cells than are kept. A cell let in by the slack, or thinner
@@ -437,7 +475,15 @@ def placement_cells(
     # Zero site weights imply the difference array and both prefix sums are
     # exactly zero. Passing this fact avoids a full-grid pattern scan on every
     # later round while the helper checks its own special-case precondition.
-    order = _least_finite_indices(flat, 4 * keep + 1, zero_weight_grid=not np.any(weights))
+    compact_order = _least_finite_indices(
+        flat, 4 * keep + 1, zero_weight_grid=not np.any(weights))
+    slots = np.searchsorted(offsets, compact_order, side="right") - 1
+    order = (
+        row_ids[slots] * (v_events.size - 1)
+        + firsts[slots]
+        + compact_order
+        - offsets[slots]
+    )
 
     found: list[tuple[float, float, float, np.ndarray]] = []
     exact = 0
@@ -458,7 +504,7 @@ def placement_cells(
         covers = (np.abs(u - cu) <= half) & (np.abs(v - cv) <= half)
         cell_mass = float(weights[covers].sum())
         found.append((cell_mass, cu, cv, covers))
-        exact += abs(cell_mass - float(flat[index])) <= 1e-9
+        exact += abs(cell_mass - float(cells.mass[i, j])) <= 1e-9
         if exact >= keep:
             break
     found.sort(key=lambda entry: entry[0])
