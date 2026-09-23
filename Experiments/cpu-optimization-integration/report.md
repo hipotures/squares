@@ -10,6 +10,7 @@ The primary case is `n=12`, outer side `99/25`, square side `9977/10000`, with `
 | M1 | Parallel directions | M0 | 44.052 / **44.217** / 44.642 s | 17.431 / **17.641** / 17.718 s | 34.175 / 7.340 s | 10.115 / 10.289 s | 3.141 / 1.023 s | **ACCEPT** |
 | M2 | Persistent HiGHS LP | M1 | 34.076 / **34.448** / 34.987 s | 7.762 / **7.925** / 7.929 s | 33.265 / 6.666 s | 1.179 / 1.238 s | 3.072 / 1.026 s | **ACCEPT** |
 | M3 | Maskless slab selection | M2 | 33.854 / **34.193** / 34.297 s | 6.155 / **6.409** / 6.570 s | 32.995 / 5.029 s | 1.213 / 1.258 s | 3.127 / 0.871 s | **ACCEPT** |
+| M4 | In-place cumsum reuse | M3 | 31.132 / **31.404** / 31.738 s | 5.430 / **5.480** / 5.755 s | 30.225 / 4.220 s | 1.167 / 1.242 s | 2.104 / 0.646 s | **ACCEPT** |
 
 ## M0: current main control
 
@@ -84,4 +85,25 @@ OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=.:src uv r
 
 For the M2 cross-check, a detached worktree at the M2 checkpoint was created with `git worktree add --detach /home/user/DEV/squares-worktrees/cpu-integration-m2-control 164cf7521c060355e87857bb392116b74ed2ea82`. The same `capture_state.py` was run with `PYTHONPATH` set to that worktree's `packing` and `packing/src` paths, using the main project's `.venv/bin/python`; the captured module paths in the JSON prove it loaded M2 code. This is a correctness diagnostic, not a timed candidate run.
 
-The current accepted production checkpoint is **M3**. In-place cumsum reuse is next and will be measured against M3.
+M3 was recorded by checkpoint commit `b2338d64e1c2bb448f6f570af8923c1a3bdfe999`.
+
+## M4: in-place cumsum reuse
+
+Source: `exp/cpu-cumsum-reuse` at `10dcd18ef65eef51de5bee8532260a3f2e635241`. Input baseline: M3 at `b2338d64e1c2bb448f6f570af8923c1a3bdfe999`. Production integration commit: `be151a7fd069bebf314ef8482ea924981e00c4d2`. Only the two prefix passes in `packing/src/sqpack/fractional/generate.py` changed. No dependency changed.
+
+**Correctness: TRAJECTORY IDENTICAL.** The retained real `980×980` round-18 grid produces bitwise equal mass under nested cumsum and in-place `np.add.accumulate`, as recorded in the [operation result](raw/m4-cumsum-operation.json). Sixty focused generate, selector and corner-clip tests passed. The [M3](raw/m3-full-state.json) and [M4](raw/m4-full-state.json) complete state captures match in row direction order, centres, coefficient matrix, weights, duals and per-round decisions. Both converge in 23 rounds and 5,842 rows at objective `12.217676366606236` and least covered `0.9999999999998309`. The earlier M2 exact retained-row diagnostic covers the identical M4 rows.
+
+Against M3, M4 saves **2.789 s (8.2%) serial** and **0.929 s (14.5%) at 16 workers**. The composed serial gain is much larger than the old standalone experiment's 0.290 s; this interaction was measured, not extrapolated. The worker-16 candidate had 2.41% CV across five runs, with variation in separation. Its full 5.430–5.755 s range remained below M3's 6.155–6.570 s range. Two extra worker-16 runs were added before acceptance.
+
+The isolated real-grid probe measured nested versus copy-plus-in-place cumsum at 6.181 versus 4.246 ms serial CPU per call and 12.068 versus 5.980 ms per worker under 16 processes. Tracked peak extra allocation dropped from 15,367,262 to 7,683,624 bytes even with the probe's conservative copy; production directly reuses the difference grid and needs no copy. Full parent RSS medians moved from 529,340 to 518,116 KiB serial and from 531,312 to 509,600 KiB at 16 workers, but the run ranges overlap, so the measured allocation reduction is stronger evidence than RSS for memory effect. Aggregate child RSS was not measured.
+
+M4 commands, from `packing/` (worker 1 repeated three times; worker 16 repeated five times after its initial spread):
+
+```bash
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. uv run --frozen --no-dev python ../Experiments/cpu-optimization-integration/measure_cumsum.py --out ../Experiments/cpu-optimization-integration/raw/m4-cumsum-operation.json
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. uv run --frozen --no-dev --with pytest python -m pytest tests/test_fractional_generate.py tests/test_fractional_selector.py tests/test_fractional_corner_clip.py -q
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=. uv run --frozen --no-dev python ../Experiments/cpu-optimization-integration/bench.py --workers "$jobs" --out "../Experiments/cpu-optimization-integration/raw/m4-w${jobs}-r${run}.json"
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONPATH=.:src uv run --frozen --no-dev python ../Experiments/cpu-optimization-integration/capture_state.py --workers 1 --label M4 --out ../Experiments/cpu-optimization-integration/raw/m4-full-state.json
+```
+
+The current accepted production checkpoint is **M4**. The fixed-size top-13 selector is next; it must first beat this composed maskless selection path before native packaging is considered.

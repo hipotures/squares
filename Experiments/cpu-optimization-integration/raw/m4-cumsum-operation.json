@@ -1,0 +1,33 @@
+{
+  "shape": [
+    980,
+    980
+  ],
+  "bitwise_equal": true,
+  "peak_extra_allocated_bytes": {
+    "nested": 15367262,
+    "inplace": 7683624
+  },
+  "measurements": {
+    "1_nested": {
+      "ms_per_call_cpu": 6.1805031999999995,
+      "max_wall_s": 0.24724424099986209,
+      "aggregate_cpu_s": 0.24722012799999998
+    },
+    "1_inplace": {
+      "ms_per_call_cpu": 4.245958574999999,
+      "max_wall_s": 0.1698512760012818,
+      "aggregate_cpu_s": 0.16983834299999995
+    },
+    "16_nested": {
+      "ms_per_call_cpu": 12.0677099578125,
+      "max_wall_s": 0.5684110789989063,
+      "aggregate_cpu_s": 7.723334373
+    },
+    "16_inplace": {
+      "ms_per_call_cpu": 5.9795668234375,
+      "max_wall_s": 0.26967112200145493,
+      "aggregate_cpu_s": 3.826922767
+    }
+  }
+}
