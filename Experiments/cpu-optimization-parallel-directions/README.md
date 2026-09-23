@@ -15,7 +15,7 @@ Base: `1f58b0f0abca55d4ea2cf0e1cd73d70ebd625659`.
 
 Production workers 1→16 saved 26.445 s (60.0% wall reduction, 2.50× throughput). The controlled research-harness 16-process baseline was 17.568 s; production integration is 0.080 s slower, within the small run-to-run and machine variation. The primary win is making the previously measured direction pool available through the real solver API. Three unprofiled end-to-end runs were made at workers 1 and 16, one at 4 and 8. Complete per-round trajectories are in `full-w*-*.json`.
 
-Parent peak RSS was 350–352 MiB at one worker and 357–359 MiB at 16. Aggregate child RSS was not measured; the pool necessarily adds worker processes and copies task arguments per direction. The major operating risk is using this pool inside another process pool: `PACK_JOBS` is only a per-step cap, not a cross-process semaphore. `workers=1` remains available to callers that already parallelize outside this solver.
+Parent peak RSS was 350,336–352,404 KiB at one worker and 357,280–358,680 KiB at 16. Aggregate child RSS was not measured; the pool necessarily adds worker processes and copies task arguments per direction. The major operating risk is using this pool inside another process pool: `PACK_JOBS` is only a per-step cap, not a cross-process semaphore. `workers=1` remains available to callers that already parallelize outside this solver.
 
 ## Reproduce
 
