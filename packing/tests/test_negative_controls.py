@@ -334,6 +334,33 @@ def test_dual_salvage_receipt_is_not_a_mutation_worker_input(
     assert not (tree / relative).exists()
 
 
+def test_retired_transition_statistics_are_not_a_mutation_worker_input(
+    control_snapshot: tuple[Path, set[Path]],
+) -> None:
+    tree, copied_targets = control_snapshot
+    source = ROOT / "atlas/known-best/video/spikes/v2-transitions/transition-stats.json"
+    relative = source.relative_to(controls.REPO)
+    specification = safe_load((ROOT / "devtools/controls.yaml").read_text())
+    assert source.is_file()
+    assert source in PRUNE
+    assert all(
+        (ROOT / control["file"]).resolve() != source
+        and "transition-stats.json" not in control["run"]
+        for control in specification["controls"]
+    )
+    assert relative not in copied_targets
+    assert not (tree / relative).exists()
+    # Both the live native audit's inputs and the linked historical narrative stay.
+    for retained in (
+        ROOT / "campaign/agent-sessions/session-153-native-full.json",
+        ROOT / "campaign/agent-sessions/session-153-native-full.rows.jsonl",
+        source.with_name("NOTES.md"),
+    ):
+        assert (
+            tree / retained.relative_to(controls.REPO)
+        ).read_bytes() == retained.read_bytes()
+
+
 def test_individually_rescued_paths_reach_the_worker(
     control_snapshot: tuple[Path, set[Path]],
 ) -> None:

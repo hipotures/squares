@@ -85,6 +85,10 @@ certificates at `s(26) >= 5.508` and `s(29) >= 5.71`, with pinned sources, mathe
 reviews and complete replays.
 These now supply the verified Frontier bounds; the records retain literal source reports
 and state the verification methods separately.
+The
+[complete native n11 decision](docs/project/reviews/review-2026-09-22-native-n11-parent-core.md)
+adds a distinct interval coverage method and supports `V4/C4` for Kleddamag’s strict
+`3.875` bound, with no new bound or C5 claim.
 
 Every result this project has registered, in the reading order its significance scores
 set. The full claims, the rationale behind each score, and the next evidence-improving
@@ -157,7 +161,7 @@ hypothesis status and summarizes experiment verdicts, and the
 | --- | ---: | --- |
 | Agendas | 38 | 18 active; 14 completed; 5 paused; 1 superseded |
 | Commitments | 362 | 183 complete; 61 stopped; 68 blocked; 16 ready; 21 tentative; 13 in progress |
-| Sessions | 153 | 94 completed; 59 stopped; all terminal |
+| Sessions | 154 | 95 completed; 59 stopped; all terminal |
 | Explorations | 40 | 24 linked to proposed hypotheses; 16 uncodified |
 | Hypotheses | 170 | 29 confirmed; 31 refuted; 55 blocked; 17 unresolved; 5 open; 29 open questions; 2 result registered; 2 abandoned; 0 running |
 | Experiments | 155 | 43 accepted; 36 rejected; 50 unresolved; 12 baseline; 11 blocked; 3 abandoned; 0 in progress |
@@ -228,8 +232,10 @@ hypothesis is not a frontier result.
 The current verified bracket is `3.875 < s(11) <= 3.877083590022814…`. Session 152 fully
 replayed and mathematically reviewed Kleddamag’s external certificate.
 It closes 95.89% of the gap from T-026 to the retained upper bound; the exact optimum
-remains open. The event-sweep replay is C3; an independent complete coverage method
-remains additional confirmation.
+remains open. Session 153 independently certifies every one of the 12,028 parent-angle
+intervals by directed-rounding box coverage, with no stalled or exhausted boxes.
+The event-sweep replay remains C3 by itself; the complete native decision and reviewed
+transfer theorem provide method-distinct C4 confirmation of the strict bound.
 Research below 3.875 must now justify its value as a simpler certificate or method
 development, rather than a public bound advance.
 The pure point/density ceiling `38200/9977 ≈ 3.8288` lies only about `0.00236` above
@@ -872,6 +878,7 @@ case or experiment separately.
 | [External Square Certificates: Mathematical and Integration Review](docs/project/reviews/review-2026-09-22-external-square-certificates-integration.md) | dated review record | record | retained | — |
 | [Tokoharu Rectangle Densities: Mathematical and Integration Review](docs/project/reviews/review-2026-09-22-tokoharu-density-mathematics.md) | dated review record | record | retained | — |
 | [Mathematical Review: Kleddamag’s `s(11) > 31/8`](docs/project/reviews/review-2026-09-22-kleddamag-n11-mathematics.md) | dated review record | record | retained | — |
+| [Native Adaptive Parent-Core Verification](docs/project/reviews/review-2026-09-22-native-n11-parent-core.md) | dated review record | record | retained | — |
 | [The Three-Lane Research Method](docs/project/three-lane-research-method.md) | component scope and use | record | retained | — |
 | [Handoff — 2026-09-04, close of the fractional-certificate block](docs/project/handoff-2026-09-04-block-close.md) | dated handoff record | record | retained | — |
 | [Handoff: Post-3.81 Portfolio at T+2](docs/project/handoff-2026-09-06-post-381-t2-commissioning.md) | dated handoff record | record | retained | — |
@@ -1140,6 +1147,14 @@ not certification. The closure is certified at reachable branch commit
 `819ade7ca8afbe634a6ee54f215f0878f5674031` solely by the
 [hosted five-job full gate](https://github.com/jlevy/squares/actions/runs/35784995867).
 
+**[Session 153](packing/campaign/agent-sessions/session-153-native-n11-parent-core.md)**
+completed the independent adaptive parent-core audit.
+All 12,028 rows certify with the admissible parent-centre domain, strict core
+containment, and bounded site and feature tables.
+The full proof remains pinned to clean `c183cc9ab`; PR 223’s final records at
+`22671c5e6` merged into `main` without changing the 19 frozen proof inputs.
+This supplies C4 confirmation by a method independent of the source implementation.
+
 **[Session 154](packing/campaign/agent-sessions/session-154-pr221-pr222-reconciliation.md)**
 reconciled PR 221 with the final PR 222 head.
 T-033 and its three evidence records remain the retained first-party 2880-step rung,
@@ -1148,10 +1163,20 @@ twenty promoted fields remain current.
 BC-373 is complete on the retained T-033 receipt and full-gate evidence; Session 151
 stays stopped as the historical record of its cutoff.
 
-**Selected next entry:** `think-vx26`. Render T-033’s missing standalone claim document
-from the retained result and evidence records.
-`think-tzg7` separately owns the frozen producer-provenance limitation, and `think-380b`
-owns the broader significance rubric.
+PR 224 is the current integration step.
+After it merges, the owner’s W3 frontier review uses the combined C4 evidence and owns
+the next research ordering.
+Session 154’s earlier `think-vx26` selection remains a bounded publication gap: render
+T-033’s missing standalone claim document from the retained result and evidence records.
+`think-tzg7` owns the frozen producer-provenance limitation, `think-380b` owns the
+broader significance rubric, `think-ck07` owns a second complete density-verification
+method, and `think-c0xc` owns the continuation-driver admission guard.
+
+**Selected next entry:** `think-d010`, Session 153’s recorded publication handoff.
+PR 223’s merge has now fulfilled it; the marker remains here because Session 153 is the
+latest observed terminal handoff.
+The owner’s newer W3 request is the actual next work and will supply a new session
+handoff when published.
 
 **Selected next entry at the Session 151 cutoff:** `think-gvlg`, registering the
 `n = 11` rung Session 151 left accepted and unregistered.
@@ -3488,7 +3513,7 @@ no intervening improvement:
 |  | value | source |
 | --- | --- | --- |
 | Best known packing (upper bound) | `3.8770835…` | Walter Trump, 1979 |
-| Best certified lower bound | `31/8 = 3.875` (strict) | [Kleddamag n11 review](docs/project/reviews/review-2026-09-22-kleddamag-n11-mathematics.md), complete exact replay and mapped mathematical audit; C3 coverage method |
+| Best certified lower bound | `31/8 = 3.875` (strict) | [Native n11 review](docs/project/reviews/review-2026-09-22-native-n11-parent-core.md), complete exact and interval coverage with the reviewed transfer theorem; C4 |
 | Bound gap | `0.0020836` | difference between the two bounds; the exact optimum remains open |
 
 ![Walter Trump’s exact eleven-square packing.](packing/atlas/rendering/trump11-overview.svg)
@@ -4617,6 +4642,9 @@ in separate tables: their units differ, and the same work can appear in both.
 | `codex-task-tree-session-134.yaml` | session-134 | 497 | 4.88 h | 1.21 h | 1.21 h | yes |
 | `codex-task-tree-session-135.yaml` | session-135 | 437 | 1.53 h | 0.48 h | 0.48 h | yes |
 | `codex-task-tree-session-152.yaml` | session-152 | 2,141 | 12.27 h | 4.31 h | 4.31 h | yes |
+| `codex-task-tree-session-153-native-closeout.yaml` | session-153 | 191 | 1.04 h | 1.0 h | 2.91 h | yes |
+| `codex-task-tree-session-153-native-draft.yaml` | session-153 | 103 | 0.55 h | 0.53 h | 0.53 h | yes |
+| `codex-task-tree-session-153-native-finalization.yaml` | session-153 | 150 | 0.87 h | 0.84 h | 0.84 h | yes |
 | `codex-task-tree-session-154-takeover.yaml` | session-154 | 72 | 0.49 h | 0.49 h | 0.49 h | yes |
 | `codex-task-tree-session-154.yaml` | session-154 | 358 | 3.03 h | 2.95 h | 3.63 h | yes |
 | `session-142-stack-correctness.yaml` | session-142 | 1,186 | 5.01 h | 2.29 h | 2.3 h | yes |
@@ -4625,9 +4653,9 @@ in separate tables: their units differ, and the same work can appear in both.
 
 | Coverage | sessions |
 | --- | ---: |
-| measured | 99 |
+| measured | 100 |
 | unmeasured | 54 |
-| **total** | **153** |
+| **total** | **154** |
 
 <!-- END GENERATED: session-close-report -->
 
