@@ -35,9 +35,9 @@ totals:
     one_off_code: 5356
     wall_hours: 497.45
 codex_receipts:
-  attributed: 59
+  attributed: 60
   unattributed: 2
-  measured: 61
+  measured: 62
 # Per-session figures below are the logs each session DECLARES. They overlap when
 # sessions share a harness log, so they do not sum to `attributed` above.
 sessions:
@@ -2544,13 +2544,14 @@ sessions:
     snapshot_incomplete: true
 - id: session-153
   title: "Native n11 adaptive parent-core verification"
-  status: in_progress
+  status: completed
   primary_bead: think-d010
   phases: 4
   measured: true
   rollups:
   - packing/campaign/resource-usage/codex-task-tree-session-153-native-draft.yaml
   - packing/campaign/resource-usage/codex-task-tree-session-153-native-closeout.yaml
+  - packing/campaign/resource-usage/codex-task-tree-session-153-native-finalization.yaml
   turns: null
   tool_calls: null
   tool_errors: null
@@ -2568,4 +2569,10 @@ sessions:
     agent_hours: 1.04
     active_union_hours: 1.0
     wall_hours: 2.91
+    snapshot_incomplete: true
+  - path: packing/campaign/resource-usage/codex-task-tree-session-153-native-finalization.yaml
+    model_responses: 150
+    agent_hours: 0.87
+    active_union_hours: 0.84
+    wall_hours: 0.84
     snapshot_incomplete: true

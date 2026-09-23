@@ -161,7 +161,7 @@ hypothesis status and summarizes experiment verdicts, and the
 | --- | ---: | --- |
 | Agendas | 38 | 18 active; 14 completed; 5 paused; 1 superseded |
 | Commitments | 362 | 182 complete; 61 stopped; 68 blocked; 16 ready; 21 tentative; 14 in progress |
-| Sessions | 153 | 93 completed; 59 stopped; 1 nonterminal |
+| Sessions | 153 | 94 completed; 59 stopped; all terminal |
 | Explorations | 40 | 24 linked to proposed hypotheses; 16 uncodified |
 | Hypotheses | 170 | 29 confirmed; 31 refuted; 55 blocked; 17 unresolved; 5 open; 29 open questions; 2 result registered; 2 abandoned; 0 running |
 | Experiments | 155 | 43 accepted; 36 rejected; 50 unresolved; 12 baseline; 11 blocked; 3 abandoned; 0 in progress |
@@ -1147,9 +1147,11 @@ not certification. The closure is certified at reachable branch commit
 `819ade7ca8afbe634a6ee54f215f0878f5674031` solely by the
 [hosted five-job full gate](https://github.com/jlevy/squares/actions/runs/35784995867).
 
-**Selected next entry:** `think-d010`. Session 153 completes its mathematical and
-implementation scope: all 12,028 adaptive parent-core rows certify with the admissible
-parent-centre domain, strict core containment and bounded site and feature tables.
+**Selected next entry:** `think-d010`.
+[Session 153](packing/campaign/agent-sessions/session-153-native-n11-parent-core.md)
+completes its mathematical and implementation scope: all 12,028 adaptive parent-core
+rows certify with the admissible parent-centre domain, strict core containment and
+bounded site and feature tables.
 The full proof and hosted checkpoint remain pinned to clean `c183cc9ab`; the final green
 PR 222 base at `be736b0ef` changes none of the 19 frozen proof inputs.
 The remaining W10 entry is publication of the independently reviewed closeout and its
@@ -4629,6 +4631,7 @@ in separate tables: their units differ, and the same work can appear in both.
 | `codex-task-tree-session-152.yaml` | session-152 | 2,141 | 12.27 h | 4.31 h | 4.31 h | yes |
 | `codex-task-tree-session-153-native-closeout.yaml` | session-153 | 191 | 1.04 h | 1.0 h | 2.91 h | yes |
 | `codex-task-tree-session-153-native-draft.yaml` | session-153 | 103 | 0.55 h | 0.53 h | 0.53 h | yes |
+| `codex-task-tree-session-153-native-finalization.yaml` | session-153 | 150 | 0.87 h | 0.84 h | 0.84 h | yes |
 | `session-142-stack-correctness.yaml` | session-142 | 1,186 | 5.01 h | 2.29 h | 2.3 h | yes |
 | `codex-task-tree-pr137-publication-tail.yaml` | unattributed | 610 | 4.39 h | 1.77 h | 1.82 h | yes |
 | `codex-task-tree-pr142-publication-tail.yaml` | unattributed | 136 | 0.87 h | 0.41 h | 0.58 h | yes |

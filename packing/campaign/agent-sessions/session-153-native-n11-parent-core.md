@@ -13,7 +13,8 @@ session:
   deadline_at: '2026-09-23T03:15:57.644Z'
   branch: codex/n11-parent-core-verifier
   primary_bead: think-d010
-  status: in_progress
+  status: completed
+  ended_at: '2026-09-23T03:03:47Z'
   goal: >-
     Preserve the exact adaptive parent-angle and centre-domain contract in a native
     verifier, then independently decide all 12028 retained n11 certificate intervals.
@@ -120,7 +121,7 @@ session:
     objective: >-
       Validate the integrated exports, mutation-worker dependency closure and final
       records, then publish the reviewed PR 223 closeout and reconcile final CI.
-    status: in_progress
+    status: completed
     entered_by: evidence_checkpoint
     switch_reason: The exact proof and evidence registration are accepted; remaining checks and publication have a separate finalization clock.
     budget_minutes: 30
@@ -130,10 +131,22 @@ session:
     validation_command: cd packing && .venv/bin/packing-validate --push --since 3c81199f31db082feebc29de88c75cbf7f08ea7c --jobs 1 --inner-jobs 2
     kill_condition: A relevant check or review finds an unresolved error in the integrated result.
     fallback: Preserve the complete proof, diagnose the affected integration, and keep the PR draft until corrected.
-    outcome: null
-    evidence: []
-    stop_reason: null
-    next_action: Finish exports, worker baselines, exact snapshot measurement, scoped validation and coordinator review.
+    outcome: >-
+      The integrated exports and narrow mutation snapshot repair are independently
+      reviewed. All 50 non-behavioral push steps pass; 2248 reachable tests pass with
+      six dedicated-Pages skips. Two repository-state refusals are resolved by
+      committing the approved export and indexing the retained journals, and both
+      affected tests pass unchanged. Exact receipt reconciliation still matches all
+      19 frozen proof inputs. The record closes at this local validation checkpoint;
+      final publication and hosted PR checks remain a separate follow-up and are not
+      claimed as already run on the closure commit.
+    evidence:
+    - packing/campaign/agent-sessions/session-153-integrated-push.json
+    - packing/campaign/agent-sessions/session-153-integrated-push.log
+    - packing/campaign/agent-sessions/session-153-snapshot-readme-controls.jsonl
+    - packing/campaign/agent-sessions/session-153-snapshot-synopsis-control.jsonl
+    stop_reason: Complete coverage, mathematical review and local integration checks are satisfied; the reviewed closeout is ready for publication follow-up.
+    next_action: Obtain final coordinator approval of the closure delta, publish PR 223 and require its final hosted checks before marking it ready; do not merge.
   budget:
     wall_minutes: 270
     slice_minutes: 30
@@ -195,11 +208,14 @@ session:
   - The final atlas regeneration completed all 324 witnesses and renderings, two SVG/PDF composites and four PNG exports from the correct data pin. The permanent mutation journal measured the integrated snapshot at 167264782 bytes, leaving 507378 bytes (about 0.484 MiB) under the unchanged 167772160-byte cap before retaining the small control journals. This is modest remaining headroom, not a general capacity fix.
   - Four README controls passed; the fifth encountered the sandbox's default uv-cache permission refusal before its check. Its focused rerun with a temporary uv cache passed in 3.188 seconds (23.048 seconds including snapshot setup). Both journals are retained. All 25 focused negative-control tests passed in 61.36 seconds, including clean result and synopsis worker baselines, mutation/restoration, real dependency copy-back, process lifecycle and exact byte preservation of the native proof artifacts.
   - The integrated scoped push ran against 3c81199f3 with one outer and two inner workers and took 1054.46 seconds, inside its 1800-second ceiling. All 50 non-behavioral steps passed. The 85-file reachable suite passed 2248 tests with six skips and two repository-state refusals in 603.36 seconds. The atlas guard rejected the intentionally uncommitted stamp change against HEAD; the worker-index guard found the two newly retained journals before they were staged. Commit the reviewed integration, then rerun those two affected checks without changing either guard or any numerical code.
+  - The reviewed integration is committed as 1972edf85cd7cb1da61ff768e558c559b5dcd6c5. Both affected HEAD/index tests pass unchanged in 18.29 seconds, and exact receipt reconciliation again accepts all 12028 rows and 19 frozen Git inputs. A first targeted invocation stopped at collection because the local Cairo library path was omitted; the corrected environment passed. The six skips are the dedicated Pages PDF browser controls, confirmed by their explicit SQPACK_PDF_MATH_BROWSER condition; those controls were not run in this Python-only selection.
+  - The first focused closure check passed eight of nine steps and refused the synopsis because the terminal session count lacked its all-terminal suffix and the new terminal next_action did not name the publication bead. The record now names the completed think-d010 publication follow-up and links the newly terminal Session 153 from the current handoff.
   resource_rollups:
   - packing/campaign/resource-usage/codex-task-tree-session-153-native-draft.yaml
   - packing/campaign/resource-usage/codex-task-tree-session-153-native-closeout.yaml
-  stop_reason: null
-  next_action: Integrate the final green PR 222 base and publish the independently reviewed PR 223 closeout; keep the proof receipt pinned to c183cc9ab and distinguish final-head checks from its historical full gate.
+  - packing/campaign/resource-usage/codex-task-tree-session-153-native-finalization.yaml
+  stop_reason: The complete native acceptance rule, mathematical review and local integration checks are satisfied, with immutable proof provenance and C4 evidence retained.
+  next_action: Publish the coordinator-approved PR 223 closure for completed think-d010 and require its final hosted checks before ready; the separately requested W3 review owns the next research ordering. Preserve the c183cc9ab proof scope and do not merge either stacked PR.
 ---
 # Session 153: Native n11 Adaptive Parent-Core Verification
 
@@ -241,11 +257,17 @@ shared coordinator. The
 [closeout interval](../resource-usage/codex-task-tree-session-153-native-closeout.yaml)
 starts at that cutoff and ends at `2026-09-23T02:12:41Z`. It adds 3,751.135 agent-active
 seconds, for a measured total of 5,735.604 seconds (95.5934 minutes) in this primary
-lane.
-Both intervals retain their live-snapshot lower-bound flags; subsequent publication
-work and the separate Sol and coordinator lanes are outside this stated total.
-The complete proof’s 6,197.381 host seconds are reported separately and are not added to
-agent-active time.
+lane. The
+[finalization interval](../resource-usage/codex-task-tree-session-153-native-finalization.yaml)
+continues from that cutoff through `2026-09-23T03:02:59Z` and adds 3,127.729
+agent-active seconds.
+The three retained deltas sum to 8,863.333 seconds (147.7222 minutes).
+Each retains its live-snapshot lower-bound flag; event completion across a cutoff can
+leave time outside that retained sum.
+Subsequent publication work and the separate Sol and coordinator lanes are outside this
+stated total.
+The complete proof’s 6,197.381 host seconds are reported separately and are
+not added to agent-active time.
 
 <!-- This document follows common-doc-guidelines.md.
 See github.com/jlevy/practical-prose and review guidelines before editing.
