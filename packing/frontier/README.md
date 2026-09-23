@@ -262,12 +262,25 @@ certificate’s replay command.
    package is what readers are pointed at: the root README’s New Results entries link
    into it, and the self-contained verifiable-claim documents live there.
 
+   A **verifiable-claim document is a separate deliverable, not a registration step.**
+   `T-025` and `T-026` each carry one, and
+   [`render_verifiable_claim`](../devtools/render_verifiable_claim.py) writes both from
+   one template — but as two hard-coded branches of one function, keyed to those two
+   files, with the witness direction, the title, the surd and the proof note written in.
+   A third claim document needs that branch parameterized and its own proof note, which
+   is work to schedule rather than a box to tick.
+   Registering without one is what `T-033` did; the row then cites the argument’s
+   existing proof note rather than inventing an artifact.
+
 4. **Update affected cases.** When the result improves a formal bound, the case’s
    `verified_lower_bound` or `verified_upper_bound` cites the evidence that directly
    establishes that bound, with `value` and `exact_form`, and its body must restate the
    new bound: `devtools.check_case_prose` reads the prose against the front matter.
-   Controls may remain result-only: `T-026` cites five entries, while the case bound
-   cites the three that establish its 1440-step result.
+   Controls may remain result-only: `T-026` cites five entries, while the case bound at
+   that rung cited the three that established it.
+   At the historical `T-033` rung, `n-011.md` cited its three establishing entries
+   rather than its control leg; the current case bound cites Kleddamag’s replay evidence
+   and retains the earlier entries as history.
    A numerical finding or a result about a restricted family does not by itself change
    an unconditional verified bound.
    Preserve earlier evidence and decisions.

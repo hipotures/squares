@@ -8,9 +8,9 @@ ours, which rest on someone else's argument, and how far each has been checked.
 
 ## The short version
 
-- **102** evidence records. **80** are formal; **74** of those were established here.
+- **105** evidence records. **83** are formal; **77** of those were established here.
 - **15** rest on an argument made elsewhere, of which **8** have been read by nobody here.
-- **32** claim to be first established here. **10** make no novelty statement at all - not assessed, which is not the same as not novel.
+- **34** claim to be first established here. **10** make no novelty statement at all - not assessed, which is not the same as not novel.
 
 A formal claim on an unread external proof is still formal: the proof proves its
 claim whether or not we read it. The count above is not a doubt about those
@@ -106,6 +106,9 @@ results, it is a statement about what this repository has itself examined.
 | `E-n011-threshold-net1440-dilation-limit` | 0 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
 | `E-n011-threshold-net720-certificate` | 0 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
 | `E-n011-threshold-net720-dilation-limit` | 0 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
+| `E-n011-threshold-net2880-certificate` | 0 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
+| `E-n011-threshold-net2880-interval-decision` | 0 | lower-bound | verified | strict inequalities only | here | - | previously-published |
+| `E-n011-threshold-net2880-dilation-limit` | 0 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
 | `E-n017-fractional-certificate` | 0 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
 | `E-n018-fractional-certificate` | 0 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
 | `E-n018-t028-fractional-certificate` | 0 | lower-bound | verified | equalities and inequalities, no tolerance | here | - | apparently-novel |
@@ -125,9 +128,9 @@ results, it is a statement about what this repository has itself examined.
 
 ## What the register rests on
 
-- **assurance**: numerically-checked 4, reported 18, verified 80
-- **method**: exact-algebraic 61, interval-certified 11, numerical-multiprecision 4, proof-audited 2, published-proof 6, reported 18
-- **novelty**: apparently-novel 32, common-knowledge 4, not assessed 10, previously-published 56
+- **assurance**: numerically-checked 4, reported 18, verified 83
+- **method**: exact-algebraic 63, interval-certified 12, numerical-multiprecision 4, proof-audited 2, published-proof 6, reported 18
+- **novelty**: apparently-novel 34, common-knowledge 4, not assessed 10, previously-published 57
 
 The `cases` column is how many frontier records cite each piece of evidence, and it is the reason to read this table rather than count records. Ranked below are the *formal* records only: a `reported` record cited across the frontier may be a shared catalogue and is labelled as such, which is the register working rather than risk. The risk is a verified claim resting on an argument nobody has examined.
 
@@ -161,6 +164,8 @@ Claims marked `apparently-novel`: first established here as far as the archived 
 | `E-n011-threshold-certificate` | 11 | The threshold atoms themselves: rank-1 Chvatal-Gomory cuts on the certificate side, charging w to every core holding at least k points of S and costing w floor(|S| / k) of the budget. The unavoidable-set counting argument, the event-cell sweep and the interval route are not new objects; a certificate whose budget rests on the floor rule, and the side it reaches, are. | 0 | verified |
 | `E-n011-threshold-net1440-certificate` | 11 | The re-certification of the retained T-025 threshold atoms on the 1440-step net at shrink 249507/250000. The atoms, the threshold theorem, the two decision routes and the net-refinement measurement are not new objects; this certificate and the lower bound derived from it under E-n011-threshold-net1440-dilation-limit are. | 0 | verified |
 | `E-n011-threshold-net1440-dilation-limit` | 11 | The exact lower-bound value obtained by combining the 1440-step re-certification of T-025's threshold atoms with T-022's sharpened containment lemma, every strict rational uniform dilation it admits, rational density, and upward embedding. The lemma and the dilation argument are T-022's and T-024's; carrying them over threshold atoms needs no new theorem, and the bound is new. | 0 | verified |
+| `E-n011-threshold-net2880-certificate` | 11 | The re-certification of the retained T-025 threshold atoms on the 2880-step net at shrink 249507/250000. The atoms, the threshold theorem, the two decision routes and the net-refinement measurement are not new objects, and T-026 already certified the same atoms one net coarser. The narrow novel object is this frozen family's 2880-step re-certification and its exact dilation value, retained as first-party method and calibration evidence rather than a current public-bound advance. | 0 | verified |
+| `E-n011-threshold-net2880-dilation-limit` | 11 | The exact value obtained for this repository's retained T-025 atoms by combining their 2880-step re-certification with T-022's sharpened containment lemma, every strict rational uniform dilation it admits, rational density, and upward embedding. The lemma and dilation argument are T-022's and T-024's, and T-026 already carried them over threshold atoms. The project-specific frozen rung is new; the stronger current public lower bound is not this result. | 0 | verified |
 | `E-n011-threshold-net720-certificate` | 11 | The re-certification of the retained T-025 threshold atoms on the 720-step net, which crosses at the same shrink as the 1440-step net and is the control that isolates what halving the half-gap tangent is worth. | 0 | verified |
 | `E-n011-threshold-net720-dilation-limit` | 11 | The exact lower-bound value from the 720-step threshold re-certification under T-022's dilation-limit argument. It is weaker than the registered bound and is retained because its source rung is the control that isolates the effect of the net alone. | 0 | verified |
 | `E-n012-independent-verifier` | 12 | Nothing new in this entry -- it is a second, independent decision of the historical 77/20 rung and its 19/5 calibration certificate. | 0 | verified |
