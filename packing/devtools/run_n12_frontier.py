@@ -29,6 +29,9 @@ DEFAULT_SEED = REPO / "packing/cases/n12_fractional_certificate/certificate.json
 SCHEMA = 2
 LEGACY_RATIONALISATION_SCALE = 200_000
 DEFAULT_RATIONALISATION_SCALE = 1_600_000
+DEFAULT_MAX_RATIONALISATION_SCALE = 25_600_000
+BLUE = "\033[94m"
+RESET = "\033[0m"
 STAGES = ("screen", "normal", "deep", "maximum")
 CSV_FIELDS = (
     "timestamp",
@@ -129,6 +132,22 @@ def load_state(root: Path, config: dict[str, Any] | None = None) -> dict[str, An
             )
         elif stored_scale != requested_scale:
             raise ValueError("resume rationalisation scale differs from the saved experiment")
+        requested_max_scale = config.get("max_scale")
+        stored_max_scale = stored_config.get("max_scale")
+        if stored_max_scale is None and requested_max_scale is not None:
+            stored_config["max_scale"] = requested_max_scale
+            state.setdefault("migrations", []).append(
+                {
+                    "at": stamp(),
+                    "kind": "max-rationalisation-scale",
+                    "from": None,
+                    "to": requested_max_scale,
+                }
+            )
+        elif stored_max_scale != requested_max_scale:
+            raise ValueError(
+                "resume maximum rationalisation scale differs from the saved experiment"
+            )
     low, high = Fraction(state["verified_low"]), Fraction(state["search_high"])
     if not low < high or not isinstance(state.get("cycles"), list):
         raise ValueError("invalid frontier state")
@@ -210,23 +229,74 @@ def next_side(state: dict[str, Any]) -> Fraction | None:
     ceiling = soft_high(state)
     if float(ceiling) == float(low) or ceiling - low < Fraction(1, 10**10):
         return None
-    # After a narrowing bracket, revisit a soft ceiling if a better verified
-    # seed is now available.  A repeat at the same seed is never useful.
+    # Revisit an unresolved ceiling only when the search instrument actually
+    # became stronger. A better VERIFIED seed alone is not enough: the old
+    # policy repeatedly reran the deterministic 3.961875 search after every
+    # tiny lower-bound improvement and reproduced identical results.
     target_scale = int(
-        state.get("config", {}).get("scale", LEGACY_RATIONALISATION_SCALE)
+        state.get("config", {}).get(
+            "max_scale",
+            state.get("config", {}).get("scale", LEGACY_RATIONALISATION_SCALE),
+        )
     )
     for cycle in reversed(state["cycles"]):
         if Fraction(cycle["side"]) == ceiling:
-            if cycle["status"] == "UNRESOLVED":
-                # Retry the exact point before bisecting only when the floating
-                # LP is already below 12 and coarse upward snapping is the blocker.
-                if scale_limited_unresolved(cycle, target_scale):
-                    return ceiling
-                old_seed = Fraction(cycle.get("seed_verified_low", state["initial_low"]))
-                if low > old_seed and ceiling - low <= Fraction(state["initial_width"]) / 16:
-                    return ceiling
+            if scale_limited_unresolved(cycle, target_scale):
+                return ceiling
             break
     return (low + ceiling) / 2
+
+
+def scale_limited_result(result: dict[str, Any]) -> bool:
+    """The LP is below 12 but upward rationalisation still misses the theorem."""
+
+    objective = result.get("objective")
+    mass = result.get("total_mass")
+    return (
+        result.get("converged") is True
+        and isinstance(objective, int | float)
+        and math.isfinite(objective)
+        and objective < 12
+        and mass is not None
+        and Fraction(mass) >= 12
+    )
+
+
+def next_refinement_scale(
+    result: dict[str, Any], current_scale: int, max_scale: int
+) -> int | None:
+    """Double the nested rationalisation grid when rounding is the blocker."""
+
+    if not scale_limited_result(result) or current_scale >= max_scale:
+        return None
+    return min(current_scale * 2, max_scale)
+
+
+def starting_scale(state: dict[str, Any], side: Fraction) -> int:
+    """Start a retried side above the finest scale already tried there."""
+
+    base = int(state["config"]["scale"])
+    maximum = int(state["config"]["max_scale"])
+    finest = 0
+    for cycle in state["cycles"]:
+        if Fraction(cycle["side"]) != side:
+            continue
+        for stage in cycle.get("stages") or []:
+            result = stage.get("result") or {}
+            used = stage_scale(stage)
+            if used is not None and scale_limited_result(result):
+                finest = max(finest, used)
+    if finest >= base and finest < maximum:
+        return min(finest * 2, maximum)
+    return base
+
+
+def significant_result(decision: str, result: dict[str, Any]) -> bool:
+    """Results worth making visually obvious in an occasional terminal glance."""
+
+    return decision in ("VERIFIED", "REFINE_SCALE") or (
+        decision == "UNRESOLVED" and scale_limited_result(result)
+    )
 
 
 def apply_result(state: dict[str, Any], cycle: dict[str, Any]) -> None:
@@ -326,16 +396,25 @@ def decide_stage(
     )
 
 
-def emit(root: Path, message: str) -> None:
-    print(message, flush=True)
+def emit(root: Path, message: str, *, significant: bool = False) -> None:
+    colour = (
+        significant
+        and "NO_COLOR" not in os.environ
+        and (sys.stdout.isatty() or os.environ.get("FORCE_COLOR") == "1")
+    )
+    print(f"{BLUE}{message}{RESET}" if colour else message, flush=True)
     with (root / "runner.log").open("a", encoding="utf-8") as handle:
+        # Persistent logs remain plain text even when the terminal line is blue.
         handle.write(f"{stamp()} {message}\n")
 
 
 def seed_for(state: dict[str, Any], side: Fraction) -> tuple[Path, str]:
     verified = Path(state["verified_certificate"])
     target_scale = int(
-        state.get("config", {}).get("scale", LEGACY_RATIONALISATION_SCALE)
+        state.get("config", {}).get(
+            "max_scale",
+            state.get("config", {}).get("scale", LEGACY_RATIONALISATION_SCALE),
+        )
     )
     best_path, best_label, best_distance = (
         verified,
@@ -805,7 +884,10 @@ def run_cycle(root: Path, state: dict[str, Any]) -> None:
             )
     if cycle["stages"]:
         last = cycle["stages"][-1]
-        if last["status"] == "complete" and last["decision"] != "ESCALATE":
+        if last["status"] == "complete" and last["decision"] not in (
+            "ESCALATE",
+            "REFINE_SCALE",
+        ):
             cycle.update(
                 {"status": last["decision"], "reason": last["reason"], "finished_at": stamp()}
             )
@@ -842,10 +924,29 @@ def run_cycle(root: Path, state: dict[str, Any]) -> None:
             None,
         )
         if generated is None:
-            stage_index = min(
-                sum(stage["status"] == "complete" for stage in cycle["stages"]),
-                len(budgets) - 1,
+            previous_complete = next(
+                (
+                    stage
+                    for stage in reversed(cycle["stages"])
+                    if stage["status"] == "complete"
+                ),
+                None,
             )
+            if previous_complete is None:
+                stage_index = 0
+                stage_scale_value = starting_scale(state, side)
+            elif previous_complete["decision"] == "REFINE_SCALE":
+                stage_index = STAGES.index(previous_complete["name"])
+                stage_scale_value = int(previous_complete["refine_scale_to"])
+            else:
+                stage_index = min(
+                    STAGES.index(previous_complete["name"]) + 1,
+                    len(budgets) - 1,
+                )
+                stage_scale_value = max(
+                    int(state["config"]["scale"]),
+                    stage_scale(previous_complete) or int(state["config"]["scale"]),
+                )
             name = STAGES[stage_index]
             stage_dir = (
                 root
@@ -870,19 +971,23 @@ def run_cycle(root: Path, state: dict[str, Any]) -> None:
                 None,
             )
             if previous is not None:
-                seed, label = Path(previous["candidate_unverified"]), f"search-seed-only@{side}"
+                previous_scale = stage_scale(previous) or LEGACY_RATIONALISATION_SCALE
+                seed, label = (
+                    Path(previous["candidate_unverified"]),
+                    f"search-seed-only@{side}:scale{previous_scale}",
+                )
             args = command(
                 side,
                 budgets[stage_index],
                 seed,
                 stage_dir,
                 state["config"]["row_rounds"],
-                int(state["config"]["scale"]),
+                stage_scale_value,
             )
             generated = {
                 "name": name,
                 "budget": budgets[stage_index],
-                "scale": int(state["config"]["scale"]),
+                "scale": stage_scale_value,
                 "directory": str(stage_dir),
                 "seed": str(seed),
                 "seed_label": label,
@@ -900,7 +1005,7 @@ def run_cycle(root: Path, state: dict[str, Any]) -> None:
             emit(
                 root,
                 f"[cycle {active + 1}] L={display(side)} seed={label} "
-                f"stage={name}({budgets[stage_index]})",
+                f"stage={name}({budgets[stage_index]}) scale={stage_scale_value}",
             )
             env = os.environ.copy()
             env.update(
@@ -945,8 +1050,21 @@ def run_cycle(root: Path, state: dict[str, Any]) -> None:
             cycle["verifier"] = "full-retainable"
             cycle["verified_candidate"] = verified_path
         else:
-            index = STAGES.index(generated["name"])
-            decision, reason = decide_stage(
+            current_scale = stage_scale(generated) or int(state["config"]["scale"])
+            refinement = next_refinement_scale(
+                result, current_scale, int(state["config"]["max_scale"])
+            )
+            if refinement is not None:
+                decision = "REFINE_SCALE"
+                reason = (
+                    f"LP objective {result.get('objective')} is below 12 but "
+                    f"rational mass {result.get('total_mass')} is not; "
+                    f"refine scale {current_scale} -> {refinement}"
+                )
+                generated["refine_scale_to"] = refinement
+            else:
+                index = STAGES.index(generated["name"])
+                decision, reason = decide_stage(
                 result,
                 index,
                 budgets,
@@ -955,10 +1073,10 @@ def run_cycle(root: Path, state: dict[str, Any]) -> None:
                     < Fraction(state["initial_width"]) / 4
                 ),
             )
-            if verifier not in ("mass-not-below-12", "full-retainable"):
-                reason += f"; verifier={verifier}"
-                if decision == "SEARCH_FAILED":
-                    decision = "UNRESOLVED"
+                if verifier not in ("mass-not-below-12", "full-retainable"):
+                    reason += f"; verifier={verifier}"
+                    if decision == "SEARCH_FAILED":
+                        decision = "UNRESOLVED"
         generated.update(
             {
                 "status": "complete",
@@ -981,16 +1099,22 @@ def run_cycle(root: Path, state: dict[str, Any]) -> None:
         emit(
             root,
             f"[stage] L={display(side)} rounds={generated['budget']} "
-            f"objective={result.get('objective')} total={result.get('total_mass')} "
+            f"scale={stage_scale(generated)} objective={result.get('objective')} "
+            f"total={result.get('total_mass')} "
             f"time={float(result.get('seconds') or 0):.0f}s -> {decision}",
+            significant=significant_result(decision, result),
         )
-        if decision == "ESCALATE":
+        if decision in ("ESCALATE", "REFINE_SCALE"):
             continue
         cycle.update({"status": decision, "reason": reason, "finished_at": stamp()})
         apply_result(state, cycle)
         save_state(root, state)
         write_views(root, state)
-        emit(root, f"[result] L={display(side)} {decision} reason={reason}")
+        emit(
+            root,
+            f"[result] L={display(side)} {decision} reason={reason}",
+            significant=significant_result(decision, result),
+        )
         emit(
             root,
             f"[frontier] verified={display(state['verified_low'])} "
@@ -1023,8 +1147,17 @@ def main(argv: list[str] | None = None) -> int:
         type=int,
         default=DEFAULT_RATIONALISATION_SCALE,
         help=(
-            "weight rationalisation denominator; default 1600000 is an exact "
-            "8x refinement of the historical 200000 grid"
+            "initial weight rationalisation denominator; default 1600000 is an "
+            "exact 8x refinement of the historical 200000 grid"
+        ),
+    )
+    parser.add_argument(
+        "--max-scale",
+        type=int,
+        default=DEFAULT_MAX_RATIONALISATION_SCALE,
+        help=(
+            "largest automatic rationalisation denominator; scale doubles only "
+            "when LP objective < 12 but rationalised mass is still >= 12"
         ),
     )
     parser.add_argument("--target-width", type=Fraction)
@@ -1036,6 +1169,7 @@ def main(argv: list[str] | None = None) -> int:
         args.workers < 1
         or args.row_rounds < 1
         or args.scale < 1
+        or args.max_scale < args.scale
         or sorted(set(budgets)) != budgets
         or budgets[0] < 1
         or (args.max_cycles is not None and args.max_cycles < 1)
@@ -1055,6 +1189,7 @@ def main(argv: list[str] | None = None) -> int:
         "budgets": budgets,
         "row_rounds": args.row_rounds,
         "scale": args.scale,
+        "max_scale": args.max_scale,
         "target_width": str(args.target_width) if args.target_width is not None else None,
         "max_cycles": args.max_cycles,
     }
@@ -1089,6 +1224,7 @@ def main(argv: list[str] | None = None) -> int:
             emit(
                 root,
                 f"[start] n=12 workers={args.workers} scale={state['config']['scale']} "
+                f"max-scale={state['config']['max_scale']} "
                 f"verified={display(state['verified_low'])} "
                 f"search-high={display(state['search_high'])}",
             )
@@ -1151,15 +1287,24 @@ only a search seed. Budgets are additional restart budgets: the default
 plus repeated inner row generation. State and report record the cumulative
 column rounds actually completed. No stage resumes solver internals.
 
-The runner uses `--scale 1600000` by default for rationalising LP weights. This
-is an exact 8x refinement of the historical 200000 grid and reduces the upward
-rounding tax without changing the LP search. A schema-2 state written before
-this option existed is migrated in place on `--resume`; old stages remain
-auditable at scale 200000. If the nearest UNRESOLVED point has LP objective
-below 12 but its coarse rationalised mass is at least 12, the upgraded runner
-retries that exact side at the finer scale before bisecting further and seeds
-the retry from the coarse candidate's sites. A point whose LP objective is
-itself above 12 is not retried merely because the scale grew.
+The runner uses `--scale 1600000` initially and an automatic nested scale
+ladder up to `--max-scale 25600000`. If a converged stage has LP objective
+below 12 but upward rationalisation still leaves total mass at or above 12,
+the runner first repeats the same column budget on the same side at twice the
+scale, seeded from the preceding candidate's sites. It keeps doubling only
+while rationalisation is the blocker. A point whose LP objective is itself at
+or above 12 spends effort on the column search instead.
+
+A schema-2 state written before these options existed is migrated in place on
+`--resume`; old stages remain auditable at their original scale. An unresolved
+point is revisited only when a finer scale remains untried there. Merely
+improving the VERIFIED low no longer causes the deterministic unresolved
+ceiling to be recomputed over and over.
+
+VERIFIED results, scale-refinement opportunities, and final scale-limited
+UNRESOLVED results are printed in blue on an interactive terminal so they stand
+out during occasional checks. `NO_COLOR` disables this; persistent logs never
+contain ANSI colour codes.
 
 `--row-rounds` limits inner row generation per column round; a stage that does
 not converge there is UNRESOLVED regardless of its floating-point objective.

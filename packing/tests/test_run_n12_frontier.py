@@ -24,6 +24,7 @@ def state(tmp_path: Path) -> dict:
         "budgets": [1, 2, 3, 4],
         "row_rounds": 60,
         "scale": frontier.DEFAULT_RATIONALISATION_SCALE,
+        "max_scale": frontier.DEFAULT_MAX_RATIONALISATION_SCALE,
         "target_width": None,
         "max_cycles": None,
         "root": tmp_path,
@@ -97,6 +98,42 @@ def test_scale_limited_unresolved_is_retried_before_bisection(tmp_path: Path) ->
     coarse["objective"] = 12.001
     assert frontier.next_side(saved) == Fraction(1585, 400)
 
+    coarse["objective"] = 11.9962
+    coarse["settings"]["scale"] = frontier.DEFAULT_MAX_RATIONALISATION_SCALE
+    assert frontier.next_side(saved) == Fraction(1585, 400)
+
+
+def test_better_verified_seed_alone_does_not_repeat_unresolved_side(tmp_path: Path) -> None:
+    saved = state(tmp_path)
+    side = Fraction(793, 200)
+    settled = result(side, objective=12.01, mass="1201/100")
+    saved["unresolved"] = [str(side)]
+    saved["cycles"].append(
+        {
+            "side": str(side),
+            "status": "UNRESOLVED",
+            "seed_verified_low": saved["verified_low"],
+            "stages": [{"status": "complete", "result": settled}],
+        }
+    )
+    saved["verified_low"] = "3961/1000"
+    assert frontier.next_side(saved) == (
+        Fraction(3961, 1000) + side
+    ) / 2
+
+
+def test_rationalisation_scale_refines_only_when_rounding_is_blocker() -> None:
+    side = Fraction(793, 200)
+    rounded = result(side, objective=11.9994, mass="19200023/1600000")
+    assert frontier.next_refinement_scale(rounded, 1_600_000, 25_600_000) == 3_200_000
+    assert frontier.next_refinement_scale(rounded, 25_600_000, 25_600_000) is None
+
+    lp_high = result(side, objective=12.0001, mass="12001/1000")
+    assert frontier.next_refinement_scale(lp_high, 1_600_000, 25_600_000) is None
+
+    already_below = result(side, objective=11.9994, mass="11999/1000")
+    assert frontier.next_refinement_scale(already_below, 1_600_000, 25_600_000) is None
+
 
 def test_transitions_and_full_gate_invariant(tmp_path: Path) -> None:
     saved = state(tmp_path)
@@ -160,14 +197,21 @@ def test_atomic_state_roundtrip_and_validation(tmp_path: Path) -> None:
 
     legacy = state(tmp_path)
     legacy["config"].pop("scale")
+    legacy["config"].pop("max_scale")
     frontier.save_state(tmp_path, legacy)
     upgraded = frontier.load_state(
         tmp_path,
-        {**legacy["config"], "scale": frontier.DEFAULT_RATIONALISATION_SCALE},
+        {
+            **legacy["config"],
+            "scale": frontier.DEFAULT_RATIONALISATION_SCALE,
+            "max_scale": frontier.DEFAULT_MAX_RATIONALISATION_SCALE,
+        },
     )
     assert upgraded["config"]["scale"] == frontier.DEFAULT_RATIONALISATION_SCALE
-    assert upgraded["migrations"][-1]["from"] == frontier.LEGACY_RATIONALISATION_SCALE
-    assert upgraded["migrations"][-1]["to"] == frontier.DEFAULT_RATIONALISATION_SCALE
+    assert upgraded["config"]["max_scale"] == frontier.DEFAULT_MAX_RATIONALISATION_SCALE
+    assert upgraded["migrations"][-2]["from"] == frontier.LEGACY_RATIONALISATION_SCALE
+    assert upgraded["migrations"][-2]["to"] == frontier.DEFAULT_RATIONALISATION_SCALE
+    assert upgraded["migrations"][-1]["kind"] == "max-rationalisation-scale"
 
     saved = state(tmp_path)
     saved["schema"] = 1
@@ -401,6 +445,17 @@ def test_full_gate_output_and_target_side_required(
     assert Path(verified).exists()
     assert Path(verified).name == "candidate.verified-2.json"
     assert not (tmp_path / "candidate.pending-verification-2.json").exists()
+
+
+def test_significant_output_is_blue_only_on_terminal(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    monkeypatch.setenv("FORCE_COLOR", "1")
+    frontier.emit(tmp_path, "[result] significant", significant=True)
+    terminal = capsys.readouterr().out
+    assert frontier.BLUE in terminal
+    assert frontier.RESET in terminal
+    assert "\033[" not in (tmp_path / "runner.log").read_text(encoding="utf-8")
 
 
 def test_lock_rejects_second_runner(tmp_path: Path) -> None:
