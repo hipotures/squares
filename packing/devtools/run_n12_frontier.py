@@ -202,26 +202,27 @@ def stage_scale(stage: dict[str, Any]) -> int | None:
 
 
 def scale_limited_unresolved(cycle: dict[str, Any], target_scale: int) -> bool:
-    """Whether finer weight snapping can change this unresolved verdict."""
+    """Whether the finest attempted grid still leaves rationalisation as the blocker."""
 
     if cycle.get("status") != "UNRESOLVED":
         return False
+    finest_scale = -1
+    finest_result: dict[str, Any] | None = None
     for stage in reversed(cycle.get("stages") or []):
-        result = stage.get("result") or {}
         used_scale = stage_scale(stage)
-        objective = result.get("objective") if isinstance(result, dict) else None
-        mass = result.get("total_mass") if isinstance(result, dict) else None
+        result = stage.get("result") or {}
         if (
             used_scale is not None
-            and used_scale < target_scale
-            and isinstance(objective, int | float)
-            and math.isfinite(objective)
-            and objective < 12
-            and mass is not None
-            and Fraction(mass) >= 12
+            and used_scale > finest_scale
+            and isinstance(result, dict)
         ):
-            return True
-    return False
+            finest_scale = used_scale
+            finest_result = result
+    return (
+        finest_result is not None
+        and finest_scale < target_scale
+        and scale_limited_result(finest_result)
+    )
 
 
 def next_side(state: dict[str, Any]) -> Fraction | None:
