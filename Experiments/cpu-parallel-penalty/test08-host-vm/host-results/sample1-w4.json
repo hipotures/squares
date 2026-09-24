@@ -1,0 +1,84 @@
+{
+  "label": "sample1",
+  "workers": 4,
+  "repeats": 232,
+  "load_before": {
+    "utc": "2026-09-24T07:12:32Z",
+    "loadavg": [
+      1.77978515625,
+      0.8251953125,
+      0.37939453125
+    ],
+    "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.00 total=61499734\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+  },
+  "native": {
+    "workers": 4,
+    "repeats": 232,
+    "directions": 181,
+    "wall": 15.602764383,
+    "max_worker_wall": 15.602716103,
+    "worker_cpu": 62.319819226,
+    "calls": 41992,
+    "checksum": "a16b5bf2520685d3",
+    "workers_detail": [
+      {
+        "cpu": 0,
+        "pid": 224449,
+        "wall": 15.602716103,
+        "cpu_time": 15.602064719,
+        "calls": 10672,
+        "checksum": "a8c40d56dc5a39b5"
+      },
+      {
+        "cpu": 1,
+        "pid": 224450,
+        "wall": 15.574865952,
+        "cpu_time": 15.574241457,
+        "calls": 10440,
+        "checksum": "f354714b0b1da9a5"
+      },
+      {
+        "cpu": 2,
+        "pid": 224451,
+        "wall": 15.569752002,
+        "cpu_time": 15.569650652,
+        "calls": 10440,
+        "checksum": "bb17d4c248150c35"
+      },
+      {
+        "cpu": 3,
+        "pid": 224452,
+        "wall": 15.573920426,
+        "cpu_time": 15.573862398,
+        "calls": 10440,
+        "checksum": "be5ba3fcb0111405"
+      }
+    ]
+  },
+  "external_wall": 15.603766027998063,
+  "command": [
+    "/root/squares-cpu-penalty-test08/replay",
+    "--data",
+    "/root/squares-cpu-penalty-test08/data.bin",
+    "--workers",
+    "4",
+    "--repeats",
+    "232"
+  ],
+  "perf_events_requested": "instructions,cycles,ls_any_fills_from_sys.all_dram_io",
+  "perf_counters": {
+    "instructions": {
+      "count": 616435276353.0,
+      "running_percent": 100.0
+    },
+    "cycles": {
+      "count": 297973899105.0,
+      "running_percent": 100.0
+    },
+    "ls_any_fills_from_sys.all_dram_io": {
+      "count": 31458434.0,
+      "running_percent": 100.0
+    }
+  },
+  "perf_stderr": ""
+}

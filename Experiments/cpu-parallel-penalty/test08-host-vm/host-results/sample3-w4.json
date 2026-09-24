@@ -1,0 +1,84 @@
+{
+  "label": "sample3",
+  "workers": 4,
+  "repeats": 232,
+  "load_before": {
+    "utc": "2026-09-24T07:13:06Z",
+    "loadavg": [
+      2.73583984375,
+      1.146484375,
+      0.5009765625
+    ],
+    "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.00 total=61504506\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+  },
+  "native": {
+    "workers": 4,
+    "repeats": 232,
+    "directions": 181,
+    "wall": 15.620242923,
+    "max_worker_wall": 15.620192383,
+    "worker_cpu": 62.442702665,
+    "calls": 41992,
+    "checksum": "a16b5bf2520685d3",
+    "workers_detail": [
+      {
+        "cpu": 0,
+        "pid": 224572,
+        "wall": 15.620192383,
+        "cpu_time": 15.619749775,
+        "calls": 10672,
+        "checksum": "a8c40d56dc5a39b5"
+      },
+      {
+        "cpu": 1,
+        "pid": 224573,
+        "wall": 15.606852165,
+        "cpu_time": 15.606285351,
+        "calls": 10440,
+        "checksum": "f354714b0b1da9a5"
+      },
+      {
+        "cpu": 2,
+        "pid": 224574,
+        "wall": 15.605425131,
+        "cpu_time": 15.605387414,
+        "calls": 10440,
+        "checksum": "bb17d4c248150c35"
+      },
+      {
+        "cpu": 3,
+        "pid": 224575,
+        "wall": 15.611590647,
+        "cpu_time": 15.611280125,
+        "calls": 10440,
+        "checksum": "be5ba3fcb0111405"
+      }
+    ]
+  },
+  "external_wall": 15.621385008998914,
+  "command": [
+    "/root/squares-cpu-penalty-test08/replay",
+    "--data",
+    "/root/squares-cpu-penalty-test08/data.bin",
+    "--workers",
+    "4",
+    "--repeats",
+    "232"
+  ],
+  "perf_events_requested": "instructions,cycles,ls_any_fills_from_sys.all_dram_io",
+  "perf_counters": {
+    "instructions": {
+      "count": 616432726566.0,
+      "running_percent": 100.0
+    },
+    "cycles": {
+      "count": 297534886011.0,
+      "running_percent": 100.0
+    },
+    "ls_any_fills_from_sys.all_dram_io": {
+      "count": 24045543.0,
+      "running_percent": 100.0
+    }
+  },
+  "perf_stderr": ""
+}

@@ -1,0 +1,68 @@
+{
+  "label": "sample2",
+  "workers": 2,
+  "repeats": 209,
+  "load_before": {
+    "utc": "2026-09-24T07:11:35Z",
+    "loadavg": [
+      1.39501953125,
+      0.560546875,
+      0.26806640625
+    ],
+    "cpu_pressure": "some avg10=0.00 avg60=0.00 avg300=0.00 total=61492491\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+  },
+  "native": {
+    "workers": 2,
+    "repeats": 209,
+    "directions": 181,
+    "wall": 27.58736571,
+    "max_worker_wall": 27.58730527,
+    "worker_cpu": 55.049374382,
+    "calls": 37829,
+    "checksum": "6030510151bba741",
+    "workers_detail": [
+      {
+        "cpu": 0,
+        "pid": 224284,
+        "wall": 27.58730527,
+        "cpu_time": 27.58551825,
+        "calls": 19019,
+        "checksum": "2e46df4eaee628fc"
+      },
+      {
+        "cpu": 1,
+        "pid": 224285,
+        "wall": 27.464156961,
+        "cpu_time": 27.463856132,
+        "calls": 18810,
+        "checksum": "42b183a8f70709f4"
+      }
+    ]
+  },
+  "external_wall": 27.588534454000182,
+  "command": [
+    "/root/squares-cpu-penalty-test08/replay",
+    "--data",
+    "/root/squares-cpu-penalty-test08/data.bin",
+    "--workers",
+    "2",
+    "--repeats",
+    "209"
+  ],
+  "perf_events_requested": "instructions,cycles,ls_any_fills_from_sys.all_dram_io",
+  "perf_counters": {
+    "instructions": {
+      "count": 555355676111.0,
+      "running_percent": 100.0
+    },
+    "cycles": {
+      "count": 271162443430.0,
+      "running_percent": 100.0
+    },
+    "ls_any_fills_from_sys.all_dram_io": {
+      "count": 234207.0,
+      "running_percent": 100.0
+    }
+  },
+  "perf_stderr": ""
+}

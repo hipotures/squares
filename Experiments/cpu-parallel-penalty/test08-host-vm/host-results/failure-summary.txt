@@ -1,0 +1,3 @@
+command=python3 run.py --outdir host-results
+package_sha256=515f1414fc7adee48f7f49eea2cc0637135b271dec33ce9fc9e8c4ec63b26a26
+failure=workers 8 sample 1 wall 7.902868434 seconds (<10 seconds)

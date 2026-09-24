@@ -1,0 +1,19 @@
+{"label": "sample1", "workers": 1, "repeats": 131, "wall": 34.530664094, "worker_cpu": 34.528023028, "checksum": "1945dec119158f0f"}
+{"label": "sample2", "workers": 1, "repeats": 131, "wall": 34.519925456, "worker_cpu": 34.517347718, "checksum": "1945dec119158f0f"}
+{"label": "sample3", "workers": 1, "repeats": 131, "wall": 34.509959886, "worker_cpu": 34.507433033, "checksum": "1945dec119158f0f"}
+{"label": "sample1", "workers": 2, "repeats": 209, "wall": 27.581684042, "worker_cpu": 55.066328689, "checksum": "6030510151bba741"}
+{"label": "sample2", "workers": 2, "repeats": 209, "wall": 27.58736571, "worker_cpu": 55.049374382, "checksum": "6030510151bba741"}
+{"label": "sample3", "workers": 2, "repeats": 209, "wall": 27.578407924, "worker_cpu": 55.052273514, "checksum": "6030510151bba741"}
+{"label": "sample1", "workers": 4, "repeats": 232, "wall": 15.602764383, "worker_cpu": 62.319819226, "checksum": "a16b5bf2520685d3"}
+{"label": "sample2", "workers": 4, "repeats": 232, "wall": 15.630268124, "worker_cpu": 62.433136533, "checksum": "a16b5bf2520685d3"}
+{"label": "sample3", "workers": 4, "repeats": 232, "wall": 15.620242923, "worker_cpu": 62.442702665, "checksum": "a16b5bf2520685d3"}
+Traceback (most recent call last):
+  File "/root/squares-cpu-penalty-test08/run.py", line 190, in <module>
+    main()
+    ~~~~^^
+  File "/root/squares-cpu-penalty-test08/run.py", line 183, in main
+    result = once(workers, repeats, args.outdir, f"sample{sample}", True)
+  File "/root/squares-cpu-penalty-test08/run.py", line 129, in once
+    assert 10 <= result["wall"] <= 60, result["wall"]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 7.902868434
