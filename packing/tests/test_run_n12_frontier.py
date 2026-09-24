@@ -1,0 +1,322 @@
+"""Short contract tests for the persistent n=12 frontier driver."""
+
+from __future__ import annotations
+
+import json
+import signal
+from fractions import Fraction
+from pathlib import Path
+
+import pytest
+
+from devtools import run_n12_frontier as frontier
+
+
+def state(tmp_path: Path) -> dict:
+    config = {
+        "verified_low": "99/25",
+        "search_high": "397/100",
+        "seed_certificate": str(frontier.DEFAULT_SEED),
+        "workers": 1,
+        "budgets": [1, 2, 3, 4],
+        "target_width": None,
+        "max_cycles": None,
+        "root": tmp_path,
+    }
+    return frontier.initial_state(config, frontier.DEFAULT_SEED)
+
+
+def result(side: Fraction, *, objective: float = 12.5, mass: str = "25/2") -> dict:
+    return {
+        "settings": {"n": 12, "outer_side": str(side), "column_rounds": 1},
+        "objective": objective,
+        "total_mass": mass,
+        "atoms": 3,
+        "seconds": 0.1,
+        "rounds": [
+            {"objective": objective, "averaged_depth": 1.0, "added": 0},
+        ],
+    }
+
+
+def fake_child(args: list[str], output: Path, _env: dict | None = None) -> int:
+    output.write_text("many detailed LP rounds stay here\n", encoding="utf-8")
+    side = Fraction(args[args.index("--side") + 1])
+    target = Path(args[args.index("--json") + 1])
+    target.write_text(json.dumps(result(side)), encoding="utf-8")
+    return 0
+
+
+def test_exact_midpoint_and_unresolved_soft_ceiling(tmp_path: Path) -> None:
+    saved = state(tmp_path)
+    assert frontier.next_side(saved) == Fraction(793, 200)
+    saved["unresolved"] = ["793/200"]
+    assert frontier.soft_high(saved) == Fraction(793, 200)
+    assert frontier.next_side(saved) == Fraction(1585, 400)
+
+
+def test_transitions_and_full_gate_invariant(tmp_path: Path) -> None:
+    saved = state(tmp_path)
+    with pytest.raises(ValueError, match="full exact gate"):
+        frontier.apply_result(saved, {"side": "793/200", "status": "VERIFIED"})
+    frontier.apply_result(saved, {"side": "793/200", "status": "UNRESOLVED"})
+    assert saved["unresolved"] == ["793/200"]
+    frontier.apply_result(saved, {"side": "1585/400", "status": "SEARCH_FAILED"})
+    assert saved["search_high"] == "317/80"
+    assert saved["search_high_kind"] == "SEARCH_FAILED"
+    assert frontier.active_unresolved(saved) == []
+    frontier.apply_result(
+        saved,
+        {
+            "side": "3961/1000",
+            "status": "VERIFIED",
+            "verifier": "full-retainable",
+            "verified_candidate": str(tmp_path / "proof.json"),
+        },
+    )
+    assert saved["verified_low"] == "3961/1000"
+    assert saved["unresolved"] == ["793/200"]
+
+
+def test_adaptive_policy_uses_multiple_signals() -> None:
+    budgets = [1, 2, 3, 4]
+    stalled = result(Fraction(793, 200))
+    assert frontier.decide_stage(stalled, 0, budgets, nearby=False)[0] == "SEARCH_FAILED"
+    close = result(Fraction(793, 200), objective=12.004, mass="1201/100")
+    assert frontier.decide_stage(close, 0, budgets, nearby=False)[0] == "ESCALATE"
+    assert frontier.decide_stage(close, 3, budgets, nearby=False)[0] == "UNRESOLVED"
+    improving = result(Fraction(793, 200), objective=12.1)
+    improving["rounds"] = [
+        {"objective": 12.2, "averaged_depth": 1.01, "added": 2},
+        {"objective": 12.1, "averaged_depth": 1.01, "added": 1},
+    ]
+    assert frontier.decide_stage(improving, 0, budgets, nearby=False)[0] == "ESCALATE"
+
+
+def test_atomic_state_roundtrip_and_validation(tmp_path: Path) -> None:
+    saved = state(tmp_path)
+    frontier.save_state(tmp_path, saved)
+    assert frontier.load_state(tmp_path, saved["config"])["verified_low"] == "99/25"
+    assert frontier.load_state(tmp_path, {**saved["config"], "max_cycles": 3})["n"] == 12
+    assert not list(tmp_path.glob("*.tmp"))
+    with pytest.raises(ValueError, match="settings differ"):
+        frontier.load_state(tmp_path, {"workers": 8})
+
+
+def test_import_prior_search_result(tmp_path: Path) -> None:
+    saved = state(tmp_path)
+    source = tmp_path / "prior.json"
+    source.write_text(json.dumps(result(Fraction(397, 100))), encoding="utf-8")
+    frontier.import_result(tmp_path, saved, source)
+    assert saved["search_high_kind"] == "SEARCH_FAILED"
+    assert saved["cycles"][0]["status"] == "SEARCH_FAILED"
+    assert (tmp_path / "L-397-100/cycle-0001/import/result.json").exists()
+
+
+def test_resume_after_completed_stage(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    saved = state(tmp_path)
+    side = frontier.next_side(saved)
+    assert side is not None
+    saved["cycles"].append(
+        {
+            "side": str(side),
+            "status": "RUNNING",
+            "stages": [
+                {
+                    "status": "complete",
+                    "decision": "SEARCH_FAILED",
+                    "reason": "stalled",
+                    "name": "screen",
+                    "budget": 1,
+                    "seed_label": "verified",
+                }
+            ],
+        }
+    )
+    saved["active"] = 0
+    monkeypatch.setattr(frontier, "run_child", lambda *_args: pytest.fail("reran stage"))
+    frontier.run_cycle(tmp_path, saved)
+    assert saved["active"] is None
+    assert saved["search_high"] == str(side)
+
+
+def test_resume_incomplete_stage_with_result(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    saved = state(tmp_path)
+    side = frontier.next_side(saved)
+    assert side is not None
+    directory = tmp_path / "old-stage"
+    directory.mkdir()
+    (directory / "result.json").write_text(json.dumps(result(side)), encoding="utf-8")
+    saved["cycles"].append(
+        {
+            "side": str(side),
+            "status": "RUNNING",
+            "seed_verified_low": saved["verified_low"],
+            "stages": [
+                {
+                    "status": "running",
+                    "directory": str(directory),
+                    "name": "screen",
+                    "budget": 1,
+                    "seed_label": "verified",
+                }
+            ],
+        }
+    )
+    saved["active"] = 0
+    monkeypatch.setattr(frontier, "run_child", lambda *_args: pytest.fail("reran stage"))
+    frontier.run_cycle(tmp_path, saved)
+    assert saved["cycles"][0]["status"] == "SEARCH_FAILED"
+    assert (directory / "result.json").exists()
+
+
+def test_resume_incomplete_stage_without_result_keeps_files(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    saved = state(tmp_path)
+    side = frontier.next_side(saved)
+    assert side is not None
+    directory = tmp_path / "old-stage"
+    directory.mkdir()
+    (directory / "stdout.log").write_text("partial evidence", encoding="utf-8")
+    saved["cycles"].append(
+        {
+            "side": str(side),
+            "status": "RUNNING",
+            "seed_verified_low": saved["verified_low"],
+            "stages": [
+                {
+                    "status": "running",
+                    "directory": str(directory),
+                    "name": "screen",
+                    "budget": 1,
+                    "seed_label": "verified",
+                }
+            ],
+        }
+    )
+    saved["active"] = 0
+    monkeypatch.setattr(frontier, "run_child", fake_child)
+    frontier.run_cycle(tmp_path, saved)
+    assert saved["cycles"][0]["stages"][0]["status"] == "interrupted"
+    assert (directory / "stdout.log").read_text(encoding="utf-8") == "partial evidence"
+    assert saved["cycles"][0]["status"] == "SEARCH_FAILED"
+
+
+def test_stop_finishes_cycle_and_console_is_concise(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    def stop_after_stage(args: list[str], output: Path, env: dict | None = None) -> int:
+        signal.raise_signal(signal.SIGINT)
+        return fake_child(args, output, env)
+
+    monkeypatch.setattr(frontier, "run_child", stop_after_stage)
+    assert (
+        frontier.main(
+            [
+                "--root",
+                str(tmp_path),
+                "--screen-rounds",
+                "1",
+                "--normal-rounds",
+                "2",
+                "--deep-rounds",
+                "3",
+                "--max-rounds",
+                "4",
+            ]
+        )
+        == 0
+    )
+    saved = frontier.load_state(tmp_path)
+    assert len(saved["cycles"]) == 1
+    assert saved["cycles"][0]["status"] == "SEARCH_FAILED"
+    output = capsys.readouterr().out
+    assert "[stop]" in output
+    assert "many detailed LP rounds" not in output
+    assert "cycles completed: 1" in output
+    assert "next suggested L:" in output
+    assert (tmp_path / "summary.csv").exists()
+    assert (tmp_path / "report.md").exists()
+
+
+def test_cli_resume_keeps_completed_frontier(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(frontier, "run_child", fake_child)
+    options = [
+        "--root",
+        str(tmp_path),
+        "--screen-rounds",
+        "1",
+        "--normal-rounds",
+        "2",
+        "--deep-rounds",
+        "3",
+        "--max-rounds",
+        "4",
+        "--max-cycles",
+        "1",
+    ]
+    assert frontier.main(options) == 0
+    first = frontier.load_state(tmp_path)
+    assert len(first["cycles"]) == 1
+    monkeypatch.setattr(
+        frontier, "run_child", lambda *_args: pytest.fail("unexpected new stage")
+    )
+    assert frontier.main([*options, "--resume"]) == 0
+    assert frontier.load_state(tmp_path)["cycles"] == first["cycles"]
+    monkeypatch.setattr(frontier, "run_child", fake_child)
+    assert frontier.main([*options[:-1], "2", "--resume"]) == 0
+    assert len(frontier.load_state(tmp_path)["cycles"]) == 2
+
+
+def test_unverified_candidate_is_only_search_seed(tmp_path: Path) -> None:
+    saved = state(tmp_path)
+    candidate = tmp_path / "candidate.unverified.json"
+    candidate.write_text("{}", encoding="utf-8")
+    saved["cycles"].append(
+        {
+            "side": "793/200",
+            "status": "UNRESOLVED",
+            "stages": [{"candidate_unverified": str(candidate)}],
+        }
+    )
+    path, label = frontier.seed_for(saved, Fraction(1587, 400))
+    assert path == candidate
+    assert label.startswith("search-seed-only")
+    assert saved["verified_certificate"] == str(frontier.DEFAULT_SEED)
+
+
+def test_full_gate_output_and_target_side_required(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    candidate = tmp_path / "candidate.unverified.json"
+    candidate.write_text(
+        json.dumps({"n": 12, "outer_side": "793/200", "total_mass": "119/10"}),
+        encoding="utf-8",
+    )
+
+    def inconclusive(_args: list[str], output: Path) -> int:
+        output.write_text("quick route accepted\n", encoding="utf-8")
+        return 0
+
+    monkeypatch.setattr(frontier, "run_child", inconclusive)
+    assert (
+        frontier.verify_candidate(tmp_path, candidate, Fraction(793, 200))[0] == "full-rejected"
+    )
+    assert (
+        frontier.verify_candidate(tmp_path, candidate, Fraction(397, 100))[0]
+        == "candidate-side-mismatch"
+    )
+
+
+def test_lock_rejects_second_runner(tmp_path: Path) -> None:
+    with (
+        frontier.locked(tmp_path),
+        pytest.raises(RuntimeError, match="another frontier runner"),
+        frontier.locked(tmp_path),
+    ):
+        pass
