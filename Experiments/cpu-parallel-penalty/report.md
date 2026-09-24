@@ -2,7 +2,7 @@
 
 Research starting point: `897b722f2997fbf09b99b1700787a0052270de30`
 on `main`; accepted production integration `011aa1b5` is an ancestor.
-The campaign is in Phase A. Tests 4–8 and final synthesis remain pending.
+Phases A and B are complete. Tests 7–8 and final synthesis remain pending.
 
 ## Phase A evidence so far
 
@@ -106,6 +106,136 @@ adjacent controls instead of being silently dropped.
 **Phase A checkpoint classification: MIXED, dominated by more cycles for
 nearly the same instructions.** Concurrency increases DRAM-origin cache fills
 and lowers IPC; host placement and runtime/kernel work contribute less.
-Tests 4–6 will test interference, working-set sensitivity, and translation
-mechanisms before attributing the fill increase to a particular shared
-resource.
+Phase B below tests interference, working-set sensitivity, and translation
+without treating the fill increase as proof of physical DDR saturation.
+
+## Phase B: interference, active footprint, and translation
+
+All screen cells have a timed region of at least 10.5 seconds. Every result
+used quantitatively below has three independent 20-second samples. The
+target and backgrounds are pinned to distinct visible guest vCPUs, input is
+prepared and warmed before timing, and `perf` event running fractions are
+at least 99.5%. Complete min/median/max/CV and raw counter receipts are in
+the test directories. The table uses target CPU time per call; its ratio
+to target wall time is close to one except for the heaviest streaming cases.
+
+### Test 4: phase interference
+
+The 90-cell screen covered five targets, six background types, and three
+background counts. All 33 cells whose screen wall time increased at least
+20% received three long repeats, as did the five idle controls. Four long
+register-target controls and three different-input controls were also run.
+
+| Target | Background, count | Idle median (ms/call) | Loaded median (ms/call) | Slowdown | Loaded CV | IPC idle → loaded |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| Register | streaming, 14 | 1.605 | 1.852 | 1.15× | 1.5% | 1.44 → 1.42 |
+| Prefix | streaming, 8 | 2.342 | 9.069 | 3.87× | 7.5% | 0.884 → 0.260 |
+| Prefix | prefix, 8 | 2.342 | 4.450 | 1.90× | 7.9% | 0.884 → 0.514 |
+| Slab | slab, 14 | 0.550 | 1.199 | 2.18× | 2.0% | 2.66 → 1.37 |
+| Slab | prefix, 8 | 0.550 | 2.630 | 4.78× | 11.0% | 2.66 → 0.600 |
+| Top-13 | streaming, 14 | 0.411 | 2.342 | 5.70× | 8.8% | 4.91 → 0.952 |
+| Complete direction | prefix, 8 | 3.485 | 7.713 | 2.21× | 1.7% | 1.685 → 0.831 |
+
+The compute-only register target increased only 13–17% under the four
+14-worker memory backgrounds. That is an upper guide to generic all-core
+frequency/throughput loss in this test, well below the 1.90–5.70× changes in
+data-intensive targets. Target instructions per call remain close to their
+idle values; the large differences are predominantly cycles/IPC and
+system-origin cache fills. For example, prefix under eight streaming workers
+rose from about 84 to 76,000 DRAM-origin fills per call. These are cache-fill
+events, **not** measured physical DDR bytes or DDR saturation.
+
+The first screen shared its read-only input pages through `fork` while each
+worker had private output. With 14 *different real retained directions* in
+the background, the prefix target took 5.51–5.82 ms/call (median 5.60), or
+2.39× idle; the shared-input prefix control had median 2.89 ms (1.23× idle).
+Thus shared input can hide interference. Different-input top-13 had median
+0.480 ms (1.17× idle), about the same as the register control, while
+different-input slab was variable (0.856–1.669 ms); no precise slab
+different-input effect is claimed. Extremely loaded streaming/slab cases
+also showed high CV or bimodal samples, so they establish susceptibility,
+not a precise whole-solver contribution.
+
+### Test 5: footprint and full-grid controls
+
+The current prefix and native top-13 kernels were screened at nine active
+sizes from 256 KiB to 32 MiB with 1, 4, 8, and 16 pinned workers. The
+screen uses representative real values, with tiling/repetition of input
+values only when a requested array exceeds the captured one. The following
+working-set knees were repeated for three 20-second samples per endpoint:
+
+| Kernel | Active bytes per worker | 1-worker CPU (ms/call) | 16-worker CPU (ms/call) | 16/1 inflation |
+| --- | ---: | ---: | ---: | ---: |
+| Prefix | 2 MiB | 0.633 | 0.743 | 1.17× |
+| Prefix | 8 MiB | 2.568 | 5.801 | 2.26× |
+| Prefix | 16 MiB | 6.700 | 25.96 | 3.88× |
+| Top-13 | 4 MiB | 0.299 | 0.343 | 1.15× |
+| Top-13 | 16 MiB | 1.181 | 2.870 | 2.43× |
+| Top-13 | 32 MiB | 2.374 | 8.019 | 3.38× |
+
+The full size screen shows the transition rather than a single threshold:
+prefix inflation is 1.32× at 4 MiB, 2.25× at 8 MiB, and 4.42× at 32 MiB;
+top-13 inflation is 1.23× at 8 MiB, 1.48× at 12 MiB, and 3.33× at 32 MiB.
+Physical host topology reports two L3 domains totaling 128 MiB. The size
+dependence is direct causal evidence for active working-set/shared-resource
+pressure. It does not by itself distinguish last-level cache capacity from
+physical memory throughput, and the two domains need not have equal size.
+
+A research-only row-strip version of the *same full real grid* passed 3,620
+bitwise comparisons over 905 captured grids and about 3.0 billion cells.
+Its three long samples gave:
+
+| Full-grid prefix | 1-worker CPU (ms/call) | 16-worker CPU (ms/call) | 16-worker change |
+| --- | ---: | ---: | ---: |
+| Current two-pass order | 2.309 | 4.701 | Control |
+| 64-row strips | 2.345 | 4.153 | 0.548 ms/call faster (11.7%) |
+| 32-row strips | 2.378 | 4.224 | 0.477 ms/call faster (10.1%) |
+
+The 64-row variant is 1.6% slower serially. Its 16-worker kernel benefit
+suggests a smaller active footprint helps, but no complete separation/solver
+speedup is claimed at this checkpoint. Physical row-stride padding of 4, 32,
+64, or 256 columns passed bitwise full-grid checks and gave no improvement in
+the long screen: at 16 workers the baseline was 4.52 ms/call and every
+padded variant was 4.80–5.78 ms/call. Padding is therefore not supported as
+a next target; those negative comparisons are screens, not three-sample
+effect estimates.
+
+### Test 6: address translation
+
+The normal-page control and `MADV_HUGEPAGE` variant used the same prefaulted
+real full-grid copy and current prefix, with 2 MiB-aligned anonymous buffers.
+Each worker's `smaps` showed 0 KiB `AnonHugePages` in the normal case and
+at least 32 MiB in the huge-page case before timing. Full-grid SHA-256 and
+output values matched; all event groups ran at 100% enabled time. Three
+adjacent 20-second pairs at each worker count gave:
+
+| Workers | Normal CPU (ms/call) | Huge-page CPU (ms/call) | Huge/normal | L1 DTLB misses that miss L2, normal → huge per call |
+| ---: | ---: | ---: | ---: | ---: |
+| 1 | 2.355 | 2.310 | 0.981× | 5,657 → 1,220 |
+| 16 | 4.640 | 4.816 | 1.038× | 4,731 → 1,832 |
+
+The huge-page path lowers this DTLB event 78% serial and 61% at 16 workers,
+and lowers DRAM-origin fills per call at 16 workers about 13%. It provides
+**no 16-worker CPU-time saving** in any of the three paired samples. Cycles
+per worker call fall about 2.8% while elapsed CPU time rises about 3.8%,
+which may reflect host/guest frequency, placement, or other changed memory
+behavior; these counters cannot isolate that. Minor faults during timing are
+near 0.02/call in both 16-worker modes, so page allocation is not the
+measured scaling mechanism in this prefaulted control. Address translation
+has measurable event cost, but this experiment refutes huge pages as a
+straightforward wall-time solution to the 16-worker penalty.
+
+### Phase B causal ranking
+
+| Mechanism | Interim evidence | Classification |
+| --- | --- | --- |
+| General all-core compute/frequency | Register target slows 13–17%, far less than memory targets | **WEAKLY SUPPORTED** as secondary |
+| Shared cache / active working set | 1.17× → 3.88× prefix inflation as active data grows; bitwise row strips improve 16-worker kernel 11.7%; different input worsens prefix | **STRONGLY SUPPORTED** |
+| Shared memory subsystem | Streaming backgrounds strongly raise cycles and DRAM-origin fills; complete direction 2.21× under prefix peers | **STRONGLY SUPPORTED**, precise DDR contribution unresolved |
+| TLB/address translation | Verified huge pages reduce DTLB misses 61% at 16 workers but do not improve CPU time | **WEAKLY SUPPORTED** as a small/overlapping cost |
+| Row layout/padding | No padded full-grid variant improved the long screen | **REFUTED** as an obvious gain for tested strides |
+| Allocation/page churn | Prefaulted normal and huge buffers have similar small timed minor faults | **WEAKLY SUPPORTED** at most for this control; whole replay unresolved |
+
+The shared-cache and memory-subsystem rows overlap; they are not additive
+parts of the 12.85-second worker-CPU increase. Phase C will quantify
+scheduling tails before any final attribution.

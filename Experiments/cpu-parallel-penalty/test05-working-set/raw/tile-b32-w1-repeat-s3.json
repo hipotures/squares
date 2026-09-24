@@ -1,0 +1,35 @@
+{
+  "workers": 1,
+  "block_rows": 32,
+  "sample": 3,
+  "tag": "repeat",
+  "target_seconds": 20.0,
+  "batch_wall": 20.011301423997793,
+  "grid_shape": [
+    980,
+    980
+  ],
+  "grid_bytes": 7683200,
+  "sha256": "8893bace91cb7a79a1a4323dc2efca656c6fbd891be9950196f371930d437cff",
+  "load_before": {
+    "loadavg": [
+      1.333984375,
+      4.6181640625,
+      7.02294921875
+    ],
+    "cpu_pressure": "some avg10=0.00 avg60=0.08 avg300=0.85 total=285795845\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+  },
+  "records": [
+    {
+      "cpu_id": 0,
+      "calls": 8410,
+      "wall": 20.001667910000833,
+      "cpu": 19.99,
+      "wall_per_call": 0.0023783196087991476,
+      "cpu_per_call": 0.0023769322235434004,
+      "sha256": "8893bace91cb7a79a1a4323dc2efca656c6fbd891be9950196f371930d437cff"
+    }
+  ],
+  "median_cpu_per_call": 0.0023769322235434004,
+  "median_wall_per_call": 0.0023783196087991476
+}

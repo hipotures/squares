@@ -1,0 +1,36 @@
+{
+  "kind": "prefix",
+  "requested_bytes": 8388608,
+  "actual_bytes": 8388608,
+  "shape": [
+    1024,
+    1024
+  ],
+  "workers": 1,
+  "sample": 3,
+  "tag": "repeat",
+  "target_seconds": 20.0,
+  "wall": 20.01530761900358,
+  "load_before": {
+    "loadavg": [
+      7.02685546875,
+      8.41015625,
+      8.232421875
+    ],
+    "cpu_pressure": "some avg10=0.07 avg60=1.83 avg300=2.37 total=299808016\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+  },
+  "records": [
+    {
+      "cpu_id": 0,
+      "calls": 7784,
+      "wall": 20.00066418300412,
+      "cpu": 19.99,
+      "wall_per_call": 0.0025694583996665105,
+      "cpu_per_call": 0.00256808838643371,
+      "checksum": "9c7dc860db8fbd15d1f26ff0df6c5825ee4bd63b8a8b148f67da8798d52d8f83",
+      "output": -2.498001805406602e-16
+    }
+  ],
+  "median_wall_per_call": 0.0025694583996665105,
+  "median_cpu_per_call": 0.00256808838643371
+}

@@ -1,0 +1,23 @@
+{
+  "rounds": [
+    0,
+    1,
+    10,
+    18,
+    22
+  ],
+  "directions_per_round": 181,
+  "grids": 905,
+  "variants_per_grid": 4,
+  "bitwise_checks": 3620,
+  "cells_compared": 3002715008,
+  "shape_min": [
+    108,
+    108
+  ],
+  "shape_max": [
+    1248,
+    1248
+  ],
+  "passed": true
+}

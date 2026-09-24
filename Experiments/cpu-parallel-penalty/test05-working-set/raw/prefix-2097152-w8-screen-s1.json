@@ -1,0 +1,106 @@
+{
+  "kind": "prefix",
+  "requested_bytes": 2097152,
+  "actual_bytes": 2097152,
+  "shape": [
+    512,
+    512
+  ],
+  "workers": 8,
+  "sample": 1,
+  "tag": "screen",
+  "target_seconds": 10.5,
+  "wall": 10.511062488003518,
+  "load_before": {
+    "loadavg": [
+      7.6181640625,
+      10.65478515625,
+      10.12548828125
+    ],
+    "cpu_pressure": "some avg10=0.41 avg60=0.75 avg300=0.26 total=269933565\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+  },
+  "records": [
+    {
+      "cpu_id": 0,
+      "calls": 14853,
+      "wall": 10.500389567001548,
+      "cpu": 10.49,
+      "wall_per_call": 0.0007069541215243754,
+      "cpu_per_call": 0.0007062546286945398,
+      "checksum": "1e5438b55b3baba7ac44c9bc592a96d17d14ac79ac057422b9c4e88e16e0f13a",
+      "output": 1.1975365959680444
+    },
+    {
+      "cpu_id": 1,
+      "calls": 14777,
+      "wall": 10.500108868000098,
+      "cpu": 10.49,
+      "wall_per_call": 0.000710571081274961,
+      "cpu_per_call": 0.0007098869865331258,
+      "checksum": "1e5438b55b3baba7ac44c9bc592a96d17d14ac79ac057422b9c4e88e16e0f13a",
+      "output": 1.1975365959680444
+    },
+    {
+      "cpu_id": 2,
+      "calls": 14853,
+      "wall": 10.50024105799821,
+      "cpu": 10.49,
+      "wall_per_call": 0.0007069441229380065,
+      "cpu_per_call": 0.0007062546286945398,
+      "checksum": "1e5438b55b3baba7ac44c9bc592a96d17d14ac79ac057422b9c4e88e16e0f13a",
+      "output": 1.1975365959680444
+    },
+    {
+      "cpu_id": 3,
+      "calls": 14788,
+      "wall": 10.50063067600422,
+      "cpu": 10.5,
+      "wall_per_call": 0.0007100778114690439,
+      "cpu_per_call": 0.0007100351636461996,
+      "checksum": "1e5438b55b3baba7ac44c9bc592a96d17d14ac79ac057422b9c4e88e16e0f13a",
+      "output": 1.1975365959680444
+    },
+    {
+      "cpu_id": 4,
+      "calls": 14965,
+      "wall": 10.50051902699488,
+      "cpu": 10.5,
+      "wall_per_call": 0.0007016718360838543,
+      "cpu_per_call": 0.000701637153357835,
+      "checksum": "1e5438b55b3baba7ac44c9bc592a96d17d14ac79ac057422b9c4e88e16e0f13a",
+      "output": 1.1975365959680444
+    },
+    {
+      "cpu_id": 5,
+      "calls": 15000,
+      "wall": 10.500003338995157,
+      "cpu": 10.5,
+      "wall_per_call": 0.0007000002225996771,
+      "cpu_per_call": 0.0007,
+      "checksum": "1e5438b55b3baba7ac44c9bc592a96d17d14ac79ac057422b9c4e88e16e0f13a",
+      "output": 1.1975365959680444
+    },
+    {
+      "cpu_id": 6,
+      "calls": 14788,
+      "wall": 10.500096579002275,
+      "cpu": 10.5,
+      "wall_per_call": 0.0007100416945497887,
+      "cpu_per_call": 0.0007100351636461996,
+      "checksum": "1e5438b55b3baba7ac44c9bc592a96d17d14ac79ac057422b9c4e88e16e0f13a",
+      "output": 1.1975365959680444
+    },
+    {
+      "cpu_id": 7,
+      "calls": 14785,
+      "wall": 10.50001684900053,
+      "cpu": 10.5,
+      "wall_per_call": 0.000710180375312853,
+      "cpu_per_call": 0.0007101792357118702,
+      "checksum": "1e5438b55b3baba7ac44c9bc592a96d17d14ac79ac057422b9c4e88e16e0f13a",
+      "output": 1.1975365959680444
+    }
+  ],
+  "median_wall_per_call": 0.000708497908037082,
+  "median_cpu_per_call": 0.0007080708076138328
+}

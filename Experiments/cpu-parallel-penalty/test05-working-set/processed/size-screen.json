@@ -1,0 +1,600 @@
+{
+  "prefix": [
+    {
+      "requested_bytes": 262144,
+      "cases": {
+        "1": {
+          "median_cpu_per_call": 8.163646844376588e-05,
+          "sample_wall": 10.505194880002819,
+          "actual_bytes": 262088,
+          "checksum": "f4134e94c2b73fbd4212db6346f6a886670eefdf98943d2965b9aee45965636f",
+          "cpu_inflation_vs_one": 1.0
+        },
+        "4": {
+          "median_cpu_per_call": 8.335620801948221e-05,
+          "sample_wall": 10.506985093001276,
+          "actual_bytes": 262088,
+          "checksum": "f4134e94c2b73fbd4212db6346f6a886670eefdf98943d2965b9aee45965636f",
+          "cpu_inflation_vs_one": 1.0210658252187985
+        },
+        "8": {
+          "median_cpu_per_call": 8.84500584061173e-05,
+          "sample_wall": 10.509885581996059,
+          "actual_bytes": 262088,
+          "checksum": "f4134e94c2b73fbd4212db6346f6a886670eefdf98943d2965b9aee45965636f",
+          "cpu_inflation_vs_one": 1.083462576128521
+        },
+        "16": {
+          "median_cpu_per_call": 9.212024365999957e-05,
+          "sample_wall": 10.518601219999255,
+          "actual_bytes": 262088,
+          "checksum": "f4134e94c2b73fbd4212db6346f6a886670eefdf98943d2965b9aee45965636f",
+          "cpu_inflation_vs_one": 1.1284202442374793
+        }
+      }
+    },
+    {
+      "requested_bytes": 1048576,
+      "cases": {
+        "1": {
+          "median_cpu_per_call": 0.0003198560800097573,
+          "sample_wall": 10.505367588004447,
+          "actual_bytes": 1048352,
+          "checksum": "0e5c885df9142724e7bb6efe0868d7980e3a21a9575deafd3f5ecf96b72e7b5c",
+          "cpu_inflation_vs_one": 1.0
+        },
+        "4": {
+          "median_cpu_per_call": 0.0003315842724088042,
+          "sample_wall": 10.506314755999483,
+          "actual_bytes": 1048352,
+          "checksum": "0e5c885df9142724e7bb6efe0868d7980e3a21a9575deafd3f5ecf96b72e7b5c",
+          "cpu_inflation_vs_one": 1.036667092270652
+        },
+        "8": {
+          "median_cpu_per_call": 0.00033655077703752495,
+          "sample_wall": 10.511975904002611,
+          "actual_bytes": 1048352,
+          "checksum": "0e5c885df9142724e7bb6efe0868d7980e3a21a9575deafd3f5ecf96b72e7b5c",
+          "cpu_inflation_vs_one": 1.052194402642771
+        },
+        "16": {
+          "median_cpu_per_call": 0.0003626650378313421,
+          "sample_wall": 10.51696869800071,
+          "actual_bytes": 1048352,
+          "checksum": "0e5c885df9142724e7bb6efe0868d7980e3a21a9575deafd3f5ecf96b72e7b5c",
+          "cpu_inflation_vs_one": 1.1338381869129355
+        }
+      }
+    },
+    {
+      "requested_bytes": 2097152,
+      "cases": {
+        "1": {
+          "median_cpu_per_call": 0.0006434793276898541,
+          "sample_wall": 10.506941473002371,
+          "actual_bytes": 2097152,
+          "checksum": "1e5438b55b3baba7ac44c9bc592a96d17d14ac79ac057422b9c4e88e16e0f13a",
+          "cpu_inflation_vs_one": 1.0
+        },
+        "4": {
+          "median_cpu_per_call": 0.0006483914139720952,
+          "sample_wall": 10.508583517999796,
+          "actual_bytes": 2097152,
+          "checksum": "1e5438b55b3baba7ac44c9bc592a96d17d14ac79ac057422b9c4e88e16e0f13a",
+          "cpu_inflation_vs_one": 1.0076336349450044
+        },
+        "8": {
+          "median_cpu_per_call": 0.0007080708076138328,
+          "sample_wall": 10.511062488003518,
+          "actual_bytes": 2097152,
+          "checksum": "1e5438b55b3baba7ac44c9bc592a96d17d14ac79ac057422b9c4e88e16e0f13a",
+          "cpu_inflation_vs_one": 1.100378484816082
+        },
+        "16": {
+          "median_cpu_per_call": 0.0007457780287948095,
+          "sample_wall": 10.52398079100385,
+          "actual_bytes": 2097152,
+          "checksum": "1e5438b55b3baba7ac44c9bc592a96d17d14ac79ac057422b9c4e88e16e0f13a",
+          "cpu_inflation_vs_one": 1.1589774476084826
+        }
+      }
+    },
+    {
+      "requested_bytes": 4194304,
+      "cases": {
+        "1": {
+          "median_cpu_per_call": 0.0012564378967541024,
+          "sample_wall": 10.508273818995804,
+          "actual_bytes": 4193408,
+          "checksum": "a0ad744c99f110376cdefdb70744e22913840599a47471f25e71479acfe1dbc6",
+          "cpu_inflation_vs_one": 1.0
+        },
+        "4": {
+          "median_cpu_per_call": 0.0013720496277049641,
+          "sample_wall": 10.510102250998898,
+          "actual_bytes": 4193408,
+          "checksum": "a0ad744c99f110376cdefdb70744e22913840599a47471f25e71479acfe1dbc6",
+          "cpu_inflation_vs_one": 1.092015475854027
+        },
+        "8": {
+          "median_cpu_per_call": 0.001694661171308395,
+          "sample_wall": 10.515736891000415,
+          "actual_bytes": 4193408,
+          "checksum": "a0ad744c99f110376cdefdb70744e22913840599a47471f25e71479acfe1dbc6",
+          "cpu_inflation_vs_one": 1.3487822801957854
+        },
+        "16": {
+          "median_cpu_per_call": 0.0016560078077558675,
+          "sample_wall": 10.520224224994308,
+          "actual_bytes": 4193408,
+          "checksum": "a0ad744c99f110376cdefdb70744e22913840599a47471f25e71479acfe1dbc6",
+          "cpu_inflation_vs_one": 1.3180180349812904
+        }
+      }
+    },
+    {
+      "requested_bytes": 8388608,
+      "cases": {
+        "1": {
+          "median_cpu_per_call": 0.002543030303030303,
+          "sample_wall": 10.512041344998579,
+          "actual_bytes": 8388608,
+          "checksum": "9c7dc860db8fbd15d1f26ff0df6c5825ee4bd63b8a8b148f67da8798d52d8f83",
+          "cpu_inflation_vs_one": 1.0
+        },
+        "4": {
+          "median_cpu_per_call": 0.0032461590804818913,
+          "sample_wall": 10.514560466006515,
+          "actual_bytes": 8388608,
+          "checksum": "9c7dc860db8fbd15d1f26ff0df6c5825ee4bd63b8a8b148f67da8798d52d8f83",
+          "cpu_inflation_vs_one": 1.2764924887500289
+        },
+        "8": {
+          "median_cpu_per_call": 0.005426390460575251,
+          "sample_wall": 10.521178362003411,
+          "actual_bytes": 8388608,
+          "checksum": "9c7dc860db8fbd15d1f26ff0df6c5825ee4bd63b8a8b148f67da8798d52d8f83",
+          "cpu_inflation_vs_one": 2.133828469959286
+        },
+        "16": {
+          "median_cpu_per_call": 0.005719917837264776,
+          "sample_wall": 10.531284395001421,
+          "actual_bytes": 8388608,
+          "checksum": "9c7dc860db8fbd15d1f26ff0df6c5825ee4bd63b8a8b148f67da8798d52d8f83",
+          "cpu_inflation_vs_one": 2.249252724377236
+        }
+      }
+    },
+    {
+      "requested_bytes": 12582912,
+      "cases": {
+        "1": {
+          "median_cpu_per_call": 0.0038007246376811593,
+          "sample_wall": 10.516529387998162,
+          "actual_bytes": 12580128,
+          "checksum": "e8751685f84064b88302d3baf77f6ecee28051f2315d40ec6940b4e92e29dc7e",
+          "cpu_inflation_vs_one": 1.0
+        },
+        "4": {
+          "median_cpu_per_call": 0.005632758835767202,
+          "sample_wall": 10.519608617003541,
+          "actual_bytes": 12580128,
+          "checksum": "e8751685f84064b88302d3baf77f6ecee28051f2315d40ec6940b4e92e29dc7e",
+          "cpu_inflation_vs_one": 1.4820223438243545
+        },
+        "8": {
+          "median_cpu_per_call": 0.009877828274128937,
+          "sample_wall": 10.52591116399708,
+          "actual_bytes": 12580128,
+          "checksum": "e8751685f84064b88302d3baf77f6ecee28051f2315d40ec6940b4e92e29dc7e",
+          "cpu_inflation_vs_one": 2.598932891953848
+        },
+        "16": {
+          "median_cpu_per_call": 0.014487816633728483,
+          "sample_wall": 10.534946191997733,
+          "actual_bytes": 12580128,
+          "checksum": "e8751685f84064b88302d3baf77f6ecee28051f2315d40ec6940b4e92e29dc7e",
+          "cpu_inflation_vs_one": 3.811856426033424
+        }
+      }
+    },
+    {
+      "requested_bytes": 16777216,
+      "cases": {
+        "1": {
+          "median_cpu_per_call": 0.006730892742453436,
+          "sample_wall": 10.522961914997722,
+          "actual_bytes": 16773632,
+          "checksum": "e010294855276083601889fd53b0d16c3f0ee7221ca19970371da05997ed9e8f",
+          "cpu_inflation_vs_one": 1.0
+        },
+        "4": {
+          "median_cpu_per_call": 0.00859353419663601,
+          "sample_wall": 10.528769673997886,
+          "actual_bytes": 16773632,
+          "checksum": "e010294855276083601889fd53b0d16c3f0ee7221ca19970371da05997ed9e8f",
+          "cpu_inflation_vs_one": 1.2767302236796056
+        },
+        "8": {
+          "median_cpu_per_call": 0.01388375842861331,
+          "sample_wall": 10.534769613004755,
+          "actual_bytes": 16773632,
+          "checksum": "e010294855276083601889fd53b0d16c3f0ee7221ca19970371da05997ed9e8f",
+          "cpu_inflation_vs_one": 2.062691972647989
+        },
+        "16": {
+          "median_cpu_per_call": 0.026058695544676852,
+          "sample_wall": 10.547982714997488,
+          "actual_bytes": 16773632,
+          "checksum": "e010294855276083601889fd53b0d16c3f0ee7221ca19970371da05997ed9e8f",
+          "cpu_inflation_vs_one": 3.871506580444834
+        }
+      }
+    },
+    {
+      "requested_bytes": 25165824,
+      "cases": {
+        "1": {
+          "median_cpu_per_call": 0.009073593073593074,
+          "sample_wall": 10.527087329995993,
+          "actual_bytes": 25148232,
+          "checksum": "5391ea3d8f9d92af3dbc500add612b8d6ab3933b36719d05e44bbd5962771662",
+          "cpu_inflation_vs_one": 1.0
+        },
+        "4": {
+          "median_cpu_per_call": 0.012556712293554399,
+          "sample_wall": 10.533184667998285,
+          "actual_bytes": 25148232,
+          "checksum": "5391ea3d8f9d92af3dbc500add612b8d6ab3933b36719d05e44bbd5962771662",
+          "cpu_inflation_vs_one": 1.3838743033449743
+        },
+        "8": {
+          "median_cpu_per_call": 0.021943075079001853,
+          "sample_wall": 10.547731995000504,
+          "actual_bytes": 25148232,
+          "checksum": "5391ea3d8f9d92af3dbc500add612b8d6ab3933b36719d05e44bbd5962771662",
+          "cpu_inflation_vs_one": 2.418344629412895
+        },
+        "16": {
+          "median_cpu_per_call": 0.03985472486315183,
+          "sample_wall": 10.574949028996343,
+          "actual_bytes": 25148232,
+          "checksum": "5391ea3d8f9d92af3dbc500add612b8d6ab3933b36719d05e44bbd5962771662",
+          "cpu_inflation_vs_one": 4.392386184822554
+        }
+      }
+    },
+    {
+      "requested_bytes": 33554432,
+      "cases": {
+        "1": {
+          "median_cpu_per_call": 0.012237762237762238,
+          "sample_wall": 10.5525900979992,
+          "actual_bytes": 33554432,
+          "checksum": "427a1ea60e296b0280ad4e93c9078612d247cfac3b4492598c0933ef58a4db9a",
+          "cpu_inflation_vs_one": 1.0
+        },
+        "4": {
+          "median_cpu_per_call": 0.017332936647022543,
+          "sample_wall": 10.562788360999548,
+          "actual_bytes": 33554432,
+          "checksum": "427a1ea60e296b0280ad4e93c9078612d247cfac3b4492598c0933ef58a4db9a",
+          "cpu_inflation_vs_one": 1.4163485374424136
+        },
+        "8": {
+          "median_cpu_per_call": 0.029564606741573036,
+          "sample_wall": 10.579554362004274,
+          "actual_bytes": 33554432,
+          "checksum": "427a1ea60e296b0280ad4e93c9078612d247cfac3b4492598c0933ef58a4db9a",
+          "cpu_inflation_vs_one": 2.4158507223113967
+        },
+        "16": {
+          "median_cpu_per_call": 0.054137341153470186,
+          "sample_wall": 10.600800043997879,
+          "actual_bytes": 33554432,
+          "checksum": "427a1ea60e296b0280ad4e93c9078612d247cfac3b4492598c0933ef58a4db9a",
+          "cpu_inflation_vs_one": 4.423794162826421
+        }
+      }
+    }
+  ],
+  "top13": [
+    {
+      "requested_bytes": 262144,
+      "cases": {
+        "1": {
+          "median_cpu_per_call": 2.245991826132801e-05,
+          "sample_wall": 10.505205988993112,
+          "actual_bytes": 262144,
+          "checksum": "abfadbf50070400857a5e70c7f4ba09f472fb41f021ed4cc52da3d3ad21aa90a",
+          "cpu_inflation_vs_one": 1.0
+        },
+        "4": {
+          "median_cpu_per_call": 2.268200183818934e-05,
+          "sample_wall": 10.50687325400213,
+          "actual_bytes": 262144,
+          "checksum": "abfadbf50070400857a5e70c7f4ba09f472fb41f021ed4cc52da3d3ad21aa90a",
+          "cpu_inflation_vs_one": 1.0098879957743978
+        },
+        "8": {
+          "median_cpu_per_call": 2.3525086268165804e-05,
+          "sample_wall": 10.509922481003741,
+          "actual_bytes": 262144,
+          "checksum": "abfadbf50070400857a5e70c7f4ba09f472fb41f021ed4cc52da3d3ad21aa90a",
+          "cpu_inflation_vs_one": 1.0474252842082612
+        },
+        "16": {
+          "median_cpu_per_call": 2.5785020557814055e-05,
+          "sample_wall": 10.519830406003166,
+          "actual_bytes": 262144,
+          "checksum": "abfadbf50070400857a5e70c7f4ba09f472fb41f021ed4cc52da3d3ad21aa90a",
+          "cpu_inflation_vs_one": 1.148046055101246
+        }
+      }
+    },
+    {
+      "requested_bytes": 1048576,
+      "cases": {
+        "1": {
+          "median_cpu_per_call": 7.861505601978491e-05,
+          "sample_wall": 10.506167965999339,
+          "actual_bytes": 1048576,
+          "checksum": "f03dc00b3dde20eb4f7d6bb220f99255067177ecb71259ace6ab5785d0a38dfb",
+          "cpu_inflation_vs_one": 1.0
+        },
+        "4": {
+          "median_cpu_per_call": 8.007573124874123e-05,
+          "sample_wall": 10.50815354000224,
+          "actual_bytes": 1048576,
+          "checksum": "f03dc00b3dde20eb4f7d6bb220f99255067177ecb71259ace6ab5785d0a38dfb",
+          "cpu_inflation_vs_one": 1.0185800952503132
+        },
+        "8": {
+          "median_cpu_per_call": 8.363049147500396e-05,
+          "sample_wall": 10.512770433000696,
+          "actual_bytes": 1048576,
+          "checksum": "f03dc00b3dde20eb4f7d6bb220f99255067177ecb71259ace6ab5785d0a38dfb",
+          "cpu_inflation_vs_one": 1.0637973908452958
+        },
+        "16": {
+          "median_cpu_per_call": 8.911084660385984e-05,
+          "sample_wall": 10.521233120998659,
+          "actual_bytes": 1048576,
+          "checksum": "f03dc00b3dde20eb4f7d6bb220f99255067177ecb71259ace6ab5785d0a38dfb",
+          "cpu_inflation_vs_one": 1.1335086574438549
+        }
+      }
+    },
+    {
+      "requested_bytes": 2097152,
+      "cases": {
+        "1": {
+          "median_cpu_per_call": 0.00015297343016303555,
+          "sample_wall": 10.506953693999094,
+          "actual_bytes": 2097152,
+          "checksum": "d3eab8f4d5fc3ad150441993fe423993f717948d633f524046c53e3fdaee231e",
+          "cpu_inflation_vs_one": 1.0
+        },
+        "4": {
+          "median_cpu_per_call": 0.0001567601952557929,
+          "sample_wall": 10.508498269002303,
+          "actual_bytes": 2097152,
+          "checksum": "d3eab8f4d5fc3ad150441993fe423993f717948d633f524046c53e3fdaee231e",
+          "cpu_inflation_vs_one": 1.0247543974709956
+        },
+        "8": {
+          "median_cpu_per_call": 0.00016068873418309415,
+          "sample_wall": 10.511168937999173,
+          "actual_bytes": 2097152,
+          "checksum": "d3eab8f4d5fc3ad150441993fe423993f717948d633f524046c53e3fdaee231e",
+          "cpu_inflation_vs_one": 1.0504355822565776
+        },
+        "16": {
+          "median_cpu_per_call": 0.00017431438189801819,
+          "sample_wall": 10.524495598998328,
+          "actual_bytes": 2097152,
+          "checksum": "d3eab8f4d5fc3ad150441993fe423993f717948d633f524046c53e3fdaee231e",
+          "cpu_inflation_vs_one": 1.1395075714275213
+        }
+      }
+    },
+    {
+      "requested_bytes": 4194304,
+      "cases": {
+        "1": {
+          "median_cpu_per_call": 0.00030089003732414584,
+          "sample_wall": 10.50850295899727,
+          "actual_bytes": 4194304,
+          "checksum": "634f653ea5f09ff33748fb98808a1e9cb252146cff09f2fb2fc1323ba0c7a11a",
+          "cpu_inflation_vs_one": 1.0
+        },
+        "4": {
+          "median_cpu_per_call": 0.0003051106618253954,
+          "sample_wall": 10.509378014001413,
+          "actual_bytes": 4194304,
+          "checksum": "634f653ea5f09ff33748fb98808a1e9cb252146cff09f2fb2fc1323ba0c7a11a",
+          "cpu_inflation_vs_one": 1.0140271327651262
+        },
+        "8": {
+          "median_cpu_per_call": 0.0003241556222042503,
+          "sample_wall": 10.511762515001465,
+          "actual_bytes": 4194304,
+          "checksum": "634f653ea5f09ff33748fb98808a1e9cb252146cff09f2fb2fc1323ba0c7a11a",
+          "cpu_inflation_vs_one": 1.0773225497494312
+        },
+        "16": {
+          "median_cpu_per_call": 0.00034787797440914714,
+          "sample_wall": 10.521005342001445,
+          "actual_bytes": 4194304,
+          "checksum": "634f653ea5f09ff33748fb98808a1e9cb252146cff09f2fb2fc1323ba0c7a11a",
+          "cpu_inflation_vs_one": 1.1561631534991026
+        }
+      }
+    },
+    {
+      "requested_bytes": 8388608,
+      "cases": {
+        "1": {
+          "median_cpu_per_call": 0.0005890280195406817,
+          "sample_wall": 10.512100113999622,
+          "actual_bytes": 8388608,
+          "checksum": "1ff766b2145c3c49418a9e52bd4145276176c4de828d7792359c9f9bb0acccf4",
+          "cpu_inflation_vs_one": 1.0
+        },
+        "4": {
+          "median_cpu_per_call": 0.0006099017727662525,
+          "sample_wall": 10.512926700997923,
+          "actual_bytes": 8388608,
+          "checksum": "1ff766b2145c3c49418a9e52bd4145276176c4de828d7792359c9f9bb0acccf4",
+          "cpu_inflation_vs_one": 1.0354376235647464
+        },
+        "8": {
+          "median_cpu_per_call": 0.0007978258257716805,
+          "sample_wall": 10.516744327993365,
+          "actual_bytes": 8388608,
+          "checksum": "1ff766b2145c3c49418a9e52bd4145276176c4de828d7792359c9f9bb0acccf4",
+          "cpu_inflation_vs_one": 1.3544785635050387
+        },
+        "16": {
+          "median_cpu_per_call": 0.000722186405454251,
+          "sample_wall": 10.525465607002843,
+          "actual_bytes": 8388608,
+          "checksum": "1ff766b2145c3c49418a9e52bd4145276176c4de828d7792359c9f9bb0acccf4",
+          "cpu_inflation_vs_one": 1.2260646038831988
+        }
+      }
+    },
+    {
+      "requested_bytes": 12582912,
+      "cases": {
+        "1": {
+          "median_cpu_per_call": 0.0008848587094053142,
+          "sample_wall": 10.516064389994426,
+          "actual_bytes": 12582912,
+          "checksum": "278693d4375f6163f9bc15af32e27ea43f4b547b9ca2115917236a77fd6bf319",
+          "cpu_inflation_vs_one": 1.0
+        },
+        "4": {
+          "median_cpu_per_call": 0.0009343756100984239,
+          "sample_wall": 10.515946699997585,
+          "actual_bytes": 12582912,
+          "checksum": "278693d4375f6163f9bc15af32e27ea43f4b547b9ca2115917236a77fd6bf319",
+          "cpu_inflation_vs_one": 1.0559602342914027
+        },
+        "8": {
+          "median_cpu_per_call": 0.0014340398646878428,
+          "sample_wall": 10.52087611299794,
+          "actual_bytes": 12582912,
+          "checksum": "278693d4375f6163f9bc15af32e27ea43f4b547b9ca2115917236a77fd6bf319",
+          "cpu_inflation_vs_one": 1.620642764144364
+        },
+        "16": {
+          "median_cpu_per_call": 0.0013081894537165248,
+          "sample_wall": 10.528967193997232,
+          "actual_bytes": 12582912,
+          "checksum": "278693d4375f6163f9bc15af32e27ea43f4b547b9ca2115917236a77fd6bf319",
+          "cpu_inflation_vs_one": 1.4784162034136703
+        }
+      }
+    },
+    {
+      "requested_bytes": 16777216,
+      "cases": {
+        "1": {
+          "median_cpu_per_call": 0.0011849090703716255,
+          "sample_wall": 10.525420614998438,
+          "actual_bytes": 16777216,
+          "checksum": "bd1c801ce6978bc9cdc09a700756652f857718210870ff2be86383b34ff7af31",
+          "cpu_inflation_vs_one": 1.0
+        },
+        "4": {
+          "median_cpu_per_call": 0.0012473279448627235,
+          "sample_wall": 10.525571714999387,
+          "actual_bytes": 16777216,
+          "checksum": "bd1c801ce6978bc9cdc09a700756652f857718210870ff2be86383b34ff7af31",
+          "cpu_inflation_vs_one": 1.0526781978903423
+        },
+        "8": {
+          "median_cpu_per_call": 0.002113719870489965,
+          "sample_wall": 10.531614514002285,
+          "actual_bytes": 16777216,
+          "checksum": "bd1c801ce6978bc9cdc09a700756652f857718210870ff2be86383b34ff7af31",
+          "cpu_inflation_vs_one": 1.7838667315012067
+        },
+        "16": {
+          "median_cpu_per_call": 0.002643437691347098,
+          "sample_wall": 10.550451736002287,
+          "actual_bytes": 16777216,
+          "checksum": "bd1c801ce6978bc9cdc09a700756652f857718210870ff2be86383b34ff7af31",
+          "cpu_inflation_vs_one": 2.230920293755563
+        }
+      }
+    },
+    {
+      "requested_bytes": 25165824,
+      "cases": {
+        "1": {
+          "median_cpu_per_call": 0.0017652012801077986,
+          "sample_wall": 10.53372821600351,
+          "actual_bytes": 25165824,
+          "checksum": "6b2f57837844388b487d9dccacbe43dfcf76faa1c22e557c562129cd583a9bd1",
+          "cpu_inflation_vs_one": 1.0
+        },
+        "4": {
+          "median_cpu_per_call": 0.0019035548635649286,
+          "sample_wall": 10.537212873998214,
+          "actual_bytes": 25165824,
+          "checksum": "6b2f57837844388b487d9dccacbe43dfcf76faa1c22e557c562129cd583a9bd1",
+          "cpu_inflation_vs_one": 1.078378361162689
+        },
+        "8": {
+          "median_cpu_per_call": 0.003440368449869561,
+          "sample_wall": 10.541595726004743,
+          "actual_bytes": 25165824,
+          "checksum": "6b2f57837844388b487d9dccacbe43dfcf76faa1c22e557c562129cd583a9bd1",
+          "cpu_inflation_vs_one": 1.9489949892056855
+        },
+        "16": {
+          "median_cpu_per_call": 0.005588050244982959,
+          "sample_wall": 10.561471876004362,
+          "actual_bytes": 25165824,
+          "checksum": "6b2f57837844388b487d9dccacbe43dfcf76faa1c22e557c562129cd583a9bd1",
+          "cpu_inflation_vs_one": 3.1656731206549455
+        }
+      }
+    },
+    {
+      "requested_bytes": 33554432,
+      "cases": {
+        "1": {
+          "median_cpu_per_call": 0.002359955005624297,
+          "sample_wall": 10.546611300000222,
+          "actual_bytes": 33554432,
+          "checksum": "b7f4634ca635302e3eabe008a7dfcfc5ea5d49dad1910182ea84fe2cb5fa83c8",
+          "cpu_inflation_vs_one": 1.0
+        },
+        "4": {
+          "median_cpu_per_call": 0.0025732998823788664,
+          "sample_wall": 10.546465330000501,
+          "actual_bytes": 33554432,
+          "checksum": "b7f4634ca635302e3eabe008a7dfcfc5ea5d49dad1910182ea84fe2cb5fa83c8",
+          "cpu_inflation_vs_one": 1.090402095059491
+        },
+        "8": {
+          "median_cpu_per_call": 0.004792341253110111,
+          "sample_wall": 10.553559073996439,
+          "actual_bytes": 33554432,
+          "checksum": "b7f4634ca635302e3eabe008a7dfcfc5ea5d49dad1910182ea84fe2cb5fa83c8",
+          "cpu_inflation_vs_one": 2.0306917893302616
+        },
+        "16": {
+          "median_cpu_per_call": 0.007852637614678899,
+          "sample_wall": 10.57596214300429,
+          "actual_bytes": 33554432,
+          "checksum": "b7f4634ca635302e3eabe008a7dfcfc5ea5d49dad1910182ea84fe2cb5fa83c8",
+          "cpu_inflation_vs_one": 3.327452259032193
+        }
+      }
+    }
+  ]
+}

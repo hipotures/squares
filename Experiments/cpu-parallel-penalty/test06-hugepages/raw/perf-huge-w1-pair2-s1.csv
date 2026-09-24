@@ -1,0 +1,6 @@
+# started on Thu Sep 24 02:11:18 2026
+
+100076932393,,instructions,20006619432,100.00,,
+111283173566,,cycles,20006619432,100.00,,
+525429,,ls_any_fills_from_sys.all_dram_io,20006619432,100.00,,
+4954941,,ls_l1_d_tlb_miss.all_l2_miss,20006619432,100.00,,

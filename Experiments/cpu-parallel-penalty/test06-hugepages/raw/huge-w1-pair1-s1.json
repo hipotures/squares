@@ -1,0 +1,182 @@
+{
+  "mode": "huge",
+  "workers": 1,
+  "sample": 1,
+  "tag": "pair1",
+  "target_seconds": 20.0,
+  "batch_wall": 20.017001034000714,
+  "grid_shape": [
+    980,
+    980
+  ],
+  "grid_bytes": 7683200,
+  "sha256": "8893bace91cb7a79a1a4323dc2efca656c6fbd891be9950196f371930d437cff",
+  "hugepages_confirmed_before_timing": true,
+  "huge_kib_before_by_worker": [
+    32768
+  ],
+  "load_before": {
+    "loadavg": [
+      4.43603515625,
+      7.84716796875,
+      8.275390625
+    ],
+    "cpu_pressure": "some avg10=0.00 avg60=1.16 avg300=2.16 total=316688782\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+  },
+  "records": [
+    {
+      "cpu_id": 0,
+      "calls": 8731,
+      "wall": 20.002020277002885,
+      "cpu": 19.99,
+      "cpu_per_call": 0.002289543007673806,
+      "wall_per_call": 0.0022909197430996315,
+      "minor_faults": 91,
+      "system_cpu": 0.0,
+      "sha256": "8893bace91cb7a79a1a4323dc2efca656c6fbd891be9950196f371930d437cff",
+      "smaps_before": {
+        "input": {
+          "range": "70e454200000-70e455a00000",
+          "fields": {
+            "Size": "24576 kB",
+            "KernelPageSize": "4 kB",
+            "MMUPageSize": "4 kB",
+            "Rss": "16384 kB",
+            "Pss": "16384 kB",
+            "Pss_Dirty": "16384 kB",
+            "Shared_Clean": "0 kB",
+            "Shared_Dirty": "0 kB",
+            "Private_Clean": "0 kB",
+            "Private_Dirty": "16384 kB",
+            "Referenced": "16384 kB",
+            "Anonymous": "16384 kB",
+            "KSM": "0 kB",
+            "LazyFree": "0 kB",
+            "AnonHugePages": "16384 kB",
+            "ShmemPmdMapped": "0 kB",
+            "FilePmdMapped": "0 kB",
+            "Shared_Hugetlb": "0 kB",
+            "Private_Hugetlb": "0 kB",
+            "Swap": "0 kB",
+            "SwapPss": "0 kB",
+            "Locked": "0 kB",
+            "THPeligible": "1",
+            "ProtectionKey": "0",
+            "VmFlags": "rd wr mr mw me ac sd hg"
+          }
+        },
+        "output": {
+          "range": "70e454200000-70e455a00000",
+          "fields": {
+            "Size": "24576 kB",
+            "KernelPageSize": "4 kB",
+            "MMUPageSize": "4 kB",
+            "Rss": "16384 kB",
+            "Pss": "16384 kB",
+            "Pss_Dirty": "16384 kB",
+            "Shared_Clean": "0 kB",
+            "Shared_Dirty": "0 kB",
+            "Private_Clean": "0 kB",
+            "Private_Dirty": "16384 kB",
+            "Referenced": "16384 kB",
+            "Anonymous": "16384 kB",
+            "KSM": "0 kB",
+            "LazyFree": "0 kB",
+            "AnonHugePages": "16384 kB",
+            "ShmemPmdMapped": "0 kB",
+            "FilePmdMapped": "0 kB",
+            "Shared_Hugetlb": "0 kB",
+            "Private_Hugetlb": "0 kB",
+            "Swap": "0 kB",
+            "SwapPss": "0 kB",
+            "Locked": "0 kB",
+            "THPeligible": "1",
+            "ProtectionKey": "0",
+            "VmFlags": "rd wr mr mw me ac sd hg"
+          }
+        }
+      },
+      "smaps_after": {
+        "input": {
+          "range": "70e454200000-70e455a00000",
+          "fields": {
+            "Size": "24576 kB",
+            "KernelPageSize": "4 kB",
+            "MMUPageSize": "4 kB",
+            "Rss": "16384 kB",
+            "Pss": "16384 kB",
+            "Pss_Dirty": "16384 kB",
+            "Shared_Clean": "0 kB",
+            "Shared_Dirty": "0 kB",
+            "Private_Clean": "0 kB",
+            "Private_Dirty": "16384 kB",
+            "Referenced": "16384 kB",
+            "Anonymous": "16384 kB",
+            "KSM": "0 kB",
+            "LazyFree": "0 kB",
+            "AnonHugePages": "16384 kB",
+            "ShmemPmdMapped": "0 kB",
+            "FilePmdMapped": "0 kB",
+            "Shared_Hugetlb": "0 kB",
+            "Private_Hugetlb": "0 kB",
+            "Swap": "0 kB",
+            "SwapPss": "0 kB",
+            "Locked": "0 kB",
+            "THPeligible": "1",
+            "ProtectionKey": "0",
+            "VmFlags": "rd wr mr mw me ac sd hg"
+          }
+        },
+        "output": {
+          "range": "70e454200000-70e455a00000",
+          "fields": {
+            "Size": "24576 kB",
+            "KernelPageSize": "4 kB",
+            "MMUPageSize": "4 kB",
+            "Rss": "16384 kB",
+            "Pss": "16384 kB",
+            "Pss_Dirty": "16384 kB",
+            "Shared_Clean": "0 kB",
+            "Shared_Dirty": "0 kB",
+            "Private_Clean": "0 kB",
+            "Private_Dirty": "16384 kB",
+            "Referenced": "16384 kB",
+            "Anonymous": "16384 kB",
+            "KSM": "0 kB",
+            "LazyFree": "0 kB",
+            "AnonHugePages": "16384 kB",
+            "ShmemPmdMapped": "0 kB",
+            "FilePmdMapped": "0 kB",
+            "Shared_Hugetlb": "0 kB",
+            "Private_Hugetlb": "0 kB",
+            "Swap": "0 kB",
+            "SwapPss": "0 kB",
+            "Locked": "0 kB",
+            "THPeligible": "1",
+            "ProtectionKey": "0",
+            "VmFlags": "rd wr mr mw me ac sd hg"
+          }
+        }
+      }
+    }
+  ],
+  "counters": {
+    "instructions": {
+      "count": 101340010387.0,
+      "running_percent": 100.0
+    },
+    "cycles": {
+      "count": 112328740952.0,
+      "running_percent": 100.0
+    },
+    "ls_any_fills_from_sys.all_dram_io": {
+      "count": 566967.0,
+      "running_percent": 100.0
+    },
+    "ls_l1_d_tlb_miss.all_l2_miss": {
+      "count": 10653351.0,
+      "running_percent": 100.0
+    }
+  },
+  "median_cpu_per_call": 0.002289543007673806
+}

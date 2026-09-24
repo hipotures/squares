@@ -1,0 +1,39 @@
+{
+  "wall": 20.005363093994674,
+  "cpu": 20.0,
+  "calls": 2642,
+  "wall_per_call": 0.0075720526472349255,
+  "cpu_per_call": 0.00757002271006813,
+  "warm_value": 3.0,
+  "last_value": 3.0,
+  "target_cpu": 0,
+  "target": "direction",
+  "background": "prefix",
+  "bg_count": 8,
+  "sample": 1,
+  "tag": "repeat",
+  "load_before": {
+    "loadavg": [
+      7.9169921875,
+      9.67431640625,
+      9.05810546875
+    ],
+    "cpu_pressure": "some avg10=0.00 avg60=0.03 avg300=0.04 total=268454570\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0"
+  },
+  "distinct_background_inputs": false,
+  "counters": {
+    "instructions": {
+      "count": 86050658952.0,
+      "running_percent": 100.0
+    },
+    "cycles": {
+      "count": 101300247208.0,
+      "running_percent": 100.0
+    },
+    "ls_any_fills_from_sys.all_dram_io": {
+      "count": 463200144.0,
+      "running_percent": 100.0
+    }
+  },
+  "ipc": 0.8494614902105028
+}

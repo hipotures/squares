@@ -1,6 +1,6 @@
 {
-  "phase": "A",
-  "status": "complete",
+  "phase": "B",
+  "status": "tests 1-6 complete; tests 7-8 pending",
   "starting_sha": "897b722f2997fbf09b99b1700787a0052270de30",
   "test01": {
     "workers": {
@@ -2413,5 +2413,43 @@
       }
     },
     "checksum": "db4b0ae1dc2f35de70c3094d90eff092c1a8bcf9fcbfe65f78606d2d1a57327c"
+  },
+  "test04": {
+    "processed_file": "test04-interference/processed/final.json",
+    "screen_cells": 90,
+    "repeated_cells": 33,
+    "idle_prefix_ms": 2.341552114844412,
+    "direction_vs_prefix8_inflation": 2.213535022466141,
+    "register_vs_stream14_inflation": 1.1538419620895353,
+    "distinct_prefix14_inflation": 2.390828684173302
+  },
+  "test05": {
+    "processed_file": "test05-working-set/processed/final.json",
+    "size_screen_file": "test05-working-set/processed/size-screen.json",
+    "bitwise_grid_checks": 3620,
+    "size_inflation": {
+      "prefix-2MiB": 1.173373402413171,
+      "prefix-8MiB": 2.2587269984798195,
+      "prefix-16MiB": 3.8745610642760626,
+      "top13-4MiB": 1.1477678409182077,
+      "top13-16MiB": 2.4291037875182315,
+      "top13-32MiB": 3.3778890222891556
+    },
+    "tile64_w16_cpu_ms": 4.152557835437938,
+    "tile0_w16_cpu_ms": 4.701212171503408,
+    "tile64_serial_cpu_ms": 2.345490793948634,
+    "tile0_serial_cpu_ms": 2.3092021706500403
+  },
+  "test06": {
+    "processed_file": "test06-hugepages/processed/summary.json",
+    "verified_huge_kib_per_worker_min": 32768,
+    "huge_vs_normal_cpu_ratio": {
+      "1": 0.9807047949162334,
+      "16": 1.0379552807910095
+    },
+    "huge_vs_normal_dtlb_miss_ratio": {
+      "1": 0.21568196815742469,
+      "16": 0.38722943419112094
+    }
   }
 }

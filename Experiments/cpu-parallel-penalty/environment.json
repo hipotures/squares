@@ -33,5 +33,13 @@
   },
   "guest_perf_event_paranoid_after_operator_change": "-1",
   "host_snapshot": "test02-vcpu-host/raw/host-snapshot",
-  "host_pinning": "test02-vcpu-host/raw/host-pinning"
+  "host_pinning": "test02-vcpu-host/raw/host-pinning",
+  "phase_b": {
+    "compiler": "cc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+    "native_build_flags": "-O3 -fPIC -shared",
+    "transparent_hugepages_enabled": "always [madvise] never",
+    "host_l3_total": "128 MiB in two instances, from test02-vcpu-host/raw/host-snapshot/lscpu-J.json",
+    "working_set_grid_source": "Experiments/cpu-post-integration-profile/raw/current-states.npz, round 18 direction 90",
+    "guest_kernel": "7.0.0-31-generic"
+  }
 }
