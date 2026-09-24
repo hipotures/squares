@@ -228,11 +228,12 @@ def scale_limited_unresolved(cycle: dict[str, Any], target_scale: int) -> bool:
 def next_side(state: dict[str, Any]) -> Fraction | None:
     low = Fraction(state["verified_low"])
     ceiling = soft_high(state)
-    if float(ceiling) == float(low) or ceiling - low < Fraction(1, 10**10):
+    if ceiling <= low:
         return None
+
     # Revisit an unresolved ceiling only when the search instrument actually
     # became stronger. A better VERIFIED seed alone is not enough: the old
-    # policy repeatedly reran the deterministic 3.961875 search after every
+    # policy repeatedly reran deterministic unresolved ceilings after every
     # tiny lower-bound improvement and reproduced identical results.
     target_scale = int(
         state.get("config", {}).get(
@@ -245,7 +246,16 @@ def next_side(state: dict[str, Any]) -> Fraction | None:
             if scale_limited_unresolved(cycle, target_scale):
                 return ceiling
             break
-    return (low + ceiling) / 2
+
+    # With no explicit --target-width the runner is supposed to keep working
+    # until the numerical backend truly cannot distinguish another midpoint.
+    # The old 1e-10 cutoff stopped unattended runs hours too early even though
+    # double precision still had roughly five more decimal orders available.
+    midpoint = (low + ceiling) / 2
+    midpoint_float = float(midpoint)
+    if midpoint_float == float(low) or midpoint_float == float(ceiling):
+        return None
+    return midpoint
 
 
 def scale_limited_result(result: dict[str, Any]) -> bool:

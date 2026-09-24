@@ -68,6 +68,18 @@ def test_exact_midpoint_and_unresolved_soft_ceiling(tmp_path: Path) -> None:
     assert frontier.next_side(saved) == Fraction(1585, 400)
 
 
+def test_sub_1e10_frontier_gap_keeps_bisecting(tmp_path: Path) -> None:
+    saved = state(tmp_path)
+    low = Fraction(26588320349, 6710886400)
+    high = Fraction(53176640699, 13421772800)
+    assert high - low == Fraction(1, 13421772800)
+    assert high - low < Fraction(1, 10**10)
+    saved["verified_low"] = str(low)
+    saved["search_high"] = str(high)
+    saved["unresolved"] = [str(high)]
+    assert frontier.next_side(saved) == (low + high) / 2
+
+
 def test_scale_limited_unresolved_is_retried_before_bisection(tmp_path: Path) -> None:
     saved = state(tmp_path)
     side = Fraction(793, 200)
