@@ -23,6 +23,7 @@ def state(tmp_path: Path) -> dict:
         "workers": 1,
         "budgets": [1, 2, 3, 4],
         "row_rounds": 60,
+        "scale": frontier.DEFAULT_RATIONALISATION_SCALE,
         "target_width": None,
         "max_cycles": None,
         "root": tmp_path,
@@ -32,7 +33,12 @@ def state(tmp_path: Path) -> dict:
 
 def result(side: Fraction, *, objective: float = 12.5, mass: str = "25/2") -> dict:
     return {
-        "settings": {"n": 12, "outer_side": str(side), "column_rounds": 1},
+        "settings": {
+            "n": 12,
+            "outer_side": str(side),
+            "column_rounds": 1,
+            "scale": frontier.DEFAULT_RATIONALISATION_SCALE,
+        },
         "objective": objective,
         "converged": True,
         "stopped": "converged: every placement covers mass 1",
@@ -58,6 +64,37 @@ def test_exact_midpoint_and_unresolved_soft_ceiling(tmp_path: Path) -> None:
     assert frontier.next_side(saved) == Fraction(793, 200)
     saved["unresolved"] = ["793/200"]
     assert frontier.soft_high(saved) == Fraction(793, 200)
+    assert frontier.next_side(saved) == Fraction(1585, 400)
+
+
+def test_scale_limited_unresolved_is_retried_before_bisection(tmp_path: Path) -> None:
+    saved = state(tmp_path)
+    side = Fraction(793, 200)
+    candidate = tmp_path / "coarse-candidate.json"
+    candidate.write_text("{}", encoding="utf-8")
+    coarse = result(side, objective=11.9962, mass="1200067/100000")
+    coarse["settings"]["scale"] = frontier.LEGACY_RATIONALISATION_SCALE
+    saved["unresolved"] = [str(side)]
+    saved["cycles"].append(
+        {
+            "side": str(side),
+            "status": "UNRESOLVED",
+            "seed_verified_low": saved["verified_low"],
+            "stages": [
+                {
+                    "status": "complete",
+                    "candidate_unverified": str(candidate),
+                    "result": coarse,
+                }
+            ],
+        }
+    )
+    assert frontier.next_side(saved) == side
+    seed, label = frontier.seed_for(saved, side)
+    assert seed == candidate
+    assert "scale200000" in label
+
+    coarse["objective"] = 12.001
     assert frontier.next_side(saved) == Fraction(1585, 400)
 
 
@@ -120,6 +157,19 @@ def test_atomic_state_roundtrip_and_validation(tmp_path: Path) -> None:
     assert not list(tmp_path.glob("*.tmp"))
     with pytest.raises(ValueError, match="settings differ"):
         frontier.load_state(tmp_path, {"workers": 8})
+
+    legacy = state(tmp_path)
+    legacy["config"].pop("scale")
+    frontier.save_state(tmp_path, legacy)
+    upgraded = frontier.load_state(
+        tmp_path,
+        {**legacy["config"], "scale": frontier.DEFAULT_RATIONALISATION_SCALE},
+    )
+    assert upgraded["config"]["scale"] == frontier.DEFAULT_RATIONALISATION_SCALE
+    assert upgraded["migrations"][-1]["from"] == frontier.LEGACY_RATIONALISATION_SCALE
+    assert upgraded["migrations"][-1]["to"] == frontier.DEFAULT_RATIONALISATION_SCALE
+
+    saved = state(tmp_path)
     saved["schema"] = 1
     frontier.save_state(tmp_path, saved)
     with pytest.raises(ValueError, match="incompatible frontier state schema"):
@@ -396,6 +446,9 @@ def test_heartbeat_reads_flushed_progress(tmp_path: Path) -> None:
         encoding="utf-8",
     )
     command = frontier.command(Fraction(793, 200), 40, frontier.DEFAULT_SEED, stage, 60)
+    assert command[command.index("--scale") + 1] == str(
+        frontier.DEFAULT_RATIONALISATION_SCALE
+    )
     assert frontier.heartbeat_message(command, stage / "stdout.log", 900) == (
         "[running] L=3.965000000 stage=deep(40) elapsed=15m "
         "last-round=23 lp-round=7 objective=12.00483"

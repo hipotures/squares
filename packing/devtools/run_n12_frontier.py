@@ -27,6 +27,8 @@ from typing import Any
 REPO = Path(__file__).resolve().parents[2]
 DEFAULT_SEED = REPO / "packing/cases/n12_fractional_certificate/certificate.json"
 SCHEMA = 2
+LEGACY_RATIONALISATION_SCALE = 200_000
+DEFAULT_RATIONALISATION_SCALE = 1_600_000
 STAGES = ("screen", "normal", "deep", "maximum")
 CSV_FIELDS = (
     "timestamp",
@@ -35,6 +37,7 @@ CSV_FIELDS = (
     "cycle",
     "stage",
     "budget",
+    "scale",
     "seed",
     "objective",
     "total_mass",
@@ -93,18 +96,39 @@ def load_state(root: Path, config: dict[str, Any] | None = None) -> dict[str, An
     state = json.loads((root / "state.json").read_text(encoding="utf-8"))
     if state.get("schema") != SCHEMA or state.get("n") != 12:
         raise ValueError("incompatible frontier state schema or n")
-    if config is not None and any(
-        state.get("config", {}).get(key) != config.get(key)
-        for key in (
-            "verified_low",
-            "search_high",
-            "seed_certificate",
-            "workers",
-            "budgets",
-            "row_rounds",
-        )
-    ):
-        raise ValueError("resume settings differ from the saved experiment")
+    if config is not None:
+        stored_config = state.get("config")
+        if not isinstance(stored_config, dict):
+            raise ValueError("invalid frontier state config")
+        if any(
+            stored_config.get(key) != config.get(key)
+            for key in (
+                "verified_low",
+                "search_high",
+                "seed_certificate",
+                "workers",
+                "budgets",
+                "row_rounds",
+            )
+        ):
+            raise ValueError("resume settings differ from the saved experiment")
+        requested_scale = config.get("scale")
+        stored_scale = stored_config.get("scale")
+        if stored_scale is None and requested_scale is not None:
+            # Schema-2 states written before the scale became configurable used
+            # 200000 unconditionally. Preserve that history in old stage results,
+            # then upgrade only future work to the requested nested refinement.
+            stored_config["scale"] = requested_scale
+            state.setdefault("migrations", []).append(
+                {
+                    "at": stamp(),
+                    "kind": "rationalisation-scale",
+                    "from": LEGACY_RATIONALISATION_SCALE,
+                    "to": requested_scale,
+                }
+            )
+        elif stored_scale != requested_scale:
+            raise ValueError("resume rationalisation scale differs from the saved experiment")
     low, high = Fraction(state["verified_low"]), Fraction(state["search_high"])
     if not low < high or not isinstance(state.get("cycles"), list):
         raise ValueError("invalid frontier state")
@@ -140,6 +164,47 @@ def soft_high(state: dict[str, Any]) -> Fraction:
     return min(active_unresolved(state), default=Fraction(state["search_high"]))
 
 
+def stage_scale(stage: dict[str, Any]) -> int | None:
+    """Rationalisation scale used by a stage, including legacy stage records."""
+
+    result = stage.get("result") or {}
+    settings = result.get("settings") if isinstance(result, dict) else None
+    if isinstance(settings, dict) and type(settings.get("scale")) is int:
+        return int(settings["scale"])
+    if type(stage.get("scale")) is int:
+        return int(stage["scale"])
+    command = stage.get("command")
+    if isinstance(command, list) and "--scale" in command:
+        try:
+            return int(command[command.index("--scale") + 1])
+        except (IndexError, TypeError, ValueError):
+            return None
+    return None
+
+
+def scale_limited_unresolved(cycle: dict[str, Any], target_scale: int) -> bool:
+    """Whether finer weight snapping can change this unresolved verdict."""
+
+    if cycle.get("status") != "UNRESOLVED":
+        return False
+    for stage in reversed(cycle.get("stages") or []):
+        result = stage.get("result") or {}
+        used_scale = stage_scale(stage)
+        objective = result.get("objective") if isinstance(result, dict) else None
+        mass = result.get("total_mass") if isinstance(result, dict) else None
+        if (
+            used_scale is not None
+            and used_scale < target_scale
+            and isinstance(objective, int | float)
+            and math.isfinite(objective)
+            and objective < 12
+            and mass is not None
+            and Fraction(mass) >= 12
+        ):
+            return True
+    return False
+
+
 def next_side(state: dict[str, Any]) -> Fraction | None:
     low = Fraction(state["verified_low"])
     ceiling = soft_high(state)
@@ -147,9 +212,16 @@ def next_side(state: dict[str, Any]) -> Fraction | None:
         return None
     # After a narrowing bracket, revisit a soft ceiling if a better verified
     # seed is now available.  A repeat at the same seed is never useful.
+    target_scale = int(
+        state.get("config", {}).get("scale", LEGACY_RATIONALISATION_SCALE)
+    )
     for cycle in reversed(state["cycles"]):
         if Fraction(cycle["side"]) == ceiling:
             if cycle["status"] == "UNRESOLVED":
+                # Retry the exact point before bisecting only when the floating
+                # LP is already below 12 and coarse upward snapping is the blocker.
+                if scale_limited_unresolved(cycle, target_scale):
+                    return ceiling
                 old_seed = Fraction(cycle.get("seed_verified_low", state["initial_low"]))
                 if low > old_seed and ceiling - low <= Fraction(state["initial_width"]) / 16:
                     return ceiling
@@ -262,6 +334,9 @@ def emit(root: Path, message: str) -> None:
 
 def seed_for(state: dict[str, Any], side: Fraction) -> tuple[Path, str]:
     verified = Path(state["verified_certificate"])
+    target_scale = int(
+        state.get("config", {}).get("scale", LEGACY_RATIONALISATION_SCALE)
+    )
     best_path, best_label, best_distance = (
         verified,
         f"verified@{state['verified_low']}",
@@ -274,18 +349,27 @@ def seed_for(state: dict[str, Any], side: Fraction) -> tuple[Path, str]:
                 continue
             candidate_side = Fraction(cycle["side"])
             distance = abs(side - candidate_side)
-            if distance >= best_distance or distance == 0:
+            used_scale = stage_scale(stage) or LEGACY_RATIONALISATION_SCALE
+            if distance == 0:
+                if used_scale >= target_scale:
+                    continue
+            elif distance >= best_distance:
                 continue
             best_path, best_label, best_distance = (
                 Path(path_text),
-                f"search-seed-only@{candidate_side}",
+                f"search-seed-only@{candidate_side}:scale{used_scale}",
                 distance,
             )
     return best_path, best_label
 
 
 def command(
-    side: Fraction, budget: int, seed: Path, directory: Path, row_rounds: int
+    side: Fraction,
+    budget: int,
+    seed: Path,
+    directory: Path,
+    row_rounds: int,
+    scale: int = DEFAULT_RATIONALISATION_SCALE,
 ) -> list[str]:
     return [
         sys.executable,
@@ -304,7 +388,7 @@ def command(
         "--grid-counts",
         "auto",
         "--scale",
-        "200000",
+        str(scale),
         "--support-cap",
         "32",
         "--column-rounds",
@@ -502,6 +586,7 @@ def write_views(root: Path, state: dict[str, Any]) -> None:
                     "cycle": index,
                     "stage": stage["name"],
                     "budget": stage["budget"],
+                    "scale": stage_scale(stage),
                     "seed": stage["seed_label"],
                     "objective": result.get("objective"),
                     "total_mass": result.get("total_mass"),
@@ -547,14 +632,14 @@ def write_views(root: Path, state: dict[str, Any]) -> None:
             "a positive full two-route exact decision."
         ),
         "",
-        "| Side | Status | Column rounds | Last objective | Reason |",
-        "| --- | --- | ---: | ---: | --- |",
+        "| Side | Status | Scale | Column rounds | Last objective | Reason |",
+        "| --- | --- | ---: | ---: | ---: | --- |",
     ]
     for cycle in state["cycles"]:
         last = cycle["stages"][-1] if cycle["stages"] else {}
         result = last.get("result") or {}
         lines.append(
-            f"| {cycle['side']} | {cycle['status']} | "
+            f"| {cycle['side']} | {cycle['status']} | {stage_scale(last) or ''} | "
             f"{cycle.get('column_rounds_completed', 0)} | {result.get('objective', '')} "
             f"| {cycle.get('reason', '')} |"
         )
@@ -787,11 +872,17 @@ def run_cycle(root: Path, state: dict[str, Any]) -> None:
             if previous is not None:
                 seed, label = Path(previous["candidate_unverified"]), f"search-seed-only@{side}"
             args = command(
-                side, budgets[stage_index], seed, stage_dir, state["config"]["row_rounds"]
+                side,
+                budgets[stage_index],
+                seed,
+                stage_dir,
+                state["config"]["row_rounds"],
+                int(state["config"]["scale"]),
             )
             generated = {
                 "name": name,
                 "budget": budgets[stage_index],
+                "scale": int(state["config"]["scale"]),
                 "directory": str(stage_dir),
                 "seed": str(seed),
                 "seed_label": label,
@@ -927,6 +1018,15 @@ def main(argv: list[str] | None = None) -> int:
         default=60,
         help="maximum inner row-generation rounds per column round",
     )
+    parser.add_argument(
+        "--scale",
+        type=int,
+        default=DEFAULT_RATIONALISATION_SCALE,
+        help=(
+            "weight rationalisation denominator; default 1600000 is an exact "
+            "8x refinement of the historical 200000 grid"
+        ),
+    )
     parser.add_argument("--target-width", type=Fraction)
     parser.add_argument("--max-cycles", type=int)
     parser.add_argument("--import-result", type=Path)
@@ -935,6 +1035,7 @@ def main(argv: list[str] | None = None) -> int:
     if (
         args.workers < 1
         or args.row_rounds < 1
+        or args.scale < 1
         or sorted(set(budgets)) != budgets
         or budgets[0] < 1
         or (args.max_cycles is not None and args.max_cycles < 1)
@@ -953,6 +1054,7 @@ def main(argv: list[str] | None = None) -> int:
         "workers": args.workers,
         "budgets": budgets,
         "row_rounds": args.row_rounds,
+        "scale": args.scale,
         "target_width": str(args.target_width) if args.target_width is not None else None,
         "max_cycles": args.max_cycles,
     }
@@ -986,7 +1088,7 @@ def main(argv: list[str] | None = None) -> int:
             os.environ["PACK_JOBS"] = str(args.workers)
             emit(
                 root,
-                f"[start] n=12 workers={args.workers} "
+                f"[start] n=12 workers={args.workers} scale={state['config']['scale']} "
                 f"verified={display(state['verified_low'])} "
                 f"search-high={display(state['search_high'])}",
             )
@@ -1048,6 +1150,17 @@ only a search seed. Budgets are additional restart budgets: the default
 8/20/40/60 schedule can request up to 128 column rounds across four runs,
 plus repeated inner row generation. State and report record the cumulative
 column rounds actually completed. No stage resumes solver internals.
+
+The runner uses `--scale 1600000` by default for rationalising LP weights. This
+is an exact 8x refinement of the historical 200000 grid and reduces the upward
+rounding tax without changing the LP search. A schema-2 state written before
+this option existed is migrated in place on `--resume`; old stages remain
+auditable at scale 200000. If the nearest UNRESOLVED point has LP objective
+below 12 but its coarse rationalised mass is at least 12, the upgraded runner
+retries that exact side at the finer scale before bisecting further and seeds
+the retry from the coarse candidate's sites. A point whose LP objective is
+itself above 12 is not retried merely because the scale grew.
+
 `--row-rounds` limits inner row generation per column round; a stage that does
 not converge there is UNRESOLVED regardless of its floating-point objective.
 An incomplete stage with
