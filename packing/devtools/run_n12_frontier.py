@@ -1065,14 +1065,14 @@ def run_cycle(root: Path, state: dict[str, Any]) -> None:
             else:
                 index = STAGES.index(generated["name"])
                 decision, reason = decide_stage(
-                result,
-                index,
-                budgets,
-                nearby=(
-                    soft_high(state) - Fraction(state["verified_low"])
-                    < Fraction(state["initial_width"]) / 4
-                ),
-            )
+                    result,
+                    index,
+                    budgets,
+                    nearby=(
+                        soft_high(state) - Fraction(state["verified_low"])
+                        < Fraction(state["initial_width"]) / 4
+                    ),
+                )
                 if verifier not in ("mass-not-below-12", "full-retainable"):
                     reason += f"; verifier={verifier}"
                     if decision == "SEARCH_FAILED":
