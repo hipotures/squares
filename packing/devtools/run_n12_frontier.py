@@ -355,6 +355,59 @@ def active_child(directory: Path) -> int | None:
     return None
 
 
+def latest_progress(directory: Path) -> tuple[str, str, str]:
+    """Read flushed logs for the latest column, LP round, and finite objective."""
+    column_round = "none"
+    lp_round = "none"
+    objective = "unknown"
+    column_log = directory / "column.log"
+    if column_log.exists():
+        for line in reversed(column_log.read_text(encoding="utf-8").splitlines()):
+            parts = line.split()
+            if len(parts) < 3 or parts[0] != "round" or not parts[1].endswith(":"):
+                continue
+            index = parts[1][:-1]
+            if not index.isdigit():
+                continue
+            column_round = index
+            for part in parts:
+                if part.startswith("objective="):
+                    objective = part.removeprefix("objective=")
+                    break
+            break
+    row_log = directory / "rows.log"
+    if row_log.exists():
+        for line in reversed(row_log.read_text(encoding="utf-8").splitlines()):
+            parts = line.split()
+            if len(parts) < 6 or not parts[0].lstrip("-").isdigit():
+                continue
+            lp_round = parts[0]
+            objective = parts[5]
+            break
+    try:
+        objective_float = float(objective)
+    except ValueError:
+        objective = "unknown"
+    else:
+        objective = f"{objective_float:.5f}" if math.isfinite(objective_float) else "unknown"
+    return column_round, lp_round, objective
+
+
+def heartbeat_message(args: list[str], output: Path, elapsed: float) -> str:
+    """One concise progress line for a long-running real subprocess."""
+    minutes = max(1, round(elapsed / 60))
+    if "--side" not in args or "--column-rounds" not in args:
+        return f"[running] {output.name} elapsed={minutes}m"
+    side = display(Fraction(args[args.index("--side") + 1]))
+    budget = args[args.index("--column-rounds") + 1]
+    stage = output.parent.name.split("-", 1)[0]
+    column_round, lp_round, objective = latest_progress(output.parent)
+    return (
+        f"[running] L={side} stage={stage}({budget}) elapsed={minutes}m "
+        f"last-round={column_round} lp-round={lp_round} objective={objective}"
+    )
+
+
 def run_child(args: list[str], output: Path, env: dict[str, str] | None = None) -> int:
     with output.open("w", encoding="utf-8") as handle:
         process = subprocess.Popen(
@@ -382,8 +435,7 @@ def run_child(args: list[str], output: Path, env: dict[str, str] | None = None) 
                 if output.parent.parent.name.startswith("cycle-"):
                     emit(
                         output.parents[3],
-                        f"[running] {output.parent.name}/{output.name} "
-                        f"elapsed={time.monotonic() - started:.0f}s",
+                        heartbeat_message(args, output, time.monotonic() - started),
                     )
 
 
@@ -986,7 +1038,8 @@ Use `--resume` after interruption. The lock prevents concurrent writers.
 Each subprocess records its PID and Linux process start identity beside its log.
 If a parent crash leaves a child alive, resume refuses to launch a duplicate
 until that child exits. SIGINT, SIGTERM, and SIGHUP request a graceful stop;
-long subprocesses emit a heartbeat every five minutes.
+long subprocesses emit a heartbeat every five minutes, including the latest
+flushed column round, LP round, and objective when available.
 
 A cycle is one side from screening through its final VERIFIED, SEARCH_FAILED, or
 UNRESOLVED decision. The first Ctrl-C finishes that cycle. Stage budgets rerun

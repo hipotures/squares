@@ -383,6 +383,49 @@ def test_resume_refuses_live_orphan_child(tmp_path: Path) -> None:
     assert (directory / "stdout.log.child.json").exists()
 
 
+def test_heartbeat_reads_flushed_progress(tmp_path: Path) -> None:
+    stage = tmp_path / "L-793-200/cycle-0001/deep-03"
+    stage.mkdir(parents=True)
+    (stage / "column.log").write_text(
+        "round 22: objective=12.01\nround 23: rows=100 objective=12.00600 | adding columns\n",
+        encoding="utf-8",
+    )
+    (stage / "rows.log").write_text(
+        "   lp rows added violated support objective sep_s lp_s\n"
+        "    7  100  4  5  80  12.004830  1.0  0.5\n",
+        encoding="utf-8",
+    )
+    command = frontier.command(Fraction(793, 200), 40, frontier.DEFAULT_SEED, stage, 60)
+    assert frontier.heartbeat_message(command, stage / "stdout.log", 900) == (
+        "[running] L=3.965000000 stage=deep(40) elapsed=15m "
+        "last-round=23 lp-round=7 objective=12.00483"
+    )
+
+
+def test_timeout_emits_heartbeat_to_terminal_and_runner_log(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    stage = tmp_path / "L-793-200/cycle-0001/deep-03"
+    stage.mkdir(parents=True)
+    (stage / "column.log").write_text("round 23: objective=12.004830\n", encoding="utf-8")
+
+    class Child:
+        pid = os.getpid()
+        calls = 0
+
+        def wait(self, *, timeout: int) -> int:
+            self.calls += 1
+            if self.calls == 1:
+                raise subprocess.TimeoutExpired("mock generator", timeout)
+            return 0
+
+    monkeypatch.setattr(frontier.subprocess, "Popen", lambda *_args, **_kwargs: Child())
+    args = frontier.command(Fraction(793, 200), 40, frontier.DEFAULT_SEED, stage, 60)
+    assert frontier.run_child(args, stage / "stdout.log") == 0
+    assert "[running] L=3.965000000 stage=deep(40)" in capsys.readouterr().out
+    assert "last-round=23" in (tmp_path / "runner.log").read_text(encoding="utf-8")
+
+
 def test_real_generator_one_cycle_and_resume(tmp_path: Path) -> None:
     """Exercise the real child CLI with a deliberately incomplete inner row budget."""
     packing = Path(__file__).resolve().parents[1]
@@ -419,6 +462,10 @@ def test_real_generator_one_cycle_and_resume(tmp_path: Path) -> None:
     stage = tmp_path / "L-403-100/cycle-0001/screen-01"
     for name in ("result.json", "stdout.log", "column.log", "rows.log", "metadata.json"):
         assert (stage / name).is_file()
+    metadata = json.loads((stage / "metadata.json").read_text(encoding="utf-8"))
+    progress = frontier.heartbeat_message(metadata["command"], stage / "stdout.log", 300)
+    assert "L=4.030000000 stage=screen(1) elapsed=5m last-round=0" in progress
+    assert "objective=unknown" not in progress
     assert not (stage / "candidate.unverified.json").exists()
     assert frontier.load_state(tmp_path)["cycles"][0]["column_rounds_completed"] == 1
     resumed = subprocess.run(
