@@ -1,6 +1,6 @@
 {
-  "phase": "D",
-  "status": "tests 1-7 complete; test 8 VM complete, physical-host half BLOCKED at Phase D checkpoint",
+  "phase": "final",
+  "status": "complete under host-access failure policy: tests 1-7 executed; test 8 VM executed, physical-host half BLOCKED",
   "starting_sha": "897b722f2997fbf09b99b1700787a0052270de30",
   "test01": {
     "workers": {
@@ -2529,5 +2529,57 @@
       "host_task": "test08-host-vm/HOST_AGENT_TASK.md",
       "shared_package": "/srv/ai/benchmarks/squares-cpu-penalty-test08/package.tar.gz"
     }
+  },
+  "final_synthesis": {
+    "primary_comparison": {
+      "worker_cpu_serial_s": 10.65,
+      "worker_cpu_16_s": 23.5,
+      "extra_worker_cpu_s": 12.85,
+      "cpu_inflation": 2.2065727699530515,
+      "instructions_ratio": 1.0455472538826633,
+      "cycles_ratio": 1.9511434208146083,
+      "ipc_serial": 1.615,
+      "ipc_16": 0.8651921065881452,
+      "dram_origin_fills_ratio": 16.703291589613606,
+      "scheduler_wait_delta_s": 0.5039398384999999
+    },
+    "independent_processes": {
+      "extra_cpu_s": 9.446,
+      "fraction_of_pool_extra_cpu": 0.7350972762645914,
+      "conclusion": "ProcessPool and feeder are not primary"
+    },
+    "causal_classification": {
+      "dominant": "more cycles for nearly the same instructions under shared cache and memory-system pressure",
+      "host_placement": "secondary, about 0.096 s separation wall saving in physical-core pinning control",
+      "all_core_throughput": "secondary; register-only target 13-17% slower under memory backgrounds",
+      "scheduler_wait": "not part of the 12.85 s extra counted worker CPU",
+      "TLB": "huge pages lower misses but do not improve 16-worker CPU",
+      "tails": "0.167-0.221 s observed final-half-idle window, tested schedulers have no reproducible saving",
+      "physical_ddr_saturation": "unproven without memory controller counters",
+      "native_host_comparison": "BLOCKED"
+    },
+    "test_verdicts": {
+      "1": "CONFIRMED: slower execution dominates",
+      "2": "WEAKLY SUPPORTED: secondary host placement cost",
+      "3": "REFUTED: ProcessPool primary cause",
+      "4": "STRONGLY SUPPORTED: phase interference",
+      "5": "STRONGLY SUPPORTED: active working set",
+      "6": "REFUTED: huge pages as wall optimization",
+      "7": "REFUTED: tested schedulers as material improvement",
+      "8": "BLOCKED: physical-host half; VM complete"
+    },
+    "next_cpu_action": {
+      "target": "64-row prefix strip, research-only paired full-solver integration test",
+      "bitwise_checks": 3620,
+      "w16_prefix_cpu_ms_current": 4.701212171503408,
+      "w16_prefix_cpu_ms_candidate": 4.152557835437938,
+      "kernel_saving_fraction": 0.11670486590483208,
+      "current_prefix_critical_path_proxy_s": 0.613,
+      "projected_solver_saving_s_unmeasured": 0.07154008279966206,
+      "absolute_zero_cost_prefix_ceiling_s": 0.613,
+      "serial_kernel_regression_fraction": 0.01571478831945594,
+      "caveat": "Projection is not measured end-to-end; no production change in this campaign"
+    },
+    "cpu_optimization_status": "NO CLEAR MATERIAL CPU OPTIMIZATION REMAINS"
   }
 }

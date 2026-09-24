@@ -351,3 +351,74 @@ The same 752 KiB lossless package and exact host task are available at
 **BLOCKED at this checkpoint** under the explicit host-access failure policy;
 no physical-host result or VM-specific causal attribution is claimed. Host
 results can be imported later without rerunning the verified VM control.
+
+## Final synthesis: why 16 workers consume 2.2× CPU
+
+The accepted production computation is unchanged. Test 1 compares the same 23-round, 4,163-direction separation replay at each worker count. At 16 workers it consumes 23.500 aggregate worker CPU-seconds versus 10.650 serial: **12.850 extra CPU-seconds, or 2.207×**. Instructions rise only 4.6% (94.99 → 99.32 billion); cycles rise 95.1% (58.83 → 114.79 billion), and IPC falls from 1.615 to 0.865. The extra CPU is predominantly less efficient execution of nearly the same instructions. Runnable scheduler wait adds about 0.504 seconds *outside* counted worker CPU; it cannot explain 12.850 extra worker CPU-seconds.
+
+At the serial measured cycle rate, the extra 55.96 billion cycles correspond to about 10.13 CPU-seconds. The remaining roughly 2.72 seconds in this **arithmetic counterfactual** reflect a lower effective counted-cycle rate at 16 workers (about 11.6% lower). This is not an independent causal attribution to frequency: placement, core mix, and PMU behavior can affect it. The phase interference experiment independently finds only 13–17% slowdown of a small register-only target under heavy backgrounds, while the memory-intensive kernels slow much more.
+
+### Cost decomposition
+
+Estimates below are deliberately **non-additive**. The same lost cycle may appear as cache pressure, memory interference, lower IPC, and a longer tail. The primary dependent variable is the extra 12.850 aggregate worker CPU-seconds; wall-only costs are labeled separately.
+
+| Cause | Evidence | Estimated contribution | Confidence |
+| --- | --- | ---: | --- |
+| Extra instructions / software work | 16-worker instructions 1.046× serial | About 0.5 CPU-s under equal per-instruction cost; small share | High for counter, low for causal conversion |
+| ProcessPool / runtime / IPC | Independent pinned processes retain 9.45 of 12.85 extra CPU-s (74%) | Difference of 3.33 CPU-s is a confounded comparative envelope, not an isolated pool cost | High that it is not primary; low for amount |
+| Guest scheduler wait | Runnable wait 0.009 → 0.513 s/replay | +0.504 s aggregate wait, outside worker CPU; wall contribution unresolved | High |
+| Host throttling / mapping | No recorded cgroup throttle; distinct physical-core pinning changes median wall 1.860 → 1.764 s | About 0.096 s wall and 1.11 worker CPU-s in that paired control | Medium |
+| All-core compute / frequency | Register-only target slows 13–17%; effective counted-cycle rate falls 11.6% | Roughly 2.72 CPU-s arithmetic counterfactual; attribution to frequency unresolved | Low–medium |
+| Shared cache / active capacity | Prefix inflation rises 1.17× at 2 MiB to 3.88× at 16 MiB; strips cut 16-worker kernel CPU 11.7% | Material part of extra cycles; cannot isolate seconds from memory effects | High for causality, low for absolute share |
+| Shared memory subsystem / bandwidth | DRAM-origin fills rise 16.7×; memory backgrounds strongly reduce IPC; different real inputs worsen prefix | Material and overlapping with cache; physical DDR throughput unmeasured | High for interference, low for DDR saturation |
+| TLB / address translation | Verified huge pages reduce DTLB misses 61% at 16 workers but CPU rises 3.8% | No measured positive 16-worker wall saving | High for negative intervention |
+| Load imbalance / tails | Workers active 83.5%; final half-idle window 0.167–0.221 s/replay; two schedulers have no repeatable gain | Window is at most 0.17–0.22 s wall, not recoverable saving; observed gain ~0 | Medium |
+| Other / unresolved | Host-vs-VM native comparison blocked at checkpoint; cache versus DDR cannot be separated by guest counters | Unquantified residual; do not force a percentage | Explicitly unresolved |
+
+### Same-replay scaling
+
+All values are median per full 23-round separation replay. Instructions and cycles are billion events; fills are million DRAM-origin cache-fill events. Enabled/running fraction was 100% for the cited perf groups. Full min/median/max/CV and raw receipts are in Test 1.
+
+| Workers | Wall (s) | Worker CPU (s) | Instructions (G) | Cycles (G) | IPC | Runnable wait (s) | DRAM fills (M) | Speedup | Efficiency | CPU inflation |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 1 | 10.655 | 10.650 | 94.99 | 58.83 | 1.615 | 0.009 | 20.48 | 1.00× | 100% | 1.00× |
+| 2 | 6.223 | 12.232 | 98.96 | 66.30 | 1.493 | 0.006 | 108.49 | 1.71× | 85.6% | 1.15× |
+| 4 | 3.799 | 14.530 | 98.30 | 77.03 | 1.276 | 0.006 | 312.11 | 2.80× | 70.1% | 1.36× |
+| 8 | 2.837 | 21.054 | 99.49 | 106.98 | 0.930 | 0.006 | 478.13 | 3.76× | 46.9% | 1.98× |
+| 16 | 1.819 | 23.500 | 99.32 | 114.79 | 0.865 | 0.513 | 342.15 | 5.86× | 36.6% | 2.21× |
+
+### Eight test verdicts
+
+| Test | Hypothesis | Result | Verdict | Confidence |
+| ---: | --- | --- | --- | --- |
+| 1 | Extra instructions versus slower execution | 4.6% more instructions, 95.1% more cycles, 2.21× worker CPU | **CONFIRMED:** slower execution dominates | High |
+| 2 | Host/vCPU scheduling is primary | Distinct physical-core pinning saves ~0.096 s separation wall; no cgroup throttle | **WEAKLY SUPPORTED:** secondary placement cost | Medium |
+| 3 | ProcessPool/feeder causes most inflation | 74% of extra CPU survives with independent pinned processes | **REFUTED:** not primary | High |
+| 4 | Concurrent phase interference | Prefix 3.87× under streaming peers; complete direction 2.21× under prefix peers; register 1.15× | **STRONGLY SUPPORTED** | High |
+| 5 | Active working set is causal | Size knees and 11.7% 16-worker bitwise row-strip kernel improvement | **STRONGLY SUPPORTED** | High |
+| 6 | TLB translation is a large wall target | Huge pages lower DTLB misses 61% but increase 16-worker CPU 3.8% | **REFUTED** as a simple wall optimization | High |
+| 7 | Tails / ordered waiting dominate | 0.17–0.22 s tail window, but cost-first and balanced schedules show no repeatable saving | **REFUTED** for tested schedules; some unavoidable tail remains | Medium |
+| 8 | Native host-vs-VM scaling | Verified VM native replay; direct host SSH timed out; no host sample supplied | **BLOCKED** (host half) | High for VM, none for host |
+
+### Answers to the ten causal questions
+
+1. **Why 2.2× CPU?** The same work executes with almost the same instruction count but nearly twice the cycles, plus a lower effective cycle rate. Memory-sensitive phases interfere under concurrency, and larger active working sets amplify the penalty.
+2. **Primary type?** More cycles per instruction from shared cache/memory pressure is the strongest explanation. Small software, host-placement, and general all-core effects coexist; scheduler wait is outside worker CPU.
+3. **Independent processes?** They retain 9.45 of the 12.85 extra CPU-seconds (74%), even without a pool, feeder, queue, or timed result transport.
+4. **Physical host?** Unresolved: the physical-host half of Test 8 is blocked. The verified package and fixed plan await execution by the PVE agent. The Phase A physical pinning control shows a secondary host-placement effect but cannot replace the host-native comparison.
+5. **DRAM-origin fills?** Yes: 20.48 million → 342.15 million per identical full replay, a 16.7× rise at 16 workers.
+6. **Physical DDR saturation?** Unproven. These fills indicate cache misses served from the memory system, not physical DDR bytes or controller utilization; no working UMC/DF PMU was exposed in the guest or host Phase A audit.
+7. **Cache/working set?** Causal in the tested kernels: size-dependent inflation and a bitwise-equal smaller active row strip reduce 16-worker prefix CPU 11.7%.
+8. **TLB?** It affects miss counts, but verified huge pages have no 16-worker wall/CPU gain in this control.
+9. **Task imbalance?** It leaves a measurable tail window, but neither tested scheduler reliably lowers complete replay wall.
+10. **Largest supported next target?** A 64-row prefix strip deserves at most one paired full-solver experiment. Its measured 11.7% kernel benefit is not a measured solver benefit.
+
+### Next CPU action
+
+**NO CLEAR MATERIAL CPU OPTIMIZATION REMAINS** at the current 3.052-second
+solver wall. The following is the only measured lead worth a bounded
+end-to-end check if savings below 0.1 second matter to the operator.
+
+The only implementation target supported by a positive semantically exact intervention is a **64-row strip for the row-major prefix**. It preserved bitwise output on 3,620 checks over 905 real grids and cut the 16-worker prefix kernel CPU from 4.701 to 4.153 ms/call. It regressed serial CPU 1.6%. The current solver's 16-worker prefix critical-path proxy is about 0.613 s, so the kernel percentage transferred unchanged would imply roughly 0.07 s, or 2–3% of a 3.052 s solver; that is an explicitly unmeasured projection. The absolute zero-cost prefix ceiling is 0.613 s. A separate small integration experiment should use paired long full-solver samples at workers 1 and 16 and retain only a reproducible end-to-end gain. Complexity is low-to-moderate; the risk is altered floating-point order or worse serial locality if the production implementation deviates from the bitwise prototype. No other tested intervention has a credible larger measured CPU gain.
+
+The campaign narrows the penalty to **shared-resource-sensitive execution of essentially the same instructions**, with smaller placement/general-throughput effects and limited recoverable scheduling overhead. Exact allocation between last-level cache capacity, memory-controller throughput, and any VM translation contribution remains unresolved pending the physical-host control.
