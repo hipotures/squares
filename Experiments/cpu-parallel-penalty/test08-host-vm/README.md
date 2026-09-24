@@ -39,3 +39,12 @@ times per endpoint on both host and VM. From this directory run
 `python3 tail-retest/summarize_combined.py` to regenerate
 `processed/summary-complete.json` from both
 plans. The combined summary is the authoritative host/VM comparison.
+
+The initial host/VM comparison motivated an additional matched physical
+placement control. The safe temporary PVE pinning scripts, before/during/after
+affinity receipts, three long native samples per 8/16-worker endpoint, and
+full-solver 8/16-worker benchmarks are preserved in
+`native-placement-control/` and `full-solver-placement/`. Regenerate their
+summary with `python3 native-placement-control/summarize.py` from this
+directory. The main report explains why the large native 8-worker placement
+gain is smaller in the full solver and does not beat default 16 workers.

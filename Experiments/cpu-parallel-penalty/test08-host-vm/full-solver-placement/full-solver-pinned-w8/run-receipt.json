@@ -1,0 +1,25 @@
+{
+  "pinned_marker_mtime_utc": "2026-09-24T07:57:29.776741+00:00",
+  "started_utc": "2026-09-24T07:57:48.932082+00:00",
+  "command": [
+    "taskset",
+    "-c",
+    "0-7",
+    "uv",
+    "run",
+    "--frozen",
+    "python",
+    "/home/user/DEV/squares/Experiments/cpu-post-integration-profile/scripts/baseline.py",
+    "--workers",
+    "8",
+    "--samples",
+    "3",
+    "--target-seconds",
+    "20",
+    "--output-dir",
+    "/home/user/DEV/squares/Experiments/cpu-parallel-penalty/test08-host-vm/full-solver-placement/full-solver-pinned-w8"
+  ],
+  "exit_code": 0,
+  "status": "complete",
+  "finished_utc": "2026-09-24T07:58:53.663243+00:00"
+}

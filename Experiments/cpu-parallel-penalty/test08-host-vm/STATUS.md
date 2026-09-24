@@ -24,7 +24,12 @@ preserved in `tail-retest/`.
 Physical PVE reproduces a large 16-worker CPU-time inflation (3.79× serial)
 for essentially the same instructions. The VM's 16-worker wall/CPU is similar
 in absolute terms, while its 8-worker endpoint is much slower than PVE.
-Host physical CPU placement differs from the guest vCPU's unpinned QEMU
-placement, so the 8-worker difference cannot be attributed specifically to
-virtualization. Neither machine exposes a working physical memory-controller
-PMU, so DDR saturation remains unproven.
+An additional controlled temporary host pin mapped VM vCPU `i` to PVE CPU
+`i`. At 8 workers the pinned VM native replay improved 3.44× and matched
+PVE within about 2% wall; all 16 original affinities were restored and
+verified. This identifies physical placement as the main source of the
+initial 8-worker host/VM gap. The complete pinned 8-worker solver saved
+0.700 s versus default 8 workers but remained 0.179 s slower than default
+16 workers. Neither machine exposes a working physical memory-controller
+PMU, so DDR saturation remains unproven. See
+`native-placement-control/processed/summary.json` and the main report.

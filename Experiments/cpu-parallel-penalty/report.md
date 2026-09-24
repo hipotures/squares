@@ -335,9 +335,36 @@ The VM wall CV across the three samples is 1.88%, 0.53%, 0.44%, 1.22%, and 4.86%
 
 **Physical-host reproduction:** at 16 workers the physical host needs 3.79× its serial aggregate CPU for essentially the same 2.66 billion instructions, with 3.94× the serial cycles. The VM is 4.73× its own serial CPU, but its 16-worker *absolute* wall, CPU, cycles, and DRAM-origin fills are similar to PVE. Thus a large 16-worker penalty exists without virtualization. The host/VM inflation-ratio difference is partly driven by the PVE serial baseline being 35% slower than the VM serial baseline; it must not be treated as a measured virtualization tax.
 
-**Placement qualification:** host workers are pinned to physical CPUs 0–15. CPUs 0–7 share one recorded L3 domain; CPUs 8–15 are in the other. The 8-worker host endpoint therefore uses only the first domain, while the 16-worker endpoint spans both. Guest workers are pinned to guest vCPUs, but the QEMU vCPU threads were not physically pinned for this native control. At 8 workers the VM consumes 3.40× the PVE worker CPU and has 6.66× the PVE DRAM-origin fills per replay; at 16 the VM and PVE are much closer. This is consistent with placement/cache-domain effects, but the experiment does **not** separate physical placement from nested translation or other VM effects at 8 workers. The earlier controlled host pinning test saved about 5% in the full 23-round replay, a different workload.
+**Placement qualification:** host workers are pinned to physical CPUs 0–15. CPUs 0–7 share one recorded L3 domain; CPUs 8–15 are in the other. The 8-worker host endpoint therefore uses only the first domain, while the 16-worker endpoint spans both. Guest workers are pinned to guest vCPUs, but the QEMU vCPU threads were initially free to migrate among physical host CPUs. At 8 workers the initial VM run consumed 3.40× the PVE worker CPU and had 6.66× the PVE DRAM-origin fills per replay. This discrepancy motivated the placement-matched causal control below.
 
 The host and guest expose the same AVX2-capable x86-64-v3 ISA target. Neither environment exposes a working AMD UMC/DF PMU device, so controller bandwidth and physical DDR saturation remain unproven. These native results are for one late round repeated, not the full 23-round production separation, and are used to identify mechanism rather than to substitute native wall for solver wall.
+
+## Placement-matched causal control and full-solver transfer
+
+The PVE agent repeated the earlier safe affinity protocol: it saved the exact original `0-31` affinity and thread identity of each of VM 207's 16 vCPU threads, pinned thread `i` to physical CPU `i`, verified all 16 mappings, installed an independent 8-minute auto-restore guard, then restored and verified every original affinity. The VM native replay ran entirely between the `PINNED` and `RESTORED` timestamps. The host affinity log and guest run receipts are under `test08-host-vm/native-placement-control/`; the processed audit is `native-placement-control/processed/summary.json`. Source/data/binary, x86-64-v3 flags, 350/620 repeat counts, and top-13 checksums are unchanged. All native samples lasted 14.96–57.10 seconds and perf events ran at 100% enabled time.
+
+| Native late-round replay | VM unpinned | VM physically pinned | Physical PVE |
+| --- | ---: | ---: | ---: |
+| 8-worker wall/replay | 0.14720 s | **0.04284 s** | 0.04366 s |
+| 8-worker worker CPU/replay | 1.14087 s | **0.33609 s** | 0.33580 s |
+| 8-worker cycles/replay | 5.998 G | **1.576 G** | 1.597 G |
+| 8-worker instructions/replay | 2.661 G | 2.656 G | 2.657 G |
+| 8-worker DRAM-origin fills/replay | 32.03 M | 6.12 M | 4.81 M |
+| 16-worker wall/replay | 0.08560 s | 0.09205 s | 0.09182 s |
+| 16-worker worker CPU/replay | 0.92160 s | 0.99651 s | 0.99745 s |
+
+The 8-worker VM native replay becomes **3.44× faster in wall** and uses **70.5% less worker CPU** when vCPUs 0–7 are placed on the same physical cores/L3 domain used by the host control. It then matches the physical host within about 2% in wall and 0.1% in worker CPU. Instructions remain essentially unchanged; cycles fall about 74%. This is direct causal evidence that physical vCPU placement, rather than intrinsic virtualization overhead, accounts for most of the initial 8-worker VM gap on this repeated late-round workload. At 16 workers, the physically pinned VM and physical host also match closely; the unpinned VM happens to be about 7% faster in this control. Placement is workload and worker-count dependent.
+
+To test practical transfer, the production n=12 solver was measured in three independent batches per condition. Every batch lasted 18.81–21.11 seconds and every one of **66 complete solves** reached 23 rounds, 5,842 rows, objective `12.217676366606236`, and the accepted stop reason. All 66 had the same 23-round decision trajectory (SHA-256 `7b845729210d31c6b12f5510b8ec78d609307130cd6ef1df61f6e0ac1ff1a0a9`). The pin control restricted the whole VM solver process tree to guest vCPUs 0–7 while PVE mapped those vCPUs to physical CPUs 0–7. A guest-only `taskset -c 0-7` control after physical affinity restoration isolates the need for host placement. The same production source was used throughout.
+
+| Full solver | Batch median (s) | Wall/solve median (s) | CV | Separation/solve (s) | LP/solve (s) |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 8 workers, default placement | 20.38 | 4.076 | 0.57% | 2.909 | 1.142 |
+| 8 workers, guest affinity only | 21.10 | 4.220 | 0.34% | 3.038 | 1.145 |
+| 8 workers, PVE + guest pinned to cores 0–7 | 20.26 | **3.376** | 0.28% | 2.155 | 1.193 |
+| 16 workers, default placement | 19.18 | **3.197** | 1.55% | 1.925 | 1.220 |
+
+Physical placement saves **0.700 s/solve (17.2%)** against default 8 workers and **0.845 s/solve (20.0%)** against guest affinity alone. The saving is in separation; LP is similar. Restricting only the guest process without physical PVE placement is slower than default, so a VM-side `taskset` command is not the solution. The physically placed 8-worker solver is still **0.179 s/solve (5.6%) slower** than the current 16-worker default. The late-round 3.44× gain therefore does not transfer proportionally to the heterogeneous 23-round solver. This control proves a real placement mechanism but does not justify changing the fastest current production worker configuration.
 
 ## Final synthesis: why 16 workers consume 2.2× CPU
 
@@ -354,13 +381,13 @@ Estimates below are deliberately **non-additive**. The same lost cycle may appea
 | Extra instructions / software work | 16-worker instructions 1.046× serial | About 0.5 CPU-s under equal per-instruction cost; small share | High for counter, low for causal conversion |
 | ProcessPool / runtime / IPC | Independent pinned processes retain 9.45 of 12.85 extra CPU-s (74%) | Difference of 3.33 CPU-s is a confounded comparative envelope, not an isolated pool cost | High that it is not primary; low for amount |
 | Guest scheduler wait | Runnable wait 0.009 → 0.513 s/replay | +0.504 s aggregate wait, outside worker CPU; wall contribution unresolved | High |
-| Host throttling / mapping | No recorded cgroup throttle; distinct physical-core pinning changes median wall 1.860 → 1.764 s | About 0.096 s wall and 1.11 worker CPU-s in that paired control | Medium |
+| Host throttling / mapping | No recorded cgroup throttle; 16-worker full replay pinning saves about 0.096 s separation wall; matched physical placement makes 8-worker native VM 3.44× faster and complete 8-worker solver 0.700 s faster | Strong at 8 workers, secondary at the current 16-worker setting; still no best-solver wall win | High for interventions; lower for extrapolation |
 | All-core compute / frequency | Register-only target slows 13–17%; effective counted-cycle rate falls 11.6% | Roughly 2.72 CPU-s arithmetic counterfactual; attribution to frequency unresolved | Low–medium |
 | Shared cache / active capacity | Prefix inflation rises 1.17× at 2 MiB to 3.88× at 16 MiB; strips cut 16-worker kernel CPU 11.7%; PVE's native 16-worker cycles rise 3.94× with constant instructions | Material part of extra cycles; cannot isolate seconds from memory effects | High for causality, low for absolute share |
 | Shared memory subsystem / bandwidth | DRAM-origin fills rise 16.7× in full VM replay; memory backgrounds strongly reduce IPC; PVE native 16-worker fills also rise sharply | Material and overlapping with cache; physical DDR throughput unmeasured | High for interference, low for DDR saturation |
 | TLB / address translation | Verified huge pages reduce DTLB misses 61% at 16 workers but CPU rises 3.8% | No measured positive 16-worker wall saving | High for negative intervention |
 | Load imbalance / tails | Workers active 83.5%; final half-idle window 0.167–0.221 s/replay; two schedulers have no repeatable gain | Window is at most 0.17–0.22 s wall, not recoverable saving; observed gain ~0 | Medium |
-| Other / unresolved | Physical host reproduces strong 16-worker native inflation; 8-worker host/VM difference is confounded by physical L3 placement; cache versus DDR cannot be separated by available counters | Unquantified residual; do not force a percentage | Explicitly unresolved |
+| Other / unresolved | Physical host reproduces strong 16-worker native inflation; matched placement resolves most of the initial 8-worker host/VM difference; cache versus DDR cannot be separated by available counters | Unquantified residual; do not force a percentage | Explicitly unresolved |
 
 ### Same-replay scaling
 
@@ -385,27 +412,32 @@ All values are median per full 23-round separation replay. Instructions and cycl
 | 5 | Active working set is causal | Size knees and 11.7% 16-worker bitwise row-strip kernel improvement | **STRONGLY SUPPORTED** | High |
 | 6 | TLB translation is a large wall target | Huge pages lower DTLB misses 61% but increase 16-worker CPU 3.8% | **REFUTED** as a simple wall optimization | High |
 | 7 | Tails / ordered waiting dominate | 0.17–0.22 s tail window, but cost-first and balanced schedules show no repeatable saving | **REFUTED** for tested schedules; some unavoidable tail remains | Medium |
-| 8 | Native host-vs-VM scaling | PVE native 16-worker CPU inflation 3.79×, VM 4.73×; absolute 16-worker CPU similar, but PVE scales much better at 8 | **STRONGLY SUPPORTED:** large 16-worker penalty exists physically; exact VM placement cost unresolved | High for physical reproduction; medium for attribution |
+| 8 | Native host-vs-VM scaling | PVE native 16-worker CPU inflation 3.79×; at 8 workers physical pinning makes VM 3.44× faster and match PVE within ~2% wall | **CONFIRMED:** physical penalty at 16 and placement cause of 8-worker gap | High for the native control |
 
 ### Answers to the ten causal questions
 
 1. **Why 2.2× CPU?** The same work executes with almost the same instruction count but nearly twice the cycles, plus a lower effective cycle rate. Memory-sensitive phases interfere under concurrency, and larger active working sets amplify the penalty.
 2. **Primary type?** More cycles per instruction from shared cache/memory pressure is the strongest explanation. Small software, host-placement, and general all-core effects coexist; scheduler wait is outside worker CPU.
 3. **Independent processes?** They retain 9.45 of the 12.85 extra CPU-seconds (74%), even without a pool, feeder, queue, or timed result transport.
-4. **Physical host?** Yes for the representative late-round native replay: 16 workers consume 3.79× PVE serial CPU with essentially constant instructions. PVE and VM have similar absolute 16-worker CPU and wall. The host's 8-worker penalty is much smaller, with physical L3 placement different from the guest's uncontrolled host placement.
+4. **Physical host?** Yes for the representative late-round native replay: 16 workers consume 3.79× PVE serial CPU with essentially constant instructions. PVE and VM have similar absolute 16-worker CPU and wall. At 8 workers, the VM's excess largely disappears when its vCPUs are physically matched to PVE's core/L3 placement.
 5. **DRAM-origin fills?** Yes: 20.48 million → 342.15 million per identical full replay, a 16.7× rise at 16 workers.
 6. **Physical DDR saturation?** Unproven. These fills indicate cache misses served from the memory system, not physical DDR bytes or controller utilization; no working UMC/DF PMU was exposed in the guest or host Phase A audit.
 7. **Cache/working set?** Causal in the tested kernels: size-dependent inflation and a bitwise-equal smaller active row strip reduce 16-worker prefix CPU 11.7%.
 8. **TLB?** It affects miss counts, but verified huge pages have no 16-worker wall/CPU gain in this control.
 9. **Task imbalance?** It leaves a measurable tail window, but neither tested scheduler reliably lowers complete replay wall.
-10. **Largest supported next target?** A 64-row prefix strip deserves at most one paired full-solver experiment. Its measured 11.7% kernel benefit is not a measured solver benefit.
+10. **Largest supported next target?** Physical affinity saves 0.700 s for the 8-worker full solver, but that variant remains 0.179 s slower than the current 16-worker default. For faster single solves, a 64-row prefix strip is the only small remaining code lead; its 11.7% kernel benefit is not a measured solver benefit.
 
 ### Next CPU action
 
-**NO CLEAR MATERIAL CPU OPTIMIZATION REMAINS** at the current 3.052-second
-solver wall. The following is the only measured lead worth a bounded
-end-to-end check if savings below 0.1 second matter to the operator.
+**NO CLEAR MATERIAL CPU OPTIMIZATION REMAINS for the fastest current 16-worker
+single solve.** A host-affinity policy gives a real 0.700-second gain versus
+default **8-worker** solves, but the pinned 8-worker result remains 0.179
+seconds slower than the contemporaneous default 16-worker solve. It may be
+valuable when saving eight worker slots matters; that throughput/capacity
+tradeoff was not measured. Guest affinity alone regresses wall. The following
+is the only code lead worth a bounded end-to-end check if savings below 0.1
+second matter to the operator.
 
 The only implementation target supported by a positive semantically exact intervention is a **64-row strip for the row-major prefix**. It preserved bitwise output on 3,620 checks over 905 real grids and cut the 16-worker prefix kernel CPU from 4.701 to 4.153 ms/call. It regressed serial CPU 1.6%. The current solver's 16-worker prefix critical-path proxy is about 0.613 s, so the kernel percentage transferred unchanged would imply roughly 0.07 s, or 2–3% of a 3.052 s solver; that is an explicitly unmeasured projection. The absolute zero-cost prefix ceiling is 0.613 s. A separate small integration experiment should use paired long full-solver samples at workers 1 and 16 and retain only a reproducible end-to-end gain. Complexity is low-to-moderate; the risk is altered floating-point order or worse serial locality if the production implementation deviates from the bitwise prototype. No other tested intervention has a credible larger measured CPU gain.
 
-The campaign narrows the penalty to **shared-resource-sensitive execution of essentially the same instructions**. The physical host reproduces a large 16-worker penalty, so virtualization is not required for it. VM placement/general-throughput effects and limited recoverable scheduling overhead coexist. Exact allocation between last-level cache capacity, memory-controller throughput, and the large 8-worker host/VM discrepancy remains unresolved; a placement-matched control would be required to attribute that discrepancy specifically to virtualization.
+The campaign narrows the penalty to **shared-resource-sensitive execution of essentially the same instructions**. The physical host reproduces a large 16-worker penalty, so virtualization is not required for it. At 8 workers, matching physical placement makes the VM's native wall and worker CPU agree closely with the host: physical vCPU placement is the dominant cause of that gap. The 8-worker full solver improves but remains slower than the current 16-worker default. Exact allocation between last-level cache capacity and memory-controller throughput remains unresolved because neither machine exposes physical DDR counters.

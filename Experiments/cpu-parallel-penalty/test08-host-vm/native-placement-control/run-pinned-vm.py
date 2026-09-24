@@ -25,12 +25,14 @@ def main():
         raise RuntimeError("PVE has not published NATIVE_PINNED")
     if (SHARED / "NATIVE_RESTORE").exists():
         raise RuntimeError("PVE restore marker already exists")
-    pinned_at = dt.datetime.fromisoformat(marker.read_text().strip())
+    # The host may publish its marker with root-only permissions through
+    # virtiofs. Its mtime is readable and sufficient for the freshness gate.
+    pinned_at = dt.datetime.fromtimestamp(marker.stat().st_mtime, dt.timezone.utc)
     age = (dt.datetime.now(dt.timezone.utc) - pinned_at).total_seconds()
     if not 0 <= age <= 90:
         raise RuntimeError(f"PVE pin marker is stale: {age:.1f} seconds")
     OUT.mkdir(parents=True, exist_ok=True)
-    receipt = {"pinned_marker": marker.read_text().strip(),
+    receipt = {"pinned_marker_mtime_utc": pinned_at.isoformat(),
                "started_utc": timestamp(), "endpoints": []}
     environment = dict(os.environ, OMP_NUM_THREADS="1", OPENBLAS_NUM_THREADS="1",
                        MKL_NUM_THREADS="1")

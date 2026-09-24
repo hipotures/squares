@@ -1,0 +1,16 @@
+pid 2459's current affinity list: 0
+pid 2460's current affinity list: 1
+pid 2461's current affinity list: 2
+pid 2462's current affinity list: 3
+pid 2463's current affinity list: 4
+pid 2464's current affinity list: 5
+pid 2465's current affinity list: 6
+pid 2466's current affinity list: 7
+pid 2467's current affinity list: 8
+pid 2468's current affinity list: 9
+pid 2469's current affinity list: 10
+pid 2470's current affinity list: 11
+pid 2471's current affinity list: 12
+pid 2472's current affinity list: 13
+pid 2473's current affinity list: 14
+pid 2474's current affinity list: 15

@@ -1,0 +1,36 @@
+{
+  "pinned_marker_mtime_utc": "2026-09-24T07:45:54.304925+00:00",
+  "started_utc": "2026-09-24T07:47:12.031432+00:00",
+  "endpoints": [
+    {
+      "workers": 8,
+      "command": [
+        "/usr/bin/python3",
+        "/home/user/DEV/squares/Experiments/cpu-parallel-penalty/test08-host-vm/tail-retest/package/run.py",
+        "--outdir",
+        "/home/user/DEV/squares/Experiments/cpu-parallel-penalty/test08-host-vm/native-placement-control/vm-results",
+        "--only",
+        "8"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 48.47946757099999,
+      "ended_utc": "2026-09-24T07:48:00.510926+00:00"
+    },
+    {
+      "workers": 16,
+      "command": [
+        "/usr/bin/python3",
+        "/home/user/DEV/squares/Experiments/cpu-parallel-penalty/test08-host-vm/tail-retest/package/run.py",
+        "--outdir",
+        "/home/user/DEV/squares/Experiments/cpu-parallel-penalty/test08-host-vm/native-placement-control/vm-results",
+        "--only",
+        "16"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 172.80179257701093,
+      "ended_utc": "2026-09-24T07:50:53.312742+00:00"
+    }
+  ],
+  "status": "complete",
+  "finished_utc": "2026-09-24T07:50:53.312761+00:00"
+}

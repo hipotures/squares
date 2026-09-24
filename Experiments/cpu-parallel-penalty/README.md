@@ -20,6 +20,12 @@ host-access-blocked checkpoint. The first PVE 8-worker batch was under the
 with a revised identical fixed plan. The final comparison is in
 `test08-host-vm/processed/summary-complete.json`.
 
+The subsequent placement-matched control is under
+`test08-host-vm/native-placement-control/` and
+`test08-host-vm/full-solver-placement/`. Physical vCPU pinning explains the
+large 8-worker native VM/PVE gap. The complete pinned 8-worker solver saves
+0.700 s versus default 8 workers, but default 16 workers remains fastest.
+
 The retained replay inputs are referenced from
 `Experiments/cpu-post-integration-profile/raw/current-states.npz`; no copy is
 needed here. The existing complete-replay driver is

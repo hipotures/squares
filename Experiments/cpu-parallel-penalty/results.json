@@ -2713,7 +2713,120 @@
       "compiler_versions_differ": true,
       "host_vs_vm_instructions_per_replay_within_fraction": 0.0014
     },
-    "interpretation": "Physical host reproduces a large 16-worker penalty (3.79x CPU inflation); VM 16-worker absolute wall/CPU is similar. Large 8-worker difference is confounded by physical L3 domain placement of host CPUs 0-7 versus unpinned QEMU vCPU threads."
+    "interpretation": "Physical PVE reproduces strong 16-worker CPU penalty. Matching VM vCPU i to PVE CPU i explains most of initial 8-worker native VM/PVE gap (3.44x VM wall improvement, 70.5% worker CPU reduction); complete 8-worker solver saves 0.700 s versus default 8 but remains 0.179 s slower than default 16.",
+    "placement_matched_control": {
+      "processed_file": "test08-host-vm/native-placement-control/processed/summary.json",
+      "affinity_verified": {
+        "native": {
+          "original_verified": true,
+          "pinned_verified": true,
+          "restored_verified": true,
+          "pinned_at": "2026-09-24T09:45:54+02:00",
+          "restored_at": "2026-09-24T09:50:53+02:00"
+        },
+        "full_solver": {
+          "original_verified": true,
+          "pinned_verified": true,
+          "restored_verified": true,
+          "pinned_at": "2026-09-24T09:57:29+02:00",
+          "restored_at": "2026-09-24T09:58:53+02:00"
+        }
+      },
+      "native_8": {
+        "vm_unpinned": {
+          "wall_per_replay": 0.14720447114857144,
+          "worker_cpu_per_replay": 1.14086702642,
+          "cycles_per_replay": 5998309794.411428,
+          "instructions_per_replay": 2661072242.3142858,
+          "dram_origin_fills_per_replay": 32031433.165714286
+        },
+        "vm_pinned": {
+          "wall_per_replay": 0.04284175560285714,
+          "worker_cpu_per_replay": 0.33609169172285713,
+          "cycles_per_replay": 1575918894.9685714,
+          "instructions_per_replay": 2656053347.254286,
+          "dram_origin_fills_per_replay": 6121031.557142857
+        },
+        "physical_pve": {
+          "wall_per_replay": 0.04366341385428572,
+          "worker_cpu_per_replay": 0.33579557332,
+          "cycles_per_replay": 1597043600.44,
+          "instructions_per_replay": 2657229594.714286,
+          "dram_origin_fills_per_replay": 4805600.505714286
+        }
+      },
+      "native_16": {
+        "vm_unpinned": {
+          "wall_per_replay": 0.08559755582741935,
+          "worker_cpu_per_replay": 0.9216042486354838
+        },
+        "vm_pinned": {
+          "wall_per_replay": 0.0920455002032258,
+          "worker_cpu_per_replay": 0.9965137028467741
+        },
+        "physical_pve": {
+          "wall_per_replay": 0.09182241239032259,
+          "worker_cpu_per_replay": 0.9974469260983871
+        }
+      },
+      "derived": {
+        "native_w8_wall_speedup_pinned_vs_unpinned": 3.436004642600461,
+        "native_w8_cpu_saving_fraction": 0.7054067792830327,
+        "solver_w8_wall_saving_vs_default": 0.6999330524020477,
+        "solver_w8_wall_saving_vs_guest_affinity_only": 0.8446247925996433,
+        "solver_pinned_w8_minus_default_w16": 0.1790900863319016
+      }
+    },
+    "full_solver_placement": {
+      "w8_default": {
+        "wall_per_solve": 4.075736723400769,
+        "separation_per_solve": 2.9092000000000002,
+        "lp_per_solve": 1.1416,
+        "batch_wall_min": 20.35338400299952,
+        "batch_wall_median": 20.378683617003844,
+        "batch_wall_max": 20.61139916999673,
+        "batch_wall_cv": 0.005679165732371476,
+        "correct_solves": 15
+      },
+      "w8_guest_affinity_only": {
+        "wall_per_solve": 4.220428463598364,
+        "separation_per_solve": 3.0382,
+        "lp_per_solve": 1.1445999999999998,
+        "batch_wall_min": 20.954384075987036,
+        "batch_wall_median": 21.10214231799182,
+        "batch_wall_max": 21.110092329006875,
+        "batch_wall_cv": 0.0034005936984498842,
+        "correct_solves": 15
+      },
+      "w8_host_and_guest_pinned": {
+        "wall_per_solve": 3.375803670998721,
+        "separation_per_solve": 2.1546666666666665,
+        "lp_per_solve": 1.1933333333333334,
+        "batch_wall_min": 20.2165291190031,
+        "batch_wall_median": 20.254822025992326,
+        "batch_wall_max": 20.351135801000055,
+        "batch_wall_cv": 0.002793163737562312,
+        "correct_solves": 18
+      },
+      "w16_default": {
+        "wall_per_solve": 3.1967135846668193,
+        "separation_per_solve": 1.9245,
+        "lp_per_solve": 1.2198333333333333,
+        "batch_wall_min": 18.80665085700457,
+        "batch_wall_median": 19.180281508000917,
+        "batch_wall_max": 19.535816187999444,
+        "batch_wall_cv": 0.015526607965253555,
+        "correct_solves": 18
+      }
+    },
+    "full_solver_correctness": {
+      "solves": 66,
+      "rounds": 23,
+      "rows": 5842,
+      "objective": 12.217676366606236,
+      "trajectories_identical": true,
+      "trajectory_sha256": "7b845729210d31c6b12f5510b8ec78d609307130cd6ef1df61f6e0ac1ff1a0a9"
+    }
   },
   "final_synthesis": {
     "primary_comparison": {
@@ -2742,7 +2855,7 @@
       "tails": "0.167-0.221 s observed final-half-idle window, tested schedulers have no reproducible saving",
       "physical_ddr_saturation": "unproven without memory controller counters",
       "native_host_comparison": "Physical PVE reproduces strong 16-worker CPU inflation, 3.79x serial; VM 4.73x serial, similar absolute 16-worker wall/CPU",
-      "host_vm_8_worker_gap": "VM CPU 3.40x PVE CPU per native replay at 8 workers; physical L3 placement differs, so virtualization-specific share unresolved"
+      "host_vm_8_worker_gap": "Physical host mapping is causal: matched VM native 8-worker wall 0.04284 s/replay versus unpinned 0.14720 and host 0.04366; instructions unchanged."
     },
     "test_verdicts": {
       "1": "CONFIRMED: slower execution dominates",
@@ -2752,7 +2865,7 @@
       "5": "STRONGLY SUPPORTED: active working set",
       "6": "REFUTED: huge pages as wall optimization",
       "7": "REFUTED: tested schedulers as material improvement",
-      "8": "STRONGLY SUPPORTED: large 16-worker penalty exists on physical host; exact 8-worker VM excess unresolved"
+      "8": "CONFIRMED: physical PVE reproduces 16-worker penalty and matched placement resolves most native 8-worker VM excess"
     },
     "next_cpu_action": {
       "target": "64-row prefix strip, research-only paired full-solver integration test",
@@ -2764,8 +2877,14 @@
       "projected_solver_saving_s_unmeasured": 0.07154008279966206,
       "absolute_zero_cost_prefix_ceiling_s": 0.613,
       "serial_kernel_regression_fraction": 0.01571478831945594,
-      "caveat": "Projection is not measured end-to-end; no production change in this campaign"
+      "caveat": "Projection is not measured end-to-end; no production change in this campaign",
+      "host_affinity_control": {
+        "full_solver_w8_default_wall_s": 4.075736723400769,
+        "full_solver_w8_physically_pinned_wall_s": 3.375803670998721,
+        "full_solver_w16_default_wall_s": 3.1967135846668193,
+        "verdict": "Useful 8-worker efficiency tradeoff, no best single-solve wall gain; not a merge candidate for speed alone."
+      }
     },
-    "cpu_optimization_status": "NO CLEAR MATERIAL CPU OPTIMIZATION REMAINS"
+    "cpu_optimization_status": "NO CLEAR MATERIAL CPU OPTIMIZATION REMAINS for fastest default 16-worker solver; pinned 8 workers save 0.700 s versus default 8 but remain 0.179 s slower than default 16"
   }
 }

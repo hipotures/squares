@@ -1,0 +1,3 @@
+{"workers": 8, "sample": 1, "batch_wall": 20.255, "per_solve": 3.376, "separation": 2.139, "lp": 1.193}
+{"workers": 8, "sample": 2, "batch_wall": 20.351, "per_solve": 3.392, "separation": 2.155, "lp": 1.195}
+{"workers": 8, "sample": 3, "batch_wall": 20.217, "per_solve": 3.369, "separation": 2.155, "lp": 1.175}
