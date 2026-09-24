@@ -1,0 +1,68 @@
+{
+  "sample_files": 15,
+  "traces": 12,
+  "timeline_counts": {
+    "cost-first-w16-pair1-s1.json.gz": {
+      "rounds": 23,
+      "chunks": 1058,
+      "directions": 4163
+    },
+    "cost-first-w16-pair2-s1.json.gz": {
+      "rounds": 23,
+      "chunks": 1058,
+      "directions": 4163
+    },
+    "cost-first-w16-pair3-s1.json.gz": {
+      "rounds": 23,
+      "chunks": 1058,
+      "directions": 4163
+    },
+    "ordered-w16-pair1-s1.json.gz": {
+      "rounds": 23,
+      "chunks": 1058,
+      "directions": 4163
+    },
+    "ordered-w16-pair2-s1.json.gz": {
+      "rounds": 23,
+      "chunks": 1058,
+      "directions": 4163
+    },
+    "ordered-w16-pair3-s1.json.gz": {
+      "rounds": 23,
+      "chunks": 1058,
+      "directions": 4163
+    },
+    "balanced-w16-balance1-s1.json.gz": {
+      "rounds": 23,
+      "chunks": 1058,
+      "directions": 4163
+    },
+    "balanced-w16-balance2-s1.json.gz": {
+      "rounds": 23,
+      "chunks": 1058,
+      "directions": 4163
+    },
+    "balanced-w16-balance3-s1.json.gz": {
+      "rounds": 23,
+      "chunks": 1058,
+      "directions": 4163
+    },
+    "ordered-w16-balance1-s1.json.gz": {
+      "rounds": 23,
+      "chunks": 1058,
+      "directions": 4163
+    },
+    "ordered-w16-balance2-s1.json.gz": {
+      "rounds": 23,
+      "chunks": 1058,
+      "directions": 4163
+    },
+    "ordered-w16-balance3-s1.json.gz": {
+      "rounds": 23,
+      "chunks": 1058,
+      "directions": 4163
+    }
+  },
+  "timestamp_order_anomalies": [],
+  "passed": true
+}

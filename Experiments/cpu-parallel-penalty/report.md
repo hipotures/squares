@@ -2,7 +2,7 @@
 
 Research starting point: `897b722f2997fbf09b99b1700787a0052270de30`
 on `main`; accepted production integration `011aa1b5` is an ancestor.
-Phases A and B are complete. Tests 7–8 and final synthesis remain pending.
+Phases A–C are complete. Test 8 and final synthesis remain pending.
 
 ## Phase A evidence so far
 
@@ -237,5 +237,73 @@ straightforward wall-time solution to the 16-worker penalty.
 | Allocation/page churn | Prefaulted normal and huge buffers have similar small timed minor faults | **WEAKLY SUPPORTED** at most for this control; whole replay unresolved |
 
 The shared-cache and memory-subsystem rows overlap; they are not additive
-parts of the 12.85-second worker-CPU increase. Phase C will quantify
-scheduling tails before any final attribution.
+parts of the 12.85-second worker-CPU increase. Phase C below quantifies
+scheduling tails before final attribution.
+
+## Phase C: complete task timeline and scheduling controls
+
+Test 7 replayed all 23 accepted rounds and 181 directions per round with the
+production four-direction chunk shape. Its explicit-future control recorded
+all 46 chunks each round: parent ready/submission, worker start/finish and
+CPU, grid dimensions, future-ready callback, parent receive, and consume end.
+The worker wraps `event_grid` only to observe grid dimensions and calls the
+production function unchanged. All tested modes returned exactly 5,842
+rows and the accepted direction, centre, and matrix SHA-256 hashes; the
+balanced mode restores original direction order before row insertion.
+
+Every final sample repeated whole 23-round replays for 19.88–22.61 seconds;
+three independent samples were taken per endpoint. The first full replay in
+each sample retains every chunk timestamp as compressed JSON. An adjacent
+unmodified `pool.map` control quantifies the instrumentation difference:
+
+| Mode | Wall/replay median (s) | Min–max (s) | CV | Worker CPU/replay (s) |
+| --- | ---: | ---: | ---: | ---: |
+| Production `pool.map` | 1.850 | 1.796–1.857 | 1.5% | 24.212 |
+| Explicit futures, production order | 1.931 | 1.852–1.988 | 2.9% | 24.991 |
+| Expensive chunks submitted first | 1.959 | 1.860–2.033 | 3.6% | 25.568 |
+
+The explicit-future timeline costs about 0.081 s/replay (4.4%) versus the
+production replay at the medians. Absolute timeline phase percentages are
+therefore descriptive; scheduling candidates are compared to the similarly
+instrumented control. Previous-round cell count predicted actual chunk
+duration only moderately (median within-round correlation about 0.35).
+
+Across the three 23-round control traces, workers were busy for 82.3–84.1%
+of the aggregate first-start-to-last-finish span (median 83.5%). The summed
+window from the point when half the workers had completed their last chunk
+to the last worker finish was 0.167–0.221 s per replay (median 0.167 s),
+roughly 8–11% of the traced wall. Round zero is the single largest round in
+the representative trace (0.346 s, versus 1.999 s summed over 23 rounds);
+its longest chunk ran 0.190 s. The full per-round active-worker histograms,
+slowest chunks, tail windows, and parent time are in
+`test07-timeline/processed/summary.json`.
+
+For the same representative traces, parent `Future.result()` waits summed
+to 1.75 s/replay, while row reconstruction took about 0.21 s. The median
+future-ready-to-consume delay per chunk was 2.5 ms and its 95th percentile
+was 31 ms. About 1.29 s of wait intervals overlapped with at least one
+later chunk already ready. This is an **ordered-wait observation, not 1.29 s
+of removable wall**: the unfinished earlier chunk still must complete, and
+later row processing cannot be committed out of original order without
+preserving the deduplication contract. These intervals overlap worker
+computation, the tail window, and each other as causal explanations.
+
+Two research-only scheduling variants were tested on three adjacent long
+pairs each:
+
+| Variant | Method | Paired savings vs ordered control (s/replay) | Median saving | Result |
+| --- | --- | --- | ---: | --- |
+| Cost-first | Same consecutive groups; submit larger prior-round grids first | −0.181, −0.028, +0.127 | −0.028 | No reproducible gain; ready-to-consume delay rose |
+| Balanced | Pack directions by prior-round grid size into four-item groups; consume directions in original order | +0.053, −0.048, −0.032 | −0.032 | No reproducible gain |
+
+In the balanced comparison, the observed tail-after-half window fell from
+0.213 to 0.178 s median and worker-span utilization rose from 82.3% to
+84.2%, yet total wall did not improve (ordered 1.822 s, balanced 1.852 s
+medians). This directly shows why the tail window is only an upper bound on
+a scheduling win. At this checkpoint **no positive wall saving from the
+tested schedulers is established**. A perfect scheduler that removed the
+entire 0.17–0.22 s tail window could at most affect about 9–12% of the
+traced separation wall, and some of that window contains necessary final
+computation. The measured recoverable share is approximately zero within
+the 0.03–0.18 s pair-to-pair VM variation. Do not add the ordered-wait and
+tail figures.

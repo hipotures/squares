@@ -8,11 +8,13 @@ Production source is not edited. Existing user deletions and unrelated
 untracked files are excluded from research commits.
 
 The four required checkpoints are Phase A (Tests 1–3), Phase B (Tests 4–6),
-Phase C (Test 7), and Phase D (Test 8). Phases A and B are complete. Each
+Phase C (Test 7), and Phase D (Test 8). Phases A–C are complete. Each
 phase's raw evidence, scripts, processed values, and interpretation is
 committed and pushed before the next phase begins. Controlled runs use one
 thread each for OpenMP, OpenBLAS, and MKL, with three 20–40-second samples
 for final comparisons.
+
+Test 8 is the remaining host/VM control.
 
 The retained replay inputs are referenced from
 `Experiments/cpu-post-integration-profile/raw/current-states.npz`; no copy is

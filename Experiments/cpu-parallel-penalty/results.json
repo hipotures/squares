@@ -1,6 +1,6 @@
 {
-  "phase": "B",
-  "status": "tests 1-6 complete; tests 7-8 pending",
+  "phase": "C",
+  "status": "tests 1-7 complete; test 8 pending",
   "starting_sha": "897b722f2997fbf09b99b1700787a0052270de30",
   "test01": {
     "workers": {
@@ -2450,6 +2450,29 @@
     "huge_vs_normal_dtlb_miss_ratio": {
       "1": 0.21568196815742469,
       "16": 0.38722943419112094
+    }
+  },
+  "test07": {
+    "processed_file": "test07-timeline/processed/summary.json",
+    "production_wall_median": 1.8498604150002695,
+    "instrumented_wall_median": 1.9305090600914396,
+    "worker_utilization_median": 0.8346508290488837,
+    "tail_after_half_seconds_median": 0.16687091498170048,
+    "head_of_line_wait_seconds_median": 1.2940739571349695,
+    "cost_first_paired_savings": [
+      -0.18094666353651756,
+      -0.028413826908614492,
+      0.12743887948183152
+    ],
+    "balanced_paired_savings": [
+      0.05269249028044043,
+      -0.04817052055334359,
+      -0.032465993159183304
+    ],
+    "accepted_hashes": {
+      "directions_sha256": "eb0fa9b2d63a27376ca5c20c3c2f33a21d536c994e89bb32fb4ff7b2be99a681",
+      "centres_sha256": "fd9d18e922c4fe7700e31934c0cf697a977986dea5a87a14d2aab0dd9227ab9b",
+      "matrix_sha256": "f7fc2882f5f80bafa94c8d386cc03f4fe4f9e38748d12f2d5840c10aac455e38"
     }
   }
 }
